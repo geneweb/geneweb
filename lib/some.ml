@@ -15,11 +15,7 @@ module AliasCache = struct
   let get_alias iper = try Hashtbl.find cache iper with Not_found -> None
 end
 
-module PerSet = Set.Make (struct
-  type t = Driver.iper
-
-  let compare = compare
-end)
+module PerSet = Driver.Iper.Set
 
 let name_unaccent s =
   let rec copy i len =
@@ -46,108 +42,69 @@ let first_name_not_found conf =
 
 let surname_not_found conf = not_found conf (transl conf "surname not found")
 
-(* **********************************************************************)
-(*  [Fonc] print_branch_to_alphabetic : conf -> string -> int -> unit   *)
+let print_display_mode_navigation conf ~current_mode ~name ?branch_count () =
+  let is_absolute = p_getenv conf.env "t" = Some "A" in
+  let t_suffix = if is_absolute then "&t=A" else "" in
+  let branch_label = transl_nth conf "display by/branch/alphabetic order" 1 in
+  let alpha_label = transl_nth conf "display by/branch/alphabetic order" 2 in
+  let print_mode_item ~icon ~label ~url_opt ~count_opt =
+    Output.printf conf {|<i class="fa %s ml-3 mr-1"></i>|} icon;
+    match url_opt with
+    | Some url -> (
+        Output.printf conf {|<a href="%s%s%s&v=%s" rel="nofollow">%s</a>|}
+          (commd conf :> string)
+          url t_suffix
+          (Mutil.encode name :> string)
+          label;
+        match count_opt with
+        | Some n -> Output.printf conf " (%d)" n
+        | None -> ())
+    | None -> (
+        Output.print_sstring conf label;
+        match count_opt with
+        | Some n -> Output.printf conf " (%d)" n
+        | None -> ())
+  in
+  Output.print_sstring conf "<div class=\"mb-3\">";
+  Output.print_sstring conf
+    (Utf8.capitalize_fst
+       (transl_nth conf "display by/branch/alphabetic order" 0));
+  (match current_mode with
+  | `Branch ->
+      print_mode_item ~icon:"fa-code-fork" ~label:branch_label ~url_opt:None
+        ~count_opt:branch_count;
+      print_mode_item ~icon:"fa-arrow-down-a-z" ~label:alpha_label
+        ~url_opt:(Some "m=N&o=i&t=N") ~count_opt:None
+  | `Alphabetic ->
+      let branch_url = if is_absolute then "m=N" else "m=NG&sn" in
+      print_mode_item ~icon:"fa-code-fork" ~label:branch_label
+        ~url_opt:(Some branch_url) ~count_opt:None;
+      print_mode_item ~icon:"fa-arrow-down-a-z" ~label:alpha_label ~url_opt:None
+        ~count_opt:None);
+  Output.print_sstring conf "</div>"
 
-(* ******************************************************************** *)
-
-(** [Description] : A partir de l'affichage par branches, permet d'afficher les
-    liens pour un affichage par ordre alphabétique. [Args] :
-    - conf : configuration de la base
-    - base : base
-    - x : 'nom/prénom/sosa...' recherché
-    - nb_branch : nombre de branches dans le résultat de la recherche [Retour] :
-      Néant [Rem] : Non exporté en clair hors de ce module. *)
 let print_branch_to_alphabetic conf x nb_branch =
-  Output.print_sstring conf "<div class=\"mb-3\">";
-  Output.print_sstring conf
-    (Utf8.capitalize_fst
-       (transl_nth conf "display by/branch/alphabetic order" 0));
-  Output.print_sstring conf "<i class=\"fa fa-code-fork ml-3 mr-1\"></i>";
-  Output.print_sstring conf
-    (transl_nth conf "display by/branch/alphabetic order" 1);
-  Output.print_sstring conf " (";
-  Output.print_sstring conf (string_of_int nb_branch);
-  Output.print_sstring conf ")<i class=\"fa fa-arrow-down-a-z ml-3 mr-1\"></i>";
-  (* Ne pas oublier l'attribut nofollow pour les robots *)
-  if p_getenv conf.env "t" = Some "A" then (
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf "m=N&o=i&t=A&v=";
-    Output.print_string conf (Mutil.encode x);
-    Output.print_sstring conf {|" rel="nofollow">|};
-    Output.print_sstring conf
-      (transl_nth conf "display by/branch/alphabetic order" 2);
-    Output.print_sstring conf "</a>")
-  else (
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf {|m=N&o=i&t=N&v=|};
-    Output.print_string conf (Mutil.encode x);
-    Output.print_sstring conf {|" rel="nofollow">|};
-    Output.print_sstring conf
-      (transl_nth conf "display by/branch/alphabetic order" 2);
-    Output.print_sstring conf "</a>");
-  (* Ne pas oublier l'attribut nofollow pour les robots *)
-  Output.print_sstring conf "</div>"
+  print_display_mode_navigation conf ~current_mode:`Branch ~name:x
+    ~branch_count:nb_branch ()
 
-(* **********************************************************************)
-(*  [Fonc] print_alphabetic_to_branch : conf -> string -> int -> unit   *)
-
-(* ******************************************************************** *)
-
-(** [Description] : A partir de l'affichage alphabétique, permet d'afficher les
-    liens pour un affichage par branches. [Args] :
-    - conf : configuration de la base
-    - base : base
-    - x : 'nom/prénom/sosa...' recherché [Retour] : Néant [Rem] : Non exporté en
-      clair hors de ce module. *)
 let print_alphabetic_to_branch conf x =
-  Output.print_sstring conf "<div class=\"mb-3\">";
-  Output.print_sstring conf
-    (Utf8.capitalize_fst
-       (transl_nth conf "display by/branch/alphabetic order" 0));
-  Output.print_sstring conf "<i class=\"fa fa-code-fork ml-3 mr-1\"></i>";
-  if p_getenv conf.env "t" = Some "A" then (
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf "m=N&t=A&v=";
-    Output.print_string conf (Mutil.encode x);
-    Output.print_sstring conf {|" rel="nofollow">|};
-    Output.print_sstring conf
-      (transl_nth conf "display by/branch/alphabetic order" 1);
-    Output.print_sstring conf "</a>")
-  else (
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf "m=NG&sn=";
-    Output.print_string conf (Mutil.encode x);
-    Output.print_sstring conf {|" rel="nofollow">|};
-    Output.print_sstring conf
-      (transl_nth conf "display by/branch/alphabetic order" 1);
-    Output.print_sstring conf "</a>");
-  Output.print_sstring conf "<i class=\"fa fa-arrow-down-a-z ml-3 mr-1\"></i>";
-  Output.print_sstring conf
-    (transl_nth conf "display by/branch/alphabetic order" 2);
-  Output.print_sstring conf "</div>"
+  print_display_mode_navigation conf ~current_mode:`Alphabetic ~name:x ()
 
 let persons_of_fsname conf base base_strings_of_fsname find proj x =
-  (* list of strings index corresponding to the crushed lower first name
-     or surname "x" *)
   let istrl = base_strings_of_fsname base x in
-  (* selecting the persons who have this first name or surname *)
+  let x_crushed = Name.crush_lower x in
+  let x_lower = Name.lower x in
+  let x_stripped = Name.strip_lower x in
   let l =
-    let x = Name.crush_lower x in
     List.fold_right
       (fun istr l ->
         let str = Mutil.nominative (Driver.sou base istr) in
         if
-          Name.crush_lower str = x
-          || List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
+          Name.crush_lower str = x_crushed
+          || List.mem x_crushed
+               (List.map Name.crush_lower (Mutil.surnames_pieces str))
         then
           let iperl = find istr in
-          (* maybe they are not the good ones because of changes in the
-             database; checking... *)
           let iperl =
             List.fold_left
               (fun iperl iper ->
@@ -161,25 +118,14 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
       istrl []
   in
   let l, name_inj =
-    let l1, name_inj =
-      let x = Name.lower x in
-      ( List.fold_right
-          (fun (str, istr, iperl) l ->
-            if x = Name.lower str then (str, istr, iperl) :: l else l)
-          l [],
-        Name.lower )
-    in
-    let l1, name_inj =
-      if l1 = [] then
-        let x = Name.strip_lower x in
-        ( List.fold_right
-            (fun (str, istr, iperl) l ->
-              if x = Name.strip_lower str then (str, istr, iperl) :: l else l)
-            l [],
-          Name.strip_lower )
-      else (l1, name_inj)
-    in
-    if l1 = [] then (l, Name.crush_lower) else (l1, name_inj)
+    match List.filter (fun (str, _, _) -> x_lower = Name.lower str) l with
+    | _ :: _ as l1 -> (l1, Name.lower)
+    | [] -> (
+        match
+          List.filter (fun (str, _, _) -> x_stripped = Name.strip_lower str) l
+        with
+        | _ :: _ as l1 -> (l1, Name.strip_lower)
+        | [] -> (l, Name.crush_lower))
   in
   (l, name_inj)
 
@@ -658,7 +604,10 @@ let print_branch conf base psn name =
         else fun s -> s
       in
       SosaCache.print_sosa conf base p with_link;
-      Output.print_sstring conf @@ if with_link then "<strong>" else "<em>";
+      let open_tag, close_tag =
+        if with_link then ("<strong>", "</strong>") else ("<em>", "</em>")
+      in
+      Output.print_sstring conf open_tag;
       Output.print_string conf
         (render p
            (if is_hide_names conf p && not (authorized_age conf base p) then
@@ -666,7 +615,7 @@ let print_branch conf base psn name =
             else if (not psn) && (not with_sn) && Driver.p_surname base p = name
             then gen_person_text ~sn:false conf base p
             else gen_person_text conf base p));
-      Output.print_sstring conf @@ if with_link then "</strong>" else "</em>";
+      Output.print_sstring conf close_tag;
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf "\n"
     in
@@ -1285,16 +1234,12 @@ let print_surname_details conf base query_string surnames_groups =
         let person_text =
           transl_nth conf "person/persons" (if person_count = 1 then 0 else 1)
         in
+        let alias_text =
+          transl_nth conf "alias/aliases" (if alias_count = 1 then 0 else 1)
+        in
         let tooltip_text =
-          if is_query_alias then
-            let alias_text =
-              transl_nth conf "alias/aliases" (if alias_count = 1 then 0 else 1)
-            in
-            Printf.sprintf "%d %s" alias_count alias_text
+          if is_query_alias then Printf.sprintf "%d %s" alias_count alias_text
           else
-            let alias_text =
-              transl_nth conf "alias/aliases" (if alias_count = 1 then 0 else 1)
-            in
             let alias_txt =
               if include_aliases && alias_count > 0 then
                 Printf.sprintf " (%d %s)" alias_count alias_text
