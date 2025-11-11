@@ -1204,10 +1204,10 @@ let recover conf =
   else if
     Sys.unix
     &&
-    try
-      (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino
-      = (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
-    with Unix.Unix_error (_, _, _) -> false
+      try
+        (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino
+        = (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
+      with Unix.Unix_error (_, _, _) -> false
   then print_file conf "err_smdr.htm"
   else if not dir_has_gwu then print_file conf "err_ngw.htm"
   else print_file conf "recover1.htm"

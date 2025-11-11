@@ -263,8 +263,8 @@ let find_non_breaking_space_positions s =
   let re = Lazy.force nbsp_re in
   Re.all re s
   |> List.filter_map (fun grp ->
-         let pos = Re.Group.start grp 0 in
-         if has_roman_after_nbsp s pos then None else Some pos)
+      let pos = Re.Group.start grp 0 in
+      if has_roman_after_nbsp s pos then None else Some pos)
   |> List.sort_uniq compare
 
 (* Detect if a word starts with Irish name prefixes Mac/Mc/Fitz *)
@@ -614,11 +614,11 @@ let fix_misc_typographic_errors dict_type s =
   let patterns = Lazy.force compiled_complex in
   s
   |> Re.replace (List.nth patterns 0) ~f:(fun groups ->
-         Re.Group.get groups 1 ^ " (")
+      Re.Group.get groups 1 ^ " (")
   |> Re.replace (List.nth patterns 1) ~f:(fun groups ->
-         let c = Re.Group.get groups 1 in
-         let h = Re.Group.get groups 2 in
-         c ^ "ʼ" ^ h)
+      let c = Re.Group.get groups 1 in
+      let h = Re.Group.get groups 2 in
+      c ^ "ʼ" ^ h)
 
 (* Détermine si un caractère est latin, grec ou cyrillique *)
 let script_cache = Hashtbl.create 256

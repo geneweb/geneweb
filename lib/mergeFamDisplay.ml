@@ -28,25 +28,25 @@ let need_differences_selection conf base fam1 fam2 =
       | Pacs -> "pacs"
       | Residence -> "residence")
   || need_selection (fun fam ->
-         match Date.od_of_cdate (Driver.get_marriage fam) with
-         | None -> ""
-         | Some d -> (DateDisplay.string_of_ondate conf d :> string))
+      match Date.od_of_cdate (Driver.get_marriage fam) with
+      | None -> ""
+      | Some d -> (DateDisplay.string_of_ondate conf d :> string))
   || need_selection (fun fam -> Driver.sou base (Driver.get_marriage_place fam))
   || need_selection (fun fam ->
-         match Driver.get_divorce fam with
-         | Divorced cod -> (
-             match Date.od_of_cdate cod with
-             | Some d -> (DateDisplay.string_of_ondate conf d :> string)
-             | None -> "divorced")
-         | _ -> "not divorced")
+      match Driver.get_divorce fam with
+      | Divorced cod -> (
+          match Date.od_of_cdate cod with
+          | Some d -> (DateDisplay.string_of_ondate conf d :> string)
+          | None -> "divorced")
+      | _ -> "not divorced")
   || need_selection (fun fam ->
-         match Driver.get_separation fam with
-         | Separated cod -> (
-             match Date.od_of_cdate cod with
-             | Some d -> (DateDisplay.string_of_ondate conf d :> string)
-             | None -> "separated")
-         | Separated_old -> "separated"
-         | _ -> "not separated")
+      match Driver.get_separation fam with
+      | Separated cod -> (
+          match Date.od_of_cdate cod with
+          | Some d -> (DateDisplay.string_of_ondate conf d :> string)
+          | None -> "separated")
+      | Separated_old -> "separated"
+      | _ -> "not separated")
 
 let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   let string_field (title : Adef.safe_string) (name : Adef.encoded_string) proj

@@ -29,14 +29,14 @@ let () =
         (fun s ->
           Output.header conf "%s"
           @@
-          try
-            Scanf.sscanf s "Content-type: %_s; charset=%s" (fun c ->
-                "Content-type: application/xhtml+xml; charset=" ^ c)
-          with _ -> (
             try
-              Scanf.sscanf s "Content-type: %_s"
-                "Content-type: application/xhtml+xml"
-            with _ -> s))
+              Scanf.sscanf s "Content-type: %_s; charset=%s" (fun c ->
+                  "Content-type: application/xhtml+xml; charset=" ^ c)
+            with _ -> (
+              try
+                Scanf.sscanf s "Content-type: %_s"
+                  "Content-type: application/xhtml+xml"
+              with _ -> s))
         (List.rev !buffer_headers);
       let open Markup in
       buffer buffer_body |> parse_html |> signals |> write_xml |> to_string
