@@ -29,9 +29,9 @@ let () =
       let open Markup in
       buffer buffer_body |> parse_html |> signals
       |> map (function
-           | `Start_element (("http://www.w3.org/1999/xhtml", "a"), _) ->
-               `Start_element (("http://www.w3.org/1999/xhtml", "span"), [])
-           | x -> x)
+        | `Start_element (("http://www.w3.org/1999/xhtml", "a"), _) ->
+            `Start_element (("http://www.w3.org/1999/xhtml", "span"), [])
+        | x -> x)
       |> write_html |> to_string |> Output.print_sstring conf;
       Output.flush conf;
       Buffer.reset buffer_body

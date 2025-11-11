@@ -149,10 +149,10 @@ let rec subst_desc sf desc =
       if
         sl = []
         &&
-        try
-          let _ = int_of_string s1 in
-          true
-        with Failure _ -> false
+          try
+            let _ = int_of_string s1 in
+            true
+          with Failure _ -> false
       then Aint s1
       else
         let sl1 = List.map sf sl in

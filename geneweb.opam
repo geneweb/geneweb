@@ -39,7 +39,7 @@ depends: [
   "digestif"
   "pp_loc"
   "utop" {with-dev-setup}
-  "ocamlformat" {with-dev-setup & = "0.27.0"}
+  "ocamlformat" {with-dev-setup & = "0.28.1"}
   "odoc" {with-doc}
 ]
 depopts: [

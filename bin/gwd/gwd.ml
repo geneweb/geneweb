@@ -1544,8 +1544,13 @@ let conf_and_connection =
     ^<^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
     ^<^ contents
   in
-  fun ~secret_salt from request script_name (contents : Adef.encoded_string) env
-    ->
+  fun ~secret_salt
+    from
+    request
+    script_name
+    (contents : Adef.encoded_string)
+    env
+  ->
     let conf, passwd_err =
       make_conf ~secret_salt from request script_name env
     in

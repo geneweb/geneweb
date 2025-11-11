@@ -725,12 +725,12 @@ let print_warning conf base = function
            ^<^ (safe_html @@ Driver.sou base t.t_place)
            ^^^ "</strong> <em>"
            ^<^ (match Date.od_of_cdate t.t_date_start with
-               | Some d -> DateDisplay.string_of_date conf d
-               | None -> Adef.safe "")
+             | Some d -> DateDisplay.string_of_date conf d
+             | None -> Adef.safe "")
            ^^^ "-"
            ^<^ (match Date.od_of_cdate t.t_date_end with
-               | Some d -> DateDisplay.string_of_date conf d
-               | None -> Adef.safe "")
+             | Some d -> DateDisplay.string_of_date conf d
+             | None -> Adef.safe "")
            ^>^ "</em>"
             :> string))
   | UndefinedSex p ->

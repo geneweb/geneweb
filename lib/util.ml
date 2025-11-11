@@ -2476,7 +2476,7 @@ let get_problem_char_name code =
 let get_problem_chars_codes category =
   problem_chars
   |> List.filter_map (fun (code, _, cat) ->
-         if cat = category then Some code else None)
+      if cat = category then Some code else None)
 
 type clean_options = {
   remove_control : bool; (* Supprimer caractères de contrôle ASCII *)

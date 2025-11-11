@@ -707,14 +707,14 @@ and unsafe_mk_person conf base (p : Driver.person) =
            List.exists
              (fun (pg, (_, il)) ->
                (match pg with
-               | Def.NLDB.PgInd ip ->
-                   Util.pget conf base ip |> Util.authorized_age conf base
-               | Def.NLDB.PgFam ifam ->
-                   Driver.foi base ifam |> Driver.get_father
-                   |> Util.pget conf base
-                   |> Util.authorized_age conf base
-               | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ ->
-                   true)
+                 | Def.NLDB.PgInd ip ->
+                     Util.pget conf base ip |> Util.authorized_age conf base
+                 | Def.NLDB.PgFam ifam ->
+                     Driver.foi base ifam |> Driver.get_father
+                     |> Util.pget conf base
+                     |> Util.authorized_age conf base
+                 | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ ->
+                     true)
                && List.exists (fun (k, _) -> k = key) il)
              db
          then

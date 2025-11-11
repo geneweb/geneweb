@@ -166,7 +166,10 @@ let print_differences conf base branches p1 p2 =
     (fun p ->
       Adef.safe
       @@
-      match Driver.get_sex p with Male -> "M" | Female -> "F" | Neuter -> "");
+      match Driver.get_sex p with
+      | Male -> "M"
+      | Female -> "F"
+      | Neuter -> "");
   let date_field trans name get =
     string_field
       (transl conf trans |> Adef.safe)

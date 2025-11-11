@@ -1379,12 +1379,12 @@ and display_firstname_results conf base query fn_options results =
       (3, sections_partial, true, results.phonetic.variants);
     ]
     |> List.filter (fun (i, secs, _, _) ->
-           match i with
-           | 0 -> secs <> []
-           | 1 -> include_aliases
-           | 4 -> secs <> []
-           | 2 | 3 -> is_partial && secs <> []
-           | _ -> false)
+        match i with
+        | 0 -> secs <> []
+        | 1 -> include_aliases
+        | 4 -> secs <> []
+        | 2 | 3 -> is_partial && secs <> []
+        | _ -> false)
   in
   Some.first_name_print_list_multi conf base query sections_groups
 

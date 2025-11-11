@@ -728,17 +728,15 @@ let treat_request =
              | "MOD_NOTES" ->
                  w_wizard
                  @@ w_base (fun conf base ->
-                        match p_getenv conf.env "ajax" with
-                        | Some "on" ->
-                            let charset =
-                              if conf.charset = "" then "utf-8"
-                              else conf.charset
-                            in
-                            Output.header conf
-                              "Content-type: application/json; charset=%s"
-                              charset;
-                            NotesDisplay.print_mod_json conf base
-                        | _ -> NotesDisplay.print_mod conf base)
+                     match p_getenv conf.env "ajax" with
+                     | Some "on" ->
+                         let charset =
+                           if conf.charset = "" then "utf-8" else conf.charset
+                         in
+                         Output.header conf
+                           "Content-type: application/json; charset=%s" charset;
+                         NotesDisplay.print_mod_json conf base
+                     | _ -> NotesDisplay.print_mod conf base)
              | "MOD_NOTES_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
              | "MOD_WIZNOTES" when conf.authorized_wizards_notes ->

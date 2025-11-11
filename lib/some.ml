@@ -903,7 +903,7 @@ let print_several_possible_surnames x conf base (_, surname_groups) =
     List.map process_surname surname_groups
     @ List.map process_alias alias_groups
     |> List.sort (fun (ord1, _, _, _, _) (ord2, _, _, _, _) ->
-           String.compare ord1 ord2)
+        String.compare ord1 ord2)
   in
 
   ignore

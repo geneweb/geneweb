@@ -366,11 +366,11 @@ let sign_text conf base sign info b1 b2 c1 c2 =
     ^<^ Adef.escaped (if sps then "" else "&sp=0")
     ^^^ Adef.escaped (if img then "" else "&im=0")
     ^^^ (match p_getenv conf.env "bd" with
-        | None | Some ("0" | "") -> Adef.escaped ""
-        | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
+      | None | Some ("0" | "") -> Adef.escaped ""
+      | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
     ^^^ (match p_getenv conf.env "color" with
-        | None | Some "" -> Adef.escaped ""
-        | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
+      | None | Some "" -> Adef.escaped ""
+      | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
     ^^^ include_marr conf base (Adef.escaped "3")
     ^^^ include_marr conf base (Adef.escaped "4")
   in
