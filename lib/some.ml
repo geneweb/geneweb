@@ -1248,125 +1248,119 @@ let print_surname_details conf base query_string surnames_groups =
        (fun (_, persons) -> List.length persons)
        2);
 
-  (* Boucle principale avec la liste unifiée *)
-  let current_letter = ref "" in
-  List.iter
-    (fun (sn, persons) ->
-      (* Distinguer si c'est la query-alias ou un patronyme normal *)
-      let is_query_alias = sn = query_string && query_only_aliases <> [] in
-      let alias_persons_for_sn =
-        if is_query_alias then query_only_aliases else find_surname_aliases sn
-      in
-      let display_surname =
-        if is_query_alias && query_only_aliases <> [] then
-          let _, first_alias = List.hd query_only_aliases in
-          first_alias
-        else sn
-      in
-      let sort_key = Util.surname_without_particle base display_surname in
-      let letter =
-        if String.length sort_key > 0 then
-          String.uppercase_ascii (String.sub sort_key 0 1)
-        else "?"
-      in
-      let id_attr =
-        if letter <> !current_letter then (
-          current_letter := letter;
-          Printf.sprintf " id=\"%s\"" letter)
-        else ""
-      in
-      let display_name =
-        Util.surname_without_particle base display_surname
-        ^ Util.surname_particle base display_surname
-      in
+  (* Boucle principale*)
+  let _ =
+    List.fold_left
+      (fun prev_letter (sn, persons) ->
+        let is_query_alias = sn = query_string && query_only_aliases <> [] in
+        let alias_persons_for_sn =
+          if is_query_alias then query_only_aliases else find_surname_aliases sn
+        in
+        let display_surname =
+          if is_query_alias && query_only_aliases <> [] then
+            let _, first_alias = List.hd query_only_aliases in
+            first_alias
+          else sn
+        in
+        let sort_key = Util.surname_without_particle base display_surname in
+        let letter =
+          if String.length sort_key > 0 then
+            String.uppercase_ascii (String.sub sort_key 0 1)
+          else "?"
+        in
+        let id_attr =
+          if letter <> prev_letter then Printf.sprintf " id=\"%s\"" letter
+          else ""
+        in
+        let particle = Util.surname_particle base display_surname in
+        let without = Util.surname_without_particle base display_surname in
+        let display_name =
+          if particle = "" then without
+          else Printf.sprintf "%s%s" without particle
+        in
 
-      (* Tooltip avec comptage approprié *)
-      let person_count = List.length persons in
-      let alias_count = List.length alias_persons_for_sn in
-      let person_text =
-        transl_nth conf "person/persons" (if person_count = 1 then 0 else 1)
-      in
-      let tooltip_text =
+        (* Tooltip avec comptage approprié *)
+        let person_count = List.length persons in
+        let alias_count = List.length alias_persons_for_sn in
+        let person_text =
+          transl_nth conf "person/persons" (if person_count = 1 then 0 else 1)
+        in
+        let tooltip_text =
+          if is_query_alias then
+            let alias_text =
+              transl_nth conf "alias/aliases" (if alias_count = 1 then 0 else 1)
+            in
+            Printf.sprintf "%d %s" alias_count alias_text
+          else
+            let alias_text =
+              transl_nth conf "alias/aliases" (if alias_count = 1 then 0 else 1)
+            in
+            let alias_txt =
+              if include_aliases && alias_count > 0 then
+                Printf.sprintf " (%d %s)" alias_count alias_text
+              else ""
+            in
+            Printf.sprintf "%d %s%s" person_count person_text alias_txt
+        in
+
+        (* Titre avec ou sans lien *)
         if is_query_alias then
-          (* Pour query-alias : seulement compter les alias *)
-          let alias_text =
-            transl_nth conf "alias/aliases" (if alias_count = 1 then 0 else 1)
-          in
-          Printf.sprintf "%d %s" alias_count alias_text
+          Output.printf conf
+            {|<h2%s class="h4 mt-3" title="%s"><strong>%s</strong></h2>|}
+            id_attr tooltip_text
+            (Util.escape_html display_name :> string)
         else
-          (* Pour patronymes normaux : personnes + alias *)
-          let alias_text =
-            transl_nth conf "alias/aliases" (if alias_count = 1 then 0 else 1)
-          in
-          let alias_txt =
-            if include_aliases && alias_count > 0 then
-              Printf.sprintf " (%d %s)" alias_count alias_text
-            else ""
-          in
-          Printf.sprintf "%d %s%s" person_count person_text alias_txt
-      in
+          Output.printf conf
+            {|<h2%s class="h4 mt-3"><a href="%sm=N&v=%s" title="%s"><strong>%s</strong></a></h2>|}
+            id_attr
+            (commd conf :> string)
+            (Mutil.encode sn :> string)
+            tooltip_text
+            (Util.escape_html display_name :> string);
 
-      (* Titre avec ou sans lien *)
-      if is_query_alias then
-        Output.printf conf
-          {|<h2%s class="h4 mt-3" title="%s"><strong>%s</strong></h2>|} id_attr
-          tooltip_text
-          (Util.escape_html display_name :> string)
-      else
-        Output.printf conf
-          {|<h2%s class="h4 mt-3"><a href="%sm=N&v=%s" title="%s"><strong>%s</strong></a></h2>|}
-          id_attr
-          (commd conf :> string)
-          (Mutil.encode sn :> string)
-          tooltip_text
-          (Util.escape_html display_name :> string);
+        Output.print_sstring conf "<ul class=\"fa-ul\">\n";
+        let all_persons =
+          if is_query_alias then
+            List.map (fun (p, alias) -> (p, Some alias)) alias_persons_for_sn
+          else if include_aliases && alias_persons_for_sn <> [] then
+            List.map (fun p -> (p, None)) persons
+            @ List.map (fun (p, alias) -> (p, Some alias)) alias_persons_for_sn
+          else List.map (fun p -> (p, None)) persons
+        in
 
-      Output.print_sstring conf "<ul class=\"fa-ul\">\n";
-      let all_persons =
-        if is_query_alias then
-          (* Pour query-alias : seulement les alias *)
-          List.map (fun (p, alias) -> (p, Some alias)) alias_persons_for_sn
-        else if
-          (* Pour patronymes normaux : personnes + alias *)
-          include_aliases && alias_persons_for_sn <> []
-        then
-          List.map (fun p -> (p, None)) persons
-          @ List.map (fun (p, alias) -> (p, Some alias)) alias_persons_for_sn
-        else List.map (fun p -> (p, None)) persons
-      in
-
-      let sorted_all_persons =
-        List.sort
-          (fun (p1, _) (p2, _) ->
-            match
-              ( Date.od_of_cdate (Driver.get_birth p1),
-                Date.od_of_cdate (Driver.get_birth p2) )
-            with
-            | Some d1, Some d2 -> Date.compare_date d1 d2
-            | None, Some _ -> 1
-            | Some _, None -> -1
-            | None, None ->
-                Gutil.alphabetic_order
-                  (Driver.p_first_name base p1)
-                  (Driver.p_first_name base p2))
-          all_persons
-      in
-
-      List.iter
-        (fun (p, snalias_opt) ->
-          Output.print_sstring conf {|<li><span class="fa-li">|};
-          Output.print_sstring conf "\n";
-          let sosa_num = SosaCache.get_sosa_person p in
-          if Geneweb_sosa.gt sosa_num Geneweb_sosa.zero then
-            SosaCache.print_sosa conf base p true
-          else Output.print_sstring conf {|<span class="bullet">•</span>|};
-          Output.print_sstring conf "</span>";
-          Update.print_person_parents_and_spouses conf base ~snalias:snalias_opt
-            p;
-          Output.print_sstring conf "</li>\n")
-        sorted_all_persons;
-      Output.print_sstring conf "</ul>\n")
-    all_surnames;
+        let sorted_all_persons =
+          List.sort
+            (fun (p1, _) (p2, _) ->
+              match
+                ( Date.od_of_cdate (Driver.get_birth p1),
+                  Date.od_of_cdate (Driver.get_birth p2) )
+              with
+              | Some d1, Some d2 -> Date.compare_date d1 d2
+              | None, Some _ -> 1
+              | Some _, None -> -1
+              | None, None ->
+                  Gutil.alphabetic_order
+                    (Driver.p_first_name base p1)
+                    (Driver.p_first_name base p2))
+            all_persons
+        in
+        List.iter
+          (fun (p, snalias_opt) ->
+            Output.print_sstring conf {|<li><span class="fa-li">|};
+            Output.print_sstring conf "\n";
+            let sosa_num = SosaCache.get_sosa_person p in
+            if Geneweb_sosa.gt sosa_num Geneweb_sosa.zero then
+              SosaCache.print_sosa conf base p true
+            else Output.print_sstring conf {|<span class="bullet">•</span>|};
+            Output.print_sstring conf "</span>";
+            Update.print_person_parents_and_spouses conf base
+              ~snalias:snalias_opt p;
+            Output.print_sstring conf "</li>\n")
+          sorted_all_persons;
+        Output.print_sstring conf "</ul>\n";
+        letter)
+      "" all_surnames
+  in
   Hutil.trailer conf
 
 let search_first_name conf base x =
