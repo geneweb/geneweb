@@ -1,6 +1,6 @@
 (executable
   (package geneweb-rpc)
-  (name main)
+  (name server)
   (public_name geneweb-rpc.server)
   (libraries
     geneweb_rpc
