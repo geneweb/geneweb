@@ -175,16 +175,6 @@ module StringCache = struct
       let s = Driver.sou base istr in
       if Hashtbl.length cache < max_size then Hashtbl.add cache istr s;
       s
-
-  let clear_if_full () =
-    if Hashtbl.length cache > max_size then (
-      Logs.debug (fun k ->
-          k "StringCache clearing cache: %d hits, %d misses" !hits !misses);
-      Hashtbl.clear cache;
-      hits := 0;
-      misses := 0)
-
-  let maintenance () = clear_if_full ()
 end
 
 module ApostropheCache = struct
@@ -1097,24 +1087,14 @@ and parse_dot_separated pn dot_pos =
 (* ========================================================================= *)
 
 let remove_duplicates (results : search_results) =
-  let exact_set =
-    List.fold_left
-      (fun acc iper -> IperSet.add iper acc)
-      IperSet.empty results.exact
-  in
+  let seen = Hashtbl.create (List.length results.exact) in
+  List.iter (fun ip -> Hashtbl.add seen ip ()) results.exact;
   let partial_filtered =
-    List.filter (fun iper -> not (IperSet.mem iper exact_set)) results.partial
+    List.filter (fun ip -> not (Hashtbl.mem seen ip)) results.partial
   in
-  let partial_set =
-    List.fold_left
-      (fun acc iper -> IperSet.add iper acc)
-      IperSet.empty partial_filtered
-  in
+  List.iter (fun ip -> Hashtbl.add seen ip ()) partial_filtered;
   let spouse_filtered =
-    List.filter
-      (fun iper ->
-        (not (IperSet.mem iper exact_set)) && not (IperSet.mem iper partial_set))
-      results.spouse
+    List.filter (fun ip -> not (Hashtbl.mem seen ip)) results.spouse
   in
   {
     exact = results.exact;
@@ -1187,9 +1167,7 @@ let execute_search_method conf base query method_ fn_options =
       results
 
 let dispatch_search_methods conf base query search_order fn_options =
-  StringCache.maintenance ();
   let all_results = { exact = []; partial = []; spouse = [] } in
-  let firstname_variants = ref Mutil.StrSet.empty in
   let combined_results =
     List.fold_left
       (fun acc method_ ->
@@ -1212,7 +1190,7 @@ let dispatch_search_methods conf base query search_order fn_options =
     }
   in
   let deduplicated = remove_duplicates results in
-  (deduplicated, !firstname_variants)
+  deduplicated
 
 (* ========================================================================= *)
 (* Section 6: Result Handling and Display                                   *)
@@ -1259,31 +1237,16 @@ let rec handle_search_results conf base query fn_options components specify
 and display_firstname_results conf base query fn_options results =
   let include_aliases = fn_options.incl_aliases in
   let is_partial = not fn_options.exact1 in
-  let sections_exact =
-    if results.direct.persons <> [] then
-      [ ("", List.map (Driver.poi base) results.direct.persons) ]
-    else []
+  let make_section ipers =
+    if ipers = [] then [] else [ ("", List.map (Driver.poi base) ipers) ]
   in
+  let sections_exact = make_section results.direct.persons in
   let sections_aliases =
-    if include_aliases then
-      [ ("", List.map (Driver.poi base) results.aliases.persons) ]
-    else []
+    if include_aliases then make_section results.aliases.persons else []
   in
-  let sections_included =
-    if results.included.persons <> [] then
-      [ ("", List.map (Driver.poi base) results.included.persons) ]
-    else []
-  in
-  let sections_partial =
-    if results.phonetic.persons <> [] then
-      [ ("", List.map (Driver.poi base) results.phonetic.persons) ]
-    else []
-  in
-  let sections_permuted =
-    if results.permuted.persons <> [] then
-      [ ("", List.map (Driver.poi base) results.permuted.persons) ]
-    else []
-  in
+  let sections_included = make_section results.included.persons in
+  let sections_partial = make_section results.phonetic.persons in
+  let sections_permuted = make_section results.permuted.persons in
   let sections_groups =
     [
       (0, sections_exact, false, results.direct.variants);
@@ -1329,7 +1292,7 @@ let search conf base query search_order fn_options specify =
   let final_results =
     List.fold_left
       (fun acc variant ->
-        let results, _fn_variants =
+        let results =
           dispatch_search_methods conf base variant search_order fn_options
         in
         {
@@ -1380,72 +1343,57 @@ let print conf base specify =
     }
   in
   let case = components.case in
+  let log_case msg = Logs.debug (fun k -> k "Print case %s" msg) in
+  let log_format fmt =
+    Logs.debug (fun k -> k "Print format %s" (Debug.format_str fmt))
+  in
+  let search_with query order =
+    search conf base query order fn_options specify
+  in
+  let full_order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
+  let name_order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
+  let surname_order = [ Surname ] in
+  let firstname_order = [ FirstName ] in
   match case with
   | FirstNameSurname (fn, sn) ->
-      Logs.debug (fun k -> k "Print case FirstNameSurname (%s, %s)" fn sn);
-      let order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
-      search conf base (fn ^ " " ^ sn) order fn_options specify
+      log_case (Printf.sprintf "FirstNameSurname (%s, %s)" fn sn);
+      search_with (fn ^ " " ^ sn) name_order
   | PersonName pn ->
-      Logs.debug (fun k -> k "Print case PersonName (%s)" pn);
-      let order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
-      search conf base pn order fn_options specify
+      log_case (Printf.sprintf "PersonName (%s)" pn);
+      search_with pn name_order
   | FirstNameOnly fn ->
       let results = search_firstname_with_cache conf base fn fn_options in
       display_firstname_results conf base fn fn_options results
   | SurnameOnly sn ->
-      Logs.debug (fun k -> k "Search n=SurnameOnly '%s'" sn);
-      let order = [ Surname ] in
-      search conf base sn order fn_options specify
+      log_case (Printf.sprintf "SurnameOnly '%s'" sn);
+      search_with sn surname_order
   | ParsedName { first_name = fn; surname = sn; oc; format; _ } -> (
       match (fn, sn) with
       | Some fn, None when fn <> "" ->
-          Logs.debug (fun k -> k "Print case ParsedName (fn = %s)" fn);
-          let order = [ FirstName ] in
-          search conf base fn order fn_options specify
+          log_case (Printf.sprintf "ParsedName (fn = %s)" fn);
+          search_with fn firstname_order
       | None, Some sn when sn <> "" ->
-          Logs.debug (fun k -> k "Print case ParsedName (sn = %s)" sn);
-          let order = [ Surname ] in
-          search conf base sn order fn_options specify
-      | _ -> (
-          let order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
+          log_case (Printf.sprintf "ParsedName (sn = %s)" sn);
+          search_with sn surname_order
+      | _ ->
           let fn = Option.value fn ~default:"" in
           let sn = Option.value sn ~default:"" in
           let oc = Option.value oc ~default:"" in
-          match format with
-          | `Dot ->
-              Logs.debug (fun k ->
-                  k "Print format %s" (Debug.format_str format));
-              search conf base
-                (Printf.sprintf "%s %s" fn sn)
-                order fn_options specify
-          | `DotOc ->
-              Logs.debug (fun k ->
-                  k "Print format %s" (Debug.format_str format));
-              search conf base
-                (Printf.sprintf "%s.%s %s" fn oc sn)
-                order fn_options specify
-          | `Space ->
-              Logs.debug (fun k ->
-                  k "Print format %s" (Debug.format_str format));
-              search conf base
-                (Printf.sprintf "%s %s" fn sn)
-                order fn_options specify
-          | `Slash ->
-              Logs.debug (fun k ->
-                  k "Print format %s" (Debug.format_str format));
-              search conf base
-                (Printf.sprintf "%s %s" fn sn)
-                order fn_options specify
-          | `SlashSurname ->
-              Logs.debug (fun k ->
-                  k "Print format %s" (Debug.format_str format));
-              let order = [ Surname; ApproxKey ] in
-              search conf base sn order fn_options specify
-          | `SlashFirstName ->
-              Logs.debug (fun k ->
-                  k "Print format %s" (Debug.format_str format));
-              let order = [ FirstName ] in
-              search conf base fn order fn_options specify))
+          log_format format;
+          let query =
+            match format with
+            | `DotOc -> Printf.sprintf "%s.%s %s" fn oc sn
+            | `SlashSurname -> sn
+            | `SlashFirstName -> fn
+            | _ -> Printf.sprintf "%s %s" fn sn
+          in
+          let order =
+            match format with
+            | `SlashSurname -> [ Surname; ApproxKey ]
+            | `SlashFirstName -> firstname_order
+            | _ -> full_order
+          in
+          search_with query order)
   | _ ->
-      Logs.debug (fun k -> k "Print case default (%s)" (Debug.case_str case));
+      log_case (Debug.case_str case);
       SrcfileDisplay.print_welcome conf base
