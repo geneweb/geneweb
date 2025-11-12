@@ -7,16 +7,11 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Logs = Geneweb_logs.Logs
 module Collection = Geneweb_db.Collection
+module IperSet = Driver.Iper.Set
 
 (* ========================================================================= *)
 (* Section 1: Types and Data Structures                                     *)
 (* ========================================================================= *)
-
-module IperSet = Set.Make (struct
-  type t = Driver.iper
-
-  let compare = compare
-end)
 
 type opts = { order : bool; exact1 : bool; incl_aliases : bool }
 
@@ -72,13 +67,34 @@ type firstname_results = {
   permuted : firstname_section;
 }
 
+type normalized_string = {
+  original : string;
+  lower : string;
+  normalized : string;
+  words : string list option;
+}
+
 (* ========================================================================= *)
 (* Section 2: Low-level Utilities                                           *)
 (* ========================================================================= *)
 
-let generate_apostrophe_variants s =
-  let apostrophes = [ "'"; "\xE2\x80\x99"; "\xCA\xBC"; "\xCA\xBB" ] in
-  let rec find_apostrophe_pos s i =
+let normalize_for_phonetic s =
+  let buf = Buffer.create (String.length s) in
+  String.iter (function ' ' | '-' -> () | c -> Buffer.add_char buf c) s;
+  Buffer.contents buf
+
+let normalize_query q =
+  let lower = Name.lower q in
+  let normalized = normalize_for_phonetic lower in
+  { original = q; lower; normalized; words = Some (cut_words q) }
+
+let normalize_name n =
+  let lower = Name.lower n in
+  let normalized = normalize_for_phonetic lower in
+  { original = n; lower; normalized; words = None }
+
+let find_apostrophe_opt s =
+  let rec aux i =
     if i >= String.length s then None
     else
       match s.[i] with
@@ -91,31 +107,23 @@ let generate_apostrophe_variants s =
         when i + 1 < String.length s
              && (s.[i + 1] = '\xBC' || s.[i + 1] = '\xBB') ->
           Some (i, 2)
-      | _ -> find_apostrophe_pos s (i + 1)
+      | _ -> aux (i + 1)
   in
-  match find_apostrophe_pos s 0 with
+  aux 0
+
+let has_apostrophe s = Option.is_some (find_apostrophe_opt s)
+
+let generate_apostrophe_variants s =
+  let apostrophes = [ "'"; "\xE2\x80\x99"; "\xCA\xBC"; "\xCA\xBB" ] in
+  match find_apostrophe_opt s with
   | None -> [ s ]
   | Some (pos, len) ->
-      let variants =
-        List.map
-          (fun apo ->
-            String.sub s 0 pos ^ apo
-            ^ String.sub s (pos + len) (String.length s - pos - len))
-          apostrophes
-      in
-      List.sort_uniq String.compare variants
-
-let has_apostrophe s =
-  String.contains s '\''
-  || (try
-        String.index s '\xE2' |> fun i ->
-        i + 2 < String.length s && s.[i + 1] = '\x80' && s.[i + 2] = '\x99'
-      with Not_found -> false)
-  ||
-  try
-    String.index s '\xCA' |> fun i ->
-    i + 1 < String.length s && (s.[i + 1] = '\xBC' || s.[i + 1] = '\xBB')
-  with Not_found -> false
+      List.map
+        (fun apo ->
+          String.sub s 0 pos ^ apo
+          ^ String.sub s (pos + len) (String.length s - pos - len))
+        apostrophes
+      |> List.sort_uniq String.compare
 
 let empty_sn_or_fn base p =
   Driver.Istr.is_empty (Driver.get_surname p)
@@ -134,17 +142,23 @@ let search_reject_p conf base p =
   empty_sn_or_fn base p
   || (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
 
-let persons_to_ipers pl = List.map (fun p -> Driver.get_iper p) pl
+let persons_to_ipers = List.map Driver.get_iper
 
-let rec list_take n = function
-  | [] -> []
-  | _ when n <= 0 -> []
-  | x :: xs -> x :: list_take (n - 1) xs
+let list_take n l =
+  let rec aux acc n = function
+    | [] -> List.rev acc
+    | _ when n <= 0 -> List.rev acc
+    | x :: xs -> aux (x :: acc) (n - 1) xs
+  in
+  aux [] n l
 
-let rec list_drop n = function
-  | xs when n <= 0 -> xs
-  | [] -> []
-  | _ :: xs -> list_drop (n - 1) xs
+let list_drop n l =
+  let rec aux n = function
+    | xs when n <= 0 -> xs
+    | [] -> []
+    | _ :: xs -> aux (n - 1) xs
+  in
+  aux n l
 
 module StringCache = struct
   let cache = Hashtbl.create 2000
@@ -193,68 +207,56 @@ let generate_permutations query =
   let words =
     List.filter (fun w -> w <> "") (String.split_on_char ' ' normalized)
   in
-  match List.length words with
-  | 2 ->
-      let w1 = List.nth words 0 in
-      let w2 = List.nth words 1 in
-      [ w2 ^ " " ^ w1 ]
-  | 3 ->
-      let w1 = List.nth words 0 in
-      let w2 = List.nth words 1 in
-      let w3 = List.nth words 2 in
+  let join = String.concat " " in
+  match words with
+  | [ w1; w2 ] -> [ join [ w2; w1 ] ]
+  | [ w1; w2; w3 ] ->
       [
-        w1 ^ " " ^ w3 ^ " " ^ w2;
-        w2 ^ " " ^ w3 ^ " " ^ w1;
-        w2 ^ " " ^ w1 ^ " " ^ w3;
-        w3 ^ " " ^ w1 ^ " " ^ w2;
-        w3 ^ " " ^ w2 ^ " " ^ w1;
+        join [ w1; w3; w2 ];
+        join [ w2; w3; w1 ];
+        join [ w2; w1; w3 ];
+        join [ w3; w1; w2 ];
+        join [ w3; w2; w1 ];
       ]
-  | 4 ->
-      let w1 = List.nth words 0 in
-      let w2 = List.nth words 1 in
-      let w3 = List.nth words 2 in
-      let w4 = List.nth words 3 in
+  | [ w1; w2; w3; w4 ] ->
       [
-        w1 ^ " " ^ w2 ^ " " ^ w4 ^ " " ^ w3;
-        w1 ^ " " ^ w3 ^ " " ^ w2 ^ " " ^ w4;
-        w1 ^ " " ^ w3 ^ " " ^ w4 ^ " " ^ w2;
-        w1 ^ " " ^ w4 ^ " " ^ w2 ^ " " ^ w3;
-        w1 ^ " " ^ w4 ^ " " ^ w3 ^ " " ^ w2;
-        w2 ^ " " ^ w1 ^ " " ^ w3 ^ " " ^ w4;
-        w2 ^ " " ^ w1 ^ " " ^ w4 ^ " " ^ w3;
-        w2 ^ " " ^ w3 ^ " " ^ w1 ^ " " ^ w4;
-        w2 ^ " " ^ w3 ^ " " ^ w4 ^ " " ^ w1;
-        w2 ^ " " ^ w4 ^ " " ^ w1 ^ " " ^ w3;
-        w2 ^ " " ^ w4 ^ " " ^ w3 ^ " " ^ w1;
-        w3 ^ " " ^ w1 ^ " " ^ w2 ^ " " ^ w4;
-        w3 ^ " " ^ w1 ^ " " ^ w4 ^ " " ^ w2;
-        w3 ^ " " ^ w2 ^ " " ^ w1 ^ " " ^ w4;
-        w3 ^ " " ^ w2 ^ " " ^ w4 ^ " " ^ w1;
-        w3 ^ " " ^ w4 ^ " " ^ w1 ^ " " ^ w2;
-        w3 ^ " " ^ w4 ^ " " ^ w2 ^ " " ^ w1;
-        w4 ^ " " ^ w1 ^ " " ^ w2 ^ " " ^ w3;
-        w4 ^ " " ^ w1 ^ " " ^ w3 ^ " " ^ w2;
-        w4 ^ " " ^ w2 ^ " " ^ w1 ^ " " ^ w3;
-        w4 ^ " " ^ w2 ^ " " ^ w3 ^ " " ^ w1;
-        w4 ^ " " ^ w3 ^ " " ^ w1 ^ " " ^ w2;
-        w4 ^ " " ^ w3 ^ " " ^ w2 ^ " " ^ w1;
+        join [ w1; w2; w4; w3 ];
+        join [ w1; w3; w2; w4 ];
+        join [ w1; w3; w4; w2 ];
+        join [ w1; w4; w2; w3 ];
+        join [ w1; w4; w3; w2 ];
+        join [ w2; w1; w3; w4 ];
+        join [ w2; w1; w4; w3 ];
+        join [ w2; w3; w1; w4 ];
+        join [ w2; w3; w4; w1 ];
+        join [ w2; w4; w1; w3 ];
+        join [ w2; w4; w3; w1 ];
+        join [ w3; w1; w2; w4 ];
+        join [ w3; w1; w4; w2 ];
+        join [ w3; w2; w1; w4 ];
+        join [ w3; w2; w4; w1 ];
+        join [ w3; w4; w1; w2 ];
+        join [ w3; w4; w2; w1 ];
+        join [ w4; w1; w2; w3 ];
+        join [ w4; w1; w3; w2 ];
+        join [ w4; w2; w1; w3 ];
+        join [ w4; w2; w3; w1 ];
+        join [ w4; w3; w1; w2 ];
+        join [ w4; w3; w2; w1 ];
       ]
   | _ -> []
 
 let person_is_misc_name conf base p k =
   let k = Name.strip_lower k in
-  if
-    List.exists
-      (fun n -> Name.strip n = k)
-      (Driver.person_misc_names base p (nobtit conf base))
-  then true
-  else false
+  List.exists
+    (fun n -> Name.strip n = k)
+    (Driver.person_misc_names base p (nobtit conf base))
 
 let person_is_approx_key base p k =
   let k = Name.strip_lower k in
   let fn = Name.strip_lower (Driver.p_first_name base p) in
   let sn = Name.strip_lower (Driver.p_surname base p) in
-  if k = fn ^ sn && fn <> "" && sn <> "" then true else false
+  k = fn ^ sn && fn <> "" && sn <> ""
 
 let select_approx_key conf base pl k =
   List.fold_right
@@ -362,44 +364,64 @@ let search_key_opt conf base query =
   | Some p -> [ Driver.get_iper p ]
 
 let match_fn_lists fn_l fn1_l opts =
-  let normalize s = Name.lower s in
-  let word_matches query_word person_word =
-    let q = normalize query_word in
-    let p = normalize person_word in
-    if opts.exact1 then q = p else Mutil.contains p q
+  let qlist = List.map normalize_query fn_l in
+  let nlist = List.map normalize_name fn1_l in
+  let nset =
+    if opts.exact1 then
+      List.fold_left
+        (fun acc n -> Mutil.StrSet.add n.normalized acc)
+        Mutil.StrSet.empty nlist
+    else Mutil.StrSet.empty
   in
   let passes_basic_test =
-    List.for_all
-      (fun query_term -> List.exists (word_matches query_term) fn1_l)
-      fn_l
+    if opts.exact1 then
+      List.for_all (fun q -> Mutil.StrSet.mem q.normalized nset) qlist
+    else
+      List.for_all
+        (fun q ->
+          List.exists (fun n -> Mutil.contains n.normalized q.normalized) nlist)
+        qlist
   in
   let passes_order_test =
     if opts.order then
-      let rec check_in_order remaining_queries remaining_persons =
-        match remaining_queries with
-        | [] -> true
-        | q :: qs ->
-            let rec find_match_and_continue persons =
-              match persons with
-              | [] -> false
-              | p :: rest ->
-                  if word_matches q p then check_in_order qs rest
-                  else find_match_and_continue rest
-            in
-            find_match_and_continue remaining_persons
-      in
-      check_in_order fn_l fn1_l
+      if opts.exact1 then
+        let rec in_order qs ns =
+          match qs with
+          | [] -> true
+          | q :: qs' ->
+              let rec advance rest =
+                match rest with
+                | [] -> false
+                | n :: ns' ->
+                    if n.normalized = q.normalized then in_order qs' ns'
+                    else advance ns'
+              in
+              advance ns
+        in
+        in_order qlist nlist
+      else
+        let rec in_order qs ns =
+          match qs with
+          | [] -> true
+          | q :: qs' ->
+              let rec find_next rest =
+                match rest with
+                | [] -> false
+                | n :: ns' ->
+                    if Mutil.contains n.normalized q.normalized then
+                      in_order qs' ns'
+                    else find_next ns'
+              in
+              find_next ns
+        in
+        in_order qlist nlist
     else true
   in
   passes_basic_test && passes_order_test
 
 let search_for_multiple_fn conf base fn pl opts batch_size =
   Logs.debug (fun k -> k "        search_for_multiple_fn: %s" fn);
-  let bool_to_string b = if b then "true" else "false" in
-  Logs.debug (fun k ->
-      k "          order: %s, exact: %s"
-        (bool_to_string opts.order)
-        (bool_to_string opts.exact1));
+  Logs.debug (fun k -> k "order: %b, exact: %b" opts.order opts.exact1);
   let fn_l = cut_words fn in
   let result =
     let rec process_batch acc remaining =
@@ -581,11 +603,6 @@ let search_firstname_aliases conf base query =
         | None -> acc)
     [] all_misc_matches
 
-let normalize_for_phonetic s =
-  let buf = Buffer.create (String.length s) in
-  String.iter (function ' ' | '-' -> () | c -> Buffer.add_char buf c) s;
-  Buffer.contents buf
-
 let search_firstname_phonetic_split conf base query =
   let query_lower = Name.lower query in
   let query_norm = normalize_for_phonetic query_lower in
@@ -640,95 +657,34 @@ let search_firstname_phonetic_split conf base query =
 
 let search_with_ngrams_complement conf base _query query_words =
   let nb_words = List.length query_words in
-  match nb_words with
-  | 0 | 1 ->
+  if nb_words = 0 || nb_words = 1 || nb_words > 4 then
+    List.flatten
+      (List.map
+         (fun w -> search_firstname_phonetic conf base (Name.crush_lower w))
+         query_words)
+  else
+    let ngram = String.concat "" query_words in
+    let results_words =
       List.flatten
         (List.map
            (fun w -> search_firstname_phonetic conf base (Name.crush_lower w))
            query_words)
-  | 2 ->
-      let w1 = List.nth query_words 0 in
-      let w2 = List.nth query_words 1 in
-      let bigram = w1 ^ w2 in
-      let results_words =
-        List.flatten
-          (List.map
-             (fun w -> search_firstname_phonetic conf base (Name.crush_lower w))
-             query_words)
-      in
-      let results_bigram =
-        try
-          let crushed = Name.crush bigram in
-          search_firstname_phonetic conf base crushed
-        with _ -> []
-      in
-      let all = results_words @ results_bigram in
-      let seen = Hashtbl.create 1000 in
-      List.filter
-        (fun ip ->
-          if Hashtbl.mem seen ip then false
-          else (
-            Hashtbl.add seen ip ();
-            true))
-        all
-  | 3 ->
-      let w1 = List.nth query_words 0 in
-      let w2 = List.nth query_words 1 in
-      let w3 = List.nth query_words 2 in
-      let trigram = w1 ^ w2 ^ w3 in
-      let results_words =
-        List.flatten
-          (List.map
-             (fun w -> search_firstname_phonetic conf base (Name.crush_lower w))
-             query_words)
-      in
-      let results_trigram =
-        try
-          let crushed = Name.crush trigram in
-          search_firstname_phonetic conf base crushed
-        with _ -> []
-      in
-      let all = results_words @ results_trigram in
-      let seen = Hashtbl.create 1000 in
-      List.filter
-        (fun ip ->
-          if Hashtbl.mem seen ip then false
-          else (
-            Hashtbl.add seen ip ();
-            true))
-        all
-  | 4 ->
-      let w1 = List.nth query_words 0 in
-      let w2 = List.nth query_words 1 in
-      let w3 = List.nth query_words 2 in
-      let w4 = List.nth query_words 3 in
-      let quadrigram = w1 ^ w2 ^ w3 ^ w4 in
-      let results_words =
-        List.flatten
-          (List.map
-             (fun w -> search_firstname_phonetic conf base (Name.crush_lower w))
-             query_words)
-      in
-      let results_quadrigram =
-        try
-          let crushed = Name.crush quadrigram in
-          search_firstname_phonetic conf base crushed
-        with _ -> []
-      in
-      let all = results_words @ results_quadrigram in
-      let seen = Hashtbl.create 1000 in
-      List.filter
-        (fun ip ->
-          if Hashtbl.mem seen ip then false
-          else (
-            Hashtbl.add seen ip ();
-            true))
-        all
-  | _ ->
-      List.flatten
-        (List.map
-           (fun w -> search_firstname_phonetic conf base (Name.crush_lower w))
-           query_words)
+    in
+    let results_ngram =
+      try
+        let crushed = Name.crush ngram in
+        search_firstname_phonetic conf base crushed
+      with _ -> []
+    in
+    let all = results_words @ results_ngram in
+    let seen = Hashtbl.create 1000 in
+    List.filter
+      (fun ip ->
+        if Hashtbl.mem seen ip then false
+        else (
+          Hashtbl.add seen ip ();
+          true))
+      all
 
 let search_firstname_with_aliases_and_ngrams conf base query =
   let query_lower = Name.lower query in
@@ -766,53 +722,43 @@ let search_firstname_with_aliases_and_ngrams conf base query =
   (alias_results, !phonetic_results)
 
 let search_firstname_with_cache conf base query opts =
-  let query_lower = Name.lower query in
-  let query_norm = normalize_for_phonetic query_lower in
-  let query_words = cut_words query in
-  let nb_words = List.length query_words in
+  let nq = normalize_query query in
+  let nb_words = match nq.words with Some w -> List.length w | None -> 0 in
   Logs.debug (fun k ->
       k "Search p=%s FirstNameOnly [aliases=%b, order=%b, exact=%b]" query
         opts.incl_aliases opts.order opts.exact1);
-  let direct_results = search_firstname_direct conf base query in
-  List.iter (fun ip -> Some.AliasCache.add_direct ip) direct_results;
-  let direct_exact = ref [] in
-  let direct_included = ref [] in
-  List.iter
-    (fun ip ->
-      let p = Driver.poi base ip in
-      let fn = Driver.sou base (Driver.get_first_name p) in
-      let fn_lower = Name.lower fn in
-      let fn_norm = normalize_for_phonetic fn_lower in
-      if fn_norm = query_norm then direct_exact := ip :: !direct_exact
-      else direct_included := ip :: !direct_included)
-    direct_results;
-  let direct_exact_results = List.rev !direct_exact in
+  let direct_ips = search_firstname_direct conf base query in
+  List.iter (fun ip -> Some.AliasCache.add_direct ip) direct_ips;
+  let normalize_person ip =
+    let p = Driver.poi base ip in
+    let fn = Driver.sou base (Driver.get_first_name p) in
+    (normalize_name fn, ip)
+  in
+  let direct_norm = List.map normalize_person direct_ips in
+  let direct_exact, direct_included =
+    List.partition (fun (n, _) -> n.normalized = nq.normalized) direct_norm
+  in
   let exact_variants =
     List.fold_left
-      (fun acc ip ->
-        let p = Driver.poi base ip in
-        let fn = Driver.sou base (Driver.get_first_name p) in
-        if fn <> "" then Mutil.StrSet.add fn acc else acc)
-      Mutil.StrSet.empty direct_exact_results
+      (fun acc (n, _) ->
+        if n.original <> "" then Mutil.StrSet.add n.original acc else acc)
+      Mutil.StrSet.empty direct_exact
   in
   let alias_results, alias_variants =
     if opts.incl_aliases then (
       let aliases = search_firstname_aliases conf base query in
       List.iter (fun (ip, alias) -> Some.AliasCache.add_alias ip alias) aliases;
-      let variants =
+      let norm_alias = List.map (fun (ip, _) -> normalize_person ip) aliases in
+      ( List.map snd norm_alias,
         List.fold_left
-          (fun acc (ip, _alias) ->
-            let p = Driver.poi base ip in
-            let fn = Driver.sou base (Driver.get_first_name p) in
-            if fn <> "" then Mutil.StrSet.add fn acc else acc)
-          Mutil.StrSet.empty aliases
-      in
-      (List.map fst aliases, variants))
+          (fun acc (n, _) ->
+            if n.original <> "" then Mutil.StrSet.add n.original acc else acc)
+          Mutil.StrSet.empty norm_alias ))
     else ([], Mutil.StrSet.empty)
   in
   let permuted_persons, permuted_variants =
     if opts.order && nb_words > 1 && nb_words < 5 then
-      let permutations = generate_permutations query in
+      let perms = generate_permutations query in
       List.fold_left
         (fun (acc_persons, acc_vars) perm_query ->
           let perm_direct = search_firstname_direct conf base perm_query in
@@ -829,18 +775,18 @@ let search_firstname_with_cache conf base query opts =
           let perm_vars =
             List.fold_left
               (fun acc ip ->
-                let p = Driver.poi base ip in
-                let fn = Driver.sou base (Driver.get_first_name p) in
-                if fn <> "" then Mutil.StrSet.add fn acc else acc)
+                let n, _ = normalize_person ip in
+                if n.original <> "" then Mutil.StrSet.add n.original acc
+                else acc)
               acc_vars perm_all
           in
           (acc_persons @ perm_all, perm_vars))
-        ([], Mutil.StrSet.empty) permutations
+        ([], Mutil.StrSet.empty) perms
     else ([], Mutil.StrSet.empty)
   in
   let included_iper, included_variants, phonetic_iper, phonetic_variants =
     if not opts.exact1 then (
-      let direct_included_results = List.rev !direct_included in
+      let direct_included_results = List.map snd direct_included in
       let phonetic_ngrams =
         if opts.incl_aliases then
           snd (search_firstname_with_aliases_and_ngrams conf base query)
@@ -855,42 +801,37 @@ let search_firstname_with_cache conf base query opts =
       let contains_query = ref [] in
       let other_phonetic = ref [] in
       let seen = Hashtbl.create 1000 in
-      List.iter (fun ip -> Hashtbl.add seen ip ()) direct_exact_results;
+      List.iter (fun ip -> Hashtbl.add seen ip ()) (List.map snd direct_exact);
       List.iter (fun ip -> Hashtbl.add seen ip ()) alias_results;
-      List.iter
-        (fun ip ->
-          if not (Hashtbl.mem seen ip) then (
-            Hashtbl.add seen ip ();
-            let p = Driver.poi base ip in
-            let fn = Driver.sou base (Driver.get_first_name p) in
-            let fn_lower = Name.lower fn in
-            let fn_norm = normalize_for_phonetic fn_lower in
-            if Mutil.contains fn_norm query_norm then
-              contains_query := ip :: !contains_query
-            else other_phonetic := ip :: !other_phonetic))
-        all_phonetic;
-      List.iter
-        (fun ip ->
-          if not (Hashtbl.mem seen ip) then (
-            Hashtbl.add seen ip ();
-            other_phonetic := ip :: !other_phonetic))
-        partial_phonetic;
+      let process_list lst f =
+        List.iter
+          (fun ip ->
+            if not (Hashtbl.mem seen ip) then (
+              Hashtbl.add seen ip ();
+              f ip))
+          lst
+      in
+      process_list all_phonetic (fun ip ->
+          let n, _ = normalize_person ip in
+          if Mutil.contains n.normalized nq.normalized then
+            contains_query := ip :: !contains_query
+          else other_phonetic := ip :: !other_phonetic);
+      process_list partial_phonetic (fun ip ->
+          other_phonetic := ip :: !other_phonetic);
       let included_iper = direct_included_results @ List.rev !contains_query in
       let included_variants =
         List.fold_left
           (fun acc ip ->
-            let p = Driver.poi base ip in
-            let fn = Driver.sou base (Driver.get_first_name p) in
-            if fn <> "" then Mutil.StrSet.add fn acc else acc)
+            let n, _ = normalize_person ip in
+            if n.original <> "" then Mutil.StrSet.add n.original acc else acc)
           Mutil.StrSet.empty included_iper
       in
       let phonetic_iper = List.rev !other_phonetic in
       let phonetic_variants =
         List.fold_left
           (fun acc ip ->
-            let p = Driver.poi base ip in
-            let fn = Driver.sou base (Driver.get_first_name p) in
-            if fn <> "" then Mutil.StrSet.add fn acc else acc)
+            let n, _ = normalize_person ip in
+            if n.original <> "" then Mutil.StrSet.add n.original acc else acc)
           Mutil.StrSet.empty phonetic_iper
       in
       (included_iper, included_variants, phonetic_iper, phonetic_variants))
@@ -900,21 +841,20 @@ let search_firstname_with_cache conf base query opts =
       k
         "  → %d results (%d exact, %d alias, %d permuted, %d included, %d \
          phonetic)"
-        (List.length direct_exact_results
-        + List.length alias_results
+        (List.length direct_exact + List.length alias_results
         + List.length permuted_persons
         + List.length included_iper + List.length phonetic_iper)
-        (List.length direct_exact_results)
+        (List.length direct_exact)
         (List.length alias_results)
         (List.length permuted_persons)
         (List.length included_iper)
         (List.length phonetic_iper));
   {
-    direct = { persons = direct_exact_results; variants = exact_variants };
+    direct = { persons = List.map snd direct_exact; variants = exact_variants };
     aliases = { persons = alias_results; variants = alias_variants };
+    permuted = { persons = permuted_persons; variants = permuted_variants };
     included = { persons = included_iper; variants = included_variants };
     phonetic = { persons = phonetic_iper; variants = phonetic_variants };
-    permuted = { persons = permuted_persons; variants = permuted_variants };
   }
 
 let group_by_surname base ipers =
@@ -1424,24 +1364,26 @@ let search conf base query search_order fn_options specify =
 (* Section 7: Main Entry Point                                              *)
 (* ========================================================================= *)
 
-let format_str format =
-  match format with
-  | `Dot -> "Dot"
-  | `DotOc -> "DotOc"
-  | `Space -> "Space"
-  | `Slash -> "Slash"
-  | `SlashSurname -> "SlashSurname"
-  | `SlashFirstName -> "SlashFirstName"
+module Debug = struct
+  let format_str format =
+    match format with
+    | `Dot -> "Dot"
+    | `DotOc -> "DotOc"
+    | `Space -> "Space"
+    | `Slash -> "Slash"
+    | `SlashSurname -> "SlashSurname"
+    | `SlashFirstName -> "SlashFirstName"
 
-let case_str case =
-  match case with
-  | FirstNameSurname _ -> "FirstNameSurname"
-  | PersonName _ -> "PersonName"
-  | FirstNameOnly _ -> "FirstNameOnly"
-  | SurnameOnly _ -> "SurnameOnly"
-  | ParsedName _ -> "ParsedName"
-  | NoInput -> "NoInput"
-  | InvalidFormat _ -> "InvalidFormat"
+  let case_str case =
+    match case with
+    | FirstNameSurname _ -> "FirstNameSurname"
+    | PersonName _ -> "PersonName"
+    | FirstNameOnly _ -> "FirstNameOnly"
+    | SurnameOnly _ -> "SurnameOnly"
+    | ParsedName _ -> "ParsedName"
+    | NoInput -> "NoInput"
+    | InvalidFormat _ -> "InvalidFormat"
+end
 
 let print conf base specify =
   let components = extract_name_components conf in
@@ -1486,33 +1428,39 @@ let print conf base specify =
           let oc = Option.value oc ~default:"" in
           match format with
           | `Dot ->
-              Logs.debug (fun k -> k "Print format %s" (format_str format));
+              Logs.debug (fun k ->
+                  k "Print format %s" (Debug.format_str format));
               search conf base
                 (Printf.sprintf "%s %s" fn sn)
                 order fn_options specify
           | `DotOc ->
-              Logs.debug (fun k -> k "Print format %s" (format_str format));
+              Logs.debug (fun k ->
+                  k "Print format %s" (Debug.format_str format));
               search conf base
                 (Printf.sprintf "%s.%s %s" fn oc sn)
                 order fn_options specify
           | `Space ->
-              Logs.debug (fun k -> k "Print format %s" (format_str format));
+              Logs.debug (fun k ->
+                  k "Print format %s" (Debug.format_str format));
               search conf base
                 (Printf.sprintf "%s %s" fn sn)
                 order fn_options specify
           | `Slash ->
-              Logs.debug (fun k -> k "Print format %s" (format_str format));
+              Logs.debug (fun k ->
+                  k "Print format %s" (Debug.format_str format));
               search conf base
                 (Printf.sprintf "%s %s" fn sn)
                 order fn_options specify
           | `SlashSurname ->
-              Logs.debug (fun k -> k "Print format %s" (format_str format));
+              Logs.debug (fun k ->
+                  k "Print format %s" (Debug.format_str format));
               let order = [ Surname; ApproxKey ] in
               search conf base sn order fn_options specify
           | `SlashFirstName ->
-              Logs.debug (fun k -> k "Print format %s" (format_str format));
+              Logs.debug (fun k ->
+                  k "Print format %s" (Debug.format_str format));
               let order = [ FirstName ] in
               search conf base fn order fn_options specify))
   | _ ->
-      Logs.debug (fun k -> k "Print case default (%s)" (case_str case));
+      Logs.debug (fun k -> k "Print case default (%s)" (Debug.case_str case));
       SrcfileDisplay.print_welcome conf base
