@@ -15,7 +15,7 @@ module AliasCache = struct
   let get_alias iper = try Hashtbl.find cache iper with Not_found -> None
 end
 
-module PerSet = Driver.Iper.Set
+module IperSet = Driver.Iper.Set
 
 let name_unaccent s =
   let rec copy i len =
@@ -1070,10 +1070,10 @@ let search_surname_list conf base x =
             (str, len + len1) :: List.remove_assoc str strl
           with Not_found -> (str, len) :: strl
         in
-        (List.fold_right PerSet.add iperl1 iperl, strl))
-      list (PerSet.empty, [])
+        (List.fold_right IperSet.add iperl1 iperl, strl))
+      list (IperSet.empty, [])
   in
-  (list, PerSet.elements iperl, name_inj)
+  (list, IperSet.elements iperl, name_inj)
 
 let search_surname_print conf base _not_found_fun x =
   let list, iperl, _name_inj = search_surname_list conf base x in
