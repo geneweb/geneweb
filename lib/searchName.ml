@@ -548,6 +548,30 @@ and search_firstname_phonetic conf base query =
     (Driver.spi_find (Driver.persons_of_first_name base))
     Driver.get_first_name
 
+let deduplicate_collect ipers f =
+  let seen = Hashtbl.create 1000 in
+  let result = ref [] in
+  List.iter
+    (fun ip ->
+      if not (Hashtbl.mem seen ip) then (
+        Hashtbl.add seen ip ();
+        match f ip with Some x -> result := x :: !result | None -> ()))
+    ipers;
+  List.rev !result
+
+let deduplicate_partition ipers classify =
+  let seen = Hashtbl.create 1000 in
+  let matched = ref [] in
+  let unmatched = ref [] in
+  List.iter
+    (fun ip ->
+      if not (Hashtbl.mem seen ip) then (
+        Hashtbl.add seen ip ();
+        if classify ip then matched := ip :: !matched
+        else unmatched := ip :: !unmatched))
+    ipers;
+  (List.rev !matched, List.rev !unmatched)
+
 let search_firstname_direct conf base query =
   let list, _name_inj =
     if query = "" then ([], fun x -> x)
@@ -556,27 +580,18 @@ let search_firstname_direct conf base query =
         (Driver.spi_find (Driver.persons_of_first_name base))
         Driver.get_first_name query
   in
-  let result = ref [] in
-  let seen = Hashtbl.create 1000 in
-  List.iter
-    (fun (_, _, iperl) ->
-      List.iter
-        (fun ip ->
-          if not (Hashtbl.mem seen ip) then (
-            Hashtbl.add seen ip ();
-            let p = Driver.poi base ip in
-            let fn = Driver.sou base (Driver.get_first_name p) in
-            if
-              fn <> ""
-              && (not (Driver.Istr.is_empty (Driver.get_first_name p)))
-              && (not (Driver.Istr.is_empty (Driver.get_surname p)))
-              && not
-                   (Util.is_hide_names conf p
-                   && not (Util.authorized_age conf base p))
-            then result := ip :: !result))
-        iperl)
-    list;
-  List.rev !result
+  let all_ipers = List.flatten (List.map (fun (_, _, iperl) -> iperl) list) in
+  deduplicate_collect all_ipers (fun ip ->
+      let p = Driver.poi base ip in
+      let fn = Driver.sou base (Driver.get_first_name p) in
+      if
+        fn <> ""
+        && (not (Driver.Istr.is_empty (Driver.get_first_name p)))
+        && (not (Driver.Istr.is_empty (Driver.get_surname p)))
+        && not
+             (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
+      then Some ip
+      else None)
 
 let search_firstname_aliases conf base query =
   let query_lower = Name.lower query in
@@ -615,44 +630,24 @@ let search_firstname_phonetic_split conf base query =
            search_firstname_phonetic conf base crushed)
          query_words)
   in
-  (* Cette partie n'est plus nécessaire avec l'index corrigé,
-     mais ne fait pas de mal pour compatibilité *)
-  let phonetic_iperl_hyphen =
-    if List.length query_words >= 2 then
-      let first = List.hd query_words in
-      let second = List.nth query_words 1 in
-      let hyphenated = first ^ "-" ^ second in
-      let crushed = Name.crush_lower hyphenated in
-      search_firstname_phonetic conf base crushed
-    else []
-  in
-  let all_iperl = phonetic_iperl_words @ phonetic_iperl_hyphen in
-  let seen = Hashtbl.create 1000 in
-  let exact_matches = ref [] in
-  let variant_matches = ref [] in
   let firstname_variants = ref Mutil.StrSet.empty in
-  List.iter
-    (fun iper ->
-      if not (Hashtbl.mem seen iper) then (
-        Hashtbl.add seen iper ();
-        Some.AliasCache.add_direct iper;
-        let p = Driver.poi base iper in
-        let fn = Driver.sou base (Driver.get_first_name p) in
-        let fn_lower = Name.lower fn in
-        let fn_norm = normalize_for_phonetic fn_lower in
-        let is_direct_match = Mutil.contains fn_norm query_norm in
-        if is_direct_match then (
-          exact_matches := iper :: !exact_matches;
-          if fn <> "" then
-            firstname_variants := Mutil.StrSet.add fn !firstname_variants)
-        else
-          let fn_norm_crushed = Name.crush fn_norm in
-          let query_norm_crushed = Name.crush query_norm in
-          if Mutil.contains fn_norm_crushed query_norm_crushed then
-            variant_matches := iper :: !variant_matches))
-    all_iperl;
-  let exact = List.rev !exact_matches in
-  let partial = List.rev !variant_matches in
+  let classify ip =
+    Some.AliasCache.add_direct ip;
+    let p = Driver.poi base ip in
+    let fn = Driver.sou base (Driver.get_first_name p) in
+    let fn_lower = Name.lower fn in
+    let fn_norm = normalize_for_phonetic fn_lower in
+    let is_direct_match = Mutil.contains fn_norm query_norm in
+    if is_direct_match then (
+      if fn <> "" then
+        firstname_variants := Mutil.StrSet.add fn !firstname_variants;
+      true)
+    else
+      let fn_norm_crushed = Name.crush fn_norm in
+      let query_norm_crushed = Name.crush query_norm in
+      Mutil.contains fn_norm_crushed query_norm_crushed
+  in
+  let exact, partial = deduplicate_partition phonetic_iperl_words classify in
   (exact, partial, !firstname_variants)
 
 let search_with_ngrams_complement conf base _query query_words =
@@ -677,14 +672,7 @@ let search_with_ngrams_complement conf base _query query_words =
       with _ -> []
     in
     let all = results_words @ results_ngram in
-    let seen = Hashtbl.create 1000 in
-    List.filter
-      (fun ip ->
-        if Hashtbl.mem seen ip then false
-        else (
-          Hashtbl.add seen ip ();
-          true))
-      all
+    deduplicate_collect all (fun ip -> Some ip)
 
 let search_firstname_with_aliases_and_ngrams conf base query =
   let query_lower = Name.lower query in
@@ -698,12 +686,8 @@ let search_firstname_with_aliases_and_ngrams conf base query =
   let phonetic_iper =
     search_with_ngrams_complement conf base query query_words
   in
-  let phonetic_results = ref [] in
-  let seen = Hashtbl.create 1000 in
-  List.iter
-    (fun ip ->
-      if not (Hashtbl.mem seen ip) then (
-        Hashtbl.add seen ip ();
+  let phonetic_results =
+    deduplicate_collect phonetic_iper (fun ip ->
         let p = Driver.poi base ip in
         let fn = Driver.sou base (Driver.get_first_name p) in
         let fn_lower = Name.lower fn in
@@ -711,15 +695,16 @@ let search_firstname_with_aliases_and_ngrams conf base query =
         let fn_norm_crushed = Name.crush fn_norm in
         if Mutil.contains fn_norm_crushed query_norm_crushed then (
           Some.AliasCache.add_direct ip;
-          phonetic_results := ip :: !phonetic_results)))
-    phonetic_iper;
+          Some ip)
+        else None)
+  in
   Logs.debug (fun k ->
       k
         "  Phonetic + ngrams: %d candidates → %d after dedup (will be split \
          into included/phonetic)"
         (List.length phonetic_iper)
-        (List.length !phonetic_results));
-  (alias_results, !phonetic_results)
+        (List.length phonetic_results));
+  (alias_results, phonetic_results)
 
 let search_firstname_with_cache conf base query opts =
   let nq = normalize_query query in
