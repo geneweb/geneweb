@@ -43,19 +43,19 @@ let first_name_not_found conf =
 let surname_not_found conf = not_found conf (transl conf "surname not found")
 
 let print_display_mode_navigation conf ~current_mode ~name ?branch_count () =
-  let is_absolute = p_getenv conf.env "t" = Some "A" in
-  let t_suffix = if is_absolute then "&t=A" else "" in
   let branch_label = transl_nth conf "display by/branch/alphabetic order" 1 in
   let alpha_label = transl_nth conf "display by/branch/alphabetic order" 2 in
   let print_mode_item ~icon ~label ~url_opt ~count_opt =
     Output.printf conf {|<i class="fa %s ml-3 mr-1"></i>|} icon;
     match url_opt with
-    | Some url -> (
-        Output.printf conf {|<a href="%s%s%s&v=%s" rel="nofollow">%s</a>|}
-          (commd conf :> string)
-          url t_suffix
-          (Mutil.encode name :> string)
-          label;
+    | Some opt -> (
+        let url =
+          Util.url_set_aux conf
+            (Util.commd conf :> string)
+            [ "m"; "pn"; "p"; "n"; "o"; "v" ]
+            [ "N"; ""; ""; ""; opt; name ]
+        in
+        Output.printf conf {|<a href="%s" rel="nofollow">%s</a>|} url label;
         match count_opt with
         | Some n -> Output.printf conf " (%d)" n
         | None -> ())
@@ -74,11 +74,10 @@ let print_display_mode_navigation conf ~current_mode ~name ?branch_count () =
       print_mode_item ~icon:"fa-code-fork" ~label:branch_label ~url_opt:None
         ~count_opt:branch_count;
       print_mode_item ~icon:"fa-arrow-down-a-z" ~label:alpha_label
-        ~url_opt:(Some "m=N&o=i&t=N") ~count_opt:None
+        ~url_opt:(Some "i") ~count_opt:None
   | `Alphabetic ->
-      let branch_url = if is_absolute then "m=N" else "m=NG&sn" in
       print_mode_item ~icon:"fa-code-fork" ~label:branch_label
-        ~url_opt:(Some branch_url) ~count_opt:None;
+        ~url_opt:(Some "") ~count_opt:None;
       print_mode_item ~icon:"fa-arrow-down-a-z" ~label:alpha_label ~url_opt:None
         ~count_opt:None);
   Output.print_sstring conf "</div>"
