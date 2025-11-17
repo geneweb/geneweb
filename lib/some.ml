@@ -284,7 +284,9 @@ let first_name_print_list_multi conf base x1 sections_groups =
       title count
   in
   let has_section section_id =
-    List.exists (fun (id, _, _, _) -> id = section_id) sections_groups
+    List.exists
+      (fun (id, sections, _, _) -> id = section_id && List.length sections > 0)
+      sections_groups
   in
   let main_count =
     match List.find_opt (fun (id, _, _, _) -> id = 0) sections_groups with
@@ -413,7 +415,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
       | 0 ->
           if main_count > 1 && not (StrSet.is_empty variants_set) then
             print_firstname_variants conf variants_set
-      | 1 when include_aliases ->
+      | 1 when include_aliases && section_count > 0 ->
           print_section_header "alias"
             (transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst)
             section_count;
