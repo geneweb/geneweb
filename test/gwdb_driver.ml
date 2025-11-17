@@ -528,5 +528,4 @@ let clear_descends_array _base = ()
 let clear_strings_array _base = ()
 let clear_persons_array _base = ()
 let clear_families_array _base = ()
-let gc ?dry_run:_ ~save_mem:_ _ = assert false
 let set_fpoi_cache _ = assert false

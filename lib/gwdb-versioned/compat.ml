@@ -713,9 +713,6 @@ module type Driver_S = sig
     since the last [sync] call are treated.
    *)
 
-  val gc :
-    ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list
-
   val set_fpoi_cache : base -> bool -> unit
 end
 
@@ -1545,11 +1542,6 @@ struct
   let make bname particles arrays =
     let base = Current.make bname particles arrays in
     Current_base base
-
-  let gc ?(dry_run = false) ~save_mem =
-    Util.wrap_base
-      (Legacy.gc ~dry_run ~save_mem)
-      (Current.gc ~dry_run ~save_mem)
 
   let set_fpoi_cache =
     Util.wrap_base Legacy.set_fpoi_cache Current.set_fpoi_cache

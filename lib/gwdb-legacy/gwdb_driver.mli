@@ -690,6 +690,3 @@ val sync :
     the whole database. Otherwise, only changes that occured
     since the last [sync] call are treated.
  *)
-
-val gc :
-  ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list
