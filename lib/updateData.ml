@@ -64,12 +64,10 @@ let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : Gwdb.istr) p =
-    try
-      Gwdb.IstrMap.add istr
-        (Gwdb.PersonSet.add p @@ Gwdb.IstrMap.find istr acc)
-        acc
-    with Not_found ->
-      Gwdb.IstrMap.add istr (Gwdb.PersonSet.add p Gwdb.PersonSet.empty) acc
+    match Gwdb.IstrMap.find_opt istr acc with
+    | Some persons -> Gwdb.IstrMap.add istr (Gwdb.PersonSet.add p persons) acc
+    | None ->
+        Gwdb.IstrMap.add istr (Gwdb.PersonSet.add p Gwdb.PersonSet.empty) acc
   in
   let aux
       (fn :
