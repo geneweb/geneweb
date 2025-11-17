@@ -3481,41 +3481,30 @@ let print_loading_overlay_js conf =
 
 type evar_button = { evar : string; text : string }
 
-(*
-  let evars =
-    List.fold_left ( fun acc {evar; _} ->
-      let include_evar = p_getenv conf.env evar <> None in
-      if include_evar then acc else acc ^ "&" ^ evar) "" evar_l
-  in
-
-*)
-
-let evar_buttons conf query_string evar_l title_text =
-  let remove evar evar_l =
-    List.fold_left (fun acc e -> if e = evar then acc else e :: acc) [] evar_l
-  in
-  let existing_evars =
-    List.fold_left
-      (fun acc { evar; _ } ->
-        let include_evar = p_getenv conf.env evar <> None in
-        if include_evar then evar :: acc else acc)
-      [] evar_l
-  in
+let evar_buttons conf _query_string evar_l title_text =
+  let all_conf_env = conf.env in
   let buttons =
     List.fold_left
       (fun acc { evar; text } ->
-        let include_evar = p_getenv conf.env evar <> None in
-        let evar_l =
-          if include_evar then remove evar existing_evars
-          else evar :: existing_evars
+        let toggle = p_getenv conf.env evar = None in
+        let all_conf_but_evar =
+          List.fold_left
+            (fun acc (k, v) -> if k = evar then acc else (k, v) :: acc)
+            [] all_conf_env
+          |> List.rev
         in
         let toggle_url =
-          Printf.sprintf "%sm=SN&n=%s%s"
+          Printf.sprintf "%s%s%s"
             (commd conf :> string)
-            (Mutil.encode query_string :> string)
-            (if evar_l <> [] then "&" ^ String.concat "&" evar_l else "")
+            (List.map
+               (fun (k, v) ->
+                 if Mutil.decode v = "" then Printf.sprintf "%s" k
+                 else Printf.sprintf "%s=%s" k (Mutil.decode v))
+               all_conf_but_evar
+            |> String.concat "&")
+            (if toggle then "&" ^ evar else "")
         in
-        let verb = if include_evar then "delete" else "add" in
+        let verb = if toggle then "add" else "delete" in
         let button_text =
           transl_nth conf text 0 |> transl_decline conf verb
           |> Utf8.capitalize_fst
@@ -3526,7 +3515,7 @@ let evar_buttons conf query_string evar_l title_text =
             class="btn btn-outline-secondary btn-sm ml-auto">
             <i class="fa fa-%s mr-1"></i>%s</a>|}
             toggle_url
-            (if include_evar then "minus" else "plus")
+            (if toggle then "plus" else "minus")
             button_text)
       "" evar_l
   in
