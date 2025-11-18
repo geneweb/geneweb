@@ -2222,14 +2222,25 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
   (* person_index.2 -> i2=, p2=, n2=, oc2= *)
   (* person_index.e -> ei=, ep=, en=, eoc= *)
-  | [ "person_index"; x ] -> (
+  (* same code in dagDisplay.ml, but with slight differences *)
+  | "person_index" :: x :: sl -> (
       let find_person =
         match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
-      | Some p -> VVstring (Driver.Iper.to_string (Driver.get_iper p))
-      | None -> VVstring "")
+      | Some p ->
+          let auth = authorized_age conf base p in
+          let ep = (p, auth) in
+          eval_person_field_var conf base env ep loc sl
+      | None -> (
+          match p_getenv conf.env s with
+          | Some s when Option.is_some (int_of_string_opt s) ->
+              let p = Driver.poi base (Driver.Iper.of_string s) in
+              let auth = authorized_age conf base p in
+              let ep = (p, auth) in
+              eval_person_field_var conf base env ep loc sl
+          | _ -> VVstring ""))
   | "prev_item" :: sl -> (
       match get_env "prev_item" env with
       | Vslistlm ell -> eval_item_field_var ell sl

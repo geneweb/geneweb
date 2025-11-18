@@ -235,7 +235,6 @@ let rec eval_variable (conf : Config.config) = function
       in
       loop n
   | [ "link_next" ] -> ""
-  | [ "person_index"; _x ] -> ""
   | [ "prefix_set"; pl ] ->
       let pl_l =
         match pl with

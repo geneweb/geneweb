@@ -38,8 +38,9 @@
   %elseif;(e.em="R")[*path between]
       %person_index.e.first_name; %person_index.e.surname;
       %sp;[and]
-      %if;(e.select="input" and e.n!="" and e.fn="" and e.sn="")%apply;capitalize_words(e.n)
-      %elseif;(e.select="input" and e.n="" and (e.fn!="" or e.sn!=""))%apply;capitalize_words(e.fn) %apply;capitalize_words(e.sn)
+      %if;(e.select="input" and e.pn!="" and e.p="" and e.n="")%apply;capitalize_words(e.pn)
+      %elseif;(e.select="input" and e.pn="" and (e.p!="" or e.n!=""))%apply;capitalize_words(e.p) %apply;capitalize_words(e.n)
+      %elseif;(e.select!="") %person_index.select.first_name; %person_index.select.surname;
       %else;%person_index.x.first_name; %person_index.x.surname;%end;
   %( TODO reorganise evar so that main person is always i= %)
   %elseif;(e.m="RL")[*path between]
@@ -58,6 +59,7 @@
     %if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;
   %end;
 </h3>
+
 %if;(e.m="DAG")
 <div class="ml-auto">
   %include;buttons_dag
