@@ -463,6 +463,14 @@ let ged_date_dmy opts dt cal =
              day_month ~calendar ~day:(optional day) ~month))
       ~year
   in
+  let dt =
+    let prec =
+      match dt.Date.prec with
+      | (Sure | About | Maybe | Before | After | YearInt _) as prec -> prec
+      | OrYear date -> YearInt date
+    in
+    Date.normalize_interval ~calendar:cal { dt with prec }
+  in
   (match dt.Date.prec with
   | Sure -> ()
   | About -> Printf.ksprintf (oc opts) "ABT "

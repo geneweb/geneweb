@@ -225,9 +225,8 @@ let get_death_text conf p p_auth =
         match List.assoc_opt "long_date" conf.Config.base_env with
         | Some "yes" ->
             let open Def in
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
+            DateDisplay.string_of_ondate conf d ^>^ DateDisplay.get_wday conf d
+        | Some _ | None -> DateDisplay.string_of_ondate conf d)
     | _ -> "" |> Adef.safe
   in
   let open Def in
@@ -247,9 +246,8 @@ let get_baptism_text conf p p_auth =
         match List.assoc_opt "long_date" conf.Config.base_env with
         | Some "yes" ->
             let open Def in
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
+            DateDisplay.string_of_ondate conf d ^>^ DateDisplay.get_wday conf d
+        | Some _ | None -> DateDisplay.string_of_ondate conf d)
     | _ -> "" |> Adef.safe
   in
   let open Def in
@@ -269,9 +267,8 @@ let get_birth_text conf p p_auth =
         match List.assoc_opt "long_date" conf.Config.base_env with
         | Some "yes" ->
             let open Def in
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
+            DateDisplay.string_of_ondate conf d ^>^ DateDisplay.get_wday conf d
+        | Some _ | None -> DateDisplay.string_of_ondate conf d)
     | _ -> "" |> Adef.safe
   in
   let open Def in
@@ -283,9 +280,8 @@ let get_marriage_date_text conf fam p_auth =
       match List.assoc_opt "long_date" conf.Config.base_env with
       | Some "yes" ->
           let open Def in
-          DateDisplay.string_of_ondate ~link:false conf d
-          ^>^ DateDisplay.get_wday conf d
-      | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
+          DateDisplay.string_of_ondate conf d ^>^ DateDisplay.get_wday conf d
+      | Some _ | None -> DateDisplay.string_of_ondate conf d)
   | _ -> "" |> Adef.safe
 
 let get_burial_text conf p p_auth =
@@ -304,9 +300,9 @@ let get_burial_text conf p p_auth =
             match List.assoc_opt "long_date" conf.Config.base_env with
             | Some "yes" ->
                 let open Def in
-                DateDisplay.string_of_ondate ~link:false conf d
+                DateDisplay.string_of_ondate conf d
                 ^>^ DateDisplay.get_wday conf d
-            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
+            | Some _ | None -> DateDisplay.string_of_ondate conf d)
         | _ -> "" |> Adef.safe)
     | Def.UnknownBurial | Def.Cremated _ -> "" |> Adef.safe
   in
@@ -329,9 +325,9 @@ let get_cremation_text conf p p_auth =
             match List.assoc_opt "long_date" conf.Config.base_env with
             | Some "yes" ->
                 let open Def in
-                DateDisplay.string_of_ondate ~link:false conf d
+                DateDisplay.string_of_ondate conf d
                 ^>^ DateDisplay.get_wday conf d
-            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
+            | Some _ | None -> DateDisplay.string_of_ondate conf d)
         | _ -> "" |> Adef.safe)
     | Def.UnknownBurial | Def.Buried _ -> "" |> Adef.safe
   in
@@ -2568,8 +2564,7 @@ and eval_date_field_var conf d = function
           | _ -> null_val)
       | _ -> null_val)
   | [] ->
-      DateDisplay.string_of_date_aux ~link:false conf ~sep:(Adef.safe "<br>") d
-      |> safe_val
+      DateDisplay.string_of_date_aux conf ~sep:(Adef.safe "<br>") d |> safe_val
   | _ -> raise Not_found
 
 and eval_nobility_title_field_var (id, pl) = function

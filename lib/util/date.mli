@@ -133,3 +133,5 @@ val partial_date_lower_bound :
 
 val make_date_error_message :
   prefix:string -> 'a Calendars.erroneous_date -> string
+
+val normalize_interval : calendar:calendar -> dmy -> dmy

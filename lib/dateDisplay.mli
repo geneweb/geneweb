@@ -4,7 +4,7 @@ val get_wday : Config.config -> Date.date -> string
 (** [get_wday conf date]
     Return the day of the week for this [date] *)
 
-val code_dmy : Config.config -> Date.dmy -> string
+val code_dmy : ?with_short_month:bool -> Config.config -> Date.dmy -> string
 (** Returns textual representation of the date translated to the current language.
     Uses different encodings depending on day's, month's and year's accessibility.
     Doesn't consider precision. *)
@@ -14,26 +14,26 @@ val code_hebrew_date : Config.config -> int -> int -> int -> string
     translated to the current language.
 *)
 
-val string_of_dmy : Config.config -> Date.dmy -> Adef.safe_string
+val string_of_dmy :
+  ?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string
 (** Converts and translate date to the textual representation for the giving language. Considers precision. *)
 
 val string_of_date : Config.config -> Date.date -> Adef.safe_string
 (** If date is [Dgreg] calls for [string_of_dmy] to convert date to the string else returns content of [Dtext].
     Difference between calendars is not taken into the acount. *)
 
-val string_of_ondate :
-  ?link:bool -> Config.config -> Date.date -> Adef.safe_string
+val string_of_ondate : Config.config -> Date.date -> Adef.safe_string
 (** Converts and translate date with considering different calendars with prefix "on"
     before dates (changes for other languages).
-    Date precision is much more verbose then with [string_of_date]. Decline phrase if needed.
-    If [link] is true then encapsulates result in HTML link to the page calendar's date converter. *)
+    Date precision is much more verbose then with [string_of_date]. Decline phrase if needed. *)
 
-val string_of_on_french_dmy : Config.config -> Date.dmy -> Adef.safe_string
-(** Translate a date in the french calendar
-    with prefix "on" before dates (changes for other languages). *)
-
-val string_of_on_hebrew_dmy : Config.config -> Date.dmy -> Adef.safe_string
-(** Translate a date in the hebrew calendar
+val string_of_on_calendar_dmy :
+  ?with_gregorian_precisions:bool ->
+  calendar:[< `Julian | `French | `Hebrew ] ->
+  Config.config ->
+  Date.dmy ->
+  Adef.safe_string
+(** Translate a date in the [calendar]
     with prefix "on" before dates (changes for other languages). *)
 
 val string_slash_of_date : Config.config -> Date.date -> Adef.safe_string
@@ -85,8 +85,7 @@ val code_french_year : Config.config -> int -> string
 (** Returns roman number of the year of French calendar *)
 
 val string_of_date_aux :
-  ?link:bool ->
-  ?dmy:(Config.config -> Date.dmy -> Adef.safe_string) ->
+  ?dmy:(?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string) ->
   ?sep:Adef.safe_string ->
   Config.config ->
   Date.date ->
@@ -106,10 +105,16 @@ val string_of_prec_dmy :
   Config.config ->
   Adef.safe_string ->
   Adef.safe_string ->
-  Date.dmy ->
+  Date.precision ->
   Adef.safe_string
-(** [string_of_prec_dmy conf s s2 d]
+(** [string_of_prec_dmy conf s s2 precision]
     Takes two date representations (as strings) [s] and [s2] and
-    returns translated phrase according to prec of [d].
-    [d] is only used to determine the precision
+    returns translated phrase according to the given [precision].
  *)
+
+val code_french_date : Config.config -> int -> int -> int -> string
+
+val gregorian_precision :
+  ?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string
+
+val code_julian_date : Config.config -> Date.dmy -> string
