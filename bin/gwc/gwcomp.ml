@@ -281,7 +281,7 @@ let date_of_string s i =
               Some (Dgreg (d, Dhebrew), i + 1)
           | 'I' ->
               let d = Date.convert ~from:Dislamic ~to_:Dgregorian d in
-              Some (Dgreg (d, Dgregorian), i + 1)
+              Some (Dgreg (d, Dislamic), i + 1)
           | _ -> Some (Dgreg (d, Dgregorian), i))
     | d -> d
   in
