@@ -39,7 +39,7 @@
       %else;
         <input type="hidden" name="ei" value="%index;">
       %end;
-      <input type="hidden" name="m" value="NG">
+      <input type="hidden" name="m" value="R">
       <span>[*relationship shortcut][:]</span>
       <div class="mt-1 ml-2">
         %if;((user.index!="" and not browsing_with_sosa_ref) or (browsing_with_sosa_ref and user.index!=sosa_ref.index))
@@ -107,18 +107,18 @@
         %else;
           <input type="hidden" name="ei" value="%index;">
         %end;
-        <input type="hidden" name="m" value="NG">
+        <input type="hidden" name="m" value="R">
         <div class="custom-control custom-radio">
           <input type="radio" class="custom-control-input" id="radio_R" name="select" value="input" onclick="main()" checked>
           <label class="custom-control-label" for="radio_R">[*search/case sensitive]0 [any individual in the base][:]</label>
         </div>
         <div>
-          <label class="sr-only" for="n">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
-          <input type="search" id="n" class="form-control mt-2" name="n" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…" autofocus>
+          <label class="sr-only" for="pn">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
+          <input type="search" id="pn" class="form-control mt-2" name="pn" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…" autofocus>
           <label class="sr-only" for="firstname">[*first name/first names]0</label>
-          <input type="search" id="firstname" class="form-control mt-2" name="fn" placeholder="[*first name/first names]0">
+          <input type="search" id="firstname" class="form-control mt-2" name="p" placeholder="[*first name/first names]0">
           <label class="sr-only" for="surname">[*surname/surnames]0</label>
-          <input type="search" id="surname" class="form-control mt-2" name="sn" placeholder="[*surname/surnames]0">
+          <input type="search" id="surname" class="form-control mt-2" name="n" placeholder="[*surname/surnames]0">
         </div>
       </div>
       <div class="text-center my-4">

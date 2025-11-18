@@ -1064,9 +1064,8 @@ let print_base_loop conf base p =
   Output.print_sstring conf ".";
   Hutil.trailer conf
 
-let relmenu_print = Perso.interp_templ "relmenu"
-
-let print conf base p = function
+let print conf base p p1 =
+  match p1 with
   | Some p1 -> (
       match p_getenv conf.env "et" with
       | Some "S" -> print_shortest_path conf base p1 p
@@ -1081,7 +1080,7 @@ let print conf base p = function
           with
           | Left rel -> print_main_relationship conf base long p1 p rel
           | Right p -> print_base_loop conf base p))
-  | None -> relmenu_print conf base p
+  | None -> Perso.interp_templ "relmenu" conf base p
 
 let print_multi conf base =
   let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t =
