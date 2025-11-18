@@ -2,6 +2,32 @@
 
 open Config
 
+type search_case =
+  | NoInput
+  | PersonName of string
+  | SurnameOnly of string
+  | FirstNameOnly of string
+  | FirstNameSurname of string * string
+  | ParsedName of {
+      first_name : string option;
+      surname : string option;
+      oc : string option;
+      original : string;
+      format :
+        [ `Space | `Slash | `Dot | `SlashSurname | `SlashFirstName | `DotOc ];
+    }
+  | InvalidFormat of string
+
+type name_components = {
+  first_name : string option;
+  surname : string option;
+  oc : string option;
+  person_name : string option;
+  case : search_case;
+}
+
+val extract_name_components : config -> name_components
+
 val search_key_aux :
   (config ->
   Geneweb_db.Driver.base ->

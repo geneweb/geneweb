@@ -51,7 +51,7 @@ let find_all conf base an =
             conf base an,
           false )
 
-let relation_print conf base p =
+let _relation_print conf base p =
   let p1 =
     match p_getenv conf.senv "ei" with
     | Some i ->
@@ -240,7 +240,9 @@ let incorrect_request ?(comment = "") conf =
 
 let person_selected conf base p =
   match p_getenv conf.senv "em" with
-  | Some "R" -> relation_print conf base p
+  | Some "R" ->
+      let p1 = find_person_in_env_pref conf base "e" in
+      RelationDisplay.print conf base p p1
   | Some _ -> incorrect_request conf ~comment:"incorrect em= value"
   | None ->
       record_visited conf (Driver.get_iper p);
@@ -248,7 +250,9 @@ let person_selected conf base p =
 
 let person_selected_with_redirect conf base p =
   match p_getenv conf.senv "em" with
-  | Some "R" -> relation_print conf base p
+  | Some "R" ->
+      let p1 = find_person_in_env_pref conf base "e" in
+      RelationDisplay.print conf base p p1
   | Some _ -> incorrect_request conf ~comment:"Incorrect em= value"
   | None ->
       Wserver.http_redirect_temporarily
@@ -813,8 +817,9 @@ let treat_request =
                              incorrect_request conf base
                                ~comment:"Missing fn= and sn= for m=NG"))
                  | Some i ->
-                     relation_print conf base
-                       (pget conf base (Driver.Iper.of_string i)))
+                     RelationDisplay.print conf base
+                       (pget conf base (Driver.Iper.of_string i))
+                       (find_person_in_env_pref conf base "e"))
              | "NOTES" ->
                  w_base (fun conf base ->
                      match
@@ -855,21 +860,56 @@ let treat_request =
              | "PPS" -> w_base @@ Place.print_all_places_surnames
              | "R" -> (
                  w_base @@ fun conf base ->
-                 (* Tout le code du cas R doit être dans une seule expression *)
-                 let p1_new = find_person_in_env conf base "1" in
-                 let p2_new = find_person_in_env conf base "2" in
-                 match (p1_new, p2_new) with
-                 | Some p1, Some p2 ->
-                     RelationDisplay.print conf base p1 (Some p2)
+                 match p_getenv conf.env "select" with
+                 | Some "input" -> (
+                     let components = SearchName.extract_name_components conf in
+                     let fn = components.first_name in
+                     let sn = components.surname in
+                     let search n =
+                       let pl, sosa_acc = find_all conf base n in
+                       match pl with
+                       | [] -> Some.search_surname_print conf base unknown n
+                       | [ p ] ->
+                           if
+                             sosa_acc
+                             || Gutil.person_of_string_key base n <> None
+                             || person_is_std_key conf base p n
+                           then person_selected_with_redirect conf base p
+                           else specify conf base n pl [] []
+                       | pl -> specify conf base n pl [] []
+                     in
+                     match p_getenv conf.env "v" with
+                     | Some n -> search n
+                     | None -> (
+                         match (fn, sn) with
+                         | Some fn, Some sn -> search (fn ^ " " ^ sn)
+                         | _ ->
+                             incorrect_request conf base
+                               ~comment:"Missing p= and n= for m=R"))
+                 | Some i ->
+                     RelationDisplay.print conf base
+                       (pget conf base (Driver.Iper.of_string i))
+                       (find_person_in_env_pref conf base "e")
                  | _ -> (
-                     (* Fallback sur l'ancien format *)
-                     let p1_old = find_person_in_env conf base "" in
-                     let p2_old = find_person_in_env conf base "1" in
-                     match (p1_old, p2_old) with
+                     (* Tout le code du cas R doit être dans une seule expression *)
+                     let p1_new = find_person_in_env conf base "1" in
+                     let p2_new = find_person_in_env conf base "2" in
+                     match (p1_new, p2_new) with
                      | Some p1, Some p2 ->
                          RelationDisplay.print conf base p1 (Some p2)
-                     | Some p1, None -> relation_print conf base p1
-                     | _ -> Hutil.incorrect_request conf))
+                     | _ -> (
+                         (* Fallback sur l'ancien format *)
+                         let p1_old = find_person_in_env conf base "" in
+                         let p2_old = find_person_in_env conf base "1" in
+                         match (p1_old, p2_old) with
+                         | Some p1, Some p2 ->
+                             RelationDisplay.print conf base p1 (Some p2)
+                         | Some p1, None ->
+                             RelationDisplay.print conf base p1
+                               (find_person_in_env_pref conf base "e")
+                         | _ ->
+                             Hutil.incorrect_request conf
+                               ~comment:"Incorrect fallback for m=R")))
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
                  Output.status conf Def.OK;
