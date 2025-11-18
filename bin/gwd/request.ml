@@ -886,7 +886,7 @@ let treat_request =
                          | _ ->
                              incorrect_request conf base
                                ~comment:"Missing p= and n= for m=R"))
-                 | Some i ->
+                 | Some i when Option.is_some (int_of_string_opt i) ->
                      RelationDisplay.print conf base
                        (pget conf base (Driver.Iper.of_string i))
                        (find_person_in_env_pref conf base "e")
