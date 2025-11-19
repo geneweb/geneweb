@@ -1273,7 +1273,7 @@ let read_family state ic fname =
   | Some (str, "notes" :: l) -> (
       let surname, l = get_name l in
       let first_name, occ, l = get_fst_name str l in
-      if l <> [] then Error "str"
+      if l <> [] then Error str
       else
         match read_line state ic with
         | Some (_, [ "beg" ]) ->
@@ -1303,7 +1303,7 @@ let read_family state ic fname =
         | "#f" :: l -> (make_strong_assumption Def.Female, l)
         | l -> (make_weak_assumption Def.Neuter, l)
       in
-      if l <> [] then Error "str"
+      if l <> [] then Error str
       else
         match read_line state ic with
         (* Read list of relations *)
