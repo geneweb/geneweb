@@ -1,10 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Outbase = Geneweb_db.Outbase
-
 (** Checks a .gwo header and prints fails if header is absent or not compatible.
 *)
-
 let check_magic fname ic =
   let b = really_input_string ic (String.length Gwcomp.magic_gwo) in
   if b <> Gwcomp.magic_gwo then
@@ -97,6 +94,23 @@ let next_family_fun_templ gwo_list fi =
     in
     loop ()
 
+(* Parse -ngrams argument: <bi>[,<tri>[,<quad>]] *)
+let parse_ngrams s =
+  match String.split_on_char ',' s with
+  | [ bi_str ] ->
+      let bi = int_of_string bi_str in
+      let tri = max 10 (bi / 25) in
+      let quad = max 5 (bi / 50) in
+      (bi, tri, quad)
+  | [ bi_str; tri_str ] ->
+      let bi = int_of_string bi_str in
+      let tri = int_of_string tri_str in
+      let quad = max 5 (tri / 2) in
+      (bi, tri, quad)
+  | [ bi_str; tri_str; quad_str ] ->
+      (int_of_string bi_str, int_of_string tri_str, int_of_string quad_str)
+  | _ -> failwith "Invalid -ngrams format. Use: <bi>[,<tri>[,<quad>]]"
+
 let just_comp = ref false
 let in_file = ref ""
 let separate = ref false
@@ -104,6 +118,8 @@ let bnotes = ref "merge"
 let shift = ref 0
 let files = ref []
 let kill_gwo = ref false
+let no_warn = ref false
+let ngrams_arg = ref None
 
 let speclist =
   [
@@ -125,13 +141,18 @@ let speclist =
     );
     ("-f", Arg.Set Geneweb.GWPARAM.force, " Remove database if already existing");
     ("-gwo", Arg.Set kill_gwo, " Suppress .gwo files after base creation");
-    ("-mem", Arg.Set Outbase.save_mem, " Save memory, but slower");
+    ("-mem", Arg.Set Geneweb_db.Outbase.save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear Db1link.do_check, " No consistency check");
     ("-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error");
+    ( "-ngrams",
+      Arg.String (fun s -> ngrams_arg := Some (parse_ngrams s)),
+      "<bi>[,<tri>[,<quad>]] N-gram indexing thresholds (e.g., '500,20,10' or \
+       '500')" );
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
     ( "-nopicture",
       Arg.Set Gwcomp.no_picture,
       " Do not create associative pictures" );
+    ("-nowarn", Arg.Set no_warn, " Do not show warnings during import");
     ( "-o",
       Arg.Set_string Gwcomp.out_file,
       "<file> Output database (default: <input file name>.gwb, a.gwb if not \
@@ -167,14 +188,15 @@ let errmsg =
    and [options] are:"
 
 let main () =
-  (try
-     if Sys.is_directory !Gwcomp.rgpd_dir then Gwcomp.rgpd := true
-     else Gwcomp.rgpd := false
-   with Sys_error _ ->
-     Printf.eprintf "Warning: failed testing for %s\n" !Gwcomp.rgpd_dir;
-     Gwcomp.rgpd := false);
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  if Array.mem "-rgpd" Sys.argv then (
+    if
+      not (Sys.file_exists !Gwcomp.rgpd_dir && Sys.is_directory !Gwcomp.rgpd_dir)
+    then (
+      Printf.eprintf "Error: RGPD directory not found\n";
+      exit 2);
+    Gwcomp.rgpd := true);
   in_file :=
     if !in_file <> "" then
       Filename.remove_extension (Filename.basename !in_file)
@@ -186,21 +208,17 @@ let main () =
   if !in_file <> "" && not (Array.mem "-o" Sys.argv) then
     Gwcomp.out_file := !in_file;
   if not (Mutil.good_name (Filename.basename !Gwcomp.out_file)) then (
-    (* Util.transl conf not available !*)
     Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
       !Gwcomp.out_file;
     Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
     flush stderr;
     exit 2);
   let bname = Filename.remove_extension (Filename.basename !Gwcomp.out_file) in
-  Geneweb.GWPARAM.init bname;
+  Geneweb.GWPARAM.init ();
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Db1link.particules_file = "" then
     Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
-
-  if !Gwcomp.rgpd then
-    Printf.eprintf "Rgpd status: True, files in: %s\n" !Gwcomp.rgpd_dir
-  else Printf.eprintf "Rgpd status: False\n";
+  if not !just_comp then Geneweb.GWPARAM.check_base_exists bname;
   let gwo = ref [] in
   List.iter
     (fun (x, separate, bnotes, shift) ->
@@ -214,11 +232,8 @@ let main () =
         gwo := (x, separate, bnotes, shift) :: !gwo
       else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
     (List.rev !files);
-  if not !just_comp then (
-    let bdir = !Geneweb.GWPARAM.bpath bname in
-    (* test_base will fail if base exists and force has not been set (-f) *)
-    Geneweb.GWPARAM.test_base bname;
-    Geneweb.GWPARAM.init_etc bname;
+  if not !just_comp then
+    let bdir = Geneweb.GWPARAM.create_base_and_config bname in
     let lock_file = Mutil.lock_file bdir in
     let on_exn exn bt =
       Format.eprintf "%a@." Lock.pp_exception (exn, bt);
@@ -226,16 +241,22 @@ let main () =
     in
     Lock.control ~on_exn ~wait:false ~lock_file (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-        if Db1link.link next_family_fun bdir then (
-          Geneweb.Util.print_default_gwf_file bname;
+        (match !ngrams_arg with
+        | Some (bi, tri, quad) ->
+            Geneweb_db.Outbase.set_ngram_thresholds bi tri quad;
+            Printf.eprintf "N-grams enabled: bi≥%d, tri≥%d, quad≥%d\n" bi tri
+              quad;
+            flush stderr
+        | None -> ());
+        if Db1link.link ~no_warn:!no_warn next_family_fun bdir then (
           if !kill_gwo then
             List.iter
               (fun (x, _separate, _bnotes, _shift) ->
                 if Sys.file_exists (x ^ "o") then Mutil.rm (x ^ "o"))
               (List.rev !files))
         else (
-          Printf.eprintf "*** database not created\n";
+          Printf.eprintf "*** database NOT created!\n";
           flush stderr;
-          exit 2)))
+          exit 2))
 
 let _ = main ()

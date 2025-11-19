@@ -18,6 +18,8 @@
             geneweb_logs
             yojson
             markup
+            re
+            uucp
             uri
             wserver
             digestif))

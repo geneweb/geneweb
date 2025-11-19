@@ -30,9 +30,9 @@
 %let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<static_max_anc_level)%bvar.max_anc_level;%else;%max_anc_level;%end;%in;
 %let;maxp;%expr(max+1)%in;
 %define;picklvl(vvv)
-  <a role="button" class="btn btn-sm btn-light%if;(vvv=e_v or (e_v>max and vvv=max)) disabled font-weight-bold text-white bg-dark%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
-  aria-label="select ascending generation level vvv to display ancestors up to that degree."%sp;
-  title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([ascending/descending (degree)]1 [up to] %max_desc_level;)%end;">vvv</a>%nn;
+  <a role="button" class="btn btn-sm btn-light%if;(vvv=e_v or (e_v>max and vvv=max)) disabled font-weight-bold text-white bg-dark%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;" onclick="showOverlay()"
+    aria-label="select ascending generation level vvv to display ancestors up to that degree."
+    title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([ascending/descending (degree)]1 [up to] %max_desc_level;)%end;">vvv</a>%nn;
 %end;
 %if;(max!=0 and not (max=1 and not has_children))
   <div class="d-flex flex-wrap align-self-center btn-toolbar py-0 mx-3 mt-1" role="toolbar" aria-label="buttons to select maximum ascending level v">
@@ -137,10 +137,10 @@
           </div>
           <div class="d-block flex-grow-1 justify-content-start align-self-center order-2 text-truncate text-nowrap px-0">
             <a class="lh-2" href="%prefix;%path_end.access;"title="%if;(jd_age_!="" and jd_age_>364)%cous_age; [years old] (%jd_age_sep; [days old])%elseif;(jd_age_!="")%if;(jd_age_<365 and jd_age_>1)%jd_age_; [days old]%elseif;(jd_age_=1)[one day old]%elseif;(jd_age_=0)0 [year/month/day]2%end;%end;%if;(path_end.occ!="0")%if;(jd_age_!="") | %end;occ %path_end.occ;%end;"%sp;
-              %(data-anclist="%path_end.anc_f_list;"%)>%(%jd_age; |%birth_age;-%death_age_;| %birth_yr;%birth_pr;%if;(cous_isdead=1)†%else;°%end; %death_yr;%death_pr; || %path_end.nbr; | %path_end.lev_cnt; | %path_end.anc_level; DEBUG %)%path_end.surname; %path_end.first_name;%nn;
-            </a>
-            %if;wizard;<a href="%prefix;&m=MOD_IND&i=%path_end.index;"%else;<span%end; title="%if;wizard;[modify] [person/persons]0%end;">
-              %if;(path_end.dates!="")%path_end.dates;%else;%if;(cous_isdead=1)†%else;°%end;%end;
+              %(data-anclist="%path_end.anc_f_list;"%)>%(%jd_age; |%birth_age;-%death_age_;| %birth_yr;%birth_pr;%if;(cous_isdead=1) †%else; °%end; %death_yr;%death_pr; || %path_end.nbr; | %path_end.lev_cnt; | %path_end.anc_level; DEBUG %)%path_end.surname; %path_end.first_name;%nn;
+            </a>%nn;
+            %if;wizard;<a href="%prefix;&m=MOD_IND&i=%path_end.index;"%else;<span%end; title="%if;wizard;[modify] [person/persons]0%end;">%nn;
+              %if;(path_end.dates!="")%path_end.dates;%else;%if;(cous_isdead=1) †%else; °%end;%end;
             %if;wizard;</a>%else;</span>%end;
           </div>
         </div>
@@ -379,6 +379,7 @@
 %include;trl
 %include;copyr
 </div>
+%include;overlay
 %include;js
 %query_time;
 <script>

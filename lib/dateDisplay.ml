@@ -591,7 +591,7 @@ let short_dates_text_notag conf base p =
 
 let short_dates_text conf base p =
   let s = short_dates_text_notag conf base p in
-  if s <> "" then Adef.safe @@ " <bdo dir=ltr>" ^ s ^ "</bdo>" else Adef.safe ""
+  if s <> "" then Adef.safe @@ " <bdo dir=ltr>" ^ s ^ "</bdo>" else Adef.safe ""
 
 (* ********************************************************************** *)
 (* [Fonc] short_marriage_date_text :

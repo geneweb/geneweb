@@ -269,8 +269,8 @@ let linked_page_rows conf base pg pgl =
           (Format.sprintf
              {|
 <td class="text-center">
-  <a href="%sm=MOD_NOTES" title="%s">
-    <i class="far fa-file-lines"></i></a></td>|}
+  <a href="%sm=MOD_NOTES" title="%s"><i class="far fa-file-lines"></i></a>
+</td>|}
              (commd conf :> string)
              (Utf8.capitalize_fst (transl conf "modify note")));
       Output.print_sstring conf
@@ -291,8 +291,8 @@ let linked_page_rows conf base pg pgl =
             (Format.sprintf
                {|
 <td class="text-center">
-  <a href="%sm=MOD_NOTES&f=%s" title="%s">
-    <i class="%s"></i></a></td>|}
+  <a href="%sm=MOD_NOTES&f=%s" title="%s"><i class="%s"></i></a>
+</td>|}
                (commd conf :> string)
                (Util.uri_encode fnotes)
                (Utf8.capitalize_fst

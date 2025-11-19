@@ -2,6 +2,23 @@
 open Config
 open Def
 
+val make_link :
+  ?title:string ->
+  ?css_class:string ->
+  ?tabindex:int option ->
+  ?aria_label:string ->
+  ?disabled:bool ->
+  ?target:string option ->
+  ?data_attrs:(string * string) list ->
+  href:string ->
+  content:string ->
+  unit ->
+  Adef.safe_string
+(** [make_link conf ~href ~content ()] creates an accessible HTML link with
+    proper aria-label, title, and other accessibility attributes. Handles
+    disabled state appropriately. The data_attrs parameter allows custom data-*
+    attributes for JavaScript interaction. *)
+
 val hash_file : string -> string option
 (** [hash_file path] Compute the MD5 hash of the file at [path]. Returns
     [Some hex] on success or [None] if the file couldn’t be read. *)
@@ -379,6 +396,11 @@ val update_family_loop :
 val p_getenv : Config.env -> string -> string option
 (** Returns value associated to the label in environnement *)
 
+val p_getenv_notrim :
+  (string * Adef.encoded_string) list -> string -> string option
+(** [p_getenv_notrim env label] like [p_getenv] but preserves leading/trailing
+    spaces *)
+
 val p_getint : Config.env -> string -> int option
 (** Returns integer value associated to the label in environnement *)
 
@@ -508,13 +530,15 @@ val mark_if_not_public :
     if url contains red_if_not_public=on *)
 
 val husband_wife :
+  ?buf:Buffer.t ->
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   bool ->
   Adef.safe_string
 (** returns a string listing the spouses of a person [bool] if true return all
-    spouses otherwise the first one only *)
+    spouses otherwise the first one only optionally writes directly into the
+    provided [Buffer.t] *)
 
 val find_person_in_env :
   config -> Geneweb_db.Driver.base -> string -> Geneweb_db.Driver.person option
@@ -590,11 +614,37 @@ val old_sosa_of_branch :
 (** @deprecated Use [sosa_of_branch] instead *)
 
 val only_printable : string -> string
-(** Trims and remplaces all non-printable characters by spaces in the given
-    string. *)
+(** Complete input sanitization: removes invisible Unicode chars, ASCII control
+    chars, and trims. Used before saving user input *)
 
 val only_printable_or_nl : string -> string
-(** Same as [only_printable] but also accepts '\n'. *)
+(** Same as [only_printable] but also accepts newlines. *)
+
+type char_category = [ `Control | `Invisible | `Space | `ZeroWidth ]
+
+type clean_options = {
+  remove_control : bool;
+  remove_invisible : bool;
+  remove_zero_width : bool;
+  normalize_spaces : bool;
+  keep_newlines : bool;
+  keep_tabs : bool;
+}
+
+val default_clean_options : clean_options
+(** Default options for clean_string: removes all problematic chars. *)
+
+val clean_string : ?options:clean_options -> string -> string
+(** Generic string cleaning with configurable options. *)
+
+val get_problem_char_name : int -> string option
+(** Get Unicode character name for a problematic character code. *)
+
+val get_problem_chars_codes : char_category -> int list
+(** Get list of Unicode code points for given category. *)
+
+val get_unicode_point : string -> int -> int * int
+(** Parse UTF-8 char at position, returns (codepoint, bytes_count). *)
 
 val relation_type_text : config -> relation_type -> int -> Adef.safe_string
 val rchild_type_text : config -> relation_type -> int -> Adef.safe_string
@@ -614,7 +664,7 @@ val end_centered : config -> unit
 *)
 
 val print_alphab_list :
-  config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
+  config -> ?prefix:string -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
 
 val short_f_month : int -> string
 
@@ -793,3 +843,59 @@ val sys_to_note_link : string -> string
 
 val note_link_to_sys : string -> string
 (** convert note_link path (a:b:c) to system format (a/b/c) *)
+
+val url_has_pnoc_params : (string * 'a) list -> bool
+(** [url_has_pnoc_params env] checks if the environment contains parameters
+    starting with 'p' or 'n' followed by digits (e.g., p1, n2, p34). Used to
+    detect persons accessed by key in URL parameters. *)
+
+val normalize_person_pool_url :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  string ->
+  (Geneweb_db.Driver.iper, string) Hashtbl.t option ->
+  string
+(** [normalize_person_pool_url conf base target_module assoc_txt_opt] Converts
+    mixed person parameters (p/n/oc and i) to normalized index-only URLs.
+
+    - Converts p1/n1/oc1 → i1, p2/n2/oc2 → i2, etc.
+    - Preserves existing i1, i2, etc. parameters as-is
+    - For RLM mode: preserves t= text parameters in URL and fills assoc_txt
+    - For RM mode: strips all t= parameters (cleaner URLs)
+    - Returns clean URL with format: "?m=TARGET&i1=123&i2=456..."
+
+    @param conf Configuration
+    @param base Database
+    @param target_module Target module name ("RLM" or "RM")
+    @param assoc_txt_opt Optional hashtable for text descriptions (RLM only)
+    @return Normalized URL string *)
+
+val print_loading_overlay :
+  Config.config -> ?custom_translation_key:string -> unit -> unit
+(** [print_loading_overlay conf ?custom_translation_key ()] generates a loading
+    overlay with a spinner and message. Uses the translation key
+    [waiting overlay] by default, or the provided custom translation key. The
+    overlay is initially hidden and can controlled via JavaScript functions. *)
+
+val loading_overlay_js_content : string
+(** [loading_overlay_js_content] contains the JavaScript code for loading
+    overlay functionality as a string constant. This allows modules to compose
+    this JavaScript with their own code rather than printing it directly.
+
+    Contains showOverlay(), hideOverlay() functions and automatic DOM ready
+    initialization. Can be concatenated with other JavaScript before output. *)
+
+val print_loading_overlay_js : Config.config -> unit
+(** [print_loading_overlay_js conf] generates JavaScript functions to control
+    the loading overlay: showOverlay() to display it, hideOverlay() to hide it,
+    and automatic hiding when the page finishes loading. Works with any overlay
+    that has the "loading-overlay" CSS class. *)
+
+type evar_button = { evar : string; text : string }
+
+val evar_buttons : config -> string -> evar_button list -> string -> unit
+(** evar_button conf query_string evar evar_text title_text creates a button to
+    toggle evar *)
+
+val url_set_aux : config -> string -> string list -> string list -> string
+(** *)

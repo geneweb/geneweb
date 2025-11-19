@@ -127,6 +127,8 @@ type base_func = {
   (* Insert new string inside the pending patches and returns its id.
      If string already exists return its id. *)
   insert_string : string -> int;
+  (* Replace string inside the pending patches and returns its id. *)
+  replace_string : string -> string -> int;
   (* Commit pending patches and write a patches' new state inside "patches"
      file. "nb_persons" is also updated. *)
   commit_patches : unit -> unit;

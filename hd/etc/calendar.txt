@@ -18,7 +18,7 @@
 
 %define;fun_day(ccc, nnn)
   <td><button class="btn btn-outline-secondary" type="submit" name="dccc1">&lt;</button></td>
-  <td><input type="number" class="form-control text-center" name="dccc" min="1" max="31" value="%date.nnn.day;"%/></td>
+  <td><input type="number" class="form-control text-center" name="dccc" min="1" max="31" value="%date.nnn.day;"></td>
   <td><button class="btn btn-outline-secondary" type="submit" name="dccc2">&gt;</button></td>
 %end;
 
@@ -40,7 +40,7 @@
 
 %define;fun_year(ccc, nnn)
   <td><button class="btn btn-outline-secondary" type="submit" name="yccc1">&lt;</button></td>
-  <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%date.nnn.year;"%/></td>
+  <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%date.nnn.year;"></td>
   <td><button class="btn btn-outline-secondary" type="submit" name="yccc2">&gt;</button></td>
 %end;
 
@@ -52,7 +52,7 @@
     %else;%date.nnn.year;%end;
   %in;
   <td><button class="btn btn-outline-secondary" type="submit" name="yccc1">&lt;</button></td>
-  <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%year;"%/></td>
+  <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%year;"></td>
   <td><button class="btn btn-outline-secondary" type="submit" name="yccc2">&gt;</button></td>
 %end;
 
@@ -85,7 +85,7 @@
     <form method="get" action="%action;">
       <div class="form-inline">
         %hidden;
-        <input type="hidden" name="m" value="CAL"%/>
+        <input type="hidden" name="m" value="CAL">
         <table class="table-sm table-bordered mx-auto">
           <thead>
             <tr>
@@ -108,7 +108,7 @@
           </thead>
           <tbody>
             <tr>
-              <th class="px-2" class="mx-1" scope="row">[*gregorian/julian/french/hebrew]0</th>
+              <th class="px-2 mx-1" scope="row">[*gregorian/julian/french/hebrew]0</th>
               %apply;calendar("g", "gregorian", 12, [(month)], "fun_year")
             </tr>
             <tr>

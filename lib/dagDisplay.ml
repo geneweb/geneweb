@@ -995,14 +995,25 @@ let rec eval_var conf base env _xx _loc = function
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
   (* person_index.2 -> i2=, p2=, n2=, oc2= *)
   (* person_index.e -> ei=, ep=, en=, eoc= *)
+  (* same thing in perso.ml, but differences! *)
   | [ "person_index"; x; sl ] -> (
       let find_person =
         match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
-      | Some p -> eval_person_var conf base p sl
-      | None -> VVstring "")
+      | Some p ->
+          let auth = authorized_age conf base p in
+          let ep = (p, auth) in
+          eval_person_field_var conf base env ep sl
+      | None -> (
+          match p_getenv conf.env s with
+          | Some s when Option.is_some (int_of_string_opt s) ->
+              let p = Driver.poi base (Driver.Iper.of_string s) in
+              let auth = authorized_age conf base p in
+              let ep = (p, auth) in
+              eval_person_field_var conf base env ep sl
+          | _ -> VVstring ""))
   | [ "person_index"; x ] -> (
       let find_person =
         match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
@@ -1043,9 +1054,10 @@ let rec eval_var conf base env _xx _loc = function
   | [ "static_max_desc_level" ] -> VVstring "10"
   | _ -> raise Not_found
 
-and eval_person_var _conf base p = function
-  | "surname" -> VVstring (Driver.sou base (Driver.get_surname p))
-  | "first_name" -> VVstring (Driver.sou base (Driver.get_first_name p))
+and eval_person_field_var _conf base _env (p, pauth) = function
+  | "surname" when pauth -> VVstring (Driver.sou base (Driver.get_surname p))
+  | "first_name" when pauth ->
+      VVstring (Driver.sou base (Driver.get_first_name p))
   | _ -> raise Not_found
 
 and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) = function
@@ -1367,12 +1379,73 @@ let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
   print_slices_menu_or_dag_page conf base page_title hts next_txt
 
 let print conf base =
-  let set = get_dag_elems conf base in
-  let elem_txt p = Item (p, Adef.safe "") in
-  let vbar_txt _ = Adef.escaped "" in
-  let invert = Util.p_getenv conf.env "invert" = Some "on" in
-  let page_title =
-    Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
-  in
-  make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
-    (Adef.escaped "")
+  (* Vérifier si URL en pnoc ou si on a déjà les index *)
+  let has_pnoc_params = Util.url_has_pnoc_params conf.env in
+  if has_pnoc_params then (
+    (* Récupérer tous les index *)
+    let all_indexes =
+      List.fold_left
+        (fun acc (key, _) ->
+          if String.length key >= 2 then
+            let prefix = String.get key 0 in
+            let idx_str = String.sub key 1 (String.length key - 1) in
+            try
+              let idx = int_of_string idx_str in
+              if (prefix = 'p' || prefix = 's') && not (List.mem idx acc) then
+                idx :: acc
+              else acc
+            with _ -> acc
+          else acc)
+        [] conf.env
+      |> List.sort compare
+    in
+
+    let converted_params = ref [] in
+
+    (* Traiter chaque index *)
+    List.iter
+      (fun idx ->
+        let k = string_of_int idx in
+        (* Traiter p* *)
+        (match p_getenv conf.env ("p" ^ k) with
+        | Some fn when fn <> "" -> (
+            let sn = Option.value ~default:"" (p_getenv conf.env ("n" ^ k)) in
+            let oc =
+              try
+                int_of_string
+                  (Option.value ~default:"0" (p_getenv conf.env ("oc" ^ k)))
+              with _ -> 0
+            in
+
+            match Driver.person_of_key base fn sn oc with
+            | Some ip ->
+                converted_params :=
+                  ("i" ^ k ^ "=" ^ Driver.Iper.to_string ip)
+                  :: !converted_params
+            | None -> ())
+        | _ -> ());
+
+        (* Traiter s* *)
+        match p_getenv conf.env ("s" ^ k) with
+        | Some s when s <> "" ->
+            converted_params :=
+              ("s" ^ k ^ "=" ^ (Mutil.encode s :> string)) :: !converted_params
+        | _ -> ())
+      all_indexes;
+
+    let clean_url =
+      Printf.sprintf "%s?m=DAG&%s"
+        (conf.command :> string)
+        (String.concat "&" (List.rev !converted_params))
+    in
+    Wserver.http_redirect_temporarily clean_url)
+  else
+    let set = get_dag_elems conf base in
+    let elem_txt p = Item (p, Adef.safe "") in
+    let vbar_txt _ = Adef.escaped "" in
+    let invert = Util.p_getenv conf.env "invert" = Some "on" in
+    let page_title =
+      Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+    in
+    make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
+      (Adef.escaped "")

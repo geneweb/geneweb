@@ -22,11 +22,11 @@ type relationship = {
 *)
 
 type relationship_info = {
-  (* Information about topological rank for each person *)
   tstab : (Geneweb_db.Driver.iper, int) Geneweb_db.Collection.Marker.t;
   reltab :
     (Geneweb_db.Driver.iper, relationship) Geneweb_db.Collection.Marker.t;
-  mutable queue : Geneweb_db.Driver.iper list array;
+  mutable queue :
+    (Geneweb_db.Driver.iper * Geneweb_db.Driver.ifam option) list array;
 }
 (** Computation consanguinity state for every person in the base *)
 
@@ -60,9 +60,9 @@ val relationship_and_links :
   bool ->
   Geneweb_db.Driver.iper ->
   Geneweb_db.Driver.iper ->
-  float * Geneweb_db.Driver.iper list
-(** Returns relationship rate between two person and common ancestors, if
-    exists. *)
+  float * (Geneweb_db.Driver.iper * Geneweb_db.Driver.ifam) list
+(** Returns relationship rate between two persons and common ancestors with
+    their family index (ifam). *)
 
 val check_noloop :
   Geneweb_db.Driver.base -> (Geneweb_db.Driver.person error -> unit) -> unit

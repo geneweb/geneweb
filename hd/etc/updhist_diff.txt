@@ -1,7 +1,7 @@
+<!-- $Id: updhist_diff.txt v7.1 10/01/2023 20:01:49 $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist_diff.txt v7.1 10/01/2023 20:01:49 $ -->
   <title>[*revision history]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -132,14 +132,14 @@ function update_old () {
   %end;
   %if;(before.first_names_aliases!=after.first_names_aliases)
     <tr>
-      <th scope="row" class="table-success text-nowrap">[*first name alias]</th>
+      <th scope="row" class="table-success text-nowrap">[*first name alias]0</th>
       <td class="odd">%before.first_names_aliases;</td>
       <td class="odd">%after.first_names_aliases;</td>
     </tr>
   %end;
   %if;(before.surnames_aliases!=after.surnames_aliases)
     <tr>
-      <th scope="row" class="table-success text-nowrap">[*surname alias]</th>
+      <th scope="row" class="table-success text-nowrap">[*surname alias]0</th>
       <td class="odd">%before.surnames_aliases;</td>
       <td class="odd">%after.surnames_aliases;</td>
     </tr>

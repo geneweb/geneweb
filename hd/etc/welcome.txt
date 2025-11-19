@@ -48,7 +48,7 @@
   <a role="button" class="btn btn-outline-success" data-toggle="tooltip"
     href="%prefix;m=MOD_DATA&data=xxx" title="[*modify] %apply;book_of%with;[yyy]1%end;%sp;
       ([wizard/wizards/friend/friends/exterior]0)">
-    <i class="fa fa-zzz fa-fw mr-1"></i>
+    <i class="fa fa-zzz fa-fw"></i>
     <span class="text-nowrap">[*yyy]1</span>
   </a>
 %end;
@@ -306,17 +306,13 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                 <div class="d-flex flex-row flex-md-column justify-content-start mb-3 mb-md-0">
                   <div class="align-self-md-start font-weight-bold mr-3 mr-md-0 mb-0 mb-md-1">[*first name/first names]1[:]</div>
                   <div class="d-flex flex-row flex-md-column">
-                    <div class="custom-control custom-checkbox mr-3 mr-md-0 mb-md-1" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*not all hlp]">
-                      <input class="custom-control-input" type="checkbox" name="p_all" id="p_all" value="off" tabindex="4">
-                      <label class="custom-control-label d-flex align-items-center" for="p_all">[*not all]</label>
-                    </div>
                     <div class="custom-control custom-checkbox mr-3 mr-md-0 mb-md-1" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*order hlp]">
-                      <input class="custom-control-input" type="checkbox" name="p_order" id="p_order" value="on" tabindex="5">
+                      <input class="custom-control-input" type="checkbox" name="p_order" id="p_order" value="on" tabindex="6">
                       <label class="custom-control-label d-flex align-items-center" for="p_order">[*order]</label>
                     </div>
-                    <div class="custom-control custom-checkbox" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*not exact hlp]">
-                      <input class="custom-control-input" type="checkbox" name="p_exact" id="p_exact" value="off" tabindex="6">
-                      <label class="custom-control-label d-flex align-items-center" for="p_exact">[*not exact]</label>
+                    <div class="custom-control custom-checkbox" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*not exact]1, [phonetic variants] [not exact hlp]">
+                      <input class="custom-control-input" type="checkbox" name="p_exact" id="p_exact" value="off" tabindex="4">
+                      <label class="custom-control-label d-flex align-items-center" for="p_exact">[*not exact]0</label>
                     </div>
                   </div>
                 </div>
@@ -448,14 +444,6 @@ fr: Autour de l'arbre
         <i class="fas fa-user-plus fa-fw mr-1" aria-hidden="true"></i>[*add::family/families]0</a>
       %end;
     %end;
-    %if;(not roglo and b.alt_serv_base!="" and not cgi)
-      <a role="button" class="btn btn-outline-primary"
-        href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
-          %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
-        title="[*go to alt base]0 %b.alt_serv_base;">
-        %if;(b.alt_serv_title!="")%b.alt_serv_title;%else;[*other base]%end;
-      </a>
-    %end;
   </div>
 </div>
 %if;roglo;
@@ -469,7 +457,7 @@ fr: Autour de l'arbre
         <a role="button" class="btn btn-outline-primary"
           href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
             %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
-          title="[*go to alt base]0 %b.alt_serv_base;">
+          title="[*go to alt base]0 %b.alt_serv_base;">%nn;
           %if;(b.alt_serv_title!="")%b.alt_serv_title;%else;[*other base]%end;
         </a>
       %end;
@@ -512,12 +500,14 @@ fr: Mon compte associatif
     </div>
     <div class="d-flex flex-wrap justify-content-md-center">
       %apply;book_button("fn","first name/first names","child")
-      %apply;book_button("sn","surname/surnames","signature")
-      %apply;book_button("pubn","public name/public names","pen")
+      %apply;book_button("sn","surname/surnames","user")
+      %apply;book_button("fna","first name alias","child")
+      %apply;book_button("sna","surname alias","user")
+      %apply;book_button("pubn","public name/public names","signature")
       %apply;book_button("qual","qualifier/qualifiers","comment")
       %apply;book_button("alias","alias/aliases","mask")
-      %apply;book_button("occu","occupation/occupations","user-doctor")
-      %apply;book_button("place","place/places","map-location-dot")
+      %apply;book_button("occu","occupation/occupations","briefcase")
+      %apply;book_button("place","place/places","location-dot")
       %apply;book_button("src","source/sources","box-archive")
       %apply;book_button("title","title/titles","crown")
       %apply;book_button("domain","domain/domains","chess-rook")

@@ -12,6 +12,16 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module IperSet = Driver.Iper.Set
 
+let get_cousins_sparse =
+  let cache = ref None in
+  fun conf base p ->
+    match !cache with
+    | Some (cached_ip, sparse) when cached_ip = Driver.get_iper p -> sparse
+    | _ ->
+        let sparse = Cousins.init_cousins_cnt conf base p in
+        cache := Some (Driver.get_iper p, sparse);
+        sparse
+
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
@@ -51,7 +61,12 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     | [] -> (Driver.Istr.empty, [])
     | place :: places_tl -> (place, places_tl)
   in
-  let acc = safe_html (Driver.sou base title ^ " " ^ Driver.sou base place) in
+  let place_str = Driver.sou base place in
+  let title_str = Driver.sou base title in
+  let acc =
+    safe_html
+      (if place_str = "" then title_str else title_str ^ " " ^ place_str)
+  in
   let href place s =
     if link then
       let href =
@@ -1804,15 +1819,15 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> null_val)
   | "carrousel_img_raw" -> (
       match get_env "carrousel_img" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   | "carrousel_note" -> (
       match get_env "carrousel_note" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   | "carrousel_src" -> (
       match get_env "carrousel_src" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   (* end carrousel *)
   | "lazy_force" -> (
@@ -2207,14 +2222,25 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
   (* person_index.2 -> i2=, p2=, n2=, oc2= *)
   (* person_index.e -> ei=, ep=, en=, eoc= *)
-  | [ "person_index"; x ] -> (
+  (* same code in dagDisplay.ml, but with slight differences *)
+  | "person_index" :: x :: sl -> (
       let find_person =
         match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
-      | Some p -> VVstring (Driver.Iper.to_string (Driver.get_iper p))
-      | None -> VVstring "")
+      | Some p ->
+          let auth = authorized_age conf base p in
+          let ep = (p, auth) in
+          eval_person_field_var conf base env ep loc sl
+      | None -> (
+          match p_getenv conf.env s with
+          | Some s when Option.is_some (int_of_string_opt s) ->
+              let p = Driver.poi base (Driver.Iper.of_string s) in
+              let auth = authorized_age conf base p in
+              let ep = (p, auth) in
+              eval_person_field_var conf base env ep loc sl
+          | _ -> VVstring ""))
   | "prev_item" :: sl -> (
       match get_env "prev_item" env with
       | Vslistlm ell -> eval_item_field_var ell sl
@@ -2240,11 +2266,33 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
            else "")
         ^ "&")
   | "pvar" :: v :: sl -> (
-      match find_person_in_env conf base v with
-      | Some p ->
-          let ep = make_ep conf base (Driver.get_iper p) in
-          eval_person_field_var conf base env ep loc sl
-      | None -> raise Not_found)
+      match v with
+      | "highest" ->
+          let max_index =
+            List.fold_left
+              (fun acc (key, _) ->
+                if String.length key >= 2 then
+                  let prefix = String.get key 0 in
+                  if prefix = 'p' || prefix = 'i' then
+                    try
+                      let num =
+                        int_of_string (String.sub key 1 (String.length key - 1))
+                      in
+                      max acc num
+                    with _ -> acc
+                  else acc
+                else acc)
+              0 conf.env
+          in
+          VVstring (string_of_int max_index)
+      | _ -> (
+          match find_person_in_env conf base v with
+          | Some p ->
+              let ep = make_ep conf base (Driver.get_iper p) in
+              eval_person_field_var conf base env ep loc sl
+          | None -> (
+              match sl with [ "exist" ] -> VVbool false | _ -> raise Not_found))
+      )
   | "qvar" :: v :: sl ->
       (* %qvar.index_v.surname;
          direct access to a person whose index value is v
@@ -2820,26 +2868,31 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
   | [ "cous_paths_min_date"; l1; l2 ] -> (
-      match Cousins.min_max_date conf base p true l1 l2 with
+      let sparse = get_cousins_sparse conf base p in
+      match Cousins.min_max_date sparse conf base p true l1 l2 with
       | Some min -> VVstring (string_of_int min)
       | None -> raise Not_found)
   | [ "cous_paths_max_date"; l1; l2 ] -> (
-      match Cousins.min_max_date conf base p false l1 l2 with
+      let sparse = get_cousins_sparse conf base p in
+      match Cousins.min_max_date sparse conf base p false l1 l2 with
       | Some max -> VVstring (string_of_int max)
       | None -> raise Not_found)
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l -> VVstring (string_of_int (List.length l))
       | None -> VVstring "-1")
   | [ "cous_paths_cnt"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l ->
           VVstring (string_of_int (List.length (Cousins.cousins_fold l)))
       | None -> VVstring "-1")
   | [ "cous_paths"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l -> (
           match get_env "cousins" env with
@@ -2851,17 +2904,21 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
   | [ "cous_implx_cnt"; l1; l2 ] -> (
       match p_getenv conf.env "c_implex" with
       | Some "on" | Some "1" ->
-          let cnt = Cousins.cousins_implex_cnt conf base l1 l2 p in
+          let sparse = get_cousins_sparse conf base p in
+          let cnt = Cousins.cousins_implex_cnt sparse conf base l1 l2 p in
           VVstring (string_of_int cnt)
       | _ -> VVstring "")
   | [ "cousins"; "max_a" ] ->
-      let max_a, _ = Cousins.max_l1_l2 conf base p in
+      let sparse = get_cousins_sparse conf base p in
+      let max_a, _ = Cousins.max_l1_l2 sparse conf base p in
       VVstring (string_of_int max_a)
   | [ "cousins"; "max_d" ] ->
-      let _, max_d = Cousins.max_l1_l2 conf base p in
+      let sparse = get_cousins_sparse conf base p in
+      let _, max_d = Cousins.max_l1_l2 sparse conf base p in
       VVstring (string_of_int max_d)
   | [ "cousins_cnt"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l ->
           let l =
@@ -2883,6 +2940,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       | Death _ | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
       | OfCourseDead ->
           null_val)
+  | [ "exist" ] -> VVbool true
   | "event" :: sl -> (
       match get_env "event" env with
       | Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl
@@ -4981,9 +5039,10 @@ let print_foreach conf base print_ast eval_expr =
       (level, l1, l2)
     in
     let level, l1, l2 = get_level_info conf env el ep in
+    let sparse = get_cousins_sparse conf base p in
     let l =
-      Cousins.cousins_l1_l2_aux conf base (string_of_int l1) (string_of_int l2)
-        p
+      Cousins.cousins_l1_l2_aux sparse conf base (string_of_int l1)
+        (string_of_int l2) p
     in
     match l with
     | Some l ->
@@ -5497,9 +5556,7 @@ let eval_predefined_apply conf env f vl =
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = (p, authorized_age conf base p) in
-  let emal =
-    match p_getint conf.env "v" with Some i -> i | None -> Cousins.mal
-  in
+  let emal = match p_getint conf.env "v" with Some i -> i | None -> 0 in
   let env =
     let sosa_ref = Util.find_sosa_ref conf base in
     if sosa_ref <> None then SosaCache.build_sosa_ht conf base;
@@ -5508,41 +5565,57 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       | Some p -> SosaCache.init_sosa_t conf base p
       | None -> None
     in
+    let computed_mal = ref None in
+    let get_mal () =
+      match !computed_mal with
+      | Some v -> v
+      | None ->
+          let v = Cousins.max_ancestor_level conf base (Driver.get_iper p) 0 in
+          computed_mal := Some v;
+          v
+    in
+    let computed_mdl = ref None in
+    let get_mdl () =
+      match !computed_mdl with
+      | Some v -> v
+      | None ->
+          let v =
+            Cousins.max_descendant_level conf base (Driver.get_iper p) 0
+          in
+          computed_mdl := Some v;
+          v
+    in
     let desc_level_table_l =
-      let dlt () = make_desc_level_table conf base emal p in
+      let dlt () =
+        let limit = if emal > 0 then emal else get_mdl () in
+        make_desc_level_table conf base limit p
+      in
       Lazy.from_fun dlt
     in
     let desc_level_table_m =
-      let dlt () = make_desc_level_table conf base Cousins.mdl p in
+      let dlt () = make_desc_level_table conf base (get_mdl ()) p in
       Lazy.from_fun dlt
     in
     let desc_level_table_l_save =
-      let dlt () = make_desc_level_table conf base emal p in
+      let dlt () =
+        let limit = if emal > 0 then emal else get_mdl () in
+        make_desc_level_table conf base limit p
+      in
       Lazy.from_fun dlt
     in
-    let mal () =
-      Vint (Cousins.max_ancestor_level conf base (Driver.get_iper p) (emal + 1))
-    in
-    (* Static max ancestor level *)
+    let mal () = Vint (get_mal ()) in
     let smal () =
-      Vint
-        (Cousins.max_ancestor_level conf base (Driver.get_iper p) Cousins.mal)
+      Vint (Cousins.max_ancestor_level conf base (Driver.get_iper p) 0)
     in
-    (* Sosa_ref max ancestor level *)
     let srmal () =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
           Vint
-            (Cousins.max_ancestor_level conf base (Driver.get_iper sosa_ref)
-               Cousins.mal)
+            (Cousins.max_ancestor_level conf base (Driver.get_iper sosa_ref) 0)
       | None -> Vint 0
     in
     let mcl () = Vint (Cousins.max_cousin_level conf) in
-    (* Récupère le nombre maximal de niveaux de descendance en prenant en
-       compte les liens inter-arbres (limité à 10 générations car
-       problématique en terme de perf). *)
     let mdl () = Vint (max_descendant_level base desc_level_table_l) in
-    (* Static max descendant level *)
     let smdl () = Vint (max_descendant_level base desc_level_table_m) in
     let nldb () =
       let db = Driver.read_nldb base in

@@ -414,7 +414,7 @@ let highlight_diff arr diff_arr =
     else if diff_arr.(i) then (
       let j = ref i in
       let accu = ref s in
-      accu := !accu ^ "<span class=\"mark\">";
+      accu := !accu ^ "<span class=\"hl\">";
       while !j < Array.length diff_arr && diff_arr.(!j) do
         accu := !accu ^ Printf.sprintf "%c" arr.(!j);
         incr j
@@ -450,9 +450,9 @@ let diff_string (before : Adef.safe_string) (after : Adef.safe_string) :
     Adef.safe_string * Adef.safe_string =
   if before = after then (before, after)
   else if (before :> string) = "" then
-    (before, "<span class=\"mark\">" ^<^ after ^>^ "</span>")
+    (before, "<span class=\"hl\">" ^<^ after ^>^ "</span>")
   else if (after :> string) = "" then
-    ("<span class=\"mark\">" ^<^ before ^>^ "</span>", after)
+    ("<span class=\"hl\">" ^<^ before ^>^ "</span>", after)
   else
     let aa = array_of_string (after :> string) in
     let bb = array_of_string (before :> string) in

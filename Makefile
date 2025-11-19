@@ -39,7 +39,7 @@ COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
 COMMIT_TITLE := $(shell git log -1 --pretty="%s" | sed "s/\"/\\\"/g")
 COMMIT_COMMENT:= $(shell git log -1 --pretty="%b" | sed "s/\"/\\\"/g")
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+BRANCH := $(shell git symbolic-ref --quiet --short HEAD || git branch -r --contains HEAD | head -n1 | tr -d ' ')
 VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
@@ -139,9 +139,6 @@ distrib: info ## Build the project and copy what is necessary for distribution
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
-	mkdir -p $(DISTRIB_DIR)/bases/etc
-	mkdir -p $(DISTRIB_DIR)/bases/lang
-	mkdir -p $(DISTRIB_DIR)/bases/src
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
 	cp LICENSE $(DISTRIB_DIR)/LICENSE.txt
 	cp etc/README.txt $(DISTRIB_DIR)/.
@@ -152,6 +149,7 @@ ifeq ($(OS_TYPE),Win)
 	cp etc/Windows/gwsetup.bat $(DISTRIB_DIR)
 	cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt
 	cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt
+	cp -f etc/ROBOT.txt $(DISTRIB_DIR)/ROBOT.txt
 else ifeq ($(OS_TYPE),Darwin)
 	cp etc/gwd.sh $(DISTRIB_DIR)
 	cp etc/gwsetup.sh $(DISTRIB_DIR)
@@ -174,10 +172,14 @@ endif
 	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT)
 	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT)
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT)
+	cp $(BUILD_DISTRIB_DIR)robot/robot.exe $(DISTRIB_DIR)/gw/robot$(EXT)
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT)
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT)
 	@printf "\n\033[1;1m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp -R hd/* $(DISTRIB_DIR)/gw/
+	rm $(DISTRIB_DIR)/gw/etc/js/checkdata.js
+	rm $(DISTRIB_DIR)/gw/etc/js/p_mod.js
+	rm $(DISTRIB_DIR)/gw/etc/js/relationmatrix.js
 	mkdir $(DISTRIB_DIR)/gw/setup
 	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
 	mkdir $(DISTRIB_DIR)/gw/setup/lang

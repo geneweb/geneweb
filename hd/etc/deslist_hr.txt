@@ -245,16 +245,16 @@
         %incr_count;
         %if;(count%2!=0)<div class="row mb-1 couple-row">%end;
           %let;unknown;%if;(ancestor.first_name="?" and ancestor.surname="?")1%end;%in;
-          <div class="col-6 p%if;(count%2=0)l%else;r%end;-2 d-flex align-content-center">
+          <div class="col-6 p%if;(count%2=0)l%else;r%end;-2 d-flex align-content">
             <a role="button" class="btn btn-outline-%if;(count%2!=0)primary%else;success%end; btn-sm w-100 d-flex
               %if;(unknown=1) border-secondary disabled" tabindex="-1" aria-disabled="true"
               %else;" title="[*select] %ancestor;"
                 href="%prefix;%ancestor.access;%foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i" and env.key!="v" and env.key!="")&%env.key=%env.val;%end;%end;&v=%expr(evar.v+level)"
               %end;>
-              <div class="flex-grow-1 order-%if;(count%2!=0)1%else;2%end; align-self-center">
-                %if;(unknown!=1)<strong>%ancestor.first_name;</strong>
+              <div class="flex-grow-1 order-%if;(count%2!=0)1%else;2%end; align-self-center">%nn;
+                %if;(unknown!=1)<strong>%ancestor.first_name;</strong>%nn;
                   %if;(ancestor.qualifier!="") <em>%ancestor.qualifier;</em>%end;
-                  %sp;<span>%ancestor.surname;</span>
+                  %sp;<span>%ancestor.surname;</span>%nn;
                   %if;(ancestor.dates!="") <small>%ancestor.dates;</small>%end;
                 %end;
               </div>

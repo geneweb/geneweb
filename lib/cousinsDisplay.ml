@@ -153,8 +153,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
               let sp = get_spouse base ip ifam in
               if
                 Array.length (Driver.get_family p) > 1
-                && lev >= 2
-                && List.length children > 0
+                && lev >= 2 && children <> []
                 && has_desc_lev conf base lev sp
               then (
                 Output.print_sstring conf (Util.transl conf "with");

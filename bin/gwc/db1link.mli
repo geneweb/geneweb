@@ -23,5 +23,9 @@ type file_info = {
 }
 (** Information about current .gwo file. *)
 
-val link : (file_info -> unit -> Gwcomp.gw_syntax option) -> string -> bool
+val link :
+  ?no_warn:bool ->
+  (file_info -> unit -> Gwcomp.gw_syntax option) ->
+  string ->
+  bool
 (** Link .gwo files and create a database. *)

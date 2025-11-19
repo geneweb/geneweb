@@ -30,7 +30,7 @@ let comment fl =
   let s =
     match Filename.extension fl with
     | ".css" | ".js" -> Fmt.str "/* %s */\n" fl
-    | _ -> Fmt.str "<!-- %s --->\n" fl
+    | _ -> Fmt.str "<!-- %s -->\n" fl
   in
   Ast.mk_text s
 
