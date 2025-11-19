@@ -210,6 +210,7 @@ let gen_print_date opts no_colon = function
   | Dgreg (d, Dhebrew) ->
       print_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dhebrew d);
       Printf.ksprintf (oc opts) "H"
+  | Dgreg (d, Dislamic) -> print_date_dmy opts d
   | Dtext t ->
       (* Dans le cas d'une date texte pour un titre, on échappe les ':' *)
       let t = gen_correct_string false no_colon t in

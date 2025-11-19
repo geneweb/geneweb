@@ -107,6 +107,25 @@ let default_hebrew_month =
   in
   fun m -> tab.(m)
 
+let default_islamic_month =
+  let tab =
+    [|
+      "Mouharram";
+      "Safar";
+      "Rabiʿ al-awwal";
+      "Rabiʿ ath-thani";
+      "Joumada al-oula";
+      "Joumada ath-thania";
+      "Rajab";
+      "Chaabane";
+      "Ramadan";
+      "Chawwal";
+      "Dhou al-qiʿda";
+      "Dhou al-hijja";
+    |]
+  in
+  fun m -> tab.(m)
+
 let french_month conf m =
   let r = Util.transl_nth conf "(french revolution month)" m in
   if r = "[(french revolution month)]" then "[" ^ default_french_month m ^ "]"
@@ -115,6 +134,10 @@ let french_month conf m =
 let hebrew_month conf m =
   let r = Util.transl_nth conf "(hebrew month)" m in
   if r = "[(hebrew month)]" then "[" ^ default_hebrew_month m ^ "]" else r
+
+let islamic_month conf m =
+  let r = Util.transl_nth conf "(islamic month)" m in
+  if r = "[(islamic month)]" then "[" ^ default_islamic_month m ^ "]" else r
 
 let code_french_year conf y =
   Util.transl_nth conf "year/month/day" 3
@@ -137,6 +160,14 @@ let code_hebrew_date conf d m y =
   let s =
     if m = 0 then ""
     else s ^ (if s = "" then "" else " ") ^ hebrew_month conf (m - 1)
+  in
+  s ^ (if s = "" then "" else " ") ^ string_of_int y
+
+let code_islamic_date conf d m y =
+  let s = if d = 0 then "" else string_of_int d in
+  let s =
+    if m = 0 then ""
+    else s ^ (if s = "" then "" else " ") ^ islamic_month conf (m - 1)
   in
   s ^ (if s = "" then "" else " ") ^ string_of_int y
 
@@ -299,6 +330,7 @@ let to_calendar = function
   | `Julian -> Date.Djulian
   | `French -> Date.Dfrench
   | `Hebrew -> Date.Dhebrew
+  | `Islamic -> Date.Dislamic
 
 let string_of_on_calendar_dmy ?with_gregorian_precisions ~calendar conf d =
   let format_date ~conf d =
@@ -306,6 +338,7 @@ let string_of_on_calendar_dmy ?with_gregorian_precisions ~calendar conf d =
     | `Julian -> code_julian_date conf d
     | `French -> code_french_date conf d.Date.day d.Date.month d.Date.year
     | `Hebrew -> code_hebrew_date conf d.Date.day d.Date.month d.Date.year
+    | `Islamic -> code_islamic_date conf d.Date.day d.Date.month d.Date.year
   in
   let sy = format_date ~conf d in
   let sy2 =
@@ -356,14 +389,21 @@ let translate_dmy conf (fst, snd, trd) cal short =
           String.uppercase_ascii
             (String.sub (hebrew_month conf (int_of_string m)) 0 2)
         else hebrew_month conf (int_of_string m)
-    | Date.Dgregorian | Date.Djulian | Date.Dfrench | Date.Dhebrew -> m
+    | Date.Dislamic when m <> "" ->
+        if short then
+          String.uppercase_ascii
+            (String.sub (islamic_month conf (int_of_string m)) 0 2)
+        else islamic_month conf (int_of_string m)
+    | Date.Dgregorian | Date.Djulian | Date.Dfrench | Date.Dhebrew
+    | Date.Dislamic ->
+        m
   in
   let translate_year y =
     match cal with
     | Date.Dfrench ->
         let y1 = int_of_string y in
         if y1 >= 1 && y1 < 4000 then Mutil.roman_of_arabian y1 else y
-    | Date.Dgregorian | Date.Djulian | Date.Dhebrew -> y
+    | Date.Dgregorian | Date.Djulian | Date.Dhebrew | Date.Dislamic -> y
   in
   match Util.transl conf "!dates order" with
   | "yymmdd" | "yyyymmdd" -> (translate_year fst, translate_month snd, trd)
@@ -434,7 +474,10 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = Adef.safe " ") conf =
       | Date.Dfrench ->
           format_date_with_gregorian_precisions ~sep ~conf ~calendar:`French d1
       | Date.Dhebrew ->
-          format_date_with_gregorian_precisions ~sep ~conf ~calendar:`Hebrew d1)
+          format_date_with_gregorian_precisions ~sep ~conf ~calendar:`Hebrew d1
+      | Date.Dislamic ->
+          format_date_with_gregorian_precisions ~sep ~conf ~calendar:`Islamic d1
+      )
 
 let string_of_ondate conf d =
   (string_of_date_aux ~dmy:string_of_on_dmy conf d :> string)
@@ -494,6 +537,13 @@ let string_slash_of_date conf date =
             d1
           ^ " ("
           ^ Util.transl_nth conf "gregorian/julian/french/hebrew" 3
+          ^ ")"
+      | Date.Dislamic ->
+          slashify_dmy
+            (translate_dmy conf (decode_dmy conf d1) Date.Dislamic true)
+            d1
+          ^ " ("
+          ^ Util.transl_nth conf "gregorian/julian/french/hebrew" 4
           ^ ")")
 
 let string_of_age conf a =

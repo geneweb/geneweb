@@ -417,7 +417,7 @@ and eval_create c = function
           let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
           match calendar with
           | Dfrench -> Util.short_f_month dmy.month
-          | Dgregorian | Djulian | Dhebrew ->
+          | Dgregorian | Djulian | Dhebrew | Dislamic ->
               if dmy.month <> 0 then string_of_int dmy.month else "")
       | _ -> "")
   | "death_place" -> (

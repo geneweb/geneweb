@@ -1171,6 +1171,7 @@ let reconstitute_date conf var =
         | Some "J" -> Djulian
         | Some "F" -> Dfrench
         | Some "H" -> Dhebrew
+        | Some "I" -> Dislamic
         | _ -> Dgregorian
       in
       let date = Date.convert ~from:calendar ~to_:Dgregorian d in

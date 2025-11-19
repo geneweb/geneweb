@@ -92,6 +92,7 @@ let ged_month cal m =
       Ext_option.return_if
         (m >= 1 && m <= Array.length hebrew_txt)
         (fun () -> hebrew_txt.(m - 1))
+  | Dislamic -> assert false
 
 (* Reference:
    https://gedcom.io/specifications/FamilySearchGEDCOMv7.html#date *)
@@ -429,6 +430,7 @@ let ged_calendar opts = function
   | Djulian -> Printf.ksprintf (oc opts) "@#DJULIAN@ "
   | Dfrench -> Printf.ksprintf (oc opts) "@#DFRENCH R@ "
   | Dhebrew -> Printf.ksprintf (oc opts) "@#DHEBREW@ "
+  | Dislamic -> assert false
 
 let ged_date_dmy opts dt cal =
   let ged_date ~calendar ~day ~month ~year =
@@ -493,7 +495,7 @@ let ged_date_dmy opts dt cal =
   | Sure | About | Maybe | Before | After -> ()
 
 let ged_date opts = function
-  | Date.Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
+  | Date.Dgreg (d, (Dgregorian | Dislamic)) -> ged_date_dmy opts d Dgregorian
   | Dgreg (d, Djulian) ->
       ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Djulian d) Djulian
   | Dgreg (d, Dfrench) ->

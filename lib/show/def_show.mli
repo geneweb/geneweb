@@ -1,5 +1,11 @@
 type date = Date.date = Dgreg of dmy * calendar | Dtext of string
-and calendar = Date.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+
+and calendar = Date.calendar =
+  | Dgregorian
+  | Djulian
+  | Dfrench
+  | Dhebrew
+  | Dislamic
 
 and dmy = Date.dmy = {
   day : int;
