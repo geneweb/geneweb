@@ -52,3 +52,27 @@ val other_events :
 (** [other_events conf base p] is the list of [p]'s other events
     (i.e. all [p]'s events except birth, , baptism, death, burial and
     marriage).  **)
+
+type ('string, 'person) witness = private {
+  person : 'person;
+  kind : Def.witness_kind;
+  note : 'string;
+}
+
+type ('string, 'person) union = private {
+  kind : Def.relation_kind;
+  date : Adef.cdate;
+  place : 'string;
+  note : 'string;
+  source : 'string;
+  witnesses : ('string, 'person) witness array;
+}
+
+type ('string, 'person) main_family_events = private {
+  main_union : ('string, 'person) union option;
+  main_separation : Def.divorce option;
+}
+
+val get_main_family_events :
+  ('person, 'string) Def.gen_fam_event list ->
+  ('string, 'person) main_family_events

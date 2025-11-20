@@ -1386,30 +1386,21 @@ let date_aux conf p_auth date =
       else DateDisplay.string_of_ondate conf d |> safe_val
   | _ -> null_val
 
-let get_marriage_events fam =
-  let fevents = Gwdb.get_fevents fam in
-  List.filter (fun fe -> Gwdb.get_fevent_name fe = Def.Efam_Marriage) fevents
-
-let get_marriage_witnesses fam =
-  let marriages = get_marriage_events fam in
-  let witnesses =
-    List.map (fun marriage -> Gwdb.get_fevent_witnesses marriage) marriages
-  in
-  witnesses |> Array.concat
-
 let get_marriage_witnesses_and_notes fam =
-  let marriages = get_marriage_events fam in
-  let witnesses =
-    List.map
-      (fun marriage -> Gwdb.get_fevent_witnesses_and_notes marriage)
-      marriages
+  let main_family_events =
+    Event.get_main_family_events (Gwdb.gen_family_of_family fam).Def.fevents
   in
-  witnesses |> Array.concat
+  Option.fold ~none:[||]
+    ~some:(fun union ->
+      Array.map
+        (fun { Event.person; kind; note } -> (person, kind, note))
+        union.Event.witnesses)
+    main_family_events.Event.main_union
 
 let get_nb_marriage_witnesses_of_kind fam wk =
-  let witnesses = get_marriage_witnesses fam in
+  let witnesses = get_marriage_witnesses_and_notes fam in
   Array.fold_left
-    (fun acc (_, w) -> if wk = w then acc + 1 else acc)
+    (fun acc (_, w, _) -> if wk = w then acc + 1 else acc)
     0 witnesses
 
 let rec eval_var conf base env ep loc sl =
@@ -2901,7 +2892,10 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                             || Event.has_witnesses event_item
                           then true
                           else loop events nb_principal_pevents nb_marr
-                      | _ -> true))
+                      | Def.Efam_Annulation | Def.Efam_MarriageBann
+                      | Def.Efam_MarriageContract | Def.Efam_MarriageLicense
+                      | Def.Efam_PACS | Def.Efam_Residence | Def.Efam_Name _ ->
+                          true))
             in
             let rec loop' = function
               | [] -> false
@@ -3937,7 +3931,7 @@ let print_foreach conf base print_ast eval_expr =
     | Vfam (_, fam, _, true) ->
         let _ =
           Array.fold_left
-            (fun (i, first) (ip, wk) ->
+            (fun (i, first) (ip, wk, _) ->
               if wk = witness_kind then (
                 let p = Util.pget conf base ip in
                 let env =
@@ -3947,7 +3941,7 @@ let print_foreach conf base print_ast eval_expr =
                 (i + 1, false))
               else (i + 1, first))
             (0, true)
-            (get_marriage_witnesses fam)
+            (get_marriage_witnesses_and_notes fam)
         in
         ()
     | _ -> ()
