@@ -77,8 +77,7 @@ let date_of_cdate = function
   | Cjulian i -> Dgreg (uncompress i, Djulian)
   | Cfrench i -> Dgreg (uncompress i, Dfrench)
   | Chebrew i -> Dgreg (uncompress i, Dhebrew)
-  | Cislamic i -> Dgreg (uncompress i, Dgregorian)
-  | Cdate (Dgreg (d, Dislamic)) -> Dgreg (d, Dgregorian)
+  | Cislamic i -> Dgreg (uncompress i, Dislamic)
   | Cdate d -> d
   | Ctext t -> Dtext t
   | Cnone -> failwith "date_of_cdate"
@@ -88,15 +87,14 @@ let cdate_of_date d =
   | Dtext t -> Ctext t
   | Dgreg (g, cal) -> (
       match compress g with
-      | None ->
-          if cal = Dislamic then Cdate (Dgreg (g, Dgregorian)) else Cdate d
+      | None -> Cdate d
       | Some i -> (
           match cal with
           | Dgregorian -> Cgregorian i
           | Djulian -> Cjulian i
           | Dfrench -> Cfrench i
           | Dhebrew -> Chebrew i
-          | Dislamic -> Cgregorian i))
+          | Dislamic -> Cislamic i))
 
 let cdate_of_od = function Some d -> cdate_of_date d | None -> Cnone
 
