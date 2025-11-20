@@ -504,14 +504,13 @@ and search_exact conf base variants =
     variants;
   IperSet.elements !exact_iperl
 
-and search_phonetic_generic conf base query base_strings spi_find get_name =
+and search_phonetic_generic conf base query base_strings spi_find _get_name =
   try
-    let list, _name_inj =
-      Some.persons_of_fsname conf base base_strings spi_find get_name query
-    in
+    let istrl = base_strings base query in
     let ddr_iperl = ref IperSet.empty in
     List.iter
-      (fun (_, _, iperl) ->
+      (fun istr ->
+        let iperl = spi_find istr in
         List.iter
           (fun ip ->
             if not (IperSet.mem ip !ddr_iperl) then
@@ -524,19 +523,39 @@ and search_phonetic_generic conf base query base_strings spi_find get_name =
                      && not (Util.authorized_age conf base p))
               then ddr_iperl := IperSet.add ip !ddr_iperl)
           iperl)
-      list;
+      istrl;
     IperSet.elements !ddr_iperl
   with _ -> []
 
 and search_phonetic conf base query =
-  search_phonetic_generic conf base query Driver.base_strings_of_surname
-    (Driver.spi_find (Driver.persons_of_surname base))
-    Driver.get_surname
+  let query_crushed = Name.crush_lower query in
+  let all_results =
+    search_phonetic_generic conf base query Driver.base_strings_of_surname
+      (Driver.spi_find (Driver.persons_of_surname base))
+      Driver.get_surname
+  in
+  List.filter
+    (fun ip ->
+      let p = Driver.poi base ip in
+      let sn = Driver.sou base (Driver.get_surname p) in
+      let sn_crushed = Name.crush_lower sn in
+      Mutil.contains sn_crushed query_crushed)
+    all_results
 
 and search_firstname_phonetic conf base query =
-  search_phonetic_generic conf base query Driver.base_strings_of_first_name
-    (Driver.spi_find (Driver.persons_of_first_name base))
-    Driver.get_first_name
+  let query_crushed = Name.crush_lower query in
+  let all_results =
+    search_phonetic_generic conf base query Driver.base_strings_of_first_name
+      (Driver.spi_find (Driver.persons_of_first_name base))
+      Driver.get_first_name
+  in
+  List.filter
+    (fun ip ->
+      let p = Driver.poi base ip in
+      let fn = Driver.sou base (Driver.get_first_name p) in
+      let fn_crushed = Name.crush_lower fn in
+      Mutil.contains fn_crushed query_crushed)
+    all_results
 
 let deduplicate_collect ipers f =
   let seen = Hashtbl.create 1000 in
@@ -563,14 +582,15 @@ let deduplicate_partition ipers classify =
   (List.rev !matched, List.rev !unmatched)
 
 let search_firstname_direct conf base query =
-  let list, _name_inj =
-    if query = "" then ([], fun x -> x)
+  let all_ipers =
+    if query = "" then []
     else
-      Some.persons_of_fsname conf base Driver.base_strings_of_first_name
-        (Driver.spi_find (Driver.persons_of_first_name base))
-        Driver.get_first_name query
+      try
+        let istrl = Driver.base_strings_of_first_name base query in
+        let spi_find = Driver.spi_find (Driver.persons_of_first_name base) in
+        List.flatten (List.map spi_find istrl)
+      with _ -> []
   in
-  let all_ipers = List.flatten (List.map (fun (_, _, iperl) -> iperl) list) in
   deduplicate_collect all_ipers (fun ip ->
       let p = Driver.poi base ip in
       let fn = Driver.sou base (Driver.get_first_name p) in
@@ -612,57 +632,58 @@ let search_firstname_phonetic_split conf base query =
   let query_lower = Name.lower query in
   let query_norm = normalize_for_phonetic query_lower in
   let query_words = cut_words query_lower in
-  let phonetic_iperl_words =
-    List.flatten
-      (List.map
-         (fun word ->
-           let crushed = Name.crush_lower word in
-           search_firstname_phonetic conf base crushed)
-         query_words)
+  let nb_words = List.length query_words in
+  let phonetic_iperl =
+    if nb_words <= 1 then
+      let crushed = Name.crush_lower query_lower in
+      search_firstname_phonetic conf base crushed
+    else
+      let word_results =
+        List.map
+          (fun w ->
+            let crushed = Name.crush_lower w in
+            (w, search_firstname_phonetic conf base crushed))
+          query_words
+      in
+      let all_candidates = List.flatten (List.map snd word_results) in
+      deduplicate_collect all_candidates (fun ip ->
+          let p = Driver.poi base ip in
+          let fn = Driver.sou base (Driver.get_first_name p) in
+          let fn_norm = normalize_for_phonetic (Name.lower fn) in
+          let matches_all_words =
+            List.for_all
+              (fun (word, _) ->
+                let word_norm = normalize_for_phonetic word in
+                Mutil.contains fn_norm word_norm)
+              word_results
+          in
+          if matches_all_words then Some ip else None)
   in
   let firstname_variants = ref Mutil.StrSet.empty in
   let classify ip =
     Some.AliasCache.add_direct ip;
     let p = Driver.poi base ip in
     let fn = Driver.sou base (Driver.get_first_name p) in
-    let fn_lower = Name.lower fn in
-    let fn_norm = normalize_for_phonetic fn_lower in
-    let is_direct_match = Mutil.contains fn_norm query_norm in
-    if is_direct_match then (
+    let fn_norm = normalize_for_phonetic (Name.lower fn) in
+    let is_match = Mutil.contains fn_norm query_norm in
+    if is_match then (
       if fn <> "" then
         firstname_variants := Mutil.StrSet.add fn !firstname_variants;
       true)
-    else
-      let fn_norm_crushed = Name.crush fn_norm in
-      let query_norm_crushed = Name.crush query_norm in
-      Mutil.contains fn_norm_crushed query_norm_crushed
+    else false
   in
-  let exact, partial = deduplicate_partition phonetic_iperl_words classify in
+  let exact, partial = deduplicate_partition phonetic_iperl classify in
   (exact, partial, !firstname_variants)
 
 let search_with_ngrams_complement conf base _query query_words =
   let nb_words = List.length query_words in
-  if nb_words = 0 || nb_words = 1 || nb_words > 4 then
-    List.flatten
-      (List.map
-         (fun w -> search_firstname_phonetic conf base (Name.crush_lower w))
-         query_words)
+  if nb_words = 0 || nb_words = 1 || nb_words > 4 then []
   else
     let ngram = String.concat "" query_words in
-    let results_words =
-      List.flatten
-        (List.map
-           (fun w -> search_firstname_phonetic conf base (Name.crush_lower w))
-           query_words)
-    in
-    let results_ngram =
-      try
-        let crushed = Name.crush ngram in
-        search_firstname_phonetic conf base crushed
-      with _ -> []
-    in
-    let all = results_words @ results_ngram in
-    deduplicate_collect all (fun ip -> Some ip)
+    try
+      let crushed = Name.crush ngram in
+      search_firstname_phonetic conf base crushed
+    with _ -> []
 
 let search_firstname_with_aliases_and_ngrams conf base query =
   let query_lower = Name.lower query in
@@ -711,7 +732,7 @@ let search_firstname_with_cache conf base query opts =
   in
   let direct_norm = List.map normalize_person direct_ips in
   let direct_exact, direct_included =
-    List.partition (fun (n, _) -> n.normalized = nq.normalized) direct_norm
+    List.partition (fun (n, _) -> n.lower = nq.lower) direct_norm
   in
   let exact_variants =
     List.fold_left
@@ -732,10 +753,19 @@ let search_firstname_with_cache conf base query opts =
     else ([], Mutil.StrSet.empty)
   in
   let permuted_persons, permuted_variants =
-    if opts.order && nb_words > 1 && nb_words < 5 then
+    if opts.order && nb_words > 1 && nb_words < 5 then (
       let perms = generate_permutations query in
+      let seen_perm = Hashtbl.create 100 in
+      List.iter
+        (fun ip -> Hashtbl.add seen_perm ip ())
+        (List.map snd direct_exact);
+      List.iter (fun ip -> Hashtbl.add seen_perm ip ()) alias_results;
       List.fold_left
         (fun (acc_persons, acc_vars) perm_query ->
+          let perm_query_norm =
+            normalize_for_phonetic (Name.lower perm_query)
+          in
+          let perm_query_crushed = Name.crush_lower perm_query in
           let perm_direct = search_firstname_direct conf base perm_query in
           List.iter (fun ip -> Some.AliasCache.add_direct ip) perm_direct;
           let perm_alias =
@@ -747,20 +777,38 @@ let search_firstname_with_cache conf base query opts =
             (fun (ip, alias) -> Some.AliasCache.add_alias ip alias)
             perm_alias;
           let perm_all = perm_direct @ List.map fst perm_alias in
+          let filtered_perm =
+            List.filter
+              (fun ip ->
+                if Hashtbl.mem seen_perm ip then false
+                else
+                  let p = Driver.poi base ip in
+                  let fn = Driver.sou base (Driver.get_first_name p) in
+                  let fn_norm = normalize_for_phonetic (Name.lower fn) in
+                  let fn_crushed = Name.crush_lower fn in
+                  let matches =
+                    Mutil.contains fn_crushed perm_query_crushed
+                    && Mutil.contains fn_norm perm_query_norm
+                  in
+                  if matches then Hashtbl.add seen_perm ip ();
+                  matches)
+              perm_all
+          in
           let perm_vars =
             List.fold_left
               (fun acc ip ->
                 let n, _ = normalize_person ip in
                 if n.original <> "" then Mutil.StrSet.add n.original acc
                 else acc)
-              acc_vars perm_all
+              acc_vars filtered_perm
           in
-          (acc_persons @ perm_all, perm_vars))
-        ([], Mutil.StrSet.empty) perms
+          (acc_persons @ filtered_perm, perm_vars))
+        ([], Mutil.StrSet.empty) perms)
     else ([], Mutil.StrSet.empty)
   in
   let included_iper, included_variants, phonetic_iper, phonetic_variants =
     if not opts.exact1 then (
+      let query_crushed = Name.crush_lower nq.lower in
       let direct_included_results = List.map snd direct_included in
       let phonetic_ngrams =
         if opts.incl_aliases then
@@ -778,6 +826,7 @@ let search_firstname_with_cache conf base query opts =
       let seen = Hashtbl.create 1000 in
       List.iter (fun ip -> Hashtbl.add seen ip ()) (List.map snd direct_exact);
       List.iter (fun ip -> Hashtbl.add seen ip ()) alias_results;
+      List.iter (fun ip -> Hashtbl.add seen ip ()) permuted_persons;
       let process_list lst f =
         List.iter
           (fun ip ->
@@ -786,14 +835,22 @@ let search_firstname_with_cache conf base query opts =
               f ip))
           lst
       in
+      process_list direct_included_results (fun ip ->
+          let n, _ = normalize_person ip in
+          if Mutil.contains n.lower nq.lower then
+            contains_query := ip :: !contains_query
+          else
+            let fn_crushed = Name.crush_lower n.lower in
+            if Mutil.contains fn_crushed query_crushed then
+              other_phonetic := ip :: !other_phonetic);
       process_list all_phonetic (fun ip ->
           let n, _ = normalize_person ip in
-          if Mutil.contains n.normalized nq.normalized then
+          if Mutil.contains n.lower nq.lower then
             contains_query := ip :: !contains_query
           else other_phonetic := ip :: !other_phonetic);
       process_list partial_phonetic (fun ip ->
           other_phonetic := ip :: !other_phonetic);
-      let included_iper = direct_included_results @ List.rev !contains_query in
+      let included_iper = List.rev !contains_query in
       let included_variants =
         List.fold_left
           (fun acc ip ->
