@@ -84,9 +84,10 @@ let normalize_for_phonetic s =
   Buffer.contents buf
 
 let normalize_query q =
+  let q_normalized = Mutil.tr '-' ' ' q in
   let lower = Name.lower q in
   let normalized = normalize_for_phonetic lower in
-  { original = q; lower; normalized; words = Some (cut_words q) }
+  { original = q; lower; normalized; words = Some (cut_words q_normalized) }
 
 let normalize_name n =
   let lower = Name.lower n in
