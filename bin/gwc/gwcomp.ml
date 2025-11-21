@@ -74,6 +74,11 @@ type gw_syntax =
       (** Block that defines wizard notes. First string represents
       First string represents wizard's id. Second is note's content. *)
 
+let log_error ~filename ~state message =
+  Printf.printf "File \"%s\", line %d:\n" filename state.State.line_cnt;
+  Printf.printf "Error: %s\n" message;
+  flush stdout
+
 (** {i .gw} file encoding *)
 type encoding = E_utf_8 | E_iso_8859_1
 
@@ -1393,9 +1398,7 @@ let comp_families state x =
        | Ok F_none -> ()
        | Error str ->
            if state.State.no_fail then (
-             Printf.printf "File \"%s\", line %d:\n" x state.State.line_cnt;
-             Printf.printf "Error: %s\n" str;
-             flush stdout;
+             log_error ~filename:x ~state str;
              loop (read_line state (ic, encoding)) encoding)
            else failwith str
      in
