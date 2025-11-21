@@ -2,3 +2,18 @@
  (name test)
  (modules test sosa_test place_test calendar_test wiki_test merge_test util_test)
  (libraries alcotest geneweb fmt))
+
+(test
+  (deps (:dict ./dict.txt))
+  (name search_test)
+  (package geneweb)
+  (modules search_test)
+  (libraries
+    alcotest
+    fmt
+    qcheck
+    qcheck-alcotest
+    geneweb_util
+    geneweb_compat
+    geneweb_search)
+  (action (run %{test} %{dict})))

@@ -3,6 +3,8 @@
   (name geneweb_rpc)
   (modes byte native)
   (libraries
+    geneweb_search
+    geneweb_util
     lwt
     yojson
     fmt))
