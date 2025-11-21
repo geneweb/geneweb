@@ -1076,6 +1076,13 @@ let loop_witn state line ic =
     not the end of the file. *)
 let read_family state ic fname =
   let ( >>= ) = Result.bind in
+  let ensure_end_of_line ~line fields =
+    if fields = [] then Ok ()
+    else if state.State.no_fail then (
+      log_error ~filename:fname ~state line;
+      Ok ())
+    else Error line
+  in
   function
   (* Block that defines that file use utf-8 encoding *)
   | Some (_, [ "encoding:"; "utf-8" ]) -> Ok F_enc_utf_8
@@ -1092,172 +1099,165 @@ let read_family state ic fname =
       let relation, fath_sex, moth_sex = relation_ss in
       (* read mother *)
       let moth_key, _, l = parse_parent state str l in
-      if l <> [] then Error str
-      else
-        let line = read_line state ic in
-        (* read list of witnesses with their sex (if exists) *)
-        let rec loop = function
-          (* TODO duplicate of loop_witn ?*)
-          | Some (str, ("wit" | "wit:") :: l) ->
-              let sex, l =
-                match l with
-                | "m:" :: l -> (make_strong_assumption Def.Male, l)
-                | "f:" :: l -> (make_strong_assumption Def.Female, l)
-                | l -> (make_weak_assumption Def.Neuter, l)
-              in
-              let wk, _, l = parse_parent state str l in
-              if l <> [] then Error str
-              else
-                Result.map
-                  (fun (witn, line) -> ((wk, sex) :: witn, line))
-                  (loop (read_line state ic))
-          | line -> Ok ([], line)
-        in
-        loop line >>= fun (witn, line) ->
-        (* read familial source if present *)
-        (match line with
-        | Some (_, [ "src"; x ]) -> Ok (cut_space x, read_line state ic)
-        | Some (str, "src" :: _) -> Error str
-        | _ -> Ok ("", line))
-        >>= fun (fsrc, line) ->
-        (* read common children source if present *)
-        (match line with
-        | Some (_, [ "csrc"; x ]) -> Ok (cut_space x, read_line state ic)
-        | Some (str, "csrc" :: _) -> Error str
-        | _ -> Ok ("", line))
-        >>= fun (csrc, line) ->
-        (* read common children birth place if present *)
-        (match line with
-        | Some (_, [ "cbp"; x ]) -> Ok (cut_space x, read_line state ic)
-        | Some (str, "cbp" :: _) -> Error str
-        | _ -> Ok ("", line))
-        >>= fun (cbp, line) ->
-        (* create a couple *)
-        let co = Adef.couple fath_key moth_key in
-        (* read a family comments *)
-        let comm, line =
-          match line with
-          | Some (str, "comm" :: _) ->
-              let comm, next_line = loop_comment state str ic in
-
-              (* duplicate of input_real_line but starting with line [s] *)
-              let rec get_next_real_line s =
-                if s = "" || s.[0] = '#' then
-                  get_next_real_line (input_a_line state ic)
-                else s
-              in
-
-              let next_line = get_next_real_line next_line in
-              (comm, Some (next_line, fields next_line))
-          | _ -> ("", line)
-        in
-        (* read family events *)
-        (match line with
-        | Some (_, "fevt" :: _) ->
-            let fevents_and_line =
-              let rec loop fevents = function
-                | "end fevt" -> Ok (fevents, read_line state ic)
-                | x ->
-                    let str, l = (x, fields x) in
-                    (* On récupère le nom, date, lieu, source, cause *)
-                    let name, l = get_fevent_name str l in
-                    let date, l = get_optional_event_date l in
-                    let place, l = get_field "#p" l in
-                    let cause, l = get_field "#c" l in
-                    let src, l = get_field "#s" l in
-                    let date =
-                      match date with
-                      | None -> Date.cdate_None
-                      | Some x -> Date.cdate_of_od x
-                    in
-                    if l <> [] then Error str
-                    else
-                      (* On récupère les témoins *)
-                      let witn, line =
-                        loop_witn state (input_a_line state ic) ic
-                      in
-                      (* On récupère les notes *)
-                      let notes, line = loop_note state line ic in
-                      let evt = (name, date, place, cause, src, notes, witn) in
-                      loop (evt :: fevents) line
-              in
-              loop [] (input_a_line state ic)
+      ensure_end_of_line ~line:str l >>= fun () ->
+      let line = read_line state ic in
+      (* read list of witnesses with their sex (if exists) *)
+      let rec loop = function
+        (* TODO duplicate of loop_witn ?*)
+        | Some (str, ("wit" | "wit:") :: l) ->
+            let sex, l =
+              match l with
+              | "m:" :: l -> (make_strong_assumption Def.Male, l)
+              | "f:" :: l -> (make_strong_assumption Def.Female, l)
+              | l -> (make_weak_assumption Def.Neuter, l)
             in
+            let wk, _, l = parse_parent state str l in
+            ensure_end_of_line ~line:str l >>= fun () ->
             Result.map
-              (fun (fevents, line) -> (List.rev fevents, line))
-              fevents_and_line
-        | _ -> Ok ([], line))
-        >>= fun (fevents, line) ->
+              (fun (witn, line) -> ((wk, sex) :: witn, line))
+              (loop (read_line state ic))
+        | line -> Ok ([], line)
+      in
+      loop line >>= fun (witn, line) ->
+      (* read familial source if present *)
+      (match line with
+      | Some (_, [ "src"; x ]) -> Ok (cut_space x, read_line state ic)
+      | Some (str, "src" :: _) -> Error str
+      | _ -> Ok ("", line))
+      >>= fun (fsrc, line) ->
+      (* read common children source if present *)
+      (match line with
+      | Some (_, [ "csrc"; x ]) -> Ok (cut_space x, read_line state ic)
+      | Some (str, "csrc" :: _) -> Error str
+      | _ -> Ok ("", line))
+      >>= fun (csrc, line) ->
+      (* read common children birth place if present *)
+      (match line with
+      | Some (_, [ "cbp"; x ]) -> Ok (cut_space x, read_line state ic)
+      | Some (str, "cbp" :: _) -> Error str
+      | _ -> Ok ("", line))
+      >>= fun (cbp, line) ->
+      (* create a couple *)
+      let co = Adef.couple fath_key moth_key in
+      (* read a family comments *)
+      let comm, line =
         match line with
-        (* have children *)
-        | Some (_, [ "beg" ]) ->
-            let cles_enfants =
-              let rec loop children =
-                match read_line state ic with
-                | Some (str, "-" :: l) ->
-                    let sex, l = get_optional_sexe l in
-                    let child, l =
-                      parse_child state str surname sex csrc cbp l
-                    in
-                    if l <> [] then Error str else loop (child :: children)
-                | Some (_, [ "end" ]) -> Ok children
-                | Some (str, _) -> Error str
-                | _ -> Error "eof"
-              in
-              Result.map List.rev (loop [])
+        | Some (str, "comm" :: _) ->
+            let comm, next_line = loop_comment state str ic in
+
+            (* duplicate of input_real_line but starting with line [s] *)
+            let rec get_next_real_line s =
+              if s = "" || s.[0] = '#' then
+                get_next_real_line (input_a_line state ic)
+              else s
             in
-            (* create a family definition (without witnesses, events and family index) *)
-            let fo =
-              {
-                Def.marriage;
-                marriage_place = marr_place;
-                marriage_note = marr_note;
-                marriage_src = marr_src;
-                witnesses = [||];
-                relation;
-                divorce;
-                fevents = [];
-                comment = comm;
-                origin_file = fname;
-                fsources = fsrc;
-                fam_index = Gwdb.dummy_ifam;
-              }
+
+            let next_line = get_next_real_line next_line in
+            (comm, Some (next_line, fields next_line))
+        | _ -> ("", line)
+      in
+      (* read family events *)
+      (match line with
+      | Some (_, "fevt" :: _) ->
+          let fevents_and_line =
+            let rec loop fevents = function
+              | "end fevt" -> Ok (fevents, read_line state ic)
+              | x ->
+                  let str, l = (x, fields x) in
+                  (* On récupère le nom, date, lieu, source, cause *)
+                  let name, l = get_fevent_name str l in
+                  let date, l = get_optional_event_date l in
+                  let place, l = get_field "#p" l in
+                  let cause, l = get_field "#c" l in
+                  let src, l = get_field "#s" l in
+                  let date =
+                    match date with
+                    | None -> Date.cdate_None
+                    | Some x -> Date.cdate_of_od x
+                  in
+                  ensure_end_of_line ~line:str l >>= fun () ->
+                  (* On récupère les témoins *)
+                  let witn, line = loop_witn state (input_a_line state ic) ic in
+                  (* On récupère les notes *)
+                  let notes, line = loop_note state line ic in
+                  let evt = (name, date, place, cause, src, notes, witn) in
+                  loop (evt :: fevents) line
             in
-            let deo =
-              Result.map
-                (fun cles_enfants ->
-                  { Def.children = Array.of_list cles_enfants })
-                cles_enfants
+            loop [] (input_a_line state ic)
+          in
+          Result.map
+            (fun (fevents, line) -> (List.rev fevents, line))
+            fevents_and_line
+      | _ -> Ok ([], line))
+      >>= fun (fevents, line) ->
+      match line with
+      (* have children *)
+      | Some (_, [ "beg" ]) ->
+          let cles_enfants =
+            let rec loop children =
+              match read_line state ic with
+              | Some (str, "-" :: l) ->
+                  let sex, l = get_optional_sexe l in
+                  let child, l = parse_child state str surname sex csrc cbp l in
+                  ensure_end_of_line ~line:str l >>= fun () ->
+                  loop (child :: children)
+              | Some (_, [ "end" ]) -> Ok children
+              | Some (str, _) -> Error str
+              | _ -> Error "eof"
             in
+            Result.map List.rev (loop [])
+          in
+          (* create a family definition (without witnesses, events and family index) *)
+          let fo =
+            {
+              Def.marriage;
+              marriage_place = marr_place;
+              marriage_note = marr_note;
+              marriage_src = marr_src;
+              witnesses = [||];
+              relation;
+              divorce;
+              fevents = [];
+              comment = comm;
+              origin_file = fname;
+              fsources = fsrc;
+              fam_index = Gwdb.dummy_ifam;
+            }
+          in
+          let deo =
             Result.map
-              (fun deo ->
-                F_some
-                  ( Family (co, fath_sex, moth_sex, witn, fevents, fo, deo),
-                    read_line state ic ))
-              deo
-        (* no children *)
-        | line ->
-            let fo =
-              {
-                Def.marriage;
-                marriage_place = marr_place;
-                marriage_note = marr_note;
-                marriage_src = marr_src;
-                witnesses = [||];
-                relation;
-                divorce;
-                fevents = [];
-                comment = comm;
-                origin_file = fname;
-                fsources = fsrc;
-                fam_index = Gwdb.dummy_ifam;
-              }
-            in
-            let deo = { Def.children = [||] } in
-            Ok
-              (F_some
-                 (Family (co, fath_sex, moth_sex, witn, fevents, fo, deo), line))
-      )
+              (fun cles_enfants ->
+                { Def.children = Array.of_list cles_enfants })
+              cles_enfants
+          in
+          Result.map
+            (fun deo ->
+              F_some
+                ( Family (co, fath_sex, moth_sex, witn, fevents, fo, deo),
+                  read_line state ic ))
+            deo
+      (* no children *)
+      | line ->
+          let fo =
+            {
+              Def.marriage;
+              marriage_place = marr_place;
+              marriage_note = marr_note;
+              marriage_src = marr_src;
+              witnesses = [||];
+              relation;
+              divorce;
+              fevents = [];
+              comment = comm;
+              origin_file = fname;
+              fsources = fsrc;
+              fam_index = Gwdb.dummy_ifam;
+            }
+          in
+          let deo = { Def.children = [||] } in
+          Ok
+            (F_some
+               (Family (co, fath_sex, moth_sex, witn, fevents, fo, deo), line)))
   (* Database notes block *)
   | Some (_, [ "notes-db" ]) ->
       let notes = read_notes_db state ic "end notes-db" in
@@ -1278,17 +1278,16 @@ let read_family state ic fname =
   | Some (str, "notes" :: l) -> (
       let surname, l = get_name l in
       let first_name, occ, l = get_fst_name str l in
-      if l <> [] then Error str
-      else
-        match read_line state ic with
-        | Some (_, [ "beg" ]) ->
-            let notes = read_notes state ic in
-            let key =
-              { pk_first_name = first_name; pk_surname = surname; pk_occ = occ }
-            in
-            Ok (F_some (Notes (key, notes), read_line state ic))
-        | Some (str, _) -> Error str
-        | None -> Error "end of file")
+      ensure_end_of_line ~line:str l >>= fun () ->
+      match read_line state ic with
+      | Some (_, [ "beg" ]) ->
+          let notes = read_notes state ic in
+          let key =
+            { pk_first_name = first_name; pk_surname = surname; pk_occ = occ }
+          in
+          Ok (F_some (Notes (key, notes), read_line state ic))
+      | Some (str, _) -> Error str
+      | None -> Error "end of file")
   (* Wizard note block *)
   | Some (str, "wizard-note" :: _) ->
       let wizid =
@@ -1308,69 +1307,66 @@ let read_family state ic fname =
         | "#f" :: l -> (make_strong_assumption Def.Female, l)
         | l -> (make_weak_assumption Def.Neuter, l)
       in
-      if l <> [] then Error str
-      else
-        match read_line state ic with
-        (* Read list of relations *)
-        | Some (_, [ "beg" ]) ->
-            let rl =
-              try
-                let rec loop = function
-                  | "end" -> Ok []
-                  | x ->
-                      Result.map
-                        (fun relations ->
-                          get_relation state x (fields x) :: relations)
-                        (loop (input_a_line state ic))
-                in
-                loop (input_a_line state ic)
-              with End_of_file -> Error "missing end rel"
-            in
-            Result.map
-              (fun rl -> F_some (Relations (sb, sex, rl), read_line state ic))
-              rl
-        | Some (str, _) -> Error str
-        | None -> Error "end of file")
+      ensure_end_of_line ~line:str l >>= fun () ->
+      match read_line state ic with
+      (* Read list of relations *)
+      | Some (_, [ "beg" ]) ->
+          let rl =
+            try
+              let rec loop = function
+                | "end" -> Ok []
+                | x ->
+                    Result.map
+                      (fun relations ->
+                        get_relation state x (fields x) :: relations)
+                      (loop (input_a_line state ic))
+              in
+              loop (input_a_line state ic)
+            with End_of_file -> Error "missing end rel"
+          in
+          Result.map
+            (fun rl -> F_some (Relations (sb, sex, rl), read_line state ic))
+            rl
+      | Some (str, _) -> Error str
+      | None -> Error "end of file")
   (* Person's events block *)
   | Some (str, "pevt" :: l) ->
       (* get considered person *)
       let sb, _, l = parse_parent state str l in
-      if l <> [] then Error str
-      else
-        let pevents =
-          let rec loop pevents = function
-            | "end pevt" -> Ok pevents
-            | x ->
-                let str, l = (x, fields x) in
-                (* On récupère le nom, date, lieu, source, cause *)
-                let name, l = get_pevent_name str l in
-                let date, l = get_optional_event_date l in
-                let place, l = get_field "#p" l in
-                let cause, l = get_field "#c" l in
-                let src, l = get_field "#s" l in
-                let date =
-                  match date with
-                  | None -> Date.cdate_None
-                  | Some x -> Date.cdate_of_od x
-                in
-                if l <> [] then Error str
-                else
-                  (* On récupère les témoins *)
-                  let witn, line = loop_witn state (input_a_line state ic) ic in
-                  (* On récupère les notes *)
-                  let notes, line = loop_note state line ic in
-                  let evt = (name, date, place, cause, src, notes, witn) in
-                  loop (evt :: pevents) line
-          in
-          loop [] (input_a_line state ic)
+      ensure_end_of_line ~line:str l >>= fun () ->
+      let pevents =
+        let rec loop pevents = function
+          | "end pevt" -> Ok pevents
+          | x ->
+              let str, l = (x, fields x) in
+              (* On récupère le nom, date, lieu, source, cause *)
+              let name, l = get_pevent_name str l in
+              let date, l = get_optional_event_date l in
+              let place, l = get_field "#p" l in
+              let cause, l = get_field "#c" l in
+              let src, l = get_field "#s" l in
+              let date =
+                match date with
+                | None -> Date.cdate_None
+                | Some x -> Date.cdate_of_od x
+              in
+              ensure_end_of_line ~line:str l >>= fun () ->
+              (* On récupère les témoins *)
+              let witn, line = loop_witn state (input_a_line state ic) ic in
+              (* On récupère les notes *)
+              let notes, line = loop_note state line ic in
+              let evt = (name, date, place, cause, src, notes, witn) in
+              loop (evt :: pevents) line
         in
-        let pevents = Result.map List.rev pevents in
-        Result.map
-          (fun pevents ->
-            F_some
-              ( Pevent (sb, make_weak_assumption Def.Neuter, pevents),
-                read_line state ic ))
-          pevents
+        loop [] (input_a_line state ic)
+      in
+      let pevents = Result.map List.rev pevents in
+      Result.map
+        (fun pevents ->
+          F_some
+            ( Pevent (sb, make_weak_assumption Def.Neuter, pevents),
+              read_line state ic ))
+        pevents
   | Some (str, _) -> Error str
   (* End of the file *)
   | None -> Ok F_none
