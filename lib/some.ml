@@ -271,135 +271,136 @@ let print_firstname_variants conf ?(filter = true) variants_set =
       Output.print_sstring conf "</div>\n")
 
 let first_name_print_list_multi conf base x1 sections_groups =
-  let make_anchor_button anchor label =
-    Printf.sprintf
-      {|<a href="#%s" class="btn btn-outline-secondary btn-sm">
-          <i class="fa fa-arrow-down mr-1"></i>%s
-        </a>|}
-      anchor label
-  in
   let print_section_header id title count =
     Output.printf conf {|<h2 class="h3 mt-4 mb-2" id="%s">%s (%d)</h2>|} id
       title count
   in
-  let has_section section_id =
-    List.exists
-      (fun (id, sections, _, _) -> id = section_id && List.length sections > 0)
-      sections_groups
-  in
-  let main_count =
-    match List.find_opt (fun (id, _, _, _) -> id = 0) sections_groups with
+  let get_section_count section_id =
+    match
+      List.find_opt (fun (id, _, _, _) -> id = section_id) sections_groups
+    with
     | Some (_, sections, _, _) ->
         List.fold_left
           (fun acc (_, persons) -> acc + List.length persons)
           0 sections
     | None -> 0
   in
+  let main_count = get_section_count 0 in
+  let alias_count = get_section_count 1 in
+  let included_count = get_section_count 2 in
+  let phonetic_count = get_section_count 3 in
+  let permuted_count = get_section_count 4 in
   let query_words = Util.cut_words (Name.lower x1) in
   let nb_words = List.length query_words in
   let can_permute = nb_words > 1 && nb_words < 5 in
   let include_aliases = p_getenv conf.env "fna" <> None in
   let p_exact_on = p_getenv conf.env "p_exact" <> Some "off" in
   let p_order_on = p_getenv conf.env "p_order" = Some "on" in
+  let make_btn_grp anchor count url is_active label =
+    let cnt =
+      if not is_active then ""
+      else
+        Printf.sprintf {|<span class="badge badge-light ml-2">%d</span>|} count
+    in
+    let tt = if is_active then "delete" else "add" in
+    let title = Utf8.capitalize_fst (transl conf tt) in
+    let btn_cls = if is_active then "primary" else "outline-primary" in
+    let anc =
+      if (not is_active) || count = 0 then ""
+      else
+        (Printf.sprintf
+           {|<a href="#%s" class="btn btn-outline-primary">
+            <i class="fa fa-arrow-down"></i>
+          </a>|})
+          anchor
+    in
+    Printf.sprintf
+      {|<div class="btn-group btn-group-sm mr-2" role="group">
+          %s
+          <a href="%s" class="btn btn-%s" title="%s">%s%s</a>
+        </div>|}
+      anc url btn_cls title label cnt
+  in
+  let make_dual_btn_grp anc1 cnt1 anc2 cnt2 tt tt2 label1 label2 url is_active =
+    let anchor1 =
+      if is_active && cnt1 > 0 then
+        Printf.sprintf
+          {|<a href="#%s" class="btn btn-outline-primary">
+            <i class="fa fa-arrow-down"></i></a>|}
+          anc1
+      else ""
+    in
+    let anchor2 =
+      if is_active && cnt2 > 0 then
+        Printf.sprintf
+          {|<a href="#%s" class="btn btn-outline-primary">
+            <i class="fa fa-arrow-down"></i></a>|}
+          anc2
+      else ""
+    in
+    let badge1 =
+      if not is_active then " / "
+      else
+        Printf.sprintf {|<span class="badge badge-light mx-2">%d</span>|} cnt1
+    in
+    let badge2 =
+      if not is_active then ""
+      else
+        Printf.sprintf {|<span class="badge badge-light ml-2">%d</span>|} cnt2
+    in
+    let btn_cls = if is_active then "primary" else "outline-primary" in
+    Printf.sprintf
+      {|<div class="btn-group btn-group-sm" role="group">
+          %s
+          <a href="%s" class="btn btn-%s" title="%s %s">%s%s%s%s</a>
+          %s
+        </div>|}
+      anchor1 url btn_cls tt tt2 label1 badge1 label2 badge2 anchor2
+  in
+  let fna_url =
+    Util.url_set_aux conf
+      (Util.commd conf :> string)
+      [ "fna" ]
+      [ (if include_aliases then "" else "1") ]
+  in
+  let order_url =
+    Util.url_set_aux conf
+      (Util.commd conf :> string)
+      [ "p_order" ]
+      [ (if p_order_on then "" else "on") ]
+  in
+  let exact_url =
+    Util.url_set_aux conf
+      (Util.commd conf :> string)
+      [ "p_exact" ]
+      [ (if p_exact_on then "off" else "") ]
+  in
   Hutil.header_without_title conf;
   Output.printf conf {|<h1>%s%s “%s”</h1>|}
     (Utf8.capitalize_fst (transl conf "search_by_firstnames"))
     (transl conf ":")
     (escape_html x1 :> string);
-  let anchor_buttons =
-    List.filter_map
-      (fun (id, anchor, label_fn) ->
-        if has_section id then Some (make_anchor_button anchor (label_fn ()))
-        else None)
-      [
-        ( 1,
-          "alias",
-          fun () -> transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst
-        );
-        ( 4,
-          "permuted-variants",
-          fun () ->
-            transl_nth conf "first names exact/included/permuted" 2
-            |> Utf8.capitalize_fst );
-        ( 2,
-          "included-variants",
-          fun () ->
-            transl_nth conf "first names exact/included/permuted" 1
-            |> Utf8.capitalize_fst );
-        ( 3,
-          "phonetic-variants",
-          fun () -> transl conf "phonetic variants" |> Utf8.capitalize_fst );
-      ]
-  in
-  let option_buttons =
-    let fna_url =
-      Util.url_set_aux conf
-        (Util.commd conf :> string)
-        [ "fna" ]
-        [ (if include_aliases then "" else "1") ]
-    in
-    let fna_button =
-      Printf.sprintf
-        {|<a href="%s" class="btn btn-%sprimary btn-sm" title="%s">
-            <i class="fa fa-%s mr-1"></i>%s
-          </a>|}
-        fna_url
-        (if include_aliases then "" else "outline-")
-        (Utf8.capitalize_fst (transl_nth conf "first name alias" 0))
-        (if include_aliases then "xmark" else "check")
-        (Utf8.capitalize_fst (transl_nth conf "first name alias" 1))
-    in
-    let order_button_opt =
-      if can_permute then
-        let order_url =
-          Util.url_set_aux conf
-            (Util.commd conf :> string)
-            [ "p_order" ]
-            [ (if p_order_on then "" else "on") ]
-        in
-        Some
-          (Printf.sprintf
-             {|<a href="%s" class="btn btn-%sprimary btn-sm" title="%s">
-                 <i class="fa fa-%s mr-1"></i>%s</a>|}
-             order_url
-             (if p_order_on then "" else "outline-")
-             (Utf8.capitalize_fst (transl conf "order hlp"))
-             (if p_order_on then "xmark" else "check")
-             (Utf8.capitalize_fst
-                (transl_nth conf "first names exact/included/permuted" 2)))
-      else None
-    in
-    let exact_url =
-      Util.url_set_aux conf
-        (Util.commd conf :> string)
-        [ "p_exact" ]
-        [ (if p_exact_on then "off" else "") ]
-    in
-    let exact_button =
-      Printf.sprintf
-        {|<a href="%s" class="btn btn-%sprimary btn-sm" title="%s, %s %s">
-            <i class="fa fa-%s mr-1"></i>%s (!)</a>|}
-        exact_url
-        (if p_exact_on then "outline-" else "")
-        (Utf8.capitalize_fst
-           (transl_nth conf "first names exact/included/permuted" 1))
-        (transl conf "phonetic variants")
-        (Utf8.capitalize_fst (transl conf "not exact hlp"))
-        (if p_exact_on then "check" else "xmark")
-        (Utf8.capitalize_fst (transl_nth conf "not exact" 1))
-    in
-    match order_button_opt with
-    | Some order_button -> [ fna_button; order_button; exact_button ]
-    | None -> [ fna_button; exact_button ]
-  in
-  Output.printf conf
-    {|<div class="d-flex flex-column align-items-center">
-        <div>%s</div>
-        <div class="mt-1">%s</div>
-      </div>|}
-    (String.concat "\n" option_buttons)
-    (String.concat "\n" anchor_buttons);
-  Output.printf conf {|<h2 class="h3 my-2">%s (%d)</h2>|}
+  Output.print_sstring conf {|<div class="d-flex flex-column">|};
+  Output.print_sstring conf {|<div class="mb-2">|};
+  Output.print_sstring conf
+    (make_btn_grp "alias" alias_count fna_url include_aliases
+       (transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst));
+  if can_permute then
+    Output.print_sstring conf
+      (make_btn_grp "permuted-variants" permuted_count order_url p_order_on
+         (transl_nth conf "first names exact/included/permuted" 2
+         |> Utf8.capitalize_fst));
+  Output.print_sstring conf
+    (make_dual_btn_grp "included-variants" included_count "phonetic-variants"
+       phonetic_count
+       (transl_nth conf "not exact" 1 |> Utf8.capitalize_fst)
+       (transl conf "not exact hlp")
+       (transl_nth conf "first names exact/included/permuted" 1
+       |> Utf8.capitalize_fst)
+       (transl conf "phonetic variants" |> Utf8.capitalize_fst)
+       exact_url (not p_exact_on));
+  Output.print_sstring conf "</div>";
+  Output.printf conf {|<div><h2 class="h3 my-2">%s (%d)</h2>|}
     (transl_nth conf "first names exact/included/permuted" 0
     |> Utf8.capitalize_fst)
     main_count;
@@ -410,39 +411,51 @@ let first_name_print_list_multi conf base x1 sections_groups =
           (fun acc (_, persons) -> acc + List.length persons)
           0 sections
       in
-      (match section_id with
+      match section_id with
       | 0 ->
           if main_count > 1 && not (StrSet.is_empty variants_set) then
-            print_firstname_variants conf variants_set
+            print_firstname_variants conf variants_set;
+          first_name_print_sections conf base sections ~rev
       | 1 when include_aliases && section_count > 0 ->
           print_section_header "alias"
             (transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst)
             section_count;
           if not (StrSet.is_empty variants_set) then
-            print_firstname_variants conf ~filter:false variants_set
-      | 2 when section_count > 0 ->
-          print_section_header "included-variants"
-            (transl_nth conf "first names exact/included/permuted" 1
-            |> Utf8.capitalize_fst)
-            section_count;
-          if not (StrSet.is_empty variants_set) then
-            print_firstname_variants conf variants_set
-      | 3 when section_count > 0 ->
-          Output.printf conf
-            {|<h2 class="h3 mt-4 mb-2" id="phonetic-variants">%s (%d)</h2>|}
-            (transl conf "phonetic variants" |> Utf8.capitalize_fst)
-            section_count;
-          print_firstname_variants conf ~filter:false variants_set
-      | 4 when section_count > 0 ->
+            print_firstname_variants conf ~filter:false variants_set;
+          first_name_print_sections conf base sections ~rev
+      | 4 when p_order_on && section_count > 0 ->
           print_section_header "permuted-variants"
             (transl_nth conf "first names exact/included/permuted" 2
             |> Utf8.capitalize_fst)
             section_count;
           if not (StrSet.is_empty variants_set) then
-            print_firstname_variants conf ~filter:false variants_set
-      | _ -> ());
-      first_name_print_sections conf base sections ~rev)
+            print_firstname_variants conf ~filter:false variants_set;
+          first_name_print_sections conf base sections ~rev
+      | 2 when (not p_exact_on) && section_count > 0 ->
+          print_section_header "included-variants"
+            (transl_nth conf "first names exact/included/permuted" 1
+            |> Utf8.capitalize_fst)
+            section_count;
+          if not (StrSet.is_empty variants_set) then
+            print_firstname_variants conf variants_set;
+          first_name_print_sections conf base sections ~rev
+      | 3 when (not p_exact_on) && section_count > 0 ->
+          let title =
+            if nb_words > 1 then
+              Printf.sprintf "%s %s %s"
+                (transl conf "disordered firstnames" |> Utf8.capitalize_fst)
+                (transl conf "and")
+                (transl conf "phonetic variants")
+            else transl conf "phonetic variants" |> Utf8.capitalize_fst
+          in
+          Output.printf conf
+            {|<h2 class="h3 mt-4 mb-2" id="phonetic-variants">%s (%d)</h2>|}
+            title section_count;
+          print_firstname_variants conf ~filter:false variants_set;
+          first_name_print_sections conf base sections ~rev
+      | _ -> ())
     sections_groups;
+  Output.print_sstring conf "</div></div>";
   Hutil.trailer conf
 
 let first_name_print_list conf base x1 xl listes ~rev =

@@ -816,9 +816,7 @@ let search_firstname_with_cache conf base query opts =
         else []
       in
       let exact_phonetic, partial_phonetic, _ =
-        if not opts.incl_aliases then
-          search_firstname_phonetic_split conf base query
-        else ([], [], Mutil.StrSet.empty)
+        search_firstname_phonetic_split conf base query
       in
       let all_phonetic = phonetic_ngrams @ exact_phonetic in
       let contains_query = ref [] in
