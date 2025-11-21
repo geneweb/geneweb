@@ -28,7 +28,7 @@ type ('person, 'string) gen_min_person = {
   mutable m_rparents : ('person, 'string) Def.gen_relation list;
   mutable m_related : int list;
   mutable m_pevents : ('person, 'string) Def.gen_pers_event list;
-  mutable m_sex : Def.sex Gwc_lib__.Gwcomp.assumption;
+  mutable m_sex : Def.sex Gwcomp.assumption;
   mutable m_notes : 'string;
 }
 (** Restricted to the minimum [Def.gen_person] data type. *)
@@ -224,7 +224,7 @@ let make_person gen p n occ : min_person * ascend * union =
       m_rparents = [];
       m_related = [];
       m_pevents = [];
-      m_sex = Gwc_lib__.Gwcomp.make_weak_assumption Def.Neuter;
+      m_sex = Gwcomp.make_weak_assumption Def.Neuter;
       m_notes = empty_string;
     }
   and a = { Def.parents = None; consang = Adef.fix (-1) }
@@ -411,18 +411,16 @@ let find_first_available_occ gen fn sn occ =
      *)
 let insert_undefined state gen key =
   (* shift person's occurence *)
-  let occ = key.Gwc_lib__.Gwcomp.pk_occ + gen.g_file_info.f_shift in
+  let occ = key.Gwcomp.pk_occ + gen.g_file_info.f_shift in
   (* person with its position in the base *)
   let x, ip =
     try
-      if
-        key.Gwc_lib__.Gwcomp.pk_first_name = "?"
-        || key.Gwc_lib__.Gwcomp.pk_surname = "?"
-      then raise Not_found
+      if key.Gwcomp.pk_first_name = "?" || key.Gwcomp.pk_surname = "?" then
+        raise Not_found
       else
         let ip =
-          find_person_by_name gen key.Gwc_lib__.Gwcomp.pk_first_name
-            key.Gwc_lib__.Gwcomp.pk_surname occ
+          find_person_by_name gen key.Gwcomp.pk_first_name key.Gwcomp.pk_surname
+            occ
         in
         (poi gen.g_base ip, ip) (* if person not found *)
     with Not_found ->
@@ -430,29 +428,23 @@ let insert_undefined state gen key =
       let new_occ =
         if
           gen.g_file_info.f_separate
-          && key.Gwc_lib__.Gwcomp.pk_first_name <> "?"
-          && key.Gwc_lib__.Gwcomp.pk_surname <> "?"
+          && key.Gwcomp.pk_first_name <> "?"
+          && key.Gwcomp.pk_surname <> "?"
         then
-          find_first_available_occ gen key.Gwc_lib__.Gwcomp.pk_first_name
-            key.Gwc_lib__.Gwcomp.pk_surname occ
+          find_first_available_occ gen key.Gwcomp.pk_first_name
+            key.Gwcomp.pk_surname occ
         else occ
       in
       (* person's entry index *)
       let i = gen.g_pcnt in
       let x, a, u =
-        make_person gen key.Gwc_lib__.Gwcomp.pk_first_name
-          key.Gwc_lib__.Gwcomp.pk_surname new_occ
+        make_person gen key.Gwcomp.pk_first_name key.Gwcomp.pk_surname new_occ
       in
       (* strore names globally *)
-      if
-        key.Gwc_lib__.Gwcomp.pk_first_name <> "?"
-        && key.Gwc_lib__.Gwcomp.pk_surname <> "?"
-      then
-        add_person_by_name gen key.Gwc_lib__.Gwcomp.pk_first_name
-          key.Gwc_lib__.Gwcomp.pk_surname i
-      else if state.Gwc_lib__.State.create_all_keys then
-        add_person_by_name gen key.Gwc_lib__.Gwcomp.pk_first_name
-          key.Gwc_lib__.Gwcomp.pk_surname i;
+      if key.Gwcomp.pk_first_name <> "?" && key.Gwcomp.pk_surname <> "?" then
+        add_person_by_name gen key.Gwcomp.pk_first_name key.Gwcomp.pk_surname i
+      else if state.State.create_all_keys then
+        add_person_by_name gen key.Gwcomp.pk_first_name key.Gwcomp.pk_surname i;
       (* extend arrays if needed *)
       new_iper gen;
       (* add person to array *)
@@ -463,14 +455,8 @@ let insert_undefined state gen key =
       gen.g_base.c_unions.(i) <- u;
       gen.g_pcnt <- gen.g_pcnt + 1;
       (* strore names locally *)
-      (if
-       key.Gwc_lib__.Gwcomp.pk_first_name <> "?"
-       && key.Gwc_lib__.Gwcomp.pk_surname <> "?"
-      then
-       let h =
-         person_hash key.Gwc_lib__.Gwcomp.pk_first_name
-           key.Gwc_lib__.Gwcomp.pk_surname
-       in
+      (if key.Gwcomp.pk_first_name <> "?" && key.Gwcomp.pk_surname <> "?" then
+       let h = person_hash key.Gwcomp.pk_first_name key.Gwcomp.pk_surname in
        Hashtbl.add gen.g_file_info.f_local_names (h, occ) i);
       (* write start position of person in [g_per] *)
       seek_out gen.g_per_index (sizeof_long * i);
@@ -481,13 +467,13 @@ let insert_undefined state gen key =
   in
   if not gen.g_errored then
     if
-      sou gen.g_base x.m_first_name <> key.Gwc_lib__.Gwcomp.pk_first_name
-      || sou gen.g_base x.m_surname <> key.Gwc_lib__.Gwcomp.pk_surname
+      sou gen.g_base x.m_first_name <> key.Gwcomp.pk_first_name
+      || sou gen.g_base x.m_surname <> key.Gwcomp.pk_surname
     then (
       Printf.printf "\nPerson defined with two spellings:\n";
-      Printf.printf "  \"%s%s %s\"\n" key.Gwc_lib__.Gwcomp.pk_first_name
+      Printf.printf "  \"%s%s %s\"\n" key.Gwcomp.pk_first_name
         (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
-        key.Gwc_lib__.Gwcomp.pk_surname;
+        key.Gwcomp.pk_surname;
       Printf.printf "  \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
@@ -555,7 +541,7 @@ let insert_person state gen so =
       (* strore names globally *)
       if so.first_name <> "?" && so.surname <> "?" then
         add_person_by_name gen so.first_name so.surname i
-      else if state.Gwc_lib__.State.create_all_keys then
+      else if state.State.create_all_keys then
         add_person_by_name gen so.first_name so.surname i;
       (* extend arrays if needed *)
       new_iper gen;
@@ -609,8 +595,7 @@ let insert_person state gen so =
   let empty_string = unique_string gen "" in
   (* Convert [(_,_,string) gen_person] to [person]. Save all strings in base *)
   let access =
-    if state.Gwc_lib__.State.no_public then handle_public_access so.access
-    else so.access
+    if state.State.no_public then handle_public_access so.access else so.access
   in
   let x' =
     {
@@ -649,8 +634,7 @@ let insert_person state gen so =
       notes = empty_string;
       psources =
         unique_string gen
-          (if so.psources = "" then state.Gwc_lib__.State.default_source
-          else so.psources);
+          (if so.psources = "" then state.State.default_source else so.psources);
       key_index = ip;
     }
   in
@@ -666,8 +650,8 @@ let insert_person state gen so =
     entry's index in the [gen.g_base]. Calls [insert_person] for definition
     and [insert_undefined] for reference. *)
 let insert_somebody state gen = function
-  | Gwc_lib__.Gwcomp.Undefined key -> insert_undefined state gen key
-  | Gwc_lib__.Gwcomp.Defined so -> insert_person state gen so
+  | Gwcomp.Undefined key -> insert_undefined state gen key
+  | Gwcomp.Defined so -> insert_person state gen so
 
 (** Checks if children [ix] doesn't have another parents *)
 let check_parents_not_already_defined gen ix fath moth =
@@ -705,11 +689,11 @@ let display_sex_inconsistency gen p =
     Print message if sexes are different. *)
 let notice_sex gen p s =
   match (p.m_sex, s) with
-  | Gwc_lib__.Gwcomp.Strong _, Gwc_lib__.Gwcomp.Weak _ -> ()
-  | Gwc_lib__.Gwcomp.Weak _, Gwc_lib__.Gwcomp.Strong _ -> p.m_sex <- s
-  | Gwc_lib__.Gwcomp.Strong sex1, Gwc_lib__.Gwcomp.Strong sex2 ->
+  | Gwcomp.Strong _, Gwcomp.Weak _ -> ()
+  | Gwcomp.Weak _, Gwcomp.Strong _ -> p.m_sex <- s
+  | Gwcomp.Strong sex1, Gwcomp.Strong sex2 ->
       if sex1 <> sex2 then display_sex_inconsistency gen p
-  | Gwc_lib__.Gwcomp.Weak sex1, Gwc_lib__.Gwcomp.Weak sex2 -> (
+  | Gwcomp.Weak sex1, Gwcomp.Weak sex2 -> (
       match (sex1, sex2) with
       | Neuter, _ -> p.m_sex <- s
       | _, Neuter -> ()
@@ -971,8 +955,8 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
     with
     (* Look for inverted WIFE/HUSB *)
     | (fath, ifath), (moth, imoth)
-      when Gwc_lib__.Gwcomp.value_of_assumption fath.m_sex = Female
-           && Gwc_lib__.Gwcomp.value_of_assumption moth.m_sex = Male ->
+      when Gwcomp.value_of_assumption fath.m_sex = Female
+           && Gwcomp.value_of_assumption moth.m_sex = Male ->
         (moth, imoth, fath, ifath)
     | (fath, ifath), (moth, imoth) -> (fath, ifath, moth, imoth)
   in
@@ -1026,9 +1010,8 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
       (fun key ->
         let e, ie = insert_person state gen key in
         notice_sex gen e
-          (if key.sex = Neuter then
-           Gwc_lib__.Gwcomp.make_weak_assumption key.sex
-          else Gwc_lib__.Gwcomp.make_strong_assumption key.sex);
+          (if key.sex = Neuter then Gwcomp.make_weak_assumption key.sex
+          else Gwcomp.make_strong_assumption key.sex);
         ie)
       deo.Def.children
   in
@@ -1037,8 +1020,7 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
   (* insert sources comment *)
   let fsources =
     unique_string gen
-      (if fo.fsources = "" then state.Gwc_lib__.State.default_source
-      else fo.fsources)
+      (if fo.fsources = "" then state.State.default_source else fo.fsources)
   in
   (* extend arrays if needed *)
   new_ifam gen;
@@ -1177,12 +1159,12 @@ let insert_pevents state fname gen sb pevtl =
 (** Insert person's notes in the base and associate it to the referenced
     with [key] person *)
 let insert_notes fname gen key str =
-  let occ = key.Gwc_lib__.Gwcomp.pk_occ + gen.g_file_info.f_shift in
+  let occ = key.Gwcomp.pk_occ + gen.g_file_info.f_shift in
   match
     try
       Some
-        (find_person_by_name gen key.Gwc_lib__.Gwcomp.pk_first_name
-           key.Gwc_lib__.Gwcomp.pk_surname occ)
+        (find_person_by_name gen key.Gwcomp.pk_first_name key.Gwcomp.pk_surname
+           occ)
     with Not_found -> None
   with
   | Some ip ->
@@ -1190,17 +1172,17 @@ let insert_notes fname gen key str =
       if sou gen.g_base p.m_notes <> "" then (
         Printf.printf "\nFile \"%s\"\n" fname;
         Printf.printf "Notes already defined for \"%s%s %s\"\n"
-          key.Gwc_lib__.Gwcomp.pk_first_name
+          key.Gwcomp.pk_first_name
           (if occ = 0 then "" else "." ^ string_of_int occ)
-          key.Gwc_lib__.Gwcomp.pk_surname;
+          key.Gwcomp.pk_surname;
         check_error gen)
       else p.m_notes <- unique_string gen str
   | None ->
       Printf.printf "File \"%s\"\n" fname;
       Printf.printf "*** warning: undefined person: \"%s%s %s\"\n"
-        key.Gwc_lib__.Gwcomp.pk_first_name
+        key.Gwcomp.pk_first_name
         (if occ = 0 then "" else "." ^ string_of_int occ)
-        key.Gwc_lib__.Gwcomp.pk_surname;
+        key.Gwcomp.pk_surname;
       flush stdout
 
 (** Changes [gen.g_base.c_bnotes] to take into account [nfname] page
@@ -1248,7 +1230,7 @@ let insert_wiznote gen wizid str =
 let insert_relation_parent state gen ip s k =
   let par, ipar = insert_somebody state gen k in
   par.m_related <- ip :: par.m_related;
-  if Gwc_lib__.Gwcomp.value_of_assumption par.m_sex = Neuter then par.m_sex <- s;
+  if Gwcomp.value_of_assumption par.m_sex = Neuter then par.m_sex <- s;
   ipar
 
 (** Convert [(Dune__exe.Gwcomp.somebody, string) Def.gen_relation] to
@@ -1260,12 +1242,12 @@ let insert_relation state gen ip r =
     r_fath =
       Option.map
         (insert_relation_parent state gen ip
-           (Gwc_lib__.Gwcomp.make_weak_assumption Def.Male))
+           (Gwcomp.make_weak_assumption Def.Male))
         r.r_fath;
     r_moth =
       Option.map
         (insert_relation_parent state gen ip
-           (Gwc_lib__.Gwcomp.make_weak_assumption Def.Female))
+           (Gwcomp.make_weak_assumption Def.Female))
         r.r_moth;
     r_sources = unique_string gen r.r_sources;
   }
@@ -1289,15 +1271,13 @@ let insert_relations state fname gen sb sex rl =
 
 (** Insert syntax element read from .gwo file. *)
 let insert_syntax state fname gen = function
-  | Gwc_lib__.Gwcomp.Family (cpl, fs, ms, witl, fevents, fam, des) ->
+  | Gwcomp.Family (cpl, fs, ms, witl, fevents, fam, des) ->
       insert_family state gen cpl fs ms witl fevents fam des
-  | Gwc_lib__.Gwcomp.Notes (key, str) -> insert_notes fname gen key str
-  | Gwc_lib__.Gwcomp.Relations (sb, sex, rl) ->
-      insert_relations state fname gen sb sex rl
-  | Gwc_lib__.Gwcomp.Pevent (sb, _, pevents) ->
-      insert_pevents state fname gen sb pevents
-  | Gwc_lib__.Gwcomp.Bnotes (nfname, str) -> insert_bnotes fname gen nfname str
-  | Gwc_lib__.Gwcomp.Wnotes (wizid, str) -> insert_wiznote gen wizid str
+  | Gwcomp.Notes (key, str) -> insert_notes fname gen key str
+  | Gwcomp.Relations (sb, sex, rl) -> insert_relations state fname gen sb sex rl
+  | Gwcomp.Pevent (sb, _, pevents) -> insert_pevents state fname gen sb pevents
+  | Gwcomp.Bnotes (nfname, str) -> insert_bnotes fname gen nfname str
+  | Gwcomp.Wnotes (wizid, str) -> insert_wiznote gen wizid str
 
 (** Update person by looking up information inferred from person events *)
 let update_person_with_pevents p =
@@ -1630,7 +1610,7 @@ let convert_persons per_index_ic per_ic persons =
           rparents = mp.m_rparents;
           related = mp.m_related;
           pevents = mp.m_pevents;
-          sex = Gwc_lib__.Gwcomp.value_of_assumption mp.m_sex;
+          sex = Gwcomp.value_of_assumption mp.m_sex;
           notes = mp.m_notes;
           key_index = i;
         }
@@ -1714,7 +1694,7 @@ let make_base state bname gen per_index_ic per_ic =
     a
   in
   Gwdb.make bname
-    (input_particles state.Gwc_lib__.State.particules_file)
+    (input_particles state.State.particules_file)
     ( (persons, ascends, unions),
       (families, couples, descends),
       strings,
@@ -1815,13 +1795,12 @@ let link ~save_mem state next_family_fun bdir =
   Gc.compact ();
   let base = make_base state bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
-  if state.Gwc_lib__.State.do_check && gen.g_pcnt > 0 then (
+  if state.State.do_check && gen.g_pcnt > 0 then (
     Geneweb.Check.check_base base (set_error base gen) (set_warning base) ignore;
-    if state.Gwc_lib__.State.pr_stats then
+    if state.State.pr_stats then
       Geneweb.Stats.(print_stats base @@ stat_base base));
   if not gen.g_errored then (
-    if state.Gwc_lib__.State.do_consang then
-      ignore @@ ConsangAll.compute base true;
+    if state.State.do_consang then ignore @@ ConsangAll.compute base true;
     Gwdb.sync ~save_mem base;
     output_wizard_notes bdir gen.g_wiznotes;
     Files.remove_dir tmp_dir;

@@ -292,7 +292,7 @@ let date_of_string s i =
 (** Read line from input channel. *)
 let input_line0 state ic =
   let line = input_line ic in
-  state.Gwc_lib__.State.line_cnt <- succ state.Gwc_lib__.State.line_cnt;
+  state.State.line_cnt <- succ state.State.line_cnt;
   if String.length line > 0 && line.[String.length line - 1] = '\r' then
     String.sub line 0 (String.length line - 1)
   else line
@@ -511,7 +511,7 @@ let get_pub_name l =
 let get_image state l =
   match l with
   | ("#image" | "#photo") :: x :: l' ->
-      if state.Gwc_lib__.State.no_picture then ("", l') else (cut_space x, l')
+      if state.State.no_picture then ("", l') else (cut_space x, l')
   | _ -> ("", l)
 
 (** Parses person's occupation if present *)
@@ -1373,7 +1373,7 @@ let read_family state ic fname =
 (** Compile .gw file and save result to corresponding .gwo *)
 let comp_families state x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
-  state.Gwc_lib__.State.line_cnt <- 0;
+  state.State.line_cnt <- 0;
   let oc = open_out_bin out_file in
   (try
      let ic = open_in x in
@@ -1388,13 +1388,12 @@ let comp_families state x =
            loop line encoding
        | Ok F_enc_utf_8 -> loop (read_line state (ic, E_utf_8)) E_utf_8
        | Ok F_gw_plus ->
-           state.Gwc_lib__.State.create_all_keys <- true;
+           state.State.create_all_keys <- true;
            loop (read_line state (ic, encoding)) encoding
        | Ok F_none -> ()
        | Error str ->
-           if state.Gwc_lib__.State.no_fail then (
-             Printf.printf "File \"%s\", line %d:\n" x
-               state.Gwc_lib__.State.line_cnt;
+           if state.State.no_fail then (
+             Printf.printf "File \"%s\", line %d:\n" x state.State.line_cnt;
              Printf.printf "Error: %s\n" str;
              flush stdout;
              loop (read_line state (ic, encoding)) encoding)
