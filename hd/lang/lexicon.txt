@@ -15260,8 +15260,18 @@ sv: personer med samma namn
 tr: aynı adı taşıyan kişiler
 
     phonetic variants
-en: phonetic variants
+en: phonétic variants
 fr: variantes phonétiques
+
+    disordered firstnames
+en: disordered first names
+fr: prénoms désordonnés
+de: ungeordnete Vornamen
+es: nombres desordenados
+it: nomi disordinati
+nl: ongeordende voornamen
+pt: nomes desordenados
+sv: oordnade förnamn
 
     photos & documents
 co: ducumenti è fiure
