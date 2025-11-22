@@ -859,25 +859,31 @@ let treat_request =
              | "OE" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_oldest_engagements
              | "P" -> (
-                w_base @@ fun conf base ->
-                match p_getenv conf.env "v" with
-                | Some v ->
-                    (* Redirection vers m=S pour compatibilité *)
-                    let conf =
-                      {
-                        conf with
-                        env =
-                          ("m", Mutil.encode "S")
-                          :: ("p", Mutil.encode v)
-                          :: ("t", Mutil.encode "A")
-                          :: List.remove_assoc "m"
-                               (List.remove_assoc "v" (List.remove_assoc "t" conf.env));
-                      }
-                    in
-                    SearchName.print conf base specify
-                | None -> 
-                    (* Index alphabétique des prénoms avec tri=F ou tri=A *)
-                    AllnDisplay.print_first_names conf base)
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "v" with
+                 | Some v ->
+                     (* Redirection vers m=S pour compatibilité *)
+                     let t_param =
+                       match p_getenv conf.env "t" with
+                       | Some t -> ("t", Mutil.encode t)
+                       | None -> ("t", Mutil.encode "")
+                     in
+                     let conf =
+                       {
+                         conf with
+                         env =
+                           ("m", Mutil.encode "S")
+                           :: ("p", Mutil.encode v)
+                           :: t_param
+                           :: List.remove_assoc "m"
+                                (List.remove_assoc "v"
+                                   (List.remove_assoc "t" conf.env));
+                       }
+                     in
+                     SearchName.print conf base specify
+                 | None ->
+                     (* Index alphabétique des prénoms avec tri=F ou tri=A *)
+                     AllnDisplay.print_first_names conf base)
              | "PERSO" ->
                  w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
              | "POP_PYR" when conf.wizard || conf.friend ->

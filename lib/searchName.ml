@@ -725,14 +725,15 @@ let search_firstname_with_aliases_and_ngrams conf base query =
 
 let search_firstname_with_cache conf base query opts =
   if opts.absolute then
-    let direct_ips = search_firstname_direct conf base query in
+    let istrl = Driver.base_strings_of_first_name base query in
     let exact_ips =
-      List.filter
-        (fun ip ->
-          let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
-          fn = query)
-        direct_ips
+      List.fold_left
+        (fun acc istr ->
+          let str = Driver.sou base istr in
+          if str = query then
+            acc @ Driver.spi_find (Driver.persons_of_first_name base) istr
+          else acc)
+        [] istrl
     in
     {
       direct = { persons = exact_ips; variants = Mutil.StrSet.empty };
@@ -747,17 +748,45 @@ let search_firstname_with_cache conf base query opts =
     Logs.debug (fun k ->
         k "Search p=%s FirstNameOnly [aliases=%b, order=%b, exact=%b]" query
           opts.incl_aliases opts.order opts.exact1);
-    let direct_ips = search_firstname_direct conf base query in
-    List.iter (fun ip -> Some.AliasCache.add_direct ip) direct_ips;
+    let istrl = Driver.base_strings_of_first_name base query in
+    let query_lower = Name.lower query in
+    let exact_istrl, other_istrl =
+      List.partition
+        (fun istr ->
+          let str = Driver.sou base istr in
+          Name.lower str = query_lower)
+        istrl
+    in
+    let exact_ips =
+      List.concat
+        (List.map
+           (fun istr ->
+             Driver.spi_find (Driver.persons_of_first_name base) istr)
+           exact_istrl)
+    in
+    List.iter (fun ip -> Some.AliasCache.add_direct ip) exact_ips;
+    let other_ips =
+      List.concat
+        (List.map
+           (fun istr ->
+             Driver.spi_find (Driver.persons_of_first_name base) istr)
+           other_istrl)
+    in
+    List.iter (fun ip -> Some.AliasCache.add_direct ip) other_ips;
     let normalize_person ip =
       let p = Driver.poi base ip in
       let fn = Driver.sou base (Driver.get_first_name p) in
       (normalize_name fn, ip)
     in
-    let direct_norm = List.map normalize_person direct_ips in
-    let direct_exact, direct_included =
-      List.partition (fun (n, _) -> n.lower = nq.lower) direct_norm
+    let direct_exact =
+      List.map
+        (fun ip ->
+          ( normalize_name
+              (Driver.sou base (Driver.get_first_name (Driver.poi base ip))),
+            ip ))
+        exact_ips
     in
+    let direct_included = List.map normalize_person other_ips in
     let exact_variants =
       List.fold_left
         (fun acc (n, _) ->
