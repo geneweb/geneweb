@@ -257,16 +257,15 @@ let print_firstname_variants conf ?(filter = true) variants_set =
     in
     if not (StrSet.is_empty filtered_variants) then (
       Output.print_sstring conf {|<div class="font-weight-bold mb-3">|};
+      let title = Utf8.capitalize_fst (transl conf "search exact") in
       Mutil.list_iter_first
         (fun first fn ->
           if not first then Output.print_sstring conf ", ";
-          Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (commd conf);
-          Output.print_sstring conf "m=S&p=";
-          Output.print_string conf (Mutil.encode fn);
-          Output.print_sstring conf {|&t=A">|};
-          Output.print_string conf (escape_html fn);
-          Output.print_sstring conf "</a>")
+          Output.printf conf {|<a href="%sm=S&p=%s&t=A" title="%s">%s</a>|}
+            (commd conf :> string)
+            (Mutil.encode fn :> string)
+            title
+            (escape_html fn :> string))
         (StrSet.elements filtered_variants);
       Output.print_sstring conf "</div>\n")
 
@@ -381,10 +380,35 @@ let first_name_print_list_multi conf base x1 sections_groups =
     if is_absolute then "search by exact first names"
     else "search by first names"
   in
-  Output.printf conf {|<h1>%s%s “%s”</h1>|}
+  Output.printf conf {|<h1>%s%s "|}
     (Utf8.capitalize_fst (transl conf title_key))
-    (transl conf ":")
-    (escape_html x1 :> string);
+    (transl conf ":");
+  let split_with_seps s =
+    let rec loop acc current i =
+      if i >= String.length s then
+        if current = "" then List.rev acc else List.rev (current :: acc)
+      else
+        match s.[i] with
+        | (' ' | '-') as sep ->
+            let new_acc = if current = "" then acc else current :: acc in
+            loop (String.make 1 sep :: new_acc) "" (i + 1)
+        | c -> loop acc (current ^ String.make 1 c) (i + 1)
+    in
+    loop [] "" 0
+  in
+  let parts = split_with_seps x1 in
+  if List.length parts > 1 then
+    List.iter
+      (fun part ->
+        if part = " " || part = "-" then Output.print_sstring conf part
+        else
+          Output.printf conf {|<a href="%sm=S&p=%s">%s</a>|}
+            (commd conf :> string)
+            (Mutil.encode part :> string)
+            (escape_html part :> string))
+      parts
+  else Output.print_string conf (escape_html x1);
+  Output.print_sstring conf {|"</h1>|};
   Output.print_sstring conf {|<div class="d-flex flex-column">|};
   Output.print_sstring conf {|<div class="mb-2">|};
   if is_absolute then
@@ -392,11 +416,10 @@ let first_name_print_list_multi conf base x1 sections_groups =
       Util.url_set_aux conf (Util.commd conf :> string) [ "t" ] [ "" ]
     in
     Output.printf conf
-      {|<a href="%s" class="btn btn-primary btn-sm" title="%s">
+      {|<a href="%s" class="btn btn-primary btn-sm">
           <i class="fa fa-search-plus mr-1"></i>%s
         </a>|}
       url
-      (Utf8.capitalize_fst (transl conf "search exact"))
       (Utf8.capitalize_fst (transl conf "searching all"))
   else (
     Output.print_sstring conf
