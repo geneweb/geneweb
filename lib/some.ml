@@ -37,7 +37,7 @@ let not_found conf txt x =
   Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
-let first_name_not_found conf =
+let _first_name_not_found conf =
   not_found conf (transl conf "first name not found")
 
 let surname_not_found conf = not_found conf (transl conf "surname not found")
@@ -262,7 +262,7 @@ let print_firstname_variants conf ?(filter = true) variants_set =
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
           Output.print_string conf (commd conf);
-          Output.print_sstring conf "m=P&v=";
+          Output.print_sstring conf "m=S&p=";
           Output.print_string conf (Mutil.encode fn);
           Output.print_sstring conf {|&t=A">|};
           Output.print_string conf (escape_html fn);
@@ -296,6 +296,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
   let include_aliases = p_getenv conf.env "fna" <> None in
   let p_exact_on = p_getenv conf.env "p_exact" <> Some "off" in
   let p_order_on = p_getenv conf.env "p_order" = Some "on" in
+  let is_absolute = p_getenv conf.env "t" = Some "A" in
   let make_btn_grp anchor count url is_active label =
     let cnt =
       if not is_active then ""
@@ -376,29 +377,45 @@ let first_name_print_list_multi conf base x1 sections_groups =
       [ (if p_exact_on then "off" else "") ]
   in
   Hutil.header_without_title conf;
+  let title_key =
+    if is_absolute then "search by exact first names"
+    else "search by first names"
+  in
   Output.printf conf {|<h1>%s%s “%s”</h1>|}
-    (Utf8.capitalize_fst (transl conf "search_by_firstnames"))
+    (Utf8.capitalize_fst (transl conf title_key))
     (transl conf ":")
     (escape_html x1 :> string);
   Output.print_sstring conf {|<div class="d-flex flex-column">|};
   Output.print_sstring conf {|<div class="mb-2">|};
-  Output.print_sstring conf
-    (make_btn_grp "alias" alias_count fna_url include_aliases
-       (transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst));
-  if can_permute then
+  if is_absolute then
+    let url =
+      Util.url_set_aux conf (Util.commd conf :> string) [ "t" ] [ "" ]
+    in
+    Output.printf conf
+      {|<a href="%s" class="btn btn-primary btn-sm" title="%s">
+          <i class="fa fa-search-plus mr-1"></i>%s
+        </a>|}
+      url
+      (Utf8.capitalize_fst (transl conf "search exact"))
+      (Utf8.capitalize_fst (transl conf "searching all"))
+  else (
     Output.print_sstring conf
-      (make_btn_grp "permuted-variants" permuted_count order_url p_order_on
-         (transl_nth conf "first names exact/included/permuted" 2
-         |> Utf8.capitalize_fst));
-  Output.print_sstring conf
-    (make_dual_btn_grp "included-variants" included_count "phonetic-variants"
-       phonetic_count
-       (transl_nth conf "not exact" 1 |> Utf8.capitalize_fst)
-       (transl conf "not exact hlp")
-       (transl_nth conf "first names exact/included/permuted" 1
-       |> Utf8.capitalize_fst)
-       (transl conf "phonetic variants" |> Utf8.capitalize_fst)
-       exact_url (not p_exact_on));
+      (make_btn_grp "alias" alias_count fna_url include_aliases
+         (transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst));
+    if can_permute then
+      Output.print_sstring conf
+        (make_btn_grp "permuted-variants" permuted_count order_url p_order_on
+           (transl_nth conf "first names exact/included/permuted" 2
+           |> Utf8.capitalize_fst));
+    Output.print_sstring conf
+      (make_dual_btn_grp "included-variants" included_count "phonetic-variants"
+         phonetic_count
+         (transl_nth conf "not exact" 1 |> Utf8.capitalize_fst)
+         (transl conf "not exact hlp")
+         (transl_nth conf "first names exact/included/permuted" 1
+         |> Utf8.capitalize_fst)
+         (transl conf "phonetic variants" |> Utf8.capitalize_fst)
+         exact_url (not p_exact_on)));
   Output.print_sstring conf "</div>";
   Output.printf conf {|<div><h2 class="h3 my-2">%s (%d)</h2>|}
     (transl_nth conf "first names exact/included/permuted" 0
@@ -458,9 +475,6 @@ let first_name_print_list_multi conf base x1 sections_groups =
   Output.print_sstring conf "</div></div>";
   Hutil.trailer conf
 
-let first_name_print_list conf base x1 xl listes ~rev =
-  first_name_print_list_multi conf base x1 [ (0, listes, rev, xl) ]
-
 let mk_specify_title conf kw n _ =
   Output.print_sstring conf (Utf8.capitalize_fst kw);
   Output.print_sstring conf {| "|};
@@ -469,27 +483,6 @@ let mk_specify_title conf kw n _ =
   Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf {| |};
   Output.print_sstring conf (transl conf "specify")
-
-let select_first_name conf n list =
-  Hutil.header conf
-    (mk_specify_title conf (transl_nth conf "first name/first names" 0) n);
-  Output.print_sstring conf "<ul>";
-  List.iter
-    (fun (sstr, (strl, _)) ->
-      Output.print_sstring conf {|<li><a href="|};
-      Output.print_string conf (commd conf);
-      Output.print_sstring conf {|m=P&v=|};
-      Output.print_string conf (Mutil.encode sstr);
-      Output.print_sstring conf {|">|};
-      Mutil.list_iter_first
-        (fun first str ->
-          if not first then Output.print_sstring conf ", ";
-          Output.print_string conf (escape_html str))
-        (StrSet.elements strl);
-      Output.print_sstring conf "</a>\n")
-    list;
-  Output.print_sstring conf "</ul>\n";
-  Hutil.trailer conf
 
 let rec merge_insert ((sstr, (strl, iperl)) as x) = function
   | ((sstr1, (strl1, iperl1)) as y) :: l ->
@@ -520,10 +513,6 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
         if iperl = [] then l else (str, istr, iperl) :: l
       else l)
     istrl []
-
-let persons_of_absolute_first_name =
-  persons_of_absolute Driver.base_strings_of_first_name
-    Driver.persons_of_first_name Driver.get_first_name
 
 let persons_of_absolute_surname =
   persons_of_absolute Driver.base_strings_of_surname Driver.persons_of_surname
@@ -1321,42 +1310,3 @@ let print_surname_details conf base query_string surnames_groups =
       "" all_surnames
   in
   Hutil.trailer conf
-
-let search_first_name conf base x =
-  let list, _ =
-    if p_getenv conf.env "t" = Some "A" then
-      ( persons_of_absolute_first_name conf base x,
-        fun _ -> raise (Match_failure ("src/some.ml", 1007, 51)) )
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 1008, 29)))
-    else
-      persons_of_fsname conf base Driver.base_strings_of_first_name
-        (Driver.spi_find (Driver.persons_of_first_name base))
-        Driver.get_first_name x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
-      list
-  in
-  List.fold_right merge_insert list []
-
-let search_first_name_print conf base x =
-  let list = search_first_name conf base x in
-  let () = SosaCache.build_sosa_ht conf base in
-  match list with
-  | [] -> first_name_not_found conf x
-  | [ (_, (strl, iperl)) ] ->
-      let iperl = List.sort_uniq compare iperl in
-      let rev_pl = List.rev_map (pget conf base) iperl in
-      let pl =
-        List.fold_left
-          (fun pl p ->
-            if (not (is_hide_names conf p)) || authorized_age conf base p then
-              p :: pl
-            else pl)
-          rev_pl []
-      in
-      first_name_print_list conf base x strl [ ("", pl) ] ~rev:false
-  | _ -> select_first_name conf x list

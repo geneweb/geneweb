@@ -810,8 +810,20 @@ let treat_request =
                          match (real_input "fn", real_input "sn") with
                          | Some fn, Some sn -> search (fn ^ " " ^ sn)
                          | Some fn, None ->
-                             Some.search_first_name_print conf base fn
+                             let conf =
+                               {
+                                 conf with
+                                 env = ("p", Mutil.encode fn) :: conf.env;
+                               }
+                             in
+                             SearchName.print conf base specify
                          | None, Some sn ->
+                             let conf =
+                               {
+                                 conf with
+                                 env = ("sn", Mutil.encode sn) :: conf.env;
+                               }
+                             in
                              Some.search_surname_print conf base unknown sn
                          | None, None ->
                              incorrect_request conf base
@@ -846,11 +858,6 @@ let treat_request =
                  w_base @@ BirthDeathDisplay.print_oldest_alive
              | "OE" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_oldest_engagements
-             | "P" -> (
-                 w_base @@ fun conf base ->
-                 match p_getenv conf.env "v" with
-                 | Some v -> Some.search_first_name_print conf base v
-                 | None -> AllnDisplay.print_first_names conf base)
              | "PERSO" ->
                  w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
              | "POP_PYR" when conf.wizard || conf.friend ->
@@ -923,8 +930,24 @@ let treat_request =
              | "RL" -> w_base @@ RelationLink.print
              | "RM" -> w_base @@ RelationMatrixDisplay.print
              | "RLM" -> w_base @@ RelationDisplay.print_multi
-             | "S" | "SN" ->
-                 w_base @@ fun conf base -> SearchName.print conf base specify
+             | "S" | "SN" | "P" ->
+                 w_base @@ fun conf base ->
+                 let conf =
+                   match (p_getenv conf.env "m", p_getenv conf.env "v") with
+                   | Some "P", Some v when p_getenv conf.env "p" = None ->
+                       {
+                         conf with
+                         env =
+                           ("m", Mutil.encode "S")
+                           :: ("p", Mutil.encode v)
+                           :: ("t", Mutil.encode "A")
+                           :: List.remove_assoc "m"
+                                (List.remove_assoc "v"
+                                   (List.remove_assoc "t" conf.env));
+                       }
+                   | _ -> conf
+                 in
+                 SearchName.print conf base specify
              | "SND_IMAGE" ->
                  w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print
              | "SND_IMAGE_OK" ->
