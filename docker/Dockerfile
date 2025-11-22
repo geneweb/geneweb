@@ -2,7 +2,7 @@
 #                                                      STAGE 1: Build Geneweb
 ###############################################################################
 
-FROM ocaml/opam:debian-ocaml-4.14-nnp@sha256:adb86241b87b40c074ff5dcdb172aa3b408209f1cf57c85db8a1350d56a4a650 AS builder
+FROM ocaml/opam:debian-ocaml-4.14-nnp@sha256:6dd7a8b14d2d6dbdc5c0d7dcc5bb1bd1136d4b17abe12e9fece2464931bbf9f9 AS builder
 
 ENV OPAMYES=yes
 ENV OPAMJOBS=2
@@ -13,7 +13,7 @@ USER root
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -yq --no-install-recommends \
-    m4 libgmp-dev libpcre3-dev libipc-system-simple-perl xdot zlib1g-dev pkg-config \
+    m4 libgmp-dev libpcre2-dev libipc-system-simple-perl xdot zlib1g-dev pkg-config \
     && ln -sf /usr/bin/opam-2.3 /usr/bin/opam
 
 # Update local opam repository
@@ -22,7 +22,6 @@ WORKDIR /home/opam/opam-repository
 RUN git fetch origin master && git checkout 2ca36230be22748ea153057760524e23defe5fc7 && opam update
 
 # Initialize OPAM
-USER opam
 WORKDIR /home/opam
 RUN opam init --disable-sandboxing --auto-setup --bare
 
@@ -56,16 +55,13 @@ ENV GWSETUP_IP=172.17.0.1
 # Ignore the apt warning here as apt-get does not allow wildcarding versions
 # hadolint ignore=DL3027
 RUN apt-get update -q \
-  && apt install -qy --no-install-recommends sudo openssl adduser \
+  && apt install -qy --no-install-recommends openssl adduser netcat-openbsd \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && adduser --system --group --uid 1000 \
-     --home ${GENEWEB_HOME} --shell /bin/bash geneweb \
-  && usermod -aG sudo geneweb \
-  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+     --home ${GENEWEB_HOME} --shell /bin/bash geneweb
 
-# Add required directories and copy geneweb distribution
-USER geneweb
+# Do everything in the Geneweb home directory
 WORKDIR ${GENEWEB_HOME}
 
 # Create directory structure and configure
@@ -75,6 +71,15 @@ RUN mkdir -p bin etc log share/data share/dist \
 # Copy application files
 COPY --from=builder /home/opam/geneweb/distribution share/dist
 COPY docker/geneweb-launch.sh bin/geneweb-launch.sh
+
+# Make script executable, ensure log files exists and update ownership
+RUN chmod +x bin/geneweb-launch.sh \
+  && touch log/gwsetup.log \
+  && touch log/gwd.log \
+  && chown -R geneweb:geneweb .
+
+# Switch to geneweb user
+USER geneweb
 
 # Configure container
 EXPOSE 2316-2317
