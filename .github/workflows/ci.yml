@@ -51,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-2022]
+        os: [ubuntu-24.04, macos-26, windows-2022]
         ocaml-compiler: [4.14.2, 5.4.0]
         setup-version: [v3]
         include:
@@ -77,27 +77,13 @@ jobs:
         with:
           command: start-timer
 
-      - name: Update apt cache (Ubuntu only)
-        if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update
-
-      - name: Configure Git for Windows
-        if: runner.os == 'Windows'
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-          git config --global core.ignorecase false
-          git config --global core.filemode false
-        shell: bash
-
       - name: Cache Opam dependencies (Unix)
         id: cache-opam-unix
         if: runner.os != 'Windows'
         uses: actions/cache@v4
         with:
           path: ~/.opam
-          key: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}-${{ hashFiles('*.opam') }}-cache
-          restore-keys: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}
+          key: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}-cache
 
       - name: Cache Opam dependencies (Windows)
         id: cache-opam-windows
@@ -105,8 +91,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: D:\.opam
-          key: windows-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}-${{ hashFiles('*.opam') }}-cache
-          restore-keys: windows-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}
+          key: windows-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}-cache
 
       - name: Setup Ocaml with v2
         if: matrix.setup-version == 'v2'
