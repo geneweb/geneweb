@@ -49,15 +49,6 @@ val print_surname_details :
     surname groups with their associated persons. Used when a search returns
     multiple surname matches. *)
 
-val search_first_name :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  string ->
-  (string * (Mutil.StrSet.t * Geneweb_db.Driver.iper list)) list
-
-val search_first_name_print :
-  Config.config -> Geneweb_db.Driver.base -> string -> unit
-
 val first_name_print_sections :
   Config.config ->
   Geneweb_db.Driver.base ->
@@ -71,15 +62,6 @@ val first_name_print_list_multi :
   string ->
   (int * (string * Geneweb_db.Driver.person list) list * bool * Mutil.StrSet.t)
   list ->
-  unit
-
-val first_name_print_list :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  string ->
-  Mutil.StrSet.t ->
-  (string * Geneweb_db.Driver.person list) list ->
-  rev:bool ->
   unit
 
 val print_several_possible_surnames :

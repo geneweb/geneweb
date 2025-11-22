@@ -16924,7 +16924,7 @@ de: optional/obligatorisch
 en: optional/mandatory
 fr: facultatif/obligatoire
 
-    search_exact
+    search exact
 co: ricerca esatta
 de: genaue Suche
 en: exact search
@@ -16938,7 +16938,7 @@ pt: pesquisa exata
 sv: exakt sökning
 tr: tam arama
 
-    search_by_firstnames
+    search by first names
 co: ricerca per prenomi
 de: Suche nach Vornamen
 en: search by first names
@@ -16951,6 +16951,16 @@ no: søk etter fornavn
 pt: pesquisa por nomes
 sv: sök efter förnamn
 tr: isimlere göre arama
+
+    search by exact first names
+en: search by exact first names
+fr: recherche par prénoms exacts
+de: Suche nach exakten Vornamen
+es: búsqueda por nombres exactos
+it: ricerca per nomi esatti
+nl: zoeken op exacte voornamen
+pt: pesquisa por nomes exatos
+sv: sök efter exakta förnamn
 
     searching all
 co: ricerca tutti l’individui
