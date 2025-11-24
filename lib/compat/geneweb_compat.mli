@@ -109,6 +109,9 @@ module List : sig
 end
 
 module Seq : sig
+  val empty : 'a Seq.t
+  (** [empty] is the empty sequence. It has no elements. Its length is 0. *)
+
   val take : int -> 'a Seq.t -> 'a Seq.t
   (** [take n xs] is the sequence of the first [n] elements of [xs].
 

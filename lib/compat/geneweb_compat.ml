@@ -68,6 +68,8 @@ end
 module Seq = struct
   open Seq
 
+  let empty () = Nil
+
   (* [take] is defined in such a way that [take 0 xs] returns [empty]
      immediately, without allocating any memory. *)
 
