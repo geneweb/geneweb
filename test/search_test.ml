@@ -5,6 +5,7 @@ module Trie = Geneweb_search.Trie.Default
 module Word = Geneweb_search.Word.Default
 module Analyze = Geneweb_search.Analyze
 module Iterator = Geneweb_search.Iterator
+module Seq = Geneweb_compat.Seq
 
 (* Compute the Levenshtein distance of [s1] and [s2]. *)
 let distance s1 s2 =
