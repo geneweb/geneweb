@@ -78,10 +78,10 @@ let rpc_handler ~task_timeout handler sockaddr target content =
 
 (* These exceptions should never occur in production. If such an exception
    is raised, it indicates that the user handler has not handled it correctly.
-   This will not terminate the server, but the WebSocket connection will be
+   This will not terminate the server, but the WebSocket connection may be
    lost. *)
 let log_ws_handler_exn sockaddr exn =
-  Logs.debug (fun k ->
+  Logs.err (fun k ->
       k "Exception raised while processing request for %a:@ %a" Util.pp_sockaddr
         sockaddr Util.pp_exn exn)
 
