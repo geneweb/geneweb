@@ -1076,12 +1076,16 @@ let loop_witn state line ic =
     not the end of the file. *)
 let read_family state ic fname =
   let ( >>= ) = Result.bind in
-  let ensure_end_of_line ~line fields =
+  let ensure_end_of_line fields =
     if fields = [] then Ok ()
-    else if state.State.no_fail then (
-      log_error ~filename:fname ~state line;
-      Ok ())
-    else Error line
+    else
+      let message =
+        Printf.sprintf "Ignored fields: %s" (String.concat " " fields)
+      in
+      if state.State.no_fail then (
+        log_error ~filename:fname ~state message;
+        Ok ())
+      else Error message
   in
   function
   (* Block that defines that file use utf-8 encoding *)
@@ -1099,7 +1103,7 @@ let read_family state ic fname =
       let relation, fath_sex, moth_sex = relation_ss in
       (* read mother *)
       let moth_key, _, l = parse_parent state str l in
-      ensure_end_of_line ~line:str l >>= fun () ->
+      ensure_end_of_line l >>= fun () ->
       let line = read_line state ic in
       (* read list of witnesses with their sex (if exists) *)
       let rec loop = function
@@ -1112,7 +1116,7 @@ let read_family state ic fname =
               | l -> (make_weak_assumption Def.Neuter, l)
             in
             let wk, _, l = parse_parent state str l in
-            ensure_end_of_line ~line:str l >>= fun () ->
+            ensure_end_of_line l >>= fun () ->
             Result.map
               (fun (witn, line) -> ((wk, sex) :: witn, line))
               (loop (read_line state ic))
@@ -1175,7 +1179,7 @@ let read_family state ic fname =
                     | None -> Date.cdate_None
                     | Some x -> Date.cdate_of_od x
                   in
-                  ensure_end_of_line ~line:str l >>= fun () ->
+                  ensure_end_of_line l >>= fun () ->
                   (* On récupère les témoins *)
                   let witn, line = loop_witn state (input_a_line state ic) ic in
                   (* On récupère les notes *)
@@ -1199,8 +1203,7 @@ let read_family state ic fname =
               | Some (str, "-" :: l) ->
                   let sex, l = get_optional_sexe l in
                   let child, l = parse_child state str surname sex csrc cbp l in
-                  ensure_end_of_line ~line:str l >>= fun () ->
-                  loop (child :: children)
+                  ensure_end_of_line l >>= fun () -> loop (child :: children)
               | Some (_, [ "end" ]) -> Ok children
               | Some (str, _) -> Error str
               | _ -> Error "eof"
@@ -1278,7 +1281,7 @@ let read_family state ic fname =
   | Some (str, "notes" :: l) -> (
       let surname, l = get_name l in
       let first_name, occ, l = get_fst_name str l in
-      ensure_end_of_line ~line:str l >>= fun () ->
+      ensure_end_of_line l >>= fun () ->
       match read_line state ic with
       | Some (_, [ "beg" ]) ->
           let notes = read_notes state ic in
@@ -1307,7 +1310,7 @@ let read_family state ic fname =
         | "#f" :: l -> (make_strong_assumption Def.Female, l)
         | l -> (make_weak_assumption Def.Neuter, l)
       in
-      ensure_end_of_line ~line:str l >>= fun () ->
+      ensure_end_of_line l >>= fun () ->
       match read_line state ic with
       (* Read list of relations *)
       | Some (_, [ "beg" ]) ->
@@ -1333,7 +1336,7 @@ let read_family state ic fname =
   | Some (str, "pevt" :: l) ->
       (* get considered person *)
       let sb, _, l = parse_parent state str l in
-      ensure_end_of_line ~line:str l >>= fun () ->
+      ensure_end_of_line l >>= fun () ->
       let pevents =
         let rec loop pevents = function
           | "end pevt" -> Ok pevents
@@ -1350,7 +1353,7 @@ let read_family state ic fname =
                 | None -> Date.cdate_None
                 | Some x -> Date.cdate_of_od x
               in
-              ensure_end_of_line ~line:str l >>= fun () ->
+              ensure_end_of_line l >>= fun () ->
               (* On récupère les témoins *)
               let witn, line = loop_witn state (input_a_line state ic) ic in
               (* On récupère les notes *)
