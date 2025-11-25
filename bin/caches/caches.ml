@@ -7,8 +7,7 @@ type cache = {
 }
 
 let add istr_set istr =
-  if not (Gwdb.is_empty_string istr) then Gwdb.IstrSet.add istr istr_set
-  else istr_set
+  if Gwdb.is_empty_string istr then istr_set else Gwdb.IstrSet.add istr istr_set
 
 let add_lastname cache istr = { cache with lastname = add cache.lastname istr }
 
