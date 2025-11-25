@@ -294,99 +294,12 @@ let rec reconstitute_events ~base conf ext cnt =
 *)
 let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
     (fevents : ('person, 'string) Def.gen_fam_event list) =
-  (* On tri les évènements pour être sûr. *)
-  let fevents =
-    Event.sort_events
-      (fun evt -> Event.Fevent evt.Def.efam_name)
-      (fun evt -> evt.efam_date)
-      fevents
+  let { Event.main_union; main_separation } =
+    Event.get_main_family_events fevents
   in
-
-  let found_marriage :
-      (Def.relation_kind
-      * Def.cdate
-      * 'string
-      * 'string
-      * 'string
-      * ('person * Def.witness_kind * 'string) array)
-      option
-      ref =
-    ref None
-  in
-
-  let found_divorce : Def.divorce option ref = ref None in
-  let mk_marr evt kind =
-    let e =
-      Some
-        ( kind,
-          evt.Def.efam_date,
-          evt.efam_place,
-          evt.efam_note,
-          evt.efam_src,
-          evt.efam_witnesses )
-    in
-    match !found_marriage with
-    | None -> found_marriage := e
-    | Some ((NoMention | Residence), _, _, _, _, _)
-      when kind <> NoMention && kind <> Residence ->
-        found_marriage := e
-    | Some (Married, _, _, _, _, _) when kind <> Married -> ()
-    | _ -> if kind = Married then found_marriage := e
-  in
-  let mk_div kind =
-    match !found_divorce with
-    | None -> found_divorce := Some kind
-    | Some _ -> ()
-  in
-  (* Marriage is more important than any other relation.
-     For other cases, latest event is the most important,
-     except for NotMention and Residence. *)
-  (* FIXME: For now, we ignore Annulation since it gives a wrong date
-     (relation on [annulation date] makes no sense) *)
-  let rec loop = function
-    | [] -> ()
-    | evt :: l -> (
-        match evt.Def.efam_name with
-        | Efam_Engage ->
-            mk_marr evt Engaged;
-            loop l
-        | Efam_Marriage ->
-            mk_marr evt Married;
-            loop l
-        | Efam_MarriageContract ->
-            mk_marr evt MarriageContract;
-            loop l
-        | Efam_NoMention ->
-            mk_marr evt NoMention;
-            loop l
-        | Efam_MarriageBann ->
-            mk_marr evt MarriageBann;
-            loop l
-        | Efam_MarriageLicense ->
-            mk_marr evt MarriageLicense;
-            loop l
-        | Efam_PACS ->
-            mk_marr evt Pacs;
-            loop l
-        | Efam_Residence ->
-            mk_marr evt Residence;
-            loop l
-        | Efam_NoMarriage ->
-            mk_marr evt NotMarried;
-            loop l
-        | Efam_Divorce ->
-            mk_div (Divorced evt.efam_date);
-            loop l
-        | Efam_Separated ->
-            mk_div Separated;
-            loop l
-        | Efam_Annulation -> loop l
-        | Efam_Name _ -> loop l)
-  in
-  loop (List.rev fevents);
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
   let marr, wit =
-    match !found_marriage with
+    match main_union with
     | None ->
         ( ( Def.NoMention,
             Date.cdate_None,
@@ -394,7 +307,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
             empty_string,
             empty_string ),
           [||] )
-    | Some (kind, date, place, note, src, wit) ->
+    | Some { Event.kind; date; place; note; source = src; witnesses = wit } ->
         ((kind, date, place, note, src), wit)
   in
   (* Parents de même sexe. *)
@@ -412,8 +325,10 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
       (relation, date, place, note, src)
     else marr
   in
-  let div = Option.value ~default:NotDivorced !found_divorce in
-  (marr, div, wit)
+  let div = Option.value ~default:Def.NotDivorced main_separation in
+  ( marr,
+    div,
+    Array.map (fun { Event.person; kind; note } -> (person, kind, note)) wit )
 
 let reconstitute_family conf base nsck =
   let events, ext = reconstitute_events ~base conf false 1 in
