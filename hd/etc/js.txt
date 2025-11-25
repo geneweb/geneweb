@@ -507,14 +507,23 @@ const RpcDatalistManager = {
         const response = await this.client.call('lookup', jargs);
         return JSON.parse(response);
       };
+      
+      // Test connexion avec timeout 3 secondes
+      const testPromise = this.client.lookup(%['%base.name;_fnames.cache', ''%]);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('RPC timeout')), 3000)
+      );
+      await Promise.race(%[testPromise, timeoutPromise%]);
+      
       this.isConnected = true;
       console.log('RpcDatalistManager: Connecté au serveur RPC');
       return true;
     } catch (error) {
-      console.warn('RpcDatalistManager: Échec connexion RPC', error);
+      console.warn('RpcDatalistManager: Serveur RPC indisponible, fallback .gz', error);
+      this.isConnected = false;
       return false;
     }
-  },
+},
 
   populateDatalist: async function(datalistId, searchTerm) {
     if (!this.isConnected || !this.client) return;
