@@ -59,9 +59,9 @@ let add_family_infos_to_cache cache family =
 
 (** Create cache files used by autocomplete *)
 let create_cache_data base =
-  let persons = Gwdb.persons base in
   let cache =
-    Gwdb.Collection.fold add_person_infos_to_cache empty_cache persons
+    Gwdb.Collection.fold add_person_infos_to_cache empty_cache
+      (Gwdb.persons base)
   in
   let families = Gwdb.families base in
   Gwdb.Collection.fold add_family_infos_to_cache cache families
