@@ -71,7 +71,9 @@ build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "Done."
 
 build-geneweb-rpc: ## Build the geneweb-rpc package
+	@printf "\033[1;1mBuilding Geneweb RPC package\033[0m\n"
 	dune build @rpc/all
+	@printf "Done."
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
@@ -165,7 +167,14 @@ endif
 	  fi; \
 	done
 	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
-	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n"
+	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n\n"
+
+distrib-rpc: build-geneweb-rpc
+	@printf "\n\n\033[1;1m└ Copy RPC server executable and js client to distribution\033[0m\n"
+	mkdir -p $(DISTRIB_DIR)/gw/etc/js
+	cp $(BUILD_DIR)/rpc/server/server.exe $(DISTRIB_DIR)/gw/rpc_server$(EXT)
+	cp $(BUILD_DIR)/rpc/test/client.bc.js $(DISTRIB_DIR)/gw/etc/js/rpc_client.min.js
+	@echo "Done."
 
 .PHONY: build build-geneweb build-geneweb-rpc gwd fmt install uninstall distrib
 
