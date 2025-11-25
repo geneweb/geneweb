@@ -1,0 +1,4 @@
+(executable
+ (name init_search_indexes)
+ (public_name init-search-indexes)
+ (libraries geneweb %%%GWDB_PKG%%%))

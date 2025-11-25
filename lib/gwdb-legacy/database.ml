@@ -1,14 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Dbdisk
-open Def
-
-type person = dsk_person
-type ascend = dsk_ascend
-type union = dsk_union
-type family = dsk_family
-type couple = dsk_couple
-type descend = dsk_descend
+type person = Dbdisk.dsk_person
+type ascend = Dbdisk.dsk_ascend
+type union = Dbdisk.dsk_union
+type family = Dbdisk.dsk_family
+type couple = Dbdisk.dsk_couple
+type descend = Dbdisk.dsk_descend
 
 let move_with_backup src dst =
   Files.rm (dst ^ "~");
@@ -135,7 +132,7 @@ let index_of_string strings ic start_pos hash_len string_patches string_pending
           let i1 = input_binary_int ic in
           let rec loop i =
             if i = -1 then raise Not_found
-            else if strings.get i = s then i
+            else if strings.Dbdisk.get i = s then i
             else (
               seek_in ic (start_pos + ((hash_len + i) * Dutil.int_size));
               loop (input_binary_int ic))
@@ -152,7 +149,9 @@ let index_of_string strings ic start_pos hash_len string_patches string_pending
    running `gwfixbase -index /path/to/base.gwb`
 *)
 let old_persons_of_first_name_or_surname base_data params =
-  let proj, person_patches, names_inx, names_dat, bname = params in
+  let proj, _has_changed, person_patches, names_inx, names_dat, bname =
+    params
+  in
   let module IstrTree = Btree.Make (struct
     type t = int
 
@@ -235,7 +234,7 @@ let old_persons_of_first_name_or_surname base_data params =
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
-  { find; cursor; next }
+  { Dbdisk.find; cursor; next }
 
 let binary_search arr cmp =
   if arr = [||] then raise Not_found;
@@ -279,7 +278,7 @@ let binary_search_next arr cmp =
   aux None 0 (Array.length arr - 1)
 
 let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
-  let proj, person_patches, names_inx, names_dat, bname = params in
+  let proj, has_changed, person_patches, names_inx, names_dat, bname = params in
   let fname_dat = Filename.concat bname names_dat in
   (* content of "snames.inx" *)
   let bt =
@@ -289,6 +288,21 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
        let bt : (int * int) array = input_value ic_inx in
        close_in ic_inx;
        bt)
+  in
+  let filtered_person_patches =
+    lazy
+      (let ht = Hashtbl.create (Hashtbl.length person_patches) in
+       Hashtbl.iter
+         (fun i p -> if has_changed base_data i p then Hashtbl.add ht i p)
+         person_patches;
+       ht)
+  in
+  let patched_set =
+    lazy
+      (Hashtbl.fold
+         (fun i _ acc -> Ext_int.Set.add i acc)
+         (Lazy.force filtered_person_patches)
+         Ext_int.Set.empty)
   in
   (* ordered by string name's ids attached to the patched persons *)
   let patched =
@@ -303,7 +317,7 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
              (fun k ->
                if not @@ Dutil.IntHT.mem ht k then Dutil.IntHT.add ht k [])
              ks)
-         person_patches;
+         (Lazy.force filtered_person_patches);
        let a = Array.make (Dutil.IntHT.length ht) (0, []) in
        ignore
        @@ Dutil.IntHT.fold
@@ -315,10 +329,10 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
        a)
   in
   let find istr =
-    let ipera =
+    let ipera, iperset =
       try
         let bt = Lazy.force bt in
-        let s = base_data.strings.get istr in
+        let s = base_data.Dbdisk.strings.get istr in
         let cmp (k, _) =
           if k = istr then 0 else cmp_str base_data s (base_data.strings.get k)
         in
@@ -326,25 +340,34 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
         let ic_dat = Secure.open_in_bin fname_dat in
         seek_in ic_dat pos;
         let len = input_binary_int ic_dat in
-        let rec read_loop ipera len =
-          if len = 0 then ipera
+        let rec read_loop (ipera, iperset) len =
+          if len = 0 then (ipera, iperset)
           else
             let iper = input_binary_int ic_dat in
-            read_loop (iper :: ipera) (len - 1)
+            let iperset' = Ext_int.Set.add iper iperset in
+            let ipera = if iperset' != iperset then iper :: ipera else ipera in
+            read_loop (ipera, iperset') (len - 1)
         in
-        let ipera = read_loop [] len in
+        let ipera, iperset = read_loop ([], Ext_int.Set.empty) len in
         close_in ic_dat;
-        ipera
-      with Not_found -> []
+        (ipera, iperset)
+      with Not_found -> ([], Ext_int.Set.empty)
     in
-    let patched = Hashtbl.fold (fun i _ acc -> i :: acc) person_patches [] in
-    let ipera = List.filter (fun i -> not @@ List.mem i patched) ipera in
+    let iperset = Ext_int.Set.diff iperset (Lazy.force patched_set) in
+    let ipera = List.filter (fun iper -> Ext_int.Set.mem iper iperset) ipera in
     Hashtbl.fold
-      (fun i p acc ->
-        let istrs = proj p in
-        if List.mem istr istrs then if List.mem i acc then acc else i :: acc
-        else acc)
-      person_patches ipera
+      (fun i p (ipera, iperset) ->
+        if Ext_int.Set.mem i iperset then (ipera, iperset)
+        else
+          let istrs = proj p in
+          if List.mem istr istrs then
+            let iperset = Ext_int.Set.add i iperset in
+            let ipera = i :: ipera in
+            (ipera, iperset)
+          else (ipera, iperset))
+      (Lazy.force filtered_person_patches)
+      (ipera, iperset)
+    |> fst
   in
   let cursor str =
     let bt = Lazy.force bt in
@@ -390,12 +413,13 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
       in
       if c < 0 then istr1 else istr2
   in
-  { find; cursor; next }
+  { Dbdisk.find; cursor; next }
 
 let persons_of_first_name :
-    base_version ->
-    base_data ->
+    Dbdisk.base_version ->
+    Dbdisk.base_data ->
     ('a -> Dutil.IntHT.key list)
+    * (Dbdisk.base_data -> int -> person -> bool)
     * (int, person) Hashtbl.t
     * string
     * string
@@ -411,9 +435,10 @@ let persons_of_first_name :
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
 let persons_of_surname :
-    base_version ->
-    base_data ->
+    Dbdisk.base_version ->
+    Dbdisk.base_data ->
     ('a -> Dutil.IntHT.key list)
+    * (Dbdisk.base_data -> int -> person -> bool)
     * (int, person) Hashtbl.t
     * string
     * string
@@ -423,6 +448,25 @@ let persons_of_surname :
       new_persons_of_first_name_or_surname Dutil.compare_snames
         Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
+
+let persons_of_lower_fs_name :
+    Dbdisk.base_version ->
+    Dbdisk.base_data ->
+    ('a -> Dutil.IntHT.key list)
+    * (Dbdisk.base_data -> int -> person -> bool)
+    * (int, person) Hashtbl.t
+    * string
+    * string
+    * string ->
+    Dbdisk.string_person_index = function
+  | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
+      new_persons_of_first_name_or_surname
+        (fun _ -> Dutil.compare_snames_lower)
+        Dutil.compare_snames_i_lower
+  | GnWb0020 ->
+      Printf.eprintf "GnWb0020 does not support lowered names indexes\n";
+      flush stderr;
+      failwith "Unsupported geneweb version"
 
 (* Search index for a given name in file names.inx *)
 
@@ -497,7 +541,7 @@ let old_strings_of_fsname bname strings (_, person_patches) =
     Hashtbl.fold
       (fun _ p acc ->
         let aux acc istr =
-          let str = strings.get istr in
+          let str = strings.Dbdisk.get istr in
           if
             (not (List.mem istr acc))
             &&
@@ -563,7 +607,7 @@ let new_strings_of_fsname_aux offset_acc offset_inx get bname strings
             if
               (not (List.mem istr acc))
               &&
-              let str = strings.get istr in
+              let str = strings.Dbdisk.get istr in
               match Name.split str with
               | [ s ] -> i = Dutil.name_index s
               | list ->
@@ -582,11 +626,11 @@ let new_strings_of_fname =
       p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
 
 let strings_of_sname = function
-  | GnWb0024 | GnWb0023 -> new_strings_of_sname
+  | Dbdisk.GnWb0024 | GnWb0023 -> new_strings_of_sname
   | _ -> old_strings_of_fsname
 
 let strings_of_fname = function
-  | GnWb0024 | GnWb0023 -> new_strings_of_fname
+  | Dbdisk.GnWb0024 | GnWb0023 -> new_strings_of_fname
   | _ -> old_strings_of_fsname
 
 (* Restrict file *)
@@ -608,7 +652,7 @@ let make_visible_record_access perm bname persons =
         let visible = input_value ic in
         close_in ic;
         visible
-      with Sys_error _ -> Array.make persons.len VsNone
+      with Sys_error _ -> Array.make persons.Dbdisk.len VsNone
     in
     visible_ref := Some visible;
     visible
@@ -616,7 +660,7 @@ let make_visible_record_access perm bname persons =
   let v_write () =
     match !visible_ref with
     | Some visible ->
-        if perm = RDONLY then raise (HttpExn (Forbidden, __LOC__))
+        if perm = Dbdisk.RDONLY then raise (Def.HttpExn (Forbidden, __LOC__))
         else
           let oc = Secure.open_out fname in
           if !verbose then (
@@ -643,7 +687,7 @@ let make_visible_record_access perm bname persons =
       | VsFalse -> false
     else fct (persons.get i)
   in
-  { v_write; v_get }
+  { Dbdisk.v_write; v_get }
 
 (*
    Synchro:
@@ -713,11 +757,11 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
     len name input_array input_item =
   let tab = ref None in
   let cleared = ref false in
-  let gen_get nopending i =
+  let gen_get ~nopatch ~nopending i =
     match if nopending then None else Hashtbl.find_opt pending i with
     | Some v -> v
     | None -> (
-        match Hashtbl.find_opt patches i with
+        match if nopatch then None else Hashtbl.find_opt patches i with
         | Some v -> v
         | None -> (
             match !tab with
@@ -749,20 +793,29 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
   in
   let rec r =
     {
-      load_array = (fun () -> ignore @@ array ());
-      get = gen_get false;
-      get_nopending = gen_get true;
+      Dbdisk.load_array = (fun () -> ignore @@ array ());
+      get = gen_get ~nopatch:false ~nopending:false;
+      get_nopending = gen_get ~nopatch:false ~nopending:true;
+      get_nopatch = gen_get ~nopatch:true ~nopending:true;
       set = (fun i v -> (array ()).(i) <- v);
       len = max len !plenr;
       output_array =
         (fun oc ->
           let v = array () in
-          let a = apply_patches v patches r.len in
+          let a = apply_patches v patches r.Dbdisk.len in
           Dutil.output_value_no_sharing oc (a : _ array));
       clear_array =
         (fun () ->
           cleared := true;
           tab := None);
+      set_array =
+        (fun arr ->
+          let len = Array.length arr in
+          r.len <- len;
+          Hashtbl.clear patches;
+          Hashtbl.clear pending;
+          plenr := 0;
+          tab := Some arr);
     }
   in
   r
@@ -823,8 +876,8 @@ let input_synchro bname =
     r
   with _ -> { synch_list = [] }
 
-let person_of_key (persons : person record_access) strings persons_of_name
-    first_name surname occ =
+let person_of_key (persons : person Dbdisk.record_access) strings
+    persons_of_name first_name surname occ =
   let first_name = Mutil.nominative first_name in
   let surname = Mutil.nominative surname in
   let ipl = persons_of_name (first_name ^ " " ^ surname) in
@@ -835,13 +888,148 @@ let person_of_key (persons : person record_access) strings persons_of_name
         let p = persons.get ip in
         if
           occ = p.occ
-          && first_name = Name.lower (strings.get p.first_name)
+          && first_name = Name.lower (strings.Dbdisk.get p.first_name)
           && surname = Name.lower (strings.get p.surname)
         then Some ip
         else find ipl
     | _ -> None
   in
   find ipl
+
+type spi_stream = {
+  spi : Dbdisk.string_person_index;
+  st : [ `First | `Current of int * int list ];
+}
+
+let spi_stream_of_spi spi = { spi; st = `First }
+
+let rec iper_of_prefix base_data spi prefix =
+  let next_person_id istr =
+    let s = base_data.Dbdisk.strings.get istr in
+    if Ext_string.start_with prefix 0 s then
+      iper_of_prefix base_data
+        { spi with st = `Current (istr, spi.spi.find istr) }
+        prefix
+    else Seq.Nil
+  in
+  try
+    match spi.st with
+    | `First ->
+        let istr = spi.spi.cursor prefix in
+        next_person_id istr
+    | `Current (istr, []) ->
+        let istr' = spi.spi.next istr in
+        if Int.compare istr istr' <> 0 then next_person_id istr' else Seq.Nil
+    | `Current (string_id, person_id :: person_ids) ->
+        Seq.Cons
+          ( person_id,
+            fun () ->
+              iper_of_prefix base_data
+                { spi with st = `Current (string_id, person_ids) }
+                prefix )
+  with Not_found -> Seq.Nil
+
+let prefix_exists base_data spi prefix =
+  try
+    let istr = spi.spi.cursor prefix in
+    let s = base_data.Dbdisk.strings.get istr in
+    Ext_string.start_with prefix 0 s
+  with Not_found -> false
+
+let iper_stream_of_prefix base_data spi prefix =
+  if not (prefix_exists base_data spi prefix) then Seq.empty
+  else fun () -> iper_of_prefix base_data spi prefix
+
+let has_name_changed proj base_data i p =
+  let names = proj p in
+  let base_person =
+    try base_data.Dbdisk.persons.get_nopatch i
+    with Failure _ -> { (Dutil.empty_person 0 0) with key_index = -1 }
+  in
+
+  let base_names = proj base_person in
+  names <> base_names
+
+let first_name_changed =
+  has_name_changed (fun p -> p.Dbdisk.first_name :: p.first_names_aliases)
+
+let surname_changed =
+  has_name_changed (fun p -> p.Dbdisk.surname :: p.surnames_aliases)
+
+let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
+    ~dat_fname ~proj ~has_changed ~insert_string ~base_data ~version ~patches =
+  let mem_proj = Dutil.IntHT.create 0 in
+  let mem_strings = Dutil.IntHT.create 0 in
+  fun prefix ->
+    let prefix, spi =
+      (* check if lowered names indexes files exist *)
+      if
+        Sys.file_exists (Filename.concat base_data.Dbdisk.bdir inx_lower_fname)
+        && Sys.file_exists (Filename.concat base_data.bdir dat_lower_fname)
+      then
+        let proj p =
+          let iper = p.Dbdisk.key_index in
+          match Dutil.IntHT.find_opt mem_proj iper with
+          | Some projection -> projection
+          | None ->
+              let aux istr =
+                match Dutil.IntHT.find_opt mem_strings istr with
+                | Some istrs -> istrs
+                | None ->
+                    let lowered_strings_istrs =
+                      Dutil.insert_lowered_name_suffix_istrs ~insert_string
+                        ~base_data ~istr
+                    in
+                    Dutil.IntHT.add mem_strings istr lowered_strings_istrs;
+                    lowered_strings_istrs
+              in
+              let istrs = List.flatten (List.map aux (proj p)) in
+              Dutil.IntHT.add mem_proj iper istrs;
+              istrs
+        in
+        let spi =
+          persons_of_lower_fs_name version base_data
+            ( proj,
+              has_changed,
+              snd patches.h_person,
+              inx_lower_fname,
+              dat_lower_fname,
+              base_data.bdir )
+        in
+        let prefix = Name.lower prefix in
+        (prefix, spi)
+      else
+        let spi =
+          persons_of_surname version base_data
+            ( proj,
+              has_changed,
+              snd patches.h_person,
+              inx_fname,
+              dat_fname,
+              base_data.bdir )
+        in
+        (prefix, spi)
+    in
+    iper_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
+
+let lowercase_first_name_index_file = "fnames_lower.inx"
+let lowercase_first_name_data_file = "fnames_lower.dat"
+let lowercase_surname_index_file = "snames_lower.inx"
+let lowercase_surname_data_file = "snames_lower.dat"
+
+let persons_stream_of_first_name_prefix =
+  persons_stream_of_prefix ~inx_lower_fname:lowercase_first_name_index_file
+    ~dat_lower_fname:lowercase_first_name_data_file ~inx_fname:"fnames.inx"
+    ~dat_fname:"fnames.dat"
+    ~proj:(fun p -> p.first_name :: p.first_names_aliases)
+    ~has_changed:first_name_changed
+
+let persons_stream_of_surname_prefix =
+  persons_stream_of_prefix ~inx_lower_fname:lowercase_surname_index_file
+    ~dat_lower_fname:lowercase_surname_data_file ~inx_fname:"snames.inx"
+    ~dat_fname:"snames.dat"
+    ~proj:(fun p -> p.surname :: p.surnames_aliases)
+    ~has_changed:surname_changed
 
 let opendb bname =
   let bname =
@@ -860,7 +1048,7 @@ let opendb bname =
         fst pending.h_couple := !(fst patches.h_couple);
         fst pending.h_descend := !(fst patches.h_descend);
         fst pending.h_string := !(fst patches.h_string);
-        (patches, if Sys.file_exists tm_fname then RDONLY else RDRW)
+        (patches, if Sys.file_exists tm_fname then Dbdisk.RDONLY else RDRW)
     | Error msg ->
         prerr_endline msg;
         (empty_patch_ht (), RDONLY)
@@ -871,7 +1059,7 @@ let opendb bname =
   in
   let ic = Secure.open_in_bin (Filename.concat bname "base") in
   let version =
-    if Files.check_magic Dutil.magic_GnWb0024 ic then GnWb0024
+    if Files.check_magic Dutil.magic_GnWb0024 ic then Dbdisk.GnWb0024
     else if Files.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
     else if Files.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
     else if Files.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
@@ -1023,7 +1211,7 @@ let opendb bname =
     else npb_init ()
   in
   let commit_patches =
-    if perm = RDONLY then fun () -> raise (HttpExn (Forbidden, __LOC__))
+    if perm = RDONLY then fun () -> raise (Def.HttpExn (Forbidden, __LOC__))
     else fun () ->
       let tm = Unix.time () |> Unix.gmtime |> Ext_unix.sprintf_date in
       (* read real person number (considering pending patches) *)
@@ -1149,7 +1337,7 @@ let opendb bname =
       let ic = Secure.open_in (Filename.concat bname fname) in
       let str =
         match rn_mode with
-        | RnDeg -> if in_channel_length ic = 0 then "" else " "
+        | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
         | Rn1Ln -> ( try input_line ic with End_of_file -> "")
         | RnAll ->
             let rec loop len =
@@ -1164,7 +1352,7 @@ let opendb bname =
     with Sys_error _ -> ""
   in
   let commit_notes =
-    if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
+    if perm = RDONLY then fun _ _ -> raise (Def.HttpExn (Forbidden, __LOC__))
     else fun fnotes s ->
       let fname =
         if fnotes = "" then "notes"
@@ -1197,10 +1385,10 @@ let opendb bname =
     in
     loop [] Filename.current_dir_name
   in
-  let bnotes = { nread = read_notes; norigin_file; efiles = ext_files } in
+  let bnotes = { Def.nread = read_notes; norigin_file; efiles = ext_files } in
   let base_data =
     {
-      persons;
+      Dbdisk.persons;
       persons_patch = snd patches.h_person;
       ascends;
       unions;
@@ -1220,13 +1408,14 @@ let opendb bname =
   let persons_of_name = persons_of_name bname patches.h_name in
   let base_func =
     {
-      person_of_key = person_of_key persons strings persons_of_name;
+      Dbdisk.person_of_key = person_of_key persons strings persons_of_name;
       persons_of_name;
       strings_of_sname = strings_of_sname version bname strings patches.h_person;
       strings_of_fname = strings_of_fname version bname strings patches.h_person;
       persons_of_surname =
         persons_of_surname version base_data
           ( (fun p -> p.surname :: p.surnames_aliases),
+            surname_changed,
             snd patches.h_person,
             "snames.inx",
             "snames.dat",
@@ -1234,10 +1423,58 @@ let opendb bname =
       persons_of_first_name =
         persons_of_first_name version base_data
           ( (fun p -> p.first_name :: p.first_names_aliases),
+            first_name_changed,
             snd patches.h_person,
             "fnames.inx",
             "fnames.dat",
             bname );
+      persons_of_lower_surname =
+        (if
+         Sys.file_exists (Filename.concat bname lowercase_surname_index_file)
+         && Sys.file_exists (Filename.concat bname lowercase_surname_data_file)
+        then
+         persons_of_lower_fs_name version base_data
+           ( (fun p -> p.surname :: p.surnames_aliases),
+             first_name_changed,
+             snd patches.h_person,
+             lowercase_surname_index_file,
+             lowercase_surname_data_file,
+             bname )
+        else
+          persons_of_surname version base_data
+            ( (fun p -> p.surname :: p.surnames_aliases),
+              surname_changed,
+              snd patches.h_person,
+              "snames.inx",
+              "snames.dat",
+              bname ));
+      persons_of_lower_first_name =
+        (if
+         Sys.file_exists (Filename.concat bname lowercase_first_name_index_file)
+         && Sys.file_exists
+              (Filename.concat bname lowercase_first_name_data_file)
+        then
+         persons_of_lower_fs_name version base_data
+           ( (fun p -> p.first_name :: p.first_names_aliases),
+             first_name_changed,
+             snd patches.h_person,
+             lowercase_first_name_index_file,
+             lowercase_first_name_data_file,
+             bname )
+        else
+          persons_of_first_name version base_data
+            ( (fun p -> p.first_name :: p.first_names_aliases),
+              first_name_changed,
+              snd patches.h_person,
+              "fnames.inx",
+              "fnames.dat",
+              bname ));
+      persons_stream_of_first_name_prefix =
+        persons_stream_of_first_name_prefix ~insert_string ~base_data ~version
+          ~patches;
+      persons_stream_of_surname_prefix =
+        persons_stream_of_surname_prefix ~insert_string ~base_data ~version
+          ~patches;
       patch_person;
       patch_ascend;
       patch_union;
@@ -1255,18 +1492,28 @@ let opendb bname =
       ifam_exists;
     }
   in
-  { data = base_data; func = base_func; version }
+  { Dbdisk.data = base_data; func = base_func; version }
 
 let record_access_of tab =
-  {
-    Dbdisk.load_array = (fun () -> ());
-    get = (fun i -> tab.(i));
-    get_nopending = (fun i -> tab.(i));
-    set = (fun i v -> tab.(i) <- v);
-    output_array = (fun oc -> Dutil.output_value_no_sharing oc (tab : _ array));
-    len = Array.length tab;
-    clear_array = (fun () -> ());
-  }
+  let tab = ref tab in
+  let rec r =
+    {
+      Dbdisk.load_array = (fun () -> ());
+      get = (fun i -> !tab.(i));
+      get_nopending = (fun i -> !tab.(i));
+      get_nopatch = (fun i -> !tab.(i));
+      set = (fun i v -> !tab.(i) <- v);
+      output_array =
+        (fun oc -> Dutil.output_value_no_sharing oc (!tab : _ array));
+      len = Array.length !tab;
+      clear_array = (fun () -> ());
+      set_array =
+        (fun arr ->
+          r.Dbdisk.len <- Array.length arr;
+          tab := arr);
+    }
+  in
+  r
 
 let make bname particles ((persons, families, strings, bnotes) as _arrays) :
     Dbdisk.dsk_base =
@@ -1275,6 +1522,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
   in
   let persons, ascends, unions = persons in
   let families, couples, descends = families in
+  let strings = record_access_of strings in
   let data : Dbdisk.base_data =
     {
       persons = record_access_of persons;
@@ -1287,7 +1535,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
         { v_write = (fun _ -> assert false); v_get = (fun _ -> assert false) };
       couples = record_access_of couples;
       descends = record_access_of descends;
-      strings = record_access_of strings;
+      strings;
       particles_txt = particles;
       particles = lazy (Mutil.compile_particles particles);
       bnotes;
@@ -1315,6 +1563,20 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
           cursor = (fun _ -> assert false);
           next = (fun _ -> assert false);
         };
+      persons_of_lower_surname =
+        {
+          find = (fun _ -> assert false);
+          cursor = (fun _ -> assert false);
+          next = (fun _ -> assert false);
+        };
+      persons_of_lower_first_name =
+        {
+          find = (fun _ -> assert false);
+          cursor = (fun _ -> assert false);
+          next = (fun _ -> assert false);
+        };
+      persons_stream_of_first_name_prefix = (fun _ -> assert false);
+      persons_stream_of_surname_prefix = (fun _ -> assert false);
       patch_person = (fun _ -> assert false);
       patch_ascend = (fun _ -> assert false);
       patch_union = (fun _ -> assert false);

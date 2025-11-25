@@ -446,6 +446,17 @@ val persons_of_surname : base -> string_person_index
 (** Returns data structure that allows to make optimised search throughout
     index by surname *)
 
+val persons_of_lower_first_name : base -> string_person_index
+(** Returns data structure that allows to make optimised search throughout
+    index by first name *)
+
+val persons_of_lower_surname : base -> string_person_index
+(** Returns data structure that allows to make optimised search throughout
+    index by surname *)
+
+val persons_stream_of_first_name_prefix : base -> string -> iper Seq.t
+val persons_stream_of_surname_prefix : base -> string -> iper Seq.t
+
 val spi_first : string_person_index -> string -> istr
 (** Returns first [first/sur]name id starting with that string *)
 
@@ -473,14 +484,14 @@ val base_strings_of_first_name : base -> string -> istr list
     Return the list of first names (as [istr]) being equal or to [x]
     using {!val:Name.crush_lower} comparison. [x] could be also a substring
     of the matched first name.
- *)
+*)
 
 val base_strings_of_surname : base -> string -> istr list
 (** [base_strings_of_surname base x]
     Return the list of surnames (as [istr]) being equal to [x]
     using  {!val:Name.crush_lower} comparison. [x] could be also a substring
     of the matched surname.
- *)
+*)
 
 val load_ascends_array : base -> unit
 (** Load array of ascendants in the memory and cache it so it could be accessed
@@ -690,3 +701,9 @@ val sync :
     the whole database. Otherwise, only changes that occured
     since the last [sync] call are treated.
  *)
+
+val initialize_lowercase_name_index :
+  ?on_lock_error:(unit -> unit) ->
+  kind:[< `First_name | `Surname ] ->
+  base ->
+  unit
