@@ -9,8 +9,8 @@ type cfg = {
   max_connection : int option;
   idle_timeout : float option;
   task_timeout : float option;
-  base_dir : string;
   index_dir : string;
+  index_fuel : int;
   tls : (string * string) option;
   dflags : dflag list;
 }
@@ -18,9 +18,10 @@ type cfg = {
 let default_interface = "localhost"
 let default_port = 8080
 let default_tls_port = 8443
-let default_base_dir = "bases"
 let default_index_dir = "etc"
-let connection_sec = "CONNECTION"
+let default_index_fuel = 50
+let conn_sec = "CONNECTION"
+let idx_sec = "INDEX"
 
 let dflags =
   let all = [ TLS; RPC ] in
@@ -37,7 +38,7 @@ let interface =
   Arg.(
     value
     & opt string default_interface
-    & info [ "i"; "interface" ] ~docs:connection_sec ~docv:"INTERFACE" ~doc)
+    & info [ "i"; "interface" ] ~docs:conn_sec ~docv:"INTERFACE" ~doc)
 
 let port =
   let doc =
@@ -48,7 +49,7 @@ let port =
   Arg.(
     value
     & opt (some int) None
-    & info [ "p"; "port" ] ~docs:connection_sec ~docv:"PORT" ~doc)
+    & info [ "p"; "port" ] ~docs:conn_sec ~docv:"PORT" ~doc)
 
 let max_connection =
   let doc =
@@ -58,7 +59,7 @@ let max_connection =
   Arg.(
     value
     & opt (some int) None
-    & info [ "m"; "max-connection" ] ~docs:connection_sec ~docv:"INT" ~doc)
+    & info [ "m"; "max-connection" ] ~docs:conn_sec ~docv:"INT" ~doc)
 
 let idle_timeout =
   let doc =
@@ -68,21 +69,21 @@ let idle_timeout =
   Arg.(
     value
     & opt (some float) None
-    & info [ "idle-timeout" ] ~docs:connection_sec ~docv:"FLOAT" ~doc)
+    & info [ "idle-timeout" ] ~docs:conn_sec ~docv:"FLOAT" ~doc)
 
 let crt =
   let doc = "Path to the TLS certificate file." in
   Arg.(
     value
     & opt (some filepath) None
-    & info [ "c"; "crt" ] ~docs:connection_sec ~docv:"PATH" ~doc)
+    & info [ "c"; "crt" ] ~docs:conn_sec ~docv:"PATH" ~doc)
 
 let key =
   let doc = "Path to the private key file for TLS." in
   Arg.(
     value
     & opt (some filepath) None
-    & info [ "k"; "key" ] ~docs:connection_sec ~docv:"PATH" ~doc)
+    & info [ "k"; "key" ] ~docs:conn_sec ~docv:"PATH" ~doc)
 
 let parse_connection_opt interface port max_connection idle_timeout crt key =
   let port =
@@ -111,19 +112,18 @@ let connection =
   and+ key = key in
   parse_connection_opt interface port max_connection idle_timeout crt key
 
-let base_dir =
-  let doc = "Specify the directory for bases." in
-  Arg.(
-    value
-    & opt dirpath default_base_dir
-    & info [ "b"; "base-dir" ] ~docv:"DIR" ~doc)
-
 let index_dir =
-  let doc = "Specify the directory for index files" in
+  let doc = "Specify the directory for index files." in
   Arg.(
     value
     & opt dirpath default_index_dir
-    & info [ "idx"; "index-dir" ] ~docv:"DIR" ~doc)
+    & info [ "idx"; "index-dir" ] ~docs:idx_sec ~docv:"DIR" ~doc)
+
+let index_fuel =
+  let doc = "Maximum number of answers per index request." in
+  Arg.(
+    value & opt int default_index_fuel
+    & info [ "index-fuel" ] ~docs:idx_sec ~docv:"INT" ~doc)
 
 let task_timeout =
   let doc =
@@ -134,12 +134,12 @@ let task_timeout =
     value & opt (some float) None & info [ "task-timeout" ] ~docv:"FLOAT" ~doc)
 
 let cfg =
-  let doc = "Remote Procedure Call (RPC) server for Geneweb" in
+  let doc = "Remote Procedure Call (RPC) server for Geneweb." in
   Cmd.make (Cmd.info "geneweb-rpc-server" ~version:"%%VERSION%%" ~doc)
   @@
   let+ interface, port, max_connection, idle_timeout, tls = connection
-  and+ base_dir = base_dir
   and+ index_dir = index_dir
+  and+ index_fuel = index_fuel
   and+ task_timeout = task_timeout
   and+ dflags = dflags in
   {
@@ -148,8 +148,8 @@ let cfg =
     max_connection;
     idle_timeout;
     tls;
-    base_dir;
     index_dir;
+    index_fuel;
     task_timeout;
     dflags;
   }

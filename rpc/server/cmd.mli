@@ -6,8 +6,8 @@ type cfg = private {
   max_connection : int option;
   idle_timeout : float option;
   task_timeout : float option;
-  base_dir : string;
   index_dir : string;
+  index_fuel : int;
   tls : (string * string) option;
   dflags : dflag list;
 }

@@ -34,11 +34,11 @@ let load_dictionaries path =
       match file with
       | File f when String.equal (Filename.extension f) ".gz" ->
           let basename = Filename.(basename f |> chop_extension) in
-          Logs.info (fun k -> k "found %s" basename);
+          Logs.app (fun k -> k "Found dictionary %s" basename);
           (basename, index_from_gzip f) :: acc
       | Dir _ | File _ -> acc
       | Exn { path; exn; bt = _ } ->
-          Logs.debug (fun k ->
+          Logs.err (fun k ->
               k "Uncaught exception while opening %s:@ %a" path Util.pp_exn exn);
           acc)
     path []
@@ -55,15 +55,17 @@ let () =
                connections@ will be insecure and may be rejected by browsers. \
                To ensure secure@ connections, please provide valid TLS \
                certificate and private key@ files.");
-      Logs.info (fun k -> k "Loading dictionaries in %s..." cfg.base_dir);
-      let dicts = load_dictionaries cfg.base_dir in
+      Logs.app (fun k -> k "Loading dictionaries in %s..." cfg.index_dir);
+      let dicts = load_dictionaries cfg.index_dir in
+      Logs.app (fun k -> k "Found %d dictionaries" (List.length dicts));
       Rpc.start ~interface:cfg.interface ~port:cfg.port
         ?max_connection:cfg.max_connection ?idle_timeout:cfg.idle_timeout
         ?task_timeout:cfg.task_timeout
       @@ Route.route
            [
              Route.path "/pingpong" Service.PingPong.srv;
-             Route.path "/search" (Service.Search.make dicts);
+             Route.path "/search"
+               (Service.Search.make ~fuel:cfg.index_fuel dicts);
            ];
       let forever, _ = Lwt.wait () in
       Lwt_main.run forever;

@@ -58,6 +58,11 @@ module PingPong : sig
 end
 
 module Search : sig
-  val make : (string * Geneweb_search.Index.Default.t) list -> t
-  (** Prepare the search service with a list of inversed index. *)
+  val make : fuel:int -> (string * Geneweb_search.Index.Default.t) list -> t
+  (** [make ~fuel l] prepares a search service with a list [l] of inverted
+      indexes, each with its name.
+
+      The [fuel] argument sets an upper bound on the number of results returned
+      by the lookup operation. If the requested size exceeds this limit, the
+      request is not fully honored and at most [fuel] results are returned. *)
 end

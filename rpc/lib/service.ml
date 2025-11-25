@@ -74,14 +74,14 @@ module Index = Geneweb_search.Index.Default
 module Analyze = Geneweb_search.Analyze
 
 module Search = struct
-  let lookup idx =
+  let lookup ~fuel idx =
     decl "lookup"
-      Desc.Syntax.(tup2 string string @-> ret (list string))
-      (fun (name, s) ->
+      Desc.Syntax.(tup3 string string int @-> ret (list string))
+      (fun (name, s, size) ->
         match List.assoc name idx with
         | exception Not_found ->
             (* TODO: Methods could fail and emit errors. We can implement
-               this by changing the return type of method into Lwt_result.t *)
+               this by changing the return type of methods to Lwt_result.t *)
             Lwt_result.return []
         | i ->
             let words =
@@ -94,8 +94,12 @@ module Search = struct
                 2. Entries that match prefixes of all the [words].
                 3. Entries that match prefixes of all the [words] up to
                    Levenshtein distance of 1. *)
+            let size = min size fuel in
             let r =
-              List.of_seq @@ Compat.Seq.take 10 @@ Compat.Seq.concat
+              (* TODO: There is no guarantee that bounding the size of forced
+                 elements in the sequence will limit the running time. We
+                 should find a solution to limit the running time itself. *)
+              List.of_seq @@ Compat.Seq.take size @@ Compat.Seq.concat
               (* BUG: We can introduce duplicate in the output here. *)
               @@ List.to_seq
                    [
@@ -106,5 +110,5 @@ module Search = struct
             in
             Lwt_result.return r)
 
-  let make idx = empty |> add (lookup idx)
+  let make ~fuel idx = empty |> add (lookup ~fuel idx)
 end
