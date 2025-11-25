@@ -49,15 +49,13 @@ let add_person_infos_to_cache cache person =
   let pevents = Gwdb.get_pevents person in
   let cache = List.fold_left add_place_from_pevent cache pevents in
   let cache = List.fold_left add_source_from_pevent cache pevents in
-  let cache = add_source cache (Gwdb.get_psources person) in
-  cache
+  add_source cache (Gwdb.get_psources person)
 
 let add_family_infos_to_cache cache family =
   let fevents = Gwdb.get_fevents family in
   let cache = List.fold_left add_place_from_fevent cache fevents in
   let cache = List.fold_left add_source_from_fevent cache fevents in
-  let cache = add_source cache (Gwdb.get_fsources family) in
-  cache
+  add_source cache (Gwdb.get_fsources family)
 
 (** Create cache files used by autocomplete *)
 let create_cache_data base =
