@@ -689,12 +689,7 @@ let acces_n conf base n x : Adef.escaped_string =
     else Adef.escaped ""
   else
     let open Def in
-    "i" ^<^ n ^^^ "="
-    ^<^ Gwdb.string_of_iper (Gwdb.get_iper x)
-    ^<^
-    if conf.Config.wizard && Gwdb.get_occ x <> 0 then
-      "&oc" ^<^ n ^>^ "=" ^ string_of_int (Gwdb.get_occ x)
-    else Adef.escaped ""
+    "i" ^<^ n ^>^ "=" ^ Gwdb.string_of_iper (Gwdb.get_iper x)
 
 (* ********************************************************************** *)
 (*  [Fonc] acces : config -> base -> person -> string                     *)
