@@ -790,9 +790,22 @@ let one_title_text base t : Adef.safe_string =
   let open Def in
   ", <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
 
-let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
+let geneweb_link ?id ?style conf (href : Adef.escaped_string)
+    (s : Adef.safe_string) =
+  let extra_html_attributes =
+    let optional_html_attribute ~key ~value =
+      Option.fold ~none:""
+        ~some:(fun value ->
+          Printf.sprintf "%s=\"%s\"" key (escape_attribute value))
+        value
+    in
+    String.concat " "
+      (List.map
+         (fun (key, value) -> optional_html_attribute ~key ~value)
+         [ ("id", id); ("style", style) ])
+  in
   let open Def in
-  "<a href=\""
+  "<a " ^<^ extra_html_attributes ^<^ " href=\""
   ^<^ (commd conf ^^^ href :> Adef.safe_string)
   ^^^ "\">" ^<^ s ^>^ "</a>"
 
