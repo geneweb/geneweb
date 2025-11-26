@@ -13,12 +13,6 @@
   %apply;dl("estates")
 %end;
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    addClearButtonToInputs();
-    inputToBook.addNavigation();
-    populateDatalists();
-});
-
 %( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)
 $(document).ready(function() {
   $("[id$=_selct]").on('change', function() {
