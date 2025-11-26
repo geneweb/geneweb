@@ -159,6 +159,17 @@ let syntax_links conf wi s =
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
           let t =
+            let identity_link () =
+              Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
+                (Util.commd conf :> string)
+                (* TODO how do we know this person is private here?
+                   TODO should be is_hidden (?) *)
+                (if
+                 conf.Config.hide_private_names
+                 && not (conf.Config.wizard || conf.Config.friend)
+                then "x x"
+                else escape name)
+            in
             if wi.wi_person_exists (fn, sn, oc) then
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
                 (Util.commd conf :> string)
@@ -173,16 +184,7 @@ let syntax_links conf wi s =
                 (encode fn) (encode sn)
                 (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
                 s name
-            else
-              Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
-                (Util.commd conf :> string)
-                (* TODO how do we know this person is private here?
-                   TODO should be is_hidden (?) *)
-                (if
-                 conf.Config.hide_private_names
-                 && not (conf.Config.wizard || conf.Config.friend)
-                then "x x"
-                else escape name)
+            else identity_link ()
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard (j, wiz, name) ->
