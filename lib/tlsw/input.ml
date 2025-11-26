@@ -12,3 +12,4 @@ let next ({ offset; _ } as t) =
   { t with offset }
 
 let to_source { input; _ } = `Raw input
+let sub { input; _ } i len = String.sub input i len

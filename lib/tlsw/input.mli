@@ -8,3 +8,4 @@ val eof : t -> bool
 val peak : t -> char option
 val next : t -> t
 val to_source : t -> Loc.source
+val sub : t -> int -> int -> string
