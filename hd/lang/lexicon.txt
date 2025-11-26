@@ -1730,6 +1730,7 @@ en: group label
 fr: nom du groupe
 
     resize fanchart
+de: den Fächerbaum an das Fenster anpassen
 en: resize fanchart to the window
 fr: adapter l’arbre en éventail à la fenêtre
 
@@ -2511,6 +2512,7 @@ sv: också
 tr: ayrıca
 
     previously/subsequently
+de: zuvor/später
 en: previously/subsequently
 fr: auparavant/par la suite
 
@@ -3090,7 +3092,7 @@ ca: bateig
 co: battesimu
 cs: křest
 da: dåb
-de: Taufe
+de: Taufe/Taufen
 en: baptism/baptisms
 eo: bapto
 es: bautismo
@@ -3504,7 +3506,7 @@ ca: naixement
 co: nascita
 cs: narození
 da: fødsel
-de: Geburt
+de: Geburt/Geburten
 en: birth/births
 eo: naskiĝo
 es: nacimiento
@@ -3643,6 +3645,7 @@ sv: förteckning över förfäder
 tr: soy kitabı
 
     book link
+de: Link zum Wörterbuch
 en: link to the dictionary
 fr: lien vers le dictionnaire
 
@@ -3927,7 +3930,7 @@ ca: enterrament
 co: sepultura
 cs: pohřeb
 da: begravelse
-de: Beisetzung
+de: Beisetzung/Beisetzungen
 en: burial/burials
 eo: entombigo
 es: entierro
@@ -4469,6 +4472,7 @@ en: cache file(s) not found/to generate missing caches, use gwsetup or run
 fr: fichier(s) cache absent(s)/pour générer les caches manquants, utiliser gwsetup ou exécutez
 
     chk_data check data
+de: Daten prüfen
 en: check data
 fr: vérifier les données
 
@@ -4513,30 +4517,37 @@ en: non-breaking spaces
 fr: espaces insécables
 
     chk_data error types
+de: Fehlertypen
 en: error types
 fr: types d’erreur
 
     chk_data keyboard navigation tooltip
+de: verwende die hoch/runter Pfeiltasten um schnell zwischen den Antworten zu navigieren
 en: use up/down arrow keys to quickly navigate between answers
 fr: utiliser les touches directionnelles haut/bas pour naviguer rapidement entre les réponses
 
     chk_data limit reached
+de: Limit erreicht
 en: limit reached
 fr: limite atteinte
 
     chk_data limited to %d results
+de: Limitiert auf <abbr title="gwf variable chk_data_max_results">%d Ergebnisse</abbr>.
 en: limited to <abbr title="gwf variable chk_data_max_results">%d results</abbr>.
 fr: limité à <abbr title="Variable gwf chk_data_max_results">%d résultats</abbr>.
 
     chk_data max results
+de: Maximale Anzahl der Ergebnisse
 en: maximum number of results
 fr: nombre de résultats maximum
 
     chk_data mixed alphabet
+de: griechisches oder kyrillisches Zeichen
 en: greek or cyrillique character
 fr: caractère grec ou cyrillique
 
     chk_data ponctuation error
+de: Punktierungsfehler
 en: punctuation error
 fr: erreur de ponctuation
 
@@ -4545,10 +4556,12 @@ en: modified letter apostrophe recommended for breton trigram cʼh
 fr: lettre modificative apostrophe recommandée pour le trigramme breton cʼh
 
     chk_data ponctuation error missing space
+de: fehlendes Leerzeichen vor der Klammer
 en: missing space before parenthesis
 fr: espace manquante avant la parenthèse
 
     chk_data use database/cache
+de: Datenbank nutzen/<b>Datenbank</b> nutzen (sehr langsam)/<b>Cache-Daten</b> nutzen (sehr schnell, kann aber Einträge zeigen die korrigiert oder gelöscht wurden)
 en: use database/using <b>database</b> (very slow)/using <b>cached data</b> (very fast but may show entries that have been corrected or deleted)
 fr: utiliser la base de données/utilisation de la <b>base de données</b> (très lent)/utilisation des <b>données en cache</b> (très rapide mais peut afficher des entrées déjà corrigées ou supprimées)
 
@@ -7133,7 +7146,7 @@ ca: defunció
 co: morte
 cs: úmrtí
 da: død
-de: Tod
+de: Tod/Tode
 en: death/deaths
 eo: morto
 es: muerte
@@ -8395,6 +8408,7 @@ en: extend to a near ancestor
 fr: étendre à un ancêtre proche
 
     falsely alive
+de: fälschlicherweise als lebend gemeldet
 en: falsely shown as alive
 fr: indiqué vivant par erreur
 
@@ -8915,6 +8929,7 @@ tr: ilk ad/ilk adlar/ilk ad(lar)
 zh: 名
 
     first names exact/included/permuted
+de: identische Vornamen/Vornamen eingeschlossen/Vornamen vertauscht
 en: identical first names/first names included/first names permuted
 fr: prénoms identiques/prénoms inclus/prénoms permutés
 
@@ -8933,6 +8948,7 @@ sv: första nattvard
 tr: ilk komünyon
 
     fix error automatically
+de: Den Fehler automatisch korrigieren
 en: fix error automatically
 fr: fixer automatiquement l’erreur
 
@@ -11552,6 +11568,7 @@ fr: albums ou galleries où la personne est citée
 
     linked albums
 co: albumi o gallerie ligati
+de: verlinkte Alben oder Gallerien
 en: linked albums or galleries
 fr: albums ou galleries liés
 
@@ -14414,6 +14431,7 @@ en: occurence number/occurence
 fr: numéro d’occurrence/occurence
 
     occurence
+de: Vorkommen/Vorkommen
 en: occurence/occurences
 fr: occurrence/occurences
 
@@ -15280,10 +15298,12 @@ sv: personer med samma namn
 tr: aynı adı taşıyan kişiler
 
     phonetic variants
+de: Phonetische Varianten
 en: phonétic variants
 fr: variantes phonétiques
 
     disordered firstnames
+de: ungeordnete Vornamen
 en: disordered first names
 fr: prénoms désordonnés
 de: ungeordnete Vornamen
@@ -16826,6 +16846,7 @@ en: legal
 fr: mentions légales
 
     pacs%t to
+de: eingetragener%t Lebenspartner/eingetragene%t Lebenspartnerin
 en: pacs%t with
 fr: pacsé%t avec/pacsée%t avec/pacsés
 
@@ -16977,6 +16998,7 @@ sv: sök efter förnamn
 tr: isimlere göre arama
 
     search by exact first names
+de: Suche nach exakten Vornamen
 en: search by exact first names
 fr: recherche par prénoms exacts
 de: Suche nach exakten Vornamen
@@ -18301,6 +18323,7 @@ sv: efternamnalias
 tr: alternatif soyadı
 
     surname details
+de: Detailansicht/Details anzeigen/zeige die Liste aller Individuen für diese Nachnamen
 en: detailed view/view details/show the liste of all individuals for those surnames
 fr: vue détaillée/voir détails/afficher la liste de tous les individus pour ces patronymes
 
@@ -20059,6 +20082,7 @@ sv: i dag
 tr: bugün
 
     toggle all
+de: alle auswählen
 en: toggle all
 fr: tout cocher
 
@@ -20346,16 +20370,19 @@ fr: total non filtré
 
     unknown first_name
 co: nome scunnisciutu
+de: unbekannter Vorname
 en: unknown first name
 fr: prénom inconnu
 
     unknown surname
 co: casata scunnisciuta
+de: unbekannter Nachname
 en: unknown surname
 fr: patronyme inconnu
 
     unknown index
 co: indice scunnisciutu
+de: unbekannter Index
 en: unknown index
 fr: index inconnu
 
@@ -21151,10 +21178,12 @@ sv: administratör/administratörer/vän/vän/extern
 tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
 
     wizard note
+de: Meisterseite
 en: wizard note
 fr: page magicien
 
     wizard note create
+de: Meisterseite anlegen
 en: create wizard page
 fr: créer la page magicien
 
@@ -21421,5 +21450,6 @@ en: this zero-width character has been widened to be visible
 fr: ce caractère sans chasse a été élargi pour être visible
 
     zoom/unzoom
+de: vergrößern/verkleinern
 en: zoom/unzoom
 fr: zoomer/dézoomer
