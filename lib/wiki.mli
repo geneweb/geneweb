@@ -37,13 +37,14 @@ type wiki_info = {
   wi_always_show_link : bool;
 }
 
-val syntax_links : Config.config -> wiki_info -> string -> string
+val syntax_links : Config.config -> Gwdb.base -> wiki_info -> string -> string
 
 val html_of_tlsw : Config.config -> string -> string list
 (** Parses a whole TLSW text to a list of strings *)
 
 val html_with_summary_of_tlsw :
   Config.config ->
+  Gwdb.base ->
   wiki_info ->
   (bool * string * string) option ->
   string ->
@@ -66,6 +67,7 @@ val split_title_and_text : string -> (string * string) list * string
 
 val print_sub_part :
   Config.config ->
+  Gwdb.base ->
   wiki_info ->
   bool ->
   string ->
@@ -90,6 +92,7 @@ val print_mod_view_page :
 
 val print_mod_ok :
   Config.config (* conf *) ->
+  Gwdb.base ->
   wiki_info (* wi *) ->
   (string -> string option) ->
   (* edit_mode *)
