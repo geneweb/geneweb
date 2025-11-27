@@ -4841,14 +4841,15 @@ const FanchartApp = {
     
     fanchart.addEventListener('mousedown', (e) => {
       e.preventDefault();
-      if (e.button === 0) {
-        // Clic gauche : déplacement
-        dragState = true;
-      } else if (e.button === 2 && isCircularMode) {
-        // Clic droit : rotation (seulement en mode circulaire)
+      if ((e.button === 2 || (e.button === 0 && e.ctrlKey)) && isCircularMode) {
+        // Clic droit (mode circulaire seulement) : rotation (également avec ctrl+clic droit pour macOS)
         rotateState = true;
         lastMouseAngle = getMouseAngle(e);
-      }
+      } else if (e.button === 0) {
+        // Clic gauche : déplacement 
+        dragState = true;
+        
+      } 
     });
     
     fanchart.addEventListener('mouseup', (e) => {
