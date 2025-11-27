@@ -314,34 +314,11 @@ let block =
     ])
     [@ocamlformat "disable"]
 
-type error_handler = loc:Loc.t -> string -> unit
-
-let parse ?(strict = false) ~on_err s =
+let parse parser ~on_err s =
   let st = Input.of_string s in
   let rec loop acc st =
     let start = Input.offset st in
-    match C.run block st with
-    | Ok (tk, st') -> loop (tk :: acc) st'
-    | Fail (err, st') ->
-        if Input.eof st then List.rev acc
-        else
-          let stop = Input.offset st' in
-          let loc = Loc.mk (Input.to_source st') start stop in
-          on_err ~loc (err ());
-          if strict then acc
-          else
-            let s = Input.sub st start (stop - start) in
-            let span = Ast.mk_span ~loc Ast.Plain s in
-            let t = (Ast.mk_text ~loc [ span ] :> Ast.t) in
-            loop (t :: acc) st'
-  in
-  loop [] st
-
-let parse_links ~on_err s =
-  let st = Input.of_string s in
-  let rec loop acc st =
-    let start = Input.offset st in
-    match C.run link st with
+    match C.run parser st with
     | Ok (tk, st') -> loop (tk :: acc) st'
     | Fail (err, st') ->
         if Input.eof st then List.rev acc
@@ -352,3 +329,8 @@ let parse_links ~on_err s =
           acc
   in
   loop [] st
+
+type error_handler = loc:Loc.t -> string -> unit
+
+let parse_links = parse link
+let parse = parse block
