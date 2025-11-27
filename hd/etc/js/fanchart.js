@@ -65,8 +65,13 @@ const CONFIG = {
 };
 
 let isCircularMode = false;
-let renderTarget = null; // (null = fanchart direct)
+let renderContext = { target: null, idPrefix: '' };
 let current_angle = CONFIG.default_angle;
+
+// Génère un ID unique selon le contexte de rendu (mode 360° ou standard)
+function contextualId(baseId) {
+    return renderContext.idPrefix + baseId;
+}
 
 const DOMCache = {
   // Cache pour les éléments individuels
@@ -2863,51 +2868,55 @@ const TextRenderer = {
   },
 
   drawCircularText: function(g, r1, r2, a1, a2, sosa, p, classes, sizeFactor = 1.0) {
-    const height = Math.abs(r2 - r1) / 3;
-
-    // Trois arcs concentriques pour prénom, nom, dates
-    const pathLength1 = this.createCircularPath(g, `tp1S${sosa}`, (r2-r1)*3/4 + r1, a1, a2);
-    this.placeTextOnPath(g, `tp1S${sosa}`, p.fn, classes, pathLength1, height, sizeFactor);
-
-    const pathLength2 = this.createCircularPath(g, `tp2S${sosa}`, (r2-r1)*2/4 + r1, a1, a2);
-    this.placeTextOnPath(g, `tp2S${sosa}`, p.sn, classes, pathLength2, height, sizeFactor);
-
-    const pathLength3 = this.createCircularPath(g, `tp3S${sosa}`, (r2-r1)/4 + r1, a1, a2);
-    this.placeTextOnPath(g, `tp3S${sosa}`, p.dates, classes + " dates", pathLength3, height, sizeFactor);
-
-    return g;
+      const height = Math.abs(r2 - r1) / 3;
+      // Trois arcs concentriques pour prénom, nom, dates
+      const pathId1 = contextualId(`tp1S${sosa}`);
+      const pathLength1 = this.createCircularPath(g, pathId1, (r2-r1)*3/4 + r1, a1, a2);
+      this.placeTextOnPath(g, pathId1, p.fn, classes, pathLength1, height, sizeFactor);
+      
+      const pathId2 = contextualId(`tp2S${sosa}`);
+      const pathLength2 = this.createCircularPath(g, pathId2, (r2-r1)*2/4 + r1, a1, a2);
+      this.placeTextOnPath(g, pathId2, p.sn, classes, pathLength2, height, sizeFactor);
+      
+      const pathId3 = contextualId(`tp3S${sosa}`);
+      const pathLength3 = this.createCircularPath(g, pathId3, (r2-r1)/4 + r1, a1, a2);
+      this.placeTextOnPath(g, pathId3, p.dates, classes + " dates", pathLength3, height, sizeFactor);
+      return g;
   },
 
-  drawRadialText: function(g, r1, r2, a1, a2, sosa, p, classes, lineCount, sizeFactor = 1.0) {
+drawRadialText: function(g, r1, r2, a1, a2, sosa, p, classes, lineCount, sizeFactor = 1.0) {
     // Calcul des paramètres de direction selon l'orientation
     const params = this.calculateRadialParameters(r1, r2, a1, a2, lineCount);
     const height = Math.abs(a2 - a1) / 360 * 2 * Math.PI * r1 / lineCount;
-
+    
     if (lineCount >= 3) {
-      // Trois lignes : prénom, nom, dates
-      const pathLength1 = this.createRadialPath(g, `tp1S${sosa}`, params.r1, params.r2, params.angles[0]);
-      this.placeTextOnPath(g, `tp1S${sosa}`, p.fn, classes, pathLength1, height, sizeFactor);
-
-      const pathLength2 = this.createRadialPath(g, `tp2S${sosa}`, params.r1, params.r2, params.angles[1]);
-      this.placeTextOnPath(g, `tp2S${sosa}`, p.sn, classes, pathLength2, height, sizeFactor);
-
-      const pathLength3 = this.createRadialPath(g, `tp3S${sosa}`, params.r1, params.r2, params.angles[2]);
-      this.placeTextOnPath(g, `tp3S${sosa}`, p.dates, classes + " dates", pathLength3, height, sizeFactor);
-
+        // Trois lignes : prénom, nom, dates
+        const pathId1 = contextualId(`tp1S${sosa}`);
+        const pathLength1 = this.createRadialPath(g, pathId1, params.r1, params.r2, params.angles[0]);
+        this.placeTextOnPath(g, pathId1, p.fn, classes, pathLength1, height, sizeFactor);
+        
+        const pathId2 = contextualId(`tp2S${sosa}`);
+        const pathLength2 = this.createRadialPath(g, pathId2, params.r1, params.r2, params.angles[1]);
+        this.placeTextOnPath(g, pathId2, p.sn, classes, pathLength2, height, sizeFactor);
+        
+        const pathId3 = contextualId(`tp3S${sosa}`);
+        const pathLength3 = this.createRadialPath(g, pathId3, params.r1, params.r2, params.angles[2]);
+        this.placeTextOnPath(g, pathId3, p.dates, classes + " dates", pathLength3, height, sizeFactor);
     } else if (lineCount === 2) {
-      // Deux lignes : nom complet, dates
-      const pathLength1 = this.createRadialPath(g, `tp1S${sosa}`, params.r1, params.r2, params.angles[0]);
-      this.placeTextOnPath(g, `tp1S${sosa}`, `${p.fn} ${p.sn}`, classes, pathLength1, height);
-
-      const pathLength2 = this.createRadialPath(g, `tp2S${sosa}`, params.r1, params.r2, params.angles[1]);
-      this.placeTextOnPath(g, `tp2S${sosa}`, p.dates, classes + " dates", pathLength2, height);
-
+        // Deux lignes : nom complet, dates
+        const pathId1 = contextualId(`tp1S${sosa}`);
+        const pathLength1 = this.createRadialPath(g, pathId1, params.r1, params.r2, params.angles[0]);
+        this.placeTextOnPath(g, pathId1, `${p.fn} ${p.sn}`, classes, pathLength1, height);
+        
+        const pathId2 = contextualId(`tp2S${sosa}`);
+        const pathLength2 = this.createRadialPath(g, pathId2, params.r1, params.r2, params.angles[1]);
+        this.placeTextOnPath(g, pathId2, p.dates, classes + " dates", pathLength2, height);
     } else { // lineCount === 1
-      // Une ligne : nom complet seulement
-      const pathLength = this.createRadialPath(g, `tp1S${sosa}`, params.r1, params.r2, params.angles[0]);
-      this.placeTextOnPath(g, `tp1S${sosa}`, `${p.fn} ${p.sn}`, classes, pathLength, height);
+        // Une ligne : nom complet seulement
+        const pathId1 = contextualId(`tp1S${sosa}`);
+        const pathLength = this.createRadialPath(g, pathId1, params.r1, params.r2, params.angles[0]);
+        this.placeTextOnPath(g, pathId1, `${p.fn} ${p.sn}`, classes, pathLength, height);
     }
-
     return g;
   },
 
@@ -4353,21 +4362,24 @@ const FanchartApp = {
       southGroup.setAttribute("transform", `rotate(180 ${center_x} ${center_y})`);
       fanchart.appendChild(southGroup);
 
-      // RENDU NORD : Lignée paternelle (S2)
-      ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 2);
-      renderTarget = northGroup; // CRITIQUE : rediriger TOUS les rendus vers le groupe
+      try {
+          // RENDU NORD : Lignée paternelle (S2)
+          ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 2);
+          renderContext = { target: northGroup, idPrefix: 'N-' };
+          // Pas de centre S1 pour les demi-disques
+          this.renderAncestorsByGeneration();
 
-      // Pas de centre S1 pour les demi-disques
-      this.renderAncestorsByGeneration();
+          // RENDU SUD : Lignée maternelle (S3)
+          ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 3);
+          renderContext = { target: southGroup, idPrefix: 'S-' };
+          this.renderAncestorsByGeneration();
+      } finally {
+          // Restaurer l'état (garanti même en cas d'erreur)
+          renderContext = { target: null, idPrefix: '' };
+          ancestor = originalAncestors;
+          current_angle = savedAngle;
+      }
 
-      // RENDU SUD : Lignée maternelle (S3)
-      ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 3);
-      renderTarget = southGroup;
-
-      this.renderAncestorsByGeneration();
-
-      // Restaurer l'état
-      renderTarget = null;
       ancestor = originalAncestors;
       current_angle = savedAngle;
 
@@ -4460,7 +4472,7 @@ const FanchartApp = {
   },
 
   initializeStandardText: function() {
-    const target = renderTarget || fanchart;
+    const target = renderContext.target || fanchart;
     const standard = document.createElementNS("http://www.w3.org/2000/svg", "text");
     standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz 0123456789 ’'–-?~/";
     standard.setAttribute("id", "standard");
@@ -4540,13 +4552,13 @@ const FanchartApp = {
    * - secteur externe droit : épouse (rayon r1+10 → r2, demi-angle).
    */
   renderAncestorSector: function(sosa, position, person) {
-    const target = renderTarget || fanchart;
+    const target = renderContext.target || fanchart;
 
     // Créer le groupe famille (basé sur le père) si il n'existe pas encore
     const fatherSosa = SVGGeometry.getFatherSosa(sosa);
-    const familyGroupId = "G" + fatherSosa;
+    const familyGroupId = contextualId("G" + fatherSosa);
 
-    let familyGroup = document.getElementById(familyGroupId);
+    let familyGroup = target.querySelector("#" + CSS.escape(familyGroupId));
     if (!familyGroup) {
       familyGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
       familyGroup.setAttribute("id", familyGroupId);
@@ -4560,7 +4572,7 @@ const FanchartApp = {
 
     // Créer le groupe de la personne dans le groupe famille
     const personGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    personGroup.setAttribute("id", "S" + sosa);
+    personGroup.setAttribute("id", contextualId("S" + sosa));
     familyGroup.append(personGroup);
 
     // Résolution des implexes
@@ -4607,7 +4619,7 @@ const FanchartApp = {
   renderMarriageSector: function(familyGroup, fatherSosa, position, person) {
     // Créer le groupe mariage en premier dans l’ordre DOM
     const marriageGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    marriageGroup.setAttribute("id", "M" + fatherSosa);
+    marriageGroup.setAttribute("id", contextualId("M" + fatherSosa));
 
     if (familyGroup.firstChild) {
       familyGroup.insertBefore(marriageGroup, familyGroup.firstChild);
