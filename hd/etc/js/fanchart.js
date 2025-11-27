@@ -53,7 +53,7 @@ const Events = {
 // ====== Configuration =======
 const CONFIG = {
   security: 0.95,
-  zoom_factor: 1.25,
+  zoom_factor: 1.12,
   default_angle: 220,
   available_angles: [180, 220, 359],
   a_r: [56, 56, 54, 54, 70, 72, 100, 150, 130, 90],
@@ -67,10 +67,49 @@ const CONFIG = {
 let isCircularMode = false;
 let renderContext = { target: null, idPrefix: '' };
 let current_angle = CONFIG.default_angle;
+let currentRotation = 0;
 
 // Génère un ID unique selon le contexte de rendu (mode 360° ou standard)
 function contextualId(baseId) {
     return renderContext.idPrefix + baseId;
+}
+
+// Trouve un élément SVG par son ID de base, en tenant compte du préfixe de contexte
+function findElementById(baseId) {
+    // D'abord essayer sans préfixe (mode normal)
+    let element = document.getElementById(baseId);
+    if (element) return element;
+    
+    // En mode circulaire, essayer avec les préfixes
+    if (isCircularMode) {
+        element = document.getElementById('N-' + baseId);
+        if (element) return element;
+        element = document.getElementById('S-' + baseId);
+        if (element) return element;
+    }
+    
+    return null;
+}
+
+// Trouve tous les éléments avec le même ID de base (les deux hémisphères)
+function findAllElementsById(baseId) {
+    const elements = [];
+    
+    // Mode normal
+    const element = document.getElementById(baseId);
+    if (element) {
+        elements.push(element);
+    }
+    
+    // Mode circulaire - chercher dans les deux hémisphères
+    if (isCircularMode) {
+        const northEl = document.getElementById('N-' + baseId);
+        if (northEl) elements.push(northEl);
+        const southEl = document.getElementById('S-' + baseId);
+        if (southEl) elements.push(southEl);
+    }
+    
+    return elements;
 }
 
 const DOMCache = {
@@ -1764,15 +1803,17 @@ const PlacesHighlighter = {
             const parentGroup = element.parentNode;
             const groupId = parentGroup?.id || '';
 
-            // Logique simplifiée grâce à la séparation des groupes
+            // Ignorer le préfixe de contexte (N-, S-) pour le mode circulaire
+            const baseId = groupId.replace(/^[NS]-/, '');
+            
             if (eventType === 'marriage') {
               // Mariages : coloriser UNIQUEMENT les éléments dans les groupes M
-              if (groupId.startsWith('M')) {
+              if (baseId.startsWith('M')) {
                 this.applyEventHighlight(element, eventType, placeName);
               }
             } else {
               // NBDS : coloriser UNIQUEMENT les éléments dans les groupes S
-              if (groupId.startsWith('S')) {
+              if (baseId.startsWith('S')) {
                 this.applyEventHighlight(element, eventType, placeName);
               }
             }
@@ -1788,6 +1829,8 @@ const PlacesHighlighter = {
    * Application du surlignage d'événement
    */
   applyEventHighlight: function(element, eventType, placeName) {
+        console.log(`[DEBUG applyEventHighlight] type=${eventType} lieu=${placeName} tagName=${element.tagName} classesBefore=${element.className.baseVal || element.className}`);
+
     // Sauvegarder l'état original seulement si nécessaire
     if (!element.dataset.originalFill) {
       element.dataset.originalFill = element.style.fill || '';
@@ -1796,6 +1839,8 @@ const PlacesHighlighter = {
     // Appliquer les classes CSS appropriées
     element.classList.add('svg-place-highlight');
     element.classList.add(`event-highlight-${eventType}`);
+
+    console.log(`[DEBUG applyEventHighlight] classesAfter=${element.className.baseVal || element.className}`);
 
     // Enregistrer pour le nettoyage
     this.state.svgElements.set(element, placeName);
@@ -1876,17 +1921,25 @@ const PlacesHighlighter = {
       const svgClass = `ma-${placeClass}`;
       const elements = document.getElementsByClassName(svgClass);
 
+      console.log(`[DEBUG] Mariage lieu="${placeName}" svgClass="${svgClass}" trouvés=${elements.length}`);
+      if (elements.length > 0) {
+        Array.from(elements).forEach((el, i) => {
+          const parentId = el.parentNode?.id || 'NO_ID';
+          const baseId = parentId.replace(/^[NS]-/, '');
+          console.log(`  [${i}] parentId="${parentId}" baseId="${baseId}" startsWithM=${baseId.startsWith('M')}`);
+        });
+      }
+
       // Traiter chaque élément avec la classe de mariage correspondante
       Array.from(elements).forEach(element => {
         const parentGroup = element.parentNode;
 
         // Vérification stricte : l'élément doit être dans un groupe de mariage
-        // Grâce à la restructuration DOM, cette vérification est simple et fiable
-        if (parentGroup?.id?.startsWith('M')) {
+        // Ignorer le préfixe de contexte (N-, S-) pour le mode circulaire
+        const baseId = parentGroup?.id?.replace(/^[NS]-/, '') || '';
+        if (baseId.startsWith('M')) {
           this.applyEventHighlight(element, 'marriage', placeName);
         }
-        // Note: avec l'ancienne structure imbriquée, nous aurions dû ajouter
-        // des vérifications complexes pour éviter les secteurs de personnes
       });
     });
   },
@@ -1923,12 +1976,11 @@ const PlacesHighlighter = {
         const parentGroup = element.parentNode;
 
         // Vérification stricte : l'élément doit être dans un groupe de personne
-        // Cette simplicité est rendue possible par la restructuration DOM
-        if (parentGroup?.id?.startsWith('S')) {
+        // Ignorer le préfixe de contexte (N-, S-) pour le mode circulaire
+        const baseId = parentGroup?.id?.replace(/^[NS]-/, '') || '';
+        if (baseId.startsWith('S')) {
           this.applyEventHighlight(element, eventType, placeName);
         }
-        // Note: dans l'ancienne architecture, nous devions gérer les cas où
-        // un secteur de personne contenait aussi un secteur de mariage
       });
     });
   },
@@ -2077,6 +2129,11 @@ const CircularModeRenderer = {
       }
     });
 
+    // Réinitialiser la rotation quand on quitte le mode circulaire
+    if (!isCircularMode) {
+      currentRotation = 0;
+    }
+
     // Mettre à jour l'URL
     URLManager.updateCurrentURL();
 
@@ -2091,7 +2148,8 @@ const CircularModeRenderer = {
   renderCoupleCenter: function() {
     const centerGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     centerGroup.setAttribute("id", "couple-center");
-    fanchart.appendChild(centerGroup);
+    const contentGroup = document.getElementById('fanchart-content') || fanchart;
+    contentGroup.appendChild(centerGroup);
 
     const s2 = ancestor["S2"]; // Père
     const s3 = ancestor["S3"]; // Mère
@@ -2105,8 +2163,8 @@ const CircularModeRenderer = {
         s2Group.setAttribute("id", "couple-s2");
         centerGroup.appendChild(s2Group);
 
-        // Secteur de fond
-        SVGRenderer.drawPie(s2Group, 0, r, -90, 90, s2,
+        // Secteur de fond pour le père (demi-cercle NORD = haut)
+        SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2,
           { type: 'person', isBackground: true });
 
         // Texte centré dans le demi-cercle nord
@@ -2119,7 +2177,7 @@ const CircularModeRenderer = {
         s2Group.appendChild(text2);
 
         // Secteur interactif (doit être en dernier pour capturer les événements)
-        SVGRenderer.drawPie(s2Group, 0, r, -90, 90, s2, { type: 'person' });
+        SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2, { type: 'person' });
       }
 
       // Groupe pour la mère (demi-cercle sud)
@@ -2128,8 +2186,8 @@ const CircularModeRenderer = {
         s3Group.setAttribute("id", "couple-s3");
         centerGroup.appendChild(s3Group);
 
-        // Secteur de fond
-        SVGRenderer.drawPie(s3Group, 0, r, 90, 270, s3,
+        // Secteur de fond pour la mère (demi-cercle SUD = bas)
+        SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3,
           { type: 'person', isBackground: true });
 
         // Texte centré dans le demi-cercle sud
@@ -2138,11 +2196,12 @@ const CircularModeRenderer = {
         text3.setAttribute("y", center_y + r/3);
         text3.setAttribute("text-anchor", "middle");
         text3.setAttribute("class", "couple-text");
+                text3.setAttribute("transform", `rotate(180, ${center_x}, ${center_y + r/3})`); // Rotation de 180° autour du centre du texte
         text3.innerHTML = `<tspan>${s3.fn}</tspan><tspan x="${center_x}" dy="15">${s3.sn}</tspan>`;
         s3Group.appendChild(text3);
 
         // Secteur interactif
-        SVGRenderer.drawPie(s3Group, 0, r, 90, 270, s3, { type: 'person' });
+        SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3, { type: 'person' });
       }
 
       // Ligne de séparation élégante
@@ -2176,17 +2235,21 @@ const CircularModeRenderer = {
   /**
    * Décale une branche d'ancêtres pour qu'un parent devienne S1
    */
-  shiftAncestorsForParent: function(originalAncestors, parentSosa) {
+shiftAncestorsForParent: function(originalAncestors, parentSosa) {
     const shifted = {};
 
     // Le parent devient S1 pour le rendu
-    shifted["S1"] = originalAncestors["S" + parentSosa];
+    const parent = originalAncestors["S" + parentSosa];
+    if (parent) {
+      shifted["S1"] = { ...parent, originalSosa: parentSosa };
+    }
 
     // Fonction récursive pour décaler toute la branche
     const shiftBranch = (oldSosa, newSosa) => {
       const person = originalAncestors["S" + oldSosa];
       if (person) {
-        shifted["S" + newSosa] = person;
+        // Copier la personne ET stocker son Sosa original
+        shifted["S" + newSosa] = { ...person, originalSosa: oldSosa };
         // Décaler récursivement les parents
         shiftBranch(oldSosa * 2, newSosa * 2);       // Père
         shiftBranch(oldSosa * 2 + 1, newSosa * 2 + 1); // Mère
@@ -2516,11 +2579,14 @@ const SVGRenderer = {
     // 1. Panneau d'information (inchangé)
     const panel = document.getElementById("person-panel");
     if (panel && type === "person" && p.sosa) {
-      const displayData = ImplexResolver.getDisplayData(p.sosa);
+      // En mode circulaire, p contient déjà les bonnes données
+      // On utilise originalSosa pour l'affichage du numéro Sosa
+      const displaySosa = p.originalSosa || p.sosa;
+      const displayData = isCircularMode ? p : ImplexResolver.getDisplayData(p.sosa);
       if (displayData) {
         const enhancedPerson = {
           ...displayData,
-          sosa: p.sosa,
+          sosa: displaySosa,  // Afficher le Sosa original
           sosasame: p.sosasame
         };
         this.buildTooltipContent(panel, enhancedPerson, type);
@@ -2557,11 +2623,12 @@ const SVGRenderer = {
     }
 
     if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
-        const displayPerson = (type === 'person' && p.sosa) ? 
-            ImplexResolver.getDisplayData(p.sosa) : p;
+        const displayPerson = isCircularMode ? p :
+            ((type === 'person' && p.sosa) ? ImplexResolver.getDisplayData(p.sosa) : p);
         
         if (displayPerson) {
             // Passer aussi le sosa original pour la détection époux/épouse
+            const displaySosa = p.originalSosa || p.sosa;
             const enhancedPerson = { ...displayPerson, sosa: p.sosa };
             const places = this.extractPlacesFromPerson(enhancedPerson, type);
             
@@ -2584,8 +2651,8 @@ const SVGRenderer = {
         }
     }
 
-    // 4. Surlignage des implexes
-    if (type === "person" && p.sosa) {
+    // 4. Surlignage des implexes (désactivé temporairement en mode circulaire)
+    if (type === "person" && p.sosa && !isCircularMode) {
       const targetsToHighlight = ImplexResolver.getHighlightTargets(p.sosa);
 
       targetsToHighlight.forEach(targetSosa => {
@@ -2639,8 +2706,26 @@ const SVGRenderer = {
       AgeHighlighter.clearAllHighlights();
     }
 
+// AVANT
     // 4. Nettoyage des implexes
     if (type === "person" && p.sosa) {
+      const targetsToClean = ImplexResolver.getHighlightTargets(p.sosa);
+
+      targetsToClean.forEach(targetSosa => {
+        const targetElement = document.getElementById("S" + targetSosa);
+        if (targetElement) {
+          targetElement.classList.remove("same_hl");
+
+          const highlightedPaths = targetElement.querySelectorAll('.highlight');
+          highlightedPaths.forEach(path => {
+            path.classList.remove('highlight');
+          });
+        }
+      });
+    }
+
+    // 4. Nettoyage des implexes (désactivé temporairement en mode circulaire)
+    if (type === "person" && p.sosa && !isCircularMode) {
       const targetsToClean = ImplexResolver.getHighlightTargets(p.sosa);
 
       targetsToClean.forEach(targetSosa => {
@@ -2677,14 +2762,16 @@ const SVGRenderer = {
       });
 
       // Gérer les mariages selon le Sosa
-      if (person.sosa && person.sosa % 2 === 1) {
-        const spouse = ancestor["S" + (person.sosa - 1)];
-        addPlaceIfExists(spouse?.marriage_place, 'marriage');
-      } else {
-        addPlaceIfExists(person.marriage_place, 'marriage');
+      if (!isCircularMode) {
+        if (person.sosa && person.sosa % 2 === 1) {
+          const spouse = ancestor["S" + (person.sosa - 1)];
+          addPlaceIfExists(spouse?.marriage_place, 'marriage');
+        } else {
+          addPlaceIfExists(person.marriage_place, 'marriage');
+        }
       }
+      // En mode circulaire, le mariage est géré par son propre secteur interactif
     }
-
     return places;
   },
 
@@ -4239,12 +4326,12 @@ const FanchartApp = {
     const margin = CONFIG.svg_margin;
 
     if (isCircularMode) {
-      // Mode circulaire : forcer un carré pour contenir le cercle complet
-      const size = 2 * (max_r + margin);
-      svg_w = size;
-      svg_h = size;
-      center_x = size / 2;
-      center_y = size / 2;
+      // Mode circulaire : même largeur que le 180°, hauteur adaptée pour demi-cercle visible
+      // L'utilisateur peut faire pivoter pour voir l'autre moitié
+      svg_w = 2 * (max_r + margin);
+      svg_h = max_r + CONFIG.a_r[0] + 2 * margin;
+      center_x = svg_w / 2;
+      center_y = max_r + margin;
     } else {
       // Calcul standard pour tous les angles
       center_x = max_r + margin;
@@ -4316,22 +4403,25 @@ const FanchartApp = {
   },
 
   renderFanchart: function() {
+    // Nettoyer complètement le SVG
+    while (fanchart.firstChild) {
+      fanchart.removeChild(fanchart.firstChild);
+    }
+
+    // Créer le groupe conteneur pour permettre la rotation
+    const contentGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    contentGroup.setAttribute("id", "fanchart-content");
+    if (currentRotation !== 0) {
+      contentGroup.setAttribute("transform", `rotate(${currentRotation} ${center_x} ${center_y})`);
+    }
+    fanchart.appendChild(contentGroup);
+
     // Initialiser le texte standard
     const standardInfo = this.initializeStandardText();
     standard = standardInfo.element;
     standard_width = standardInfo.width;
 
     if (isCircularMode) {
-      // Nettoyer complètement le SVG
-      while (fanchart.firstChild) {
-        fanchart.removeChild(fanchart.firstChild);
-      }
-
-      // Réinitialiser après nettoyage
-      const newStandardInfo = this.initializeStandardText();
-      standard = newStandardInfo.element;
-      standard_width = newStandardInfo.width;
-
       // Sauvegarder l'état
       const savedAngle = current_angle;
       const originalAncestors = ancestor;
@@ -4339,38 +4429,33 @@ const FanchartApp = {
       // Forcer l'angle à 180° pour les demi-cercles
       current_angle = 180;
 
-      // Créer les groupes pour les deux hémisphères
+      // Créer les groupes pour les deux hémisphères DANS contentGroup
       const northGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
       northGroup.setAttribute("id", "north-hemisphere");
-      fanchart.appendChild(northGroup);
+      contentGroup.appendChild(northGroup);  // ← Dans contentGroup, pas fanchart
 
       const southGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
       southGroup.setAttribute("id", "south-hemisphere");
       southGroup.setAttribute("transform", `rotate(180 ${center_x} ${center_y})`);
-      fanchart.appendChild(southGroup);
+      contentGroup.appendChild(southGroup);  // ← Dans contentGroup, pas fanchart
 
+      // RENDU NORD : Lignée paternelle (S2)
       try {
-          // RENDU NORD : Lignée paternelle (S2)
-          ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 2);
-          renderContext = { target: northGroup, idPrefix: 'N-' };
-          // Pas de centre S1 pour les demi-disques
-          this.renderAncestorsByGeneration();
+        ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 2);
+        renderContext = { target: northGroup, idPrefix: 'N-' };
+        this.renderAncestorsByGeneration();
 
-          // RENDU SUD : Lignée maternelle (S3)
-          ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 3);
-          renderContext = { target: southGroup, idPrefix: 'S-' };
-          this.renderAncestorsByGeneration();
+        // RENDU SUD : Lignée maternelle (S3)
+        ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 3);
+        renderContext = { target: southGroup, idPrefix: 'S-' };
+        this.renderAncestorsByGeneration();
       } finally {
-          // Restaurer l'état (garanti même en cas d'erreur)
-          renderContext = { target: null, idPrefix: '' };
-          ancestor = originalAncestors;
-          current_angle = savedAngle;
+        renderContext = { target: null, idPrefix: '' };
+        ancestor = originalAncestors;
+        current_angle = savedAngle;
       }
 
-      ancestor = originalAncestors;
-      current_angle = savedAngle;
-
-      // Ajouter le centre en mode couple
+      // Ajouter le centre en mode couple (dans contentGroup)
       CircularModeRenderer.renderCoupleCenter();
 
     } else {
@@ -4459,7 +4544,7 @@ const FanchartApp = {
   },
 
   initializeStandardText: function() {
-    const target = renderContext.target || fanchart;
+    const target = renderContext.target || document.getElementById('fanchart-content') || fanchart;
     const standard = document.createElementNS("http://www.w3.org/2000/svg", "text");
     standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz 0123456789 ’'–-?~/";
     standard.setAttribute("id", "standard");
@@ -4539,7 +4624,7 @@ const FanchartApp = {
    * - secteur externe droit : épouse (rayon r1+10 → r2, demi-angle).
    */
   renderAncestorSector: function(sosa, position, person) {
-    const target = renderContext.target || fanchart;
+    const target = renderContext.target || document.getElementById('fanchart-content') || fanchart;
 
     // Créer le groupe famille (basé sur le père) si il n'existe pas encore
     const fatherSosa = SVGGeometry.getFatherSosa(sosa);
@@ -4738,23 +4823,74 @@ const FanchartApp = {
       (event.deltaY < 0 ? +1 : -1));
     }, { passive: false });
 
-    // Drag
-    var drag_state = false;
-    fanchart.onmousedown = function(e) {
-      e.preventDefault();
-      drag_state = true;
+    // Drag (clic gauche) + Rotation (clic droit, mode circulaire seulement)
+    // États des interactions
+    let dragState = false;
+    let rotateState = false;
+    let lastMouseAngle = 0;
+    
+    // Calcule l'angle de la souris par rapport au centre du SVG
+    const getMouseAngle = (e) => {
+      const rect = fanchart.getBoundingClientRect();
+      const svgCenterX = rect.left + rect.width / 2;
+      const svgCenterY = rect.top + rect.height / 2;
+      return Math.atan2(e.clientY - svgCenterY, e.clientX - svgCenterX) * 180 / Math.PI;
     };
-    fanchart.onmouseup = () => drag_state = false;
-    fanchart.onmousemove = (e) => {
-      if (drag_state) {
+    
+    // Applique la rotation au contenu du SVG
+    const applyRotation = () => {
+      const content = fanchart.querySelector('#fanchart-content');
+      if (content) {
+        content.setAttribute('transform', `rotate(${currentRotation} ${center_x} ${center_y})`);
+      }
+    };
+    
+    fanchart.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      if (e.button === 0) {
+        // Clic gauche : déplacement
+        dragState = true;
+      } else if (e.button === 2 && isCircularMode) {
+        // Clic droit : rotation (seulement en mode circulaire)
+        rotateState = true;
+        lastMouseAngle = getMouseAngle(e);
+      }
+    });
+    
+    fanchart.addEventListener('mouseup', (e) => {
+      dragState = false;
+      rotateState = false;
+    });
+    
+    fanchart.addEventListener('mouseleave', () => {
+      dragState = false;
+      rotateState = false;
+    });
+    
+    fanchart.addEventListener('mousemove', (e) => {
+      if (dragState) {
         e.preventDefault();
         this.set_svg_viewbox(
           svg_viewbox_x - Math.round(e.movementX * svg_viewbox_w / this.window_w),
           svg_viewbox_y - Math.round(e.movementY * svg_viewbox_h / this.window_h),
           svg_viewbox_w, svg_viewbox_h
         );
+      } else if (rotateState) {
+        e.preventDefault();
+        const currentMouseAngle = getMouseAngle(e);
+        const deltaAngle = currentMouseAngle - lastMouseAngle;
+        currentRotation = (currentRotation + deltaAngle) % 360;
+        lastMouseAngle = currentMouseAngle;
+        applyRotation();
       }
-    };
+    });
+    
+    // Désactiver le menu contextuel sur le SVG (pour permettre le clic droit)
+    fanchart.addEventListener('contextmenu', (e) => {
+      if (isCircularMode) {
+        e.preventDefault();
+      }
+    });
 
     // Boutons de navigation
     document.getElementById("b-no-buttons").onclick = function() {

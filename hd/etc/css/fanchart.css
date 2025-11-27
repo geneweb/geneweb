@@ -215,7 +215,9 @@ svg .icon {
   transition: opacity 0.2s ease;
 }
 
-svg g[id^="S"]:hover .icon { /* Triangle noir au survol de l'individu */
+svg g[id^="S"]:hover .icon,  /* Triangle noir au survol de l'individu */
+svg g[id^="N-S"]:hover .icon,
+svg g[id^="S-S"]:hover .icon {
   opacity: 1 !important;
   fill: black !important;
 }
@@ -247,47 +249,71 @@ svg .no-link:hover {
    =========================================== */
 
 /* Survol d’une personne */
-svg g[id^="S"]:hover > path.bg { /*arrière-plan légèrement grisé */
+svg g[id^="S"]:hover > path.bg, /*arrière-plan légèrement grisé */
+svg g[id^="N-S"]:hover > path.bg,
+svg g[id^="S-S"]:hover > path.bg {
   fill: rgba(225, 225, 225, 0.3) !important;
 }
 
 svg g[id^="S"]:hover > text, /* texte en gras et noir */
-svg g[id^="S"]:hover > .text {
+svg g[id^="S"]:hover > .text,
+svg g[id^="N-S"]:hover > text,
+svg g[id^="N-S"]:hover > .text,
+svg g[id^="S-S"]:hover > text,
+svg g[id^="S-S"]:hover > .text {
   font-weight: 600 !important;
   fill: black !important;
   font-size: 95% !important;
 }
 
 /* Survol d'un mariage */
-svg g[id^="M"]:hover > path.bg { /* arrière-plan orange léger */
+svg g[id^="M"]:hover > path.bg, /* arrière-plan orange léger */
+svg g[id^="N-M"]:hover > path.bg,
+svg g[id^="S-M"]:hover > path.bg {
   fill: rgba(230, 146, 54, 0.2) !important;
 }
 
 svg g[id^="M"]:hover > text, /* texte gras avec ombre blanche */
-svg g[id^="M"]:hover > .text {
+svg g[id^="M"]:hover > .text,
+svg g[id^="N-M"]:hover > text,
+svg g[id^="N-M"]:hover > .text,
+svg g[id^="S-M"]:hover > text,
+svg g[id^="S-M"]:hover > .text {
   font-weight: 600 !important;
   text-shadow: 0 0 1px white !important;
 }
 
 /* Surlignage programmatique des personnes et mariages (classe .highlight)
    Appliqué par JavaScript lors des interactions avec la liste des lieux */
-svg g[id^="S"] > path.bg.highlight {
+svg g[id^="S"] > path.bg.highlight,
+svg g[id^="N-S"] > path.bg.highlight,
+svg g[id^="S-S"] > path.bg.highlight {
   fill: rgba(225, 225, 225, 0.3) !important;
 }
 
 svg g[id^="S"] .highlight text,
-svg g[id^="S"] .highlight .text {
+svg g[id^="S"] .highlight .text,
+svg g[id^="N-S"] .highlight text,
+svg g[id^="N-S"] .highlight .text,
+svg g[id^="S-S"] .highlight text,
+svg g[id^="S-S"] .highlight .text {
   font-weight: 600 !important;
   fill: black !important;
   font-size: 95% !important;
 }
 
-svg g[id^="M"] > path.bg.highlight {
+svg g[id^="M"] > path.bg.highlight,
+svg g[id^="N-M"] > path.bg.highlight,
+svg g[id^="S-M"] > path.bg.highlight {
   fill: rgba(230, 146, 54, 0.2) !important;
 }
 
 svg g[id^="M"] .highlight text,
-svg g[id^="M"] .highlight .text {
+svg g[id^="M"] .highlight .text,
+svg g[id^="N-M"] .highlight text,
+svg g[id^="N-M"] .highlight .text,
+svg g[id^="S-M"] .highlight text,
+svg g[id^="S-M"] .highlight .text {
   font-weight: 600 !important;
   fill: black !important;
   text-shadow: 0 0 1px white !important;
@@ -312,7 +338,11 @@ svg g:hover > .text {
 
 /* Secteurs de personnes : léger agrandissement de la police au survol */
 svg g[id^="S"]:hover > text,
-svg g[id^="S"]:hover > .text {
+svg g[id^="S"]:hover > .text,
+svg g[id^="N-S"]:hover > text,
+svg g[id^="N-S"]:hover > .text,
+svg g[id^="S-S"]:hover > text,
+svg g[id^="S-S"]:hover > .text {
   font-size: 95% !important;
 }
 
@@ -355,7 +385,9 @@ svg .event-highlight-baptism {
   fill: rgba(199, 224, 201, 0.4) !important;
 }
 
-svg g[id^="M"] .event-highlight-marriage {
+svg g[id^="M"] .event-highlight-marriage,
+svg g[id^="N-M"] .event-highlight-marriage,
+svg g[id^="S-M"] .event-highlight-marriage {
   fill: rgba(230, 146, 54, 0.3) !important;
 }
 
@@ -368,7 +400,9 @@ svg .event-highlight-burial {
 }
 
 /* Accélération GPU pour les transformations fréquentes */
-svg g[id^="G"] {
+svg g[id^="G"],
+svg g[id^="N-G"],
+svg g[id^="S-G"] {
   will-change: transform;
   transform-origin: center;
 }
