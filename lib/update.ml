@@ -17,6 +17,11 @@ type update_error =
   | UERR_locked_base
   | UERR_illegal_access_update of Def.access * Def.access
   | UERR_not_plain_text of Adef.escaped_string
+  | UERR_invalid_occurrence_number of {
+      first_name : string;
+      last_name : string;
+      occurrence_number : int;
+    }
 
 let not_plain_text_error s = UERR_not_plain_text (Util.escape_html s)
 
@@ -405,6 +410,14 @@ let string_of_error conf =
       ("not_plain_text_error" |> Util.transl conf |> Utf8.capitalize_fst)
       ^<^ Util.transl conf ":" ^<^ " "
       ^<^ (s :> Adef.safe_string)
+  | UERR_invalid_occurrence_number { first_name; last_name; occurrence_number }
+    ->
+      let open Def in
+      ("input_error_invalid_occurrence_number" |> Util.transl conf
+     |> Utf8.capitalize_fst)
+      ^<^ Util.transl conf ":" ^<^ " "
+      ^<^ Adef.safe
+            (Adef.as_string @@ fso first_name last_name occurrence_number)
 
 let print_err_unknown conf (f, s, o) =
   let err = UERR_unknow_person (f, s, o) in
@@ -1115,6 +1128,17 @@ let check_illegal_access_update base person =
       then Some (UERR_illegal_access_update (previous_access, person.access))
       else None
   | None -> None
+
+let check_occurrence_number ~first_name ~last_name occurrence_number =
+  Ext_option.return_if
+    (not @@ Occurrence_number.is_valid occurrence_number)
+    (fun () ->
+      UERR_invalid_occurrence_number
+        { first_name; last_name; occurrence_number })
+
+let check_person_occurrence_number person =
+  check_occurrence_number ~first_name:person.Def.first_name
+    ~last_name:person.Def.surname person.Def.occ
 
 let check_missing_name base p =
   let quest f g =
