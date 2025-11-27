@@ -528,6 +528,30 @@ let fix_person_key base =
       else false
     else false
 
+let fix_invalid_occurrence_number ~report ~base ~person =
+  let current_occurrence_number = Gwdb.get_occ person in
+  let is_invalid_occurrence_number =
+    not @@ Occurrence_number.is_valid current_occurrence_number
+  in
+  let () =
+    if is_invalid_occurrence_number then (
+      let new_occurrence_number =
+        Gutil.find_free_occ base
+          (Gwdb.p_first_name base person)
+          (Gwdb.p_surname base person)
+      in
+      let person_id = Gwdb.get_iper person in
+      Gwdb.patch_person base person_id
+        { (Gwdb.gen_person_of_person person) with occ = new_occurrence_number };
+      Option.iter
+        (fun report ->
+          report
+            (Fix_UpdatedOcc
+               (person_id, current_occurrence_number, new_occurrence_number)))
+        report)
+  in
+  is_invalid_occurrence_number
+
 let perform_fixes ~(report : (patch -> unit) option) ~progress ~base
     ~(person_fixes : person_fix list) ~(family_fixes : family_fix list) =
   if person_fixes = [] && family_fixes = [] then 0
