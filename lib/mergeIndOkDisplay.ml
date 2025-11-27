@@ -88,6 +88,7 @@ let check_person_before_merge conf base previous_p1 previous_p2 new_p =
   let bind_none x f = match x with Some _ -> x | None -> f () in
   let ( >>= ) = bind_none in
   Update.check_missing_name base new_p >>= fun () ->
+  Update.check_person_occurrence_number new_p >>= fun () ->
   Update.check_missing_witnesses_names conf
     (fun e -> e.Def.epers_witnesses)
     new_p.Def.pevents
