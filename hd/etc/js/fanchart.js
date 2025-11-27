@@ -175,25 +175,6 @@ const LayoutCalculator = {
 
     // Ajouter des marges (padding, scrollbar, etc.)
     return maxWidth + 40; // 20px de chaque côté pour le confort
-  },
-
-  /**
-   * Calcule la largeur maximale disponible pour le fanchart
-   * en tenant compte du contenu réel
-   */
-  calculateMaxFanchartWidth: function() {
-    const windowWidth = window.innerWidth;
-    const placesListWidth = this.calculatePlacesListWidth();
-
-    // Pour le mode 359° (très carré), ajouter une marge à gauche
-    const isSquareChart = (current_angle >= 310 || isCircularMode);
-    const leftMargin = isSquareChart ? 150 : 0; // Espace pour les contrôles
-
-    // Calculer l'espace disponible
-    const availableWidth = windowWidth - placesListWidth - leftMargin;
-
-    // S'assurer qu'on utilise au moins 50% de l'écran pour le graphique
-    return Math.max(availableWidth, windowWidth * 0.5);
   }
 };
 
@@ -4296,30 +4277,36 @@ const FanchartApp = {
 
     // Dimensions de la fenêtre avec limitation pour la liste des lieux
 
-    this.window_h = window.innerHeight;
-    const maxAllowedWidth = window.innerWidth * 0.85; // 85% max de la largeur
-    const calculatedWidth = Math.round(this.window_h * svg_w / svg_h);
-    this.window_w = Math.min(calculatedWidth, maxAllowedWidth);
-
-    // Si on a dû réduire la largeur, ajuster la hauteur en conséquence
-    if (this.window_w < calculatedWidth) {
-      this.window_h = Math.round(this.window_w * svg_h / svg_w);
-    }
-
-    // Ajuster la position pour les modes carrés (éviter l'empiètement)
-    if (current_angle >= 310 || isCircularMode) {
-      fanchart.style.marginLeft = '120px';
+    // 1. D'abord calculer et appliquer la largeur du panneau des lieux
+    const actualListWidth = LayoutCalculator.calculatePlacesListWidth();
+    root.style.setProperty('--fc-tool-size', actualListWidth + 'px');
+    
+    // 2. Déterminer la marge gauche selon le mode
+    const isSquareChart = (current_angle >= 310 || isCircularMode);
+    const leftMargin = isSquareChart ? 120 : 0;
+    fanchart.style.marginLeft = leftMargin + 'px';
+    
+    // 3. Calculer l'espace réellement disponible pour le SVG
+    const availableWidth = window.innerWidth - actualListWidth - leftMargin - 20; // 20px marge sécurité
+    const availableHeight = window.innerHeight;
+    
+    // 4. Calculer les dimensions en préservant le ratio du SVG
+    const svgRatio = svg_w / svg_h;
+    const screenRatio = availableWidth / availableHeight;
+    
+    if (svgRatio > screenRatio) {
+      // Limité par la largeur
+      this.window_w = availableWidth;
+      this.window_h = Math.round(availableWidth / svgRatio);
     } else {
-      fanchart.style.marginLeft = '0';
+      // Limité par la hauteur
+      this.window_h = availableHeight;
+      this.window_w = Math.round(availableHeight * svgRatio);
     }
-
-    // Configurer le SVG
-    fanchart.setAttribute("height", this.window_h);
+    
+    // 5. Configurer le SVG
     fanchart.setAttribute("width", this.window_w);
-
-    // Mettre à jour la variable CSS pour la largeur de la liste
-     const actualListWidth = LayoutCalculator.calculatePlacesListWidth();
-     root.style.setProperty('--fc-tool-size', actualListWidth + 'px');
+    fanchart.setAttribute("height", this.window_h);
 
     // Initialisation de la viewbox
     svg_viewbox_x = 0;
