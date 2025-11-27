@@ -2110,110 +2110,49 @@ const PlacesHighlighter = {
 
 // ========== Module de rendu circulaire ==========
 const CircularModeRenderer = {
-  // Active/désactive le mode circulaire
-  toggle: function() {
-    isCircularMode = !isCircularMode;
-
-    const btn = document.getElementById('b-circular-mode');
-    if (btn) {
-      btn.classList.toggle('active', isCircularMode);
-      btn.title = isCircularMode ? 'Revenir au mode éventail' : 'Mode circulaire (360°)';
-    }
-
-    // Désactiver/activer les boutons d'angle au lieu de les masquer
-    CONFIG.available_angles.forEach(angle => {
-      const angleBtn = document.getElementById(`b-angle-${angle}`);
-      if (angleBtn) {
-        angleBtn.classList.toggle('disabled', isCircularMode);
-        angleBtn.disabled = isCircularMode;
-      }
-    });
-
-    // Réinitialiser la rotation quand on quitte le mode circulaire
-    if (!isCircularMode) {
-      currentRotation = 0;
-    }
-
-    // Mettre à jour l'URL
-    URLManager.updateCurrentURL();
-
-    // Redessiner
-    FanchartApp.calculateDimensions();
-    FanchartApp.reRenderWithCurrentGenerations();
-  },
-
-  /**
-   * Rend le centre en mode couple (S2 au nord, S3 au sud)
-   */
+  // Rend le centre en mode couple (S2 au nord, S3 au sud)
   renderCoupleCenter: function() {
     const centerGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     centerGroup.setAttribute("id", "couple-center");
     const contentGroup = document.getElementById('fanchart-content') || fanchart;
     contentGroup.appendChild(centerGroup);
 
-    const s2 = ancestor["S2"]; // Père
-    const s3 = ancestor["S3"]; // Mère
+    const s2 = ancestor["S2"];
+    const s3 = ancestor["S3"];
     const r = CONFIG.a_r[0];
 
-    // Groupes individuels pour chaque parent,
-    // facilite la gestion des événements et du surlignage —
-    // Groupe pour le père (demi-cercle nord)
+    // Père (nord)
     if (s2) {
-        const s2Group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        s2Group.setAttribute("id", "couple-s2");
-        centerGroup.appendChild(s2Group);
+      const s2Group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      s2Group.setAttribute("id", "N-S2");
+      centerGroup.appendChild(s2Group);
+      SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2, { type: 'person', isBackground: true });
+      this.renderCenterText(s2Group, s2, center_x, center_y - r/2, false);
+      s2.sosa = 2;
+      SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2, { type: 'person' });
+    }
 
-        // Secteur de fond pour le père (demi-cercle NORD = haut)
-        SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2,
-          { type: 'person', isBackground: true });
+    // Mère (sud)
+    if (s3) {
+      const s3Group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      s3Group.setAttribute("id", "S-S3");
+      centerGroup.appendChild(s3Group);
+      SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3, { type: 'person', isBackground: true });
+      this.renderCenterText(s3Group, s3, center_x, center_y + r/2, true);
+      s3.sosa = 3;
+      SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3, { type: 'person' });
+    }
 
-        // Texte centré dans le demi-cercle nord
-        const text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text2.setAttribute("x", center_x);
-        text2.setAttribute("y", center_y - r/3);
-        text2.setAttribute("text-anchor", "middle");
-        text2.setAttribute("class", "couple-text");
-        text2.innerHTML = `<tspan>${s2.fn}</tspan><tspan x="${center_x}" dy="15">${s2.sn}</tspan>`;
-        s2Group.appendChild(text2);
+    // Séparateur
+    const sep = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    sep.setAttribute("x1", center_x - r);
+    sep.setAttribute("y1", center_y);
+    sep.setAttribute("x2", center_x + r);
+    sep.setAttribute("y2", center_y);
+    sep.setAttribute("stroke", "#ccc");
+    sep.setAttribute("stroke-width", "1");
+    centerGroup.appendChild(sep);
 
-        // Secteur interactif (doit être en dernier pour capturer les événements)
-        SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2, { type: 'person' });
-      }
-
-      // Groupe pour la mère (demi-cercle sud)
-      if (s3) {
-        const s3Group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        s3Group.setAttribute("id", "couple-s3");
-        centerGroup.appendChild(s3Group);
-
-        // Secteur de fond pour la mère (demi-cercle SUD = bas)
-        SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3,
-          { type: 'person', isBackground: true });
-
-        // Texte centré dans le demi-cercle sud
-        const text3 = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text3.setAttribute("x", center_x);
-        text3.setAttribute("y", center_y + r/3);
-        text3.setAttribute("text-anchor", "middle");
-        text3.setAttribute("class", "couple-text");
-                text3.setAttribute("transform", `rotate(180, ${center_x}, ${center_y + r/3})`); // Rotation de 180° autour du centre du texte
-        text3.innerHTML = `<tspan>${s3.fn}</tspan><tspan x="${center_x}" dy="15">${s3.sn}</tspan>`;
-        s3Group.appendChild(text3);
-
-        // Secteur interactif
-        SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3, { type: 'person' });
-      }
-
-      // Ligne de séparation élégante
-      const separator = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      separator.setAttribute("x1", center_x - r);
-      separator.setAttribute("y1", center_y);
-      separator.setAttribute("x2", center_x + r);
-      separator.setAttribute("y2", center_y);
-      separator.setAttribute("stroke", "#ccc");
-      separator.setAttribute("stroke-width", "1");
-      separator.setAttribute("stroke-dasharray", "3,3"); // Ligne pointillée pour plus d'élégance
-      centerGroup.appendChild(separator);
       /*
       // Optionnel : Ajouter un petit texte pour le S1 au centre
       if (ancestor["S1"]) {
@@ -2232,10 +2171,46 @@ const CircularModeRenderer = {
       }*/
     },
 
+  renderCenterText: function(group, person, x, y, inverted) {
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", x);
+    text.setAttribute("y", y);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    
+    const fn = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+    fn.setAttribute("x", x);
+    fn.setAttribute("dy", "-0.2em");
+    fn.setAttribute("class", "couple-text");
+    fn.textContent = person.fn;
+    
+    const sn = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+    sn.setAttribute("x", x);
+    sn.setAttribute("dy", "1em");
+    sn.setAttribute("class", "couple-sn");
+    sn.textContent = person.sn;
+    
+    const dates = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+    dates.setAttribute("x", x);
+    dates.setAttribute("dy", "1.1em");
+    dates.setAttribute("class", "couple-dates");
+    dates.textContent = person.dates || '';
+    
+    text.appendChild(fn);
+    text.appendChild(sn);
+    text.appendChild(dates);
+    
+    if (inverted) {
+      text.setAttribute("transform", `rotate(180, ${x}, ${y})`);
+    }
+    
+    group.appendChild(text);
+  },
+
   /**
    * Décale une branche d'ancêtres pour qu'un parent devienne S1
    */
-shiftAncestorsForParent: function(originalAncestors, parentSosa) {
+  shiftAncestorsForParent: function(originalAncestors, parentSosa) {
     const shifted = {};
 
     // Le parent devient S1 pour le rendu
@@ -3264,7 +3239,7 @@ const ColorManager = {
       }
     });
 
-    document.getElementById("b-circular-mode").onclick = () => CircularModeRenderer.toggle();
+    document.getElementById("b-angle-360").onclick = () => AngleManager.setAngle(360);
 
     // Bouton colorisation lieux
     document.getElementById("b-places-colorise").onclick = function() {
@@ -3431,34 +3406,45 @@ const AngleManager = {
   },
 
   // Changer l'angle et redessiner
-  setAngle: function(newAngle) {
-    if (!CONFIG.available_angles.includes(newAngle)) {
-      console.warn(`Angle ${newAngle} non supporté`);
-      return;
+  setAngle: function(angle) {
+    // Gérer le mode circulaire automatiquement
+    const wasCircular = isCircularMode;
+    
+    if (angle === 360) {
+      isCircularMode = true;
+      current_angle = 180;  // Le mode 360 utilise deux demi-cercles de 180°
+      currentRotation = 0;  // Réinitialiser la rotation
+    } else {
+      isCircularMode = false;
+      current_angle = angle;
+      if (wasCircular) {
+        currentRotation = 0;  // Réinitialiser si on quitte le mode circulaire
+      }
     }
 
-    if (newAngle === current_angle) {
-      return;
-    }
-
-    current_angle = newAngle;
-
-    // Mettre à jour l'URL avec le système existant
+    this.updateAngleButtons();
     URLManager.updateCurrentURL();
 
-    // Mettre à jour l'interface
-    this.updateAngleButtons();
-
-    // Redessiner le graphique
+    // Recalculer complètement
+    FanchartApp.window_w = window.innerWidth;
+    FanchartApp.window_h = window.innerHeight;
+    FanchartApp.calculateDimensions();
     FanchartApp.reRenderWithCurrentGenerations();
+    // Force le reset du viewBox après changement de mode
+    FanchartApp.fitScreen();
   },
 
   // Mettre à jour l'état visuel des boutons
   updateAngleButtons: function() {
-    CONFIG.available_angles.forEach(angle => {
+    // Désactiver tous les boutons d'angle
+    [180, 220, 359, 360].forEach(angle => {
       const btn = document.getElementById(`b-angle-${angle}`);
       if (btn) {
-        btn.classList.toggle('active', angle === current_angle);
+        // Actif si : c'est 360 et on est en mode circulaire, OU c'est l'angle courant hors mode circulaire
+        const isActive = (angle === 360) 
+          ? isCircularMode 
+          : (!isCircularMode && current_angle === angle);
+        btn.classList.toggle('active', isActive);
       }
     });
   },
@@ -4312,9 +4298,16 @@ const FanchartApp = {
     }
 
     // Calculer max_r avec validation
-    max_r = 0;
-    for (var i = 0; i < max_gen+1 && i < CONFIG.a_r.length; i++) {
-      max_r += CONFIG.a_r[i];
+    let max_r = 0;
+    let rings = max_gen + 1;
+
+    // En mode circulaire, on a un anneau de moins car les parents sont au centre
+    if (isCircularMode) {
+      rings += 1;
+    }
+    
+    for (let i = 0; i < rings; i++) {
+      max_r += CONFIG.a_r[i] || CONFIG.a_r[CONFIG.a_r.length - 1];
     }
 
     if (isNaN(max_r) || max_r <= 0) {
@@ -4326,12 +4319,13 @@ const FanchartApp = {
     const margin = CONFIG.svg_margin;
 
     if (isCircularMode) {
-      // Mode circulaire : même largeur que le 180°, hauteur adaptée pour demi-cercle visible
-      // L'utilisateur peut faire pivoter pour voir l'autre moitié
-      svg_w = 2 * (max_r + margin);
-      svg_h = max_r + CONFIG.a_r[0] + 2 * margin;
-      center_x = svg_w / 2;
-      center_y = max_r + margin;
+      // Mode circulaire : même logique que le 359° mais avec un cercle complet
+      // Le viewBox est carré, mais on le positionne comme un éventail large
+      const size = 2 * (max_r + margin);
+      svg_w = size;
+      svg_h = size;
+      center_x = size / 2;
+      center_y = size / 2;
     } else {
       // Calcul standard pour tous les angles
       center_x = max_r + margin;

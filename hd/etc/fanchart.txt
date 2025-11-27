@@ -174,7 +174,7 @@
   <div class="control-section">
     <div class="section-title">Ouverture</div>
     <div class="btn-group-fanchart">
-      <button id="b-angle-180" class="btn-fanchart" title="Vue en demi-cercle (180°)">180</button>
+      <button id="b-angle-180" class="btn-fanchart" title="Vue en demi-disque (180°)">180̣</button>
       <button id="b-angle-220" class="btn-fanchart active" title="Vue standard (220°)">220</button>
       <button id="b-angle-359" class="btn-fanchart" title="Vue complète (359°)">359</button>
     </div>
@@ -183,7 +183,7 @@
   <div class="control-section">
     <div class="section-title">Mode</div>
     <div class="btn-group-fanchart">
-      <button id="b-circular-mode" class="btn-fanchart" title="Mode circulaire (360°)">360</button>
+      <button id="b-angle-360" class="btn-fanchart" title="Mode circulaire : deux demi-disques">360</button>
     </div>
   </div>
 

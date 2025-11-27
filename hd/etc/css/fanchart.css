@@ -208,6 +208,19 @@ textPath {
   cursor: pointer;
 }
 
+/* Centre du couple en mode circulaire */
+#couple-center .couple-fn {
+  font-size: 10px;
+}
+#couple-center .couple-sn {
+  font-size: 14px;
+  font-weight: 600 !important;
+  fill: black !important;
+}
+#couple-center .couple-dates {
+  font-size: 11px;
+  }
+
 /* Indicateurs de navigation (triangles et croix) */
 svg .icon {
   fill: transparent !important;
