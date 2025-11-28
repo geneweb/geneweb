@@ -958,8 +958,9 @@ let parse_child state str surname sex csrc cbp l =
 
 (** Parse relation type [Def.gen_relation] with a person outside of family block
     (foster parents, god parent, etc.). *)
-let get_relation state str =
+let get_relation ~filename state str =
   let ( >>= ) = Result.bind in
+  let ensure_end_of_line fields = ensure_end_of_line ~filename ~state fields in
   function
   | "-" :: x :: l -> (
       (match x with
@@ -974,39 +975,39 @@ let get_relation state str =
         parse_parent state str l >>= fun (fk, _, l) ->
         (match l with "+" :: l -> Ok l | _ -> Error str) >>= fun l ->
         parse_parent state str l >>= fun (mk, _, l) ->
-        if l <> [] then Error str
-        else
-          Ok
+        Result.map
+          (fun () ->
             {
               Def.r_type = rtyp;
               r_fath = Some fk;
               r_moth = Some mk;
               r_sources = "";
-            }
+            })
+          (ensure_end_of_line l)
       else
         match l with
         | "fath:" :: l ->
             parse_parent state str l >>= fun (fk, _, l) ->
-            if l <> [] then Error str
-            else
-              Ok
+            Result.map
+              (fun () ->
                 {
                   Def.r_type = rtyp;
                   r_fath = Some fk;
                   r_moth = None;
                   r_sources = "";
-                }
+                })
+              (ensure_end_of_line l)
         | "moth:" :: l ->
             parse_parent state str l >>= fun (mk, _, l) ->
-            if l <> [] then Error str
-            else
-              Ok
+            Result.map
+              (fun () ->
                 {
                   Def.r_type = rtyp;
                   r_fath = None;
                   r_moth = Some mk;
                   r_sources = "";
-                }
+                })
+              (ensure_end_of_line l)
         | _ -> Error str)
   | _ -> Error str
 
@@ -1086,7 +1087,7 @@ let loop_comment state = aux_loop_note state "comm"
 (** Parse witnesses across the lines and returns list of [(wit,wsex,wk,wnote)]
     where wit is a witness definition/reference, [wsex] is a sex of witness
     , [wk] is a kind of witness relationship to the family, [wnote] is a witness note. *)
-let loop_witn state line ic =
+let loop_witn ~filename state line ic =
   let rec loop_witn acc str =
     let ( >>= ) = Result.bind in
     match fields str with
@@ -1100,11 +1101,10 @@ let loop_witn state line ic =
         in
         let wkind, l = get_event_witness_kind l in
         parse_parent state str l >>= fun (wit, _, l) ->
-        if l <> [] then Error str
-        else
-          (* read witness note which starts on a new line *)
-          let wnote, str = loop_witness_note state (input_a_line state ic) ic in
-          loop_witn ((wit, sex, wkind, wnote) :: acc) str
+        ensure_end_of_line ~filename ~state l >>= fun () ->
+        (* read witness note which starts on a new line *)
+        let wnote, str = loop_witness_note state (input_a_line state ic) ic in
+        loop_witn ((wit, sex, wkind, wnote) :: acc) str
     | _ -> Ok (List.rev acc, str)
   in
   loop_witn [] line
@@ -1211,7 +1211,7 @@ let read_family state ic fname =
                   in
                   ensure_end_of_line l >>= fun () ->
                   (* On récupère les témoins *)
-                  loop_witn state (input_a_line state ic) ic
+                  loop_witn ~filename:fname state (input_a_line state ic) ic
                   >>= fun (witn, line) ->
                   (* On récupère les notes *)
                   let notes, line = loop_note state line ic in
@@ -1353,7 +1353,7 @@ let read_family state ic fname =
                     loop (input_a_line state ic) >>= fun relations ->
                     Result.map
                       (fun relation -> relation :: relations)
-                      (get_relation state x (fields x))
+                      (get_relation ~filename:fname state x (fields x))
               in
               loop (input_a_line state ic)
             with End_of_file -> Error "missing end rel"
@@ -1386,7 +1386,8 @@ let read_family state ic fname =
               in
               ensure_end_of_line l >>= fun () ->
               (* On récupère les témoins *)
-              loop_witn state (input_a_line state ic) ic >>= fun (witn, line) ->
+              loop_witn ~filename:fname state (input_a_line state ic) ic
+              >>= fun (witn, line) ->
               (* On récupère les notes *)
               let notes, line = loop_note state line ic in
               let evt = (name, date, place, cause, src, notes, witn) in
