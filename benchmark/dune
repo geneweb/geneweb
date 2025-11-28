@@ -1,8 +1,8 @@
 (executable
-  (name bench)
-  (libraries unix geneweb geneweb.sosa benchmark))
+ (name bench)
+ (libraries unix geneweb geneweb.sosa benchmark))
 
 (rule
-  (action (run ./bench.exe) )
-  (alias runbench)
-)
+ (action
+  (run ./bench.exe))
+ (alias runbench))

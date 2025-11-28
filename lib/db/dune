@@ -1,11 +1,4 @@
 (library
  (name geneweb_db)
  (public_name geneweb.db)
- (libraries
-   unix
-   re
-   fmt
-   logs
-   geneweb.def
-   geneweb.ancient
-   geneweb.util))
+ (libraries unix re fmt logs geneweb.def geneweb.ancient geneweb.util))
