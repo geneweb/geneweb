@@ -3,6 +3,7 @@
  (name gw_ancient)
  (libraries
   (select gw_ancient.ml from
-    (%%%ANCIENT_LIB%%% -> %%%ANCIENT_FILE%%%)
+    (ancient -> gw_ancient.wrapped.ml)
+    ( -> gw_ancient.dum.ml)
    ))
 )

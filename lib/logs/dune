@@ -1,0 +1,7 @@
+(library
+  (name geneweb_logs)
+  (public_name geneweb.logs)
+  (libraries
+    fmt
+    unix
+    geneweb_compat))
