@@ -52,12 +52,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, macos-26, windows-2022]
-        ocaml-compiler: [4.14.2, 5.4.0]
+        ocaml-compiler: [4.10.2, 4.14.2, 5.4.0]
         setup-version: [v3]
-        include:
-          - os: ubuntu-22.04
-            ocaml-compiler: 4.08.1
-            setup-version: v2
 
     outputs:
       total_matrix_jobs: ${{ strategy.job-total || 0 }}
