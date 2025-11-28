@@ -1,4 +1,8 @@
-type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
+type key = State.Person_reference.t = {
+  pk_first_name : string;
+  pk_surname : string;
+  pk_occ : int;
+}
 (** Key to refer a person's definition *)
 
 (** Represents a person in .gw file. It could be either reference to a person
@@ -7,6 +11,13 @@ type somebody =
   | Undefined of key  (** Reference to person *)
   | Defined of (Gwdb.iper, Gwdb.iper, string) Def.gen_person
       (** Person's definition *)
+
+let person_reference_from_person (person : _ Def.gen_person) =
+  {
+    pk_first_name = person.first_name;
+    pk_surname = person.surname;
+    pk_occ = person.occ;
+  }
 
 type 'a assumption = Weak of 'a | Strong of 'a
 
@@ -418,19 +429,6 @@ let get_optional_sexe = function
   | "f" :: l -> (Female, l)
   | l -> (Neuter, l)
 
-(** Parses int that starts at the position [i] inside [x].
-    Raises [Not_found] if integer isn't found. *)
-let make_int x =
-  let rec loop found n i =
-    if i = String.length x then if found then n else raise Not_found
-    else
-      match x.[i] with
-      | '0' .. '9' as c ->
-          loop true ((10 * n) + Char.code c - Char.code '0') (succ i)
-      | _ -> raise Not_found
-  in
-  loop false 0
-
 (** Parses person's first name and occurence number.
     Occurence number is 0 if not present. *)
 let get_fst_name str l =
@@ -449,8 +447,18 @@ let get_fst_name str l =
           let x, occ =
             match String.rindex_opt x '.' with
             | Some i -> (
-                try (String.sub x 0 i, make_int x (succ i))
-                with Not_found -> (x, 0))
+                let s = String.sub x (succ i) (String.length x - i - 1) in
+
+                match Occurrence_number.from_string s with
+                | Ok occurrence_number -> (String.sub x 0 i, occurrence_number)
+                | Error `Not_a_decimal -> (x, 0)
+                | Error `Negative_decimal ->
+                    let occurrence_number =
+                      match int_of_string_opt s with
+                      | None -> assert false
+                      | Some i -> i
+                    in
+                    (String.sub x 0 i, occurrence_number))
             | None -> (x, 0)
           in
           Ok (x, occ, l')
@@ -904,6 +912,7 @@ let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
       pevents = u.pevents;
     }
   in
+  State.add_person_reference state (person_reference_from_person u);
   (u, l)
 
 (** Parses the line containing a parent and returns [(somebody,np,rest)]. [somebody] is either [Defined p] if
@@ -925,9 +934,10 @@ let parse_parent state str l =
           | s :: _ when s.[0] = '+' -> false
           | _ -> true
       in
-      if not defined then
+      if not defined then (
         let key = { pk_first_name = pp; pk_surname = np; pk_occ = op } in
-        (Undefined key, np, l)
+        State.add_person_reference state key;
+        (Undefined key, np, l))
       else
         let u = create_person () in
         let u, l = set_infos state pp np op u.sex "" "" str u l in
@@ -1320,6 +1330,7 @@ let read_family state ic fname =
           let key =
             { pk_first_name = first_name; pk_surname = surname; pk_occ = occ }
           in
+          State.add_person_reference state key;
           Ok (F_some (Notes (key, notes), read_line state ic))
       | Some (str, _) -> Error str
       | None -> Error "end of file")
@@ -1406,6 +1417,55 @@ let read_family state ic fname =
   (* End of the file *)
   | None -> Ok F_none
 
+let fix_invalid_person_references ~(state : State.t) data_element =
+  let fix_person person =
+    let person_reference =
+      person |> person_reference_from_person
+      |> State.get_fixed_person_reference state
+    in
+    { person with occ = person_reference.pk_occ }
+  in
+  let fix_somebody = function
+    | Undefined person_reference ->
+        Undefined (State.get_fixed_person_reference state person_reference)
+    | Defined person -> Defined (fix_person person)
+  in
+  let fix_event (name, date, place, cause, source, notes, witnesses) =
+    ( name,
+      date,
+      place,
+      cause,
+      source,
+      notes,
+      List.map
+        (fun (witness, sex, kind, note) ->
+          (fix_somebody witness, sex, kind, note))
+        witnesses )
+  in
+  match data_element with
+  | Family (parents, father_sex, mother_sex, witnesses, events, family, children)
+    ->
+      Family
+        ( Futil.map_couple_p fix_somebody parents,
+          father_sex,
+          mother_sex,
+          List.map (fun (witness, sex) -> (fix_somebody witness, sex)) witnesses,
+          List.map fix_event events,
+          Futil.map_family_ps fix_person Fun.id (fun ?format:_ -> Fun.id) family,
+          Futil.map_descend_p fix_person children )
+  | Relations (somebody, sex, relations) ->
+      Relations
+        ( fix_somebody somebody,
+          sex,
+          List.map
+            (Futil.map_relation_ps fix_somebody (fun ?format:_ -> Fun.id))
+            relations )
+  | Pevent (somebody, sex, events) ->
+      Pevent (fix_somebody somebody, sex, List.map fix_event events)
+  | Notes (person_reference, note) ->
+      Notes (State.get_fixed_person_reference state person_reference, note)
+  | (Bnotes _ | Wnotes _) as data_element -> data_element
+
 (** Compile .gw file and save result to corresponding .gwo *)
 let comp_families state x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
@@ -1438,7 +1498,11 @@ let comp_families state x =
      in
      List.iter
        (fun data_element -> output_value oc (data_element : gw_syntax))
-       (List.rev data_elements);
+       (List.rev_map
+          (if State.all_person_references_are_valid state then Fun.id
+          else fix_invalid_person_references ~state)
+          data_elements);
+     assert (State.all_person_references_are_valid state);
      close_in ic
    with e ->
      close_out oc;

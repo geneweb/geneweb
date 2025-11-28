@@ -1,6 +1,10 @@
 (* Copyright (c) 2007-2008 INRIA *)
 
-type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
+type key = State.Person_reference.t = {
+  pk_first_name : string;
+  pk_surname : string;
+  pk_occ : int;
+}
 (** Key to refer a person's definition *)
 
 (** Represents a person in .gw file. It could be either reference to a person
