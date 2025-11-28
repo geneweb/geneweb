@@ -1,8 +1,0 @@
-(executable
-  (package geneweb)
-  (name ged2gwb)
-  (public_name geneweb.ged2gwb)
-  (modules ged2gwb)
-  (preprocess (action (run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %{input-file})))
-  (libraries camlp5 unix str geneweb_db geneweb)
-)
