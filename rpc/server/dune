@@ -1,23 +1,22 @@
 (executable
-  (package geneweb-rpc)
-  (name server)
-  (public_name geneweb-rpc.server)
-  (libraries
-    geneweb_rpc
-    geneweb_search
-    geneweb_util
-    lwt
-    cmdliner
-    httpun
-    httpun-lwt-unix
-    httpun-ws
-    fmt
-    digestif
-    tls
-    logs
-    logs.fmt
-    logs.lwt
-    yojson)
-  (preprocess
-    (pps
-      lwt_ppx)))
+ (package geneweb-rpc)
+ (name server)
+ (public_name geneweb-rpc.server)
+ (libraries
+  geneweb_rpc
+  geneweb_search
+  geneweb_util
+  lwt
+  cmdliner
+  httpun
+  httpun-lwt-unix
+  httpun-ws
+  fmt
+  digestif
+  tls
+  logs
+  logs.fmt
+  logs.lwt
+  yojson)
+ (preprocess
+  (pps lwt_ppx)))
