@@ -1,7 +1,6 @@
 (executable
-  (package geneweb)
-  (name gwgc)
-  (public_name geneweb.gwgc)
-  (modules gwgc)
-  (libraries unix str geneweb)
-)
+ (package geneweb)
+ (name gwgc)
+ (public_name geneweb.gwgc)
+ (modules gwgc)
+ (libraries unix str geneweb))

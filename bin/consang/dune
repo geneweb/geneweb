@@ -1,6 +1,6 @@
 (executable
-  (package geneweb)
-  (name consang)
-  (public_name geneweb.consang)
-  (modules consang)
-  (libraries unix geneweb logs logs.fmt logs-syslog))
+ (package geneweb)
+ (name consang)
+ (public_name geneweb.consang)
+ (modules consang)
+ (libraries unix geneweb logs logs.fmt logs-syslog))

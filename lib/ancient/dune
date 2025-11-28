@@ -2,8 +2,8 @@
  (public_name geneweb.ancient)
  (name gw_ancient)
  (libraries
-  (select gw_ancient.ml from
-    (ancient -> gw_ancient.wrapped.ml)
-    ( -> gw_ancient.dum.ml)
-   ))
-)
+  (select
+   gw_ancient.ml
+   from
+   (ancient -> gw_ancient.wrapped.ml)
+   (-> gw_ancient.dum.ml))))

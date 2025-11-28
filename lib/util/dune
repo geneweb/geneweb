@@ -3,17 +3,15 @@
  (public_name geneweb.util)
  (wrapped false)
  (libraries
-   calendars
-   camlzip
-   stdlib-shims
-   unidecode
-   geneweb_def
-   geneweb_compat
-   re
-   unix
-   uucp
-   uunf
-   uutf
-   digestif
- )
-)
+  calendars
+  camlzip
+  stdlib-shims
+  unidecode
+  geneweb_def
+  geneweb_compat
+  re
+  unix
+  uucp
+  uunf
+  uutf
+  digestif))
