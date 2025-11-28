@@ -39,33 +39,7 @@ lib/version.ml:
 	@printf 'Generating $@… Done.\n'
 .PHONY: install lib/version.ml
 
-# Patch/unpatch files for campl5 >= 8.03
-CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
-CAMLP5_MAJOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 1)
-CAMLP5_MINOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 2)
-
-patch_files:
-	@if [ '$(CAMLP5_VERSION)' != 0 ] && [ $(CAMLP5_MAJOR) -eq 8 ] && [ $(CAMLP5_MINOR) -ge 3 ]; then \
-	  printf "\nPatching bin/ged2gwb/dune and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
-	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune; \
-	  if [ "$(OS_TYPE)" = "Win" ]; then \
-	    perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\s*\})/\1\r\n  ; Token.kwds = Hashtbl.create 301\2/' bin/ged2gwb/ged2gwb.ml; \
-	  else \
-	    perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\n  \})/$$1\n  ; Token.kwds = Hashtbl.create 301$$2/' bin/ged2gwb/ged2gwb.ml; \
-	  fi \
-	fi
-
-unpatch_files:
-	@if [ -f bin/ged2gwb/dune.bak ] && [ -f bin/ged2gwb/ged2gwb.ml.bak ]; then \
-	  printf "Restoring original patched files… Done.\n"; \
-	  mv bin/ged2gwb/dune.bak bin/ged2gwb/dune; \
-	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
-	fi
-
 BUILD = dune build @bin/all @lib/all
-UNPATCH = $(MAKE) --no-print-directory unpatch_files
-
-unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
 
 info:
 	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n'
@@ -76,24 +50,24 @@ ifneq ($(COMMIT_COMMENT),)
 	@printf '\n$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
 endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
-.PHONY: patch_files unpatch_files info
+.PHONY: info
 
 generated: lib/version.ml
 	@printf "Done.\n"
 
-fmt build build-geneweb gwd install uninstall: info patch_files generated
+fmt build build-geneweb gwd install uninstall: info generated
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
-	$(call unpatch_after, dune build @fmt --auto-promote)
+	dune build @fmt --auto-promote
 
 # [BEGIN] Installation / Distribution section
 build:
-	$(call unpatch_after, dune build)
+	dune build
 
 build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
-	@$(call unpatch_after, dune build @bin/all @lib/all)
+	dune build @bin/all @lib/all
 	@printf "Done."
 
 build-geneweb-rpc: ## Build the geneweb-rpc package
@@ -101,21 +75,21 @@ build-geneweb-rpc: ## Build the geneweb-rpc package
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
-	@$(call unpatch_after, dune build bin/gwd bin/gwc)
+	dune build bin/gwd bin/gwc
 	@printf "Done."
 
 install: ## Install geneweb using dune
-	$(call unpatch_after, dune build @install)
+	dune build @install
 	dune install
 
 uninstall: ## Uninstall geneweb using dune
-	$(call unpatch_after, dune build @install)
+	dune build @install
 	dune uninstall
 
 distrib: info ## Build the project and copy what is necessary for distribution
-	@$(MAKE) --no-print-directory patch_files generated
+	@$(MAKE) --no-print-directory generated
 	@printf "\n\033[1;1mBuilding executables\n\033[0m"
-	@$(call unpatch_after, $(BUILD))
+	@$(BUILD)
 	@printf "Done.\n"
 	@$(RM) -r $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
@@ -205,7 +179,7 @@ opendoc: doc
 
 test: ## Run tests
 test:
-	@$(call unpatch_after, dune build @runtest)
+	@dune build @runtest
 .PHONY: test
 
 bench: ## Run benchmarks
@@ -239,7 +213,7 @@ clean:
 
 ci: ## Run tests, skip known failures
 ci:
-	@$(call unpatch_after, GENEWEB_CI=on dune build @runtest)
+	@GENEWEB_CI=on dune build @runtest
 
 ocp-indent: ## Run ocp-indent (inplace edition)
 ocp-indent:
