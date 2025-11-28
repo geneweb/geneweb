@@ -19,20 +19,6 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
 
-CPPO_D=$(OS_D)
-
-%/dune: %/dune.in Makefile.config
-	@printf "Generating $@…" \
-	&& cat $< \
-	| cppo -n $(CPPO_D) \
-	| sed \
-	-e 's/%%%CPPO_D%%%/$(CPPO_D)/g' \
-	-e 's/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g' \
-	-e 's/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g' \
-	-e 's/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g' \
-	> $@ \
-	&& printf " Done.\n"
-
 COMPIL_DATE := $(shell date +'%Y-%m-%d')
 COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
@@ -60,8 +46,8 @@ CAMLP5_MINOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 2)
 
 patch_files:
 	@if [ '$(CAMLP5_VERSION)' != 0 ] && [ $(CAMLP5_MAJOR) -eq 8 ] && [ $(CAMLP5_MINOR) -ge 3 ]; then \
-	  printf "\nPatching bin/ged2gwb/dune.in and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
-	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune.in; \
+	  printf "\nPatching bin/ged2gwb/dune and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
+	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune; \
 	  if [ "$(OS_TYPE)" = "Win" ]; then \
 	    perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\s*\})/\1\r\n  ; Token.kwds = Hashtbl.create 301\2/' bin/ged2gwb/ged2gwb.ml; \
 	  else \
@@ -70,9 +56,9 @@ patch_files:
 	fi
 
 unpatch_files:
-	@if [ -f bin/ged2gwb/dune.in.bak ] && [ -f bin/ged2gwb/ged2gwb.ml.bak ]; then \
+	@if [ -f bin/ged2gwb/dune.bak ] && [ -f bin/ged2gwb/ged2gwb.ml.bak ]; then \
 	  printf "Restoring original patched files… Done.\n"; \
-	  mv bin/ged2gwb/dune.in.bak bin/ged2gwb/dune.in; \
+	  mv bin/ged2gwb/dune.bak bin/ged2gwb/dune; \
 	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
 	fi
 
@@ -92,10 +78,7 @@ endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
 .PHONY: patch_files unpatch_files info
 
-DUNE_IN_FILES := $(shell find lib bin test -name "dune.in")
-DUNE_FILES := $(patsubst %.in,%,$(DUNE_IN_FILES))
-
-generated: $(DUNE_FILES) lib/version.ml
+generated: lib/version.ml
 	@printf "Done.\n"
 
 fmt build build-geneweb gwd install uninstall: info patch_files generated
@@ -212,7 +195,7 @@ endif
 # [END] Installation / Distribution section
 
 doc: ## Documentation generation
-doc: | $(GENERATED_FILES_DEP)
+doc:
 	dune build @doc
 .PHONY: doc
 
@@ -221,19 +204,19 @@ opendoc: doc
 .PHONY: opendoc
 
 test: ## Run tests
-test: | $(GENERATED_FILES_DEP)
+test:
 	@$(call unpatch_after, dune build @runtest)
 .PHONY: test
 
 bench: ## Run benchmarks
-bench: | $(GENERATED_FILES_DEP)
+bench:
 	dune build @runbench
 .PHONY: bench
 
 BENCH_FILE?=geneweb-bench.bin
 
 bench-marshal: ## Run benchmarks and record the result
-bench-marshal: | $(GENERATED_FILES_DEP)
+bench-marshal:
 ifdef BENCH_NAME
 	dune exec benchmark/bench.exe -- --marshal --name ${BENCH_NAME} ${BENCH_FILE}
 else
@@ -242,21 +225,20 @@ endif
 .PHONY: bench-marshal
 
 bench-tabulate: ## Read BENCH_FILE and print a report
-bench-tabulate: | $(GENERATED_FILES_DEP)
+bench-tabulate:
 	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
 	@$(RM) $(BENCH_FILE)
 .PHONY: bench-tabulate
 
 clean:
 	@echo -n "Cleaning…"
-	@$(RM) $(GENERATED_FILES_DEP)
 	@$(RM) -r $(DISTRIB_DIR)
 	@dune clean
 	@echo " Done."
 .PHONY: clean
 
 ci: ## Run tests, skip known failures
-ci: | $(GENERATED_FILES_DEP)
+ci:
 	@$(call unpatch_after, GENEWEB_CI=on dune build @runtest)
 
 ocp-indent: ## Run ocp-indent (inplace edition)

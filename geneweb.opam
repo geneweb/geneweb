@@ -43,7 +43,6 @@ depends: [
   "odoc" {with-doc}
 ]
 depopts: [
-  "ocaml-option-nnp"
   "ancient" {>= "0.10.0"}
   "zarith"
 ]

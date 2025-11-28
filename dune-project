@@ -50,7 +50,6 @@
     (ocamlformat (and :with-dev-setup (= "0.27.0")))
   )
   (depopts
-    ocaml-option-nnp
     (ancient (>= 0.10.0))
     zarith
   )
@@ -61,6 +60,7 @@
   (synopsis "RPC support for GeneWeb")
   (tags (geneweb rpc json))
   (depends
+    geneweb
     (qcheck :with-test)
     (qcheck-alcotest :with-test)
     lwt

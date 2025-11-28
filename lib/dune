@@ -1,10 +1,7 @@
-(dirs :standard \ %%%DUNE_DIRS_EXCLUDE%%%)
-
 (library
  (name geneweb)
  (public_name geneweb)
  (synopsis "GeneWeb library")
- (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
             str
             stdlib-shims
@@ -15,6 +12,7 @@
             geneweb_sosa
             geneweb_util
             geneweb_templ
+            geneweb_logs
             yojson
             markup
             re
