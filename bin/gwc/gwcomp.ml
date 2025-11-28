@@ -79,6 +79,17 @@ let log_error ~filename ~state message =
   Printf.printf "Error: %s\n" message;
   flush stdout
 
+let ensure_end_of_line ~filename ~state fields =
+  if fields = [] then Ok ()
+  else
+    let message =
+      Printf.sprintf "Ignored fields: %s" (String.concat " " fields)
+    in
+    if state.State.no_fail then (
+      log_error ~filename ~state message;
+      Ok ())
+    else Error message
+
 (** {i .gw} file encoding *)
 type encoding = E_utf_8 | E_iso_8859_1
 
@@ -1103,15 +1114,7 @@ let loop_witn state line ic =
 let read_family state ic fname =
   let ( >>= ) = Result.bind in
   let ensure_end_of_line fields =
-    if fields = [] then Ok ()
-    else
-      let message =
-        Printf.sprintf "Ignored fields: %s" (String.concat " " fields)
-      in
-      if state.State.no_fail then (
-        log_error ~filename:fname ~state message;
-        Ok ())
-      else Error message
+    ensure_end_of_line ~filename:fname ~state fields
   in
   function
   (* Block that defines that file use utf-8 encoding *)
