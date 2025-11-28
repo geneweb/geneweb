@@ -208,18 +208,10 @@ textPath {
   cursor: pointer;
 }
 
-/* Centre du couple en mode circulaire */
-#couple-center .couple-fn {
-  font-size: 10px;
+/* Patronyme du couple en mode circulaire graissé */
+.bold-sn {
+  font-weight: 600;
 }
-#couple-center .couple-sn {
-  font-size: 14px;
-  font-weight: 600 !important;
-  fill: black !important;
-}
-#couple-center .couple-dates {
-  font-size: 11px;
-  }
 
 /* Indicateurs de navigation (triangles et croix) */
 svg .icon {
@@ -564,8 +556,10 @@ body:not(.age) #age-legend { display: none; }
 }
 
 /* Surlignage SVG - cibler uniquement les arrière-plans, pas le texte */
-body.age svg .bg.highlight {
-  fill: #aaa !important;
+body.age svg g[id^="S"] > path.bg.highlight,
+body.age svg g[id^="M"] > path.bg.highlight,
+body.age svg g[id^="N"] > path.bg.highlight {
+  fill: #FAF183 !important;
 }
 
 body.age svg .highlight text {
@@ -1129,17 +1123,17 @@ body:not(.place) .places-panel {
 
 .event-count {
   font-weight: 700;
-  font-size: 10px;
+  font-size: 11px;
   text-align: right;
   min-width: 10px;
 }
 
 .event-label {
-  font-weight: 600;
-  font-size: 10px;
+  font-weight: 700;
+  font-size: 11px;
   text-transform: uppercase;
   width: 8px;
-  text-align: left;
+  text-align: right;
 }
 
 /* Badge total du lieu */
@@ -1187,6 +1181,10 @@ body:not(.place) .places-panel {
 
 .place-content.person-match {
   background: rgba(40, 167, 69, 0.12) !important;
+  font-weight: 600;
+}
+
+.place-content:hover .place-name {
   font-weight: 600;
 }
 

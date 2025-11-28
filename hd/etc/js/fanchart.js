@@ -65,13 +65,13 @@ const CONFIG = {
 };
 
 let isCircularMode = false;
-let renderContext = { target: null, idPrefix: '' };
+let renderContext = { target: null, idSuffix: '' };
 let current_angle = CONFIG.default_angle;
 let currentRotation = 0;
 
 // Génère un ID unique selon le contexte de rendu (mode 360° ou standard)
 function contextualId(baseId) {
-    return renderContext.idPrefix + baseId;
+    return baseId + renderContext.idSuffix;
 }
 
 // Trouve un élément SVG par son ID de base, en tenant compte du préfixe de contexte
@@ -80,12 +80,12 @@ function findElementById(baseId) {
     let element = document.getElementById(baseId);
     if (element) return element;
     
-    // En mode circulaire, essayer avec les préfixes
+    // En mode circulaire, essayer avec les suffixes
     if (isCircularMode) {
-        element = document.getElementById('N-' + baseId);
-        if (element) return element;
-        element = document.getElementById('S-' + baseId);
-        if (element) return element;
+        const northEl = document.getElementById(baseId + '-N');
+        if (northEl) elements.push(northEl);
+        const southEl = document.getElementById(baseId + '-S');
+        if (southEl) elements.push(southEl);
     }
     
     return null;
@@ -103,9 +103,9 @@ function findAllElementsById(baseId) {
     
     // Mode circulaire - chercher dans les deux hémisphères
     if (isCircularMode) {
-        const northEl = document.getElementById('N-' + baseId);
+        const northEl = document.getElementById('-N' + baseId);
         if (northEl) elements.push(northEl);
-        const southEl = document.getElementById('S-' + baseId);
+        const southEl = document.getElementById('-S' + baseId);
         if (southEl) elements.push(southEl);
     }
     
@@ -172,7 +172,10 @@ const LayoutCalculator = {
     if (!document.body.classList.contains('place')) {
       return 0;
     }
-
+    const panel = document.querySelector('.places-panel');
+    if (panel && panel.offsetWidth > 0) {
+      return panel.offsetWidth;
+    }
     // Créer un élément de mesure temporaire
     const measurer = document.createElement('div');
     measurer.style.cssText = `
@@ -1803,8 +1806,8 @@ const PlacesHighlighter = {
             const parentGroup = element.parentNode;
             const groupId = parentGroup?.id || '';
 
-            // Ignorer le préfixe de contexte (N-, S-) pour le mode circulaire
-            const baseId = groupId.replace(/^[NS]-/, '');
+            // Ignorer le préfixe de contexte (-N, -S) pour le mode circulaire
+            const baseId = groupId.replace(/^-[NS]/, '');
             
             if (eventType === 'marriage') {
               // Mariages : coloriser UNIQUEMENT les éléments dans les groupes M
@@ -1829,8 +1832,6 @@ const PlacesHighlighter = {
    * Application du surlignage d'événement
    */
   applyEventHighlight: function(element, eventType, placeName) {
-        console.log(`[DEBUG applyEventHighlight] type=${eventType} lieu=${placeName} tagName=${element.tagName} classesBefore=${element.className.baseVal || element.className}`);
-
     // Sauvegarder l'état original seulement si nécessaire
     if (!element.dataset.originalFill) {
       element.dataset.originalFill = element.style.fill || '';
@@ -1839,8 +1840,6 @@ const PlacesHighlighter = {
     // Appliquer les classes CSS appropriées
     element.classList.add('svg-place-highlight');
     element.classList.add(`event-highlight-${eventType}`);
-
-    console.log(`[DEBUG applyEventHighlight] classesAfter=${element.className.baseVal || element.className}`);
 
     // Enregistrer pour le nettoyage
     this.state.svgElements.set(element, placeName);
@@ -1921,22 +1920,13 @@ const PlacesHighlighter = {
       const svgClass = `ma-${placeClass}`;
       const elements = document.getElementsByClassName(svgClass);
 
-      console.log(`[DEBUG] Mariage lieu="${placeName}" svgClass="${svgClass}" trouvés=${elements.length}`);
-      if (elements.length > 0) {
-        Array.from(elements).forEach((el, i) => {
-          const parentId = el.parentNode?.id || 'NO_ID';
-          const baseId = parentId.replace(/^[NS]-/, '');
-          console.log(`  [${i}] parentId="${parentId}" baseId="${baseId}" startsWithM=${baseId.startsWith('M')}`);
-        });
-      }
-
       // Traiter chaque élément avec la classe de mariage correspondante
       Array.from(elements).forEach(element => {
         const parentGroup = element.parentNode;
 
         // Vérification stricte : l'élément doit être dans un groupe de mariage
-        // Ignorer le préfixe de contexte (N-, S-) pour le mode circulaire
-        const baseId = parentGroup?.id?.replace(/^[NS]-/, '') || '';
+        // Ignorer le préfixe de contexte (-N, -S) pour le mode circulaire
+        const baseId = parentGroup?.id?.replace(/^-[NS]/, '') || '';
         if (baseId.startsWith('M')) {
           this.applyEventHighlight(element, 'marriage', placeName);
         }
@@ -1976,8 +1966,8 @@ const PlacesHighlighter = {
         const parentGroup = element.parentNode;
 
         // Vérification stricte : l'élément doit être dans un groupe de personne
-        // Ignorer le préfixe de contexte (N-, S-) pour le mode circulaire
-        const baseId = parentGroup?.id?.replace(/^[NS]-/, '') || '';
+        // Ignorer le préfixe de contexte (-N, -S) pour le mode circulaire
+        const baseId = parentGroup?.id?.replace(/^-[NS]/, '') || '';
         if (baseId.startsWith('S')) {
           this.applyEventHighlight(element, eventType, placeName);
         }
@@ -2124,7 +2114,7 @@ const CircularModeRenderer = {
     // Père (nord)
     if (s2) {
       const s2Group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      s2Group.setAttribute("id", "N-S2");
+      s2Group.setAttribute("id", "S2-N");
       centerGroup.appendChild(s2Group);
       SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2, { type: 'person', isBackground: true });
       this.renderCenterText(s2Group, s2, center_x, center_y - r/2, false);
@@ -2135,7 +2125,7 @@ const CircularModeRenderer = {
     // Mère (sud)
     if (s3) {
       const s3Group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      s3Group.setAttribute("id", "S-S3");
+      s3Group.setAttribute("id", "S3-S");
       centerGroup.appendChild(s3Group);
       SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3, { type: 'person', isBackground: true });
       this.renderCenterText(s3Group, s3, center_x, center_y + r/2, true);
@@ -2172,37 +2162,38 @@ const CircularModeRenderer = {
     },
 
   renderCenterText: function(group, person, x, y, inverted) {
+    const r = CONFIG.a_r[0];
+    // Convertir la largeur disponible en unités de mesure du texte
+    // standard_width = largeur d'un "M" de référence, permet la conversion
+    const availableWidth = 1.7 * r;
+    const conversionFactor = standard_width / 10; // approximation basée sur la taille standard
+    
+    const texts = [person.fn, person.sn, person.dates || ''];
+    const fontSizes = texts.map(text => {
+      if (!text) return 100;
+      const bbox = TextRenderer.getBBoxCached(text);
+      // Comparer bbox.width à la largeur disponible convertie
+      const targetWidth = availableWidth * conversionFactor;
+      const widthRatio = bbox.width > targetWidth ? targetWidth / bbox.width : 1;
+      return Math.round(widthRatio * 88);
+    });
+    
+    
+    const dy = Math.min(r / 3, 16);
+    
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.setAttribute("x", x);
     text.setAttribute("y", y);
     text.setAttribute("text-anchor", "middle");
     text.setAttribute("dominant-baseline", "middle");
-    
-    const fn = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-    fn.setAttribute("x", x);
-    fn.setAttribute("dy", "-0.2em");
-    fn.setAttribute("class", "couple-text");
-    fn.textContent = person.fn;
-    
-    const sn = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-    sn.setAttribute("x", x);
-    sn.setAttribute("dy", "1em");
-    sn.setAttribute("class", "couple-sn");
-    sn.textContent = person.sn;
-    
-    const dates = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-    dates.setAttribute("x", x);
-    dates.setAttribute("dy", "1.1em");
-    dates.setAttribute("class", "couple-dates");
-    dates.textContent = person.dates || '';
-    
-    text.appendChild(fn);
-    text.appendChild(sn);
-    text.appendChild(dates);
-    
     if (inverted) {
       text.setAttribute("transform", `rotate(180, ${x}, ${y})`);
     }
+    
+    text.innerHTML = 
+      `<tspan x="${x}" dy="-${dy * 0.4}px" style="font-size:${fontSizes[0]}%">${person.fn}</tspan>` +
+      `<tspan x="${x}" dy="${dy * 0.9}px" class="bold-sn" style="font-size:${fontSizes[1]}%">${person.sn}</tspan>` +
+      `<tspan x="${x}" dy="${dy * 0.7}px" class="dates" style="font-size:${Math.round(fontSizes[2] * 0.7)}%">${person.dates || ''}</tspan>`;
     
     group.appendChild(text);
   },
@@ -2626,21 +2617,27 @@ const SVGRenderer = {
         }
     }
 
-    // 4. Surlignage des implexes (désactivé temporairement en mode circulaire)
-    if (type === "person" && p.sosa && !isCircularMode) {
-      const targetsToHighlight = ImplexResolver.getHighlightTargets(p.sosa);
+    // 4. Surlignage des implexes
+    if (type === "person" && p.sosa) {
+      // En mode circulaire, utiliser le Sosa original et chercher par classe os-{sosa}
+      const effectiveSosa = isCircularMode ? (p.originalSosa || p.sosa) : p.sosa;
+      const targetsToHighlight = ImplexResolver.getHighlightTargets(effectiveSosa);
 
       targetsToHighlight.forEach(targetSosa => {
-        if (targetSosa !== p.sosa) {
-          const targetElement = document.getElementById("S" + targetSosa);
-          if (targetElement) {
+        if (targetSosa !== effectiveSosa) {
+          // En mode circulaire : chercher par classe os-{sosa} (cross-hémisphères)
+          // En mode standard : chercher par ID
+          const targetElements = isCircularMode
+            ? Array.from(document.getElementsByClassName("os-" + targetSosa))
+            : findAllElementsById("S" + targetSosa);
+          
+          targetElements.forEach(targetElement => {
             targetElement.classList.add("same_hl");
-
             const targetPath = targetElement.querySelector('path.link');
             if (targetPath) {
               targetPath.classList.add('highlight');
             }
-          }
+          });
         }
       });
     }
@@ -2681,38 +2678,23 @@ const SVGRenderer = {
       AgeHighlighter.clearAllHighlights();
     }
 
-// AVANT
     // 4. Nettoyage des implexes
     if (type === "person" && p.sosa) {
-      const targetsToClean = ImplexResolver.getHighlightTargets(p.sosa);
+      const effectiveSosa = isCircularMode ? (p.originalSosa || p.sosa) : p.sosa;
+      const targetsToClean = ImplexResolver.getHighlightTargets(effectiveSosa);
 
       targetsToClean.forEach(targetSosa => {
-        const targetElement = document.getElementById("S" + targetSosa);
-        if (targetElement) {
+        const targetElements = isCircularMode
+          ? Array.from(document.getElementsByClassName("os-" + targetSosa))
+          : findAllElementsById("S" + targetSosa);
+        
+        targetElements.forEach(targetElement => {
           targetElement.classList.remove("same_hl");
-
           const highlightedPaths = targetElement.querySelectorAll('.highlight');
           highlightedPaths.forEach(path => {
             path.classList.remove('highlight');
           });
-        }
-      });
-    }
-
-    // 4. Nettoyage des implexes (désactivé temporairement en mode circulaire)
-    if (type === "person" && p.sosa && !isCircularMode) {
-      const targetsToClean = ImplexResolver.getHighlightTargets(p.sosa);
-
-      targetsToClean.forEach(targetSosa => {
-        const targetElement = document.getElementById("S" + targetSosa);
-        if (targetElement) {
-          targetElement.classList.remove("same_hl");
-
-          const highlightedPaths = targetElement.querySelectorAll('.highlight');
-          highlightedPaths.forEach(path => {
-            path.classList.remove('highlight');
-          });
-        }
+        });
       });
     }
   },
@@ -2903,7 +2885,7 @@ const TextRenderer = {
     // Construction du texte avec tailles adaptatives
     text.innerHTML =
       `<tspan style="font-size:${fontSizes[0]}%">${p.fn}</tspan>` +
-      `<tspan x="${x}" dy="15" style="font-size:${fontSizes[1]}%">${p.sn}</tspan>` +
+      `<tspan x="${x}" dy="15" class="bold-sn" style="font-size:${fontSizes[1]}%">${p.sn}</tspan>` +
       `<tspan class="dates" x="${x}" dy="15">${p.dates}</tspan>`;
 
     g.append(text);
@@ -2927,7 +2909,7 @@ const TextRenderer = {
       return g;
   },
 
-drawRadialText: function(g, r1, r2, a1, a2, sosa, p, classes, lineCount, sizeFactor = 1.0) {
+  drawRadialText: function(g, r1, r2, a1, a2, sosa, p, classes, lineCount, sizeFactor = 1.0) {
     // Calcul des paramètres de direction selon l'orientation
     const params = this.calculateRadialParameters(r1, r2, a1, a2, lineCount);
     const height = Math.abs(a2 - a1) / 360 * 2 * Math.PI * r1 / lineCount;
@@ -3293,6 +3275,31 @@ const ColorManager = {
 const AgeHighlighter = {
   currentHighlight: null,
   emptyCategories: new Set(),
+
+  /**
+   * Gère le survol des secteurs SVG en mode âge
+   * Surligne la catégorie correspondante dans la légende
+   * @param {Object} p - Données de la personne ou du mariage
+   * @param {string} type - 'person' ou 'marriage'
+   * @param {string} action - 'enter' (leave géré par clearAllHighlights)
+   */
+  handleSVGHover: function(p, type, action) {
+    if (action !== 'enter') return;
+
+    let categoryClass = '';
+
+    if (type === 'person' && p.death_age) {
+      // Catégorie d'âge au décès (DA0-DA4)
+      categoryClass = Utils.ageClass(p.death_age);
+    } else if (type === 'marriage' && p.marriage_length) {
+      // Catégorie de durée de mariage (DAM0-DAM4)
+      categoryClass = Utils.marriageLengthClass(p.marriage_length);
+    }
+
+    if (categoryClass && !this.emptyCategories.has(categoryClass)) {
+      this.setHighlight(categoryClass);
+    }
+  },
 
   initialize: function() {
     const closeBtn = document.querySelector('.legend-close');
@@ -3803,7 +3810,6 @@ const ImplexResolver = {
   reverseMap: new Map(),
 
   initialize: function() {
-    console.log("ImplexResolver: Initialisation...");
     this.resolutionCache.clear();
     this.reverseMap.clear();
 
@@ -4102,13 +4108,7 @@ const FanchartApp = {
   },
 
   init: function() {
-    // CALCULS INITIAUX
-    this.calculateDimensions();
-    this.processAncestorData();
-
-    ImplexResolver.initialize();
-
-    // LECTURE DE L'ÉTAT URL
+    // 1. LECTURE DE L'ÉTAT URL
     const state = URLManager.readCurrentState();
     tool = state.tool;
     sortMode = state.sortMode;
@@ -4116,6 +4116,12 @@ const FanchartApp = {
     isCircularMode = state.isCircular;
     current_angle = state.angle;
     implexMode = state.implexMode;
+
+    // 2. CALCULS INITIAUX
+    this.calculateDimensions();
+    this.processAncestorData();
+
+    ImplexResolver.initialize();
 
     // CONSTRUCTION DES DONNÉES
     LocationDataBuilder.buildCompleteLocationData();
@@ -4303,7 +4309,7 @@ const FanchartApp = {
 
     // En mode circulaire, on a un anneau de moins car les parents sont au centre
     if (isCircularMode) {
-      rings += 1;
+      rings += -1;
     }
     
     for (let i = 0; i < rings; i++) {
@@ -4364,28 +4370,16 @@ const FanchartApp = {
     
     // 2. Déterminer la marge gauche selon le mode
     const isSquareChart = (current_angle >= 310 || isCircularMode);
-    const leftMargin = isSquareChart ? 120 : 0;
-    fanchart.style.marginLeft = leftMargin + 'px';
     
     // 3. Calculer l'espace réellement disponible pour le SVG
-    const availableWidth = window.innerWidth - actualListWidth - leftMargin - 20; // 20px marge sécurité
+    const availableWidth = window.innerWidth - actualListWidth;
     const availableHeight = window.innerHeight;
     
-    // 4. Calculer les dimensions en préservant le ratio du SVG
-    const svgRatio = svg_w / svg_h;
-    const screenRatio = availableWidth / availableHeight;
+    // 4. Le SVG occupe tout l'espace disponible pour permettre zoom et navigation
+    this.window_w = availableWidth;
+    this.window_h = availableHeight;
     
-    if (svgRatio > screenRatio) {
-      // Limité par la largeur
-      this.window_w = availableWidth;
-      this.window_h = Math.round(availableWidth / svgRatio);
-    } else {
-      // Limité par la hauteur
-      this.window_h = availableHeight;
-      this.window_w = Math.round(availableHeight * svgRatio);
-    }
-    
-    // 5. Configurer le SVG
+    // 5. Configurer le SVG à la taille complète de l'espace de travail
     fanchart.setAttribute("width", this.window_w);
     fanchart.setAttribute("height", this.window_h);
 
@@ -4436,15 +4430,15 @@ const FanchartApp = {
       // RENDU NORD : Lignée paternelle (S2)
       try {
         ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 2);
-        renderContext = { target: northGroup, idPrefix: 'N-' };
+        renderContext = { target: northGroup, idSuffix: '-N' };
         this.renderAncestorsByGeneration();
 
         // RENDU SUD : Lignée maternelle (S3)
         ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 3);
-        renderContext = { target: southGroup, idPrefix: 'S-' };
+        renderContext = { target: southGroup, idSuffix: '-S' };
         this.renderAncestorsByGeneration();
       } finally {
-        renderContext = { target: null, idPrefix: '' };
+        renderContext = { target: null, idSuffix: '' };
         ancestor = originalAncestors;
         current_angle = savedAngle;
       }
@@ -4639,6 +4633,10 @@ const FanchartApp = {
     // Créer le groupe de la personne dans le groupe famille
     const personGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     personGroup.setAttribute("id", contextualId("S" + sosa));
+    // En mode circulaire, ajouter une classe avec le Sosa original pour le surlignage des implexes
+    if (isCircularMode && person.originalSosa) {
+      personGroup.classList.add("os-" + person.originalSosa);
+    }
     familyGroup.append(personGroup);
 
     // Résolution des implexes
@@ -4841,8 +4839,8 @@ const FanchartApp = {
     
     fanchart.addEventListener('mousedown', (e) => {
       e.preventDefault();
-      if ((e.button === 2 || (e.button === 0 && e.ctrlKey)) && isCircularMode) {
-        // Clic droit (mode circulaire seulement) : rotation (également avec ctrl+clic droit pour macOS)
+      if ((e.button === 2 || (e.button === 0 && e.shiftKey)) && isCircularMode) {
+        // Clic droit (mode circulaire seulement) : rotation (également avec shift+clic droit pour macOS)
         rotateState = true;
         lastMouseAngle = getMouseAngle(e);
       } else if (e.button === 0) {
@@ -4908,8 +4906,6 @@ const FanchartApp = {
     };
 
     document.getElementById("b-refresh").onclick = () => {
-      this.window_w = window.innerWidth;
-      this.window_h = window.innerHeight;
       this.calculateDimensions();
       this.fitScreen();
     };
