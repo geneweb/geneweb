@@ -811,6 +811,7 @@ body:not(.place) .places-panel {
   color: white;
   cursor: pointer;
   margin-bottom: 1px;
+  padding: 0px 3px;
 }
 
 .summary-event-count {
@@ -1030,8 +1031,8 @@ body:not(.place) .places-panel {
   background: rgba(40, 167, 69, 0.08);
 }
 
-.place-content.person-match {
-  background: rgba(40, 167, 69, 0.08) !important;
+.places-panel .place-content.person-match {
+  background: rgba(40, 167, 69, 0.08);
   font-weight: 600;
   min-height: inherit;
 }
@@ -1039,6 +1040,29 @@ body:not(.place) .places-panel {
 .place-content.grayed-out {
   opacity: 0.35;
   pointer-events: none;
+}
+
+.places-panel .place-content.person-match {
+  background: linear-gradient(to right,
+    rgba(40, 167, 69, 0.15) 0%,
+    rgba(40, 167, 69, 0.25) 100%) !important;
+}
+
+/* Lieu verrouillé au repos - violet */
+.places-panel .place-content.locked:not(.person-match) {
+  background: linear-gradient(to right,
+    rgba(102, 126, 234, 0.12) 0%,
+    rgba(102, 126, 234, 0.25) 100%) !important;
+  box-shadow: inset 2px 0 0 #667eea;
+}
+
+/* Lieu verrouillé + matché par survol individu - vert avec shadow violet */
+.places-panel .place-content.locked.person-match {
+  box-shadow: inset 2px 0 0 #667eea;
+}
+
+.place-content.locked .place-name {
+  font-weight: 700;
 }
 
 /* Colonnes internes */
@@ -1188,12 +1212,7 @@ body:not(.place) .places-panel {
   font-weight: 600;
 }
 
-.places-panel.show-events .place-content.person-match {
-  background: linear-gradient(to right,
-    rgba(40, 167, 69, 0.12) 0%,
-    rgba(40, 167, 69, 0.20) 100%) !important;
-}
-
+/* 
 /* Badge total - alternance cohérente */
 .places-panel.show-events .place-row:nth-child(even) .place-count {
   background: rgba(255, 255, 255, 0.95);
