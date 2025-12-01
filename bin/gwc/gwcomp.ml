@@ -101,6 +101,14 @@ let ensure_end_of_line ~filename ~state fields =
       Ok ())
     else Error message
 
+let continue ~filename ~state ~continue_ok ~continue_error = function
+  | Ok value -> continue_ok value
+  | Error message ->
+      if state.State.no_fail then (
+        log_error ~filename ~state message;
+        continue_error ())
+      else Error message
+
 (** {i .gw} file encoding *)
 type encoding = E_utf_8 | E_iso_8859_1
 
@@ -1243,9 +1251,11 @@ let read_family state ic fname =
               match read_line state ic with
               | Some (str, "-" :: l) ->
                   let sex, l = get_optional_sexe l in
-                  parse_child state str surname sex csrc cbp l
-                  >>= fun (child, l) ->
-                  ensure_end_of_line l >>= fun () -> loop (child :: children)
+                  continue ~filename:fname ~state
+                    ~continue_error:(fun () -> loop children)
+                    (parse_child state str surname sex csrc cbp l)
+                    ~continue_ok:(fun (child, l) ->
+                      ensure_end_of_line l >>= fun () -> loop (child :: children))
               | Some (_, [ "end" ]) -> Ok children
               | Some (str, _) -> Error str
               | _ -> Error "eof"
