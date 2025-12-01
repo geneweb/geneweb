@@ -146,8 +146,8 @@ let mul x n =
     loop zero x n
 
 let div x n =
-  if n > max_mul_base then invalid_arg "Sosa.div"
-  else
+  if n <= 0 then invalid_arg "Sosa.div"
+  else if n <= max_mul_base then
     let l =
       let rec loop i l r =
         if i < 0 then l
@@ -159,6 +159,11 @@ let div x n =
       loop (Array.length x - 1) [] 0
     in
     Array.of_list (normalize l)
+  else if Array.length x <= 2 then of_int (to_int x / n)
+  else
+    let nv = of_int n in
+    let rec loop q x = if gt nv x then q else loop (inc q 1) (sub x nv) in
+    loop zero x
 
 let modl x n =
   of_int
