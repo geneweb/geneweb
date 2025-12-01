@@ -55,7 +55,7 @@ type gw_syntax =
       reference to person. Second is note's content. *)
   | Relations of
       somebody * Def.sex assumption * (somebody, string) Def.gen_relation list
-      (** Block that defines relations of a person with someone outisde of
+      (** Block that defines relations of a person with someone outside of
       family block (like foster parents) (field {i rparents}). Contains:
       - Concerned person definition/reference
       - Sex of person
@@ -122,7 +122,7 @@ let check_magic fname ic =
        ^ "\" is not a GeneWeb object file, or it is a very old version")
 
 (** [copy_decode s i1 i2] decode the word delimited by [i1] and [i2] inside [s]
-    by remplacing "\\" -> '\' and '_' -> ' ' *)
+    by replacing "\\" -> '\' and '_' -> ' ' *)
 let copy_decode s i1 i2 =
   let len =
     let rec loop len i =
@@ -164,7 +164,7 @@ let fields str =
   in
   loop 0 0
 
-(** Removes spaces at the begining an at the end of string. *)
+(** Removes spaces at the beginning and at the end of string. *)
 let cut_space x =
   let len = String.length x in
   if len = 0 then x
@@ -429,8 +429,8 @@ let get_optional_sexe = function
   | "f" :: l -> (Female, l)
   | l -> (Neuter, l)
 
-(** Parses person's first name and occurence number.
-    Occurence number is 0 if not present. *)
+(** Parses person's first name and occurrence number.
+    Occurrence number is 0 if not present. *)
 let get_fst_name str l =
   match l with
   | x :: l' -> (
@@ -546,7 +546,7 @@ let get_occu l =
 let get_sources l =
   match l with "#src" :: x :: l' -> (cut_space x, l') | _ -> ("", l)
 
-(** Parses person's acces rights *)
+(** Parses person's access rights *)
 let get_access l =
   match l with
   | "#apubl" :: l' -> (Def.Public, l')
@@ -722,8 +722,8 @@ let get_event_witness_kind l =
 (** Parses the line containing an information about relationship between parents within family
     and returns [((relk, fath_sex, moth_sex), mar, place, note, src, divorce, rest)].
     [relk] i a relation kind between parents ([Def.relation_kind]), [fath_sex] and [moth_sex]
-    is a sex of each parent, [mar] is a optional mariage date (if married), [place] is a
-    marriage place if present, [note] is a mariage note if present, [src] is a mariage source
+    is a sex of each parent, [mar] is a optional marriage date (if married), [place] is a
+    marriage place if present, [note] is a marriage note if present, [src] is a marriage source
     if present, [divorce] is a divorce status [Def.divorce], [rest] is the rest of the line to
     parse
 *)
@@ -826,7 +826,7 @@ let bogus_def p n = p = "?" || n = "?"
     - Events
     - Notes
     If can't parse person's sources use [comm_psources] instead.
-    If can't parse bithdate use [comm_birth_place] instead. *)
+    If can't parse birth date use [comm_birth_place] instead. *)
 let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
   let first_names_aliases, l = get_fst_names_aliases str l in
   let surnames_aliases, l = get_surnames_aliases str l in
@@ -916,14 +916,14 @@ let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
   (u, l)
 
 (** Parses the line containing a parent and returns [(somebody,np,rest)]. [somebody] is either [Defined p] if
-    person's definiton was parsed ([p] regroups all personal information) either [Undefined k] if a reference
+    person's definition was parsed ([p] regroups all personal information) either [Undefined k] if a reference
     to a person already defined was parsed ([k] is a key to find corresponding definition). [np] is a person's
     surname. [rest] is a rest of line to parse. Could be used to parse familial witnesses. *)
 let parse_parent state str l =
   (* last name *)
   let np, l = get_name l in
   Result.map
-    (fun (* first name and occurence number *)
+    (fun (* first name and occurrence number *)
            (pp, op, l) ->
       (* person is not defined as a child elsewhere (is defined here) *)
       let defined =
@@ -946,8 +946,8 @@ let parse_parent state str l =
 
 (** Parses the line containing a children and returns a person [gen_person] containing
     all extracted information. If a children definition doesn't provide
-    surname then father's surname is used. ALso if it doesn't provide a children's
-    birth place and source then it uses information provided by family definiton. *)
+    surname then father's surname is used. Also if it doesn't provide a children's
+    birth place and source then it uses information provided by family definition. *)
 let parse_child state str surname sex csrc cbp l =
   let u = create_person () in
   Result.map
@@ -1065,7 +1065,7 @@ type 'a read_family =
   | F_gw_plus  (** Read block that defines that the file uses gwplus syntax *)
   | F_none  (** Read end of the file *)
 
-(** Read succesive lines starting with `tag` and concat them. *)
+(** Read successive lines starting with `tag` and concat them. *)
 let aux_loop_note state tag line ic =
   let tag_len = String.length tag in
   let rec loop acc str =
@@ -1085,13 +1085,13 @@ let aux_loop_note state tag line ic =
   in
   (note, line)
 
-(** Parse note (succesive lines starting with "note") *)
+(** Parse note (successive lines starting with "note") *)
 let loop_note state = aux_loop_note state "note"
 
-(** Parse wintess note (succesive lines starting with "wnote") *)
+(** Parse witness note (successive lines starting with "wnote") *)
 let loop_witness_note state = aux_loop_note state "wnote"
 
-(** Parse comment (succesive lines starting with "comm") *)
+(** Parse comment (successive lines starting with "comm") *)
 let loop_comment state = aux_loop_note state "comm"
 
 (** Parse witnesses across the lines and returns list of [(wit,wsex,wk,wnote)]
