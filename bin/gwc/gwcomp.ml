@@ -1372,8 +1372,9 @@ let read_family state ic fname =
                 | "end" -> Ok []
                 | x ->
                     loop (input_a_line state ic) >>= fun relations ->
-                    Result.map
-                      (fun relation -> relation :: relations)
+                    continue ~filename:fname ~state
+                      ~continue_error:(fun () -> Ok relations)
+                      ~continue_ok:(fun relation -> Ok (relation :: relations))
                       (get_relation ~filename:fname state x (fields x))
               in
               loop (input_a_line state ic)
