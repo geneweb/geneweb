@@ -1118,11 +1118,18 @@ let loop_witn ~filename state line ic =
           | l -> (make_weak_assumption Def.Neuter, l)
         in
         let wkind, l = get_event_witness_kind l in
-        parse_parent state str l >>= fun (wit, _, l) ->
-        ensure_end_of_line ~filename ~state l >>= fun () ->
-        (* read witness note which starts on a new line *)
-        let wnote, str = loop_witness_note state (input_a_line state ic) ic in
-        loop_witn ((wit, sex, wkind, wnote) :: acc) str
+        continue ~filename ~state
+          ~continue_error:(fun () ->
+            loop_witn acc
+              (snd @@ loop_witness_note state (input_a_line state ic) ic))
+          (parse_parent state str l)
+          ~continue_ok:(fun (wit, _, l) ->
+            ensure_end_of_line ~filename ~state l >>= fun () ->
+            (* read witness note which starts on a new line *)
+            let wnote, str =
+              loop_witness_note state (input_a_line state ic) ic
+            in
+            loop_witn ((wit, sex, wkind, wnote) :: acc) str)
     | _ -> Ok (List.rev acc, str)
   in
   loop_witn [] line
@@ -1163,11 +1170,14 @@ let read_family state ic fname =
               | "f:" :: l -> (make_strong_assumption Def.Female, l)
               | l -> (make_weak_assumption Def.Neuter, l)
             in
-            parse_parent state str l >>= fun (wk, _, l) ->
-            ensure_end_of_line l >>= fun () ->
-            Result.map
-              (fun (witn, line) -> ((wk, sex) :: witn, line))
-              (loop (read_line state ic))
+            continue ~filename:fname ~state
+              ~continue_error:(fun () -> loop (read_line state ic))
+              (parse_parent state str l)
+              ~continue_ok:(fun (wk, _, l) ->
+                ensure_end_of_line l >>= fun () ->
+                Result.map
+                  (fun (witn, line) -> ((wk, sex) :: witn, line))
+                  (loop (read_line state ic)))
         | line -> Ok ([], line)
       in
       loop line >>= fun (witn, line) ->
