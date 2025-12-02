@@ -4272,6 +4272,13 @@ and eval_family_field_var conf base env
   | "father" :: sl ->
       let ep = make_ep conf base ifath in
       eval_person_field_var conf base env ep loc sl
+  | "divorce_date" :: sl -> (
+      match Driver.get_divorce fam with
+      | Divorced cd when m_auth -> (
+          match Date.od_of_cdate cd with
+          | Some d -> eval_date_field_var conf d sl
+          | None -> null_val)
+      | _ -> null_val)
   | "marriage_date" :: sl -> (
       match Date.od_of_cdate (Driver.get_marriage fam) with
       | Some d when m_auth -> eval_date_field_var conf d sl
