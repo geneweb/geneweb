@@ -2,6 +2,8 @@ open Geneweb
 open Config
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Server = Geneweb_http.Server
+module Code = Geneweb_http.Code
 
 let ns = "export"
 
@@ -131,16 +133,16 @@ let export conf base =
       let opts =
         {
           Gwexport.default_opts with
-          oc = (fname, Output.print_sstring conf, Wserver.close_connection);
+          oc = (fname, Output.print_sstring conf, Server.close_connection);
           no_notes;
           no_picture = getenv_opt "pictures" conf.env = Some "off";
           source;
         }
       in
       let select = ((fun i -> IPS.mem i ipers), fun i -> IFS.mem i ifams) in
-      Wserver.http Def.OK;
-      Wserver.header "Content-type: text/plain";
-      Wserver.header
+      Server.http Code.OK;
+      Server.header "Content-type: text/plain";
+      Server.header
         (Printf.sprintf "Content-disposition: attachment; filename=\"%s\"" fname);
       (match output with
       | `ged -> Gwb2gedLib.gwb2ged base false opts select
@@ -149,7 +151,7 @@ let export conf base =
           Output.print_sstring conf "encoding: utf-8\n";
           Output.print_sstring conf "gwplus\n\n";
           GwuLib.gwu opts isolated base "" "" (Hashtbl.create 0) select);
-      Wserver.wflush ();
+      Server.wflush ();
       true
 
 let () =

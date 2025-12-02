@@ -9,6 +9,7 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Header = Geneweb_http.Header
 
 let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
     ?(aria_label = "") ?(disabled = false) ?(target = None) ?(data_attrs = [])
@@ -491,7 +492,7 @@ let translate_eval s = Translate.eval (Mutil.nominative s)
 (* *)
 
 let get_referer conf =
-  let referer = Mutil.extract_param "referer: " '\n' conf.request in
+  let referer = Header.extract_param "referer: " '\n' conf.request in
   escape_html referer
 
 let begin_centered conf =
@@ -543,7 +544,7 @@ let html ?(content_type = "text/html") conf =
   Output.header conf "Connection: close"
 
 let unauthorized conf auth_type =
-  Output.status conf Def.Unauthorized;
+  Output.status conf Code.Unauthorized;
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
   Output.header conf "Content-type: text/html; charset=%s" conf.charset;
@@ -1203,7 +1204,6 @@ let rec skip_spaces s i =
   if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
 
 let create_env s =
-  let s = (s : Adef.encoded_string :> string) in
   let use_amp = not (Mutil.contains s "content-disposition") in
   let rec get_assoc beg i =
     if i = String.length s then
@@ -1474,7 +1474,7 @@ let is_full_html_template conf fname =
 let body_prop conf =
   (* NOTE: assumes http access to the server. https handled by proxy *)
   (* TODO verify cgi mode *)
-  let server = Mutil.extract_param "Host: " '\n' conf.request in
+  let server = Header.extract_param "Host: " '\n' conf.request in
   let bname_pwd = (commd conf :> string) in
   let http_str = Format.sprintf "http://%s/%s" server bname_pwd in
   try
@@ -1484,7 +1484,7 @@ let body_prop conf =
   with Not_found -> ""
 
 let get_server_string conf =
-  if not conf.cgi then Mutil.extract_param "host: " '\r' conf.request
+  if not conf.cgi then Header.extract_param "host: " '\r' conf.request
   else
     let server_name = try Sys.getenv "SERVER_NAME" with Not_found -> "" in
     let server_port =
@@ -1493,7 +1493,7 @@ let get_server_string conf =
     if server_port = "80" then server_name else server_name ^ ":" ^ server_port
 
 let get_request_string conf =
-  if not conf.cgi then Mutil.extract_param "GET " ' ' conf.request
+  if not conf.cgi then Header.extract_param "GET " ' ' conf.request
   else
     let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
@@ -2639,7 +2639,7 @@ let is_that_user_and_password auth_scheme user passwd =
         that_response_would_be = ds.ds_response
 
 let browser_doesnt_have_tables conf =
-  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
+  let user_agent = Header.extract_param "user-agent: " '/' conf.request in
   String.lowercase_ascii user_agent = "lynx"
 
 let of_course_died conf p =

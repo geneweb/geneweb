@@ -6,6 +6,7 @@ open Config
 let src = Logs.Src.create ~doc:"Robot" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
+module Code = Geneweb_http.Code
 
 let magic_robot = "GWRB0008"
 
@@ -66,7 +67,7 @@ let is_ip_already_covered excl_list ip =
   List.exists (fun (pattern, _) -> ip_matches_pattern ip pattern) excl_list
 
 let robot_error conf cnt sec =
-  Output.status conf Def.Forbidden;
+  Output.status conf Code.Forbidden;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   let env =
     Templ.Env.(

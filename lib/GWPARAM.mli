@@ -81,7 +81,7 @@ val output_error :
   ?headers:string list ->
   ?content:Adef.safe_string ->
   Config.config ->
-  Def.httpStatus ->
+  Geneweb_http.Code.status ->
   unit
 (** If [?content] is not set, sends page content from
     [/etc/<status-code>-<lang>.html]. If the current lang is not available, use

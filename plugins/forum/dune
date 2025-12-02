@@ -11,7 +11,7 @@
 
 (executable
  (name plugin_forum)
- (libraries geneweb geneweb.gwd_lib geneweb.wserver)
+ (libraries geneweb geneweb.gwd_lib geneweb_http)
  (modes
   (native plugin))
  (modules plugin_forum))

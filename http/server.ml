@@ -6,8 +6,7 @@ let src = Logs.Src.create ~doc:"Wserver" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
-type handler =
-  Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit
+type handler = Unix.sockaddr * string list -> string -> string -> unit
 
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
@@ -63,19 +62,8 @@ let printing_state = ref Nothing
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
   printing_state := Status;
-  if status <> Def.OK || not !cgi then (
-    let answer =
-      match status with
-      | Def.OK -> "200 OK"
-      | Def.Moved_Temporarily -> "302 Moved Temporarily"
-      | Def.Bad_Request -> "400 Bad Request"
-      | Def.Unauthorized -> "401 Unauthorized"
-      | Def.Forbidden -> "403 Forbidden"
-      | Def.Not_Found -> "404 Not Found"
-      | Def.Conflict -> "409 Conflict"
-      | Def.Internal_Server_Error -> "500 Internal Server Error"
-      | Def.Service_Unavailable -> "503 Service Unavailable"
-    in
+  if status <> Code.OK || not !cgi then (
+    let answer = Code.to_string status in
     if !cgi then (
       output_string !wserver_oc "Status: ";
       output_string !wserver_oc answer)
@@ -86,27 +74,27 @@ let http status =
 
 let header s =
   if !printing_state <> Status then
-    if !printing_state = Nothing then http Def.OK
+    if !printing_state = Nothing then http Code.OK
     else failwith "Cannot write HTTP headers: page contents already started";
   output_string !wserver_oc s;
   printnl ()
 
 let printf fmt =
   if !printing_state <> Contents then (
-    if !printing_state = Nothing then http Def.OK;
+    if !printing_state = Nothing then http Code.OK;
     printnl ();
     printing_state := Contents);
   Printf.fprintf !wserver_oc fmt
 
 let print_string s =
   if !printing_state <> Contents then (
-    if !printing_state = Nothing then http Def.OK;
+    if !printing_state = Nothing then http Code.OK;
     printnl ();
     printing_state := Contents);
   output_string !wserver_oc s
 
 let http_redirect_temporarily url =
-  http Def.Moved_Temporarily;
+  http Code.Moved_Temporarily;
   output_string !wserver_oc "Location: ";
   output_string !wserver_oc url;
   printnl ();
@@ -146,11 +134,11 @@ let get_request strm =
 let get_request_and_content strm =
   let request = get_request strm in
   let content =
-    match Mutil.extract_param "content-length: " ' ' request with
+    match Header.extract_param "content-length: " ' ' request with
     | "" -> ""
     | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
   in
-  (request, Adef.encoded content)
+  (request, content)
 
 let string_of_sockaddr = function
   | Unix.ADDR_UNIX s -> s
@@ -160,7 +148,7 @@ let sockaddr_of_string s = Unix.ADDR_UNIX s
 
 let timeout_handler ~timeout _ =
   try
-    if !printing_state = Nothing then http Def.OK;
+    if !printing_state = Nothing then http Code.OK;
     if !printing_state <> Contents then (
       output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
       printnl ();
@@ -185,15 +173,14 @@ let treat_connection callback client_addr client_socket =
       get_request_and_content strm
     in
     let path, query =
-      match Mutil.extract_param "GET /" ' ' request with
-      | "" -> (Mutil.extract_param "POST /" ' ' request, query)
+      match Header.extract_param "GET /" ' ' request with
+      | "" -> (Header.extract_param "POST /" ' ' request, query)
       | str -> (
           match String.index_opt str '?' with
           | Some i ->
               ( String.sub str 0 i,
-                String.sub str (i + 1) (String.length str - i - 1)
-                |> Adef.encoded )
-          | None -> (str, "" |> Adef.encoded))
+                String.sub str (i + 1) (String.length str - i - 1) )
+          | None -> (str, ""))
     in
     (request, path, query)
   in
@@ -368,5 +355,3 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
       wserver_oc := oc;
       ignore (treat_connection callback addr client_socket);
       exit 0
-
-module Pool = Pool

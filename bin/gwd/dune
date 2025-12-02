@@ -12,7 +12,7 @@
  (name gwd_lib)
  (public_name geneweb.gwd_lib)
  (wrapped true)
- (libraries geneweb wserver)
+ (libraries geneweb geneweb_http)
  (modules gwdPlugin request))
 
 (executable
@@ -24,6 +24,7 @@
   dynlink
   geneweb
   geneweb.logs
+  geneweb_http
   gwd_lib
   logs
   logs.fmt
@@ -33,6 +34,5 @@
   fmt.tty
   str
   unix
-  uri
-  wserver)
+  uri)
  (modules base64 gwd gwdPluginDep gwdPluginMD5 gwdPluginMETA robot))

@@ -1,9 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(* module [Wserver]: elementary web service *)
-
-type handler =
-  Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit
+type handler = Unix.sockaddr * string list -> string -> string -> unit
 
 val start :
   ?addr:string ->
@@ -52,7 +49,7 @@ val wflush : unit -> unit
 (** Flushes the content of the current socket *)
 (* To flush page contents print. *)
 
-val http : Def.httpStatus -> unit
+val http : Code.status -> unit
 (** [Output.status conf answer] sends the http header where [answer] represents
     the answer status. *)
 
@@ -60,7 +57,7 @@ val http_redirect_temporarily : string -> unit
 (** [Output.status conf_redirect url] sends the http header where [url]
     represents the Location where the request needs to be redirected. *)
 
-val get_request_and_content : char Stream.t -> string list * Adef.encoded_string
+val get_request_and_content : char Stream.t -> string list * string
 (** Returns the request from a stream read from a socket. *)
 
 val wsocket : unit -> Unix.file_descr
@@ -111,5 +108,3 @@ val cgi : bool ref
        "machine.domain:2368"   (your machine name)
        "addr:2368"             (your machine internet address)
 *)
-
-module Pool : module type of Pool
