@@ -2288,6 +2288,7 @@ const CircularModeRenderer = {
       this.renderCenterText(s2Group, s2, center_x, center_y - r/2, false);
       s2.sosa = 2;
       SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2, { type: 'person' });
+      this.drawCenterNavigationIndicator(s2Group, s2, r, 'north');
     }
 
     // Mère (sud)
@@ -2299,6 +2300,7 @@ const CircularModeRenderer = {
       this.renderCenterText(s3Group, s3, center_x, center_y + r/2, true);
       s3.sosa = 3;
       SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3, { type: 'person' });
+      this.drawCenterNavigationIndicator(s3Group, s3, r, 'south');
     }
 
     // Séparateur
@@ -2327,7 +2329,54 @@ const CircularModeRenderer = {
         s1Text.appendChild(s1Title);
         centerGroup.appendChild(s1Text);
       }*/
-    },
+  },
+
+  /**
+   * Indicateur de navigation pour les secteurs centraux du mode couple
+   * @param {SVGElement} group - Groupe SVG parent
+   * @param {Object} person - Données de la personne
+   * @param {number} r - Rayon du cercle central
+   * @param {string} position - 'north' ou 'south'
+   */
+  drawCenterNavigationIndicator: function(group, person, r, position) {
+    if (!person || !person.fn || person.fn === "?") return;
+    const fontSize = Math.max(35, Math.min(65, Math.round((r / 2) * 2)));
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", center_x);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+
+    const offset = r * 0.87;
+    const yPos = position === "north"
+      ? center_y - offset
+      : center_y + offset;
+
+    text.setAttribute("y", yPos);
+
+    const symbol = person.has_parents
+      ? (position === "north" ? "&#x25B2;" : "&#x25BC;") : "&#x2716;";
+
+    text.setAttribute("class", person.has_parents ? "link icon" : "no-link");
+
+    text.innerHTML = `<tspan style="font-size:${fontSize}%;">${symbol}</tspan>`;
+
+    if (person.has_parents) {
+      text.onclick = (e) => {
+        const useNewTab = e.ctrlKey || e.metaKey;
+        URLManager.navigateToPerson(person, useNewTab, true);
+      };
+    }
+
+    const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    title.textContent = person.has_parents
+      ? `Recentrer l'arbre sur ${person.fn} ${person.sn}`
+      : `${person.fn} ${person.sn} : aucun parent connu`;
+    text.appendChild(title);
+
+    group.appendChild(text);
+    return text;
+  },
 
   renderCenterText: function(group, person, x, y, inverted) {
     const r = CONFIG.a_r[0];
