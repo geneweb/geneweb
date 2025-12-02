@@ -57,22 +57,22 @@ type printing_state = Nothing | Status | Contents
 
 let printing_state = ref Nothing
 
+let string_of_status = function
+  | Def.OK -> "200 OK"
+  | Def.Moved_Temporarily -> "302 Moved Temporarily"
+  | Def.Bad_Request -> "400 Bad Request"
+  | Def.Unauthorized -> "401 Unauthorized"
+  | Def.Forbidden -> "403 Forbidden"
+  | Def.Not_Found -> "404 Not Found"
+  | Def.Conflict -> "409 Conflict"
+  | Def.Internal_Server_Error -> "500 Internal Server Error"
+  | Def.Service_Unavailable -> "503 Service Unavailable"
+
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
   printing_state := Status;
   if status <> Def.OK || not !cgi then (
-    let answer =
-      match status with
-      | Def.OK -> "200 OK"
-      | Def.Moved_Temporarily -> "302 Moved Temporarily"
-      | Def.Bad_Request -> "400 Bad Request"
-      | Def.Unauthorized -> "401 Unauthorized"
-      | Def.Forbidden -> "403 Forbidden"
-      | Def.Not_Found -> "404 Not Found"
-      | Def.Conflict -> "409 Conflict"
-      | Def.Internal_Server_Error -> "500 Internal Server Error"
-      | Def.Service_Unavailable -> "503 Service Unavailable"
-    in
+    let answer = string_of_status status in
     if !cgi then (
       output_string !wserver_oc "Status: ";
       output_string !wserver_oc answer)

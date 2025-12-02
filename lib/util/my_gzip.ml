@@ -80,3 +80,45 @@ let rec input_line ic =
     else (
       Buffer.add_bytes ic.tail b;
       input_line ic)
+
+let gzip_string ?(level = 6) input =
+  let input_len = String.length input in
+  if input_len = 0 then ""
+  else
+    let header = Bytes.create 10 in
+    Bytes.set header 0 '\x1f';
+    Bytes.set header 1 '\x8b';
+    Bytes.set header 2 '\x08';
+    Bytes.set header 3 '\x00';
+    Bytes.set header 4 '\x00';
+    Bytes.set header 5 '\x00';
+    Bytes.set header 6 '\x00';
+    Bytes.set header 7 '\x00';
+    Bytes.set header 8 '\x00';
+    Bytes.set header 9 '\xff';
+    let output_buf = Buffer.create (input_len / 2) in
+    let input_pos = ref 0 in
+    let refill buf =
+      let available = input_len - !input_pos in
+      let to_read = min available (Bytes.length buf) in
+      Bytes.blit_string input !input_pos buf 0 to_read;
+      input_pos := !input_pos + to_read;
+      to_read
+    in
+    let flush buf len = Buffer.add_subbytes output_buf buf 0 len in
+    Zlib.compress ~level ~header:false refill flush;
+    let crc = Zlib.update_crc_string 0l input 0 input_len in
+    let trailer = Bytes.create 8 in
+    Bytes.set trailer 0 (Char.chr (Int32.to_int crc land 0xff));
+    Bytes.set trailer 1
+      (Char.chr (Int32.to_int (Int32.shift_right_logical crc 8) land 0xff));
+    Bytes.set trailer 2
+      (Char.chr (Int32.to_int (Int32.shift_right_logical crc 16) land 0xff));
+    Bytes.set trailer 3
+      (Char.chr (Int32.to_int (Int32.shift_right_logical crc 24) land 0xff));
+    Bytes.set trailer 4 (Char.chr (input_len land 0xff));
+    Bytes.set trailer 5 (Char.chr ((input_len lsr 8) land 0xff));
+    Bytes.set trailer 6 (Char.chr ((input_len lsr 16) land 0xff));
+    Bytes.set trailer 7 (Char.chr ((input_len lsr 24) land 0xff));
+    Bytes.to_string header ^ Buffer.contents output_buf
+    ^ Bytes.to_string trailer
