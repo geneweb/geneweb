@@ -1243,6 +1243,156 @@ type title_item =
   * Gwdb.istr list
   * (Date.date option * Date.date option) list
 
+module EventUtils : sig
+  type family_relation =
+    | Child
+    | GrandChild
+    | GreatGrandChild
+    | Sibling
+    | Spouse
+    | Parent
+    | GrandParent
+    | GreatGrandParent
+
+  type event_kind = Witnessed | CurrentPerson | Relation of family_relation
+  type ('a, 'b) witnessed_event_data
+  type ('a, 'b) event
+
+  val get_event_kind : ('a, 'b) event -> event_kind
+  val get_event : ('a, 'b) event -> 'b Event.event_item
+  val get_event_holder : ('a, 'b) event -> 'a
+
+  val get_witnessed_event_data :
+    ('a, 'b) event -> ('a, 'b) witnessed_event_data option
+
+  val get_witness : ('a, 'b) witnessed_event_data -> 'a
+  val get_witness_note : ('a, 'b) witnessed_event_data -> string
+  val get_witness_kind : ('a, 'b) witnessed_event_data -> Def.witness_kind
+
+  val get_events :
+    Config.config ->
+    Gwdb.base ->
+    Gwdb.person ->
+    event_kind list ->
+    (Gwdb.person, Gwdb.istr) event list
+
+  val get_sorted_events :
+    Config.config ->
+    Gwdb.base ->
+    Gwdb.person ->
+    event_kind list ->
+    (Gwdb.person, Gwdb.istr) event list
+end = struct
+  type family_relation =
+    | Child
+    | GrandChild
+    | GreatGrandChild
+    | Sibling
+    | Spouse
+    | Parent
+    | GrandParent
+    | GreatGrandParent
+
+  type event_kind = Witnessed | CurrentPerson | Relation of family_relation
+
+  type ('a, 'b) witnessed_event_data = {
+    event_holder : 'a;
+    event : 'b Event.event_item;
+    witness_kind : Def.witness_kind;
+    witness_note : string;
+    witness : 'a;
+  }
+
+  type ('a, 'b) event_data = { event_holder : 'a; event : 'b Event.event_item }
+
+  type ('a, 'b) event =
+    | MainPersonEvent of ('a, 'b) event_data
+    | FamilyRelationEvent of family_relation * ('a, 'b) event_data
+    | WitnessedEvent of ('a, 'b) witnessed_event_data
+
+  let get_event_holder = function
+    | MainPersonEvent event_data -> event_data.event_holder
+    | FamilyRelationEvent (_, event_data) -> event_data.event_holder
+    | WitnessedEvent witnessed_event_data -> witnessed_event_data.event_holder
+
+  let get_event_kind = function
+    | MainPersonEvent _ -> CurrentPerson
+    | FamilyRelationEvent (frel, _) -> Relation frel
+    | WitnessedEvent _ -> Witnessed
+
+  let get_witnessed_event_data = function
+    | MainPersonEvent _ | FamilyRelationEvent _ -> None
+    | WitnessedEvent witnessed_event_data -> Some witnessed_event_data
+
+  let get_witness data = data.witness
+  let get_witness_note data = data.witness_note
+  let get_witness_kind data = data.witness_kind
+
+  let family_relation_event family_relation event_holder event =
+    FamilyRelationEvent (family_relation, { event_holder; event })
+
+  let witnessed_events conf base witness =
+    List.map
+      (fun (event_holder, witness_kind, witness_note, event_item) ->
+        WitnessedEvent
+          {
+            event_holder;
+            witness_kind;
+            witness_note;
+            event = event_item;
+            witness;
+          })
+      (Relation.get_event_witnessed conf base witness)
+
+  let person_events p events =
+    List.map (fun event -> MainPersonEvent { event_holder = p; event }) events
+
+  let is_fevent name e = Event.get_name e = Event.Fevent name
+  let is_pevent name e = Event.get_name e = Event.Pevent name
+  let is_marriage = is_fevent Def.Efam_Marriage
+  let is_death = is_pevent Def.Epers_Death
+  let is_burial = is_pevent Def.Epers_Burial
+
+  let spouse_events conf base p events =
+    let all_marriages = List.filter is_marriage events in
+    let all_spouses = List.filter_map Event.get_spouse_iper all_marriages in
+    List.flatten
+    @@ List.map
+         (fun isp ->
+           let sp = Gwdb.poi base isp in
+           let sp_events = Event.events conf base sp in
+           List.filter_map
+             (fun e ->
+               Ext_option.return_if
+                 (is_death e || is_burial e)
+                 (fun () -> family_relation_event Spouse sp e))
+             sp_events)
+         all_spouses
+
+  let get_events conf base p kinds =
+    let p_events = Event.events conf base p in
+    List.map
+      (function
+        | CurrentPerson -> person_events p p_events
+        | Witnessed -> witnessed_events conf base p
+        | Relation Spouse -> spouse_events conf base p p_events
+        | Relation _ -> failwith "todo")
+      kinds
+    |> List.flatten
+
+  let get_event = function
+    | MainPersonEvent e -> e.event
+    | FamilyRelationEvent (_, e) -> e.event
+    | WitnessedEvent e -> e.event
+
+  let get_event_name e = Event.get_name (get_event e)
+  let get_event_date e = Event.get_date (get_event e)
+
+  let get_sorted_events conf base p kinds =
+    get_events conf base p kinds
+    |> Event.sort_events get_event_name get_event_date
+end
+
 type 'a env =
   | Vallgp of generation_person list
   | Vanc of generation_person
@@ -1268,7 +1418,7 @@ type 'a env =
   | Vstring of string
   | Vsosa_ref of Gwdb.person option
   | Vtitle of Gwdb.person * title_item
-  | Vevent of Gwdb.person * Gwdb.istr Event.event_item
+  | Vevent' of (Gwdb.person, Gwdb.istr) EventUtils.event
   | Vlazyp of string option ref
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
@@ -1306,6 +1456,10 @@ let warning_use_has_parents_before_parent (fname, bp, ep) var r =
 let bool_val x = TemplAst.VVbool x
 let str_val x = TemplAst.VVstring x
 let null_val = TemplAst.VVstring ""
+
+let bool_val_of_env_bool = function
+  | Vbool b -> TemplAst.VVbool b
+  | _ -> null_val
 
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
   TemplAst.VVstring ((x :> Adef.safe_string) :> string)
@@ -1827,7 +1981,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | "event_witnessed" :: sl -> (
       match get_env "event_witnessed" env with
-      | Vevent (p, e) -> eval_event_witnessed_var conf base env (p, e) loc sl
+      | Vevent' event -> eval_event_witnessed_var conf base env event loc sl
       | _ -> raise Not_found)
   | "event_witness_kind" :: _ -> (
       match get_env "event_witness_kind" env with
@@ -2367,7 +2521,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
         | None -> null_val)
   | "event" :: sl -> (
       match get_env "event" env with
-      | Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl
+      | Vevent' event -> eval_event_field_var conf base env ep event loc sl
       | _ -> raise Not_found)
   | "father" :: sl -> (
       match Gwdb.get_parents p with
@@ -2564,13 +2718,21 @@ and eval_nobility_title_field_var (id, pl) = function
   | [] -> TemplAst.VVstring (if pl = "" then id else id ^ " " ^ pl)
   | _ -> raise Not_found
 
-and eval_bool_event_field base (p, p_auth) event_item = function
-  | "has_date" -> p_auth && Event.get_date event_item <> Date.cdate_None
-  | "has_place" -> p_auth && Gwdb.sou base (Event.get_place event_item) <> ""
-  | "has_note" -> p_auth && Gwdb.sou base (Event.get_note event_item) <> ""
-  | "has_src" -> p_auth && Gwdb.sou base (Event.get_src event_item) <> ""
-  | "has_witnesses" -> p_auth && Event.has_witnesses event_item
-  | "has_spouse" -> p_auth && Event.get_spouse_iper event_item <> None
+and eval_bool_event_field base (p, p_auth) event = function
+  | "has_date" ->
+      p_auth && Event.get_date (EventUtils.get_event event) <> Date.cdate_None
+  | "has_place" ->
+      p_auth
+      && Gwdb.sou base (Event.get_place (EventUtils.get_event event)) <> ""
+  | "has_note" ->
+      p_auth
+      && Gwdb.sou base (Event.get_note (EventUtils.get_event event)) <> ""
+  | "has_src" ->
+      p_auth && Gwdb.sou base (Event.get_src (EventUtils.get_event event)) <> ""
+  | "has_witnesses" ->
+      p_auth && Event.has_witnesses (EventUtils.get_event event)
+  | "has_spouse" ->
+      p_auth && Event.get_spouse_iper (EventUtils.get_event event) <> None
   | "computable_age" ->
       if p_auth then
         match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
@@ -2582,7 +2744,7 @@ and eval_bool_event_field base (p, p_auth) event_item = function
       else false
   | _ -> raise Not_found
 
-and eval_str_event_field conf base (p, p_auth) event_item = function
+and eval_str_event_field conf base (p, p_auth) event = function
   | "age" ->
       if p_auth then
         let birth_date, approx =
@@ -2591,7 +2753,9 @@ and eval_str_event_field conf base (p, p_auth) event_item = function
           | x -> (x, false)
         in
         match
-          (birth_date, Date.cdate_to_dmy_opt (Event.get_date event_item))
+          ( birth_date,
+            Date.cdate_to_dmy_opt (Event.get_date (EventUtils.get_event event))
+          )
         with
         | ( Some ({ prec = Sure | About | Maybe } as d1),
             Some ({ prec = Sure | About | Maybe } as d2) )
@@ -2608,7 +2772,7 @@ and eval_str_event_field conf base (p, p_auth) event_item = function
   | "name" -> (
       if not p_auth then null_val
       else
-        match Event.get_name event_item with
+        match Event.get_name (EventUtils.get_event event) with
         | Event.Pevent name ->
             Util.string_of_pevent_name conf base name |> safe_val
         | Event.Fevent name ->
@@ -2616,45 +2780,77 @@ and eval_str_event_field conf base (p, p_auth) event_item = function
   | "date" -> (
       if not p_auth then null_val
       else
-        match Date.od_of_cdate (Event.get_date event_item) with
+        match
+          Date.od_of_cdate (Event.get_date (EventUtils.get_event event))
+        with
         | Some d -> DateDisplay.string_of_date conf d |> safe_val
         | None -> null_val)
-  | "on_date" -> date_aux conf p_auth (Event.get_date event_item)
+  | "on_date" ->
+      date_aux conf p_auth (Event.get_date (EventUtils.get_event event))
   | "place" ->
       if p_auth then
-        Gwdb.sou base (Event.get_place event_item)
+        Gwdb.sou base (Event.get_place (EventUtils.get_event event))
         |> Util.trimmed_string_of_place |> safe_val
       else null_val
   | "note" ->
-      Event.get_note event_item
+      Event.get_note (EventUtils.get_event event)
       |> get_note_source conf base ~p p_auth conf.Config.no_note
   | "src" ->
-      Event.get_src event_item |> get_note_source conf base ~p p_auth false
+      Event.get_src (EventUtils.get_event event)
+      |> get_note_source conf base ~p p_auth false
+  | "witness_kind" when EventUtils.get_event_kind event = EventUtils.Witnessed
+    ->
+      let witnessed_event_data =
+        Option.get (EventUtils.get_witnessed_event_data event)
+      in
+      let wk =
+        Util.string_of_witness_kind conf (Gwdb.get_sex p)
+          (EventUtils.get_witness_kind witnessed_event_data)
+      in
+      str_val (wk :> string)
+  | "witness_note" when EventUtils.get_event_kind event = EventUtils.Witnessed
+    ->
+      let witnessed_event_data =
+        Option.get (EventUtils.get_witnessed_event_data event)
+      in
+      let wnote =
+        Util.escape_html
+          (Notes.limit_display_length
+             (EventUtils.get_witness_note witnessed_event_data))
+      in
+      str_val (wnote :> string)
   | _ -> raise Not_found
 
-and eval_event_field_var conf base env (p, p_auth) event_item loc = function
+and eval_event_field_var conf base env (p, p_auth) event loc = function
+  | "event_holder" :: sl ->
+      let event_holder = EventUtils.get_event_holder event in
+      let ep = (event_holder, Person.is_visible conf base event_holder) in
+      eval_person_field_var conf base env ep loc sl
   | "date" :: sl -> (
-      match (p_auth, Date.od_of_cdate (Event.get_date event_item)) with
+      match
+        (p_auth, Date.od_of_cdate (Event.get_date (EventUtils.get_event event)))
+      with
       | true, Some d -> eval_date_field_var conf d sl
       | _ -> null_val)
   | "spouse" :: sl -> (
-      match Event.get_spouse_iper event_item with
+      match Event.get_spouse_iper (EventUtils.get_event event) with
       | Some isp ->
           let sp = Gwdb.poi base isp in
           let ep = (sp, Person.is_visible conf base sp) in
           eval_person_field_var conf base env ep loc sl
       | None -> null_val)
   | [ s ] -> (
-      try bool_val (eval_bool_event_field base (p, p_auth) event_item s)
-      with Not_found ->
-        eval_str_event_field conf base (p, p_auth) event_item s)
+      try bool_val (eval_bool_event_field base (p, p_auth) event s)
+      with Not_found -> eval_str_event_field conf base (p, p_auth) event s)
   | _ -> raise Not_found
 
-and eval_event_witnessed_var conf base env (p, e) loc = function
+and eval_event_witnessed_var conf base env event loc = function
   | "event" :: sl ->
+      let p = EventUtils.get_event_holder event in
       let ep = (p, Person.is_visible conf base p) in
-      eval_event_field_var conf base env ep e loc sl
+      eval_event_field_var conf base env ep event loc sl
   | "person" :: sl ->
+      let p = EventUtils.get_event_holder event in
       let ep = (p, Person.is_visible conf base p) in
       eval_person_field_var conf base env ep loc sl
   | _ -> raise Not_found
@@ -3846,14 +4042,30 @@ let print_foreach conf base print_ast eval_expr =
     loop 0
   in
   let print_foreach_event env al ((p, _) as ep) =
-    let events = Event.sorted_events conf base p in
+    let events =
+      EventUtils.get_sorted_events conf base p [ EventUtils.CurrentPerson ]
+    in
     let env = event_count events :: env in
     Ext_list.iter_first
       (fun first evt ->
-        let env = ("event", Vevent (p, evt)) :: env in
+        let env = ("event", Vevent' evt) :: env in
         let env = ("first", Vbool first) :: env in
         List.iter (print_ast env ep) al)
       events
+  in
+  let print_foreach_every_event env al ((p, _) as ep) =
+    let events =
+      EventUtils.get_sorted_events conf base p
+        EventUtils.[ CurrentPerson; Witnessed ]
+    in
+    let sorted_all_events = List.map (fun e -> Vevent' e) events in
+    let env = event_count sorted_all_events :: env in
+    Ext_list.iter_first
+      (fun first e ->
+        let env = ("event", e) :: env in
+        let env = ("first", Vbool first) :: env in
+        List.iter (print_ast env ep) al)
+      sorted_all_events
   in
   let print_foreach_epers_event_witness env al ((p, _) as ep) epers_event =
     let epers_event_witness_string =
@@ -3885,8 +4097,14 @@ let print_foreach conf base print_ast eval_expr =
   in
   let print_foreach_event_witness env al ((_, p_auth) as ep) =
     if p_auth then
-      match get_env "event" env with
-      | Vevent (_, event_item) ->
+      let event_item =
+        match get_env "event" env with
+        | Vevent' evt -> Some (EventUtils.get_event evt)
+        (*TODO *)
+        | _ -> None
+      in
+      Option.iter
+        (fun event_item ->
           Array.iteri
             (fun i (ip, wk, wnote) ->
               let p = Util.pget conf base ip in
@@ -3904,29 +4122,48 @@ let print_foreach conf base print_ast eval_expr =
                 :: env
               in
               List.iter (print_ast env ep) al)
-            (Event.get_witnesses_and_notes event_item)
-      | _ -> ()
+            (Event.get_witnesses_and_notes event_item))
+        event_item
   in
   let print_foreach_event_witnessed env al ((p, p_auth) as ep) =
     (* This is the category "Presence at event" *)
     if p_auth then
-      let events_witnesses = Relation.get_event_witnessed conf base p in
-      let env = event_count events_witnesses :: env in
+      let witnessed_events =
+        EventUtils.get_sorted_events conf base p [ EventUtils.Witnessed ]
+      in
+      let env = event_count witnessed_events :: env in
       List.iter
-        (fun (related_person, wk, wnote, evt) ->
-          let wk = Util.string_of_witness_kind conf (Gwdb.get_sex p) wk in
-          let wnote = Util.escape_html @@ Notes.limit_display_length wnote in
-          let env = ("event_witnessed", Vevent (related_person, evt)) :: env in
+        (fun witnessed_event (*(related_person, wk, wnote, evt)*) ->
+          let witnessed_event_data =
+            EventUtils.get_witnessed_event_data witnessed_event
+          in
           let env =
-            ("event_witness_kind", Vstring (wk : Adef.safe_string :> string))
-            :: ( "event_witness_note",
-                 Vstring (wnote : Adef.escaped_string :> string) )
-            :: env
+            match witnessed_event_data with
+            | Some witnessed_event_data ->
+                let wk =
+                  Util.string_of_witness_kind conf (Gwdb.get_sex p)
+                    (EventUtils.get_witness_kind witnessed_event_data)
+                in
+                let wnote =
+                  Util.escape_html
+                  @@ Notes.limit_display_length
+                       (EventUtils.get_witness_note witnessed_event_data)
+                in
+                let env = ("event_witnessed", Vevent' witnessed_event) :: env in
+                let env =
+                  ( "event_witness_kind",
+                    Vstring (wk : Adef.safe_string :> string) )
+                  :: ( "event_witness_note",
+                       Vstring (wnote : Adef.escaped_string :> string) )
+                  :: env
+                in
+
+                env
+            | None -> env
           in
           List.iter (print_ast env ep) al)
-        events_witnesses
+        witnessed_events
   in
-
   let print_foreach_witness env al ep witness_kind = function
     | Vfam (_, fam, _, true) ->
         let _ =
@@ -4233,6 +4470,7 @@ let print_foreach conf base print_ast eval_expr =
     | "cousin_level" -> print_foreach_cousin_level env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
+    | "every_event" -> print_foreach_every_event env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
     | "nobility_title" -> print_foreach_nobility_title env al ep
