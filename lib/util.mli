@@ -404,7 +404,7 @@ val p_getenv_notrim :
 val p_getint : Config.env -> string -> int option
 (** Returns integer value associated to the label in environnement *)
 
-val create_env : Adef.encoded_string -> Config.env
+val create_env : string -> Config.env
 (** Create association list from the query part of a URL. (i.e. a list of
     key-value separated by `&` or `;`) *)
 

@@ -60,6 +60,13 @@
 )
 
 (package
+  (name geneweb-http)
+  (synopsis "HTTP 1.1 support for GeneWeb daemon")
+  (depends
+    (ocaml (>= 4.10))
+    geneweb-compat))
+
+(package
   (name geneweb-rpc)
   (synopsis "RPC support for GeneWeb")
   (tags (geneweb rpc json))

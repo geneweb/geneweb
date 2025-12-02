@@ -372,7 +372,7 @@ let print_linked_list_gallery conf base pgl =
           if
             (restrict_l = [] || not (is_restricted conf base restrict_l))
             && (typ = "gallery" || typ = "album")
-          then Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
+          then Output.printf conf "%s" (create_gallery_item conf fnotes nenv s)
       | _ -> ())
     pgl;
   Output.print_sstring conf "</div>\n"

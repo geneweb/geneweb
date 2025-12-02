@@ -6,7 +6,7 @@
       without a previous call to [status].
     - The output channel is a socket given by [gwd] *)
 
-val status : Config.config -> Def.httpStatus -> unit
+val status : Config.config -> Geneweb_http.Code.status -> unit
 (** [status conf answer] print HTTP status line to the output channel where
     [answer] is a HTTP status. *)
 

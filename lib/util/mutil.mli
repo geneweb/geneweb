@@ -301,14 +301,6 @@ val gen_decode : bool -> Adef.encoded_string -> string
 (** Like above but heading and trailing spaces are stripped only if bool
     parameter is [true]. [decode] = [gen_decode true]. *)
 
-val extract_param : string -> char -> string list -> string
-(** [extract_param name stopc request] can be used to extract some parameter
-    from a browser [request] (list of strings); [name] is a string which should
-    match the beginning of a request line, [stopc] is a character ending the
-    request line. For example, the string request has been obtained by:
-    [extract_param "GET /" ' ']. Answers the empty string if the parameter is
-    not found. *)
-
 val sprintf_date : Unix.tm -> Adef.safe_string
 (** Print a date using "%04d-%02d-%02d %02d:%02d:%02d" format Example :
     2021-12-13 22:35:08. *)

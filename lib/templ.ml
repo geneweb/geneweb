@@ -6,6 +6,7 @@ module Parser = Geneweb_templ.Parser
 module Ast = Geneweb_templ.Ast
 module Loc = Geneweb_templ.Loc
 module Driver = Geneweb_db.Driver
+module Header = Geneweb_http.Header
 
 exception BadApplyArity
 exception NamedArgumentNotMatched of string
@@ -118,7 +119,7 @@ let not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 
 let setup_link (conf : Config.config) =
-  let s = Mutil.extract_param "host: " '\r' conf.request in
+  let s = Header.extract_param "host: " '\r' conf.request in
   try
     let i = String.rindex s ':' in
     let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
@@ -664,7 +665,7 @@ let templ_eval_var (conf : Config.config) = function
   | [ "false" ] -> VVbool false
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
-      VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
+      VVbool (Header.extract_param "referer: " '\n' conf.request <> "")
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend

@@ -1,5 +1,5 @@
 (library
  (name geneweb_def)
  (public_name geneweb.def)
- (libraries re)
+ (libraries re geneweb_http)
  (wrapped false))

@@ -8,6 +8,7 @@ let src = Logs.Src.create ~doc:"DagDisplay" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
+module Server = Geneweb_http.Server
 
 let image_normal_txt conf base p fname width height =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
@@ -1442,7 +1443,7 @@ let print conf base =
         (Util.prefix_base conf :> string)
         (String.concat "&" (List.rev !converted_params))
     in
-    Wserver.http_redirect_temporarily clean_url)
+    Server.http_redirect_temporarily clean_url)
   else
     let set = get_dag_elems conf base in
     let elem_txt p = Item (p, Adef.safe "") in

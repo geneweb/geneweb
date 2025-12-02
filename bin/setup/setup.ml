@@ -1,4 +1,7 @@
 open Geneweb
+module Server = Geneweb_http.Server
+module Code = Geneweb_http.Code
+module Header = Geneweb_http.Header
 
 let port = ref 2316
 let gwd_port = ref 2317
@@ -16,10 +19,10 @@ let printer_conf =
     Config.empty with
     output_conf =
       {
-        status = Wserver.http;
-        header = Wserver.header;
-        body = Wserver.print_string;
-        flush = Wserver.wflush;
+        status = Server.http;
+        header = Server.header;
+        body = Server.print_string;
+        flush = Server.wflush;
       };
   }
 
@@ -54,7 +57,7 @@ let charset conf =
   try Hashtbl.find conf.lexicon "!charset" with Not_found -> "utf-8"
 
 let header_no_page_title conf title =
-  Output.status printer_conf Def.OK;
+  Output.status printer_conf Code.OK;
   Output.header printer_conf "Content-type: text/html; charset=%s"
     (charset conf);
   Output.print_sstring printer_conf
@@ -125,7 +128,6 @@ let rec skip_spaces s i =
   if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
 
 let create_env s =
-  let s = (s : Adef.encoded_string :> string) in
   let rec get_assoc beg i =
     if i = String.length s then
       if i = beg then [] else [ String.sub s beg (i - beg) ]
@@ -329,13 +331,13 @@ let is_directory x =
   with Unix.Unix_error (_, _, _) -> false
 
 let server_string conf =
-  let s = Mutil.extract_param "host: " '\r' conf.request in
+  let s = Header.extract_param "host: " '\r' conf.request in
   try
     let i = String.rindex s ':' in
     String.sub s 0 i
   with Not_found -> "127.0.0.1"
 
-let referer conf = Mutil.extract_param "referer: " '\r' conf.request
+let referer conf = Header.extract_param "referer: " '\r' conf.request
 
 let only_file_name =
   lazy
@@ -881,7 +883,7 @@ let print_file conf bname =
   let ic_opt = try Some (open_in fname) with Sys_error _ -> None in
   match ic_opt with
   | Some ic ->
-      Output.status printer_conf Def.OK;
+      Output.status printer_conf Code.OK;
       Output.header printer_conf "Content-type: text/html; charset=%s"
         (charset conf);
       copy_from_stream conf
@@ -1630,7 +1632,7 @@ let print_typed_file conf typ fname =
   let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
   match ic_opt with
   | Some ic ->
-      Output.status printer_conf Def.OK;
+      Output.status printer_conf Code.OK;
       Output.header printer_conf "Content-type: %s" typ;
       Output.header printer_conf "Content-length: %d" (in_channel_length ic);
       (try
@@ -1827,7 +1829,7 @@ let input_lexicon lang =
       raise e
   with Sys_error _ -> t
 
-let setup (addr, req) comm (env_str : Adef.encoded_string) =
+let setup (addr, req) comm env_str =
   let conf =
     let env = create_env env_str in
     if env = [] && (comm = "" || String.length comm = 2) then
@@ -1856,7 +1858,7 @@ let setup (addr, req) comm (env_str : Adef.encoded_string) =
   else if conf.comm = "" then print_file conf "welcome.htm"
   else setup_comm conf comm
 
-let wrap_setup a b (c : Adef.encoded_string) =
+let wrap_setup a b c =
   if not Sys.unix then (
     (* another process have been launched, therefore we lost variables;
        and we cannot parse the arg list again, because of possible spaces
@@ -2000,4 +2002,4 @@ let intro () =
 let () =
   if Sys.unix then intro ()
   else if Sys.getenv_opt "WSERVER" = None then intro ();
-  Wserver.start ~port:!port ~max_pending_requests:150 ~n_workers:1 wrap_setup
+  Server.start ~port:!port ~max_pending_requests:150 ~n_workers:1 wrap_setup

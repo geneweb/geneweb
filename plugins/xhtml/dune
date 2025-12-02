@@ -1,6 +1,6 @@
 (executable
  (name plugin_xhtml)
- (libraries geneweb geneweb.gwd_lib geneweb.wserver)
+ (libraries geneweb geneweb.gwd_lib geneweb_http)
  (modes
   (native plugin)))
 
