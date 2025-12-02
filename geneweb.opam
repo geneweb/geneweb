@@ -13,6 +13,7 @@ bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "dune" {>= "2.9"}
   "ocaml" {>= "4.10"}
+  "geneweb-compat"
   "alcotest" {with-test}
   "benchmark"
   "calendars" {= "1.0.0"}
