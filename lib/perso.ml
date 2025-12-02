@@ -1243,6 +1243,14 @@ type title_item =
   * Gwdb.istr list
   * (Date.date option * Date.date option) list
 
+type witnessed_event_data = {
+  event_holder : Gwdb.person;
+  event : Gwdb.istr Event.event_item;
+  witness_kind : Def.witness_kind;
+  witness_note : string;
+  witness : Gwdb.person;
+}
+
 type 'a env =
   | Vallgp of generation_person list
   | Vanc of generation_person
@@ -1269,6 +1277,7 @@ type 'a env =
   | Vsosa_ref of Gwdb.person option
   | Vtitle of Gwdb.person * title_item
   | Vevent of Gwdb.person * Gwdb.istr Event.event_item
+  | VeventWitnessed of witnessed_event_data
   | Vlazyp of string option ref
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
@@ -1306,6 +1315,10 @@ let warning_use_has_parents_before_parent (fname, bp, ep) var r =
 let bool_val x = TemplAst.VVbool x
 let str_val x = TemplAst.VVstring x
 let null_val = TemplAst.VVstring ""
+
+let bool_val_of_env_bool = function
+  | Vbool b -> TemplAst.VVbool b
+  | _ -> null_val
 
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
   TemplAst.VVstring ((x :> Adef.safe_string) :> string)
@@ -2368,7 +2381,12 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | "event" :: sl -> (
       match get_env "event" env with
       | Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl
+      | VeventWitnessed witnessed_event_data ->
+          eval_event_witnessed_field_var conf base env ep witnessed_event_data
+            loc sl
       | _ -> raise Not_found)
+  | "is_main_person_event" :: _ ->
+      bool_val_of_env_bool (get_env "is_main_person_event" env)
   | "father" :: sl -> (
       match Gwdb.get_parents p with
       | Some ifam ->
@@ -2649,6 +2667,30 @@ and eval_event_field_var conf base env (p, p_auth) event_item loc = function
       with Not_found ->
         eval_str_event_field conf base (p, p_auth) event_item s)
   | _ -> raise Not_found
+
+and eval_event_witnessed_field_var conf base env (p, p_auth)
+    witnessed_event_data loc = function
+  | "event_holder" :: sl ->
+      let ep =
+        ( witnessed_event_data.event_holder,
+          Person.is_visible conf base witnessed_event_data.event_holder )
+      in
+      eval_person_field_var conf base env ep loc sl
+  | [ "witness_kind" ] ->
+      let wk =
+        Util.string_of_witness_kind conf (Gwdb.get_sex p)
+          witnessed_event_data.witness_kind
+      in
+      str_val (wk :> string)
+  | [ "witness_note" ] ->
+      let wnote =
+        Util.escape_html
+          (Notes.limit_display_length witnessed_event_data.witness_note)
+      in
+      str_val (wnote :> string)
+  | sl ->
+      eval_event_field_var conf base env (p, p_auth) witnessed_event_data.event
+        loc sl
 
 and eval_event_witnessed_var conf base env (p, e) loc = function
   | "event" :: sl ->
@@ -3855,6 +3897,44 @@ let print_foreach conf base print_ast eval_expr =
         List.iter (print_ast env ep) al)
       events
   in
+  let print_foreach_event_and_witnessed_event env al ((p, _) as ep) =
+    let p_events =
+      List.map (fun e -> Vevent (p, e)) (Event.events conf base p)
+    in
+    let events_witnessed =
+      List.map
+        (fun (event_holder, witness_kind, witness_note, event) ->
+          VeventWitnessed
+            { event_holder; witness_kind; witness_note; event; witness = p })
+        (Relation.get_event_witnessed conf base p)
+    in
+    let all_events = p_events @ events_witnessed in
+    let sorted_all_events =
+      Event.sort_events
+        (function
+          | Vevent (_, event) -> Event.get_name event
+          | VeventWitnessed { event } -> Event.get_name event
+          | _ -> assert false (* by construction *))
+        (function
+          | Vevent (_, event) -> Event.get_date event
+          | VeventWitnessed { event } -> Event.get_date event
+          | _ -> assert false (* by construction *))
+        all_events
+    in
+    let env = event_count sorted_all_events :: env in
+    Ext_list.iter_first
+      (fun first e ->
+        let env =
+          match e with
+          | Vevent _ -> ("is_main_person_event", Vbool true) :: env
+          | VeventWitnessed _ -> ("is_main_person_event", Vbool false) :: env
+          | _ -> assert false
+        in
+        let env = ("event", e) :: env in
+        let env = ("first", Vbool first) :: env in
+        List.iter (print_ast env ep) al)
+      sorted_all_events
+  in
   let print_foreach_epers_event_witness env al ((p, _) as ep) epers_event =
     let epers_event_witness_string =
       match epers_event with
@@ -3926,7 +4006,6 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         events_witnesses
   in
-
   let print_foreach_witness env al ep witness_kind = function
     | Vfam (_, fam, _, true) ->
         let _ =
@@ -4233,6 +4312,8 @@ let print_foreach conf base print_ast eval_expr =
     | "cousin_level" -> print_foreach_cousin_level env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
+    | "event_and_witnessed_event" ->
+        print_foreach_event_and_witnessed_event env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
     | "nobility_title" -> print_foreach_nobility_title env al ep
