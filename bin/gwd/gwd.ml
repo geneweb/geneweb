@@ -12,15 +12,17 @@ module Gutil = Geneweb_db.Gutil
 
 let gzip_min_size = 1000
 
-let client_accepts_gzip request =
+let client_accepts encoding request =
   let accept =
     String.lowercase_ascii
       (Mutil.extract_param "accept-encoding: " '\n' request)
   in
-  Mutil.contains accept "gzip"
+  Mutil.contains accept encoding
 
 let make_gzip_output_conf request =
-  if not (client_accepts_gzip request) then None
+  let accepts_brotli = client_accepts "br" request in
+  let accepts_gzip = client_accepts "gzip" request in
+  if not (accepts_brotli || accepts_gzip) then None
   else
     let body_buf = Buffer.create 65536 in
     let headers_buf = Buffer.create 1024 in
@@ -41,25 +43,29 @@ let make_gzip_output_conf request =
             let is_html =
               Mutil.contains (String.lowercase_ascii headers) "text/html"
             in
-            let final_body, is_gzipped =
+            let final_body, encoding =
               if is_html && body_len > gzip_min_size then
-                try
-                  let compressed = My_gzip.gzip_string ~level:6 body in
-                  if String.length compressed < body_len then (compressed, true)
-                  else (body, false)
-                with _ -> (body, false)
-              else (body, false)
+                if accepts_brotli then
+                  try (Brotli.compress ~quality:4 body, Some "br")
+                  with _ -> (body, None)
+                else if accepts_gzip then
+                  try (My_gzip.gzip_string ~level:6 body, Some "gzip")
+                  with _ -> (body, None)
+                else (body, None)
+              else (body, None)
             in
             let oc = Wserver.woc () in
             let status_line = Wserver.string_of_status !status_ref in
             if not !Wserver.cgi then
               Printf.fprintf oc "HTTP/1.0 %s\r\n" status_line
             else Printf.fprintf oc "Status: %s\r\n" status_line;
-            if is_gzipped then (
-              output_string oc "Content-Encoding: gzip\r\n";
-              output_string oc "Vary: Accept-Encoding\r\n";
-              Printf.fprintf oc "Content-Length: %d\r\n"
-                (String.length final_body));
+            (match encoding with
+            | Some enc ->
+                Printf.fprintf oc "Content-Encoding: %s\r\n" enc;
+                output_string oc "Vary: Accept-Encoding\r\n";
+                Printf.fprintf oc "Content-Length: %d\r\n"
+                  (String.length final_body)
+            | None -> ());
             output_string oc headers;
             output_string oc "\r\n";
             output_string oc final_body;
@@ -1769,7 +1775,7 @@ type misc_fname =
   | Woff2 of string
   | CacheGz of string
 
-let content_misc conf len misc_fname is_gzipped =
+let content_misc conf len misc_fname encoding =
   Output.status conf Def.OK;
   let fname, t =
     match misc_fname with
@@ -1787,7 +1793,9 @@ let content_misc conf len misc_fname is_gzipped =
   in
   Output.header conf "Content-type: %s" t;
   Output.header conf "Content-length: %d" len;
-  if is_gzipped then Output.header conf "Content-encoding: gzip";
+  (match encoding with
+  | Some enc -> Output.header conf "Content-Encoding: %s" enc
+  | None -> ());
   Output.header conf "Vary: Accept-Encoding";
   Output.header conf "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
@@ -1808,7 +1816,7 @@ let find_misc_file conf name =
       let name' = Util.search_in_assets @@ Filename.concat "etc" name in
       if Sys.file_exists name' then name' else ""
 
-let print_misc_file conf misc_fname is_gzipped =
+let print_misc_file conf misc_fname encoding =
   match misc_fname with
   | Css fname
   | Js fname
@@ -1822,7 +1830,7 @@ let print_misc_file conf misc_fname is_gzipped =
         let ic = Secure.open_in_bin fname in
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
-        content_misc conf len misc_fname is_gzipped;
+        content_misc conf len misc_fname encoding;
         let rec loop len =
           if len = 0 then ()
           else
@@ -1840,7 +1848,7 @@ let print_misc_file conf misc_fname is_gzipped =
       let ic = Secure.open_in_bin fname in
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
-      content_misc conf len misc_fname false;
+      content_misc conf len misc_fname None;
       let rec loop len =
         if len = 0 then ()
         else
@@ -1857,14 +1865,25 @@ let misc_request conf request fname =
   let is_compressible =
     Filename.check_suffix fname ".js" || Filename.check_suffix fname ".css"
   in
-  let try_gzip = is_compressible && client_accepts_gzip request in
-  let actual_fname, is_gzipped =
-    if try_gzip then
+  let accepts_br = is_compressible && client_accepts "br" request in
+  let accepts_gz = is_compressible && client_accepts "gzip" request in
+  let actual_fname, encoding =
+    if accepts_br then
+      let br_fname = fname ^ ".br" in
+      let br_path = find_misc_file conf br_fname in
+      if br_path <> "" then (br_path, Some "br")
+      else if accepts_gz then
+        let gz_fname = fname ^ ".gz" in
+        let gz_path = find_misc_file conf gz_fname in
+        if gz_path <> "" then (gz_path, Some "gzip")
+        else (find_misc_file conf fname, None)
+      else (find_misc_file conf fname, None)
+    else if accepts_gz then
       let gz_fname = fname ^ ".gz" in
       let gz_path = find_misc_file conf gz_fname in
-      if gz_path <> "" then (gz_path, true)
-      else (find_misc_file conf fname, false)
-    else (find_misc_file conf fname, false)
+      if gz_path <> "" then (gz_path, Some "gzip")
+      else (find_misc_file conf fname, None)
+    else (find_misc_file conf fname, None)
   in
   if actual_fname <> "" then
     let misc_fname =
@@ -1880,7 +1899,7 @@ let misc_request conf request fname =
       else if Filename.check_suffix fname ".cache.gz" then CacheGz actual_fname
       else Other actual_fname
     in
-    print_misc_file conf misc_fname is_gzipped
+    print_misc_file conf misc_fname encoding
   else false
 
 let strip_quotes s =
