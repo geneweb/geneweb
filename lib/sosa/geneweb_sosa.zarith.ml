@@ -52,8 +52,5 @@ let of_string = Z.of_string
 let gen x = Z.log2 x + 1
 
 let branches x =
-  let rec aux acc d =
-    if Z.equal Z.zero d then acc
-    else aux (Z.to_int (Z.logand d one) :: acc) (Z.shift_right d 1)
-  in
-  List.tl (aux [] x)
+  let n = Z.numbits x in
+  List.init (n - 1) (fun i -> if Z.testbit x (n - i - 2) then 1 else 0)
