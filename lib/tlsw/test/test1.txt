@@ -1,0 +1,35 @@
+= Exemple de titre 1 =
+== Exemple de titre 2 ==
+=== Exemple de titre 3 ===
+==== Exemple de titre 4 ====
+===== Exemple de titre 5 =====
+====== Exemple de titre 6 ======
+
+== Ceci est un titre n'est-ce pas? ==
+Et maintenant un peu de texte fort simple avec du formatage
+comme ceci ''toto'' et aussi ceci '''ldl''' et {plop} puis
+ et là?
+
+ Ceci n'est pas du texte formatable '''n'est-ce pas?'''
+ même encore ici
+
+mais plus maintenant?
+* Un élément
+* Deux élément
+* Trois élément
+
+* Une autre liste
+* qui continue ici
+
+* Ceci est une première liste avec
+un saut de ligne dedans puis
+* Encore un élément puis
+** Une sous-liste! incroyable
+** etncodo
+
+* element 1
+** element 2
+* retour en dessous
+
+Et maintenant des liens dans le texte comme par exemple [[pierre/villemot/18]] ou
+encore [[henri/gouraud]] et puis des liens vers les notes [[[note18/toto est une note]]].

@@ -17,3 +17,8 @@
     geneweb_compat
     geneweb_search)
   (action (run %{test} %{dict})))
+
+(executable
+  (name wiki_check)
+  (modules wiki_check)
+  (libraries geneweb_compat geneweb_util geneweb_db geneweb_tlsw cmdliner tyxml fmt logs progress))
