@@ -21,3 +21,8 @@ val input_line : in_channel -> string
     be produce even if it does not end with a line feed.
 
     @raise End_of_file if it reaches the end of the file. *)
+
+val gzip_string : ?level:int -> string -> string
+(** [gzip_string ?level input] compresses [input] using gzip format.
+    @param level compression level 1-9, default 6
+    @return gzip compressed data *)

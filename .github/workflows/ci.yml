@@ -77,6 +77,14 @@ jobs:
         with:
           command: start-timer
 
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libbrotli-dev
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install brotli
+
       - name: Cache Opam dependencies (Unix)
         id: cache-opam-unix
         if: runner.os != 'Windows'

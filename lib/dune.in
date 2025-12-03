@@ -9,6 +9,7 @@
             str
             stdlib-shims
             camlp-streams
+            geneweb_brotli
             geneweb_core
             geneweb_def
             geneweb_db

@@ -1,0 +1,10 @@
+(library
+ (name geneweb_brotli)
+ (public_name geneweb.brotli)
+ (synopsis "Brotli compression for GeneWeb")
+ (wrapped false)
+ (foreign_stubs
+  (language c)
+  (names brotli_stubs)
+  (flags :standard -I/usr/include))
+ (library_flags -cclib -L/usr/lib -cclib -lbrotlienc))
