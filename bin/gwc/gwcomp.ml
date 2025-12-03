@@ -1417,23 +1417,28 @@ let comp_families state x =
      output_string oc magic_gwo;
      (* write source filename *)
      output_value oc (x : string);
-     let rec loop line encoding =
+     let rec loop ~data_elements line encoding =
        match read_family state (ic, encoding) x line with
        | Ok (F_some (family, line)) ->
-           output_value oc (family : gw_syntax);
-           loop line encoding
-       | Ok F_enc_utf_8 -> loop (read_line state (ic, E_utf_8)) E_utf_8
+           loop ~data_elements:(family :: data_elements) line encoding
+       | Ok F_enc_utf_8 ->
+           loop ~data_elements (read_line state (ic, E_utf_8)) E_utf_8
        | Ok F_gw_plus ->
            state.State.create_all_keys <- true;
-           loop (read_line state (ic, encoding)) encoding
-       | Ok F_none -> ()
+           loop ~data_elements (read_line state (ic, encoding)) encoding
+       | Ok F_none -> data_elements
        | Error str ->
            if state.State.no_fail then (
              log_error ~filename:x ~state str;
-             loop (read_line state (ic, encoding)) encoding)
+             loop ~data_elements (read_line state (ic, encoding)) encoding)
            else failwith str
      in
-     loop (read_line state (ic, E_iso_8859_1)) E_iso_8859_1;
+     let data_elements =
+       loop ~data_elements:[] (read_line state (ic, E_iso_8859_1)) E_iso_8859_1
+     in
+     List.iter
+       (fun data_element -> output_value oc (data_element : gw_syntax))
+       (List.rev data_elements);
      close_in ic
    with e ->
      close_out oc;
