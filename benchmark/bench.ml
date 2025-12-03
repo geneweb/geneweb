@@ -1,4 +1,12 @@
-open Geneweb
+module Driver = Geneweb_db.Driver
+module Sosa = Geneweb_sosa
+module Place = Geneweb.Place
+module Util = Geneweb.Util
+module Config = Geneweb.Config
+module UpdateData = Geneweb.UpdateData
+module Perso = Geneweb.Perso
+module BirthDeath = Geneweb.BirthDeath
+module Check = Geneweb.Check
 
 let style = ref Benchmark.Auto
 
@@ -145,7 +153,7 @@ let bench () =
              };
            ]
       :: bench_w_base
-           ~load:[ Geneweb_db.load_persons_array ]
+           ~load:[ Geneweb_db.Driver.load_persons_array ]
            "Util.authorized_age"
            (fun base conf ->
              Geneweb_db.Collection.iter
@@ -168,7 +176,8 @@ let bench () =
            (fun base _conf ->
              Geneweb_db.Collection.fold
                (fun acc p ->
-                 Perso.first_possible_duplication base (Geneweb_db.get_iper p)
+                 Perso.first_possible_duplication base
+                   (Geneweb_db.Driver.get_iper p)
                    ([], [])
                  :: acc)
                []
@@ -178,7 +187,7 @@ let bench () =
            (fun base get ->
              (Sys.opaque_identity BirthDeath.select_person) conf base get true
              |> Sys.opaque_identity ignore)
-           [ (fun p -> Date.od_of_cdate (Geneweb_db.get_birth p)) ]
+           [ (fun p -> Date.od_of_cdate (Geneweb_db.Driver.get_birth p)) ]
       :: suite
   | _ -> suite
 
