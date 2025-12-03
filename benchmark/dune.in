@@ -1,9 +1,0 @@
-(executable
-  (name bench)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
-  (libraries unix geneweb benchmark))
-
-(rule
-  (action (run ./bench.exe) )
-  (alias runbench)
-)

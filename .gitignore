@@ -6,7 +6,6 @@ Makefile.config
 Makefile.local
 
 # Generated from dune.in files
-benchmark/dune
 bin/cache_files/dune
 bin/connex/dune
 bin/consang/dune
