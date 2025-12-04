@@ -26,8 +26,13 @@
   (libraries
     dynlink
     geneweb
-    geneweb.logs
     gwd_lib
+    logs
+    logs.fmt
+    logs-syslog
+    logs-syslog.unix
+    fmt
+    fmt.tty
     str
     unix
     uri

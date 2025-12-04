@@ -2,7 +2,10 @@
 
 open Geneweb
 open Config
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Robot" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 
 let magic_robot = "GWRB0008"
 
@@ -143,13 +146,13 @@ let min_disp_req = ref 6
 
 let log_summary tm xcl nconn =
   let local_tm = Unix.localtime tm in
-  Logs.info (fun k ->
+  Log.info (fun k ->
       k "%s === ROBOT SUMMARY ===" (Mutil.sprintf_date local_tm :> string));
-  Logs.info (fun k ->
+  Log.info (fun k ->
       k "  Blocked IPs: %d, Monitored: %d" (List.length xcl.excl) nconn);
-  Logs.info (fun k ->
+  Log.info (fun k ->
       k "  Most active: %d req by %s" (fst xcl.max_conn) (snd xcl.max_conn));
-  Logs.info (fun k -> k "  Blocked robots detail:");
+  Log.info (fun k -> k "  Blocked robots detail:");
   List.iter
     (fun (ip, att) -> Logs.info (fun k -> k "    %s: %d attempts" ip !att))
     ( List.rev xcl.excl |> fun l ->
@@ -159,7 +162,7 @@ let log_summary tm xcl nconn =
       in
       take 20 l );
   if List.length xcl.excl > 20 then
-    Logs.info (fun k -> k "    ... and %d more" (List.length xcl.excl - 20))
+    Log.info (fun k -> k "    ... and %d more" (List.length xcl.excl - 20))
 
 let check tm from max_call sec conf suicide =
   let nfw =
@@ -181,8 +184,7 @@ let check tm from max_call sec conf suicide =
     | Some att ->
         incr att;
         if is_log_worthy !att then
-          Logs.syslog `LOG_NOTICE
-          @@ Printf.sprintf "ROBOT %s: %d refused attempts" from !att;
+          Log.info (fun k -> k "ROBOT %s: %d refused attempts" from !att);
         true
     | None ->
         purge_who tm xcl sec;
@@ -213,14 +215,14 @@ let check tm from max_call sec conf suicide =
             xcl.who;
         let refused =
           if suicide || cnt > max_call then (
-            Logs.info (fun k ->
+            Log.info (fun k ->
                 k "ROBOT %s: BLOCKED after %d req in %.0fs%s\n" from cnt
                   (tm -. tm0)
                   (if suicide then " (suicide)" else ""));
             if not (is_ip_already_covered xcl.excl from) then
               xcl.excl <- (from, ref 1) :: xcl.excl
             else
-              Logs.info (fun k ->
+              Log.info (fun k ->
                   k "ROBOT %s: BLOCKED (covered by existing pattern)\n" from);
             xcl.who <- W.remove from xcl.who;
             xcl.max_conn <- (0, "");

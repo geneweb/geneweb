@@ -29,6 +29,8 @@
     camlzip
     cppo
     fmt
+    logs
+    logs-syslog
     jingoo
     markup
     ounit
@@ -36,7 +38,6 @@
     ppx_deriving
     ppx_import
     stdlib-shims
-    syslog
     (unidecode (= "0.2.0"))
     uri
     uucp
@@ -64,7 +65,7 @@
     (qcheck-alcotest :with-test)
     lwt
     lwt_ppx
-    tls-lwt
+    tls
     (cmdliner (>= "2.0.0"))
     logs
     digestif
