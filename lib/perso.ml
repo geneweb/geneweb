@@ -1369,21 +1369,25 @@ end = struct
   let is_death = is_pevent Def.Epers_Death
   let is_burial = is_pevent Def.Epers_Burial
 
+  let relation_events conf base filter relation_kind ipers =
+    List.flatten
+    @@ List.map
+         (fun ip ->
+           let p = Gwdb.poi base ip in
+           let p_events = Event.events conf base p in
+           List.filter_map
+             (fun e ->
+               Ext_option.return_if (filter e) (fun () ->
+                   family_relation_event relation_kind p e))
+             p_events)
+         ipers
+
   let spouse_events conf base p events =
     let all_marriages = List.filter is_marriage events in
     let all_spouses = List.filter_map Event.get_spouse_iper all_marriages in
-    List.flatten
-    @@ List.map
-         (fun isp ->
-           let sp = Gwdb.poi base isp in
-           let sp_events = Event.events conf base sp in
-           List.filter_map
-             (fun e ->
-               Ext_option.return_if
-                 (is_death e || is_burial e)
-                 (fun () -> family_relation_event Spouse sp e))
-             sp_events)
-         all_spouses
+    relation_events conf base
+      (fun e -> is_death e || is_burial e)
+      Spouse all_spouses
 
   let get_events conf base p kinds =
     let p_events = Event.events conf base p in
