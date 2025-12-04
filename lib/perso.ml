@@ -1259,6 +1259,7 @@ module EventUtils : sig
   type ('a, 'b) event
 
   val get_event_kind : ('a, 'b) event -> event_kind
+  val string_of_event_kind : event_kind -> string
   val get_event : ('a, 'b) event -> 'b Event.event_item
   val get_event_holder : ('a, 'b) event -> 'a
 
@@ -1319,6 +1320,21 @@ end = struct
     | MainPersonEvent _ -> CurrentPerson
     | FamilyRelationEvent (frel, _) -> Relation frel
     | WitnessedEvent _ -> Witnessed
+
+  let string_of_family_relation = function
+    | Child -> "child"
+    | GrandChild -> "grand_child"
+    | GreatGrandChild -> "great_grand_child"
+    | Sibling -> "sibling"
+    | Spouse -> "spouse"
+    | Parent -> "parent"
+    | GrandParent -> "grand_parent"
+    | GreatGrandParent -> "great_grand_parent"
+
+  let string_of_event_kind = function
+    | CurrentPerson -> "current_person_event"
+    | Relation rel -> string_of_family_relation rel ^ "_event"
+    | Witnessed -> "witnessed_event"
 
   let get_witnessed_event_data = function
     | MainPersonEvent _ | FamilyRelationEvent _ -> None
@@ -2785,6 +2801,9 @@ and eval_str_event_field conf base (p, p_auth) event = function
         with
         | Some d -> DateDisplay.string_of_date conf d |> safe_val
         | None -> null_val)
+  | "kind" ->
+      str_val
+        (EventUtils.string_of_event_kind (EventUtils.get_event_kind event))
   | "on_date" ->
       date_aux conf p_auth (Event.get_date (EventUtils.get_event event))
   | "place" ->
