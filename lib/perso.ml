@@ -1243,14 +1243,6 @@ type title_item =
   * Gwdb.istr list
   * (Date.date option * Date.date option) list
 
-(*type witnessed_event_data = {
-    event_holder : Gwdb.person;
-    event : Gwdb.istr Event.event_item;
-    witness_kind : Def.witness_kind;
-    witness_note : string;
-    witness : Gwdb.person;
-  }*)
-
 module EventUtils : sig
   type family_relation =
     | Child
@@ -1427,7 +1419,6 @@ type 'a env =
   | Vsosa_ref of Gwdb.person option
   | Vtitle of Gwdb.person * title_item
   | Vevent' of (Gwdb.person, Gwdb.istr) EventUtils.event
-  | VeventWitnessed of (Gwdb.person, Gwdb.istr) EventUtils.witnessed_event_data
   | Vlazyp of string option ref
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
@@ -2853,31 +2844,6 @@ and eval_event_field_var conf base env (p, p_auth) event loc = function
       with Not_found -> eval_str_event_field conf base (p, p_auth) event s)
   | _ -> raise Not_found
 
-(*and eval_event_witnessed_field_var conf base env (p, p_auth)
-    witnessed_event_data loc = function
-  | "event_holder" :: sl ->
-    let event_holder = EventUtils.get_event_holder witnessed_event in
-      let ep =
-        (event_holder,
-          Person.is_visible conf base event_holder )
-      in
-      eval_person_field_var conf base env ep loc sl
-  | [ "witness_kind" ] ->
-      let wk =
-        Util.string_of_witness_kind conf (Gwdb.get_sex p)
-          witnessed_event_data.witness_kind
-      in
-      str_val (wk :> string)
-  | [ "witness_note" ] ->
-      let wnote =
-        Util.escape_html
-          (Notes.limit_display_length witnessed_event_data.witness_note)
-      in
-      str_val (wnote :> string)
-  | sl ->
-      eval_event_field_var conf base env (p, p_auth) witnessed_event_data.event
-        loc sl*)
-
 and eval_event_witnessed_var conf base env event loc = function
   | "event" :: sl ->
       let p = EventUtils.get_event_holder event in
@@ -4093,30 +4059,6 @@ let print_foreach conf base print_ast eval_expr =
         EventUtils.[ CurrentPerson; Witnessed ]
     in
     let sorted_all_events = List.map (fun e -> Vevent' e) events in
-    (*
-    let p_events =
-      List.map (fun e -> Vevent (p, e)) (Event.events conf base p)
-    in
-    let events_witnessed =
-      List.map
-        (fun (event_holder, witness_kind, witness_note, event) ->
-          VeventWitnessed
-            { event_holder; witness_kind; witness_note; event; witness = p })
-        (Relation.get_event_witnessed conf base p)
-    in
-    let all_events = p_events @ events_witnessed in
-    let sorted_all_events =
-      Event.sort_events
-        (function
-          | Vevent (_, event) -> Event.get_name event
-          | VeventWitnessed { event } -> Event.get_name event
-          | _ -> assert false (* by construction *))
-        (function
-          | Vevent (_, event) -> Event.get_date event
-          | VeventWitnessed { event } -> Event.get_date event
-          | _ -> assert false (* by construction *))
-        all_events
-    in*)
     let env = event_count sorted_all_events :: env in
     Ext_list.iter_first
       (fun first e ->
