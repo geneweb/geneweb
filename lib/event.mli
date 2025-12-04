@@ -76,5 +76,3 @@ type ('string, 'person) main_family_events = private {
 val get_main_family_events :
   ('person, 'string) Def.gen_fam_event list ->
   ('string, 'person) main_family_events
-
-type 'a event

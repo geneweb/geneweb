@@ -1251,6 +1251,134 @@ type witnessed_event_data = {
   witness : Gwdb.person;
 }
 
+module EventUtils : sig
+  type family_relation =
+    | Child
+    | GrandChild
+    | GreatGrandChild
+    | Sibling
+    | Spouse
+    | Parent
+    | GrandParent
+    | GreatGrandParent
+
+  type event_kind = Witnessed | CurrentPerson | Relation of family_relation
+  type ('a, 'b) event
+
+  val get_event_kind : ('a, 'b) event -> event_kind
+  val get_event : ('a, 'b) event -> 'b Event.event_item
+
+  val get_events :
+    Config.config ->
+    Gwdb.base ->
+    Gwdb.person ->
+    event_kind list ->
+    (Gwdb.person, Gwdb.istr) event list
+
+  val get_sorted_events :
+    Config.config ->
+    Gwdb.base ->
+    Gwdb.person ->
+    event_kind list ->
+    (Gwdb.person, Gwdb.istr) event list
+end = struct
+  type family_relation =
+    | Child
+    | GrandChild
+    | GreatGrandChild
+    | Sibling
+    | Spouse
+    | Parent
+    | GrandParent
+    | GreatGrandParent
+
+  type event_kind = Witnessed | CurrentPerson | Relation of family_relation
+
+  type ('a, 'b) witnessed_event_data = {
+    event_holder : 'a;
+    event : 'b Event.event_item;
+    witness_kind : Def.witness_kind;
+    witness_note : string;
+    witness : 'a;
+  }
+
+  type ('a, 'b) event_data = { event_holder : 'a; event : 'b Event.event_item }
+
+  type ('a, 'b) event =
+    | MainPersonEvent of ('a, 'b) event_data
+    | FamilyRelationEvent of family_relation * ('a, 'b) event_data
+    | WitnessedEvent of ('a, 'b) witnessed_event_data
+
+  let get_event_kind = function
+    | MainPersonEvent _ -> CurrentPerson
+    | FamilyRelationEvent (frel, _) -> Relation frel
+    | WitnessedEvent _ -> Witnessed
+
+  let family_relation_event family_relation event_holder event =
+    FamilyRelationEvent (family_relation, { event_holder; event })
+
+  let witnessed_events conf base witness =
+    List.map
+      (fun (event_holder, witness_kind, witness_note, event_item) ->
+        WitnessedEvent
+          {
+            event_holder;
+            witness_kind;
+            witness_note;
+            event = event_item;
+            witness;
+          })
+      (Relation.get_event_witnessed conf base witness)
+
+  let person_events p events =
+    List.map (fun event -> MainPersonEvent { event_holder = p; event }) events
+
+  let is_fevent name e = Event.get_name e = Event.Fevent name
+  let is_pevent name e = Event.get_name e = Event.Pevent name
+  let is_marriage = is_fevent Def.Efam_Marriage
+  let is_death = is_pevent Def.Epers_Death
+  let is_burial = is_pevent Def.Epers_Burial
+
+  let spouse_events conf base p events =
+    let all_marriages = List.filter is_marriage events in
+    let all_spouses = List.filter_map Event.get_spouse_iper all_marriages in
+    List.flatten
+    @@ List.map
+         (fun isp ->
+           let sp = Gwdb.poi base isp in
+           let sp_events = Event.events conf base sp in
+           List.filter_map
+             (fun e ->
+               Ext_option.return_if
+                 (is_death e || is_burial e)
+                 (fun () -> family_relation_event Spouse sp e))
+             sp_events)
+         all_spouses
+
+  let get_events conf base p kinds =
+    let p_events = Event.events conf base p in
+    List.map
+      (function
+        | CurrentPerson -> person_events p p_events
+        | Witnessed -> witnessed_events conf base p
+        | Relation Spouse -> spouse_events conf base p p_events
+        | Relation _ -> failwith "todo")
+      kinds
+    |> List.flatten
+
+  let get_event = function
+    | MainPersonEvent e -> e.event
+    | FamilyRelationEvent (_, e) -> e.event
+    | WitnessedEvent e -> e.event
+
+  let get_event_name e = Event.get_name (get_event e)
+  let get_event_date e = Event.get_date (get_event e)
+
+  let get_sorted_events conf base p kinds =
+    get_events conf base p kinds
+    |> Event.sort_events get_event_name get_event_date
+end
+
 type 'a env =
   | Vallgp of generation_person list
   | Vanc of generation_person
@@ -1277,6 +1405,7 @@ type 'a env =
   | Vsosa_ref of Gwdb.person option
   | Vtitle of Gwdb.person * title_item
   | Vevent of Gwdb.person * Gwdb.istr Event.event_item
+  | Vevent' of (Gwdb.person, Gwdb.istr) EventUtils.event
   | VeventWitnessed of witnessed_event_data
   | Vlazyp of string option ref
   | Vlazy of 'a env Lazy.t
@@ -3898,6 +4027,12 @@ let print_foreach conf base print_ast eval_expr =
       events
   in
   let print_foreach_event_and_witnessed_event env al ((p, _) as ep) =
+    let events =
+      EventUtils.get_sorted_events conf base p
+        EventUtils.[ CurrentPerson; Witnessed ]
+    in
+    let sorted_all_events = List.map (fun e -> Vevent' e) events in
+    (*
     let p_events =
       List.map (fun e -> Vevent (p, e)) (Event.events conf base p)
     in
@@ -3920,7 +4055,7 @@ let print_foreach conf base print_ast eval_expr =
           | VeventWitnessed { event } -> Event.get_date event
           | _ -> assert false (* by construction *))
         all_events
-    in
+    in*)
     let env = event_count sorted_all_events :: env in
     Ext_list.iter_first
       (fun first e ->
@@ -3928,6 +4063,7 @@ let print_foreach conf base print_ast eval_expr =
           match e with
           | Vevent _ -> ("is_main_person_event", Vbool true) :: env
           | VeventWitnessed _ -> ("is_main_person_event", Vbool false) :: env
+          (* TODO*)
           | _ -> assert false
         in
         let env = ("event", e) :: env in
@@ -3965,8 +4101,15 @@ let print_foreach conf base print_ast eval_expr =
   in
   let print_foreach_event_witness env al ((_, p_auth) as ep) =
     if p_auth then
-      match get_env "event" env with
-      | Vevent (_, event_item) ->
+      let event_item =
+        match get_env "event" env with
+        | Vevent (_, event_item) -> Some event_item
+        | Vevent' evt -> Some (EventUtils.get_event evt)
+        (*TODO *)
+        | _ -> None
+      in
+      Option.iter
+        (fun event_item ->
           Array.iteri
             (fun i (ip, wk, wnote) ->
               let p = Util.pget conf base ip in
@@ -3984,8 +4127,8 @@ let print_foreach conf base print_ast eval_expr =
                 :: env
               in
               List.iter (print_ast env ep) al)
-            (Event.get_witnesses_and_notes event_item)
-      | _ -> ()
+            (Event.get_witnesses_and_notes event_item))
+        event_item
   in
   let print_foreach_event_witnessed env al ((p, p_auth) as ep) =
     (* This is the category "Presence at event" *)

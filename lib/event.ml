@@ -381,29 +381,3 @@ let get_main_family_events fevents =
   in
   loop (List.rev fevents);
   { main_union = !found_marriage; main_separation = !found_divorce }
-
-type family_relation =
-  | Child
-  | GrandChild
-  | GreatGrandChild
-  | Spouse
-  | GrandParent
-  | GreatGrandParent
-
-type ('a, 'b) witnessed_event_data = {
-  event_holder : 'a;
-  event : 'b Event.event_item;
-  witness_kind : Def.witness_kind;
-  witness_note : 'b;
-  witness : 'a;
-}
-
-type ('a, 'b) event_data = {
-  event_holder : 'a;
-  event : 'b event_item
-}
-
-type ('a, 'b) event =
-  | MainPersonEvent of ('a, 'b) event_data
-  | FamilyRelationEvent of family_relation
-  | WitnessedEvent of ('a, 'b) witnessed_event_data
