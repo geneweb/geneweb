@@ -4079,7 +4079,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_every_event env al ((p, _) as ep) =
     let events =
       EventUtils.get_sorted_events conf base p
-        EventUtils.[ CurrentPerson; Witnessed ]
+        EventUtils.[ CurrentPerson; Witnessed; Relation Spouse ]
     in
     let sorted_all_events = List.map (fun e -> Vevent' e) events in
     let env = event_count sorted_all_events :: env in
