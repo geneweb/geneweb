@@ -1259,6 +1259,7 @@ module EventUtils : sig
   type ('a, 'b) event
 
   val get_event_kind : ('a, 'b) event -> event_kind
+  val string_of_event_kind : event_kind -> string
   val get_event : ('a, 'b) event -> 'b Event.event_item
   val get_event_holder : ('a, 'b) event -> 'a
 
@@ -1320,6 +1321,21 @@ end = struct
     | FamilyRelationEvent (frel, _) -> Relation frel
     | WitnessedEvent _ -> Witnessed
 
+  let string_of_family_relation = function
+    | Child -> "child"
+    | GrandChild -> "grand_child"
+    | GreatGrandChild -> "great_grand_child"
+    | Sibling -> "sibling"
+    | Spouse -> "spouse"
+    | Parent -> "parent"
+    | GrandParent -> "grand_parent"
+    | GreatGrandParent -> "great_grand_parent"
+
+  let string_of_event_kind = function
+    | CurrentPerson -> "current_person_event"
+    | Relation rel -> string_of_family_relation rel ^ "_event"
+    | Witnessed -> "witnessed_event"
+
   let get_witnessed_event_data = function
     | MainPersonEvent _ | FamilyRelationEvent _ -> None
     | WitnessedEvent witnessed_event_data -> Some witnessed_event_data
@@ -1353,21 +1369,25 @@ end = struct
   let is_death = is_pevent Def.Epers_Death
   let is_burial = is_pevent Def.Epers_Burial
 
+  let relation_events conf base filter relation_kind ipers =
+    List.flatten
+    @@ List.map
+         (fun ip ->
+           let p = Gwdb.poi base ip in
+           let p_events = Event.events conf base p in
+           List.filter_map
+             (fun e ->
+               Ext_option.return_if (filter e) (fun () ->
+                   family_relation_event relation_kind p e))
+             p_events)
+         ipers
+
   let spouse_events conf base p events =
     let all_marriages = List.filter is_marriage events in
     let all_spouses = List.filter_map Event.get_spouse_iper all_marriages in
-    List.flatten
-    @@ List.map
-         (fun isp ->
-           let sp = Gwdb.poi base isp in
-           let sp_events = Event.events conf base sp in
-           List.filter_map
-             (fun e ->
-               Ext_option.return_if
-                 (is_death e || is_burial e)
-                 (fun () -> family_relation_event Spouse sp e))
-             sp_events)
-         all_spouses
+    relation_events conf base
+      (fun e -> is_death e || is_burial e)
+      Spouse all_spouses
 
   let get_events conf base p kinds =
     let p_events = Event.events conf base p in
@@ -2785,6 +2805,9 @@ and eval_str_event_field conf base (p, p_auth) event = function
         with
         | Some d -> DateDisplay.string_of_date conf d |> safe_val
         | None -> null_val)
+  | "kind" ->
+      str_val
+        (EventUtils.string_of_event_kind (EventUtils.get_event_kind event))
   | "on_date" ->
       date_aux conf p_auth (Event.get_date (EventUtils.get_event event))
   | "place" ->
