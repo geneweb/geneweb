@@ -14,7 +14,6 @@
   (libraries
     geneweb
     wserver)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules gwdPlugin request)
 )
 
@@ -28,11 +27,16 @@
     geneweb
     geneweb.logs
     gwd_lib
+    logs
+    logs.fmt
+    logs-syslog
+    logs-syslog.unix
+    fmt
+    fmt.tty
     str
     unix
     uri
     wserver)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules
     base64
     gwd

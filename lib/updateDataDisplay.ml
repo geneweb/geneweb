@@ -1,7 +1,10 @@
 open Config
 open Util
 open UpdateData
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"UpdateDataDisplay" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 
@@ -371,7 +374,7 @@ and eval_compound_var conf base env xx sl =
         | Some n ->
             if String.length s > n then String.sub s 0 (String.length s - n)
             else (
-              Logs.syslog `LOG_WARNING "String shorter that requested\n";
+              Log.warn (fun k -> k "String shorter that requested");
               s)
         | None -> raise Not_found)
     | "printable" :: sl -> only_printable (loop sl)
