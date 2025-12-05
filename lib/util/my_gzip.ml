@@ -1,82 +1,72 @@
-type in_channel = {
-  gic : Gzip.in_channel;
-  (* Underlying input channel of camlzip. *)
-  lines : string Queue.t;
-  (* Queue of complete lines not yet returned by [input_line]. *)
-  tail : Buffer.t; (* Last incomplete line. *)
-}
-
-let open_in path =
-  {
-    gic = Gzip.open_in path;
-    lines = Queue.create ();
-    tail = Buffer.create 2_048;
-  }
-
-let close_in ic = Gzip.close_in ic.gic
-let close_in_noerr ic = try Gzip.close_in ic.gic with _ -> ()
-
-let with_open path f =
-  let ic = open_in path in
-  Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () -> f ic
-
-let contains_newline b r =
-  let rec loop i =
-    if i >= r then false
-    else if Char.equal (Bytes.get b i) '\n' then true
-    else loop (i + 1)
+let gunzip_file path =
+  let ic = Stdlib.open_in_bin path in
+  Fun.protect ~finally:(fun () -> Stdlib.close_in_noerr ic) @@ fun () ->
+  let file_len = in_channel_length ic in
+  let compressed = Bigstringaf.create file_len in
+  let tmp = Bytes.create (min file_len De.io_buffer_size) in
+  let rec read_all pos =
+    if pos < file_len then begin
+      let n = Stdlib.input ic tmp 0 (min (Bytes.length tmp) (file_len - pos)) in
+      if n > 0 then begin
+        Bigstringaf.blit_from_bytes tmp ~src_off:0 compressed ~dst_off:pos
+          ~len:n;
+        read_all (pos + n)
+      end
+    end
   in
-  loop 0
-
-(* Search the end of the next line in the buffer [b] starting at [s]. *)
-let find_nextline b s =
-  let len = Buffer.length b in
-  let rec loop i =
-    if i >= len then raise Not_found
-    else if Char.equal (Buffer.nth b i) '\n' then i
-    else loop (i + 1)
+  read_all 0;
+  let i = De.bigstring_create De.io_buffer_size in
+  let o = De.bigstring_create De.io_buffer_size in
+  let chunks = ref [] in
+  let total_len = ref 0 in
+  let p = ref 0 in
+  let refill buf =
+    let len =
+      min (Bigstringaf.length compressed - !p) (De.bigstring_length buf)
+    in
+    Bigstringaf.blit compressed ~src_off:!p buf ~dst_off:0 ~len;
+    p := !p + len;
+    len
   in
-  loop s
-
-(* Read from the input channel [ic] until a new line is found in the
-   buffer. Return the number of read characters. *)
-let read_until_newline ic =
-  let sz = 8192 in
-  let buf = Bytes.create sz in
-  let rec loop acc =
-    let r = Gzip.input ic.gic buf 0 sz in
-    Buffer.add_subbytes ic.tail buf 0 r;
-    if contains_newline buf r || r = 0 then acc + r else loop (acc + r)
+  let flush buf len =
+    let chunk = Bigstringaf.copy buf ~off:0 ~len in
+    chunks := chunk :: !chunks;
+    total_len := !total_len + len
   in
-  loop 0
+  match Gz.Higher.uncompress ~refill ~flush i o with
+  | Ok _ ->
+      let result = Bigstringaf.create !total_len in
+      let _ =
+        List.fold_left
+          (fun pos chunk ->
+            let len = Bigstringaf.length chunk in
+            Bigstringaf.blit chunk ~src_off:0 result ~dst_off:pos ~len;
+            pos + len)
+          0 (List.rev !chunks)
+      in
+      result
+  | Error (`Msg err) -> failwith ("gunzip error: " ^ err)
 
-(* Feed the queue with all the complete lines in the buffer.
-   The eventual last incomplete line is returned. The buffer tail
-   is empty after calling this function.
-
-   Return the incomplete line remaining in the buffer. *)
-let flush_tail ic =
-  let len = Buffer.length ic.tail in
-  let rec loop s =
-    match find_nextline ic.tail s with
-    | exception Not_found ->
-        let b = Bytes.create (len - s) in
-        Buffer.blit ic.tail s b 0 (len - s);
-        Buffer.clear ic.tail;
-        b
-    | e ->
-        Queue.push (Buffer.sub ic.tail s (e - s)) ic.lines;
-        loop (e + 1)
-  in
-  loop 0
-
-let rec input_line ic =
-  if not @@ Queue.is_empty ic.lines then Queue.pop ic.lines
+let gzip_string ?(level = 6) input =
+  let input_len = String.length input in
+  if input_len = 0 then ""
   else
-    let r = read_until_newline ic in
-    let b = flush_tail ic in
-    if r = 0 && Bytes.length b = 0 then raise End_of_file
-    else if r = 0 then Bytes.to_string b
-    else (
-      Buffer.add_bytes ic.tail b;
-      input_line ic)
+    let i = De.bigstring_create De.io_buffer_size in
+    let o = De.bigstring_create De.io_buffer_size in
+    let w = De.Lz77.make_window ~bits:15 in
+    let q = De.Queue.create 0x8000 in
+    let r = Buffer.create (input_len / 2) in
+    let p = ref 0 in
+    let refill buf =
+      let len = min (input_len - !p) (De.bigstring_length buf) in
+      Bigstringaf.blit_from_string input ~src_off:!p buf ~dst_off:0 ~len;
+      p := !p + len;
+      len
+    in
+    let flush buf len =
+      Buffer.add_string r (Bigstringaf.substring buf ~off:0 ~len)
+    in
+    let time () = Int32.of_float (Unix.gettimeofday ()) in
+    let cfg = Gz.Higher.configuration Gz.Unix time in
+    Gz.Higher.compress ~level ~w ~q ~refill ~flush () cfg i o;
+    Buffer.contents r

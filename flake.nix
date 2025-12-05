@@ -68,7 +68,7 @@
               calendars
               camlp5
               camlp-streams
-              camlzip
+              decompress
               fmt
               logs
               logs-syslog
