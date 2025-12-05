@@ -238,7 +238,7 @@ let wiki_aux ?(keep_newlines = false) pp conf base env str =
       Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
     }
   in
-  String.concat "\n" lines |> Wiki.syntax_links conf wi |> Util.safe_html
+  String.concat "\n" lines |> Wiki.syntax_links conf base wi |> Util.safe_html
 
 let source conf base str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base [] str

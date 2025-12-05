@@ -76,7 +76,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
         Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
       }
     in
-    Wiki.html_with_summary_of_tlsw conf wi edit_opt s
+    Wiki.html_with_summary_of_tlsw conf base wi edit_opt s
   in
   let s = Util.safe_html s in
   let s =
@@ -114,7 +114,7 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
       Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
     }
   in
-  Wiki.print_sub_part conf wi conf.Config.wizard mode fnotes cnt0 lines;
+  Wiki.print_sub_part conf base wi conf.Config.wizard mode fnotes cnt0 lines;
   Hutil.trailer conf
 
 let print_linked_list conf base pgl =
@@ -296,8 +296,8 @@ let print_mod_ok conf base =
       Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
     }
   in
-  Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
-    true
+  Wiki.print_mod_ok conf base wi edit_mode fname read_string commit
+    string_filter true
 
 let begin_text_without_html_tags lim s =
   let rec loop i size len =

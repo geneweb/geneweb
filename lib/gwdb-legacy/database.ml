@@ -1075,6 +1075,7 @@ let opendb bname =
   in
   let patch_person i p =
     assert (i <> -1);
+    assert (Occurrence_number.is_valid p.Dbdisk.occ);
     persons.len <- max persons.len (i + 1);
     fst pending.h_person := persons.len;
     Hashtbl.replace (snd pending.h_person) i p;
