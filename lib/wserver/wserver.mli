@@ -52,6 +52,9 @@ val wflush : unit -> unit
 (** Flushes the content of the current socket *)
 (* To flush page contents print. *)
 
+val string_of_status : Def.httpStatus -> string
+(** HTTP status line (e.g. "200 OK", "404 Not Found"). *)
+
 val http : Def.httpStatus -> unit
 (** [Output.status conf answer] sends the http header where [answer] represents
     the answer status. *)
