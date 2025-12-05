@@ -25,24 +25,14 @@ COMMIT_ID := $(shell git rev-parse --short HEAD)
 COMMIT_TITLE := $(shell git log -1 --pretty="%s" | sed "s/\"/\\\"/g")
 COMMIT_COMMENT:= $(shell git log -1 --pretty="%b" | sed "s/\"/\\\"/g")
 BRANCH := $(shell git symbolic-ref --quiet --short HEAD || git branch -r --contains HEAD | head -n1 | tr -d ' ')
-VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
-OCAMLV := $(shell ocaml --version)
-
-lib/version.ml:
-	@cp lib/version.txt $@
-	@printf 'let branch = "$(BRANCH)"\n' >> $@
-	@printf 'let src = "$(SOURCE)"\n' >> $@
-	@printf 'let commit_id = "$(COMMIT_ID)"\n' >> $@
-	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
-	@printf 'let compil_date = "$(COMPIL_DATE)"\n' >> $@
-	@printf 'Generating $@… Done.\n'
-.PHONY: install lib/version.ml
+VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
+OCAMLV := $(shell ocamlopt --version)
 
 BUILD = dune build @bin/all @lib/all
 
 info:
-	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n'
+	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with OCaml $(OCAMLV).\n\n'
 	@printf 'Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. '
 	@printf 'Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n'
 	@printf '  \033[1;1m%s\033[0m\n' '$(subst ','\'',$(COMMIT_TITLE))'
@@ -52,10 +42,7 @@ endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
 .PHONY: info
 
-generated: lib/version.ml
-	@printf "Done.\n"
-
-fmt build build-geneweb gwd install uninstall: info generated
+fmt build build-geneweb gwd install uninstall: info
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
@@ -83,13 +70,13 @@ gwd: ## Build ondy gwd/gwc executables
 install: ## Install geneweb using dune
 	dune build @install
 	dune install
+.PHONY: install
 
 uninstall: ## Uninstall geneweb using dune
 	dune build @install
 	dune uninstall
 
 distrib: info ## Build the project and copy what is necessary for distribution
-	@$(MAKE) --no-print-directory generated
 	@printf "\n\033[1;1mBuilding executables\n\033[0m"
 	@$(BUILD)
 	@printf "Done.\n"
