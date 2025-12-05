@@ -1,0 +1,9 @@
+(install
+ (package geneweb)
+ (section
+  (site
+   (geneweb hd)))
+ (files
+  (glob_files_rec etc/*)
+  (glob_files_rec images/*)
+  (glob_files_rec lang/*)))
