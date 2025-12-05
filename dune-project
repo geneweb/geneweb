@@ -1,7 +1,6 @@
 (lang dune 3.6)
 
 (name geneweb)
-
 (generate_opam_files true)
 (license GPL-2.0-only)
 (authors "Daniel de Rauglaudre")
