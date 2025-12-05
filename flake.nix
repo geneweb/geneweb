@@ -4,20 +4,32 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    ocaml-ancient.url = "github:OCamlPro/ocaml-ancient/v0.10.x";
+    ocaml-ancient = {
+      url = "github:OCamlPro/ocaml-ancient/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, flake-utils, ocaml-ancient, ... }@inputs:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
-        ancient = ocaml-ancient.outputs.packages.${system}.default;
-        fetchFromGitHub = pkgs.fetchFromGitHub;
+        pkgs = import nixpkgs {
+          system = "${system}";
+          overlays = [(_: prev: {
+            ocamlPackages = prev.ocamlPackages.overrideScope (_: p: {
+              cmdliner = prev.ocamlPackages.callPackage ./nix/cmdliner.nix { };
+              unidecode = prev.ocamlPackages.callPackage ./nix/unidecode.nix { };
+              calendars = prev.ocamlPackages.callPackage ./nix/calendars.nix { };
+              not-ocamlfind = prev.ocamlPackages.callPackage ./nix/not-ocamlfind.nix { };
+              odoc = prev.ocamlPackages.callPackage ./nix/odoc.nix { };
+              ancient = ocaml-ancient.outputs.packages.${system}.ancient;
+              # Produce a segment fault while compiling stdlib with jsoo...
+              # ocaml = p.ocaml.override { framePointerSupport = true; };
+            });
+          })];
+        };
 
-        ocamlPackages = pkgs.ocaml-ng.ocamlPackages_4_14.overrideScope (final: super: {
-          # Add frame pointers for better profiling with Perf.
-          ocaml = super.ocaml.override { framePointerSupport = true; };
-        });
+        ocamlPackages = pkgs.ocamlPackages;
 
         # Due to Nix's package isolation principle, the findlib package cannot
         # install the topfind script into the OCaml directory. This wrapper
@@ -35,46 +47,31 @@
       in
       {
         packages = rec {
-          unidecode = ocamlPackages.callPackage ./nix/unidecode.nix { };
-          calendars = ocamlPackages.callPackage ./nix/calendars.nix { };
-          logs-syslog = ocamlPackages.callPackage ./nix/logs-syslog.nix { };
-          not-ocamlfind =
-            ocamlPackages.callPackage ./nix/not-ocamlfind.nix { inherit ocamlPackages; };
-          cmdliner = ocamlPackages.callPackage ./nix/cmdliner.nix { };
-          alcotest = ocamlPackages.alcotest.override { inherit cmdliner; };
-          queck-alcotest = ocamlPackages.qcheck-alcotest.override { inherit alcotest; };
-
-          default = ocamlPackages.buildDunePackage {
+          geneweb = ocamlPackages.buildDunePackage {
             pname = "geneweb";
             version = "dev";
-            duneVersion = "3";
             src = ./.;
 
-            buildInputs = [
-              not-ocamlfind
-              ancient
-              unidecode
-              calendars
-              cmdliner
-              alcotest
-              queck-alcotest
-              logs-syslog
-            ] ++ (with pkgs; [
-              bash
-              gcc
-              gnumake
-              pkg-config
-              m4
-              pcre2
-              gmp
-              zlib
-              bubblewrap
+            nativeBuildInputs = (with pkgs; [
+              pkgs.git
             ]) ++ (with ocamlPackages; [
+              not-ocamlfind
+              cppo
+              camlp5
+            ]);
+
+            # FIXME: Do not propagate all these dependencies.
+            propagatedBuildInputs = (with ocamlPackages; [
+              ancient
+              pcre2
+              benchmark
+              calendars
               camlp5
               camlp-streams
               camlzip
-              cppo
               fmt
+              logs
+              logs-syslog
               jingoo
               markup
               ounit
@@ -82,28 +79,40 @@
               ppx_deriving
               ppx_import
               stdlib-shims
-              uri
-              uucp
-              uunf
+              unidecode
               uutf
+              uunf
+              uucp
+              re
+              uri
               yojson
-              zarith
               digestif
-              pcre2
-              qcheck
-              ojs
-              js_of_ocaml
-              js_of_ocaml-ppx
-              tls
+              pp_loc
+            ]);
+          };
+
+          geneweb-rpc = ocamlPackages.buildDunePackage {
+            pname = "geneweb-rpc";
+            version = "dev";
+            src = ./.;
+
+            buildInputs = [ geneweb ] ++ (with ocamlPackages; [
               lwt
               lwt_ppx
-              httpun-ws
+              tls-lwt
+              cmdliner
+              digestif
+              httpun
               httpun-lwt-unix
+              httpun-ws
+              js_of_ocaml
+              js_of_ocaml-ppx
               promise_jsoo
               benchmark
               pp_loc
               logs
-              syslog-message # shouldn't be necessary
+              yojson
+              fmt
             ]);
           };
         };
@@ -112,6 +121,8 @@
 
         devShells.default = pkgs.mkShell {
           packages = [ ocamlWrapped ] ++ (with ocamlPackages; [
+            qcheck
+            qcheck-alcotest
             findlib
             utop
             odoc
@@ -122,7 +133,8 @@
           ]);
 
           inputsFrom = [
-            self.packages.${system}.default
+            self.packages.${system}.geneweb
+            self.packages.${system}.geneweb-rpc
           ];
         };
       });

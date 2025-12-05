@@ -52,38 +52,24 @@
         "type": "github"
       }
     },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1748708770,
-        "narHash": "sha256-q8jG2HJWgooWa9H0iatZqBPF3bp0504e05MevFmnFLY=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "a59eb7800787c926045d51b70982ae285faa2346",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-25.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "ocaml-ancient": {
       "inputs": {
         "flake-utils": "flake-utils_2",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1750845426,
-        "narHash": "sha256-BOd+VWufslKioTW3YiGI2Bub+uMKP/F40MhwzY2/yQU=",
+        "lastModified": 1764937393,
+        "narHash": "sha256-nRbF1Xfeg7zt6c/C7bISMYRRdOb3/VVzlIrHT0s8r8g=",
         "owner": "OCamlPro",
         "repo": "ocaml-ancient",
-        "rev": "828399fe8fd005a704df60894f7e7259314d4e6b",
+        "rev": "86411313f8869241fd1e4662d20d7e5b43ba976c",
         "type": "github"
       },
       "original": {
         "owner": "OCamlPro",
-        "ref": "v0.10.x",
+        "ref": "master",
         "repo": "ocaml-ancient",
         "type": "github"
       }
