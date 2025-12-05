@@ -96,10 +96,6 @@ let purge_who tm xcl sec =
   in
   List.iter (fun k -> xcl.who <- W.remove k xcl.who) to_remove
 
-let input_excl ic =
-  let b = really_input_string ic (String.length magic_robot) in
-  if b <> magic_robot then raise Not_found else (input_value ic : excl)
-
 let output_excl oc xcl =
   output_string oc magic_robot;
   output_value oc (xcl : excl)

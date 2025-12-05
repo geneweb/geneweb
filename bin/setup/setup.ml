@@ -8,8 +8,6 @@ let bin_dir = ref ""
 let base_dir = ref ""
 let lang_param = ref ""
 let only_file = ref ""
-let bname = ref ""
-let commnd = ref ""
 
 let printer_conf =
   {
@@ -34,10 +32,6 @@ let encode s = (Mutil.encode s :> string)
 let rec list_remove_assoc x = function
   | (x1, y1) :: l -> if x = x1 then l else (x1, y1) :: list_remove_assoc x l
   | [] -> []
-
-let rec list_assoc_all x = function
-  | [] -> []
-  | (a, b) :: l -> if a = x then b :: list_assoc_all x l else list_assoc_all x l
 
 type config = {
   lang : string;
@@ -310,20 +304,6 @@ let parse_upto lim =
   in
   loop 0
 
-let parse_upto_void lim =
-  let rec loop len (strm__ : _ Stream.t) =
-    match Stream.peek strm__ with
-    | Some c when c = lim ->
-        Stream.junk strm__;
-        ()
-    | Some c -> (
-        Stream.junk strm__;
-        try loop (Buff.store len c) strm__
-        with Stream.Failure -> raise (Stream.Error ""))
-    | _ -> raise Stream.Failure
-  in
-  loop 0
-
 let is_directory x =
   try (Unix.lstat x).Unix.st_kind = Unix.S_DIR
   with Unix.Unix_error (_, _, _) -> false
@@ -453,13 +433,6 @@ let nth_field s n =
     else loop (nth + 1) (j + 1)
   in
   loop 0 0
-
-let translate_phrase lexicon s n =
-  let n = match n with Some n -> n | None -> 0 in
-  try
-    let s = Hashtbl.find lexicon s in
-    nth_field s n
-  with Not_found -> "[" ^ nth_field s n ^ "]"
 
 let file_contents fname =
   try
@@ -1662,17 +1635,6 @@ let raw_file conf s =
     else "text/html"
   in
   print_typed_file conf typ fname
-
-let has_gwb_directories dh =
-  try
-    let rec loop () =
-      let e = Unix.readdir dh in
-      if Filename.check_suffix e ".gwb" then true else loop ()
-    in
-    loop ()
-  with End_of_file ->
-    Unix.closedir dh;
-    false
 
 let setup_comm_ok conf = function
   | "gwsetup" -> setup_gen conf

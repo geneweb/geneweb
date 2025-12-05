@@ -3,7 +3,6 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 
-let i = ref 0
 let nb_ind_init = ref 0
 
 let dump_persons bname ofile =

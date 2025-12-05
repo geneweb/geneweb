@@ -14,26 +14,13 @@ module W = Map.Make (struct
   let compare = compare
 end)
 
-type norfriwiz = Normal | Friend of string | Wizard of string
-
-type who = {
-  acc_times : float list;
-  oldest_time : float;
-  nb_connect : int;
-  nbase : string;
-  utype : norfriwiz;
-}
+type who = { acc_times : float list; nb_connect : int }
 
 type excl = {
   mutable excl : (string * int ref) list;
   mutable who : who W.t;
-  mutable max_conn : int * string;
-  mutable last_summary : float;
+  max_conn : int * string;
 }
-
-let input_excl ic =
-  let b = really_input_string ic (String.length magic_robot) in
-  if b <> magic_robot then raise Not_found else (input_value ic : excl)
 
 let output_excl oc xcl =
   output_string oc magic_robot;
@@ -61,11 +48,6 @@ let write_robot_file fname xcl =
   let oc = Secure.open_out_bin fname in
   output_excl oc xcl;
   close_out oc
-
-let string_of_norfriwiz = function
-  | Normal -> "visitor"
-  | Friend s -> sprintf "friend (%s)" s
-  | Wizard s -> sprintf "wizard (%s)" s
 
 let is_valid_ip ip =
   if String.contains ip '*' then
@@ -154,10 +136,8 @@ let print_status () =
           List.iter
             (fun (ip, who) ->
               if who.acc_times <> [] then
-                printf "  %s: %d req, last: %.0f s ago, type: %s\n" ip
-                  who.nb_connect
-                  (Unix.time () -. List.hd who.acc_times)
-                  (string_of_norfriwiz who.utype))
+                printf "  %s: %d req, last: %.0f s ago\n" ip who.nb_connect
+                  (Unix.time () -. List.hd who.acc_times))
             top_10
 
 let export_blacklist output_file =
@@ -185,8 +165,7 @@ let import_blacklist input_file =
   let xcl =
     match read_robot_file fname with
     | Some x -> x
-    | None ->
-        { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 }
+    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
   in
 
   let ic = Secure.open_in input_file in
@@ -250,8 +229,7 @@ let add_ip patterns_str =
   let xcl =
     match read_robot_file fname with
     | Some x -> x
-    | None ->
-        { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 }
+    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
   in
 
   List.iter
@@ -297,8 +275,7 @@ let remove_ip ip =
   let xcl =
     match read_robot_file fname with
     | Some x -> x
-    | None ->
-        { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 }
+    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
   in
   if List.mem_assoc ip xcl.excl then (
     xcl.excl <- List.remove_assoc ip xcl.excl;
@@ -308,9 +285,7 @@ let remove_ip ip =
 
 let clear_all () =
   let fname = get_robot_file () in
-  let xcl =
-    { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 }
-  in
+  let xcl = { excl = []; who = W.empty; max_conn = (0, "") } in
   write_robot_file fname xcl;
   printf "Cleared all robot data\n"
 
@@ -319,8 +294,7 @@ let clear_monitoring () =
   let xcl =
     match read_robot_file fname with
     | Some x -> { x with who = W.empty; max_conn = (0, "") }
-    | None ->
-        { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 }
+    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
   in
   write_robot_file fname xcl;
   printf "Cleared monitoring data (kept blacklist)\n"

@@ -44,28 +44,7 @@ let notes_links s =
   in
   loop [] [] 1 0
 
-let read_file_contents fname =
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic -> (
-      let len = ref 0 in
-      try
-        let rec loop () =
-          len := Buff.store !len (input_char ic);
-          loop ()
-        in
-        loop ()
-      with End_of_file ->
-        close_in ic;
-        Buff.get !len)
-  | None -> ""
-
 type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
-
-let read_cache_linked_pages conf : cache_linked_pages_t =
-  let ic = open_in_bin conf in
-  let ht : cache_linked_pages_t = input_value ic in
-  close_in ic;
-  ht
 
 let save_cache_linked_pages bdir cache_linked_pages =
   let oc = open_out_bin (Filename.concat bdir Notes.cache_linked_pages_name) in

@@ -51,14 +51,11 @@ module MF : MF = struct
   }
 
   type filename = string
-  type pos = { mutable p_ord : bool; mutable p_ext : int; mutable p_pos : int }
+  type pos = { mutable p_ext : int; mutable p_pos : int }
 
   let filename_of_string x = x
-
-  let last_pos ic =
-    { p_ord = true; p_ext = 0; p_pos = in_channel_length ic.ic_chan }
-
-  let not_a_pos = { p_ord = false; p_ext = 0; p_pos = -1 }
+  let last_pos ic = { p_ext = 0; p_pos = in_channel_length ic.ic_chan }
+  let not_a_pos = { p_ext = 0; p_pos = -1 }
   let prev_pos pos = { pos with p_pos = pos.p_pos - 1 }
   let next_pos pos = { pos with p_pos = pos.p_pos + 1 }
 
@@ -70,11 +67,9 @@ module MF : MF = struct
   let pos_of_string s =
     try
       let pos = int_of_string s in
-      if pos < 0 then not_a_pos else { p_ord = true; p_ext = 0; p_pos = pos }
+      if pos < 0 then not_a_pos else { p_ext = 0; p_pos = pos }
     with Failure _ -> (
-      try
-        Scanf.sscanf s "%d-%d" (fun a b ->
-            { p_ord = a = 0; p_ext = a; p_pos = b })
+      try Scanf.sscanf s "%d-%d" (fun a b -> { p_ext = a; p_pos = b })
       with Scanf.Scan_failure _ -> not_a_pos)
 
   let extend fname f =
@@ -142,7 +137,7 @@ module MF : MF = struct
 
   let rpos_in ic =
     let pos = in_channel_length ic.ic_chan - pos_in ic.ic_chan in
-    { p_ord = ic.ic_ext = 0; p_ext = ic.ic_ext; p_pos = pos }
+    { p_ext = ic.ic_ext; p_pos = pos }
 
   let rec rseek_in ic pos =
     if ic.ic_ext = pos.p_ext then
@@ -150,7 +145,6 @@ module MF : MF = struct
       if pos.p_pos > len then
         if pos.p_ext >= 1 then (
           let ext = ic.ic_ext - 1 in
-          pos.p_ord <- ext = 0;
           pos.p_ext <- ext;
           pos.p_pos <- pos.p_pos - len;
           rseek_in ic pos)
