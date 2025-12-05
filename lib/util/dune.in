@@ -4,12 +4,13 @@
  (wrapped false)
  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries
+   bigstringaf
    calendars
-   camlzip
    stdlib-shims
    unidecode
    geneweb_def
    geneweb_compat
+   decompress.gz
    re
    unix
    uucp
