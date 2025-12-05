@@ -5,30 +5,6 @@ distribution
 Makefile.config
 Makefile.local
 
-# Generated from dune.in files
-bin/cache_files/dune
-bin/connex/dune
-bin/consang/dune
-bin/fixbase/dune
-bin/ged2gwb/dune
-bin/gwb2ged/dune
-bin/gwc/dune
-bin/gwd/dune
-bin/gwdiff/dune
-bin/gwgc/dune
-bin/gwu/dune
-bin/robot/dune
-bin/setup/dune
-bin/update_nldb/dune
-lib/core/dune
-lib/dune
-lib/ancient/dune
-lib/gwdb/dune
-lib/logs/dune
-lib/util/dune
-plugins/welcome/dune
-
-test/dune
 test-gw-vars.txt
 test/ref
 

@@ -37,7 +37,7 @@
         packages = rec {
           unidecode = ocamlPackages.callPackage ./nix/unidecode.nix { };
           calendars = ocamlPackages.callPackage ./nix/calendars.nix { };
-          syslog = ocamlPackages.callPackage ./nix/syslog.nix { };
+          logs-syslog = ocamlPackages.callPackage ./nix/logs-syslog.nix { };
           not-ocamlfind =
             ocamlPackages.callPackage ./nix/not-ocamlfind.nix { inherit ocamlPackages; };
           cmdliner = ocamlPackages.callPackage ./nix/cmdliner.nix { };
@@ -55,10 +55,10 @@
               ancient
               unidecode
               calendars
-              syslog
               cmdliner
               alcotest
               queck-alcotest
+              logs-syslog
             ] ++ (with pkgs; [
               bash
               gcc
@@ -102,6 +102,8 @@
               promise_jsoo
               benchmark
               pp_loc
+              logs
+              syslog-message # shouldn't be necessary
             ]);
           };
         };

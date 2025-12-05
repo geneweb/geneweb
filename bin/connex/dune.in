@@ -1,6 +1,0 @@
-(executables
-  (package geneweb)
-  (names connex)
-  (public_names geneweb.connex)
-  (modules connex)
-  (libraries unix str geneweb))

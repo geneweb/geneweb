@@ -3,7 +3,10 @@ open Dag2html
 open Def
 open Util
 open Dag
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"DagDisplay" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 
 let image_normal_txt conf base p fname width height =
@@ -913,7 +916,7 @@ let eval_predefined_apply f vl =
     let m = List.fold_left (fun acc s -> f acc s) first_element l in
     string_of_int m
   with Failure _ ->
-    Logs.syslog `LOG_WARNING "Incorrect parameter for eval_predefined_apply";
+    Log.warn (fun k -> k "Incorrect parameter for eval_predefined_apply");
     raise Not_found
 
 let parents_access_aux conf base td get_parent =

@@ -1,4 +1,11 @@
-module Logs = Geneweb_logs.Logs
+(** This module allows plugins to modify geneweb configuration.
+
+    This approch is preffered to Functors or library variants for simple
+    functions if it does not come with a performance cost. *)
+
+let src = Logs.Src.create ~doc:"GWPARAM" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 
 let nb_errors = ref 0

@@ -4,7 +4,10 @@ open Geneweb
 open Config
 open Def
 open Util
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Request" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil

@@ -1,7 +1,10 @@
 open Config
 open Def
 open Util
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"ImageCarrousel" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 
 let cp = Filesystem.copy_file ~perm:0o666
@@ -88,7 +91,7 @@ let move_file_to_save dir file =
     1
   with
   | Sys_error e ->
-      Logs.syslog `LOG_ERR (Printf.sprintf "Error moving file to saved: %s" e);
+      Log.err (fun k -> k "Error moving file to saved: %s" e);
       0
   | _ -> 0
 
