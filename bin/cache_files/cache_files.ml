@@ -252,7 +252,9 @@ let speclist =
   [
     ( "-bd",
       Arg.String Secure.set_base_dir,
-      "<DIR> Specify where the 'bases' directory is installed (default '.')" );
+      Fmt.str
+        "<DIR> Specify where the 'bases' directory is installed (default %S)"
+        Secure.default_base_dir );
     ("", Arg.Unit (fun () -> ()), "");
     ("-fn", Arg.Set fnames, " first names");
     ("-fna", Arg.Set fname_aliases, " first name aliases (only with -checkdata)");
@@ -281,7 +283,7 @@ let speclist =
     ("", Arg.Unit (fun () -> ()), "");
     ("-prog", Arg.Set prog, " show progress bar");
   ]
-  |> List.filter (fun (opt, _, _) -> opt <> "") (* retire les séparateurs *)
+  |> List.filter (fun (opt, _, _) -> opt <> "") (* retire les sÃ©parateurs *)
   |> Arg.align
 
 let anonfun i = bname := i
@@ -323,17 +325,17 @@ let () =
   let fields = if !all || !pub_names then `Pub_names :: fields else fields in
   let fields = if !all || !aliases then `Aliases :: fields else fields in
 
-  (* Gestion spéciale fn/sn : d'abord checkdata puis datalist merged si besoin *)
+  (* Gestion spÃ©ciale fn/sn : d'abord checkdata puis datalist merged si besoin *)
   let should_merge = !merge_aliases || !all in
 
   if !all || !fnames then (
     if gen_cd then (
-      (* Génère toujours le cache fnames checkdata *)
+      (* GÃ©nÃ¨re toujours le cache fnames checkdata *)
       total :=
         !total
         +. gen_checkdata_only bname "fnames"
              (collect_checkdata_names base `Fnames);
-      (* Si -all, génère aussi fnames_alias checkdata *)
+      (* Si -all, gÃ©nÃ¨re aussi fnames_alias checkdata *)
       if !all then
         total :=
           !total
@@ -354,12 +356,12 @@ let () =
 
   if !all || !snames then (
     if gen_cd then (
-      (* Génère toujours le cache snames checkdata *)
+      (* GÃ©nÃ¨re toujours le cache snames checkdata *)
       total :=
         !total
         +. gen_checkdata_only bname "snames"
              (collect_checkdata_names base `Snames);
-      (* Si -all, génère aussi snames_alias checkdata *)
+      (* Si -all, gÃ©nÃ¨re aussi snames_alias checkdata *)
       if !all then
         total :=
           !total
@@ -378,7 +380,7 @@ let () =
           +. gen_datalist_only bname "snames"
                (collect_checkdata_names base `Snames));
 
-  (* Caches alias séparés pour checkdata uniquement *)
+  (* Caches alias sÃ©parÃ©s pour checkdata uniquement *)
   if !fname_aliases then
     total :=
       !total

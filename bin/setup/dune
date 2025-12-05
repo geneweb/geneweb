@@ -1,6 +1,5 @@
 (executable
  (package geneweb)
  (name setup)
- (public_name geneweb.setup)
- (libraries unix str wserver geneweb)
- (modules setup))
+ (public_name gwsetup)
+ (libraries unix str wserver geneweb))

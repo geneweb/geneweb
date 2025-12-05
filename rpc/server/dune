@@ -1,7 +1,7 @@
 (executable
  (package geneweb-rpc)
  (name server)
- (public_name geneweb-rpc.server)
+ (public_name gwd-rpc)
  (libraries
   geneweb_rpc
   lwt

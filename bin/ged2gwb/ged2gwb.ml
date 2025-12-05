@@ -3155,8 +3155,9 @@ let out_file = ref "a"
 let speclist =
   [ ( "-bd",
       Arg.String Secure.set_base_dir,
+      Fmt.str
       "<DIR> Specify where the “bases” directory with databases is installed \
-       (default if empty is “.”)." )
+       (default if empty is %S)." Secure.default_base_dir )
   ; ( "-o", Arg.Set_string out_file,
       "<file> Output database (default: <input file name>.gwb, a.gwb if not \
        available). Alphanumerics and -" )

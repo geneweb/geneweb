@@ -15,4 +15,5 @@
   uucp
   uunf
   uutf
-  digestif))
+  digestif
+  xdg))

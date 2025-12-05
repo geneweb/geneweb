@@ -8,6 +8,7 @@ open Gwd_lib
 module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Sites = Geneweb_sites.Sites
 
 type log = Stdout | Stderr | File of string | Syslog
 
@@ -102,6 +103,43 @@ let output_conf =
     flush = Wserver.wflush;
   }
 
+let ( // ) = Filename.concat
+
+let default_gw_prefix =
+  match Sites.hd with
+  | s :: _ -> s
+  | _ ->
+      (* This case occurs if gwd hasn't been installed with dune. *)
+      Filename.current_dir_name // "gw"
+
+let gw_prefix = ref None
+let set_gw_prefix s = gw_prefix := Some s
+let default_images_prefix = default_gw_prefix // "images"
+let images_prefix = ref None
+let set_images_prefix s = images_prefix := Some s
+let default_etc_prefix = default_gw_prefix // "etc"
+let etc_prefix = ref None
+let set_etc_prefix s = etc_prefix := Some s
+
+let parse_prefixes () =
+  let p =
+    match (!gw_prefix, !images_prefix) with
+    | Some s, None -> s // "images"
+    | _, Some s -> s
+    | None, None -> default_images_prefix
+  in
+  images_prefix := Some p;
+  let p =
+    match (!gw_prefix, !etc_prefix) with
+    | Some s, None -> s // "etc"
+    | _, Some s -> s
+    | None, None -> default_etc_prefix
+  in
+  etc_prefix := Some p;
+  let p = Option.value ~default:default_gw_prefix !gw_prefix in
+  gw_prefix := Some p;
+  Secure.add_assets p
+
 let printer_conf = { Config.empty with output_conf }
 let auth_file = ref ""
 let cache_langs = ref []
@@ -113,9 +151,6 @@ let default_lang = ref "fr"
 let friend_passwd = ref ""
 let green_color = "#2f6400"
 let images_dir = ref ""
-let gw_prefix = ref ""
-let images_prefix = ref ""
-let etc_prefix = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
 let login_timeout = ref 1800
 let default_n_workers = 20
@@ -1330,13 +1365,9 @@ let make_conf ~secret_salt from_addr request script_name env =
   if threshold_test <> "" then
     RelationLink.threshold := int_of_string threshold_test;
   GWPARAM.test_reorg base_file;
-  let gw_prefix_computed =
-    if !gw_prefix <> "" then !gw_prefix
-    else String.concat Filename.dir_sep [ "gw" ]
-  in
   let base_env =
     if base_file = "" then []
-    else Util.read_base_env base_file gw_prefix_computed !debug
+    else Util.read_base_env base_file (Option.get !gw_prefix) !debug
   in
   let default_lang =
     try
@@ -1509,19 +1540,9 @@ let make_conf ~secret_salt from_addr request script_name env =
       today_wd = tm.Unix.tm_wday;
       time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
       ctime = utm;
-      gw_prefix = gw_prefix_computed;
-      images_prefix =
-        (match (!gw_prefix, !images_prefix) with
-        | gw_p, im_p when gw_p <> "" && im_p = "" ->
-            String.concat Filename.dir_sep [ gw_p; "images" ]
-        | _, im_p when im_p <> "" -> im_p
-        | _, _ -> Filename.concat "gw" "images");
-      etc_prefix =
-        (match (!gw_prefix, !etc_prefix) with
-        | gw_p, etc_p when gw_p <> "" && etc_p = "" ->
-            String.concat Filename.dir_sep [ gw_p; "etc" ]
-        | _, etc_p when etc_p <> "" -> etc_p
-        | _, _ -> Filename.concat "gw" "etc");
+      gw_prefix = Option.get !gw_prefix;
+      images_prefix = Option.get !images_prefix;
+      etc_prefix = Option.get !etc_prefix;
       cgi;
       output_conf;
       forced_plugins = !forced_plugins;
@@ -2125,7 +2146,9 @@ let geneweb_server ~predictable_mode () =
   images_dir: %s
   secure asset: %a|}
                   Version.src Version.branch Version.commit_id Sys.argv.(0)
-                  (Sys.getcwd ()) !gw_prefix !etc_prefix !images_prefix
+                  (Sys.getcwd ()) (Option.get !gw_prefix)
+                  (Option.get !etc_prefix)
+                  (Option.get !images_prefix)
                   !images_dir
                   Fmt.(box @@ brackets @@ list ~sep:comma string)
                   (Secure.assets ())))
@@ -2340,16 +2363,17 @@ let parse_cmd () =
   let speclist =
     [
       ( "-hd",
-        Arg.String
-          (fun x ->
-            gw_prefix := x;
-            Secure.add_assets x),
-        "<DIR> Specify where the “etc”, “images” and “lang” directories are \
-         installed (default if empty is “gw”)." );
+        Arg.String set_gw_prefix,
+        Fmt.str
+          "<DIR> Specify where the “etc”, “images” and “lang” directories are \
+           installed (default if empty is %S)."
+          default_gw_prefix );
       ( "-bd",
         Arg.String Secure.set_base_dir,
-        "<DIR> Specify where the “bases” directory with databases is installed \
-         (default if empty is “bases”)." );
+        Fmt.str
+          "<DIR> Specify where the “bases” directory with databases is \
+           installed (default if empty is %S)."
+          Secure.default_base_dir );
       ( "-wd",
         Arg.String make_sock_dir,
         "<DIR> Directory for socket communication (Windows) and access count."
@@ -2367,12 +2391,12 @@ let parse_cmd () =
       ( "-etc_prefix",
         Arg.String
           (fun x ->
-            etc_prefix := x;
+            set_etc_prefix x;
             Secure.add_assets x),
         "<DIR> Specify where the “etc” directory is installed (default if \
          empty is [-hd value]/etc)." );
       ( "-images_prefix",
-        Arg.String (fun x -> images_prefix := x),
+        Arg.String set_images_prefix,
         "<DIR> Specify where the “images” directory is installed (default if \
          empty is [-hd value]/images)." );
       ( "-images_dir",
@@ -2576,7 +2600,7 @@ let main () =
        let d = Filename.dirname f in
        if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
      in
-     images_prefix := "file://" ^ slashify abs_dir);
+     images_prefix := Some ("file://" ^ slashify abs_dir));
   GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Mutil.particles_file = "" then
@@ -2645,6 +2669,7 @@ let () =
     exit 1);
   Logs.set_level ~all:true (Some Logs.Info);
   parse_cmd ();
+  parse_prefixes ();
   with_log !log_file @@ fun reporter ->
   Fmt_tty.setup_std_outputs ~style_renderer:`Ansi_tty ();
   Logs.set_reporter reporter;

@@ -1,8 +1,7 @@
 (executable
  (package geneweb)
  (name ged2gwb)
- (public_name geneweb.ged2gwb)
- (modules ged2gwb)
+ (public_name ged2gwb)
  (preprocess
   (action
    (run
