@@ -8,6 +8,7 @@ module Iterator = Geneweb_search.Iterator
 module Seq = Geneweb_compat.Seq
 
 (* Compute the Levenshtein distance of [s1] and [s2]. *)
+(* Unused --
 let distance s1 s2 =
   let l1 = String.length s1 in
   let l2 = String.length s2 in
@@ -25,7 +26,7 @@ let distance s1 s2 =
     done;
     Array.blit dp 0 prev 0 (l2 + 1)
   done;
-  prev.(l2)
+  prev.(l2) *)
 
 module Trie_tests = struct
   let test_cardinal _trie _a () =
@@ -117,16 +118,12 @@ module Flatset_tests = struct
   module C = Flatset.Comparator
 
   module Naive = struct
-    type t = int array
-
     let of_seq s =
       let arr = Array.of_seq s in
       Array.fast_sort Int.compare arr;
       arr
 
-    let to_seq = Array.to_seq
     let mem = Array.mem
-    let cardinal = List.length
     let empty = [||]
 
     let union a1 a2 =

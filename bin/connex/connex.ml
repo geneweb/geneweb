@@ -29,10 +29,6 @@ let rec merge_families ifaml1f ifaml2f =
   | ifaml1, [] -> ifaml1
   | [], ifaml2 -> ifaml2
 
-let rec filter f = function
-  | x :: l -> if f x then x :: filter f l else filter f l
-  | [] -> []
-
 let connected_families base ifam cpl =
   let rec loop ifaml ipl_scanned = function
     | ip :: ipl ->

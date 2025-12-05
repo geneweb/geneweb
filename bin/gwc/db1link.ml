@@ -39,9 +39,9 @@ type descend = int Def.gen_descend
 (** Family's descendants entry in the base *)
 
 type ('person, 'string) gen_min_person = {
-  mutable m_first_name : 'string;
-  mutable m_surname : 'string;
-  mutable m_occ : int;
+  m_first_name : 'string;
+  m_surname : 'string;
+  m_occ : int;
   mutable m_rparents : ('person, 'string) gen_relation list;
   mutable m_related : int list;
   mutable m_pevents : ('person, 'string) gen_pers_event list;
@@ -92,10 +92,10 @@ type file_info = {
 type gen = {
   (* Table that associates unique string to its position inside
      [g_base]'s unique string array *)
-  mutable g_strings : (string, int) Hashtbl.t;
+  g_strings : (string, int) Hashtbl.t;
   (* Table that associates person's names hash with the index of
      person's entry inside the [g_base].*)
-  mutable g_names : (int, int) Hashtbl.t;
+  g_names : (int, int) Hashtbl.t;
   (* Counter of persons inside [g_base] *)
   mutable g_pcnt : int;
   (* Counter of families inside [g_base] *)

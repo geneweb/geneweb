@@ -415,7 +415,7 @@ type gen = {
   fam_done : (Driver.ifam, bool) Collection.Marker.t;
   mutable notes_pl_p : Driver.person list;
   mutable ext_files : (string * string list ref) list;
-  mutable notes_alias : (string * string) list;
+  notes_alias : (string * string) list;
   mutable pevents_pl_p : Driver.person list;
 }
 
