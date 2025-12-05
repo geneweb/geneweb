@@ -42,6 +42,7 @@
     digestif
     pp_loc
     dune-site
+    xdg
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.28.1")))
   )
