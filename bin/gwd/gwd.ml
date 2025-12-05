@@ -11,6 +11,89 @@ module Gutil = Geneweb_db.Gutil
 
 type log = Stdout | Stderr | File of string | Syslog
 
+let gzip_min_size = 1024
+
+let client_accepts_gzip request =
+  let accept =
+    String.lowercase_ascii
+      (Mutil.extract_param "accept-encoding: " '\n' request)
+  in
+  if not (Mutil.contains accept "gzip") then false
+  else
+    let dominated_by_zero part =
+      let dominated s =
+        Mutil.contains s "q=0" && not (Mutil.contains s "q=0.")
+      in
+      let p = String.trim part in
+      Mutil.contains p "gzip"
+      && dominated (String.concat "" (String.split_on_char ' ' p))
+    in
+    not (List.exists dominated_by_zero (String.split_on_char ',' accept))
+
+let make_gzip_output_conf request =
+  if not (client_accepts_gzip request) then None
+  else
+    let body_buf = Buffer.create 65536 in
+    let headers_buf = Buffer.create 1024 in
+    let status_ref = ref Def.OK in
+    let flushed = ref false in
+    let is_compressible = ref false in
+    Some
+      {
+        status = (fun st -> status_ref := st);
+        header =
+          (fun s ->
+            if not !is_compressible then begin
+              let s_lc = String.lowercase_ascii s in
+              if
+                String.length s_lc >= 13
+                && String.sub s_lc 0 13 = "content-type:"
+              then
+                is_compressible :=
+                  Mutil.contains s_lc "text/html"
+                  || Mutil.contains s_lc "application/json"
+            end;
+            Buffer.add_string headers_buf s;
+            Buffer.add_string headers_buf "\r\n");
+        body = Buffer.add_string body_buf;
+        flush =
+          (fun () ->
+            if !flushed then ()
+            else begin
+              flushed := true;
+              let body = Buffer.contents body_buf in
+              let body_len = String.length body in
+              let final_body, is_gzipped =
+                if !is_compressible && body_len > gzip_min_size then
+                  try
+                    let compressed = My_gzip.gzip_string ~level:6 body in
+                    if String.length compressed < body_len then
+                      (compressed, true)
+                    else (body, false)
+                  with _ -> (body, false)
+                else (body, false)
+              in
+              let oc = Wserver.woc () in
+              let status_line = Wserver.string_of_status !status_ref in
+              if not !Wserver.cgi then
+                Printf.fprintf oc "HTTP/1.0 %s\r\n" status_line
+              else Printf.fprintf oc "Status: %s\r\n" status_line;
+              if is_gzipped then begin
+                output_string oc "Content-Encoding: gzip\r\n";
+                output_string oc "Vary: Accept-Encoding\r\n"
+              end;
+              Printf.fprintf oc "Content-Length: %d\r\n"
+                (String.length final_body);
+              let headers = Buffer.contents headers_buf in
+              output_string oc headers;
+              output_string oc "\r\n";
+              output_string oc final_body;
+              flush oc;
+              Buffer.clear body_buf;
+              Buffer.clear headers_buf
+            end);
+      }
+
 let output_conf =
   {
     status = Wserver.http;
@@ -1554,6 +1637,9 @@ let conf_and_connection =
     let conf, passwd_err =
       make_conf ~secret_salt from request script_name env
     in
+    (match make_gzip_output_conf request with
+    | Some gzip_oc -> conf.output_conf <- gzip_oc
+    | None -> ());
     match !redirected_addr with
     | Some addr -> print_redirected conf from request addr
     | None -> (
@@ -1606,6 +1692,7 @@ let conf_and_connection =
             try
               let t1 = Unix.gettimeofday () in
               Request.treat_request conf;
+              Output.flush conf;
               let t2 = Unix.gettimeofday () in
               if t2 -. t1 > slow_query_threshold then
                 Logs.warn (fun k ->
@@ -1703,7 +1790,7 @@ type misc_fname =
   | Woff2 of string
   | CacheGz of string
 
-let content_misc conf len misc_fname =
+let content_misc conf len misc_fname is_gzipped =
   Output.status conf Def.OK;
   let fname, t =
     match misc_fname with
@@ -1721,6 +1808,10 @@ let content_misc conf len misc_fname =
   in
   Output.header conf "Content-type: %s" t;
   Output.header conf "Content-length: %d" len;
+  if is_gzipped then begin
+    Output.header conf "Content-encoding: gzip";
+    Output.header conf "Vary: Accept-Encoding"
+  end;
   Output.header conf "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
@@ -1740,7 +1831,7 @@ let find_misc_file conf name =
       let name' = Util.search_in_assets @@ Filename.concat "etc" name in
       if Sys.file_exists name' then name' else ""
 
-let print_misc_file conf misc_fname =
+let print_misc_file conf misc_fname is_gzipped =
   match misc_fname with
   | Css fname
   | Js fname
@@ -1754,7 +1845,7 @@ let print_misc_file conf misc_fname =
         let ic = Secure.open_in_bin fname in
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
-        content_misc conf len misc_fname;
+        content_misc conf len misc_fname is_gzipped;
         let rec loop len =
           if len = 0 then ()
           else
@@ -1772,7 +1863,7 @@ let print_misc_file conf misc_fname =
       let ic = Secure.open_in_bin fname in
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
-      content_misc conf len misc_fname;
+      content_misc conf len misc_fname false;
       let rec loop len =
         if len = 0 then ()
         else
@@ -1785,23 +1876,34 @@ let print_misc_file conf misc_fname =
       close_in ic;
       true
 
-let misc_request conf fname =
-  let fname = find_misc_file conf fname in
-  if fname <> "" then
+let misc_request conf request fname =
+  let is_compressible =
+    Filename.check_suffix fname ".js" || Filename.check_suffix fname ".css"
+  in
+  let try_gzip = is_compressible && client_accepts_gzip request in
+  let actual_fname, is_gzipped =
+    if try_gzip then
+      let gz_fname = fname ^ ".gz" in
+      let gz_path = find_misc_file conf gz_fname in
+      if gz_path <> "" then (gz_path, true)
+      else (find_misc_file conf fname, false)
+    else (find_misc_file conf fname, false)
+  in
+  if actual_fname <> "" then
     let misc_fname =
-      if Filename.check_suffix fname ".css" then Css fname
-      else if Filename.check_suffix fname ".js" then Js fname
-      else if Filename.check_suffix fname ".json" then Json fname
-      else if Filename.check_suffix fname ".map" then Map fname
-      else if Filename.check_suffix fname ".otf" then Otf fname
-      else if Filename.check_suffix fname ".svg" then Svg fname
-      else if Filename.check_suffix fname ".eot" then Eot fname
-      else if Filename.check_suffix fname ".woff2" then Woff2 fname
-      else if Filename.check_suffix fname ".png" then Png fname
-      else if Filename.check_suffix fname ".cache.gz" then CacheGz fname
-      else Other fname
+      if Filename.check_suffix fname ".css" then Css actual_fname
+      else if Filename.check_suffix fname ".js" then Js actual_fname
+      else if Filename.check_suffix fname ".json" then Json actual_fname
+      else if Filename.check_suffix fname ".map" then Map actual_fname
+      else if Filename.check_suffix fname ".otf" then Otf actual_fname
+      else if Filename.check_suffix fname ".svg" then Svg actual_fname
+      else if Filename.check_suffix fname ".eot" then Eot actual_fname
+      else if Filename.check_suffix fname ".woff2" then Woff2 actual_fname
+      else if Filename.check_suffix fname ".png" then Png actual_fname
+      else if Filename.check_suffix fname ".cache.gz" then CacheGz actual_fname
+      else Other actual_fname
     in
-    print_misc_file conf misc_fname
+    print_misc_file conf misc_fname is_gzipped
   else false
 
 let strip_quotes s =
@@ -1929,7 +2031,7 @@ let connection ~secret_salt (addr, request) script_name contents0 =
         let contents, env = build_env request contents0 in
         if
           (not (image_request printer_conf script_name env))
-          && not (misc_request printer_conf script_name)
+          && not (misc_request printer_conf request script_name)
         then
           conf_and_connection ~secret_salt from request script_name contents env
       with Exit -> ()
@@ -2056,6 +2158,7 @@ let geneweb_cgi ~secret_salt addr script_name contents =
   let request = add "cookie" "HTTP_COOKIE" request in
   let request = add "content-type" "CONTENT_TYPE" request in
   let request = add "accept-language" "HTTP_ACCEPT_LANGUAGE" request in
+  let request = add "accept-encoding" "HTTP_ACCEPT_ENCODING" request in
   let request = add "referer" "HTTP_REFERER" request in
   let request = add "user-agent" "HTTP_USER_AGENT" request in
   connection ~secret_salt (Unix.ADDR_UNIX addr, request) script_name contents

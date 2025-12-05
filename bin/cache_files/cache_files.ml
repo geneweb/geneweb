@@ -34,14 +34,14 @@ let write_cache_file bname fname data =
   let filename = bname ^ "_" ^ fname ^ ".cache" in
   let file = !cache_dir // filename in
   let gz_file = file ^ ".gz" in
-  let oc = Gzip.open_out gz_file in
-  let finally () = try Gzip.close_out oc with Sys_error _ -> () in
-  Fun.protect ~finally @@ fun () ->
+  let buf = Buffer.create 65536 in
   List.iter
     (fun s ->
-      let s = s ^ "\n" in
-      Gzip.output_substring oc s 0 (String.length s))
-    data
+      Buffer.add_string buf s;
+      Buffer.add_char buf '\n')
+    data;
+  let compressed = My_gzip.gzip_string ~level:9 (Buffer.contents buf) in
+  Secure.with_open_out_bin gz_file (fun oc -> output_string oc compressed)
 
 let write_checkdata_cache bname fname entries =
   let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in

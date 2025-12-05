@@ -21,8 +21,8 @@
     (calendars (= "1.0.0"))
     (camlp5 (>= "8.03.00"))
     camlp-streams
-    camlzip
     cppo
+    decompress
     fmt
     logs
     logs-syslog
