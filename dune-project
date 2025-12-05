@@ -41,6 +41,7 @@
     yojson
     digestif
     pp_loc
+    dune-site
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.28.1")))
   )
