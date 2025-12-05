@@ -2,10 +2,6 @@
 
 (name geneweb)
 
-; ignore formatting of generated dune file
-(formatting
- (enabled_for ocaml))
-
 (generate_opam_files true)
 (license GPL-2.0-only)
 (authors "Daniel de Rauglaudre")
@@ -15,20 +11,30 @@
 (documentation "https://geneweb.tuxfamily.org/wiki/GeneWeb")
 
 (package
+  (name geneweb-compat)
+  (synopsis "GeneWeb library for legacy support.")
+  (tags (geneweb legacy))
+  (depends
+    (ocaml (>= 4.10))))
+
+(package
   (name geneweb)
   (synopsis "Genealogy library and software")
   (description "GeneWeb is an open source genealogy software written in OCaml. It comes with a Web interface and can be used off-line or as a Web service.")
   (tags (genealogy))
   (depends
-    (ocaml (>= 4.08))
+    (ocaml (>= 4.10))
+    geneweb-compat
     (alcotest :with-test)
     benchmark
     (calendars (= "1.0.0"))
-    (camlp5 (>= "8.00.01"))
+    (camlp5 (>= "8.03.00"))
     camlp-streams
     camlzip
     cppo
     fmt
+    logs
+    logs-syslog
     jingoo
     markup
     ounit
@@ -36,7 +42,6 @@
     ppx_deriving
     ppx_import
     stdlib-shims
-    syslog
     (unidecode (= "0.2.0"))
     uri
     uucp
@@ -49,22 +54,30 @@
     (ocamlformat (and :with-dev-setup (= "0.27.0")))
   )
   (depopts
-    ocaml-option-nnp
     (ancient (>= 0.10.0))
     zarith
   )
 )
 
 (package
+  (name geneweb-http)
+  (synopsis "HTTP 1.1 support for GeneWeb daemon")
+  (depends
+    (ocaml (>= 4.10))
+    geneweb-compat))
+
+(package
   (name geneweb-rpc)
   (synopsis "RPC support for GeneWeb")
   (tags (geneweb rpc json))
   (depends
+    (ocaml (>= 4.10))
+    geneweb
     (qcheck :with-test)
     (qcheck-alcotest :with-test)
     lwt
     lwt_ppx
-    tls-lwt
+    tls
     (cmdliner (>= "2.0.0"))
     logs
     digestif

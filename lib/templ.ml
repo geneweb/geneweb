@@ -1,9 +1,12 @@
-module Logs = Geneweb_logs.Logs
+let src = Logs.Src.create ~doc:"Templ" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Parser = Geneweb_templ.Parser
 module Ast = Geneweb_templ.Ast
 module Loc = Geneweb_templ.Loc
 module Driver = Geneweb_db.Driver
+module Header = Geneweb_http.Header
 
 exception BadApplyArity
 exception NamedArgumentNotMatched of string
@@ -37,17 +40,18 @@ let pp_exception ppf (e, bt) =
 
 let on_exn e bt =
   incr GWPARAM.nb_errors;
-  Logs.debug (fun k -> k "%a" pp_exception (e, bt))
+  Log.debug (fun k -> k "%a" pp_exception (e, bt))
 
 let resolve_include conf _loc fl =
   let r = Util.etc_file_name conf fl in
-  (*  Logs.debug (fun k -> k "%a: resolved %s into: %s" Loc.pp loc fl r); *)
+  (* Log.debug (fun k -> k "%a: resolved %s into: %s" Loc.pp loc fl r); *)
   r
 
 let parse conf fl =
   let fl = Util.etc_file_name conf fl in
-  Parser.parse ~cached:!Logs.debug_flag ~on_exn
-    ~resolve_include:(resolve_include conf) (`File fl)
+  let cached = not conf.predictable_mode in
+  Parser.parse ~cached ~on_exn ~resolve_include:(resolve_include conf)
+    (`File fl)
 
 let sort_apply_parameters loc f_expr xl vl =
   let named_vl, unnamed_vl =
@@ -115,7 +119,7 @@ let not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 
 let setup_link (conf : Config.config) =
-  let s = Mutil.extract_param "host: " '\r' conf.request in
+  let s = Header.extract_param "host: " '\r' conf.request in
   try
     let i = String.rindex s ':' in
     let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
@@ -539,7 +543,7 @@ let apply_format conf nth s1 s2 =
                                                   | None -> "[" ^ s1 ^ "?]")))))
                               ))))))
     with _ ->
-      Printf.sprintf "Format error in %s\n" s1 |> Logs.syslog `LOG_WARNING;
+      Log.warn (fun k -> k "Format error in %s\n" s1);
       s1
 
 let rec eval_ast conf Ast.{ desc; _ } =
@@ -661,7 +665,7 @@ let templ_eval_var (conf : Config.config) = function
   | [ "false" ] -> VVbool false
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
-      VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
+      VVbool (Header.extract_param "referer: " '\n' conf.request <> "")
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
@@ -786,7 +790,7 @@ let eval_bool_expr conf (eval_var, eval_apply) e =
         raise_with_loc e.Ast.loc (Failure "bool value expected")
   with Exc_located _ as exn ->
     let bt = Printexc.get_raw_backtrace () in
-    Logs.debug (fun k -> k "%a" pp_exception (exn, bt));
+    Log.debug (fun k -> k "%a" pp_exception (exn, bt));
     false
 
 let eval_string_expr conf (eval_var, eval_apply) e =
@@ -797,7 +801,7 @@ let eval_string_expr conf (eval_var, eval_apply) e =
         raise_with_loc e.Ast.loc (Failure "string value expected")
   with Exc_located _ as exn ->
     let bt = Printexc.get_raw_backtrace () in
-    Logs.debug (fun k -> k "%a" pp_exception (exn, bt));
+    Log.debug (fun k -> k "%a" pp_exception (exn, bt));
     ""
 
 let print_body_prop (conf : Config.config) =
@@ -1326,7 +1330,8 @@ and print_var print_ast_list conf ifun env ep loc sl =
           try
             let fl = Util.etc_file_name conf templ in
             let astl =
-              Parser.parse ~cached:!Logs.debug_flag ~on_exn
+              let cached = not conf.predictable_mode in
+              Parser.parse ~cached ~on_exn
                 ~resolve_include:(resolve_include conf) (`File fl)
             in
             print_ast_list env ep astl
@@ -1402,7 +1407,7 @@ let output conf ifun env ep fl =
   try eval conf ifun env ep @@ parse conf fl
   with e ->
     let bt = Printexc.get_raw_backtrace () in
-    Logs.debug (fun k -> k "%a" pp_exception (e, bt))
+    Log.debug (fun k -> k "%a" pp_exception (e, bt))
 
 type simple_env = Vstring of Adef.encoded_string | Vother of unit vother
 

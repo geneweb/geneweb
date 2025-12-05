@@ -5,17 +5,20 @@ open Config
 open Def
 open Util
 open Gwd_lib
-module Logs = Geneweb_logs.Logs
 module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Server = Geneweb_http.Server
+module Header = Geneweb_http.Header
+
+type log = Stdout | Stderr | File of string | Syslog
 
 let output_conf =
   {
-    status = Wserver.http;
-    header = Wserver.header;
-    body = Wserver.print_string;
-    flush = Wserver.wflush;
+    status = Server.http;
+    header = Server.header;
+    body = Server.print_string;
+    flush = Server.wflush;
   }
 
 let printer_conf = { Config.empty with output_conf }
@@ -54,6 +57,12 @@ let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
 let wizard_passwd = ref ""
 let predictable_mode = ref false
+let log_file : log ref = ref Stderr
+let verbosity_level = ref 6
+let debug_flag = ref false
+let force_cgi = ref false
+let cgi_secret_salt : string option ref = ref None
+let encode_env e = List.map (fun ((x, y) : _ * string) -> (x, Adef.encoded y)) e
 
 let is_multipart_form =
   let s = "multipart/form-data" in
@@ -74,13 +83,13 @@ let deprecated_warning_max_clients () =
       k
         "The `-max_clients` option is deprecated and may be removed in a \
          future release.@ It has no effect.@ Use `-n_workers` and\n\
-        \    `-max_pending_requests` instead.@.")
+        \    `-max_pending_requests` instead.")
 
 let deprecated_warning_no_fork () =
   Logs.warn (fun k ->
       k
         "The `-no-fork` option is deprecated and may be removed in a future \
-         release.@ To achieve the same behavior, use `-n_workers 0` instead.@.")
+         release.@ To achieve the same behavior, use `-n_workers 0` instead.")
 
 type auth_report = {
   ar_ok : bool;
@@ -101,12 +110,12 @@ let split_username username =
   | 1 -> (username, "")
   | 2 -> (List.nth l1 0, List.nth l1 1)
   | _ ->
-      Logs.syslog `LOG_CRIT "Bad .auth key or sosa encoding";
+      Logs.err (fun k -> k "Bad .auth key or sosa encoding");
       (username, "")
 
 let log_passwd_failed ar tm from request base_file =
-  let referer = Mutil.extract_param "referer: " '\n' request in
-  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
+  let referer = Header.extract_param "referer: " '\n' request in
+  let user_agent = Header.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
   Logs.info (fun k ->
       k "%s (%d) %s_%s => failed (%s)"
@@ -135,8 +144,8 @@ let http conf status =
   Output.header conf "Content-type: text/html; charset=iso-8859-1"
 
 let robots_txt conf =
-  Logs.syslog `LOG_NOTICE "Robot request";
-  Output.status conf Def.OK;
+  Logs.info (fun k -> k "Robot request");
+  Output.status conf Code.OK;
   Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
   else (
@@ -144,8 +153,8 @@ let robots_txt conf =
     Output.print_sstring conf "Disallow: /\n")
 
 let refuse_log conf from =
-  Logs.syslog `LOG_NOTICE @@ "Excluded: " ^ from;
-  http conf Def.Forbidden;
+  Logs.info (fun k -> k "Excluded: %s" from);
+  http conf Code.Forbidden;
   Output.header conf "Content-type: text/html";
   Output.print_sstring conf
     "Your access has been disconnected by administrator.\n";
@@ -153,17 +162,16 @@ let refuse_log conf from =
   ()
 
 let only_log conf from =
-  Logs.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
-  http conf Def.OK;
+  Logs.info (fun k -> k "Connection refused from %s" from);
+  http conf Code.OK;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
   Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
 
 let refuse_auth conf from auth auth_type =
-  Logs.syslog `LOG_NOTICE
-  @@ Printf.sprintf
-       "Access failed --- From: %s --- Basic realm: %s --- Response: %s" from
-       auth_type auth;
+  Logs.info (fun k ->
+      k "Access failed --- From: %s --- Basic realm: %s --- Response: %s" from
+        auth_type auth);
   Util.unauthorized conf auth_type
 
 let index_from s o c =
@@ -174,7 +182,7 @@ let index s c = index_from s 0 c
 let rec extract_assoc key = function
   | [] -> ("", [])
   | ((k, v) as kv) :: kvl ->
-      if k = key then (Mutil.decode v, kvl)
+      if k = key then (v, kvl)
       else
         let v, kvl = extract_assoc key kvl in
         (v, kv :: kvl)
@@ -206,9 +214,7 @@ let load_lexicon =
                   let fname = Util.search_in_assets fname in
                   if Sys.file_exists fname then
                     Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
-                  else
-                    Logs.syslog `LOG_WARNING
-                      (Format.sprintf "File %s unavailable\n" fname))
+                  else Logs.warn (fun k -> k "File %s unavailable\n" fname))
                 !lexicon_list;
               ht)
         in
@@ -303,12 +309,11 @@ let print_renamed conf new_n =
 let log_redirect from request req =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
   let on_exn exn bt =
-    Logs.syslog `LOG_NOTICE @@ Format.asprintf "%a\n" Lock.pp_exception (exn, bt)
+    Logs.info (fun k -> k "%a\n" Lock.pp_exception (exn, bt))
   in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  let referer = Mutil.extract_param "referer: " '\n' request in
-  Logs.syslog `LOG_NOTICE
-  @@ Printf.sprintf "%s --- From: %s --- Referer: %s" req from referer
+  let referer = Header.extract_param "referer: " '\n' request in
+  Logs.info (fun k -> k "%s --- From: %s --- Referer: %s" req from referer)
 
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
@@ -369,7 +374,7 @@ let trace_auth base_env f =
 
 let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  Output.status conf Def.Unauthorized;
+  Output.status conf Code.Unauthorized;
   if !use_auth_digest_scheme then
     let nonce = digest_nonce conf.ctime in
     let _ =
@@ -549,7 +554,7 @@ let get_actlog check_from utm from_addr base_password =
     in
     loop false ATnormal []
   with Sys_error e ->
-    Logs.syslog `LOG_WARNING ("Error opening (get) actlog: " ^ e);
+    Logs.warn (fun k -> k "Error opening (get) actlog: %s" e);
     ([], ATnormal, false)
 
 let set_actlog list =
@@ -563,9 +568,7 @@ let set_actlog list =
           (if e = "" then "" else " " ^ e))
       list;
     close_out oc
-  with Sys_error e ->
-    Logs.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
-    ()
+  with Sys_error e -> Logs.warn (fun k -> k "Error opening actlog: %s" e)
 
 let get_token check_from utm from_addr base_password =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
@@ -638,7 +641,7 @@ let refresh_url conf bname =
     in
     serv ^ req
   in
-  http conf Def.OK;
+  http conf Code.OK;
   Output.header conf "Content-type: text/html";
   Output.printf conf
     "<head>\n\
@@ -652,7 +655,7 @@ let refresh_url conf bname =
   raise Exit
 
 let http_preferred_language request =
-  let v = Mutil.extract_param "accept-language: " '\n' request in
+  let v = Header.extract_param "accept-language: " '\n' request in
   if v = "" then ""
   else
     let s = String.lowercase_ascii v in
@@ -842,7 +845,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
   in
   let passwd1 =
-    let auth = Mutil.extract_param "authorization: " '\r' request in
+    let auth = Header.extract_param "authorization: " '\r' request in
     if auth = "" then ""
     else
       let s = "Basic " in
@@ -852,10 +855,10 @@ let basic_authorization from_addr request base_env passwd access_type utm
       else ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
-  let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
+  let auto = Header.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
   let ok, wizard, friend, username =
-    if (not !Wserver.cgi) && (passwd = "w" || passwd = "f") then
+    if (not !Server.cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
         if wizard_passwd = "" && wizard_passwd_file = "" then
           (true, true, friend_passwd = "", "")
@@ -903,15 +906,13 @@ let basic_authorization from_addr request base_env passwd access_type utm
     if access_type = ATset then
       if wizard then
         let pwd_id = set_token utm from_addr base_file 'w' user username in
-        if !Wserver.cgi then (command, pwd_id)
-        else (base_file ^ "_" ^ pwd_id, "")
+        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
       else if friend then
         let pwd_id = set_token utm from_addr base_file 'f' user username in
-        if !Wserver.cgi then (command, pwd_id)
-        else (base_file ^ "_" ^ pwd_id, "")
-      else if !Wserver.cgi then (command, "")
+        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+      else if !Server.cgi then (command, "")
       else (base_file, "")
-    else if !Wserver.cgi then (command, passwd)
+    else if !Server.cgi then (command, passwd)
     else if passwd = "" then
       if auto = "auto" then
         let suffix = if wizard then "_w" else if friend then "_f" else "" in
@@ -1027,7 +1028,7 @@ let digest_authorization request base_env passwd utm base_file command =
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
   in
-  let command = if !Wserver.cgi then command else base_file in
+  let command = if !Server.cgi then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
     {
       ar_ok = true;
@@ -1042,10 +1043,10 @@ let digest_authorization request base_env passwd utm base_file command =
       ar_can_stale = false;
     }
   else if passwd = "w" || passwd = "f" then
-    let auth = Mutil.extract_param "authorization: " '\r' request in
+    let auth = Header.extract_param "authorization: " '\r' request in
     if Mutil.start_with "Digest " 0 auth then
       let meth =
-        match Mutil.extract_param "GET " ' ' request with
+        match Header.extract_param "GET " ' ' request with
         | "" -> "POST"
         | _ -> "GET"
       in
@@ -1125,7 +1126,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
   match access_type with
   | ATwizard (user, username) ->
       let command, passwd =
-        if !Wserver.cgi then (command, passwd)
+        if !Server.cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1144,7 +1145,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
       }
   | ATfriend (user, username) ->
       let command, passwd =
-        if !Wserver.cgi then (command, passwd)
+        if !Server.cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1163,7 +1164,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
       }
   | ATnormal ->
       let command, passwd =
-        if !Wserver.cgi then (command, "") else (base_file, "")
+        if !Server.cgi then (command, "") else (base_file, "")
       in
       {
         ar_ok = true;
@@ -1195,10 +1196,10 @@ let make_conf ~secret_salt from_addr request script_name env =
         !allowed_tags_file
     in
     GWPARAM.errors_other := str :: !GWPARAM.errors_other;
-    Logs.syslog `LOG_WARNING str);
+    Logs.warn (fun k -> k "%s" str));
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
-  let cgi = !Wserver.cgi in
+  let cgi = !Server.cgi in
   let command, base_file, passwd, env, access_type =
     let base_access, env =
       let x, env = extract_assoc "b" env in
@@ -1209,7 +1210,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       | [ bname ] -> (bname, "")
       | [ bname; access ] -> (bname, access)
       | _ ->
-          Logs.syslog `LOG_CRIT (Format.sprintf "bad bname: (%s)\n" base_access);
+          Logs.err (fun k -> k "bad bname: (%s)" base_access);
           assert false
     in
     let bases = Util.get_bases_list () in
@@ -1241,7 +1242,7 @@ let make_conf ~secret_salt from_addr request script_name env =
     match x with
     | "from" -> ("from", env)
     | "" -> ("", env)
-    | _ -> ("", ("opt", Mutil.encode x) :: env)
+    | _ -> ("", ("opt", x) :: env)
   in
   let threshold_test, env = extract_assoc "threshold" env in
   if threshold_test <> "" then
@@ -1298,7 +1299,7 @@ let make_conf ~secret_salt from_addr request script_name env =
   let manitou =
     try
       ar.ar_wizard && ar.ar_user <> ""
-      && p_getenv env "manitou" <> Some "off"
+      && p_getenv (encode_env env) "manitou" <> Some "off"
       && List.assoc "manitou" base_env = ar.ar_user
     with Not_found -> false
   in
@@ -1334,7 +1335,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       user_iper = None;
       auth_scheme = ar.ar_scheme;
       command = ar.ar_command;
-      indep_command = (if !Wserver.cgi then ar.ar_command else "geneweb") ^ "?";
+      indep_command = (if !Server.cgi then ar.ar_command else "geneweb") ^ "?";
       highlight =
         (try List.assoc "highlight_color" base_env
          with Not_found -> green_color);
@@ -1389,18 +1390,18 @@ let make_conf ~secret_salt from_addr request script_name env =
       bname = Filename.remove_extension base_file;
       nb_of_persons = 0;
       nb_of_families = 0;
-      env;
+      env = encode_env env;
       senv = [];
       cgi_passwd = ar.ar_passwd;
       henv =
-        ((if not !Wserver.cgi then []
+        ((if not !Server.cgi then []
           else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
           else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
         @ (if lang = "" then [] else [ ("lang", Mutil.encode lang) ])
         @ if from = "" then [] else [ ("opt", Mutil.encode from) ]);
       base_env;
-      allowed_titles = Lazy.from_fun (allowed_titles env base_env);
-      denied_titles = Lazy.from_fun (denied_titles env base_env);
+      allowed_titles = Lazy.from_fun (allowed_titles (encode_env env) base_env);
+      denied_titles = Lazy.from_fun (denied_titles (encode_env env) base_env);
       request;
       lexicon;
       charset = "UTF-8";
@@ -1413,7 +1414,10 @@ let make_conf ~secret_salt from_addr request script_name env =
            if x = "" then !auth_file
            else Filename.concat (!GWPARAM.bpath base_file) x
          with Not_found -> !auth_file);
-      border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
+      border =
+        (match Util.p_getint (encode_env env) "border" with
+        | Some i -> i
+        | None -> 0);
       n_connect = None;
       today =
         {
@@ -1451,8 +1455,8 @@ let make_conf ~secret_salt from_addr request script_name env =
   (conf, ar)
 
 let log tm conf from gauth request script_name contents =
-  let referer = Mutil.extract_param "referer: " '\n' request in
-  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
+  let referer = Header.extract_param "referer: " '\n' request in
+  let user_agent = Header.extract_param "user-agent: " '\n' request in
   Logs.info (fun k ->
       k "(%d) %s?%s\n%s%s%s%s%s" (Unix.getpid ()) script_name
         (if String.length contents > 200 then
@@ -1482,7 +1486,7 @@ let is_robot from =
 let auth_err request auth_file =
   if auth_file = "" then (false, "")
   else
-    let auth = Mutil.extract_param "authorization: " '\r' request in
+    let auth = Header.extract_param "authorization: " '\r' request in
     if auth <> "" then
       match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
       | Some ic -> (
@@ -1541,11 +1545,10 @@ let conf_and_connection =
   in
   let context conf contents =
     conf.bname
-    ^<^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
-    ^<^ contents
+    ^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
+    ^ contents
   in
-  fun ~secret_salt from request script_name (contents : Adef.encoded_string) env
-    ->
+  fun ~secret_salt from request script_name contents env ->
     let conf, passwd_err =
       make_conf ~secret_salt from request script_name env
     in
@@ -1554,18 +1557,16 @@ let conf_and_connection =
     | None -> (
         let auth_err, auth =
           if conf.auth_file = "" then (false, "")
-          else if !Wserver.cgi then (true, "")
+          else if !Server.cgi then (true, "")
           else auth_err request conf.auth_file
         in
         let mode = Util.p_getenv conf.env "m" in
         (if mode <> Some "IM" then
            let contents =
-             if List.mem_assoc "log_pwd" env then Adef.encoded "..."
-             else contents
+             if List.mem_assoc "log_pwd" env then "..." else contents
            in
-           log_and_robot_check conf auth from request script_name
-             (contents :> string));
-        match (!Wserver.cgi, auth_err, passwd_err) with
+           log_and_robot_check conf auth from request script_name contents);
+        match (!Server.cgi, auth_err, passwd_err) with
         | true, true, _ ->
             if is_robot from then Robot.robot_error conf 0 0 else no_access conf
         | _, true, _ ->
@@ -1591,22 +1592,18 @@ let conf_and_connection =
               unauth_server conf ar
         | _ -> (
             let printexc bt exn =
-              Logs.syslog `LOG_CRIT
-                ((context conf contents :> string)
-                ^ " " ^ Printexc.to_string exn);
+              Logs.err (fun k ->
+                  k "%s %s" (context conf contents) (Printexc.to_string exn));
               if Printexc.backtrace_status () then
-                let s = Format.sprintf "Backtrace:@ %s" bt in
-                Logs.syslog `LOG_CRIT s
+                Logs.err (fun k -> k "Backtrace:@ %s" bt)
             in
             try
               let t1 = Unix.gettimeofday () in
               Request.treat_request conf;
               let t2 = Unix.gettimeofday () in
               if t2 -. t1 > slow_query_threshold then
-                Logs.syslog `LOG_WARNING
-                  (Printf.sprintf "%s slow query (%.3f)"
-                     (context conf contents : Adef.encoded_string :> string)
-                     (t2 -. t1))
+                Logs.warn (fun k ->
+                    k "%s slow query (%.3f)" (context conf contents) (t2 -. t1))
             with
             | Exit -> ()
             | Def.HttpExn (code, _) as exn ->
@@ -1699,7 +1696,7 @@ type misc_fname =
   | CacheGz of string
 
 let content_misc conf len misc_fname =
-  Output.status conf Def.OK;
+  Output.status conf Code.OK;
   let fname, t =
     match misc_fname with
     | Css fname -> (fname, "text/css; charset=UTF-8")
@@ -1755,7 +1752,7 @@ let print_misc_file conf misc_fname =
           else
             let olen = min (Bytes.length buf) len in
             really_input ic buf 0 olen;
-            Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
+            Server.printf "%s" (Bytes.sub_string buf 0 olen);
             loop (len - olen)
         in
         loop len;
@@ -1809,7 +1806,6 @@ let strip_quotes s =
   String.sub s i0 (i1 - i0)
 
 let extract_multipart boundary str =
-  let str = (str : Adef.encoded_string :> string) in
   let rec skip_nl i =
     if i < String.length str && str.[i] = '\r' then skip_nl (i + 1)
     else if i < String.length str && str.[i] = '\n' then skip_nl (i + 1)
@@ -1830,7 +1826,7 @@ let extract_multipart boundary str =
       let s, i = next_line i in
       if s = boundary then
         let s, i = next_line i in
-        let s = String.lowercase_ascii s |> Adef.encoded in
+        let s = String.lowercase_ascii s in
         let env = Util.create_env s in
         match (Util.p_getenv env "name", Util.p_getenv env "filename") with
         | Some var, Some filename ->
@@ -1853,9 +1849,7 @@ let extract_multipart boundary str =
               loop i
             in
             let v = String.sub str i (i1 - i) in
-            (var ^ "_name", Mutil.encode filename)
-            :: (var, Adef.encoded v)
-            :: loop i1
+            (var ^ "_name", filename) :: (var, v) :: loop i1
         | Some var, None ->
             let var = strip_quotes var in
             let i = skip_nl i in
@@ -1875,7 +1869,7 @@ let extract_multipart boundary str =
               loop i
             in
             let v = String.sub str i (i1 - i) |> String.trim in
-            (var, Adef.encoded v) :: loop i
+            (var, v) :: loop i
         | _ -> loop i
       else if s = boundary ^ "--" then []
       else loop i
@@ -1884,23 +1878,21 @@ let extract_multipart boundary str =
   let str, _ =
     List.fold_left
       (fun (str, sep) (v, x) ->
-        if v = "file" then (str, sep) else (str ^^^ sep ^<^ v ^<^ "=" ^<^ x, "&"))
-      (Adef.encoded "", "")
-      env
+        if v = "file" then (str, sep) else (str ^ sep ^ v ^ "=" ^ x, "&"))
+      ("", "") env
   in
   (str, env)
 
-let build_env request (contents : Adef.encoded_string) :
-    Adef.encoded_string * (string * Adef.encoded_string) list =
-  let content_type = Mutil.extract_param "content-type: " '\n' request in
+let build_env request contents =
+  let content_type = Header.extract_param "content-type: " '\n' request in
   if is_multipart_form content_type then
-    let boundary =
-      (extract_boundary (Adef.encoded content_type)
-        : Adef.encoded_string
-        :> string)
-    in
+    let boundary = (extract_boundary content_type :> string) in
     extract_multipart boundary contents
-  else (contents, Util.create_env contents)
+  else
+    ( contents,
+      List.map
+        (fun ((x, y) : _ * Adef.encoded_string) -> (x, (y :> string)))
+        (Util.create_env contents) )
 
 let connection ~secret_salt (addr, request) script_name contents0 =
   let from =
@@ -1923,7 +1915,7 @@ let connection ~secret_salt (addr, request) script_name contents0 =
       try
         let contents, env = build_env request contents0 in
         if
-          (not (image_request printer_conf script_name env))
+          (not (image_request printer_conf script_name (encode_env env)))
           && not (misc_request printer_conf script_name)
         then
           conf_and_connection ~secret_salt from request script_name contents env
@@ -1971,7 +1963,7 @@ let geneweb_server ~predictable_mode () =
                 null_reopen [ Unix.O_WRONLY ] Unix.stderr
             | _ -> exit 0
           else (
-            Logs.info (fun k ->
+            Logs.app (fun k ->
                 k
                   {|  Possible addresses:
   http://localhost:%d/base
@@ -2016,7 +2008,7 @@ let geneweb_server ~predictable_mode () =
         secret_salt
     | _ -> retrieve_secret_salt ()
   in
-  Wserver.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+  Server.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
     (connection ~secret_salt)
 
@@ -2104,8 +2096,8 @@ let make_sock_dir x =
   Filesystem.create_dir ~parent:true x;
   if Sys.unix then ()
   else (
-    Wserver.sock_in := Filename.concat x "gwd.sin";
-    Wserver.sock_out := Filename.concat x "gwd.sou");
+    Server.sock_in := Filename.concat x "gwd.sin";
+    Server.sock_out := Filename.concat x "gwd.sou");
   GWPARAM.sock_dir := x
 
 let arg_plugin_doc opt doc =
@@ -2179,23 +2171,20 @@ let print_version_commit () =
   exit 0
 
 let set_log_file f =
-  Logs.set_output_channel
-    (match f with
-    | "-" | "<stdout>" -> Logs.Stdout
-    | "2" | "<stderr>" -> Logs.Stderr
-    | _ ->
-        let oc =
-          open_out_gen [ Open_wronly; Open_creat; Open_append; Open_text ] 644 f
-        in
-        Logs.Channel oc)
+  match f with
+  | "-" | "<stdout>" -> log_file := Stdout
+  | "2" | "<stderr>" -> log_file := Stderr
+  | "<syslog>" -> log_file := Syslog
+  | f -> log_file := File f
 
-let set_verbosity_level lvl = Logs.verbosity_level := lvl
+let set_verbosity_level lvl = verbosity_level := lvl
 
 let set_debug_flag () =
   debug := true;
-  Logs.debug_flag := true;
+  debug_flag := true;
   Printexc.record_backtrace true;
   set_verbosity_level 7;
+  Logs.set_level ~all:true (Some Logs.Debug);
   Sys.enable_runtime_warnings true
 
 let set_predictable_mode () =
@@ -2205,15 +2194,10 @@ let set_predictable_mode () =
          security enhancements and caching.");
   predictable_mode := true
 
-let main () =
-  if not Sys.unix then (
-    Wserver.sock_in := "gwd.sin";
-    Wserver.sock_out := "gwd.sou");
+let parse_cmd () =
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
   in
-  let force_cgi = ref false in
-  let cgi_secret_salt : string option ref = ref None in
   let speclist =
     [
       ( "-hd",
@@ -2310,7 +2294,7 @@ let main () =
       ( "-log_level",
         Arg.Int set_verbosity_level,
         {|<N> Send messages with severity <= <N> to syslog (default: |}
-        ^ string_of_int !Logs.verbosity_level
+        ^ string_of_int !verbosity_level
         ^ {|).|} );
       ( "-robot_xcl",
         Arg.String robot_exclude_arg,
@@ -2408,7 +2392,12 @@ let main () =
   arg_parse_in_file
     (chop_extension Sys.argv.(0) ^ ".arg")
     speclist anonfun usage;
-  Arg.parse speclist anonfun usage;
+  Arg.parse speclist anonfun usage
+
+let main () =
+  if not Sys.unix then (
+    Server.sock_in := "gwd.sin";
+    Server.sock_out := "gwd.sou");
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2433,11 +2422,13 @@ let main () =
       Driver.load_database dbn)
     !cache_databases;
   if !auth_file <> "" && !force_cgi then
-    Logs.syslog `LOG_WARNING
-      "-auth option is not compatible with CGI mode.\n\
-      \ Use instead friend_passwd_file= and wizard_passwd_file= in .cgf file\n";
+    Logs.warn (fun k ->
+        k
+          "-auth option is not compatible with CGI mode.\n\
+          \ Use instead friend_passwd_file= and wizard_passwd_file= in .cgf \
+           file");
   if !use_auth_digest_scheme && !force_cgi then
-    Logs.syslog `LOG_WARNING "-digest option is not compatible with CGI mode.\n";
+    Logs.warn (fun k -> k "-digest option is not compatible with CGI mode.");
   (if !images_dir <> "" then
      let abs_dir =
        let f =
@@ -2451,22 +2442,21 @@ let main () =
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Mutil.particles_file = "" then
     Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
-  Wserver.stop_server :=
+  Server.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
   let query, cgi =
-    try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
-    with Not_found -> ("" |> Adef.encoded, !force_cgi)
+    try (Sys.getenv "QUERY_STRING", true) with Not_found -> ("", !force_cgi)
   in
   Util.is_welcome := false;
   if cgi then (
-    Wserver.cgi := true;
+    Server.cgi := true;
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
         let len =
           try int_of_string (Sys.getenv "CONTENT_LENGTH") with Not_found -> -1
         in
         set_binary_mode_in stdin true;
-        read_input len |> Adef.encoded)
+        read_input len)
       else query
     in
     let addr =
@@ -2481,21 +2471,43 @@ let main () =
   else geneweb_server ~predictable_mode:!predictable_mode ()
 
 let has_root_privileges () =
-  assert Sys.unix;
-  let root = 0 in
-  Unix.getuid () = root
-  || Unix.getgid () = root
-  || Unix.geteuid () = root
-  || Unix.getegid () = root
+  if not Sys.unix then false
+  else
+    let root = 0 in
+    Unix.getuid () = root
+    || Unix.getgid () = root
+    || Unix.geteuid () = root
+    || Unix.getegid () = root
+
+let with_log t k =
+  let fmt_to_reporter fmt = Logs_fmt.reporter ~dst:fmt () in
+  let reporter, finally =
+    match t with
+    | Stdout -> (fmt_to_reporter Format.std_formatter, Fun.id)
+    | Stderr -> (fmt_to_reporter Format.err_formatter, Fun.id)
+    | File f ->
+        let oc = open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 f in
+        ( fmt_to_reporter @@ Format.formatter_of_out_channel oc,
+          fun () -> close_out_noerr oc )
+    | Syslog ->
+        (* TODO: Add cli options to configure the address and the port for Syslog. *)
+        let addr = Unix.inet_addr_of_string "127.0.0.1" in
+        (Logs_syslog_unix.udp_reporter addr ~port:514 (), Fun.id)
+  in
+  Fun.protect ~finally @@ fun () -> k reporter
 
 let () =
-  if Sys.unix && has_root_privileges () then (
-    Logs.err (fun k ->
-        k
-          "The gwd server should never be run with root privileges. If you \
-           need elevated privileges, for example to open a port below 1024, \
-           see the security section of the documentation.");
+  if has_root_privileges () then (
+    Format.eprintf
+      "The gwd server should never be run with root privileges. If you need \
+       elevated privileges, for example to open a port below 1024, see the \
+       security section of the documentation.";
     exit 1);
+  Logs.set_level ~all:true (Some Logs.Info);
+  parse_cmd ();
+  with_log !log_file @@ fun reporter ->
+  Fmt_tty.setup_std_outputs ~style_renderer:`Ansi_tty ();
+  Logs.set_reporter reporter;
   try main () with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Logs.err (fun k ->
@@ -2505,8 +2517,8 @@ let () =
              GeneWeb with another port number (option -p)"
             !selected_port)
   | Unix.Unix_error (Unix.ENOTCONN, _, _) when Sys.unix ->
-      Logs.syslog `LOG_WARNING
-        {|Unix.Unix_error(Unix.ENOTCONN, "shutdown", "")|}
+      Logs.warn (fun k ->
+          k "Unix.Unix_error(Unix.ENOTCONN, \"shutdown\", \"\")")
   | Unix.Unix_error (Unix.EACCES, "bind", _) when Sys.unix ->
       Logs.err (fun k ->
           k
@@ -2515,12 +2527,10 @@ let () =
              section of the documentation."
             !selected_port)
   | Register_plugin_failure (p, `dynlink_error e) ->
-      Logs.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
-  | Register_plugin_failure (p, `string s) ->
-      Logs.syslog `LOG_CRIT (p ^ ": " ^ s)
+      Logs.err (fun k -> k "%s: %s" p (Dynlink.error_message e))
+  | Register_plugin_failure (p, `string s) -> Logs.err (fun k -> k "%s: %s" p s)
   | exn ->
       let bt = Printexc.get_backtrace () in
-      Logs.syslog `LOG_CRIT (Printexc.to_string exn);
+      Logs.err (fun k -> k "%s" (Printexc.to_string exn));
       if Printexc.backtrace_status () then
-        let s = Format.sprintf "Backtrace:@ %s" bt in
-        Logs.syslog `LOG_CRIT s
+        Logs.err (fun k -> k "Backtrace:@ %s" bt)

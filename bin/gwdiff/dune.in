@@ -1,6 +1,0 @@
-(executables
-  (package geneweb)
-  (names gwdiff)
-  (public_names geneweb.gwdiff)
-  (modules gwdiff)
-  (libraries unix str geneweb))

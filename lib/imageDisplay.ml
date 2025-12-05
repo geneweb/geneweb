@@ -2,8 +2,12 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"ImageDisplay" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
+module Code = Geneweb_http.Code
 
 let print_placeholder_gendered_portrait conf p size =
   let image, alt =
@@ -28,7 +32,7 @@ let print_placeholder_gendered_portrait conf p size =
     - fname : le nom du fichier [Retour] : aucun [Rem] : Ne pas utiliser en
       dehors de ce module. *)
 let content conf ct len fname =
-  Output.status conf Def.OK;
+  Output.status conf Code.OK;
   Output.header conf "Content-type: %s" ct;
   Output.header conf "Content-length: %d" len;
   Output.header conf "Content-disposition: inline; filename=%s"
@@ -80,9 +84,8 @@ let print_image_file conf fname =
         close_in ic;
         Ok ()
       with Sys_error e ->
-        Logs.syslog `LOG_ERR
-          (Format.sprintf "Error printing image file content for %s : %s" fname
-             e);
+        Log.err (fun k ->
+            k "Error printing image file content for %s : %s" fname e);
         Error e)
 
 (* ************************************************************************** *)

@@ -1,5 +1,8 @@
 open Config
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Image" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 
 let path_str path =
@@ -257,8 +260,7 @@ let parse_src_with_size_info conf s =
     let s = String.sub s 0 pos1 in
     Ok (urlorpath_of_string conf s, (w, h))
   with Not_found | Failure _ ->
-    Logs.syslog `LOG_ERR
-      (Format.sprintf "Error parsing portrait source with size info %s" s);
+    Log.err (fun k -> k "Error parsing portrait source with size info %s" s);
     Error "Failed to parse url with size info"
 
 (* In images/carrousel we store either
@@ -403,9 +405,9 @@ let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
     (if Sys.file_exists old_carrousel && Sys.is_directory old_carrousel then
        try Sys.rename old_carrousel new_carrousel
        with Sys_error e ->
-         Logs.syslog `LOG_ERR
-           (Format.sprintf "Error renaming carrousel directory %s to %s: %s"
-              old_carrousel new_carrousel e));
+         Log.err (fun k ->
+             k "Error renaming carrousel directory %s to %s: %s" old_carrousel
+               new_carrousel e));
     let rename_files_with_extensions dir base_name =
       Array.iter
         (fun ext ->
@@ -417,9 +419,8 @@ let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
             let new_file = Filename.concat dir (new_key ^ blason ^ ext) in
             try Sys.rename old_file new_file
             with Sys_error e ->
-              Logs.syslog `LOG_ERR
-                (Format.sprintf "Error renaming %s to %s: %s" old_file new_file
-                   e))
+              Log.err (fun k ->
+                  k "Error renaming %s to %s: %s" old_file new_file e))
         [| ".jpg"; ".jpeg"; ".png"; ".gif"; ".stop" |]
     in
     rename_files_with_extensions p_dir old_key;
@@ -543,7 +544,7 @@ let get_carrousel_img_aux conf base p old =
           [] (Sys.readdir f)
       else []
     with Sys_error e ->
-      Logs.syslog `LOG_ERR (Format.sprintf "carrousel error: %s, %s" f e);
+      Log.err (fun k -> k "carrousel error: %s, %s" f e);
       []
 
 let get_carrousel_imgs conf base p = get_carrousel_img_aux conf base p false

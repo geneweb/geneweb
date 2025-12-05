@@ -6,7 +6,7 @@
   geneweb.gwd_lib
   geneweb.gwexport_lib
   geneweb.gwu_lib
-  geneweb.wserver)
+  geneweb_http)
  (embed_in_plugin_libraries
   geneweb.gwexport_lib
   geneweb.gwu_lib

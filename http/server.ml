@@ -1,10 +1,12 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 module Compat = Geneweb_compat
-module Logs = Geneweb_logs.Logs
 
-type handler =
-  Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit
+let src = Logs.Src.create ~doc:"Wserver" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
+type handler = Unix.sockaddr * string list -> string -> string -> unit
 
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
@@ -60,19 +62,8 @@ let printing_state = ref Nothing
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
   printing_state := Status;
-  if status <> Def.OK || not !cgi then (
-    let answer =
-      match status with
-      | Def.OK -> "200 OK"
-      | Def.Moved_Temporarily -> "302 Moved Temporarily"
-      | Def.Bad_Request -> "400 Bad Request"
-      | Def.Unauthorized -> "401 Unauthorized"
-      | Def.Forbidden -> "403 Forbidden"
-      | Def.Not_Found -> "404 Not Found"
-      | Def.Conflict -> "409 Conflict"
-      | Def.Internal_Server_Error -> "500 Internal Server Error"
-      | Def.Service_Unavailable -> "503 Service Unavailable"
-    in
+  if status <> Code.OK || not !cgi then (
+    let answer = Code.to_string status in
     if !cgi then (
       output_string !wserver_oc "Status: ";
       output_string !wserver_oc answer)
@@ -83,27 +74,27 @@ let http status =
 
 let header s =
   if !printing_state <> Status then
-    if !printing_state = Nothing then http Def.OK
+    if !printing_state = Nothing then http Code.OK
     else failwith "Cannot write HTTP headers: page contents already started";
   output_string !wserver_oc s;
   printnl ()
 
 let printf fmt =
   if !printing_state <> Contents then (
-    if !printing_state = Nothing then http Def.OK;
+    if !printing_state = Nothing then http Code.OK;
     printnl ();
     printing_state := Contents);
   Printf.fprintf !wserver_oc fmt
 
 let print_string s =
   if !printing_state <> Contents then (
-    if !printing_state = Nothing then http Def.OK;
+    if !printing_state = Nothing then http Code.OK;
     printnl ();
     printing_state := Contents);
   output_string !wserver_oc s
 
 let http_redirect_temporarily url =
-  http Def.Moved_Temporarily;
+  http Code.Moved_Temporarily;
   output_string !wserver_oc "Location: ";
   output_string !wserver_oc url;
   printnl ();
@@ -143,11 +134,11 @@ let get_request strm =
 let get_request_and_content strm =
   let request = get_request strm in
   let content =
-    match Mutil.extract_param "content-length: " ' ' request with
+    match Header.extract_param "content-length: " ' ' request with
     | "" -> ""
     | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
   in
-  (request, Adef.encoded content)
+  (request, content)
 
 let string_of_sockaddr = function
   | Unix.ADDR_UNIX s -> s
@@ -157,7 +148,7 @@ let sockaddr_of_string s = Unix.ADDR_UNIX s
 
 let timeout_handler ~timeout _ =
   try
-    if !printing_state = Nothing then http Def.OK;
+    if !printing_state = Nothing then http Code.OK;
     if !printing_state <> Contents then (
       output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
       printnl ();
@@ -182,15 +173,14 @@ let treat_connection callback client_addr client_socket =
       get_request_and_content strm
     in
     let path, query =
-      match Mutil.extract_param "GET /" ' ' request with
-      | "" -> (Mutil.extract_param "POST /" ' ' request, query)
+      match Header.extract_param "GET /" ' ' request with
+      | "" -> (Header.extract_param "POST /" ' ' request, query)
       | str -> (
           match String.index_opt str '?' with
           | Some i ->
               ( String.sub str 0 i,
-                String.sub str (i + 1) (String.length str - i - 1)
-                |> Adef.encoded )
-          | None -> (str, "" |> Adef.encoded))
+                String.sub str (i + 1) (String.length str - i - 1) )
+          | None -> (str, ""))
     in
     (request, path, query)
   in
@@ -220,10 +210,8 @@ let skip_possible_remaining_chars fd =
 
 let check_stopping () =
   if Sys.file_exists !stop_server then (
-    flush stdout;
-    Logs.err (fun k ->
-        k "Server stopped by presence of file %s.\n" !stop_server);
-    Logs.err (fun k -> k "Remove that file to allow servers to run again.");
+    Log.err (fun k -> k "Server stopped by presence of file %s.\n" !stop_server);
+    Log.err (fun k -> k "Remove that file to allow servers to run again.");
     exit 0)
 
 let accept_connection_windows socket =
@@ -276,9 +264,9 @@ let accept_connections_windows socket =
   while true do
     try accept_connection_windows socket with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-        Logs.info (fun k -> k "%s" (Printexc.to_string e))
+        Log.info (fun k -> k "%s" (Printexc.to_string e))
     | Sys_error msg as e when msg = "Broken pipe" ->
-        Logs.info (fun k -> k "%s" (Printexc.to_string e))
+        Log.info (fun k -> k "%s" (Printexc.to_string e))
   done
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
@@ -302,7 +290,7 @@ let with_timeout ~timeout handler f =
 
 let accept_connection_unix ~timeout callback socket pid =
   let client_socket, client_addr = My_unix.accept_noeintr socket in
-  Logs.debug (fun k -> k "Worker %d got a job" pid);
+  Log.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   connection_closed := false;
   wserver_sock := client_socket;
@@ -320,7 +308,7 @@ let accept_connections_unix ~timeout ~n_workers callback socket =
       try accept_connection_unix ~timeout callback socket (Unix.getpid ())
       with e ->
         let bt = Printexc.get_raw_backtrace () in
-        Logs.info (fun k -> k "%a" Util.pp_exception (e, bt))
+        Log.info (fun k -> k "%a" Util.pp_exception (e, bt))
     done
 
 let accept_connections ~timeout ~n_workers callback socket =
@@ -354,7 +342,7 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
       Unix.bind socket (Unix.ADDR_INET (addr, port));
       Unix.listen socket max_pending_requests;
       let tm = Unix.localtime (Unix.time ()) in
-      Logs.debug (fun k ->
+      Log.info (fun k ->
           k "Ready %4d-%02d-%02d %02d:%02d port %d..." (1900 + tm.Unix.tm_year)
             (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
             port);

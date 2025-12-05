@@ -3,6 +3,10 @@
 open Config
 open Util
 open Notes
+
+let src = Logs.Src.create ~doc:"NotesDisplay" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module IperSet = Driver.Iper.Set
@@ -44,8 +48,7 @@ let is_ancestor conf base anc =
 
   (* anc is [[fn/sn/oc]]; Return true if anc is one ancestor of conf.user_iper *)
   let bad_format n =
-    Geneweb_logs.Logs.syslog `LOG_WARNING
-      (Printf.sprintf "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
+    Log.warn (fun k -> k "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
   in
   if String.length anc <= 4 then (
     bad_format 1;
@@ -369,7 +372,7 @@ let print_linked_list_gallery conf base pgl =
           if
             (restrict_l = [] || not (is_restricted conf base restrict_l))
             && (typ = "gallery" || typ = "album")
-          then Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
+          then Output.printf conf "%s" (create_gallery_item conf fnotes nenv s)
       | _ -> ())
     pgl;
   Output.print_sstring conf "</div>\n"

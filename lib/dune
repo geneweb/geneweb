@@ -1,0 +1,23 @@
+(library
+ (name geneweb)
+ (public_name geneweb)
+ (synopsis "GeneWeb library")
+ (libraries
+  unix
+  str
+  stdlib-shims
+  camlp-streams
+  geneweb_core
+  geneweb_def
+  geneweb_db
+  geneweb_sosa
+  geneweb_util
+  geneweb_templ
+  geneweb_logs
+  geneweb_http
+  yojson
+  markup
+  re
+  uucp
+  uri
+  digestif))

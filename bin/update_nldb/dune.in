@@ -1,6 +1,0 @@
-(executables
-  (package geneweb)
-  (names update_nldb)
-  (public_names geneweb.update_nldb)
-  (modules update_nldb)
-  (libraries unix str geneweb))

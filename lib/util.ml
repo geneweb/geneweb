@@ -2,10 +2,14 @@
 
 open Config
 open Def
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Util" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Header = Geneweb_http.Header
 
 let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
     ?(aria_label = "") ?(disabled = false) ?(target = None) ?(data_attrs = [])
@@ -84,8 +88,7 @@ let print_default_gwf_file bname =
         List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
         close_out oc
     with Unix.Unix_error (_, _, _) ->
-      Logs.syslog `LOG_WARNING
-        (Printf.sprintf "Error while creating %s or %s\n" config_d fname)
+      Log.warn (fun k -> k "Error while creating %s or %s" config_d fname)
 
 let rec cut_at_equal i s =
   if i = String.length s then (s, "")
@@ -111,7 +114,7 @@ let read_base_env bname gw_prefix debug =
       close_in ic;
       List.rev env
     with Sys_error error ->
-      Logs.warn (fun k ->
+      Log.warn (fun k ->
           k "Error %s while loading %s, using empty config" error fname);
       []
   in
@@ -119,7 +122,7 @@ let read_base_env bname gw_prefix debug =
   if Sys.file_exists fname1 then load_file fname1
   else (
     if debug then
-      Logs.info (fun k ->
+      Log.info (fun k ->
           k "No configuration file %s found, see %s for example" fname1
             (Filename.concat gw_prefix "a.gwf"));
     [])
@@ -489,7 +492,7 @@ let translate_eval s = Translate.eval (Mutil.nominative s)
 (* *)
 
 let get_referer conf =
-  let referer = Mutil.extract_param "referer: " '\n' conf.request in
+  let referer = Header.extract_param "referer: " '\n' conf.request in
   escape_html referer
 
 let begin_centered conf =
@@ -541,7 +544,7 @@ let html ?(content_type = "text/html") conf =
   Output.header conf "Connection: close"
 
 let unauthorized conf auth_type =
-  Output.status conf Def.Unauthorized;
+  Output.status conf Code.Unauthorized;
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
   Output.header conf "Content-type: text/html; charset=%s" conf.charset;
@@ -572,8 +575,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
       match String.split_on_char '_' commd with
       | b :: _p -> b
       | [] ->
-          Logs.syslog `LOG_ERR
-            (Format.sprintf "Poorly formatted command: %s" commd);
+          Log.err (fun k -> k "Poorly formatted command: %s" commd);
           commd
   in
   let s =
@@ -686,13 +688,10 @@ let safe_html_allowed_tags =
              tags
        in
        loop []
-     else
-       let str =
-         Printf.sprintf "Requested allowed_tags file (%s) absent"
-           !allowed_tags_file
-       in
-       Logs.syslog `LOG_WARNING str;
-       default_safe_html_allowed_tags)
+     else (
+       Log.warn (fun k ->
+           k "Requested allowed_tags file (%s) absent" !allowed_tags_file);
+       default_safe_html_allowed_tags))
 
 (* Few notes:
 
@@ -1205,7 +1204,6 @@ let rec skip_spaces s i =
   if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
 
 let create_env s =
-  let s = (s : Adef.encoded_string :> string) in
   let use_amp = not (Mutil.contains s "content-disposition") in
   let rec get_assoc beg i =
     if i = String.length s then
@@ -1452,8 +1450,7 @@ let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
-    Logs.syslog `LOG_ERR
-      (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
+    Log.err (fun k -> k "Error opening file %s in open_etc_file: %s" fname e);
     None
 
 (* Detect if a template file is a full HTML page *)
@@ -1477,7 +1474,7 @@ let is_full_html_template conf fname =
 let body_prop conf =
   (* NOTE: assumes http access to the server. https handled by proxy *)
   (* TODO verify cgi mode *)
-  let server = Mutil.extract_param "Host: " '\n' conf.request in
+  let server = Header.extract_param "Host: " '\n' conf.request in
   let bname_pwd = (commd conf :> string) in
   let http_str = Format.sprintf "http://%s/%s" server bname_pwd in
   try
@@ -1487,7 +1484,7 @@ let body_prop conf =
   with Not_found -> ""
 
 let get_server_string conf =
-  if not conf.cgi then Mutil.extract_param "host: " '\r' conf.request
+  if not conf.cgi then Header.extract_param "host: " '\r' conf.request
   else
     let server_name = try Sys.getenv "SERVER_NAME" with Not_found -> "" in
     let server_port =
@@ -1496,7 +1493,7 @@ let get_server_string conf =
     if server_port = "80" then server_name else server_name ^ ":" ^ server_port
 
 let get_request_string conf =
-  if not conf.cgi then Mutil.extract_param "GET " ' ' conf.request
+  if not conf.cgi then Header.extract_param "GET " ' ' conf.request
   else
     let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
@@ -2642,7 +2639,7 @@ let is_that_user_and_password auth_scheme user passwd =
         that_response_would_be = ds.ds_response
 
 let browser_doesnt_have_tables conf =
-  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
+  let user_agent = Header.extract_param "user-agent: " '/' conf.request in
   String.lowercase_ascii user_agent = "lynx"
 
 let of_course_died conf p =
@@ -2717,13 +2714,12 @@ let test_cnt_d conf =
   (if not (Sys.file_exists config_d) then
      try Unix.mkdir config_d 0o755
      with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING
-         (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
+       Log.warn (fun k ->
+           k "Failure when creating config_dir (util): %s" config_d));
   if not (Sys.file_exists cnt_d) then
     try Unix.mkdir cnt_d 0o755
     with Unix.Unix_error (_, _, _) ->
-      Logs.syslog `LOG_WARNING
-        (Printf.sprintf "Failure when creating cnt_dir (util): %s" cnt_d)
+      Log.warn (fun k -> k "Failure when creating cnt_dir (util): %s" cnt_d)
   else ();
   cnt_d
 
@@ -3595,7 +3591,7 @@ let url_set_aux conf url evar_l str_l =
   let href =
     match String.split_on_char '?' url with
     | [] ->
-        Logs.syslog `LOG_WARNING "Empty Url\n";
+        Log.warn (fun k -> k "Empty Url");
         ""
     | server :: _ -> server
   in

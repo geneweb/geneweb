@@ -3,7 +3,6 @@
 open Config
 open Def
 open Util
-module Logs = Geneweb_logs.Logs
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
@@ -175,10 +174,8 @@ let rec next_branch_same_len conf base dist backward missing ia sa ipl =
                   (Driver.get_mother cpl) Female ipl
             | _ -> failwith "next_branch_same_len")
         | Neuter ->
-            Logs.syslog `LOG_CRIT
-              (Format.sprintf "sex of %s is Neuter!\n"
-                 (Gutil.designation base (Driver.poi base ia)));
-            assert false)
+            Fmt.failwith "sex of %s is Neuter!"
+              (Gutil.designation base (Driver.poi base ia)))
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist true missing ia sa ipl
