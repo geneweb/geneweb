@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let ver = "7.1-beta"
-
 let available_languages =
   [
     "af";
@@ -39,3 +37,9 @@ let available_languages =
     "zh";
   ]
 
+let ver = "7.1-beta"
+let branch = "%BRANCH%"
+let src = "%SOURCE%"
+let commit_id = "%COMMIT_ID%"
+let commit_date = "%COMMIT_DATE%"
+let compil_date = "%COMPIL_DATE%"

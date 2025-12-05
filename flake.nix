@@ -116,7 +116,7 @@
             utop
             odoc
             ocaml-lsp
-            ocamlformat_0_27_0
+            ocamlformat_0_28_1
             patdiff
             memtrace
           ]);
