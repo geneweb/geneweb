@@ -26,6 +26,11 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~f_spouses ~p_parents
     add !f_spouses Geneweb.Fixbase.fix_family_spouses family_fixes
   in
   let person_fixes =
+    (* This fix should be applied before all the others.  *)
+    add !invalid_occurrence_number Geneweb.Fixbase.fix_invalid_occurrence_number
+      person_fixes
+  in
+  let person_fixes =
     add !p_parents Geneweb.Fixbase.fix_person_parents person_fixes
   in
   let person_fixes = add !p_NBDS Geneweb.Fixbase.fix_nbds person_fixes in
@@ -51,10 +56,6 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~f_spouses ~p_parents
   in
   let person_fixes =
     add !key (Geneweb.Fixbase.fix_person_key base) person_fixes
-  in
-  let person_fixes =
-    add !invalid_occurrence_number Geneweb.Fixbase.fix_invalid_occurrence_number
-      person_fixes
   in
   let person_fixes = List.rev person_fixes in
   let family_fixes = List.rev family_fixes in
