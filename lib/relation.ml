@@ -158,9 +158,9 @@ let add_common_parent base ip1 ip2 set =
       let cpl1 = Driver.foi base ifam1 in
       let cpl2 = Driver.foi base ifam2 in
       if Driver.get_father cpl1 = Driver.get_father cpl2 then
-        Dag.Pset.add (Driver.get_father cpl1) set
+        Dag.Iperset.add (Driver.get_father cpl1) set
       else if Driver.get_mother cpl1 = Driver.get_mother cpl2 then
-        Dag.Pset.add (Driver.get_mother cpl1) set
+        Dag.Iperset.add (Driver.get_mother cpl1) set
       else set
   | _ -> set
 
@@ -176,10 +176,10 @@ let ind_set_of_relation_path base path =
               | Some prev_ip -> add_common_parent base prev_ip ip set
               | None -> set)
         in
-        (Dag.Pset.add ip set, Some ip))
-      (Dag.Pset.empty, None) (List.rev path)
+        (Dag.Iperset.add ip set, Some ip))
+      (Dag.Iperset.empty, None) (List.rev path)
   in
-  set
+  Dag.Iperset.elements set
 
 type node = NotVisited | Visited of (bool * Driver.iper * famlink)
 

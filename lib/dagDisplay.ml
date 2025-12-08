@@ -727,6 +727,9 @@ let print_html_table conf hts =
   else print_table conf hts
 
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
+  let set_lookup =
+    List.fold_left (Fun.flip Dag.Iperset.add) Dag.Iperset.empty set
+  in
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
@@ -771,7 +774,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
         in
         List.fold_left
           (fun txt (ips, ifamo) ->
-            if Pset.mem ips set then txt
+            if Dag.Iperset.mem ips set_lookup then txt
             else
               let ps = pget conf base ips in
               let auth =
