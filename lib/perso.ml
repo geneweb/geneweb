@@ -1377,6 +1377,8 @@ end = struct
 
   let is_death = is_pevent Def.Epers_Death
   let is_burial = is_pevent Def.Epers_Burial
+  let is_birth = is_pevent Def.Epers_Birth
+  let is_baptism = is_pevent Def.Epers_Baptism
 
   let relation_events conf base filter relation_kind ipers =
     List.flatten
@@ -1479,6 +1481,15 @@ end = struct
     | (MainPersonEvent _ | WitnessedEvent _) as e -> e
     | FamilyRelationEvent (_, evt) -> FamilyRelationEvent (frel, evt)
 
+  let sibling_events conf base p =
+    let all_siblings =
+      List.map fst (Cousins.siblings conf base (Gwdb.get_iper p))
+    in
+    relation_events conf base
+      (fun e ->
+        is_death e || is_burial e || is_birth e || is_baptism e || is_marriage e)
+      Sibling all_siblings
+
   let get_events conf base p kinds =
     let p_events = Event.events conf base p in
     List.map
@@ -1495,6 +1506,7 @@ end = struct
             List.map
               (set_family_relation GreatGrandParent)
               (ascendant_events conf base p 3)
+        | Relation Sibling -> sibling_events conf base p
         | Relation _ -> failwith "todo")
       kinds
     |> List.flatten
@@ -4186,6 +4198,7 @@ let print_foreach conf base print_ast eval_expr =
             Relation Parent;
             Relation GrandParent;
             Relation GreatGrandParent;
+            Relation Sibling;
           ]
     in
     let sorted_all_events = List.map (fun e -> Vevent' e) events in
