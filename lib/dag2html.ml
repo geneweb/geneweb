@@ -16,17 +16,22 @@ and ghost_id
 external span_id_of_int : int -> span_id = "%identity"
 external ghost_id_of_int : int -> ghost_id = "%identity"
 
-let new_span_id =
-  let i = ref 0 in
-  fun () ->
-    incr i;
-    span_id_of_int !i
-
-let new_ghost_id =
-  let i = ref 0 in
-  fun () ->
-    incr i;
-    ghost_id_of_int !i
+let new_span_id, new_ghost_id, reset_id_counters =
+  let span_id_counter = ref 0 in
+  let ghost_id_counter = ref 0 in
+  let new_span_id () =
+    incr span_id_counter;
+    span_id_of_int !span_id_counter
+  in
+  let new_ghost_id () =
+    incr ghost_id_counter;
+    ghost_id_of_int !ghost_id_counter
+  in
+  let reset () =
+    span_id_counter := 0;
+    ghost_id_counter := 0
+  in
+  (new_span_id, new_ghost_id, reset)
 
 (* creating the html table structure *)
 
@@ -41,6 +46,15 @@ type 'a table_data =
 
 type 'a html_table_line = (int * align * 'a table_data) array
 type 'a html_table = 'a html_table_line array
+
+module IdagSet = Set.Make (struct
+  type t = idag
+
+  let compare a b = Int.compare (int_of_idag a) (int_of_idag b)
+end)
+
+(** Each logical cell maps to 3 HTML columns: left-pad, content, right-pad *)
+let cell_colspan_factor = 3
 
 let html_table_struct indi_ip indi_txt vbar_txt phony d t =
   let phony = function
@@ -90,7 +104,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
             in
             loop (j + 1)
           in
-          let colspan = 3 * (next_j - j) in
+          let colspan = cell_colspan_factor * (next_j - j) in
           let les = (1, LeftA, TDnothing) :: les in
           let les =
             let td =
@@ -120,7 +134,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
             in
             loop (j + 1)
           in
-          let colspan = 3 * (next_j - j) in
+          let colspan = cell_colspan_factor * (next_j - j) in
           let les = (1, LeftA, TDnothing) :: les in
           let les =
             let td =
@@ -154,7 +168,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
             in
             loop (j + 1)
           in
-          let colspan = (3 * (next_j - j)) - 2 in
+          let colspan = (cell_colspan_factor * (next_j - j)) - 2 in
           let les = (1, LeftA, TDnothing) :: les in
           let les =
             if
@@ -231,13 +245,8 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
                     loop (l + 1)
                 | Nothing -> l + 1
               in
-              if next_l > next_j then (
-                Printf.eprintf
-                  "assert false i %d k %d l %d next_l %d next_j %d\n" i k l
-                  next_l next_j;
-                flush stderr);
               let next_l = min next_l next_j in
-              let colspan = (3 * (next_l - l)) - 2 in
+              let colspan = (cell_colspan_factor * (next_l - l)) - 2 in
               let les =
                 match (t.table.(i).(l).elem, t.table.(i + 1).(l).elem) with
                 | Nothing, _ | _, Nothing ->
@@ -343,17 +352,11 @@ let rec get_block t i j =
     else Some ([ (x.elem, 1) ], 1)
 
 let group_by_common_children d list =
-  let module O = struct
-    type t = idag
-
-    let compare = compare
-  end in
-  let module S = Set.Make (O) in
   let nlcsl =
     List.map
       (fun id ->
         let n = d.dag.(int_of_idag id) in
-        let cs = List.fold_right S.add n.chil S.empty in
+        let cs = List.fold_right IdagSet.add n.chil IdagSet.empty in
         ([ id ], cs))
       list
   in
@@ -363,10 +366,12 @@ let group_by_common_children d list =
       | (nl, cs) :: rest ->
           let rec loop1 beg = function
             | (nl1, cs1) :: rest1 ->
-                if S.is_empty (S.inter cs cs1) then
+                if IdagSet.is_empty (IdagSet.inter cs cs1) then
                   loop1 ((nl1, cs1) :: beg) rest1
                 else
-                  loop ((nl @ nl1, S.union cs cs1) :: List.rev_append beg rest1)
+                  loop
+                    ((nl @ nl1, IdagSet.union cs cs1)
+                    :: List.rev_append beg rest1)
             | [] -> (nl, cs) :: loop rest
           in
           loop1 [] rest
@@ -595,12 +600,6 @@ let group_children t =
    if A and B have common children *)
 
 let group_span_by_common_children d t =
-  let module O = struct
-    type t = idag
-
-    let compare = compare
-  end in
-  let module S = Set.Make (O) in
   let i = Array.length t.table - 1 in
   let line = t.table.(i) in
   let rec loop j cs =
@@ -609,14 +608,15 @@ let group_span_by_common_children d t =
       match line.(j).elem with
       | Elem id ->
           let n = d.dag.(int_of_idag id) in
-          let curr_cs = List.fold_right S.add n.chil S.empty in
-          if S.is_empty (S.inter cs curr_cs) then loop (j + 1) curr_cs
+          let curr_cs = List.fold_right IdagSet.add n.chil IdagSet.empty in
+          if IdagSet.is_empty (IdagSet.inter cs curr_cs) then
+            loop (j + 1) curr_cs
           else (
             line.(j).span <- line.(j - 1).span;
-            loop (j + 1) (S.union cs curr_cs))
-      | Ghost _ | Nothing -> loop (j + 1) S.empty
+            loop (j + 1) (IdagSet.union cs curr_cs))
+      | Ghost _ | Nothing -> loop (j + 1) IdagSet.empty
   in
-  loop 0 S.empty
+  loop 0 IdagSet.empty
 
 let find_same_parents t i j1 j2 j3 j4 =
   let rec loop i j1 j2 j3 j4 =
@@ -1380,12 +1380,7 @@ let invert_dag d =
   let d = { dag = Array.copy d.dag } in
   for i = 0 to Array.length d.dag - 1 do
     let n = d.dag.(i) in
-    d.dag.(i) <-
-      {
-        pare = List.map (fun x -> x) n.chil;
-        valu = n.valu;
-        chil = List.map (fun x -> x) n.pare;
-      }
+    d.dag.(i) <- { pare = n.chil; valu = n.valu; chil = n.pare }
   done;
   d
 
@@ -1409,6 +1404,7 @@ let invert_table t =
 (* main *)
 
 let table_of_dag phony no_optim invert no_group d =
+  reset_id_counters ();
   let d = if invert then invert_dag d else d in
   let t = tablify phony no_optim no_group d in
   let t = if invert then invert_table t else t in

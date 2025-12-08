@@ -1,6 +1,8 @@
-(* $Id: dag2html.mli,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
+(** DAG to HTML table conversion.
 
-(* TODOCP *)
+    Transforms a directed acyclic graph into an HTML table structure suitable
+    for rendering genealogical trees. *)
+
 type 'a dag = { mutable dag : 'a node array }
 and 'a node = { mutable pare : idag list; valu : 'a; mutable chil : idag list }
 and idag
@@ -34,6 +36,9 @@ val html_table_struct :
   'a dag ->
   idag table ->
   (int * align * 'b table_data) array array
+(** Convert table structure to HTML table data. *)
 
 val table_of_dag :
   ('a node -> bool) -> bool -> bool -> bool -> 'a dag -> idag table
+(** [table_of_dag phony no_optim invert no_group dag] Convert DAG to 2D table
+    layout. *)
