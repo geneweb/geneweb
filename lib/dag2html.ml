@@ -16,17 +16,20 @@ and ghost_id
 external span_id_of_int : int -> span_id = "%identity"
 external ghost_id_of_int : int -> ghost_id = "%identity"
 
-let new_span_id =
-  let i = ref 0 in
-  fun () ->
-    incr i;
-    span_id_of_int !i
+let span_id_counter = ref 0
+let ghost_id_counter = ref 0
 
-let new_ghost_id =
-  let i = ref 0 in
-  fun () ->
-    incr i;
-    ghost_id_of_int !i
+let new_span_id () =
+  incr span_id_counter;
+  span_id_of_int !span_id_counter
+
+let new_ghost_id () =
+  incr ghost_id_counter;
+  ghost_id_of_int !ghost_id_counter
+
+let reset_id_counters () =
+  span_id_counter := 0;
+  ghost_id_counter := 0
 
 (* creating the html table structure *)
 
@@ -41,6 +44,15 @@ type 'a table_data =
 
 type 'a html_table_line = (int * align * 'a table_data) array
 type 'a html_table = 'a html_table_line array
+
+module IdagSet = Set.Make (struct
+  type t = idag
+
+  let compare a b = Int.compare (int_of_idag a) (int_of_idag b)
+end)
+
+(** Each logical cell maps to 3 HTML columns: left-pad, content, right-pad *)
+let cell_colspan_factor = 3
 
 let html_table_struct indi_ip indi_txt vbar_txt phony d t =
   let phony = function
@@ -90,7 +102,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
             in
             loop (j + 1)
           in
-          let colspan = 3 * (next_j - j) in
+          let colspan = cell_colspan_factor * (next_j - j) in
           let les = (1, LeftA, TDnothing) :: les in
           let les =
             let td =
@@ -120,7 +132,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
             in
             loop (j + 1)
           in
-          let colspan = 3 * (next_j - j) in
+          let colspan = cell_colspan_factor * (next_j - j) in
           let les = (1, LeftA, TDnothing) :: les in
           let les =
             let td =
@@ -154,7 +166,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
             in
             loop (j + 1)
           in
-          let colspan = (3 * (next_j - j)) - 2 in
+          let colspan = (cell_colspan_factor * (next_j - j)) - 2 in
           let les = (1, LeftA, TDnothing) :: les in
           let les =
             if
@@ -231,13 +243,8 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
                     loop (l + 1)
                 | Nothing -> l + 1
               in
-              if next_l > next_j then (
-                Printf.eprintf
-                  "assert false i %d k %d l %d next_l %d next_j %d\n" i k l
-                  next_l next_j;
-                flush stderr);
               let next_l = min next_l next_j in
-              let colspan = (3 * (next_l - l)) - 2 in
+              let colspan = (cell_colspan_factor * (next_l - l)) - 2 in
               let les =
                 match (t.table.(i).(l).elem, t.table.(i + 1).(l).elem) with
                 | Nothing, _ | _, Nothing ->
@@ -343,12 +350,7 @@ let rec get_block t i j =
     else Some ([ (x.elem, 1) ], 1)
 
 let group_by_common_children d list =
-  let module O = struct
-    type t = idag
-
-    let compare = compare
-  end in
-  let module S = Set.Make (O) in
+  let module S = IdagSet in
   let nlcsl =
     List.map
       (fun id ->
@@ -595,12 +597,7 @@ let group_children t =
    if A and B have common children *)
 
 let group_span_by_common_children d t =
-  let module O = struct
-    type t = idag
-
-    let compare = compare
-  end in
-  let module S = Set.Make (O) in
+  let module S = IdagSet in
   let i = Array.length t.table - 1 in
   let line = t.table.(i) in
   let rec loop j cs =
@@ -1380,12 +1377,7 @@ let invert_dag d =
   let d = { dag = Array.copy d.dag } in
   for i = 0 to Array.length d.dag - 1 do
     let n = d.dag.(i) in
-    d.dag.(i) <-
-      {
-        pare = List.map (fun x -> x) n.chil;
-        valu = n.valu;
-        chil = List.map (fun x -> x) n.pare;
-      }
+    d.dag.(i) <- { pare = n.chil; valu = n.valu; chil = n.pare }
   done;
   d
 
@@ -1409,6 +1401,7 @@ let invert_table t =
 (* main *)
 
 let table_of_dag phony no_optim invert no_group d =
+  reset_id_counters ();
   let d = if invert then invert_dag d else d in
   let t = tablify phony no_optim no_group d in
   let t = if invert then invert_table t else t in
