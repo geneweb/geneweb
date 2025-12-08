@@ -1426,6 +1426,24 @@ end = struct
         ipers
       |> List.flatten
 
+  let rec descendants_at_depth conf base p n =
+    assert (n >= 1);
+    let ifams = Gwdb.get_family p in
+    let children =
+      Array.concat
+      @@ List.map
+           (fun ifam -> Gwdb.get_children (Gwdb.foi base ifam))
+           (Array.to_list ifams)
+    in
+
+    if n = 1 then children
+    else
+      Array.concat
+      @@ List.map
+           (fun iper ->
+             descendants_at_depth conf base (Gwdb.poi base iper) (n - 1))
+           (Array.to_list children)
+
   let parent_events conf base p =
     let ascendants_data = ascendants_at_depth conf base p 1 in
     List.map
@@ -1477,6 +1495,20 @@ end = struct
                 ipers))
          asc)
 
+  let descendant_events conf base p depth =
+    let rel =
+      match depth with
+      | 1 -> Child
+      | 2 -> GrandChild
+      | 3 -> GreatGrandChild
+      | _ -> assert false
+    in
+    let desc = Array.to_list @@ descendants_at_depth conf base p depth in
+    relation_events conf base
+      (fun e ->
+        is_marriage e || is_birth e || is_baptism e || is_death e || is_burial e)
+      rel desc
+
   let set_family_relation frel = function
     | (MainPersonEvent _ | WitnessedEvent _) as e -> e
     | FamilyRelationEvent (_, evt) -> FamilyRelationEvent (frel, evt)
@@ -1507,7 +1539,9 @@ end = struct
               (set_family_relation GreatGrandParent)
               (ascendant_events conf base p 3)
         | Relation Sibling -> sibling_events conf base p
-        | Relation _ -> failwith "todo")
+        | Relation Child -> descendant_events conf base p 1
+        | Relation GrandChild -> descendant_events conf base p 2
+        | Relation GreatGrandChild -> descendant_events conf base p 3)
       kinds
     |> List.flatten
 
@@ -4199,6 +4233,9 @@ let print_foreach conf base print_ast eval_expr =
             Relation GrandParent;
             Relation GreatGrandParent;
             Relation Sibling;
+            Relation Child;
+            Relation GrandChild;
+            Relation GreatGrandChild;
           ]
     in
     let sorted_all_events = List.map (fun e -> Vevent' e) events in
