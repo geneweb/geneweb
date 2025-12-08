@@ -38,9 +38,10 @@ let dag_of_relation_path conf base path =
     List.fold_left
       (fun set n ->
         match n.valu with
-        | Def.Left ip -> Dag.Pset.add ip set
+        | Def.Left ip -> Dag.Iperset.add ip set
         | Def.Right _ -> set)
-      Dag.Pset.empty nl
+      Dag.Iperset.empty nl
+    |> Dag.Iperset.elements
   in
   (set, d)
 
