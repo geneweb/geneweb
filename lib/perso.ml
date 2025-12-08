@@ -1366,6 +1366,15 @@ end = struct
   let is_fevent name e = Event.get_name e = Event.Fevent name
   let is_pevent name e = Event.get_name e = Event.Pevent name
   let is_marriage = is_fevent Def.Efam_Marriage
+
+  let is_marriage_excluding iper_o e =
+    is_marriage e
+    && (Option.is_none iper_o
+       || Option.map
+            (Gwdb.compare_iper (Option.get iper_o))
+            (Event.get_spouse_iper e)
+          <> Some 0)
+
   let is_death = is_pevent Def.Epers_Death
   let is_burial = is_pevent Def.Epers_Burial
 
@@ -1386,13 +1395,12 @@ end = struct
     let all_marriages = List.filter is_marriage events in
     let all_spouses = List.filter_map Event.get_spouse_iper all_marriages in
     let all_spouses =
-      Gwdb.IperSet.elements
-      @@ List.fold_left
-           (fun set iper -> Gwdb.IperSet.add iper set)
-           Gwdb.IperSet.empty all_spouses
+      Gwdb.IperSet.elements @@ Gwdb.IperSet.of_list all_spouses
     in
+    let iper_p = Gwdb.get_iper p in
     relation_events conf base
-      (fun e -> is_death e || is_burial e)
+      (fun e ->
+        is_death e || is_burial e || is_marriage_excluding (Some iper_p) e)
       Spouse all_spouses
 
   let rec ascendants_at_depth conf base p n :
@@ -1423,7 +1431,10 @@ end = struct
         let fevents = Option.map Gwdb.get_fevents fam in
         let parent_pers_events =
           relation_events conf base
-            (fun e -> is_death e || is_burial e)
+            (fun e ->
+              is_death e || is_burial e
+              || is_marriage_excluding father e
+                 && is_marriage_excluding mother e)
             Parent ipers
         in
         let marriage : ('a, 'b) event list option =
