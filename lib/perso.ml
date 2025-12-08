@@ -1480,6 +1480,10 @@ end = struct
             List.map
               (set_family_relation GrandParent)
               (ascendant_events conf base p 2)
+        | Relation GreatGrandParent ->
+            List.map
+              (set_family_relation GreatGrandParent)
+              (ascendant_events conf base p 3)
         | Relation _ -> failwith "todo")
       kinds
     |> List.flatten
@@ -4170,6 +4174,7 @@ let print_foreach conf base print_ast eval_expr =
             Relation Spouse;
             Relation Parent;
             Relation GrandParent;
+            Relation GreatGrandParent;
           ]
     in
     let sorted_all_events = List.map (fun e -> Vevent' e) events in
