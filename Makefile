@@ -39,19 +39,9 @@ COMMIT_ID := $(shell git rev-parse --short HEAD)
 COMMIT_TITLE := $(shell git log -1 --pretty="%s" | sed "s/\"/\\\"/g")
 COMMIT_COMMENT:= $(shell git log -1 --pretty="%b" | sed "s/\"/\\\"/g")
 BRANCH := $(shell git symbolic-ref --quiet --short HEAD || git branch -r --contains HEAD | head -n1 | tr -d ' ')
-VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
-OCAMLV := $(shell ocaml --version)
-
-lib/version.ml:
-	@cp lib/version.txt $@
-	@printf 'let branch = "$(BRANCH)"\n' >> $@
-	@printf 'let src = "$(SOURCE)"\n' >> $@
-	@printf 'let commit_id = "$(COMMIT_ID)"\n' >> $@
-	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
-	@printf 'let compil_date = "$(COMPIL_DATE)"\n' >> $@
-	@printf 'Generating $@… Done.\n'
-.PHONY: install lib/version.ml
+VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.sh)
+OCAMLV := $(shell ocamlopt --version)
 
 # Patch/unpatch files for campl5 >= 8.03
 CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
@@ -82,7 +72,7 @@ UNPATCH = $(MAKE) --no-print-directory unpatch_files
 unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
 
 info:
-	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n'
+	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with OCaml $(OCAMLV).\n\n'
 	@printf 'Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. '
 	@printf 'Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n'
 	@printf '  \033[1;1m%s\033[0m\n' '$(subst ','\'',$(COMMIT_TITLE))'
@@ -95,7 +85,7 @@ endif
 DUNE_IN_FILES := $(shell find lib bin test -name "dune.in")
 DUNE_FILES := $(patsubst %.in,%,$(DUNE_IN_FILES))
 
-generated: $(DUNE_FILES) lib/version.ml
+generated: $(DUNE_FILES)
 	@printf "Done.\n"
 
 fmt build build-geneweb gwd install uninstall: info patch_files generated
@@ -124,6 +114,7 @@ gwd: ## Build ondy gwd/gwc executables
 install: ## Install geneweb using dune
 	$(call unpatch_after, dune build @install)
 	dune install
+.PHONY: install
 
 uninstall: ## Uninstall geneweb using dune
 	$(call unpatch_after, dune build @install)

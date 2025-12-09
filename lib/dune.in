@@ -1,5 +1,11 @@
 (dirs :standard \ %%%DUNE_DIRS_EXCLUDE%%%)
 
+(rule
+  (target version.ml)
+  (action
+    (with-stdout-to %{target}
+      (system "sh ./version.sh"))))
+
 (library
  (name geneweb)
  (public_name geneweb)
