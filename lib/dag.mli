@@ -15,10 +15,8 @@ val get_dag_elems :
     - [i1], [i2], ... or [p1/n1/oc1], [p2/n2/oc2], ... : person identifiers
     - [s1], [s2], ... : Sosa numbers relative to each person
 
-    For each (person, sosa) pair, collects all ancestors along the Sosa branch
-    and returns the union of all collected persons as a list.
-
-    Uses {!Iperset} internally for efficient duplicate detection. *)
+    For each (person, sosa) pair, collects all ancestors along the Sosa branch.
+    Returns the union of all collected persons without duplicates. *)
 
 type ('a, 'b) sum = ('a, 'b) Def.choice
 
