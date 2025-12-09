@@ -350,12 +350,11 @@ let rec get_block t i j =
     else Some ([ (x.elem, 1) ], 1)
 
 let group_by_common_children d list =
-  let module S = IdagSet in
   let nlcsl =
     List.map
       (fun id ->
         let n = d.dag.(int_of_idag id) in
-        let cs = List.fold_right S.add n.chil S.empty in
+        let cs = List.fold_right IdagSet.add n.chil IdagSet.empty in
         ([ id ], cs))
       list
   in
@@ -365,10 +364,12 @@ let group_by_common_children d list =
       | (nl, cs) :: rest ->
           let rec loop1 beg = function
             | (nl1, cs1) :: rest1 ->
-                if S.is_empty (S.inter cs cs1) then
+                if IdagSet.is_empty (IdagSet.inter cs cs1) then
                   loop1 ((nl1, cs1) :: beg) rest1
                 else
-                  loop ((nl @ nl1, S.union cs cs1) :: List.rev_append beg rest1)
+                  loop
+                    ((nl @ nl1, IdagSet.union cs cs1)
+                    :: List.rev_append beg rest1)
             | [] -> (nl, cs) :: loop rest
           in
           loop1 [] rest
@@ -597,7 +598,6 @@ let group_children t =
    if A and B have common children *)
 
 let group_span_by_common_children d t =
-  let module S = IdagSet in
   let i = Array.length t.table - 1 in
   let line = t.table.(i) in
   let rec loop j cs =
@@ -606,14 +606,15 @@ let group_span_by_common_children d t =
       match line.(j).elem with
       | Elem id ->
           let n = d.dag.(int_of_idag id) in
-          let curr_cs = List.fold_right S.add n.chil S.empty in
-          if S.is_empty (S.inter cs curr_cs) then loop (j + 1) curr_cs
+          let curr_cs = List.fold_right IdagSet.add n.chil IdagSet.empty in
+          if IdagSet.is_empty (IdagSet.inter cs curr_cs) then
+            loop (j + 1) curr_cs
           else (
             line.(j).span <- line.(j - 1).span;
-            loop (j + 1) (S.union cs curr_cs))
-      | Ghost _ | Nothing -> loop (j + 1) S.empty
+            loop (j + 1) (IdagSet.union cs curr_cs))
+      | Ghost _ | Nothing -> loop (j + 1) IdagSet.empty
   in
-  loop 0 S.empty
+  loop 0 IdagSet.empty
 
 let find_same_parents t i j1 j2 j3 j4 =
   let rec loop i j1 j2 j3 j4 =
