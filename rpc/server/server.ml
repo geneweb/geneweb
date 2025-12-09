@@ -11,21 +11,18 @@ let set_levels dflags =
     (fun flag -> Logs.Src.set_level (flag_to_src flag) (Some Debug))
     dflags
 
-let fold_lines f acc ic =
-  let rec loop acc =
-    match My_gzip.input_line ic with
-    | exception End_of_file -> acc
-    | s -> loop (f acc s)
-  in
-  loop acc
-
 let index_from_gzip path =
-  My_gzip.with_open path @@ fun ic ->
-  fold_lines
-    (fun acc line ->
-      let words = Analyze.preprocess line in
-      List.fold_left (fun acc w -> (w.Analyze.content, line) :: acc) acc words)
-    [] ic
+  let content = My_gzip.gunzip_file path in
+  String.split_on_char '\n' content
+  |> List.fold_left
+       (fun acc line ->
+         if line = "" then acc
+         else
+           let words = Analyze.preprocess line in
+           List.fold_left
+             (fun acc w -> (w.Analyze.content, line) :: acc)
+             acc words)
+       []
   |> List.to_seq |> Index.of_seq
 
 let load_dictionaries path =
