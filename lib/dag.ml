@@ -5,18 +5,8 @@ open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-
-module Iperset = Set.Make (struct
-  type t = Driver.iper
-
-  let compare = Driver.Iper.compare
-end)
-
-module Ipermap = Map.Make (struct
-  type t = Driver.iper
-
-  let compare = Driver.Iper.compare
-end)
+module Iperset = Driver.Iper.Set
+module Ipermap = Driver.Iper.Map
 
 let get_dag_elems conf base =
   let rec loop prev_person set i =

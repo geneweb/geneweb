@@ -4,26 +4,8 @@
     specifying persons and their Sosa numbers. The resulting DAG can then be
     rendered as an HTML table via {!Dag2html} and {!DagDisplay}. *)
 
-(** Efficient set of person identifiers. O(log n) operations. *)
-module Iperset : sig
-  type t
-  type elt = Geneweb_db.Driver.iper
-
-  val empty : t
-  val add : elt -> t -> t
-  val mem : elt -> t -> bool
-  val elements : t -> elt list
-  val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
-end
-
-(** Efficient map from person identifiers. O(log n) operations. *)
-module Ipermap : sig
-  type 'a t
-
-  val empty : 'a t
-  val add : Geneweb_db.Driver.iper -> 'a -> 'a t -> 'a t
-  val find_opt : Geneweb_db.Driver.iper -> 'a t -> 'a option
-end
+module Iperset : Set.S with type elt = Geneweb_db.Driver.iper
+module Ipermap : Map.S with type key = Geneweb_db.Driver.iper
 
 val get_dag_elems :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper list
