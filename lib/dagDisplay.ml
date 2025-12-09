@@ -120,116 +120,6 @@ let string_of_item conf base = function
       ^^^ DateDisplay.short_dates_text conf base p
       ^^^ if (s :> string) = "" then Adef.safe "" else " " ^<^ s
 
-(* Print with HTML table tags: <table> <tr> <td> *)
-
-let print_table conf
-    (hts :
-      (int * Dag2html.align * Adef.safe_string Dag2html.table_data) array array)
-    =
-  begin_centered conf;
-  Output.print_sstring conf {|<table border="|};
-  Output.print_sstring conf (string_of_int conf.border);
-  Output.print_sstring conf {|" cellspacing="0" cellpadding="0">|};
-  for i = 0 to Array.length hts - 1 do
-    Output.print_sstring conf "<tr align=\"left\">\n";
-    for j = 0 to Array.length hts.(i) - 1 do
-      let colspan, align, td = hts.(i).(j) in
-      Output.print_sstring conf "<td";
-      if colspan = 1 && (td = TDnothing || td = TDhr CenterA) then ()
-      else (
-        Output.print_sstring conf " colspan=\"";
-        Output.print_sstring conf (string_of_int colspan);
-        Output.print_sstring conf "\"");
-      (match (align, td) with
-      | LeftA, TDhr LeftA ->
-          Output.print_sstring conf " align=\"";
-          Output.print_sstring conf conf.left;
-          Output.print_sstring conf "\""
-      | LeftA, _ -> ()
-      | CenterA, _ -> Output.print_sstring conf " align=\"center\""
-      | RightA, _ ->
-          Output.print_sstring conf " align=\"";
-          Output.print_sstring conf conf.right;
-          Output.print_sstring conf "\"");
-      Output.print_sstring conf ">";
-      (match td with
-      | TDitem (_ip, s, _t) -> Output.print_string conf s
-      | TDtext (_ip, s) -> Output.print_string conf s
-      | TDnothing -> Output.print_sstring conf "&nbsp;"
-      | TDbar None -> Output.print_sstring conf "|"
-      | TDbar (Some (s : Adef.escaped_string)) ->
-          if p_getenv conf.env "cgl" = Some "on" then Output.print_string conf s
-          else (
-            Output.print_sstring conf {|<a style="text-decoration:none" href="|};
-            Output.print_string conf s;
-            Output.print_sstring conf {|">|</a>|})
-      | TDhr align -> (
-          match align with
-          | LeftA ->
-              Output.print_sstring conf "<hr class=\"";
-              Output.print_sstring conf conf.left;
-              Output.print_sstring conf "\">"
-          | RightA ->
-              Output.print_sstring conf "<hr class=\"";
-              Output.print_sstring conf conf.right;
-              Output.print_sstring conf "\">"
-          | _ -> Output.print_sstring conf {|<hr class="full">|}));
-      Output.print_sstring conf "</td>"
-    done;
-    Output.print_sstring conf "</tr>"
-  done;
-  Output.print_sstring conf "</table>";
-  end_centered conf
-
-let buff_store_int s blen i j =
-  let rec loop blen i =
-    if i = j then blen else loop (Buff.store blen s.[i]) (i + 1)
-  in
-  loop blen i
-
-(* Remove empty tags, i.e. <a href=..></a> enclosing empty text, from s *)
-
-let strip_empty_tags s =
-  let rec loop blen opened_tag i =
-    if i >= String.length s then Buff.get blen
-    else
-      match s.[i] with
-      | '<' -> (
-          let j = i + 1 in
-          let tag_close, j =
-            match s.[j] with '/' -> (true, j + 1) | _ -> (false, j)
-          in
-          let tag_name, j =
-            let rec loop k =
-              match s.[k] with
-              | 'a' .. 'z' | 'A' .. 'Z' -> loop (k + 1)
-              | _ -> (String.sub s j (k - j), k)
-            in
-            loop j
-          in
-          let j =
-            let rec loop j = if s.[j] = '>' then j + 1 else loop (j + 1) in
-            loop j
-          in
-          match opened_tag with
-          | Some (opened_tag_name, k) ->
-              if tag_close then
-                if tag_name = opened_tag_name then loop blen None j
-                else loop (buff_store_int s blen k j) None j
-              else loop (buff_store_int s blen k i) (Some (tag_name, i)) j
-          | None ->
-              if tag_close then loop (buff_store_int s blen i j) None j
-              else loop blen (Some (tag_name, i)) j)
-      | c ->
-          let blen =
-            match opened_tag with
-            | Some (_, k) -> buff_store_int s blen k i
-            | None -> blen
-          in
-          loop (Buff.store blen c) None (i + 1)
-  in
-  loop 0 None 0
-
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let set_lookup =
     List.fold_left (Fun.flip Dag.Iperset.add) Dag.Iperset.empty set
@@ -322,15 +212,11 @@ type 'a env =
   | Vsstring of Adef.safe_string
   | Vestring of Adef.escaped_string
   | Vind of Driver.person
-  | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
   | Vvars of (string * string) list ref
 
-let get_env v env =
-  try match Templ.Env.find v env with Vlazy l -> Lazy.force l | x -> x
-  with Not_found -> Vnone
-
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -580,7 +466,7 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
-let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
+let rec print_foreach _conf hts print_ast _eval_expr env () _loc s sl _el al =
   match s :: sl with
   | [ "dag_cell" ] -> print_foreach_dag_cell hts print_ast env al
   | [ "dag_line" ] -> print_foreach_dag_line print_ast env hts al
