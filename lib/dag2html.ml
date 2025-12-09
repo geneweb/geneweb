@@ -16,20 +16,22 @@ and ghost_id
 external span_id_of_int : int -> span_id = "%identity"
 external ghost_id_of_int : int -> ghost_id = "%identity"
 
-let span_id_counter = ref 0
-let ghost_id_counter = ref 0
-
-let new_span_id () =
-  incr span_id_counter;
-  span_id_of_int !span_id_counter
-
-let new_ghost_id () =
-  incr ghost_id_counter;
-  ghost_id_of_int !ghost_id_counter
-
-let reset_id_counters () =
-  span_id_counter := 0;
-  ghost_id_counter := 0
+let new_span_id, new_ghost_id, reset_id_counters =
+  let span_id_counter = ref 0 in
+  let ghost_id_counter = ref 0 in
+  let new_span_id () =
+    incr span_id_counter;
+    span_id_of_int !span_id_counter
+  in
+  let new_ghost_id () =
+    incr ghost_id_counter;
+    ghost_id_of_int !ghost_id_counter
+  in
+  let reset () =
+    span_id_counter := 0;
+    ghost_id_counter := 0
+  in
+  (new_span_id, new_ghost_id, reset)
 
 (* creating the html table structure *)
 
