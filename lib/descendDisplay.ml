@@ -1279,8 +1279,7 @@ let print_tree conf base v p =
     |> Adef.safe
   in
   let hts = make_tree_hts conf base gv p in
-  DagDisplay.print_slices_menu_or_dag_page conf base page_title hts
-    (Adef.escaped "")
+  DagDisplay.print_dag_page conf base page_title hts (Adef.escaped "")
 
 let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -1905,8 +1904,7 @@ let print_vaucher_tree conf base v p =
   let hts = make_vaucher_tree_hts conf base gv p in
   let hts = safe_vaucher_tree hts in
   (* just to verify hts structure !! *)
-  DagDisplay.print_slices_menu_or_dag_page conf base page_title hts
-    (Adef.escaped "")
+  DagDisplay.print_dag_page conf base page_title hts (Adef.escaped "")
 (* ******** end of J Vaucher tree ********* *)
 
 let print conf base p =
