@@ -1,0 +1,4 @@
+(library
+ (name geneweb_tlsw)
+ (public_name geneweb.tlsw)
+ (libraries fmt pp_loc tyxml))
