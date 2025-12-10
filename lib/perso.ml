@@ -1270,13 +1270,6 @@ module EventUtils : sig
   val get_witness_note : ('a, 'b) witnessed_event_data -> string
   val get_witness_kind : ('a, 'b) witnessed_event_data -> Def.witness_kind
 
-  val get_events :
-    Config.config ->
-    Gwdb.base ->
-    Gwdb.person ->
-    event_kind list ->
-    (Gwdb.person, Gwdb.istr) event list
-
   val get_sorted_events :
     Config.config ->
     Gwdb.base ->
@@ -1310,6 +1303,22 @@ end = struct
     | MainPersonEvent of ('a, 'b) event_data
     | FamilyRelationEvent of family_relation * ('a, 'b) event_data
     | WitnessedEvent of ('a, 'b) witnessed_event_data
+
+  module Env : sig
+    type t
+
+    val empty : t
+    val add : Gwdb.iper -> t -> t
+    val exists : Gwdb.iper -> t -> bool
+  end = struct
+    type t = Gwdb.IperSet.t
+
+    let empty = Gwdb.IperSet.empty
+    let add = Gwdb.IperSet.add
+
+    let exists iper =
+      Gwdb.IperSet.exists (fun iper' -> Gwdb.compare_iper iper iper' = 0)
+  end
 
   let get_event_holder = function
     | MainPersonEvent event_data -> event_data.event_holder
@@ -1347,21 +1356,28 @@ end = struct
   let family_relation_event family_relation event_holder event =
     FamilyRelationEvent (family_relation, { event_holder; event })
 
-  let witnessed_events conf base witness =
-    List.map
-      (fun (event_holder, witness_kind, witness_note, event_item) ->
-        WitnessedEvent
-          {
-            event_holder;
-            witness_kind;
-            witness_note;
-            event = event_item;
-            witness;
-          })
-      (Relation.get_event_witnessed conf base witness)
+  let witnessed_events conf base env witness =
+    let events =
+      List.map
+        (fun (event_holder, witness_kind, witness_note, event_item) ->
+          WitnessedEvent
+            {
+              event_holder;
+              witness_kind;
+              witness_note;
+              event = event_item;
+              witness;
+            })
+        (Relation.get_event_witnessed conf base witness)
+    in
+    (env, events)
 
-  let person_events p events =
-    List.map (fun event -> MainPersonEvent { event_holder = p; event }) events
+  let person_events env p events =
+    let env = Env.add (Gwdb.get_iper p) env in
+    let events =
+      List.map (fun event -> MainPersonEvent { event_holder = p; event }) events
+    in
+    (env, events)
 
   let is_fevent name e = Event.get_name e = Event.Fevent name
   let is_pevent name e = Event.get_name e = Event.Pevent name
@@ -1393,17 +1409,29 @@ end = struct
              p_events)
          ipers
 
-  let spouse_events conf base p events =
-    let all_marriages = List.filter is_marriage events in
-    let all_spouses = List.filter_map Event.get_spouse_iper all_marriages in
+  let spouse_events conf base env p p_events =
+    let all_marriages = List.filter is_marriage p_events in
+    let all_spouses =
+      List.filter_map
+        (fun e ->
+          let sp_o = Event.get_spouse_iper e in
+          match sp_o with
+          | Some sp when not (Env.exists sp env) -> sp_o
+          | _ -> None)
+        all_marriages
+    in
+    let env = List.fold_left (fun e sp -> Env.add sp e) env all_spouses in
     let all_spouses =
       Gwdb.IperSet.elements @@ Gwdb.IperSet.of_list all_spouses
     in
     let iper_p = Gwdb.get_iper p in
-    relation_events conf base
-      (fun e ->
-        is_death e || is_burial e || is_marriage_excluding (Some iper_p) e)
-      Spouse all_spouses
+    let events =
+      relation_events conf base
+        (fun e ->
+          is_death e || is_burial e || is_marriage_excluding (Some iper_p) e)
+        Spouse all_spouses
+    in
+    (env, events)
 
   let rec ascendants_at_depth conf base p n :
       (Gwdb.iper list
@@ -1444,10 +1472,12 @@ end = struct
              descendants_at_depth conf base (Gwdb.poi base iper) (n - 1))
            (Array.to_list children)
 
-  let parent_events conf base p =
+  let parent_events conf base env p =
     let ascendants_data = ascendants_at_depth conf base p 1 in
-    List.map
-      (fun (ipers, fam, father, mother) ->
+    List.fold_left
+      (fun (env, events) (ipers, fam, father, mother) ->
+        let ipers = List.filter (fun iper -> Env.exists iper env) ipers in
+        let env = List.fold_left (fun env iper -> Env.add iper env) env ipers in
         let fevents = Option.map Gwdb.get_fevents fam in
         let parent_pers_events =
           relation_events conf base
@@ -1478,24 +1508,26 @@ end = struct
                 fevents)
             fevents
         in
-        Option.fold ~none:parent_pers_events
-          ~some:(fun marriage -> parent_pers_events @ marriage)
-          marriage)
-      ascendants_data
-    |> List.flatten
+        ( env,
+          Option.fold ~none:parent_pers_events
+            ~some:(fun marriage -> parent_pers_events @ marriage)
+            marriage ))
+      (env, []) ascendants_data
 
-  let ascendant_events conf base p depth =
+  let ascendant_events conf base env p depth =
     let asc = ascendants_at_depth conf base p (depth - 1) in
-    List.flatten
-      (List.map
-         (fun (ipers, _, _, _) ->
-           List.flatten
-             (List.map
-                (fun iper -> parent_events conf base (Gwdb.poi base iper))
-                ipers))
-         asc)
+    List.fold_left
+      (fun (env, events) (ipers, _, _, _) ->
+        List.fold_left
+          (fun (env, events) iper ->
+            let env, events' =
+              parent_events conf base env (Gwdb.poi base iper)
+            in
+            (env, events' @ events))
+          (env, events) ipers)
+      (env, []) asc
 
-  let descendant_events conf base p depth =
+  let descendant_events conf base env p depth =
     let rel =
       match depth with
       | 1 -> Child
@@ -1504,46 +1536,58 @@ end = struct
       | _ -> assert false
     in
     let desc = Array.to_list @@ descendants_at_depth conf base p depth in
-    relation_events conf base
-      (fun e ->
-        is_marriage e || is_birth e || is_baptism e || is_death e || is_burial e)
-      rel desc
+    let env, desc =
+      List.fold_left
+        (fun (env, desc) iper ->
+          if Env.exists iper env then (env, desc)
+          else (Env.add iper env, iper :: desc))
+        (env, []) desc
+    in
+    ( env,
+      relation_events conf base
+        (fun e ->
+          is_marriage e || is_birth e || is_baptism e || is_death e
+          || is_burial e)
+        rel desc )
 
   let set_family_relation frel = function
     | (MainPersonEvent _ | WitnessedEvent _) as e -> e
     | FamilyRelationEvent (_, evt) -> FamilyRelationEvent (frel, evt)
 
-  let sibling_events conf base p =
+  let sibling_events conf base env p =
     let all_siblings =
       List.map fst (Cousins.siblings conf base (Gwdb.get_iper p))
     in
-    relation_events conf base
-      (fun e ->
-        is_death e || is_burial e || is_birth e || is_baptism e || is_marriage e)
-      Sibling all_siblings
+    let env, all_siblings =
+      List.fold_left
+        (fun (env, siblings) iper ->
+          if Env.exists iper env then (env, siblings)
+          else (Env.add iper env, iper :: siblings))
+        (env, []) all_siblings
+    in
+    ( env,
+      relation_events conf base
+        (fun e ->
+          is_death e || is_burial e || is_birth e || is_baptism e
+          || is_marriage e)
+        Sibling all_siblings )
 
-  let get_events conf base p kinds =
-    let p_events = Event.events conf base p in
-    List.map
-      (function
-        | CurrentPerson -> person_events p p_events
-        | Witnessed -> witnessed_events conf base p
-        | Relation Spouse -> spouse_events conf base p p_events
-        | Relation Parent -> parent_events conf base p
-        | Relation GrandParent ->
-            List.map
-              (set_family_relation GrandParent)
-              (ascendant_events conf base p 2)
-        | Relation GreatGrandParent ->
-            List.map
-              (set_family_relation GreatGrandParent)
-              (ascendant_events conf base p 3)
-        | Relation Sibling -> sibling_events conf base p
-        | Relation Child -> descendant_events conf base p 1
-        | Relation GrandChild -> descendant_events conf base p 2
-        | Relation GreatGrandChild -> descendant_events conf base p 3)
-      kinds
-    |> List.flatten
+  let get_events conf base env p p_events kind =
+    match kind with
+    | CurrentPerson -> person_events env p p_events
+    | Witnessed -> witnessed_events conf base env p
+    | Relation Spouse -> spouse_events conf base env p p_events
+    | Relation Parent -> parent_events conf base env p
+    | Relation GrandParent ->
+        let env, events = ascendant_events conf base env p 2 in
+        (env, List.map (set_family_relation GrandParent) events)
+    | Relation GreatGrandParent ->
+        let env, events = ascendant_events conf base env p 3 in
+        (env, List.map (set_family_relation GreatGrandParent) events)
+    | Relation Sibling -> sibling_events conf base env p
+    | Relation Child -> descendant_events conf base env p 1
+    | Relation GrandChild -> descendant_events conf base env p 2
+    | Relation GreatGrandChild -> descendant_events conf base env p 3
 
   let get_event = function
     | MainPersonEvent e -> e.event
@@ -1554,7 +1598,13 @@ end = struct
   let get_event_date e = Event.get_date (get_event e)
 
   let get_sorted_events conf base p kinds =
-    get_events conf base p kinds
+    let p_events = Event.events conf base p in
+    List.fold_left
+      (fun (env, events) kind ->
+        let env, events' = get_events conf base env p p_events kind in
+        (env, events' @ events))
+      (Env.empty, []) kinds
+    |> snd
     |> Event.sort_events get_event_name get_event_date
 end
 
