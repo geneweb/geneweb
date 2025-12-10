@@ -3,8 +3,9 @@
  (public_name geneweb.util)
  (wrapped false)
  (libraries
+  bigstringaf
   calendars
-  camlzip
+  decompress.gz
   stdlib-shims
   unidecode
   geneweb_def
