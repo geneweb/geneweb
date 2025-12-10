@@ -1729,6 +1729,10 @@ de: Name der Gruppe
 en: group label
 fr: nom du groupe
 
+    resize fanchart
+en: resize fanchart to the window
+fr: adapter l’arbre en éventail à la fenêtre
+
     add a group
 af: voeg groep by
 bg: добавяне на група
@@ -3083,12 +3087,12 @@ co: battesimu
 cs: křest
 da: dåb
 de: Taufe
-en: baptism
+en: baptism/baptisms
 eo: bapto
 es: bautismo
 et: ristimine
 fi: kaste
-fr: baptême
+fr: baptême/baptêmes
 he:  תבילה
 is: skírn
 it: battesimo
@@ -3497,12 +3501,12 @@ co: nascita
 cs: narození
 da: fødsel
 de: Geburt
-en: birth
+en: birth/births
 eo: naskiĝo
 es: nacimiento
 et: sünd
 fi: syntymä
-fr: naissance
+fr: naissance/naissances
 he:   לידה
 is: fæðing
 it: nascita
@@ -3920,12 +3924,12 @@ co: sepultura
 cs: pohřeb
 da: begravelse
 de: Beisetzung
-en: burial
+en: burial/burials
 eo: entombigo
 es: entierro
 et: matus
 fi: hautaus
-fr: inhumation
+fr: inhumation/inhumations
 he:  קבורה
 is: útför
 it: sepoltura
@@ -7126,7 +7130,7 @@ co: morte
 cs: úmrtí
 da: død
 de: Tod
-en: death
+en: death/deaths
 eo: morto
 es: muerte
 et: surm
@@ -14397,6 +14401,10 @@ de: Vorkommen-Zahl/Vorkommen
 en: occurence number/occurence
 fr: numéro d’occurrence/occurence
 
+    occurence
+en: occurence/occurences
+fr: occurrence/occurences
+
     occupation/occupations
 af: beroep
 bg: занятие
@@ -21395,3 +21403,7 @@ co: stu caratteru senza caccia hè statu allargatu per esse videvule
 de: Dieses Zeichen mit der Breite Null wurde vergrößert, damit es sichtbar ist
 en: this zero-width character has been widened to be visible
 fr: ce caractère sans chasse a été élargi pour être visible
+
+    zoom/unzoom
+en: zoom/unzoom
+fr: zoomer/dézoomer
