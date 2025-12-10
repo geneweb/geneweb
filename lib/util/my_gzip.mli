@@ -1,4 +1,4 @@
-val gunzip_file : string -> string
+val gunzip_file : string -> Bigstringaf.t
 (** [gunzip_file path] decompresses gzip file and returns full content. *)
 
 val gzip_string : ?level:int -> string -> string

@@ -13,15 +13,30 @@ let set_levels dflags =
 
 let index_from_gzip path =
   let content = My_gzip.gunzip_file path in
-  String.split_on_char '\n' content
+  let len = Bigstringaf.length content in
+  let rec split acc pos =
+    if pos >= len then acc
+    else
+      let eol =
+        let rec find i =
+          if i >= len then len
+          else if Bigstringaf.get content i = '\n' then i
+          else find (i + 1)
+        in
+        find pos
+      in
+      if eol = pos then split acc (eol + 1)
+      else
+        let line = Bigstringaf.substring content ~off:pos ~len:(eol - pos) in
+        split (line :: acc) (eol + 1)
+  in
+  split [] 0
   |> List.fold_left
        (fun acc line ->
-         if line = "" then acc
-         else
-           let words = Analyze.preprocess line in
-           List.fold_left
-             (fun acc w -> (w.Analyze.content, line) :: acc)
-             acc words)
+         let words = Analyze.preprocess line in
+         List.fold_left
+           (fun acc w -> (w.Analyze.content, line) :: acc)
+           acc words)
        []
   |> List.to_seq |> Index.of_seq
 
