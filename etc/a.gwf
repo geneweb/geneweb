@@ -260,6 +260,60 @@ cache_cousins_ttl=1
 # Path to store all the histories (default "history_d").
 #history_path=
 
+# =============================================================================
+# Datalist autocompletion (browser cache files)
+# =============================================================================
+# Enable datalist autocompletion for form inputs. When enabled, the browser
+# loads .gz cache files to provide suggestions while typing.
+# Cache files are generated in bases/etc/mybase/cache/ by gwsetup or manually.
+# Set to 1 to enable, 0 or empty to disable.
+#
+# First names (welcome, MOD_IND, MOD_FAM)
+# datalist_fnames=1
+#
+# Surnames (welcome, MOD_IND, MOD_FAM)
+# datalist_snames=1
+#
+# Places (MOD_IND, MOD_FAM)
+# datalist_places=1
+#
+# Occupations (MOD_IND, MOD_FAM)
+# datalist_occupations=1
+#
+# Sources (MOD_IND, MOD_FAM)
+# datalist_sources=1
+#
+# Public names (MOD_IND)
+# datalist_pub_names=1
+#
+# Qualifiers (MOD_IND)
+# datalist_qualifiers=1
+#
+# Aliases (MOD_IND)
+# datalist_aliases=1
+#
+# Nobility titles (welcome, MOD_IND)
+# datalist_titles=1
+#
+# Estates/domains (welcome, MOD_IND)
+# datalist_estates=1
+
+# =============================================================================
+# RPC Datalist Server (alternative to static .gz cache files)
+# =============================================================================
+# For large bases, datalist autocompletion can use a WebSocket RPC server
+# instead of loading heavy .gz files in the browser. The server performs
+# lookups on indexed caches, returning only matching results in real-time.
+# Requires the RPC server running with base caches loaded.
+#
+# Enable RPC datalists (for non-Roglo bases). Roglo bases use RPC by default.
+# rpc_datalist=1
+#
+# RPC server address (without port). Default: localhost
+# The server listens on port 8080 with endpoint /search
+# Examples: localhost, 192.168.1.100, rpc.myserver.org
+# rpc_server_url=localhost
+
 # Indicate that the present database has been renamed to “newname”.
 #renamed=newname
 
