@@ -1,7 +1,17 @@
+let get_data_kind_from_env env =
+  Option.bind (Util.p_getenv env "data") (fun value ->
+      match value with
+      | "occu" -> Some `occupation
+      | "place" -> Some `place
+      | "src" -> Some `source
+      | "fn" -> Some `firstname
+      | "sn" -> Some `lastname
+      | _ -> None)
+
 let get_data conf =
-  match Util.p_getenv conf.Config.env "data" with
-  | Some "occu" -> ([ Gwdb.get_occupation ], [], [], [])
-  | Some "place" ->
+  match get_data_kind_from_env conf.Config.env with
+  | Some `occupation -> ([ Gwdb.get_occupation ], [], [], [])
+  | Some `place ->
       ( [
           Gwdb.get_birth_place;
           Gwdb.get_baptism_place;
@@ -11,7 +21,7 @@ let get_data conf =
         [ (fun evt -> Gwdb.get_pevent_place evt) ],
         [ Gwdb.get_marriage_place ],
         [ (fun evt -> Gwdb.get_fevent_place evt) ] )
-  | Some "src" ->
+  | Some `source ->
       ( [
           Gwdb.get_birth_src;
           Gwdb.get_baptism_src;
@@ -22,8 +32,8 @@ let get_data conf =
         [ (fun evt -> Gwdb.get_pevent_src evt) ],
         [ Gwdb.get_marriage_src; Gwdb.get_fsources ],
         [ (fun evt -> Gwdb.get_fevent_src evt) ] )
-  | Some "fn" -> ([ Gwdb.get_first_name ], [], [], [])
-  | Some "sn" -> ([ Gwdb.get_surname ], [], [], [])
+  | Some `firstname -> ([ Gwdb.get_first_name ], [], [], [])
+  | Some `surname -> ([ Gwdb.get_surname ], [], [], [])
   | _ -> ([], [], [], [])
 
 let get_all_data conf base =
@@ -165,8 +175,8 @@ let reduce_cpl_list size list =
       - gen_person iper istr : gen_person avec les champs modifiés
     [Rem] : Non exporté en clair hors de ce module.                           *)
 let update_person conf base old new_input p =
-  match Util.p_getenv conf.Config.env "data" with
-  | Some "occu" ->
+  match get_data_kind_from_env conf.Config.env with
+  | Some `occupation ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_input)
       in
@@ -174,7 +184,7 @@ let update_person conf base old new_input p =
       let s_occupation = Gwdb.sou base occupation in
       let occupation = if old = s_occupation then new_istr else occupation in
       { (Gwdb.gen_person_of_person p) with occupation }
-  | Some "place" ->
+  | Some `place ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_input)
       in
@@ -208,7 +218,7 @@ let update_person conf base old new_input p =
         burial_place;
         pevents;
       }
-  | Some "src" ->
+  | Some `source ->
       let new_istr =
         Gwdb.insert_string ~format:`Html base
           (Ext_string.only_printable new_input)
@@ -246,7 +256,7 @@ let update_person conf base old new_input p =
         psources = psources_src;
         pevents;
       }
-  | Some "fn" ->
+  | Some `firstname ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_input)
       in
@@ -282,7 +292,7 @@ let update_person conf base old new_input p =
         occ;
         first_names_aliases;
       }
-  | Some "sn" ->
+  | Some `surname ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_input)
       in
@@ -333,8 +343,8 @@ let update_person conf base old new_input p =
       - gen_family ifam istr : gen_family avec les champs modifiés
     [Rem] : Non exporté en clair hors de ce module.                           *)
 let update_family conf base old new_istr fam =
-  match Util.p_getenv conf.Config.env "data" with
-  | Some "place" ->
+  match get_data_kind_from_env conf.Config.env with
+  | Some `place ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_istr)
       in
@@ -352,7 +362,7 @@ let update_family conf base old new_istr fam =
           (Gwdb.get_fevents fam)
       in
       { (Gwdb.gen_family_of_family fam) with marriage_place; fevents }
-  | Some "src" ->
+  | Some `source ->
       let new_istr =
         Gwdb.insert_string ~format:`Html base
           (Ext_string.only_printable new_istr)
@@ -399,12 +409,12 @@ let update_person_list conf base new_input list nb_pers max_updates =
     match get_data conf with _, _, [], [] -> false | _ -> true
   in
   let action =
-    match Util.p_getenv conf.env "data" with
-    | Some "occu" -> "co"
-    | Some "place" -> "cp"
-    | Some "src" -> "cs"
-    | Some "fn" -> "fn"
-    | Some "sn" -> "sn"
+    match get_data_kind_from_env conf.env with
+    | Some `occupation -> "co"
+    | Some `place -> "cp"
+    | Some `source -> "cs"
+    | Some `firstname -> "fn"
+    | Some `surname -> "sn"
     | _ -> ""
   in
   let list =
