@@ -103,7 +103,12 @@ val accessible_by_key :
 *)
 
 val geneweb_link :
-  Config.config -> Adef.escaped_string -> Adef.safe_string -> Adef.safe_string
+  ?id:string ->
+  ?style:string ->
+  Config.config ->
+  Adef.escaped_string ->
+  Adef.safe_string ->
+  Adef.safe_string
 (** [geneweb_link conf href s] Returns HTML link to actual geneweb's command (database name) with additional (to those defind by [commd])
     argument [href] and [s] as textual content of the link. *)
 

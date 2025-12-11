@@ -68,7 +68,7 @@ type wiki_info = {
 let escape (s : string) = (Util.escape_html s : Adef.escaped_string :> string)
 let encode (s : string) = (Mutil.encode s : Adef.encoded_string :> string)
 
-let syntax_links conf wi s =
+let syntax_links conf base wi s =
   let slen = String.length s in
   let rec loop quot_lev pos i len =
     let len, quot_lev =
@@ -159,30 +159,35 @@ let syntax_links conf wi s =
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
           let t =
-            if wi.wi_person_exists (fn, sn, oc) then
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
-                (Util.commd conf :> string)
-                (encode fn) (encode sn)
-                (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                name
+            let identity_link () =
+              Adef.as_string
+              @@ Util.geneweb_link ~style:"color:red" conf (Adef.escaped "")
+                   (* TODO how do we know this person is private here?
+                      TODO should be is_hidden (?) *)
+                   (Adef.safe
+                      (if
+                       conf.Config.hide_private_names
+                       && not (conf.Config.wizard || conf.Config.friend)
+                      then "x x"
+                      else escape name))
+            in
+            let profile_page_link ?style () =
+              match
+                Option.map (Gwdb.poi base) (Gwdb.person_of_key base fn sn oc)
+              with
+              | None -> identity_link ()
+              | Some person ->
+                  Adef.as_string
+                  @@ Util.geneweb_link ?style
+                       ~id:(Printf.sprintf "p_%d" pos)
+                       conf
+                       (Util.acces conf base person)
+                       (name |> escape |> Adef.safe)
+            in
+            if wi.wi_person_exists (fn, sn, oc) then profile_page_link ()
             else if wi.wi_always_show_link then
-              let s = " style=\"color:red\"" in
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\"%s>%s</a>"
-                pos
-                (Util.commd conf :> string)
-                (encode fn) (encode sn)
-                (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                s name
-            else
-              Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
-                (Util.commd conf :> string)
-                (* TODO how do we know this person is private here?
-                   TODO should be is_hidden (?) *)
-                (if
-                 conf.Config.hide_private_names
-                 && not (conf.Config.wizard || conf.Config.friend)
-                then "x x"
-                else escape name)
+              profile_page_link ~style:"color:red" ()
+            else identity_link ()
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard (j, wiz, name) ->
@@ -543,7 +548,7 @@ let html_of_tlsw conf s =
   in
   hotl conf (Some lines) first_cnt None sections_nums [] ("" :: lines)
 
-let html_with_summary_of_tlsw conf wi edit_opt s =
+let html_with_summary_of_tlsw conf base wi edit_opt s =
   let lines, no_toc = lines_list_of_string s in
   let summary, sections_nums =
     if no_toc then ([], []) else summary_of_tlsw_lines conf false lines
@@ -565,7 +570,7 @@ let html_with_summary_of_tlsw conf wi edit_opt s =
     hotl conf (Some lines) first_cnt edit_opt sections_nums [] lines
   in
   let s =
-    syntax_links conf wi
+    syntax_links conf base wi
       (String.concat "\n"
          (lines_before_summary @ summary @ lines_after_summary))
   in
@@ -632,7 +637,7 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     Output.print_sstring conf {|">&gt;&gt;</a>|});
   Output.print_sstring conf "</p>"
 
-let print_sub_part_text conf wi edit_opt cnt0 lines =
+let print_sub_part_text conf base wi edit_opt cnt0 lines =
   let lines =
     List.map
       (function
@@ -644,14 +649,14 @@ let print_sub_part_text conf wi edit_opt cnt0 lines =
   in
   let lines = hotl conf None cnt0 edit_opt [] [] lines in
   let s = String.concat "\n" lines in
-  let s = syntax_links conf wi s in
+  let s = syntax_links conf base wi s in
   let s =
     if cnt0 < first_cnt then string_of_modify_link conf 0 (s = "") edit_opt ^ s
     else s
   in
   Output.print_string conf (Util.safe_html s)
 
-let print_sub_part conf wi can_edit edit_mode sub_fname cnt0 lines =
+let print_sub_part conf base wi can_edit edit_mode sub_fname cnt0 lines =
   let edit_opt = Some (can_edit, edit_mode, sub_fname) in
   let sfn =
     if sub_fname = "" then Adef.encoded ""
@@ -660,7 +665,7 @@ let print_sub_part conf wi can_edit edit_mode sub_fname cnt0 lines =
       "&f=" ^<^ Mutil.encode sub_fname
   in
   print_sub_part_links conf (Mutil.encode edit_mode) sfn cnt0 (lines = []);
-  print_sub_part_text conf wi edit_opt cnt0 lines
+  print_sub_part_text conf base wi edit_opt cnt0 lines
 
 let print_mod_view_page conf can_edit mode fname title env s =
   let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
@@ -810,7 +815,7 @@ let split_title_and_text s =
     (env, txt)
   else (env, s)
 
-let print_ok conf wi edit_mode fname title_is_1st s =
+let print_ok conf base wi edit_mode fname title_is_1st s =
   let title _ =
     Output.print_sstring conf
       (Utf8.capitalize_fst (Util.transl conf "notes modified"))
@@ -832,10 +837,10 @@ let print_ok conf wi edit_mode fname title_is_1st s =
   let lines =
     if v = 0 && title <> "" then ("<h1>" ^ title ^ "</h1>") :: lines else lines
   in
-  print_sub_part conf wi conf.Config.wizard edit_mode fname v lines;
+  print_sub_part conf base wi conf.Config.wizard edit_mode fname v lines;
   Hutil.trailer conf
 
-let print_mod_ok conf wi edit_mode fname read_string commit string_filter
+let print_mod_ok conf base wi edit_mode fname read_string commit string_filter
     title_is_1st =
   let fname = fname (Util.p_getenv conf.Config.env "f") in
   match edit_mode fname with
@@ -863,7 +868,7 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
         in
         if s <> old_string then commit fname s;
         let sub_part = string_filter sub_part in
-        print_ok conf wi edit_mode fname title_is_1st sub_part
+        print_ok conf base wi edit_mode fname title_is_1st sub_part
   | None -> Hutil.incorrect_request conf
 
 let line_is_in_wiki_syntax s =
