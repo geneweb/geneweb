@@ -689,12 +689,7 @@ let acces_n conf base n x : Adef.escaped_string =
     else Adef.escaped ""
   else
     let open Def in
-    "i" ^<^ n ^^^ "="
-    ^<^ Gwdb.string_of_iper (Gwdb.get_iper x)
-    ^<^
-    if conf.Config.wizard && Gwdb.get_occ x <> 0 then
-      "&oc" ^<^ n ^>^ "=" ^ string_of_int (Gwdb.get_occ x)
-    else Adef.escaped ""
+    "i" ^<^ n ^>^ "=" ^ Gwdb.string_of_iper (Gwdb.get_iper x)
 
 (* ********************************************************************** *)
 (*  [Fonc] acces : config -> base -> person -> string                     *)
@@ -790,9 +785,22 @@ let one_title_text base t : Adef.safe_string =
   let open Def in
   ", <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
 
-let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
+let geneweb_link ?id ?style conf (href : Adef.escaped_string)
+    (s : Adef.safe_string) =
+  let extra_html_attributes =
+    let optional_html_attribute ~key ~value =
+      Option.fold ~none:""
+        ~some:(fun value ->
+          Printf.sprintf "%s=\"%s\"" key (escape_attribute value))
+        value
+    in
+    String.concat " "
+      (List.map
+         (fun (key, value) -> optional_html_attribute ~key ~value)
+         [ ("id", id); ("style", style) ])
+  in
   let open Def in
-  "<a href=\""
+  "<a " ^<^ extra_html_attributes ^<^ " href=\""
   ^<^ (commd conf ^^^ href :> Adef.safe_string)
   ^^^ "\">" ^<^ s ^>^ "</a>"
 

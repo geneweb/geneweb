@@ -749,6 +749,7 @@ let check_person conf base p =
   let bind_none x f = match x with Some _ -> x | None -> f () in
   let ( >>= ) = bind_none in
   Update.check_missing_name base p >>= fun () ->
+  Update.check_person_occurrence_number p >>= fun () ->
   Update.check_missing_witnesses_names conf
     (fun e -> e.Def.epers_witnesses)
     p.pevents

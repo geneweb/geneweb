@@ -1,4 +1,8 @@
-type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
+type key = State.Person_reference.t = {
+  pk_first_name : string;
+  pk_surname : string;
+  pk_occ : int;
+}
 (** Key to refer a person's definition *)
 
 (** Represents a person in .gw file. It could be either reference to a person
@@ -7,6 +11,13 @@ type somebody =
   | Undefined of key  (** Reference to person *)
   | Defined of (Gwdb.iper, Gwdb.iper, string) Def.gen_person
       (** Person's definition *)
+
+let person_reference_from_person (person : _ Def.gen_person) =
+  {
+    pk_first_name = person.first_name;
+    pk_surname = person.surname;
+    pk_occ = person.occ;
+  }
 
 type 'a assumption = Weak of 'a | Strong of 'a
 
@@ -44,7 +55,7 @@ type gw_syntax =
       reference to person. Second is note's content. *)
   | Relations of
       somebody * Def.sex assumption * (somebody, string) Def.gen_relation list
-      (** Block that defines relations of a person with someone outisde of
+      (** Block that defines relations of a person with someone outside of
       family block (like foster parents) (field {i rparents}). Contains:
       - Concerned person definition/reference
       - Sex of person
@@ -79,6 +90,25 @@ let log_error ~filename ~state message =
   Printf.printf "Error: %s\n" message;
   flush stdout
 
+let ensure_end_of_line ~filename ~state fields =
+  if fields = [] then Ok ()
+  else
+    let message =
+      Printf.sprintf "Ignored fields: %s" (String.concat " " fields)
+    in
+    if state.State.no_fail then (
+      log_error ~filename ~state message;
+      Ok ())
+    else Error message
+
+let continue ~filename ~state ~continue_ok ~continue_error = function
+  | Ok value -> continue_ok value
+  | Error message ->
+      if state.State.no_fail then (
+        log_error ~filename ~state message;
+        continue_error ())
+      else Error message
+
 (** {i .gw} file encoding *)
 type encoding = E_utf_8 | E_iso_8859_1
 
@@ -100,7 +130,7 @@ let check_magic fname ic =
        ^ "\" is not a GeneWeb object file, or it is a very old version")
 
 (** [copy_decode s i1 i2] decode the word delimited by [i1] and [i2] inside [s]
-    by remplacing "\\" -> '\' and '_' -> ' ' *)
+    by replacing "\\" -> '\' and '_' -> ' ' *)
 let copy_decode s i1 i2 =
   let len =
     let rec loop len i =
@@ -142,7 +172,7 @@ let fields str =
   in
   loop 0 0
 
-(** Removes spaces at the begining an at the end of string. *)
+(** Removes spaces at the beginning and at the end of string. *)
 let cut_space x =
   let len = String.length x in
   if len = 0 then x
@@ -407,21 +437,8 @@ let get_optional_sexe = function
   | "f" :: l -> (Female, l)
   | l -> (Neuter, l)
 
-(** Parses int that starts at the position [i] inside [x].
-    Raises [Not_found] if integer isn't found. *)
-let make_int x =
-  let rec loop found n i =
-    if i = String.length x then if found then n else raise Not_found
-    else
-      match x.[i] with
-      | '0' .. '9' as c ->
-          loop true ((10 * n) + Char.code c - Char.code '0') (succ i)
-      | _ -> raise Not_found
-  in
-  loop false 0
-
-(** Parses person's first name and occurence number.
-    Occurence number is 0 if not present. *)
+(** Parses person's first name and occurrence number.
+    Occurrence number is 0 if not present. *)
 let get_fst_name str l =
   match l with
   | x :: l' -> (
@@ -438,13 +455,23 @@ let get_fst_name str l =
           let x, occ =
             match String.rindex_opt x '.' with
             | Some i -> (
-                try (String.sub x 0 i, make_int x (succ i))
-                with Not_found -> (x, 0))
+                let s = String.sub x (succ i) (String.length x - i - 1) in
+
+                match Occurrence_number.from_string s with
+                | Ok occurrence_number -> (String.sub x 0 i, occurrence_number)
+                | Error `Not_a_decimal -> (x, 0)
+                | Error `Negative_decimal ->
+                    let occurrence_number =
+                      match int_of_string_opt s with
+                      | None -> assert false
+                      | Some i -> i
+                    in
+                    (String.sub x 0 i, occurrence_number))
             | None -> (x, 0)
           in
-          (x, occ, l')
-      | _ -> failwith str)
-  | _ -> failwith str
+          Ok (x, occ, l')
+      | _ -> Error str)
+  | _ -> Error str
 
 (** Parses person's first name aliases if they are present *)
 let rec get_fst_names_aliases str l =
@@ -527,7 +554,7 @@ let get_occu l =
 let get_sources l =
   match l with "#src" :: x :: l' -> (cut_space x, l') | _ -> ("", l)
 
-(** Parses person's acces rights *)
+(** Parses person's access rights *)
 let get_access l =
   match l with
   | "#apubl" :: l' -> (Def.Public, l')
@@ -703,8 +730,8 @@ let get_event_witness_kind l =
 (** Parses the line containing an information about relationship between parents within family
     and returns [((relk, fath_sex, moth_sex), mar, place, note, src, divorce, rest)].
     [relk] i a relation kind between parents ([Def.relation_kind]), [fath_sex] and [moth_sex]
-    is a sex of each parent, [mar] is a optional mariage date (if married), [place] is a
-    marriage place if present, [note] is a mariage note if present, [src] is a mariage source
+    is a sex of each parent, [mar] is a optional marriage date (if married), [place] is a
+    marriage place if present, [note] is a marriage note if present, [src] is a marriage source
     if present, [divorce] is a divorce status [Def.divorce], [rest] is the rest of the line to
     parse
 *)
@@ -807,7 +834,7 @@ let bogus_def p n = p = "?" || n = "?"
     - Events
     - Notes
     If can't parse person's sources use [comm_psources] instead.
-    If can't parse bithdate use [comm_birth_place] instead. *)
+    If can't parse birth date use [comm_birth_place] instead. *)
 let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
   let first_names_aliases, l = get_fst_names_aliases str l in
   let surnames_aliases, l = get_surnames_aliases str l in
@@ -893,87 +920,114 @@ let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
       pevents = u.pevents;
     }
   in
+  State.add_person_reference state (person_reference_from_person u);
   (u, l)
 
 (** Parses the line containing a parent and returns [(somebody,np,rest)]. [somebody] is either [Defined p] if
-    person's definiton was parsed ([p] regroups all personal information) either [Undefined k] if a reference
+    person's definition was parsed ([p] regroups all personal information) either [Undefined k] if a reference
     to a person already defined was parsed ([k] is a key to find corresponding definition). [np] is a person's
     surname. [rest] is a rest of line to parse. Could be used to parse familial witnesses. *)
 let parse_parent state str l =
   (* last name *)
   let np, l = get_name l in
-  (* first name and occurence number *)
-  let pp, op, l = get_fst_name str l in
-  (* person is not defined as a child elsewhere (is defined here) *)
-  let defined =
-    if bogus_def pp np then true
-    else
-      match l with [] -> false | s :: _ when s.[0] = '+' -> false | _ -> true
-  in
-  if not defined then
-    let key = { pk_first_name = pp; pk_surname = np; pk_occ = op } in
-    (Undefined key, np, l)
-  else
-    let u = create_person () in
-    let u, l = set_infos state pp np op u.sex "" "" str u l in
-    (Defined u, np, l)
+  Result.map
+    (fun (* first name and occurrence number *)
+           (pp, op, l) ->
+      (* person is not defined as a child elsewhere (is defined here) *)
+      let defined =
+        if bogus_def pp np then true
+        else
+          match l with
+          | [] -> false
+          | s :: _ when s.[0] = '+' -> false
+          | _ -> true
+      in
+      if not defined then (
+        let key = { pk_first_name = pp; pk_surname = np; pk_occ = op } in
+        State.add_person_reference state key;
+        (Undefined key, np, l))
+      else
+        let u = create_person () in
+        let u, l = set_infos state pp np op u.sex "" "" str u l in
+        (Defined u, np, l))
+    (get_fst_name str l)
 
 (** Parses the line containing a children and returns a person [gen_person] containing
     all extracted information. If a children definition doesn't provide
-    surname then father's surname is used. ALso if it doesn't provide a children's
-    birth place and source then it uses information provided by family definiton. *)
+    surname then father's surname is used. Also if it doesn't provide a children's
+    birth place and source then it uses information provided by family definition. *)
 let parse_child state str surname sex csrc cbp l =
   let u = create_person () in
-  let prenom, occ, l = get_fst_name str l in
-  let nom, l =
-    match l with
-    | "?" :: _ -> get_name l
-    | x :: _ -> (
-        match x.[0] with
-        | '<' | '>' | '!' | '~' | '?' | '-' | '0' .. '9' | '{' | '#' ->
-            (surname, l)
-        | '(' | '[' -> ((if prenom = "" then "" else surname), l)
-        | _ -> get_name l)
-    | _ -> (surname, [])
-  in
-  set_infos state prenom nom occ sex csrc cbp str u l
+  Result.map
+    (fun (prenom, occ, l) ->
+      let nom, l =
+        match l with
+        | "?" :: _ -> get_name l
+        | x :: _ -> (
+            match x.[0] with
+            | '<' | '>' | '!' | '~' | '?' | '-' | '0' .. '9' | '{' | '#' ->
+                (surname, l)
+            | '(' | '[' -> ((if prenom = "" then "" else surname), l)
+            | _ -> get_name l)
+        | _ -> (surname, [])
+      in
+      set_infos state prenom nom occ sex csrc cbp str u l)
+    (get_fst_name str l)
 
 (** Parse relation type [Def.gen_relation] with a person outside of family block
     (foster parents, god parent, etc.). *)
-let get_relation state str = function
+let get_relation ~filename state str =
+  let ( >>= ) = Result.bind in
+  let ensure_end_of_line fields = ensure_end_of_line ~filename ~state fields in
+  function
   | "-" :: x :: l -> (
-      let rtyp =
-        match x with
-        | "adop" | "adop:" -> Def.Adoption
-        | "reco" | "reco:" -> Recognition
-        | "cand" | "cand:" -> CandidateParent
-        | "godp" | "godp:" -> GodParent
-        | "fost" | "fost:" -> FosterParent
-        | _ -> failwith str
-      in
-      if String.length x = 5 && x.[4] = ':' then (
-        let fk, _, l = parse_parent state str l in
-        let l = match l with "+" :: l -> l | _ -> failwith str in
-        let mk, _, l = parse_parent state str l in
-        if l <> [] then failwith str;
-        {
-          Def.r_type = rtyp;
-          r_fath = Some fk;
-          r_moth = Some mk;
-          r_sources = "";
-        })
+      (match x with
+      | "adop" | "adop:" -> Ok Def.Adoption
+      | "reco" | "reco:" -> Ok Recognition
+      | "cand" | "cand:" -> Ok CandidateParent
+      | "godp" | "godp:" -> Ok GodParent
+      | "fost" | "fost:" -> Ok FosterParent
+      | _ -> Error str)
+      >>= fun rtyp ->
+      if String.length x = 5 && x.[4] = ':' then
+        parse_parent state str l >>= fun (fk, _, l) ->
+        (match l with "+" :: l -> Ok l | _ -> Error str) >>= fun l ->
+        parse_parent state str l >>= fun (mk, _, l) ->
+        Result.map
+          (fun () ->
+            {
+              Def.r_type = rtyp;
+              r_fath = Some fk;
+              r_moth = Some mk;
+              r_sources = "";
+            })
+          (ensure_end_of_line l)
       else
         match l with
         | "fath:" :: l ->
-            let fk, _, l = parse_parent state str l in
-            if l <> [] then failwith str;
-            { r_type = rtyp; r_fath = Some fk; r_moth = None; r_sources = "" }
+            parse_parent state str l >>= fun (fk, _, l) ->
+            Result.map
+              (fun () ->
+                {
+                  Def.r_type = rtyp;
+                  r_fath = Some fk;
+                  r_moth = None;
+                  r_sources = "";
+                })
+              (ensure_end_of_line l)
         | "moth:" :: l ->
-            let mk, _, l = parse_parent state str l in
-            if l <> [] then failwith str;
-            { r_type = rtyp; r_fath = None; r_moth = Some mk; r_sources = "" }
-        | _ -> failwith str)
-  | _ -> failwith str
+            parse_parent state str l >>= fun (mk, _, l) ->
+            Result.map
+              (fun () ->
+                {
+                  Def.r_type = rtyp;
+                  r_fath = None;
+                  r_moth = Some mk;
+                  r_sources = "";
+                })
+              (ensure_end_of_line l)
+        | _ -> Error str)
+  | _ -> Error str
 
 (** Read notes of a person inside [note] block across multiple lines and
     concat them. *)
@@ -1019,7 +1073,7 @@ type 'a read_family =
   | F_gw_plus  (** Read block that defines that the file uses gwplus syntax *)
   | F_none  (** Read end of the file *)
 
-(** Read succesive lines starting with `tag` and concat them. *)
+(** Read successive lines starting with `tag` and concat them. *)
 let aux_loop_note state tag line ic =
   let tag_len = String.length tag in
   let rec loop acc str =
@@ -1039,20 +1093,21 @@ let aux_loop_note state tag line ic =
   in
   (note, line)
 
-(** Parse note (succesive lines starting with "note") *)
+(** Parse note (successive lines starting with "note") *)
 let loop_note state = aux_loop_note state "note"
 
-(** Parse wintess note (succesive lines starting with "wnote") *)
+(** Parse witness note (successive lines starting with "wnote") *)
 let loop_witness_note state = aux_loop_note state "wnote"
 
-(** Parse comment (succesive lines starting with "comm") *)
+(** Parse comment (successive lines starting with "comm") *)
 let loop_comment state = aux_loop_note state "comm"
 
 (** Parse witnesses across the lines and returns list of [(wit,wsex,wk,wnote)]
     where wit is a witness definition/reference, [wsex] is a sex of witness
     , [wk] is a kind of witness relationship to the family, [wnote] is a witness note. *)
-let loop_witn state line ic =
+let loop_witn ~filename state line ic =
   let rec loop_witn acc str =
+    let ( >>= ) = Result.bind in
     match fields str with
     | ("wit" | "wit:") :: l ->
         let sex, l =
@@ -1063,12 +1118,19 @@ let loop_witn state line ic =
           | l -> (make_weak_assumption Def.Neuter, l)
         in
         let wkind, l = get_event_witness_kind l in
-        let wit, _, l = parse_parent state str l in
-        if l <> [] then failwith str;
-        (* read witness note which starts on a new line *)
-        let wnote, str = loop_witness_note state (input_a_line state ic) ic in
-        loop_witn ((wit, sex, wkind, wnote) :: acc) str
-    | _ -> (List.rev acc, str)
+        continue ~filename ~state
+          ~continue_error:(fun () ->
+            loop_witn acc
+              (snd @@ loop_witness_note state (input_a_line state ic) ic))
+          (parse_parent state str l)
+          ~continue_ok:(fun (wit, _, l) ->
+            ensure_end_of_line ~filename ~state l >>= fun () ->
+            (* read witness note which starts on a new line *)
+            let wnote, str =
+              loop_witness_note state (input_a_line state ic) ic
+            in
+            loop_witn ((wit, sex, wkind, wnote) :: acc) str)
+    | _ -> Ok (List.rev acc, str)
   in
   loop_witn [] line
 
@@ -1077,15 +1139,7 @@ let loop_witn state line ic =
 let read_family state ic fname =
   let ( >>= ) = Result.bind in
   let ensure_end_of_line fields =
-    if fields = [] then Ok ()
-    else
-      let message =
-        Printf.sprintf "Ignored fields: %s" (String.concat " " fields)
-      in
-      if state.State.no_fail then (
-        log_error ~filename:fname ~state message;
-        Ok ())
-      else Error message
+    ensure_end_of_line ~filename:fname ~state fields
   in
   function
   (* Block that defines that file use utf-8 encoding *)
@@ -1095,14 +1149,15 @@ let read_family state ic fname =
   (* Family block *)
   | Some (str, "fam" :: l) -> (
       (* read father *)
-      let fath_key, surname, l = parse_parent state str l in
+      parse_parent state str l
+      >>= fun (fath_key, surname, l) ->
       (* read relation between parents *)
       let relation_ss, marriage, marr_place, marr_note, marr_src, divorce, l =
         get_mar_date str l
       in
       let relation, fath_sex, moth_sex = relation_ss in
       (* read mother *)
-      let moth_key, _, l = parse_parent state str l in
+      parse_parent state str l >>= fun (moth_key, _, l) ->
       ensure_end_of_line l >>= fun () ->
       let line = read_line state ic in
       (* read list of witnesses with their sex (if exists) *)
@@ -1115,11 +1170,14 @@ let read_family state ic fname =
               | "f:" :: l -> (make_strong_assumption Def.Female, l)
               | l -> (make_weak_assumption Def.Neuter, l)
             in
-            let wk, _, l = parse_parent state str l in
-            ensure_end_of_line l >>= fun () ->
-            Result.map
-              (fun (witn, line) -> ((wk, sex) :: witn, line))
-              (loop (read_line state ic))
+            continue ~filename:fname ~state
+              ~continue_error:(fun () -> loop (read_line state ic))
+              (parse_parent state str l)
+              ~continue_ok:(fun (wk, _, l) ->
+                ensure_end_of_line l >>= fun () ->
+                Result.map
+                  (fun (witn, line) -> ((wk, sex) :: witn, line))
+                  (loop (read_line state ic)))
         | line -> Ok ([], line)
       in
       loop line >>= fun (witn, line) ->
@@ -1181,7 +1239,8 @@ let read_family state ic fname =
                   in
                   ensure_end_of_line l >>= fun () ->
                   (* On récupère les témoins *)
-                  let witn, line = loop_witn state (input_a_line state ic) ic in
+                  loop_witn ~filename:fname state (input_a_line state ic) ic
+                  >>= fun (witn, line) ->
                   (* On récupère les notes *)
                   let notes, line = loop_note state line ic in
                   let evt = (name, date, place, cause, src, notes, witn) in
@@ -1202,8 +1261,11 @@ let read_family state ic fname =
               match read_line state ic with
               | Some (str, "-" :: l) ->
                   let sex, l = get_optional_sexe l in
-                  let child, l = parse_child state str surname sex csrc cbp l in
-                  ensure_end_of_line l >>= fun () -> loop (child :: children)
+                  continue ~filename:fname ~state
+                    ~continue_error:(fun () -> loop children)
+                    (parse_child state str surname sex csrc cbp l)
+                    ~continue_ok:(fun (child, l) ->
+                      ensure_end_of_line l >>= fun () -> loop (child :: children))
               | Some (_, [ "end" ]) -> Ok children
               | Some (str, _) -> Error str
               | _ -> Error "eof"
@@ -1280,7 +1342,7 @@ let read_family state ic fname =
   (* Notes block *)
   | Some (str, "notes" :: l) -> (
       let surname, l = get_name l in
-      let first_name, occ, l = get_fst_name str l in
+      get_fst_name str l >>= fun (first_name, occ, l) ->
       ensure_end_of_line l >>= fun () ->
       match read_line state ic with
       | Some (_, [ "beg" ]) ->
@@ -1288,6 +1350,7 @@ let read_family state ic fname =
           let key =
             { pk_first_name = first_name; pk_surname = surname; pk_occ = occ }
           in
+          State.add_person_reference state key;
           Ok (F_some (Notes (key, notes), read_line state ic))
       | Some (str, _) -> Error str
       | None -> Error "end of file")
@@ -1302,8 +1365,7 @@ let read_family state ic fname =
   (* Personal relation block *)
   | Some (str, "rel" :: l) -> (
       (* get considered person *)
-      let sb, _, l = parse_parent state str l in
-
+      parse_parent state str l >>= fun (sb, _, l) ->
       let sex, l =
         match l with
         | "#h" :: l -> (make_strong_assumption Def.Male, l)
@@ -1319,10 +1381,11 @@ let read_family state ic fname =
               let rec loop = function
                 | "end" -> Ok []
                 | x ->
-                    Result.map
-                      (fun relations ->
-                        get_relation state x (fields x) :: relations)
-                      (loop (input_a_line state ic))
+                    loop (input_a_line state ic) >>= fun relations ->
+                    continue ~filename:fname ~state
+                      ~continue_error:(fun () -> Ok relations)
+                      ~continue_ok:(fun relation -> Ok (relation :: relations))
+                      (get_relation ~filename:fname state x (fields x))
               in
               loop (input_a_line state ic)
             with End_of_file -> Error "missing end rel"
@@ -1335,7 +1398,7 @@ let read_family state ic fname =
   (* Person's events block *)
   | Some (str, "pevt" :: l) ->
       (* get considered person *)
-      let sb, _, l = parse_parent state str l in
+      parse_parent state str l >>= fun (sb, _, l) ->
       ensure_end_of_line l >>= fun () ->
       let pevents =
         let rec loop pevents = function
@@ -1355,7 +1418,8 @@ let read_family state ic fname =
               in
               ensure_end_of_line l >>= fun () ->
               (* On récupère les témoins *)
-              let witn, line = loop_witn state (input_a_line state ic) ic in
+              loop_witn ~filename:fname state (input_a_line state ic) ic
+              >>= fun (witn, line) ->
               (* On récupère les notes *)
               let notes, line = loop_note state line ic in
               let evt = (name, date, place, cause, src, notes, witn) in
@@ -1374,6 +1438,55 @@ let read_family state ic fname =
   (* End of the file *)
   | None -> Ok F_none
 
+let fix_invalid_person_references ~(state : State.t) data_element =
+  let fix_person person =
+    let person_reference =
+      person |> person_reference_from_person
+      |> State.get_fixed_person_reference state
+    in
+    { person with occ = person_reference.pk_occ }
+  in
+  let fix_somebody = function
+    | Undefined person_reference ->
+        Undefined (State.get_fixed_person_reference state person_reference)
+    | Defined person -> Defined (fix_person person)
+  in
+  let fix_event (name, date, place, cause, source, notes, witnesses) =
+    ( name,
+      date,
+      place,
+      cause,
+      source,
+      notes,
+      List.map
+        (fun (witness, sex, kind, note) ->
+          (fix_somebody witness, sex, kind, note))
+        witnesses )
+  in
+  match data_element with
+  | Family (parents, father_sex, mother_sex, witnesses, events, family, children)
+    ->
+      Family
+        ( Futil.map_couple_p fix_somebody parents,
+          father_sex,
+          mother_sex,
+          List.map (fun (witness, sex) -> (fix_somebody witness, sex)) witnesses,
+          List.map fix_event events,
+          Futil.map_family_ps fix_person Fun.id (fun ?format:_ -> Fun.id) family,
+          Futil.map_descend_p fix_person children )
+  | Relations (somebody, sex, relations) ->
+      Relations
+        ( fix_somebody somebody,
+          sex,
+          List.map
+            (Futil.map_relation_ps fix_somebody (fun ?format:_ -> Fun.id))
+            relations )
+  | Pevent (somebody, sex, events) ->
+      Pevent (fix_somebody somebody, sex, List.map fix_event events)
+  | Notes (person_reference, note) ->
+      Notes (State.get_fixed_person_reference state person_reference, note)
+  | (Bnotes _ | Wnotes _) as data_element -> data_element
+
 (** Compile .gw file and save result to corresponding .gwo *)
 let comp_families state x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
@@ -1385,23 +1498,32 @@ let comp_families state x =
      output_string oc magic_gwo;
      (* write source filename *)
      output_value oc (x : string);
-     let rec loop line encoding =
+     let rec loop ~data_elements line encoding =
        match read_family state (ic, encoding) x line with
        | Ok (F_some (family, line)) ->
-           output_value oc (family : gw_syntax);
-           loop line encoding
-       | Ok F_enc_utf_8 -> loop (read_line state (ic, E_utf_8)) E_utf_8
+           loop ~data_elements:(family :: data_elements) line encoding
+       | Ok F_enc_utf_8 ->
+           loop ~data_elements (read_line state (ic, E_utf_8)) E_utf_8
        | Ok F_gw_plus ->
            state.State.create_all_keys <- true;
-           loop (read_line state (ic, encoding)) encoding
-       | Ok F_none -> ()
+           loop ~data_elements (read_line state (ic, encoding)) encoding
+       | Ok F_none -> data_elements
        | Error str ->
            if state.State.no_fail then (
              log_error ~filename:x ~state str;
-             loop (read_line state (ic, encoding)) encoding)
+             loop ~data_elements (read_line state (ic, encoding)) encoding)
            else failwith str
      in
-     loop (read_line state (ic, E_iso_8859_1)) E_iso_8859_1;
+     let data_elements =
+       loop ~data_elements:[] (read_line state (ic, E_iso_8859_1)) E_iso_8859_1
+     in
+     List.iter
+       (fun data_element -> output_value oc (data_element : gw_syntax))
+       (List.rev_map
+          (if State.all_person_references_are_valid state then Fun.id
+          else fix_invalid_person_references ~state)
+          data_elements);
+     assert (State.all_person_references_are_valid state);
      close_in ic
    with e ->
      close_out oc;
