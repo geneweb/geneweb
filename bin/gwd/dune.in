@@ -30,7 +30,6 @@
     str
     unix
     wserver
-    caches
     %%%GWDB_PKG%%%
   )
   (modules

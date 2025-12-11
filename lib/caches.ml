@@ -94,7 +94,7 @@ let tmp_file fname = fname ^ ".tmp"
 let write_caches base =
   if Gwdb.nb_of_persons base > node_threshold then (
     let cache = create_cache_data base in
-    let base_dir = Geneweb.GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
+    let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
     let lastname =
       sorted_list_of_istr_set base Utf8.alphabetic_order cache.lastname
     in
@@ -115,9 +115,7 @@ let write_caches base =
     in
     let source_fname = source_cache_fname base_dir in
     let source_fname_tmp = tmp_file source_fname in
-    let place =
-      sorted_list_of_istr_set base Geneweb.Place.compare_places cache.place
-    in
+    let place = sorted_list_of_istr_set base Place.compare_places cache.place in
     let place_fname = place_cache_fname base_dir in
     let place_fname_tmp = tmp_file place_fname in
     write_cache_data lastname_fname_tmp lastname;
@@ -139,7 +137,7 @@ let cache_file_of_cache_data base_file = function
   | `occupation -> occupation_cache_fname base_file
 
 let has_cache ~conf ~mode =
-  let base_file = Geneweb.GWPARAM.bpath (conf.Geneweb.Config.bname ^ ".gwb") in
+  let base_file = GWPARAM.bpath (conf.Config.bname ^ ".gwb") in
   let file = cache_file_of_cache_data base_file mode in
   Sys.file_exists file
 
@@ -221,12 +219,12 @@ let complete_with_patch mode base filter data =
   complete_with_families_patch mode base filter data
 
 let read_cache ~conf kind =
-  let bfile = Geneweb.GWPARAM.bpath (conf.Geneweb.Config.bname ^ ".gwb") in
+  let bfile = GWPARAM.bpath (conf.Config.bname ^ ".gwb") in
   let cache_file = cache_file_of_cache_data bfile kind in
   let ic = Secure.open_in_bin cache_file in
   try (Marshal.from_channel ic : string list)
   with e ->
-    Geneweb.GWPARAM.syslog `LOG_ERR
+    GWPARAM.syslog `LOG_ERR
       (Printf.sprintf "Error while reading api autocomplete cache %s %s"
          cache_file (Printexc.to_string e));
     close_in ic;

@@ -7,12 +7,12 @@ val node_threshold : int
 val write_caches : Gwdb.base -> unit
 
 val has_cache :
-  conf:Geneweb.Config.config ->
+  conf:Config.config ->
   mode:[< `firstname | `lastname | `occupation | `place | `source ] ->
   bool
 
 val read_cache :
-  conf:Geneweb.Config.config ->
+  conf:Config.config ->
   [< `firstname | `lastname | `occupation | `place | `source ] ->
   string list
 
