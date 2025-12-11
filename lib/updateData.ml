@@ -8,8 +8,7 @@ let get_data_kind_from_env env =
       | "sn" -> Some `lastname
       | _ -> None)
 
-let get_data conf =
-  match get_data_kind_from_env conf.Config.env with
+let get_data = function
   | Some `occupation -> ([ Gwdb.get_occupation ], [], [], [])
   | Some `place ->
       ( [
@@ -37,7 +36,9 @@ let get_data conf =
   | _ -> ([], [], [], [])
 
 let get_all_data conf base =
-  let get_p, get_pe, get_f, get_fe = get_data conf in
+  let get_p, get_pe, get_f, get_fe =
+    get_data @@ get_data_kind_from_env conf.Config.env
+  in
   let aux : 'a. 'a -> Gwdb.IstrSet.t -> ('a -> Gwdb.istr) -> Gwdb.IstrSet.t =
    fun arg acc get ->
     let istr = get arg in
@@ -71,7 +72,9 @@ let get_all_data conf base =
   Gwdb.IstrSet.elements acc
 
 let get_person_from_data conf base =
-  let get_p, get_pe, get_f, get_fe = get_data conf in
+  let get_p, get_pe, get_f, get_fe =
+    get_data @@ get_data_kind_from_env conf.Config.env
+  in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : Gwdb.istr) p =
     match Gwdb.IstrMap.find_opt istr acc with
@@ -405,11 +408,12 @@ let update_family conf base old new_istr fam =
       - unit
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let update_person_list conf base new_input list nb_pers max_updates =
+  let data_kind = get_data_kind_from_env conf.Config.env in
   let test_family =
-    match get_data conf with _, _, [], [] -> false | _ -> true
+    match get_data data_kind with _, _, [], [] -> false | _ -> true
   in
   let action =
-    match get_data_kind_from_env conf.env with
+    match data_kind with
     | Some `occupation -> "co"
     | Some `place -> "cp"
     | Some `source -> "cs"
