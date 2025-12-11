@@ -469,18 +469,38 @@ let update_person_list conf base new_input list nb_pers max_updates =
 let build_list ~ignore_case conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
-  let list = get_all_data conf base in
+  let list =
+    let get_data_from_database ~conf base =
+      List.map (fun string_id -> `String_id string_id) (get_all_data conf base)
+    in
+    match get_data_kind_from_env conf.Config.env with
+    | None -> get_data_from_database ~conf base
+    | Some data_kind ->
+        if not @@ Caches.has_cache ~conf ~mode:data_kind then
+          get_data_from_database ~conf base
+        else
+          List.map
+            (fun string -> `String string)
+            (Caches.complete_with_patch data_kind base (Fun.const true)
+               (Caches.read_cache ~conf data_kind))
+  in
+  let to_string_id_string ~base = function
+    | `String_id istr -> Some (istr, Gwdb.sou base istr)
+    | `String string ->
+        let string_id = Gwdb.find_opt_string_istr base string in
+        Option.map (fun string_id -> (string_id, string)) string_id
+  in
   if ini <> "" then
     List.filter_map
-      (fun istr ->
-        let str = Gwdb.sou base istr in
-        if
-          Utf8.start_with_wildcard ~ignore_case ini 0
-          @@ Place.without_suburb str
-        then Some (istr, str)
-        else None)
+      (fun element ->
+        Option.bind (to_string_id_string ~base element) (fun (istr, str) ->
+            if
+              Utf8.start_with_wildcard ~ignore_case ini 0
+              @@ Place.without_suburb str
+            then Some (istr, str)
+            else None))
       list
-  else List.rev_map (fun istr -> (istr, Gwdb.sou base istr)) list
+  else List.filter_map (to_string_id_string ~base) list
 
 let build_list_short conf list =
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
