@@ -515,23 +515,16 @@ let build_list_short conf list =
       List.rev_map
         (fun (_, s) ->
           let s = Place.without_suburb s in
-          if String.length s > i then String.sub s 0 (Utf8.next s i)
-          else s ^ String.make (i + 1 - String.length s) '_')
+          (* Astuce pour gérer les espaces. *)
+          Ext_string.tr ' ' '_'
+            (if String.length s > i then String.sub s 0 (Utf8.next s i)
+            else s ^ String.make (i + 1 - String.length s) '_'))
         l
     in
-    (* Fonction pour supprimer les doublons. *)
-    let remove_dup list =
-      Ext_string.Set.elements
-        (List.fold_left
-           (fun accu ini -> Ext_string.Set.add ini accu)
-           Ext_string.Set.empty list)
-    in
-    (* Astuce pour gérer les espaces. *)
-    let inis = List.rev_map (fun p -> Ext_string.tr ' ' '_' p) inis in
-    let inis = remove_dup inis in
+    let inis = List.sort_uniq Utf8.alphabetic_order inis in
     match inis with
     | [ ini ] -> build_ini list (String.length ini)
-    | list -> List.sort Utf8.alphabetic_order list
+    | list -> list
   in
   build_ini list (String.length ini)
 
