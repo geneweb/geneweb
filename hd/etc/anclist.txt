@@ -268,7 +268,7 @@
     %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
     %if;(count > 100)
       <p>
-        <span>[*number of branches] : </span>
+        <span class="ml-3">[*number of branches][:]</span>
         %foreach;sorted_list_item;
           %if;(prev_item.2 != item.2)
             <a href="#a_%apply;hexa(item.2)">%item.2;</a>
@@ -276,27 +276,21 @@
         %end;
       </p>
     %end;
-
-  %if;(not cancel_links)
-    <div class="">[*help surname branch].</div>
-    <table class="display_search border-0">
-      <tr>
-        <td><b>[*sort by/branch/alphabetic order]0</b></td>
-        <td><img src="%images_prefix;picto_branch.png"></td>
-        <td>[sort by/branch/alphabetic order]1</td>
-        <td><i class="fa-solid fa-arrow-down-a-z ml-2"></i></td>
-        <td>
-          <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;">
-            [sort by/branch/alphabetic order]2
-          </a>
-        </td>
-      </tr>
-    </table>
-  %end;
+    %if;(not cancel_links)
+      <div class="ml-3 mb-3">
+        [*help surname branch].</br>
+        <b>[*sort by/branch/alphabetic order]0</b>
+        <i class="fa fa-code-fork ml-2"></i>
+        [sort by/branch/alphabetic order]1
+        <i class="fa-solid fa-arrow-down-a-z ml-2"></i>
+        <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;">%nn;
+          [sort by/branch/alphabetic order]2</a>
+      </div>
+    %end;
     <ul class="surname_branch_sort">
       %if;(count <= 100)
         <li>%nn;
-        <table class="table table-sm w-auto asc-desc-table mt-2">
+        <table class="table table-sm w-auto asc-desc-table">
           <thead><tr>
             <th>[*surname/surnames]0</th>
             <th>[*nb branches]</th>
@@ -368,22 +362,16 @@
     %( surnames branch %)
     %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
     %if;(not cancel_links)
-      <div>[*help surname branch].</div>
-      <table class="display_search border-0">
-        <tr>
-          <td><b>[*sort by/branch/alphabetic order]0</b></td>
-          <td><img src="%images_prefix;picto_branch.png"></td>
-          <td>
-            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;&sort=on">
-              [sort by/branch/alphabetic order]1
-            </a>
-          </td>
-          <td><i class="fa-solid fa-arrow-down-a-z ml-2"></i></td>
-          <td>[sort by/branch/alphabetic order]2</td>
-        </tr>
-      </table>
+      <div class="ml-3 mb-3">
+        [*help surname branch].<br>
+        <b>[*sort by/branch/alphabetic order]0</b>
+        <i class="fa fa-code-fork ml-2"></i>
+        <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;&sort=on">%nn;
+          [sort by/branch/alphabetic order]1</a>%nn;
+        <i class="fa-solid fa-arrow-down-a-z ml-2"></i> [sort by/branch/alphabetic order]2
+      </div>
     %end;
-    <table class="table table-sm w-auto asc-desc-table mt-2">
+    <table class="table table-sm w-auto asc-desc-table">
       <thead>
       <tr>
         <th>[*surname/surnames]0</th>

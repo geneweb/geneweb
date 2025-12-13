@@ -1384,7 +1384,8 @@ let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
 let print conf base =
   (* Vérifier si URL en pnoc ou si on a déjà les index *)
   let has_pnoc_params = Util.url_has_pnoc_params conf.env in
-  if has_pnoc_params then (
+  let has_s1 = Util.p_getenv conf.env "s1" <> None in
+  if has_pnoc_params && not has_s1 then (
     (* Récupérer tous les index *)
     let all_indexes =
       List.fold_left
@@ -1438,7 +1439,7 @@ let print conf base =
 
     let clean_url =
       Printf.sprintf "%s?m=DAG&%s"
-        (conf.command :> string)
+        (Util.prefix_base conf :> string)
         (String.concat "&" (List.rev !converted_params))
     in
     Wserver.http_redirect_temporarily clean_url)
