@@ -218,8 +218,8 @@ bench-tabulate:
 
 clean:
 	@echo -n "Cleaning…"
-	@$(RM) -r $(DISTRIB_DIR)
-	@dune clean
+	@rm -rf $(DISTRIB_DIR)
+	@rm -rf _build
 	@echo " Done."
 .PHONY: clean
 
