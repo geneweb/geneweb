@@ -107,16 +107,19 @@ ifeq ($(OS_TYPE),Win)
 	cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt
 	cp -f etc/ROBOT.txt $(DISTRIB_DIR)/ROBOT.txt
 else ifeq ($(OS_TYPE),Darwin)
-	cp etc/gwd.sh $(DISTRIB_DIR)
-	cp etc/gwsetup.sh $(DISTRIB_DIR)
-	cp etc/macOS/geneweb.sh $(DISTRIB_DIR)
+	cp etc/gwd.sh $(DISTRIB_DIR)/gwd.command
+	cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.command
+	cp etc/geneweb.sh $(DISTRIB_DIR)/geneweb.command
 else
 	cp etc/gwd.sh $(DISTRIB_DIR)/gwd.sh
 	cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.sh
+	cp etc/geneweb.sh $(DISTRIB_DIR)/geneweb.sh
 endif
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
+	echo "-bd" >> $(DISTRIB_DIR)/gw/gwd.arg
+	echo "./bases" >> $(DISTRIB_DIR)/gw/gwd.arg
 	@printf "\n\033[1;1m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT)
 	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT)
