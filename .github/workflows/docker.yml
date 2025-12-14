@@ -1,4 +1,4 @@
-name: Build GeneWeb Docker image
+name: GeneWeb Docker
 
 on:
   workflow_dispatch:

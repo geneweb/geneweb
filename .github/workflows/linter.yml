@@ -1,4 +1,4 @@
-name: OCaml Code Linter
+name: Geneweb Ocaml Code Linter
 
 on:
   push:
