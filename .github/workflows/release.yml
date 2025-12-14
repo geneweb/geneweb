@@ -1,72 +1,179 @@
-name: release
+name: Geneweb Release
 
 on:
   push:
     tags:
-      - v**
+      - v*
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Pre-release'
+        required: false
+        type: boolean
+        default: true
+      tag_name:
+        description: 'Tag name'
+        required: true
+        type: string
 
 env:
   DUNE_PROFILE: "release"
+  OPAMYES: true
 
 jobs:
-
   release:
-
     strategy:
-
       fail-fast: false
-
       matrix:
-
         include:
           - os: macos-latest
-            ocaml-version: 4.14.x
-            geneweb-archive: geneweb-macos.zip
-          - os: ubuntu-latest
-            ocaml-version: 4.14.x
-            geneweb-archive: geneweb-linux.zip
+            ocaml-version: 5.4.0
+            platform: macos-arm64
+            is-unix: true
+          - os: macos-15-intel
+            ocaml-version: 5.4.0
+            platform: macos-intel
+            is-unix: true
+          - os: ubuntu-22.04
+            ocaml-version: 5.4.0
+            platform: linux
+            is-unix: true
           - os: windows-latest
-            ocaml-version: 4.14.x
-            geneweb-archive: geneweb-windows.zip
+            ocaml-version: 4.14.2
+            platform: windows
+            is-unix: false
 
     runs-on: ${{ matrix.os }}
 
     steps:
-
-      - name: checkout
+      - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
 
-      - name: setup-ocaml
-        uses: ocaml/setup-ocaml@v2
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-version }}
 
-      - name: setup
+      - name: Install Perl dependencies and remove locked mingw gcc shim (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
         run: |
-          opam install dune ocamlformat.0.27.0
-          opam exec -- dune build @fmt
-          opam pin add . -y --no-action
-          opam depext -y geneweb
-          opam install -y . --deps-only --with-test
+          cpan -j .github/ci-config/cpan-config.pm -T -f -i String::ShellQuote IPC::System::Simple;
+          rm -f _opam/bin/x86_64-w64-mingw32-gcc.exe || true
+          rm -f _opam/bin/i686-w64-mingw32-gcc.exe || true
 
-      # Build the distribution
-      - name: Build the distribution
+      - name: Install dependencies
         run: |
-          opam exec -- ocaml ./configure.ml --sosa-legacy --gwdb-legacy
-          opam exec -- make distrib
+          opam install . --deps-only
+          ${{ matrix.is-unix && 'opam install ancient' || '' }}
 
-      # Archive distribution for release
-      - name: Archive Release
-        uses: thedoctor0/zip-release@0.7.6
-        with:
-          type: zip
-          filename: ${{ matrix.geneweb-archive }}
-          directory: distribution
+      - name: Force static GMP linking (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          # Zarith is installed with dynamic linking, hide ALL libgmp DLLs
+          find /usr -name "libgmp-10.dll" -exec mv {} {}.hidden \; 2>/dev/null || true
+          find /usr -name "libgmp.dll.a" -exec mv {} {}.hidden \; 2>/dev/null || true
+          OPAM_PREFIX=$(opam var prefix | tr '\\' '/')
+          find "$OPAM_PREFIX" -name "libgmp-10.dll" -exec mv {} {}.hidden \; 2>/dev/null || true
+          
+          # Reinstall zarith WITHOUT depext (won’t reinstall system packages)
+          echo "Reinstalling zarith with static GMP…"
+          OPAMASSUMEDEPEXTS=true opam reinstall zarith --yes
+          echo "Static GMP linking configured"
 
-      # Upload the distribution
-      - name: Upload distribution to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Configure and build Geneweb
+        run: |
+          opam exec -- ocaml ./configure.ml --sosa-zarith ${{ matrix.is-unix && '--gwd-caching' || '' }}
+          opam exec -- make distrib distrib-rpc
+
+      - name: Verify static linking (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          echo "=== Checking executable dependencies ==="
+          cd distribution/gw
+          ldd gwd.exe
+          
+          NON_WINDOWS=$(ldd gwd.exe | grep -v -F /cygdrive/c/Windows/ || true)
+          if [ -n "$NON_WINDOWS" ]; then
+            echo "❌ ERROR: Non-Windows dependencies found:"
+            echo "$NON_WINDOWS"
+            exit 1
+          else
+            echo "✅ SUCCESS: libgmp is statically linked (all dependencies are statically linked or from Windows)"
+          fi
+
+      - name: Minify RPC client with terser
+        shell: bash
+        working-directory: distribution/gw/etc/js
+        run: |
+          npm install -g terser
+          chmod +w rpc_client.min.js
+          terser rpc_client.min.js -o rpc_client.min.js --compress --mangle
+
+      - name: Create release archive
+        shell: bash
+        working-directory: distribution
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.tag_name }}"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          
+          # Strip leading 'v' from version for archive naming
+          VERSION="${VERSION#v}"
+          
+          VERSIONED_ARCHIVE="geneweb-${VERSION}-${{ matrix.platform }}.zip"
+          
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            7z a -tzip "../${VERSIONED_ARCHIVE}" * -mx=9
+          else
+            zip -9 -r "../${VERSIONED_ARCHIVE}" *
+          fi
+          
+          echo "VERSIONED_ARCHIVE=${VERSIONED_ARCHIVE}" >> $GITHUB_ENV
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: distribution/${{ matrix.geneweb-archive }}
-          tag: ${{ github.ref }}
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
+          files: ${{ env.VERSIONED_ARCHIVE }}
+          fail_on_unmatched_files: true
+          prerelease: ${{ (github.event_name == 'workflow_dispatch' && inputs.prerelease) || contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') || contains(github.ref_name, 'dev') }}
+          draft: false
+          name: "GeneWeb ${{ env.VERSION }}"
+          body: |
+            ${{ contains(env.VERSION, 'alpha') && '⚠️ **Alpha release** - Not for production use' || '' }}
+            ${{ contains(env.VERSION, 'beta') && '⚠️ **Beta release** - Testing recommended' || '' }}
+            ${{ contains(env.VERSION, 'rc') && '✅ **Release candidate** - Production ready pending final validation' || '' }}
+            
+            ### Download
+            
+            [Linux (glibc 2.35+)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) • [macOS (Apple Silicon)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) • [macOS (Intel)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) • [Windows](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) • [Source code](${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}.zip)
+            
+            ### Prerequisites
+            
+            **Linux/macOS:** Install GMP library
+             ```bash
+            # Ubuntu/Debian
+            sudo apt-get install libgmp10
+            
+            # macOS
+            brew install gmp
+            ```
+            
+            **Windows:** No additional dependencies required (GMP statically linked)
+            
+            ### Installation
+            
+            1. Extract the downloaded archive
+            2. Run `./gwd` (Unix) or `gwd.exe` (Windows)
+            
+            **Note:** Binaries are unsigned. Your OS may display security warnings on first run.
+            
+            For more information, see the [documentation](https://geneweb.tuxfamily.org/wiki/GeneWeb).
