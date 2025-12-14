@@ -10,7 +10,18 @@ by double clicking on the gwsetup.bat (Windows), gwsetup.command (macOS) or gwse
 On macOS geneweb.command will kill previous versions, start both programs and minimises
 the corresponding window.
 
+On macOS, security constraints from Apple will require several steps before you can run GeneWeb:
+- when clicking on one of the xxx.command icons, or launching ./xxx in command line mode
+  you will be prevented from executing the command or the program
+- earlier versions of macOS may simply ask you to confirm that you wont to execute the program
+- with more recent versions, you have to open "systems settings", "privacy and security" where you 
+  will be asked to authorize execution of program xxx.
+  When effectively running the program, you may be asked to provide the system password
+
 Installation in CGI mode
+
+CGI mode is somewhat more tricky to install and assumes you have installed Apache.
+The full source files distribution contains an example of CGI Installation in the test folder.
 
 Before executing install-cgi.sh, you must adjust some of your own configuration
 in the install-cgi.sh script and in install-cgi/gwd.cgi:
