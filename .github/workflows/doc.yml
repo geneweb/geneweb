@@ -1,4 +1,4 @@
-name: deploy-doc
+name: Geneweb doc
 on:
   push:
     tags:

@@ -1,4 +1,4 @@
-name: GeneWeb CI
+name: Geneweb CI
 on:
   workflow_dispatch:
   pull_request:
@@ -43,6 +43,7 @@ on:
       - 'geneweb.opam.template'
 
 env:
+  DUNE_PROFILE: "dev"
   OPAMYES: true
 
 jobs:
@@ -53,7 +54,6 @@ jobs:
       matrix:
         os: [ubuntu-24.04, macos-26, windows-2022]
         ocaml-compiler: [4.10.2, 4.14.2, 5.4.0]
-        setup-version: [v3]
         exclude:
           - os: windows-2022
             ocaml-compiler: 4.10.2
@@ -81,7 +81,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.opam
-          key: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}-cache
+          key: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-cache
 
       - name: Cache Opam dependencies (Windows)
         id: cache-opam-windows
@@ -89,24 +89,24 @@ jobs:
         uses: actions/cache@v5
         with:
           path: D:\.opam
-          key: windows-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}-cache
+          key: windows-${{ matrix.ocaml-compiler }}-cache
 
-      - name: Setup Ocaml with v2
-        if: matrix.setup-version == 'v2'
-        uses: ocaml/setup-ocaml@v2
+      - name: Setup Ocaml with v3
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - name: Setup Ocaml with v3
-        if: matrix.setup-version == 'v3'
-        uses: ocaml/setup-ocaml@v3.4.0
-        with:
-          ocaml-compiler: ${{ (!startsWith(matrix.os, 'windows') && matrix.ocaml-compiler == '4.14.2') && 'ocaml-variants.4.14.2+options,ocaml-option-nnp' || matrix.ocaml-compiler }}
-
       - name: Install Perl dependencies (Windows @v3)
-        if: runner.os == 'Windows' && matrix.setup-version == 'v3'
+        if: runner.os == 'Windows'
         run: cpan -j .github/ci-config/cpan-config.pm -T -f -i String::ShellQuote IPC::System::Simple;
         shell: bash
+
+      - name: Remove locked mingw gcc shim if present
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          rm -f _opam/bin/x86_64-w64-mingw32-gcc.exe || true
+          rm -f _opam/bin/i686-w64-mingw32-gcc.exe || true
 
       # The uucp library seems to push old OCaml compiler to their limits,
       # see https://github.com/ocaml/ocaml/issues/14166. This is a workaround
