@@ -13,6 +13,7 @@ type patch =
   | Fix_WrongString of
       Gwdb.ifam option * Gwdb.iper option * (Gwdb.istr * Gwdb.istr) option
   | Fix_UpdatedOcc of Gwdb.iper * int * int
+  | Fix_WrongStringFailure of Gwdb.ifam option * Gwdb.iper option * string
 
 let string_of_patch base =
   let string_of_p i = Gutil.designation base (Gwdb.poi base i) in
@@ -58,6 +59,15 @@ let string_of_patch base =
         | Some (i, i') ->
             Gwdb.string_of_istr i ^ " -> " ^ Gwdb.string_of_istr i'
         | None -> "Dtext")
+  | Fix_WrongStringFailure (ifam_opt, iper_opt, string) ->
+      Printf.sprintf "Fixed invalid string failed (%s): %s"
+        (match ifam_opt with
+        | Some i -> "ifam " ^ Gwdb.string_of_ifam i
+        | None -> (
+            match iper_opt with
+            | Some i -> "iper " ^ Gwdb.string_of_iper i
+            | None -> assert false))
+        string
   | Fix_UpdatedOcc (iper, oocc, nocc) ->
       Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc nocc
 
@@ -436,14 +446,23 @@ let fix_person_strings ~report ~base ~person =
       report;
     change := true
   in
+  let report_failure str =
+    Option.iter
+      (fun fn -> fn (Fix_WrongStringFailure (None, Some iper, str)))
+      report
+  in
   let fix_map_date = fix_map_utf8_date ~report:report_date in
   let fix_map_str ?format = fix_map_str ~report:report_str ~base ?format in
   let gen_pers = Gwdb.gen_person_of_person person in
   let gen_pers' =
-    Futil.map_person_ps ~fd:fix_map_date
-      ~f_first_name:(fix_map_str ~format:`First_name)
-      ~f_surname:(fix_map_str ~format:`Surname)
-      Fun.id fix_map_str gen_pers
+    try
+      Futil.map_person_ps ~fd:fix_map_date
+        ~f_first_name:(fix_map_str ~format:`First_name)
+        ~f_surname:(fix_map_str ~format:`Surname)
+        Fun.id fix_map_str gen_pers
+    with Gwdb.Not_plain_text s ->
+      report_failure s;
+      gen_pers
   in
   if gen_pers' <> gen_pers then (
     Gwdb.patch_person base iper gen_pers';
@@ -463,11 +482,19 @@ let fix_family_strings ~report ~base ~family =
       report;
     change := true
   in
+  let report_failure str =
+    Option.iter
+      (fun fn -> fn (Fix_WrongStringFailure (Some ifam, None, str)))
+      report
+  in
   let fix_map_date = fix_map_utf8_date ~report:report_date in
   let fix_map_str ?format = fix_map_str ~report:report_str ~base ?format in
   let gen_fam = Gwdb.gen_family_of_family family in
   let gen_fam' =
-    Futil.map_family_ps ~fd:fix_map_date Fun.id Fun.id fix_map_str gen_fam
+    try Futil.map_family_ps ~fd:fix_map_date Fun.id Fun.id fix_map_str gen_fam
+    with Gwdb.Not_plain_text s ->
+      report_failure s;
+      gen_fam
   in
   if gen_fam' <> gen_fam then (
     Gwdb.patch_family base ifam gen_fam';
