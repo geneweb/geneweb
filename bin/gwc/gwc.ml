@@ -30,26 +30,26 @@ let pr_stats = ref false
 let particules_file = ref ""
 
 let make_state () =
-  Gwc_lib.State.
-    {
-      just_comp = !just_comp;
-      out_file = !out_file;
-      force = !force;
-      separate = !separate;
-      bnotes = !bnotes;
-      shift = !shift;
-      files = !files;
-      no_fail = !no_fail;
-      no_picture = !no_picture;
-      no_public = !no_public;
-      create_all_keys = !create_all_keys;
-      line_cnt = !line_cnt;
-      default_source = !default_source;
-      do_check = !do_check;
-      do_consang = !do_consang;
-      pr_stats = !pr_stats;
-      particules_file = !particules_file;
-    }
+  {
+    Gwc_lib.State.default with
+    just_comp = !just_comp;
+    out_file = !out_file;
+    force = !force;
+    separate = !separate;
+    bnotes = !bnotes;
+    shift = !shift;
+    files = !files;
+    no_fail = !no_fail;
+    no_picture = !no_picture;
+    no_public = !no_public;
+    create_all_keys = !create_all_keys;
+    line_cnt = !line_cnt;
+    default_source = !default_source;
+    do_check = !do_check;
+    do_consang = !do_consang;
+    pr_stats = !pr_stats;
+    particules_file = !particules_file;
+  }
 
 let speclist =
   [
