@@ -46,10 +46,20 @@ depopts: [
   "ancient" {>= "0.10.0"}
   "zarith"
 ]
-dev-repo: "git+https://github.com/geneweb/geneweb.git"
-build-env: DUNE_PROFILE = "release"
-
 build: [
-  [ "ocaml" "./configure.ml" ]
-  [ make "build-geneweb" ]
+  ["dune" "subst"] {dev}
+  [
+    "dune"
+    "build"
+    "-p"
+    name
+    "-j"
+    jobs
+    "--promote-install-files=false"
+    "@install"
+    "@runtest" {with-test}
+    "@doc" {with-doc}
+  ]
+  ["dune" "install" "-p" name "--create-install-files" name]
 ]
+dev-repo: "git+https://github.com/geneweb/geneweb.git"

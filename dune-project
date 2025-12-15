@@ -57,7 +57,7 @@
   (tags (geneweb rpc json))
   (depends
     (ocaml (>= 4.10))
-    geneweb
+    (geneweb (= :version))
     (qcheck :with-test)
     (qcheck-alcotest :with-test)
     lwt

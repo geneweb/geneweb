@@ -11,7 +11,7 @@ bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "dune" {>= "2.9"}
   "ocaml" {>= "4.10"}
-  "geneweb"
+  "geneweb" {= version}
   "qcheck" {with-test}
   "qcheck-alcotest" {with-test}
   "lwt"
