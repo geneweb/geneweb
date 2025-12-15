@@ -1,6 +1,0 @@
-build-env: DUNE_PROFILE = "release"
-
-build: [
-  [ "ocaml" "./configure.ml" ]
-  [ make "build-geneweb" ]
-]
