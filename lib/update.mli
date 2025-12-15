@@ -17,6 +17,11 @@ type update_error =
   | UERR_locked_base
   | UERR_illegal_access_update of Def.access * Def.access
   | UERR_not_plain_text of Adef.escaped_string
+  | UERR_invalid_occurrence_number of {
+      first_name : string;
+      last_name : string;
+      occurrence_number : int;
+    }
 
 val not_plain_text_error : string -> update_error
 
@@ -138,6 +143,12 @@ val is_illegal_access_update :
 
 val check_illegal_access_update :
   Gwdb.base -> (Gwdb.iper, 'a, 'b) Def.gen_person -> update_error option
+
+val check_occurrence_number :
+  first_name:string -> last_name:string -> int -> update_error option
+
+val check_person_occurrence_number :
+  (_, _, string) Def.gen_person -> update_error option
 
 val print_create_conflict :
   Config.config -> Gwdb.base -> Gwdb.person -> string -> 'exn

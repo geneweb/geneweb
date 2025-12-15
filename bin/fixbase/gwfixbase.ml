@@ -2,7 +2,7 @@ let add b f l = if b then f :: l else l
 
 let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~f_spouses ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_strings ~key bname =
+    ~invalid_strings ~key ~invalid_occurrence_number bname =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -24,6 +24,11 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~f_spouses ~p_parents
   in
   let family_fixes =
     add !f_spouses Geneweb.Fixbase.fix_family_spouses family_fixes
+  in
+  let person_fixes =
+    (* This fix should be applied before all the others.  *)
+    add !invalid_occurrence_number Geneweb.Fixbase.fix_invalid_occurrence_number
+      person_fixes
   in
   let person_fixes =
     add !p_parents Geneweb.Fixbase.fix_person_parents person_fixes
@@ -125,6 +130,7 @@ let fevents_witnesses = ref false
 let marriage_divorce = ref false
 let invalid_strings = ref false
 let key = ref false
+let invalid_occurrence_number = ref false
 let index = ref false
 let dry_run = ref false
 
@@ -144,6 +150,9 @@ let speclist =
     ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
     ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
     ("-person-key", Arg.Set key, " missing doc");
+    ( "-invalid-occurrence-number",
+      Arg.Set invalid_occurrence_number,
+      " missing doc" );
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enable by any other option." );
@@ -164,7 +173,7 @@ let main () =
   if
     !f_parents || !f_children || !f_spouses || !p_parents || !p_families
     || !pevents_witnesses || !fevents_witnesses || !marriage_divorce || !p_NBDS
-    || !invalid_strings || !key || !index
+    || !invalid_strings || !key || !index || !invalid_occurrence_number
   then ()
   else (
     f_parents := true;
@@ -177,9 +186,10 @@ let main () =
     marriage_divorce := true;
     p_NBDS := true;
     invalid_strings := true;
-    key := true);
+    key := true;
+    invalid_occurrence_number := true);
   check ~dry_run ~fast ~verbosity ~f_parents ~f_children ~f_spouses ~p_NBDS
     ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
-    ~marriage_divorce ~invalid_strings ~key !bname
+    ~marriage_divorce ~invalid_strings ~key ~invalid_occurrence_number !bname
 
 let () = main ()

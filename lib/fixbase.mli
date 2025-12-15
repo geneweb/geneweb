@@ -78,6 +78,8 @@ val fix_person_key : Gwdb.base -> person_fix
 (** For every person in the base, update their occurence number
     if someone with same key (normalized first name and last name, and occurence number) already exists. *)
 
+val fix_invalid_occurrence_number : person_fix
+
 val perform_fixes :
   report:(patch -> unit) option ->
   progress:(int -> int -> unit) ->

@@ -370,7 +370,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
         Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
       }
     in
-    Wiki.html_with_summary_of_tlsw conf wi edit_opt s
+    Wiki.html_with_summary_of_tlsw conf base wi edit_opt s
   in
   let s =
     match ho with
@@ -424,7 +424,7 @@ let print_part_wiznote conf base wz s cnt0 =
       Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
     }
   in
-  Wiki.print_sub_part conf wi can_edit "WIZNOTES" wz cnt0 lines;
+  Wiki.print_sub_part conf base wi can_edit "WIZNOTES" wz cnt0 lines;
   Hutil.trailer conf
 
 let wizard_auth_file_name conf =
@@ -520,8 +520,8 @@ let print_mod_ok conf base =
         Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
       }
     in
-    Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
-      false
+    Wiki.print_mod_ok conf base wi edit_mode fname read_string commit
+      string_filter false
 
 let wizard_denying wddir =
   let fname = Filename.concat wddir "connected.deny" in
