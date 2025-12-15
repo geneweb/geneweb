@@ -6,6 +6,9 @@ let src = Logs.Src.create ~doc:"ImageCarrousel" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
+module Server = Geneweb_http.Server
+module Code = Geneweb_http.Code
+module Header = Geneweb_http.Header
 
 let cp = Filesystem.copy_file ~perm:0o666
 
@@ -333,7 +336,7 @@ let effective_send_ok conf base p file =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
   let strm = Stream.of_string file in
-  let request, content = Wserver.get_request_and_content strm in
+  let request, content = Server.get_request_and_content strm in
   let content =
     let s =
       let rec loop len (strm__ : _ Stream.t) =
@@ -351,7 +354,7 @@ let effective_send_ok conf base p file =
     match image_type content with
     | None ->
         dump_bad_image conf content;
-        Mutil.extract_param "content-type: " '\n' request
+        Header.extract_param "content-type: " '\n' request
         |> incorrect_content_type conf base p
     | Some (typ, content) -> (
         match
@@ -423,7 +426,7 @@ let effective_send_c_ok conf base p file file_name =
     | None -> Adef.safe ""
   in
   let strm = Stream.of_string file in
-  let request, content = Wserver.get_request_and_content strm in
+  let request, content = Server.get_request_and_content strm in
   let content =
     if mode = "note" || mode = "source" || image_url <> "" then ""
     else
@@ -443,7 +446,7 @@ let effective_send_c_ok conf base p file file_name =
     if content <> "" then
       match image_type content with
       | None ->
-          let ct = Mutil.extract_param "Content-Type: " '\n' request in
+          let ct = Header.extract_param "Content-Type: " '\n' request in
           dump_bad_image conf content;
           incorrect_content_type conf base p ct
       | Some (typ, content) -> (
@@ -932,7 +935,7 @@ let print_main_c conf base =
                       "" !url_params
                   in
                   let redirect_url = base_url ^ params_string in
-                  Output.status conf Def.Moved_Temporarily;
+                  Output.status conf Code.Moved_Temporarily;
                   Output.header conf "Location: %s" redirect_url;
                   Output.flush conf)
           | None -> Hutil.incorrect_request conf ~comment:"missing person index"

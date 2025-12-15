@@ -11,12 +11,20 @@
 (documentation "https://geneweb.tuxfamily.org/wiki/GeneWeb")
 
 (package
+  (name geneweb-compat)
+  (synopsis "GeneWeb library for legacy support.")
+  (tags (geneweb legacy))
+  (depends
+    (ocaml (>= 4.10))))
+
+(package
   (name geneweb)
   (synopsis "Genealogy library and software")
   (description "GeneWeb is an open source genealogy software written in OCaml. It comes with a Web interface and can be used off-line or as a Web service.")
   (tags (genealogy))
   (depends
     (ocaml (>= 4.10))
+    geneweb-compat
     (alcotest :with-test)
     benchmark
     (calendars (= "1.0.0"))
@@ -50,6 +58,13 @@
     zarith
   )
 )
+
+(package
+  (name geneweb-http)
+  (synopsis "HTTP 1.1 support for GeneWeb daemon")
+  (depends
+    (ocaml (>= 4.10))
+    geneweb-compat))
 
 (package
   (name geneweb-rpc)

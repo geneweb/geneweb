@@ -5,6 +5,7 @@ open Def
 open Util
 module Ast = Geneweb_templ.Ast
 module Driver = Geneweb_db.Driver
+module Header = Geneweb_http.Header
 
 type counter = {
   mutable welcome_cnt : int;
@@ -280,7 +281,7 @@ let rec lexicon_translate conf base nomin strm first_c =
   if upp then Utf8.capitalize_fst r else r
 
 let browser_cannot_handle_passwords conf =
-  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
+  let user_agent = Header.extract_param "user-agent: " '/' conf.request in
   String.lowercase_ascii user_agent = "konqueror"
 
 let get_variable strm =

@@ -32,7 +32,7 @@ and digest_auth_scheme = {
 }
 
 type output_conf = {
-  status : Def.httpStatus -> unit;
+  status : Geneweb_http.Code.status -> unit;
   header : string -> unit;
   body : string -> unit;
   flush : unit -> unit;

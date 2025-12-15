@@ -1,0 +1,4 @@
+(library
+ (package geneweb-http)
+ (name geneweb_http)
+ (libraries camlp-streams geneweb_compat logs unix fmt))

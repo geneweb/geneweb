@@ -7,6 +7,7 @@ let src = Logs.Src.create ~doc:"ImageDisplay" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
+module Code = Geneweb_http.Code
 
 let print_placeholder_gendered_portrait conf p size =
   let image, alt =
@@ -31,7 +32,7 @@ let print_placeholder_gendered_portrait conf p size =
     - fname : le nom du fichier [Retour] : aucun [Rem] : Ne pas utiliser en
       dehors de ce module. *)
 let content conf ct len fname =
-  Output.status conf Def.OK;
+  Output.status conf Code.OK;
   Output.header conf "Content-type: %s" ct;
   Output.header conf "Content-length: %d" len;
   Output.header conf "Content-disposition: inline; filename=%s"

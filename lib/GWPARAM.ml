@@ -7,6 +7,7 @@ let src = Logs.Src.create ~doc:"GWPARAM" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
+module Code = Geneweb_http.Code
 
 let nb_errors = ref 0
 let errors_undef = ref []
@@ -302,24 +303,14 @@ let output_error =
       close_in ic
     with _ -> ( try close_in ic with _ -> ())
   in
-  fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
-    Output.status conf code;
+  fun ?(headers = []) ?(content : Adef.safe_string option) conf status ->
+    Output.status conf status;
     List.iter (Output.header conf "%s") headers;
     Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
     match content with
     | Some content -> Output.print_string conf content
     | None -> (
-        let code =
-          match code with
-          | Def.Bad_Request -> "400"
-          | Unauthorized -> "401"
-          | Forbidden -> "403"
-          | Not_Found -> "404"
-          | Conflict -> "409"
-          | Internal_Server_Error -> "500"
-          | Service_Unavailable -> "503"
-          | OK | Moved_Temporarily -> assert false
-        in
+        let code = Fmt.str "%d" (Code.status_code status) in
         let fname lang =
           code ^ "-" ^ lang ^ ".html"
           |> Filename.concat "etc" |> Mutil.search_asset_opt

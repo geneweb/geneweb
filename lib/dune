@@ -14,10 +14,10 @@
   geneweb_util
   geneweb_templ
   geneweb_logs
+  geneweb_http
   yojson
   markup
   re
   uucp
   uri
-  wserver
   digestif))

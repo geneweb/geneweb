@@ -1,4 +1,5 @@
 open Config
+module Server = Geneweb_http.Server
 
 let t conf ?(c = 1) l =
   let s = Util.transl conf l in
@@ -265,10 +266,10 @@ let print_redirect_to_list conf base =
         in
         redirect_url ^ String.concat "" person_params
     in
-    Wserver.http_redirect_temporarily final_url
+    Server.http_redirect_temporarily final_url
   with _ ->
     let error_url = Printf.sprintf "%sm=CHK_DATA" (Util.commd conf :> string) in
-    Wserver.http_redirect_temporarily error_url
+    Server.http_redirect_temporarily error_url
 
 let render_error_entry_fast conf base dict_param istr s error_type ~book_title
     ~list_title ~fix_title =
