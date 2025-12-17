@@ -33,17 +33,16 @@
   %if;(b.max_anc_level = "")%apply;min(e.v, max_anc_level, 7)
   %else;%apply;min(e.v, max_anc_level, b.max_anc_level)%end;
 %in;
-<h3 class="mt-2 ml-3">%nn;
-  %if;(e.t = "F")
+<h3 class="mt-2 ml-2">%nn;
+  %if;(e.t="F")
     %apply;a_of_b%with;[*surnames branch]%and;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") <em>%qualifier;</em>%end;
-      %sp;%surname;
-      %if;(alias != "") <em>(%alias;)</em>%end;<br>    %end;
-  %elseif;(e.t = "E")
+      %if;(public_name!="")%public_name;%else;%first_name;%end;
+      %if;(qualifier!="") <em>%qualifier;</em>%end;
+      %sp;%surname;%if;(alias!="") <em>(%alias;)</em>%end;%end;%sp;
+  %elseif;(e.t="E")
     %apply;a_of_b%with;[*list eclair]%and;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %if;(public_name!="")%public_name;%else;%first_name;%end;
+      %if;(qualifier!="") <em>%qualifier;</em>%end;
       %sp;%surname;
     %end;
   %else;
@@ -267,14 +266,12 @@
     %end;
     %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
     %if;(count > 100)
-      <p>
-        <span class="ml-3">[*number of branches][:]</span>
-        %foreach;sorted_list_item;
-          %if;(prev_item.2 != item.2)
-            <a href="#a_%apply;hexa(item.2)">%item.2;</a>
-          %end;
+      <span class="ml-3">[*number of branches][:]</span>
+      %foreach;sorted_list_item;
+        %if;(prev_item.2 != item.2)
+          <a href="#a_%apply;hexa(item.2)">%item.2;</a>
         %end;
-      </p>
+      %end;
     %end;
     %if;(not cancel_links)
       <div class="ml-3 mb-3">
@@ -300,9 +297,7 @@
       %end;
       %foreach;sorted_list_item;
         %if;(prev_item.2 != item.2 and count > 100)
-          <li>%nn;
-          <a name="a_%apply;hexa(item.2)">%item.2;</a>
-          <table class="table table-sm w-auto asc-desc-table">
+          <div name="a_%apply;hexa(item.2)"><table class="table table-sm w-auto asc-desc-table">
             <thead><tr>
               <th>[*surname/surnames]0</th>
               <th>[*nb branches]</th>
@@ -347,8 +342,7 @@
           </td>
         </tr>
         %if;(item.2 != next_item.2 and count > 100)
-          </table>
-          </li>
+          </table></div>
         %end;
       %end;
       %if;(count <= 100)
