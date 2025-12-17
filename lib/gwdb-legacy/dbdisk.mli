@@ -112,6 +112,7 @@ type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
   | Epers_VenteBien
   | Epers_Will
   | Epers_Name of 'string
+  | Epers_Adoption
 
 type ('person, 'string) gen_pers_event = {
   (*('person, 'string) Def.gen_pers_event =*)
