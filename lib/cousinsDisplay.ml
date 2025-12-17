@@ -368,7 +368,7 @@ let print_anniv conf base p dead_people level =
       set S.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
-    Printf.sprintf {|<a href="%sm=RL&%s&b1=%d&%s&b2=%d%s">%s</a>|}
+    Printf.sprintf {|<a href="%sm=RL&%s&b1=%d&%s&b2=%d">%s</a>|}
       (commd conf :> string)
       (acces_n conf base (Adef.escaped "1") p :> string)
       up_sosa
@@ -376,9 +376,6 @@ let print_anniv conf base p dead_people level =
          (Option.fold ~none:c ~some:(pget conf base) spouse)
         :> string)
       (sosa_of_persons conf base down_br)
-      (if spouse = None then
-         "&" ^ (acces_n conf base (Adef.escaped "4") c :> string)
-       else "")
       (person_title_text conf base c :> string)
     |> Adef.safe
   in

@@ -25,7 +25,7 @@
           <i class="fas fa-bezier-curve fa-fw"></i>%if;(link_next!="")<i class="fas fa-arrow-right fa-fw"></i>%end;%nn;
         </a>
       %end;
-    %else;
+    %elseif;(e.m!="RL")
       %if;(e.em="R" or ((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!="")))
         <a class="disabled %if;(e.et="S") border rounded%end;"
           href="%prefix;&em=R&et=S%nn;
