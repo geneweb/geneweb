@@ -62,6 +62,7 @@ let string_of_epers_name base epers_name =
   | Def.Epers_VenteBien -> "sell"
   | Def.Epers_Will -> "will"
   | Def.Epers_Name n -> Gwdb.sou base n
+  | Def.Epers_Adoption -> "adoption"
 
 let string_of_efam_name base efam_name =
   match efam_name with
