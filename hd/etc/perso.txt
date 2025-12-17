@@ -22,7 +22,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<a href="#content" class="sr-only sr-only-focusable">[*skip to main content]</a>
+<a href="#content" class="sr-only sr-only-focusable ml-4">[*skip to main content]</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
 %include;perso_utils
 %include;menubar
