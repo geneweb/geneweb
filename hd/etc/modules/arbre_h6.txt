@@ -1,4 +1,4 @@
-  <!-- $Id: modules/arbre_h7.txt v7.1 14/11/2023 20:45:45 $ -->
+  <!-- $Id: modules/arbre_h61.txt v7.1 14/11/2023 20:45:45 $ -->
   <link rel="stylesheet" href="%etc_prefix;modules/arbre_h6%if;(b.css!="")%b.css;%end;.css">
   %let;l_fs;%if;(e.fs!="")%e.fs;%else;9%end;%in;
   %let;l_wi;%if;(e.wi!="")%e.wi;%else;980%end;%in;
@@ -42,7 +42,7 @@
       <a href="%if;(e.image!="")%url_set.image;%else;%url_set.image.0;%end;"
         class="btn btn-outline-primary btn-sm border-0 px-1"
         title="%if;(e.image=0)[*visualize/show/hide/summary]1%else;%nn;
-           [*visualize/show/hide/summary]2%end; [image/images]0">
+           [*visualize/show/hide/summary]2%end; [image/images]0">%nn;
         <i class="fa fa-image fa-fw"></i>
         <i class="fa fa-toggle-%if;(e.image=0)off%else;on%end;"></i>
       </a>%nn;
@@ -95,7 +95,7 @@
 
 <div id="htree">
   %foreach;ancestor_level(6)
-    <div id="l%expr(level+1)">
+    <div id="l%expr(level+1)">%nn;
       %if;(e.image!=0 and level>0 and level<4)
         %foreach;ancestor;
           %if;ancestor.has_image;
@@ -116,28 +116,24 @@
       %else;
         %foreach;ancestor;
           <a id="p%ancestor.anc_sosa.v;"%sp;
-          %if;(e.nav=1)href="%if;(e.i="")%apply;url_set%with;p/n/oc%and;%ancestor.first_name;/%ancestor.surname;/%if;(ancestor.occ!=0)%ancestor.occ;%end;%end;%nn;
-             %else;%apply;url_set("i", ancestor.index)%end;"
-          %else;href="%prefix;%ancestor.access;"
-          %end;
-          %if;(ancestor.same!="")
-            onmouseover="over1('p%ancestor.same.v;')"
-            onmouseout="out1('p%ancestor.same.v;')"
-            >= %if;(l_sosa_ref=1)%ancestor.sosa;%else;%ancestor.same;%end; =</a>
-          %else;
-            >
-            %if;(l_sosa_ref=1)
-              &middot; %ancestor.sosa; &middot;<br>
-            %elseif;(e.sosa=1)
-              &middot; %ancestor.anc_sosa;
-              %if;(browsing_with_sosa_ref and ancestor.has_sosa) ~ %ancestor.sosa;%end;
-               &middot;<br>
+            %if;(e.nav=1)href="%if;(e.i="")%apply;url_set%with;p/n/oc%and;%ancestor.first_name;/%ancestor.surname;/%if;(ancestor.occ!=0)%ancestor.occ;%end;%end;%nn;
+               %else;%apply;url_set("i", ancestor.index)%end;"
+            %else;href="%prefix;%ancestor.access;"
             %end;
-            %ancestor;<br>
-            %ancestor.dates;
-            %if;(e.bp=1 and ancestor.has_birth_place)
-              <br>%ancestor.birth_place;
-            %end;
+            %if;(ancestor.same!="") onmouseover="over1('p%ancestor.same.v;')"
+            onmouseout="out1('p%ancestor.same.v;')">= %if;(l_sosa_ref=1)%ancestor.sosa;%else;%ancestor.same;%end; =</a>%nn;
+            %else;>%nn;
+              %if;(l_sosa_ref=1)
+              &middot; %ancestor.sosa; &middot;
+              %elseif;(e.sosa=1)
+                &middot; %ancestor.anc_sosa;%nn;
+                %if;(browsing_with_sosa_ref and ancestor.has_sosa) ~ %ancestor.sosa;%end;
+                 &middot;
+              %end;
+              %ancestor;<br>%ancestor.dates;
+              %if;(e.bp=1 and ancestor.has_birth_place)
+                <br>%ancestor.birth_place;
+              %end;
             </a>
           %end;
           %if;(level<6)<div id="ps%ancestor.anc_sosa.v;"></div>%end;

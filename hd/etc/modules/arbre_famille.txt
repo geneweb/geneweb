@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_famille.txt v7.1 13/08/2023 23:29:59 $ -->
+<!-- $Id: modules/arbre_famille.txt v7.1 17/12/2025 16:47:28 $ -->
 %define;short_display_person_image(xxx,yyy,zzz)
   %let;personinfo;%if;("xxx"="child")%sp;(%childrank;)%nn;
                   %elseif;("xxx"="child.spouse")
@@ -47,14 +47,13 @@
   %end;">
     %if;(not (cancel_links or xxx.is_restricted))
       <a href="%prefix;%xxx.access;&m=F%if;(e.sp=0)&sp=0%end;%if;(e.half=0)&half=0%end;%if;(e.im=0)&im=0%end;"
-        class="big_anchor list-group-item-action" title="[*navigation] %xxx;%personinfo;">
-      </a>
+        class="big_anchor list-group-item-action" title="[*navigation] %xxx;%personinfo;"></a>
     %end;
     <div class="d-flex align-items-center">
     %if;(e.im!=0 and ("yyy"="yes" or "yyy"="force"))
       %if;xxx.has_image;
         %if;not cancel_links;
-          <a href="%xxx.image_url;" class="normal_anchor" %nn;
+          <a href="%xxx.image_url;" class="normal_anchor"
             target="_blank" title="[*image/images]0 %xxx;%personinfo;">%nn;
         %end;
           <img class="image-arbre-famille %if;not cancel_links;fade_image%end; rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0">%nn;
@@ -62,7 +61,7 @@
       %elseif;(b.default_image="yes")
         %if;(wizard and not cancel_links)
           <a href="%prefix;m=SND_IMAGE;i=%xxx.index;"
-            class="normal_anchor" target="_blank" %nn;
+            class="normal_anchor" target="_blank"
             title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;%personinfo;">%nn;
         %end;
         <img class="image-arbre-famille rounded ml-0"
@@ -78,28 +77,27 @@
     %(%if;(xxx.has_sosa)%apply;display_sosa("xxx")%end;
       %apply;image_MF("xxx")%)
       %if;(not (cancel_links or xxx.is_restricted))
-      <a class="normal_anchor" %nn;
-        href="%prefix;%xxx.access;"
+      <a class="normal_anchor" href="%prefix;%xxx.access;"
         title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx.first_name; %xxx.surname;%end;%end;%personinfo;">%nn;
       %end;
-      <span class="name-container
+      <span class="name-container%nn;
         %if;("xxx"="father" or "xxx"="mother" or
           "xxx"="father.father" or "xxx"="father.mother" or
-          "xxx"="mother.father" or "xxx"="mother.mother")text-truncate-narrow%end;">
-         %xxx.first_name; %xxx.surname;
-      </span>
-      %if;(not (cancel_links or xxx.is_restricted))
-      </a>
+          "xxx"="mother.father" or "xxx"="mother.mother")text-truncate-narrow%end;">%nn;
+        %xxx.first_name; %xxx.surname;%nn;
+      </span>%nn;
+      %if;(not (cancel_links or xxx.is_restricted))%nn;
+        </a>
       %end;
       %if;(wizard and not cancel_links)
-        <a class="normal_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;" %nn;
+        <a class="normal_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;"
           title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;%personinfo;">%nn;
       %end;
       <span class="text-muted">%nn;
-        %if;(xxx.dates!="")%xxx.dates;%nn;
-        %elseif;(wizard and not cancel_links)-%nn;
+        %if;(xxx.dates!="")%xxx.dates;
+        %elseif;(wizard and not cancel_links)-
         %elseif;(cancel_links)<br>
-        %end;%nn;
+        %end;
       </span>%nn;
       %if;(wizard and not cancel_links)</a>%end;
     </span>
@@ -243,8 +241,7 @@
       <a href="%if;(e.half!=0)%url_set.half.0;%else;%url_set.half;%end;"
         class="btn btn-outline-%if;(e.half=0)primary%else;danger%end;"
         title="%if;(e.half!=0)[*visualize/show/hide/summary]2%else;%nn;
-           [*visualize/show/hide/summary]1%end; [half-brothers/half-sisters/half-siblings]2">
-        ½%nn;
+           [*visualize/show/hide/summary]1%end; [half-brothers/half-sisters/half-siblings]2">½%nn;
       </a>
       <a href="%if;(e.sp!=0)%url_set.sp.0;%else;%url_set.sp;%end;"
         class="btn btn-outline-%if;(e.sp=0)primary%else;danger%end;"
