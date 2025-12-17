@@ -80,7 +80,7 @@
     <p>
       %foreach;descendant_level;
         %if;(level = l_v)
-          [*total] : %number_of_descendants; [[person/persons]1@(c)]
+          [*total] : %number_of_descendants; [person/persons]n
         %end;
       %end;
     </p>

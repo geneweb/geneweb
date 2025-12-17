@@ -342,7 +342,7 @@
       %incr_count;
     %end;
   %end;
-  <tr><td colspan="10">[*total] : %count; [[person/persons]1@(c)]%sp;
+  <tr><td colspan="10">[*total] : %count; [person/persons]n%sp;
     %if;(not cancel_links)
       <div class="menu">
         <span>

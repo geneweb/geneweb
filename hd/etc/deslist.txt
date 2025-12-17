@@ -476,7 +476,7 @@
     %reset_count;
     %apply;descendants_by_list("self", "self", 0, xx, 0, 1)%nl;
     <p>
-    [*total][:] %expr(count-1) [[person/persons]1@(c)]%sp;
+    [*total][:] %expr(count-1) [person/persons]n%sp;
     ([spouses not included]).
     %if;((evar.notes="on" or evar.src="on") and evar.inline != "on")
       <p><hr></p>

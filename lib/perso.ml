@@ -4449,7 +4449,7 @@ let eval_transl conf base env upp s c =
             (* select nth value *)
             (* replaced by %apply;nth([...],sex) or "s" below *)
             match get_env "count" env with
-            | Vcnt i -> !i
+            | Vcnt i -> if !i > 1 then 1 else 0
             | _ -> 0)
         | "s" -> (
             (* male/female/neuter *)
@@ -4463,18 +4463,18 @@ let eval_transl conf base env upp s c =
             (* witness/witnesses *)
             match get_env "fam" env with
             | Vfam (_, fam, _, _) ->
-                if Array.length (Driver.get_witnesses fam) <= 1 then 0 else 1
+                if Array.length (Driver.get_witnesses fam) > 1 then 1 else 0
             | _ -> 0)
         | "f" -> (
             (* family/families *)
             match get_env "p" env with
-            | Vind p -> if Array.length (Driver.get_family p) <= 1 then 0 else 1
+            | Vind p -> if Array.length (Driver.get_family p) > 1 then 1 else 0
             | _ -> Fmt.failwith "Families of unknown person")
         | "c" -> (
             (* child/children *)
             match get_env "fam" env with
             | Vfam (_, fam, _, _) ->
-                if Array.length (Driver.get_children fam) <= 1 then 0 else 1
+                if Array.length (Driver.get_children fam) > 1 then 1 else 0
             | _ -> (
                 match get_env "p" env with
                 | Vind p ->
@@ -4486,7 +4486,7 @@ let eval_transl conf base env upp s c =
                               (Driver.get_children (Driver.foi base ifam)))
                         0 (Driver.get_family p)
                     in
-                    if n <= 1 then 0 else 1
+                    if n > 0 then 1 else 0
                 | _ -> Fmt.failwith "Children of unknown person"))
         | "e" -> (
             (* singular/plural for events *)
