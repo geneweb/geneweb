@@ -70,27 +70,24 @@
                   <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
                 %end;
                 <label class="sr-only" for="fullname">Search person name</label>
-                <input type="search" id="fullname" class="form-control form-control-lg no-clear-button mb-2"
+                <input type="search" id="fullname" class="form-control form-control-lg no-clear-button"
                   name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end; [or] [key]0"
-                  autofocus tabindex="4">
-                <label class="sr-only" for="n">Search public name</label>
-                <input type="search" id="n" class="form-control form-control-lg no-clear-button"
-                  name="n" placeholder="[*surname/surnames]0" tabindex="5">
+                  autofocus>
                 <label class="sr-only" for="p">Search firstname</label>
                 <input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2"
-                  name="p" placeholder="[*first name/first names]0" tabindex="6">
-                <div class="d-flex align-items-center ml-2 flex-nowrap">
-                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*all-hlp]">
-                    <input class="form-check-input" type="checkbox" name="p_all" id="p_all" value="on">
-                    <label class="form-check-label" for="p_all">[*all]</label>
+                  name="p" placeholder="[*first name/first names]2">
+                <label class="sr-only" for="n">Search surname</label>
+                <input type="search" id="n" class="form-control form-control-lg no-clear-button mt-2"
+                  name="n" placeholder="[*surname/surnames]0">
+                <div class="d-flex mt-2">
+                  <div class="ml-2">[*first name/first names]1</div>
+                  <div class="custom-control custom-checkbox ml-2 mr-3 mr-md-0 mb-md-1" data-toggle="tooltip" data-placement="bottom" title="[*order hlp]">
+                    <input class="custom-control-input" type="checkbox" name="p_order" id="p_order" value="on">
+                    <label class="custom-control-label d-flex align-items-center" for="p_order">[order]</label>
                   </div>
-                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*order-hlp]">
-                    <input class="form-check-input" type="checkbox" name="p_order" id="p_order" value="on">
-                    <label class="form-check-label" for="p_order">[*order]</label>
-                  </div>
-                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*exact-hlp]">
-                    <input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="on">
-                    <label class="form-check-label" for="p_exact">[*exact]</label>
+                  <div class="custom-control custom-checkbox ml-2" data-toggle="tooltip" data-placement="bottom" title="[*not exact]1, [phonetic variants] [not exact hlp]">
+                    <input class="custom-control-input" type="checkbox" name="p_exact" id="p_exact" value="off">
+                    <label class="custom-control-label d-flex align-items-center" for="p_exact">[not exact]0</label>
                   </div>
                 </div>
               </div>
