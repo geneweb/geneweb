@@ -47,7 +47,8 @@ let put_events_in_notes base p =
           | Def.Epers_Ordination | Def.Epers_Property | Def.Epers_Recensement
           | Def.Epers_Residence | Def.Epers_Retired | Def.Epers_ScellentChildLDS
           | Def.Epers_ScellentParentLDS | Def.Epers_ScellentSpouseLDS
-          | Def.Epers_VenteBien | Def.Epers_Will | Def.Epers_Name _ ->
+          | Def.Epers_VenteBien | Def.Epers_Will | Def.Epers_Adoption
+          | Def.Epers_Name _ ->
               true)
     in
     loop (Gwdb.get_pevents p)
@@ -651,6 +652,7 @@ let print_pevent opts base gen e =
   | Def.Epers_ScellentSpouseLDS -> Printf.ksprintf (oc opts) "#slgs"
   | Def.Epers_VenteBien -> Printf.ksprintf (oc opts) "#vteb"
   | Def.Epers_Will -> Printf.ksprintf (oc opts) "#will"
+  | Def.Epers_Adoption -> Printf.ksprintf (oc opts) "#adop"
   | Def.Epers_Name s -> Printf.ksprintf (oc opts) "#%s" (correct_string base s));
   let epers_date = Date.od_of_cdate (Gwdb.get_pevent_date e) in
   (match epers_date with
@@ -1017,7 +1019,8 @@ let print_notes_for_person opts base gen p =
                    | Epers_Property | Epers_Recensement | Epers_Residence
                    | Epers_Retired | Epers_ScellentChildLDS
                    | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS
-                   | Epers_VenteBien | Epers_Will | Epers_Name _ ->
+                   | Epers_VenteBien | Epers_Will | Epers_Adoption
+                   | Epers_Name _ ->
                        ""
                  in
                  let notes =
@@ -1046,7 +1049,7 @@ let print_notes_for_person opts base gen p =
              | Epers_Property | Epers_Recensement | Epers_Residence
              | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentParentLDS
              | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will
-             | Epers_Name _ ->
+             | Epers_Adoption | Epers_Name _ ->
                  print_pevent opts base gen evt;
                  loop events)
        in

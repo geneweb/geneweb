@@ -408,6 +408,8 @@ let string_of_epers_name conf epers_name =
   | Epers_Name n ->
       Adef.safe
       @@ Utf8.capitalize_fst (escape_html n : Adef.safe_string :> string)
+  | Epers_Adoption ->
+      Adef.safe @@ Utf8.capitalize_fst (Util.transl conf "adoption")
 
 let string_of_efam_name conf efam_name =
   match efam_name with

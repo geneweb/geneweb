@@ -576,6 +576,7 @@ let ged_tag_pevent base evt_name =
   | Def.Epers_VenteBien -> "Property sale"
   | Def.Epers_Will -> "WILL"
   | Def.Epers_Name n -> Gwdb.sou base n
+  | Def.Epers_Adoption -> "ADOP"
 
 let is_primary_pevents = function
   | Def.Epers_Birth | Def.Epers_Baptism | Def.Epers_Death | Def.Epers_Burial
@@ -596,7 +597,8 @@ let is_primary_pevents = function
   | Def.Epers_Hospitalisation | Def.Epers_Illness | Def.Epers_ListePassenger
   | Def.Epers_MilitaryDistinction | Def.Epers_MilitaryPromotion
   | Def.Epers_MilitaryService | Def.Epers_MobilisationMilitaire
-  | Def.Epers_ScellentParentLDS | Def.Epers_VenteBien | Def.Epers_Name _ ->
+  | Def.Epers_ScellentParentLDS | Def.Epers_VenteBien | Def.Epers_Name _
+  | Def.Epers_Adoption ->
       false
 
 let relation_format_of_witness_kind :

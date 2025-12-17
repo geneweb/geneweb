@@ -964,6 +964,7 @@ let string_of_pevent_name_without_base conf = function
   | Def.Epers_ScellentSpouseLDS -> Adef.safe @@ transl conf "scellentSpouseLDS"
   | Def.Epers_VenteBien -> Adef.safe @@ transl conf "venteBien"
   | Def.Epers_Will -> Adef.safe @@ transl conf "will"
+  | Def.Epers_Adoption -> Adef.safe @@ transl conf "adoption"
   | _ -> failwith "bad argument in Util.string_of_pevent_without_base"
 
 let string_of_fevent_name_without_base conf = function

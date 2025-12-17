@@ -163,7 +163,8 @@ let map_pers_event ?(fd = Fun.id) fp fs e =
       | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
       | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
       | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentParentLDS
-      | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will ) as evt ->
+      | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will | Epers_Adoption
+        ) as evt ->
         evt
     | Epers_Name s -> Epers_Name (fs s)
   in
