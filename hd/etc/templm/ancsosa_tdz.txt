@@ -216,7 +216,7 @@
       %end;
     %end;
   %end;
-  <tr><td colspan="9">[*total] : %count; [[person/persons]1@(c)]</td></tr>
+  <tr><td colspan="9">[*total] : %count; [person/persons]n</td></tr>
 %end;
 
 %( main %)

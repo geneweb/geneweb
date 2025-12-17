@@ -1318,7 +1318,7 @@
   %end;
   <tfoot>
     <tr>
-      <td colspan="7" align="center">[*total][:] %count;/%expr(2^(l_v+1)-2^v0) [[ancestor/ancestors]1@(c)].</td>
+      <td colspan="7" align="center">[*total][:] %count;/%expr(2^(l_v+1)-2^v0) [ancestor/ancestors]n.</td>
     </tr>
   </tfoot>
 %end;
@@ -1418,7 +1418,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       </ul>
     %end;
   %end;
-  <p>[*total][:] %count; [[person/persons]0@(c)]</p>
+  <p>[*total][:] %count; [person/persons]n</p>
 
 %elseif;(e.t = "N")
   %( short display %)
@@ -1458,7 +1458,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         </ul>
       %end;
     %end;
-  <p>[*total][:] 1+%count; [[ancestor/ancestors]1@(c)]</p>
+  <p>[*total][:] 1+%count; [ancestor/ancestors]n</p>
   %elseif;(e.t = "M" and e.evt = "on")
     %include;miss_evt
 
@@ -1601,7 +1601,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       </li>
     %end;
   </ul>
-  <p style="clear:both;">[*total][:] %count; [[person/persons]]1@(c)].</p>
+  <p style="clear:both;">[*total][:] %count; [person/persons]n</p>
 
 %elseif;(e.t = "M")
   %( missing ancestors by generation %)
@@ -1708,7 +1708,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %end;
     %end;
   </table>
-  <p>[*total][:] %count; [[person/persons]1@(c)]</p>
+  <p>[*total][:] %count; [person/persons]n</p>
 
 %elseif;(e.t = "G" and e.only= "on")
   %( long display; only the selected generation %)
@@ -1843,29 +1843,31 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         %foreach;ancestor_level(l_v)
           %if;((v0=1 and level=0) or level>=v0)
             %if;(only=0 and e.gen=1 and level!=0)
-            <tr class="no-hover-highlight">
-              <th class="text-left border-0 gen-row" scope="row" colspan="%nb_col;">
-                <span class="ml-1">[*generation/generations]0 %level;</span>
-              </th>
-            </tr>
-          %end;
-          %foreach;ancestor;
-              %if;(only=0 or level=l_v)
-              <tr%if;(ancestor.anc_sosa.v %2=0 and level>1) class="even-row"%end;>
-                %apply;table_row()
+              <tr class="no-hover-highlight">
+                <th class="text-left border-0 gen-row" scope="row" colspan="%nb_col;">
+                  <span class="ml-1">[*generation/generations]0 %level;</span>
+                </th>
               </tr>
-              %if;(ancestor.nb_families > 1)
-                %apply;table_family()
+            %end;
+            %foreach;ancestor;
+                %if;(only=0 or level=l_v)
+                <tr%if;(ancestor.anc_sosa.v %2=0 and level>1) class="even-row"%end;>
+                  %apply;table_row()
+                </tr>
+                %if;(ancestor.nb_families > 1)
+                  %apply;table_family()
+                %end;
               %end;
             %end;
-        %end;
           %end;
         %end;
       </tbody>
     </table>
-    <div class="mt-1">
-      [*total][:] 1+%count;/%expr((2^(l_v+1)-2^v0)) [[person/persons]1@(c)].
-    </div>
+    %if;(l_v>1)
+      <div class="mt-1">
+        [*total][:] 1+%count;/%expr((2^(l_v+1)-2^v0)) [person/persons]n.
+      </div>
+    %end;
   %else;
     <div class="mt-2">
       %( CSV header %)
