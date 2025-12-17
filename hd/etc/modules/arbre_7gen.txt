@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_7gen.txt v7.0 27/06/2018 18:47:46 $ -->
+<!-- $Id: modules/arbre_7gen.txt v7.1 17/12/2025 16:04:35 $ -->
 %define;descendants(curlev, maxlev, f_cnt)
   <ul>
   %if;(has_families)

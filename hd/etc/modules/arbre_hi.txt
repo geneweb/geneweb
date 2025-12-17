@@ -1,4 +1,4 @@
-  <!-- $Id: modules/arbre_hi.txt v7.1 04/03/2023 09:51:04 $-->
+  <!-- $Id: modules/arbre_hi.txt v7.1 17/12/2025 16:04:27 $-->
 %let;evarv;%if;(e.v!="")%e.v;%else;7%end;%in;
 %let;evart;%if;(e.t!="")%e.t;%else;T%end;%in;
 %let;evart1;%if;(e.t1!="")%e.t1;%else;CT%end;%in;
@@ -45,7 +45,7 @@
   <span style="top:%ttt;px;left:%lll;px;font-family:monospace;">x</span>
   <script>
     $(window).on("load", function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
+      $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, z-index:1});
     });
   </script>
 %end;
@@ -59,7 +59,7 @@
 %define;line(x0,y0,x1,y1)
   <script>
     $(window).on("load", function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
+      $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, z-index:-1});
     });
   </script>
 %end;
@@ -105,47 +105,38 @@
     %end;
     width:%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;px;%nn;
     height:%if;(boxsize=2)%expr(hb1*2)%else;%hb1;%end;px;%nn;
-    background-color:%if;(bg_col="")#FFFFFF%else;#bgg;%end;;zindex:2">
+    background-color:%if;(bg_col="")#FFFFFF%else;#bgg;%end;;z-index:2">
     %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
     %if;(e.cgl!="on")
       %if;(evarcpl!="on")
         <a class="big_anchor_1 list-group-item-action"
-          href='%prefix;%aaaaccess;'
-          title="%aaafirst_name; %aaasurname; (%aaaocc;)">
+          href="%prefix;%aaaaccess;" title="%aaafirst_name; %aaasurname; (%aaaocc;)">
           %if;(aaahas_image)
             <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
           %end;
         </a>
         <a class="big_anchor_1m list-group-item-action"
-          href="%prefix;m=MOD_IND&i=%aaaindex;"
-          title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
-        </a>
+          href="%prefix;m=MOD_IND&i=%aaaindex;" title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)"></a>
       %else;
         <a class="big_anchor_him list-group-item-action"
-          href='%prefix;%aaaaccess;'
-          title="%aaafirst_name; %aaasurname; (%aaaocc;)">
+          href="%prefix;%aaaaccess;" title="%aaafirst_name; %aaasurname; (%aaaocc;)">%nn;
           %if;(aaahas_image)
-            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
+            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">%nn;
           %end;
         </a>
         %if;(aaasame="")
         <a class="big_anchor_her list-group-item-action"
-          href='%prefix;%aaaspouse.access;'
-          title="%aaaspouse;">
+          href="%prefix;%aaaspouse.access;" title="%aaaspouse;">
           %if;(aaaspouse.has_image)
             <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0">
           %end;
         </a>
         %end;
         <a class="big_anchor_him_m list-group-item-action"
-          href="%prefix;m=MOD_IND&i=%aaaindex;"
-          title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
-        </a>
+          href="%prefix;m=MOD_IND&i=%aaaindex;" title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)"></a>
         %if;(aaasame="")
         <a class="big_anchor_her_m list-group-item-action"
-          href="%prefix;m=MOD_IND&i=%aaaspouse.index;"
-          title="Modifier %aaaspouse;">
-        </a>
+          href="%prefix;m=MOD_IND&i=%aaaspouse.index;" title="Modifier %aaaspouse;"></a>
         %end;
       %end;
     %else;
@@ -182,12 +173,11 @@
       %end;
     %end;
     %if;(e.cgl!="on")
-    <div>
-      <a style="width:100%%;zindex:2;"
+      <a style="width:100%%;z-index:2;"
         href="%prefix_base_password;%aaaaccess;&t=T&t1=CT&
           %foreach;env_binding;%if;(not (env.key="t" or env.key="t1" or env.key="p"
             or env.key="n" or env.key="oc"))%env.key=%env.val;&%end;%end;"
-        %if;(aaasame!="")%apply;implex1(aaasame.v)%end;%nn;
+        %if;(aaasame!="")%apply;implex1(aaasame.v)%end;
         title='[*generation/generations]0 %level; – Sosa %nn;
           %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
           %else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%nn;
@@ -203,14 +193,12 @@
             %if;(aaaspouse.birth_date.year!="" and aaaspouse.is_dead) – %end;%nn;
             %if;(aaaspouse.birth_date.year="" and aaaspouse.death_date.year!="")†%else;%aaaspouse.death_date.year;%end;&#010;%nn;
             %if;(not aaaspouse.has_parents) [*missing parents].%end;%nn;
-          %end;'>
+          %end;'>%nn;
         %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(boxsize=2)%fs;%else;%expr(fs-5)%end;%in;
         %let;tm;%if;(boxsize=2)8%else;2%end;%in;
-        <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">
-          %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
-        </span>
+        <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">%nn;
+          %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;</span>
       </a>
-    </div>
     %end;
   </div>
 %end;
@@ -283,7 +271,7 @@
           %if;(aaaspouse.birth_date.year!="" and aaaspouse.is_dead) – %end;%nn;
           %if;(aaaspouse.birth_date.year="" and aaaspouse.death_date.year!="")†%else;%aaaspouse.death_date.year;%end;&#010;%nn;
           %if;(not aaaspouse.has_parents) [*missing parents].%end;%nn;
-        %end;'>
+        %end;'>%nn;
     %if;(xxx=1)┼
     %elseif;((xxx>1 and xxx<4) or (xxx>7 and xxx<16) or (xxx>31 and xxx<64) or
              (xxx>127 and xxx<256) or (xxx>511 and xxx<1024) or (xxx>2047 and xxx<4096))
@@ -543,7 +531,7 @@
  [*aa:::bb:tt]
 %end;
 
-<h2 class="display-5 ml-3">%apply;my_title("ancestors tree of", evarhi, first_name) %surname; %dates (%evarv; [generation/generations]1)</h2>
+<h2 class="display-5 ml-5 mt-2">%apply;my_title("ancestors tree of", evarhi, first_name) %surname; %dates (%evarv; [generation/generations]1)</h2>
 %let;boxsize;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))2%else;1%end;%in;
 %if;((evarcpl="on" and evarv < 4) or (evarcpl!="on" and evarv < 3))
   [*compact tree][:] [specify::generation/generations]0 > 3.

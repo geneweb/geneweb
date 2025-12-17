@@ -57,7 +57,7 @@
 </div>
 %if;(not (e.t="T" and e.t1="CT"))
 %include;js
-%query_time;
 %end;
+%query_time;
 </body>
 </html>
