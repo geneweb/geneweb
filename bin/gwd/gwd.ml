@@ -30,7 +30,7 @@ let client_accepts_gzip request =
     in
     not (List.exists dominated_by_zero (String.split_on_char ',' accept))
 
-let make_gzip_output_conf request =
+let make_gzip_output_conf ~level request =
   if not (client_accepts_gzip request) then None
   else
     let body_buf = Buffer.create 65536 in
@@ -66,7 +66,7 @@ let make_gzip_output_conf request =
               let final_body, is_gzipped =
                 if !is_compressible && body_len > gzip_min_size then
                   try
-                    let compressed = My_gzip.gzip_string ~level:6 body in
+                    let compressed = My_gzip.gzip_string ~level body in
                     if String.length compressed < body_len then
                       (compressed, true)
                     else (body, false)
@@ -1637,9 +1637,18 @@ let conf_and_connection =
     let conf, passwd_err =
       make_conf ~secret_salt from request script_name env
     in
-    (match make_gzip_output_conf request with
-    | Some gzip_oc -> conf.output_conf <- gzip_oc
-    | None -> ());
+    let gzip_level =
+      match List.assoc_opt "gzip_html_compression" conf.base_env with
+      | Some s -> (
+          match int_of_string_opt s with
+          | Some n when n >= 1 && n <= 9 -> n
+          | _ -> 0)
+      | None -> 6
+    in
+    (if gzip_level > 0 then
+       match make_gzip_output_conf ~level:gzip_level request with
+       | Some gzip_oc -> conf.output_conf <- gzip_oc
+       | None -> ());
     match !redirected_addr with
     | Some addr -> print_redirected conf from request addr
     | None -> (
