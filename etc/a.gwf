@@ -320,6 +320,13 @@ cache_cousins_ttl=1
 # Indicate that the database has been moved to “new.adress” website.
 #moved=https://new.address:2317/…
 
+# Gzip compression for HTML responses
+# Controls gzip compression level for dynamically generated HTML and JSON.
+# - 0: disabled (no compression, enables progressive HTML rendering)
+# - 1-9: compression level (1=fastest, 9=smallest, 6=default balance)
+# Static assets (JS/CSS) use pre-compressed .gz files when available.
+#gzip_html_compression=6
+
 # Templates.
 #
 # Some pages, not all, have templates, including:
