@@ -36,10 +36,6 @@ let speclist opts =
         less than "
        ^ string_of_int !GwuLib.sep_limit
        ^ ". The present option changes this limit." )
-  :: ( "-all_files",
-       Arg.Set GwuLib.all_files,
-       " save all content of notes_d in the .gw file, including files without \
-        Wiki links. Default is no." )
   :: Gwexport.speclist opts
   |> List.sort compare |> Arg.align
 

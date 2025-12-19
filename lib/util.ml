@@ -288,6 +288,9 @@ let start_with s i p =
   i + String.length p <= String.length s
   && String.lowercase_ascii (String.sub s i (String.length p)) = p
 
+let starts_with s p =
+  String.length p <= String.length s && String.sub s 0 (String.length p) = p
+
 let start_with_vowel conf s =
   if String.length s > 0 then
     let s, _ = Name.unaccent_utf_8 true s 0 in

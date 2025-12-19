@@ -151,6 +151,12 @@ val is_old_person :
   bool
 
 val start_with : string -> int -> string -> bool
+(** [start_with s i p] check substring p within string s starting at i. performs
+    a locercase_ascii before testing *)
+
+val starts_with : string -> string -> bool
+(** [starts_with s p] check substring p at start of string s. *)
+
 val start_with_vowel : config -> string -> bool
 val access_status : Geneweb_db.Driver.person -> string
 

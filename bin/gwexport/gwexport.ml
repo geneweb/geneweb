@@ -13,6 +13,7 @@ type gwexport_opts = {
   desc : int option;
   img_base_path : string;
   keys : string list;
+  aws : bool;
   mem : bool;
   no_notes : [ `none | `nn | `nnn ];
   no_picture : bool;
@@ -33,6 +34,7 @@ let default_opts =
     desc = None;
     img_base_path = "";
     keys = [];
+    aws = false;
     mem = false;
     no_notes = `none;
     no_picture = false;
@@ -53,11 +55,15 @@ let speclist c =
       "<N> maximum generation of the root's ascendants" );
     ( "-ad",
       Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
-      "<N> maximum generation of the root's ascendants descendants" );
+      "<N> maximum generation of the root's ascendants descendants \
+       (deprecated, use -a with -d)" );
     ( "-key",
       Arg.String (fun s -> c := { !c with keys = s :: !c.keys }),
       "<KEY> key reference of root person. Used for -a/-d options. Can be used \
-       multiple times. Key format is \"First Name.occ SURNAME\"" );
+       multiple times. Key format is \"First_Name.occ SURNAME\"" );
+    ( "-aws",
+      Arg.Unit (fun () -> c := { !c with aws = true }),
+      " save siblings of exported persons." );
     ( "-c",
       Arg.Int (fun s -> c := { !c with censor = s }),
       "<NUM> when a person is born less than <num> years ago, it is not \
@@ -109,7 +115,7 @@ let speclist c =
     ( "-picture-path",
       Arg.Unit (fun () -> c := { !c with picture_path = true }),
       " extract pictures path." );
-    ( "-s",
+    ( "-sn",
       Arg.String (fun x -> c := { !c with surnames = x :: !c.surnames }),
       "<SN> select this surname (option usable several times, union of \
        surnames will be used)." );
@@ -123,21 +129,42 @@ let speclist c =
 module IPS = Geneweb_db.Driver.Iper.Set
 module IFS = Geneweb_db.Driver.Ifam.Set
 
-(* S: Does it mean private persons whose birth year is before 'max_year'
-   are uncensored? *)
+(** [is_censored_person base threshold p] détermine si une personne non Public
+    doit être censurée selon le seuil temporel pour des raisons de
+    confidentialité.
 
-(** [is_censored_person max_year person_name] Returns [true] iff the person has
-    a birth date that is after max_year and its visibility is not public *)
-let is_censored_person threshold p =
-  match Date.cdate_to_dmy_opt (Driver.get_birth p) with
-  | None -> false
-  | Some dmy -> dmy.Adef.year >= threshold && Driver.get_access p != Def.Public
+    Cette fonction utilise des heuristiques pour déterminer si une personne est
+    probablement vivante :
+    - Si née après le seuil : censurée
+    - Si pas de date de naissance mais décédée récemment : censurée
+    - Si vivante ou statut inconnu : censurée par précaution *)
+let is_censored_person base threshold p =
+  (* Vérifier la date de naissance *)
+  if Driver.get_access p = Def.Public then false
+  else
+    match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+    | Some dmy -> dmy.Adef.year > threshold
+    | None -> (
+        (* Si pas de date de naissance, vérifier la date de décès *)
+        match Driver.get_death p with
+        | Death (_, cd) -> (
+            match Date.cdate_to_dmy_opt cd with
+            | Some dmy ->
+                (* Heuristique : si décédé après (seuil - 80 ans), peut-être vivant *)
+                dmy.year > threshold - 80
+            | None -> true (* Pas de date de décès : supposer vivant *))
+        | NotDead -> true (* Vivant *)
+        | DontKnowIfDead | DeadDontKnowWhen ->
+            (* Incertain : appliquer la censure par précaution *)
+            true
+        | _ -> false)
 
 (** [is_censored_couple base max_year family] Returns [true] if either the
     father or the mother of a given family in the base is censored *)
 let is_censored_couple base threshold cpl =
-  (is_censored_person threshold @@ Driver.poi base (Driver.get_father cpl))
-  || (is_censored_person threshold @@ Driver.poi base (Driver.get_mother cpl))
+  (is_censored_person base threshold @@ Driver.poi base (Driver.get_father cpl))
+  || is_censored_person base threshold
+     @@ Driver.poi base (Driver.get_mother cpl)
 
 (* The following functions are utils set people as "censored" by marking them.
    Censoring a person consists in setting a mark defined as:
@@ -150,7 +177,7 @@ let is_censored_couple base threshold cpl =
 (** Marks a censored person *)
 let censor_person base pmark flag threshold p no_check =
   let ps = Driver.poi base p in
-  if no_check || is_censored_person threshold ps then
+  if no_check || is_censored_person base threshold ps then
     Collection.Marker.set pmark p (Collection.Marker.get pmark p lor flag)
 
 (** Marks all the members of a family that are censored. If a couple is
@@ -255,7 +282,7 @@ let select_asc conf base max_gen ips =
 (* S: only used by `select_surnames` in a List.iter *)
 (* Should it use search engine functions? *)
 
-(** [select_surname nase pmark fmark surname] Sets a `true` marker to families
+(** [select_surname base pmark fmark surname] Sets a `true` marker to families
     whose mother or father that match the given surname. Propagates the mark to
     children that have this surname. *)
 let select_surname base pmark fmark surname =
@@ -285,9 +312,9 @@ let select_surname base pmark fmark surname =
     (Driver.ifams base)
 
 (** [select_surnames base surnames] Calls `select_surname` on every family that
-    have the given surnames. Returns two functions: * the first takes a person
-    and returns `true` iff it has been selected * the second takes a family and
-    returns `false` iff it has been selected *)
+    have the given surnames. Returns two functions:
+    - the first takes a person and returns `true` iff it has been selected
+    - the second takes a family and returns `true` iff it has been selected *)
 let select_surnames base surnames :
     (Driver.iper -> bool) * (Driver.ifam -> bool) =
   let pmark = Driver.iper_marker (Driver.ipers base) false in
@@ -295,8 +322,6 @@ let select_surnames base surnames :
   List.iter (select_surname base pmark fmark) surnames;
   ( (fun i -> Collection.Marker.get pmark i),
     fun i -> Collection.Marker.get fmark i )
-
-(**/**)
 
 (** [select_parentship base ip1 ip2] Returns the set of common descendants of
     ip1 and the ancestors of ip2 and the set of their families. *)
@@ -316,16 +341,13 @@ let select_parentship base ip1 ip2 =
         asc IPS.empty
   in
   let ifams =
-    (* S: families  *)
     IPS.fold
       (fun iper acc ->
         Array.fold_left
           (fun acc ifam ->
             if
-              IFS.mem ifam acc (* S: useless test? *)
+              IFS.mem ifam acc
               || not (IPS.mem (Gutil.spouse iper @@ Driver.foi base ifam) ipers)
-              (* S: is the partner of the
-                 person not in ipers? *)
             then acc
             else IFS.add ifam acc)
           acc
@@ -334,109 +356,264 @@ let select_parentship base ip1 ip2 =
   in
   (ipers, ifams)
 
-(** [select_from_set ipers ifams] Returns two functions : * the first returns
-    true if its input is in ipers * the second returns true if its input is in
-    ifams *)
-let select_from_set (ipers : IPS.t) (ifams : IFS.t) =
+(** Types pour clarifier les différentes stratégies de sélection *)
+type selection_strategy =
+  | SelectAll  (** Sélectionner toutes les personnes *)
+  | SelectSurnames of string list  (** Filtrer par noms de famille *)
+  | SelectParentship of Driver.iper list  (** Chemins de parenté entre paires *)
+  | SelectAncestors of int  (** Ascendants avec profondeur *)
+  | SelectDescendants of int  (** Descendants avec profondeur *)
+  | SelectAncDesc of { asc : int; desc : int }  (** Ascendants ET descendants *)
+
+(** [determine_strategy opts ips] analyse les options et détermine la stratégie
+    de sélection à appliquer.
+
+    Note: L'option [ascdesc] est conservée pour compatibilité mais l'utilisation
+    de [asc] + [desc] est recommandée. *)
+let determine_strategy opts ips =
+  match (opts.ascdesc, opts.asc, opts.desc, opts.surnames, opts.parentship) with
+  (* ascdesc : syntaxe legacy, équivalent à asc + desc *)
+  | Some ascdesc, asc_opt, _, _, _ ->
+      let asc = Option.value ~default:max_int asc_opt in
+      SelectAncDesc { asc; desc = ascdesc }
+  (* asc + desc : syntaxe recommandée *)
+  | None, asc_opt, Some desc_val, _, _ ->
+      let asc = Option.value ~default:0 asc_opt in
+      let desc = -desc_val in
+      SelectAncDesc { asc; desc }
+  (* asc seul *)
+  | None, Some asc, None, _, _ -> SelectAncestors asc
+  (* Noms de famille *)
+  | None, None, None, surnames, _ when surnames <> [] -> SelectSurnames surnames
+  (* Parenté *)
+  | None, None, None, [], true -> SelectParentship ips
+  (* Aucun filtre *)
+  | None, None, None, _, _ -> SelectAll
+
+(** [build_person_and_family_sets base ht] construit les ensembles de personnes
+    et familles à partir d'une hashtable de personnes sélectionnées.
+
+    @return
+      Triple (sel_per, sel_fam, (ipers, ifams)) où:
+      - sel_per: prédicat de sélection des personnes
+      - sel_fam: prédicat de sélection des familles
+      - ipers: ensemble des indices de personnes sélectionnées
+      - ifams: ensemble des indices de familles sélectionnées *)
+let build_person_and_family_sets base ht =
+  let ipers = Hashtbl.fold (fun i _ ipers -> IPS.add i ipers) ht IPS.empty in
+  (* Sélectionner les familles où les deux conjoints sont dans ipers *)
+  let ifams =
+    IPS.fold
+      (fun iper acc ->
+        Array.fold_left
+          (fun acc ifam ->
+            if IFS.mem ifam acc then acc
+            else
+              let spouse = Gutil.spouse iper @@ Driver.foi base ifam in
+              if IPS.mem spouse ipers then IFS.add ifam acc else acc)
+          acc
+          (Driver.get_family (Driver.poi base iper)))
+      ipers IFS.empty
+  in
   let sel_per i = IPS.mem i ipers in
   let sel_fam i = IFS.mem i ifams in
-  (sel_per, sel_fam)
+  (sel_per, sel_fam, (ipers, ifams))
 
-(** [select opts ips] Return filters for [iper] and [ifam] to be used when
-    exporting a (portion of a) base. *)
-let select base opts ips =
-  let ips =
-    List.rev_append ips
-    @@ Mutil.filter_map (Gutil.person_of_string_key base) opts.keys
-  in
-  let not_censor_p, not_censor_f =
-    if opts.censor <> 0 then (
-      let pmark = Driver.iper_marker (Driver.ipers base) 0 in
-      let fmark = Driver.ifam_marker (Driver.ifams base) 0 in
-      (if opts.censor = -1 then restrict_base base pmark fmark 1
-       else
-         let tm = Unix.localtime (Unix.time ()) in
-         let threshold = 1900 + tm.Unix.tm_year - opts.censor in
-         censor_base base pmark fmark 1 threshold);
-      ( (fun i -> Collection.Marker.get pmark i = 0),
-        fun i -> Collection.Marker.get fmark i = 0 ))
-    else ((fun _ -> true), fun _ -> true)
-  in
-  let conf = Config.{ empty with wizard = true } in
-  let sel_per, sel_fam =
-    (* S: a lot of redundant tests are done here, would be simpler with
-       pattern matchings and factorization. *)
-    if opts.ascdesc <> None || opts.desc <> None then (
-      assert (opts.censor = 0);
-      let asc =
-        if opts.ascdesc <> None then Option.value ~default:max_int opts.asc
-        else Option.value ~default:0 opts.asc
+(** [apply_genealogical_selection base conf strategy ips] applique la stratégie
+    de sélection et retourne les prédicats de filtrage.
+
+    @return
+      Triple (sel_per, sel_fam, sets_opt) où sets_opt contient les ensembles
+      (ipers, ifams) pour les stratégies généalogiques, ou None pour les autres
+*)
+let apply_genealogical_selection base conf strategy ips =
+  match strategy with
+  | SelectAll -> ((fun _ -> true), (fun _ -> true), None)
+  | SelectSurnames surnames ->
+      let sel_per, sel_fam = select_surnames base surnames in
+      (sel_per, sel_fam, None)
+  | SelectParentship person_list ->
+      let rec loop ipers ifams = function
+        | [] ->
+            let sel_per i = IPS.mem i ipers in
+            let sel_fam i = IFS.mem i ifams in
+            (sel_per, sel_fam, Some (ipers, ifams))
+        | k2 :: k1 :: tl ->
+            let ipers', ifams' = select_parentship base k1 k2 in
+            let ipers = IPS.fold IPS.add ipers ipers' in
+            let ifams = IFS.fold IFS.add ifams ifams' in
+            loop ipers ifams tl
+        | [ _ ] ->
+            failwith "SelectParentship requires an even number of persons"
       in
-      let desc = -Option.value ~default:0 opts.desc in
-      let ht =
-        match opts.ascdesc with
-        | Some ascdesc ->
-            let ips = List.map (fun i -> (i, asc)) ips in
-            Util.select_mascdesc conf base ips ascdesc
-        | None ->
-            let ht = Hashtbl.create 0 in
-            IPS.iter
-              (fun i -> Hashtbl.add ht i (Driver.poi base i))
-              (select_asc conf base asc ips);
-            ht
+      loop IPS.empty IFS.empty person_list
+  | SelectAncestors asc ->
+      let ipers = select_asc conf base asc ips in
+      let per_sel i = IPS.mem i ipers in
+      (* Familles où les deux parents sont sélectionnés *)
+      let fam_sel i =
+        let f = Driver.foi base i in
+        per_sel (Driver.get_father f) && per_sel (Driver.get_mother f)
       in
-      let ht' =
-        let ips = List.map (fun i -> (i, 0)) ips in
-        Util.select_desc conf base desc ips
-      in
-      Hashtbl.iter (fun i p -> Hashtbl.replace ht i p) ht';
-      let ipers =
-        Hashtbl.fold (fun i _ ipers -> IPS.add i ipers) ht IPS.empty
-      in
+      (* Construire ifams pour la censure *)
       let ifams =
         IPS.fold
           (fun iper acc ->
             Array.fold_left
               (fun acc ifam ->
-                if
-                  IFS.mem ifam acc
-                  || not
-                       (IPS.mem
-                          (Gutil.spouse iper @@ Driver.foi base ifam)
-                          ipers)
-                then acc
-                else IFS.add ifam acc)
+                if fam_sel ifam && not (IFS.mem ifam acc) then IFS.add ifam acc
+                else acc)
               acc
               (Driver.get_family (Driver.poi base iper)))
           ipers IFS.empty
       in
-      let sel_per i = IPS.mem i ipers in
-      let sel_fam i = IFS.mem i ifams in
-      (sel_per, sel_fam))
-    else
-      match opts.asc with
-      (* opts.ascdesc = None && opts.desc = None *)
-      | Some asc ->
-          let ipers = select_asc conf base asc ips in
-          let per_sel i = IPS.mem i ipers in
-          let fam_sel i =
+      (per_sel, fam_sel, Some (ipers, ifams))
+  | SelectDescendants desc ->
+      let ht = Hashtbl.create 0 in
+      (* Ajouter seulement les personnes de départ *)
+      List.iter (fun i -> Hashtbl.add ht i (Driver.poi base i)) ips;
+      (* Ajouter les descendants *)
+      let ht_desc =
+        let ips_with_depth = List.map (fun i -> (i, 0)) ips in
+        Util.select_desc conf base desc ips_with_depth
+      in
+      Hashtbl.iter (fun i p -> Hashtbl.replace ht i p) ht_desc;
+      let sel_per, sel_fam, (ipers, ifams) =
+        build_person_and_family_sets base ht
+      in
+      (sel_per, sel_fam, Some (ipers, ifams))
+  | SelectAncDesc { asc; desc } ->
+      (* Construire l'ensemble des ascendants *)
+      let ht =
+        let ips_with_depth = List.map (fun i -> (i, asc)) ips in
+        Util.select_mascdesc conf base ips_with_depth desc
+      in
+      (* Ajouter les descendants *)
+      let ht_desc =
+        let ips_with_depth = List.map (fun i -> (i, 0)) ips in
+        Util.select_desc conf base (-desc) ips_with_depth
+      in
+      Hashtbl.iter (fun i p -> Hashtbl.replace ht i p) ht_desc;
+      let sel_per, sel_fam, (ipers, ifams) =
+        build_person_and_family_sets base ht
+      in
+      (sel_per, sel_fam, Some (ipers, ifams))
+
+(** [apply_censorship_on_subset base opts ipers_opt ifams_opt] applique la
+    censure uniquement sur le sous-ensemble sélectionné (plus efficace).
+
+    @param ipers_opt: Option d'ensemble de personnes (None = toute la base)
+    @param ifams_opt: Option d'ensemble de familles (None = toute la base)
+    @return Paire de prédicats (not_censor_p, not_censor_f) *)
+let apply_censorship_on_subset base opts ipers_opt ifams_opt =
+  if opts.censor = 0 then ((fun _ -> true), fun _ -> true)
+  else
+    let threshold =
+      if opts.censor = -1 then max_int (* Tout ce qui est vivant *)
+      else
+        let tm = Unix.localtime (Unix.time ()) in
+        1900 + tm.Unix.tm_year - opts.censor
+    in
+
+    match (ipers_opt, ifams_opt) with
+    | Some ipers, Some ifams ->
+        (* Censure sur sous-ensemble : évaluation paresseuse *)
+        let not_censor_p i =
+          (* Si pas dans l'ensemble sélectionné, pas besoin de vérifier *)
+          if not (IPS.mem i ipers) then true
+          else not (is_censored_person base threshold (Driver.poi base i))
+        in
+
+        let not_censor_f i =
+          if not (IFS.mem i ifams) then true
+          else
             let f = Driver.foi base i in
-            per_sel (Driver.get_father f) && per_sel (Driver.get_mother f)
-          in
-          (per_sel, fam_sel)
-      | None ->
-          if opts.surnames <> [] then select_surnames base opts.surnames
-          else if opts.parentship then
-            let rec loop ipers ifams = function
-              | [] -> select_from_set ipers ifams
-              | k2 :: k1 :: tl ->
-                  let ipers', ifams' = select_parentship base k1 k2 in
-                  let ipers = IPS.fold IPS.add ipers ipers' in
-                  let ifams = IFS.fold IFS.add ifams ifams' in
-                  loop ipers ifams tl
-              | _ -> assert false
-            in
-            loop IPS.empty IFS.empty ips
-          else ((fun _ -> true), fun _ -> true)
+            not_censor_p (Driver.get_father f)
+            && not_censor_p (Driver.get_mother f)
+        in
+
+        (not_censor_p, not_censor_f)
+    | None, None ->
+        (* Censure sur toute la base : utiliser les markers pour efficacité *)
+        let pmark = Driver.iper_marker (Driver.ipers base) 0 in
+        let fmark = Driver.ifam_marker (Driver.ifams base) 0 in
+
+        if opts.censor = -1 then restrict_base base pmark fmark 1
+        else censor_base base pmark fmark 1 threshold;
+
+        (* Marker = 0 signifie NON censuré (à inclure) *)
+        ( (fun i -> Collection.Marker.get pmark i = 0),
+          fun i -> Collection.Marker.get fmark i = 0 )
+    | _ ->
+        (* Cas incohérent : ne devrait pas arriver *)
+        assert false
+
+(** [select base opts ips] Return filters for [iper] and [ifam] to be used when
+    exporting a (portion of a) base.
+
+    @param base The genealogical database
+    @param opts
+      Export options with filtering criteria:
+      - [censor]: Privacy filter (0=none, -1=all living, N>0=born less than N
+        years ago)
+      - [asc]: Ancestor depth
+      - [desc]: Descendant depth
+      - [ascdesc]: Legacy option for combined ancestor/descendant depth
+        (deprecated, use asc+desc)
+      - [surnames]: List of surnames to filter
+      - [parentship]: Find relationship paths between person pairs
+      - [keys]: Person keys defining the starting set
+    @param ips
+      Initial list of person indices (currently always empty, keys are used
+      instead)
+    @return
+      Pair of predicates (person_filter, family_filter) where:
+      - person_filter i: true if person i should be included
+      - family_filter i: true if family i should be included
+
+    The function applies filters in the following order: 1. Build initial person
+    set from keys 2. Apply genealogical selection (ancestors, descendants,
+    surnames, etc.) 3. Apply censorship filter on the selected subset 4. Combine
+    both filters with AND logic
+
+    Note: Censorship is compatible with all selection strategies and is applied
+    efficiently only on the selected subset when possible. *)
+let select base opts ips =
+  (* Étape 1: Construire l'ensemble initial de personnes à partir des clés *)
+  let ips =
+    List.rev_append ips
+    @@ Mutil.filter_map (Gutil.person_of_string_key base) opts.keys
   in
-  ((fun i -> not_censor_p i && sel_per i), fun i -> not_censor_f i && sel_fam i)
+  (* Étape 2: Déterminer et appliquer la stratégie de sélection *)
+  let strategy = determine_strategy opts ips in
+  let conf = Config.{ empty with wizard = true } in
+  let sel_per, sel_fam, sets_opt =
+    apply_genealogical_selection base conf strategy ips
+  in
+
+  (* Étape 3: Appliquer les filtres de censure sur le sous-ensemble *)
+  let not_censor_p, not_censor_f =
+    match sets_opt with
+    | Some (ipers, ifams) ->
+        (* Censure efficace sur le sous-ensemble sélectionné *)
+        apply_censorship_on_subset base opts (Some ipers) (Some ifams)
+    | None ->
+        (* Censure sur toute la base (pour SelectAll et SelectSurnames) *)
+        apply_censorship_on_subset base opts None None
+  in
+
+  (* Étape 4: Combiner les filtres avec ET logique *)
+  let person_filter = fun i -> sel_per i && not_censor_p i in
+  let family_filter = fun i -> sel_fam i && not_censor_f i in
+
+  (* Étape 5: Vérifier qu'au moins une personne passe les filtres *)
+  (match sets_opt with
+  | Some (ipers, _) ->
+      if not (IPS.exists person_filter ipers) then
+        failwith "No persons match the selection criteria"
+  | None ->
+      (* Pour SelectAll et SelectSurnames sur toute la base : *)
+      (* pas de vérification (trop coûteux pour les grandes bases) *)
+      ());
+
+  (person_filter, family_filter)
