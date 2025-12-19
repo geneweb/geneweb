@@ -20,6 +20,17 @@
   %end;
 %end;
 
+%define;havingaschildren(xx)
+  [having as children:::xx]1%nn;
+%end;
+
+%define;havingchildren(cc)
+  %if;(cc>1)
+    %apply;havingaschildren%with;%apply;nth%with;[n (number)]%and;cc%end;%end;
+  %else;[having as children]0%nn;
+  %end;
+%end;
+
 %define;li_SD(xx)
   <li style="vertical-align: middle;list-style-type: %nn;
     %if;xx.has_parents;disc%else;circle%end;">%nn;

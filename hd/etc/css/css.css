@@ -747,6 +747,17 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   background-color: #D2691E !important;
 }
 
+/* Affichage long deslist */
+.desc-gen > li::marker { /* Numérotation de liste en gras */
+  font-weight: bold;
+}
+
+.desc-gen > li:hover { /* Highlight au survol pour repérer la génération */
+  background-color: rgba(0, 123, 255, 0.05);
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
+}
+
 /* --- Ascendants/Descendants table --- */
 /* Border and background styles for table headers, th and td */
 .asc-desc-table thead, .asc-desc-table th {

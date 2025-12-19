@@ -43,15 +43,6 @@
     %end;
   %end;
 %end;
-%define;havingaschildren(xx)
-  [having as children:::xx]1%nn;
-%end;
-%define;havingchildren(cc)
-  %if;(cc>1)
-    %apply;havingaschildren%with;%apply;nth%with;[n (number)]%and;cc%end;%end;
-  %else;[having as children]0%nn;
-  %end;
-%end;
 %( Copie des fonctions qui se trouvent dans perso.txt dont la SEULE
    modification est que la phrase NE commence PAS par une majuscule. %)
 %define;loc_married_to(sexx, date)
