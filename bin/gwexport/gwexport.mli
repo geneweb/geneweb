@@ -9,6 +9,7 @@ type gwexport_opts = {
   desc : int option; (* Maximum generation of the root's descendants *)
   img_base_path : string; (* Unused by this module (and not set by options) *)
   keys : string list; (* Key reference of additional persons to select *)
+  aws : bool; (* Export also siblings of exported persons *)
   mem : bool; (* Unused by this module *)
   no_notes : [ `nn | `nnn | `none ];
       (* Unused by this module
