@@ -113,6 +113,7 @@ jobs:
           npm install -g terser
           chmod +w rpc_client.min.js
           terser rpc_client.min.js -o rpc_client.min.js --compress --mangle
+          gzip -9 -k -f rpc_client.min.js
 
       - name: Create release archive
         shell: bash
