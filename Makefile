@@ -175,6 +175,7 @@ distrib-rpc: build-geneweb-rpc
 	mkdir -p $(DISTRIB_DIR)/gw/etc/js
 	cp $(BUILD_DIR)/rpc/server/server.exe $(DISTRIB_DIR)/gw/rpc_server$(EXT)
 	cp $(BUILD_DIR)/rpc/test/client.bc.js $(DISTRIB_DIR)/gw/etc/js/rpc_client.min.js
+	gzip -9 -k -f $(DISTRIB_DIR)/gw/etc/js/rpc_client.min.js
 	@echo "Done."
 
 .PHONY: build build-geneweb build-geneweb-rpc gwd fmt install uninstall distrib
