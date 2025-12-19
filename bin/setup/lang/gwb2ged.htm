@@ -108,40 +108,31 @@ ll be the name of the database ended by the suffix
 </tr>
 </table>
 <p>
-[In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).]
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
+-key[:] [Extract ancestors or descendants] according to -a and -d, format "first_name.occ surname"
+</td>
+</tr>
+<tr align=left><td> </td>
+<td colspan=3><input name="key" size=30 maxlength=200></td>
+</tr>
+</table>
 <p>
 <table class="setup">
 <tr align=left><td> </td>
 <td colspan=3>
--a[:] [Extract only the ancestors of]
-</td></tr>
-<tr align=left><td>[First name]
+-a[:] [Number of ancestor levels above key]
 </td>
-<td><input name="a1" size=30 maxlength=200></td>
-<td>[Num]
-</td>
-<td><input name="a2" size=5 maxlength=8></td>
-</tr>
-<tr align=left><td>[Surname]
-</td>
-<td colspan=3><input name="a3" size=40 maxlength=200></td>
+<td><input name="a" size=5 maxlength=8></td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
--d[:] [Extract only the descendants of]
+-d[:] [Number of descendant levels below key]
 </td>
-</tr>
-<tr align=left><td>[First name]
-</td>
-<td><input name="d1" size=30 maxlength=200></td>
-<td>[Num]
-</td>
-<td><input name="d2" size=5 maxlength=8></td></tr>
-<tr align=left><td>[Surname]
-</td>
-<td colspan=3><input name="d3" size=40 maxlength=200></td>
+<td><input name="d" size=5 maxlength=8></td>
 </tr>
 </table>
 <p>
@@ -152,30 +143,21 @@ he same time</em> ancestors of the one and descendants of the other.
 %)
 <p>
 <table class="setup">
-<tr align=left><td> </td><td colspan=3>
--aws[:] [Extract ancestors with siblings of]
+<tr align=left>
+<td><input type=checkbox name=mem value="on" id=mem>   
+<label for=mem>-aws</label>[:] [Extract also siblings of exported persons]
 </td>
-</tr>
-<tr align=left><td>[First name]
-</td>
-<td><input name="aws1" size=30 maxlength=200></td>
-<td>[Num]
-</td>
-<td><input name="aws2" size=5 maxlength=8></td></tr>
-<tr align=left><td>[Surname]
-</td>
-<td colspan=3><input name="aws3" size=40 maxlength=200></td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
--s[:] [extract surname (usable several times).]
+-sn[:] [extract surname (usable several times).]
 </td>
 </tr>
 <tr align=left><td>[Surname]
 </td>
-<td colspan=3><input name="s" size=40 maxlength=200></td>
+<td colspan=3><input name="sn" size=40 maxlength=200></td>
 </tr>
 </table>
 <p>
@@ -197,7 +179,7 @@ is Public.<br>  All the spouses and descendants are also censored.
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=nsp id=nsp value="on">   
-<label for=nsp>-nsp</label>[:] [Do not extract spouses' parents (for options -s and -d).]
+<label for=nsp>-nsp</label>[:] [Do not extract spouses' parents (for options -a and -d).]
 </td>
 </tr>
 </table>
