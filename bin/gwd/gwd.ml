@@ -1637,6 +1637,14 @@ let conf_and_connection =
     let conf, passwd_err =
       make_conf ~secret_salt from request script_name env
     in
+    let m = Util.p_getenv env "m" in
+    let is_binary =
+      match m with
+      | Some ("IM" | "IM_C" | "IM_C_S" | "IMH" | "FIM" | "SRC" | "DOC" | "DOCH")
+        ->
+          true
+      | _ -> false
+    in
     let gzip_level =
       match List.assoc_opt "gzip_html_compression" conf.base_env with
       | Some s -> (
@@ -1645,7 +1653,7 @@ let conf_and_connection =
           | _ -> 0)
       | None -> 6
     in
-    (if gzip_level > 0 then
+    (if gzip_level > 0 && not is_binary then
        match make_gzip_output_conf ~level:gzip_level request with
        | Some gzip_oc -> conf.output_conf <- gzip_oc
        | None -> ());
