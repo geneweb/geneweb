@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: gwu.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <!-- $Id: gwu.htm,v 7.00 2025_12_16 05:35:06 ddr Exp $ -->
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
@@ -85,31 +85,24 @@ by <span style="font-family: monospace">gwc -f *.gw</span>, then <span style=
 </table>
 <p>
 <table class="setup">
-<tr align=left><td> </td><td colspan=3>[Extract only the ancestors of]
+<tr align=left><td> </td><td colspan=3>Wip: [Extract only the ancestors of]
 </td></tr>
-<tr align=left><td>[First name]
+<tr align=left><td>
 </td>
-<td><input name="a1" size=30 maxlength=200></td>
-<td>[Num]
-</td>
-<td><input name="a2" size=5 maxlength=8></td></tr>
-<tr align=left><td>[Surname]
-</td>
-<td colspan=3><input name="a3" size=40 maxlength=200></td></tr>
+<td><input name="anc" size=50 maxlength=200></td></tr>
+<tr><td> </td><td>Number of generations up <input name="a" size=5 maxlength=8></td>
+</tr>
 </table>
 <p>
 <table class="setup">
-<tr align=left><td> </td><td colspan=3>[Extract only the descendants of]
+<tr align=left><td> </td><td colspan=3>Wip: [Extract only the descendants of]
 </td></tr>
-<tr align=left><td>[First name]
+<tr align=left><td>
 </td>
-<td><input name="d1" size=30 maxlength=200></td>
-<td>[Num]
-</td>
-<td><input name="d2" size=5 maxlength=8></td></tr>
-<tr align=left><td>[Surname]
-</td>
-<td colspan=3><input name="d3" size=40 maxlength=200></td></tr>
+<td><input name="des" size=50 maxlength=200></td>
+<tr><td> </td>
+<td>Number of generations down <input name="d" size=5 maxlength=8></td>
+</tr>
 </table>
 <p>
 [If you use both options above, the intersection is assumed: persons <em>at the same time</em> ancestors of the one and descendants of the other.]
@@ -117,6 +110,13 @@ by <span style="font-family: monospace">gwc -f *.gw</span>, then <span style=
 If you use both options above, the intersection is assumed: persons <em>at the s
 ame time</em> ancestors of the one and descendants of the other.
 %)
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=aws value="on" id=aws>   </td>
+<td>Wip: [Extract also siblings of exported persons]</td>
+</tr>
+</table>
 <p>
 <li>
 [Then click on this button][:]

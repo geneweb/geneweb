@@ -97,14 +97,15 @@ main() {
     rotate_log "gwsetup.log"
     rotate_log "gwd.log"
     
-    # Start gwsetup
+    # Start gwsetup (musr be dexcuted in BASES_DIR)
     msg "start_gwsetup"
     "$SCRIPT_DIR/gw/gwsetup" -gd "$SCRIPT_DIR/gw" -lang "$LANG" > gwsetup.log 2>&1 &
     check_process '/gwsetup' "gwsetup"
     
     # Start gwd
+    cd "$SCRIPT_DIR"
     msg "start_gwd"
-    "$SCRIPT_DIR/gw/gwd" -hd "$SCRIPT_DIR/gw" > "$SCRIPT_DIR/gw/gwd.log" 2>&1 &
+    "./gw/gwd" -hd "./gw" > "./gw/gwd.log" 2>&1 &
     check_process '/gwd' "gwd"
     
     # Success message

@@ -849,7 +849,7 @@ lv: Darboties ar
 sv: Konsultera
 
     Content of comm.log
-aa: bso_comm.htm
+aa: comm.htm
 co: Cuntenutu di u schedariu comm.log
 de: Inhalt der Datei "comm.log"
 en: Content of comm.log
@@ -860,7 +860,7 @@ it: Contenuto del file "comm.log"
 sv: Innehållet i filen "comm.log"
 
     Content of result file
-aa: bso_log.htm
+aa: log.htm
 co: Cuntenutu di u schedariu risultatu
 de: Inhalt der Ergebnisdatei
 en: Content of result file
@@ -1174,51 +1174,17 @@ fr: fichier vide
 it: file vuoto
 sv: tom fil
 
-    Encode the characters in ANSEL.
+    The characters are encoded for
 aa: gwb2ged.htm
-co: Cudificà i caratteri in ANSEL.
-de: Kodiere die Zeichen in ANSEL.
-en: Encode the characters in ANSEL.
-es: Codificar los carácteres en ANSEL.
-fr: Coder les caractères en ANSEL.
-it: Codificare i caratteri in ANSEL.
-lv: Burti ANSEL kodçjumâ.
-sv: Koda tecknen i ANSEL.
-
-    Encode the characters in ANSI (ISO 8859-1).
-aa: gwb2ged.htm
-co: Cudificà i caratteri in ANSI (ISO 8859-1).
-de: Kodiere die Zeichen in ANSI (ISO 8859-1).
-en: Encode the characters in ANSI (ISO 8859-1).
-es: Codificar los car&aacute;cteres en ANSI (ISO 8859-1).
-fr: Coder les caract&egrave;res en ANSI (ISO 8859-1).
-it: Codificare i caratteri in ANSI (ISO 8859-1).
-lv: Burti ANSI kodçjumâ (ISO 8859-1).
-sv: Koda tecknen i ANSI (ISO 8859-1).
-
-    Encode the characters in ASCII.
-aa: gwb2ged.htm
-co: Cudificà i caratteri in ASCII.
-de: Kodiere die Zeichen in ASCII.
-en: Encode the characters in ASCII.
-es: Codificar los carácteres en ASCII.
-fi: Koodaa merkit ASCII muodossa.
-fr: Coder les caractères en ASCII.
-it: Codificare i caratteri in ASCII.
-lv: Burti ASCII kodçjumâ.
-sv: Koda tecknen i ASCII.
-
-    Encode the characters in UTF-8.
-aa: gwb2ged.htm
-co: Cudificà i caratteri in UTF-8.
-de: Kodiere die Zeichen in UTF-8.
-en: Encode the characters in UTF-8.
-es: Codificar los carácteres en UTF-8.
-fi: Koodaa merkit UTF-8 muodossa.
-fr: Coder les caractères en UTF-8.
-it: Codificare i caratteri in UTF-8.
-lv: Burti UTF-8 kodçjumâ.
-sv: Koda tecknen i UTF-8.
+co: Cudificà i caratteri in
+de: Kodiere die Zeichen in
+en: The characters are encoded in
+es: Codificar los car&aacute;cteres en
+fr: Les caract&egrave;res sont encodés en
+fi: Koodaa merkit muodossa
+it: Codificare i caratteri in
+lv: Burti kodçjumâ
+sv: Koda tecknen i
 
     End by the initialization of consanguinities.
 aa: gwc.htm
@@ -1321,12 +1287,10 @@ it: Estrazione di un file %G
 lv: Izveidot %G datni
 sv: Exportera en %G källfil
 
-    Extract ancestors with siblings of
+    Extract also siblings of exported persons
 aa: gwb2ged.htm
-co: Estrae l’antenati cù fratelli è surelle
-de: Extrahiere Vorfahren mit Geschwistern von
-en: Extract ancestors with siblings of
-fr: Extraire les ancêtres avec fratries de
+en: Extract also siblings of exported persons
+fr: Extraire aussi les fratries des personnes exportées
 
     Extract from a database
 aa: main.htm

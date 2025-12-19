@@ -7,7 +7,7 @@
 
 let ok_r = ref []
 let assets_r = ref [ "gw" ]
-let bd_r = ref (Filename.concat Filename.current_dir_name "bases")
+let bd_r = ref (Filename.concat "." "bases")
 
 (* [decompose: string -> string list] decompose a path into a list of
    directory and a basename. "a/b/c" -> [ "a" ; "b"; "c" ] *)

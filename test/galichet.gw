@@ -340,13 +340,39 @@ end page-ext
 # extended page "Gallery" used by:
 #  - person "Jean Charles.0 Galichet"
 page-ext Gallery
-  TITLE=la 1ere ligne correspond au titre
+  TITLE=Gallery test
   TYPE=gallery
   {
-  "title": "Gallery test",
-  "desc": "test",
-  "path": "doc",
-  "img": "jean_pierre.0.galichet.jpg",
-  "map": []
+    "title": "Gallery test",
+    "desc": "test",
+    "img": "jean_pierre.0.galichet.jpg",
+    "map": [
+      {
+        "shape": "rect",
+        "coords": "246,94.75,339,212.75",
+        "fn": "jean pierre",
+        "sn": "galichet",
+        "oc": "0",
+        "alt": "je veux un lien vers la page de Jean Pierre Galichet  à partir du pouce.",
+        "group": "1",
+        "gw": "[[jean pierre/galichet/jean pierre galichet]]"
+      },
+      {
+        "shape": "rect",
+        "coords": "131,273,222,329",
+        "fn": "marie elisabeth",
+        "sn": "loche",
+        "oc": "0",
+        "alt": "et un lien vers sa femme au bout de la langue",
+        "group": "1",
+        "gw": "[[marie elisabeth/loche/marie elisabeth loche]]"
+      }
+    ],
+    "groups": [
+      {
+        "name": 1,
+        "label": "groupe 1"
+      }
+    ]
   }
 end page-ext

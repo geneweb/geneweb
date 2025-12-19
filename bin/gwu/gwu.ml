@@ -17,6 +17,18 @@ let speclist opts =
   :: ( "-raw",
        Arg.Set GwuLib.raw_output,
        " raw output (without possible utf-8 conversion)" )
+  :: ( "-a",
+       Arg.String (fun s -> GwuLib.ancestors_of := s :: !GwuLib.ancestors_of),
+       " Wip: Save ancestors of person <1st_name.num surname>. Can be used \
+        multiple times." )
+  :: ( "-d",
+       Arg.String
+         (fun s -> GwuLib.descendants_of := s :: !GwuLib.descendants_of),
+       " Wip: Save descendants of person <1st_name.num surname>. Can be used \
+        multiple times." )
+  :: ( "-aws",
+       Arg.Set GwuLib.aws,
+       " Wip: export also siblings of exported persons." )
   :: ( "-sep",
        Arg.String (fun s -> GwuLib.separate_list := s :: !GwuLib.separate_list),
        " <1st_name.num surname> To use together with the option \"-odir\": \
