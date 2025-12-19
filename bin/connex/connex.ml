@@ -8,7 +8,7 @@ let all = ref false
 let statistics = ref false
 let detail = ref 0
 let ignore = ref []
-let output = ref ""
+let output = ref None
 let ignore_files = ref true
 let ask_for_delete = ref 0
 let cnt_for_delete = ref 0
@@ -99,27 +99,26 @@ let wiki_designation base basename p =
 let print_family base basename ifam =
   let fam = Driver.foi base ifam in
   let p = Driver.poi base (Driver.get_father fam) in
-  if !output <> "" then (
+  if !output = None then (
     if
       Driver.sou base (Driver.get_first_name p) = "?"
       || Driver.sou base (Driver.get_surname p) = "?"
     then Printf.eprintf "i=%s" (Driver.Iper.to_string (Driver.get_iper p))
     else Printf.eprintf "  - %s" (utf8_designation base p);
-    Printf.eprintf "\n";
-    Printf.eprintf "  - %s\n"
+    Printf.eprintf "\n  - %s\n"
       (utf8_designation base (Driver.poi base (Driver.get_mother fam)));
-    flush stderr);
-  if
-    Driver.sou base (Driver.get_first_name p) = "?"
-    || Driver.sou base (Driver.get_surname p) = "?"
-  then
-    let indx = Driver.Iper.to_string (Driver.get_iper p) in
-    Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>" !server
-      !gwd_port basename indx indx
-  else Printf.printf "  - %s" (wiki_designation base basename p);
-  Printf.printf "\n";
-  Printf.printf "  - %s\n"
-    (wiki_designation base basename (Driver.poi base (Driver.get_mother fam)))
+    flush stderr)
+  else (
+    if
+      Driver.sou base (Driver.get_first_name p) = "?"
+      || Driver.sou base (Driver.get_surname p) = "?"
+    then
+      let indx = Driver.Iper.to_string (Driver.get_iper p) in
+      Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>" !server
+        !gwd_port basename indx indx
+    else Printf.printf "  - %s" (wiki_designation base basename p);
+    Printf.printf "\n  - %s\n"
+      (wiki_designation base basename (Driver.poi base (Driver.get_mother fam))))
 
 let kill_family base ip =
   let u = { family = Array.of_list [] } in
@@ -135,7 +134,7 @@ let effective_del base (ifam, fam) =
   Array.iter (kill_parents base) (Driver.get_children fam);
   Driver.delete_family base ifam
 
-let move base basename =
+let compute_connex base basename =
   Driver.load_ascends_array base;
   Driver.load_unions_array base;
   Driver.load_couples_array base;
@@ -185,14 +184,15 @@ let move base basename =
         if nb > 0 && (!all || nb <= !min) then (
           if nb <= !min then min := nb;
           if nb >= !max then max := nb;
-          if !output <> "" then (
+          if !output = None then (
             Printf.eprintf "Connex component \"%s\" length %d\n"
               (Driver.sou base origin_file)
               nb;
-            flush stderr);
-          Printf.printf "Connex component \"%s\" length %d<br>\n"
-            (Driver.sou base origin_file)
-            nb;
+            flush stderr)
+          else
+            Printf.printf "Connex component \"%s\" length %d<br>\n"
+              (Driver.sou base origin_file)
+              nb;
           if !detail == nb then List.iter (print_family base basename) ifaml
           else print_family base basename ifam;
           if !statistics then
@@ -268,12 +268,17 @@ let speclist =
     ( "-exact",
       Arg.Set exact,
       " delete only branches whose size strictly = -del value" );
-    ("-o", Arg.String (fun x -> output := x), "<file> output to this file");
+    ("-o", Arg.String (fun x -> output := Some x), "<file> output to this file");
   ]
   |> List.sort compare |> Arg.align
 
 let () =
   Arg.parse speclist (fun s -> bname := s) usage;
+  (match !output with
+  | Some file ->
+      let oc = open_out file in
+      Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
+  | None -> ());
   if !ask_for_delete > 0 then
     let lock_file = Mutil.lock_file !bname in
     let on_exn exn bt =
@@ -281,5 +286,5 @@ let () =
       exit 2
     in
     Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-    Driver.with_database !bname (fun base -> move base !bname)
-  else Driver.with_database !bname (fun base -> move base !bname)
+    Driver.with_database !bname (fun base -> compute_connex base !bname)
+  else Driver.with_database !bname (fun base -> compute_connex base !bname)

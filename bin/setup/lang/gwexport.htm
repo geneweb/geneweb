@@ -1,54 +1,4 @@
-<!DOCTYPE html>
-<html lang="%l">
-<head>
-  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: gwb2ged.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
-  <meta charset="utf-8">
-  <meta name="robots" content="none">
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>
-[Extract a GEDCOM file]
-</title>
-%fsetup.css;
-</head>
-<body %Vbody_prop;>
-<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
-<h1 style="margin:0;">
-[Extract a GEDCOM file]
-</h1>
-</div>
-
-<form method="get" action="gwb2ged">
-<input type="hidden" name="opt" value="check">
-<input type="hidden" name="lang" value="%l">
-<ul><li>
-[Select your database by clicking on the associated button][:]
-<p>
-<table class="setup">
-%b{<tr align="left">
-<td><input type="radio" name="anon" id="anon%a" value="%a">   
-<label for="anon%a">%a</label></td></tr>|
-<tr align="left"><td>- [there is no database at present]
-</tr></td>}
-</table>
-<p>
-<li>
-[Enter the name you want to give to your GEDCOM file. If you write nothing, it will be the name of the database ended by the suffix]
-%(
-Enter the name you want to give to your GEDCOM file. If you write nothing, it wi
-ll be the name of the database ended by the suffix
-%)
-"<tt>.ged</tt>".
-
-<p>
-<table class="setup">
-<tr align=left><td>
--o&nbsp;&nbsp;
-<input name="o" size="30">
-</td></tr>
-</table>
-<p>
 <li>
 [Select the options you want][:]
 <p>
@@ -136,11 +86,48 @@ ll be the name of the database ended by the suffix
 </tr>
 </table>
 <p>
-[If you use both above options, the intersection is assumed:<br> persons <em>at the same time</em> ancestors of the one and descendants of the other.]
-%(
-If you use both above options, the intersection is assumed:<br> persons <em>at t
-he same time</em> ancestors of the one and descendants of the other.
-%)
+
+%%Ilang;fr;{
+Stratégie de filtrage :
+<pre>
+1/ -key : (plusieurs possibles) définit une liste d'individus
+      exporte l'ascendance et la descendance des individus selon les critères qui suivent
+      -a : Profondeur de l'ascendance
+      -d : Profondeur de la descendance
+      sans -a et -d, toute la base est exportée
+      -ad : -ad n est équivalent à -a n -d n (déprécié, conservé pour compatibilité)
+      -aws : exporte aussi la fratrie de la personne
+      -nsp : ne pas exporter les conjoints
+2/ -sn : (plusieurs possibles) définit une liste de patronymes
+3/ -parentship : (plusieurs possibles) définit une liste de paires de personnes.
+      exporte les personnes présentes sur le chemin entre les deux personnes d'une paire
+4/ -c : Filtre appliqué après la sélection faite par le ET des trois filtres précédents
+      -c -1 : Exclut toutes les personnes vivantes
+      -c n : Exclut les personnes nées il y a moins de n ans
+</pre>
+|}
+%Ilang;en;{
+Filter strategy :
+<pre>
+1/ -key : (several possible) defines a list of persons
+      export ascendance and descendance of the persons according to the following criteria
+      -a : Depth of ascendants
+      -d : Depth of descendants
+      without -a and -d the whole base is exported
+      -ad : -ad n is equivalent to -a n -d n (depreciated, kept for compatibility)
+      -aws : export also siblings of persons
+      -nsp : do not export spouses
+2/ -sn : (several possible) defines a list of surnames
+3/ -parentship : (several possible) defines a list of pairs of persons.
+      export the persons present on the path between the pair elements
+4/ -c : Filter applied after the selection performed by the AND of the three filters above
+      -c -1 : Exclude living persons
+      -c n : Exclude persons born less than n years ago
+</pre>
+|}
+
+<br>
+
 <p>
 <table class="setup">
 <tr align=left>
@@ -184,8 +171,3 @@ is Public.<br>  All the spouses and descendants are also censored.
 </tr>
 </table>
 <p>
-<li>
-[Then click on this button][:]
-<input type=submit value="[Extract]">
-</ul>
-</form>

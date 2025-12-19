@@ -13,8 +13,10 @@ let out_dir = ref ""
 let raw_output = ref false
 let sep_limit = ref 21
 let separate_list = ref []
+let descendants_of = ref []
+let ancestors_of = ref []
+let aws = ref false
 let dummy = ref [ "" ]
-let all_files = ref false
 
 (* Returns true if `old_gw` is `true` and there exist an event associated to a
    person that:
@@ -1873,18 +1875,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             Printf.eprintf "Missing file: %s\n" f;
             "")
         in
-        let s_len = String.length s in
-        (* false if there are no wiki links in the file ! *)
-        let contains_wiki_link s =
-          let rec loop s i =
-            match NotesLinks.misc_notes_link s i with
-            | NotesLinks.WLnone (j, _) when j < s_len -> loop s j
-            | NotesLinks.WLnone _ -> false
-            | _ -> true
-          in
-          loop s 0
-        in
-        if (contains_wiki_link s || !all_files) && s <> "" then (
+        if s <> "" then (
           if not !first then Printf.ksprintf oc "\n";
           first := false;
           let f = Util.sys_to_note_link f in

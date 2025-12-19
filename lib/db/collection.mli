@@ -36,6 +36,8 @@ val iterator : 'a t -> unit -> 'a option
 (** [iterator c] returns a function returning [Some next_element] when it is
     called, or [None] if you reached the end of the collection. *)
 
+val exists : ('a -> bool) -> 'a t -> bool
+
 type 'a collection = 'a t
 
 (** Markers for elements inside a collection. *)

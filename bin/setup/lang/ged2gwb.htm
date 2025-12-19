@@ -231,7 +231,7 @@ e year.
 <table class="setup">
 <tr align=left>
 <td><input type="checkbox" name="reorg" id="reorg" value="on">
-<label for="reorg" style="font-family: monospace">-org           | </label>[Reorg mode.]
+<label for="reorg" style="font-family: monospace">-reorg           | </label>[Reorg mode.]
 </td>
 </tr>
 </table>
@@ -271,7 +271,7 @@ May 2, 1912" or "February 5, 1912" according to the countries).
 <tr align=left>
 <td>    </td>
 <td><span style="font-family: monospace">-dates_dm</span></td>
-<td><input type="radio" name="dates" id="dates_dm" value="_dm">
+<td><input type="radio" name="dates" id="dates" value="dates_dm">
 <label for="dates_dm">[Interpret these dates as "day/month/year".]
 </label></td>
 </tr>
@@ -279,7 +279,7 @@ May 2, 1912" or "February 5, 1912" according to the countries).
 <tr align=left>
 <td>    </td>
 <td><span style="font-family: monospace">-dates_md</span></td>
-<td><input type=radio name=dates value="_md" id="dates_md">
+<td><input type=radio name=dates id="dates" value="dates_md">
 <label for="dates_md">[Interpret these dates as "month/day/year".]
 </label></td>
 </tr>
@@ -302,28 +302,35 @@ May 2, 1912" or "February 5, 1912" according to the countries).
 <tr align=left><td></td>
 <td>    </td>
 <td ><input type="radio" name="charset" value="ANSEL" id="ANSEL">
-<label for="ANSEL">[The accentuated characters are in ANSEL encoding.]
-</label></td>
-</tr>
-
-<tr align=left><td></td>
-<td>    </td>
-<td><input type="radio" name="charset" value="ANSI" id="ANSI">
-<label for="ANSI">[The accentuated characters are in ANSI encoding (ISO 8859-1).]
+<label for="ANSEL">[The characters are encoded for] ANSEL.
 </label></td>
 </tr>
 
 <tr align=left><td></td>
 <td>    </td>
 <td><input type=radio name=charset value=ASCII id="ASCII">
-<label for="ASCII">[The accentuated characters are in ASCII encoding.]
+<label for="ASCII">[The characters are encoded for] ASCII.
+</label></td>
+</tr>
+
+<tr align=left><td></td>
+<td>    </td>
+<td><input type="radio" name="charset" value="MACINTOSH" id="MACINTOSH">
+<label for="MACINTOSH">[The characters are encoded for] MACINTOSH.
 </label></td>
 </tr>
 
 <tr align=left><td></td>
 <td>    </td>
 <td><input type="radio" name="charset" value="MSDOS" id="MSDOS">
-<label for="MSDOS">[The accentuated characters are in MSDOS encoding.]
+<label for="MSDOS">[The characters are encoded for] MSDOS.
+</label></td>
+</tr>
+
+<tr align=left><td></td>
+<td>    </td>
+<td><input type="radio" name="charset" value="UTF-8" id="UTF-8">
+<label for="UTF-8">[The characters are encoded for] UTF-8.
 </label></td>
 </tr>
 

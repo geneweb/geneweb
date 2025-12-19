@@ -52,6 +52,16 @@ let iterator { get; length } =
   in
   next
 
+let exists fn { get; length } =
+  let rec loop i =
+    if i = length then false
+    else
+      match get i with
+      | Some x -> if fn x then true else loop (i + 1)
+      | None -> loop (i + 1)
+  in
+  loop 0
+
 type 'a collection = 'a t
 
 module Marker = struct

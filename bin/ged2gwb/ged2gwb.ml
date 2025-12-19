@@ -3230,20 +3230,23 @@ let speclist =
     , " Put untreated GEDCOM tags in notes" )
   ; ( "-ds", Arg.Set_string default_source
     , " Set the source field for persons and families without source data" )
-  ; ( "-dates_dm", Arg.Unit (fun () -> month_number_dates := DayMonthDates)
-    ," Interpret months-numbered dates as day/month/year" )
-  ; ( "-dates_md", Arg.Unit (fun () -> month_number_dates := MonthDayDates)
-    , " Interpret months-numbered dates as month/day/year" )
+  ; ( "-dates", Arg.String (fun s -> 
+          if s = "dates_md" then month_number_dates := MonthDayDates
+          else if s = "dates_dm" then month_number_dates := DayMonthDates)
+    , " Interpret months-numbered dates as year only (default) or month/day/year or day/month/year" )
   ; ( "-rs_no_mention", Arg.Unit (fun () -> relation_status := NoMention)
     , " Force relation status to NoMention (default is Married)" )
   ; ( "-charset"
     , Arg.String begin function
         | "ANSEL" -> charset_option := Some Ansel
         | "ASCII" -> charset_option := Some Ascii
+        | "MACINTOSH" -> charset_option := Some MacIntosh
         | "MSDOS" -> charset_option := Some Msdos
+        | "UTF-8" -> charset_option := Some Utf8
+        | "none" -> charset_option := None
         | _ -> raise (Arg.Bad "bad -charset value")
       end
-    , " [ANSEL|ASCII|MSDOS] Force given charset decoding, \
+    , " [ANSEL|ANSI|ASCII|MACINTOSH|MSDOS|UTF-8] Force given charset decoding, \
        overriding the possible setting in GEDCOM" )
   ; ( "-particles"
     , Arg.String (fun s -> particles := Mutil.input_particles s)
