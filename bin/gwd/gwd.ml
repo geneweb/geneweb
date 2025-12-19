@@ -1658,7 +1658,9 @@ let conf_and_connection =
        | Some gzip_oc -> conf.output_conf <- gzip_oc
        | None -> ());
     match !redirected_addr with
-    | Some addr -> print_redirected conf from request addr
+    | Some addr ->
+        print_redirected conf from request addr;
+        Output.flush conf
     | None -> (
         let auth_err, auth =
           if conf.auth_file = "" then (false, "")
@@ -1675,28 +1677,31 @@ let conf_and_connection =
              (contents :> string));
         match (!Wserver.cgi, auth_err, passwd_err) with
         | true, true, _ ->
-            if is_robot from then Robot.robot_error conf 0 0 else no_access conf
+            if is_robot from then Robot.robot_error conf 0 0 else no_access conf;
+            Output.flush conf
         | _, true, _ ->
-            if is_robot from then Robot.robot_error conf 0 0
-            else
-              let auth_type =
-                let x =
-                  try List.assoc "auth_file" conf.base_env
-                  with Not_found -> ""
-                in
-                if x = "" then "GeneWeb service" else "database " ^ conf.bname
-              in
-              refuse_auth conf from auth auth_type
+            (if is_robot from then Robot.robot_error conf 0 0
+             else
+               let auth_type =
+                 let x =
+                   try List.assoc "auth_file" conf.base_env
+                   with Not_found -> ""
+                 in
+                 if x = "" then "GeneWeb service" else "database " ^ conf.bname
+               in
+               refuse_auth conf from auth auth_type);
+            Output.flush conf
         | _, _, ({ ar_ok = false } as ar) ->
-            if is_robot from then Robot.robot_error conf 0 0
-            else
-              let tm = Unix.time () in
-              let lock_file = !GWPARAM.adm_file "gwd.lck" in
-              (* FIXME: we silently ignore errors if we cannot lock the database. *)
-              let on_exn _exn _bt = () in
-              Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
-                  log_passwd_failed ar tm from request conf.bname);
-              unauth_server conf ar
+            (if is_robot from then Robot.robot_error conf 0 0
+             else
+               let tm = Unix.time () in
+               let lock_file = !GWPARAM.adm_file "gwd.lck" in
+               (* FIXME: we silently ignore errors if we cannot lock the database. *)
+               let on_exn _exn _bt = () in
+               Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
+                   log_passwd_failed ar tm from request conf.bname);
+               unauth_server conf ar);
+            Output.flush conf
         | _ -> (
             let printexc bt exn =
               Logs.err (fun k ->
