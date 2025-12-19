@@ -47,9 +47,7 @@
 %define;book_button(xxx,yyy,zzz)
   <a role="button" class="btn btn-outline-success" data-toggle="tooltip"
     href="%prefix;m=MOD_DATA&data=xxx" title="[*modify] %apply;book_of%with;[yyy]1%end;%sp;
-      ([wizard/wizards/friend/friends/exterior]0)">
-    <i class="fa fa-zzz fa-fw"></i>
-    <span class="text-nowrap">[*yyy]1</span>
+      ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-zzz mr-1"></i>[*yyy]1
   </a>
 %end;
 %define;language(x)
@@ -267,10 +265,10 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                 <div class="d-flex mt-3">
                   <div class="btn-group-vertical mr-2">
                     <a role="button" href="%prefix;m=P&tri=A" data-toggle="tooltip"
-                      title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2">
+                      title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2">%nn;
                       <i class="fa fa-arrow-down-a-z fa-fw"></i></a>
                     <a role="button" href="%prefix;m=P&tri=F" data-toggle="tooltip"
-                      title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">
+                      title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">%nn;
                       <i class="fa fa-arrow-down-wide-short fa-fw"></i></a>
                   </div>
                   <div class="d-flex flex-grow-1">
@@ -285,10 +283,10 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                 <div class="d-flex mt-2">
                   <div class="btn-group-vertical mr-2">
                     <a role="button" href="%prefix;m=N&tri=A" data-toggle="tooltip"
-                      title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2">
+                      title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2">%nn;
                       <i class="fa fa-arrow-down-a-z fa-fw"></i></a>
                     <a role="button" href="%prefix;m=N&tri=F" data-toggle="tooltip"
-                      title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">
+                      title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">%nn;
                       <i class="fa fa-arrow-down-wide-short fa-fw"></i></a>
                   </div>
                   <div class="d-flex flex-grow-1">
@@ -379,7 +377,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     </div>
   </div>
 %end;
-<div class="d-flex flex-column justify-content-start justify-content-md-center mt-4 col-12 col-md-11 col-lg-8 mx-auto">
+<div class="d-flex flex-column justify-content-start justify-content-md-center mt-4 col-12 col-md-11 col-lg-10 mx-auto">
   <div class="h4 text-md-center"><i class="fas fa-screwdriver-wrench fa-sm fa-fw text-secondary"></i>
     %if;roglo;[
 en: Around the tree
@@ -399,48 +397,47 @@ fr: Autour de l'arbre
       </a>
     %end;
     %if;has_misc_notes;
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=MISC_NOTES">
-      <i class="fas fa-align-justify fa-fw mr-1" aria-hidden="true"></i>
-      [*base index notes]</a>
+      <a role="button" class="btn btn-outline-primary" href="%prefix;m=MISC_NOTES">%nn;
+      <i class="fas fa-align-justify fa-fw mr-1" aria-hidden="true"></i>[*base index notes]</a>
     %end;
     %if;((wizard or friend) and
         (b.wizard_passwd_file!="" or b.wizard_descr_file!=""))
-       <a role="button" class="btn btn-outline-primary" href="%prefix;m=WIZNOTES">
+       <a role="button" class="btn btn-outline-primary" href="%prefix;m=WIZNOTES">%nn;
          <i class="far fa-file-lines fa-fw mr-1" aria-hidden="true"></i>[*base wizard notes]</a>
     %end;
     %if;(nb_persons.v!=0)
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=STAT">
+      <a role="button" class="btn btn-outline-primary" href="%prefix;m=STAT">%nn;
         <i class="far fa-chart-bar fa-fw mr-1" aria-hidden="true"></i>[*statistics]</a>
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=ANM">
+      <a role="button" class="btn btn-outline-primary" href="%prefix;m=ANM">%nn;
         <i class="fa fa-cake-candles fa-fw mr-1" aria-hidden="true"></i>[*anniversaries]</a>
       %if;(has_history and b.history="yes")
-        <a role="button" class="btn btn-outline-primary" href="%prefix;m=HIST&k=20">
+        <a role="button" class="btn btn-outline-primary" href="%prefix;m=HIST&k=20">%nn;
           <i class="fas fa-clock-rotate-left fa-fw mr-1" aria-hidden="true"></i>[*history]</a>
       %end;
     %end;
     %if;(plugin.forum and b.disable_forum!="yes")
-      <a class="btn btn-outline-primary" href="%prefix;m=FORUM">
+      <a class="btn btn-outline-primary" href="%prefix;m=FORUM">%nn;
         <i class="far fa-comments fa-fw mr-1" aria-hidden="true"></i>[*forum]</a>
     %end;
     %if;(b.propose_place_surnames!="no" and nb_persons.v!=0)
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=PPS&bi=on&ba=on&ma=on&de=on&bu=on">
+      <a role="button" class="btn btn-outline-primary" href="%prefix;m=PPS&bi=on&ba=on&ma=on&de=on&bu=on">%nn;
         <i class="fas fa-globe fa-fw mr-1" aria-hidden="true"></i>[*place/places]1/[surname/surnames]0</a>
     %end;
     %if;(b.hide_advanced_request="no")
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=AS">
+      <a role="button" class="btn btn-outline-primary" href="%prefix;m=AS">%nn;
         <i class="fa fa-magnifying-glass-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a>
     %end;
-    <a role="button" class="btn btn-outline-primary" href="%prefix;m=CAL">
+    <a role="button" class="btn btn-outline-primary" href="%prefix;m=CAL">%nn;
       <i class="far fa-calendar-days fa-fw mr-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
     %if;wizard;
-      <a role="button" class="btn btn-outline-success" href="%prefix;m=H&v=conf">
+      <a role="button" class="btn btn-outline-success" href="%prefix;m=H&v=conf">%nn;
         <i class="fas fa-gear fa-fw mr-1" aria-hidden="true"></i>[*configuration]1</a>
     %end;
     %if;wizard;
-      <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_NOTES&f=new_note">
+      <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_NOTES&f=new_note">%nn;
         <i class="fa fa-file-lines fa-fw mr-1" aria-hidden="true"></i>[*add::note/notes]0</a>
       %if;(b.propose_add_family!="no")
-      <a role="button" class="btn btn-outline-success" href="%prefix;m=ADD_FAM">
+      <a role="button" class="btn btn-outline-success" href="%prefix;m=ADD_FAM">%nn;
         <i class="fas fa-user-plus fa-fw mr-1" aria-hidden="true"></i>[*add::family/families]0</a>
       %end;
     %end;
@@ -495,7 +492,7 @@ fr: Mon compte associatif
 %end;
 %if;(((not roglo and wizard) or (roglo and user.ident!=""
     and (user.ident in b.superwizard or b.superwizard="all"))) and nb_persons.v!=0)
-  <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-8 mx-auto">
+  <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-9 mx-auto">
     <div class="h4 text-md-center">
       <i class="fas fa-book fa-sm fa-fw text-success mr-1"></i>[*book/books]1%nn;
     </div>
