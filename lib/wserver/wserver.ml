@@ -356,9 +356,8 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
       Unix.listen socket max_pending_requests;
       let tm = Unix.localtime (Unix.time ()) in
       Log.info (fun k ->
-          k "Ready %4d-%02d-%02d %02d:%02d port %d..." (1900 + tm.Unix.tm_year)
-            (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-            port);
+          k "Ready %4d-%02d-%02d %02d:%02d." (1900 + tm.Unix.tm_year)
+            (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min);
       if n_workers = 0 then ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
       accept_connections ~timeout ~n_workers callback socket
   | s ->
