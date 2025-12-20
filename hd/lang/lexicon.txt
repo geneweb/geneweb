@@ -8386,6 +8386,10 @@ de: auf einen nahen Vorfahren erweitern
 en: extend to a near ancestor
 fr: étendre à un ancêtre proche
 
+    falsely alive
+en: falsely shown as alive
+fr: indiqué vivant par erreur
+
     families with encoding
 af: gekodeerde families
 bg: семейства с кодиране
