@@ -26,7 +26,7 @@ COMMIT_TITLE := $(shell git log -1 --pretty="%s" | sed "s/\"/\\\"/g")
 COMMIT_COMMENT:= $(shell git log -1 --pretty="%b" | sed "s/\"/\\\"/g")
 BRANCH := $(shell git symbolic-ref --quiet --short HEAD || git branch -r --contains HEAD | head -n1 | tr -d ' ')
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
-VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
+VERSION := $(shell awk -F\" '/^let ver =/ {print $$2}' lib/version.txt)
 OCAMLV := $(shell ocamlopt --version)
 
 BUILD = dune build @bin/all @lib/all
@@ -50,10 +50,12 @@ fmt: ## Format Ocaml code
 
 # [BEGIN] Installation / Distribution section
 build:
+	@rm $(BUILD_DIR)/lib/version.ml
 	dune build
 
 build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
+	@rm $(BUILD_DIR)/lib/version.ml
 	dune build @bin/all @lib/all
 	@printf "Done."
 
