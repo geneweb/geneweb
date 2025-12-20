@@ -50,12 +50,12 @@ fmt: ## Format Ocaml code
 
 # [BEGIN] Installation / Distribution section
 build:
-	@rm $(BUILD_DIR)/lib/version.ml
+	@rm -f $(BUILD_DIR)/lib/version.ml
 	dune build
 
 build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
-	@rm $(BUILD_DIR)/lib/version.ml
+	@rm -f $(BUILD_DIR)/lib/version.ml
 	dune build @bin/all @lib/all
 	@printf "Done."
 
@@ -82,7 +82,7 @@ distrib: info ## Build the project and copy what is necessary for distribution
 	@printf "\n\033[1;1mBuilding executables\n\033[0m"
 	@$(BUILD)
 	@printf "Done.\n"
-	@$(RM) -r $(DISTRIB_DIR)
+	@rm -rf $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
@@ -217,7 +217,7 @@ endif
 bench-tabulate: ## Read BENCH_FILE and print a report
 bench-tabulate:
 	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
-	@$(RM) $(BENCH_FILE)
+	@rm -f $(BENCH_FILE)
 .PHONY: bench-tabulate
 
 clean:
