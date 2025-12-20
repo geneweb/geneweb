@@ -473,42 +473,30 @@
 %define;list_row(xxx, prefx, fam_cnt, ch_cnt)
   %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
   %if;("prefx"!="")<span class="text-monospace">prefx</span>%end;
-  %sp;%apply;image_MF("xxx")
+    %apply;image_MF("xxx")
   %apply;link%with;%xxx.access;%and;%xxx.first_name; %xxx.surname;%and;%xxx.index;%end;%nn;
   %if;(xxx.title!=""), %xxx.title;%end;
+  %xxx.dates;
   %if;(has_families)
     %foreach;family;
       <span class="text-nowrap">
         %if;(wizard and not cancel_links)
-          <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %xxx; [and] %xxx.spouse;">
+          <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %xxx; [and] %xxx.spouse;">%nn;
         %end;
-            <small>&%if;(nb_families>0)%apply;letter(family_cnt)%end; %if;(marriage_date.year!="")%marriage_date.year;%end;</small>
-        %if;(wizard and not cancel_links)
-          </a>
-        %end;
-      </span>
-      <span>
+        <small>&%if;(nb_families>0)%apply;letter(family_cnt)%end; %if;(marriage_date.year!="")%marriage_date.year;%end;</small>%nn;
+        %if;(wizard and not cancel_links)</a>%end;
         %sp;%apply;image_MF("xxx.spouse")
-        %apply;link%with;%xxx.spouse.access;
-        %and;%xxx.spouse.first_name; %xxx.spouse.surname;%and;%xxx.spouse.index;
-        %end;
+        %apply;link%with;%xxx.spouse.access;%and;%xxx.spouse.first_name; %xxx.spouse.surname;%and;%xxx.spouse.index;%end;
         %if;(xxx.spouse.title!=""), %xxx.spouse.title;%end;
+        %xxx.spouse.dates;
       </span>
-      %(&nbsp; (%xxx.nb_children;
-      %if;(1=0 or 1=0 and xxx.spouse.has_families and xxx.spouse.nb_children<xxx.spouse.nb_children_total)
-        -%xxx.spouse.nb_children_total;
-        %foreach;xxx.spouse.family;
-          %if;(is_first)%else;, %end;
-          &nbsp;%xxx.spouse.spouse;
-        %end;
-      %end;)%)
     %end;
   %end;
 %end;
 
 %( Parcours de l'arbre descendant, niveau par niveau %)
 %define;one_person(xxx, lv, max_l, prefx, fam_cnt, ch_cnt)
-  %if;(lv<max_l)
+  %if;(lv<=max_l)
     <div>
       %apply;list_row("xxx", "prefx", fam_cnt, ch_cnt)
     </div>
@@ -580,8 +568,8 @@
 %end;
 %( Main %)
 %if;(e.t="A")
-  <div class="mt-1">
-    <div class="my-1">[*d'Aboville] %apply;togend(e.v)[:]</div>
+  <div class="mt-1 ml-2">
+    <div class="mt-1"><b>[*d'Aboville]</b>[:]</div>
     %apply;one_person("self", 0, l_v, 1, nb_families, 0)
   </div>
 %else;

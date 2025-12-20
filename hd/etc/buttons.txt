@@ -189,7 +189,7 @@
           %end;
         %end;
         <span class="col-auto px-0 mr-2">[*generation/generations]0</span>
-        %if;not ((e.m="D" and (e.t="D" or e.t="L")) or (e.m="A" and (e.t="H" or e.t="G")))
+        %if;not ((e.m="D" and (e.t="D" or e.t="L" or e.t="A")) or (e.m="A" and (e.t="H" or e.t="G")))
           <div class="input-group mr-2">
             <div class="input-group-prepend">
               <label for="input_v0" class="input-group-text" title="v0= (min<=max)">min</label>
