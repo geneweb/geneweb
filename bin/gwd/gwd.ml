@@ -2102,22 +2102,25 @@ let geneweb_server ~predictable_mode () =
           else (
             Logs.app (fun k ->
                 k
-                  {|  Possible addresses:
-  http://localhost:%d/base
-  http://127.0.0.1:%d/base
-  http://%s:%d/base
-  where "base" is the name of the database
-  Type "Ctrl+C" to stop the service|}
-                  !selected_port !selected_port hostn !selected_port);
-            (* taken from Michel Normand commit 1874dcbf7 *)
+                  {|  GeneWeb %s
+
+  Possible addresses:
+    http://localhost:%d/base
+    http://127.0.0.1:%d/base
+    http://%s:%d/base
+    where “base” is the name of the database.
+
+  Type “Ctrl+C” to stop the service.
+|}
+                  Version.ver !selected_port !selected_port hostn !selected_port);
             Logs.debug (fun k ->
                 k
-                  {|  gwd parameters (after GWPARAM.init & cache_lexicon):
+                  {| Gwd parameters:
   source: %s
   branch: %s
   commit: %s
-  gwd:%s
-  current_dir_name: %s
+  gwd: %s
+  working_dir: %s
   gw_prefix: %s
   etc_prefix: %s
   images_prefix: %s
