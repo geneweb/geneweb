@@ -1,4 +1,286 @@
-Changelog for Versions 7.0 and 7.1
+GeneWeb version 7.1.0~beta2
+---------------------------
+After 20 months of development, this release represents a major evolution of
+GeneWeb with over 1000 commits and 300 merged pull requests. The work has been
+carried out by a small team of dedicated volunteers (A2, Henri Gouraud,
+michelmno) with significant technical contributions from Pierre Villemot at
+OcamlPro, canonici and ilankri at Geneanet and valuable input from the
+community. Special recognition to Claude AI models for development assistance.
+
+This version brings major areas of improvement: a complete infrastructure
+modernization with dune/opam build chain maintenance, the full implementation
+of a RPC server and an option to cache the database in memory, extensive
+performance optimizations particularly beneficial for large databases like
+Roglo, and a comprehensive suite of new genealogical tools that significantly
+enhance the user experience for both data entry and analysis.
+
+## Templates & User Interface
+The template system has undergone extensive modernization, introducing powerful
+new tools for genealogists while improving the overall user experience. The
+interface now benefits from enhanced JavaScript optimization, better caching
+mechanisms, and a more consistent design language.
+
+### New Genealogical Tools
+Seven new reference books have been added to facilitate data entry and ensure
+data consistency across the database. These books cover firstname aliases,
+surname aliases, public names, qualifiers, general aliases, titles, and domains.
+Each book provides a cache for autocomplete functionality and helps maintain
+standardized entries across large databases (A2).
+
+A new image mapping tool has been introduced, created in 2019 by Ludovic Ledieu
+(1974-2024), allowing detailed annotation of historical photographs and
+documents. This tool enables users to identify and link individuals within
+images, creating an interactive experience for enhancing family photographs (A2)
+Images can be either isolated or regrouped into albums (Michel de Lambilly).
+
+The Fanchart visualization has been completely revamped, building on Ludovic
+Ledieu's original work with improved rendering and interaction capabilities
+(A2).
+
+A comprehensive coat of arms management system has been integrated into the
+carousel mechanism, allowing heraldic images to be associated with multiple
+individuals (Michel de Lambilly).
+
+The carousel system itself has been reworked to better handle multiple images,
+coats of arms, and other media associated with an individual, moving beyond the
+simple portrait limitation (A2 and Henri Gouraud).
+
+### Data Quality and Analysis Tools
+A new data checking tool (`m=CHK_DATA`) has been introduced to identify common
+typographic errors in the reference books. This tool uses caching mechanisms to
+efficiently scan large databases and suggest corrections, helping maintain data
+quality across millions of records (A2).
+
+The RLM (Multiple Relation Link) builder provides a JavaScript-based interface
+accessible from the menubar, allowing users to manually construct complex
+relationship matrices between individuals. This tool integrates with the
+modernized graph editors for `upd_RLM` and `DAG`, providing a complete workflow
+for relationship analysis (A2).
+
+A new Relation Matrix tool (`m=RM`) calculates and displays multiple
+relationship links between individuals, helping genealogists visualize
+relationship percentages and the links between them (A2).
+
+### Search and Navigation Improvements
+The search system has been significantly reworked, delivering major performance
+improvements. Search operations that previously took 30+ seconds on large
+databases now complete in under 10 seconds, thanks to algorithmic optimizations
+and better use of caching (A2 and Henri Gouraud).
+
+Input autocompletion has been enhanced to work either through local cache files
+or via the new RPC server, providing responsive suggestions even on databases
+with hundreds of thousands of unique values (Halbaroth, Henri Gouraud and A2).
+
+The full display mode for individuals has been modernized, with improved
+ascending and descending view layouts that better utilize screen space (A2).
+
+Notes display has been modernized with a tree view structure for directory
+listings, making it easier to navigate complex note hierarchies (A2).
+
+The database index now provides direct links to all available databases on the
+server, simplifying multi-database navigation (Henri Gouraud).
+
+The homonyms list has been reworked to provide more information for better
+identification of individuals with similar names (Henri Gouraud).
+
+### Automatic Updates and Cross-References
+Person references in notes and image maps are now automatically updated when
+individuals are modified or merged, maintaining data consistency across the
+database without manual intervention (Henri Gouraud).
+
+### Form Enhancements
+Data entry forms now feature floating placeholders that improve the user
+experience by clearly indicating what information belongs in each field (A2).
+
+A new Ctrl+click functionality provides direct links from input fields to the
+corresponding reference books for wizards, allowing users to quickly verify or
+add standardized entries without leaving the form (A2).
+
+### New Template Variables
+Several new template variables enhance the flexibility of custom templates:
+* **Place details**: `%xxx_place.main;` and `%xxx_place.subplace;` for all event
+types (birth, marriage, death, etc.) - allows separate display of main location
+and subdivision
+* **Marriage span**: `%marriage_age_years;` - provides the marriage duration
+* **Predictable mode**: `predictable_mode` boolean - enables deterministic
+template rendering for testing purposes
+* **Roglo support**: `roglo=yes` - activates Roglo-specific template extensions
+
+### Event Display
+Events in the NMBDS (baptism, marriage, death, burial) display now include notes
+and sources directly in the interface, with the option to hide these tooltips
+through the `event_tooltips=no` configuration parameter (A2).
+
+### Access Control
+The access system has been reworked to include a new SemiPublic status for
+Roglo, providing finer-grained control over data visibility.
+A new field has been added in the .auth file providing the key in the base of
+identified users. This allow one click display of the path between the visitor
+and the visited person (Henri Gouraud).
+
+## Core Infrastructure (Pierre Villemot@OcamlPro)
+Pierre Villemot at OcamlPro led a comprehensive infrastructure modernization
+that transforms how GeneWeb is built, deployed, and maintained. These changes
+provide a solid foundation for future development while improving performance
+and maintainability.
+
+### Cache in Memory, RPC Server and Backend Architecture
+The groundbreaking memory caching system introduced through the `-cache-in-
+memory <BASE>` parameter for `gwd` and developed by Keryan Didier at OcamlPro
+has been maintained operationally by Pierre Villemot. This feature preloads
+entire databases into memory at launch time using the `ocaml-ancient` library to
+share read-only data across forked processes without duplication. The system
+improves response times on large databases. This feature requires the no-naked-
+pointers compiler variant and is Unix-only due to dependencies on `nnp` and
+`ancient` libraries. It can be enabled at build time through `./configure --gwd-
+caching`. The tradeoff is a longer server startup time (approximately 30 seconds
+for large databases) as all data is preloaded.
+
+A complete RPC server implementation has been introduced, featuring a full
+search engine that can be deployed separately from the main web server. This
+architecture enables better scalability and allows specialized optimizations for
+search operations. The RPC server uses cmdliner for command-line parameter
+handling and integrates seamlessly with the existing GeneWeb infrastructure.
+
+The logging system has been completely refactored to use the standard `logs` and
+`logs-syslog` libraries, replacing the previous custom logging implementation.
+This provides better integration with modern Unix system logging and more
+flexible log management.
+
+Core libraries have been reorganized, with `gwdb` and `sosa` receiving
+particular attention to improve modularity and reduce coupling between
+components. The lock system that manages concurrent access to databases has been
+refactored for better reliability and performance.
+
+A simple worker pool has been added to `gwd`, controlled by the `-n_workers`
+parameter. This allows the web server to handle multiple requests concurrently
+while maintaining database consistency.
+
+The legacy `gwrepl` tool has been removed as its functionality has been
+superseded by more modern approaches.
+
+### Build System
+The `configure.ml` script and opam configuration files have been simplified and
+updated. Support for Nix has been added, enabling reproducible builds and easier
+deployment in Nix-based environments. GeneWeb's development environment now uses
+`DUNE_PROFILE=release` or `dev` to control optimization levels and debugging
+information.
+
+Dependencies have been significantly updated. OCaml version 4.10 is now the
+minimum requirement, with support extending up to OCaml 5.4.0. Dune requires
+version 3.6 or later, and camlp5 needs version 8.03 minimum. New dependencies
+include `decompress` for compression support, `logs` and `logs-syslog` for
+logging, `yojson` for JSON handling, `digestif` for hashing, `pp_loc` for error
+reporting, `utop` for interactive development, and `ancient` as an optional
+dependency for in-memory caching optimization. The `num` library has been
+removed (eliminating the `--sosa_num` configure option), and the custom`syslog`
+implementation has been replaced by the standard library.
+
+### Testing and Continuous Integration
+All Github CI workflows have been optimized and extended. Added a native ARM64
+Docker support (A2). The Dockerfile created by Florian Piesched in 2024) has
+been maintained (Jeffery Fernandez) and upgraded to support in-memory cache
+option (Pierre Villemot and A2). A Google Colaboratory script has been added
+for online quick testing, enabling rapid validation of changes without local
+environment setup (A2). A new `run-gw-test.sh` test script framework facilitates
+automated database and template testing (michelmno and Henri Gouraud).
+
+## Base Reorganization 
+A new database reorganization system available through the `-reorg` parameter
+has been implemented. This feature restructures the file and directory layout of
+databases optimizing storage of data linked to a single database (Henri Gouraud)
+
+## Web Performance & Optimization (A2)
+Significant performance improvements have been achieved across the web
+interface, with particular focus on reducing bandwidth usage and improving
+response times for large databases.
+
+### Compression
+Dynamic HTML compression has been implemented with configurable gzip compression
+levels (0-9) through the `gzip_html_compression` configuration parameter. This
+can reduce HTML transfer sizes by 70-80% for typical genealogical pages,
+significantly improving load times on slower connections.
+
+Static assets including CSS and JavaScript files are now pre-compressed and
+served with `.gz` extensions, eliminating compression overhead on each request
+while maintaining the bandwidth benefits.
+
+### JavaScript and Asset Optimization
+JavaScript handling has been optimized through better DOMContent loading
+strategies, reducing the time before pages become interactive. Static assets now
+include hash-based versioning, enabling aggressive browser caching while
+ensuring users always receive the latest versions when files change.
+
+### Cousin Caching Improvements
+The cache file system has been enhanced with better performance characteristics.
+The cousins calculation tool (`m=C`) now supports database-specific caching
+through `cache_cousins_tool` and `cache_cousins_ttl` configuration parameters,
+reducing calculation times for frequently accessed relationship data.
+
+## Configuration Parameters (GWF)
+The `.gwf` configuration file format has been extended with numerous new
+parameters that control the advanced features introduced in this release:
+
+**Compression and Performance:**
+- `gzip_html_compression=0-9` sets the HTML compression level (0=off, 9=maximum)
+- `cache_cousins_tool=yes` enables cousin calculation caching
+- `cache_cousins_ttl=72` sets cache time-to-live in hours
+
+**RPC Server Integration:** 
+- `rpc_server_url=myserver.org` specifies the RPC
+server location
+- `rpc_datalist=1` enables RPC-based datalists for
+autocompletion
+
+**Template Features:**
+- `roglo=yes` activates Roglo-specific template extensions
+- `event_tooltips=no` hides event notes and sources in tooltips
+
+**Form Autocompletion:**
+A new set of datalist parameters control which fields offer autocompletion:
+`datalist_aliases`, `datalist_estates`, `datalist_fnames`, `datalist_occupations`,
+`datalist_places`, `datalist_pub_names`, `datalist_qualifiers`,
+`datalist_snames`, `datalist_titles`, and `datalist_sources`. Each can be set to
+`1` to enable autocompletion for that field type.
+
+## Tools & Utilities
+Several command-line tools have been enhanced or introduced:
+The `cache_files.exe` utility now accepts additional parameters for generating
+binary caches used by the Check Data tool and supports all reference book types
+(Henri Gouraud and A2).
+
+A new `robot.exe` tool provides IP blacklist management with various parameters,
+helping administrators control access and prevent abuse (A2).
+
+The `gwc` compiler now includes a `-nopublic` option for processing databases
+with privacy restrictions (Geneanet).
+
+The `gwd` web server accepts the `-n_workers #` parameter to control the worker
+pool size (Pierre Villemot).
+
+## Translations
+Community translators have contributed updates and new translations: Corsican
+language support (Patriccollu), German improvements (ftrojahn), and Portuguese
+enhancements (smmribeiro).
+
+## Bug Fixes and Code Quality
+Throughout the development cycle, hundreds of code optimizations, bug fixes, and
+cleanup operations have been performed across the codebase. These improvements
+enhance stability, maintainability, and performance, though they are too
+numerous to list individually. The cumulative effect is a more robust and
+reliable platform for genealogical research.
+
+---
+This release represents a significant step forward for GeneWeb, balancing
+infrastructure improvements that ensure long-term sustainability with user-
+facing features that enhance the genealogical research experience. The
+foundation laid by this work enables continued evolution of the platform to meet
+the needs of both small family databases and large-scale genealogical projects
+like Roglo.
+
+
+GeneWeb version 7.0.0 and 7.1~alpha
+-----------------------------------
 
 Various minor corrections and updates in template files.
 
