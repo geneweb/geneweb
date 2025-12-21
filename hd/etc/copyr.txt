@@ -166,14 +166,14 @@
             <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
             <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
           </a>%nn;
-          %if;predictable_mode;GeneWeb v. %version;
+          %if;predictable_mode;GeneWeb %version;
           %else;
             <a href="https://github.com/%source;/tree/%commit_id;"
                data-toggle="tooltip" data-html="true"
                title="[*branch/branches]0 %branch; [compiled on] %compil_date;%nn;
                %if;not is_printed_by_template;&#010;
                %else;<br>%end;[from commit] %commit_id; (%commit_date)">%nn;
-              GeneWeb v. %version;</a>
+              GeneWeb %version;</a>
           %end;
         </div>
         <div class="btn-group mt-0">
