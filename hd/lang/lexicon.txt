@@ -2506,6 +2506,10 @@ sl: tudi
 sv: också
 tr: ayrıca
 
+    previously/subsequently
+en: previously/subsequently
+fr: auparavant/par la suite
+
     an ancestor
 af: 'n voorsaat
 bg: един от предците
@@ -16358,7 +16362,7 @@ eo: rilato%t kun
 es: parentesco%t con
 et: kooselu%t
 fi: suhde%t ja
-fr: relation%t avec
+fr: en relation%t avec
 he: %t קירבה
 is: sambúð%t með
 it: legame%t con
@@ -16808,6 +16812,10 @@ co: infurmazione legale
 de: rechtlich
 en: legal
 fr: mentions légales
+
+    pacs%t to
+en: pacs%t with
+fr: pacsé%t avec/pacsée%t avec/pacsés
 
     path to
 co: chjassu versu mè/chjassu versu u Sosa n<sup>u</sup> 1

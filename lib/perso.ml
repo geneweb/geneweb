@@ -4640,7 +4640,11 @@ let print_foreach conf base print_ast eval_expr =
         let gpl = next_generation conf base mark gpl in
         loop gpl (succ i) n
     in
-    loop [ GP_person (Sosa.one, Driver.get_iper p, None) ] 0 0
+    let first_family =
+      let families = Driver.get_family p in
+      if Array.length families > 0 then Some families.(0) else None
+    in
+    loop [ GP_person (Sosa.one, Driver.get_iper p, first_family) ] 0 0
   in
 
   let print_foreach_ascendant_at_level env al ((p, _) as ep) =
