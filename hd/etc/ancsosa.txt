@@ -264,24 +264,6 @@
   %end;
 %end;
 
-%define;married_to(is_male, date_place)
-  %if;is_male;
-    %if;are_married;[married%t to:::date_place]0%nn;
-    %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
-    %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
-    %elseif;is_no_sexes_check;[relationship%t to:::date_place]0%nn;
-    %elseif;is_no_mention;date_place [with]%nn;
-    %end;
-  %else;
-    %if;are_married;[married%t to:::date_place]1%nn;
-    %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
-    %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
-    %elseif;is_no_sexes_check;[relationship%t to:::date_place]1%nn;
-    %elseif;is_no_mention;date_place [with]%nn;
-    %end;
-  %end;
-%end;
-
 %let;lai;alt="[image/images]0"%in;
 %let;ltap;%if;(wizard and not cancel_links) title="[*add::parents]" %end;%in;
 %let;ltmf;%if;(wizard and not cancel_links) title="[*modify::family/families]0" %end;%in;
@@ -553,7 +535,6 @@
           </table>
         %end;
       </td></tr></table>
-      <br>
     %end;
     %if;(e.src = "on" and child.has_sources)
       %if;(e.notes = "on" and (child.has_notes or child.has_event))<hr>%end;
@@ -583,7 +564,7 @@
              and ancestor.same="")
           <div class="shadow p-3">
           <dt><b><a href="#%ancestor.anc_sosa.v;" name="notes-%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
-          %apply;letter(child_cnt)</b></a> <span class="small text-muted">(%ancestor;%ancestor.dates;)</span></dt>
+          <span class="small text-muted">(%ancestor;%ancestor.dates;)</span></dt>
           <dd>
           %if;(e.notes = "on" and (ancestor.has_notes or ancestor.has_event))
             <table><tr><td>
@@ -733,60 +714,55 @@
   %end;
   %if;(ancestor.index!=index)%apply;personal_notes() %if;(e.inline!="on")%apply;parents_links()%end;%end;
   %foreach;ancestor.family;
-    %if;(ancestor.index=index or family.index!=ancestor.family.index)
-      <div class="mt-1 mb-3 ml-4 mr-2 px-3 py-2 shadow">…
-        %apply;married_to%with;%ancestor.is_male;%and;
-          %if;(ancestor.index!=index) (%family_cnt;)%end;
-          %if;(on_marriage_date!="") %on_marriage_date;%end;
-          %if;(marriage_place!="") [in (place)] %marriage_place;%end;
-        %end;…
-        %if;(e.witn="on" and has_witnesses)   
-          ([witness/witnesses]1[:] %foreach;witness;
-            %if;(not is_first),%nl;%end;
-            %apply;link2(witness.var, witness.index)
-          %end;)
-        %end;
-        <div>%apply;somebody("spouse").</div>
-      </div>
+    %if;(family.index=ancestor.family.index and (ancestor.anc_sosa.v=1 or ancestor.is_male))
+      <div class="my-1">… %apply;married_to%with;ancestor%and;
+        %if;(on_marriage_date!="") %on_marriage_date;%end;
+        %if;(marriage_place!="") [in (place)] %marriage_place;%end;
+      %end;…
+      %apply;setvar%with;main_date%and;%marriage_date.julian_day;%end;
+      %if;(e.witn="on" and has_witnesses)    ([witness/witnesses]1[:]
+        %foreach;witness;
+          %if;(not is_first),%sp;%end;
+          %apply;link2(witness.var, witness.index)
+        %end;)
+      %end;</div>
     %end;
   %end;
 %end;
 
 %define;child_long_info(spec)
-  <b>%apply;my_link(child.access, child.child_name, child.is_restricted, child.index)%nn;</b>%nn;
-  %apply;somebody_long_info("child")
+  <b>%apply;my_link(child.access, child.child_name, child.is_restricted, child.index)</b>%(%child.dates;%)%nn;
   %if;(child.sosa_in_list!="")
-    %if;(e.only!="on" and not cancel_links) [*see] <a href="#%child.sosa_in_list;"><b>%child.sosa_in_list;</b></a>.%end;
+    %if;(e.only!="on" and not cancel_links). [*see] <a href="#%child.sosa_in_list;"><b>%child.sosa_in_list;</b></a>.%end;
   %else;
+    %apply;somebody_long_info("child")
     %apply;somebody_extra_info("child")
     %if;((e.notes="on" and (child.has_notes or child.has_event) and e.inline="on") or (e.src="on" and child.has_sources and e.inline="on"))
-      .<div class="mt-2 mb-3 ml-4 mr-2 p-3 shadow">
+      .<div class="my-2 ml-4 mr-2 p-3 shadow">
         %if;(e.notes="on" and (child.has_notes or child.has_event))
           <div class="h5">[*note/notes]1</div> %apply;clean_comment_tags(child.notes)
           %if;child.has_event;
             <table>
               %foreach;child.event;
                 <tr>
-                  <td valign="top" style="white-space: nowrap;" width="1">
+                  <td class="align-top text-nowrap" style="width:1%%">
                     <span class="edate">
                       %if;event.has_date;%event.date; :
                       %else;--- :
                       %end;
                     </span>
                   </td>
-                  <td valign="top">
+                  <td class="align-top">
                     <span>
                       %apply;capitalize(event.name)%sp;
                       %if;event.has_spouse;([with] %event.spouse;)%end;
                       %if;event.has_place; - %event.place; %end;
                     </span>
                     %if;event.has_witnesses;
-                      <p style="margin:0;">
-                        %foreach;event_witness;
-                          <span>%apply;capitalize(event_witness_kind)[:]</span>
-                          %apply;short_display_person("event_witness")<br>
-                        %end;
-                      </p>
+                      %foreach;event_witness;
+                        <span>%apply;capitalize(event_witness_kind)[:]</span>
+                        %apply;short_display_person("event_witness")<br>
+                      %end;
                     %end;
                     %if;event.has_note;<div>%event.note;</div>%end;
                     %if;event.has_src;<span><em>[*source/sources]1[:] %event.src;</em></span>%end;
@@ -810,84 +786,98 @@
       <sup><small>(<a href="#notes-%ancestor.anc_sosa.v;%if;("spec"!= "")-spec%end;%apply;letter(child_cnt)">%nn;
         %if;(e.notes="on")[note/notes]0%else;%[[*source/sources]1%end;
          %ancestor.anc_sosa;%if;("spec"!="")-spec%end;%apply;letter(child_cnt)
-      </a>)</small></sup>.
+      </a>)</small></sup>%nn;
     %end;
+    %if;not child.has_families;.%else;…%end;
     %foreach;child.family;
-      <div class="mt-1 mb-3 ml-4 mr-2 px-3 py-2 shadow">…
-        %apply;married_to%with;%child.is_male;%and;
+      <div class="my-1 ml-3 mr-2 px-2 py-1 shadow">…
+        %apply;married_to%with;child%and;
           %if;(on_marriage_date!="") %on_marriage_date;%end;
           %if;(marriage_place!="") [in (place)] %marriage_place;%end;
-        %end;…
-        <div>%apply;somebody("spouse").</div>
-        %if;are_divorced;… [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;
-        %elseif;are_separated;… [separated]%if;(on_separation_date!="") %on_separation_date%end;
+        %end; %apply;somebody("spouse")
+        %if;(nb_children=0).%else;, %apply;havingchildren(nb_children)%end;
+        %if;are_divorced; ; [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.
+        %elseif;are_separated; ; [separated]%if;(on_separation_date!="") %on_separation_date;%end;.
         %end;
       </div>
     %end;
   %end;
 %end;
 
-%define;long_display_ancestor_families()
-  %if;ancestor.is_male;…
-    %foreach;ancestor.family;
-      %if;(family.index=ancestor.family.index)
-        %apply;married_to%with;%ancestor.is_male%and;
-          %if;(on_marriage_date!="") %on_marriage_date;%end;
-          %if;(marriage_place!="") [in (place)] %marriage_place;%end;
-        %end;…
-        %if;(e.witn="on" and has_witnesses)   ([witness/witnesses]1[:]
-          %foreach;witness;
-            %if;(not is_first),%nl;%end;
-            %apply;link2(witness.var, witness.index)
-          %end;)
-        %end;
-        %if;(e.comm="on" and (has_comment or has_marriage_note))
-          (%comment;
-           %if;has_marriage_note;%marriage_note;%end;)%nl;
-        %end;
-      %end;
-    %end;
-  %else;
-    %foreach;ancestor.family;
-      %if;(family.index=ancestor.family.index)
-        %apply;havingchildren(nb_children)[:]
-        <ol type="a" class="mt-1">
+%define;marriage_timing(ancestor_marriage_date, this_date)
+  %if;("this_date"="" or "ancestor_marriage_date"="")[also]%nn;
+    %elseif;(this_date<ancestor_marriage_date)[previously/subsequently]0%nn;
+    %else;[previously/subsequently]1%nn;
+  %end;
+%end;
+
+%define;display_remarriage(xx)
+  <div class="mt-2 p-1%if;(ancestor.anc_sosa.v!=1 or (ancestor.anc_sosa.v=1 and "xx"="ancestor.spouse")) pl-3%sp;
+    border-left border-%if;(xx.sex=0)primary%else;danger%end; shadow%end;">
+    <b>%xx;</b>%sp;
+    %apply;marriage_timing%with;%apply;getvar%with;main_date%end;%and;%marriage_date.julian_day;%end;%sp;
+    %apply;married_to%with;xx%and;
+      %if;(on_marriage_date!="") %on_marriage_date;%end;
+      %if;(marriage_place!="") [in (place)] %marriage_place;%end;
+    %end;%sp;%apply;somebody("spouse")
+    %if;(nb_children=0).%else;, %apply;havingchildren(nb_children)
+      %if;(e.siblings="on" or ancestor.anc_sosa.v=1)[:]%nn;
+        <ol type="a" class="mt-1 mb-0">
           %foreach;child;
-            %if;(e.siblings="on" or child.sosa_in_list!="")
-              <li>%apply;child_long_info("")</li>
-            %end;
+            <li>%apply;child_long_info(family_cnt)</li>
           %end;
         </ol>
       %end;
     %end;
-    %if;(e.siblings="on")
-      %( father's other children %)
-      %foreach;ancestor.spouse.family;
-        %if;(spouse.index!=ancestor.index and nb_children>0)
-          … %apply;havingchildren(nb_children)%sp;
-          <a href="#%family.father.sosa_in_list;"><b>%family.father.sosa_in_list;
-          </b></a>-(X%family_cnt;)[:]
-          <ol type="a">
-            %foreach;child;
-              <li>%apply;child_long_info(family_cnt)</li>
-            %end;
-          </ol>
-        %end;
+    <div>%nn;
+      %if;are_divorced;… [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.%nn;
+      %elseif;are_separated;… [separated]%if;(on_separation_date!="") %on_separation_date;%end;.%nn;
       %end;
-      %( mother's other children %)
-      %foreach;ancestor.family;
-        %if;(spouse.index!=ancestor.spouse.index and nb_children>0)
-          … %apply;havingchildren(nb_children)%sp;
-          <a href="#%family.mother.sosa_in_list;"><b>%family.mother.sosa_in_list;</b></a>-(X%family_cnt;)[:]
-          <ol type="a">
-            %foreach;child;
-              <li>%apply;child_long_info(family_cnt)</li>
+    </div>
+  </div>
+%end;
+
+%define;long_display_ancestor_families()
+  %if;((ancestor.anc_sosa.v=1 and has_families) or ancestor.is_female)
+    %foreach;ancestor.family;
+      %if;(family.index=ancestor.family.index)
+        %if;(ancestor.anc_sosa.v=1)%apply;somebody("spouse")%end;
+        %if;(nb_children>0)
+          <div class="mt-1">
+            %if;(e.siblings="on" or ancestor.anc_sosa.v=1 )
+              %apply;havingchildren(nb_children)[:]
+              <ol type="a" class="mt-1 mb-0">
+                %foreach;child;
+                  %if;(e.siblings="on" or child.sosa_in_list!="" or ancestor.anc_sosa.v=1)
+                    <li>%apply;child_long_info("")</li>
+                  %end;
+                %end;
+              </ol>
+            %else;
+              %let;child_sosa;%expr((ancestor.anc_sosa.v-1)/2)%in;
+              %apply;a_of_b%with;[*parents]%and; <a href="#%child_sosa;"><b>%child_sosa;</b></a>.%end;
             %end;
-          </ol>
+          </div>
         %end;
+        <div class="my-1">%nn;
+          %if;are_divorced;… [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.
+          %elseif;are_separated;… [separated]%if;(on_separation_date!="") %on_separation_date;%end;.
+          %end;
+        </div>
+      %end;
+    %end;
+    %foreach;ancestor.spouse.family;
+      %if;(spouse.index!=ancestor.index)
+        %apply;display_remarriage("ancestor.spouse")
+      %end;
+    %end;
+    %foreach;ancestor.family;
+      %if;(spouse.index!=ancestor.spouse.index)
+        %apply;display_remarriage("ancestor")
       %end;
     %end;
   %end;
+  %if;(ancestor.anc_sosa.v%2=1)<hr class="my-2">%end;
 %end;
 
 %define;dates_in_interval(xx)
@@ -1347,7 +1337,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %if;(v0=1 and only=0)%apply;togena(e.v)
     %else;
       %if;(v0>1 and v0<l_v and only=0)%apply;fromthenth(v0)%end;
-      %sp;%if;(e.t="G")%apply;uptothegen(l_v)%else;%apply;tothenthgen(l_v)%end;
+      %sp;%if;(e.t="G")%apply;togena(l_v)%else;%apply;tothenthgen(l_v)%end;
     %end;
   %if;(e.t="D") [up to] %p_of_index.1; %if;(e.v > 4) %apply;togena(e.v)%end;%end;
   %if;(e.t="X")<div class="ml-3">[only] [up to] %pvar.1; %pvar.1.dates;</div>%end;
@@ -1677,7 +1667,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   <p>[*total][:] %count; [person/persons]n</p>
 
 %elseif;(e.t="G" and e.only="on")
-  %( long display; only the selected generation %)
+  %( long display %)
   %if;((e.notes="on" or e.src="on") and e.inline!="on")
     <div>
       [*see][:] <a href="#asc">[*ancestor/ancestors]1</a>%sp;%nn;
@@ -1698,9 +1688,9 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         %else;
             <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
             %apply;long_display_ancestor_personal()
-          %if;(ancestor.index!=self.index)
-            <p>%apply;long_display_ancestor_families()</p>
-          %end;
+            %if;(ancestor.index!=self.index)
+              <div class="my-1">%apply;long_display_ancestor_families()</div>
+            %end;
         %end;
       %end;
     %end;
@@ -1714,7 +1704,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   <div class="mx-3">
     %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
     %foreach;ancestor_level(nb_gen)
-      %if;(level>0)<h4 class="mt-3">[*generation/generations]0 %level;</h4>%end;
+      %if;(level>0)<h4 class="mt-2">[*generation/generations]0 %level;</h4>%end;
       %foreach;ancestor;
         %if;(ancestor.same!="")
           <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</a></b>[:]
@@ -1722,9 +1712,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         %else;
           <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</a></b>
           %apply;long_display_ancestor_personal()
-          %if;(ancestor.index!=self.index)
-            <div class="my-1">%apply;long_display_ancestor_families()</div>
-          %end;
+         <div class="my-1">%apply;long_display_ancestor_families()</div>
         %end;
       %end;
     %end;
