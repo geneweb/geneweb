@@ -29,8 +29,6 @@ SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[
 VERSION := $(shell awk -F\" '/^let ver =/ {print $$2}' lib/version.txt)
 OCAMLV := $(shell ocamlopt --version)
 
-BUILD = dune build @bin/all @lib/all
-
 info:
 	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with OCaml $(OCAMLV).\n\n'
 	@printf 'Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. '
@@ -48,14 +46,15 @@ fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
 	dune build @fmt --auto-promote
 
-# [BEGIN] Installation / Distribution section
-build:
+.PHONY: clean-version
+clean-version:
 	@rm -f $(BUILD_DIR)/lib/version.ml
+
+build: clean-version
 	dune build
 
-build-geneweb: ## Build the geneweb package (libraries and binaries)
+build-geneweb: clean-version ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
-	@rm -f $(BUILD_DIR)/lib/version.ml
 	dune build @bin/all @lib/all
 	@printf "Done."
 
@@ -64,7 +63,7 @@ build-geneweb-rpc: ## Build the geneweb-rpc package
 	dune build @rpc/all
 	@printf "Done."
 
-gwd: ## Build ondy gwd/gwc executables
+gwd: clean-version ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
 	dune build bin/gwd bin/gwc
 	@printf "Done."
@@ -78,9 +77,7 @@ uninstall: ## Uninstall geneweb using dune
 	dune build @install
 	dune uninstall
 
-distrib: info ## Build the project and copy what is necessary for distribution
-	@printf "\n\033[1;1mBuilding executables\n\033[0m"
-	@$(BUILD)
+distrib: info build-geneweb ## Build the project and copy what is necessary for distribution
 	@printf "Done.\n"
 	@rm -rf $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
