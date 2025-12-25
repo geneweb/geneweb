@@ -1,7 +1,5 @@
 (executable
- (package geneweb-rpc)
  (name rpc_test)
- (public_name rpc_test)
  (modules rpc_test)
  (libraries fmt yojson geneweb_rpc httpun httpun-lwt-unix httpun-ws))
 

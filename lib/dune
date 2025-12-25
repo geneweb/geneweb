@@ -24,6 +24,7 @@
   geneweb_util
   geneweb_templ
   geneweb_logs
+  geneweb_sites
   yojson
   markup
   re

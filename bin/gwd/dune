@@ -18,7 +18,7 @@
 (executable
  (package geneweb)
  (name gwd)
- (public_name geneweb.gwd)
+ (public_name gwd)
  (flags -linkall)
  (libraries
   dynlink

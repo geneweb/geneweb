@@ -15,7 +15,7 @@ build: [
   ["dune" "install" "-p" name "--create-install-files" name]
   ["cmdliner" "install" "tool-support"
               "--update-opam-install=%{_:name}%.install"
-              "_build/install/default/bin/geneweb-rpc.server" {os-family != "windows"}
-              "_build/install/default/bin/geneweb-rpc.server.exe" {os-family = "windows"}
+              "_build/install/default/bin/gwd-rpc" {os-family != "windows"}
+              "_build/install/default/bin/gwd-rpc.exe" {os-family = "windows"}
               "_build/cmdliner-install"]
 ]

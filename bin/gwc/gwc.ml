@@ -125,8 +125,10 @@ let speclist =
   [
     ( "-bd",
       Arg.String Secure.set_base_dir,
-      "<DIR> Specify where the “bases” directory with databases is installed \
-       (default if empty is “.”)." );
+      Fmt.str
+        "<DIR> Specify where the “bases” directory with databases is installed \
+         (default if empty is %S)."
+        Secure.default_base_dir );
     ( "-bnotes",
       Arg.Set_string bnotes,
       " [drop|erase|first|merge] Behavior for base notes of the next file. \

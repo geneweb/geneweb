@@ -8,6 +8,6 @@
 (executable
  (package geneweb)
  (name gwu)
- (public_name geneweb.gwu)
+ (public_name gwu)
  (modules gwu)
  (libraries geneweb gwexport_lib gwu_lib str unix))

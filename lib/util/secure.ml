@@ -7,7 +7,13 @@
 
 let ok_r = ref []
 let assets_r = ref [ "gw" ]
-let bd_r = ref (Filename.concat Filename.current_dir_name "bases")
+let ( // ) = Filename.concat
+
+let default_base_dir =
+  let t = Xdg.create ~env:Sys.getenv_opt () in
+  Xdg.data_dir t // "geneweb" // "bases"
+
+let bd_r = ref default_base_dir
 
 (* [decompose: string -> string list] decompose a path into a list of
    directory and a basename. "a/b/c" -> [ "a" ; "b"; "c" ] *)

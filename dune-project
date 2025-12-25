@@ -1,7 +1,8 @@
 (lang dune 3.6)
+(using dune_site 0.1)
+(generate_opam_files true)
 
 (name geneweb)
-(generate_opam_files true)
 (license GPL-2.0-only)
 (authors "Daniel de Rauglaudre")
 (maintainers "Elie Canonici-Merle <elie.canonicimerle@geneanet.org>")
@@ -12,8 +13,10 @@
 (package
   (name geneweb)
   (synopsis "Genealogy library and software")
-  (description "GeneWeb is an open source genealogy software written in OCaml. It comes with a Web interface and can be used off-line or as a Web service.")
+  (description "GeneWeb is an open source genealogy software written in OCaml. \
+    It comes with a Web interface and can be used off-line or as a Web service.")
   (tags (genealogy))
+  (sites (share hd))
   (depends
     (ocaml (>= 4.10))
     (alcotest :with-test)
@@ -41,6 +44,8 @@
     yojson
     digestif
     pp_loc
+    dune-site
+    xdg
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.28.1")))
   )

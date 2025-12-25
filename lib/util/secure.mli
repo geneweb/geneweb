@@ -3,6 +3,9 @@
 val assets : unit -> string list
 (** Returns list of allowed to acces assets *)
 
+val default_base_dir : string
+(** Default value for the base directory. *)
+
 val base_dir : unit -> string
 (** Returns directory where databases are installed to which acces is allowed *)
 

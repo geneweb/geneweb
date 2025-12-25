@@ -66,6 +66,8 @@
               pcre2
               benchmark
               calendars
+              dune-site
+              xdg
               camlp5
               camlp-streams
               decompress
