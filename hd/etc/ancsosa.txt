@@ -715,10 +715,7 @@
   %if;(ancestor.index!=index)%apply;personal_notes() %if;(e.inline!="on")%apply;parents_links()%end;%end;
   %foreach;ancestor.family;
     %if;(family.index=ancestor.family.index and (ancestor.anc_sosa.v=1 or ancestor.is_male))
-      <div class="my-1">… %apply;married_to%with;ancestor%and;
-        %if;(on_marriage_date!="") %on_marriage_date;%end;
-        %if;(marriage_place!="") [in (place)] %marriage_place;%end;
-      %end;…
+      <div class="my-1">… %apply;married_to%with;ancestor%and;0%end;…
       %apply;setvar%with;main_date%and;%marriage_date.julian_day;%end;
       %if;(e.witn="on" and has_witnesses)    ([witness/witnesses]1[:]
         %foreach;witness;
@@ -791,10 +788,7 @@
     %if;not child.has_families;.%else;…%end;
     %foreach;child.family;
       <div class="my-1 ml-3 mr-2 px-2 py-1 shadow">…
-        %apply;married_to%with;child%and;
-          %if;(on_marriage_date!="") %on_marriage_date;%end;
-          %if;(marriage_place!="") [in (place)] %marriage_place;%end;
-        %end; %apply;somebody("spouse")
+        %apply;married_to%with;child%and;0%end; %apply;somebody("spouse")
         %if;(nb_children=0).%else;, %apply;havingchildren(nb_children)%end;
         %if;are_divorced; ; [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.
         %elseif;are_separated; ; [separated]%if;(on_separation_date!="") %on_separation_date;%end;.
@@ -816,10 +810,7 @@
     border-left border-%if;(xx.sex=0)primary%else;danger%end; shadow%end;">
     <b>%xx;</b>%sp;
     %apply;marriage_timing%with;%apply;getvar%with;main_date%end;%and;%marriage_date.julian_day;%end;%sp;
-    %apply;married_to%with;xx%and;
-      %if;(on_marriage_date!="") %on_marriage_date;%end;
-      %if;(marriage_place!="") [in (place)] %marriage_place;%end;
-    %end;%sp;%apply;somebody("spouse")
+    %apply;married_to%with;xx%and;0%end; %apply;somebody("spouse")
     %if;(nb_children=0).%else;, %apply;havingchildren(nb_children)
       %if;(e.siblings="on" or ancestor.anc_sosa.v=1)[:]%nn;
         <ol type="a" class="mt-1 mb-0">
@@ -1712,7 +1703,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         %else;
           <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</a></b>
           %apply;long_display_ancestor_personal()
-         <div class="my-1">%apply;long_display_ancestor_families()</div>
+          <div class="my-1">%apply;long_display_ancestor_families()</div>
         %end;
       %end;
     %end;
