@@ -37,7 +37,7 @@ let available_languages =
     "zh";
   ]
 
-let ver = "7.1-beta"
+let ver = "7.1.0~beta2"
 let branch = "%BRANCH%"
 let src = "%SOURCE%"
 let commit_id = "%COMMIT_ID%"
