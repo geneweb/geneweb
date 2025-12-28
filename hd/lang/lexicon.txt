@@ -11783,6 +11783,10 @@ ru: жил(а) с %s по %s
 sv: lever från/till
 tr: yaşamış/için
 
+    lock group
+en: lock this group
+fr: verrouiller ce groupe
+
     long display
 af: uitgebreide weergawe
 bg: подробни резултати
