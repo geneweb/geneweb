@@ -1834,7 +1834,9 @@ $(document).ready(function() {
     resetButtonHandler();
     addClearButtonToInputs();
     inputToBook.addNavigation();
-    populateDatalists();
+    if (typeof populateDatalists === 'function') {
+        populateDatalists();
+    }
 });
 
 jQuery.event.special.touchstart = {

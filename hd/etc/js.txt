@@ -702,7 +702,7 @@ function constructCachePath() {
 function populateDatalists() {
   const path = constructCachePath();
   const datalists = %[
-  %if;(is_welcome or e.m="MOD_NOTES" or "IND" in e.m or "FAM" in e.m)
+  %if;(is_welcome or "IND" in e.m or "FAM" in e.m)
     %if;(b.datalist_snames=1)  { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
     %if;(b.datalist_fnames=1)  { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
     %if;("IND" in e.m or "FAM" in e.m)
@@ -758,7 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
   addClearButtonToInputs();
   inputToBook.addNavigation();
 %end;
-%if;(is_welcome or "IND" in e.m or "FAM" in e.m)
+%if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_NOTES")
   %if;(roglo or b.rpc_datalist=1)
     (async () => {
       const rpcOk = await RpcDatalistManager.init();
