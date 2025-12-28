@@ -2184,8 +2184,13 @@ span.notesourcecolor {
   border-top: 1px solid #dee2e6;
 }
 
-.in {
-  background-color: coral;
+.imap-group {
+  border-left: 2px solid #e9ecef;
+  padding-left: 5px;
+}
+
+.imap-locked a {
+  font-weight: 600;
 }
 
 .list_comma li {
