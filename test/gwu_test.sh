@@ -104,16 +104,21 @@ if test "$DBNAME" = "$REFDBNAME"; then
     tmpdir="$BASES_DIR/unzip_tmp"
     mkdir -p $tmpdir && rm -rf $tmpdir/*
     unzip -q $cmddir/$ZIP_IMG -d $tmpdir
+    if test -d "$tmpdir/src"; then
+        prfx=''
+    else
+        prfx='*/'
+    fi
     if test -n "$optreorg"; then
         tmpname=$BASES_DIR/${DBNAME}.gwb/documents
         $SUDOPRFX mkdir -p $tmpname/portraits
-        $SUDOPRFX cp -Rp $tmpdir/src/$DBNAME/* $tmpname/
-        $SUDOPRFX cp -Rp $tmpdir/images/$DBNAME/* $tmpname/portraits/
+        $SUDOPRFX cp -Rp $tmpdir/${prfx}src/$DBNAME/* $tmpname/
+        $SUDOPRFX cp -Rp $tmpdir/${prfx}images/$DBNAME/* $tmpname/portraits/
     else
         for xx in src images; do
             tmpname=$xx/$DBNAME
             test -e $BASES_DIR/$tmpname || $SUDOPRFX mkdir -p $BASES_DIR/$tmpname
-            $SUDOPRFX cp -Rp $tmpdir/$tmpname/* $BASES_DIR/$tmpname/
+            $SUDOPRFX cp -Rp $tmpdir/${prfx}$tmpname/* $BASES_DIR/$tmpname/
         done
     fi
     rm -rf $tmpdir
