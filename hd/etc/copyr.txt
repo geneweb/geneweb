@@ -166,18 +166,18 @@
             <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
             <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
           </a>%nn;
-          %if;predictable_mode;GeneWeb %version;
+          %if;predictable_mode;GeneWeb %version_short;
           %else;
             <a href="https://github.com/%source;/tree/%commit_id;"
                data-toggle="tooltip" data-html="true"
                title="[*branch/branches]0 %branch; [compiled on] %compil_date;%nn;
                %if;not is_printed_by_template;&#010;
                %else;<br>%end;[from commit] %commit_id; (%commit_date)">%nn;
-              GeneWeb %version;</a>
+              GeneWeb %version_short;</a>
           %end;
         </div>
-        <div class="btn-group mt-0">
-          <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>
+        <div class="btn-group mt-0 ml-1">
+          <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>
           <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;"
              class="ml-1" target="_blank" rel="noreferrer, noopener" data-toggle="tooltip" title="GeneWeb Wiki">%nn;
             <i class="fab fa-wikipedia-w"></i>

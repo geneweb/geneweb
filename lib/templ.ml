@@ -440,6 +440,7 @@ and eval_simple_variable conf = function
   | "url" -> url_aux ~pwd:true conf
   | "url_no_pwd" -> url_aux ~pwd:false conf
   | "version" -> Version.ver
+  | "version_short" -> Version.ver_short
   | "commit_id" -> Version.commit_id
   | "commit_date" -> Version.commit_date
   | "compil_date" -> Version.compil_date

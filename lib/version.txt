@@ -37,6 +37,7 @@ let available_languages =
     "zh";
   ]
 
+let ver_short = "%VER_SHORT%"
 let ver = "7.1.0~beta2"
 let branch = "%BRANCH%"
 let src = "%SOURCE%"
