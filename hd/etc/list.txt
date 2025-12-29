@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: list.txt v7.1 23/07/2024 00:28:00 $ -->
+  <!-- $Id: list.txt v7.1 29/12/2025 05:00:30 $ -->
   <title>%nn;
     [*list/list (ancestors)] [of] [person/persons]0%if;(e.surn!="") [by] [surname/surnames]0%end; [by] [place/places]0%nn;
   </title>
@@ -124,22 +124,22 @@
 
 %empty_sorted_list
 %if;(e.nb!="")
-%for;i;0;e.nb;
-  %let;myindex;%apply;get_ip(i)%in;
-  %let;first_name;%apply;get_value(myindex, "first_name")%in;
-  %let;surname;%apply;get_value(myindex, "surname")%in;
-  %let;occ;%apply;get_value(myindex, "occ")%in;
-  %(TODO: would we want to sort by event dates? it was "dates_sort" before %)
-  %let;dates;%apply;get_value(myindex, "dates")%in;
-  %let;s;%apply;get_var("p",i)%in;
-  %let;so;%if;(s="" and k!="")%k;%else;%s;%end;%in;
-  %apply;add_in_sorted_list%with;
-    %so;%and;
-    %if;(e.datesort=1)%dates;%else;%if;(e.surn="")%surname;%end;%first_name;%occ;%end;%and;
-    %myindex;%and;
-    %i;%and;
+  %for;i;0;e.nb;
+    %let;myindex;%apply;get_ip(i)%in;
+    %let;first_name;%apply;get_value(myindex, "first_name")%in;
+    %let;surname;%apply;get_value(myindex, "surname")%in;
+    %let;occ;%apply;get_value(myindex, "occ")%in;
+    %(TODO: would we want to sort by event dates? it was "dates_sort" before %)
+    %let;dates;%apply;get_value(myindex, "dates")%in;
+    %let;s;%apply;get_var("p",i)%in;
+    %let;so;%if;(s="" and k!="")%k;%else;%s;%end;%in;
+    %apply;add_in_sorted_list%with;
+      %so;%and;
+      %if;(e.datesort=1)%dates;%else;%if;(e.surn="")%surname;%end;%first_name;%occ;%end;%and;
+      %myindex;%and;
+      %i;%and;
+    %end;
   %end;
-%end;
 %end;
 
 <div class="mt-2">
@@ -153,7 +153,7 @@
       %end;
       %if;(e.data="place")<a href="%prefix;m=PPS&k=%k;%opt;" title="[place/places]0/[surname/surnames]0">%k;</a>%end;
     %sp;(%end;
-    %e.nb; %if;(e.nb>1)[person/persons]1%else;[person/persons]0%end;,
+    %if;(e.nb!="")%e.nb; %if;(e.nb>1)[person/persons]1%else;[person/persons]0%end;, %end;
       %if;(e.datesort=1)[date/dates]1%else;[sort by/branch/alphabetic order]2%end;
     %if;(k!="" and e.data!="fna" and e.data!="sna"))%end;
   </div>
