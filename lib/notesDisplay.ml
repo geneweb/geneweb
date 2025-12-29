@@ -379,6 +379,7 @@ let print_linked_list_gallery conf base pgl =
   Output.print_sstring conf "</div>\n"
 
 let print_linked_list_standard conf base pgl =
+  let db = notes_links_db conf base false in
   Output.print_sstring conf
     "\n<table class=\"table table-borderless table-striped w-auto mt-3\">";
   List.iter
@@ -394,7 +395,6 @@ let print_linked_list_standard conf base pgl =
           in
           if restrict_l = [] || not (is_restricted conf base restrict_l) then (
             Output.print_sstring conf "\n<tr>";
-            let db = notes_links_db conf base false in
             let pgl =
               match List.assoc_opt fnotes db with
               | Some _ -> true
