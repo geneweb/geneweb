@@ -3092,13 +3092,13 @@ ca: bateig
 co: battesimu
 cs: křest
 da: dåb
-de: Taufe/Taufen
-en: baptism/baptisms
+de: Taufe
+en: baptism
 eo: bapto
 es: bautismo
 et: ristimine
 fi: kaste
-fr: baptême/baptêmes
+fr: baptême
 he:  תבילה
 is: skírn
 it: battesimo
@@ -3115,6 +3115,39 @@ ru: крещение
 sl: krst
 sv: dop
 tr: vaftiz
+
+    baptism/baptisms
+af: doop/dope
+bg: кръщение/кръщения
+br: badeziant/badeziañtoù
+ca: bateig/bateigs
+co: battesimu/battésimi
+cs: křest/křty
+da: dåb/dåb
+de: Taufe/Taufen
+en: baptism/baptisms
+eo: bapto/baptoj
+es: bautismo/bautismos
+et: ristimine/ristimised
+fi: kaste/kasteet
+fr: baptême/baptêmes
+he: טבילה/טבילות
+is: skírn/skírnir
+it: battesimo/battesimi
+lt: krikštas/krikštai
+lv: kristības/kristības
+nl: doop/dopen
+no: dåp/dåp
+oc: baptisme/baptismes
+pl: chrzest/chrzty
+pt: baptismo/baptismos
+pt-br: batismo/batismos
+ro: botez/botezuri
+ru: крещение/крещения
+sk: krst/krsty
+sl: krst/krsti
+sv: dop/dop
+tr: vaftiz/vaftizler
 
     baptism place
 co: locu di battesimu
@@ -3506,13 +3539,13 @@ ca: naixement
 co: nascita
 cs: narození
 da: fødsel
-de: Geburt/Geburten
-en: birth/births
+de: Geburt
+en: birth
 eo: naskiĝo
 es: nacimiento
 et: sünd
 fi: syntymä
-fr: naissance/naissances
+fr: naissance
 he:   לידה
 is: fæðing
 it: nascita
@@ -3529,6 +3562,38 @@ sk: narodenie
 sl: rojstva
 sv: födelse
 tr: doğum
+
+    birth/births
+af: geboorte/geboorten
+bg: раждане/раждания
+br: ganedigezh/ganedigezhioù
+ca: naixement/naixements
+co: nascita/nascite
+cs: narození/narození
+da: fødsel/fødsler
+de: Geburt/Geburten
+en: birth/births
+eo: naskiĝo/naskiĝoj
+es: nacimiento/nacimientos
+et: sünd/sünnid
+fi: syntymä/syntymät
+fr: naissance/naissances
+he: לידה/לידות
+is: fæðing/fæðingar
+it: nascita/nascite
+lt: gimimas/gimimai
+lv: dzimšana/dzimšanas
+nl: geboorte/geboorten
+no: fødsel/fødsler
+oc: naissença/naissenças
+pl: urodzenie/urodzenia
+pt: nascimento/nascimentos
+ro: naștere/nașteri
+ru: рождение/рождения
+sk: narodenie/narodenia
+sl: rojstvo/rojstva
+sv: födelse/födelser
+tr: doğum/doğumlar
 
     birth date and birth place
 co: data è locu di nascita
@@ -3930,13 +3995,13 @@ ca: enterrament
 co: sepultura
 cs: pohřeb
 da: begravelse
-de: Beisetzung/Beisetzungen
-en: burial/burials
+de: Beisetzung
+en: burial
 eo: entombigo
 es: entierro
 et: matus
 fi: hautaus
-fr: inhumation/inhumations
+fr: inhumation
 he:  קבורה
 is: útför
 it: sepoltura
@@ -3953,6 +4018,38 @@ sk: pohreb
 sl: pogreb
 sv: begravning
 tr: defin
+
+    burial/burials
+af: begrafnis/begrafnisse
+bg: погребение/погребения
+br: beziadur/beziadurioù
+ca: enterrament/enterraments
+co: sepultura/sepulture
+cs: pohřeb/pohřby
+da: begravelse/begravelser
+de: Beisetzung/Beisetzungen
+en: burial/burials
+eo: entombigo/entombigoj
+es: entierro/entierros
+et: matus/matused
+fi: hautaus/hautaukset
+fr: inhumation/inhumations
+he: קבורה/קבורות
+is: útför/útfarir
+it: sepoltura/sepolture
+lt: laidotuvės/laidotuvės
+lv: bēres/bēres
+nl: begrafenis/begrafenissen
+no: begravelse/begravelser
+oc: sepultura/sepulturas
+pl: pogrzeb/pogrzeby
+pt: enterro/enterros
+ro: înmormântare/înmormântări
+ru: похороны/похороны
+sk: pohreb/pohreby
+sl: pogreb/pogrebi
+sv: begravning/begravningar
+tr: defin/definler
 
     burial place
 co: locu di sepultura
@@ -7146,8 +7243,8 @@ ca: defunció
 co: morte
 cs: úmrtí
 da: død
-de: Tod/Tode
-en: death/deaths
+de: Tod
+en: death
 eo: morto
 es: muerte
 et: surm
@@ -7169,6 +7266,38 @@ sk: úmrtie
 sl: smrti
 sv: död
 tr: ölüm
+
+    death/deaths
+af: dood/dooie
+bg: смърт/смъртни случаи
+br: marv/marvioù
+ca: defunció/defuncions
+co: morte/morti
+cs: úmrtí/úmrtí
+da: død/dødsfald
+de: Tod/Tode
+en: death/deaths
+eo: morto/mortoj
+es: muerte/muertes
+et: surm/surmad
+fi: kuolema/kuolemat
+fr: décès/décès
+he: מוות/מקרי מוות
+is: andlát/andlát
+it: morte/morti
+lt: mirtis/mirtys
+lv: nāve/nāves
+nl: overlijden/overlijdens
+no: død/dødsfall
+oc: decès/decès
+pl: zgon/zgony
+pt: morte/mortes
+ro: deces/decese
+ru: смерть/смерти
+sk: úmrtie/úmrtia
+sl: smrt/smrti
+sv: död/dödsfall
+tr: ölüm/ölümler
 
     death date and death place
 co: data è locu di a morte
@@ -12243,7 +12372,7 @@ bg: брак/бракове
 br: eured/euredoù
 ca: casament/casaments
 co: matrimoniu/matrimonii
-cs: manželství
+cs: manželství/manželství
 da: giftermål/giftermål
 de: Heirat/Heiraten
 en: marriage/marriages
@@ -12252,22 +12381,23 @@ es: casamiento/casamientos
 et: abielu/abielud
 fi: avioliitto/avioliitot
 fr: mariage/mariages
-he:    נישואין
+he: נישואין/נישואין
 is: gifting/giftingar
 it: matrimonio/matrimoni
 lt: santuoka/santuokos
-lv: ģimene
+lv: laulība/laulības
 nl: huwelijk/huwelijken
 no: ekteskap/ekteskap
 oc: maridatge/maridatges
 pl: ślub/śluby
 pt: casamento/casamentos
-ro: casatorie/casatorii
+pt-br: casamento/casamentos
+ro: căsătorie/căsătorii
 ru: брак/браки
 sk: manželstvo/manželstvá
-sl: poroke/poroke
+sl: poroka/poroke
 sv: äktenskap/äktenskap
-tr: eş/eşler
+tr: evlilik/evlilikler
 
     marriages with
 co: rilazioni o matrimonii cù

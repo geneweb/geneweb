@@ -261,23 +261,23 @@
     <div class="summary-places-info">0 lieux</div>
     <div class="summary-events-table">
       <div class="summary-event-column">
-        <span class="summary-event-label birth-label" title="Naissances">N</span>
+        <span class="summary-event-label birth-label" title="[birth/births]1">N</span>
         <span class="summary-event-count">0</span>
       </div>
       <div class="summary-event-column">
-        <span class="summary-event-label baptism-label" title="Baptêmes">B</span>
+        <span class="summary-event-label baptism-label" title="[baptism/baptisms]1">B</span>
         <span class="summary-event-count">0</span>
       </div>
       <div class="summary-event-column">
-        <span class="summary-event-label marriage-label" title="Mariages">M</span>
+        <span class="summary-event-label marriage-label" title="[marriage/marriages]1">M</span>
         <span class="summary-event-count">0</span>
       </div>
       <div class="summary-event-column">
-        <span class="summary-event-label death-label" title="Décès">D</span>
+        <span class="summary-event-label death-label" title="[death/deaths]1">D</span>
         <span class="summary-event-count">0</span>
       </div>
       <div class="summary-event-column">
-        <span class="summary-event-label burial-label" title="Sépultures">S</span>
+        <span class="summary-event-label burial-label" title="[burial/burials]1">S</span>
         <span class="summary-event-count">0</span>
       </div>
     </div>
@@ -351,16 +351,16 @@ window.FC_TRANSLATIONS = {
   'places': "[place/places]1",
   'event': "[event/events]0",
   'events': "[event/events]1",
-  'birth': "[birth]0",
-  'births': "[birth]1",
-  'baptism': "[baptism]0",
-  'baptisms': "[baptism]1",
+  'birth': "[birth/births]0",
+  'births': "[birth/births]1",
+  'baptism': "[baptism/baptisms]0",
+  'baptisms': "[baptism/baptisms]1",
   'marriage': "[marriage/marriages]0",
   'marriages': "[marriage/marriages]1",
-  'death': "[death]0",
-  'deaths': "[death]1",
-  'burial': "[burial]0",
-  'burials': "[burial]1",
+  'death': "[death/deaths]0",
+  'deaths': "[death/deaths]1",
+  'burial': "[burial/burials]0",
+  'burials': "[burial/burials]1",
   'implex': "[implex/implexes]0",
 
   // À vérifier…
