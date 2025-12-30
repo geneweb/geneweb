@@ -223,7 +223,7 @@
     %if;not (wizard and not cancel_links)%apply;li_SD("spouse")
     %else;<li><span class="fa-li%if;(spouse.has_blason and spouse.has_portrait) pt-1%end;">%apply;marr_wrench_to_bullet("spouse")</span>%end;
     %if;(spouse.has_blason and spouse.has_portrait)
-      <img src="%spouse.blason_url;" %blason_extra_small_size; alt="[blason/blasons]0 [spouse/spouses]0"
+      <img src="%spouse.blason_url;" %spouse.blason_extra_small_size; alt="[blason/blasons]0 [spouse/spouses]0"
         class="%if;(op_m=3)align-self-center mx-1%end; mr-2" title="[*blason/blasons]0 [spouse/spouses]0">%nn;
     %end;
     <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
