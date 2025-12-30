@@ -381,6 +381,14 @@ cache_cousins_ttl=1
 #perso_module_x=file_2
 #perso_module_z=file_3
 
+# Display occupation in homonyms lists (name conflict resolution page)
+# Useful for bases where occupation helps distinguish individuals
+# (e.g., "Weaver Josef Kastner" vs "Shoemaker Josef Kastner")
+#   0 or absent: disabled
+#   yes : enabled, no truncation
+#   n : truncate to n characters with ellipsis
+#occu_in_homonyms=5
+
 # The display on perso pages will be governed by a vector defining
 # a selection of modules and the order in which they are displayed.
 #
