@@ -184,8 +184,8 @@ let parameters env =
             | "anon_a" when s <> "" -> loop (comm ^ " " ^ s) env
             | "anon_b" when s <> "" -> loop (comm ^ " " ^ s) env
             | "d" when s <> "" -> loop (comm ^ " -d " ^ s) env
-            | "fn_a" when s <> "" -> loop (comm ^ " " ^ s) env
-            | "fn_b" when s <> "" -> loop (comm ^ " " ^ s) env
+            | "fn_a" when s <> "" -> loop (comm ^ " -pnoc_a \"" ^ s) env
+            | "fn_b" when s <> "" -> loop (comm ^ " -pnoc_b \"" ^ s) env
             | "i" when s <> "" -> loop (comm ^ " -i " ^ s) env
             | "o" when s <> "" ->
                 if s = "choice" then loop comm env (* ignore ?? *)
@@ -196,12 +196,12 @@ let parameters env =
                   in
                   loop (comm ^ " -o " ^ out) env
             | "o1" when s <> "" -> comm ^ " -o " ^ s ^ " > " ^ s
-            | "oc_a" when s <> "" -> loop (comm ^ " " ^ s) env
-            | "oc_b" when s <> "" -> loop (comm ^ " " ^ s) env
+            | "oc_a" when s <> "" -> loop (comm ^ "." ^ s) env
+            | "oc_b" when s <> "" -> loop (comm ^ "." ^ s) env
             | "od" when s <> "" -> loop (comm ^ " " ^ s) env
             | "opt" when s <> "" -> loop comm env (* ignore *)
-            | "sn_a" when s <> "" -> loop (comm ^ " " ^ s) env
-            | "sn_b" when s <> "" -> loop (comm ^ " " ^ s) env
+            | "sn_a" when s <> "" -> loop (comm ^ " " ^ s ^ "\"") env
+            | "sn_b" when s <> "" -> loop (comm ^ " " ^ s ^ "\"") env
             | _ when s = "on" -> loop (comm ^ " -" ^ k) env
             (* TODO see all cases where value <> o, *)
             | _ when s <> "" -> loop (comm ^ " -" ^ k ^ " " ^ s) env
