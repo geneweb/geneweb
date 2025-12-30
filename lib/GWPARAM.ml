@@ -479,6 +479,22 @@ let is_related conf base p =
         else false
   else false
 
+let has_date base p =
+  Driver.get_birth p <> Date.cdate_None
+  || Driver.get_baptism p <> Date.cdate_None
+  || (match Driver.get_death p with
+    | Death (_, d) -> d <> Date.cdate_None
+    | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
+        false)
+  || (match Driver.get_burial p with
+    | Buried cod -> Date.od_of_cdate cod <> None
+    | Cremated _ | UnknownBurial -> false)
+  ||
+  let families = Driver.get_family p in
+  Array.exists
+    (fun ifam -> Driver.foi base ifam |> Driver.get_marriage <> Date.cdate_None)
+    families
+
 (* Authorization checks for person access *)
 let p_auth conf base p =
   let mode_semi_public =
@@ -496,7 +512,8 @@ let p_auth conf base p =
   || conf.Config.friend && conf.Config.semi_public
      && (is_semi_public p || is_related conf base p)
      && not_private
-  || (conf.Config.public_if_no_date && access <> Def.Private)
+  || (not (has_date base p))
+     && conf.Config.public_if_no_date && access <> Def.Private
   ||
   if conf.Config.private_years <= -1 then true
   else

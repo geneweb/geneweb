@@ -3515,6 +3515,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       p_auth && Driver.sou base (Driver.get_burial_place p) <> ""
   | "has_cremation_witnesses" ->
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Cremation)
+  | "has_date" -> GWPARAM.p_auth conf base p
   | "has_death_date" -> (
       match Driver.get_death p with
       | Death (_, _) -> p_auth

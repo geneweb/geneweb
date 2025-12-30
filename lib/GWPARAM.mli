@@ -100,6 +100,9 @@ val is_related :
     conf.userkey. conf.userkey is the person visiting the base the search for
     ancestors is limited to 3 generations *)
 
+val has_date : Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+(** person has at least one date (birth, baptism, marriage, death, burial) *)
+
 val p_auth :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 (** Calculate the access rights to the person's information in according to his
