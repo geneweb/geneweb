@@ -20,6 +20,11 @@ function addClearButtonToInputs() {
     }
 
     function initializeInput(element) {
+        if (element.type === 'hidden' || 
+            element.style.display === 'none' ||
+            getComputedStyle(element).display === 'none') {
+            return;
+        }
         if (element.dataset.clearInitialized) {
             const existingButton = element.parentNode.querySelector('.clear-button-icon');
             if (existingButton) {

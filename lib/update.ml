@@ -207,22 +207,132 @@ let print_person_parents_and_spouses conf base ?(alias = None) ?(snalias = None)
     Buffer.add_char buf '.';
     Output.print_sstring conf (Buffer.contents buf)
 
+let form_dates_from_env conf =
+  let prec_str = function
+    | "about" -> "ca "
+    | "maybe" -> "?"
+    | "before" -> "<"
+    | "after" -> ">"
+    | _ -> ""
+  in
+  let get_year prefix =
+    match Util.p_getenv conf.env (prefix ^ "_yyyy") with
+    | Some y when y <> "" ->
+        let prec =
+          Util.p_getenv conf.env (prefix ^ "_prec") |> Option.value ~default:""
+        in
+        Some (prec_str prec ^ y)
+    | _ -> None
+  in
+  let find_event_year event_name =
+    let rec loop i =
+      if i > 20 then None
+      else
+        let idx = string_of_int i in
+        match Util.p_getenv conf.env ("e_name" ^ idx) with
+        | Some name when name = event_name -> (
+            match Util.p_getenv conf.env ("e_date" ^ idx ^ "_yyyy") with
+            | Some y when y <> "" ->
+                let prec =
+                  Util.p_getenv conf.env ("e_date" ^ idx ^ "_prec")
+                  |> Option.value ~default:""
+                in
+                Some (prec_str prec ^ y)
+            | _ -> None)
+        | Some _ -> loop (i + 1)
+        | None -> None
+    in
+    loop 1
+  in
+  let by =
+    match find_event_year "#birt" with
+    | Some y -> Some y
+    | None -> (
+        match find_event_year "#bapt" with
+        | Some y -> Some y
+        | None -> (
+            match get_year "birth" with
+            | Some y -> Some y
+            | None -> get_year "bapt"))
+  in
+  let dy =
+    match find_event_year "#deat" with
+    | Some y -> Some y
+    | None -> (
+        match find_event_year "#buri" with
+        | Some y -> Some y
+        | None -> (
+            match find_event_year "#crem" with
+            | Some y -> Some y
+            | None -> (
+                match get_year "death" with
+                | Some y -> Some y
+                | None -> get_year "burial")))
+  in
+  match (by, dy) with
+  | Some b, Some d -> " " ^ b ^ "–" ^ d
+  | Some b, None -> " " ^ b ^ "–"
+  | None, Some d -> " †" ^ d
+  | None, None -> ""
+
 let print_same_name conf base p =
   match Gutil.find_same_name base p with
   | [ _ ] -> ()
   | pl ->
-      Output.print_sstring conf "<p>";
+      let occu_opt =
+        match List.assoc_opt "occu_in_homonyms" conf.base_env with
+        | Some "yes" -> Some None
+        | Some s -> (
+            match int_of_string_opt s with
+            | Some n when n > 0 -> Some (Some n)
+            | _ -> None)
+        | None -> None
+      in
+      let original_i = Util.p_getenv conf.env "i" in
+      Output.print_sstring conf "<p class=\"mt-2 mb-0\">";
       Output.print_sstring conf
       @@ Utf8.capitalize_fst (transl conf "persons having the same name");
       Output.print_sstring conf (transl conf ":");
-      Output.print_sstring conf "<ul>";
+      Output.print_sstring conf
+        {|<table class="table table-sm table-borderless my-1"><tbody>|};
       List.iter
         (fun p ->
-          Output.print_sstring conf "<li>";
+          let is_original =
+            match original_i with
+            | Some i -> Driver.Iper.to_string (Driver.get_iper p) = i
+            | None -> false
+          in
+          Output.print_sstring conf "<tr";
+          if is_original then
+            Output.print_sstring conf {| class="font-italic text-info"|};
+          Output.print_sstring conf ">";
+          Output.print_sstring conf
+            {|<td class="text-right align-middle text-muted p-0 pr-2" style="width:2em">|};
+          Output.print_sstring conf (string_of_int (Driver.get_occ p));
+          Output.print_sstring conf "</td>";
+          (match occu_opt with
+          | None -> ()
+          | Some max_len_opt ->
+              (match max_len_opt with
+              | Some n ->
+                  Output.printf conf
+                    {|<td class="text-muted align-middle p-0 pr-1" style="width:%dem">|}
+                    ((n / 2) + 1)
+              | None ->
+                  Output.print_sstring conf {|<td class="text-muted p-0 pr-1">|});
+              let occu = Driver.sou base (Driver.get_occupation p) in
+              (match max_len_opt with
+              | Some n when occu <> "" && String.length occu > n ->
+                  Output.print_string conf (escape_html (String.sub occu 0 n));
+                  Output.print_sstring conf "…"
+              | _ when occu <> "" -> Output.print_string conf (escape_html occu)
+              | _ -> ());
+              Output.print_sstring conf "</td>");
+          Output.print_sstring conf {|<td class="p-0">|};
           print_person_parents_and_spouses conf base p;
-          Output.print_sstring conf "</li>")
+          Output.print_sstring conf "</td></tr>")
         pl;
-      Output.print_sstring conf "</ul></p>"
+      Output.print_sstring conf "</tbody></table></p>"
 
 (* ************************************************************************* *)
 (*  [Fonc] is_label_note : string -> bool                                    *)
@@ -311,21 +421,36 @@ let string_of_error conf =
       ^<^ transl conf ":" ^<^ " "
       ^<^ strong (fso f s o)
   | UERR_already_defined (base, p, var) ->
-      (Printf.sprintf
-         (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-         ("\"" ^ (fso_p base p :> string) ^ "\"")
-         (fun _ ->
-           Printf.sprintf "<a href=\"%s%s\">"
-             (commd conf : Adef.escaped_string :> string)
-             (acces conf base p : Adef.escaped_string :> string))
-         (fun _ -> "</a>")
-      ^
-      if var = "" then "."
-      else
-        "<span class=\"UERR_already_defined_var\">("
-        ^ (Util.escape_html var : Adef.escaped_string :> string)
-        ^ ")</span>.")
-      |> Adef.safe
+      let fn = Driver.p_first_name base p in
+      let sn = Driver.p_surname base p in
+      let occ = Driver.get_occ p in
+      let person_key =
+        if occ = 0 then fn ^ " " ^ sn
+        else fn ^ "." ^ string_of_int occ ^ " " ^ sn
+      in
+      let dates = (DateDisplay.short_dates_text conf base p :> string) in
+      let form_dates = form_dates_from_env conf in
+      let name_quoted = "\"" ^ (fso_p base p :> string) ^ form_dates ^ "\"" in
+      let person_link =
+        Printf.sprintf "<a href=\"%s%s\">%s</a>%s"
+          (commd conf :> string)
+          (acces conf base p :> string)
+          (escape_html person_key :> string)
+          dates
+      in
+      let base_msg =
+        Printf.sprintf
+          (fcapitale (ftransl conf "name %s already used by %s"))
+          name_quoted person_link
+      in
+      let msg =
+        if var = "" then base_msg ^ "."
+        else
+          base_msg ^ " <span class=\"UERR_already_defined_var\">("
+          ^ (Util.escape_html var :> string)
+          ^ ")</span>."
+      in
+      Adef.safe msg
   | UERR_own_ancestor (base, p) ->
       strong (fso_p base p)
       ^>^ " "
@@ -1136,52 +1261,57 @@ let print_create_conflict conf base p var =
       (Driver.p_first_name base p)
       (Driver.p_surname base p)
   in
-  Output.print_sstring conf {|<form method="post" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|">|};
-  let aux =
-    List.iter (fun (x, v) ->
-        if x = "notes" || is_label_note x then Util.hidden_textarea conf x v
-        else Util.hidden_input conf x v)
+  let original_occ =
+    match Util.p_getenv conf.env "i" with
+    | Some i ->
+        Gutil.find_same_name base p
+        |> List.find_opt (fun op ->
+            Driver.Iper.to_string (Driver.get_iper op) = i)
+        |> Option.map Driver.get_occ
+    | None -> None
   in
-  aux conf.henv;
-  aux conf.env;
+  let attempted_occ =
+    match Util.p_getenv conf.env "occ" with
+    | Some o -> int_of_string_opt o
+    | None -> Some 0
+  in
+  let click_on s =
+    Printf.sprintf (fcapitale (ftransl conf {|click on "%s"|})) (transl conf s)
+  in
+  Output.printf conf {|<form method="post" action="%s">|} conf.command;
+  List.iter
+    (fun (x, v) ->
+      if x = "notes" || is_label_note x then Util.hidden_textarea conf x v
+      else Util.hidden_input conf x v)
+    (conf.henv @ conf.env);
   if var <> "" then Util.hidden_input conf "field" (Mutil.encode var);
   Util.hidden_input conf "free_occ" (Mutil.encode @@ string_of_int free_n);
-  Output.print_sstring conf "<ul><li>";
-  transl conf "first free number"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf (transl conf ":");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (string_of_int free_n);
-  Output.print_sstring conf ".\n";
-  Output.printf conf
-    (fcapitale (ftransl conf {|click on "%s"|}))
-    (transl conf "create");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "to try again with this number");
-  Output.print_sstring conf ".</li><li>";
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "or"));
-  Output.print_sstring conf " ";
-  Output.printf conf (ftransl conf {|click on "%s"|}) (transl conf "back");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "and" 0);
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "change it (the number) yourself");
-  Output.print_sstring conf ".</li><li>";
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "or"));
-  Output.print_sstring conf " ";
-  Output.printf conf (ftransl conf {|click on "%s"|}) (transl conf "back");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "and" 0);
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf {|use "link" instead of "create"|});
-  Output.print_sstring conf ".</li></ul>";
-  transl conf "create" |> Utf8.capitalize_fst |> Adef.encoded
-  |> Util.submit_input conf "create";
-  transl conf "back" |> Utf8.capitalize_fst |> Adef.encoded
-  |> Util.submit_input conf "return";
-  Output.print_sstring conf {|</form>|};
+  Output.printf conf "<ul><li>%s%s %d. %s %s.</li>"
+    (Utf8.capitalize_fst (transl conf "first free number"))
+    (transl conf ":") free_n (click_on "create")
+    (transl conf "to try again with this number");
+  (match (original_occ, attempted_occ) with
+  | Some orig, Some att when orig <> att ->
+      Output.printf conf "<li>%s%s %d. %s %s.</li>"
+        (Utf8.capitalize_fst (transl conf "previous occurrence number"))
+        (transl conf ":") orig (click_on "back")
+        (transl conf "to restore this value")
+  | _ -> ());
+  Output.printf conf "<li>%s %s %s %s.</li>"
+    (Utf8.capitalize_fst (transl conf "or"))
+    (Printf.sprintf (ftransl conf {|click on "%s"|}) (transl conf "back"))
+    (transl_nth conf "and" 0)
+    (transl conf "change it (the number) yourself");
+  Output.printf conf "<li>%s %s %s %s.</li></ul>"
+    (Utf8.capitalize_fst (transl conf "or"))
+    (Printf.sprintf (ftransl conf {|click on "%s"|}) (transl conf "back"))
+    (transl_nth conf "and" 0)
+    (transl conf {|use "link" instead of "create"|});
+  Util.submit_input conf "create"
+    (Adef.encoded @@ Utf8.capitalize_fst (transl conf "create"));
+  Util.submit_input conf "return"
+    (Adef.encoded @@ Utf8.capitalize_fst (transl conf "back"));
+  Output.print_sstring conf "</form>";
   print_same_name conf base p
 
 let insert_person conf base src new_persons (f, s, o, create, var) =

@@ -2511,11 +2511,6 @@ sl: tudi
 sv: också
 tr: ayrıca
 
-    previously/subsequently
-de: zuvor/später
-en: previously/subsequently
-fr: auparavant/par la suite
-
     an ancestor
 af: 'n voorsaat
 bg: един от предците
@@ -13479,38 +13474,38 @@ sl: ime
 sv: namn
 tr: ad
 
-    name %s already used by %tthis person%t
-af: %s is reeds gebruik deur %t
-bg: името %s вече е използвано %tза друг човек%t
-br: anv %s implijet endeo gant %tan den-mañ%t
-ca: nom %s ja utilitzat per %taquesta persona%t
-co: nome %s dighjà adupratu da %tsta persona%t
-cs: jméno %s už má tato %tosoba%t
-da: navn %s er allerede anvendt af %tdenne person%t
-de: Name %s wird schon bei %tdieser Person%t benutzt
-en: name %s already used by %tthis person%t
-eo: nomo %s jam uzita de %ttiu persono%t
-es: nombre %s ya utilizado por %testa persona%t
-et: nimi %s on juba kasutuses %tsellel inimesel%t
-fi: nimi %s on jo käytössä %ttällä henkilöllä%t
-fr: nom %s déjà utilisé par %tcette personne%t
-he: השם %s בשימוש כבר ע"י %tאדם זה%t
-is: nafnið %s er þegar í %tnotkun af%t
-it: nome %s già utilizzato da %tquesta persona%t
-lt: vardas %s jau panaudotas %tšio asmens%t
-lv: vārds - %s jau ir %tšai personai%t
-nl: de naam %s is al gebruikt door %tdeze persoon%t
-no: navn %s brukes allerede av %tdenne personen%t
-oc: nom %s ja utilizat per %taquela persona%t
-pl: imię %s jest już używane przez %ttę osobę%t
-pt: apelido %s já utilizado por %testa pessoa%t
-pt-br: nome %s já utilizado por %testa pessoa%t
-ro: numele %s est in uz de %taceasta persoana%t
-ru: имя %s уже использовано %tэтим человеком%t
-sk: meno %s už má táto %tosoba%t
-sl: ime %s že uporablja %tta oseba%t
-sv: namn %s används redan av %tdenna person%t
-tr: %s adı zaten %tbu kişi%t tarafından kullanılıyor
+    name %s already used by %s
+af: %s is reeds gebruik deur %s
+bg: името %s вече е използвано от %s
+br: anv %s implijet endeo gant %s
+ca: nom %s ja utilitzat per %s
+co: nome %s dighjà adupratu da %s
+cs: jméno %s už má %s
+da: navn %s er allerede anvendt af %s
+de: Name %s wird schon bei %s benutzt
+en: name %s already used by %s
+eo: nomo %s jam uzita de %s
+es: nombre %s ya utilizado por %s
+et: nimi %s on juba kasutuses %s
+fi: nimi %s on jo käytössä %s
+fr: nom %s déjà utilisé par %s
+he: השם %s בשימוש כבר ע"י %s
+is: nafnið %s er þegar í notkun af %s
+it: nome %s già utilizzato da %s
+lt: vardas %s jau panaudotas %s
+lv: vārds %s jau ir %s
+nl: de naam %s is al gebruikt door %s
+no: navn %s brukes allerede av %s
+oc: nom %s ja utilizat per %s
+pl: imię %s jest już używane przez %s
+pt: apelido %s já utilizado por %s
+pt-br: nome %s já utilizado por %s
+ro: numele %s est in uz de %s
+ru: имя %s уже использовано %s
+sk: meno %s už má %s
+sl: ime %s že uporablja %s
+sv: namn %s används redan av %s
+tr: %s adı zaten %s tarafından kullanılıyor
 
     name changed. updated linked pages
 co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. E pagine quaghjò assuciate à l’anziana chjave sò state mudificate.
@@ -15702,6 +15697,16 @@ co: precedente
 de: vorher
 en: previous
 fr: précédent
+
+    previous occurrence number
+fr: numéro d’occurrence précédent
+de: vorherige Nummer
+en: previous occurrence number
+
+    previously/subsequently
+de: zuvor/später
+en: previously/subsequently
+fr: auparavant/par la suite
 
     previous coat of arms
 co: una salvaguardia preesistente di l’armuratura serà squassata.
@@ -19858,6 +19863,11 @@ pt: brevemente
 ru: ещё будет
 sv: kommande händelser
 tr: gelmek
+
+    to restore this value
+fr: pour restaurer cette valeur
+de: um diesen Wert wiederherzustellen
+en: to restore this value
 
     to see the first branch
 af: om die eerste staak te sien
