@@ -880,7 +880,7 @@ let simple conf =
   if ged <> "" && not (Sys.file_exists ged) then print_file conf "err_unkn.htm"
   else if out_file = "" then print_file conf "err_miss.htm"
   else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "create_ok.htm"
+  else print_file conf "create.htm"
 
 let gwc_or_ged2gwb out_name_of_in_name conf =
   let fname =
@@ -908,7 +908,7 @@ let gwc_or_ged2gwb out_name_of_in_name conf =
   else if (not (Sys.file_exists in_file)) && not (String.contains fname '*')
   then print_file conf "err_unkn.htm"
   else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "create_ok.htm"
+  else print_file conf "create.htm"
 
 let gwc_check conf =
   let conf = { conf with env = ("nofail", "on") :: ("f", "on") :: conf.env } in

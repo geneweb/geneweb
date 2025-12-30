@@ -520,7 +520,8 @@ let addiff base1 base2 iper1 iper2 d_tab =
 (* Main *)
 
 let gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
-  Printf.printf "<h3>Differences between</h3><br>Base1: %s / base2: %s<p>" !in_file1 !in_file2;
+  Printf.printf "<h3>Differences between</h3><br>Base1: %s / base2: %s<p>"
+    !in_file1 !in_file2;
   let desc_tab =
     Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base1) []
   in
@@ -530,8 +531,6 @@ let gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
 
 let pnoc_a = ref ""
 let pnoc_b = ref ""
-
-
 let mem = ref false
 let d_mode = ref false
 let ad_mode = ref false
@@ -560,7 +559,8 @@ let speclist =
 let anon_args = ref []
 let anon_fun arg = anon_args := arg :: !anon_args
 
-let usage_msg = "Usage: " ^ Sys.argv.(0) ^ " [options] base1 base2\nOptions are: "
+let usage_msg =
+  "Usage: " ^ Sys.argv.(0) ^ " [options] base1 base2\nOptions are: "
 
 let load_base f k =
   Driver.with_database f (fun base ->
@@ -575,13 +575,13 @@ let load_base f k =
 let main () =
   Arg.parse speclist anon_fun usage_msg;
   (match List.rev !anon_args with
-  | [ba; bb] ->
+  | [ ba; bb ] ->
       in_file1 := ba;
       in_file2 := bb
-  | _ -> (
+  | _ ->
       Printf.eprintf "Error: Expected exactly 2 base names\n";
       Arg.usage speclist usage_msg;
-      exit 2));
+      exit 2);
   (* Validate required arguments *)
   if !pnoc_a = "" then (
     Printf.eprintf "Error: -pnoc_a is required\n";
@@ -597,8 +597,8 @@ let main () =
   load_base !in_file1 @@ fun base1 ->
   load_base !in_file2 @@ fun base2 ->
   (* let iper2 = Driver.person_of_key base2 !p2_fn !p2_sn !p2_occ in *)
-  let (fn1, oc1, sn1) = Geneweb.GWPARAM.split_key !pnoc_a in
-  let (fn2, oc2, sn2) = Geneweb.GWPARAM.split_key !pnoc_a in
+  let fn1, oc1, sn1 = Geneweb.GWPARAM.split_key !pnoc_a in
+  let fn2, oc2, sn2 = Geneweb.GWPARAM.split_key !pnoc_a in
   let oc1 = int_of_string oc1 in
   let oc2 = int_of_string oc2 in
   let iper1 = Driver.person_of_key base1 fn1 sn1 oc1 in
@@ -608,7 +608,8 @@ let main () =
   | None, _ ->
       Printf.printf "Cannot find person %s.%d %s in reference base" fn1 oc1 sn1
   | _, None ->
-      Printf.printf "Cannot find person %s.%d %s in destination base" fn2 oc2 sn2
+      Printf.printf "Cannot find person %s.%d %s in destination base" fn2 oc2
+        sn2
   | Some iper1, Some iper2 -> gwdiff base1 base2 iper1 iper2 !d_mode !ad_mode);
   if !html then Printf.printf "</BODY>\n"
 
