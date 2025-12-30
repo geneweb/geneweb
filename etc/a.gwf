@@ -226,16 +226,14 @@
 # Maximum level of displayed cousins.
 #max_cousins_level=6
 
-# Use cache file “cache_cousins” for cousins tool (m=C).
+# Use cache file for cousins tool (m=C).
+# disabled by default
 # Usefull when self has a lot of relationships.
 #cache_cousins_tool=yes
 
-# Cache configuration for cousins relationship tool (m=C)
-# Enable/disable cache for cousins computation
-cache_cousins_tool=yes
 # Cache time-to-live in hours (files older than this are auto-deleted)
 # Default: 1 hour. Set to 0 to disable auto-cleanup (permanent cache)
-cache_cousins_ttl=1
+#cache_cousins_ttl=1
 
 # Number of latest events (birth, death) displayed in statistics.
 #latest_event=20
@@ -265,38 +263,40 @@ cache_cousins_ttl=1
 # =============================================================================
 # Enable datalist autocompletion for form inputs. When enabled, the browser
 # loads .gz cache files to provide suggestions while typing.
-# Cache files are generated in bases/etc/mybase/cache/ by gwsetup or manually.
-# Set to 1 to enable, 0 or empty to disable.
+# Cache files are generated in bases/etc/mybase/cache/
+# using the “cache_files" tool in gwsetup or in command line.
+# They are not set by default
+# Set to 1 to enable
 #
 # First names (welcome, MOD_IND, MOD_FAM)
-# datalist_fnames=1
+#datalist_fnames=1
 #
 # Surnames (welcome, MOD_IND, MOD_FAM)
-# datalist_snames=1
+#datalist_snames=1
 #
 # Places (MOD_IND, MOD_FAM)
-# datalist_places=1
+#datalist_places=1
 #
 # Occupations (MOD_IND, MOD_FAM)
-# datalist_occupations=1
+#datalist_occupations=1
 #
 # Sources (MOD_IND, MOD_FAM)
-# datalist_sources=1
+#datalist_sources=1
 #
 # Public names (MOD_IND)
-# datalist_pub_names=1
+#datalist_pub_names=1
 #
 # Qualifiers (MOD_IND)
-# datalist_qualifiers=1
+#datalist_qualifiers=1
 #
 # Aliases (MOD_IND)
-# datalist_aliases=1
+#datalist_aliases=1
 #
 # Nobility titles (welcome, MOD_IND)
-# datalist_titles=1
+#datalist_titles=1
 #
 # Estates/domains (welcome, MOD_IND)
-# datalist_estates=1
+#datalist_estates=1
 
 # =============================================================================
 # RPC Datalist Server (alternative to static .gz cache files)
@@ -307,12 +307,12 @@ cache_cousins_ttl=1
 # Requires the RPC server running with base caches loaded.
 #
 # Enable RPC datalists (for non-Roglo bases). Roglo bases use RPC by default.
-# rpc_datalist=1
+#rpc_datalist=1
 #
 # RPC server address (without port). Default: localhost
 # The server listens on port 8080 with endpoint /search
 # Examples: localhost, 192.168.1.100, rpc.myserver.org
-# rpc_server_url=localhost
+#rpc_server_url=localhost
 
 # Indicate that the present database has been renamed to “newname”.
 #renamed=newname
@@ -531,22 +531,6 @@ cache_cousins_ttl=1
 # estate ... and print something clever.
 #print_advanced_title=yes
 
-# Load datalists for autocompletion. These options allow to provide
-# suggestions for various inputs in individual and family forms.
-# The lists are populated with values extracted from your Geneweb database
-# using the “cache_files" tool in gwsetup or in command line. They are not
-# automatically updated: regenerate them to ensure that the data is up-to-date.
-#datalist_aliases=1
-#datalist_estates=1
-#datalist_fnames=1
-#datalist_occupations=1
-#datalist_places=1
-#datalist_pub_names=1
-#datalist_qualifiers=1
-#datalist_snames=1
-#datalist_titles=1
-#datalist_sources=1
-
 # Notify change program (e.g. shell script) to be executed for each
 # database change. First argument is the name of the base, then the
 # individual and finally the action performed.
@@ -574,14 +558,6 @@ cache_cousins_ttl=1
 # There is no default here.
 #default_image_no=
 
-# for carrousel.txt use a reorg flag (not set by default)
-# to access a specific bases subdirectories organisation:
-# bases/<basename>.gwb/documents/portraits
-# bases/<basename>.gwb/documents/images
-# Warning: complete work never merged in geneweb/master branch,
-#          (TODO need a ref here) so flag not to be set.
-#reorg=on
-_
 # for carrousel.txt
 # dump sent image, if detected as empty type, in a 'bad-image' file
 # old parameter since version 4.02, defaut is to ignore.
@@ -593,6 +569,11 @@ _
 # Nevertheless the has_events var may force list creation or not
 # may be set to "always" or "never".
 #has_events=
+
+# Events in the NMBDS (baptism, marriage, death, burial) display
+# now include notes and sources directly in the interface,
+# with the option to hide these tooltips
+#event_tooltips=no
 
 # for wiki syntax since version 5.00, TODO what purpose ?
 # notes alias file is <basename>.gwb/notes.alias by default, or specified here
@@ -614,6 +595,14 @@ _
 # list of plugins to activate in this base, from previously loaded gwd plugins
 # since version 7.0. Details on https://geneweb.tuxfamily.org/wiki/plugins
 #plugins=
+
+# Activates Roglo-specific template extensions, default is not
+#roglo=yes
+#
+# associated alt_serv_* TODO: to be documented
+#alt_serv_adr=
+#alt_serv_base=
+#alt_serv_title=
 
 ### templm specific parameters ######################################
 
