@@ -38,15 +38,15 @@
   <div class="container fixed-top" role="navigation">
     <nav class="navbar navbar-light justify-content-center mx-1" id="banner">
       <nav class="nav nav-pills nav-fill">
-        <a class="nav-item nav-link px-1 py-1" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#birth" title="[*birth]"><i class="fa fa-cake-candles fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#baptism" title="[*baptism]"><i class="fa fa-dove fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#death" title="[*death]"><i class="fa fa-cross fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#burial" title="[*burial]"><i class="fa fa-person-praying fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*event/events]1</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#relations" title="[*relation/relations]1"><i class="fa fa-users fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#titles" title="[*title/titles]1"><i class="fa fa-award fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*title/titles]1</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#notes" title="[*note/notes]1"><i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
+        <a class="nav-item nav-link p-0" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
+        <a class="nav-item nav-link p-0 ml-2" href="#birth" title="[*birth]"><i class="fa fa-cake-candles fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
+        <a class="nav-item nav-link p-0 ml-2" href="#baptism" title="[*baptism]"><i class="fa fa-dove fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
+        <a class="nav-item nav-link p-0 ml-2" href="#death" title="[*death]"><i class="fa fa-cross fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
+        <a class="nav-item nav-link p-0 ml-2" href="#burial" title="[*burial]"><i class="fa fa-person-praying fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
+        <a class="nav-item nav-link p-0 ml-2" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*event/events]1</span></a>
+        <a class="nav-item nav-link p-0 ml-2" href="#relations" title="[*relation/relations]1"><i class="fa fa-users fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
+        <a class="nav-item nav-link p-0 ml-2" href="#titles" title="[*title/titles]1"><i class="fa fa-award fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*title/titles]1</span></a>
+        <a class="nav-item nav-link p-0 ml-2" href="#notes" title="[*note/notes]1"><i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
       </nav>
     </nav>
   </div>
