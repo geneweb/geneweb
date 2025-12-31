@@ -434,7 +434,7 @@ fr: Autour de l'arbre
         <i class="fas fa-gear fa-fw mr-1" aria-hidden="true"></i>[*configuration]1</a>
     %end;
     %if;wizard;
-      <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_NOTES&f=new_note">%nn;
+      <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_NOTES&new">%nn;
         <i class="fa fa-file-lines fa-fw mr-1" aria-hidden="true"></i>[*add::note/notes]0</a>
       %if;(b.propose_add_family!="no")
       <a role="button" class="btn btn-outline-success" href="%prefix;m=ADD_FAM">%nn;
