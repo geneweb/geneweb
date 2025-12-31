@@ -436,6 +436,9 @@ cache_cousins_ttl=1
 # Disable the forum (all the request on the forum are “incorect request”.
 #disable_forum=yes
 
+# Hide number of connected users/friends/wizards in footer (copyr template).
+#hide_connections=yes
+
 # Manitou is a wizard who can:
 # - delete any forum message
 # - edit any wizard’s notes

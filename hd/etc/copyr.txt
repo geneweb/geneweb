@@ -131,7 +131,7 @@
           </div>
         %end;
         <!-- Connections info -->
-        %if;(connections.total!="")
+        %if;(connections.total!="" and b.hide_connections!="yes")
           <div class="d-flex flex-column justify-items-center align-items-center small ml-1 ml-md-3">
             %if;(connections.friends!="" and connections.friends>0)<span>%connections.friends;
               %if;(connections.friends=1) [wizard/wizards/friend/friends/exterior]2
