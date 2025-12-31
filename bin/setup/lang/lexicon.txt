@@ -386,12 +386,23 @@ de: <span style="color:#FF0000;">ACHTUNG</span>: Die folgenden drei Optionen fü
 en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
 fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
 
+    some commands suppresses irreversibly some data. It may be prudent to have a backup archive
+aa: confirm.htm
+co: <span style="color:#FF0000;">AVERTIMENTU</span> : sta cumanda mudificheghja a basa di manera irriversibile. Forse seria una bella idea d’avè un archiviu di salvaguardia.
+de: <span style="color:#FF0000;">ACHTUNG</span>: dieser Befehl verändert die base unwiderruflich. Ein Backup Archiv wird empfohlen.
+en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+
     <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 aa: bsi_fix.htm
 co: <span style="color:#FF0000;">AVERTIMENTU</span> : sta cumanda mudificheghja a basa di manera irriversibile. Forse seria una bella idea d’avè un archiviu di salvaguardia.
 de: <span style="color:#FF0000;">ACHTUNG</span>: dieser Befehl verändert die base unwiderruflich. Ein Backup Archiv wird empfohlen.
 en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+
+    timestamped and moved to the "old" folder
+en: Timestamped and moved to the "old" folder.
+fr: Horodatées et déplacées dans le dossier "old".
 
     a GEDCOM source file
 aa: welcome.htm
@@ -546,6 +557,14 @@ fr: couleur de fond
 it: colore di fondo
 lv: fona krâsa
 sv: bakgrundsfärg
+
+    use old gw format
+en: Use old .gw format (for compatibility <= 6.08).
+fr: Utiliser l'ancien format .gw (compatibilité <= 6.08).
+
+    incompatible data
+en: Incompatible data will be reported in the person's note.
+fr: Les données incompatibles seront reportées dans la note de l'individu.
 
     background image
 aa: backg.htm
@@ -849,7 +868,7 @@ lv: Darboties ar
 sv: Konsultera
 
     Content of comm.log
-aa: bso_comm.htm
+aa: comm.htm
 co: Cuntenutu di u schedariu comm.log
 de: Inhalt der Datei "comm.log"
 en: Content of comm.log
@@ -860,7 +879,7 @@ it: Contenuto del file "comm.log"
 sv: Innehållet i filen "comm.log"
 
     Content of result file
-aa: bso_log.htm
+aa: log.htm
 co: Cuntenutu di u schedariu risultatu
 de: Inhalt der Ergebnisdatei
 en: Content of result file
@@ -1106,14 +1125,14 @@ en: do not commit changes (only traces).
 fr: ne pas effectuer les changements (traces seules).
 
     Do not extract notes.
-aa: gwb2ged.htm
+aa: gwexport.htm
 co: Ùn micca estrae e note.
 de: Notizen nicht extrahieren.
 en: Do not extract notes.
 fr: Ne pas extraire les notes.
 
     Do not extract spouses' parents (for options -s and -d).
-aa: gwb2ged.htm
+aa: gwexport.htm
 co: Ùn micca estrae i genitori di i sposi (per l’ozzioni -s è -d).
 de: Eltern der Ehepartner nicht extrahieren
 en: Do not extract spouses' parents (for options -s and -d).
@@ -1146,11 +1165,34 @@ lv: Darîts. Datu bâzes izveidoðana ir pabeigta. Jûsu datu bâze "%o" ir izve
 sv: Operationen är avklarad. Din databas benämnd "%o" är skapad.
 
     Dont extract individual pictures (portraits).
-aa: gwb2ged.htm
+aa: gwexport.htm
 co: Ùn micca estrae e fiure individuale (ritratti).
 de: Persönliche Bilder nicht extrahieren (Portraits).
 en: Dont extract individual pictures (portraits).
 fr: Ne pas extraire les images individuelles (portraits).
+
+    Do not extract database notes.
+aa: gwexport.htm
+en: Do not extract database notes.
+fr: Ne pas exporter les notes de la base
+
+    Extract ancestors or descendants
+aa: gwexport.htm
+en: Extract ancestors or descendants of:
+fr: Extraire les ascendants et descendants de :
+
+    Number of ancestor levels above key
+en: Number of ancestor levels above key.
+fr: Nombre de niveaux d'ascendants au dessus de la clé.
+
+    Number of descendant levels below key
+en: Number of descendant levels below key
+fr: Nombre de niveaux de descendants sous la clé.
+
+    key format
+aa: gwexport.htm
+en: key format: "first_name.occ surname" (spaces in first_name and surname replaced by _)
+fr: format des clés : "prénom.occ patronyme" (espaces dans prénom et patronyme sont remplacés par _)
 
     empty
 aa: welcome.htm
@@ -1174,51 +1216,37 @@ fr: fichier vide
 it: file vuoto
 sv: tom fil
 
-    Encode the characters in ANSEL.
+    The characters are encoded for
 aa: gwb2ged.htm
-co: Cudificà i caratteri in ANSEL.
-de: Kodiere die Zeichen in ANSEL.
-en: Encode the characters in ANSEL.
-es: Codificar los carácteres en ANSEL.
-fr: Coder les caractères en ANSEL.
-it: Codificare i caratteri in ANSEL.
-lv: Burti ANSEL kodçjumâ.
-sv: Koda tecknen i ANSEL.
-
-    Encode the characters in ANSI (ISO 8859-1).
-aa: gwb2ged.htm
-co: Cudificà i caratteri in ANSI (ISO 8859-1).
-de: Kodiere die Zeichen in ANSI (ISO 8859-1).
-en: Encode the characters in ANSI (ISO 8859-1).
-es: Codificar los car&aacute;cteres en ANSI (ISO 8859-1).
-fr: Coder les caract&egrave;res en ANSI (ISO 8859-1).
-it: Codificare i caratteri in ANSI (ISO 8859-1).
-lv: Burti ANSI kodçjumâ (ISO 8859-1).
-sv: Koda tecknen i ANSI (ISO 8859-1).
+co: Cudificà i caratteri in
+de: Kodiere die Zeichen in
+en: The characters are encoded in
+es: Codificar los car&aacute;cteres en
+fr: Les caract&egrave;res sont encodés en
+fi: Koodaa merkit muodossa
+it: Codificare i caratteri in
+lv: Burti kodçjumâ
+sv: Koda tecknen i
 
     Encode the characters in ASCII.
-aa: gwb2ged.htm
-co: Cudificà i caratteri in ASCII.
-de: Kodiere die Zeichen in ASCII.
+aa: gwexport.htm
 en: Encode the characters in ASCII.
-es: Codificar los carácteres en ASCII.
-fi: Koodaa merkit ASCII muodossa.
-fr: Coder les caractères en ASCII.
-it: Codificare i caratteri in ASCII.
-lv: Burti ASCII kodçjumâ.
-sv: Koda tecknen i ASCII.
+fr: Encoder les caractères en ASCII.
 
     Encode the characters in UTF-8.
-aa: gwb2ged.htm
-co: Cudificà i caratteri in UTF-8.
-de: Kodiere die Zeichen in UTF-8.
+aa: gwexport.htm
 en: Encode the characters in UTF-8.
-es: Codificar los carácteres en UTF-8.
-fi: Koodaa merkit UTF-8 muodossa.
-fr: Coder les caractères en UTF-8.
-it: Codificare i caratteri in UTF-8.
-lv: Burti UTF-8 kodçjumâ.
-sv: Koda tecknen i UTF-8.
+fr: Encoder les caractères en UTF-8.
+
+    Encode the characters in ANSEL.
+aa: gwexport.htm
+en: Encode the characters in ANSEL.
+fr: Encoder les caractères en ANSEL.
+
+    Encode the characters in ANSI (ISO 8859-1).
+aa: gwexport.htm
+en: Encode the characters in ANSI (ISO 8859-1).
+fr: Encoder les caractères en ANSI (ISO 8859-1).
 
     End by the initialization of consanguinities.
 aa: gwc.htm
@@ -1230,6 +1258,18 @@ fr: Terminer par le précalcul de consanguinité.
 it: Terminare con il pre-calcolo di consanguineità.
 lv: Nobeigt ar asinsradniecîbas pârrçíinu.
 sv: Avsluta med att beräkna blodsbanden.
+
+
+    If you write nothing
+aa: gwu.htm
+co: S’è ùn scrivite nunda, u so nome serà deduttu secondu quellu di a basa di dati.
+de: Wenn Du nichts eingibst, wird der Dateiname aus dem Namen deiner %G-Datenbank abgeleitet.
+en: If you write nothing, its name will be deducted from the name of the database.
+es: Si Ud. no mete nada, este será deducido del nombre de la base.
+fr: Si vous ne mettez rien, ce sera déduit du nom de la base.
+it: Se non mettete niente, il nome verrà dedotto da quello della base.
+lv: Ja Jûs neko neierakstîsiet, datnes vârds tiks izveidots no datu bâzes nosaukuma.
+sv: Om du inte skriver någonting, kommer det att bli samma namn som databasen avslutad med.
 
     Enter the name you want to give to your %G database.
 aa: gwc.htm
@@ -1253,16 +1293,16 @@ it: Digitate il nome che volete dare alla vostra base di dati %G. Se non mettete
 lv: Nosaukumu kurâ Jûs vçlties nosaukt savu %G datu bâzi. Ja neierakstîsiet, tad datu bâzes nosaukums tiks veidos no GEDCOM datnes nosaukuma.
 sv: Namnet du vill kalla din %G databas. Om namnet utelämnas, kommer det att bli härlätt från GEDCOM-filens namn.
 
-    Enter the name you want to give to your %G source file. Its name must end with the suffix "<tt>.gw</tt>". If you write nothing, its name will be deducted from the name of the database.
+    Enter the name you want to give to your %G source file.
 aa: gwu.htm
-co: Scrivite u nome chì vò vulete dà à u vostru schedariu di fonte %G. U so nome deve finisce cù u suffissu « <tt>.gw</tt> ». S’è ùn scrivite nunda, u so nome serà deduttu secondu quellu di a basa di dati.
-de: Gib den Namen ein, den du deiner %G-Quelldatei geben möchtest. Er muß mit "<tt>.gw</tt>" enden. Wenn Du nichts eingibst, wird der Dateiname aus dem Namen deiner %G-Datenbank abgeleitet.
-en: Enter the name you want to give to your %G source file. Its name must end with the suffix "<tt>.gw</tt>". If you write nothing, its name will be deducted from the name of the database.
-es: Entre Ud. el nombre que Ud. desee dar a su fichero fuente %G. El debe terminar en "<tt>.gw</tt>".  Si Ud. no mete nada, este será deducido del nombre de la base.
-fr: Entrez le nom que vous voulez donner à votre fichier source %G. Il doit se terminer par "<tt>.gw</tt>". Si vous ne mettez rien, ce sera déduit du nom de la base.
-it: Digitate il nome che volete attribuire al vostro file sorgente %G. Deve finire con "<tt>.gw</tt>".  Se non mettete niente, il nome verrà dedotto da quello della base.
-lv: Ierakstiet datnes nosaukumu %G datnei. Nosaukumam jâbeidzas ar paplaðinâjumu "<tt>.gw</tt>". Ja Jûs neko neierakstîsiet, datnes vârds tiks izveidots no datu bâzes nosaukuma.
-sv: Skriv in namnet du vill kalla din %G källfil. Om du inte skriver någonting, kommer det att bli samma namn som databasen  avslutad med "<tt>.gw</tt>".
+co: Scrivite u nome chì vò vulete dà à u vostru schedariu di fonte %G. U so nome deve finisce cù u suffissu « <tt>.gw</tt> ».
+de: Gib den Namen ein, den du deiner %G-Quelldatei geben möchtest. Er muß mit "<tt>.gw</tt>" enden.
+en: Enter the name you want to give to your %G source file. Its name must end with the suffix "<tt>.gw</tt>".
+es: Entre Ud. el nombre que Ud. desee dar a su fichero fuente %G. El debe terminar en "<tt>.gw</tt>".
+fr: Entrez le nom que vous voulez donner à votre fichier source %G. Il doit se terminer par "<tt>.gw</tt>".
+it: Digitate il nome che volete attribuire al vostro file sorgente %G. Deve finire con "<tt>.gw</tt>".
+lv: Ierakstiet datnes nosaukumu %G datnei. Nosaukumam jâbeidzas ar paplaðinâjumu "<tt>.gw</tt>".
+sv: Skriv in namnet du vill kalla din %G källfil.
 
     Enter the name you want to give to your GEDCOM file. If you write nothing, it will be the name of the database ended by the suffix
 aa: gwb2ged.htm
@@ -1321,12 +1361,10 @@ it: Estrazione di un file %G
 lv: Izveidot %G datni
 sv: Exportera en %G källfil
 
-    Extract ancestors with siblings of
-aa: gwb2ged.htm
-co: Estrae l’antenati cù fratelli è surelle
-de: Extrahiere Vorfahren mit Geschwistern von
-en: Extract ancestors with siblings of
-fr: Extraire les ancêtres avec fratries de
+    Extract also siblings of exported persons
+aa: gwexport.htm
+en: Extract also siblings of exported persons
+fr: Extraire aussi les fratries des personnes exportées
 
     Extract from a database
 aa: main.htm
@@ -1369,12 +1407,42 @@ it: Estrarre solo i discendenti di
 lv: Atlasît tikai dotâs personas pçcteèus
 sv: Exportera endast ättlingarna till
 
-    extract surname (usable several times).
+    Select the gwu specific options you want
+en: Select the gwu specific options you want.
+fr: Selectionnez les options gwu souhaitées.
+
+    Select individuals involved in parentship
+en: Select individuals involved in parentship computation between pairs of keys.
+fr: Sélectionner les personnes apparaissant dans le calcul de parenté entre paires de clés.
+
+    Do not extract spouses' parents
+en: Do not extract spouses' parents (for options -a and -d).
+fr: Ne pas extraire les parents des conjoints (pour les options -a et -d).
+
+    Verbose
+en: Verbose.
+fr: Verbose.
+
+    Pairs must be defined with -key option
+en: Pairs must be defined with -key option, descendant first: e.g. -key \"Descendant.0 SURNAME\" -key \"Ancestor.0 SURNAME\".
+fr: Les paires de clés sont définies avec l'option -key, descendant en premier : -key \"Descendant.0 Patronyme\" -key \"Ascendant.0 patronyme\".
+
+    extract surname.
 aa: gwb2ged.htm
-co: Estrae una casata (impieghevule parechje volte).
-de: Nachnamen extrahieren (mehrfach verwendbar).
-en: Extract surname (usable several times).
-fr: Extraire un nom de famille (utilisable plusieurs fois).
+co: Estrae una casata.
+de: Nachnamen extrahieren.
+en: Extract surname .
+fr: Extraire un nom de famille.
+
+    Add another surname
+aa: gwexport.htm
+en: Add another surname.
+fr: Ajouter un patronyme.
+
+    Add another key
+aa: gwexport.htm
+en: Add another key.
+fr: Ajouter une autre clé.
 
     families' children.
 aa: gwfix.htm
@@ -2962,16 +3030,10 @@ it: Selezionate il vostro file sorgente %G (che finisce con ".gw"):
 lv: Ierakstiet pilnu %G resursdatnes nosaukumu (kas beidzas ar ".gw").
 sv: Skriv in det kompletta namnet för din %G källfil (den måste sluta med ".gw"):
 
-    Select the options you want
-aa: ged2gwb.htm
-co: Selezziunate l’ozzioni chì vò vulete
-de: Sofern gewünscht, wähle bitte aus den folgenden Optionen
-en: Select the options you want
-es: Seleccione las opciones que Ud. desee
-fr: Sélectionnez les options que vous désirez
-it: Selezionate le opzioni desiderate
-lv: Iezîmçjiet nepiecieðmâs papildus iespçjas
-sv: Välj de optioner du vill ha
+    Select filter options
+aa: export.htm
+en: Select the filter options you want
+fr: Sélectionnez les options de filtrage que vous désirez
 
     Select the source file or navigate in your folders.
 co: Selezziunate u nome di u schedariu di fonte, o navigate in i vostri cartulari.
@@ -3889,17 +3951,10 @@ it: <b>Attenzione</b>: l'operazione può prendere qualche secondo o quanche minu
 lv: <b>Brîdinâjums</b>: tas var ilgt no daþâm sekundçm lîdz pat daþâm minûtçm, atkarîbâ no apstâkïiem. Lûdzu pacietîbu.
 sv: <b>Varning</b>: denna operation kan ta några sekunder eller minuter, beroende på fallet. Ha tålamod.
 
-    Warning: this suppression is definitive! To confirm, push this button.
+    Warning: moved to "old"! To confirm, push this button.
 aa: delete_1.htm
-co: <b>Avertimentu</b> : sta squassatura hè irriversibile ! Per cunfirmà, appughjate nant’à stu buttone.
-de: <b>Achtung</b>: Diese Auswahl ist unwiderruflich! Zur Bestätigung bitte diesen Kopf drücken:
-en: <b>Warning</b>: this suppression is definitive! To confirm, push this button.
-es: <b>Atención</b>: esta supresión es definitiva ! Para confirmar, apoye Ud en este botón:
-fi: <b>Varoitus</b>: tämä poisto on lopullinen! Paina tätä nappia vahvistaaksesi.
-fr: <b>Attention</b> : cette suppression est définitive! Pour confirmer, appuyez sur ce bouton:
-it: <b>Attenzione</b>: questa azione è definitiva! Per confermare, cliccate su questo bottone:
-lv: <b>Uzmanîbu</b>: ðis brîdinâjums ir pçdçjais! Lai to apstiprinâtu, nospiediet ðo podziòu.
-sv: <b>Varning</b>: detta val är definitivt! För att bekräfta, tryck på denna knapp.
+en: <b>Warning</b>: bases will be timestamped and moved to "old" folder! To confirm, push this button:
+fr: <b>Attention</b> : les bases seront horodatées et déplacées vers le dossier "old"! Pour confirmer, appuyez sur ce bouton :
 
     We are going to create a database named "%o" from the following databases:
 aa: merge_1.htm

@@ -5,9 +5,10 @@ let gwd_port = ref 2317
 let default_lang = ref "en"
 let setup_dir = ref "."
 let bin_dir = ref ""
-let base_dir = ref ""
+let base_dir = ref (Filename.concat Filename.current_dir_name "bases")
 let lang_param = ref ""
 let only_file = ref ""
+let bname = ref ""
 
 let printer_conf =
   {
@@ -71,8 +72,10 @@ let trailer _conf =
     {|<img src="images/logo_bas.png" style="border:0"></a>|};
   Output.print_sstring printer_conf {| Version |};
   Output.print_sstring printer_conf Version.ver;
+  Output.print_sstring printer_conf {|, commit |};
+  Output.print_sstring printer_conf Version.commit_id;
   Output.print_sstring printer_conf
-    " Copyright &copy; 1998-2021</em></div></div></body></html>"
+    "; Copyright &copy; 1998-2025</em></div></div></body></html>"
 
 let header conf title =
   header_no_page_title conf title;
@@ -149,122 +152,63 @@ let stringify s =
     "\"" ^ s ^ "\""
   with Not_found -> s
 
-let parameters =
-  let rec loop comm = function
+let parameters env =
+  bname := "";
+  let rec loop comm env =
+    match env with
     | (k, s) :: env -> (
         let k = strip_spaces (decode k) in
-        let s = strip_spaces (decode s) in
-        if k = "" || s = "" then loop comm env
-        else if k = "opt" then loop comm env
-        else if k = "anon" then loop (comm ^ " " ^ stringify s) env
-        else
-          match numbered_key k with
-          | Some (k, '1') ->
-              let s, env =
-                let rec loop s = function
-                  | (k1, s1) :: env as genv -> (
-                      match numbered_key k1 with
-                      | Some (k1, _) when k1 = k ->
-                          let s1 = strip_spaces (decode s1) in
-                          let s =
-                            if s1 = "" then s else s ^ " \"" ^ s1 ^ "\""
-                          in
-                          loop s env
-                      | _ -> (s, genv))
-                  | [] -> (s, [])
-                in
-                loop ("\"" ^ s ^ "\"") env
+        let s = strip_spaces (decode s) |> stringify in
+        match numbered_key k with
+        | Some (k, '1') ->
+            let s, env =
+              let rec loop s = function
+                | (k1, s1) :: env as genv -> (
+                    match numbered_key k1 with
+                    | Some (k1, _) when k1 = k ->
+                        let s1 = strip_spaces (decode s1) in
+                        let s = if s1 = "" then s else s ^ " \"" ^ s1 ^ "\"" in
+                        loop s env
+                    | _ -> (s, genv))
+                | [] -> (s, [])
               in
-              loop (comm ^ " -" ^ k ^ " " ^ s) env
-          | Some _ -> loop comm env
-          | None ->
-              if s = "none" then loop comm env
-              else if s = "on" then loop (comm ^ " -" ^ k) env
-              else if s.[0] = '_' then loop (comm ^ " -" ^ k ^ stringify s) env
-              else if s.[String.length s - 1] = '_' then
-                loop (comm ^ " -" ^ s ^ k) env
-              else loop (comm ^ " -" ^ k ^ " " ^ stringify s) env)
-    | [] -> comm
-  in
-  loop ""
-
-let parameters_1 =
-  let rec loop comm bname = function
-    | (k, s) :: env ->
-        let k = strip_spaces (decode k) in
-        let s = strip_spaces (decode s) in
-        if k = "" || s = "" then loop comm bname env
-        else if k = "opt" then loop comm bname env
-        else if k = "gwd_p" && s <> "" then
-          loop (comm ^ " -gwd_p " ^ stringify s) bname env
-        else if k = "anon" && s <> "" then
-          loop (comm ^ " " ^ stringify s) (stringify s) env
-        else if k = "a" then loop (comm ^ " -a") bname env
-        else if k = "s" then loop (comm ^ " -s") bname env
-        else if k = "d" && s <> "" then
-          loop (comm ^ " -d " ^ stringify s) bname env
-        else if k = "i" && s <> "" then
-          loop (comm ^ " -i " ^ stringify s) bname env
-        else if k = "bf" then loop (comm ^ " -bf") bname env
-        else if k = "del" && s <> "" then
-          loop (comm ^ " -del " ^ stringify s) bname env
-        else if k = "cnt" && s <> "" then
-          loop (comm ^ " -cnt " ^ stringify s) bname env
-        else if k = "exact" then loop (comm ^ " -exact") bname env
-        else if k = "o1" && s <> "" then
-          let out = stringify s in
-          comm ^ " -o " ^ out ^ " > " ^ out
-        else if k = "o" && s <> "" then
-          if s = "choice" then loop comm bname env
-          else
-            let out = stringify s in
-            let out =
-              if out = "/notes_d/connex.txt" then bname ^ ".gwb" ^ out else out
+              loop ("\"" ^ s ^ "\"") env
             in
-            let out = slashify_linux_dos out in
-            comm ^ " -o " ^ out ^ " > " ^ out
-        else loop comm bname env
+            loop (comm ^ " -" ^ k ^ " " ^ s) env
+        | _ -> (
+            match k with
+            (* k with some parameter *)
+            | "anon" when s <> "" ->
+                bname := s;
+                loop (comm ^ " " ^ !bname) env
+            | "anon_a" when s <> "" -> loop (comm ^ " " ^ s) env
+            | "anon_b" when s <> "" -> loop (comm ^ " " ^ s) env
+            | "d" when s <> "" -> loop (comm ^ " -d " ^ s) env
+            | "fn_a" when s <> "" -> loop (comm ^ " -pnoc_a \"" ^ s) env
+            | "fn_b" when s <> "" -> loop (comm ^ " -pnoc_b \"" ^ s) env
+            | "i" when s <> "" -> loop (comm ^ " -i " ^ s) env
+            | "o" when s <> "" ->
+                if s = "choice" then loop comm env (* ignore ?? *)
+                else
+                  let out =
+                    if s = "/notes_d/connex.txt" then !bname ^ ".gwb" ^ s
+                    else s |> slashify_linux_dos
+                  in
+                  loop (comm ^ " -o " ^ out) env
+            | "o1" when s <> "" -> comm ^ " -o " ^ s ^ " > " ^ s
+            | "oc_a" when s <> "" -> loop (comm ^ "." ^ s) env
+            | "oc_b" when s <> "" -> loop (comm ^ "." ^ s) env
+            | "od" when s <> "" -> loop (comm ^ " " ^ s) env
+            | "opt" when s <> "" -> loop comm env (* ignore *)
+            | "sn_a" when s <> "" -> loop (comm ^ " " ^ s ^ "\"") env
+            | "sn_b" when s <> "" -> loop (comm ^ " " ^ s ^ "\"") env
+            | _ when s = "on" -> loop (comm ^ " -" ^ k) env
+            (* TODO see all cases where value <> o, *)
+            | _ when s <> "" -> loop (comm ^ " -" ^ k ^ " " ^ s) env
+            | _ -> loop comm env))
     | [] -> comm
   in
-  loop "" ""
-
-let parameters_2 =
-  let rec loop comm = function
-    | (k, s) :: env ->
-        let k = strip_spaces (decode k) in
-        let s = strip_spaces (decode s) in
-        if k = "" || s = "" then loop comm env
-        else if k = "opt" then loop comm env
-        else if k = "anon1" then loop (comm ^ " " ^ stringify s) env
-        else if k = "anon2" then loop (comm ^ " " ^ stringify s) env
-        else if k = "a1" then loop (comm ^ " -1 " ^ stringify s) env
-        else if k = "a2" then loop (comm ^ " " ^ stringify s) env
-        else if k = "a3" then loop (comm ^ " " ^ stringify s) env
-        else if k = "b1" then loop (comm ^ " -2 " ^ stringify s) env
-        else if k = "b2" then loop (comm ^ " " ^ stringify s) env
-        else if k = "b3" then loop (comm ^ " " ^ stringify s) env
-        else if k = "ad" then loop (comm ^ " -ad ") env
-        else if k = "d" then loop (comm ^ " -d ") env
-        else if k = "mem" then loop (comm ^ " -mem") env
-        else if k = "o" then
-          loop (comm ^ " -o " ^ stringify s ^ " > " ^ stringify s) env
-        else loop comm env
-    | [] -> comm
-  in
-  loop ""
-
-let parameters_3 =
-  let rec loop comm = function
-    | (k, s) :: env ->
-        let k = strip_spaces (decode k) in
-        if k = "" || k = "opt" then loop comm env
-        else if k = "anon" && s <> "" then loop (comm ^ " " ^ stringify s) env
-        else if k = "bd" && s <> "" then
-          loop (comm ^ " -" ^ stringify k ^ " " ^ stringify s) env
-        else loop (comm ^ " -" ^ stringify k) env
-    | [] -> comm
-  in
-  loop ""
+  loop "" env
 
 let rec list_replace k v = function
   | [] -> [ (k, v) ]
@@ -352,8 +296,6 @@ let macro conf = function
       let lang_def = transl conf "!languages" in
       Translate.language_name ~sep:'|' lang lang_def
   | 'P' -> string_of_int !gwd_port
-  | 'Q' -> parameters_1 conf.env
-  | 'R' -> parameters_2 conf.env
   | '%' -> "%"
   | c -> "BAD MACRO " ^ String.make 1 c
 
@@ -655,14 +597,11 @@ let rec copy_from_stream conf print strm =
                   let fname = slashify_linux_dos fname in
                   print fname
               | 'P' -> print (string_of_int !gwd_port)
-              | 'Q' -> print (parameters_1 conf.env) (* same as p *)
-              | 'R' -> print (parameters_2 conf.env) (* same as p *)
               | 'V' | 'F' -> (
                   let k = get_variable strm in
                   match p_getenv conf.env k with
                   | Some v -> print v
                   | None -> ())
-              | 'S' -> print (parameters_3 conf.env)
               | _ -> (
                   match p_getenv conf.env (String.make 1 c) with
                   | Some v -> (
@@ -941,7 +880,7 @@ let simple conf =
   if ged <> "" && not (Sys.file_exists ged) then print_file conf "err_unkn.htm"
   else if out_file = "" then print_file conf "err_miss.htm"
   else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "bso.htm"
+  else print_file conf "create.htm"
 
 let gwc_or_ged2gwb out_name_of_in_name conf =
   let fname =
@@ -969,7 +908,7 @@ let gwc_or_ged2gwb out_name_of_in_name conf =
   else if (not (Sys.file_exists in_file)) && not (String.contains fname '*')
   then print_file conf "err_unkn.htm"
   else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "bso.htm"
+  else print_file conf "create.htm"
 
 let gwc_check conf =
   let conf = { conf with env = ("nofail", "on") :: ("f", "on") :: conf.env } in
@@ -998,25 +937,26 @@ let gwc conf =
   (try Sys.remove gwo with Sys_error _ -> ());
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "bso_err.htm" else print_file conf "bso_ok.htm"
+  if rc > 1 then print_file conf "err_standard.htm"
+  else print_file conf "gwc_ok.htm"
 
-let gwdiff_check conf = print_file conf "bsi_diff.htm"
+let gwdiff_check conf = print_file conf "confirm.htm"
 
 let gwdiff ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ parameters_2 conf.env)
+    exec_f (comm ^ parameters conf.env)
   in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm"
+  if rc > 1 then print_file conf "err_standard.htm"
   else
     let conf =
       conf_with_env conf "o" (Filename.basename (s_getenv conf.env "o"))
     in
     print_file conf ok_file
 
-let gwfixbase_check conf = print_file conf "bsi_fix.htm"
+let gwfixbase_check conf = print_file conf "confirm.htm"
 
 let gwfixbase ok_file conf =
   let rc =
@@ -1025,24 +965,25 @@ let gwfixbase ok_file conf =
   in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
 
 let cache_files_check conf =
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
   if in_base = "" then print_file conf "err_miss.htm";
-  print_file conf "bsi_cache_files.htm"
+  print_file conf "confirm.htm"
 
 let cache_files ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "cache_files") ^ " " in
-    exec_f (comm ^ parameters_3 conf.env ^ " > comm.log")
+    exec_f (comm ^ parameters conf.env ^ " > comm.log")
   in
   flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+  if rc > 1 then print_file conf "err_standard\n  .htm"
+  else print_file conf ok_file
 
-let connex_check conf = print_file conf "bsi_connex.htm"
+let connex_check conf = print_file conf "confirm.htm"
 
 let connex ok_file conf =
   let ic = Unix.open_process_in "uname" in
@@ -1052,7 +993,7 @@ let connex ok_file conf =
     let commnd =
       "cd " ^ Sys.getcwd () ^ "; tput bel;"
       ^ stringify (Filename.concat !bin_dir "connex")
-      ^ " " ^ parameters_1 conf.env
+      ^ " " ^ parameters conf.env
     in
     if uname = "Darwin" then
       let launch = "tell application \"Terminal\" to do script " in
@@ -1064,7 +1005,7 @@ let connex ok_file conf =
       (* à compléter et tester ! *)
       let commnd =
         stringify (Filename.concat !bin_dir "connex")
-        ^ " " ^ parameters_1 conf.env
+        ^ " " ^ parameters conf.env
       in
       Sys.command commnd
     else (
@@ -1073,7 +1014,7 @@ let connex ok_file conf =
       2)
   in
   flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
 
 let gwu_or_gwb2ged_check suffix conf =
   let in_file =
@@ -1108,10 +1049,7 @@ let gwu_or_gwb2ged_check suffix conf =
   let conf = conf_with_env conf "odir" odir in
   let conf = conf_with_env conf "o" out_file in
   if in_file = "" then print_file conf "err_miss.htm"
-  else print_file conf "bsi.htm"
-
-let gwu = gwu_or_gwb2ged_check ".gw"
-let gwb2ged = gwu_or_gwb2ged_check ".ged"
+  else print_file conf "confirm.htm"
 
 let gwb2ged_or_gwu_1 ok_file conf =
   let rc =
@@ -1120,29 +1058,31 @@ let gwb2ged_or_gwu_1 ok_file conf =
   in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm"
+  if rc > 1 then print_file conf "err_standard.htm"
   else
     let conf =
       conf_with_env conf "o" (Filename.basename (s_getenv conf.env "o"))
     in
     print_file conf ok_file
 
-let gwb2ged_1 = gwb2ged_or_gwu_1 "gw2gd_ok.htm"
-let gwu_1 = gwb2ged_or_gwu_1 "gwu_ok.htm"
+let gwu_check = gwu_or_gwb2ged_check ".gw"
+let gwu = gwb2ged_or_gwu_1 "gwu_ok.htm"
+let gwb2ged_check = gwu_or_gwb2ged_check ".ged"
+let gwb2ged = gwb2ged_or_gwu_1 "gwb2ged_ok.htm"
 
 let consang_check conf =
   let in_f =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
   if in_f = "" then print_file conf "err_miss.htm"
-  else print_file conf "bsi.htm"
+  else print_file conf "confirm.htm"
 
 let update_nldb_check conf =
   let in_f =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
   if in_f = "" then print_file conf "err_miss.htm"
-  else print_file conf "bsi.htm"
+  else print_file conf "confirm.htm"
 
 let has_gwu dir =
   try
@@ -1271,8 +1211,8 @@ let recover_2 conf =
   in
   if rc > 1 then (
     Sys.chdir dir;
-    print_file conf "err_reco.htm")
-  else print_file conf "bso_ok.htm"
+    print_file conf "err_recover.htm")
+  else print_file conf "create_ok.htm"
 
 let cleanup conf =
   let in_base =
@@ -1292,23 +1232,21 @@ let cleanup_1 conf =
   let c = Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
+  let tm = Unix.localtime (Unix.time ()) in
+  let t_stamp =
+    Printf.sprintf "%04d-%02d-%02d-%02d-%02d-%02d" (1900 + tm.Unix.tm_year)
+      (1 + tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+      tm.Unix.tm_sec
+  in
   let _ = Sys.command c in
   Printf.eprintf "$ mkdir old\n";
   (try Unix.mkdir "old" 0o755 with Unix.Unix_error (_, _, _) -> ());
-
-  if Sys.unix then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
-  else (
-    Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
-    Printf.eprintf "$ rmdir old\\%s\n" in_base_dir);
-
+  if Sys.unix then
+    Printf.eprintf "$ mv %s old/%s-%s.gwb\n" in_base in_base t_stamp
+  else Printf.eprintf "$ move %s old\\%s-%s.gwb\n" in_base in_base t_stamp;
   flush stderr;
-  Mutil.rm_rf (Filename.concat "old" in_base_dir);
-
-  if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
-  else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
-
-  flush stderr;
-  Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
+  Sys.rename in_base_dir
+    (String.concat Filename.dir_sep [ "old"; in_base ^ "-" ^ t_stamp; ".gwb" ]);
   let c =
     Filename.concat !bin_dir "gwc"
     ^ " tmp.gw -nofail -o " ^ in_base ^ " > comm.log 2>&1"
@@ -1316,15 +1254,13 @@ let cleanup_1 conf =
   Printf.eprintf "$ %s\n" c;
   flush stderr;
   let rc = Sys.command c in
-
   let rc = if not Sys.unix then infer_rc conf rc else rc in
-
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then
     let conf = { conf with comm = "gwc" } in
-    print_file conf "bsi_err.htm"
-  else print_file conf "clean_ok.htm"
+    print_file conf "err_standard.htm"
+  else print_file conf "cleanup_ok.htm"
 
 let rec check_new_names conf l1 l2 =
   match (l1, l2) with
@@ -1364,20 +1300,41 @@ let rename conf =
     List.iter
       (fun (k, v) -> if k <> v then Sys.rename ("_" ^ k ^ ".gwb") (v ^ ".gwb"))
       rename_list;
-    print_file conf "ren_ok.htm"
+    print_file conf "rename_ok.htm"
   with Exit -> ()
 
 let delete conf = print_file conf "delete_1.htm"
 
 let delete_1 conf =
-  List.iter (fun (k, v) -> if v = "del" then Mutil.rm_rf (k ^ ".gwb")) conf.env;
-  print_file conf "del_ok.htm"
+  let tm = Unix.localtime (Unix.time ()) in
+  let t_stamp =
+    Printf.sprintf "%04d-%02d-%02d-%02d-%02d-%02d" (1900 + tm.Unix.tm_year)
+      (1 + tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+      tm.Unix.tm_sec
+  in
+  Printf.eprintf "$ mkdir old\n";
+  (try Unix.mkdir "old" 0o755 with Unix.Unix_error (_, _, _) -> ());
+  List.iter
+    (fun (k, v) ->
+      if v = "del" then (
+        if Sys.unix then
+          Printf.eprintf "$ mv %s.gwb old/%s-%s.gwb\n" k k t_stamp
+        else Printf.eprintf "$ move %s.gwb old\\%s-%s.gwb\n" k k t_stamp;
+        try
+          Sys.rename (k ^ ".gwb")
+            (Filename.concat "old" (k ^ "-" ^ t_stamp ^ ".gwb"))
+        with Sys_error e ->
+          Printf.eprintf "Error %s, %s, %s\n" e (k ^ ".gwb")
+            (Filename.concat "old" (k ^ "-" ^ t_stamp ^ ".gwb")));
+      flush stderr)
+    conf.env;
+  print_file conf "delete_ok.htm"
 
 let merge conf =
   let out_file =
     match p_getenv conf.env "o" with Some f -> strip_spaces f | _ -> ""
   in
-  let conf = { conf with comm = "." } in
+  let conf = { conf with comm = "merge" } in
   let bases = selected conf.env in
   if out_file = "" || List.length bases < 2 then print_file conf "err_miss.htm"
   else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
@@ -1421,7 +1378,8 @@ let merge_1 conf =
       flush stderr;
       Sys.command c
   in
-  if rc > 1 then print_file conf "bso_err.htm" else print_file conf "bso_ok.htm"
+  if rc > 1 then print_file conf "err_standard.htm"
+  else print_file conf "create_ok.htm"
 
 let read_gwd_arg () =
   let fname = Filename.concat !setup_dir "gwd.arg" in
@@ -1559,11 +1517,11 @@ let ged2gwb conf =
   let rc = if not Sys.unix then infer_rc conf rc else rc in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "bso_err.htm"
+  if rc > 1 then print_file conf "err_standard.htm"
   else
     let bname = try List.assoc "o" conf.env with Not_found -> "" in
     Util.print_default_gwf_file bname;
-    print_file conf "bso_ok.htm"
+    print_file conf "create_ok.htm"
 
 let consang conf ok_file =
   let rc =
@@ -1572,7 +1530,7 @@ let consang conf ok_file =
   in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+  if rc > 1 then print_file conf "err_consang.htm" else print_file conf ok_file
 
 let update_nldb conf ok_file =
   let rc =
@@ -1581,7 +1539,7 @@ let update_nldb conf ok_file =
   in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
 
 let separate_slashed_filename s =
   let rec loop i =
@@ -1655,20 +1613,20 @@ let setup_comm_ok conf = function
       | _ -> gwc conf)
   | "gwu" -> (
       match p_getenv conf.env "opt" with
-      | Some "check" -> gwu conf
-      | _ -> gwu_1 conf)
+      | Some "check" -> gwu_check conf
+      | _ -> gwu conf)
   | "ged2gwb" -> (
       match p_getenv conf.env "opt" with
       | Some "check" -> ged2gwb_check conf
       | _ -> ged2gwb conf)
   | "gwb2ged" -> (
       match p_getenv conf.env "opt" with
-      | Some "check" -> gwb2ged conf
-      | _ -> gwb2ged_1 conf)
+      | Some "check" -> gwb2ged_check conf
+      | _ -> gwb2ged conf)
   | "consang" -> (
       match p_getenv conf.env "opt" with
       | Some "check" -> consang_check conf
-      | _ -> consang conf "consg_ok.htm")
+      | _ -> consang conf "consang_ok.htm")
   | "update_nldb" -> (
       match p_getenv conf.env "opt" with
       | Some "check" -> update_nldb_check conf
@@ -1869,6 +1827,7 @@ let usage =
 
 let speclist =
   [
+    (* TODO -bd seems to be flatly ignored in setup.ml *)
     ( "-bd",
       Arg.String (fun x -> base_dir := x),
       "<dir> Directory where the databases are installed." );
@@ -1921,6 +1880,7 @@ let intro () =
   Secure.set_base_dir ".";
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
+  Printf.eprintf "Start gwsetup\n";
   default_lang := default_setup_lang;
   let gwd_lang, setup_lang =
     if !daemon then

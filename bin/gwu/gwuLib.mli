@@ -2,6 +2,9 @@ val out_dir : string ref
 val old_gw : bool ref
 val raw_output : bool ref
 val separate_list : string list ref
+val ancestors_of : string list ref
+val descendants_of : string list ref
+val aws : bool ref
 val only_file : string ref
 val sep_limit : int ref
 val all_files : bool ref

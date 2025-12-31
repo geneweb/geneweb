@@ -13,6 +13,9 @@ let out_dir = ref ""
 let raw_output = ref false
 let sep_limit = ref 21
 let separate_list = ref []
+let descendants_of = ref []
+let ancestors_of = ref []
+let aws = ref false
 let dummy = ref [ "" ]
 let all_files = ref false
 

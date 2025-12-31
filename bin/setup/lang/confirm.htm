@@ -2,7 +2,7 @@
 <html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: bsi_diff.htm,v 7.00 2018_04_10 05:35:06 hg Exp $ -->
+  <!-- $Id: confirm.htm,v 7.00 2025_12_18 05:35:06 hg Exp $ -->
   <meta charset="utf-8">
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
@@ -23,11 +23,7 @@ The operation "%d" will be applied on your database "%a". Warning: it can take s
 seconds or some minutes, depending on the case. Be patient.
 %)
 <p>
-[<span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.]
-%(
-<span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly
-some families. It may be prudent to have a backup archive.
-%)
+[some commands suppresses irreversibly some data. It may be prudent to have a backup archive]
 <p>
 [Push this button to start][:]
 <form method="post" action="%d">
@@ -37,5 +33,5 @@ some families. It may be prudent to have a backup archive.
 <p>
 [For information, this operation corresponds to the following commands][:]
 <pre>
-     $ %x%/%d %R > comm.log
+     $ %x%/%d %p > comm.log
 </pre>

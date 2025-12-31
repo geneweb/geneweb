@@ -1,56 +1,6 @@
-<!DOCTYPE html>
-<html lang="%l">
-<head>
-  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: gwb2ged.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
-  <meta charset="utf-8">
-  <meta name="robots" content="none">
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>
-[Extract a GEDCOM file]
-</title>
-%fsetup.css;
-</head>
-<body %Vbody_prop;>
-<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
-<h1 style="margin:0;">
-[Extract a GEDCOM file]
-</h1>
-</div>
-
-<form method="get" action="gwb2ged">
-<input type="hidden" name="opt" value="check">
-<input type="hidden" name="lang" value="%l">
-<ul><li>
-[Select your database by clicking on the associated button][:]
-<p>
-<table class="setup">
-%b{<tr align="left">
-<td><input type="radio" name="anon" id="anon%a" value="%a">   
-<label for="anon%a">%a</label></td></tr>|
-<tr align="left"><td>- [there is no database at present]
-</tr></td>}
-</table>
-<p>
 <li>
-[Enter the name you want to give to your GEDCOM file. If you write nothing, it will be the name of the database ended by the suffix]
-%(
-Enter the name you want to give to your GEDCOM file. If you write nothing, it wi
-ll be the name of the database ended by the suffix
-%)
-"<tt>.ged</tt>".
-
-<p>
-<table class="setup">
-<tr align=left><td>
--o&nbsp;&nbsp;
-<input name="o" size="30">
-</td></tr>
-</table>
-<p>
-<li>
-[Select the options you want][:]
+[Select filter options][:]
 <p>
 <table class="setup">
 <tr><td>-charset</td></tr>
@@ -87,7 +37,15 @@ ll be the name of the database ended by the suffix
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=nn id=nn value="on">   
-<label for=nn>-nn</label>[:] [Do not extract notes.]
+<label for=nn>-nn</label>[:] [Do not extract database notes.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=nnn id=nnn value="on">   
+<label for=nn>-nnn</label>[:] [Do not extract notes.]
 </td>
 </tr>
 </table>
@@ -108,16 +66,32 @@ ll be the name of the database ended by the suffix
 </tr>
 </table>
 <p>
-<p>
 <table class="setup">
-<tr align=left><td> </td><td colspan=3>
--key[:] [Extract ancestors or descendants] according to -a and -d, format "first_name.occ surname"
+<tr align=left><td> </td><td colspan=3>
+-key[:] [Extract ancestors or descendants]
 </td>
 </tr>
-<tr align=left><td> </td>
+<tbody id="key-inputs">
+<tr align=left><td> </td>
 <td colspan=3><input name="key" size=30 maxlength=200></td>
 </tr>
+</tbody>
+<tr align=left><td> </td>
+<td colspan=3>
+<button type="button" onclick="addKeyInput()">[Add another key]</button>
+</td>
+</tr>
 </table>
+[key format]
+<script>
+function addKeyInput() {
+  var tbody = document.getElementById('key-inputs');
+  var tr = document.createElement('tr');
+  tr.setAttribute('align', 'left');
+  tr.innerHTML = '<td> </td><td colspan=3><input name="key" size=30 maxlength=200></td>';
+  tbody.appendChild(tr);
+}
+</script>
 <p>
 <table class="setup">
 <tr align=left><td> </td>
@@ -144,6 +118,15 @@ he same time</em> ancestors of the one and descendants of the other.
 <p>
 <table class="setup">
 <tr align=left>
+<td><input type=checkbox name=parentship value="on" id=parentship>   
+<label for=mem>-parentship</label>[:] [Select individuals involved in parentship]
+</td>
+</tr>
+</table>
+<p>
+[Pairs must be defined with -key option]
+<table class="setup">
+<tr align=left>
 <td><input type=checkbox name=mem value="on" id=mem>   
 <label for=mem>-aws</label>[:] [Extract also siblings of exported persons]
 </td>
@@ -151,15 +134,30 @@ he same time</em> ancestors of the one and descendants of the other.
 </table>
 <p>
 <table class="setup">
-<tr align=left><td> </td><td colspan=3>
--sn[:] [extract surname (usable several times).]
+<tr align=left><td> </td><td colspan=3>
+-sn[:] [extract surname.]
 </td>
 </tr>
-<tr align=left><td>[Surname]
+<tbody id="sn-inputs">
+<tr align=left><td> </td>
+<td colspan=3><input name="sn" size=30 maxlength=200></td>
+</tr>
+</tbody>
+<tr align=left><td> </td>
+<td colspan=3>
+<button type="button" onclick="addKeyInput()">[Add another surname]</button>
 </td>
-<td colspan=3><input name="sn" size=40 maxlength=200></td>
 </tr>
 </table>
+<script>
+function addKeyInput() {
+  var tbody = document.getElementById('sn-inputs');
+  var tr = document.createElement('tr');
+  tr.setAttribute('align', 'left');
+  tr.innerHTML = '<td> </td><td colspan=3><input name="sn" size=30 maxlength=200></td>';
+  tbody.appendChild(tr);
+}
+</script>
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
@@ -170,22 +168,24 @@ is Public.<br>  All the spouses and descendants are also censored.
 %)
 </td>
 </tr>
-<tr align=left><td>[Years]
-</td>
-<td colspan=3><input name="c" size=10 maxlength=200></td>
+<tr align=left>
+<td> </td><td><input name="c" size=10 maxlength=200> [Years]</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=nsp id=nsp value="on">   
-<label for=nsp>-nsp</label>[:] [Do not extract spouses' parents (for options -a and -d).]
+<label for=nsp>-nsp</label>[:] [Do not extract spouses' parents]
 </td>
 </tr>
 </table>
 <p>
-<li>
-[Then click on this button][:]
-<input type=submit value="[Extract]">
-</ul>
-</form>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=v id=v value="on">   
+<label for=nsp>-v</label>[:] [Verbose]
+</td>
+</tr>
+</table>
+<p>
