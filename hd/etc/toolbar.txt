@@ -1,13 +1,4 @@
 <!-- $Id: toolbar.txt v7.1 09/03/2025 03:17:13 $ -->
-
-%if;(e.f="new_note")
-  <div class="form-group row ml-1">
-    <label class="col-form-label" for="new_f">[*new note name][:]</label>
-    <div class="col-6">
-      <input type="input" class="form-control" name="new_f" id="new_f">
-    </div>
-  </div>
-%end;
 <style>
 %if;(e.m="MOD_NOTES")
 body {
@@ -70,10 +61,6 @@ body {
   line-height: 1.5;
 }
 
-.transform-navbar {
-  transform: translateX(-24%%); /* Adjust this value to align with textarea */
-}
-
 .navbar::before {
   content: '';
   position: absolute;
@@ -92,13 +79,17 @@ body {
   margin: 0 auto;
 }
 
+.toolbar-centered {
+  justify-content: center !important;
+}
+
 #nav-note {
   z-index:1030;
 }
 </style>
-<nav id="nav-note" class="navbar navbar-expand-lg navbar-light bg-light %if;(e.m="MOD_NOTES") fixed-top%end; p-0 w-95">
-  <div class="container-fluid">
-    <div class="navbar-nav mx-auto flex-row transform-navbar">
+<nav id="nav-note" class="navbar navbar-expand-lg navbar-light bg-light%if;("NOTES" in e.m) fixed-top%end; p-0 w-95">
+  <div class="container-fluid%if;("NOTES" in e.m) justify-content-center%end;">
+    <div class="navbar-nav flex-row>
       <div class="navbar-nav">
         <!-- HTML Group -->
         <div class="nav-item dropdown">
@@ -176,7 +167,7 @@ body {
           <div class="dropdown-menu" aria-labelledby="miscDropdown">
             <a class="dropdown-item" onclick="return insertTags('%[%[%[x:x/x%]%]%]','','')">%[%[%[directory:filename/[text]%]%]%]</a>
             <a class="dropdown-item" onclick="return insertTags('TITLE=','','')">TITLE=</a>
-            <a class="dropdown-item" onclick="return insertTags('HEAD=','','')">HEAD=[him/her]0/[him/her]1</a>
+            <a class="dropdown-item" onclick="return insertTags('HEAD=','','')">HEAD=</a>
             <a class="dropdown-item" onclick="return insertTags('DEATH=','','')">DEATH=</a>
             <a class="dropdown-item" onclick="return insertTags('OCCU=','','')">OCCU=</a>
             <a class="dropdown-item" onclick="return insertTags('BNOTE=','','')">BNOTE=</a>
