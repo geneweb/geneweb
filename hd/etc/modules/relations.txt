@@ -61,6 +61,10 @@
 %foreach;event_witness_relation;%incr_count;%end;
 %let;rel_nbr;%count;%in;
 
+%define;witness_at(xxx)
+  [witness at %s of:::xxx]
+%end;
+
 %if;(op_m=1 and has_relations)
   %reset_count;
   %foreach;relation;%if;(has_relation_him or has_relation_her)%incr_count;%end;%end;
@@ -103,6 +107,19 @@
   %foreach;related;
     %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
       %apply;short_display_person("related")
+    </li>
+  %end;
+  %foreach;event_witness_relation;
+    %apply;li_SDC("event_witness_relation.person")
+      %let;str;%apply;capitalize(event_witness_relation.event.name)%sp;
+        %if;(event_witness_relation.event.date.year!="")(%event_witness_relation.event.date.year;)%end;%in;
+      %apply;witness_at(str)
+      %if;(event_witness_relation_kind!=[witness/witnesses]0)(%event_witness_relation_kind;)%end;%sp;
+      %apply;short_display_person("event_witness_relation.person")
+      %if;(event_witness_relation.event.spouse!="")
+      %sp;[and]
+      %apply;short_display_person("event_witness_relation.event.spouse")
+      %end;.
     </li>
   %end;
   </ul>
