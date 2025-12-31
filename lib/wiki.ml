@@ -861,18 +861,18 @@ let print_mod_view_page conf can_edit mode fname title env s =
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
   let is_empty = sub_part = "" in
+  let is_new_note = Util.p_getenv conf.env "new" <> None in
   let sfn =
     if fname = "" then Adef.encoded "" else "&f=" ^<^ Mutil.encode fname
   in
   Hutil.header_without_title conf;
-  Output.print_sstring conf "<div class=\"d-flex mb-3\">";
-  Output.print_sstring conf "<h1 class=\"mb-0\">";
+  Output.print_sstring conf {|<div class="d-flex mb-3"><h1 class="mb-0">|};
   title false;
   Output.print_sstring conf "</h1>";
-  if can_edit then (
+  if can_edit && not is_new_note then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
-    Output.print_sstring conf {|m=|};
+    Output.print_sstring conf "m=";
     Output.print_string conf mode;
     if has_v then Output.printf conf "&v=%d" v;
     Output.print_string conf sfn;
@@ -883,38 +883,54 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Output.print_sstring conf "</div>";
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty;
-  Output.print_sstring conf {|<form method="POST" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|">|};
+  Output.printf conf {|<form method="POST" action="%s">|} conf.command;
   Util.hidden_env conf;
   if can_edit then Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK");
   if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
-  if fname <> "" then Util.hidden_input conf "f" (Mutil.encode fname);
+  if fname <> "" && not is_new_note then
+    Util.hidden_input conf "f" (Mutil.encode fname);
   if can_edit then
     Util.hidden_input conf "digest" (Mutil.digest s |> Mutil.encode);
+  let note_lbl = Utf8.capitalize_fst (transl_nth conf "note/notes" 0) in
+  (if is_new_note then
+     let plh = Utf8.capitalize_fst (transl_nth conf "new note name" 0) in
+     Output.printf conf
+       {|<div class="row mb-3">
+  <label class="col-sm-2 col-form-label sr-only" for="new_f">%s</label>
+  <div class="col-sm-7">
+    <input type="text" class="form-control form-control-lg" placeholder="%s"
+      name="new_f" id="new_f" tabindex="4" autofocus>
+  </div>
+</div>|}
+       note_lbl plh);
   Output.print_sstring conf
     {|<div class="d-flex flex-column"><div class="pt-1">|};
-  let env =
+  Templ.output_simple conf
     Templ.Env.(add "name" (Templ.Vstring (Adef.encoded "notes")) empty)
-  in
-  Templ.output_simple conf env "toolbar";
+    "toolbar";
   Output.print_sstring conf {|</div><div class="row editor-container">|};
-  Output.print_sstring conf
-    {|<div class="d-flex flex-column col-9"><textarea name="notes" id="notes_comments"
-  class="form-control insert-character-target"|};
-  Output.print_sstring conf
-    (if can_edit then ">" else " readonly=\"readonly\">");
-  Output.print_string conf (Util.escape_html sub_part);
-  Output.print_sstring conf "</textarea>";
-  if can_edit then (
-    Output.print_sstring conf
-      {|<button type="submit" class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3">|};
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-    Output.print_sstring conf "</button>");
-  Output.print_sstring conf "</div><div class=\"col mx-2 p-2\">";
-  Output.print_sstring conf "</div></div>";
-  Output.print_sstring conf "</div></form>";
+  Output.print_sstring conf {|<div class="d-flex flex-column col-9">|};
+  Output.printf conf
+    {|<textarea name="notes" id="notes_comments" rows="25" tabindex="5"
+ class="form-control insert-character-target%s"%s%s>%s</textarea>|}
+    (if is_new_note then " no-clear-button" else "")
+    (if can_edit then "" else {| readonly="readonly"|})
+    (if is_new_note then Printf.sprintf " placeholder=\"%s\"" note_lbl else "")
+    (Util.escape_html sub_part :> string);
+  (if can_edit then
+     let btn_label =
+       Utf8.capitalize_fst (transl_nth conf "validate/delete" 0)
+     in
+     Output.printf conf
+       {|<button type="submit" tabindex="6"
+ class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3"
+ title="%s"><span class="font-weight-bold text-uppercase">%s</span>
+<i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
+</button>|}
+       btn_label btn_label);
+  Output.print_sstring conf {|</div><div class="col mx-2 pl-0 pr-3 py-0">|};
+  Templ.output_simple conf Templ.Env.empty "characters";
+  Output.print_sstring conf {|</div></div></div></form>|};
   Hutil.trailer conf
 
 let insert_sub_part s v sub_part =
