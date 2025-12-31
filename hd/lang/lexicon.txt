@@ -13724,10 +13724,10 @@ sv: nytt namn
 tr: yeni ad
 
     new note name
-co: nome di a nota nova
-de: Name der neuen Notiz
-en: name of the new note
-fr: nom de la nouvelle note
+co: nome di a nota nova/nota nova
+de: Name der neuen Notiz/neuen Notiz
+en: name of the new note/new note
+fr: nom de la nouvelle note/nouvelle note
 
     new tree with this individual
 co: arburu novu da st’individuu

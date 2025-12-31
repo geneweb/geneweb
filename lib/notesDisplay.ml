@@ -537,12 +537,15 @@ let print_mod_json conf base =
   Output.printf conf "{\"digest\":\"%s\",\"r\":%s}" digest s
 
 let print_mod conf base =
+  let is_new_note = Util.p_getenv conf.env "new" <> None in
   let fnotes =
-    match p_getenv conf.env "f" with
-    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
-    | None -> ""
+    if is_new_note then ""
+    else
+      match p_getenv conf.env "f" with
+      | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      | None -> ""
   in
-  let nenv, s = read_notes base fnotes in
+  let nenv, s = if is_new_note then ([], "") else read_notes base fnotes in
   let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
   let restrict_l =
     if restrict_l = "" then [] else String.split_on_char ',' restrict_l
@@ -556,17 +559,24 @@ let print_mod conf base =
         Templ.output_simple conf Templ.Env.empty ("notes_upd_" ^ typ)
     | (exception Not_found) | _ ->
         let title _ =
-          Output.printf conf "%s - %s%s"
-            (Utf8.capitalize_fst (transl conf "base notes"))
-            conf.bname
-            (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
+          Output.print_sstring conf
+            (Utf8.capitalize_fst (transl conf "base notes"));
+          if is_new_note then (
+            Output.print_sstring conf " — ";
+            Output.print_sstring conf
+              (Utf8.capitalize_fst (transl_nth conf "new note name" 1)))
+          else if fnotes <> "" then (
+            Output.print_sstring conf " — ";
+            Output.print_sstring conf fnotes)
         in
         Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
           nenv s
 
 let print_mod_ok conf base =
   let fname = function
-    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+    | Some f ->
+        let f = Mutil.tr ' ' '_' f in
+        if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
   let edit_mode _ = if conf.wizard then Some "NOTES" else None in
