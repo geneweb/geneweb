@@ -1600,21 +1600,19 @@ let no_access conf =
   Hutil.trailer conf
 
 let log_and_robot_check conf auth from request script_name contents =
-  if !robot_xcl = None then
-    log (Unix.time ()) conf from auth request script_name contents
-  else
-    let lock_file = !GWPARAM.adm_file "gwd.lck" in
-    (* FIXME: we silently ignore errors if we cannot lock the database. *)
-    let on_exn _exn _bt = () in
-    Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-    let tm = Unix.time () in
-    (match !robot_xcl with
-    | Some (cnt, sec) ->
-        let s = "suicide" in
-        let suicide = Util.p_getenv conf.env s <> None in
-        conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide)
-    | _ -> ());
-    log tm conf from auth request script_name contents
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  (* FIXME: we silently ignore errors if we cannot lock the database. *)
+  let on_exn _exn _bt = () in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+  let tm = Unix.time () in
+  let cnt, sec =
+    match !robot_xcl with
+    | Some (cnt, sec) -> (cnt, sec)
+    | None -> (max_int, max_int)
+  in
+  let suicide = Util.p_getenv conf.env "suicide" <> None in
+  conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide);
+  log tm conf from auth request script_name contents
 
 let conf_and_connection =
   let slow_query_threshold =
