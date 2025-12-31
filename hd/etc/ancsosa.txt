@@ -789,10 +789,10 @@
     %foreach;child.family;
       <div class="my-1 ml-3 mr-2 px-2 py-1 shadow">…
         %apply;married_to%with;child%and;0%end; %apply;somebody("spouse")
-        %if;(nb_children=0).%else;, %apply;havingchildren(nb_children)%end;
-        %if;are_divorced; ; [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.
-        %elseif;are_separated; ; [separated]%if;(on_separation_date!="") %on_separation_date;%end;.
-        %end;
+        %if;(nb_children=0)%else;, %apply;havingchildren(nb_children)%end;
+        %if;are_divorced; ; [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;
+        %elseif;are_separated; ; [separated]%if;(on_separation_date!="") %on_separation_date;%end;
+        %end;.
       </div>
     %end;
   %end;
@@ -829,7 +829,7 @@
 %end;
 
 %define;long_display_ancestor_families()
-  %if;((ancestor.anc_sosa.v=1 and has_families) or ancestor.is_female)
+  %if;((ancestor.anc_sosa.v=1 or ancestor.is_female) and ancestor.has_families)
     %foreach;ancestor.family;
       %if;(family.index=ancestor.family.index)
         %if;(ancestor.anc_sosa.v=1)%apply;somebody("spouse")%end;
