@@ -183,7 +183,8 @@ let parameters env =
                 loop (comm ^ " " ^ !bname) env
             | "anon_a" when s <> "" -> loop (comm ^ " " ^ s) env
             | "anon_b" when s <> "" -> loop (comm ^ " " ^ s) env
-            | "d" when s <> "" -> loop (comm ^ " -d " ^ s) env
+            | "a" when s <> "" && s <> "on" -> loop (comm ^ " -d " ^ s) env
+            | "d" when s <> "" && s <> "on" -> loop (comm ^ " -d " ^ s) env
             | "fn_a" when s <> "" -> loop (comm ^ " -pnoc_a \"" ^ s) env
             | "fn_b" when s <> "" -> loop (comm ^ " -pnoc_b \"" ^ s) env
             | "i" when s <> "" -> loop (comm ^ " -i " ^ s) env
