@@ -16924,6 +16924,10 @@ co: schedarii micca referenzati
 en: files not referenced
 fr: fichiers non référencés 
 
+    files not in db help
+en: files not referenced in notes or pages (running update_nldb may be necessary)
+fr: fichiers non référencés dans les notes ou pages (exécuter update_nldb peut être nécessaire)
+
     scale
 co: anni à a generazione
 de: Jahre nach Generation
