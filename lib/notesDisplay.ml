@@ -641,8 +641,11 @@ let build_path_hierarchy d =
   in
   build_paths [] "" parts
 
+let can_see conf _f = conf.wizard || conf.friend
+
 (* Format directory entry with proper indentation level *)
 let format_folder_entry conf depth r path_to is_current is_path view =
+  let view = view || can_see conf r in
   Format.sprintf {|<div class="my-1" style="margin-left: %.1fem;">%s</div>|}
     (1.5 *. float_of_int depth)
     (if is_current then
@@ -675,6 +678,7 @@ let format_folder_entry conf depth r path_to is_current is_path view =
 
 (* Format file entry with proper indentation level *)
 let format_file_entry conf depth d f n_type title view =
+  let view = view || can_see conf d in
   let icon = match n_type with "gallery" -> "image" | _ -> "file-lines" in
   let color, mod_edit =
     let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
