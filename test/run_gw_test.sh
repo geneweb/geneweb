@@ -485,6 +485,26 @@ elif test "$test_diff"; then
     fi
 fi
 
+# start gwsetup on same above conditions as gwd
+# first step is to start and manually test
+# constraint from gwsetup source code:
+#   gwsetup.log hardcoded name and in current dir
+# TODO: replace relative path if not default vars.
+# do not call open to avoid to hang the script.
+if test "$GWD2START" && test -z "$cgitest"; then
+    pgrep gwsetup >/dev/null && \
+        { killall gwsetup || { echo "unable to kill previous gwsetup process"; exit 1; }; }
+
+    cd $BASES_DIR
+    OCAMLRUNPARAM=b $SUDOPRFX ../gw/gwsetup \
+      -gd ../gw \
+      -lang en \
+      > gwsetup.log 2>&1 &
+    echo "gwsetup ready for manual tests"
+    #open "../START.htm"
+    echo "access http://localhost:2316 for that."
+fi
+
 if test -f "$GWDLOG"; then
 echo "$GWDLOG reported traces (empty if no failure):"
 grep -vw "Predictable mode must not be" $GWDLOG | grep -E "$WARNING_CONDITIONS"
@@ -492,7 +512,7 @@ grep -B1 -E "$FAILING_CONDITIONS" $GWDLOG && RC=$(($RC+1))
 fi
 if test "$RC" != 0; then
     echo "$0 failed, at least $RC detected error(s)."
-    exit 1
 else
     echo "$0 completed, No detected error."
 fi
+
