@@ -757,6 +757,10 @@ document.addEventListener('DOMContentLoaded', () => {
 %if;("IND" in e.m or "FAM" in e.m)
   addClearButtonToInputs();
   inputToBook.addNavigation();
+  sortSelectOptions();
+  initCustomEvents();
+  initSelectToggle();
+  initFormFocus();
 %end;
 %if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_NOTES")
   %if;(roglo or b.rpc_datalist=1)
