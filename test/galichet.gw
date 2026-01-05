@@ -191,20 +191,43 @@ pevt Jayot Jean
 #deat 8/11/1674 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end pevt
 
-fam Boizot Jean.1234 #occu Menuisier 1618 22/3/1702 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Jayot Claude
+fam Boizot Jean #occu Menuisier 1618 22/3/1702 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Jayot Claude
 fevt
 #marr 
 end fevt
 beg
-- f Jeanne.1 27/2/1671 #bp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France 22/4/1748 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+- f Jeanne 27/2/1671 #bp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France 22/4/1748 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+- h Forceindex1234.1234 1672 1674
 end
 
-pevt Boizot Jeanne.1
+notes Boizot Forceindex1234.1234
+beg
+* Je crée cet individu avec un index arbitrairement élevé
+pour vérifier que il est bien conservé par gwc et gwu.
+* à noter que gwb2ged ne permet pas cette sauvegarde,
+puisque le format GEDCOM n'a pas cette notion d'index,
+seulement sous entendu par l'orde dans le fichier.
+* le prénom spécifique me permet de l'identifier lors de la comparaison
+des fichiers gw, pour un flow
+<pre>
+xx.gw   -> gwc     -> xx.gwb
+xx.gwb  -> gwb2ged -> xx.ged
+xx.ged  -> ged2gwb -> xx2.gwb
+xx2.gwb -> gwu     -> xx2.gw
+xx2.gwb -> gwb2ged -> xx2.ged</pre>
+end notes
+
+pevt Boizot Jeanne
 #birt 27/2/1671 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 #deat 22/4/1748 #p _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
 end pevt
 
-pevt Boizot Jean.1234
+pevt Boizot Forceindex1234.1234
+#birt 1672
+#deat 1674
+end pevt
+
+pevt Boizot Jean
 #birt 1618
 #deat 22/3/1702 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end pevt
@@ -242,7 +265,7 @@ pevt Geruzet Anthoine.1
 #deat 17/1/1709 #p _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
 end pevt
 
-fam Geruzet Anthoine +17/1/1695 #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Boizot Jeanne.1
+fam Geruzet Anthoine +17/1/1695 #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Boizot Jeanne
 fevt
 #marr 17/1/1695 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end fevt
