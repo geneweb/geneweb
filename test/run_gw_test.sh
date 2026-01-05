@@ -62,8 +62,10 @@ WIZ=hg
 FN=anthoine
 SN=geruzet
 OC=0
-ID=26 # individual Id, ideally should have multiple events
-FID=13 # family id for this individual, ideally, should have multiple families
+# Warning ID and FID may be updated if DB updated.
+# for ref DBNAME this is associated to Laurent Geruzet
+ID=27 # individual Id, ideally should have multiple events
+FID=12 # family id for this individual, ideally, should have multiple families
 IMG_C="peugeot_206.png" # une image du carrousel de $ID!
 IMG_C_S="850r.jpg" # une image sauvegardée du carrousel de $ID!
 IMG_SRC="carte.de.priere.png" # une image dans bases/src/mabase/images
