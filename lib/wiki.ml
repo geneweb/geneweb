@@ -1075,6 +1075,14 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
     | Some f -> fname (Some f)
     | None -> fname (Util.p_getenv conf.env "f")
   in
+  (match new_fname with
+  | Some _ when fname <> "" ->
+      let new_fn_path =
+        String.concat Filename.dir_sep
+          [ !GWPARAM.bpath conf.bname; "notes_d"; fname ^ ".txt" ]
+      in
+      if Sys.file_exists new_fn_path then Update.error_same_file conf
+  | _ -> ());
   match edit_mode fname with
   | Some edit_mode ->
       let old_string =

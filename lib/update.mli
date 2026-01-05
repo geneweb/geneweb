@@ -20,6 +20,7 @@ type update_error =
   | UERR_missing_surname of Adef.safe_string
   | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
+  | UERR_same_file
 
 exception ModErr of update_error
 
@@ -122,6 +123,7 @@ val def_error :
 val error : config -> update_error -> 'exn
 val error_locked : config -> 'exn
 val error_digest : config -> 'exn
+val error_same_file : config -> 'exn
 
 val digest_person :
   ?salt:string -> (Geneweb_db.Driver.iper, key, string) gen_person -> string

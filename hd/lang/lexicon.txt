@@ -19694,6 +19694,10 @@ sl: forum moderira
 sv: detta forum har moderator
 tr: bu forum yönetilmektedir
 
+    this notes file already exists
+en: the name of this new note is already used
+fr: le nom de cette nouvelle note est déjà utilisé
+
     time line
 co: cronolugia
 de: Chronologie
