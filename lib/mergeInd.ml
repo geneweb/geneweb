@@ -216,30 +216,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
   Notes.update_cache_linked_pages conf Notes.Merge key key (List.length pgl)
 
 exception Error_loop of Driver.person
-exception Same_person
 exception Different_sexes of Driver.person * Driver.person
-
-module IperSet = Driver.Iper.Set
-
-let is_ancestor base p1 p2 =
-  let ip1 = Driver.get_iper p1 in
-  let ip2 = Driver.get_iper p2 in
-  if ip1 = ip2 then raise Same_person
-  else
-    let rec loop set = function
-      | [] -> false
-      | ip :: tl -> (
-          if IperSet.mem ip set then loop set tl
-          else if ip = ip1 then true
-          else
-            let set = IperSet.add ip set in
-            match Driver.get_parents (Driver.poi base ip) with
-            | Some ifam ->
-                let cpl = Driver.foi base ifam in
-                loop set (Driver.get_father cpl :: Driver.get_mother cpl :: tl)
-            | None -> loop set tl)
-    in
-    loop IperSet.empty [ ip2 ]
 
 let check_ind base p1 p2 =
   if
@@ -247,8 +224,8 @@ let check_ind base p1 p2 =
     && Driver.get_sex p1 <> Neuter
     && Driver.get_sex p2 <> Neuter
   then raise @@ Different_sexes (p1, p2)
-  else if is_ancestor base p1 p2 then raise (Error_loop p2)
-  else if is_ancestor base p2 p1 then raise (Error_loop p1)
+  else if Gutil.is_ancestor base p1 p2 then raise (Error_loop p2)
+  else if Gutil.is_ancestor base p2 p1 then raise (Error_loop p1)
   else compatible_ind base p1 p2
 
 let merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind =
