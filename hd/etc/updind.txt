@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;" id="updform">
 <head>
-  <!-- $Id: updind.txt v7.1 31/08/2023 15:28:42 $ -->
+  <!-- $Id: updind.txt v7.1 06/01/2026 01:59:44 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   %let;mrg;%if;(e.m="MRG_IND_OK" or e.m="MRG_MOD_IND_OK")1%end;%in;
   %let;mod;%if;(e.m="MOD_IND" or e.m="MOD_IND_OK")1%end;%in;
@@ -264,56 +264,58 @@
 %end;
 
 %define;selector_pevent(xcnt)
-  <select class="form-control font-weight-bold" id="pevent_selectxcnt" onchange="show_pevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
+  <select class="form-control custom-select font-weight-bold sortable-select" id="pevent_selectxcnt" onchange="show_pevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
+    <option value="" id="deletexcnt">[*select/delete an event]1</option>
+    <option disabled>──────────────────</option>
     <option value="">[*custom event]</option>
-    <option disabled>──────────</option>
-    <option value="">-</option>
-    <option value="#acco"%if;(event.e_name="#acco") selected%end;>[*accomplishment]</option>
-    <option value="#acqu"%if;(event.e_name="#acqu") selected%end;>[*acquisition]</option>
-    <option value="#adhe"%if;(event.e_name="#adhe") selected%end;>[*adhesion]</option>
-    <option value="#barm"%if;(event.e_name="#barm") selected%end;>[*bar mitzvah]</option>
-    <option value="#basm"%if;(event.e_name="#basm") selected%end;>[*bat mitzvah]</option>
-    <option value="#bles"%if;(event.e_name="#bles") selected%end;>[*benediction]</option>
-    <option value="#chgn"%if;(event.e_name="#chgn") selected%end;>[*change name]</option>
-    <option value="#circ"%if;(event.e_name="#circ") selected%end;>[*circumcision]</option>
-    <option value="#conf"%if;(event.e_name="#conf") selected%end;>[*confirmation]</option>
-    <option value="#awar"%if;(event.e_name="#awar") selected%end;>[*decoration]</option>
-    <option value="#demm"%if;(event.e_name="#demm") selected%end;>[*demobilisationMilitaire]</option>
-    <option value="#degr"%if;(event.e_name="#degr") selected%end;>[*diploma]</option>
-    <option value="#dist"%if;(event.e_name="#dist") selected%end;>[*distinction]</option>
-    <option value="#endl"%if;(event.e_name="#endl") selected%end;>[*dotation]</option>
-    <option value="#educ"%if;(event.e_name="#educ") selected%end;>[*education]</option>
-    <option value="#elec"%if;(event.e_name="#elec") selected%end;>[*election]</option>
-    <option value="#emig"%if;(event.e_name="#emig") selected%end;>[*emigration]</option>
-    <option value="#exco"%if;(event.e_name="#exco") selected%end;>[*excommunication]</option>
-    <option value="#fcom"%if;(event.e_name="#fcom") selected%end;>[*firstCommunion]</option>
-    <option value="#fune"%if;(event.e_name="#fune") selected%end;>[*funeral]</option>
-    <option value="#grad"%if;(event.e_name="#grad") selected%end;>[*graduate]</option>
-    <option value="#hosp"%if;(event.e_name="#hosp") selected%end;>[*hospitalisation]</option>
-    <option value="#illn"%if;(event.e_name="#illn") selected%end;>[*illness]</option>
-    <option value="#immi"%if;(event.e_name="#immi") selected%end;>[*immigration]</option>
-    <option value="#lpas"%if;(event.e_name="#lpas") selected%end;>[*listePassenger]</option>
-    <option value="#mdis"%if;(event.e_name="#mdis") selected%end;>[*militaryDistinction]</option>
-    <option value="#mpro"%if;(event.e_name="#mpro") selected%end;>[*militaryPromotion]</option>
-    <option value="#mser"%if;(event.e_name="#mser") selected%end;>[*militaryService]</option>
-    <option value="#mobm"%if;(event.e_name="#mobm") selected%end;>[*mobilisationMilitaire]</option>
-    <option value="#natu"%if;(event.e_name="#natu") selected%end;>[*naturalisation]</option>
-    <option value="#occu"%if;(event.e_name="#occu") selected%end;>[*occupation/occupations]0</option>
-    <option value="#ordn"%if;(event.e_name="#ordn") selected%end;>[*ordination]</option>
-    <option value="#prop"%if;(event.e_name="#prop") selected%end;>[*property]</option>
-    <option value="#cens"%if;(event.e_name="#cens") selected%end;>[*recensement]</option>
-    <option value="#resi"%if;(event.e_name="#resi") selected%end;>[*residence]</option>
-    <option value="#reti"%if;(event.e_name="#reti") selected%end;>[*retired]</option>
-    <option value="#vteb"%if;(event.e_name="#vteb") selected%end;>[*venteBien]</option>
-    <option value="#will"%if;(event.e_name="#will") selected%end;>[*will]</option>
-    <option disabled>──────────</option>
-    <option value="#bapl"%if;(event.e_name="#bapl") selected%end;>[*baptismLDS]</option>
-    <option value="#conl"%if;(event.e_name="#conl") selected%end;>[*confirmation LDS]</option>
-    <option value="#dotl"%if;(event.e_name="#dotl") selected%end;>[*dotationLDS]</option>
-    <option value="#flkl"%if;(event.e_name="#flkl") selected%end;>[*familyLinkLDS]</option>
-    <option value="#slgc"%if;(event.e_name="#slgc") selected%end;>[*scellentChildLDS]</option>
-    <option value="#slgp"%if;(event.e_name="#slgp") selected%end;>[*scellentParentLDS]</option>
-    <option value="#slgs"%if;(event.e_name="#slgs") selected%end;>[*scellentSpouseLDS]</option>
+    <option disabled>──────────────────</option>
+    <option data-insert="1" value=""%if;(event.e_name="") selected%end; disabled> [*select/delete an event]0 </option>
+    <option value="#acco" data-sort="1"%if;(event.e_name="#acco") selected%end;>[*accomplishment]</option>
+    <option value="#acqu" data-sort="1"%if;(event.e_name="#acqu") selected%end;>[*acquisition]</option>
+    <option value="#adhe" data-sort="1"%if;(event.e_name="#adhe") selected%end;>[*adhesion]</option>
+    <option value="#barm" data-sort="1"%if;(event.e_name="#barm") selected%end;>[*bar mitzvah]</option>
+    <option value="#basm" data-sort="1"%if;(event.e_name="#basm") selected%end;>[*bat mitzvah]</option>
+    <option value="#bles" data-sort="1"%if;(event.e_name="#bles") selected%end;>[*benediction]</option>
+    <option value="#chgn" data-sort="1"%if;(event.e_name="#chgn") selected%end;>[*change name]</option>
+    <option value="#circ" data-sort="1"%if;(event.e_name="#circ") selected%end;>[*circumcision]</option>
+    <option value="#conf" data-sort="1"%if;(event.e_name="#conf") selected%end;>[*confirmation]</option>
+    <option value="#awar" data-sort="1"%if;(event.e_name="#awar") selected%end;>[*decoration]</option>
+    <option value="#demm" data-sort="1"%if;(event.e_name="#demm") selected%end;>[*demobilisationMilitaire]</option>
+    <option value="#degr" data-sort="1"%if;(event.e_name="#degr") selected%end;>[*diploma]</option>
+    <option value="#dist" data-sort="1"%if;(event.e_name="#dist") selected%end;>[*distinction]</option>
+    <option value="#endl" data-sort="1"%if;(event.e_name="#endl") selected%end;>[*dotation]</option>
+    <option value="#educ" data-sort="1"%if;(event.e_name="#educ") selected%end;>[*education]</option>
+    <option value="#elec" data-sort="1"%if;(event.e_name="#elec") selected%end;>[*election]</option>
+    <option value="#emig" data-sort="1"%if;(event.e_name="#emig") selected%end;>[*emigration]</option>
+    <option value="#exco" data-sort="1"%if;(event.e_name="#exco") selected%end;>[*excommunication]</option>
+    <option value="#fcom" data-sort="1"%if;(event.e_name="#fcom") selected%end;>[*firstCommunion]</option>
+    <option value="#fune" data-sort="1"%if;(event.e_name="#fune") selected%end;>[*funeral]</option>
+    <option value="#grad" data-sort="1"%if;(event.e_name="#grad") selected%end;>[*graduate]</option>
+    <option value="#hosp" data-sort="1"%if;(event.e_name="#hosp") selected%end;>[*hospitalisation]</option>
+    <option value="#illn" data-sort="1"%if;(event.e_name="#illn") selected%end;>[*illness]</option>
+    <option value="#immi" data-sort="1"%if;(event.e_name="#immi") selected%end;>[*immigration]</option>
+    <option value="#lpas" data-sort="1"%if;(event.e_name="#lpas") selected%end;>[*listePassenger]</option>
+    <option value="#mdis" data-sort="1"%if;(event.e_name="#mdis") selected%end;>[*militaryDistinction]</option>
+    <option value="#mpro" data-sort="1"%if;(event.e_name="#mpro") selected%end;>[*militaryPromotion]</option>
+    <option value="#mser" data-sort="1"%if;(event.e_name="#mser") selected%end;>[*militaryService]</option>
+    <option value="#mobm" data-sort="1"%if;(event.e_name="#mobm") selected%end;>[*mobilisationMilitaire]</option>
+    <option value="#natu" data-sort="1"%if;(event.e_name="#natu") selected%end;>[*naturalisation]</option>
+    <option value="#occu" data-sort="1"%if;(event.e_name="#occu") selected%end;>[*occupation/occupations]0</option>
+    <option value="#ordn" data-sort="1"%if;(event.e_name="#ordn") selected%end;>[*ordination]</option>
+    <option value="#prop" data-sort="1"%if;(event.e_name="#prop") selected%end;>[*property]</option>
+    <option value="#cens" data-sort="1"%if;(event.e_name="#cens") selected%end;>[*recensement]</option>
+    <option value="#resi" data-sort="1"%if;(event.e_name="#resi") selected%end;>[*residence]</option>
+    <option value="#reti" data-sort="1"%if;(event.e_name="#reti") selected%end;>[*retired]</option>
+    <option value="#vteb" data-sort="1"%if;(event.e_name="#vteb") selected%end;>[*venteBien]</option>
+    <option value="#will" data-sort="1"%if;(event.e_name="#will") selected%end;>[*will]</option>
+    <option data-insert="2" disabled> </option>
+    <option value="#bapl" data-sort="2"%if;(event.e_name="#bapl") selected%end;>[*baptismLDS]</option>
+    <option value="#conl" data-sort="2"%if;(event.e_name="#conl") selected%end;>[*confirmation LDS]</option>
+    <option value="#dotl" data-sort="2"%if;(event.e_name="#dotl") selected%end;>[*dotationLDS]</option>
+    <option value="#flkl" data-sort="2"%if;(event.e_name="#flkl") selected%end;>[*familyLinkLDS]</option>
+    <option value="#slgc" data-sort="2"%if;(event.e_name="#slgc") selected%end;>[*scellentChildLDS]</option>
+    <option value="#slgp" data-sort="2"%if;(event.e_name="#slgp") selected%end;>[*scellentParentLDS]</option>
+    <option value="#slgs" data-sort="2"%if;(event.e_name="#slgs") selected%end;>[*scellentSpouseLDS]</option>
   </select>
 %end;
 
@@ -1316,74 +1318,8 @@
 %include;trl
 %include;copyr
 </div>
+%include;upd_js
 %include;js
 %query_time;
-%include;upd_js
-<script>
-function change_buri(xcnt) {
-  var selector = document.getElementById('buri_select' + xcnt);
-  var input = document.getElementById('e_name' + xcnt);
-  input.value = selector.value;
-}
-
-function set_buri(xcnt) {
-  var selector = document.getElementById('buri_select' + xcnt);
-  if (selector.value == "") {
-    selector.value = "#buri";
-    change_buri(xcnt);
-  }
-}
-
-function change_death(xcnt) {
-  var selector = document.getElementById('death_select' + xcnt);
-  var input = document.getElementById('e_name' + xcnt);
-  if (selector.value != "NotDead" && selector.value != "DontKnowIfDead") {
-    input.value = "#deat";
-  } else {
-    input.value = "";
-  }
-}
-
-function set_burial_focus(xcnt) {
-  var selector = document.getElementById('buri_select' + xcnt);
-  selector.value = "#buri";
-  change_buri(xcnt);
-}
-
-function set_death_focus(xcnt) {
-  var selector = document.getElementById('death_select' + xcnt);
-  selector.value = "Death";
-  change_death(xcnt);
-}
-
-function show_pevent_label(xxname, xcnt) {
-  var selector = document.getElementById('pevent_select' + xcnt);
-  var label = document.getElementById('pevent_label_selector' + xcnt);
-  var input = document.getElementById('e_name' + xcnt);
-  if (selector.value == "") {
-    if (xxname.charAt(0) == "#") {
-      input.value = "";
-    } else {
-      input.value = xxname;
-    }
-  } else {
-    input.value = selector.value;
-  }
-  if (selector.value == "" || selector.value.charAt(0) != "#") {
-    label.style.display = 'inline';
-  } else {
-    label.style.display = 'none';
-  }
-}
-
-$(document).ready(function() {
-  //show event perso
-  $(".other_evts").each(function() {
-    var inp = $(this).find("input").first();
-    if (inp.val().charAt(0) != "#" && inp.val() != "") {
-      $(this).show();}
-  });
-});
-</script>
 </body>
 </html>

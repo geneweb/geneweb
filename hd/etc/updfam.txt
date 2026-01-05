@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;" id="updform">
 <head>
-  <!-- $Id: updfam.txt v7.1 12/12/2024 05:28:35 $ -->
+  <!-- $Id: updfam.txt v7.1 06/01/2026 01:59:36 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -320,25 +320,25 @@
 %end;
 
 %define;selector_fevent(xcnt)
-  <select class="form-control custom-select font-weight-bold" id="fevent_selectxcnt" onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
-    <option value=""%if;(event.e_name="") selected%end; disabled>[*select/delete an event]0</option>
-    <option disabled>───────────────</option>
-    <option value="#marr"%if;(event.e_name="#marr") selected%end;>[*marriage event]</option>
-    <option value="#nmar"%if;(event.e_name="#nmar") selected%end;>[*no marriage event]</option>
-    <option value="#enga"%if;(event.e_name="#enga") selected%end;>[*engage event]</option>
-    <option value="#nmen"%if;(event.e_name="#nmen") selected%end;>[*no mention]</option>
-    <option value="#marb"%if;(event.e_name="#marb") selected%end;>[*marriage bann]</option>
-    <option value="#marc"%if;(event.e_name="#marc") selected%end;>[*marriage contract]</option>
-    <option value="#marl"%if;(event.e_name="#marl") selected%end;>[*marriage licence]</option>
-    <option value="#pacs"%if;(event.e_name="#pacs") selected%end;>[*PACS]</option>
-    <option value="#div"%if;(event.e_name="#div") selected%end;>[*divorce event]</option>
-    <option value="#sep"%if;(event.e_name="#sep") selected%end;>[*separate event]</option>
-    <option value="#anul"%if;(event.e_name="#anul") selected%end;>[*annulation]</option>
-    <option value="#resi"%if;(event.e_name="#resi") selected%end;>[*residence]</option>
+  <select class="form-control custom-select font-weight-bold sortable-select" id="fevent_selectxcnt"
+    onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
+    <option value="" id="deletexcnt">[*select/delete an event]1</option>
     <option disabled>───────────────</option>
     <option value=""%if;(not ("#" in event.e_name) and event.e_name!="") selected%end; id="customxcnt">[*custom event]</option>
     <option disabled>───────────────</option>
-    <option value="" id="deletexcnt"> [*select/delete an event]1</option>
+    <option data-insert="1" value=""%if;(event.e_name="") selected%end; disabled><i>[*select/delete an event]0</i></option>
+    <option value="#marr" data-sort="1" %if;(event.e_name="#marr") selected%end;>[*marriage event]</option>
+    <option value="#nmar" data-sort="1" %if;(event.e_name="#nmar") selected%end;>[*no marriage event]</option>
+    <option value="#enga" data-sort="1" %if;(event.e_name="#enga") selected%end;>[*engage event]</option>
+    <option value="#nmen" data-sort="1" %if;(event.e_name="#nmen") selected%end;>[*no mention]</option>
+    <option value="#marb" data-sort="1" %if;(event.e_name="#marb") selected%end;>[*marriage bann]</option>
+    <option value="#marc" data-sort="1" %if;(event.e_name="#marc") selected%end;>[*marriage contract]</option>
+    <option value="#marl" data-sort="1" %if;(event.e_name="#marl") selected%end;>[*marriage licence]</option>
+    <option value="#pacs" data-sort="1" %if;(event.e_name="#pacs") selected%end;>[*PACS]</option>
+    <option value="#div" data-sort="1" %if;(event.e_name="#div") selected%end;>[*divorce event]</option>
+    <option value="#sep" data-sort="1" %if;(event.e_name="#sep") selected%end;>[*separate event]</option>
+    <option value="#anul" data-sort="1" %if;(event.e_name="#anul") selected%end;>[*annulation]</option>
+    <option value="#resi" data-sort="1" %if;(event.e_name="#resi") selected%end;>[*residence]</option>
   </select>
 %end;
 
@@ -809,57 +809,8 @@
 %include;trl
 %include;copyr
 </div>
+%include;upd_js
 %include;js
 %query_time;
-%include;upd_js
-<script>
-function show_fevent_label(xxname, xcnt) {
-  var selector = document.getElementById('fevent_select' + xcnt);
-  var label = document.getElementById('fevent_label_selector' + xcnt);
-  var input = document.getElementById('e_name' + xcnt);
-
-  if (selector.value == "") {
-    if (xxname.charAt(0) != "#" && xxname != "") {
-      input.value = xxname;
-    } else {
-      input.value = "";
-    }
-  } else {
-    input.value = selector.value;
-  }
-
-  if (selector.options[selector.selectedIndex].id === "custom" + xcnt) {
-    label.style.display = 'inline';
-    input.style.display = 'inline';
-  } else {
-    label.style.display = 'none';
-    input.style.display = 'none';
-  }
-}
-
-$(document).ready(function() {
-  //show evt perso
-  $(".other_evts").each(function() {
-    var inp = $(this).find("input").first();
-    if (inp.val().charAt(0) != "#" && inp.val() != "") {
-      $(this).show();
-    }
-  });
-});
-</script>
-<script>
-$(document).ready(function() {
-    var targetId = $('#updfam').data('insert').split('/')[0];
-    if (!targetId) {
-        var $inputs = $('#updfam').find('input[type="text"]');
-        targetId = $inputs.filter(function() {
-            return (this.id.startsWith('e_place') || this.id.endsWith('_fn')) && this.value === '';
-        }).first().attr('id');
-    }
-    if (targetId) {
-        $('#' + targetId).focus();
-    }
-});
-</script>
 </body>
 </html>

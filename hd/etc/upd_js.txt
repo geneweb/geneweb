@@ -1,3 +1,4 @@
+<!-- $Id: upd_js.txt v7.1 06/01/2026 02:00:03 $ -->
 %( Input datalists and function to populate all datalists %)
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
 %apply;dl("fnames")
@@ -13,148 +14,170 @@
   %apply;dl("estates")
 %end;
 <script>
-%( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)
-$(document).ready(function() {
-  $("[id$=_selct]").on('change', function() {
-    var pre = '#' + this.id;
-    var all = pre + '_data, ' + pre + '_sex';
-    var mod = pre + '_mod';
-    var isLink = this.value === "link";
-    $(all).toggle(!isLink);
-    $(mod).toggle(isLink);
-  }).change();
-});
+%if;("IND" in e.m)
+function change_buri(xcnt) {
+  const selector = document.getElementById('buri_select' + xcnt);
+  const input = document.getElementById('e_name' + xcnt);
+  input.value = selector.value;
+}
 
-document.addEventListener("scroll", function () {
-  const banner = document.getElementById("banner");
-  if (window.scrollY > 35) {
-    banner.classList.add("scrolled");
-  } else {
-    banner.classList.remove("scrolled");
-  }
-});
-
-<!--
-function changeCalendar(e,v,m,c) {
-  var mv = m;
-  switch (m) {
-  case "VD": mv = 1; break;
-  case "BR": mv = 2; break;
-  case "FM": mv = 3; break;
-  case "NI": mv = 4; break;
-  case "PL": mv = 5; break;
-  case "VT": mv = 6; break;
-  case "GE": mv = 7; break;
-  case "FL": mv = 8; break;
-  case "PR": mv = 9; break;
-  case "ME": mv = 10; break;
-  case "TH": mv = 11; break;
-  case "FT": mv = 12; break;
-  case "JC": mv = 13; break;
-  }
-  switch(c.options%[c.selectedIndex%].value) {
-  case 'G':
-  case 'J':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(month)]11</option>\
-</select>\
-';
-    break;
-  case 'F':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(french revolution month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(french revolution month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(french revolution month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(french revolution month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(french revolution month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(french revolution month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(french revolution month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(french revolution month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(french revolution month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(french revolution month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(french revolution month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(french revolution month)]11</option>\
-<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
-[(french revolution month)]12</option>\
-</select>\
-';
-    break;
-  case 'H':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(hebrew month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(hebrew month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(hebrew month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(hebrew month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(hebrew month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(hebrew month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(hebrew month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(hebrew month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(hebrew month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(hebrew month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(hebrew month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(hebrew month)]11</option>\
-<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
-[(hebrew month)]12</option>\
-</select>\
-';
-    break;
+function set_buri(xcnt) {
+  const selector = document.getElementById('buri_select' + xcnt);
+  if (selector.value === '') {
+    selector.value = '#buri';
+    change_buri(xcnt);
   }
 }
--->
+
+function change_death(xcnt) {
+  const selector = document.getElementById('death_select' + xcnt);
+  const input = document.getElementById('e_name' + xcnt);
+  input.value = (selector.value !== 'NotDead' && selector.value !== 'DontKnowIfDead') ? '#deat' : '';
+}
+
+function set_burial_focus(xcnt) {
+  const selector = document.getElementById('buri_select' + xcnt);
+  selector.value = '#buri';
+  change_buri(xcnt);
+}
+
+function set_death_focus(xcnt) {
+  const selector = document.getElementById('death_select' + xcnt);
+  selector.value = 'Death';
+  change_death(xcnt);
+}
+%end;
+
+/**
+ * Trie alphabétiquement les options par groupes numérotés.
+ * data-insert="N" sur le séparateur = point d'insertion du groupe N
+ * data-sort="N" sur les options = appartenance au groupe N
+ */
+function sortSelectOptions() {
+  document.querySelectorAll('select.sortable-select').forEach(select => {
+    select.querySelectorAll('option[data-insert]').forEach(insertPoint => {
+      const group = insertPoint.dataset.insert;
+      const sortables = Array.from(select.querySelectorAll(`option[data-sort="${group}"]`));
+      
+      if (sortables.length < 2) return;
+      
+      sortables.forEach(opt => opt.remove());
+      sortables.sort((a, b) => a.textContent.localeCompare(b.textContent, undefined, { sensitivity: 'base' }));
+      
+      const fragment = document.createDocumentFragment();
+      sortables.forEach(opt => fragment.appendChild(opt));
+      
+      if (insertPoint.nextSibling) {
+        select.insertBefore(fragment, insertPoint.nextSibling);
+      } else {
+        select.appendChild(fragment);
+      }
+    });
+  });
+}
+
+/** Gère l'affichage du champ d'événement personnalisé */
+function showEventLabel(type, defaultName, cnt) {
+  const selector = document.getElementById(type + '_select' + cnt);
+  const label = document.getElementById(type + '_label_selector' + cnt);
+  const input = document.getElementById('e_name' + cnt);
+  const selectedOption = selector.options[selector.selectedIndex];
+  
+  input.value = (selector.value === '') 
+    ? (defaultName && defaultName.charAt(0) !== '#' ? defaultName : '')
+    : selector.value;
+  
+  const isCustom = selectedOption.id === 'custom' + cnt;
+  label.style.display = isCustom ? 'inline' : 'none';
+  input.style.display = isCustom ? 'inline' : 'none';
+}
+
+function show_pevent_label(xxname, xcnt) {
+  showEventLabel('pevent', xxname, xcnt);
+}
+
+function show_fevent_label(xxname, xcnt) {
+  showEventLabel('fevent', xxname, xcnt);
+}
+
+/** Affiche les champs d'événements personnalisés existants au chargement */
+function initCustomEvents() {
+  document.querySelectorAll('.other_evts').forEach(evt => {
+    const input = evt.querySelector('input');
+    if (input?.value && input.value.charAt(0) !== '#') {
+      evt.style.display = '';
+    }
+  });
+}
+
+/** Focus initial sur le premier champ pertinent */
+function initFormFocus() {
+  const form = document.getElementById('updfam') || document.getElementById('updind');
+  if (!form) return;
+  
+  let targetId = form.dataset.insert?.split('/')[0] || null;
+  
+  if (!targetId) {
+    const input = Array.from(form.querySelectorAll('input[type="text"]'))
+      .find(el => (el.id?.startsWith('e_place') || el.id?.endsWith('_fn')) && el.value === '');
+    targetId = input?.id;
+  }
+  
+  if (targetId) {
+    document.getElementById(targetId)?.focus();
+  }
+}
+
+/** Toggle visibilité des champs create/link pour témoins/relations */
+function initSelectToggle() {
+  document.querySelectorAll('[id$="_selct"]').forEach(select => {
+    select.addEventListener('change', function() {
+      const pre = this.id;
+      const isLink = this.value === 'link';
+      
+      const dataEl = document.getElementById(pre + '_data');
+      const sexEl = document.getElementById(pre + '_sex');
+      const modEl = document.getElementById(pre + '_mod');
+      
+      if (dataEl) dataEl.style.display = isLink ? 'none' : '';
+      if (sexEl) sexEl.style.display = isLink ? 'none' : '';
+      if (modEl) modEl.style.display = isLink ? '' : 'none';
+    });
+    select.dispatchEvent(new Event('change'));
+  });
+}
+
+/** Gestion du scroll pour le banner */
+document.addEventListener('scroll', () => {
+  const banner = document.getElementById('banner');
+  if (banner) {
+    banner.classList.toggle('scrolled', window.scrollY > 35);
+  }
+});
+
+/** Configuration des mois par type de calendrier */
+const CALENDAR_MONTHS = {
+  'G': %['-', '[(month)]0', '[(month)]1', '[(month)]2', '[(month)]3', '[(month)]4', '[(month)]5', '[(month)]6', '[(month)]7', '[(month)]8', '[(month)]9', '[(month)]10', '[(month)]11'],
+  'J': %['-', '[(month)]0', '[(month)]1', '[(month)]2', '[(month)]3', '[(month)]4', '[(month)]5', '[(month)]6', '[(month)]7', '[(month)]8', '[(month)]9', '[(month)]10', '[(month)]11'],
+  'F': %['-', '[(french revolution month)]0', '[(french revolution month)]1', '[(french revolution month)]2', '[(french revolution month)]3', '[(french revolution month)]4', '[(french revolution month)]5', '[(french revolution month)]6', '[(french revolution month)]7', '[(french revolution month)]8', '[(french revolution month)]9', '[(french revolution month)]10', '[(french revolution month)]11', '[(french revolution month)]12'],
+  'H': %['-', '[(hebrew month)]0', '[(hebrew month)]1', '[(hebrew month)]2', '[(hebrew month)]3', '[(hebrew month)]4', '[(hebrew month)]5', '[(hebrew month)]6', '[(hebrew month)]7', '[(hebrew month)]8', '[(hebrew month)]9', '[(hebrew month)]10', '[(hebrew month)]11', '[(hebrew month)]12']
+};
+
+const FRENCH_MONTH_CODES = { VD:1, BR:2, FM:3, NI:4, PL:5, VT:6, GE:7, FL:8, PR:9, ME:10, TH:11, FT:12, JC:13 };
+
+function changeCalendar(e, v, m, c) {
+  const mv = FRENCH_MONTH_CODES[m] || m;
+  const calType = c.options[c.selectedIndex].value;
+  const months = CALENDAR_MONTHS[calType] || CALENDAR_MONTHS['G'];
+  
+  let options = '';
+  for (let i = 0; i < months.length; i++) {
+    const val = i === 0 ? '' : i;
+    options += '<option value="' + val + '"' + (mv == i ? ' selected' : '') + '>' + months[i] + '</option>';
+  }
+  
+  document.getElementById(e).innerHTML = 
+    '<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">' +
+    options + '</select>';
+}
 </script>
