@@ -2829,7 +2829,7 @@ let rec in_text case_sens s m =
     else
       match start_equiv_with case_sens s m i with
       | Some _ -> true
-      | None -> loop false (i + 1)
+      | None -> loop false (Utf8.next m i)
   in
   loop false 0
 
@@ -2842,7 +2842,9 @@ let html_highlight case_sens h s =
     else
       match start_equiv_with case_sens h s i with
       | Some j -> loop false j (Buff.mstore len (ht i j))
-      | None -> loop false (i + 1) (Buff.store len s.[i])
+      | None ->
+          let i' = Utf8.next s i in
+          loop false i' (Buff.mstore len (String.sub s i (i' - i)))
   in
   loop false 0 0
 
