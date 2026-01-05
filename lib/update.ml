@@ -21,6 +21,7 @@ type update_error =
   | UERR_missing_surname of Adef.safe_string
   | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
+  | UERR_same_file
 
 exception ModErr of update_error
 
@@ -333,6 +334,9 @@ let string_of_error conf =
   | UERR_digest ->
       transl conf
         {|the base has changed; do "back", "reload", and refill the form|}
+      |> Utf8.capitalize_fst |> Adef.safe
+  | UERR_same_file ->
+      transl conf "this notes file already exists"
       |> Utf8.capitalize_fst |> Adef.safe
   | UERR_bad_date d ->
       (Utf8.capitalize_fst (transl conf "incorrect date")
@@ -876,6 +880,13 @@ let error_locked conf =
 
 let error_digest conf =
   let err = UERR_digest in
+  prerr conf err @@ fun () ->
+  Output.print_sstring conf "<p>";
+  Output.print_string conf (string_of_error conf err);
+  Output.print_sstring conf "</p>"
+
+let error_same_file conf =
+  let err = UERR_same_file in
   prerr conf err @@ fun () ->
   Output.print_sstring conf "<p>";
   Output.print_string conf (string_of_error conf err);
