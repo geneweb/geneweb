@@ -579,15 +579,15 @@ let ged_tag_pevent base evt_name =
   | Def.Epers_Adoption -> "ADOP"
 
 let is_primary_pevents = function
-  | Def.Epers_Birth | Def.Epers_Baptism | Def.Epers_Death | Def.Epers_Burial
-  | Def.Epers_Cremation | Def.Epers_BaptismLDS | Def.Epers_BarMitzvah
-  | Def.Epers_BatMitzvah | Def.Epers_Benediction | Def.Epers_Confirmation
-  | Def.Epers_ConfirmationLDS | Def.Epers_Dotation | Def.Epers_Education
-  | Def.Epers_Emigration | Def.Epers_FirstCommunion | Def.Epers_Graduate
-  | Def.Epers_Immigration | Def.Epers_Naturalisation | Def.Epers_Occupation
-  | Def.Epers_Ordination | Def.Epers_Property | Def.Epers_Recensement
-  | Def.Epers_Residence | Def.Epers_Retired | Def.Epers_ScellentChildLDS
-  | Def.Epers_ScellentSpouseLDS | Def.Epers_Will ->
+  | Def.Epers_Adoption | Def.Epers_Birth | Def.Epers_Baptism | Def.Epers_Death
+  | Def.Epers_Burial | Def.Epers_Cremation | Def.Epers_BaptismLDS
+  | Def.Epers_BarMitzvah | Def.Epers_BatMitzvah | Def.Epers_Benediction
+  | Def.Epers_Confirmation | Def.Epers_ConfirmationLDS | Def.Epers_Dotation
+  | Def.Epers_Education | Def.Epers_Emigration | Def.Epers_FirstCommunion
+  | Def.Epers_Graduate | Def.Epers_Immigration | Def.Epers_Naturalisation
+  | Def.Epers_Occupation | Def.Epers_Ordination | Def.Epers_Property
+  | Def.Epers_Recensement | Def.Epers_Residence | Def.Epers_Retired
+  | Def.Epers_ScellentChildLDS | Def.Epers_ScellentSpouseLDS | Def.Epers_Will ->
       true
   | Def.Epers_Accomplishment | Def.Epers_Acquisition | Def.Epers_Adhesion
   | Def.Epers_ChangeName | Def.Epers_Circumcision | Def.Epers_Decoration
@@ -597,8 +597,7 @@ let is_primary_pevents = function
   | Def.Epers_Hospitalisation | Def.Epers_Illness | Def.Epers_ListePassenger
   | Def.Epers_MilitaryDistinction | Def.Epers_MilitaryPromotion
   | Def.Epers_MilitaryService | Def.Epers_MobilisationMilitaire
-  | Def.Epers_ScellentParentLDS | Def.Epers_VenteBien | Def.Epers_Name _
-  | Def.Epers_Adoption ->
+  | Def.Epers_ScellentParentLDS | Def.Epers_VenteBien | Def.Epers_Name _ ->
       false
 
 let relation_format_of_witness_kind :
