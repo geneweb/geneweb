@@ -646,35 +646,42 @@ let can_see conf _f = conf.wizard || conf.friend
 (* Format directory entry with proper indentation level *)
 let format_folder_entry conf depth r path_to is_current is_path view =
   let view = view || can_see conf r in
-  Format.sprintf {|<div class="my-1" style="margin-left: %.1fem;">%s</div>|}
-    (1.5 *. float_of_int depth)
-    (if is_current then
-       Format.sprintf
-         {|<span class="text-muted">
+  let margin =
+    if depth = 0 then ""
+    else
+      Printf.sprintf " style=\"margin-left: %.1fem;\""
+        (1.5 *. float_of_int depth)
+  in
+  let content =
+    if is_current then
+      Format.sprintf
+        {|<span class="text-muted">
           <i class="far fa-folder-open fa-fw mr-2"></i>%s</span>|}
-         (Util.escape_html r :> string)
-     else
-       let title_attr =
-         let back_txt = Utf8.capitalize_fst (transl conf "back") in
-         if is_path then
-           if r = ".." then Format.sprintf {| title="%s .."|} back_txt
-           else
-             Format.sprintf {| title="%s %s"|} back_txt
-               (Util.escape_html r :> string)
-         else ""
-       in
-       if view then
-         Format.sprintf
-           {|<a href="%sm=MISC_NOTES&d=%s"%s>
-             <i class="far fa-folder-open fa-fw mr-2"></i>%s</a>|}
-           (commd conf :> string)
-           (Mutil.encode path_to :> string)
-           title_attr
-           (Util.escape_html r :> string)
-       else
-         Format.sprintf {|<i class="far fa-folder-open fa-fw mr-2"%s></i>%s|}
-           title_attr
-           (Util.escape_html r :> string))
+        (Util.escape_html r :> string)
+    else
+      let title_attr =
+        let back_txt = Utf8.capitalize_fst (transl conf "back") in
+        if is_path then
+          if r = ".." then Format.sprintf {| title="%s .."|} back_txt
+          else
+            Format.sprintf {| title="%s %s"|} back_txt
+              (Util.escape_html r :> string)
+        else ""
+      in
+      if view then
+        Format.sprintf
+          {|<a href="%sm=MISC_NOTES&d=%s"%s>
+            <i class="far fa-folder-open fa-fw mr-2"></i>%s</a>|}
+          (commd conf :> string)
+          (Mutil.encode path_to :> string)
+          title_attr
+          (Util.escape_html r :> string)
+      else
+        Format.sprintf {|<i class="far fa-folder-open fa-fw mr-2"%s></i>%s|}
+          title_attr
+          (Util.escape_html r :> string)
+  in
+  Format.sprintf {|<div class="mt-1"%s>%s</div>|} margin content
 
 (* Format file entry with proper indentation level *)
 let format_file_entry conf depth d f n_type title view =
@@ -686,29 +693,33 @@ let format_file_entry conf depth d f n_type title view =
     let f = Util.note_link_to_sys f in
     if Sys.file_exists f then ("", "") else (" text-danger", "MOD_")
   in
+  let margin =
+    if depth = 0 then ""
+    else
+      Printf.sprintf " style=\"margin-left: %.1fem;\""
+        (1.5 *. float_of_int depth)
+  in
   if view then
     Format.sprintf
-      {|<div class="py-1" style="margin-left: %.1fem;">
+      {|<div class="mt-1"%s>
          <a class="%s" href="%sm=%sNOTES&f=%s">
            <i class="far fa-%s fa-fw mr-2"></i>%s</a>%s</div>|}
-      (1.5 *. float_of_int depth)
-      color
+      margin color
       (commd conf :> string)
       mod_edit
       (Mutil.encode (if d = "" then f else d ^ ":" ^ f) :> string)
       icon
-      (Util.escape_html f :> string) (* nom du fichier *)
+      (Util.escape_html f :> string)
       (if (title :> string) <> "" then
          Format.sprintf {|<span class="text-muted ml-2">%s</span>|}
            (title :> string)
        else "")
   else
     Format.sprintf
-      {|<div class="py-1" style="margin-left: %.1fem;">
+      {|<div class="mt-2"%s>
          <i class="far fa-%s fa-fw mr-2"></i>
          <span class="text">%s</span></div>|}
-      (1.5 *. float_of_int depth)
-      icon
+      margin icon
       (Util.escape_html f :> string)
 
 (* Format back button *)
@@ -821,12 +832,12 @@ let print_misc_notes conf base =
     |> List.rev
   in
   if db <> [] then (
-    Output.print_sstring conf {|<div class="px-1">|};
+    Output.print_sstring conf "<div>";
     if d <> "" then (
       format_folder_entry conf 0 ".." "" false true true
       |> Output.print_sstring conf;
       path_hierarchy d);
-    Output.print_sstring conf {|<div class="px-1">|};
+    Output.print_sstring conf {|<div class="ml-2">|};
     List.iter (fun d -> one_folder d true) dirs_in_db;
     List.iter (fun f -> one_file f true) files_in_db;
     Output.print_sstring conf "</div>");
@@ -854,10 +865,11 @@ let print_misc_notes conf base =
       ([], []) ls
   in
   if dirs <> [] || files <> [] then (
-    Output.print_sstring conf {|<div class="px-1">|};
+    Output.print_sstring conf {|<div class="ml-2">|};
     Output.print_sstring conf
       (Format.sprintf
-         {|<h4 title="%s">%s <sup><i class="fa fa-info fa-xs" ></i></sup></h4>|}
+         {|<h2 class="h3 mt-3 mb-1" title="%s">%s
+  <i class="far fa-circle-question fa-xs"></i></h2>|}
          (transl conf "files not in db help" |> Utf8.capitalize_fst)
          (transl conf "files not in db" |> Utf8.capitalize_fst));
     if d <> "" then (
