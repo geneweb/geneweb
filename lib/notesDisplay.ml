@@ -9,44 +9,23 @@ let src = Logs.Src.create ~doc:"NotesDisplay" __MODULE__
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module IperSet = Driver.Iper.Set
-
-(* FIXME code copied/adapted from MergeInd. To be factorized *)
-let test_ancestor conf base p1 p2 =
-  let max =
-    match List.assoc_opt "restrict_note_max" conf.base_env with
-    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
-    | None -> 32
-  in
-  let ip1 = Driver.get_iper p1 in
-  let ip2 = Driver.get_iper p2 in
-  if ip1 = ip2 then true
-  else
-    let rec loop n set = function
-      | [] -> false
-      | ip :: tl when n > 0 -> (
-          if IperSet.mem ip set then loop n set tl
-          else if ip = ip1 then true
-          else
-            let set = IperSet.add ip set in
-            match Driver.get_parents (Driver.poi base ip) with
-            | Some ifam ->
-                let cpl = Driver.foi base ifam in
-                loop (n - 1) set
-                  (Driver.get_father cpl :: Driver.get_mother cpl :: tl)
-            | None -> loop n set tl)
-      | _ -> false
-    in
-    loop max IperSet.empty [ ip2 ]
-(* n generations > 2^(n+1) *)
 
 let is_ancestor conf base anc =
   let restrict_for_spouses =
     try List.assoc "restrict_for_spouses" conf.base_env = "yes"
     with Not_found -> false
   in
-
-  (* anc is [[fn/sn/oc]]; Return true if anc is one ancestor of conf.user_iper *)
+  let max =
+    match List.assoc_opt "restrict_note_max" conf.base_env with
+    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
+    | None -> 32
+  in
+  let test_ancestor p1 p2 =
+    let ip1 = Driver.get_iper p1 in
+    let ip2 = Driver.get_iper p2 in
+    ip1 = ip2
+    || try Gutil.is_ancestor ~max base p1 p2 with Gutil.Same_person -> true
+  in
   let bad_format n =
     Log.warn (fun k -> k "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
   in
@@ -70,8 +49,7 @@ let is_ancestor conf base anc =
       in
       match (Driver.person_of_key base fn sn oc, conf.user_iper) with
       | Some anc_ip, Some user_ip ->
-          test_ancestor conf base (Driver.poi base anc_ip)
-            (Driver.poi base user_ip)
+          test_ancestor (Driver.poi base anc_ip) (Driver.poi base user_ip)
           || restrict_for_spouses
              &&
              let families = Driver.get_family (Driver.poi base user_ip) in
@@ -83,7 +61,7 @@ let is_ancestor conf base anc =
                  let spouse_ip =
                    if user_ip = fath_ip then moth_ip else fath_ip
                  in
-                 test_ancestor conf base (Driver.poi base anc_ip)
+                 test_ancestor (Driver.poi base anc_ip)
                    (Driver.poi base spouse_ip))
                families
       | _ -> false

@@ -1,5 +1,4 @@
 exception Error_loop of Geneweb_db.Driver.person
-exception Same_person
 exception Different_sexes of Geneweb_db.Driver.person * Geneweb_db.Driver.person
 
 (* TODOOCP *)
@@ -39,11 +38,3 @@ val kill_ancestors :
   int ref ->
   int ref ->
   unit
-
-val is_ancestor :
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  Geneweb_db.Driver.person ->
-  bool
-(** [is_ancestor base p1 p2] Checks if [p1] is an ancestor of [p2]. Raises
-    [Same_person] if [p1] and [p2] have the same iper. *)

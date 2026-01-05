@@ -2,6 +2,14 @@
 
 open Def
 
+exception Same_person
+
+val is_ancestor :
+  ?max:int -> Driver.base -> Driver.person -> Driver.person -> bool
+(** [is_ancestor ?max base p1 p2] checks if [p1] is an ancestor of [p2].
+    @param max optional depth limit (default: unlimited)
+    @raise Same_person if [p1] and [p2] have the same iper. *)
+
 val spouse : Driver.iper -> Driver.family -> Driver.iper
 (** [spouse p f] returns spouse of giving person inside the family. *)
 
