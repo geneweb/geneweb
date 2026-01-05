@@ -4,6 +4,8 @@ usage()
 {
 echo "Usage: $cmd [Options]
 Compare gwc input and gwu output expecting no changes.
+Then use gwb2ged, ged2gwb and gwu
+comparing two gedcom files and  gw file if -t specified
 By default:
 * assume we are running as test/$cmd
   in the repo folder where geneweb was built
@@ -20,6 +22,7 @@ Options:
 -h  To display this help.
 -r  To pass -reorg option to gwc
     (if not set then gwc will create a legacy DB)
+-t  run diff of gw or ged outputs
 "
 exit 1
 }
@@ -39,11 +42,23 @@ SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
 GWCOPT='-v -f -cg'
 #=== hardcoded vars (end)   ===
 
+diff_gw () {
+    local gw1=$1
+    local gw2=$2
+    local stripped_gw1=$gw1.stripped
+    local stripped_gw2=$gw2.stripped
+
+    sed -e 's/<br>//; s/\bod\b/0/; s/\(Forceindex1234\).1234/\1/' $gw1 > $stripped_gw1
+    sed -e 's/<br>//' $gw2 > $stripped_gw2
+
+    diff --unified=0 $stripped_gw1 $stripped_gw2 || RC=$(($RC+1))
+}
+
 #===  main ====================
 cmd=$(basename $0)
 cmddir=$(dirname $0)
 echo "$0 $@ started"
-while getopts "df:hr" Option
+while getopts "df:hrt" Option
 do
 case $Option in
     d ) debug=1;;
@@ -53,11 +68,13 @@ case $Option in
         ;;
     h ) usage;;
     r ) optreorg='-reorg';;
+    t ) test_diff=1;;
     * ) usage;;
 esac
 done
 shift $(($OPTIND - 1))
 
+test -n "$debug" && set -x
 # overwrite above hardcoded vars by an input file.
 test -f "$setenv_file" && . $setenv_file
 
@@ -147,9 +164,35 @@ done
 $SUDOPRFX $BIN_DIR/update_nldb -bd $BASES_DIR $DBNAME  >$BASES_DIR/$DBNAME.update_nldb.log 2>&1 || \
   { echo "update_nldb failure, details in $BASES_DIR/$DBNAME.update_nldb.log"; exit 1; }
 
+gwb2gedout="$BASES_DIR/${DBNAME}gwb2ged"
+$SUDOPRFX $BIN_DIR/gwb2ged $BASES_DIR/$DBNAME -v -o $gwb2gedout.ged 2>$gwb2gedout.stderr || \
+  { echo "gwb2ged failure, details in $gwb2gedout.stderr"; exit 1; }
+test -n "$debug" && cat $gwb2gedout.stderr
+
+ged2gwbdbn="${DBNAME}ged2gwb"
+ged2gwbout="$BASES_DIR/$ged2gwbdbn"
+$SUDOPRFX $BIN_DIR/ged2gwb $gwb2gedout.ged -f -bd $BASES_DIR $optreorg -o $ged2gwbdbn  >$ged2gwbout.log 2>&1 || \
+  { echo "ged2gwb failure, details in $ged2gwbout.log"; exit 1; }
+test -n "$debug" && cat $ged2gwbout.log
+
+$SUDOPRFX $BIN_DIR/gwu $ged2gwbout -v -o $ged2gwbout.gwu.o.gw 2>$ged2gwbout.gwu.o.stderr || \
+  { echo "gwu failure, details in $ged2gwbout.gwu.o.stderr"; exit 1; }
+test -n "$debug" && cat $ged2gwbout.gwu.o.stderr
+
+ged2gedout="$BASES_DIR/${DBNAME}ged2ged"
+$SUDOPRFX $BIN_DIR/gwb2ged $ged2gwbout -v -o $ged2gedout.ged 2>$ged2gedout.stderr || \
+  { echo "gwb2ged failure, details in $ged2gedout.stderr"; exit 1; }
+test -n "$debug" && cat $ged2gedout.stderr
+
+if test "$test_diff"; then
+    diff_gw $BASES_DIR/$DBNAME.gw $ged2gwbout.gwu.o.gw
+    diff --unified=0 $gwb2gedout.ged $ged2gedout.ged || RC=$(($RC+1))
+fi
+
 if test "$RC" != 0; then
     echo "$0 failed, at least $RC detected error(s)."
     exit 1
 else
     echo "$0 completed, No detected error."
 fi
+
