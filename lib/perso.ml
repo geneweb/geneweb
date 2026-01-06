@@ -2934,6 +2934,15 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         | _ -> conf
       in
       !GWPARAM_ITL.has_parents_link conf.Config.command (Gwdb.get_iper p)
+  | "has_grandparents" ->
+      let has_parents person_id =
+        person_id |> Gwdb.poi base |> Gwdb.get_parents |> Option.is_some
+      in
+      Option.fold ~none:false
+        ~some:(fun family_id ->
+          family_id |> Gwdb.foi base |> Gwdb.get_parent_array
+          |> Array.exists has_parents)
+        (Gwdb.get_parents p)
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_psources" ->
       if Util.is_hide_names conf p && not p_auth then false
