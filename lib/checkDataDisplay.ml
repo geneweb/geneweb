@@ -195,7 +195,7 @@ end
 let get_sel_err_types conf =
   List.filter_map
     (fun info ->
-      match Util.p_getenv conf.env info.form_param with
+      match Util.p_getenv conf.env (info : error_info).form_param with
       | Some "1" -> Some info.error_type
       | _ -> None)
     ErrorInfo.all
