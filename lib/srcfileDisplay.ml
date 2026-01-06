@@ -3,7 +3,6 @@
 open Config
 open Def
 open Util
-module Ast = Geneweb_templ.Ast
 module Driver = Geneweb_db.Driver
 
 type counter = {
@@ -563,7 +562,7 @@ let print_welcome conf base =
       let sosa_ref () = Util.find_sosa_ref conf base in
       Lazy.from_fun sosa_ref
     in
-    Templ.Env.(add "sosa_ref" (Vsosa_ref sosa_ref_l) empty)
+    Templ.Env.empty |> Templ.Env.add "sosa_ref" (Vsosa_ref sosa_ref_l)
   in
   let ifun =
     Templ.

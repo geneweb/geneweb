@@ -1,5 +1,3 @@
-module I = Index.Default
-
 let is_separator c = c = ' ' || c = ',' || c = '-'
 
 type 'a loc = { content : 'a; offset : int; len : int }

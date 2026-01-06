@@ -509,16 +509,15 @@ let print_dag_page conf base page_title hts next_txt =
     | None -> Driver.poi base Driver.Iper.dummy
   in
   let env =
-    Templ.Env.(
-      empty |> add "p" (Vind p)
-      |> add "p_auth" (Vbool (authorized_age conf base p))
-      |> add "count" (Vcnt (ref 0))
-      |> add "count1" (Vcnt (ref 0))
-      |> add "count2" (Vcnt (ref 0))
-      |> add "count3" (Vcnt (ref 0))
-      |> add "vars" (Vvars (ref []))
-      |> add "p_title" (Vsstring page_title)
-      |> add "next_txt" (Vestring next_txt))
+    Templ.Env.empty |> Templ.Env.add "p" (Vind p)
+    |> Templ.Env.add "p_auth" (Vbool (authorized_age conf base p))
+    |> Templ.Env.add "count" (Vcnt (ref 0))
+    |> Templ.Env.add "count1" (Vcnt (ref 0))
+    |> Templ.Env.add "count2" (Vcnt (ref 0))
+    |> Templ.Env.add "count3" (Vcnt (ref 0))
+    |> Templ.Env.add "vars" (Vvars (ref []))
+    |> Templ.Env.add "p_title" (Vsstring page_title)
+    |> Templ.Env.add "next_txt" (Vestring next_txt)
   in
   let ifun =
     Templ.

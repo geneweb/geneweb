@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Outbase = Geneweb_db.Outbase
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 

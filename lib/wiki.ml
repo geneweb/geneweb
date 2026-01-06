@@ -900,7 +900,8 @@ let print_mod_view_editor conf can_edit sub_part is_new_note =
     {|<div class="d-flex flex-column">
   <div class="pt-1">|};
   let env =
-    Templ.Env.(add "name" (Templ.Vstring (Adef.encoded "notes")) empty)
+    Templ.Env.empty
+    |> Templ.Env.add "name" (Templ.Vstring (Adef.encoded "notes"))
   in
   Templ.output_simple conf env "toolbar";
   let submit_btn =

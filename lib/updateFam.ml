@@ -506,7 +506,7 @@ let print_update_fam conf base fcd digest =
       ( "ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "ADD_PAR_OK" | "MOD_FAM"
       | "MOD_FAM_OK" | "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK"
       | "MRG_MOD_FAM_OK" ) ->
-      let env = Templ.Env.(add "digest" (Vstring digest) empty) in
+      let env = Templ.Env.empty |> Templ.Env.add "digest" (Vstring digest) in
       let ifun =
         Templ.
           {
