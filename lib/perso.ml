@@ -31,6 +31,16 @@ let get_cousins_sparse =
         cache := Some (Driver.get_iper p, sparse);
         sparse
 
+let get_asc_cnt =
+  let cache = ref None in
+  fun conf base p ->
+    match !cache with
+    | Some (cached_ip, arr) when cached_ip = Driver.get_iper p -> arr
+    | _ ->
+        let arr = Cousins.init_asc_cnt conf base p in
+        cache := Some (Driver.get_iper p, arr);
+        arr
+
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
@@ -2472,14 +2482,15 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
   | sl -> (
       match get_env "level" env with
       | Vint lev -> (
+          let asc_cnt = get_asc_cnt conf base p in
           match path_mode with
           | Paths_cnt_raw -> (
-              let list1 = Cousins.anc_cnt_aux conf base lev at_to p in
+              let list1 = Cousins.anc_cnt_aux ~asc_cnt conf base lev at_to p in
               match list1 with
               | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
               | None -> raise Not_found)
           | Paths_cnt -> (
-              let list1 = Cousins.anc_cnt_aux conf base lev at_to p in
+              let list1 = Cousins.anc_cnt_aux ~asc_cnt conf base lev at_to p in
               match list1 with
               | Some list1 ->
                   VVstring
@@ -2488,7 +2499,7 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
                        sl)
               | None -> raise Not_found)
           | Paths -> (
-              let l = Cousins.anc_cnt_aux conf base lev at_to p in
+              let l = Cousins.anc_cnt_aux ~asc_cnt conf base lev at_to p in
               match l with
               | Some l -> (
                   match get_env "cousins" env with

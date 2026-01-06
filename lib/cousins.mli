@@ -123,6 +123,7 @@ val cousins_fold :
     levels). *)
 
 val anc_cnt_aux :
+  ?asc_cnt:one_cousin list array ->
   config ->
   Geneweb_db.Driver.base ->
   int ->
@@ -130,7 +131,10 @@ val anc_cnt_aux :
   Geneweb_db.Driver.person ->
   one_cousin list option
 (** Returns ancestors at level (if bool=true) or up to level (if bool=false).
-    Level 1 = parents, level 2 = grandparents, etc. *)
+    Level 1 = parents, level 2 = grandparents, etc.
+    @param asc_cnt
+      Pre-computed ancestor array from {!init_asc_cnt} for caching across
+      multiple calls on the same person. If omitted, computed internally. *)
 
 val desc_cnt_aux :
   config ->
@@ -141,3 +145,12 @@ val desc_cnt_aux :
   one_cousin list option
 (** Returns descendants at level (if bool=true) or up to level (if bool=false).
     Level 1 = children, level 2 = grandchildren, etc. *)
+
+val init_asc_cnt :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  one_cousin list array
+(** Builds array of ancestors by level. Index 0 = person, 1 = parents, etc. Each
+    entry contains all ancestor paths to that level (including duplicates for
+    implex detection). *)
