@@ -4,7 +4,6 @@ open Config
 open Def
 open Util
 open HistoryDiff
-module Ast = Geneweb_templ.Ast
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
@@ -912,12 +911,13 @@ let print_foreach conf base print_ast _eval_expr =
           | [] -> ()
           | gr :: l ->
               let env =
-                Templ.Env.(
-                  empty |> add "line" (Vint i)
-                  |> add "date" (Vstring (gr.date : Adef.safe_string :> string))
-                  |> add "wizard"
-                       (Vstring
-                          (gr.HistoryDiff.wizard : Adef.safe_string :> string)))
+                Templ.Env.empty
+                |> Templ.Env.add "line" (Vint i)
+                |> Templ.Env.add "date"
+                     (Vstring (gr.date : Adef.safe_string :> string))
+                |> Templ.Env.add "wizard"
+                     (Vstring
+                        (gr.HistoryDiff.wizard : Adef.safe_string :> string))
               in
               List.iter (print_ast env xx) al;
               loop (i + 1) l
@@ -970,10 +970,9 @@ let print conf base =
           let p = person_of_gen_p_key base after.gen_p in
           let p_auth = authorized_age conf base p in
           let env =
-            Templ.Env.(
-              empty
-              |> add "history_file" (Vstring file)
-              |> add "history_len" (Vint len))
+            Templ.Env.empty
+            |> Templ.Env.add "history_file" (Vstring file)
+            |> Templ.Env.add "history_len" (Vint len)
           in
           let eval_predefined_apply _env f vl =
             (eval_predefined_apply conf _env f vl :> string)

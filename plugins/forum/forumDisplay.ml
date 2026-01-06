@@ -258,7 +258,7 @@ let print conf base env =
 
 let visualize conf base mess =
   let vmess = Vmess (mess, None, MF.not_a_pos, MF.not_a_pos, None) in
-  let env = Templ.Env.(add "mess" vmess empty) in
+  let env = Templ.Env.empty |> Templ.Env.add "mess" vmess in
   print conf base env
 
 let message_txt conf n =
@@ -303,16 +303,16 @@ let print_forum_message conf base r so =
   let env =
     match r with
     | Some (acc, mess, pos, next_pos) when acc && is_visible conf mess ->
-        Templ.Env.(
-          empty
-          |> add "mess" (Vmess (mess, None, pos, next_pos, so))
-          |> add "pos" (Vpos (ref pos)))
-    | Some _ | None -> Templ.Env.(add "pos" (Vpos (ref MF.not_a_pos)) empty)
+        Templ.Env.empty
+        |> Templ.Env.add "mess" (Vmess (mess, None, pos, next_pos, so))
+        |> Templ.Env.add "pos" (Vpos (ref pos))
+    | Some _ | None ->
+        Templ.Env.empty |> Templ.Env.add "pos" (Vpos (ref MF.not_a_pos))
   in
   print conf base env
 
 let print_forum_headers conf base =
-  let env = Templ.Env.(add "pos" (Vpos (ref MF.not_a_pos)) empty) in
+  let env = Templ.Env.empty |> Templ.Env.add "pos" (Vpos (ref MF.not_a_pos)) in
   print conf base env
 
 let valid_forum_message conf base pos =

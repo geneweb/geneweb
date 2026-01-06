@@ -3,7 +3,6 @@
 open Config
 open Def
 open Util
-module Ast = Geneweb_templ.Ast
 module Driver = Geneweb_db.Driver
 
 let string_person_of base p =
@@ -623,10 +622,9 @@ let print_update_ind conf base p digest =
   | Some ("MOD_IND" | "MOD_IND_OK")
   | Some ("ADD_IND" | "ADD_IND_OK") ->
       let env =
-        Templ.Env.(
-          empty
-          |> add "digest" (Vstring digest)
-          |> add "next_pevent" (Vcnt (ref (List.length p.pevents + 1))))
+        Templ.Env.empty
+        |> Templ.Env.add "digest" (Vstring digest)
+        |> Templ.Env.add "next_pevent" (Vcnt (ref (List.length p.pevents + 1)))
       in
       let ifun =
         Templ.

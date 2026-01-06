@@ -8,7 +8,6 @@ let src = Logs.Src.create ~doc:"Perso" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
-module Ast = Geneweb_templ.Ast
 module Loc = Geneweb_templ.Loc
 module Collection = Geneweb_db.Collection
 module Driver = Geneweb_db.Driver
@@ -5685,37 +5684,37 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       Vnldb db
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
-    Templ.Env.(
-      empty |> add "p" (Vind p)
-      |> add "p_auth" (Vbool (authorized_age conf base p))
-      |> add "count" (Vcnt (ref 0))
-      |> add "count1" (Vcnt (ref 0))
-      |> add "count2" (Vcnt (ref 0))
-      |> add "count3" (Vcnt (ref 0))
-      |> add "vars" (Vvars (ref []))
-      |> add "cousins" (Vcousl (ref []))
-      |> add "v1_v2" (Vcous_level (ref 0, ref 0))
-      |> add "list" (Vslist (ref SortedList.empty))
-      |> add "listb" (Vslist (ref SortedList.empty))
-      |> add "listc" (Vslist (ref SortedList.empty))
-      |> add "listd" (Vslist (ref SortedList.empty))
-      |> add "liste" (Vslist (ref SortedList.empty))
-      |> add "desc_mark"
-           (Vdmark (ref @@ Collection.Marker.dummy Driver.Iper.dummy false))
-      |> add "lazy_print" (Vlazyp (ref None))
-      |> add "sosa" (Vsosa (ref []))
-      |> add "sosa_ref" (Vsosa_ref sosa_ref)
-      |> add "t_sosa" (Vt_sosa t_sosa)
-      |> add "max_anc_level" (Vlazy (Lazy.from_fun mal))
-      |> add "static_max_anc_level" (Vlazy (Lazy.from_fun smal))
-      |> add "sosa_ref_max_anc_level" (Vlazy (Lazy.from_fun srmal))
-      |> add "max_cous_level" (Vlazy (Lazy.from_fun mcl))
-      |> add "max_desc_level" (Vlazy (Lazy.from_fun mdl))
-      |> add "static_max_desc_level" (Vlazy (Lazy.from_fun smdl))
-      |> add "desc_level_table" (Vdesclevtab desc_level_table_l)
-      |> add "desc_level_table_save" (Vdesclevtab desc_level_table_l_save)
-      |> add "nldb" (Vlazy (Lazy.from_fun nldb))
-      |> add "all_gp" (Vlazy (Lazy.from_fun all_gp)))
+    Templ.Env.empty |> Templ.Env.add "p" (Vind p)
+    |> Templ.Env.add "p_auth" (Vbool (authorized_age conf base p))
+    |> Templ.Env.add "count" (Vcnt (ref 0))
+    |> Templ.Env.add "count1" (Vcnt (ref 0))
+    |> Templ.Env.add "count2" (Vcnt (ref 0))
+    |> Templ.Env.add "count3" (Vcnt (ref 0))
+    |> Templ.Env.add "vars" (Vvars (ref []))
+    |> Templ.Env.add "cousins" (Vcousl (ref []))
+    |> Templ.Env.add "v1_v2" (Vcous_level (ref 0, ref 0))
+    |> Templ.Env.add "list" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "listb" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "listc" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "listd" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "liste" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "desc_mark"
+         (Vdmark (ref @@ Collection.Marker.dummy Driver.Iper.dummy false))
+    |> Templ.Env.add "lazy_print" (Vlazyp (ref None))
+    |> Templ.Env.add "sosa" (Vsosa (ref []))
+    |> Templ.Env.add "sosa_ref" (Vsosa_ref sosa_ref)
+    |> Templ.Env.add "t_sosa" (Vt_sosa t_sosa)
+    |> Templ.Env.add "max_anc_level" (Vlazy (Lazy.from_fun mal))
+    |> Templ.Env.add "static_max_anc_level" (Vlazy (Lazy.from_fun smal))
+    |> Templ.Env.add "sosa_ref_max_anc_level" (Vlazy (Lazy.from_fun srmal))
+    |> Templ.Env.add "max_cous_level" (Vlazy (Lazy.from_fun mcl))
+    |> Templ.Env.add "max_desc_level" (Vlazy (Lazy.from_fun mdl))
+    |> Templ.Env.add "static_max_desc_level" (Vlazy (Lazy.from_fun smdl))
+    |> Templ.Env.add "desc_level_table" (Vdesclevtab desc_level_table_l)
+    |> Templ.Env.add "desc_level_table_save"
+         (Vdesclevtab desc_level_table_l_save)
+    |> Templ.Env.add "nldb" (Vlazy (Lazy.from_fun nldb))
+    |> Templ.Env.add "all_gp" (Vlazy (Lazy.from_fun all_gp))
   in
   let ifun =
     {

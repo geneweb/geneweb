@@ -5,7 +5,6 @@ open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module Collection = Geneweb_db.Collection
 module IperSet = Driver.Iper.Set
 
 let src = Logs.Src.create ~doc:"SearchName" __MODULE__

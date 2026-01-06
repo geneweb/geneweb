@@ -4,7 +4,6 @@
 open Config
 open Def
 open Util
-module Ast = Geneweb_templ.Ast
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
@@ -594,7 +593,9 @@ let print_foreach conf base print_ast eval_expr =
 
 let gen_print conf base hoo =
   let env =
-    Templ.Env.(empty |> add "pos" (Vpos (ref 0)) |> add "count" (Vcnt (ref 0)))
+    Templ.Env.empty
+    |> Templ.Env.add "pos" (Vpos (ref 0))
+    |> Templ.Env.add "count" (Vcnt (ref 0))
   in
   let env =
     match hoo with

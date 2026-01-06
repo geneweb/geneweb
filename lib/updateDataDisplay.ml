@@ -525,8 +525,9 @@ let print_foreach conf print_ast _eval_expr =
 let print_mod conf base =
   let list = build_list conf base in
   let env =
-    Templ.Env.(
-      empty |> add "list" (Vlist_data list) |> add "count" (Vcnt (ref 0)))
+    Templ.Env.empty
+    |> Templ.Env.add "list" (Vlist_data list)
+    |> Templ.Env.add "count" (Vcnt (ref 0))
   in
   let ifun =
     Templ.

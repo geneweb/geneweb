@@ -2,12 +2,6 @@ open Def
 open Config
 module Driver = Geneweb_db.Driver
 
-module IstrMap = Map.Make (struct
-  type t = Driver.istr
-
-  let compare = compare
-end)
-
 type dict_type =
   | Fnames
   | Snames
