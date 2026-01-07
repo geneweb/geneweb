@@ -243,6 +243,7 @@ let rec reconstitute_pevents ~base conf form_is_modified cnt =
         | "#slgs" -> Epers_ScellentSpouseLDS
         | "#vteb" -> Epers_VenteBien
         | "#will" -> Epers_Will
+        | "#adop" -> Epers_Adoption
         | "buri_or_crem" -> Epers_Burial
         | n -> Epers_Name (Ext_string.only_printable n)
       in

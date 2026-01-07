@@ -271,7 +271,7 @@ let other_events conf base p =
         | Epers_Ordination | Epers_Property | Epers_Recensement
         | Epers_Residence | Epers_Retired | Epers_ScellentChildLDS
         | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien
-        | Epers_Will | Epers_Name _ ) ->
+        | Epers_Will | Epers_Name _ | Epers_Adoption ) ->
         true
   in
   p |> events conf base |> List.filter is_other_event

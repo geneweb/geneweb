@@ -238,6 +238,7 @@ type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
   | Epers_VenteBien
   | Epers_Will
   | Epers_Name of 'string
+  | Epers_Adoption
 
 val pp_gen_pers_event_name :
   (Format.formatter -> 'string -> unit) ->

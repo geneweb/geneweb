@@ -1453,10 +1453,11 @@ let find_pevent_name_from_tag gen tag tagv =
   | "SLGS" | "lds sealing spouse" -> Epers_ScellentSpouseLDS
   | "property sale" -> Epers_VenteBien
   | "WILL" -> Epers_Will
+  | "ADOP" -> Epers_Adoption
   | _ -> Epers_Name (add_string gen (strip_spaces tagv))
 
 let primary_pevents =
-  ["BAPM"; "CHR"; "BAPL"; "BARM"; "BASM"; "BIRT"; "BLES"; "BURI"; "CENS";
+  ["ADOP"; "BAPM"; "CHR"; "BAPL"; "BARM"; "BASM"; "BIRT"; "BLES"; "BURI"; "CENS";
    "CONF"; "CONL"; "CREM"; "DEAT"; "DECO"; "EDUC"; "EMIG"; "ENDL"; "FCOM";
    "GRAD"; "IMMI"; "NATU"; "OCCU"; "ORDN"; "PROP"; "RETI"; "RESI"; "SLGS";
    "SLGC"; "WILL"]
