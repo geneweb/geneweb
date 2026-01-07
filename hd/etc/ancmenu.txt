@@ -130,94 +130,19 @@ function missing_events_options () {
       <div class="d-flex flex-column">
         <div class="d-flex flex-column was-validated">
           <label class="sr-only" for="v">[*specify::generation/generations]0[:]</label>
-          <select class="custom-select " id="v" name="v" required title="[up to] 2^n-2 / [only] 2^(n-1)">
+          <select class="custom-select" id="v" name="v" required
+            title="[up to] 2^n-2 / [only] 2^(n-1)">
             <option value="" label=" "></option>
-            %foreach;ancestor_level;
-              %if;(level>0)
-                %empty_sorted_list;
-                %(%anc_paths;%foreach;path_at_level quasi identique !%)
-                %foreach;ancestor;
-                  %apply;add_in_sorted_list(ancestor.birth_date.year)
-                  %apply;add_in_sorted_list(ancestor.death_date.year)
-                %end;
--               %let;b_max_implex_lev;%if;(b.max_implex_lev!="")%b.max_implex_lev;%else;20%end;%in;
-                %let;levelp;%expr(level+1)%in;
-                %let;number_of_ancestors_max;%expr(2^levelp-2)%in;
-                %let;number_of_ancestors_max_at_level;%expr(2^level)%in;
-                %let;dd;%expr(levelp/10)%in;
-                %let;dd_at_level;%expr(level/10)%in;
-                %let;anc_paths_c;%if;(level<b_max_implex_lev)%anc_paths_cnt.v;%else;%number_of_ancestors.v;%end;%in;
-                %let;anc_paths_c_r;%if;(level<b_max_implex_lev)%anc_paths_cnt_raw.v;%else;%number_of_ancestors.v;%end;%in;
-                %let;anc_paths_c_l;%if;(level<b_max_implex_lev)%anc_paths_at_level_cnt.v;%else;%number_of_ancestors_at_level.v;%end;%in;
-                %let;anc_paths_c_l_r;%if;(level<b_max_implex_lev)%anc_paths_at_level_cnt_raw.v;%else;%number_of_ancestors_at_level.v;%end;%in;
-                %let;extra_paths;%expr(anc_paths_c_r-anc_paths_c)%in;
-                %let;extra_paths_at_level;%if;(level<b_max_implex_lev)%expr(anc_paths_c_l_r-anc_paths_c_l)%else;0%end;%in;
-                %let;percent;%expr(100*anc_paths_c|number_of_ancestors_max)%in;
-                %let;percent_paths;%expr(100*anc_paths_c_r|number_of_ancestors_max)%in;
-                %let;percent_plus;%expr(100*(anc_paths_c-anc_paths_c_l)|number_of_ancestors_max)%in;
-                %let;percent_at_level;%expr(100*anc_paths_c_l|number_of_ancestors_max_at_level)%in;
-                %let;percent_paths_at_level;%expr(100*anc_paths_c_l_r|number_of_ancestors_max_at_level)%in;
-                %let;blue;rgba(210,230,255,.5)%in;%let;lred;rgba(255,210,180,.5)%in;%let;whit;rgba(255,255,255,0)%in;
-                <option value="%level;" title="" class="d-flex px-2"
-                    data-lex='%apply;ancname(level)'
-                    data-noa='%anc_paths_c;'
-                    data-noa_l='%anc_paths_c_l;'
-                    %if;(extra_paths!=0)data-path='+%extra_paths;'%end;%sp;
-                    %if;(extra_paths_at_level!=0)data-path_l='+%extra_paths_at_level;'%end;%sp;
-                    data-sty=' style="background:linear-gradient(90deg,
-                      rgba(155,200,255,.5) %percent_plus;%%,%nn;%(lightblue%)
-                      %blue; %percent_plus;%%,%nn;
-                      %blue; %percent;%%,%nn;
-                      %lred; %percent;%%,%nn;
-                      %lred; %percent_paths;%%,%nn;
-                      %whit; %percent_paths;%%"'
-                    data-sty_l=' style="background: linear-gradient(90deg,
-                      rgba(180,200,220,.5) %percent_at_level;%%,%nn;%(lightgrey%)
-                      %lred; %percent_at_level;%%,%nn;
-                      %lred; %percent_paths_at_level;%%,%nn;
-                      %whit; %percent_paths_at_level;%%"'
-                    %( carefull after level 61, number_of_ancestors_max > ocaml max_int;! %)
-                    data-pp='%nn;
-                      %if;(level<61)/%nn;
-                        %if;(level<14)%number_of_ancestors_max;%else;%expr(number_of_ancestors_max|(10^(3*dd)))%end; %nn;
-                        %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
-                        %elseif;(dd=8)Y%elseif;(dd=7)Z%elseif;(dd=6)E%elseif;(dd=5)P%nn;
-                        %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;
-                        %if;(percent!=0) (%percent;
-                          %if;(percent_paths!=percent)-%percent_paths;%end; %%)
-                        %else; (%expr(percent*10)
-                          %if;(percent_paths!=percent)-%expr(percent_paths*10)%end; ‰)
-                        %end;
-                      %end;'
-                    data-pp_l='%nn;
-                      %if;(level<61)/%nn;
-                        %if;(level<17)%number_of_ancestors_max_at_level;
-                        %else;%expr(number_of_ancestors_max_at_level|(10^(3*dd_at_level)))%end; %nn;
-                        %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
-                        %elseif;(level>80)Y%elseif;(level>70)Z%elseif;(level>60)E%elseif;(level>50)P%nn;
-                        %elseif;(level>39)T%elseif;(level>29)G%elseif;(level>18)M%elseif;(level>16)k%else;%end;
-                        %if;(percent_at_level!=0) (%percent_at_level;
-                          %if;(percent_paths_at_level!=percent_at_level)-%percent_paths_at_level;%end; %%)%end;
-                      %end;'
-                    data-per='%foreach;sorted_list_item;
-                                %if;(prev_item.1 = "")%item.1;%end;
-                                %if;(next_item.1 = "")-%item.1;%end;
-                              %end;'
-                    >%nn;
-                  %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%if;(level<10) %(todo fix margin%) %end;%nn;
-                </option>
-              %end;
-            %end;
           </select>
           <div class="invalid-feedback ml-1">
             <i class="fas fa-triangle-exclamation mr-1"></i>[*specify::generation/generations]0
           </div>
         </div>
         <div class="d-flex justify-content-end mt-2">
-          <div class="order-2 align-self-center ml-4">
-            <button type="submit" class="btn btn-outline-primary">Ok</button>
+          <div class="order-2 align-self-center mx-4">
+            <button type="submit" class="btn btn-outline-primary">OK</button>
           </div>
-          <div class="order-1">
+          <div class="order-1 mr-5">
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="only" name="only">
               <label class="custom-control-label" for="only">[*only the generation selected]<span class="text-primary ml-1">✱</span></label>
@@ -595,23 +520,123 @@ function missing_events_options () {
 </div>
 %include;js
 %query_time;
-%let;redlight2;rgb(255,136,46)%in;
 <script>
+const ancStats = %anc_stats_json;;
+const maxAncLevel = %max_anc_level;;
+const ANC_COLORS = {
+  prev: 'rgba(155,200,255,.5)',
+  uniq: 'rgba(210,230,255,.5)',
+  path: 'rgba(255,210,180,.5)',
+  empty: 'rgba(255,255,255,0)',
+  level: 'rgba(180,200,220,.5)'
+};
+
+function gradientCumul(gc) {
+  if (!gc) return '';
+  const { prev, unique, paths } = gc;
+  return ' style="background:linear-gradient(90deg,'
+    + `${ANC_COLORS.prev} ${prev}%,`
+    + `${ANC_COLORS.uniq} ${prev}%,`
+    + `${ANC_COLORS.uniq} ${unique}%,`
+    + `${ANC_COLORS.path} ${unique}%,`
+    + `${ANC_COLORS.path} ${paths}%,`
+    + `${ANC_COLORS.empty} ${paths}%)"`;
+}
+
+function gradientLevel(gl) {
+  if (!gl) return '';
+  const { unique, paths } = gl;
+  return ' style="background:linear-gradient(90deg,'
+    + `${ANC_COLORS.level} ${unique}%,`
+    + `${ANC_COLORS.path} ${unique}%,`
+    + `${ANC_COLORS.path} ${paths}%,`
+    + `${ANC_COLORS.empty} ${paths}%)"`;
+}
+// Inject options from JSON
+ancStats.data.forEach(function(d) {
+  var $opt = $('<option>', { value: d.v, text: d.t });
+  $opt.data('noa', d.noa);
+  $opt.data('noa_l', d.noa_l);
+  $opt.data('path', d.path);
+  $opt.data('path_l', d.path_l);
+  $opt.data('per', d.per);
+  $opt.data('gc', d.gc);
+  $opt.data('gl', d.gl);
+  $opt.data('pp', d.pp);
+  $opt.data('pp_l', d.pp_l);
+  if (d.v > maxAncLevel) {
+    $opt.prop('disabled', true);
+    $opt.addClass('text-muted');
+  }
+  $('#v').append($opt);
+});
+
 $(document).ready(function() {
   $("#v").select2({
-    templateResult: function(el) { return '<div' + (($('#only').is(':checked')) ? ($(el.element).data('sty_l') || '') : ($(el.element).data('sty') || '')) + '" class="d-flex justify-content-around text-right ' + ($(el.element).prop('class') || '') + '"><span class="onlycheck pl-2 text-right" title="' + ($(el.element).data('lex') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</span><span class="ml-2 text-nowrap">' + ($(el.element).data('per') || '') + '</span>' + (($('#only').is(':checked')) ? ('') : ('<div class="col-3 ml-auto text-right">+' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span></div>')) + '<span class="col-3 text-right" title="'+ (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + ($(el.element).data('path_l') || '') + ($(el.element).data('pp_l') || '')) : (($(el.element).data('noa') || '') + ($(el.element).data('path') || '') + ($(el.element).data('pp') || ''))) + '">' + (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '')) : (($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || ''))) + '</span></span></div>'; },
-    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span><span class="ml-auto noa"> ' + (($('#only').is(':checked')) ? ('(' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span>)') : ('(' + ($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || '') + '</span>)')) + '</span><span class=" d-none noa_l"> ' + (($('#only').is(':checked')) ? ('(' + ($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || '') + '</span>)') : ('(' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span>)')) + '</span>'; },
+    templateResult: function(el) {
+      var $el = $(el.element);
+      var isOnly = $('#only').is(':checked');
+      var sty = isOnly
+        ? gradientLevel($el.data('gl'))
+        : gradientCumul($el.data('gc'));
+      var lex = el.text || '';
+      var per = $el.data('per') || '';
+      var noa_l = $el.data('noa_l') || '';
+      var path_l = $el.data('path_l') || '';
+      var noa = $el.data('noa') || '';
+      var path = $el.data('path') || '';
+      var pp = $el.data(isOnly ? 'pp_l' : 'pp') || '';
+      var titleNum = isOnly ? (noa_l + path_l) : (noa + path);
+      var title = titleNum + pp;
+      var prefix = isOnly ? '[only] ' : '[up to] ';
+      var cls = el.disabled ? 'text-muted' : '';
+      var colDate = 'width:' + (isOnly ? '12' : '8') + 'rem';
+
+      return '<div' + sty + ' class="d-flex justify-content-center ' + cls
+        + '" title="' + title + '">'
+        + '<span class="text-right" style="width:14rem">' + prefix + lex + '</span>'
+        + '<span class="text-center" style="' + colDate + '">' + per + '</span>'
+        + '<span class="text-right" style="width:10rem">+' + noa_l
+        + '<span class="ancmenu-implex">' + path_l + '</span></span>'
+        + (isOnly ? '' : '<span class="text-right" style="width:12rem">' + noa
+          + '<span class="ancmenu-implex">' + path + '</span></span>')
+        + '</div>';
+    },
+    templateSelection: function(el) {
+      var isOnly = $('#only').is(':checked');
+      var noa = $(el.element).data(isOnly ? 'noa_l' : 'noa') || '';
+      var path = $(el.element).data(isOnly ? 'path_l' : 'path') || '';
+      var noa2 = $(el.element).data(isOnly ? 'noa' : 'noa_l') || '';
+      var path2 = $(el.element).data(isOnly ? 'path' : 'path_l') || '';
+      var noaHtml = noa
+        ? ' (' + noa + '<span class="ancmenu-implex">' + path + '</span>)'
+        : '';
+      var noa2Html = noa2
+        ? ' (' + noa2 + '<span class="ancmenu-implex">' + path2 + '</span>)'
+        : '';
+      return '<span class="onlycheck">'
+        + (isOnly ? '[only]' : '[up to]') + '</span>'
+        + '<span>' + el.text + '</span>'
+        + '<span class="ml-auto noa">' + noaHtml + '</span>'
+        + '<span class="d-none noa_l">' + noa2Html + '</span>';
+    },
     escapeMarkup: function(markup) { return markup; },
     width: "resolve",
     allowClear: false,
-    placeholder: "… [specify::generation/generations]0 (max %max_anc_level;)",
+    placeholder: "… [specify::generation/generations]0 (max " + maxAncLevel + ")",
     theme: "classic"
   }).maximizeSelect2Height();
-});
+
   $("body").on('change', '#only', function() {
-   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]"), $('.noa').addClass("d-none"), $('.noa_l').removeClass("d-none"))
-                               : ($('.onlycheck').text("[up to]"), $('.noa').removeClass("d-none"), $('.noa_l').addClass("d-none"))
+    ($('#only').is(':checked'))
+      ? ($('.onlycheck').text('[only]'),
+         $('.noa').addClass('d-none'),
+         $('.noa_l').removeClass('d-none'))
+      : ($('.onlycheck').text('[up to]'),
+         $('.noa').removeClass('d-none'),
+         $('.noa_l').addClass('d-none'));
   });
+});
 </script>
 <script>
 (function () {

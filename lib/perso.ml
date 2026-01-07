@@ -2101,6 +2101,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       eval_anc_paths_cnt conf base env ep Paths_cnt true loc sl
   | "anc_paths_at_level" :: sl ->
       eval_anc_paths_cnt conf base env ep Paths true loc sl
+  | [ "anc_stats_json" ] ->
+      VVstring (AncStatsDisplay.compute_json conf base (fst ep))
   | "desc_paths_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
   | "desc_paths_cnt" :: sl ->
