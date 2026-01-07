@@ -467,6 +467,17 @@ val persons_of_surname : base -> string_person_index
 (** Returns data structure that allows to make optimised search throughout
     index by surname *)
 
+val persons_of_lower_first_name : base -> string_person_index
+(** Returns data structure that allows to make optimised search throughout
+    index by first name *)
+
+val persons_of_lower_surname : base -> string_person_index
+(** Returns data structure that allows to make optimised search throughout
+    index by surname *)
+
+val persons_stream_of_first_name_prefix : base -> string -> iper Seq.t
+val persons_stream_of_surname_prefix : base -> string -> iper Seq.t
+
 val spi_first : string_person_index -> string -> istr
 (** Returns first [first/sur]name id starting with that string *)
 
@@ -713,3 +724,9 @@ val sync :
 *)
 
 val set_fpoi_cache : base -> bool -> unit
+
+val initialize_lowercase_name_index :
+  ?on_lock_error:(unit -> unit) ->
+  kind:[< `First_name | `Surname ] ->
+  base ->
+  unit
