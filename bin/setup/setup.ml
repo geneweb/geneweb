@@ -292,7 +292,7 @@ let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 let only_file_name =
   lazy
     (if !only_file = "" then Filename.concat !setup_dir "only.txt"
-    else !only_file)
+     else !only_file)
 
 (* this set of macros are used within translations, hence the repeat of some *)
 (* like %l, %L, %P, ... and they may be different! %G  *)
@@ -1623,14 +1623,14 @@ let input_lexicon lang =
              | Some i ->
                  let line_lang = String.sub line 0 i in
                  (if
-                  line_lang = lang
-                  || (line_lang = derived_lang && not (Hashtbl.mem t k))
-                 then
-                  let v =
-                    if i + 1 = String.length line then ""
-                    else String.sub line (i + 2) (String.length line - i - 2)
-                  in
-                  Hashtbl.add t k v);
+                    line_lang = lang
+                    || (line_lang = derived_lang && not (Hashtbl.mem t k))
+                  then
+                    let v =
+                      if i + 1 = String.length line then ""
+                      else String.sub line (i + 2) (String.length line - i - 2)
+                    in
+                    Hashtbl.add t k v);
                  loop (input_line ic)
              | None -> ()
            in

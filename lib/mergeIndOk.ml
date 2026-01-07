@@ -358,9 +358,9 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
         in
         (* TODO mod_pc = True tout le temps *)
         (if mod_pc then
-         let pc = Gwdb.gen_person_of_person pc in
-         let pc = { pc with rparents = pc_rparents; pevents = pc_pevents } in
-         Gwdb.patch_person base ipc pc);
+           let pc = Gwdb.gen_person_of_person pc in
+           let pc = { pc with rparents = pc_rparents; pevents = pc_pevents } in
+           Gwdb.patch_person base ipc pc);
         let p_related, mod_p =
           let rec loop (p_related, mod_p) i =
             if i = Array.length (Gwdb.get_family pc) then (p_related, mod_p)

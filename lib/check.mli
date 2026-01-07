@@ -17,6 +17,7 @@ val check_base :
   (Warning.base_warning -> unit) ->
   (Gwdb.iper * Gwdb.person * Def.sex option * Gwdb.relation list option -> unit) ->
   unit
-(** [check_base base onwarning onerror _] makes full database proprety check. Checks every person and family separetely
-    with corresponding function inside [CheckItem] module. Checks also person's graph in order to find cycles (if person
-    is own ancestor). *)
+(** [check_base base onwarning onerror _] makes full database proprety check.
+    Checks every person and family separetely with corresponding function inside
+    [CheckItem] module. Checks also person's graph in order to find cycles (if
+    person is own ancestor). *)

@@ -1004,9 +1004,9 @@ and print_foreach_dag_cell_pre hts print_ast env al =
           else displayed_sub outs (pos1 - pos) (pos2 - pos1)
       in
       (if clipped_outs <> "" then
-       let v = Vdcellp clipped_outs in
-       let print_ast = print_ast (("dag_cell_pre", v) :: env) () in
-       List.iter print_ast al);
+         let v = Vdcellp clipped_outs in
+         let print_ast = print_ast (("dag_cell_pre", v) :: env) () in
+         List.iter print_ast al);
       loop (pos + sz) (col + colspan) (j + 1)
   in
   loop 0 0 0
