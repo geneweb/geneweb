@@ -48,12 +48,10 @@ let print_clean conf =
 
 (* ************************************************************************ *)
 
-(** [Description] : Ré-écrit le fichier historique lié à une personne en
-      ayant supprimé les entrées non désirées.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Ré-écrit le fichier historique lié à une personne en ayant
+    supprimé les entrées non désirées. [Args] :
+    - conf : configuration de la base [Retour] : Néant [Rem] : Exporté en clair
+      hors de ce module. *)
 let print_clean_ok conf =
   let rec clean_history i history new_history =
     match history with
@@ -76,20 +74,20 @@ let print_clean_ok conf =
       let new_history = clean_history 0 history [] in
       let fname = HistoryDiff.history_path conf f in
       (if new_history = [] then Files.rm fname
-      else
-        let ext_flags =
-          [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
-        in
-        match
-          try Some (Secure.open_out_gen ext_flags 0o644 fname)
-          with Sys_error _ -> None
-        with
-        | Some oc ->
-            List.iter
-              (fun v -> output_value oc (v : HistoryDiff.gen_record))
-              new_history;
-            close_out oc
-        | None -> ());
+       else
+         let ext_flags =
+           [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
+         in
+         match
+           try Some (Secure.open_out_gen ext_flags 0o644 fname)
+           with Sys_error _ -> None
+         with
+         | Some oc ->
+             List.iter
+               (fun v -> output_value oc (v : HistoryDiff.gen_record))
+               new_history;
+             close_out oc
+         | None -> ());
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 
@@ -446,13 +444,10 @@ let string_of_efam_name conf efam_name =
 (* ************************************************************************ *)
 
 (** [Description] : Converti un tableau de char en string, avec les parties
-      modifiées encadrées par des balises <span>.
-    [Args] :
-      - arr : tableau à convertir
-      - diff_arr : tableau des différences
-    [Retour] :
-      - string
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+    modifiées encadrées par des balises <span>. [Args] :
+    - arr : tableau à convertir
+    - diff_arr : tableau des différences [Retour] :
+    - string [Rem] : Non exporté en clair hors de ce module. *)
 let highlight_diff arr diff_arr =
   let rec loop i s =
     if i >= Array.length arr then s
@@ -475,13 +470,10 @@ let highlight_diff arr diff_arr =
 
 (* ************************************************************************ *)
 
-(** [Description] : Converti une string en tableau de char afin de pouvoir
-      faire un diff.
-    [Args] :
-      - s : string à convertir
-    [Retour] :
-      - char array
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+(** [Description] : Converti une string en tableau de char afin de pouvoir faire
+    un diff. [Args] :
+    - s : string à convertir [Retour] :
+    - char array [Rem] : Non exporté en clair hors de ce module. *)
 let array_of_string s =
   let s = (s :> string) in
   let len = String.length s in
