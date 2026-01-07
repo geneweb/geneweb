@@ -1104,13 +1104,13 @@ let opendb bname =
     match ic2 with Some ic2 -> Some (input_binary_int ic2) | None -> None
   in
   (if true then
-   match ic2 with
-   | Some ic2 ->
-       ignore @@ input_binary_int ic2;
-       (* ic2_surname_start_pos *)
-       ignore @@ input_binary_int ic2
-       (* ic2_first_name_start_pos *)
-   | None -> ());
+     match ic2 with
+     | Some ic2 ->
+         ignore @@ input_binary_int ic2;
+         (* ic2_surname_start_pos *)
+         ignore @@ input_binary_int ic2
+         (* ic2_first_name_start_pos *)
+     | None -> ());
   let shift = 0 in
   let iper_exists =
     make_record_exists (snd patches.h_person) (snd pending.h_person) persons_len
@@ -1431,45 +1431,47 @@ let opendb bname =
             bname );
       persons_of_lower_surname =
         (if
-         Sys.file_exists (Filename.concat bname lowercase_surname_index_file)
-         && Sys.file_exists (Filename.concat bname lowercase_surname_data_file)
-        then
-         persons_of_lower_fs_name version base_data
-           ( (fun p -> p.surname :: p.surnames_aliases),
-             first_name_changed,
-             snd patches.h_person,
-             lowercase_surname_index_file,
-             lowercase_surname_data_file,
-             bname )
-        else
-          persons_of_surname version base_data
-            ( (fun p -> p.surname :: p.surnames_aliases),
-              surname_changed,
-              snd patches.h_person,
-              "snames.inx",
-              "snames.dat",
-              bname ));
+           Sys.file_exists (Filename.concat bname lowercase_surname_index_file)
+           && Sys.file_exists
+                (Filename.concat bname lowercase_surname_data_file)
+         then
+           persons_of_lower_fs_name version base_data
+             ( (fun p -> p.surname :: p.surnames_aliases),
+               first_name_changed,
+               snd patches.h_person,
+               lowercase_surname_index_file,
+               lowercase_surname_data_file,
+               bname )
+         else
+           persons_of_surname version base_data
+             ( (fun p -> p.surname :: p.surnames_aliases),
+               surname_changed,
+               snd patches.h_person,
+               "snames.inx",
+               "snames.dat",
+               bname ));
       persons_of_lower_first_name =
         (if
-         Sys.file_exists (Filename.concat bname lowercase_first_name_index_file)
-         && Sys.file_exists
-              (Filename.concat bname lowercase_first_name_data_file)
-        then
-         persons_of_lower_fs_name version base_data
-           ( (fun p -> p.first_name :: p.first_names_aliases),
-             first_name_changed,
-             snd patches.h_person,
-             lowercase_first_name_index_file,
-             lowercase_first_name_data_file,
-             bname )
-        else
-          persons_of_first_name version base_data
-            ( (fun p -> p.first_name :: p.first_names_aliases),
-              first_name_changed,
-              snd patches.h_person,
-              "fnames.inx",
-              "fnames.dat",
-              bname ));
+           Sys.file_exists
+             (Filename.concat bname lowercase_first_name_index_file)
+           && Sys.file_exists
+                (Filename.concat bname lowercase_first_name_data_file)
+         then
+           persons_of_lower_fs_name version base_data
+             ( (fun p -> p.first_name :: p.first_names_aliases),
+               first_name_changed,
+               snd patches.h_person,
+               lowercase_first_name_index_file,
+               lowercase_first_name_data_file,
+               bname )
+         else
+           persons_of_first_name version base_data
+             ( (fun p -> p.first_name :: p.first_names_aliases),
+               first_name_changed,
+               snd patches.h_person,
+               "fnames.inx",
+               "fnames.dat",
+               bname ));
       persons_stream_of_first_name_prefix =
         persons_stream_of_first_name_prefix ~insert_string ~base_data ~version
           ~patches;

@@ -238,8 +238,8 @@ type ('iper, 'person, 'string) gen_person = {
 (** Polymorphic type describing information about person. *)
 
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
-(** Person's ascendants (family where he is a children) with its consangunity rate
-    (equal to relationship betwen his parents). *)
+(** Person's ascendants (family where he is a children) with its consangunity
+    rate (equal to relationship betwen his parents). *)
 
 (* Person's families to which he belongs as parent (union of families) *)
 type 'family gen_union = { family : 'family array }

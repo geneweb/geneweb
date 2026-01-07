@@ -316,14 +316,16 @@ let print_title opts base t =
   Printf.ksprintf (oc opts) ":";
   Printf.ksprintf (oc opts) "%s" (correct_string_no_colon base t.Def.t_place);
   (if t.Def.t_nth <> 0 then Printf.ksprintf (oc opts) ":"
-  else
-    match (t_date_start, t_date_end) with
-    | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) ":"
-    | _ -> ());
+   else
+     match (t_date_start, t_date_end) with
+     | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) ":"
+     | _ -> ());
   print_title_date_option opts t_date_start;
   (if t.Def.t_nth <> 0 then Printf.ksprintf (oc opts) ":"
-  else
-    match t_date_end with Some _ -> Printf.ksprintf (oc opts) ":" | None -> ());
+   else
+     match t_date_end with
+     | Some _ -> Printf.ksprintf (oc opts) ":"
+     | None -> ());
   print_title_date_option opts t_date_end;
   if t.Def.t_nth <> 0 then Printf.ksprintf (oc opts) ":%d" t.Def.t_nth;
   Printf.ksprintf (oc opts) "]"
@@ -486,8 +488,8 @@ let print_parent opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s" (s_correct_string surname)
     (s_correct_string first_name)
     (if first_name = "?" && surname = "?" then ""
-    else if get_new_occ p = 0 then ""
-    else "." ^ string_of_int (get_new_occ p));
+     else if get_new_occ p = 0 then ""
+     else "." ^ string_of_int (get_new_occ p));
   if pr then
     if has_infos then print_infos gen opts base false "" "" p
     else if first_name <> "?" && surname <> "?" then
@@ -925,7 +927,7 @@ let print_family opts base gen m =
                   Gwdb.get_fevent_note evt
                   ::
                   (if opts.source = None then Gwdb.get_fevent_src evt :: accu
-                  else accu)
+                   else accu)
                 in
                 loop l acc
           in
@@ -987,73 +989,74 @@ let print_notes_for_person opts base gen p =
       Printf.ksprintf (oc opts) "beg\n";
       if notes <> "" then Printf.ksprintf (oc opts) "%s\n" notes;
       (if put_events_in_notes base p then
-       let rec loop pevents =
-         match pevents with
-         | [] -> ()
-         | evt :: events -> (
-             match Gwdb.get_pevent_name evt with
-             | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
-             | Epers_Cremation ->
-                 let name =
-                   (* TODO use Check.string_of_epers_name instead? *)
-                   match Gwdb.get_pevent_name evt with
-                   | Epers_Birth -> "birth"
-                   | Epers_Baptism -> "baptism"
-                   | Epers_Death -> "death"
-                   | Epers_Burial -> "burial"
-                   | Epers_Cremation -> "cremation"
-                   | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
-                   | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
-                   | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
-                   | Epers_Confirmation | Epers_ConfirmationLDS
-                   | Epers_Decoration | Epers_DemobilisationMilitaire
-                   | Epers_Diploma | Epers_Distinction | Epers_Dotation
-                   | Epers_DotationLDS | Epers_Education | Epers_Election
-                   | Epers_Emigration | Epers_Excommunication
-                   | Epers_FamilyLinkLDS | Epers_FirstCommunion | Epers_Funeral
-                   | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
-                   | Epers_Immigration | Epers_ListePassenger
-                   | Epers_MilitaryDistinction | Epers_MilitaryPromotion
-                   | Epers_MilitaryService | Epers_MobilisationMilitaire
-                   | Epers_Naturalisation | Epers_Occupation | Epers_Ordination
-                   | Epers_Property | Epers_Recensement | Epers_Residence
-                   | Epers_Retired | Epers_ScellentChildLDS
-                   | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS
-                   | Epers_VenteBien | Epers_Will | Epers_Adoption
-                   | Epers_Name _ ->
-                       ""
-                 in
-                 let notes =
-                   if opts.Gwexport.notes then
-                     Gwdb.sou base (Gwdb.get_pevent_note evt)
-                   else ""
-                 in
-                 if notes <> "" then
-                   Printf.ksprintf (oc opts) "%s: %s\n" name notes;
-                 print_witnesses opts base gen ~use_per_sel:false
-                   (Gwdb.get_pevent_witnesses_and_notes evt);
-                 loop events
-             | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
-             | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
-             | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
-             | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Decoration
-             | Epers_DemobilisationMilitaire | Epers_Diploma | Epers_Distinction
-             | Epers_Dotation | Epers_DotationLDS | Epers_Education
-             | Epers_Election | Epers_Emigration | Epers_Excommunication
-             | Epers_FamilyLinkLDS | Epers_FirstCommunion | Epers_Funeral
-             | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
-             | Epers_Immigration | Epers_ListePassenger
-             | Epers_MilitaryDistinction | Epers_MilitaryPromotion
-             | Epers_MilitaryService | Epers_MobilisationMilitaire
-             | Epers_Naturalisation | Epers_Occupation | Epers_Ordination
-             | Epers_Property | Epers_Recensement | Epers_Residence
-             | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentParentLDS
-             | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will
-             | Epers_Adoption | Epers_Name _ ->
-                 print_pevent opts base gen evt;
-                 loop events)
-       in
-       loop (Gwdb.get_pevents p));
+         let rec loop pevents =
+           match pevents with
+           | [] -> ()
+           | evt :: events -> (
+               match Gwdb.get_pevent_name evt with
+               | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+               | Epers_Cremation ->
+                   let name =
+                     (* TODO use Check.string_of_epers_name instead? *)
+                     match Gwdb.get_pevent_name evt with
+                     | Epers_Birth -> "birth"
+                     | Epers_Baptism -> "baptism"
+                     | Epers_Death -> "death"
+                     | Epers_Burial -> "burial"
+                     | Epers_Cremation -> "cremation"
+                     | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
+                     | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
+                     | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
+                     | Epers_Confirmation | Epers_ConfirmationLDS
+                     | Epers_Decoration | Epers_DemobilisationMilitaire
+                     | Epers_Diploma | Epers_Distinction | Epers_Dotation
+                     | Epers_DotationLDS | Epers_Education | Epers_Election
+                     | Epers_Emigration | Epers_Excommunication
+                     | Epers_FamilyLinkLDS | Epers_FirstCommunion
+                     | Epers_Funeral | Epers_Graduate | Epers_Hospitalisation
+                     | Epers_Illness | Epers_Immigration | Epers_ListePassenger
+                     | Epers_MilitaryDistinction | Epers_MilitaryPromotion
+                     | Epers_MilitaryService | Epers_MobilisationMilitaire
+                     | Epers_Naturalisation | Epers_Occupation
+                     | Epers_Ordination | Epers_Property | Epers_Recensement
+                     | Epers_Residence | Epers_Retired | Epers_ScellentChildLDS
+                     | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS
+                     | Epers_VenteBien | Epers_Will | Epers_Adoption
+                     | Epers_Name _ ->
+                         ""
+                   in
+                   let notes =
+                     if opts.Gwexport.notes then
+                       Gwdb.sou base (Gwdb.get_pevent_note evt)
+                     else ""
+                   in
+                   if notes <> "" then
+                     Printf.ksprintf (oc opts) "%s: %s\n" name notes;
+                   print_witnesses opts base gen ~use_per_sel:false
+                     (Gwdb.get_pevent_witnesses_and_notes evt);
+                   loop events
+               | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
+               | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
+               | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
+               | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Decoration
+               | Epers_DemobilisationMilitaire | Epers_Diploma
+               | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
+               | Epers_Education | Epers_Election | Epers_Emigration
+               | Epers_Excommunication | Epers_FamilyLinkLDS
+               | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
+               | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
+               | Epers_ListePassenger | Epers_MilitaryDistinction
+               | Epers_MilitaryPromotion | Epers_MilitaryService
+               | Epers_MobilisationMilitaire | Epers_Naturalisation
+               | Epers_Occupation | Epers_Ordination | Epers_Property
+               | Epers_Recensement | Epers_Residence | Epers_Retired
+               | Epers_ScellentChildLDS | Epers_ScellentParentLDS
+               | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will
+               | Epers_Adoption | Epers_Name _ ->
+                   print_pevent opts base gen evt;
+                   loop events)
+         in
+         loop (Gwdb.get_pevents p));
       Printf.ksprintf (oc opts) "end notes\n");
     let from =
       Printf.sprintf "person \"%s.%d %s\"" (Gwdb.p_first_name base p)
@@ -1822,10 +1825,10 @@ let gwu_simple ~export_isolated opts =
       let () = Gwdb.load_ascends_array base in
       let () = Gwdb.load_strings_array base in
       (if not opts.Gwexport.mem then
-       let () = Gwdb.load_couples_array base in
-       let () = Gwdb.load_unions_array base in
-       let () = Gwdb.load_descends_array base in
-       ());
+         let () = Gwdb.load_couples_array base in
+         let () = Gwdb.load_unions_array base in
+         let () = Gwdb.load_descends_array base in
+         ());
       let _ofile, oc, close = opts.Gwexport.oc in
       if not !raw_output then oc "encoding: utf-8\n";
       if !old_gw then oc "\n" else oc "gwplus\n\n";

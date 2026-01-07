@@ -118,4 +118,5 @@ val string_of_title :
   * Gwdb.istr list
   * (Date.date option * Date.date option) list ->
   Adef.safe_string
-(** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate} *)
+(** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate}
+*)

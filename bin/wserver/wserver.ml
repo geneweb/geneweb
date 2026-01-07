@@ -228,8 +228,8 @@ let wait_available max_clients s =
   match max_clients with
   | Some m ->
       (if List.length !pids >= m then
-       let pid, _ = Unix.wait () in
-       pids := list_remove pid !pids);
+         let pid, _ = Unix.wait () in
+         pids := list_remove pid !pids);
       if !pids <> [] then cleanup_sons ();
       let stop_verbose = ref false in
       while !pids <> [] && Unix.select [ s ] [] [] 15.0 = ([], [], []) do

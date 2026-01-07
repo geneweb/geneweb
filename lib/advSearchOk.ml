@@ -343,9 +343,9 @@ end = struct
       p
       |> Event.other_events conf base
       |> List.map (fun e (* wrap value in unit -> dmy to be lazy ?*) () ->
-             Date.cdate_to_dmy_opt @@ Event.get_date e)
+          Date.cdate_to_dmy_opt @@ Event.get_date e)
       |> List.exists (fun event_date_f ->
-             match_date ~p ~default:false ~dates ~df:(fun _ -> event_date_f ()))
+          match_date ~p ~default:false ~dates ~df:(fun _ -> event_date_f ()))
 
   let match_name ~search_list ~mode : string list -> bool =
     let matching : string list -> string list -> bool =
@@ -817,9 +817,7 @@ end = struct
           match Util.p_getenv conf.Config.env k with
           | Some v ->
               loop
-                (if acc = "" then v
-                else if v = "" then acc
-                else acc ^ " / " ^ v)
+                (if acc = "" then v else if v = "" then acc else acc ^ " / " ^ v)
                 (i + 1)
           | None -> acc
         in

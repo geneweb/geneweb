@@ -140,14 +140,12 @@ let combine_by_ini ~ignore_case ini list =
 
 (* ************************************************************************** *)
 
-(** [Description] : Retourne la sous liste telle que la somme des longueurs
-                    des ('b list) soit égale à size.
-    [Args] :
-      - size : la taille de la liste retournée
-      - list : la liste originale
-    [Retour] :
-      - list : la nouvelle liste dont la somme des ('b list) est égale à size
-    [Rem] : Non exporté en clair hors de ce module.                           *)
+(** [Description] : Retourne la sous liste telle que la somme des longueurs des
+    ('b list) soit égale à size. [Args] :
+    - size : la taille de la liste retournée
+    - list : la liste originale [Retour] :
+    - list : la nouvelle liste dont la somme des ('b list) est égale à size
+      [Rem] : Non exporté en clair hors de ce module. *)
 let reduce_cpl_list size list =
   let rec loop size cnt reduced_list list =
     if cnt >= size then reduced_list
@@ -167,16 +165,14 @@ let reduce_cpl_list size list =
 
 (* ************************************************************************** *)
 
-(** [Description] : Met à jour le/les champ(s) de la personne.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - old  : l'ancien contenu
-      - new_input : le nouveau contenu
-      - p : person
-    [Retour] :
-      - gen_person iper istr : gen_person avec les champs modifiés
-    [Rem] : Non exporté en clair hors de ce module.                           *)
+(** [Description] : Met à jour le/les champ(s) de la personne. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - old : l'ancien contenu
+    - new_input : le nouveau contenu
+    - p : person [Retour] :
+    - gen_person iper istr : gen_person avec les champs modifiés [Rem] : Non
+      exporté en clair hors de ce module. *)
 let update_person conf base old new_input p =
   match get_data_kind_from_env conf.Config.env with
   | Some `occupation ->
@@ -335,16 +331,14 @@ let update_person conf base old new_input p =
 
 (* ************************************************************************** *)
 
-(** [Description] : Met à jour le/les champ(s) de la famille.
-    [Args] :
-      - conf      : configuration de la base
-      - base      : base de donnée
-      - old       : l'ancien contenu
-      - new_input : le nouveau contenu
-      - fam       : family
-    [Retour] :
-      - gen_family ifam istr : gen_family avec les champs modifiés
-    [Rem] : Non exporté en clair hors de ce module.                           *)
+(** [Description] : Met à jour le/les champ(s) de la famille. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - old : l'ancien contenu
+    - new_input : le nouveau contenu
+    - fam : family [Retour] :
+    - gen_family ifam istr : gen_family avec les champs modifiés [Rem] : Non
+      exporté en clair hors de ce module. *)
 let update_family conf base old new_istr fam =
   match get_data_kind_from_env conf.Config.env with
   | Some `place ->
@@ -396,17 +390,14 @@ let update_family conf base old new_istr fam =
 
 (* ********************************************************************** *)
 
-(** [Description] :
-    [Args] :
-      - conf      : configuration
-      - base      : base
-      - new_input : le nouveau contenu
-      - list      : la liste des (clé, person list)
-      - nb_pers   : le nombre de personnes concernées par la mise à jour
-      - max_updates = le nombre maximum de persons que l'on met à jour
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : [Args] :
+    - conf : configuration
+    - base : base
+    - new_input : le nouveau contenu
+    - list : la liste des (clé, person list)
+    - nb_pers : le nombre de personnes concernées par la mise à jour
+    - max_updates = le nombre maximum de persons que l'on met à jour [Retour] :
+    - unit [Rem] : Non exporté en clair hors de ce module. *)
 let update_person_list conf base new_input list nb_pers max_updates =
   let data_kind = get_data_kind_from_env conf.Config.env in
   let test_family =
@@ -432,15 +423,16 @@ let update_person_list conf base new_input list nb_pers max_updates =
           let o_p = Gwdb.gen_person_of_person p in
           let np = update_person conf base old new_input p in
           (if action = "fn" || action = "sn" then
-           let pi = np.key_index in
-           let op = Gwdb.poi base pi in
-           let sp =
-             Futil.map_person_ps
-               (fun ip -> ip)
-               (fun ?format:_ istr -> Gwdb.sou base istr)
-               np
-           in
-           Image.rename_portrait conf base op (sp.first_name, sp.surname, sp.occ));
+             let pi = np.key_index in
+             let op = Gwdb.poi base pi in
+             let sp =
+               Futil.map_person_ps
+                 (fun ip -> ip)
+                 (fun ?format:_ istr -> Gwdb.sou base istr)
+                 np
+             in
+             Image.rename_portrait conf base op
+               (sp.first_name, sp.surname, sp.occ));
           Gwdb.patch_person base np.key_index np;
           if test_family then
             Array.iter
@@ -523,7 +515,7 @@ let build_list_short conf list =
           (* Astuce pour gérer les espaces. *)
           Ext_string.tr ' ' '_'
             (if String.length s > i then String.sub s 0 (Utf8.next s i)
-            else s ^ String.make (i + 1 - String.length s) '_'))
+             else s ^ String.make (i + 1 - String.length s) '_'))
         l
     in
     let inis = List.sort_uniq Utf8.alphabetic_order inis in

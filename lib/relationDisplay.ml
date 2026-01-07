@@ -86,7 +86,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   Util.commd conf ^^^ "em=R&ei=" ^<^ Gwdb.string_of_iper ip1 ^<^ "&i="
   ^<^ Gwdb.string_of_iper ip2
   ^<^ (if Util.p_getenv conf.Config.env "spouse" = Some "on" then "&spouse=on"
-      else "")
+       else "")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
 
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
@@ -546,9 +546,9 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
           ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
           ^<^ Util.acces_n conf base (Adef.escaped "2") dp2
           ^^^ (if pp1 = None then Adef.escaped ""
-              else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
+               else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
           ^^^ (if pp2 = None then Adef.escaped ""
-              else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
+               else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
           ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
           ^^^ image_opt
         in
@@ -601,9 +601,9 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
           ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
           ^<^ Util.acces_n conf base (Adef.escaped "2") dp2
           ^^^ (if pp1 = None then Adef.escaped ""
-              else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
+               else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
           ^^^ (if pp2 = None then Adef.escaped ""
-              else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
+               else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
           ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
           ^^^ image_opt
         in

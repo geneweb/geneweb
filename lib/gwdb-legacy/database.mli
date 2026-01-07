@@ -17,19 +17,20 @@ val make :
   * Def.base_notes ->
   Dbdisk.dsk_base
 (** [make bname particles ((persons, ascendants, unions) (families, couples,
-    descendants) strings base_notes)] returns initialised with giving data
+     descendants) strings base_notes)] returns initialised with giving data
     [dsk_base]. This function is called exclusively for database creating
     purpose. It means that, it contains only data without functionalities.
-    Either call [opendb] on existing database or call [Gwdb.make], if you
-    want to make requests. *)
+    Either call [opendb] on existing database or call [Gwdb.make], if you want
+    to make requests. *)
 
 (* Ajout pour l'API *)
 
 type synchro_patch = {
   mutable synch_list : (string * int list * int list) list;
 }
-(** List of commited modifications inside the database. First element is a timestamp of a commit,
-    second - changed/added by considered commit person ids, third - changed/added by considered commit families ids. *)
+(** List of commited modifications inside the database. First element is a
+    timestamp of a commit, second - changed/added by considered commit person
+    ids, third - changed/added by considered commit families ids. *)
 
 val lowercase_first_name_index_file : string
 val lowercase_first_name_data_file : string

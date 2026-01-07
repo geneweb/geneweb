@@ -40,23 +40,22 @@ let is_contemporary conf base p =
   in
   is_empty p || is_contemporary' conf base private_years p
 
-(** Calcul les droits de visualisation d'une personne en
-      fonction de son age.
-      Renvoie (dans l'ordre des tests) :
-      - Vrai si : magicien ou ami ou la personne est public
-      - Vrai si : la personne est en si_titre, si elle a au moins un
-                  titre et que public_if_title = yes dans le fichier gwf
-      - Faux si : la personne n'est pas décédée et private_years > 0
-      - Vrai si : la personne est plus agée (en fonction de la date de
-                  naissance ou de la date de baptème) que privates_years
-      - Faux si : la personne est plus jeune (en fonction de la date de
-                  naissance ou de la date de baptème) que privates_years
-      - Vrai si : la personne est décédée depuis plus de privates_years
-      - Faux si : la personne est décédée depuis moins de privates_years
-      - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
-                  privée et public_if_no_date = yes
-      - Vrai si : la personne s'est mariée depuis plus de private_years
-      - Faux dans tous les autres cas *)
+(** Calcul les droits de visualisation d'une personne en fonction de son age.
+    Renvoie (dans l'ordre des tests) :
+    - Vrai si : magicien ou ami ou la personne est public
+    - Vrai si : la personne est en si_titre, si elle a au moins un titre et que
+      public_if_title = yes dans le fichier gwf
+    - Faux si : la personne n'est pas décédée et private_years > 0
+    - Vrai si : la personne est plus agée (en fonction de la date de naissance
+      ou de la date de baptème) que privates_years
+    - Faux si : la personne est plus jeune (en fonction de la date de naissance
+      ou de la date de baptème) que privates_years
+    - Vrai si : la personne est décédée depuis plus de privates_years
+    - Faux si : la personne est décédée depuis moins de privates_years
+    - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas privée et
+      public_if_no_date = yes
+    - Vrai si : la personne s'est mariée depuis plus de private_years
+    - Faux dans tous les autres cas *)
 let is_visible conf base p =
   (not (is_empty p))
   && (conf.Config.wizard || conf.friend

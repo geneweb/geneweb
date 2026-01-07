@@ -26,7 +26,8 @@ let no_accent = function
   | '\187' -> '>'
   | c -> c
 
-let accent_code = (* and 1-to-1 conversions *)
+let accent_code =
+  (* and 1-to-1 conversions *)
   function
   | '\192' | '\200' | '\204' | '\210' | '\217' | '\224' | '\232' | '\236'
   | '\242' | '\249' ->

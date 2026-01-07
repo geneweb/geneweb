@@ -25,13 +25,11 @@ let print_img conf img =
   Output.print_string conf img;
   Output.print_sstring conf {|" alt="" title="">|}
 
-(** [Description] : A partir de l'affichage par branches, permet
-                    d'afficher les liens pour un affichage par ordre
-                    alphabétique.
-    [Args] :
-      - conf      : configuration de la base
-      - x         : 'nom/prénom/sosa...' recherché
-      - nb_branch : nombre de branches dans le résultat de la recherche *)
+(** [Description] : A partir de l'affichage par branches, permet d'afficher les
+    liens pour un affichage par ordre alphabétique. [Args] :
+    - conf : configuration de la base
+    - x : 'nom/prénom/sosa...' recherché
+    - nb_branch : nombre de branches dans le résultat de la recherche *)
 let print_branch_to_alphabetic ~exact (conf : Config.Trimmed.t) (x : string)
     (nb_branch : int) : unit =
   let conf = Config.Trimmed.to_config conf in
@@ -71,11 +69,10 @@ let print_branch_to_alphabetic ~exact (conf : Config.Trimmed.t) (x : string)
   (* Ne pas oublier l'attribut nofollow pour les robots *)
   Output.print_sstring conf "</td></tr></table><br>"
 
-(** [Description] : A partir de l'affichage alphabétique, permet
-                    d'afficher les liens pour un affichage par branches.
-    [Args] :
-      - conf      : configuration de la base
-      - x         : 'nom/prénom/sosa...' recherché                      *)
+(** [Description] : A partir de l'affichage alphabétique, permet d'afficher les
+    liens pour un affichage par branches. [Args] :
+    - conf : configuration de la base
+    - x : 'nom/prénom/sosa...' recherché *)
 let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf

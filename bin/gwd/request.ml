@@ -126,17 +126,17 @@ let specify conf base n pl =
       Geneweb.Output.print_string conf
         (Geneweb.DateDisplay.short_dates_text conf base p);
       (if Geneweb.Person.is_visible conf base p then
-       match Gwdb.get_first_names_aliases p with
-       | [] -> ()
-       | fnal ->
-           Geneweb.Output.print_sstring conf "\n<em>(";
-           Ext_list.iter_first
-             (fun first fna ->
-               if not first then Geneweb.Output.print_sstring conf ", ";
-               Gwdb.sou base fna |> Geneweb.Util.escape_html
-               |> Geneweb.Output.print_string conf)
-             fnal;
-           Geneweb.Output.print_sstring conf ")</em>");
+         match Gwdb.get_first_names_aliases p with
+         | [] -> ()
+         | fnal ->
+             Geneweb.Output.print_sstring conf "\n<em>(";
+             Ext_list.iter_first
+               (fun first fna ->
+                 if not first then Geneweb.Output.print_sstring conf ", ";
+                 Gwdb.sou base fna |> Geneweb.Util.escape_html
+                 |> Geneweb.Output.print_string conf)
+               fnal;
+             Geneweb.Output.print_sstring conf ")</em>");
       let spouses =
         Array.fold_right
           (fun ifam spouses ->
@@ -487,21 +487,21 @@ let treat_request =
         let m = Option.value ~default:"" (Geneweb.Util.p_getenv conf.env "m") in
         if not @@ try_plugin plugins conf bfile m then
           ((if List.assoc_opt "counter" conf.base_env <> Some "no" then
-            match
-              if only_special_env conf.env then
-                Geneweb.SrcfileDisplay.incr_welcome_counter conf
-              else Geneweb.SrcfileDisplay.incr_request_counter conf
-            with
-            | Some (welcome_cnt, request_cnt, start_date) ->
-                Log.log (fun oc ->
-                    let thousand oc x =
-                      output_string oc @@ Mutil.string_of_int_sep "," x
-                    in
-                    Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
-                      thousand
-                      (welcome_cnt + request_cnt)
-                      thousand welcome_cnt start_date)
-            | None -> ());
+              match
+                if only_special_env conf.env then
+                  Geneweb.SrcfileDisplay.incr_welcome_counter conf
+                else Geneweb.SrcfileDisplay.incr_request_counter conf
+              with
+              | Some (welcome_cnt, request_cnt, start_date) ->
+                  Log.log (fun oc ->
+                      let thousand oc x =
+                        output_string oc @@ Mutil.string_of_int_sep "," x
+                      in
+                      Printf.fprintf oc
+                        "  #accesses %a (#welcome %a) since %s\n" thousand
+                        (welcome_cnt + request_cnt)
+                        thousand welcome_cnt start_date)
+              | None -> ());
            let incorrect_request conf _ = incorrect_request conf in
            match m with
            | "" ->
@@ -529,15 +529,15 @@ let treat_request =
                else
                  w_base
                    (if only_special_env conf.env then
-                    Geneweb.SrcfileDisplay.print_start
-                   else
-                     w_person @@ fun conf base p ->
-                     match Geneweb.Util.p_getenv conf.env "ptempl" with
-                     | Some t
-                       when List.assoc_opt "ptempl" conf.base_env = Some "yes"
-                       ->
-                         Geneweb.Perso.interp_templ t conf base p
-                     | _ -> person_selected conf base p)
+                      Geneweb.SrcfileDisplay.print_start
+                    else
+                      w_person @@ fun conf base p ->
+                      match Geneweb.Util.p_getenv conf.env "ptempl" with
+                      | Some t
+                        when List.assoc_opt "ptempl" conf.base_env = Some "yes"
+                        ->
+                          Geneweb.Perso.interp_templ t conf base p
+                      | _ -> person_selected conf base p)
            | "A" -> Geneweb.Perso.print_ascend |> w_person |> w_base
            | "ADD_FAM" -> w_wizard @@ w_base @@ Geneweb.UpdateFam.print_add
            | "ADD_FAM_OK" ->

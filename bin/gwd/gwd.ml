@@ -1227,21 +1227,21 @@ let make_conf from_addr request script_name env =
         List.assoc_opt "hide_private_names" base_env = Some "yes";
       use_restrict =
         (if ar.ar_wizard || ar.ar_friend then false
-        else List.assoc_opt "use_restrict" base_env = Some "yes");
+         else List.assoc_opt "use_restrict" base_env = Some "yes");
       no_image =
         (if ar.ar_wizard || ar.ar_friend then false
-        else List.assoc_opt "no_image_for_visitor" base_env = Some "yes");
+         else List.assoc_opt "no_image_for_visitor" base_env = Some "yes");
       no_note =
         (if ar.ar_wizard || ar.ar_friend then false
-        else List.assoc_opt "no_note_for_visitor" base_env = Some "yes");
+         else List.assoc_opt "no_note_for_visitor" base_env = Some "yes");
       bname = base_file;
       env;
       senv = [];
       cgi_passwd = ar.ar_passwd;
       henv =
         ((if not !Wserver.cgi then []
-         else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
-         else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
+          else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
+          else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
         @ (if lang = "" then [] else [ ("lang", Mutil.encode lang) ])
         @ if from = "" then [] else [ ("opt", Mutil.encode from) ]);
       base_env;
@@ -1277,11 +1277,11 @@ let make_conf from_addr request script_name env =
       ctime = utm;
       image_prefix =
         (if !images_url <> "" then !images_url
-        else if !Wserver.cgi then
-          match Sys.getenv_opt "GW_STATIC_PATH" with
-          | Some x -> x ^ "../images"
-          | None -> "../distribution/gw/images/"
-        else "images");
+         else if !Wserver.cgi then
+           match Sys.getenv_opt "GW_STATIC_PATH" with
+           | Some x -> x ^ "../images"
+           | None -> "../distribution/gw/images/"
+         else "images");
       static_path =
         (match Sys.getenv_opt "GW_STATIC_PATH" with
         | Some x -> x
@@ -1420,11 +1420,12 @@ let conf_and_connection =
         in
         let mode = Geneweb.Util.p_getenv conf.env "m" in
         (if mode <> Some "IM" then
-         let contents =
-           if List.mem_assoc "log_pwd" env then Adef.encoded "..." else contents
-         in
-         log_and_robot_check conf auth from request script_name
-           (contents :> string));
+           let contents =
+             if List.mem_assoc "log_pwd" env then Adef.encoded "..."
+             else contents
+           in
+           log_and_robot_check conf auth from request script_name
+             (contents :> string));
         match (!Wserver.cgi, auth_err, passwd_err) with
         | true, true, _ ->
             if is_robot from then Robot.robot_error conf 0 0 else no_access conf
@@ -2099,14 +2100,15 @@ let main () =
   Geneweb.GWPARAM.init ();
   cache_lexicon ();
   (if !images_dir <> "" then
-   let abs_dir =
-     let f =
-       Geneweb.Util.search_in_assets (Filename.concat !images_dir "gwback.jpg")
+     let abs_dir =
+       let f =
+         Geneweb.Util.search_in_assets
+           (Filename.concat !images_dir "gwback.jpg")
+       in
+       let d = Filename.dirname f in
+       if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
      in
-     let d = Filename.dirname f in
-     if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
-   in
-   images_url := "file://" ^ slashify abs_dir);
+     images_url := "file://" ^ slashify abs_dir);
   if !Geneweb.Util.cnt_dir = Filename.current_dir_name then
     Geneweb.Util.cnt_dir := Secure.base_dir ();
   Wserver.stop_server :=

@@ -199,21 +199,20 @@ let oc opts =
   let _, oc, _ = opts.Gwexport.oc in
   oc
 
-(** [display_note_aux opts tagn s len i] outputs text [s] with CONT/CONC
-    tag. GEDCOM lines are limited to 255 characters. However, the
-    CONCatenation or CONTinuation tags can be used to expand a field
-    beyond this limit. Lines are cut and align with [max_len]
-    characters for easy display/printing.
-    @see <https://www.familysearch.org/developers/docs/gedcom/> GEDCOM
-    STANDARD 5.5, Appendix A CONC and CONT tag
+(** [display_note_aux opts tagn s len i] outputs text [s] with CONT/CONC tag.
+    GEDCOM lines are limited to 255 characters. However, the CONCatenation or
+    CONTinuation tags can be used to expand a field beyond this limit. Lines are
+    cut and align with [max_len] characters for easy display/printing.
+    @see <https://www.familysearch.org/developers/docs/gedcom/>
+      GEDCOM STANDARD 5.5, Appendix A CONC and CONT tag
     @param opts carries output channel
     @param tagn specifies the current gedcom tag level (0, 1, ...)
-    @param s specifies text to print to the output channel (already
-    encode with gedcom charset)
-    @param len specifies the number of characters (char or wide char)
-    already printed
-    @param i specifies the last char index (index to s -- one byte
-    char) *)
+    @param s
+      specifies text to print to the output channel (already encode with gedcom
+      charset)
+    @param len
+      specifies the number of characters (char or wide char) already printed
+    @param i specifies the last char index (index to s -- one byte char) *)
 
 let rec display_note_aux opts tagn s len i =
   let j = ref i in
@@ -246,9 +245,7 @@ let rec display_note_aux opts tagn s len i =
       display_note_aux opts tagn s
         (String.length (string_of_int (succ tagn) ^ " CONC "))
         i)
-    else
-      (* continue same gedcom line *)
-
+    else (* continue same gedcom line *)
       (* FIXME: Rewrite this so we can get rid of this custom [nbc] *)
       let nbc c =
         if Char.code c < 0b10000000 then 1

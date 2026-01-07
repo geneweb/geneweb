@@ -15,10 +15,9 @@ val set_base_dir : string -> unit
 val check : string -> bool
 (** Check if a filename is safe to read:
     - it must not contain the '\000' character
-    - it must either be relative to the local directory OR
-      included in one of the allowed directories (base_dir or assets)
-    - the relative part does not contain the '..' directory
-*)
+    - it must either be relative to the local directory OR included in one of
+      the allowed directories (base_dir or assets)
+    - the relative part does not contain the '..' directory *)
 
 val open_in : string -> in_channel
 (** Secured version of [open_in] *)

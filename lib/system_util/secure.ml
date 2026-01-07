@@ -49,12 +49,10 @@ let list_check_prefix d df =
   in
   loop (d, df)
 
-(** Check if a filename is safe to read:
-    * it must not contain the '\000' character
-    * it must either be relative to the local directory OR
-      included in one of the allowed directories (base_dir or assets)
-    * the relative part does not contain the '..' directory
-*)
+(** Check if a filename is safe to read: * it must not contain the '\000'
+    character * it must either be relative to the local directory OR included in
+    one of the allowed directories (base_dir or assets) * the relative part does
+    not contain the '..' directory *)
 let check fname =
   if String.contains fname '\000' then false
   else
