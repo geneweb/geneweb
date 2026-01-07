@@ -1180,9 +1180,11 @@ let recover_2 conf =
       flush stderr;
       Sys.chdir init_dir;
       let c =
-        Filename.concat "." old_to_src
-        ^ " " ^ in_file ^ o_opt
-        ^ stringify (Filename.concat dir tmp)
+        Printf.sprintf "%s %s %s %s%s"
+          (Filename.concat "." old_to_src)
+          in_file
+          (if by_gedcom then "" else "-all_files")
+          o_opt (stringify (Filename.concat dir tmp))
       in
       Printf.eprintf "$ %s\n" c;
       flush stderr;
@@ -1229,7 +1231,7 @@ let cleanup_1 conf =
   let in_base_dir = in_base ^ ".gwb" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
-  let c = Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
+  let c = Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw -all_files" in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
   let _ = Sys.command c in
@@ -1299,10 +1301,10 @@ let rename conf =
     check_new_names conf rename_list (all_db ".");
     check_rename_conflict conf (snd (List.split rename_list));
     List.iter
-      (fun (k, v) -> if k <> v then Sys.rename (k ^ ".gwb") ("_" ^ k ^ ".gwb"))
+      (fun (k, v) -> if k <> v then Sys.rename (k ^ ".gwb") (v ^ ".gwb"))
       rename_list;
     List.iter
-      (fun (k, v) -> if k <> v then Sys.rename ("_" ^ k ^ ".gwb") (v ^ ".gwb"))
+      (fun (k, v) -> if k <> v then Sys.rename (k ^ ".gwf") (v ^ ".gwf"))
       rename_list;
     print_file conf "rename_ok.htm"
   with Exit -> ()
@@ -1337,7 +1339,7 @@ let merge_1 conf =
       | [] -> 0
       | b :: bases ->
           let c =
-            Filename.concat !bin_dir "gwu" ^ " " ^ b ^ " -o " ^ b ^ ".gw"
+            Filename.concat !bin_dir "gwu" ^ " " ^ b ^ " -o " ^ b ^ ".gw -all_files"
           in
           Printf.eprintf "$ %s\n" c;
           flush stderr;
