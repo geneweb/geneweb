@@ -23,13 +23,13 @@ type t = {
   bnotes : string;
   shift : int;
   no_fail : bool;
-      (** Do not raise exception if syntax error occured.
-    Instead print error information on stdout *)
+      (** Do not raise exception if syntax error occured. Instead print error
+          information on stdout *)
   no_picture : bool;  (** Save path to the images *)
   no_public : bool;  (** Ignore public access in source files **)
   mutable create_all_keys : bool;
       (** Forces to create all the keys for every persons (even for ? ?).
-    Enabled for gwplus format. *)
+          Enabled for gwplus format. *)
   mutable files : (string * bool * string * int) list;
   mutable line_cnt : int;  (** Line counter while reading .gw file *)
   mutable person_references : person_references;

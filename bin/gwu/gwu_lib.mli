@@ -6,8 +6,8 @@ val only_file : string ref
 val sep_limit : int ref
 
 val prepare_free_occ : ?select:(Gwdb.iper -> bool) -> Gwdb.base -> unit
-(** Initializes the internal hashtables. Person whose identifier is
-    not selected (`select p = false`) are ignored. *)
+(** Initializes the internal hashtables. Person whose identifier is not selected
+    (`select p = false`) are ignored. *)
 
 val gwu :
   Gwexport.gwexport_opts ->

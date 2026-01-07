@@ -193,14 +193,14 @@ and eval_simple_variable conf = function
             " - "
             ^ Printf.sprintf "%s %d" (Util.transl conf "connections") c
             ^ (if cw > 0 then
-               Printf.sprintf ", %s %s"
-                 (Util.transl_nth conf "wizard/wizards/friend/friends/exterior"
-                    1)
-                 (if conf.wizard then
-                  Printf.sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>" (commd conf)
-                    cw
-                 else string_of_int cw)
-              else "")
+                 Printf.sprintf ", %s %s"
+                   (Util.transl_nth conf
+                      "wizard/wizards/friend/friends/exterior" 1)
+                   (if conf.wizard then
+                      Printf.sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
+                        (commd conf) cw
+                    else string_of_int cw)
+               else "")
             ^
             if cf > 0 then
               Printf.sprintf ", %s %d"

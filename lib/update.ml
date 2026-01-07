@@ -159,7 +159,7 @@ let infer_event_date_from_witnesses ~base witnesses =
         | Some date_lower_bound, Some birth ->
             Some
               (if Date.compare_date date_lower_bound birth < 0 then birth
-              else date_lower_bound)
+               else date_lower_bound)
       in
       let date_upper_bound =
         let death = witness |> Gwdb.get_death |> Date.date_of_death in
@@ -169,7 +169,7 @@ let infer_event_date_from_witnesses ~base witnesses =
         | Some date_upper_bound, Some death ->
             Some
               (if Date.compare_date date_upper_bound death > 0 then death
-              else date_upper_bound)
+               else date_upper_bound)
       in
       (date_lower_bound, date_upper_bound)
     in
@@ -207,14 +207,11 @@ let infer_witness_death_from_event ~conf ~base ~date ~existing_witnesses =
 (* ************************************************************************** *)
 
 (** [Description] : Print several information to distinguish homonyms. The
-      information includes name of the person, name of the parents,
-      name of the spouse.
-    [Args] :
-      - conf : configuration of the base
-      - base : base
-      - p    : person
-    [Retour] : unit
-    [Rem] : Not visible.                                                      *)
+    information includes name of the person, name of the parents, name of the
+    spouse. [Args] :
+    - conf : configuration of the base
+    - base : base
+    - p : person [Retour] : unit [Rem] : Not visible. *)
 let print_person_parents_and_spouse conf base p =
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (Util.commd conf);
@@ -259,14 +256,11 @@ let print_same_name conf base p =
 
 (* ************************************************************************* *)
 
-(** [Description] : Test si le label contient le mot 'note' pour savoir si
-      dans les évènement secondaires, il faut traiter la note comme un
-      textarea.
-    [Args] :
-      - lbl : le label
-    [Retour] :
-      - bool
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+(** [Description] : Test si le label contient le mot 'note' pour savoir si dans
+    les évènement secondaires, il faut traiter la note comme un textarea. [Args]
+    :
+    - lbl : le label [Retour] :
+    - bool [Rem] : Non exporté en clair hors de ce module. *)
 let is_label_note lbl =
   let rec loop i =
     if i = String.length lbl then false
@@ -469,7 +463,7 @@ let someone_strong base p =
   "<strong>"
   ^<^ Util.escape_html (Gwdb.p_first_name base p)
   ^^^ (if Gwdb.get_occ p = 0 then Adef.escaped ""
-      else Adef.escaped @@ "." ^ string_of_int (Gwdb.get_occ p))
+       else Adef.escaped @@ "." ^ string_of_int (Gwdb.get_occ p))
   ^^^ " "
   ^<^ Util.escape_html (Gwdb.p_surname base p)
   ^>^ "</strong>"
@@ -800,12 +794,12 @@ let print_warning conf base (w : Warning.base_warning) =
            ^<^ (Util.safe_html @@ Gwdb.sou base t.t_place)
            ^^^ "</strong> <em>"
            ^<^ (match Date.od_of_cdate t.t_date_start with
-               | Some d -> DateDisplay.string_of_date conf d
-               | None -> Adef.safe "")
+             | Some d -> DateDisplay.string_of_date conf d
+             | None -> Adef.safe "")
            ^^^ "-"
            ^<^ (match Date.od_of_cdate t.t_date_end with
-               | Some d -> DateDisplay.string_of_date conf d
-               | None -> Adef.safe "")
+             | Some d -> DateDisplay.string_of_date conf d
+             | None -> Adef.safe "")
            ^>^ "</em>"
             :> string))
   | UndefinedSex p ->
@@ -835,14 +829,11 @@ let print_warnings conf base (wl : Warning.base_warning list) =
 
 (* ************************************************************************* *)
 
-(** [Description] : Fonction d'impression des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - fun  : Def.misc (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+(** [Description] : Fonction d'impression des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - fun : Def.misc (miscellaneous) [Retour] :
+    - unit [Rem] : Non exporté en clair hors de ce module. *)
 let print_misc conf _base = function
   | Warning.MissingSources ->
       Output.print_sstring conf "<em>";
@@ -855,14 +846,11 @@ let print_misc conf _base = function
 
 (* ************************************************************************* *)
 
-(** [Description] : Affiche la liste des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - ml   : Def.misc list (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                          *)
+(** [Description] : Affiche la liste des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - ml : Def.misc list (miscellaneous) [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_miscs conf base ml =
   print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
   List.iter (fun m ->
@@ -876,16 +864,13 @@ let print_miscs conf base ml =
 
 (* ************************************************************************* *)
 
-(** [Description] : Affiche sous la même rubrique, la liste des warnings
-                    et la liste des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - wl   : Def.warning list
-      - ml   : Def.misc list (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                              *)
+(** [Description] : Affiche sous la même rubrique, la liste des warnings et la
+    liste des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - wl : Def.warning list
+    - ml : Def.misc list (miscellaneous) [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then (
     Output.printf conf "%s\n"

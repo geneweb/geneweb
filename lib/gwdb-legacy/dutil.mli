@@ -1,10 +1,12 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 type name_index_data = int array array
-(** Index for all kind of mix between person's names (first index inside {i names.inx}) *)
+(** Index for all kind of mix between person's names (first index inside
+    {i names.inx}) *)
 
 type strings_of_fsname = int array array
-(** Index for sub-strings of person's surame and first name (second and third index respectively inside {i names.inx}) *)
+(** Index for sub-strings of person's surame and first name (second and third
+    index respectively inside {i names.inx}) *)
 
 val magic_GnWb0020 : string
 (** Header for the {i base} file (version 0020) *)
@@ -25,19 +27,23 @@ val table_size : int
 (** Maximal size of hash table for name indexation (inside {i names.inx}) *)
 
 val compare_fnames_i : Dbdisk.base_data -> int -> int -> int
-(** [compare_fnames_i base i1 i2] compare two first names that have indexes [i1] and [i2] inside the [base]. *)
+(** [compare_fnames_i base i1 i2] compare two first names that have indexes [i1]
+    and [i2] inside the [base]. *)
 
 val compare_fnames : string -> string -> int
 (** [compare_fnames] compare two first names. *)
 
 val compare_snames_i : Dbdisk.base_data -> int -> int -> int
-(** [compare_snames_i base i1 i2] compare two surnames that have indexes [i1] and [i2] inside the [base]. *)
+(** [compare_snames_i base i1 i2] compare two surnames that have indexes [i1]
+    and [i2] inside the [base]. *)
 
 val compare_snames_i_lower : Dbdisk.base_data -> int -> int -> int
-(** [compare_snames_i_lower base i1 i2] compares two lowered versions of surnames that have indexes [i1] and [i2] inside the [base]. *)
+(** [compare_snames_i_lower base i1 i2] compares two lowered versions of
+    surnames that have indexes [i1] and [i2] inside the [base]. *)
 
 val compare_snames : Dbdisk.base_data -> string -> string -> int
-(** [compare_snames_i base s1 s2] compare two surnames according to the principe specified by [Mutil.compare_after_particle]. *)
+(** [compare_snames_i base s1 s2] compare two surnames according to the principe
+    specified by [Mutil.compare_after_particle]. *)
 
 val compare_snames_lower : string -> string -> int
 (** [compare_snames_lower s1 s2] compares two lowered versions of surnames. *)
@@ -47,8 +53,9 @@ val dsk_person_misc_names :
   Dbdisk.dsk_person ->
   (Dbdisk.dsk_person -> Dbdisk.dsk_title list) ->
   string list
-(** [dsk_person_misc_names base p nobtit] computes various mix between all kind of names of a person's entry [p]
-    from the database [base]. [nobtit] is used to return a title entries for passed in argument person. *)
+(** [dsk_person_misc_names base p nobtit] computes various mix between all kind
+    of names of a person's entry [p] from the database [base]. [nobtit] is used
+    to return a title entries for passed in argument person. *)
 
 val poi : Dbdisk.dsk_base -> int -> Dbdisk.dsk_person
 (** [poi base i] returns person's entry with index [i] from [base]. *)
@@ -63,12 +70,13 @@ val p_surname : Dbdisk.dsk_base -> Dbdisk.dsk_person -> string
 (** Returns person's surname from the given person's entry. *)
 
 val output_value_no_sharing : out_channel -> _ -> unit
-(** Output given value to the channel. Uses [Marshall.to_channel] with [No_sharing] flag. *)
+(** Output given value to the channel. Uses [Marshall.to_channel] with
+    [No_sharing] flag. *)
 
 val int_size : int
 (** Size of integer value inside the Geneweb's binary files *)
 
-(** Hastable that has unhashed int as a key.  *)
+(** Hastable that has unhashed int as a key. *)
 module IntHT : sig
   include module type of Hashtbl.Make (struct
     type t = int
@@ -79,22 +87,17 @@ module IntHT : sig
 end
 
 val name_index : string -> int
-(** [name_index s]
-    Compute the index of crush_lowered version of s
-    in an array of size [table_size].
-*)
+(** [name_index s] Compute the index of crush_lowered version of s in an array
+    of size [table_size]. *)
 
 val empty_person : 'string -> 'string -> (unit, _, 'string) Dbdisk.gen_person
-(** [empty_person empty quest] returns a Dbdisk.gen_person with
-    [first_name] and [surname] initialized to [quest],
-    other 'string field initialized to [empty], and
-    only empty arrays/lists.
-*)
+(** [empty_person empty quest] returns a Dbdisk.gen_person with [first_name] and
+    [surname] initialized to [quest], other 'string field initialized to
+    [empty], and only empty arrays/lists. *)
 
 val empty_family : 'string -> (_, unit, 'string) Dbdisk.gen_family
-(** [empty_family empty] returns a Dbdisk.gen_person with string field initialized
-    initialized with [empty] and only empty arrays/lists.
-*)
+(** [empty_family empty] returns a Dbdisk.gen_person with string field
+    initialized initialized with [empty] and only empty arrays/lists. *)
 
 val map_person_ps :
   ?fd:(Date.date -> Date.date) ->
@@ -104,12 +107,12 @@ val map_person_ps :
   ('a, 'd, 'e) Dbdisk.gen_person
 (** Convert:
 
-    - Generic type used to represent related persons (parents, witnesses of a personal event, etc.)
-    of [Def.gen_person] into another one.
-    - Generic type used to represent another large part of information of [Def.gen_person]
-    into another one.
-    If [fd] is present, apply it on every date (birth, death, titles,, personal events, etc.).
-    Generic type that is used to represent indexation key isn't converted. *)
+    - Generic type used to represent related persons (parents, witnesses of a
+      personal event, etc.) of [Def.gen_person] into another one.
+    - Generic type used to represent another large part of information of
+      [Def.gen_person] into another one. If [fd] is present, apply it on every
+      date (birth, death, titles,, personal events, etc.). Generic type that is
+      used to represent indexation key isn't converted. *)
 
 val map_family_ps :
   ?fd:(Date.date -> Date.date) ->
@@ -121,11 +124,11 @@ val map_family_ps :
 (** Convert:
 
     - Generic type used to represent faimily indexation key into another one.
-    - Generic type used to represent witnesses (of the marriage or of a famillial events, etc.)
-    of [Def.gen_family] into another one.
-    - Generic type used to represent another large part of information of [Def.gen_family]
-    into another one.
-    If [fd] is present, apply it on it on every date (marriage, divorce, famillial events, etc.).*)
+    - Generic type used to represent witnesses (of the marriage or of a
+      famillial events, etc.) of [Def.gen_family] into another one.
+    - Generic type used to represent another large part of information of
+      [Def.gen_family] into another one. If [fd] is present, apply it on it on
+      every date (marriage, divorce, famillial events, etc.).*)
 
 val insert_lowered_name_suffix_istrs :
   insert_string:(string -> int) ->

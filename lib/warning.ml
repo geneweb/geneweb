@@ -1,6 +1,7 @@
 (*TODO why polymorphic *)
 
-(** Database warnings attached to the specification of the person, family, relation, etc. *)
+(** Database warnings attached to the specification of the person, family,
+    relation, etc. *)
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | BigAgeBetweenSpouses of
       'person
@@ -19,9 +20,11 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | ChildrenNotInOrder of 'family * 'descend * 'person * 'person
       (** Children aren't ordered *)
   | CloseChildren of 'family * 'person * 'person
-      (** Age difference between two child is less then 7 month (except for twins) *)
+      (** Age difference between two child is less then 7 month (except for
+          twins) *)
   | DeadOld of 'person * Date.dmy
-      (** Dead old (at the age older then 109 after 1900 year and older then 100 before) *)
+      (** Dead old (at the age older then 109 after 1900 year and older then 100
+          before) *)
   | DeadTooEarlyToBeFather of 'person * 'person
       (** Children is born in more then 1 year after his father's death *)
   | DistantChildren of 'family * 'person * 'person
@@ -42,21 +45,25 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | ParentBornAfterChild of 'person * 'person
       (** Parent is born after one of his children *)
   | ParentTooOld of 'person * Date.dmy * 'person
-      (** Person became a parent at age older then 55 years for mother and 70 for father *)
+      (** Person became a parent at age older then 55 years for mother and 70
+          for father *)
   | ParentTooYoung of 'person * Date.dmy * 'person
       (** Person became a parent at age younger then 11 years old *)
   | PEventOrder of 'person * 'pevent * 'pevent
       (** Personal events haven't been ordered correctly *)
   | PossibleDuplicateFam of 'family * 'family
-      (** There is a possibility that two families are a duplicate of each other *)
+      (** There is a possibility that two families are a duplicate of each other
+      *)
   | PossibleDuplicateFamHomonymous of 'family * 'family * 'person
-      (** There is a possibility that two families are a duplicate of each other (Homonymous spouse) *)
+      (** There is a possibility that two families are a duplicate of each other
+          (Homonymous spouse) *)
   | PWitnessEventAfterDeath of 'person * 'pevent * 'person
       (** Witness is dead before personal event date *)
   | PWitnessEventBeforeBirth of 'person * 'pevent * 'person
       (** Witness is born after personal event date *)
   | TitleDatesError of 'person * 'title
-      (** Title's start date is after end date or person is born after title dates *)
+      (** Title's start date is after end date or person is born after title
+          dates *)
   | UndefinedSex of 'person  (** Person has undefined sex (Neuter) *)
   | YoungForMarriage of 'person * Date.dmy * 'family
       (** Person is married before he was 12 years old *)
