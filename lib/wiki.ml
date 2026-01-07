@@ -166,10 +166,10 @@ let syntax_links conf base wi s =
                       TODO should be is_hidden (?) *)
                    (Adef.safe
                       (if
-                       conf.Config.hide_private_names
-                       && not (conf.Config.wizard || conf.Config.friend)
-                      then "x x"
-                      else escape name))
+                         conf.Config.hide_private_names
+                         && not (conf.Config.wizard || conf.Config.friend)
+                       then "x x"
+                       else escape name))
             in
             let profile_page_link ?style () =
               match
@@ -342,7 +342,7 @@ let summary_of_tlsw_lines conf short lines =
 let string_of_modify_link conf cnt empty = function
   | Some (can_edit, mode, sfn) when conf.Config.wizard ->
       (if empty then "<p>"
-      else {|<div style="font-size:80%;float:right;margin-left:3em">|})
+       else {|<div style="font-size:80%;float:right;margin-left:3em">|})
       ^ {|(<a href="|}
       ^ (Util.commd conf :> string)
       ^ "m="
@@ -353,7 +353,7 @@ let string_of_modify_link conf cnt empty = function
       ^ (if sfn = "" then "" else "&f=" ^ (Mutil.encode sfn :> string))
       ^ {|">|}
       ^ (if can_edit then Util.transl_decline conf "modify" ""
-        else Util.transl conf "view source")
+         else Util.transl conf "view source")
       ^ "</a>)"
       ^ if empty then "</p>" else "</div>"
   | _ -> ""
@@ -594,13 +594,14 @@ let rev_extract_sub_part (s : string) (v : int) : string list =
             (* S: previous condition is a strange way to write `if v = 0` *)
           else
             let nlev = section_level s len in
-            if cnt = v (*  *) then loop (s :: lines) nlev (cnt + 1) sl
+            if cnt = v (* *) then loop (s :: lines) nlev (cnt + 1) sl
             else if cnt > v then
               if nlev > lev then loop (s :: lines) lev (cnt + 1) sl else lines
             else loop lines lev (cnt + 1) sl
-        else if (* This line is not a title *)
-                cnt <= v then
-          loop lines lev cnt sl (* Line is in an ignored section *)
+        else if
+          (* This line is not a title *)
+          cnt <= v
+        then loop lines lev cnt sl (* Line is in an ignored section *)
         else loop (s :: lines) lev cnt sl (* Keeping the line *)
     | [] -> lines
   in
@@ -704,15 +705,15 @@ let print_mod_view_page conf can_edit mode fname title env s =
     Output.print_sstring conf "</a>)</div>");
   Hutil.print_link_to_welcome conf true;
   (if can_edit && has_v then
-   let open Def in
-   print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty);
+     let open Def in
+     print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty);
   Output.print_sstring conf {|<form name="form_notes" method="POST" action="|};
   Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
   (if can_edit then
-   let open Def in
-   Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK"));
+     let open Def in
+     Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK"));
   if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
   if fname <> "" then Util.hidden_input conf "f" (Mutil.encode fname);
   if can_edit then

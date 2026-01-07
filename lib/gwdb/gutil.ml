@@ -188,18 +188,18 @@ let homonyms ~base ~first_name ~surname =
   let surname = Name.lower surname in
   ipl
   |> List.filter_map (fun ip ->
-         let p = Gwdb.poi base ip in
-         Ext_option.return_if
-           (first_name = Name.lower (Gwdb.p_first_name base p)
-           && surname = Name.lower (Gwdb.p_surname base p))
-           (fun () -> ip))
+      let p = Gwdb.poi base ip in
+      Ext_option.return_if
+        (first_name = Name.lower (Gwdb.p_first_name base p)
+        && surname = Name.lower (Gwdb.p_surname base p))
+        (fun () -> ip))
 
 let get_all_occurrence_numbers ~base ~first_name ~surname =
   let ipl = homonyms ~base ~first_name ~surname in
   ipl
   |> List.map (fun ip ->
-         let p = Gwdb.poi base ip in
-         Gwdb.get_occ p)
+      let p = Gwdb.poi base ip in
+      Gwdb.get_occ p)
   |> Ext_int.Set.of_list
 
 let find_free_occ base f s =

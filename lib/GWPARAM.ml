@@ -1,8 +1,7 @@
 (** This module allows plugins to modify geneweb configuration.
 
-    This approch is preffered to Functors or library variants
-    for simple functions if it does not come with a performance cost.
-*)
+    This approch is preffered to Functors or library variants for simple
+    functions if it does not come with a performance cost. *)
 
 type syslog_level =
   [ `LOG_ALERT
@@ -25,10 +24,8 @@ module Default = struct
 
   let bpath bname = Filename.concat (Secure.base_dir ()) bname
 
-  (** [output_error ?headers ?content conf code]
-      Send the http status [code], [headers] and
-      [content] if provided, or default content otherwise.
-  *)
+  (** [output_error ?headers ?content conf code] Send the http status [code],
+      [headers] and [content] if provided, or default content otherwise. *)
   let output_error =
     let output_file conf fn =
       let ic = open_in fn in
@@ -108,10 +105,8 @@ let bpath = ref Default.bpath
 let output_error = ref Default.output_error
 let syslog = ref Default.syslog
 
-(** [wrap_output conf title content]
-    Plugins defining a page content but not a complete UI
-    may want to wrap their page using [wrap_output].
-*)
+(** [wrap_output conf title content] Plugins defining a page content but not a
+    complete UI may want to wrap their page using [wrap_output]. *)
 let wrap_output = ref Default.wrap_output
 
 let has_ignored_duplicates = ref (fun _ _ -> false)
