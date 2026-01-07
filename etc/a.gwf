@@ -214,6 +214,13 @@
 # if not specified then limited by max_anc_level.
 #max_anc_tree=
 
+# Maximum generation level for implex calculation in ancestor menu.
+# Higher values provide more detailed implex statistics but increase computation
+# Percentages display is limited to level 60 regardless (OCaml integer overflow)
+# Set higher for detailed genealogies, lower for large databases where implex
+# computation is costly. Default: 20.
+#max_implex_lev=20
+
 # Maximum number of generations when  displaying descendants.
 #max_desc_level=12
 
