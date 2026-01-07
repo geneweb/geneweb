@@ -104,7 +104,7 @@ main() {
     
     # Start gwd
     msg "start_gwd"
-    "$SCRIPT_DIR/gw/gwd" -hd "$SCRIPT_DIR/gw" > "$SCRIPT_DIR/gw/gwd.log" 2>&1 &
+    "$SCRIPT_DIR/gw/gwd" -bd "$BASES_DIR" -hd "$SCRIPT_DIR/gw" > "$SCRIPT_DIR/gw/gwd.log" 2>&1 &
     check_process '/gwd' "gwd"
     
     # Success message
