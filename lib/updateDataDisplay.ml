@@ -175,15 +175,16 @@ and eval_simple_bool_var _conf _base env _xx = function
   | "short_display" -> (
       match get_env "list" env with
       | Vlist_value _ | Vstring _ | Vother _ | Vnone -> false
-      | Vlist_data l -> (
-          List.length l > 1000
-          &&
-          match
-            List.sort_uniq Utf8.alphabetic_order
-              (List.rev_map (fun (_, s) -> Place.without_suburb s) l)
-          with
-          | [] | [ _ ] -> false
-          | _ :: _ :: _ -> true))
+      | Vlist_data l ->
+          let has_distinct_index_keys () =
+            match
+              List.sort_uniq Utf8.alphabetic_order
+                (List.rev_map (fun (_, s) -> Place.without_suburb s) l)
+            with
+            | [] | [ _ ] -> false
+            | _ :: _ :: _ -> true
+          in
+          List.length l > 1000 && has_distinct_index_keys ())
   | _ -> raise Not_found
 
 and eval_simple_str_var conf _base env _xx = function
