@@ -1,7 +1,16 @@
-let get_data conf =
-  match Util.p_getenv conf.Config.env "data" with
-  | Some "occu" -> ([ Gwdb.get_occupation ], [], [], [])
-  | Some "place" ->
+let get_data_kind_from_env env =
+  Option.bind (Util.p_getenv env "data") (fun value ->
+      match value with
+      | "occu" -> Some `occupation
+      | "place" -> Some `place
+      | "src" -> Some `source
+      | "fn" -> Some `firstname
+      | "sn" -> Some `lastname
+      | _ -> None)
+
+let get_data = function
+  | Some `occupation -> ([ Gwdb.get_occupation ], [], [], [])
+  | Some `place ->
       ( [
           Gwdb.get_birth_place;
           Gwdb.get_baptism_place;
@@ -11,7 +20,7 @@ let get_data conf =
         [ (fun evt -> Gwdb.get_pevent_place evt) ],
         [ Gwdb.get_marriage_place ],
         [ (fun evt -> Gwdb.get_fevent_place evt) ] )
-  | Some "src" ->
+  | Some `source ->
       ( [
           Gwdb.get_birth_src;
           Gwdb.get_baptism_src;
@@ -22,12 +31,14 @@ let get_data conf =
         [ (fun evt -> Gwdb.get_pevent_src evt) ],
         [ Gwdb.get_marriage_src; Gwdb.get_fsources ],
         [ (fun evt -> Gwdb.get_fevent_src evt) ] )
-  | Some "fn" -> ([ Gwdb.get_first_name ], [], [], [])
-  | Some "sn" -> ([ Gwdb.get_surname ], [], [], [])
+  | Some `firstname -> ([ Gwdb.get_first_name ], [], [], [])
+  | Some `surname -> ([ Gwdb.get_surname ], [], [], [])
   | _ -> ([], [], [], [])
 
 let get_all_data conf base =
-  let get_p, get_pe, get_f, get_fe = get_data conf in
+  let get_p, get_pe, get_f, get_fe =
+    get_data @@ get_data_kind_from_env conf.Config.env
+  in
   let aux : 'a. 'a -> Gwdb.IstrSet.t -> ('a -> Gwdb.istr) -> Gwdb.IstrSet.t =
    fun arg acc get ->
     let istr = get arg in
@@ -61,7 +72,9 @@ let get_all_data conf base =
   Gwdb.IstrSet.elements acc
 
 let get_person_from_data conf base =
-  let get_p, get_pe, get_f, get_fe = get_data conf in
+  let get_p, get_pe, get_f, get_fe =
+    get_data @@ get_data_kind_from_env conf.Config.env
+  in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : Gwdb.istr) p =
     match Gwdb.IstrMap.find_opt istr acc with
@@ -165,8 +178,8 @@ let reduce_cpl_list size list =
       - gen_person iper istr : gen_person avec les champs modifiés
     [Rem] : Non exporté en clair hors de ce module.                           *)
 let update_person conf base old new_input p =
-  match Util.p_getenv conf.Config.env "data" with
-  | Some "occu" ->
+  match get_data_kind_from_env conf.Config.env with
+  | Some `occupation ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_input)
       in
@@ -174,7 +187,7 @@ let update_person conf base old new_input p =
       let s_occupation = Gwdb.sou base occupation in
       let occupation = if old = s_occupation then new_istr else occupation in
       { (Gwdb.gen_person_of_person p) with occupation }
-  | Some "place" ->
+  | Some `place ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_input)
       in
@@ -208,7 +221,7 @@ let update_person conf base old new_input p =
         burial_place;
         pevents;
       }
-  | Some "src" ->
+  | Some `source ->
       let new_istr =
         Gwdb.insert_string ~format:`Html base
           (Ext_string.only_printable new_input)
@@ -246,7 +259,7 @@ let update_person conf base old new_input p =
         psources = psources_src;
         pevents;
       }
-  | Some "fn" ->
+  | Some `firstname ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_input)
       in
@@ -282,7 +295,7 @@ let update_person conf base old new_input p =
         occ;
         first_names_aliases;
       }
-  | Some "sn" ->
+  | Some `surname ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_input)
       in
@@ -333,8 +346,8 @@ let update_person conf base old new_input p =
       - gen_family ifam istr : gen_family avec les champs modifiés
     [Rem] : Non exporté en clair hors de ce module.                           *)
 let update_family conf base old new_istr fam =
-  match Util.p_getenv conf.Config.env "data" with
-  | Some "place" ->
+  match get_data_kind_from_env conf.Config.env with
+  | Some `place ->
       let new_istr =
         Gwdb.insert_string base (Ext_string.only_printable new_istr)
       in
@@ -352,7 +365,7 @@ let update_family conf base old new_istr fam =
           (Gwdb.get_fevents fam)
       in
       { (Gwdb.gen_family_of_family fam) with marriage_place; fevents }
-  | Some "src" ->
+  | Some `source ->
       let new_istr =
         Gwdb.insert_string ~format:`Html base
           (Ext_string.only_printable new_istr)
@@ -395,16 +408,17 @@ let update_family conf base old new_istr fam =
       - unit
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let update_person_list conf base new_input list nb_pers max_updates =
+  let data_kind = get_data_kind_from_env conf.Config.env in
   let test_family =
-    match get_data conf with _, _, [], [] -> false | _ -> true
+    match get_data data_kind with _, _, [], [] -> false | _ -> true
   in
   let action =
-    match Util.p_getenv conf.env "data" with
-    | Some "occu" -> "co"
-    | Some "place" -> "cp"
-    | Some "src" -> "cs"
-    | Some "fn" -> "fn"
-    | Some "sn" -> "sn"
+    match data_kind with
+    | Some `occupation -> "co"
+    | Some `place -> "cp"
+    | Some `source -> "cs"
+    | Some `firstname -> "fn"
+    | Some `surname -> "sn"
     | _ -> ""
   in
   let list =
@@ -455,18 +469,38 @@ let update_person_list conf base new_input list nb_pers max_updates =
 let build_list ~ignore_case conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
-  let list = get_all_data conf base in
+  let list =
+    let get_data_from_database ~conf base =
+      List.map (fun string_id -> `String_id string_id) (get_all_data conf base)
+    in
+    match get_data_kind_from_env conf.Config.env with
+    | None -> get_data_from_database ~conf base
+    | Some data_kind ->
+        if not @@ Caches.has_cache ~conf ~mode:data_kind then
+          get_data_from_database ~conf base
+        else
+          List.map
+            (fun string -> `String string)
+            (Caches.complete_with_patch data_kind base (Fun.const true)
+               (Caches.read_cache ~conf data_kind))
+  in
+  let to_string_id_string ~base = function
+    | `String_id istr -> Some (istr, Gwdb.sou base istr)
+    | `String string ->
+        let string_id = Gwdb.find_opt_string_istr base string in
+        Option.map (fun string_id -> (string_id, string)) string_id
+  in
   if ini <> "" then
     List.filter_map
-      (fun istr ->
-        let str = Gwdb.sou base istr in
-        if
-          Utf8.start_with_wildcard ~ignore_case ini 0
-          @@ Place.without_suburb str
-        then Some (istr, str)
-        else None)
+      (fun element ->
+        Option.bind (to_string_id_string ~base element) (fun (istr, str) ->
+            if
+              Utf8.start_with_wildcard ~ignore_case ini 0
+              @@ Place.without_suburb str
+            then Some (istr, str)
+            else None))
       list
-  else List.rev_map (fun istr -> (istr, Gwdb.sou base istr)) list
+  else List.filter_map (to_string_id_string ~base) list
 
 let build_list_short conf list =
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
@@ -481,23 +515,16 @@ let build_list_short conf list =
       List.rev_map
         (fun (_, s) ->
           let s = Place.without_suburb s in
-          if String.length s > i then String.sub s 0 (Utf8.next s i)
-          else s ^ String.make (i + 1 - String.length s) '_')
+          (* Astuce pour gérer les espaces. *)
+          Ext_string.tr ' ' '_'
+            (if String.length s > i then String.sub s 0 (Utf8.next s i)
+            else s ^ String.make (i + 1 - String.length s) '_'))
         l
     in
-    (* Fonction pour supprimer les doublons. *)
-    let remove_dup list =
-      Ext_string.Set.elements
-        (List.fold_left
-           (fun accu ini -> Ext_string.Set.add ini accu)
-           Ext_string.Set.empty list)
-    in
-    (* Astuce pour gérer les espaces. *)
-    let inis = List.rev_map (fun p -> Ext_string.tr ' ' '_' p) inis in
-    let inis = remove_dup inis in
+    let inis = List.sort_uniq Utf8.alphabetic_order inis in
     match inis with
     | [ ini ] -> build_ini list (String.length ini)
-    | list -> List.sort Utf8.alphabetic_order list
+    | list -> list
   in
   build_ini list (String.length ini)
 

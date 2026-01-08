@@ -51,7 +51,7 @@ let main () =
           Gwdb.sync ~save_mem:!save_mem
             ~tasks:
               [
-                (fun () -> Caches.write_caches base);
+                (fun () -> Geneweb.Caches.write_caches base);
                 (fun () ->
                   let conf =
                     Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)

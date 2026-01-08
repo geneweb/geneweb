@@ -2,5 +2,5 @@
   (name consang)
   (public_name geneweb.consang)
   (modules consang)
-  (libraries unix str %%%GWDB_PKG%%% geneweb caches)
+  (libraries unix str %%%GWDB_PKG%%% geneweb)
 )
