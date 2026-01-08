@@ -172,7 +172,7 @@ and eval_simple_bool_var _conf _base env _xx = function
       match get_env "key" env with
       | Vstring _ as x -> get_env "entry_key" env = x
       | _ -> false)
-  | "short_display" -> (
+  | "needs_short_display" -> (
       match get_env "list" env with
       | Vlist_value _ | Vstring _ | Vother _ | Vnone -> false
       | Vlist_data l ->
