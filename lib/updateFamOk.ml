@@ -1016,21 +1016,16 @@ let effective_chg_order base ip u ifam n =
 
 let effective_del conf base ip fam =
   let ifam = Driver.get_ifam fam in
-  Driver.delete_family base ifam;
-  let changed =
-    let gen_p =
-      let p =
-        if ip = Driver.get_mother fam then
-          Driver.poi base (Driver.get_mother fam)
-        else Driver.poi base (Driver.get_father fam)
-      in
-      Util.string_gen_person base (Driver.gen_person_of_person p)
+  let gen_p =
+    let p =
+      if ip = Driver.get_mother fam then Driver.poi base (Driver.get_mother fam)
+      else Driver.poi base (Driver.get_father fam)
     in
-    let gen_fam =
-      Util.string_gen_family base (Driver.gen_family_of_family fam)
-    in
-    U_Delete_family (gen_p, gen_fam)
+    Util.string_gen_person base (Driver.gen_person_of_person p)
   in
+  let gen_fam = Util.string_gen_family base (Driver.gen_family_of_family fam) in
+  Driver.delete_family base ifam;
+  let changed = U_Delete_family (gen_p, gen_fam) in
   History.record conf base changed "df"
 
 let is_a_link = function _, _, _, Update.Link, _ -> true | _ -> false
