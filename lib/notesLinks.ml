@@ -26,7 +26,7 @@ let check_file_name s =
 
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * key * string option * string option
+  | WLperson of int * key * string option * string option * int option
   | WLwizard of int * string * string
   | WLnone of int * string
 
@@ -144,7 +144,19 @@ let misc_notes_link s i =
             in
             let fn = Name.lower fn in
             let sn = Name.lower sn in
-            WLperson (j, (fn, sn, oc), name, text)
+            let j, fam_marker =
+              if j < slen && s.[j] = '#' then
+                let rec parse_int acc k =
+                  if k < slen && s.[k] >= '0' && s.[k] <= '9' then
+                    parse_int
+                      ((acc * 10) + Char.code s.[k] - Char.code '0')
+                      (k + 1)
+                  else (k, if acc > 0 then Some acc else None)
+                in
+                parse_int 0 (j + 1)
+              else (j, None)
+            in
+            WLperson (j, (fn, sn, oc), name, text, fam_marker)
           with Not_found -> wlnone j
       else wlnone j
   else wlnone (i + 1)

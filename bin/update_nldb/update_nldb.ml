@@ -35,9 +35,11 @@ let notes_links s =
             if List.mem lfname list_nt then list_nt else lfname :: list_nt
           in
           loop list_nt list_ind pos j
-      | NotesLinks.WLperson (j, key, _name, text) ->
+      | NotesLinks.WLperson (j, key, _name, text, fam_marker) ->
           let list_ind =
-            let link = { NLDB.lnTxt = text; lnPos = pos } in
+            let link =
+              { NLDB.lnTxt = text; lnPos = pos; lnFamMarker = fam_marker }
+            in
             (key, link) :: list_ind
           in
           loop list_nt list_ind (pos + 1) j
