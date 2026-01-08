@@ -3018,6 +3018,14 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
             VVbool r
         | _ -> raise Not_found
       else VVbool false
+  | [ "has_linked_page_family"; s ] -> (
+      match get_env "fam" env with
+      | Vfam (ifam, _, _, m_auth) ->
+          if m_auth then
+            let v = Notes.get_linked_page_family conf base ifam s in
+            VVbool ((v :> string) <> "")
+          else VVbool false
+      | _ -> VVbool false)
   (* TODO exclude TYPE gallery and album ?? *)
   (* TODO fold link_to_ind and Notes.link_to_ind !! *)
   | [ "has_linked_pages" ] ->
@@ -3094,6 +3102,11 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
           |> safe_val
       | _ -> raise Not_found)
+  | [ "linked_page_family"; s ] -> (
+      match get_env "fam" env with
+      | Vfam (ifam, _, _, _) ->
+          VVstring (Notes.get_linked_page_family conf base ifam s :> string)
+      | _ -> VVstring "")
   | "marriage_date" :: sl -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, true) -> (
