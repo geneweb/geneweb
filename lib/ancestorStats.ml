@@ -124,61 +124,66 @@ let compute_json conf base p =
   Buffer.add_string buf (string_of_int max_lv);
   Buffer.add_string buf ",\"data\":[";
   let cumul_paths = ref 0 in
-  let cumul_list = ref [] in
+  let seen_cumul = Hashtbl.create 4096 in
   let prev_pct_uc = ref 0 in
+  let first = ref true in
   for i = 1 to max_lv do
     let level_list = asc_cnt.(i) in
     let pl = List.length level_list in
-    let level_folded = Cousins.cousins_fold level_list in
-    let ul = List.length level_folded in
-    cumul_paths := !cumul_paths + pl;
-    cumul_list := List.rev_append level_list !cumul_list;
-    let uc = List.length (Cousins.cousins_fold !cumul_list) in
-    let pc = !cumul_paths in
-    let ic = if i < mil then pc - uc else 0 in
-    let il = if i < mil then pl - ul else 0 in
-    let span = compute_span base level_list in
-    let theo_c = theoretical_max_cumul i in
-    let theo_l = theoretical_max_level i in
-    let pct_uc = compute_percent uc theo_c in
-    let pct_pc = compute_percent pc theo_c in
-    let pct_ul = compute_percent ul theo_l in
-    let pct_pl = compute_percent pl theo_l in
-    let pct_pp = !prev_pct_uc in
-    let txt = gen_text conf i in
-    prev_pct_uc := pct_uc;
-    if i > 1 then Buffer.add_char buf ',';
-    Buffer.add_string buf "{\"v\":";
-    Buffer.add_string buf (string_of_int i);
-    Buffer.add_string buf ",\"t\":\"";
-    Buffer.add_string buf txt;
-    Buffer.add_string buf "\",\"lex\":\"";
-    Buffer.add_string buf txt;
-    Buffer.add_string buf "\",\"noa\":\"";
-    Buffer.add_string buf (string_of_int uc);
-    Buffer.add_string buf "\",\"noa_l\":\"";
-    Buffer.add_string buf (string_of_int ul);
-    Buffer.add_string buf "\",\"path\":\"";
-    if ic > 0 then (
-      Buffer.add_char buf '+';
-      Buffer.add_string buf (string_of_int ic));
-    Buffer.add_string buf "\",\"path_l\":\"";
-    if il > 0 then (
-      Buffer.add_char buf '+';
-      Buffer.add_string buf (string_of_int il));
-    Buffer.add_string buf "\",\"per\":\"";
-    Buffer.add_string buf span;
-    Buffer.add_string buf "\",\"sty\":\"";
-    Buffer.add_string buf (format_gradient_cumul pct_pp pct_uc pct_pc);
-    Buffer.add_string buf "\",\"sty_l\":\"";
-    Buffer.add_string buf (format_gradient_level pct_ul pct_pl);
-    Buffer.add_string buf "\",\"pp\":\"";
-    Buffer.add_string buf
-      (escape_json_string (format_pp theo_c pct_uc pct_pc i));
-    Buffer.add_string buf "\",\"pp_l\":\"";
-    Buffer.add_string buf
-      (escape_json_string (format_pp theo_l pct_ul pct_pl i));
-    Buffer.add_string buf "\"}"
+    let seen_level = Hashtbl.create 128 in
+    List.iter (fun (ip, _, _, _) -> Hashtbl.replace seen_level ip ()) level_list;
+    let ul = Hashtbl.length seen_level in
+    if ul > 0 then begin
+      Hashtbl.iter (fun ip () -> Hashtbl.replace seen_cumul ip ()) seen_level;
+      let uc = Hashtbl.length seen_cumul in
+      if i < mil then cumul_paths := !cumul_paths + pl;
+      let pc = !cumul_paths in
+      let ic = if i < mil then pc - uc else 0 in
+      let il = if i < mil then pl - ul else 0 in
+      let theo_c = theoretical_max_cumul i in
+      let theo_l = theoretical_max_level i in
+      let pct_uc = compute_percent uc theo_c in
+      let pct_pc = if i < mil then compute_percent pc theo_c else pct_uc in
+      let pct_ul = compute_percent ul theo_l in
+      let pct_pl = if i < mil then compute_percent pl theo_l else pct_ul in
+      let pct_pp = !prev_pct_uc in
+      prev_pct_uc := pct_uc;
+      let txt = gen_text conf i in
+      let per = compute_span base level_list in
+      if not !first then Buffer.add_char buf ',';
+      first := false;
+      Buffer.add_string buf "{\"v\":";
+      Buffer.add_string buf (string_of_int i);
+      Buffer.add_string buf ",\"t\":\"";
+      Buffer.add_string buf txt;
+      Buffer.add_string buf "\",\"lex\":\"";
+      Buffer.add_string buf txt;
+      Buffer.add_string buf "\",\"noa\":\"";
+      Buffer.add_string buf (string_of_int uc);
+      Buffer.add_string buf "\",\"noa_l\":\"";
+      Buffer.add_string buf (string_of_int ul);
+      Buffer.add_string buf "\",\"path\":\"";
+      if ic > 0 then (
+        Buffer.add_char buf '+';
+        Buffer.add_string buf (string_of_int ic));
+      Buffer.add_string buf "\",\"path_l\":\"";
+      if il > 0 then (
+        Buffer.add_char buf '+';
+        Buffer.add_string buf (string_of_int il));
+      Buffer.add_string buf "\",\"per\":\"";
+      Buffer.add_string buf per;
+      Buffer.add_string buf "\",\"sty\":\"";
+      Buffer.add_string buf (format_gradient_cumul pct_pp pct_uc pct_pc);
+      Buffer.add_string buf "\",\"sty_l\":\"";
+      Buffer.add_string buf (format_gradient_level pct_ul pct_pl);
+      Buffer.add_string buf "\",\"pp\":\"";
+      Buffer.add_string buf
+        (escape_json_string (format_pp theo_c pct_uc pct_pc i));
+      Buffer.add_string buf "\",\"pp_l\":\"";
+      Buffer.add_string buf
+        (escape_json_string (format_pp theo_l pct_ul pct_pl i));
+      Buffer.add_string buf "\"}"
+    end
   done;
   Buffer.add_string buf "]}";
   Buffer.contents buf
