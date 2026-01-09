@@ -30,26 +30,22 @@ val leap_year : int -> bool
 (** Says if the given year is a leap year. *)
 
 val nb_days_in_month : int -> int -> int
-(** Returns number of days for the given month and year for
-    gregorian calendar. Takes into account leap years. *)
+(** Returns number of days for the given month and year for gregorian calendar.
+    Takes into account leap years. *)
 
 val time_elapsed : dmy -> dmy -> dmy
-(** [time_elapsed start stop]
-    Compute the time elapsed between [start] and [stop].
-    If [stop] is prior to [start], resulting [dmy]'s field
-    are negative (but correct).
-    Resulting [prec] can be:
+(** [time_elapsed start stop] Compute the time elapsed between [start] and
+    [stop]. If [stop] is prior to [start], resulting [dmy]'s field are negative
+    (but correct). Resulting [prec] can be:
     - [Sure] for exact duration
     - [Before] for "less than" duration
     - [After] for "more than" duration
-    - [Maybe] for other cases
-    Used to compare only gregorian calendar's dates.
- *)
+    - [Maybe] for other cases Used to compare only gregorian calendar's dates.
+*)
 
 val time_elapsed_opt : dmy -> dmy -> dmy option
-(** Same as [time_elapsed], but will return [None]
-    if computation is not possible
-    (e.g. time_elapsed_opt /1839 /1859). *)
+(** Same as [time_elapsed], but will return [None] if computation is not
+    possible (e.g. time_elapsed_opt /1839 /1859). *)
 
 val date_of_burial : Def.burial -> date option
 val dmy_of_death : Def.death -> dmy option
@@ -58,39 +54,34 @@ val date_of_death : Def.death -> date option
 (** Returns date of death if present. *)
 
 val dmy_of_dmy2 : dmy2 -> dmy
-(** [dmy_of_dmy2 dmy2]
-    Convert a [dmy2] to [dmy] using [Sure] as precision. *)
+(** [dmy_of_dmy2 dmy2] Convert a [dmy2] to [dmy] using [Sure] as precision. *)
 
 val dmy2_of_dmy : dmy -> dmy2
-(** [dmy2_of_dmy dmy]
-    Convert a [dmy2] to [dmy]. *)
+(** [dmy2_of_dmy dmy] Convert a [dmy2] to [dmy]. *)
 
 val compare_dmy : dmy -> dmy -> int
-(** [compare_dmy d1 d2]
-    Return a negative integer if [d1] is prior to [d2],
-    [0] if [d1] is equal to [d2],
-    and a positive integer if [d2] is prior to [d1].
+(** [compare_dmy d1 d2] Return a negative integer if [d1] is prior to [d2], [0]
+    if [d1] is equal to [d2], and a positive integer if [d2] is prior to [d1].
 *)
 
 val compare_dmy_strict : dmy -> dmy -> int option
-(** Same as compare_dmy but is None if dates are not really comparable because of precision *)
+(** Same as compare_dmy but is None if dates are not really comparable because
+    of precision *)
 
 val compare_date : date -> date -> int
-(** [compare_date d1 d2]
-    If both [d1] and [d2] are [Dgreg] date, uses [compare_dmy]
-    to compare them.
-    [Dtext] dates are always considered prior to any [Dgreg] date,
-    and equal to any other [Dtext] date.
-*)
+(** [compare_date d1 d2] If both [d1] and [d2] are [Dgreg] date, uses
+    [compare_dmy] to compare them. [Dtext] dates are always considered prior to
+    any [Dgreg] date, and equal to any other [Dtext] date. *)
 
 val compare_date_strict : date -> date -> int option
-(** Same as compare_date but is None if dates are not really comparable because of precision *)
+(** Same as compare_date but is None if dates are not really comparable because
+    of precision *)
 
 val cdate_None : cdate
 (** Absent compressed date *)
 
 val date_of_cdate : cdate -> date
-(** Convert [cdate] to [date]; fail if [cdate] is [Cnone]  *)
+(** Convert [cdate] to [date]; fail if [cdate] is [Cnone] *)
 
 val od_of_cdate : cdate -> date option
 (** Optional date from [cdate] *)
@@ -107,14 +98,14 @@ val cdate_of_od : date option -> cdate
 (* TODO date_to_dmy? *)
 
 val to_sdn : from:calendar -> ?lower:bool -> dmy -> int
-(** Convert a [dmy] in calendar [from] to SDN
-    if dmy is a partial date (month|day = 0) then return the SDN of a lower bound *)
+(** Convert a [dmy] in calendar [from] to SDN if dmy is a partial date
+    (month|day = 0) then return the SDN of a lower bound *)
 
 val convert : from:calendar -> to_:calendar -> dmy -> dmy
-(** [convert ~from ~to_ dmy] Converts a [dmy] from calendar [from] to calendar [to_];
-    Correctly convert [dmy.prec]
-    Can convert partial date, and recover partial dates after converting them back,
-    by using dmy.delta to define a date interval *)
+(** [convert ~from ~to_ dmy] Converts a [dmy] from calendar [from] to calendar
+    [to_]; Correctly convert [dmy.prec] Can convert partial date, and recover
+    partial dates after converting them back, by using dmy.delta to define a
+    date interval *)
 
 val gregorian_of_sdn : prec:precision -> int -> dmy
 (** Convert SDN to [dmy] in gregorian calendar *)

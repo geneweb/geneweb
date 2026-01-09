@@ -171,11 +171,11 @@ let print_wizards_by_date conf list =
            | None -> (true, spl)
          in
          (if new_item then
-          if stm = 0.0 then Output.print_sstring conf "....."
-          else
-            match spl with
-            | (_, disp_sep_period) :: _ -> disp_sep_period tm
-            | [] -> ());
+            if stm = 0.0 then Output.print_sstring conf "....."
+            else
+              match spl with
+              | (_, disp_sep_period) :: _ -> disp_sep_period tm
+              | [] -> ());
          if new_item then Output.print_sstring conf "</dt><dd>";
          let wname = if wname = "" then wz else wname in
          if not (prev = None || new_item) then Output.print_sstring conf ", ";
@@ -635,23 +635,24 @@ let do_change_wizard_visibility conf base x set_vis =
   let denying = wizard_denying wddir in
   let is_visible = not (List.mem conf.Config.user denying) in
   (if ((not set_vis) && not is_visible) || (set_vis && is_visible) then ()
-  else
-    let tmp_file = Filename.concat wddir "1connected.deny" in
-    let oc = Secure.open_out tmp_file in
-    let found =
-      List.fold_left
-        (fun found wz ->
-          if wz = conf.Config.user && set_vis then true
-          else (
-            Printf.fprintf oc "%s\n" wz;
-            found))
-        false denying
-    in
-    if (not found) && not set_vis then Printf.fprintf oc "%s\n" conf.Config.user;
-    close_out oc;
-    let file = Filename.concat wddir "connected.deny" in
-    Files.rm file;
-    Sys.rename tmp_file file);
+   else
+     let tmp_file = Filename.concat wddir "1connected.deny" in
+     let oc = Secure.open_out tmp_file in
+     let found =
+       List.fold_left
+         (fun found wz ->
+           if wz = conf.Config.user && set_vis then true
+           else (
+             Printf.fprintf oc "%s\n" wz;
+             found))
+         false denying
+     in
+     if (not found) && not set_vis then
+       Printf.fprintf oc "%s\n" conf.Config.user;
+     close_out oc;
+     let file = Filename.concat wddir "connected.deny" in
+     Files.rm file;
+     Sys.rename tmp_file file);
   do_connected_wizards conf base x
 
 let change_wizard_visibility conf base =

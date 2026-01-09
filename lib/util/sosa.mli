@@ -32,7 +32,8 @@ val half : t -> t
     will be child's sosa number. *)
 
 val even : t -> bool
-(** Tells if sosa number is even. Even numbers describe fathers, odd - mothers for each generation. *)
+(** Tells if sosa number is even. Even numbers describe fathers, odd - mothers
+    for each generation. *)
 
 val inc : t -> int -> t
 (** Addition of sosa number with a integer *)
@@ -53,11 +54,10 @@ val gen : t -> int
 (** Retruns generation of sosa number. *)
 
 val branches : t -> int list
-(** [branches sosa]
-    Return the path to follow in order to reach [sosa]
-    It is encoded as a list of int representing the acendant to choose at each generation.
-    [0] if you have to follow the father branch, [1] if it is the mother branch.
-*)
+(** [branches sosa] Return the path to follow in order to reach [sosa] It is
+    encoded as a list of int representing the acendant to choose at each
+    generation. [0] if you have to follow the father branch, [1] if it is the
+    mother branch. *)
 
 val of_int : int -> t
 (** Converts sosa from integer *)

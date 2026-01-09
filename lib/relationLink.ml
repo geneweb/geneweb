@@ -364,18 +364,18 @@ let sign_text conf base sign info b1 b2 c1 c2 =
     ^<^ "&c1=" ^<^ string_of_int c1 ^<^ "&c2=" ^<^ string_of_int c2
     ^<^ Adef.escaped
           (if Util.p_getenv conf.Config.env "spouse" = Some "on" then
-           "&spouse=on"
-          else "")
+             "&spouse=on"
+           else "")
     ^^^ Adef.escaped
           (if Util.p_getenv conf.Config.env "image" = Some "off" then
-           "&image=off"
-          else "")
+             "&image=off"
+           else "")
     ^^^ (match Util.p_getenv conf.Config.env "bd" with
-        | None | Some ("0" | "") -> Adef.escaped ""
-        | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
+      | None | Some ("0" | "") -> Adef.escaped ""
+      | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
     ^^^ (match Util.p_getenv conf.Config.env "color" with
-        | None | Some "" -> Adef.escaped ""
-        | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
+      | None | Some "" -> Adef.escaped ""
+      | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
     ^^^ include_marr conf base (Adef.escaped "3")
     ^^^ include_marr conf base (Adef.escaped "4")
   in
@@ -562,8 +562,8 @@ let print_two_branches_with_pre conf base info =
   then (
     Output.print_sstring conf "\n";
     (if info.pb1 <> None || info.nb1 <> None then
-     let s = prev_next_1_text conf base info info.pb1 info.nb1 in
-     print_pre_left conf sz s);
+       let s = prev_next_1_text conf base info info.pb1 info.nb1 in
+       print_pre_left conf sz s);
     if info.pb2 <> None || info.nb2 <> None then
       let s = prev_next_2_text conf base info info.pb2 info.nb2 in
       print_pre_right conf sz s);

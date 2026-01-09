@@ -22,7 +22,7 @@
   (depends
     (alcotest :with-test)
     calendars
-    (camlp5 (>= "8.00.01"))
+    (camlp5 (>= "8.03.00"))
     camlp-streams
     (dune (>= "2.9.0"))
     (fmt :with-test)

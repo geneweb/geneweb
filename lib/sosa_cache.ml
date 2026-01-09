@@ -248,35 +248,32 @@ let get_sosa_person ~conf ~base ~person =
 (* ************************************************************************ *)
 
 (** [Description] : Affiche le picto sosa ainsi que le lien de calcul de
-      relation entre la personne et le sosa 1 (si l'option cancel_link
-      n'est pas activée).
-    [Args] :
+    relation entre la personne et le sosa 1 (si l'option cancel_link n'est pas
+    activée). [Args] :
     - conf : configuration de la base
     - base : base de donnée
-    - p    : la personne que l'on veut afficher
-    - link : ce booléen permet d'afficher ou non le lien sur le picto
-               sosa. Il n'est pas nécessaire de mettre le lien si on a
-               déjà affiché cette personne.
-      [Retour] :
-    - unit
-      [Rem] : Exporté en clair hors de ce module.                             *)
+    - p : la personne que l'on veut afficher
+    - link : ce booléen permet d'afficher ou non le lien sur le picto sosa. Il
+      n'est pas nécessaire de mettre le lien si on a déjà affiché cette
+      personne. [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_sosa ~conf ~base ~person ~link =
   let sosa_num = get_sosa_person ~conf ~base ~person in
   if Sosa.gt sosa_num Sosa.zero then
     match find_sosa_ref conf base with
     | Some r ->
         (if not link then ()
-        else
-          let sosa_link =
-            let i1 = Gwdb.string_of_iper (Gwdb.get_iper person) in
-            let i2 = Gwdb.string_of_iper (Gwdb.get_iper r) in
-            let b2 = Sosa.to_string sosa_num in
-            "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
-          in
-          Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_string conf (sosa_link |> Adef.safe);
-          Output.print_sstring conf {|"> |});
+         else
+           let sosa_link =
+             let i1 = Gwdb.string_of_iper (Gwdb.get_iper person) in
+             let i2 = Gwdb.string_of_iper (Gwdb.get_iper r) in
+             let b2 = Sosa.to_string sosa_num in
+             "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
+           in
+           Output.print_sstring conf {|<a href="|};
+           Output.print_string conf (Util.commd conf);
+           Output.print_string conf (sosa_link |> Adef.safe);
+           Output.print_sstring conf {|"> |});
         let title =
           if Util.is_hide_names conf r && not (Person.is_visible conf base r)
           then ""
