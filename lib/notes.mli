@@ -125,3 +125,12 @@ val update_cache_linked_pages :
 
 val json_extract_img : Config.config -> string -> string * string
 val safe_gallery : Config.config -> Geneweb_db.Driver.base -> string -> string
+
+val get_linked_page_family :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.ifam ->
+  string ->
+  Adef.safe_string
+(** [get_linked_page_family conf base ifam tag] returns backlink HTML for family
+    [ifam] and header tag [tag] (e.g. "MARIAGE"). *)

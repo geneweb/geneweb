@@ -323,7 +323,7 @@ let syntax_links conf wi s =
           in
           Buffer.add_string buff t;
           loop quot_lev pos j
-      | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
+      | NotesLinks.WLperson (j, (fn, sn, oc), name, _, _) ->
           let name =
             if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
             then Option.value ~default:"??" name
@@ -459,7 +459,7 @@ let remove_links s =
       let len, i =
         match NotesLinks.misc_notes_link s i with
         | NotesLinks.WLpage (j, _, _, _, text) -> (Buff.mstore len text, j)
-        | NotesLinks.WLperson (j, (fn, sn, _), name, text) ->
+        | NotesLinks.WLperson (j, (fn, sn, _), name, text, _) ->
             let text =
               match text with
               | None | Some "" -> Option.value ~default:(fn ^ " " ^ sn) name

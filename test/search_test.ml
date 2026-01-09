@@ -1,9 +1,6 @@
 module A = Alcotest
 module Compat = Geneweb_compat
-module Index = Geneweb_search.Index.Default
 module Trie = Geneweb_search.Trie.Default
-module Word = Geneweb_search.Word.Default
-module Analyze = Geneweb_search.Analyze
 module Iterator = Geneweb_search.Iterator
 module Seq = Geneweb_compat.Seq
 
@@ -210,9 +207,9 @@ module Flatset_tests = struct
     let b = Seq.equal Int.equal seq1 seq2 in
     if not b then
       Fmt.pr "it1 = %a@. it2 = %a@."
-        Fmt.(seq ~sep:comma int)
+        (Fmt.seq ~sep:Fmt.comma Fmt.int)
         seq1
-        Fmt.(seq ~sep:comma int)
+        (Fmt.seq ~sep:Fmt.comma Fmt.int)
         seq2;
     b
 
@@ -232,7 +229,7 @@ module Flatset_tests = struct
 
   let test_random_iterator_union =
     QCheck.Test.make ~count:1000 ~name:"random iterator union"
-      QCheck.(make Gen.(list_size (int_range 1 100) nonempty_array))
+      QCheck.(make (Gen.list_size (Gen.int_range 1 100) nonempty_array))
     @@ fun l ->
     let it1 =
       let l1 = List.map (fun a -> Array.to_seq a |> Naive.of_seq) l in
@@ -260,7 +257,7 @@ module Flatset_tests = struct
 
   let test_random_iterator_join =
     QCheck.Test.make ~count:1000 ~name:"random iterator join"
-      QCheck.(make Gen.(list_size (int_range 1 3) nonempty_array))
+      QCheck.(make (Gen.list_size (Gen.int_range 1 3) nonempty_array))
     @@ fun l ->
     let it1 =
       let l1 = List.map (fun a -> Array.to_seq a |> Naive.of_seq) l in

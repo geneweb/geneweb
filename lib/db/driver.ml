@@ -278,7 +278,7 @@ let make bname particles arrays k =
 let bfname base fname = Filename.concat base.data.bdir fname
 
 module NLDB = struct
-  let magic = "GWNL0010"
+  let magic = "GWNL0011"
 
   let read base =
     let fname = bfname base "notes_links" in

@@ -9,6 +9,7 @@
     <li>%apply;capitalize(linked_page.BIBLIO)</li>
   </ul>
 %end;
+
 %reset_count;
 %if;has_sources;%incr_count;%end;
 %foreach;event;
@@ -17,8 +18,21 @@
 %if;(count>0)
   <h2 class="mt-2">%if;(count=1)[*source/sources]0%else;[*source/sources]1%end;</h2>
   <ul class="pl-4 pY-0">
+  %let;marr;[marriage/marriages]0%in;
   %foreach;source;
-    <li>%apply;capitalize(source_type)[:] %source;.</li>
+    <li>%apply;capitalize(source_type)[:]
+      %if;(marr in source_type and has_linked_page_family.MARIAGE)
+        %linked_page_family.MARIAGE; ;%sp;
+      %end;%source;.
+    </li>
+  %end;
+  %if;(has_linked_page_family.MARIAGE)
+    %reset_count
+    %foreach;family;%incr_count;
+      %if;not has_marriage_source;
+        <li>[*marriage/marriages]0 %count;[:] %linked_page_family.MARIAGE;.</li>
+      %end;
+    %end;
   %end;
   %if;(op_m=2)
     %reset_count;

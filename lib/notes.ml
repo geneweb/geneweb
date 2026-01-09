@@ -227,9 +227,15 @@ let update_notes_links_db base fnotes s =
               if List.mem lfname list_nt then list_nt else lfname :: list_nt
             in
             loop list_nt list_ind pos j
-        | NotesLinks.WLperson (j, key, _, txt) ->
+        | NotesLinks.WLperson (j, key, _, txt, fam_marker) ->
             let list_ind =
-              let link = { Def.NLDB.lnTxt = txt; Def.NLDB.lnPos = pos } in
+              let link =
+                {
+                  Def.NLDB.lnTxt = txt;
+                  Def.NLDB.lnPos = pos;
+                  Def.NLDB.lnFamMarker = fam_marker;
+                }
+              in
               (key, link) :: list_ind
             in
             loop list_nt list_ind (pos + 1) j
@@ -427,7 +433,7 @@ let rewrite_key s oldk newk _file =
       | WLpage (j, _, _, _, _) | WLwizard (j, _, _) | WLnone (j, _) ->
           let ss = String.sub s i (j - i) in
           rebuild (rs ^ ss) j
-      | WLperson (j, k, name, text) ->
+      | WLperson (j, k, name, text, fam_marker) ->
           if Def.NLDB.equal_key k oldk then
             let fn, sn, oc = newk in
             let ofn, osn, _ooc = oldk in
@@ -436,13 +442,19 @@ let rewrite_key s oldk newk _file =
               | Some str -> Some (replace ofn fn str |> replace osn sn)
               | None -> None
             in
+            let fam_suffix =
+              match fam_marker with
+              | Some n -> "&" ^ string_of_int n
+              | None -> ""
+            in
             let ss =
-              Printf.sprintf "[[%s/%s/%d/%s%s]]" fn sn oc
+              Printf.sprintf "[[%s/%s/%d/%s%s]]%s" fn sn oc
                 (Option.fold
                    ~none:(Printf.sprintf "%s %s" fn sn)
                    ~some:(fun txt -> txt)
                    name)
                 (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
+                fam_suffix
             in
             rebuild (rs ^ ss) j
           else
@@ -699,3 +711,105 @@ let linked_pages_nbr conf base ip =
   match entry with Some nbr -> nbr | None -> 0
 
 let has_linked_pages conf base ip = linked_pages_nbr conf base ip <> 0
+
+let linked_page_text_family conf base ifam s (str : Adef.safe_string)
+    (pg, (_, il)) : Adef.safe_string =
+  match pg with
+  | Def.NLDB.PgMisc pg -> (
+      let fam = Driver.foi base ifam in
+      let father_key =
+        let p = Driver.poi base (Driver.get_father fam) in
+        let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+        let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+        (fn, sn, Driver.get_occ p)
+      in
+      let mother_key =
+        let p = Driver.poi base (Driver.get_mother fam) in
+        let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+        let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+        (fn, sn, Driver.get_occ p)
+      in
+      let dominated_by_marker =
+        let markers =
+          List.filter_map (fun (_, ind) -> ind.Def.NLDB.lnFamMarker) il
+        in
+        List.sort_uniq compare markers
+      in
+      let matching_marker =
+        List.find_opt
+          (fun marker ->
+            let dominated_keys =
+              List.filter_map
+                (fun (key, ind) ->
+                  if ind.Def.NLDB.lnFamMarker = Some marker then Some key
+                  else None)
+                il
+            in
+            List.mem father_key dominated_keys
+            && List.mem mother_key dominated_keys)
+          dominated_by_marker
+      in
+      match matching_marker with
+      | None -> str
+      | Some marker -> (
+          try
+            let nenv, _ = read_notes base pg in
+            let v = List.assoc s nenv in
+            if v = "" then raise Not_found;
+            let persons_with_marker =
+              List.filter
+                (fun (_, ind) -> ind.Def.NLDB.lnFamMarker = Some marker)
+                il
+            in
+            let father_annot =
+              List.find_map
+                (fun (key, ind) ->
+                  if key = father_key then ind.Def.NLDB.lnTxt else None)
+                persons_with_marker
+            in
+            let mother_annot =
+              List.find_map
+                (fun (key, ind) ->
+                  if key = mother_key then ind.Def.NLDB.lnTxt else None)
+                persons_with_marker
+            in
+            let annot_suffix =
+              match (father_annot, mother_annot) with
+              | Some fa, Some ma when fa <> "" && ma <> "" ->
+                  Printf.sprintf " (%s/%s)" fa ma
+              | Some fa, _ when fa <> "" -> Printf.sprintf " (%s)" fa
+              | _, Some ma when ma <> "" -> Printf.sprintf " (%s)" ma
+              | _ -> ""
+            in
+            let lnPos =
+              match persons_with_marker with
+              | (_, ind) :: _ -> ind.Def.NLDB.lnPos
+              | [] -> 0
+            in
+            let a, b, c =
+              try
+                let i = String.index v '{' in
+                let j = String.index v '}' in
+                ( String.sub v 0 i,
+                  String.sub v (i + 1) (j - i - 1),
+                  String.sub v (j + 1) (String.length v - j - 1) )
+              with Not_found -> ("", v, "")
+            in
+            let str1 =
+              Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s%s" a
+                (Util.commd conf :> string)
+                (Mutil.encode pg :> string)
+                lnPos b c annot_suffix
+              |> Util.safe_html
+            in
+            if (str :> string) = "" then str1
+            else if Util.start_with (str1 :> string) 0 "<li>" then
+              Adef.safe ((str :> string) ^ (str1 :> string))
+            else Adef.safe ((str :> string) ^ ", " ^ (str1 :> string))
+          with Not_found -> str))
+  | _ -> str
+
+let get_linked_page_family conf base ifam s =
+  let db = Driver.read_nldb base in
+  let db = merge_possible_aliases conf db in
+  List.fold_left (linked_page_text_family conf base ifam s) (Adef.safe "") db

@@ -461,7 +461,7 @@ module NLDB = struct
     | PgWizard of string
 
   type key = string * string * int
-  type ind = { lnTxt : string option; lnPos : int }
+  type ind = { lnTxt : string option; lnPos : int; lnFamMarker : int option }
   type ('a, 'b) t = (('a, 'b) page * (string list * (key * ind) list)) list
 
   let equal_key (fn1, sn1, oc1) (fn2, sn2, oc2) =
