@@ -117,73 +117,136 @@ let gen_text conf level =
 
 let compute_json conf base p =
   let mil = get_max_implex_level conf in
-  let asc_cnt = Cousins.init_asc_cnt conf base p in
-  let max_lv = Array.length asc_cnt - 2 in
+  let ip = Geneweb_db.Driver.get_iper p in
   let buf = Buffer.create 16384 in
-  Buffer.add_string buf "{\"max\":";
-  Buffer.add_string buf (string_of_int max_lv);
-  Buffer.add_string buf ",\"data\":[";
-  let cumul_paths = ref 0 in
+  let data_buf = Buffer.create 16384 in
   let seen_cumul = Hashtbl.create 4096 in
+  let cumul_paths = ref 0 in
   let prev_pct_uc = ref 0 in
   let first = ref true in
-  for i = 1 to max_lv do
-    let level_list = asc_cnt.(i) in
-    let pl = List.length level_list in
-    let seen_level = Hashtbl.create 128 in
-    List.iter (fun (ip, _, _, _) -> Hashtbl.replace seen_level ip ()) level_list;
-    let ul = Hashtbl.length seen_level in
-    if ul > 0 then begin
-      Hashtbl.iter (fun ip () -> Hashtbl.replace seen_cumul ip ()) seen_level;
+  let current_level = Hashtbl.create 4096 in
+  let next_level = Hashtbl.create 4096 in
+  Hashtbl.add current_level ip 1;
+  let i = ref 0 in
+  let max_lv = ref 0 in
+  while Hashtbl.length current_level > 0 do
+    incr i;
+    Hashtbl.clear next_level;
+    let seen_at_level = Hashtbl.create 128 in
+    let ul = ref 0 in
+    let pl = ref 0 in
+    let min_y = ref max_int in
+    let max_y = ref min_int in
+    Hashtbl.iter
+      (fun pip cnt ->
+        let pp = Geneweb_db.Driver.poi base pip in
+        match Geneweb_db.Driver.get_parents pp with
+        | Some ifam ->
+            let fam = Geneweb_db.Driver.foi base ifam in
+            let fath = Geneweb_db.Driver.get_father fam in
+            let moth = Geneweb_db.Driver.get_mother fam in
+            List.iter
+              (fun parent_ip ->
+                if !i < mil then pl := !pl + cnt;
+                let is_new_at_level =
+                  not (Hashtbl.mem seen_at_level parent_ip)
+                in
+                if is_new_at_level then begin
+                  Hashtbl.add seen_at_level parent_ip ();
+                  let parent = Geneweb_db.Driver.poi base parent_ip in
+                  (match
+                     Date.od_of_cdate (Geneweb_db.Driver.get_birth parent)
+                   with
+                  | Some (Def.Dgreg (dg, _)) ->
+                      if dg.Def.year < !min_y then min_y := dg.Def.year;
+                      if dg.Def.year > !max_y then max_y := dg.Def.year
+                  | _ -> ());
+                  match Geneweb_db.Driver.get_death parent with
+                  | Def.Death (_, cd) -> (
+                      match Date.od_of_cdate cd with
+                      | Some (Def.Dgreg (dg, _)) ->
+                          if dg.Def.year < !min_y then min_y := dg.Def.year;
+                          if dg.Def.year > !max_y then max_y := dg.Def.year
+                      | _ -> ())
+                  | _ -> ()
+                end;
+                let is_new = not (Hashtbl.mem seen_cumul parent_ip) in
+                if is_new then begin
+                  incr ul;
+                  Hashtbl.add seen_cumul parent_ip ()
+                end;
+                if !i < mil then begin
+                  let prev =
+                    try Hashtbl.find next_level parent_ip with Not_found -> 0
+                  in
+                  Hashtbl.replace next_level parent_ip (prev + cnt)
+                end
+                else Hashtbl.replace next_level parent_ip 1)
+              [ fath; moth ]
+        | None -> ())
+      current_level;
+    let ul = !ul in
+    let pl = !pl in
+    let ul_level = Hashtbl.length seen_at_level in
+    if ul_level > 0 then begin
+      max_lv := !i;
+      if !i < mil then cumul_paths := !cumul_paths + pl;
       let uc = Hashtbl.length seen_cumul in
-      if i < mil then cumul_paths := !cumul_paths + pl;
       let pc = !cumul_paths in
-      let ic = if i < mil then pc - uc else 0 in
-      let il = if i < mil then pl - ul else 0 in
-      let theo_c = theoretical_max_cumul i in
-      let theo_l = theoretical_max_level i in
+      let ic = if !i < mil then pc - uc else 0 in
+      let il = if !i < mil then pl - ul_level else 0 in
+      let theo_c = theoretical_max_cumul !i in
+      let theo_l = theoretical_max_level !i in
       let pct_uc = compute_percent uc theo_c in
-      let pct_pc = if i < mil then compute_percent pc theo_c else pct_uc in
+      let pct_pc = if !i < mil then compute_percent pc theo_c else pct_uc in
       let pct_ul = compute_percent ul theo_l in
-      let pct_pl = if i < mil then compute_percent pl theo_l else pct_ul in
+      let pct_pl = if !i < mil then compute_percent pl theo_l else pct_ul in
       let pct_pp = !prev_pct_uc in
       prev_pct_uc := pct_uc;
-      let txt = gen_text conf i in
-      let per = compute_span base level_list in
-      if not !first then Buffer.add_char buf ',';
+      let txt = gen_text conf !i in
+      let per =
+        if !min_y = max_int then "-" else Printf.sprintf "%d-%d" !min_y !max_y
+      in
+      if not !first then Buffer.add_char data_buf ',';
       first := false;
-      Buffer.add_string buf "{\"v\":";
-      Buffer.add_string buf (string_of_int i);
-      Buffer.add_string buf ",\"t\":\"";
-      Buffer.add_string buf txt;
-      Buffer.add_string buf "\",\"lex\":\"";
-      Buffer.add_string buf txt;
-      Buffer.add_string buf "\",\"noa\":\"";
-      Buffer.add_string buf (string_of_int uc);
-      Buffer.add_string buf "\",\"noa_l\":\"";
-      Buffer.add_string buf (string_of_int ul);
-      Buffer.add_string buf "\",\"path\":\"";
+      Buffer.add_string data_buf "{\"v\":";
+      Buffer.add_string data_buf (string_of_int !i);
+      Buffer.add_string data_buf ",\"t\":\"";
+      Buffer.add_string data_buf txt;
+      Buffer.add_string data_buf "\",\"lex\":\"";
+      Buffer.add_string data_buf txt;
+      Buffer.add_string data_buf "\",\"noa\":\"";
+      Buffer.add_string data_buf (string_of_int uc);
+      Buffer.add_string data_buf "\",\"noa_l\":\"";
+      Buffer.add_string data_buf (string_of_int ul_level);
+      Buffer.add_string data_buf "\",\"path\":\"";
       if ic > 0 then (
-        Buffer.add_char buf '+';
-        Buffer.add_string buf (string_of_int ic));
-      Buffer.add_string buf "\",\"path_l\":\"";
+        Buffer.add_char data_buf '+';
+        Buffer.add_string data_buf (string_of_int ic));
+      Buffer.add_string data_buf "\",\"path_l\":\"";
       if il > 0 then (
-        Buffer.add_char buf '+';
-        Buffer.add_string buf (string_of_int il));
-      Buffer.add_string buf "\",\"per\":\"";
-      Buffer.add_string buf per;
-      Buffer.add_string buf "\",\"sty\":\"";
-      Buffer.add_string buf (format_gradient_cumul pct_pp pct_uc pct_pc);
-      Buffer.add_string buf "\",\"sty_l\":\"";
-      Buffer.add_string buf (format_gradient_level pct_ul pct_pl);
-      Buffer.add_string buf "\",\"pp\":\"";
-      Buffer.add_string buf
-        (escape_json_string (format_pp theo_c pct_uc pct_pc i));
-      Buffer.add_string buf "\",\"pp_l\":\"";
-      Buffer.add_string buf
-        (escape_json_string (format_pp theo_l pct_ul pct_pl i));
-      Buffer.add_string buf "\"}"
-    end
+        Buffer.add_char data_buf '+';
+        Buffer.add_string data_buf (string_of_int il));
+      Buffer.add_string data_buf "\",\"per\":\"";
+      Buffer.add_string data_buf per;
+      Buffer.add_string data_buf "\",\"sty\":\"";
+      Buffer.add_string data_buf (format_gradient_cumul pct_pp pct_uc pct_pc);
+      Buffer.add_string data_buf "\",\"sty_l\":\"";
+      Buffer.add_string data_buf (format_gradient_level pct_ul pct_pl);
+      Buffer.add_string data_buf "\",\"pp\":\"";
+      Buffer.add_string data_buf
+        (escape_json_string (format_pp theo_c pct_uc pct_pc !i));
+      Buffer.add_string data_buf "\",\"pp_l\":\"";
+      Buffer.add_string data_buf
+        (escape_json_string (format_pp theo_l pct_ul pct_pl !i));
+      Buffer.add_string data_buf "\"}"
+    end;
+    Hashtbl.reset current_level;
+    Hashtbl.iter (fun k v -> Hashtbl.add current_level k v) next_level
   done;
+  Buffer.add_string buf "{\"max\":";
+  Buffer.add_string buf (string_of_int !max_lv);
+  Buffer.add_string buf ",\"data\":[";
+  Buffer.add_buffer buf data_buf;
   Buffer.add_string buf "]}";
   Buffer.contents buf
