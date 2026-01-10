@@ -13,6 +13,7 @@ type gwexport_opts = {
   desc : int option;
   img_base_path : string;
   keys : string list;
+  aws : bool;
   mem : bool;
   no_notes : [ `none | `nn | `nnn ];
   no_picture : bool;
@@ -33,6 +34,7 @@ let default_opts =
     desc = None;
     img_base_path = "";
     keys = [];
+    aws = false;
     mem = false;
     no_notes = `none;
     no_picture = false;
@@ -57,7 +59,10 @@ let speclist c =
     ( "-key",
       Arg.String (fun s -> c := { !c with keys = s :: !c.keys }),
       "<KEY> key reference of root person. Used for -a/-d options. Can be used \
-       multiple times. Key format is \"First Name.occ SURNAME\"" );
+       multiple times. Key format is \"First_Name.occ SURNAME\"" );
+    ( "-aws",
+      Arg.Unit (fun () -> c := { !c with aws = true }),
+      " save siblings of exported persons." );
     ( "-c",
       Arg.Int (fun s -> c := { !c with censor = s }),
       "<NUM> when a person is born less than <num> years ago, it is not \
@@ -109,7 +114,7 @@ let speclist c =
     ( "-picture-path",
       Arg.Unit (fun () -> c := { !c with picture_path = true }),
       " extract pictures path." );
-    ( "-s",
+    ( "-sn",
       Arg.String (fun x -> c := { !c with surnames = x :: !c.surnames }),
       "<SN> select this surname (option usable several times, union of \
        surnames will be used)." );

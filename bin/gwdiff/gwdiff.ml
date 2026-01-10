@@ -520,6 +520,8 @@ let addiff base1 base2 iper1 iper2 d_tab =
 (* Main *)
 
 let gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
+  Printf.printf "<h3>Differences between</h3><br>Base1: %s / base2: %s<p>"
+    !in_file1 !in_file2;
   let desc_tab =
     Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base1) []
   in
@@ -527,34 +529,21 @@ let gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
   | true, _ | false, false -> ddiff base1 base2 iper1 iper2 desc_tab
   | false, true -> addiff base1 base2 iper1 iper2 desc_tab
 
-let p1_fn = ref ""
-let p1_occ = ref 0
-let p1_sn = ref ""
-let p2_fn = ref ""
-let p2_occ = ref 0
-let p2_sn = ref ""
-
-type arg_state = ASnone | ASwaitP1occ | ASwaitP1sn | ASwaitP2occ | ASwaitP2sn
-
-let arg_state = ref ASnone
+let pnoc_a = ref ""
+let pnoc_b = ref ""
 let mem = ref false
 let d_mode = ref false
 let ad_mode = ref false
+let html = ref false
 
 let speclist =
   [
-    ( "-1",
-      Arg.String
-        (fun s ->
-          p1_fn := s;
-          arg_state := ASwaitP1occ),
-      "<fn> <occ> <sn> (mandatory) defines starting person in base1" );
-    ( "-2",
-      Arg.String
-        (fun s ->
-          p2_fn := s;
-          arg_state := ASwaitP2occ),
-      "<fn> <occ> <sn> (mandatory) defines starting person in base2" );
+    ( "-pnoc_a",
+      Arg.String (fun s -> pnoc_a := s),
+      "<fn>.<occ> <sn> (mandatory) defines starting person in base1" );
+    ( "-pnoc_b",
+      Arg.String (fun s -> pnoc_b := s),
+      "<fn>.<occ> <sn> (mandatory) defines starting person in base2" );
     ("-ad", Arg.Set ad_mode, " checks descendants of all ascendants ");
     ("-d", Arg.Set d_mode, " checks descendants (default)");
     ( "-html",
@@ -567,63 +556,11 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
-let anonfun s =
-  match !arg_state with
-  | ASnone ->
-      if !in_file1 = "" then in_file1 := s
-      else if !in_file2 = "" then in_file2 := s
-      else raise (Arg.Bad "Too much arguments")
-  | ASwaitP1occ -> (
-      try
-        p1_occ := int_of_string s;
-        arg_state := ASwaitP1sn
-      with Failure _ -> raise (Arg.Bad "Numeric value for occ (-1)!"))
-  | ASwaitP1sn ->
-      p1_sn := s;
-      arg_state := ASnone
-  | ASwaitP2occ -> (
-      try
-        p2_occ := int_of_string s;
-        arg_state := ASwaitP2sn
-      with Failure _ -> raise (Arg.Bad "Numeric value for occ (-2)!"))
-  | ASwaitP2sn ->
-      p2_sn := s;
-      arg_state := ASnone
+let anon_args = ref []
+let anon_fun arg = anon_args := arg :: !anon_args
 
-let errmsg = "Usage: " ^ Sys.argv.(0) ^ " [options] base1 base2\nOptions are: "
-
-let check_args () =
-  Arg.parse speclist anonfun errmsg;
-  if !in_file1 = "" then (
-    Printf.printf "Missing reference data base\n";
-    Printf.printf "Use option -help for usage\n";
-    flush stdout;
-    exit 2);
-  if !in_file2 = "" then (
-    Printf.printf "Missing destination data base\n";
-    Printf.printf "Use option -help for usage\n";
-    flush stdout;
-    exit 2);
-  if !p1_fn = "" then (
-    Printf.printf "-1 parameter is mandatory\n";
-    Printf.printf "Use option -help for usage\n";
-    flush stdout;
-    exit 2);
-  if !p1_sn = "" then (
-    Printf.printf "Incomplete -1 parameter\n";
-    Printf.printf "Use option -help for usage\n";
-    flush stdout;
-    exit 2);
-  if !p2_fn = "" then (
-    Printf.printf "-2 parameter is mandatory\n";
-    Printf.printf "Use option -help for usage\n";
-    flush stdout;
-    exit 2);
-  if !p2_sn = "" then (
-    Printf.printf "Incomplete -2 parameter\n";
-    Printf.printf "Use option -help for usage\n";
-    flush stdout;
-    exit 2)
+let usage_msg =
+  "Usage: " ^ Sys.argv.(0) ^ " [options] base1 base2\nOptions are: "
 
 let load_base f k =
   Driver.with_database f (fun base ->
@@ -636,21 +573,43 @@ let load_base f k =
       k base)
 
 let main () =
-  let _ = check_args () in
+  Arg.parse speclist anon_fun usage_msg;
+  (match List.rev !anon_args with
+  | [ ba; bb ] ->
+      in_file1 := ba;
+      in_file2 := bb
+  | _ ->
+      Printf.eprintf "Error: Expected exactly 2 base names\n";
+      Arg.usage speclist usage_msg;
+      exit 2);
+  (* Validate required arguments *)
+  if !pnoc_a = "" then (
+    Printf.eprintf "Error: -pnoc_a is required\n";
+    Arg.usage speclist usage_msg;
+    exit 2);
+  if !pnoc_b = "" then (
+    Printf.eprintf "Error: -pnoc_b is required\n";
+    Arg.usage speclist usage_msg;
+    exit 2);
+
   let _ = if not !html then cr := "\n" else cr := "<BR>\n" in
   (* [base1] is the reference base and [base2] is the destination base. *)
   load_base !in_file1 @@ fun base1 ->
   load_base !in_file2 @@ fun base2 ->
-  let iper1 = Driver.person_of_key base1 !p1_fn !p1_sn !p1_occ in
-  let iper2 = Driver.person_of_key base2 !p2_fn !p2_sn !p2_occ in
+  (* let iper2 = Driver.person_of_key base2 !p2_fn !p2_sn !p2_occ in *)
+  let fn1, oc1, sn1 = Geneweb.GWPARAM.split_key !pnoc_a in
+  let fn2, oc2, sn2 = Geneweb.GWPARAM.split_key !pnoc_a in
+  let oc1 = int_of_string oc1 in
+  let oc2 = int_of_string oc2 in
+  let iper1 = Driver.person_of_key base1 fn1 sn1 oc1 in
+  let iper2 = Driver.person_of_key base2 fn2 sn2 oc2 in
   if !html then Printf.printf "<BODY>\n";
   (match (iper1, iper2) with
   | None, _ ->
-      Printf.printf "Cannot find person %s.%d %s in reference base" !p1_fn
-        !p1_occ !p1_sn
+      Printf.printf "Cannot find person %s.%d %s in reference base" fn1 oc1 sn1
   | _, None ->
-      Printf.printf "Cannot find person %s.%d %s in destination base" !p2_fn
-        !p2_occ !p2_sn
+      Printf.printf "Cannot find person %s.%d %s in destination base" fn2 oc2
+        sn2
   | Some iper1, Some iper2 -> gwdiff base1 base2 iper1 iper2 !d_mode !ad_mode);
   if !html then Printf.printf "</BODY>\n"
 
