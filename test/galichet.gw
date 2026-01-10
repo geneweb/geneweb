@@ -57,6 +57,14 @@ beg
 * et un texte alternatif '''avec''' apostrophe pour la femme [[Marie Elisabeth/Loche]]
 
 * les vues individuelles sont correctes, mais la vue sous forme de table des ascendants est incorrecte à cause de cette apostrophe.
+
+* ici je teste le tag html de prefix, dans une liste '''wiki'''
+<pre>une 1ere  ligne
+suivie d'une 2eme ligne
+et d'une 3eme
+et une ligne terminale</pre>
+*voir la fiche de [[Anthoine/Geruzet]]
+pour les même ligne dans une liste html.
 end notes
 
 pevt Galichet Jean_Charles
@@ -183,20 +191,43 @@ pevt Jayot Jean
 #deat 8/11/1674 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end pevt
 
-fam Boizot Jean.1234 #occu Menuisier 1618 22/3/1702 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Jayot Claude
+fam Boizot Jean #occu Menuisier 1618 22/3/1702 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Jayot Claude
 fevt
 #marr 
 end fevt
 beg
-- f Jeanne.1 27/2/1671 #bp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France 22/4/1748 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+- f Jeanne 27/2/1671 #bp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France 22/4/1748 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+- h Forceindex1234.1234 1672 1674
 end
 
-pevt Boizot Jeanne.1
+notes Boizot Forceindex1234.1234
+beg
+* Je crée cet individu avec un index arbitrairement élevé
+pour vérifier que il est bien conservé par gwc et gwu.
+* à noter que gwb2ged ne permet pas cette sauvegarde,
+puisque le format GEDCOM n'a pas cette notion d'index,
+seulement sous entendu par l'orde dans le fichier.
+* le prénom spécifique me permet de l'identifier lors de la comparaison
+des fichiers gw, pour un flow
+<pre>
+xx.gw   -> gwc     -> xx.gwb
+xx.gwb  -> gwb2ged -> xx.ged
+xx.ged  -> ged2gwb -> xx2.gwb
+xx2.gwb -> gwu     -> xx2.gw
+xx2.gwb -> gwb2ged -> xx2.ged</pre>
+end notes
+
+pevt Boizot Jeanne
 #birt 27/2/1671 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 #deat 22/4/1748 #p _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
 end pevt
 
-pevt Boizot Jean.1234
+pevt Boizot Forceindex1234.1234
+#birt 1672
+#deat 1674
+end pevt
+
+pevt Boizot Jean
 #birt 1618
 #deat 22/3/1702 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end pevt
@@ -209,6 +240,21 @@ beg
 - h Anthoine #occu Maître_Menuisier_reçu_le_25.01.1695_à_Reims 1667 #bp _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France 16/2/1755 #dp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
 end
 
+notes Geruzet Anthoine
+beg
+<li>exemple de note
+<li>avec des tags html et pas wiki
+<li>le 3eme élément de la liste
+<br>suivi d'un saut de ligne
+<li>ici je teste le tag de prefix, dans une liste <b>html</b>
+<pre>une 1ere  ligne
+suivie d'une 2eme ligne
+et d'une 3eme
+et une ligne terminale</pre>
+<li>voir la fiche de [[Jean Pierre/Galichet]]
+pour les même ligne dans une liste wiki.
+end notes
+
 pevt Geruzet Anthoine
 #birt 1667 #p _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France
 #deat 16/2/1755 #p _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -219,7 +265,7 @@ pevt Geruzet Anthoine.1
 #deat 17/1/1709 #p _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
 end pevt
 
-fam Geruzet Anthoine +17/1/1695 #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Boizot Jeanne.1
+fam Geruzet Anthoine +17/1/1695 #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Boizot Jeanne
 fevt
 #marr 17/1/1695 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end fevt
@@ -275,6 +321,14 @@ fevt
 #marr 30/10/1794 #p Paris,75000,Ville-de-Paris,Ile-de-France,France #s base_michelbonnet
 end fevt
 
+notes Dupond Marie
+beg
+* en 1ere ligne un lien vers un autre individu [[Jean Pierre/Galichet]]
+* je continue ma liste wiki
+* une ligne avec [un commentaire entre crochets qui n'est pas un url]
+* en cas d'erreur (issue #2218) tous le texte avant le 1er crochet est supprimé depuis le précédent crochet fermant.
+end notes
+
 pevt Geruzet Jean-Baptiste
 #birt 23/9/1768 #p Laon,02,Aisne,Picardie,France
 #deat 20/5/1846 #p Laon,02,Aisne,Picardie,France
@@ -317,6 +371,19 @@ notes-db
   * test la présence d'une apostrophe dans le texte alternate d'une image,
   (https://github.com/geneweb/geneweb/issues/1558)
   <br>voir les notes du couple [[Jean Pierre/Galichet]] et [[Marie Elisabeth/Loche]]
+
+  * Add '''pre''' html tag in galichet.gw in two individual notes
+  (https://github.com/geneweb/geneweb/issues/2221)
+  ** [[anthoine/geruzet]]
+     The '''pre''' is badly formatted while in a html list.
+     all lines are merged in only one line.
+  ** [[jean pierre/galichet]]
+     The '''pre''' is correctly formatted while in a wiki list.
+
+  * Add comment line between brackets as basic test of issue #2218
+    may be other use cases to be checked.
+  ** [[marie/dupond]]
+     with brackets in a wiki list.
 end notes-db
 
 # extended page "Andre" used by:
@@ -340,13 +407,39 @@ end page-ext
 # extended page "Gallery" used by:
 #  - person "Jean Charles.0 Galichet"
 page-ext Gallery
-  TITLE=la 1ere ligne correspond au titre
+  TITLE=Gallery test
   TYPE=gallery
   {
-  "title": "Gallery test",
-  "desc": "test",
-  "path": "doc",
-  "img": "jean_pierre.0.galichet.jpg",
-  "map": []
+    "title": "Gallery test",
+    "desc": "test",
+    "img": "jean_pierre.0.galichet.jpg",
+    "map": [
+      {
+        "shape": "rect",
+        "coords": "246,94.75,339,212.75",
+        "fn": "jean pierre",
+        "sn": "galichet",
+        "oc": "0",
+        "alt": "je veux un lien vers la page de Jean Pierre Galichet  à partir du pouce.",
+        "group": "1",
+        "gw": "[[jean pierre/galichet/jean pierre galichet]]"
+      },
+      {
+        "shape": "rect",
+        "coords": "131,273,222,329",
+        "fn": "marie elisabeth",
+        "sn": "loche",
+        "oc": "0",
+        "alt": "et un lien vers sa femme au bout de la langue",
+        "group": "1",
+        "gw": "[[marie elisabeth/loche/marie elisabeth loche]]"
+      }
+    ],
+    "groups": [
+      {
+        "name": 1,
+        "label": "groupe 1"
+      }
+    ]
   }
 end page-ext

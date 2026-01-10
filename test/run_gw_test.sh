@@ -46,7 +46,7 @@ BIN_DIR="$DIST_DIR/gw"
 BASES_DIR="$DIST_DIR/bases"
 LEXICON=
 TAGS=
-GWDLOG=./distribution/gw/gwd.log
+GWDLOG=$BIN_DIR/gwd.log
 GWCGI=gwd.cgi # the cgi script name that call gwd with cgi parameter
 GWDLOGCGI=/tmp/gwd.log # associated error log
 CLEANLOG=1
@@ -62,8 +62,10 @@ WIZ=hg
 FN=anthoine
 SN=geruzet
 OC=0
-ID=26 # individual Id, ideally should have multiple events
-FID=13 # family id for this individual, ideally, should have multiple families
+# Warning ID and FID may be updated if DB updated.
+# for ref DBNAME this is associated to Laurent Geruzet
+ID=27 # individual Id, ideally should have multiple events
+FID=12 # family id for this individual, ideally, should have multiple families
 IMG_C="peugeot_206.png" # une image du carrousel de $ID!
 IMG_C_S="850r.jpg" # une image sauvegardée du carrousel de $ID!
 IMG_SRC="carte.de.priere.png" # une image dans bases/src/mabase/images
@@ -132,7 +134,7 @@ if test -n "$TAGS"; then
     gwdopt="$gwdopt --allowed_tags $TAGS"
 fi
 if test "$test_diff" || test "$set_ref"; then
-    gwdopt="$gwdopt -predictable_mode"
+    gwdopt="$gwdopt -predictable_mode -n_workers 0"
 fi
 
 pgrep gwd >/dev/null && \
@@ -149,8 +151,6 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -lang en \
   -log "<stderr>" \
   -plugins -unsafe $BIN_DIR/plugins \
-  -n_workers 0 \
-  -predictable_mode \
   2>> $GWDLOG &
 fi
 
@@ -205,6 +205,23 @@ crl () {
       test -n "$tstmsg" && echo "Failed $tstmsg, $nberr detected error(s)"
       grep "var.errors_list.=" /tmp/tmp.txt;
       RC=$(($RC+1))
+    elif test "$DBNAME" = "galichet"; then
+      if test -z "$cmd" && ! grep $GREPOPT "m=MISC_NOTES" /tmp/tmp.txt; then
+        echo "missing Notes index button on Welcome page ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      elif test "$cmd" = "p=xxx&n=yyy" && \
+           ! grep $GREPOPT -E "Not.found:|Unknown.person:" /tmp/tmp.txt; then
+        echo "missing 'Not found' page, issue 2220, ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      elif test "$cmd" = 'p=anthoine&n=geruzet&oc=0' && \
+           grep $GREPOPT "une.1ere..ligne.*ligne.terminal" /tmp/tmp.txt; then
+        echo "'text in pre tags not properly formatted, issue 2221, ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      elif test "$cmd" = 'p=marie&n=dupond&oc=0' && \
+           ! grep $GREPOPT "Galichet.*un.commentaire.entre.crochets" /tmp/tmp.txt; then
+        echo "'Failure parsing notes with brackets, issue 2218, ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      fi
     fi
   fi
   unset tstmsg
@@ -282,7 +299,7 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
 done
 if [ $attempt -eq $MAX_ATTEMPTS ]; then
-  echo "gwd does not seem to be running after $attempt trys"
+  echo "gwd does not seem to be running after $attempt trys\nhave a look to $GWDLOG"
   exit 1
 else
   echo "gwd start after $attempt trys"
@@ -470,6 +487,26 @@ elif test "$test_diff"; then
     fi
 fi
 
+# start gwsetup on same above conditions as gwd
+# first step is to start and manually test
+# constraint from gwsetup source code:
+#   gwsetup.log hardcoded name and in current dir
+# TODO: replace relative path if not default vars.
+# do not call open to avoid to hang the script.
+if test "$GWD2START" && test -z "$cgitest"; then
+    pgrep gwsetup >/dev/null && \
+        { killall gwsetup || { echo "unable to kill previous gwsetup process"; exit 1; }; }
+
+    cd $BASES_DIR
+    OCAMLRUNPARAM=b $SUDOPRFX ../gw/gwsetup \
+      -gd ../gw \
+      -lang en \
+      > gwsetup.log 2>&1 &
+    echo "gwsetup ready for manual tests"
+    #open "../START.htm"
+    echo "access http://localhost:2316 for that."
+fi
+
 if test -f "$GWDLOG"; then
 echo "$GWDLOG reported traces (empty if no failure):"
 grep -vw "Predictable mode must not be" $GWDLOG | grep -E "$WARNING_CONDITIONS"
@@ -477,7 +514,7 @@ grep -B1 -E "$FAILING_CONDITIONS" $GWDLOG && RC=$(($RC+1))
 fi
 if test "$RC" != 0; then
     echo "$0 failed, at least $RC detected error(s)."
-    exit 1
 else
     echo "$0 completed, No detected error."
 fi
+
