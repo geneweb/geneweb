@@ -181,7 +181,8 @@ let compute_json conf base p =
                   in
                   Hashtbl.replace next_level parent_ip (prev + cnt)
                 end
-                else Hashtbl.replace next_level parent_ip 1)
+                else if is_new_at_level then
+                  Hashtbl.replace next_level parent_ip 1)
               [ fath; moth ]
         | None -> ())
       current_level;
@@ -194,7 +195,9 @@ let compute_json conf base p =
       let uc = Hashtbl.length seen_cumul in
       let pc = !cumul_paths in
       let ic = if !i < mil then pc - uc else 0 in
-      let il = if !i < mil then pl - ul_level else 0 in
+      let il_local = if !i < mil then pl - ul_level else 0 in
+      let il_global = ul_level - ul in
+      let il = il_local + il_global in
       let theo_c = theoretical_max_cumul !i in
       let theo_l = theoretical_max_level !i in
       let pct_uc = compute_percent uc theo_c in
@@ -218,7 +221,7 @@ let compute_json conf base p =
       Buffer.add_string data_buf "\",\"noa\":\"";
       Buffer.add_string data_buf (string_of_int uc);
       Buffer.add_string data_buf "\",\"noa_l\":\"";
-      Buffer.add_string data_buf (string_of_int ul_level);
+      Buffer.add_string data_buf (string_of_int ul);
       Buffer.add_string data_buf "\",\"path\":\"";
       if ic > 0 then (
         Buffer.add_char data_buf '+';
