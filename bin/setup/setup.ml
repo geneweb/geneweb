@@ -9,6 +9,7 @@ let base_dir = ref (Filename.concat Filename.current_dir_name "bases")
 let lang_param = ref ""
 let only_file = ref ""
 let bname = ref ""
+let no_o = ref true
 
 let printer_conf =
   {
@@ -189,14 +190,18 @@ let parameters env =
             | "fn_b" when s <> "" -> loop (comm ^ " -pnoc_b \"" ^ s) env
             | "i" when s <> "" -> loop (comm ^ " -i " ^ s) env
             | "o" when s <> "" ->
-                if s = "choice" then loop comm env (* ignore ?? *)
+                if s = "choice" then (
+                  no_o := false;
+                  loop comm env (* ignore ?? *))
                 else
                   let out =
                     if s = "/notes_d/connex.txt" then !bname ^ ".gwb" ^ s
                     else s |> slashify_linux_dos
                   in
+                  no_o := false;
                   loop (comm ^ " -o " ^ out) env
-            | "o1" when s <> "" -> comm ^ " -o " ^ s ^ " > " ^ s
+            | "ot" when s <> "" -> comm ^ " -o " ^ s
+            | "o1" when s <> "" -> comm ^ " -o " ^ s
             | "oc_a" when s <> "" -> loop (comm ^ "." ^ s) env
             | "oc_b" when s <> "" -> loop (comm ^ "." ^ s) env
             | "od" when s <> "" -> loop (comm ^ " " ^ s) env
@@ -991,24 +996,26 @@ let connex ok_file conf =
   let uname = input_line ic in
   let () = close_in ic in
   let rc =
-    let commnd =
+    let commnd1 =
       "cd " ^ Sys.getcwd () ^ "; tput bel;"
       ^ stringify (Filename.concat !bin_dir "connex")
       ^ " " ^ parameters conf.env
     in
+    let commnd2 =
+      stringify (Filename.concat !bin_dir "connex") ^ " " ^ parameters conf.env
+    in
     if uname = "Darwin" then
-      let launch = "tell application \"Terminal\" to do script " in
-      Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd ^ " \"' ")
+      if !no_o then
+        let launch = "tell application \"Terminal\" to do script " in
+        Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd1 ^ " \"' ")
+      else exec_f commnd2
     else if uname = "Linux" then
       (* non testé ! *)
-      Sys.command ("xterm -e \" " ^ commnd ^ " \" ")
+      if !no_o then Sys.command ("xterm -e \" " ^ commnd1 ^ " \" ")
+      else exec_f commnd2
     else if Sys.win32 then
       (* à compléter et tester ! *)
-      let commnd =
-        stringify (Filename.concat !bin_dir "connex")
-        ^ " " ^ parameters conf.env
-      in
-      Sys.command commnd
+      if !no_o then Sys.command commnd1 else exec_f commnd2
     else (
       Printf.eprintf "%s (%s) %s (%s)\n" "Unknown Os_type" Sys.os_type
         "or wrong uname response" uname;

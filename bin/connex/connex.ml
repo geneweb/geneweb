@@ -99,27 +99,26 @@ let wiki_designation base basename p =
 let print_family base basename ifam =
   let fam = Driver.foi base ifam in
   let p = Driver.poi base (Driver.get_father fam) in
-  if !output <> None then (
+  if !output = None then (
     if
       Driver.sou base (Driver.get_first_name p) = "?"
       || Driver.sou base (Driver.get_surname p) = "?"
     then Printf.eprintf "i=%s" (Driver.Iper.to_string (Driver.get_iper p))
     else Printf.eprintf "  - %s" (utf8_designation base p);
-    Printf.eprintf "\n";
-    Printf.eprintf "  - %s\n"
+    Printf.eprintf "\n  - %s\n"
       (utf8_designation base (Driver.poi base (Driver.get_mother fam)));
-    flush stderr);
-  if
-    Driver.sou base (Driver.get_first_name p) = "?"
-    || Driver.sou base (Driver.get_surname p) = "?"
-  then
-    let indx = Driver.Iper.to_string (Driver.get_iper p) in
-    Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>" !server
-      !gwd_port basename indx indx
-  else Printf.printf "  - %s" (wiki_designation base basename p);
-  Printf.printf "\n";
-  Printf.printf "  - %s\n"
-    (wiki_designation base basename (Driver.poi base (Driver.get_mother fam)))
+    flush stderr)
+  else (
+    if
+      Driver.sou base (Driver.get_first_name p) = "?"
+      || Driver.sou base (Driver.get_surname p) = "?"
+    then
+      let indx = Driver.Iper.to_string (Driver.get_iper p) in
+      Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>" !server
+        !gwd_port basename indx indx
+    else Printf.printf "  - %s" (wiki_designation base basename p);
+    Printf.printf "\n  - %s\n"
+      (wiki_designation base basename (Driver.poi base (Driver.get_mother fam))))
 
 let kill_family base ip =
   let u = { family = Array.of_list [] } in
@@ -185,14 +184,15 @@ let compute_connex base basename =
         if nb > 0 && (!all || nb <= !min) then (
           if nb <= !min then min := nb;
           if nb >= !max then max := nb;
-          if !output <> None then (
+          if !output = None then (
             Printf.eprintf "Connex component \"%s\" length %d\n"
               (Driver.sou base origin_file)
               nb;
-            flush stderr);
-          Printf.printf "Connex component \"%s\" length %d<br>\n"
-            (Driver.sou base origin_file)
-            nb;
+            flush stderr)
+          else
+            Printf.printf "Connex component \"%s\" length %d<br>\n"
+              (Driver.sou base origin_file)
+              nb;
           if !detail == nb then List.iter (print_family base basename) ifaml
           else print_family base basename ifam;
           if !statistics then
