@@ -12,7 +12,8 @@ let speclist opts =
        " export isolated persons (work only if export all database)." )
   :: ( "-old_gw",
        Arg.Set GwuLib.old_gw,
-       " do not export additional fields (for backward compatibility: < 7.00)" )
+       " do not export additional fields (for backward compatibility: < 7.00)"
+     )
   :: ( "-raw",
        Arg.Set GwuLib.raw_output,
        " raw output (without possible utf-8 conversion)" )

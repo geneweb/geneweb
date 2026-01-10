@@ -1185,7 +1185,8 @@ let recover_2 conf =
           (Filename.concat "." old_to_src)
           in_file
           (if by_gedcom then "" else "-all_files")
-          o_opt (stringify (Filename.concat dir tmp))
+          o_opt
+          (stringify (Filename.concat dir tmp))
       in
       Printf.eprintf "$ %s\n" c;
       flush stderr;
@@ -1232,7 +1233,9 @@ let cleanup_1 conf =
   let in_base_dir = in_base ^ ".gwb" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
-  let c = Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw -all_files" in
+  let c =
+    Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw -all_files"
+  in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
   let _ = Sys.command c in
@@ -1340,7 +1343,8 @@ let merge_1 conf =
       | [] -> 0
       | b :: bases ->
           let c =
-            Filename.concat !bin_dir "gwu" ^ " " ^ b ^ " -o " ^ b ^ ".gw -all_files"
+            Filename.concat !bin_dir "gwu"
+            ^ " " ^ b ^ " -o " ^ b ^ ".gw -all_files"
           in
           Printf.eprintf "$ %s\n" c;
           flush stderr;
