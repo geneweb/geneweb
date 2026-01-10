@@ -526,23 +526,17 @@ let init_desc_cnt conf base p =
   done;
   desc_cnt
 
-let anc_cnt_aux conf base lev at_to p =
-  let cous = Hashtbl.create 10000 in
-  let asc_cnt = init_asc_cnt conf base p in
+let anc_cnt_aux ?asc_cnt conf base lev at_to p =
+  let asc_cnt =
+    match asc_cnt with Some a -> a | None -> init_asc_cnt conf base p
+  in
   if at_to then if lev < Array.length asc_cnt then Some asc_cnt.(lev) else None
   else
-    let rec loop i =
-      if i > lev || i >= Array.length asc_cnt - 1 then
-        Some (Hashtbl.fold (fun _k v acc -> v :: acc) cous [])
-      else (
-        (* several cousins records with same ip, different faml! *)
-        List.iter
-          (fun (ip, faml, ianc, lvl) ->
-            Hashtbl.replace cous ip (ip, faml, ianc, lvl))
-          asc_cnt.(i);
-        loop (i + 1))
+    let rec loop acc i =
+      if i > lev || i >= Array.length asc_cnt then Some acc
+      else loop (List.rev_append asc_cnt.(i) acc) (i + 1)
     in
-    loop 1
+    loop [] 1
 
 let desc_cnt_aux conf base lev at_to p =
   let cous = Hashtbl.create 10000 in
