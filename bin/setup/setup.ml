@@ -1264,7 +1264,14 @@ let cleanup_1 conf =
   in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
-  let rc = Sys.command c in
+  let rc1 = Sys.command c in
+  let c =
+    Filename.concat !bin_dir "update_nldb " ^ in_base ^ " > comm.log 2>&1"
+  in
+  Printf.eprintf "$ %s\n" c;
+  flush stderr;
+  let rc2 = Sys.command c in
+  let rc = rc1 + rc2 in
   let rc = if not Sys.unix then infer_rc conf rc else rc in
   Printf.eprintf "\n";
   flush stderr;
