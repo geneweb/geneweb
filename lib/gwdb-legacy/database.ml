@@ -944,7 +944,8 @@ let has_name_changed proj base_data i p =
   let names = proj p in
   let base_person =
     try base_data.Dbdisk.persons.get_nopatch i
-    with Failure _ -> { (Dutil.empty_person 0 0) with key_index = -1 }
+    with Failure _ | Invalid_argument _ ->
+      { (Dutil.empty_person 0 0) with key_index = -1 }
   in
 
   let base_names = proj base_person in
