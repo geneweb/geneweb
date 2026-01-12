@@ -44,12 +44,6 @@ endif
 	> $@ \
 	&& echo " Done!"
 
-bin/gwrepl/.depend:
-	@echo -n "Generating $@..."
-	@pwd > $@
-	@dune top bin/gwrepl >> $@
-	@echo " Done!"
-
 dune-workspace: dune-workspace.in Makefile.config
 	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
@@ -67,8 +61,7 @@ GENERATED_FILES_DEP = \
 	bin/gwb2ged/dune \
 	bin/gwc/dune \
 	bin/gwd/dune \
-	bin/gwrepl/dune \
-	bin/gwrepl/.depend \
+	bin/populate-xss-gwb/dune \
 	bin/gwu/dune \
 	bin/setup/dune \
 	bin/update_nldb/dune \
@@ -123,7 +116,7 @@ distrib:
 	cp $(BUILD_DISTRIB_DIR)gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged;
 	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc;
 	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd;
-	if test -f $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc ; then cp $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc $(DISTRIB_DIR)/gw/gwrepl; fi
+	cp $(BUILD_DISTRIB_DIR)populate-xss-gwb/populate_xss_gwb.exe $(DISTRIB_DIR)/gw/populate-xss-gwb;
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu;
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup;
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb;
