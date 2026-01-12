@@ -31,7 +31,6 @@
     num
     (ocaml (>= 4.08))
     odoc
-    ppx_blob
     ppx_deriving
     ppx_import
     stdlib-shims
