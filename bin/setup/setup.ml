@@ -1248,18 +1248,14 @@ let cleanup_1 conf =
   let _ = Sys.command c in
   Printf.eprintf "$ mkdir old\n";
   (try Unix.mkdir "old" 0o755 with Unix.Unix_error (_, _, _) -> ());
-
   if Sys.unix then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
   else (
     Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
     Printf.eprintf "$ rmdir old\\%s\n" in_base_dir);
-
   flush stderr;
   Mutil.rm_rf (Filename.concat "old" in_base_dir);
-
   if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
   else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
-
   flush stderr;
   Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
   let c =
@@ -1269,9 +1265,7 @@ let cleanup_1 conf =
   Printf.eprintf "$ %s\n" c;
   flush stderr;
   let rc = Sys.command c in
-
   let rc = if not Sys.unix then infer_rc conf rc else rc in
-
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then
@@ -1305,20 +1299,84 @@ let rec check_rename_conflict conf = function
   | [] -> ()
 
 let rename conf =
+  GWPARAM.init ();
+  Printf.eprintf "Init: %s\n" (!GWPARAM.bpath "aaa");
+  flush stderr;
   let rename_list =
     List.map (fun (k, v) -> (k, strip_spaces (decode v))) conf.env
+  in
+  let rename_cnt_files k v =
+    (* we assume that etc/bname/cache has been renamed *)
+    let dir = !GWPARAM.cnt_d k in
+    Printf.eprintf "Rename cnt files in %s\n" dir;
+    let files = Sys.readdir dir in
+    Array.iter
+      (fun filename ->
+        (* FIXME will rename base kxxx to vxxx *)
+        let k1 = k ^ "_" in
+        let v1 = v ^ "_" in
+        if String.starts_with ~prefix:k1 filename then (
+          let suffix =
+            String.sub filename (String.length k1)
+              (String.length filename - String.length k1)
+          in
+          let old_path = Filename.concat dir filename in
+          let new_path = Filename.concat dir (v1 ^ suffix) in
+          Unix.rename old_path new_path;
+          if Filename.remove_extension filename = k then
+            let ext = Filename.extension filename in
+            let old_path = Filename.concat dir filename in
+            let new_path = Filename.concat dir (v ^ ext) in
+            Unix.rename old_path new_path))
+      files
   in
   try
     check_new_names conf rename_list (all_db ".");
     check_rename_conflict conf (snd (List.split rename_list));
     List.iter
-      (fun (k, v) -> if k <> v then Sys.rename (k ^ ".gwb") (v ^ ".gwb"))
-      rename_list;
-    List.iter
-      (fun (k, v) -> if k <> v then Sys.rename (k ^ ".gwf") (v ^ ".gwf"))
+      (fun (k, v) ->
+        if k <> v then begin
+          Printf.eprintf "Start renaming (%s -> %s)\n" k v;
+          flush stderr;
+          try
+            if GWPARAM.is_reorg_base k then begin
+              Printf.eprintf "Is reorg\n";
+              flush stderr;
+              Sys.rename (k ^ ".gwb") (v ^ ".gwb")
+            end
+            else begin
+              Printf.eprintf "Is not reorg\n";
+              flush stderr;
+              if Sys.file_exists (k ^ ".gwb") then
+                Sys.rename (k ^ ".gwb") (v ^ ".gwb");
+              if Sys.file_exists (k ^ ".gwf") then
+                Sys.rename (k ^ ".gwf") (v ^ ".gwf");
+              if Sys.file_exists (!GWPARAM.etc_d k) then
+                Sys.rename (!GWPARAM.etc_d k) (!GWPARAM.etc_d v);
+              if Sys.file_exists (!GWPARAM.src_d k) then
+                Sys.rename (!GWPARAM.src_d k) (!GWPARAM.src_d v);
+              if Sys.file_exists (!GWPARAM.portraits_d k) then
+                Sys.rename (!GWPARAM.portraits_d k) (!GWPARAM.portraits_d v)
+            end;
+            rename_cnt_files k v
+          with Sys_error msg ->
+            Printf.eprintf "Error renaming %s to %s: %s\n" k v msg;
+            flush stderr;
+            raise Exit
+        end)
       rename_list;
     print_file conf "rename_ok.htm"
-  with Exit -> ()
+  with
+  | Exit ->
+      Printf.eprintf "Failed renaming\n";
+      flush stderr;
+      (*raise Exit  Re-raise to signal failure to caller *)
+      print_file conf "err_standard.htm"
+  | Sys_error msg ->
+      Printf.eprintf "System error during renaming: %s\n" msg;
+      flush stderr;
+      (* raise Exit *)
+      print_file conf "err_standard.htm"
 
 let delete conf = print_file conf "delete_1.htm"
 

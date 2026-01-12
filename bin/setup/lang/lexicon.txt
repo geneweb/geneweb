@@ -3865,6 +3865,10 @@ it: <b>Attenzione</b>: questa azione è definitiva! Per confermare, cliccate su 
 lv: <b>Uzmanîbu</b>: ðis brîdinâjums ir pçdçjais! Lai to apstiprinâtu, nospiediet ðo podziòu.
 sv: <b>Varning</b>: detta val är definitivt! För att bekräfta, tryck på denna knapp.
 
+    WARNING: rename has changed folder names
+en: <b>Warning</b>: Folder name change (etc, src, images) may impact your sym links
+fr: <b>Attention</b> : Le changement de nom des dossiers (src, etc, images) peut impacter vos liens symboliques
+
     We are going to create a database named "%o" from the following databases:
 aa: merge_1.htm
 co: Avemu da creà una basa di dati chì si chjama « %o » à partesi di ste base di dati :
