@@ -29,7 +29,7 @@
       <i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="sr-only">[*search/case sensitive]0</span>%nn;
     </a>
-    %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and e.m!="S" and e.m!="L" and e.m!="" and not ("_FAM" in e.m))1%end;%in;
+    %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and e.m!="S" and e.m!="L" and e.m!="" and not ("_FAM" in e.m or "DEL_" in e.m))1%end;%in;
     %if;(nb_persons.v!=0 and not predictable_mode)
       <a role="button" class="btn btn-sm btn-link p-0 border-0 fa-icon"
         href="%if;(rng=1)%apply;url_set%with;i/p/n/oc/file%and;%random_index;%end;%else;%prefix;i=%random_index;%end;"
