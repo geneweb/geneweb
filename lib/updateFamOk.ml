@@ -1014,24 +1014,26 @@ let effective_chg_order base ip u ifam n =
   let u = { family = Array.of_list fam } in
   Driver.patch_union base ip u
 
-let effective_del conf base ip fam =
+let effective_del conf base _ip fam =
   let ifam = Driver.get_ifam fam in
-  Driver.delete_family_rec base ifam;
-  let changed =
-    let gen_p =
-      let p =
-        if ip = Driver.get_mother fam then
-          Driver.poi base (Driver.get_mother fam)
-        else Driver.poi base (Driver.get_father fam)
-      in
-      Util.string_gen_person base (Driver.gen_person_of_person p)
-    in
-    let gen_fam =
-      Util.string_gen_family base (Driver.gen_family_of_family fam)
-    in
-    U_Delete_family (gen_p, gen_fam)
+  let father = Driver.get_father fam in
+  let mother = Driver.get_mother fam in
+  let children = Driver.get_children fam in
+  let gen_fam = Util.string_gen_family base (Driver.gen_family_of_family fam) in
+  let gen_p_of ip =
+    Util.string_gen_person base
+      (Driver.gen_person_of_person (Driver.poi base ip))
   in
-  History.record conf base changed "df"
+  let gen_father = gen_p_of father in
+  let gen_mother = gen_p_of mother in
+  let gen_children = Array.map gen_p_of children in
+  Driver.delete_family_rec base ifam;
+  History.record conf base (U_Delete_family (gen_father, gen_fam)) "df";
+  History.record conf base (U_Delete_family (gen_mother, gen_fam)) "df";
+  Array.iter
+    (fun gen_p ->
+      History.record conf base (U_Delete_family (gen_p, gen_fam)) "df")
+    gen_children
 
 let is_a_link = function _, _, _, Update.Link, _ -> true | _ -> false
 
@@ -1158,16 +1160,23 @@ let print_add_ok conf base (wl, ml) cpl des =
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
-let print_del_ok conf base wl =
+let print_del_ok conf base wl ~father ~mother ~children =
   Hutil.header conf @@ print_title conf "family deleted";
-  (match p_getenv conf.env "ip" with
-  | Some i ->
-      let p = Driver.poi base (Driver.Iper.of_string i) in
-      Output.print_sstring conf "<ul><li>";
-      Output.print_string conf
-        (reference conf base p (gen_person_text conf base p));
-      Output.print_sstring conf "\n</ul>"
-  | None -> ());
+  let print_person ip =
+    let p = Driver.poi base ip in
+    Output.print_sstring conf "<li>";
+    Output.print_string conf
+      (reference conf base p (gen_person_text conf base p));
+    Output.print_sstring conf "</li>\n"
+  in
+  Output.print_sstring conf "<ul>\n";
+  print_person father;
+  print_person mother;
+  Output.print_sstring conf "</ul>\n";
+  if Array.length children > 0 then (
+    Output.print_sstring conf "<ul>\n";
+    Array.iter print_person children;
+    Output.print_sstring conf "</ul>\n");
   Update.print_warnings conf base wl;
   Hutil.trailer conf
 
@@ -1176,15 +1185,20 @@ let print_del conf base =
   | Some i ->
       let ifam = Driver.Ifam.of_string i in
       let fam = Driver.foi base ifam in
-      let ip =
-        match p_getenv conf.env "ip" with
-        | Some i when Driver.get_mother fam = Driver.Iper.of_string i ->
-            Driver.get_mother fam
-        | Some _ | None -> Driver.get_father fam
-      in
-      effective_del conf base ip fam;
-      Util.commit_patches conf base;
-      print_del_ok conf base []
+      if Driver.get_ifam fam = Driver.Ifam.dummy then
+        Hutil.incorrect_request conf
+      else
+        let father = Driver.get_father fam in
+        let mother = Driver.get_mother fam in
+        let children = Driver.get_children fam in
+        let ip =
+          match p_getenv conf.env "ip" with
+          | Some i when mother = Driver.Iper.of_string i -> mother
+          | Some _ | None -> father
+        in
+        effective_del conf base ip fam;
+        Util.commit_patches conf base;
+        print_del_ok conf base [] ~father ~mother ~children
   | None -> Hutil.incorrect_request conf
 
 let print_inv_ok conf base p =
