@@ -1016,7 +1016,7 @@ let effective_chg_order base ip u ifam n =
 
 let effective_del conf base ip fam =
   let ifam = Driver.get_ifam fam in
-  Driver.delete_family base ifam;
+  Driver.delete_family_rec base ifam;
   let changed =
     let gen_p =
       let p =

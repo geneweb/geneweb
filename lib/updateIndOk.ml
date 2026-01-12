@@ -945,7 +945,7 @@ let effective_del_no_commit base op =
   Update.update_related_pointers base op.key_index
     (rparents_of op.rparents @ pwitnesses_of op.pevents)
     [];
-  Driver.delete_person base op.key_index
+  Driver.delete_person_rec base op.key_index
 
 let effective_del_commit conf base op =
   Notes.update_notes_links_db base (Def.NLDB.PgInd op.key_index) "";
