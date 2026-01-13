@@ -32,7 +32,11 @@ let give_access_someone conf base (x, t) list =
       Output.print_sstring conf "-";
       Output.print_sstring conf (string_of_int d.year));
   if has_dates then Output.print_sstring conf "</em>: ";
-  (if List.mem x list then Output.print_sstring conf "<em>"
+  (if
+   List.exists
+     (fun person -> Gwdb.eq_iper (Gwdb.get_iper person) (Gwdb.get_iper x))
+     list
+  then Output.print_sstring conf "<em>"
   else
     let open Def in
     Output.print_string conf
@@ -68,7 +72,11 @@ let give_access_someone conf base (x, t) list =
       (if t.t_nth >= 100 then string_of_int t.t_nth
       else Util.transl_nth conf "nth" t.t_nth);
     Output.print_sstring conf ")");
-  if List.mem x list then Output.print_sstring conf "</em>"
+  if
+    List.exists
+      (fun person -> Gwdb.eq_iper (Gwdb.get_iper person) (Gwdb.get_iper x))
+      list
+  then Output.print_sstring conf "</em>"
   else Output.print_sstring conf "</a>"
 
 let give_access_title_aux conf xhref content =
