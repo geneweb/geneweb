@@ -261,41 +261,40 @@
 # =============================================================================
 # Datalist autocompletion (browser cache files)
 # =============================================================================
-# Enable datalist autocompletion for form inputs. When enabled, the browser
-# loads .gz cache files to provide suggestions while typing.
-# Cache files are generated in bases/etc/mybase/cache/
-# using the “cache_files" tool in gwsetup or in command line.
-# They are not set by default
-# Set to 1 to enable
+# Enable autocompletion for form inputs using HTML <datalist>.
+# Suggestions are loaded from compressed cache files (.gz) generated
+# from your Geneweb database.
 #
-# First names (welcome, MOD_IND, MOD_FAM)
+# Cache files are created in: bases/etc/<base>/cache/
+# using the "cache_files" tool (gwsetup or command line).
+#
+# IMPORTANT:
+# - Cache files are NOT generated nor updated automatically.
+# - You must regenerate them manually after data changes.
+#
+# Set the desired options below to 1 to enable autocompletion
+# for the corresponding fields.
+#
+# First names and surnames
+# Used in: welcome page, individual and family modification forms
 #datalist_fnames=1
-#
-# Surnames (welcome, MOD_IND, MOD_FAM)
 #datalist_snames=1
 #
-# Places (MOD_IND, MOD_FAM)
+# Places, occupations and sources
+# Used in: individual and family modification forms
 #datalist_places=1
-#
-# Occupations (MOD_IND, MOD_FAM)
 #datalist_occupations=1
-#
-# Sources (MOD_IND, MOD_FAM)
 #datalist_sources=1
 #
-# Public names (MOD_IND)
+# Public names, qualifiers and aliases
+# Used in: individual modification form
 #datalist_pub_names=1
-#
-# Qualifiers (MOD_IND)
 #datalist_qualifiers=1
-#
-# Aliases (MOD_IND)
 #datalist_aliases=1
 #
-# Nobility titles (welcome, MOD_IND)
+# Nobility titles and domains
+# Used in: welcome page and individual modification forms
 #datalist_titles=1
-#
-# Estates/domains (welcome, MOD_IND)
 #datalist_estates=1
 
 # =============================================================================
@@ -581,21 +580,14 @@
 # may be set to "always" or "never".
 #has_events=
 
-# Events in the NMBDS (baptism, marriage, death, burial) display
-# now include notes and sources directly in the interface,
-# with the option to hide these tooltips
+# Display notes and sources as tooltips on NMBDS events
+# (birth, baptism, marriage, death, burial) in individual page header.
+# Enabled by default. Set to "no" to disable these tooltips.
 #event_tooltips=no
 
 # for wiki syntax since version 5.00, TODO what purpose ?
 # notes alias file is <basename>.gwb/notes.alias by default, or specified here
 #notes_alias_file=
-
-# Display in red color not existing person or do not if var is set to off.
-#red_if_not_exist=off
-
-# in gwd/request.ml use Perso.interp_templ or person_selected if var is set
-# TODO what purpose ?
-#ptempl=yes
 
 # By default generated web pages have robots content="none"
 # except if robot_index=yes defined since PR #1728  in version 7.1
@@ -607,13 +599,36 @@
 # since version 7.0. Details on https://geneweb.tuxfamily.org/wiki/plugins
 #plugins=
 
-# Activates Roglo-specific template extensions, default is not
+# Activates Roglo-specific template, not active by defaut.
 #roglo=yes
+
+# Alternative Geneweb server/base
+# If set, display a button in home bar to jump to another Geneweb base.
+# Used to link related bases (e.g. private/public, test/production).
 #
-# associated alt_serv_* TODO: to be documented
+# Alternative server address (optional).
+# If empty, use current server address.
 #alt_serv_adr=
+#
+# Alternative base name (mandatory to enable the button).
 #alt_serv_base=
+#
+# Optional title for the alternative base (used in tooltip).
+# If empty, base name is used.
 #alt_serv_title=
+
+# red_if_not_exist forces links to appear as existing even if person is missing
+# or not accessible. Breaks red/blue link semantics.
+# LEGACY: Kept for backward compatibility. Do not use.
+#red_if_not_exist=off
+
+# in gwd/request.ml use Perso.interp_templ or person_selected if var is set
+# LEGACY: kept for backward compatibility, purpose unclear…
+#ptempl=yes
+
+# in etc/updfam.txt legacy option to handle multiple parents (>2)
+# DEV: do not use in new setups
+#multi_parents=yes
 
 ### templm specific parameters ######################################
 
@@ -643,7 +658,6 @@
 #event_age=yes
 
 # for templm, jquery functions:
-# TODO obsolete description versus current source code.
 # on individual page, display numbers of ascendants, descendants, implexes
 # on individual & family forms, search for places, sources, occupations
 #    and search for witnesses
@@ -671,10 +685,6 @@
 # for templm, In family form, if variable is set
 # if no mariage comment, then union comment is moved to mariage comment.
 #move_comment=yes
-
-# is used in etc/updfam.txt
-# TODO do not understand purpose
-#multi_parents=yes
 
 # for templm, In form pages,
 # if uppercase is set, then able to change the list of particles
