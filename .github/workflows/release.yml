@@ -89,6 +89,41 @@ jobs:
           opam exec -- ocaml ./configure.ml --sosa-zarith ${{ matrix.is-unix && '--gwd-caching' || '' }}
           opam exec -- make distrib distrib-rpc
 
+      - name: Bundle PCRE2 runtime DLL (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          echo "=== Bundling PCRE2 DLL for Windows ==="
+          
+          # Debug: show opam structure
+          OPAM_PATH=$(cygpath "$OPAMROOT")
+          echo "OPAMROOT: $OPAMROOT"
+          echo "OPAM_PATH: $OPAM_PATH"
+          echo ""
+          echo "Opam switch info:"
+          opam switch show
+          opam var prefix
+          echo ""
+          
+          # List what's in opam bin
+          echo "Contents of opam bin:"
+          ls -la "$(opam var bin)" | grep -i pcre || echo "No PCRE in opam bin"
+          echo ""
+          
+          # Search widely
+          echo "Searching for libpcre2-8-0.dll..."
+          PCRE2_DLL=$(find "$OPAM_PATH" /usr/x86_64-w64-mingw32 /usr/bin -name "libpcre2-8-0.dll" 2>/dev/null | head -1)
+          
+          if [ -n "$PCRE2_DLL" ]; then
+            echo "Found: $PCRE2_DLL"
+            cp "$PCRE2_DLL" distribution/gw/
+            ls -lh distribution/gw/libpcre2-8-0.dll
+          else
+            echo "ERROR: Not found. All PCRE2 files in system:"
+            find /usr -name "*pcre2*" 2>/dev/null | head -20
+            exit 1
+          fi
+
       - name: Verify static linking (Windows)
         if: runner.os == 'Windows'
         shell: bash
@@ -157,18 +192,18 @@ jobs:
             
             [Linux (glibc 2.35+)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) • [macOS (Apple Silicon)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) • [macOS (Intel)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) • [Windows](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) • [Source code](${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}.zip)
             
-            ### Prerequisites
-            
-            **Linux/macOS:** Install GMP library
-             ```bash
+            **Linux:** Install system libraries
+            ```bash
             # Ubuntu/Debian
-            sudo apt-get install libgmp10
-            
-            # macOS
-            brew install gmp
+            sudo apt-get install libgmp10 libpcre2-dev
             ```
             
-            **Windows:** No additional dependencies required (GMP statically linked)
+            **macOS:** Install via [Homebrew](https://brew.sh/)
+            ```bash
+            brew install gmp pcre2
+            ```
+            
+            **Windows:** No additional dependencies required (gmp statically linked/pcre2 bundled).
             
             ### Installation
             
