@@ -479,7 +479,7 @@ let build_list ~ignore_case conf base =
         if not @@ Caches.has_cache ~conf ~mode:data_kind then
           get_data_from_database ~conf base
         else
-          List.map
+          Ext_list.map_sort_uniq
             (fun string -> `String string)
             (Caches.complete_with_patch data_kind base (Fun.const true)
                (Caches.read_cache ~conf data_kind))
