@@ -1,0 +1,1 @@
+GeneWeb.app/Contents/Resources/stop_geneweb.command
