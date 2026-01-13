@@ -92,31 +92,31 @@ let node_threshold = 20_000
 let tmp_file fname = fname ^ ".tmp"
 
 let write_caches base =
+  let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
+  let lastname_fname = lastname_cache_fname base_dir in
+  let first_name_fname = first_name_cache_fname base_dir in
+  let occupation_fname = occupation_cache_fname base_dir in
+  let source_fname = source_cache_fname base_dir in
+  let place_fname = place_cache_fname base_dir in
   if Gwdb.nb_of_persons base > node_threshold then (
     let cache = create_cache_data base in
-    let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
     let lastname =
       sorted_list_of_istr_set base Utf8.alphabetic_order cache.lastname
     in
-    let lastname_fname = lastname_cache_fname base_dir in
     let lastname_fname_tmp = tmp_file lastname_fname in
     let first_name =
       sorted_list_of_istr_set base Utf8.alphabetic_order cache.first_name
     in
-    let first_name_fname = first_name_cache_fname base_dir in
     let first_name_fname_tmp = tmp_file first_name_fname in
     let occupation =
       sorted_list_of_istr_set base Utf8.alphabetic_order cache.occupation
     in
-    let occupation_fname = occupation_cache_fname base_dir in
     let occupation_fname_tmp = tmp_file occupation_fname in
     let source =
       sorted_list_of_istr_set base Utf8.alphabetic_order cache.source
     in
-    let source_fname = source_cache_fname base_dir in
     let source_fname_tmp = tmp_file source_fname in
     let place = sorted_list_of_istr_set base Place.compare_places cache.place in
-    let place_fname = place_cache_fname base_dir in
     let place_fname_tmp = tmp_file place_fname in
     write_cache_data lastname_fname_tmp lastname;
     write_cache_data first_name_fname_tmp first_name;
