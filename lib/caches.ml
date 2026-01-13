@@ -128,6 +128,15 @@ let write_caches base =
     Files.mv occupation_fname_tmp occupation_fname;
     Files.mv source_fname_tmp source_fname;
     Files.mv place_fname_tmp place_fname)
+  else
+    List.iter Files.rm
+      [
+        lastname_fname;
+        first_name_fname;
+        occupation_fname;
+        source_fname;
+        place_fname;
+      ]
 
 let cache_file_of_cache_data base_file = function
   | `lastname -> lastname_cache_fname base_file
