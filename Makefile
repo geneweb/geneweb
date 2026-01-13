@@ -61,7 +61,6 @@ GENERATED_FILES_DEP = \
 	lib/gwlib.ml \
 	lib/dev_config.ml \
 	lib/util/dune \
-	bin/caches/dune \
 	bin/consang/dune \
 	bin/fixbase/dune \
 	bin/ged2gwb/dune \

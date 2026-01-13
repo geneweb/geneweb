@@ -172,6 +172,19 @@ and eval_simple_bool_var _conf _base env _xx = function
       match get_env "key" env with
       | Vstring _ as x -> get_env "entry_key" env = x
       | _ -> false)
+  | "needs_short_display" -> (
+      match get_env "list" env with
+      | Vlist_value _ | Vstring _ | Vother _ | Vnone -> false
+      | Vlist_data l ->
+          let has_distinct_index_keys () =
+            match
+              List.sort_uniq Utf8.alphabetic_order
+                (List.rev_map (fun (_, s) -> Place.without_suburb s) l)
+            with
+            | [] | [ _ ] -> false
+            | _ :: _ :: _ -> true
+          in
+          List.length l > 1000 && has_distinct_index_keys ())
   | _ -> raise Not_found
 
 and eval_simple_str_var conf _base env _xx = function
@@ -179,10 +192,6 @@ and eval_simple_str_var conf _base env _xx = function
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_key" -> eval_string_env "entry_key" env
   | "ini" -> eval_string_env "ini" env
-  | "nb_results" -> (
-      match get_env "list" env with
-      | Vlist_data l -> string_of_int (List.length l)
-      | _ -> "0")
   | "title" ->
       let len =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
