@@ -476,12 +476,16 @@ let build_list ~ignore_case conf base =
     match get_data_kind_from_env conf.Config.env with
     | None -> get_data_from_database ~conf base
     | Some data_kind ->
-        if not @@ Caches.has_cache ~conf ~mode:data_kind then
-          get_data_from_database ~conf base
+        let with_cache () =
+          Gwdb.nb_of_persons base > Caches.node_threshold
+          && Caches.has_cache ~conf ~mode:data_kind
+        in
+        if not @@ with_cache () then get_data_from_database ~conf base
         else
-          List.map
+          Ext_list.map_sort_uniq
             (fun string -> `String string)
-            (Caches.complete_with_patch data_kind base (Fun.const true)
+            (Caches.complete_with_patch data_kind base
+               (Fun.negate @@ String.equal "")
                (Caches.read_cache ~conf data_kind))
   in
   let to_string_id_string ~base = function
