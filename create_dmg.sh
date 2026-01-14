@@ -34,7 +34,104 @@ echo ""
 STAGING_DIR=$(mktemp -d)
 cp -R "${APP_NAME}.app" "$STAGING_DIR/"
 ln -s /Applications "$STAGING_DIR/Applications"
-ln -s "${APP_NAME}.app/Contents/Resources/stop_geneweb.command" "$STAGING_DIR/stop_geneweb.command"
+ln -s "${APP_NAME}.app/Contents/Resources/geneweb_stop.command" "$STAGING_DIR/GeneWeb_stop.command"
+
+# Ajouter après la création du fichier "Arrêter GeneWeb"
+
+cat > "$STAGING_DIR/Installer GeneWeb.command" << 'EOFINSTALL'
+#!/bin/bash
+
+clear
+echo "╔═══════════════════════════════════════════════════════╗"
+echo "║         Installation de GeneWeb pour macOS            ║"
+echo "╚═══════════════════════════════════════════════════════╝"
+echo ""
+
+# Obtenir le chemin du DMG
+DMG_PATH="$(cd "$(dirname "$0")" && pwd)"
+
+echo "1️⃣  Vérification..."
+
+if [ ! -d "$DMG_PATH/GeneWeb.app" ]; then
+    echo "❌ GeneWeb.app non trouvé dans le DMG"
+    exit 1
+fi
+
+echo "2️⃣  Installation dans /Applications..."
+
+# Supprimer l'ancienne version si elle existe
+if [ -d "/Applications/GeneWeb.app" ]; then
+    echo "   → Suppression de l'ancienne version..."
+    rm -rf /Applications/GeneWeb.app
+fi
+
+echo "3️⃣  Arrêt de GeneWeb si déjà lancé..."
+
+# Vérifier si GeneWeb tourne
+if pgrep -q "gwd\|gwsetup"; then
+    echo "   → GeneWeb est en cours d'exécution, arrêt..."
+    
+    # Arrêt doux
+    pkill gwd
+    pkill gwsetup
+    sleep 2
+    
+    # Arrêt forcé si nécessaire
+    pkill -9 gwd 2>/dev/null || true
+    pkill -9 gwsetup 2>/dev/null || true
+    sleep 1
+    
+    # Vérifier que tout est arrêté
+    if pgrep -q "gwd\|gwsetup"; then
+        echo ""
+        echo "❌ Impossible d'arrêter GeneWeb complètement"
+        echo ""
+        echo "Processus encore actifs:"
+        pgrep -fl "gwd|gwsetup"
+        echo ""
+        echo "Veuillez:"
+        echo "  1. Fermer la fenêtre Terminal de GeneWeb"
+        echo "  2. Ou double-cliquer sur 'Arrêter GeneWeb.command'"
+        echo "  3. Puis relancer cette installation"
+        echo ""
+        read -p "Appuyez sur Entrée pour quitter..."
+        exit 1
+    fi
+    
+    echo "   ✅ GeneWeb arrêté"
+else
+    echo "   ✅ GeneWeb n'est pas en cours d'exécution"
+fi
+
+# Copier la nouvelle version
+echo "   → Copie de GeneWeb.app..."
+cp -R "$DMG_PATH/GeneWeb.app" /Applications/
+
+echo "4️⃣️  Suppression de la quarantaine..."
+xattr -cr /Applications/GeneWeb.app 2>/dev/null || {
+    echo ""
+    echo "⚠️  Impossible de supprimer la quarantaine automatiquement"
+    echo ""
+    echo "Veuillez taper cette commande dans le Terminal:"
+    echo "  xattr -cr /Applications/GeneWeb.app"
+    echo ""
+    read -p "Appuyez sur Entrée pour continuer..."
+}
+
+echo ""
+echo "╔═══════════════════════════════════════════════════════╗"
+echo "║  ✅ Installation terminée !                           ║"
+echo "║                                                       ║"
+echo "║  Vous pouvez maintenant :                             ║"
+echo "║    1. Éjecter ce DMG                                  ║"
+echo "║    2. Lancer GeneWeb depuis Applications              ║"
+echo "╚═══════════════════════════════════════════════════════╝"
+echo ""
+
+sleep 3
+EOFINSTALL
+
+chmod +x "$STAGING_DIR/Installer GeneWeb.command"
 
 cat > "$STAGING_DIR/Lisez-moi.txt" << 'EOF'
 ╔═══════════════════════════════════════════════════════╗
@@ -57,7 +154,7 @@ ARRÊT
 ═════
 Pour arrêter proprement :
 → Ouvrez GeneWeb.app → Afficher le contenu du paquet
-→ Double-cliquez sur stop_geneweb.command
+→ Double-cliquez sur geneweb_stop.command
 
 SUPPORT
 ═══════
@@ -85,7 +182,7 @@ STOP
 ════
 To stop properly:
 → Open GeneWeb.app → Show Package Contents
-→ Double-click stop_geneweb.command
+→ Double-click geneweb_stop.command
 
 SUPPORT
 ═══════

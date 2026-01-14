@@ -253,19 +253,8 @@ else
     BASES_DIR="$BUNDLE_DIR/Resources/bases"
 fi
 
-# Définir les ports (ordre de priorité: config > défaut)
-GWD_PORT="${GWD_PORT:-2317}"
-GWSETUP_PORT="${GWSETUP_PORT:-2316}"
-
 LOG_FILE="/tmp/geneweb_launch.log"
 exec > "$LOG_FILE" 2>&1
-
-echo "=== Lancement de GeneWeb à $(date) ==="
-echo "Configuration:"
-echo "  BASES_DIR: $BASES_DIR"
-echo "  GWD_PORT: $GWD_PORT"
-echo "  GWSETUP_PORT: $GWSETUP_PORT"
-echo "  Config file: $CONFIG_FILE"
 
 GW_DIR="$BUNDLE_DIR/Resources/gw"
 START_PAGE="$BUNDLE_DIR/Resources/START.htm"
@@ -315,17 +304,31 @@ msg() {
             if [[ "$DETECTED_LANG" = "fr" ]]; then
                 echo ""; echo "✅ GeneWeb est lancé !"; echo ""
                 echo "🌐 Votre navigateur va s'ouvrir."
-                echo "📌 Gardez cette fenêtre ouverte."
                 echo "📁 Bases: $BASES_DIR"
                 echo "🔌 Ports: gwd=$GWD_PORT, gwsetup=$GWSETUP_PORT"
+                echo "❓ Options gwd: $GWD_OPTS"
                 echo ""
+                echo "📋 Logs disponibles :"
+                echo "    gwsetup: $GWSETUP_LOG"
+                echo "    gwd: $GWD_LOG"
+                echo ""
+                echo "Pour arrêter GeneWeb :"
+                echo "  - Script: Arrêter GeneWeb.command"
+                echo "  - Terminal: pkill gwd; pkill gwsetup"
             else
                 echo ""; echo "✅ GeneWeb is running!"; echo ""
                 echo "🌐 Your browser will open."
-                echo "📌 Keep this window open."
                 echo "📁 Databases: $BASES_DIR"
                 echo "🔌 Ports: gwd=$GWD_PORT, gwsetup=$GWSETUP_PORT"
+                echo "❓ Options gwd: $GWD_OPTS"
                 echo ""
+                echo "📋 Logs available:"
+                echo "    gwsetup: $GWSETUP_LOG"
+                echo "    gwd: $GWD_LOG"
+                echo ""
+                echo "To stop GeneWeb:"
+                echo "  - Script: geneweb_stop.command"
+                echo "  - Terminal: pkill gwd; pkill gwsetup"
             fi
             ;;
         stop)
@@ -348,54 +351,74 @@ pkill -f '/gwsetup' 2>/dev/null || true
 sleep 1
 
 cd "$BASES_DIR"
-[ -f "gwsetup.log" ] && mv "gwsetup.log" "gwsetup.log.old"
-[ -f "gwd.log" ] && mv "gwd.log" "gwd.log.old"
 
 msg "start"
 
-# Lancer gwsetup avec le port configuré
-"$GW_DIR/gwsetup" -gd "$GW_DIR" -lang "$DETECTED_LANG" -p "$GWSETUP_PORT" > gwsetup.log 2>&1 &
+# Définir les ports
+GWD_PORT="${GWD_PORT:-2317}"
+GWSETUP_PORT="${GWSETUP_PORT:-2316}"
+GWD_OPTS="${GWD_OPTS:-}"
+
+# Définir les emplacements des logs (depuis config ou par défaut dans /tmp)
+GWSETUP_LOG="${GWSETUP_LOG:-/tmp/geneweb_gwsetup.log}"
+GWD_LOG="${GWD_LOG:-/tmp/geneweb_gwd.log}"
+
+# Créer les répertoires des logs si nécessaire
+mkdir -p "$(dirname "$GWSETUP_LOG")" 2>/dev/null || true
+mkdir -p "$(dirname "$GWD_LOG")" 2>/dev/null || true
+
+# Sauvegarder les anciens logs
+[ -f "$GWSETUP_LOG" ] && mv "$GWSETUP_LOG" "${GWSETUP_LOG}.old" 2>/dev/null || true
+[ -f "$GWD_LOG" ] && mv "$GWD_LOG" "${GWD_LOG}.old" 2>/dev/null || true
+
+echo "=== Lancement de GeneWeb à $(date) ==="
+echo "Configuration:"
+echo "  BASES_DIR: $BASES_DIR"
+echo "  GWD_PORT: $GWD_PORT"
+echo "  GWSETUP_PORT: $GWSETUP_PORT"
+echo "  GWD_OPTS: $GWD_OPTS"
+echo "  Config file: $CONFIG_FILE"
+echo "Logs:"
+echo "  gwsetup: $GWSETUP_LOG"
+echo "  gwd: $GWD_LOG"
+
+# Lancer gwsetup et le détacher complètement
+"$GW_DIR/gwsetup" -gd "$GW_DIR" -lang "$DETECTED_LANG" > "$GWSETUP_LOG" 2>&1 &
+GWSETUP_PID=$!
+disown $GWSETUP_PID
 sleep 3
 
 if ! pgrep -f '/gwsetup' >/dev/null 2>&1; then
     [[ "$DETECTED_LANG" = "fr" ]] && echo "❌ Échec gwsetup" || echo "❌ Failed gwsetup"
-    echo "Contenu de gwsetup.log:"
-    cat gwsetup.log
-    echo ""
-    echo "Configuration utilisée:"
-    echo "  Port: $GWSETUP_PORT"
-    echo "  Langue: $DETECTED_LANG"
+    echo "Voir les logs: $GWSETUP_LOG"
+    cat "$GWSETUP_LOG"
     exit 1
 fi
 
-# Lancer gwd avec le port configuré
-"$GW_DIR/gwd" -bd "$BASES_DIR" -hd "$GW_DIR" -p "$GWD_PORT" > gwd.log 2>&1 &
+# Lancer gwd et le détacher complètement
+"$GW_DIR/gwd" -bd "$BASES_DIR" -hd "$GW_DIR" $GWD_OPTS > "$GWD_LOG" 2>&1 &
+GWD_PID=$!
+disown $GWD_PID
 sleep 3
 
 if ! pgrep -f '/gwd' >/dev/null 2>&1; then
     [[ "$DETECTED_LANG" = "fr" ]] && echo "❌ Échec gwd" || echo "❌ Failed gwd"
-    echo "Contenu de gwd.log:"
-    cat gwd.log
-    echo ""
-    echo "Configuration utilisée:"
-    echo "  Bases: $BASES_DIR"
-    echo "  Port: $GWD_PORT"
+    echo "Voir les logs: $GWD_LOG"
+    cat "$GWD_LOG"
     exit 1
 fi
 
 msg "ready"
 
 sleep 1
-# Ouvrir avec le bon port
-[[ -f "$START_PAGE" ]] && open "$START_PAGE" || open "http://127.0.0.1:${GWD_PORT}/gw_setup"
+[[ -f "$START_PAGE" ]] && open "$START_PAGE" || open "http://127.0.0.1:2317/gw_setup"
 
-[[ -n "${TERM_PROGRAM:-}" ]] && osascript -e 'tell application "Terminal" to set miniaturized of first window to true' 2>/dev/null || true
+# Désactiver le trap cleanup car les processus sont détachés
+trap - INT TERM EXIT
+sleep 3
 
-while true; do
-    sleep 1
-    pgrep -f '/gwd' >/dev/null 2>&1 || break
-    pgrep -f '/gwsetup' >/dev/null 2>&1 || break
-done
+# Fermer le script (les processus continuent)
+exit 0
 EOFMAIN
 
 chmod +x "${BUNDLE_DIR}/MacOS/${APP_NAME}"
@@ -434,7 +457,7 @@ EOFSETUP
 
 chmod +x "${BUNDLE_DIR}/Resources/gwsetup.command"
 
-cat > "${BUNDLE_DIR}/Resources/stop_geneweb.command" << 'EOFSTOP'
+cat > "${BUNDLE_DIR}/Resources/geneweb_stop.command" << 'EOFSTOP'
 #!/bin/bash
 echo "🛑 Arrêt de GeneWeb / Stopping GeneWeb..."
 pkill gwd
@@ -446,7 +469,7 @@ echo "✅ GeneWeb arrêté / GeneWeb stopped"
 sleep 2
 EOFSTOP
 
-chmod +x "${BUNDLE_DIR}/Resources/stop_geneweb.command"
+chmod +x "${BUNDLE_DIR}/Resources/geneweb_stop.command"
 
 echo ""
 echo "📎 Création des utilitaires utilisateur..."
@@ -454,7 +477,7 @@ echo "📎 Création des utilitaires utilisateur..."
 mkdir -p "${BUNDLE_DIR}/Resources/Utilitaires"
 
 # 1. Arrêter GeneWeb
-cp "${BUNDLE_DIR}/Resources/stop_geneweb.command" \
+cp "${BUNDLE_DIR}/Resources/geneweb_stop.command" \
    "${BUNDLE_DIR}/Resources/Utilitaires/Arrêter GeneWeb.command"
 
 # 2. Lancer seulement gwd
@@ -547,7 +570,7 @@ GeneWeb pour macOS
 ==================
 
 LANCEMENT : Double-cliquez sur GeneWeb.app
-ARRÊT : Double-cliquez sur stop_geneweb.command dans Resources
+ARRÊT : Double-cliquez sur geneweb_stop.command dans Resources
 LOGS : /tmp/geneweb_launch.log
 SUPPORT : https://github.com/geneweb/geneweb
 EOFREADME
@@ -576,6 +599,8 @@ cat > "${BUNDLE_DIR}/Info.plist" << EOF
     <string>${VERSION}</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>GeneWeb.icns</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>LSMinimumSystemVersion</key>
@@ -586,19 +611,64 @@ cat > "${BUNDLE_DIR}/Info.plist" << EOF
 </plist>
 EOF
 
+# Copier l'icône si elle existe
+if [ -f "GeneWeb.icns" ]; then
+    cp "GeneWeb.icns" "${BUNDLE_DIR}/Resources/"
+    echo "   ✅ Icône ajoutée"
+elif [ -f "distribution/GeneWeb.icns" ]; then
+    cp "distribution/GeneWeb.icns" "${BUNDLE_DIR}/Resources/"
+    echo "   ✅ Icône ajoutée"
+else
+    echo "   ⚠️  GeneWeb.icns non trouvée (placez-la à la racine du projet)"
+fi
+
+echo ""
+echo "🧹 Nettoyage des fichiers système..."
+
+# Supprimer les fichiers .DS_Store (cause des problèmes de permissions)
+find "${APP_NAME}.app" -name ".DS_Store" -delete 2>/dev/null || true
+
+# Supprimer les fichiers cachés macOS
+find "${APP_NAME}.app" -name "._*" -delete 2>/dev/null || true
+
+# Supprimer les fichiers de sauvegarde
+find "${APP_NAME}.app" -name "*~" -delete 2>/dev/null || true
+find "${APP_NAME}.app" -name "*.bak" -delete 2>/dev/null || true
+
+# Supprimer les fichiers Python compilés
+find "${APP_NAME}.app" -name "*.pyc" -delete 2>/dev/null || true
+find "${APP_NAME}.app" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+
+# Fixer toutes les permissions
+echo "   → Correction des permissions..."
+chmod -R u+w "${APP_NAME}.app" 2>/dev/null || true
+chmod -R go-w "${APP_NAME}.app" 2>/dev/null || true
+
+# S'assurer que les exécutables sont exécutables
+chmod +x "${BUNDLE_DIR}"/MacOS/* 2>/dev/null || true
+chmod +x "${BUNDLE_DIR}"/Resources/gw/* 2>/dev/null || true
+chmod +x "${BUNDLE_DIR}"/Resources/*.command 2>/dev/null || true
+
+echo "   ✅ Nettoyage et permissions corrigés"
+
 echo ""
 echo "🔐 Signature finale..."
 
-xattr -dr com.apple.quarantine "${APP_NAME}.app" 2>/dev/null || true
+# Supprimer la quarantaine
+xattr -cr "${APP_NAME}.app" 2>/dev/null || true
 
+# Signer dans le bon ordre : dylibs -> exécutables -> bundle
+echo "   → Signature des dylibs..."
 for lib in "${BUNDLE_DIR}"/Frameworks/*.dylib; do
     [ -f "$lib" ] && codesign --force --sign - --timestamp=none "$lib" 2>/dev/null || true
 done
 
+echo "   → Signature des exécutables..."
 for exe in "${BUNDLE_DIR}"/Resources/gw/*; do
     [ -x "$exe" ] && [ -f "$exe" ] && codesign --force --sign - --timestamp=none "$exe" 2>/dev/null || true
 done
 
+echo "   → Signature du bundle..."
 codesign --force --deep --sign - --timestamp=none "${APP_NAME}.app" 2>/dev/null || true
 
 echo ""
