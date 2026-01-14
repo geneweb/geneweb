@@ -77,7 +77,8 @@ uninstall: ## Uninstall geneweb using dune
 	dune build @install
 	dune uninstall
 
-distrib: info build-geneweb ## Build the project and copy what is necessary for distribution
+distrib: info ## Build the project and copy what is necessary for distribution
+	dune build --release @bin/all @lib/all
 	@printf "Done.\n"
 	@rm -rf $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"

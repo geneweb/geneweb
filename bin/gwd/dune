@@ -8,12 +8,16 @@
    %{target}
    (run ocaml %{maker} %{project_root}/plugins))))
 
+(generate_sites_module
+ (module geneweb_sites)
+ (sites geneweb))
+
 (library
  (name gwd_lib)
  (public_name geneweb.gwd_lib)
  (wrapped true)
- (libraries geneweb wserver)
- (modules gwdPlugin request))
+ (libraries geneweb wserver dune-site)
+ (modules gwdPlugin request geneweb_sites))
 
 (executable
  (package geneweb)
