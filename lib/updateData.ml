@@ -476,8 +476,8 @@ let build_list ~ignore_case conf base =
     match get_data_kind_from_env conf.Config.env with
     | None -> get_data_from_database ~conf base
     | Some data_kind ->
-        if not @@ Caches.has_cache ~conf ~mode:data_kind then
-          get_data_from_database ~conf base
+        let with_cache () = Caches.has_cache ~conf ~mode:data_kind in
+        if not @@ with_cache () then get_data_from_database ~conf base
         else
           Ext_list.map_sort_uniq
             (fun string -> `String string)
