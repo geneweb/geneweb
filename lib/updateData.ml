@@ -478,7 +478,8 @@ let build_list ~ignore_case conf base =
     | Some data_kind ->
         let with_cache () =
           Gwdb.nb_of_persons base > Caches.node_threshold
-          && Caches.has_cache ~conf ~mode:data_kind
+          && Caches.has_cache ~conf ~mode:data_kind ~with_up_to_date_state:true
+               ()
         in
         if not @@ with_cache () then get_data_from_database ~conf base
         else

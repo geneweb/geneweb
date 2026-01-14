@@ -145,10 +145,18 @@ let cache_file_of_cache_data base_file = function
   | `source -> source_cache_fname base_file
   | `occupation -> occupation_cache_fname base_file
 
-let has_cache ~conf ~mode =
+let has_cache ?(with_up_to_date_state = false) ~conf ~mode () =
   let base_file = GWPARAM.bpath (conf.Config.bname ^ ".gwb") in
   let file = cache_file_of_cache_data base_file mode in
+  let has_up_to_date_state () =
+    let patches_file = Filename.concat base_file "patches" in
+    let base_file = Filename.concat base_file "base" in
+    if Files.exists patches_file then
+      (Unix.stat file).st_mtime > (Unix.stat patches_file).st_mtime
+    else (Unix.stat file).st_mtime > (Unix.stat base_file).st_mtime
+  in
   Sys.file_exists file
+  && ((not with_up_to_date_state) || has_up_to_date_state ())
 
 let add_if_valid base filter istr list =
   let s = Gwdb.sou base istr in

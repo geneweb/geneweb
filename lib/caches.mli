@@ -7,8 +7,10 @@ val node_threshold : int
 val write_caches : Gwdb.base -> unit
 
 val has_cache :
+  ?with_up_to_date_state:bool ->
   conf:Config.config ->
   mode:[< `firstname | `lastname | `occupation | `place | `source ] ->
+  unit ->
   bool
 
 val read_cache :
