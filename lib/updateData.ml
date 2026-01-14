@@ -484,7 +484,8 @@ let build_list ~ignore_case conf base =
         else
           Ext_list.map_sort_uniq
             (fun string -> `String string)
-            (Caches.complete_with_patch data_kind base (Fun.const true)
+            (Caches.complete_with_patch data_kind base
+               (Fun.negate @@ String.equal "")
                (Caches.read_cache ~conf data_kind))
   in
   let to_string_id_string ~base = function
