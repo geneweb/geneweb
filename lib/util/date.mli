@@ -20,7 +20,14 @@ val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
     - [Before] for "less than" duration
     - [After] for "more than" duration
     - [Maybe] for other cases Used to compare only gregorian calendar's dates.
-*)
+
+    Handles partial dates: [day=0] means unknown day, [month=0] means unknown
+    month. Result precision degrades appropriately:
+    - [/1850] to [12/07/1900] returns [0/7/50] (50 years, 7 months)
+    - [/1850] to [/1900] returns [0/0/50] (50 years)
+
+    Note: The result is a [dmy] structure used to represent duration, not an
+    actual date. *)
 
 val time_elapsed_opt : Def.dmy -> Def.dmy -> Def.dmy option
 (** Same as [time_elapsed], but will return [None] if computation is not

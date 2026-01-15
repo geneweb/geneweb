@@ -99,7 +99,9 @@ let nb_days_in_month m a =
     [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |].(m - 1)
   else 0
 
-(* TODO use SDN instead *)
+(* TODO: Consider using SDN (Serial Day Number) for calendar-neutral
+   calculations once Calendars library is updated. Current implementation
+   works only for Gregorian calendar and partial dates. *)
 let time_elapsed d1 d2 =
   let prec =
     match (d1.prec, d2.prec) with
@@ -109,39 +111,37 @@ let time_elapsed d1 d2 =
     | (About | Maybe | Sure | After), (Before | Sure | Maybe | About) -> Before
     | _ -> Maybe
   in
-  match d1 with
-  | { day = 0; month = 0; year = a1; _ } ->
-      { day = 0; month = 0; year = d2.year - a1; prec; delta = 0 }
-  | { day = 0; month = m1; year = a1; _ } -> (
-      match d2 with
-      | { day = 0; month = 0; year = a2; _ } ->
-          { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
-      | { day = 0; month = m2; year = a2; _ } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 }
-      | { month = m2; year = a2; _ } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 })
-  | { day = j1; month = m1; year = a1; _ } -> (
-      match d2 with
-      | { day = 0; month = 0; year = a2; _ } ->
-          { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
-      | { day = 0; month = m2; year = a2; _ } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 }
-      | { day = j2; month = m2; year = a2; _ } ->
-          let day, r =
-            if j1 <= j2 then (j2 - j1, 0)
-            else (j2 - j1 + nb_days_in_month m1 a1, 1)
-          in
-          let month, r =
-            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
-          in
-          let year = a2 - a1 - r in
-          { day; month; year; prec; delta = 0 })
+  let compute_month_diff m1 m2 =
+    if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1)
+  in
+  let compute_day_diff j1 j2 m1 a1 =
+    if j1 <= j2 then (j2 - j1, 0) else (j2 - j1 + nb_days_in_month m1 a1, 1)
+  in
+  match (d1, d2) with
+  | { day = 0; month = 0; year = a1; _ }, { year = a2; _ } ->
+      { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
+  | { day = 0; month = _; year = a1; _ }, { day = 0; month = 0; year = a2; _ }
+    ->
+      { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
+  | { day = 0; month = m1; year = a1; _ }, { day = 0; month = m2; year = a2; _ }
+    ->
+      let month, r = compute_month_diff m1 m2 in
+      { day = 0; month; year = a2 - a1 - r; prec; delta = 0 }
+  | { day = 0; month = m1; year = a1; _ }, { month = m2; year = a2; _ } ->
+      let month, r = compute_month_diff m1 m2 in
+      { day = 0; month; year = a2 - a1 - r; prec; delta = 0 }
+  | { day = _; month = _; year = a1; _ }, { day = 0; month = 0; year = a2; _ }
+    ->
+      { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
+  | { day = _; month = m1; year = a1; _ }, { day = 0; month = m2; year = a2; _ }
+    ->
+      let month, r = compute_month_diff m1 m2 in
+      { day = 0; month; year = a2 - a1 - r; prec; delta = 0 }
+  | ( { day = j1; month = m1; year = a1; _ },
+      { day = j2; month = m2; year = a2; _ } ) ->
+      let day, r1 = compute_day_diff j1 j2 m1 a1 in
+      let month, r2 = compute_month_diff (m1 + r1) m2 in
+      { day; month; year = a2 - a1 - r2; prec; delta = 0 }
 
 let time_elapsed_opt d1 d2 =
   match (d1.prec, d2.prec) with
