@@ -6,8 +6,11 @@ val leap_year : int -> bool
 (** Says if the given year is a leap year. *)
 
 val nb_days_in_month : int -> int -> int
-(** Returns number of days for the given month and year for gregorian calendar.
-    Takes into account leap years. *)
+(** Returns number of days for the given month and year in the Gregorian
+    calendar. Takes leap years into account. Returns [0] for [month = 0]
+    (partial dates) or invalid months (> 12). Note: Calendars with 13 months
+    (Hebrew embolismic, French complementary) are not supported by this
+    function. *)
 
 val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
 (** [time_elapsed start stop] Compute the time elapsed between [start] and
