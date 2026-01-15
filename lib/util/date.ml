@@ -194,19 +194,24 @@ and eval_strict strict dmy1 dmy2 x =
     | x -> Some x
   else Some x
 
-exception Not_comparable
-
-let compare_dmy ?(strict = false) dmy1 dmy2 =
-  match compare_dmy_opt ~strict dmy1 dmy2 with
-  | None -> raise Not_comparable
+let compare_dmy dmy1 dmy2 =
+  match compare_dmy_opt ~strict:false dmy1 dmy2 with
+  | None -> assert false
   | Some x -> x
 
-let compare_date ?(strict = false) d1 d2 =
+let compare_dmy_strict dmy1 dmy2 = compare_dmy_opt ~strict:true dmy1 dmy2
+
+let compare_date d1 d2 =
   match (d1, d2) with
-  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy ~strict dmy1 dmy2
-  | Dgreg (_, _), Dtext _ -> if strict then raise Not_comparable else 1
-  | Dtext _, Dgreg (_, _) -> if strict then raise Not_comparable else -1
-  | Dtext _, Dtext _ -> if strict then raise Not_comparable else 0
+  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy dmy1 dmy2
+  | Dgreg (_, _), Dtext _ -> 1
+  | Dtext _, Dgreg (_, _) -> -1
+  | Dtext _, Dtext _ -> 0
+
+let compare_date_strict d1 d2 =
+  match (d1, d2) with
+  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy_strict dmy1 dmy2
+  | Dgreg (_, _), Dtext _ | Dtext _, Dgreg (_, _) | Dtext _, Dtext _ -> None
 
 let cdate_to_dmy_opt cdate =
   match od_of_cdate cdate with
