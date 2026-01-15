@@ -34,14 +34,6 @@ jobs:
             ocaml-version: 5.4.0
             platform: macos-intel
             is-unix: true
-          - os: ubuntu-22.04
-            ocaml-version: 5.4.0
-            platform: linux
-            is-unix: true
-          - os: windows-latest
-            ocaml-version: 4.14.2
-            platform: windows
-            is-unix: false
 
     runs-on: ${{ matrix.os }}
 
@@ -96,7 +88,7 @@ jobs:
           echo "=== Checking executable dependencies ==="
           cd distribution/gw
           ldd gwd.exe
-          
+
           NON_WINDOWS=$(ldd gwd.exe | grep -v -F /cygdrive/c/Windows/ || true)
           if [ -n "$NON_WINDOWS" ]; then
             echo "❌ ERROR: Non-Windows dependencies found:"
@@ -114,7 +106,34 @@ jobs:
           chmod +w rpc_client.min.js
           terser rpc_client.min.js -o rpc_client.min.js --compress --mangle
           gzip -9 -k -f rpc_client.min.js
-
+      
+      - name: Create macOS bundle and DMG
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          echo "🍎 Creating macOS bundle and DMG..."
+          
+          chmod +x create_bundle.sh create_dmg.sh
+          
+          ./create_bundle.sh
+          ./create_dmg.sh
+          
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.tag_name }}"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          VERSION="${VERSION#v}"
+          
+          DMG_NAME="GeneWeb-${VERSION}.dmg"
+          
+          if [ -f "$DMG_NAME" ]; then
+            mv "$DMG_NAME" distribution/
+            mv "${DMG_NAME}.sha256" distribution/
+            echo "✅ DMG: $DMG_NAME"
+            ls -lh "distribution/$DMG_NAME"
+          fi
+      
       - name: Create release archive
         shell: bash
         working-directory: distribution
@@ -130,6 +149,12 @@ jobs:
           
           VERSIONED_ARCHIVE="geneweb-${VERSION}-${{ matrix.platform }}.zip"
           
+          if [[ "$RUNNER_OS" == "macOS" ]] && [[ -f "GeneWeb-${VERSION}.dmg" ]]; then
+            echo "DMG_EXISTS=true" >> $GITHUB_ENV
+            echo "DMG_NAME=GeneWeb-${VERSION}.dmg" >> $GITHUB_ENV
+            echo "DMG_SHA256=GeneWeb-${VERSION}.dmg.sha256" >> $GITHUB_ENV
+          fi
+          
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             7z a -tzip "../${VERSIONED_ARCHIVE}" * -mx=9
           else
@@ -138,13 +163,17 @@ jobs:
           
           echo "VERSIONED_ARCHIVE=${VERSIONED_ARCHIVE}" >> $GITHUB_ENV
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
-
+      
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
-          files: ${{ env.VERSIONED_ARCHIVE }}
+          files: |
+            ${{ env.VERSIONED_ARCHIVE }}
+            ${{ "$RUNNER_OS" == 'macOS' && env.DMG_EXISTS == 'true' && format('distribution/{0}', env.DMG_NAME) || '' }}
+            ${{ "$RUNNER_OS" == 'macOS' && env.DMG_EXISTS == 'true' && format('distribution/{0}', env.DMG_SHA256) || '' }}
           fail_on_unmatched_files: true
+          
           prerelease: ${{ (github.event_name == 'workflow_dispatch' && inputs.prerelease) || contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') || contains(github.ref_name, 'dev') }}
           draft: false
           name: "GeneWeb ${{ env.VERSION }}"
@@ -153,28 +182,70 @@ jobs:
             ${{ contains(env.VERSION, 'beta') && '⚠️ **Beta release** - Testing recommended' || '' }}
             ${{ contains(env.VERSION, 'rc') && '✅ **Release candidate** - Production ready pending final validation' || '' }}
             
-            ### Download
+            ## 📥 Downloads
             
-            [Linux (glibc 2.35+)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) • [macOS (Apple Silicon)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) • [macOS (Intel)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) • [Windows](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) • [Source code](${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}.zip)
+            ### macOS Installer (Recommended)
             
-            ### Prerequisites
+            | File | Description | Size |
+            |------|-------------|------|
+            | [🍎 **GeneWeb-${{ env.VERSION }}.dmg**](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.ref_name }}/GeneWeb-${{ env.VERSION }}.dmg) | **One-click installer** for macOS (Apple Silicon & Intel)<br/>✅ No dependencies needed<br/>✅ Includes GMP library<br/>✅ Auto-installer script | ~250 MB |
             
-            **Linux/macOS:** Install GMP library
-             ```bash
+            ### Platform Archives (Advanced users)
+            
+            | Platform | Archive | Requirements |
+            |----------|---------|--------------|
+            | 🐧 **Linux** | [geneweb-${{ env.VERSION }}-linux.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) | glibc 2.35+, `libgmp10` |
+            | 🍎 **macOS (Apple Silicon)** | [geneweb-${{ env.VERSION }}-macos-arm64.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) | `gmp` via Homebrew |
+            | 🍎 **macOS (Intel)** | [geneweb-${{ env.VERSION }}-macos-intel.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) | `gmp` via Homebrew |
+            | 🪟 **Windows** | [geneweb-${{ env.VERSION }}-windows.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) | None (GMP included) |
+            
+            ## 📖 Installation
+            
+            <details>
+            <summary><b>ZIP Archives</b></summary>
+
+            **Prerequisites:**
+            ```bash
             # Ubuntu/Debian
             sudo apt-get install libgmp10
             
             # macOS
             brew install gmp
             ```
-            
-            **Windows:** No additional dependencies required (GMP statically linked)
-            
-            ### Installation
-            
+
+            **Installation:**
             1. Extract the downloaded archive
             2. Run `./gwd` (Unix) or `gwd.exe` (Windows)
-            
-            **Note:** Binaries are unsigned. Your OS may display security warnings on first run.
-            
-            For more information, see the [documentation](https://geneweb.tuxfamily.org/wiki/GeneWeb).
+            3. Open http://127.0.0.1:2317 in your browser
+            </details>
+
+            <details>
+            <summary><b>macOS DMG (One-click installer)</b></summary>
+
+            1. Download `GeneWeb-${{ env.VERSION }}.dmg`
+            2. Open the DMG
+            3. Double-click **"GeneWeb_install.command"**
+            4. Follow the on-screen instructions
+
+            **First launch:** macOS will show a security warning:
+            - Go to **System Preferences** → **Privacy & Security**
+            - Click **"Open Anyway"** next to the GeneWeb message
+            - Launch GeneWeb from Applications
+
+            **To verify the download:**
+            ```bash
+            shasum -a 256 -c GeneWeb-${{ env.VERSION }}.dmg.sha256
+            ```
+            </details>
+
+            ## 📚 Documentation
+
+            - 📖 [User Guide](https://geneweb.tuxfamily.org/wiki/GeneWeb)
+            - 🔧 [Configuration](https://geneweb.tuxfamily.org/wiki/GeneWeb/Config)
+            - 💻 [Developer Docs](https://geneweb.tuxfamily.org/wiki/GeneWeb/Development)
+
+            ## 🆘 Support
+
+            - [Report a bug](https://github.com/geneweb/geneweb/issues/new)
+            - [Discussion forum](https://www.geneanet.org/forum/GeneWeb)
+            - [Wiki](https://geneweb.tuxfamily.org/wiki/GeneWeb)

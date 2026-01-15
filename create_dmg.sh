@@ -38,7 +38,7 @@ ln -s "${APP_NAME}.app/Contents/Resources/geneweb_stop.command" "$STAGING_DIR/Ge
 
 # Ajouter après la création du fichier "Arrêter GeneWeb"
 
-cat > "$STAGING_DIR/Installer GeneWeb.command" << 'EOFINSTALL'
+cat > "$STAGING_DIR/GeneWeb_install.command" << 'EOFINSTALL'
 #!/bin/bash
 
 clear
@@ -131,7 +131,7 @@ echo ""
 sleep 3
 EOFINSTALL
 
-chmod +x "$STAGING_DIR/Installer GeneWeb.command"
+chmod +x "$STAGING_DIR/GeneWeb_install.command"
 
 cat > "$STAGING_DIR/Lisez-moi.txt" << 'EOF'
 ╔═══════════════════════════════════════════════════════╗
