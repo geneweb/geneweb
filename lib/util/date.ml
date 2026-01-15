@@ -11,7 +11,14 @@ type cdate = Adef.cdate =
   | Cdate of date
   | Cnone
 
-(* compress concrete date if it's possible *)
+(* Compress concrete date into integer if simple precision.
+   Encoding: (((prec_code * 32 + day) * 13 + month) * 2500 + year)
+   - prec_code: 0=Sure, 1=About, 2=Maybe, 3=Before, 4=After
+   - day ∈ [0,31], month ∈ [0,12], year ∈ ]0,2500[
+   - Limitations: year must be in ]0,2500[, delta must be 0,
+     OrYear/YearInt cannot be compressed
+   - Note: month can be 13 for some calendars but compression uses
+     mod 13 so max storable is 12 *)
 let compress d =
   let simple =
     match d.prec with
