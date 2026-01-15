@@ -62,24 +62,20 @@ let date_of_cdate = function
   | Ctext t -> Dtext t
   | Cnone -> failwith "date_of_cdate"
 
-let cdate_of_date d =
-  match d with
-  | Dgreg (g, cal) -> (
+let cdate_of_date = function
+  | Dtext t -> Ctext t
+  | Dgreg (g, cal) as d -> (
       match compress g with
+      | None -> Cdate d
       | Some i -> (
           match cal with
           | Dgregorian -> Cgregorian i
           | Djulian -> Cjulian i
           | Dfrench -> Cfrench i
-          | Dhebrew -> Chebrew i)
-      | None -> Cdate d)
-  | Dtext t -> Ctext t
+          | Dhebrew -> Chebrew i))
 
 let cdate_of_od = function Some d -> cdate_of_date d | None -> Cnone
-
-let od_of_cdate od =
-  match od with Cnone -> None | _ -> Some (date_of_cdate od)
-
+let od_of_cdate = function Cnone -> None | cd -> Some (date_of_cdate cd)
 let cdate_None = cdate_of_od None
 
 let dmy_of_dmy2 dmy2 =
@@ -221,9 +217,7 @@ let compare_date_strict d1 d2 =
   | Dgreg (_, _), Dtext _ | Dtext _, Dgreg (_, _) | Dtext _, Dtext _ -> None
 
 let cdate_to_dmy_opt cdate =
-  match od_of_cdate cdate with
-  | Some (Dgreg (d, _)) -> Some d
-  | Some (Dtext _) | None -> None
+  match od_of_cdate cdate with Some (Dgreg (d, _)) -> Some d | _ -> None
 
 let cdate_of_death = function
   | Death (_, cd) -> Some cd
