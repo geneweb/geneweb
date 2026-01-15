@@ -12,7 +12,7 @@ if [ ! -d "$DISTRIB_DIR" ]; then
 fi
 
 echo "╔═══════════════════════════════════════════════════════╗"
-echo "║     Création du bundle GeneWeb.app pour macOS        ║"
+echo "║     Création du bundle GeneWeb.app pour macOS         ║"
 echo "╚═══════════════════════════════════════════════════════╝"
 echo ""
 
@@ -175,6 +175,73 @@ for exe in "${BUNDLE_DIR}"/Resources/gw/*; do
 done
 
 echo ""
+echo "🔧 Vérification et correction de pcre2..."
+
+# Détecter quelle version de pcre2 est nécessaire
+PCRE2_NEEDED=$(otool -L "${BUNDLE_DIR}"/Resources/gw/gwd 2>/dev/null | grep pcre2 | head -1 | awk '{print $1}')
+
+if [ -n "$PCRE2_NEEDED" ]; then
+    PCRE2_FILE=$(basename "$PCRE2_NEEDED")
+    echo "   Version nécessaire: $PCRE2_FILE"
+    echo "   Chemin actuel: $PCRE2_NEEDED"
+    
+    if [ ! -f "${BUNDLE_DIR}/Frameworks/${PCRE2_FILE}" ]; then
+        # Chercher pcre2 dans plusieurs emplacements
+        PCRE2_FOUND=""
+        
+        for search_path in \
+            "/opt/homebrew/opt/pcre2/lib/$PCRE2_FILE" \
+            "/opt/homebrew/lib/$PCRE2_FILE" \
+            "/opt/local/lib/$PCRE2_FILE" \
+            "/usr/local/lib/$PCRE2_FILE"; do
+            
+            if [ -f "$search_path" ]; then
+                PCRE2_FOUND="$search_path"
+                break
+            fi
+        done
+        
+        # Recherche générique si pas trouvé
+        if [ -z "$PCRE2_FOUND" ]; then
+            PCRE2_FOUND=$(find /opt/homebrew /opt/local /usr/local -name "$PCRE2_FILE" 2>/dev/null | head -1)
+        fi
+        
+        if [ -n "$PCRE2_FOUND" ] && [ -f "$PCRE2_FOUND" ]; then
+            echo "   → Copie de $PCRE2_FILE depuis $PCRE2_FOUND"
+            cp "$PCRE2_FOUND" "${BUNDLE_DIR}/Frameworks/"
+            chmod +w "${BUNDLE_DIR}/Frameworks/${PCRE2_FILE}"
+            install_name_tool -id "@rpath/${PCRE2_FILE}" "${BUNDLE_DIR}/Frameworks/${PCRE2_FILE}"
+        else
+            echo "   ❌ ERREUR: $PCRE2_FILE non trouvée !"
+            echo "   Installez avec: brew install pcre2"
+            exit 1
+        fi
+    fi
+    
+    # Corriger tous les exécutables
+    for exe in "${BUNDLE_DIR}"/Resources/gw/*; do
+        [ ! -x "$exe" ] || [ ! -f "$exe" ] && continue
+        
+        if otool -L "$exe" 2>/dev/null | grep -q "pcre2"; then
+            # Nettoyer rpaths
+            for rpath in $(otool -l "$exe" 2>/dev/null | grep -A2 LC_RPATH | grep path | awk '{print $2}'); do
+                install_name_tool -delete_rpath "$rpath" "$exe" 2>/dev/null || true
+            done
+            
+            # Ajouter rpath
+            install_name_tool -add_rpath "@executable_path/../../Frameworks" "$exe" 2>/dev/null || true
+            
+            # Changer toutes les références pcre2 vers @rpath
+            for old_path in $(otool -L "$exe" 2>/dev/null | grep pcre2 | awk '{print $1}'); do
+                install_name_tool -change "$old_path" "@rpath/${PCRE2_FILE}" "$exe" 2>/dev/null || true
+            done
+            
+            echo "   ✅ Corrigé: $(basename "$exe")"
+        fi
+    done
+fi
+
+echo ""
 echo "📝 Création des scripts de lancement..."
 
 cat > "${BUNDLE_DIR}/MacOS/${APP_NAME}" << 'EOFMAIN'
@@ -189,12 +256,12 @@ if [[ "$BUNDLE_DIR" == /Volumes/* ]]; then
     echo "╔═══════════════════════════════════════════════════════╗"
     echo "║                    ERREUR                             ║"
     echo "╠═══════════════════════════════════════════════════════╣"
-    echo "║  GeneWeb ne peut pas être lancé depuis le DMG        ║"
+    echo "║  GeneWeb ne peut pas être lancé depuis le DMG         ║"
     echo "║                                                       ║"
-    echo "║  Installation requise :                              ║"
-    echo "║    1. Glissez GeneWeb.app vers Applications          ║"
-    echo "║    2. Éjectez le DMG                                 ║"
-    echo "║    3. Lancez depuis /Applications                    ║"
+    echo "║  Installation requise :                               ║"
+    echo "║    1. Glissez GeneWeb.app vers Applications           ║"
+    echo "║    2. Éjectez le DMG                                  ║"
+    echo "║    3. Lancez depuis /Applications                     ║"
     echo "╚═══════════════════════════════════════════════════════╝"
     echo ""
     echo "Cette fenêtre se fermera dans 10 secondes..."
@@ -266,11 +333,11 @@ mkdir -p "$BASES_DIR" || {
     echo "╔═══════════════════════════════════════════════════════╗"
     echo "║                    ERREUR                             ║"
     echo "╠═══════════════════════════════════════════════════════╣"
-    echo "║  Impossible de créer le dossier des bases            ║"
+    echo "║  Impossible de créer le dossier des bases             ║"
     echo "║                                                       ║"
     echo "║  Dossier: $BASES_DIR"
     echo "║                                                       ║"
-    echo "║  Vérifiez les permissions                            ║"
+    echo "║  Vérifiez les permissions                             ║"
     echo "╚═══════════════════════════════════════════════════════╝"
     echo ""
     echo "Log complet: $LOG_FILE"
