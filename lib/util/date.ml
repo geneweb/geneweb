@@ -151,11 +151,11 @@ let rec compare_dmy_opt ?(strict = false) dmy1 dmy2 =
 
 and compare_month_or_day ~is_day strict dmy1 dmy2 =
   (* compare a known month|day with a unknown one (0) *)
-  let compare_with_unknown_value ~strict ~unkonwn ~known =
-    match unkonwn.prec with
+  let compare_with_unknown_value ~strict ~unknown ~known =
+    match unknown.prec with
     | After -> Some 1
     | Before -> Some (-1)
-    | _other -> if strict then None else compare_prec false unkonwn known
+    | _other -> if strict then None else compare_prec false unknown known
   in
   (* if we are comparing months the next comparison to do is on days
       else if we are comparing days it is compare_prec *)
@@ -166,11 +166,11 @@ and compare_month_or_day ~is_day strict dmy1 dmy2 =
   (* 0 means month|day is unknow*)
   match (x, y) with
   | 0, 0 -> compare_prec strict dmy1 dmy2
-  | 0, _ -> compare_with_unknown_value ~strict ~unkonwn:dmy1 ~known:dmy2
+  | 0, _ -> compare_with_unknown_value ~strict ~unknown:dmy1 ~known:dmy2
   | _, 0 ->
       (* swap dmy1 and dmy2 *)
       Option.map Int.neg
-      @@ compare_with_unknown_value ~strict ~unkonwn:dmy2 ~known:dmy1
+      @@ compare_with_unknown_value ~strict ~unknown:dmy2 ~known:dmy1
   | m1, m2 -> (
       match Int.compare m1 m2 with
       | 0 -> next_comparison strict dmy1 dmy2
