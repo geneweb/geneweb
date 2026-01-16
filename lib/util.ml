@@ -2119,8 +2119,18 @@ let read_visited conf =
   try
     let ic = Secure.open_in_bin fname in
     let ht : cache_visited_t = input_value ic in
+    (* [rebuild_if_needed] is a hacky wrapper around the standard library
+       function [Hashtbl.rebuild].  Resources:
+           - https://github.com/ocaml/ocaml/blob/ce529ce4255a8a057357647fe385c03b0132fdbe/stdlib/hashtbl.ml#L505
+           - https://github.com/ocaml/ocaml/blob/ce529ce4255a8a057357647fe385c03b0132fdbe/stdlib/hashtbl.ml#L604  *)
+    let rebuild_if_needed ht =
+      try
+        let () = ignore (Hashtbl.mem ht "") in
+        ht
+      with Invalid_argument _ -> Hashtbl.rebuild ht
+    in
     close_in ic;
-    ht
+    rebuild_if_needed ht
   with Sys_error _ -> Hashtbl.create 0
 
 (* ************************************************************************ *)
@@ -2139,6 +2149,8 @@ let write_visited conf ht =
     output_value oc ht;
     close_out oc
   with Sys_error _ -> ()
+
+let rewrite_visited conf = write_visited conf (read_visited conf)
 
 (* ************************************************************************ *)
 (*  [Fonc] record_visited : config -> iper -> unit                          *)
