@@ -821,13 +821,23 @@ let error conf str =
   Output.printf printer_conf "<em>%s</em>\n" (String.capitalize_ascii str);
   trailer conf
 
-let exec_f comm =
+let infer_rc conf rc =
+  if not Sys.unix then
+    if rc > 0 then rc
+    else
+      match p_getenv conf.env "o" with
+      | Some out_file -> if Sys.file_exists (out_file ^ ".gwb") then 0 else 2
+      | _ -> 0
+  else rc
+
+let exec_f conf comm =
   let s = comm ^ " > " ^ "comm.log" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
   Printf.eprintf "$ %s\n" s;
   flush stderr;
-  Sys.command s
+  let rc = Sys.command s in
+  if not Sys.unix then infer_rc conf rc else rc
 
 let out_name_of_ged in_file =
   let f = Filename.basename in_file in
@@ -924,21 +934,11 @@ let ged2gwb_check conf =
   let conf = { conf with env = ("f", "on") :: conf.env } in
   gwc_or_ged2gwb out_name_of_ged conf
 
-let infer_rc conf rc =
-  if not Sys.unix then
-    if rc > 0 then rc
-    else
-      match p_getenv conf.env "o" with
-      | Some out_file -> if Sys.file_exists (out_file ^ ".gwb") then 0 else 2
-      | _ -> 0
-  else rc
-
 let gwc conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "gwc") in
-    exec_f (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env)
   in
-  let rc = if not Sys.unix then infer_rc conf rc else rc in
   let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
   (try Sys.remove gwo with Sys_error _ -> ());
   Printf.eprintf "\n";
@@ -951,7 +951,7 @@ let gwdiff_check conf = print_file conf "confirm.htm"
 let gwdiff ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env)
   in
   Printf.eprintf "\n";
   flush stderr;
@@ -967,7 +967,7 @@ let gwfixbase_check conf = print_file conf "confirm.htm"
 let gwfixbase ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env)
   in
   Printf.eprintf "\n";
   flush stderr;
@@ -983,7 +983,7 @@ let cache_files_check conf =
 let cache_files ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "cache_files") ^ " " in
-    exec_f (comm ^ parameters conf.env ^ " > comm.log")
+    exec_f conf (comm ^ parameters conf.env ^ " > comm.log")
   in
   flush stderr;
   if rc > 1 then print_file conf "err_standard\n  .htm"
@@ -1008,14 +1008,14 @@ let connex ok_file conf =
       if !no_o then
         let launch = "tell application \"Terminal\" to do script " in
         Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd1 ^ " \"' ")
-      else exec_f commnd2
+      else exec_f conf commnd2
     else if uname = "Linux" then
       (* non testé ! *)
       if !no_o then Sys.command ("xterm -e \" " ^ commnd1 ^ " \" ")
-      else exec_f commnd2
+      else exec_f conf commnd2
     else if Sys.win32 then
       (* à compléter et tester ! *)
-      if !no_o then Sys.command commnd1 else exec_f commnd2
+      if !no_o then Sys.command commnd1 else exec_f conf commnd2
     else (
       Printf.eprintf "%s (%s) %s (%s)\n" "Unknown Os_type" Sys.os_type
         "or wrong uname response" uname;
@@ -1062,10 +1062,8 @@ let gwu_or_gwb2ged_check suffix conf =
 let gwb2ged_or_gwu_1 ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env)
   in
-  Printf.eprintf "\n";
-  flush stderr;
   if rc > 1 then print_file conf "err_standard.htm"
   else
     let conf =
@@ -1207,16 +1205,11 @@ let recover_2 conf =
       Printf.eprintf "$ cd \"%s\"\n" dir;
       flush stderr;
       Sys.chdir dir;
-      let c =
+      let comm =
         Filename.concat !bin_dir src_to_new
         ^ " " ^ tmp ^ " -f -o " ^ out_file ^ " > " ^ "comm.log"
       in
-      Printf.eprintf "$ %s\n" c;
-      flush stderr;
-      let rc = Sys.command c in
-      let rc = if not Sys.unix then infer_rc conf rc else rc in
-      Printf.eprintf "\n";
-      flush stderr;
+      let rc = exec_f conf comm in
       rc)
     else rc
   in
@@ -1575,11 +1568,8 @@ let gwd_1 conf =
 let ged2gwb conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
+    exec_f conf (comm ^ " -fne '\"\"'" ^ parameters conf.env)
   in
-  let rc = if not Sys.unix then infer_rc conf rc else rc in
-  Printf.eprintf "\n";
-  flush stderr;
   if rc > 1 then print_file conf "err_standard.htm"
   else
     let bname = try List.assoc "o" conf.env with Not_found -> "" in
@@ -1589,19 +1579,15 @@ let ged2gwb conf =
 let consang conf ok_file =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env)
   in
-  Printf.eprintf "\n";
-  flush stderr;
   if rc > 1 then print_file conf "err_consang.htm" else print_file conf ok_file
 
 let update_nldb conf ok_file =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env)
   in
-  Printf.eprintf "\n";
-  flush stderr;
   if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
 
 let separate_slashed_filename s =
