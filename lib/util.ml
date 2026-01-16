@@ -2183,7 +2183,7 @@ let read_visited conf =
     let ic = Secure.open_in_bin fname in
     let ht : cache_visited_t = input_value ic in
     close_in ic;
-    ht
+    Hashtbl.rebuild ht
   with Sys_error _ -> Hashtbl.create 0
 
 (* ************************************************************************ *)
@@ -2202,6 +2202,8 @@ let write_visited conf ht =
     output_value oc ht;
     close_out oc
   with Sys_error _ -> ()
+
+let rewrite_visited conf = write_visited conf (read_visited conf)
 
 (* ************************************************************************ *)
 (*  [Fonc] record_visited : config -> iper -> unit                          *)
