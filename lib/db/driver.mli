@@ -655,6 +655,9 @@ val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Collection.Marker.t
 (** [ifam_marker c v] create marker over collection of family's ids and
     initialise it for every element with [v] *)
 
+val check_nldb_format : base -> [ `Ok | `BadFormat | `NoFile ]
+(** Check notes_links file format without reading content. *)
+
 val read_nldb : base -> (iper, ifam) Def.NLDB.t
 (** TODOOCP : doc *)
 

@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
+<!-- $Id: js.txt v7.1 17/01/2026 10:39:33 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
@@ -743,9 +743,45 @@ function safeInitialize(fn) {
     console.error('Initialization error:', error);
   }
 }
-
+var notifLabels={
+  danger:'[*NOTIF error/warning/success/info]0',
+  warning:'[*NOTIF error/warning/success/info]1',
+  success:'[*NOTIF error/warning/success/info]2',
+  info:'[*NOTIF error/warning/success/info]3'
+};
+%if;(e.notif_pending!="")
+function notifShow(items){
+  if(!items||!items.length)return;
+  var c=document.querySelector('.gw-notif-ctr');
+  if(!c){
+    c=document.createElement('div');
+    c.className='gw-notif-ctr';
+    c.setAttribute('aria-live','polite');
+    document.body.appendChild(c);
+  }
+  items.forEach(function(x,i){
+    var id='gw-notif-'+Date.now()+'-'+i,
+        ah=x.autohide?' data-autohide="true" data-delay="6000"':' data-autohide="false"',
+        ti=x.title||notifLabels[x.level],
+        h='<div id="'+id+'" class="toast border-'+x.level+'" role="alert"'+ah+'>'+
+          '<div class="toast-header bg-'+x.level+' text-white">'+
+          '<i class="fa '+x.icon+' mr-2"></i><strong class="mr-auto">'+ti+'</strong>'+
+          '<button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast">'+
+          '<span>&times;</span></button></div>'+
+          '<div class="toast-body">'+x.message+'</div></div>';
+    c.insertAdjacentHTML('beforeend',h);
+    $('#'+id).toast('show');
+  });
+}
+function notifCheck(){
+  fetch('%prefix;m=NOTIF').then(function(r){return r.json()}).then(notifShow).catch(function(){});
+}
+%end;
 %( Initialize on DOM Content Loaded %)
 document.addEventListener('DOMContentLoaded', () => {
+%if;(e.notif_pending!="")
+  notifCheck();
+%end;
 %if;is_welcome;
   %if;(b.propose_titles!="no")
     initializeWelcomeSearchFunctionality();

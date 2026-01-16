@@ -450,6 +450,18 @@ let w_lock ~onerror fn conf (base_name : string option) =
     ~wait:true ~lock_file:(Mutil.lock_file bfile)
   @@ fun () -> fn conf base_name
 
+let nldb_check_done = ref false
+
+let check_nldb_format conf base =
+  if not !nldb_check_done then (
+    nldb_check_done := true;
+    match Driver.check_nldb_format base with
+    | `BadFormat ->
+        Notif.error
+          ~title:(Util.transl conf "NOTIF_TT incompatible notes_links")
+          (Util.transl conf "NOTIF incompatible notes_links")
+    | `Ok | `NoFile -> ())
+
 let w_base ~none fn conf (bfile : string option) =
   match bfile with
   | None -> none conf
@@ -473,6 +485,15 @@ let w_base ~none fn conf (bfile : string option) =
                   nb_of_families = Driver.nb_of_families base;
                 }
           in
+          check_nldb_format conf base;
+          let conf =
+            if Notif.has_pending () then
+              {
+                conf with
+                env = ("notif_pending", Adef.encoded "1") :: conf.env;
+              }
+            else conf
+          in
           fn conf base)
 
 let w_person ~none fn conf base =
@@ -492,7 +513,20 @@ let treat_request =
   let w_base =
     let none conf =
       if conf.bname = "" then GWPARAM.output_error conf Def.Bad_Request
-      else GWPARAM.output_error conf Def.Not_Found
+      else (
+        Notif.error
+          ~title:(Util.transl conf "NOTIF_TT unknown base")
+          (Printf.sprintf
+             (Util.ftransl conf "NOTIF unknown base %s")
+             conf.bname);
+        let conf =
+          if Notif.has_pending () then
+            let json = Notif.render_json () in
+            { conf with env = ("notif_inline", Adef.encoded json) :: conf.env }
+          else conf
+        in
+        try Templ.output_simple conf Templ.Env.empty "index"
+        with _ -> GWPARAM.output_error conf Def.Not_Found)
     in
     w_base ~none
   in
@@ -551,6 +585,7 @@ let treat_request =
             ((if
                 List.assoc_opt "counter" conf.base_env <> Some "no"
                 && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
+                && m <> "NOTIF"
               then
                 match
                   if only_special_env conf.env then
@@ -851,6 +886,11 @@ let treat_request =
                            "Content-type: application/json; charset=%s" charset;
                          NotesDisplay.print_json conf base
                      | _ -> NotesDisplay.print conf base)
+             | "NOTIF" ->
+                 w_base @@ fun conf _base ->
+                 Output.header conf "Content-type: application/json";
+                 Output.print_sstring conf (Notif.render_json ());
+                 Output.flush conf
              | "OA" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_oldest_alive
              | "OE" when conf.wizard || conf.friend ->
