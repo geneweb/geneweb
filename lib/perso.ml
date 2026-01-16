@@ -1446,7 +1446,7 @@ let get_note_or_source conf base
         | _ -> lines
       else lines
     in
-    Notes.source_note_with_env conf base env (String.concat " " lines)
+    Notes.source_note_with_env conf base env (String.concat "\n" lines)
     |> safe_val
   else null_val
 
