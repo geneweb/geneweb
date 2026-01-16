@@ -402,6 +402,9 @@ type cache_visited_t = (string, (Gwdb.iper * string) list) Hashtbl.t
 val read_visited : Config.config -> cache_visited_t
 val record_visited : Config.config -> Gwdb.iper -> unit
 
+val rewrite_visited : Config.config -> unit
+(** To call to ensure compatibility with OCaml 4.14. *)
+
 val array_mem_witn :
   Gwdb.base ->
   Gwdb.iper ->

@@ -57,6 +57,9 @@ let main () =
                     Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)
                   in
                   Geneweb.Sosa_cache.write_static_sosa_cache ~conf ~base);
+                (fun () ->
+                  Geneweb.Util.rewrite_visited
+                    (Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)));
               ]
             base)
       with Consang.TopologicalSortError p ->
