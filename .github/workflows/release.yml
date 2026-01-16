@@ -190,6 +190,33 @@ jobs:
           echo "VERSIONED_ARCHIVE=${VERSIONED_ARCHIVE}" >> $GITHUB_ENV
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
+      - name: Create Windows installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $VERSION = "${{ steps.version.outputs.version }}"
+          
+          # Download InnoSetup
+          Write-Host "📥 Downloading InnoSetup..."
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile "innosetup-installer.exe"
+          
+          # Install InnoSetup silently
+          Write-Host "📦 Installing InnoSetup..."
+          Start-Process -FilePath "innosetup-installer.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/DIR=.\innosetup" -Wait
+          
+          # Compile installer
+          Write-Host "🔨 Building installer..."
+          & ".\innosetup\ISCC.exe" "geneweb.iss" "/DMyVersion=$VERSION"
+          
+          $INSTALLER_NAME = "geneweb-${VERSION}-windows-setup.exe"
+          if (Test-Path $INSTALLER_NAME) {
+            Write-Host "✅ Installer created: $INSTALLER_NAME"
+            echo "INSTALLER_NAME=$INSTALLER_NAME" >> $env:GITHUB_ENV
+          } else {
+            Write-Host "❌ Installer not found!"
+            exit 1
+          }
+
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
@@ -197,6 +224,7 @@ jobs:
           files: |
             ${{ env.VERSIONED_ARCHIVE }}
             ${{ env.DMG_NAME }}
+            ${{ env.INSTALLER_NAME }}
           fail_on_unmatched_files: false
           prerelease: ${{ (github.event_name == 'workflow_dispatch' && inputs.prerelease) || contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') || contains(github.ref_name, 'dev') }}
           draft: false
@@ -208,12 +236,12 @@ jobs:
             
             ### Download
             
-            | Platform | ZIP Archive | DMG Installer |
-            |----------|-------------|---------------|
+            | Platform | ZIP Archive | Installer |
+            |----------|-------------|-----------|
             | 🐧 Linux | [geneweb-${{ env.VERSION }}-linux.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) | - |
             | 🍎 macOS (Apple Silicon) | [geneweb-${{ env.VERSION }}-macos-arm64.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) | [geneweb-${{ env.VERSION }}-macos-arm64.dmg](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.dmg) |
             | 🍎 macOS (Intel) | [geneweb-${{ env.VERSION }}-macos-intel.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) | [geneweb-${{ env.VERSION }}-macos-intel.dmg](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.dmg) |
-            | 🪟 Windows | [geneweb-${{ env.VERSION }}-windows.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) | - |
+            | 🪟 Windows | [geneweb-${{ env.VERSION }}-windows.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) | [geneweb-${{ env.VERSION }}-windows-setup.exe](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows-setup.exe) |
             
             ### Prerequisites (Unix ZIP archives only)
             
