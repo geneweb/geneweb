@@ -106,6 +106,9 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~f_spouses ~p_parents
           (fun () ->
             let conf = Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base) in
             Geneweb.Sosa_cache.write_static_sosa_cache ~conf ~base);
+          (fun () ->
+            Geneweb.Util.rewrite_visited
+              (Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)));
         ]
       base;
     if v1 then (
