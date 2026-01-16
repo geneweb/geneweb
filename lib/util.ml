@@ -2183,7 +2183,7 @@ let read_visited conf =
     let ic = Secure.open_in_bin fname in
     let ht : cache_visited_t = input_value ic in
     close_in ic;
-    ht
+    Hashtbl.rebuild ht
   with Sys_error _ -> Hashtbl.create 0
 
 (* ************************************************************************ *)
