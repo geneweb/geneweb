@@ -52,18 +52,16 @@ val html_with_summary_of_tlsw :
 (** HTML displaying a table of content for a TLSW file *)
 
 val extract_sub_part : string -> int -> string list
-(** [extract_sub_part tlsw i]
-    Extracts the `i`th first TLSW sections of `tlsw` *)
+(** [extract_sub_part tlsw i] Extracts the `i`th first TLSW sections of `tlsw`
+*)
 
 val split_title_and_text : string -> (string * string) list * string
-(**
-   The argument is expected to have the form "KEY=value\n"...
-   This function calculates each Key/value pair and puts it in a list;
-   except for the key TITLE, that is the second element of the returned tuple.
-   If there is no title defined, checks if the first line is not empty and does
-   not start with '=' nor contains '<' nor '[', in which case it is choosen as a
-   first line. Otherwise, the title is the empty string.
-*)
+(** The argument is expected to have the form "KEY=value\n"... This function
+    calculates each Key/value pair and puts it in a list; except for the key
+    TITLE, that is the second element of the returned tuple. If there is no
+    title defined, checks if the first line is not empty and does not start with
+    '=' nor contains '<' nor '\[', in which case it is choosen as a first line.
+    Otherwise, the title is the empty string. *)
 
 val print_sub_part :
   Config.config ->
@@ -87,8 +85,8 @@ val print_mod_view_page :
   (string * string) list (* env *) ->
   string (* s *) ->
   unit
-(** [print_mod_view_page conf can_edit mode fname title env s]
-    Prints an editable part *)
+(** [print_mod_view_page conf can_edit mode fname title env s] Prints an
+    editable part *)
 
 val print_mod_ok :
   Config.config (* conf *) ->
@@ -106,14 +104,15 @@ val print_mod_ok :
   (* string_filter *)
   bool (* title_is_1st *) ->
   unit
-(** [print_mod_ok conf wi edit_mode fname read_string commit string_filter title_is_1st]
-    Commits the changes of a page *)
+(** [print_mod_ok conf wi edit_mode fname read_string commit string_filter
+     title_is_1st] Commits the changes of a page *)
 
 (*S: shouldn't the following functions be defined elsewhere? *)
 
 val notes_aliases : Config.config -> (string * string) list
-(** Reads the notes alias file (conf.base_env.notes_alias_file or base_path/notes.alias).
-    File format is "KEY value\n...", returns the list of (KEY,value) *)
+(** Reads the notes alias file (conf.base_env.notes_alias_file or
+    base_path/notes.alias). File format is "KEY value\n...", returns the list of
+    (KEY,value) *)
 
 val map_notes : (string * string) list -> string -> string
 (** Given an alias list, finds the corresponding alias for a given string *)

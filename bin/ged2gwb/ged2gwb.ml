@@ -89,7 +89,7 @@ let speclist =
               let b =
                 max a
                   (if b = "" then !Ged2gwb_lib.State.dead_years
-                  else int_of_string b)
+                   else int_of_string b)
               in
               Ged2gwb_lib.State.alive_years := a;
               Ged2gwb_lib.State.dead_years := b

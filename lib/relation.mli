@@ -84,7 +84,6 @@ val get_event_witnessed :
   Gwdb.base ->
   Gwdb.person ->
   (Gwdb.person * Def.witness_kind * string * Gwdb.istr Event.event_item) list
-(** [get_event_witness_related conf base p] is a list of tuple
-      with informations on events the person participated to.
-      ( person that has the event * witness_kind * witness_note * event_item )
-  *)
+(** [get_event_witness_related conf base p] is a list of tuple with informations
+    on events the person participated to. ( person that has the event *
+    witness_kind * witness_note * event_item ) *)
