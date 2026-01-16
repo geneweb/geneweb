@@ -14190,37 +14190,37 @@ sv: notering/noteringar
 tr: not/notlar
 zh: 备注
 
-    notes modified
-af: aantekeninge gewysig
-bg: бележките са променени
-br: notennoù kemmet
-ca: notes modificades
-co: note mudificate
-cs: poznámky změněny
-da: noter ændret
-de: geänderte Notizen
-en: notes modified
-eo: notoj modifitaj
-es: notas modificadas
-et: märkused muudetud
-fi: muistiinpanoja muokattu
-fr: notes modifiées
-he: רשימות עודכנו
-is: athugasemd gerð
-it: note modificate
-lt: tvarkyti užrašai
-lv: pārveidotas piezīmes
-nl: notities veranderd
-no: notater er endret
-oc: nòtas modificadas
-pl: uwagi zmodyfikowane
-pt: notas modificadas
-ro: nota modificata
-ru: заметки изменены
-sk: poznámky zmenené
+    note modified
+af: aantekening gewysig
+bg: бележката е променена
+br: notenn kemmet
+ca: nota modificada
+co: nota mudificata
+cs: poznámka změněna
+da: note ændret
+de: geänderte Notiz
+en: note modified
+eo: noto modifita
+es: nota modificada
+et: märkus muudetud
+fi: muistiinpano muokattu
+fr: note modifiée
+he: רשימה עודכנה
+is: athugasemd breytt
+it: nota modificata
+lt: užrašas pakeistas
+lv: piezīme pārveidota
+nl: notitie veranderd
+no: notat er endret
+oc: nòta modificada
+pl: uwaga zmodyfikowana
+pt: nota modificada
+ro: notă modificată
+ru: заметка изменена
+sk: poznámka zmenená
 sl: zaznamek spremenjen
-sv: noteringar modifierade
-tr: notlar değiştirildi
+sv: notering modifierad
+tr: not değiştirildi
 
     notes summary
 bg: резюме на бележките

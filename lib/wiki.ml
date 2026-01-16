@@ -1046,13 +1046,15 @@ let split_title_and_text s =
 
 let print_ok conf wi edit_mode fname title_is_1st s =
   let title _ =
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (Util.transl conf "notes modified"))
+    match Util.p_getenv conf.env "new_f" with
+    | Some _ ->
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (Util.transl_nth conf "new note name" 1))
+    | None ->
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (Util.transl conf "note modified"))
   in
   Hutil.header conf title;
-  Output.print_sstring conf {|<div style="text-align:center"> --- |};
-  title ();
-  Output.print_sstring conf {| --- </div>|};
   let get_v = Util.p_getint conf.env "v" in
   let v = match get_v with Some v -> v | None -> 0 in
   let title, s =
