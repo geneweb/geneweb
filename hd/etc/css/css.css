@@ -1,3 +1,22 @@
+/* Notifications */
+.notif-ctr {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1080;
+  max-width: 330px;
+}
+
+code {
+  font-size: 1rem;
+}
+
+.toast-body {
+  background-color: white;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
 /* Élargissement raisonnable du container pour les hautes résolutions */
 @media (min-width: 1600px) {
   body .container {

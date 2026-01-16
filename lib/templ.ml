@@ -927,7 +927,7 @@ and print_foreach_env_binding (conf : Config.config) print_ast set_vother env ep
       match env_vars with
       | [] -> acc
       | (k, v) :: env_vars ->
-          if List.mem_assoc k acc then loop acc env_vars
+          if k = "notif" || List.mem_assoc k acc then loop acc env_vars
           else loop ((k, v) :: acc) env_vars
     in
     loop [] (conf.env @ conf.henv @ conf.senv)

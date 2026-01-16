@@ -3638,7 +3638,8 @@ let url_set_aux conf url evar_l str_l =
   let url_env =
     List.fold_left
       (fun acc (k, v) ->
-        if List.mem k evar_l then acc else (k, Adef.as_string v) :: acc)
+        if List.mem k evar_l || k = "notif" then acc
+        else (k, Adef.as_string v) :: acc)
       url_env conf_map
     |> List.rev
   in
