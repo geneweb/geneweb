@@ -450,6 +450,18 @@ let w_lock ~onerror fn conf (base_name : string option) =
     ~wait:true ~lock_file:(Mutil.lock_file bfile)
   @@ fun () -> fn conf base_name
 
+let nldb_check_done = ref false
+
+let check_nldb_format conf base =
+  if not !nldb_check_done then (
+    nldb_check_done := true;
+    match Driver.check_nldb_format base with
+    | `BadFormat ->
+        Notif.error
+          ~title:(Util.transl conf "NOTIF_TT incompatible notes_links")
+          (Util.transl conf "NOTIF incompatible notes_links")
+    | `Ok | `NoFile -> ())
+
 let w_base ~none fn conf (bfile : string option) =
   match bfile with
   | None -> none conf
@@ -473,6 +485,8 @@ let w_base ~none fn conf (bfile : string option) =
                   nb_of_families = Driver.nb_of_families base;
                 }
           in
+          check_nldb_format conf base;
+          let conf = Notif.inject_pending conf in
           fn conf base)
 
 let w_person ~none fn conf base =
@@ -492,7 +506,15 @@ let treat_request =
   let w_base =
     let none conf =
       if conf.bname = "" then GWPARAM.output_error conf Def.Bad_Request
-      else GWPARAM.output_error conf Def.Not_Found
+      else (
+        Notif.error
+          ~title:(Util.transl conf "NOTIF_TT unknown base")
+          (Printf.sprintf
+             (Util.ftransl conf "NOTIF unknown base %s")
+             conf.bname);
+        let conf = Notif.inject_pending conf in
+        try Templ.output_simple conf Templ.Env.empty "index"
+        with _ -> GWPARAM.output_error conf Def.Not_Found)
     in
     w_base ~none
   in
@@ -993,8 +1015,13 @@ let treat_request =
                  w_base @@ WiznotesDisplay.print_search
              | _ ->
                  w_base @@ fun conf base ->
-                 let str = Format.sprintf "m=%s is not available here" m in
-                 incorrect_request conf base ~comment:str)
+                 Notif.error
+                   ~title:(Util.transl conf "NOTIF_TT incorrect request")
+                   (Printf.sprintf
+                      (Util.ftransl conf "NOTIF incorrect request %s")
+                      ("m=" ^ m));
+                 let conf = Notif.inject_pending conf in
+                 SrcfileDisplay.print_welcome conf base)
               conf bfile)
       else
         let title _ =

@@ -75,5 +75,8 @@
   </div>
 </div>
 </div>
+%if;(e.notif!="")<script>
+%include;js_notif
+</script>%end;
 </body>
 </html>

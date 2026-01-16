@@ -14257,6 +14257,41 @@ de: Notiz ohne Titel
 en: note without title
 fr: note sans titre
 
+    NOTIF error/warning/success/info
+de: Fehler/Warnung/Erfolg/Information
+en: error/warning/success/information
+fr: erreur/attention/succès/information
+
+    NOTIF_TT unknown base
+de: Datenbank nicht gefunden!
+en: Database not found!
+fr: Base introuvable !
+
+    NOTIF unknown base %s
+de: Die Datenbank <b>%s</b> existiert nicht.
+en: Database <b>%s</b> does not exist.
+fr: La base de données <b>%s</b> n’existe pas.
+
+    NOTIF_TT incorrect request
+de: Ungültige Anfrage
+en: Incorrect request
+fr: Requête incorrecte
+
+    NOTIF incorrect request %s
+de: <b>%s</b> ist hier nicht verfügbar.
+en: <b>%s</b> is not available here.
+fr: <b>%s</b> n'est pas disponible ici.
+
+    NOTIF_TT incompatible notes_links
+de: Inkompatibles verknüpfte Notizen Format
+en: Incompatible linked notes format
+fr: Format des notes liées incompatible
+
+    NOTIF incompatible notes_links
+de: Führen Sie das Tool <code><b>update_nldb</b></code> aus<br>oder <b>löschen</b> Sie die Datei <b>notes_links</b>.
+en: Run <code><b>update_nldb</b></code> tool or <b>delete notes_links</b> file.
+fr: Relancez l’outil <code><b>update_nldb</b></code><br> ou <b>supprimez</b> le fichier <b>notes_links</b>.
+
     nth
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 bg: n-ти/първи/втори/трети/четвърти/пети/шести/седми/осми/девети/десети/единадесети/дванадесети/тринадесети/четиринадесети/петнадесети/шестнадесети/седемнадесети/осемнадесети/деветнадесети/двадесети/21-и/22-и/23-и/24-и/25-и/26-и/27-и/28-и/29-и/30-и/31-и/32-и/33-и/34-и/35-и/36-и/37-и/38-и/39-и/40-и/41-и/42-и/43-и/44-и/45-и/46-и/47-и/48-и/49-и/50-и/51-и/52-и/53-и/54-и/55-и/56-и/57-и/58-и/59-и/60-и/61-и/62-и/63-и/64-и/65-и/66-и/67-и/68-и/69-и/70-и/71-и/72-и/73-и/74-и/75-и/76-и/77-и/78-и/79-и/80-и/81-и/82-и/83-и/84-и/85-и/86-и/87-и/88-и/89-и/90-и/91-и/92-и/93-и/94-и/95-и/96-и/97-и/98-и/99-и
