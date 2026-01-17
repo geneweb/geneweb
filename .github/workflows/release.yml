@@ -79,7 +79,7 @@ jobs:
           OPAM_PREFIX=$(opam var prefix | tr '\\' '/')
           find "$OPAM_PREFIX" -name "libgmp-10.dll" -exec mv {} {}.hidden \; 2>/dev/null || true
           
-          # Reinstall zarith WITHOUT depext (won’t reinstall system packages)
+          # Reinstall zarith WITHOUT depext (won't reinstall system packages)
           echo "Reinstalling zarith with static GMP…"
           OPAMASSUMEDEPEXTS=true opam reinstall zarith --yes
           echo "Static GMP linking configured"
@@ -88,6 +88,24 @@ jobs:
         run: |
           opam exec -- ocaml ./configure.ml --sosa-zarith ${{ matrix.is-unix && '--gwd-caching' || '' }}
           opam exec -- make distrib distrib-rpc
+
+      - name: Bundle PCRE2 runtime DLL (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          echo "=== Bundling PCRE2 DLL for Windows ==="
+          OPAM_PATH=$(cygpath "$OPAMROOT")
+          PCRE2_DLL=$(find "$OPAM_PATH" /usr/x86_64-w64-mingw32 /usr/bin -name "libpcre2-8-0.dll" 2>/dev/null | head -1)
+          
+          if [ -n "$PCRE2_DLL" ]; then
+            echo "Found: $PCRE2_DLL"
+            cp "$PCRE2_DLL" distribution/gw/
+            ls -lh distribution/gw/libpcre2-8-0.dll
+          else
+            echo "ERROR: PCRE2 DLL not found"
+            find /usr -name "*pcre2*" 2>/dev/null | head -20
+            exit 1
+          fi
 
       - name: Verify static linking (Windows)
         if: runner.os == 'Windows'
@@ -103,7 +121,7 @@ jobs:
             echo "$NON_WINDOWS"
             exit 1
           else
-            echo "✅ SUCCESS: libgmp is statically linked (all dependencies are statically linked or from Windows)"
+            echo "✅ SUCCESS: All dependencies are statically linked or from Windows"
           fi
 
       - name: Minify RPC client with terser
@@ -115,36 +133,99 @@ jobs:
           terser rpc_client.min.js -o rpc_client.min.js --compress --mangle
           gzip -9 -k -f rpc_client.min.js
 
-      - name: Create release archive
+      - name: Determine version
+        id: version
         shell: bash
-        working-directory: distribution
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             VERSION="${{ inputs.tag_name }}"
           else
             VERSION="${{ github.ref_name }}"
           fi
-          
-          # Strip leading 'v' from version for archive naming
           VERSION="${VERSION#v}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Create macOS bundle and DMG
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          echo "🍎 Creating macOS bundle and DMG..."
           
+          chmod +x create_bundle.sh create_dmg.sh
+          
+          ./create_bundle.sh
+          ./create_dmg.sh
+          
+          VERSION="${{ steps.version.outputs.version }}"
+          ARCH_SUFFIX="${{ matrix.platform == 'macos-arm64' && 'arm64' || 'intel' }}"
+          
+          # Find and rename the DMG to match tag version (for consistency with ZIP archives)
+          CREATED_DMG=$(ls GeneWeb-*.dmg 2>/dev/null | head -1)
+          
+          if [ -n "$CREATED_DMG" ]; then
+            DMG_NAME="GeneWeb-${VERSION}-macos-${ARCH_SUFFIX}.dmg"
+            mv "$CREATED_DMG" "${DMG_NAME}"
+            echo "DMG_NAME=${DMG_NAME}" >> $GITHUB_ENV
+            echo "✅ Renamed $CREATED_DMG → ${DMG_NAME}"
+            ls -lh "${DMG_NAME}"
+          else
+            echo "⚠️ No DMG found"
+            ls -la *.dmg 2>/dev/null || echo "No .dmg files in current directory"
+          fi
+
+      - name: Create release archive
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
           VERSIONED_ARCHIVE="geneweb-${VERSION}-${{ matrix.platform }}.zip"
           
+          cd distribution
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             7z a -tzip "../${VERSIONED_ARCHIVE}" * -mx=9
           else
             zip -9 -r "../${VERSIONED_ARCHIVE}" *
           fi
+          cd ..
           
           echo "VERSIONED_ARCHIVE=${VERSIONED_ARCHIVE}" >> $GITHUB_ENV
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
-      - name: Upload to GitHub Release
+      - name: Create Windows installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $VERSION = "${{ steps.version.outputs.version }}"
+          
+          # Download InnoSetup
+          Write-Host "📥 Downloading InnoSetup..."
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile "innosetup-installer.exe"
+          
+          # Install InnoSetup silently
+          Write-Host "📦 Installing InnoSetup..."
+          Start-Process -FilePath "innosetup-installer.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/DIR=.\innosetup" -Wait
+          
+          # Compile installer
+          Write-Host "🔨 Building installer..."
+          & ".\innosetup\ISCC.exe" "geneweb.iss" "/DMyVersion=$VERSION"
+          
+          $INSTALLER_NAME = "GeneWeb-${VERSION}-windows-setup.exe"
+          if (Test-Path $INSTALLER_NAME) {
+            Write-Host "✅ Installer created: $INSTALLER_NAME"
+            echo "INSTALLER_NAME=$INSTALLER_NAME" >> $env:GITHUB_ENV
+          } else {
+            Write-Host "❌ Installer not found!"
+            exit 1
+          }
+
+      - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
-          files: ${{ env.VERSIONED_ARCHIVE }}
-          fail_on_unmatched_files: true
+          files: |
+            ${{ env.VERSIONED_ARCHIVE }}
+            ${{ env.DMG_NAME }}
+            ${{ env.INSTALLER_NAME }}
+          fail_on_unmatched_files: false
           prerelease: ${{ (github.event_name == 'workflow_dispatch' && inputs.prerelease) || contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') || contains(github.ref_name, 'dev') }}
           draft: false
           name: "GeneWeb ${{ env.VERSION }}"
@@ -155,26 +236,16 @@ jobs:
             
             ### Download
             
-            [Linux (glibc 2.35+)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) • [macOS (Apple Silicon)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) • [macOS (Intel)](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) • [Windows](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) • [Source code](${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}.zip)
+            | Platform | ZIP Archive | Installer |
+            |----------|-------------|-----------|
+            | 🐧 Linux | [geneweb-${{ env.VERSION }}-linux.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) | - |
+            | 🍎 macOS (Apple Silicon) | [geneweb-${{ env.VERSION }}-macos-arm64.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) | [GeneWeb-${{ env.VERSION }}-macos-arm64.dmg](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/GeneWeb-${{ env.VERSION }}-macos-arm64.dmg) |
+            | 🍎 macOS (Intel) | [geneweb-${{ env.VERSION }}-macos-intel.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) | [GeneWeb-${{ env.VERSION }}-macos-intel.dmg](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/GeneWeb-${{ env.VERSION }}-macos-intel.dmg) |
+            | 🪟 Windows | [geneweb-${{ env.VERSION }}-windows.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) | [GeneWeb-${{ env.VERSION }}-windows-setup.exe](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/GeneWeb-${{ env.VERSION }}-windows-setup.exe) |
             
-            ### Prerequisites
+            ### Prerequisites (Unix ZIP archives only)
             
-            **Linux/macOS:** Install GMP library
-             ```bash
-            # Ubuntu/Debian
-            sudo apt-get install libgmp10
-            
-            # macOS
-            brew install gmp
-            ```
-            
-            **Windows:** No additional dependencies required (GMP statically linked)
-            
-            ### Installation
-            
-            1. Extract the downloaded archive
-            2. Run `./gwd` (Unix) or `gwd.exe` (Windows)
-            
-            **Note:** Binaries are unsigned. Your OS may display security warnings on first run.
+            **Linux:** `sudo apt-get install libgmp10 libpcre2-dev`
+            **macOS:** `brew install gmp pcre2`
             
             For more information, see the [documentation](https://geneweb.tuxfamily.org/wiki/GeneWeb).
