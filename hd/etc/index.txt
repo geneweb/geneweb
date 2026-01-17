@@ -75,5 +75,34 @@
   </div>
 </div>
 </div>
+%if;(evar.notif_inline!="")
+<script>
+var notifLabels={
+  danger:'[*NOTIF error/warning/success/info]0',
+  warning:'[*NOTIF error/warning/success/info]1',
+  success:'[*NOTIF error/warning/success/info]2',
+  info:'[*NOTIF error/warning/success/info]3'
+};
+(function(){
+  var txt=document.createElement('textarea');
+  txt.innerHTML='%evar.notif_inline;';
+  try{var items=JSON.parse(txt.value);}catch(e){return;}
+  if(!items||!items.length)return;
+  var c=document.createElement('div');
+  c.className='gw-notif-ctr';
+  document.body.appendChild(c);
+  items.forEach(function(x){
+    var ti=x.title||notifLabels[x.level],
+        h='<div class="toast show border-'+x.level+'" role="alert">'+
+          '<div class="toast-header bg-'+x.level+' text-white">'+
+          '<i class="fa '+x.icon+' mr-2"></i><strong class="mr-auto">'+ti+'</strong>'+
+          '<button type="button" class="close text-white ml-2 mb-1" onclick="this.closest(\'.toast\').remove()">'+
+          '<span>&times;</span></button></div>'+
+          '<div class="toast-body">'+x.message+'</div></div>';
+    c.insertAdjacentHTML('beforeend',h);
+  });
+})();
+</script>
+%end;
 </body>
 </html>

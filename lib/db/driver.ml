@@ -279,6 +279,16 @@ let bfname base fname = Filename.concat base.data.bdir fname
 
 module NLDB = struct
   let magic = "GWNL0011"
+  let warned = ref false
+
+  let check_format base =
+    let fname = bfname base "notes_links" in
+    match try Some (open_in_bin fname) with Sys_error _ -> None with
+    | Some ic ->
+        let ok = Mutil.check_magic magic ic in
+        close_in ic;
+        if ok then `Ok else `BadFormat
+    | None -> `NoFile
 
   let read base =
     let fname = bfname base "notes_links" in
@@ -287,9 +297,13 @@ module NLDB = struct
         let r =
           if Mutil.check_magic magic ic then
             (input_value ic : (iper, iper) Def.NLDB.t)
-          else failwith "unsupported nldb format"
+          else (
+            if not !warned then (
+              warned := true;
+              Logs.warn (fun m -> m "Unsupported nldb format in %s" fname));
+            [])
         in
-        close_in ic;
+        close_in_noerr ic;
         r
     | None -> []
 
@@ -308,6 +322,7 @@ module NLDB = struct
       Sys.rename fname_tmp fname_def
 end
 
+let check_nldb_format = NLDB.check_format
 let read_nldb = NLDB.read
 let write_nldb = NLDB.write
 let base_notes_origin_file base = base.data.bnotes.Def.norigin_file
