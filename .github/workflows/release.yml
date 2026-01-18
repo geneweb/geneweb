@@ -89,6 +89,24 @@ jobs:
           opam exec -- ocaml ./configure.ml --sosa-zarith ${{ matrix.is-unix && '--gwd-caching' || '' }}
           opam exec -- make distrib distrib-rpc
 
+      - name: Bundle PCRE2 runtime DLL (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          echo "=== Bundling PCRE2 DLL for Windows ==="
+          OPAM_PATH=$(cygpath "$OPAMROOT")
+          PCRE2_DLL=$(find "$OPAM_PATH" /usr/x86_64-w64-mingw32 /usr/bin -name "libpcre2-8-0.dll" 2>/dev/null | head -1)
+          
+          if [ -n "$PCRE2_DLL" ]; then
+            echo "Found: $PCRE2_DLL"
+            cp "$PCRE2_DLL" distribution/gw/
+            ls -lh distribution/gw/libpcre2-8-0.dll
+          else
+            echo "ERROR: PCRE2 DLL not found"
+            find /usr -name "*pcre2*" 2>/dev/null | head -20
+            exit 1
+          fi
+
       - name: Verify static linking (Windows)
         if: runner.os == 'Windows'
         shell: bash
