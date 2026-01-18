@@ -234,15 +234,22 @@ let this_request_updates_database conf =
       true
   | _ -> false
 
-let incorrect_request ?(comment = "") conf =
-  Hutil.incorrect_request ~comment conf
+let request_issue ?(level = `Warning) ~key conf base =
+  let title = Util.transl conf ("NOTIF_TT " ^ key) in
+  let comment = Util.transl conf ("NOTIF " ^ key) in
+  (match level with
+  | `Error -> Notif.error ~title comment
+  | `Warning -> Notif.warning ~title comment
+  | `Info -> Notif.info ~title comment);
+  let conf = Notif.inject_pending conf in
+  SrcfileDisplay.print_welcome conf base
 
 let person_selected conf base p =
   match p_getenv conf.senv "em" with
   | Some "R" ->
       let p1 = find_person_in_env_pref conf base "e" in
       RelationDisplay.print conf base p p1
-  | Some _ -> incorrect_request conf ~comment:"incorrect em= value"
+  | Some _ -> request_issue conf base ~key:"incorrect em value"
   | None ->
       record_visited conf (Driver.get_iper p);
       Perso.print conf base p
@@ -252,7 +259,7 @@ let person_selected_with_redirect conf base p =
   | Some "R" ->
       let p1 = find_person_in_env_pref conf base "e" in
       RelationDisplay.print conf base p p1
-  | Some _ -> incorrect_request conf ~comment:"Incorrect em= value"
+  | Some _ -> request_issue conf base ~key:"incorrect em value"
   | None ->
       Wserver.http_redirect_temporarily
         (commd conf ^^^ Util.acces conf base p :> string)
@@ -412,9 +419,8 @@ let make_senv conf base =
         match Driver.person_of_key base vp vn voc with
         | Some ip -> ip
         | None ->
-            Hutil.incorrect_request conf
-              ~comment:"Incorrect em=, ei=, ep=, en=, eoc= configuration";
-            raise Exit
+            request_issue conf base ~key:"incorrect person env";
+            Driver.Iper.dummy
       in
       let vi = Driver.Iper.to_string ip in
       set_senv conf (Mutil.encode vm) (Mutil.encode vi)
@@ -554,8 +560,10 @@ let treat_request =
           List.assoc_opt "wizards_cant_write" conf.base_env = Some "yes"
           && this_request_updates_database conf
         then
-          Hutil.incorrect_request conf
-            ~comment:"Wizard actions not allowed on this base"
+          w_base
+            (fun conf base ->
+              request_issue conf base ~level:`Error ~key:"wizards cant write")
+            conf bfile
         else
           let plugins =
             match List.assoc_opt "plugins" conf.Config.base_env with
@@ -580,9 +588,6 @@ let treat_request =
                   else SrcfileDisplay.incr_request_counter conf
                 with
                 | _ -> ());
-             let incorrect_request ?(comment = "") conf _ =
-               incorrect_request ~comment conf
-             in
              let doc_aux conf base print =
                match Util.p_getenv conf.env "s" with
                | Some f ->
@@ -590,8 +595,7 @@ let treat_request =
                      let f = Filename.chop_suffix f ".txt" in
                      SrcfileDisplay.print_source conf base f
                    else print conf f
-               | _ ->
-                   incorrect_request conf ~comment:"Missing s= for m=DOC" base
+               | _ -> request_issue conf base ~key:"missing doc param"
              in
              match m with
              | "" -> (
@@ -697,8 +701,7 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
                  | Some f -> SrcfileDisplay.print conf base f
-                 | None ->
-                     incorrect_request conf base ~comment:"Missing v= for m=H")
+                 | None -> request_issue conf base ~key:"missing v param")
              | "HIST" -> w_base @@ History.print
              | "HIST_CLEAN" ->
                  w_wizard @@ w_base
@@ -845,8 +848,8 @@ let treat_request =
                              in
                              Some.search_surname_print conf base unknown sn
                          | None, None ->
-                             incorrect_request conf base
-                               ~comment:"Missing fn= and sn= for m=NG"))
+                             request_issue conf base
+                               ~key:"missing fn and sn for search"))
                  | Some i ->
                      RelationDisplay.print conf base
                        (pget conf base (Driver.Iper.of_string i))
@@ -936,8 +939,8 @@ let treat_request =
                          match (fn, sn) with
                          | Some fn, Some sn -> search (fn ^ " " ^ sn)
                          | _ ->
-                             incorrect_request conf base
-                               ~comment:"Missing p= and n= for m=R"))
+                             request_issue conf base
+                               ~key:"missing p and n for relation"))
                  | Some i when Option.is_some (int_of_string_opt i) ->
                      RelationDisplay.print conf base
                        (pget conf base (Driver.Iper.of_string i))
@@ -960,8 +963,8 @@ let treat_request =
                              RelationDisplay.print conf base p1
                                (find_person_in_env_pref conf base "e")
                          | _ ->
-                             Hutil.incorrect_request conf
-                               ~comment:"Incorrect fallback for m=R")))
+                             request_issue conf base
+                               ~key:"incorrect fallback for relation")))
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
                  Output.status conf Def.OK;
@@ -989,9 +992,7 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
                  | Some f -> SrcfileDisplay.print_source conf base f
-                 | _ ->
-                     incorrect_request conf base ~comment:"Missing v= for m=SRC"
-                 )
+                 | _ -> request_issue conf base ~key:"missing v param")
              | "STAT" ->
                  w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
              | "TP" -> (
@@ -1003,8 +1004,7 @@ let treat_request =
                      | _ ->
                          Perso.interp_templ ("tp0_" ^ f) conf base
                            (Driver.empty_person base Driver.Iper.dummy))
-                 | None ->
-                     incorrect_request conf base ~comment:"Missing v= for m=TP")
+                 | None -> request_issue conf base ~key:"missing v param")
              | "TT" -> w_base @@ TitleDisplay.print
              | "U" -> w_wizard @@ w_base @@ w_person @@ updmenu_print
              | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
@@ -1016,10 +1016,12 @@ let treat_request =
              | _ ->
                  w_base @@ fun conf base ->
                  Notif.error
-                   ~title:(Util.transl conf "NOTIF_TT incorrect request")
+                   ~title:
+                     (Utf8.capitalize
+                        (Util.transl conf "NOTIF_TT incorrect request"))
                    (Printf.sprintf
                       (Util.ftransl conf "NOTIF incorrect request %s")
-                      ("m=" ^ m));
+                      m);
                  let conf = Notif.inject_pending conf in
                  SrcfileDisplay.print_welcome conf base)
               conf bfile)
