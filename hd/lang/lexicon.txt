@@ -14273,14 +14273,97 @@ en: Database <b>%s</b> does not exist.
 fr: La base de données <b>%s</b> n’existe pas.
 
     NOTIF_TT incorrect request
-de: Ungültige Anfrage
-en: Incorrect request
-fr: Requête incorrecte
+->: incorrect request
 
     NOTIF incorrect request %s
-de: <b>%s</b> ist hier nicht verfügbar.
-en: <b>%s</b> is not available here.
-fr: <b>%s</b> n'est pas disponible ici.
+de: <b>m=%s</b> existiert nicht.
+en: <b>m=%s</b> does not exist.
+fr: <b>m=%s</b> n'existe pas.
+
+    NOTIF incorrect em value
+de: Ungültiger <b>em=</b> Wert.
+en: Invalid <b>em=</b> value.
+fr: Valeur <b>em=</b> incorrecte.
+
+    NOTIF_TT incorrect em value
+de: Ungültiger Parameter
+en: Invalid parameter
+fr: Paramètre invalide
+
+    NOTIF incorrect em value
+de: Ungültiger <b>em=</b> Wert.
+en: Invalid <b>em=</b> value.
+fr: Valeur <b>em=</b> incorrecte.
+
+    NOTIF_TT incorrect person env
+de: Konfigurationsfehler
+en: Configuration error
+fr: Erreur de configuration
+
+    NOTIF incorrect person env
+de: Ungültige Person-Konfiguration (em=, ei=, ep=, en=, eoc=).
+en: Invalid person configuration (em=, ei=, ep=, en=, eoc=).
+fr: Configuration de personne incorrecte (em=, ei=, ep=, en=, eoc=).
+
+    NOTIF_TT wizards cant write
+de: Zugriff verweigert
+en: Access denied
+fr: Accès refusé
+
+    NOTIF wizards cant write
+de: Schreibaktionen sind für diese Datenbank nicht erlaubt.
+en: Write actions are not allowed on this database.
+fr: Les actions d'écriture ne sont pas autorisées sur cette base.
+
+    NOTIF_TT missing doc param
+de: Fehlender Parameter
+en: Missing parameter
+fr: Paramètre manquant
+
+    NOTIF missing doc param
+de: Fehlender <b>s=</b> Parameter für m=DOC.
+en: Missing <b>s=</b> parameter for m=DOC.
+fr: Paramètre <b>s=</b> manquant pour m=DOC.
+
+    NOTIF_TT missing p and n for relation
+de: Fehlender Parameters
+en: Missing parameters
+fr: Paramètres manquant
+
+    NOTIF missing p and n for relation
+de: Fehlende Parameter <b>p=</b> und <b>n=</b> für m=R.
+en: Missing <b>p=</b> and <b>n=</b> parameters for m=R.
+fr: Paramètres <b>p=</b> et <b>n=</b> manquants pour m=R.
+
+    NOTIF_TT missing v param
+de: Fehlender Parameter
+en: Missing parameter
+fr: Paramètre manquant
+
+    NOTIF missing v param
+de: Fehlender <b>v=</b> Parameter für m=H/SRC/TP.
+en: Missing <b>v=</b> parameter for m=H/SRC/TP.
+fr: Paramètre <b>v=</b> manquant pour m=H/SRC/TP.
+
+    NOTIF_TT incorrect fallback for relation
+de: Beziehungsfehler
+en: Relation error
+fr: Erreur de relation
+
+    NOTIF incorrect fallback for relation
+de: Personen für Beziehungsberechnung nicht gefunden.
+en: Persons for relation computation not found.
+fr: Personnes pour le calcul de relation introuvables.
+
+    NOTIF_TT missing fn and sn for search
+de: Fehlender Parameters
+en: Missing parameters
+fr: Paramètres manquant
+
+    NOTIF missing fn and sn for search
+de: Fehlende Parameter <b>fn=</b> und <b>sn=</b> für die Suche.
+en: Missing <b>fn=</b> and <b>sn=</b> parameters for search.
+fr: Paramètres <b>fn=</b> et <b>sn=</b> manquants pour la recherche.
 
     NOTIF_TT incompatible notes_links
 de: Inkompatibles verknüpfte Notizen Format

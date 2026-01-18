@@ -50,7 +50,6 @@ val treat_request : Config.config -> unit
 (**/**)
 
 (* Used by v7 plugin *)
-val incorrect_request : ?comment:string -> Config.config -> unit
 val only_special_env : (string * _) list -> bool
 
 (**/**)
