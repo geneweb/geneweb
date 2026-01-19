@@ -95,7 +95,7 @@ let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
   else (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=NG&sn=";
+    Output.print_sstring conf "m=N&v=";
     Output.print_string conf (Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
