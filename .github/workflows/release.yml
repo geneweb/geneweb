@@ -132,6 +132,7 @@ jobs:
           chmod +w rpc_client.min.js
           terser rpc_client.min.js -o rpc_client.min.js --compress --mangle
           gzip -9 -k -f rpc_client.min.js
+          brotli -f -q 11 rpc_client.min.js
 
       - name: Determine version
         id: version
@@ -180,11 +181,7 @@ jobs:
           VERSIONED_ARCHIVE="geneweb-${VERSION}-${{ matrix.platform }}.zip"
           
           cd distribution
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            7z a -tzip "../${VERSIONED_ARCHIVE}" * -mx=9
-          else
-            zip -9 -r "../${VERSIONED_ARCHIVE}" *
-          fi
+          7z a -tzip -mx=9 -mfb=258 -mpass=15 "../${VERSIONED_ARCHIVE}" *
           cd ..
           
           echo "VERSIONED_ARCHIVE=${VERSIONED_ARCHIVE}" >> $GITHUB_ENV

@@ -135,12 +135,16 @@ endif
 	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 4500 ]; then \
 	    printf "gzip -9 -k %s\n" "$$f"; \
 	    gzip -9 -k -f "$$f"; \
+	    printf "brotli %s\n" "$$f"; \
+	    brotli -f -q 11 "$$f"; \
 	  fi; \
 	done
 	@for f in $(DISTRIB_DIR)/gw/etc/css/*.css; do \
 	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 10000 ]; then \
 	    printf "gzip -9 -k %s\n" "$$f"; \
 	    gzip -9 -k -f "$$f"; \
+	    printf "brotli %s\n" "$$f"; \
+	    brotli -f -q 11 "$$f"; \
 	  fi; \
 	done
 	mkdir $(DISTRIB_DIR)/gw/setup

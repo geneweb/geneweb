@@ -13,7 +13,7 @@ USER root
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -yq --no-install-recommends \
-    m4 libgmp-dev libpcre2-dev libipc-system-simple-perl xdot zlib1g-dev pkg-config \
+    m4 libgmp-dev libpcre2-dev libipc-system-simple-perl xdot zlib1g-dev pkg-config brotli \
     && ln -sf /usr/bin/opam-2.3 /usr/bin/opam
 
 # Update local opam repository
