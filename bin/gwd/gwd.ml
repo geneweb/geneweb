@@ -14,25 +14,25 @@ type log = Stdout | Stderr | File of string | Syslog
 
 let gzip_min_size = 1024
 
-let client_accepts_gzip request =
+let client_accepts_encoding request encoding =
   let accept =
     String.lowercase_ascii
       (Mutil.extract_param "accept-encoding: " '\n' request)
   in
-  if not (Mutil.contains accept "gzip") then false
+  if not (Mutil.contains accept encoding) then false
   else
     let dominated_by_zero part =
       let dominated s =
         Mutil.contains s "q=0" && not (Mutil.contains s "q=0.")
       in
       let p = String.trim part in
-      Mutil.contains p "gzip"
+      Mutil.contains p encoding
       && dominated (String.concat "" (String.split_on_char ' ' p))
     in
     not (List.exists dominated_by_zero (String.split_on_char ',' accept))
 
 let make_gzip_output_conf ~level request =
-  if not (client_accepts_gzip request) then None
+  if not (client_accepts_encoding request "gzip") then None
   else
     let body_buf = Buffer.create 65536 in
     let headers_buf = Buffer.create 1024 in
@@ -1831,7 +1831,9 @@ type misc_fname =
   | Woff2 of string
   | CacheGz of string
 
-let content_misc conf len misc_fname is_gzipped =
+type content_encoding = No_encoding | Gzip | Brotli
+
+let content_misc conf len misc_fname encoding =
   Output.status conf Def.OK;
   let fname, t =
     match misc_fname with
@@ -1849,10 +1851,14 @@ let content_misc conf len misc_fname is_gzipped =
   in
   Output.header conf "Content-type: %s" t;
   Output.header conf "Content-length: %d" len;
-  if is_gzipped then begin
-    Output.header conf "Content-encoding: gzip";
-    Output.header conf "Vary: Accept-Encoding"
-  end;
+  (match encoding with
+  | No_encoding -> ()
+  | Gzip ->
+      Output.header conf "Content-encoding: gzip";
+      Output.header conf "Vary: Accept-Encoding"
+  | Brotli ->
+      Output.header conf "Content-encoding: br";
+      Output.header conf "Vary: Accept-Encoding");
   Output.header conf "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
@@ -1872,7 +1878,7 @@ let find_misc_file conf name =
       let name' = Util.search_in_assets @@ Filename.concat "etc" name in
       if Sys.file_exists name' then name' else ""
 
-let print_misc_file conf misc_fname is_gzipped =
+let print_misc_file conf misc_fname encoding =
   match misc_fname with
   | Css fname
   | Js fname
@@ -1886,7 +1892,7 @@ let print_misc_file conf misc_fname is_gzipped =
         let ic = Secure.open_in_bin fname in
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
-        content_misc conf len misc_fname is_gzipped;
+        content_misc conf len misc_fname encoding;
         let rec loop len =
           if len = 0 then ()
           else
@@ -1904,7 +1910,7 @@ let print_misc_file conf misc_fname is_gzipped =
       let ic = Secure.open_in_bin fname in
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
-      content_misc conf len misc_fname false;
+      content_misc conf len misc_fname No_encoding;
       let rec loop len =
         if len = 0 then ()
         else
@@ -1921,14 +1927,22 @@ let misc_request conf request fname =
   let is_compressible =
     Filename.check_suffix fname ".js" || Filename.check_suffix fname ".css"
   in
-  let try_gzip = is_compressible && client_accepts_gzip request in
-  let actual_fname, is_gzipped =
-    if try_gzip then
-      let gz_fname = fname ^ ".gz" in
-      let gz_path = find_misc_file conf gz_fname in
-      if gz_path <> "" then (gz_path, true)
-      else (find_misc_file conf fname, false)
-    else (find_misc_file conf fname, false)
+  let actual_fname, encoding =
+    if is_compressible then
+      let candidates =
+        (if client_accepts_encoding request "br" then [ (".br", Brotli) ]
+         else [])
+        @
+        if client_accepts_encoding request "gzip" then [ (".gz", Gzip) ] else []
+      in
+      let rec try_candidates = function
+        | [] -> (find_misc_file conf fname, No_encoding)
+        | (ext, enc) :: rest ->
+            let path = find_misc_file conf (fname ^ ext) in
+            if path <> "" then (path, enc) else try_candidates rest
+      in
+      try_candidates candidates
+    else (find_misc_file conf fname, No_encoding)
   in
   if actual_fname <> "" then
     let misc_fname =
@@ -1944,7 +1958,7 @@ let misc_request conf request fname =
       else if Filename.check_suffix fname ".cache.gz" then CacheGz actual_fname
       else Other actual_fname
     in
-    print_misc_file conf misc_fname is_gzipped
+    print_misc_file conf misc_fname encoding
   else false
 
 let strip_quotes s =
