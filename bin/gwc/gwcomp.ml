@@ -676,6 +676,7 @@ let get_pevent_name str l =
   | "#slgs" :: l' -> (Epers_ScellentSpouseLDS, l')
   | "#vteb" :: l' -> (Epers_VenteBien, l')
   | "#will" :: l' -> (Epers_Will, l')
+  | "#adop" :: l' -> (Epers_Adoption, l')
   | s :: l' ->
       if s.[0] = '#' then (Epers_Name (String.sub s 1 (String.length s - 1)), l')
       else failwith str

@@ -576,17 +576,18 @@ let ged_tag_pevent base evt_name =
   | Def.Epers_VenteBien -> "Property sale"
   | Def.Epers_Will -> "WILL"
   | Def.Epers_Name n -> Gwdb.sou base n
+  | Def.Epers_Adoption -> "ADOP"
 
 let is_primary_pevents = function
-  | Def.Epers_Birth | Def.Epers_Baptism | Def.Epers_Death | Def.Epers_Burial
-  | Def.Epers_Cremation | Def.Epers_BaptismLDS | Def.Epers_BarMitzvah
-  | Def.Epers_BatMitzvah | Def.Epers_Benediction | Def.Epers_Confirmation
-  | Def.Epers_ConfirmationLDS | Def.Epers_Dotation | Def.Epers_Education
-  | Def.Epers_Emigration | Def.Epers_FirstCommunion | Def.Epers_Graduate
-  | Def.Epers_Immigration | Def.Epers_Naturalisation | Def.Epers_Occupation
-  | Def.Epers_Ordination | Def.Epers_Property | Def.Epers_Recensement
-  | Def.Epers_Residence | Def.Epers_Retired | Def.Epers_ScellentChildLDS
-  | Def.Epers_ScellentSpouseLDS | Def.Epers_Will ->
+  | Def.Epers_Adoption | Def.Epers_Birth | Def.Epers_Baptism | Def.Epers_Death
+  | Def.Epers_Burial | Def.Epers_Cremation | Def.Epers_BaptismLDS
+  | Def.Epers_BarMitzvah | Def.Epers_BatMitzvah | Def.Epers_Benediction
+  | Def.Epers_Confirmation | Def.Epers_ConfirmationLDS | Def.Epers_Dotation
+  | Def.Epers_Education | Def.Epers_Emigration | Def.Epers_FirstCommunion
+  | Def.Epers_Graduate | Def.Epers_Immigration | Def.Epers_Naturalisation
+  | Def.Epers_Occupation | Def.Epers_Ordination | Def.Epers_Property
+  | Def.Epers_Recensement | Def.Epers_Residence | Def.Epers_Retired
+  | Def.Epers_ScellentChildLDS | Def.Epers_ScellentSpouseLDS | Def.Epers_Will ->
       true
   | Def.Epers_Accomplishment | Def.Epers_Acquisition | Def.Epers_Adhesion
   | Def.Epers_ChangeName | Def.Epers_Circumcision | Def.Epers_Decoration

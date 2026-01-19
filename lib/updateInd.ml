@@ -426,7 +426,8 @@ and eval_event_var e = function
           | Epers_ScellentSpouseLDS -> str_val "#slgs"
           | Epers_VenteBien -> str_val "#vteb"
           | Epers_Will -> str_val "#will"
-          | Epers_Name x -> safe_val (Util.escape_html x :> Adef.safe_string))
+          | Epers_Name x -> safe_val (Util.escape_html x :> Adef.safe_string)
+          | Epers_Adoption -> str_val "#adop")
       | _ -> str_val "")
   | [ "e_place" ] -> (
       match e with

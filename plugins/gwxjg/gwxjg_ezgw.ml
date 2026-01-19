@@ -264,6 +264,7 @@ module Event = struct
     | Pevent Def.Epers_ScellentSpouseLDS -> "EPERS_SCELLENTSPOUSELDS"
     | Pevent Def.Epers_VenteBien -> "EPERS_VENTEBIEN"
     | Pevent Def.Epers_Will -> "EPERS_WILL"
+    | Pevent Def.Epers_Adoption -> "EPERS_ADOPTION"
     | Fevent Def.Efam_Marriage -> "EFAM_MARRIAGE"
     | Fevent Def.Efam_NoMarriage -> "EFAM_NO_MARRIAGE"
     | Fevent Def.Efam_NoMention -> "EFAM_NO_MENTION"
