@@ -383,35 +383,11 @@ let bullet_nosel_txt = Adef.safe "o"
 
 let print_selection_bullet conf = function
   | Some (txt, sel) ->
-      let req : Adef.encoded_string =
-        List.fold_left
-          (fun (req : Adef.encoded_string) (k, (v : Adef.encoded_string)) ->
-            if (not sel) && k = "u" && v = txt then req
-            else
-              let s : Adef.encoded_string =
-                let open Def in
-                Adef.encoded k ^^^ "=" ^<^ v
-              in
-              if (req :> string) = "" then s
-              else
-                let open Def in
-                req ^^^ "&" ^<^ s)
-          (Adef.encoded "") conf.Config.env
-      in
-      Output.print_sstring conf {|<a id="if|};
-      Output.print_string conf txt;
-      Output.print_sstring conf {|" href="|};
-      Output.print_string conf (Util.prefix_base conf);
-      Output.print_string conf req;
-      if sel then (
-        let open Def in
-        Output.print_string conf ("&u=" ^<^ txt);
-        if sel || List.mem_assoc "u" conf.Config.env then (
-          Output.print_string conf ("#if" ^<^ txt);
-          Output.print_sstring conf {|" rel="nofollow">|};
-          Output.print_string conf
-            (if sel then bullet_sel_txt else bullet_unsel_txt);
-          Output.print_sstring conf "</a>\n"))
+      Output.print_sstring conf
+      @@ Printf.sprintf {|<a class="selection_bullet" famid="%s">%s</a>|}
+           (Adef.as_string txt)
+           (bullet_sel_txt :> string);
+      Output.print_sstring conf "\n"
   | None ->
       Output.print_string conf bullet_nosel_txt;
       Output.print_sstring conf "\n"
@@ -497,8 +473,9 @@ let print_branch conf base psn name =
              print_elem sp true false true;
              let children = Gwdb.get_children fam in
              (match select with
-             | Some (_, true) ->
-                 Output.print_sstring conf "<ul>";
+             | Some (txt, true) ->
+                 Output.print_sstring conf
+                   (Printf.sprintf "<ul id=\"fam_%s\">" (Adef.as_string txt));
                  Array.iter
                    (fun e ->
                      loop (Util.pget conf base e);
@@ -618,6 +595,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
            n + 1)
          1 ancestors;
   Output.print_sstring conf "</div>";
+  Hutil.script conf "build/bundles/geneweb/gwlistbybranch.js";
   Hutil.trailer conf
 
 let print_several_possible_surnames x conf base (_, homonymes) =
