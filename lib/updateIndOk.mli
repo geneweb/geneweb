@@ -56,10 +56,6 @@ val print_mod_aux :
   ((Geneweb_db.Driver.iper, Update.key, string) gen_person -> unit) ->
   unit
 
-val print_add : config -> Geneweb_db.Driver.base -> unit
-(** Tries to add a person to the base and displays a success HTML page if
-    successful *)
-
 val print_del : config -> Geneweb_db.Driver.base -> unit
 (** Tries to remove a person from the base and displays a success HTML page if
     successful *)
