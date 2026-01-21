@@ -35,16 +35,6 @@ let getn conf var key =
   | Some v -> v
   | None -> failwith (var ^ "_" ^ key ^ " unbound")
 
-let get_purged_fn_sn removed_string first_name surname =
-  if
-    Name.contains_forbidden_char first_name
-    || Name.contains_forbidden_char surname
-  then (
-    removed_string :=
-      (Name.purge first_name ^ " " ^ Name.purge surname) :: !removed_string;
-    (Name.purge first_name, Name.purge surname))
-  else (first_name, surname)
-
 let getenv_sex conf var =
   match p_getenv conf.env (var ^ "_sex") with
   | Some "M" -> Male
@@ -66,13 +56,9 @@ let rec reconstitute_sorted_events conf cnt =
       (id, pos) :: el
   | _ -> []
 
-let reconstitute_somebody removed_string conf var =
+let reconstitute_somebody conf var =
   let first_name = only_printable (getn conf var "fn") in
   let surname = only_printable (getn conf var "sn") in
-  (* S'il y a des caractères interdits, on les supprime *)
-  let first_name, surname =
-    get_purged_fn_sn removed_string first_name surname
-  in
   let occ = try int_of_string (getn conf var "occ") with Failure _ -> 0 in
   let sex = getenv_sex conf var in
   let create = getn_p conf var sex in

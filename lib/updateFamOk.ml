@@ -7,20 +7,12 @@ open Update_util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
-(* Liste des string dont on a supprimé un caractère.       *)
-(* Utilisé pour le message d'erreur lors de la validation. *)
-let removed_string = ref []
-let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
-let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
-
 let reconstitute_parent_or_child conf var default_surname =
   let first_name = only_printable (getn conf var "fn") in
   let surname =
     let surname = only_printable (getn conf var "sn") in
     if surname = "" then default_surname else surname
   in
-  (* S'il y a des caractères interdits, on les supprime *)
-  let first_name, surname = get_purged_fn_sn first_name surname in
   let occ = try int_of_string (getn conf var "occ") with Failure _ -> 0 in
   let create_info =
     let b = Update.reconstitute_date conf (var ^ "b") in
@@ -167,7 +159,8 @@ let rec reconstitute_events conf ext cnt =
         let rec loop i ext =
           let key = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i in
           match
-            try Some (reconstitute_somebody conf key) with Failure _ -> None
+            try Some (Update_util.reconstitute_somebody conf key)
+            with Failure _ -> None
           with
           | None -> ([], ext)
           | Some (fn, sn, occ, create, var) -> (
@@ -1132,16 +1125,6 @@ let print_title conf fmt _ =
 
 let print_mod_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
-  (* Si on a supprimé des caractères interdits *)
-  if List.length !removed_string > 0 then (
-    Output.print_sstring conf "<h3 class=\"error\">";
-    Output.printf conf
-      (fcapitale (ftransl conf "%s forbidden char"))
-      (List.fold_left
-         (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
-         " " Name.forbidden_char);
-    Output.print_sstring conf "</h3>\n";
-    List.iter (Output.printf conf "<p>%s</p>") !removed_string);
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
@@ -1152,11 +1135,6 @@ let print_change_event_order_ok conf base (wl, ml) cpl des =
 
 let print_add_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family added";
-  (* Si on a supprimé des caractères interdits *)
-  if List.length !removed_string > 0 then (
-    Output.printf conf "<h2 class=\"error\">%s</h2>\n"
-      (Utf8.capitalize_fst (transl conf "forbidden char"));
-    List.iter (Output.printf conf "<p>%s</p>") !removed_string);
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
@@ -1224,9 +1202,6 @@ let forbidden_disconnected conf scpl sdes =
   else false
 
 let print_add o_conf base =
-  (* Attention ! On pense à remettre les compteurs à *)
-  (* zéro pour la détection des caractères interdits *)
-  let () = removed_string := [] in
   let conf = Update.update_conf o_conf in
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let sfam, scpl, sdes, ext = reconstitute_family conf base nsck in
@@ -1402,9 +1377,6 @@ let family_structure base ifam =
   (Driver.get_parent_array fam, Driver.get_children fam)
 
 let print_mod o_conf base =
-  (* Attention ! On pense à remettre les compteurs à *)
-  (* zéro pour la détection des caractères interdits *)
-  let () = removed_string := [] in
   let o_f =
     let ifam =
       match p_getenv o_conf.env "i" with

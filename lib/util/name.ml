@@ -1,8 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(* La liste des caractères interdits *)
-let forbidden_char = [ ':'; '@'; '#'; '='; '$' ]
-
 (* Name.lower *)
 
 let unaccent_utf_8 lower s i =
@@ -127,19 +124,6 @@ let strip_c s c =
 
 let strip s = strip_c s ' '
 
-(* String without any forbidden caracters defined in forbidden_char *)
-(* ******************************************************************** *)
-(*  [Fonc] purge : string -> string                                     *)
-
-(* ******************************************************************** *)
-
-(** [Description] : Supprime tous les caractères interdits (défini par
-    forbidden_char) présents dans la chaine passée en argument. [Args] :
-    - s : string que l'on veut purger [Retour] :
-    - string : retourne la chaîne délestée des caractères interdits [Rem] :
-      Exporté en clair hors de ce module. *)
-let purge s = List.fold_left strip_c s forbidden_char
-
 (* Name.crush *)
 
 (* If string starting from [i] contains roman number then returns the next position,
@@ -231,7 +215,6 @@ let concat_aux fn l1 sn l2 =
   Bytes.unsafe_to_string b
 
 let concat fn sn = concat_aux fn (String.length fn) sn (String.length sn)
-let contains_forbidden_char s = List.exists (String.contains s) forbidden_char
 
 (* Copy/paste from String.split_on_char adapted to our needs *)
 let split_sname_callback fn s =

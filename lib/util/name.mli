@@ -1,8 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-val forbidden_char : char list
-(** List of forbidden to use characters *)
-
 val unaccent_utf_8 : bool -> string -> int -> string * int
 (** [unaccent_utf_8 lower s i] checks UTF-8 characher that starts at position
     [i] inside [s] and returns couple (cs,np) where [cs] is ASCII representation
@@ -35,9 +32,6 @@ val strip : string -> string
 val strip_c : string -> char -> string
 (** [strip_c s c] removes all the occurences of [c] inside the name *)
 
-val purge : string -> string
-(** Removes all the forbiden characters from [forbidden_char] inside the name *)
-
 val crush : string -> string
 (** A custom sonnex/soundex-like phonetic algorithm:
     - no spaces
@@ -64,9 +58,6 @@ val crush_lower : string -> string
 
 val concat : string -> string -> string
 (** [concat fn sn] is [fn ^ " " ^ sn] but faster. *)
-
-val contains_forbidden_char : string -> bool
-(** [contains_forbidden_char s] is [true] iif s contains forbidden characters *)
 
 val split_sname_callback : (int -> int -> unit) -> string -> unit
 (** [split_sname_callback fn s] Same as [split_sname], but call [fn] with
