@@ -1406,9 +1406,15 @@ let comp_families x =
   let oc = open_out_bin out_file in
   (try
      let ic = open_in x in
-     (* write header *)
+     let initial_encoding =
+       match Bom.check ic with
+       | Bom.Utf8 -> E_utf_8
+       | bom when Bom.is_unsupported bom ->
+           close_in ic;
+           failwith (Bom.to_string bom ^ " encoding not supported")
+       | _ -> E_iso_8859_1
+     in
      output_string oc magic_gwo;
-     (* write source filename *)
      output_value oc (x : string);
      let rec loop line encoding =
        match read_family_1 (ic, encoding) x line with
@@ -1426,7 +1432,7 @@ let comp_families x =
            flush stdout;
            loop (read_line (ic, encoding)) encoding
      in
-     loop (read_line (ic, E_iso_8859_1)) E_iso_8859_1;
+     loop (read_line (ic, initial_encoding)) initial_encoding;
      close_in ic
    with e ->
      close_out oc;

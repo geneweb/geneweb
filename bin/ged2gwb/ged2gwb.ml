@@ -2651,18 +2651,17 @@ let find_lev0 (strm__ : _ Stream.t) =
   bp, r1, r2
 
 let open_in_bin_with_bom_check fname =
-  let in_channel_has_bom ic =
-    try
-      input_char ic = '\239'
-      && input_char ic = '\187'
-      && input_char ic = '\191'
-    with End_of_file -> false
-  in
   let ic = open_in_bin fname in
-  if in_channel_has_bom ic then
-    charset_option := Some Utf8
-  else
-    seek_in ic 0;
+  (match Bom.check ic with
+   | Bom.Utf8 -> charset_option := Some Utf8
+   | bom when Bom.is_unsupported bom ->
+       close_in ic;
+       Printf.fprintf !log_oc "Error: %s encoding not supported\n"
+         (Bom.to_string bom);
+       Printf.fprintf !log_oc "Convert file to UTF-8 or ANSEL first\n";
+       flush !log_oc;
+       exit 2
+   | _ -> ());
   ic
 
 let pass1 gen fname =
