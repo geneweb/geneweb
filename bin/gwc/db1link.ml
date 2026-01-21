@@ -1704,8 +1704,9 @@ let link ?(no_warn = false) next_family_fun bdir =
     Check.check_base base (set_error base gen) (set_warning base no_warn) ignore;
     if !pr_stats then Stats.(print_stats base @@ stat_base base));
   if not gen.g_errored then (
-    if !do_consang then ignore @@ ConsangAll.compute base true;
-    Driver.sync base;
+    if !do_consang then (
+      ignore @@ ConsangAll.compute base true;
+      Driver.sync base);
     output_wizard_notes bdir gen.g_wiznotes;
     output_command_line bdir;
     Mutil.rm_rf tmp_dir;
