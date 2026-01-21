@@ -304,7 +304,7 @@ let print conf base specify unknown =
       search_key conf base sn >>= fun () ->
       let sres = Search_name_display.search_surname conf base sn in
       if not (Search_name_display.sn_search_result_is_empty sres) then
-        Search_name_display.search_surname_print conf base unknown sres sn
+        Search_name_display.surname_print conf base unknown sres sn
       else
         let ( >>= ) = bind sn in
         search_approx_key conf base sn >>= fun () ->
