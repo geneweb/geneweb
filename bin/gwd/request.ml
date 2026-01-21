@@ -254,11 +254,11 @@ let is_intermediate_submission conf =
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
-      ( "ADD_FAM" | "ADD_IND" | "CHANGE_WIZ_VIS" | "CHG_CHN" | "CHG_FAM_ORD"
-      | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND" | "INV_FAM" | "KILL_ANC" | "MOD_FAM"
-      | "MOD_IND" | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N"
-      | "MRG_DUP_FAM_Y_N" | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND"
-      | "MOD_DATA" | "SND_IMAGE" ) ->
+      ( "ADD_FAM" | "CHANGE_WIZ_VIS" | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM"
+      | "DEL_IMAGE" | "DEL_IND" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
+      | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
+      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "SND_IMAGE" )
+    ->
       true
   | _ -> false
 
@@ -641,9 +641,6 @@ let treat_request =
                  if is_intermediate_submission conf then
                    w_wizard @@ w_base @@ UpdateFam.print_add
                  else w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
-             | "ADD_IND" -> w_wizard @@ w_base @@ UpdateInd.print_add
-             | "ADD_IND_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_add
              | "ADD_PAR" -> w_wizard @@ w_base @@ UpdateFam.print_add_parents
              | "ADD_PAR_OK" ->
                  if is_intermediate_submission conf then

@@ -667,48 +667,6 @@ let print_del1 conf base p =
   Output.print_sstring conf "</form>\n";
   Hutil.trailer conf
 
-let print_add conf base =
-  let p =
-    {
-      first_name = "";
-      surname = "";
-      occ = 0;
-      image = "";
-      first_names_aliases = [];
-      surnames_aliases = [];
-      public_name = "";
-      qualifiers = [];
-      aliases = [];
-      titles = [];
-      rparents = [];
-      related = [];
-      occupation = "";
-      sex = Neuter;
-      access = IfTitles;
-      birth = Date.cdate_None;
-      birth_place = "";
-      birth_note = "";
-      birth_src = "";
-      baptism = Date.cdate_None;
-      baptism_place = "";
-      baptism_note = "";
-      baptism_src = "";
-      death = DontKnowIfDead;
-      death_place = "";
-      death_note = "";
-      death_src = "";
-      burial = UnknownBurial;
-      burial_place = "";
-      burial_note = "";
-      burial_src = "";
-      pevents = [];
-      notes = "";
-      psources = "";
-      key_index = Driver.Iper.dummy;
-    }
-  in
-  print_update_ind conf base p ""
-
 let print_mod conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf

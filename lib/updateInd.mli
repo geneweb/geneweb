@@ -18,9 +18,6 @@ val print_update_ind :
 (** The main HTML page displayed after an update. Based on template updind.txt
 *)
 
-val print_add : config -> Geneweb_db.Driver.base -> unit
-(** Displays an HTML form with empty fields for adding a person *)
-
 val print_del : config -> Geneweb_db.Driver.base -> unit
 (** Displays a page for validating the deletion of a person *)
 

@@ -1070,28 +1070,6 @@ let all_checks_person base p a u =
     wl;
   wl
 
-let print_add_ok conf base wl p =
-  Hutil.header conf @@ print_title conf "person added";
-  (* Si on a supprimé des caractères interdits *)
-  if List.length !removed_string > 0 then (
-    Output.printf conf "<h2 class=\"error\">%s</h2>\n"
-      (Utf8.capitalize_fst (transl conf "forbidden char"));
-    List.iter (Output.printf conf "<p>%s</p>") !removed_string);
-  (* Si on a supprimé des relations, on les mentionne *)
-  List.iter
-    (fun s ->
-      Output.print_string conf (Util.escape_html s);
-      Output.print_sstring conf " -> ";
-      Output.print_sstring conf (transl conf "forbidden char");
-      Output.print_sstring conf "\n")
-    !deleted_relation;
-  Output.print_sstring conf "\n";
-  Output.print_string conf
-    (referenced_person_text conf base (Driver.poi base p.key_index));
-  Output.print_sstring conf "\n";
-  Update.print_warnings conf base wl;
-  Hutil.trailer conf
-
 let print_del_ok conf =
   Hutil.header conf @@ print_title conf "person deleted";
   Hutil.trailer conf
@@ -1104,27 +1082,6 @@ let print_change_event_order_ok conf base wl p =
     (referenced_person_text conf base (Driver.poi base p.key_index));
   Output.print_sstring conf "\n";
   Hutil.trailer conf
-
-let print_add o_conf base =
-  (* Attention ! On pense à remettre les compteurs à *)
-  (* zéro pour la détection des caractères interdits *)
-  let () = removed_string := [] in
-  let conf = Update.update_conf o_conf in
-  let sp, ext = reconstitute_person conf in
-  let redisp = Option.is_some (p_getenv conf.env "return") in
-  if ext || redisp then UpdateInd.print_update_ind conf base sp ""
-  else
-    let sp = strip_person sp in
-    match check_person conf base sp with
-    | Some err -> error_person conf err
-    | None ->
-        let p, a = effective_add conf base sp in
-        let u = { family = Driver.get_family (Driver.poi base p.key_index) } in
-        let wl = all_checks_person base p a u in
-        Util.commit_patches conf base;
-        let changed = U_Add_person (Util.string_gen_person base p) in
-        History.record conf base changed "ap";
-        print_add_ok conf base wl p
 
 let print_del conf base =
   match p_getenv conf.env "i" with
