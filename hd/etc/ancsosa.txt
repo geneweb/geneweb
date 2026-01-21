@@ -35,7 +35,7 @@
     %if;(e.t="D")
       [*ancestor/ancestors]1 … [up to] …%nn;
     %elseif;(e.t="N" and e.only="on")
-      [*generation/generations]0 %e.v;
+      [*generation/generations]0 %e_v;
     %else;
       %apply;a_of_b%with;
         %if;(e.t="M")
@@ -48,7 +48,7 @@
         %sp;%surname;
       %end;
       %if;(e.cgl="on" and e.t!="N")
-        %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
+        %let;nb_gen;%apply;min(e_v, max_anc_level)%in;
         %sp;%apply;togena(nb_gen).
       %end;
     %end;
@@ -71,6 +71,7 @@
 %let;birth_symbol;%if;(bvar.birth_symbol!="")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol!="")%bvar.death_symbol;%else;&dagger;%end;%in;
 %let;l_up;%if;(e.i1!="" or e.p1!="")1%end;%in;
+%let;e_v;%if;(e.v="")0%else;%e.v;%end;%in;
 %define;letter(xx)
   %apply;nth%with;
     /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z
@@ -557,7 +558,7 @@
   </h3>
   <dl>
   %foreach;ancestor_level;
-    %if;(e.v!="" and level<=e.v and (e.only!="on" or level=e.v))
+    %if;(e_v!="" and level<=e_v and (e.only!="on" or level=e_v))
       %foreach;ancestor;
         %if;((e.src="on" and ancestor.has_sources or
               e.notes="on" and (ancestor.has_notes or ancestor.has_event))
@@ -1325,12 +1326,12 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %sp;%surname;
     %(%if;(alias!="") <em>(%alias;)</em>%end;%) %dates;
   %end;%sp;
-    %if;(v0=1 and only=0)%apply;togena(e.v)
+    %if;(v0=1 and only=0)%apply;togena(e_v)
     %else;
       %if;(v0>1 and v0<l_v and only=0)%apply;fromthenth(v0)%end;
       %sp;%if;(e.t="G")%apply;togena(l_v)%else;%apply;tothenthgen(l_v)%end;
     %end;
-  %if;(e.t="D") [up to] %p_of_index.1; %if;(e.v > 4) %apply;togena(e.v)%end;%end;
+  %if;(e.t="D") [up to] %p_of_index.1; %if;(e_v > 4) %apply;togena(e_v)%end;%end;
   %if;(e.t="X")<div class="ml-3">[only] [up to] %pvar.1; %pvar.1.dates;</div>%end;
 </h1>
 %end;
@@ -1340,11 +1341,11 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 
 %( short display %)
 %elseif;(e.t="N")
-  %let;v0;%if;(e.v0!="" and e.v0>0)%e.v0;%else;0%end;%in;
-  %if;(e.only="on" or v0=e.v)
+  %let;v0;%if;(e_v0!="" and e_v0>0)%e_v0;%else;0%end;%in;
+  %if;(e.only="on" or v0=e_v)
     %reset_count;
     %foreach;ancestor_at_level;
-      %if;(e.v>=0 and level=e.v)
+      %if;(e_v>=0 and level=e_v)
         <ul class="mb-2">%nl;
           %foreach;ancestor;
             %if;(ancestor.first_name!="?" and ancestor.surname!="?")
@@ -1371,7 +1372,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %end;
     %end;
   %else;
-    %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
+    %let;nb_gen;%apply;min(e_v, max_anc_level)%in;
     %reset_count;
     %foreach;ancestor_level(nb_gen)
       %if;(level>=v0)
@@ -1418,7 +1419,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 
 %elseif;(e.t = "M" and e.al = "on")
   %( missing ancestors alphabetically %)
-  %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
+  %let;nb_gen;%apply;min(e_v, max_anc_level)%in;
   <div class="ml-2">
     %apply;togena(nb_gen)
     %apply;living_interval_dates(e.after, e.before).
@@ -1427,14 +1428,14 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     <table>
       <tr>
         <td><b>[*sort by/generation/alphabetic order]0</b></td>
-        <td><img src="%images_prefix;picto_branch.png"></td>
+        <td><i class="fa fa-sort-numeric-down fa-fw"></i></td>
         <td>
           <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;%nn;
-            &t=%e.t;&v=%e.v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al="
+            &t=%e.t;&v=%e_v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al="
           >[sort by/generation/alphabetic order]1
           </a>
         </td>
-        <td><img src="%images_prefix;picto_alphabetic_order.png"></td>
+        <td><i class="fa fa-arrow-down-a-z fa-fw"></i></td>
         <td>[sort by/generation/alphabetic order]2</td>
       </tr>
     </table>
@@ -1490,7 +1491,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   <ul class="missing_ancestors_sort">
     %if;(nb_ind <= 100)
       <li>%nn;
-      <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+      %(<a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>%)
       <table class="table table-sm w-auto asc-desc-table">
         <tr>
           <th width="20%%">[*person/persons]0</th>
@@ -1559,7 +1560,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 
 %elseif;(e.t = "M")
   %( missing ancestors by generation %)
-  %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
+  %let;nb_gen;%apply;min(e_v, max_anc_level)%in;
   <p>
     %apply;togena(nb_gen)
     %apply;living_interval_dates(e.after, e.before)
@@ -1567,12 +1568,12 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   <table class="display_search">
     <tr>
       <td><b>[*sort by/generation/alphabetic order]0</b></td>
-      <td><img src="%images_prefix;picto_branch.png"></td>
+      <td><i class="fa fa-sort-numeric-down fa-fw"></i></td>
       <td>[sort by/generation/alphabetic order]1</td>
-      <td><img src="%images_prefix;picto_alphabetic_order.png"></td>
+      <td><i class="fa fa-arrow-down-a-z fa-fw"></i></td>
       <td>
-        <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&t=%e.t;&v=%e.v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al=on">
-          [sort by/generation/alphabetic order]2
+        <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&t=%e.t;&v=%e_v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al=on"
+        >[sort by/generation/alphabetic order]2
         </a>
       </td>
     </tr>
@@ -1674,15 +1675,15 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %end;
     </div>
   %end;
-  %if;(e.v!=0)
+  %if;(e_v!=0)
     <h3><em>%apply;capitalize%with;%apply;gen("v")%end;.</em></h3>
   %end;
   %foreach;ancestor_level;
-    %if;(e.v!="" and level=e.v)
+    %if;(e_v!="" and level=e_v)
       %foreach;ancestor;
         %if;(ancestor.same!="")
             <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>[:]
-            [see] <b><a href="#%ancestor.same.v;">%ancestor.same;</a></b>.
+            [see] <b><a href="#%ancestor.same_v;">%ancestor.same;</a></b>.
         %else;
             <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
             %apply;long_display_ancestor_personal()
@@ -1700,13 +1701,13 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t="G")
   %( long display %)
   <div class="mx-3">
-    %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
+    %let;nb_gen;%apply;min(e_v, max_anc_level)%in;
     %foreach;ancestor_level(nb_gen)
       %if;(level>0)<h4 class="mt-2">[*generation/generations]0 %level;</h4>%end;
       %foreach;ancestor;
         %if;(ancestor.same!="")
           <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</a></b>[:]
-          [see] <b><a href="#%ancestor.same.v;">%ancestor.same;</a></b>.
+          [see] <b><a href="#%ancestor.same_v;">%ancestor.same;</a></b>.
         %else;
           <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</a></b>
           %apply;long_display_ancestor_personal()

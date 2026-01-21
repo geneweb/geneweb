@@ -1053,10 +1053,12 @@ let eval_var conf ifun env ep loc sl =
     | "today" :: sl ->
         eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
     | [ "trace"; s ] ->
-        Printf.eprintf "%s; " s;
+        Printf.eprintf "***** %s; " s;
+        flush stderr;
         VVstring ""
     | [ "tracenl"; s ] ->
-        Printf.eprintf "%s\n" s;
+        Printf.eprintf "***** %s\n" s;
+        flush stderr;
         VVstring ""
     | s :: sl -> (
         match (get_val ifun.get_vother s env, sl) with
