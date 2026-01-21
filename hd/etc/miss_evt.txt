@@ -129,17 +129,17 @@
 %end;
 
 %define;td_missing_events_rowspan(xx)
-  %if;(xx.same="" and (e.marr="on" or (is_first and level=1)) and xx.nb_families>1)
+  %if;(xx.same="" and (e.marr="on" or (is_first and level=0)) and xx.nb_families>1)
     rowspan="%xx.nb_families;"
   %end;
 %end;
 
 %define;td_missing_events(xx)
-  %apply;td_missing_events_rowspan("xx") class="%if;(count>0)table-warning%end;
+  %apply;td_missing_events_rowspan("xx") class="align-middle%if;(count>0) table-warning%end;"
 %end;
 
 %define;td_family_missing_class(xx)
-  class="align-middle%if;(count>0) table-warning%end;"
+  class="text-center align-middle%if;(count>0) table-warning%end;"
 %end;
 
 %define;table_missing_events(xx)
@@ -169,7 +169,7 @@
   %if;(xx.same = "")
     %reset_count;
     %apply;has_missing_birth_date("xx")
-    <td %apply;td_missing_events("xx") align-middle">
+    <td %apply;td_missing_events("xx")>
       %if;xx.has_birth_date;
         %xx.slash_birth_date;
         %if;(count>0)
@@ -188,7 +188,7 @@
     %( birth place %)
     %reset_count;
     %apply;has_missing_birth_place("xx")
-    <td %apply;td_missing_events("xx") align-middle">
+    <td %apply;td_missing_events("xx")>
       %if;xx.has_birth_date;
         %xx.birth_place;
         %if;(count>0)
@@ -273,7 +273,7 @@
     %( marriage place %)
     %if;(e.marr="on" or (is_first and level=0))
       %if;xx.has_families;
-        %foreach;ancestor.family;
+        %foreach;xx.family;
           %if;(family_cnt=1)
             %reset_count;
             %apply;has_missing_marriage_place()
@@ -289,9 +289,9 @@
         <td></td>
       %end;
     %else;
-      %if;ancestor.has_families;
-        %foreach;ancestor.family;
-          %if;(spouse.index=ancestor.spouse.index)
+      %if;xx.has_families;
+        %foreach;xx.family;
+          %if;(spouse.index=xx.spouse.index)
             %reset_count;
             %apply;has_missing_marriage_place()
             <td %apply;td_family_missing_class("xx")>
@@ -307,61 +307,163 @@
       %end;
     %end;
 
-    %( death date %)
-    %reset_count;
-    %apply;has_missing_death_date("xx")
-    <td %apply;td_missing_events("xx") align-middle">
-      %if;xx.has_death_date;
-        %xx.slash_death_date;
-        %if;(count>0)
-          %apply;display_edit_ind_btn("death")
-        %end;
-      %elseif;xx.has_burial_date;
-        %xx.slash_burial_date;
-        %if;(count>0)
-          %apply;display_edit_ind_btn("death")
+    %( death date - only for first family when e.marr="on" %)
+    %if;(e.marr="on" or (is_first and level=0))
+      %if;xx.has_families;
+        %foreach;xx.family;
+          %if;(family_cnt=1)
+            %reset_count;
+            %apply;has_missing_death_date("xx")
+            <td %apply;td_missing_events("xx")>
+              %if;xx.has_death_date;
+                %xx.slash_death_date;
+                %if;(count>0)
+                  %apply;display_edit_ind_btn("death")
+                %end;
+              %elseif;xx.has_burial_date;
+                %xx.slash_burial_date;
+                %if;(count>0)
+                  %apply;display_edit_ind_btn("death")
+                %end;
+              %else;
+                %if;xx.is_dead;
+                  %apply;display_edit_ind_btn("death")
+                %end;
+              %end;
+            </td>
+          %end;
         %end;
       %else;
-        %if;xx.is_dead;
-          %apply;display_edit_ind_btn("death")
-        %end;
+        %reset_count;
+        %apply;has_missing_death_date("xx")
+        <td %apply;td_missing_events("xx")>
+          %if;xx.has_death_date;
+            %xx.slash_death_date;
+            %if;(count>0)
+              %apply;display_edit_ind_btn("death")
+            %end;
+          %elseif;xx.has_burial_date;
+            %xx.slash_burial_date;
+            %if;(count>0)
+              %apply;display_edit_ind_btn("death")
+            %end;
+          %else;
+            %if;xx.is_dead;
+              %apply;display_edit_ind_btn("death")
+            %end;
+          %end;
+        </td>
       %end;
-    </td>
+    %else;
+      %reset_count;
+      %apply;has_missing_death_date("xx")
+      <td %apply;td_missing_events("xx")>
+        %if;xx.has_death_date;
+          %xx.slash_death_date;
+          %if;(count>0)
+            %apply;display_edit_ind_btn("death")
+          %end;
+        %elseif;xx.has_burial_date;
+          %xx.slash_burial_date;
+          %if;(count>0)
+            %apply;display_edit_ind_btn("death")
+          %end;
+        %else;
+          %if;xx.is_dead;
+            %apply;display_edit_ind_btn("death")
+          %end;
+        %end;
+      </td>
+    %end;
 
-    %( death place %)
-    %reset_count;
-    %apply;has_missing_death_place("xx")
-    <td %apply;td_missing_events("xx") align-middle">
-      %if;xx.has_death_date;
-        %xx.death_place;
-        %if;(count>0)
-          %apply;display_edit_ind_btn("death")
-        %end;
-      %elseif;xx.has_burial_date;
-        %xx.burial_place;
-        %if;(count>0)
-          %apply;display_edit_ind_btn("death")
+    %( death place - only for first family when e.marr="on" %)
+    %if;(e.marr="on" or (is_first and level=0))
+      %if;xx.has_families;
+        %foreach;xx.family;
+          %if;(family_cnt=1)
+            %reset_count;
+            %apply;has_missing_death_place("xx")
+            <td %apply;td_missing_events("xx")>
+              %if;xx.has_death_date;
+                %xx.death_place;
+                %if;(count>0)
+                  %apply;display_edit_ind_btn("death")
+                %end;
+              %elseif;xx.has_burial_date;
+                %xx.burial_place;
+                %if;(count>0)
+                  %apply;display_edit_ind_btn("death")
+                %end;
+              %else;
+                %if;xx.has_death_place;
+                  %xx.death_place;
+                %elseif;xx.has_burial_place;
+                  %xx.burial_place;
+                %end;
+                %if;(count>0)
+                  %apply;display_edit_ind_btn("death")
+                %end;
+              %end;
+            </td>
+          %end;
         %end;
       %else;
-        %if;xx.has_death_place;
-          %xx.death_place;
-        %elseif;xx.has_burial_place;
-          %xx.burial_place;
-        %end;
-        %if;(count>0)
-          %apply;display_edit_ind_btn("death")
-        %end;
+        %reset_count;
+        %apply;has_missing_death_place("xx")
+        <td %apply;td_missing_events("xx")>
+          %if;xx.has_death_date;
+            %xx.death_place;
+            %if;(count>0)
+              %apply;display_edit_ind_btn("death")
+            %end;
+          %elseif;xx.has_burial_date;
+            %xx.burial_place;
+            %if;(count>0)
+              %apply;display_edit_ind_btn("death")
+            %end;
+          %else;
+            %if;xx.has_death_place;
+              %xx.death_place;
+            %elseif;xx.has_burial_place;
+              %xx.burial_place;
+            %end;
+            %if;(count>0)
+              %apply;display_edit_ind_btn("death")
+            %end;
+          %end;
+        </td>
       %end;
-    </td>
+    %else;
+      %reset_count;
+      %apply;has_missing_death_place("xx")
+      <td %apply;td_missing_events("xx")>
+        %if;xx.has_death_date;
+          %xx.death_place;
+          %if;(count>0)
+            %apply;display_edit_ind_btn("death")
+          %end;
+        %elseif;xx.has_burial_date;
+          %xx.burial_place;
+          %if;(count>0)
+            %apply;display_edit_ind_btn("death")
+          %end;
+        %else;
+          %if;xx.has_death_place;
+            %xx.death_place;
+          %elseif;xx.has_burial_place;
+            %xx.burial_place;
+          %end;
+          %if;(count>0)
+            %apply;display_edit_ind_btn("death")
+          %end;
+        %end;
+      </td>
+    %end;
   %end;
 %end;
 
-%define;td_family_missing_class(xx)
-  class="text-center align-middle%if;(count>0) table-warning%end; "
-%end;
-
 %define;table_family_missing_events(xx)
-  %foreach;ancestor.family;
+  %foreach;xx.family;
     %if;(family_cnt!=1)
       <tr>
         <td class="text-left align-middle">
