@@ -1499,6 +1499,19 @@ let get_request_string conf =
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
     script_name ^ "?" ^ query_string
 
+let get_protocol conf =
+  let forwarded_proto =
+    Mutil.extract_param "x-forwarded-proto: " '\r' conf.request
+  in
+  if String.lowercase_ascii forwarded_proto = "https" then "https"
+  else
+    let host = get_server_string conf in
+    if
+      String.length host > 4
+      && String.sub host (String.length host - 4) 4 = ":443"
+    then "https"
+    else "http"
+
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then (
     let print_file fname =

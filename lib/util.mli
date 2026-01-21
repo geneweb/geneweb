@@ -571,6 +571,10 @@ val get_request_string : config -> string
 (** Returns request string. Request string has format {i scriptname?querystring}
     where scriptname is a path to the script in URI. *)
 
+val get_protocol : config -> string
+(** Returns "https" if request came through HTTPS proxy (via X-Forwarded-Proto
+    header) or if server port is 443, otherwise "http". *)
+
 val create_topological_sort :
   config ->
   Geneweb_db.Driver.base ->
