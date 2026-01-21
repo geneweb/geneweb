@@ -10,8 +10,22 @@ let assets_r = ref [ "gw" ]
 let ( // ) = Filename.concat
 
 let default_base_dir =
-  let t = Xdg.create ~env:Sys.getenv_opt () in
-  Xdg.data_dir t // "geneweb" // "bases"
+  let candidates =
+    [
+      "bases";
+      "../bases";
+      Filename.dirname Sys.executable_name // ".." // "bases";
+    ]
+  in
+  let rec find_existing = function
+    | [] ->
+        let t = Xdg.create ~env:Sys.getenv_opt () in
+        Xdg.data_dir t // "geneweb" // "bases"
+    | dir :: rest ->
+        if Sys.file_exists dir && Sys.is_directory dir then dir
+        else find_existing rest
+  in
+  find_existing candidates
 
 let bd_r = ref default_base_dir
 
