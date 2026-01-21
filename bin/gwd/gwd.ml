@@ -405,7 +405,7 @@ let print_renamed conf new_n =
       in
       loop 0
     in
-    "http://" ^ Util.get_server_string conf ^ new_req
+    Util.get_protocol conf ^ "://" ^ Util.get_server_string conf ^ new_req
   in
   let env =
     Templ.Env.(
@@ -432,7 +432,7 @@ let log_redirect from request req =
 
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
-  let link = "http://" ^ new_addr ^ req in
+  let link = Util.get_protocol conf ^ "://" ^ new_addr ^ req in
   let env = Templ.Env.(add "link" (Templ.Vstring (Mutil.encode link)) empty) in
   log_redirect from request req;
   try Templ.output_simple conf env "redirect"

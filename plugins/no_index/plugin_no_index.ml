@@ -121,7 +121,9 @@ let no_index conf base =
   let opt2 = Util.p_getenv conf.env "opt" = Some "no_index_pwd" in
   if opt1 || opt2 then (
     let link = url_no_index conf base opt2 in
-    Output.print_sstring conf {|<a href="http://|};
+    Output.print_sstring conf {|<a href="|};
+    Output.print_sstring conf (Util.get_protocol conf);
+    Output.print_sstring conf "://";
     Output.print_string conf link;
     Output.print_sstring conf {|">|};
     Output.print_string conf link;
