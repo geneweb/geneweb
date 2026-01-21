@@ -34,14 +34,6 @@ val surname_print :
 val search_surname :
   Config.config -> Gwdb.base -> string -> surname_search_result
 
-val search_surname_print :
-  Config.config ->
-  Gwdb.base ->
-  (Config.config -> string -> unit) ->
-  surname_search_result ->
-  string ->
-  unit
-
 val search_first_name :
   Config.config -> Gwdb.base -> string -> first_name_search_result
 

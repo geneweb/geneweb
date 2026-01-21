@@ -902,8 +902,6 @@ let sn_search_result_is_empty { list; iperl = _; bhl } =
   | _, [ (_, (_, _)) ] -> false
   | _ -> true
 
-let search_surname_print = surname_print
-
 type first_name_search_result =
   (string * (Ext_string.Set.t * Gwdb.iper list)) list
 
