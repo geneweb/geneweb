@@ -223,6 +223,34 @@ let specify conf base n pl1 pl2 pl3 =
   (* FIXME why are those else () needed ? *)
   Hutil.trailer conf
 
+let has_prefix s prefix =
+  let len_p = String.length prefix in
+  String.length s >= len_p && String.sub s 0 len_p = prefix
+
+let is_intermediate_submission conf =
+  let on_value = Adef.encoded "on" in
+  List.exists
+    (fun (k, v) ->
+      v = on_value
+      && (has_prefix k "add_qualifier"
+         || has_prefix k "add_alias"
+         || has_prefix k "add_first_name_alias"
+         || has_prefix k "add_surname_alias"
+         || has_prefix k "ins_title"
+         || has_prefix k "add_relation"
+         || has_prefix k "ins_event" || has_prefix k "ins_ch"
+         || has_prefix k "inv_ch" || has_prefix k "ins_pa"
+         || has_prefix k "ins_witn"
+         || String.length k > 2
+            && k.[0] = 'e'
+            && has_prefix k "e"
+            &&
+              try
+                ignore (int_of_string (String.sub k 1 1));
+                has_prefix k ("e" ^ String.sub k 1 1 ^ "_ins_witn")
+              with _ -> false))
+    conf.env
+
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
@@ -610,13 +638,18 @@ let treat_request =
              | "A" -> AscendDisplay.print |> w_person |> w_base
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
              | "ADD_FAM_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
+                 if is_intermediate_submission conf then
+                   w_wizard @@ w_base @@ UpdateFam.print_add
+                 else w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
              | "ADD_IND" -> w_wizard @@ w_base @@ UpdateInd.print_add
              | "ADD_IND_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_add
              | "ADD_PAR" -> w_wizard @@ w_base @@ UpdateFam.print_add_parents
              | "ADD_PAR_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add_parents
+                 if is_intermediate_submission conf then
+                   w_wizard @@ w_base @@ UpdateFam.print_add_parents
+                 else
+                   w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add_parents
              | "ANM" ->
                  w_base @@ fun conf _ ->
                  BirthdayDisplay.print_anniversaries conf
@@ -742,10 +775,14 @@ let treat_request =
                  w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
              | "MOD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_mod
              | "MOD_FAM_OK" when conf.wizard ->
-                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_mod
+                 if is_intermediate_submission conf then
+                   w_wizard @@ w_base @@ UpdateFam.print_mod
+                 else w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_mod
              | "MOD_IND" -> w_wizard @@ w_base @@ UpdateInd.print_mod
              | "MOD_IND_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_mod
+                 if is_intermediate_submission conf then
+                   w_wizard @@ w_base @@ UpdateInd.print_mod
+                 else w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_mod
              | "MOD_NOTES" ->
                  w_wizard
                  @@ w_base (fun conf base ->
