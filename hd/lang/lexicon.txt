@@ -1969,6 +1969,39 @@ ru: участие
 sv: medlemskap
 tr: üyelik
 
+    adoption
+af: aanneming
+bg: осиновяване
+br: adtadiñ
+ca: adopció
+co: aduzzione
+cs: adopce
+da: adoption
+de: Adoption
+en: adoption
+eo: adopto
+es: adopción
+et: lapsendamine
+fi: adoptio
+fr: adoption
+he: אימוץ
+is: ættleiðing
+it: adozione
+lt: įvaikinimas
+lv: adopcija
+nl: adoptie
+no: adopsjon
+oc: adopcion
+pl: adopcja
+pt: adopção
+pt-br: adoção
+ro: adopție
+ru: усыновление
+sk: adopcia
+sl: posvojitev
+sv: adoption
+tr: evlat edinme
+
     adoptive father/adoptive mother/adoptive parents
 af: aangenome vader/angenome moeder/aangenome ouers
 bg: осиновител/осиновителка/осиновители

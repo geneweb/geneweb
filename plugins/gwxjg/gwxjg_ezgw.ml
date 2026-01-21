@@ -230,6 +230,7 @@ module Event = struct
     | Pevent Epers_Accomplishment -> "EPERS_ACCOMPLISHMENT"
     | Pevent Epers_Acquisition -> "EPERS_ACQUISITION"
     | Pevent Epers_Adhesion -> "EPERS_ADHESION"
+    | Pevent Epers_Adoption -> "EPERS_ADOPTION"
     | Pevent Epers_BaptismLDS -> "EPERS_BAPTISMLDS"
     | Pevent Epers_BarMitzvah -> "EPERS_BARMITZVAH"
     | Pevent Epers_BatMitzvah -> "EPERS_BATMITZVAH"

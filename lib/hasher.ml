@@ -219,6 +219,7 @@ module Make (H : Digestif.S) = struct
     | Epers_Accomplishment -> string "Epers_Accomplishment"
     | Epers_Acquisition -> string "Epers_Acquisition"
     | Epers_Adhesion -> string "Epers_Adhesion"
+    | Epers_Adoption -> string "Epers_Adoption"
     | Epers_BaptismLDS -> string "Epers_BaptismLDS"
     | Epers_BarMitzvah -> string "Epers_BarMitzvah"
     | Epers_BatMitzvah -> string "Epers_BatMitzvah"

@@ -1237,6 +1237,7 @@ let string_of_pevent_name conf base epers_name =
   | Epers_Accomplishment -> Adef.safe @@ transl conf "accomplishment"
   | Epers_Acquisition -> Adef.safe @@ transl conf "acquisition"
   | Epers_Adhesion -> Adef.safe @@ transl conf "adhesion"
+  | Epers_Adoption -> Adef.safe @@ transl conf "adoption"
   | Epers_BaptismLDS -> Adef.safe @@ transl conf "baptismLDS"
   | Epers_BarMitzvah -> Adef.safe @@ transl conf "bar mitzvah"
   | Epers_BatMitzvah -> Adef.safe @@ transl conf "bat mitzvah"

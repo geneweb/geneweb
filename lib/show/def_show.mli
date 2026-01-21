@@ -194,6 +194,7 @@ type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
   | Epers_Accomplishment
   | Epers_Acquisition
   | Epers_Adhesion
+  | Epers_Adoption
   | Epers_BaptismLDS
   | Epers_BarMitzvah
   | Epers_BatMitzvah

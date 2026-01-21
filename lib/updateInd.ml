@@ -364,6 +364,7 @@ and eval_event_var e = function
           | Epers_Accomplishment -> str_val "#acco"
           | Epers_Acquisition -> str_val "#acqu"
           | Epers_Adhesion -> str_val "#adhe"
+          | Epers_Adoption -> str_val "#adop"
           | Epers_BaptismLDS -> str_val "#bapl"
           | Epers_BarMitzvah -> str_val "#barm"
           | Epers_BatMitzvah -> str_val "#basm"
