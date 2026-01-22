@@ -73,5 +73,3 @@ val interp_no_header :
   'a Templ.env ->
   'b ->
   unit
-
-val script : Config.config -> string -> unit

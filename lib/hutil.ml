@@ -128,13 +128,3 @@ let interp_no_header conf fname ifun env ep =
   gen_interp false conf fname ifun env ep
 
 let interp conf fname ifun env ep = gen_interp true conf fname ifun env ep
-
-let script conf script_name =
-  let assets_version =
-    Option.value ~default:""
-    @@ Option.map string_of_int (Util.read_assets_version ())
-  in
-  Output.print_sstring conf
-  @@ Printf.sprintf
-       {|<script type='text/javascript' src="%s?v=%s" defer></script>|}
-       script_name assets_version
