@@ -543,24 +543,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     | Some x -> x = "yes"
     | None -> List.assoc_opt "always_surname" conf.Config.base_env = Some "yes"
   in
-  let title h =
-    if h || Util.p_getenv conf.Config.env "t" = Some "A" then
-      Output.print_string conf (Util.escape_html x)
-    else
-      Ext_list.iter_first
-        (fun first x ->
-          if not first then Output.print_sstring conf ", ";
-          Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf {|m=N&t=A&v=|};
-          Output.print_string conf (Mutil.encode x);
-          Output.print_sstring conf {|">|};
-          Output.print_string conf (Util.escape_html x);
-          Output.print_sstring conf {|</a>|})
-        (Ext_string.Set.elements xl)
-  in
   let br = Util.p_getint conf.Config.env "br" in
-  Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
@@ -594,8 +577,41 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
            if br = None || br = Some n then print_one_branch conf base bh psn;
            n + 1)
          1 ancestors;
-  Output.print_sstring conf "</div>";
-  Hutil.script conf "build/bundles/geneweb/gwlistbybranch.js";
+  Output.print_sstring conf "</div>"
+
+let print_one_surname_by_branch conf base x xl branches =
+  let title h =
+    if h || Util.p_getenv conf.Config.env "t" = Some "A" then
+      Output.print_string conf (Util.escape_html x)
+    else
+      Ext_list.iter_first
+        (fun first x ->
+          if not first then Output.print_sstring conf ", ";
+          Output.print_sstring conf {|<a href="|};
+          Output.print_string conf (Util.commd conf);
+          Output.print_sstring conf {|m=N&t=A&v=|};
+          Output.print_string conf (Mutil.encode x);
+          Output.print_sstring conf {|">|};
+          Output.print_string conf (Util.escape_html x);
+          Output.print_sstring conf {|</a>|})
+        (Ext_string.Set.elements xl)
+  in
+  Hutil.header conf title;
+  Hutil.interp_no_header conf "list_by_branch"
+    {
+      Templ.eval_var =
+        (fun _ _ _ -> function
+          | [ "content" ] ->
+              print_one_surname_by_branch conf base x xl branches;
+              VVstring ""
+          | _ -> raise Not_found);
+      Templ.eval_transl = (fun _ -> raise Not_found);
+      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+      Templ.get_vother = Option.some;
+      Templ.set_vother = Fun.id;
+      Templ.print_foreach = (fun _ -> raise Not_found);
+    }
+    [] ();
   Hutil.trailer conf
 
 let print_several_possible_surnames x conf base (_, homonymes) =
