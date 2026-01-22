@@ -476,11 +476,7 @@ let print_branch conf base psn name =
              | Some (txt, true) ->
                  Output.print_sstring conf
                    (Printf.sprintf "<ul id=\"fam_%s\">" (Adef.as_string txt));
-                 Array.iter
-                   (fun e ->
-                     loop (Util.pget conf base e);
-                     Output.print_sstring conf "</li>")
-                   children;
+                 Array.iter (fun e -> loop (Util.pget conf base e)) children;
                  Output.print_sstring conf "</ul>"
              | Some (_, false) -> ()
              | None ->
@@ -489,8 +485,8 @@ let print_branch conf base psn name =
                      {|<ul class="posterity"><li>...</li></ul>|});
              Output.print_sstring conf "</li>";
              false)
-           true family_list;
-    Output.print_sstring conf "</li>"
+           true family_list
+    else Output.print_sstring conf "</li>"
   in
   loop
 
