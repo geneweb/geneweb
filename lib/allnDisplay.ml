@@ -17,7 +17,9 @@ let compare_particle_at_the_end base is_surnames a b =
 let print_title conf base is_surnames ini len =
   if len >= 2 then
     if is_surnames then
-      Printf.sprintf (Util.fcapitale (Util.ftransl conf "the %d surnames")) len
+      Printf.sprintf
+        (Util.fcapitale (Util.ftransl conf "%s surnames list title"))
+        (Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") len)
       |> Output.print_sstring conf
     else
       Printf.sprintf
@@ -25,7 +27,7 @@ let print_title conf base is_surnames ini len =
         len
       |> Output.print_sstring conf
   else if is_surnames then
-    Util.transl_nth conf "surname/surnames" 0
+    Util.transl conf "surname list title"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   else
     Util.transl_nth conf "first name/first names" 0
@@ -37,7 +39,10 @@ let print_title conf base is_surnames ini len =
     Output.print_string conf (Util.escape_html ini))
   else (
     Output.print_sstring conf " (";
-    Output.print_sstring conf (string_of_int @@ Gwdb.nb_of_real_persons base);
+    Output.print_sstring conf
+      (Mutil.string_of_int_sep
+         (Util.transl conf "(thousand separator)")
+         (Gwdb.nb_of_real_persons base));
     Output.print_sstring conf " ";
     Output.print_sstring conf
       (Util.translate_eval ("@(c)" ^ Util.transl_nth conf "person/persons" 1));
