@@ -854,7 +854,7 @@ let infer_rc conf rc =
   else rc
 
 let exec_f conf comm =
-  let s = comm ^ " > " ^ "comm.log 2>&1" in
+  let s = comm ^ " > " ^ "comm.log" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
   Printf.eprintf "$ %s\n" s;
@@ -1006,7 +1006,7 @@ let cache_files_check conf =
 let cache_files ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "cache_files") ^ " " in
-    exec_f conf (comm ^ parameters conf.env ^ " > comm.log 2>&1")
+    exec_f conf (comm ^ parameters conf.env ^ " > comm.log")
   in
   flush stderr;
   if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
@@ -1227,7 +1227,7 @@ let recover_2 conf =
       Sys.chdir dir;
       let comm =
         Filename.concat !bin_dir src_to_new
-        ^ " " ^ tmp ^ " -f -o " ^ out_file ^ " > " ^ "comm.log 2>&1"
+        ^ " " ^ tmp ^ " -f -o " ^ out_file ^ " > " ^ "comm.log"
       in
       let rc = exec_f conf comm in
       rc)
@@ -1271,14 +1271,12 @@ let cleanup_1 conf =
   Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
   let c =
     Filename.concat !bin_dir "gwc"
-    ^ " tmp.gw -nofail -o " ^ in_base ^ " > comm.log 2>&1"
+    ^ " tmp.gw -nofail -o " ^ in_base ^ " > comm.log"
   in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
   let rc1 = Sys.command c in
-  let c =
-    Filename.concat !bin_dir "update_nldb " ^ in_base ^ " > comm.log 2>&1"
-  in
+  let c = Filename.concat !bin_dir "update_nldb " ^ in_base ^ " > comm.log" in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
   let rc2 = Sys.command c in
@@ -1443,7 +1441,7 @@ let merge_1 conf =
             (fun s b ->
               if s = "" then " " ^ b ^ ".gw" else s ^ " -sep " ^ b ^ ".gw")
             "" bases
-        ^ " -f -o " ^ out_file ^ " > comm.log 2>&1"
+        ^ " -f -o " ^ out_file ^ " > comm.log"
       in
       Printf.eprintf "$ %s\n" c;
       flush stderr;
