@@ -1,29 +1,61 @@
-name: Geneweb doc
+name: Geneweb Doc
 on:
+  workflow_dispatch:
   push:
     tags:
       - v**
+
+env:
+  OPAMYES: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: checkout-code
+      - name: Checkout code
         uses: actions/checkout@v6
-      - name: setup-ocaml
-        uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.14.0
-      - name: setup
-        run: |
-             opam pin add . -y --no-action
-             opam depext -y geneweb
-             opam install -y ./*.opam --deps-only --with-doc
-      - name: build
+          fetch-depth: 1
+
+      - name: Cache OPAM dependencies
+        id: cache-opam
+        uses: actions/cache@v5
+        with:
+          path: ~/.opam
+          key: ${{ runner.os }}-doc-ocaml-4.14.2-${{ hashFiles('*.opam') }}
+          restore-keys: |
+            ${{ runner.os }}-doc-ocaml-4.14.2-
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 4.14.2
+
+      - name: Install dependencies
+        run: opam install . --deps-only --with-doc
+
+      - name: Build documentation
         run: |
              opam exec -- ocaml ./configure.ml
              opam exec -- make doc
-      - name: deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: _build/default/_doc/_html # The folder the action should deploy.
+          path: '_build/default/_doc/_html'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
