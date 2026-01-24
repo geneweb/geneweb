@@ -1006,7 +1006,7 @@ let cache_files_check conf =
 let cache_files ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "cache_files") ^ " " in
-    exec_f conf (comm ^ parameters conf.env ^ " > comm.log")
+    exec_f conf (comm ^ parameters conf.env)
   in
   flush stderr;
   if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
@@ -1293,15 +1293,19 @@ let rec check_new_names conf l1 l2 =
   match (l1, l2) with
   | (k, v) :: l, x :: m ->
       if k <> x then (
+        Printf.eprintf "Mismatch: k (%s) <> x (%s)\n" k x;
         print_file conf "err_outd.htm";
         raise Exit)
       else if not (Mutil.good_name v) then (
         let conf = { conf with env = ("o", v) :: conf.env } in
+        Printf.eprintf "Bad name: (%s)\n" v;
         print_file conf "err_name.htm";
         raise Exit)
       else check_new_names conf l m
   | [], [] -> ()
   | _ ->
+      Printf.eprintf "Bad exit (l1:%d, l2:%d)\n" (List.length l1)
+        (List.length l2);
       print_file conf "err_outd.htm";
       raise Exit
 
@@ -1316,11 +1320,15 @@ let rec check_rename_conflict conf = function
 
 let rename conf =
   GWPARAM.init ();
-  Printf.eprintf "Init: %s\n" (!GWPARAM.bpath "aaa");
   flush stderr;
   let rename_list =
-    List.map (fun (k, v) -> (k, strip_spaces (decode v))) conf.env
+    List.fold_left
+      (fun acc (k, v) ->
+        if k <> "lang" then (k, strip_spaces (decode v)) :: acc else acc)
+      [] conf.env
+    |> List.rev
   in
+  List.iter (fun (k, v) -> Printf.eprintf "k=%s, v=%s\n" k v) rename_list;
   let rename_cnt_files k v =
     (* we assume that etc/bname/cache has been renamed *)
     let dir = !GWPARAM.cnt_d k in
