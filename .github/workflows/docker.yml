@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - v*
     paths-ignore:
       - 'etc/**'
       - 'hd/**'
@@ -43,7 +45,7 @@ on:
       
 env:
   IMAGE_NAME: "geneweb"
-  PUSH_IMAGE: ${{ github.ref == 'refs/heads/master' }}
+  PUSH_IMAGE: ${{ startsWith(github.ref, 'refs/tags/v') }}
 
 jobs:
   build-ubuntu-24-amd64:
@@ -69,6 +71,8 @@ jobs:
           tags: |
             type=edge,branch=master
             type=sha,prefix=,format=short
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
           labels: |
             org.opencontainers.image.title=GeneWeb
             org.opencontainers.image.description=Genealogy Software
@@ -130,6 +134,8 @@ jobs:
           tags: |
             type=edge,branch=master
             type=sha,prefix=,format=short
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
           labels: |
             org.opencontainers.image.title=GeneWeb
             org.opencontainers.image.description=Genealogy Software
