@@ -15,9 +15,15 @@ let anonfun s =
     bname := Some s)
   else raise (Arg.Bad "Cannot treat several databases")
 
+let ansel_warning =
+  "Warning: ANSEL charset was administratively withdrawn in 2013. UTF-8 is \
+   recommended for new GEDCOM files."
+
 let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
+  if !opts.Gwexport.charset = Gwexport.Ansel then
+    Printf.eprintf "%s\n%!" ansel_warning;
   match !bname with
   | None -> raise @@ Arg.Bad "Expect a database"
   | Some bname ->

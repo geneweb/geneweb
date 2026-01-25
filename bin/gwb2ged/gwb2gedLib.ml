@@ -87,7 +87,7 @@ let ged_month cal m =
 
 let encode opts s =
   match opts.Gwexport.charset with
-  | Gwexport.Ansel -> Ansel.of_iso_8859_1 @@ Mutil.iso_8859_1_of_utf_8 s
+  | Gwexport.Ansel -> Ansel.of_utf_8 s
   | Gwexport.Ascii | Gwexport.Ansi -> Mutil.iso_8859_1_of_utf_8 s
   | Gwexport.Utf8 -> s
 

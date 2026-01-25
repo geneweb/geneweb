@@ -247,7 +247,7 @@ let ascii_of_macintosh s =
 
 let utf8_of_string s =
   match !charset with
-  | Ansel -> Mutil.utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
+  | Ansel -> Ansel.to_utf_8 s
   | Ascii -> Mutil.utf_8_of_iso_8859_1 s
   | Msdos -> Mutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
   | MacIntosh -> Mutil.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
