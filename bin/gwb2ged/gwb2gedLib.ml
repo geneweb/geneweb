@@ -160,32 +160,21 @@ let rec display_note_aux opts tagn s len i =
         (String.length (string_of_int (succ tagn) ^ " CONC "))
         i)
     else (* continue same gedcom line *)
-      (* FIXME: Rewrite this so we can get rid of this custom [nbc] *)
-      let nbc c =
-        if Char.code c < 0x80 then 1
-        else if Char.code c < 0xC0 then -1
-        else if Char.code c < 0xE0 then 2
-        else if Char.code c < 0xF0 then 3
-        else if Char.code c < 0xF8 then 4
-        else if Char.code c < 0xFC then 5
-        else if Char.code c < 0xFE then 6
-        else -1
-      in
-      let is_ansel_combining c =
+      let is_utf8_continuation c =
         let b = Char.code c in
-        b >= 0xE0 && b <= 0xF9
+        b >= 0x80 && b < 0xC0
       in
       let b = Buffer.create 4 in
       let rec output_onechar () =
         if !j = String.length s then decr j
         else if opts.Gwexport.charset = Gwexport.Ansel then (
           Buffer.add_char b s.[!j];
-          if is_ansel_combining s.[!j] && !j + 1 < String.length s then (
+          if is_utf8_continuation s.[!j] && !j + 1 < String.length s then (
             incr j;
             Buffer.add_char b s.[!j]))
         else if opts.Gwexport.charset <> Gwexport.Utf8 then
           Buffer.add_char b s.[i]
-        else if i = !j || nbc s.[!j] = -1 then (
+        else if i = !j || is_utf8_continuation s.[!j] then (
           Buffer.add_char b s.[!j];
           incr j;
           output_onechar ())
