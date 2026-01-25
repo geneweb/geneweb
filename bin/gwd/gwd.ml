@@ -1554,26 +1554,38 @@ let make_conf ~secret_salt from_addr request script_name env =
   GWPARAM.cnt_dir := !GWPARAM.cnt_d conf.bname;
   (conf, ar)
 
+(* Filter to avoid logging requests that don't provide useful information *)
+let should_log_request contents referer user_agent =
+  let contents_str = (contents :> string) in
+  let is_empty_request = String.length contents_str = 0 in
+  let is_favicon = Mutil.contains (String.lowercase_ascii referer) "favicon" in
+  let is_browser_probe = is_empty_request && String.length user_agent = 0 in
+  (* Log the request only if it's NOT one of these useless types *)
+  not (is_browser_probe || is_favicon)
+
 let log tm conf from gauth request script_name contents =
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
-  Logs.info (fun k ->
-      k "(%d) %s?%s\n%s%s%s%s%s" (Unix.getpid ()) script_name
-        (if String.length contents > 200 then
-           Printf.sprintf "%s..." (String.sub contents 0 200)
-         else contents)
-        (Printf.sprintf "  From: %s" from)
-        (if gauth <> "" then Printf.sprintf "\n  User: %s" gauth else "")
-        (if conf.wizard && not conf.friend then
-           Printf.sprintf "\n  User: %s%s(wizard)" conf.user
-             (if conf.user = "" then "" else " ")
-         else if conf.friend && not conf.wizard then
-           Printf.sprintf "\n  User: %s%s(friend)" conf.user
-             (if conf.user = "" then "" else " ")
-         else "")
-        (if user_agent <> "" then Printf.sprintf "\n  Agent: %s" user_agent
-         else "")
-        (if referer <> "" then Printf.sprintf "\n  Referer: %s" referer else ""))
+  if not (should_log_request contents referer user_agent) then ()
+  else
+    Logs.info (fun k ->
+        k "(%d) %s?%s\n%s%s%s%s%s" (Unix.getpid ()) script_name
+          (if String.length contents > 200 then
+             Printf.sprintf "%s..." (String.sub contents 0 200)
+           else contents)
+          (Printf.sprintf "  From: %s" from)
+          (if gauth <> "" then Printf.sprintf "\n  User: %s" gauth else "")
+          (if conf.wizard && not conf.friend then
+             Printf.sprintf "\n  User: %s%s(wizard)" conf.user
+               (if conf.user = "" then "" else " ")
+           else if conf.friend && not conf.wizard then
+             Printf.sprintf "\n  User: %s%s(friend)" conf.user
+               (if conf.user = "" then "" else " ")
+           else "")
+          (if user_agent <> "" then Printf.sprintf "\n  Agent: %s" user_agent
+           else "")
+          (if referer <> "" then Printf.sprintf "\n  Referer: %s" referer
+           else ""))
 
 let is_robot from =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
