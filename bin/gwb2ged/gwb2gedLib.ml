@@ -162,21 +162,29 @@ let rec display_note_aux opts tagn s len i =
     else (* continue same gedcom line *)
       (* FIXME: Rewrite this so we can get rid of this custom [nbc] *)
       let nbc c =
-        if Char.code c < 0b10000000 then 1
-        else if Char.code c < 0b11000000 then -1
-        else if Char.code c < 0b11100000 then 2
-        else if Char.code c < 0b11110000 then 3
-        else if Char.code c < 0b11111000 then 4
-        else if Char.code c < 0b11111100 then 5
-        else if Char.code c < 0b11111110 then 6
+        if Char.code c < 0x80 then 1
+        else if Char.code c < 0xC0 then -1
+        else if Char.code c < 0xE0 then 2
+        else if Char.code c < 0xF0 then 3
+        else if Char.code c < 0xF8 then 4
+        else if Char.code c < 0xFC then 5
+        else if Char.code c < 0xFE then 6
         else -1
       in
-      (* FIXME: avoid this buffer *)
+      let is_ansel_combining c =
+        let b = Char.code c in
+        b >= 0xE0 && b <= 0xF9
+      in
       let b = Buffer.create 4 in
       let rec output_onechar () =
-        if !j = String.length s then decr j (* non wide char / UTF-8 char *)
+        if !j = String.length s then decr j
+        else if opts.Gwexport.charset = Gwexport.Ansel then (
+          Buffer.add_char b s.[!j];
+          if is_ansel_combining s.[!j] && !j + 1 < String.length s then (
+            incr j;
+            Buffer.add_char b s.[!j]))
         else if opts.Gwexport.charset <> Gwexport.Utf8 then
-          Buffer.add_char b s.[i] (* 1 to 4 bytes UTF-8 wide char *)
+          Buffer.add_char b s.[i]
         else if i = !j || nbc s.[!j] = -1 then (
           Buffer.add_char b s.[!j];
           incr j;
