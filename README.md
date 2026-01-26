@@ -1,151 +1,155 @@
+<img align="left" src="hd/images/arbre_start.png" height="90" alt="GeneWeb">
+
 # GeneWeb
 
-[![build status](https://github.com/geneweb/geneweb/actions/workflows/ci.yml/badge.svg)](https://github.com/geneweb/geneweb/actions/workflows/ci.yml)
+## Open source genealogy software with a web interface written in OCaml
+[![Build](https://github.com/geneweb/geneweb/actions/workflows/ci.yml/badge.svg)](https://github.com/geneweb/geneweb/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/geneweb/geneweb?label=latest)](https://github.com/geneweb/geneweb/releases/latest)
+[![License](https://img.shields.io/badge/license-GPL--2.0-blue.svg)](LICENSE)
 
-GeneWeb is an open source genealogy software written in OCaml. It comes
-with a Web interface and can be used off-line or as a Web service.
+---
 
-## Documentation
+> [!NOTE]
+> **Version 7.1 is currently in beta.**
+> The software is stable and thoroughly tested. The "beta" label exists only
+> because the internal database format is not yet compatible with Geneanet’s
+> infrastructure. This will be resolved for the final 7.1.0 release.
 
-- Documentation maintained by the community: https://geneweb.tuxfamily.org/
-- GeneWeb API (generated from source): http://geneweb.github.io/geneweb/
-- GeneWeb overview (realized by OCamlPro): https://geneweb.github.io/
+---
 
-## Quick and easy live GeneWeb test
+## Why GeneWeb?
 
-- Test your GeneWeb database on current master: https://github.com/geneweb/geneweb/blob/master/geneweb_colab.ipynb
+Created by [Daniel de Rauglaudre](https://github.com/roglo) in 1998, GeneWeb is the engine behind some of the largest genealogical databases
+in the world:
 
-## Installation (for users)
+- **[Roglo](https://roglo.eu)** — Over **11 million individuals**, maintained
+  collaboratively by nearly **300 contributors**
+- **[Geneanet](https://www.geneanet.org)** — Used GeneWeb as its core engine
+  for two decades
 
-WARNING: before installing a new version of GeneWeb, it is highly recommended to save
-your bases into .gw formatted files.
+What sets GeneWeb apart:
 
-When installing a version of GeneWeb with the "pre-release" qualifier, you are
-participating to the collective test effort (thanks for your contribution). You should keep aside the previous version
-you were using and refrain from extensive updates or additions in your bases
-until the "release" qualifier is effective.
+| Feature | Description |
+|---------|-------------|
+| **Proven at scale** | Handles databases with millions of individuals |
+| **Battle-tested** | Years of development, real-world refinement |
+| **Advanced relationships** | Find connections across billions of possible paths |
+| **Your data, your control** | Run locally on your computer or deploy as a web server |
+| **Privacy built-in** | Granular access controls protect living persons’ information |
+| **Standard formats** | Full GEDCOM import and export for interoperability |
 
-Any problem you encounter or issue you want to raise should be entered on the issue page
-of the GitHub repository (https://github.com/geneweb/geneweb/issues).
+---
 
-Download the file corresponding to your environment from
-the [releases page](https://github.com/geneweb/geneweb/releases).
+## Getting started
 
-Extract the distribution folder and place it at the location of your choice. You may also rename it.
-Its content is as follows (this example is for a GNU/Linux distribution;
-other distributions are very similar):
+**Want to try first?** Run GeneWeb directly in your browser with
+[Google Colab](https://github.com/geneweb/geneweb/blob/master/geneweb_colab.ipynb)
+— no installation required.
 
-```
-distribution/
-├── bases
-├── CHANGES.txt
-├── gw
-   ├── a.gwf
-   ├── connex
-   ├── consang
-   ├── etc
-   ├── ged2gwb
-   ├── gwb2ged
-   ├── gwc
-   ├── gwd
-   ├── gwd.arg
-   ├── gwdiff
-   ├── gwfixbase
-   ├── gwsetup
-   ├── gwu
-   ├── images
-   ├── lang
-   ├── plugins
-   ├── setup
-   └── update_nldb
-├── gwd.sh
-├── gwsetup.sh
-├── install-cgi
-├── install-cgi.sh
-├── LICENSE.txt
-├── LISEZMOI.txt
-├── README.txt
-└── START.htm
+> [!WARNING]
+> **Export backups of your databases in `.gw` format before installing a new version!**
+
+<details>
+<summary><strong>Building from source</strong></summary>
+
+You need [OCaml](https://ocaml.org) 4.10+ and
+[opam](https://opam.ocaml.org).
+
+```sh
+# Install dependencies, configure and build
+opam install . --deps-only
+ocaml ./configure.ml
+make distrib
 ```
 
-Starting the GeneWeb servers may depend on your specific environment.
+See `ocaml ./configure.ml --help` for configuration options.
 
-### Windows
+</details>
 
-TODO
+### Download
 
-### MacOS
+**[Download the latest release](https://github.com/geneweb/geneweb/releases/latest)**
+for Linux, macOS, or Windows.
 
-Apple provides a security mechanism preventing users from executing applications
-which are not provided by authenticated developers. Such applications cannot be started
-by double-clicking on their icons.
-Apple provides a two-step mechanism circumventing this security:
-* Right-click on the application icon (```gwd``` and ```gwsetup```). This will pop-up a window
-mentioning the security issue and providing an "open" button. Click on this button to open
-the application. Ignore the resulting messages as no parameters were provided.
-* Once ```gwd``` and ```gwsetup``` have been started in this fashion, they will be white-listed
-on your machine and subsequent opens will succeed.
+### First steps
 
-After white-listing ```gwd``` and ```gwsetup```, double-click on the ```geneweb.command```
-file which will launch both servers with appropriate parameters.
-With the configuration provided in this launch command, the bases are located in
-the ```bases``` folder.
-You may reorganize your folder structure (and launch command) as described in the
-documentation at https://geneweb.tuxfamily.org/.
+1. **Extract** the downloaded archive to a folder of your choice
+2. **Launch** the application:
+   - Linux: run `./gwd.sh` in a terminal
+   - macOS: double-click `geneweb.command`
+   - Windows: double-click `START.htm`
+3. **Open** your browser at [http://localhost:2317](http://localhost:2317)
 
-### Linux
+You're ready for your genealogical journey.
 
-Quite similar to the MacOS solution, without the security check.
-```xxx.command``` files have an equivalent ```xxx.sh``` variant.
+<details>
+<summary><strong>macOS security note</strong></summary>
 
-### Security considerations
+macOS may block applications from unidentified developers. To authorize GeneWeb:
 
-On UNIX-like operating systems, special privileges are often required to open
-a port below `1024`. If you have no other choice but to use such a port, we
-recommend the following approaches:
-- On `Linux`, use capabilites as follows:
-```console
+1. Right-click on `gwd` and `gwsetup` in the `gw` folder
+2. Select "Open" from the context menu
+3. Click "Open" in the security dialog
+
+This only needs to be done once. After that, `geneweb.command` will work
+normally.
+
+</details>
+
+<details>
+<summary><strong>Running on port 80</strong></summary>
+
+On Unix systems, ports below 1024 require elevated privileges.
+
+**Linux** — use capabilities:
+```sh
 sudo setcap 'cap_net_bind_service=+ep' gwd
 ./gwd -p 80
 ```
-- On `macOS`, use `launchd` to redirect the port on 80.
 
-## Resources
+**macOS** — use `launchd` to redirect port 80 to 2317.
 
-* Documentation: https://geneweb.tuxfamily.org/wiki/GeneWeb
-* Mailing list: https://framalistes.org/sympa/subscribe/geneweb
-* IRC: irc://irc.libera.chat/geneweb
-* Git: https://github.com/geneweb/geneweb
-* Forum: https://www.geneanet.org/forum/GeneWeb-85
-* Wikipedia: https://en.wikipedia.org/wiki/GeneWeb
+</details>
 
-## Contribute
+---
 
-See [Contributor guidelines](CONTRIBUTING.md).
+## Documentation
 
-### Installation (for developers)
+- **[User documentation](https://geneweb.tuxfamily.org/wiki/GeneWeb)** —
+  Getting started guides, tutorials, and reference
+- **[API reference](http://geneweb.github.io/geneweb/)** —
+  Generated documentation for developers
+- **[Architecture overview](https://geneweb.github.io/)** —
+  Technical introduction (by [OCamlPro](https://ocamlpro.com/))
 
-See [geneweb.opam](./geneweb.opam).
+---
 
-### Build instructions
+## Community
 
-1. Run the configuration script
-   ```
-   $ ocaml ./configure.ml
-   ```
-2. Build the distribution
-   ```
-   $ make clean distrib
-   ```
+- **Forum**: [Geneanet GeneWeb forum](https://www.geneanet.org/forum/GeneWeb-85)
+  (French and English)
+- **Mailing list**: [geneweb@framalistes.org](https://framalistes.org/sympa/subscribe/geneweb)
+- **IRC**: [#geneweb on Libera.Chat](irc://irc.libera.chat/geneweb)
 
-You can have a description of available configuration options using
-```
-$ ocaml ./configure.ml --help
-```
+Found a bug or have a feature request?
+[Open an issue](https://github.com/geneweb/geneweb/issues) on GitHub.
 
-## Copyright
+---
 
-All files marked in this distribution are Copyright (c) 1998-2016 INRIA
-(Institut National de Recherche en Informatique et Automatique) and
-distributed under the GNU GENERAL PUBLIC LICENSE. See [LICENSE](LICENSE) file
-for details.
+## Contributing
+
+We welcome contributions from developers and translators.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## License
+
+GeneWeb is free software distributed under the
+[GNU General Public License v2](LICENSE).
+
+Copyright © 1998–2011 [INRIA](https://github.com/inria/).
+
+---
+
+<h3 align="center">Preserving family history, one generation at a time.</h3>
