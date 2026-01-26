@@ -575,10 +575,18 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
          1 ancestors;
   Output.print_sstring conf "</div>"
 
+let print_title conf order_string xl =
+  let name_list =
+    (List.map Util.escape_html xl :> string list) |> String.concat " ,"
+  in
+  Output.print_sstring conf (Printf.sprintf "%s (%s)" name_list order_string)
+
 let print_one_surname_by_branch conf base x xl branches =
   let title h =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
-      Output.print_string conf (Util.escape_html x)
+      print_title conf
+        (Util.transl_nth conf "branch/branches" 1)
+        (Ext_string.Set.elements xl)
     else
       Ext_list.iter_first
         (fun first x ->
@@ -696,21 +704,24 @@ let print_family_alphabetic x conf base liste =
   | [] -> surname_not_found conf x
   | _ ->
       let title h =
-        let access x =
-          if h || List.length homonymes = 1 then
-            (Util.escape_html x :> Adef.safe_string)
-          else
-            let open Def in
-            Util.geneweb_link conf
-              ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
-                :> Adef.escaped_string)
+        if h then
+          print_title conf (Util.transl conf "alphabetic order") homonymes
+        else
+          let access x =
+            if List.length homonymes = 1 then
               (Util.escape_html x :> Adef.safe_string)
-        in
-        Ext_list.iter_first
-          (fun first x ->
-            if not first then Output.print_sstring conf ", ";
-            Output.print_string conf (access x))
-          homonymes
+            else
+              let open Def in
+              Util.geneweb_link conf
+                ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
+                  :> Adef.escaped_string)
+                (Util.escape_html x :> Adef.safe_string)
+          in
+          Ext_list.iter_first
+            (fun first x ->
+              if not first then Output.print_sstring conf ", ";
+              Output.print_string conf (access x))
+            homonymes
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
