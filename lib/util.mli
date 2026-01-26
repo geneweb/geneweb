@@ -474,6 +474,8 @@ val ftransl : config -> ('a, 'b) format2 -> ('a, 'b) format2
 val ftransl_nth : config -> ('a, 'b) format2 -> int -> ('a, 'b) format2
 val fdecline : ('a, 'b) format2 -> string -> ('a, 'b) format2
 val fcapitale : ('a, 'b) format2 -> ('a, 'b) format2
+val gen_decline_basic : string -> string -> string
+val gen_decline : config -> string -> string -> string -> string -> string
 
 val nth_field : string -> int -> string
 (** [nth_field str n] gets [n]'th field of string that separate its fields with
