@@ -85,7 +85,7 @@ let speclist c =
             }),
       " [ASCII|ANSEL|ANSI|UTF-8] set charset; default is UTF-8" );
     ( "-d",
-      Arg.Int (fun s -> c := { !c with desc = Some s }),
+      Arg.Int (fun s -> c := { !c with desc = Some (-s) }),
       "<N> maximum generation of the root's descendants." );
     ( "-mem",
       Arg.Unit (fun () -> c := { !c with mem = true }),
@@ -138,7 +138,7 @@ module IFS = Geneweb_db.Driver.Ifam.Set
     - Si née après le seuil : censurée
     - Si pas de date de naissance mais décédée récemment : censurée
     - Si vivante ou statut inconnu : censurée par précaution *)
-let is_censored_person base threshold p =
+let is_censored_person threshold p =
   (* Vérifier la date de naissance *)
   if Driver.get_access p = Def.Public then false
   else
@@ -162,8 +162,8 @@ let is_censored_person base threshold p =
 (** [is_censored_couple base max_year family] Returns [true] if either the
     father or the mother of a given family in the base is censored *)
 let is_censored_couple base threshold cpl =
-  (is_censored_person base threshold @@ Driver.poi base (Driver.get_father cpl))
-  || is_censored_person base threshold
+  (is_censored_person threshold @@ Driver.poi base (Driver.get_father cpl))
+  || is_censored_person threshold
      @@ Driver.poi base (Driver.get_mother cpl)
 
 (* The following functions are utils set people as "censored" by marking them.
@@ -177,7 +177,7 @@ let is_censored_couple base threshold cpl =
 (** Marks a censored person *)
 let censor_person base pmark flag threshold p no_check =
   let ps = Driver.poi base p in
-  if no_check || is_censored_person base threshold ps then
+  if no_check || is_censored_person threshold ps then
     Collection.Marker.set pmark p (Collection.Marker.get pmark p lor flag)
 
 (** Marks all the members of a family that are censored. If a couple is
@@ -373,16 +373,15 @@ type selection_strategy =
 let determine_strategy opts ips =
   match (opts.ascdesc, opts.asc, opts.desc, opts.surnames, opts.parentship) with
   (* ascdesc : syntaxe legacy, équivalent à asc + desc *)
-  | Some ascdesc, asc_opt, _, _, _ ->
-      let asc = Option.value ~default:max_int asc_opt in
-      SelectAncDesc { asc; desc = ascdesc }
+  | Some ascdesc, _, _, _, _ ->
+      SelectAncDesc { asc = ascdesc; desc = ascdesc }
   (* asc + desc : syntaxe recommandée *)
-  | None, asc_opt, Some desc_val, _, _ ->
-      let asc = Option.value ~default:0 asc_opt in
-      let desc = -desc_val in
+  | None, Some asc, Some desc, _, _ ->
       SelectAncDesc { asc; desc }
   (* asc seul *)
   | None, Some asc, None, _, _ -> SelectAncestors asc
+  (* desc seul *)
+  | None, None, Some desc, _, _ -> SelectDescendants desc
   (* Noms de famille *)
   | None, None, None, surnames, _ when surnames <> [] -> SelectSurnames surnames
   (* Parenté *)
@@ -393,31 +392,68 @@ let determine_strategy opts ips =
 (** [build_person_and_family_sets base ht] construit les ensembles de personnes
     et familles à partir d'une hashtable de personnes sélectionnées.
 
+    Pour chaque famille où au moins un conjoint est sélectionné, ajoute aussi
+    l'autre conjoint aux personnes sélectionnées pour avoir des familles complètes.
+
     @return
       Triple (sel_per, sel_fam, (ipers, ifams)) où:
       - sel_per: prédicat de sélection des personnes
       - sel_fam: prédicat de sélection des familles
-      - ipers: ensemble des indices de personnes sélectionnées
+      - ipers: ensemble des indices de personnes sélectionnées (+ leurs conjoints)
       - ifams: ensemble des indices de familles sélectionnées *)
 let build_person_and_family_sets base ht =
   let ipers = Hashtbl.fold (fun i _ ipers -> IPS.add i ipers) ht IPS.empty in
-  (* Sélectionner les familles où les deux conjoints sont dans ipers *)
-  let ifams =
+  (* Sélectionner les familles et ajouter les conjoints *)
+  let ipers, ifams =
     IPS.fold
-      (fun iper acc ->
+      (fun iper (ipers_acc, ifams_acc) ->
         Array.fold_left
-          (fun acc ifam ->
-            if IFS.mem ifam acc then acc
+          (fun (ipers_acc, ifams_acc) ifam ->
+            if IFS.mem ifam ifams_acc then (ipers_acc, ifams_acc)
             else
-              let spouse = Gutil.spouse iper @@ Driver.foi base ifam in
-              if IPS.mem spouse ipers then IFS.add ifam acc else acc)
-          acc
+              let fam = Driver.foi base ifam in
+              let spouse = Gutil.spouse iper fam in
+              (* Ajouter la famille et le conjoint *)
+              let ipers_acc = IPS.add spouse ipers_acc in
+              let ifams_acc = IFS.add ifam ifams_acc in
+              (ipers_acc, ifams_acc))
+          (ipers_acc, ifams_acc)
           (Driver.get_family (Driver.poi base iper)))
-      ipers IFS.empty
+      ipers (ipers, IFS.empty)
   in
   let sel_per i = IPS.mem i ipers in
   let sel_fam i = IFS.mem i ifams in
   (sel_per, sel_fam, (ipers, ifams))
+
+(** [add_siblings base ipers ifams] ajoute les frères et sœurs de toutes les
+    personnes dans ipers, ainsi que leur famille parentale commune et leurs parents.
+
+    Cela ajoute implicitement un niveau d'ascendance pour pouvoir visualiser
+    le lien de fratrie.
+
+    @return Nouvelle paire (ipers, ifams) avec les siblings, parents et familles ajoutés *)
+let add_siblings base ipers ifams =
+  (* Pour chaque personne, ajouter ses siblings, sa famille parentale et ses parents *)
+  let new_ipers, new_ifams =
+    IPS.fold (fun iper (acc_ipers, acc_ifams) ->
+      let p = Driver.poi base iper in
+      match Driver.get_parents p with
+      | Some parent_ifam ->
+          let fam = Driver.foi base parent_ifam in
+          (* Ajouter la famille parentale *)
+          let acc_ifams = IFS.add parent_ifam acc_ifams in
+          (* Ajouter les parents (père et mère) *)
+          let acc_ipers = IPS.add (Driver.get_father fam) acc_ipers in
+          let acc_ipers = IPS.add (Driver.get_mother fam) acc_ipers in
+          (* Ajouter tous les enfants (siblings) *)
+          let acc_ipers = Array.fold_left (fun acc child_iper ->
+            IPS.add child_iper acc
+          ) acc_ipers (Driver.get_children fam) in
+          (acc_ipers, acc_ifams)
+      | None -> (acc_ipers, acc_ifams)
+    ) ipers (ipers, ifams)
+  in
+  (new_ipers, new_ifams)
 
 (** [apply_genealogical_selection base conf strategy ips] applique la stratégie
     de sélection et retourne les prédicats de filtrage.
@@ -521,7 +557,7 @@ let apply_censorship_on_subset base opts ipers_opt ifams_opt =
         let not_censor_p i =
           (* Si pas dans l'ensemble sélectionné, pas besoin de vérifier *)
           if not (IPS.mem i ipers) then true
-          else not (is_censored_person base threshold (Driver.poi base i))
+          else not (is_censored_person threshold (Driver.poi base i))
         in
 
         let not_censor_f i =
@@ -591,6 +627,27 @@ let select base opts ips =
     apply_genealogical_selection base conf strategy ips
   in
 
+  (* Étape 2b: Si -aws, ajouter les siblings *)
+  let sets_opt =
+    if opts.aws then
+      match sets_opt with
+      | Some (ipers, ifams) ->
+          let ipers, ifams = add_siblings base ipers ifams in
+          Some (ipers, ifams)
+      | None ->
+          (* -aws sur toute la base n'a pas de sens, on ignore *)
+          sets_opt
+    else sets_opt
+  in
+
+  (* Reconstruire les prédicats si les ensembles ont changé *)
+  let sel_per, sel_fam = 
+    match sets_opt with
+    | Some (ipers, ifams) ->
+        ((fun i -> IPS.mem i ipers), (fun i -> IFS.mem i ifams))
+    | None -> (sel_per, sel_fam)
+  in
+
   (* Étape 3: Appliquer les filtres de censure sur le sous-ensemble *)
   let not_censor_p, not_censor_f =
     match sets_opt with
@@ -615,5 +672,4 @@ let select base opts ips =
       (* Pour SelectAll et SelectSurnames sur toute la base : *)
       (* pas de vérification (trop coûteux pour les grandes bases) *)
       ());
-
   (person_filter, family_filter)
