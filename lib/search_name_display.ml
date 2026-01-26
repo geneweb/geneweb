@@ -384,7 +384,7 @@ let bullet_nosel_txt = Adef.safe "o"
 let print_selection_bullet conf = function
   | Some (txt, sel) ->
       Output.print_sstring conf
-      @@ Printf.sprintf {|<a class="selection_bullet" famid="%s">%s</a>|}
+      @@ Printf.sprintf {|<a class="selection_bullet" data-famid="%s">%s</a>|}
            (Adef.as_string txt)
            (bullet_sel_txt :> string);
       Output.print_sstring conf "\n"
