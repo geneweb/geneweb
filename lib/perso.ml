@@ -5609,6 +5609,16 @@ let eval_predefined_apply conf env f vl =
           l := SortedList.add sl !l;
           ""
       | _ -> raise Not_found)
+  | "decline", [ case; s ] ->
+      let c =
+        match String.length case with
+        | 1 -> case.[0]
+        | _ ->
+            Logs.warn (fun k ->
+                k "bad case format (%s) in %%apply;decline" case);
+            'g'
+      in
+      Mutil.decline c s |> Translate.eval
   | "hexa", [ s ] -> Util.hexa_string s
   | "initial", [ s ] ->
       if String.length s = 0 then "" else String.sub s 0 (Utf8.next s 0)
