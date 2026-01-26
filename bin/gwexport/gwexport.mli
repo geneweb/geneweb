@@ -20,10 +20,12 @@ type gwexport_opts = {
       (* If asc, ascdesc and desc are not set & parenting = true, then
          select individuals involved in parentship between pair of keys
          (/!\ assumes the input are pairs of keys) *)
-  picture_path : bool; (* Unused by this module *)
+  picture_path : bool; (* Used in gwb2gedLib module *)
   source : string option; (* Unused by this module *)
   surnames : string list; (* Used to select persons by their surname *)
-  verbose : bool; (* Unused by this module *)
+  verbose : bool; (* Used in gwus module *)
+  test : bool;
+      (* Used in gwu to print detailed etst data (use it only on small results) *)
 }
 
 val default_opts : gwexport_opts

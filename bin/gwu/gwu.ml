@@ -67,31 +67,33 @@ let () =
         Driver.load_unions_array base;
         Driver.load_descends_array base;
         ());
-      if opts.Gwexport.verbose then (
-        let iper_filter, ifam_filter = select in
-        let nb_persons =
-          Geneweb_db.Collection.fold (fun count i ->
-            if iper_filter i then 
-              (Printf.eprintf "P: %s\n"
-                (Geneweb_db.Gutil.designation base (Driver.poi base i));
-              count + 1)
-            else count
-          ) 0 (Driver.ipers base)
-        in
-        let nb_families =
-          Geneweb_db.Collection.fold (fun count i ->
-            if ifam_filter i then (
-              let father = Driver.get_father (Driver.foi base i) in
-              let mother = Driver.get_mother (Driver.foi base i) in
-              Printf.eprintf "F: %s & %s\n" 
-                (Geneweb_db.Gutil.designation base (Driver.poi base father))
-                (Geneweb_db.Gutil.designation base (Driver.poi base mother));
-              count + 1 )
-            else count
-          ) 0 (Driver.ifams base)
-        in
-        Printf.eprintf "Exporting %d persons and %d families\n" 
-          nb_persons nb_families);
+      (if opts.Gwexport.test then
+         let iper_filter, ifam_filter = select in
+         let nb_persons =
+           Geneweb_db.Collection.fold
+             (fun count i ->
+               if iper_filter i then (
+                 Printf.eprintf "P: %s\n"
+                   (Geneweb_db.Gutil.designation base (Driver.poi base i));
+                 count + 1)
+               else count)
+             0 (Driver.ipers base)
+         in
+         let nb_families =
+           Geneweb_db.Collection.fold
+             (fun count i ->
+               if ifam_filter i then (
+                 let father = Driver.get_father (Driver.foi base i) in
+                 let mother = Driver.get_mother (Driver.foi base i) in
+                 Printf.eprintf "F: %s & %s\n"
+                   (Geneweb_db.Gutil.designation base (Driver.poi base father))
+                   (Geneweb_db.Gutil.designation base (Driver.poi base mother));
+                 count + 1)
+               else count)
+             0 (Driver.ifams base)
+         in
+         Printf.eprintf "Exporting %d persons and %d families\n" nb_persons
+           nb_families);
       let _ofile, oc, close = opts.Gwexport.oc in
       if not !GwuLib.raw_output then oc "encoding: utf-8\n";
       if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
