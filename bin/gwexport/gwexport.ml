@@ -23,6 +23,7 @@ type gwexport_opts = {
   source : string option;
   surnames : string list;
   verbose : bool;
+  test : bool;
 }
 
 let default_opts =
@@ -44,6 +45,7 @@ let default_opts =
     source = None;
     surnames = [];
     verbose = false;
+    test = false;
   }
 
 let errmsg = "Usage: " ^ Sys.argv.(0) ^ " <BASE> [OPT]"
@@ -124,6 +126,7 @@ let speclist c =
       "<SRC> replace individuals and families sources. Also delete event \
        sources." );
     ("-v", Arg.Unit (fun () -> c := { !c with verbose = true }), " verbose");
+    ("-t", Arg.Unit (fun () -> c := { !c with test = true }), " test mode");
   ]
 
 module IPS = Geneweb_db.Driver.Iper.Set
@@ -163,8 +166,7 @@ let is_censored_person threshold p =
     father or the mother of a given family in the base is censored *)
 let is_censored_couple base threshold cpl =
   (is_censored_person threshold @@ Driver.poi base (Driver.get_father cpl))
-  || is_censored_person threshold
-     @@ Driver.poi base (Driver.get_mother cpl)
+  || (is_censored_person threshold @@ Driver.poi base (Driver.get_mother cpl))
 
 (* The following functions are utils set people as "censored" by marking them.
    Censoring a person consists in setting a mark defined as:
@@ -323,38 +325,122 @@ let select_surnames base surnames :
   ( (fun i -> Collection.Marker.get pmark i),
     fun i -> Collection.Marker.get fmark i )
 
-(** [select_parentship base ip1 ip2] Returns the set of common descendants of
-    ip1 and the ancestors of ip2 and the set of their families. *)
+(** [select_parentship base ip1 ip2] Returns the shortest path between ip1 and
+    ip2 using the existing get_shortest_path_relation function from Relation
+    module, along with their families.
+
+    The function identifies the type of relationship at each step and includes:
+    - Parent families (to show sibling relationships)
+    - Marriage families (to show marriage links)
+    - All persons on the path
+
+    Note: Spouses of the endpoint persons (ip1 and ip2) are NOT included unless
+    they are part of the path itself.
+
+    @return
+      Triple (ipers, ifams, core_ipers) where core_ipers contains only the
+      persons on the original path (not the added parents), for use with -aws
+      option *)
 let select_parentship base ip1 ip2 =
   let conf = Config.{ empty with wizard = true; bname = Driver.bname base } in
-  let asc = select_asc conf base max_int [ ip1 ] in
-  let desc = Util.select_desc conf base (-max_int) [ (ip2, 0) ] in
-  let ipers =
-    (* S: The intersection of asc and desc *)
-    if IPS.cardinal asc > Hashtbl.length desc then
-      Hashtbl.fold
-        (fun k _ acc -> if IPS.mem k asc then IPS.add k acc else acc)
-        desc IPS.empty
-    else
-      IPS.fold
-        (fun k acc -> if Hashtbl.mem desc k then IPS.add k acc else acc)
-        asc IPS.empty
-  in
-  let ifams =
-    IPS.fold
-      (fun iper acc ->
-        Array.fold_left
-          (fun acc ifam ->
-            if
-              IFS.mem ifam acc
-              || not (IPS.mem (Gutil.spouse iper @@ Driver.foi base ifam) ipers)
-            then acc
-            else IFS.add ifam acc)
-          acc
-          (Driver.get_family (Driver.poi base iper)))
-      ipers IFS.empty
-  in
-  (ipers, ifams)
+
+  (* Utiliser la fonction existante pour trouver le chemin le plus court *)
+  let path_opt = Relation.get_shortest_path_relation conf base ip1 ip2 [] in
+
+  match path_opt with
+  | None ->
+      (* Pas de chemin trouvé, retourner les deux personnes avec leurs conjoints *)
+      let core_ipers = IPS.add ip1 (IPS.singleton ip2) in
+      let ipers, ifams =
+        IPS.fold
+          (fun iper (acc_ipers, acc_ifams) ->
+            Array.fold_left
+              (fun (acc_ipers, acc_ifams) ifam ->
+                if IFS.mem ifam acc_ifams then (acc_ipers, acc_ifams)
+                else
+                  let fam = Driver.foi base ifam in
+                  let spouse = Gutil.spouse iper fam in
+                  let acc_ipers = IPS.add spouse acc_ipers in
+                  let acc_ifams = IFS.add ifam acc_ifams in
+                  (acc_ipers, acc_ifams))
+              (acc_ipers, acc_ifams)
+              (Driver.get_family (Driver.poi base iper)))
+          core_ipers (core_ipers, IFS.empty)
+      in
+      (ipers, ifams, core_ipers)
+  | Some (path, _) ->
+      (* Extraire toutes les personnes du chemin - ce sont les "core" persons *)
+      let core_ipers =
+        List.fold_left (fun acc (ip, _) -> IPS.add ip acc) IPS.empty path
+      in
+
+      (* Pour chaque personne du chemin, ajouter sa famille parentale si elle existe
+         (cela permet de voir les siblings qui sont aussi sur le chemin) *)
+      let add_parent_families ipers ifams =
+        IPS.fold
+          (fun iper (acc_ipers, acc_ifams) ->
+            let p = Driver.poi base iper in
+            match Driver.get_parents p with
+            | Some parent_ifam ->
+                let fam = Driver.foi base parent_ifam in
+                let father = Driver.get_father fam in
+                let mother = Driver.get_mother fam in
+                (* Ajouter les parents *)
+                let acc_ipers = IPS.add father (IPS.add mother acc_ipers) in
+                (* Ajouter la famille *)
+                let acc_ifams = IFS.add parent_ifam acc_ifams in
+                (* N'ajouter QUE les enfants qui sont déjà dans core_ipers (sur le chemin)
+                 Les autres siblings ne sont pas ajoutés automatiquement *)
+                let acc_ipers =
+                  Array.fold_left
+                    (fun acc child ->
+                      if IPS.mem child core_ipers then IPS.add child acc
+                      else acc)
+                    acc_ipers (Driver.get_children fam)
+                in
+                (acc_ipers, acc_ifams)
+            | None -> (acc_ipers, acc_ifams))
+          ipers (ipers, ifams)
+      in
+
+      (* Analyser le chemin pour ajouter les familles de mariage entre personnes consécutives *)
+      let rec process_marriages ipers ifams = function
+        | [] | [ _ ] -> (ipers, ifams)
+        | (ip1, _) :: ((ip2, _) :: _ as rest) ->
+            let p1 = Driver.poi base ip1 in
+
+            (* Chercher une famille où ip1 et ip2 sont conjoints *)
+            let marriage_ifam = ref None in
+            Array.iter
+              (fun ifam ->
+                let fam = Driver.foi base ifam in
+                if Gutil.spouse ip1 fam = ip2 then marriage_ifam := Some ifam)
+              (Driver.get_family p1);
+
+            let ipers, ifams =
+              match !marriage_ifam with
+              | Some ifam ->
+                  (* Ajouter la famille de mariage *)
+                  let ifams = IFS.add ifam ifams in
+                  (ipers, ifams)
+              | None ->
+                  (* Pas de mariage direct, peut-être lien parent-enfant
+                     qui sera géré par add_parent_families *)
+                  (ipers, ifams)
+            in
+
+            process_marriages ipers ifams rest
+      in
+
+      (* Ajouter d'abord les familles parentales de toutes les personnes du chemin *)
+      let ipers, ifams = add_parent_families core_ipers IFS.empty in
+
+      (* Puis ajouter les familles de mariage le long du chemin *)
+      let ipers, ifams = process_marriages ipers ifams path in
+
+      (* Retourner ipers (toutes les personnes), ifams (toutes les familles),
+         et core_ipers (seulement les personnes du chemin original) *)
+      (ipers, ifams, core_ipers)
 
 (** Types pour clarifier les différentes stratégies de sélection *)
 type selection_strategy =
@@ -373,11 +459,9 @@ type selection_strategy =
 let determine_strategy opts ips =
   match (opts.ascdesc, opts.asc, opts.desc, opts.surnames, opts.parentship) with
   (* ascdesc : syntaxe legacy, équivalent à asc + desc *)
-  | Some ascdesc, _, _, _, _ ->
-      SelectAncDesc { asc = ascdesc; desc = ascdesc }
+  | Some ascdesc, _, _, _, _ -> SelectAncDesc { asc = ascdesc; desc = ascdesc }
   (* asc + desc : syntaxe recommandée *)
-  | None, Some asc, Some desc, _, _ ->
-      SelectAncDesc { asc; desc }
+  | None, Some asc, Some desc, _, _ -> SelectAncDesc { asc; desc }
   (* asc seul *)
   | None, Some asc, None, _, _ -> SelectAncestors asc
   (* desc seul *)
@@ -393,13 +477,15 @@ let determine_strategy opts ips =
     et familles à partir d'une hashtable de personnes sélectionnées.
 
     Pour chaque famille où au moins un conjoint est sélectionné, ajoute aussi
-    l'autre conjoint aux personnes sélectionnées pour avoir des familles complètes.
+    l'autre conjoint aux personnes sélectionnées pour avoir des familles
+    complètes.
 
     @return
       Triple (sel_per, sel_fam, (ipers, ifams)) où:
       - sel_per: prédicat de sélection des personnes
       - sel_fam: prédicat de sélection des familles
-      - ipers: ensemble des indices de personnes sélectionnées (+ leurs conjoints)
+      - ipers: ensemble des indices de personnes sélectionnées (+ leurs
+        conjoints)
       - ifams: ensemble des indices de familles sélectionnées *)
 let build_person_and_family_sets base ht =
   let ipers = Hashtbl.fold (fun i _ ipers -> IPS.add i ipers) ht IPS.empty in
@@ -426,32 +512,38 @@ let build_person_and_family_sets base ht =
   (sel_per, sel_fam, (ipers, ifams))
 
 (** [add_siblings base ipers ifams] ajoute les frères et sœurs de toutes les
-    personnes dans ipers, ainsi que leur famille parentale commune et leurs parents.
+    personnes dans ipers, ainsi que leur famille parentale commune et leurs
+    parents.
 
-    Cela ajoute implicitement un niveau d'ascendance pour pouvoir visualiser
-    le lien de fratrie.
+    Cela ajoute implicitement un niveau d'ascendance pour pouvoir visualiser le
+    lien de fratrie.
 
-    @return Nouvelle paire (ipers, ifams) avec les siblings, parents et familles ajoutés *)
+    @return
+      Nouvelle paire (ipers, ifams) avec les siblings, parents et familles
+      ajoutés *)
 let add_siblings base ipers ifams =
   (* Pour chaque personne, ajouter ses siblings, sa famille parentale et ses parents *)
   let new_ipers, new_ifams =
-    IPS.fold (fun iper (acc_ipers, acc_ifams) ->
-      let p = Driver.poi base iper in
-      match Driver.get_parents p with
-      | Some parent_ifam ->
-          let fam = Driver.foi base parent_ifam in
-          (* Ajouter la famille parentale *)
-          let acc_ifams = IFS.add parent_ifam acc_ifams in
-          (* Ajouter les parents (père et mère) *)
-          let acc_ipers = IPS.add (Driver.get_father fam) acc_ipers in
-          let acc_ipers = IPS.add (Driver.get_mother fam) acc_ipers in
-          (* Ajouter tous les enfants (siblings) *)
-          let acc_ipers = Array.fold_left (fun acc child_iper ->
-            IPS.add child_iper acc
-          ) acc_ipers (Driver.get_children fam) in
-          (acc_ipers, acc_ifams)
-      | None -> (acc_ipers, acc_ifams)
-    ) ipers (ipers, ifams)
+    IPS.fold
+      (fun iper (acc_ipers, acc_ifams) ->
+        let p = Driver.poi base iper in
+        match Driver.get_parents p with
+        | Some parent_ifam ->
+            let fam = Driver.foi base parent_ifam in
+            (* Ajouter la famille parentale *)
+            let acc_ifams = IFS.add parent_ifam acc_ifams in
+            (* Ajouter les parents (père et mère) *)
+            let acc_ipers = IPS.add (Driver.get_father fam) acc_ipers in
+            let acc_ipers = IPS.add (Driver.get_mother fam) acc_ipers in
+            (* Ajouter tous les enfants (siblings) *)
+            let acc_ipers =
+              Array.fold_left
+                (fun acc child_iper -> IPS.add child_iper acc)
+                acc_ipers (Driver.get_children fam)
+            in
+            (acc_ipers, acc_ifams)
+        | None -> (acc_ipers, acc_ifams))
+      ipers (ipers, ifams)
   in
   (new_ipers, new_ifams)
 
@@ -459,30 +551,33 @@ let add_siblings base ipers ifams =
     de sélection et retourne les prédicats de filtrage.
 
     @return
-      Triple (sel_per, sel_fam, sets_opt) où sets_opt contient les ensembles
-      (ipers, ifams) pour les stratégies généalogiques, ou None pour les autres
-*)
+      Quadruple (sel_per, sel_fam, sets_opt, core_ipers_opt) où:
+      - sets_opt contient les ensembles (ipers, ifams) pour les stratégies
+        généalogiques, ou None
+      - core_ipers_opt contient l'ensemble des personnes "principales" (pour
+        -aws sur -parentship), ou None si non applicable *)
 let apply_genealogical_selection base conf strategy ips =
   match strategy with
-  | SelectAll -> ((fun _ -> true), (fun _ -> true), None)
+  | SelectAll -> ((fun _ -> true), (fun _ -> true), None, None)
   | SelectSurnames surnames ->
       let sel_per, sel_fam = select_surnames base surnames in
-      (sel_per, sel_fam, None)
+      (sel_per, sel_fam, None, None)
   | SelectParentship person_list ->
-      let rec loop ipers ifams = function
+      let rec loop ipers ifams core_ipers = function
         | [] ->
             let sel_per i = IPS.mem i ipers in
             let sel_fam i = IFS.mem i ifams in
-            (sel_per, sel_fam, Some (ipers, ifams))
+            (sel_per, sel_fam, Some (ipers, ifams), Some core_ipers)
         | k2 :: k1 :: tl ->
-            let ipers', ifams' = select_parentship base k1 k2 in
+            let ipers', ifams', core_ipers' = select_parentship base k1 k2 in
             let ipers = IPS.fold IPS.add ipers ipers' in
             let ifams = IFS.fold IFS.add ifams ifams' in
-            loop ipers ifams tl
+            let core_ipers = IPS.fold IPS.add core_ipers core_ipers' in
+            loop ipers ifams core_ipers tl
         | [ _ ] ->
             failwith "SelectParentship requires an even number of persons"
       in
-      loop IPS.empty IFS.empty person_list
+      loop IPS.empty IFS.empty IPS.empty person_list
   | SelectAncestors asc ->
       let ipers = select_asc conf base asc ips in
       let per_sel i = IPS.mem i ipers in
@@ -503,7 +598,7 @@ let apply_genealogical_selection base conf strategy ips =
               (Driver.get_family (Driver.poi base iper)))
           ipers IFS.empty
       in
-      (per_sel, fam_sel, Some (ipers, ifams))
+      (per_sel, fam_sel, Some (ipers, ifams), None)
   | SelectDescendants desc ->
       let ht = Hashtbl.create 0 in
       (* Ajouter seulement les personnes de départ *)
@@ -517,7 +612,7 @@ let apply_genealogical_selection base conf strategy ips =
       let sel_per, sel_fam, (ipers, ifams) =
         build_person_and_family_sets base ht
       in
-      (sel_per, sel_fam, Some (ipers, ifams))
+      (sel_per, sel_fam, Some (ipers, ifams), None)
   | SelectAncDesc { asc; desc } ->
       (* Construire l'ensemble des ascendants *)
       let ht =
@@ -533,7 +628,7 @@ let apply_genealogical_selection base conf strategy ips =
       let sel_per, sel_fam, (ipers, ifams) =
         build_person_and_family_sets base ht
       in
-      (sel_per, sel_fam, Some (ipers, ifams))
+      (sel_per, sel_fam, Some (ipers, ifams), None)
 
 (** [apply_censorship_on_subset base opts ipers_opt ifams_opt] applique la
     censure uniquement sur le sous-ensemble sélectionné (plus efficace).
@@ -623,28 +718,45 @@ let select base opts ips =
   (* Étape 2: Déterminer et appliquer la stratégie de sélection *)
   let strategy = determine_strategy opts ips in
   let conf = Config.{ empty with wizard = true } in
-  let sel_per, sel_fam, sets_opt =
+  let sel_per, sel_fam, sets_opt, core_ipers_opt =
     apply_genealogical_selection base conf strategy ips
   in
 
   (* Étape 2b: Si -aws, ajouter les siblings *)
   let sets_opt =
     if opts.aws then
-      match sets_opt with
-      | Some (ipers, ifams) ->
+      match (sets_opt, core_ipers_opt) with
+      | Some (ipers, ifams), Some core_ipers ->
+          (* Pour -parentship : appliquer -aws seulement aux extrémités du chemin
+             (personnes fournies via -key), pas aux intermédiaires du chemin *)
+          let endpoint_ipers =
+            List.fold_left (fun acc ip -> IPS.add ip acc) IPS.empty ips
+          in
+          (* Ne garder que les endpoints qui sont dans core_ipers *)
+          let aws_ipers =
+            IPS.filter (fun ip -> IPS.mem ip endpoint_ipers) core_ipers
+          in
+          (* Appliquer add_siblings aux endpoints, puis fusionner avec ipers existant *)
+          let new_ipers, new_ifams = add_siblings base aws_ipers ifams in
+          (* Fusionner : garder toutes les personnes de ipers original + nouvelles de add_siblings *)
+          let merged_ipers = IPS.union ipers new_ipers in
+          let merged_ifams = IFS.union ifams new_ifams in
+          Some (merged_ipers, merged_ifams)
+      | Some (ipers, ifams), None ->
+          (* Pour autres stratégies : appliquer -aws à toutes les personnes *)
           let ipers, ifams = add_siblings base ipers ifams in
           Some (ipers, ifams)
-      | None ->
+      | None, _ ->
           (* -aws sur toute la base n'a pas de sens, on ignore *)
           sets_opt
     else sets_opt
   in
 
   (* Reconstruire les prédicats si les ensembles ont changé *)
-  let sel_per, sel_fam = 
+  let sel_per, sel_fam =
     match sets_opt with
     | Some (ipers, ifams) ->
-        ((fun i -> IPS.mem i ipers), (fun i -> IFS.mem i ifams))
+        ((fun i -> IPS.mem i ipers), fun i -> IFS.mem i ifams)
     | None -> (sel_per, sel_fam)
   in
 
