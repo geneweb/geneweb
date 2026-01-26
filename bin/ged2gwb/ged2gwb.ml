@@ -1334,6 +1334,7 @@ let find_pevent_name_from_tag gen tag tagv =
   | "CREM" -> Epers_Cremation
   | "accomplishment" -> Epers_Accomplishment
   | "acquisition" -> Epers_Acquisition
+  | "ADOP" -> Epers_Adoption
   | "award" | "distinction" -> Epers_Distinction
   | "BAPL" | "lds baptism" -> Epers_BaptismLDS
   | "BARM" -> Epers_BarMitzvah
@@ -1380,10 +1381,10 @@ let find_pevent_name_from_tag gen tag tagv =
   | _ -> Epers_Name (add_string gen (strip_spaces tagv))
 
 let primary_pevents =
-  ["BAPM"; "CHR"; "BAPL"; "BARM"; "BASM"; "BIRT"; "BLES"; "BURI"; "CENS";
-   "CONF"; "CONL"; "CREM"; "DEAT"; "DECO"; "EDUC"; "EMIG"; "ENDL"; "FCOM";
-   "GRAD"; "IMMI"; "NATU"; "OCCU"; "ORDN"; "PROP"; "RETI"; "RESI"; "SLGS";
-   "SLGC"; "WILL"]
+  ["BAPM"; "CHR"; "ADOP"; "BAPL"; "BARM"; "BASM"; "BIRT"; "BLES"; "BURI";
+   "CENS"; "CONF"; "CONL"; "CREM"; "DEAT"; "DECO"; "EDUC"; "EMIG"; "ENDL";
+   "FCOM"; "GRAD"; "IMMI"; "NATU"; "OCCU"; "ORDN"; "PROP"; "RETI"; "RESI";
+   "SLGS"; "SLGC"; "WILL"]
 
 let treat_indi_pevent gen ip r =
   let prim_events =
