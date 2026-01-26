@@ -856,7 +856,6 @@ let infer_rc conf rc =
 let exec_f conf comm =
   let s = comm ^ " > " ^ "comm.log" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
-  flush stderr;
   Printf.eprintf "$ %s\n" s;
   flush stderr;
   let rc = Sys.command s in
@@ -1041,6 +1040,7 @@ let connex ok_file conf =
     else (
       Printf.eprintf "%s (%s) %s (%s)\n" "Unknown Os_type" Sys.os_type
         "or wrong uname response" uname;
+      flush stderr;
       2)
   in
   flush stderr;
@@ -1252,7 +1252,6 @@ let cleanup_1 conf =
   in
   let in_base_dir = in_base ^ ".gwb" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
-  flush stderr;
   let c = Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
@@ -1294,11 +1293,13 @@ let rec check_new_names conf l1 l2 =
   | (k, v) :: l, x :: m ->
       if k <> x then (
         Printf.eprintf "Mismatch: k (%s) <> x (%s)\n" k x;
+        flush stderr;
         print_file conf "err_outd.htm";
         raise Exit)
       else if not (Mutil.good_name v) then (
         let conf = { conf with env = ("o", v) :: conf.env } in
         Printf.eprintf "Bad name: (%s)\n" v;
+        flush stderr;
         print_file conf "err_name.htm";
         raise Exit)
       else check_new_names conf l m
@@ -1306,6 +1307,7 @@ let rec check_new_names conf l1 l2 =
   | _ ->
       Printf.eprintf "Bad exit (l1:%d, l2:%d)\n" (List.length l1)
         (List.length l2);
+      flush stderr;
       print_file conf "err_outd.htm";
       raise Exit
 
@@ -1329,10 +1331,12 @@ let rename conf =
     |> List.rev
   in
   List.iter (fun (k, v) -> Printf.eprintf "k=%s, v=%s\n" k v) rename_list;
+  flush stderr;
   let rename_cnt_files k v =
     (* we assume that etc/bname/cache has been renamed *)
     let dir = !GWPARAM.cnt_d k in
     Printf.eprintf "Rename cnt files in %s\n" dir;
+    flush stderr;
     let files = Sys.readdir dir in
     Array.iter
       (fun filename ->
@@ -1363,13 +1367,9 @@ let rename conf =
           flush stderr;
           try
             if GWPARAM.is_reorg_base k then begin
-              Printf.eprintf "Is reorg\n";
-              flush stderr;
               Sys.rename (k ^ ".gwb") (v ^ ".gwb")
             end
             else begin
-              Printf.eprintf "Is not reorg\n";
-              flush stderr;
               if Sys.file_exists (k ^ ".gwb") then
                 Sys.rename (k ^ ".gwb") (v ^ ".gwb");
               if Sys.file_exists (k ^ ".gwf") then
@@ -1954,6 +1954,7 @@ let intro () =
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
   Printf.eprintf "Start gwsetup\n";
+  flush stderr;
   default_lang := default_setup_lang;
   let gwd_lang, setup_lang =
     if !daemon then
