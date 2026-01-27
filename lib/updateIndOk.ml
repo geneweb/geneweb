@@ -12,6 +12,13 @@ let removed_string = ref []
 let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
+let with_lock conf fn =
+  let bfile = !GWPARAM.bpath conf.bname in
+  Lock.control
+    ~on_exn:(fun _exn _bt -> Update.error_locked conf)
+    ~wait:true ~lock_file:(Mutil.lock_file bfile)
+  @@ fn
+
 let rec reconstitute_string_list conf var ext cnt =
   match get_nth conf var cnt with
   | None -> ([], ext)
@@ -1135,6 +1142,7 @@ let print_mod ?prerr o_conf base =
     Notes.links_to_ind conf base db old_key None
   in
   let callback sp =
+    with_lock conf @@ fun () ->
     let p = effective_mod ?prerr conf base sp in
     let op = Driver.poi base p.key_index in
     let u = { family = Driver.get_family op } in
