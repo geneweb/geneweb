@@ -910,8 +910,8 @@ let access_status p =
     - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
 *)
 let acces_n conf base n x : Adef.escaped_string =
-  let first_name = Driver.p_first_name base x in
-  let surname = Driver.p_surname base x in
+  let first_name = Driver.p_first_name_raw base x in
+  let surname = Driver.p_surname_raw base x in
   if surname = "" then Adef.escaped ""
   else if accessible_by_key conf base x first_name surname then
     "p" ^<^ n ^^^ "="

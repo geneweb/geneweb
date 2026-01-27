@@ -170,7 +170,9 @@ let decline case s =
 (* end compatibility code *)
 
 let nominative s =
-  match String.rindex_opt s ':' with Some _ -> decline 'n' s | _ -> s
+  match String.index_opt s ':' with
+  | Some i -> String.sub s 0 i
+  | None -> s
 
 let mkdir_p ?(perm = 0o755) d =
   let rec loop d =
