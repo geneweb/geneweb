@@ -6,12 +6,6 @@ open Util
 open Update_util
 module Driver = Geneweb_db.Driver
 
-(* Liste des string dont on a supprimé un caractère.       *)
-(* Utilisé pour le message d'erreur lors de la validation. *)
-let removed_string = ref []
-let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
-let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
-
 let rec reconstitute_string_list conf var ext cnt =
   match get_nth conf var cnt with
   | None -> ([], ext)
@@ -208,7 +202,8 @@ let rec reconstitute_pevents conf ext cnt =
         let rec loop i ext =
           let key = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i in
           match
-            try Some (reconstitute_somebody conf key) with Failure _ -> None
+            try Some (Update_util.reconstitute_somebody conf key)
+            with Failure _ -> None
           with
           | Some (fn, sn, occ, create, var) -> (
               let witnesses, ext = loop (i + 1) ext in
@@ -317,8 +312,6 @@ let reconstitute_relation_parent conf var key sex =
   | fn, sn ->
       let fn = only_printable fn in
       let sn = only_printable sn in
-      (* S'il y a des caractères interdits, on les supprime *)
-      let fn, sn = get_purged_fn_sn fn sn in
       let occ =
         try int_of_string (getn conf var (key ^ "_occ")) with Failure _ -> 0
       in
@@ -553,8 +546,6 @@ let reconstitute_person conf =
   in
   let first_name = only_printable (get conf "first_name") in
   let surname = only_printable (get conf "surname") in
-  (* S'il y a des caractères interdits, on les supprime *)
-  let first_name, surname = get_purged_fn_sn first_name surname in
   let occ =
     try int_of_string (String.trim (get conf "occ")) with Failure _ -> 0
   in
@@ -968,16 +959,6 @@ let print_title conf fmt _ =
 
 let print_mod_ok conf base wl pgl p ofn osn oocc =
   Hutil.header conf @@ print_title conf "person modified";
-  (* Si on a supprimé des caractères interdits *)
-  if List.length !removed_string > 0 then (
-    Output.print_sstring conf "<h3 class=\"error\">";
-    Output.printf conf
-      (fcapitale (ftransl conf "%s forbidden char"))
-      (List.fold_left
-         (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
-         " " Name.forbidden_char);
-    Output.print_sstring conf "</h3>\n";
-    List.iter (Output.printf conf "<p>%s</p>") !removed_string);
   (* Si on a supprimé des relations, on les mentionne *)
   (match !deleted_relation with
   | [] -> ()
@@ -1108,9 +1089,6 @@ let print_mod_aux conf base callback =
   else Update.error_digest conf
 
 let print_mod ?prerr o_conf base =
-  (* Attention ! On pense à remettre les compteurs à *)
-  (* zéro pour la détection des caractères interdits *)
-  let () = removed_string := [] in
   let o_p =
     match p_getenv o_conf.env "i" with
     | Some ip ->
