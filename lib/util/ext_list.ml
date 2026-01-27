@@ -1,3 +1,10 @@
+let cons_opt x xs = Option.fold ~none:xs ~some:(fun x -> x :: xs) x
+
+module Infix = struct
+  let ( @?: ) = cons_opt
+  let ( @:: ) = List.cons
+end
+
 let take l n =
   let rec aux res l n =
     match l with x :: l when n > 0 -> aux (x :: res) l (n - 1) | _ -> res
