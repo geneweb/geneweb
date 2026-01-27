@@ -383,35 +383,11 @@ let bullet_nosel_txt = Adef.safe "o"
 
 let print_selection_bullet conf = function
   | Some (txt, sel) ->
-      let req : Adef.encoded_string =
-        List.fold_left
-          (fun (req : Adef.encoded_string) (k, (v : Adef.encoded_string)) ->
-            if (not sel) && k = "u" && v = txt then req
-            else
-              let s : Adef.encoded_string =
-                let open Def in
-                Adef.encoded k ^^^ "=" ^<^ v
-              in
-              if (req :> string) = "" then s
-              else
-                let open Def in
-                req ^^^ "&" ^<^ s)
-          (Adef.encoded "") conf.Config.env
-      in
-      Output.print_sstring conf {|<a id="if|};
-      Output.print_string conf txt;
-      Output.print_sstring conf {|" href="|};
-      Output.print_string conf (Util.prefix_base conf);
-      Output.print_string conf req;
-      if sel then (
-        let open Def in
-        Output.print_string conf ("&u=" ^<^ txt);
-        if sel || List.mem_assoc "u" conf.Config.env then (
-          Output.print_string conf ("#if" ^<^ txt);
-          Output.print_sstring conf {|" rel="nofollow">|};
-          Output.print_string conf
-            (if sel then bullet_sel_txt else bullet_unsel_txt);
-          Output.print_sstring conf "</a>\n"))
+      Output.print_sstring conf
+      @@ Printf.sprintf {|<a class="selection_bullet" data-famid="%s">%s</a>|}
+           (Adef.as_string txt)
+           (bullet_sel_txt :> string);
+      Output.print_sstring conf "\n"
   | None ->
       Output.print_string conf bullet_nosel_txt;
       Output.print_sstring conf "\n"
@@ -497,13 +473,10 @@ let print_branch conf base psn name =
              print_elem sp true false true;
              let children = Gwdb.get_children fam in
              (match select with
-             | Some (_, true) ->
-                 Output.print_sstring conf "<ul>";
-                 Array.iter
-                   (fun e ->
-                     loop (Util.pget conf base e);
-                     Output.print_sstring conf "</li>")
-                   children;
+             | Some (txt, true) ->
+                 Output.print_sstring conf
+                   (Printf.sprintf "<ul id=\"fam_%s\">" (Adef.as_string txt));
+                 Array.iter (fun e -> loop (Util.pget conf base e)) children;
                  Output.print_sstring conf "</ul>"
              | Some (_, false) -> ()
              | None ->
@@ -512,8 +485,8 @@ let print_branch conf base psn name =
                      {|<ul class="posterity"><li>...</li></ul>|});
              Output.print_sstring conf "</li>";
              false)
-           true family_list;
-    Output.print_sstring conf "</li>"
+           true family_list
+    else Output.print_sstring conf "</li>"
   in
   loop
 
@@ -566,24 +539,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     | Some x -> x = "yes"
     | None -> List.assoc_opt "always_surname" conf.Config.base_env = Some "yes"
   in
-  let title h =
-    if h || Util.p_getenv conf.Config.env "t" = Some "A" then
-      Output.print_string conf (Util.escape_html x)
-    else
-      Ext_list.iter_first
-        (fun first x ->
-          if not first then Output.print_sstring conf ", ";
-          Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf {|m=N&t=A&v=|};
-          Output.print_string conf (Mutil.encode x);
-          Output.print_sstring conf {|">|};
-          Output.print_string conf (Util.escape_html x);
-          Output.print_sstring conf {|</a>|})
-        (Ext_string.Set.elements xl)
-  in
   let br = Util.p_getint conf.Config.env "br" in
-  Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
@@ -617,7 +573,49 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
            if br = None || br = Some n then print_one_branch conf base bh psn;
            n + 1)
          1 ancestors;
-  Output.print_sstring conf "</div>";
+  Output.print_sstring conf "</div>"
+
+let print_title conf order_string xl =
+  let name_list =
+    (List.map Util.escape_html xl :> string list) |> String.concat " ,"
+  in
+  Output.print_sstring conf (Printf.sprintf "%s (%s)" name_list order_string)
+
+let print_one_surname_by_branch conf base x xl branches =
+  let title h =
+    if h || Util.p_getenv conf.Config.env "t" = Some "A" then
+      print_title conf
+        (Util.transl_nth conf "branch/branches" 1)
+        (Ext_string.Set.elements xl)
+    else
+      Ext_list.iter_first
+        (fun first x ->
+          if not first then Output.print_sstring conf ", ";
+          Output.print_sstring conf {|<a href="|};
+          Output.print_string conf (Util.commd conf);
+          Output.print_sstring conf {|m=N&t=A&v=|};
+          Output.print_string conf (Mutil.encode x);
+          Output.print_sstring conf {|">|};
+          Output.print_string conf (Util.escape_html x);
+          Output.print_sstring conf {|</a>|})
+        (Ext_string.Set.elements xl)
+  in
+  Hutil.header conf title;
+  Hutil.interp_no_header conf "list_by_branch"
+    {
+      Templ.eval_var =
+        (fun _ _ _ -> function
+          | [ "content" ] ->
+              print_one_surname_by_branch conf base x xl branches;
+              VVstring ""
+          | _ -> raise Not_found);
+      Templ.eval_transl = (fun _ -> raise Not_found);
+      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+      Templ.get_vother = Option.some;
+      Templ.set_vother = Fun.id;
+      Templ.print_foreach = (fun _ -> raise Not_found);
+    }
+    [] ();
   Hutil.trailer conf
 
 let print_several_possible_surnames x conf base (_, homonymes) =
@@ -706,21 +704,24 @@ let print_family_alphabetic x conf base liste =
   | [] -> surname_not_found conf x
   | _ ->
       let title h =
-        let access x =
-          if h || List.length homonymes = 1 then
-            (Util.escape_html x :> Adef.safe_string)
-          else
-            let open Def in
-            Util.geneweb_link conf
-              ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
-                :> Adef.escaped_string)
+        if h then
+          print_title conf (Util.transl conf "alphabetic order") homonymes
+        else
+          let access x =
+            if List.length homonymes = 1 then
               (Util.escape_html x :> Adef.safe_string)
-        in
-        Ext_list.iter_first
-          (fun first x ->
-            if not first then Output.print_sstring conf ", ";
-            Output.print_string conf (access x))
-          homonymes
+            else
+              let open Def in
+              Util.geneweb_link conf
+                ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
+                  :> Adef.escaped_string)
+                (Util.escape_html x :> Adef.safe_string)
+          in
+          Ext_list.iter_first
+            (fun first x ->
+              if not first then Output.print_sstring conf ", ";
+              Output.print_string conf (access x))
+            homonymes
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
