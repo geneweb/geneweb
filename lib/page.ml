@@ -16,6 +16,25 @@ module Last_name_search = struct
           { last_name; display_mode; exact })
         (Util.p_getenv env "v")
   end
+
+  let canonical_url ~conf (query_params : Query_params.t) =
+    let query =
+      let last_name =
+        ( "v",
+          (if query_params.exact then Fun.id else Name.lower)
+            query_params.last_name )
+      in
+      let display_mode, exact =
+        match query_params.display_mode with
+        | `Branch ->
+            ( None,
+              Ext_option.return_if query_params.exact (fun () -> ("t", "A")) )
+        | `List -> (Some ("o", "i"), None)
+      in
+      let open Ext_list.Infix in
+      ("m", "N") @:: last_name @:: exact @?: display_mode @?: []
+    in
+    Canonical_url.make ~conf ~query
 end
 
 module First_name_search = struct
