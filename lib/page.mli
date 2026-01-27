@@ -8,6 +8,8 @@ module Last_name_search : sig
 
     val from_env : Config.env -> t option
   end
+
+  val canonical_url : conf:Config.Trimmed.t -> Query_params.t -> Canonical_url.t
 end
 
 module First_name_search : sig
