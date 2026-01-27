@@ -693,12 +693,20 @@ let treat_request =
                      let pl, sosa_acc = find_all conf base n in
                      match pl with
                      | [] ->
-                         let sres =
-                           Geneweb.Search_name_display.search_surname conf base
-                             n
+                         let query_params =
+                           match
+                             Geneweb.Page.Last_name_search.Query_params.from_env
+                               (("v", Mutil.encode n) :: conf.env)
+                           with
+                           | None -> assert false
+                           | Some query_params -> query_params
                          in
-                         Geneweb.Search_name_display.surname_print conf base
-                           unknown sres n
+                         let sres =
+                           Geneweb.Search_name_display.search_surname
+                             ~exact:query_params.exact conf base n
+                         in
+                         Geneweb.Search_name_display.surname_print ~query_params
+                           conf base unknown sres
                      | [ p ] ->
                          if
                            sosa_acc
@@ -716,15 +724,33 @@ let treat_request =
                        match (real_input "fn", real_input "sn") with
                        | Some fn, Some sn -> search (fn ^ " " ^ sn)
                        | Some fn, None ->
-                           Geneweb.Search_name_display.first_name_print conf
-                             base fn
-                       | None, Some sn ->
-                           let sres =
-                             Geneweb.Search_name_display.search_surname conf
-                               base sn
+                           let query_params =
+                             match
+                               Geneweb.Page.First_name_search.Query_params
+                               .from_env
+                                 (("v", Mutil.encode fn) :: conf.env)
+                             with
+                             | None -> assert false
+                             | Some query_params -> query_params
                            in
-                           Geneweb.Search_name_display.surname_print conf base
-                             unknown sres sn
+                           Geneweb.Search_name_display.first_name_print
+                             ~query_params conf base
+                       | None, Some sn ->
+                           let query_params =
+                             match
+                               Geneweb.Page.Last_name_search.Query_params
+                               .from_env
+                                 (("v", Mutil.encode sn) :: conf.env)
+                             with
+                             | Some query_params -> query_params
+                             | None -> assert false
+                           in
+                           let sres =
+                             Geneweb.Search_name_display.search_surname
+                               ~exact:query_params.exact conf base sn
+                           in
+                           Geneweb.Search_name_display.surname_print
+                             ~query_params conf base unknown sres
                        | None, None -> incorrect_request conf base))
                | Some i ->
                    relation_print conf base
