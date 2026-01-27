@@ -2640,6 +2640,7 @@ let main () =
   Util.is_welcome := false;
   if cgi then (
     Wserver.cgi := true;
+    set_binary_mode_out stdout true;
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
         let len =
