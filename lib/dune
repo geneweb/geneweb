@@ -15,6 +15,7 @@
             geneweb_util
 	    geneweb_system_util
             geneweb_log
+            uri
             markup)
  (preprocess (pps ppx_deriving.show))
 )
