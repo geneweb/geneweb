@@ -670,9 +670,13 @@ val person_misc_names : base -> person -> (person -> title list) -> string list
 
 val p_first_name : base -> person -> string
 (** Returns first name of person. *)
+val p_first_name_raw : base -> person -> string
+(** Returns first name of person with declension data. *)
 
 val p_surname : base -> person -> string
 (** Returns surname of person *)
+val p_surname_raw : base -> person -> string
+(** Returns surname of person with declension data *)
 
 val children_of_p : base -> person -> iper list
 (** Returns list of children ids for every family for giving person *)

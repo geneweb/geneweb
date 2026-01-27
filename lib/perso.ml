@@ -3891,6 +3891,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if GWPARAM.p_auth_sp conf base p then
         Driver.p_first_name base p |> Util.escape_html |> safe_val
       else str_val (Util.private_txt conf "p")
+  | "first_name_raw" ->
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.p_first_name_raw base p |> Util.escape_html |> safe_val
+      else str_val (Util.private_txt conf "p")
   | "first_name_key" ->
       if hide_person conf base p then null_val
       else Driver.p_first_name base p |> Name.lower |> Mutil.encode |> safe_val

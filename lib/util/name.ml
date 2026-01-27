@@ -1,7 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 (* La liste des caractères interdits *)
-let forbidden_char = [ ':'; '@'; '#'; '='; '$' ]
+let forbidden_char = [ '@'; '#'; '='; '$' ]
 
 (* Name.lower *)
 
