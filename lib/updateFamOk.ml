@@ -13,6 +13,13 @@ let removed_string = ref []
 let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
+let with_lock conf fn =
+  let bfile = !GWPARAM.bpath conf.bname in
+  Lock.control
+    ~on_exn:(fun _exn _bt -> Update.error_locked conf)
+    ~wait:true ~lock_file:(Mutil.lock_file bfile)
+  @@ fn
+
 let reconstitute_parent_or_child conf var default_surname =
   let first_name = only_printable (getn conf var "fn") in
   let surname =
@@ -1250,6 +1257,7 @@ let print_add o_conf base =
     match check_family conf sfam scpl with
     | Some err, _ | _, Some err -> error_family conf err
     | None, None ->
+        with_lock conf @@ fun () ->
         let sfam, sdes = strip_family sfam sdes in
         let nsck = p_getenv conf.env "nsck" = Some "on" in
         let ifam, fam, cpl, des = effective_add conf base nsck sfam scpl sdes in
@@ -1416,6 +1424,7 @@ let print_mod o_conf base =
   in
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
+    with_lock conf @@ fun () ->
     let ofs = family_structure base sfam.fam_index in
     let nsck = p_getenv conf.env "nsck" = Some "on" in
     let ifam, fam, cpl, des = effective_mod conf base nsck sfam scpl sdes in
