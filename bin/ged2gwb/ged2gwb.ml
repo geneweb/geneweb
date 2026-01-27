@@ -1059,7 +1059,26 @@ let treat_notes gen rl =
 let treat_source gen r =
   if String.length r.rval > 0 && r.rval.[0] = '@' then
     match find_sources_record gen r.rval with
-      Some v -> strip_spaces v.rcont, v.rsons
+      Some v ->
+        let src =
+          let titl =
+            match find_field "TITL" v.rsons with
+              Some l -> rebuild_text l
+            | None -> ""
+          in
+          let text =
+            match find_field "TEXT" v.rsons with
+              Some l -> rebuild_text l
+            | None -> ""
+          in
+          let rcont = strip_spaces v.rcont in
+          if titl <> "" && text <> "" then "{" ^ titl ^ "} " ^ text
+          else if titl <> "" then titl
+          else if text <> "" then text
+          else if rcont <> "" then rcont
+          else r.rval
+        in
+        src, v.rsons
     | None ->
         print_location r.rpos;
         Printf.fprintf !log_oc "Source %s not found\n" r.rval;
