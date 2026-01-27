@@ -848,7 +848,7 @@ let skip_lang s =
   in
   loop
 
-let inline lang macro_char macro s =
+let _inline lang macro_char macro s =
   let lang = lang ^ ":" in
   let derived_lang =
     try
@@ -902,7 +902,7 @@ let inline lang macro_char macro s =
   in
   loop None true 0
 
-let language_name ?(sep = '/') lang lang_def =
+let _language_name ?(sep = '/') lang lang_def =
   let str = lang_def in
   let len = String.length lang in
   let rec loop beg i =
