@@ -87,7 +87,7 @@ let ged_month cal m =
 
 let encode opts s =
   match opts.Gwexport.charset with
-  | Gwexport.Ansel -> Ansel.of_iso_8859_1 @@ Mutil.iso_8859_1_of_utf_8 s
+  | Gwexport.Ansel -> Ansel.of_utf_8 s
   | Gwexport.Ascii | Gwexport.Ansi -> Mutil.iso_8859_1_of_utf_8 s
   | Gwexport.Utf8 -> s
 
@@ -160,24 +160,21 @@ let rec display_note_aux opts tagn s len i =
         (String.length (string_of_int (succ tagn) ^ " CONC "))
         i)
     else (* continue same gedcom line *)
-      (* FIXME: Rewrite this so we can get rid of this custom [nbc] *)
-      let nbc c =
-        if Char.code c < 0b10000000 then 1
-        else if Char.code c < 0b11000000 then -1
-        else if Char.code c < 0b11100000 then 2
-        else if Char.code c < 0b11110000 then 3
-        else if Char.code c < 0b11111000 then 4
-        else if Char.code c < 0b11111100 then 5
-        else if Char.code c < 0b11111110 then 6
-        else -1
+      let is_utf8_continuation c =
+        let b = Char.code c in
+        b >= 0x80 && b < 0xC0
       in
-      (* FIXME: avoid this buffer *)
       let b = Buffer.create 4 in
       let rec output_onechar () =
-        if !j = String.length s then decr j (* non wide char / UTF-8 char *)
+        if !j = String.length s then decr j
+        else if opts.Gwexport.charset = Gwexport.Ansel then (
+          Buffer.add_char b s.[!j];
+          if is_utf8_continuation s.[!j] && !j + 1 < String.length s then (
+            incr j;
+            Buffer.add_char b s.[!j]))
         else if opts.Gwexport.charset <> Gwexport.Utf8 then
-          Buffer.add_char b s.[i] (* 1 to 4 bytes UTF-8 wide char *)
-        else if i = !j || nbc s.[!j] = -1 then (
+          Buffer.add_char b s.[i]
+        else if i = !j || is_utf8_continuation s.[!j] then (
           Buffer.add_char b s.[!j];
           incr j;
           output_onechar ())
