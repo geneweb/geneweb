@@ -89,3 +89,25 @@ val cdate_of_od : date option -> cdate
 (** Optional date to [cdate] *)
 
 (* TODO date_to_dmy? *)
+
+val to_sdn : from:calendar -> ?lower:bool -> dmy -> int
+(** Convert [dmy] in calendar [from] to SDN (Serial Day Number). For partial
+    dates (day=0 or month=0), returns lower bound by default. Set [lower:false]
+    for upper bound. Includes [delta] in result. *)
+
+val convert : from:calendar -> to_:calendar -> dmy -> dmy
+(** Convert [dmy] between calendars via Gregorian pivot. Partial dates pass
+    through unchanged (no valid SDN representation). Preserves [prec] including
+    OrYear/YearInt variants. *)
+
+val gregorian_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to Gregorian [dmy] with given precision. *)
+
+val julian_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to Julian [dmy] with given precision. *)
+
+val french_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to French Republican [dmy] with given precision. *)
+
+val hebrew_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to Hebrew [dmy] with given precision. *)

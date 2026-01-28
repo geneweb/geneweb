@@ -34,6 +34,9 @@ let dmy_of_dmy2 { Def.day2; month2; year2; delta2 } =
     delta = delta2;
   }
 
+let dmy2_of_dmy { Def.day; month; year; delta; _ } =
+  { Def.day2 = day; month2 = month; year2 = year; delta2 = delta }
+
 let convert_via_sdn from_sdn to_of_sdn d =
   let convert_dmy2 d2 =
     if d2.Def.day2 = 0 || d2.Def.month2 = 0 then d2
