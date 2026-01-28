@@ -1,3 +1,7 @@
+val cons_opt : 'a option -> 'a list -> 'a list
+(** [cons_opt None xs] is [xs] and [cons_opt (Some x) xs] is [x ::
+    xs].  *)
+
 val take : 'a list -> int -> 'a list
 (** [take l n] returns the first [n] elements of [l].  *)
 
@@ -81,3 +85,12 @@ val groupby :
     Group the elements returning the same key together.
     Ordering of elements is unspecified.
  *)
+
+module Infix : sig
+  val ( @?: ) : 'a option -> 'a list -> 'a list
+  (** [ x @?: xs] is [cons_opt x xs].  *)
+
+  val ( @:: ) : 'a -> 'a list -> 'a list
+  (** [x @:: xs] is [x :: xs], but can be combined with [( @?: )]
+      without extra parentheses.  *)
+end
