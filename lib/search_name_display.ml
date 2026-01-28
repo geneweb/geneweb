@@ -582,11 +582,13 @@ let print_title conf order_string xl =
   Output.print_sstring conf (Printf.sprintf "%s (%s)" name_list order_string)
 
 let print_one_surname_by_branch conf base x xl branches =
+  let names = Ext_string.Set.elements xl in
+  let name_list_str =
+    (List.map Util.escape_html names :> string list) |> String.concat " ,"
+  in
   let title h =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
-      print_title conf
-        (Util.transl_nth conf "branch/branches" 1)
-        (Ext_string.Set.elements xl)
+      print_title conf (Util.transl_nth conf "branch/branches" 1) names
     else
       Ext_list.iter_first
         (fun first x ->
@@ -600,7 +602,19 @@ let print_one_surname_by_branch conf base x xl branches =
           Output.print_sstring conf {|</a>|})
         (Ext_string.Set.elements xl)
   in
-  Hutil.header conf title;
+  let meta =
+    [
+      {
+        Hutil.name = "description";
+        content =
+          Utf8.capitalize_fst
+            (Printf.sprintf
+               (Util.ftransl conf "%s %s surname_list_meta_description")
+               name_list_str (Gwdb.bname base));
+      };
+    ]
+  in
+  Hutil.header_with_meta conf title meta;
   Hutil.interp_no_header conf "list_by_branch"
     {
       Templ.eval_var =
@@ -723,7 +737,23 @@ let print_family_alphabetic x conf base liste =
               Output.print_string conf (access x))
             homonymes
       in
-      Hutil.header conf title;
+      let meta =
+        let homonymes_str =
+          (List.map Util.escape_html homonymes :> string list)
+          |> String.concat " ,"
+        in
+        [
+          {
+            Hutil.name = "description";
+            content =
+              Utf8.capitalize_fst
+                (Printf.sprintf
+                   (Util.ftransl conf "%s %s surname_list_meta_description")
+                   homonymes_str (Gwdb.bname base));
+          };
+        ]
+      in
+      Hutil.header_with_meta conf title meta;
       Hutil.print_link_to_welcome conf true;
       (* Si on est dans un calcul de parenté, on affiche *)
       (* l'aide sur la sélection d'un individu.          *)
