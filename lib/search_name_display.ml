@@ -378,11 +378,10 @@ let has_children_with_that_name conf base des name =
 (* List selection bullets *)
 
 let bullet_sel_txt = Adef.safe "o"
-let bullet_unsel_txt = Adef.safe "+"
 let bullet_nosel_txt = Adef.safe "o"
 
 let print_selection_bullet conf = function
-  | Some (txt, sel) ->
+  | Some (txt, _) ->
       Output.print_sstring conf
       @@ Printf.sprintf {|<a class="selection_bullet" data-famid="%s">%s</a>|}
            (Adef.as_string txt)
@@ -511,7 +510,7 @@ let print_one_branch conf base bh psn =
     Output.print_sstring conf "</ul></li>");
   Output.print_sstring conf "</ul>"
 
-let print_one_surname_by_branch conf base x xl (bhl, str) =
+let print_one_surname_by_branch conf base x (bhl, str) =
   let ancestors =
     match Util.p_getenv conf.Config.env "order" with
     | Some "d" ->
@@ -623,7 +622,7 @@ let print_one_surname_by_branch conf base x xl branches =
       Templ.eval_var =
         (fun _ _ _ -> function
           | [ "content" ] ->
-              print_one_surname_by_branch conf base x xl branches;
+              print_one_surname_by_branch conf base x branches;
               VVstring ""
           | _ -> raise Not_found);
       Templ.eval_transl = (fun _ -> raise Not_found);
