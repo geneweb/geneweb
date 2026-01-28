@@ -8,7 +8,7 @@ body {
 %end;
 
 .navbar.fixed-top {
-  background-color: rgba(255, 255, 255, 0.95) !important; /* Slightly transparent background */
+  background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent background */
   backdrop-filter: blur(5px); /* Blur effect for content underneath */
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
@@ -50,6 +50,13 @@ body {
   margin-top: 1rem;
 }
 
+@media (max-width: 991px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+}
+
 .editor-main {
   height: 100%;
 }
@@ -71,7 +78,7 @@ body {
 }
 
 .navbar {
-  border-bottom: none !important;
+  border-bottom: none;
 }
 
 .toolbar-centered {
@@ -205,7 +212,7 @@ body {
           </div>
         %if;(e.m="MOD_NOTES")
           <div class="nav-item mr-2">
-            <a class="nav-link" data-toggle="modal" data-target="#init_gallery" href="javascript:;" onclick="init_tool();" title="Initialise imagemap">
+            <a class="nav-link" data-toggle="modal" data-target="#init_gallery" href="#init_gallery" title="Initialise imagemap">
               <i class="fa fa-images"></i> Imap
             </a>
           </div>
@@ -216,8 +223,8 @@ body {
   </div>
 </nav>
 %if;(e.m="MOD_NOTES")
-<div class="modal fade" id="init_gallery" tabindex="-1" role="dialog" aria-labbelledby="init_gallery_label" aria-hidden="true">
-  <div class="modal-dialog role="document">
+<div class="modal fade" id="init_gallery" tabindex="-1" role="dialog" aria-labelledby="init_gallery_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="init_gallery_label">[*create::image map]</h5>
@@ -256,14 +263,13 @@ body {
 </div>
 <script>
 function init_gallery() {
-  var title = $("#page_title").val();
-  var fname = $("#fname").val();
-  var res = {
-    "title": title,
-    "img": fname,
-  };
-  $("#notes_comments").val( "TITLE=" + title +"\nTYPE=gallery\n" + JSON.stringify(res, null, 2) );
-  $('#init_gallery').modal('hide')
+  const title = document.getElementById('page_title').value;
+  const fname = document.getElementById('fname').value;
+  const galleryData = { title, img: fname };
+  const galleryJson = JSON.stringify(galleryData, null, 2);
+  document.getElementById('notes_comments').value =
+    `TITLE=${title}\nTYPE=gallery\n${galleryJson}`;
+  $(document.getElementById('init_gallery')).modal('hide');
 }
 </script>
 %end;
