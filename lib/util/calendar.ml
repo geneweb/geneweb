@@ -1,29 +1,31 @@
-(* TODO this is probably buggy,
-   because geneweb uses month|day = 0 for incomplete dates *)
-(** Convert [Adef.date] to Calendars.d *)
-let to_calendars : Def.dmy -> Calendars.d =
- fun { Def.day; month; year; delta; _ } -> { Calendars.day; month; year; delta }
+let to_calendar_date kind { Def.day; month; year; delta; _ } =
+  let day = max 1 day in
+  let month = max 1 month in
+  match Calendars.make kind ~day ~month ~year ~delta with
+  | Ok d -> d
+  | Error err ->
+      failwith
+        (Printf.sprintf "Invalid date: %s"
+           (Calendars.Unsafe.to_string err.value))
 
-(** Convert Calendars.d to [Adef.date] *)
-let of_calendars : ?prec:Def.precision -> Calendars.d -> Def.dmy =
- fun ?(prec = Def.Sure) { Calendars.day; month; year; delta } ->
+let of_calendars : type a. ?prec:Def.precision -> a Calendars.date -> Def.dmy =
+ fun ?(prec = Def.Sure) { Calendars.day; month; year; delta; _ } ->
   { Def.day; month; year; delta; prec }
 
-let sdn_of_gregorian (d : Def.dmy) =
-  Calendars.sdn_of_gregorian @@ to_calendars d
+let sdn_of_gregorian d =
+  Calendars.to_sdn (to_calendar_date Calendars.Gregorian d)
 
 let gregorian_of_sdn prec sdn =
-  of_calendars ~prec @@ Calendars.gregorian_of_sdn sdn
+  of_calendars ~prec (Calendars.gregorian_of_sdn sdn)
 
-let sdn_of_julian (d : Def.dmy) = Calendars.sdn_of_julian @@ to_calendars d
-let julian_of_sdn prec sdn = of_calendars ~prec @@ Calendars.julian_of_sdn sdn
-let sdn_of_french (d : Def.dmy) = Calendars.sdn_of_french @@ to_calendars d
-let french_of_sdn prec sdn = of_calendars ~prec @@ Calendars.french_of_sdn sdn
-let sdn_of_hebrew (d : Def.dmy) = Calendars.sdn_of_hebrew @@ to_calendars d
-let hebrew_of_sdn prec sdn = of_calendars ~prec @@ Calendars.hebrew_of_sdn sdn
+let sdn_of_julian d = Calendars.to_sdn (to_calendar_date Calendars.Julian d)
+let julian_of_sdn prec sdn = of_calendars ~prec (Calendars.julian_of_sdn sdn)
+let sdn_of_french d = Calendars.to_sdn (to_calendar_date Calendars.French d)
+let french_of_sdn prec sdn = of_calendars ~prec (Calendars.french_of_sdn sdn)
+let sdn_of_hebrew d = Calendars.to_sdn (to_calendar_date Calendars.Hebrew d)
+let hebrew_of_sdn prec sdn = of_calendars ~prec (Calendars.hebrew_of_sdn sdn)
 
-let dmy_of_dmy2 : Def.dmy2 -> Def.dmy =
- fun { Def.day2; month2; year2; delta2 } ->
+let dmy_of_dmy2 { Def.day2; month2; year2; delta2 } =
   {
     Def.day = day2;
     month = month2;
@@ -32,30 +34,47 @@ let dmy_of_dmy2 : Def.dmy2 -> Def.dmy =
     delta = delta2;
   }
 
-let aux fn (d : Def.dmy) : Def.dmy =
-  let aux2 d2 =
-    let d = of_calendars @@ fn @@ to_calendars @@ dmy_of_dmy2 d2 in
-    {
-      Def.day2 = d.Def.day;
-      month2 = d.Def.month;
-      year2 = d.Def.year;
-      delta2 = d.Def.delta;
-    }
+let convert_via_sdn from_sdn to_of_sdn d =
+  let convert_dmy2 d2 =
+    if d2.Def.day2 = 0 || d2.Def.month2 = 0 then d2
+    else
+      let sdn = from_sdn (dmy_of_dmy2 d2) in
+      let c = of_calendars (to_of_sdn sdn) in
+      {
+        Def.day2 = c.Def.day;
+        month2 = c.Def.month;
+        year2 = c.Def.year;
+        delta2 = c.Def.delta;
+      }
   in
   let prec =
     match d.Def.prec with
-    | Def.OrYear d2 -> Def.OrYear (aux2 d2)
-    | Def.YearInt d2 -> Def.YearInt (aux2 d2)
+    | Def.OrYear d2 -> Def.OrYear (convert_dmy2 d2)
+    | Def.YearInt d2 -> Def.YearInt (convert_dmy2 d2)
     | prec -> prec
   in
-  of_calendars ~prec @@ fn @@ to_calendars d
+  if d.Def.day = 0 || d.Def.month = 0 then { d with Def.prec }
+  else
+    let sdn = from_sdn d in
+    of_calendars ~prec (to_of_sdn sdn)
 
-let gregorian_of_julian = aux Calendars.gregorian_of_julian
-let julian_of_gregorian = aux Calendars.julian_of_gregorian
-let gregorian_of_french = aux Calendars.gregorian_of_french
-let french_of_gregorian = aux Calendars.french_of_gregorian
-let gregorian_of_hebrew = aux Calendars.gregorian_of_hebrew
-let hebrew_of_gregorian = aux Calendars.hebrew_of_gregorian
+let gregorian_of_julian d =
+  convert_via_sdn sdn_of_julian Calendars.gregorian_of_sdn d
+
+let julian_of_gregorian d =
+  convert_via_sdn sdn_of_gregorian Calendars.julian_of_sdn d
+
+let gregorian_of_french d =
+  convert_via_sdn sdn_of_french Calendars.gregorian_of_sdn d
+
+let french_of_gregorian d =
+  convert_via_sdn sdn_of_gregorian Calendars.french_of_sdn d
+
+let gregorian_of_hebrew d =
+  convert_via_sdn sdn_of_hebrew Calendars.gregorian_of_sdn d
+
+let hebrew_of_gregorian d =
+  convert_via_sdn sdn_of_gregorian Calendars.hebrew_of_sdn d
 
 type moon_phase = Calendars.moon_phase =
   | NewMoon
