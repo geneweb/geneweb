@@ -471,82 +471,208 @@ let eval_var_handled conf sl =
       Printf.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
     Printf.sprintf " %%%s?" (String.concat "." sl)
 
-let apply_format conf nth s1 s2 =
-  let s1 =
-    (* perform nth selection before format check *)
+let split_at_triple_colon s =
+  (* Cherche ::: dans la chaîne *)
+  let rec find i =
+    if i >= String.length s - 2 then None
+    else if i + 2 < String.length s && 
+            s.[i] = ':' && s.[i+1] = ':' && s.[i+2] = ':' then
+      Some (String.sub s 0 i, 
+            String.sub s (i + 3) (String.length s - i - 3))
+    else
+      find (i + 1)
+  in
+  find 0
+
+let is_case_letter c =
+  (* Lettres de cas grammatical *)
+  List.mem c ['a'; 'g'; 'd'; 'i'; 'l'; 'v'; 'n']
+
+let parse_format_with_declension s =
+  (* Parse "přidat :a:%s" *)
+  (* Retourne ("přidat %s", Some 'a') *)
+  (* Gère aussi plusieurs déclinaisons: "between :a:%s and :g:%s" *)
+  
+  let rec find_all_declensions acc i =
+    if i >= String.length s - 2 then (s, List.rev acc)
+    else if s.[i] = ':' && i + 2 < String.length s && 
+            is_case_letter s.[i+1] && s.[i+2] = ':' then
+      (* Trouvé :x: *)
+      find_all_declensions (s.[i+1] :: acc) (i + 3)
+    else
+      find_all_declensions acc (i + 1)
+  in
+  
+  let s_format, declensions = find_all_declensions [] 0 in
+  
+  (* Supprimer tous les :x: de la chaîne *)
+  let s_cleaned = 
+    let rec remove_declensions str =
+      let rec find i =
+        if i >= String.length str - 2 then str
+        else if str.[i] = ':' && i + 2 < String.length str && 
+                is_case_letter str.[i+1] && str.[i+2] = ':' then
+          (* Supprimer :x: *)
+          let before = String.sub str 0 i in
+          let after = String.sub str (i + 3) (String.length str - i - 3) in
+          remove_declensions (before ^ after)
+        else
+          find (i + 1)
+      in
+      find 0
+    in
+    remove_declensions s_format
+  in
+  
+  (s_cleaned, declensions)
+
+let split_parameters s =
+  (* Sépare les paramètres en respectant :x: comme déclinaison *)
+  
+  let rec loop acc current i in_declension =
+    if i >= String.length s then
+      if current = "" then List.rev acc else List.rev (current :: acc)
+    else if s.[i] = ':' then
+      if in_declension then
+        (* Fin de :x: *)
+        loop acc (current ^ ":") (i + 1) false
+      else if i + 2 < String.length s && 
+              is_case_letter s.[i+1] && 
+              s.[i+2] = ':' then
+        (* Début de :x: *)
+        loop acc (current ^ ":") (i + 1) true
+      else
+        (* Séparateur de paramètres *)
+        if current = "" then
+          loop acc "" (i + 1) false
+        else
+          loop (current :: acc) "" (i + 1) false
+    else
+      loop acc (current ^ String.make 1 s.[i]) (i + 1) in_declension
+  in
+  loop [] "" 0 false
+
+
+let rec apply_format conf nth s1 s2 =
+  (* s1 = clé du lexique (peut contenir :x:) *)
+  (* s2 = paramètre(s) (peut contenir déclinaisons, variables, traductions) *)
+  
+  (* 1. Traduire s1 depuis le lexique *)
+  let s1_translated =
     match nth with
     | Some n -> Util.transl_nth conf s1 n
     | None -> Util.transl conf s1
   in
-  if not (String.contains s1 '%') then s1
+  Printf.eprintf "S1 translated : %s\n" s1_translated;
+  (* 2. Extraire les déclinaisons de s1_translated *)
+  let s1_format, declensions = parse_format_with_declension s1_translated in
+  
+  (* 3. Si pas de format, retourner directement *)
+  if not (String.contains s1_format '%') then s1_format
   else
     try
-      match Util.check_format "%t" s1 with
-      | Some s3 -> Printf.sprintf s3 (fun _ -> s2)
-      | None -> (
-          match Util.check_format "%s" s1 with
-          | Some s3 -> Printf.sprintf s3 s2
-          | None -> (
-              match Util.check_format "%d" s1 with
-              | Some s3 -> Printf.sprintf s3 (int_of_string s2)
-              | None -> (
-                  let s21, s22 =
-                    try
-                      let i = String.index s2 ':' in
-                      ( String.sub s2 0 i,
-                        String.sub s2 (i + 1) (String.length s2 - i - 1) )
-                    with _ -> ("", "")
-                  in
-                  match Util.check_format "%s%s" s1 with
-                  | Some s3 -> Printf.sprintf s3 s21 s22
-                  | None -> (
-                      match Util.check_format "%t%s" s1 with
-                      | Some s3 -> Printf.sprintf s3 (fun _ -> s21) s22
-                      | None -> (
-                          match Util.check_format "%d%s" s1 with
-                          | Some s3 -> Printf.sprintf s3 (int_of_string s21) s22
-                          | None -> (
-                              match Util.check_format "%s%t" s1 with
-                              | Some s3 -> Printf.sprintf s3 s21 (fun _ -> s22)
-                              | None -> (
-                                  match Util.check_format "%t%t" s1 with
-                                  | Some s3 ->
-                                      Printf.sprintf s3
-                                        (fun _ -> s21)
-                                        (fun _ -> s22)
-                                  | None -> (
-                                      match Util.check_format "%d%t" s1 with
-                                      | Some s3 ->
-                                          Printf.sprintf s3 (int_of_string s21)
-                                            (fun _ -> s22)
-                                      | None -> (
-                                          match Util.check_format "%s%d" s1 with
-                                          | Some s3 ->
-                                              Printf.sprintf s3 s21
-                                                (int_of_string s22)
-                                          | None -> (
-                                              match
-                                                Util.check_format "%t%d" s1
-                                              with
-                                              | Some s3 ->
-                                                  Printf.sprintf s3
-                                                    (fun _ -> s21)
-                                                    (int_of_string s22)
-                                              | None -> (
-                                                  match
-                                                    Util.check_format "%d%d" s1
-                                                  with
-                                                  | Some s3 ->
-                                                      Printf.sprintf s3
-                                                        (int_of_string s21)
-                                                        (int_of_string s22)
-                                                  | None -> "[" ^ s1 ^ "?]")))))
-                              ))))))
-    with _ ->
-      Log.warn (fun k -> k "Format error in %s\n" s1);
-      s1
+      (* 4. Séparer s2 en paramètres *)
+      let params = 
+        if s2 = "" then []
+        else split_parameters s2
+      in
+      List.iter (fun p -> Printf.eprintf "Params: %s\n" p) params;
 
-let rec eval_ast conf Ast.{ desc; _ } =
+      (* 5. Évaluer chaque paramètre (variables, traductions) *)
+      let params_evaluated = List.map (eval_param_internal conf) params in
+      List.iter (fun p -> Printf.eprintf "Declensions: %c\n" p) declensions;
+      List.iter (fun p -> Printf.eprintf "P evaluated: %s\n" p) params_evaluated;
+
+      (* 6. Appliquer les déclinaisons aux paramètres *)
+      let params_declined = 
+        if List.length declensions = 0 then
+          params_evaluated
+        else
+          List.map2 (fun param case ->
+            Printf.eprintf "Decline: %c %s\n" case param;
+            let result = Mutil.decline case param in
+            Printf.eprintf "Result: %s\n" result;
+            Translate.eval result
+          ) params_evaluated declensions
+      in
+      
+      List.iter (fun p -> Printf.eprintf "P declined: %s\n" p) params_declined;
+      
+      (* 7. Appliquer le format selon le nombre de paramètres *)
+      match List.length params_declined with
+      | 0 -> s1_format
+      | 1 -> (
+          let p1 = List.nth params_declined 0 in
+          match Util.check_format "%t" s1_format with
+          | Some s3 -> Printf.sprintf s3 (fun _ -> p1)
+          | None -> (
+              match Util.check_format "%s" s1_format with
+              | Some s3 -> Printf.sprintf s3 p1
+              | None -> (
+                  match Util.check_format "%d" s1_format with
+                  | Some s3 -> Printf.sprintf s3 (int_of_string p1)
+                  | None -> "[" ^ s1_format ^ "?]")))
+      | 2 -> (
+          let p1 = List.nth params_declined 0 in
+          let p2 = List.nth params_declined 1 in
+          match Util.check_format "%s%s" s1_format with
+          | Some s3 -> Printf.sprintf s3 p1 p2
+          | None -> (
+              match Util.check_format "%t%s" s1_format with
+              | Some s3 -> Printf.sprintf s3 (fun _ -> p1) p2
+              | None -> (
+                  match Util.check_format "%d%s" s1_format with
+                  | Some s3 -> Printf.sprintf s3 (int_of_string p1) p2
+                  | None -> (
+                      match Util.check_format "%s%t" s1_format with
+                      | Some s3 -> Printf.sprintf s3 p1 (fun _ -> p2)
+                      | None -> (
+                          match Util.check_format "%t%t" s1_format with
+                          | Some s3 -> 
+                              Printf.sprintf s3 (fun _ -> p1) (fun _ -> p2)
+                          | None -> (
+                              match Util.check_format "%d%t" s1_format with
+                              | Some s3 -> 
+                                  Printf.sprintf s3 (int_of_string p1) (fun _ -> p2)
+                              | None -> (
+                                  match Util.check_format "%s%d" s1_format with
+                                  | Some s3 -> 
+                                      Printf.sprintf s3 p1 (int_of_string p2)
+                                  | None -> (
+                                      match Util.check_format "%t%d" s1_format with
+                                      | Some s3 -> 
+                                          Printf.sprintf s3 (fun _ -> p1) (int_of_string p2)
+                                      | None -> (
+                                          match Util.check_format "%d%d" s1_format with
+                                          | Some s3 -> 
+                                              Printf.sprintf s3 
+                                                (int_of_string p1) 
+                                                (int_of_string p2)
+                                          | None -> "[" ^ s1_format ^ "?]")))))))))
+      | _ -> "[" ^ s1_format ^ "?]"  (* Plus de 2 paramètres non supporté *)
+      
+    with _ ->
+      Log.warn (fun k -> k "Format error in %s\n" s1_format);
+      s1_format
+
+and eval_param_internal conf s =
+  (* Évalue un paramètre qui peut contenir :
+     - des variables : %first_name_raw;
+     - des traductions : [parent/parents]n
+     - du texte brut : Henri
+  *)
+  
+  (* Si contient des variables ou traductions, parser *)
+  if String.contains s '%' || String.contains s '[' then
+    let astl =
+      Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
+        (`Raw s)
+    in
+    List.fold_left (fun acc a -> acc ^ eval_ast conf a) "" astl
+  else
+    s
+
+and eval_ast conf Ast.{ desc; _ } =
   match desc with
   | Ast.Atext s -> s
   | Avar (s, sl) -> eval_var_handled conf (s :: sl)
@@ -554,14 +680,17 @@ let rec eval_ast conf Ast.{ desc; _ } =
   | ast -> not_impl "eval_ast" ast
 
 and eval_transl conf upp s c =
+  Printf.eprintf "\nEval transl %s, %s\n" c s;
   if c = "" && String.length s > 0 && s.[0] = '\n' then
     eval_transl_inline conf s
   else eval_transl_lexicon conf upp s c
 
 and eval_transl_inline conf s =
+  Printf.eprintf "Eval transl inline %s\n" s; flush stderr;
   fst @@ Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
 
 and eval_transl_lexicon conf upp s c =
+  Printf.eprintf "Eval transl lexicon %s, %s\n" c s; flush stderr;
   let c_opt = [ '0'; '1'; '2'; '3'; 'n'; 's'; 'w'; 'f'; 'c'; 'e'; 't' ] in
   let scan_for_transl s c i =
     (* scans starting at i for bracketed translation [to be translated] *)
@@ -594,6 +723,86 @@ and eval_transl_lexicon conf upp s c =
           String.sub s (k + 2) (String.length s - k - 2)
         else String.sub s (k + 1) (String.length s - k - 1) )
   in
+
+  let r =
+    let nth = try Some (int_of_string c) with Failure _ -> None in
+    
+    (* NOUVEAU : Vérifier si nouvelle syntaxe [key:::param] *)
+    match split_at_triple_colon s with
+    | Some (key, param) ->
+        Printf.eprintf "Nouvelle syntaxe détectée: key=%s, param=%s\n" key param;
+        flush stderr;
+        
+        (* Évaluer le paramètre (peut contenir variables, traductions) *)
+        let param_evaluated = eval_param_internal conf param in
+        Printf.eprintf "Paramètre évalué: %s\n" param_evaluated; flush stderr;
+        
+        (* Appliquer le format avec déclinaisons *)
+        apply_format conf nth key param_evaluated
+    
+    | None ->
+        (* ANCIEN : Comportement existant *)
+        match split_at_coloncolon s with
+        | None -> (
+            try apply_format conf nth s ""
+            with Failure _ -> raise Not_found
+        )
+        | Some (s1, s2) -> (
+            Printf.eprintf "S1: %s, s2: %s\n" s1 s2; flush stderr;
+            try
+              if String.length s2 > 0 && s2.[0] = '|' then
+                let i = 1 in
+                let j = String.rindex s2 '|' in
+                if j = 0 then
+                  (* missing second | *)
+                  let s2 = String.sub s2 i (String.length s2 - j - 1) in
+                  Printf.eprintf "Apply format 1 %d %s, %s\n" (Option.value ~default:0 nth) s1 s2; flush stderr;
+                  try apply_format conf nth s1 s2
+                  with Failure _ -> raise Not_found
+                else
+                  let s3 =
+                    let s = String.sub s2 i (j - i) in
+                    (* scan s for potential translates *)
+                    let _k, s =
+                      let rec loop (k, s) =
+                        let k, s = scan_for_transl s c k in
+                        if k = -1 then (k, s) else loop (k, s)
+                      in
+                      loop (0, s)
+                    in
+                    let astl =
+                      Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
+                        (`Raw s)
+                    in
+                    (* parse_templ handles only text, evars and translations *)
+                    (* more complex parsing (%surname;, %if; ...) not available *)
+                    List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
+                  in
+                  let s4 = String.sub s2 (j + 1) (String.length s2 - j - 1) in
+                  let s2 = s3 ^ s4 in
+                  Printf.eprintf "Apply format 2 %d %s, %s\n" (Option.value ~default:0 nth) s1 s2; flush stderr;
+                  try apply_format conf nth s1 s2
+                  with Failure _ -> raise Not_found
+              else if String.length s2 > 0 && s2.[0] = ':' then
+                (* this is a third colon *)
+                let s2 = String.sub s2 1 (String.length s2 - 1) in
+                Printf.eprintf "Apply format 3 %d %s, %s\n" (Option.value ~default:0 nth) s1 s2; flush stderr;
+                try apply_format conf nth s1 s2 with Failure _ -> raise Not_found
+              else raise Not_found
+            with Not_found ->
+              let s3 =
+                match nth with
+                | Some n -> Util.transl_nth conf s2 n
+                | None -> if s2 = "" then "" else Util.transl conf s2
+              in
+              Util.transl_decline conf s1 s3)
+  in
+  let r = Util.simple_decline conf r in
+  let r = Util.translate_eval r in
+  if upp then Utf8.capitalize_fst r else r
+
+
+(*
   let r =
     let nth = try Some (int_of_string c) with Failure _ -> None in
     match split_at_coloncolon s with
@@ -605,6 +814,7 @@ and eval_transl_lexicon conf upp s c =
              nominative expects a : in the string ! *)
         )
     | Some (s1, s2) -> (
+        Printf.eprintf "S1: %s, s2: %s\n" s1 s2; flush stderr;
         try
           if String.length s2 > 0 && s2.[0] = '|' then
             let i = 1 in
@@ -612,6 +822,7 @@ and eval_transl_lexicon conf upp s c =
             if j = 0 then
               (* missing second | *)
               let s2 = String.sub s2 i (String.length s2 - j - 1) in
+              Printf.eprintf "Apply format 1 %d %s, %s\n" (Option.value ~default:0 nth) s1 s2; flush stderr;
               try apply_format conf nth s1 s2
               with Failure _ -> raise Not_found
             else
@@ -635,11 +846,13 @@ and eval_transl_lexicon conf upp s c =
               in
               let s4 = String.sub s2 (j + 1) (String.length s2 - j - 1) in
               let s2 = s3 ^ s4 in
+              Printf.eprintf "Apply format 2 %d %s, %s\n" (Option.value ~default:0 nth) s1 s2; flush stderr;
               try apply_format conf nth s1 s2
               with Failure _ -> raise Not_found
           else if String.length s2 > 0 && s2.[0] = ':' then
             (* this is a third colon *)
             let s2 = String.sub s2 1 (String.length s2 - 1) in
+            Printf.eprintf "Apply format 3 %d %s, %s\n" (Option.value ~default:0 nth) s1 s2; flush stderr;
             try apply_format conf nth s1 s2 with Failure _ -> raise Not_found
           else raise Not_found
         with Not_found ->
@@ -653,6 +866,8 @@ and eval_transl_lexicon conf upp s c =
   let r = Util.simple_decline conf r in
   let r = Util.translate_eval r in
   if upp then Utf8.capitalize_fst r else r
+*)
+
 
 let templ_eval_var (conf : Config.config) = function
   | [ "browsing_with_sosa_ref" ] -> (
