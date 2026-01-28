@@ -1,3 +1,14 @@
+(* Calendar conversions using Calendars library (>= 2.0.0)
+   
+   This module wraps the external Calendars library to provide
+   conversions between Geneweb's Def.dmy type and Serial Day Numbers (SDN).
+   
+   SDN (Serial Day Number) is a day numbering system where:
+   - SDN 1 = November 25, 4714 BC (Gregorian proleptic)
+   - Enables calendar-neutral date arithmetic
+   - Used for inter-calendar conversions
+*)
+
 val gregorian_of_sdn : Def.precision -> int -> Def.dmy
 (** Returns date of gregorian calendar from SDN and specified precision. *)
 

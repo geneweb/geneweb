@@ -21,7 +21,7 @@
     (ocaml (>= 4.10))
     (alcotest :with-test)
     benchmark
-    (calendars (= "1.0.0"))
+    (calendars (>= "2.0.0"))
     (camlp5 (>= "8.03.00"))
     camlp-streams
     cppo
