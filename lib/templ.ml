@@ -603,54 +603,74 @@ let rec apply_format conf nth s1 s2 =
       | 0 -> s1_format
       | 1 -> (
           let p1 = List.nth params_declined 0 in
-          match Util.check_format "%t" s1_format with
-          | Some s3 -> Printf.sprintf s3 (fun _ -> p1)
-          | None -> (
-              match Util.check_format "%s" s1_format with
-              | Some s3 -> Printf.sprintf s3 p1
-              | None -> (
-                  match Util.check_format "%d" s1_format with
-                  | Some s3 -> Printf.sprintf s3 (int_of_string p1)
-                  | None -> "[" ^ s1_format ^ "?]")))
+          
+          let try_format fmt apply_fn =
+            match Util.check_format fmt s1_format with
+            | Some s3 -> Some (apply_fn s3)
+            | None -> None
+          in
+          
+          match try_format "%t" (fun s3 -> Printf.sprintf s3 (fun _ -> p1)) with
+          | Some r -> r
+          | None ->
+              match try_format "%s" (fun s3 -> Printf.sprintf s3 p1) with
+              | Some r -> r
+              | None ->
+                  match try_format "%d" (fun s3 -> Printf.sprintf s3 (int_of_string p1)) with
+                  | Some r -> r
+                  | None -> "[" ^ s1_format ^ "?]")
       | 2 -> (
           let p1 = List.nth params_declined 0 in
           let p2 = List.nth params_declined 1 in
-          match Util.check_format "%s%s" s1_format with
-          | Some s3 -> Printf.sprintf s3 p1 p2
-          | None -> (
+          
+          let format_attempts = [
+            (fun () ->
+              match Util.check_format "%s%s" s1_format with
+              | Some s3 -> Some (Printf.sprintf s3 p1 p2)
+              | None -> None);
+            (fun () ->
               match Util.check_format "%t%s" s1_format with
-              | Some s3 -> Printf.sprintf s3 (fun _ -> p1) p2
-              | None -> (
-                  match Util.check_format "%d%s" s1_format with
-                  | Some s3 -> Printf.sprintf s3 (int_of_string p1) p2
-                  | None -> (
-                      match Util.check_format "%s%t" s1_format with
-                      | Some s3 -> Printf.sprintf s3 p1 (fun _ -> p2)
-                      | None -> (
-                          match Util.check_format "%t%t" s1_format with
-                          | Some s3 -> 
-                              Printf.sprintf s3 (fun _ -> p1) (fun _ -> p2)
-                          | None -> (
-                              match Util.check_format "%d%t" s1_format with
-                              | Some s3 -> 
-                                  Printf.sprintf s3 (int_of_string p1) (fun _ -> p2)
-                              | None -> (
-                                  match Util.check_format "%s%d" s1_format with
-                                  | Some s3 -> 
-                                      Printf.sprintf s3 p1 (int_of_string p2)
-                                  | None -> (
-                                      match Util.check_format "%t%d" s1_format with
-                                      | Some s3 -> 
-                                          Printf.sprintf s3 (fun _ -> p1) (int_of_string p2)
-                                      | None -> (
-                                          match Util.check_format "%d%d" s1_format with
-                                          | Some s3 -> 
-                                              Printf.sprintf s3 
-                                                (int_of_string p1) 
-                                                (int_of_string p2)
-                                          | None -> "[" ^ s1_format ^ "?]")))))))))
+              | Some s3 -> Some (Printf.sprintf s3 (fun _ -> p1) p2)
+              | None -> None);
+            (fun () ->
+              match Util.check_format "%d%s" s1_format with
+              | Some s3 -> Some (Printf.sprintf s3 (int_of_string p1) p2)
+              | None -> None);
+            (fun () ->
+              match Util.check_format "%s%t" s1_format with
+              | Some s3 -> Some (Printf.sprintf s3 p1 (fun _ -> p2))
+              | None -> None);
+            (fun () ->
+              match Util.check_format "%t%t" s1_format with
+              | Some s3 -> Some (Printf.sprintf s3 (fun _ -> p1) (fun _ -> p2))
+              | None -> None);
+            (fun () ->
+              match Util.check_format "%d%t" s1_format with
+              | Some s3 -> Some (Printf.sprintf s3 (int_of_string p1) (fun _ -> p2))
+              | None -> None);
+            (fun () ->
+              match Util.check_format "%s%d" s1_format with
+              | Some s3 -> Some (Printf.sprintf s3 p1 (int_of_string p2))
+              | None -> None);
+            (fun () ->
+              match Util.check_format "%t%d" s1_format with
+              | Some s3 -> Some (Printf.sprintf s3 (fun _ -> p1) (int_of_string p2))
+              | None -> None);
+            (fun () ->
+              match Util.check_format "%d%d" s1_format with
+              | Some s3 -> Some (Printf.sprintf s3 (int_of_string p1) (int_of_string p2))
+              | None -> None);
+          ] in
+          
+          let rec try_formats = function
+            | [] -> "[" ^ s1_format ^ "?]"
+            | attempt :: rest ->
+                match attempt () with
+                | Some result -> result
+                | None -> try_formats rest
+          in
+          try_formats format_attempts)
       | _ -> "[" ^ s1_format ^ "?]"  (* Plus de 2 paramètres non supporté *)
-      
     with _ ->
       Log.warn (fun k -> k "Format error in %s\n" s1_format);
       s1_format
