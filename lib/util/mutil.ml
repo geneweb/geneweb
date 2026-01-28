@@ -101,6 +101,12 @@ let list_iter_first f = function
 
 (* [decline] has been deprecated since version 5.00
    compatibility code: *)
+(* Fixed version of colon_to_at_word in lib/mutil.ml *)
+(* Solution: Forbid mixing modifications (+/-) and complete replacements *)
+
+(* Fixed version of colon_to_at_word in lib/mutil.ml *)
+(* Solution: Warn about mixing and fallback to replacement mode *)
+
 let colon_to_at_word s ibeg iend =
   let iendroot =
     let rec loop i =
@@ -112,6 +118,46 @@ let colon_to_at_word s ibeg iend =
   in
   if iendroot = iend then String.sub s ibeg (iend - ibeg)
   else
+    (* PHASE 1: Detect if mixing modifications and replacements *)
+    let has_modification = ref false in
+    let has_replacement = ref false in
+    
+    let rec detect_mixing i =
+      if i >= iend then ()
+      else
+        let inext =
+          let rec loop i =
+            if i + 3 >= iend then iend
+            else if s.[i] = ':' && s.[i + 2] = ':' then i
+            else loop (i + 1)
+          in
+          loop (i + 3)
+        in
+        let i_start = i + 3 in
+        let j = inext in
+        if i_start < j then begin
+          if s.[i_start] = '+' || s.[i_start] = '-' then
+            has_modification := true
+          else
+            has_replacement := true
+        end;
+        detect_mixing inext
+    in
+    detect_mixing iendroot;
+    
+    (* Warn and fallback if mixing detected *)
+    let use_replacement_mode = 
+      if !has_modification && !has_replacement then begin
+        (* Issue warning *)
+        Printf.eprintf 
+          "Warning: declension mixing modifications (+/-) and replacements in '%s'!"
+          (String.sub s ibeg (iend - ibeg));
+        true
+      end else
+        !has_replacement
+    in
+    
+    (* PHASE 2: Parse transformations *)
     let listdecl, maxd =
       let rec loop list maxd i =
         if i >= iend then (list, maxd)
@@ -127,21 +173,46 @@ let colon_to_at_word s ibeg iend =
           let e, d =
             let i = i + 3 in
             let j = inext in
-            if i < j && s.[i] = '+' then (String.sub s (i + 1) (j - i - 1), 0)
-            else if i < j && s.[i] = '-' then
-              let rec loop n i =
-                if i < j && s.[i] = '-' then loop (n + 1) (i + 1)
-                else (String.sub s i (j - i), n)
+            if use_replacement_mode then
+              (* Replacement mode: treat everything as complete replacement *)
+              (* Strip + or - prefix if present *)
+              let start_pos = 
+                if i < j && (s.[i] = '+' || s.[i] = '-') then
+                  (* Skip the prefix character(s) *)
+                  let rec skip_dashes pos =
+                    if pos < j && s.[pos] = '-' then skip_dashes (pos + 1)
+                    else pos
+                  in
+                  if s.[i] = '-' then skip_dashes (i + 1) else i + 1
+                else i
               in
-              loop 1 (i + 1)
-            else (String.sub s i (j - i), iendroot - ibeg)
+              (String.sub s start_pos (j - start_pos), iendroot - ibeg)
+            else
+              (* Normal mode: respect + and - prefixes *)
+              if i < j && s.[i] = '+' then 
+                (* Add suffix: remove 0 *)
+                (String.sub s (i + 1) (j - i - 1), 0)
+              else if i < j && s.[i] = '-' then
+                (* Remove n chars and add suffix *)
+                let rec count_dashes n i =
+                  if i < j && s.[i] = '-' then count_dashes (n + 1) (i + 1)
+                  else (String.sub s i (j - i), n)
+                in
+                count_dashes 1 (i + 1)
+              else
+                (* Complete replacement *)
+                (String.sub s i (j - i), iendroot - ibeg)
           in
           loop ((s.[i + 1], e) :: list) (max d maxd) inext
       in
       loop [] 0 iendroot
     in
+    
+    (* PHASE 3: Calculate root based on maxd *)
     let len = max 0 (iendroot - ibeg - maxd) in
     let root = String.sub s ibeg len in
+    
+    (* PHASE 4: Build conditional expression *)
     let s =
       List.fold_left
         (fun t (c, e) ->
