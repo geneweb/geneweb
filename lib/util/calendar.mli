@@ -33,6 +33,12 @@ val sdn_of_french : Def.dmy -> int
 val sdn_of_hebrew : Def.dmy -> int
 (** Returns SDN of the date of hebrew calendar. *)
 
+val dmy_of_dmy2 : Def.dmy2 -> Def.dmy
+(** Convert [dmy2] to [dmy] with precision [Sure]. *)
+
+val dmy2_of_dmy : Def.dmy -> Def.dmy2
+(** Extract [dmy2] fields from [dmy], discarding precision. *)
+
 val gregorian_of_julian : Def.dmy -> Def.dmy
 (** Converts julian calendar's date to gregorian. *)
 

@@ -219,6 +219,67 @@ let compare_date_strict d1 d2 =
 let cdate_to_dmy_opt cdate =
   match od_of_cdate cdate with Some (Dgreg (d, _)) -> Some d | _ -> None
 
+let max_month_of = function
+  | Dgregorian | Djulian -> 12
+  | Dfrench | Dhebrew -> 13
+
+let partial_date_upper_bound ~from ~day ~month ~year =
+  match (day, month) with
+  | 0, 0 | _, 0 -> (1, 1, year + 1)
+  | 0, month ->
+      if month = max_month_of from then (1, 1, year + 1)
+      else (1, month + 1, year)
+  | day, month -> (day, month, year)
+
+let to_sdn ~from ?(lower = true) d =
+  let { day; month; year; delta; _ } = d in
+  let day, month, year =
+    if lower then (max 1 day, max 1 month, year)
+    else partial_date_upper_bound ~from ~day ~month ~year
+  in
+  let dmy = { d with day; month; year } in
+  let base_sdn =
+    match from with
+    | Dgregorian -> Calendar.sdn_of_gregorian dmy
+    | Djulian -> Calendar.sdn_of_julian dmy
+    | Dfrench -> Calendar.sdn_of_french dmy
+    | Dhebrew -> Calendar.sdn_of_hebrew dmy
+  in
+  base_sdn + delta
+
+let gregorian_of_sdn ~prec sdn = Calendar.gregorian_of_sdn prec sdn
+let julian_of_sdn ~prec sdn = Calendar.julian_of_sdn prec sdn
+let french_of_sdn ~prec sdn = Calendar.french_of_sdn prec sdn
+let hebrew_of_sdn ~prec sdn = Calendar.hebrew_of_sdn prec sdn
+
+let convert ~from ~to_ dmy =
+  if from = to_ then dmy
+  else
+    let via_gregorian d =
+      let g =
+        match from with
+        | Dgregorian -> d
+        | Djulian -> Calendar.gregorian_of_julian d
+        | Dfrench -> Calendar.gregorian_of_french d
+        | Dhebrew -> Calendar.gregorian_of_hebrew d
+      in
+      match to_ with
+      | Dgregorian -> g
+      | Djulian -> Calendar.julian_of_gregorian g
+      | Dfrench -> Calendar.french_of_gregorian g
+      | Dhebrew -> Calendar.hebrew_of_gregorian g
+    in
+    let convert_dmy2 d2 =
+      Calendar.dmy2_of_dmy (via_gregorian (Calendar.dmy_of_dmy2 d2))
+    in
+    let prec =
+      match dmy.prec with
+      | OrYear d2 -> OrYear (convert_dmy2 d2)
+      | YearInt d2 -> YearInt (convert_dmy2 d2)
+      | p -> p
+    in
+    { (via_gregorian dmy) with prec }
+
 let cdate_of_death = function
   | Death (_, cd) -> Some cd
   | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
