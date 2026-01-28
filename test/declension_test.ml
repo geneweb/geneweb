@@ -326,6 +326,22 @@ let test_apply_decline_multiple_transforms () =
   (check string) "multiple transforms genitive" "Jana" result_g;
   (check string) "multiple transforms instrumental" "Janem" result_i
 
+(* Test du remplacement *)
+let test_replacement () =
+  let name = "Henri:a:Aaaa:i:Iiii" in
+  let result_a = apply_decline "a" name in
+  let result_i = apply_decline "i" name in
+  (check string) "replacement: accusative" "Aaaa" result_a;
+  (check string) "replacement: instrumental" "Iiii" result_i
+
+(* Test du remplacement *)
+let test_mixing () =
+  let name = "Henri:a:Aaaa:i:+Iiii" in
+  let result_a = apply_decline "a" name in
+  let result_i = apply_decline "i" name in
+  (check string) "replacement: accusative" "Aaaa" result_a;
+  (check string) "replacement: instrumental" "Iiii" result_i
+
 (* ============================================ *)
 (* Test suite definition                       *)
 (* ============================================ *)
@@ -421,5 +437,7 @@ let v =
         test_case "Apply decline UTF-8" `Quick test_apply_decline_utf8;
         test_case "Apply decline multiple transforms" `Quick
           test_apply_decline_multiple_transforms;
+        test_case "Apply replacement" `Quick test_replacement;
+        test_case "Apply mixing" `Quick test_mixing;
       ] );
   ]
