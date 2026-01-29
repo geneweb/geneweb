@@ -869,7 +869,7 @@ let search_firstname_phonetic_split alias_cache conf base query =
       in
       deduplicate_collect all_candidates (fun ip ->
           let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
+          let fn = Driver.p_first_name base p in
           let fn_codes =
             List.map Name.crush_lower (cut_words (Name.lower fn))
           in
@@ -884,7 +884,7 @@ let search_firstname_phonetic_split alias_cache conf base query =
   let classify ip =
     Some.AliasCache.add_direct alias_cache ip;
     let p = Driver.poi base ip in
-    let fn = Driver.sou base (Driver.get_first_name p) in
+    let fn = Driver.p_first_name base p in
     let fn_norm = normalize_for_phonetic (Name.lower fn) in
     let is_match = Mutil.contains fn_norm query_norm in
     if is_match then (
@@ -920,7 +920,7 @@ let search_firstname_phonetic_ngrams alias_cache conf base query =
   let phonetic_results =
     deduplicate_collect phonetic_iper (fun ip ->
         let p = Driver.poi base ip in
-        let fn = Driver.sou base (Driver.get_first_name p) in
+        let fn = Driver.p_first_name base p in
         let fn_lower = Name.lower fn in
         let fn_norm = normalize_for_phonetic fn_lower in
         let fn_norm_crushed = Name.crush fn_norm in
@@ -1004,15 +1004,13 @@ let search_firstname alias_cache conf base query opts =
     List.iter (fun ip -> Some.AliasCache.add_direct alias_cache ip) other_ips;
     let normalize_person ip =
       let p = Driver.poi base ip in
-      let fn = Driver.sou base (Driver.get_first_name p) in
+      let fn = Driver.p_first_name base p in
       (normalize_name fn, ip)
     in
     let direct_exact =
       List.map
         (fun ip ->
-          ( normalize_name
-              (Driver.sou base (Driver.get_first_name (Driver.poi base ip))),
-            ip ))
+          (normalize_name (Driver.p_first_name base (Driver.poi base ip)), ip))
         exact_ips
     in
     let direct_included = List.map normalize_person other_ips in
@@ -1073,7 +1071,7 @@ let search_firstname alias_cache conf base query opts =
                   if Hashtbl.mem seen_perm ip then false
                   else
                     let p = Driver.poi base ip in
-                    let fn = Driver.sou base (Driver.get_first_name p) in
+                    let fn = Driver.p_first_name base p in
                     let fn_norm = normalize_for_phonetic (Name.lower fn) in
                     let fn_crushed = Name.crush_lower fn in
                     let matches =
