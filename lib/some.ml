@@ -145,7 +145,7 @@ let print_elem conf base is_surname ?(rev = false) (p, xl) =
         (acces conf base x :> string)
         (Driver.Iper.to_string iper :> string);
       if is_surname then
-        let fn = escape_html @@ Driver.sou base (Driver.get_first_name x) in
+        let fn = escape_html @@ Driver.p_first_name base x in
         let sn_particle =
           if rev then
             escape_html @@ surname_particle base (Driver.p_surname base x)

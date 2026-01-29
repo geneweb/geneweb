@@ -459,14 +459,14 @@ and eval_person_field_var conf base env p = function
   | [ "access" ] -> safe_val (Util.acces conf base p :> Adef.safe_string)
   | [ "dates" ] -> safe_val (DateDisplay.short_dates_text conf base p)
   | [ "has_history" ] ->
-      let fn = Driver.sou base (Driver.get_first_name p) in
-      let sn = Driver.sou base (Driver.get_surname p) in
+      let fn = Driver.p_first_name base p in
+      let sn = Driver.p_surname base p in
       let occ = Driver.get_occ p in
       let person_file = HistoryDiff.history_file fn sn occ in
       VVbool (Sys.file_exists (HistoryDiff.history_path conf person_file))
   | [ "history_file" ] ->
-      let fn = Driver.sou base (Driver.get_first_name p) in
-      let sn = Driver.sou base (Driver.get_surname p) in
+      let fn = Driver.p_first_name base p in
+      let sn = Driver.p_surname base p in
       let occ = Driver.get_occ p in
       VVstring (HistoryDiff.history_file fn sn occ)
   | [ "index" ] -> Templ.VVstring (Driver.Iper.to_string (Driver.get_iper p))

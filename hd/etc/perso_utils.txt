@@ -1,4 +1,12 @@
-<!-- $Id: perso_utils v7.1 13/08/2023 16:55:48 $ -->
+<!-- $Id: perso_utils v7.1 29/01/2026 16:55:48 $ -->
+
+%define;transl1(keyxxx, paramyyy, z)
+  [keyxxx:::paramyyy]z
+%end;
+%define;transl2(keyxxx, param1yyy, param2www, z)
+  [keyxxx:::param1yyy:param2www]z
+%end;
+
 %define;setvar(nnn,vvv)
   %set_var.nnn.vvv;
 %end;

@@ -191,9 +191,8 @@ let record_diff conf base changed =
           let sp = Driver.poi base isp in
           let sp_file =
             history_file
-              (Driver.sou base (Driver.get_first_name sp))
-              (Driver.sou base (Driver.get_surname sp))
-              (Driver.get_occ sp)
+              (Driver.p_first_name base sp)
+              (Driver.p_surname base sp) (Driver.get_occ sp)
           in
           let sp_fname = history_path conf sp_file in
           let gen_sp = Driver.gen_person_of_person sp in
@@ -208,9 +207,8 @@ let record_diff conf base changed =
               let p = Driver.poi base ip in
               let person_file =
                 history_file
-                  (Driver.sou base (Driver.get_first_name p))
-                  (Driver.sou base (Driver.get_surname p))
-                  (Driver.get_occ p)
+                  (Driver.p_first_name base p)
+                  (Driver.p_surname base p) (Driver.get_occ p)
               in
               let fname = history_path conf person_file in
               if Sys.file_exists fname then ()
