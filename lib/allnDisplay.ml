@@ -14,13 +14,19 @@ let compare_particle_at_the_end base is_surnames a b =
 
 (* print *)
 
-let print_title conf base is_surnames ini len =
+let print_title conf base is_surnames ini len h =
   if len >= 2 then
     if is_surnames then
-      Printf.sprintf
-        (Util.fcapitale (Util.ftransl conf "%s surnames list title"))
-        (Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") len)
-      |> Output.print_sstring conf
+      if h then
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (Util.transl conf "all the names"))
+      else
+        Printf.sprintf
+          (Util.fcapitale (Util.ftransl conf "%s surnames list title"))
+          (Mutil.string_of_int_sep
+             (Util.transl conf "(thousand separator)")
+             len)
+        |> Output.print_sstring conf
     else
       Printf.sprintf
         (Util.fcapitale (Util.ftransl conf "the %d first names"))
@@ -57,7 +63,7 @@ let tr c1 s2 s =
   loop 0 0
 
 let print_alphabetic_big conf base is_surnames ini list len too_big =
-  let title _ = print_title conf base is_surnames ini len in
+  let title = print_title conf base is_surnames ini len in
   let mode = if is_surnames then Adef.encoded "N" else Adef.encoded "P" in
   Hutil.header conf title;
   Output.print_sstring conf {|<p class="search_name">|};
@@ -120,7 +126,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
   Hutil.trailer conf
 
 let print_alphabetic_all conf base is_surnames ini list len =
-  let title _ = print_title conf base is_surnames ini len in
+  let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   Hutil.header conf title;
   Output.print_sstring conf {|<p class="search_name">|};
@@ -164,7 +170,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
   Hutil.trailer conf
 
 let print_alphabetic_small conf base is_surnames ini list len =
-  let title _ = print_title conf base is_surnames ini len in
+  let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   Hutil.header conf title;
   if list <> [] then (
@@ -192,7 +198,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
   Hutil.trailer conf
 
 let print_frequency_any conf base is_surnames list len =
-  let title _ = print_title conf base is_surnames "" len in
+  let title = print_title conf base is_surnames "" len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let n = ref 0 in
   Hutil.header conf title;
@@ -267,7 +273,7 @@ let print_alphabetic ~index conf base is_surnames =
 (* short print *)
 
 let print_alphabetic_short conf base is_surnames ini list len =
-  let title _ = print_title conf base is_surnames ini len in
+  let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let need_ref = len >= 250 in
   Hutil.header conf title;
