@@ -1,6 +1,14 @@
 <!-- $Id: perso_utils v7.1 04/04/2026 04:04:19 $ -->
+
 %let;birth_symbol;%if;(b.birth_symbol!="")%b.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(b.death_symbol!="")%b.death_symbol;%else;&dagger;%end;%in;
+
+%define;transl1(keyxxx, paramyyy, z)
+  [keyxxx:::paramyyy]z
+%end;
+%define;transl2(keyxxx, param1yyy, param2www, z)
+  [keyxxx:::param1yyy:param2www]z
+%end;
 
 %define;setvar(nnn,vvv)
   %set_var.nnn.vvv;
