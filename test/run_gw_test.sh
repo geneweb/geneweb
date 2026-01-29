@@ -210,7 +210,7 @@ crl () {
         echo "missing Notes index button on Welcome page ${urlprfix}w=$PWD&$cmd"
         RC=$(($RC+1))
       elif test "$cmd" = "p=xxx&n=yyy" && \
-           ! grep $GREPOPT -E "Not.found:|Unknown.person:" /tmp/tmp.txt; then
+           ! grep $GREPOPT -iE "Not.found:|Unknown.person" /tmp/tmp.txt; then
         echo "missing 'Not found' page, issue 2220, ${urlprfix}w=$PWD&$cmd"
         RC=$(($RC+1))
       elif test "$cmd" = 'p=anthoine&n=geruzet&oc=0' && \
