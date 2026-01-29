@@ -62,10 +62,26 @@ let tr c1 s2 s =
   in
   loop 0 0
 
+let surname_list_meta_description conf base =
+  [
+    Hutil.
+      {
+        name = "description";
+        content =
+          Utf8.capitalize_fst
+            (Printf.sprintf
+               (Util.ftransl conf "%s all_names_meta_description")
+               (Gwdb.bname base));
+      };
+  ]
+
 let print_alphabetic_big conf base is_surnames ini list len too_big =
   let title = print_title conf base is_surnames ini len in
   let mode = if is_surnames then Adef.encoded "N" else Adef.encoded "P" in
-  Hutil.header conf title;
+  let meta =
+    if is_surnames then surname_list_meta_description conf base else []
+  in
+  Hutil.header_with_meta conf title meta;
   Output.print_sstring conf {|<p class="search_name">|};
   List.iter
     (fun ini_k ->
@@ -128,7 +144,10 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
 let print_alphabetic_all conf base is_surnames ini list len =
   let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
-  Hutil.header conf title;
+  let meta =
+    if is_surnames then surname_list_meta_description conf base else []
+  in
+  Hutil.header_with_meta conf title meta;
   Output.print_sstring conf {|<p class="search_name">|};
   List.iter
     (fun (ini_k, _) ->
@@ -172,7 +191,10 @@ let print_alphabetic_all conf base is_surnames ini list len =
 let print_alphabetic_small conf base is_surnames ini list len =
   let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
-  Hutil.header conf title;
+  let meta =
+    if is_surnames then surname_list_meta_description conf base else []
+  in
+  Hutil.header_with_meta conf title meta;
   if list <> [] then (
     Output.print_sstring conf "<ul>";
     List.iter
@@ -276,7 +298,10 @@ let print_alphabetic_short conf base is_surnames ini list len =
   let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let need_ref = len >= 250 in
-  Hutil.header conf title;
+  let meta =
+    if is_surnames then surname_list_meta_description conf base else []
+  in
+  Hutil.header_with_meta conf title meta;
   if need_ref then (
     Output.print_sstring conf "<p>";
     List.iter
