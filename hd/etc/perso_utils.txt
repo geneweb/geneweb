@@ -52,10 +52,15 @@
 %define;marr_wrench_to_bullet(xx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
-      <i class="fa fa-wrench fa-sm text-success"
-        title="[*modify::family/families]0 %self; &
-        %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;
-        %spouse.surname; ([wizard/wizards/friend/friends/exterior]0)"></i>%nn;
+      <i class="fa fa-wrench fa-sm text-success" data-html="true" data-toggle="tooltip"
+        title="<div class='text-left'>[*modify::family/families]0 %self.surname;/%self.spouse.surname; ([wizard/wizards/friend/friends/exterior]0)<br>
+<b>[*him/her]0 %marriage_age;</b><br>
+— [father/mother]0 %father.marriage_age;<br>
+— [father/mother]1 %mother.marriage_age;<br><br>
+
+<b>[*him/her]1 %spouse.marriage_age;</b><br>
+— [father/mother]0 %spouse.father.marriage_age;<br>
+— [father/mother]1 %spouse.mother.marriage_age;</div>"></i>%nn;
     </a>
   %end;
 %end;

@@ -21549,7 +21549,7 @@ eo: jaro/monato/tago
 es: año/mes/día
 et: aasta/kuu/päev
 fi: vuosi/kuukausi/päivä
-fr: année/mois/jour/an
+fr: an/mois/jour/an
 he: שנה/ חודש/ יום
 is: ár/mánuður/dagur
 it: anno/mese/giorno

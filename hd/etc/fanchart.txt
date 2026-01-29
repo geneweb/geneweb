@@ -41,7 +41,7 @@
   ,"sn":"%xx.surname","snk":"%xx.surname_key;"%if;(xx.occ!=0),"oc":"%xx.occ"%end;,"dates":"%xx.dates;"%nn;
   %if;(xx.computable_death_age or xx.computable_age)
     ,"age_text":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age;%end;%else;%if;xx.computable_age;%xx.age;%end;%end;"%nn;
-    ,"age":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age_years;%end;%else;%if;xx.computable_age;%xx.age_years;%end;%end;"%end;
+    ,"age":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age.years;%end;%else;%if;xx.computable_age;%xx.age.years;%end;%end;"%end;
   %apply;event("xx","birth")
   %apply;event("xx","baptism")
   %apply;event("xx","death")

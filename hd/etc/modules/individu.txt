@@ -204,86 +204,6 @@
     %end;
   %end;
 %end;
-%( Calculs d’âge en années/mois/jours et en jours de Mickael Rouesné %)
-%define;remainder(xxx)
-  %let;tmp;%expr(xxx-((xxx/10/10/10)*1000))%in;
-  %if;(tmp<10)00%tmp;%nn;
-  %elseif;(tmp<100)0%tmp;%nn;
-  %else;%tmp;%end;
-%end;
-%let;l_nbd;
-  %if;(is_dead and computable_death_age
-               and birth_date.day != "" and birth_date.prec = ""
-               and death_date.day != "" and death_date.prec = "")
-    %if;(death_date.julian_day > birth_date.julian_day)
-      %expr(death_date.julian_day - birth_date.julian_day)
-    %else;0%end;
-  %elseif;(computable_age and has_birth_date and birth_date.day != "" and birth_date.prec = "")
-    %if;(today.julian_day > birth_date.julian_day)
-      %expr(today.julian_day - birth_date.julian_day)
-    %else;0%end;
-  %else;0%end;
-%in;
-%define;nb_days(xx)
-  %apply;nth%with;
-    /31/28/31/30/31/30/31/31/30/31/30/31%and;
-    xx%end;
-%end;
-%define;compute_age1(z1,z2,z3)
-  %if;(z1 > 0)z1 %nn;
-    %if;(z1 = 1)[year/month/day]0%else;[years old]%end;
-    %if;(z2 > 0 or z3 > 0), %end;
-  %end;
-  %if;(z2 > 0)z2 %nn;
-    %if;(z2 = 1)[year/month/day]1%else;[months old]%end;
-    %if;(z3 > 0), %end;
-  %end;
-  %if;(z1+z2=0)
-    %if;(z3 >=0)z3 %nn;
-      %if;(z3 = 0 or z3 = 1)[year/month/day]2%else;[days old]%end;
-    %end;
-  %else;
-    %if;(z3 > 0)z3 %nn;
-      %if;(z3 = 1)[year/month/day]2%else;[days old]%end;
-    %end;
-  %end;%if;(lang="en") old%end;
-%end;
-%define;compute_age(z1,z2)
-  %( test for z1.year has been done before call %)
-  %let;l1;%apply;nb_days(z2.month)%in;
-  %if;(z1.month!="" and z2.month!="" and z1.month > z2.month)
-    %if;(z1.day!="" and z2.day!="" and z1.day >= z2.day)
-      %apply;compute_age1(z1.year - z2.year,z1.month - z2.month,z1.day - z2.day)
-    %else;
-      %apply;compute_age1(z1.year - z2.year,z1.month - z2.month - 1,l1 + z1.day - z2.day)
-    %end;
-  %end;
-  %if;(z1.month!="" and z2.month!="" and z1.month = z2.month)
-    %if;(z1.day!="" and z2.day!="" and z1.day >= z2.day)
-      %apply;compute_age1(z1.year - z2.year,0,z1.day - z2.day)
-    %elseif;(z1.year > z2.year)
-      %apply;compute_age1(z1.year - z2.year - 1,11,l1 + z1.day - z2.day)
-    %end;
-  %end;
-  %if;(z1.month!="" and z2.month!="" and z1.month < z2.month and z1.year > z2.year)
-    %if;(z1.day!="" and z2.day!="" and z1.day >= z2.day)
-      %apply;compute_age1(z1.year - z2.year - 1,12 + z1.month - z2.month,z1.day - z2.day)
-    %else;
-      %apply;compute_age1(z1.year - z2.year - 1,11 + z1.month - z2.month,l1 + z1.day - z2.day)
-    %end;
-  %end;
-%end;
-%define;curr_age()
-  %foreach;event;
-    %if;(event.name=[death] and has_death_date and has_birth_date)
-      %if;(death_date.prec="" and birth_date.prec="" and death_date.year!="" and birth_date.year!=""
-      and death_date.year >= birth_date.year)%apply;compute_age("death_date","birth_date")%else;%event.age;%end;
-    %end;
-  %end;
-  %if;(computable_age)
-    %if;(birth_date.year!= "" and today.year >= birth_date.year and l_nbd != "")%apply;compute_age("today","birth_date")%else;%age;%end;
-  %end;
-%end;
 %define;etat_civil()
   <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
@@ -312,6 +232,9 @@
           %if;has_baptism_place;[*baptized]s %in_place; %baptism_place;
           %end;
         %end;
+        %foreach;event;
+          %if;(event.name=[baptism] and event.age!="") [aged] %event.age;%end;
+        %end;
       </li>%nl;
     %end;
     %if;is_dead;
@@ -337,19 +260,24 @@
     %end;
     %if;(computable_death_age or computable_age and not roglo)
       <li class="mt-1" title="%nn;
-        %if;(is_dead and computable_death_age)[*age at death][:] %nn;
-        %elseif;(not is_dead and computable_age)[*age][:] %nn;
-        %end;
-        %if;(l_nbd > 999)%expr(l_nbd/10/10/10)[(thousand separator)]%apply;remainder(l_nbd) [days old]%nn;
-        %elseif;(l_nbd > 31)%l_nbd; [days old]%nn;
-        %end;%if;(lang="en") old%end;">
+        %if;(is_dead and computable_death_age)[*age at death][:]%sp;
+        %else;%if;(not is_dead and computable_age)[*age][:]%sp;%end;%end;
+        %if;(age_days!="")%apply;1000sep(age_days) [days old]%end;
+        %if;(lang="en") old%end;">
         <span class="fa-li"><i class="far fa-id-card"></i></span>
         %if;(is_dead and computable_death_age)
           %if;(death_date.month!="" and death_date.day!=""
-           and birth_date.month!="" and birth_date.day!="")%apply;curr_age()%else;~ %death_age;%end;
+           and birth_date.month!="" and birth_date.day!="")
+            %if;(death_date.sdn > birth_date.sdn)%death_age;
+            %end;
+          %else;~ %death_age;%end;
         %end;
         %if;(not is_dead and computable_age)
-          %if;(birth_date.month!="" and birth_date.day!="")%apply;curr_age()%else;~ %age;%end;
+          %if;(birth_date.month!="" and birth_date.day!="")
+            %if;(today.julian_day > birth_date.sdn)
+              %age;
+            %end;
+          %else;~ %age;%end;
         %end;
       </li>
     %end;

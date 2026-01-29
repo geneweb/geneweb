@@ -1,6 +1,11 @@
+/* Chronologie */
+.age-years { color: #0066cc; }
+.age-months { color: #000; }
+.age-days { color: #888; }
+
 /* Notifications */
 .notif-ctr {
-  position: fixed;
+  position: fixed;p
   top: 10px;
   right: 10px;
   z-index: 1080;
