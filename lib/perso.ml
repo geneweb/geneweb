@@ -21,6 +21,158 @@ let person_living_age conf p p_auth =
   | true, Some d, NotDead -> Some (Date.time_elapsed d conf.today)
   | _ -> None
 
+let format_age conf age =
+  let y = age.Def.year in
+  let m = age.Def.month in
+  let d = age.Def.day in
+  let prec_str =
+    match age.Def.prec with
+    | Sure -> ""
+    | About | Maybe -> "~"
+    | Before -> "<"
+    | After -> ">"
+    | OrYear _ | YearInt _ -> ""
+  in
+  let parts =
+    List.fold_left
+      (fun acc (value, idx, plural_key) ->
+        if value > 0 then
+          acc
+          @ [
+              (string_of_int value ^ " "
+              ^
+              if value = 1 then transl_nth conf "year/month/day" idx
+              else transl conf plural_key);
+            ]
+        else acc)
+      []
+      [ (y, 0, "years old"); (m, 1, "months old"); (d, 2, "days old") ]
+  in
+  let formatted = String.concat ", " parts in
+  let result =
+    if prec_str = "" then formatted else prec_str ^ " " ^ formatted
+  in
+  Adef.safe result
+
+let eval_age_field_var conf ?(before_birth = false) age = function
+  | [ "years" ] -> Templ.VVstring (string_of_int age.Def.year)
+  | [ "months" ] -> Templ.VVstring (string_of_int age.Def.month)
+  | [ "days" ] -> Templ.VVstring (string_of_int age.Def.day)
+  | [ "short" ] ->
+      let y = age.Def.year in
+      let m = age.Def.month in
+      let d = age.Def.day in
+      let sign = if before_birth then "−" else "" in
+      let s =
+        if y > 0 then
+          sign ^ string_of_int y ^ " "
+          ^
+          if y = 1 then transl_nth conf "year/month/day" 0
+          else transl conf "years old"
+        else if m > 0 then
+          sign ^ string_of_int m ^ " "
+          ^
+          if m = 1 then transl_nth conf "year/month/day" 1
+          else transl conf "months old"
+        else
+          sign ^ string_of_int d ^ " "
+          ^
+          if d = 1 then transl_nth conf "year/month/day" 2
+          else transl conf "days old"
+      in
+      Templ.VVstring s
+  | [ "sign" ] -> Templ.VVstring (if before_birth then "−" else "")
+  | [ "before_birth" ] -> Templ.VVbool before_birth
+  | [ "prec" ] -> (
+      match age.Def.prec with
+      | Sure -> Templ.VVstring ""
+      | About | Maybe -> Templ.VVstring "~"
+      | Before -> Templ.VVstring "<"
+      | After -> Templ.VVstring ">"
+      | OrYear _ | YearInt _ -> Templ.VVstring "")
+  | [] -> raise Not_found
+  | _ -> raise Not_found
+
+let compare_dmy d1 d2 =
+  match compare d1.Def.year d2.Def.year with
+  | 0 -> (
+      match compare d1.Def.month d2.Def.month with
+      | 0 -> compare d1.Def.day d2.Def.day
+      | c -> c)
+  | c -> c
+
+let eval_marriage_age conf p fam sl =
+  match
+    ( Date.cdate_to_dmy_opt (Driver.get_birth p),
+      Date.cdate_to_dmy_opt (Driver.get_marriage fam) )
+  with
+  | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
+      Some ({ prec = Sure | About | Maybe; _ } as d2) ) -> (
+      let age = Date.time_elapsed d1 d2 in
+      match sl with
+      | [] -> Templ.VVstring (format_age conf age :> string)
+      | _ -> eval_age_field_var conf age sl)
+  | _ -> Templ.VVstring ""
+
+let compute_age_at_event conf p_auth birth_opt event_date_opt sl =
+  match (p_auth, birth_opt, event_date_opt) with
+  | true, Some birth_dmy, Some event_dmy -> (
+      let before_birth = compare_dmy event_dmy birth_dmy < 0 in
+      let age =
+        if before_birth then Date.time_elapsed event_dmy birth_dmy
+        else Date.time_elapsed birth_dmy event_dmy
+      in
+      match sl with
+      | [ _ ] ->
+          let s = (format_age conf age :> string) in
+          Templ.VVstring (if before_birth then "−" ^ s else s)
+      | _ :: rest -> eval_age_field_var conf ~before_birth age rest
+      | [] -> assert false)
+  | _ -> Templ.VVstring ""
+
+let eval_death_age conf p p_auth sl =
+  if p_auth then
+    match Gutil.get_birth_death_date p with
+    | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
+        Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
+        _ )
+      when d1 <> d2 -> (
+        let age = Date.time_elapsed d1 d2 in
+        match sl with
+        | [] -> Templ.VVstring (format_age conf age :> string)
+        | _ -> eval_age_field_var conf age sl)
+    | _ -> Templ.VVstring ""
+  else Templ.VVstring ""
+
+let eval_age_at_parent_event conf base p p_auth get_parent get_target_date sl =
+  match Driver.get_parents p with
+  | Some ifam ->
+      let parent = pget conf base (get_parent (Driver.foi base ifam)) in
+      let target = get_target_date parent in
+      compute_age_at_event conf p_auth
+        (Date.cdate_to_dmy_opt (Driver.get_birth p))
+        target sl
+  | None -> Templ.VVstring ""
+
+let p_birth p = Date.cdate_to_dmy_opt (Driver.get_birth p)
+
+let death_date_opt p =
+  match Date.date_of_death (Driver.get_death p) with
+  | Some (Dgreg (dmy, _)) -> Some dmy
+  | _ -> None
+
+let eval_age_at_child_event conf base self child get_target_date sl =
+  let self_auth = authorized_age conf base self in
+  let target = get_target_date child in
+  compute_age_at_event conf self_auth
+    (Date.cdate_to_dmy_opt (Driver.get_birth self))
+    target sl
+
+let child_marriage base child =
+  let fams = Driver.get_family child in
+  if Array.length fams = 0 then None
+  else Date.cdate_to_dmy_opt (Driver.get_marriage (Driver.foi base fams.(0)))
+
 let get_cousins_sparse =
   let cache = ref None in
   fun conf base p ->
@@ -2462,8 +2614,9 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> null_val)
   | "spouse" :: sl -> (
       match get_env "fam" env with
-      | Vfam (_, _, (_, _, ip), _) when mode_local env ->
-          let ep = make_ep conf base ip in
+      | Vfam (_, _, (_, _, ip), m_auth) ->
+          let spouse = pget conf base ip in
+          let ep = (spouse, m_auth && authorized_age conf base spouse) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
   | "witness" :: sl -> (
@@ -2853,6 +3006,78 @@ and eval_place_field conf pl = function
 and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
   function
   | [ "access_status" ] -> VVstring (Util.access_status p)
+  | [ "age" ] -> (
+      match person_living_age conf p p_auth with
+      | Some elapsed -> VVstring (format_age conf elapsed :> string)
+      | None -> null_val)
+  | "age" :: sl -> (
+      match person_living_age conf p p_auth with
+      | Some elapsed -> eval_age_field_var conf elapsed sl
+      | None -> null_val)
+  | [ "marriage_age" ] -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when m_auth && p_auth ->
+          eval_marriage_age conf p fam []
+      | _ -> null_val)
+  | "marriage_age" :: sl -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when m_auth && p_auth ->
+          eval_marriage_age conf p fam sl
+      | _ -> null_val)
+  | [ "death_age" ] -> eval_death_age conf p p_auth []
+  | "death_age" :: sl -> eval_death_age conf p p_auth sl
+  | ([ "age_at_father_birth" ] | "age_at_father_birth" :: _) as sl ->
+      eval_age_at_parent_event conf base p p_auth Driver.get_father p_birth sl
+  | ([ "age_at_father_death" ] | "age_at_father_death" :: _) as sl ->
+      eval_age_at_parent_event conf base p p_auth Driver.get_father
+        death_date_opt sl
+  | ([ "age_at_mother_birth" ] | "age_at_mother_birth" :: _) as sl ->
+      eval_age_at_parent_event conf base p p_auth Driver.get_mother p_birth sl
+  | ([ "age_at_mother_death" ] | "age_at_mother_death" :: _) as sl ->
+      eval_age_at_parent_event conf base p p_auth Driver.get_mother
+        death_date_opt sl
+  | ([ "age_at_parent_marriage" ] | "age_at_parent_marriage" :: _) as sl -> (
+      match Driver.get_parents p with
+      | Some ifam ->
+          let fam = Driver.foi base ifam in
+          let target = Date.cdate_to_dmy_opt (Driver.get_marriage fam) in
+          compute_age_at_event conf p_auth
+            (Date.cdate_to_dmy_opt (Driver.get_birth p))
+            target sl
+      | None -> Templ.VVstring "")
+  | ([ "age_at_spouse_death" ] | "age_at_spouse_death" :: _) as sl -> (
+      match get_env "fam" env with
+      | Vfam (_, _, (_, _, ispouse), m_auth) ->
+          let spouse = pget conf base ispouse in
+          let target = death_date_opt spouse in
+          compute_age_at_event conf (p_auth && m_auth)
+            (Date.cdate_to_dmy_opt (Driver.get_birth p))
+            target sl
+      | _ -> null_val)
+  | ([ "age_at_child_birth" ] | "age_at_child_birth" :: _) as sl -> (
+      match (get_env "p" env, get_env "child" env) with
+      | Vind self, Vind child ->
+          eval_age_at_child_event conf base self child p_birth sl
+      | _ -> Templ.VVstring "")
+  | ([ "age_at_child_death" ] | "age_at_child_death" :: _) as sl -> (
+      match (get_env "p" env, get_env "child" env) with
+      | Vind self, Vind child ->
+          eval_age_at_child_event conf base self child death_date_opt sl
+      | _ -> Templ.VVstring "")
+  | ([ "age_at_child_marriage" ] | "age_at_child_marriage" :: _) as sl -> (
+      match (get_env "p" env, get_env "child" env) with
+      | Vind self, Vind child ->
+          eval_age_at_child_event conf base self child (child_marriage base) sl
+      | _ -> Templ.VVstring "")
+  | ([ "age_at_related_baptism" ] | "age_at_related_baptism" :: _) as sl -> (
+      match (get_env "p" env, get_env "rel" env) with
+      | Vind self, Vrel (_, Some related) ->
+          let self_auth = authorized_age conf base self in
+          let target = Date.cdate_to_dmy_opt (Driver.get_baptism related) in
+          compute_age_at_event conf self_auth
+            (Date.cdate_to_dmy_opt (Driver.get_birth self))
+            target sl
+      | _ -> Templ.VVstring "")
   | "anc1" :: sl -> (
       match get_env "anc1" env with
       | Vind pa ->
@@ -3138,6 +3363,22 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           let pl = Driver.sou base t.t_place in
           eval_nobility_title_field_var (id, pl) sl
       | Some _ | None -> null_val)
+  | [ "parent_marriage_date" ] -> (
+      match Driver.get_parents p with
+      | Some ifam when p_auth -> (
+          let fam = Driver.foi base ifam in
+          match Date.od_of_cdate (Driver.get_marriage fam) with
+          | Some d -> VVstring (DateDisplay.string_of_date conf d :> string)
+          | None -> Templ.VVstring "")
+      | _ -> Templ.VVstring "")
+  | "parent_marriage_date" :: sl -> (
+      match Driver.get_parents p with
+      | Some ifam when p_auth -> (
+          let fam = Driver.foi base ifam in
+          match Date.od_of_cdate (Driver.get_marriage fam) with
+          | Some d -> eval_date_field_var conf d sl
+          | None -> Templ.VVstring "")
+      | _ -> Templ.VVstring "")
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
   | "sosa" :: sl -> (
       match get_env "sosa" env with
@@ -3209,10 +3450,9 @@ and eval_date_field_var conf d = function
               else VVstring (string_of_int dmy2.day2)
           | _ -> null_val)
       | _ -> null_val)
-  | [ "julian_day" ] -> (
+  | [ "julian_day" ] | [ "sdn" ] -> (
       match d with
-      | Dgreg (dmy, _) ->
-          VVstring (string_of_int (Calendar.sdn_of_gregorian dmy))
+      | Dgreg (dmy, cal) -> VVstring (string_of_int (Date.to_sdn ~from:cal dmy))
       | _ -> null_val)
   | [ "month" ] -> (
       match d with
@@ -3329,7 +3569,7 @@ and eval_str_event_field conf base (p, p_auth)
               if (not approx) && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
             in
-            safe_val (s ^<^ DateDisplay.string_of_age conf a)
+            safe_val (s ^<^ format_age conf a)
         | _ -> null_val
       else null_val
   | "name" -> (
@@ -3361,6 +3601,30 @@ and eval_event_field_var conf base env (p, p_auth)
       match (p_auth, Date.od_of_cdate date) with
       | true, Some d -> eval_date_field_var conf d sl
       | _ -> null_val)
+  | [ "age" ] -> (
+      if not p_auth then null_val
+      else
+        let birth_date =
+          match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+          | None -> Date.cdate_to_dmy_opt (Driver.get_baptism p)
+          | x -> x
+        in
+        match (birth_date, Date.cdate_to_dmy_opt date) with
+        | Some d1, Some d2 when d1 <> d2 ->
+            VVstring (format_age conf (Date.time_elapsed d1 d2) :> string)
+        | _ -> null_val)
+  | "age" :: sl -> (
+      if not p_auth then null_val
+      else
+        let birth_date =
+          match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+          | None -> Date.cdate_to_dmy_opt (Driver.get_baptism p)
+          | x -> x
+        in
+        match (birth_date, Date.cdate_to_dmy_opt date) with
+        | Some d1, Some d2 when d1 <> d2 ->
+            eval_age_field_var conf (Date.time_elapsed d1 d2) sl
+        | _ -> null_val)
   | "spouse" :: sl -> (
       match isp with
       | Some isp ->
@@ -3751,10 +4015,20 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match person_living_age conf p p_auth with
       | Some elapsed -> DateDisplay.string_of_age conf elapsed |> safe_val
       | None -> null_val)
-  | "age_years" -> (
-      match person_living_age conf p p_auth with
-      | Some elapsed -> elapsed.year |> string_of_int |> str_val
-      | None -> null_val)
+  | "age_days" -> (
+      if not p_auth then null_val
+      else
+        match Date.od_of_cdate (Driver.get_birth p) with
+        | Some (Dgreg (birth_dmy, cal)) ->
+            let birth_sdn = Date.to_sdn ~from:cal birth_dmy in
+            let end_sdn =
+              match Date.date_of_death (Driver.get_death p) with
+              | Some (Dgreg (death_dmy, cal2)) ->
+                  Date.to_sdn ~from:cal2 death_dmy
+              | _ -> Date.to_sdn ~from:Dgregorian conf.today
+            in
+            VVstring (string_of_int (end_sdn - birth_sdn))
+        | _ -> null_val)
   | "alias" -> (
       match Driver.get_aliases p with
       | nn :: _ when p_auth ->
@@ -3859,16 +4133,6 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
               else transl_decline conf "possibly (date)" "" ^ " "
             in
             s ^<^ DateDisplay.string_of_age conf a |> safe_val
-        | _ -> null_val
-      else null_val
-  | "death_age_years" ->
-      if p_auth then
-        match Gutil.get_birth_death_date p with
-        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
-            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
-            _ )
-          when d1 <> d2 ->
-            (Date.time_elapsed d1 d2).year |> string_of_int |> str_val
         | _ -> null_val
       else null_val
   | "death_place" ->
@@ -4020,22 +4284,6 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           mark_descendants 0 p;
           r := tab;
           null_val
-      | _ -> raise Not_found)
-  | "marriage_age" -> (
-      match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) ->
-          if m_auth then
-            match
-              ( Date.cdate_to_dmy_opt (Driver.get_birth p),
-                Date.cdate_to_dmy_opt (Driver.get_marriage fam) )
-            with
-            | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
-                Some ({ prec = Sure | About | Maybe; _ } as d2) ) ->
-                Date.time_elapsed d1 d2
-                |> DateDisplay.string_of_age conf
-                |> safe_val
-            | _ -> null_val
-          else null_val
       | _ -> raise Not_found)
   | "marriage_age_years" -> (
       match get_env "fam" env with

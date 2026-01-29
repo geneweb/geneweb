@@ -280,6 +280,52 @@ let convert ~from ~to_ dmy =
     in
     { (via_gregorian dmy) with prec }
 
+let days_between ~from d1 d2 =
+  if d1.day = 0 || d1.month = 0 || d2.day = 0 || d2.month = 0 then None
+  else
+    let sdn1 = to_sdn ~from d1 in
+    let sdn2 = to_sdn ~from d2 in
+    if sdn2 >= sdn1 then Some (sdn2 - sdn1) else None
+
+let time_elapsed_cal ~from d1 d2 =
+  if from = Dgregorian then time_elapsed d1 d2
+  else
+    let d1 = convert ~from ~to_:Dgregorian d1 in
+    let d2 = convert ~from ~to_:Dgregorian d2 in
+    time_elapsed d1 d2
+
+type age = { nb_year : int; nb_month : int; nb_day : int; prec : precision }
+
+let age_of_dmy d =
+  { nb_year = d.year; nb_month = d.month; nb_day = d.day; prec = d.prec }
+
+let age_between ~from d1 d2 =
+  let valid =
+    if d1.day > 0 && d1.month > 0 && d2.day > 0 && d2.month > 0 then
+      let sdn1 = to_sdn ~from d1 in
+      let sdn2 = to_sdn ~from d2 in
+      sdn2 >= sdn1
+    else
+      d2.year > d1.year
+      || d2.year = d1.year
+         && (d1.month = 0 || d2.month = 0 || d2.month > d1.month
+            || d2.month = d1.month
+               && (d1.day = 0 || d2.day = 0 || d2.day >= d1.day))
+  in
+  if not valid then None else Some (age_of_dmy (time_elapsed_cal ~from d1 d2))
+
+type relative_pos = Before of age | After of age | Same
+
+let age_is_zero a = a.nb_year = 0 && a.nb_month = 0 && a.nb_day = 0
+
+let relative_age ~from ~ref d =
+  match age_between ~from ref d with
+  | Some age -> Some (if age_is_zero age then Same else After age)
+  | None -> (
+      match age_between ~from d ref with
+      | Some age -> Some (Before age)
+      | None -> None)
+
 let cdate_of_death = function
   | Death (_, cd) -> Some cd
   | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->

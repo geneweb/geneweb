@@ -1104,9 +1104,9 @@
   %apply;place_popup%with;ancestor%and;burial%and;0%end;
 %( Âge %)
   %if;(e.age="on")
-    <td class="align-middle text-center"%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;>%nn;
-      %if;ancestor.computable_death_age;%ancestor.death_age;%end;%nn;
-      %if;ancestor.computable_age;%ancestor.age;%end;%nn;
+    <td class="align-middle text-center"%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end; title="
+      %if;ancestor.computable_death_age;%ancestor.death_age;">%ancestor.death_age.short;%end;%nn;
+      %if;ancestor.computable_age;%ancestor.age;">%ancestor.age.short;%end;%nn;
     </td>
   %end;
 %( Profession %)

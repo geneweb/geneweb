@@ -111,3 +111,28 @@ val french_of_sdn : prec:precision -> int -> dmy
 
 val hebrew_of_sdn : prec:precision -> int -> dmy
 (** Convert SDN to Hebrew [dmy] with given precision. *)
+
+val days_between : from:calendar -> dmy -> dmy -> int option
+(** Total days between two complete dates. Returns [None] if either date is
+    partial (day=0 or month=0) or if d2 < d1. *)
+
+val time_elapsed_cal : from:calendar -> dmy -> dmy -> dmy
+(** Like [time_elapsed] but converts dates to Gregorian first if needed. Allows
+    computing intervals between dates in any calendar. *)
+
+type age = { nb_year : int; nb_month : int; nb_day : int; prec : precision }
+(** Age/interval result with named fields. *)
+
+val age_between : from:calendar -> dmy -> dmy -> age option
+(** Compute age between two dates. Returns [None] if d2 < d1. Uses SDN for
+    validation on complete dates. *)
+
+type relative_pos =
+  | Before of age
+  | After of age
+  | Same  (** Position of target relative to reference date. *)
+
+val relative_age : from:calendar -> ref:dmy -> dmy -> relative_pos option
+(** Position and distance of date relative to reference. [Before age] means date
+    is [age] before ref. [After age] means date is [age] after ref. Returns
+    [None] if comparison impossible (incompatible partial dates). *)
