@@ -383,12 +383,14 @@ let get_blason_owner conf base p =
   else None
 
 let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
+  (* FIXME get clean fn, sn upstream *)
+  let nfn, nsn = Declension.clean_declension nfn nsn in
   let sp2_ = Mutil.tr ' ' '_' in
   let old_key =
     Format.sprintf "%s.%d.%s"
-      (Driver.get_first_name p |> Driver.sou base |> Name.lower |> sp2_)
+      (Driver.p_first_name base p |> Name.lower |> sp2_)
       (Driver.get_occ p)
-      (Driver.get_surname p |> Driver.sou base |> Name.lower |> sp2_)
+      (Driver.p_surname base p |> Name.lower |> sp2_)
   in
   let new_key =
     Format.sprintf "%s.%d.%s"

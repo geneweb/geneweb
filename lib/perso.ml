@@ -358,8 +358,8 @@ let nobility_titles_list conf base p =
       personne a été modifiée, Faux sinon. [Rem] : Exporté en clair hors de ce
       module. *)
 let has_history conf base p p_auth =
-  let fn = Driver.sou base (Driver.get_first_name p) in
-  let sn = Driver.sou base (Driver.get_surname p) in
+  let fn = Driver.p_first_name base p in
+  let sn = Driver.p_surname base p in
   let occ = Driver.get_occ p in
   let person_file = HistoryDiff.history_file fn sn occ in
   p_auth && Sys.file_exists (HistoryDiff.history_path conf person_file)
@@ -1549,8 +1549,8 @@ let get_linked_page conf base p s =
   let db = Driver.read_nldb base in
   let db = Notes.merge_possible_aliases conf db in
   let key =
-    let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-    let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+    let fn = Name.lower (Driver.p_first_name base p) in
+    let sn = Name.lower (Driver.p_surname base p) in
     (fn, sn, Driver.get_occ p)
   in
   List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
@@ -3227,8 +3227,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
         match get_env "nldb" env with
         | Vnldb db ->
             let key =
-              let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-              let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+              let fn = Name.lower (Driver.p_first_name base p) in
+              let sn = Name.lower (Driver.p_surname base p) in
               (fn, sn, Driver.get_occ p)
             in
             let r =
@@ -3261,8 +3261,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
         match get_env "nldb" env with
         | Vnldb db ->
             let key =
-              let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-              let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+              let fn = Name.lower (Driver.p_first_name base p) in
+              let sn = Name.lower (Driver.p_surname base p) in
               (fn, sn, Driver.get_occ p)
             in
             VVbool (Notes.links_to_ind conf base db key None <> [])
@@ -3276,10 +3276,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           let r =
             if p_auth then
               let key =
-                let fn =
-                  Name.lower (Driver.sou base (Driver.get_first_name p))
-                in
-                let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+                let fn = Name.lower (Driver.p_first_name base p) in
+                let sn = Name.lower (Driver.p_surname base p) in
                 (fn, sn, Driver.get_occ p)
               in
               string_of_int
@@ -3297,10 +3295,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           let n =
             if p_auth then
               let key =
-                let fn =
-                  Name.lower (Driver.sou base (Driver.get_first_name p))
-                in
-                let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+                let fn = Name.lower (Driver.p_first_name base p) in
+                let sn = Name.lower (Driver.p_surname base p) in
                 (fn, sn, Driver.get_occ p)
               in
               List.length (Notes.links_to_ind conf base db key (Some s))
@@ -3323,8 +3319,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       match get_env "nldb" env with
       | Vnldb db ->
           let key =
-            let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-            let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+            let fn = Name.lower (Driver.p_first_name base p) in
+            let sn = Name.lower (Driver.p_surname base p) in
             (fn, sn, Driver.get_occ p)
           in
           List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
@@ -4191,8 +4187,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "history_file" ->
       if not p_auth then null_val
       else
-        let fn = Driver.sou base (Driver.get_first_name p) in
-        let sn = Driver.sou base (Driver.get_surname p) in
+        let fn = Driver.p_first_name base p in
+        let sn = Driver.p_surname base p in
         let occ = Driver.get_occ p in
         HistoryDiff.history_file fn sn occ |> str_val
   | "image" | "portrait" -> (
