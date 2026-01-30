@@ -862,6 +862,13 @@ let search_firstname alias_cache conf base query opts =
       List.fold_left
         (fun acc istr ->
           let str = Driver.sou base istr in
+          (* remove declension data *)
+          let str =
+            try
+              let i = String.index str ':' in
+              String.sub str 0 i
+            with Not_found -> str
+          in
           if str = query then
             acc @ Driver.spi_find (Driver.persons_of_first_name base) istr
           else acc)
