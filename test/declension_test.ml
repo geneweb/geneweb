@@ -8,6 +8,7 @@ let make_czech_conf () =
   (* Add some basic Czech translations with declensions *)
   Hashtbl.add lexicon "add" "přidat :a:";
   Hashtbl.add lexicon "with" "s :i:";
+  Hashtbl.add lexicon "person/persons" "osoba/osob";
   Hashtbl.add lexicon "on %s's side" "ze strany :g:%s";
   Hashtbl.add lexicon "%1 of %2" "%1 :g:%2";
   Config.{ empty with lang = "cs"; lexicon }
@@ -342,8 +343,20 @@ let test_mixing () =
   (check string) "replacement: accusative" "Aaaa" result_a;
   (check string) "replacement: instrumental" "Iiii" result_i
 
+(* Test de la traduction/declinaison *)
+let test_decline () =
+  let _name = "Jan:g:+a:i:+em" in
+  let conf_cs = make_czech_conf () in
+  let s = "on %s's side:::Jan:g:+a:i:+em" in
+  let result_a = Templ.eval_transl conf_cs true s "0" in
+  (* "ze strany :g:%s"  *)
+  (check string) "translate decline" "Ze strany Jana" result_a;
+  let s = "on %s's side:::[person/persons]1" in
+  let result_b = Templ.eval_transl conf_cs true s "1" in
+  (check string) "translate + translate" "Ze strany osob" result_b
+  (* FIXME "1" should apply to person/persons *)
 (* ============================================ *)
-(* Test suite definition                       *)
+(* Test suite definition                        *)
 (* ============================================ *)
 
 let v =
@@ -439,5 +452,6 @@ let v =
           test_apply_decline_multiple_transforms;
         test_case "Apply replacement" `Quick test_replacement;
         test_case "Apply mixing" `Quick test_mixing;
+        test_case "Apply translate decline" `Quick test_decline;
       ] );
   ]
