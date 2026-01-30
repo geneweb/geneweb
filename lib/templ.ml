@@ -592,7 +592,7 @@ let rec apply_format conf nth s1 s2 =
 
       (* 7. Appliquer le format selon le nombre de paramètres *)
       match List.length params_declined with
-      | 0 -> s1_format
+      | 0 -> Str.global_replace (Str.regexp "%[std]") " " s1_format
       | 1 -> (
           let p1 = List.nth params_declined 0 in
 
