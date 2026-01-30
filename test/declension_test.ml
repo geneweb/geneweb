@@ -354,7 +354,13 @@ let test_decline () =
   let s = "on %s's side:::[person/persons]" in
   let result_b = Templ.eval_transl conf_cs true s "1" in
   (check string) "translate + translate" "Ze strany osob" result_b;
-    let s = "on %s's side:::aaa [person/persons] bbb" in
+  let s = "on %s's side::|[person/persons]1|" in
+  let result_b = Templ.eval_transl conf_cs true s "1" in
+  (check string) "translate + translate" "Ze strany osob" result_b;
+  let s = "on %s's side::|[person/persons]0|" in
+  let result_b = Templ.eval_transl conf_cs true s "1" in
+  (check string) "translate + translate" "Ze strany osoba" result_b;
+  let s = "on %s's side:::aaa [person/persons] bbb" in
   let result_c = Templ.eval_transl conf_cs true s "1" in
   (check string) "translate + translate" "Ze strany aaa osob bbb" result_c;
   let s = "on %s's side:::aaa [person/persons]0 bbb" in
