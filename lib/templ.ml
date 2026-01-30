@@ -573,7 +573,36 @@ let split_parameters s =
   in
   loop [] "" 0 false
 
+let insert_nth s n =
+  Printf.eprintf "insert_nth: %s, %s\n" n s;
+  Str.global_substitute 
+    (Str.regexp "\\[\\([^]]+\\)\\]\\(.\\)?")
+    (fun matched ->
+      let content = Str.matched_group 1 matched in
+      let bracket = "[" ^ content ^ "]" in
+      try
+        let next = Str.matched_group 2 matched in
+        if String.length next = 0 then
+          (* Vide, ajouter n *)
+          bracket ^ n
+        else if next.[0] = ' ' then
+          (* Espace : ajouter n AVANT l'espace *)
+          bracket ^ n ^ " "
+        else
+          (* Autre caractère : GARDER tel quel *)
+          bracket ^ next
+      with Not_found ->
+        (* Pas de caractère après ] : ajouter n *)
+        bracket ^ n
+    )
+    s
+
+let _select_nth s n =
+  let s1 = String.split_on_char '/' s in
+  if n < List.length s1 then List.nth s1 n else s
+
 let rec apply_format conf nth s1 s2 =
+  Printf.eprintf "S2: %s\n" s2;
   (* s1 = clé du lexique (peut contenir :x:) *)
   (* s2 = paramètre(s) (peut contenir déclinaisons, variables, traductions) *)
 
@@ -591,11 +620,13 @@ let rec apply_format conf nth s1 s2 =
   if not (String.contains s1_format '%') then s1_format
   else
     try
+      Printf.eprintf "S2 in: %s\n" s2;
+      
       (* 4. Séparer s2 en paramètres *)
       let params = if s2 = "" then [] else split_parameters s2 in
 
       (* 5. Évaluer chaque paramètre (variables, traductions) *)
-      let params_evaluated = List.map (eval_param_internal conf) params in
+      let params_evaluated = List.map (eval_param_internal conf nth) params in
 
       (* 6. Appliquer les déclinaisons aux paramètres *)
       let params_declined =
@@ -695,7 +726,8 @@ let rec apply_format conf nth s1 s2 =
       Log.warn (fun k -> k "Format error in %s\n" s1_format);
       s1_format
 
-and eval_param_internal conf s =
+and eval_param_internal conf nth s =
+  Printf.eprintf "eval_param_internal: %d, %s\n" (Option.value ~default:0 nth) s;
   (* Évalue un paramètre qui peut contenir :
      - des variables : %first_name_raw;
      - des traductions : [parent/parents]n
@@ -703,11 +735,18 @@ and eval_param_internal conf s =
   *)
 
   (* Si contient des variables ou traductions, parser *)
-  if String.contains s '%' || String.contains s '[' then
+  if String.contains s '%' || String.contains s '[' then (
+    Printf.eprintf "S in: %s\n" s;
+    let s =
+      match nth with
+      | Some n -> insert_nth s (string_of_int n)
+      | None -> s
+    in
+    Printf.eprintf "S out: %s\n" s;
     let astl =
       Parser.parse ~on_exn ~resolve_include:(resolve_include conf) (`Raw s)
     in
-    List.fold_left (fun acc a -> acc ^ eval_ast conf a) "" astl
+    List.fold_left (fun acc a -> acc ^ eval_ast conf a) "" astl)
   else s
 
 and eval_ast conf Ast.{ desc; _ } =
@@ -726,6 +765,7 @@ and eval_transl_inline conf s =
   fst @@ Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
 
 and eval_transl_lexicon conf upp s c =
+  Printf.eprintf "eval_transl_lexicon %s, %s\n" c s;
   let c_opt = [ '0'; '1'; '2'; '3'; 'n'; 's'; 'w'; 'f'; 'c'; 'e'; 't' ] in
   let scan_for_transl s c i =
     (* scans starting at i for bracketed translation [to be translated] *)
@@ -765,8 +805,9 @@ and eval_transl_lexicon conf upp s c =
     (* NOUVEAU : Vérifier si nouvelle syntaxe [key:::param] *)
     match split_at_triple_colon s with
     | Some (key, param) ->
+        Printf.eprintf "Triple colon: %s, %s\n" key param;
         (* Évaluer le paramètre (peut contenir variables, traductions) *)
-        let param_evaluated = eval_param_internal conf param in
+        let param_evaluated = eval_param_internal conf nth param in
         (* Appliquer le format avec déclinaisons *)
         apply_format conf nth key param_evaluated
     | None -> (
@@ -795,6 +836,7 @@ and eval_transl_lexicon conf upp s c =
                       in
                       loop (0, s)
                     in
+                    Printf.eprintf "S: %s\n" s;
                     let astl =
                       Parser.parse ~on_exn
                         ~resolve_include:(resolve_include conf) (`Raw s)
@@ -810,6 +852,7 @@ and eval_transl_lexicon conf upp s c =
               else if String.length s2 > 0 && s2.[0] = ':' then
                 (* this is a third colon *)
                 let s2 = String.sub s2 1 (String.length s2 - 1) in
+                Printf.eprintf "No |: %s, %s" s1 s2;
                 try apply_format conf nth s1 s2
                 with Failure _ -> raise Not_found
               else raise Not_found
