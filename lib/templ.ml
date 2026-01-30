@@ -96,19 +96,6 @@ let subst_text x v s =
     in
     loop 0 0 0
 
-let split_at_coloncolon s =
-  let rec loop i =
-    if i >= String.length s - 1 then None
-    else
-      match (s.[i], s.[i + 1]) with
-      | ':', ':' ->
-          let s1 = String.sub s 0 i in
-          let s2 = String.sub s (i + 2) (String.length s - i - 2) in
-          Some (s1, s2)
-      | _ -> loop (i + 1)
-  in
-  loop 0
-
 let not_impl func x =
   let desc =
     if Obj.is_block (Obj.repr x) then
@@ -746,39 +733,6 @@ and eval_transl_inline conf s =
   fst @@ Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
 
 and eval_transl_lexicon conf upp s c =
-  let c_opt = [ '0'; '1'; '2'; '3'; 'n'; 's'; 'w'; 'f'; 'c'; 'e'; 't' ] in
-  let scan_for_transl s c i =
-    (* scans starting at i for bracketed translation [to be translated] *)
-    (* the space after translation can be used to force a choice *)
-    (* if no choice, then c is used *)
-    let j =
-      match String.index_from_opt s i '[' with Some j -> j | None -> -1
-    in
-    let k =
-      match String.index_from_opt s i ']' with Some k -> k | None -> -1
-    in
-    let existing_choice =
-      if k <> -1 && k < String.length s - 2 then List.mem s.[k + 1] c_opt
-      else false
-    in
-    let c =
-      if String.length s = k then c
-      else if String.length s > k + 1 && List.mem s.[k + 1] c_opt then
-        String.make 1 s.[k + 1]
-      else c
-    in
-    if j = -1 || k = -1 then (-1, s)
-    else
-      ( k + 1,
-        String.sub s 0 (k + 1)
-        ^ c
-        ^
-        if String.length s = k + 1 || String.length s = k + 2 then ""
-        else if existing_choice then
-          String.sub s (k + 2) (String.length s - k - 2)
-        else String.sub s (k + 1) (String.length s - k - 1) )
-  in
-
   let r =
     let nth = try Some (int_of_string c) with Failure _ -> None in
 
@@ -789,57 +743,7 @@ and eval_transl_lexicon conf upp s c =
         let param_evaluated = eval_param_internal conf nth param in
         (* Appliquer le format avec déclinaisons *)
         apply_format conf nth key param_evaluated
-    | None -> (
-        (* ANCIEN : Comportement existant *)
-        match split_at_coloncolon s with
-        | None -> (
-            try apply_format conf nth s "" with Failure _ -> raise Not_found)
-        | Some (s1, s2) -> (
-            try
-              if String.length s2 > 0 && s2.[0] = '|' then
-                let i = 1 in
-                let j = String.rindex s2 '|' in
-                if j = 0 then
-                  (* missing second | *)
-                  let s2 = String.sub s2 i (String.length s2 - j - 1) in
-                  try apply_format conf nth s1 s2
-                  with Failure _ -> raise Not_found
-                else
-                  let s3 =
-                    let s = String.sub s2 i (j - i) in
-                    (* scan s for potential translates *)
-                    let _k, s =
-                      let rec loop (k, s) =
-                        let k, s = scan_for_transl s c k in
-                        if k = -1 then (k, s) else loop (k, s)
-                      in
-                      loop (0, s)
-                    in
-                    let astl =
-                      Parser.parse ~on_exn
-                        ~resolve_include:(resolve_include conf) (`Raw s)
-                    in
-                    (* parse_templ handles only text, evars and translations *)
-                    (* more complex parsing (%surname;, %if; ...) not available *)
-                    List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
-                  in
-                  let s4 = String.sub s2 (j + 1) (String.length s2 - j - 1) in
-                  let s2 = s3 ^ s4 in
-                  try apply_format conf nth s1 s2
-                  with Failure _ -> raise Not_found
-              else if String.length s2 > 0 && s2.[0] = ':' then
-                (* this is a third colon *)
-                let s2 = String.sub s2 1 (String.length s2 - 1) in
-                try apply_format conf nth s1 s2
-                with Failure _ -> raise Not_found
-              else raise Not_found
-            with Not_found ->
-              let s3 =
-                match nth with
-                | Some n -> Util.transl_nth conf s2 n
-                | None -> if s2 = "" then "" else Util.transl conf s2
-              in
-              Util.transl_decline conf s1 s3))
+    | None -> try apply_format conf nth s "" with Failure _ -> raise Not_found
   in
   let r = Util.simple_decline conf r in
   let r = Util.translate_eval r in
