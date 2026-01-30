@@ -472,15 +472,22 @@ let eval_var_handled conf sl =
     Printf.sprintf " %%%s?" (String.concat "." sl)
 
 let split_at_triple_colon s =
-  (* Cherche ::: dans la chaîne *)
+  (* Cherche :: dans la chaîne (et ignore le 3ème : s'il existe) *)
   let rec find i =
-    if i >= String.length s - 2 then None
-    else if
-      i + 2 < String.length s
-      && s.[i] = ':'
-      && s.[i + 1] = ':'
-      && s.[i + 2] = ':'
-    then Some (String.sub s 0 i, String.sub s (i + 3) (String.length s - i - 3))
+    if i >= String.length s - 1 then None
+    else if s.[i] = ':' && s.[i + 1] = ':' then
+      (* Trouvé :: *)
+      let before = String.sub s 0 i in
+      (* Vérifier s'il y a un 3ème : *)
+      let start_after = 
+        if i + 2 < String.length s && s.[i + 2] = ':' then
+          i + 3  (* Sauter ::: *)
+        else
+          i + 2  (* Sauter :: *)
+      in
+      let after = String.sub s start_after (String.length s - start_after) in
+      Printf.eprintf "Split: %s, %s\n" before after;
+      Some (before, after)
     else find (i + 1)
   in
   find 0
