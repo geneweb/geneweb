@@ -2279,9 +2279,9 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       str_val
         ((Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
         ^ "pz="
-        ^ Driver.sou base (Driver.get_first_name p)
+        ^ (Driver.p_first_name base p)
         ^ "&nz="
-        ^ Driver.sou base (Driver.get_surname p)
+        ^ (Driver.p_surname base p)
         ^ (if Driver.get_occ p <> 0 then
              "&ocz=" ^ string_of_int (Driver.get_occ p)
            else "")

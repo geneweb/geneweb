@@ -65,9 +65,8 @@ let compute_cell_data conf base tstab p1 p2 =
 
 (* Fonction utilitaire pour obtenir le nom simple d'une personne *)
 let get_person_simple_name base person =
-  let first_name = Driver.sou base (Driver.get_first_name person) in
-  let surname = Driver.sou base (Driver.get_surname person) in
-  Printf.sprintf "%s %s" first_name surname
+  Printf.sprintf "%s %s" 
+    (Driver.p_first_name base person) (Driver.p_surname base person)
 
 (* Fonction générique pour créer des liens de parenté *)
 let encoded_key name = (Mutil.encode (Name.lower name) :> string)
