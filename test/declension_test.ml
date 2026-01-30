@@ -351,10 +351,15 @@ let test_decline () =
   let result_a = Templ.eval_transl conf_cs true s "0" in
   (* "ze strany :g:%s"  *)
   (check string) "translate decline" "Ze strany Jana" result_a;
-  let s = "on %s's side:::[person/persons]1" in
+  let s = "on %s's side:::[person/persons]" in
   let result_b = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate + translate" "Ze strany osob" result_b
-(* FIXME "1" should apply to person/persons *)
+  (check string) "translate + translate" "Ze strany osob" result_b;
+    let s = "on %s's side:::aaa [person/persons] bbb" in
+  let result_c = Templ.eval_transl conf_cs true s "1" in
+  (check string) "translate + translate" "Ze strany aaa osob bbb" result_c;
+  let s = "on %s's side:::aaa [person/persons]0 bbb" in
+  let result_d = Templ.eval_transl conf_cs true s "1" in
+  (check string) "translate + translate" "Ze strany aaa osoba bbb" result_d
 (* ============================================ *)
 (* Test suite definition                        *)
 (* ============================================ *)
