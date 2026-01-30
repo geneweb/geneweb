@@ -382,8 +382,7 @@ let rec eval_var conf base env _xx _loc = function
 
 and eval_person_field_var _conf base _env (p, pauth) = function
   | "surname" when pauth -> VVstring (Driver.p_surname base p)
-  | "first_name" when pauth ->
-      VVstring (Driver.p_first_name base p)
+  | "first_name" when pauth -> VVstring (Driver.p_first_name base p)
   | _ -> raise Not_found
 
 and eval_dag_cell_var conf base env (colspan, align, td) = function
