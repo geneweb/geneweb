@@ -15,8 +15,9 @@ let make_czech_conf () =
 
 let make_english_conf () =
   let lexicon = Hashtbl.create 100 in
-  Hashtbl.add lexicon "add" "add";
+  Hashtbl.add lexicon "add" "adde";
   Hashtbl.add lexicon "with" "with";
+  Hashtbl.add lexicon "person/persons" "eperson/epersons";
   Hashtbl.add lexicon "on %s's side" "on %s's side";
   Hashtbl.add lexicon "%1 of %2" "%1 of %2";
   Config.{ empty with lang = "en"; lexicon }
@@ -149,7 +150,7 @@ let test_transl_unknown_key () =
 
 let test_transl_english_no_declension () =
   let conf = make_english_conf () in
-  (check string) "English has no declension codes" "add"
+  (check string) "English has no declension codes" "adde"
     (Util.transl conf "add")
 
 (* Test 2.2: transl_decline - Translation + declension *)
@@ -169,7 +170,7 @@ let test_transl_decline_english () =
   let conf = make_english_conf () in
   let name = "rodina:a:-u" in
   (* English should ignore declension codes and use nominative *)
-  (check string) "English ignores declension" "add rodina"
+  (check string) "English ignores declension" "adde rodina"
     (Util.transl_decline conf "add" name)
 
 (* Test 2.3: transl_a_of_b - Composed expression *)
@@ -265,7 +266,7 @@ let test_same_name_different_languages () =
   (check string) "Czech with declension" "přidat Vladanu"
     (Util.transl_decline conf_cs "add" name);
   (* English should use nominative *)
-  (check string) "English without declension" "add Vladana"
+  (check string) "English without declension" "adde Vladana"
     (Util.transl_decline conf_en "add" name)
 
 (* ============================================ *)
@@ -347,28 +348,47 @@ let test_mixing () =
 let test_decline () =
   let _name = "Jan:g:+a:i:+em" in
   let conf_cs = make_czech_conf () in
+  let conf_en = make_english_conf () in
   let s = "on %s's side:::Jan:g:+a:i:+em" in
   let result_a = Templ.eval_transl conf_cs true s "0" in
   (* "ze strany :g:%s"  *)
   (check string) "translate decline" "Ze strany Jana" result_a;
+  
   let s = "on %s's side:::[person/persons]" in
   let result_b = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate + translate" "Ze strany osob" result_b;
-  let s = "on %s's side::[person/persons]1" in
+  (check string) "translate ::: translate 1" "Ze strany osob" result_b;
+
+  let s = "on %s's side:::[person/persons]1" in
   let result_b = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate + translate" "Ze strany osob" result_b;
-  let s = "on %s's side::[person/persons]0" in
+  (check string) "translate :: translate 2" "Ze strany osob" result_b;
+
+  let s = "on %s's side:::[person/persons]0" in
   let result_b = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate + translate" "Ze strany osoba" result_b;
-  let s = "on %s's side::[person/persons]" in
+  (check string) "translate :: translate 3" "Ze strany osoba" result_b;
+
+  let s = "on %s's side::person/persons" in
   let result_b = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate + translate" "Ze strany osob" result_b;
+  (check string) "translate :: translate 4" "Ze strany osob" result_b;
+
   let s = "on %s's side:::aaa [person/persons] bbb" in
   let result_c = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate + translate" "Ze strany aaa osob bbb" result_c;
+  (check string) "translate ::: aaa translate bbb 5" "Ze strany aaa osob bbb" result_c;
+
   let s = "on %s's side:::aaa [person/persons]0 bbb" in
   let result_d = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate + translate" "Ze strany aaa osoba bbb" result_d
+  (check string) "translate ::: aaa translate/0 bbb 6" "Ze strany aaa osoba bbb" result_d;
+  
+  let s = "add:::[person/persons]" in
+  let result_d = Templ.eval_transl conf_en true s "1" in
+  (check string) "translate ::: translate 7" "Adde epersons" result_d;
+  
+  let s = "add::person/persons" in
+  let result_d = Templ.eval_transl conf_en true s "1" in
+  (check string) "translate :: translate 8" "Adde epersons" result_d
+  
+  
+  
+  
 (* ============================================ *)
 (* Test suite definition                        *)
 (* ============================================ *)
