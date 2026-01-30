@@ -731,6 +731,13 @@ let search_firstname_with_cache conf base query opts =
       List.fold_left
         (fun acc istr ->
           let str = Driver.sou base istr in
+          (* remove declension data *)
+          let str =
+            try
+              let i = String.index str ':' in
+              String.sub str 0 i
+            with Not_found -> str
+          in
           if str = query then
             acc @ Driver.spi_find (Driver.persons_of_first_name base) istr
           else acc)
@@ -1482,6 +1489,7 @@ let print conf base specify =
       log_case (Printf.sprintf "PersonName (%s)" pn);
       search_with pn name_order
   | FirstNameOnly fn ->
+      log_case (Printf.sprintf "FirstNameOnly (%s)" fn);
       let results = search_firstname_with_cache conf base fn fn_options in
       display_firstname_results conf base fn fn_options results
   | SurnameOnly sn ->

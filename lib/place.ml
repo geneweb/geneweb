@@ -589,7 +589,7 @@ let print_html_places_surnames_long conf base link_to_ind
           Output.printf conf "<a href=\"%s" (commd conf :> string);
           Output.print_string conf (acces conf base @@ pget conf base @@ ip);
           Output.printf conf "\" title=\"%s\">%s</a>"
-            ((Driver.p_first_name base (Driver.poi base ip)))
+            (Driver.p_first_name base (Driver.poi base ip))
             sn
       | _ ->
           Output.printf conf "<a href=\"%s" (commd conf :> string);
