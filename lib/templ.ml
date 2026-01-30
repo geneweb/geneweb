@@ -466,14 +466,14 @@ let split_at_triple_colon s =
       (* Trouvé :: *)
       let before = String.sub s 0 i in
       (* Vérifier s'il y a un 3ème : *)
-      let start_after = 
+      let n, start_after = 
         if i + 2 < String.length s && s.[i + 2] = ':' then
-          i + 3  (* Sauter ::: *)
+          3, i + 3  (* Sauter ::: *)
         else
-          i + 2  (* Sauter :: *)
+          2, i + 2  (* Sauter :: *)
       in
       let after = String.sub s start_after (String.length s - start_after) in
-      Some (before, after)
+      Some (n, before, after)
     else find (i + 1)
   in
   find 0
@@ -576,6 +576,7 @@ let _select_nth s n =
   if n < List.length s1 then List.nth s1 n else s
 
 let rec apply_format conf nth s1 s2 =
+  Printf.eprintf "Apply format: %s, %s\n" s1 s2;
   (* s1 = clé du lexique (peut contenir :x:) *)
   (* s2 = paramètre(s) (peut contenir déclinaisons, variables, traductions) *)
 
@@ -705,7 +706,6 @@ and eval_param_internal conf nth s =
   *)
 
   (* Si contient des variables ou traductions, parser *)
-  if String.contains s '%' || String.contains s '[' then (
     let s =
       match nth with
       | Some n -> insert_nth s (string_of_int n)
@@ -714,8 +714,7 @@ and eval_param_internal conf nth s =
     let astl =
       Parser.parse ~on_exn ~resolve_include:(resolve_include conf) (`Raw s)
     in
-    List.fold_left (fun acc a -> acc ^ eval_ast conf a) "" astl)
-  else s
+    List.fold_left (fun acc a -> acc ^ eval_ast conf a) "" astl
 
 and eval_ast conf Ast.{ desc; _ } =
   match desc with
@@ -738,12 +737,25 @@ and eval_transl_lexicon conf upp s c =
 
     (* NOUVEAU : Vérifier si nouvelle syntaxe [key:::param] *)
     match split_at_triple_colon s with
-    | Some (key, param) ->
+    | Some (3, key, param) ->
+        Printf.eprintf "Case 3 :: %s, %s\n" key param;
         (* Évaluer le paramètre (peut contenir variables, traductions) *)
         let param_evaluated = eval_param_internal conf nth param in
         (* Appliquer le format avec déclinaisons *)
-        apply_format conf nth key param_evaluated
-    | None -> try apply_format conf nth s "" with Failure _ -> raise Not_found
+        if not (String.contains key '%') then
+          eval_transl conf upp key c ^ " " ^ param_evaluated
+        else
+          apply_format conf nth key param_evaluated
+    | Some (2, key, param) ->
+        Printf.eprintf "Case 2 :: %s, %s\n" key param;
+        (* this is the [add::parents] case where both terms must be translated *)
+        let param_evaluated = eval_param_internal conf nth ("[" ^ param ^ "]") in
+        Printf.eprintf "Param evaluated: %s\n" param_evaluated;
+        if not (String.contains key '%') then
+          eval_transl conf upp key c ^ " " ^ param_evaluated
+        else
+          apply_format conf nth key param_evaluated
+    | _ -> try apply_format conf nth s "" with Failure _ -> raise Not_found
   in
   let r = Util.simple_decline conf r in
   let r = Util.translate_eval r in
