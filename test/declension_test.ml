@@ -11,12 +11,15 @@ let make_czech_conf () =
   Hashtbl.add lexicon "person/persons" "osoba/osob";
   Hashtbl.add lexicon "on %s's side" "ze strany :g:%s";
   Hashtbl.add lexicon "%1 of %2" "%1 :g:%2";
+  Hashtbl.add lexicon "marriage between %s and %s"
+    "manželství mezi :a:%s a :g:%s";
   Config.{ empty with lang = "cs"; lexicon }
 
 let make_english_conf () =
   let lexicon = Hashtbl.create 100 in
   Hashtbl.add lexicon "add" "adde";
   Hashtbl.add lexicon "with" "with";
+  Hashtbl.add lexicon "before" "before +before";
   Hashtbl.add lexicon "person/persons" "eperson/epersons";
   Hashtbl.add lexicon "on %s's side" "on %s's side";
   Hashtbl.add lexicon "%1 of %2" "%1 of %2";
@@ -151,7 +154,9 @@ let test_transl_unknown_key () =
 let test_transl_english_no_declension () =
   let conf = make_english_conf () in
   (check string) "English has no declension codes" "adde"
-    (Util.transl conf "add")
+    (Util.transl conf "add");
+  let result = Util.transl_decline conf "before" "name" in
+  (check string) "English before " "name before" result
 
 (* Test 2.2: transl_decline - Translation + declension *)
 let test_transl_decline_czech () =
@@ -353,7 +358,7 @@ let test_decline () =
   let result_a = Templ.eval_transl conf_cs true s "0" in
   (* "ze strany :g:%s"  *)
   (check string) "translate decline" "Ze strany Jana" result_a;
-  
+
   let s = "on %s's side:::[person/persons]" in
   let result_b = Templ.eval_transl conf_cs true s "1" in
   (check string) "translate ::: translate 1" "Ze strany osob" result_b;
@@ -372,23 +377,27 @@ let test_decline () =
 
   let s = "on %s's side:::aaa [person/persons] bbb" in
   let result_c = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate ::: aaa translate bbb 5" "Ze strany aaa osob bbb" result_c;
+  (check string) "translate ::: aaa translate bbb 5" "Ze strany aaa osob bbb"
+    result_c;
 
   let s = "on %s's side:::aaa [person/persons]0 bbb" in
   let result_d = Templ.eval_transl conf_cs true s "1" in
-  (check string) "translate ::: aaa translate/0 bbb 6" "Ze strany aaa osoba bbb" result_d;
-  
+  (check string) "translate ::: aaa translate/0 bbb 6" "Ze strany aaa osoba bbb"
+    result_d;
+
   let s = "add:::[person/persons]" in
   let result_d = Templ.eval_transl conf_en true s "1" in
   (check string) "translate ::: translate 7" "Adde epersons" result_d;
-  
+
   let s = "add::person/persons" in
   let result_d = Templ.eval_transl conf_en true s "1" in
-  (check string) "translate :: translate 8" "Adde epersons" result_d
-  
-  
-  
-  
+  (check string) "translate :: translate 8" "Adde epersons" result_d;
+
+  let s = "marriage between %s and %s:::Vladana:a:-u:g:-y:Lukáš:g:--še" in
+  let result_d = Templ.eval_transl conf_cs true s "0" in
+  (check string) "translate :: translate 9" "Manželství mezi Vladanu a Lukáše"
+    result_d
+
 (* ============================================ *)
 (* Test suite definition                        *)
 (* ============================================ *)
