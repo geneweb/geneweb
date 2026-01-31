@@ -573,31 +573,46 @@ let _select_nth s n =
   let s1 = String.split_on_char '/' s in
   if n < List.length s1 then List.nth s1 n else s
 
-let rec apply_format conf nth s1 s2 =
-  Printf.eprintf "Apply format: %s, %s\n" s1 s2;
+let rec apply_format ?(transl = true) ?(case = 0) conf nth s1 s2 =
+  Printf.eprintf "Apply format: %s, case=%d,  %s, %d, %s\n"
+    (if transl then "translate" else "no translate")
+    case s1
+    (Option.value ~default:0 nth)
+    s2;
+  flush stderr;
 
   (* s1 = clé du lexique (peut contenir :x:) *)
   (* s2 = paramètre(s) (peut contenir déclinaisons, variables, traductions) *)
 
   (* 1. Traduire s1 depuis le lexique *)
   let s1_translated =
-    match nth with
-    | Some n -> Util.transl_nth conf s1 n
-    | None -> Util.transl conf s1
+    if transl then
+      match nth with
+      | Some n -> Util.transl_nth conf s1 n
+      | None -> Util.transl conf s1
+    else s1
   in
 
   (* 2. Extraire les déclinaisons de s1_translated *)
   let s1_format, declensions = parse_format_with_declension s1_translated in
 
   (* 3. Si pas de format, retourner directement *)
-  if not (String.contains s1_format '%') then s1_format
+  if not (String.contains s1_format '%') then
+    match case with
+    | 2 ->
+        s1_format ^ " " ^ Util.transl_nth conf s2 (Option.value ~default:0 nth)
+    | _ -> s1_format
   else
     try
       (* 4. Séparer s2 en paramètres *)
       let params = if s2 = "" then [] else split_parameters s2 in
-
+      Printf.eprintf "Params 1: %d, %s\n" (List.length params)
+        (List.nth params 0);
       (* 5. Évaluer chaque paramètre (variables, traductions) *)
       let params_evaluated = List.map (eval_param_internal conf nth) params in
+      Printf.eprintf "Params 2: %d, %s\n"
+        (List.length params_evaluated)
+        (List.nth params_evaluated 0);
 
       (* 6. Appliquer les déclinaisons aux paramètres *)
       let params_declined =
@@ -609,6 +624,9 @@ let rec apply_format conf nth s1 s2 =
               Translate.eval result)
             params_evaluated declensions
       in
+      Printf.eprintf "Params 3: %d, %s\n"
+        (List.length params_declined)
+        (List.nth params_declined 0);
 
       (* 7. Appliquer le format selon le nombre de paramètres *)
       match List.length params_declined with
@@ -694,12 +712,13 @@ let rec apply_format conf nth s1 s2 =
           try_formats format_attempts
       | _ -> "[" ^ s1_format ^ "?]" (* Plus de 2 paramètres non supporté *)
     with _ ->
+      Printf.eprintf "No format\n";
       Log.warn (fun k -> k "Format error in %s\n" s1_format);
-      s1_format
+      Str.global_replace (Str.regexp "%[std]") "" s1_format
 
 and eval_param_internal conf nth s =
   (* Évalue un paramètre qui peut contenir :
-     - des variables : %first_name_raw;
+     - des variables : %first_name_raw; (* NO *)
      - des traductions : [parent/parents]n
      - du texte brut : Henri
   *)
@@ -720,15 +739,18 @@ and eval_ast conf Ast.{ desc; _ } =
   | Atransl (upp, s, c) -> eval_transl conf upp s c
   | ast -> not_impl "eval_ast" ast
 
-and eval_transl conf upp s c =
+and eval_transl ?(transl = true) conf upp s c =
+  Printf.eprintf "\n***\nTempl.Eval transl: %s, %s\n" c s;
   if c = "" && String.length s > 0 && s.[0] = '\n' then
     eval_transl_inline conf s
-  else eval_transl_lexicon conf upp s c
+  else eval_transl_lexicon conf ~transl upp s c
 
 and eval_transl_inline conf s =
   fst @@ Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
 
-and eval_transl_lexicon conf upp s c =
+and eval_transl_lexicon ?(transl = true) conf upp s c =
+  Printf.eprintf "Templ.eval_transl_lexicon 0: %s, %s\n" c s;
+  flush stderr;
   let r =
     let nth = try Some (int_of_string c) with Failure _ -> None in
 
@@ -736,26 +758,54 @@ and eval_transl_lexicon conf upp s c =
     match split_at_triple_colon s with
     | Some (3, key, param) ->
         Printf.eprintf "Case 3 :: %s, %s\n" key param;
+        flush stderr;
         (* Évaluer le paramètre (peut contenir variables, traductions) *)
         let param_evaluated = eval_param_internal conf nth param in
         (* Appliquer le format avec déclinaisons *)
         if not (String.contains key '%') then
-          eval_transl conf upp key c ^ " " ^ param_evaluated
+          eval_transl ~transl conf upp key c ^ " " ^ param_evaluated
         else apply_format conf nth key param_evaluated
-    | Some (2, key, param) ->
-        Printf.eprintf "Case 2 :: %s, %s\n" key param;
+    | Some (2, key, param) -> (
+        Printf.eprintf "Case 2 :: %s, %s, %s\n" key c param;
+        flush stderr;
         (* this is the [add::parents] case where both terms must be translated *)
-        let param_evaluated =
-          eval_param_internal conf nth ("[" ^ param ^ "]")
-        in
-        Printf.eprintf "Param evaluated: %s\n" param_evaluated;
-        if not (String.contains key '%') then
-          eval_transl conf upp key c ^ " " ^ param_evaluated
-        else apply_format conf nth key param_evaluated
-    | _ -> ( try apply_format conf nth s "" with Failure _ -> raise Not_found)
+        let n = try int_of_string c with Failure _ -> 0 in
+        let key = Util.transl_nth conf key n in
+        match (String.contains key '%', String.contains key ':') with
+        | true, true ->
+            Printf.eprintf "True, true\n";
+            flush stderr;
+            let param = Util.transl_nth conf param n in
+            apply_format conf ~transl:false (Some 0) key param
+        | true, false ->
+            Printf.eprintf "True, false\n";
+            flush stderr;
+            apply_format conf ~transl:false (Some 0) key param
+        | false, true ->
+            Printf.eprintf "False, true\n";
+            flush stderr;
+            let key, case = parse_format_with_declension key in
+            (* Parse "přidat :a:%s" *)
+            (* Retourne ("přidat %s", Some 'a') *)
+            let param_declined = Mutil.decline (List.nth case 0) param in
+            apply_format conf ~transl:false (Some 0) key param_declined
+        | false, false ->
+            Printf.eprintf "False, false\n";
+            flush stderr;
+            let param = Util.transl_nth conf param n in
+            Util.gen_decline_basic key param)
+    | _ -> (
+        try apply_format ~transl conf nth s ""
+        with Failure _ -> raise Not_found)
   in
+  Printf.eprintf "Templ.eval_transl_lexicon 1: %s\n" r;
+  flush stderr;
   let r = Util.simple_decline conf r in
+  Printf.eprintf "Templ.eval_transl_lexicon 2: %s\n" r;
+  flush stderr;
   let r = Util.translate_eval r in
+  Printf.eprintf "Templ.eval_transl_lexicon 3: %s\n" r;
+  flush stderr;
   if upp then Utf8.capitalize_fst r else r
 
 let templ_eval_var (conf : Config.config) = function
@@ -1529,7 +1579,7 @@ let output_simple conf env fl =
               | Vstring s -> VVstring (s :> string)
               | _ -> raise Not_found)
           | _ -> raise Not_found);
-      eval_transl = (fun _ -> eval_transl conf);
+      eval_transl = (fun _ -> eval_transl ~transl:true conf);
       eval_predefined_apply = (fun _ -> raise Not_found);
       get_vother;
       set_vother;

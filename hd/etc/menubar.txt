@@ -2,8 +2,8 @@
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*add]/[delete::image/images]1 (I)" accesskey="I"%in;
-%let;laL;title="[*add::parents] [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)" accesskey="L"%in;
-%let;laP;title="[*modify::person/persons]0 %first_name;%if;(occ!=0).%occ%end; %surname; (P)" accesskey="P"%in;
+%let;laL;title="[*add::parent/parents]1[:]][of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)" accesskey="L"%in;
+%let;laP;title="[*modify::person/persons]0[:] %first_name;%if;(occ!=0).%occ%end; %surname; (P)" accesskey="P"%in;
 %let;laR;title="[*relationship computing] (R)" accesskey="R"%in;
 %let;laU;title="[*update] (U)" accesskey="U"%in;
 %let;laS;accesskey="S"%in;
@@ -135,7 +135,7 @@
                 <sup><span class="fa fa-user male" aria-hidden="true"></span></sup>%nn;
                 <sub><span class="fa fa-plus %sexcolor;" aria-hidden="true"></span></sub>%nn;
                 <sup><span class="fa fa-user female" aria-hidden="true"></span></sup>%nn;
-                <span class="sr-only">[*add::parents] [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)</span></a>
+                <span class="sr-only">xxx [*add::parent/parents]1 [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)</span></a>
             </li>
           %end;
           %( SELF button %)
@@ -332,10 +332,10 @@
                 <li class="nav-item">
                   %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%else;%end;%in;
                   <a class="nav-link %if;((e.m="MOD_FAM" or e.m="MOD_FAM_OK") and e.i=family.index)active%end;" id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
-                    title="[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)"
+                    title="[*modify::family/families]0[:] [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)"
                     accesskey="%a_k;">%nn;
                     <span class="fa fa-user-pen %sexcolor;" aria-hidden="true"></span><span class="fa fa-user %apply;spousesexcolor(spouse.sex)" aria-hidden="true"></span>%if;(nb_families!=1)<span class="small align-top"><sup>%family_cnt;</sup></span>%end;
-                    <span class="sr-only"> [*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span></a>
+                    <span class="sr-only"> [*modify::family/families]0[:] [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span></a>
                 </li>
               %end;
               %( Family dropdown menu %)
