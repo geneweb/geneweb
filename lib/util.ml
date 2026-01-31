@@ -343,9 +343,11 @@ let gen_decline_basic wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
   if len >= 3 && wt.[len - 3] = ':' && wt.[len - 1] = ':' then
+    (* detect wt = xxxx :x: -> decline s according to x *)
     let start = String.sub wt 0 (len - 3) in
     start ^ Mutil.decline wt.[len - 2] s
   else
+    (* detect wt = xxxx +before -> invert result *)
     match String.rindex_opt wt '+' with
     | Some i ->
         if
