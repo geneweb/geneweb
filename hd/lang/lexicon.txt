@@ -1768,6 +1768,11 @@ sv: lägg till en grupp
 tr: bir grup ekle
 zh: 添加一个组
 
+    parent/parents
+en: parent/parents
+de: Eltern/Eltern
+fr: parent/parents
+
     add
 af: byvoeg
 bg: добавяне на
