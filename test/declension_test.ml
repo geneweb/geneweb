@@ -19,10 +19,11 @@ let make_english_conf () =
   let lexicon = Hashtbl.create 100 in
   Hashtbl.add lexicon "add" "adde";
   Hashtbl.add lexicon "with" "with";
-  Hashtbl.add lexicon "before" "before +before";
+  Hashtbl.add lexicon "test before" "test before +before";
   Hashtbl.add lexicon "person/persons" "eperson/epersons";
   Hashtbl.add lexicon "on %s's side" "on %s's side";
   Hashtbl.add lexicon "%1 of %2" "%1 of %2";
+  Hashtbl.add lexicon "married%t to" "married%t to";
   Config.{ empty with lang = "en"; lexicon }
 
 (* ============================================ *)
@@ -155,8 +156,8 @@ let test_transl_english_no_declension () =
   let conf = make_english_conf () in
   (check string) "English has no declension codes" "adde"
     (Util.transl conf "add");
-  let result = Util.transl_decline conf "before" "name" in
-  (check string) "English before " "name before" result
+  let result = Util.transl_decline conf "test before" "name" in
+  (check string) "English test before " "name test before" result
 
 (* Test 2.2: transl_decline - Translation + declension *)
 let test_transl_decline_czech () =
@@ -396,7 +397,11 @@ let test_decline () =
   let s = "marriage between %s and %s:::Vladana:a:-u:g:-y:Lukáš:g:--še" in
   let result_d = Templ.eval_transl conf_cs true s "0" in
   (check string) "translate :: translate 9" "Manželství mezi Vladanu a Lukáše"
-    result_d
+    result_d;
+
+  let s = "married%t to::" in
+  let result_d = Templ.eval_transl conf_en true s "0" in
+  (check string) "translate :: empty param 10" "Married to" result_d
 
 (* ============================================ *)
 (* Test suite definition                        *)

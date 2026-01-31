@@ -230,6 +230,7 @@ let colon_to_at s =
   loop 0 0
 
 let decline case s =
+  Printf.eprintf "Mutil.decline: %c, %s\n" case s;
   Printf.sprintf "@(@(%c)%s)" case
     (if not (String.contains s ':') then s else colon_to_at s)
 (* end compatibility code *)
