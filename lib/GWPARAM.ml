@@ -206,6 +206,15 @@ let check_base_exists bname =
     Printf.eprintf "Database \"%s\" already exists. Use -f to overwrite.\n"
       bname;
     exit 2)
+  else
+    let new_bdir =
+      Filename.concat (Secure.base_dir ()) (clean_bname ^ "_backup.gwb")
+    in
+    if Sys.file_exists bdir then (
+      try Sys.rename bdir new_bdir
+      with Failure _ ->
+        Printf.eprintf "Cannot create backup copy of \"%s\"\n" bname;
+        exit 2)
 
 let rec create_base_and_config bname =
   let clean_bname = Filename.remove_extension bname in
