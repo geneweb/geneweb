@@ -577,14 +577,17 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
 
 let print_title conf order_string xl =
   let name_list =
-    (List.map Util.escape_html xl :> string list) |> String.concat " ,"
+    (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) xl :> string list)
+    |> String.concat " ,"
   in
   Output.print_sstring conf (Printf.sprintf "%s (%s)" name_list order_string)
 
 let print_one_surname_by_branch conf base x xl branches =
   let names = Ext_string.Set.elements xl in
   let name_list_str =
-    (List.map Util.escape_html names :> string list) |> String.concat " ,"
+    (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) names
+      :> string list)
+    |> String.concat " ,"
   in
   let title h =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
@@ -598,7 +601,7 @@ let print_one_surname_by_branch conf base x xl branches =
           Output.print_sstring conf {|m=N&t=A&v=|};
           Output.print_string conf (Mutil.encode x);
           Output.print_sstring conf {|">|};
-          Output.print_string conf (Util.escape_html x);
+          Output.print_string conf (Util.escape_html (Utf8.uppercase x));
           Output.print_sstring conf {|</a>|})
         (Ext_string.Set.elements xl)
   in
@@ -723,13 +726,13 @@ let print_family_alphabetic x conf base liste =
         else
           let access x =
             if List.length homonymes = 1 then
-              (Util.escape_html x :> Adef.safe_string)
+              (Util.escape_html (Utf8.uppercase x) :> Adef.safe_string)
             else
               let open Def in
               Util.geneweb_link conf
                 ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
                   :> Adef.escaped_string)
-                (Util.escape_html x :> Adef.safe_string)
+                (Util.escape_html (Utf8.uppercase x) :> Adef.safe_string)
           in
           Ext_list.iter_first
             (fun first x ->
@@ -739,7 +742,8 @@ let print_family_alphabetic x conf base liste =
       in
       let meta =
         let homonymes_str =
-          (List.map Util.escape_html homonymes :> string list)
+          (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) homonymes
+            :> string list)
           |> String.concat " ,"
         in
         [
