@@ -258,10 +258,18 @@ let unknown conf n =
   Geneweb.Hutil.print_link_to_welcome conf false;
   Geneweb.Hutil.trailer conf
 
+let is_default_sosa_ref conf base p =
+  let default_sosa_ref_iper =
+    Option.map Gwdb.get_iper @@ Geneweb.Util.default_sosa_ref conf base
+  in
+  Option.fold ~none:false
+    ~some:(Gwdb.eq_iper (Gwdb.get_iper p))
+    default_sosa_ref_iper
+
 let make_henv conf base =
   let conf =
     match Geneweb.Util.find_sosa_ref conf base with
-    | Some p ->
+    | Some p when not (is_default_sosa_ref conf base p) ->
         let x =
           let first_name = Gwdb.p_first_name base p in
           let surname = Gwdb.p_surname base p in
@@ -275,7 +283,7 @@ let make_henv conf base =
             [ ("iz", Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode) ]
         in
         { conf with henv = conf.henv @ x }
-    | None -> conf
+    | Some _ | None -> conf
   in
   let conf =
     match Geneweb.Util.p_getenv conf.env "dsrc" with
