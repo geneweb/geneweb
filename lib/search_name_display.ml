@@ -578,7 +578,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
 let print_title conf order_string xl =
   let name_list =
     (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) xl :> string list)
-    |> String.concat " ,"
+    |> String.concat ", "
   in
   Output.print_sstring conf (Printf.sprintf "%s (%s)" name_list order_string)
 
@@ -587,7 +587,7 @@ let print_one_surname_by_branch conf base x xl branches =
   let name_list_str =
     (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) names
       :> string list)
-    |> String.concat " ,"
+    |> String.concat ", "
   in
   let title h =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
