@@ -216,6 +216,48 @@ let check_base_exists bname =
         Printf.eprintf "Cannot create backup copy of \"%s\"\n" bname;
         exit 2)
 
+let restore_backup bname =
+  let clean_bname = Filename.remove_extension bname in
+  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
+  let backup_bdir =
+    Filename.concat (Secure.base_dir ()) (clean_bname ^ "_backup.gwb")
+  in
+  if Sys.file_exists backup_bdir then (
+    try Sys.rename backup_bdir bdir
+    with Failure _ ->
+      Printf.eprintf "Cannot restore backup copy of \"%s\"\n" bname;
+      exit 2)
+
+let move_config_from_backup bname =
+  let clean_bname = Filename.remove_extension bname in
+  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
+  let backup_bdir =
+    Filename.concat (Secure.base_dir ()) (clean_bname ^ "_backup.gwb")
+  in
+  if not !reorg then (
+    let history = Filename.concat bdir "history" in
+    let b_history = Filename.concat backup_bdir "history" in
+    let history_d = Filename.concat bdir "history_d" in
+    let b_history_d = Filename.concat backup_bdir "history_d" in
+    if Sys.file_exists b_history then (
+      try Sys.rename b_history history
+      with Failure _ ->
+        Printf.eprintf "Cannot restore history \"%s\"\n" history;
+        exit 2);
+    if Sys.file_exists b_history_d then (
+      try Sys.rename b_history_d history_d
+      with Failure _ ->
+        Printf.eprintf "Cannot restore history_d \"%s\"\n" history_d;
+        exit 2))
+  else
+    let config_d = Filename.concat bdir "config" in
+    let b_config_d = Filename.concat backup_bdir "config" in
+    if Sys.file_exists b_config_d then (
+      try Sys.rename b_config_d config_d
+      with Failure _ ->
+        Printf.eprintf "Cannot rename config_dir \"%s\"\n" config_d;
+        exit 2)
+
 let rec create_base_and_config bname =
   let clean_bname = Filename.remove_extension bname in
   let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in

@@ -274,10 +274,12 @@ let main () =
               (fun (x, _separate, _bnotes, _shift) ->
                 if Sys.file_exists (x ^ "o") then Mutil.rm (x ^ "o"))
               (List.rev !files);
+          Geneweb.GWPARAM.move_config_from_backup bname;
           let time_elapsed = Unix.gettimeofday () -. start_time in
           print_duration time_elapsed)
         else (
           Printf.eprintf "*** database NOT created\n";
+          Geneweb.GWPARAM.restore_backup bname;
           let time_elapsed = Unix.gettimeofday () -. start_time in
           print_duration time_elapsed;
           exit 2)))
