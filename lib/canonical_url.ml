@@ -1,10 +1,10 @@
-type t = Uri.t
+type t = Localized_url.t
 
 let make ~conf ~query =
-  Uri.make ~path:conf.Config.Trimmed.bname
-    ~query:
-      (("lang", [ conf.Config.Trimmed.lang ])
-      :: List.map (fun (key, value) -> (key, [ value ])) query)
-    ()
+  Localized_url.make ~conf
+    ~lang:
+      (Option.value ~default:Lang.english
+         (Lang.from_tag conf.Config.Trimmed.lang))
+    ~query
 
-let to_string url = Uri.to_string url
+let to_string url = Localized_url.to_string url
