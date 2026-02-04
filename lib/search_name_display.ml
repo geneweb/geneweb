@@ -878,12 +878,12 @@ let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
       in
       print_family_alphabetic query_params.last_name conf base pl
   | `Branch -> (
-      let canonical_url =
-        Page.Last_name_search.canonical_url
-          ~conf:(Config.Trimmed.from_config conf)
-          query_params
-      in
       let () =
+        let canonical_url =
+          Page.Last_name_search.canonical_url
+            ~conf:(Config.Trimmed.from_config conf)
+            query_params
+        in
         Output.link_header (Config.Trimmed.from_config conf) canonical_url
       in
       match (bhl, list) with
