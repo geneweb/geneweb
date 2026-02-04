@@ -730,6 +730,7 @@ let treat_request =
              | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
              | "LM" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_marriage
+             | "MAP" -> w_base @@ w_person @@ Perso.interp_templ "map"
              | "MISC_NOTES" -> w_base @@ NotesDisplay.print_misc_notes
              | "MISC_NOTES_SEARCH" ->
                  w_base @@ NotesDisplay.print_misc_notes_search
