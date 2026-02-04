@@ -268,18 +268,25 @@ let main () =
               quad;
             flush stderr
         | None -> ());
-        if Db1link.link ~no_warn:!no_warn next_family_fun bdir then (
-          if !kill_gwo then
-            List.iter
-              (fun (x, _separate, _bnotes, _shift) ->
-                if Sys.file_exists (x ^ "o") then Mutil.rm (x ^ "o"))
-              (List.rev !files);
-          let time_elapsed = Unix.gettimeofday () -. start_time in
-          print_duration time_elapsed)
-        else (
-          Printf.eprintf "*** database NOT created\n";
-          let time_elapsed = Unix.gettimeofday () -. start_time in
-          print_duration time_elapsed;
-          exit 2)))
+        try
+          if Db1link.link ~no_warn:!no_warn next_family_fun bdir then (
+            if !kill_gwo then
+              List.iter
+                (fun (x, _separate, _bnotes, _shift) ->
+                  if Sys.file_exists (x ^ "o") then Mutil.rm (x ^ "o"))
+                (List.rev !files);
+            let time_elapsed = Unix.gettimeofday () -. start_time in
+            print_duration time_elapsed)
+          else (
+            Printf.eprintf "*** database NOT created\n";
+            let time_elapsed = Unix.gettimeofday () -. start_time in
+            print_duration time_elapsed;
+            exit 2)
+        with Db1link.Critical_import_error msg ->
+          Printf.eprintf "\n*** CRITICAL ERROR: %s\n" msg;
+          Printf.eprintf "*** Import aborted. Database NOT created.\n";
+          Printf.eprintf "*** Fix your source file before retrying.\n";
+          flush stderr;
+          exit 2))
 
 let _ = main ()
