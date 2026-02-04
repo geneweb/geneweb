@@ -625,20 +625,7 @@ let tree_generation_list conf base gv p =
                 | None, Some m ->
                     Cell (m, fo, Alone, true, 1, base_prefix) :: list
                 | None, None -> Empty :: list)
-            | None -> (
-                match
-                  !GWPARAM_ITL.tree_generation_list conf base base_prefix p
-                with
-                | Some (fath, if1, base_prefix1), Some (moth, if2, base_prefix2)
-                  ->
-                    Cell (fath, Some if1, Left, true, 1, base_prefix1)
-                    :: Cell (moth, Some if2, Right, true, 1, base_prefix2)
-                    :: list
-                | Some (fath, ifam, base_prefix), None ->
-                    Cell (fath, Some ifam, Alone, true, 1, base_prefix) :: list
-                | None, Some (moth, ifam, base_prefix) ->
-                    Cell (moth, Some ifam, Alone, true, 1, base_prefix) :: list
-                | None, None -> Empty :: list)))
+            | None -> Empty :: list))
       pol []
   in
   let gen =
@@ -1905,17 +1892,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let cpl = Gwdb.foi base ifam in
           let ep = make_ep conf base (Gwdb.get_father cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match
-            !GWPARAM_ITL.get_father conf base conf.Config.command
-              (Gwdb.get_iper a)
-          with
-          | Some (ep, base_prefix) ->
-              let conf = { conf with command = base_prefix } in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "father" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "father" null_val)
   | "item" :: sl -> (
       match get_env "item" env with
       | Vslistlm ell -> eval_item_field_var ell sl
@@ -1926,17 +1903,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let cpl = Gwdb.foi base ifam in
           let ep = make_ep conf base (Gwdb.get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match
-            !GWPARAM_ITL.get_mother conf base conf.Config.command
-              (Gwdb.get_iper a)
-          with
-          | Some (ep, base_prefix) ->
-              let conf = { conf with command = base_prefix } in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "mother" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "mother" null_val)
   | "next_item" :: sl -> (
       match get_env "item" env with
       | Vslistlm (_ :: ell) -> eval_item_field_var ell sl
@@ -2093,21 +2060,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vfam (_, _, (_, _, ip), _) when mode_local env ->
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, _, (_, _, ip), _) -> (
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> baseprefix
-                | _ -> conf.Config.command
-              in
-              match !GWPARAM_ITL.get_person conf base baseprefix ip with
-              | Some (ep, baseprefix) ->
-                  let conf = { conf with command = baseprefix } in
-                  let env = ("p_link", Vbool true) :: env in
-                  eval_person_field_var conf base env ep loc sl
-              | None -> raise Not_found)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "witness" :: sl -> (
       match get_env "witness" env with
       | Vind p ->
@@ -2145,16 +2098,9 @@ and eval_cell_field_var conf base env cell loc = function
       | Cell (_, _, _, _, s, _) -> TemplAst.VVstring (string_of_int s))
   | "family" :: sl -> (
       match cell with
-      | Cell (p, Some ifam, _, _, _, base_prefix) -> (
-          if conf.Config.bname = base_prefix then
-            let f, c, a = make_efam conf base (Gwdb.get_iper p) ifam in
-            eval_family_field_var conf base env (ifam, f, c, a) loc sl
-          else
-            let conf = { conf with command = base_prefix } in
-            match !GWPARAM_ITL.get_family conf base base_prefix p ifam with
-            | Some (f, c, a) ->
-                eval_family_field_var conf base env (ifam, f, c, a) loc sl
-            | None -> assert false)
+      | Cell (p, Some ifam, _, _, _, _base_prefix) ->
+          let f, c, a = make_efam conf base (Gwdb.get_iper p) ifam in
+          eval_family_field_var conf base env (ifam, f, c, a) loc sl
       | _ -> TemplAst.VVstring "")
   | [ "is_center" ] -> (
       match cell with
@@ -2380,17 +2326,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           let cpl = Gwdb.foi base ifam in
           let ep = make_ep conf base (Gwdb.get_father cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match
-            !GWPARAM_ITL.get_father conf base conf.Config.command
-              (Gwdb.get_iper p)
-          with
-          | Some (ep, baseprefix) ->
-              let conf = { conf with command = baseprefix } in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "father" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "father" null_val)
   | [ "has_linked_page"; s ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
@@ -2434,17 +2370,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | _ ->
           TemplAst.VVbool
             (Option.is_some (get_sosa conf base (Gwdb.get_iper p))))
-  | [ "init_cache"; nb_asc; from_gen_desc; nb_desc ] -> (
-      try
-        let nb_asc = int_of_string nb_asc in
-        let from_gen_desc = int_of_string from_gen_desc in
-        let nb_desc = int_of_string nb_desc in
-        let () =
-          !GWPARAM_ITL.init_cache conf base (Gwdb.get_iper p) nb_asc
-            from_gen_desc nb_desc
-        in
-        null_val
-      with _ -> raise Not_found)
+  | [ "init_cache"; _nb_asc; _from_gen_desc; _nb_desc ] -> null_val
   | [ "linked_page"; s ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
@@ -2469,17 +2395,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           let cpl = Gwdb.foi base ifam in
           let ep = make_ep conf base (Gwdb.get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match
-            !GWPARAM_ITL.get_mother conf base conf.Config.command
-              (Gwdb.get_iper p)
-          with
-          | Some (ep, baseprefix) ->
-              let conf = { conf with command = baseprefix } in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "mother" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "mother" null_val)
   | "nobility_title" :: sl -> (
       match Person.main_title conf base p with
       | Some t when p_auth ->
@@ -2788,25 +2704,11 @@ and eval_bool_person_field conf' base env (p, p_auth) =
       && has_witness_for_event conf base p (Event.Pevent Def.Epers_Burial)
   | "has_children" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, _) ->
-          if Array.length (Gwdb.get_children fam) > 0 then true
-          else !GWPARAM_ITL.has_children conf' base p fam
-      | _ -> (
+      | Vfam (_, fam, _, _) -> Array.length (Gwdb.get_children fam) > 0
+      | _ ->
           Array.exists
             (fun ifam -> [||] <> Gwdb.get_children (Gwdb.foi base ifam))
-            (Gwdb.get_family p)
-          ||
-          match get_env "fam_link" env with
-          | Vfam (ifam, _, (ifath, imoth, _), _) ->
-              let conf =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> { conf' with command = baseprefix }
-                | _ -> conf'
-              in
-              []
-              <> !GWPARAM_ITL.get_children_of_parents
-                   base conf.command ifam ifath imoth
-          | _ -> false))
+            (Gwdb.get_family p))
   | "has_consanguinity" ->
       p_auth
       && Gwdb.get_consang p != Adef.fix (-1)
@@ -2917,9 +2819,7 @@ and eval_bool_person_field conf' base env (p, p_auth) =
             in
             loop events [| 0; 0; 0; 0 |] 0 || loop' events
       else false
-  | "has_families" ->
-      Array.length (Gwdb.get_family p) > 0
-      || !GWPARAM_ITL.has_family_correspondance conf.command (Gwdb.get_iper p)
+  | "has_families" -> Array.length (Gwdb.get_family p) > 0
   | "has_first_names_aliases" ->
       if (not p_auth) && Person.is_hide_names conf' p then false
       else Gwdb.get_first_names_aliases p <> []
@@ -2938,15 +2838,7 @@ and eval_bool_person_field conf' base env (p, p_auth) =
   | "has_notes" | "has_pnotes" ->
       p_auth && (not conf.no_note) && Gwdb.sou base (Gwdb.get_notes p) <> ""
   | "has_occupation" -> p_auth && Gwdb.sou base (Gwdb.get_occupation p) <> ""
-  | "has_parents" ->
-      Gwdb.get_parents p <> None
-      ||
-      let conf =
-        match get_env "baseprefix" env with
-        | Vstring baseprefix -> { conf' with command = baseprefix }
-        | _ -> conf'
-      in
-      !GWPARAM_ITL.has_parents_link conf.Config.command (Gwdb.get_iper p)
+  | "has_parents" -> Gwdb.get_parents p <> None
   | "has_grandparents" ->
       let has_parents person_id =
         person_id |> Gwdb.poi base |> Gwdb.get_parents |> Option.is_some
@@ -2975,13 +2867,7 @@ and eval_bool_person_field conf' base env (p, p_auth) =
   | "has_siblings" -> (
       match Gwdb.get_parents p with
       | Some ifam -> Array.length (Gwdb.get_children (Gwdb.foi base ifam)) > 1
-      | None ->
-          let conf =
-            match get_env "baseprefix" env with
-            | Vstring baseprefix -> { conf' with command = baseprefix }
-            | _ -> conf'
-          in
-          !GWPARAM_ITL.has_siblings conf.Config.command (Gwdb.get_iper p))
+      | None -> false)
   | "has_sources" ->
       p_auth
       && (Gwdb.sou base (Gwdb.get_psources p) <> ""
@@ -3276,29 +3162,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "fam" env with
       | Vfam (_, fam, _, _) ->
           Gwdb.get_children fam |> Array.length |> string_of_int |> str_val
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (ifam, _, _, _) ->
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> baseprefix
-                | _ -> conf.Config.command
-              in
-              string_of_int (!GWPARAM_ITL.nb_children baseprefix ifam)
-              |> str_val
-          | _ ->
-              Array.fold_left
-                (fun n ifam ->
-                  n + Array.length (Gwdb.get_children (Gwdb.foi base ifam)))
-                0 (Gwdb.get_family p)
-              |> string_of_int |> str_val))
-  | "nb_families" -> (
-      match get_env "p_link" env with
-      | Vbool _ ->
-          Gwdb.get_iper p
-          |> !GWPARAM_ITL.nb_families conf.Config.command
-          |> string_of_int |> str_val
-      | _ -> Gwdb.get_family p |> Array.length |> string_of_int |> str_val)
+      | _ ->
+          Array.fold_left
+            (fun n ifam ->
+              n + Array.length (Gwdb.get_children (Gwdb.foi base ifam)))
+            0 (Gwdb.get_family p)
+          |> string_of_int |> str_val)
+  | "nb_families" ->
+      Gwdb.get_family p |> Array.length |> string_of_int |> str_val
   | "notes" | "pnotes" ->
       Gwdb.get_notes p
       |> get_note_source conf base ~p p_auth conf.Config.no_note
@@ -3794,77 +3665,41 @@ let print_foreach conf' base print_ast eval_expr =
       celll
   in
   let print_foreach_child env al ep = function
-    | Vfam (ifam, fam, (ifath, imoth, isp), _) -> (
-        match get_env "f_link" env with
-        | Vbool _ ->
-            let baseprefix =
-              match get_env "baseprefix" env with
-              | Vstring baseprefix -> baseprefix
-              | _ -> conf.command
+    | Vfam (ifam, fam, (ifath, imoth, isp), _) ->
+        let auth =
+          Array.for_all
+            (fun ip -> Person.is_visible conf' base (Util.pget conf' base ip))
+            (Gwdb.get_children fam)
+        in
+        let env = ("auth", Vbool auth) :: env in
+        let n =
+          let p =
+            match get_env "p" env with Vind p -> p | _ -> assert false
+          in
+          let rec loop i =
+            if i = Array.length (Gwdb.get_children fam) then -2
+            else if (Gwdb.get_children fam).(i) = Gwdb.get_iper p then i
+            else loop (i + 1)
+          in
+          loop 0
+        in
+        Array.iteri
+          (fun i ip ->
+            let p = Util.pget conf' base ip in
+            let env = ("#loop", Vint 0) :: env in
+            let env = ("child", Vind p) :: env in
+            let env = ("child_cnt", Vint (i + 1)) :: env in
+            let env =
+              if i = n - 1 && not (Person.is_empty p) then
+                ("pos", Vstring "prev") :: env
+              else if i = n then ("pos", Vstring "self") :: env
+              else if i = n + 1 && not (Person.is_empty p) then
+                ("pos", Vstring "next") :: env
+              else env
             in
-            let children =
-              !GWPARAM_ITL.get_children base baseprefix ifam ifath imoth
-            in
-            List.iter
-              (fun (((p, _) as ep), baseprefix) ->
-                let env = ("#loop", Vint 0) :: env in
-                let env = ("child_link", Vind p) :: env in
-                let env = ("baseprefix", Vstring baseprefix) :: env in
-                let env = ("p_link", Vbool true) :: env in
-                List.iter (print_ast env ep) al)
-              children
-        | _ ->
-            let auth =
-              Array.for_all
-                (fun ip ->
-                  Person.is_visible conf' base (Util.pget conf' base ip))
-                (Gwdb.get_children fam)
-            in
-            let env = ("auth", Vbool auth) :: env in
-            let n =
-              let p =
-                match get_env "p" env with Vind p -> p | _ -> assert false
-              in
-              let rec loop i =
-                if i = Array.length (Gwdb.get_children fam) then -2
-                else if (Gwdb.get_children fam).(i) = Gwdb.get_iper p then i
-                else loop (i + 1)
-              in
-              loop 0
-            in
-            Array.iteri
-              (fun i ip ->
-                let p = Util.pget conf' base ip in
-                let env = ("#loop", Vint 0) :: env in
-                let env = ("child", Vind p) :: env in
-                let env = ("child_cnt", Vint (i + 1)) :: env in
-                let env =
-                  if i = n - 1 && not (Person.is_empty p) then
-                    ("pos", Vstring "prev") :: env
-                  else if i = n then ("pos", Vstring "self") :: env
-                  else if i = n + 1 && not (Person.is_empty p) then
-                    ("pos", Vstring "next") :: env
-                  else env
-                in
-                let ep = (p, Person.is_visible conf' base p) in
-                List.iter (print_ast env ep) al)
-              (Gwdb.get_children fam);
-
-            List.iter
-              (fun (_, _, children) ->
-                List.iter
-                  (fun ((p, _), baseprefix, can_merge) ->
-                    if not can_merge then
-                      let env = ("#loop", Vint 0) :: env in
-                      let env = ("child_link", Vind p) :: env in
-                      let env = ("baseprefix", Vstring baseprefix) :: env in
-                      let env = ("p_link", Vbool true) :: env in
-                      let ep = (p, true) in
-                      List.iter (print_ast env ep) al)
-                  children)
-              (!GWPARAM_ITL.get_children' conf' base
-                 (Gwdb.get_iper (fst ep))
-                 fam isp))
+            let ep = (p, Person.is_visible conf' base p) in
+            List.iter (print_ast env ep) al)
+          (Gwdb.get_children fam)
     | _ -> ()
   and print_foreach_descendant_level env al ep =
     let max_level =
@@ -3987,83 +3822,33 @@ let print_foreach conf' base print_ast eval_expr =
     | _ -> ()
   in
   let print_foreach_family env al ini_ep (p, _) =
-    match get_env "p_link" env with
-    | Vbool _ ->
-        let conf =
-          match get_env "baseprefix" env with
-          | Vstring baseprefix -> { conf' with command = baseprefix }
-          | _ -> conf'
-        in
-        List.fold_left
-          (fun (prev, i) (ifam, fam, (ifath, imoth, spouse), baseprefix, _) ->
-            let cpl = (ifath, imoth, Gwdb.get_iper spouse) in
-            let vfam = Vfam (ifam, fam, cpl, true) in
-            let env = ("#loop", Vint 0) :: env in
-            let env = ("fam_link", vfam) :: env in
-            let env = ("f_link", Vbool true) :: env in
-            let env = ("is_link", Vbool true) :: env in
-            let env = ("baseprefix", Vstring baseprefix) :: env in
-            let env = ("family_cnt", Vint (i + 1)) :: env in
-            let env =
-              match prev with
-              | Some vfam -> ("prev_fam", vfam) :: env
-              | None -> env
-            in
-            List.iter (print_ast env ini_ep) al;
-            (Some vfam, i + 1))
-          (None, 0)
-          (!GWPARAM_ITL.get_families conf base p)
-        |> ignore
-    | _ ->
-        (if Array.length (Gwdb.get_family p) > 0 then
-         let rec loop prev i =
-           if i = Array.length (Gwdb.get_family p) then ()
-           else
-             let ifam = (Gwdb.get_family p).(i) in
-             let fam = Gwdb.foi base ifam in
-             let ifath = Gwdb.get_father fam in
-             let imoth = Gwdb.get_mother fam in
-             let ispouse = Gutil.spouse (Gwdb.get_iper p) fam in
-             let cpl = (ifath, imoth, ispouse) in
-             let m_auth =
-               Person.is_visible conf' base (Util.pget conf' base ifath)
-               && Person.is_visible conf' base (Util.pget conf' base imoth)
-             in
-             let vfam = Vfam (ifam, fam, cpl, m_auth) in
-             let env = ("#loop", Vint 0) :: env in
-             let env = ("fam", vfam) :: env in
-             let env = ("family_cnt", Vint (i + 1)) :: env in
-             let env =
-               match prev with
-               | Some vfam -> ("prev_fam", vfam) :: env
-               | None -> env
-             in
-             List.iter (print_ast env ini_ep) al;
-             loop (Some vfam) (i + 1)
-         in
-         loop None 0);
-        List.fold_left
-          (fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge) ->
-            if can_merge then (None, i)
-            else
-              let cpl = (ifath, imoth, Gwdb.get_iper sp) in
-              let vfam = Vfam (ifam, fam, cpl, true) in
-              let env = ("#loop", Vint 0) :: env in
-              let env = ("fam_link", vfam) :: env in
-              let env = ("f_link", Vbool true) :: env in
-              let env = ("is_link", Vbool true) :: env in
-              let env = ("baseprefix", Vstring baseprefix) :: env in
-              let env = ("family_cnt", Vint (i + 1)) :: env in
-              let env =
-                match prev with
-                | Some vfam -> ("prev_fam", vfam) :: env
-                | None -> env
-              in
-              List.iter (print_ast env ini_ep) al;
-              (Some vfam, i + 1))
-          (None, 0)
-          (!GWPARAM_ITL.get_families conf' base p)
-        |> ignore
+    if Array.length (Gwdb.get_family p) > 0 then
+      let rec loop prev i =
+        if i = Array.length (Gwdb.get_family p) then ()
+        else
+          let ifam = (Gwdb.get_family p).(i) in
+          let fam = Gwdb.foi base ifam in
+          let ifath = Gwdb.get_father fam in
+          let imoth = Gwdb.get_mother fam in
+          let ispouse = Gutil.spouse (Gwdb.get_iper p) fam in
+          let cpl = (ifath, imoth, ispouse) in
+          let m_auth =
+            Person.is_visible conf' base (Util.pget conf' base ifath)
+            && Person.is_visible conf' base (Util.pget conf' base imoth)
+          in
+          let vfam = Vfam (ifam, fam, cpl, m_auth) in
+          let env = ("#loop", Vint 0) :: env in
+          let env = ("fam", vfam) :: env in
+          let env = ("family_cnt", Vint (i + 1)) :: env in
+          let env =
+            match prev with
+            | Some vfam -> ("prev_fam", vfam) :: env
+            | None -> env
+          in
+          List.iter (print_ast env ini_ep) al;
+          loop (Some vfam) (i + 1)
+      in
+      loop None 0
   in
   let print_foreach_first_name_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Person.is_hide_names conf' p then ()
@@ -4365,20 +4150,7 @@ let print_foreach conf' base print_ast eval_expr =
               in
               let efam = Vfam (ifam, Gwdb.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
-          | None -> (
-              let conf =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> { conf' with command = baseprefix }
-                | _ -> conf'
-              in
-              match !GWPARAM_ITL.get_father' conf base (Gwdb.get_iper a) with
-              | Some (baseprefix, ep, ifam, fam, cpl) ->
-                  let efam = Vfam (ifam, fam, cpl, true) in
-                  let env = ("p_link", Vbool true) :: env in
-                  let env = ("f_link", Vbool true) :: env in
-                  let env = ("baseprefix", Vstring baseprefix) :: env in
-                  loop env ep efam sl
-              | None -> warning_use_has_parents_before_parent loc "father" ()))
+          | None -> warning_use_has_parents_before_parent loc "father" ())
       | "mother" :: sl -> (
           match Gwdb.get_parents a with
           | Some ifam ->
@@ -4394,36 +4166,14 @@ let print_foreach conf' base print_ast eval_expr =
               in
               let efam = Vfam (ifam, Gwdb.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
-          | None -> (
-              match !GWPARAM_ITL.get_mother' conf' base (Gwdb.get_iper a) with
-              | Some (baseprefix, ep, ifam, fam, cpl) ->
-                  let efam = Vfam (ifam, fam, cpl, true) in
-                  let env = ("p_link", Vbool true) :: env in
-                  let env = ("f_link", Vbool true) :: env in
-                  let env = ("baseprefix", Vstring baseprefix) :: env in
-                  loop env ep efam sl
-              | None -> warning_use_has_parents_before_parent loc "mother" ()))
+          | None -> warning_use_has_parents_before_parent loc "mother" ())
       | "self" :: sl -> loop env ep efam sl
       | "spouse" :: sl -> (
           match efam with
           | Vfam (_, _, (_, _, ip), _) ->
               let ep = make_ep conf' base ip in
               loop env ep efam sl
-          | _ -> (
-              match get_env "fam_link" env with
-              | Vfam (_, _, (_, _, ip), _) -> (
-                  let baseprefix =
-                    match get_env "baseprefix" env with
-                    | Vstring baseprefix -> baseprefix
-                    | _ -> conf.command
-                  in
-                  match !GWPARAM_ITL.get_person conf' base baseprefix ip with
-                  | Some (ep, baseprefix) ->
-                      let env = ("p_link", Vbool true) :: env in
-                      let env = ("baseprefix", Vstring baseprefix) :: env in
-                      loop env ep efam sl
-                  | None -> raise Not_found)
-              | _ -> raise Not_found))
+          | _ -> raise Not_found)
       | _ -> raise Not_found
     in
     let efam =
@@ -4523,12 +4273,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     in
     let mcl () = Vint (Cousins.max_cousin_level conf base p) in
     (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres (limité à 10 générations car problématique en terme de perf). *)
-    let mdl () =
-      Vint
-        (max
-           (max_descendant_level base desc_level_table_l)
-           (!GWPARAM_ITL.max_descendant_level conf base (Gwdb.get_iper p) 10))
-    in
+    let mdl () = Vint (max_descendant_level base desc_level_table_l) in
     (* Static max descendant level *)
     let smdl () = Vint (max_descendant_level base desc_level_table_m) in
     let nldb () =
