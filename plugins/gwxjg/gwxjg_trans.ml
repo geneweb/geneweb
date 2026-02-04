@@ -69,7 +69,7 @@ let make_lang lexicon len lang =
 
 let lexicon_files = ref []
 
-let de_en_es_fi_fr_it_nl_no_pt_sv =
+let all_lexicons =
   lazy
     (let acc =
        List.fold_left
