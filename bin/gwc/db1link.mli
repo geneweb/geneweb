@@ -1,3 +1,5 @@
+exception Critical_import_error of string
+
 val default_source : string ref
 (** Default source field for persons and families without source data *)
 
