@@ -884,9 +884,7 @@ let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
           query_params
       in
       let () =
-        Output.canonical_url_header
-          (Config.Trimmed.from_config conf)
-          canonical_url
+        Output.link_header (Config.Trimmed.from_config conf) canonical_url
       in
       match (bhl, list) with
       | [], _ -> not_found_fun conf query_params.last_name
