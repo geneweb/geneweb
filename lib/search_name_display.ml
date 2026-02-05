@@ -589,12 +589,16 @@ let print_one_surname_by_branch ~exact conf base x (bhl, str) =
          1 ancestors;
   Output.print_sstring conf "</div>"
 
-let print_title conf order_string xl =
+let print_title conf ?order_string xl =
   let name_list =
     (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) xl :> string list)
     |> String.concat ", "
   in
-  Output.print_sstring conf (Printf.sprintf "%s (%s)" name_list order_string)
+  match order_string with
+  | Some order_string ->
+      Output.print_sstring conf
+        (Printf.sprintf "%s (%s)" name_list order_string)
+  | None -> Output.print_sstring conf name_list
 
 let print_one_surname_by_branch ~exact conf base x xl branches =
   let names = Ext_string.Set.elements xl in
@@ -604,8 +608,11 @@ let print_one_surname_by_branch ~exact conf base x xl branches =
     |> String.concat ", "
   in
   let title h =
-    if h || exact then
-      print_title conf (Util.transl_nth conf "branch/branches" 1) names
+    if h then
+      print_title conf
+        ~order_string:(Util.transl_nth conf "branch/branches" 1)
+        names
+    else if exact then print_title conf names
     else
       Ext_list.iter_first
         (fun first x ->
@@ -615,7 +622,7 @@ let print_one_surname_by_branch ~exact conf base x xl branches =
           Output.print_sstring conf {|m=N&t=A&v=|};
           Output.print_string conf (Mutil.encode x);
           Output.print_sstring conf {|">|};
-          Output.print_string conf (Util.escape_html (Utf8.uppercase x));
+          Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
         (Ext_string.Set.elements xl)
   in
@@ -737,7 +744,9 @@ let print_family_alphabetic x conf base liste =
   | _ ->
       let title h =
         if h then
-          print_title conf (Util.transl conf "alphabetic order") homonymes
+          print_title conf
+            ~order_string:(Util.transl conf "alphabetic order")
+            homonymes
         else
           let access x =
             if List.length homonymes = 1 then
