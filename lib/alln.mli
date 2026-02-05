@@ -12,7 +12,13 @@ type t =
                                  prefixes (their length depends on initial searched prefix) *)
 
 val select_names :
-  Config.config -> Gwdb.base -> bool -> string -> int -> t * int
+  at_least:int option ->
+  Config.Trimmed.t ->
+  Gwdb.base ->
+  bool ->
+  string ->
+  int ->
+  t * int
 (** [select_names conf base is_surnames ini limit]
     Select up to [limit] first names/surnames starting with [ini].
     If more values are available, return [Specify] with different

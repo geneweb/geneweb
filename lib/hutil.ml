@@ -1,5 +1,7 @@
 (* Copyright (c) 2007 INRIA *)
 
+type meta = { name : string; content : string }
+
 let link_to_referer conf =
   let referer = Util.get_referer conf in
   let back = Utf8.capitalize_fst (Util.transl conf "back") in
@@ -30,7 +32,7 @@ let gen_print_link_to_welcome f conf right_aligned =
 let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
 (* S: use Util.include_template for "hed"? *)
-let header_without_http conf title =
+let header_without_http conf title ?meta () =
   Output.print_sstring conf "<!DOCTYPE html><head><title>";
   title true;
   Output.print_sstring conf "</title><meta name=\"robots\" content=\"none\">";
@@ -45,6 +47,10 @@ let header_without_http conf title =
   Output.print_sstring conf {|/favicon_gwd.png">|};
   Output.print_sstring conf
     {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
+  Option.iter
+    (List.iter (fun { name; content } ->
+         Output.printf conf "<meta name=\"%s\" content=\"%s\">" name content))
+    meta;
   Util.include_template conf [] "css" (fun () -> ());
   (match Util.open_etc_file "hed" with
   | Some (ic, _) -> Templ.copy_from_templ conf [] ic
@@ -60,37 +66,40 @@ let header_without_http conf title =
   Output.printf conf "<body%s>\n" s;
   Util.message_to_wizard conf
 
-let header_without_page_title conf title =
+let header_without_page_title conf title ?(meta = []) () =
   Util.html conf;
-  header_without_http conf title
+  header_without_http conf title ~meta ()
 
 let header_link_welcome conf title =
-  header_without_page_title conf title;
+  header_without_page_title conf title ();
   print_link_to_welcome conf true;
   Output.print_sstring conf "<h1>";
   title false;
   Output.print_sstring conf "</h1>\n"
 
 let header_no_page_title conf title =
-  header_without_page_title conf title;
+  header_without_page_title conf title ();
   match Util.p_getenv conf.env "title" with
   | None | Some "" -> ()
   | Some x -> Output.printf conf "<h1>%s</h1>\n" x
 
-let header conf title =
-  header_without_page_title conf title;
+let header conf title ?(meta = []) () =
+  header_without_page_title conf title ~meta ();
   Output.print_sstring conf "\n<h1>";
   title false;
   Output.print_sstring conf "</h1>\n"
 
+let header_with_meta conf title meta = header conf title ~meta ()
+let header conf title = header conf title ()
+
 let header_fluid conf title =
-  header_without_http conf title;
+  header_without_http conf title ();
   Output.print_sstring conf "<h1>";
   title false;
   Output.print_sstring conf "</h1>\n"
 
 let rheader conf title =
-  header_without_page_title conf title;
+  header_without_page_title conf title ();
   Output.print_sstring conf "<h1 class=\"error\">";
   title false;
   Output.print_sstring conf "</h1>\n"

@@ -338,7 +338,7 @@ let unauth_server conf ar =
          (Geneweb.Util.ftransl conf "%s access cancelled for that page"))
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
   in
-  Geneweb.Hutil.header_without_http conf title;
+  Geneweb.Hutil.header_without_http conf title ();
   Geneweb.Output.print_sstring conf "<h1>\n";
   title false;
   Geneweb.Output.print_sstring conf "</h1>\n";

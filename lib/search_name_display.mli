@@ -18,35 +18,35 @@ val persons_of_fsname :
     Returns [(l,inj)] where [l] is a list of [(str,istr,iperl)] where [istr] is id of [str] and [iperl] is a list of persons
     found that has [istr] as a first/surname such that [str = inj x]*)
 
-val first_name_print : Config.config -> Gwdb.base -> string -> unit
+val first_name_print :
+  query_params:Page.First_name_search.Query_params.t ->
+  Config.config ->
+  Gwdb.base ->
+  unit
 
 type surname_search_result
 type first_name_search_result
 
 val surname_print :
+  query_params:Page.Last_name_search.Query_params.t ->
   Config.config ->
   Gwdb.base ->
   (Config.config -> string -> unit) ->
   surname_search_result ->
-  string ->
   unit
 
 val search_surname :
-  Config.config -> Gwdb.base -> string -> surname_search_result
-
-val search_surname_print :
-  Config.config ->
-  Gwdb.base ->
-  (Config.config -> string -> unit) ->
-  surname_search_result ->
-  string ->
-  unit
+  exact:bool -> Config.config -> Gwdb.base -> string -> surname_search_result
 
 val search_first_name :
-  Config.config -> Gwdb.base -> string -> first_name_search_result
+  exact:bool -> Config.config -> Gwdb.base -> string -> first_name_search_result
 
 val search_first_name_print :
-  Config.config -> Gwdb.base -> first_name_search_result -> string -> unit
+  query_params:Page.First_name_search.Query_params.t ->
+  Config.config ->
+  Gwdb.base ->
+  first_name_search_result ->
+  unit
 
 val sn_search_result_is_empty : surname_search_result -> bool
 val fn_search_result_is_empty : first_name_search_result -> bool

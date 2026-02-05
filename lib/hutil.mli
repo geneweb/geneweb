@@ -1,6 +1,9 @@
 (* Copyright (c) 2007 INRIA *)
 
-val header_without_http : Config.config -> (bool -> unit) -> unit
+type meta = { name : string; content : string }
+
+val header_without_http :
+  Config.config -> (bool -> unit) -> ?meta:meta list -> unit -> unit
 (** [header_without_http conf title] prints HTML page header in the body of the current response on the socket.
     HTML page header consists of :
 
@@ -15,9 +18,12 @@ val header_without_http : Config.config -> (bool -> unit) -> unit
     - Opening <body> tag with its attributes
     - If user is a wizard or a friend, then includes all messages send to him. *)
 
-val header_without_page_title : Config.config -> (bool -> unit) -> unit
+val header_without_page_title :
+  Config.config -> (bool -> unit) -> ?meta:meta list -> unit -> unit
 (** Calls for [Util.html] to print HTTP header and for [header_without_http] to print HTML page header.
     Additionaly prints opening container <div> tag on the socket. *)
+
+val header_with_meta : Config.config -> (bool -> unit) -> meta list -> unit
 
 val header : Config.config -> (bool -> unit) -> unit
 (** [header conf title] calls for [header_without_page_title] to print HTTP header and HTML page header.

@@ -37,6 +37,7 @@
     stdlib-shims
     syslog
     (unidecode (= "0.2.0"))
+    uri
     uucp
     uunf
     uutf
