@@ -44,7 +44,7 @@ let print_title conf base is_surnames ini len h =
     Output.print_sstring conf (Util.transl conf "starting with");
     Output.print_sstring conf " ";
     Output.print_string conf (Util.escape_html ini))
-  else (
+  else if not h then (
     Output.print_sstring conf " (";
     Output.print_sstring conf
       (Mutil.string_of_int_sep
