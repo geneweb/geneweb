@@ -296,7 +296,10 @@ let print conf base specify unknown =
       search_partial_key conf base s >>= fun () -> unknown conf s
   | Some fn, None ->
       let query_params =
-        match Page.First_name_search.Query_params.from_env conf.env with
+        match
+          Page.First_name_search.Query_params.from_env
+            (("v", Mutil.encode fn) :: conf.env)
+        with
         | None -> assert false
         | Some query_params -> query_params
       in
