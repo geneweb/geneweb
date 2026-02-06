@@ -10,7 +10,7 @@ type t = string * Service.t
 let path n srv = (n, srv)
 
 let not_implemented id =
-  Response.(error ~id @@ Error.server_error ~code:10 "not implemented")
+  Response.(error ~id @@ Error.server_error ~code:(-32097) "not implemented")
 
 let route l =
   let map = MS.of_seq (List.to_seq l) in
@@ -28,11 +28,11 @@ let route l =
               match%lwt Service.Desc.eval desc f params with
               | Ok r -> Lwt.return @@ Response.ok ~id r
               | Error e ->
-                  (* TODO: choose an error code *)
                   Lwt.return
                   @@ Response.(
                        error ~id
-                       @@ Error.server_error ~code:10 "%a" Service.pp_error e))
+                       @@ Error.server_error ~code:(-32098) "%a"
+                            Service.pp_error e))
         in
         match params with
         | Some (`List l) -> call l

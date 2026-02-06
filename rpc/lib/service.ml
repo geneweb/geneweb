@@ -76,8 +76,8 @@ module Analyze = Geneweb_search.Analyze
 module Search = struct
   let lookup ~fuel idx =
     decl "lookup"
-      Desc.Syntax.(tup3 string string int @-> ret (list string))
-      (fun (name, s, size) ->
+      Desc.Syntax.(string @-> string @-> int @-> ret (list string))
+      (fun name s size ->
         match List.assoc name idx with
         | exception Not_found ->
             (* TODO: Methods could fail and emit errors. We can implement
