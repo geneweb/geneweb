@@ -44,6 +44,7 @@
     <option id="#acco" value="[*accomplishment]">[*accomplishment]</option>
     <option id="#acqu" value="[*acquisition]">[*acquisition]</option>
     <option id="#adhe" value="[*adhesion]">[*adhesion]</option>
+    <option id="#adop" value="[*adoption]">[*adoption]</option>
     <option id="#bapl" value="[*baptismLDS]">[*baptismLDS]</option>
     <option id="#barm" value="[*bar mitzvah]">[*bar mitzvah]</option>
     <option id="#basm" value="[*bat mitzvah]">[*bat mitzvah]</option>

@@ -692,6 +692,7 @@ let get_pevent_name str l =
   | "#acco" :: l' -> (Epers_Accomplishment, l')
   | "#acqu" :: l' -> (Epers_Acquisition, l')
   | "#adhe" :: l' -> (Epers_Adhesion, l')
+  | "#adop" :: l' -> (Epers_Adoption, l')
   | "#awar" :: l' -> (Epers_Decoration, l')
   | "#bapl" :: l' -> (Epers_BaptismLDS, l')
   | "#barm" :: l' -> (Epers_BarMitzvah, l')
