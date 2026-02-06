@@ -290,6 +290,13 @@ let ged_calendar opts = function
   | Dfrench -> Printf.ksprintf (oc opts) "@#DFRENCH R@ "
   | Dhebrew -> Printf.ksprintf (oc opts) "@#DHEBREW@ "
 
+let ged_bce opts =
+  match opts.Gwexport.charset with Gwexport.Utf8 -> "BCE" | _ -> "B.C."
+
+let ged_year opts y =
+  if y >= 0 then Printf.ksprintf (oc opts) "%d" y
+  else Printf.ksprintf (oc opts) "%d %s" (-y) (ged_bce opts)
+
 let ged_date_dmy opts dt cal =
   (match dt.prec with
   | Sure -> ()
@@ -302,8 +309,7 @@ let ged_date_dmy opts dt cal =
   ged_calendar opts cal;
   if dt.day <> 0 then Printf.ksprintf (oc opts) "%02d " dt.day;
   if dt.month <> 0 then Printf.ksprintf (oc opts) "%s " (ged_month cal dt.month);
-  if dt.year >= 0 then Printf.ksprintf (oc opts) "%d" dt.year
-  else Printf.ksprintf (oc opts) "%d BCE" (-dt.year);
+  ged_year opts dt.year;
   match dt.prec with
   | OrYear dmy2 ->
       Printf.ksprintf (oc opts) " AND ";
@@ -311,14 +317,14 @@ let ged_date_dmy opts dt cal =
       if dmy2.day2 <> 0 then Printf.ksprintf (oc opts) "%02d " dmy2.day2;
       if dmy2.month2 <> 0 then
         Printf.ksprintf (oc opts) "%s " (ged_month cal dmy2.month2);
-      Printf.ksprintf (oc opts) "%d" dmy2.year2
+      ged_year opts dmy2.year2
   | YearInt dmy2 ->
       Printf.ksprintf (oc opts) " AND ";
       ged_calendar opts cal;
       if dmy2.day2 <> 0 then Printf.ksprintf (oc opts) "%02d " dmy2.day2;
       if dmy2.month2 <> 0 then
         Printf.ksprintf (oc opts) "%s " (ged_month cal dmy2.month2);
-      Printf.ksprintf (oc opts) "%d" dmy2.year2
+      ged_year opts dmy2.year2
   | _ -> ()
 
 let ged_date opts = function
