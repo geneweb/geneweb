@@ -10,6 +10,9 @@ module Last_name_search : sig
   end
 
   val canonical_url : conf:Config.Trimmed.t -> Query_params.t -> Canonical_url.t
+
+  val alternate_url :
+    conf:Config.Trimmed.t -> lang:Lang.t -> Query_params.t -> Localized_url.t
 end
 
 module First_name_search : sig

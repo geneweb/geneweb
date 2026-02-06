@@ -32,4 +32,8 @@ val flush : Config.config -> unit
     output configuration which needs the whole document or close the channel on [flush].
  *)
 
-val canonical_url_header : Config.Trimmed.t -> Canonical_url.t -> unit
+val link_header :
+  ?alternate_urls:Localized_url.t list ->
+  Config.Trimmed.t ->
+  Canonical_url.t ->
+  unit

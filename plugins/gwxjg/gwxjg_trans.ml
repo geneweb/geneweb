@@ -69,7 +69,7 @@ let make_lang lexicon len lang =
 
 let lexicon_files = ref []
 
-let de_en_es_fi_fr_it_nl_no_pt_sv =
+let all_lexicons =
   lazy
     (let acc =
        List.fold_left
@@ -102,13 +102,6 @@ let de_en_es_fi_fr_it_nl_no_pt_sv =
        loop [] acc
      in
      let len = List.length lexicon in
-     ( make_lang lexicon len "de",
-       make_lang lexicon len "en",
-       make_lang lexicon len "es",
-       make_lang lexicon len "fi",
-       make_lang lexicon len "fr",
-       make_lang lexicon len "it",
-       make_lang lexicon len "nl",
-       make_lang lexicon len "no",
-       make_lang lexicon len "pt",
-       make_lang lexicon len "sv" ))
+     List.map
+       (fun lang -> (lang, make_lang lexicon len lang))
+       (List.map Geneweb.Lang.tag Geneweb.Lang.all))
