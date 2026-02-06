@@ -241,8 +241,13 @@ let accept_connection_windows socket =
         [| "WSERVER=" ^ string_of_sockaddr addr |]
     in
     let args = Sys.argv in
-    Unix.create_process_env Sys.argv.(0) args env Unix.stdin Unix.stdout
-      Unix.stderr
+    let null_in = Unix.openfile "NUL" [ Unix.O_RDONLY ] 0 in
+    let pid =
+      Unix.create_process_env Sys.argv.(0) args env null_in Unix.stdout
+        Unix.stderr
+    in
+    Unix.close null_in;
+    pid
   in
   let _ = Unix.waitpid [] pid in
   Compat.In_channel.with_open_bin !sock_in close_in;
