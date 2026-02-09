@@ -389,8 +389,8 @@ let get_burial l =
 
 (** Parse sex of person *)
 let get_optional_sexe = function
-  | "h" :: l -> (Male, l)
-  | "f" :: l -> (Female, l)
+  | "h" :: (_ :: _ as l) -> (Male, l)
+  | "f" :: (_ :: _ as l) -> (Female, l)
   | l -> (Neuter, l)
 
 (** Parses int that starts at the position [i] inside [x]. Raises [Not_found] if
