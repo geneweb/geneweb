@@ -499,9 +499,7 @@ let print_parent opts base gen p =
 let print_child opts base fam_surname csrc cbp p =
   Printf.ksprintf (oc opts) "-";
   (match Driver.get_sex p with
-  | Male ->
-      Printf.ksprintf (oc opts)
-        (if !old_gw then " h" else " m")
+  | Male -> Printf.ksprintf (oc opts) (if !old_gw then " h" else " m")
   | Female -> Printf.ksprintf (oc opts) " f"
   | _ -> ());
   Printf.ksprintf (oc opts) " %s"
@@ -1104,17 +1102,17 @@ let is_isolated p =
 let is_definition_for_parent p =
   match Driver.get_parents p with Some _ -> false | None -> true
 
-let get_isolated_related base m list =
+let get_isolated_related base gen m list =
   let concat_isolated p_relation ip list =
     let p = Driver.poi base ip in
     if List.mem_assq p list then list
     else if is_isolated p then
       match Driver.get_rparents p with
-      | { r_fath = Some x; _ } :: _ when x = Driver.get_iper p_relation ->
-          list @ [ (p, true) ]
-      | { r_fath = None; r_moth = Some x; _ } :: _
-        when x = Driver.get_iper p_relation ->
-          list @ [ (p, true) ]
+      | ({ r_fath = Some x; _ } | { r_moth = Some x; _ }) :: _ ->
+          if x = Driver.get_iper p_relation then
+            list
+            @ [ (p, not (Collection.Marker.get gen.mark (Driver.get_iper p))) ]
+          else list
       | _ -> list
     else list
   in
@@ -1297,9 +1295,7 @@ let print_relations_for_person opts base gen def_p is_definition p =
       if has_infos opts base p then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
       match Driver.get_sex p with
-      | Male ->
-          Printf.ksprintf (oc opts)
-            (if !old_gw then " #h" else " #m")
+      | Male -> Printf.ksprintf (oc opts) (if !old_gw then " #h" else " #m")
       | Female -> Printf.ksprintf (oc opts) " #f"
       | Neuter -> ());
     Printf.ksprintf (oc opts) "\n";
@@ -1311,7 +1307,7 @@ let print_relations_for_person opts base gen def_p is_definition p =
 
 let print_relations opts base gen ml =
   let pl = List.fold_right (get_persons_with_relations base) ml [] in
-  let pl = List.fold_right (get_isolated_related base) ml pl in
+  let pl = List.fold_right (get_isolated_related base gen) ml pl in
   let pl =
     List.fold_right
       (fun p pl -> if list_memf eq_key_fst p pl then pl else p :: pl)
