@@ -494,7 +494,9 @@ let print_parent opts base gen p =
 let print_child opts base fam_surname csrc cbp p =
   Printf.ksprintf (oc opts) "-";
   (match Driver.get_sex p with
-  | Male -> Printf.ksprintf (oc opts) " h"
+  | Male ->
+      Printf.ksprintf (oc opts)
+        (if !old_gw then " h" else " m")
   | Female -> Printf.ksprintf (oc opts) " f"
   | _ -> ());
   Printf.ksprintf (oc opts) " %s"
@@ -1290,7 +1292,9 @@ let print_relations_for_person opts base gen def_p is_definition p =
       if has_infos opts base p then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
       match Driver.get_sex p with
-      | Male -> Printf.ksprintf (oc opts) " #h"
+      | Male ->
+          Printf.ksprintf (oc opts)
+            (if !old_gw then " #h" else " #m")
       | Female -> Printf.ksprintf (oc opts) " #f"
       | Neuter -> ());
     Printf.ksprintf (oc opts) "\n";
