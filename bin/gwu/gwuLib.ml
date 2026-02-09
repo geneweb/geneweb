@@ -812,19 +812,24 @@ let print_empty_family opts base p =
 
 let print_family opts base gen m =
   let fam = m.m_fam in
+  let fath, moth =
+    if Driver.get_sex m.m_fath = Female && Driver.get_sex m.m_moth = Male then
+      (m.m_moth, m.m_fath)
+    else (m.m_fath, m.m_moth)
+  in
   Printf.ksprintf (oc opts) "fam ";
-  print_parent opts base gen m.m_fath;
+  print_parent opts base gen fath;
   Printf.ksprintf (oc opts) " +";
   print_date_option opts (Date.od_of_cdate (Driver.get_marriage fam));
   let print_sexes s =
     let c x =
       match Driver.get_sex x with Male -> 'm' | Female -> 'f' | Neuter -> '?'
     in
-    Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
+    Printf.ksprintf (oc opts) " %s %c%c" s (c fath) (c moth)
   in
   let relation =
     let r = Driver.get_relation fam in
-    match (Driver.get_sex m.m_fath, Driver.get_sex m.m_moth) with
+    match (Driver.get_sex fath, Driver.get_sex moth) with
     | Male, Male | Female, Female -> Update_util.map_nosexcheck r
     | _ -> r
   in
@@ -860,7 +865,7 @@ let print_family opts base gen m =
      | Separated_old -> Printf.ksprintf (oc opts) " #sep"
      | _ -> ());
   Printf.ksprintf (oc opts) " ";
-  print_parent opts base gen m.m_moth;
+  print_parent opts base gen moth;
   Printf.ksprintf (oc opts) "\n";
   Array.iter
     (fun ip ->
@@ -904,7 +909,7 @@ let print_family opts base gen m =
   (match Array.length m.m_chil with
   | 0 -> ()
   | _ ->
-      let fam_surname = Driver.get_surname m.m_fath in
+      let fam_surname = Driver.get_surname fath in
       Printf.ksprintf (oc opts) "beg\n";
       Array.iter
         (fun p ->
@@ -915,12 +920,12 @@ let print_family opts base gen m =
   Collection.Marker.set gen.fam_done m.m_ifam true;
   let f _ =
     Printf.sprintf "family \"%s.%d %s\" & \"%s.%d %s\""
-      (Driver.p_first_name base m.m_fath)
-      (get_new_occ m.m_fath)
-      (Driver.p_surname base m.m_fath)
-      (Driver.p_first_name base m.m_moth)
-      (get_new_occ m.m_moth)
-      (Driver.p_surname base m.m_moth)
+      (Driver.p_first_name base fath)
+      (get_new_occ fath)
+      (Driver.p_surname base fath)
+      (Driver.p_first_name base moth)
+      (get_new_occ moth)
+      (Driver.p_surname base moth)
   in
   let s =
     let sl =
