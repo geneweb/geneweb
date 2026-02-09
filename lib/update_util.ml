@@ -364,3 +364,11 @@ let eval_create c = function
       | Update.Create (Neuter, _) -> "neuter"
       | _ -> "")
   | _ -> raise Not_found
+
+let map_nosexcheck = function
+  | Married -> NoSexesCheckMarried
+  | NotMarried -> NoSexesCheckNotMarried
+  | ( Engaged | NoSexesCheckNotMarried | NoMention | NoSexesCheckMarried
+    | MarriageBann | MarriageContract | MarriageLicense | Pacs | Residence ) as
+    x ->
+      x

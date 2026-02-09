@@ -815,7 +815,13 @@ let print_family opts base gen m =
     in
     Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
   in
-  (match Driver.get_relation fam with
+  let relation =
+    let r = Driver.get_relation fam in
+    match (Driver.get_sex m.m_fath, Driver.get_sex m.m_moth) with
+    | Male, Male | Female, Female -> Update_util.map_nosexcheck r
+    | _ -> r
+  in
+  (match relation with
   | Married -> ()
   | NotMarried -> Printf.ksprintf (oc opts) " #nm"
   | Engaged -> Printf.ksprintf (oc opts) " #eng"
