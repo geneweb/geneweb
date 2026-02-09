@@ -317,7 +317,7 @@ let output_particles_file particles fname =
 
 type pending_operation = { commit : unit -> unit; rollback : unit -> unit }
 
-let generate_base base =
+let generate_base ~keep_patch base =
   let tmp_base = Filename.concat base.Dbdisk.data.bdir "1base" in
   let tmp_base_acc = Filename.concat base.data.bdir "1base.acc" in
   let remove_temporary_files () =
@@ -415,7 +415,10 @@ let generate_base base =
     Sys.rename tmp_base base_file;
     Files.rm base_acc_file;
     Sys.rename tmp_base_acc base_acc_file;
-    Files.rm (Filename.concat base.data.bdir "patches");
+    if not keep_patch then Files.rm (Filename.concat base.data.bdir "patches")
+    else if Files.exists (Filename.concat base.data.bdir "patches") then
+      Files.set_modification_time_to_now
+        (Filename.concat base.data.bdir "patches");
     Files.rm (Filename.concat base.data.bdir "patches~");
     Files.rm (Filename.concat base.data.bdir "synchro_patches");
     Files.rm (Filename.concat base.data.bdir "notes_link");
@@ -554,7 +557,7 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
           generate_index ~strings_data:(StringData.of_base base) base
         in
         let pending_base_generation =
-          try generate_base base
+          try generate_base ~keep_patch:true base
           with e ->
             pending_index_generation.rollback ();
             raise e
@@ -592,7 +595,7 @@ let output ?(save_mem = false) ?(tasks = []) base =
   let pending_lowercase_surname_index_generation =
     generate_lowercase_surname_index ~strings_data base
   in
-  let pending_base_generation = generate_base base in
+  let pending_base_generation = generate_base ~keep_patch:false base in
   (try
      (let oc_inx = Secure.open_out_bin tmp_names_inx in
       let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
