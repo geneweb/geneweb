@@ -1171,11 +1171,7 @@ let print_relation_parent opts base mark defined_p p =
     (correct_string base (Driver.get_surname p))
     (correct_string base (Driver.get_first_name p))
     (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
-  if
-    Array.length (Driver.get_family p) = 0
-    && Driver.get_parents p = None
-    && not (Collection.Marker.get mark (Driver.get_iper p))
-  then (
+  if is_isolated p && not (Collection.Marker.get mark (Driver.get_iper p)) then (
     Collection.Marker.set mark (Driver.get_iper p) true;
     if has_infos opts base p then print_infos opts base false "" "" p
     else Printf.ksprintf (oc opts) " 0";
