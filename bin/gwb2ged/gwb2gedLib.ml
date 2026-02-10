@@ -276,7 +276,16 @@ let ged_name opts base per =
   List.iter
     (fun s ->
       Printf.ksprintf (oc opts) "1 NAME %s\n" (encode opts (Driver.sou base s)))
-    (Driver.get_aliases per)
+    (Driver.get_aliases per);
+  let sn =
+    encode opts (Mutil.nominative (Driver.sou base (Driver.get_surname per)))
+  in
+  List.iter
+    (fun n ->
+      Printf.ksprintf (oc opts) "1 NAME %s /%s/\n"
+        (encode opts (Driver.sou base n))
+        sn)
+    (Driver.get_first_names_aliases per)
 
 let ged_sex opts per =
   match Driver.get_sex per with
