@@ -70,3 +70,16 @@ val print_several_possible_surnames :
   Geneweb_db.Driver.base ->
   'a * (string * Geneweb_db.Driver.person list) list ->
   unit
+
+val get_extra_surnames : Config.config -> string list
+(** Collect v1=, v2=, ... surname values from URL env. *)
+
+val collect_surname_suggestions :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper list ->
+  string list ->
+  string list
+(** [collect_surname_suggestions conf base iperl known] returns surnames found
+    in aliases and boundary children, excluding those already in [known]. Sorted
+    alphabetically. *)
