@@ -654,7 +654,8 @@ let print_pevent opts base gen e =
   in
   if note <> "" then
     List.iter
-      (fun line -> Printf.ksprintf (oc opts) "note %s\n" line)
+      (fun line ->
+        if line <> "" then Printf.ksprintf (oc opts) "note %s\n" line)
       (lines_list_of_string note)
 
 let get_persons_with_pevents m list =
@@ -757,8 +758,9 @@ let print_fevent opts base gen in_comment e =
   if note <> "" then
     List.iter
       (fun line ->
-        Printf.ksprintf (oc opts) "note %s" line;
-        print_sep ())
+        if line <> "" then (
+          Printf.ksprintf (oc opts) "note %s" line;
+          print_sep ()))
       (lines_list_of_string note)
 
 let print_comment_for_family opts base gen fam =
