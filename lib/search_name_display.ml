@@ -32,8 +32,9 @@ let print_img conf img =
       - conf      : configuration de la base
       - x         : 'nom/prénom/sosa...' recherché
       - nb_branch : nombre de branches dans le résultat de la recherche *)
-let print_branch_to_alphabetic (conf : Config.config) (x : string)
+let print_branch_to_alphabetic ~exact (conf : Config.Trimmed.t) (x : string)
     (nb_branch : int) : unit =
+  let conf = Config.Trimmed.to_config conf in
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf
     (Utf8.capitalize_fst
@@ -49,7 +50,7 @@ let print_branch_to_alphabetic (conf : Config.config) (x : string)
   print_img conf (Adef.encoded "picto_alphabetic_order.png");
   Output.print_sstring conf {|</td><td>|};
   (* Ne pas oublier l'attribut nofollow pour les robots *)
-  if Util.p_getenv conf.Config.env "t" = Some "A" then (
+  if exact then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=N&o=i&t=A&v=";
@@ -95,7 +96,7 @@ let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
   else (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=NG&sn=";
+    Output.print_sstring conf "m=N&v=";
     Output.print_string conf (Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
@@ -197,7 +198,7 @@ let first_char s =
     let len = Utf8.next s 0 in
     if len < String.length s then String.sub s 0 len else s
 
-let first_name_print_list conf base x1 xl liste =
+let first_name_print_list ~exact conf base x1 xl liste =
   let liste =
     let l =
       List.sort
@@ -226,8 +227,7 @@ let first_name_print_list conf base x1 xl liste =
       [] l
   in
   let title h =
-    if h || Util.p_getenv conf.Config.env "t" = Some "A" then
-      Output.print_string conf (Util.escape_html x1)
+    if h || exact then Output.print_string conf (Util.escape_html x1)
     else
       Ext_list.iter_first
         (fun first x ->
@@ -273,6 +273,7 @@ let mk_specify_title conf kw n _ =
   Output.print_sstring conf (Util.transl conf "specify")
 
 let select_first_name conf n list =
+  let conf = Config.Trimmed.to_config conf in
   Hutil.header conf
   @@ mk_specify_title conf (Util.transl_nth conf "first name/first names" 0) n;
   Output.print_sstring conf "<ul>";
@@ -331,16 +332,17 @@ let persons_of_absolute_surname =
   persons_of_absolute Gwdb.base_strings_of_surname Gwdb.persons_of_surname
     Gwdb.get_surname
 
-let first_name_print conf base x =
+let first_name_print ~(query_params : Page.First_name_search.Query_params.t)
+    conf base =
   let list =
-    if Util.p_getenv conf.Config.env "t" = Some "A" then
-      persons_of_absolute_first_name conf base x
-    else if x = "" then []
+    if query_params.exact then
+      persons_of_absolute_first_name conf base query_params.first_name
+    else if query_params.first_name = "" then []
     else
       fst
       @@ persons_of_fsname conf base Gwdb.base_strings_of_first_name
            (Gwdb.spi_find (Gwdb.persons_of_first_name base))
-           Gwdb.get_first_name x
+           Gwdb.get_first_name query_params.first_name
   in
   let list =
     List.map
@@ -350,7 +352,7 @@ let first_name_print conf base x =
   in
   let list = List.fold_right merge_insert list [] in
   match list with
-  | [] -> first_name_not_found conf x
+  | [] -> first_name_not_found conf query_params.first_name
   | [ (_, (strl, iperl)) ] ->
       let iperl = List.sort_uniq compare iperl in
       let pl = List.map (Util.pget conf base) iperl in
@@ -363,55 +365,37 @@ let first_name_print conf base x =
             else pl)
           pl []
       in
-      first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf x list
+      first_name_print_list ~exact:query_params.exact conf base
+        query_params.first_name strl pl
+  | _ ->
+      select_first_name
+        (Config.Trimmed.from_config conf)
+        query_params.first_name list
 
-let has_children_with_that_name conf base des name =
+let has_children_with_that_name ~exact conf base des name =
   let compare_name n1 n2 =
-    if Util.p_getenv conf.Config.env "t" = Some "A" then n1 = n2
-    else Name.lower n1 = Name.lower n2
+    if exact then n1 = n2 else Name.lower n1 = Name.lower n2
   in
   List.exists
-    (fun ip -> compare_name (Gwdb.p_surname base (Util.pget conf base ip)) name)
+    (fun ip ->
+      compare_name
+        (Gwdb.p_surname base
+           (Util.pget (Config.Trimmed.to_config conf) base ip))
+        name)
     (Array.to_list (Gwdb.get_children des))
 
 (* List selection bullets *)
 
 let bullet_sel_txt = Adef.safe "o"
-let bullet_unsel_txt = Adef.safe "+"
 let bullet_nosel_txt = Adef.safe "o"
 
 let print_selection_bullet conf = function
-  | Some (txt, sel) ->
-      let req : Adef.encoded_string =
-        List.fold_left
-          (fun (req : Adef.encoded_string) (k, (v : Adef.encoded_string)) ->
-            if (not sel) && k = "u" && v = txt then req
-            else
-              let s : Adef.encoded_string =
-                let open Def in
-                Adef.encoded k ^^^ "=" ^<^ v
-              in
-              if (req :> string) = "" then s
-              else
-                let open Def in
-                req ^^^ "&" ^<^ s)
-          (Adef.encoded "") conf.Config.env
-      in
-      Output.print_sstring conf {|<a id="if|};
-      Output.print_string conf txt;
-      Output.print_sstring conf {|" href="|};
-      Output.print_string conf (Util.prefix_base conf);
-      Output.print_string conf req;
-      if sel then (
-        let open Def in
-        Output.print_string conf ("&u=" ^<^ txt);
-        if sel || List.mem_assoc "u" conf.Config.env then (
-          Output.print_string conf ("#if" ^<^ txt);
-          Output.print_sstring conf {|" rel="nofollow">|};
-          Output.print_string conf
-            (if sel then bullet_sel_txt else bullet_unsel_txt);
-          Output.print_sstring conf "</a>\n"))
+  | Some (txt, _) ->
+      Output.print_sstring conf
+      @@ Printf.sprintf {|<a class="selection_bullet" data-famid="%s">%s</a>|}
+           (Adef.as_string txt)
+           (bullet_sel_txt :> string);
+      Output.print_sstring conf "\n"
   | None ->
       Output.print_string conf bullet_nosel_txt;
       Output.print_sstring conf "\n"
@@ -427,7 +411,7 @@ let alphabetic1 n1 n2 = Utf8.alphabetic_order n1 n2
 
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 
-let print_branch conf base psn name =
+let print_branch ~exact conf base psn name =
   let unsel_list = unselected_bullets conf in
   let rec loop p =
     let u = Util.pget conf base (Gwdb.get_iper p) in
@@ -437,7 +421,11 @@ let print_branch conf base psn name =
           let fam = Gwdb.foi base ifam in
           let c = Gutil.spouse (Gwdb.get_iper p) fam in
           let c = Util.pget conf base c in
-          let down = has_children_with_that_name conf base fam name in
+          let down =
+            has_children_with_that_name ~exact
+              (Config.Trimmed.from_config conf)
+              base fam name
+          in
           let down =
             if Gwdb.get_sex p = Def.Female && Gwdb.p_surname base c = name then
               false
@@ -497,13 +485,10 @@ let print_branch conf base psn name =
              print_elem sp true false true;
              let children = Gwdb.get_children fam in
              (match select with
-             | Some (_, true) ->
-                 Output.print_sstring conf "<ul>";
-                 Array.iter
-                   (fun e ->
-                     loop (Util.pget conf base e);
-                     Output.print_sstring conf "</li>")
-                   children;
+             | Some (txt, true) ->
+                 Output.print_sstring conf
+                   (Printf.sprintf "<ul id=\"fam_%s\">" (Adef.as_string txt));
+                 Array.iter (fun e -> loop (Util.pget conf base e)) children;
                  Output.print_sstring conf "</ul>"
              | Some (_, false) -> ()
              | None ->
@@ -512,17 +497,17 @@ let print_branch conf base psn name =
                      {|<ul class="posterity"><li>...</li></ul>|});
              Output.print_sstring conf "</li>";
              false)
-           true family_list;
-    Output.print_sstring conf "</li>"
+           true family_list
+    else Output.print_sstring conf "</li>"
   in
   loop
 
-let print_one_branch conf base bh psn =
+let print_one_branch ~exact conf base bh psn =
   Output.print_sstring conf "<ul>";
   let p = bh.bh_ancestor in
   if bh.bh_well_named_ancestors = [] then
     let x = Gwdb.sou base (Gwdb.get_surname p) in
-    print_branch conf base psn x p
+    print_branch ~exact conf base psn x p
   else (
     Output.print_sstring conf "<li>";
     if Person.is_empty p then Output.print_sstring conf "&lt;&lt;"
@@ -533,12 +518,12 @@ let print_one_branch conf base bh psn =
     List.iter
       (fun p ->
         let x = Gwdb.sou base (Gwdb.get_surname p) in
-        print_branch conf base psn x p)
+        print_branch ~exact conf base psn x p)
       bh.bh_well_named_ancestors;
     Output.print_sstring conf "</ul></li>");
   Output.print_sstring conf "</ul>"
 
-let print_one_surname_by_branch conf base x xl (bhl, str) =
+let print_one_surname_by_branch ~exact conf base x (bhl, str) =
   let ancestors =
     match Util.p_getenv conf.Config.env "order" with
     | Some "d" ->
@@ -566,30 +551,14 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     | Some x -> x = "yes"
     | None -> List.assoc_opt "always_surname" conf.Config.base_env = Some "yes"
   in
-  let title h =
-    if h || Util.p_getenv conf.Config.env "t" = Some "A" then
-      Output.print_string conf (Util.escape_html x)
-    else
-      Ext_list.iter_first
-        (fun first x ->
-          if not first then Output.print_sstring conf ", ";
-          Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf {|m=N&t=A&v=|};
-          Output.print_string conf (Mutil.encode x);
-          Output.print_sstring conf {|">|};
-          Output.print_string conf (Util.escape_html x);
-          Output.print_sstring conf {|</a>|})
-        (Ext_string.Set.elements xl)
-  in
   let br = Util.p_getint conf.Config.env "br" in
-  Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
   (* Menu afficher par branche/ordre alphabetique *)
-  if br = None then print_branch_to_alphabetic conf x len;
+  if br = None then
+    print_branch_to_alphabetic ~exact (Config.Trimmed.from_config conf) x len;
   Output.print_sstring conf {|<div id="surname_by_branch">|};
   if len > 1 && br = None then (
     Output.print_sstring conf "<dl>";
@@ -605,7 +574,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
            Output.print_sstring conf {|" rel="nofollow">|};
            Output.print_sstring conf (string_of_int n);
            Output.print_sstring conf ".</a></dt><dd>";
-           print_one_branch conf base bh psn;
+           print_one_branch ~exact conf base bh psn;
            Output.print_sstring conf "</dd>";
            n + 1)
          1 ancestors;
@@ -614,15 +583,83 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     ignore
     @@ List.fold_left
          (fun n bh ->
-           if br = None || br = Some n then print_one_branch conf base bh psn;
+           if br = None || br = Some n then
+             print_one_branch ~exact conf base bh psn;
            n + 1)
          1 ancestors;
-  Output.print_sstring conf "</div>";
+  Output.print_sstring conf "</div>"
+
+let print_title conf ?order_string xl =
+  let name_list =
+    (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) xl :> string list)
+    |> String.concat ", "
+  in
+  match order_string with
+  | Some order_string ->
+      Output.print_sstring conf
+        (Printf.sprintf "%s (%s)" name_list order_string)
+  | None -> Output.print_sstring conf name_list
+
+let print_one_surname_by_branch ~exact conf base x xl branches =
+  let names = Ext_string.Set.elements xl in
+  let name_list_str =
+    (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) names
+      :> string list)
+    |> String.concat ", "
+  in
+  let title h =
+    if h then
+      print_title conf
+        ~order_string:(Util.transl_nth conf "branch/branches" 1)
+        names
+    else if exact then print_title conf names
+    else
+      Ext_list.iter_first
+        (fun first x ->
+          if not first then Output.print_sstring conf ", ";
+          Output.print_sstring conf {|<a href="|};
+          Output.print_string conf (Util.commd conf);
+          Output.print_sstring conf {|m=N&t=A&v=|};
+          Output.print_string conf (Mutil.encode x);
+          Output.print_sstring conf {|">|};
+          Output.print_string conf (Util.escape_html x);
+          Output.print_sstring conf {|</a>|})
+        (Ext_string.Set.elements xl)
+  in
+  let meta =
+    [
+      {
+        Hutil.name = "description";
+        content =
+          Utf8.capitalize_fst
+            (Printf.sprintf
+               (Util.ftransl conf "%s %s surname_list_meta_description")
+               name_list_str (Gwdb.bname base));
+      };
+    ]
+  in
+  Hutil.header_with_meta conf title meta;
+  Hutil.interp_no_header conf "list_by_branch"
+    {
+      Templ.eval_var =
+        (fun _ _ _ -> function
+          | [ "content" ] ->
+              print_one_surname_by_branch ~exact conf base x branches;
+              VVstring ""
+          | _ -> raise Not_found);
+      Templ.eval_transl = (fun _ -> raise Not_found);
+      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+      Templ.get_vother = Option.some;
+      Templ.set_vother = Fun.id;
+      Templ.print_foreach = (fun _ -> raise Not_found);
+    }
+    [] ();
   Hutil.trailer conf
 
 let print_several_possible_surnames x conf base (_, homonymes) =
   let fx = x in
   let x = match homonymes with x :: _ -> x | _ -> x in
+  let conf = Config.Trimmed.to_config conf in
   let title =
     mk_specify_title conf (Util.transl_nth conf "surname/surnames" 0) fx
   in
@@ -706,23 +743,45 @@ let print_family_alphabetic x conf base liste =
   | [] -> surname_not_found conf x
   | _ ->
       let title h =
-        let access x =
-          if h || List.length homonymes = 1 then
-            (Util.escape_html x :> Adef.safe_string)
-          else
-            let open Def in
-            Util.geneweb_link conf
-              ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
-                :> Adef.escaped_string)
-              (Util.escape_html x :> Adef.safe_string)
-        in
-        Ext_list.iter_first
-          (fun first x ->
-            if not first then Output.print_sstring conf ", ";
-            Output.print_string conf (access x))
-          homonymes
+        if h then
+          print_title conf
+            ~order_string:(Util.transl conf "alphabetic order")
+            homonymes
+        else
+          let access x =
+            if List.length homonymes = 1 then
+              (Util.escape_html (Utf8.uppercase x) :> Adef.safe_string)
+            else
+              let open Def in
+              Util.geneweb_link conf
+                ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
+                  :> Adef.escaped_string)
+                (Util.escape_html (Utf8.uppercase x) :> Adef.safe_string)
+          in
+          Ext_list.iter_first
+            (fun first x ->
+              if not first then Output.print_sstring conf ", ";
+              Output.print_string conf (access x))
+            homonymes
       in
-      Hutil.header conf title;
+      let meta =
+        let homonymes_str =
+          (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) homonymes
+            :> string list)
+          |> String.concat ", "
+        in
+        [
+          {
+            Hutil.name = "description";
+            content =
+              Utf8.capitalize_fst
+                (Printf.sprintf
+                   (Util.ftransl conf "%s %s surname_list_meta_description")
+                   homonymes_str (Gwdb.bname base));
+          };
+        ]
+      in
+      Hutil.header_with_meta conf title meta;
       Hutil.print_link_to_welcome conf true;
       (* Si on est dans un calcul de parenté, on affiche *)
       (* l'aide sur la sélection d'un individu.          *)
@@ -804,9 +863,10 @@ type surname_search_result = {
   bhl : Gwdb.person branch_head list;
 }
 
-let surname_print conf base not_found_fun { iperl; list; bhl } x =
-  match Util.p_getenv conf.Config.env "o" with
-  | Some "i" ->
+let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
+    base not_found_fun { iperl; list; bhl } =
+  match query_params.display_mode with
+  | `List ->
       let pl =
         List.fold_right (fun ip ipl -> Util.pget conf base ip :: ipl) iperl []
       in
@@ -816,23 +876,43 @@ let surname_print conf base not_found_fun { iperl; list; bhl } x =
             (not (Util.is_hide_names conf p)) || Person.is_visible conf base p)
           pl
       in
-      print_family_alphabetic x conf base pl
-  | _ -> (
+      print_family_alphabetic query_params.last_name conf base pl
+  | `Branch -> (
+      let () =
+        let canonical_url =
+          Page.Last_name_search.canonical_url
+            ~conf:(Config.Trimmed.from_config conf)
+            query_params
+        in
+        let alternate_urls =
+          List.map
+            (fun lang ->
+              Page.Last_name_search.alternate_url
+                ~conf:(Config.Trimmed.from_config conf)
+                ~lang query_params)
+            Lang.all
+        in
+        Output.link_header
+          (Config.Trimmed.from_config conf)
+          canonical_url ~alternate_urls
+      in
       match (bhl, list) with
-      | [], _ -> not_found_fun conf x
+      | [], _ -> not_found_fun conf query_params.last_name
       | _, [ (s, (strl, _)) ] ->
-          print_one_surname_by_branch conf base x strl (bhl, s)
+          print_one_surname_by_branch ~exact:query_params.exact conf base
+            query_params.last_name strl (bhl, s)
       | _ ->
           let strl = List.map fst list in
-          print_several_possible_surnames x conf base (bhl, strl))
+          print_several_possible_surnames query_params.last_name
+            (Config.Trimmed.from_config conf)
+            base (bhl, strl))
 
 (**/**)
 (* TODO: refactoring avec les fonctions ci-dessus !!! *)
 
-let search_surname conf base x : surname_search_result =
+let search_surname ~exact conf base x : surname_search_result =
   let list, name_inj =
-    if Util.p_getenv conf.Config.env "t" = Some "A" then
-      (persons_of_absolute_surname conf base x, Fun.id)
+    if exact then (persons_of_absolute_surname conf base x, Fun.id)
     else if x = "" then ([], Fun.id)
     else
       persons_of_fsname conf base Gwdb.base_strings_of_surname
@@ -868,15 +948,12 @@ let sn_search_result_is_empty { list; iperl = _; bhl } =
   | _, [ (_, (_, _)) ] -> false
   | _ -> true
 
-let search_surname_print = surname_print
-
 type first_name_search_result =
   (string * (Ext_string.Set.t * Gwdb.iper list)) list
 
-let search_first_name conf base x : first_name_search_result =
+let search_first_name ~exact conf base x : first_name_search_result =
   let list =
-    if Util.p_getenv conf.Config.env "t" = Some "A" then
-      persons_of_absolute_first_name conf base x
+    if exact then persons_of_absolute_first_name conf base x
     else if x = "" then []
     else
       fst
@@ -892,9 +969,10 @@ let search_first_name conf base x : first_name_search_result =
   in
   List.fold_right merge_insert list []
 
-let search_first_name_print conf base list x =
+let search_first_name_print
+    ~(query_params : Page.First_name_search.Query_params.t) conf base list =
   match list with
-  | [] -> first_name_not_found conf x
+  | [] -> first_name_not_found conf query_params.first_name
   | [ (_, (strl, iperl)) ] ->
       let iperl = List.sort_uniq compare iperl in
       let pl = List.map (Util.pget conf base) iperl in
@@ -907,7 +985,11 @@ let search_first_name_print conf base list x =
             else pl)
           pl []
       in
-      first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf x list
+      first_name_print_list ~exact:query_params.exact conf base
+        query_params.first_name strl pl
+  | _ ->
+      select_first_name
+        (Config.Trimmed.from_config conf)
+        query_params.first_name list
 
 let fn_search_result_is_empty l = l = []

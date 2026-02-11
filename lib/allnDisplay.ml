@@ -14,13 +14,20 @@ let compare_particle_at_the_end base is_surnames a b =
 
 (* print *)
 
-let print_title conf base is_surnames ini len =
+let print_title conf base is_surnames ini len h =
+  let conf = Config.Trimmed.to_config conf in
   if len >= 2 then
     if is_surnames then
-      Printf.sprintf
-        (Util.fcapitale (Util.ftransl conf "%s surnames list title"))
-        (Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") len)
-      |> Output.print_sstring conf
+      if h then
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (Util.transl conf "all the names"))
+      else
+        Printf.sprintf
+          (Util.fcapitale (Util.ftransl conf "%s surnames list title"))
+          (Mutil.string_of_int_sep
+             (Util.transl conf "(thousand separator)")
+             len)
+        |> Output.print_sstring conf
     else
       Printf.sprintf
         (Util.fcapitale (Util.ftransl conf "the %d first names"))
@@ -37,7 +44,7 @@ let print_title conf base is_surnames ini len =
     Output.print_sstring conf (Util.transl conf "starting with");
     Output.print_sstring conf " ";
     Output.print_string conf (Util.escape_html ini))
-  else (
+  else if not h then (
     Output.print_sstring conf " (";
     Output.print_sstring conf
       (Mutil.string_of_int_sep
@@ -56,10 +63,29 @@ let tr c1 s2 s =
   in
   loop 0 0
 
+let surname_list_meta_description conf base =
+  [
+    Hutil.
+      {
+        name = "description";
+        content =
+          Utf8.capitalize_fst
+            (Printf.sprintf
+               (Util.ftransl
+                  (Config.Trimmed.to_config conf)
+                  "%s all_names_meta_description")
+               (Gwdb.bname base));
+      };
+  ]
+
 let print_alphabetic_big conf base is_surnames ini list len too_big =
-  let title _ = print_title conf base is_surnames ini len in
+  let title = print_title conf base is_surnames ini len in
   let mode = if is_surnames then Adef.encoded "N" else Adef.encoded "P" in
-  Hutil.header conf title;
+  let meta =
+    if is_surnames then surname_list_meta_description conf base else []
+  in
+  let conf = Config.Trimmed.to_config conf in
+  Hutil.header_with_meta conf title meta;
   Output.print_sstring conf {|<p class="search_name">|};
   List.iter
     (fun ini_k ->
@@ -120,9 +146,13 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
   Hutil.trailer conf
 
 let print_alphabetic_all conf base is_surnames ini list len =
-  let title _ = print_title conf base is_surnames ini len in
+  let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
-  Hutil.header conf title;
+  let meta =
+    if is_surnames then surname_list_meta_description conf base else []
+  in
+  let conf = Config.Trimmed.to_config conf in
+  Hutil.header_with_meta conf title meta;
   Output.print_sstring conf {|<p class="search_name">|};
   List.iter
     (fun (ini_k, _) ->
@@ -164,9 +194,13 @@ let print_alphabetic_all conf base is_surnames ini list len =
   Hutil.trailer conf
 
 let print_alphabetic_small conf base is_surnames ini list len =
-  let title _ = print_title conf base is_surnames ini len in
+  let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
-  Hutil.header conf title;
+  let meta =
+    if is_surnames then surname_list_meta_description conf base else []
+  in
+  let conf = Config.Trimmed.to_config conf in
+  Hutil.header_with_meta conf title meta;
   if list <> [] then (
     Output.print_sstring conf "<ul>";
     List.iter
@@ -192,9 +226,10 @@ let print_alphabetic_small conf base is_surnames ini list len =
   Hutil.trailer conf
 
 let print_frequency_any conf base is_surnames list len =
-  let title _ = print_title conf base is_surnames "" len in
+  let title = print_title conf base is_surnames "" len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let n = ref 0 in
+  let conf = Config.Trimmed.to_config conf in
   Hutil.header conf title;
   Output.print_sstring conf "<ul>";
   List.iter
@@ -223,54 +258,49 @@ let print_frequency_any conf base is_surnames list len =
   Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
-let print_frequency conf base is_surnames =
+let print_frequency ~at_least conf base is_surnames =
   let () = Gwdb.load_strings_array base in
-  let list, len = Alln.select_names conf base is_surnames "" max_int in
+  let list, len =
+    Alln.select_names ~at_least conf base is_surnames "" max_int
+  in
   let list = Alln.groupby_count list in
   print_frequency_any conf base is_surnames list len
 
-let print_alphabetic ~index conf base is_surnames =
-  let ini =
-    match Util.p_getenv conf.Config.env "k" with Some k -> k | _ -> ""
-  in
-  if
-    (List.assoc_opt "fast_alphabetic" conf.Config.base_env = Some "yes"
-    || Gwdb.nb_of_persons base >= 100_000)
-    && ini = ""
-  then (
+let print_alphabetic ~prefix ~all ~at_least ~fast ~index conf base is_surnames =
+  let ini = match prefix with Some k -> k | _ -> "" in
+  if (fast || Gwdb.nb_of_persons base >= 100_000) && ini = "" then (
     Gwdb.load_strings_array base;
     let list =
       List.sort Utf8.alphabetic_order (List.map Utf8.uchar_to_string index)
     in
     print_alphabetic_big conf base is_surnames ini list 1 true)
-  else
-    let all =
-      match Util.p_getenv conf.Config.env "o" with
-      | Some "A" -> true
-      | _ -> false
-    in
-    if String.length ini < 2 then Gwdb.load_strings_array base;
-    let list, len =
-      Alln.select_names conf base is_surnames ini (if all then max_int else 50)
-    in
-    match list with
-    | Alln.Specify keys ->
-        let keys = List.sort Utf8.alphabetic_order keys in
-        let too_big = (not all) && List.length keys > Alln.default_max_cnt in
-        print_alphabetic_big conf base is_surnames ini keys len too_big
-    | Alln.Result list ->
-        if len >= 50 || ini = "" then
-          let list = Alln.groupby_ini (Utf8.length ini + 1) list in
-          print_alphabetic_all conf base is_surnames ini list len
-        else print_alphabetic_small conf base is_surnames ini list len
+  else if String.length ini < 2 then Gwdb.load_strings_array base;
+  let list, len =
+    Alln.select_names ~at_least conf base is_surnames ini
+      (if all then max_int else 50)
+  in
+  match list with
+  | Alln.Specify keys ->
+      let keys = List.sort Utf8.alphabetic_order keys in
+      let too_big = (not all) && List.length keys > Alln.default_max_cnt in
+      print_alphabetic_big conf base is_surnames ini keys len too_big
+  | Alln.Result list ->
+      if len >= 50 || ini = "" then
+        let list = Alln.groupby_ini (Utf8.length ini + 1) list in
+        print_alphabetic_all conf base is_surnames ini list len
+      else print_alphabetic_small conf base is_surnames ini list len
 
 (* short print *)
 
 let print_alphabetic_short conf base is_surnames ini list len =
-  let title _ = print_title conf base is_surnames ini len in
+  let title = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let need_ref = len >= 250 in
-  Hutil.header conf title;
+  let meta =
+    if is_surnames then surname_list_meta_description conf base else []
+  in
+  let conf = Config.Trimmed.to_config conf in
+  Hutil.header_with_meta conf title meta;
   if need_ref then (
     Output.print_sstring conf "<p>";
     List.iter
@@ -314,13 +344,11 @@ let print_alphabetic_short conf base is_surnames ini list len =
     list;
   Hutil.trailer conf
 
-let print_short conf base is_surnames =
-  let ini =
-    match Util.p_getenv conf.Config.env "k" with Some k -> k | _ -> ""
-  in
+let print_short ~prefix ~at_least conf base is_surnames =
+  let ini = match prefix with Some k -> k | _ -> "" in
   let () = if String.length ini < 2 then Gwdb.load_strings_array base in
-  match Alln.select_names conf base is_surnames ini max_int with
-  | Alln.Specify _, _ -> Hutil.incorrect_request conf
+  match Alln.select_names ~at_least conf base is_surnames ini max_int with
+  | Alln.Specify _, _ -> Hutil.incorrect_request (Config.Trimmed.to_config conf)
   | Alln.Result list, len ->
       let list = Alln.groupby_ini (Utf8.length ini + 1) list in
       print_alphabetic_short conf base is_surnames ini list len

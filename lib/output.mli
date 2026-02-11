@@ -31,3 +31,9 @@ val flush : Config.config -> unit
     MUST be called only once at the end of the page because plugins can define a custom
     output configuration which needs the whole document or close the channel on [flush].
  *)
+
+val link_header :
+  ?alternate_urls:Localized_url.t list ->
+  Config.Trimmed.t ->
+  Canonical_url.t ->
+  unit

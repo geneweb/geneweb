@@ -6,7 +6,7 @@ let default_max_cnt = 2000
 
 type t = Result of (string * string * int) list | Specify of string list
 
-let select_names conf base is_surnames ini limit =
+let select_names ~at_least conf base is_surnames ini limit =
   let inilen = Utf8.length ini + 1 in
   let cut k = Utf8.sub k 0 (min (Utf8.length k) inilen) in
   let name_index =
@@ -42,42 +42,59 @@ let select_names conf base is_surnames ini limit =
                 match list with
                 | Specify _ ->
                     if ips = [] then 0
-                    else if conf.Config.use_restrict then
+                    else if conf.Config.Trimmed.use_restrict then
                       if
                         List.exists
-                          (fun i -> not @@ Util.is_restricted conf base i)
+                          (fun i ->
+                            not
+                            @@ Util.is_restricted
+                                 (Config.Trimmed.to_config conf)
+                                 base i)
                           ips
                       then 1
                       else 0
                     else if
                       (* TODO should be is_hidden (?) *)
-                      conf.Config.hide_private_names
-                      && not (conf.Config.wizard || conf.Config.friend)
+                      conf.Config.Trimmed.hide_private_names
+                      && not
+                           (conf.Config.Trimmed.wizard
+                          || conf.Config.Trimmed.friend)
                     then
                       if
                         List.exists
                           (fun i ->
-                            Person.is_visible conf base (Gwdb.poi base i))
+                            Person.is_visible
+                              (Config.Trimmed.to_config conf)
+                              base (Gwdb.poi base i))
                           ips
                       then 1
                       else 0
                     else 1
                 | Result _ ->
-                    if conf.Config.use_restrict then
+                    if conf.Config.Trimmed.use_restrict then
                       List.fold_left
                         (fun acc i ->
-                          if Util.is_restricted conf base i then acc
+                          if
+                            Util.is_restricted
+                              (Config.Trimmed.to_config conf)
+                              base i
+                          then acc
                           else acc + 1)
                         0 ips
                     else if
                       (* TODO should be is_hidden (?) *)
-                      conf.Config.hide_private_names
-                      && not (conf.Config.wizard || conf.Config.friend)
+                      conf.Config.Trimmed.hide_private_names
+                      && not
+                           (conf.Config.Trimmed.wizard
+                          || conf.Config.Trimmed.friend)
                     then
                       List.fold_left
                         (fun acc i ->
-                          if Person.is_visible conf base (Gwdb.poi base i) then
-                            acc + 1
+                          if
+                            Person.is_visible
+                              (Config.Trimmed.to_config conf)
+                              base (Gwdb.poi base i)
+                          then acc + 1
                           else acc)
                         0 ips
                     else List.length ips
@@ -116,7 +133,7 @@ let select_names conf base is_surnames ini limit =
     match list with
     | Specify _ -> (list, len)
     | Result acc -> (
-        match Util.p_getint conf.Config.env "atleast" with
+        match at_least with
         | None -> (list, len)
         | Some min ->
             let acc, len =

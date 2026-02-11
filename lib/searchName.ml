@@ -295,16 +295,39 @@ let print conf base specify unknown =
       search_approx_key conf base s >>= fun () ->
       search_partial_key conf base s >>= fun () -> unknown conf s
   | Some fn, None ->
-      let fres = Search_name_display.search_first_name conf base fn in
+      let query_params =
+        match
+          Page.First_name_search.Query_params.from_env
+            (("v", Mutil.encode fn) :: conf.env)
+        with
+        | None -> assert false
+        | Some query_params -> query_params
+      in
+      let fres =
+        Search_name_display.search_first_name ~exact:query_params.exact conf
+          base fn
+      in
       if Search_name_display.fn_search_result_is_empty fres then unknown conf fn
-      else Search_name_display.search_first_name_print conf base fres fn
+      else
+        Search_name_display.search_first_name_print ~query_params conf base fres
   | None, Some sn ->
       let ( >>= ) = bind sn in
       search_sosa conf base sn >>= fun () ->
       search_key conf base sn >>= fun () ->
-      let sres = Search_name_display.search_surname conf base sn in
+      let query_params =
+        match
+          Page.Last_name_search.Query_params.from_env
+            (("v", Mutil.encode sn) :: conf.env)
+        with
+        | None -> assert false
+        | Some query_params -> query_params
+      in
+      let sres =
+        Search_name_display.search_surname ~exact:query_params.exact conf base
+          sn
+      in
       if not (Search_name_display.sn_search_result_is_empty sres) then
-        Search_name_display.search_surname_print conf base unknown sres sn
+        Search_name_display.surname_print ~query_params conf base unknown sres
       else
         let ( >>= ) = bind sn in
         search_approx_key conf base sn >>= fun () ->

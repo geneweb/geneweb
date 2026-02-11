@@ -2,20 +2,13 @@
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
-  if
-    k = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
-  then true
-  else if
-    List.exists
-      (fun n -> Name.strip n = k)
-      (Gwdb.person_misc_names base p (Geneweb.Util.nobtit conf base))
-  then true
-  else false
+  k = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
+  || List.exists
+       (fun n -> Name.strip n = k)
+       (Gwdb.person_misc_names base p (Geneweb.Util.nobtit conf base))
 
 let select_std_eq conf base pl k =
-  List.fold_right
-    (fun p pl -> if person_is_std_key conf base p k then p :: pl else pl)
-    pl []
+  List.filter (fun p -> person_is_std_key conf base p k) pl
 
 let find_all conf base an =
   let sosa_ref = Geneweb.Util.find_sosa_ref conf base in
@@ -708,12 +701,20 @@ let treat_request =
                      let pl, sosa_acc = find_all conf base n in
                      match pl with
                      | [] ->
-                         let sres =
-                           Geneweb.Search_name_display.search_surname conf base
-                             n
+                         let query_params =
+                           match
+                             Geneweb.Page.Last_name_search.Query_params.from_env
+                               (("v", Mutil.encode n) :: conf.env)
+                           with
+                           | None -> assert false
+                           | Some query_params -> query_params
                          in
-                         Geneweb.Search_name_display.surname_print conf base
-                           unknown sres n
+                         let sres =
+                           Geneweb.Search_name_display.search_surname
+                             ~exact:query_params.exact conf base n
+                         in
+                         Geneweb.Search_name_display.surname_print ~query_params
+                           conf base unknown sres
                      | [ p ] ->
                          if
                            sosa_acc
@@ -731,15 +732,33 @@ let treat_request =
                        match (real_input "fn", real_input "sn") with
                        | Some fn, Some sn -> search (fn ^ " " ^ sn)
                        | Some fn, None ->
-                           Geneweb.Search_name_display.first_name_print conf
-                             base fn
-                       | None, Some sn ->
-                           let sres =
-                             Geneweb.Search_name_display.search_surname conf
-                               base sn
+                           let query_params =
+                             match
+                               Geneweb.Page.First_name_search.Query_params
+                               .from_env
+                                 (("v", Mutil.encode fn) :: conf.env)
+                             with
+                             | None -> assert false
+                             | Some query_params -> query_params
                            in
-                           Geneweb.Search_name_display.surname_print conf base
-                             unknown sres sn
+                           Geneweb.Search_name_display.first_name_print
+                             ~query_params conf base
+                       | None, Some sn ->
+                           let query_params =
+                             match
+                               Geneweb.Page.Last_name_search.Query_params
+                               .from_env
+                                 (("v", Mutil.encode sn) :: conf.env)
+                             with
+                             | Some query_params -> query_params
+                             | None -> assert false
+                           in
+                           let sres =
+                             Geneweb.Search_name_display.search_surname
+                               ~exact:query_params.exact conf base sn
+                           in
+                           Geneweb.Search_name_display.surname_print
+                             ~query_params conf base unknown sres
                        | None, None -> incorrect_request conf base))
                | Some i ->
                    relation_print conf base

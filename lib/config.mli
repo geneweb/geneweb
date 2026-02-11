@@ -116,3 +116,65 @@ type config = {
 val empty : config
 (** A dummy {!type:config} value, with uninitialized fields.
     Used for testing purpose *)
+
+module Trimmed : sig
+  type t = private {
+    from : string;
+    api_mode : bool;
+    manitou : bool;
+    supervisor : bool;
+    wizard : bool;
+    is_printed_by_template : bool;
+    debug : bool;
+    friend : bool;
+    just_friend_wizard : bool;
+    user : string;
+    username : string;
+    auth_scheme : auth_scheme_kind;
+    command : string;
+    indep_command : string;
+    lang : string;
+    default_lang : string;
+    default_sosa_ref : Gwdb.iper * Gwdb.person option;
+    authorized_wizards_notes : bool;
+    public_if_titles : bool;
+    public_if_no_date : bool;
+    setup_link : bool;
+    access_by_key : bool;
+    private_years : int;
+    default_contemporary_private_years : int;
+    hide_private_names : bool;
+    use_restrict : bool;
+    no_image : bool;
+    no_note : bool;
+    bname : string;
+    cgi_passwd : string;
+    allowed_titles : string list Lazy.t;
+    denied_titles : string list Lazy.t;
+    request : string list;
+    lexicon : (string, string) Hashtbl.t;
+    charset : string;
+    is_rtl : bool;
+    left : string;
+    right : string;
+    auth_file : string;
+    border : int;
+    n_connect : (int * int * int * (string * float) list) option;
+    today : Date.dmy;
+    today_wd : int;
+    time : int * int * int;
+    ctime : float;
+    output_conf : output_conf;
+    image_prefix : string;
+    static_path : string;
+    cgi : bool;
+    forced_plugins : string list;
+    plugins : string list;
+    notify_change : string option;
+    preferred_countries : string list option;
+    dates_format : dates_format;
+  }
+
+  val to_config : t -> config
+  val from_config : config -> t
+end
