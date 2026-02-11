@@ -768,7 +768,7 @@ let print_family_alphabetic x conf base liste =
         let homonymes_str =
           (List.map (fun x -> Util.escape_html (Utf8.uppercase x)) homonymes
             :> string list)
-          |> String.concat " ,"
+          |> String.concat ", "
         in
         [
           {
