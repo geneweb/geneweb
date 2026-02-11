@@ -509,7 +509,7 @@ const RpcDatalistManager = {
       };
       
       // Test connexion avec timeout 3 secondes
-      const testPromise = this.client.lookup(%['%base.name;_fnames.cache', '', 1%]);
+      const testPromise = this.client.lookup('%base.name;_fnames.cache', '', 1);
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('RPC timeout')), 3000)
       );
@@ -538,7 +538,7 @@ const RpcDatalistManager = {
 
     try {
       const cacheFile = this.getCacheFile(datalistId);
-      const results = await this.client.lookup([cacheFile, searchTerm, 50]);
+      const results = await this.client.lookup(cacheFile, searchTerm, 50);
 
       const fragment = document.createDocumentFragment();
       results.forEach(item => {
