@@ -89,7 +89,8 @@ let parse_connection_opt interface port max_connection idle_timeout crt key =
   let port =
     match (port, crt) with
     | None, Some _ -> default_tls_port
-    | _ -> default_port
+    | None, None -> default_port
+    | Some p, _ -> p
   in
   match (crt, key) with
   | Some crt, Some key ->
