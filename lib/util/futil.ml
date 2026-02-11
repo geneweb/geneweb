@@ -33,15 +33,15 @@ let map_pers_event ?(fd = identity) fp fs e =
     match e.epers_name with
     | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
       | Epers_Cremation | Epers_Accomplishment | Epers_Acquisition
-      | Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
-      | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
-      | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Decoration
-      | Epers_DemobilisationMilitaire | Epers_Diploma | Epers_Distinction
-      | Epers_Dotation | Epers_DotationLDS | Epers_Education | Epers_Election
-      | Epers_Emigration | Epers_Excommunication | Epers_FamilyLinkLDS
-      | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
-      | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
-      | Epers_ListePassenger | Epers_MilitaryDistinction
+      | Epers_Adhesion | Epers_Adoption | Epers_BaptismLDS | Epers_BarMitzvah
+      | Epers_BatMitzvah | Epers_Benediction | Epers_ChangeName
+      | Epers_Circumcision | Epers_Confirmation | Epers_ConfirmationLDS
+      | Epers_Decoration | Epers_DemobilisationMilitaire | Epers_Diploma
+      | Epers_Distinction | Epers_Dotation | Epers_DotationLDS | Epers_Education
+      | Epers_Election | Epers_Emigration | Epers_Excommunication
+      | Epers_FamilyLinkLDS | Epers_FirstCommunion | Epers_Funeral
+      | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
+      | Epers_Immigration | Epers_ListePassenger | Epers_MilitaryDistinction
       | Epers_MilitaryPromotion | Epers_MilitaryService
       | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
       | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
