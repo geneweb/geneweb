@@ -60,8 +60,7 @@
               camlp5
             ]);
 
-            # FIXME: Do not propagate all these dependencies.
-            propagatedBuildInputs = (with ocamlPackages; [
+            propagatedBuildInputs = with ocamlPackages; [
               ancient
               pcre2
               benchmark
@@ -90,7 +89,7 @@
               yojson
               digestif
               pp_loc
-            ]);
+            ];
           };
 
           geneweb-rpc = ocamlPackages.buildDunePackage {

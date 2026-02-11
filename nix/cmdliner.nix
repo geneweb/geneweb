@@ -5,12 +5,12 @@
   ocaml,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "cmdliner";
   version = "2.0.0";
 
   src = fetchurl {
-    url = "https://erratique.ch/software/${pname}/releases/${pname}-${version}.tbz";
+    url = "https://erratique.ch/software/${finalAttrs.pname}/releases/${finalAttrs.pname}-${finalAttrs.version}.tbz";
     sha256 = "sha256-TlR6Yxw2+6rf9g0713JOs/g7onTpL7cllQuueGg3hYI=";
   };
 
@@ -19,11 +19,12 @@ stdenv.mkDerivation rec {
   makeFlags = [ "PREFIX=$(out)" ];
   installTargets = "install install-doc";
   installFlags = [
-    "LIBDIR=$(out)/lib/ocaml/${ocaml.version}/site-lib/${pname}"
-    "DOCDIR=$(out)/share/doc/${pname}"
+    "LIBDIR=$(out)/lib/ocaml/${ocaml.version}/site-lib/${finalAttrs.pname}"
+    "DOCDIR=$(out)/share/doc/${finalAttrs.pname}"
   ];
+
   postInstall = ''
-    mv $out/lib/ocaml/${ocaml.version}/site-lib/${pname}/{opam,${pname}.opam}
+    mv $out/lib/ocaml/${ocaml.version}/site-lib/${finalAttrs.pname}/{opam,${finalAttrs.pname}.opam}
   '';
 
   meta = with lib; {
@@ -33,4 +34,4 @@ stdenv.mkDerivation rec {
     inherit (ocaml.meta) platforms;
     maintainers = [ maintainers.vbgl ];
   };
-}
+})
