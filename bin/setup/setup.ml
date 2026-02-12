@@ -949,7 +949,7 @@ let gwc_or_ged2gwb out_name_of_in_name conf =
   else print_file conf "create.htm"
 
 let gwc_check conf =
-  let conf = { conf with env = ("nofail", "on") :: ("f", "on") :: conf.env } in
+  let conf = { conf with env = ("nofail", "on") :: conf.env } in
   gwc_or_ged2gwb out_name_of_gw conf
 
 let ged2gwb_check conf =
