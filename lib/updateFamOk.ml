@@ -286,24 +286,27 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
     ref None
   in
 
+  let found_annulation = ref false in
   let found_divorce : Def.divorce option ref = ref None in
   let mk_marr evt kind =
-    let e =
-      Some
-        ( kind,
-          evt.efam_date,
-          evt.efam_place,
-          evt.efam_note,
-          evt.efam_src,
-          evt.efam_witnesses )
-    in
-    match !found_marriage with
-    | None -> found_marriage := e
-    | Some ((NoMention | Residence), _, _, _, _, _)
-      when kind <> NoMention && kind <> Residence ->
-        found_marriage := e
-    | Some (Married, _, _, _, _, _) when kind <> Married -> ()
-    | _ -> if kind = Married then found_marriage := e
+    if !found_annulation then ()
+    else
+      let e =
+        Some
+          ( kind,
+            evt.efam_date,
+            evt.efam_place,
+            evt.efam_note,
+            evt.efam_src,
+            evt.efam_witnesses )
+      in
+      match !found_marriage with
+      | None -> found_marriage := e
+      | Some ((NoMention | Residence), _, _, _, _, _)
+        when kind <> NoMention && kind <> Residence ->
+          found_marriage := e
+      | Some (Married, _, _, _, _, _) when kind <> Married -> ()
+      | _ -> if kind = Married then found_marriage := e
   in
   let mk_div kind =
     match !found_divorce with
@@ -313,8 +316,6 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   (* Marriage is more important than any other relation.
      For other cases, latest event is the most important,
      except for NotMention and Residence. *)
-  (* FIXME: For now, we ignore Annulation since it gives a wrong date
-     (relation on [annulation date] makes no sense) *)
   let rec loop = function
     | [] -> ()
     | evt :: l -> (
@@ -352,7 +353,9 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
         | Efam_Separated ->
             mk_div (Separated evt.efam_date);
             loop l
-        | Efam_Annulation -> loop l
+        | Efam_Annulation ->
+            found_annulation := true;
+            loop l
         | Efam_Name _ -> loop l)
   in
   loop (List.rev fevents);
