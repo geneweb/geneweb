@@ -3551,17 +3551,17 @@ it: Questa operazione ha creato un file chiamato "%o".
 lv: Rezultâtâ ir izviedota datne: "%o".
 sv: Det har skapats en fil benämnd "%o".
 
-    To change that, edit the file named "%y" and change the line holding: "<tt>%o</tt>" into "<tt>%a</tt>".
+    To change that, create or edit the file named "%y" and replace the line containing "<tt>%o</tt>" with "<tt>%a</tt>".
 aa: err_acc.htm
-co: Per cambià què, ci vole à mudificà u schedariu « gw/%y » è rimpiazzà a linea cuntenendu : <tt>%o</tt>" da "<tt>%a</tt>".
-de: Um dies zu ändern, bearbeite die Datei "gw/%y" und ändere die Zeile, in der "<tt>%o</tt>" steht in "<tt>%a</tt>".
-en: To change that, edit the file named "gw/%y" and change the line holding: "<tt>%o</tt>" into "<tt>%a</tt>".
-es: Para sobrepasar esta prohibición, edite Ud el fichero "gw/%y" y remplace la linea que contiene "<tt>%o</tt>" por "<tt>%a</tt>".
-fi: Muuttaaksesi asetukset, muokkaa tiedostoa "gw/%y" in asennus- hakemistossa ja muuta rivi "<tt>%o</tt>" seuraavanlaiseksi "<tt>%a</tt>".
-fr: Pour outrepasser cet interdit, il faut éditer le fichier "gw/%y" et remplacer la ligne contenant "<tt>%o</tt>" en "<tt>%a</tt>".
-it: Per aggirare questo divieto, bisogna editare il file "gw/%y" e sostituire la linea contenente "<tt>%o</tt>" en "<tt>%a</tt>".
-lv: Pieejas iegûðanai jârediìç fails "gw/%y" lînijâ, kas satur: "<tt>%o</tt>" jâieraksta "<tt>%a</tt>".
-sv: För att ändra det, editera filen "gw/%y" och ändra raden som innehåller: "<tt>%o</tt>" till "<tt>%a</tt>".
+co: Per cambià què, ci vole à creà o mudificà u schedariu « gw/%y » è rimpiazzà a linea cuntenendu : <tt>%o</tt>" da "<tt>%a</tt>".
+de: Um dies zu ändern, erstelle oder bearbeite die Datei "gw/%y" und ersetze die Zeile "<tt>%o</tt>" durch "<tt>%a</tt>".
+en: To change that, create or edit the file named "gw/%y" and replace the line containing "<tt>%o</tt>" with "<tt>%a</tt>".
+es: Para sobrepasar esta prohibición, cree o edite el fichero "gw/%y" y remplace la linea que contiene "<tt>%o</tt>" por "<tt>%a</tt>".
+fi: Muuttaaksesi asetukset, luo tai muokkaa tiedostoa "gw/%y" ja korvaa rivi "<tt>%o</tt>" seuraavanlaiseksi "<tt>%a</tt>".
+fr: Pour outrepasser cet interdit, il faut créer ou éditer le fichier "gw/%y" et remplacer la ligne contenant "<tt>%o</tt>" par "<tt>%a</tt>".
+it: Per aggirare questo divieto, bisogna creare o editare il file "gw/%y" e sostituire la linea contenente "<tt>%o</tt>" con "<tt>%a</tt>".
+lv: Pieejas iegûðanai jâizveido vai jârediìç fails "gw/%y" lînijâ, kas satur: "<tt>%o</tt>" jâieraksta "<tt>%a</tt>".
+sv: För att ändra det, skapa eller editera filen "gw/%y" och ersätt raden som innehåller: "<tt>%o</tt>" med "<tt>%a</tt>".
 
     To consult a database, the gwd service must have been launched.
 aa: list.htm
