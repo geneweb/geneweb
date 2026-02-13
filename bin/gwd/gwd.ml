@@ -326,7 +326,13 @@ let load_lexicon =
               in
               rev_iter
                 (fun fname ->
-                  let fname = Util.search_in_assets fname in
+                  let fname =
+                    let f = Util.search_in_assets fname in
+                    if Sys.file_exists f then f
+                    else
+                      let bf = Filename.concat (Secure.base_dir ()) fname in
+                      if Sys.file_exists bf then bf else f
+                  in
                   if Sys.file_exists fname then
                     Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
                   else Logs.warn (fun k -> k "File %s unavailable\n" fname))
