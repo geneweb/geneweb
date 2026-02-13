@@ -337,25 +337,23 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
   | exception Not_found ->
       check_stopping ();
-      let addr =
+      let socket, addr =
         match addr with
-        | None ->
-            if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
-              Unix.inet_addr_any
-            else Unix.inet6_addr_any
-        | Some addr -> (
-            try Unix.inet_addr_of_string addr
-            with Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0))
+        | Some a ->
+            let a =
+              try Unix.inet_addr_of_string a
+              with Failure _ -> (Unix.gethostbyname a).Unix.h_addr_list.(0)
+            in
+            let domain = Unix.domain_of_sockaddr (Unix.ADDR_INET (a, 0)) in
+            (Unix.socket domain Unix.SOCK_STREAM 0, a)
+        | None -> (
+            try
+              let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
+              Unix.setsockopt s Unix.IPV6_ONLY false;
+              (s, Unix.inet6_addr_any)
+            with Unix.Unix_error (Unix.EAFNOSUPPORT, _, _) ->
+              (Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0, Unix.inet_addr_any))
       in
-      let socket =
-        Unix.socket
-          (if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
-             Unix.PF_INET
-           else Unix.PF_INET6)
-          Unix.SOCK_STREAM 0
-      in
-      if Unix.string_of_inet_addr Unix.inet6_addr_any <> "::" then
-        Unix.setsockopt socket Unix.IPV6_ONLY false;
       Unix.setsockopt socket Unix.SO_REUSEADDR true;
       Unix.bind socket (Unix.ADDR_INET (addr, port));
       Unix.listen socket max_pending_requests;

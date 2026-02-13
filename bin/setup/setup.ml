@@ -1746,9 +1746,12 @@ let string_of_sockaddr = function
 
 let only_addr () =
   let local_addr =
-    if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
+    try
+      let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
+      Unix.close s;
+      Unix.string_of_inet_addr Unix.inet6_addr_loopback
+    with Unix.Unix_error (Unix.EAFNOSUPPORT, _, _) ->
       Unix.string_of_inet_addr Unix.inet_addr_loopback
-    else Unix.string_of_inet_addr Unix.inet6_addr_loopback
   in
   let fname = Lazy.force only_file_name in
   match try Some (open_in fname) with Sys_error _ -> None with
