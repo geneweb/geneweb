@@ -137,7 +137,7 @@ let get_request strm =
     | Some c ->
         Stream.junk strm__;
         loop (store len c) strm__
-    | _ -> if len = 0 then [] else [ get_buff len ]
+    | None -> if len = 0 then [] else [ get_buff len ]
   in
   loop 0 strm
 

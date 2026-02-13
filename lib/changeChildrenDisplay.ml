@@ -119,7 +119,7 @@ let print conf base =
   | Some i ->
       let p = Gwdb.poi base (Gwdb.iper_of_string i) in
       print_change conf base p
-  | _ -> Hutil.incorrect_request conf
+  | None -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
   Output.print_sstring conf "<h4>";
@@ -201,4 +201,4 @@ let print_ok o_conf base =
   | Some i ->
       let p = Gwdb.poi base (Gwdb.iper_of_string i) in
       print_change_ok conf base p
-  | _ -> Hutil.incorrect_request conf
+  | None -> Hutil.incorrect_request conf

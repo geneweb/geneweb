@@ -40,19 +40,19 @@ let change_child conf base parent_surname changed ip =
   let new_first_name =
     match Util.p_getenv conf.Config.env (var ^ "_first_name") with
     | Some x -> Ext_string.only_printable x
-    | _ -> Gwdb.p_first_name base p
+    | None -> Gwdb.p_first_name base p
   in
   let new_surname =
     match Util.p_getenv conf.Config.env (var ^ "_surname") with
     | Some x ->
         let x = Ext_string.only_printable x in
         if x = "" then parent_surname else x
-    | _ -> Gwdb.p_surname base p
+    | None -> Gwdb.p_surname base p
   in
   let new_occ =
     match Util.p_getint conf.Config.env (var ^ "_occ") with
     | Some x -> x
-    | _ -> 0
+    | None -> 0
   in
   if new_first_name = "" then raise (FirstNameMissing ip)
   else if

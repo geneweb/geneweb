@@ -93,7 +93,7 @@ let topological_sort base poi =
           let imoth = Gwdb.get_mother cpl in
           Gwdb.Marker.set tab ifath (Gwdb.Marker.get tab ifath + 1);
           Gwdb.Marker.set tab imoth (Gwdb.Marker.get tab imoth + 1)
-      | _ -> ())
+      | None -> ())
     persons;
   (* starting from the leaf vertex of graph (persons without childs) *)
   let todo =
@@ -123,7 +123,7 @@ let topological_sort base poi =
                 in
                 if Gwdb.Marker.get tab imoth = 0 then imoth :: new_list
                 else new_list
-            | _ -> new_list)
+            | None -> new_list)
           [] list
       in
       loop (tval + 1) new_list
@@ -132,7 +132,7 @@ let topological_sort base poi =
   if !cnt <> Gwdb.nb_of_persons base then
     check_noloop base (function
       | Def.OwnAncestor p -> raise (TopologicalSortError p)
-      | _ -> assert false);
+      | AlreadyDefined _ | BadSexOfMarriedPerson _ -> assert false);
   tab
 
 let phony_rel =
@@ -269,7 +269,7 @@ let relationship_and_links base ri b ip1 ip2 =
           let cpl = Gwdb.foi base ifam in
           treat_parent u tu (Gwdb.get_father cpl);
           treat_parent u tu (Gwdb.get_mother cpl)
-      | _ -> ()
+      | None -> ()
     in
     insert i1;
     insert i2;

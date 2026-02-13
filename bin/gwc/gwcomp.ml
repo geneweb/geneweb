@@ -356,7 +356,7 @@ let get_optional_birthdate l =
             let d = date_of_string x i in
             (Some d, l')
         | _ -> (None, l))
-  | _ -> (None, l)
+  | [] -> (None, l)
 
 (** Parses person's baptism date if it is present. *)
 let get_optional_baptdate l =
@@ -371,7 +371,7 @@ let get_optional_baptdate l =
             (Some d, l')
         | _ -> (None, l)
       else (None, l)
-  | _ -> (None, l)
+  | [] -> (None, l)
 
 (** Parse death information if present. *)
 let get_optional_deathdate l =
@@ -400,7 +400,7 @@ let get_optional_deathdate l =
             (Some d, l')
         | _ -> (None, l)
       else (None, l)
-  | _ -> (None, l)
+  | [] -> (None, l)
 
 (** Parse burial information if present. *)
 let get_burial l =
@@ -471,7 +471,7 @@ let get_fst_name str l =
           in
           Ok (x, occ, l')
       | _ -> Error str)
-  | _ -> Error str
+  | [] -> Error str
 
 (** Parses person's first name aliases if they are present *)
 let rec get_fst_names_aliases str l =
@@ -527,7 +527,7 @@ let get_name l =
       | '?' | ' ' ->
           (cut_space x, l')
       | _ -> ("", l))
-  | _ -> ("", l)
+  | [] -> ("", l)
 
 (** Parses person's public name if present *)
 let get_pub_name l =
@@ -537,7 +537,7 @@ let get_pub_name l =
         let a = String.sub x 1 (String.length x - 2) in
         (cut_space a, l')
       else ("", l)
-  | _ -> ("", l)
+  | [] -> ("", l)
 
 (** Parses person's image path if present *)
 let get_image state l =
@@ -621,7 +621,7 @@ let rec get_titles str l =
         let al, l' = get_titles str l' in
         ((if t.t_ident = "" then al else t :: al), l')
       else ([], l)
-  | _ -> ([], l)
+  | [] -> ([], l)
 
 (** Parses person's event name *)
 let get_pevent_name str l =
@@ -680,7 +680,7 @@ let get_pevent_name str l =
   | s :: l' ->
       if s.[0] = '#' then (Epers_Name (String.sub s 1 (String.length s - 1)), l')
       else failwith str
-  | _ -> failwith str
+  | [] -> failwith str
 
 (** Parses family event name *)
 let get_fevent_name str l =
@@ -700,7 +700,7 @@ let get_fevent_name str l =
   | s :: l' ->
       if s.[0] = '#' then (Efam_Name (String.sub s 1 (String.length s - 1)), l')
       else failwith str
-  | _ -> failwith str
+  | [] -> failwith str
 
 (** Parses event date if it is present. *)
 let get_optional_event_date l =
@@ -714,7 +714,7 @@ let get_optional_event_date l =
             let d = date_of_string x i in
             (Some d, l')
         | _ -> (None, l))
-  | _ -> (None, l)
+  | [] -> (None, l)
 
 (** Parse witness kind *)
 let get_event_witness_kind l =
@@ -941,7 +941,7 @@ let parse_parent state str l =
           match l with
           | [] -> false
           | s :: _ when s.[0] = '+' -> false
-          | _ -> true
+          | _ :: _ -> true
       in
       if not defined then (
         let key = { pk_first_name = pp; pk_surname = np; pk_occ = op } in
@@ -970,7 +970,7 @@ let parse_child state str surname sex csrc cbp l =
                 (surname, l)
             | '(' | '[' -> ((if prenom = "" then "" else surname), l)
             | _ -> get_name l)
-        | _ -> (surname, [])
+        | [] -> (surname, [])
       in
       set_infos state prenom nom occ sex csrc cbp str u l)
     (get_fst_name str l)
@@ -1269,7 +1269,7 @@ let read_family state ic fname =
                       ensure_end_of_line l >>= fun () -> loop (child :: children))
               | Some (_, [ "end" ]) -> Ok children
               | Some (str, _) -> Error str
-              | _ -> Error "eof"
+              | None -> Error "eof"
             in
             Result.map List.rev (loop [])
           in

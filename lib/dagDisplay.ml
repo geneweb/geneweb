@@ -152,7 +152,7 @@ let print_table conf
               Output.print_sstring conf "<hr class=\"";
               Output.print_sstring conf conf.Config.right;
               Output.print_sstring conf "\">"
-          | _ -> Output.print_sstring conf {|<hr class="full">|}));
+          | CenterA -> Output.print_sstring conf {|<hr class="full">|}));
       Output.print_sstring conf "</td>"
     done;
     Output.print_sstring conf "</tr>"
@@ -345,7 +345,7 @@ let gen_compute_columns_sizes size_fun
                     match td with
                     | Dag2html.TDitem s -> size_fun s
                     | Dag2html.TDtext s -> size_fun s
-                    | _ -> 1
+                    | TDhr _ | TDbar _ | TDnothing -> 1
                   in
                   let currsz =
                     let rec loop currsz col cnt =
@@ -400,7 +400,10 @@ let try_add_vbar stra_row stra_row_max hts i col =
         if pj >= Array.length hts.(i - 1) then ""
         else
           let colspan, _, td = hts.(i - 1).(pj) in
-          if pcol = col then match td with Dag2html.TDbar _ -> "|" | _ -> ""
+          if pcol = col then
+            match td with
+            | Dag2html.TDbar _ -> "|"
+            | TDitem _ | TDtext _ | TDhr _ | TDnothing -> ""
           else loop (pcol + colspan) (pj + 1)
       in
       loop 0 0
@@ -411,7 +414,10 @@ let try_add_vbar stra_row stra_row_max hts i col =
         if nj >= Array.length hts.(i + 1) then ""
         else
           let colspan, _, td = hts.(i + 1).(nj) in
-          if ncol = col then match td with Dag2html.TDbar _ -> "|" | _ -> ""
+          if ncol = col then
+            match td with
+            | Dag2html.TDbar _ -> "|"
+            | TDitem _ | TDtext _ | TDhr _ | TDnothing -> ""
           else loop (ncol + colspan) (nj + 1)
       in
       loop 0 0
@@ -585,7 +591,7 @@ let print_table_pre conf hts =
               match td with
               | Dag2html.TDitem s -> aux s
               | Dag2html.TDtext s -> aux s
-              | _ -> [||]
+              | TDnothing | TDhr _ | TDbar _ -> [||]
             in
             loop (stra :: stral)
               (max max_row (Array.length stra))
@@ -768,7 +774,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | Right _ -> Adef.safe "&nbsp;"
   in
   let indi_txt n : Adef.safe_string =
-    let bd = match n.Dag2html.valu with Def.Left _ -> bd | _ -> 0 in
+    let bd = match n.Dag2html.valu with Def.Left _ -> bd | Right _ -> 0 in
     if bd > 0 then
       let open Def in
       {|<table border="|} ^<^ string_of_int bd
@@ -779,7 +785,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let vbar_txt n =
     match n.Dag2html.valu with
     | Def.Left ip -> vbar_txt ip
-    | _ -> Adef.escaped ""
+    | Right _ -> Adef.escaped ""
   in
   let phony n =
     match n.Dag2html.valu with Def.Left _ -> false | Right _ -> true
@@ -861,7 +867,11 @@ let get_env v env =
   | Some x -> x
   | None -> Vnone
 
-let get_vother = function Vother x -> Some x | _ -> None
+let get_vother = function
+  | Vother x -> Some x
+  | Vdag _ | Vdcell _ | Vdcellp _ | Vdline _ | Vdlinep _ | Vlazy _ | Vnone ->
+      None
+
 let set_vother x = Vother x
 
 let rec eval_var conf (page_title : Adef.safe_string)
@@ -869,15 +879,20 @@ let rec eval_var conf (page_title : Adef.safe_string)
   | "dag" :: sl -> (
       match get_env "dag" env with
       | Vdag d -> eval_dag_var conf d sl
-      | _ -> raise Not_found)
+      | Vnone | Vdcell _ | Vdcellp _ | Vdline _ | Vdlinep _ | Vlazy _ | Vother _
+        ->
+          raise Not_found)
   | "dag_cell" :: sl -> (
       match get_env "dag_cell" env with
       | Vdcell dcell -> eval_dag_cell_var conf dcell sl
-      | _ -> raise Not_found)
+      | Vnone | Vdcellp _ | Vdline _ | Vlazy _ | Vother _ | Vdag _ | Vdlinep _
+        ->
+          raise Not_found)
   | [ "dag_cell_pre" ] -> (
       match get_env "dag_cell_pre" env with
       | Vdcellp s -> TemplAst.VVstring s
-      | _ -> raise Not_found)
+      | Vnone | Vdline _ | Vlazy _ | Vother _ | Vdag _ | Vdcell _ | Vdlinep _ ->
+          raise Not_found)
   | [ "head_title" ] -> TemplAst.VVstring (page_title :> string)
   | [ "link_next" ] -> TemplAst.VVstring (next_txt :> string)
   | _ -> raise Not_found
@@ -899,27 +914,32 @@ and eval_dag_cell_var conf (colspan, align, td) = function
       TemplAst.VVstring
         (match td with
         | Dag2html.TDbar (Some s) -> (s : Adef.escaped_string :> string)
-        | _ -> "")
+        | TDbar None | TDnothing | TDitem _ | TDtext _ | TDhr _ -> "")
   | [ "colspan" ] -> TemplAst.VVstring (string_of_int colspan)
   | [ "is_bar" ] ->
-      TemplAst.VVbool (match td with Dag2html.TDbar _ -> true | _ -> false)
+      TemplAst.VVbool
+        (match td with
+        | Dag2html.TDbar _ -> true
+        | TDnothing | TDitem _ | TDtext _ | TDhr _ -> false)
   | [ "is_hr_left" ] -> (
       match td with
       | Dag2html.TDhr Dag2html.LeftA -> TemplAst.VVbool true
-      | _ -> TemplAst.VVbool false)
+      | TDhr (CenterA | RightA) | TDnothing | TDitem _ | TDtext _ | TDbar _ ->
+          TemplAst.VVbool false)
   | [ "is_hr_right" ] -> (
       match td with
       | Dag2html.TDhr Dag2html.RightA -> TemplAst.VVbool true
-      | _ -> TemplAst.VVbool false)
+      | TDhr (LeftA | CenterA) | TDnothing | TDitem _ | TDtext _ | TDbar _ ->
+          TemplAst.VVbool false)
   | [ "is_nothing" ] -> TemplAst.VVbool (td = Dag2html.TDnothing)
   | [ "item" ] -> (
       match td with
       | Dag2html.TDitem s -> TemplAst.VVstring (s : Adef.safe_string :> string)
-      | _ -> TemplAst.VVstring "")
+      | TDnothing | TDtext _ | TDhr _ | TDbar _ -> TemplAst.VVstring "")
   | [ "text" ] -> (
       match td with
       | Dag2html.TDtext s -> TemplAst.VVstring (s : Adef.safe_string :> string)
-      | _ -> TemplAst.VVstring "")
+      | TDnothing | TDitem _ | TDhr _ | TDbar _ -> TemplAst.VVstring "")
   | _ -> raise Not_found
 
 let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
@@ -932,15 +952,23 @@ let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
 
 and print_foreach_dag_cell_pre hts print_ast env al =
   let i =
-    match get_env "dag_line" env with Vdline i -> i | _ -> raise Not_found
+    match get_env "dag_line" env with
+    | Vdline i -> i
+    | Vnone | Vdcellp _ | Vlazy _ | Vother _ | Vdag _ | Vdcell _ | Vdlinep _ ->
+        raise Not_found
   in
   let _, _, _, colsz, _ =
-    match get_env "dag" env with Vdag d -> d | _ -> raise Not_found
+    match get_env "dag" env with
+    | Vdag d -> d
+    | Vnone | Vdcellp _ | Vlazy _ | Vother _ | Vdline _ | Vdcell _ | Vdlinep _
+      ->
+        raise Not_found
   in
   let max_row, stra, row, pos1, pos2 =
     match get_env "dag_line_pre" env with
     | Vdlinep x -> x
-    | _ -> raise Not_found
+    | Vnone | Vdcellp _ | Vlazy _ | Vother _ | Vdag _ | Vdcell _ | Vdline _ ->
+        raise Not_found
   in
   let rec loop pos col j =
     if j = Array.length hts.(i) then ()
@@ -1013,7 +1041,10 @@ and print_foreach_dag_cell_pre hts print_ast env al =
 
 and print_foreach_dag_cell hts print_ast env al =
   let i =
-    match get_env "dag_line" env with Vdline i -> i | _ -> raise Not_found
+    match get_env "dag_line" env with
+    | Vdline i -> i
+    | Vnone | Vdcellp _ | Vlazy _ | Vother _ | Vdag _ | Vdcell _ | Vdlinep _ ->
+        raise Not_found
   in
   for j = 0 to Array.length hts.(i) - 1 do
     let print_ast = print_ast (("dag_cell", Vdcell hts.(i).(j)) :: env) () in
@@ -1028,10 +1059,17 @@ and print_foreach_dag_line print_ast env hts al =
 
 and print_foreach_dag_line_pre conf hts print_ast env al =
   let i =
-    match get_env "dag_line" env with Vdline i -> i | _ -> raise Not_found
+    match get_env "dag_line" env with
+    | Vdline i -> i
+    | Vnone | Vdcellp _ | Vlazy _ | Vother _ | Vdag _ | Vdcell _ | Vdlinep _ ->
+        raise Not_found
   in
   let _, _, _, colsz, _ =
-    match get_env "dag" env with Vdag d -> d | _ -> raise Not_found
+    match get_env "dag" env with
+    | Vdag d -> d
+    | Vnone | Vdcellp _ | Vlazy _ | Vother _ | Vdline _ | Vdcell _ | Vdlinep _
+      ->
+        raise Not_found
   in
   let stra, max_row =
     let stral, max_row =
@@ -1052,7 +1090,7 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
             match td with
             | Dag2html.TDitem s -> aux (s :> Adef.safe_string)
             | Dag2html.TDtext s -> aux s
-            | _ -> [||]
+            | TDnothing | TDhr _ | TDbar _ -> [||]
           in
           loop (stra :: stral)
             (max max_row (Array.length stra))
