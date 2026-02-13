@@ -76,16 +76,17 @@ jobs:
           command: start-timer
 
       - name: Cache Opam dependencies
-        id: cache-opam
         uses: actions/cache@v5
         with:
-          path: ${{ runner.os == 'Windows' && 'C:\.opam' || '~/.opam' }}
-          key: ${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-cache
+          path: ${{ runner.os == 'Windows' && 'C:\\.opam' || '~/.opam' }}
+          key: ${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-${{ hashFiles('**/*.opam') }}
+          restore-keys: ${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-
 
       - name: Setup Ocaml with v3
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          dune-cache: true
 
       - name: Install Perl dependencies (Windows @v3)
         if: runner.os == 'Windows'
@@ -118,7 +119,7 @@ jobs:
       - name: Build Geneweb
         id: build
         shell: bash
-        run: opam exec -- make distrib
+        run: opam exec -- make distrib distrib-rpc
 
       - name: Run tests
         id: tests
