@@ -1966,7 +1966,11 @@ let intro () =
           if String.length !lang_param < 2 then default_setup_lang
           else !lang_param
         in
-        Printf.printf "To start, open location http://localhost:%d/\n" !port;
+        let only = only_addr () in
+        let addr =
+          if only <> "127.0.0.1" && only <> "::1" then only else "localhost"
+        in
+        Printf.printf "To start, open location http://%s:%d/\n" addr !port;
         flush stdout;
         if Unix.fork () = 0 then (
           Unix.close Unix.stdin;
@@ -1986,6 +1990,9 @@ let intro () =
         else (!lang_param, !lang_param)
       in
       copy_text setup_lang (Filename.concat "lang" "intro.txt");
+      let only = only_addr () in
+      if only <> "127.0.0.1" && only <> "::1" then
+        Printf.printf "       http://%s:%d/\n" only !port;
       (gwd_lang, setup_lang)
   in
   set_gwd_default_language_if_absent gwd_lang;
