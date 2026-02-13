@@ -1048,14 +1048,8 @@ let prefix_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:is_subset_pfx
 
 let force_exact_search_by_name conf =
-  let is_search_by_name_mode_key key =
-    List.mem key
-      [
-        "exact_first_name";
-        "exact_surname";
-        "exact_first_name_prefix";
-        "exact_surname_prefix";
-      ]
+  let is_exact_search_by_name_mode_key key =
+    List.mem key [ "exact_first_name"; "exact_surname" ]
   in
   let module Config_env = Set.Make (struct
     type t = string * Adef.encoded_string
@@ -1068,6 +1062,8 @@ let force_exact_search_by_name conf =
   in
   let make_env env =
     Config_env.elements exact_search_by_name_parameters
-    @ List.filter (fun (key, _) -> not @@ is_search_by_name_mode_key key) env
+    @ List.filter
+        (fun (key, _) -> not @@ is_exact_search_by_name_mode_key key)
+        env
   in
   { conf with Config.env = make_env conf.Config.env }
