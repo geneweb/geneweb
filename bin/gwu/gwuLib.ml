@@ -447,6 +447,11 @@ let add_linked_files gen from s some_linked_files =
             String.sub b 0 k
           with Not_found -> b
         in
+        let fname =
+          match String.index_opt fname '#' with
+          | Some k -> String.sub fname 0 k
+          | None -> fname
+        in
         let fname = map_notes gen.notes_alias fname in
         let f = from () in
         let new_linked_files =
