@@ -1747,9 +1747,12 @@ let string_of_sockaddr = function
 
 let only_addr () =
   let local_addr =
-    if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
+    try
+      let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
+      Unix.close s;
+      Unix.string_of_inet_addr Unix.inet6_addr_loopback
+    with Unix.Unix_error (Unix.EAFNOSUPPORT, _, _) ->
       Unix.string_of_inet_addr Unix.inet_addr_loopback
-    else Unix.string_of_inet_addr Unix.inet6_addr_loopback
   in
   let fname = Lazy.force only_file_name in
   match try Some (open_in fname) with Sys_error _ -> None with
@@ -1963,7 +1966,11 @@ let intro () =
           if String.length !lang_param < 2 then default_setup_lang
           else !lang_param
         in
-        Printf.printf "To start, open location http://localhost:%d/\n" !port;
+        let only = only_addr () in
+        let addr =
+          if only <> "127.0.0.1" && only <> "::1" then only else "localhost"
+        in
+        Printf.printf "To start, open location http://%s:%d/\n" addr !port;
         flush stdout;
         if Unix.fork () = 0 then (
           Unix.close Unix.stdin;
@@ -1983,6 +1990,9 @@ let intro () =
         else (!lang_param, !lang_param)
       in
       copy_text setup_lang (Filename.concat "lang" "intro.txt");
+      let only = only_addr () in
+      if only <> "127.0.0.1" && only <> "::1" then
+        Printf.printf "       http://%s:%d/\n" only !port;
       (gwd_lang, setup_lang)
   in
   set_gwd_default_language_if_absent gwd_lang;
