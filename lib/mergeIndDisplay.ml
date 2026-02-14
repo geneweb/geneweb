@@ -215,7 +215,7 @@ let print_differences conf base branches p1 p2 =
       let is = 2 in
       match Driver.get_death p with
       | NotDead -> transl_nth conf "alive" is |> Adef.safe
-      | Death (dr, cd) ->
+      | Death (dr, cd) -> (
           let s =
             match dr with
             | Killed -> transl_nth conf "killed (in action)" is
@@ -224,8 +224,9 @@ let print_differences conf base branches p1 p2 =
             | Disappeared -> transl_nth conf "disappeared" is
             | Unspecified -> transl_nth conf "died" is
           in
-          s ^<^ " "
-          ^<^ DateDisplay.string_of_ondate conf (Date.date_of_cdate cd)
+          match Date.od_of_cdate cd with
+          | Some d -> s ^<^ " " ^<^ DateDisplay.string_of_ondate conf d
+          | None -> s |> Adef.safe)
       | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
       | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
       | DontKnowIfDead | OfCourseDead -> Adef.safe "");
