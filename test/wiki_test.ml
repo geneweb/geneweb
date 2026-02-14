@@ -23,6 +23,11 @@ let expect_failure name speed f =
 let l =
   [
     ([ WLpage (13, ([], "aaa"), "aaa", "", "bbb") ], "[[[aaa/bbb]]]");
+    ([ WLpage (17, ([], "aaa"), "aaa", "b_2", "ccc") ], "[[[aaa#b_2/ccc]]]");
+    ( [
+        WLpage (31, ([ "Sources" ], "Index"), "Sources:Index", "a_2", "sources");
+      ],
+      "[[[Sources:Index#a_2/sources]]]" );
     ( [ WLperson (11, ("ccc", "ddd", 0), Some "ccc ddd", None, None) ],
       "[[ccc/ddd]]" );
     ( [ WLperson (17, ("ccc", "ddd", 0), Some "Texte", None, None) ],
