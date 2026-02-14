@@ -389,8 +389,8 @@ let get_burial l =
 
 (** Parse sex of person *)
 let get_optional_sexe = function
-  | "h" :: l -> (Male, l)
-  | "f" :: l -> (Female, l)
+  | ("h" | "m") :: (_ :: _ as l) -> (Male, l)
+  | "f" :: (_ :: _ as l) -> (Female, l)
   | l -> (Neuter, l)
 
 (** Parses int that starts at the position [i] inside [x]. Raises [Not_found] if
@@ -1332,7 +1332,7 @@ let read_family ic fname = function
 
       let sex, l =
         match l with
-        | "#h" :: l -> (Male, l)
+        | ("#h" | "#m") :: l -> (Male, l)
         | "#f" :: l -> (Female, l)
         | l -> (Neuter, l)
       in

@@ -369,14 +369,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   let marr =
     if nsck then
       let relation, date, place, note, src = marr in
-      let relation =
-        match relation with
-        | Married -> NoSexesCheckMarried
-        | ( NotMarried | Engaged | NoSexesCheckNotMarried | NoMention
-          | NoSexesCheckMarried | MarriageBann | MarriageContract
-          | MarriageLicense | Pacs | Residence ) as x ->
-            x
-      in
+      let relation = Update_util.map_nosexcheck relation in
       (relation, date, place, note, src)
     else marr
   in
