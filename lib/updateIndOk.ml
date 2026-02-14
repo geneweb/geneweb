@@ -387,7 +387,9 @@ let reconstitute_death conf birth baptism death_place burial burial_place =
   | _s -> (
       match d with
       | Some d -> Death (dr, Date.cdate_of_date d)
-      | None -> DeadDontKnowWhen)
+      | None ->
+          if dr <> Unspecified then Death (dr, Date.cdate_None)
+          else DeadDontKnowWhen)
 
 let reconstitute_burial conf burial_place =
   let d = Update.reconstitute_date conf "burial" in
@@ -456,6 +458,8 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
                     | ( DeadYoung | DeadDontKnowWhen | OfCourseDead
                       | DontKnowIfDead ) as death ->
                         death
+                    | Death (dr, _) when dr <> Unspecified ->
+                        Death (dr, Date.cdate_None)
                     | Death _ | NotDead -> DeadDontKnowWhen)
               in
               let de =

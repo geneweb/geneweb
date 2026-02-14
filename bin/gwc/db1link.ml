@@ -1387,7 +1387,7 @@ let update_pevents_with_person p =
           in
           Some evt
     | Death (_, cd) ->
-        let date = Date.cdate_of_od (Some (Date.date_of_cdate cd)) in
+        let date = cd in
         let evt =
           {
             epers_name = Epers_Death;

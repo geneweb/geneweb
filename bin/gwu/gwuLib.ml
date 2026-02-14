@@ -381,7 +381,7 @@ let print_infos opts base is_child csrc cbp p =
   if opts.source = None then
     print_if_no_empty opts base "#ps" (Driver.get_baptism_src p);
   (match Driver.get_death p with
-  | Death (dr, d) ->
+  | Death (dr, d) -> (
       Printf.ksprintf (oc opts) " ";
       (match dr with
       | Killed -> Printf.ksprintf (oc opts) "k"
@@ -389,7 +389,9 @@ let print_infos opts base is_child csrc cbp p =
       | Executed -> Printf.ksprintf (oc opts) "e"
       | Disappeared -> Printf.ksprintf (oc opts) "s"
       | _ -> ());
-      print_date opts (Date.date_of_cdate d)
+      match Date.od_of_cdate d with
+      | Some d -> print_date opts d
+      | None -> Printf.ksprintf (oc opts) "0")
   | DeadYoung -> Printf.ksprintf (oc opts) " mj"
   | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
   | DontKnowIfDead -> (

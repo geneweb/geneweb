@@ -3096,7 +3096,8 @@ let rec negative_date_ancestors persons ascends unions families couples i =
         | None -> p.birth
       end ;
       death = match p.death with
-        | Death (dr, cd2) -> Death (dr, neg_year_cdate cd2)
+        | Death (dr, cd2) when cd2 <> Date.cdate_None ->
+            Death (dr, neg_year_cdate cd2)
         | _ -> p.death
     }
   in
