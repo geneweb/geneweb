@@ -521,13 +521,6 @@ it: Siete sicuri di voler cancellare queste basi ?
 lv: Vai Jûs patieðâm vçlaties dzçst sekojoðas datu bâzes?
 sv: Är du säker att du vill radera dessa databaser?
 
-    Ask for deleting branches whose size <= that value.
-aa: connex.htm
-co: Dumandà di squassà e ghjembe di dimensione <= à stu valore.
-de: Frage nach dem löschen von Zweigen dessen Größe <= diesem Wert sind.
-en: Ask for deleting branches whose size <= that value.
-fr: Demander à détruire les composantes de taille <= à cette valeur.
-
     Ask to indicate the updates in the welcome pages as a link "history of updates". <p> Remark (technical): the updates traces are saved in a file named "history" in the directory of the database (%a.gwb). This file grows indefinitively. You can edit it to remove the old information. Or you can also delete this file to restart empty.
 aa: gwf_1.htm
 co: Dumandà d’affissà e mudificazioni nant’à a pagina d’accolta sottu u liame « cronolugia di e mudificazioni ». <p> Rimarca (technica) : e traccie di e mudificazioni sò arregistrate in u schedariu chì si chjama « history » in u cartulare di a basa di dati (%a.gwb). A so dimensione cresce indefinitamente. Pudete mudificallu per caccià e vechje infurmazioni. O pudete dinù squassallu per riparte à viotu.
@@ -621,13 +614,6 @@ co: Fighjendu in a finestra chì s’hè aperta s’è ùn avete micca dumandatu
 de: durch das einsehen des Terminal Fensters wenn Sie nicht nach Ergebnis umleitung gefragt haben.
 en: By looking at the terminal window if you have not asked for result redirection.
 fr: En regardant dans la fenêtre qui s'est ouverte si vous n'avez pas demandé de redirection des résultats.
-
-    By origin file.
-aa: connex.htm
-co: Secondu à u schedariu d’origine.
-de: durch Originaldatei
-en: By origin file.
-fr: D'après le fichier origine.
 
     Can be useful in local, in order to be able to put an image for somebody, because the procedure installs automatically the image at the right place with the appropriate file name.
 aa: gwf_1.htm
@@ -1033,6 +1019,13 @@ it: Cancellazione di basi di dati
 lv: Datu bâþu dzçðana
 sv: Radering av databaser
 
+    Delete up to n branches of size <= -del value.
+aa: connex.htm
+co: Squassà finu à n ghjembe di dimensione <= valore -del.
+de: Bis zu n Zweige der Größe <= -del-Wert löschen.
+en: Delete up to n branches of size <= -del value.
+fr: Supprimer jusqu'à n branches de taille <= valeur -del.
+
     Destination directory and database
 aa: recover2.htm
 co: Cartulare è basa di dati di destinazione
@@ -1043,13 +1036,6 @@ fr: Répertoire et base d’arrivée
 it: Directory e base finale
 lv: Jaunais datu bâzes katalogs un datu bâze
 sv: Målkatalog och databas
-
-    Details for this length.
-aa: connex.htm
-co: Pruvede detaglii per sta longhezza.
-de: Details für diese länge.
-en: Details for this length.
-fr: Fournir détails pour cette taille.
 
     Differences computed
 aa: gwdiff_ok.htm
@@ -1598,6 +1584,13 @@ en: Go to your Web browser and open one of the following addresses:
 fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
 it: Lanciate il vostro navigatore Web e aprite uno dei seguenti indirizzi:
 
+    Group by origin file.
+aa: connex.htm
+co: Raggrupà secondu u schedariu d'origine.
+de: Nach Ursprungsdatei gruppieren.
+en: Group by origin file.
+fr: Grouper par fichier d’origine.
+
     Gwfixbase messages
 aa: gwfix_ok.htm
 co: Messaghji gwfixbase
@@ -1963,12 +1956,12 @@ it: Se non mettete niente il nome verrà dedotto da quello del file sorgente %G.
 lv: Ja nekas netiks ierakstîts, datu bâzes nosaukums tiks izveidots no %G resursdatnes nosaukuma.
 sv: Om du inte skriver någonting, kommer namnet att bli härlätt från %G källfilens namn.
 
-    Ignore this file.
+    Ignore this origin file.
 aa: connex.htm
-co: Ignurà stu schedariu.
-de: Ignoriere diese Datei.
-en: Ignore this file.
-fr: Ignorer ce fichier.
+co: Ignurà stu schedariu d'origine.
+de: Diese Ursprungsdatei ignorieren.
+en: Ignore this origin file.
+fr: Ignorer ce fichier d'origine.
 
     Images path
 aa: gwf_1.htm
@@ -2574,6 +2567,13 @@ de: Erzeuge Statistiken über verbundene Komponenten
 en: Produce connected components statistics.
 fr: Afficher les statistiques sur les composantes connexes.
 
+    Prompt for deleting branches of size <= this value.
+aa: connex.htm
+co: Dumandà di squassà e ghjembe di dimensione <= à stu valore.
+de: Zweige der Größe <= diesem Wert zum Löschen vorschlagen.
+en: Prompt for deleting branches of size <= this value.
+fr: Demander la suppression des branches de taille <= cette valeur.
+
     Push the below button to launch the operation
 aa: recover2.htm
 co: Primete nant’à u buttone quaghjò per lancià l’operazione.
@@ -3020,6 +3020,13 @@ fr: Activer cette option.
 it: Scegliere questa opzione.
 lv: Ieslçgt ðo iespçju
 sv: Sätt denna option.
+
+    Show detail for components of this size.
+aa: connex.htm
+co: Pruvede detaglii per e cumpunente di sta dimensione.
+de: Details für Komponenten dieser Größe anzeigen.
+en: Show detail for components of this size.
+fr: Afficher le détail des composantes de cette taille.
 
     Simple method
 aa: simple.htm
@@ -3961,6 +3968,13 @@ de: Wenn Nachfahren angezeigt werden, soll die Anzahl der angezeigten Generation
 en: When descendants are displayed, limit the number of displayed generations. By default, it is 12 generations, but you can indicate a different value here.
 fr: Quand on affiche les descendants, limite le nombre de générations affichables. C’est 12 par défaut, mais vous pouvez indiquer une valeur différente ici.
 it: Quando si visualizzano i discendenti, limita il numero delle parentele visualizzabili. Il numero per difetto è 12, ma potete indicare qui un valore diverso.
+
+    With -del, match size exactly instead of <=.
+aa: connex.htm
+co: Cù -del, currisponde à a dimensione esatta invece di <=.
+de: Mit -del, nur Zweige exakt dieser Größe löschen (nicht <=).
+en: With -del, match size exactly instead of <=.
+fr: Avec -del, ne supprimer que les branches de taille exacte (pas <=).
 
     with the simple method
 aa: main.htm
