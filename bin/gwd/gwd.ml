@@ -1085,8 +1085,20 @@ let bad_nonce_report command passwd_char =
 let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
     base_file =
   let asch = HttpAuth (Digest ds) in
-  if wf_passwd <> "" && is_that_user_and_password asch ds.ds_username wf_passwd
-  then
+  let digest_match_simple_passwd () =
+    if wf_passwd = "" then false
+    else
+      let user, pass =
+        match String.index_opt wf_passwd ':' with
+        | Some i ->
+            ( String.sub wf_passwd 0 i,
+              String.sub wf_passwd (i + 1) (String.length wf_passwd - i - 1) )
+        | None -> ("", wf_passwd)
+      in
+      (user = "" || user = ds.ds_username)
+      && is_that_user_and_password asch ds.ds_username pass
+  in
+  if digest_match_simple_passwd () then
     if ds.ds_nonce <> nonce then bad_nonce_report command passwd_char
     else
       {
