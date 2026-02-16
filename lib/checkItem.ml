@@ -320,14 +320,16 @@ let changed_marriages_order base warning p =
           | Some d1, Some d2 ->
               if Date.compare_date d1 d2 = 1 then Some d1 else Some d2
           | Some d1, None -> Some d1
-          | _ -> max_date
+          | None, Some _ | None, None -> max_date
         in
         (max_date, Array.append tab [| (ifam, date) |]))
       (None, [||]) (Gwdb.get_family p)
   in
   Array.stable_sort
     (fun (_f1, d1) (_f2, d2) ->
-      match (d1, d2) with Some d1, Some d2 -> Date.compare_date d1 d2 | _ -> 0)
+      match (d1, d2) with
+      | Some d1, Some d2 -> Date.compare_date d1 d2
+      | Some _, None | None, Some _ | None, None -> 0)
     a;
   let a = Array.map (fun (f, _) -> f) a in
   if a <> b then (
@@ -600,7 +602,7 @@ let check_person_dates_as_witness base (warning : Warning.base_warning -> unit)
     | Some (Dgreg (_, _) as d) -> (
         (match Date.od_of_cdate (Gwdb.get_birth p) with
         | Some (Dgreg (_, _) as d') -> if strictly_before d d' then w1 evt
-        | _ -> ());
+        | Some (Dtext _) | None -> ());
         match Date.date_of_death (Gwdb.get_death p) with
         | Some d' -> if strictly_after d d' then w2 evt
         | None -> ())
@@ -662,7 +664,7 @@ let check_person_dates_as_witness base (warning : Warning.base_warning -> unit)
             in
             match witness_kind with
             | Some kind -> (e, r, kind) :: acc
-            | _ -> acc)
+            | None -> acc)
           acc (Gwdb.get_pevents r))
       [] related_p
   in
@@ -718,7 +720,7 @@ let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
         born_after_his_elder_sibling warning child b np ifam fam;
         close_siblings warning child np ifam;
         callback child;
-        let np = match b with Some d -> Some (child, d) | _ -> np in
+        let np = match b with Some d -> Some (child, d) | None -> np in
         (np, gap))
       (None, None) children
   in
@@ -805,8 +807,12 @@ let check_parent_marriage_age warning fam p =
                                  (OldForMarriage (p, e, Gwdb.get_ifam fam))
                              else loop list
                     | Some (Dtext _) | None -> loop list))
-            | _ -> loop list)
-        | _ -> loop list)
+            | Some (Dtext _) | None -> loop list)
+        | Efam_NoMarriage | Efam_NoMention | Efam_Engage | Efam_Divorce
+        | Efam_Separated | Efam_Annulation | Efam_MarriageBann
+        | Efam_MarriageContract | Efam_MarriageLicense | Efam_Residence
+        | Efam_Name _ ->
+            loop list)
   in
   loop (Gwdb.get_fevents fam)
 

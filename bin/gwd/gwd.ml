@@ -616,7 +616,7 @@ let parse_digest s =
           with Stream.Failure -> raise (Stream.Error "")
         in
         if s = "Digest" then kvl else []
-    | _ -> []
+    | None -> []
   and ident (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
     | Some (('A' .. 'Z' | 'a' .. 'z') as c) ->
@@ -647,7 +647,7 @@ let parse_digest s =
           with Stream.Failure -> raise (Stream.Error "")
         in
         kv :: kvl
-    | _ -> []
+    | None -> []
   and key_eq_val_list_kont (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
     | Some ',' ->
@@ -699,7 +699,7 @@ let parse_digest s =
     | Some c ->
         Stream.junk strm__;
         string (Buff.store len c) strm__
-    | _ -> raise Stream.Failure
+    | None -> raise Stream.Failure
   and any_val len (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
     | Some (('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-') as c) ->
@@ -764,7 +764,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
     else
       match basic_match_auth wizard_passwd wizard_passwd_file uauth with
       | Some username -> (true, true, false, username)
-      | _ -> (
+      | None -> (
           if friend_passwd = "" && friend_passwd_file = "" then
             (true, false, true, "")
           else
@@ -1109,7 +1109,7 @@ let make_conf from_addr request script_name env =
       match String.split_on_char '_' base_access with
       | [ bname ] -> (bname, "")
       | [ bname; access ] -> (bname, access)
-      | _ -> assert false
+      | [] | _ :: _ :: _ :: _ -> assert false
     in
     let passwd, env, access_type =
       let has_passwd = List.mem_assoc "w" env in
@@ -1296,7 +1296,7 @@ let make_conf from_addr request script_name env =
            Option.map (String.split_on_char ',')
              (List.assoc_opt "autocompletion_countries" base_env)
          in
-         match opt with Some [] -> None | _ -> opt);
+         match opt with Some [] -> None | Some (_ :: _) | None -> opt);
       dates_format;
     }
   in
@@ -1372,7 +1372,7 @@ let auth_err request auth_file =
             with End_of_file ->
               close_in ic;
               (true, auth))
-        | _ -> (true, "(auth file '" ^ auth_file ^ "' not found)"))
+        | None -> (true, "(auth file '" ^ auth_file ^ "' not found)"))
     | None -> (true, "(authorization not provided)")
 
 let no_access conf =
@@ -1393,7 +1393,7 @@ let log_and_robot_check conf auth from request script_name contents =
             let s = "suicide" in
             let suicide = Geneweb.Util.p_getenv conf.env s <> None in
             conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide)
-        | _ -> ());
+        | None -> ());
         log tm conf from auth request script_name contents)
 
 let conf_and_connection =
@@ -1695,7 +1695,7 @@ let extract_multipart boundary str =
               let s, i = next_line i in
               (var, Adef.encoded s) :: loop i
             else loop i
-        | _ -> loop i
+        | None, (Some _ | None) -> loop i
       else if s = boundary ^ "--" then []
       else loop i
   in
@@ -1852,7 +1852,9 @@ let arg_parse_in_file fname speclist anonfun errmsg =
       loop []
     in
     let list =
-      match list with [ x ] -> Gutil.arg_list_of_string x | _ -> list
+      match list with
+      | [ x ] -> Gutil.arg_list_of_string x
+      | [] | _ :: _ :: _ -> list
     in
     Arg.parse_argv ~current:(ref 0)
       (Array.of_list @@ (Sys.argv.(0) :: list))

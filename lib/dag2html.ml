@@ -335,7 +335,7 @@ let rec get_block t i j =
             else ((x.elem, 1) :: (x1, c1) :: list, max mpc c1)
           in
           Some (list, mpc)
-      | _ -> assert false
+      | Some ([], _) | None -> assert false
     else Some ([ (x.elem, 1) ], 1)
 
 let group_by_common_children d list =
@@ -879,7 +879,7 @@ let treat_gaps t =
               else loop1 t (j1 - 1)
             in
             loop1 t (j - 2)
-      | _ -> loop t (j + 1)
+      | Ghost _ | Nothing -> loop t (j + 1)
   in
   if Array.length t.table.(i) = 1 then t else loop t 2
 
@@ -891,7 +891,7 @@ let group_span_last_row t =
       (match row.(i).elem with
       | (Elem _ | Ghost _) as x ->
           if x = row.(i - 1).elem then row.(i).span <- row.(i - 1).span
-      | _ -> ());
+      | Nothing -> ());
       loop (i + 1))
   in
   loop 1
@@ -903,7 +903,7 @@ let has_phony_children phony d t =
     else
       match line.(j).elem with
       | Elem x -> if phony d.dag.(int_of_idag x) then true else loop (j + 1)
-      | _ -> loop (j + 1)
+      | Ghost _ | Nothing -> loop (j + 1)
   in
   loop 0
 
@@ -991,7 +991,7 @@ let fall t =
                     else copy_data t.table.(i1).(l - 1))
               done);
             loop (j2 + 1)
-        | _ -> loop (j + 1)
+        | Elem _ | Nothing -> loop (j + 1)
     in
     loop 0
   done
@@ -1056,7 +1056,7 @@ let do_fall2_right t i1 i2 j1 j2 =
           else
             match t.table.(i).(j).elem with
             | Nothing -> loop_j (j + 1)
-            | _ -> i + 1
+            | Ghost _ | Elem _ -> i + 1
         in
         loop_j j2
     in
@@ -1092,7 +1092,7 @@ let do_fall2_left t i1 i2 j1 j2 =
           else
             match t.table.(i).(j).elem with
             | Nothing -> loop_j (j - 1)
-            | _ -> i + 1
+            | Ghost _ | Elem _ -> i + 1
         in
         loop_j j1
     in
@@ -1139,7 +1139,7 @@ let try_fall2_right t i j =
           else
             match t.table.(i).(j).elem with
             | Ghost _ -> loop (i - 1)
-            | _ -> i + 1
+            | Elem _ | Nothing -> i + 1
         in
         loop (i - 1)
       in
@@ -1174,7 +1174,7 @@ let try_fall2_right t i j =
       in
       if (not separated1) || not separated2 then None
       else Some (do_fall2_right t i1 (i + 1) j j2)
-  | _ -> None
+  | Elem _ | Nothing -> None
 
 let try_fall2_left t i j =
   match t.table.(i).(j).elem with
@@ -1185,7 +1185,7 @@ let try_fall2_left t i j =
           else
             match t.table.(i).(j).elem with
             | Ghost _ -> loop (i - 1)
-            | _ -> i + 1
+            | Elem _ | Nothing -> i + 1
         in
         loop (i - 1)
       in
@@ -1222,7 +1222,7 @@ let try_fall2_left t i j =
       in
       if (not separated1) || not separated2 then None
       else Some (do_fall2_left t i1 (i + 1) j1 j)
-  | _ -> None
+  | Elem _ | Nothing -> None
 
 let try_shorten_too_long t i j =
   match t.table.(i).(j).elem with
@@ -1241,7 +1241,10 @@ let try_shorten_too_long t i j =
       let i1 =
         let rec loop i =
           if i = Array.length t.table then i
-          else match t.table.(i).(j).elem with Elem _ -> loop (i + 1) | _ -> i
+          else
+            match t.table.(i).(j).elem with
+            | Elem _ -> loop (i + 1)
+            | Ghost _ | Nothing -> i
         in
         loop (i + 1)
       in
@@ -1249,7 +1252,9 @@ let try_shorten_too_long t i j =
         let rec loop i =
           if i = Array.length t.table then i
           else
-            match t.table.(i).(j).elem with Nothing -> loop (i + 1) | _ -> i
+            match t.table.(i).(j).elem with
+            | Nothing -> loop (i + 1)
+            | Elem _ | Ghost _ -> i
         in
         loop i1
       in
@@ -1276,7 +1281,7 @@ let try_shorten_too_long t i j =
       if (not separated_left) || not separated_right then None
       else if i2 < Array.length t.table then None
       else Some (do_shorten_too_long t i j j2)
-  | _ -> None
+  | Elem _ | Nothing -> None
 
 let fall2_right t =
   let rec loop_i i t =

@@ -858,7 +858,7 @@ end = struct
           Printf.sprintf "%s %s %s" search
             (Util.transl conf "before (date)")
             (DateDisplay.string_of_dmy conf d2 :> string)
-      | _ -> search
+      | None, None -> search
     in
     if test_string conf place_prefix_field_name then
       search ^ " "

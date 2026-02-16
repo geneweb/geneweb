@@ -9,7 +9,7 @@ type 'a sort_result = Sorted of 'a list | ErrorCycle of 'a list
 (* Finds "isolated" nodes,
    that is, nodes that have no dependencies *)
 let find_isolated_nodes hash =
-  let aux id deps acc = match deps with [] -> id :: acc | _ -> acc in
+  let aux id deps acc = match deps with [] -> id :: acc | _ :: _ -> acc in
   Hashtbl.fold aux hash []
 
 (* Takes a node name list and removes all those nodes from a hash *)
@@ -97,7 +97,7 @@ let sort nodes =
   let remaining_ids = Hashtbl.fold (fun k _ a -> k :: a) nodes_hash [] in
   match remaining_ids with
   | [] -> Sorted sorted_node_ids
-  | _ -> ErrorCycle remaining_ids
+  | _ :: _ -> ErrorCycle remaining_ids
 
 (* MIT License *)
 

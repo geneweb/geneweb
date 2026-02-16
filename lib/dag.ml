@@ -30,7 +30,7 @@ let get_dag_elems conf base =
           | None -> set
         in
         loop po set (i + 1)
-    | _ -> set
+    | Some _, None | None, Some _ | None, None -> set
   in
   loop None Pset.empty 1
 

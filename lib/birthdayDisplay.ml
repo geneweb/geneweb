@@ -151,7 +151,9 @@ let print_anniversary_list conf base dead_people dt liste =
                 Output.print_sstring conf " ";
                 Output.print_sstring conf (Util.transl conf "years old"));
             Output.print_sstring conf "</em>"
-        | _ -> ());
+        | Death _ | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
+          ->
+            ());
       Output.print_sstring conf "</li>")
     liste;
   Output.print_sstring conf "</ul>"
