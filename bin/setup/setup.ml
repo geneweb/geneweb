@@ -1013,38 +1013,17 @@ let cache_files ok_file conf =
 let connex_check conf = print_file conf "confirm.htm"
 
 let connex ok_file conf =
-  let ic = Unix.open_process_in "uname" in
-  let uname = input_line ic in
-  let () = close_in ic in
-  let rc =
-    let commnd1 =
-      "cd " ^ Sys.getcwd () ^ "; tput bel;"
-      ^ stringify (Filename.concat !bin_dir "connex")
-      ^ " " ^ parameters conf.env
-    in
-    let commnd2 =
-      stringify (Filename.concat !bin_dir "connex") ^ " " ^ parameters conf.env
-    in
-    if uname = "Darwin" then
-      if !no_o then
-        let launch = "tell application \"Terminal\" to do script " in
-        Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd1 ^ " \"' ")
-      else exec_f conf commnd2
-    else if uname = "Linux" then
-      (* non testé ! *)
-      if !no_o then Sys.command ("xterm -e \" " ^ commnd1 ^ " \" ")
-      else exec_f conf commnd2
-    else if Sys.win32 then
-      (* à compléter et tester ! *)
-      if !no_o then Sys.command commnd1 else exec_f conf commnd2
-    else (
-      Printf.eprintf "%s (%s) %s (%s)\n" "Unknown Os_type" Sys.os_type
-        "or wrong uname response" uname;
-      flush stderr;
-      2)
+  let comm =
+    stringify (Filename.concat !bin_dir "connex") ^ " " ^ parameters conf.env
   in
+  let s = comm ^ " > comm.log" in
+  Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
+  Printf.eprintf "$ %s\n" s;
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  let rc = Sys.command s in
+  flush stderr;
+  if rc <> 0 then print_file conf "err_standard.htm"
+  else print_file conf ok_file
 
 let gwu_or_gwb2ged_check suffix conf =
   let in_file =
