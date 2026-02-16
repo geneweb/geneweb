@@ -25,3 +25,5 @@ val map_name_visibility :
   base:Gwdb.base ->
   person:Gwdb.person ->
   'a
+
+val has_visible_name : Config.config -> Gwdb.base -> Gwdb.person -> bool

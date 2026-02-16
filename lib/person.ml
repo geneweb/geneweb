@@ -126,3 +126,10 @@ let map_name_visibility ~on_hidden_name ~on_restricted_name ~on_visible_name
   | NameVisibilityUtil.HiddenName -> on_hidden_name conf base person
   | RestrictedName -> on_restricted_name conf base person
   | VisibleName -> on_visible_name conf base person
+
+let has_visible_name conf base person =
+  map_name_visibility
+    ~on_hidden_name:(fun _ _ _ -> false)
+    ~on_restricted_name:(fun _ _ _ -> false)
+    ~on_visible_name:(fun _ _ _ -> true)
+    ~conf ~base ~person
