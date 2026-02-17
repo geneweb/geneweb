@@ -224,16 +224,14 @@ end = struct
         match df p with Some d -> Date.compare_dmy d d2 <= 0 | None -> false)
     | None, None -> default
 
-  let match_sex ~p ~sex =
-    if sex = Def.Neuter then true else Gwdb.get_sex p = sex
+  let match_sex ~p ~sex = sex = Def.Neuter || Gwdb.get_sex p = sex
 
   let married_cmp p = function
     | "Y" -> Gwdb.get_family p <> [||]
     | "N" -> Gwdb.get_family p = [||]
     | _ -> true
 
-  let match_married ~p ~married =
-    if married = "" then true else married_cmp p married
+  let match_married ~p ~married = married = "" || married_cmp p married
 
   let exact_place_wrapper ~get ~exact_place ~base ~p ~(places : place list)
       ~default =
@@ -273,31 +271,27 @@ end = struct
         (fun ifam ->
           let fam = Gwdb.foi base ifam in
           let sp = Gwdb.poi base @@ Gutil.spouse (Gwdb.get_iper p) fam in
-          if Person.is_visible conf base sp then
-            df fam
-            && match_marriage_place ~exact_place ~default:true ~base ~p:fam
-                 ~places
-          else false)
+          Person.is_visible conf base sp
+          && df fam
+          && match_marriage_place ~exact_place ~default:true ~base ~p:fam
+               ~places)
         (Gwdb.get_family p)
     in
     match (d1, d2) with
     | Some d1, Some d2 ->
         test_date_place (fun fam ->
             match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-            | Some d ->
-                if Date.compare_dmy d d1 < 0 then false
-                else if Date.compare_dmy d2 d < 0 then false
-                else true
+            | Some d -> Date.compare_dmy d d1 >= 0 && Date.compare_dmy d2 d >= 0
             | None -> false)
     | Some d1, None ->
         test_date_place (fun fam ->
             match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-            | Some d -> if Date.compare_dmy d d1 < 0 then false else true
+            | Some d -> Date.compare_dmy d d1 >= 0
             | None -> false)
     | None, Some d2 ->
         test_date_place (fun fam ->
             match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-            | Some d -> if Date.compare_dmy d d2 > 0 then false else true
+            | Some d -> Date.compare_dmy d d2 <= 0
             | None -> false)
     | None, None ->
         if places = [] then default else test_date_place (fun _ -> true)
