@@ -639,7 +639,7 @@ let advanced_search conf base max_answers =
                   ~place_field:other_events_place_searched
                   (AdvancedSearchMatch.Or.match_other_events ~conf)
                   (AdvancedSearchMatch.And.match_other_events ~conf))
-      | _ ->
+      | Fields.And ->
           Lazy.force civil_match
           && AdvancedSearchMatch.And.match_baptism ~base ~p ~exact_place
                ~dates:(getd @@ Fields.bapt_date ~gets ~search_type)
