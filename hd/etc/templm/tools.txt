@@ -337,7 +337,7 @@
           %if;(wizard and e.m = "RLM")
             <li><a href="%url_set.m_iz_upddag_templ_pz_nz_ocz.U_0_on;">[*modify::tree]</a></li>
           %end;
-          <li><a href="%prefix;%suffix;&notab=on" accesskey="/"
+          <li><a href="%url_set.notab.on;" accesskey="/"
              title="[display by slices/slice width/overlap/total width]0 (/)"
              >[*display by slices/slice width/overlap/total width]0</a></li>
         </ul>

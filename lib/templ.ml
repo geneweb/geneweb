@@ -422,7 +422,7 @@ and eval_simple_variable conf = function
       let s = (s :> string) in
       if s = "" then s else s ^ "/"
   | "suffix" ->
-      (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
+      Log.warn (fun k -> k "%%suffix; is deprecated, use %%url_set instead");
       let l =
         List.fold_left
           (fun accu (k, _) -> List.remove_assoc k accu)
