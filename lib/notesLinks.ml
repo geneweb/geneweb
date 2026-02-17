@@ -94,10 +94,10 @@ let misc_notes_link s i =
         let b = String.sub s (i + 2) (j - i - 4) in
         let spe, b =
           match String.index_opt b ':' with
-          | Some i ->
+          | Some i when i > 0 && b.[i - 1] = 'w' ->
               ( Some (String.sub b 0 i),
                 String.sub b (i + 1) (String.length b - i - 1) )
-          | None -> (None, b)
+          | _ -> (None, b)
         in
         let b, text =
           match String.index_opt b ';' with
