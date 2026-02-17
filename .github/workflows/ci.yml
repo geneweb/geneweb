@@ -76,6 +76,7 @@ jobs:
           command: start-timer
 
       - name: Cache Opam dependencies
+        id: cache-opam
         uses: actions/cache@v5
         with:
           path: ${{ runner.os == 'Windows' && 'C:\\.opam' || '~/.opam' }}
