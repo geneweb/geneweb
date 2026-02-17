@@ -13,8 +13,7 @@ let html_formatted_hidden_or_restricted_fullname_string conf =
   html_format_hidden_name @@ hidden_or_restricted_fullname_string conf
 
 module NameVisibilityUtil : sig
-  type t = Gwdb.person
-  type name_visibility = HiddenName | RestrictedName | VisibleName of t
+  type name_visibility = HiddenName | RestrictedName | VisibleName
 
   val name_visibility_of_person :
     conf:Config.config ->
@@ -22,8 +21,7 @@ module NameVisibilityUtil : sig
     person:Gwdb.person ->
     name_visibility
 end = struct
-  type t = Gwdb.person
-  type name_visibility = HiddenName | RestrictedName | VisibleName of t
+  type name_visibility = HiddenName | RestrictedName | VisibleName
 
   let is_hidden conf base person =
     Util.is_hide_names conf person && not (Person.is_visible conf base person)
@@ -31,7 +29,7 @@ end = struct
   let name_visibility_of_person ~conf ~base ~person =
     if Person.is_empty person then RestrictedName
     else if is_hidden conf base person then HiddenName
-    else VisibleName person
+    else VisibleName
 end
 
 let is_hidden conf base person =
@@ -47,7 +45,7 @@ let map_person_name_visibility' ~on_hidden_name ~on_restricted_name
   match NameVisibilityUtil.name_visibility_of_person ~conf ~base ~person with
   | NameVisibilityUtil.HiddenName -> on_hidden_name conf base person
   | RestrictedName -> on_restricted_name conf base person
-  | VisibleName _name_data -> on_visible_name conf base person
+  | VisibleName -> on_visible_name conf base person
 
 let map_person_name_visibility
     ?(on_hidden_name =
