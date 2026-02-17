@@ -2104,7 +2104,8 @@ let connection ~secret_salt (addr, request) script_name contents0 =
           try (Unix.gethostbyaddr iaddr).Unix.h_name
           with _ -> Unix.string_of_inet_addr iaddr)
   in
-  if script_name = "robots.txt" then robots_txt printer_conf
+  if request = [] then ()
+  else if script_name = "robots.txt" then robots_txt printer_conf
   else if excluded from then refuse_log printer_conf from
   else
     let accept =
