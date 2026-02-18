@@ -20952,7 +20952,7 @@ ca: validar/eliminar
 co: validà/squassà
 cs: ovìøit/výmaz
 da: valider/slet
-de: Bestätigen/Verwerfen
+de: bestätigen/löschen
 en: submit/delete
 es: validar/borrar
 et: kinnita/kustuta
