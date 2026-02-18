@@ -189,8 +189,7 @@ let combine_by_ini ini list =
   Mutil.groupby
     ~key:(fun (_, s) ->
       let s = Place.without_suburb s in
-      if Utf8.length s >= len then Utf8.sub s 0 len
-      else s ^ String.make (len - Utf8.length s) ' ')
+      if Utf8.length s >= len then Utf8.sub s 0 len else s)
     ~value:(fun x -> x)
     list
 
@@ -615,8 +614,7 @@ let build_list_short conf list =
       List.rev_map
         (fun (_, s) ->
           let s = Place.without_suburb s in
-          if String.length s > i then String.sub s 0 (Utf8.next s i)
-          else s ^ String.make (i + 1 - String.length s) ' ')
+          if String.length s > i then String.sub s 0 (Utf8.next s i) else s)
         l
     in
     (* Fonction pour supprimer les doublons. *)
@@ -628,7 +626,9 @@ let build_list_short conf list =
     in
     let inis = remove_dup inis in
     match inis with
-    | [ ini ] -> build_ini list (String.length ini)
+    | [ ini ] ->
+        let new_i = String.length ini in
+        if new_i <= i then [ ini ] else build_ini list new_i
     | list -> List.sort Gutil.alphabetic_order list
   in
   build_ini list (String.length ini)
