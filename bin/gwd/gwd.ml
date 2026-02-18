@@ -10,7 +10,36 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Sites = Geneweb_sites.Sites
 
-type log = Stdout | Stderr | File of string | Syslog
+type opened_file = { path : string; mutable oc : out_channel }
+type log = Stdout | Stderr | File of opened_file | Syslog
+
+let setup_log t =
+  let set_reporter fmt = Logs.set_reporter @@ Logs_fmt.reporter ~dst:fmt () in
+  let set_file_reporter file =
+    let oc =
+      open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 file.path
+    in
+    file.oc <- oc;
+    set_reporter @@ Format.formatter_of_out_channel oc
+  in
+  let refresh_file_reporter file =
+    close_out_noerr file.oc;
+    set_file_reporter file
+  in
+  let set_sighup_signal file =
+    if Sys.unix then
+      Sys.set_signal Sys.sighup
+        (Sys.Signal_handle (fun _ -> refresh_file_reporter file))
+  in
+  match t with
+  | Stdout -> set_reporter Format.std_formatter
+  | Stderr -> set_reporter Format.err_formatter
+  | File file ->
+      set_file_reporter file;
+      set_sighup_signal file
+  | Syslog ->
+      let addr = Unix.inet_addr_of_string "127.0.0.1" in
+      Logs.set_reporter (Logs_syslog_unix.udp_reporter addr ~port:514 ())
 
 let gzip_min_size = 1024
 
@@ -2382,7 +2411,7 @@ let set_log_file f =
   | "-" | "<stdout>" -> log_file := Stdout
   | "2" | "<stderr>" -> log_file := Stderr
   | "<syslog>" -> log_file := Syslog
-  | f -> log_file := File f
+  | f -> log_file := File { path = f; oc = stdout }
 
 let set_verbosity_level lvl = verbosity_level := lvl
 
@@ -2689,23 +2718,6 @@ let has_root_privileges () =
     || Unix.geteuid () = root
     || Unix.getegid () = root
 
-let with_log t k =
-  let fmt_to_reporter fmt = Logs_fmt.reporter ~dst:fmt () in
-  let reporter, finally =
-    match t with
-    | Stdout -> (fmt_to_reporter Format.std_formatter, Fun.id)
-    | Stderr -> (fmt_to_reporter Format.err_formatter, Fun.id)
-    | File f ->
-        let oc = open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 f in
-        ( fmt_to_reporter @@ Format.formatter_of_out_channel oc,
-          fun () -> close_out_noerr oc )
-    | Syslog ->
-        (* TODO: Add cli options to configure the address and the port for Syslog. *)
-        let addr = Unix.inet_addr_of_string "127.0.0.1" in
-        (Logs_syslog_unix.udp_reporter addr ~port:514 (), Fun.id)
-  in
-  Fun.protect ~finally @@ fun () -> k reporter
-
 let () =
   if has_root_privileges () then (
     Format.eprintf
@@ -2716,9 +2728,8 @@ let () =
   Logs.set_level ~all:true (Some Logs.Info);
   parse_cmd ();
   parse_prefixes ();
-  with_log !log_file @@ fun reporter ->
+  setup_log !log_file;
   Fmt_tty.setup_std_outputs ~style_renderer:`Ansi_tty ();
-  Logs.set_reporter reporter;
   try main () with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Logs.err (fun k ->
