@@ -190,7 +190,7 @@ let combine_by_ini ini list =
     ~key:(fun (_, s) ->
       let s = Place.without_suburb s in
       if Utf8.length s >= len then Utf8.sub s 0 len
-      else s ^ String.make (len - String.length s) ' ')
+      else s ^ String.make (len - Utf8.length s) ' ')
     ~value:(fun x -> x)
     list
 
