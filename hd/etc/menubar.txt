@@ -394,6 +394,8 @@
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=Z&v=6&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&fn=1&ns=1&hl=1%if;(e.im=0)&im=0%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestor/ancestors]1</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=G&v=3&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
                 <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="%prefix;%access;&m=MAP&v=7"><span class="fa fa-map-location-dot fa-fw mr-2"></span>[*ancestor mapping]</a>
+                <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;i=%index;&m=A&t=F&tf1=sb&v=%max_anc_level;&maxv=%max_anc_level;"><span class="fa fa-align-justify fa-fw mr-2"></span>[*surnames branch]</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=4&tool=place"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*fanchart]</a>
