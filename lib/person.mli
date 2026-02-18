@@ -17,7 +17,7 @@ val is_restricted : Config.config -> Gwdb.base -> Gwdb.iper -> bool
 val is_hidden : Config.config -> Gwdb.base -> Gwdb.person -> bool
 val has_restricted_name : Config.config -> Gwdb.base -> Gwdb.person -> bool
 
-val map_person_name_visibility' :
+val map_name_visibility :
   on_hidden_name:(Config.config -> Gwdb.base -> Gwdb.person -> 'a) ->
   on_restricted_name:(Config.config -> Gwdb.base -> Gwdb.person -> 'a) ->
   on_visible_name:(Config.config -> Gwdb.base -> Gwdb.person -> 'a) ->

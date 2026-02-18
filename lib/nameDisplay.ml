@@ -18,7 +18,7 @@ let map_person_name_visibility
     ?(on_restricted_name =
       fun conf _ _ -> hidden_or_restricted_fullname_string conf)
     ~on_visible_name conf base person =
-  Person.map_person_name_visibility' ~on_hidden_name ~on_restricted_name
+  Person.map_name_visibility ~on_hidden_name ~on_restricted_name
     ~on_visible_name ~conf ~base ~person
 
 let map_first_name_data :
@@ -52,7 +52,7 @@ let first_name_html conf base person =
   Adef.safe (map_first_name_data gen_first_name_html conf base person)
 
 let first_name_str_of_person conf base person =
-  Person.map_person_name_visibility'
+  Person.map_name_visibility
     ~on_hidden_name:(fun _ _ _ ->
       (hidden_or_restricted_fullname_string conf :> string))
     ~on_restricted_name:(fun _ _ _ ->
@@ -71,7 +71,7 @@ let fullname_html ~p_surname =
       fn_html ^^^ " " ^<^ esc surname)
 
 let fullname_str_of_person conf base person =
-  Person.map_person_name_visibility'
+  Person.map_name_visibility
     ~on_hidden_name:(fun _ _ _ ->
       (hidden_or_restricted_fullname_string conf :> string))
     ~on_restricted_name:(fun _ _ _ ->
