@@ -15,9 +15,7 @@
   (:dict ./dict.txt))
  (name search_test)
  (package geneweb)
- (modules search_test)
  (libraries
-  alcotest
   fmt
   qcheck
   qcheck-alcotest
@@ -26,3 +24,7 @@
   geneweb_search)
  (action
   (run %{test} %{dict})))
+
+(test
+ (name heap_test)
+ (libraries qcheck qcheck-alcotest geneweb_compat geneweb_search))
