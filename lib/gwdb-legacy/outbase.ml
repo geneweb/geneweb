@@ -525,8 +525,13 @@ let update_modification_times ~base ~(kind : [< `First_name | `Surname ])
 
 let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
     ~kind base =
-  Lock.control ~onerror:on_lock_error (Files.lock_file base.Dbdisk.data.bdir)
-    true (fun () ->
+  Lock.control
+    ~onerror:(fun () ->
+      on_lock_error ();
+      base)
+    (Files.lock_file base.Dbdisk.data.bdir)
+    true
+    (fun () ->
       let first_name_index_files =
         [
           Database.lowercase_first_name_data_file;
@@ -553,6 +558,8 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
             (generate_lowercase_surname_index, surname_already_initialized)
       in
       if not already_initialized then (
+        base.Dbdisk.func.cleanup ();
+        let base = Database.opendb base.Dbdisk.data.bdir in
         let pending_index_generation =
           generate_index ~strings_data:(StringData.of_base base) base
         in
@@ -566,7 +573,9 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
         pending_index_generation.commit ();
         update_modification_times ~base ~kind ~surname_already_initialized
           ~first_name_already_initialized ~first_name_index_files
-          ~surname_index_files))
+          ~surname_index_files;
+        base)
+      else base)
 
 let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
