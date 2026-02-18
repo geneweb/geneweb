@@ -730,7 +730,7 @@ module type Driver_S = sig
     ?on_lock_error:(unit -> unit) ->
     kind:[< `First_name | `Surname ] ->
     base ->
-    unit
+    base
 end
 
 module type DriverImpl = sig
@@ -1589,6 +1589,10 @@ struct
 
   let initialize_lowercase_name_index ?on_lock_error ~kind =
     Util.wrap_base
-      (Legacy.initialize_lowercase_name_index ?on_lock_error ~kind)
-      (Current.initialize_lowercase_name_index ?on_lock_error ~kind)
+      (fun base ->
+        Legacy_base
+          (Legacy.initialize_lowercase_name_index ?on_lock_error ~kind base))
+      (fun base ->
+        Current_base
+          (Current.initialize_lowercase_name_index ?on_lock_error ~kind base))
 end

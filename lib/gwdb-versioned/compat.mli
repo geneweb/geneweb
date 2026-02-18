@@ -730,7 +730,7 @@ module type Driver_S = sig
     ?on_lock_error:(unit -> unit) ->
     kind:[< `First_name | `Surname ] ->
     base ->
-    unit
+    base
 end
 
 module type DriverImpl = sig
