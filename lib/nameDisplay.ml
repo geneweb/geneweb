@@ -12,48 +12,13 @@ let html_format_hidden_name hidden_name =
 let html_formatted_hidden_or_restricted_fullname_string conf =
   html_format_hidden_name @@ hidden_or_restricted_fullname_string conf
 
-module NameVisibilityUtil : sig
-  type name_visibility = HiddenName | RestrictedName | VisibleName
-
-  val name_visibility_of_person :
-    conf:Config.config ->
-    base:Gwdb.base ->
-    person:Gwdb.person ->
-    name_visibility
-end = struct
-  type name_visibility = HiddenName | RestrictedName | VisibleName
-
-  let is_hidden conf base person =
-    Util.is_hide_names conf person && not (Person.is_visible conf base person)
-
-  let name_visibility_of_person ~conf ~base ~person =
-    if Person.is_empty person then RestrictedName
-    else if is_hidden conf base person then HiddenName
-    else VisibleName
-end
-
-let is_hidden conf base person =
-  NameVisibilityUtil.(
-    name_visibility_of_person ~conf ~base ~person = HiddenName)
-
-let is_restricted conf base person =
-  NameVisibilityUtil.(
-    name_visibility_of_person ~conf ~base ~person = RestrictedName)
-
-let map_person_name_visibility' ~on_hidden_name ~on_restricted_name
-    ~on_visible_name ~conf ~base ~person =
-  match NameVisibilityUtil.name_visibility_of_person ~conf ~base ~person with
-  | NameVisibilityUtil.HiddenName -> on_hidden_name conf base person
-  | RestrictedName -> on_restricted_name conf base person
-  | VisibleName -> on_visible_name conf base person
-
 let map_person_name_visibility
     ?(on_hidden_name =
       fun conf _ _ -> hidden_or_restricted_fullname_string conf)
     ?(on_restricted_name =
       fun conf _ _ -> hidden_or_restricted_fullname_string conf)
     ~on_visible_name conf base person =
-  map_person_name_visibility' ~on_hidden_name ~on_restricted_name
+  Person.map_person_name_visibility' ~on_hidden_name ~on_restricted_name
     ~on_visible_name ~conf ~base ~person
 
 let map_first_name_data :
@@ -87,7 +52,7 @@ let first_name_html conf base person =
   Adef.safe (map_first_name_data gen_first_name_html conf base person)
 
 let first_name_str_of_person conf base person =
-  map_person_name_visibility'
+  Person.map_person_name_visibility'
     ~on_hidden_name:(fun _ _ _ ->
       (hidden_or_restricted_fullname_string conf :> string))
     ~on_restricted_name:(fun _ _ _ ->
@@ -106,7 +71,7 @@ let fullname_html ~p_surname =
       fn_html ^^^ " " ^<^ esc surname)
 
 let fullname_str_of_person conf base person =
-  map_person_name_visibility'
+  Person.map_person_name_visibility'
     ~on_hidden_name:(fun _ _ _ ->
       (hidden_or_restricted_fullname_string conf :> string))
     ~on_restricted_name:(fun _ _ _ ->
@@ -348,7 +313,7 @@ let first_child conf base p =
         let enfant = Util.pget conf base ct.(0) in
         let child =
           if
-            Util.is_hide_names conf enfant
+            Person.is_hide_names conf enfant
             && not (Person.is_visible conf base enfant)
           then Adef.safe "xx"
           else if

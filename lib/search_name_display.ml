@@ -131,7 +131,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
               (fun iperl iper ->
                 let person = Util.pget conf base iper in
                 if
-                  (not (NameDisplay.is_hidden conf base person))
+                  (not (Person.is_hidden conf base person))
                   && Gwdb.eq_istr (proj person) istr
                 then iper :: iperl
                 else iperl)
@@ -314,7 +314,7 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
               let p = Util.pget conf base iper in
               if
                 Gwdb.eq_istr (get_field p) istr
-                && ((not (Util.is_hide_names conf p))
+                && ((not (Person.is_hide_names conf p))
                    || Person.is_visible conf base p)
               then iper :: iperl
               else iperl)
@@ -360,7 +360,8 @@ let first_name_print ~(query_params : Page.First_name_search.Query_params.t)
         List.fold_right
           (fun p pl ->
             if
-              (not (Util.is_hide_names conf p)) || Person.is_visible conf base p
+              (not (Person.is_hide_names conf p))
+              || Person.is_visible conf base p
             then p :: pl
             else pl)
           pl []
@@ -873,7 +874,7 @@ let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
       let pl =
         List.filter
           (fun p ->
-            (not (Util.is_hide_names conf p)) || Person.is_visible conf base p)
+            (not (Person.is_hide_names conf p)) || Person.is_visible conf base p)
           pl
       in
       print_family_alphabetic query_params.last_name conf base pl
@@ -980,7 +981,8 @@ let search_first_name_print
         List.fold_right
           (fun p pl ->
             if
-              (not (Util.is_hide_names conf p)) || Person.is_visible conf base p
+              (not (Person.is_hide_names conf p))
+              || Person.is_visible conf base p
             then p :: pl
             else pl)
           pl []

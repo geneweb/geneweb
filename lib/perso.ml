@@ -915,7 +915,7 @@ let build_surnames_list conf base v p =
   let rec loop lev sosa p surn dp =
     if Gwdb.Marker.get mark (Gwdb.get_iper p) = 0 then ()
     else if lev = v then
-      if Util.is_hide_names conf p && not (Person.is_visible conf base p) then
+      if Person.is_hide_names conf p && not (Person.is_visible conf base p) then
         ()
       else add_surname sosa p surn dp
     else (
@@ -1048,7 +1048,7 @@ let build_list_eclair conf base v p =
   (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
   let rec loop lev p surn =
     if lev = v then
-      if Util.is_hide_names conf p && not (Person.is_visible conf base p) then
+      if Person.is_hide_names conf p && not (Person.is_visible conf base p) then
         ()
       else add_person p surn
     else (
@@ -2744,7 +2744,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_approx_death_place" ->
       p_auth && (snd (Util.get_approx_death_date_place base p) :> string) <> ""
   | "has_aliases" ->
-      if (not p_auth) && Util.is_hide_names conf p then false
+      if (not p_auth) && Person.is_hide_names conf p then false
       else Gwdb.get_aliases p <> []
   | "has_baptism_date" -> p_auth && Gwdb.get_baptism p <> Date.cdate_None
   | "has_baptism_place" ->
@@ -2910,7 +2910,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       || !GWPARAM_ITL.has_family_correspondance
            conf.Config.command (Gwdb.get_iper p)
   | "has_first_names_aliases" ->
-      if (not p_auth) && Util.is_hide_names conf p then false
+      if (not p_auth) && Person.is_hide_names conf p then false
       else Gwdb.get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
   | "has_image" -> Image.get_portrait conf base p |> Option.is_some
@@ -2945,13 +2945,13 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         (Gwdb.get_parents p)
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_psources" ->
-      if Util.is_hide_names conf p && not p_auth then false
+      if Person.is_hide_names conf p && not p_auth then false
       else Gwdb.sou base (Gwdb.get_psources p) <> ""
   | "has_public_name" ->
-      if (not p_auth) && Util.is_hide_names conf p then false
+      if (not p_auth) && Person.is_hide_names conf p then false
       else Gwdb.sou base (Gwdb.get_public_name p) <> ""
   | "has_qualifiers" ->
-      if (not p_auth) && Util.is_hide_names conf p then false
+      if (not p_auth) && Person.is_hide_names conf p then false
       else Gwdb.get_qualifiers p <> []
   (* TODO what should this be *)
   | "has_relations" ->
@@ -2988,7 +2988,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                    || Gwdb.sou base (Gwdb.get_fsources fam) <> ""))
               (Gwdb.get_family p))
   | "has_surnames_aliases" ->
-      if (not p_auth) && Util.is_hide_names conf p then false
+      if (not p_auth) && Person.is_hide_names conf p then false
       else Gwdb.get_surnames_aliases p <> []
   | "is_buried" -> (
       match Gwdb.get_burial p with
@@ -3025,8 +3025,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       (* TODO why is it not Util.is_restricted *)
       Person.is_empty p
   | "is_contemporary" -> Person.is_contemporary conf base p
-  | "name_is_hidden" -> NameDisplay.is_hidden conf base p
-  | "name_is_restricted" -> NameDisplay.is_restricted conf base p
+  | "name_is_hidden" -> Person.is_hidden conf base p
+  | "name_is_restricted" -> Person.has_restricted_name conf base p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
@@ -3043,7 +3043,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "alias" -> (
       match Gwdb.get_aliases p with
       | nn :: _ ->
-          if (not p_auth) && Util.is_hide_names conf p then null_val
+          if (not p_auth) && Person.is_hide_names conf p then null_val
           else Gwdb.sou base nn |> Util.escape_html |> safe_val
       | _ -> null_val)
   | "approx_birth_place" ->
@@ -3151,17 +3151,17 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "father_age_at_birth" ->
       string_of_parent_age conf base ep Gwdb.get_father |> safe_val
   | "first_name" ->
-      if (not p_auth) && Util.is_hide_names conf p then
+      if (not p_auth) && Person.is_hide_names conf p then
         str_val (NameDisplay.hidden_first_name_txt :> string)
       else Gwdb.p_first_name base p |> Util.escape_html |> safe_val
   | "first_name_key" ->
-      if Util.is_hide_names conf p && not p_auth then null_val
+      if Person.is_hide_names conf p && not p_auth then null_val
       else Gwdb.p_first_name base p |> Name.lower |> Mutil.encode |> safe_val
   | "first_name_key_val" ->
-      if Util.is_hide_names conf p && not p_auth then null_val
+      if Person.is_hide_names conf p && not p_auth then null_val
       else Gwdb.p_first_name base p |> Name.lower |> str_val
   | "first_name_key_strip" ->
-      if Util.is_hide_names conf p && not p_auth then null_val
+      if Person.is_hide_names conf p && not p_auth then null_val
       else Name.strip_c (Gwdb.p_first_name base p) '"' |> str_val
   | "history_file" ->
       if not p_auth then null_val
@@ -3288,7 +3288,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       Gwdb.get_notes p
       |> get_note_source conf base ~p p_auth conf.Config.no_note
   | "occ" ->
-      if Util.is_hide_names conf p && not p_auth then null_val
+      if Person.is_hide_names conf p && not p_auth then null_val
       else Gwdb.get_occ p |> string_of_int |> str_val
   | "occupation" ->
       Gwdb.get_occupation p |> get_note_source conf base ~p p_auth false
@@ -3371,12 +3371,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           Gwdb.string_of_iper imoth |> Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "public_name" ->
-      if (not p_auth) && Util.is_hide_names conf p then null_val
+      if (not p_auth) && Person.is_hide_names conf p then null_val
       else
         Gwdb.get_public_name p |> Gwdb.sou base |> Util.escape_html |> safe_val
   | "qualifier" -> (
       match Gwdb.get_qualifiers p with
-      | nn :: _ when p_auth || not (Util.is_hide_names conf p) ->
+      | nn :: _ when p_auth || not (Person.is_hide_names conf p) ->
           Gwdb.sou base nn |> Util.escape_html |> safe_val
       | _ -> null_val)
   | "sex" ->
@@ -3407,29 +3407,29 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vstring s -> safe_val (Notes.source_note conf base p s)
       | _ -> raise Not_found)
   | "surname" ->
-      if (not p_auth) && Util.is_hide_names conf p then
+      if (not p_auth) && Person.is_hide_names conf p then
         str_val (NameDisplay.hidden_surname_txt :> string)
       else Gwdb.p_surname base p |> Util.escape_html |> safe_val
   | "surname_begin" ->
-      if (not p_auth) && Util.is_hide_names conf p then null_val
+      if (not p_auth) && Person.is_hide_names conf p then null_val
       else
         Gwdb.p_surname base p |> Util.surname_particle base |> Util.escape_html
         |> safe_val
   | "surname_end" ->
-      if (not p_auth) && Util.is_hide_names conf p then
+      if (not p_auth) && Person.is_hide_names conf p then
         str_val (NameDisplay.hidden_surname_txt :> string)
       else
         Gwdb.p_surname base p
         |> Util.surname_without_particle base
         |> Util.escape_html |> safe_val
   | "surname_key" ->
-      if Util.is_hide_names conf p && not p_auth then null_val
+      if Person.is_hide_names conf p && not p_auth then null_val
       else Gwdb.p_surname base p |> Name.lower |> Mutil.encode |> safe_val
   | "surname_key_val" ->
-      if Util.is_hide_names conf p && not p_auth then null_val
+      if Person.is_hide_names conf p && not p_auth then null_val
       else Gwdb.p_surname base p |> Name.lower |> str_val
   | "surname_key_strip" ->
-      if Util.is_hide_names conf p && not p_auth then null_val
+      if Person.is_hide_names conf p && not p_auth then null_val
       else Name.strip_c (Gwdb.p_surname base p) '"' |> str_val
   | "title" -> Util.person_title conf base p |> safe_val
   | _ -> raise Not_found
@@ -3626,7 +3626,7 @@ let print_foreach conf base print_ast eval_expr =
     match int_of_string_opt s with Some i -> i | None -> raise Not_found
   in
   let print_foreach_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && Util.is_hide_names conf p then ()
+    if (not p_auth) && Person.is_hide_names conf p then ()
     else
       Ext_list.iter_first
         (fun first a ->
@@ -4035,7 +4035,7 @@ let print_foreach conf base print_ast eval_expr =
         |> ignore
   in
   let print_foreach_first_name_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && Util.is_hide_names conf p then ()
+    if (not p_auth) && Person.is_hide_names conf p then ()
     else
       Ext_list.iter_first
         (fun first s ->
@@ -4080,7 +4080,7 @@ let print_foreach conf base print_ast eval_expr =
     | None -> ()
   in
   let print_foreach_qualifier env al ((p, p_auth) as ep) =
-    if (not p_auth) && Util.is_hide_names conf p then ()
+    if (not p_auth) && Person.is_hide_names conf p then ()
     else
       Ext_list.iter_first
         (fun first nn ->
@@ -4221,7 +4221,7 @@ let print_foreach conf base print_ast eval_expr =
     loop true srcl
   in
   let print_foreach_surname_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && Util.is_hide_names conf p then ()
+    if (not p_auth) && Person.is_hide_names conf p then ()
     else
       Ext_list.iter_first
         (fun first s ->

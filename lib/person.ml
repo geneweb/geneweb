@@ -65,3 +65,64 @@ let is_visible conf base p =
         && Gwdb.get_access p = IfTitles
         && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
      || not (is_contemporary' conf base conf.Config.private_years p))
+
+(* aswer the question "should we show p's names and other private stuffs?";
+   takes into account if you are a wizard or not *)
+(* TODO ??
+   - change conf.hide_names to not take in account wizard|friend;
+   - take into account wizard|friend in this function
+   - and authorized_age
+   - rename to is_hidden
+   ??
+*)
+(* it is always combined with a p_auth or authorized_age
+   TODO : diff between p_auth and authorized_age *)
+(* TODO why not conf.hide_names && not Util.is_public *)
+(* bug: is_hide_names if true if person is Private but with age > private_year *)
+let is_hide_names conf p =
+  conf.Config.hide_private_names
+  && not (conf.Config.wizard || conf.Config.friend)
+  || Gwdb.get_access p = Def.Private
+
+let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
+  let fct p =
+    (not (Gwdb.is_quest_string (Gwdb.get_surname p)))
+    && (not (Gwdb.is_quest_string (Gwdb.get_first_name p)))
+    && not (is_visible conf base p)
+  in
+  conf.Config.use_restrict && Gwdb.base_visible_get base fct ip
+
+module NameVisibilityUtil : sig
+  type name_visibility = HiddenName | RestrictedName | VisibleName
+
+  val name_visibility_of_person :
+    conf:Config.config ->
+    base:Gwdb.base ->
+    person:Gwdb.person ->
+    name_visibility
+end = struct
+  type name_visibility = HiddenName | RestrictedName | VisibleName
+
+  let is_hidden conf base person =
+    is_hide_names conf person && not (is_visible conf base person)
+
+  let name_visibility_of_person ~conf ~base ~person =
+    if is_empty person then RestrictedName
+    else if is_hidden conf base person then HiddenName
+    else VisibleName
+end
+
+let is_hidden conf base person =
+  NameVisibilityUtil.(
+    name_visibility_of_person ~conf ~base ~person = HiddenName)
+
+let has_restricted_name conf base person =
+  NameVisibilityUtil.(
+    name_visibility_of_person ~conf ~base ~person = RestrictedName)
+
+let map_person_name_visibility' ~on_hidden_name ~on_restricted_name
+    ~on_visible_name ~conf ~base ~person =
+  match NameVisibilityUtil.name_visibility_of_person ~conf ~base ~person with
+  | NameVisibilityUtil.HiddenName -> on_hidden_name conf base person
+  | RestrictedName -> on_restricted_name conf base person
+  | VisibleName -> on_visible_name conf base person
