@@ -1,4 +1,4 @@
-<!-- $Id: map.txt 18/02/2026 03:40:28-->
+<!-- $Id: map.txt 18/02/2026 06:21:05 -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
@@ -9,612 +9,106 @@
   <link rel="icon" href="%images_prefix;favicon_gwd.png">
   <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
   %include;css
-  <link rel="stylesheet" href="%etc_prefix;/css/leaflet.css?version=2.0.0-alpha">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-        }
-
-        .map-container {
-            width: 100%;
-            height: 100vh;
-            position: relative;
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Interface de contrôle générationnelle */
-        .generation-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
-            min-width: 280px;
-            max-width: 350px;
-        }
-
-        .controls-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .controls-title {
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 16px;
-        }
-
-        .current-generation {
-            background: #3498db;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        /* Réglette de génération */
-        .generation-slider-container {
-            margin: 15px 0;
-        }
-
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #7f8c8d;
-            margin-bottom: 8px;
-        }
-
-        .generation-slider {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #e0e0e0;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .generation-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #3498db;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .generation-slider::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #3498db;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border: none;
-        }
-
-        /* Contrôles de lecture automatique */
-        .playback-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 6px;
-        }
-
-        .play-button {
-            flex: 1;
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .play-button:hover {
-            background: #229954;
-        }
-
-        .play-button.playing {
-            background: #e74c3c;
-        }
-
-        .play-button.playing:hover {
-            background: #c0392b;
-        }
-
-        .speed-control {
-            flex: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            color: #7f8c8d;
-        }
-
-        .speed-slider {
-            width: 60px;
-            height: 4px;
-        }
-
-        /* Statistiques en temps réel */
-        .generation-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 10px;
-            background: #ecf0f1;
-            border-radius: 4px;
-        }
-
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: #7f8c8d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Timeline indicator */
-        .timeline-indicator {
-            margin: 15px 0;
-            padding: 10px;
-            background: linear-gradient(90deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .timeline-text {
-            font-size: 13px;
-            color: #2e7d32;
-            font-weight: 500;
-        }
-
-        /* Légende des couleurs */
-        .color-legend {
-            margin-top: 15px;
-            padding: 10px;
-            background: #fafafa;
-            border-radius: 6px;
-            border-left: 4px solid #3498db;
-        }
-
-        .legend-title {
-            font-size: 12px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-
-        .legend-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 11px;
-            color: #7f8c8d;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 1px solid #ccc;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .generation-controls {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                max-width: none;
-            }
-        }
-
-.leaflet-popup-content-wrapper {
-    border-radius: 8px;
-    min-width: 250px !important;
-    max-width: 350px !important;
-}
-
-
-.leaflet-popup-content strong {
-    font-size: 16px;
-
-}
-
-        /* Animations */
-        .generation-marker {
-            transition: all 0.3s ease;
-        }
-
-        .generation-marker.new {
-            animation: markerAppear 0.5s ease-out;
-        }
-
-        @keyframes markerAppear {
-            0% {
-                opacity: 0;
-                transform: scale(0);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        .loading-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            z-index: 2000;
-            text-align: center;
-        }
-
-        .loading-popup .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+  <link rel="stylesheet" href="%etc_prefix;css/leaflet.css?version=2.0.0-alpha.1">
+  <link rel="stylesheet" href="%etc_prefix;css/map.css?hash=%apply;hash%with;%etc_prefix;css/map.css%end;">
 </head>
 <body%body_prop;>
 %let;l_v;%if;(e.v!="")%expr(e.v-1)%else;%if;has_parents;1%else;0%end;%end;%in;
-    <div id="loadingPopup" class="loading-popup" style="display: none;">
-        <div class="spinner"></div>
-        <div>Loading GPS coordinates…</div>
-       <div id="loadingProgress" style="margin-top: 10px; font-size: 12px; color: #666;"></div>
+  <div id="loadingPopup" class="loading-popup" style="display: none;">
+    <div class="spinner"></div>
+    <div>Géolocalisation en cours…</div>
+    <div id="loadingProgress" style="margin-top: 10px; font-size: 12px; color: #666;"></div>
+    <div style="margin-top: 8px; font-size: 11px; color: #999;">
+      1 req./sec — API libre
+      <a href="https://nominatim.org/release-docs/latest/api/Overview/" target="_blank" rel="noopener">Nominatim</a>
+      / <a href="https://www.openstreetmap.org/about" target="_blank" rel="noopener">OpenStreetMap</a>
     </div>
-    <div class="map-container">
-        <div id="map"></div>
-        
-        <div class="generation-controls">
-            <div class="controls-header">
-                <span class="controls-title">Navigation</span>
-                <span class="current-generation">Cujus</span>
-            </div>
-
-            <div class="generation-slider-container">
-                <div class="slider-label">
-                    <span>Cujus</span>
-                    <span>%l_v;<sup>e</sup génération</span>
-                </div>
-                <input type="range" class="generation-slider" id="generationSlider"
-                  min="0" max="%l_v;" value="%l_v;">
-            </div>
-
-            <div class="playback-controls">
-                <button class="play-button" id="playButton">
-                    <span class="play-icon mr-1">▶</span>
-                    <span class="play-text">Lire</span>
-                </button>
-                <div class="speed-control">
-                    <span>Vitesse[:]</span>
-                    <input type="range" class="speed-slider" id="speedSlider"
-                      min="1" max="5" step="1" value="3">
-                    <span id="speedValue">3×</span>
-                </div>
-            </div>
-
-            <div class="timeline-indicator">
-                <div class="timeline-text" id="timelineText">
-                    %self; • Génération actuelle
-                </div>
-            </div>
-
-            <div class="generation-stats">
-                <div class="stat-item">
-                    <span class="stat-value" id="placesCount">3</span>
-                    <span class="stat-label">Lieux</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value" id="eventsCount">8</span>
-                    <span class="stat-label">Événements</span>
-                </div>
-            </div>
-
-            <div class="color-legend">
-                <div class="legend-title mb-1">Première apparition[:]</div>
-                <div class="legend-items">
-                  <div>
-                    <span class="legend-item">
-                        <div class="legend-color" style="background-color: #1054a3;"></div>
-                        <span>Gén. 1-2</span>
-                    </span>
-                    %if;(e.v>2)
-                    <span class="legend-item">
-                        <div class="legend-color" style="background-color: #2171b5;"></div>
-                        <span>Gén. 3-4</span>
-                    </span>
-                    %end;
-                    %if;(e.v>4)
-                    <span class="legend-item">
-                        <div class="legend-color" style="background-color: #4292c6;"></div>
-                        <span>Gén. 5-6</span>
-                    </span>
-                    %end;
-                    %if;(e.v>6)
-                    <span class="legend-item">
-                        <div class="legend-color" style="background-color: #6baed6;"></div>
-                        <span>Gén. 7-8</span>
-                    </span>
-                    %end;
-                    %if;(e.v>8)
-                    <span class="legend-item">
-                        <div class="legend-color" style="background-color: #9ecae1;"></div>
-                        <span>Gén. 9-10</span>
-                    </span>
-                    %end;
-                    %if;(e.v>10)
-                    <span class="legend-item">
-                        <div class="legend-color" style="background-color: #c6dbef;"></div>
-                        <span>Gén. 11-12</span>
-                    </span>
-                    %end;
-                  </div
-                </div>
-            </div>
+  </div>
+  <div class="map-container">
+    <div id="map"></div>
+    <div class="generation-controls">
+      <div class="controls-header">
+        <span class="controls-title">Navigation</span>
+        <span class="current-generation">Cujus</span>
+      </div>
+      <div class="generation-slider-container">
+        <div class="slider-label">
+          <span>Cujus</span>
+          <span>%l_v;<sup>e</sup> génération</span>
         </div>
+        <input type="range" class="generation-slider" id="generationSlider" min="0" max="%l_v;" value="%l_v;">
+      </div>
+      <div class="playback-controls">
+        <button class="play-button" id="playButton">
+          <span class="play-icon mr-1">▶</span>
+          <span class="play-text">Lire</span>
+        </button>
+        <div class="speed-control">
+          <span>Vitesse[:]</span>
+          <input type="range" class="speed-slider" id="speedSlider" min="1" max="5" step="1" value="3">
+          <span id="speedValue">3×</span>
+        </div>
+      </div>
+      <div class="timeline-indicator">
+        <div class="timeline-text" id="timelineText">%self; • Génération actuelle</div>
+      </div>
+      <div class="generation-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="placesCount">-</span>
+          <span class="stat-label">Lieux</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="eventsCount">-</span>
+          <span class="stat-label">Événements</span>
+        </div>
+      </div>
+      <div class="color-legend">
+        <div class="legend-title mb-1">Première apparition[:]</div>
+        <div class="legend-items">
+          <div>
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #1054a3;"></div>
+              <span>Gén. 1-2</span>
+            </span>
+            %if;(e.v>2)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #2171b5;"></div>
+              <span>Gén. 3-4</span>
+            </span>
+            %end;
+            %if;(e.v>4)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #4292c6;"></div>
+              <span>Gén. 5-6</span>
+            </span>
+            %end;
+            %if;(e.v>6)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #6baed6;"></div>
+              <span>Gén. 7-8</span>
+            </span>
+            %end;
+            %if;(e.v>8)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #9ecae1;"></div>
+              <span>Gén. 9-10</span>
+            </span>
+            %end;
+            %if;(e.v>10)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #c6dbef;"></div>
+              <span>Gén. 11-12</span>
+            </span>
+            %end;
+          </div>
+        </div>
+      </div>
     </div>
-    <script type="module">
-        import L, {Map as LeafletMap, TileLayer, CircleMarker, FeatureGroup} from '/js/leaflet.js';
-        
-        // GPS coordinates cache
-        const coordinateCache = {};
-        
-        // Fetch GPS coordinates from Nominatim
-        async function getCoordinates(placeName) {
-            const cacheKey = `gw_geoloc_${placeName}`;
-            
-            // Vérifier le cache
-            const cached = localStorage.getItem(cacheKey);
-            if (cached) {
-                return { coords: JSON.parse(cached), fromCache: true };
-            }
-            
-            try {
-                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}, France&limit=1`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.length > 0) {
-                    const coords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-                    localStorage.setItem(cacheKey, JSON.stringify(coords));
-                    console.log(`Nominatim: ${placeName} -> ${coords}`);
-                    return { coords, fromCache: false };
-                }
-                
-                // Si pas trouvé, stocker null mais retourner l'objet structuré
-                localStorage.setItem(cacheKey, JSON.stringify(null));
-                return { coords: null, fromCache: false };
-            } catch (error) {
-                console.error(`Error for ${placeName}:`, error);
-                return { coords: null, fromCache: false };
-            }
-        }
-
-        // Optionnel: vider le cache
-        function clearGeoCache() {
-            Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('gw_geoloc_')) {
-                    localStorage.removeItem(key);
-                }
-            });
-        }
-        
-        // Build URL from individuals array
-        function buildURL(placeName, individuals, rootIndex) {
-            const params = individuals.map((ind, i) => `i${i+1}=${ind}`).join('&');
-            return `%prefix;spouse=on;m=RLM;${params}&i${individuals.length+1}=${rootIndex}&t${individuals.length+1}=${placeName}`;
-        }
-        
-        // Transform generation->place format to place->generation format
-        function transformToPlaceFormat(data) {
-            const places = {};
-            
-            Object.entries(data.gen).forEach(([gen, genPlaces]) => {
-                Object.entries(genPlaces).forEach(([placeName, placeData]) => {
-                    if (!places[placeName]) {
-                        places[placeName] = {
-                            generations: {},
-                            coordinates: null,
-                            firstAppearance: parseInt(gen)
-                        };
-                    }
-                    places[placeName].generations[gen] = {
-                        eventCount: placeData.i.length,
-                        yearStart: placeData.s,
-                        yearEnd: placeData.e,
-                        individuals: placeData.i,
-                        url: buildURL(placeName, placeData.i, data.meta.index)
-                    };
-                    places[placeName].firstAppearance = Math.min(places[placeName].firstAppearance, parseInt(gen));
-                });
-            });
-            
-            return { meta: data.meta, places };
-        }
-
-function showLoading(total) {
-    const popup = document.getElementById('loadingPopup');
-    const progress = document.getElementById('loadingProgress');
-    popup.style.display = 'block';
-    progress.textContent = `0 / ${total} lieux traités`;
-}
-
-function updateLoading(current, total) {
-    const progress = document.getElementById('loadingProgress');
-    progress.textContent = `${current} / ${total} lieux traités`;
-}
-
-function hideLoading() {
-    document.getElementById('loadingPopup').style.display = 'none';
-}
-
-
-function showGeocodingErrors(places) {
-    // Créer un popup d'erreur
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'geocoding-error-popup';
-    errorDiv.innerHTML = `
-        <div class="error-header">
-            <h3>Problèmes de géolocalisation</h3>
-            <button class="close-btn">&times;</button>
-        </div>
-        <div class="error-content">
-            <p>${places.length} lieux n'ont pas pu être localisés :</p>
-            <ul class="error-list">
-                ${places.map(place => `<li>${place}</li>`).join('')}
-            </ul>
-            <p class="error-note">Ces lieux n'apparaîtront pas sur la carte.</p>
-        </div>
-    `;
-    
-    // Ajouter CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        .geocoding-error-popup {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            border: 1px solid #e74c3c;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            width: 300px;
-            max-height: 400px;
-            overflow-y: auto;
-            z-index: 1500;
-            font-size: 13px;
-        }
-        .error-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8d7da;
-            padding: 10px 15px;
-            border-bottom: 1px solid #e74c3c;
-        }
-        .error-header h3 {
-            margin: 0;
-            font-size: 15px;
-            color: #721c24;
-        }
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: #721c24;
-        }
-        .error-content {
-            padding: 15px;
-        }
-        .error-list {
-            max-height: 200px;
-            overflow-y: auto;
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-        .error-note {
-            font-style: italic;
-            color: #666;
-            margin-top: 10px;
-        }
-    `;
-    
-    document.head.appendChild(style);
-    document.body.appendChild(errorDiv);
-
-    errorDiv.querySelector('.close-btn').addEventListener('click', () => {
-        errorDiv.remove();
-    });
-}
-
-function getGenerationDateRanges(rawData) {
-    const ranges = {};
-    
-    Object.entries(rawData.gen).forEach(([gen, places]) => {
-        let minYear = null, maxYear = null;
-        
-        Object.values(places).forEach(place => {
-            minYear = minYear === null ? place.s : Math.min(minYear, place.s);
-            maxYear = maxYear === null ? place.e : Math.max(maxYear, place.e);
-        });
-        
-        ranges[gen] = { min: minYear, max: maxYear };
-    });
-    
-    return ranges;
-}
-        
-        // Load and process map data
-        async function loadMapData() {
-            try {
-                // Assume JSON data is embedded in the page or fetched
-                const rawData = {
+  </div>
+  <script>
+    window.__mapData = {
 %let;zz;%sp;%sp;%in;
-%zz;"meta": {"person":"%self;", "index":"%index", "maxGen":%l_v;},
+%zz;"meta": {"person":"%self;", "index":"%index", "prefix":"%prefix;", "maxGen":%l_v;},
 %zz;"gen": {
   %empty_sorted_list;
   %let;lv;%expr(l_v+1)%in;
@@ -624,18 +118,18 @@ function getGenerationDateRanges(rawData) {
         %foreach;ancestor;
           %if;(ancestor.same = "")
             %if;(ancestor.has_birth_place)
-              %apply;add_in_sorted_list(ancestor.birth_place,ancestor.birth_date.year,ancestor.index,ancestor.anc_sosa)
+              %apply;add_in_sorted_list(ancestor.birth_place,ancestor.birth_date.year,ancestor.index,ancestor.birth_place.sub,ancestor.birth_place.main)
             %elseif;(ancestor.has_baptism_place)
-              %apply;add_in_sorted_list(ancestor.baptism_place,ancestor.baptism_date.year,ancestor.index,ancestor.anc_sosa)
+              %apply;add_in_sorted_list(ancestor.baptism_place,ancestor.baptism_date.year,ancestor.index,ancestor.baptism_place.sub,ancestor.baptism_place.main)
             %end;
             %if;(ancestor.has_death_place)
-              %apply;add_in_sorted_list(ancestor.death_place,ancestor.death_date.year,ancestor.index,ancestor.anc_sosa)
+              %apply;add_in_sorted_list(ancestor.death_place,ancestor.death_date.year,ancestor.index,ancestor.death_place.sub,ancestor.death_place.main)
             %elseif;(ancestor.has_burial_place)
-              %apply;add_in_sorted_list(ancestor.burial_place,ancestor.burial_date.year,ancestor.index,ancestor.anc_sosa)
+              %apply;add_in_sorted_list(ancestor.burial_place,ancestor.burial_date.year,ancestor.index,ancestor.burial_place.sub,ancestor.burial_place.main)
             %end;
             %foreach;ancestor.family;
               %if;(ancestor.spouse.index = spouse.index and marriage_place != "")
-                %apply;add_in_sorted_list(marriage_place,marriage_date.year,ancestor.index,ancestor.anc_sosa)
+                %apply;add_in_sorted_list(marriage_place,marriage_date.year,ancestor.index,marriage_place.sub,marriage_place.main)
               %end;
             %end;
           %end;
@@ -645,7 +139,7 @@ function getGenerationDateRanges(rawData) {
     %zz;%zz;"%j;": {
     %foreach;sorted_list_item;
       %if;(prev_item.1!=item.1)
-        %zz;%zz;%zz;"%item.1;": {"s":%if;(item.2!="")%item.2;%else;""%end;, "i":%[%item.3;
+        %zz;%zz;%zz;"%item.1;": {"s":%if;(item.2!="")%item.2;%else;""%end;%if;(item.4!=""),"sub":"%item.4;","main":"%item.5;"%end;, "i":%[%item.3;
       %end;
       %if;(prev_item.1=item.1)%nn;
         , %item.3;%end;
@@ -658,330 +152,7 @@ function getGenerationDateRanges(rawData) {
   %end;
   %zz;}
 };
-        const transformedData = transformToPlaceFormat(rawData);
-        const places = Object.entries(transformedData.places);
-        const failedPlaces = [];
-        
-        showLoading(places.length);
-        
-        for (let i = 0; i < places.length; i++) {
-            const [placeName, placeData] = places[i];
-            const result = await getCoordinates(placeName);
-            placeData.coordinates = result.coords;
-            
-            updateLoading(i + 1, places.length);
-            
-            if (result.coords === null) {
-                failedPlaces.push(placeName);
-            }
-            
-            if (!result.fromCache) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-        }
-        
-        hideLoading();
-        
-        if (failedPlaces.length > 0) {
-            showGeocodingErrors(failedPlaces);
-        }
-        
-        return transformedData;
-    } catch (error) {
-        hideLoading();
-        console.error('Error loading map data:', error);
-        return null;
-    }
-}
-        
-        // Generational Navigator
-        class GenerationalNavigator {
-            constructor(mapData, leafletMap, rawData) {
-                this.mapData = mapData;
-                this.rawData = rawData
-                this.map = leafletMap;
-                this.currentGeneration = this.mapData.meta.maxGen;
-                this.markers = new Map();
-                this.isPlaying = false;
-                this.playbackSpeed = 3;
-                this.playbackTimer = null;
-                
-                this.initializeControls();
-                this.displayGeneration(this.currentGeneration);
-            }
-            
-            initializeControls() {
-                const slider = document.getElementById('generationSlider');
-                if (slider) {
-                    slider.max = this.mapData.meta.maxGen;
-                    slider.value = this.mapData.meta.maxGen;
-                    slider.addEventListener('input', (e) => {
-                        this.displayGeneration(parseInt(e.target.value));
-                    });
-                }
-                
-                const playButton = document.getElementById('playButton');
-                if (playButton) {
-                    playButton.addEventListener('click', () => this.togglePlayback());
-                }
-                
-                const speedSlider = document.getElementById('speedSlider');
-                const speedValue = document.getElementById('speedValue');
-                if (speedSlider && speedValue) {
-                    speedSlider.addEventListener('input', (e) => {
-                        this.playbackSpeed = parseFloat(e.target.value);
-                        speedValue.textContent = `${this.playbackSpeed}x`;
-                        
-                        if (this.isPlaying) {
-                            this.stopPlayback();
-                            this.startPlayback();
-                        }
-                    });
-                }
-            }
-            
-            displayGeneration(generation) {
-                this.currentGeneration = generation;
-                this.updateCurrentGenerationDisplay();
-                
-                const places = this.prepareGenerationData(generation);
-                this.updateMapDisplay(places);
-                this.updateStatistics(places);
-                this.updateTimeline(generation);
-            }
-            
-            prepareGenerationData(generation) {
-                const places = [];
-                
-                Object.entries(this.mapData.places).forEach(([placeName, placeData]) => {
-                    let totalEvents = 0;
-                    let yearStart = null;
-                    let yearEnd = null;
-                    let url = null;
-                    
-                    // Accumulate data up to current generation
-                    for (let gen = 0; gen <= generation; gen++) {
-                        const genData = placeData.generations[gen.toString()];
-                        if (genData) {
-                            totalEvents = genData.eventCount;
-                            yearStart = yearStart === null ? genData.yearStart : Math.min(yearStart, genData.yearStart);
-                            yearEnd = yearEnd === null ? genData.yearEnd : Math.max(yearEnd, genData.yearEnd);
-                            url = genData.url; // Keep latest URL
-                        }
-                    }
-                    
-                    if (totalEvents > 0 && placeData.coordinates) {
-                        places.push({
-                            name: placeName,
-                            coordinates: placeData.coordinates,
-                            eventCount: totalEvents,
-                            yearStart,
-                            yearEnd,
-                            firstAppearance: placeData.firstAppearance,
-                            url
-                        });
-                    }
-                });
-                
-                return places;
-            }
-            
-            createAnimatedMarker(place) {
-                function getMarkerSize(count) {
-                if (count === 1) return 5;
-                if (count <= 3) return 7;
-                if (count <= 6) return 11;
-                if (count <= 10) return 14;
-                if (count <= 25) return 18;
-                if (count <= 50) return 22;
-                if (count <= 85) return 30;
-                if (count <= 160) return 38;
-                return 44;
-            }
-
-                const size =  getMarkerSize(place.eventCount);
-
-                const marker = new CircleMarker(place.coordinates, {
-                    radius: size,
-                    fillColor: this.getGenerationColor(place.firstAppearance),
-                    color: '#333',
-                    weight: 2,
-                    fillOpacity: 0.7,
-                    className: 'generation-marker'
-                });
-                
-                const period = place.yearStart === place.yearEnd ? 
-                    place.yearStart : 
-                    `${place.yearStart}-${place.yearEnd}`;
-                
-const popupContent = `
-    <strong class="d-flex align-self-center text-center">${place.name}</strong>
-    <div class="d-flex mt-1">
-        <div class="flex-grow-1">
-            ${period}<br>
-            ${place.eventCount} événement${place.eventCount > 1 ? 's' : ''}
-            <div class="legend-item text-muted small mt-1">
-               <span>> ${place.firstAppearance}e gén.</span>
-               <div class="legend-color mb-1" style="background-color: ${this.getGenerationColor(place.firstAppearance)}"></div>
-            </div>
-        </div>
-        <a role="button" href="${place.url}" target="_blank" class="btn btn-sm mt-1 ml-auto"><i class="fa fa-user fa-fw mr-1"></i>Arbre</a>
-    </div>
-`;
-                marker.bindPopup(popupContent);
-                
-                return marker;
-            }
-            
-            updateMapDisplay(places) {
-                this.markers.forEach(marker => this.map.removeLayer(marker));
-                this.markers.clear();
-                
-                places.forEach(place => {
-                    const marker = this.createAnimatedMarker(place);
-                    this.markers.set(place.name, marker);
-                    marker.addTo(this.map);
-                });
-            }
-            
-            getGenerationColor(generation) {
-           const colors = {
-        1: '#1054a3', // Bleu royal foncé - Gén 1-2
-        2: '#1054a3',
-        3: '#2171b5', // Bleu foncé - Gén 3-4
-        4: '#2171b5',
-        5: '#4292c6', // Bleu moyen - Gén 5-6
-        6: '#4292c6',
-        7: '#6baed6', // Bleu clair - Gén 7-8
-        8: '#6baed6',
-        9: '#9ecae1', // Bleu très clair - Gén 9-10
-        10: '#9ecae1',
-        11: '#c6dbef', // Bleu pâle - Gén 11-12
-        12: '#c6dbef'
-    };
-    return colors[generation] || '#deebf7'; // Bleu presque blanc pour 13+
-            }
-            
-            updateCurrentGenerationDisplay() {
-                const currentGenElement = document.querySelector('.current-generation');
-                if (currentGenElement) {
-                    currentGenElement.textContent = `Gén. ${this.currentGeneration}`;
-                }
-                
-                const slider = document.getElementById('generationSlider');
-                if (slider) {
-                    slider.value = this.currentGeneration;
-                }
-            }
-            
-            updateStatistics(places) {
-                const placesCount = places.length;
-                const eventsCount = places.reduce((sum, place) => sum + place.eventCount, 0);
-                
-                const placesCountEl = document.getElementById('placesCount');
-                const eventsCountEl = document.getElementById('eventsCount');
-                
-                if (placesCountEl) placesCountEl.textContent = placesCount;
-                if (eventsCountEl) eventsCountEl.textContent = eventsCount;
-            }
-            
-updateTimeline(generation) {
-    const timelineTextEl = document.getElementById('timelineText');
-    if (!timelineTextEl) return;
-    
-    const person = this.mapData.meta.person;
-    
-    if (generation === 0) {
-        timelineTextEl.textContent = `${person} • Génération actuelle`;
-        return;
-    }
-    
-    const ranges = getGenerationDateRanges(this.rawData);
-    const range = ranges[generation];
-    
-    if (range) {
-        const period = range.min === range.max ? range.min : `${range.min}-${range.max}`;
-        timelineTextEl.textContent = `Génération ${generation} • ${period}`;
-    }
-}
-            
-            togglePlayback() {
-                if (this.isPlaying) {
-                    this.stopPlayback();
-                } else {
-                    this.startPlayback();
-                }
-            }
-            
-startPlayback() {
-    this.isPlaying = true;
-    
-    // Always start from generation 0
-    this.displayGeneration(0);
-    
-    const playButton = document.getElementById('playButton');
-    playButton.classList.add('playing');
-    playButton.querySelector('.play-icon').textContent = '||';
-    playButton.querySelector('.play-text').textContent = 'Pause';
-    
-    this.playbackTimer = setInterval(() => {
-        if (this.currentGeneration < this.mapData.meta.maxGen) {
-            this.displayGeneration(this.currentGeneration + 1);
-        } else {
-            // Stop at max
-            this.stopPlayback();
-        }
-    }, 2000 / this.playbackSpeed);
-}
-            
-            stopPlayback() {
-                this.isPlaying = false;
-                const playButton = document.getElementById('playButton');
-                if (playButton) {
-                    playButton.classList.remove('playing');
-                    const icon = playButton.querySelector('.play-icon');
-                    const text = playButton.querySelector('.play-text');
-                    if (icon) icon.textContent = '▶';
-                    if (text) text.textContent = 'Lire';
-                }
-                
-                if (this.playbackTimer) {
-                    clearInterval(this.playbackTimer);
-                    this.playbackTimer = null;
-                }
-            }
-        }
-        
-        // Initialize application
-        document.addEventListener('DOMContentLoaded', async () => {
-            const map = new L.Map('map');
-            
-            const mapData = await loadMapData();
-            if (mapData) {
-                // Calculate bounds from all coordinates
-                const validCoords = Object.values(mapData.places)
-                    .map(p => p.coordinates)
-                    .filter(coords => coords !== null);
-                
-                if (validCoords.length > 0) {
-                    // Calculer le centroïde
-                    const latSum = validCoords.reduce((sum, coord) => sum + coord[0], 0);
-                    const lngSum = validCoords.reduce((sum, coord) => sum + coord[1], 0);
-                    const centroid = [latSum / validCoords.length, lngSum / validCoords.length];
-                    
-                    // Zoom fixe niveau demi-département
-                    map.setView(centroid, 10);
-                } else {
-                    map.setView([46.5, 2.5], 6);
-                }
-                
-                new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(map);
-                
-                const navigator = new GenerationalNavigator(mapData, map);
-            }
-        });
-    </script>
+  </script>
+  <script type="module" src="%etc_prefix;js/map.min.js?hash=%apply;hash%with;%etc_prefix;js/map.min.js%end;"></script>
 </body>
 </html>
