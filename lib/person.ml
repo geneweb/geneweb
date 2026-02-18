@@ -120,8 +120,8 @@ let has_restricted_name conf base person =
   NameVisibilityUtil.(
     name_visibility_of_person ~conf ~base ~person = RestrictedName)
 
-let map_person_name_visibility' ~on_hidden_name ~on_restricted_name
-    ~on_visible_name ~conf ~base ~person =
+let map_name_visibility ~on_hidden_name ~on_restricted_name ~on_visible_name
+    ~conf ~base ~person =
   match NameVisibilityUtil.name_visibility_of_person ~conf ~base ~person with
   | NameVisibilityUtil.HiddenName -> on_hidden_name conf base person
   | RestrictedName -> on_restricted_name conf base person
