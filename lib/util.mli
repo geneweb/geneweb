@@ -116,10 +116,6 @@ val wprint_geneweb_link :
   Config.config -> Adef.escaped_string -> Adef.safe_string -> unit
 (** Prints on the socket link created by [geneweb_link]. *)
 
-val is_restricted : Config.config -> Gwdb.base -> Gwdb.iper -> bool
-(** Tells if person is restrited to acccess. If mode `use_restrict` is
-    disabled returns always [false]. *)
-
 val pget_opt : Config.config -> Gwdb.base -> Gwdb.iper -> Gwdb.person option
 
 val pget : Config.config -> Gwdb.base -> Gwdb.iper -> Gwdb.person
@@ -386,9 +382,6 @@ val html_highlight : bool -> string -> string -> string
 
 val wprint_in_columns :
   Config.config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
-
-val is_hide_names : Config.config -> Gwdb.person -> bool
-(** Tells if person's names are hiden (if person's access is [Private] or if mode [conf.hide_names] is enabled). *)
 
 val gen_print_tips : Config.config -> Adef.safe_string -> unit
 (** Print a tip with the specified text *)

@@ -60,25 +60,6 @@ let escape_attribute =
 
 let escape_html s : Adef.escaped_string = escape s |> Adef.escaped
 let esc x = (escape_html x :> Adef.safe_string)
-
-(* aswer the question "should we show p's names and other private stuffs?";
-   takes into account if you are a wizard or not *)
-(* TODO ??
-   - change conf.hide_names to not take in account wizard|friend;
-   - take into account wizard|friend in this function
-   - and authorized_age
-   - rename to is_hidden
-   ??
-*)
-(* it is always combined with a p_auth or authorized_age
-   TODO : diff between p_auth and authorized_age *)
-(* TODO why not conf.hide_names && not Util.is_public *)
-(* bug: is_hide_names if true if person is Private but with age > private_year *)
-let is_hide_names conf p =
-  conf.Config.hide_private_names
-  && not (conf.Config.wizard || conf.Config.friend)
-  || Gwdb.get_access p = Def.Private
-
 let cnt_dir = ref Filename.current_dir_name
 
 let search_in_path p s =
@@ -591,14 +572,6 @@ let is_old_person conf p =
       p.Def.access <> Def.Private && conf.Config.public_if_no_date
   | _ -> false
 
-let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
-  let fct p =
-    (not (Gwdb.is_quest_string (Gwdb.get_surname p)))
-    && (not (Gwdb.is_quest_string (Gwdb.get_first_name p)))
-    && not (Person.is_visible conf base p)
-  in
-  conf.Config.use_restrict && Gwdb.base_visible_get base fct ip
-
 (** Returns person option with given id from the base.
     Wrapper around `Gwdb.poi` defined such as:
     - Some ip: if user has permissions or `use_restrict` disabled.
@@ -609,7 +582,7 @@ let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
       None.
 *)
 let pget_opt conf base ip =
-  if is_restricted conf base ip then None else Some (Gwdb.poi base ip)
+  if Person.is_restricted conf base ip then None else Some (Gwdb.poi base ip)
 
 let pget conf base ip =
   Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
@@ -656,7 +629,7 @@ let is_public conf base p =
 let accessible_by_key conf base p fn sn =
   conf.Config.access_by_key
   && (not ((* should it be is_empty_person here? *) fn = "?" || sn = "?"))
-  && ((not (is_hide_names conf p))
+  && ((not (Person.is_hide_names conf p))
      || is_public conf base p || conf.Config.friend || conf.Config.wizard)
 
 (* ********************************************************************** *)
@@ -1577,7 +1550,8 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
               let p = pget conf base ip in
               if Person.is_empty p then None
               else if
-                (not (is_hide_names conf p)) || Person.is_visible conf base p
+                (not (Person.is_hide_names conf p))
+                || Person.is_visible conf base p
               then Some p
               else None
           | None -> None)

@@ -373,7 +373,7 @@ let same_parents conf base p1 p2 =
 let print_link_name conf base n p1 p2 sol =
   let pp1, pp2, (x1, x2, list), reltab = sol in
   let info = (reltab, list) in
-  if Util.is_hide_names conf p2 && not (Person.is_visible conf base p2) then
+  if Person.is_hide_names conf p2 && not (Person.is_visible conf base p2) then
     Output.print_sstring conf "x x"
   else Output.print_string conf @@ NameDisplay.person_title_text conf base p2;
   Output.print_sstring conf " ";
@@ -480,7 +480,7 @@ let print_link_name conf base n p1 p2 sol =
     "<strong>" ^<^ s ^>^ "</strong>"
   in
   let s2 =
-    if Util.is_hide_names conf p1 && not (Person.is_visible conf base p1) then
+    if Person.is_hide_names conf p1 && not (Person.is_visible conf base p1) then
       Adef.safe "x x"
     else NameDisplay.gen_person_title_text NameDisplay.no_reference conf base p1
   in
