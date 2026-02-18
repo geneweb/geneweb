@@ -184,7 +184,7 @@
                       <a href="https://www.wikidata.org/w/index.php?search=%nn;
                         %if;(e.data!="place")%encode.entry_value;%nn;
                         %else;
-                          %if;(not first and suburb!="")(uri_encode.printable.suburb;%else;%encode.other;%end;
+                          %if;(not first and suburb!="")%encode.printable.suburb;%else;%encode.other;%end;
                         %end;"
                         role="button" class="btn btn-link p-0 ml-1"
                         title="%apply;wikidata%with;%if;(e.data!="place")%escape.entry_value;%else;%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;%end;%end;"
@@ -270,8 +270,8 @@
                             %if;(first)
                               %escape.other;<br><span class="ml-4">%escape.suburb;</span>
                             %else;
-                              <span class="sr-only">%escape.printable.other (</span>
-                              <span class="ml-4">%escape.suburb;</span>
+                              <span class="sr-only">%escape.printable.other (</span>%nn;
+                              <span class="ml-4">%escape.suburb;</span>%nn;
                               <span class="sr-only">)</span>
                             %end;
                           %else;
