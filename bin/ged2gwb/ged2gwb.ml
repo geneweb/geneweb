@@ -2099,7 +2099,8 @@ let primary_fevents =
   ["ANUL"; "DIV"; "ENGA"; "MARR"; "MARB"; "MARC"; "MARL"; "RESI"; "SEP"]
 
 (* Types d'évènement présents seulement dans les tags de niveau 2 (2 TYPE). *)
-let secondary_fevent_types = [Efam_NoMarriage; Efam_NoMention]
+let secondary_fevent_types =
+  [Efam_NoMarriage; Efam_NoMention; Efam_PACS]
 
 let treat_fam_fevent gen ifath r =
   let check_place_unmarried efam_name place r =
