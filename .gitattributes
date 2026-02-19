@@ -26,3 +26,4 @@
 *.icns binary
 *.jpg binary
 *.png binary
+test/ged2gw.t/*.GED binary
