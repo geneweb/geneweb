@@ -412,55 +412,14 @@ let print_statistics conf =
     in
     Templ.output conf ifun Templ.Env.empty () "stats"
 
-let print_population_pyramid conf base =
-  let interval =
-    match p_getint conf.env "int" with Some i -> max 1 i | None -> 5
-  in
-  let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
-  let at_date =
-    match p_getint conf.env "y" with
-    | Some i -> { year = i; month = 31; day = 12; prec = Sure; delta = 0 }
-    | None -> conf.today
-  in
-  let nb_intervals = 150 / interval in
-  let men, wom =
-    make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base
-  in
-  let at_year = at_date.year in
-  let string_of_nb n =
-    Mutil.string_of_int_sep (transl conf "(thousand separator)") n
-  in
-  let title _ =
-    transl conf "population pyramid"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf " (";
-    Output.print_sstring conf (string_of_int at_year);
-    Output.print_sstring conf ")"
-  in
-  let print_image doit sex iname =
-    Output.print_sstring conf "<td>";
-    if doit then (
-      Output.print_sstring conf {|<img src="|};
-      Output.print_sstring conf (Util.images_prefix conf);
-      Output.print_sstring conf "/";
-      Output.print_string conf iname;
-      Output.print_sstring conf {|" alt="|};
-      Output.print_sstring conf (transl_nth conf "M/F" sex);
-      Output.print_sstring conf {|" title="|};
-      Output.print_sstring conf (transl_nth conf "M/F" sex);
-      Output.print_sstring conf {|">|})
-    else Output.print_sstring conf "&nbsp;";
-    Output.print_sstring conf "</td>"
-  in
-  Hutil.header conf title;
+let print_pyramid_table conf ~men ~wom ~nb_intervals ~interval ~row_label_side =
+  let sep = transl conf "(thousand separator)" in
+  let nbstr n = Mutil.string_of_int_sep sep n in
   let max_hum =
-    let max_men = Array.fold_left max 0 men in
-    let max_wom = Array.fold_left max 0 wom in
-    max 1 (max max_men max_wom)
+    max 1 (max (Array.fold_left max 0 men) (Array.fold_left max 0 wom))
   in
-  let max_size = 70 in
-  let band_size n = ((2 * max_size * n) + max_hum) / (2 * max_hum) in
-  let first_interv =
+  let band n = max 1 (((140 * n) + max_hum) / (2 * max_hum)) * 3 in
+  let first =
     let rec loop i =
       if i <= 0 then 0
       else if men.(i) > 0 || wom.(i) > 0 then i
@@ -468,89 +427,168 @@ let print_population_pyramid conf base =
     in
     loop nb_intervals
   in
-  Output.print_sstring conf "<div>\n";
-  Output.print_sstring conf {|<table id="table_pop_pyr" border="|};
-  Output.print_sstring conf (string_of_int conf.border);
-  Output.print_sstring conf
-    {|" cellspacing="0" cellpadding="0" style="margin:auto">|};
-  for i = first_interv downto 0 do
-    let nb_men = men.(i) in
-    let nb_wom = wom.(i) in
-    Output.print_sstring conf "<tr><td class=\"pyramid_year\">";
-    Output.print_sstring conf (string_of_int @@ (at_year - (i * interval)));
-    Output.print_sstring conf "</td><td>&nbsp;</td>";
-    print_image (i = 0) 0 (Adef.safe "male.png");
-    Output.print_sstring conf "<td>&nbsp;</td><td align=\"right\">\n";
-    Output.printf conf
-      {|<table cellspacing="0" cellpadding="0"><tr><td class="pyramid_nb">|};
-    if nb_men <> 0 then Output.print_sstring conf (string_of_int nb_men);
-    Output.print_sstring conf "&nbsp;</td><td>";
-    let aux_img nb img =
-      if nb <> 0 then (
-        let n = max 1 (band_size nb) in
-        Output.print_sstring conf {|<img src="|};
-        Output.print_string conf img;
-        Output.print_sstring conf {|" width="|};
-        Output.print_sstring conf (string_of_int @@ (n * 3));
-        Output.print_sstring conf {|" height="22">|})
+  let compact = interval < 3 in
+  let h = if compact then max 8 (interval * 8) else 24 in
+  let pfx = Util.images_prefix conf in
+  let bar nb file =
+    if nb = 0 then ""
+    else
+      Printf.sprintf {|<img src="%s/%s" width="%d" height="%d">|} pfx file
+        (band nb) h
+  in
+  let nb_html nb =
+    if nb = 0 then "" else Printf.sprintf {|<i>%s</i>|} (nbstr nb)
+  in
+  let side_html i =
+    match row_label_side with
+    | Some f -> Printf.sprintf {|<td class="text-muted px-2">%s</td>|} (f i)
+    | None -> ""
+  in
+  let cls = if compact then " pyr-compact" else "" in
+  Output.printf conf {|<div><table id="table_pop_pyr" class="%s">|} cls;
+  for i = first downto 0 do
+    let nm = men.(i) and nw = wom.(i) in
+    let center =
+      if i = nb_intervals then "&nbsp;" else string_of_int ((i + 1) * interval)
     in
-    aux_img nb_men
-      (Adef.encoded (Filename.concat (Util.images_prefix conf) "pyr_male.png"));
-    Output.print_sstring conf
-      {|</td></tr></table></td><td align="center" class="pyramid_center">|};
-    if i = nb_intervals then Output.print_sstring conf "&nbsp;"
-    else Output.print_sstring conf (string_of_int @@ ((i + 1) * interval));
-    Output.print_sstring conf
-      {|</td><td align="left"><table cellspacing="0" cellpadding="0"><tr><td>|};
-    aux_img nb_wom
-      (Adef.encoded
-         (Filename.concat (Util.images_prefix conf) "pyr_female.png"));
-    Output.print_sstring conf {|</td><td class="pyramid_nb">&nbsp;|};
-    if nb_wom <> 0 then Output.print_sstring conf (string_of_int nb_wom);
-    Output.print_sstring conf "</td></tr></table></td><td>&nbsp;</td>\n";
-    print_image (i = 0) 1 (Adef.safe "female.png");
-    Output.print_sstring conf {|<td>&nbsp;</td><td class="pyramid_year">|};
-    Output.print_sstring conf (string_of_int @@ (at_year - (i * interval)));
-    Output.print_sstring conf "</td></tr>"
+    Output.printf conf
+      {|<tr>%s
+  <td class="text-right">%s %s</td>
+  <td class="text-center px-1">%s</td>
+  <td>%s %s</td>
+%s</tr>|}
+      (side_html i) (nb_html nm) (bar nm "pyr_male.png") center
+      (bar nw "pyr_female.png") (nb_html nw) (side_html i)
   done;
-  Output.print_sstring conf "</table>";
-  Output.print_sstring conf "</div><p>";
-  let sum_men = Array.fold_left ( + ) 0 men in
-  let sum_wom = Array.fold_left ( + ) 0 wom in
-  transl conf "number of living persons"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf (transl conf ":");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
-  Output.print_sstring conf {|.</p><form method="get" action="|};
-  Output.print_string conf (commd conf);
-  Output.print_sstring conf {|"><div class="form-inline">|};
-  hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "POP_PYR");
-  Output.print_sstring conf {|<label for="yr">|};
-  transl_nth conf "year/month/day" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</label>";
-  Output.print_sstring conf {|<input type="number" id="yr" name="y" value="|};
-  Output.print_sstring conf (string_of_int at_year);
-  Output.print_sstring conf
-    {|" class="form-control col-1 ml-2" step="1">
- <label for="int" class="ml-3">|};
-  transl conf "interval" |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf
-    {|</label><input type="number" id="int" name="int" value="|};
-  Output.print_sstring conf (string_of_int interval);
-  Output.print_sstring conf
-    {|" class="form-control col-1 ml-2" step="1" min="0" max="130">
-<label for="lim" class="ml-3">|};
-  transl conf "limit" |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf
-    {|</label><input type="number" id="lim" name="lim" value="|};
-  Output.print_sstring conf (string_of_int limit);
-  Output.print_sstring conf
-    {|" class="form-control col-1 ml-2" step="1" min="0" max="|};
-  Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
-  Output.print_sstring conf
-    {|"><button type="submit" class="btn btn-primary ml-3">OK</button>
-    </div></form>|};
-  Hutil.trailer conf
+  Output.print_sstring conf {|</table>
+</div>|}
+
+let print_pyramid_totals conf ~string_of_nb ~label_key ~sum_men ~sum_wom =
+  Output.printf conf
+    {|<div class="mt-3">%s%s %s (%s &#9794; + %s &#9792;).</div>|}
+    (Utf8.capitalize_fst (transl conf label_key))
+    (transl conf ":")
+    (string_of_nb (sum_men + sum_wom))
+    (string_of_nb sum_men) (string_of_nb sum_wom)
+
+let print_pyramid_form_tail conf ~interval ~limit =
+  Output.printf conf
+    {|<label for="int" class="ml-3">%s</label>
+<input type="number" id="int" name="int"
+       value="%d" class="form-control col-1 ml-2"
+       step="1" min="1" max="130">
+<label for="lim" class="ml-3">%s</label>
+<input type="number" id="lim" name="lim"
+       value="%d" class="form-control col-1 ml-2"
+       step="1" min="0">
+<button type="submit"
+        class="btn btn-primary ml-3">OK</button>|}
+    (Utf8.capitalize_fst (transl conf "interval"))
+    interval
+    (Utf8.capitalize_fst (transl conf "limit"))
+    limit
+
+let print_population_pyramid conf base =
+  let death_mode = p_getenv conf.env "t" = Some "D" in
+  let interval =
+    match p_getint conf.env "int" with Some i -> max 1 i | None -> 5
+  in
+  let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
+  let nb_intervals = 150 / interval in
+  let string_of_nb n =
+    Mutil.string_of_int_sep (transl conf "(thousand separator)") n
+  in
+  let commd_s = (commd conf :> string) in
+  let open_form hidden_extra =
+    Output.printf conf
+      {|<form method="get" class="mt-2" action="%s">
+<div class="form-inline">|}
+      commd_s;
+    hidden_env conf;
+    Util.hidden_input conf "m" (Adef.encoded "POP_PYR");
+    Output.print_sstring conf hidden_extra
+  in
+  if death_mode then (
+    let from_year =
+      match p_getint conf.env "from" with
+      | Some y -> y
+      | None -> conf.today.year
+    in
+    let to_year =
+      match p_getint conf.env "to" with Some y -> y | None -> from_year
+    in
+    let men, wom =
+      make_death_pyramid ~nb_intervals ~interval ~limit ~from_year ~to_year conf
+        base
+    in
+    let range =
+      if to_year <> from_year then Printf.sprintf "%d-%d" from_year to_year
+      else string_of_int from_year
+    in
+    let title _ =
+      Output.printf conf
+        {|<a href="%sm=POP_PYR" title="%s"
+  class="btn btn-secondary btn-sm mb-1 mr-3">&#176;</a>%s (%s)|}
+        commd_s
+        (Utf8.capitalize_fst (transl conf "population pyramid"))
+        (Utf8.capitalize_fst (transl conf "death pyramid"))
+        range
+    in
+    Hutil.header conf title;
+    print_pyramid_table conf ~men ~wom ~nb_intervals ~interval
+      ~row_label_side:None;
+    let sum_men = Array.fold_left ( + ) 0 men in
+    let sum_wom = Array.fold_left ( + ) 0 wom in
+    print_pyramid_totals conf ~string_of_nb
+      ~label_key:"number of deceased persons" ~sum_men ~sum_wom;
+    open_form {|<input type="hidden" name="t" value="D">|};
+    Output.printf conf
+      {|<label for="from" class="mr-1">%s</label>
+<input type="number" id="from" name="from" value="%d"
+  class="form-control col-1 ml-1" step="1">
+<label for="to" class="ml-3 mr-1">… %s</label>
+<input type="number" id="to" name="to" value="%d"
+  class="form-control col-1 ml-1" step="1">|}
+      (Utf8.capitalize_fst (transl_nth conf "from/to (date year)" 0))
+      from_year
+      (transl_nth conf "from/to (date year)" 1)
+      to_year;
+    print_pyramid_form_tail conf ~interval ~limit;
+    Output.print_sstring conf {|</div></form>|};
+    Hutil.trailer conf)
+  else
+    let at_date =
+      match p_getint conf.env "y" with
+      | Some i -> { year = i; month = 31; day = 12; prec = Sure; delta = 0 }
+      | None -> conf.today
+    in
+    let men, wom =
+      make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base
+    in
+    let at_year = at_date.year in
+    let title _ =
+      Output.printf conf
+        {|<a href="%sm=POP_PYR&t=D&from=1900&to=%d" title="%s"
+  class="btn btn-secondary btn-sm mb-1 mr-3">&dagger;</a>%s (%d)|}
+        commd_s conf.today.year
+        (Utf8.capitalize_fst (transl conf "death pyramid"))
+        (Utf8.capitalize_fst (transl conf "population pyramid"))
+        at_year
+    in
+    Hutil.header conf title;
+    print_pyramid_table conf ~men ~wom ~nb_intervals ~interval
+      ~row_label_side:(Some (fun i -> string_of_int (at_year - (i * interval))));
+    let sum_men = Array.fold_left ( + ) 0 men in
+    let sum_wom = Array.fold_left ( + ) 0 wom in
+    print_pyramid_totals conf ~string_of_nb
+      ~label_key:"number of living persons" ~sum_men ~sum_wom;
+    open_form "";
+    Output.printf conf
+      {|<label for="yr">%s</label>
+<input type="number" id="yr" name="y" value="%d"
+  class="form-control col-1 ml-2" step="1">|}
+      (Utf8.capitalize_fst (transl_nth conf "year/month/day" 0))
+      at_year;
+    print_pyramid_form_tail conf ~interval ~limit;
+    Output.print_sstring conf {|</div></form>|};
+    Hutil.trailer conf

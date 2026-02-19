@@ -43,6 +43,7 @@
 %if;(wizard or friend)
   <ul>
     <li><a href="%prefix;m=POP_PYR">[population pyramid]</a></li>
+    <li><a href="%prefix;m=POP_PYR&t=D&from=1900&to=2025">[death pyramid]</a></li>
   </ul>
 %end;
 

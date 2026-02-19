@@ -3864,7 +3864,7 @@ sl: od zaveze id
 sv: från commit id
 tr: kayıt kimliğinden
 zh: 从提交 ID
-    
+
     branch %s compiled on %s from commit
 af: tak %s saamgestel op %s vanaf commit id
 ar: فرع %s تم تجميعه في %s من commit %s
@@ -9292,6 +9292,34 @@ de: vom Karussell
 en: from carrousel
 fr: du carrousel
 
+    from/to (date year)
+bg: от/до
+co: da/à
+cs: od/do
+da: fra/til
+de: von/bis
+en: from/to
+eo: de/ĝis
+es: de/a
+et: alates/kuni
+fi: alkaen/asti
+fr: de/à
+he: מ/עד
+it: da/a
+lt: nuo/iki
+lv: no/līdz
+nl: van/tot
+no: fra/til
+oc: de/a
+pl: od/do
+pt: de/a
+ro: de la/până la
+ru: от/до
+sk: od/do
+sl: od/do
+sv: från/till
+tr: itibaren/kadar
+
     from the %s (gen)
 af: van die %s
 ar: من الـ%s
@@ -14570,6 +14598,34 @@ ru: количество событий
 sv: antal händelser
 tr: etkinliklerin sayısı
 
+    number of deceased persons
+bg: брой на починалите лица
+co: numeru di persone morte
+cs: počet zemřelých osob
+da: antal afdøde personer
+de: Anzahl der verstorbenen Personen
+en: number of deceased individuals
+eo: nombro de la mortintaj personoj
+es: número de personas fallecidas
+et: surnud isikuid
+fi: kuolleiden lukumäärä
+fr: nombre d'individus décédés
+he: מספר הנפטרים
+it: numero di persone decedute
+lt: mirusiųjų skaičius
+lv: mirušo personu skaits
+nl: aantal overleden personen
+no: antall avdøde personer
+oc: nombre de personas defuntas
+pl: liczba osób zmarłych
+pt: número de pessoas falecidas
+ro: numărul de persoane decedate
+ru: количество умерших персон
+sk: počet zosnulých osôb
+sl: število umrlih oseb
+sv: antal avlidna personer
+tr: vefat eden bireylerin sayısı
+
     number of living persons
 bg: брой на живите лица
 co: numeru di persone vive
@@ -15659,6 +15715,34 @@ sk: populačná pyramída
 sl: populacijska piramida
 sv: befolkningspyramid
 tr: nüfus piramidi
+
+    death pyramid
+bg: пирамида на възрастта при смъртта
+co: piramida di l'età à a morte
+cs: pyramida věku při úmrtí
+da: dødspyramide
+de: Sterbealter-Pyramide
+en: death age pyramid
+eo: piramido de mortaĝo
+es: pirámide de edad al fallecer
+et: surmapüramiid
+fi: kuolinpyramidi
+fr: pyramide des âges au décès
+he: פירמידת גיל פטירה
+it: piramide dell'età al decesso
+lt: mirties amžiaus piramidė
+lv: nāves vecuma piramīda
+nl: piramide overlijdensleeftijd
+no: dødspyramide
+oc: piramida de las edats al decòs
+pl: piramida wieku zgonu
+pt: pirâmide de idade ao óbito
+ro: piramida vârstei la deces
+ru: пирамида возраста смерти
+sk: pyramída veku pri úmrtí
+sl: piramida starosti ob smrti
+sv: dödsålderspyramid
+tr: ölüm yaşı piramidi
 
     portrait
 co: ritrattu

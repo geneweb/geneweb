@@ -42,3 +42,16 @@ val make_population_pyramid :
     persons that are considered in pyramid should be alive at this date. [limit]
     allows to limit persons by age (those that has age greater then limit aren't
     taken into the account) *)
+
+val make_death_pyramid :
+  nb_intervals:int ->
+  interval:int ->
+  limit:int ->
+  from_year:int ->
+  to_year:int ->
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  int array * int array
+(** Counts deceased persons by age-at-death bucket. Only persons with both a
+    Gregorian birth date and a death date falling in [from_year..to_year] are
+    counted. *)

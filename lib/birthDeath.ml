@@ -114,3 +114,27 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
                 else wom.(j) <- wom.(j) + 1)
     (Driver.ipers base);
   (men, wom)
+
+let make_death_pyramid ~nb_intervals ~interval ~limit ~from_year ~to_year conf
+    base =
+  let men = Array.make (nb_intervals + 1) 0 in
+  let wom = Array.make (nb_intervals + 1) 0 in
+  Collection.iter
+    (fun i ->
+      let p = pget conf base i in
+      let sex = Driver.get_sex p in
+      if sex <> Neuter then
+        match Date.dmy_of_death (Driver.get_death p) with
+        | None -> ()
+        | Some dd -> (
+            if dd.year >= from_year && dd.year <= to_year then
+              match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+              | None -> ()
+              | Some bd ->
+                  let a = Date.time_elapsed bd dd in
+                  if limit = 0 || a.year <= limit then
+                    let j = min nb_intervals (a.year / interval) in
+                    if sex = Male then men.(j) <- men.(j) + 1
+                    else wom.(j) <- wom.(j) + 1))
+    (Driver.ipers base);
+  (men, wom)

@@ -1610,18 +1610,19 @@ li.desc
 
 
 /* --------------------------- Pyramide des Ã¢ges -------------------------- */
-.pyramid_center
-{
-  padding-left: 6px;
-  padding-right: 6px;
+#table_pop_pyr {
+  border-collapse:collapse;
+  margin:auto;
 }
 
-
-.pyramid_nb
-{
-  font-style: italic;
+#table_pop_pyr td{
+  padding:1px 0;
 }
 
+#table_pop_pyr.pyr-compact td{
+  font-size:11px;
+  line-height:.9;
+}
 
 /* --------------------------------- wiki -------------------------------- */
 div.summary ul
