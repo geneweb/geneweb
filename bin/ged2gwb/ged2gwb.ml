@@ -2868,12 +2868,7 @@ let add_parents_to_isolated gen =
     | Left3 _ -> ()
   done
 
-let make_arrays in_file =
-  let fname =
-    if Filename.check_suffix in_file ".ged" then in_file
-    else if Filename.check_suffix in_file ".GED" then in_file
-    else in_file ^ ".ged"
-  in
+let make_arrays fname =
   let gen =
     {g_per = {arr = [| |]; tlen = 0}; g_fam = {arr = [| |]; tlen = 0};
      g_str = {arr = [| |]; tlen = 0}; g_bnot = ""; g_ic = open_in_bin_with_bom_check fname;
@@ -3179,7 +3174,6 @@ let finish_base (persons, families, strings, _) =
 
 (* Main *)
 
-let in_file = ref ""
 let out_file = ref "a"
 
 let speclist =
@@ -3295,13 +3289,15 @@ let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
 let main () =
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
-  in_file :=
-    if !in_file <> "" then begin
-      close_in (open_in_bin_with_bom_check !in_file);
+  if !in_file <> "" then
+    close_in (open_in_bin_with_bom_check !in_file);
+  let input_file =
+    if !in_file <> "" then
       Filename.remove_extension !in_file
-    end
-    else !in_file;
-  if !in_file <> "" && (not (Array.mem "-o" Sys.argv)) then out_file := !in_file;
+    else
+      !in_file
+  in
+  if input_file <> "" && (not (Array.mem "-o" Sys.argv)) then out_file := input_file;
   out_file := Filename.basename !out_file |> Filename.remove_extension;
   if not (Mutil.good_name !out_file) then (
     (* Util.transl conf not available !*)
