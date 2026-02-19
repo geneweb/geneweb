@@ -1279,7 +1279,8 @@ let has_witness_for_event conf base p event_name =
   List.exists
     (fun (event_item : Gwdb.istr Event.event_item) ->
       Event.get_name event_item = event_name && Event.has_witnesses event_item)
-    (Event.events conf base p)
+    (Event.events conf base
+       (Authorized.Person.make ~conf ~base (Gwdb.get_iper p)))
 
 let get_env v env =
   match List.assoc_opt v env with
@@ -2835,9 +2836,15 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         | Some "never" -> false
         | Some "always" ->
             Array.length (Gwdb.get_family p) > 0
-            || List.length (Event.events conf base p) > 0
+            || List.length
+                 (Event.events conf base
+                    (Authorized.Person.make ~conf ~base (Gwdb.get_iper p)))
+               > 0
         | Some _ | None ->
-            let events = Event.events conf base p in
+            let events =
+              Event.events conf base
+                (Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
+            in
             let nb_fam = Array.length (Gwdb.get_family p) in
             (* return true if there is more event information
                than basic principals events.
@@ -3855,7 +3862,10 @@ let print_foreach conf base print_ast eval_expr =
     loop 0
   in
   let print_foreach_event env al ((p, _) as ep) =
-    let events = Event.sorted_events conf base p in
+    let events =
+      Event.sorted_events conf base
+        (Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
+    in
     let env = event_count events :: env in
     Ext_list.iter_first
       (fun first evt ->
@@ -3874,7 +3884,10 @@ let print_foreach conf base print_ast eval_expr =
       | Def.Epers_Birth -> "birth_witness"
       | _ -> "" (* TODO: ? *)
     in
-    let events = Event.sorted_events conf base p in
+    let events =
+      Event.sorted_events conf base
+        (Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
+    in
     let env = event_count events :: env in
     List.iter
       (fun event_item ->

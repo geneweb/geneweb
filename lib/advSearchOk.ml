@@ -139,8 +139,9 @@ module AdvancedSearchMatch : sig
     bool
 
   val match_civil_status :
+    conf:Config.config ->
     base:Gwdb.base ->
-    p:Gwdb.person ->
+    p:Authorized.Person.t ->
     sex:Def.sex ->
     married:string ->
     occupation:string ->
@@ -156,7 +157,7 @@ module AdvancedSearchMatch : sig
     exact_place:bool ->
     conf:Config.config ->
     base:Gwdb.base ->
-    p:Gwdb.person ->
+    p:Authorized.Person.t ->
     places:place list ->
     default:bool ->
     dates:Date.dmy option * Date.dmy option ->
@@ -165,7 +166,7 @@ module AdvancedSearchMatch : sig
   module type Match = sig
     val match_baptism :
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -173,7 +174,7 @@ module AdvancedSearchMatch : sig
 
     val match_birth :
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -181,7 +182,7 @@ module AdvancedSearchMatch : sig
 
     val match_burial :
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -189,7 +190,7 @@ module AdvancedSearchMatch : sig
 
     val match_death :
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -198,7 +199,7 @@ module AdvancedSearchMatch : sig
     val match_other_events :
       conf:Config.config ->
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -224,14 +225,22 @@ end = struct
         match df p with Some d -> Date.compare_dmy d d2 <= 0 | None -> false)
     | None, None -> default
 
-  let match_sex ~p ~sex = sex = Def.Neuter || Gwdb.get_sex p = sex
+  let match_sex ~p ~sex =
+    sex = Def.Neuter || Authorized.Person.get_sex p = Some sex
 
-  let married_cmp p = function
-    | "Y" -> Gwdb.get_family p <> [||]
-    | "N" -> Gwdb.get_family p = [||]
+  let married_cmp ~conf ~base p = function
+    | "Y" ->
+        Option.fold ~none:false
+          (Authorized.Person.get_family ~conf ~base p)
+          ~some:(( <> ) [||])
+    | "N" ->
+        Option.fold ~none:false
+          (Authorized.Person.get_family ~conf ~base p)
+          ~some:(( = ) [||])
     | _ -> true
 
-  let match_married ~p ~married = married = "" || married_cmp p married
+  let match_married ~conf ~base ~p ~married =
+    married = "" || married_cmp ~conf ~base p married
 
   let exact_place_wrapper ~get ~exact_place ~base ~p ~(places : place list)
       ~default =
@@ -241,20 +250,37 @@ end = struct
         (fun (_, istr_o) ->
           match istr_o with
           | None -> false
-          | Some istr -> Gwdb.compare_istr istr (get p) = 0)
+          | Some istr ->
+              Option.fold ~none:false
+                ~some:(fun istr' -> Gwdb.compare_istr istr istr' = 0)
+                (get p))
         places
     else
       List.exists
         (fun (abbreved_str, _) ->
-          string_incl abbreved_str (abbrev_lower (Gwdb.sou base (get p))))
+          Option.fold ~none:false
+            ~some:(fun istr' ->
+              string_incl abbreved_str (abbrev_lower (Gwdb.sou base istr')))
+            (get p))
         places
 
-  let match_baptism_place = exact_place_wrapper ~get:Gwdb.get_baptism_place
-  let match_birth_place = exact_place_wrapper ~get:Gwdb.get_birth_place
-  let match_death_place = exact_place_wrapper ~get:Gwdb.get_death_place
-  let match_burial_place = exact_place_wrapper ~get:Gwdb.get_burial_place
-  let match_other_event_place = exact_place_wrapper ~get:Event.get_place
-  let match_marriage_place = exact_place_wrapper ~get:Gwdb.get_marriage_place
+  let match_baptism_place =
+    exact_place_wrapper ~get:Authorized.Person.get_baptism_place
+
+  let match_birth_place =
+    exact_place_wrapper ~get:Authorized.Person.get_birth_place
+
+  let match_death_place =
+    exact_place_wrapper ~get:Authorized.Person.get_death_place
+
+  let match_burial_place =
+    exact_place_wrapper ~get:Authorized.Person.get_burial_place
+
+  let match_other_event_place =
+    exact_place_wrapper ~get:(fun event -> Some (Event.get_place event))
+
+  let match_marriage_place =
+    exact_place_wrapper ~get:Authorized.Family.get_marriage_place
 
   let match_other_events_place ~exact_place ~conf ~base ~p ~places ~default =
     if places = [] then default
@@ -268,29 +294,39 @@ end = struct
     let d1, d2 = dates in
     let test_date_place df =
       Array.exists
-        (fun ifam ->
-          let fam = Gwdb.foi base ifam in
-          let sp = Gwdb.poi base @@ Gutil.spouse (Gwdb.get_iper p) fam in
-          Person.is_visible conf base sp
-          && df fam
+        (fun fam ->
+          df fam
           && match_marriage_place ~exact_place ~default:true ~base ~p:fam
                ~places)
-        (Gwdb.get_family p)
+        (Option.value ~default:[||]
+           (Authorized.Person.get_family ~conf ~base p))
     in
     match (d1, d2) with
     | Some d1, Some d2 ->
         test_date_place (fun fam ->
-            match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+            match
+              Option.bind
+                (Authorized.Family.get_marriage fam)
+                Date.cdate_to_dmy_opt
+            with
             | Some d -> Date.compare_dmy d d1 >= 0 && Date.compare_dmy d2 d >= 0
             | None -> false)
     | Some d1, None ->
         test_date_place (fun fam ->
-            match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+            match
+              Option.bind
+                (Authorized.Family.get_marriage fam)
+                Date.cdate_to_dmy_opt
+            with
             | Some d -> Date.compare_dmy d d1 >= 0
             | None -> false)
     | None, Some d2 ->
         test_date_place (fun fam ->
-            match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+            match
+              Option.bind
+                (Authorized.Family.get_marriage fam)
+                Date.cdate_to_dmy_opt
+            with
             | Some d -> Date.compare_dmy d d2 <= 0
             | None -> false)
     | None, None ->
@@ -310,26 +346,31 @@ end = struct
         (Utf8.unaccent @@ Utf8.lowercase s)
     in
     occupation = ""
-    || string_incl (clean occupation)
-         (clean @@ Gwdb.sou base @@ Gwdb.get_occupation p)
+    || Option.fold ~none:false
+         ~some:(fun occupation' ->
+           string_incl (clean occupation) (clean @@ Gwdb.sou base occupation'))
+         (Authorized.Person.get_occupation p)
 
   let match_baptism_date =
-    match_date ~df:(fun p -> Date.cdate_to_dmy_opt (Gwdb.get_baptism p))
+    match_date ~df:(fun p ->
+        Option.bind (Authorized.Person.get_baptism p) Date.cdate_to_dmy_opt)
 
   let match_birth_date =
-    match_date ~df:(fun p -> Date.cdate_to_dmy_opt (Gwdb.get_birth p))
+    match_date ~df:(fun p ->
+        Option.bind (Authorized.Person.get_birth p) Date.cdate_to_dmy_opt)
 
   let match_burial_date =
     let get_burial p =
       (* TODO Date.cdate_of_burial *)
-      match Gwdb.get_burial p with
-      | Buried cod | Cremated cod -> Date.cdate_to_dmy_opt cod
-      | UnknownBurial -> None
+      match Authorized.Person.get_burial p with
+      | Some (Buried cod | Cremated cod) -> Date.cdate_to_dmy_opt cod
+      | Some UnknownBurial | None -> None
     in
     match_date ~df:get_burial
 
   let match_death_date =
-    match_date ~df:(fun p -> Date.dmy_of_death (Gwdb.get_death p))
+    match_date ~df:(fun p ->
+        Option.bind (Authorized.Person.get_death p) Date.dmy_of_death)
 
   let match_other_events_date ~conf ~base ~p ~default ~dates =
     if dates = (None, None) then default
@@ -354,23 +395,29 @@ end = struct
     if search_list = [] then fun _ -> true
     else
       let eq = match_name ~search_list ~mode in
-      fun p -> eq (List.map Name.lower @@ Name.split @@ Gwdb.sou base @@ get p)
+      fun p ->
+        eq
+          (Option.fold ~none:[]
+             ~some:(fun name ->
+               List.map Name.lower @@ Name.split @@ Gwdb.sou base name)
+             (get p))
 
   let match_first_name ~base ~first_name_list ~mode =
     wrap_match_name ~base ~search_list:first_name_list ~mode
-      ~get:Gwdb.get_first_name
+      ~get:Authorized.Person.get_first_name
 
   let match_surname ~base ~surname_list ~mode =
-    wrap_match_name ~base ~search_list:surname_list ~mode ~get:Gwdb.get_surname
+    wrap_match_name ~base ~search_list:surname_list ~mode
+      ~get:Authorized.Person.get_surname
 
   let match_alias ~base ~alias_list ~mode ~kind p =
     let gets =
       let get =
         match kind with
-        | `First_name -> Gwdb.get_first_names_aliases
-        | `Surname -> Gwdb.get_surnames_aliases
+        | `First_name -> Authorized.Person.get_first_names_aliases
+        | `Surname -> Authorized.Person.get_surnames_aliases
       in
-      List.map (fun alias _ -> alias) (get p)
+      List.map (fun alias _ -> Some alias) (Option.value ~default:[] (get p))
     in
     List.exists
       (fun get -> wrap_match_name ~base ~search_list:alias_list ~get ~mode p)
@@ -385,8 +432,9 @@ end = struct
     match_alias ~base ~alias_list:surname_list ~mode ~kind:`Surname p
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
-  let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
-      ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname =
+  let match_civil_status ~conf ~base ~p ~sex ~married ~occupation
+      ~first_name_list ~surname_list ~skip_fname ~skip_sname ~exact_first_name
+      ~exact_surname =
     match_sex ~p ~sex
     && (skip_fname
        || match_first_name ~base ~first_name_list ~mode:exact_first_name p
@@ -395,13 +443,13 @@ end = struct
     && (skip_sname
        || match_surname ~base ~surname_list ~mode:exact_surname p
        || match_surname_alias ~base ~surname_list ~mode:exact_surname p)
-    && match_married ~p ~married
+    && match_married ~conf ~base ~p ~married
     && match_occupation ~base ~p ~occupation
 
   module type Match = sig
     val match_baptism :
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -409,7 +457,7 @@ end = struct
 
     val match_birth :
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -417,7 +465,7 @@ end = struct
 
     val match_burial :
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -425,7 +473,7 @@ end = struct
 
     val match_death :
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -434,7 +482,7 @@ end = struct
     val match_other_events :
       conf:Config.config ->
       base:Gwdb.base ->
-      p:Gwdb.person ->
+      p:Authorized.Person.t ->
       dates:Date.dmy option * Date.dmy option ->
       places:place list ->
       exact_place:bool ->
@@ -588,11 +636,11 @@ let advanced_search conf base max_answers =
   let get_name_search_mode = get_name_search_mode gets in
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
-      ((list, len) as acc) p search_type =
-    let auth = Person.is_visible conf base p in
+      ((list, len) as acc) unsafe_p search_type =
+    let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper unsafe_p) in
     let civil_match =
       lazy
-        (AdvancedSearchMatch.match_civil_status ~base ~p
+        (AdvancedSearchMatch.match_civil_status ~conf ~base ~p
            ~sex:(gets "sex" |> sex_of_string)
            ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
            ~skip_sname ~first_name_list:fn_list ~surname_list:sn_list
@@ -601,7 +649,6 @@ let advanced_search conf base max_answers =
     in
     let pmatch =
       match search_type with
-      | _ when not auth -> false
       | Fields.Or ->
           let match_f ~date_field ~place_field or_f and_f =
             or_f ~base ~p
@@ -662,7 +709,7 @@ let advanced_search conf base max_answers =
                ~dates:(getd @@ Fields.other_events_date ~gets ~search_type)
                ~places:(Lazy.force other_events_place_searched)
     in
-    if pmatch then (p :: list, len + 1) else acc
+    if pmatch then (unsafe_p :: list, len + 1) else acc
   in
   let list, len =
     if "on" = gets "sosa_filter" then
