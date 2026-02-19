@@ -6,7 +6,7 @@ let persons_of_stream conf base filter iperset stream max =
     | Some (_iper, _) when n <= 0 -> iperset
     | Some (iper, ipers) ->
         let p = Gwdb.poi base iper in
-        if Person.is_visible conf base p && filter p then
+        if Person.has_visible_name conf base p && filter p then
           let iperset' = Gwdb.IperSet.add iper iperset in
           if iperset' == iperset then aux n iperset ipers
           else aux (n - 1) iperset' ipers
@@ -69,7 +69,7 @@ let persons_of_prefixes_stream max conf base filter other_pfxs main_pfx =
           let p = Gwdb.poi base iper in
           if
             List.for_all (match_other_istr p) other_pfxs
-            && Person.is_visible conf base p
+            && Person.has_visible_name conf base p
             && filter p
           then
             let iperset' = Gwdb.IperSet.add iper results in
@@ -199,8 +199,7 @@ let search_by_sosa ~conf ~base ~sosa =
         Util.p_of_sosa conf base sosa sosa_ref)
 
 let search_reject_p conf base p =
-  empty_sn_or_fn base p
-  || (Util.is_hide_names conf p && not (Person.is_visible conf base p))
+  empty_sn_or_fn base p || not (Person.has_visible_name conf base p)
 
 let search_by_name conf base n =
   let n1 = Name.abbrev (Name.lower n) in

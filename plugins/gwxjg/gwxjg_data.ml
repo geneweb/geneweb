@@ -696,10 +696,10 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let events = Jingoo.Jg_types.Tlist [] in
   let name_is_hidden =
-    Jingoo.Jg_types.Tbool (Geneweb.NameDisplay.is_hidden conf base p)
+    Jingoo.Jg_types.Tbool (Geneweb.Person.is_hidden conf base p)
   in
   let name_is_restricted =
-    Jingoo.Jg_types.Tbool (Geneweb.NameDisplay.is_restricted conf base p)
+    Jingoo.Jg_types.Tbool (Geneweb.Person.has_restricted_name conf base p)
   in
   Jingoo.Jg_types.Tpat
     (function
@@ -755,7 +755,10 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let consanguinity =
     Jingoo.Jg_types.Tfloat (Gwxjg_ezgw.Person.consanguinity p)
   in
-  let events' = Gwxjg_ezgw.Person.events conf base p in
+  let events' =
+    Gwxjg_ezgw.Person.events conf base
+      (Geneweb.Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
+  in
   let events = lazy_list (mk_event conf base) events' in
   let birth = find_event conf base (Geneweb.Event.Pevent Epers_Birth) events' in
   let baptism =
@@ -913,10 +916,10 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
           lazy_list (mk_event conf base) (other_marriage_events mother) )
   in
   let name_is_hidden =
-    Jingoo.Jg_types.Tbool (Geneweb.NameDisplay.is_hidden conf base p)
+    Jingoo.Jg_types.Tbool (Geneweb.Person.is_hidden conf base p)
   in
   let name_is_restricted =
-    Jingoo.Jg_types.Tbool (Geneweb.NameDisplay.is_restricted conf base p)
+    Jingoo.Jg_types.Tbool (Geneweb.Person.has_restricted_name conf base p)
   in
   Jingoo.Jg_types.Tpat
     (function

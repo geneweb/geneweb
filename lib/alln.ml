@@ -47,7 +47,7 @@ let select_names ~at_least conf base is_surnames ini limit =
                         List.exists
                           (fun i ->
                             not
-                            @@ Util.is_restricted
+                            @@ Person.is_restricted
                                  (Config.Trimmed.to_config conf)
                                  base i)
                           ips
@@ -75,7 +75,7 @@ let select_names ~at_least conf base is_surnames ini limit =
                       List.fold_left
                         (fun acc i ->
                           if
-                            Util.is_restricted
+                            Person.is_restricted
                               (Config.Trimmed.to_config conf)
                               base i
                           then acc
