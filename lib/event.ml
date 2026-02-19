@@ -219,23 +219,19 @@ let events conf base p =
   if not (Person.is_visible conf base p) then []
   else
     let pevents = List.map event_item_of_pevent (Gwdb.get_pevents p) in
-    let events =
-      (* append fevents *)
-      Array.fold_right
-        (fun ifam events ->
-          let fam = Gwdb.foi base ifam in
-          let isp = Gutil.spouse (Gwdb.get_iper p) fam in
-          (* filter family event with contemporary spouse *)
-          let m_auth = Person.is_visible conf base (Util.pget conf base isp) in
-          if not m_auth then events
-          else
-            List.fold_right
-              (fun fe events ->
-                event_item_of_fevent ~sp:(Some isp) fe :: events)
-              (Gwdb.get_fevents fam) events)
-        (Gwdb.get_family p) pevents
-    in
-    events
+    (* append fevents *)
+    Array.fold_right
+      (fun ifam events ->
+        let fam = Gwdb.foi base ifam in
+        let isp = Gutil.spouse (Gwdb.get_iper p) fam in
+        (* filter family event with contemporary spouse *)
+        let m_auth = Person.is_visible conf base (Util.pget conf base isp) in
+        if not m_auth then events
+        else
+          List.fold_right
+            (fun fe events -> event_item_of_fevent ~sp:(Some isp) fe :: events)
+            (Gwdb.get_fevents fam) events)
+      (Gwdb.get_family p) pevents
 
 let sorted_events conf base p =
   let unsorted_events = events conf base p in
