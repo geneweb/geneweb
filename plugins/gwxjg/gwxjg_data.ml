@@ -755,7 +755,10 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let consanguinity =
     Jingoo.Jg_types.Tfloat (Gwxjg_ezgw.Person.consanguinity p)
   in
-  let events' = Gwxjg_ezgw.Person.events conf base p in
+  let events' =
+    Gwxjg_ezgw.Person.events conf base
+      (Geneweb.Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
+  in
   let events = lazy_list (mk_event conf base) events' in
   let birth = find_event conf base (Geneweb.Event.Pevent Epers_Birth) events' in
   let baptism =
