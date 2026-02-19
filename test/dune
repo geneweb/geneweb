@@ -28,3 +28,7 @@
 (test
  (name heap_test)
  (libraries qcheck qcheck-alcotest geneweb_compat geneweb_search))
+
+(cram
+ (package geneweb)
+ (deps %{bin:ged2gwb}))
