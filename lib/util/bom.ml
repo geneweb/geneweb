@@ -12,10 +12,13 @@ let check ic =
         let b2 = input_byte ic in
         let b3 = input_byte ic in
         if b2 = 0x00 && b3 = 0x00 then Utf32_le else Utf16_le
-      else if b0 = 0x00 && b1 = 0x00 then
-        let b2 = input_byte ic in
-        let b3 = input_byte ic in
-        if b2 = 0xFE && b3 = 0xFF then Utf32_be else None
+      else if b0 = 0x00 then
+        if b1 = 0x00 then
+          let b2 = input_byte ic in
+          let b3 = input_byte ic in
+          if b2 = 0xFE && b3 = 0xFF then Utf32_be else None
+        else Utf16_be
+      else if b1 = 0x00 then Utf16_le
       else None
     with End_of_file -> None
   in
@@ -24,10 +27,10 @@ let check ic =
 
 let to_string = function
   | Utf8 -> "UTF-8"
-  | Utf16_le -> "UTF-16 LE"
-  | Utf16_be -> "UTF-16 BE"
-  | Utf32_le -> "UTF-32 LE"
-  | Utf32_be -> "UTF-32 BE"
+  | Utf16_le -> "UTF-16LE"
+  | Utf16_be -> "UTF-16BE"
+  | Utf32_le -> "UTF-32LE"
+  | Utf32_be -> "UTF-32BE"
   | None -> ""
 
 let is_unsupported = function
