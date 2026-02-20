@@ -41,33 +41,28 @@ let union (type k v c) (module C : Comparator with type t = k and type wit = c)
     (l : (k, v, c) t list) =
   let arr = Array.of_list l in
   let module H = Heap.Make (struct
-    type t = int * k * v
+    type t = int * k
 
-    (* FIXME: Remove the `Obj.magic`. *)
-    let dummy = (0, C.dummy, Obj.magic 0)
-
-    (* FXME: We silently ignore collision. *)
-    let compare (_, k1, _) (_, k2, _) = C.compare k1 k2
+    let dummy = (0, C.dummy)
+    let compare (_, k1) (_, k2) = C.compare k1 k2
   end) in
   let len = Array.length arr in
   let hp = H.create len in
   for i = 0 to len - 1 do
-    match arr.(i).curr () with
-    | exception End -> ()
-    | k, v -> H.insert hp (i, k, v)
+    match arr.(i).curr () with exception End -> () | k, _ -> H.insert hp (i, k)
   done;
   let seek w =
     let rec loop () =
       match H.min hp with
       | exception H.Empty -> ()
-      | _, k, _ when C.compare w k <= 0 -> ()
-      | i, _, _ ->
-          let (_ : int * k * v) = H.delete_min hp in
+      | _, k when C.compare w k <= 0 -> ()
+      | i, _ ->
+          let (_ : int * k) = H.delete_min hp in
           arr.(i).seek w;
           let () =
             match arr.(i).curr () with
             | exception End -> ()
-            | k, v -> H.insert hp (i, k, v)
+            | k, _ -> H.insert hp (i, k)
           in
           loop ()
     in
@@ -76,14 +71,16 @@ let union (type k v c) (module C : Comparator with type t = k and type wit = c)
   let next () =
     match H.delete_min hp with
     | exception H.Empty -> ()
-    | i, _, _ -> (
+    | i, _ -> (
         arr.(i).next ();
         match arr.(i).curr () with
         | exception End -> ()
-        | k, v -> H.insert hp (i, k, v))
+        | k, _ -> H.insert hp (i, k))
   in
   let curr () =
-    match H.min hp with exception H.Empty -> raise End | _, k, v -> (k, v)
+    match H.min hp with
+    | exception H.Empty -> raise End
+    | i, _ -> arr.(i).curr ()
   in
   { curr; next; seek }
 
