@@ -1,4 +1,8 @@
-type ('a, 'c) t = { curr : unit -> 'a; next : unit -> unit; seek : 'a -> unit }
+type ('k, 'v, 'c) t = {
+  curr : unit -> 'k * 'v;
+  next : unit -> unit;
+  seek : 'k -> unit;
+}
 
 exception End
 
@@ -10,22 +14,23 @@ module type Comparator = sig
   val compare : t -> t -> int
 end
 
-type ('a, 'c) comparator =
-  (module Comparator with type t = 'a and type wit = 'c)
+type ('k, 'c) comparator =
+  (module Comparator with type t = 'k and type wit = 'c)
 
-let make _cmp ~curr ~next ~seek = { curr; next; seek }
+let[@inline] make _cmp ~curr ~next ~seek = { curr; next; seek }
 let[@inline always] curr it = it.curr ()
 let[@inline always] next it = it.next ()
 let[@inline always] seek it e = it.seek e
 
-let equal (type a c) (module C : Comparator with type t = a and type wit = c)
-    (it1 : (a, c) t) (it2 : (a, c) t) =
+let equal (type k v c) (module C : Comparator with type t = k and type wit = c)
+    (it1 : (k, v, c) t) (it2 : (k, v, c) t) =
   let rec loop () =
-    let v1 = try Some (it1.curr ()) with End -> None in
-    let v2 = try Some (it2.curr ()) with End -> None in
-    match (v1, v2) with
-    | Some v1, Some v2 ->
-        if C.compare v1 v2 <> 0 then false
+    let o1 = try Some (it1.curr ()) with End -> None in
+    let o2 = try Some (it2.curr ()) with End -> None in
+    match (o1, o2) with
+    | Some (k1, v1), Some (k2, v2) ->
+        (* FIXME: remove the polymorphic comparison. *)
+        if C.compare k1 k2 <> 0 && v1 = v2 then false
         else (
           it1.next ();
           it2.next ();
@@ -35,32 +40,35 @@ let equal (type a c) (module C : Comparator with type t = a and type wit = c)
   in
   loop ()
 
-let union (type a c) (module C : Comparator with type t = a and type wit = c)
-    (l : (a, c) t list) =
+let union (type k v c) (module C : Comparator with type t = k and type wit = c)
+    (l : (k, v, c) t list) =
   let arr = Array.of_list l in
   let module H = Heap.Make (struct
-    type t = int * a
+    type t = int * k * v
 
-    let dummy = (0, C.dummy)
-    let compare (_, v1) (_, v2) = C.compare v1 v2
+    (* FIXME: Remove the `Obj.magic`. *)
+    let dummy = (0, C.dummy, Obj.magic 0)
+
+    (* FXME: We silently ignore collision. *)
+    let compare (_, k1, _) (_, k2, _) = C.compare k1 k2
   end) in
   let len = Array.length arr in
   let hp = H.create len in
   for i = 0 to len - 1 do
-    match curr arr.(i) with exception End -> () | v -> H.insert hp (i, v)
+    match curr arr.(i) with exception End -> () | k, v -> H.insert hp (i, k, v)
   done;
   let seek w =
     let rec loop () =
       match H.min hp with
       | exception H.Empty -> ()
-      | _, v when C.compare w v <= 0 -> ()
-      | i, _ ->
-          let (_ : int * a) = H.delete_min hp in
+      | _, k, _ when C.compare w k <= 0 -> ()
+      | i, _, _ ->
+          let (_ : int * k * v) = H.delete_min hp in
           seek arr.(i) w;
           let () =
             match curr arr.(i) with
             | exception End -> ()
-            | v -> H.insert hp (i, v)
+            | k, v -> H.insert hp (i, k, v)
           in
           loop ()
     in
@@ -69,19 +77,21 @@ let union (type a c) (module C : Comparator with type t = a and type wit = c)
   let next () =
     match H.delete_min hp with
     | exception H.Empty -> ()
-    | i, _ -> (
+    | i, _, _ -> (
         next arr.(i);
-        match curr arr.(i) with exception End -> () | v -> H.insert hp (i, v))
+        match curr arr.(i) with
+        | exception End -> ()
+        | k, v -> H.insert hp (i, k, v))
   in
   let curr () =
-    match H.min hp with exception H.Empty -> raise End | _, v -> v
+    match H.min hp with exception H.Empty -> raise End | _, k, v -> (k, v)
   in
   { curr; next; seek }
 
 (* This implementation follows the leapfrog join describes in the paper
    https://openproceedings.org/ICDT/2014/paper_13.pdf *)
-let join (type a c) (module C : Comparator with type t = a and type wit = c)
-    (l : (a, c) t list) =
+let join (type k v c) (module C : Comparator with type t = k and type wit = c)
+    (l : (k, v, c) t list) =
   let arr = Array.of_list l in
   if Array.length arr = 0 then
     (* Intersection of 0th elements cannot be represented by a finite
@@ -96,12 +106,12 @@ let join (type a c) (module C : Comparator with type t = a and type wit = c)
   let search () =
     let k = Array.length arr in
     let rec loop x =
-      let y = curr arr.(!pos) in
+      let y, _ = curr arr.(!pos) in
       if C.compare y x < 0 then (
         seek arr.(!pos) x;
         match curr arr.(!pos) with
         | exception End -> ended := true
-        | x' ->
+        | x', _ ->
             (* As y < x and the iterator [arr.(!pos)] has not
                reached its end, the previous seek call must
                advance this iterator. *)
@@ -110,11 +120,14 @@ let join (type a c) (module C : Comparator with type t = a and type wit = c)
             pos := (!pos + 1) mod k;
             loop x')
     in
-    loop (curr arr.((k + !pos - 1) mod k))
+    let x, _ = curr arr.((k + !pos - 1) mod k) in
+    loop x
   in
   let () =
     try
-      Array.sort (fun it1 it2 -> C.compare (curr it1) (curr it2)) arr;
+      Array.sort
+        (fun it1 it2 -> C.compare (fst @@ curr it1) (fst @@ curr it2))
+        arr;
       search ()
     with End -> ended := true
   in

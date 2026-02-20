@@ -144,14 +144,14 @@ module Flatset_tests = struct
     let iterator t =
       let idx = ref 0 in
       let curr () =
-        if !idx < Array.length t then t.(!idx) else raise Iterator.End
+        if !idx < Array.length t then (t.(!idx), ()) else raise Iterator.End
       in
       let next () = if !idx < Array.length t then incr idx in
       let seek w =
         let rec loop () =
           match curr () with
           | exception Iterator.End -> ()
-          | v when w <= v -> ()
+          | v, () when w <= v -> ()
           | _ ->
               next ();
               loop ()
@@ -182,9 +182,9 @@ module Flatset_tests = struct
     let s = Flatset.of_seq (List.to_seq [ 1; 3; 5; 9 ]) in
     let it = Flatset.iterator s in
     Iterator.seek it 4;
-    A.(check int) "first seek" 5 (Iterator.curr it);
+    A.(check int) "first seek" 5 (fst @@ Iterator.curr it);
     Iterator.seek it 4;
-    A.(check int) "second seek" 5 (Iterator.curr it)
+    A.(check int) "second seek" 5 (fst @@ Iterator.curr it)
 
   let test_random_mem =
     QCheck.Test.make ~count:1000 ~name:"random mem" (QCheck.make index_array)
@@ -204,12 +204,12 @@ module Flatset_tests = struct
     (* Iterator.equal (module C) it1 it2 *)
     let seq1 = Iterator.to_seq it1 in
     let seq2 = Iterator.to_seq it2 in
-    let b = Seq.equal Int.equal seq1 seq2 in
+    let b = Seq.equal (fun (k1, ()) (k2, ()) -> Int.equal k1 k2) seq1 seq2 in
     if not b then
       Fmt.pr "it1 = %a@. it2 = %a@."
-        (Fmt.seq ~sep:Fmt.comma Fmt.int)
+        Fmt.(seq ~sep:comma @@ pair int nop)
         seq1
-        (Fmt.seq ~sep:Fmt.comma Fmt.int)
+        Fmt.(seq ~sep:comma @@ pair int nop)
         seq2;
     b
 
@@ -225,7 +225,7 @@ module Flatset_tests = struct
     Iterator.seek it2 probe;
     let v1 = try Some (Iterator.curr it1) with Iterator.End -> None in
     let v2 = try Some (Iterator.curr it2) with Iterator.End -> None in
-    Option.equal Int.equal v1 v2
+    Option.equal (fun (k1, ()) (k2, ()) -> Int.equal k1 k2) v1 v2
 
   let test_random_iterator_union =
     QCheck.Test.make ~count:1000 ~name:"random iterator union"
@@ -246,12 +246,12 @@ module Flatset_tests = struct
     (* Iterator.equal (module C) it1 it2 *)
     let seq1 = Iterator.to_seq it1 in
     let seq2 = Iterator.to_seq it2 in
-    let b = Seq.equal Int.equal seq1 seq2 in
+    let b = Seq.equal (fun (k1, ()) (k2, ()) -> Int.equal k1 k2) seq1 seq2 in
     if not b then
       Fmt.pr "it1 = %a@. it2 = %a@."
-        Fmt.(seq ~sep:comma int)
+        Fmt.(seq ~sep:comma @@ pair int nop)
         seq1
-        Fmt.(seq ~sep:comma int)
+        Fmt.(seq ~sep:comma @@ pair int nop)
         seq2;
     b
 
@@ -275,12 +275,12 @@ module Flatset_tests = struct
     (* Iterator.equal (module C) it1 it2 *)
     let seq1 = Iterator.to_seq it1 in
     let seq2 = Iterator.to_seq it2 in
-    let b = Seq.equal Int.equal seq1 seq2 in
+    let b = Seq.equal (fun (k1, ()) (k2, ()) -> Int.equal k1 k2) seq1 seq2 in
     if not b then
       Fmt.pr "it1 = %a@. it2 = %a@."
-        Fmt.(seq ~sep:comma int)
+        Fmt.(seq ~sep:comma @@ pair int nop)
         seq1
-        Fmt.(seq ~sep:comma int)
+        Fmt.(seq ~sep:comma @@ pair int nop)
         seq2;
     b
 

@@ -28,7 +28,7 @@ module type S = sig
   val cardinal : t -> int
   (** [cardinal t] returns the cardinal of the set. *)
 
-  val iterator : t -> (elt, cmp) Iterator.t
+  val iterator : t -> (elt, unit, cmp) Iterator.t
   (** [iterator s] returns a iterator starting at the first element of [s]. *)
 end
 

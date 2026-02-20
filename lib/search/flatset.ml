@@ -9,7 +9,7 @@ module type S = sig
   val to_seq : t -> elt Seq.t
   val mem : elt -> t -> bool
   val cardinal : t -> int
-  val iterator : t -> (elt, cmp) Iterator.t
+  val iterator : t -> (elt, unit, cmp) Iterator.t
 end
 
 module type OrderedType = sig
@@ -102,7 +102,9 @@ module Make (O : OrderedType) = struct
 
   let iterator t =
     let idx = ref 0 in
-    let curr () = if !idx < cardinal t then t.(!idx) else raise Iterator.End in
+    let curr () =
+      if !idx < cardinal t then (t.(!idx), ()) else raise Iterator.End
+    in
     let next () = if !idx < cardinal t then incr idx in
     let seek e =
       if !idx < cardinal t then (

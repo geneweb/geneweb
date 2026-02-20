@@ -1,8 +1,4 @@
-type ('a, 'c) t = private {
-  curr : unit -> 'a;
-  next : unit -> unit;
-  seek : 'a -> unit;
-}
+type ('k, 'v, 'c) t
 (** Type of an iterator. *)
 
 exception End
@@ -17,25 +13,25 @@ module type Comparator = sig
   val compare : t -> t -> int
 end
 
-type ('a, 'c) comparator =
-  (module Comparator with type t = 'a and type wit = 'c)
+type ('k, 'c) comparator =
+  (module Comparator with type t = 'k and type wit = 'c)
 
 val make :
-  ('a, 'c) comparator ->
-  curr:(unit -> 'a) ->
+  ('k, 'c) comparator ->
+  curr:(unit -> 'k * 'v) ->
   next:(unit -> unit) ->
-  seek:('a -> unit) ->
-  ('a, 'c) t
+  seek:('k -> unit) ->
+  ('k, 'v, 'c) t
 
-val curr : ('a, 'c) t -> 'a
+val curr : ('k, 'v, 'c) t -> 'k * 'v
 (** [curr it] returns the element currently pointed by the iterator [it].
     @raise End if the iterator [it] has reached the end of the collection. *)
 
-val next : ('a, 'c) t -> unit
+val next : ('k, 'v, 'c) t -> unit
 (** [next it] advances the iterator [it] to the next element. No effect if the
     iterator [it] has already reached the end of the collection. *)
 
-val seek : ('a, 'c) t -> 'a -> unit
+val seek : ('k, 'v, 'c) t -> 'k -> unit
 (** [seek e] advances the iterator [it] to the smallest element in the
     collection that is greater or equal to [e]. If already positioned at this
     element, the iterator remains unchanged.
@@ -44,20 +40,20 @@ val seek : ('a, 'c) t -> 'a -> unit
     complexity is expected to be O(1 + log(N/n)) where N is the cardinal of the
     collection. *)
 
-val union : ('a, 'c) comparator -> ('a, 'c) t list -> ('a, 'c) t
+val union : ('k, 'c) comparator -> ('k, 'v, 'c) t list -> ('k, 'v, 'c) t
 (** [union l] computes the union iterator of the iterators [l]. The resulting
     iterator produces elements of the union of [l] in ascending order. *)
 
-val join : ('a, 'c) comparator -> ('a, 'c) t list -> ('a, 'c) t
+val join : ('k, 'c) comparator -> ('k, 'v, 'c) t list -> ('k, 'v, 'c) t
 (** [join l] computes the join iterator of the iterators [l]. The resulting
     iterator produces elements of the intersection of [l] in ascending order.
 
     @raise Invalid_argument if the list [l] is empty. *)
 
-val equal : ('a, 'c) comparator -> ('a, 'c) t -> ('a, 'c) t -> bool
+val equal : ('k, 'c) comparator -> ('k, 'v, 'c) t -> ('k, 'v, 'c) t -> bool
 (** [equal it1 it2] checks if the two iterators [it1] and [it2] are equal. This
     function consumes both [it1] and [it2]. *)
 
-val to_seq : ('a, 'c) t -> 'a Seq.t
+val to_seq : ('k, 'v, 'c) t -> ('k * 'v) Seq.t
 (** [to_seq it] converts the iterator [it] into a sequence. Forcing the
     resulting sequence consumes [it]. *)

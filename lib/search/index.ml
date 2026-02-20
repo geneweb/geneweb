@@ -87,7 +87,8 @@ module Make (W : Word.S) (E : Entry) = struct
     match l with
     | [] -> Seq.empty
     | _ :: _ ->
-        Seq.map HE.to_entry @@ Iterator.to_seq
+        Seq.map (fun (k, ()) -> HE.to_entry k)
+        @@ Iterator.to_seq
         @@ Iterator.join (module Flatset.Comparator) l
 
   let ( let* ) = Option.bind
