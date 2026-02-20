@@ -112,7 +112,6 @@ module Flatset_tests = struct
   end
 
   module Flatset = Geneweb_search.Flatset.Make (Entry)
-  module C = Flatset.Comparator
 
   module Naive = struct
     let of_seq s =
@@ -158,7 +157,7 @@ module Flatset_tests = struct
         in
         loop ()
       in
-      Cursor.make (module C) ~curr ~next ~seek
+      Cursor.make Flatset.cmp ~curr ~next ~seek
   end
 
   let nonempty_array = QCheck.Gen.(range_subset ~size:5 0 50)
@@ -239,7 +238,7 @@ module Flatset_tests = struct
       let l2 =
         List.map (fun a -> Array.to_seq a |> Flatset.of_seq |> Flatset.cursor) l
       in
-      Cursor.union (module C) l2
+      Cursor.union Flatset.cmp l2
     in
     (* Cursor.equal (module C) it1 it2 *)
     let seq1 = Cursor.to_seq it1 in
@@ -266,7 +265,7 @@ module Flatset_tests = struct
       let l2 =
         List.map (fun a -> Array.to_seq a |> Flatset.of_seq |> Flatset.cursor) l
       in
-      Cursor.join (module C) l2
+      Cursor.join Flatset.cmp l2
     in
     (* Cursor.equal (module C) it1 it2 *)
     let seq1 = Cursor.to_seq it1 in

@@ -3,8 +3,7 @@ module type S = sig
   type t
   type cmp
 
-  module Comparator : Comparator.S with type t = elt and type wit = cmp
-
+  val cmp : (elt, cmp) Comparator.t
   val of_seq : elt Seq.t -> t
   val to_seq : t -> elt Seq.t
   val mem : elt -> t -> bool
@@ -42,13 +41,16 @@ module Make (O : OrderedType) = struct
   type t = O.t array
   type cmp
 
-  module Comparator = struct
-    type t = O.t
-    type wit = cmp
+  let cmp =
+    (module struct
+      type t = O.t
+      type wit = cmp
 
-    let dummy = O.dummy
-    let compare = O.compare
-  end
+      let dummy = O.dummy
+      let compare = O.compare
+    end : Comparator.S
+      with type t = O.t
+       and type wit = cmp)
 
   let of_seq s =
     let l = List.of_seq s in
@@ -112,5 +114,5 @@ module Make (O : OrderedType) = struct
         assert (i >= cardinal t || O.compare t.(i) e >= 0);
         idx := i)
     in
-    Cursor.make (module Comparator) ~curr ~next ~seek
+    Cursor.make cmp ~curr ~next ~seek
 end

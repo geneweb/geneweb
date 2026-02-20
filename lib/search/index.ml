@@ -89,7 +89,7 @@ module Make (W : Word.S) (E : Entry) = struct
     | _ :: _ ->
         Seq.map (fun (k, ()) -> HE.to_entry k)
         @@ Cursor.to_seq
-        @@ Cursor.join (module Flatset.Comparator) l
+        @@ Cursor.join Flatset.cmp l
 
   let ( let* ) = Option.bind
 
@@ -139,7 +139,7 @@ module Make (W : Word.S) (E : Entry) = struct
       (fun acc pfx ->
         match loop [] pfx 0 t with
         | [] -> None
-        | l -> Some (Cursor.union (module Flatset.Comparator) l :: acc))
+        | l -> Some (Cursor.union Flatset.cmp l :: acc))
       [] ps
     |> Option.value ~default:[] |> intersection
 
@@ -184,7 +184,7 @@ module Make (W : Word.S) (E : Entry) = struct
       (fun acc atm ->
         match loop [] atm t with
         | [] -> None
-        | l -> Some (Cursor.union (module Flatset.Comparator) l :: acc))
+        | l -> Some (Cursor.union Flatset.cmp l :: acc))
       [] atms
     |> Option.value ~default:[] |> intersection
 end

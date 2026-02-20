@@ -8,8 +8,9 @@ module type S = sig
   (** Type of elements of the collection. *)
 
   type cmp
+  (** Witness of the comparator. *)
 
-  module Comparator : Comparator.S with type t = elt and type wit = cmp
+  val cmp : (elt, cmp) Comparator.t
 
   type t
   (** Type of flat set. *)
