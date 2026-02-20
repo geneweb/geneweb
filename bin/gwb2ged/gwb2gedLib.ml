@@ -375,6 +375,7 @@ let ged_tag_pevent base evt =
   | Epers_Accomplishment -> "Accomplishment"
   | Epers_Acquisition -> "Acquisition"
   | Epers_Adhesion -> "Membership"
+  | Epers_Adoption -> "ADOP"
   | Epers_BaptismLDS -> "BAPL"
   | Epers_BarMitzvah -> "BARM"
   | Epers_BatMitzvah -> "BASM"
@@ -421,10 +422,10 @@ let ged_tag_pevent base evt =
 
 let is_primary_pevents = function
   | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
-  | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction
-  | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Dotation
-  | Epers_Education | Epers_Emigration | Epers_FirstCommunion | Epers_Graduate
-  | Epers_Immigration | Epers_Naturalisation | Epers_Occupation
+  | Epers_Adoption | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
+  | Epers_Benediction | Epers_Confirmation | Epers_ConfirmationLDS
+  | Epers_Dotation | Epers_Education | Epers_Emigration | Epers_FirstCommunion
+  | Epers_Graduate | Epers_Immigration | Epers_Naturalisation | Epers_Occupation
   | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
   | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentSpouseLDS
   | Epers_Will ->
