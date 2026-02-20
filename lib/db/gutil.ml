@@ -271,12 +271,20 @@ let sort_person_list_aux sort base =
               Driver.get_death p2 )
           with
           | Some d1, _, Some d2, _ -> Date.compare_date d1 d2
-          | Some d1, _, _, Death (_, d2) ->
-              Date.compare_date d1 (Date.date_of_cdate d2)
-          | _, Death (_, d1), Some d2, _ ->
-              Date.compare_date (Date.date_of_cdate d1) d2
-          | _, Death (_, d1), _, Death (_, d2) ->
-              Date.compare_date (Date.date_of_cdate d1) (Date.date_of_cdate d2)
+          | Some d1, _, _, Death (_, d2) -> (
+              match Date.od_of_cdate d2 with
+              | Some d2 -> Date.compare_date d1 d2
+              | None -> 1)
+          | _, Death (_, d1), Some d2, _ -> (
+              match Date.od_of_cdate d1 with
+              | Some d1 -> Date.compare_date d1 d2
+              | None -> -1)
+          | _, Death (_, d1), _, Death (_, d2) -> (
+              match (Date.od_of_cdate d1, Date.od_of_cdate d2) with
+              | Some d1, Some d2 -> Date.compare_date d1 d2
+              | Some _, None -> 1
+              | None, Some _ -> -1
+              | None, None -> 0)
           | Some _, _, _, _ -> 1
           | _, Death (_, _), _, _ -> 1
           | _, _, Some _, _ -> -1
