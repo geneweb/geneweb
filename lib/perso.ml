@@ -1585,8 +1585,7 @@ let get_note_or_source conf base
         ('k', fun () -> Image.default_image_filename "portraits" base p);
       ]
     in
-    let s = string_with_macros conf env note_or_source in
-    let lines = Wiki.html_of_tlsw conf s in
+    let lines = Wiki.html_of_tlsw conf note_or_source in
     let lines =
       (* remove enclosing <p> .. </p> if any *)
       if List.compare_length_with lines 2 > 0 then
