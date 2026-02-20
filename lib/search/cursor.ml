@@ -10,17 +10,17 @@ let[@inline] make _cmp ~curr ~next ~seek = { curr; next; seek }
 
 let equal (type k v c)
     (module C : Comparator.S with type t = k and type wit = c)
-    (it1 : (k, v, c) t) (it2 : (k, v, c) t) =
+    (c1 : (k, v, c) t) (c2 : (k, v, c) t) =
   let rec loop () =
-    let o1 = try Some (it1.curr ()) with End -> None in
-    let o2 = try Some (it2.curr ()) with End -> None in
+    let o1 = try Some (c1.curr ()) with End -> None in
+    let o2 = try Some (c2.curr ()) with End -> None in
     match (o1, o2) with
     | Some (k1, v1), Some (k2, v2) ->
         (* FIXME: remove the polymorphic comparison. *)
         if C.compare k1 k2 <> 0 && v1 = v2 then false
         else (
-          it1.next ();
-          it2.next ();
+          c1.next ();
+          c2.next ();
           loop ())
     | None, Some _ | Some _, None -> false
     | None, None -> true
@@ -85,7 +85,7 @@ let join (type k v c) (module C : Comparator.S with type t = k and type wit = c)
        set for any type. *)
     invalid_arg "join";
   let ended = ref false in
-  (* Index of a cursor [it] in [arr] such that its current value
+  (* Index of a cursor [c] in [arr] such that its current value
      is the smallest among current values of cursors of [arr]. *)
   let pos = ref 0 in
   (* Helper function that advances the cursors of [arr] until
@@ -139,14 +139,14 @@ let join (type k v c) (module C : Comparator.S with type t = k and type wit = c)
   let curr () = if !ended then raise End else arr.(0).curr () in
   { curr; next; seek }
 
-let to_seq it =
+let to_seq c =
   let rec loop () =
-    match it.curr () with
+    match c.curr () with
     | exception End -> Seq.Nil
     | v -> (
-        it.next ();
+        c.next ();
         (* XXX: hot fix *)
-        match it.curr () with
+        match c.curr () with
         | exception End -> Seq.Cons (v, loop)
         | w -> if v = w then loop () else Seq.Cons (v, loop))
   in
