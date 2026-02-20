@@ -18,9 +18,6 @@ type ('k, 'c) comparator =
   (module Comparator with type t = 'k and type wit = 'c)
 
 let[@inline] make _cmp ~curr ~next ~seek = { curr; next; seek }
-let[@inline always] curr it = it.curr ()
-let[@inline always] next it = it.next ()
-let[@inline always] seek it e = it.seek e
 
 let equal (type k v c) (module C : Comparator with type t = k and type wit = c)
     (it1 : (k, v, c) t) (it2 : (k, v, c) t) =
@@ -55,7 +52,9 @@ let union (type k v c) (module C : Comparator with type t = k and type wit = c)
   let len = Array.length arr in
   let hp = H.create len in
   for i = 0 to len - 1 do
-    match curr arr.(i) with exception End -> () | k, v -> H.insert hp (i, k, v)
+    match arr.(i).curr () with
+    | exception End -> ()
+    | k, v -> H.insert hp (i, k, v)
   done;
   let seek w =
     let rec loop () =
@@ -64,9 +63,9 @@ let union (type k v c) (module C : Comparator with type t = k and type wit = c)
       | _, k, _ when C.compare w k <= 0 -> ()
       | i, _, _ ->
           let (_ : int * k * v) = H.delete_min hp in
-          seek arr.(i) w;
+          arr.(i).seek w;
           let () =
-            match curr arr.(i) with
+            match arr.(i).curr () with
             | exception End -> ()
             | k, v -> H.insert hp (i, k, v)
           in
@@ -78,8 +77,8 @@ let union (type k v c) (module C : Comparator with type t = k and type wit = c)
     match H.delete_min hp with
     | exception H.Empty -> ()
     | i, _, _ -> (
-        next arr.(i);
-        match curr arr.(i) with
+        arr.(i).next ();
+        match arr.(i).curr () with
         | exception End -> ()
         | k, v -> H.insert hp (i, k, v))
   in
@@ -106,10 +105,10 @@ let join (type k v c) (module C : Comparator with type t = k and type wit = c)
   let search () =
     let k = Array.length arr in
     let rec loop x =
-      let y, _ = curr arr.(!pos) in
+      let y, _ = arr.(!pos).curr () in
       if C.compare y x < 0 then (
-        seek arr.(!pos) x;
-        match curr arr.(!pos) with
+        arr.(!pos).seek x;
+        match arr.(!pos).curr () with
         | exception End -> ended := true
         | x', _ ->
             (* As y < x and the iterator [arr.(!pos)] has not
@@ -120,20 +119,20 @@ let join (type k v c) (module C : Comparator with type t = k and type wit = c)
             pos := (!pos + 1) mod k;
             loop x')
     in
-    let x, _ = curr arr.((k + !pos - 1) mod k) in
+    let x, _ = arr.((k + !pos - 1) mod k).curr () in
     loop x
   in
   let () =
     try
       Array.sort
-        (fun it1 it2 -> C.compare (fst @@ curr it1) (fst @@ curr it2))
+        (fun it1 it2 -> C.compare (fst @@ it1.curr ()) (fst @@ it2.curr ()))
         arr;
       search ()
     with End -> ended := true
   in
   let seek w =
-    seek arr.(!pos) w;
-    match curr arr.(!pos) with
+    arr.(!pos).seek w;
+    match arr.(!pos).curr () with
     | exception End -> ended := true
     | _ ->
         let k = Array.length arr in
@@ -141,26 +140,30 @@ let join (type k v c) (module C : Comparator with type t = k and type wit = c)
         search ()
   in
   let next () =
-    next arr.(!pos);
-    match curr arr.(!pos) with
+    arr.(!pos).next ();
+    match arr.(!pos).curr () with
     | exception End -> ended := true
     | _ ->
         let k = Array.length arr in
         pos := (!pos + 1) mod k;
         search ()
   in
-  let curr () = if !ended then raise End else curr arr.(0) in
+  let curr () = if !ended then raise End else arr.(0).curr () in
   { curr; next; seek }
 
 let to_seq it =
   let rec loop () =
-    match curr it with
+    match it.curr () with
     | exception End -> Seq.Nil
     | v -> (
-        next it;
+        it.next ();
         (* XXX: hot fix *)
-        match curr it with
+        match it.curr () with
         | exception End -> Seq.Cons (v, loop)
         | w -> if v = w then loop () else Seq.Cons (v, loop))
   in
   loop
+
+let[@inline] curr it = it.curr ()
+let[@inline] next it = it.next ()
+let[@inline] seek it e = it.seek e
