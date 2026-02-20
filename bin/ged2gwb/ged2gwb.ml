@@ -2681,9 +2681,15 @@ let open_in_bin_with_bom_check fname =
    | Bom.Utf8 -> charset_option := Some Utf8
    | bom when Bom.is_unsupported bom ->
        close_in ic;
-       Printf.fprintf !log_oc "Error: %s encoding not supported\n"
+       let base = Filename.remove_extension fname in
+       let ext = Filename.extension fname in
+       Printf.fprintf !log_oc
+         "Error: %s encoding detected, not supported\n"
          (Bom.to_string bom);
-       Printf.fprintf !log_oc "Convert file to UTF-8 or ANSEL first\n";
+       Printf.fprintf !log_oc
+         "Convert to UTF-8 first:\n\
+          iconv -f %s -t UTF-8 %s > %s_UTF8%s\n"
+         (Bom.to_string bom) fname base ext;
        flush !log_oc;
        exit 2
    | _ -> ());
@@ -3290,8 +3296,10 @@ let main () =
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
   in_file :=
-    if !in_file <> "" then
+    if !in_file <> "" then begin
+      close_in (open_in_bin_with_bom_check !in_file);
       Filename.remove_extension !in_file
+    end
     else !in_file;
   if !in_file <> "" && (not (Array.mem "-o" Sys.argv)) then out_file := !in_file;
   out_file := Filename.basename !out_file |> Filename.remove_extension;
