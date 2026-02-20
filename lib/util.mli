@@ -770,8 +770,9 @@ val safe_html : string -> Adef.safe_string
 
 val string_with_macros :
   config -> (char * (unit -> string)) list -> string -> string
-(** [string_with_macros conf env s] Return a string with "%xxx" macro replaced
-    by their value. *)
+(** [string_with_macros conf env s] Return a string with "%x" macro (single
+    letter) replaced by their value. Special case for %vxxx which expands to the
+    value of var_xxx from base environment *)
 
 val is_empty_name : Geneweb_db.Driver.person -> bool
 (** [is_empty_name p] [false] if we knwon the first name or the last name of
