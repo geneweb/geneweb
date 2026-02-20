@@ -3,7 +3,7 @@ module type S = sig
   type t
   type cmp
 
-  module Comparator : Cursor.Comparator with type t = elt and type wit = cmp
+  module Comparator : Comparator.S with type t = elt and type wit = cmp
 
   val of_seq : elt Seq.t -> t
   val to_seq : t -> elt Seq.t

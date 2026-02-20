@@ -6,20 +6,10 @@ type ('k, 'v, 'c) t = {
 
 exception End
 
-module type Comparator = sig
-  type t
-  type wit
-
-  val dummy : t
-  val compare : t -> t -> int
-end
-
-type ('k, 'c) comparator =
-  (module Comparator with type t = 'k and type wit = 'c)
-
 let[@inline] make _cmp ~curr ~next ~seek = { curr; next; seek }
 
-let equal (type k v c) (module C : Comparator with type t = k and type wit = c)
+let equal (type k v c)
+    (module C : Comparator.S with type t = k and type wit = c)
     (it1 : (k, v, c) t) (it2 : (k, v, c) t) =
   let rec loop () =
     let o1 = try Some (it1.curr ()) with End -> None in
@@ -37,7 +27,8 @@ let equal (type k v c) (module C : Comparator with type t = k and type wit = c)
   in
   loop ()
 
-let union (type k v c) (module C : Comparator with type t = k and type wit = c)
+let union (type k v c)
+    (module C : Comparator.S with type t = k and type wit = c)
     (l : (k, v, c) t list) =
   let arr = Array.of_list l in
   let module H = Heap.Make (struct
@@ -86,7 +77,7 @@ let union (type k v c) (module C : Comparator with type t = k and type wit = c)
 
 (* This implementation follows the leapfrog join describes in the paper
    https://openproceedings.org/ICDT/2014/paper_13.pdf *)
-let join (type k v c) (module C : Comparator with type t = k and type wit = c)
+let join (type k v c) (module C : Comparator.S with type t = k and type wit = c)
     (l : (k, v, c) t list) =
   let arr = Array.of_list l in
   if Array.length arr = 0 then

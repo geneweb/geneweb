@@ -9,7 +9,7 @@ module type S = sig
 
   type cmp
 
-  module Comparator : Cursor.Comparator with type t = elt and type wit = cmp
+  module Comparator : Comparator.S with type t = elt and type wit = cmp
 
   type t
   (** Type of flat set. *)

@@ -5,19 +5,8 @@ exception End
 (** Exception raised when attempting to access elements beyond the end of an
     cursor. *)
 
-module type Comparator = sig
-  type t
-  type wit
-
-  val dummy : t
-  val compare : t -> t -> int
-end
-
-type ('k, 'c) comparator =
-  (module Comparator with type t = 'k and type wit = 'c)
-
 val make :
-  ('k, 'c) comparator ->
+  ('k, 'c) Comparator.t ->
   curr:(unit -> 'k * 'v) ->
   next:(unit -> unit) ->
   seek:('k -> unit) ->
@@ -40,17 +29,17 @@ val seek : ('k, 'v, 'c) t -> 'k -> unit
     complexity is expected to be O(1 + log(N/n)) where N is the cardinal of the
     collection. *)
 
-val union : ('k, 'c) comparator -> ('k, 'v, 'c) t list -> ('k, 'v, 'c) t
+val union : ('k, 'c) Comparator.t -> ('k, 'v, 'c) t list -> ('k, 'v, 'c) t
 (** [union l] computes the union cursor of the cursors [l]. The resulting cursor
     produces elements of the union of [l] in ascending order. *)
 
-val join : ('k, 'c) comparator -> ('k, 'v, 'c) t list -> ('k, 'v, 'c) t
+val join : ('k, 'c) Comparator.t -> ('k, 'v, 'c) t list -> ('k, 'v, 'c) t
 (** [join l] computes the join cursor of the cursors [l]. The resulting cursor
     produces elements of the intersection of [l] in ascending order.
 
     @raise Invalid_argument if the list [l] is empty. *)
 
-val equal : ('k, 'c) comparator -> ('k, 'v, 'c) t -> ('k, 'v, 'c) t -> bool
+val equal : ('k, 'c) Comparator.t -> ('k, 'v, 'c) t -> ('k, 'v, 'c) t -> bool
 (** [equal it1 it2] checks if the two cursors [it1] and [it2] are equal. This
     function consumes both [it1] and [it2]. *)
 
