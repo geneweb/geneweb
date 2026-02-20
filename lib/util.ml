@@ -1474,18 +1474,6 @@ let is_full_html_template conf fname =
       close_in ic;
       result
 
-let body_prop conf =
-  (* NOTE: assumes http access to the server. https handled by proxy *)
-  (* TODO verify cgi mode *)
-  let server = Mutil.extract_param "Host: " '\n' conf.request in
-  let bname_pwd = (commd conf :> string) in
-  let http_str = Format.sprintf "http://%s/%s" server bname_pwd in
-  try
-    match List.assoc "body_prop" conf.base_env with
-    | "" -> ""
-    | s -> " " ^ Str.replace_first (Str.regexp "%S") http_str s
-  with Not_found -> ""
-
 let get_server_string conf =
   if not conf.cgi then Mutil.extract_param "host: " '\r' conf.request
   else
@@ -1776,6 +1764,13 @@ let string_with_macros conf env s =
     else Buffer.contents buff
   in
   loop Out 0
+
+let body_prop conf =
+  try
+    match List.assoc "body_prop" conf.base_env with
+    | "" -> ""
+    | s -> " " ^ string_with_macros conf [] s
+  with Not_found -> ""
 
 let place_of_string conf place =
   match List.assoc_opt "place" conf.base_env with
