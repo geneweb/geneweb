@@ -34,20 +34,21 @@
   <h2>[*user and language variables]</h2>
   <div>%nn;
     User[:] %user.ident;<br>
-    username[:] %user.name;<br>
-    userkey[:] %user.key;<br>
-    lang: %lang.full; (%lang;)<br>
-    lang fallback: %lang_fallback;<br>
-    default_lang: %default_lang;<br>
-    browser_lang: %browser_lang;<br>
+    Username[:] %user.name;<br>
+    Status[:] %if;wizard;Wizard%elseif;friend;Friend%else;Visitor%end;<br>
+    Userkey[:] %user.key;<br>
+    Lang: %lang.full; (%lang;)<br>
+    Lang fallback: %lang_fallback;<br>
+    Default_lang: %default_lang;<br>
+    Browser_lang: %browser_lang;<br>
   </div>
 </section>
 
 <section id="gwd-arguments" class="mt-3 mx-3">
 <h2>[*launch arguments of Gwd server]</h2>
  <div>%gwd.arglist;</div>
-  <p>
-  Mode: %if;(cgi)CGI%else;Server%end;<br>
+  <br>
+  Mode: <b>%if;cgi;CGI%else;Server%end;</b><br>
   prefix: %prefix;<br>
   etc_prefix: %etc_prefix;<br>
   images_prefix: %images_prefix;<br>
@@ -56,8 +57,9 @@
 <section id="bvar-list" class="mt-3 mx-3">
   <h2>[*configuration parameters]</h2>
   <div>
-     Mode: <b>%if;reorg;Reorg%else;Classic%end;</b>[:]%sp;
-    <tt>%if;reorg;%base.name;.gwb%/etc%/%base.name;%else;%base.name;%end;.gwf</tt><br>
+    <b>Gwf</b>[:] %if;reorg;%base.name;.gwb%/etc%/%base.name;.gwf (<b>Reorg</b>)
+    %else;%base.name;.gwf (<b>Classic</b>)%end;<br>
+    <br>
     %bvar.list;
   </div>
 </section>

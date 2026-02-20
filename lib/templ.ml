@@ -183,6 +183,16 @@ let rec eval_variable (conf : Config.config) = function
       in
       func conf.lang Version.available_languages 0
   | [ "bvar"; "list" ] ->
+      let wizard_only =
+        [
+          "friend_passwd";
+          "wizard_passwd";
+          "manitou";
+          "supervisor";
+          "friend_passwd_file";
+          "wizard_passwd_file";
+        ]
+      in
       let is_duplicate key assoc_list =
         let rec aux count = function
           | [] -> count > 1
@@ -191,7 +201,9 @@ let rec eval_variable (conf : Config.config) = function
         aux 0 assoc_list
       in
       let l =
-        List.sort (fun (k1, _v1) (k2, _v2) -> compare k1 k2) conf.base_env
+        if List.assoc "sort_bvar_entries" conf.base_env = "no" then
+          conf.base_env
+        else List.sort (fun (k1, _v1) (k2, _v2) -> compare k1 k2) conf.base_env
       in
       List.fold_left
         (fun acc (k, v) ->
@@ -200,8 +212,11 @@ let rec eval_variable (conf : Config.config) = function
           in
           acc
           ^ Format.sprintf "<b%s>%s</b>=%s<br>\n" duplicate k
-              (Util.escape_html v :> string))
-        "" conf.base_env
+              (if conf.wizard || not (List.mem k wizard_only) then
+                 (Util.escape_html v :> string)
+               else if (Util.escape_html v :> string) = "" then ""
+               else "####"))
+        "" l
   | [ "gwd"; "arglist" ] -> !GWPARAM.gwd_cmd
   | [ "bvar"; v ] | [ "b"; v ] -> (
       try List.assoc v conf.base_env with Not_found -> "")
