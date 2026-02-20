@@ -1680,6 +1680,8 @@ let expand_env =
 
 (* in srcfileDisplay, there is a macro function with many more macros! *)
 (* not necessarily easy to transpose in this context (base absent) *)
+(* Warning: env is not the classical environment! *)
+(* it is: (char * (unit -> string)) list (see Perso.get_note_or_source) *)
 let string_with_macros conf env s =
   let start_with s i p =
     i + String.length p <= String.length s
