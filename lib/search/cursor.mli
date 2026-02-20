@@ -1,5 +1,5 @@
 type ('k, 'v, 'c) t
-(** Type of an cursor. *)
+(** Type of a cursor. *)
 
 exception End
 (** Exception raised when attempting to access elements beyond the end of an
