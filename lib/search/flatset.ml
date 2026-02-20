@@ -3,13 +3,13 @@ module type S = sig
   type t
   type cmp
 
-  module Comparator : Iterator.Comparator with type t = elt and type wit = cmp
+  module Comparator : Cursor.Comparator with type t = elt and type wit = cmp
 
   val of_seq : elt Seq.t -> t
   val to_seq : t -> elt Seq.t
   val mem : elt -> t -> bool
   val cardinal : t -> int
-  val iterator : t -> (elt, unit, cmp) Iterator.t
+  val cursor : t -> (elt, unit, cmp) Cursor.t
 end
 
 module type OrderedType = sig
@@ -100,10 +100,10 @@ module Make (O : OrderedType) = struct
       in
       loop 1
 
-  let iterator t =
+  let cursor t =
     let idx = ref 0 in
     let curr () =
-      if !idx < cardinal t then (t.(!idx), ()) else raise Iterator.End
+      if !idx < cardinal t then (t.(!idx), ()) else raise Cursor.End
     in
     let next () = if !idx < cardinal t then incr idx in
     let seek e =
@@ -112,5 +112,5 @@ module Make (O : OrderedType) = struct
         assert (i >= cardinal t || O.compare t.(i) e >= 0);
         idx := i)
     in
-    Iterator.make (module Comparator) ~curr ~next ~seek
+    Cursor.make (module Comparator) ~curr ~next ~seek
 end

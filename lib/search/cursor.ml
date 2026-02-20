@@ -97,10 +97,10 @@ let join (type k v c) (module C : Comparator with type t = k and type wit = c)
        set for any type. *)
     invalid_arg "join";
   let ended = ref false in
-  (* Index of an iterator [it] in [arr] such that its current value
-     is the smallest among current values of iterators of [arr]. *)
+  (* Index of an cursors [it] in [arr] such that its current value
+     is the smallest among current values of cursorss of [arr]. *)
   let pos = ref 0 in
-  (* Helper function that advances the iterators of [arr] until
+  (* Helper function that advances the cursorss of [arr] until
      the next meeting point. *)
   let search () =
     let k = Array.length arr in
@@ -111,9 +111,9 @@ let join (type k v c) (module C : Comparator with type t = k and type wit = c)
         match arr.(!pos).curr () with
         | exception End -> ended := true
         | x', _ ->
-            (* As y < x and the iterator [arr.(!pos)] has not
+            (* As y < x and the cursors [arr.(!pos)] has not
                reached its end, the previous seek call must
-               advance this iterator. *)
+               advance this cursors. *)
             (* assert (C.compare y x' < 0); *)
             assert (C.compare y x' <= 0);
             pos := (!pos + 1) mod k;
