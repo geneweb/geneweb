@@ -8,6 +8,12 @@ exception End
 
 let[@inline] make _cmp ~curr ~next ~seek = { curr; next; seek }
 
+let empty =
+  let curr () = raise End in
+  let next () = () in
+  let seek _k = () in
+  { curr; next; seek }
+
 let equal (type k v c)
     (module C : Comparator.S with type t = k and type wit = c)
     (c1 : (k, v, c) t) (c2 : (k, v, c) t) =
@@ -80,8 +86,7 @@ let union (type k v c)
         arr.(i).next ();
         match arr.(i).curr () with
         | exception End -> ()
-        | k, _ ->
-            H.insert hp (k, i))
+        | k, _ -> H.insert hp (k, i))
   in
   let curr () =
     match H.min hp with
@@ -153,6 +158,14 @@ let join (type k v c) (module C : Comparator.S with type t = k and type wit = c)
   in
   let curr () = if !ended then raise End else arr.(0).curr () in
   { curr; next; seek }
+
+let map f c =
+  (* FIXME: Memoize `f k v`. *)
+  let curr () =
+    let k, v = c.curr () in
+    (k, f k v)
+  in
+  { curr; next = c.next; seek = c.seek }
 
 let to_seq c =
   let rec loop () =
