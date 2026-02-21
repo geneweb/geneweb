@@ -12,6 +12,8 @@ val make :
   seek:('k -> unit) ->
   ('k, 'v, 'c) t
 
+val empty : ('k, 'v, 'c) t
+
 val curr : ('k, 'v, 'c) t -> 'k * 'v
 (** [curr c] returns the element currently pointed by the cursor [c].
     @raise End if the cursor [c] has reached the end of the collection. *)
@@ -38,6 +40,8 @@ val join : ('k, 'c) Comparator.t -> ('k, 'v, 'c) t list -> ('k, 'v, 'c) t
     produces elements of the intersection of [l] in ascending order.
 
     @raise Invalid_argument if the list [l] is empty. *)
+
+val map : ('k -> 'v -> 'w) -> ('k, 'v, 'c) t -> ('k, 'w, 'c) t
 
 val equal : ('k, 'c) Comparator.t -> ('k, 'v, 'c) t -> ('k, 'v, 'c) t -> bool
 (** [equal c1 c2] checks if the two cursors [c1] and [c2] are equal. This

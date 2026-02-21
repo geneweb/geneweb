@@ -3,12 +3,17 @@ module type S = sig
   type char_
   type word
   type entry
+  type elt
+  type cmp
 
+  val cmp : (elt, cmp) Comparator.t
   val of_seq : (word * entry) Seq.t -> t
   val mem : word -> t -> bool
-  val search : word list -> t -> entry Seq.t
-  val search_prefix : word list -> t -> entry Seq.t
-  val fuzzy_search : max_dist:int -> word list -> t -> entry Seq.t
+  val search : word list -> t -> (elt, entry, cmp) Cursor.t
+  val search_prefix : word list -> t -> (elt, entry, cmp) Cursor.t
+
+  val fuzzy_search :
+    max_dist:int -> word list -> t -> (elt, entry, cmp) Cursor.t
 end
 
 module type Entry = sig
@@ -21,10 +26,6 @@ module type Entry = sig
 end
 
 module Make (W : Word.S) (E : Entry) = struct
-  type char_ = W.char_
-  type word = W.t
-  type entry = E.t
-
   module Trie = Trie.Make (W)
 
   (* Hash consed entries *)
@@ -57,6 +58,13 @@ module Make (W : Word.S) (E : Entry) = struct
   module Flatset = Flatset.Make (HE)
 
   type t = Flatset.t Trie.t
+  type char_ = W.char_
+  type word = W.t
+  type entry = E.t
+  type elt = HE.t
+  type cmp = Flatset.cmp
+
+  let cmp = Flatset.cmp
 
   let of_seq =
     let module SE = Set.Make (HE) in
@@ -85,10 +93,9 @@ module Make (W : Word.S) (E : Entry) = struct
 
   let intersection l =
     match l with
-    | [] -> Seq.empty
+    | [] -> Cursor.empty
     | _ :: _ ->
-        Seq.map (fun (k, ()) -> HE.to_entry k)
-        @@ Cursor.to_seq @@ Cursor.join Flatset.cmp l
+        Cursor.map (fun k () -> HE.to_entry k) @@ Cursor.join Flatset.cmp l
 
   let ( let* ) = Option.bind
 
