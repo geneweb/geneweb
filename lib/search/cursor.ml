@@ -17,7 +17,7 @@ let equal (type k v c)
     match (o1, o2) with
     | Some (k1, v1), Some (k2, v2) ->
         (* FIXME: remove the polymorphic comparison. *)
-        if C.compare k1 k2 <> 0 && v1 = v2 then false
+        if C.compare k1 k2 <> 0 || v1 != v2 then false
         else (
           c1.next ();
           c2.next ();
@@ -59,14 +59,29 @@ let union (type k v c)
     in
     loop ()
   in
+  let rec skip k =
+    match H.min hp with
+    | k', _ when C.compare k k' = 0 ->
+        let _, i = H.delete_min hp in
+        arr.(i).next ();
+        let () =
+          match arr.(i).curr () with
+          | exception End -> ()
+          | k, _ -> H.insert hp (k, i)
+        in
+        skip k
+    | (exception H.Empty) | _ -> ()
+  in
   let next () =
     match H.delete_min hp with
     | exception H.Empty -> ()
-    | _, i -> (
+    | k', i -> (
+        skip k';
         arr.(i).next ();
         match arr.(i).curr () with
         | exception End -> ()
-        | k, _ -> H.insert hp (k, i))
+        | k, _ ->
+            H.insert hp (k, i))
   in
   let curr () =
     match H.min hp with
@@ -143,12 +158,9 @@ let to_seq c =
   let rec loop () =
     match c.curr () with
     | exception End -> Seq.Nil
-    | v -> (
+    | v ->
         c.next ();
-        (* XXX: hot fix *)
-        match c.curr () with
-        | exception End -> Seq.Cons (v, loop)
-        | w -> if v = w then loop () else Seq.Cons (v, loop))
+        Seq.Cons (v, loop)
   in
   loop
 

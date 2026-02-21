@@ -2,6 +2,7 @@ module A = Alcotest
 module Compat = Geneweb_compat
 module Trie = Geneweb_search.Trie.Default
 module Cursor = Geneweb_search.Cursor
+module Comparator = Geneweb_search.Comparator
 module Seq = Geneweb_compat.Seq
 
 (* Compute the Levenshtein distance of [s1] and [s2]. *)
@@ -24,6 +25,58 @@ let distance s1 s2 =
     Array.blit dp 0 prev 0 (l2 + 1)
   done;
   prev.(l2) *)
+
+module Cursor_tests = struct
+  type wit
+
+  let cmp =
+    (module struct
+      type nonrec wit = wit
+      type t = int
+
+      let compare = Int.compare
+      let dummy = 0
+    end : Comparator.S
+      with type t = int
+       and type wit = wit)
+
+  let cursor_of_list l =
+    let l = ref l in
+    let curr () = match !l with [] -> raise Cursor.End | x :: _ -> (x, ()) in
+    let next () = match !l with [] -> () | _ :: xs -> l := xs in
+    let seek _ = assert false in
+    Cursor.make cmp ~curr ~next ~seek
+
+  let test_union_1 () =
+    let c1 = cursor_of_list [ 1; 3; 5; 10 ] in
+    let c2 = cursor_of_list [ 2; 6; 11 ] in
+    let expected = cursor_of_list [ 1; 2; 3; 5; 6; 10; 11 ] in
+    let result = Cursor.union cmp [ c1; c2 ] in
+    A.(check bool) "foo" true (Cursor.equal cmp result expected)
+
+  let test_union_2 () =
+    let c1 = cursor_of_list [ 2; 4; 5; 7 ] in
+    let c2 = cursor_of_list [ 3; 4; 6; 11 ] in
+    let expected = cursor_of_list [ 2; 3; 4; 5; 6; 7; 11 ] in
+    let result = Cursor.union cmp [ c1; c2 ] in
+    A.(check bool) "foo" true (Cursor.equal cmp result expected)
+
+  let test_union_3 () =
+    let c1 = cursor_of_list [ 1 ] in
+    let c2 = cursor_of_list [ 1; 4; 6; 11 ] in
+    let expected = cursor_of_list [ 1; 4; 6; 11 ] in
+    let result = Cursor.union cmp [ c1; c2 ] in
+    A.(check bool) "foo" true (Cursor.equal cmp result expected)
+
+  let all =
+    let quick_test s tst = A.test_case s `Quick tst in
+    ( "Cursor tests",
+      [
+        quick_test "union 1" test_union_1;
+        quick_test "union 2" test_union_2;
+        quick_test "union 3" test_union_3;
+      ] )
+end
 
 module Trie_tests = struct
   let test_cardinal _trie _a () =
@@ -282,7 +335,7 @@ module Flatset_tests = struct
   let all =
     let quick_test s tst = A.test_case s `Quick tst in
     let qcheck_test tst = QCheck_alcotest.to_alcotest tst in
-    ( "flatset tests",
+    ( "Flatset tests",
       [
         quick_test "empty" test_empty;
         quick_test "seek advance" test_seek_advance;
@@ -300,5 +353,6 @@ let () =
   match Array.to_list Sys.argv with
   | x :: path :: xs ->
       let argv = Array.of_list (x :: xs) in
-      A.run ~argv __FILE__ [ Trie_tests.generate path; Flatset_tests.all ]
+      A.run ~argv __FILE__
+        [ Cursor_tests.all; Trie_tests.generate path; Flatset_tests.all ]
   | _ -> failwith "expected a dictionary file in txt format as first argument"

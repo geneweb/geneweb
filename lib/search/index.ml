@@ -88,8 +88,7 @@ module Make (W : Word.S) (E : Entry) = struct
     | [] -> Seq.empty
     | _ :: _ ->
         Seq.map (fun (k, ()) -> HE.to_entry k)
-        @@ Cursor.to_seq
-        @@ Cursor.join Flatset.cmp l
+        @@ Cursor.to_seq @@ Cursor.join Flatset.cmp l
 
   let ( let* ) = Option.bind
 
