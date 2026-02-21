@@ -5,17 +5,17 @@ fam Galichet Jean_Pierre #occu Marchand_de_bois #src déjà_décédés_au_mariag
 src déjà_décédés_au_mariage_de_sa_fille_Thérèse_Eugénie
 csrc rajout_de_2_enfants_pour_test
 fevt
-#marr 
+#marr
 note Rajout de notes avec retour à la ligne avec des tag html
 note <br>1880 - Habitent Yzernay naissance d'une fille
 note <br>1886 - Habitent la Verdelière (6 enfants) - Recensement Moulins: - Vue 23
 note <br>1891 - N'habitent plus Moulins, recensés au Temple (79) * Vue 7
 end fevt
 beg
-- h Jean_Charles #occu Négociant #src témoin_au_mariage_de_sa_soeur_Thérèse_Eugénie 1813 #bs 1849-36ans od
-- h Pierre 1814 1/1/1835
-- h Paul 1816 1/1/1886
-- h lolo #src inventé 1818 od
+- m Jean_Charles #occu Négociant #src témoin_au_mariage_de_sa_soeur_Thérèse_Eugénie 1813 #bs 1849-36ans od
+- m Pierre 1814 1/1/1835
+- m Paul 1816 1/1/1886
+- m lolo #src inventé 1818 od
 - f Thérèse_Eugénie #src inscription_des_hypothèques_du_23_février_1874_au_profit_de_dame_thérèse_eugènie_Galichet;_voir_ses_ascendants_dans_la_base_<a_href="https://gw.geneanet.org/mout?lang=fr&p=therese+eugenie&n=galichet">mout</a> 7/9/1830 #bp _[Châlons-sur-Marne]_-_Châlons-en-Champagne,51,Marne,Champagne-Ardenne,France #bs acte_de_mariage od
 end
 
@@ -77,7 +77,7 @@ end notes
 
 pevt Galichet Jean_Charles
 #birt 1813 #s 1849-36ans
-#deat 
+#deat
 end pevt
 
 pevt Galichet Pierre
@@ -92,12 +92,12 @@ end pevt
 
 pevt Galichet lolo
 #birt 1818
-#deat 
+#deat
 end pevt
 
 pevt Galichet Thérèse_Eugénie
 #birt 7/9/1830 #p _[Châlons-sur-Marne]_-_Châlons-en-Champagne,51,Marne,Champagne-Ardenne,France #s acte_de_mariage
-#deat 
+#deat
 end pevt
 
 pevt Loche Marie_Elisabeth
@@ -115,7 +115,7 @@ fevt
 #marr 3/3/1835
 end fevt
 beg
-- h Jean-Paul 2/2/1836 od
+- m Jean-Paul 2/2/1836 od
 - f Laure 1839 od
 end
 
@@ -155,7 +155,7 @@ fevt
 #marr 1570 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end fevt
 beg
-- h Louis 1575 0
+- m Louis 1575 0
 end
 
 notes Galichet Nicole
@@ -165,12 +165,12 @@ end notes
 
 pevt Sutaine Louis
 #birt 1575
-#deat 
+#deat
 end pevt
 
 fam Sutaine Louis + #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Petizon Claude 0
 fevt
-#marr  #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+#marr #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end fevt
 beg
 - f Perrette 1600 11/4/1684 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -183,7 +183,7 @@ end pevt
 
 fam Jayot Jean 1604 8/11/1674 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Sutaine Perrette
 fevt
-#marr 
+#marr
 end fevt
 beg
 - f Claude 27/6/1633 11/4/1697 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -201,11 +201,11 @@ end pevt
 
 fam Boizot Jean #occu Menuisier 1618 22/3/1702 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Jayot Claude
 fevt
-#marr 
+#marr
 end fevt
 beg
 - f Jeanne 27/2/1671 #bp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France 22/4/1748 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
-- h Forceindex1234.1234 1672 1674
+- m Forceindex1234.1234 1672 1674
 end
 
 notes Boizot Forceindex1234.1234
@@ -242,10 +242,10 @@ end pevt
 
 fam Geruzet Anthoine.1 #occu Menuisier_à_Paris_(Paroisse_St_Roch) 1640 17/1/1709 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France + Bouquet Louise 0
 fevt
-#marr 
+#marr
 end fevt
 beg
-- h Anthoine #occu Maître_Menuisier_reçu_le_25.01.1695_à_Reims 1667 #bp _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France 16/2/1755 #dp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
+- m Anthoine #occu Maître_Menuisier_reçu_le_25.01.1695_à_Reims 1667 #bp _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France 16/2/1755 #dp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
 end
 
 notes Geruzet Anthoine
@@ -278,7 +278,7 @@ fevt
 #marr 17/1/1695 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end fevt
 beg
-- h Jacques #occu Marchand 4/2/1705 #bp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France 10/3/1774 #dp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
+- m Jacques #occu Marchand 4/2/1705 #bp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France 10/3/1774 #dp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
 end
 
 pevt Geruzet Jacques
@@ -291,7 +291,7 @@ fevt
 #marr 2/8/1728 #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
 end fevt
 beg
-- h Laurent #occu Marchand_Drapier,_Changeur_du_Roy 25/9/1738 #bp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France 1812 #dp Laon,02,Aisne,Picardie,France
+- m Laurent #occu Marchand_Drapier,_Changeur_du_Roy 25/9/1738 #bp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France 1812 #dp Laon,02,Aisne,Picardie,France
 - f Marie-Jeanne 31/12/1751 #pp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France 8/1/1830 #dp Soissons,02,Aisne,Picardie,France
 end
 
@@ -309,7 +309,7 @@ end pevt
 
 pevt Geruzet Marie-Jeanne
 #birt 31/12/1751
-#bapt  #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
+#bapt #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
 #deat 8/1/1830 #p Soissons,02,Aisne,Picardie,France
 end pevt
 
@@ -318,7 +318,7 @@ fevt
 #marr 28/12/1763 #p _[Eglise_St_Rémi]_-_Laon,02,Aisne,Picardie,France
 end fevt
 beg
-- h Jean-Baptiste {Jean-Baptiste_Laurent} #occu Officier_d'infanterie,_marchand_teinturier 23/9/1768 #bp Laon,02,Aisne,Picardie,France 20/5/1846 #dp Laon,02,Aisne,Picardie,France
+- m Jean-Baptiste {Jean-Baptiste_Laurent} #occu Officier_d'infanterie,_marchand_teinturier 23/9/1768 #bp Laon,02,Aisne,Picardie,France 20/5/1846 #dp Laon,02,Aisne,Picardie,France
 end
 fam Geruzet Laurent +25/3/1786 #mp Reims,51,Marne,Champagne-Ardenne,France #ms base_michelbonnet Laramee Charlotte #src base_michelbonnet 1766 14/6/1789
 fevt
