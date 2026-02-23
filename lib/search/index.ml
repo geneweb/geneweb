@@ -3,12 +3,17 @@ module type S = sig
   type char_
   type word
   type entry
+  type elt
+  type cmp
 
+  val cmp : (elt, cmp) Comparator.t
   val of_seq : (word * entry) Seq.t -> t
   val mem : word -> t -> bool
-  val search : word list -> t -> entry Seq.t
-  val search_prefix : word list -> t -> entry Seq.t
-  val fuzzy_search : max_dist:int -> word list -> t -> entry Seq.t
+  val search : word list -> t -> (elt, entry, cmp) Cursor.t
+  val search_prefix : word list -> t -> (elt, entry, cmp) Cursor.t
+
+  val fuzzy_search :
+    max_dist:int -> word list -> t -> (elt, entry, cmp) Cursor.t
 end
 
 module type Entry = sig
@@ -21,10 +26,6 @@ module type Entry = sig
 end
 
 module Make (W : Word.S) (E : Entry) = struct
-  type char_ = W.char_
-  type word = W.t
-  type entry = E.t
-
   module Trie = Trie.Make (W)
 
   (* Hash consed entries *)
@@ -57,6 +58,13 @@ module Make (W : Word.S) (E : Entry) = struct
   module Flatset = Flatset.Make (HE)
 
   type t = Flatset.t Trie.t
+  type char_ = W.char_
+  type word = W.t
+  type entry = E.t
+  type elt = HE.t
+  type cmp = Flatset.cmp
+
+  let cmp = Flatset.cmp
 
   let of_seq =
     let module SE = Set.Make (HE) in
@@ -85,10 +93,9 @@ module Make (W : Word.S) (E : Entry) = struct
 
   let intersection l =
     match l with
-    | [] -> Seq.empty
+    | [] -> Cursor.empty
     | _ :: _ ->
-        Seq.map HE.to_entry @@ Iterator.to_seq
-        @@ Iterator.join (module Flatset.Comparator) l
+        Cursor.map (fun k () -> HE.to_entry k) @@ Cursor.join Flatset.cmp l
 
   let ( let* ) = Option.bind
 
@@ -108,7 +115,7 @@ module Make (W : Word.S) (E : Entry) = struct
       fun i t ->
         if i = len then
           let* s = Trie.data t in
-          Some (Flatset.iterator s)
+          Some (Flatset.cursor s)
         else
           match Trie.step (W.get w i) t with
           | exception Not_found -> None
@@ -128,7 +135,7 @@ module Make (W : Word.S) (E : Entry) = struct
       let len = W.length pfx in
       fun i t ->
         if i = len then
-          Trie.fold (fun _ se acc -> Flatset.iterator se :: acc) t acc
+          Trie.fold (fun _ se acc -> Flatset.cursor se :: acc) t acc
         else
           match Trie.step (W.get pfx i) t with
           | exception Not_found -> acc
@@ -138,7 +145,7 @@ module Make (W : Word.S) (E : Entry) = struct
       (fun acc pfx ->
         match loop [] pfx 0 t with
         | [] -> None
-        | l -> Some (Iterator.union (module Flatset.Comparator) l :: acc))
+        | l -> Some (Cursor.union Flatset.cmp l :: acc))
       [] ps
     |> Option.value ~default:[] |> intersection
 
@@ -172,7 +179,7 @@ module Make (W : Word.S) (E : Entry) = struct
       (* Accumulate in [acc] all the iterators of flatsets in [t] whose the
          key matches the pattern represented by the automaton A. *)
       if A.accept st then
-        Trie.fold (fun _ se acc -> Flatset.iterator se :: acc) t acc
+        Trie.fold (fun _ se acc -> Flatset.cursor se :: acc) t acc
       else if A.can_match st then
         Trie.fold_subtries
           (fun c t acc -> loop acc (A ((module A), A.next c st)) t)
@@ -183,7 +190,7 @@ module Make (W : Word.S) (E : Entry) = struct
       (fun acc atm ->
         match loop [] atm t with
         | [] -> None
-        | l -> Some (Iterator.union (module Flatset.Comparator) l :: acc))
+        | l -> Some (Cursor.union Flatset.cmp l :: acc))
       [] atms
     |> Option.value ~default:[] |> intersection
 end

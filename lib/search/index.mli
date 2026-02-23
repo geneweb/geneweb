@@ -6,6 +6,10 @@ module type S = sig
   type char_
   type word
   type entry
+  type elt
+  type cmp
+
+  val cmp : (elt, cmp) Comparator.t
 
   val of_seq : (word * entry) Seq.t -> t
   (** [of_seq s] creates a new inverted index from the sequence [s]. The
@@ -14,15 +18,16 @@ module type S = sig
   val mem : word -> t -> bool
   (** [mem w t] checks if the word [w] is in the index [t]. *)
 
-  val search : word list -> t -> entry Seq.t
+  val search : word list -> t -> (elt, entry, cmp) Cursor.t
   (** [search ws t] returns the sequence of entries in the index [t] which are
       associated with all the exact words [ws]. *)
 
-  val search_prefix : word list -> t -> entry Seq.t
+  val search_prefix : word list -> t -> (elt, entry, cmp) Cursor.t
   (** [search_prefix ps t] returns the sequence of entries in the index [t]
       which are associated with all the prefix [ps]. *)
 
-  val fuzzy_search : max_dist:int -> word list -> t -> entry Seq.t
+  val fuzzy_search :
+    max_dist:int -> word list -> t -> (elt, entry, cmp) Cursor.t
   (** [fuzzy_search ~max_dist ps t] returns the sequence of entries in the index
       [t] which are associated with all the words matching each pattern of [ps]
       with a Levenstein distance limited to [max_dist]. *)

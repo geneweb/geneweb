@@ -8,8 +8,9 @@ module type S = sig
   (** Type of elements of the collection. *)
 
   type cmp
+  (** Witness of the comparator. *)
 
-  module Comparator : Iterator.Comparator with type t = elt and type wit = cmp
+  val cmp : (elt, cmp) Comparator.t
 
   type t
   (** Type of flat set. *)
@@ -28,7 +29,7 @@ module type S = sig
   val cardinal : t -> int
   (** [cardinal t] returns the cardinal of the set. *)
 
-  val iterator : t -> (elt, cmp) Iterator.t
+  val cursor : t -> (elt, unit, cmp) Cursor.t
   (** [iterator s] returns a iterator starting at the first element of [s]. *)
 end
 

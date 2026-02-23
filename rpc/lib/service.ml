@@ -72,6 +72,7 @@ end
 
 module Index = Geneweb_search.Index.Default
 module Analyze = Geneweb_search.Analyze
+module Cursor = Geneweb_search.Cursor
 
 module Search = struct
   let lookup ~fuel idx =
@@ -99,9 +100,9 @@ module Search = struct
               (* TODO: There is no guarantee that bounding the size of forced
                  elements in the sequence will limit the running time. We
                  should find a solution to limit the running time itself. *)
-              List.of_seq @@ Compat.Seq.take size @@ Compat.Seq.concat
-              (* BUG: We can introduce duplicate in the output here. *)
-              @@ List.to_seq
+              List.of_seq @@ Compat.Seq.take size @@ Seq.map snd
+              @@ Cursor.to_seq
+              @@ Cursor.union Index.cmp
                    [
                      Index.search words i;
                      Index.search_prefix words i;
