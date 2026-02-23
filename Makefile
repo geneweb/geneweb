@@ -102,8 +102,8 @@ else
 endif
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
-	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
-	echo "-bd" >> $(DISTRIB_DIR)/gw/gwd.arg
+	echo "--setup-link" > $(DISTRIB_DIR)/gw/gwd.arg
+	echo "--bd" >> $(DISTRIB_DIR)/gw/gwd.arg
 	echo "./bases" >> $(DISTRIB_DIR)/gw/gwd.arg
 	@printf "\n\033[1;1m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT)
