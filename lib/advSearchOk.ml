@@ -146,6 +146,7 @@ module AdvancedSearchMatch : sig
     occupation:string ->
     first_name_list:string list list ->
     surname_list:string list list ->
+    alias_public_name_qualifiers:string list list ->
     skip_fname:bool ->
     skip_sname:bool ->
     exact_first_name:[ `Exact | `Not_Exact | `Not_Exact_Prefix ] ->
@@ -375,6 +376,9 @@ end = struct
         match kind with
         | `First_name -> Gwdb.get_first_names_aliases
         | `Surname -> Gwdb.get_surnames_aliases
+        | `Alias -> Gwdb.get_aliases
+        | `Public_name -> fun p -> [ Gwdb.get_public_name p ]
+        | `Qualifiers -> Gwdb.get_qualifiers
       in
       List.map (fun alias _ -> alias) (get p)
     in
@@ -390,9 +394,19 @@ end = struct
   let match_surname_alias ~base ~surname_list ~mode p =
     match_alias ~base ~alias_list:surname_list ~mode ~kind:`Surname p
 
+  let match_alias_public_name_qualifiers ~base ~alias_public_name_qualifiers p =
+    alias_public_name_qualifiers = []
+    || match_alias ~base ~alias_list:alias_public_name_qualifiers ~mode:`Exact
+         ~kind:`Alias p
+    || match_alias ~base ~alias_list:alias_public_name_qualifiers ~mode:`Exact
+         ~kind:`Public_name p
+    || match_alias ~base ~alias_list:alias_public_name_qualifiers ~mode:`Exact
+         ~kind:`Qualifiers p
+
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
-      ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname =
+      ~surname_list ~alias_public_name_qualifiers ~skip_fname ~skip_sname
+      ~exact_first_name ~exact_surname =
     match_sex ~p ~sex
     && (skip_fname
        || match_first_name ~base ~first_name_list ~mode:exact_first_name p
@@ -401,6 +415,7 @@ end = struct
     && (skip_sname
        || match_surname ~base ~surname_list ~mode:exact_surname p
        || match_surname_alias ~base ~surname_list ~mode:exact_surname p)
+    && match_alias_public_name_qualifiers ~base ~alias_public_name_qualifiers p
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
 
@@ -579,6 +594,13 @@ let advanced_search conf base max_answers =
   let sn_list =
     List.map (fun s -> List.map Name.lower @@ Name.split s) (getss "surname")
   in
+
+  let alias_public_name_qualifiers =
+    List.map
+      (fun s -> List.map Name.lower @@ Name.split s)
+      (getss "alias_pubname_qualifiers")
+  in
+
   let search_type = get_search_type gets in
 
   let place_searched place_field =
@@ -602,6 +624,7 @@ let advanced_search conf base max_answers =
            ~sex:(gets "sex" |> sex_of_string)
            ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
            ~skip_sname ~first_name_list:fn_list ~surname_list:sn_list
+           ~alias_public_name_qualifiers
            ~exact_first_name:(get_name_search_mode "exact_first_name")
            ~exact_surname:(get_name_search_mode "exact_surname"))
     in
@@ -1046,6 +1069,9 @@ let exact_matching_surname_aliases ~surname =
 
 let prefix_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:is_subset_pfx
+
+let matching_alias_public_name_qualifiers ~string =
+  filter_alias ~name:string ~matching:Ext_list.elements_cmp
 
 let force_exact_search_by_name conf =
   let is_exact_search_by_name_mode_key key =
