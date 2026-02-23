@@ -351,19 +351,17 @@
        <img src="%blason_url;"%blason_small_size; class="%if;(op_m=3) mx-1%end; mx-2" alt="[blason/blasons]0">%nn;
       %if;not cancel_links;</a>%end;
     %end;
-    %if;has_public_name;
-      %if;has_qualifiers;%public_name; <em>%qualifier;</em>
-      %else;%public_name; %surname;%end;
-    %else;
-      %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+    %let;qualifier_;%if;has_qualifiers;<em>%qualifier;</em>%end;%in;
+    %let;public_or_first_name;
+      %if;has_public_name;%public_name;
       %else;
-        %if;cancel_links;%first_name; %surname;
-        %else;
-          <a href="%prefix;m=P&v=%first_name_key;#i%index;">%first_name;</a>
-          <a href="%prefix;m=N&v=%surname_key;#i%index;">%surname;</a>%nn;
-        %end;
+        %if;not cancel_links;<a href="%prefix;m=P&v=%first_name_key;#i%index;">%end;%first_name;%nn;
+        %if;not cancel_links;</a>%end;
       %end;
-    %end;
+    %in;
+    %public_or_first_name; %qualifier_;%sp;
+    %if;not cancel_links;<a href="%prefix;m=N&v=%surname_key;#i%index;">%end;%surname;%nn;
+    %if;not cancel_links;</a>%end;
     <span class="font-weight-light small">%dates;</span>
   </h1>
   </div> %( closing div just before h1 %)
