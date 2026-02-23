@@ -1,6 +1,4 @@
 (library
  (public_name geneweb.search)
  (name geneweb_search)
- (libraries fmt)
- (flags
-  (:standard -w -44-68)))
+ (libraries fmt))
