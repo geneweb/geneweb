@@ -523,10 +523,118 @@ let update_modification_times ~base ~(kind : [< `First_name | `Surname ])
         List.iter Files.set_modification_time_to_now
           (List.map (Filename.concat base.data.bdir) first_name_index_files)
 
+module Integrity : sig
+  val check_index_integrity :
+    kind:[< `Surname | `First_name ] ->
+    base:Dbdisk.dsk_base ->
+    index_file:string ->
+    bool
+
+  val write_index_integrity :
+    kind:[< `Surname | `First_name | `All ] -> base:Dbdisk.dsk_base -> unit
+
+  val has_index_integrity_file : Dbdisk.dsk_base -> bool
+end = struct
+  let index_integrity_fname = "index_integrity"
+  let current_integrity_code = "20260219"
+
+  type integrity = { firstname : string option; surname : string option }
+
+  let read_index_integrity base : integrity =
+    let integrity_file =
+      Filename.concat base.Dbdisk.data.bdir index_integrity_fname
+    in
+    if not (Sys.file_exists integrity_file) then
+      { firstname = None; surname = None }
+    else
+      let ic = Secure.open_in integrity_file in
+      let firstname = match input_line ic with "" -> None | s -> Some s in
+      let surname = match input_line ic with "" -> None | s -> Some s in
+      let integrity = { firstname; surname } in
+      close_in ic;
+      integrity
+
+  let integrity_matches kind integrity =
+    match kind with
+    | `Surname -> integrity.surname = Some current_integrity_code
+    | `First_name -> integrity.firstname = Some current_integrity_code
+
+  let string_of_integrity integrity =
+    Printf.sprintf "%s\n%s\n"
+      (Option.value ~default:"" integrity.firstname)
+      (Option.value ~default:"" integrity.surname)
+
+  let write_index_integrity ~kind ~base =
+    let integrity_file =
+      Filename.concat base.Dbdisk.data.bdir index_integrity_fname
+    in
+    let integrity_code = read_index_integrity base in
+    let new_integrity_code =
+      match kind with
+      | `Surname ->
+          { integrity_code with surname = Some current_integrity_code }
+      | `First_name ->
+          { integrity_code with firstname = Some current_integrity_code }
+      | `All ->
+          {
+            surname = Some current_integrity_code;
+            firstname = Some current_integrity_code;
+          }
+    in
+    let oc =
+      Secure.open_out_gen
+        [ Open_wronly; Open_trunc; Open_creat; Open_text; Open_nonblock ]
+        0o644 integrity_file
+    in
+    output_string oc (string_of_integrity new_integrity_code);
+    close_out oc
+
+  exception IndexErrorFound
+
+  let check_index_integrity ~kind ~base ~index_file =
+    let check () =
+      let is_in_bound k =
+        (k >= 0 && k < base.Dbdisk.data.strings.len) || raise IndexErrorFound
+      in
+      let is_well_ordered last_string nstring =
+        String.compare last_string nstring < 0 || raise IndexErrorFound
+      in
+      let ic = Secure.open_in (Filename.concat base.data.bdir index_file) in
+      let bt = (input_value ic : (int * int) array) in
+      let is_ok =
+        try
+          ignore
+          @@ Array.fold_left
+               (fun last_str (k, _offset) ->
+                 if is_in_bound k then (
+                   let str = base.data.strings.get k in
+                   ignore @@ is_well_ordered last_str str;
+                   str)
+                 else assert false)
+               "" bt;
+          true
+        with IndexErrorFound -> false
+      in
+      close_in ic;
+      is_ok
+    in
+    let index_integrity = read_index_integrity base in
+    integrity_matches kind index_integrity || check ()
+
+  let has_index_integrity_file base =
+    Sys.file_exists
+      (Filename.concat base.Dbdisk.data.bdir index_integrity_fname)
+end
+
 let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
     ~kind base =
-  Lock.control ~onerror:on_lock_error (Files.lock_file base.Dbdisk.data.bdir)
-    true (fun () ->
+  Lock.control
+    ~onerror:(fun () ->
+      on_lock_error ();
+      base)
+    (Files.lock_file base.Dbdisk.data.bdir)
+    true
+    (fun () ->
       let first_name_index_files =
         [
           Database.lowercase_first_name_data_file;
@@ -541,9 +649,13 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
       in
       let surname_already_initialized =
         are_already_initialized base surname_index_files
+        && Integrity.check_index_integrity ~kind ~base
+             ~index_file:Database.lowercase_surname_index_file
       in
       let first_name_already_initialized =
         are_already_initialized base first_name_index_files
+        && Integrity.check_index_integrity ~kind ~base
+             ~index_file:Database.lowercase_first_name_index_file
       in
       let generate_index, already_initialized =
         match kind with
@@ -553,6 +665,8 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
             (generate_lowercase_surname_index, surname_already_initialized)
       in
       if not already_initialized then (
+        base.Dbdisk.func.cleanup ();
+        let base = Database.opendb base.Dbdisk.data.bdir in
         let pending_index_generation =
           generate_index ~strings_data:(StringData.of_base base) base
         in
@@ -566,7 +680,13 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
         pending_index_generation.commit ();
         update_modification_times ~base ~kind ~surname_already_initialized
           ~first_name_already_initialized ~first_name_index_files
-          ~surname_index_files))
+          ~surname_index_files;
+        Integrity.write_index_integrity ~kind ~base;
+        base)
+      else (
+        if not (Integrity.has_index_integrity_file base) then
+          Integrity.write_index_integrity ~kind ~base;
+        base))
 
 let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
@@ -688,6 +808,7 @@ let output ?(save_mem = false) ?(tasks = []) base =
 
   pending_lowercase_surname_index_generation.commit ();
   pending_lowercase_first_name_index_generation.commit ();
+  Integrity.write_index_integrity ~kind:`All ~base;
 
   Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");

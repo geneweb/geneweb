@@ -706,4 +706,4 @@ val initialize_lowercase_name_index :
   ?on_lock_error:(unit -> unit) ->
   kind:[< `First_name | `Surname ] ->
   base ->
-  unit
+  base
