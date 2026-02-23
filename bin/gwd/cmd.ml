@@ -240,9 +240,7 @@ let friend_password =
 
 let digest_password =
   let doc = "Use digest authorization scheme for passwords." in
-  C.Arg.(
-    value & flag
-    & info [ "digest-password" ] ~docs:security_section ~doc)
+  C.Arg.(value & flag & info [ "digest-password" ] ~docs:security_section ~doc)
 
 let allowed_tags_file =
   let doc = "File of allowed HTML tags. One tag par line in the file." in
@@ -259,9 +257,7 @@ let allowed_addresses =
 
 let no_reverse_host =
   let doc = "Force no reverse host by address." in
-  C.Arg.(
-    value & flag
-    & info [ "no-reverse-host" ] ~docs:security_section ~doc)
+  C.Arg.(value & flag & info [ "no-reverse-host" ] ~docs:security_section ~doc)
 
 let ban_threshold =
   let doc = "Ban robots opening more than $(docv) connections per seconds." in
@@ -287,7 +283,7 @@ let interface =
   let doc = "Select a specific interface" in
   C.Arg.(
     value
-    & opt (some string) None 
+    & opt (some string) None
     & info [ "i"; "interface" ] ~docs:http_section ~docv:"INTERFACE" ~doc)
 
 let redirect_interface =

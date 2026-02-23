@@ -936,15 +936,15 @@ let parse_digest s =
 let basic_authorization from_addr request base_env passwd access_type utm
     base_file command =
   let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with Not_found -> 
-      Option.value ~default:"" !wizard_passwd
+    try List.assoc "wizard_passwd" base_env
+    with Not_found -> Option.value ~default:"" !wizard_passwd
   in
   let wizard_passwd_file =
     try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
   in
   let friend_passwd =
-    try List.assoc "friend_passwd" base_env with Not_found -> 
-      Option.value ~default:"" !friend_passwd
+    try List.assoc "friend_passwd" base_env
+    with Not_found -> Option.value ~default:"" !friend_passwd
   in
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
@@ -1136,15 +1136,15 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
 
 let digest_authorization request base_env passwd utm base_file command =
   let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with Not_found -> 
-      Option.value ~default:"" !wizard_passwd
+    try List.assoc "wizard_passwd" base_env
+    with Not_found -> Option.value ~default:"" !wizard_passwd
   in
   let wizard_passwd_file =
     try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
   in
   let friend_passwd =
-    try List.assoc "friend_passwd" base_env with Not_found -> 
-      Option.value ~default:"" !friend_passwd
+    try List.assoc "friend_passwd" base_env
+    with Not_found -> Option.value ~default:"" !friend_passwd
   in
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
@@ -2658,9 +2658,7 @@ let parse_prefixes_legacy () =
   etc_prefix := Some new_etc_prefix
 
 let is_new_cli () =
-  match Filename.basename @@ Sys.argv.(0) with 
-  | "gwd.new" -> true
-  | _ -> true
+  match Filename.basename @@ Sys.argv.(0) with "gwd.new" -> true | _ -> true
 
 let parse_cmd () =
   if is_new_cli () then
