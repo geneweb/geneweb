@@ -12,6 +12,7 @@ module SearchingFields : sig
   val sosa : Config.config -> Gwdb.base -> string
   val union : Config.config -> int
   val sex : Config.config -> int
+  val other_aliases : Config.config -> string
 end
 
 val searching_fields : Config.config -> Gwdb.base -> Adef.safe_string
@@ -35,5 +36,8 @@ val exact_matching_surname_aliases :
 
 val prefix_matching_surname_aliases :
   surname:string -> aliases:string list -> string list
+
+val matching_alias_public_name_qualifiers :
+  string:string -> aliases:string list -> string list
 
 val force_exact_search_by_name : Config.config -> Config.config
