@@ -12,6 +12,7 @@ module SearchingFields : sig
   val sosa : Config.config -> Gwdb.base -> string
   val union : Config.config -> int
   val sex : Config.config -> int
+  val other_aliases : Config.config -> string
 end
 
 val searching_fields : Config.config -> Gwdb.base -> Adef.safe_string

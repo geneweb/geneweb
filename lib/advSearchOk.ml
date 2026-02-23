@@ -830,6 +830,7 @@ module SearchingFields : sig
   val surname : Config.config -> string
   val occupation : Config.config -> string
   val events : Config.config -> string
+  val other_aliases : Config.config -> string
 end = struct
   let gets conf x =
     match Util.p_getenv conf.Config.env x with
@@ -980,6 +981,7 @@ end = struct
         else event_string
 
   let union conf = match gets conf "married" with "Y" -> 0 | "N" -> 1 | _ -> 2
+  let other_aliases conf = gets conf "alias_pubname_qualifiers"
 end
 
 (*
