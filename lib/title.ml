@@ -77,10 +77,14 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
     ->
       Date.compare_date d1 d2
   | (_, _, _, Death (_, d1)), (_, Some d2, _, _)
-    when Date.compare_date (Date.date_of_cdate d1) d2 <= 0 ->
+    when match Date.od_of_cdate d1 with
+         | Some d1 -> Date.compare_date d1 d2 <= 0
+         | None -> false ->
       -1
   | (_, Some (Dgreg (_, _) as d1), _, _), (_, _, _, Death (_, d2))
-    when Date.compare_date d1 (Date.date_of_cdate d2) > 0 ->
+    when match Date.od_of_cdate d2 with
+         | Some d2 -> Date.compare_date d1 d2 > 0
+         | None -> false ->
       1
   | _ -> (
       match

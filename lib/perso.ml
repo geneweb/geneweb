@@ -391,12 +391,14 @@ let get_death_text conf p p_auth =
   let on_death_date =
     match (p_auth, Driver.get_death p) with
     | true, Death (_, d) -> (
-        let d = Date.date_of_cdate d in
-        match List.assoc_opt "long_date" conf.base_env with
-        | Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
+        match Date.od_of_cdate d with
+        | None -> "" |> Adef.safe
+        | Some d -> (
+            match List.assoc_opt "long_date" conf.base_env with
+            | Some "yes" ->
+                DateDisplay.string_of_ondate ~link:false conf d
+                ^>^ DateDisplay.get_wday conf d
+            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d))
     | _ -> "" |> Adef.safe
   in
   died ^^^ " " ^<^ on_death_date
@@ -3198,8 +3200,10 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       if p_auth then eval_place_field conf pl sl else null_val
   | "death_date" :: sl -> (
       match Driver.get_death p with
-      | Death (_, cd) when p_auth ->
-          eval_date_field_var conf (Date.date_of_cdate cd) sl
+      | Death (_, cd) when p_auth -> (
+          match Date.od_of_cdate cd with
+          | Some d -> eval_date_field_var conf d sl
+          | None -> null_val)
       | Death _ | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
       | OfCourseDead ->
           null_val)
@@ -3806,7 +3810,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_date" -> GWPARAM.p_auth conf base p
   | "has_death_date" -> (
       match Driver.get_death p with
-      | Death (_, _) -> p_auth
+      | Death (_, cd) -> p_auth && cd <> Date.cdate_None
       | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
         ->
           false)
@@ -4413,10 +4417,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           raise Not_found)
   | "slash_death_date" -> (
       match (p_auth, Driver.get_death p) with
-      | true, Death (_, d) ->
-          Date.date_of_cdate d
-          |> DateDisplay.string_slash_of_date conf
-          |> safe_val
+      | true, Death (_, d) -> (
+          match Date.od_of_cdate d with
+          | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
+          | None -> null_val)
       | _ -> null_val)
   | "slash_approx_death_date" -> (
       match (p_auth, fst (Util.get_approx_death_date_place conf base p)) with
