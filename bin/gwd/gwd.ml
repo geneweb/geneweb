@@ -10,37 +10,6 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Sites = Geneweb_sites.Sites
 
-type opened_file = { path : string; mutable oc : out_channel }
-type log = Stdout | Stderr | File of opened_file | Syslog
-
-let setup_log t =
-  let set_reporter fmt = Logs.set_reporter @@ Logs_fmt.reporter ~dst:fmt () in
-  let set_file_reporter file =
-    let oc =
-      open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 file.path
-    in
-    file.oc <- oc;
-    set_reporter @@ Format.formatter_of_out_channel oc
-  in
-  let refresh_file_reporter file =
-    close_out_noerr file.oc;
-    set_file_reporter file
-  in
-  let set_sighup_signal file =
-    if Sys.unix then
-      Sys.set_signal Sys.sighup
-        (Sys.Signal_handle (fun _ -> refresh_file_reporter file))
-  in
-  match t with
-  | Stdout -> set_reporter Format.std_formatter
-  | Stderr -> set_reporter Format.err_formatter
-  | File file ->
-      set_file_reporter file;
-      set_sighup_signal file
-  | Syslog ->
-      let addr = Unix.inet_addr_of_string "127.0.0.1" in
-      Logs.set_reporter (Logs_syslog_unix.udp_reporter addr ~port:514 ())
-
 let gzip_min_size = 1024
 
 let client_accepts_encoding request encoding =
@@ -133,59 +102,29 @@ let output_conf =
   }
 
 let ( // ) = Filename.concat
-
-let default_gw_prefix =
-  match Sites.hd with
-  | s :: _ -> s
-  | _ ->
-      (* This case occurs if gwd hasn't been installed with dune. *)
-      Filename.current_dir_name // "gw"
-
 let gw_prefix = ref None
 let set_gw_prefix s = gw_prefix := Some s
-let default_images_prefix = default_gw_prefix // "images"
 let images_prefix = ref None
 let set_images_prefix s = images_prefix := Some s
-let default_etc_prefix = default_gw_prefix // "etc"
 let etc_prefix = ref None
 let set_etc_prefix s = etc_prefix := Some s
-
-let parse_prefixes () =
-  let p =
-    match (!gw_prefix, !images_prefix) with
-    | Some s, None -> s // "images"
-    | _, Some s -> s
-    | None, None -> default_images_prefix
-  in
-  images_prefix := Some p;
-  let p =
-    match (!gw_prefix, !etc_prefix) with
-    | Some s, None -> s // "etc"
-    | _, Some s -> s
-    | None, None -> default_etc_prefix
-  in
-  etc_prefix := Some p;
-  let p = Option.value ~default:default_gw_prefix !gw_prefix in
-  gw_prefix := Some p;
-  Secure.add_assets p
-
+let socket_dir = ref Cmd.default_socket_dir
+let set_socket_dir s = socket_dir := s
 let printer_conf = { Config.empty with output_conf }
-let auth_file = ref ""
+let auth_file = ref None
 let cache_langs = ref []
 let cache_databases = ref []
 let choose_browser_lang = ref false
-let conn_timeout = ref 120
+let conn_timeout = ref Cmd.default_connection_timeout
 let daemon = ref false
-let default_lang = ref "fr"
-let friend_passwd = ref ""
+let friend_passwd = ref None
 let green_color = "#2f6400"
+let default_lang = ref Cmd.default_default_lang
 let images_dir = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
-let login_timeout = ref 1800
-let default_n_workers = 20
-let n_workers = ref default_n_workers
-let default_max_pending_requests = 150
-let max_pending_requests = ref default_max_pending_requests
+let login_timeout = ref Cmd.default_login_timeout
+let n_workers = ref Cmd.default_n_workers
+let max_pending_requests = ref Cmd.default_max_pending_requests
 let no_host_address = ref false
 let only_addresses = ref []
 let plugins = ref []
@@ -194,17 +133,25 @@ let unsafe_plugins = ref []
 let redirected_addr = ref None
 let robot_xcl = ref None
 let selected_addr = ref None
-let selected_port = ref 2317
+let selected_port = ref Cmd.default_port
 let setup_link = ref false
 let trace_failed_passwd = ref false
 let debug = ref false
-let use_auth_digest_scheme = ref false
+let set_debug () = debug := true
+
+(* FIXME: This option must be turn on by default but it seems to be 
+   incompatible with CGI mode. *)
+let digest_password = ref false
 let wizard_just_friend = ref false
-let wizard_passwd = ref ""
+let wizard_passwd = ref None
 let predictable_mode = ref false
-let log_file : log ref = ref Stderr
-let verbosity_level = ref 6
-let debug_flag = ref false
+let log_file : Cmd.log ref = ref Cmd.Stderr
+
+let set_log_file s =
+  match Cmd.log_parser s with Ok l -> log_file := l | Error _ -> assert false
+
+let verbosity_level = ref Cmd.default_verbosity
+let set_verbosity_level lvl = verbosity_level := lvl
 let force_cgi = ref false
 let cgi_secret_salt : string option ref = ref None
 
@@ -221,6 +168,12 @@ let is_multipart_form =
 
 let extract_boundary content_type =
   List.assoc "boundary" (Util.create_env content_type)
+
+let deprecated_warning_images_dir () =
+  Logs.warn (fun k ->
+      k
+        "The `-images_dir` option is deprecated and may be removed in a future \
+         release.@ Use `-images_prefix` instead.")
 
 let deprecated_warning_max_clients () =
   Logs.warn (fun k ->
@@ -525,7 +478,7 @@ let trace_auth base_env f =
 let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
   Output.status conf Def.Unauthorized;
-  if !use_auth_digest_scheme then
+  if !digest_password then
     let nonce = digest_nonce conf.ctime in
     let _ =
       let tm = Unix.localtime (Unix.time ()) in
@@ -983,13 +936,15 @@ let parse_digest s =
 let basic_authorization from_addr request base_env passwd access_type utm
     base_file command =
   let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with Not_found -> !wizard_passwd
+    try List.assoc "wizard_passwd" base_env with Not_found -> 
+      Option.value ~default:"" !wizard_passwd
   in
   let wizard_passwd_file =
     try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
   in
   let friend_passwd =
-    try List.assoc "friend_passwd" base_env with Not_found -> !friend_passwd
+    try List.assoc "friend_passwd" base_env with Not_found -> 
+      Option.value ~default:"" !friend_passwd
   in
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
@@ -1181,13 +1136,15 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
 
 let digest_authorization request base_env passwd utm base_file command =
   let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with Not_found -> !wizard_passwd
+    try List.assoc "wizard_passwd" base_env with Not_found -> 
+      Option.value ~default:"" !wizard_passwd
   in
   let wizard_passwd_file =
     try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
   in
   let friend_passwd =
-    try List.assoc "friend_passwd" base_env with Not_found -> !friend_passwd
+    try List.assoc "friend_passwd" base_env with Not_found -> 
+      Option.value ~default:"" !friend_passwd
   in
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
@@ -1343,7 +1300,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
         ar_can_stale = false;
       }
   | ATnone | ATset ->
-      if !use_auth_digest_scheme then
+      if !digest_password then
         digest_authorization request base_env passwd utm base_file command
       else
         basic_authorization from_addr request base_env passwd access_type utm
@@ -1571,9 +1528,9 @@ let make_conf ~secret_salt from_addr request script_name env =
       auth_file =
         (try
            let x = List.assoc "auth_file" base_env in
-           if x = "" then !auth_file
+           if x = "" then Option.value ~default:"" !auth_file
            else Filename.concat (!GWPARAM.bpath base_file) x
-         with Not_found -> !auth_file);
+         with Not_found -> Option.value ~default:"" !auth_file);
       border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
       n_connect = None;
       today =
@@ -2328,14 +2285,6 @@ let slashify s =
   let conv_char i = match s.[i] with '\\' -> '/' | x -> x in
   String.init (String.length s) conv_char
 
-let make_sock_dir x =
-  Filesystem.create_dir ~parent:true x;
-  if Sys.unix then ()
-  else (
-    Wserver.sock_in := Filename.concat x "gwd.sin";
-    Wserver.sock_out := Filename.concat x "gwd.sou");
-  GWPARAM.sock_dir := x
-
 let arg_plugin_doc opt doc =
   doc
   ^ " Combine with -force to enable for every base. Combine with -unsafe to \
@@ -2406,23 +2355,6 @@ let print_version_commit () =
   Printf.printf "Branch %s\nLast commit %s\n" Version.branch Version.commit_id;
   exit 0
 
-let set_log_file f =
-  match f with
-  | "-" | "<stdout>" -> log_file := Stdout
-  | "2" | "<stderr>" -> log_file := Stderr
-  | "<syslog>" -> log_file := Syslog
-  | f -> log_file := File { path = f; oc = stdout }
-
-let set_verbosity_level lvl = verbosity_level := lvl
-
-let set_debug_flag () =
-  debug := true;
-  debug_flag := true;
-  Printexc.record_backtrace true;
-  set_verbosity_level 7;
-  Logs.set_level ~all:true (Some Logs.Debug);
-  Sys.enable_runtime_warnings true
-
 let set_predictable_mode () =
   Logs.warn (fun k ->
       k
@@ -2430,7 +2362,7 @@ let set_predictable_mode () =
          security enhancements and caching.");
   predictable_mode := true
 
-let parse_cmd () =
+let parse_cmd_legacy () =
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
   in
@@ -2441,15 +2373,15 @@ let parse_cmd () =
         Fmt.str
           "<DIR> Specify where the “etc”, “images” and “lang” directories are \
            installed (default if empty is %S)."
-          default_gw_prefix );
+          Cmd.default_gw_prefix );
       ( "-bd",
         Arg.String Secure.set_base_dir,
         Fmt.str
           "<DIR> Specify where the “bases” directory with databases is \
            installed (default if empty is %S)."
-          Secure.default_base_dir );
+          Cmd.default_base_dir );
       ( "-wd",
-        Arg.String make_sock_dir,
+        Arg.String set_socket_dir,
         "<DIR> Directory for socket communication (Windows) and access count."
       );
       ( "-cache_langs",
@@ -2463,10 +2395,7 @@ let parse_cmd () =
         Arg.String (fun s -> cgi_secret_salt := Some s),
         "<STRING> Add a secret salt to form digests." );
       ( "-etc_prefix",
-        Arg.String
-          (fun x ->
-            set_etc_prefix x;
-            Secure.add_assets x),
+        Arg.String (fun x -> set_etc_prefix x),
         "<DIR> Specify where the “etc” directory is installed (default if \
          empty is [-hd value]/etc)." );
       ( "-images_prefix",
@@ -2474,7 +2403,10 @@ let parse_cmd () =
         "<DIR> Specify where the “images” directory is installed (default if \
          empty is [-hd value]/images)." );
       ( "-images_dir",
-        Arg.String (fun x -> images_dir := x),
+        Arg.String
+          (fun x ->
+            deprecated_warning_images_dir ();
+            images_dir := x),
         "<DIR> Same than previous but directory name relative to current." );
       ( "-a",
         Arg.String (fun x -> selected_addr := Some x),
@@ -2493,15 +2425,16 @@ let parse_cmd () =
         "<FILE> HTML tags which are allowed to be displayed. One tag per line \
          in file." );
       ( "-wizard",
-        Arg.String (fun x -> wizard_passwd := x),
+        Arg.String (fun x -> wizard_passwd := Some x),
         "<PASSWD> Set a wizard password." );
       ( "-friend",
-        Arg.String (fun x -> friend_passwd := x),
+        Arg.String (fun x -> friend_passwd := Some x),
         "<PASSWD> Set a friend password." );
       ("-wjf", Arg.Set wizard_just_friend, " Wizard just friend (permanently).");
       ( "-lang",
         Arg.String (fun x -> default_lang := x),
-        "<LANG> Set a default language (default: " ^ !default_lang ^ ")." );
+        "<LANG> Set a default language (default: " ^ Cmd.default_default_lang
+        ^ ")." );
       ( "-blang",
         Arg.Set choose_browser_lang,
         " Select the user browser language if any." );
@@ -2509,14 +2442,14 @@ let parse_cmd () =
         Arg.String (fun x -> only_addresses := x :: !only_addresses),
         "<ADDRESS> Only inet address accepted." );
       ( "-auth",
-        Arg.String (fun x -> auth_file := x),
+        Arg.String (fun x -> auth_file := Some x),
         "<FILE> Authorization file to restrict access. The file must hold \
          lines of the form \"user:password\"." );
       ( "-no_host_address",
         Arg.Set no_host_address,
         " Force no reverse host by address." );
       ( "-digest",
-        Arg.Set use_auth_digest_scheme,
+        Arg.Set digest_password,
         " Use Digest authorization scheme (more secure on passwords)" );
       ( "-add_lexicon",
         Arg.String (Mutil.list_ref_append lexicon_list),
@@ -2555,7 +2488,7 @@ let parse_cmd () =
         Arg.Set trace_failed_passwd,
         " Print the failed passwords in log (except if option -digest is set). "
       );
-      ("-debug", Arg.Unit set_debug_flag, " Enable debug mode");
+      ("-debug", Arg.Unit set_debug, " Enable debug mode");
       ( "-nolock",
         Arg.Set Lock.no_lock_flag,
         " Do not lock files before writing." );
@@ -2578,17 +2511,17 @@ let parse_cmd () =
           ( "-n_workers",
             Arg.Int (fun x -> n_workers := x),
             "<NUM> Number of workers used by the server (default: "
-            ^ string_of_int default_n_workers
+            ^ string_of_int Cmd.default_n_workers
             ^ ")" );
           ( "-max_pending_requests",
             Arg.Int (fun x -> max_pending_requests := x),
             "<NUM> Maximum number of pending requests (default: "
-            ^ string_of_int default_max_pending_requests
+            ^ string_of_int Cmd.default_max_pending_requests
             ^ ")" );
           ( "-conn_tmout",
             Arg.Int (fun x -> conn_timeout := x),
             "<SEC> Connection timeout (only on Unix) (default "
-            ^ string_of_int !conn_timeout
+            ^ string_of_int Cmd.default_connection_timeout
             ^ "s; 0 means no limit)." );
           ("-daemon", Arg.Set daemon, " Unix daemon mode.");
           ( "-no-fork",
@@ -2632,9 +2565,6 @@ let parse_cmd () =
   Arg.parse speclist anonfun usage
 
 let main () =
-  if not Sys.unix then (
-    Wserver.sock_in := "gwd.sin";
-    Wserver.sock_out := "gwd.sou");
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2658,13 +2588,13 @@ let main () =
       let dbn = !GWPARAM.bpath dbn in
       Driver.load_database dbn)
     !cache_databases;
-  if !auth_file <> "" && !force_cgi then
+  if Option.is_some !auth_file && !force_cgi then
     Logs.warn (fun k ->
         k
           "-auth option is not compatible with CGI mode.\n\
           \ Use instead friend_passwd_file= and wizard_passwd_file= in .cgf \
            file");
-  if !use_auth_digest_scheme && !force_cgi then
+  if !digest_password && !force_cgi then
     Logs.warn (fun k -> k "-digest option is not compatible with CGI mode.");
   (if !images_dir <> "" then
      let abs_dir =
@@ -2718,6 +2648,109 @@ let has_root_privileges () =
     || Unix.geteuid () = root
     || Unix.getegid () = root
 
+let parse_prefixes_legacy () =
+  let (`Ok (_, _, new_gw_prefix, new_images_prefix, new_etc_prefix)) =
+    Cmd.parse_directories (Secure.base_dir ()) !socket_dir !gw_prefix
+      !images_prefix !etc_prefix
+  in
+  gw_prefix := Some new_gw_prefix;
+  images_prefix := Some new_images_prefix;
+  etc_prefix := Some new_etc_prefix
+
+let is_new_cli () =
+  match Filename.basename @@ Sys.argv.(0) with 
+  | "gwd.new" -> true
+  | _ -> true
+
+let parse_cmd () =
+  if is_new_cli () then
+    match Cmdliner.Cmd.eval_value' Cmd.t with
+    | `Ok o ->
+        selected_addr := o.interface;
+        selected_port := o.port;
+        Secure.set_base_dir o.base_dir;
+        gw_prefix := Some o.gw_prefix;
+        images_prefix := Some o.images_prefix;
+        etc_prefix := Some o.etc_prefix;
+        socket_dir := o.socket_dir;
+        auth_file := o.authorization_file;
+        cache_langs := o.cache_langs;
+        cache_databases := o.cache_databases;
+        choose_browser_lang := o.browser_lang;
+        conn_timeout := o.connection_timeout;
+        daemon := o.daemon;
+        friend_passwd := o.friend_password;
+        default_lang := o.default_lang;
+        lexicon_list := o.lexicon_files;
+        login_timeout := o.login_timeout;
+        n_workers := o.n_workers;
+        max_pending_requests := o.max_pending_requests;
+        no_host_address := o.no_reverse_host;
+        only_addresses := o.allowed_addresses;
+        redirected_addr := o.redirect_interface;
+        robot_xcl := Obj.magic o.ban_threshold;
+        Robot.min_disp_req := o.min_disp_req;
+        trace_failed_passwd := o.trace_failed_password;
+        debug := o.debug;
+        digest_password := o.digest_password;
+        wizard_just_friend := o.wizard_just_friend;
+        wizard_passwd := o.wizard_password;
+        predictable_mode := o.predictable_mode;
+        log_file := o.log;
+        verbosity_level := o.verbosity;
+        force_cgi := o.cgi;
+        cgi_secret_salt := o.secret_salt;
+        GWPARAM.sock_dir := o.socket_dir
+    | `Exit code -> exit code
+  else (
+    parse_cmd_legacy ();
+    parse_prefixes_legacy ())
+
+let make_socket_dir socket_dir =
+  Filesystem.create_dir ~parent:true socket_dir;
+  if not Sys.unix then (
+    Filesystem.create_dir ~parent:true socket_dir;
+    Wserver.sock_in := socket_dir // "gwd.sin";
+    Wserver.sock_out := socket_dir // "gwd.sou")
+
+let switch_debug debug =
+  if debug then (
+    Printexc.record_backtrace true;
+    set_verbosity_level 7;
+    Logs.set_level ~all:true (Some Logs.Debug);
+    Sys.enable_runtime_warnings true)
+
+type opened_file = { path : string; mutable oc : out_channel }
+type opened_log = Stdout | Stderr | File of opened_file | Syslog
+
+let setup_log t =
+  let opened_log : opened_log ref = ref Stderr in
+  let set_reporter fmt = Logs.set_reporter @@ Logs_fmt.reporter ~dst:fmt () in
+  let set_file_reporter path =
+    let oc = open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 path in
+    opened_log := File { path; oc };
+    set_reporter @@ Format.formatter_of_out_channel oc
+  in
+  let refresh_file_reporter () =
+    assert false
+    (* close_out_noerr file.oc; *)
+    (* set_file_reporter file.path *)
+  in
+  let set_sighup_signal file =
+    if Sys.unix then
+      Sys.set_signal Sys.sighup
+        (Sys.Signal_handle (fun _ -> refresh_file_reporter file))
+  in
+  match t with
+  | Cmd.Stdout -> set_reporter Format.std_formatter
+  | Stderr -> set_reporter Format.err_formatter
+  | File path ->
+      set_file_reporter path;
+      set_sighup_signal ()
+  | Syslog ->
+      let addr = Unix.inet_addr_of_string "127.0.0.1" in
+      Logs.set_reporter (Logs_syslog_unix.udp_reporter addr ~port:514 ())
+
 let () =
   if has_root_privileges () then (
     Format.eprintf
@@ -2727,7 +2760,8 @@ let () =
     exit 1);
   Logs.set_level ~all:true (Some Logs.Info);
   parse_cmd ();
-  parse_prefixes ();
+  Secure.add_assets @@ Option.get !etc_prefix;
+  switch_debug !debug;
   setup_log !log_file;
   Fmt_tty.setup_std_outputs ~style_renderer:`Ansi_tty ();
   try main () with

@@ -15,9 +15,8 @@
 (library
  (name gwd_lib)
  (public_name geneweb.gwd_lib)
- (wrapped true)
- (libraries geneweb wserver dune-site)
- (modules gwdPlugin request geneweb_sites))
+ (libraries geneweb wserver dune-site cmdliner)
+ (modules gwdPlugin request geneweb_sites cmd))
 
 (executable
  (package geneweb)
