@@ -20,8 +20,8 @@
  (public_name geneweb.gwd_lib)
  (name gwd_lib)
  (wrapped true)
- (libraries geneweb geneweb.plugin wserver dune-site)
- (modules request geneweb_sites))
+ (libraries geneweb geneweb.plugin wserver dune-site cmdliner)
+ (modules request geneweb_sites cmd cmd_legacy robot))
 
 (executable
  (package geneweb)
@@ -44,4 +44,4 @@
   unix
   uri
   wserver)
- (modules base64 gwd plugin_checksums robot))
+ (modules base64 gwd plugin_checksums))

@@ -225,7 +225,7 @@ let check tm from max_call sec conf suicide =
             true)
           else false
         in
-        let list, nconn =
+        let _list, nconn =
           W.fold
             (fun k w (list, nconn) ->
               let tm = w.oldest_time in
