@@ -22,7 +22,8 @@ let suburb_aux sub nosub s =
         | Some j -> sub s len i j)
   else nosub s
 
-(** [split_suburb "[foo-bar] - boobar (baz)"] is [9"foo-bar", "boobar (baz)")] *)
+(** [split_suburb "[foo-bar] - boobar (baz)"] is [9"foo-bar", "boobar (baz)")]
+*)
 let split_suburb =
   suburb_aux
     (fun s len i j -> (String.sub s 1 (i - 1), String.sub s j (len - j)))
@@ -143,20 +144,20 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
           if Hashtbl.length ht > max_length then raise List_too_long
   in
   (if add_birth || add_death || add_baptism || add_burial then
-   let aux b fn p =
-     if b then
-       let x = fn p in
-       if not (Gwdb.is_empty_string x) then ht_add x p
-   in
-   Gwdb.Collection.iter
-     (fun i ->
-       let p = Util.pget conf base i in
-       if Person.is_visible conf base p then (
-         aux add_birth Gwdb.get_birth_place p;
-         aux add_baptism Gwdb.get_baptism_place p;
-         aux add_death Gwdb.get_death_place p;
-         aux add_burial Gwdb.get_burial_place p))
-     (Gwdb.ipers base));
+     let aux b fn p =
+       if b then
+         let x = fn p in
+         if not (Gwdb.is_empty_string x) then ht_add x p
+     in
+     Gwdb.Collection.iter
+       (fun i ->
+         let p = Util.pget conf base i in
+         if Person.is_visible conf base p then (
+           aux add_birth Gwdb.get_birth_place p;
+           aux add_baptism Gwdb.get_baptism_place p;
+           aux add_death Gwdb.get_death_place p;
+           aux add_burial Gwdb.get_burial_place p))
+       (Gwdb.ipers base));
   if add_marriage then
     Gwdb.Collection.iter
       (fun i ->

@@ -12,8 +12,7 @@ bin/ged2gwb/dune
 bin/gwb2ged/dune
 bin/gwc/dune
 bin/gwd/dune
-bin/gwrepl/.depend
-bin/gwrepl/dune
+bin/populate-xss-gwb/dune
 bin/gwu/dune
 bin/setup/dune
 bin/update_nldb/dune

@@ -170,14 +170,13 @@ let nobility_titles_list conf base p =
 
 (* ********************************************************************** *)
 
-(** [Description] : Indique si l'individu a été modifiée.
-    [Args] :
-      - conf   : configuration de la base
-      - base   : arbre
-      - p      : person
-      - p_auth : indique si l'utilisateur est authentifié
-    [Retour] : Vrai si la personne a été modifiée, Faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
+(** [Description] : Indique si l'individu a été modifiée. [Args] :
+    - conf : configuration de la base
+    - base : arbre
+    - p : person
+    - p_auth : indique si l'utilisateur est authentifié [Retour] : Vrai si la
+      personne a été modifiée, Faux sinon. [Rem] : Exporté en clair hors de ce
+      module. *)
 let has_history conf base p p_auth =
   let fn = Gwdb.sou base (Gwdb.get_first_name p) in
   let sn = Gwdb.sou base (Gwdb.get_surname p) in
@@ -190,14 +189,11 @@ let has_history conf base p p_auth =
 
 (* ************************************************************************ *)
 
-(** [Description] : Retourne une description de la mort de la personne
-    [Args] :
+(** [Description] : Retourne une description de la mort de la personne [Args] :
     - conf : configuration de la base
-    - p    : la personne que l'on veut afficher
-    - p_auth : authentifié ou non
-      [Retour] :
-    - string
-      [Rem] : Exporté en clair hors de ce module.                             *)
+    - p : la personne que l'on veut afficher
+    - p_auth : authentifié ou non [Retour] :
+    - string [Rem] : Exporté en clair hors de ce module. *)
 let get_death_text conf p p_auth =
   let died =
     if p_auth then
@@ -932,8 +928,8 @@ let build_surnames_list conf base v p =
           then add_surname sosa p surn dp;
           let sosa = Sosa.twice sosa in
           (if not (Person.is_empty fath) then
-           let dp1 = merge_date_place conf base surn dp fath in
-           loop (lev + 1) sosa fath (Gwdb.get_surname fath) dp1);
+             let dp1 = merge_date_place conf base surn dp fath in
+             loop (lev + 1) sosa fath (Gwdb.get_surname fath) dp1);
           let sosa = Sosa.inc sosa 1 in
           if not (Person.is_empty moth) then
             let dp2 = merge_date_place conf base surn dp moth in
@@ -971,14 +967,12 @@ let build_surnames_list conf base v p =
 (* ************************************************************************* *)
 
 (** [Description] : Construit la liste éclair des ascendants de p jusqu'à la
-                    génération v.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - v    : le nombre de génération
-      - p    : person
-    [Retour] : (surname * place * date begin * date end * person * list iper)
-    [Rem] : Exporté en clair hors de ce module.                              *)
+    génération v. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - v : le nombre de génération
+    - p : person [Retour] : (surname * place * date begin * date end * person *
+      list iper) [Rem] : Exporté en clair hors de ce module. *)
 let build_list_eclair conf base v p =
   let ht = Hashtbl.create 701 in
   let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
@@ -1274,7 +1268,9 @@ type 'a env =
   | Vother of 'a
   | Vnone
 
-(** [has_witness_for_event event_name events] is [true] iff there is an event with name [event_name] in [events] and this event had witnesses. It do not check for permissions *)
+(** [has_witness_for_event event_name events] is [true] iff there is an event
+    with name [event_name] in [events] and this event had witnesses. It do not
+    check for permissions *)
 let has_witness_for_event conf base p event_name =
   List.exists
     (fun (event_item : Gwdb.istr Event.event_item) ->
@@ -1326,12 +1322,12 @@ let get_sosa conf base iper : Sosa.t option =
 
 (** [Description] : Permet de récupérer un lien de la chronique familiale.
     [Args] :
-      - conf : configuration
-      - base : base de donnée
-      - p    : person
-      - s    : nom du lien (eg. "HEAD", "OCCU", "BIBLIO", "BNOTE", "DEATH")
-    [Retour] : string : "<a href="xxx">description du lien</a>"
-    [Rem] : Exporté en clair hors de ce module.                               *)
+    - conf : configuration
+    - base : base de donnée
+    - p : person
+    - s : nom du lien (eg. "HEAD", "OCCU", "BIBLIO", "BNOTE", "DEATH") [Retour]
+      : string : "<a href="xxx">description du lien</a>" [Rem] : Exporté en
+      clair hors de ce module. *)
 let get_linked_page conf base p s =
   let db = Gwdb.read_nldb base in
   let db = Notes.merge_possible_aliases conf db in
@@ -3985,34 +3981,35 @@ let print_foreach conf base print_ast eval_expr =
         |> ignore
     | _ ->
         (if Array.length (Gwdb.get_family p) > 0 then
-         let rec loop prev i =
-           if i = Array.length (Gwdb.get_family p) then ()
-           else
-             let ifam = (Gwdb.get_family p).(i) in
-             let fam = Gwdb.foi base ifam in
-             let ifath = Gwdb.get_father fam in
-             let imoth = Gwdb.get_mother fam in
-             let ispouse = Gutil.spouse (Gwdb.get_iper p) fam in
-             let cpl = (ifath, imoth, ispouse) in
-             let m_auth =
-               Person.is_visible conf base (Util.pget conf base ifath)
-               && Person.is_visible conf base (Util.pget conf base imoth)
-             in
-             let vfam = Vfam (ifam, fam, cpl, m_auth) in
-             let env = ("#loop", Vint 0) :: env in
-             let env = ("fam", vfam) :: env in
-             let env = ("family_cnt", Vint (i + 1)) :: env in
-             let env =
-               match prev with
-               | Some vfam -> ("prev_fam", vfam) :: env
-               | None -> env
-             in
-             List.iter (print_ast env ini_ep) al;
-             loop (Some vfam) (i + 1)
-         in
-         loop None 0);
+           let rec loop prev i =
+             if i = Array.length (Gwdb.get_family p) then ()
+             else
+               let ifam = (Gwdb.get_family p).(i) in
+               let fam = Gwdb.foi base ifam in
+               let ifath = Gwdb.get_father fam in
+               let imoth = Gwdb.get_mother fam in
+               let ispouse = Gutil.spouse (Gwdb.get_iper p) fam in
+               let cpl = (ifath, imoth, ispouse) in
+               let m_auth =
+                 Person.is_visible conf base (Util.pget conf base ifath)
+                 && Person.is_visible conf base (Util.pget conf base imoth)
+               in
+               let vfam = Vfam (ifam, fam, cpl, m_auth) in
+               let env = ("#loop", Vint 0) :: env in
+               let env = ("fam", vfam) :: env in
+               let env = ("family_cnt", Vint (i + 1)) :: env in
+               let env =
+                 match prev with
+                 | Some vfam -> ("prev_fam", vfam) :: env
+                 | None -> env
+               in
+               List.iter (print_ast env ini_ep) al;
+               loop (Some vfam) (i + 1)
+           in
+           loop None 0);
         List.fold_left
-          (fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge) ->
+          (fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge)
+             ->
             if can_merge then (None, i)
             else
               let cpl = (ifath, imoth, Gwdb.get_iper sp) in

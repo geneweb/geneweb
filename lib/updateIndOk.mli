@@ -10,7 +10,8 @@ val effective_del_commit :
 (** Adds to the diff the deletion of a person *)
 
 val effective_del : Config.config -> Gwdb.base -> Gwdb.person -> unit
-(** [effective_del] applies [effective_del_no_commit] and [effective_del_commit] *)
+(** [effective_del] applies [effective_del_no_commit] and [effective_del_commit]
+*)
 
 val effective_mod :
   ?prerr:(Config.config -> Gwdb.base -> Update.update_error -> unit) ->
@@ -34,8 +35,8 @@ val all_checks_person :
   Gwdb.ifam Def.gen_ascend ->
   Gwdb.ifam Def.gen_union ->
   Warning.base_warning list
-(** Patches the informations of a person by checking the order of events:
-    for example, a birth should happen before the death of a mother. *)
+(** Patches the informations of a person by checking the order of events: for
+    example, a birth should happen before the death of a mother. *)
 
 val print_mod_aux :
   ?check_person_f:

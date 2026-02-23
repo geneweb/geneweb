@@ -23,18 +23,18 @@ let need_differences_selection conf base fam1 fam2 =
       | Pacs -> "pacs"
       | Residence -> "residence")
   || need_selection (fun fam ->
-         match Date.od_of_cdate (Gwdb.get_marriage fam) with
-         | None -> ""
-         | Some d -> (DateDisplay.string_of_ondate conf d :> string))
+      match Date.od_of_cdate (Gwdb.get_marriage fam) with
+      | None -> ""
+      | Some d -> (DateDisplay.string_of_ondate conf d :> string))
   || need_selection (fun fam -> Gwdb.sou base (Gwdb.get_marriage_place fam))
   || need_selection (fun fam ->
-         match Gwdb.get_divorce fam with
-         | NotDivorced -> "not divorced"
-         | Separated -> "separated"
-         | Divorced cod -> (
-             match Date.od_of_cdate cod with
-             | Some d -> (DateDisplay.string_of_ondate conf d :> string)
-             | None -> "divorced"))
+      match Gwdb.get_divorce fam with
+      | NotDivorced -> "not divorced"
+      | Separated -> "separated"
+      | Divorced cod -> (
+          match Date.od_of_cdate cod with
+          | Some d -> (DateDisplay.string_of_ondate conf d :> string)
+          | None -> "divorced"))
 
 let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   let string_field (title : Adef.safe_string) (name : Adef.encoded_string) proj

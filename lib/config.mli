@@ -114,8 +114,8 @@ type config = {
 (** Geneweb configuration data type *)
 
 val empty : config
-(** A dummy {!type:config} value, with uninitialized fields.
-    Used for testing purpose *)
+(** A dummy {!type:config} value, with uninitialized fields. Used for testing
+    purpose *)
 
 module Trimmed : sig
   type t = private {

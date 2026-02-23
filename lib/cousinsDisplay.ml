@@ -33,15 +33,15 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
         ^^^ "&b2="
         ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
         ^<^ ((if
-              (List.assoc_opt "spouse" conf.Config.env :> string option)
-              = Some "on"
-             then Adef.encoded "&spouse=on"
-             else Adef.encoded "")
+                (List.assoc_opt "spouse" conf.Config.env :> string option)
+                = Some "on"
+              then Adef.encoded "&spouse=on"
+              else Adef.encoded "")
              ^^^ (if
-                  (List.assoc_opt "image" conf.Config.env :> string option)
-                  = Some "off"
-                 then Adef.encoded "&image=off"
-                 else Adef.encoded "")
+                    (List.assoc_opt "image" conf.Config.env :> string option)
+                    = Some "off"
+                  then Adef.encoded "&image=off"
+                  else Adef.encoded "")
              ^^^ "&bd="
              ^<^ Option.value ~default:(Adef.encoded "0")
                    (List.assoc_opt "bd" conf.Config.env)
@@ -66,15 +66,15 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
         ^<^ "&"
         ^<^ Util.acces_n conf base (Adef.escaped "4") p3
         ^^^ ((if
-              (List.assoc_opt "spouse" conf.Config.env :> string option)
-              = Some "on"
-             then Adef.encoded "&spouse=on"
-             else Adef.encoded "")
+                (List.assoc_opt "spouse" conf.Config.env :> string option)
+                = Some "on"
+              then Adef.encoded "&spouse=on"
+              else Adef.encoded "")
              ^^^ (if
-                  (List.assoc_opt "image" conf.Config.env :> string option)
-                  = Some "off"
-                 then Adef.encoded "&image=off"
-                 else Adef.encoded "")
+                    (List.assoc_opt "image" conf.Config.env :> string option)
+                    = Some "off"
+                  then Adef.encoded "&image=off"
+                  else Adef.encoded "")
              ^^^ "&bd="
              ^<^ Option.value ~default:(Adef.encoded "0")
                    (List.assoc_opt "bd" conf.Config.env)
@@ -254,10 +254,10 @@ let print_cousins conf base p lev1 lev2 =
       let txt = NameDisplay.fullname_html_of_person conf base p in
       Util.transl_a_of_gr_eq_gen_lev conf a
         (if h then
-         ((Util.escape_html (NameDisplay.fullname_str_of_person conf base p)
-            :> Adef.safe_string)
-           :> string)
-        else (txt : Adef.safe_string :> string))
+           ((Util.escape_html (NameDisplay.fullname_str_of_person conf base p)
+              :> Adef.safe_string)
+             :> string)
+         else (txt : Adef.safe_string :> string))
         (txt : Adef.safe_string :> string)
     in
     if lev1 = lev2 then
@@ -330,7 +330,7 @@ let sosa_of_persons conf base =
         (* do no works if sex = Neuter *)
         loop
           (if Gwdb.get_sex (Util.pget conf base ip) = Male then 2 * n
-          else (2 * n) + 1)
+           else (2 * n) + 1)
           list
   in
   loop 1
@@ -418,8 +418,8 @@ let print_anniv conf base p dead_people level =
       ^^^ "&b2="
       ^<^ string_of_int (sosa_of_persons conf base down_br)
       ^<^ (if spouse = None then
-           "&" ^<^ Util.acces_n conf base (Adef.escaped "4") c
-          else Adef.escaped "")
+             "&" ^<^ Util.acces_n conf base (Adef.escaped "4") c
+           else Adef.escaped "")
       ^>^ "&spouse=on"
     in
     let open Def in

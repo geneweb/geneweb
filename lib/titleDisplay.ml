@@ -33,14 +33,14 @@ let give_access_someone conf base (x, t) list =
       Output.print_sstring conf (string_of_int d.year));
   if has_dates then Output.print_sstring conf "</em>: ";
   (if
-   List.exists
-     (fun person -> Gwdb.eq_iper (Gwdb.get_iper person) (Gwdb.get_iper x))
-     list
-  then Output.print_sstring conf "<em>"
-  else
-    let open Def in
-    Output.print_string conf
-      ({|<a href="|} ^<^ Util.commd conf ^^^ Util.acces conf base x ^>^ {|">|}));
+     List.exists
+       (fun person -> Gwdb.eq_iper (Gwdb.get_iper person) (Gwdb.get_iper x))
+       list
+   then Output.print_sstring conf "<em>"
+   else
+     let open Def in
+     Output.print_string conf
+       ({|<a href="|} ^<^ Util.commd conf ^^^ Util.acces conf base x ^>^ {|">|}));
   (match (t.t_name, Gwdb.get_public_name x, Gwdb.get_qualifiers x) with
   | Tmain, pn, nn :: _ when Gwdb.sou base pn <> "" ->
       Output.print_string conf (Util.escape_html @@ Gwdb.sou base pn);
@@ -70,7 +70,7 @@ let give_access_someone conf base (x, t) list =
     Output.print_sstring conf " (";
     Output.print_sstring conf
       (if t.t_nth >= 100 then string_of_int t.t_nth
-      else Util.transl_nth conf "nth" t.t_nth);
+       else Util.transl_nth conf "nth" t.t_nth);
     Output.print_sstring conf ")");
   if
     List.exists
@@ -233,11 +233,11 @@ let print_places_list conf base t t_equiv list =
       ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p
       ^>^ if absolute then "&a=A" else "")
       (if p = "" then Adef.safe "..."
-      else
-        ((Util.escape_html @@ Util.surname_without_particle base p)
-         ^^^ Util.escape_html
-         @@ Util.surname_particle base p
-          :> Adef.safe_string))
+       else
+         ((Util.escape_html @@ Util.surname_without_particle base p)
+          ^^^ Util.escape_html
+          @@ Util.surname_particle base p
+           :> Adef.safe_string))
   in
   Hutil.header conf title;
   Util.wprint_in_columns conf order wprint_elem list;

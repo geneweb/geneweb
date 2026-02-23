@@ -1,8 +1,9 @@
 let prefix conf = Util.escape_html conf.Config.image_prefix
 
-(** [default_portrait_filename_of_key fn sn occ] is the default filename of the corresponding person's portrait. WITHOUT its file extenssion.
- e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
- *)
+(** [default_portrait_filename_of_key fn sn occ] is the default filename of the
+    corresponding person's portrait. WITHOUT its file extenssion. e.g:
+    default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is
+    "jean_claude.3.dupond" *)
 let default_portrait_filename_of_key first_name surname occ =
   let space_to_unders = Ext_string.tr ' ' '_' in
   let f = space_to_unders (Name.lower first_name) in
@@ -173,7 +174,8 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
   in
   (w, h)
 
-(** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
+(** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait.
+*)
 let has_access_to_portrait conf base p =
   let img = Gwdb.get_image p in
   (not conf.Config.no_image)

@@ -15,8 +15,8 @@ let escape_aux count blit str =
   in
   loop 0 0
 
-(** [escape str] replaces '&', '"', '<' and '>'
-    with their corresponding character entities (using entity number) *)
+(** [escape str] replaces '&', '"', '<' and '>' with their corresponding
+    character entities (using entity number) *)
 let escape s =
   escape_aux
     (function '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *) | _ -> 1)
@@ -41,9 +41,9 @@ let escape s =
           loop (istr + 1) (ibuf + 1))
     s
 
-(** [escape_attribute str] only escapes double quote and ampersand.
-    Since we will return normalized HTML, ['"'] should be the only
-    dangerous character here. *)
+(** [escape_attribute str] only escapes double quote and ampersand. Since we
+    will return normalized HTML, ['"'] should be the only dangerous character
+    here. *)
 let escape_attribute =
   escape_aux
     (function '&' | '"' -> 5 (* "&#xx;" *) | _ -> 1)
@@ -443,23 +443,23 @@ let default_safe_html_allowed_tags =
 let safe_html_allowed_tags =
   lazy
     (if !allowed_tags_file = "" then default_safe_html_allowed_tags
-    else
-      let ic = open_in !allowed_tags_file in
-      let rec loop tags =
-        match input_line ic with
-        | tag ->
-            let ns, tag =
-              match String.split_on_char ' ' tag with
-              | [ ns; tag ] -> (ns, tag)
-              | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
-              | _ -> assert false
-            in
-            loop ((ns, String.lowercase_ascii tag) :: tags)
-        | exception End_of_file ->
-            close_in ic;
-            tags
-      in
-      loop [])
+     else
+       let ic = open_in !allowed_tags_file in
+       let rec loop tags =
+         match input_line ic with
+         | tag ->
+             let ns, tag =
+               match String.split_on_char ' ' tag with
+               | [ ns; tag ] -> (ns, tag)
+               | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
+               | _ -> assert false
+             in
+             loop ((ns, String.lowercase_ascii tag) :: tags)
+         | exception End_of_file ->
+             close_in ic;
+             tags
+       in
+       loop [])
 
 (* Few notes:
 
@@ -599,15 +599,13 @@ let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
   in
   conf.Config.use_restrict && Gwdb.base_visible_get base fct ip
 
-(** Returns person option with given id from the base.
-    Wrapper around `Gwdb.poi` defined such as:
+(** Returns person option with given id from the base. Wrapper around `Gwdb.poi`
+    defined such as:
     - Some ip: if user has permissions or `use_restrict` disabled.
-    - None: if `conf.use_restrict` (option defined in .gwf file):
-      checks that the user has enough rights to see
-      corresponding person (see `authorized_age`).
-      If the user does not have enough permissions, returns
-      None.
-*)
+    - None: if `conf.use_restrict` (option defined in .gwf file): checks that
+      the user has enough rights to see corresponding person (see
+      `authorized_age`). If the user does not have enough permissions, returns
+      None. *)
 let pget_opt conf base ip =
   if is_restricted conf base ip then None else Some (Gwdb.poi base ip)
 
@@ -642,17 +640,15 @@ let is_public conf base p =
 
 (* ********************************************************************** *)
 
-(** [Description] : Vrai si la personne est accessible par sa clé,
-                    Faux sinon.
+(** [Description] : Vrai si la personne est accessible par sa clé, Faux sinon.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-      - fn   : prénom de la personne
-      - sn   : patronyme de la personne
-    [Retour] :
-      - bool : Vrai si la personne est accessible par sa clé, faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : person
+    - fn : prénom de la personne
+    - sn : patronyme de la personne [Retour] :
+    - bool : Vrai si la personne est accessible par sa clé, faux sinon. [Rem] :
+      Exporté en clair hors de ce module. *)
 let accessible_by_key conf base p fn sn =
   conf.Config.access_by_key
   && (not ((* should it be is_empty_person here? *) fn = "?" || sn = "?"))
@@ -664,15 +660,13 @@ let accessible_by_key conf base p fn sn =
 
 (* ********************************************************************** *)
 
-(** [Description] : Renvoie les paramètres URL pour l'accès à la nième
-                    personne.
+(** [Description] : Renvoie les paramètres URL pour l'accès à la nième personne.
     [Args] :
     - conf : configuration de la base
     - base : base de donnée
-    - n    : la nième personne (e.g. : calcul de parenté entre p1 et p2)
-    - p    : person
-      [Retour] : string
-      [Rem] : Exporté en clair hors de ce module.                           *)
+    - n : la nième personne (e.g. : calcul de parenté entre p1 et p2)
+    - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let acces_n conf base n x : Adef.escaped_string =
   let first_name = Gwdb.p_first_name base x in
   let surname = Gwdb.p_surname base x in
@@ -698,11 +692,10 @@ let acces_n conf base n x : Adef.escaped_string =
 
 (** [Description] : Renvoie les paramètres URL pour l'accès à la personne.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let acces conf base x = acces_n conf base (Adef.escaped "") x
 
 (**/**)
@@ -772,12 +765,10 @@ let main_title conf base p =
 (* *********************************************************************** *)
 
 (** [Description] : Renvoie la chaîne de caractère du titre ainsi que le
-                    domaine.
-    [Args] :
-      - base : base de donnée
-      - t    : le titre de noblesse que l'on veut afficher
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                        *)
+    domaine. [Args] :
+    - base : base de donnée
+    - t : le titre de noblesse que l'on veut afficher [Retour] : string [Rem] :
+      Non exporté en clair hors de ce module. *)
 let one_title_text base t : Adef.safe_string =
   let place = Gwdb.sou base t.Def.t_place in
   let s = Gwdb.sou base t.Def.t_ident in
@@ -812,19 +803,17 @@ let wprint_geneweb_link conf href s =
 
 (* ************************************************************************* *)
 
-(** [Description] : Essaie de déterminer dans quelle famille il peut y avoir
-                    une boucle. Si il n'y a pas d'ambiguité, alors on renvoie
-                    un lien vers la famille à modifier, sinon, on renvoie un
-                    lien vers le menu général de mise à jour.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - p    : person
-      - s    : la clé de la personne sous forme de string
-    [Retour] :
-      - string : retourne un lien de mise à jour soit vers la famille
-                 contenant la boucle, soit vers le menu de mise à jour.
-    [Rem] : Exporté en clair hors de ce module.                              *)
+(** [Description] : Essaie de déterminer dans quelle famille il peut y avoir une
+    boucle. Si il n'y a pas d'ambiguité, alors on renvoie un lien vers la
+    famille à modifier, sinon, on renvoie un lien vers le menu général de mise à
+    jour. [Args] :
+    - conf : configuration
+    - base : base
+    - p : person
+    - s : la clé de la personne sous forme de string [Retour] :
+    - string : retourne un lien de mise à jour soit vers la famille contenant la
+      boucle, soit vers le menu de mise à jour. [Rem] : Exporté en clair hors de
+      ce module. *)
 let update_family_loop conf base p s =
   if Person.is_empty p then s
   else
@@ -1441,9 +1430,9 @@ let print_alphabetically_indexed_list (type entry) conf index_key print_elem
         (list
         |> Ext_list.groupby ~key:index_key ~value:Fun.id
         |> List.sort (fun (index_key, _) (index_key', _) ->
-               Utf8.alphabetic_order index_key index_key')
+            Utf8.alphabetic_order index_key index_key')
         |> List.map (fun (index_key, entries) ->
-               (index_key, List.sort compare_entry entries)))
+            (index_key, List.sort compare_entry entries)))
   in
   match list with
   | `Flat_list list ->
@@ -2064,7 +2053,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
                    Output.printf conf "<h3 class=\"subtitle\">%s%s</h3>\n"
                      (if ord = "" then "..." else String.make 1 ord.[0])
                      (if !kind = HeadElem then ""
-                     else " (" ^ transl conf "continued" ^ ")");
+                      else " (" ^ transl conf "continued" ^ ")");
                    Output.print_sstring conf "<ul>\n");
                  Output.print_sstring conf "<li>";
                  wprint_elem elem;
@@ -2102,12 +2091,10 @@ let wprint_in_columns conf order wprint_elem list =
 
 (* ********************************************************************** *)
 
-(** [Description] : Affiche un tips.
-    [Args] :
-      - conf : configuration de la base
-      - s    : le contenu du tips
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Affiche un tips. [Args] :
+    - conf : configuration de la base
+    - s : le contenu du tips [Retour] : Néant [Rem] : Non exporté en clair hors
+      de ce module. *)
 let gen_print_tips conf s =
   Output.print_sstring conf "<div class=\"tips\">\n";
   Output.print_sstring conf "<table>\n";
@@ -2134,11 +2121,9 @@ let print_tips_relationship conf =
 (* ********************************************************************** *)
 
 (** [Description] : Recherche dans l'URL les options d'affichage qui sont
-                    données et renvoie la concaténation de ces options.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    données et renvoie la concaténation de ces options. [Args] :
+    - conf : configuration de la base [Retour] : string [Rem] : Exporté en clair
+      hors de ce module. *)
 let display_options conf =
   let s =
     Adef.escaped
@@ -2173,11 +2158,9 @@ type cache_visited_t = (string, (Gwdb.iper * string) list) Hashtbl.t
 
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie le chemin du fichier de cache.
-    [Args] :
-      - config : configuration de la base
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Renvoie le chemin du fichier de cache. [Args] :
+    - config : configuration de la base [Retour] : unit [Rem] : Exporté en clair
+      hors de ce module. *)
 let cache_visited conf =
   let bname =
     if Filename.check_suffix conf.Config.bname ".gwb" then conf.Config.bname
@@ -2192,16 +2175,16 @@ let cache_visited conf =
 
 (** [Description] : List le fichier de cache des dernières fiches visités.
     [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-    [Retour] : Hashtbl des user => dernières visites
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    - fname : le fichier de cache (qui se trouve dans base.gwb) [Retour] :
+      Hashtbl des user => dernières visites [Rem] : Exporté en clair hors de ce
+      module. *)
 let read_visited conf =
   let fname = cache_visited conf in
   try
     let ic = Secure.open_in_bin fname in
     let ht : cache_visited_t = input_value ic in
     close_in ic;
-    ht
+    Hashtbl.rebuild ht
   with Sys_error _ -> Hashtbl.create 0
 
 (* ************************************************************************ *)
@@ -2209,12 +2192,10 @@ let read_visited conf =
 
 (* ************************************************************************ *)
 
-(** [Description] : Met à jour le fichier de cache des visites.
-    [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-      - ht    : le compteur de visite
-    [Retour] : unit
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+(** [Description] : Met à jour le fichier de cache des visites. [Args] :
+    - fname : le fichier de cache (qui se trouve dans base.gwb)
+    - ht : le compteur de visite [Retour] : unit [Rem] : Non exporté en clair
+      hors de ce module. *)
 let write_visited conf ht =
   let fname = cache_visited conf in
   try
@@ -2223,18 +2204,17 @@ let write_visited conf ht =
     close_out oc
   with Sys_error _ -> ()
 
+let rewrite_visited conf = write_visited conf (read_visited conf)
+
 (* ************************************************************************ *)
 (*  [Fonc] record_visited : config -> iper -> unit                          *)
 
 (* ************************************************************************ *)
 
-(** [Description] : Vérifie si le user est ami ou magicien et met à jour
-                    le fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-      - ip   : iper
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Vérifie si le user est ami ou magicien et met à jour le
+    fichier de cache. [Args] :
+    - conf : configuration de la base
+    - ip : iper [Retour] : unit [Rem] : Exporté en clair hors de ce module. *)
 let record_visited conf ip =
   if conf.Config.friend || conf.Config.wizard then
     let ht = read_visited conf in
@@ -2276,16 +2256,15 @@ let array_mem_witn base ip witnesses wnotes =
   in
   loop 0
 
-(** [select_masc conf base ips]
-    From [ips], a list matching ipers to a number of maximum generations,
-    get maximum ascendants of ipers up to these corresponding generations.
+(** [select_masc conf base ips] From [ips], a list matching ipers to a number of
+    maximum generations, get maximum ascendants of ipers up to these
+    corresponding generations.
 
-    A person is maximum ascendant if their generation matches the maximum, or
-    if they do not have ancestors.
+    A person is maximum ascendant if their generation matches the maximum, or if
+    they do not have ancestors.
 
     The result is a Hashtbl matching an iper to the corresponding person and
-    their generation.
-*)
+    their generation. *)
 let select_masc conf base ips =
   let poi =
     if conf.Config.wizard || conf.Config.friend then Gwdb.poi else pget conf
@@ -2491,8 +2470,8 @@ let read_base_env ~bname =
               let setting = cut_at_equal 0 s in
               loop
                 (if List.mem (fst setting) authorized_client_preference_keys
-                then env
-                else setting :: env)
+                 then env
+                 else setting :: env)
         | exception End_of_file -> env
       in
       loop []
