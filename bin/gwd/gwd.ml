@@ -14,86 +14,12 @@ module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 module Compat = Geneweb_compat
-
-type opened_file = { path : string; mutable oc : out_channel }
-type log = Stdout | Stderr | File of opened_file | Syslog
+open Cmd_legacy
 
 let timestamp_tag : unit Logs.Tag.def =
   Logs.Tag.def "timestamp" ~doc:"POSIX timestamp" Fmt.nop
 
 let timestamp = Logs.Tag.(empty |> add timestamp_tag ())
-let pp_brackets ~style pp = Fmt.(brackets @@ styled style @@ pp)
-
-let pp_level ppf level =
-  match level with
-  | Logs.App -> ()
-  | Logs.Error -> pp_brackets ~style:`Red Fmt.string ppf "ERROR"
-  | Logs.Warning -> pp_brackets ~style:`Yellow Fmt.string ppf "WARN"
-  | Logs.Info -> pp_brackets ~style:`Blue Fmt.string ppf "INFO"
-  | Logs.Debug -> pp_brackets ~style:`Green Fmt.string ppf "DEBUG"
-
-let pp_header ppf timestamp level =
-  match level with
-  | Logs.App -> ()
-  | _ ->
-      Format.fprintf ppf "%a%a: "
-        Fmt.(
-          option ~none:nop @@ pp_brackets ~style:`Magenta (Ptime.pp_rfc3339 ()))
-        timestamp pp_level level
-
-let reporter ~predictable_mode ppf =
-  let report src level ~over k msgf =
-    let k ppf =
-      Format.pp_close_box ppf ();
-      Format.pp_print_newline ppf ();
-      over ();
-      k ()
-    in
-    msgf @@ fun ?header ?tags fmt ->
-    let timestamp =
-      Option.bind tags @@ fun tags ->
-      Option.bind (Logs.Tag.find timestamp_tag tags) @@ fun () ->
-      if predictable_mode then Some Ptime.epoch else Some (Ptime_clock.now ())
-    in
-    pp_header ppf timestamp level;
-    Format.pp_open_box ppf 0;
-    Format.kfprintf k ppf fmt
-  in
-  { Logs.report }
-
-let setup_log ~predictable_mode t =
-  let set_reporter ppf = Logs.set_reporter @@ reporter ~predictable_mode ppf in
-  let set_file_reporter file =
-    let oc =
-      open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 file.path
-    in
-    file.oc <- oc;
-    set_reporter @@ Format.formatter_of_out_channel oc
-  in
-  let oc_to_fmt oc =
-    if Compat.Out_channel.isatty oc then
-      Fmt_tty.setup ~style_renderer:`Ansi_tty oc
-    else Format.formatter_of_out_channel oc
-  in
-  let refresh_file_reporter file =
-    close_out_noerr file.oc;
-    set_file_reporter file
-  in
-  let set_sighup_signal file =
-    if Sys.unix then
-      Sys.set_signal Sys.sighup
-        (Sys.Signal_handle (fun _ -> refresh_file_reporter file))
-  in
-  match t with
-  | Stdout -> set_reporter @@ oc_to_fmt Compat.Out_channel.stdout
-  | Stderr -> set_reporter @@ oc_to_fmt Compat.Out_channel.stderr
-  | File file ->
-      set_file_reporter file;
-      set_sighup_signal file
-  | Syslog ->
-      let addr = Unix.inet_addr_of_string "127.0.0.1" in
-      Logs.set_reporter (Logs_syslog_unix.udp_reporter addr ~port:514 ())
-
 let gzip_min_size = 1024
 
 let client_accepts_encoding request encoding =
@@ -186,92 +112,8 @@ let output_conf =
   }
 
 let ( // ) = Filename.concat
-
-let default_gw_prefix =
-  match Sites.hd with
-  | s :: _ -> s
-  | _ ->
-      (* This case occurs if gwd hasn't been installed with dune. *)
-      Filename.current_dir_name // "gw"
-
-let gw_prefix = ref None
-let set_gw_prefix s = gw_prefix := Some s
-let default_images_prefix = default_gw_prefix // "images"
-let images_prefix = ref None
-let set_images_prefix s = images_prefix := Some s
-let default_etc_prefix = default_gw_prefix // "etc"
-let etc_prefix = ref None
-let set_etc_prefix s = etc_prefix := Some s
-
-let parse_prefixes () =
-  let p =
-    match (!gw_prefix, !images_prefix) with
-    | Some s, None -> s // "images"
-    | _, Some s -> s
-    | None, None -> default_images_prefix
-  in
-  images_prefix := Some p;
-  let p =
-    match (!gw_prefix, !etc_prefix) with
-    | Some s, None -> s // "etc"
-    | _, Some s -> s
-    | None, None -> default_etc_prefix
-  in
-  etc_prefix := Some p;
-  let p = Option.value ~default:default_gw_prefix !gw_prefix in
-  gw_prefix := Some p;
-  Secure.add_assets p
-
-type plugin = {
-  (* Filesystem path to the plugin's directory. *)
-  path : string;
-  (* If [true], bypasses the checksum verification before loading. *)
-  unsafe : bool;
-  (* If [true], the plugin is loaded globally for all databases. *)
-  forced : bool;
-  (* If [true], [path] is treated as a parent directory containing multiple
-     sub-plugins to be discovered and loaded. If [false], [path] points
-     directly to a single plugin. *)
-  collection : bool;
-}
-
 let printer_conf = { Config.empty with output_conf }
-let auth_file = ref ""
-let cache_langs = ref []
-let cache_databases = ref []
-let choose_browser_lang = ref false
-let conn_timeout = ref 120
-let daemon = ref false
-let default_lang = ref "fr"
-let friend_passwd = ref ""
 let green_color = "#2f6400"
-let images_dir = ref ""
-let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
-let login_timeout = ref 1800
-let default_n_workers = 20
-let n_workers = ref default_n_workers
-let default_max_pending_requests = 150
-let max_pending_requests = ref default_max_pending_requests
-let no_host_address = ref false
-let only_addresses = ref []
-let plugins : plugin list ref = ref []
-let redirected_addr = ref None
-let robot_xcl = ref None
-let selected_addr = ref None
-let selected_port = ref 2317
-let setup_link = ref false
-let trace_failed_passwd = ref false
-let debug = ref false
-let check = ref false
-let use_auth_digest_scheme = ref false
-let wizard_just_friend = ref false
-let wizard_passwd = ref ""
-let predictable_mode = ref false
-let log_file : log ref = ref Stderr
-let verbosity_level = ref 6
-let debug_flag = ref false
-let force_cgi = ref false
-let cgi_secret_salt : string option ref = ref None
 
 let is_multipart_form =
   let s = "multipart/form-data" in
@@ -286,19 +128,6 @@ let is_multipart_form =
 
 let extract_boundary content_type =
   List.assoc "boundary" (Util.create_env content_type)
-
-let deprecated_warning_max_clients () =
-  Logs.warn (fun k ->
-      k
-        "The `-max_clients` option is deprecated and may be removed in a \
-         future release.@ It has no effect.@ Use `-n_workers` and\n\
-        \    `-max_pending_requests` instead.")
-
-let deprecated_warning_no_fork () =
-  Logs.warn (fun k ->
-      k
-        "The `-no-fork` option is deprecated and may be removed in a future \
-         release.@ To achieve the same behavior, use `-n_workers 0` instead.")
 
 type auth_report = {
   ar_ok : bool;
@@ -405,6 +234,18 @@ let lexicon_fname = ref (Filename.concat tmp "lexicon.bin.")
 let load_lexicon =
   let lexicon_cache = Hashtbl.create 0 in
   fun lang ->
+    let process_lexicon ht fname =
+      let fname =
+        let f = Util.search_in_assets fname in
+        if Sys.file_exists f then f
+        else
+          let bf = Filename.concat (Secure.base_dir ()) fname in
+          if Sys.file_exists bf then bf else f
+      in
+      if Sys.file_exists fname then
+        Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
+      else Logs.warn (fun k -> k "File %s unavailable\n" fname)
+    in
     let fname = !lexicon_fname ^ lang in
     match Hashtbl.find_opt lexicon_cache fname with
     | Some lex -> lex
@@ -413,25 +254,8 @@ let load_lexicon =
           Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
             (fun () ->
               let ht = Hashtbl.create 0 in
-              let rec rev_iter fn = function
-                | [] -> ()
-                | hd :: tl ->
-                    rev_iter fn tl;
-                    fn hd
-              in
-              rev_iter
-                (fun fname ->
-                  let fname =
-                    let f = Util.search_in_assets fname in
-                    if Sys.file_exists f then f
-                    else
-                      let bf = Filename.concat (Secure.base_dir ()) fname in
-                      if Sys.file_exists bf then bf else f
-                  in
-                  if Sys.file_exists fname then
-                    Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
-                  else Logs.warn (fun k -> k "File %s unavailable\n" fname))
-                !lexicon_list;
+              process_lexicon ht ("lang" // "lexicon.txt");
+              List.iter (process_lexicon ht) !lexicon_list;
               ht)
         in
         Hashtbl.add lexicon_cache fname lex;
@@ -448,7 +272,7 @@ let add_lex_dir dir =
   Filesystem.walk_folder
     (fun e () ->
       match e with
-      | Filesystem.File s -> lexicon_list := (dir // s) :: !lexicon_list
+      | Filesystem.File s -> lexicon_list := !lexicon_list @ [ dir // s ]
       | _ -> ())
     dir ()
 
@@ -487,7 +311,7 @@ let load_plugin ~unsafe ~forced path =
   Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
   load_cmxs cmxs
 
-let load_plugins { path; unsafe; forced; collection } =
+let load_plugins Cmd.{ path; unsafe; forced; collection } =
   if not collection then load_plugin ~unsafe ~forced path
   else
     match Plugin.compute_dependencies path with
@@ -628,7 +452,7 @@ let trace_auth base_env f =
 let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
   Output.status conf Code.Unauthorized;
-  if !use_auth_digest_scheme then
+  if !digest_password then
     let nonce = digest_nonce conf.ctime in
     let _ =
       let tm = Unix.localtime (Unix.time ()) in
@@ -1086,13 +910,15 @@ let parse_digest s =
 let basic_authorization from_addr request base_env passwd access_type utm
     base_file command =
   let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with Not_found -> !wizard_passwd
+    try List.assoc "wizard_passwd" base_env
+    with Not_found -> Option.value ~default:"" !wizard_passwd
   in
   let wizard_passwd_file =
     try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
   in
   let friend_passwd =
-    try List.assoc "friend_passwd" base_env with Not_found -> !friend_passwd
+    try List.assoc "friend_passwd" base_env
+    with Not_found -> Option.value ~default:"" !friend_passwd
   in
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
@@ -1282,13 +1108,15 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
 
 let digest_authorization request base_env passwd utm base_file command =
   let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with Not_found -> !wizard_passwd
+    try List.assoc "wizard_passwd" base_env
+    with Not_found -> Option.value ~default:"" !wizard_passwd
   in
   let wizard_passwd_file =
     try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
   in
   let friend_passwd =
-    try List.assoc "friend_passwd" base_env with Not_found -> !friend_passwd
+    try List.assoc "friend_passwd" base_env
+    with Not_found -> Option.value ~default:"" !friend_passwd
   in
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
@@ -1444,7 +1272,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
         ar_can_stale = false;
       }
   | ATnone | ATset ->
-      if !use_auth_digest_scheme then
+      if !digest_password then
         digest_authorization request base_env passwd utm base_file command
       else
         basic_authorization from_addr request base_env passwd access_type utm
@@ -1584,13 +1412,14 @@ let make_conf ~secret_salt from_addr request script_name env =
   let username, userkey = split_username ar.ar_name in
   let forced_plugins =
     List.fold_left
-      (fun acc { path; forced; _ } ->
+      (fun acc Cmd.{ path; forced; _ } ->
         if forced then Filename.basename path :: acc else acc)
       [] !plugins
     |> List.rev
   in
   let plugins =
-    List.fold_left (fun acc { path; _ } -> path :: acc) [] !plugins |> List.rev
+    List.fold_left (fun acc Cmd.{ path; _ } -> path :: acc) [] !plugins
+    |> List.rev
   in
   if List.assoc_opt "multi_parents" base_env = Some "yes" then
     warning_multi_parents ();
@@ -1687,9 +1516,9 @@ let make_conf ~secret_salt from_addr request script_name env =
       auth_file =
         (try
            let x = List.assoc "auth_file" base_env in
-           if x = "" then !auth_file
+           if x = "" then Option.value ~default:"" !auth_file
            else Filename.concat (!GWPARAM.bpath base_file) x
-         with Not_found -> !auth_file);
+         with Not_found -> Option.value ~default:"" !auth_file);
       border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
       n_connect = None;
       today =
@@ -1925,16 +1754,6 @@ let conf_and_connection =
                 let bt = Printexc.get_backtrace () in
                 printexc bt exn))
 
-let chop_extension name =
-  let rec loop i =
-    if i < 0 then name
-    else if name.[i] = '.' then String.sub name 0 i
-    else if name.[i] = '/' then name
-    else if name.[i] = '\\' then name
-    else loop (i - 1)
-  in
-  loop (String.length name - 1)
-
 let match_strings regexp s =
   let rec loop i j =
     if i = String.length regexp && j = String.length s then true
@@ -1950,7 +1769,7 @@ let match_strings regexp s =
   loop 0 0
 
 let excluded from =
-  let efname = chop_extension Sys.argv.(0) ^ ".xcl" in
+  let efname = Filename.remove_extension Sys.argv.(0) ^ ".xcl" in
   try
     let ic = open_in efname in
     let rec loop () =
@@ -2043,7 +1862,7 @@ let find_misc_file conf name =
   if
     Sys.file_exists name
     && List.exists
-         (fun { path; _ } -> Mutil.start_with (path // "assets") 0 name)
+         (fun Cmd.{ path; _ } -> Mutil.start_with (path // "assets") 0 name)
          !plugins
   then name
   else
@@ -2417,325 +2236,11 @@ let read_input len =
      with End_of_file -> ());
     Buffer.contents buff
 
-let arg_parse_in_file fname speclist anonfun errmsg =
-  try
-    let ic = open_in fname in
-    let list =
-      let rec loop acc =
-        match input_line ic with
-        | line -> loop (if line <> "" then line :: acc else acc)
-        | exception End_of_file ->
-            close_in ic;
-            List.rev acc
-      in
-      loop []
-    in
-    let list =
-      match list with [ x ] -> Gutil.arg_list_of_string x | _ -> list
-    in
-    Arg.parse_argv ~current:(ref 0)
-      (Array.of_list @@ (Sys.argv.(0) :: list))
-      speclist anonfun errmsg
-  with Sys_error _ -> ()
-
-let robot_exclude_arg s =
-  try robot_xcl := Scanf.sscanf s "%d,%d" (fun cnt sec -> Some (cnt, sec))
-  with _ ->
-    Printf.eprintf "Bad use of option -robot_xcl\n";
-    Printf.eprintf "Use option -help for usage.\n";
-    flush Stdlib.stderr;
-    exit 2
-
 let slashify s =
   let conv_char i = match s.[i] with '\\' -> '/' | x -> x in
   String.init (String.length s) conv_char
 
-let make_sock_dir x =
-  Filesystem.create_dir ~parent:true x;
-  if Sys.unix then ()
-  else (
-    Server.sock_in := Filename.concat x "gwd.sin";
-    Server.sock_out := Filename.concat x "gwd.sou");
-  GWPARAM.sock_dir := x
-
-let arg_plugin_doc opt doc =
-  doc
-  ^ " Combine with -force to enable for every base. Combine with -unsafe to \
-     allow unverified plugins. e.g. \"" ^ opt ^ " -unsafe -force\"."
-
-let arg_plugin_aux () =
-  let aux (unsafe, force, p) =
-    incr Arg.current;
-    assert (!Arg.current < Array.length Sys.argv);
-    match Sys.argv.(!Arg.current) with
-    | "-unsafe" -> (true, force, p)
-    | "-force" -> (unsafe, true, p)
-    | p' ->
-        assert (p = "");
-        (unsafe, force, p')
-  in
-  let rec loop ((_, _, p) as acc) = if p = "" then loop (aux acc) else acc in
-  loop (false, false, "")
-
-let arg_plugin opt doc =
-  ( opt,
-    Arg.Unit
-      (fun () ->
-        let unsafe, forced, path = arg_plugin_aux () in
-        plugins := !plugins @ [ { path; unsafe; forced; collection = false } ]),
-    arg_plugin_doc opt doc )
-
-let arg_plugins opt doc =
-  ( opt,
-    Arg.Unit
-      (fun () ->
-        let unsafe, forced, path = arg_plugin_aux () in
-        plugins := !plugins @ [ { path; unsafe; forced; collection = true } ]),
-    arg_plugin_doc opt doc )
-
-let print_version_commit () =
-  Printf.printf "Geneweb version %s\nRepository %s\n" Version.ver Version.src;
-  Printf.printf "Branch %s\nLast commit %s\n" Version.branch Version.commit_id;
-  exit 0
-
-let set_log_file f =
-  match f with
-  | "-" | "<stdout>" -> log_file := Stdout
-  | "2" | "<stderr>" -> log_file := Stderr
-  | "<syslog>" -> log_file := Syslog
-  | f -> log_file := File { path = f; oc = stdout }
-
-let set_verbosity_level lvl = verbosity_level := lvl
-
-let set_debug_flag () =
-  debug := true;
-  debug_flag := true;
-  Printexc.record_backtrace true;
-  set_verbosity_level 7;
-  Logs.set_level ~all:true (Some Logs.Debug);
-  Sys.enable_runtime_warnings true
-
-let set_predictable_mode () =
-  Logs.warn (fun k ->
-      k
-        "Predictable mode must not be enabled in production. It disables \
-         security enhancements and caching.");
-  predictable_mode := true
-
-let set_check_flag () =
-  check := true;
-  set_debug_flag ();
-  predictable_mode := true
-
-let parse_cmd () =
-  let usage =
-    "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
-  in
-  let speclist =
-    [
-      ( "-hd",
-        Arg.String set_gw_prefix,
-        Fmt.str
-          "<DIR> Specify where the “etc”, “images” and “lang” directories are \
-           installed (default if empty is %S)."
-          default_gw_prefix );
-      ( "-bd",
-        Arg.String Secure.set_base_dir,
-        Fmt.str
-          "<DIR> Specify where the “bases” directory with databases is \
-           installed (default if empty is %S)."
-          (Dirs.name Secure.default_base_dir) );
-      ( "-wd",
-        Arg.String make_sock_dir,
-        "<DIR> Directory for socket communication (Windows) and access count."
-      );
-      ( "-cache_langs",
-        Arg.String
-          (fun s ->
-            List.iter (Mutil.list_ref_append cache_langs)
-            @@ String.split_on_char ',' s),
-        " Lexicon languages to be cached." );
-      ("-cgi", Arg.Set force_cgi, " Force CGI mode.");
-      ( "-cgi_secret_salt",
-        Arg.String (fun s -> cgi_secret_salt := Some s),
-        "<STRING> Add a secret salt to form digests." );
-      ( "-etc_prefix",
-        Arg.String
-          (fun x ->
-            set_etc_prefix x;
-            Secure.add_assets x),
-        "<DIR> Specify where the “etc” directory is installed (default if \
-         empty is [-hd value]/etc)." );
-      ( "-images_prefix",
-        Arg.String set_images_prefix,
-        "<DIR> Specify where the “images” directory is installed (default if \
-         empty is [-hd value]/images)." );
-      ( "-images_dir",
-        Arg.String (fun x -> images_dir := x),
-        "<DIR> Same than previous but directory name relative to current." );
-      ( "-a",
-        Arg.String (fun x -> selected_addr := Some x),
-        "<ADDRESS> Select a specific address (default = any address of this \
-         computer)." );
-      ( "-p",
-        Arg.Int (fun x -> selected_port := x),
-        "<NUMBER> Select a port number (default = "
-        ^ string_of_int !selected_port
-        ^ ")." );
-      ( "-setup_link",
-        Arg.Set setup_link,
-        " Display a link to local gwsetup in bottom of pages." );
-      ( "-allowed_tags",
-        Arg.String (fun x -> Util.allowed_tags_file := x),
-        "<FILE> HTML tags which are allowed to be displayed. One tag per line \
-         in file." );
-      ( "-wizard",
-        Arg.String (fun x -> wizard_passwd := x),
-        "<PASSWD> Set a wizard password." );
-      ( "-friend",
-        Arg.String (fun x -> friend_passwd := x),
-        "<PASSWD> Set a friend password." );
-      ("-wjf", Arg.Set wizard_just_friend, " Wizard just friend (permanently).");
-      ( "-lang",
-        Arg.String (fun x -> default_lang := x),
-        "<LANG> Set a default language (default: " ^ !default_lang ^ ")." );
-      ( "-blang",
-        Arg.Set choose_browser_lang,
-        " Select the user browser language if any." );
-      ( "-only",
-        Arg.String (fun x -> only_addresses := x :: !only_addresses),
-        "<ADDRESS> Only inet address accepted." );
-      ( "-auth",
-        Arg.String (fun x -> auth_file := x),
-        "<FILE> Authorization file to restrict access. The file must hold \
-         lines of the form \"user:password\"." );
-      ( "-no_host_address",
-        Arg.Set no_host_address,
-        " Force no reverse host by address." );
-      ( "-digest",
-        Arg.Set use_auth_digest_scheme,
-        " Use Digest authorization scheme (more secure on passwords)" );
-      ( "-add_lexicon",
-        Arg.String (Mutil.list_ref_append lexicon_list),
-        "<FILE> Add file as lexicon." );
-      ( "-particles",
-        Arg.String (fun x -> Mutil.particles_file := x),
-        "<FILE> Particles file." );
-      ( "-log",
-        Arg.String set_log_file,
-        {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|}
-      );
-      ( "-log_level",
-        Arg.Int set_verbosity_level,
-        {|<N> Send messages with severity <= <N> to syslog (default: |}
-        ^ string_of_int !verbosity_level
-        ^ {|).|} );
-      ( "-robot_xcl",
-        Arg.String robot_exclude_arg,
-        "<CNT>,<SEC> Exclude connections when more than <CNT> requests in \
-         <SEC> seconds." );
-      ( "-min_disp_req",
-        Arg.Int (fun x -> Robot.min_disp_req := x),
-        " Minimum number of requests in robot trace (default: "
-        ^ string_of_int !Robot.min_disp_req
-        ^ ")." );
-      ( "-login_tmout",
-        Arg.Int (fun x -> login_timeout := x),
-        "<SEC> Login timeout for entries with passwords in CGI mode (default "
-        ^ string_of_int !login_timeout
-        ^ "s)." );
-      ( "-redirect",
-        Arg.String (fun x -> redirected_addr := Some x),
-        "<ADDR> Send a message to say that this service has been redirected to \
-         <ADDR>." );
-      ( "-trace_failed_passwd",
-        Arg.Set trace_failed_passwd,
-        " Print the failed passwords in log (except if option -digest is set). "
-      );
-      ("-debug", Arg.Unit set_debug_flag, " Enable debug mode");
-      ( "-nolock",
-        Arg.Set Lock.no_lock_flag,
-        " Do not lock files before writing." );
-      ( "-check",
-        Arg.Unit set_check_flag,
-        " Run only the server startup sequence for test purpose. This flag \
-         implies -debug and -predictable_mode." );
-      arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin.";
-      arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.";
-      ( "-version",
-        Arg.Unit print_version_commit,
-        " Print the Geneweb version, the source repository and last commit id \
-         and message." );
-    ]
-  in
-  let speclist =
-    if Sys.unix then
-      speclist
-      @ [
-          ( "-max_clients",
-            Arg.Unit deprecated_warning_max_clients,
-            "<NUM> Max number of clients treated at the same time (default: no \
-             limit) (not cgi) (DEPRECATED)." );
-          ( "-n_workers",
-            Arg.Int (fun x -> n_workers := x),
-            "<NUM> Number of workers used by the server (default: "
-            ^ string_of_int default_n_workers
-            ^ ")" );
-          ( "-max_pending_requests",
-            Arg.Int (fun x -> max_pending_requests := x),
-            "<NUM> Maximum number of pending requests (default: "
-            ^ string_of_int default_max_pending_requests
-            ^ ")" );
-          ( "-conn_tmout",
-            Arg.Int (fun x -> conn_timeout := x),
-            "<SEC> Connection timeout (only on Unix) (default "
-            ^ string_of_int !conn_timeout
-            ^ "s; 0 means no limit)." );
-          ("-daemon", Arg.Set daemon, " Unix daemon mode.");
-          ( "-no-fork",
-            Arg.Unit
-              (fun () ->
-                deprecated_warning_no_fork ();
-                n_workers := 0),
-            " Prevent forking processes (DEPRECATED)" );
-          ( "-cache-in-memory",
-            Arg.String
-              (fun s ->
-                if Gw_ancient.is_available then
-                  cache_databases := s :: !cache_databases
-                else
-                  failwith "-cache-in-memory option unavailable for this build."),
-            "<DATABASE> Preload this database in memory" );
-          ( "-predictable_mode",
-            Arg.Unit set_predictable_mode,
-            " Turn on the predictable mode. In this mode, the behavior of the \
-             server is predictable, which is helpful for debugging or testing. \
-             (default: false)" );
-        ]
-    else speclist
-  in
-  let speclist = List.sort compare speclist in
-  let speclist = Arg.align speclist in
-  let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
-  (if Sys.unix then
-     default_lang :=
-       let s = try Sys.getenv "LANG" with Not_found -> "" in
-       if List.mem s Version.available_languages then s
-       else
-         let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
-         if String.length s >= 2 then
-           let s = String.sub s 0 2 in
-           if List.mem s Version.available_languages then s else "en"
-         else "en");
-  arg_parse_in_file
-    (chop_extension Sys.argv.(0) ^ ".arg")
-    speclist anonfun usage;
-  Arg.parse speclist anonfun usage
-
 let main () =
-  if not Sys.unix then (
-    Server.sock_in := "gwd.sin";
-    Server.sock_out := "gwd.sou");
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2765,13 +2270,13 @@ let main () =
         Logs.err (fun k -> k "Cannot load the database %s" dbn);
         exit 2)
     !cache_databases;
-  if !auth_file <> "" && !force_cgi then
+  if Option.is_some !auth_file && !force_cgi then
     Logs.warn (fun k ->
         k
           "-auth option is not compatible with CGI mode.\n\
           \ Use instead friend_passwd_file= and wizard_passwd_file= in .cgf \
            file");
-  if !use_auth_digest_scheme && !force_cgi then
+  if !digest_password && !force_cgi then
     Logs.warn (fun k -> k "-digest option is not compatible with CGI mode.");
   (if !images_dir <> "" then
      let abs_dir =
@@ -2828,6 +2333,148 @@ let has_root_privileges () =
     || Unix.geteuid () = root
     || Unix.getegid () = root
 
+let parse_cmd () =
+  let arg_file = Sys.argv.(0) ^ ".arg" in
+  if Sys.file_exists arg_file then
+    Fmt.epr
+      "The file %S is ignored. If you want to pass additional arguments to \
+       gwd, we recommend writing a wrapper shell script."
+      arg_file;
+  match Cmd.parse () with
+  | `Ok o ->
+      selected_addr := o.interface;
+      selected_port := o.port;
+      Secure.set_base_dir o.base_dir;
+      gw_prefix := Some o.gw_prefix;
+      images_prefix := Some o.images_prefix;
+      images_dir := o.images_dir;
+      etc_prefix := Some o.etc_prefix;
+      socket_dir := o.socket_dir;
+      auth_file := o.authorization_file;
+      cache_langs := o.cache_langs;
+      cache_databases := o.cache_databases;
+      choose_browser_lang := o.browser_lang;
+      conn_timeout := o.connection_timeout;
+      daemon := o.daemon;
+      friend_passwd := o.friend_password;
+      default_lang := o.default_lang;
+      lexicon_list := o.lexicon_files;
+      login_timeout := o.login_timeout;
+      n_workers := o.n_workers;
+      max_pending_requests := o.max_pending_requests;
+      no_host_address := o.no_reverse_host;
+      only_addresses := o.allowed_addresses;
+      redirected_addr := o.redirect_interface;
+      robot_xcl := o.ban_threshold;
+      Robot.min_disp_req := o.min_disp_req;
+      trace_failed_passwd := o.trace_failed_password;
+      debug := o.debug;
+      check := o.check;
+      digest_password := o.digest_password;
+      wizard_just_friend := o.wizard_just_friend;
+      wizard_passwd := o.wizard_password;
+      predictable_mode := o.predictable_mode;
+      log_file := o.log;
+      verbosity_level := o.verbosity;
+      force_cgi := o.cgi;
+      cgi_secret_salt := o.secret_salt;
+      setup_link := o.setup_link;
+      plugins := o.plugins;
+      Lock.no_lock_flag := o.no_lock;
+      Mutil.particles_file := Option.value ~default:"" o.particles_file;
+      Util.allowed_tags_file := Option.value ~default:"" o.allowed_tags_file
+  | `Exit code -> exit code
+
+let make_socket_dir socket_dir =
+  match socket_dir with
+  | Some p ->
+      GWPARAM.sock_dir := p;
+      Filesystem.create_dir ~parent:true p;
+      if Sys.win32 then (
+        Server.sock_in := p // "gwd.sin";
+        Server.sock_out := p // "gwd.sou")
+  | None -> ()
+
+let switch_check () =
+  debug := true;
+  predictable_mode := true
+
+let switch_debug () =
+  Printexc.record_backtrace true;
+  set_verbosity_level 7;
+  Logs.set_level ~all:true (Some Logs.Debug);
+  Sys.enable_runtime_warnings true
+
+type opened_file = { path : string; mutable oc : out_channel option }
+type log = Stdout | Stderr | File of opened_file | Syslog
+
+let pp_brackets ~style pp = Fmt.(brackets @@ styled style @@ pp)
+
+let pp_level ppf l =
+  match l with
+  | Logs.App -> ()
+  | Logs.Error -> pp_brackets ~style:`Red Fmt.string ppf "ERROR"
+  | Logs.Warning -> pp_brackets ~style:`Yellow Fmt.string ppf "WARN"
+  | Logs.Info -> pp_brackets ~style:`Blue Fmt.string ppf "INFO"
+  | Logs.Debug -> pp_brackets ~style:`Green Fmt.string ppf "DEBUG"
+
+let pp_header ppf timestamp level =
+  match level with
+  | Logs.App -> ()
+  | _ ->
+      Format.fprintf ppf "%a%a: "
+        Fmt.(
+          option ~none:nop @@ pp_brackets ~style:`Magenta (Ptime.pp_rfc3339 ()))
+        timestamp pp_level level
+
+let reporter ~predictable_mode ppf =
+  let report src level ~over k msgf =
+    let k ppf =
+      Format.pp_close_box ppf ();
+      Format.pp_print_newline ppf ();
+      over ();
+      k ()
+    in
+    msgf @@ fun ?header ?tags fmt ->
+    let timestamp =
+      Option.bind tags @@ fun tags ->
+      Option.bind (Logs.Tag.find timestamp_tag tags) @@ fun () ->
+      if predictable_mode then Some Ptime.epoch else Some (Ptime_clock.now ())
+    in
+    pp_header ppf timestamp level;
+    Format.pp_open_box ppf 0;
+    Format.kfprintf k ppf fmt
+  in
+  { Logs.report }
+
+let setup_log ~predictable_mode t =
+  let set_reporter ppf = Logs.set_reporter @@ reporter ~predictable_mode ppf in
+  let refresh o =
+    Option.iter close_out_noerr o.oc;
+    let oc = open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 o.path in
+    set_reporter @@ Format.formatter_of_out_channel oc;
+    o.oc <- Some oc
+  in
+  let oc_to_fmt oc =
+    if Compat.Out_channel.isatty oc then
+      Fmt_tty.setup ~style_renderer:`Ansi_tty oc
+    else Format.formatter_of_out_channel oc
+  in
+  let set_sighup_signal o =
+    if Sys.unix then
+      Sys.set_signal Sys.sighup (Sys.Signal_handle (fun _ -> refresh o))
+  in
+  match t with
+  | Cmd.Stdout -> set_reporter @@ oc_to_fmt Compat.Out_channel.stdout
+  | Stderr -> set_reporter @@ oc_to_fmt Compat.Out_channel.stderr
+  | File path ->
+      let o = { path; oc = None } in
+      refresh o;
+      set_sighup_signal o
+  | Syslog ->
+      let addr = Unix.inet_addr_of_string "127.0.0.1" in
+      Logs.set_reporter (Logs_syslog_unix.udp_reporter addr ~port:514 ())
+
 let () =
   if has_root_privileges () then (
     Format.eprintf
@@ -2837,7 +2484,11 @@ let () =
     exit 1);
   Logs.set_level ~all:true (Some Logs.Info);
   parse_cmd ();
-  parse_prefixes ();
+  Secure.add_assets @@ Option.get !gw_prefix;
+  Secure.add_assets @@ Option.get !etc_prefix;
+  if !check then switch_check ();
+  if !debug then switch_debug ();
+  make_socket_dir !socket_dir;
   setup_log ~predictable_mode:!predictable_mode !log_file;
   try main () with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
