@@ -16,7 +16,7 @@
  (name gwd_lib)
  (public_name geneweb.gwd_lib)
  (libraries geneweb wserver dune-site cmdliner)
- (modules gwdPlugin request geneweb_sites cmd))
+ (modules gwdPlugin request geneweb_sites cmd cmd_legacy robot))
 
 (executable
  (package geneweb)
@@ -38,4 +38,4 @@
   unix
   uri
   wserver)
- (modules base64 gwd gwdPluginDep gwdPluginMD5 gwdPluginMETA robot))
+ (modules base64 gwd gwdPluginDep gwdPluginMD5 gwdPluginMETA))

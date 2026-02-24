@@ -1,4 +1,7 @@
 type log = Stdout | Stderr | File of string | Syslog
+type opt = Safe | Unsafe | Force
+type path = File of string | Dir of string
+type plugin = { path : path; opts : opt list }
 
 type t = {
   (* Directories *)
@@ -40,7 +43,8 @@ type t = {
   default_lang : string;
   browser_lang : bool;
   setup_link : string option;
-  (* Plugins *)
+  (* Plugin *)
+  plugins : plugin list;
   (* Tracing *)
   debug : bool;
   verbosity : int;
@@ -73,4 +77,4 @@ val parse_directories :
   string option ->
   string option ->
   string option ->
-  [ `Ok of string * string * string * string * string ]
+  string * string * string * string * string

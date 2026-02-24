@@ -5,6 +5,10 @@ module GWPARAM = Geneweb.GWPARAM
 let ( // ) = Filename.concat
 
 type log = Stdout | Stderr | File of string | Syslog
+type kind = Safe | Unsafe
+type opt = Safe | Unsafe | Force
+type path = File of string | Dir of string
+type plugin = { path : path; opts : opt list }
 
 type t = {
   (* Directories *)
@@ -46,6 +50,8 @@ type t = {
   default_lang : string;
   browser_lang : bool;
   setup_link : string option;
+  (* Plugins *)
+  plugins : plugin list;
   (* Tracing *)
   debug : bool;
   verbosity : int;
@@ -137,12 +143,10 @@ let parse_directories bd wd gw_prefix images_prefix etc_prefix =
     | None, None -> default_etc_prefix
   in
   let gw_prefix = Option.value ~default:default_gw_prefix gw_prefix in
-  `Ok (bd, wd, gw_prefix, images_prefix, etc_prefix)
+  (bd, wd, gw_prefix, images_prefix, etc_prefix)
 
 let directories =
-  let open Cmdliner.Term.Syntax in
-  C.Term.ret
-  @@
+  let open C.Term.Syntax in
   let+ base_dir = base_dir
   and+ socket_dir = socket_dir
   and+ gw_prefix = gw_prefix
@@ -157,19 +161,31 @@ let data_section = "DATA MANAGEMENT"
 let cache_databases =
   let doc = "Load these databases in memory before starting the server." in
   C.Arg.(
-    value & opt_all string []
+    value
+    & opt_all (list string) []
     & info [ "cache-database" ] ~docs:data_section ~doc)
+
+let cache_databases =
+  let open C.Term.Syntax in
+  let+ cache_databases = cache_databases in
+  List.concat cache_databases
 
 let lexicon_files =
   let doc = "Add file $(docv) as lexicon." in
   C.Arg.(
-    value & opt_all filepath []
+    value
+    & opt_all (list filepath) []
     & info [ "lexicon-file" ] ~docv:"FILE" ~docs:data_section ~doc)
+
+let lexicon_files =
+  let open C.Term.Syntax in
+  let+ lexicon_files = lexicon_files in
+  List.concat lexicon_files
 
 let cache_langs =
   let doc = "Cached lexicon languages." in
   C.Arg.(
-    value & opt_all string [] & info [ "cache-lang" ] ~docs:data_section ~doc)
+    value & opt (list string) [] & info [ "cache-lang" ] ~docs:data_section ~doc)
 
 let particles_files =
   let doc = "Particles file path." in
@@ -252,8 +268,9 @@ let allowed_tags_file =
 let allowed_addresses =
   let doc = "" in
   C.Arg.(
-    value & opt_all string []
-    & info [ "allowed-address" ] ~docs:security_section ~doc)
+    value
+    & opt (list string) []
+    & info [ "allowed-address" ] ~docv:"FILES" ~docs:security_section ~doc)
 
 let no_reverse_host =
   let doc = "Force no reverse host by address." in
@@ -292,7 +309,7 @@ let redirect_interface =
     value
     & opt (some string) None
     & info
-        [ "redirect"; "redirect-interface" ]
+        [ "redirect-interface"; "redirect" ]
         ~docs:http_section ~docv:"INTERFACE" ~doc)
 
 let port =
@@ -339,13 +356,12 @@ let default_lang =
   C.Arg.(
     value
     & opt string default_default_lang
-    & info [ "dlang"; "default-lang" ] ~docs:web_interface_section ~doc)
+    & info [ "default-lang" ] ~docs:web_interface_section ~doc)
 
 let browser_lang =
   let doc = "Select the user brower language if defined." in
   C.Arg.(
-    value & flag
-    & info [ "blang"; "browser-lang" ] ~docs:web_interface_section ~doc)
+    value & flag & info [ "browser-lang" ] ~docs:web_interface_section ~doc)
 
 let setup_link =
   let doc = "Display a link to local gwsetup in bottom of pages." in
@@ -353,6 +369,43 @@ let setup_link =
     value
     & opt (some string) None
     & info [ "setup-link" ] ~docs:web_interface_section ~docv:"URL" ~doc)
+
+(* Plugin commands *)
+
+let plugin_section = "PLUGIN"
+
+let plugin_files =
+  let doc =
+    "Specify where the “bases” directory with databases is installed."
+  in
+  C.Arg.(
+    value
+    & opt_all (list filepath) []
+    & info [ "plugin-file" ] ~docs:plugin_section ~docv:"PATH" ~doc)
+
+let plugin_dirs =
+  let doc =
+    "Specify where the “bases” directory with databases is installed."
+  in
+  C.Arg.(
+    value
+    & opt_all (list dirpath) []
+    & info [ "plugin-dir" ] ~docs:plugin_section ~docv:"PATH" ~doc)
+
+let plugins =
+  let open C.Term.Syntax in
+  let+ plugin_files = plugin_files and+ plugin_dirs = plugin_dirs in
+  let acc =
+    List.fold_left
+      (fun acc file -> { path = File file; opts = [ Safe ] } :: acc)
+      [] (List.concat plugin_files)
+  in
+  let acc =
+    List.fold_left
+      (fun acc dir -> { path = Dir dir; opts = [ Safe ] } :: acc)
+      acc (List.concat plugin_dirs)
+  in
+  List.rev acc
 
 (* Tracing commands *)
 
@@ -368,7 +421,7 @@ let verbosity =
   let doc = "" in
   C.Arg.(
     value & opt int default_verbosity
-    & info [ "v"; "verbosity" ] ~docs:tracing_section ~docv:"INT" ~doc)
+    & info [ "verbosity" ] ~docs:tracing_section ~docv:"INT" ~doc)
 
 let log =
   let doc = "" in
@@ -381,7 +434,7 @@ let trace_failed_password =
     value & flag & info [ "trace-failed-password" ] ~docs:tracing_section ~doc)
 
 let t =
-  let open Cmdliner.Term.Syntax in
+  let open C.Term.Syntax in
   let doc = "" in
   C.Cmd.make (C.Cmd.info "gwd" ~version:"%%VERSION%%" ~doc)
   @@
@@ -415,6 +468,7 @@ let t =
   and+ default_lang = default_lang
   and+ browser_lang = browser_lang
   and+ setup_link = setup_link
+  and+ plugins = plugins
   and+ debug = debug
   and+ verbosity = verbosity
   and+ log = log
@@ -454,6 +508,7 @@ let t =
     default_lang;
     browser_lang;
     setup_link;
+    plugins;
     debug;
     verbosity;
     log;
