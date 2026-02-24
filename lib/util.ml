@@ -326,49 +326,59 @@ let nth_field w n =
   let i1, i2 = if i2 = i1 then nth_field_abs w 0 else (i1, i2) in
   String.sub w i1 (i2 - i1)
 
-let tnf s = "[" ^ s ^ "]"
+let tnf s = "[x" ^ s ^ "]"
 let transl conf w = try Hashtbl.find conf.lexicon w with Not_found -> tnf w
 
 let transl_nth conf w n =
+  Printf.eprintf "Util.transl_nth 1: %d, %s\n" n w;
   let len = String.length w in
   let w =
     if len > 3 && w.[len - 1] = ':' && w.[len - 2] = ':' && w.[len - 3] = ':'
     then String.sub w 0 (len - 3)
     else w
   in
+  Printf.eprintf "Util.transl_nth 2: %d, (%s)\n" n w;
   try nth_field (Hashtbl.find conf.lexicon w) n
   with Not_found -> tnf (nth_field w n)
 
 let gen_decline_basic wt s =
+  Printf.eprintf "Util.gen_decline_basic: %s, %s\n" wt s;
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
-  if len >= 3 && wt.[len - 3] = ':' && wt.[len - 1] = ':' then
-    let start = String.sub wt 0 (len - 3) in
-    start ^ Mutil.decline wt.[len - 2] s
-  else
-    match String.rindex_opt wt '+' with
-    | Some i ->
-        if
-          i > 0
-          && wt.[i - 1] = ' '
-          && String.length wt - i = 7
-          && String.get wt (i + 1) = 'b'
-          && String.get wt (i + 2) = 'e'
-          && String.get wt (i + 3) = 'f'
-          && String.get wt (i + 4) = 'o'
-          && String.get wt (i + 5) = 'r'
-          && String.get wt (i + 6) = 'e'
-        then
-          let start = String.sub wt 0 (i - 1) in
-          if s = "" then start else Mutil.decline 'n' s ^ " " ^ start
-        else wt ^ Mutil.decline 'n' s1
-    | None -> wt ^ Mutil.decline 'n' s1
+  (* detect wt = xxxx :x: -> decline s according to x *)
+  let start, rest =
+    if len >= 3 && wt.[len - 3] = ':' && wt.[len - 1] = ':' then
+      (String.sub wt 0 (len - 4), Mutil.decline wt.[len - 2] s)
+    else (wt, s)
+  in
+  (* detect start = xxxx +before -> invert result *)
+  match String.rindex_opt start '+' with
+  | Some i ->
+      if
+        i > 0
+        && wt.[i - 1] = ' '
+        && String.length wt - i = 7
+        && String.get wt (i + 1) = 'b'
+        && String.get wt (i + 2) = 'e'
+        && String.get wt (i + 3) = 'f'
+        && String.get wt (i + 4) = 'o'
+        && String.get wt (i + 5) = 'r'
+        && String.get wt (i + 6) = 'e'
+      then
+        let start = String.sub wt 0 (i - 1) in
+        if s = "" then start else Mutil.decline 'n' s ^ " " ^ start
+      else wt ^ Mutil.decline 'n' s1
+  | None -> start ^ " " ^ Mutil.decline 'n' rest
 
 let transl_decline conf w s =
-  Translate.eval (gen_decline_basic (transl conf w) s)
+  Printf.eprintf "Util.transl decline: %s, %s\n" w s;
+  let str = Translate.eval (gen_decline_basic (transl conf w) s) in
+  Printf.eprintf "result: %s\n" str;
+  str
 
 (* in string s, handle xxx[aa|bb]Xcc according to X status (vowel) *)
 let simple_decline conf wt =
+  Printf.eprintf "Util.simple_decline: %s\n" wt;
   let len = String.length wt in
   let rec loop i =
     if i >= len then ""
@@ -397,6 +407,7 @@ let simple_decline conf wt =
   loop 0
 
 let gen_decline conf wt s1 s2 s2_raw =
+  Printf.eprintf "Util.gen_decline: %s, %s, %s\n" wt s1 s2;
   let string_of = function '1' -> Some s1 | '2' -> Some s2 | _ -> None in
   let len = String.length wt in
   let rec loop i =
@@ -910,8 +921,8 @@ let access_status p =
     - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
 *)
 let acces_n conf base n x : Adef.escaped_string =
-  let first_name = Driver.p_first_name base x in
-  let surname = Driver.p_surname base x in
+  let first_name = Driver.p_first_name_raw base x in
+  let surname = Driver.p_surname_raw base x in
   if surname = "" then Adef.escaped ""
   else if accessible_by_key conf base x first_name surname then
     "p" ^<^ n ^^^ "="

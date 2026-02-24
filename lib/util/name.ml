@@ -1,7 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 (* La liste des caractères interdits *)
-let forbidden_char = [ ':'; '@'; '#'; '='; '$' ]
+let forbidden_char = [ '@'; '#'; '='; '$' ]
 
 (* Name.lower *)
 
@@ -34,6 +34,13 @@ let next_chars_if_equiv s i t j =
      Key comparison (first name, surname, number) applies "lower" equality
      on first names and surnames *)
 let lower s =
+  let s =
+    try
+      let i = String.index s ':' in
+      String.sub s 0 i
+    with Not_found -> s
+  in
+
   let rec copy special i len =
     if i = String.length s then Buff.get len
     else if Char.code s.[i] < 0x80 then

@@ -840,6 +840,8 @@ let delete_person_rec base iper = ignore @@ delete_person_aux ([], []) base iper
 let delete_family_rec base ifam = ignore @@ delete_family_aux ([], []) base ifam
 let p_first_name base p = Mutil.nominative (sou base (get_first_name p))
 let p_surname base p = Mutil.nominative (sou base (get_surname p))
+let p_first_name_raw base p = sou base (get_first_name p)
+let p_surname_raw base p = sou base (get_surname p)
 
 let children_of_p base p =
   Array.fold_right

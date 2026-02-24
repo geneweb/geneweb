@@ -879,21 +879,14 @@ let treat_request =
                  match p_getenv conf.env "v" with
                  | Some v ->
                      (* Redirection vers m=S pour compatibilité *)
-                     let t_param =
-                       match p_getenv conf.env "t" with
-                       | Some t -> ("t", Mutil.encode t)
-                       | None -> ("t", Mutil.encode "")
-                     in
                      let conf =
                        {
                          conf with
                          env =
                            ("m", Mutil.encode "S")
                            :: ("p", Mutil.encode v)
-                           :: t_param
                            :: List.remove_assoc "m"
-                                (List.remove_assoc "v"
-                                   (List.remove_assoc "t" conf.env));
+                                (List.remove_assoc "v" conf.env);
                        }
                      in
                      SearchName.print conf base specify

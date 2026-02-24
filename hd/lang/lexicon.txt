@@ -1768,6 +1768,11 @@ sv: lägg till en grupp
 tr: bir grup ekle
 zh: 添加一个组
 
+    parent/parents
+en: parent/parents
+de: Eltern/Eltern
+fr: parent/parents
+
     add
 af: byvoeg
 bg: добавяне на
@@ -13090,6 +13095,14 @@ ru: изменение/изменения
 sv: ändring/ändringar
 tr: güncelleme/güncellemeler
 
+    modify %s
+cs: změnit :a:%s
+fr: modifier %s
+
+    celebrate %s
+cs: slavit :a:%s
+fr: célébrer %s
+
     modify
 af: wysig
 bg: да се променят
@@ -19294,6 +19307,7 @@ tr: ertesi gün
 
     the difference of age between %t and %t is quite important
 co: a sfarenza d’età trà %t è %t pare assai impurtante
+cs: rozdíl věku mezi :a:%t a :a:%t je docela důležitý
 de: der Altersunterschied zwischen %t und %t ist sehr groß
 en: date of birth of %t and %t are too far together
 es: la diferencia de edad entre %t y %t es grande

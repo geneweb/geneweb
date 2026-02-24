@@ -354,8 +354,8 @@ let nobility_titles_list conf base p =
       personne a été modifiée, Faux sinon. [Rem] : Exporté en clair hors de ce
       module. *)
 let has_history conf base p p_auth =
-  let fn = Driver.sou base (Driver.get_first_name p) in
-  let sn = Driver.sou base (Driver.get_surname p) in
+  let fn = Driver.p_first_name base p in
+  let sn = Driver.p_surname base p in
   let occ = Driver.get_occ p in
   let person_file = HistoryDiff.history_file fn sn occ in
   p_auth && Sys.file_exists (HistoryDiff.history_path conf person_file)
@@ -1545,8 +1545,8 @@ let get_linked_page conf base p s =
   let db = Driver.read_nldb base in
   let db = Notes.merge_possible_aliases conf db in
   let key =
-    let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-    let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+    let fn = Name.lower (Driver.p_first_name base p) in
+    let sn = Name.lower (Driver.p_surname base p) in
     (fn, sn, Driver.get_occ p)
   in
   List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
@@ -2429,10 +2429,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       in
       str_val
         ((Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
-        ^ "pz="
-        ^ Driver.sou base (Driver.get_first_name p)
-        ^ "&nz="
-        ^ Driver.sou base (Driver.get_surname p)
+        ^ "pz=" ^ Driver.p_first_name base p ^ "&nz=" ^ Driver.p_surname base p
         ^ (if Driver.get_occ p <> 0 then
              "&ocz=" ^ string_of_int (Driver.get_occ p)
            else "")
@@ -3223,8 +3220,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
         match get_env "nldb" env with
         | Vnldb db ->
             let key =
-              let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-              let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+              let fn = Name.lower (Driver.p_first_name base p) in
+              let sn = Name.lower (Driver.p_surname base p) in
               (fn, sn, Driver.get_occ p)
             in
             let r =
@@ -3257,8 +3254,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
         match get_env "nldb" env with
         | Vnldb db ->
             let key =
-              let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-              let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+              let fn = Name.lower (Driver.p_first_name base p) in
+              let sn = Name.lower (Driver.p_surname base p) in
               (fn, sn, Driver.get_occ p)
             in
             VVbool (Notes.links_to_ind conf base db key None <> [])
@@ -3272,10 +3269,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           let r =
             if p_auth then
               let key =
-                let fn =
-                  Name.lower (Driver.sou base (Driver.get_first_name p))
-                in
-                let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+                let fn = Name.lower (Driver.p_first_name base p) in
+                let sn = Name.lower (Driver.p_surname base p) in
                 (fn, sn, Driver.get_occ p)
               in
               string_of_int
@@ -3293,10 +3288,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           let n =
             if p_auth then
               let key =
-                let fn =
-                  Name.lower (Driver.sou base (Driver.get_first_name p))
-                in
-                let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+                let fn = Name.lower (Driver.p_first_name base p) in
+                let sn = Name.lower (Driver.p_surname base p) in
                 (fn, sn, Driver.get_occ p)
               in
               List.length (Notes.links_to_ind conf base db key (Some s))
@@ -3319,8 +3312,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       match get_env "nldb" env with
       | Vnldb db ->
           let key =
-            let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-            let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+            let fn = Name.lower (Driver.p_first_name base p) in
+            let sn = Name.lower (Driver.p_surname base p) in
             (fn, sn, Driver.get_occ p)
           in
           List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
@@ -4154,6 +4147,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if GWPARAM.p_auth_sp conf base p then
         Driver.p_first_name base p |> Util.escape_html |> safe_val
       else str_val (Util.private_txt conf "p")
+  | "first_name_raw" ->
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.p_first_name_raw base p |> Util.escape_html |> safe_val
+      else str_val (Util.private_txt conf "p")
   | "first_name_key" ->
       if hide_person conf base p then null_val
       else Driver.p_first_name base p |> Name.lower |> Mutil.encode |> safe_val
@@ -4166,8 +4163,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "history_file" ->
       if not p_auth then null_val
       else
-        let fn = Driver.sou base (Driver.get_first_name p) in
-        let sn = Driver.sou base (Driver.get_surname p) in
+        let fn = Driver.p_first_name base p in
+        let sn = Driver.p_surname base p in
         let occ = Driver.get_occ p in
         HistoryDiff.history_file fn sn occ |> str_val
   | "image" | "portrait" -> (
@@ -5856,6 +5853,16 @@ let eval_predefined_apply conf env f vl =
           l := SortedList.add sl !l;
           ""
       | _ -> raise Not_found)
+  | "decline", [ case; s ] ->
+      let c =
+        match String.length case with
+        | 1 -> case.[0]
+        | _ ->
+            Logs.warn (fun k ->
+                k "bad case format (%s) in %%apply;decline" case);
+            'g'
+      in
+      Mutil.decline c s |> Translate.eval
   | "hexa", [ s ] -> Util.hexa_string s
   | "initial", [ s ] ->
       if String.length s = 0 then "" else String.sub s 0 (Utf8.next s 0)
