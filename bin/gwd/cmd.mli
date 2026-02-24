@@ -45,7 +45,7 @@ type t = {
   setup_link : string option;
   (* Plugin *)
   plugins : plugin list;
-  (* Tracing *)
+  (* Tracing & debugging *)
   debug : bool;
   verbosity : int;
   log : log;

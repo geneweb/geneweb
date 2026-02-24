@@ -2297,8 +2297,10 @@ let legacy_arguments =
     ("-auth", "--authorization-file");
     ("-bd", "--bd");
     ("-blang", "--browser-lang");
+    ("-daemon", "--daemon");
     ("-debug", "--debug");
     ("-digest", "--digest-password");
+    ("-cache-in-memory", "--cache-database");
     ("-cache_langs", "--cache-langs");
     ("-cgi", "--cgi");
     ("-cgi_secret_salt", "--secret-salt");
@@ -2343,7 +2345,8 @@ let preprocess_legacy_arguments =
   Array.map (fun a ->
       match Hashtbl.find tbl a with
       | new_ ->
-          Fmt.epr "The CLI option %S is deprecated. Please use %S instead.@." a new_;
+          (* TODO: Turn this log on when we are ready to deprecated the legacy CLI. *)
+          (* Fmt.epr "The CLI option %S is deprecated. Please use %S instead.@." a new_; *)
           new_
       | exception Not_found -> a)
 

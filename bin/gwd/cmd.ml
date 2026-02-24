@@ -1,6 +1,7 @@
 module Sites = Geneweb_sites.Sites
-module C = Cmdliner
 module GWPARAM = Geneweb.GWPARAM
+module Version = Geneweb.Version
+module C = Cmdliner
 
 let ( // ) = Filename.concat
 
@@ -52,7 +53,7 @@ type t = {
   setup_link : string option;
   (* Plugins *)
   plugins : plugin list;
-  (* Tracing *)
+  (* Tracing & debugging *)
   debug : bool;
   verbosity : int;
   log : log;
@@ -93,37 +94,44 @@ let default_images_prefix = default_gw_prefix // "images"
 let default_etc_prefix = default_gw_prefix // "etc"
 
 let base_dir =
-  let doc =
-    "Specify where the “bases” directory with databases is installed."
-  in
+  let doc = "$(docv) is the directory where GeneWeb databases are stored." in
   C.Arg.(
     value
     & opt dirpath default_base_dir
     & info [ "bd"; "base-dir" ] ~docs:dirs_section ~docv:"PATH" ~doc)
 
 let socket_dir =
-  let doc = "Directory for socket communication and access count on Windows." in
+  let doc =
+    "$(docv) specifies where socket communication and access count are \n\
+    \  stored on Windows."
+  in
   C.Arg.(
     value
     & opt dirpath default_socket_dir
     & info [ "wd"; "socket-dir" ] ~docs:dirs_section ~docv:"PATH" ~doc)
 
 let gw_prefix =
-  let doc = "Specify where etc, images and lang directories are installed." in
+  let doc =
+    "$(docv) specifies where \"etc\", \"images\" and \"lang\" directories are \
+     installed."
+  in
   C.Arg.(
     value
     & opt (some dirpath) None
-    & info [ "hd" ] ~docs:dirs_section ~docv:"PATH" ~doc)
+    & info [ "hd"; "gw-prefix" ] ~docs:dirs_section ~docv:"PATH" ~doc)
 
 let images_prefix =
-  let doc = "Specify where the “images” directory is installed." in
+  let doc = "$(docv) specifies where the \"images\" directory is installed." in
   C.Arg.(
     value
     & opt (some dirpath) None
     & info [ "images-prefix" ] ~docs:dirs_section ~docv:"PATH" ~doc)
 
 let etc_prefix =
-  let doc = "Specifywhere etc, images and lang directories are installed." in
+  let doc =
+    "$(docv) specifies where \"etc\" directory is installed. The default\n\
+    \  is gw_prefix/etc."
+  in
   C.Arg.(
     value
     & opt (some dirpath) None
@@ -205,8 +213,8 @@ let default_login_timeout = 1800
 
 let authorization_file =
   let doc =
-    "Authorization file to restrict access. The file must hold lines of the \
-     form 'user:password'."
+    "$(docv) is an authorization file to restrict access. The file must hold \
+     lines of the form 'user:password'."
   in
   C.Arg.(
     value
@@ -241,21 +249,27 @@ let wizard_just_friend =
     & info [ "wjf"; "wizard-just-friend" ] ~docs:security_section ~doc)
 
 let wizard_password =
-  let doc = "Set a wizard password." in
+  let doc =
+    "Set a password to grant administrative and editing rights \n\
+    \  via the web interface."
+  in
   C.Arg.(
     value
     & opt (some string) None
     & info [ "wizard-password" ] ~docs:security_section ~doc)
 
 let friend_password =
-  let doc = "Set a friend password." in
+  let doc = "Set a wizard password." in
   C.Arg.(
     value
     & opt (some string) None
     & info [ "friend-password" ] ~docs:security_section ~doc)
 
 let digest_password =
-  let doc = "Use digest authorization scheme for passwords." in
+  let doc =
+    "Enables HTTP digest authentification schema instead of plain \n\
+    \  schema. This feature is not compatible with the CGI mode."
+  in
   C.Arg.(value & flag & info [ "digest-password" ] ~docs:security_section ~doc)
 
 let allowed_tags_file =
@@ -266,27 +280,30 @@ let allowed_tags_file =
     & info [ "allowed-tags-file" ] ~docs:security_section ~doc)
 
 let allowed_addresses =
-  let doc = "" in
+  let doc = "A whitelist of IP addresses allowed to connect to the server." in
   C.Arg.(
     value
     & opt (list string) []
-    & info [ "allowed-address" ] ~docv:"FILES" ~docs:security_section ~doc)
+    & info [ "allowed-address" ] ~docs:security_section ~docv:"FILES" ~doc)
 
 let no_reverse_host =
   let doc = "Force no reverse host by address." in
   C.Arg.(value & flag & info [ "no-reverse-host" ] ~docs:security_section ~doc)
 
 let ban_threshold =
-  let doc = "Ban robots opening more than $(docv) connections per seconds." in
+  let doc =
+    "Bans IP addresses making more than $(docv) requests per second. Set \n\
+    \  to 0 to disable."
+  in
   C.Arg.(
     value & opt int 0
-    & info [ "ban-threshold" ] ~docv:"INT" ~docs:security_section ~doc)
+    & info [ "ban-threshold" ] ~docs:security_section ~docv:"INT" ~doc)
 
 let min_disp_req =
   let doc = "Set minimum traced requests by robot to $(docv)." in
   C.Arg.(
     value & opt int 0
-    & info [ "min-disp-req" ] ~docv:"INT" ~docs:security_section ~doc)
+    & info [ "min-disp-req" ] ~docs:security_section ~docv:"INT" ~doc)
 
 (* HTTP server commands *)
 
@@ -297,7 +314,7 @@ let default_max_pending_requests = 150
 let default_n_workers = 20
 
 let interface =
-  let doc = "Select a specific interface" in
+  let doc = "Bind the HTTP server to the network interface $(docv)." in
   C.Arg.(
     value
     & opt (some string) None
@@ -313,7 +330,7 @@ let redirect_interface =
         ~docs:http_section ~docv:"INTERFACE" ~doc)
 
 let port =
-  let doc = "Select a port" in
+  let doc = "Set the TCP port listen by the HTTP server to $(docv)." in
   C.Arg.(
     value & opt int default_port
     & info [ "p"; "port" ] ~docs:http_section ~docv:"PORT" ~doc)
@@ -333,17 +350,20 @@ let max_pending_requests =
     & info [ "max-pending-requests" ] ~docs:http_section ~docv:"INT" ~doc)
 
 let n_workers =
-  let doc = "Number of workers used by the HTTP server." in
+  let doc =
+    "$(docv) is the number of workers available to process \n\
+    \  incoming HTTP requests."
+  in
   C.Arg.(
     value & opt int default_n_workers
     & info [ "n-workers" ] ~docs:http_section ~docv:"INT" ~doc)
 
 let cgi =
-  let doc = "Force CGI mode." in
+  let doc = "Force the server to behave as a CGI script." in
   C.Arg.(value & flag & info [ "cgi" ] ~docs:http_section ~doc)
 
 let daemon =
-  let doc = "Unix daemon mode." in
+  let doc = "Run the process in the background (UNIX only)." in
   C.Arg.(value & flag & info [ "daemon" ] ~docs:http_section ~docv:"INT" ~doc)
 
 (* Web interface commands *)
@@ -352,19 +372,26 @@ let web_interface_section = "WEB INTERFACE"
 let default_default_lang = "fr"
 
 let default_lang =
-  let doc = "Select a default language." in
+  let doc =
+    "Set the fallback language for the user interface if no \n\
+    \  language is specified."
+  in
   C.Arg.(
     value
     & opt string default_default_lang
     & info [ "default-lang" ] ~docs:web_interface_section ~doc)
 
 let browser_lang =
-  let doc = "Select the user brower language if defined." in
+  let doc =
+    "Select the user interface language based on the client\n  configuration."
+  in
   C.Arg.(
     value & flag & info [ "browser-lang" ] ~docs:web_interface_section ~doc)
 
 let setup_link =
-  let doc = "Display a link to local gwsetup in bottom of pages." in
+  let doc =
+    "Display a shortcut link at the bottom of the pages to gwsetup tool."
+  in
   C.Arg.(
     value
     & opt (some string) None
@@ -407,18 +434,24 @@ let plugins =
   in
   List.rev acc
 
-(* Tracing commands *)
+(* Tracing & debugging commands *)
 
-let tracing_section = "TRACING"
+let tracing_section = "TRACING & DEBUGGING"
 let default_verbosity = 6
 let default_log = Stderr
 
 let debug =
-  let doc = "" in
+  let doc =
+    "Enable debug mode. Provides more verbose output and traces. The option \n\
+    \  turns predicatable mode on."
+  in
   C.Arg.(value & flag & info [ "d"; "debug" ] ~docs:tracing_section ~doc)
 
 let verbosity =
-  let doc = "" in
+  let doc =
+    "Adjust the level of logging detail to $(docv). Higher values provide\n\
+    \  more details."
+  in
   C.Arg.(
     value & opt int default_verbosity
     & info [ "verbosity" ] ~docs:tracing_section ~docv:"INT" ~doc)
@@ -435,8 +468,8 @@ let trace_failed_password =
 
 let t =
   let open C.Term.Syntax in
-  let doc = "" in
-  C.Cmd.make (C.Cmd.info "gwd" ~version:"%%VERSION%%" ~doc)
+  let doc = "Geneweb daemon" in
+  C.Cmd.make (C.Cmd.info "gwd" ~version:Version.ver ~doc)
   @@
   let+ base_dir, socket_dir, gw_prefix, images_prefix, etc_prefix = directories
   and+ cache_databases = cache_databases
