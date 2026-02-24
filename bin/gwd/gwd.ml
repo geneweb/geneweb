@@ -379,7 +379,7 @@ exception
     string * [ `dynlink_error of Dynlink.error | `string of string ]
 
 let register_plugin dir =
-  if !debug then print_endline (__LOC__ ^ ": " ^ dir);
+  if !debug then prerr_endline (__LOC__ ^ ": " ^ dir);
   if not (List.mem dir !unsafe_plugins || GwdPluginMD5.allowed dir) then
     failwith dir;
   let pname = Filename.basename dir in
