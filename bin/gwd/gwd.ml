@@ -2289,71 +2289,13 @@ let has_root_privileges () =
     || Unix.geteuid () = root
     || Unix.getegid () = root
 
-let legacy_arguments =
-  [
-    ("-a", "-i");
-    ("-add_lexicon", "--lexicon-file");
-    ("-allowed_tags", "--allowed-tags-file");
-    ("-auth", "--authorization-file");
-    ("-bd", "--bd");
-    ("-blang", "--browser-lang");
-    ("-daemon", "--daemon");
-    ("-debug", "--debug");
-    ("-digest", "--digest-password");
-    ("-cache-in-memory", "--cache-database");
-    ("-cache_langs", "--cache-langs");
-    ("-cgi", "--cgi");
-    ("-cgi_secret_salt", "--secret-salt");
-    ("-conn_tmout", "--connection-timeout");
-    ("-etc_prefix", "--etc-prefix");
-    ("-friend", "--friend-password");
-    ("-force", "");
-    ("-help", "--help");
-    ("-hd", "--gw-prefix");
-    ("-images_prefix", "--images-prefix");
-    ("-images_dir", "--images-dir");
-    ("-lang", "--default-lang");
-    ("-log", "--log");
-    ("-log_level", "--verbosity");
-    ("-login_tmout", "--login-timeout");
-    ("-max_clients", "--max-clients");
-    ("-max_pending_requests", "--max-pending-requests");
-    ("-min_disp_req", "--min-disp-req");
-    ("-no_host_address", "--no-reverse-host");
-    ("-nolock", "--no-lock");
-    ("-n_workers", "--n-workers");
-    ("-only", "--allowed-address");
-    ("-p", "--port");
-    ("-particles", "--particles-file");
-    ("-plugin", "--plugin-file");
-    ("-plugins", "--plugin-dir");
-    ("-redirect", "--redirect-interface");
-    ("-robot_xcl", "--ban-threshold");
-    ("-safe", "");
-    ("-setup_link", "--setup-link");
-    ("-trace_failed_passwd", "--trace-failed-password");
-    ("-unsafe", "");
-    ("-version", "--version");
-    ("-wd", "--socket-dir");
-    ("-wizard", "--wizard-password");
-    ("-wjf", "--wizard-just-friend");
-  ]
-
-let preprocess_legacy_arguments =
-  let tbl : (string, string) Hashtbl.t = Hashtbl.create 17 in
-  List.iter (fun (old, new_) -> Hashtbl.add tbl old new_) legacy_arguments;
-  Array.map (fun a ->
-      match Hashtbl.find tbl a with
-      | new_ ->
-          (* TODO: Turn this log on when we are ready to deprecated the legacy CLI. *)
-          (* Fmt.epr "The CLI option %S is deprecated. Please use %S instead.@." a new_; *)
-          new_
-      | exception Not_found -> a)
-
-let parse_cmd () = 
+let parse_cmd () =
   (* Cmd_legacy.parse () *)
-  let argv = preprocess_legacy_arguments Sys.argv in
-  match Cmdliner.Cmd.eval_value' ~argv Cmd.t with
+  let file =
+    let f = Sys.argv.(0) ^ ".arg" in
+    if Sys.file_exists f then Some f else None
+  in
+  match Cmd.parse ?file () with
   | `Ok o ->
       selected_addr := o.interface;
       selected_port := o.port;

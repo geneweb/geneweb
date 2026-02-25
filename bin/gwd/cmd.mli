@@ -52,7 +52,9 @@ type t = {
   trace_failed_password : bool;
 }
 
-val t : t Cmdliner.Cmd.t
+val parse : ?file:string -> unit -> t Cmdliner.Cmd.eval_exit
+(** [parse ?file ()] parses the [argv] and produces a structure of type [t] or
+    an error. *)
 
 (* These default values and parsers are exposed in order to be used by 
    the legacy CLI. *)

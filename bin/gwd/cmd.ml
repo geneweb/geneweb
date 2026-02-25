@@ -547,3 +547,88 @@ let t =
     log;
     trace_failed_password;
   }
+
+let legacy_arguments =
+  [
+    ("-a", "-i");
+    ("-add_lexicon", "--lexicon-file");
+    ("-allowed_tags", "--allowed-tags-file");
+    ("-auth", "--authorization-file");
+    ("-bd", "--bd");
+    ("-blang", "--browser-lang");
+    ("-daemon", "--daemon");
+    ("-debug", "--debug");
+    ("-digest", "--digest-password");
+    ("-cache-in-memory", "--cache-database");
+    ("-cache_langs", "--cache-langs");
+    ("-cgi", "--cgi");
+    ("-cgi_secret_salt", "--secret-salt");
+    ("-conn_tmout", "--connection-timeout");
+    ("-etc_prefix", "--etc-prefix");
+    ("-friend", "--friend-password");
+    ("-force", "");
+    ("-help", "--help");
+    ("-hd", "--gw-prefix");
+    ("-images_prefix", "--images-prefix");
+    ("-images_dir", "--images-dir");
+    ("-lang", "--default-lang");
+    ("-log", "--log");
+    ("-log_level", "--verbosity");
+    ("-login_tmout", "--login-timeout");
+    ("-max_clients", "--max-clients");
+    ("-max_pending_requests", "--max-pending-requests");
+    ("-min_disp_req", "--min-disp-req");
+    ("-no_host_address", "--no-reverse-host");
+    ("-nolock", "--no-lock");
+    ("-n_workers", "--n-workers");
+    ("-only", "--allowed-address");
+    ("-p", "--port");
+    ("-particles", "--particles-file");
+    ("-plugin", "--plugin-file");
+    ("-plugins", "--plugin-dir");
+    ("-redirect", "--redirect-interface");
+    ("-robot_xcl", "--ban-threshold");
+    ("-safe", "");
+    ("-setup_link", "--setup-link");
+    ("-trace_failed_passwd", "--trace-failed-password");
+    ("-unsafe", "");
+    ("-version", "--version");
+    ("-wd", "--socket-dir");
+    ("-wizard", "--wizard-password");
+    ("-wjf", "--wizard-just-friend");
+  ]
+
+let preprocess_legacy_arguments =
+  let tbl : (string, string) Hashtbl.t = Hashtbl.create 17 in
+  List.iter (fun (old, new_) -> Hashtbl.add tbl old new_) legacy_arguments;
+  Array.map (fun a ->
+      match Hashtbl.find tbl a with
+      | new_ ->
+          (* TODO: Turn this log on when we are ready to deprecated the legacy CLI. *)
+          (* Fmt.epr "The CLI option %S is deprecated. Please use %S instead.@." a new_; *)
+          new_
+      | exception Not_found -> a)
+
+let arguments_in_file file =
+  In_channel.with_open_text file @@ fun ic ->
+  let rec loop acc =
+    match input_line ic with
+    | exception End_of_file -> List.rev acc
+    | l -> loop (l :: acc)
+  in
+  Array.of_list @@ loop []
+
+let parse ?file () =
+  let argv_file =
+    match file with Some f -> arguments_in_file f | None -> [||]
+  in
+  let argv =
+    let l1 = Array.length argv_file in
+    let l2 = Array.length Sys.argv in
+    Array.init (l1 + l2) (fun i ->
+        if i = 0 then Sys.argv.(0)
+        else if i <= l1 then argv_file.(i - 1)
+        else Sys.argv.(l1 + i))
+  in
+  let argv = preprocess_legacy_arguments argv in
+  Cmdliner.Cmd.eval_value' ~argv t
