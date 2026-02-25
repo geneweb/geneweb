@@ -2458,6 +2458,7 @@ let () =
     exit 1);
   Logs.set_level ~all:true (Some Logs.Info);
   parse_cmd ();
+  Secure.add_assets @@ Option.get !gw_prefix;
   Secure.add_assets @@ Option.get !etc_prefix;
   switch_debug !debug;
   setup_log !log_file;
