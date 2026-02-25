@@ -38,7 +38,7 @@ let conn_timeout = ref Cmd.default_connection_timeout
 let daemon = ref false
 let friend_passwd : string option ref = ref None
 let default_lang = ref Cmd.default_default_lang
-let images_dir = ref ""
+let images_dir = ref Cmd.default_images_dir
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
 let login_timeout = ref Cmd.default_login_timeout
 let n_workers = ref Cmd.default_n_workers
@@ -128,9 +128,9 @@ let arg_plugins opt doc =
     arg_plugin_doc opt doc )
 
 let parse_prefixes () =
-  let _, _, new_gw_prefix, new_images_prefix, new_etc_prefix =
+  let _, _, new_gw_prefix, new_images_prefix, new_etc_prefix, _ =
     Cmd.parse_directories (Secure.base_dir ()) !socket_dir !gw_prefix
-      !images_prefix !etc_prefix
+      !images_prefix !etc_prefix !images_dir
   in
   gw_prefix := Some new_gw_prefix;
   images_prefix := Some new_images_prefix;

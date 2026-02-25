@@ -2302,6 +2302,7 @@ let parse_cmd () =
       Secure.set_base_dir o.base_dir;
       gw_prefix := Some o.gw_prefix;
       images_prefix := Some o.images_prefix;
+      images_dir := o.images_dir;
       etc_prefix := Some o.etc_prefix;
       socket_dir := o.socket_dir;
       auth_file := o.authorization_file;

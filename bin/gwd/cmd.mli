@@ -10,6 +10,7 @@ type t = {
   gw_prefix : string;
   etc_prefix : string;
   images_prefix : string;
+  images_dir : string;
   (* Data management *)
   cache_databases : string list;
   lexicon_files : string list;
@@ -61,6 +62,7 @@ val parse : ?file:string -> unit -> t Cmdliner.Cmd.eval_exit
 
 val default_gw_prefix : string
 val default_images_prefix : string
+val default_images_dir : string
 val default_base_dir : string
 val default_socket_dir : string
 val default_etc_prefix : string
@@ -79,4 +81,5 @@ val parse_directories :
   string option ->
   string option ->
   string option ->
-  string * string * string * string * string
+  string ->
+  string * string * string * string * string * string

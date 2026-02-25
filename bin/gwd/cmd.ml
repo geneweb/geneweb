@@ -18,6 +18,7 @@ type t = {
   gw_prefix : string;
   etc_prefix : string;
   images_prefix : string;
+  images_dir : string;
   (* Data management *)
   cache_databases : string list;
   lexicon_files : string list;
@@ -92,6 +93,7 @@ let default_gw_prefix =
 
 let default_images_prefix = default_gw_prefix // "images"
 let default_etc_prefix = default_gw_prefix // "etc"
+let default_images_dir = ""
 
 let base_dir =
   let doc = "$(docv) is the directory where GeneWeb databases are stored." in
@@ -127,6 +129,16 @@ let images_prefix =
     & opt (some dirpath) None
     & info [ "images-prefix" ] ~docs:dirs_section ~docv:"PATH" ~doc)
 
+let images_dir =
+  let doc =
+    "Same as --image-prefix but directory name relative to \n  current."
+  in
+  let deprecated = "Use `-images_prefix` instead." in
+  C.Arg.(
+    value
+    & opt dirpath default_images_dir
+    & info [ "images-dir" ] ~docs:dirs_section ~doc ~deprecated)
+
 let etc_prefix =
   let doc =
     "$(docv) specifies where \"etc\" directory is installed. The default\n\
@@ -137,7 +149,7 @@ let etc_prefix =
     & opt (some dirpath) None
     & info [ "etc-prefix" ] ~docs:dirs_section ~docv:"PATH" ~doc)
 
-let parse_directories bd wd gw_prefix images_prefix etc_prefix =
+let parse_directories bd wd gw_prefix images_prefix etc_prefix images_dir =
   let images_prefix =
     match (gw_prefix, images_prefix) with
     | Some s, None -> s // "images"
@@ -151,7 +163,7 @@ let parse_directories bd wd gw_prefix images_prefix etc_prefix =
     | None, None -> default_etc_prefix
   in
   let gw_prefix = Option.value ~default:default_gw_prefix gw_prefix in
-  (bd, wd, gw_prefix, images_prefix, etc_prefix)
+  (bd, wd, gw_prefix, images_prefix, etc_prefix, images_dir)
 
 let directories =
   let open C.Term.Syntax in
@@ -159,8 +171,10 @@ let directories =
   and+ socket_dir = socket_dir
   and+ gw_prefix = gw_prefix
   and+ images_prefix = images_prefix
-  and+ etc_prefix = etc_prefix in
+  and+ etc_prefix = etc_prefix
+  and+ images_dir = images_dir in
   parse_directories base_dir socket_dir gw_prefix images_prefix etc_prefix
+    images_dir
 
 (* Data management commands *)
 
@@ -349,6 +363,15 @@ let max_pending_requests =
     & opt int default_max_pending_requests
     & info [ "max-pending-requests" ] ~docs:http_section ~docv:"INT" ~doc)
 
+let max_clients =
+  let doc = "Max number of clients treated at the same time." in
+  let deprecated =
+    "No effect. Use `--n-workers` and  `--max-pending-requests` instead."
+  in
+  C.Arg.(
+    value & opt int 0
+    & info [ "max-clients" ] ~docs:http_section ~doc ~deprecated)
+
 let n_workers =
   let doc =
     "$(docv) is the number of workers available to process \n\
@@ -465,12 +488,19 @@ let trace_failed_password =
   C.Arg.(
     value & flag & info [ "trace-failed-password" ] ~docs:tracing_section ~doc)
 
+let no_fork =
+  let doc = "Prevent from forking processes (only UNIX)." in
+  let deprecated = "No effect. Use `-n_workers 0` instead." in
+  C.Arg.(
+    value & flag & info [ "no-fork" ] ~docs:tracing_section ~doc ~deprecated)
+
 let t =
   let open C.Term.Syntax in
   let doc = "Geneweb daemon" in
   C.Cmd.make (C.Cmd.info "gwd" ~version:Version.ver ~doc)
   @@
-  let+ base_dir, socket_dir, gw_prefix, images_prefix, etc_prefix = directories
+  let+ base_dir, socket_dir, gw_prefix, images_prefix, etc_prefix, images_dir =
+    directories
   and+ cache_databases = cache_databases
   and+ lexicon_files = lexicon_files
   and+ cache_langs = cache_langs
@@ -494,6 +524,7 @@ let t =
   and+ port = port
   and+ connection_timeout = connection_timeout
   and+ max_pending_requests = max_pending_requests
+  and+ _ : int = max_clients
   and+ n_workers = n_workers
   and+ cgi = cgi
   and+ daemon = daemon
@@ -504,12 +535,14 @@ let t =
   and+ debug = debug
   and+ verbosity = verbosity
   and+ log = log
-  and+ trace_failed_password = trace_failed_password in
+  and+ trace_failed_password = trace_failed_password 
+  and+ _ : bool = no_fork in
   {
     base_dir;
     socket_dir;
     gw_prefix;
     images_prefix;
+    images_dir;
     etc_prefix;
     cache_databases;
     lexicon_files;
@@ -578,6 +611,7 @@ let legacy_arguments =
     ("-max_pending_requests", "--max-pending-requests");
     ("-min_disp_req", "--min-disp-req");
     ("-no_host_address", "--no-reverse-host");
+    ("-no-fork", "--no-fork");
     ("-nolock", "--no-lock");
     ("-n_workers", "--n-workers");
     ("-only", "--allowed-address");
