@@ -2350,7 +2350,8 @@ let preprocess_legacy_arguments =
           new_
       | exception Not_found -> a)
 
-let parse_cmd () =
+let parse_cmd () = 
+  (* Cmd_legacy.parse () *)
   let argv = preprocess_legacy_arguments Sys.argv in
   match Cmdliner.Cmd.eval_value' ~argv Cmd.t with
   | `Ok o ->
@@ -2423,33 +2424,27 @@ let switch_debug debug =
     Logs.set_level ~all:true (Some Logs.Debug);
     Sys.enable_runtime_warnings true)
 
-type opened_file = { path : string; mutable oc : out_channel }
-type opened_log = Stdout | Stderr | File of opened_file | Syslog
+type opened_file = { path : string; mutable oc : out_channel option }
 
 let setup_log t =
-  let opened_log : opened_log ref = ref Stderr in
   let set_reporter fmt = Logs.set_reporter @@ Logs_fmt.reporter ~dst:fmt () in
-  let set_file_reporter path =
-    let oc = open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 path in
-    opened_log := File { path; oc };
-    set_reporter @@ Format.formatter_of_out_channel oc
+  let refresh o =
+    Option.iter close_out_noerr o.oc;
+    let oc = open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 o.path in
+    set_reporter @@ Format.formatter_of_out_channel oc;
+    o.oc <- Some oc
   in
-  let refresh_file_reporter () =
-    assert false
-    (* close_out_noerr file.oc; *)
-    (* set_file_reporter file.path *)
-  in
-  let set_sighup_signal file =
+  let set_sighup_signal o =
     if Sys.unix then
-      Sys.set_signal Sys.sighup
-        (Sys.Signal_handle (fun _ -> refresh_file_reporter file))
+      Sys.set_signal Sys.sighup (Sys.Signal_handle (fun _ -> refresh o))
   in
   match t with
   | Cmd.Stdout -> set_reporter Format.std_formatter
   | Stderr -> set_reporter Format.err_formatter
   | File path ->
-      set_file_reporter path;
-      set_sighup_signal ()
+      let o = { path; oc = None } in
+      refresh o;
+      set_sighup_signal o
   | Syslog ->
       let addr = Unix.inet_addr_of_string "127.0.0.1" in
       Logs.set_reporter (Logs_syslog_unix.udp_reporter addr ~port:514 ())
