@@ -2331,6 +2331,7 @@ let parse_cmd () =
       verbosity_level := o.verbosity;
       force_cgi := o.cgi;
       cgi_secret_salt := o.secret_salt;
+      setup_link := o.setup_link;
       GWPARAM.sock_dir := o.socket_dir
       (* List.iter *)
       (*   (fun Cmd.{ path; opts } -> *)

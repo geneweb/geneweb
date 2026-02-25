@@ -42,7 +42,7 @@ type t = {
   (* Web interface *)
   default_lang : string;
   browser_lang : bool;
-  setup_link : string option;
+  setup_link : bool;
   (* Plugin *)
   plugins : plugin list;
   (* Tracing & debugging *)

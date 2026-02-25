@@ -50,7 +50,7 @@ type t = {
   (* Web interface *)
   default_lang : string;
   browser_lang : bool;
-  setup_link : string option;
+  setup_link : bool;
   (* Plugins *)
   plugins : plugin list;
   (* Tracing & debugging *)
@@ -393,8 +393,7 @@ let setup_link =
     "Display a shortcut link at the bottom of the pages to gwsetup tool."
   in
   C.Arg.(
-    value
-    & opt (some string) None
+    value & flag
     & info [ "setup-link" ] ~docs:web_interface_section ~docv:"URL" ~doc)
 
 (* Plugin commands *)
