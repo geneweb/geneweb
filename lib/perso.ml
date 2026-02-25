@@ -1403,6 +1403,12 @@ let get_nb_marriage_witnesses_of_kind fam wk =
     (fun acc (_, w, _) -> if wk = w then acc + 1 else acc)
     0 witnesses
 
+let is_alive person =
+  match Gwdb.get_death person with
+  | Def.NotDead -> true
+  | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead | Death _ ->
+      false
+
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl
   with Not_found -> eval_compound_var conf base env ep loc sl
@@ -2702,11 +2708,11 @@ and eval_bool_person_field conf base env (p, p_auth) = function
           | _ -> false)
       | _ -> false)
   | "computable_age" ->
-      if p_auth then
-        match (Date.cdate_to_dmy_opt (Gwdb.get_birth p), Gwdb.get_death p) with
-        | Some d, Def.NotDead -> not (d.day = 0 && d.month = 0 && d.prec <> Sure)
-        | _ -> false
-      else false
+      p_auth && is_alive p
+      && Option.fold ~none:false
+           ~some:(fun (d : Date.dmy) ->
+             not (d.day = 0 && d.month = 0 && d.prec <> Sure))
+           (Date.cdate_to_dmy_opt (Gwdb.get_birth p))
   | "computable_death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
@@ -3031,15 +3037,15 @@ and eval_bool_person_field conf base env (p, p_auth) = function
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "access" -> Util.acces conf base p |> safe_val
-  | "age" -> (
-      match
-        (p_auth, Date.cdate_to_dmy_opt (Gwdb.get_birth p), Gwdb.get_death p)
-      with
-      | true, Some d, Def.NotDead ->
-          Date.time_elapsed d conf.Config.today
-          |> DateDisplay.string_of_age conf
-          |> safe_val
-      | _ -> null_val)
+  | "age" ->
+      if p_auth && is_alive p then
+        Option.fold ~none:null_val
+          ~some:(fun d ->
+            Date.time_elapsed d conf.Config.today
+            |> DateDisplay.string_of_age conf
+            |> safe_val)
+          (Date.cdate_to_dmy_opt (Gwdb.get_birth p))
+      else null_val
   | "alias" -> (
       match Gwdb.get_aliases p with
       | nn :: _ ->
