@@ -1405,9 +1405,8 @@ let get_nb_marriage_witnesses_of_kind fam wk =
 
 let is_alive person =
   match Gwdb.get_death person with
-  | Def.NotDead -> true
-  | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead | Death _ ->
-      false
+  | Def.NotDead | DontKnowIfDead -> true
+  | DeadYoung | DeadDontKnowWhen | OfCourseDead | Death _ -> false
 
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl
