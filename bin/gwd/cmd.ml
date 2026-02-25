@@ -61,6 +61,25 @@ type t = {
   trace_failed_password : bool;
 }
 
+(* Helper functions to reject some options on non-UNIX platforms. *)
+
+let unix_only_opt ~error ~default t =
+  let open C.Term.Syntax in
+  C.Term.ret
+  @@
+  let+ t = t in
+  match t with
+  | Some _ when not Sys.unix -> `Error (false, error)
+  | Some x -> `Ok x
+  | None -> `Ok default
+
+let unix_only_flag ~error t =
+  let open C.Term.Syntax in
+  C.Term.ret
+  @@
+  let+ t = t in
+  if t && not Sys.unix then `Error (false, error) else `Ok t
+
 (* Custom parsers *)
 
 let log_parser s =
@@ -245,9 +264,12 @@ let login_timeout =
 let predictable_mode =
   let doc =
     "Turn on the predictable mode. In this mode, the behavior of the server is \
-     predictable, which is helpful for debugging or testing."
+     predictable, which is helpful for debugging or testing (UNIX only)."
   in
-  C.Arg.(value & flag & info [ "predictable-mode" ] ~docs:security_section ~doc)
+  let error = "--predictable-mode is available only on UNIX." in
+  C.Arg.(
+    unix_only_flag ~error & value & flag
+    & info [ "predictable-mode" ] ~docs:security_section ~doc)
 
 let secret_salt =
   let doc = "" in
@@ -350,35 +372,45 @@ let port =
     & info [ "p"; "port" ] ~docs:http_section ~docv:"PORT" ~doc)
 
 let connection_timeout =
-  let doc = "" in
+  let doc = "(UNIX only)" in
+  let error = "--connection-timeout is available only on UNIX." in
   C.Arg.(
-    value
-    & opt int default_connection_timeout
+    unix_only_opt ~error ~default:default_connection_timeout
+    & value
+    & opt (some int) None
     & info [ "connection-timeout" ] ~docs:http_section ~docv:"INT" ~doc)
 
 let max_pending_requests =
   let doc = "" in
+  let error = "--max-pending-requests is available only on UNIX." in
   C.Arg.(
-    value
-    & opt int default_max_pending_requests
+    unix_only_opt ~error ~default:default_max_pending_requests
+    & value
+    & opt (some int) None
     & info [ "max-pending-requests" ] ~docs:http_section ~docv:"INT" ~doc)
 
 let max_clients =
-  let doc = "Max number of clients treated at the same time." in
+  let doc = "Max number of clients treated at the same time (UNIX only)." in
+  let error = "--max-clients is available only on UNIX." in
   let deprecated =
     "No effect. Use `--n-workers` and  `--max-pending-requests` instead."
   in
   C.Arg.(
-    value & opt int 0
+    unix_only_opt ~error ~default:0
+    & value
+    & opt (some int) None
     & info [ "max-clients" ] ~docs:http_section ~doc ~deprecated)
 
 let n_workers =
   let doc =
     "$(docv) is the number of workers available to process \n\
-    \  incoming HTTP requests."
+    \  incoming HTTP requests (UNIX only)."
   in
+  let error = "--n-workers is available only on UNIX." in
   C.Arg.(
-    value & opt int default_n_workers
+    unix_only_opt ~error ~default:default_n_workers
+    & value
+    & opt (some int) None
     & info [ "n-workers" ] ~docs:http_section ~docv:"INT" ~doc)
 
 let cgi =
@@ -490,9 +522,11 @@ let trace_failed_password =
 
 let no_fork =
   let doc = "Prevent from forking processes (only UNIX)." in
+  let error = "--no-fork is available only on UNIX." in
   let deprecated = "No effect. Use `-n_workers 0` instead." in
   C.Arg.(
-    value & flag & info [ "no-fork" ] ~docs:tracing_section ~doc ~deprecated)
+    unix_only_flag ~error & value & flag
+    & info [ "no-fork" ] ~docs:tracing_section ~doc ~deprecated)
 
 let t =
   let open C.Term.Syntax in
@@ -535,7 +569,7 @@ let t =
   and+ debug = debug
   and+ verbosity = verbosity
   and+ log = log
-  and+ trace_failed_password = trace_failed_password 
+  and+ trace_failed_password = trace_failed_password
   and+ _ : bool = no_fork in
   {
     base_dir;
