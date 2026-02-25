@@ -352,9 +352,9 @@
   %apply;place_popup%with;xxx%and;burial%and;%famx;%end;
 %( Âge %)
   %if;(e.age="on" and famx=1)
-    <td class="align-middle text-center"%rowspan; title="%nn;
-      %if;xxx.computable_death_age;%xxx.death_age;">%xxx.death_age.short;%end;%nn;
-      %if;xxx.computable_age;%xxx.age;">%xxx.age.short;%end;%nn;
+    <td class="align-middle text-center"%rowspan;
+      %if;xxx.computable_death_age; title="%xxx.death_age;">%xxx.death_age.short;%end;%nn;
+      %if;xxx.computable_age; title="%xxx.age;">%xxx.age.short;%end;%nn;
     </td>
   %end;
 %( Profession %)
