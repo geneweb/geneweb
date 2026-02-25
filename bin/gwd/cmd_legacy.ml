@@ -141,6 +141,25 @@ let print_version_commit () =
   Printf.printf "Branch %s\nLast commit %s\n" Version.branch Version.commit_id;
   exit 0
 
+(** Parse line and extract separated arguments ("" and '' are used to indlude
+    spaces inside the argument) *)
+let arg_list_of_string line =
+  let rec loop list i len quote =
+    if i = String.length line then
+      if len = 0 then List.rev list else List.rev (Buff.get len :: list)
+    else
+      match (quote, line.[i]) with
+      | Some c1, c2 ->
+          if c1 = c2 then loop list (i + 1) len None
+          else loop list (i + 1) (Buff.store len c2) quote
+      | None, ' ' ->
+          let list = if len = 0 then list else Buff.get len :: list in
+          loop list (i + 1) 0 quote
+      | None, (('"' | '\'') as c) -> loop list (i + 1) 0 (Some c)
+      | None, c -> loop list (i + 1) (Buff.store len c) None
+  in
+  loop [] 0 0 None
+
 let arg_parse_in_file fname speclist anonfun errmsg =
   try
     let ic = open_in fname in
@@ -154,9 +173,7 @@ let arg_parse_in_file fname speclist anonfun errmsg =
       in
       loop []
     in
-    let list =
-      match list with [ x ] -> Gutil.arg_list_of_string x | _ -> list
-    in
+    let list = match list with [ x ] -> arg_list_of_string x | _ -> list in
     Arg.parse_argv ~current:(ref 0)
       (Array.of_list @@ (Sys.argv.(0) :: list))
       speclist anonfun errmsg
