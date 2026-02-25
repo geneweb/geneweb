@@ -308,7 +308,7 @@ let min_disp_req =
 (* HTTP server commands *)
 
 let http_section = "HTTP SERVER"
-let default_port = 8080
+let default_port = 2317
 let default_connection_timeout = 120
 let default_max_pending_requests = 150
 let default_n_workers = 20
