@@ -1022,9 +1022,6 @@
     <div style="margin-left:30px">%event.note;</div>
   %end;
 %end;
-%define;witness_at_event(xx)
-  [*witness at %s of:::xx]%nn;
-%end;
 %define;timeline()
     <div class="highlight1">
     %if;has_occupation;
