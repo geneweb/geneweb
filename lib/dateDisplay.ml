@@ -348,6 +348,39 @@ let gregorian_precision conf d =
     ^ " " ^ transl_nth conf "and" 0 ^ " "
     ^ (string_of_on_dmy conf d2 :> string)
 
+let code_dmy_no_year conf d =
+  let s = code_dmy conf d in
+  let ys = string_of_bce_year conf d.year in
+  let slen = String.length s in
+  let ylen = String.length ys in
+  if slen <= ylen then s
+  else if String.sub s (slen - ylen) ylen = ys then
+    let r = String.trim (String.sub s 0 (slen - ylen)) in
+    let rlen = String.length r in
+    if rlen > 0 && r.[rlen - 1] = ',' then String.sub r 0 (rlen - 1) else r
+  else if String.sub s 0 ylen = ys then
+    String.trim (String.sub s ylen (slen - ylen))
+  else s
+
+let french_gregorian_precision conf d =
+  let sdn_lo = Date.to_sdn ~from:Dfrench ~lower:true d in
+  let sdn_hi = Date.to_sdn ~from:Dfrench ~lower:false d - 1 in
+  if sdn_lo = sdn_hi then
+    string_of_dmy conf (Calendar.gregorian_of_sdn Sure sdn_lo)
+  else
+    let d1 = Calendar.gregorian_of_sdn Sure sdn_lo in
+    let d2 = Calendar.gregorian_of_sdn Sure sdn_hi in
+    let s1 =
+      if d1.year = d2.year then
+        replace_spaces_by_nbsp
+          (transl_decline conf "on (day month year)" (code_dmy_no_year conf d1))
+      else (string_of_on_dmy conf d1 :> string)
+    in
+    Adef.safe
+    @@ transl conf "between (date)"
+    ^ " " ^ s1 ^ " " ^ transl_nth conf "and" 0 ^ " "
+    ^ (string_of_on_dmy conf d2 :> string)
+
 let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
     ?(sep = Adef.safe " ") conf =
   let mk_link c d (s : Adef.safe_string) =
@@ -387,7 +420,12 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
       let s = if link && d1.day > 0 then mk_link 'f' d1 s else s in
       match d.prec with
       | Sure | About | Before | After | Maybe ->
-          s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
+          let greg =
+            if d1.day = 0 || d1.month = 0 then
+              french_gregorian_precision conf d1
+            else gregorian_precision conf d
+          in
+          s ^^^ sep ^^^ " (" ^<^ greg ^>^ ")"
       | OrYear _ | YearInt _ -> s)
   | Dgreg (d, Dhebrew) -> (
       let d1 = Calendar.hebrew_of_gregorian d in
@@ -535,21 +573,33 @@ let year_text conf d =
     - conf : configuration de la base
     - d : Def.dmy [Retour] : string [Rem] : Exporté en clair hors de ce module.
 *)
-let prec_year_text conf d =
+let wrap_year_prec conf d year_str =
   let s =
     match d.prec with
     | About -> (
-        (* On utilise le dictionnaire pour être sur *)
-        (* que ce soit compréhensible de tous.      *)
-        match transl conf "about (short date)" with
-        | "ca" -> "ca "
-        | s -> s)
+        match transl conf "about (short date)" with "ca" -> "ca " | s -> s)
     | Maybe -> "?"
     | Before -> "/"
     | _ -> ""
   in
-  let s = s ^ year_text conf d in
+  let s = s ^ year_str in
   match d.prec with After -> s ^ "/" | _ -> s
+
+let prec_year_text conf d = wrap_year_prec conf d (year_text conf d)
+
+let french_year_text conf d =
+  if d.month = 0 then code_french_year conf d.year
+  else if d.month <= 3 then string_of_int (d.year + 1791)
+  else if d.month = 4 then
+    (if d.prec <> Maybe then "?" else "") ^ string_of_int (d.year + 1792)
+  else string_of_int (d.year + 1792)
+
+let prec_year_text_cal conf d = function
+  | Dfrench when d.day = 0 -> (
+      match d.prec with
+      | OrYear _ | YearInt _ -> prec_year_text conf d
+      | _ -> wrap_year_prec conf d (french_year_text conf d))
+  | _ -> prec_year_text conf d
 
 (* ********************************************************************** *)
 (*  [Fonc] short_dates_text : config -> base -> person -> string          *)
@@ -571,17 +621,16 @@ let short_dates_text_notag conf base p =
     let birth_date, death_date, _ = Gutil.get_birth_death_date p in
     let s =
       match (birth_date, death_date) with
-      | Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
-          prec_year_text conf b ^ "–" ^ prec_year_text conf d
-      | Some (Dgreg (b, _)), _ -> (
-          (* La personne peut être décédée mais ne pas avoir de date. *)
+      | Some (Dgreg (b, cb)), Some (Dgreg (d, cd)) ->
+          prec_year_text_cal conf b cb ^ "–" ^ prec_year_text_cal conf d cd
+      | Some (Dgreg (b, cb)), _ -> (
           match Driver.get_death p with
           | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
-              prec_year_text conf b ^ "–"
-          | _ -> prec_year_text conf b)
-      | _, Some (Dgreg (d, _)) -> death_symbol conf ^ prec_year_text conf d
+              prec_year_text_cal conf b cb ^ "–"
+          | _ -> prec_year_text_cal conf b cb)
+      | _, Some (Dgreg (d, cd)) ->
+          death_symbol conf ^ prec_year_text_cal conf d cd
       | _, _ -> (
-          (* La personne peut être décédée mais ne pas avoir de date. *)
           match Driver.get_death p with
           | Death (_, _) | DeadDontKnowWhen | DeadYoung -> death_symbol conf
           | _ -> "")

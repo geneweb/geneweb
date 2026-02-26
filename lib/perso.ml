@@ -16,7 +16,9 @@ module IperSet = Driver.Iper.Set
 
 let person_living_age conf p p_auth =
   match
-    (p_auth, Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+    ( p_auth,
+      Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+      Driver.get_death p )
   with
   | true, Some d, NotDead -> Some (Date.time_elapsed d conf.today)
   | _ -> None
@@ -103,8 +105,8 @@ let compare_dmy d1 d2 =
 
 let eval_marriage_age conf p fam sl =
   match
-    ( Date.cdate_to_dmy_opt (Driver.get_birth p),
-      Date.cdate_to_dmy_opt (Driver.get_marriage fam) )
+    ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+      Date.cdate_to_gregorian_dmy_opt (Driver.get_marriage fam) )
   with
   | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
       Some ({ prec = Sure | About | Maybe; _ } as d2) ) -> (
@@ -133,10 +135,12 @@ let compute_age_at_event conf p_auth birth_opt event_date_opt sl =
 let eval_death_age conf p p_auth sl =
   if p_auth then
     match Gutil.get_birth_death_date p with
-    | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
-        Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
+    | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), c1)),
+        Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), c2)),
         _ )
       when d1 <> d2 -> (
+        let d1 = Date.approx_gregorian ~from:c1 d1 in
+        let d2 = Date.approx_gregorian ~from:c2 d2 in
         let age = Date.time_elapsed d1 d2 in
         match sl with
         | [] -> Templ.VVstring (format_age conf age :> string)
@@ -154,11 +158,11 @@ let eval_age_at_parent_event conf base p p_auth get_parent get_target_date sl =
         target sl
   | None -> Templ.VVstring ""
 
-let p_birth p = Date.cdate_to_dmy_opt (Driver.get_birth p)
+let p_birth p = Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p)
 
 let death_date_opt p =
   match Date.date_of_death (Driver.get_death p) with
-  | Some (Dgreg (dmy, _)) -> Some dmy
+  | Some (Dgreg (dmy, cal)) -> Some (Date.approx_gregorian ~from:cal dmy)
   | _ -> None
 
 let eval_age_at_child_event conf base self child get_target_date sl =
@@ -3710,10 +3714,12 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "computable_death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
-        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
-            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
+        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), c1)),
+            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), c2)),
             _ )
           when d1 <> d2 ->
+            let d1 = Date.approx_gregorian ~from:c1 d1 in
+            let d2 = Date.approx_gregorian ~from:c2 d2 in
             let a = Date.time_elapsed d1 d2 in
             a.year > 0
             || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
@@ -3724,8 +3730,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              ( Date.cdate_to_dmy_opt (Driver.get_birth p),
-                Date.cdate_to_dmy_opt (Driver.get_marriage fam) )
+              ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+                Date.cdate_to_gregorian_dmy_opt (Driver.get_marriage fam) )
             with
             | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
                 Some ({ prec = Sure | About | Maybe; _ } as d2) ) ->
@@ -4122,10 +4128,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
-        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
-            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
+        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), c1)),
+            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), c2)),
             approx )
           when d1 <> d2 ->
+            let d1 = Date.approx_gregorian ~from:c1 d1 in
+            let d2 = Date.approx_gregorian ~from:c2 d2 in
             let a = Date.time_elapsed d1 d2 in
             let s =
               if (not approx) && d1.prec = Sure && d2.prec = Sure then ""

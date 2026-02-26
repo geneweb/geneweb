@@ -112,6 +112,16 @@ val french_of_sdn : prec:precision -> int -> dmy
 val hebrew_of_sdn : prec:precision -> int -> dmy
 (** Convert SDN to Hebrew [dmy] with given precision. *)
 
+val approx_gregorian : from:calendar -> dmy -> dmy
+(** [approx_gregorian ~from d] ensures [d] contains meaningful Gregorian values.
+    For complete non-Gregorian dates, returns [d] unchanged (already converted
+    at import). For partial non-Gregorian dates (day=0 or month=0), converts via
+    SDN midpoint of the period preserving partial fields. *)
+
+val cdate_to_gregorian_dmy_opt : cdate -> dmy option
+(** Like [cdate_to_dmy_opt] but ensures the returned [dmy] contains Gregorian
+    values even for partial non-Gregorian dates. *)
+
 val days_between : from:calendar -> dmy -> dmy -> int option
 (** Total days between two complete dates. Returns [None] if either date is
     partial (day=0 or month=0) or if d2 < d1. *)

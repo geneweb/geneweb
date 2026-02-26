@@ -252,6 +252,25 @@ let julian_of_sdn ~prec sdn = Calendar.julian_of_sdn prec sdn
 let french_of_sdn ~prec sdn = Calendar.french_of_sdn prec sdn
 let hebrew_of_sdn ~prec sdn = Calendar.hebrew_of_sdn prec sdn
 
+let approx_gregorian ~from d =
+  if from = Dgregorian then d
+  else if d.day > 0 && d.month > 0 then d
+  else
+    let sdn_lo = to_sdn ~from ~lower:true d in
+    let sdn_hi = to_sdn ~from ~lower:false d - 1 in
+    let sdn = sdn_lo + ((sdn_hi - sdn_lo) / 2) in
+    let g = Calendar.gregorian_of_sdn d.prec sdn in
+    {
+      g with
+      day = (if d.day = 0 then 0 else g.day);
+      month = (if d.month = 0 then 0 else g.month);
+    }
+
+let cdate_to_gregorian_dmy_opt cdate =
+  match od_of_cdate cdate with
+  | Some (Dgreg (d, cal)) -> Some (approx_gregorian ~from:cal d)
+  | _ -> None
+
 let convert ~from ~to_ dmy =
   if from = to_ then dmy
   else
