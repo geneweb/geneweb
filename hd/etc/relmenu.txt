@@ -42,7 +42,7 @@
       <input type="hidden" name="m" value="R">
       <span>[*relationship shortcut][:]</span>
       <div class="mt-1 ml-2">
-        %if;((user.index!="" and not browsing_with_sosa_ref) or (browsing_with_sosa_ref and user.index!=sosa_ref.index))
+        %if;(user.index!="" and (not browsing_with_sosa_ref or user.index!=sosa_ref.index))
           <div class="custom-control custom-radio">
             <input type="radio" class="custom-control-input" id="sel_user" name="select" value="%user.index;" onclick="main()">
             <label class="custom-control-label" for="sel_user">%user.ident; ([user/password/cancel]0)</label>

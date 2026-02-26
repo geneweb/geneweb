@@ -327,21 +327,23 @@ let make_henv conf base =
     else conf
   in
   let conf =
-    let fn, oc, sn = GWPARAM.split_key conf.userkey in
-    match
-      Geneweb_db.Driver.person_of_key base fn sn
-        (if oc = "" then 0 else int_of_string oc)
-    with
-    | Some ip ->
-        {
-          conf with
-          semi_public =
-            (if conf.semi_public then
-               Driver.get_access (Driver.poi base ip) = SemiPublic
-             else true);
-          user_iper = Some ip;
-        }
-    | None -> conf
+    if conf.userkey = "" then conf
+    else
+      let fn, oc, sn = GWPARAM.split_key conf.userkey in
+      match
+        Geneweb_db.Driver.person_of_key base fn sn
+          (if oc = "" then 0 else int_of_string oc)
+      with
+      | Some ip ->
+          {
+            conf with
+            semi_public =
+              (if conf.semi_public then
+                 Driver.get_access (Driver.poi base ip) = SemiPublic
+               else true);
+            user_iper = Some ip;
+          }
+      | None -> conf
   in
   let aux param conf =
     match Util.p_getenv conf.env param with
