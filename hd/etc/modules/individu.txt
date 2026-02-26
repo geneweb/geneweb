@@ -13,7 +13,7 @@
     %if;(cc>0)[close family]0
     %else;[*close family]0
     %end; (<small class="text-muted">l1/l2</small>)
-  %end;
+  %end
 %end;
 %define;rela()
   %if;(count2=1)
@@ -182,10 +182,9 @@
           %if;(ccc>0)%apply;rela()%end;
           <a href="%prefix;m=RL&i=%apply;getvar(ancestor1_index)&i1=%sosa_ref.index;&l1=%l1;&i2=%index;&l2=%l2;&spouse=on&dag=on"
             title="[*to see the first relationship link] [with] %sosa_ref; (%expr(l1+l2) [degree of kinship]1, %l1;↑%l2;↓)">%nn;
-            %apply;cousin%with;%l1;%and;%l2;%and;%if;(count=3 and l1!=0)[half-relationship]s%else;[half-relationship]3%end;%and;ccc%end;</a>
+            %apply;cousin%with;%l1;%and;%l2;%and;%if;(count=3 and l1!=0)[half-relationship]s%end;%and;ccc%end;</a>
         %and;
-          <a href="%prefix;%sosa_ref.access;"
-            title="[Sosa 1]">%sosa_ref;</a>%nn;
+          <a href="%prefix;%sosa_ref.access;" title="[Sosa 1]">%sosa_ref;</a>%nn;
         %end;
         %( TODO: use undecomposed translation %)
         %if;(l1!=0)%sp;[passing by]
@@ -286,7 +285,8 @@
         %apply;capitalize(occupation)</li>%nl;
     %end;
     %if;(has_linked_page.OCCU and linked_page.OCCU!="")
-      <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
+      <li><span class="fa-li"><i class="far fa-file-lines"></i></span>
+      %apply;capitalize(linked_page.OCCU)</li>%nl;
     %end;
     %if;(has_consanguinity and b.show_consang!="no")
       <li class="mt-1" title="[*consanguinity]"><span class="fa-li"><i class="fas fa-percent"></i></span>
