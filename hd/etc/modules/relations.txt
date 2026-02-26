@@ -61,8 +61,8 @@
 %foreach;event_witness_relation;%incr_count;%end;
 %let;rel_nbr;%count;%in;
 
-%define;witness_at(xxx)
-  [witness at %s of:::xxx]
+%define;witness_at(xxx,yyy)
+  [*witness at %s of:::xxx:yyy]
 %end;
 
 %if;(op_m=1 and has_relations)
@@ -81,11 +81,11 @@
       %end;
     %end;
   </h2>
-  <ul  class="pl-4">
+  <ul class="pl-4">
   %foreach;relation;
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
-        <ul  class="pl-4">
+        <ul class="pl-4">
           %apply;li_SDC("relation_him")
             %apply;short_display_person("relation_him")
           </li>
@@ -111,10 +111,9 @@
   %end;
   %foreach;event_witness_relation;
     %apply;li_SDC("event_witness_relation.person")
-      %let;str;%apply;capitalize(event_witness_relation.event.name)%sp;
-        %if;(event_witness_relation.event.date.year!="")(%event_witness_relation.event.date.year;)%end;%in;
-      %apply;witness_at(str)
-      %if;(event_witness_relation_kind!=[witness/witnesses]0)(%event_witness_relation_kind;)%end;%sp;
+      %let;str;%event_witness_relation.event.name;
+      %if;(event_witness_relation.event.date.year!="") [in (year)] %event_witness_relation.event.date.year;%end;%in;
+      %apply;witness_at(event_witness_relation_kind,str)
       %apply;short_display_person("event_witness_relation.person")
       %if;(event_witness_relation.event.spouse!="")
       %sp;[and]
