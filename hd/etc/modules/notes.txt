@@ -26,7 +26,7 @@
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
       <div class="ml-3>%apply;capitalize(linked_page.BNOTE)</div>
     %end;
-    <div class="ml-3 ind-notes">
+    <div class="ml-4 ind-notes">
       %notes;
     </div>
   %end;
