@@ -9808,9 +9808,9 @@ tr: üvey erkek kardeşler/üvey kız kardeşler/üvey kardeşler
 
     half-relationship
 co: mezu/meza/mezi
-de: halb-/halb-/halb-/
-en: half-/half-/half-/ 
-fr: demi-/demi-/demi-/ 
+de: halb-/halb-/halb-
+en: half-/half-/half-
+fr: demi-/demi-/demi-
 
     half-siblings
 co: fratellastri è surellastre
