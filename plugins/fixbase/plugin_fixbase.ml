@@ -149,6 +149,7 @@ let fixbase_ok conf base =
           ifams := ifam :: !ifams
       | Geneweb.Fixbase.Fix_WrongString (ifam, iper, istr) ->
           istrs := (ifam, iper, istr) :: !istrs
+      | Geneweb.Fixbase.Fix_WrongStringFailure (_, _, _) -> ()
     in
     let progress (_ : int) (_ : int) = () in
     let enabled = List.exists (UI.enabled conf) in
