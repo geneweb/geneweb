@@ -13,7 +13,7 @@
     %if;(cc>0)[close family]0
     %else;[*close family]0
     %end; (<small class="text-muted">l1/l2</small>)
-  %end;
+  %end
 %end;
 %define;rela()
   %if;(count2=1)
@@ -182,10 +182,9 @@
           %if;(ccc>0)%apply;rela()%end;
           <a href="%prefix;m=RL&i=%apply;getvar(ancestor1_index)&i1=%sosa_ref.index;&l1=%l1;&i2=%index;&l2=%l2;&spouse=on&dag=on"
             title="[*to see the first relationship link] [with] %sosa_ref; (%expr(l1+l2) [degree of kinship]1, %l1;↑%l2;↓)">%nn;
-            %apply;cousin%with;%l1;%and;%l2;%and;%if;(count=3 and l1!=0)[half-relationship]s%else;[half-relationship]3%end;%and;ccc%end;</a>
+            %apply;cousin%with;%l1;%and;%l2;%and;%if;(count=3 and l1!=0)[half-relationship]s%end;%and;ccc%end;</a>
         %and;
-          <a href="%prefix;%sosa_ref.access;"
-            title="[Sosa 1]">%sosa_ref;</a>%nn;
+          <a href="%prefix;%sosa_ref.access;" title="[Sosa 1]">%sosa_ref;</a>%nn;
         %end;
         %( TODO: use undecomposed translation %)
         %if;(l1!=0)%sp;[passing by]
@@ -205,7 +204,7 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
+  <ul class="%if;not roglo;fa-ul%end;%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
       <li %apply;getvar%with;ns[birth]%end;>
         %if;(not roglo)<span class="fa-li"><i class="fas fa-baby"></i></span>%end;
@@ -264,7 +263,7 @@
         %else;%if;(not is_dead and computable_age)[*age][:]%sp;%end;%end;
         %if;(age_days!="")%apply;1000sep(age_days) [days old]%end;
         %if;(lang="en") old%end;">
-        <span class="fa-li"><i class="far fa-id-card"></i></span>
+        %if;not roglo;<span class="fa-li"><i class="far fa-id-card"></i></span>%end;
         %if;(is_dead and computable_death_age)
           %if;(death_date.month!="" and death_date.day!=""
            and birth_date.month!="" and birth_date.day!="")
@@ -282,11 +281,13 @@
       </li>
     %end;
     %if;has_occupation;
-      %if;(not roglo)<li class="mt-1" title="[*occupation/occupations]0"><span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
+      <li class="mt-1" title="[*occupation/occupations]0">
+        %if;not roglo;<span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
         %apply;capitalize(occupation)</li>%nl;
     %end;
     %if;(has_linked_page.OCCU and linked_page.OCCU!="")
-      <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
+      <li>%if;not roglo;<span class="fa-li"><i class="far fa-file-lines"></i></span>%end;
+      %apply;capitalize(linked_page.OCCU)</li>%nl;
     %end;
     %if;(has_consanguinity and b.show_consang!="no")
       <li class="mt-1" title="[*consanguinity]"><span class="fa-li"><i class="fas fa-percent"></i></span>
@@ -351,19 +352,17 @@
        <img src="%blason_url;"%blason_small_size; class="%if;(op_m=3) mx-1%end; mx-2" alt="[blason/blasons]0">%nn;
       %if;not cancel_links;</a>%end;
     %end;
-    %if;has_public_name;
-      %if;has_qualifiers;%public_name; <em>%qualifier;</em>
-      %else;%public_name; %surname;%end;
-    %else;
-      %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+    %let;qualifier_;%if;has_qualifiers;<em>%qualifier;</em>%end;%in;
+    %let;public_or_first_name;
+      %if;has_public_name;%public_name;
       %else;
-        %if;cancel_links;%first_name; %surname;
-        %else;
-          <a href="%prefix;m=P&v=%first_name_key;#i%index;">%first_name;</a>
-          <a href="%prefix;m=N&v=%surname_key;#i%index;">%surname;</a>%nn;
-        %end;
+        %if;not cancel_links;<a href="%prefix;m=P&v=%first_name_key;#i%index;">%end;%first_name;%nn;
+        %if;not cancel_links;</a>%end;
       %end;
-    %end;
+    %in;
+    %public_or_first_name; %qualifier_;%sp;
+    %if;not cancel_links;<a href="%prefix;m=N&v=%surname_key;#i%index;">%end;%surname;%nn;
+    %if;not cancel_links;</a>%end;
     <span class="font-weight-light small">%dates;</span>
   </h1>
   </div> %( closing div just before h1 %)

@@ -9808,9 +9808,9 @@ tr: üvey erkek kardeşler/üvey kız kardeşler/üvey kardeşler
 
     half-relationship
 co: mezu/meza/mezi
-de: halb-/halb-/halb-/
-en: half-/half-/half-/ 
-fr: demi-/demi-/demi-/ 
+de: halb-/halb-/halb-
+en: half-/half-/half-
+fr: demi-/demi-/demi-
 
     half-siblings
 co: fratellastri è surellastre
@@ -21380,13 +21380,12 @@ en: without implex display
 fr: sans afficher les implexes
 
     witness at %s of
-co: testimone à u %s di
-de: Zeuge bei %s von
-en: witness at %s of
-fr: témoin au %s de
-pt: testemunha de %s de
-sv: vittne vid %s av
-tr: %s tanık
+co: %s à u %s di
+de: %s bei %s von
+en: %s at %s of
+fr: %s au %s de
+pt: %s de %s de
+sv: %s vid %s av
 
     witness at marriage of %s and %s
 af: getuie by die troue van %s met %s
