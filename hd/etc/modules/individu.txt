@@ -204,7 +204,7 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
+  <ul class="%if;not roglo;fa-ul%end;%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
       <li %apply;getvar%with;ns[birth]%end;>
         %if;(not roglo)<span class="fa-li"><i class="fas fa-baby"></i></span>%end;
@@ -263,7 +263,7 @@
         %else;%if;(not is_dead and computable_age)[*age][:]%sp;%end;%end;
         %if;(age_days!="")%apply;1000sep(age_days) [days old]%end;
         %if;(lang="en") old%end;">
-        <span class="fa-li"><i class="far fa-id-card"></i></span>
+        %if;not roglo;<span class="fa-li"><i class="far fa-id-card"></i></span>%end;
         %if;(is_dead and computable_death_age)
           %if;(death_date.month!="" and death_date.day!=""
            and birth_date.month!="" and birth_date.day!="")
@@ -281,11 +281,12 @@
       </li>
     %end;
     %if;has_occupation;
-      %if;(not roglo)<li class="mt-1" title="[*occupation/occupations]0"><span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
+      <li class="mt-1" title="[*occupation/occupations]0">
+        %if;not roglo;<span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
         %apply;capitalize(occupation)</li>%nl;
     %end;
     %if;(has_linked_page.OCCU and linked_page.OCCU!="")
-      <li><span class="fa-li"><i class="far fa-file-lines"></i></span>
+      <li>%if;not roglo;<span class="fa-li"><i class="far fa-file-lines"></i></span>%end;
       %apply;capitalize(linked_page.OCCU)</li>%nl;
     %end;
     %if;(has_consanguinity and b.show_consang!="no")
