@@ -715,6 +715,8 @@ let treat_request =
              | "INV_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_inv
              | "INV_FAM_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
+             | "ISOLATED" ->
+                 w_base @@ fun conf base -> Perso.print_isolated conf base
              | "KILL_ANC" ->
                  w_wizard @@ w_lock @@ w_base
                  @@ MergeIndDisplay.print_kill_ancestors

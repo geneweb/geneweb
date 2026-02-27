@@ -6022,6 +6022,290 @@ let interp_notempl_with_menu title templ_fname conf base p =
   Hutil.header_with_title conf title;
   gen_interp_templ true title templ_fname conf base p
 
+let print_isolated conf base =
+  Driver.load_ascends_array base;
+  Driver.load_unions_array base;
+  let rtypes =
+    [|
+      Def.GodParent;
+      Def.Adoption;
+      Def.Recognition;
+      Def.FosterParent;
+      Def.CandidateParent;
+    |]
+  in
+  let rtype_keys =
+    [|
+      "godfather/godmother/godparents";
+      "adoptive father/adoptive mother/adoptive parents";
+      "recognizing father/recognizing mother/recognizing parents";
+      "foster father/foster mother/foster parents";
+      "candidate father/candidate mother/candidate parents";
+    |]
+  in
+  let wkinds =
+    [|
+      Def.Witness;
+      Def.Witness_GodParent;
+      Def.Witness_Informant;
+      Def.Witness_Attending;
+      Def.Witness_Mentioned;
+      Def.Witness_CivilOfficer;
+      Def.Witness_ReligiousOfficer;
+      Def.Witness_Other;
+    |]
+  in
+  let wkind_keys =
+    [|
+      "witness/witness/witnesses";
+      "godfather/godmother/godparents";
+      "informant/informant/informant";
+      "present/present/present";
+      "mentioned/mentioned/mentioned";
+      "civil registrar/civil registrar/civil registrar";
+      "parrish registrar/parrish registrar/parrish registrar";
+      "other/other/other";
+    |]
+  in
+  let idx_of arr v =
+    let rec aux i =
+      if i >= Array.length arr then 0 else if arr.(i) = v then i else aux (i + 1)
+    in
+    aux 0
+  in
+  let label keys i = transl_nth conf keys.(i) 2 in
+  let candidates =
+    Geneweb_db.Collection.fold
+      (fun acc iper ->
+        let p = Driver.poi base iper in
+        if Driver.get_parents p = None && Array.length (Driver.get_family p) = 0
+        then iper :: acc
+        else acc)
+      [] (Driver.ipers base)
+  in
+  let truly = ref [] in
+  let by_rel = Array.make 5 [] in
+  let n_rel = ref 0 in
+  let by_wit = Array.make 8 [] in
+  let n_wit = ref 0 in
+  let find_wit_kind_in iper rp =
+    let from_pevt =
+      List.find_map
+        (fun evt ->
+          Array.find_map
+            (fun (wip, wk) -> if wip = iper then Some wk else None)
+            evt.Def.epers_witnesses)
+        (Driver.get_pevents rp)
+    in
+    match from_pevt with
+    | Some _ -> from_pevt
+    | None ->
+        Array.find_map
+          (fun ifam ->
+            List.find_map
+              (fun evt ->
+                Array.find_map
+                  (fun (wip, wk) -> if wip = iper then Some wk else None)
+                  evt.Def.efam_witnesses)
+              (Driver.get_fevents (Driver.foi base ifam)))
+          (Driver.get_family rp)
+  in
+  let classify_related p =
+    let iper = Driver.get_iper p in
+    List.find_map
+      (fun ip ->
+        let rp = Driver.poi base ip in
+        match
+          List.find_map
+            (fun r ->
+              if r.Def.r_fath = Some iper || r.Def.r_moth = Some iper then
+                Some (`Rel (idx_of rtypes r.Def.r_type))
+              else None)
+            (Driver.get_rparents rp)
+        with
+        | Some _ as v -> v
+        | None ->
+            Option.map
+              (fun wk -> `Wit (idx_of wkinds wk))
+              (find_wit_kind_in iper rp))
+      (Driver.get_related p)
+  in
+  List.iter
+    (fun iper ->
+      let p = Driver.poi base iper in
+      if
+        Driver.sou base (Driver.get_first_name p) = "?"
+        && Driver.sou base (Driver.get_surname p) = "?"
+      then ()
+      else
+        let rp = Driver.get_rparents p in
+        let rl = Driver.get_related p in
+        if rp = [] && rl = [] then truly := p :: !truly
+        else if rp <> [] then (
+          incr n_rel;
+          let i = idx_of rtypes (List.hd rp).Def.r_type in
+          by_rel.(i) <- p :: by_rel.(i))
+        else
+          match classify_related p with
+          | Some (`Rel i) ->
+              incr n_rel;
+              by_rel.(i) <- p :: by_rel.(i)
+          | Some (`Wit i) ->
+              incr n_wit;
+              by_wit.(i) <- p :: by_wit.(i)
+          | None ->
+              incr n_wit;
+              by_wit.(0) <- p :: by_wit.(0))
+    candidates;
+  let cmp p1 p2 =
+    let sn p = Name.lower (Driver.sou base (Driver.get_surname p)) in
+    let fn p = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+    match String.compare (sn p1) (sn p2) with
+    | 0 -> String.compare (fn p1) (fn p2)
+    | c -> c
+  in
+  let truly = List.sort cmp !truly in
+  Array.iteri (fun i l -> by_rel.(i) <- List.sort cmp l) by_rel;
+  Array.iteri (fun i l -> by_wit.(i) <- List.sort cmp l) by_wit;
+  let n1 = List.length truly in
+  let n2 = !n_rel in
+  let n3 = !n_wit in
+  let tot = n1 + n2 + n3 in
+  let iso =
+    "isolated persons/totally isolated/linked by relation/witness to an event"
+  in
+  let title _ =
+    Output.printf conf "%s (%d)"
+      (Utf8.capitalize_fst (transl_nth conf iso 0))
+      tot
+  in
+  let find_all_wit_kinds iper =
+    List.concat_map
+      (fun ip ->
+        let rp = Driver.poi base ip in
+        List.filter_map
+          (fun (_, _, _, _, _, wl, _) ->
+            Array.find_map
+              (fun (wip, wk) -> if wip = iper then Some wk else None)
+              wl)
+          (Event.sorted_events conf base rp))
+      (Driver.get_related (Driver.poi base iper))
+    |> List.sort_uniq compare
+  in
+  Hutil.header conf title;
+  let print_person_li p =
+    Output.print_sstring conf "<li>";
+    Output.print_string conf (referenced_person_text conf base p);
+    Output.print_string conf (DateDisplay.short_dates_text conf base p)
+  in
+  let print_list list =
+    Output.print_sstring conf "<ul>\n";
+    List.iter
+      (fun p ->
+        print_person_li p;
+        Output.print_sstring conf "</li>\n")
+      list;
+    Output.print_sstring conf "</ul>\n"
+  in
+  let print_wit_list cur_idx list =
+    let cur_wk = wkinds.(cur_idx) in
+    Output.print_sstring conf "<ul>\n";
+    List.iter
+      (fun p ->
+        print_person_li p;
+        let others =
+          List.filter
+            (fun wk -> wk <> cur_wk)
+            (find_all_wit_kinds (Driver.get_iper p))
+        in
+        (if others <> [] then
+           let s =
+             String.concat ", "
+               (List.map
+                  (fun wk ->
+                    (Util.string_of_witness_kind conf (Driver.get_sex p) wk
+                      :> string))
+                  others)
+           in
+           Output.printf conf " <em>(%s)</em>" s);
+        Output.print_sstring conf "</li>\n")
+      list;
+    Output.print_sstring conf "</ul>\n"
+  in
+  let up = " <a href=\"#isolated-top\" class=\"small text-muted ml-2\">^</a>" in
+  let print_sub plist id lbl list =
+    if list <> [] then (
+      Output.printf conf "<h4 class=\"ml-3\" id=\"%s\">%s (%d)%s</h4>\n" id
+        (Utf8.capitalize_fst lbl) (List.length list) up;
+      plist list)
+  in
+  let print_h3 id lbl n =
+    Output.printf conf "<h3 id=\"%s\">%s (%d)%s</h3>\n" id
+      (Utf8.capitalize_fst lbl) n up
+  in
+  Output.print_sstring conf "<div id=\"isolated-top\" class=\"mb-3\">\n";
+  let toc = Buffer.create 256 in
+  let add_toc_raw id lbl n =
+    Buffer.add_string toc
+      (Printf.sprintf "<a href=\"#%s\">%s&nbsp;(%d)</a>" id
+         (Utf8.capitalize_fst lbl) n)
+  in
+  let add_sub_toc prefix keys arr =
+    let first = ref true in
+    Array.iteri
+      (fun i list ->
+        if list <> [] then (
+          if !first then (
+            Buffer.add_string toc (transl conf ":");
+            Buffer.add_string toc " ";
+            first := false)
+          else Buffer.add_string toc " &middot; ";
+          Buffer.add_string toc
+            (Printf.sprintf "<a href=\"#%s-%d\">%s&nbsp;(%d)</a>" prefix i
+               (Utf8.capitalize_fst (label keys i))
+               (List.length list))))
+      arr
+  in
+  if n1 > 0 then add_toc_raw "sec-truly" (transl_nth conf iso 1) n1;
+  if n2 > 0 then (
+    if Buffer.length toc > 0 then Buffer.add_string toc "<br>\n";
+    add_toc_raw "sec-rel" (transl_nth conf iso 2) n2;
+    add_sub_toc "sec-rel" rtype_keys by_rel);
+  if n3 > 0 then (
+    if Buffer.length toc > 0 then Buffer.add_string toc "<br>\n";
+    add_toc_raw "sec-wit" (transl_nth conf iso 3) n3;
+    add_sub_toc "sec-wit" wkind_keys by_wit);
+  Output.print_sstring conf (Buffer.contents toc);
+  Output.print_sstring conf "</div>\n";
+  if n1 > 0 then (
+    print_h3 "sec-truly" (transl_nth conf iso 1) n1;
+    if conf.wizard then (
+      Output.print_sstring conf "<div class=\"text-danger mb-1\">";
+      Output.print_sstring conf
+        (Utf8.capitalize_fst
+           (transl conf
+              "caution: these persons are lost when exporting with gwu without \
+               the -isolated option"));
+      Output.print_sstring conf "</div>\n");
+    print_list truly);
+  if n2 > 0 then (
+    print_h3 "sec-rel" (transl_nth conf iso 2) n2;
+    Array.iteri
+      (fun i list ->
+        print_sub print_list
+          (Printf.sprintf "sec-rel-%d" i)
+          (label rtype_keys i) list)
+      by_rel);
+  if n3 > 0 then (
+    print_h3 "sec-wit" (transl_nth conf iso 3) n3;
+    Array.iteri
+      (fun i list ->
+        print_sub (print_wit_list i)
+          (Printf.sprintf "sec-wit-%d" i)
+          (label wkind_keys i) list)
+      by_wit);
+  Hutil.trailer conf
+
 (* Main *)
 
 let print ?no_headers conf base p =
