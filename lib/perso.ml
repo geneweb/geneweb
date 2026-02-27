@@ -748,41 +748,65 @@ type cell =
   | Cell of Driver.person * Driver.ifam option * pos * bool * int * string
   | Empty
 
-let rec enrich lst1 lst2 =
-  match (lst1, lst2) with
-  | _, [] -> []
-  | [], lst -> lst
-  | Cell (_, _, Right, _, s1, _) :: l1, Cell (p, f, d, u, s2, b) :: l2 ->
-      Cell (p, f, d, u, s1 + s2 + 1, b) :: enrich l1 l2
-  | Cell (_, _, Left, _, s, _) :: l1, Cell (p, f, d, u, _, b) :: l2 ->
-      enrich l1 (Cell (p, f, d, u, s, b) :: l2)
-  | Cell (_, _, _, _, s, _) :: l1, Cell (p, f, d, u, _, b) :: l2 ->
-      Cell (p, f, d, u, s, b) :: enrich l1 l2
-  | Empty :: l1, Cell (p, f, d, _, s, b) :: l2 ->
-      Cell (p, f, d, false, s, b) :: enrich l1 l2
-  | _ :: l1, Empty :: l2 -> Empty :: enrich l1 l2
+let enrich lst1 lst2 =
+  let rec aux lst1 lst2 k =
+    match (lst1, lst2) with
+    | _, [] -> k []
+    | [], lst -> k lst
+    | Cell (_, _, Right, _, s1, _) :: l1, Cell (p, f, d, u, s2, b) :: l2 ->
+        let k l = k (Cell (p, f, d, u, s1 + s2 + 1, b) :: l) in
+        aux l1 l2 k
+    | Cell (_, _, Left, _, s, _) :: l1, Cell (p, f, d, u, _, b) :: l2 ->
+        aux l1 (Cell (p, f, d, u, s, b) :: l2) k
+    | Cell (_, _, _, _, s, _) :: l1, Cell (p, f, d, u, _, b) :: l2 ->
+        let k l = k (Cell (p, f, d, u, s, b) :: l) in
+        aux l1 l2 k
+    | Empty :: l1, Cell (p, f, d, _, s, b) :: l2 ->
+        let k l = k (Cell (p, f, d, false, s, b) :: l) in
+        aux l1 l2 k
+    | _ :: l1, Empty :: l2 ->
+        let k l = k (Empty :: l) in
+        aux l1 l2 k
+  in
+  aux lst1 lst2 (fun x -> x)
 
 let is_empty = List.for_all (( = ) Empty)
 
 let rec enrich_tree lst =
-  match lst with
-  | [] -> []
-  | head :: tail -> (
-      if is_empty head then enrich_tree tail
-      else
-        match tail with
-        | [] -> [ head ]
-        | thead :: ttail -> head :: enrich_tree (enrich head thead :: ttail))
-
+  let rec aux l k =
+    match l with
+    | [] -> k []
+    | head :: tail -> (
+        if is_empty head then k (enrich_tree tail)
+        else
+          match tail with
+          | [] -> k [ head ]
+          | thead :: ttail ->
+              let k l = k (head :: l) in
+              let l = enrich head thead :: ttail in
+              aux l k)
+  in
+  aux lst (fun x -> x)
 (* tree_generation_list
     conf: configuration parameters
     base: base name
     gv: number of generations
     p: person *)
+
+let list_fold_right f l acc =
+  let rec aux f l k =
+    match l with
+    | [] -> k acc
+    | x :: xs ->
+        let k acc = k (f x acc) in
+        aux f xs k
+  in
+  aux f l (fun x -> x)
+
 let tree_generation_list conf base gv p =
   let mf = match p_getenv conf.env "mf" with Some "1" -> true | _ -> false in
   let next_gen pol =
-    List.fold_right
+    list_fold_right
       (fun po l ->
         match po with
         | Empty -> Empty :: l
