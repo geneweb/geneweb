@@ -3795,6 +3795,11 @@ pt: ambos
 sv: både
 tr: her ikisi de
 
+    caution: these persons are lost when exporting with gwu without the -isolated option
+de: Achtung: diese Personen gehen beim Export mit gwu ohne die Option -isolated verloren
+en: caution: these persons are lost when exporting with gwu without the -isolated option
+fr: attention : ces personnes sont perdues à l’export gwu sans l’option -isolated
+
     compiled on
 af: saamgestel op
 ar: تم تجميعه في
@@ -11367,6 +11372,11 @@ sk: narodila/narodila sa po svojom dieťati
 sl: je rojen po tem, ko je imel otroka/je rojena po tem, ko je imela otroka
 sv: är född efter sitt barn
 tr: çocuğundan sonra doğmuş
+
+    isolated persons/totally isolated/linked by relation/witness to an event
+de: isolierte Personen/völlig isoliert/durch Beziehung verknüpft/Zeuge bei einem Ereignis
+en: isolated persons/totally isolated/linked by relation/witness to an event
+fr: personnes isolées/totalement isolées/liées par relation/témoin à un événement
 
     it is the same person!
 af: is dieselfde persoon!

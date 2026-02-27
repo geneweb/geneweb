@@ -181,3 +181,8 @@ val string_of_title :
   Adef.safe_string
 (** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate}
 *)
+
+val print_isolated : config -> Geneweb_db.Driver.base -> unit
+(** Display persons with no parents and no families, grouped into truly
+    isolated, linked by relation (rparents), and referenced by other persons
+    (related/witnesses). *)
