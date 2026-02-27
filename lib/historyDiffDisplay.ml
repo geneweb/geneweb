@@ -290,6 +290,7 @@ let string_of_epers_name conf epers_name =
   | Epers_Acquisition ->
       Adef.safe @@ Utf8.capitalize_fst (transl conf "acquisition")
   | Epers_Adhesion -> Adef.safe @@ Utf8.capitalize_fst (transl conf "adhesion")
+  | Epers_Adoption -> Adef.safe @@ Utf8.capitalize_fst (transl conf "adoption")
   | Epers_BaptismLDS ->
       Adef.safe @@ Utf8.capitalize_fst (transl conf "baptismLDS")
   | Epers_BarMitzvah ->

@@ -24,6 +24,7 @@ let string_of_epers_name base epers_name =
   | Epers_Accomplishment -> "accomplishment"
   | Epers_Acquisition -> "acquisition"
   | Epers_Adhesion -> "adhesion"
+  | Epers_Adoption -> "adoption"
   | Epers_BaptismLDS -> "baptism (LDS)"
   | Epers_BarMitzvah -> "bar mitzvah"
   | Epers_BatMitzvah -> "bat mitzvah"

@@ -273,6 +273,7 @@
     <option value="#acco" data-sort="1"%if;(event.e_name="#acco") selected%end;>[*accomplishment]</option>
     <option value="#acqu" data-sort="1"%if;(event.e_name="#acqu") selected%end;>[*acquisition]</option>
     <option value="#adhe" data-sort="1"%if;(event.e_name="#adhe") selected%end;>[*adhesion]</option>
+    <option value="#adop" data-sort="1"%if;(event.e_name="#adop") selected%end;>[*adoption]</option>
     <option value="#barm" data-sort="1"%if;(event.e_name="#barm") selected%end;>[*bar mitzvah]</option>
     <option value="#basm" data-sort="1"%if;(event.e_name="#basm") selected%end;>[*bat mitzvah]</option>
     <option value="#bles" data-sort="1"%if;(event.e_name="#bles") selected%end;>[*benediction]</option>

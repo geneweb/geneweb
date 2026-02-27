@@ -144,6 +144,7 @@ let rec reconstitute_pevents conf ext cnt =
         | "#acco" -> Epers_Accomplishment
         | "#acqu" -> Epers_Acquisition
         | "#adhe" -> Epers_Adhesion
+        | "#adop" -> Epers_Adoption
         | "#awar" -> Epers_Decoration
         | "#bapl" -> Epers_BaptismLDS
         | "#barm" -> Epers_BarMitzvah
