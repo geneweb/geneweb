@@ -10,9 +10,9 @@
   %if;([cousin.l1.l2]!="[cousin.l1.l2]")
     %if;(cc>0)[cousin.l1.l2:::dd]s%else;[*cousin.l1.l2:::dd]s%end;
   %else;
-    %if;(cc>0)[close family]0
-    %else;[*close family]0
-    %end; (<small class="text-muted">l1/l2</small>)
+    %if;(cc>0)[close family]0%nn;
+    %else;[*close family]0%nn;
+    %end; (<small class="text-muted">l1/l2</small>)%nn;
   %end
 %end;
 %define;rela()
@@ -108,7 +108,7 @@
 %end;
 %define;sosa(ccc)
   %reset_count;
-  <li class="mt-1"><span class="fa-li"><i class="far fa-circle-dot text-success"></i></span>
+  <li class="mt-1">%if;not roglo;<span class="fa-li"><i class="far fa-circle-dot text-success"></i></span>%end;
     %if;(sosa=1)[*Sosa 1]
     %else;
       %apply;a_of_b%with;<a href="%prefix;%sosa_link;">[Sosa] %sosa;</a> – %nn;
@@ -177,8 +177,8 @@
     %let;l1;%apply;getvar(l1)%in;
     %let;l2;%apply;getvar(l2)%in;
     %if;(count>0)
-      <li class="mt-2"><span class="fa-li">%apply;all_link()</span>
-        %apply;a_of_b%with;
+      <li class="mt-2">%if;not roglo<span class="fa-li">%apply;all_link()</span>%end;
+        %apply;a_of_b%with;%nn;
           %if;(ccc>0)%apply;rela()%end;
           <a href="%prefix;m=RL&i=%apply;getvar(ancestor1_index)&i1=%sosa_ref.index;&l1=%l1;&i2=%index;&l2=%l2;&spouse=on&dag=on"
             title="[*to see the first relationship link] [with] %sosa_ref; (%expr(l1+l2) [degree of kinship]1, %l1;↑%l2;↓)">%nn;
@@ -204,7 +204,7 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
+  <ul class="%if;not roglo;fa-ul%end;%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
       <li %apply;getvar%with;ns[birth]%end;>
         %if;(not roglo)<span class="fa-li"><i class="fas fa-baby"></i></span>%end;
@@ -217,7 +217,7 @@
       </li>
       %if;birthday;
         <li>
-          <span class="fa-li"><i class="fa-solid fa-cake-candles"></i></span>
+          %if;not roglo;<span class="fa-li"><i class="fa-solid fa-cake-candles"></i></span>%end;
           [*happy birthday to you!]
         </li>
       %end;
@@ -263,7 +263,7 @@
         %else;%if;(not is_dead and computable_age)[*age][:]%sp;%end;%end;
         %if;(age_days!="")%apply;1000sep(age_days) [days old]%end;
         %if;(lang="en") old%end;">
-        <span class="fa-li"><i class="far fa-id-card"></i></span>
+        %if;not roglo;<span class="fa-li"><i class="far fa-id-card"></i></span>%end;
         %if;(is_dead and computable_death_age)
           %if;(death_date.month!="" and death_date.day!=""
            and birth_date.month!="" and birth_date.day!="")
@@ -281,15 +281,17 @@
       </li>
     %end;
     %if;has_occupation;
-      %if;(not roglo)<li class="mt-1" title="[*occupation/occupations]0"><span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
+      <li class="mt-1" title="[*occupation/occupations]0">
+        %if;not roglo;<span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
         %apply;capitalize(occupation)</li>%nl;
     %end;
     %if;(has_linked_page.OCCU and linked_page.OCCU!="")
-      <li><span class="fa-li"><i class="far fa-file-lines"></i></span>
+      <li>%if;not roglo;<span class="fa-li"><i class="far fa-file-lines"></i></span>%end;
       %apply;capitalize(linked_page.OCCU)</li>%nl;
     %end;
     %if;(has_consanguinity and b.show_consang!="no")
-      <li class="mt-1" title="[*consanguinity]"><span class="fa-li"><i class="fas fa-percent"></i></span>
+      <li class="mt-1" title="[*consanguinity]">%nn;
+        %if;not roglo;<span class="fa-li"><i class="fas fa-percent"></i></span>%end;
         %if;(cancel_links)
           [*consanguinity][:] %consanguinity;
         %else;
