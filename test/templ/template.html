@@ -1,0 +1,65 @@
+<html>
+  <head>%base.name   </head>
+  <link rel="icon" href="%image_prefx;favicon.png"/>
+  <body>
+    %define;foo(x)foo_x%end;
+
+    <span id="apply_1">%apply;foo("bar")</span>
+
+    %define;bar(x, y)bar_x_y%end;
+
+    %define;foobar(x)
+      %define;toto(y)
+        x_y
+      %end;
+    %end;
+    
+    <span id="apply_2">%apply;bar("Hello", "World")</span>
+
+    <span id="apply_3">%apply;bar%with;Hello%and;World%end;</span>
+
+    %if;(lang="fr")<span>french!</span>%end;
+
+    %include;included.html
+
+    %for;i;0;10;
+      %let;
+        h;%apply;foo(bar)
+      %in;
+      %if;(h!="toto")
+        <span>boom</span>
+      %end;
+    %end;
+
+    %foreach;blabla;
+      <span>toto</span>
+    %end;
+
+    %let;
+      x;%apply;foo(bar)
+      %let;
+        y;%apply;foo(bar)
+      %in;
+      x y
+    %in;
+
+    %sq;     
+
+    <span id="nn">   %nn;   </span>    
+
+    <span id="transl_1">[connect  ]   </span>
+  
+    <span id="transl_2">
+    [disconnect]  
+    text
+    </span>
+
+    %if;c1;
+    %elseif;c2;
+    %else;
+      %if;c3;
+      %else;
+      %end; 
+    %end;
+  </body>
+</html>

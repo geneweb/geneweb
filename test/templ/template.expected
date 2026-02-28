@@ -1,0 +1,69 @@
+Atext ("<html>\n<head>");
+{ desc = Avar (base, [name]); loc = template.html:(2, 9):(2, 19) };
+Atext ("   </head>\n<link rel=\"icon\" href=\"");
+{ desc = Avar (image_prefx, []); loc = template.html:(3, 26):(3, 39) };
+Atext ("favicon.png\"/>\n<body>\n");
+{ desc = Adefine (foo, [{x, }], [Atext ("foo_x")],
+[Atext ("<span id=\"apply_1\">");
+ { desc = Aapply (foo, [{, [Atext ("bar")]}]);
+  loc = template.html:(7, 24):(7, 41) }; Atext ("</span>\n");
+ { desc = Adefine (bar, [{x, }; {y, }], [Atext ("bar_x_y")],
+ [{ desc = Adefine (foobar, [{x, }],
+  [{ desc = Adefine (toto, [{y, }], [Atext ("x_y\n")], []);
+    loc = template.html:(12, 7):(14, 12) }],
+  [Atext ("<span id=\"apply_2\">");
+   { desc = Aapply (bar, [{, [Atext ("Hello")]}; {, [Atext ("World")]}]);
+    loc = template.html:(17, 24):(17, 52) };
+   Atext ("</span>\n<span id=\"apply_3\">");
+   { desc = Aapply (bar, [{, [Atext ("Hello")]}; {, [Atext ("World")]}]);
+    loc = template.html:(19, 24):(19, 60) }; Atext ("</span>\n");
+   { desc = Aif (Aop2 (=,
+                 { desc = Avar (lang, []);
+                  loc = template.html:(21, 10):(21, 14) }, Atext ("fr")),
+   [Atext ("<span>french!</span>")], []);
+    loc = template.html:(21, 5):(21, 45) };
+   Apack ([Atext ("<!-- included.html -->\n");
+           { desc = Apack ([{ desc = Avar (base, [bar]);
+                             loc = included.html:(1, 1):(1, 10) }]);
+            loc = template.html:(23, 5):(23, 27) };
+           Atext ("<!-- included.html -->\n")]);
+   { desc = Afor (i, Aint (0), Aint (10),
+   [{ desc = Alet (h,
+    [{ desc = Aapply (foo,
+     [{, [{ desc = Avar (bar, []); loc = template.html:(27, 22):(27, 25) }]}]);
+      loc = template.html:(27, 11):(27, 26) }]
+    [{ desc = Aif (Aop2 (!=,
+                   { desc = Avar (h, []);
+                    loc = template.html:(29, 12):(29, 13) }, Atext ("toto")),
+     [Atext ("<span>boom</span>\n")], []);
+      loc = template.html:(29, 7):(31, 12) }]);
+     loc = template.html:(26, 7):(28, 11) }]);
+    loc = template.html:(25, 5):(32, 10) };
+   { desc = Aforeach ((blabla, []), [], [Atext ("<span>toto</span>\n")]);
+    loc = template.html:(34, 5):(36, 10) };
+   { desc = Alet (x,
+   [{ desc = Aapply (foo,
+    [{, [{ desc = Avar (bar, []); loc = template.html:(39, 20):(39, 23) }]}]);
+     loc = template.html:(39, 9):(39, 24) };
+    { desc = Alet (y,
+    [{ desc = Aapply (foo,
+     [{, [{ desc = Avar (bar, []); loc = template.html:(41, 22):(41, 25) }]}]);
+      loc = template.html:(41, 11):(41, 26) }]
+    [Atext ("x y\n")]); loc = template.html:(40, 7):(42, 11) }]
+   [Atext ("<span id=\"nn\">   </span>    \n<span id=\"transl_1\">");
+    Atransl (false, connect  , );
+    Atext ("   </span>\n<span id=\"transl_2\">\n");
+    Atransl (false, disconnect, ); Atext ("  \ntext\n</span>\n");
+    { desc = Aif ({ desc = Avar (c1, []);
+                   loc = template.html:(57, 9):(57, 11) },
+    [],
+    [Aif ({ desc = Avar (c2, []); loc = template.html:(58, 13):(58, 15) },
+     [],
+     [{ desc = Aif ({ desc = Avar (c3, []);
+                     loc = template.html:(60, 11):(60, 13) },
+      [], []); loc = template.html:(60, 7):(62, 12) }])]);
+     loc = template.html:(57, 5):(63, 10) }; Atext ("</body>\n</html>")]);
+    loc = template.html:(38, 5):(44, 9) }]);
+   loc = template.html:(11, 5):(15, 10) }]);
+  loc = template.html:(9, 5):(9, 34) }]);
+ loc = template.html:(5, 5):(5, 29) }

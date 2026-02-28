@@ -10,21 +10,24 @@ let with_cache (type a b) (f : a -> b) : a -> b =
         r
     | r -> r
 
-let parse_ast lexbuf = Lexer.parse_ast (Buffer.create 1024) [] [] lexbuf |> fst
+let parse_ast ~src lexbuf =
+  let st = Lexer.State.create ~src lexbuf in
+  Lexer.parse_ast (Buffer.create 1024) [] st lexbuf |> fst
 
-let parse_file s =
-  Compat.In_channel.with_open_text s @@ fun ic ->
-  let lexbuf = Lexing.from_channel ic in
-  (* TODO: This function is not available in OCaml 4.08. We should
-     find a workaround after fixing locations in the parser. *)
-  (* Lexing.set_filename lexbuf s; *)
-  parse_ast lexbuf
+let parse_file ~src fl =
+  Compat.In_channel.with_open_text fl @@ fun ic ->
+  (* We do not use position feature of the Lexing module as our lexer does not
+     produce a single token per call. Instead, we rely on
+     `lex_abs_pos`, `lex_start_pos` and `lex_curr_pos` of [lexbuf] to compute
+     locations. *)
+  let lexbuf = Lexing.from_channel ~with_positions:false ic in
+  parse_ast ~src lexbuf
 
 let parse_source ~cached src =
   match src with
-  | `File s -> if cached then with_cache parse_file s else parse_file s
-  | `In_channel ic -> parse_ast @@ Lexing.from_channel ic
-  | `Raw s -> parse_ast @@ Lexing.from_string s
+  | `File fl ->
+      if cached then with_cache (parse_file ~src) fl else parse_file ~src fl
+  | `Raw s -> parse_ast ~src (Lexing.from_string ~with_positions:false s)
 
 let comment fl =
   let s =

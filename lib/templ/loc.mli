@@ -1,7 +1,7 @@
 type t
 (** Type of locations. *)
 
-type source = [ `File of string | `In_channel of in_channel | `Raw of string ]
+type source = [ `File of string | `Raw of string ]
 (** Type of sources. *)
 
 val equal_source : source -> source -> bool
@@ -14,9 +14,12 @@ val pp_source : source Fmt.t
 val dummy : t
 (** Dummy location. *)
 
-val of_lexbuf : Lexing.lexbuf -> t
-(** [of_lexbuf lexbuf] creates a location from the current state of the lexing
-    buffer [lexbuf]. *)
+val is_dummy : t -> bool
+(** [is_dummy t] checks if [t] is the dummy location. *)
+
+val of_offsets : source -> int -> int -> t
+(** [of_offsets src start stop] creates a location for the source [src] starting
+    at [start] and ending at [stop]. *)
 
 val equal : t -> t -> bool
 (** [equal t1 t2] checks if the locations [t1] and [t2] are equal. *)
@@ -25,7 +28,7 @@ val pp : t Fmt.t
 (** [pp ppf t] prints a string representation of the location on the formatter
     [ppf]. *)
 
-val pp_with_input : t Fmt.t
-(** [pp_with_input ppf t] prints the lines referenced by [t] on the formatter
+val pp_with_source : t Fmt.t
+(** [pp_with_source ppf t] prints the lines referenced by [t] on the formatter
     [ppf] using Pp_loc library. For channel sources, this assumes that
     unrestricted seeking operations on channels. *)

@@ -87,12 +87,12 @@ let pp_source ppf src =
   | `File f -> Fmt.pf ppf "File (%s)" f
   | `Raw s -> Fmt.pf ppf "Raw (%s)" s
 
-let pp_list pp_elt = Fmt.(brackets @@ list ~sep:semi pp_elt)
-let pp_pair pp1 pp2 = Fmt.(braces @@ pair ~sep:comma pp1 pp2)
+let pp_list pp_elt = Fmt.(box ~indent:2 @@ brackets @@ list ~sep:semi pp_elt)
+let pp_pair pp1 pp2 = Fmt.(box ~indent:2 @@ braces @@ pair ~sep:comma pp1 pp2)
 
 let rec pp_desc ppf t =
   match t with
-  | Atext s -> Fmt.pf ppf "Atext (%s)" s
+  | Atext s -> Fmt.pf ppf "Atext (%S)" s
   | Avar (s, sx) -> Fmt.pf ppf "Avar (%s,@ %a)" s (pp_list Fmt.string) sx
   | Atransl (b, s1, s2) -> Fmt.pf ppf "Atransl (%b,@ %s,@ %s)" b s1 s2
   | Awid_hei s -> Fmt.pf ppf "Awid_hei (%s)" s
@@ -121,25 +121,26 @@ let rec pp_desc ppf t =
   | Apack l -> Fmt.pf ppf "Apack (%a)" (pp_list pp) l
 
 and pp ppf { desc; loc } =
-  Fmt.pf ppf "{ desc = %a; loc = %a }" pp_desc desc Loc.pp loc
+  if Loc.is_dummy loc then (Fmt.box @@ pp_desc) ppf desc
+  else Fmt.pf ppf "@[{ desc = %a;@, loc = %a }@]" pp_desc desc Loc.pp loc
 
 let pp = Fmt.(box @@ pp)
-let[@inline always] mk ?(loc = Loc.dummy) desc = { desc; loc }
-let[@inline always] mk_text ?loc x = mk ?loc (Atext x)
-let[@inline always] mk_var ?loc x y = mk ?loc (Avar (x, y))
-let[@inline always] mk_transl ?loc x y z = mk ?loc (Atransl (x, y, z))
-let[@inline always] mk_wid_hei ?loc x = mk ?loc (Awid_hei x)
-let[@inline always] mk_foreach ?loc x y z = mk ?loc (Aforeach (x, y, z))
-let[@inline always] mk_for ?loc x y z t = mk ?loc (Afor (x, y, z, t))
-let[@inline always] mk_if ?loc x y z = mk ?loc (Aif (x, y, z))
-let[@inline always] mk_define ?loc x y z t = mk ?loc (Adefine (x, y, z, t))
-let[@inline always] mk_apply ?loc x y = mk ?loc (Aapply (x, y))
-let[@inline always] mk_let ?loc x y z = mk ?loc (Alet (x, y, z))
-let[@inline always] mk_op1 ?loc x y = mk ?loc (Aop1 (x, y))
-let[@inline always] mk_op2 ?loc x y z = mk ?loc (Aop2 (x, y, z))
-let[@inline always] mk_int ?loc x = mk ?loc (Aint x)
-let[@inline always] mk_include ?loc x = mk ?loc (Ainclude x)
-let[@inline always] mk_pack ?loc l = mk ?loc (Apack l)
+let[@inline] mk ?(loc = Loc.dummy) desc = { desc; loc }
+let[@inline] mk_text ?loc x = mk ?loc (Atext x)
+let[@inline] mk_var ?loc x y = mk ?loc (Avar (x, y))
+let[@inline] mk_transl ?loc x y z = mk ?loc (Atransl (x, y, z))
+let[@inline] mk_wid_hei ?loc x = mk ?loc (Awid_hei x)
+let[@inline] mk_foreach ?loc x y z = mk ?loc (Aforeach (x, y, z))
+let[@inline] mk_for ?loc x y z t = mk ?loc (Afor (x, y, z, t))
+let[@inline] mk_if ?loc x y z = mk ?loc (Aif (x, y, z))
+let[@inline] mk_define ?loc x y z t = mk ?loc (Adefine (x, y, z, t))
+let[@inline] mk_apply ?loc x y = mk ?loc (Aapply (x, y))
+let[@inline] mk_let ?loc x y z = mk ?loc (Alet (x, y, z))
+let[@inline] mk_op1 ?loc x y = mk ?loc (Aop1 (x, y))
+let[@inline] mk_op2 ?loc x y z = mk ?loc (Aop2 (x, y, z))
+let[@inline] mk_int ?loc x = mk ?loc (Aint x)
+let[@inline] mk_include ?loc x = mk ?loc (Ainclude x)
+let[@inline] mk_pack ?loc l = mk ?loc (Apack l)
 
 let rec subst_desc sf desc =
   match desc with
