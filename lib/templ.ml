@@ -7,6 +7,7 @@ module Ast = Geneweb_templ.Ast
 module Loc = Geneweb_templ.Loc
 module Driver = Geneweb_db.Driver
 
+exception UnboundVar
 exception BadApplyArity
 exception NamedArgumentNotMatched of string
 
@@ -31,7 +32,8 @@ let pp_exception ppf (e, bt) =
   in
   match e with
   | Exc_located (loc, e) ->
-      Fmt.pf ppf "@[%a@ %s@ %a@]" pp_header () (Printexc.to_string e) Loc.pp loc
+      Fmt.pf ppf "@[%a@ %s@ %a@]" pp_header () (Printexc.to_string e)
+        Loc.pp_with_source loc
   | _ ->
       Fmt.pf ppf "@[%a@ %s@ %a@]" pp_header () (Printexc.to_string e)
         Fmt.(list ~sep:cut string)
@@ -739,9 +741,7 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
       try eval_var loc (s :: sl)
       with Not_found -> (
         try templ_eval_var conf (s :: sl)
-        with Not_found ->
-          raise_with_loc loc
-            (Failure ("unbound var: " ^ String.concat "." (s :: sl)))))
+        with Not_found -> raise_with_loc loc UnboundVar))
   | Atransl (upp, s, c) -> VVstring (eval_transl conf upp s c)
   | Aapply (s, ell) ->
       let vl =

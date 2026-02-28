@@ -16,7 +16,7 @@
 *.ml text
 *.mli text
 *.opam text
-*.sh text
+*.sh text eol=lf
 *.txt text
 *.1 text
 

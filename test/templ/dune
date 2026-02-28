@@ -1,0 +1,17 @@
+(executable
+ (name templ_test)
+ (libraries fmt geneweb_templ))
+
+(rule
+ (deps
+  (:template ./template.html)
+  (glob_files ./*.html))
+ (action
+  (with-stdout-to
+   template.out
+   (run ./templ_test.exe %{template}))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff template.expected template.out)))

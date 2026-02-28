@@ -1,10 +1,48 @@
 {
 
-(* let pos lex = !current_file, Lexing.lexeme_start lex, Lexing.lexeme_end lex *)
+module State : sig
+  type t = private {
+    src : Loc.source;
+    lexbuf : Lexing.lexbuf;
+    start : int;
+    tokens : Ast.t list;
+  }
+
+  val create : src:Loc.source -> Lexing.lexbuf -> t
+  val update_loc : t -> t
+  val current_loc : t -> Loc.t
+  val push_token : Ast.t -> t -> t
+  val tokens : t -> Ast.t list
+end = struct
+  type t = {
+    src : Loc.source;
+    lexbuf : Lexing.lexbuf;
+    start : int;
+    tokens : Ast.t list;
+  }
+
+  let[@inline] offset lexbuf =
+    lexbuf.Lexing.lex_abs_pos + lexbuf.Lexing.lex_start_pos
+
+  let create ~src lexbuf =
+    { src; lexbuf; start = offset lexbuf; tokens = [] }
+
+  let update_loc st =
+    { st with start = offset st.lexbuf }
+
+  let current_loc (st : t) =
+    let stop = st.lexbuf.Lexing.lex_abs_pos + st.lexbuf.Lexing.lex_curr_pos in
+    Loc.of_offsets st.src st.start stop
+
+  let push_token tk st =
+    { st with tokens = tk :: st.tokens }
+
+  let tokens st = List.rev st.tokens
+end
 
 (* Leading ([' ' '\t' '\r']* '\n') will be removed, except if
    the previous node is a Atransl. *)
-let flush ast b _lexbuf =
+let flush b st =
   let s = Buffer.contents b in
   let trim s =
     let rec loop i =
@@ -17,17 +55,16 @@ let flush ast b _lexbuf =
     in
     loop 0
   in
-  let s = match ast with
+  let s = match st.State.tokens with
     | Ast.{ desc = Atransl _; _ } :: _ | { desc = Awid_hei _; _ } :: _ -> s
     | _ -> trim s
   in
-  let ast =
-    if s = "" then ast
-    else Ast.mk_text s :: ast
+  let st =
+    if s = "" then st
+    else State.push_token (Ast.mk_text s) st
   in
-  let () = Buffer.reset b in
-  ast
-
+  Buffer.reset b;
+  st
 }
 
 let ws = ([ ' ' '\n' '\t' '\r' ])
@@ -40,69 +77,86 @@ let var = (r_ident ('.' (r_ident|num))*)
 
 let value = ([^ ' ' '>' ';' '\n' '\r'  '\t' ]+)
 
-rule parse_ast b closing ast = parse
+rule parse_ast b closing st = parse
 
   (* Special variable: strip whitespaces coming after this. *)
   | "%sq;" ws* {
-      parse_ast b closing ast lexbuf
+      parse_ast b closing st lexbuf
     }
 
   (* Special variable: strip on newline and its surrounding whitespaces. *)
   | "%nn;" [ ' ' '\t' '\r' ]* '\n'? [ ' ' '\t' '\r' ]* {
-      parse_ast b closing ast lexbuf
+      parse_ast b closing st lexbuf
     }
 
   | '%' {
+      let st = State.update_loc st in
       match match variable lexbuf with `variable [] -> `escaped '%' | x -> x with
-      | `escaped c -> Buffer.add_char b c ; parse_ast b closing ast lexbuf
-      | `comment -> parse_ast b closing ast lexbuf
+      | `escaped c ->
+          Buffer.add_char b c;
+          parse_ast b closing st lexbuf
+      | `comment ->
+          parse_ast b closing st lexbuf
       | x ->
-        let loc = Loc.of_lexbuf lexbuf in
-        let ast = flush ast b lexbuf in
+        let st = flush b st in
         match x with
-        | `variable [v] when List.mem v closing -> List.rev ast, v
-        | `variable ["define"] -> parse_define b closing ast lexbuf
-        | `variable ["let"] -> parse_let b closing ast lexbuf
-        | `variable ["include"] -> parse_include b closing ast lexbuf
+        | `variable [v] when List.mem v closing ->
+            State.tokens st, v
+        | `variable ["define"] ->
+            parse_define b closing st lexbuf
+        | `variable ["let"] ->
+            parse_let b closing st lexbuf
+        | `variable ["include"] ->
+            parse_include b closing st lexbuf
         | x ->
           let a = match x with
-            | `variable ["if"] -> parse_if b lexbuf
-            | `variable ["foreach"] -> parse_foreach b lexbuf
-            | `variable ["apply"] -> parse_apply b lexbuf
-            | `variable ["expr"] -> parse_expr_stmt lexbuf
-            | `variable ["for"] -> parse_for b lexbuf
-            | `variable ["wid_hei"] -> Ast.mk_wid_hei (value lexbuf)
-            | `variable (hd :: tl) -> Ast.mk_var ~loc hd tl
-            | `variable [] | `escaped _ | `comment -> assert false
+            | `variable ["if"] ->
+                parse_if b st lexbuf
+            | `variable ["foreach"] ->
+                parse_foreach b st lexbuf
+            | `variable ["apply"] ->
+                parse_apply b st lexbuf
+            | `variable ["expr"] ->
+                parse_expr_stmt st lexbuf
+            | `variable ["for"] ->
+                parse_for b st lexbuf
+            | `variable ["wid_hei"] ->
+                Ast.mk_wid_hei ~loc:(State.current_loc st) (value lexbuf)
+            | `variable (hd :: tl) ->
+                Ast.mk_var ~loc:(State.current_loc st) hd tl
+            | `variable [] | `escaped _ | `comment ->
+                assert false
           in
-          parse_ast b closing (a :: ast) lexbuf
+          let st = State.push_token a st in
+          parse_ast b closing st lexbuf
     }
 
   | '[' {
-      let ast = flush ast b lexbuf in
+      let st = flush b st in
       let a =
-        let loc = Loc.of_lexbuf lexbuf in
         let (upp, s, n) = lexicon_word lexbuf in
         if String.length s > 1 && (s.[0] = '[' || s.[0] = '@') then
-            Ast.mk_include ~loc (`Raw s)
+            Ast.mk_include (`Raw s)
         else
-          Ast.mk_transl ~loc upp s n
+          Ast.mk_transl upp s n
       in
-      parse_ast b closing (a :: ast) lexbuf
+      let st = State.push_token a st in
+      parse_ast b closing st lexbuf
     }
 
   | '\n' [ ' ' '\n' '\t' '\r' ]* {
-      let () = Buffer.add_char b '\n' in
-      parse_ast b closing ast lexbuf
+      Buffer.add_char b '\n';
+      parse_ast b closing st lexbuf
     }
 
   | _ as c {
-      let () = Buffer.add_char b c in
-      parse_ast b closing ast lexbuf
+      Buffer.add_char b c;
+      parse_ast b closing st lexbuf
     }
 
   | eof {
-      List.rev (flush ast b lexbuf), ""
+      let st = flush b st in
+      State.tokens st, ""
     }
 
 and parse_ident_list = parse
@@ -113,177 +167,167 @@ and parse_ident_list = parse
       []
     }
 
-and parse_expr = parse
+and parse_expr st = parse
   | "" {
-      parse_expr_if lexbuf
+      parse_expr_if st lexbuf
     }
 
-and parse_expr_if = parse
+and parse_expr_if st = parse
   | ws* "if" {
-      let e1 = parse_expr_or lexbuf in
-      parse_expr_if_1 e1 lexbuf
+      let e1 = parse_expr_or st lexbuf in
+      parse_expr_if_1 e1 st lexbuf
     }
   | "" {
-      parse_expr_or lexbuf
+      parse_expr_or st lexbuf
     }
-and parse_expr_if_1 e1 = parse
+and parse_expr_if_1 e1 st = parse
   | ws* "then" {
-      let e2 = parse_expr_or lexbuf in
-      parse_expr_if_2 e1 e2 lexbuf
+      let e2 = parse_expr_or st lexbuf in
+      parse_expr_if_2 e1 e2 st lexbuf
     }
-and parse_expr_if_2 e1 e2 = parse
+and parse_expr_if_2 e1 e2 st = parse
   | ws* "else" {
-      let e3 = parse_expr_or lexbuf in
+      let e3 = parse_expr_or st lexbuf in
       Ast.mk_if e1 [e2] [e3]
     }
 
-and parse_expr_or = parse
+and parse_expr_or st = parse
   | ws* {
-      let e1 = parse_expr_and lexbuf in
-      parse_expr_or_1 e1 lexbuf
+      let e1 = parse_expr_and st lexbuf in
+      parse_expr_or_1 e1 st lexbuf
     }
-and parse_expr_or_1 e1 = parse
+and parse_expr_or_1 e1 st = parse
   | ws* "or" {
-      let loc = Loc.of_lexbuf lexbuf in
-      let e2 = parse_expr_or lexbuf in
-      Ast.mk_op2 ~loc "or" e1 e2
+      let e2 = parse_expr_or st lexbuf in
+      Ast.mk_op2 "or" e1 e2
     }
   | ws* {
       e1
     }
 
-and parse_expr_and = parse
+and parse_expr_and st = parse
   | ws* {
-      let e1 = parse_expr_is_substr lexbuf in
-      parse_expr_and_1 e1 lexbuf
+      let e1 = parse_expr_is_substr st lexbuf in
+      parse_expr_and_1 e1 st lexbuf
     }
-and parse_expr_and_1 e1 = parse
+and parse_expr_and_1 e1 st = parse
   | ws* "and" {
-      let loc = Loc.of_lexbuf lexbuf in
-      let e2 = parse_expr_and lexbuf in
-      Ast.mk_op2 ~loc "and" e1 e2
+      let e2 = parse_expr_and st lexbuf in
+      Ast.mk_op2 "and" e1 e2
     }
   | ws* {
       e1
     }
 
-and parse_expr_is_substr = parse
+and parse_expr_is_substr st = parse
   | ws* {
-      let e1 = parse_expr_in lexbuf in
-      parse_expr_is_substr_1 e1 lexbuf
+      let e1 = parse_expr_in st lexbuf in
+      parse_expr_is_substr_1 e1 st lexbuf
     }
-and parse_expr_is_substr_1 e1 = parse
+and parse_expr_is_substr_1 e1 st = parse
   | ws* "is_substr" {
-      let loc = Loc.of_lexbuf lexbuf in
-      let e2 = parse_expr_is_substr lexbuf in
-      Ast.mk_op2 ~loc "is_substr" e1 e2
+      let e2 = parse_expr_is_substr st lexbuf in
+      Ast.mk_op2 "is_substr" e1 e2
     }
   | ws* {
       e1
     }
 
-and parse_expr_in = parse
+and parse_expr_in st = parse
   | ws* {
-      let e1 = parse_expr_3 lexbuf in
-      parse_expr_in_1 e1 lexbuf
+      let e1 = parse_expr_3 st lexbuf in
+      parse_expr_in_1 e1 st lexbuf
     }
-and parse_expr_in_1 e1 = parse
+and parse_expr_in_1 e1 st = parse
   | ws* "in" {
-      let loc = Loc.of_lexbuf lexbuf in
-      let e2 = parse_expr_in lexbuf in
-      Ast.mk_op2 ~loc "in" e1 e2
+      let e2 = parse_expr_in st lexbuf in
+      Ast.mk_op2 "in" e1 e2
     }
   | ws* {
       e1
     }
 
-and parse_expr_3 = parse
+and parse_expr_3 st = parse
   | ws* {
-      let e1 = parse_expr_4 lexbuf in
-      parse_expr_3_1 e1 lexbuf
+      let e1 = parse_expr_4 st lexbuf in
+      parse_expr_3_1 e1 st lexbuf
     }
-and parse_expr_3_1 e1 = parse
+and parse_expr_3_1 e1 st = parse
   | ws* (("="|"!="|">"|">="|"<"|"<=") as op) {
-      let loc = Loc.of_lexbuf lexbuf in
-      let e2 = parse_expr_4 lexbuf in
-      Ast.mk_op2 ~loc op e1 e2
+      let e2 = parse_expr_4 st lexbuf in
+      Ast.mk_op2 op e1 e2
     }
   | ws* {
       e1
     }
 
-and parse_expr_4 = parse
+and parse_expr_4 st = parse
   | ws* {
-      let e1 = parse_expr_5 lexbuf in
-      parse_expr_4_1 e1 lexbuf
+      let e1 = parse_expr_5 st lexbuf in
+      parse_expr_4_1 e1 st lexbuf
     }
-and parse_expr_4_1 e1 = parse
+and parse_expr_4_1 e1 st = parse
   | ws* (("+"|"-") as op) ws* {
-      let loc = Loc.of_lexbuf lexbuf in
-      let e2 = parse_expr_5 lexbuf in
-      let a = Ast.mk_op2 ~loc (String.make 1 op) e1 e2 in
-      parse_expr_4_1 a lexbuf
+      let e2 = parse_expr_5 st lexbuf in
+      let a = Ast.mk_op2 (String.make 1 op) e1 e2 in
+      parse_expr_4_1 a st lexbuf
     }
   | ws*  { e1 }
 
-and parse_expr_5 = parse
+and parse_expr_5 st = parse
   | ws* {
-      let e1 = parse_simple_expr lexbuf in
-      parse_expr_5_1 e1 lexbuf
+      let e1 = parse_simple_expr st lexbuf in
+      parse_expr_5_1 e1 st lexbuf
     }
 
-and parse_expr_5_1 e1 = parse
+and parse_expr_5_1 e1 st = parse
   | ws* (("*" | "^" | "/" | "|" | "%" |"/.") as op) {
-      let loc = Loc.of_lexbuf lexbuf in
-      let e2 = parse_simple_expr lexbuf in
-      let a = Ast.mk_op2 ~loc op e1 e2 in
-      parse_expr_5_1 a lexbuf
+      let e2 = parse_simple_expr st lexbuf in
+      let a = Ast.mk_op2 op e1 e2 in
+      parse_expr_5_1 a st lexbuf
     }
   | ws* {
       e1
     }
 
-and parse_simple_expr = parse
+and parse_simple_expr st = parse
   | ws* '(' {
-      let e = parse_expr lexbuf in
-      let () = discard_RPAREN lexbuf in
+      let e = parse_expr st lexbuf in
+      discard_RPAREN lexbuf;
       e
     }
   | ws* "not" {
-      let loc = Loc.of_lexbuf lexbuf in
-      let e = parse_simple_expr lexbuf in
-      Ast.mk_op1 ~loc "not" e
+      let e = parse_simple_expr st lexbuf in
+      Ast.mk_op1 "not" e
     }
   | ws* '"' ([^'"']* as s) '"' {
-      let loc = Loc.of_lexbuf lexbuf in
-      Ast.mk_text ~loc s
+      Ast.mk_text s
     }
   | ws* (num as s) {
-      let loc = Loc.of_lexbuf lexbuf in
-      Ast.mk_int ~loc s
+      Ast.mk_int s
     }
   | ws* '[' {
-      let loc = Loc.of_lexbuf lexbuf in
+      let st = State.update_loc st in
       let u, w, n = lexicon_word lexbuf in
-      Ast.mk_transl ~loc u w n
+      Ast.mk_transl ~loc:(State.current_loc st) u w n
     }
   | ws* (var as id) {
-      let loc = Loc.of_lexbuf lexbuf in
+      let st = State.update_loc st in
       match String.split_on_char '.' id with
       | hd :: tl -> (
         (* FIXME: This hack introduces backtracking in the parser. We should
            parse our syntax without backtracking at all. *)
         try
-          let l = List.map (fun v -> None, v) (parse_tuple lexbuf) in
-          Ast.mk_apply ~loc hd l
-        with _ -> Ast.mk_var ~loc hd tl)
+          let l = List.map (fun v -> None, v) (parse_tuple st lexbuf) in
+          Ast.mk_apply ~loc:(State.current_loc st) hd l
+        with _ -> Ast.mk_var ~loc:(State.current_loc st) hd tl)
       | [] -> assert false
     }
 
-and parse_simple_expr_1 = parse
+and parse_simple_expr_1 st = parse
   | ws* {
-      let e = parse_expr lexbuf in
-      let () = discard_RPAREN lexbuf in
+      let e = parse_expr st lexbuf in
+      discard_RPAREN lexbuf;
       e
     }
 
@@ -292,64 +336,64 @@ and discard_RPAREN = parse
       ()
     }
 
-and parse_apply_tuple = parse
+and parse_apply_tuple st = parse
   | ws* '(' ws* ')' {
       []
     }
   | ws* '(' {
-     parse_apply_tuple_1 lexbuf
+     parse_apply_tuple_1 st lexbuf
   }
-and parse_apply_tuple_1 = parse
+and parse_apply_tuple_1 st = parse
   | ws* (r_ident as id) ws* ':' {
-      let e = parse_expr_3 lexbuf in
-      (Some id, [e]) :: parse_apply_tuple_2 lexbuf
+      let e = parse_expr_3 st lexbuf in
+      (Some id, [e]) :: parse_apply_tuple_2 st lexbuf
     }
   | ws* {
-     let e = parse_expr_3 lexbuf in
-     (None, [e]) :: parse_apply_tuple_2 lexbuf
+     let e = parse_expr_3 st lexbuf in
+     (None, [e]) :: parse_apply_tuple_2 st lexbuf
     }
-and parse_apply_tuple_2 = parse
+and parse_apply_tuple_2 st = parse
   | ws* ',' {
-    parse_apply_tuple_1 lexbuf
+    parse_apply_tuple_1 st lexbuf
     }
   | ws* ')' {
       []
     }
 
-and parse_tuple = parse
+and parse_tuple st = parse
   | ws* '(' {
-      parse_tuple_1 lexbuf
+      parse_tuple_1 st lexbuf
     }
-and parse_tuple_1 = parse
+and parse_tuple_1 st = parse
   | ws* ')' {
       []
     }
   | ws* {
-      let r = parse_expr_list lexbuf in
-      let () = discard_RPAREN lexbuf in
+      let r = parse_expr_list st lexbuf in
+      discard_RPAREN lexbuf;
       r
     }
-and parse_expr_list = parse
+and parse_expr_list st = parse
   | ws* {
-      let x = parse_expr_3 lexbuf in
-      parse_expr_list_1 x lexbuf
+      let x = parse_expr_3 st lexbuf in
+      parse_expr_list_1 x st lexbuf
     }
-and parse_expr_list_1 x = parse
+and parse_expr_list_1 x st = parse
   | ws* ',' {
-      let tl = parse_expr_list lexbuf in
+      let tl = parse_expr_list st lexbuf in
       [x] :: tl
     }
   | ws* {
       [[x]]
     }
 
-and parse_char_stream_semi fn fn2 = parse
+and parse_char_stream_semi fn fn2 st = parse
   | '(' {
-      fn2 lexbuf
+      fn2 st lexbuf
     }
   | ws* {
-      let r = fn lexbuf in
-      let () = discard_opt_semi lexbuf in
+      let r = fn st lexbuf in
+      discard_opt_semi lexbuf;
       r
     }
 
@@ -460,116 +504,130 @@ and comment = parse
       comment lexbuf
     }
 
-and parse_define b closing ast = parse
+and parse_define b closing st = parse
   | ws* (r_ident as f) ws* '(' {
-      let args = parse_params lexbuf in
-      let (a, _) = parse_ast b ["end"] [] lexbuf in
-      let (k, t) = parse_ast b closing [] lexbuf in
-      let u = Ast.mk_define f args a k in
-      (List.rev (u :: ast), t)
+      let args = parse_params st lexbuf in
+      let nst = State.create ~src:st.src lexbuf in
+      let (a, _) = parse_ast b ["end"] nst lexbuf in
+      (* We do not include the body of the underlying let-expression in the
+         computation of the location. *)
+      let loc = State.current_loc st in
+      let nst = State.create ~src:st.src lexbuf in
+      let (k, t) = parse_ast b closing nst lexbuf in
+      let u = Ast.mk_define ~loc f args a k in
+      let st = State.push_token u st in
+      State.tokens st, t
     }
-and parse_params = parse
+and parse_params st = parse
   | ws* (r_ident as a) ws* '=' ws* {
-      let e = parse_simple_expr lexbuf in
-      (a, Some e) :: parse_params_1 lexbuf
+      let e = parse_simple_expr st lexbuf in
+      (a, Some e) :: parse_params_1 st lexbuf
     }
   | ws* (r_ident as a) {
-      (a, None) :: parse_params_1 lexbuf
+      (a, None) :: parse_params_1 st lexbuf
     }
   | ws* ')' ws* {
       []
     }
-and parse_params_1 = parse
+and parse_params_1 st = parse
   | ws* ',' ws* (r_ident as a) ws* '=' {
-      let e = parse_simple_expr lexbuf in
-      (a, Some e) :: parse_params_1 lexbuf
+      let e = parse_simple_expr st lexbuf in
+      (a, Some e) :: parse_params_1 st lexbuf
     }
   | ws* ',' ws* (r_ident as a) {
-      (a, None) :: parse_params_1 lexbuf
+      (a, None) :: parse_params_1 st lexbuf
     }
   | ws* ')' ws* {
       []
     }
 
-and parse_let b closing ast = parse
+and parse_let b closing st = parse
   |  ws* (r_ident as k) ';' ws* {
-      let (v, _) = parse_ast b ["in"] [] lexbuf in
-      let (a, t) = parse_ast b closing [] lexbuf in
-      let u = Ast.mk_let k v a in
-      (List.rev (u :: ast), t)
+      let nst = State.create ~src:st.src lexbuf in
+      let (v, _) = parse_ast b ["in"] nst lexbuf in
+      (* We do not include the body of the let-expression in the
+         computation of the location. *)
+      let loc = State.current_loc st in
+      let nst = State.create ~src:st.src lexbuf in
+      let (a, t) = parse_ast b closing nst lexbuf in
+      let u = Ast.mk_let ~loc k v a in
+      let st = State.push_token u st in
+      State.tokens st, t
     }
 
-and parse_include b closing ast = parse
+and parse_include b closing st = parse
   | value as file {
-    let loc = Loc.of_lexbuf lexbuf in
-    let a = Ast.mk_include ~loc (`File file) in
-    parse_ast b closing (a :: ast) lexbuf
+    let u = Ast.mk_include ~loc:(State.current_loc st) (`File file) in
+    let st = State.push_token u st in
+    parse_ast b closing st lexbuf
   }
 
-and parse_apply b = parse
+and parse_apply b st = parse
   | (r_ident as f) '%' {
-      let loc = Loc.of_lexbuf lexbuf in
       assert (`variable ["with"] = variable lexbuf) ;
       let app =
         let rec loop () =
-          match parse_ast b ["and"; "end"] [] lexbuf with
+          let nst = State.create ~src:st.src lexbuf in
+          match parse_ast b ["and"; "end"] nst lexbuf with
           | a, "and" -> a :: loop ()
           | a, _ -> [ a ]
         in loop ()
       in
-      Ast.mk_apply ~loc f (List.map (fun v -> None, v) app)
+      Ast.mk_apply ~loc:(State.current_loc st) f (List.map (fun v -> None, v) app)
     }
   | (r_ident as f) {
-      let loc = Loc.of_lexbuf lexbuf in
-      let app = parse_apply_tuple lexbuf in
-      Ast.mk_apply ~loc f app
+      let app = parse_apply_tuple st lexbuf in
+      Ast.mk_apply ~loc:(State.current_loc st) f app
     }
 
-and parse_expr_stmt = parse
+and parse_expr_stmt st = parse
   | "" {
-      parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf
+      parse_char_stream_semi parse_simple_expr parse_simple_expr_1 st lexbuf
     }
 
-and parse_if b = parse
+and parse_if b st = parse
   | "" {
-      let e = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
+      let e = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 st lexbuf in
       let (a1, a2) =
         let rec loop () =
-          let (a1, t) = parse_ast b ["elseif"; "else"; "end"] [] lexbuf in
+          let nst = State.create ~src:st.src lexbuf in
+          let (a1, t) = parse_ast b ["elseif"; "else"; "end"] nst lexbuf in
           match t with
           | "elseif" ->
-            let e2 = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
+            let e2 = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 st lexbuf in
             let (a2, a3) = loop () in
             a1, [ Ast.mk_if e2 a2 a3 ]
           | "else" ->
-            let (a2, _) = parse_ast b ["end"] [] lexbuf in
+            let nst = State.create ~src:st.src lexbuf in
+            let (a2, _) = parse_ast b ["end"] nst lexbuf in
             a1, a2
           | _ -> a1, []
         in loop ()
       in
-      Ast.mk_if e a1 a2
+      Ast.mk_if ~loc:(State.current_loc st) e a1 a2
     }
 
-and parse_for b = parse
+and parse_for b st = parse
   | (r_ident as iterator) ';' {
-      let min = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
-      let max = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
-      let (a, _) = parse_ast b ["end"] [] lexbuf in
-      Ast.mk_for iterator min max a
+      let min = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 st lexbuf in
+      let max = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 st lexbuf in
+      let nst = State.create ~src:st.src lexbuf in
+      let (a, _) = parse_ast b ["end"] nst lexbuf in
+      Ast.mk_for ~loc:(State.current_loc st) iterator min max a
     }
 
-and parse_foreach b = parse
+and parse_foreach b st = parse
   | "" {
-      let loc = Loc.of_lexbuf lexbuf in
       let [@warning "-8"] hd :: tl = compound_var lexbuf in
-      let params = parse_foreach_params lexbuf in
-      let (a, _) = parse_ast b ["end"] [] lexbuf in
-      Ast.mk_foreach ~loc (hd, tl) params a
+      let params = parse_foreach_params st lexbuf in
+      let nst = State.create ~src:st.src lexbuf in
+      let (a, _) = parse_ast b ["end"] nst lexbuf in
+      Ast.mk_foreach ~loc:(State.current_loc st) (hd, tl) params a
     }
 
-and parse_foreach_params = parse
+and parse_foreach_params st = parse
   | '(' {
-      parse_tuple_1 lexbuf
+      parse_tuple_1 st lexbuf
     }
   | ';'? {
       []
