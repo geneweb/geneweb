@@ -406,6 +406,9 @@ fr: Autour de l'arbre
          <i class="far fa-file-lines fa-fw mr-1" aria-hidden="true"></i>[*base wizard notes]</a>
     %end;
     %if;(nb_persons.v!=0)
+      <a role="button" class="btn btn-outline-primary" href="%prefix;m=ISOLATED">%nn;
+        <i class="fa fa-user fa-fw mr-1" aria-hidden="true"></i>%nn;
+        [*isolated persons/totally isolated/linked by relation/witness to an event]0</a>
       <a role="button" class="btn btn-outline-primary" href="%prefix;m=STAT">%nn;
         <i class="far fa-chart-bar fa-fw mr-1" aria-hidden="true"></i>[*statistics]</a>
       <a role="button" class="btn btn-outline-primary" href="%prefix;m=ANM">%nn;
