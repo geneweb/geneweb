@@ -120,7 +120,7 @@ let output_strings_hash tmp_strings_inx base =
 (* Associate istr to persons.
    A person is associated with its first name/surname and aliases
 *)
-let output_name_index_aux cmp get base names_inx names_dat =
+let output_name_index_aux cmp cmp_per get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.Dbdisk.data.persons.len - 1 do
     let p = base.data.persons.get i in
@@ -141,11 +141,17 @@ let output_name_index_aux cmp get base names_inx names_dat =
        ht 0;
   (* sort by name behind the int order *)
   Array.sort (fun (k, _) (k', _) -> cmp k k') a;
+  let cmp_iper k ip1 ip2 =
+    let p1 = base.data.persons.get ip1 in
+    let p2 = base.data.persons.get ip2 in
+    cmp_per k p1 p2
+  in
   let oc_n_dat = Secure.open_out_bin names_dat in
   let bt2 =
     Array.map
       (fun (k, ipl) ->
         let off = pos_out oc_n_dat in
+        let ipl = List.rev @@ List.sort_uniq (cmp_iper k) ipl in
         output_binary_int oc_n_dat (List.length ipl);
         List.iter (output_binary_int oc_n_dat) ipl;
         (k, off))
@@ -265,16 +271,50 @@ let output_name_index_lower_aux strings_store cmp cmp_per get base names_inx
   Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array);
   close_out oc_n_inx
 
+let marital_names base p =
+  match p.Dbdisk.sex with
+  | Female ->
+      let get_other iper (cpl : Dbdisk.dsk_couple) =
+        if Int.compare (Adef.father cpl) iper = 0 then Adef.mother cpl
+        else Adef.father cpl
+      in
+      let unions = base.Dbdisk.data.unions.get p.Dbdisk.key_index in
+      Array.fold_left
+        (fun acc ifam ->
+          let couple = base.data.couples.get ifam in
+          let other = get_other p.key_index couple in
+          let sn = (base.data.persons.get other).surname in
+          sn :: acc)
+        [] unions.family
+  | Male | Neuter -> []
+
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.Dbdisk.data)
-    (fun p -> p.surname :: p.surnames_aliases)
+    (fun istr p1 p2 ->
+      let sn1 = p1.surname in
+      let sn2 = p2.surname in
+      let c1 = Dutil.compare_snames_i base.data istr sn1 in
+      let c2 = Dutil.compare_snames_i base.data istr sn2 in
+      match (c1, c2) with
+      | c1, 0 when c1 <> 0 -> 1
+      | 0, c2 when c2 <> 0 -> -1
+      | _, _ ->
+          let c = Dutil.compare_snames_i base.data sn1 sn2 in
+          if c = 0 then
+            let c' =
+              Dutil.compare_snames_i base.data p1.first_name p2.first_name
+            in
+            if c' = 0 then compare p1.key_index p2.key_index else c'
+          else c)
+    (fun p -> (p.surname :: p.surnames_aliases) @ marital_names base p)
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.Dbdisk.data)
+    (fun istr p1 p2 -> Int.compare p1.key_index p2.key_index)
     (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
 
@@ -294,7 +334,7 @@ let output_surname_lower_index strings_ht base tmp_snames_inx tmp_snames_dat =
     compare_persons cmp_istr (fun p -> p.Dbdisk.surname) (fun p -> p.first_name)
   in
   output_name_index_lower_aux strings_ht cmp_istr cmp_per
-    (fun p -> p.surname :: p.surnames_aliases)
+    (fun p -> (p.surname :: p.surnames_aliases) @ marital_names base p)
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
