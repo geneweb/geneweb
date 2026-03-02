@@ -16,15 +16,14 @@
         pkgs = import nixpkgs {
           system = "${system}";
           overlays = [(_: prev: {
-            ocamlPackages = prev.ocamlPackages.overrideScope (_: p: {
-              cmdliner = prev.ocamlPackages.callPackage ./nix/cmdliner.nix { };
-              unidecode = prev.ocamlPackages.callPackage ./nix/unidecode.nix { };
-              calendars = prev.ocamlPackages.callPackage ./nix/calendars.nix { };
-              not-ocamlfind = prev.ocamlPackages.callPackage ./nix/not-ocamlfind.nix { };
-              odoc = prev.ocamlPackages.callPackage ./nix/odoc.nix { };
+            ocamlPackages = prev.ocaml-ng.ocamlPackages_5_4.overrideScope (_: p: {
+              cmdliner = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/cmdliner.nix { };
+              unidecode = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/unidecode.nix { };
+              calendars = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/calendars.nix { };
+              not-ocamlfind = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/not-ocamlfind.nix { };
+              odoc = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/odoc.nix { };
               ancient = ocaml-ancient.outputs.packages.${system}.ancient;
-              # Produce a segment fault while compiling stdlib with jsoo...
-              # ocaml = p.ocaml.override { framePointerSupport = true; };
+              ocaml = p.ocaml.override { framePointerSupport = true; };
             });
           })];
         };
