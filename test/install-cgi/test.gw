@@ -12,6 +12,11 @@ end
 notes MOUSE Tiny
 beg
 The picture above has historically been a test image for compression and image rendering. Its story can be read in <a href="http://www.lenna.org">lenna.org</a>.
+<table border><tr>
+<td><a href="%sm=IM;s=hasen.jpg"><img height="100" src="%sm=IM;s=hasen.jpg"></a><br>Hasen</td>
+<td><a href="%sm=IM;s=hasen.jpg"><img height="100" src="%sm=IM;s=hasen.jpg"></a><br>Hasen</td>
+<td><a href="%sm=IM;s=hasen.jpg"><img height="100" src="%sm=IM;s=hasen.jpg"></a><br>Hasen</td>
+</tr></table><br>
 end notes
 
 pevt MOUSE Tiny

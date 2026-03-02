@@ -46,6 +46,11 @@ a:has(i), .deslist a, .ind-notes a {
   white-space: normal;
 }
 
+#mod_notes table img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Sosa icon as bullet list icon */
 .fa-circle-dot {
   font-size: .8em;
@@ -2060,7 +2065,7 @@ hr.full
   margin-right: 0;
 }
 
-/* --- Ascendants/Descendants liste rÃ©digÃ©e --- */
+/* --- Ascendants/Descendants liste rédigée --- */
 .asc_notes_src_inline, .desc_notes_src_inline
 {
   padding-left:15px;

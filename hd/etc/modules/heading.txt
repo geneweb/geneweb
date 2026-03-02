@@ -1,0 +1,20 @@
+<!-- heading.txt 04/03/2026 02:32:58 -->
+  <h1 class="%if;("i2" in p_mod)text-center%else;text-xs-center text-md-left%end;">
+    %if;(has_portrait and has_blason) %(has_portrait is false if no portrait !! TODO: FIXME!%)
+      %if;not cancel_links;<a href="%blason_url;" target="_blank">%end;
+       <img src="%blason_url;"%blason_small_size; class="mx-%if;("i3" in p_mod)1%else;2%end;" alt="[blason/blasons]0">%nn;
+      %if;not cancel_links;</a>%end;
+    %end;
+    %let;qualifier_;%if;has_qualifiers;<em>%qualifier;</em>%end;%in;
+    %let;public_or_first_name;
+      %if;has_public_name;%public_name;
+      %else;
+        %if;not cancel_links;<a href="%prefix;m=P&v=%first_name_key;#i%index;">%end;%first_name;%nn;
+        %if;not cancel_links;</a>%end;
+      %end;
+    %in;
+    %public_or_first_name; %qualifier_;%sp;
+    %if;not cancel_links;<a href="%prefix;m=N&v=%surname_key;#i%index;">%end;%surname;%nn;
+    %if;not cancel_links;</a>%end;
+    <span class="font-weight-light small">%dates;</span>
+  </h1>
