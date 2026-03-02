@@ -129,7 +129,7 @@
             [*spouses info]%nn;
           </a>
         %end;
-        <a role="button" class="btn btn-link px-0 ml-1%if;(e.csv=1 or e.t="Y") disabled%end;"
+        <a role="button" class="btn btn-link px-0 ml-1%if;(e.csv=1) disabled%end;"
           href="%if;(e.hl!=1)%url_set.hl.1;%else;%url_set.hl;%end;">%nn;
           <i class="fas fa-highlighter fa-lg fa-fw mr-1%if;(e.hl!=1) text-warning%end;" aria-hidden="true"></i>%nn;
           %if;(e.hl!=1)[*highlight gaps/hide highlighting]0%else;[*highlight gaps/hide highlighting]1%end;%nn;
@@ -190,7 +190,7 @@
         %end;
         <span class="col-auto px-0 mr-2">[*generation/generations]0</span>
         %if;not ((e.m="D" and (e.t="D" or e.t="L" or e.t="A")) or (e.m="A" and (e.t="H" or e.t="G")))
-          <div class="input-group mr-2">
+          <div class="input-group flex-nowrap mr-2">
             <div class="input-group-prepend">
               <label for="input_v0" class="input-group-text" title="v0= (min<=max)">min</label>
             </div>
@@ -200,7 +200,7 @@
               max="%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;" autofocus>
           </div>
         %end;
-        <div class="input-group mr-2">
+        <div class="input-group flex-nowrap mr-2">
           <div class="input-group-prepend">
             <label for="input_v" class="input-group-text" title="v=…">max</label>
           </div>
@@ -214,7 +214,7 @@
          href="%apply;urlset%with;v%and;%expr(e.v-1)%end;">
         <i class="fa fa-minus fa-fw"></i>
       </a>
-      <a type="button" class="btn btn-link px-0 mx-0 %if;((e.m="D" and e.v>=static_max_desc_level) or (e.m="A" and e.v>static_max_anc_level)) disabled%end;"
+      <a role="button" class="btn btn-link px-0 mx-0 %if;((e.m="D" and e.v>=static_max_desc_level) or (e.m="A" and e.v>static_max_anc_level)) disabled%end;"
         title="[*add] 1 [generation/generations]0%if;(e.v < static_max_desc_level and static_max_desc_level > 1) (max %static_max_desc_level; [generation/generations]1)%end;" 
         href="%apply;urlset%with;v%and;%expr(e.v+1)%end;">
         <i class="fa fa-plus fa-fw"></i>
@@ -230,8 +230,8 @@
         </a>
       %end;
       %if;(e.v!=0 and istable=1)
-        <button class="btn btn-link pl-2 ml-2 text-nowrap"
-          href="%if;(only=0)%url_set.only_v0.on_;%else;%url_set.only_v0._;%end;"
+        <a class="btn btn-link pl-2 ml-2 text-nowrap"
+          href="%apply;url_set%with;only/v0%and;%if;(only=0)on%end;/%if;(only=0)%l_v;%else;%if;(e.t="Y")1%else;0%end;%end;%end;"
           title="%if;(only=0)[*visualize/show/hide/summary]1 [only the generation selected]
                  %else;[*visualize/show/hide/summary]1%sp;
                    %if;(e.m="D")
@@ -250,7 +250,7 @@
             %else;%apply;capitalize%with;%apply;togena%with;%if;(e.v="")0%else;%e.v;%end;%end;%end;
             %end;
           %end;
-        </button>
+        </a>
       %elseif;(e.v=0)
         <span class="btn disabled text-primary pl-0 ml-2">[*specify::generation/generations]0%sp;
         %if;(e.m="D" and e.t="D") [or] [extend]%end;</span>

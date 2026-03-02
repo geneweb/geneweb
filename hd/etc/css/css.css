@@ -863,6 +863,11 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   border-right: 1px dashed #808080 !important;
 }
 
+/* Couple table: highlight incomplete marriage events */
+.not_sure_dates.bg-ly-incomplete, span.bg-ly-incomplete {
+  background-color: rgb(255 238 186 / 95%);
+}
+
 /* Specific hover effect for the link inside the table cell */
 .table_big_cell:hover,
 .ascdesc_table a:hover,
