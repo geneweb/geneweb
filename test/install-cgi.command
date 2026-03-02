@@ -123,6 +123,7 @@ if ! [ -d $BASES/images/test ]; then
 fi
 
 cp $INSTALL_CGI/Lenna.jpg $BASES/src/test/images/aatest.jpg
+cp $INSTALL_CGI/hasen.jpg $BASES/src/test/images/hasen.jpg
 cp $INSTALL_CGI/Lenna.jpg $BASES/images/test/tiny.0.mouse.jpg
 
 echo "Create test base in $BASES"
