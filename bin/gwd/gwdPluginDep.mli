@@ -1,7 +1,12 @@
-type 'a sort_result = Sorted of 'a list | ErrorCycle of 'a list
+type 'a result = Sorted of 'a list | Cycle of 'a list
 
-val sort : ('a * 'a list) list -> 'a sort_result
-(** Given a list of elements (in this case, plugins) and their dependencies,
-    tries to compute a valid order `l` and return `Sorted l` . If there is a
-    cycle, returns `ErrorCycle l'` where `l'` is a dependency cycle. Uses Kahn's
-    algorithm for cycle detection. *)
+val topological_sort : ('a * 'a list) list -> 'a result
+(** [topological_sort l] attempts to sort the nodes of the graph represented by
+    the adjacency list [l] into a topological order.
+
+    The input [l] is an association list where each key is a node and its value
+    is the list of nodes reachable via an outgoing edge.
+
+    If successful, the function returns [Sorted r] where [r] is a topologically
+    sorted list of all nodes. Otherwise, it returns [Cycle c] where [c]
+    represents a cycle path in the graph. *)
