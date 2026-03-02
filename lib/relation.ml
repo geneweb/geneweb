@@ -650,7 +650,8 @@ let get_event_witnessed conf base p =
                   | Def.Witness_Attending | Def.Witness_Mentioned
                   | Def.Witness_Other ->
                       l := (c, wk, wnote, event_item) :: !l))
-          (Event.events conf base c))
+          (Event.events conf base
+             (Authorized.Person.make ~conf ~base (Gwdb.get_iper c))))
       related;
     !l
   in

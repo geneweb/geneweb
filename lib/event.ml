@@ -216,26 +216,28 @@ let sort_events get_name get_date events =
   List.merge cmp l1 l2
 
 let events conf base p =
-  if not (Person.is_visible conf base p) then []
-  else
-    let pevents = List.map event_item_of_pevent (Gwdb.get_pevents p) in
-    let events =
-      (* append fevents *)
-      Array.fold_right
-        (fun ifam events ->
-          let fam = Gwdb.foi base ifam in
-          let isp = Gutil.spouse (Gwdb.get_iper p) fam in
-          (* filter family event with contemporary spouse *)
-          let m_auth = Person.is_visible conf base (Util.pget conf base isp) in
-          if not m_auth then events
-          else
-            List.fold_right
-              (fun fe events ->
-                event_item_of_fevent ~sp:(Some isp) fe :: events)
-              (Gwdb.get_fevents fam) events)
-        (Gwdb.get_family p) pevents
-    in
-    events
+  let pevents =
+    List.map event_item_of_pevent
+      (Option.fold ~none:[]
+         ~some:(List.map Authorized.Personal_event.to_pers_event)
+         (Authorized.Person.get_pevents p))
+  in
+  (* append fevents *)
+  Array.fold_right
+    (fun ifam events ->
+      let isp =
+        Option.bind
+          (Authorized.Family.get_spouse ~conf ~base ~person:p ifam)
+          Authorized.Person.get_iper
+      in
+      List.fold_right
+        (fun fe events -> event_item_of_fevent ~sp:isp fe :: events)
+        (Option.fold ~none:[]
+           ~some:(List.map Authorized.Family_event.to_fam_event)
+           (Authorized.Family.get_fevents ifam))
+        events)
+    (Option.value ~default:[||] (Authorized.Person.get_family ~conf ~base p))
+    pevents
 
 let sorted_events conf base p =
   let unsorted_events = events conf base p in

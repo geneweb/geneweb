@@ -593,7 +593,8 @@ let display_descendant_index conf base max_level ancestor =
           Gwdb.p_first_name base p <> "?"
           && Gwdb.p_surname base p <> "?"
           && Gwdb.p_first_name base p <> "x"
-          && ((not (Util.is_hide_names conf p)) || Person.is_visible conf base p)
+          && ((not (Person.is_hide_names conf p))
+             || Person.is_visible conf base p)
         then Gwdb.get_iper p :: acc
         else acc)
       [] (Gwdb.ipers base)
@@ -631,7 +632,7 @@ let display_spouse_index conf base max_level ancestor =
                     Gwdb.p_first_name base c <> "?"
                     && Gwdb.p_surname base c <> "?"
                     && Gwdb.p_first_name base p <> "x"
-                    && ((not (Util.is_hide_names conf c))
+                    && ((not (Person.is_hide_names conf c))
                        || Person.is_visible conf base c)
                     && not (List.mem (Gwdb.get_iper c) acc)
                   then Gwdb.get_iper c :: acc
