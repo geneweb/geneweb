@@ -1055,16 +1055,15 @@ let find_sources_record gen addr =
       end
   | None -> None
 
-let rec flatten_notes =
-  function
-    r :: rl ->
-      let n = flatten_notes rl in
-      begin match r.rlab with
-        "CONC" | "CONT" | "NOTE" ->
-          (r.rlab, r.rval) :: (flatten_notes r.rsons @ n)
-      | _ -> n
-      end
-  | [] -> []
+let flatten_notes =
+  let rec aux acc = function
+    | r :: rl -> treat_label acc r rl
+    | [] -> List.rev acc
+  and treat_label acc r rl = match r.rlab with
+    | "CONC" | "CONT" | "NOTE" ->
+      aux ((r.rlab, r.rval) :: acc) (r.rsons @ rl)
+    | _ -> aux acc rl
+  in aux []
 
 let extract_notes gen rl =
   List.fold_right
