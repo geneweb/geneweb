@@ -265,10 +265,27 @@ let output_name_index_lower_aux strings_store cmp cmp_per get base names_inx
   Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array);
   close_out oc_n_inx
 
+let marital_names base p =
+  match p.Dbdisk.sex with
+  | Female ->
+      let get_other iper (cpl : Dbdisk.dsk_couple) =
+        if Int.compare (Adef.father cpl) iper = 0 then Adef.mother cpl
+        else Adef.father cpl
+      in
+      let unions = base.Dbdisk.data.unions.get p.Dbdisk.key_index in
+      Array.fold_left
+        (fun acc ifam ->
+          let couple = base.data.couples.get ifam in
+          let other = get_other p.key_index couple in
+          let sn = (base.data.persons.get other).surname in
+          sn :: acc)
+        [] unions.family
+  | Male | Neuter -> []
+
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.Dbdisk.data)
-    (fun p -> p.surname :: p.surnames_aliases)
+    (fun p -> p.surname :: p.surnames_aliases @ marital_names base p)
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
@@ -287,23 +304,6 @@ let compare_persons cmp_istr proj1 proj2 istr p1 p2 =
   | _, _ ->
       let c = cmp_istr (proj1 p1) (proj1 p2) in
       if c = 0 then cmp_istr (proj2 p1) (proj2 p2) else c
-
-let marital_names base p =
-  match p.Dbdisk.sex with
-  | Female ->
-      let get_other iper (cpl : Dbdisk.dsk_couple) =
-        if Int.compare (Adef.father cpl) iper = 0 then Adef.mother cpl
-        else Adef.father cpl
-      in
-      let unions = base.Dbdisk.data.unions.get p.Dbdisk.key_index in
-      Array.fold_left
-        (fun acc ifam ->
-          let couple = base.data.couples.get ifam in
-          let other = get_other p.key_index couple in
-          let sn = (base.data.persons.get other).surname in
-          sn :: acc)
-        [] unions.family
-  | Male | Neuter -> []
 
 let output_surname_lower_index strings_ht base tmp_snames_inx tmp_snames_dat =
   let cmp_istr = Dutil.compare_snames_i_lower base.Dbdisk.data in
