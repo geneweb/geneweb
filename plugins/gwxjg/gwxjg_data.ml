@@ -421,9 +421,11 @@ and ppget conf base p =
         | "surname" ->
             Jingoo.Jg_types.Tsafe
               (Geneweb.NameDisplay.hidden_surname_txt :> string)
+        | "public_name" -> Jingoo.Jg_types.Tstr "HIDDEN PUBLIC NAME"
         | "name_is_hidden" -> Jingoo.Jg_types.Tbool true
         | "name_is_restricted" -> Jingoo.Jg_types.Tbool true
-        | "first_name_aliases" | "surname_aliases" -> Jingoo.Jg_types.Tlist []
+        | "first_name_aliases" | "surname_aliases" | "aliases" | "qualifiers" ->
+            Jingoo.Jg_types.Tlist []
         | x -> (Lazy.force lazy_p) x)
     else unsafe_mk_semi_public_person conf base p
   else unsafe_mk_person conf base p
@@ -694,6 +696,11 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let sex = Jingoo.Jg_types.Tint (Gwxjg_ezgw.Person.sex p) in
   let surname = Jingoo.Jg_types.Tstr (Gwxjg_ezgw.Person.surname base p) in
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
+  let aliases = mk_str_lst base (Gwdb.get_aliases p) in
+  let public_name =
+    Jingoo.Jg_types.Tstr (Gwdb.sou base (Gwdb.get_public_name p))
+  in
+  let qualifiers = mk_str_lst base (Gwdb.get_qualifiers p) in
   let events = Jingoo.Jg_types.Tlist [] in
   let name_is_hidden =
     Jingoo.Jg_types.Tbool (Geneweb.Person.is_hidden conf base p)
@@ -705,6 +712,7 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
     (function
     | "access_url" -> access_url
     | "access" -> access
+    | "aliases" -> aliases
     | "children" -> children
     | "events" -> events
     | "families" -> families
@@ -715,6 +723,8 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
     | "iper" -> iper
     | "mother" -> mother
     | "parents" -> parents
+    | "public_name" -> public_name
+    | "qualifiers" -> qualifiers
     | "related" -> related
     | "sex" -> sex
     | "siblings" -> siblings
