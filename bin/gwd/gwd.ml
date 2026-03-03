@@ -13,8 +13,21 @@ module Sites = Geneweb_sites.Sites
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
 
+let pp_brackets pp_v ppf v = Fmt.pf ppf "[%a] " pp_v v
+let pp_h ~style ppf = pp_brackets Fmt.(styled style string) ppf
+
+let pp_header ppf (l, h) =
+  match l with
+  | Logs.App -> Option.iter (pp_brackets Fmt.(styled `Cyan string) ppf) h
+  | Logs.Error -> pp_h ~style:`Red ppf (Option.value ~default:"ERROR" h)
+  | Logs.Warning -> pp_h ~style:`Yellow ppf (Option.value ~default:"WARNING" h)
+  | Logs.Info -> pp_h ~style:`Blue ppf (Option.value ~default:"INFO" h)
+  | Logs.Debug -> pp_h ~style:`Green ppf (Option.value ~default:"DEBUG" h)
+
+let set_reporter fmt =
+  Logs.set_reporter @@ Logs_fmt.reporter ~pp_header ~dst:fmt ()
+
 let setup_log t =
-  let set_reporter fmt = Logs.set_reporter @@ Logs_fmt.reporter ~dst:fmt () in
   let set_file_reporter file =
     let oc =
       open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 file.path
