@@ -1,4 +1,4 @@
-(* $Id: merge.ml, v7-exp 2018-09-26 07:34:44 ddr Exp $ *)
+(* $Id: merge.ml, v7.1 04/03/2026 00:11:35 *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -11,6 +11,28 @@ let print_someone conf base p =
     (Driver.p_first_name base p)
     (if Driver.get_occ p = 0 then "" else "." ^ string_of_int (Driver.get_occ p))
     (Driver.p_surname base p)
+
+let print_person_info conf base p =
+  Output.print_sstring conf {|<a href="|};
+  Output.print_string conf (commd conf);
+  Output.print_string conf (acces conf base p);
+  Output.print_sstring conf {|">|};
+  Output.print_string conf (escape_html (Driver.p_first_name base p));
+  if Driver.get_occ p <> 0 then (
+    Output.print_sstring conf ".";
+    Output.print_sstring conf (string_of_int (Driver.get_occ p)));
+  Output.print_sstring conf " ";
+  Output.print_string conf (escape_html (Driver.p_surname base p));
+  Output.print_sstring conf "</a>";
+  let dates = DateDisplay.short_dates_text conf base p in
+  if (dates :> string) <> "" then
+    Output.print_string conf (mod_ind_link conf p dates);
+  let cop = (child_of_parent conf base p :> string) in
+  if cop <> "" then (
+    Output.print_sstring conf ", ";
+    Output.print_sstring conf cop);
+  let hw = (husband_wife conf base p true :> string) in
+  if hw <> "" then Output.print_sstring conf hw
 
 let print conf base p =
   let list = Gutil.find_same_name base p in
@@ -25,18 +47,14 @@ let print conf base p =
       (Utf8.capitalize_fst (transl_decline conf "merge" ""))
   in
   Hutil.header conf title;
+  Output.print_sstring conf "<h2 class=\"h4\">\n";
+  print_person_info conf base p;
+  Output.print_sstring conf " ";
+  Output.print_sstring conf (transl_decline conf "with" "");
+  Output.print_sstring conf (transl conf ":");
+  Output.print_sstring conf "\n</h2>\n";
   Output.print_sstring conf
-    (Format.sprintf
-       {|<h2>
-%s%s %s %s%s
-</h2>
-<form method="get" action="%s" class="mx-3 mb-3">|}
-       (Driver.p_first_name base p)
-       (if Driver.get_occ p = 0 then ""
-        else "." ^ string_of_int (Driver.get_occ p))
-       (Driver.p_surname base p)
-       (transl_decline conf "with" "")
-       (transl conf ":")
+    (Format.sprintf {|<form method="get" action="%s" class="mx-3 mb-3">|}
        (conf.command :> string));
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
@@ -82,16 +100,7 @@ let print conf base p =
         Output.print_string conf
           (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
         Output.print_sstring conf "\">";
-        let cop = (Util.child_of_parent conf base p :> string) in
-        let cop = if cop = "" then "" else ", " ^ cop in
-        let hbw = (Util.husband_wife conf base p true :> string) in
-        let hbw = if hbw = "" then "" else ", " ^ hbw in
-        Output.print_sstring conf
-          (Printf.sprintf "%s.%d %s%s%s"
-             (Driver.get_first_name p |> Driver.sou base)
-             (Driver.get_occ p)
-             (Driver.get_surname p |> Driver.sou base)
-             cop hbw);
+        print_person_info conf base p;
         Output.print_sstring conf "</label></div>")
       list;
   Output.print_sstring conf
