@@ -909,27 +909,23 @@ let print_one_surname_by_branch conf base x xl ~extra_names ~suggestions
         (Mutil.encode s :> string)
         (esc s)
     in
-    if h || p_getenv conf.env "t" = Some "A" then begin
-      Output.print_sstring conf (esc x);
-      if extra <> [] then begin
-        Output.print_sstring conf " | ";
-        Mutil.list_iter_first
-          (fun first sn ->
-            if not first then Output.print_sstring conf ", ";
-            Output.print_sstring conf (esc sn))
-          extra
-      end
-    end
-    else begin
-      link x;
-      if extra <> [] then begin
-        Output.print_sstring conf " | ";
-        Mutil.list_iter_first
-          (fun first sn ->
-            if not first then Output.print_sstring conf ", ";
-            link sn)
-          extra
-      end
+    let primaries = if primary = [] then [ x ] else primary in
+    let render =
+      if h || p_getenv conf.env "t" = Some "A" then fun s ->
+        Output.print_sstring conf (esc s)
+      else fun s -> link s
+    in
+    let print_list l =
+      Mutil.list_iter_first
+        (fun first s ->
+          if not first then Output.print_sstring conf ", ";
+          render s)
+        l
+    in
+    print_list primaries;
+    if extra <> [] then begin
+      Output.print_sstring conf " | ";
+      print_list extra
     end
   in
   Hutil.header conf title;
@@ -1189,7 +1185,11 @@ let print_family_alphabetic ?(extra_names = []) ~suggestions x conf base liste =
                 :> Adef.escaped_string)
               (escape_html s :> Adef.safe_string)
         in
-        Output.print_string conf (access x);
+        Mutil.list_iter_first
+          (fun first s ->
+            if not first then Output.print_sstring conf ", ";
+            Output.print_string conf (access s))
+          homonymes;
         if extra <> [] then begin
           Output.print_sstring conf " | ";
           Mutil.list_iter_first
