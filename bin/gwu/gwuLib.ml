@@ -583,6 +583,7 @@ let print_pevent opts base gen e =
   | Epers_Accomplishment -> Printf.ksprintf (oc opts) "#acco"
   | Epers_Acquisition -> Printf.ksprintf (oc opts) "#acqu"
   | Epers_Adhesion -> Printf.ksprintf (oc opts) "#adhe"
+  | Epers_Adoption -> Printf.ksprintf (oc opts) "#adop"
   | Epers_BaptismLDS -> Printf.ksprintf (oc opts) "#bapl"
   | Epers_BarMitzvah -> Printf.ksprintf (oc opts) "#barm"
   | Epers_BatMitzvah -> Printf.ksprintf (oc opts) "#basm"
