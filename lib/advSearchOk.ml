@@ -778,7 +778,10 @@ let advanced_search conf base max_answers =
           n_list
         |> List.flatten |> List.flatten |> List.sort_uniq compare
         |> List.map (Gwdb.spi_find @@ persons_of base)
-        |> List.flatten |> List.sort_uniq compare
+        |> List.flatten
+        |> List.filter (fun person_id ->
+               person_id |> Gwdb.poi base |> Person.has_visible_name conf base)
+        |> List.sort_uniq compare
       in
       if
         sn_list <> []
