@@ -3,6 +3,13 @@ let to_calendar_date kind { Def.day; month; year; delta; _ } =
   let month = max 1 month in
   match Calendars.make kind ~day ~month ~year ~delta with
   | Ok d -> d
+  | Error _ when year <= 0 -> (
+      match Calendars.make kind ~day ~month ~year:1 ~delta with
+      | Ok d -> d
+      | Error err ->
+          failwith
+            (Printf.sprintf "Invalid date: %s"
+               (Calendars.Unsafe.to_string err.value)))
   | Error err ->
       failwith
         (Printf.sprintf "Invalid date: %s"
