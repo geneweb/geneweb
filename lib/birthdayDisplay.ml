@@ -50,7 +50,64 @@ let print_anniversary_day conf base dead_people liste =
     liste;
   Output.print_sstring conf "</ul>"
 
-let gen_print conf base mois f_scan dead_people =
+let propose_months conf ?max_d mode =
+  let is_cousins = p_getenv conf.env "m" = Some "C" in
+  let d_val =
+    match p_getint conf.env "d" with Some d when d >= 0 -> d | _ -> 6
+  in
+  let max_d = match max_d with Some d -> d | None -> 250 in
+
+  let sel_month =
+    match p_getint conf.env "v" with
+    | Some v when v >= 1 && v <= 12 -> v
+    | _ -> conf.today.month
+  in
+  let month_options =
+    let buf = Buffer.create 256 in
+    for i = 1 to 12 do
+      Printf.bprintf buf {|<option value="%d"%s>%s</option>|} i
+        (if i = sel_month then " selected" else "")
+        (transl_nth conf "(month)" (i - 1)
+        |> Util.translate_eval |> Utf8.capitalize_fst)
+    done;
+    Buffer.contents buf
+  in
+  begin_centered conf;
+  Output.printf conf
+    {|<form class="form-inline justify-content-center my-3"
+method="get" action="%s">|}
+    conf.command;
+  Util.hidden_env conf;
+  mode ();
+  Output.printf conf
+    {|<label class="mr-2" for="v_month">%s</label>
+  <select class="form-control form-control-lg %s" name="v" id="v_month">%s</select>|}
+    (Utf8.capitalize_fst (transl_nth conf "year/month/day" 1))
+    (if is_cousins then "mr-3" else "mr-2")
+    month_options;
+  if is_cousins then
+    Output.printf conf
+      {|<label class="mx-2" for="d_deg">%s</label>
+  <div class="input-group input-group-lg">
+    <div class="input-group-prepend">
+      <button type="button" class="btn btn-outline-secondary"
+        onclick="var i=document.getElementById('d_deg');
+        i.value=Math.max(0,+i.value-1)">&minus;</button></div>
+    <input type="number" name="d" id="d_deg" class="form-control text-center"
+      value="%d" min="0" max="%d" style="width:4em">
+    <div class="input-group-append">
+      <button type="button" class="btn btn-outline-secondary"
+        onclick="var i=document.getElementById('d_deg');
+        i.value=Math.min(%d,+i.value+1)">+</button></div></div>|}
+      (Utf8.capitalize_fst (transl_nth conf "degree of kinship" 0))
+      d_val max_d max_d;
+  Output.printf conf
+    {|<button type="submit" class="btn btn-primary btn-lg ml-2">%s</button>
+</form>|}
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+  end_centered conf
+
+let gen_print conf base mois f_scan ?max_d ?mode dead_people =
   let tab = Array.make 31 [] in
   let title _ =
     let lab =
@@ -130,6 +187,7 @@ let gen_print conf base mois f_scan dead_people =
       Output.print_sstring conf "</li>\n")
   done;
   Output.print_sstring conf "</ul>\n";
+  (match mode with Some m -> propose_months conf ?max_d m | None -> ());
   Hutil.trailer conf
 
 let print_anniversary_list conf base dead_people dt liste =
@@ -200,40 +258,6 @@ let print_birth_day conf base day_name fphrase wd dt list =
         (transl conf "the birthday");
       Output.print_sstring conf "...</p>";
       print_anniversary_list conf base false dt list
-
-let propose_months conf mode =
-  begin_centered conf;
-  Output.print_sstring conf "<span>";
-  transl conf "select a month to see all the anniversaries"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</span>";
-  Output.print_sstring conf {|<table border="|};
-  Output.print_sstring conf (string_of_int conf.border);
-  Output.print_sstring conf {|"><tr><td>|};
-  Output.print_sstring conf {|<form class="form-inline" method="get" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|"><p>|};
-  Util.hidden_env conf;
-  mode ();
-  Output.print_sstring conf
-    {|<select class="form-control form-control-lg" name="v">|};
-  for i = 1 to 12 do
-    Output.print_sstring conf {|<option value="|};
-    Output.print_sstring conf (string_of_int i);
-    Output.print_sstring conf {|"|};
-    Output.print_sstring conf
-      (if i = conf.today.month then {| selected="selected">|} else ">");
-    transl_nth conf "(month)" (i - 1)
-    |> Util.translate_eval |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf "</option>"
-  done;
-  Output.print_sstring conf "</select>";
-  Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary btn-lg ml-2">|};
-  transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button></p></form></td></tr></table>";
-  end_centered conf
 
 let day_after d =
   let day, r =
