@@ -761,7 +761,7 @@ let advanced_search conf base max_answers =
           |> snd
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
-      let list_aux strings_of persons_of n_list mode =
+      let list_aux ?(filter_marital = false) strings_of persons_of n_list mode =
         List.map
           (List.map (fun x ->
                let eq =
@@ -780,7 +780,16 @@ let advanced_search conf base max_answers =
         |> List.map (Gwdb.spi_find @@ persons_of base)
         |> List.flatten
         |> List.filter (fun person_id ->
-               person_id |> Gwdb.poi base |> Person.has_visible_name conf base)
+               person_id |> Gwdb.poi base |> fun p ->
+               Person.has_visible_name conf base p
+               && ((not filter_marital)
+                  || SearchName.filter_marital_names
+                       ~remove_marital_names_match_only:(fn_list = [])
+                       (fun n ->
+                         let ns = List.map Name.lower @@ Name.split n in
+                         AdvancedSearchMatch.match_name ~search_list:n_list
+                           ~mode ns)
+                       conf base "" p))
         |> List.sort_uniq compare
       in
       if
@@ -795,7 +804,8 @@ let advanced_search conf base max_answers =
           r <> ([], 0)
         in
         let list =
-          SearchName.persons_starting_with ~conf ~base ~filter
+          SearchName.persons_starting_with
+            ~remove_marital_names_match_only:(fn_list = []) ~conf ~base ~filter
             ~first_name_prefix:"" ~surname_prefix:(gets "surname")
             ~limit:max_answers
         in
@@ -812,7 +822,8 @@ let advanced_search conf base max_answers =
           r <> ([], 0)
         in
         let list =
-          SearchName.persons_starting_with ~conf ~base ~filter
+          SearchName.persons_starting_with
+            ~remove_marital_names_match_only:false ~conf ~base ~filter
             ~first_name_prefix:(gets "first_name") ~surname_prefix:""
             ~limit:max_answers
         in
@@ -822,8 +833,8 @@ let advanced_search conf base max_answers =
           if sn_list <> [] then
             ( false,
               true,
-              list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-                sn_list
+              list_aux ~filter_marital:true Gwdb.base_strings_of_surname
+                Gwdb.persons_of_surname sn_list
                 (get_name_search_mode "exact_surname") )
           else
             ( true,
