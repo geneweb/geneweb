@@ -105,32 +105,81 @@ let sort_by_len l =
   let cmp pfx1 pfx2 = String.length pfx2.value - String.length pfx1.value in
   List.sort cmp l
 
-let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
-    ~limit =
+let filter_marital_names ?(remove_marital_names_match_only = false) match_name
+    conf base pfx p =
+  let is_matched_by_actual_surname base pfx p =
+    match Authorized.Person.get_surname p with
+    | Some istr -> match_name (Gwdb.sou base istr)
+    | None -> false
+  in
+  let has_visible_marital_name conf base pfx p =
+    match Authorized.Person.get_family ~conf ~base p with
+    | Some fams ->
+        Array.exists
+          (fun fam ->
+            let sp = Authorized.Family.get_spouse ~conf ~base ~person:p fam in
+            Option.bind sp (fun sp ->
+                Some (is_matched_by_actual_surname base pfx sp))
+            = Some true)
+          fams
+    | None -> false
+  in
+  Gwdb.get_sex p <> Def.Female
+  ||
+  let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper p) in
+  is_matched_by_actual_surname base pfx p
+  || (not remove_marital_names_match_only)
+     && has_visible_marital_name conf base pfx p
+
+let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
+    ~first_name_prefix ~surname_prefix ~limit =
   let l =
-    let main_prefix, other_prefixes, partial_results =
+    let main_prefix, other_prefixes, partial_results, filter =
       match
         ( sort_by_len (split_name ~kind:`First_name first_name_prefix),
           sort_by_len (split_name ~kind:`Surname surname_prefix) )
       with
-      | [], [] -> (None, [], [])
+      | [], [] -> (None, [], [], filter)
       | main_prefix :: other_prefixes, [] ->
           ( Some main_prefix,
             other_prefixes,
             persons_starting_with ~conf ~base ~filter ~limit ~other_prefixes:[]
-              { kind = `First_name; value = first_name_prefix } )
+              { kind = `First_name; value = first_name_prefix },
+            filter )
       | [], main_prefix :: other_prefixes ->
+          let filter p =
+            filter p
+            && filter_marital_names ~remove_marital_names_match_only
+              (fun s ->
+                 List.exists
+                   (start_with base
+                     (Name.lower (strip_particle base main_prefix.value)))
+                     (Name.split s))
+                 conf base main_prefix.value p
+          in
           ( Some main_prefix,
             other_prefixes,
             persons_starting_with ~conf ~base ~filter ~limit ~other_prefixes:[]
-              { kind = `Surname; value = surname_prefix } )
+              { kind = `Surname; value = surname_prefix },
+            filter )
       | (_ :: _ as first_name_prefixes), main_prefix :: other_prefixes ->
+          let filter p =
+            filter p
+            && filter_marital_names
+              (fun s ->
+                 List.exists
+                   (start_with base
+                     (Name.lower (strip_particle base main_prefix.value)))
+                     (Name.split s))
+                 conf base main_prefix.value p
+          in
           ( Some main_prefix,
             first_name_prefixes @ other_prefixes,
             persons_starting_with ~conf ~base ~filter ~limit
               ~other_prefixes:
                 [ { kind = `First_name; value = first_name_prefix } ]
-              { kind = `Surname; value = surname_prefix } )
+              { kind = `Surname; value = surname_prefix },
+            filter )
     in
     match main_prefix with
     | None -> []

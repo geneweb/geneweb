@@ -285,7 +285,7 @@ let marital_names base p =
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.Dbdisk.data)
-    (fun p -> p.surname :: p.surnames_aliases @ marital_names base p)
+    (fun p -> (p.surname :: p.surnames_aliases) @ marital_names base p)
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
