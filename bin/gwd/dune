@@ -19,8 +19,7 @@
 (library
  (public_name geneweb.gwd_lib)
  (name gwd_lib)
- (wrapped true)
- (libraries geneweb geneweb.plugin wserver dune-site)
+ (libraries geneweb geneweb_http geneweb.plugin dune-site)
  (modules request geneweb_sites))
 
 (executable
@@ -33,6 +32,7 @@
   geneweb
   geneweb.logs
   geneweb.plugin
+  geneweb_http
   gwd_lib
   logs
   logs-syslog
@@ -42,6 +42,5 @@
   fmt.tty
   str
   unix
-  uri
-  wserver)
+  uri)
  (modules base64 gwd plugin_checksums robot))
