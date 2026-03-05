@@ -1251,7 +1251,7 @@ type 'a env =
   | Vcelll of cell list
   | Vcnt of int ref
   | Vdesclevtab of
-      ((Gwdb.iper, int) Gwdb.Marker.t * (Gwdb.ifam, int) Gwdb.Marker.t) lazy_t
+      ((Gwdb.iper, int) Gwdb.Marker.t * (Gwdb.ifam, int) Gwdb.Marker.t) Lazy.t
   | Vdmark of (Gwdb.iper, bool) Gwdb.Marker.t ref
   | Vslist of SortedList.t ref
   | Vslistlm of string list list

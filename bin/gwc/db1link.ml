@@ -678,7 +678,7 @@ let check_parents_not_already_defined gen ix fath moth =
               x.death := DontKnowIfDead;
       *)
       check_error gen
-  | _ -> ()
+  | None -> ()
 
 let display_sex_inconsistency gen p =
   Printf.printf "\nInconsistency about the sex of\n  %s %s\n"
@@ -716,7 +716,9 @@ let update_family_with_fevents gen fam =
   let nsck_std_fields =
     match fam.Def.relation with
     | NoSexesCheckNotMarried | NoSexesCheckMarried -> true
-    | _ -> false
+    | Married | NotMarried | Engaged | NoMention | MarriageBann
+    | MarriageContract | MarriageLicense | Pacs | Residence ->
+        false
   in
   (* On veut cette fois ci que ce soit le dernier évènement *)
   (* qui soit mis dans les évènements principaux.           *)
@@ -777,7 +779,7 @@ let update_family_with_fevents gen fam =
                 | Some (Dgreg (dmy, cal)) ->
                     let dmy = { dmy with prec = About } in
                     Date.cdate_of_od (Some (Dgreg (dmy, cal)))
-                | _ -> evt.efam_date
+                | Some (Dtext _) | None -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on ne met pas de lieu.            *)
@@ -851,7 +853,7 @@ let update_family_with_fevents gen fam =
               let fam = { fam with divorce = Separated } in
               let () = found_divorce := true in
               loop l fam
-        | _ -> loop l fam)
+        | Efam_Residence | Efam_Name _ -> loop l fam)
   in
   loop (List.rev fam.fevents) fam
 
@@ -1287,7 +1289,10 @@ let update_person_with_pevents p =
   let found_burial = ref false in
   let death_std_fields = p.Def.death in
   let death_reason_std_fields =
-    match death_std_fields with Death (dr, _) -> dr | _ -> Unspecified
+    match death_std_fields with
+    | Death (dr, _) -> dr
+    | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
+        Unspecified
   in
   let rec loop pevents p =
     match pevents with
@@ -1333,7 +1338,8 @@ let update_person_with_pevents p =
                     match death_std_fields with
                     | OfCourseDead -> OfCourseDead
                     | DeadYoung -> DeadYoung
-                    | _ -> DeadDontKnowWhen)
+                    | NotDead | DeadDontKnowWhen | DontKnowIfDead | Death _ ->
+                        DeadDontKnowWhen)
               in
               let p =
                 {
@@ -1374,7 +1380,23 @@ let update_person_with_pevents p =
               in
               let () = found_burial := true in
               loop l p
-        | _ -> loop l p)
+        | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
+        | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
+        | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
+        | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Decoration
+        | Epers_DemobilisationMilitaire | Epers_Diploma | Epers_Distinction
+        | Epers_Dotation | Epers_DotationLDS | Epers_Education | Epers_Election
+        | Epers_Emigration | Epers_Excommunication | Epers_FamilyLinkLDS
+        | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
+        | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
+        | Epers_ListePassenger | Epers_MilitaryDistinction
+        | Epers_MilitaryPromotion | Epers_MilitaryService
+        | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
+        | Epers_Ordination | Epers_Property | Epers_Recensement
+        | Epers_Residence | Epers_Retired | Epers_ScellentChildLDS
+        | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien
+        | Epers_Will | Epers_Adoption | Epers_Name _ ->
+            loop l p)
   in
   loop p.pevents p
 

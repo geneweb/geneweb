@@ -18,9 +18,9 @@ let find_all conf base an =
       if n <> Sosa.zero then
         match Geneweb.Util.p_of_sosa conf base n p with
         | Some p -> ([ p ], true)
-        | _ -> ([], false)
+        | None -> ([], false)
       else ([], false)
-  | _ -> (
+  | Some _, None | None, Some _ | None, None -> (
       let acc = Geneweb.SearchName.search_by_key conf base an in
       match acc with
       | Some acc -> ([ acc ], false)
@@ -83,7 +83,7 @@ let specify conf base n pl =
             | nn :: _ ->
                 let nn = Gwdb.sou base nn in
                 if Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t
-            | _ -> ()
+            | [] -> ()
         in
         List.iter
           (fun t ->
@@ -216,7 +216,7 @@ let very_unknown conf _ =
       Geneweb.Hutil.rheader conf title;
       Geneweb.Hutil.print_link_to_welcome conf false;
       Geneweb.Hutil.trailer conf
-  | _ -> (
+  | None, None | Some _, None | None, Some _ -> (
       match Geneweb.Util.p_getenv conf.env "i" with
       | Some i ->
           let title _ =
@@ -353,7 +353,7 @@ let make_senv conf base =
     let conf =
       match Geneweb.Util.p_getenv conf.env "et" with
       | Some x -> { conf with senv = conf.senv @ [ ("et", Mutil.encode x) ] }
-      | _ -> conf
+      | None -> conf
     in
     let conf = aux "cgl" "on" conf in
     let conf =
@@ -363,7 +363,7 @@ let make_senv conf base =
     in
     match Geneweb.Util.p_getenv conf.env "color" with
     | Some x -> { conf with senv = conf.senv @ [ ("color", Mutil.encode x) ] }
-    | _ -> conf
+    | None -> conf
   in
   let get x = Geneweb.Util.p_getenv conf.Geneweb.Config.env x in
   match (get "em", get "ei", get "ep", get "en", get "eoc") with
@@ -437,7 +437,7 @@ let w_base ~none fn conf (bfile : string option) =
 let w_person ~none fn conf base =
   match Geneweb.Util.find_person_in_env conf base "" with
   | Some p -> fn conf base p
-  | _ -> none conf base
+  | None -> none conf base
 
 let output_error ?headers ?content conf code =
   Geneweb.GWPARAM.output_error ?headers ?content conf code
@@ -556,21 +556,21 @@ let treat_request =
                | Some x ->
                    Geneweb.BirthdayDisplay.print_birth conf base
                      (int_of_string x)
-               | _ -> Geneweb.BirthdayDisplay.print_menu_birth conf base)
+               | None -> Geneweb.BirthdayDisplay.print_menu_birth conf base)
            | "AD" -> (
                w_base @@ fun conf base ->
                match Geneweb.Util.p_getenv conf.env "v" with
                | Some x ->
                    Geneweb.BirthdayDisplay.print_dead conf base
                      (int_of_string x)
-               | _ -> Geneweb.BirthdayDisplay.print_menu_dead conf base)
+               | None -> Geneweb.BirthdayDisplay.print_menu_dead conf base)
            | "AM" -> (
                w_base @@ fun conf base ->
                match Geneweb.Util.p_getenv conf.env "v" with
                | Some x ->
                    Geneweb.BirthdayDisplay.print_marriage conf base
                      (int_of_string x)
-               | _ -> Geneweb.BirthdayDisplay.print_menu_marriage conf base)
+               | None -> Geneweb.BirthdayDisplay.print_menu_marriage conf base)
            | "C" -> w_base @@ w_person @@ Geneweb.CousinsDisplay.print
            | "CHG_CHN" when conf.wizard ->
                w_wizard @@ w_base @@ Geneweb.ChangeChildrenDisplay.print
@@ -784,7 +784,7 @@ let treat_request =
                w_base @@ fun conf base ->
                match Geneweb.Util.p_getenv conf.env "v" with
                | Some f -> Geneweb.SrcfileDisplay.print_source conf base f
-               | _ -> incorrect_request conf base)
+               | None -> incorrect_request conf base)
            | "STAT" ->
                w_base @@ fun conf _ ->
                Geneweb.BirthDeathDisplay.print_statistics conf

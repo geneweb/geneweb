@@ -380,7 +380,7 @@ let warning_month_number_dates () =
   (example found in gedcom: \"%s\")"
         s;
       flush !state.log_oc
-  | _ -> ()
+  | MonthDayDates | DayMonthDates | NoMonthNumberDates -> ()
 
 (* Decoding fields *)
 let rec skip_spaces =
@@ -1164,7 +1164,7 @@ let treat_source gen r =
 let source gen r =
   match find_field "SOUR" r.rsons with
     Some r -> treat_source gen r
-  | _ -> "", []
+  | None -> "", []
 
 let p_index_from s i c =
   if i >= String.length s then String.length s
@@ -1477,7 +1477,7 @@ let treat_indi_pevent gen ip r =
               let place =
                 match find_field "PLAC" r.rsons with
                   Some r -> strip_spaces r.rval
-                | _ -> ""
+                | None -> ""
               in
               let reason = "" in
               let note = find_and_treat_notes gen r.rsons in
@@ -1545,7 +1545,7 @@ let treat_indi_pevent gen ip r =
                let place =
                  match find_field "PLAC" r.rsons with
                    Some r -> strip_spaces r.rval
-                 | _ -> ""
+                 | None -> ""
                in
                let reason = "" in
                let note = find_and_treat_notes gen r.rsons in
@@ -1585,7 +1585,27 @@ let treat_indi_pevent gen ip r =
                let has_epers_name =
                  match name with
                    Epers_Name n -> n <> string_empty
-                 | _ -> false
+                 | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+                   | Epers_Cremation | Epers_Accomplishment | Epers_Acquisition
+                   | Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah
+                   | Epers_BatMitzvah | Epers_Benediction | Epers_ChangeName
+                   | Epers_Circumcision | Epers_Confirmation
+                   | Epers_ConfirmationLDS | Epers_Decoration
+                   | Epers_DemobilisationMilitaire | Epers_Diploma
+                   | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
+                   | Epers_Education | Epers_Election | Epers_Emigration
+                   | Epers_Excommunication | Epers_FamilyLinkLDS
+                   | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
+                   | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
+                   | Epers_ListePassenger | Epers_MilitaryDistinction
+                   | Epers_MilitaryPromotion | Epers_MilitaryService
+                   | Epers_MobilisationMilitaire | Epers_Naturalisation
+                   | Epers_Occupation | Epers_Ordination | Epers_Property
+                   | Epers_Recensement | Epers_Residence | Epers_Retired
+                   | Epers_ScellentChildLDS | Epers_ScellentParentLDS
+                   | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will
+                   | Epers_Adoption ->
+                    false
                in
                if has_epers_name || date <> None || place <> "" ||
                   note <> "" || src <> "" || witnesses <> [| |]
@@ -1669,7 +1689,24 @@ let reconstitute_from_pevents pevents bi bp de bu =
                 evt.epers_src
               in
               let () = found_burial := true in loop l bi bp de bu
-        | _ -> loop l bi bp de bu
+        |  Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
+           | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
+           | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
+           | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Decoration
+           | Epers_DemobilisationMilitaire | Epers_Diploma | Epers_Distinction
+           | Epers_Dotation | Epers_DotationLDS | Epers_Education
+           | Epers_Election | Epers_Emigration | Epers_Excommunication
+           | Epers_FamilyLinkLDS | Epers_FirstCommunion | Epers_Funeral
+           | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
+           | Epers_Immigration | Epers_ListePassenger
+           | Epers_MilitaryDistinction | Epers_MilitaryPromotion
+           | Epers_MilitaryService | Epers_MobilisationMilitaire
+           | Epers_Naturalisation | Epers_Occupation | Epers_Ordination
+           | Epers_Property | Epers_Recensement | Epers_Residence
+           | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentParentLDS
+           | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will
+           | Epers_Adoption | Epers_Name _ ->
+            loop l bi bp de bu
   in
   loop pevents bi bp de bu
 
@@ -1783,7 +1820,7 @@ let add_indi gen r =
                let x = applycase_surname x in
                if x <> surname then x :: list else list)
             list []
-        | _ -> []
+        | None -> []
       end
     | None -> []
   in
@@ -1793,7 +1830,7 @@ let add_indi gen r =
       List.filter_map (fun r ->
           parse_alias (Stream.of_string r.rval)
         ) l
-    | _ -> []
+    | [] -> []
   in
   let sex =
     match find_field "SEX" r.rsons with
@@ -1894,12 +1931,12 @@ let add_indi gen r =
       let d =
         match find_field "DATE" r.rsons with
           Some r -> date_of_field r.rval
-        | _ -> None
+        | None -> None
       in
       let p =
         match find_field "PLAC" r.rsons with
           Some r -> strip_spaces r.rval
-        | _ -> ""
+        | None -> ""
       in
       let note = find_and_treat_notes gen r.rsons in
       d, p, (note, []), source gen r
@@ -1916,12 +1953,12 @@ let add_indi gen r =
       let d =
         match find_field "DATE" r.rsons with
           Some r -> date_of_field r.rval
-        | _ -> None
+        | None -> None
       in
       let p =
         match find_field "PLAC" r.rsons with
           Some r -> strip_spaces r.rval
-        | _ -> ""
+        | None -> ""
       in
       let note = find_and_treat_notes gen r.rsons in
       d, p, (note, []), source gen r
@@ -1941,7 +1978,7 @@ let add_indi gen r =
               | Some d -> Def.Death (Unspecified, Date.cdate_of_date d)
               | None -> Def.DeadDontKnowWhen
             end
-          | _ -> Def.DeadDontKnowWhen
+          | None -> Def.DeadDontKnowWhen
         in
         let p =
           match find_field "PLAC" r.rsons with
@@ -1964,12 +2001,12 @@ let add_indi gen r =
           let d =
             match find_field "DATE" r.rsons with
               Some r -> date_of_field r.rval
-            | _ -> None
+            | None -> None
           in
           let p =
             match find_field "PLAC" r.rsons with
               Some r -> strip_spaces r.rval
-            | _ -> ""
+            | None -> ""
           in
           let note = find_and_treat_notes gen r.rsons in
           Def.Buried (Date.cdate_of_od d), p, (note, []), source gen r
@@ -1986,12 +2023,12 @@ let add_indi gen r =
           let d =
             match find_field "DATE" r.rsons with
               Some r -> date_of_field r.rval
-            | _ -> None
+            | None -> None
           in
           let p =
             match find_field "PLAC" r.rsons with
               Some r -> strip_spaces r.rval
-            | _ -> ""
+            | None -> ""
           in
           let note = find_and_treat_notes gen r.rsons in
           Def.Cremated (Date.cdate_of_od d), p, (note, []), source gen r
@@ -2012,7 +2049,7 @@ let add_indi gen r =
   List.iter (fun r ->
       begin match find_field "FAMC" r.rsons with
         | Some r -> forward_adop gen ip r.rval (find_field "ADOP" r.rsons)
-        | _ -> ()
+        | None -> ()
       end) adoptions;
   let ext_notes =
     let concat_text s1 s2 s_sep =
@@ -2159,7 +2196,7 @@ let treat_fam_fevent gen ifath r =
               let place =
                 match find_field "PLAC" r.rsons with
                   Some r -> strip_spaces r.rval
-                | _ -> ""
+                | None -> ""
               in
               let reason = "" in
               let note = find_and_treat_notes gen r.rsons in
@@ -2198,7 +2235,11 @@ let treat_fam_fevent gen ifath r =
                         else check_place_unmarried name place r
                     | None -> check_place_unmarried name place r
                     end
-                | _ -> name, place
+                | Efam_NoMarriage | Efam_NoMention | Efam_Engage | Efam_Divorce
+                  | Efam_Separated | Efam_Annulation | Efam_MarriageBann
+                  | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS
+                  | Efam_Residence | Efam_Name _ ->
+                   name, place
               in
               let evt =
                 {Def.efam_name = name; efam_date = Date.cdate_of_od date;
@@ -2236,7 +2277,7 @@ let treat_fam_fevent gen ifath r =
                let place =
                  match find_field "PLAC" r.rsons with
                    Some r -> strip_spaces r.rval
-                 | _ -> ""
+                 | None -> ""
                in
                let reason = "" in
                let note = find_and_treat_notes gen r.rsons in
@@ -2277,7 +2318,11 @@ let treat_fam_fevent gen ifath r =
                let has_efam_name =
                  match name with
                    Efam_Name n -> n <> string_empty
-                 | _ -> false
+                 | Efam_Marriage | Efam_NoMarriage | Efam_NoMention
+                   | Efam_Engage | Efam_Divorce | Efam_Separated
+                   | Efam_Annulation | Efam_MarriageBann | Efam_MarriageContract
+                   | Efam_MarriageLicense | Efam_PACS | Efam_Residence ->
+                    false
                in
                if has_efam_name || date <> None || place <> "" ||
                   note <> "" || src <> "" || witnesses <> [| |] ||
@@ -2328,7 +2373,7 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
                 | Some (Dgreg (dmy, cal)) ->
                     let dmy = {dmy with prec = About} in
                     Date.cdate_of_od (Some (Dgreg (dmy, cal)))
-                | _ -> evt.efam_date
+                | Some (Dtext _) | None -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on ne met pas de lieu.            *)
@@ -2364,7 +2409,7 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
             else
               let div = Def.Separated in
               let () = found_divorce := true in loop l marr witn div
-        | _ -> loop l marr witn div
+        | Efam_Residence | Efam_Name _ -> loop l marr witn div
   in
   let (marr, witn, div) = loop (List.rev fevents) marr witn div in
   (* Parents de même sexe. *)
@@ -2373,7 +2418,10 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
     let relation =
       match relation with
         Def.Married | Def.NoSexesCheckMarried -> Def.NoSexesCheckMarried
-      | _ -> Def.NoSexesCheckNotMarried
+        | NotMarried | Engaged | NoSexesCheckNotMarried | NoMention
+          | MarriageBann | MarriageContract | MarriageLicense | Pacs
+          | Residence ->
+           Def.NoSexesCheckNotMarried
     in
     let marr = relation, date, place, note, src in marr, witn, div
   else marr, witn, div
@@ -2435,7 +2483,7 @@ let add_fam_norm gen r adop_list =
               ipl
             | _ -> ip :: ipl
           end
-        | _ -> ip :: ipl
+        | Left _ -> ip :: ipl
       else ip :: ipl
     end rl []
   in
@@ -2479,7 +2527,7 @@ let add_fam_norm gen r adop_list =
       let d =
         match find_field "DATE" r.rsons with
           Some r -> date_of_field r.rval
-        | _ -> None
+        | None -> None
       in
       let rec heredis_witnesses =
         function
@@ -2599,7 +2647,7 @@ let add_fam gen r =
         list;
       match find_field "CHIL" r.rsons with
         Some _ -> add_fam_norm gen r list
-      | _ -> ()
+      | None -> ()
 
 let treat_header2 r =
   begin match find_field "GEDC" r.rsons with
@@ -2614,7 +2662,7 @@ let treat_header2 r =
                (int_of_string_opt major) ~some:(fun v -> v >= 7) ~none:false
            in
            if is_major_post7 then !state.charset_option <- Some Utf8;
-        | _ -> ();
+        | [] -> ();
         end
      | None -> ()
      end;
@@ -2731,7 +2779,7 @@ let pass1 gen fname =
         let (strm__ : _ Stream.t) = strm in
         match Stream.peek strm__ with
           Some _ -> Stream.junk strm__; skip_to_eoln strm; loop ()
-        | _ -> ()
+        | None -> ()
   in
   loop (); close_in ic
 
@@ -2768,7 +2816,7 @@ let pass2 gen fname =
         | Some _ ->
             Stream.junk strm__;
             let (_ : string) = get_to_eoln 0 strm in loop ()
-        | _ -> ()
+        | None -> ()
   in
   loop () ;
   fill_g_per gen gen.g_godp ;
@@ -2802,7 +2850,7 @@ let pass3 gen fname =
             Printf.fprintf !state.log_oc "Strange input '%c' (%i).\n" c (Char.code c);
             flush !state.log_oc;
             let (_ : string) = get_to_eoln 0 strm in loop ()
-        | _ -> ()
+        | None -> ()
   in
   loop ();
   List.iter begin fun (ifam, ip) ->
@@ -2823,7 +2871,7 @@ let pass3 gen fname =
             gen.g_fam.arr.(ifam) <- Def.Right (fam, cpl, des)
         | _ -> ()
       end
-    | _ -> ()
+    | Def.Left _ -> ()
   end gen.g_witn ;
   fill_g_per gen gen.g_frelated ;
   close_in ic
@@ -2887,7 +2935,7 @@ let add_parents_to_isolated gen =
               gen.g_fam.arr.(ifam) <- Def.Right (fam, cpl, des);
               let a = { a with Def.parents = Some ifam } in
               gen.g_per.arr.(i) <- Def.Right (p, a, u)
-            | _ -> ()
+            | Def.Left _ -> ()
           end
     | Def.Left _ -> ()
   done
@@ -3128,7 +3176,9 @@ let rec negative_date_ancestors persons ascends unions families couples i =
       end ;
       death = match p.death with
         | Def.Death (dr, cd2) -> Def.Death (dr, neg_year_cdate cd2)
-        | _ -> p.death
+        | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
+          | OfCourseDead ->
+           p.death
     }
   in
   persons.(i) <- p;
