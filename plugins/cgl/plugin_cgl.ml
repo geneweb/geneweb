@@ -1,10 +1,11 @@
 open Geneweb
 open Config
+module Plugin = Geneweb_plugin
 
 let ns = "cgl"
 
 let () =
-  Gwd_lib.GwdPlugin.register_se ~ns @@ fun _assets conf _base ->
+  Plugin.register_se ~ns @@ fun _assets conf _base ->
   if Util.p_getenv conf.env "cgl" = Some "on" then
     let buffer_status = ref None in
     let buffer_headers = ref [] in

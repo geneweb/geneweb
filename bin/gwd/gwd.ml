@@ -9,6 +9,7 @@ module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Sites = Geneweb_sites.Sites
+module Plugin = Geneweb_plugin
 
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
@@ -189,8 +190,8 @@ type plugin = {
   unsafe : bool;
   (* If [true], the plugin is loaded globally for all databases. *)
   forced : bool;
-  (* If [true], [path] is treated as a parent directory containing multiple 
-     sub-plugins to be discovered and loaded. If [false], [path] points 
+  (* If [true], [path] is treated as a parent directory containing multiple
+     sub-plugins to be discovered and loaded. If [false], [path] points
      directly to a single plugin. *)
   collection : bool;
 }
@@ -416,9 +417,24 @@ let load_cmxs cmxs =
   with Dynlink.Error e ->
     raise (Register_plugin_failure (cmxs, `dynlink_error e))
 
-let load_plugin ~unsafe path =
-  Logs.debug (fun k -> k "Loading plugin %s..." (Filename.basename path));
-  if not (unsafe || GwdPluginMD5.allowed path) then failwith path;
+module MS = Map.Make (String)
+
+let check_plugin =
+  let sums = MS.of_seq @@ List.to_seq Plugin_checksums.checksums in
+  fun path ->
+    let pname = Filename.basename path in
+    match MS.find pname sums with
+    | exception Not_found -> false
+    | sum -> Plugin.checksum path = sum
+
+let load_plugin ~unsafe ~forced path =
+  let pname = Filename.basename path in
+  Logs.debug (fun k ->
+      k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
+  if not (unsafe || check_plugin path) then (
+    Logs.err (fun k ->
+        k "Refuse to load plugin %s for cause of wrong checksum." pname);
+    exit 1);
   let pname = Filename.basename path in
   let cmxs =
     let s = Fmt.str "plugin_%s.cmxs" pname in
@@ -427,52 +443,25 @@ let load_plugin ~unsafe path =
   lexicon_fname := !lexicon_fname ^ pname ^ ".";
   let lex_dir = path // "assets" // "lex" in
   if Sys.file_exists lex_dir then add_lex_dir lex_dir;
-  GwdPlugin.assets := path // "assets";
-  Fun.protect ~finally:(fun () -> GwdPlugin.assets := "") @@ fun () ->
+  Plugin.assets := path // "assets";
+  Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
   load_cmxs cmxs
 
-module MS = Map.Make (String)
-
-let compute_dependencies path =
-  let deps =
-    Filesystem.walk_folder
-      (fun e acc ->
-        match e with
-        | Dir d ->
-            let meta_file = d // "META" in
-            MS.update (Filename.basename d)
-              (fun o ->
-                match o with
-                | Some _ -> o
-                | None ->
-                    if Sys.file_exists meta_file then
-                      Some GwdPluginMETA.(parse meta_file).depends
-                    else Some [])
-              acc
-        | Exn { path; exn; bt } ->
-            Logs.err (fun k ->
-                k "Cannot compute dependencies of the plugin collection %S" path);
-            Printexc.raise_with_backtrace exn bt
-        | _ -> acc)
-      path MS.empty
-  in
-  match GwdPluginDep.topological_sort @@ List.of_seq @@ MS.to_seq deps with
-  | GwdPluginDep.Cycle cycle ->
-      Logs.err (fun k ->
-          k
-            "Cycle found while computing dependencies of the plugin collection \
-             %S:@ %a"
-            path
-            Fmt.(list ~sep:(const string " -> ") string)
-            cycle);
-      exit 1
-  | GwdPluginDep.Sorted deps -> deps
-
 let load_plugins { path; unsafe; forced; collection } =
-  if not collection then load_plugin ~unsafe path
+  if not collection then load_plugin ~unsafe ~forced path
   else
-    let deps = compute_dependencies path in
-    List.iter (fun d -> load_plugin ~unsafe (path // d)) deps
+    match Plugin.compute_dependencies path with
+    | Ok deps ->
+        List.iter (fun d -> load_plugin ~unsafe ~forced (path // d)) deps
+    | Error cycle ->
+        Logs.err (fun k ->
+            k
+              "Cycle found while computing dependencies of the plugin \
+               collection %S:@ %a"
+              path
+              Fmt.(list ~sep:(const string " -> ") string)
+              cycle);
+        exit 1
 
 let alias_lang lang =
   if String.length lang < 2 then lang
@@ -2712,7 +2701,7 @@ let main () =
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter load_plugins !plugins;
   GWPARAM.init ();
-  (* FIXME: this line MUST be after plugin loading as plugins can modified 
+  (* FIXME: this line MUST be after plugin loading as plugins can modified
      [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
   cache_lexicon ();
   List.iter

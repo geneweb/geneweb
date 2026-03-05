@@ -1,6 +1,7 @@
 open Geneweb
 open Config
 module Driver = Geneweb_db.Driver
+module Plugin = Geneweb_plugin
 
 let arg_f_parents = "f_parents"
 let arg_f_children = "f_children"
@@ -442,7 +443,7 @@ let _ =
     else false
   in
   let w_base = Gwd_lib.Request.w_base ~none:(fun _ -> false) in
-  Gwd_lib.GwdPlugin.register ~ns
+  Plugin.register ~ns
     [
       ("FIXBASE", fun assets -> w_base @@ aux fixbase assets);
       ("FIXBASE_OK", fun assets -> w_base @@ aux fixbase_ok assets);
