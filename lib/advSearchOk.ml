@@ -37,11 +37,6 @@ let string_incl =
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
 
-let is_subset_pfx s1 s2 =
-  List.for_all
-    (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
-    s1
-
 module AdvancedSearchMatch : sig
   type place = string * Gwdb.istr option
 
@@ -290,7 +285,7 @@ end = struct
       match mode with
       | `Exact -> Ext_list.elements_cmp
       | `Not_Exact -> Ext_list.is_subset
-      | `Not_Exact_Prefix -> is_subset_pfx
+      | `Not_Exact_Prefix -> SearchName.is_subset_pfx
     in
     fun x -> matching search_list x
 
@@ -498,7 +493,7 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           |> snd
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
-      let list_aux strings_of persons_of n_list mode =
+      let list_aux ?(filter_marital = false) strings_of persons_of n_list mode =
         List.map
           (fun x ->
             let eq = AdvancedSearchMatch.match_name ~search_list:n_list ~mode in
@@ -512,7 +507,18 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           n_list
         |> List.flatten |> List.sort_uniq compare
         |> List.map (Gwdb.spi_find @@ persons_of base)
-        |> List.flatten |> List.sort_uniq compare
+        |> List.flatten
+        |> List.filter (fun person_id ->
+               person_id |> Gwdb.poi base |> fun p ->
+               (not filter_marital)
+               || SearchName.filter_marital_names
+                    ~remove_marital_names_match_only:(fn_list = [])
+                    (fun n ->
+                      let ns = List.map Name.lower @@ Name.split n in
+                      AdvancedSearchMatch.match_name ~search_list:n_list ~mode
+                        ns)
+                    conf base p)
+        |> List.sort_uniq compare
       in
       if sn_list <> [] && query_params.surname_search_mode = `Not_Exact_Prefix
       then
@@ -524,7 +530,8 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           r <> ([], 0)
         in
         let list =
-          SearchName.persons_starting_with ~conf ~base ~filter
+          SearchName.persons_starting_with
+            ~remove_marital_names_match_only:(fn_list = []) ~conf ~base ~filter
             ~first_name_prefix:""
             ~surname_prefix:(Option.value ~default:"" query_params.surname)
             ~limit:max_answers
@@ -541,7 +548,8 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           r <> ([], 0)
         in
         let list =
-          SearchName.persons_starting_with ~conf ~base ~filter
+          SearchName.persons_starting_with
+            ~remove_marital_names_match_only:false ~conf ~base ~filter
             ~first_name_prefix:
               (Option.value ~default:"" query_params.first_name)
             ~surname_prefix:"" ~limit:max_answers
@@ -552,8 +560,9 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           if sn_list <> [] then
             ( false,
               true,
-              list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-                sn_list query_params.surname_search_mode )
+              list_aux ~filter_marital:true Gwdb.base_strings_of_surname
+                Gwdb.persons_of_surname sn_list query_params.surname_search_mode
+            )
           else
             ( true,
               false,
@@ -852,7 +861,7 @@ let exact_matching_first_name_aliases ~first_name =
   filter_alias ~name:first_name ~matching:Ext_list.elements_cmp
 
 let prefix_matching_first_name_aliases ~first_name =
-  filter_alias ~name:first_name ~matching:is_subset_pfx
+  filter_alias ~name:first_name ~matching:SearchName.is_subset_pfx
 
 let matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:Ext_list.is_subset
@@ -861,7 +870,7 @@ let exact_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:Ext_list.elements_cmp
 
 let prefix_matching_surname_aliases ~surname =
-  filter_alias ~name:surname ~matching:is_subset_pfx
+  filter_alias ~name:surname ~matching:SearchName.is_subset_pfx
 
 let matching_alias_public_name_qualifiers ~string =
   filter_alias ~name:string ~matching:Ext_list.elements_cmp
