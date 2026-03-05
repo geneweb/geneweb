@@ -19,6 +19,7 @@
   (sites (share hd))
   (depends
     (ocaml (>= 4.10))
+    geneweb-compat
     (alcotest :with-test)
     benchmark
     (calendars (>= "2.0.0"))
@@ -54,6 +55,13 @@
     zarith
   )
 )
+
+(package
+  (name geneweb-compat)
+  (synopsis "GeneWeb library for legacy support.")
+  (tags (geneweb legacy))
+  (depends
+    (ocaml (>= 4.10))))
 
 (package
   (name geneweb-rpc)
