@@ -1,3 +1,28 @@
+(** Calendar conversion module.
+
+    All conversions use the Serial Day Number (SDN) as pivot, numerically
+    identical to the Julian Day Number (JDN). Reference: Fliegel & Van Flandern,
+    1968, Communications of the ACM, vol. 11, n. 10, p. 657.
+
+    Year zero does not exist in the Anno Domini system (1 BC is immediately
+    followed by AD 1). Astronomical year numbering (ISO 8601:2019) uses year 0 =
+    1 BC; all SDN/JDN formulas assume this convention internally. Callers must
+    ensure year <> 0 for Gregorian/Julian inputs; Calendars.make rejects it as
+    Invalid_year.
+
+    French Republican calendar uses the astronomical equinox method (Remy
+    Pialat), not the Romme arithmetic rule. This matches the original decree
+    (Art. III) and Fourmilab's implementation. Valid for An I-XIV (1792-1805);
+    accuracy degrades for extrapolated dates due to solar longitude
+    approximation precision (~1 arc-minute).
+
+    Hebrew calendar uses integer arithmetic throughout (helek as unit),
+    implementing all four dechiyot. Reference values: molad BaHaRaD = 1d 5h
+    204p, lunation = 29d 12h 793p. See Reingold & Dershowitz, Calendrical
+    Calculations, 4th ed., 2018, Cambridge University Press.
+
+    Partial dates (day=0 or month=0) bypass SDN conversion entirely in
+    convert_via_sdn, as SDN cannot encode unknown components. *)
 (* Calendar conversions using Calendars library (>= 2.0.0)
    
    This module wraps the external Calendars library to provide
