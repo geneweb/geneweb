@@ -322,6 +322,9 @@ let print_anniv conf base p dead_people level =
         in
         loop set 0
   in
+  let max_deg =
+    match p_getint conf.env "d" with Some d when d > 0 -> d | _ -> 0
+  in
   let set =
     let module P = Pqueue.Make (struct
       type t = Driver.iper * int * int
@@ -329,12 +332,18 @@ let print_anniv conf base p dead_people level =
       let leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2
     end) in
     let a = P.add (Driver.get_iper p, 0, 1) P.empty in
+    let max_asc = if max_deg > 0 then min level max_deg else level in
     let rec loop set a =
       if P.is_empty a then set
       else
         let (ip, n, up_sosa), a = P.take a in
-        let set = insert_desc set up_sosa [] (n + 3) ip in
-        if n >= level then set
+        let desc_lim =
+          if max_deg > 0 then min (n + 3) (max_deg - n) else n + 3
+        in
+        let set =
+          if desc_lim >= 0 then insert_desc set up_sosa [] desc_lim ip else set
+        in
+        if n >= max_asc then set
         else
           let a =
             match Driver.get_parents (pget conf base ip) with
@@ -396,7 +405,10 @@ let print_anniv conf base p dead_people level =
       (Adef.encoded (if dead_people then "AD" else "AN"))
   in
   match p_getint conf.env "v" with
-  | Some i -> BirthdayDisplay.gen_print conf base i f_scan dead_people
+  | Some i ->
+      BirthdayDisplay.gen_print conf base i f_scan
+        ~max_d:((2 * level) + 3)
+        ~mode dead_people
   | _ ->
       if dead_people then
         BirthdayDisplay.gen_print_menu_dead conf base f_scan mode
