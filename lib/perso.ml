@@ -1404,9 +1404,11 @@ let get_nb_marriage_witnesses_of_kind fam wk =
     (fun acc (_, w, _) -> if wk = w then acc + 1 else acc)
     0 witnesses
 
-let is_alive person =
+let is_alive ~conf person =
   match Gwdb.get_death person with
-  | Def.NotDead | DontKnowIfDead -> true
+  | Def.NotDead -> true
+  | DontKnowIfDead ->
+      not @@ Util.is_old_person conf (Gwdb.gen_person_of_person person)
   | DeadYoung | DeadDontKnowWhen | OfCourseDead | Death _ -> false
 
 let rec eval_var conf base env ep loc sl =
@@ -2708,7 +2710,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
           | _ -> false)
       | _ -> false)
   | "computable_age" ->
-      p_auth && is_alive p
+      p_auth && is_alive ~conf p
       && Option.fold ~none:false
            ~some:(fun (d : Date.dmy) ->
              not (d.day = 0 && d.month = 0 && d.prec <> Sure))
@@ -3044,7 +3046,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "access" -> Util.acces conf base p |> safe_val
   | "age" ->
-      if p_auth && is_alive p then
+      if p_auth && is_alive ~conf p then
         Option.fold ~none:null_val
           ~some:(fun d ->
             Date.time_elapsed d conf.Config.today
