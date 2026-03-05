@@ -2,6 +2,7 @@ open Geneweb
 open Config
 open Adef
 module Driver = Geneweb_db.Driver
+module Plugin = Geneweb_plugin
 
 let ns = "no_index"
 
@@ -131,4 +132,4 @@ let no_index conf base =
     Output.flush conf;
     exit 0)
 
-let () = Gwd_lib.GwdPlugin.register_se ~ns @@ fun _assets -> w_base no_index
+let () = Plugin.register_se ~ns @@ fun _assets -> w_base no_index

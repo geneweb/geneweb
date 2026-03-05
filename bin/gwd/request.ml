@@ -7,6 +7,7 @@ open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Plugin = Geneweb_plugin
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
@@ -448,7 +449,7 @@ let try_plugin list conf base_name m =
     else fun (ns, fn) ->
       (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base_name
   in
-  List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
+  List.exists fn (Hashtbl.find_all Plugin.ht m)
 
 let w_lock ~onerror fn conf (base_name : string option) =
   let bfile = !GWPARAM.bpath conf.bname in
@@ -573,11 +574,11 @@ let treat_request =
             | Some list -> String.split_on_char ',' list |> List.map String.trim
           in
           if List.mem "*" plugins then
-            List.iter (fun (_, fn) -> fn conf bfile) !GwdPlugin.se
+            List.iter (fun (_, fn) -> fn conf bfile) !Plugin.se
           else
             List.iter
               (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile)
-              !GwdPlugin.se;
+              !Plugin.se;
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
           if not @@ try_plugin plugins conf bfile m then
             ((if

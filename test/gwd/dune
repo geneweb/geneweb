@@ -1,0 +1,5 @@
+(cram
+ (package geneweb)
+ (deps
+  %{bin:gwd}
+  (glob_files_rec ../../plugins/*)))
