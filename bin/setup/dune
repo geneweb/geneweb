@@ -2,4 +2,4 @@
  (package geneweb)
  (name setup)
  (public_name gwsetup)
- (libraries unix str wserver geneweb))
+ (libraries unix str geneweb_http geneweb))

@@ -1,4 +1,6 @@
 open Geneweb
+module Server = Geneweb_http.Server
+module Code = Geneweb_http.Code
 
 let port = ref 2316
 let gwd_port = ref 2317
@@ -16,10 +18,10 @@ let printer_conf =
     Config.empty with
     output_conf =
       {
-        status = Wserver.http;
-        header = Wserver.header;
-        body = Wserver.print_string;
-        flush = Wserver.wflush;
+        status = Server.http;
+        header = Server.header;
+        body = Server.print_string;
+        flush = Server.wflush;
       };
   }
 
@@ -50,7 +52,7 @@ let charset conf =
   try Hashtbl.find conf.lexicon "!charset" with Not_found -> "utf-8"
 
 let header_no_page_title conf title =
-  Output.status printer_conf Def.OK;
+  Output.status printer_conf Code.OK;
   Output.header printer_conf "Content-type: text/html; charset=%s"
     (charset conf);
   Output.print_sstring printer_conf
@@ -842,7 +844,7 @@ let print_file conf bname =
   let ic_opt = try Some (open_in fname) with Sys_error _ -> None in
   match ic_opt with
   | Some ic ->
-      Output.status printer_conf Def.OK;
+      Output.status printer_conf Code.OK;
       Output.header printer_conf "Content-type: text/html; charset=%s"
         (charset conf);
       copy_from_stream conf
@@ -1631,7 +1633,7 @@ let print_typed_file conf typ fname =
   let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
   match ic_opt with
   | Some ic ->
-      Output.status printer_conf Def.OK;
+      Output.status printer_conf Code.OK;
       Output.header printer_conf "Content-type: %s" typ;
       Output.header printer_conf "Content-length: %d" (in_channel_length ic);
       (try
@@ -2005,4 +2007,8 @@ let intro () =
 let () =
   if Sys.unix then intro ()
   else if Sys.getenv_opt "WSERVER" = None then intro ();
-  Wserver.start ~port:!port ~max_pending_requests:150 ~n_workers:1 wrap_setup
+  (* FIXME: this hack is necessary to avoid a cyclic dependency between
+     `geneweb` and `geneweb-http`. We must remove it after refactoring
+     the encoded string subsystem. *)
+  let wrap_setup x y z = wrap_setup x y (Adef.encoded z) in
+  Server.start ~port:!port ~max_pending_requests:150 ~n_workers:1 wrap_setup

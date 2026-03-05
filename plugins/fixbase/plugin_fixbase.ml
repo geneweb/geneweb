@@ -1,6 +1,7 @@
 open Geneweb
 open Config
 module Driver = Geneweb_db.Driver
+module Code = Geneweb_http.Code
 
 let arg_f_parents = "f_parents"
 let arg_f_children = "f_children"
@@ -429,7 +430,7 @@ let fixbase_ok conf base =
     let lock_file = Mutil.lock_file @@ !GWPARAM.bpath conf.bname in
     Lock.control
       ~on_exn:(fun _exn _bt ->
-        GWPARAM.output_error conf Def.Service_Unavailable)
+        GWPARAM.output_error conf Code.Service_Unavailable)
       ~wait:false ~lock_file process
 
 let ns = "fixbase"

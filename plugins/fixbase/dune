@@ -6,14 +6,8 @@
 
 (executable
  (name plugin_fixbase)
- (libraries geneweb.gwd_lib geneweb_def_show)
+ (libraries geneweb geneweb.gwd_lib geneweb_def_show geneweb_http)
  (preprocess
   (pps ppx_deriving.show))
- (flags -linkall)
  (modes
-  (native plugin))
- (modules plugin_fixbase))
-
-(alias
- (name plugin)
- (deps plugin_fixbase.cmxs))
+  (native plugin)))

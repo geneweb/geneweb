@@ -35,7 +35,7 @@ and digest_auth_scheme = {
 (** Digest authentication scheme inside {i Autorization} HTTP header *)
 
 type output_conf = {
-  status : Def.httpStatus -> unit;
+  status : Geneweb_http.Code.status -> unit;
   header : string -> unit;
   body : string -> unit;
   flush : unit -> unit;
