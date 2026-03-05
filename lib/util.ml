@@ -9,6 +9,7 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Code = Geneweb_http.Code
 
 let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
     ?(aria_label = "") ?(disabled = false) ?(target = None) ?(data_attrs = [])
@@ -546,7 +547,7 @@ let html ?(content_type = "text/html") conf =
   Output.header conf "Connection: close"
 
 let unauthorized conf auth_type =
-  Output.status conf Def.Unauthorized;
+  Output.status conf Code.Unauthorized;
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
   Output.header conf "Content-type: text/html; charset=%s" conf.charset;

@@ -8,6 +8,7 @@ open Relation
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Iper = Driver.Iper
+module Server = Geneweb_http.Server
 
 let dag_of_ind_dag_list indl =
   let indl, _ =
@@ -1086,7 +1087,7 @@ let print_multi conf base =
     let clean_url =
       Util.normalize_person_pool_url conf base "RLM" (Some assoc_txt)
     in
-    Wserver.http_redirect_temporarily clean_url
+    Server.http_redirect_temporarily clean_url
   else
     let pl =
       let rec loop pl i =

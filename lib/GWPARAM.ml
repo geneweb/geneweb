@@ -4,6 +4,7 @@
     functions if it does not come with a performance cost. *)
 
 module Driver = Geneweb_db.Driver
+module Code = Geneweb_http.Code
 
 let nb_errors = ref 0
 let errors_undef = ref []
@@ -308,7 +309,7 @@ let output_error =
     | None -> (
         let code =
           match code with
-          | Def.Bad_Request -> "400"
+          | Code.Bad_Request -> "400"
           | Unauthorized -> "401"
           | Forbidden -> "403"
           | Not_Found -> "404"

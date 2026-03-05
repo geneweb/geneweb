@@ -2,15 +2,16 @@
 
 open Config
 open Def
+module Code = Geneweb_http.Code
 
 let get_vother x = x
 let set_vother x = Some x
 
 let incorrect_request ?(comment = "") conf =
-  GWPARAM.output_error conf Def.Bad_Request ~content:(Adef.safe comment)
+  GWPARAM.output_error conf Code.Bad_Request ~content:(Adef.safe comment)
 
 let error_cannot_access conf fname =
-  GWPARAM.output_error conf Def.Not_Found
+  GWPARAM.output_error conf Code.Not_Found
     ~content:
       ("Cannot access file \""
       ^<^ (Util.escape_html fname : Adef.escaped_string :> Adef.safe_string)

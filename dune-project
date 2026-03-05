@@ -20,6 +20,7 @@
   (depends
     (ocaml (>= 4.10))
     geneweb-compat
+    geneweb-http
     (alcotest :with-test)
     benchmark
     (calendars (>= "2.0.0"))
@@ -62,6 +63,13 @@
   (tags (geneweb legacy))
   (depends
     (ocaml (>= 4.10))))
+
+(package
+  (name geneweb-http)
+  (synopsis "HTTP 1.1 support for GeneWeb daemon.")
+  (depends
+    (ocaml (>= 4.10))
+    geneweb-compat))
 
 (package
   (name geneweb-rpc)
