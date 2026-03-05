@@ -6,7 +6,7 @@
 
 (executable
  (name plugin_fixbase)
- (libraries geneweb.gwd_lib geneweb_def_show)
+ (libraries geneweb.gwd_lib geneweb.plugin geneweb_def_show)
  (preprocess
   (pps ppx_deriving.show))
  (flags -linkall)

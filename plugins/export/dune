@@ -2,6 +2,7 @@
  (name plugin_export)
  (libraries
   geneweb
+  geneweb.plugin
   geneweb.gwb2ged_lib
   geneweb.gwd_lib
   geneweb.gwexport_lib

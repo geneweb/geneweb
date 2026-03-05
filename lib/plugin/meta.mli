@@ -1,4 +1,4 @@
-type meta = {
+type meta = private {
   version : string;
   maintainers : string list;
   depends : string list;

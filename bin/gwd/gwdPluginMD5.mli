@@ -1,1 +1,0 @@
-val allowed : string -> bool

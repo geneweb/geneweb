@@ -4,7 +4,7 @@
 
 (executable
  (name plugin_jingoo)
- (libraries geneweb.gwd_lib)
+ (libraries geneweb.plugin)
  (embed_in_plugin_libraries jingoo)
  (flags -linkall)
  (modes
