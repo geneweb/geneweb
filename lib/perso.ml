@@ -2936,7 +2936,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | None -> false)
   | "has_nephews_or_nieces" ->
       Option.value ~default:false
-        (Util.has_nephews_or_nieces conf base
+        (Util.has_nephews_or_nieces ~conf ~base
            (Authorized.Person.make ~conf ~base (Gwdb.get_iper p)))
   | "has_nobility_titles" -> p_auth && Person.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->

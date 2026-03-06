@@ -1714,7 +1714,7 @@ let rchild_type_text conf t sex =
   in
   Adef.safe @@ transl_nth conf s (index_of_sex sex)
 
-let has_nephews_or_nieces conf base p =
+let has_nephews_or_nieces ~conf ~base p =
   let exception Ok in
   try
     let a = p in
