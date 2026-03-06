@@ -28,6 +28,7 @@ module rec Person : sig
   type t
 
   val make : conf:Config.config -> base:Gwdb.base -> Gwdb.iper -> t
+  val equal : t -> t -> bool
   val get_iper : t -> Gwdb.iper option
   val get_sex : t -> Def.sex option
   val get_first_name : t -> Gwdb.istr option
@@ -49,6 +50,9 @@ module rec Person : sig
 
   val get_family :
     conf:Config.config -> base:Gwdb.base -> t -> Family.t array option
+
+  val get_parents :
+    conf:Config.config -> base:Gwdb.base -> t -> Family.t option option
 
   val get_pevents : t -> Personal_event.t list option
 end = struct
@@ -94,6 +98,12 @@ end = struct
       (fun () -> get person.person)
 
   let get_iper person = get_if_navigation_authorized ~get:Gwdb.get_iper person
+
+  let equal person1 person2 =
+    match (get_iper person1, get_iper person2) with
+    | None, None | None, Some _ | Some _, None -> false
+    | Some person_id1, Some person_id2 -> Gwdb.eq_iper person_id1 person_id2
+
   let get_sex person = get_if_navigation_authorized ~get:Gwdb.get_sex person
 
   let get_first_name person =
@@ -148,6 +158,12 @@ end = struct
         person |> Gwdb.get_family |> Array.map (Family.make ~conf ~base))
       person
 
+  let get_parents ~conf ~base person =
+    get_if_navigation_authorized
+      ~get:(fun person ->
+        person |> Gwdb.get_parents |> Option.map (Family.make ~conf ~base))
+      person
+
   let get_pevents person =
     get_if_fully_authorized
       ~get:(fun person ->
@@ -161,6 +177,7 @@ and Family : sig
   val make : conf:Config.config -> base:Gwdb.base -> Gwdb.ifam -> t
   val get_marriage : t -> Adef.cdate option
   val get_marriage_place : t -> Gwdb.istr option
+  val get_children : conf:Config.config -> base:Gwdb.base -> t -> Person.t array
 
   val get_spouse :
     conf:Config.config ->
@@ -218,6 +235,9 @@ end = struct
             else if Gwdb.eq_iper person_id mother_id then
               Some (Person.make ~conf ~base father_id)
             else None)
+
+  let get_children ~conf ~base family =
+    family.family |> Gwdb.get_children |> Array.map (Person.make ~conf ~base)
 
   let get_fevents family =
     get_if_fully_authorized
