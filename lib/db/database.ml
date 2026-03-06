@@ -974,7 +974,6 @@ let with_database ?(read_only = false) bname k =
         prerr_endline msg;
         (empty_patch_ht (), RDONLY)
   in
-  let synchro = input_synchro bname in
   let fname = bname // "particles.txt" in
   let particles =
     if Sys.file_exists fname then Mutil.input_particles fname
@@ -1109,6 +1108,7 @@ let with_database ?(read_only = false) bname k =
       try Secure.open_out_bin tmp_fname
       with Sys_error _ -> raise (Failure "the database is not writable")
     in
+    let synchro = input_synchro bname in
     let synchro =
       let timestamp = string_of_float (Unix.time ()) in
       let timestamp = String.sub timestamp 0 (String.index timestamp '.') in
