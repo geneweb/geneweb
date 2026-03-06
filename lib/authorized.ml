@@ -221,20 +221,11 @@ end = struct
     family.family |> Gwdb.get_mother |> Person.make ~conf ~base
 
   let get_spouse ~conf ~base ~person family =
-    match Person.get_iper person with
-    | None -> None
-    | Some person_id -> (
-        match
-          ( family |> get_father ~conf ~base |> Person.get_iper,
-            family |> get_mother ~conf ~base |> Person.get_iper )
-        with
-        | None, None | None, Some _ | Some _, None -> None
-        | Some father_id, Some mother_id ->
-            if Gwdb.eq_iper person_id father_id then
-              Some (Person.make ~conf ~base mother_id)
-            else if Gwdb.eq_iper person_id mother_id then
-              Some (Person.make ~conf ~base father_id)
-            else None)
+    let father = get_father ~conf ~base family in
+    let mother = get_mother ~conf ~base family in
+    if Person.equal person father then Some mother
+    else if Person.equal person mother then Some father
+    else None
 
   let get_children ~conf ~base family =
     family.family |> Gwdb.get_children |> Array.map (Person.make ~conf ~base)
