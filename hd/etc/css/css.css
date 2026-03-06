@@ -2404,3 +2404,11 @@ span.notesourcecolor {
 #rm-table [data-toggle="tooltip"] .tooltip.right .tooltip-arrow {
   border-right-color: #ddd !important;
 }
+
+/* Calendar tool: moon visualization */
+.moon-vis{width:60px;height:60px;border-radius:50%;
+  position:relative;overflow:hidden;display:inline-block;
+  background:#1a1a2e;box-shadow:0 0 8px rgba(255,255,200,.3)}
+.moon-vis .lit{position:absolute;top:0;height:100%;
+  background:linear-gradient(135deg,#fffde7,#fff9c4);
+  border-radius:50%}
