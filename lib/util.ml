@@ -1714,32 +1714,6 @@ let rchild_type_text conf t sex =
   in
   Adef.safe @@ transl_nth conf s (index_of_sex sex)
 
-let has_nephews_or_nieces ~conf ~base p =
-  let exception Ok in
-  try
-    let a = p in
-    Option.map
-      (function
-        | None -> false
-        | Some fam ->
-            Array.iter
-              (fun ip ->
-                if Authorized.Person.equal ip p then ()
-                else
-                  Array.iter
-                    (fun ifam ->
-                      if
-                        Array.length
-                          (Authorized.Family.get_children ~conf ~base ifam)
-                        > 0
-                      then raise Ok)
-                    (Option.value ~default:[||]
-                       (Authorized.Person.get_family ~conf ~base p)))
-              (Authorized.Family.get_children ~conf ~base fam);
-            false)
-      (Authorized.Person.get_parents ~conf ~base a)
-  with Ok -> Some true
-
 let h s = Digest.to_hex (Digest.string s)
 
 let is_that_user_and_password auth_scheme user passwd =

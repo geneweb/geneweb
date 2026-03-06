@@ -41,6 +41,9 @@ module rec Person : sig
     conf:Config.config -> base:Gwdb.base -> t -> Family.t option option
 
   val get_pevents : t -> Personal_event.t list option
+
+  val has_nephews_or_nieces :
+    conf:Config.config -> base:Gwdb.base -> t -> bool option
 end
 
 and Family : sig

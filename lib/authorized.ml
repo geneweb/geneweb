@@ -55,6 +55,9 @@ module rec Person : sig
     conf:Config.config -> base:Gwdb.base -> t -> Family.t option option
 
   val get_pevents : t -> Personal_event.t list option
+
+  val has_nephews_or_nieces :
+    conf:Config.config -> base:Gwdb.base -> t -> bool option
 end = struct
   type authorization_level =
     | Navigation_without_names
@@ -169,6 +172,31 @@ end = struct
       ~get:(fun person ->
         person |> Gwdb.get_pevents |> List.map Personal_event.make)
       person
+
+  let has_nephews_or_nieces ~conf ~base p =
+    let exception Ok in
+    try
+      let a = p in
+      Option.map
+        (function
+          | None -> false
+          | Some fam ->
+              Array.iter
+                (fun ip ->
+                  if Person.equal ip p then ()
+                  else
+                    Array.iter
+                      (fun ifam ->
+                        if
+                          Array.length (Family.get_children ~conf ~base ifam)
+                          > 0
+                        then raise Ok)
+                      (Option.value ~default:[||]
+                         (Person.get_family ~conf ~base p)))
+                (Family.get_children ~conf ~base fam);
+              false)
+        (Person.get_parents ~conf ~base a)
+    with Ok -> Some true
 end
 
 and Family : sig
