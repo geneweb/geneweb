@@ -505,7 +505,7 @@ and eval_person_field_var conf base env p = function
   | _ -> TemplAst.VVstring "person..."
 
 and simple_person_text conf base p =
-  match Util.main_title conf base p with
+  match Person.main_title conf base p with
   | Some t -> NameDisplay.title_html_of_person conf base p t
   | None -> NameDisplay.fullname_html_of_person conf base p
 

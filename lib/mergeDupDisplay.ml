@@ -17,7 +17,7 @@ let print_link ?(with_occurrence_number = true) ?(with_life_dates = true)
   Output.print_sstring conf "</a>";
   if with_life_dates then
     Output.print_string conf (DateDisplay.short_dates_text conf base p);
-  match Util.main_title conf base p with
+  match Person.main_title conf base p with
   | Some t ->
       if with_main_title then
         Output.print_string conf (Util.one_title_text base t)

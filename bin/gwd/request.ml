@@ -5,7 +5,7 @@ let person_is_std_key conf base p k =
   k = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
   || List.exists
        (fun n -> Name.strip n = k)
-       (Gwdb.person_misc_names base p (Geneweb.Util.nobtit conf base))
+       (Gwdb.person_misc_names base p (Geneweb.Person.nobtit conf base))
 
 let select_std_eq conf base pl k =
   List.filter (fun p -> person_is_std_key conf base p k) pl
@@ -91,7 +91,7 @@ let specify conf base n pl =
             | Tname s, _ -> compare_and_add t s
             | _, pn when Gwdb.sou base pn <> "" -> compare_and_add t pn
             | _ -> ())
-          (Geneweb.Util.nobtit conf base p);
+          (Geneweb.Person.nobtit conf base p);
         (p, !tl))
       pl
   in

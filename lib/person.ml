@@ -153,3 +153,20 @@ let compare_by_dates person1 person2 =
   | Some birth1, Some birth2 ->
       let c3 = Date.compare_date birth1 birth2 in
       if c3 = 0 then compare_optional_dates death1 death2 else c3
+
+let nobtit conf base p =
+  Gwdb.nobtitles base conf.Config.allowed_titles conf.Config.denied_titles p
+
+let is_empty_name p =
+  Gwdb.is_quest_string (Gwdb.get_surname p)
+  && Gwdb.is_quest_string (Gwdb.get_first_name p)
+
+let is_fully_visible_to_visitors conf base p =
+  let conf = { conf with Config.wizard = false; friend = false } in
+  is_visible conf base p
+
+let main_title conf base p =
+  let titles = nobtit conf base p in
+  match List.find_opt (fun x -> x.Def.t_name = Def.Tmain) titles with
+  | None -> ( match titles with x :: _ -> Some x | _ -> None)
+  | x -> x

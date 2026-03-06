@@ -26,7 +26,7 @@ let date_interval conf base t x =
       (fun t ->
         Option.iter set (Date.cdate_to_dmy_opt t.Def.t_date_start);
         Option.iter set (Date.cdate_to_dmy_opt t.Def.t_date_end))
-      (Util.nobtit conf base x);
+      (Person.nobtit conf base x);
     match t with
     | JustSelf -> ()
     | AddSpouse | AddChildren ->
@@ -145,7 +145,7 @@ let select_title_place conf base ~absolute title place =
   Gwdb.Collection.iter
     (fun i ->
       let x = Util.pget conf base i in
-      List.iter (select x) (Util.nobtit conf base x))
+      List.iter (select x) (Person.nobtit conf base x))
     (Gwdb.ipers base);
   (!list, !clean_title, !clean_place, !all_names)
 
@@ -161,7 +161,7 @@ let select_all_with_place conf base place =
   Gwdb.Collection.iter
     (fun i ->
       let x = Util.pget conf base i in
-      List.iter (select x) (Util.nobtit conf base x))
+      List.iter (select x) (Person.nobtit conf base x))
     (Gwdb.ipers base);
   (!list, !clean_place)
 
@@ -183,7 +183,7 @@ let select_title conf base ~absolute title =
   Gwdb.Collection.iter
     (fun i ->
       let x = Util.pget conf base i in
-      List.iter add_place (Util.nobtit conf base x))
+      List.iter add_place (Person.nobtit conf base x))
     (Gwdb.ipers base);
   (StrSet.elements !set, !clean_name, !all_names)
 
@@ -202,7 +202,7 @@ let select_place conf base place =
   Gwdb.Collection.iter
     (fun i ->
       let x = Util.pget conf base i in
-      List.iter add_title (Util.nobtit conf base x))
+      List.iter add_title (Person.nobtit conf base x))
     (Gwdb.ipers base);
   (!list, !clean_name)
 
@@ -212,7 +212,8 @@ let select_all proj conf base =
       let x = Util.pget conf base i in
       List.fold_left
         (fun s t -> StrSet.add (Gwdb.sou base (proj t)) s)
-        acc (Util.nobtit conf base x))
+        acc
+        (Person.nobtit conf base x))
     StrSet.empty (Gwdb.ipers base)
   |> StrSet.elements
 
@@ -233,7 +234,7 @@ let select_all2 proj conf base =
                 cnt
           in
           incr cnt)
-        (Util.nobtit conf base x))
+        (Person.nobtit conf base x))
     (Gwdb.ipers base);
   Hashtbl.fold (fun s cnt list -> (s, !cnt) :: list) ht []
 

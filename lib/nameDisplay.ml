@@ -146,7 +146,7 @@ let fullname_html_of_person = fullname_html_of_person ~p_surname:Gwdb.p_surname
 
 let gen_person_title_text reference conf base p =
   if Person.is_visible conf base p then
-    match Util.main_title conf base p with
+    match Person.main_title conf base p with
     | Some t ->
         let open Def in
         reference conf base p (title_html_of_person conf base p t)
@@ -178,7 +178,7 @@ let referenced_person_text_without_surname conf base p =
   reference conf base p (first_name_html_of_person conf base p)
 
 let person_text_without_title conf base p =
-  match Util.main_title conf base p with
+  match Person.main_title conf base p with
   | Some t -> (
       if Gwdb.eq_istr t.Def.t_place (Gwdb.get_surname p) then
         first_name_html_of_person conf base p
@@ -263,7 +263,7 @@ let husband_wife conf base p all =
         let fam = Gwdb.foi base (Gwdb.get_family p).(i) in
         let conjoint = Gutil.spouse (Gwdb.get_iper p) fam in
         let conjoint = Util.pget conf base conjoint in
-        if not @@ Util.is_empty_name conjoint then
+        if not @@ Person.is_empty_name conjoint then
           Printf.sprintf
             (Util.relation_txt conf (Gwdb.get_sex p) fam)
             (fun () -> "")
@@ -279,7 +279,7 @@ let husband_wife conf base p all =
         let fam = Gwdb.foi base (Gwdb.get_family p).(i) in
         let conjoint = Gutil.spouse (Gwdb.get_iper p) fam in
         let conjoint = Util.pget conf base conjoint in
-        if not @@ Util.is_empty_name conjoint then
+        if not @@ Person.is_empty_name conjoint then
           let res =
             let open Def in
             res

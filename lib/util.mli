@@ -69,11 +69,6 @@ val hidden_input_s : Config.config -> string -> string -> unit
 val submit_input : Config.config -> string -> Adef.encoded_string -> unit
 (** [submit_input conf k v] *)
 
-val nobtit : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title list
-(** [nobtit conf base p] returns list of titles of [p] from the [base]
-    that respects constraints imposed by [conf.allowed_titles] and
-    [conf.denied_titles] *)
-
 val strictly_after_private_years : Config.config -> Date.dmy -> bool
 
 (* TODO see if it can be removed from mli; it is used in geneanet's geneweb-plugin-api *)
@@ -132,10 +127,6 @@ val string_gen_family :
   (Gwdb.iper, Gwdb.ifam, Gwdb.istr) Def.gen_family ->
   (Gwdb.iper, Gwdb.ifam, string) Def.gen_family
 (** Remplaces string ids inside family's entry by their actual string value. *)
-
-val main_title : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title option
-(** Returns main person's title. If person doesn't have it, then returns first title
-    from the list. *)
 
 val max_ancestor_level : Config.config -> Gwdb.base -> Gwdb.iper -> int -> int
 
@@ -437,11 +428,6 @@ val string_with_macros :
     If [with_links_target_attribute] is set to true, html links are rewritten with target="_blank" attribute.
 *)
 
-val is_empty_name : Gwdb.person -> bool
-(** [is_empty_name p]
-    [false] if we knwon the first name or the last name of [p].
-*)
-
 (**/**)
 
 val copy_from_templ_ref :
@@ -509,10 +495,6 @@ val name_with_roman_number : string -> string option
 
 val designation : Gwdb.base -> Gwdb.person -> Adef.escaped_string
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
-
-val is_fully_visible_to_visitors :
-  Config.config -> Gwdb.base -> Gwdb.person -> bool
-(** [is_fully_visible_to_visitors conf base p] is true iff [p] is fully visible for a visitor *)
 
 val is_public : Config.config -> Gwdb.base -> Gwdb.person -> bool
 val read_base_env : bname:string -> (string * string) list
