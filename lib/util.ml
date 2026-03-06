@@ -1718,22 +1718,27 @@ let has_nephews_or_nieces conf base p =
   let exception Ok in
   try
     let a = p in
-    match Gwdb.get_parents a with
-    | None -> false
-    | Some ifam ->
-        let fam = Gwdb.foi base ifam in
-        Array.iter
-          (fun ip ->
-            if ip = Gwdb.get_iper p then ()
-            else
-              Array.iter
-                (fun ifam ->
-                  if Array.length (Gwdb.get_children (Gwdb.foi base ifam)) > 0
-                  then raise Ok)
-                (Gwdb.get_family (pget conf base ip)))
-          (Gwdb.get_children fam);
-        false
-  with Ok -> true
+    Option.map
+      (function
+        | None -> false
+        | Some fam ->
+            Array.iter
+              (fun ip ->
+                if Authorized.Person.equal ip p then ()
+                else
+                  Array.iter
+                    (fun ifam ->
+                      if
+                        Array.length
+                          (Authorized.Family.get_children ~conf ~base ifam)
+                        > 0
+                      then raise Ok)
+                    (Option.value ~default:[||]
+                       (Authorized.Person.get_family ~conf ~base p)))
+              (Authorized.Family.get_children ~conf ~base fam);
+            false)
+      (Authorized.Person.get_parents ~conf ~base a)
+  with Ok -> Some true
 
 let h s = Digest.to_hex (Digest.string s)
 

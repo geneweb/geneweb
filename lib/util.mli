@@ -336,7 +336,9 @@ val relation_type_text :
 val rchild_type_text :
   Config.config -> Def.relation_type -> Def.sex -> Adef.safe_string
 
-val has_nephews_or_nieces : Config.config -> Gwdb.base -> Gwdb.person -> bool
+val has_nephews_or_nieces :
+  Config.config -> Gwdb.base -> Authorized.Person.t -> bool option
+
 val browser_doesnt_have_tables : Config.config -> bool
 val doctype : Adef.safe_string
 
