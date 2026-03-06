@@ -42,3 +42,13 @@ val register_se :
 
 val se : (string * (Geneweb.Config.config -> string option -> unit)) list ref
 (** Table of hooks registered by plugins. *)
+
+val checksum : string -> string
+(** [checksum path] computes the SHA-256 sum of the cmxs files containes in the
+    directory [path]. *)
+
+val compute_dependencies : string -> (string list, string list) result
+(** [compute_dependencies path] returns a topologically sorted list of all
+    plugins found in [path] for safe loading.
+
+    If a circular dependency exists, it returns [Error cycle]. *)

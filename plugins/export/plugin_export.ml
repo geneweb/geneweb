@@ -2,6 +2,7 @@ open Geneweb
 open Config
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Plugin = Geneweb_plugin
 
 let ns = "export"
 
@@ -153,5 +154,4 @@ let export conf base =
       true
 
 let () =
-  Gwd_lib.GwdPlugin.register ~ns
-    [ ("EXPORT", fun _assets -> w_lock @@ w_base @@ export) ]
+  Plugin.register ~ns [ ("EXPORT", fun _assets -> w_lock @@ w_base @@ export) ]

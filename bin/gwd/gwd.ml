@@ -9,6 +9,7 @@ module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Sites = Geneweb_sites.Sites
+module Plugin = Geneweb_plugin
 
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
@@ -182,6 +183,19 @@ let parse_prefixes () =
   gw_prefix := Some p;
   Secure.add_assets p
 
+type plugin = {
+  (* Filesystem path to the plugin's directory. *)
+  path : string;
+  (* If [true], bypasses the checksum verification before loading. *)
+  unsafe : bool;
+  (* If [true], the plugin is loaded globally for all databases. *)
+  forced : bool;
+  (* If [true], [path] is treated as a parent directory containing multiple
+     sub-plugins to be discovered and loaded. If [false], [path] points
+     directly to a single plugin. *)
+  collection : bool;
+}
+
 let printer_conf = { Config.empty with output_conf }
 let auth_file = ref ""
 let cache_langs = ref []
@@ -201,9 +215,7 @@ let default_max_pending_requests = 150
 let max_pending_requests = ref default_max_pending_requests
 let no_host_address = ref false
 let only_addresses = ref []
-let plugins = ref []
-let forced_plugins = ref []
-let unsafe_plugins = ref []
+let plugins : plugin list ref = ref []
 let redirected_addr = ref None
 let robot_xcl = ref None
 let selected_addr = ref None
@@ -211,6 +223,7 @@ let selected_port = ref 2317
 let setup_link = ref false
 let trace_failed_passwd = ref false
 let debug = ref false
+let check = ref false
 let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
 let wizard_passwd = ref ""
@@ -391,28 +404,64 @@ exception
   Register_plugin_failure of
     string * [ `dynlink_error of Dynlink.error | `string of string ]
 
-let register_plugin dir =
-  if !debug then print_endline (__LOC__ ^ ": " ^ dir);
-  if not (List.mem dir !unsafe_plugins || GwdPluginMD5.allowed dir) then
-    failwith dir;
-  let pname = Filename.basename dir in
-  let plugin = Filename.concat dir @@ "plugin_" ^ pname ^ ".cmxs" in
+let add_lex_dir dir =
+  Filesystem.walk_folder
+    (fun e () ->
+      match e with
+      | Filesystem.File s -> lexicon_list := (dir // s) :: !lexicon_list
+      | _ -> ())
+    dir ()
+
+let load_cmxs cmxs =
+  try Dynlink.loadfile cmxs
+  with Dynlink.Error e ->
+    raise (Register_plugin_failure (cmxs, `dynlink_error e))
+
+module MS = Map.Make (String)
+
+let check_plugin =
+  let sums = MS.of_seq @@ List.to_seq Plugin_checksums.checksums in
+  fun path ->
+    let pname = Filename.basename path in
+    match MS.find pname sums with
+    | exception Not_found -> false
+    | sum -> Plugin.checksum path = sum
+
+let load_plugin ~unsafe ~forced path =
+  let pname = Filename.basename path in
+  Logs.debug (fun k ->
+      k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
+  if not (unsafe || check_plugin path) then (
+    Logs.err (fun k ->
+        k "Refuse to load plugin %s for cause of wrong checksum." pname);
+    exit 1);
+  let pname = Filename.basename path in
+  let cmxs =
+    let s = Fmt.str "plugin_%s.cmxs" pname in
+    path // s
+  in
   lexicon_fname := !lexicon_fname ^ pname ^ ".";
-  let lex_dir = Filename.concat (Filename.concat dir "assets") "lex" in
-  if Sys.file_exists lex_dir then (
-    let lex = Sys.readdir lex_dir in
-    Array.sort compare lex;
-    Array.iter
-      (fun f ->
-        let f = Filename.concat lex_dir f in
-        if not (Sys.is_directory f) then lexicon_list := f :: !lexicon_list)
-      lex);
-  let assets = Filename.concat dir "assets" in
-  GwdPlugin.assets := assets;
-  (try Dynlink.loadfile plugin
-   with Dynlink.Error e ->
-     raise (Register_plugin_failure (plugin, `dynlink_error e)));
-  GwdPlugin.assets := ""
+  let lex_dir = path // "assets" // "lex" in
+  if Sys.file_exists lex_dir then add_lex_dir lex_dir;
+  Plugin.assets := path // "assets";
+  Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
+  load_cmxs cmxs
+
+let load_plugins { path; unsafe; forced; collection } =
+  if not collection then load_plugin ~unsafe ~forced path
+  else
+    match Plugin.compute_dependencies path with
+    | Ok deps ->
+        List.iter (fun d -> load_plugin ~unsafe ~forced (path // d)) deps
+    | Error cycle ->
+        Logs.err (fun k ->
+            k
+              "Cycle found while computing dependencies of the plugin \
+               collection %S:@ %a"
+              path
+              Fmt.(list ~sep:(const string " -> ") string)
+              cycle);
+        exit 1
 
 let alias_lang lang =
   if String.length lang < 2 then lang
@@ -1488,6 +1537,16 @@ let make_conf ~secret_salt from_addr request script_name env =
     with Not_found | Failure _ -> 150
   in
   let username, userkey = split_username ar.ar_name in
+  let forced_plugins =
+    List.fold_left
+      (fun acc { path; forced; _ } ->
+        if forced then Filename.basename path :: acc else acc)
+      [] !plugins
+    |> List.rev
+  in
+  let plugins =
+    List.fold_left (fun acc { path; _ } -> path :: acc) [] !plugins |> List.rev
+  in
   let conf =
     {
       from = from_addr;
@@ -1605,8 +1664,8 @@ let make_conf ~secret_salt from_addr request script_name env =
       etc_prefix = Option.get !etc_prefix;
       cgi;
       output_conf;
-      forced_plugins = !forced_plugins;
-      plugins = !plugins;
+      forced_plugins;
+      plugins;
       secret_salt = Some secret_salt;
       predictable_mode = !predictable_mode;
     }
@@ -1940,11 +1999,11 @@ let find_misc_file conf name =
   if
     Sys.file_exists name
     && List.exists
-         (fun p -> Mutil.start_with (Filename.concat p "assets") 0 name)
+         (fun { path; _ } -> Mutil.start_with (path // "assets") 0 name)
          !plugins
   then name
   else
-    let name' = Filename.concat (!GWPARAM.etc_d conf.bname) name in
+    let name' = !GWPARAM.etc_d conf.bname // name in
     if Sys.file_exists name' then name'
     else
       let name' = Util.search_in_assets @@ Filename.concat "etc" name in
@@ -2372,46 +2431,16 @@ let arg_plugin opt doc =
   ( opt,
     Arg.Unit
       (fun () ->
-        let unsafe, force, s = arg_plugin_aux () in
-        if unsafe then unsafe_plugins := !unsafe_plugins @ [ s ];
-        if force then
-          forced_plugins := !forced_plugins @ [ Filename.basename s ];
-        plugins := !plugins @ [ s ]),
+        let unsafe, forced, path = arg_plugin_aux () in
+        plugins := !plugins @ [ { path; unsafe; forced; collection = false } ]),
     arg_plugin_doc opt doc )
 
 let arg_plugins opt doc =
   ( opt,
     Arg.Unit
       (fun () ->
-        let unsafe, force, s = arg_plugin_aux () in
-        let ps = Array.to_list (Sys.readdir s) in
-        let deps_ht = Hashtbl.create 0 in
-        let deps =
-          List.map
-            (fun pname ->
-              let dir = Filename.concat s pname in
-              if (not unsafe) && not (GwdPluginMD5.allowed dir) then failwith s;
-              Hashtbl.add deps_ht pname dir;
-              let f = Filename.concat dir "META" in
-              if Sys.file_exists f then
-                (pname, GwdPluginMETA.((parse f).depends))
-              else (pname, []))
-            ps
-        in
-        match GwdPluginDep.sort deps with
-        | GwdPluginDep.ErrorCycle _ -> assert false
-        | GwdPluginDep.Sorted deps ->
-            List.iter
-              (fun pname ->
-                try
-                  let s = Hashtbl.find deps_ht pname in
-                  if unsafe then unsafe_plugins := !unsafe_plugins @ [ s ];
-                  if force then forced_plugins := !forced_plugins @ [ pname ];
-                  plugins := !plugins @ [ s ]
-                with Not_found ->
-                  raise
-                    (Register_plugin_failure (pname, `string "Missing plugin")))
-              deps),
+        let unsafe, forced, path = arg_plugin_aux () in
+        plugins := !plugins @ [ { path; unsafe; forced; collection = true } ]),
     arg_plugin_doc opt doc )
 
 let print_version_commit () =
@@ -2435,6 +2464,10 @@ let set_debug_flag () =
   set_verbosity_level 7;
   Logs.set_level ~all:true (Some Logs.Debug);
   Sys.enable_runtime_warnings true
+
+let set_check_flag () =
+  check := true;
+  set_debug_flag ()
 
 let set_predictable_mode () =
   Logs.warn (fun k ->
@@ -2572,6 +2605,10 @@ let parse_cmd () =
       ( "-nolock",
         Arg.Set Lock.no_lock_flag,
         " Do not lock files before writing." );
+      ( "-check",
+        Arg.Unit set_check_flag,
+        " Run only the server startup sequence for test purpose. This flag \
+         implies -debug." );
       arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin.";
       arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.";
       ( "-version",
@@ -2662,8 +2699,10 @@ let main () =
     process "" false (Array.to_list Sys.argv)
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
-  List.iter register_plugin !plugins;
+  List.iter load_plugins !plugins;
   GWPARAM.init ();
+  (* FIXME: this line MUST be after plugin loading as plugins can modified
+     [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
   cache_lexicon ();
   List.iter
     (fun dbn ->
@@ -2699,6 +2738,7 @@ let main () =
     with Not_found -> ("" |> Adef.encoded, !force_cgi)
   in
   Util.is_welcome := false;
+  if !check then exit 0;
   if cgi then (
     Wserver.cgi := true;
     set_binary_mode_out stdout true;
