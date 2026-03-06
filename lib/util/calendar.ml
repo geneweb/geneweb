@@ -1,8 +1,24 @@
+let of_sdn : type a. a Calendars.kind -> Calendars.sdn -> a Calendars.date =
+ fun kind sdn ->
+  match kind with
+  | Calendars.Gregorian -> Calendars.gregorian_of_sdn sdn
+  | Calendars.Julian -> Calendars.julian_of_sdn sdn
+  | Calendars.French -> Calendars.french_of_sdn sdn
+  | Calendars.Hebrew -> Calendars.hebrew_of_sdn sdn
+  | Calendars.Islamic -> Calendars.islamic_of_sdn sdn
+
 let to_calendar_date kind { Def.day; month; year; delta; _ } =
   let day = max 1 day in
   let month = max 1 month in
   match Calendars.make kind ~day ~month ~year ~delta with
   | Ok d -> d
+  | Error { kind = Invalid_day; _ } -> (
+      match Calendars.make kind ~day:1 ~month ~year ~delta with
+      | Ok d -> of_sdn kind (Calendars.to_sdn d + day - 1)
+      | Error err ->
+          failwith
+            (Printf.sprintf "Invalid date: %s"
+               (Calendars.Unsafe.to_string err.value)))
   | Error err ->
       failwith
         (Printf.sprintf "Invalid date: %s"

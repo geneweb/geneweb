@@ -147,6 +147,15 @@
 %include;trl
 %include;copyr
 </div>
+<script>
+document.querySelectorAll('input[name^="y"]')
+  .forEach(function(el){
+    el.addEventListener('input',function(){
+      el.classList.toggle('is-invalid',
+        el.value==='0');
+    });
+  });
+</script>
 %include;js
 %query_time;
 </body>
