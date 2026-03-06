@@ -918,10 +918,13 @@ let infer_death birth bapt =
     else if a < !state.alive_years then NotDead
     else DontKnowIfDead
   in
-  match birth, bapt with
-  | Some (Date.Dgreg (d, _)), _ -> aux d
-  | _, Some (Date.Dgreg (d, _)) -> aux d
-  | _ -> DontKnowIfDead
+  match birth with
+  | Some (Date.Dgreg (d, _)) -> aux d
+  | None | Some (Dtext _) -> (
+    match bapt with
+    | Some (Date.Dgreg (d, _)) -> aux d
+    | None | Some (Dtext _) -> DontKnowIfDead
+  )
 
 (* Fonctions utiles pour la mise en forme des noms. *)
 
