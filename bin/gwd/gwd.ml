@@ -9,6 +9,8 @@ module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Sites = Geneweb_sites.Sites
+module Server = Geneweb_http.Server
+module Code = Geneweb_http.Code
 
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
@@ -78,7 +80,7 @@ let make_gzip_output_conf ~level request =
   else
     let body_buf = Buffer.create 65536 in
     let headers_buf = Buffer.create 1024 in
-    let status_ref = ref Def.OK in
+    let status_ref = ref Code.OK in
     let flushed = ref false in
     let is_compressible = ref false in
     Some
@@ -116,9 +118,9 @@ let make_gzip_output_conf ~level request =
                   with _ -> (body, false)
                 else (body, false)
               in
-              let oc = Wserver.woc () in
-              let status_line = Wserver.string_of_status !status_ref in
-              if not !Wserver.cgi then
+              let oc = Server.woc () in
+              let status_line = Code.to_string !status_ref in
+              if not !Server.cgi then
                 Printf.fprintf oc "HTTP/1.0 %s\r\n" status_line
               else Printf.fprintf oc "Status: %s\r\n" status_line;
               if is_gzipped then begin
@@ -139,10 +141,10 @@ let make_gzip_output_conf ~level request =
 
 let output_conf =
   {
-    status = Wserver.http;
-    header = Wserver.header;
-    body = Wserver.print_string;
-    flush = Wserver.wflush;
+    status = Server.http;
+    header = Server.header;
+    body = Server.print_string;
+    flush = Server.wflush;
   }
 
 let ( // ) = Filename.concat
@@ -302,7 +304,7 @@ let http conf status =
 
 let robots_txt conf =
   Logs.info (fun k -> k "Robot request");
-  Output.status conf Def.OK;
+  Output.status conf Code.OK;
   Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
   else (
@@ -311,7 +313,7 @@ let robots_txt conf =
 
 let refuse_log conf from =
   Logs.info (fun k -> k "Excluded: %s" from);
-  http conf Def.Forbidden;
+  http conf Code.Forbidden;
   Output.header conf "Content-type: text/html";
   Output.print_sstring conf
     "Your access has been disconnected by administrator.\n";
@@ -320,7 +322,7 @@ let refuse_log conf from =
 
 let only_log conf from =
   Logs.info (fun k -> k "Connection refused from %s" from);
-  http conf Def.OK;
+  http conf Code.OK;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
   Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
@@ -537,7 +539,7 @@ let trace_auth base_env f =
 
 let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  Output.status conf Def.Unauthorized;
+  Output.status conf Code.Unauthorized;
   if !use_auth_digest_scheme then
     let nonce = digest_nonce conf.ctime in
     let _ =
@@ -804,7 +806,7 @@ let refresh_url conf bname =
     in
     serv ^ req
   in
-  http conf Def.OK;
+  http conf Code.OK;
   Output.header conf "Content-type: text/html";
   Output.printf conf
     "<head>\n\
@@ -1021,7 +1023,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
   let ok, wizard, friend, username =
-    if (not !Wserver.cgi) && (passwd = "w" || passwd = "f") then
+    if (not !Server.cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
         if wizard_passwd = "" && wizard_passwd_file = "" then
           (true, true, friend_passwd = "", "")
@@ -1069,15 +1071,13 @@ let basic_authorization from_addr request base_env passwd access_type utm
     if access_type = ATset then
       if wizard then
         let pwd_id = set_token utm from_addr base_file 'w' user username in
-        if !Wserver.cgi then (command, pwd_id)
-        else (base_file ^ "_" ^ pwd_id, "")
+        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
       else if friend then
         let pwd_id = set_token utm from_addr base_file 'f' user username in
-        if !Wserver.cgi then (command, pwd_id)
-        else (base_file ^ "_" ^ pwd_id, "")
-      else if !Wserver.cgi then (command, "")
+        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+      else if !Server.cgi then (command, "")
       else (base_file, "")
-    else if !Wserver.cgi then (command, passwd)
+    else if !Server.cgi then (command, passwd)
     else if passwd = "" then
       if auto = "auto" then
         let suffix = if wizard then "_w" else if friend then "_f" else "" in
@@ -1205,7 +1205,7 @@ let digest_authorization request base_env passwd utm base_file command =
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
   in
-  let command = if !Wserver.cgi then command else base_file in
+  let command = if !Server.cgi then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
     {
       ar_ok = true;
@@ -1303,7 +1303,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
   match access_type with
   | ATwizard (user, username) ->
       let command, passwd =
-        if !Wserver.cgi then (command, passwd)
+        if !Server.cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1322,7 +1322,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
       }
   | ATfriend (user, username) ->
       let command, passwd =
-        if !Wserver.cgi then (command, passwd)
+        if !Server.cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1341,7 +1341,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
       }
   | ATnormal ->
       let command, passwd =
-        if !Wserver.cgi then (command, "") else (base_file, "")
+        if !Server.cgi then (command, "") else (base_file, "")
       in
       {
         ar_ok = true;
@@ -1376,7 +1376,7 @@ let make_conf ~secret_salt from_addr request script_name env =
     Logs.warn (fun k -> k "%s" str));
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
-  let cgi = !Wserver.cgi in
+  let cgi = !Server.cgi in
   let command, base_file, passwd, env, access_type =
     let base_access, env =
       let x, env = extract_assoc "b" env in
@@ -1508,7 +1508,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       user_iper = None;
       auth_scheme = ar.ar_scheme;
       command = ar.ar_command;
-      indep_command = (if !Wserver.cgi then ar.ar_command else "geneweb") ^ "?";
+      indep_command = (if !Server.cgi then ar.ar_command else "geneweb") ^ "?";
       highlight =
         (try List.assoc "highlight_color" base_env
          with Not_found -> green_color);
@@ -1567,7 +1567,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       senv = [];
       cgi_passwd = ar.ar_passwd;
       henv =
-        ((if not !Wserver.cgi then []
+        ((if not !Server.cgi then []
           else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
           else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
         @ (if lang = "" then [] else [ ("lang", Mutil.encode lang) ])
@@ -1757,7 +1757,7 @@ let conf_and_connection =
     | None -> (
         let auth_err, auth =
           if conf.auth_file = "" then (false, "")
-          else if !Wserver.cgi then (true, "")
+          else if !Server.cgi then (true, "")
           else auth_err request conf.auth_file
         in
         let mode = Util.p_getenv conf.env "m" in
@@ -1768,7 +1768,7 @@ let conf_and_connection =
            in
            log_and_robot_check conf auth from request script_name
              (contents :> string));
-        match (!Wserver.cgi, auth_err, passwd_err) with
+        match (!Server.cgi, auth_err, passwd_err) with
         | true, true, _ ->
             if is_robot from then Robot.robot_error conf 0 0 else no_access conf
         | _, true, _ ->
@@ -1906,7 +1906,7 @@ type misc_fname =
 type content_encoding = No_encoding | Gzip | Brotli
 
 let content_misc conf len misc_fname encoding =
-  Output.status conf Def.OK;
+  Output.status conf Code.OK;
   let fname, t =
     match misc_fname with
     | Css fname -> (fname, "text/css; charset=UTF-8")
@@ -1970,7 +1970,7 @@ let print_misc_file conf misc_fname encoding =
           else
             let olen = min (Bytes.length buf) len in
             really_input ic buf 0 olen;
-            Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
+            Server.printf "%s" (Bytes.sub_string buf 0 olen);
             loop (len - olen)
         in
         loop len;
@@ -2256,7 +2256,13 @@ let geneweb_server ~predictable_mode () =
         secret_salt
     | _ -> retrieve_secret_salt ()
   in
-  Wserver.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+  (* FIXME: this hack is necessary to avoid a cyclic dependency between
+     `geneweb` and `geneweb-http`. We must remove it after refactoring
+     the encoded string subsystem. *)
+  let connection ~secret_salt x y z =
+    connection ~secret_salt x y (Adef.encoded z)
+  in
+  Server.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
     (connection ~secret_salt)
 
@@ -2345,8 +2351,8 @@ let make_sock_dir x =
   Filesystem.create_dir ~parent:true x;
   if Sys.unix then ()
   else (
-    Wserver.sock_in := Filename.concat x "gwd.sin";
-    Wserver.sock_out := Filename.concat x "gwd.sou");
+    Server.sock_in := Filename.concat x "gwd.sin";
+    Server.sock_out := Filename.concat x "gwd.sou");
   GWPARAM.sock_dir := x
 
 let arg_plugin_doc opt doc =
@@ -2646,8 +2652,8 @@ let parse_cmd () =
 
 let main () =
   if not Sys.unix then (
-    Wserver.sock_in := "gwd.sin";
-    Wserver.sock_out := "gwd.sou");
+    Server.sock_in := "gwd.sin";
+    Server.sock_out := "gwd.sou");
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2692,7 +2698,7 @@ let main () =
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Mutil.particles_file = "" then
     Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
-  Wserver.stop_server :=
+  Server.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
   let query, cgi =
     try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
@@ -2700,7 +2706,7 @@ let main () =
   in
   Util.is_welcome := false;
   if cgi then (
-    Wserver.cgi := true;
+    Server.cgi := true;
     set_binary_mode_out stdout true;
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (

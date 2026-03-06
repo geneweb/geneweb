@@ -16,7 +16,7 @@
  (name gwd_lib)
  (public_name geneweb.gwd_lib)
  (wrapped true)
- (libraries geneweb wserver dune-site)
+ (libraries geneweb geneweb_http dune-site)
  (modules gwdPlugin request geneweb_sites))
 
 (executable
@@ -38,5 +38,5 @@
   str
   unix
   uri
-  wserver)
+  geneweb_http)
  (modules base64 gwd gwdPluginDep gwdPluginMD5 gwdPluginMETA robot))
