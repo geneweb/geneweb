@@ -418,8 +418,9 @@ fr: Autour de l'arbre
           <i class="fas fa-clock-rotate-left fa-fw mr-1" aria-hidden="true"></i>[*history]</a>
       %end;
     %end;
-    %if;(plugin.forum and b.disable_forum!="yes")
-      <a class="btn btn-outline-primary" href="%prefix;m=FORUM">%nn;
+    %if;((plugin.forum or roglo) and b.disable_forum!="yes")
+      <a class="btn btn-outline-primary"
+        href="%if;roglo;https://forum.roglo.eu%else;%prefix;m=FORUM%end;">%nn;
         <i class="far fa-comments fa-fw mr-1" aria-hidden="true"></i>[*forum]</a>
     %end;
     %if;(b.propose_place_surnames!="no" and nb_persons.v!=0)
@@ -432,7 +433,8 @@ fr: Autour de l'arbre
     %end;
     <a role="button" class="btn btn-outline-primary" href="%prefix;m=CAL">%nn;
       <i class="far fa-calendar-days fa-fw mr-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
-    %if;wizard;
+    %if;((roglo and (user.ident in b.superwizard or (b.superwizard="all" and wizard)))
+      or ((not roglo) and wizard))
       <a role="button" class="btn btn-outline-success" href="%prefix;m=H&v=conf">%nn;
         <i class="fas fa-gear fa-fw mr-1" aria-hidden="true"></i>[*configuration]1</a>
     %end;
@@ -494,7 +496,7 @@ fr: Mon compte associatif
   </div>
 %end;
 %if;(((not roglo and wizard) or (roglo and user.ident!=""
-    and (user.ident in b.superwizard or b.superwizard="all"))) and nb_persons.v!=0)
+    and (user.ident in b.superwizard or (b.superwizard="all" and wizard)))) and nb_persons.v!=0)
   <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-9 mx-auto">
     <div class="h4 text-md-center">
       <i class="fas fa-book fa-sm fa-fw text-success mr-1"></i>[*book/books]1%nn;
