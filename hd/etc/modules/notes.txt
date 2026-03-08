@@ -45,7 +45,7 @@
                 %if;not cancel_links;
                   <a href="#wed-callnote-%count;" id="note-wed-%count;" title="[see] [marriage/marriages]0">^</a>%nn;
                 %else;^%end;
-                %if;(nb_families>1) %apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end;
+                %if;(nb_families>1) %apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end;%sp;
                 %spouse.first_name; %spouse.surname;[:] %comment;
               </li>
           %end;
