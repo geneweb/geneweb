@@ -495,14 +495,10 @@ let has_date base p =
 
 (* Authorization checks for person access *)
 let p_auth conf base p =
-  let mode_semi_public =
-    try List.assoc "semi_public" conf.Config.base_env = "yes"
-    with Not_found -> false
-  in
   let access = Driver.get_access p in
   let not_private = access <> Def.Private in
   conf.Config.wizard
-  || ((not mode_semi_public) && conf.Config.friend)
+  || ((not conf.Config.semi_public) && conf.Config.friend)
   || conf.user_iper = Some (Driver.get_iper p)
   || access = Def.Public
   || conf.Config.public_if_titles && access = Def.IfTitles
@@ -521,7 +517,7 @@ let p_auth conf base p =
       | Some d ->
           let a = Date.time_elapsed d conf.today in
           if a.Adef.year > lim then true
-          else if a.Adef.year = 0 then a.month > 0 || a.day > 0
+          else if a.Adef.year = lim && (a.month > 0 || a.day > 0) then true
           else none ()
     in
     check_date
