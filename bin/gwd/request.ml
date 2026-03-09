@@ -200,7 +200,7 @@ let very_unknown conf _ =
       | None -> incorrect_request conf)
 
 (* Print Not found page *)
-let unknown conf n =
+let unknown ?(with_status = true) conf n =
   let title _ =
     Geneweb.Util.transl conf "not found"
     |> Utf8.capitalize_fst
@@ -210,7 +210,7 @@ let unknown conf n =
     Geneweb.Output.print_string conf (Geneweb.Util.escape_html n);
     Geneweb.Output.print_sstring conf {|"|}
   in
-  Geneweb.Output.status conf Def.Not_Found;
+  if with_status then Geneweb.Output.status conf Def.Not_Found;
   Geneweb.Hutil.rheader conf title;
   Geneweb.Hutil.print_link_to_welcome conf false;
   Geneweb.Hutil.trailer conf
@@ -490,7 +490,8 @@ module NG = struct
             conf base n
         in
         Geneweb.Search_name_display.surname_print ~query_params conf base
-          unknown sres
+          (unknown ~with_status:false)
+          sres
     | [ p ] ->
         if
           sosa_acc
@@ -530,7 +531,8 @@ module NG = struct
             conf base sn
         in
         Geneweb.Search_name_display.surname_print ~query_params conf base
-          unknown sres
+          (unknown ~with_status:false)
+          sres
     | None, None, None -> incorrect_request conf base
 
   let ng

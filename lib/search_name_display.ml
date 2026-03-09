@@ -869,7 +869,7 @@ let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
       let pl = List.filter (fun p -> Person.has_visible_name conf base p) pl in
       print_family_alphabetic query_params.last_name conf base pl
   | `Branch -> (
-      let () =
+      let print_canonical ?status () =
         let canonical_url =
           Page.Last_name_search.canonical_url
             ~conf:(Config.Trimmed.from_config conf)
@@ -883,17 +883,22 @@ let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
                 ~lang query_params)
             Lang.all
         in
+        Option.iter (Output.status conf) status;
         Output.link_header
           (Config.Trimmed.from_config conf)
           canonical_url ~alternate_urls
       in
       match (bhl, list) with
-      | [], _ -> not_found_fun conf query_params.last_name
+      | [], _ ->
+          print_canonical ~status:Def.Not_Found ();
+          not_found_fun conf query_params.last_name
       | _, [ (s, (strl, _)) ] ->
+          print_canonical ();
           print_one_surname_by_branch ~exact:query_params.exact conf base
             query_params.last_name strl (bhl, s)
       | _ ->
           let strl = List.map fst list in
+          print_canonical ();
           print_several_possible_surnames query_params.last_name
             (Config.Trimmed.from_config conf)
             base (bhl, strl))
