@@ -13,12 +13,17 @@ module Sites = Geneweb_sites.Sites
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
 
-let pp_brackets pp_v ppf v = Fmt.pf ppf "[%a] " pp_v v
-let pp_h ~style ppf = pp_brackets Fmt.(styled style string) ppf
+let pp_brackets ~style ppf v = Fmt.pf ppf "[%a]" Fmt.(styled style string) v
+
+let pp_h ~style ppf h =
+  let timestamp = Ptime.to_rfc3339 @@ Ptime_clock.now () in
+  Fmt.pf ppf "%a%a: "
+    (pp_brackets ~style:`Magenta)
+    timestamp (pp_brackets ~style) h
 
 let pp_header ppf (l, h) =
   match l with
-  | Logs.App -> Option.iter (pp_brackets Fmt.(styled `Cyan string) ppf) h
+  | Logs.App -> Option.iter (pp_brackets ~style:`Cyan ppf) h
   | Logs.Error -> pp_h ~style:`Red ppf (Option.value ~default:"ERROR" h)
   | Logs.Warning -> pp_h ~style:`Yellow ppf (Option.value ~default:"WARNING" h)
   | Logs.Info -> pp_h ~style:`Blue ppf (Option.value ~default:"INFO" h)
