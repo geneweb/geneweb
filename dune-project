@@ -29,6 +29,7 @@
     fmt
     logs
     logs-syslog
+    ptime
     jingoo
     markup
     ounit
