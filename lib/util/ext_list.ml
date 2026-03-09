@@ -221,3 +221,7 @@ let groupby ~key ~value list =
       else Hashtbl.add h k [ v ])
     list;
   Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
+
+let fold_right f l acc =
+  let l = List.rev l in
+  List.fold_left (fun acc a -> f a acc) acc l

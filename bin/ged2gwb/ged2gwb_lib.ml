@@ -1066,9 +1066,9 @@ let flatten_notes =
   in aux []
 
 let extract_notes gen rl =
-  List.fold_right
+  Ext_list.fold_right
     (fun r lines ->
-       List.fold_right
+       Ext_list.fold_right
          (fun r lines ->
             r.rused <- true;
             if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] = '@' then
