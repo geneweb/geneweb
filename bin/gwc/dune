@@ -1,5 +1,11 @@
+(library
+ (name gwcomp)
+ (libraries geneweb)
+ (modules gwcomp))
+
 (executable
  (package geneweb)
  (name gwc)
  (public_name gwc)
- (libraries unix geneweb))
+ (libraries unix gwcomp)
+ (modules gwc db1link))
