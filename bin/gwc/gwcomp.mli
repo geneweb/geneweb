@@ -106,10 +106,10 @@ val create_all_keys : bool ref
     gwplus format. *)
 
 val verbose : bool ref
-val out_file : string ref
 
-val comp_families : string -> unit
-(** Compile .gw file and save result to corresponding .gwo *)
+val compile : bname:string -> output:string -> string -> unit
+(** [compile ~bname ~output input] compiles the .gw file [input] and save result
+    to corresponding .gwo file [output]. *)
 
 (* Ajout pour l'API *)
 

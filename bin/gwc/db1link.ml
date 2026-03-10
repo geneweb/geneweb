@@ -73,13 +73,15 @@ type cbase = {
 (** State of the base collecting all information at link time used to create
     further Geneweb database *)
 
+type bnotes = Merge | Erase | First | Drop
+
 type file_info = {
   (* current .gw filename *)
   mutable f_curr_src_file : string; (* current .gwo filename *)
   mutable f_curr_gwo_file : string;
       (* all persons from current file should be separated  *)
   mutable f_separate : bool; (* behavior for base notes from current file *)
-  mutable f_bnotes : [ `merge | `erase | `first | `drop ];
+  mutable f_bnotes : bnotes;
       (* shift all persons from the current file with the given number *)
   mutable f_shift : int;
       (* Table that associates person's names hash and its occurence number
@@ -1120,7 +1122,7 @@ let insert_notes fname gen key str =
     content [str] that is treated by the way mentioned in
     [gen.g_file_info.f_bnotes]. *)
 let insert_bnotes fname gen nfname str =
-  if gen.g_file_info.f_bnotes <> `drop then
+  if gen.g_file_info.f_bnotes <> Drop then
     let old_nread = gen.g_base.c_bnotes.nread in
     (* Convert path notation from 'dir1:dir2:file' to 'dir1/dir2/file'
        (if a valid path) *)
@@ -1134,11 +1136,10 @@ let insert_bnotes fname gen nfname str =
     let bnotes =
       let str =
         match gen.g_file_info.f_bnotes with
-        | `drop -> assert false
-        | `erase -> str
-        | `merge -> old_nread nfname RnAll ^ str
-        | `first -> (
-            match old_nread nfname RnAll with "" -> str | str -> str)
+        | Drop -> assert false
+        | Erase -> str
+        | Merge -> old_nread nfname RnAll ^ str
+        | First -> ( match old_nread nfname RnAll with "" -> str | str -> str)
       in
       {
         nread = (fun f n -> if f = nfname then str else old_nread f n);
@@ -1674,7 +1675,7 @@ let link ?(no_warn = false) next_family_fun bdir =
       f_curr_gwo_file = "";
       f_separate = false;
       f_shift = 0;
-      f_bnotes = `merge;
+      f_bnotes = Merge;
     }
   in
   let gen =
