@@ -24,6 +24,10 @@ open Config
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
+   [[image:filename.jpg]] inline image from the notes image directory
+   [[image:subdir:filename.jpg]] image in a subdirectory (use ':' as separator)
+   [[image:filename.jpg/alt text]] image with alt text
+   [[image:filename.jpg/alt text/200px]] image with alt text and CSS max-width
    empty line : new paragraph
    lines starting with space : displayed as they are (providing 1/ there
      are at least two 2/ there is empty lines before and after the group
