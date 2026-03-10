@@ -240,6 +240,7 @@ let update_notes_links_db base fnotes s =
             in
             loop list_nt list_ind (pos + 1) j
         | NotesLinks.WLwizard (j, _, _) -> loop list_nt list_ind pos j
+        | NotesLinks.WLimage (j, _, _, _) -> loop list_nt list_ind pos j
         | NotesLinks.WLnone (j, _) -> loop list_nt list_ind pos j
     in
     loop [] [] 1 0
@@ -430,7 +431,10 @@ let rewrite_key s oldk newk _file =
     if i >= slen then rs
     else
       match NotesLinks.misc_notes_link s i with
-      | WLpage (j, _, _, _, _) | WLwizard (j, _, _) | WLnone (j, _) ->
+      | WLpage (j, _, _, _, _)
+      | WLwizard (j, _, _)
+      | WLimage (j, _, _, _)
+      | WLnone (j, _) ->
           let ss = String.sub s i (j - i) in
           rebuild (rs ^ ss) j
       | WLperson (j, k, name, text, fam_marker) ->
