@@ -1223,7 +1223,9 @@ let create_env s =
         Adef.encoded (String.sub s (succ i) (String.length s - succ i)) )
     else separate (succ i) s
   in
-  List.map (separate 0) (get_assoc 0 0)
+  List.filter_map
+    (fun s -> if s = "" then None else Some (separate 0 s))
+    (get_assoc 0 0)
 
 let std_color conf (s : Adef.safe_string) =
   "<span style=\"color:" ^<^ conf.highlight ^<^ "\">" ^<^ s ^>^ "</span>"
