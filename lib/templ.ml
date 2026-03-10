@@ -421,6 +421,7 @@ and eval_simple_variable conf = function
   | "prefix_no_lang" -> (Util.commd ~excl:[ "lang" ] conf :> string)
   | "prefix_no_all" ->
       (Util.commd ~excl:[ "templ"; "p_mod"; "wide" ] conf :> string)
+  | "prefix_no_senv" -> (Util.commd ~senv:false conf :> string)
   | "referer" -> (Util.get_referer conf :> string)
   | "right" -> conf.right
   | "sosa_ref" -> (
