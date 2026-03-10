@@ -15,12 +15,15 @@ type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
 
 let pp_brackets ~style ppf v = Fmt.pf ppf "[%a]" Fmt.(styled style string) v
+let predictable_mode = ref false
 
 let pp_h ~style ppf h =
-  let timestamp = Ptime.to_rfc3339 @@ Ptime_clock.now () in
-  Fmt.pf ppf "%a%a: "
-    (pp_brackets ~style:`Magenta)
-    timestamp (pp_brackets ~style) h
+  if not !predictable_mode then
+    Fmt.pf ppf "%a%a: "
+      (pp_brackets ~style:`Magenta)
+      (Ptime.to_rfc3339 @@ Ptime_clock.now ())
+      (pp_brackets ~style) h
+  else Fmt.pf ppf "%a " (pp_brackets ~style) h
 
 let pp_header ppf (l, h) =
   match l with
@@ -232,7 +235,6 @@ let check = ref false
 let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
 let wizard_passwd = ref ""
-let predictable_mode = ref false
 let log_file : log ref = ref Stderr
 let verbosity_level = ref 6
 let debug_flag = ref false
@@ -2472,6 +2474,7 @@ let set_debug_flag () =
 
 let set_check_flag () =
   check := true;
+  predictable_mode := true;
   set_debug_flag ()
 
 let set_predictable_mode () =
