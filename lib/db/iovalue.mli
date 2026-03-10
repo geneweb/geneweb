@@ -12,7 +12,8 @@ val output : out_channel -> 'a -> unit
 (** Output a value to the giving channel. Identical to [Marshal.to_channel] with
     [No_sharing] flag. *)
 
-val output_array_access : out_channel -> (int -> 'a) -> int -> int -> int
+val output_array_access :
+  out_channel -> (int -> 'a) -> int -> Position.t -> Position.t
 (** [output_array_acces oc getf arr_get arr_len pos] prints to the channel
     [oc] position for each element (that could be obtained with [arr_get]) in
     the binary file where marshalled array is stored. Array should be of length
