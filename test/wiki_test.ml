@@ -6,8 +6,10 @@ let f s =
     if i = len then List.rev acc
     else
       match misc_notes_link s i with
-      | (WLpage (j, _, _, _, _) | WLperson (j, _, _, _, _) | WLwizard (j, _, _))
-        as x ->
+      | ( WLpage (j, _, _, _, _)
+        | WLperson (j, _, _, _, _)
+        | WLwizard (j, _, _)
+        | WLimage (j, _, _, _) ) as x ->
           loop (x :: acc) j
       | WLnone (j, _text) as wn -> loop (wn :: acc) j
   in
@@ -61,6 +63,18 @@ let l =
     ([ WLwizard (14, "hg", "henri") ], "[[w:hg/henri]]");
     ( [ WLnone (1, "["); WLnone (2, "["); WLwizard (16, "hg", "henri") ],
       "[[[[w:hg/henri]]" );
+    ([ WLimage (19, ([], "photo.jpg"), "", None) ], "[[image:photo.jpg]]");
+    ( [ WLimage (24, ([ "albums" ], "pic.jpg"), "", None) ],
+      "[[image:albums:pic.jpg]]" );
+    ( [ WLimage (28, ([], "photo.jpg"), "my photo", None) ],
+      "[[image:photo.jpg/my photo]]" );
+    ( [ WLimage (34, ([], "photo.jpg"), "my photo", Some "200px") ],
+      "[[image:photo.jpg/my photo/200px]]" );
+    ( [ WLimage (29, ([], "photo.jpg"), "my photo", None) ],
+      "[[image:photo.jpg/my photo/]]" );
+    ([ WLnone (22, "[[image:bad path.jpg]]") ], "[[image:bad path.jpg]]");
+    ( [ WLimage (21, ([ "a"; "b" ], "c.jpg"), "t", None) ],
+      "[[image:a:b:c.jpg/t]]" );
   ]
 
 let pp_token ppf tk =
@@ -77,6 +91,11 @@ let pp_token ppf tk =
         Fmt.(option ~none:(any "None") int)
         fam_marker
   | WLwizard (pos, wiz, name) -> Fmt.pf ppf "WLwizard (%d, %s, %s)" pos wiz name
+  | WLimage (pos, (p, fname), alt, width) ->
+      Fmt.pf ppf "WLimage (%d, ([%s], %s), %s, %a)" pos (String.concat "; " p)
+        fname alt
+        Fmt.(option ~none:(any "None") string)
+        width
   | WLnone (pos, s) -> Fmt.pf ppf "WLnone (%d, %s)" pos s
 
 let eq_token = ( = )
