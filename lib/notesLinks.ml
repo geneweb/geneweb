@@ -115,6 +115,34 @@ let misc_notes_link s i =
             | None -> (b, "")
           in
           WLwizard (j, wiz, name)
+        else if spe = Some "image" then
+          (* Syntax: [[image:path/alt/width]]
+             where path uses ':' as directory separator (same as notes pages).
+             Fields are separated by '/': path, optional alt text, optional width. *)
+          let img_path, rest =
+            match String.index_opt b '/' with
+            | Some i ->
+                ( String.sub b 0 i,
+                  Some (String.sub b (i + 1) (String.length b - i - 1)) )
+            | None -> (b, None)
+          in
+          match check_file_name img_path with
+          | None -> wlnone j
+          | Some fpath ->
+              let alt, width_opt =
+                match rest with
+                | None -> ("", None)
+                | Some r -> (
+                    match String.index_opt r '/' with
+                    | None -> (r, None)
+                    | Some k ->
+                        ( String.sub r 0 k,
+                          let w =
+                            String.sub r (k + 1) (String.length r - k - 1)
+                          in
+                          if w = "" then None else Some w ))
+              in
+              WLimage (j, fpath, alt, width_opt)
         else
           try
             let k = 0 in
