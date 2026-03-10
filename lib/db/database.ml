@@ -27,13 +27,13 @@ let move_with_backup src dst =
        number of persons                        : binary_int
        number of families                       : binary_int
        number of strings                        : binary_int
-       persons array offset in file             : binary_int
-       ascends array offset in file             : binary_int
-       unions array offset in file              : binary_int
-       families array offset in file            : binary_int
-       couples array offset in file             : binary_int
-       descends array offset in file            : binary_int
-       strings array offset in file             : binary_int
+       persons array position in file           : position
+       ascends array position in file           : position
+       unions array position in file            : position
+       families array position in file          : position
+       couples array position in file           : position
+       descends array position in file          : position
+       strings array position in file           : position
        notes origin file                        : value
        persons array                            : value
        ascends array                            : value
@@ -44,17 +44,17 @@ let move_with_backup src dst =
        strings array                            : value
 
     base.acc - direct accesses to arrays inside base
-       persons offsets   : array of binary_ints
-       ascends offsets   : array of binary_ints
-       unions offsets    : array of binary_ints
-       families offsets  : array of binary_ints
-       couples offsets   : array of binary_ints
-       descends offsets  : array of binary_ints
-       strings offsets   : array of binary_ints
+       persons positions   : array of positions
+       ascends positions   : array of positions
+       unions positions    : array of positions
+       families positions  : array of positions
+       couples positions   : array of positions
+       descends positions  : array of positions
+       strings positions   : array of positions
 
     names.inx - index for names, strings of first names and surnames
-       offset to sindex : binary_int
-       offset to findex : binary_int
+       offset to sindex : position
+       offset to findex : position
        1st index (mixes between names) : value
          array, length = "table_size", associating:
           - a hash value of a "crushed" (module "Name") name (modulo length)
@@ -383,11 +383,10 @@ let persons_of_name bname patches =
       let ai =
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then (
-          let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
+          Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
           seek_in ic_inx_acc (Iovalue.sizeof_long * i);
-          let pos = input_binary_int ic_inx_acc in
-          close_in ic_inx_acc;
-          seek_in ic_inx pos;
+          let pos = Position.input ic_inx_acc in
+          Position.seek_in ic_inx pos;
           (Iovalue.input ic_inx : int array))
         else
           let a =
@@ -420,19 +419,18 @@ let old_strings_of_fsname bname strings (_, person_patches) =
       let ai =
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then (
-          let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
+          Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
           seek_in ic_inx_acc (Iovalue.sizeof_long * (Dutil.table_size + i));
-          let pos = input_binary_int ic_inx_acc in
-          close_in ic_inx_acc;
-          seek_in ic_inx pos;
+          let pos = Position.input ic_inx_acc in
+          Position.seek_in ic_inx pos;
           (Iovalue.input ic_inx : int array))
         else
           let a =
             match !t with
             | Some a -> a
             | None ->
-                let pos = input_binary_int ic_inx in
-                seek_in ic_inx pos;
+                let pos = Position.input ic_inx in
+                Position.seek_in ic_inx pos;
                 let a : Dutil.strings_of_fsname = input_value ic_inx in
                 t := Some a;
                 a
@@ -472,11 +470,10 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
       let ai =
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then (
-          let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
+          Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
           seek_in ic_inx_acc
             (Iovalue.sizeof_long * ((offset_acc * Dutil.table_size) + i));
           let pos = input_binary_int ic_inx_acc in
-          close_in ic_inx_acc;
           seek_in ic_inx pos;
           (Iovalue.input ic_inx : int array))
         else
@@ -485,8 +482,8 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
             | Some a -> a
             | None ->
                 seek_in ic_inx offset_inx;
-                let pos = input_binary_int ic_inx in
-                seek_in ic_inx pos;
+                let pos = Position.input ic_inx in
+                Position.seek_in ic_inx pos;
                 let a : Dutil.strings_of_fsname = input_value ic_inx in
                 t := Some a;
                 a
@@ -781,8 +778,8 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
           match ic_acc with
           | Some ic_acc ->
               seek_in ic_acc (shift + (Iovalue.sizeof_long * i));
-              let pos = input_binary_int ic_acc in
-              seek_in ic pos;
+              let offset = Position.input ic_acc in
+              Position.seek_in ic offset;
               input_item ic
           | None ->
               Printf.eprintf "Sorry; I really need base.acc\n";
@@ -793,7 +790,7 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
     match !tab with
     | Some x -> x
     | None ->
-        seek_in ic array_pos;
+        Position.seek_in ic array_pos;
         let t =
           if read_only then (
             let t = ReadOnly (Gw_ancient.mark (input_array ic)) in
@@ -993,13 +990,13 @@ let with_database ?(read_only = false) bname k =
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
   let strings_len = input_binary_int ic in
-  let persons_array_pos = input_binary_int ic in
-  let ascends_array_pos = input_binary_int ic in
-  let unions_array_pos = input_binary_int ic in
-  let families_array_pos = input_binary_int ic in
-  let couples_array_pos = input_binary_int ic in
-  let descends_array_pos = input_binary_int ic in
-  let strings_array_pos = input_binary_int ic in
+  let persons_array_pos = Position.input ic in
+  let ascends_array_pos = Position.input ic in
+  let unions_array_pos = Position.input ic in
+  let families_array_pos = Position.input ic in
+  let couples_array_pos = Position.input ic in
+  let descends_array_pos = Position.input ic in
+  let strings_array_pos = Position.input ic in
   let norigin_file = input_value ic in
   try_with_open_bin (bname // "base.acc") @@ fun ic_acc ->
   let shift = 0 in
