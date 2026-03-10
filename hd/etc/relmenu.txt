@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: relmenu.txt v7.1 22/12/2024 19:06:29 $ -->
+  <!-- $Id: relmenu.txt v7.1 10/03/2026 08:30:00 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -26,7 +26,21 @@
   %if;(alias != "") <em>(%alias;)</em>%end;
   %sp;[and]0…%nn;
 </h1>
-<form name="relationship" method="submit" action="%action;">
+<form name="relationship" method="get" action="%action;">
+  %( Propagate henv only, NOT senv — senv contains stale em/ei/et
+     from a previous relationship computation that would conflict
+     with the explicit form inputs below. %)
+  %foreach;env_binding;
+    %if;(env.key="pz" or env.key="nz" or env.key="ocz" or env.key="iz"
+      or env.key="escache" or env.key="alwsurn" or env.key="pure_xhtml"
+      or env.key="size" or env.key="p_mod" or env.key="wide"
+      or env.key="manitou" or env.key="fmode" or env.key="templ"
+      or env.key="dsrc" or env.key="lang")
+      <input type="hidden" name="%env.key;" value="%env.val;">
+    %end;
+  %end;
+  %if;cgi;<input type="hidden" name="b" value="%base.name;">%end;
+  <input type="hidden" name="m" value="R">
   <div class="row">
     <div id="rel_form_shortcut" class="col-4">
       <input type="hidden" name="em" value="R">
@@ -39,7 +53,6 @@
       %else;
         <input type="hidden" name="ei" value="%index;">
       %end;
-      <input type="hidden" name="m" value="R">
       <span>[*relationship shortcut][:]</span>
       <div class="mt-1 ml-2">
         %if;(user.index!="" and (not browsing_with_sosa_ref or user.index!=sosa_ref.index))
@@ -94,20 +107,18 @@
         %end;
       </div>
     </div>
-    <div class="col-4">
-      %hidden;
-      <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
-        <input type="hidden" name="em" value="R">
-        %if;access_by_key;
-          <input type="hidden" name="ep" value="%first_name_key_val;">
-          <input type="hidden" name="en" value="%surname_key_val;">
-          %if;(occ!=0)
-            <input type="hidden" name="eoc" value="%occ;">
-          %end;
-        %else;
-          <input type="hidden" name="ei" value="%index;">
+    <div id="rel_form_search" class="col-4">
+      <input type="hidden" name="em" value="R">
+      %if;access_by_key;
+        <input type="hidden" name="ep" value="%first_name_key_val;">
+        <input type="hidden" name="en" value="%surname_key_val;">
+        %if;(occ!=0)
+          <input type="hidden" name="eoc" value="%occ;">
         %end;
-        <input type="hidden" name="m" value="R">
+      %else;
+        <input type="hidden" name="ei" value="%index;">
+      %end;
+      <div onclick="document.getElementById('radio_R').checked = 'checked'; main();">
         <div class="custom-control custom-radio">
           <input type="radio" class="custom-control-input" id="radio_R" name="select" value="input" onclick="main()" checked>
           <label class="custom-control-label" for="radio_R">[*search/case sensitive]0 [any individual in the base][:]</label>
