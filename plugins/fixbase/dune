@@ -1,9 +1,3 @@
-(alias
- (name plugin)
- (deps
-  (source_tree assets)
-  plugin_fixbase.cmxs))
-
 (executable
  (name plugin_fixbase)
  (libraries geneweb.gwd_lib geneweb.plugin geneweb_def_show)
@@ -13,7 +7,3 @@
  (modes
   (native plugin))
  (modules plugin_fixbase))
-
-(alias
- (name plugin)
- (deps plugin_fixbase.cmxs))
