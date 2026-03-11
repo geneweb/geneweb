@@ -3244,22 +3244,16 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
 
 and eval_family_field_var conf base env
     ((_, fam, (ifath, imoth, _), m_auth) as fcd) loc = function
-  | "father" :: sl -> (
-      match get_env "f_link" env with
-      | Vbool _ -> raise Not_found
-      | _ ->
-          let ep = make_ep conf base ifath in
-          eval_person_field_var conf base env ep loc sl)
+  | "father" :: sl ->
+      let ep = make_ep conf base ifath in
+      eval_person_field_var conf base env ep loc sl
   | "marriage_date" :: sl -> (
       match Date.od_of_cdate (Gwdb.get_marriage fam) with
       | Some d when m_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
-  | "mother" :: sl -> (
-      match get_env "f_link" env with
-      | Vbool _ -> raise Not_found
-      | _ ->
-          let ep = make_ep conf base imoth in
-          eval_person_field_var conf base env ep loc sl)
+  | "mother" :: sl ->
+      let ep = make_ep conf base imoth in
+      eval_person_field_var conf base env ep loc sl
   | "marriage" :: sl -> eval_family_marriage_field_var fam sl
   | [ s ] -> str_val (eval_str_family_field env fcd s)
   | _ -> raise Not_found
