@@ -16,7 +16,3 @@
   (:standard -w -40-27))
  (modes
   (native plugin)))
-
-(alias
- (name plugin)
- (deps plugin_export.cmxs))

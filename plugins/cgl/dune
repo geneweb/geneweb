@@ -3,7 +3,3 @@
  (libraries geneweb geneweb.plugin geneweb.wserver)
  (modes
   (native plugin)))
-
-(alias
- (name plugin)
- (deps plugin_cgl.cmxs))

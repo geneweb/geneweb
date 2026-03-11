@@ -6,7 +6,7 @@
 (rule
  (target plugin_checksums.ml)
  (deps
-  (alias_rec %{project_root}/plugins/plugin))
+  (glob_files_rec ../../plugins/*))
  (action
   (with-stdout-to
    %{target}
