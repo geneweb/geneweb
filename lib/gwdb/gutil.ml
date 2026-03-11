@@ -135,52 +135,6 @@ let arg_list_of_string line =
   in
   loop [] 0 0 None
 
-let sort_person_list_aux sort base =
-  let default p1 p2 =
-    match
-      Utf8.alphabetic_order (Gwdb.p_surname base p1) (Gwdb.p_surname base p2)
-    with
-    | 0 -> (
-        match
-          Utf8.alphabetic_order
-            (Gwdb.p_first_name base p1)
-            (Gwdb.p_first_name base p2)
-        with
-        | 0 -> (
-            match compare (Gwdb.get_occ p1) (Gwdb.get_occ p2) with
-            | 0 -> compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
-            | c -> c)
-        | c -> c)
-    | c -> c
-  in
-  sort (fun p1 p2 ->
-      if Gwdb.get_iper p1 = Gwdb.get_iper p2 then 0
-      else
-        match
-          match
-            ( Date.od_of_cdate (Gwdb.get_birth p1),
-              Gwdb.get_death p1,
-              Date.od_of_cdate (Gwdb.get_birth p2),
-              Gwdb.get_death p2 )
-          with
-          | Some d1, _, Some d2, _ -> Date.compare_date d1 d2
-          | Some d1, _, _, Def.Death (_, d2) ->
-              Date.compare_date d1 (Date.date_of_cdate d2)
-          | _, Def.Death (_, d1), Some d2, _ ->
-              Date.compare_date (Date.date_of_cdate d1) d2
-          | _, Def.Death (_, d1), _, Def.Death (_, d2) ->
-              Date.compare_date (Date.date_of_cdate d1) (Date.date_of_cdate d2)
-          | Some _, _, _, _ -> 1
-          | _, Def.Death (_, _), _, _ -> 1
-          | _, _, Some _, _ -> -1
-          | _, _, _, Def.Death (_, _) -> -1
-          | _ -> 0
-        with
-        | 0 -> default p1 p2
-        | c -> c)
-
-let sort_uniq_person_list = sort_person_list_aux List.sort_uniq
-
 let homonyms ~base ~first_name ~surname =
   let ipl = Gwdb.persons_of_name base (first_name ^ " " ^ surname) in
   let first_name = Name.lower first_name in

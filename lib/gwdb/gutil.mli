@@ -34,15 +34,6 @@ val arg_list_of_string : string -> string list
 (** Parse line and extract separated arguments ("" and '' are used to indlude spaces
     inside the argument) *)
 
-val sort_uniq_person_list : Gwdb.base -> Gwdb.person list -> Gwdb.person list
-(** Sort list of persons by comparison with following order:
-    - Compare by birth and death date
-    - Compare by surname
-    - Compare by first name
-    - Compare by occurence number
-    - Compare by id
-    and also remove duplicates *)
-
 val homonyms :
   base:Gwdb.base -> first_name:string -> surname:string -> Gwdb.iper list
 
