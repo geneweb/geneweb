@@ -2289,12 +2289,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           in
           TemplAst.VVbool r
       | _ -> raise Not_found)
-  | [ "has_sosa" ] -> (
-      match get_env "p_link" env with
-      | Vbool _ -> TemplAst.VVbool false
-      | _ ->
-          TemplAst.VVbool
-            (Option.is_some (get_sosa conf base (Gwdb.get_iper p))))
+  | [ "has_sosa" ] ->
+      TemplAst.VVbool (Option.is_some (get_sosa conf base (Gwdb.get_iper p)))
   | [ "linked_page"; s ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
@@ -3006,10 +3002,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "image_small_size" ->
       Image.string_of_image_small_size conf base ep |> str_val
   | "image_url" -> string_of_image_url conf base ep false |> safe_val
-  | "index" -> (
-      match get_env "p_link" env with
-      | Vbool _ -> null_val
-      | _ -> Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode |> safe_val)
+  | "index" ->
+      Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode |> safe_val
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
       | Vdmark r ->
@@ -4050,15 +4044,7 @@ let print_foreach conf' base print_ast eval_expr =
               let auth = Person.is_visible conf' base p in
               let ep = (p, auth) in
               loop env ep efam sl
-          | _ -> (
-              match get_env "child_link" env with
-              | Vind p ->
-                  let env = ("p_link", Vbool true) :: env in
-                  let env = ("f_link", Vbool true) :: env in
-                  let auth = Person.is_visible conf' base p in
-                  let ep = (p, auth) in
-                  loop env ep efam sl
-              | _ -> raise Not_found))
+          | _ -> raise Not_found)
       | "father" :: sl -> (
           match Gwdb.get_parents a with
           | Some ifam ->
