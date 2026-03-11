@@ -5,8 +5,7 @@ open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module Iperset = Driver.Iper.Set
-module Ipermap = Driver.Iper.Map
+module Iper = Driver.Iper
 
 let get_dag_elems conf base =
   let rec loop prev_person set i =
@@ -20,14 +19,14 @@ let get_dag_elems conf base =
           match Util.branch_of_sosa conf base (Sosa.of_string s) p with
           | Some branch ->
               List.fold_left
-                (fun set p -> Iperset.add (Driver.get_iper p) set)
+                (fun set p -> Iper.Set.add (Driver.get_iper p) set)
                 set branch
           | None -> set
         in
         loop person_opt set (i + 1)
     | _ -> set
   in
-  Iperset.elements (loop None Iperset.empty 1)
+  Iper.Set.elements (loop None Iper.Set.empty 1)
 
 type ('a, 'b) sum = ('a, 'b) Def.choice
 
@@ -36,11 +35,11 @@ let make_dag conf base ipers =
   let n = Array.length ipers_arr in
   let iper_to_idag =
     Array.fold_left
-      (fun (map, i) ip -> (Ipermap.add ip (idag_of_int i) map, i + 1))
-      (Ipermap.empty, 0) ipers_arr
+      (fun (map, i) ip -> (Iper.Map.add ip (idag_of_int i) map, i + 1))
+      (Iper.Map.empty, 0) ipers_arr
     |> fst
   in
-  let find_idag ip = Ipermap.find_opt ip iper_to_idag in
+  let find_idag ip = Iper.Map.find_opt ip iper_to_idag in
   let nodes =
     Array.map
       (fun ip ->

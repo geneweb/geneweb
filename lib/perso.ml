@@ -12,7 +12,7 @@ module Loc = Geneweb_templ.Loc
 module Collection = Geneweb_db.Collection
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module IperSet = Driver.Iper.Set
+module Iper = Driver.Iper
 
 let person_living_age conf p p_auth =
   match
@@ -2979,7 +2979,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           | None -> null_val)
       | [ "nb_events" ] -> VVstring (string_of_int (List.length persl))
       | [ "nb_ind" ] ->
-          IperSet.elements (List.fold_right IperSet.add persl IperSet.empty)
+          Iper.Set.elements (List.fold_right Iper.Set.add persl Iper.Set.empty)
           |> List.length |> string_of_int |> str_val
       | [ "place" ] -> safe_val place
       | sl ->

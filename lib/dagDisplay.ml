@@ -8,6 +8,7 @@ let src = Logs.Src.create ~doc:"DagDisplay" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
+module Iper = Driver.Iper
 
 let image_normal_txt conf base p fname width height =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
@@ -124,9 +125,7 @@ let string_of_item conf base = function
       ^^^ if (s :> string) = "" then Adef.safe "" else " " ^<^ s
 
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
-  let set_lookup =
-    List.fold_left (Fun.flip Dag.Iperset.add) Dag.Iperset.empty set
-  in
+  let set_lookup = List.fold_left (Fun.flip Iper.Set.add) Iper.Set.empty set in
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
@@ -171,7 +170,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
         in
         List.fold_left
           (fun txt (ips, ifamo) ->
-            if Dag.Iperset.mem ips set_lookup then txt
+            if Iper.Set.mem ips set_lookup then txt
             else
               let ps = pget conf base ips in
               let auth =
