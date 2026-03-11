@@ -13,8 +13,6 @@ let marriage_age_min = 10
 let marriage_age_max = 80
 let marriage_age_span = marriage_age_max - marriage_age_min + 1
 let children_max = 20
-let pyramid_buckets = 21
-let pyramid_interval = 5
 let remarriage_max = 4
 let relation_kind_count = 11
 let top_n = 20
@@ -42,8 +40,6 @@ type acc = {
   deaths_by_month : int array;
   marriages_by_month : int array;
   marriage_dow : int array;
-  pyramid_men : int array;
-  pyramid_women : int array;
   age_marriage_men : int array;
   age_marriage_women : int array;
   children_count : int array;
@@ -102,8 +98,6 @@ let make_acc () =
     deaths_by_month = Array.make 12 0;
     marriages_by_month = Array.make 12 0;
     marriage_dow = Array.make 7 0;
-    pyramid_men = Array.make pyramid_buckets 0;
-    pyramid_women = Array.make pyramid_buckets 0;
     age_marriage_men = Array.make marriage_age_span 0;
     age_marriage_women = Array.make marriage_age_span 0;
     children_count = Array.make (children_max + 1) 0;
@@ -142,11 +136,6 @@ let incr_istr_tbl tbl k =
   if not (Driver.Istr.is_quest k || Driver.Istr.is_empty k) then
     let c = try Driver.Istr.Table.find tbl k with Not_found -> 0 in
     Driver.Istr.Table.replace tbl k (c + 1)
-
-let is_dead p =
-  match Driver.get_death p with
-  | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> true
-  | NotDead | DontKnowIfDead -> false
 
 let birth_dmy_greg p = Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p)
 
@@ -268,16 +257,6 @@ let person_pass conf base a by_cache auth_cache =
                   end
               | Neuter -> ()
             end
-        | Some bd, None when not (is_dead p) -> (
-            let age = conf.today.year - bd.year in
-            let bucket = age / pyramid_interval in
-            let bucket = min bucket (pyramid_buckets - 1) in
-            if bucket >= 0 then
-              match Driver.get_sex p with
-              | Male -> a.pyramid_men.(bucket) <- a.pyramid_men.(bucket) + 1
-              | Female ->
-                  a.pyramid_women.(bucket) <- a.pyramid_women.(bucket) + 1
-              | Neuter -> ())
         | _ -> ()
       end)
     (Driver.persons base)
@@ -641,21 +620,6 @@ let emit_json buf base a =
   Buffer.add_string buf {|,"women":|};
   add_float_array buf lec_women;
   Buffer.add_char buf '}';
-  Buffer.add_string buf {|,"pyramid":{"labels":|};
-  let pyr_labels =
-    Array.init pyramid_buckets (fun i ->
-        if i = pyramid_buckets - 1 then "100+"
-        else
-          let lo = i * pyramid_interval in
-          let hi = lo + pyramid_interval - 1 in
-          Printf.sprintf "%d-%d" lo hi)
-  in
-  add_str_array buf pyr_labels;
-  Buffer.add_string buf {|,"men":|};
-  add_int_array buf a.pyramid_men;
-  Buffer.add_string buf {|,"women":|};
-  add_int_array buf a.pyramid_women;
-  Buffer.add_char buf '}';
   Buffer.add_string buf {|,"age_at_marriage":{"labels":|};
   let am_first = ref (-1) in
   let am_last = ref (-1) in
@@ -743,7 +707,7 @@ let emit_json buf base a =
     (top_entries base top_n a.marriage_places);
   Buffer.add_char buf '}'
 
-let print conf base =
+let print_json conf base =
   let np = Driver.nb_of_persons base in
   let a = make_acc () in
   let by_cache = Array.make np 0 in
@@ -756,3 +720,27 @@ let print conf base =
   Output.header conf "Content-type: application/json; charset=%s" charset;
   Output.print_sstring conf (Buffer.contents buf);
   Output.flush conf
+
+type 'a env = Vother of 'a
+
+let get_vother = function Vother x -> Some x
+let set_vother x = Vother x
+
+let print_page conf =
+  let ifun =
+    Templ.
+      {
+        eval_var = (fun _ -> raise Not_found);
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = (fun _ -> raise Not_found);
+      }
+  in
+  Templ.output conf ifun Templ.Env.empty () "statistics"
+
+let print conf base =
+  match p_getenv conf.env "json" with
+  | Some _ -> print_json conf base
+  | None -> print_page conf

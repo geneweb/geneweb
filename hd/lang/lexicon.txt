@@ -2214,6 +2214,10 @@ sv: livslängd
 tr: ölüm yaşı
 zh: 享年
 
+    age at marriage
+en: age at marriage
+fr: âge au mariage
+
     aged
 af: ouderdom by afsterwe
 bg: на възраст
@@ -7591,7 +7595,6 @@ sl: opis
 sv: beskrivning
 tr: açıklama
 
-
     died
 af: oorlede
 ar: توفي
@@ -11586,6 +11589,10 @@ sl: star manj kot en mesec/stara manj kot en mesec
 sv: mindre än en månad
 tr: bir aydan kısa bir süre eski
 
+    life expectancy
+en: life expectancy
+fr: espérance de vie
+
     limit
 co: limita
 de: Limit
@@ -14685,6 +14692,10 @@ de: Zeilennummer
 en: number of rows
 fr: nombre de lignes
 
+    number of unions
+en: number of unions
+fr: nombre de relations
+
     n° d’Aboville
 co: n° d’Aboville
 de: Nr. Aboville
@@ -15625,6 +15636,10 @@ tr: aynı adı taşıyan kişiler
 de: Phonetische Varianten
 en: phonétic variants
 fr: variantes phonétiques
+
+    data quality
+en: data quality
+fr: qualité des données
 
     disordered firstnames
 de: ungeordnete Vornamen
