@@ -561,21 +561,21 @@ let get_all_generations conf base p =
 type pos = Left | Right | Center | Alone
 
 type cell =
-  | Cell of Gwdb.person * Gwdb.ifam option * pos * bool * int * string
+  | Cell of Gwdb.person * Gwdb.ifam option * pos * bool * int
   | Empty
 
 let rec enrich lst1 lst2 =
   match (lst1, lst2) with
   | _, [] -> []
   | [], lst -> lst
-  | Cell (_, _, Right, _, s1, _) :: l1, Cell (p, f, d, u, s2, b) :: l2 ->
-      Cell (p, f, d, u, s1 + s2 + 1, b) :: enrich l1 l2
-  | Cell (_, _, Left, _, s, _) :: l1, Cell (p, f, d, u, _, b) :: l2 ->
-      enrich l1 (Cell (p, f, d, u, s, b) :: l2)
-  | Cell (_, _, _, _, s, _) :: l1, Cell (p, f, d, u, _, b) :: l2 ->
-      Cell (p, f, d, u, s, b) :: enrich l1 l2
-  | Empty :: l1, Cell (p, f, d, _, s, b) :: l2 ->
-      Cell (p, f, d, false, s, b) :: enrich l1 l2
+  | Cell (_, _, Right, _, s1) :: l1, Cell (p, f, d, u, s2) :: l2 ->
+      Cell (p, f, d, u, s1 + s2 + 1) :: enrich l1 l2
+  | Cell (_, _, Left, _, s) :: l1, Cell (p, f, d, u, _) :: l2 ->
+      enrich l1 (Cell (p, f, d, u, s) :: l2)
+  | Cell (_, _, _, _, s) :: l1, Cell (p, f, d, u, _) :: l2 ->
+      Cell (p, f, d, u, s) :: enrich l1 l2
+  | Empty :: l1, Cell (p, f, d, _, s) :: l2 ->
+      Cell (p, f, d, false, s) :: enrich l1 l2
   | _ :: l1, Empty :: l2 -> Empty :: enrich l1 l2
 
 let is_empty = List.for_all (( = ) Empty)
@@ -601,7 +601,7 @@ let tree_generation_list conf base gv p =
       (fun po list ->
         match po with
         | Empty -> Empty :: list
-        | Cell (p, _, _, _, _, base_prefix) -> (
+        | Cell (p, _, _, _, _) -> (
             match Gwdb.get_parents p with
             | Some ifam -> (
                 let cpl = Gwdb.foi base ifam in
@@ -614,16 +614,15 @@ let tree_generation_list conf base gv p =
                   if not @@ Person.is_empty_name p then Some p else None
                 in
                 let fo = Some ifam in
-                let base_prefix = conf.Config.bname in
                 match (fath, moth) with
                 | Some f, Some m ->
-                    Cell (f, fo, Left, true, 1, base_prefix)
-                    :: Cell (m, fo, Right, true, 1, base_prefix)
+                    Cell (f, fo, Left, true, 1)
+                    :: Cell (m, fo, Right, true, 1)
                     :: list
                 | Some f, None ->
-                    Cell (f, fo, Alone, true, 1, base_prefix) :: list
+                    Cell (f, fo, Alone, true, 1) :: list
                 | None, Some m ->
-                    Cell (m, fo, Alone, true, 1, base_prefix) :: list
+                    Cell (m, fo, Alone, true, 1) :: list
                 | None, None -> Empty :: list)
             | None -> Empty :: list))
       pol []
@@ -632,7 +631,7 @@ let tree_generation_list conf base gv p =
     let rec loop i gen list =
       if i = 0 then gen :: list else loop (i - 1) (next_gen gen) (gen :: list)
     in
-    loop (gv - 1) [ Cell (p, None, Center, true, 1, conf.Config.bname) ] []
+    loop (gv - 1) [ Cell (p, None, Center, true, 1) ] []
   in
   enrich_tree gen
 
@@ -2095,16 +2094,16 @@ and eval_cell_field_var conf base env cell loc = function
   | [ "colspan" ] -> (
       match cell with
       | Empty -> TemplAst.VVstring "1"
-      | Cell (_, _, _, _, s, _) -> TemplAst.VVstring (string_of_int s))
+      | Cell (_, _, _, _, s) -> TemplAst.VVstring (string_of_int s))
   | "family" :: sl -> (
       match cell with
-      | Cell (p, Some ifam, _, _, _, _base_prefix) ->
+      | Cell (p, Some ifam, _, _, _) ->
           let f, c, a = make_efam conf base (Gwdb.get_iper p) ifam in
           eval_family_field_var conf base env (ifam, f, c, a) loc sl
       | _ -> TemplAst.VVstring "")
   | [ "is_center" ] -> (
       match cell with
-      | Cell (_, _, Center, _, _, _) -> TemplAst.VVbool true
+      | Cell (_, _, Center, _, _) -> TemplAst.VVbool true
       | _ -> TemplAst.VVbool false)
   | [ "is_empty" ] -> (
       match cell with
@@ -2112,26 +2111,21 @@ and eval_cell_field_var conf base env cell loc = function
       | _ -> TemplAst.VVbool false)
   | [ "is_left" ] -> (
       match cell with
-      | Cell (_, _, Left, _, _, _) -> TemplAst.VVbool true
+      | Cell (_, _, Left, _, _) -> TemplAst.VVbool true
       | _ -> TemplAst.VVbool false)
   | [ "is_right" ] -> (
       match cell with
-      | Cell (_, _, Right, _, _, _) -> TemplAst.VVbool true
+      | Cell (_, _, Right, _, _) -> TemplAst.VVbool true
       | _ -> TemplAst.VVbool false)
   | [ "is_top" ] -> (
       match cell with
-      | Cell (_, _, _, false, _, _) -> TemplAst.VVbool true
+      | Cell (_, _, _, false, _) -> TemplAst.VVbool true
       | _ -> TemplAst.VVbool false)
   | "person" :: sl -> (
       match cell with
-      | Cell (p, _, _, _, _, base_prefix) ->
-          if conf.Config.bname = base_prefix then
-            let ep = make_ep conf base (Gwdb.get_iper p) in
-            eval_person_field_var conf base env ep loc sl
-          else
-            let conf = { conf with command = base_prefix } in
-            let ep = (p, true) in
-            eval_person_field_var conf base env ep loc sl
+      | Cell (p, _, _, _, _) ->
+        let ep = make_ep conf base (Gwdb.get_iper p) in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
