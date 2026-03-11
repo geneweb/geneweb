@@ -133,3 +133,23 @@ let has_visible_name conf base person =
     ~on_restricted_name:(fun _ _ _ -> false)
     ~on_visible_name:(fun _ _ _ -> true)
     ~conf ~base ~person
+
+let compare_by_dates person1 person2 =
+  let compare_optional_dates date1 date2 =
+    match (date1, date2) with
+    | Some date1, Some date2 -> Date.compare_date date1 date2
+    | None, None -> 0
+    | None, Some _ -> 1
+    | Some _, None -> -1
+  in
+  let birth1, death1, _ = Gutil.get_birth_death_date person1 in
+  let birth2, death2, _ = Gutil.get_birth_death_date person2 in
+  match (birth1, birth2) with
+  | None, None -> compare_optional_dates death1 death2
+  | None, Some birth2 ->
+      Option.fold ~none:1 ~some:(Date.compare_date birth2) death1
+  | Some birth1, None ->
+      Option.fold ~none:(-1) ~some:(Date.compare_date birth1) death2
+  | Some birth1, Some birth2 ->
+      let c3 = Date.compare_date birth1 birth2 in
+      if c3 = 0 then compare_optional_dates death1 death2 else c3

@@ -27,3 +27,4 @@ val map_name_visibility :
   'a
 
 val has_visible_name : Config.config -> Gwdb.base -> Gwdb.person -> bool
+val compare_by_dates : Gwdb.person -> Gwdb.person -> int
