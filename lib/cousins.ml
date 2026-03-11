@@ -3,12 +3,7 @@ open Util
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
-
-module IperSet = Set.Make (struct
-  type t = Driver.iper
-
-  let compare = Driver.Iper.compare
-end)
+module Iper = Driver.Iper
 
 module CoordMap = Map.Make (struct
   type t = int * int
@@ -89,13 +84,13 @@ let siblings_by conf base iparent ip =
   List.filter (( <> ) ip) list
 
 let merge_siblings l1 l2 =
-  let seen = ref IperSet.empty in
+  let seen = ref Iper.Set.empty in
   let rec filter_unique acc = function
     | [] -> List.rev acc
     | ((ip, _) as x) :: rest ->
-        if IperSet.mem ip !seen then filter_unique acc rest
+        if Iper.Set.mem ip !seen then filter_unique acc rest
         else (
-          seen := IperSet.add ip !seen;
+          seen := Iper.Set.add ip !seen;
           filter_unique (x :: acc) rest)
   in
   filter_unique [] (List.rev_append l1 l2)
@@ -267,8 +262,8 @@ let rec ascendants base acc l =
 let descendants_aux base liste1 liste2 =
   let excluded =
     List.fold_left
-      (fun set (ip, _, _, _) -> IperSet.add ip set)
-      IperSet.empty liste2
+      (fun set (ip, _, _, _) -> Iper.Set.add ip set)
+      Iper.Set.empty liste2
   in
   let rec loop0 acc = function
     | [] -> acc
@@ -281,7 +276,7 @@ let descendants_aux base liste1 liste2 =
               let children = Driver.get_children (Driver.foi base ifam) in
               Array.fold_right
                 (fun ipch acc ->
-                  if IperSet.mem ipch excluded then acc
+                  if Iper.Set.mem ipch excluded then acc
                   else (ipch, ifam :: ifaml, ipar0, lev - 1) :: acc)
                 children acc)
             [] fams
@@ -470,21 +465,24 @@ let cousins_fold l =
     | one_cousin :: l ->
         let ip, ifaml, ianc, lev = one_cousin in
         if ip = ip0 then
-          let iancl_set0 = IperSet.add ianc iancl_set0 in
+          let iancl_set0 = Iper.Set.add ianc iancl_set0 in
           loop false acc
             (ip, (ifaml :: ifaml0, iancl_set0, cnt0 + 1), lev :: lev0)
             l
         else
           let acc =
             if first || cnt0 = 0 then acc
-            else (ip0, (ifaml0, IperSet.elements iancl_set0, cnt0), lev0) :: acc
+            else
+              (ip0, (ifaml0, Iper.Set.elements iancl_set0, cnt0), lev0) :: acc
           in
-          loop false acc (ip, ([ ifaml ], IperSet.singleton ianc, 1), [ lev ]) l
+          loop false acc
+            (ip, ([ ifaml ], Iper.Set.singleton ianc, 1), [ lev ])
+            l
     | [] ->
         if first || cnt0 = 0 then acc
-        else (ip0, (ifaml0, IperSet.elements iancl_set0, cnt0), lev0) :: acc
+        else (ip0, (ifaml0, Iper.Set.elements iancl_set0, cnt0), lev0) :: acc
   in
-  loop false [] (Driver.Iper.dummy, ([], IperSet.empty, 0), [ 0 ]) l
+  loop false [] (Driver.Iper.dummy, ([], Iper.Set.empty, 0), [ 0 ]) l
 
 let cousins_implex_cnt sparse _conf _base l1 l2 _p =
   let il1 = int_of_string l1 in

@@ -4,9 +4,6 @@
     specifying persons and their Sosa numbers. The resulting DAG can then be
     rendered as an HTML table via {!Dag2html} and {!DagDisplay}. *)
 
-module Iperset : Set.S with type elt = Geneweb_db.Driver.iper
-module Ipermap : Map.S with type key = Geneweb_db.Driver.iper
-
 val get_dag_elems :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper list
 (** [get_dag_elems conf base] extracts person identifiers from URL parameters.

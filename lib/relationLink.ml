@@ -5,6 +5,7 @@ open Def
 open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
+module Iper = Driver.Iper
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
 
@@ -742,7 +743,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
         match b with
         | Some b ->
             let set =
-              List.fold_left (fun set (ip, _) -> Dag.Iperset.add ip set) set b
+              List.fold_left (fun set (ip, _) -> Iper.Set.add ip set) set b
             in
             loop set (n + 1)
               (find_next_branch conf base dist ia (Driver.get_sex a) b)
@@ -761,9 +762,9 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
               let set, _ = add_branches dist set n ip2 l2 in
               set)
             set l2)
-        (Dag.Iperset.add ia Dag.Iperset.empty)
+        (Iper.Set.add ia Iper.Set.empty)
         l1
-      |> Dag.Iperset.elements
+      |> Iper.Set.elements
     in
     let spl =
       List.fold_right

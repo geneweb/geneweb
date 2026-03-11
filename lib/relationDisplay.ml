@@ -7,6 +7,7 @@ open Dag2html
 open Relation
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
+module Iper = Driver.Iper
 
 let dag_of_ind_dag_list indl =
   let indl, _ =
@@ -38,10 +39,10 @@ let dag_of_relation_path conf base path =
     List.fold_left
       (fun set n ->
         match n.valu with
-        | Def.Left ip -> Dag.Iperset.add ip set
+        | Def.Left ip -> Iper.Set.add ip set
         | Def.Right _ -> set)
-      Dag.Iperset.empty nl
-    |> Dag.Iperset.elements
+      Iper.Set.empty nl
+    |> Iper.Set.elements
   in
   (set, d)
 
@@ -651,12 +652,6 @@ let print_solution conf base long n p1 p2 sol =
 let max_br = 33
 
 let print_dag_links conf base p1 p2 rl =
-  let module O = struct
-    type t = Driver.iper
-
-    let compare = compare
-  end in
-  let module M = Map.Make (O) in
   let sps = Util.get_opt conf "sp" true in
   let img = Util.get_opt conf "im" true in
   let anc_map =
@@ -665,21 +660,21 @@ let print_dag_links conf base p1 p2 rl =
         List.fold_left
           (fun anc_map (p, n) ->
             let pp1, pp2, nn, nt, maxlev =
-              try M.find (Driver.get_iper p) anc_map
+              try Iper.Map.find (Driver.get_iper p) anc_map
               with Not_found -> (pp1, pp2, 0, 0, 0)
             in
             if nn >= max_br then anc_map
             else
               let v = (pp1, pp2, nn + n, nt + 1, max maxlev (max x1 x2)) in
-              M.add (Driver.get_iper p) v anc_map)
+              Iper.Map.add (Driver.get_iper p) v anc_map)
           anc_map list)
-      M.empty rl
+      Iper.Map.empty rl
   in
   let is_anc =
     match rl with (_, _, (x1, x2, _), _) :: _ -> x1 = 0 || x2 = 0 | _ -> false
   in
   let something =
-    M.fold
+    Iper.Map.fold
       (fun _ (_, _, nn, nt, _) something ->
         something || (nt > 1 && nn > 1 && nn < max_br))
       anc_map false
@@ -691,7 +686,7 @@ let print_dag_links conf base p1 p2 rl =
       Output.print_sstring conf (Util.images_prefix conf);
       Output.print_sstring conf {|/picto_fleche_bleu.png" alt="">|})
     else Output.print_sstring conf "<ul>";
-    M.iter
+    Iper.Map.iter
       (fun ip (pp1, pp2, nn, nt, _) ->
         let dp1 = match pp1 with Some p -> p | _ -> p1 in
         let dp2 = match pp2 with Some p -> p | _ -> p2 in

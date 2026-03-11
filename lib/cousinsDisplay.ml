@@ -7,6 +7,7 @@ open Cousins
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Iper = Driver.Iper
 
 let default_max_cnt = Cousins.default_max_cnt
 
@@ -286,21 +287,16 @@ let sosa_of_persons conf base =
   loop 1
 
 let print_anniv conf base p dead_people level =
-  let module S = Map.Make (struct
-    type t = Driver.iper
-
-    let compare = compare
-  end) in
   let s_mem x m =
     try
-      let _ = S.find x m in
+      let _ = Iper.Map.find x m in
       true
     with Not_found -> false
   in
   let rec insert_desc set up_sosa down_br n ip =
     if s_mem ip set then set
     else
-      let set = S.add ip (up_sosa, down_br) set in
+      let set = Iper.Map.add ip (up_sosa, down_br) set in
       if n = 0 then set
       else
         let u = Driver.get_family (pget conf base ip) in
@@ -357,13 +353,13 @@ let print_anniv conf base p dead_people level =
           in
           loop set a
     in
-    loop S.empty a
+    loop Iper.Map.empty a
   in
   let set =
-    S.fold
+    Iper.Map.fold
       (fun ip (up_sosa, down_br) set ->
         let u = Driver.get_family (pget conf base ip) in
-        let set = S.add ip (up_sosa, down_br, None) set in
+        let set = Iper.Map.add ip (up_sosa, down_br, None) set in
         if Array.length u = 0 then set
         else
           let rec loop set i =
@@ -371,10 +367,10 @@ let print_anniv conf base p dead_people level =
             else
               let cpl = Driver.foi base u.(i) in
               let c = Gutil.spouse ip cpl in
-              loop (S.add c (up_sosa, down_br, Some ip) set) (i + 1)
+              loop (Iper.Map.add c (up_sosa, down_br, Some ip) set) (i + 1)
           in
           loop set 0)
-      set S.empty
+      set Iper.Map.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
     Printf.sprintf {|<a href="%sm=RL&%s&b1=%d&%s&b2=%d">%s</a>|}
@@ -389,7 +385,7 @@ let print_anniv conf base p dead_people level =
     |> Adef.safe
   in
   let f_scan =
-    let list = ref (S.fold (fun ip b list -> (ip, b) :: list) set []) in
+    let list = ref (Iper.Map.fold (fun ip b list -> (ip, b) :: list) set []) in
     fun () ->
       match !list with
       | (x, b) :: l ->

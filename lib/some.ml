@@ -6,6 +6,7 @@ open Util
 module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Iper = Driver.Iper
 
 module AliasCache = struct
   let cache = Hashtbl.create 1000
@@ -14,8 +15,6 @@ module AliasCache = struct
   let add_direct iper = Hashtbl.replace cache iper None
   let get_alias iper = try Hashtbl.find cache iper with Not_found -> None
 end
-
-module IperSet = Driver.Iper.Set
 
 let get_extra_surnames conf =
   let rec loop i acc =
@@ -1287,10 +1286,10 @@ let search_surname_list conf base x =
             (str, len + len1) :: List.remove_assoc str strl
           with Not_found -> (str, len) :: strl
         in
-        (List.fold_right IperSet.add iperl1 iperl, strl))
-      list (IperSet.empty, [])
+        (List.fold_right Iper.Set.add iperl1 iperl, strl))
+      list (Iper.Set.empty, [])
   in
-  (list, IperSet.elements iperl, name_inj)
+  (list, Iper.Set.elements iperl, name_inj)
 
 let search_surname_print conf base _not_found_fun x =
   let extra = get_extra_surnames conf in
@@ -1326,11 +1325,11 @@ let search_surname_print conf base _not_found_fun x =
         List.fold_left
           (fun acc q ->
             let _, ip, _ = search_surname_list conf base q in
-            List.fold_left (fun s i -> IperSet.add i s) acc ip)
-          (List.fold_left (fun s i -> IperSet.add i s) IperSet.empty iperl0)
+            List.fold_left (fun s i -> Iper.Set.add i s) acc ip)
+          (List.fold_left (fun s i -> Iper.Set.add i s) Iper.Set.empty iperl0)
           extra
       in
-      let iperl = IperSet.elements iperl_set in
+      let iperl = Iper.Set.elements iperl_set in
       let pl =
         List.fold_right
           (fun ip acc ->
@@ -1348,10 +1347,10 @@ let search_surname_print conf base _not_found_fun x =
         List.fold_left
           (fun acc q ->
             let _, ip, _ = search_surname_list conf base q in
-            List.fold_left (fun s i -> IperSet.add i s) acc ip)
-          (List.fold_left (fun s i -> IperSet.add i s) IperSet.empty iperl0)
+            List.fold_left (fun s i -> Iper.Set.add i s) acc ip)
+          (List.fold_left (fun s i -> Iper.Set.add i s) Iper.Set.empty iperl0)
           extra
-        |> IperSet.elements
+        |> Iper.Set.elements
       in
       let bhl = select_ancestors conf base names_lower all_iperl in
       let bhl =

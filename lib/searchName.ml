@@ -5,7 +5,7 @@ open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module IperSet = Driver.Iper.Set
+module Iper = Driver.Iper
 
 let src = Logs.Src.create ~doc:"SearchName" __MODULE__
 
@@ -492,7 +492,7 @@ let rec search_surname conf base x =
         ([], phonetic_results)
 
 and search_exact conf base variants =
-  let exact_iperl = ref IperSet.empty in
+  let exact_iperl = ref Iper.Set.empty in
   List.iter
     (fun variant ->
       try
@@ -505,23 +505,23 @@ and search_exact conf base variants =
           (fun (str, _, iperl) ->
             if Name.lower str = Name.lower variant then
               List.iter
-                (fun ip -> exact_iperl := IperSet.add ip !exact_iperl)
+                (fun ip -> exact_iperl := Iper.Set.add ip !exact_iperl)
                 iperl)
           list
       with _ -> ())
     variants;
-  IperSet.elements !exact_iperl
+  Iper.Set.elements !exact_iperl
 
 and search_phonetic_generic conf base query base_strings spi_find _get_name =
   try
     let istrl = base_strings base query in
-    let ddr_iperl = ref IperSet.empty in
+    let ddr_iperl = ref Iper.Set.empty in
     List.iter
       (fun istr ->
         let iperl = spi_find istr in
         List.iter
           (fun ip ->
-            if not (IperSet.mem ip !ddr_iperl) then
+            if not (Iper.Set.mem ip !ddr_iperl) then
               let p = Driver.poi base ip in
               if
                 (not (Driver.Istr.is_empty (Driver.get_first_name p)))
@@ -529,10 +529,10 @@ and search_phonetic_generic conf base query base_strings spi_find _get_name =
                 && not
                      (Util.is_hide_names conf p
                      && not (Util.authorized_age conf base p))
-              then ddr_iperl := IperSet.add ip !ddr_iperl)
+              then ddr_iperl := Iper.Set.add ip !ddr_iperl)
           iperl)
       istrl;
-    IperSet.elements !ddr_iperl
+    Iper.Set.elements !ddr_iperl
   with _ -> []
 
 and search_phonetic conf base query =

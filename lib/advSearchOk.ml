@@ -6,7 +6,7 @@ open Util
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
-module IperSet = Driver.Iper.Set
+module Iper = Driver.Iper
 
 let get_number var key env = p_getint env (var ^ "_" ^ key)
 
@@ -403,8 +403,8 @@ let advanced_search conf base max_answers =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
           let rec loop p (set, acc) =
-            if not (IperSet.mem (Driver.get_iper p) set) then
-              let set = IperSet.add (Driver.get_iper p) set in
+            if not (Iper.Set.mem (Driver.get_iper p) set) then
+              let set = Iper.Set.add (Driver.get_iper p) set in
               let acc = match_person acc p search_type in
               match Driver.get_parents p with
               | Some ifam ->
@@ -418,7 +418,7 @@ let advanced_search conf base max_answers =
           in
           loop
             (pget conf base @@ Driver.get_iper sosa_ref)
-            (IperSet.empty, ([], 0))
+            (Iper.Set.empty, ([], 0))
           |> snd
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then

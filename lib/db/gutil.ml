@@ -4,7 +4,7 @@ open Def
 
 exception Same_person
 
-module IperSet = Driver.Iper.Set
+module Iper = Driver.Iper
 
 let is_ancestor ?max base p1 p2 =
   let ip1 = Driver.get_iper p1 in
@@ -15,10 +15,10 @@ let is_ancestor ?max base p1 p2 =
       | [] -> false
       | ip :: tl -> (
           if Option.is_some max && n <= 0 then false
-          else if IperSet.mem ip set then loop n set tl
+          else if Iper.Set.mem ip set then loop n set tl
           else if ip = ip1 then true
           else
-            let set = IperSet.add ip set in
+            let set = Iper.Set.add ip set in
             match Driver.get_parents (Driver.poi base ip) with
             | Some ifam ->
                 let cpl = Driver.foi base ifam in
@@ -27,7 +27,7 @@ let is_ancestor ?max base p1 p2 =
             | None -> loop n set tl)
     in
     let n = Option.value ~default:max_int max in
-    loop n IperSet.empty [ ip2 ]
+    loop n Iper.Set.empty [ ip2 ]
 
 let designation base p =
   let first_name = Driver.p_first_name base p in
