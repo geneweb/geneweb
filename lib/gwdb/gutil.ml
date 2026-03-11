@@ -179,7 +179,6 @@ let sort_person_list_aux sort base =
         | 0 -> default p1 p2
         | c -> c)
 
-let sort_person_list = sort_person_list_aux List.sort
 let sort_uniq_person_list = sort_person_list_aux List.sort_uniq
 
 let homonyms ~base ~first_name ~surname =
