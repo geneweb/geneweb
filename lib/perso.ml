@@ -2295,7 +2295,6 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | _ ->
           TemplAst.VVbool
             (Option.is_some (get_sosa conf base (Gwdb.get_iper p))))
-  | [ "init_cache"; _nb_asc; _from_gen_desc; _nb_desc ] -> null_val
   | [ "linked_page"; s ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
