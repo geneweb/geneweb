@@ -35,7 +35,6 @@
   geneweb.plugin
   gwd_lib
   logs
-  logs.fmt
   logs-syslog
   logs-syslog.unix
   ptime

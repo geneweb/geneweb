@@ -14,26 +14,38 @@ module Plugin = Geneweb_plugin
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
 
-let pp_brackets ~style ppf v = Fmt.pf ppf "[%a]" Fmt.(styled style string) v
+let pp_brackets ~style pp = Fmt.(brackets @@ styled style @@ pp)
 
-let pp_h ~style ppf h =
-  let timestamp = Ptime.to_rfc3339 @@ Ptime_clock.now () in
-  Fmt.pf ppf "%a%a: "
-    (pp_brackets ~style:`Magenta)
-    timestamp (pp_brackets ~style) h
-
-let pp_header ppf (l, h) =
+let pp_level ppf l =
   match l with
-  | Logs.App -> Option.iter (pp_brackets ~style:`Cyan ppf) h
-  | Logs.Error -> pp_h ~style:`Red ppf (Option.value ~default:"ERROR" h)
-  | Logs.Warning -> pp_h ~style:`Yellow ppf (Option.value ~default:"WARNING" h)
-  | Logs.Info -> pp_h ~style:`Blue ppf (Option.value ~default:"INFO" h)
-  | Logs.Debug -> pp_h ~style:`Green ppf (Option.value ~default:"DEBUG" h)
+  | Logs.App -> ()
+  | Logs.Error -> pp_brackets ~style:`Red Fmt.string ppf "ERROR"
+  | Logs.Warning -> pp_brackets ~style:`Yellow Fmt.string ppf "WARN"
+  | Logs.Info -> pp_brackets ~style:`Blue Fmt.string ppf "INFO"
+  | Logs.Debug -> pp_brackets ~style:`Green Fmt.string ppf "DEBUG"
 
-let set_reporter fmt =
-  Logs.set_reporter @@ Logs_fmt.reporter ~pp_header ~dst:fmt ()
+let reporter ~predictable_mode ppf =
+  let report src level ~over k msgf =
+    let k ppf =
+      Format.pp_close_box ppf ();
+      Format.pp_print_newline ppf ();
+      over ();
+      k ()
+    in
+    msgf @@ fun ?header ?tags fmt ->
+    let timestamp =
+      if predictable_mode then Ptime.epoch else Ptime_clock.now ()
+    in
+    Format.fprintf ppf "%a%a: "
+      (pp_brackets ~style:`Magenta @@ Ptime.pp_rfc3339 ())
+      timestamp pp_level level;
+    Format.pp_open_box ppf 0;
+    Format.kfprintf k ppf fmt
+  in
+  { Logs.report }
 
-let setup_log t =
+let setup_log ~predictable_mode t =
+  let set_reporter ppf = Logs.set_reporter @@ reporter ~predictable_mode ppf in
   let set_file_reporter file =
     let oc =
       open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 file.path
@@ -2470,15 +2482,16 @@ let set_debug_flag () =
   Logs.set_level ~all:true (Some Logs.Debug);
   Sys.enable_runtime_warnings true
 
-let set_check_flag () =
-  check := true;
-  set_debug_flag ()
-
 let set_predictable_mode () =
   Logs.warn (fun k ->
       k
         "Predictable mode must not be enabled in production. It disables \
          security enhancements and caching.");
+  predictable_mode := true
+
+let set_check_flag () =
+  check := true;
+  set_debug_flag ();
   predictable_mode := true
 
 let parse_cmd () =
@@ -2613,7 +2626,7 @@ let parse_cmd () =
       ( "-check",
         Arg.Unit set_check_flag,
         " Run only the server startup sequence for test purpose. This flag \
-         implies -debug." );
+         implies -debug and -predictable_mode." );
       arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin.";
       arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.";
       ( "-version",
@@ -2786,7 +2799,7 @@ let () =
   Logs.set_level ~all:true (Some Logs.Info);
   parse_cmd ();
   parse_prefixes ();
-  setup_log !log_file;
+  setup_log ~predictable_mode:!predictable_mode !log_file;
   Fmt_tty.setup_std_outputs ~style_renderer:`Ansi_tty ();
   try main () with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
