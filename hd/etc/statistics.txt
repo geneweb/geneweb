@@ -1,0 +1,383 @@
+<!-- $Id: statistics.txt v7.1 11/03/2026 03:37:19 $ -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>Statistics</title>
+  %if;(bvar.robot_index="yes")<meta name="robots" content="index,follow">%else;<meta name="robots" content="none">%end;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+%include;home
+
+<div class="container-fluid px-3 px-lg-5 mt-3">
+<h1 class="h3 mb-3">
+  <i class="fa fa-chart-bar mr-2"></i>[*statistics] — %bname;
+</h1>
+
+<div id="stats-loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="sr-only">[*loading…]</span>
+  </div>
+  <p class="mt-2 text-muted">[*loading…]</p>
+</div>
+
+<div id="stats-content" style="display:none">
+
+<!-- KPI cards -->
+<div class="row mb-3" id="kpi-row"></div>
+
+<!-- Demographics -->
+<div class="row mb-3">
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*sex]1</h6>
+    <canvas id="ch-sex" height="220"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*alive]0/[died]0</h6>
+    <canvas id="ch-alive" height="220"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*relation/relations]1</h6>
+    <canvas id="ch-relations" height="220"></canvas>
+  </div></div></div>
+</div>
+
+<!-- Births & Deaths + Marriages by decade -->
+<div class="row mb-3">
+  <div class="col-md-6"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*birth/births]1 &amp; [*death/deaths]1</h6>
+    <canvas id="ch-bd-decade" height="150"></canvas>
+  </div></div></div>
+  <div class="col-md-6"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*marriage/marriages]1</h6>
+    <canvas id="ch-mar-decade" height="150"></canvas>
+  </div></div></div>
+</div>
+
+<!-- Age at marriage and death -->
+<div class="row mb-3">
+  <div class="col-md-6"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*age at marriage]</h6>
+    <canvas id="ch-age-mar" height="150"></canvas>
+  </div></div></div>
+  <div class="col-md-6"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*age at death]</h6>
+    <canvas id="ch-age-death" height="150"></canvas>
+  </div></div></div>
+</div>
+
+<!-- Life expectancy by century -->
+<div class="row mb-3">
+  <div class="col-12"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*life expectancy]</h6>
+    <canvas id="ch-life-exp" height="90"></canvas>
+  </div></div></div>
+</div>
+
+
+<!-- Births/Marriage/Deaths by month -->
+<div class="row mb-3">
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*birth/births]1 / [year/month/day]1</h6>
+    <canvas id="ch-birth-month" height="180"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*marriage/marriages]1 / [year/month/day]1</h6>
+    <canvas id="ch-mar-month" height="180"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*death/deaths]1 / [year/month/day]1</h6>
+    <canvas id="ch-death-month" height="180"></canvas>
+  </div></div></div>
+</div>
+
+<!-- Top surnames + firstnames -->
+<div class="row mb-3">
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">Top [*surname/surnames]1</h6>
+    <canvas id="ch-surnames" height="300"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">Top [*first name/first names]1 &#9794;</h6>
+    <canvas id="ch-fn-m" height="300"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">Top [*first name/first names]1 &#9792;</h6>
+    <canvas id="ch-fn-f" height="300"></canvas>
+  </div></div></div>
+</div>
+
+<!-- Top places -->
+<div class="row mb-3">
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">Top [*place/places]1 ([*birth/births]1)</h6>
+    <canvas id="ch-bp" height="300"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">Top [*place/places]1 ([*marriage/marriages]1)</h6>
+    <canvas id="ch-mp" height="300"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">Top [*place/places]1 ([*death/deaths]1)</h6>
+    <canvas id="ch-dp" height="300"></canvas>
+  </div></div></div>
+</div>
+
+<!-- Top profession + remariages + childrenCompleteness -->
+<div class="row mb-3">
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">Top [*occupation/occupations]1</h6>
+    <canvas id="ch-occupations" height="260"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*number of unions]</h6>
+    <canvas id="ch-remarriage" height="260"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*number of children]</h6>
+    <canvas id="ch-children" height="260"></canvas>
+  </div></div></div>
+</div>
+
+<!-- Completeness -->
+<div class="row mb-3">
+  <div class="col-4"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*data quality]</h6>
+    <canvas id="ch-completeness" height="250"></canvas>
+  </div></div></div>
+</div>
+
+<!-- Quick links -->
+<div class="row mb-4">
+  <div class="col-12"><div class="card"><div class="card-body">
+    <h6 class="card-title text-muted">[*other statistics]</h6>
+    <div class="d-flex flex-wrap">
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LB">[*latest births]</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LD">[*latest deaths]</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LM">[*latest marriages]</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=OE">[*oldest engagements]</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=OA">[*oldest alive]</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LL">[*who lived the longest]</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=POP_PYR">[*population pyramid]</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=PPS">[*place/places]1</a>
+    </div>
+  </div></div></div>
+</div>
+
+</div><!-- stats-content -->
+</div><!-- container-fluid -->
+
+%include;trl
+%include;copyr
+%query_time;
+</div>
+%include;js
+
+<script>
+var GW = {
+  url: "%prefix;m=STATS&json=1",
+  sn: "%prefix;m=N&v=",
+  pl: "%prefix;m=PPS&s=",
+  mo: %["[*(month)]0","[*(month)]1","[*(month)]2","[*(month)]3","[*(month)]4","[*(month)]5","[*(month)]6","[*(month)]7","[*(month)]8","[*(month)]9","[*(month)]10","[*(month)]11",%],
+  L: {
+    pe:"[*person/persons]1", fa:"[*family/families]1", le:"[*life expectancy]",
+    md:"[*median]", so:"[*source/sources]1", al:"[*alive]0", di:"[*died]0",
+    bi:"[*birth/births]1", de:"[*death/deaths]1",
+    db:"[*date of birth]", pb:"[*where born]",
+    dd:"[*date of death]", pd:"[*where dead]",
+    pa:"[*parents]", oc:"[*occupation/occupations]0",
+    im:"[*image/images]0"
+  }
+};
+
+(function() {
+var C = {
+  m:"rgba(54,162,235,0.7)", mB:"rgba(54,162,235,1)",
+  f:"rgba(255,99,132,0.7)", fB:"rgba(255,99,132,1)",
+  n:"rgba(201,203,207,0.7)", g:"rgba(75,192,192,0.7)",
+  gB:"rgba(75,192,192,1)", o:"rgba(255,159,64,0.7)",
+  oB:"rgba(255,159,64,1)", p:"rgba(153,102,255,0.7)",
+  pB:"rgba(153,102,255,1)"
+};
+Chart.defaults.animation = false;
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+
+function fmt(n) { return n == null ? "\u2014" : n.toLocaleString(); }
+
+function kpi(row, label, value, color) {
+  var d = document.createElement("div");
+  d.className = "col-6 col-md-3 col-lg-2 mb-2";
+  d.innerHTML = '<div class="card" style="border-left:4px solid '+color+'">'
+    +'<div class="card-body py-2 px-3">'
+    +'<div class="text-muted small">'+label+'</div>'
+    +'<div class="h5 mb-0 font-weight-bold">'+value+'</div>'
+    +'</div></div>';
+  row.appendChild(d);
+}
+
+function topBar(id, entries, color, href) {
+  if (!entries || !entries.length) return;
+  var lb = %[%], dt = %[%];
+  for (var i = 0; i < entries.length; i++) { lb.push(entries%[i%].n); dt.push(entries%[i%].c); }
+  new Chart(document.getElementById(id), {
+    type:"bar",
+    data:{labels:lb, datasets:%[{data:dt, backgroundColor:color, borderWidth:0}%]},
+    options:{
+      indexAxis:"y",
+      plugins:{legend:{display:false}},
+      scales:{x:{beginAtZero:true},y:{ticks:{autoSkip:false}}},
+      onClick: function(e, el) {
+        if (el.length && href) window.location = href + encodeURIComponent(entries%[el%[0%].index%].n);
+      }
+    }
+  });
+}
+
+function moBar(id, data, color) {
+  new Chart(document.getElementById(id), {
+    type:"bar",
+    data:{labels:GW.mo, datasets:%[{data:data, backgroundColor:color, borderWidth:0}%]},
+    options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
+}
+
+function mfBar(id, d) {
+  new Chart(document.getElementById(id), {
+    type:"bar",
+    data:{labels:d.labels, datasets:%[
+      {label:"\u2642", data:d.men, backgroundColor:C.m, borderWidth:0},
+      {label:"\u2640", data:d.women, backgroundColor:C.f, borderWidth:0}
+    %]},
+    options:{scales:{x:{ticks:{maxTicksLimit:20}}, y:{beginAtZero:true}}}
+  });
+}
+
+fetch(GW.url).then(function(r) {
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}).then(function(D) {
+  var c = D.counts, a = D.averages, q = D.completeness, L = GW.L;
+  var row = document.getElementById("kpi-row");
+  kpi(row, L.pe, fmt(c.total), C.mB);
+  kpi(row, L.fa, fmt(c.families), C.gB);
+  kpi(row, "\u2642 "+L.le, a.life_men != null ? a.life_men.toFixed(1) : "\u2014", C.mB);
+  kpi(row, "\u2640 "+L.le, a.life_women != null ? a.life_women.toFixed(1) : "\u2014", C.fB);
+  kpi(row, L.md, a.median_life+" a.", C.pB);
+  kpi(row, L.so, q.sources+"\u0025", C.oB);
+
+  new Chart(document.getElementById("ch-sex"), {
+    type:"doughnut",
+    data:{
+      labels:%["\u2642 "+fmt(c.men), "\u2640 "+fmt(c.women), "? "+fmt(c.neuter)%],
+      datasets:%[{data:%[c.men, c.women, c.neuter%], backgroundColor:%[C.m, C.f, C.n%]}%]
+    },
+    options:{plugins:{legend:{position:"bottom"}}}
+  });
+
+  new Chart(document.getElementById("ch-alive"), {
+    type:"doughnut",
+    data:{
+      labels:%[L.al+" "+fmt(c.alive), L.di+" "+fmt(c.dead), "? "+fmt(c.unknown_status)%],
+      datasets:%[{data:%[c.alive, c.dead, c.unknown_status%], backgroundColor:%[C.g, C.n, C.o%]}%]
+    },
+    options:{plugins:{legend:{position:"bottom"}}}
+  });
+
+  var rt = D.relation_types;
+  var rtL=%[%], rtD=%[%], rtC=%[%];
+  var pal = %[C.m,C.g,C.o,C.f,C.n,C.p,"rgba(255,205,86,0.7)","rgba(100,181,246,0.7)","rgba(174,213,129,0.7)","rgba(240,98,146,0.7)","rgba(206,147,216,0.7)"%];
+  for (var i=0; i<rt.labels.length; i++) {
+    if (rt.values%[i%]>0) { rtL.push(rt.labels%[i%]+" "+fmt(rt.values%[i%])); rtD.push(rt.values%[i%]); rtC.push(pal%[i%]); }
+  }
+  new Chart(document.getElementById("ch-relations"), {
+    type:"doughnut",
+    data:{labels:rtL, datasets:%[{data:rtD, backgroundColor:rtC}%]},
+    options:{plugins:{legend:{position:"bottom"}}}
+  });
+
+  var bd = D.births_deaths_by_decade;
+  if (bd.labels.length) {
+    new Chart(document.getElementById("ch-bd-decade"), {
+      type:"bar",
+      data:{labels:bd.labels, datasets:%[
+        {label:L.bi, data:bd.births, backgroundColor:C.m, borderWidth:0},
+        {label:L.de, data:bd.deaths, backgroundColor:C.f, borderWidth:0}
+      %]},
+      options:{scales:{x:{ticks:{maxTicksLimit:30}}, y:{beginAtZero:true}}}
+    });
+  }
+
+  mfBar("ch-age-death", D.age_at_death);
+
+  var le = D.life_exp_by_century;
+  new Chart(document.getElementById("ch-life-exp"), {
+    type:"line",
+    data:{labels:le.labels, datasets:%[
+      {label:"\u2642", data:le.men, borderColor:C.mB, backgroundColor:C.m, fill:false, tension:0.3, spanGaps:true},
+      {label:"\u2640", data:le.women, borderColor:C.fB, backgroundColor:C.f, fill:false, tension:0.3, spanGaps:true}
+    %]},
+    options:{scales:{y:{beginAtZero:false}}}
+  });
+
+  topBar("ch-surnames", D.top_surnames, C.m, GW.sn);
+  topBar("ch-fn-m", D.top_firstnames_m, C.m, null);
+  topBar("ch-fn-f", D.top_firstnames_f, C.f, null);
+  topBar("ch-occupations", D.top_occupations, C.g, null);
+  topBar("ch-bp", D.top_birth_places, C.o, GW.pl);
+  topBar("ch-dp", D.top_death_places, C.p, GW.pl);
+  topBar("ch-mp", D.top_marriage_places, C.g, GW.pl);
+
+  var md = D.marriages_by_decade;
+  if (md.labels.length) {
+    new Chart(document.getElementById("ch-mar-decade"), {
+      type:"bar",
+      data:{labels:md.labels, datasets:%[{data:md.values, backgroundColor:C.g, borderWidth:0}%]},
+      options:{plugins:{legend:{display:false}}, scales:{x:{ticks:{maxTicksLimit:25}}, y:{beginAtZero:true}}}
+    });
+  }
+
+  moBar("ch-mar-month", D.marriages_by_month, C.g);
+  mfBar("ch-age-mar", D.age_at_marriage);
+
+  new Chart(document.getElementById("ch-children"), {
+    type:"bar",
+    data:{labels:D.children_per_family.labels, datasets:%[{data:D.children_per_family.values, backgroundColor:C.o, borderWidth:0}%]},
+    options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
+
+  new Chart(document.getElementById("ch-remarriage"), {
+    type:"bar",
+    data:{labels:D.remarriage.labels, datasets:%[{data:D.remarriage.values, backgroundColor:C.p, borderWidth:0}%]},
+    options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
+
+  new Chart(document.getElementById("ch-completeness"), {
+    type:"radar",
+    data:{
+      labels:%[L.db,L.pb,L.dd,L.pd,L.pa,L.oc,L.so,L.im%],
+      datasets:%[{
+        data:%[q.birth_date,q.birth_place,q.death_date,q.death_place,q.parents,q.occupation,q.sources,q.image%],
+        backgroundColor:"rgba(75,192,192,0.2)", borderColor:C.gB, pointBackgroundColor:C.gB
+      }%]
+    },
+    options:{plugins:{legend:{display:false}}, scales:{r:{min:0, max:100, ticks:{stepSize:25}}}}
+  });
+
+  moBar("ch-birth-month", D.births_by_month, C.m);
+  moBar("ch-death-month", D.deaths_by_month, C.f);
+
+  document.getElementById("stats-loading").style.display = "none";
+  document.getElementById("stats-content").style.display = "block";
+}).catch(function(err) {
+  document.getElementById("stats-loading").innerHTML = '<div class="alert alert-danger">'+err.message+'</div>';
+});
+})();
+</script>
+</body>
+</html>

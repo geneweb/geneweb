@@ -30,6 +30,13 @@
                           sha512-Bb1WXpqE5T4DNZzNLvoK3ABggd1ycVuM5kKvKamvvjc0bD7/9AAWJx1J4lra90R9qGFRH6zbQEFuUk253WNmBw=="
                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
+    %if;(e.m="STATS")
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
+              integrity="sha256-SERKgtTty1vsDxll+qzd4Y2cF9swY9BCq62i9wXJ9Uo=
+                         sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ
+                         sha512-WoViKhKD4qI2WruSZqv9+kvM4WfFhUMQCLN4QlDTt5aU56fLQy2gYoxWIqlEnXqJy/+Ac5q/hk1oWfqnMDhwMA=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %end;
   %else;
     <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
     <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=4.6.1"></script>
@@ -39,6 +46,9 @@
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
       <script src="%etc_prefix;js/regex.min.js?version=4.4.0"></script>
+    %end;
+    %if;(e.m="STATS")
+      <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;
   %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
