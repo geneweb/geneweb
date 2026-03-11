@@ -994,6 +994,7 @@ let treat_request =
                  | _ -> request_issue conf base ~key:"missing v param")
              | "STAT" ->
                  w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
+             | "STATS" -> w_base @@ Statistics.print
              | "TP" -> (
                  w_base @@ fun conf base ->
                  match Util.p_getenv conf.env "v" with
