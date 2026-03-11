@@ -1812,20 +1812,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       in
       loop env
   | "family" :: sl -> (
-      (* TODO ???
-         let mode_local =
-         match get_env "fam_link" env with
-         [ Vfam ifam _ (_, _, ip) _ -> False
-         | _ -> True ]
-         in *)
       match get_env "fam" env with
       | Vfam (i, f, c, m) ->
           eval_family_field_var conf base env (i, f, c, m) loc sl
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (i, f, c, m) ->
-              eval_family_field_var conf base env (i, f, c, m) loc sl
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "father" :: sl -> (
       match Gwdb.get_parents a with
       | Some ifam ->
@@ -4111,11 +4101,7 @@ let print_foreach conf' base print_ast eval_expr =
           | _ -> raise Not_found)
       | _ -> raise Not_found
     in
-    let efam =
-      match get_env "is_link" env with
-      | Vbool _ -> get_env "fam_link" env
-      | _ -> get_env "fam" env
-    in
+    let efam = get_env "fam" env in
     loop env ini_ep efam (s :: sl)
   in
   print_foreach
