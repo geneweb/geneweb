@@ -559,10 +559,7 @@ let get_all_generations conf base p =
 *)
 
 type pos = Left | Right | Center | Alone
-
-type cell =
-  | Cell of Gwdb.person * Gwdb.ifam option * pos * bool * int
-  | Empty
+type cell = Cell of Gwdb.person * Gwdb.ifam option * pos * bool * int | Empty
 
 let rec enrich lst1 lst2 =
   match (lst1, lst2) with
@@ -619,10 +616,8 @@ let tree_generation_list conf base gv p =
                     Cell (f, fo, Left, true, 1)
                     :: Cell (m, fo, Right, true, 1)
                     :: list
-                | Some f, None ->
-                    Cell (f, fo, Alone, true, 1) :: list
-                | None, Some m ->
-                    Cell (m, fo, Alone, true, 1) :: list
+                | Some f, None -> Cell (f, fo, Alone, true, 1) :: list
+                | None, Some m -> Cell (m, fo, Alone, true, 1) :: list
                 | None, None -> Empty :: list)
             | None -> Empty :: list))
       pol []
@@ -1346,9 +1341,6 @@ let make_efam conf base ip ifam =
   in
   (fam, cpl, m_auth)
 
-let mode_local env =
-  match get_env "fam_link" env with Vfam _ -> false | _ -> true
-
 let get_note_source conf base ?p auth no_note note_source =
   safe_val
   @@
@@ -1409,11 +1401,8 @@ and eval_simple_var conf base env ep = function
 and eval_simple_bool_var conf base env =
   let fam_check_aux fn =
     match get_env "fam" env with
-    | Vfam (_, fam, _, _) when mode_local env -> fn fam
-    | _ -> (
-        match get_env "fam_link" env with
-        | Vfam (_, fam, _, _) -> fn fam
-        | _ -> raise Not_found)
+    | Vfam (_, fam, _, _) -> fn fam
+    | _ -> raise Not_found
   in
   let check_relation test =
     fam_check_aux (fun fam -> test @@ Gwdb.get_relation fam)
@@ -1446,13 +1435,10 @@ and eval_simple_bool_var conf base env =
       | _ -> raise Not_found)
   | "has_comment" | "has_fnotes" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
+      | Vfam (_, fam, _, m_auth) ->
           m_auth && (not conf.Config.no_note)
           && Gwdb.sou base (Gwdb.get_comment fam) <> ""
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, _, _, _) -> false
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "has_fsources" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
@@ -1479,35 +1465,23 @@ and eval_simple_bool_var conf base env =
       | _ -> false)
   | "has_witnesses" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
+      | Vfam (_, fam, _, m_auth) ->
           m_auth && Array.length (Gwdb.get_witnesses fam) > 0
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, _, _, _) -> false
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "is_first" -> (
       match get_env "first" env with Vbool x -> x | _ -> raise Not_found)
   | "is_last" -> (
       match get_env "last" env with Vbool x -> x | _ -> raise Not_found)
   | "is_no_mention" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, _) when mode_local env ->
-          Gwdb.get_relation fam = Def.NoMention
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, _) -> Gwdb.get_relation fam = Def.NoMention
-          | _ -> raise Not_found))
+      | Vfam (_, fam, _, _) -> Gwdb.get_relation fam = Def.NoMention
+      | _ -> raise Not_found)
   | "is_no_sexes_check" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, _) when mode_local env ->
+      | Vfam (_, fam, _, _) ->
           Gwdb.get_relation fam = Def.NoSexesCheckNotMarried
           || Gwdb.get_relation fam = Def.NoSexesCheckMarried
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, _) ->
-              Gwdb.get_relation fam = Def.NoSexesCheckNotMarried
-              || Gwdb.get_relation fam = Def.NoSexesCheckMarried
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "is_sibling_after" -> get_env "pos" env = Vstring "next"
   | "is_sibling_before" -> get_env "pos" env = Vstring "prev"
@@ -1546,7 +1520,7 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | _ -> null_val)
   | "divorce_date" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+      | Vfam (_, fam, _, m_auth) -> (
           match Gwdb.get_divorce fam with
           | Def.Divorced d -> (
               match date_aux conf m_auth d with
@@ -1554,17 +1528,7 @@ and eval_simple_str_var conf base env (_, p_auth) = function
                   TemplAst.VVstring ("<em>" ^ s ^ "</em>")
               | x -> x)
           | Def.NotDivorced | Def.Separated -> raise Not_found)
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) -> (
-              match Gwdb.get_divorce fam with
-              | Def.Divorced d -> (
-                  match date_aux conf m_auth d with
-                  | TemplAst.VVstring s when s <> "" ->
-                      TemplAst.VVstring ("<em>" ^ s ^ "</em>")
-                  | x -> x)
-              | Def.NotDivorced | Def.Separated -> raise Not_found)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "slash_divorce_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
@@ -1638,19 +1602,12 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | _ -> null_val)
   | "marriage_place" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
+      | Vfam (_, fam, _, m_auth) ->
           if m_auth then
             Gwdb.get_marriage_place fam
             |> Gwdb.sou base |> Util.trimmed_string_of_place |> safe_val
           else null_val
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) ->
-              if m_auth then
-                Gwdb.get_marriage_place fam
-                |> Gwdb.sou base |> Util.trimmed_string_of_place |> safe_val
-              else null_val
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "marriage_note" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
@@ -1710,13 +1667,8 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | _ -> raise Not_found)
   | "on_marriage_date" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
-          date_aux conf m_auth (Gwdb.get_marriage fam)
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) ->
-              date_aux conf m_auth (Gwdb.get_marriage fam)
-          | _ -> raise Not_found))
+      | Vfam (_, fam, _, m_auth) -> date_aux conf m_auth (Gwdb.get_marriage fam)
+      | _ -> raise Not_found)
   | "slash_marriage_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
@@ -1847,22 +1799,11 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | "child" :: sl -> (
       match get_env "child" env with
-      | Vind p when mode_local env ->
+      | Vind p ->
           let auth = Person.is_visible conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
-      | _ -> (
-          match get_env "child_link" env with
-          | Vind p ->
-              let ep = (p, true) in
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring b -> b
-                | _ -> conf.Config.command
-              in
-              let conf = { conf with command = baseprefix } in
-              eval_person_field_var conf base env ep loc sl
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "enclosing" :: sl ->
       let rec loop = function
         | ("#loop", _) :: env -> eval_person_field_var conf base env ep loc sl
@@ -2056,7 +1997,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | "spouse" :: sl -> (
       match get_env "fam" env with
-      | Vfam (_, _, (_, _, ip), _) when mode_local env ->
+      | Vfam (_, _, (_, _, ip), _) ->
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
@@ -2124,8 +2065,8 @@ and eval_cell_field_var conf base env cell loc = function
   | "person" :: sl -> (
       match cell with
       | Cell (p, _, _, _, _) ->
-        let ep = make_ep conf base (Gwdb.get_iper p) in
-        eval_person_field_var conf base env ep loc sl
+          let ep = make_ep conf base (Gwdb.get_iper p) in
+          eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
