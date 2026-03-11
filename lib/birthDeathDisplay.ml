@@ -87,7 +87,7 @@ let print_death conf base =
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
             let sure d = d.prec = Sure in
-            match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+            match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
                 if sure d1 && sure d && d1 <> d then
@@ -196,10 +196,14 @@ let print_oldest_alive conf base =
   let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
   let get_oldest_alive p =
     match Driver.get_death p with
-    | NotDead -> Date.od_of_cdate (Driver.get_birth p)
+    | NotDead -> (
+        match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
+        | Some d -> Some (Dgreg (d, Dgregorian))
+        | None -> None)
     | DontKnowIfDead when limit > 0 -> (
-        match Date.od_of_cdate (Driver.get_birth p) with
-        | Some (Dgreg (d, _)) as x when conf.today.year - d.year <= limit -> x
+        match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
+        | Some d when conf.today.year - d.year <= limit ->
+            Some (Dgreg (d, Dgregorian))
         | Some _ | None -> None)
     | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         None
@@ -238,12 +242,15 @@ let print_longest_lived conf base =
   let get_longest p =
     if Util.authorized_age conf base p then
       match
-        (Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+        ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+          Driver.get_death p )
       with
       | Some bd, Death (_, cd) -> (
-          match Date.cdate_to_dmy_opt cd with
+          match Date.cdate_to_gregorian_dmy_opt cd with
           | None -> None
-          | Some dd -> Some (Dgreg (Date.time_elapsed bd dd, Dgregorian)))
+          | Some dd ->
+              let te = Date.time_elapsed bd dd in
+              if te.year >= 0 then Some (Dgreg (te, Dgregorian)) else None)
       | _ -> None
     else None
   in
