@@ -251,28 +251,7 @@ let sort_person_list_aux sort base =
   sort (fun p1 p2 ->
       if Gwdb.get_iper p1 = Gwdb.get_iper p2 then 0
       else
-        match
-          match
-            ( Date.od_of_cdate (Gwdb.get_birth p1),
-              Gwdb.get_death p1,
-              Date.od_of_cdate (Gwdb.get_birth p2),
-              Gwdb.get_death p2 )
-          with
-          | Some d1, _, Some d2, _ -> Date.compare_date d1 d2
-          | Some d1, _, _, Def.Death (_, d2) ->
-              Date.compare_date d1 (Date.date_of_cdate d2)
-          | _, Def.Death (_, d1), Some d2, _ ->
-              Date.compare_date (Date.date_of_cdate d1) d2
-          | _, Def.Death (_, d1), _, Def.Death (_, d2) ->
-              Date.compare_date (Date.date_of_cdate d1) (Date.date_of_cdate d2)
-          | Some _, _, _, _ -> 1
-          | _, Def.Death (_, _), _, _ -> 1
-          | _, _, Some _, _ -> -1
-          | _, _, _, Def.Death (_, _) -> -1
-          | _ -> 0
-        with
-        | 0 -> default p1 p2
-        | c -> c)
+        match Person.compare_by_dates p1 p2 with 0 -> default p1 p2 | c -> c)
 
 (* Sort list of persons by comparison with following order:
    - Compare by birth and death date
