@@ -546,10 +546,10 @@ let print conf base =
     }
   in
   Hutil.header conf title;
-  Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-      Util.print_loading_overlay conf ();
-      Output.printf conf
-        {|<form method="get" action="%s" class="mt-2" id="chk-data-form">
+
+  Util.print_loading_overlay conf ();
+  Output.printf conf
+    {|<form method="get" action="%s" class="mt-2" id="chk-data-form">
   %s
   <input type="hidden" name="m" value="CHK_DATA">
   <div class="d-flex justify-content-center mb-3">
@@ -585,56 +585,56 @@ let print conf base =
         <abbr title="%s"><i class="fa fa-circle-question mr-1"></i>↑↓</abbr>
       </div>
       <div class="card-body d-flex flex-column">|}
-        (Util.commd conf :> string)
-        (if conf.cgi then
-           let b_value =
-             if conf.cgi_passwd = "" then conf.bname
-             else conf.bname ^ "_" ^ conf.cgi_passwd
-           in
-           Printf.sprintf {|<input type="hidden" name="b" value="%s">|} b_value
-         else "")
-        (t conf "chk_data books to check")
-        (List.length params.selected_dicts)
-        (render_dict_checkboxes_two_columns conf params.selected_dicts)
-        (t conf "toggle all")
-        (t conf "chk_data error types")
-        (List.length params.sel_err_types)
-        (render_error_checkboxes conf params.sel_err_types)
-        (t conf "toggle all") (t conf "options")
-        (t conf "chk_data keyboard navigation tooltip");
-      if not params.is_roglo then
-        Output.printf conf
-          {|
+    (Util.commd conf :> string)
+    (if conf.cgi then
+       let b_value =
+         if conf.cgi_passwd = "" then conf.bname
+         else conf.bname ^ "_" ^ conf.cgi_passwd
+       in
+       Printf.sprintf {|<input type="hidden" name="b" value="%s">|} b_value
+     else "")
+    (t conf "chk_data books to check")
+    (List.length params.selected_dicts)
+    (render_dict_checkboxes_two_columns conf params.selected_dicts)
+    (t conf "toggle all")
+    (t conf "chk_data error types")
+    (List.length params.sel_err_types)
+    (render_error_checkboxes conf params.sel_err_types)
+    (t conf "toggle all") (t conf "options")
+    (t conf "chk_data keyboard navigation tooltip");
+  if not params.is_roglo then
+    Output.printf conf
+      {|
           <div class="form-check mb-1">
             <input class="form-check-input" type="checkbox" name="nocache" id="use-db" value="1"%s>
             <label class="form-check-label" for="use-db">
               <i class="fa fa-database mr-2"></i>%s
             </label>
           </div>|}
-          (if params.nocache_checked then " checked" else "")
-          (tn conf "chk_data use database/cache" 0);
-      Output.printf conf
-        {|
+      (if params.nocache_checked then " checked" else "")
+      (tn conf "chk_data use database/cache" 0);
+  Output.printf conf
+    {|
           <div class="form-group mb-0">
             <label for="max-results" class="mb-0">%s%s</label>
             <input type="number" class="form-control" name="max" id="max-results" min="1" step="1" value="%s"%s>%s
           </div>|}
-        (t conf "chk_data max results")
-        (t conf ":")
-        (match params.form_max with Some n -> string_of_int n | None -> "")
-        (match params.config_max with
-        | Some n -> Printf.sprintf {| max="%d"|} n
-        | None -> "")
-        (match params.config_max with
-        | Some c ->
-            Printf.sprintf {|<small class="ml-1 text-muted">%s</small>|}
-              (Utf8.capitalize_fst
-                 (Printf.sprintf
-                    (Util.ftransl conf "chk_data limited to %d results")
-                    c))
-        | None -> "");
-      Output.printf conf
-        {|
+    (t conf "chk_data max results")
+    (t conf ":")
+    (match params.form_max with Some n -> string_of_int n | None -> "")
+    (match params.config_max with
+    | Some n -> Printf.sprintf {| max="%d"|} n
+    | None -> "")
+    (match params.config_max with
+    | Some c ->
+        Printf.sprintf {|<small class="ml-1 text-muted">%s</small>|}
+          (Utf8.capitalize_fst
+             (Printf.sprintf
+                (Util.ftransl conf "chk_data limited to %d results")
+                c))
+    | None -> "");
+  Output.printf conf
+    {|
           <div class="text-center py-1 px-3 mt-auto">
             <button type="submit" class="btn btn-primary w-100" data-action="validate-submit">
               <i class="fa fa-magnifying-glass mr-2"></i>%s
@@ -644,24 +644,24 @@ let print conf base =
       </div>
     </div>
   </form>|}
-        (t conf "chk_data check data");
-      if params.selected_dicts <> [] && params.sel_err_types <> [] then (
-        let cache_index = if params.nocache_checked then 1 else 2 in
-        Output.printf conf
-          {|
+    (t conf "chk_data check data");
+  if params.selected_dicts <> [] && params.sel_err_types <> [] then (
+    let cache_index = if params.nocache_checked then 1 else 2 in
+    Output.printf conf
+      {|
   <div class="alert alert-info mt-3">
     <i class="fa fa-database mr-2"></i>%s
   </div>
   <div id="cd" data-ok-title="%s">
 |}
-          (tn conf "chk_data use database/cache" cache_index)
-          (tn conf "validate/delete" 0);
-        display_results conf base params.selected_dicts params.sel_err_types
-          params.max_results;
-        Output.print_sstring conf {|
+      (tn conf "chk_data use database/cache" cache_index)
+      (tn conf "validate/delete" 0);
+    display_results conf base params.selected_dicts params.sel_err_types
+      params.max_results;
+    Output.print_sstring conf {|
   </div>
 |});
-      Hutil.trailer conf)
+  Hutil.trailer conf
 
 type chk_result =
   | Success of {
@@ -867,30 +867,30 @@ let print_result_as_html conf result =
       Hutil.header conf (fun _ ->
           Output.print_sstring conf
             ("✓ " ^ t conf ~c:0 "modification successful"));
-      Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-          print_status_message conf ~success:true
-            ~content:(t conf "modification successful");
-          if r.cache_updated then
-            Output.printf conf
-              {|<div class="text-muted mt-2"><i class="fa fa-check-circle mr-1"></i>%s</div>|}
-              (t conf "cache updated");
-          (match (r.nb_modified, r.elapsed) with
-          | Some n, Some time when n > 1 ->
-              let modif_word =
-                Util.transl_nth conf "modification/modifications" 1
-              in
-              Output.printf conf
-                {|<div class="text-info mt-2"><i class="fa fa-info-circle mr-1"></i>%d %s — %.1f s</div>|}
-                n modif_word time
-          | _ -> ());
-          send_validation_result_to_opener conf result);
+
+      print_status_message conf ~success:true
+        ~content:(t conf "modification successful");
+      if r.cache_updated then
+        Output.printf conf
+          {|<div class="text-muted mt-2"><i class="fa fa-check-circle mr-1"></i>%s</div>|}
+          (t conf "cache updated");
+      (match (r.nb_modified, r.elapsed) with
+      | Some n, Some time when n > 1 ->
+          let modif_word =
+            Util.transl_nth conf "modification/modifications" 1
+          in
+          Output.printf conf
+            {|<div class="text-info mt-2"><i class="fa fa-info-circle mr-1"></i>%d %s — %.1f s</div>|}
+            n modif_word time
+      | _ -> ());
+      send_validation_result_to_opener conf result;
       Hutil.trailer conf
   | Error msg ->
       Hutil.header conf (fun _ ->
           Output.print_sstring conf ("✗ " ^ t conf ~c:0 "modification failed"));
-      Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-          print_status_message conf ~success:false ~content:msg;
-          send_validation_result_to_opener conf result);
+
+      print_status_message conf ~success:false ~content:msg;
+      send_validation_result_to_opener conf result;
       Hutil.trailer conf
 
 let print_chk_ok conf base =
