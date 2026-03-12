@@ -3,6 +3,13 @@
 .age-months { color: #000; }
 .age-days { color: #888; }
 
+.age-posthumous .age-years,
+.age-posthumous .age-months,
+.age-posthumous .age-days {
+  color: #aaa ;
+  cursor: not-allowed;
+}
+
 /* Notifications */
 .notif-ctr {
   position: fixed;
