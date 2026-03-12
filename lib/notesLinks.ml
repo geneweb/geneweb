@@ -186,7 +186,47 @@ let misc_notes_link s i =
               else (j, None)
             in
             WLperson (j, (fn, sn, oc), name, text, fam_marker)
-          with Not_found -> wlnone j
+          with Not_found ->
+            (* No '/' found: try natural name syntax [[First Last (oc)]]
+               where (oc) is an optional occurrence number.
+               The last whitespace-delimited word (before any parenthesized
+               occurrence) is the surname; everything before it is the
+               first name. *)
+            let b_trimmed = String.trim b in
+            let name_part, oc =
+              let len = String.length b_trimmed in
+              if len > 0 && b_trimmed.[len - 1] = ')' then
+                match String.rindex_opt b_trimmed '(' with
+                | Some lp when lp > 0 ->
+                    let inside =
+                      String.sub b_trimmed (lp + 1) (len - lp - 2)
+                      |> String.trim
+                    in
+                    (match int_of_string inside with
+                    | oc_val ->
+                        (String.sub b_trimmed 0 lp |> String.trim, oc_val)
+                    | exception Failure _ -> (b_trimmed, 0))
+                | _ -> (b_trimmed, 0)
+              else (b_trimmed, 0)
+            in
+            (match String.rindex_opt name_part ' ' with
+            | Some sp when sp > 0 ->
+                let fn =
+                  Name.lower (String.sub name_part 0 sp |> String.trim)
+                in
+                let sn =
+                  Name.lower
+                    (String.sub name_part (sp + 1)
+                       (String.length name_part - sp - 1)
+                    |> String.trim)
+                in
+                let display = String.trim b_trimmed in
+                let display =
+                  (* Strip the (oc) suffix from display if present *)
+                  if oc > 0 then name_part else display
+                in
+                WLperson (j, (fn, sn, oc), Some display, text, None)
+            | _ -> wlnone j)
       else wlnone j
   else wlnone (i + 1)
 
