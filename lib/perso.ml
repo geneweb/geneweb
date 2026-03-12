@@ -3455,7 +3455,9 @@ and eval_date_field_var conf d = function
       | _ -> null_val)
   | [ "julian_day" ] | [ "sdn" ] -> (
       match d with
-      | Dgreg (dmy, cal) -> VVstring (string_of_int (Date.to_sdn ~from:cal dmy))
+      | Dgreg (dmy, cal) ->
+          let from = if dmy.day > 0 && dmy.month > 0 then Dgregorian else cal in
+          VVstring (string_of_int (Date.to_sdn ~from dmy))
       | _ -> null_val)
   | [ "month" ] -> (
       match d with
@@ -4025,11 +4027,19 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else
         match Date.od_of_cdate (Driver.get_birth p) with
         | Some (Dgreg (birth_dmy, cal)) ->
-            let birth_sdn = Date.to_sdn ~from:cal birth_dmy in
+            let from =
+              if birth_dmy.day > 0 && birth_dmy.month > 0 then Dgregorian
+              else cal
+            in
+            let birth_sdn = Date.to_sdn ~from birth_dmy in
             let end_sdn =
               match Date.date_of_death (Driver.get_death p) with
               | Some (Dgreg (death_dmy, cal2)) ->
-                  Date.to_sdn ~from:cal2 death_dmy
+                  let from2 =
+                    if death_dmy.day > 0 && death_dmy.month > 0 then Dgregorian
+                    else cal2
+                  in
+                  Date.to_sdn ~from:from2 death_dmy
               | _ -> Date.to_sdn ~from:Dgregorian conf.today
             in
             VVstring (string_of_int (end_sdn - birth_sdn))
