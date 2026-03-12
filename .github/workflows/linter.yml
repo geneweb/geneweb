@@ -40,7 +40,7 @@ jobs:
       - name: Use OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: 4.14.2
+          ocaml-compiler: 4.14.3
           dune-cache: true
 
       - name: Install ocamlformat
