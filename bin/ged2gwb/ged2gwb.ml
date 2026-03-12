@@ -492,6 +492,24 @@ let make_date n1 n2 n3 =
                 else 0, 0
       in
       let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
+      let d, m, y =
+        if d > 0 && m > 0 && m <= 12
+           && d > Date.nb_days_in_month m y
+        then begin
+          let max_d = Date.nb_days_in_month m y in
+          let d' = d - max_d in
+          let m', y' =
+            if m = 12 then 1, y + 1
+            else m + 1, y
+          in
+          Printf.fprintf !log_oc
+            "Warning: %02d/%02d/%04d invalid, \
+             using %02d/%02d/%04d\n" d m y d' m' y';
+          flush !log_oc;
+          d', m', y'
+        end
+        else d, m, y
+      in
       {day = d; month = m; year = y; prec = Sure; delta = 0}
   | None, Some m, Some y ->
       let m =
