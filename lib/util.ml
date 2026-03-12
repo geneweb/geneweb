@@ -631,6 +631,8 @@ let default_safe_html_allowed_tags =
     ("http://www.w3.org/1999/xhtml", "dt");
     ("http://www.w3.org/1999/xhtml", "em");
     ("http://www.w3.org/1999/xhtml", "embed");
+    ("http://www.w3.org/1999/xhtml", "figure");
+    ("http://www.w3.org/1999/xhtml", "figcaption");
     ("http://www.w3.org/1999/xhtml", "font");
     ("http://www.w3.org/1999/xhtml", "h1");
     ("http://www.w3.org/1999/xhtml", "h2");
@@ -2838,6 +2840,7 @@ let rec in_text case_sens s m =
           if in_text case_sens s text then true else loop false j
       | NotesLinks.WLperson (j, (fn, sn, _), None, _, _) ->
           if in_text case_sens s (fn ^ " " ^ sn) then true else loop false j
+      | NotesLinks.WLimage (j, _, _, _) -> loop false j
       | NotesLinks.WLnone (j, _) -> loop false j
     else
       match start_equiv_with case_sens s m i with

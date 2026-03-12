@@ -2,6 +2,7 @@ type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
   | WLperson of int * Def.NLDB.key * string option * string option * int option
   | WLwizard of int * string * string
+  | WLimage of int * (string list * string) * string * string option
   | WLnone of int * string
 
 val char_dir_sep : char

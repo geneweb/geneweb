@@ -25,6 +25,10 @@ open Util
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
+   [[image:filename.jpg]] inline image from src/ directory
+   [[image:filename.jpg/alt text]] inline image with alt text
+   [[image:filename.jpg/alt text/200px]] inline image with alt text and max-width
+   {{file.jpg|left|200px|caption}} floated image with text wrapping
    empty line : new paragraph
    lines starting with space : displayed as they are (providing 1/ there
      are at least two 2/ there is empty lines before and after the group
@@ -183,6 +187,18 @@ let bold_italic_syntax s =
     else if s.[i] = '%' then (
       Buffer.add_char buff '%';
       loop quot_lev (i + 1) (* highlight *))
+    else if i < slen - 1 && s.[i] = '{' && s.[i + 1] = '{' then (
+      (* Pass through {{...}} image syntax unchanged for syntax_links *)
+      let j =
+        let rec find_end j =
+          if j >= slen - 1 then slen
+          else if s.[j] = '}' && s.[j + 1] = '}' then j + 2
+          else find_end (j + 1)
+        in
+        find_end (i + 2)
+      in
+      Buffer.add_string buff (String.sub s i (j - i));
+      loop quot_lev j)
     else if s.[i] = '{' then (
       let buff2 = Buffer.create 80 in
       let b, j =
@@ -259,6 +275,68 @@ let syntax_links conf wi s =
     else if s.[i] = '%' then (
       Buffer.add_char buff '%';
       loop quot_lev pos (i + 1))
+    else if i < slen - 1 && s.[i] = '{' && s.[i + 1] = '{' then (
+      (* double-brace floated image syntax *)
+      let j =
+        let rec find_end j =
+          if j >= slen - 1 then slen
+          else if s.[j] = '}' && s.[j + 1] = '}' then j
+          else find_end (j + 1)
+        in
+        find_end (i + 2)
+      in
+      if j < slen then (
+        let content = String.sub s (i + 2) (j - i - 2) in
+        let parts = String.split_on_char '|' content in
+        let t =
+          match parts with
+          | file :: rest ->
+              let file = String.trim file in
+              let align =
+                match rest with a :: _ -> String.trim a | [] -> "right"
+              in
+              let width =
+                match rest with
+                | _ :: w :: _ -> String.trim w
+                | _ -> ""
+              in
+              let caption =
+                match rest with
+                | _ :: _ :: c when c <> [] -> String.trim (String.concat "|" c)
+                | _ -> ""
+              in
+              let float_style =
+                if align = "left" then
+                  "float:left;margin:0 1em 0.5em 0;clear:left"
+                else "float:right;margin:0 0 0.5em 1em;clear:right"
+              in
+              let width_style =
+                if width <> "" then
+                  Printf.sprintf ";max-width:%s" (escape width)
+                else ""
+              in
+              let src =
+                Printf.sprintf "%sm=IM&s=%s"
+                  (commd conf :> string)
+                  (encode file)
+              in
+              let caption_html =
+                if caption <> "" then
+                  Printf.sprintf
+                    "<figcaption style=\"font-size:0.85em;text-align:center\">%s</figcaption>"
+                    caption
+                else ""
+              in
+              Printf.sprintf
+                {|<figure style="%s%s"><a href="%s" target="_blank"><img src="%s" alt="%s" style="width:100%%"></a>%s</figure>|}
+                float_style width_style src src (escape caption) caption_html
+          | [] -> ""
+        in
+        Buffer.add_string buff t;
+        loop quot_lev pos (j + 2))
+      else (
+        Buffer.add_char buff '{';
+        loop quot_lev pos (i + 1)))
     else if s.[i] = '{' then (
       let buff2 = Buffer.create 80 in
       let b, j =
@@ -373,6 +451,23 @@ let syntax_links conf wi s =
           in
           Buffer.add_string buff t;
           loop quot_lev (pos + 1) j
+      | NotesLinks.WLimage (j, (dirs, file), alt, width_opt) ->
+          let path = String.concat "/" (dirs @ [ file ]) in
+          let src =
+            Printf.sprintf "%sm=IM&s=%s" (commd conf :> string) (encode path)
+          in
+          let style =
+            match width_opt with
+            | None -> ""
+            | Some w -> Printf.sprintf " style=\"max-width:%s\"" (escape w)
+          in
+          let t =
+            Printf.sprintf
+              {|<a href="%s" target="_blank"><img src="%s" alt="%s"%s class="notes-image"></a>|}
+              src src (escape alt) style
+          in
+          Buffer.add_string buff t;
+          loop quot_lev pos j
       | NotesLinks.WLnone (j, none_s) ->
           Buffer.add_string buff none_s;
           loop quot_lev pos j
@@ -467,6 +562,7 @@ let remove_links s =
             in
             (Buff.mstore len text, j)
         | NotesLinks.WLwizard (j, _, text) -> (Buff.mstore len text, j)
+        | NotesLinks.WLimage (j, _, alt, _) -> (Buff.mstore len alt, j)
         | NotesLinks.WLnone (j, none_s) -> (Buff.mstore len none_s, j)
       in
       loop len i
