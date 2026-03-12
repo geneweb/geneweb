@@ -3,7 +3,7 @@
 val assets : unit -> string list
 (** Returns list of allowed to acces assets *)
 
-val default_base_dir : string
+val default_base_dir : Geneweb_dirs.one Geneweb_dirs.var
 (** Default value for the base directory. *)
 
 val base_dir : unit -> string

@@ -9,6 +9,7 @@ module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Sites = Geneweb_sites.Sites
+module Dirs = Geneweb_dirs
 module Plugin = Geneweb_plugin
 
 type opened_file = { path : string; mutable oc : out_channel }
@@ -2511,7 +2512,7 @@ let parse_cmd () =
         Fmt.str
           "<DIR> Specify where the “bases” directory with databases is \
            installed (default if empty is %S)."
-          Secure.default_base_dir );
+          (Dirs.name Secure.default_base_dir) );
       ( "-wd",
         Arg.String make_sock_dir,
         "<DIR> Directory for socket communication (Windows) and access count."

@@ -4,6 +4,7 @@ open Geneweb
 open Def
 
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 
 type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend
@@ -3181,7 +3182,7 @@ let speclist =
       Arg.String Secure.set_base_dir,
       Fmt.str
       "<DIR> Specify where the “bases” directory with databases is installed \
-       (default if empty is %S)." Secure.default_base_dir )
+       (default if empty is %S)." (Dirs.name Secure.default_base_dir) )
   ; ( "-o", Arg.Set_string out_file,
       "<file> Output database (default: <input file name>.gwb, a.gwb if not \
        available). Alphanumerics and -" )
@@ -3255,7 +3256,7 @@ let speclist =
     , " Put untreated GEDCOM tags in notes" )
   ; ( "-ds", Arg.Set_string default_source
     , " Set the source field for persons and families without source data" )
-  ; ( "-dates", Arg.String (fun s -> 
+  ; ( "-dates", Arg.String (fun s ->
           if s = "dates_md" then month_number_dates := MonthDayDates
           else if s = "dates_dm" then month_number_dates := DayMonthDates)
     , " Interpret months-numbered dates as year only (default) or month/day/year or day/month/year" )
