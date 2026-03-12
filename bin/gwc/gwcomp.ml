@@ -32,7 +32,7 @@ type gw_syntax =
       * sex
       * (somebody * sex) list
       * (string gen_fam_event_name
-        * cdate
+        * Adef.cdate
         * string
         * string
         * string
@@ -66,7 +66,7 @@ type gw_syntax =
       somebody
       * sex
       * (string gen_pers_event_name
-        * cdate
+        * Adef.cdate
         * string
         * string
         * string
@@ -171,7 +171,7 @@ let date_of_string s i =
   in
   let precision, i =
     match s.[i] with
-    | '~' -> (About, succ i)
+    | '~' -> (Adef.About, succ i)
     | '?' -> (Maybe, succ i)
     | '>' -> (After, succ i)
     | '<' -> (Before, succ i)
@@ -217,13 +217,15 @@ let date_of_string s i =
             if month < 1 || month > 13 then error 2
             else if day < 1 || day > 31 then error 3
             else
-              let d = { day; month; year; prec = precision; delta = 0 } in
-              Some (Dgreg (d, Dgregorian), i)
+              let d = { Adef.day; month; year; prec = precision; delta = 0 } in
+              Some (Adef.Dgreg (d, Dgregorian), i)
         | None ->
             if year = 0 then None
             else if month < 1 || month > 13 then error 4
             else
-              let d = { day = 0; month; year; prec = precision; delta = 0 } in
+              let d =
+                { Adef.day = 0; month; year; prec = precision; delta = 0 }
+              in
               Some (Dgreg (d, Dgregorian), i))
     | None ->
         if undefined then
@@ -235,7 +237,9 @@ let date_of_string s i =
             Some (Dtext txt, String.length s)
           else failwith ("date_of_string " ^ s)
         else
-          let d = { day = 0; month = 0; year; prec = precision; delta = 0 } in
+          let d =
+            { Adef.day = 0; month = 0; year; prec = precision; delta = 0 }
+          in
           Some (Dgreg (d, Dgregorian), i)
   in
   let date =
@@ -245,12 +249,12 @@ let date_of_string s i =
         else if s.[i] = '|' then
           let year2, i = champ (succ i) in
           let (day2, month2, year2), i = dmy2 year2 i in
-          let dmy2 = { day2; month2; year2; delta2 = 0 } in
+          let dmy2 = { Adef.day2; month2; year2; delta2 = 0 } in
           Some (Dgreg ({ d with prec = OrYear dmy2 }, cal), i)
         else if i + 1 < String.length s && s.[i] = '.' && s.[i + 1] = '.' then
           let year2, i = champ (i + 2) in
           let (day2, month2, year2), i = dmy2 year2 i in
-          let dmy2 = { day2; month2; year2; delta2 = 0 } in
+          let dmy2 = { Adef.day2; month2; year2; delta2 = 0 } in
           Some (Dgreg ({ d with prec = YearInt dmy2 }, cal), i)
         else Some (dt, i)
     | Some ((Dtext _ as dt), i) -> Some (dt, i)
@@ -259,7 +263,7 @@ let date_of_string s i =
   let date =
     match date with
     | Some (Dgreg (d, _), i) -> (
-        if i = String.length s then Some (Dgreg (d, Dgregorian), i)
+        if i = String.length s then Some (Adef.Dgreg (d, Dgregorian), i)
         else
           match s.[i] with
           | 'G' -> Some (Dgreg (d, Dgregorian), i + 1)

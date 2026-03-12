@@ -7,7 +7,7 @@ let of_sdn : type a. a Calendars.kind -> Calendars.sdn -> a Calendars.date =
   | Calendars.Hebrew -> Calendars.hebrew_of_sdn sdn
   | Calendars.Islamic -> Calendars.islamic_of_sdn sdn
 
-let to_calendar_date kind { Def.day; month; year; delta; _ } =
+let to_calendar_date kind { Adef.day; month; year; delta; _ } =
   let day = max 1 day in
   let month = max 1 month in
   match Calendars.make kind ~day ~month ~year ~delta with
@@ -24,9 +24,10 @@ let to_calendar_date kind { Def.day; month; year; delta; _ } =
         (Printf.sprintf "Invalid date: %s"
            (Calendars.Unsafe.to_string err.value))
 
-let of_calendars : type a. ?prec:Def.precision -> a Calendars.date -> Def.dmy =
- fun ?(prec = Def.Sure) { Calendars.day; month; year; delta; _ } ->
-  { Def.day; month; year; delta; prec }
+let of_calendars : type a. ?prec:Adef.precision -> a Calendars.date -> Adef.dmy
+    =
+ fun ?(prec = Adef.Sure) { Calendars.day; month; year; delta; _ } ->
+  { Adef.day; month; year; delta; prec }
 
 let sdn_of_gregorian d =
   Calendars.to_sdn (to_calendar_date Calendars.Gregorian d)
@@ -41,38 +42,38 @@ let french_of_sdn prec sdn = of_calendars ~prec (Calendars.french_of_sdn sdn)
 let sdn_of_hebrew d = Calendars.to_sdn (to_calendar_date Calendars.Hebrew d)
 let hebrew_of_sdn prec sdn = of_calendars ~prec (Calendars.hebrew_of_sdn sdn)
 
-let dmy_of_dmy2 { Def.day2; month2; year2; delta2 } =
+let dmy_of_dmy2 { Adef.day2; month2; year2; delta2 } =
   {
-    Def.day = day2;
+    Adef.day = day2;
     month = month2;
     year = year2;
-    prec = Def.Sure;
+    prec = Adef.Sure;
     delta = delta2;
   }
 
-let dmy2_of_dmy { Def.day; month; year; delta; _ } =
-  { Def.day2 = day; month2 = month; year2 = year; delta2 = delta }
+let dmy2_of_dmy { Adef.day; month; year; delta; _ } =
+  { Adef.day2 = day; month2 = month; year2 = year; delta2 = delta }
 
 let convert_via_sdn from_sdn to_of_sdn d =
   let convert_dmy2 d2 =
-    if d2.Def.day2 = 0 || d2.Def.month2 = 0 then d2
+    if d2.Adef.day2 = 0 || d2.Adef.month2 = 0 then d2
     else
       let sdn = from_sdn (dmy_of_dmy2 d2) in
       let c = of_calendars (to_of_sdn sdn) in
       {
-        Def.day2 = c.Def.day;
-        month2 = c.Def.month;
-        year2 = c.Def.year;
-        delta2 = c.Def.delta;
+        Adef.day2 = c.Adef.day;
+        month2 = c.month;
+        year2 = c.year;
+        delta2 = c.delta;
       }
   in
   let prec =
-    match d.Def.prec with
-    | Def.OrYear d2 -> Def.OrYear (convert_dmy2 d2)
-    | Def.YearInt d2 -> Def.YearInt (convert_dmy2 d2)
+    match d.Adef.prec with
+    | Adef.OrYear d2 -> Adef.OrYear (convert_dmy2 d2)
+    | YearInt d2 -> YearInt (convert_dmy2 d2)
     | prec -> prec
   in
-  if d.Def.day = 0 || d.Def.month = 0 then { d with Def.prec }
+  if d.Adef.day = 0 || d.month = 0 then { d with Adef.prec }
   else
     let sdn = from_sdn d in
     of_calendars ~prec (to_of_sdn sdn)

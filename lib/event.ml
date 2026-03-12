@@ -50,7 +50,7 @@ let sort_events get_name get_date events =
 
 type 'a event_item =
   'a event_name
-  * cdate
+  * Adef.cdate
   * Driver.istr
   * Driver.istr
   * Driver.istr

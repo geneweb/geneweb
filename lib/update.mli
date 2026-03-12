@@ -13,7 +13,7 @@ type update_error =
       Geneweb_db.Driver.base * Geneweb_db.Driver.person * string
   | UERR_own_ancestor of Geneweb_db.Driver.base * Geneweb_db.Driver.person
   | UERR_digest
-  | UERR_bad_date of Def.dmy
+  | UERR_bad_date of Adef.dmy
   | UERR_missing_field of Adef.safe_string
   | UERR_already_has_parents of
       Geneweb_db.Driver.base * Geneweb_db.Driver.person
@@ -25,10 +25,10 @@ type update_error =
 exception ModErr of update_error
 
 type create_info = {
-  ci_birth_date : date option;
+  ci_birth_date : Adef.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : date option;
+  ci_death_date : Adef.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
@@ -40,7 +40,7 @@ type key = string * string * int * create * string
 val infer_death :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> death
 
-val infer_death_bb : config -> date option -> date option -> death
+val infer_death_bb : config -> Adef.date option -> Adef.date option -> death
 
 val infer_death_from_parents :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.family -> death
@@ -149,14 +149,14 @@ val digest_family :
     The optional [salt] parameter should be set to a secret value generated at
     server startup to strengthen security. *)
 
-val reconstitute_date : config -> string -> date option
+val reconstitute_date : config -> string -> Adef.date option
 
 val print_someone :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
 
 val update_conf : config -> config
-val bad_date : config -> dmy -> 'a
-val check_greg_day : config -> dmy -> unit
+val bad_date : config -> Adef.dmy -> 'a
+val check_greg_day : config -> Adef.dmy -> unit
 
 val check_missing_witnesses_names :
   config ->

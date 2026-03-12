@@ -52,7 +52,7 @@ module Make (D : ConverterDriver) = struct
   let conv_dmy dmy =
     obj
       [|
-        ("day", int dmy.day);
+        ("day", int dmy.Adef.day);
         ("delta", if dmy.delta = 0 then null else int dmy.delta);
         ("month", int dmy.month);
         ("year", int dmy.year);
@@ -61,12 +61,14 @@ module Make (D : ConverterDriver) = struct
   let conv_dmy2 dmy =
     obj
       [|
-        ("day", int dmy.day2); ("month", int dmy.month2); ("year", int dmy.year2);
+        ("day", int dmy.Adef.day2);
+        ("month", int dmy.month2);
+        ("year", int dmy.year2);
       |]
 
   let conv_date_cal dt cal =
     let prec =
-      match dt.prec with
+      match dt.Adef.prec with
       | Sure -> str "Sure"
       | About -> str "About"
       | Maybe -> str "Maybe"
@@ -91,7 +93,7 @@ module Make (D : ConverterDriver) = struct
 
   let conv_date oc =
     match oc with
-    | Dgreg (d, c) -> conv_date_cal d (Def_show.show_calendar c)
+    | Adef.Dgreg (d, c) -> conv_date_cal d (Def_show.show_calendar c)
     | Dtext t -> str t
 
   let conv_cdate cd =

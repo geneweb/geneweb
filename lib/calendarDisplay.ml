@@ -1,5 +1,4 @@
 open Config
-open Def
 
 type 'a env_value = Vint of int | Vother of 'a | Vnone
 
@@ -9,7 +8,7 @@ let set_vother x = Vother x
 
 let dmy_of_sdn cal prec jd =
   match cal with
-  | Dgregorian -> Calendar.gregorian_of_sdn prec jd
+  | Adef.Dgregorian -> Calendar.gregorian_of_sdn prec jd
   | Djulian -> Calendar.julian_of_sdn prec jd
   | Dfrench -> Calendar.french_of_sdn prec jd
   | Dhebrew -> Calendar.hebrew_of_sdn prec jd
@@ -23,7 +22,7 @@ let eval_julian_day conf =
       | Some v -> (
           try
             let len = String.length v in
-            if cal = Djulian && len > 2 && v.[len - 2] = '/' then
+            if cal = Adef.Djulian && len > 2 && v.[len - 2] = '/' then
               int_of_string (String.sub v 0 (len - 2)) + 1
             else int_of_string v
           with Failure _ -> 0)
@@ -31,7 +30,7 @@ let eval_julian_day conf =
     in
     let mm = getint ("m" ^ var) in
     let dd = getint ("d" ^ var) in
-    let dt = { day = dd; month = mm; year = yy; prec = Sure; delta = 0 } in
+    let dt = { Adef.day = dd; month = mm; year = yy; prec = Sure; delta = 0 } in
     let skip_zero y dir = if y = 0 then dir else y in
 
     match Util.p_getenv conf.env ("t" ^ var) with
@@ -44,7 +43,7 @@ let eval_julian_day conf =
         else
           let jd = conv dt in
           let back = dmy_of_sdn cal Sure jd in
-          if back.Def.day <> dd || back.Def.month <> mm then
+          if back.Adef.day <> dd || back.month <> mm then
             Notif.warning
               ~title:(Util.transl conf "NOTIF_TT bad date")
               (Util.transl conf "NOTIF bad date corrected");
@@ -79,7 +78,7 @@ let eval_julian_day conf =
 
   let calendars =
     [
-      ("g", Dgregorian, Calendar.sdn_of_gregorian, 12);
+      ("g", Adef.Dgregorian, Calendar.sdn_of_gregorian, 12);
       ("j", Djulian, Calendar.sdn_of_julian, 12);
       ("f", Dfrench, Calendar.sdn_of_french, 13);
       ("h", Dhebrew, Calendar.sdn_of_hebrew, 13);

@@ -19,41 +19,6 @@ exception HttpExn of httpStatus * string
 (** Type that represents 2 possible choices *)
 type ('a, 'b) choice = Left of 'a | Right of 'b
 
-type cdate = Adef.cdate
-(** Alias to [Adef.cdate] *)
-
-(** Alias to [Adef.date] *)
-type date = Adef.date =
-  | Dgreg of dmy * calendar
-  (* textual form of the date *)
-  | Dtext of string
-
-(** Alias to [Adef.calendar] *)
-and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
-
-and dmy = Adef.dmy = {
-  day : int;
-  month : int;
-  year : int;
-  prec : precision;
-  delta : int;
-}
-(** Alias to [Adef.dmy] *)
-
-and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
-(** Alias to [Adef.dmy2] *)
-
-(** Alias to [Adef.precision] *)
-and precision = Adef.precision =
-  | Sure
-  | About
-  | Maybe
-  | Before
-  | After
-  | OrYear of dmy2
-  (* inteval *)
-  | YearInt of dmy2
-
 (** Relation kind between couple in the family *)
 type relation_kind =
   | Married
@@ -71,10 +36,10 @@ type relation_kind =
 (** Divorce status *)
 type divorce =
   | NotDivorced
-  | Divorced of cdate
+  | Divorced of Adef.cdate
   | Separated_old
   | NotSeparated
-  | Separated of cdate
+  | Separated of Adef.cdate
 
 (** Death reason *)
 type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
@@ -82,14 +47,14 @@ type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
 (** Death status *)
 type death =
   | NotDead
-  | Death of death_reason * cdate
+  | Death of death_reason * Adef.cdate
   | DeadYoung
   | DeadDontKnowWhen
   | DontKnowIfDead
   | OfCourseDead
 
 (** Burial information *)
-type burial = UnknownBurial | Buried of cdate | Cremated of cdate
+type burial = UnknownBurial | Buried of Adef.cdate | Cremated of Adef.cdate
 
 (** Rights for access to the personal data *)
 type access = IfTitles | Public | SemiPublic | Private
@@ -101,8 +66,8 @@ type 'string gen_title = {
   t_name : 'string gen_title_name;
   t_ident : 'string;
   t_place : 'string;
-  t_date_start : cdate;
-  t_date_end : cdate;
+  t_date_start : Adef.cdate;
+  t_date_end : Adef.cdate;
   t_nth : int;
 }
 (** Type that represents information about nobility title of a person *)
@@ -174,7 +139,7 @@ type 'string gen_pers_event_name =
 
 type ('person, 'string) gen_pers_event = {
   epers_name : 'string gen_pers_event_name;
-  epers_date : cdate;
+  epers_date : Adef.cdate;
   epers_place : 'string;
   epers_reason : 'string;
   epers_note : 'string;
@@ -201,7 +166,7 @@ type 'string gen_fam_event_name =
 
 type ('person, 'string) gen_fam_event = {
   efam_name : 'string gen_fam_event_name;
-  efam_date : cdate;
+  efam_date : Adef.cdate;
   efam_place : 'string;
   efam_reason : 'string;
   efam_note : 'string;
@@ -260,11 +225,11 @@ type ('iper, 'person, 'string) gen_person = {
   occupation : 'string;
   sex : sex;
   access : access;
-  birth : cdate;
+  birth : Adef.cdate;
   birth_place : 'string;
   birth_note : 'string;
   birth_src : 'string;
-  baptism : cdate;
+  baptism : Adef.cdate;
   baptism_place : 'string;
   baptism_note : 'string;
   baptism_src : 'string;
@@ -294,7 +259,7 @@ type 'person gen_descend = { children : 'person array }
 (** Children of the family *)
 
 type ('person, 'ifam, 'string) gen_family = {
-  marriage : cdate;
+  marriage : Adef.cdate;
   marriage_place : 'string;
   marriage_note : 'string;
   marriage_src : 'string;
@@ -324,7 +289,7 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | BigAgeBetweenSpouses of
       'person
       * 'person
-      * dmy (* Age differece between couples is greater then 50 years *)
+      * Adef.dmy (* Age differece between couples is greater then 50 years *)
   | BirthAfterDeath of 'person  (** Person is born after his death *)
   | IncoherentSex of 'person * int * int  (** Incoherent sex of person *)
   | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array
@@ -340,7 +305,7 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | CloseChildren of 'family * 'person * 'person
       (** Age difference between two child is less then 7 month (except for
           twins) *)
-  | DeadOld of 'person * dmy
+  | DeadOld of 'person * Adef.dmy
       (** Dead old (at the age older then 109 after 1900 year and older then 100
           before) *)
   | DeadTooEarlyToBeFather of 'person * 'person
@@ -362,10 +327,10 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** Children is born after his mother's death *)
   | ParentBornAfterChild of 'person * 'person
       (** Parent is born after one of his children *)
-  | ParentTooOld of 'person * dmy * 'person
+  | ParentTooOld of 'person * Adef.dmy * 'person
       (** Person became a parent at age older then 55 years for mother and 70
           for father *)
-  | ParentTooYoung of 'person * dmy * 'person
+  | ParentTooYoung of 'person * Adef.dmy * 'person
       (** Person became a parent at age younger then 11 years old *)
   | PEventOrder of 'person * 'pevent * 'pevent
       (** Personal events haven't been ordered correctly *)
@@ -383,9 +348,9 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** Title's start date is after end date or person is born after title
           dates *)
   | UndefinedSex of 'person  (** Person has undefined sex (Neuter) *)
-  | YoungForMarriage of 'person * dmy * 'family
+  | YoungForMarriage of 'person * Adef.dmy * 'family
       (** Person is married before he was 12 years old *)
-  | OldForMarriage of 'person * dmy * 'family
+  | OldForMarriage of 'person * Adef.dmy * 'family
       (** Person is married after he was 100 years old *)
 
 (** Missing sources warning *)

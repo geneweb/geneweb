@@ -24,62 +24,62 @@
     Partial dates (day=0 or month=0) bypass SDN conversion entirely in
     convert_via_sdn, as SDN cannot encode unknown components. *)
 (* Calendar conversions using Calendars library (>= 2.0.0)
-   
+
    This module wraps the external Calendars library to provide
-   conversions between Geneweb's Def.dmy type and Serial Day Numbers (SDN).
-   
+   conversions between Geneweb's Adef.dmy type and Serial Day Numbers (SDN).
+
    SDN (Serial Day Number) is a day numbering system where:
    - SDN 1 = November 25, 4714 BC (Gregorian proleptic)
    - Enables calendar-neutral date arithmetic
    - Used for inter-calendar conversions
 *)
 
-val gregorian_of_sdn : Def.precision -> int -> Def.dmy
+val gregorian_of_sdn : Adef.precision -> int -> Adef.dmy
 (** Returns date of gregorian calendar from SDN and specified precision. *)
 
-val julian_of_sdn : Def.precision -> int -> Def.dmy
+val julian_of_sdn : Adef.precision -> int -> Adef.dmy
 (** Returns date of julian calendar from SDN and specified precision. *)
 
-val french_of_sdn : Def.precision -> int -> Def.dmy
+val french_of_sdn : Adef.precision -> int -> Adef.dmy
 (** Returns date of french calendar from SDN and specified precision. *)
 
-val hebrew_of_sdn : Def.precision -> int -> Def.dmy
+val hebrew_of_sdn : Adef.precision -> int -> Adef.dmy
 (** Returns date of hebrew calendar from SDN and specified precision. *)
 
-val sdn_of_gregorian : Def.dmy -> int
+val sdn_of_gregorian : Adef.dmy -> int
 (** Returns SDN of the date of gregorian calendar. *)
 
-val sdn_of_julian : Def.dmy -> int
+val sdn_of_julian : Adef.dmy -> int
 (** Returns SDN of the date of julian calendar. *)
 
-val sdn_of_french : Def.dmy -> int
+val sdn_of_french : Adef.dmy -> int
 (** Returns SDN of the date of french calendar. *)
 
-val sdn_of_hebrew : Def.dmy -> int
+val sdn_of_hebrew : Adef.dmy -> int
 (** Returns SDN of the date of hebrew calendar. *)
 
-val dmy_of_dmy2 : Def.dmy2 -> Def.dmy
+val dmy_of_dmy2 : Adef.dmy2 -> Adef.dmy
 (** Convert [dmy2] to [dmy] with precision [Sure]. *)
 
-val dmy2_of_dmy : Def.dmy -> Def.dmy2
+val dmy2_of_dmy : Adef.dmy -> Adef.dmy2
 (** Extract [dmy2] fields from [dmy], discarding precision. *)
 
-val gregorian_of_julian : Def.dmy -> Def.dmy
+val gregorian_of_julian : Adef.dmy -> Adef.dmy
 (** Converts julian calendar's date to gregorian. *)
 
-val julian_of_gregorian : Def.dmy -> Def.dmy
+val julian_of_gregorian : Adef.dmy -> Adef.dmy
 (** Converts gregorian calendar's date to julian date. *)
 
-val gregorian_of_french : Def.dmy -> Def.dmy
+val gregorian_of_french : Adef.dmy -> Adef.dmy
 (** Converts french calendar's date to gregorian date. *)
 
-val french_of_gregorian : Def.dmy -> Def.dmy
+val french_of_gregorian : Adef.dmy -> Adef.dmy
 (** Converts gregorian calendar's date to french date. *)
 
-val gregorian_of_hebrew : Def.dmy -> Def.dmy
+val gregorian_of_hebrew : Adef.dmy -> Adef.dmy
 (** Converts hebrew calendar's date to gregorian date. *)
 
-val hebrew_of_gregorian : Def.dmy -> Def.dmy
+val hebrew_of_gregorian : Adef.dmy -> Adef.dmy
 (** Converts gregorian calendar's date to hebrew date. *)
 
 (** Moon phases *)
