@@ -1,5 +1,0 @@
-(library
- (name geneweb_export)
- (public_name geneweb.export)
- (libraries unix geneweb_def geneweb_def_show geneweb_db)
- (modules json_converter))
