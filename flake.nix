@@ -15,17 +15,19 @@
       let
         pkgs = import nixpkgs {
           system = "${system}";
-          overlays = [(_: prev: {
-            ocamlPackages = prev.ocaml-ng.ocamlPackages_5_4.overrideScope (_: p: {
-              cmdliner = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/cmdliner.nix { };
-              unidecode = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/unidecode.nix { };
-              calendars = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/calendars.nix { };
-              not-ocamlfind = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/not-ocamlfind.nix { };
-              odoc = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/odoc.nix { };
-              ancient = ocaml-ancient.outputs.packages.${system}.ancient;
-              ocaml = p.ocaml.override { framePointerSupport = true; };
-            });
-          })];
+          overlays = [
+            (_: prev: {
+              ocamlPackages = prev.ocaml-ng.ocamlPackages_5_4.overrideScope (_: p: {
+                cmdliner = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/cmdliner.nix { };
+                unidecode = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/unidecode.nix { };
+                calendars = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/calendars.nix { };
+                not-ocamlfind = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/not-ocamlfind.nix { };
+                odoc = prev.ocaml-ng.ocamlPackages_5_4.callPackage ./nix/odoc.nix { };
+                ancient = ocaml-ancient.outputs.packages.${system}.ancient;
+                ocaml = p.ocaml.override { framePointerSupport = true; };
+              });
+            })
+          ];
         };
 
         ocamlPackages = pkgs.ocamlPackages;
@@ -121,7 +123,11 @@
         formatter = pkgs.nixpkgs-fmt;
 
         devShells.default = pkgs.mkShell {
-          packages = [ ocamlWrapped ] ++ (with ocamlPackages; [
+          packages = [
+            ocamlWrapped
+          ] ++ (with pkgs; [
+            rlwrap
+          ]) ++ (with ocamlPackages; [
             qcheck
             qcheck-alcotest
             findlib
