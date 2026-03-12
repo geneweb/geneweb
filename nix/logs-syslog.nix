@@ -1,4 +1,7 @@
-{ buildDunePackage, logs, syslog-message, ptime
+{ buildDunePackage
+, logs
+, syslog-message
+, ptime
 }:
 
 buildDunePackage (finalAttrs: {
