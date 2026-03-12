@@ -231,6 +231,8 @@
   %let;my_death_date_month;%if;(self.death_date.month!="")%if;(self.death_date.month<=9)0%end;%self.death_date.month;%else;00%end;%in;
   %let;my_death_date_day;%if;(self.death_date.day!="")%if;(self.death_date.day<=9)0%end;%self.death_date.day;%else;00%end;%in;
   %let;my_death_date;%my_death_date_year;%my_death_date_month;%my_death_date_day;%in;
+  %let;my_death_sort;%my_death_date;2%in;
+  %let;has_known_death;%if;(my_death_date_year!="0000" and my_death_date_year!="9999")1%else;0%end;%in;
   %empty_sorted_list;
   %reset_count2;
   %( événements self %)
@@ -393,7 +395,8 @@
 %end;">
         %(<td class="align-middle">%item.1;</td>%)
           <td class="align-middle text-right text-nowrap">%item.3;</td>
-          <td class="align-middle text-center text-nowrap px-2">%item.7;</td>
+          <td class="align-middle text-center text-nowrap px-2%nn;
+            %if;(has_known_death=1 and item.1>my_death_sort) age-posthumous%end;">%item.7;</td>
           <td class="align-middle">
             %if;(item.4="self_evt")
               %reset_count2;
