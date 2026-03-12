@@ -155,7 +155,7 @@ val get_access : person -> Def.access
 val get_aliases : person -> istr list
 (** Get person's aliases ids *)
 
-val get_baptism : person -> Def.cdate
+val get_baptism : person -> Adef.cdate
 (** Get person's baptism date *)
 
 val get_baptism_note : person -> istr
@@ -167,7 +167,7 @@ val get_baptism_place : person -> istr
 val get_baptism_src : person -> istr
 (** Get person's baptism source id *)
 
-val get_birth : person -> Def.cdate
+val get_birth : person -> Adef.cdate
 (** Get person's birth date *)
 
 val get_birth_note : person -> istr
@@ -246,7 +246,7 @@ val get_image : person -> istr
 val get_iper : person -> iper
 (** Get person's id *)
 
-val get_marriage : family -> Def.cdate
+val get_marriage : family -> Adef.cdate
 (** Get family's marriage date *)
 
 val get_marriage_note : family -> istr

@@ -115,7 +115,7 @@ let soy y = if y = 0 then "-0" else string_of_int y
 let oc opts = match opts.Gwexport.oc with _, oc, _ -> oc
 
 let print_date_dmy opts d =
-  (match d.prec with
+  (match d.Adef.prec with
   | About -> Printf.ksprintf (oc opts) "~"
   | Maybe -> Printf.ksprintf (oc opts) "?"
   | Before -> Printf.ksprintf (oc opts) "<"
@@ -193,7 +193,7 @@ let correct_string_no_colon base is =
   gen_correct_string false true (Driver.sou base is)
 
 let gen_print_date opts no_colon = function
-  | Dgreg (d, Dgregorian) -> print_date_dmy opts d
+  | Adef.Dgreg (d, Dgregorian) -> print_date_dmy opts d
   | Dgreg (d, Djulian) ->
       print_date_dmy opts (Calendar.julian_of_gregorian d);
       Printf.ksprintf (oc opts) "J"

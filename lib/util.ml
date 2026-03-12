@@ -808,7 +808,7 @@ let nobtit conf base p =
   Driver.nobtitles base conf.allowed_titles conf.denied_titles p
 
 let strictly_after_private_years a lim =
-  if a.year > lim then true
+  if a.Adef.year > lim then true
   else if a.year < lim then false
   else a.month > 0 || a.day > 0
 

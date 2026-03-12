@@ -18,7 +18,8 @@ let reconstitute_date_dmy conf var =
           match get_number var "dd" conf.env with
           | Some d ->
               if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
-                Some { day = d; month = m; year = y; prec = Sure; delta = 0 }
+                Some
+                  { Adef.day = d; month = m; year = y; prec = Sure; delta = 0 }
               else None
           | None ->
               if m >= 1 && m <= 12 then
@@ -29,7 +30,7 @@ let reconstitute_date_dmy conf var =
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
-  | Some d -> Some (Dgreg (d, Dgregorian))
+  | Some d -> Some (Adef.Dgreg (d, Dgregorian))
   | None -> None
 
 let rec skip_spaces x i =
@@ -168,9 +169,9 @@ let advanced_search conf base max_answers =
     authorized_age conf base p
     &&
     match (d1, d2) with
-    | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) -> (
+    | Some (Adef.Dgreg (d1, _)), Some (Adef.Dgreg (d2, _)) -> (
         match df () with
-        | Some (Dgreg (d, _)) ->
+        | Some (Adef.Dgreg (d, _)) ->
             Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
         | _ -> false)
     | Some (Dgreg (d1, _)), _ -> (

@@ -86,7 +86,7 @@ let print_death conf base =
             Output.print_string conf month_txt;
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
-            let sure d = d.prec = Sure in
+            let sure d = d.Adef.prec = Sure in
             match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
@@ -198,12 +198,12 @@ let print_oldest_alive conf base =
     match Driver.get_death p with
     | NotDead -> (
         match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
-        | Some d -> Some (Dgreg (d, Dgregorian))
+        | Some d -> Some (Adef.Dgreg (d, Dgregorian))
         | None -> None)
     | DontKnowIfDead when limit > 0 -> (
         match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
         | Some d when conf.today.year - d.year <= limit ->
-            Some (Dgreg (d, Dgregorian))
+            Some (Adef.Dgreg (d, Dgregorian))
         | Some _ | None -> None)
     | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         None
@@ -250,7 +250,7 @@ let print_longest_lived conf base =
           | None -> None
           | Some dd ->
               let te = Date.time_elapsed bd dd in
-              if te.year >= 0 then Some (Dgreg (te, Dgregorian)) else None)
+              if te.year >= 0 then Some (Adef.Dgreg (te, Dgregorian)) else None)
       | _ -> None
     else None
   in
@@ -268,7 +268,7 @@ let print_longest_lived conf base =
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf " (";
-      Output.print_sstring conf (string_of_int d.year);
+      Output.print_sstring conf (string_of_int d.Adef.year);
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "years old");
       Output.print_sstring conf ")";
@@ -566,7 +566,8 @@ let print_population_pyramid conf base =
   else
     let at_date =
       match p_getint conf.env "y" with
-      | Some i -> { year = i; month = 31; day = 12; prec = Sure; delta = 0 }
+      | Some i ->
+          { Adef.year = i; month = 31; day = 12; prec = Sure; delta = 0 }
       | None -> conf.today
     in
     let men, wom =

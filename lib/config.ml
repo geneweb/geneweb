@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-
 type auth_scheme_kind =
   | NoAuth
   | TokenAuth of token_auth_scheme
@@ -97,7 +95,7 @@ type config = {
   auth_file : string;
   border : int;
   mutable n_connect : (int * int * int * (string * float) list) option;
-  today : dmy;
+  today : Adef.dmy;
   today_wd : int;
   time : int * int * int;
   ctime : float; (* TODO verify usefulness *)
@@ -182,7 +180,7 @@ let empty =
     auth_file = "";
     border = 0;
     n_connect = None;
-    today = { Def.day = 0; month = 0; year = 0; delta = 0; prec = Def.Sure };
+    today = { Adef.day = 0; month = 0; year = 0; delta = 0; prec = Adef.Sure };
     today_wd = 0;
     time = (0, 0, 0);
     ctime = 0.;

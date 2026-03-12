@@ -519,8 +519,8 @@ let p_auth conf base p =
       | None -> none ()
       | Some d ->
           let a = Date.time_elapsed d conf.today in
-          if a.Def.year > lim then true
-          else if a.Def.year = 0 then a.month > 0 || a.day > 0
+          if a.Adef.year > lim then true
+          else if a.Adef.year = 0 then a.month > 0 || a.day > 0
           else none ()
     in
     check_date

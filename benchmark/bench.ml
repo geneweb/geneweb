@@ -100,10 +100,11 @@ let bench () =
                 in
                 for day = 1 to len do
                   let d =
-                    { Def.day; month; year; delta = 0; prec = Def.Sure }
+                    { Adef.day; month; year; delta = 0; prec = Adef.Sure }
                   in
                   (Sys.opaque_identity ignore)
-                    (Calendar.julian_of_sdn Def.Sure @@ Calendar.sdn_of_julian d)
+                    (Calendar.julian_of_sdn Adef.Sure
+                    @@ Calendar.sdn_of_julian d)
                 done
               done
           done)

@@ -134,7 +134,7 @@ let dmy_to_sdn_range_l dmy =
       else
         let dmy2 =
           {
-            year =
+            Adef.year =
               (if dmy.month = 0 || (dmy.month = 12 && dmy.day = 0) then
                  dmy.year + 1
                else dmy.year);
@@ -154,7 +154,7 @@ let dmy_to_sdn_range_l dmy =
     (sdn, sdn2)
   in
   (* S: calls to sdn_of_dmy dmy can be factorized *)
-  match dmy.prec with
+  match dmy.Adef.prec with
   | Sure ->
       let sdn1, sdn2 = sdn_of_dmy dmy in
       [ (Some sdn1, Some sdn2) ]
@@ -224,13 +224,13 @@ let compatible_dmys dmy1 dmy2 =
 let compatible_dates date1 date2 =
   let compatible_cals cal1 cal2 =
     match (cal1, cal2) with
-    | Dgregorian, Djulian | Dgregorian, Dfrench -> true
+    | Adef.Dgregorian, Adef.Djulian | Dgregorian, Dfrench -> true
     | _ -> cal1 = cal2
   in
   if date1 = date2 then true
   else
     match (date1, date2) with
-    | Dgreg (dmy1, cal1), Dgreg (dmy2, cal2) ->
+    | Adef.Dgreg (dmy1, cal1), Dgreg (dmy2, cal2) ->
         compatible_dmys dmy1 dmy2 && compatible_cals cal1 cal2
     | Dgreg (_, _), Dtext _ -> false
     | Dtext _, _ -> true

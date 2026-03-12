@@ -32,7 +32,7 @@ type gw_syntax =
       * sex
       * (somebody * sex) list
       * (string gen_fam_event_name
-        * cdate
+        * Adef.cdate
         * string
         * string
         * string
@@ -67,7 +67,7 @@ type gw_syntax =
       somebody
       * sex
       * (string gen_pers_event_name
-        * cdate
+        * Adef.cdate
         * string
         * string
         * string
@@ -113,5 +113,5 @@ val comp_families : string -> unit
 
 (* Ajout pour l'API *)
 
-val date_of_string : string -> int -> date option
+val date_of_string : string -> int -> Adef.date option
 (** Parses [Def.date] from string that starts at pos [i] inside [s] *)

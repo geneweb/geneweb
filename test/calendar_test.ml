@@ -20,57 +20,54 @@
    - 200k-day stress roundtrip (greg, jul, french, hebrew) *)
 
 let pp_dmy fmt d =
-  Format.fprintf fmt "{day=%d;month=%d;year=%d;delta=%d;prec=...}" d.Def.day
-    d.Def.month d.Def.year d.Def.delta
+  Format.fprintf fmt "{day=%d;month=%d;year=%d;delta=%d;prec=...}" d.Adef.day
+    d.month d.year d.delta
 
 let testable_dmy = Alcotest.testable pp_dmy ( = )
 
 let data_complete =
   [
-    Def.{ day = 1; month = 1; year = 1900; delta = 0; prec = Sure };
-    Def.{ day = 15; month = 6; year = 2000; delta = 0; prec = Sure };
-    Def.{ day = 29; month = 2; year = 2000; delta = 0; prec = Sure };
+    { Adef.day = 1; month = 1; year = 1900; delta = 0; prec = Sure };
+    { day = 15; month = 6; year = 2000; delta = 0; prec = Sure };
+    { day = 29; month = 2; year = 2000; delta = 0; prec = Sure };
   ]
 
 let data_partial =
   [
-    Def.{ day = 0; month = 1; year = 1900; delta = 0; prec = Sure };
-    Def.{ day = 0; month = 0; year = 1900; delta = 0; prec = Sure };
+    { Adef.day = 0; month = 1; year = 1900; delta = 0; prec = Sure };
+    { day = 0; month = 0; year = 1900; delta = 0; prec = Sure };
   ]
 
 let data_oryear =
   [
-    Def.
-      {
-        day = 1;
-        month = 1;
-        year = 1900;
-        delta = 0;
-        prec = OrYear { day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
-      };
-    Def.
-      {
-        day = 0;
-        month = 1;
-        year = 1900;
-        delta = 0;
-        prec = OrYear { day2 = 0; month2 = 1; year2 = 1901; delta2 = 0 };
-      };
-    Def.
-      {
-        day = 0;
-        month = 0;
-        year = 1900;
-        delta = 0;
-        prec = OrYear { day2 = 0; month2 = 0; year2 = 1901; delta2 = 0 };
-      };
+    {
+      Adef.day = 1;
+      month = 1;
+      year = 1900;
+      delta = 0;
+      prec = OrYear { day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
+    };
+    {
+      Adef.day = 0;
+      month = 1;
+      year = 1900;
+      delta = 0;
+      prec = OrYear { day2 = 0; month2 = 1; year2 = 1901; delta2 = 0 };
+    };
+    {
+      Adef.day = 0;
+      month = 0;
+      year = 1900;
+      delta = 0;
+      prec = OrYear { day2 = 0; month2 = 0; year2 = 1901; delta2 = 0 };
+    };
   ]
 
 open Alcotest
 open Calendar
 
 let mk ?(delta = 0) day month year =
-  Def.{ day; month; year; delta; prec = Sure }
+  { Adef.day; month; year; delta; prec = Sure }
 
 (* -- Year zero rejection -- *)
 
@@ -139,7 +136,7 @@ let bc_gregorian () =
 let year1_to_bc_julian () =
   let sdn = sdn_of_julian (mk 1 1 1) in
   let prev = julian_of_sdn Sure (sdn - 1) in
-  (check int) "year before AD 1 is -1" (-1) prev.Def.year
+  (check int) "year before AD 1 is -1" (-1) prev.Adef.year
 
 (* -- Julian/Gregorian transition -- *)
 
@@ -162,12 +159,12 @@ let french_epoch () =
 let french_non_sextile () =
   let compl5 = mk 5 13 2 in
   let sdn5 = sdn_of_french compl5 in
-  let next = gregorian_of_sdn Def.Sure (sdn5 + 1) in
-  let vend1_an3 = gregorian_of_sdn Def.Sure (sdn_of_french (mk 1 1 3)) in
+  let next = gregorian_of_sdn Sure (sdn5 + 1) in
+  let vend1_an3 = gregorian_of_sdn Sure (sdn_of_french (mk 1 1 3)) in
   (check testable_dmy) "jour after 5 compl II = 1 vend III" vend1_an3 next
 
 let french_last_historical () =
-  let greg = gregorian_of_sdn Def.Sure (sdn_of_french (mk 11 4 14)) in
+  let greg = gregorian_of_sdn Sure (sdn_of_french (mk 11 4 14)) in
   (check testable_dmy) "11 nivose XIV = 1 jan 1806" (mk 1 1 1806) greg
 
 let french_sextile_an3 () =
@@ -225,12 +222,12 @@ let hebrew_19_cycle () =
 
 let partial_day_zero () =
   let conv = Calendar.gregorian_of_julian (mk 0 6 2000) in
-  (check int) "day preserved" 0 conv.Def.day
+  (check int) "day preserved" 0 conv.Adef.day
 
 let partial_month_zero () =
   let conv = Calendar.gregorian_of_julian (mk 0 0 1900) in
-  (check int) "month preserved" 0 conv.Def.month;
-  (check int) "day preserved" 0 conv.Def.day
+  (check int) "month preserved" 0 conv.Adef.month;
+  (check int) "day preserved" 0 conv.day
 
 (* -- JDN reference values -- *)
 
@@ -258,12 +255,12 @@ let stress_roundtrip () =
   let errors = ref [] in
   for sdn = start to start + 199999 do
     let check_cal name of_sdn sdn_of =
-      let d = of_sdn Def.Sure sdn in
+      let d = of_sdn Adef.Sure sdn in
       let sdn2 = sdn_of d in
       if sdn <> sdn2 then
         errors :=
-          Printf.sprintf "%s SDN %d -> %d/%d/%d -> %d" name sdn d.Def.day
-            d.Def.month d.Def.year sdn2
+          Printf.sprintf "%s SDN %d -> %d/%d/%d -> %d" name sdn d.Adef.day
+            d.month d.year sdn2
           :: !errors
     in
     check_cal "greg" gregorian_of_sdn sdn_of_gregorian;
@@ -303,7 +300,7 @@ let round_trip of_ to_ l () =
   List.iter (fun d -> (check testable_dmy) "" d (f d)) l
 
 let sdn_round_trip name of_sdn sdn_of =
-  test_case name `Quick (round_trip (of_sdn Def.Sure) sdn_of data_complete)
+  test_case name `Quick (round_trip (of_sdn Adef.Sure) sdn_of data_complete)
 
 let v =
   [

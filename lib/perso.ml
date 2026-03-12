@@ -24,11 +24,11 @@ let person_living_age conf p p_auth =
   | _ -> None
 
 let format_age conf age =
-  let y = age.Def.year in
-  let m = age.Def.month in
-  let d = age.Def.day in
+  let y = age.Adef.year in
+  let m = age.month in
+  let d = age.day in
   let prec_str =
-    match age.Def.prec with
+    match age.prec with
     | Sure -> ""
     | About | Maybe -> "~"
     | Before -> "<"
@@ -57,13 +57,13 @@ let format_age conf age =
   Adef.safe result
 
 let eval_age_field_var conf ?(before_birth = false) age = function
-  | [ "years" ] -> Templ.VVstring (string_of_int age.Def.year)
-  | [ "months" ] -> Templ.VVstring (string_of_int age.Def.month)
-  | [ "days" ] -> Templ.VVstring (string_of_int age.Def.day)
+  | [ "years" ] -> Templ.VVstring (string_of_int age.Adef.year)
+  | [ "months" ] -> Templ.VVstring (string_of_int age.month)
+  | [ "days" ] -> Templ.VVstring (string_of_int age.day)
   | [ "short" ] ->
-      let y = age.Def.year in
-      let m = age.Def.month in
-      let d = age.Def.day in
+      let y = age.year in
+      let m = age.month in
+      let d = age.day in
       let sign = if before_birth then "−" else "" in
       let s =
         if y > 0 then
@@ -86,7 +86,7 @@ let eval_age_field_var conf ?(before_birth = false) age = function
   | [ "sign" ] -> Templ.VVstring (if before_birth then "−" else "")
   | [ "before_birth" ] -> Templ.VVbool before_birth
   | [ "prec" ] -> (
-      match age.Def.prec with
+      match age.prec with
       | Sure -> Templ.VVstring ""
       | About | Maybe -> Templ.VVstring "~"
       | Before -> Templ.VVstring "<"
@@ -96,10 +96,10 @@ let eval_age_field_var conf ?(before_birth = false) age = function
   | _ -> raise Not_found
 
 let compare_dmy d1 d2 =
-  match compare d1.Def.year d2.Def.year with
+  match compare d1.Adef.year d2.Adef.year with
   | 0 -> (
-      match compare d1.Def.month d2.Def.month with
-      | 0 -> compare d1.Def.day d2.Def.day
+      match compare d1.Adef.month d2.Adef.month with
+      | 0 -> compare d1.Adef.day d2.Adef.day
       | c -> c)
   | c -> c
 
@@ -1375,8 +1375,8 @@ end)
 type ancestor_surname_info =
   | Branch of
       (string
-      * date option
-      * date option
+      * Adef.date option
+      * Adef.date option
       * string
       * Driver.person
       * Sosa.t list
@@ -1384,8 +1384,8 @@ type ancestor_surname_info =
   | Eclair of
       (string
       * Adef.safe_string
-      * date option
-      * date option
+      * Adef.date option
+      * Adef.date option
       * Driver.person
       * Driver.iper list
       * Loc.t)
@@ -1406,7 +1406,7 @@ type title_item =
   * Driver.istr gen_title_name
   * Driver.istr
   * Driver.istr list
-  * (date option * date option) list
+  * (Adef.date option * Adef.date option) list
 
 type path_mode = Paths_cnt_raw | Paths_cnt | Paths
 
@@ -2760,7 +2760,7 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
   | [ "dates" ] ->
       let date_opt_to_string d =
         match d with
-        | Some (Dgreg (dmy, _)) ->
+        | Some (Adef.Dgreg (dmy, _)) ->
             Some (DateDisplay.string_of_dmy conf dmy :> string)
         | Some (Dtext d) -> Some (d |> escape_html :> string)
         | None -> None
@@ -2780,7 +2780,7 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
       match dates with
       | [ (d, _) ] -> (
           match d with
-          | Some (Dgreg (dmy, _)) ->
+          | Some (Adef.Dgreg (dmy, _)) ->
               VVstring (DateDisplay.string_of_dmy conf dmy :> string)
           | Some (Dtext d) -> VVstring (d |> escape_html :> string)
           | None -> null_val)
@@ -2789,7 +2789,7 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
       match dates with
       | [ (_, d) ] -> (
           match d with
-          | Some (Dgreg (dmy, _)) ->
+          | Some (Adef.Dgreg (dmy, _)) ->
               VVstring (DateDisplay.string_of_dmy conf dmy :> string)
           | Some (Dtext d) -> VVstring (d |> escape_html :> string)
           | None -> null_val)
@@ -3456,7 +3456,9 @@ and eval_date_field_var conf d = function
   | [ "julian_day" ] | [ "sdn" ] -> (
       match d with
       | Dgreg (dmy, cal) ->
-          let from = if dmy.day > 0 && dmy.month > 0 then Dgregorian else cal in
+          let from =
+            if dmy.day > 0 && dmy.month > 0 then Adef.Dgregorian else cal
+          in
           VVstring (string_of_int (Date.to_sdn ~from dmy))
       | _ -> null_val)
   | [ "month" ] -> (
@@ -4028,7 +4030,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         match Date.od_of_cdate (Driver.get_birth p) with
         | Some (Dgreg (birth_dmy, cal)) ->
             let from =
-              if birth_dmy.day > 0 && birth_dmy.month > 0 then Dgregorian
+              if birth_dmy.day > 0 && birth_dmy.month > 0 then Adef.Dgregorian
               else cal
             in
             let birth_sdn = Date.to_sdn ~from birth_dmy in
@@ -4036,7 +4038,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
               match Date.date_of_death (Driver.get_death p) with
               | Some (Dgreg (death_dmy, cal2)) ->
                   let from2 =
-                    if death_dmy.day > 0 && death_dmy.month > 0 then Dgregorian
+                    if death_dmy.day > 0 && death_dmy.month > 0 then
+                      Adef.Dgregorian
                     else cal2
                   in
                   Date.to_sdn ~from:from2 death_dmy

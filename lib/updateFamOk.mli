@@ -2,7 +2,7 @@ val reconstitute_from_fevents :
   bool ->
   'string ->
   ('person, 'string) Def.gen_fam_event list ->
-  (Def.relation_kind * Def.cdate * 'string * 'string * 'string)
+  (Def.relation_kind * Adef.cdate * 'string * 'string * 'string)
   * Def.divorce
   * ('person * Def.witness_kind) array
 (** [reconstitute_from_fevents nsck empty_string family_events] Iterate over

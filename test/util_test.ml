@@ -174,7 +174,6 @@ let util_escape_html _ =
       :> string)
 
 let datedisplay_string_of_date _ =
-  let open Def in
   let conf = Config.empty in
   let conf =
     {
@@ -189,7 +188,7 @@ let datedisplay_string_of_date _ =
     "ghjennaghju/ferraghju/marzu/aprile/maghju/ghjugnu/lugliu/aostu/sittembre/uttobre/nuvembre/dicembre";
   let test aaa cal (d, m, y) =
     let date =
-      Dgreg ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
+      Adef.Dgreg ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
     in
     let bbb :> string = DateDisplay.string_of_date conf date in
     (check string) "" aaa bbb

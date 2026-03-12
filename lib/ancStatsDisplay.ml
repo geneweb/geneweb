@@ -95,7 +95,7 @@ let get_years base parent_ip =
   let p = Geneweb_db.Driver.poi base parent_ip in
   let year_of_cdate cd =
     match Date.od_of_cdate cd with
-    | Some (Def.Dgreg (dg, _)) -> Some dg.Def.year
+    | Some (Adef.Dgreg (dg, _)) -> Some dg.Adef.year
     | _ -> None
   in
   let birth = year_of_cdate (Geneweb_db.Driver.get_birth p) in

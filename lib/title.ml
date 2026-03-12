@@ -11,8 +11,10 @@ module T = Driver.Istr.Table
 type date_search = JustSelf | AddSpouse | AddChildren
 
 let date_interval conf base t x =
-  let d1 = ref { day = 0; month = 0; year = max_int; prec = Sure; delta = 0 } in
-  let d2 = ref { day = 0; month = 0; year = 0; prec = Sure; delta = 0 } in
+  let d1 =
+    ref { Adef.day = 0; month = 0; year = max_int; prec = Sure; delta = 0 }
+  in
+  let d2 = ref { Adef.day = 0; month = 0; year = 0; prec = Sure; delta = 0 } in
   let found = ref false in
   let rec loop t x =
     let set d =

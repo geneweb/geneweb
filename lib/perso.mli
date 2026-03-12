@@ -177,7 +177,7 @@ val string_of_title :
   * Geneweb_db.Driver.istr Def.gen_title_name
   * Geneweb_db.Driver.istr
   * Geneweb_db.Driver.istr list
-  * (Def.date option * Def.date option) list ->
+  * (Adef.date option * Adef.date option) list ->
   Adef.safe_string
 (** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate}
 *)

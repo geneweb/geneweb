@@ -98,8 +98,8 @@ val update_relations_of_related :
 
 val reconstitute_death :
   config ->
-  Def.date option ->
-  Def.date option ->
+  Adef.date option ->
+  Adef.date option ->
   string ->
   Def.burial ->
   string ->
@@ -108,12 +108,12 @@ val reconstitute_death :
 val reconstitute_from_pevents :
   ('a, string) Def.gen_pers_event list ->
   bool ->
-  Def.cdate * string * string * string ->
-  Def.cdate * string * string * string ->
+  Adef.cdate * string * string * string ->
+  Adef.cdate * string * string * string ->
   Def.death * string * string * string ->
   Def.burial * string * string * string ->
-  (Def.cdate * string * string * string)
-  * (Def.cdate * string * string * string)
+  (Adef.cdate * string * string * string)
+  * (Adef.cdate * string * string * string)
   * (Def.death * string * string * string)
   * (Def.burial * string * string * string)
   * ('a, string) Def.gen_pers_event list

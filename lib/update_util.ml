@@ -3,10 +3,10 @@ open Def
 open Util
 
 type create_info = Update.create_info = {
-  ci_birth_date : date option;
+  ci_birth_date : Adef.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : date option;
+  ci_death_date : Adef.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
@@ -147,23 +147,23 @@ let eval_date_field = function
   | None -> None
   | Some d -> (
       match d with
-      | Dgreg (d, Dgregorian) -> Some d
+      | Adef.Dgreg (d, Dgregorian) -> Some d
       | Dgreg (d, Djulian) -> Some (Calendar.julian_of_gregorian d)
       | Dgreg (d, Dfrench) -> Some (Calendar.french_of_gregorian d)
       | Dgreg (d, Dhebrew) -> Some (Calendar.hebrew_of_gregorian d)
       | Dtext _ -> None)
 
 let eval_is_cal cal = function
-  | Some (Dgreg (_, x)) -> if x = cal then "1" else ""
+  | Some (Adef.Dgreg (_, x)) -> if x = cal then "1" else ""
   | Some (Dtext _) | None -> ""
 
 let eval_is_prec cond = function
-  | Some (Dgreg ({ prec = x; _ }, _)) -> if cond x then "1" else ""
+  | Some (Adef.Dgreg ({ prec = x; _ }, _)) -> if cond x then "1" else ""
   | Some (Dtext _) | None -> ""
 
 let add_precision s p =
   match p with
-  | Maybe -> "?" ^ s
+  | Adef.Maybe -> "?" ^ s
   | Before -> "&lt;" ^ s
   | After -> "&gt;" ^ s
   | About -> "/" ^ s ^ "/"
@@ -176,54 +176,54 @@ let eval_date_var od s =
   match s with
   | "calendar" -> (
       match od with
-      | Some (Dgreg (_, Dgregorian)) -> "gregorian"
+      | Some (Adef.Dgreg (_, Dgregorian)) -> "gregorian"
       | Some (Dgreg (_, Djulian)) -> "julian"
       | Some (Dgreg (_, Dfrench)) -> "french"
       | Some (Dgreg (_, Dhebrew)) -> "hebrew"
       | _ -> "")
   | "day" -> (
       match eval_date_field od with
-      | Some d -> if d.day = 0 then "" else string_of_int d.day
+      | Some d -> if d.Adef.day = 0 then "" else string_of_int d.Adef.day
       | None -> "")
   | "month" -> (
       match eval_date_field od with
       | Some d -> (
-          if d.month = 0 then ""
+          if d.Adef.month = 0 then ""
           else
             match od with
-            | Some (Dgreg (_, Dfrench)) -> short_f_month d.month
-            | _ -> string_of_int d.month)
+            | Some (Adef.Dgreg (_, Dfrench)) -> short_f_month d.Adef.month
+            | _ -> string_of_int d.Adef.month)
       | None -> "")
   | "orday" -> (
       match eval_date_field od with
       | Some d -> (
-          match d.prec with
-          | OrYear d2 | YearInt d2 ->
+          match d.Adef.prec with
+          | Adef.OrYear d2 | YearInt d2 ->
               if d2.day2 = 0 then "" else string_of_int d2.day2
           | _ -> "")
       | None -> "")
   | "ormonth" -> (
       match eval_date_field od with
       | Some d -> (
-          match d.prec with
+          match d.Adef.prec with
           | OrYear d2 | YearInt d2 -> (
               if d2.month2 = 0 then ""
               else
                 match od with
-                | Some (Dgreg (_, Dfrench)) -> short_f_month d2.month2
+                | Some (Adef.Dgreg (_, Dfrench)) -> short_f_month d2.month2
                 | _ -> string_of_int d2.month2)
           | _ -> "")
       | None -> "")
   | "oryear" -> (
       match eval_date_field od with
       | Some d -> (
-          match d.prec with
+          match d.Adef.prec with
           | OrYear d2 | YearInt d2 -> string_of_int d2.year2
           | _ -> "")
       | None -> "")
   | "prec" -> (
       match od with
-      | Some (Dgreg ({ prec = Sure; _ }, _)) -> "sure"
+      | Some (Adef.Dgreg ({ prec = Sure; _ }, _)) -> "sure"
       | Some (Dgreg ({ prec = About; _ }, _)) -> "about"
       | Some (Dgreg ({ prec = Maybe; _ }, _)) -> "maybe"
       | Some (Dgreg ({ prec = Before; _ }, _)) -> "before"
@@ -237,21 +237,23 @@ let eval_date_var od s =
       | Some (Dgreg _) | None -> "")
   | "year" -> (
       match eval_date_field od with
-      | Some d -> string_of_int d.year
+      | Some d -> string_of_int d.Adef.year
       | None -> "")
-  | "cal_french" -> eval_is_cal Dfrench od
-  | "cal_gregorian" -> eval_is_cal Dgregorian od
-  | "cal_hebrew" -> eval_is_cal Dhebrew od
-  | "cal_julian" -> eval_is_cal Djulian od
+  | "cal_french" -> eval_is_cal Adef.Dfrench od
+  | "cal_gregorian" -> eval_is_cal Adef.Dgregorian od
+  | "cal_hebrew" -> eval_is_cal Adef.Dhebrew od
+  | "cal_julian" -> eval_is_cal Adef.Djulian od
   | "prec_no" -> if od = None then "1" else ""
-  | "prec_sure" -> eval_is_prec (function Sure -> true | _ -> false) od
-  | "prec_about" -> eval_is_prec (function About -> true | _ -> false) od
-  | "prec_maybe" -> eval_is_prec (function Maybe -> true | _ -> false) od
-  | "prec_before" -> eval_is_prec (function Before -> true | _ -> false) od
-  | "prec_after" -> eval_is_prec (function After -> true | _ -> false) od
-  | "prec_oryear" -> eval_is_prec (function OrYear _ -> true | _ -> false) od
+  | "prec_sure" -> eval_is_prec (function Adef.Sure -> true | _ -> false) od
+  | "prec_about" -> eval_is_prec (function Adef.About -> true | _ -> false) od
+  | "prec_maybe" -> eval_is_prec (function Adef.Maybe -> true | _ -> false) od
+  | "prec_before" ->
+      eval_is_prec (function Adef.Before -> true | _ -> false) od
+  | "prec_after" -> eval_is_prec (function Adef.After -> true | _ -> false) od
+  | "prec_oryear" ->
+      eval_is_prec (function Adef.OrYear _ -> true | _ -> false) od
   | "prec_yearint" ->
-      eval_is_prec (function YearInt _ -> true | _ -> false) od
+      eval_is_prec (function Adef.YearInt _ -> true | _ -> false) od
   | _ -> raise Not_found
 
 (* TODO : looks bad *)
