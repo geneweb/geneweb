@@ -10,10 +10,10 @@
   unidecode
   geneweb_def
   geneweb_compat
+  geneweb_dirs
   re
   unix
   uucp
   uunf
   uutf
-  digestif
-  xdg))
+  digestif))

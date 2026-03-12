@@ -40,7 +40,6 @@ depends: [
   "digestif"
   "pp_loc"
   "dune-site"
-  "xdg"
   "utop" {with-dev-setup}
   "ocamlformat" {with-dev-setup & = "0.28.1"}
   "odoc" {with-doc}

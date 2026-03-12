@@ -1,5 +1,6 @@
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
+module Dirs = Geneweb_dirs
 
 type checkdata_entry = Driver.istr * string
 
@@ -254,7 +255,7 @@ let speclist =
       Arg.String Secure.set_base_dir,
       Fmt.str
         "<DIR> Specify where the 'bases' directory is installed (default %S)"
-        Secure.default_base_dir );
+        (Dirs.name Secure.default_base_dir) );
     ("", Arg.Unit (fun () -> ()), "");
     ("-fn", Arg.Set fnames, " first names");
     ("-fna", Arg.Set fname_aliases, " first name aliases (only with -checkdata)");

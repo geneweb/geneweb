@@ -1,5 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+module Dirs = Geneweb_dirs
+
 (** Checks a .gwo header and prints fails if header is absent or not compatible.
 *)
 let check_magic fname ic =
@@ -128,7 +130,7 @@ let speclist =
       Fmt.str
         "<DIR> Specify where the “bases” directory with databases is installed \
          (default if empty is %S)."
-        Secure.default_base_dir );
+        Dirs.(name Secure.default_base_dir) );
     ( "-bnotes",
       Arg.Set_string bnotes,
       " [drop|erase|first|merge] Behavior for base notes of the next file. \
