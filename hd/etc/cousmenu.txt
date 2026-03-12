@@ -347,8 +347,8 @@
       <h3 class="%if;(e_v>6) pl-3%end;">[*link between]
         %(%let;maxi;%if;(cousins.max_a < e_v)%cousins.max_a;%else;%e_v;%end;%in;%)
         %if;(public_name != "")%public_name;%else;%first_name;%end;
-        %if;(qualifier != "") <em>%qualifier;</em>%end; %surname;%sp;
-        %(%if;(alias != "") <em>(%alias;)</em>%end;%) %dates;%sp;
+        %if;(qualifier != "") <em>%qualifier;</em>%end; %surname;
+        %(%if;(alias != "") <em>(%alias;)</em>%end;%)%dates;%sp;
         %if;(e_v=0 and not has_parents)[and] [a descendant]0%else;[and] [close family]
           %(%if;has_parents;<span class="small"> [up to] %maxi; [generation/generations]1</span>%end;%)
         %end;
