@@ -68,31 +68,31 @@
   %end;
   %if;xx.has_occupation;, %xx.occupation;%end;
   %if;(xx.has_birth_date or xx.has_birth_place)
-    , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
+    , <strong>%if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;</strong>
     %if;xx.has_birth_date; %xx.on_birth_date;%end;
     %if;xx.has_birth_place;, %xx.birth_place;%end;
   %end;
   %if;(xx.has_baptism_date or xx.has_baptism_place)
-    , %if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
-    %else;[baptized]2%end;
+    , <strong>%if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
+    %else;[baptized]2%end;</strong>
     %if;xx.has_baptism_date; %xx.on_baptism_date;%end;
     %if;xx.has_baptism_place;, %xx.baptism_place;%end;
   %end;
-  %if;xx.is_dead;, %xx.died;
+  %if;xx.is_dead;, <strong>%xx.died;</strong>
     %if;(xx.has_death_date) %xx.on_death_date;%end;
     %if;(xx.has_death_place), %xx.death_place;%end;
   %end;
   %if;xx.is_buried;,
-    %if;xx.is_male;[buried]0%else;[buried]1%end;
+    <strong>%if;xx.is_male;[buried]0%else;[buried]1%end;</strong>
     %if;xx.has_burial_date; %xx.on_burial_date;%end;
     %if;xx.has_burial_place;, %xx.burial_place;%end;
   %end;
   %if;xx.is_cremated;,
-    %if;xx.is_male;[cremated]0%else;[cremated]1%end;
+    <strong>%if;xx.is_male;[cremated]0%else;[cremated]1%end;</strong>
     %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
     %if;xx.has_cremation_place;, %xx.cremation_place;%end;
   %end;
-  %if;xx.computable_death_age;, [aged] %xx.death_age;%end;
+  %if;xx.computable_death_age;, <strong>[aged]</strong> %xx.death_age;%end;
   %if;(e.rel="on" and xx.has_relations)
     %foreach;xx.relation; ;
       %relation_type;[:]
@@ -123,11 +123,11 @@
 %end;
 
 %define;married_to(date_place)
-  %if;are_married;[married%t to:::date_place]s%nn;
-  %elseif;are_not_married;[relationship%t to:::date_place]s%nn;
-  %elseif;are_engaged;[engaged%t to:::date_place]s%nn;
-  %elseif;is_no_sexes_check;[relationship%t to:::date_place]s%nn;
-  %elseif;is_no_mention;date_place [with]%nn;
+  %if;are_married;<strong>[married]s</strong>%nn; date_place [to]%nn;
+  %elseif;are_not_married;<strong>[relationship]s</strong>%nn; date_place [to]%nn;
+  %elseif;are_engaged;<strong>[engaged]s</strong>%nn; date_place [to]%nn;
+  %elseif;is_no_sexes_check;<strong>[relationship]s</strong>%nn; date_place [to]%nn;
+  %elseif;is_no_mention;date_place <strong>[with]</strong>%nn;
   %end;
 %end;
 
@@ -253,7 +253,7 @@
           <div class="ml-4 text-muted">[see above].</div>
         %elseif;has_children;
           <div class="mt-2">
-            %apply;havingchildren(nb_children)[:]
+            <strong>%apply;havingchildren(nb_children)[:]</strong>
             %family.set_infinite_desc_level;
             <ol class="desc-gen desc-gen-%expr(curlev%4) mt-1 %if;(curlev=0) pl-4%end;">
               %foreach;child;

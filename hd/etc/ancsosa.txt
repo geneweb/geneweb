@@ -173,31 +173,31 @@
   %end;
   %if;xx.has_occupation;, %xx.occupation;%end;
   %if;(xx.has_birth_date or xx.has_birth_place)
-    , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
+    , <strong>%if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;</strong>
     %if;xx.has_birth_date; %xx.on_birth_date;%end;
     %if;xx.has_birth_place;, %xx.birth_place;%end;
   %end;
   %if;(xx.has_baptism_date or xx.has_baptism_place)
-    , %if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
-    %else;[baptized]2%end;
+    , <strong>%if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
+    %else;[baptized]2%end;</strong>
     %if;xx.has_baptism_date; %xx.on_baptism_date;%end;
     %if;xx.has_baptism_place;, %xx.baptism_place;%end;
   %end;
-  %if;xx.is_dead;, %xx.died;
+  %if;xx.is_dead;, <strong>%xx.died;</strong>
     %if;(xx.has_death_date) %xx.on_death_date;%end;
     %if;(xx.has_death_place), %xx.death_place;%end;
   %end;
   %if;xx.is_buried;,
-    %if;xx.is_male;[buried]0%else;[buried]1%end;
+    <strong>%if;xx.is_male;[buried]0%else;[buried]1%end;</strong>
     %if;xx.has_burial_date; %xx.on_burial_date;%end;
     %if;xx.has_burial_place;, %xx.burial_place;%end;
   %end;
   %if;xx.is_cremated;,
-    %if;xx.is_male;[cremated]0%else;[cremated]1%end;
+    <strong>%if;xx.is_male;[cremated]0%else;[cremated]1%end;</strong>
     %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
     %if;xx.has_cremation_place;, %xx.cremation_place;%end;
   %end;
-  %if;xx.computable_death_age;, [aged] %xx.death_age;%end;
+  %if;xx.computable_death_age;, <strong>[aged]</strong> %xx.death_age;%end;
 %end;
 
 %define;somebody_extra_info(xx)
@@ -732,7 +732,7 @@
   %if;(ancestor.index!=index)%apply;personal_notes() %if;(e.inline!="on")%apply;parents_links()%end;%end;
   %foreach;ancestor.family;
     %if;(family.index=ancestor.family.index and (ancestor.anc_sosa.v=1 or ancestor.is_male))
-      <div class="my-1">… %apply;married_to%with;ancestor%and;0%end;…
+      <div class="my-1">… <strong>%if;are_married;[married]0%elseif;are_not_married;[relationship]0%elseif;are_engaged;[engaged]0%elseif;is_no_sexes_check;[relationship]0%end;</strong>%if;(on_marriage_date!="") %on_marriage_date;%end;%if;(marriage_place!="") [in (place)] %marriage_place;%end; [to]…
       %apply;setvar%with;main_date%and;%marriage_date.julian_day;%end;
       %if;(e.witn="on" and has_witnesses)    ([witness/witnesses]1[:]
         %foreach;witness;
@@ -805,8 +805,8 @@
     %if;not child.has_families;.%else;…%end;
     %foreach;child.family;
       <div class="my-1 ml-3 mr-2 px-2 py-1 shadow">…
-        %apply;married_to%with;child%and;0%end; %apply;somebody("spouse")
-        %if;(nb_children=0)%else;, %apply;havingchildren(nb_children)%end;
+        <strong>%if;are_married;[married]0%elseif;are_not_married;[relationship]0%elseif;are_engaged;[engaged]0%elseif;is_no_sexes_check;[relationship]0%end;</strong>%if;(on_marriage_date!="") %on_marriage_date;%end;%if;(marriage_place!="") [in (place)] %marriage_place;%end; [to] %apply;somebody("spouse")
+        %if;(nb_children=0)%else;, <strong>%apply;havingchildren(nb_children)</strong>%end;
         %if;are_divorced; ; [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;
         %elseif;are_separated; ; [separated]%if;(on_separation_date!="") %on_separation_date;%end;
         %end;.
@@ -827,8 +827,8 @@
     border-left border-%if;(xx.sex=0)primary%else;danger%end; shadow%end;">
     <b>%xx;</b>%sp;
     %apply;marriage_timing%with;%apply;getvar%with;main_date%end;%and;%marriage_date.julian_day;%end;%sp;
-    %apply;married_to%with;xx%and;0%end; %apply;somebody("spouse")
-    %if;(nb_children=0).%else;, %apply;havingchildren(nb_children)
+    <strong>%if;are_married;[married]0%elseif;are_not_married;[relationship]0%elseif;are_engaged;[engaged]0%elseif;is_no_sexes_check;[relationship]0%end;</strong>%if;(on_marriage_date!="") %on_marriage_date;%end;%if;(marriage_place!="") [in (place)] %marriage_place;%end; [to] %apply;somebody("spouse")
+    %if;(nb_children=0).%else;, <strong>%apply;havingchildren(nb_children)</strong>
       %if;(e.siblings="on" or ancestor.anc_sosa.v=1)[:]%nn;
         <ol type="a" class="mt-1 mb-0">
           %foreach;child;
@@ -853,7 +853,7 @@
         %if;(nb_children>0)
           <div class="mt-1">
             %if;(e.siblings="on" or ancestor.anc_sosa.v=1 )
-              %apply;havingchildren(nb_children)[:]
+              <strong>%apply;havingchildren(nb_children)[:]</strong>
               <ol type="a" class="mt-1 mb-0">
                 %foreach;child;
                   %if;(e.siblings="on" or child.sosa_in_list!="" or ancestor.anc_sosa.v=1)
