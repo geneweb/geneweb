@@ -1,10 +1,15 @@
-val assets : string ref
+val assets : Geneweb_fs.Fpath.t ref
 (** When dynamically loading a plugin, this variable contains the path of the
     assets directory associated to the plugin being currently loaded. *)
 
 val register :
   ns:string ->
-  (string * (string -> Geneweb.Config.config -> string option -> bool)) list ->
+  (string
+  * (Geneweb_fs.Fpath.t ->
+    Geneweb.Config.config ->
+    Geneweb_fs.Fpath.t option ->
+    bool))
+  list ->
   unit
 (** [register ~ns handlers] register modes handlers of a plugin.
 
@@ -24,12 +29,17 @@ val register :
     Handlers can overwrite pre-existing modes or create new ones. *)
 
 val ht :
-  (string, string * (Geneweb.Config.config -> string option -> bool)) Hashtbl.t
+  ( string,
+    string * (Geneweb.Config.config -> Geneweb_fs.Fpath.t option -> bool) )
+  Hashtbl.t
 (** Table of handlers registered by plugins. *)
 
 val register_se :
   ns:string ->
-  (string -> Geneweb.Config.config -> string option -> unit) ->
+  (Geneweb_fs.Fpath.t ->
+  Geneweb.Config.config ->
+  Geneweb_fs.Fpath.t option ->
+  unit) ->
   unit
 (** [register_se ~ns hook] register a plugin hook (side effect function).
 
@@ -40,15 +50,19 @@ val register_se :
     everything in a buffer and apply a transformation to the resulting document
     before actually sending it to the client. *)
 
-val se : (string * (Geneweb.Config.config -> string option -> unit)) list ref
+val se :
+  (string * (Geneweb.Config.config -> Geneweb_fs.Fpath.t option -> unit)) list
+  ref
 (** Table of hooks registered by plugins. *)
 
-val checksum : string -> string
-(** [checksum path] computes the SHA-256 sum of the cmxs files containes in the
+val checksum : Geneweb_fs.Fpath.t -> string
+(** [checksum path] computes the SHA-256 sum of the cmxs files contained in the
     directory [path]. *)
 
-val compute_dependencies : string -> (string list, string list) result
+val compute_dependencies :
+  Geneweb_fs.Fpath.t -> (string list, string list) result
 (** [compute_dependencies path] returns a topologically sorted list of all
     plugins found in [path] for safe loading.
 
-    If a circular dependency exists, it returns [Error cycle]. *)
+    If a circular dependency exists, it returns [Error c] where [c] is a cycle
+    in the graph. *)

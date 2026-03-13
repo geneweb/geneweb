@@ -80,3 +80,4 @@ Requires OCaml 4.10+. Tested with 4.10.2, 4.14.3, and 5.4.1.
 3. Never use the `Obj` module from OCaml stdlib
 4. Don't use global mutable state (global references) - prefer passing data as arguments
 5. Don't use `List.nth`, `List.concat`, or `@` from OCaml stdlib
+6. Always run check formatting before creating commits

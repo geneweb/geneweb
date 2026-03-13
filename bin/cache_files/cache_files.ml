@@ -1,6 +1,9 @@
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Dirs = Geneweb_dirs
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
+module GWPARAM = Geneweb.GWPARAM
 
 type checkdata_entry = Driver.istr * string
 
@@ -23,18 +26,17 @@ let prog = ref false
 let checkdata = ref false
 let datalist = ref false
 let width = ref 50
-let cache_dir = ref ""
-let ( // ) = Filename.concat
+let cache_dir = ref Fpath.empty
 
 let set_cache_dir bname =
-  let dir = Secure.base_dir () // "etc" // bname // "cache" in
-  Filesystem.create_dir ~parent:true dir;
+  let dir = Fpath.(Secure.base_dir () // ~$"etc" // ~$bname // ~$"cache") in
+  File.create_dir ~parent:true dir;
   dir
 
 let write_cache_file bname fname data =
   let filename = bname ^ "_" ^ fname ^ ".cache" in
-  let file = !cache_dir // filename in
-  let gz_file = file ^ ".gz" in
+  let file = Fpath.(!cache_dir // ~$filename) in
+  let gz_file = Fpath.of_string (Fpath.to_string file ^ ".gz") in
   let buf = Buffer.create 65536 in
   List.iter
     (fun s ->
@@ -46,15 +48,15 @@ let write_cache_file bname fname data =
 
 let write_checkdata_cache bname fname entries =
   let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in
-  let file = !cache_dir // filename in
+  let file = Fpath.(!cache_dir // ~$filename) in
   let oc = Secure.open_out_bin file in
   let finally () = try close_out oc with Sys_error _ -> () in
   Fun.protect ~finally @@ fun () -> Marshal.to_channel oc entries []
 
 let read_checkdata_cache bname fname =
   let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in
-  let file = !cache_dir // filename in
-  if Sys.file_exists file then
+  let file = Fpath.(!cache_dir // ~$filename) in
+  if File.file_exists file then
     let ic = Secure.open_in_bin file in
     let finally () = try close_in ic with Sys_error _ -> () in
     Fun.protect ~finally @@ fun () ->
@@ -175,9 +177,11 @@ let gen_checkdata_cache bname fname collect_fn =
     ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter collect_fn
   in
   write_checkdata_cache bname fname entries;
-  let path = !cache_dir // (bname ^ "_" ^ fname ^ "_checkdata.cache") in
-  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
-    (List.length entries) fname duration;
+  let path =
+    Fpath.(!cache_dir // ~$(bname ^ "_" ^ fname ^ "_checkdata.cache"))
+  in
+  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width
+    (Fpath.to_string path) (List.length entries) fname duration;
   (entries, duration)
 
 let gen_datalist_from_entries bname fname entries =
@@ -185,9 +189,9 @@ let gen_datalist_from_entries bname fname entries =
     with_timer @@ fun () -> List.map snd entries |> List.sort String.compare
   in
   write_cache_file bname fname data;
-  let path = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz") in
-  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
-    (List.length data) fname duration;
+  let path = Fpath.(!cache_dir // ~$(bname ^ "_" ^ fname ^ ".cache.gz")) in
+  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width
+    (Fpath.to_string path) (List.length data) fname duration;
   duration
 
 let gen_datalist_merged bname fname main_fname alias_fname =
@@ -206,9 +210,9 @@ let gen_datalist_merged bname fname main_fname alias_fname =
     List.sort_uniq String.compare (main_data @ alias_data)
   in
   write_cache_file bname fname data;
-  let path = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz") in
-  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
-    (List.length data) (fname ^ "+alias") duration;
+  let path = Fpath.(!cache_dir // ~$(bname ^ "_" ^ fname ^ ".cache.gz")) in
+  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width
+    (Fpath.to_string path) (List.length data) (fname ^ "+alias") duration;
   duration
 
 let gen_both_caches bname fname collect_fn =
@@ -252,7 +256,7 @@ let validate_options () =
 let speclist =
   [
     ( "-bd",
-      Arg.String Secure.set_base_dir,
+      Arg.String (fun s -> Secure.set_base_dir (Fpath.of_string s)),
       Fmt.str
         "<DIR> Specify where the 'bases' directory is installed (default %S)"
         (Dirs.name Secure.default_base_dir) );
@@ -292,17 +296,18 @@ let usage = "Usage: cache_files [options] base\nwhere [options] are:"
 
 let () =
   Arg.parse speclist anonfun usage;
-  if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  if not (Array.mem "-bd" Sys.argv) then
+    Secure.set_base_dir (Fpath.of_string ".");
   validate_options ();
   let bname = Filename.remove_extension (Filename.basename !bname) in
-
-  Driver.with_database (Secure.base_dir () // bname) @@ fun base ->
+  let bpath = !GWPARAM.bpath bname in
+  Driver.with_database bpath @@ fun base ->
   cache_dir := set_cache_dir bname;
 
   let gen_dl = should_gen_datalist () in
   let gen_cd = should_gen_checkdata () in
 
-  width := String.length (!cache_dir // bname) + 30;
+  width := String.length (Fpath.to_string Fpath.(!cache_dir // ~$bname)) + 30;
 
   (match (gen_dl, gen_cd) with
   | true, true -> Printf.printf "Generating datalist and checkdata caches\n"

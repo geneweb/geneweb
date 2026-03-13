@@ -3,6 +3,8 @@
 open Geneweb
 open Config
 open Util
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
 
 type message = {
   m_time : string;
@@ -88,7 +90,7 @@ module MF : MF = struct
         close_in ic
     | None -> ());
     close_out oc;
-    Mutil.rm fname;
+    File.remove ~force:true (Fpath.of_string fname);
     Sys.rename tmp fname
 
   let patch fname pos str =
@@ -114,7 +116,7 @@ module MF : MF = struct
          loop 0);
         close_in ic;
         close_out oc;
-        Mutil.rm fname;
+        File.remove ~force:true (Fpath.of_string fname);
         Sys.rename tmp_fname fname
     | None -> ()
 
@@ -164,7 +166,7 @@ module MF : MF = struct
 end
 
 let forum_file conf =
-  let fn = Filename.concat (Util.bpath conf.bname) "forum" in
+  let fn = Fpath.to_string Fpath.(!GWPARAM.bpath conf.bname // ~$"forum") in
   MF.filename_of_string fn
 
 (* Black list *)
@@ -186,18 +188,12 @@ let match_strings regexp s =
 let can_post conf =
   try
     let fname = List.assoc "forum_exclude_file" conf.base_env in
-    let fname = Util.bpath fname in
-    let ic = open_in fname in
+    let path = !GWPARAM.bpath fname in
+    File.with_open_in_text path @@ fun ic ->
     let rec loop () =
-      match try Some (input_line ic) with End_of_file -> None with
-      | Some line ->
-          if match_strings line conf.from then (
-            close_in ic;
-            false)
-          else loop ()
-      | None ->
-          close_in ic;
-          true
+      match input_line ic with
+      | exception End_of_file -> true
+      | line -> if match_strings line conf.from then false else loop ()
     in
     loop ()
   with Not_found | Sys_error _ -> true
@@ -364,7 +360,7 @@ let moderators conf =
   match List.assoc_opt "moderator_file" conf.base_env with
   | None | Some "" -> []
   | Some fname -> (
-      let fname = Util.bpath fname in
+      let fname = !GWPARAM.bpath fname in
       match try Some (Secure.open_in fname) with Sys_error _ -> None with
       | Some ic ->
           let list =

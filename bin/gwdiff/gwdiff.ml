@@ -3,6 +3,7 @@
 open Def
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
+module Fpath = Geneweb_fs.Fpath
 
 (*= TODO =====================================================================
   - Improve the way not to check several time the same persons.
@@ -594,8 +595,10 @@ let main () =
 
   let _ = if not !html then cr := "\n" else cr := "<BR>\n" in
   (* [base1] is the reference base and [base2] is the destination base. *)
-  load_base !in_file1 @@ fun base1 ->
-  load_base !in_file2 @@ fun base2 ->
+  let in_file1 = Fpath.of_string !in_file1 in
+  let in_file2 = Fpath.of_string !in_file2 in
+  load_base in_file1 @@ fun base1 ->
+  load_base in_file2 @@ fun base2 ->
   (* let iper2 = Driver.person_of_key base2 !p2_fn !p2_sn !p2_occ in *)
   let fn1, oc1, sn1 = Geneweb.GWPARAM.split_key !pnoc_a in
   let fn2, oc2, sn2 = Geneweb.GWPARAM.split_key !pnoc_b in

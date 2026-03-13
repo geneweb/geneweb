@@ -38,7 +38,7 @@ open Config
 
 type wiki_info = {
   wi_mode : string;
-  wi_file_path : string -> string;
+  wi_file_path : string -> Geneweb_fs.Fpath.t;
   wi_person_exists : string * string * int -> bool;
   wi_mark_if_not_public : string * string * int -> bool;
   wi_always_show_link : bool;
@@ -108,11 +108,6 @@ val print_mod_ok :
      title_is_1st] Commits the changes of a page *)
 
 (*S: shouldn't the following functions be defined elsewhere? *)
-
-val notes_aliases : config -> (string * string) list
-(** Reads the notes alias file (conf.base_env.notes_alias_file or
-    base_path/notes.alias). File format is "KEY value\n...", returns the list of
-    (KEY,value) *)
 
 val map_notes : (string * string) list -> string -> string
 (** Given an alias list, finds the corresponding alias for a given string *)

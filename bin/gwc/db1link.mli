@@ -30,6 +30,6 @@ type file_info = {
 val link :
   ?no_warn:bool ->
   (file_info -> unit -> Gwcomp.gw_syntax option) ->
-  string ->
+  Geneweb_fs.Fpath.t ->
   bool
 (** Link .gwo files and create a database. *)

@@ -4,7 +4,7 @@
 open Config
 open Def
 
-val file_name : config -> string
+val file_name : config -> Geneweb_fs.Fpath.t
 (** Returns path to the file where history of current base updates is stored *)
 
 val record :

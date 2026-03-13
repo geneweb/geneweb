@@ -3,6 +3,8 @@
 open Def
 module Driver = Geneweb_db.Driver
 module Compat = Geneweb_compat
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let magic_gwo = "GnWo000o"
 
@@ -568,7 +570,7 @@ let auth_access ~bname fn sn oc l =
     match auth_file_name with
     | Some file_name -> (
         let friend_passwd_file =
-          Filename.concat (Secure.base_dir ()) file_name
+          Fpath.concat (Secure.base_dir ()) (Fpath.of_string file_name)
         in
         try
           Secure.with_open_in_text friend_passwd_file (fun ic ->
@@ -589,8 +591,9 @@ let auth_access ~bname fn sn oc l =
               in
               loop ht)
         with Sys_error _ ->
-          if Sys.file_exists friend_passwd_file then
-            Printf.eprintf "Warning: error reading %s\n" friend_passwd_file;
+          if File.file_exists friend_passwd_file then
+            Printf.eprintf "Warning: error reading %s\n"
+              (Fpath.to_string friend_passwd_file);
           ht)
     | None -> ht
   in
@@ -1442,5 +1445,5 @@ let compile ~bname ~output input =
   try compile ~bname oc input
   with exn ->
     let bt = Printexc.get_raw_backtrace () in
-    Mutil.rm output;
+    File.remove ~force:true (Fpath.of_string output);
     Printexc.raise_with_backtrace exn bt

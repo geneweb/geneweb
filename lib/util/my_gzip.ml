@@ -1,6 +1,8 @@
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
+
 let gunzip_file path =
-  let ic = Stdlib.open_in_bin path in
-  Fun.protect ~finally:(fun () -> Stdlib.close_in_noerr ic) @@ fun () ->
+  File.with_open_in_bin path @@ fun ic ->
   let file_len = in_channel_length ic in
   let compressed = Bigstringaf.create file_len in
   let tmp = Bytes.create (min file_len De.io_buffer_size) in

@@ -9,6 +9,8 @@ let src = Logs.Src.create ~doc:"NotesDisplay" __MODULE__
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let is_ancestor conf base anc =
   let restrict_for_spouses =
@@ -666,8 +668,11 @@ let format_file_entry conf depth d f n_type title view =
   let view = view || can_see conf d in
   let icon = match n_type with "gallery" -> "image" | _ -> "file-lines" in
   let color, mod_edit =
-    let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
-    let f = notes_d ^ Filename.dir_sep ^ d ^ NotesLinks.dir_sep ^ f ^ ".txt" in
+    let notes_d = Fpath.(!GWPARAM.bpath conf.bname // ~$"notes_d") in
+    let f =
+      Fpath.to_string notes_d ^ Filename.dir_sep ^ d ^ NotesLinks.dir_sep ^ f
+      ^ ".txt"
+    in
     let f = Util.note_link_to_sys f in
     if Sys.file_exists f then ("", "") else (" text-danger", "MOD_")
   in
@@ -727,7 +732,7 @@ let print_misc_notes conf base =
     else List.length (String.split_on_char NotesLinks.char_dir_sep d) + 1
   in
   (* ATTENTION check this if "notes_d" changes (REORG) *)
-  let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
+  let notes_d = Fpath.(!GWPARAM.bpath conf.bname // ~$"notes_d") in
   let path_hierarchy d =
     List.iteri
       (fun i (path_to, dirname) ->
@@ -820,12 +825,12 @@ let print_misc_notes conf base =
     List.iter (fun f -> one_file f true) files_in_db;
     Output.print_sstring conf "</div>");
   let d = Util.note_link_to_sys d in
-  let cur_dir = Filename.concat notes_d d in
-  let ls = Sys.readdir cur_dir |> Array.to_list in
+  let cur_dir = Fpath.(notes_d // ~$d) in
+  let ls = File.readdir cur_dir |> Array.to_list in
   let files, dirs =
     List.fold_left
       (fun (acc_f, acc_d) f ->
-        let stats = Unix.stat (Filename.concat cur_dir f) in
+        let stats = File.stat Fpath.(cur_dir // ~$f) in
         match stats.st_kind with
         | S_DIR when f.[0] <> '.' ->
             if List.mem f dirs_in_db then (acc_f, acc_d) else (acc_f, f :: acc_d)

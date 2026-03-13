@@ -6,6 +6,8 @@ open Util
 open HistoryDiff
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let escape_html s = (Util.escape_html s :> Adef.safe_string)
 
@@ -78,7 +80,7 @@ let print_clean_ok conf =
       let history = load_person_history conf f in
       let new_history = clean_history 0 history [] in
       let fname = history_path conf f in
-      (if new_history = [] then Mutil.rm fname
+      (if new_history = [] then File.remove ~force:true fname
        else
          let ext_flags =
            [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]

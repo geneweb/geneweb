@@ -2,11 +2,12 @@ open Geneweb
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
+module Fpath = Geneweb_fs.Fpath
 
 let nb_ind_init = ref 0
 
-let dump_persons bname ofile =
-  Driver.with_database bname @@ fun base ->
+let dump_persons bpath ofile =
+  Driver.with_database bpath @@ fun base ->
   let nb_ind = Driver.nb_of_persons base in
   let nb_fam = Driver.nb_of_families base in
   let undef = ref 0 in
@@ -34,11 +35,11 @@ let dump_persons bname ofile =
     result;
   let real_count = List.length result in
   let check = real_count + !undef in
-  Printf.eprintf "Base %s\n" bname;
-  Printf.eprintf "Final state: %d persons (initial value %d), %d families\n"
-    nb_ind !nb_ind_init nb_fam;
-  Printf.eprintf "             %d real persons , %d ?.0 ?, %d+%d=%d (%d)\n"
-    real_count !undef real_count !undef check !nb_ind_init
+  Fmt.epr "Base %a\n" Fpath.pp bpath;
+  Fmt.epr "Final state: %d persons (initial value %d), %d families\n" nb_ind
+    !nb_ind_init nb_fam;
+  Fmt.epr "             %d real persons , %d ?.0 ?, %d+%d=%d (%d)\n" real_count
+    !undef real_count !undef check !nb_ind_init
 
 let aux txt
     (fn :
@@ -197,7 +198,7 @@ let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
 
 (**/**)
 
-let bname = ref ""
+let bpath = ref ""
 let verbosity = ref 2
 let fast = ref false
 let f_parents = ref false
@@ -239,28 +240,29 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
-let anonfun i = bname := i
+let anonfun i = bpath := i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
-  Secure.set_base_dir (Filename.dirname !bname);
-  if !bname = "" then (
+  if !bpath = "" then (
     Arg.usage speclist usage;
     exit 2);
-  let lock_file = Mutil.lock_file !bname in
+  let bpath = Fpath.of_string !bpath in
+  Secure.set_base_dir (Fpath.dirname bpath);
+  let lock_file = Mutil.lock_file bpath in
   let on_exn exn bt =
     Format.eprintf "%a@." Lock.pp_exception (exn, bt);
     exit 2
   in
-  Driver.with_database !bname @@ fun base ->
+  Driver.with_database bpath @@ fun base ->
   let nb_fam = Driver.nb_of_families base in
   let nb_ind = Driver.nb_of_persons base in
   let nb_real_ind = Driver.nb_of_real_persons base in
   nb_ind_init := nb_ind;
-  Printf.eprintf "GwFixbase for base %s\n" !bname;
-  Printf.eprintf "Initial state: %d persons, %d real persons, %d families\n"
-    nb_ind nb_real_ind nb_fam;
+  Fmt.epr "GwFixbase for base %a\n" Fpath.pp bpath;
+  Fmt.epr "Initial state: %d persons, %d real persons, %d families\n" nb_ind
+    nb_real_ind nb_fam;
 
   Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
   if
@@ -282,6 +284,6 @@ let main () =
   check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
     ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
     ~invalid_utf8 ~key;
-  if !dump then dump_persons !bname !ofile
+  if !dump then dump_persons bpath !ofile
 
 let _ = main ()

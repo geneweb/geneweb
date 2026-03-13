@@ -1,7 +1,7 @@
 type t
 (** Type of locations. *)
 
-type source = [ `File of string | `Raw of string ]
+type source = [ `File of Geneweb_fs.Fpath.t | `Raw of string ]
 (** Type of sources. *)
 
 val equal_source : source -> source -> bool

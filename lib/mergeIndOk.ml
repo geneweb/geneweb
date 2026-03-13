@@ -5,6 +5,8 @@ open Def
 open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let rec merge_lists l1 = function
   | x2 :: l2 ->
@@ -485,29 +487,33 @@ let merge_carrousel conf base o_p1 o_p2 p =
   let rec move_files dir1 dir2 =
     Array.iter
       (fun entry ->
-        let full_path1 = Filename.concat dir1 entry in
-        let full_path2 = Filename.concat dir2 entry in
-        if (Unix.stat full_path2).st_kind = Unix.S_REG then
+        let full_path1 = Fpath.(dir1 // ~$entry) in
+        let full_path2 = Fpath.(dir2 // ~$entry) in
+        if (File.stat full_path2).st_kind = Unix.S_REG then
           try
-            Sys.rename full_path2
-              (full_path1 ^ if full_path1 = full_path2 then "-copy" else "")
+            let dest =
+              if full_path1 = full_path2 then
+                Fpath.of_string (Fpath.to_string full_path1 ^ "-copy")
+              else full_path1
+            in
+            File.rename full_path2 dest
           with e ->
             Printf.eprintf "Error rename path2 (merge) %s\n"
               (Printexc.to_string e)
         else if
-          (Unix.stat full_path2).st_kind = Unix.S_DIR
+          (File.stat full_path2).st_kind = Unix.S_DIR
           && entry <> "." && entry <> ".."
         then
-          if not (Sys.file_exists full_path1) then (
-            try Unix.mkdir full_path1 0o755
+          if not (File.file_exists full_path1) then (
+            try File.create_dir ~required_perm:0o755 full_path1
             with e ->
               Printf.eprintf "Error create save1 (merge) %s\n"
                 (Printexc.to_string e);
               move_files full_path1 full_path2)
           else ())
-      (Sys.readdir dir2)
+      (File.readdir dir2)
   in
-  let full_dir file = Filename.concat (!GWPARAM.images_d conf.bname) file in
+  let full_dir file = Fpath.(!GWPARAM.images_d conf.bname // ~$file) in
   let ofn = p.first_name in
   let osn = p.surname in
   let oocc = p.occ in
@@ -523,27 +529,27 @@ let merge_carrousel conf base o_p1 o_p2 p =
   let dir0 = full_dir dir0 in
   let dir1 = full_dir dir1 in
   let dir2 = full_dir dir2 in
-  match (Sys.file_exists dir1, Sys.file_exists dir2) with
+  match (File.file_exists dir1, File.file_exists dir2) with
   | true, true ->
       if dir0 = dir1 then (
         move_files dir0 dir2;
-        try Mutil.rm_rf dir2
+        try File.remove ~force:true ~recursive:true dir2
         with e ->
           Printf.eprintf "Error delete dir2 (merge) %s\n" (Printexc.to_string e));
       if dir0 = dir2 then (
         move_files dir0 dir1;
-        try Mutil.rm_rf dir1
+        try File.remove ~force:true ~recursive:true dir1
         with e ->
           Printf.eprintf "Error delete dir1 (merge) %s\n" (Printexc.to_string e))
   | true, false -> (
       if dir1 <> dir0 then
-        try Sys.rename dir1 dir0
+        try File.rename dir1 dir0
         with e ->
           Printf.eprintf "Error rename dir1 (merge) %s\n" (Printexc.to_string e)
       )
   | false, true -> (
       if dir2 <> dir0 then
-        try Sys.rename dir2 dir0
+        try File.rename dir2 dir0
         with e ->
           Printf.eprintf "Error rename dir2 (merge) %s\n" (Printexc.to_string e)
       )

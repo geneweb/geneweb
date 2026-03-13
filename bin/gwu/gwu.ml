@@ -1,5 +1,6 @@
 open GwuLib
 module Driver = Geneweb_db.Driver
+module Fpath = Geneweb_fs.Fpath
 
 let isolated = ref false
 
@@ -39,65 +40,70 @@ let speclist opts =
   :: Gwexport.speclist opts
   |> List.sort compare |> Arg.align
 
-let bname = ref None
+let bpath = ref None
+let raise_bad = Fmt.kstr (fun s -> raise (Arg.Bad s))
 
 let anonfun s =
-  if !bname = None then (
-    Secure.set_base_dir (Filename.dirname s);
-    bname := Some s)
-  else raise (Arg.Bad "Cannot treat several databases")
+  match !bpath with
+  | None -> bpath := Some s
+  | Some _ -> raise_bad "Cannot treat several databases"
 
-let () =
+let parse_cmd () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
-  let opts = !opts in
-  match !bname with
-  | None -> raise @@ Arg.Bad "Expect a database"
-  | Some bname ->
-      Driver.with_database bname @@ fun base ->
-      let select = Gwexport.select base opts [] in
-      let in_dir =
-        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-      in
-      let src_oc_ht = Hashtbl.create 1009 in
-      Driver.load_ascends_array base;
-      Driver.load_strings_array base;
-      if not opts.Gwexport.mem then (
-        Driver.load_couples_array base;
-        Driver.load_unions_array base;
-        Driver.load_descends_array base;
-        ());
-      (if opts.Gwexport.test then
-         let iper_filter, ifam_filter = select in
-         let nb_persons =
-           Geneweb_db.Collection.fold
-             (fun count i ->
-               if iper_filter i then (
-                 Printf.eprintf "P: %s\n"
-                   (Geneweb_db.Gutil.designation base (Driver.poi base i));
-                 count + 1)
-               else count)
-             0 (Driver.ipers base)
-         in
-         let nb_families =
-           Geneweb_db.Collection.fold
-             (fun count i ->
-               if ifam_filter i then (
-                 let father = Driver.get_father (Driver.foi base i) in
-                 let mother = Driver.get_mother (Driver.foi base i) in
-                 Printf.eprintf "F: %s & %s\n"
-                   (Geneweb_db.Gutil.designation base (Driver.poi base father))
-                   (Geneweb_db.Gutil.designation base (Driver.poi base mother));
-                 count + 1)
-               else count)
-             0 (Driver.ifams base)
-         in
-         Printf.eprintf "Exporting %d persons and %d families\n" nb_persons
-           nb_families);
-      let _ofile, oc, close = opts.Gwexport.oc in
-      if not !GwuLib.raw_output then oc "encoding: utf-8\n";
-      if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
-      GwuLib.prepare_free_occ base;
-      GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select;
-      Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;
-      close ()
+  if Option.is_none !bpath then
+    raise_bad "Missing file name. Use -help for usage@.";
+  !opts
+
+let () =
+  let opts = parse_cmd () in
+  let bpath = Fpath.of_string @@ Option.get !bpath in
+  Secure.set_base_dir (Fpath.dirname bpath);
+  Driver.with_database bpath @@ fun base ->
+  let select = Gwexport.select base opts [] in
+  let in_dir =
+    if Fpath.check_suffix bpath ".gwb" then bpath
+    else Fpath.of_string @@ Fpath.to_string bpath ^ ".gwb"
+  in
+  let src_oc_ht = Hashtbl.create 1009 in
+  Driver.load_ascends_array base;
+  Driver.load_strings_array base;
+  if not opts.Gwexport.mem then (
+    Driver.load_couples_array base;
+    Driver.load_unions_array base;
+    Driver.load_descends_array base;
+    ());
+  (if opts.Gwexport.test then
+     let iper_filter, ifam_filter = select in
+     let nb_persons =
+       Geneweb_db.Collection.fold
+         (fun count i ->
+           if iper_filter i then (
+             Printf.eprintf "P: %s\n"
+               (Geneweb_db.Gutil.designation base (Driver.poi base i));
+             count + 1)
+           else count)
+         0 (Driver.ipers base)
+     in
+     let nb_families =
+       Geneweb_db.Collection.fold
+         (fun count i ->
+           if ifam_filter i then (
+             let father = Driver.get_father (Driver.foi base i) in
+             let mother = Driver.get_mother (Driver.foi base i) in
+             Printf.eprintf "F: %s & %s\n"
+               (Geneweb_db.Gutil.designation base (Driver.poi base father))
+               (Geneweb_db.Gutil.designation base (Driver.poi base mother));
+             count + 1)
+           else count)
+         0 (Driver.ifams base)
+     in
+     Printf.eprintf "Exporting %d persons and %d families\n" nb_persons
+       nb_families);
+  let _ofile, oc, close = opts.Gwexport.oc in
+  if not !GwuLib.raw_output then oc "encoding: utf-8\n";
+  if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
+  GwuLib.prepare_free_occ base;
+  GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select;
+  Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;
+  close ()
