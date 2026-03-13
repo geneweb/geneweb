@@ -2649,6 +2649,23 @@ let main () =
     Wserver.sock_in := "gwd.sin";
     Wserver.sock_out := "gwd.sou");
   let gwd_cmd =
+    let argv_list = Array.to_list Sys.argv in
+    let argv_list =
+      match argv_list with
+      | cmd :: rest ->
+          let abs_cmd =
+            if Filename.is_relative cmd then
+              let cwd = Sys.getcwd () in
+              let dir = Filename.dirname cmd in
+              let base = Filename.basename cmd in
+              if dir = Filename.current_dir_name then
+                Filename.concat cwd base
+              else Filename.concat (Filename.concat cwd dir) base
+            else cmd
+          in
+          abs_cmd :: rest
+      | [] -> []
+    in
     let rec process acc skip_next = function
       | [] -> acc
       | arg :: rest ->
@@ -2659,7 +2676,7 @@ let main () =
             process (acc ^ "<br><b>" ^ arg ^ "</b> ") false rest
           else process (acc ^ arg) false rest
     in
-    process "" false (Array.to_list Sys.argv)
+    process "" false argv_list
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter register_plugin !plugins;

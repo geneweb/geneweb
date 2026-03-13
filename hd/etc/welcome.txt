@@ -13,6 +13,11 @@
 <body%body_prop;>
 <div class="container" id="welcome">
 %include;hed
+%if;wizard;
+<div class="alert alert-info py-1 px-2 small mb-2" role="alert">
+  <strong>gwd:</strong> <code>%gwd.arglist;</code>
+</div>
+%end;
 %define;book_of(xx)[book of %s:::xx]%end;
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%end;
 %apply;dl("fnames")
