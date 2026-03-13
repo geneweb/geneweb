@@ -14,16 +14,36 @@
     notes: ["simple", "complete"],
     sources: ["simple", "complete"],
     arbres: ["ascendants", "horizontal", "compact", "descendants"],
-    htrees: ["+3-3 gen.", "famille", "6 gen", "8 gen", "HI"],
+    htrees: ["+3-3 gen.", "family", "6 gen", "8 gen", "HI"],
     gr_parents: ["standard", "three cols"],
     ligne: ["standard"],
     data_3col: ["standard"],
-    w: ["personnel"],
-    x: ["personnel"],
-    z: ["personnel"]
+    w: ["custom"],
+    x: ["custom"],
+    z: ["custom"]
+  };
+
+  // Display names for module labels (English)
+  const MODULE_LABELS = {
+    individu: "individual",
+    parents: "parents",
+    unions: "unions",
+    fratrie: "siblings",
+    relations: "relations",
+    chronologie: "timeline",
+    notes: "notes",
+    sources: "sources",
+    arbres: "trees",
+    htrees: "h-trees",
+    gr_parents: "grandparents",
+    ligne: "lineage",
+    data_3col: "3-col data",
+    w: "w",
+    x: "x",
+    z: "z"
   };
   
-  // Map rapide pour lookup par première lettre
+  // Fast map for first-letter lookup
   const MODULE_MAP = new Map();
   for (const [name, opts] of Object.entries(MODULES)) {
     MODULE_MAP.set(name[0], { name, opts });
@@ -41,14 +61,14 @@
     buttons: new Map()
   };
   
-  // État de l'application
+  // Application state
   const state = {
     currentValue: '',
     activeButtons: new Set()
   };
   
   /**
-   * Génère le HTML de la table de modules
+   * Generate the HTML module table
    */
   function generateTable() {
     const rows = Object.entries(MODULES).map(([module, options]) => {
@@ -62,7 +82,7 @@
       }).join('');
       
       return `<tr>
-        <td class="align-middle pmod">${module}</td>
+        <td class="align-middle pmod">${MODULE_LABELS[module] || module}</td>
         <td><div class="d-inline-flex">${buttons}</div></td>
       </tr>`;
     }).join('');
@@ -76,17 +96,17 @@
   }
   
   /**
-   * Met à jour l'état des boutons
+   * Update button states
    */
   function updateButtonStates() {
-    // Réinitialiser tous les boutons
+    // Reset all buttons
     state.activeButtons.forEach(id => {
       const btn = $(`#${id}`);
       btn.removeClass('btn-primary').addClass('btn-outline-primary');
     });
     state.activeButtons.clear();
     
-    // Activer les boutons correspondant à la valeur actuelle
+    // Activate buttons matching the current value
     const val = DOM.input.val();
     for (let i = 0; i < val.length - 1; i += 2) {
       const moduleId = val.substr(i, 2);
@@ -100,7 +120,7 @@
   }
   
   /**
-   * Affiche une erreur
+   * Display an error
    */
   function showError(type, data) {
     DOM.alert.removeClass('d-none');
@@ -116,13 +136,13 @@
       $('#alert-module').text(data.module);
     }
     
-    // Retirer les 2 derniers caractères de la valeur
+    // Remove the last 2 characters from the value
     const newVal = DOM.input.val().slice(0, -2);
     DOM.input.val(newVal);
   }
   
   /**
-   * Construit la vue des images
+   * Build the image view
    */
   function buildView() {
     const val = DOM.input.val();
@@ -150,7 +170,7 @@
         break;
       }
       
-      // Image spéciale pour le module z
+      // Special image for module z
       const imgSrc = (moduleChar === 'z') 
         ? 'zz_1.jpg' 
         : `${moduleInfo.name}_${optNum}.jpg`;
@@ -158,7 +178,7 @@
       images.push(`<img class="rm" src="${DOM.imgPrefix}/${imgSrc}">`);
     }
     
-    // Mettre à jour le DOM une seule fois
+    // Update the DOM once
     if (!hasError) {
       DOM.builder.html(images.join('\n'));
       updateButtonStates();
@@ -166,7 +186,7 @@
   }
   
   /**
-   * Ajoute un module via le bouton
+   * Add a module via button click
    */
   function addModule(btnId) {
     const buttonInfo = DOM.buttons.get(btnId);
@@ -183,7 +203,7 @@
   }
   
   /**
-   * Supprime le dernier module
+   * Remove the last module
    */
   function removeLastModule() {
     const val = DOM.input.val();
@@ -195,7 +215,7 @@
     DOM.input.val(newVal);
     $('.rm:last-child').remove();
     
-    // Restaurer le bouton si plus utilisé
+    // Restore the button if no longer used
     if (!newVal.includes(removedId)) {
       const btnId = `pm_${removedId}`;
       $(`#${btnId}`).removeClass('btn-primary').addClass('btn-outline-primary');
@@ -204,7 +224,7 @@
   }
   
   /**
-   * Réinitialise tout
+   * Reset everything
    */
   function clearAll() {
     DOM.input.val('');
@@ -216,10 +236,10 @@
   }
   
   /**
-   * Initialisation principale
+   * Main initialization
    */
   function init() {
-    // Initialiser le cache DOM
+    // Initialize DOM cache
     DOM.input = $('#p_mod');
     DOM.builder = $('#p_mod_builder');
     DOM.alert = $('.alert');
@@ -228,67 +248,67 @@
     DOM.imgPrefix = $('.img-prfx').attr('data-prfx');
     DOM.bvar = $('#p_mod_bvar');
     
-    // Générer et insérer la table
+    // Generate and insert the table
     $('#p_mod_table').replaceWith(generateTable());
     
-    // Initialiser les popovers
+    // Initialize popovers
     $('[data-toggle="popover"]').popover();
     
-    // Activer les alertes
+    // Enable alerts
     DOM.alert.alert();
     
-    // Event handlers optimisés avec délégation
+    // Optimized event handlers with delegation
     setupEventHandlers();
     
-    // Construire la vue initiale si valeur présente
+    // Build initial view if value is present
     if (DOM.input.val()) {
       buildView();
     }
   }
   
   /**
-   * Configure tous les event handlers
+   * Set up all event handlers
    */
   function setupEventHandlers() {
-    // Input handler avec debounce léger
+    // Input handler with light debounce
     let inputTimer;
     DOM.input.on('input', function() {
       clearTimeout(inputTimer);
       inputTimer = setTimeout(buildView, 50);
     });
     
-    // Fermer l'alerte
+    // Close alert
     DOM.alert.on('click', function() {
       $(this).addClass('d-none');
       DOM.input.focus();
     });
     
-    // Bouton variable de configuration
+    // Configuration variable button
     DOM.bvar.on('click', function() {
       DOM.input.val($(this).val());
       buildView();
     });
     
-    // Bouton supprimer
+    // Remove button
     $('#p_mod_rm').on('click', removeLastModule);
     
-    // Bouton effacer
+    // Clear button
     $('#p_mod_clear').on('click', clearAll);
     
-    // Bouton zz
+    // zz button
     $('#zz').on('click', function() {
       DOM.input.val('zz');
       buildView();
     });
     
-    // Délégation pour les boutons de modules
+    // Delegation for module buttons
     $(document).on('click', '[id^="pm_"]', function(e) {
       e.preventDefault();
       addModule(this.id);
     });
   }
   
-  // Lancer l'initialisation au chargement
+  // Launch initialization on page load
   $(document).ready(init);
   
 })(jQuery);

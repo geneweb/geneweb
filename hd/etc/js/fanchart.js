@@ -2767,44 +2767,44 @@ const SVGRenderer = {
         }
         html += `</h2>`;
 
-      // Événements vitaux
+      // Vital events
       if (displayPerson.birth_date || displayPerson.birth_place) {
-        html += `<div><strong>Naissance :</strong> `;
+        html += `<div><strong>${t('birth', 'Birth')} :</strong> `;
         if (displayPerson.birth_date) html += `${displayPerson.birth_date}`;
         if (displayPerson.birth_place) html += ` – ${displayPerson.birth_place}`;
         html += `</div>`;
       }
 
       if (displayPerson.baptism_date || displayPerson.baptism_place) {
-        html += `<div><strong>Baptême :</strong> `;
+        html += `<div><strong>${t('baptism', 'Baptism')} :</strong> `;
         if (displayPerson.baptism_date) html += `${displayPerson.baptism_date}`;
         if (displayPerson.baptism_place) html += ` – ${displayPerson.baptism_place}`;
         html += `</div>`;
       }
 
       if (displayPerson.death_date || displayPerson.death_place) {
-        html += `<div><strong>Décès :</strong> `;
+        html += `<div><strong>${t('death', 'Death')} :</strong> `;
         if (displayPerson.death_date) html += `${displayPerson.death_date}`;
         if (displayPerson.death_place) html += ` – ${displayPerson.death_place}`;
         html += `</div>`;
       }
 
       if (displayPerson.burial_date || displayPerson.burial_place) {
-        html += `<div><strong>Sépulture :</strong> `;
+        html += `<div><strong>${t('burial', 'Burial')} :</strong> `;
         if (displayPerson.burial_date) html += `${displayPerson.burial_date}`;
         if (displayPerson.burial_place) html += ` – ${displayPerson.burial_place}`;
         html += `</div>`;
       }
 
       if (displayPerson.age_text) {
-        html += `<div><strong>Âge :</strong> ${displayPerson.age_text}</div>`;
+        html += `<div><strong>${t('age', 'Age')} :</strong> ${displayPerson.age_text}</div>`;
       }
 
       // Notice d'implexe améliorée
       if (isImplex) {
         const cloneCount = ImplexResolver.getAllClones(p.sosasame || currentSosa).length;
         html += `<div class="implex-notice">`;
-        html += `<strong>💡 Implexe :</strong> apparaît ${cloneCount + 1} fois.`;
+        html += `<strong>${t('implex', 'Implex')} :</strong> appears ${cloneCount + 1} times.`;
         html += `</div>`;
       }
 
@@ -2813,24 +2813,24 @@ const SVGRenderer = {
     } else if (type === "marriage") {
       // Code existant pour les mariages - copier depuis l'original
       const years = parseInt(p.marriage_length) || -1;
-      let html = `<h2>Mariage</h2>`;
+      let html = `<h2>${t('marriage', 'Marriage')}</h2>`;
 
       const marriageDate = p.marriage_date_ || p.marriage_date;
       if (marriageDate) {
-        html += `<div><strong>Date :</strong> ${marriageDate}</div>`;
+        html += `<div><strong>${t('date', 'Date')} :</strong> ${marriageDate}</div>`;
       }
 
       if (p.marriage_place) {
-        html += `<div><strong>Lieu :</strong> ${p.marriage_place}</div>`;
+        html += `<div><strong>${t('place', 'Place')} :</strong> ${p.marriage_place}</div>`;
       }
 
       if (years >= 0) {
-        const yearLabel = years === 1 ? "an" : "ans";
-        html += `<div><strong>Durée :</strong> ${years} ${yearLabel}</div>`;
+        const yearLabel = years === 1 ? t('marriage_year', 'year') : t('marriage_years', 'years');
+        html += `<div><strong>${t('duration', 'Duration')} :</strong> ${years} ${yearLabel}</div>`;
       }
 
       if (p.marriage_age) {
-        html += `<div><strong>Âge au mariage :</strong> ${p.marriage_age} ans</div>`;
+        html += `<div><strong>${t('marriage_age', 'Age at marriage')} :</strong> ${p.marriage_age}</div>`;
       }
 
       panel.innerHTML = html;

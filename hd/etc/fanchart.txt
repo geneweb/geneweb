@@ -362,10 +362,13 @@ window.FC_TRANSLATIONS = {
   'burial': "[burial/burials]0",
   'burials': "[burial/burials]1",
   'implex': "[implex/implexes]0",
+  'age': "[*age]",
+  'date': "[*date]",
+  'duration': "[*duration]",
+  'marriage_age': "[*age at marriage]",
 
-  // À vérifier…
-  'marriage_years': "[*marriage years]",
-  'marriage_year': "[*marriage year]",
+  'marriage_years': "[*years]",
+  'marriage_year': "[*year]",
   'years_old': "[*years old]",
 
   // Navigation
@@ -399,6 +402,6 @@ window.t = function(key, defaultValue = key) {
   return typeof value === 'string' ? value : defaultValue;
 };
 </script>
-<script src="%etc_prefix;js/fanchart.min.js?hash=%apply;hash%with;%etc_prefix;js/fanchart.min.js%end;"></script>
+<script src="%etc_prefix;js/fanchart.js?hash=%apply;hash%with;%etc_prefix;js/fanchart.js%end;"></script>
 </body>
 </html>
