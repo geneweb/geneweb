@@ -76,7 +76,7 @@
   $ gwc -gwo -bd . ../galichet.gw -f
   Compilation: 0 min 0 sec
   Migration check for galichet:
-    Classic .gwf exists: true (galichet.gwf)
+    Classic .gwf exists: true (./galichet.gwf)
     Reorg .gwf exists: false
   Configuration kept
   
@@ -128,7 +128,7 @@
   $ gwc -bd . ../galichet.gwo -f
   Compilation: 0 min 0 sec
   Migration check for galichet:
-    Classic .gwf exists: true (galichet.gwf)
+    Classic .gwf exists: true (./galichet.gwf)
     Reorg .gwf exists: false
   Configuration kept
   
@@ -154,7 +154,7 @@
   $ gwc -bd . ../galichet.gw -f && cmp ../galichet.gwo galichet.gwo && rm galichet.gwo
   Compilation: 0 min 0 sec
   Migration check for galichet:
-    Classic .gwf exists: true (galichet.gwf)
+    Classic .gwf exists: true (./galichet.gwf)
     Reorg .gwf exists: false
   Configuration kept
   

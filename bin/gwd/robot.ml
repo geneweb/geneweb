@@ -7,6 +7,8 @@ let src = Logs.Src.create ~doc:"Robot" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Code = Geneweb_http.Code
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let magic_robot = "GWRB0008"
 
@@ -103,10 +105,13 @@ let output_excl oc xcl =
 
 let robot_excl () =
   let fname =
-    String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
+    String.concat Filename.dir_sep
+      [ Fpath.to_string (Secure.base_dir ()); "cnt"; "robot" ]
   in
   let xcl =
-    match try Some (Secure.open_in_bin fname) with _ -> None with
+    match
+      try Some (Secure.open_in_bin (Fpath.of_string fname)) with _ -> None
+    with
     | Some ic -> (
         try
           let b = really_input_string ic (String.length magic_robot) in
@@ -242,7 +247,10 @@ let check tm from max_call sec conf suicide =
           log_summary tm xcl nconn);
         refused
   in
-  (match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
+  (match
+     try Some (Secure.open_out_bin (Fpath.of_string fname))
+     with Sys_error _ -> None
+   with
   | Some oc ->
       output_excl oc xcl;
       close_out oc

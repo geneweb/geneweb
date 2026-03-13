@@ -10,6 +10,8 @@ module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Code = Geneweb_http.Code
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
     ?(aria_label = "") ?(disabled = false) ?(target = None) ?(data_attrs = [])
@@ -79,16 +81,17 @@ let print_default_gwf_file bname =
   in
   let config_d = !GWPARAM.config_d bname in
   let fname = !GWPARAM.config bname in
-  if not (Sys.file_exists fname) then
+  if not (File.file_exists fname) then
     try
-      if not (Sys.file_exists config_d) then Unix.mkdir config_d 0o755;
-      if bname = "" || Sys.file_exists fname then ()
+      (try File.create_dir ~required_perm:0o755 config_d with _ -> ());
+      if bname = "" || File.file_exists fname then ()
       else
-        let oc = open_out fname in
+        let oc = Secure.open_out fname in
         List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
         close_out oc
     with Unix.Unix_error (_, _, _) ->
-      Log.warn (fun k -> k "Error while creating %s or %s" config_d fname)
+      Log.warn (fun k ->
+          k "Error while creating %a or %a" Fpath.pp config_d Fpath.pp fname)
 
 let rec cut_at_equal i s =
   if i = String.length s then (s, "")
@@ -115,15 +118,15 @@ let read_base_env bname gw_prefix debug =
       List.rev env
     with Sys_error error ->
       Log.warn (fun k ->
-          k "Error %s while loading %s, using empty config" error fname);
+          k "Error %s while loading %a, using empty config" error Fpath.pp fname);
       []
   in
   let fname1 = !GWPARAM.config bname in
-  if Sys.file_exists fname1 then load_file fname1
+  if File.file_exists fname1 then load_file fname1
   else (
     if debug then
       Log.info (fun k ->
-          k "No configuration file %s found, see %s for example" fname1
+          k "No configuration file %a found, see %s for example" Fpath.pp fname1
             (Filename.concat gw_prefix "a.gwf"));
     [])
 
@@ -247,25 +250,26 @@ let escape_attribute =
 let is_hide_names conf p =
   if conf.hide_names || Driver.get_access p = Private then true else false
 
-let search_in_path p s =
+let search_in_path assets path =
   let rec loop = function
     | d :: dl ->
-        let f = Filename.concat d s in
-        if Sys.file_exists f then f else loop dl
-    | [] -> s
+        let f = Fpath.(d // path) in
+        if File.file_exists f then f else loop dl
+    | [] -> path
   in
-  loop (p ())
+  loop (assets ())
 
 let search_in_assets = search_in_path Secure.assets
 
 let hash_file file =
-  try Some (Digest.to_hex (Digest.file file)) with Sys_error _ -> None
+  try Some (Digest.to_hex (Digest.file (Fpath.to_string file)))
+  with Sys_error _ -> None
 
 let hash_cache = Hashtbl.create 100
 
 let hash_file_cached file =
   try
-    let stats = Unix.stat file in
+    let stats = File.stat file in
     let mtime = stats.st_mtime in
     match Hashtbl.find hash_cache file with
     | cached_mtime, hash when Float.equal cached_mtime mtime -> Some hash
@@ -1341,8 +1345,8 @@ let find_file_in_directories directories filename =
   let rec search = function
     | [] -> None
     | dir :: remaining ->
-        let full_path = Filename.concat dir filename in
-        if Sys.file_exists full_path then Some full_path else search remaining
+        let full_path = Fpath.(dir // ~$filename) in
+        if File.file_exists full_path then Some full_path else search remaining
   in
   search directories
 
@@ -1387,16 +1391,16 @@ let generate_search_directories conf =
   in
   let template_dirs =
     match current_template with
-    | Some t -> [ Filename.concat base_etc t; base_etc ]
+    | Some t -> [ Fpath.(base_etc // ~$t); base_etc ]
     | None -> [ base_etc ]
   in
   let asset_template_dirs =
     List.concat
       (List.map
          (fun asset_dir ->
-           let etc_dir = Filename.concat asset_dir "etc" in
+           let etc_dir = Fpath.(asset_dir // ~$"etc") in
            match current_template with
-           | Some t -> [ Filename.concat etc_dir t; etc_dir ]
+           | Some t -> [ Fpath.(etc_dir // ~$t); etc_dir ]
            | None -> [ etc_dir ])
          asset_dirs)
   in
@@ -1425,7 +1429,7 @@ let find_template_file conf fname auto_txt =
   let search_dirs = generate_search_directories conf in
   match find_file_in_directories search_dirs final_fname with
   | Some path -> path
-  | None -> search_in_assets (Filename.concat "etc" final_fname)
+  | None -> search_in_assets Fpath.(~$"etc" // ~$final_fname)
 
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
@@ -1457,7 +1461,8 @@ let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
-    Log.err (fun k -> k "Error opening file %s in open_etc_file: %s" fname e);
+    Log.err (fun k ->
+        k "Error opening file %a in open_etc_file: %s" Fpath.pp fname e);
     None
 
 (* Detect if a template file is a full HTML page *)
@@ -1510,9 +1515,7 @@ let get_protocol conf =
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then (
     let print_file fname =
-      let fname =
-        Filename.concat (!GWPARAM.etc_d conf.bname) (fname ^ ".txt")
-      in
+      let fname = Fpath.(!GWPARAM.etc_d conf.bname // ~$(fname ^ ".txt")) in
       try
         let ic = Secure.open_in fname in
         try
@@ -2255,16 +2258,17 @@ let write_default_sosa conf key =
       [] (List.rev conf.base_env)
   in
   let fname = !GWPARAM.config conf.bname in
-  let tmp_fname = fname ^ "2" in
+  let tmp_fname = Fpath.of_string (Fpath.to_string fname ^ "2") in
   let oc =
-    try Stdlib.open_out tmp_fname
+    try Secure.open_out tmp_fname
     with Sys_error _ -> failwith "the gwf file is not writable"
   in
   List.iter (fun (k, v) -> Stdlib.output_string oc (k ^ "=" ^ v ^ "\n")) gwf;
   close_out oc;
-  Mutil.rm (fname ^ "~");
-  Sys.rename fname (fname ^ "~");
-  try Sys.rename tmp_fname fname with Sys_error _ -> ()
+  let fname_backup = Fpath.of_string (Fpath.to_string fname ^ "~") in
+  File.remove ~force:true fname_backup;
+  File.rename fname fname_backup;
+  try File.rename tmp_fname fname with Sys_error _ -> ()
 
 let update_gwf_sosa conf base (ip, (fn, sn, occ)) =
   let sosa_ref_key =
@@ -2290,8 +2294,8 @@ let create_topological_sort conf base =
       let bfile = bpath (conf.bname ^ ".gwb") in
       let tstab_file =
         if conf.use_restrict && (not conf.wizard) && not conf.friend then
-          Filename.concat bfile "tstab_visitor"
-        else Filename.concat bfile "tstab"
+          Fpath.(bfile // ~$"tstab_visitor")
+        else Fpath.(bfile // ~$"tstab")
       in
       Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
         (fun () ->
@@ -2730,15 +2734,16 @@ let update_wf_trace conf fname =
 let test_cnt_d conf =
   let config_d = !GWPARAM.config_d conf.bname in
   let cnt_d = !GWPARAM.cnt_d conf.bname in
-  (if not (Sys.file_exists config_d) then
-     try Unix.mkdir config_d 0o755
-     with Unix.Unix_error (_, _, _) ->
+  (if not (File.file_exists config_d) then
+     try File.create_dir ~required_perm:0o755 config_d
+     with File.File_error _ ->
        Log.warn (fun k ->
-           k "Failure when creating config_dir (util): %s" config_d));
-  if not (Sys.file_exists cnt_d) then
-    try Unix.mkdir cnt_d 0o755
-    with Unix.Unix_error (_, _, _) ->
-      Log.warn (fun k -> k "Failure when creating cnt_dir (util): %s" cnt_d)
+           k "Failure when creating config_dir (util): %a" Fpath.pp config_d));
+  if not (File.file_exists cnt_d) then
+    try File.create_dir ~required_perm:0o755 cnt_d
+    with File.File_error _ ->
+      Log.warn (fun k ->
+          k "Failure when creating cnt_dir (util): %a" Fpath.pp cnt_d)
   else ();
   cnt_d
 
@@ -2781,8 +2786,8 @@ type auth_user = { au_user : string; au_passwd : string; au_info : string }
 let read_gen_auth_file fname base_file =
   let fname =
     if GWPARAM.is_reorg_base base_file then
-      Filename.concat (!GWPARAM.config_d base_file) fname
-    else Filename.concat (Secure.base_dir ()) fname
+      Fpath.(!GWPARAM.config_d base_file // ~$fname)
+    else Fpath.(Secure.base_dir () // ~$fname)
   in
   try
     let ic = Secure.open_in fname in
@@ -3090,7 +3095,7 @@ let cache_visited conf =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
     else conf.bname ^ ".gwb"
   in
-  Filename.concat (bpath bname) "cache_visited"
+  Fpath.(bpath bname // ~$"cache_visited")
 
 (* ************************************************************************ *)
 (*  [Fonc] read_visited : string -> cache_visited_t                         *)
@@ -3349,7 +3354,7 @@ let has_children base u =
 
 let get_bases_list ?(format_fun = fun x -> x) () =
   let list = ref [] in
-  let dh = Unix.opendir (Secure.base_dir ()) in
+  let dh = File.opendir (Secure.base_dir ()) in
   (try
      while true do
        let e = Unix.readdir dh in
@@ -3653,3 +3658,18 @@ let url_set_aux conf url evar_l str_l =
   in
 
   Format.sprintf "%s?%s" href (reorder conf url_env)
+
+let notes_aliases path =
+  File.with_open_in_text path @@ fun ic ->
+  let rec loop acc =
+    match input_line ic with
+    | exception End_of_file -> acc
+    | line -> (
+        match String.index line ' ' with
+        | exception Not_found -> acc
+        | i ->
+            let prefix = String.sub line 0 i in
+            let suffix = String.sub line (i + 1) (String.length line - i - 1) in
+            loop ((prefix, suffix) :: acc))
+  in
+  loop []

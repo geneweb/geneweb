@@ -4,6 +4,8 @@ open Config
 open Def
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 type gen_record = {
   date : Adef.safe_string;
@@ -32,25 +34,27 @@ let history_d conf =
       if Filename.check_suffix conf.bname ".gwb" then conf.bname
       else conf.bname ^ ".gwb"
     in
-    Filename.concat (Util.bpath bname) path
-  else path
+    Fpath.(!GWPARAM.bpath bname // ~$path)
+  else Fpath.of_string path
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
 let history_path conf fname =
   if String.length fname >= 6 then
-    let dirs =
-      [ history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1] ]
-    in
-    List.fold_right Filename.concat dirs fname
-  else Filename.concat (history_d conf) fname
+    Fpath.(
+      history_d conf
+      // ~$(String.make 1 fname.[0])
+      // ~$(String.make 1 fname.[1])
+      // ~$fname)
+  else Fpath.(history_d conf // ~$fname)
 
 (* Créé tous les dossiers intermédiaires. *)
 let create_history_dirs conf fname =
   if String.length fname >= 6 then
-    let dirs =
-      [ history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1] ]
-    in
-    Filesystem.create_dir ~parent:true (List.fold_left Filename.concat "" dirs)
+    File.create_dir ~parent:true
+      Fpath.(
+        history_d conf
+        // ~$(String.make 1 fname.[0])
+        // ~$(String.make 1 fname.[1]))
 
 (* ************************************************************************ *)
 (*  [Fonc] write_history_file : config -> string -> gen_record -> unit      *)
@@ -148,13 +152,13 @@ let record_diff conf base changed =
         let ofname = history_path conf o_person_file in
         let fname = history_path conf person_file in
         (* La clé a changé, on reprend l'ancien historique. *)
-        (if o_person_file <> person_file && Sys.file_exists ofname then
+        (if o_person_file <> person_file && File.file_exists ofname then
            try
              let () = create_history_dirs conf person_file in
-             Sys.rename ofname fname
+             File.rename ofname fname
            with Sys_error _ -> ());
         let gr = make_gen_record conf base false p in
-        if Sys.file_exists fname then
+        if File.file_exists fname then
           write_history_file conf person_file fname gr
         else
           let o_gr = make_gen_record conf base true o in
@@ -175,7 +179,7 @@ let record_diff conf base changed =
             let ofname = history_path conf o_person_file in
             (try
                let () = create_history_dirs conf person_file in
-               Sys.rename ofname fname
+               File.rename ofname fname
              with Sys_error _ -> ());
             write_history_file conf person_file fname gr)
           else write_history_file conf person_file fname gr
@@ -213,7 +217,7 @@ let record_diff conf base changed =
                   (Driver.get_occ p)
               in
               let fname = history_path conf person_file in
-              if Sys.file_exists fname then ()
+              if File.file_exists fname then ()
               else
                 let gen_p = Driver.gen_person_of_person p in
                 let gen_p = Util.string_gen_person base gen_p in
@@ -228,7 +232,7 @@ let record_diff conf base changed =
               if o_person_file <> person_file then (
                 let ofname = history_path conf o_person_file in
                 let fname = history_path conf person_file in
-                (try Sys.rename ofname fname with Sys_error _ -> ());
+                (try File.rename ofname fname with Sys_error _ -> ());
                 let p = Driver.poi base ip in
                 let p =
                   Futil.map_person_ps

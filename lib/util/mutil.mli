@@ -34,11 +34,7 @@ val nominative : string -> string
 (** Encodes name for nominative declination format.
     @deprecated *)
 
-val mkdir_p : ?perm:int -> string -> unit
-(** [mkdir_p ?perm dir] Create the directory [dir]. No error if existing, make
-    parent directories as needed. *)
-
-val lock_file : string -> string
+val lock_file : Geneweb_fs.Fpath.t -> Geneweb_fs.Fpath.t
 (** Returns the name of a lock file (with extension .lck). Result is generally
     used as an argument for [Lock.control] function. *)
 
@@ -71,7 +67,7 @@ val arabian_of_roman : string -> int
 
 val fallback : (string * string) list ref
 
-val read_fallback : string -> string -> unit
+val read_fallback : string -> Geneweb_fs.Fpath.t -> unit
 (** reads a file lexicon.gwf which defines a possible fallback language for each
     of the available languages. Most of the lines of this file are commented and
     can be uncommented by the user who can place the new file in bases/etc/lang
@@ -145,12 +141,6 @@ val compare_after_particle : Re.re -> string -> string -> int
 (** [compare_after_particle particles s1 s2] compare strings [s1] [s2] starting
     from the first character after particle's match. If they are equal, compare
     particles. *)
-
-val rm : string -> unit
-(** [rm fname] Remove [fname]. If [fname] does not exists, do nothing. *)
-
-val mv : string -> string -> unit
-(** [mv src dst] Move [src] to [dst]. If [src] does not exists, do nothing. *)
 
 val string_of_int_sep : string -> int -> string
 (** [string_of_int_sep "," 1000000] is ["1,000,000"] *)
@@ -226,15 +216,6 @@ val list_index : 'a -> 'a list -> int
 val list_ref_append : 'a list ref -> 'a -> unit
 (** [list_ref_append tl hd] Add [hd] at the beginning of [tl] ref. *)
 
-val input_file_ic : in_channel -> string
-(** Read the content of a file. Starts from the position where it is when
-    calling [input_file_ic], and read until the end of the file.
-
-    This function avoid crashes with text files on Windows platform.
-
-    If the channel is opened on a file that is not a regular file, the result is
-    meaningless. *)
-
 val normalize_utf_8 : string -> string
 (** [normalize_utf_8 s] Return [s] normalized using
     {{:http://www.unicode.org/glossary/#normalization_form_c}NFC} with all
@@ -253,7 +234,7 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 val read_or_create_channel :
   ?magic:string ->
   ?wait:bool ->
-  string ->
+  Geneweb_fs.Fpath.t ->
   (in_channel -> 'a) ->
   (out_channel -> 'a) ->
   'a
@@ -271,7 +252,7 @@ val read_or_create_channel :
     On Windows, file is not locked. *)
 
 val read_or_create_value :
-  ?magic:string -> ?wait:bool -> string -> (unit -> 'a) -> 'a
+  ?magic:string -> ?wait:bool -> Geneweb_fs.Fpath.t -> (unit -> 'a) -> 'a
 (** [read_or_create_value ?magic fname create]
 
     If [fname] exists (and starts and ends with [magic] if this one is
@@ -329,11 +310,12 @@ val rev_input_line : in_channel -> int -> bytes ref * int ref -> string * int
     Raises [End_of_file] if the beginning of the file is reached at the
     beginning of line. *)
 
-val search_file_opt : string list -> string -> string option
+val search_file_opt :
+  Geneweb_fs.Fpath.t list -> string -> Geneweb_fs.Fpath.t option
 (** [search_file directories file] Search for a [file] in different
     [directories] and return then first result or [None] if not found *)
 
-val search_asset_opt : string -> string option
+val search_asset_opt : string -> Geneweb_fs.Fpath.t option
 (** [search_asset fname] Searches for a file in assets directories. i.e.
     directories previously registered with [Secure.add_assets] *)
 
@@ -344,9 +326,6 @@ val eq_key : string * string * int -> string * string * int -> bool
 val ls_r : string list -> string list
 (** [ls_r dirs] List directories (and subdirectories) contents of [dirs],
     including [dirs] themselves. *)
-
-val rm_rf : string -> unit
-(** [rm_rf dir] Remove directory [dir] and everything inside [dir]. *)
 
 val filter_map : ('a -> 'b option) -> 'a list -> 'b list
 (** [filter_map fn list] is a combination of map and filter. Not tail-recursive.

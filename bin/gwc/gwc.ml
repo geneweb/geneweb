@@ -2,6 +2,8 @@
 module Compat = Geneweb_compat
 module GWPARAM = Geneweb.GWPARAM
 module Dirs = Geneweb_dirs
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 type kind = Gw | Gwo
 
@@ -79,9 +81,9 @@ let iterator_gwo_files bar inputs file_info =
   in
   next
 
-let generate_database ~no_warn ~bdir bar gwo_files =
+let generate_database ~no_warn ~bpath bar gwo_files =
   let iterator = iterator_gwo_files bar gwo_files in
-  match Db1link.link ~no_warn iterator bdir with
+  match Db1link.link ~no_warn iterator bpath with
   | exception Db1link.Critical_import_error msg ->
       Fmt.epr "CRITICAL ERROR: %s@." msg;
       exit 2
@@ -262,7 +264,7 @@ let parse_cmd () =
   let inputs = List.rev !rev_inputs in
   let bname = parse_output inputs !output in
   let base_dir = Option.value ~default:Filename.current_dir_name !base_dir in
-  (inputs, bname, base_dir)
+  (inputs, bname, Fpath.of_string base_dir)
 
 let with_timer f =
   let start = Unix.gettimeofday () in
@@ -273,15 +275,15 @@ let with_timer f =
 let pp_duration ppf d =
   Fmt.pf ppf "%d min %d sec" (int_of_float (d /. 60.0)) (int_of_float d mod 60)
 
-let ( // ) = Filename.concat
-
 let check_database_exists base_dir bname =
-  let path = base_dir // Fmt.str "%s.gwb" bname in
-  Sys.file_exists path
+  let s = Fmt.str "%s.gwb" bname in
+  let path = Fpath.(base_dir // ~$s) in
+  File.file_exists path
 
 let cleanup gwo_files =
   List.iter
-    (fun (fname, _, _, _, was_gw) -> if was_gw then Mutil.rm fname)
+    (fun (path, _, _, _, was_gw) ->
+      if was_gw then File.remove @@ Fpath.of_string path)
     gwo_files
 
 let () =
@@ -306,8 +308,8 @@ let () =
       if !kill_gwo then cleanup gwo_files;
       Fmt.epr "Database %S already exists. Use -f to overwrite.@." bname;
       exit 2);
-    let bdir = GWPARAM.create_base_and_config bname in
-    let lock_file = Mutil.lock_file bdir in
+    let bpath = GWPARAM.create_base_and_config bname in
+    let lock_file = Mutil.lock_file bpath in
     let on_exn exn bt =
       Fmt.epr "%a@." Lock.pp_exception (exn, bt);
       exit 2
@@ -321,7 +323,7 @@ let () =
     let (), duration =
       with_timer @@ fun () ->
       ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter @@ fun bar ->
-      generate_database ~no_warn:!no_warn ~bdir bar gwo_files
+      generate_database ~no_warn:!no_warn ~bpath bar gwo_files
     in
     Format.eprintf "Database generation: %a@." pp_duration duration;
     if !kill_gwo then cleanup gwo_files)

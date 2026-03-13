@@ -7,6 +7,7 @@ module Gutil = Geneweb_db.Gutil
 module Plugin = Geneweb_plugin
 module Code = Geneweb_http.Code
 module Server = Geneweb_http.Server
+module Fpath = Geneweb_fs.Fpath
 
 let ns = "export"
 
@@ -144,7 +145,7 @@ let export conf base =
           GwuLib.prepare_free_occ ~select:(fst select) base;
           Output.print_sstring conf "encoding: utf-8\n";
           Output.print_sstring conf "gwplus\n\n";
-          GwuLib.gwu opts isolated base "" "" (Hashtbl.create 0) select);
+          GwuLib.gwu opts isolated base Fpath.empty "" (Hashtbl.create 0) select);
       Server.wflush ();
       true
 

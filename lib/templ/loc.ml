@@ -1,19 +1,20 @@
 module Compat = Geneweb_compat
+module Fpath = Geneweb_fs.Fpath
 
-type source = [ `File of string | `Raw of string ]
+type source = [ `File of Geneweb_fs.Fpath.t | `Raw of string ]
 
 let equal_source src1 src2 =
   match (src1, src2) with
-  | `File f1, `File f2 -> String.equal f1 f2
+  | `File f1, `File f2 -> Fpath.equal f1 f2
   | `File _, _ | _, `File _ -> false
   | `Raw s1, `Raw s2 -> String.equal s1 s2
 
 let pp_source ppf src =
-  match src with `File f -> Fmt.string ppf f | `Raw _ -> Fmt.pf ppf "<raw>"
+  match src with `File f -> Fpath.pp ppf f | `Raw _ -> Fmt.pf ppf "<raw>"
 
 type t = { src : source; start : int; stop : int }
 
-let dummy = { src = `File "<dummy>"; start = -1; stop = -1 }
+let dummy = { src = `File (Fpath.of_string "<dummy>"); start = -1; stop = -1 }
 let[@inline] is_dummy t = t == dummy
 let[@inline] of_offsets src start stop = { src; start; stop }
 
@@ -34,7 +35,7 @@ let with_pp_loc_input src k =
           open them in text mode. On Windows, text mode normalizes line endings
           to the UNIX format. We must use the same mode to print correct line
           and column numbers. *)
-      Compat.In_channel.with_open_text f @@ fun ic ->
+      Compat.In_channel.with_open_text (Fpath.to_string f) @@ fun ic ->
       k (Pp_loc.Input.in_channel ic)
   | `Raw s -> k (Pp_loc.Input.string s)
 

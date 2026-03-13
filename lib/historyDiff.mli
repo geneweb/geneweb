@@ -14,7 +14,7 @@ val history_file : string -> string -> int -> string
 (** Returns history filename for the person with the given key. Has format :
     {i firstname.occ.surname} *)
 
-val history_path : Config.config -> string -> string
+val history_path : Config.config -> string -> Geneweb_fs.Fpath.t
 (** Returns path to the history file inside {i history_d} with given filename *)
 
 val record_diff :

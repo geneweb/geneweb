@@ -1,6 +1,8 @@
 open Def
 open Config
 module Driver = Geneweb_db.Driver
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 type dict_type =
   | Fnames
@@ -1069,15 +1071,14 @@ let dict_to_cache_name dict_type =
 let cache_file_path conf dict_type =
   let bname = Filename.remove_extension conf.bname in
   let cache_dir =
-    Filename.concat (Secure.base_dir ())
-      (Filename.concat "etc" (Filename.concat bname "cache"))
+    Fpath.(Secure.base_dir () // ~$"etc" // ~$bname // ~$"cache")
   in
   let fname = dict_to_cache_name dict_type in
-  Filename.concat cache_dir (bname ^ "_" ^ fname ^ "_checkdata.cache")
+  Fpath.(cache_dir // ~$(bname ^ "_" ^ fname ^ "_checkdata.cache"))
 
 let cache_file_exists conf dict_type =
   let cache_file = cache_file_path conf dict_type in
-  Sys.file_exists cache_file
+  File.file_exists cache_file
 
 let read_cache conf dict_type =
   let cache_file = cache_file_path conf dict_type in
@@ -1094,7 +1095,7 @@ let read_cache conf dict_type =
 
 let update_cache_entry conf dict_type istr new_value =
   let cache_file = cache_file_path conf dict_type in
-  if Sys.file_exists cache_file then
+  if File.file_exists cache_file then
     try
       let entries = read_cache conf dict_type in
       let updated_entries =

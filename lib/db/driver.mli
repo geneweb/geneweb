@@ -56,7 +56,7 @@ type base
 (** The database representation. *)
 
 val make :
-  string ->
+  Geneweb_fs.Fpath.t ->
   string list ->
   ((int, int, int) Def.gen_person array
   * int Def.gen_ascend array
@@ -68,11 +68,11 @@ val make :
   * Def.base_notes ->
   (base -> 'a) ->
   'a
-(** [make bname particles arrays k] create a base with [bname] name and [arrays]
-    as content and invokes the continuation [k] with it. *)
+(** [make bdir particles arrays k] create a base in the directory [bdir] and
+    [arrays] as content and invokes the continuation [k] with it. *)
 
-val load_database : string -> unit
-(** [load_database bname] loads the database [bname] into memory.
+val load_database : Geneweb_fs.Fpath.t -> unit
+(** [load_database bdir] loads the database [bdir] into memory.
 
     The base is read-only and any attempt to modify its values will result in
     failure.
@@ -87,8 +87,8 @@ val load_database : string -> unit
 
     @raise Failwith if the base has already been loaded. *)
 
-val with_database : string -> (base -> 'a) -> 'a
-(** [with_database bname k] loads the database [bname] and invokes the
+val with_database : Geneweb_fs.Fpath.t -> (base -> 'a) -> 'a
+(** [with_database bdir k] loads the database [bdir] and invokes the
     continuation [k] with it.
 
     If the database [bname] has already been loaded into memory with

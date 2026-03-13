@@ -234,8 +234,8 @@ let person_pass conf base a by_cache auth_cache =
               then age - 1
               else age
             in
-            if age >= 0 && age < age_max then
-              begin match Driver.get_sex p with
+            if age >= 0 && age < age_max then begin
+              match Driver.get_sex p with
               | Male ->
                   a.age_death_men.(age) <- a.age_death_men.(age) + 1;
                   a.sum_life_men <- a.sum_life_men + age;
@@ -256,7 +256,7 @@ let person_pass conf base a by_cache auth_cache =
                     a.life_cent_cnt_women.(ci) <- a.life_cent_cnt_women.(ci) + 1
                   end
               | Neuter -> ()
-              end
+            end
         | _ -> ()
       end)
     (Driver.persons base)

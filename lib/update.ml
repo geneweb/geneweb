@@ -5,6 +5,8 @@ open Def
 open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 type update_error =
   | UERR of Adef.safe_string
@@ -514,17 +516,17 @@ let print_err_unknown conf (f, s, o) =
   print_return conf
 
 let delete_topological_sort_v conf _base =
-  let bfile = Util.bpath conf.bname in
-  let tstab_file = Filename.concat bfile "tstab_visitor" in
-  Mutil.rm tstab_file;
-  let tstab_file = Filename.concat bfile "restrict" in
-  Mutil.rm tstab_file
+  let bfile = !GWPARAM.bpath conf.bname in
+  let tstab_file = Fpath.(bfile // ~$"tstab_visitor") in
+  File.remove ~force:true tstab_file;
+  let tstab_file = Fpath.(bfile // ~$"restrict") in
+  File.remove ~force:true tstab_file
 
 let delete_topological_sort conf base =
   let _ = delete_topological_sort_v conf base in
-  let bfile = Util.bpath conf.bname in
-  let tstab_file = Filename.concat bfile "tstab" in
-  Mutil.rm tstab_file
+  let bfile = !GWPARAM.bpath conf.bname in
+  let tstab_file = Fpath.(bfile // ~$"tstab") in
+  File.remove ~force:true tstab_file
 
 let print_someone conf base p =
   Output.printf conf "%s%s %s"

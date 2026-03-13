@@ -4,6 +4,8 @@ module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
 module Iper = Driver.Iper
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 module CoordMap = Map.Make (struct
   type t = int * int
@@ -291,17 +293,17 @@ let descendants base sparse i j =
   descendants_aux base liste1 liste2
 
 let cleanup_old_cache_files cache_dir ttl_hours =
-  if Sys.file_exists cache_dir then
+  if File.file_exists cache_dir then
     let now = Unix.time () in
     let ttl_seconds = float_of_int (ttl_hours * 3600) in
-    let files = Sys.readdir cache_dir in
+    let files = File.readdir cache_dir in
     Array.iter
       (fun filename ->
-        let filepath = Filename.concat cache_dir filename in
+        let filepath = Fpath.(cache_dir // ~$filename) in
         try
-          let stat = Unix.stat filepath in
+          let stat = File.stat filepath in
           let age = now -. stat.Unix.st_mtime in
-          if age > ttl_seconds then Sys.remove filepath
+          if age > ttl_seconds then File.remove filepath
         with _ -> ())
       files
 
@@ -357,14 +359,12 @@ let init_cousins_cnt conf base p =
   let occ = Driver.get_occ p in
   let key = Format.sprintf "%s.%d.%s" fn occ sn in
   let cache_dir =
-    Filename.concat
-      (Filename.concat (!GWPARAM.bpath conf.bname) "caches")
-      "cousins_levels"
+    Fpath.(!GWPARAM.bpath conf.bname // ~$"caches" // ~$"cousins_levels")
   in
   let sparse =
     match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
     | Some "yes" ->
-        Filesystem.create_dir ~parent:true cache_dir;
+        File.create_dir ~parent:true cache_dir;
 
         let ttl_hours =
           match List.assoc_opt "cache_cousins_ttl" conf.Config.base_env with
@@ -377,7 +377,7 @@ let init_cousins_cnt conf base p =
           if level > max_a_l then merge_sparse_list (List.rev acc)
           else
             let cache_file =
-              Filename.concat cache_dir (Printf.sprintf "%s_level_%d" key level)
+              Fpath.(cache_dir // ~$(Printf.sprintf "%s_level_%d" key level))
             in
             let level_sparse =
               try
@@ -393,7 +393,7 @@ let init_cousins_cnt conf base p =
                 in
                 if cached_key = key && cached_lev = level then partial
                 else (
-                  Sys.remove cache_file;
+                  File.remove cache_file;
                   let cumul = merge_sparse_list (List.rev acc) in
                   let full =
                     if level = 0 then build_level_0 ()
@@ -405,7 +405,7 @@ let init_cousins_cnt conf base p =
                          (key, level, partial)));
                   partial)
               with _ ->
-                if Sys.file_exists cache_file then Sys.remove cache_file;
+                if File.file_exists cache_file then File.remove cache_file;
                 let cumul = merge_sparse_list (List.rev acc) in
                 let full =
                   if level = 0 then build_level_0 ()

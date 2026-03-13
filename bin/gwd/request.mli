@@ -9,16 +9,16 @@ val w_base :
   none:(Config.config -> 'a) ->
   (Config.config -> Geneweb_db.Driver.base -> 'a) ->
   Config.config ->
-  string option ->
+  Geneweb_fs.Fpath.t option ->
   'a
 (** [w_lock ~none callback conf base] Acquire a write lock on the base and call
     [callback], or fail with [none]. *)
 
 val w_lock :
-  onerror:(Config.config -> string option -> 'a) ->
-  (Config.config -> string option -> 'a) ->
+  onerror:(Config.config -> Geneweb_fs.Fpath.t option -> 'a) ->
+  (Config.config -> Geneweb_fs.Fpath.t option -> 'a) ->
   Config.config ->
-  string option ->
+  Geneweb_fs.Fpath.t option ->
   'a
 (** [w_lock ~onerror callback conf base] Acquire a write lock on the base and
     call the callback, or fail with [onerror]. *)

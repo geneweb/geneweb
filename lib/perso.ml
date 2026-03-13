@@ -13,6 +13,8 @@ module Collection = Geneweb_db.Collection
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Iper = Driver.Iper
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let person_living_age conf p p_auth =
   match
@@ -362,7 +364,7 @@ let has_history conf base p p_auth =
   let sn = Driver.sou base (Driver.get_surname p) in
   let occ = Driver.get_occ p in
   let person_file = HistoryDiff.history_file fn sn occ in
-  p_auth && Sys.file_exists (HistoryDiff.history_path conf person_file)
+  p_auth && File.file_exists (HistoryDiff.history_path conf person_file)
 
 (* ************************************************************************ *)
 (*  [Fonc] get_death_text : config -> person -> bool -> string      *)
@@ -1766,7 +1768,7 @@ and eval_simple_bool_var conf base env =
       | _ -> raise Not_found)
   | s ->
       let v = extract_var "file_exists_" s in
-      if v <> "" then SrcfileDisplay.source_file_name conf v |> Sys.file_exists
+      if v <> "" then File.file_exists @@ SrcfileDisplay.source_file_name conf v
       else raise Not_found
 
 and eval_simple_str_var conf base env (p, p_auth) = function
@@ -2282,7 +2284,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
   | [ "plugin"; plugin ] ->
-      VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
+      VVbool (List.mem plugin (List.map Fpath.basename conf.plugins))
   | "base" :: "nb_persons" :: sl ->
       VVstring (eval_int conf (Driver.nb_of_persons base) sl)
   | "base" :: "nb_families" :: sl ->
@@ -3928,10 +3930,10 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       p_auth && (not conf.no_note) && Driver.sou base (Driver.get_notes p) <> ""
   | "has_wiznotes" ->
       let wfile =
-        String.concat Filename.dir_sep
-          [ !GWPARAM.bpath conf.bname; "wiznotes"; conf.user ^ ".txt" ]
+        Fpath.(
+          !GWPARAM.bpath conf.bname // ~$"wiznotes" // ~$(conf.user ^ ".txt"))
       in
-      conf.wizard && Sys.file_exists wfile
+      conf.wizard && File.file_exists wfile
   | "has_occupation" ->
       p_auth && Driver.sou base (Driver.get_occupation p) <> ""
   | "has_parents" -> Driver.get_parents p <> None
@@ -4063,7 +4065,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "auto_image_file_name" -> (
       (* TODO what do we want here? can we remove this? *)
       match Image.get_portrait_path conf base p with
-      | Some (`Path s) -> str_val s
+      | Some (`Path s) -> str_val (Fpath.to_string s)
       | Some (`Url u) -> str_val u
       | None -> null_val)
   | "birth_place" ->
@@ -4197,7 +4199,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | None -> null_val)
   | "old_image" | "old_portrait" -> (
       match Image.get_old_portrait conf base p with
-      | Some (`Path s) -> str_val s
+      | Some (`Path s) -> str_val (Fpath.to_string s)
       | Some (`Url u) -> str_val u
       | None -> null_val)
   | "image_html_url" | "portrait_html_url" ->
@@ -4240,17 +4242,17 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | _ -> raise Not_found)
   | "blason" -> (
       match Image.get_blason conf base p false with
-      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some (`Path p) when Fpath.extension p = ".stop" -> null_val
       | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
   | "old_blason" -> (
       match Image.get_old_blason conf base p false with
-      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some (`Path p) when Fpath.extension p = ".stop" -> null_val
       | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
   | "blason_self" -> (
       match Image.get_blason conf base p true with
-      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some (`Path p) when Fpath.extension p = ".stop" -> null_val
       | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
   | "portrait_name" -> str_val (Image.get_portrait_name conf base p)
@@ -4673,12 +4675,14 @@ and string_of_image_url conf base (p, p_auth) html saved : Adef.escaped_string =
       if saved then Image.get_old_portrait conf base p
       else Image.get_portrait conf base p
     with
-    | Some (`Path fname) when Filename.extension fname = ".url" -> (
-        match Some (Secure.open_in fname) with
-        | Some ic -> Adef.escaped (input_line ic)
-        | None -> Adef.escaped "")
+    | Some (`Path fname) when Fpath.extension fname = ".url" -> (
+        match Secure.open_in fname with
+        | exception Sys_error _ -> Adef.escaped ""
+        | ic ->
+            Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+            Adef.escaped (input_line ic))
     | Some (`Path fname) ->
-        let s = Unix.stat fname in
+        let s = File.stat fname in
         let b = acces conf base p in
         let k = Image.default_image_filename "portraits" base p in
         Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s"
@@ -4696,14 +4700,16 @@ and string_of_blason_url conf base (p, p_auth) html saved : Adef.escaped_string
     =
   if p_auth then
     match Image.get_blason_aux conf base p false saved with
-    | Some (`Path fname) when Filename.extension fname = ".url" -> (
-        match Some (Secure.open_in fname) with
-        | Some ic -> Adef.escaped (input_line ic)
-        | None -> Adef.escaped "")
+    | Some (`Path fname) when Fpath.extension fname = ".url" -> (
+        match Secure.open_in fname with
+        | exception Sys_error _ -> Adef.escaped ""
+        | ic ->
+            Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+            Adef.escaped (input_line ic))
     | Some (`Path fname) ->
         (* p is not the blason owner *)
-        let s = Unix.stat fname in
-        let k = Filename.basename fname |> Filename.chop_extension in
+        let s = File.stat fname in
+        let k = Fpath.basename fname |> Filename.chop_extension in
         (* k is first_name.occ.surname.blason *)
         let parts = String.split_on_char '.' k in
         let access =
@@ -5675,7 +5681,7 @@ let print_foreach conf base print_ast eval_expr =
         (if old then Image.get_carrousel_old_imgs else Image.get_carrousel_imgs)
           conf base p
       in
-      List.sort (fun (a, _, _, _) (b, _, _, _) -> String.compare a b) l
+      List.sort (fun (a, _, _, _) (b, _, _, _) -> Fpath.compare a b) l
     in
     let rec loop first cnt = function
       | [] -> ()
@@ -5683,7 +5689,7 @@ let print_foreach conf base print_ast eval_expr =
           let env =
             Templ.Env.(
               env
-              |> add "carrousel_img" (Vstring (Filename.basename name))
+              |> add "carrousel_img" (Vstring (Fpath.basename name))
               |> add "carrousel_img_src" (Vstring src)
               |> add "carrousel_img_note" (Vstring note)
               |> add "first" (Vbool first)

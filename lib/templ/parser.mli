@@ -1,7 +1,7 @@
 val parse :
   ?cached:bool ->
   on_exn:(exn -> Printexc.raw_backtrace -> unit) ->
-  resolve_include:(Loc.t -> string -> string) ->
+  resolve_include:(Loc.t -> Geneweb_fs.Fpath.t -> Geneweb_fs.Fpath.t) ->
   Loc.source ->
   Ast.t list
 (** [parse ?cached ~on_exn ~find src] parses [src] and expands included

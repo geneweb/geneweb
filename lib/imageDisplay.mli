@@ -1,6 +1,6 @@
 open Config
 
-val print_image_file : config -> string -> (unit, string) result
+val print_image_file : config -> Geneweb_fs.Fpath.t -> (unit, string) result
 (** [print_image_file conf fname] send HTTP respose with content of an image
     file at the path [fname]. MIME type of an image is deducted from [fname]
     extension. Returns [false] if image wasn't found or couldn't be send. *)

@@ -12,7 +12,7 @@ type desc = private
   | Aop1 of string * t
   | Aop2 of string * t * t
   | Aint of string
-  | Ainclude of [ `File of string | `Raw of string ]
+  | Ainclude of [ `File of Geneweb_fs.Fpath.t | `Raw of string ]
   | Apack of t list
 
 and t = private { desc : desc; loc : Loc.t }
@@ -43,7 +43,10 @@ val mk_let : ?loc:Loc.t -> string -> t list -> t list -> t
 val mk_op1 : ?loc:Loc.t -> string -> t -> t
 val mk_op2 : ?loc:Loc.t -> string -> t -> t -> t
 val mk_int : ?loc:Loc.t -> string -> t
-val mk_include : ?loc:Loc.t -> [ `File of string | `Raw of string ] -> t
+
+val mk_include :
+  ?loc:Loc.t -> [ `File of Geneweb_fs.Fpath.t | `Raw of string ] -> t
+
 val mk_pack : ?loc:Loc.t -> t list -> t
 
 val subst : (string -> string) -> t -> t

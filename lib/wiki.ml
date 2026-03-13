@@ -3,6 +3,8 @@
 open Def
 open Config
 open Util
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
 
 (* TLSW: Text Language Stolen to Wikipedia
    = title level 1 =
@@ -70,34 +72,6 @@ let make_edit_button conf ?(mode = "") fnotes ?(cnt = None) () =
   title="%s">(%s)</a>|}
     href title (transl conf "modify")
 
-let notes_aliases conf =
-  let fname =
-    match List.assoc_opt "notes_alias_file" conf.base_env with
-    | Some f -> f
-    | None -> Filename.concat (Util.bpath conf.bname) "notes.alias"
-  in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic ->
-      let rec loop list =
-        match try Some (input_line ic) with End_of_file -> None with
-        | Some s ->
-            let list =
-              (* S: is it replacable by `String.split_on_char ' '` s? *)
-              try
-                let i = String.index s ' ' in
-                ( String.sub s 0 i,
-                  String.sub s (i + 1) (String.length s - i - 1) )
-                :: list
-              with Not_found -> list
-            in
-            loop list
-        | None ->
-            close_in ic;
-            list
-      in
-      loop []
-  | None -> []
-
 let map_notes aliases f = try List.assoc f aliases with Not_found -> f
 let fname_of_path (dirs, file) = List.fold_right Filename.concat dirs file
 
@@ -115,7 +89,7 @@ let encode (s : string) = (Mutil.encode s : Adef.encoded_string :> string)
 
 type wiki_info = {
   wi_mode : string;
-  wi_file_path : string -> string;
+  wi_file_path : string -> Fpath.t;
   wi_person_exists : string * string * int -> bool;
   wi_mark_if_not_public : string * string * int -> bool;
   wi_always_show_link : bool;
@@ -307,7 +281,12 @@ let syntax_links conf wi s =
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->
           let text = bold_italic_syntax text in
           let fpath, fname =
-            let aliases = notes_aliases conf in
+            let aliases =
+              (* FIXME: potential inconsistency between the path computed
+                 below and the approach in `notes.ml`. *)
+              let path = Fpath.(!GWPARAM.bpath conf.bname // ~$"notes.alias") in
+              Util.notes_aliases path
+            in
             let fname = map_notes aliases fname1 in
             match NotesLinks.check_file_name fname with
             | Some fpath -> (fpath, fname)
@@ -315,7 +294,7 @@ let syntax_links conf wi s =
           in
           let c =
             let f = wi.wi_file_path (fname_of_path fpath) in
-            if Sys.file_exists f then "" else " style=\"color:red\""
+            if File.file_exists f then "" else " style=\"color:red\""
           in
           let anchor = if anchor = "" then "" else "#" ^ encode anchor in
           let t =
@@ -1105,10 +1084,9 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
   (match new_fname with
   | Some _ when fname <> "" ->
       let new_fn_path =
-        String.concat Filename.dir_sep
-          [ !GWPARAM.bpath conf.bname; "notes_d"; fname ^ ".txt" ]
+        Fpath.(!GWPARAM.bpath conf.bname // ~$"notes_d" // ~$(fname ^ ".txt"))
       in
-      if Sys.file_exists new_fn_path then Update.error_same_file conf
+      if File.file_exists new_fn_path then Update.error_same_file conf
   | _ -> ());
   match edit_mode fname with
   | Some edit_mode ->

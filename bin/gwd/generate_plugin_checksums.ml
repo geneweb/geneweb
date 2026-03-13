@@ -1,6 +1,6 @@
 module Plugin = Geneweb_plugin
-
-let ( // ) = Filename.concat
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let () =
   let path = Sys.argv.(1) in
@@ -8,7 +8,9 @@ let () =
   let checksums =
     Array.fold_left
       (fun acc dir ->
-        (Filename.basename dir, Plugin.checksum (path // dir)) :: acc)
+        ( Filename.basename dir,
+          Plugin.checksum (Fpath.of_string (Filename.concat path dir)) )
+        :: acc)
       [] plugins
   in
   let pp_checksum ppf (dir, sum) = Format.fprintf ppf "(%S, %S)" dir sum in

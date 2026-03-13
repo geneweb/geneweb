@@ -2,6 +2,8 @@ module Json_rpc = Geneweb_rpc.Json_rpc
 module Service = Geneweb_rpc.Service
 module Analyze = Geneweb_search.Analyze
 module Index = Geneweb_search.Index.Default
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
 
 let set_levels dflags =
   let flag_to_src (d : Cmd.dflag) =
@@ -41,17 +43,18 @@ let index_from_gzip path =
   |> List.to_seq |> Index.of_seq
 
 let load_dictionaries path =
-  Filesystem.walk_folder ~recursive:true
+  File.walk_folder ~recursive:true
     (fun file acc ->
       match file with
-      | File f when String.equal (Filename.extension f) ".gz" ->
-          let basename = Filename.(basename f |> chop_extension) in
+      | File f when File.check_suffix f ".gz" ->
+          let basename = Filename.chop_extension @@ Fpath.basename f in
           Logs.app (fun k -> k "Found dictionary %s" basename);
           (basename, index_from_gzip f) :: acc
       | Dir _ | File _ -> acc
       | Exn { path; exn; bt = _ } ->
           Logs.err (fun k ->
-              k "Uncaught exception while opening %s:@ %a" path Util.pp_exn exn);
+              k "Uncaught exception while opening %a:@ %a" Fpath.pp path
+                Util.pp_exn exn);
           acc)
     path []
 
@@ -68,7 +71,7 @@ let () =
                To ensure secure@ connections, please provide valid TLS \
                certificate and private key@ files.");
       Logs.app (fun k -> k "Loading dictionaries in %s..." cfg.index_dir);
-      let dicts = load_dictionaries cfg.index_dir in
+      let dicts = load_dictionaries (Fpath.of_string cfg.index_dir) in
       Logs.app (fun k -> k "Found %d dictionaries" (List.length dicts));
       Rpc.start ~interface:cfg.interface ~port:cfg.port
         ?max_connection:cfg.max_connection ?idle_timeout:cfg.idle_timeout

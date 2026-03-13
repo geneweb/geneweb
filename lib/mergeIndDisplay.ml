@@ -6,6 +6,8 @@ open Util
 open MergeInd
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let print_differences conf base branches p1 p2 =
   let gen_string_field ?(check = true) chk1 chk2 (title : Adef.safe_string)
@@ -113,7 +115,7 @@ let print_differences conf base branches p1 p2 =
             :> Adef.safe_string)
       | Some (`Path path) ->
           let k = Image.default_image_filename "portraits" base p in
-          let s = Unix.stat path in
+          let s = File.stat path in
           Printf.sprintf
             {|<img src="%sm=IM&d=%s&%s&k=%s" \
               style="max-width:75px;max-height:100px"> %s|}
@@ -121,7 +123,7 @@ let print_differences conf base branches p1 p2 =
             (string_of_int
             @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
             (acces conf base p : Adef.escaped_string :> string)
-            k path
+            k (Fpath.to_string path)
           |> Adef.safe
       | None -> Adef.safe "");
   string_field
@@ -134,7 +136,7 @@ let print_differences conf base branches p1 p2 =
            ^>^ {|" style="max-width:75px;max-height:100px">|} ^ url
             :> Adef.safe_string)
       | Some (`Path path) ->
-          let s = Unix.stat path in
+          let s = File.stat path in
           Printf.sprintf
             {|<img src="%sm=FIM&d=%s&p=%s&n=%s&oc=%d&k=%s" \
               style="max-width:75px;max-height:100px"> %s|}
@@ -145,7 +147,7 @@ let print_differences conf base branches p1 p2 =
             (Driver.get_surname p |> Driver.sou base)
             (Driver.get_occ p)
             ((acces conf base p : Adef.escaped_string :> string) ^ ".blason")
-            path
+            (Fpath.to_string path)
           |> Adef.safe
       | None -> Adef.safe "");
   string_field

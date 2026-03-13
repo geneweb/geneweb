@@ -2,6 +2,7 @@ open Alcotest
 open Def
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
 
 let empty_string = 0
 let quest_string = 1
@@ -36,7 +37,8 @@ let test_is_ancestor () =
       strings,
       base_notes )
   in
-  Driver.make "is_ancestor_base" [] data @@ fun base ->
+  let bpath = Fpath.of_string "is_ancestor_base" in
+  Driver.make bpath [] data @@ fun base ->
   let child = Driver.poi base (iper 0) in
   let father = Driver.poi base (iper 1) in
   let mother = Driver.poi base (iper 2) in

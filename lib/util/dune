@@ -11,6 +11,7 @@
   geneweb_def
   geneweb_compat
   geneweb_dirs
+  geneweb_fs
   re
   unix
   uucp
