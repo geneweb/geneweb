@@ -235,9 +235,9 @@ and migrate_gwf_bidirectional bname user_wants_reorg =
   let reorg_exists = Sys.file_exists reorg_path in
   Printf.eprintf "Migration check for %s:\n" bname;
   Printf.eprintf "  Classic .gwf exists: %b%s\n" legacy_exists
-    (if legacy_exists then " (" ^ legacy_path ^ ")" else "");
+    (if legacy_exists then " (" ^ Filename.basename legacy_path ^ ")" else "");
   Printf.eprintf "  Reorg .gwf exists: %b%s\n" reorg_exists
-    (if reorg_exists then " (" ^ reorg_path ^ ")" else "");
+    (if reorg_exists then " (" ^ Filename.basename reorg_path ^ ")" else "");
   match (user_wants_reorg, legacy_exists, reorg_exists) with
   | true, true, false ->
       (* Migration classic → reorg *)

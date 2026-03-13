@@ -173,7 +173,8 @@ let speclist =
       Fmt.str
         "<DIR> Specify where the “bases” directory with databases is installed \
          (default if empty is %S)."
-        Dirs.(name Secure.default_base_dir) );
+        Dirs.(name Secure.default_base_dir)
+      |> String.split_on_char '\\' |> String.concat "/" );
     ( "-bnotes",
       Arg.String set_bnotes,
       " [drop|erase|first|merge] Behavior for base notes of the next file. \
@@ -222,13 +223,23 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
+let errmsg =
+  "Usage: gwc [options] [files]\n\
+   where [files] are a list of files:\n\
+  \  source files end with .gw\n\
+  \  object files end with .gwo\n\
+   and [options] are:"
+
 let anonfun fname =
   let bn = !bnotes in
   let sep = !separate in
   let kind =
     if Filename.check_suffix fname ".gw" then Gw
     else if Filename.check_suffix fname ".gwo" then Gwo
-    else raise_bad "Don't know what to do with %S" fname
+    else (
+      Fmt.epr "gwc: Don’t know what to do with %S.@." fname;
+      Fmt.epr "%s" (Arg.usage_string speclist errmsg);
+      exit 2)
   in
   separate := default_separate;
   bnotes := default_bnotes;
@@ -247,13 +258,6 @@ let parse_output inputs output =
   | _, Some bname -> bname
 
 let parse_cmd () =
-  let errmsg =
-    "Usage: gwc [options] [files]\n\
-     where [files] are a list of files:\n\
-    \  source files end with .gw\n\
-    \  object files end with .gwo\n\
-     and [options] are:"
-  in
   Arg.parse speclist anonfun errmsg;
   let inputs = List.rev !rev_inputs in
   let bname = parse_output inputs !output in

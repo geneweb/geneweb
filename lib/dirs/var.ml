@@ -11,7 +11,7 @@ let ( // ) = Filename.concat
 let name { name; _ } = Fmt.str "$%s" name
 
 let concat { name; content = One s } suffix =
-  let name = name // suffix in
+  let name = name ^ "/" ^ suffix in
   let content = One (s // suffix) in
   { name; content }
 
