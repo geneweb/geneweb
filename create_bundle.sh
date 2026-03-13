@@ -489,6 +489,8 @@ exit 0
 EOFMAIN
 
 chmod +x "${BUNDLE_DIR}/MacOS/${APP_NAME}"
+# Rename to match CFBundleExecutable (case-sensitive)
+mv "${BUNDLE_DIR}/MacOS/${APP_NAME}" "${BUNDLE_DIR}/MacOS/GeneWeb"
 
 cat > "${BUNDLE_DIR}/Resources/gwd.command" << 'EOFGWD'
 #!/bin/bash
