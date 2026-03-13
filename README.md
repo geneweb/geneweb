@@ -71,6 +71,59 @@ documentation at ```http://geneweb.tuxfamily.org/```
 Quite similar to the MacOS solution, without the security check.
 ```xxx.command``` files have an equivalent ```xxx.sh``` variant.
 
+## Wiki / Notes Syntax
+
+GeneWeb uses a lightweight wiki markup (TLSW) in Notes, Sources, and wiki pages.
+A full reference is available in-app at `m=H&v=wiki_syntax`.
+
+### Person Links
+
+| Syntax | Description |
+|--------|-------------|
+| `[[first/last]]` | Link to a person (slash syntax) |
+| `[[first/last/oc]]` | Link with occurrence number |
+| `[[First Last]]` | Link to a person (natural name syntax) |
+| `[[First Last (oc)]]` | Link with occurrence (natural syntax) |
+| `[[first/last/oc/text]]` | Link with custom display text |
+
+In natural name syntax, the first word is the first name and the remaining words form the surname.
+
+### Images in Notes
+
+**Inline images:**
+
+| Syntax | Description |
+|--------|-------------|
+| `[[image:filename]]` | Display an image |
+| `[[image:filename/alt text]]` | Image with alt text |
+| `[[image:filename/alt/200px]]` | Image with alt text and max width |
+
+**Floated images with caption:**
+
+| Syntax | Description |
+|--------|-------------|
+| `{{image.jpg}}` | Right-aligned floated image |
+| `{{image.jpg\|left}}` | Left-aligned floated image |
+| `{{image.jpg\|right\|200px}}` | Right-aligned, 200px wide |
+| `{{image.jpg\|left\|200px\|Caption}}` | With width and caption |
+
+Floated images generate a `<figure>` element. Alignment: `left` or `right`. Width requires `px` suffix.
+
+Image files are stored in the database image directory:
+- **Reorg mode:** `{base}.gwb/documents/images/`
+- **Legacy mode:** `src/{base}/images/`
+
+### Other Wiki Markup
+
+| Syntax | Result |
+|--------|--------|
+| `''italic''` | *italic* |
+| `'''bold'''` | **bold** |
+| `=Title=` | Heading level 1 |
+| `[[[page/text]]]` | Wiki page link |
+| `[url text]` | External link |
+| `[[w:wizard/name]]` | Wizard link |
+
 ## Resources
 
 * Documentation: http://geneweb.tuxfamily.org/wiki/GeneWeb

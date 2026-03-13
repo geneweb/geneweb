@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+<title>[*wiki syntax] – %bname;</title>
+<meta name="robots" content="none">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+%include.css;
+</head>
+<body>
+<div class="container my-4">
+
+<h2>Wiki / Notes Syntax (TLSW)</h2>
+<p>GeneWeb uses a lightweight wiki markup in Notes, Sources, and wiki pages. Below is a reference for all supported syntax.</p>
+
+<h3>Basic Formatting</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td><code>''italic''</code></td><td><em>italic</em></td></tr>
+<tr><td><code>'''bold'''</code></td><td><strong>bold</strong></td></tr>
+<tr><td><code>'''''bold italic'''''</code></td><td><strong><em>bold italic</em></strong></td></tr>
+<tr><td><code>=Title=</code></td><td>Heading level 1</td></tr>
+<tr><td><code>==Subtitle==</code></td><td>Heading level 2</td></tr>
+<tr><td><code>===Sub-subtitle===</code></td><td>Heading level 3</td></tr>
+<tr><td><code>----</code></td><td>Horizontal rule</td></tr>
+</tbody>
+</table>
+
+<h3>Lists</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td><code>*item</code> (at start of line)</td><td>Bulleted list item</td></tr>
+<tr><td><code>**sub-item</code></td><td>Nested bulleted item</td></tr>
+<tr><td><code>#item</code></td><td>Numbered list item</td></tr>
+<tr><td><code>##sub-item</code></td><td>Nested numbered item</td></tr>
+</tbody>
+</table>
+
+<h3>Person Links</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>[[first/last]]</code></td><td>Link to a person (slash syntax)</td></tr>
+<tr><td><code>[[first/last/oc]]</code></td><td>Link to a person with occurrence number</td></tr>
+<tr><td><code>[[First Last]]</code></td><td>Link to a person (natural name syntax)</td></tr>
+<tr><td><code>[[First Last (oc)]]</code></td><td>Link to a person with occurrence (natural syntax)</td></tr>
+<tr><td><code>[[first/last/oc/text]]</code></td><td>Link with custom display text</td></tr>
+</tbody>
+</table>
+<p><small>In natural name syntax, the first word is the first name and remaining words are the surname. Occurrence is optional and enclosed in parentheses.</small></p>
+
+<h3>Wiki Page Links</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>[[[page]]]</code></td><td>Link to a wiki page</td></tr>
+<tr><td><code>[[[page/display text]]]</code></td><td>Link to a wiki page with custom text</td></tr>
+</tbody>
+</table>
+
+<h3>External Links</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>[url text]</code></td><td>External link with display text</td></tr>
+</tbody>
+</table>
+
+<h3>Wizard Links</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>[[w:wizard/display name]]</code></td><td>Link to a wizard's page</td></tr>
+</tbody>
+</table>
+
+<h3>Inline Images</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>[[image:filename]]</code></td><td>Display an image</td></tr>
+<tr><td><code>[[image:filename/alt text]]</code></td><td>Image with alt text</td></tr>
+<tr><td><code>[[image:filename/alt text/200px]]</code></td><td>Image with alt text and max width</td></tr>
+</tbody>
+</table>
+<p><small>Images are served from the database image directory. In reorg mode: <code>{base}.gwb/documents/images/</code>. In legacy mode: <code>src/{base}/images/</code>.</small></p>
+
+<h3>Floated Images with Caption</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>{{image.jpg}}</code></td><td>Floated image (default: right-aligned)</td></tr>
+<tr><td><code>{{image.jpg|left}}</code></td><td>Left-aligned floated image</td></tr>
+<tr><td><code>{{image.jpg|right|200px}}</code></td><td>Right-aligned, 200px wide</td></tr>
+<tr><td><code>{{image.jpg|left|200px|Caption text}}</code></td><td>Left-aligned with width and caption</td></tr>
+</tbody>
+</table>
+<p><small>Floated images generate a <code>&lt;figure&gt;</code> element with optional <code>&lt;figcaption&gt;</code>. Alignment can be <code>left</code> or <code>right</code>. Width must include <code>px</code> suffix.</small></p>
+
+<h3>Other</h3>
+<table class="table table-sm table-bordered">
+<thead class="thead-light"><tr><th>Syntax</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>&lt;br&gt;</code></td><td>Line break (HTML tags allowed per safe_html whitelist)</td></tr>
+<tr><td><code>__NOTOC__</code></td><td>Suppress automatic table of contents</td></tr>
+<tr><td><code>__SHORT_TABLE_OF_CONTENT__</code></td><td>Compact table of contents</td></tr>
+</tbody>
+</table>
+
+</div>
+</body>
+</html>
