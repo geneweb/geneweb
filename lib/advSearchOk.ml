@@ -846,7 +846,7 @@ let advanced_search conf base max_answers =
       Gwdb.load_persons_array base;
       let result =
         Gwdb.Collection.fold_until
-          (fun (_, len) -> len <= max_answers)
+          (fun (_, len) -> len < max_answers)
           (fun acc i -> match_person acc (Util.pget conf base i) search_type)
           ([], 0) (Gwdb.ipers base)
       in
