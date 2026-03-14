@@ -49,6 +49,10 @@ a, .pre {
   white-space: pre;
 }
 
+#destable a, #anctable a, #anctableX a {
+  white-space: unset;
+}
+
 a:has(i), .deslist a, .ind-notes a {
   white-space: normal;
 }
@@ -831,15 +835,18 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   font-family: 'Open Sans', Roboto, sans-serif;
 }
 
-.asc-desc-table td.side-border-male {
+.asc-desc-table td.side-border-male,
+.asc-desc-table td.side-border-female {
   border-right-width: 2px;
   border-left-width: 2px;
+  border-style: dashed;
+
+}
+.asc-desc-table td.side-border-male {
   border-color: #318CE7;
 }
 
 .asc-desc-table td.side-border-female {
-  border-right-width: 2px;
-  border-left-width: 2px;
   border-color: #F653A6;
 }
 
