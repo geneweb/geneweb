@@ -220,3 +220,33 @@
     </td>
   %end;
 %end;
+%define;marr_place_td(rspan)
+  <td class="align-middle%if;(are_divorced or are_separated) divorced-side-border%end;
+    %if;(e.ns=1)
+      %if;has_marriage_note; note%if;has_marriage_source;source%end;%elseif;has_marriage_source; source%end;
+    %end;
+    %if;(e.hl=1 and marriage_place="") bg-ly-incomplete%end;"
+    %if;("rspan"!="") rowspan="rspan"%end;
+    %if;(e.ns=1 and (has_marriage_note or has_marriage_source) or (wizard and e.marr_date="on"))title="[*click]%sp;
+      %if;(e.ns=1 and (has_marriage_note or has_marriage_source))%nn;
+        [notes sources show help]%sp;
+        %apply;a_of_b%with;
+          %if;has_marriage_note;[note/notes]1%if;has_marriage_source; [and] [source/sources]1%end;
+          %elseif;has_marriage_source;[source/sources]1%end;
+        %and;[marriage/marriages]0%end;
+        %if;(wizard and e.marr_date="on")&#010;[or] %end;
+      %end;
+      %if;(wizard and e.marr_date="on")[notes sources edit on date]%end;."%end;
+    %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0"
+      %apply;popover_params("bottom")
+      data-content='%if;has_marriage_note;%apply;clean_comment_tags(marriage_note)
+                      %if;has_marriage_source;<hr>%end;%end;
+                    %if;has_marriage_source;%apply;capitalize(marriage_source)%end;'
+      data-title="%apply;a_of_b%with;
+        %if;has_marriage_note;[*note/notes]1%if;has_marriage_source; [and] [source/sources]1%end;
+        %elseif;has_marriage_source;[*source/sources]1%end;
+      %and;[*marriage/marriages]0%end;"%nn;
+    %end;>%nn;
+    %if;(marriage_place!="")%marriage_place;%else;&nbsp;%end;%nn;
+  </td>
+%end;
