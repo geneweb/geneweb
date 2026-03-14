@@ -3,6 +3,7 @@
 open Config
 open Util
 module Driver = Geneweb_db.Driver
+module Iper = Driver.Iper
 
 let limit_by_tree conf =
   match List.assoc_opt "max_anc_tree" conf.base_env with
@@ -14,7 +15,7 @@ let print_ancestors_dag conf base v p =
   let set =
     (* TODO this should be a get_ancestors_set lvl ip *)
     let rec loop set lev ip =
-      let set = Dag.Iperset.add ip set in
+      let set = Iper.Set.add ip set in
       if lev <= 0 then set
       else
         match Driver.get_parents (pget conf base ip) with
@@ -29,7 +30,7 @@ let print_ancestors_dag conf base v p =
             loop set (lev - 1) (get_right cpl)
         | None -> set
     in
-    loop Dag.Iperset.empty v (Driver.get_iper p) |> Dag.Iperset.elements
+    loop Iper.Set.empty v (Driver.get_iper p) |> Iper.Set.elements
   in
   let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
   (* Récupère les options d'affichage. *)

@@ -3,6 +3,7 @@ module Headers = Httpun.Headers
 module Reqd = Httpun.Reqd
 module Response = Httpun.Response
 module Status = Httpun.Status
+module Payload = Httpun_ws.Payload
 module S = Httpun_lwt_unix.Server
 module Y = Yojson.Safe
 module U = Yojson.Safe.Util
@@ -85,34 +86,45 @@ let log_ws_handler_exn sockaddr exn =
       k "Exception raised while processing request for %a:@ %a" Util.pp_sockaddr
         sockaddr Util.pp_exn exn)
 
-let ws_handler manager fd rpc_handler sockaddr target wsd =
-  let on_read ~kind content ~off:_ ~len:_ =
-    let () = Fd_manager.ping manager fd in
+let read_full_payload ~total payload k =
+  let buf = Bigstringaf.create total in
+  let rec on_read ~pos content ~off ~len =
+    Bigstringaf.blit content ~src_off:off buf ~dst_off:pos ~len;
+    let pos = pos + len in
+    if pos < total then schedule_read ~pos else k @@ Bigstringaf.to_string buf
+  and schedule_read ~pos =
+    Payload.schedule_read payload ~on_eof:ignore ~on_read:(on_read ~pos)
+  in
+  schedule_read ~pos:0
+
+let ws_handler ~max_payload_size manager fd rpc_handler sockaddr target wsd =
+  let on_read content =
+    Fd_manager.ping manager fd;
     Lwt.dont_wait
       (fun () ->
-        rpc_handler sockaddr target @@ Bigstringaf.to_string content
-        >>= fun content ->
-        let len = String.length content in
-        let content = Bigstringaf.of_string ~off:0 ~len content in
-        Lwt.return @@ Httpun_ws.Wsd.schedule wsd ~kind content ~off:0 ~len)
+        rpc_handler sockaddr target content >>= fun response ->
+        let len = String.length response in
+        let response = Bigstringaf.of_string ~off:0 ~len response in
+        Lwt.return
+        @@ Httpun_ws.Wsd.schedule wsd ~kind:`Text response ~off:0 ~len)
       (log_ws_handler_exn sockaddr)
   in
-  let frame ~opcode ~is_fin:_ ~len:_ payload =
-    match (opcode : Httpun_ws.Websocket.Opcode.t) with
-    | #Httpun_ws.Websocket.Opcode.standard_non_control as opcode ->
-        Httpun_ws.Payload.schedule_read payload ~on_eof:ignore
-          ~on_read:(on_read ~kind:opcode)
-    | `Connection_close -> Httpun_ws.Wsd.close wsd
-    | `Ping -> Httpun_ws.Wsd.send_pong wsd
-    | `Pong | `Other _ -> ()
+  let frame ~opcode ~is_fin ~len payload =
+    if not is_fin then (
+      Logs.err (fun k ->
+          k "The RPC server does not support fragmented message yet.");
+      Httpun_ws.Wsd.close wsd)
+    else
+      match (opcode : Httpun_ws.Websocket.Opcode.t) with
+      | #Httpun_ws.Websocket.Opcode.standard_non_control ->
+          if len > max_payload_size then
+            Logs.err (fun k -> k "Too long message")
+          else read_full_payload ~total:len payload on_read
+      | `Connection_close -> Httpun_ws.Wsd.close wsd
+      | `Ping -> Httpun_ws.Wsd.send_pong wsd
+      | `Pong | `Other _ -> ()
   in
-  let eof ?error () =
-    match error with
-    | Some _ -> assert false
-    | None ->
-        Logs.err (fun k -> k "EOF");
-        Httpun_ws.Wsd.close wsd
-  in
+  let eof ?error:_ () = assert false in
   { Httpun_ws.Websocket_connection.frame; eof }
 
 module Request = Httpun.Request
@@ -171,7 +183,7 @@ let resolve_addr interface port =
     [ Unix.(AI_FAMILY PF_INET) ]
 
 let start ~interface ~port ?max_connection ?idle_timeout ?task_timeout
-    ?(tls = false) ?certfile ?keyfile user_handler =
+    ?(tls = false) ?certfile ?keyfile ?max_payload_size user_handler =
   let create_connection_handler =
     match (tls, certfile, keyfile) with
     | true, Some certfile, Some keyfile ->
@@ -184,11 +196,13 @@ let start ~interface ~port ?max_connection ?idle_timeout ?task_timeout
             ~error_handler:http_error_handler
     | _ -> Fmt.invalid_arg "start"
   in
-  let task_timeout = match task_timeout with Some f -> f | None -> 0. in
+  let task_timeout = Option.value ~default:0. task_timeout in
+  let max_payload_size = Option.value ~default:max_int max_payload_size in
   let connection_handler fd_manager sockaddr fd =
     if%lwt Fd_manager.add fd_manager fd then
       let request_handler =
-        http_request_handler @@ ws_handler fd_manager fd
+        http_request_handler
+        @@ ws_handler ~max_payload_size fd_manager fd
         @@ rpc_handler ~task_timeout @@ user_handler
       in
       try%lwt

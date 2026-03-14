@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: calendar.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- $Id: calendar.txt v7.1 2026/03 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none">
@@ -17,14 +17,14 @@
 <div class="container">
 
 %define;fun_day(ccc, nnn)
-  <td><button class="btn btn-outline-secondary" type="submit" name="dccc1">&lt;</button></td>
-  <td><input type="number" class="form-control text-center" name="dccc" min="1" max="31" value="%date.nnn.day;"></td>
-  <td><button class="btn btn-outline-secondary" type="submit" name="dccc2">&gt;</button></td>
+  <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="dccc1">&lsaquo;</button></td>
+  <td><input type="number" class="form-control form-control-sm text-center" style="width:4rem" name="dccc" min="1" max="31" value="%date.nnn.day;"></td>
+  <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="dccc2">&rsaquo;</button></td>
 %end;
 
 %define;fun_month(ccc, nnn, vvv, lll)
-  <td><button class="btn btn-outline-secondary" type="submit" name="mccc1">&lt;</button></td>
-  <td><select class="form-control h-100 w-100" style="text-align-last:center;" name="mccc">
+  <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="mccc1">&lsaquo;</button></td>
+  <td><select class="form-control form-control-sm text-center" style="text-align-last:center" name="mccc">
         %foreach;integer_range(1, vvv)
           <option value="%integer;"%nn;
            %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
@@ -35,13 +35,13 @@
           </option>
         %end;
       </select></td>
-  <td><button class="btn btn-outline-secondary" type="submit" name="mccc2">&gt;</button></td>
+  <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="mccc2">&rsaquo;</button></td>
 %end;
 
 %define;fun_year(ccc, nnn)
-  <td><button class="btn btn-outline-secondary" type="submit" name="yccc1">&lt;</button></td>
-  <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%date.nnn.year;"></td>
-  <td><button class="btn btn-outline-secondary" type="submit" name="yccc2">&gt;</button></td>
+  <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="yccc1">&lsaquo;</button></td>
+  <td><input class="form-control form-control-sm text-center" style="width:5rem" name="yccc" size="6" maxlength="6" value="%date.nnn.year;"></td>
+  <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="yccc2">&rsaquo;</button></td>
 %end;
 
 %define;fun_julian_year(ccc, nnn)
@@ -51,9 +51,9 @@
       %expr(date.nnn.year - 1)/%expr(date.nnn.year % 10)
     %else;%date.nnn.year;%end;
   %in;
-  <td><button class="btn btn-outline-secondary" type="submit" name="yccc1">&lt;</button></td>
-  <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%year;"></td>
-  <td><button class="btn btn-outline-secondary" type="submit" name="yccc2">&gt;</button></td>
+  <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="yccc1">&lsaquo;</button></td>
+  <td><input class="form-control form-control-sm text-center" style="width:5rem" name="yccc" size="6" maxlength="6" value="%year;"></td>
+  <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="yccc2">&rsaquo;</button></td>
 %end;
 
 %define;calendar(ccc, nnn, vvv, lll, fun_yyy)
@@ -70,83 +70,145 @@
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
     %apply;fun_day("ccc", "nnn")
   %end;
-  <td><button class="btn btn-outline-success" type="submit" name="tccc">=</button></td>
+  <td><button class="btn btn-sm btn-outline-success" type="submit" name="tccc">=</button></td>
 %end;
 
-<div class="row mt-4">
-  <div class="mx-auto text-center">
-    <h1>[*calendar/calendars]1</h1>
-    <h3 class="mt-4">%apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
-    %if;(date.julian_day = today.julian_day) - %time;%end;</h3>
+<div class="row mt-4 mb-2">
+  <div class="col text-center">
+    <h4 class="mb-1">[*calendar/calendars]1</h4>
+    <span class="text-muted" style="font-size:1.1rem">
+      %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;%nn;
+      %if;(date.julian_day = today.julian_day) &mdash; %time;%end;
+    </span>
   </div>
 </div>
-<div class="row mt-3">
-  <div class="mx-auto text-center">
-    <form method="get" action="%action;">
-      <div class="form-inline">
-        %hidden;
-        <input type="hidden" name="m" value="CAL">
-        <table class="table-sm table-bordered mx-auto">
-          <thead>
-            <tr>
-              <th class="py-2">&nbsp;</th>
-            %if;([!dates order] = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
-              <th class="text-center" colspan="3">[*year/month/day]2</th>
-              <th class="text-center" colspan="3">[*year/month/day]1</th>
-              <th class="text-center" colspan="3">[*year/month/day]0</th>
-            %elseif;([!dates order] = "mmddyyyy")
-              <th class="text-center" colspan="3">[*year/month/day]1</th>
-              <th class="text-center" colspan="3">[*year/month/day]2</th>
-              <th class="text-center" colspan="3">[*year/month/day]0</th>
-            %else;
-              <th class="text-center" colspan="3">[*year/month/day]0</th>
-              <th class="text-center" colspan="3">[*year/month/day]1</th>
-              <th class="text-center" colspan="3">[*year/month/day]2</th>
-            %end;
-            <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th class="px-2 mx-1" scope="row">[*gregorian/julian/french/hebrew]0</th>
-              %apply;calendar("g", "gregorian", 12, [(month)], "fun_year")
-            </tr>
-            <tr>
-              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]1</th>
-              %apply;calendar("j", "julian", 12, [(month)], "fun_julian_year")
-            </tr>
-            <tr>
-              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]2</th>
-              %apply;calendar("f", "french", 13, [(french revolution month)], "fun_year")
-            </tr>
-            <tr>
-              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]3</th>
-              %apply;calendar("h", "hebrew", 13, [(hebrew month)], "fun_year")
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </form>
-    %if;(date.moon_phase.index != 0)
-      %apply;capitalize%with;
-        %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
-                   date.moon_phase.index) -%sp;
-        <samp>%date.moon_phase.hour;[:]%date.moon_phase.minute;</samp> UT
-      %end;
-    %end;
-    <br>
-    <span>%nn;[*moon age/new moon/first quarter/full moon/last quarter]0[:]%sp;
-      %date.moon_age;</span>
-    <br><br>
-    [*julian day][:]%sp;
-      %if;(date.julian_day < 1000)%date.julian_day;
-      %else;%date.julian_day.sep1000;%end;
+
+<form method="get" action="%action;">
+%hidden;
+<input type="hidden" name="m" value="CAL">
+
+<div class="row justify-content-center">
+<div class="col-xl-10 col-lg-11">
+
+  <div class="card mb-3 border-success">
+    <div class="card-header bg-light py-2 px-3">
+      <span class="font-weight-bold text-success">[*gregorian/julian/french/hebrew]0</span>
+      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; 1582</span>
+    </div>
+    <div class="card-body py-2 px-3">
+      <table class="mx-auto"><tr>
+        %apply;calendar("g", "gregorian", 12, [(month)], "fun_year")
+      </tr></table>
+    </div>
   </div>
+
+  <div class="card mb-3 border-primary">
+    <div class="card-header bg-light py-2 px-3">
+      <span class="font-weight-bold text-primary">[*gregorian/julian/french/hebrew]1</span>
+      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; 45 BC / Old Style</span>
+    </div>
+    <div class="card-body py-2 px-3">
+      <table class="mx-auto"><tr>
+        %apply;calendar("j", "julian", 12, [(month)], "fun_julian_year")
+      </tr></table>
+    </div>
+  </div>
+
+  <div class="card mb-3 border-danger">
+    <div class="card-header bg-light py-2 px-3">
+      <span class="font-weight-bold text-danger">[*gregorian/julian/french/hebrew]2</span>
+      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; An I (1792) &ndash; XIV (1805)</span>
+    </div>
+    <div class="card-body py-2 px-3">
+      <table class="mx-auto"><tr>
+        %apply;calendar("f", "french", 13, [(french revolution month)], "fun_year")
+      </tr></table>
+    </div>
+  </div>
+
+  <div class="card mb-3 border-warning">
+    <div class="card-header bg-light py-2 px-3">
+      <span class="font-weight-bold text-warning">[*gregorian/julian/french/hebrew]3</span>
+      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; Hillel II (~358) / 19y Metonic</span>
+    </div>
+    <div class="card-body py-2 px-3">
+      <table class="mx-auto"><tr>
+        %apply;calendar("h", "hebrew", 13, [(hebrew month)], "fun_year")
+      </tr></table>
+    </div>
+  </div>
+
+</div>
+</div>
+</form>
+
+<div class="row justify-content-center mt-2 mb-4">
+<div class="col-xl-10 col-lg-11">
+<div class="card">
+  <div class="card-body text-center py-3">
+    <div class="d-flex justify-content-center align-items-center flex-wrap">
+
+      <div class="mx-4 my-2 text-center">
+        <div class="moon-vis" id="moonVis"></div>
+        <div class="small text-muted mt-1">
+          %if;(date.moon_phase.index != 0)
+            %apply;capitalize%with;%nn;
+              %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
+                         date.moon_phase.index)%end;
+            <br><samp>%date.moon_phase.hour;[:]%date.moon_phase.minute;</samp> UT
+          %end;
+        </div>
+      </div>
+
+      <div class="mx-4 my-2 text-center">
+        <div style="font-size:2rem;line-height:1">%date.moon_age;</div>
+        <div class="small text-muted">[*moon age/new moon/first quarter/full moon/last quarter]0</div>
+      </div>
+
+      <div class="mx-4 my-2 text-center">
+        <div class="text-monospace" style="font-size:1.4rem">
+          %if;(date.julian_day < 1000)%date.julian_day;
+          %else;%date.julian_day.sep1000;%end;
+        </div>
+        <div class="small text-muted">
+          [*julian day]
+          <span title="Fliegel & Van Flandern, CACM 1968 &#10;Epoch: 1 Jan 4713 BC (Julian), noon UT" style="cursor:help">&#9432;</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
 </div>
 
 %include;trl
 %include;copyr
 </div>
+<script>
+document.querySelectorAll('input[name^="y"]')
+  .forEach(function(el){
+    el.addEventListener('input',function(){
+      el.classList.toggle('is-invalid',el.value==='0');
+    });
+  });
+(function(){
+  var age=%date.moon_age;,el=document.getElementById('moonVis');
+  if(!el)return;
+  var w=60,r=w/2,pct=age/29.53;
+  var lit=document.createElement('div');
+  lit.className='lit';lit.style.left='0';lit.style.width=w+'px';
+  if(pct<0.02||pct>0.98){
+    lit.style.borderRadius='50%';
+    if(pct<0.02)lit.style.display='none';
+  }else{
+    var off=r*Math.abs(2*pct-1);
+    lit.style.clipPath='ellipse('+r+'px '+r+'px at '+
+      (pct<0.5?r+Math.round(r-r*(2*pct)):r-Math.round(r-r*(2*(1-pct))))+'px '+r+'px)';
+  }
+  el.appendChild(lit);
+})();
+</script>
 %include;js
 %query_time;
 </body>

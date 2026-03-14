@@ -15,7 +15,7 @@ type update_error =
   | UERR_already_defined of Driver.base * Driver.person * string
   | UERR_own_ancestor of Driver.base * Driver.person
   | UERR_digest
-  | UERR_bad_date of Def.dmy
+  | UERR_bad_date of Adef.dmy
   | UERR_missing_field of Adef.safe_string
   | UERR_already_has_parents of Driver.base * Driver.person
   | UERR_missing_surname of Adef.safe_string
@@ -26,10 +26,10 @@ type update_error =
 exception ModErr of update_error
 
 type create_info = {
-  ci_birth_date : date option;
+  ci_birth_date : Adef.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : date option;
+  ci_death_date : Adef.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
@@ -52,7 +52,7 @@ let infer_death_from_cdate conf ?(max_age = maximum_lifespan) cdate =
 
 let infer_death_bb conf birth bapt =
   let infer_death_from_odate conf = function
-    | Some (Dgreg (d, _)) -> infer_death_from_dmy conf d
+    | Some (Adef.Dgreg (d, _)) -> infer_death_from_dmy conf d
     | Some (Dtext _) | None -> DontKnowIfDead
   in
   match infer_death_from_odate conf birth with
@@ -1105,7 +1105,7 @@ let reconstitute_date_dmy2 conf var =
       | Some m -> (
           match get_number var "orday" conf.env with
           | Some d ->
-              let dmy2 = { day2 = d; month2 = m; year2 = y; delta2 = 0 } in
+              let dmy2 = { Adef.day2 = d; month2 = m; year2 = y; delta2 = 0 } in
               if
                 dmy2.day2 >= 1 && dmy2.day2 <= 31 && dmy2.month2 >= 1
                 && dmy2.month2 <= 13
@@ -1114,7 +1114,7 @@ let reconstitute_date_dmy2 conf var =
                 let d = Date.dmy_of_dmy2 dmy2 in
                 bad_date conf d
           | None ->
-              let dmy2 = { day2 = 0; month2 = m; year2 = y; delta2 = 0 } in
+              let dmy2 = { Adef.day2 = 0; month2 = m; year2 = y; delta2 = 0 } in
               if dmy2.month2 >= 1 && dmy2.month2 <= 13 then dmy2
               else
                 let d = Date.dmy_of_dmy2 dmy2 in
@@ -1161,7 +1161,7 @@ let reconstitute_date_dmy conf var =
     | Some y -> (
         let prec =
           match prec with
-          | Some "about" -> About
+          | Some "about" -> Adef.About
           | Some "maybe" -> Maybe
           | Some "before" -> Before
           | Some "after" -> After
@@ -1183,12 +1183,16 @@ let reconstitute_date_dmy conf var =
         | Some m -> (
             match get_number var "dd" conf.env with
             | Some d ->
-                let d = { day = d; month = m; year = y; prec; delta = 0 } in
+                let d =
+                  { Adef.day = d; month = m; year = y; prec; delta = 0 }
+                in
                 if d.day >= 1 && d.day <= 31 && d.month >= 1 && d.month <= 13
                 then Some d
                 else bad_date conf d
             | None ->
-                let d = { day = 0; month = m; year = y; prec; delta = 0 } in
+                let d =
+                  { Adef.day = 0; month = m; year = y; prec; delta = 0 }
+                in
                 if d.month >= 1 && d.month <= 13 then Some d
                 else bad_date conf d)
         | None -> Some { day = 0; month = 0; year = y; prec; delta = 0 })
@@ -1237,7 +1241,7 @@ let check_missing_witnesses_names conf get list =
   loop list
 
 let check_greg_day conf d =
-  if d.day > Date.nb_days_in_month d.month d.year then bad_date conf d
+  if d.Adef.day > Date.nb_days_in_month d.month d.year then bad_date conf d
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
@@ -1246,16 +1250,16 @@ let reconstitute_date conf var =
         match p_getenv conf.env (var ^ "_cal") with
         | Some "G" | None ->
             check_greg_day conf d;
-            (d, Dgregorian)
+            (d, Adef.Dgregorian)
         | Some "J" -> (Calendar.gregorian_of_julian d, Djulian)
         | Some "F" -> (Calendar.gregorian_of_french d, Dfrench)
         | Some "H" -> (Calendar.gregorian_of_hebrew d, Dhebrew)
         | _ ->
             check_greg_day conf d;
-            (d, Dgregorian)
+            (d, Adef.Dgregorian)
       in
-      Some (Dgreg (d, cal))
-  | Some d, true -> Some (Dgreg (Calendar.gregorian_of_french d, Dfrench))
+      Some (Adef.Dgreg (d, cal))
+  | Some d, true -> Some (Adef.Dgreg (Calendar.gregorian_of_french d, Dfrench))
   | None, _ -> (
       match p_getenv conf.env (var ^ "_text") with
       | Some _ ->

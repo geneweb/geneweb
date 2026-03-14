@@ -136,7 +136,7 @@ val nobtit :
     respects constraints imposed by [conf.allowed_titles] and
     [conf.denied_titles] *)
 
-val strictly_after_private_years : dmy -> int -> bool
+val strictly_after_private_years : Adef.dmy -> int -> bool
 
 val authorized_age :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
@@ -447,13 +447,13 @@ val get_approx_birth_date_place :
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
-  date option * Adef.safe_string
+  Adef.date option * Adef.safe_string
 
 val get_approx_death_date_place :
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
-  date option * Adef.safe_string
+  Adef.date option * Adef.safe_string
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 

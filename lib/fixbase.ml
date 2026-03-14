@@ -399,7 +399,7 @@ let fix_utf8_sequence ?report progress base =
   let ff i = i in
   let fs ifam iper i = normalize_utf_8 ifam iper i in
   let fd ifam iper = function
-    | Dtext d -> Dtext (normalize_utf_8_date ifam iper d)
+    | Adef.Dtext d -> Adef.Dtext (normalize_utf_8_date ifam iper d)
     | d -> d
   in
   Collection.iteri

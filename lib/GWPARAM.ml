@@ -4,6 +4,7 @@
     functions if it does not come with a performance cost. *)
 
 module Driver = Geneweb_db.Driver
+module Code = Geneweb_http.Code
 
 let nb_errors = ref 0
 let errors_undef = ref []
@@ -234,9 +235,9 @@ and migrate_gwf_bidirectional bname user_wants_reorg =
   let reorg_exists = Sys.file_exists reorg_path in
   Printf.eprintf "Migration check for %s:\n" bname;
   Printf.eprintf "  Classic .gwf exists: %b%s\n" legacy_exists
-    (if legacy_exists then " (" ^ legacy_path ^ ")" else "");
+    (if legacy_exists then " (" ^ Filename.basename legacy_path ^ ")" else "");
   Printf.eprintf "  Reorg .gwf exists: %b%s\n" reorg_exists
-    (if reorg_exists then " (" ^ reorg_path ^ ")" else "");
+    (if reorg_exists then " (" ^ Filename.basename reorg_path ^ ")" else "");
   match (user_wants_reorg, legacy_exists, reorg_exists) with
   | true, true, false ->
       (* Migration classic → reorg *)
@@ -308,7 +309,7 @@ let output_error =
     | None -> (
         let code =
           match code with
-          | Def.Bad_Request -> "400"
+          | Code.Bad_Request -> "400"
           | Unauthorized -> "401"
           | Forbidden -> "403"
           | Not_Found -> "404"
@@ -519,8 +520,8 @@ let p_auth conf base p =
       | None -> none ()
       | Some d ->
           let a = Date.time_elapsed d conf.today in
-          if a.Def.year > lim then true
-          else if a.Def.year = 0 then a.month > 0 || a.day > 0
+          if a.Adef.year > lim then true
+          else if a.Adef.year = 0 then a.month > 0 || a.day > 0
           else none ()
     in
     check_date

@@ -7,6 +7,7 @@ open Cousins
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Iper = Driver.Iper
 
 let default_max_cnt = Cousins.default_max_cnt
 
@@ -286,21 +287,16 @@ let sosa_of_persons conf base =
   loop 1
 
 let print_anniv conf base p dead_people level =
-  let module S = Map.Make (struct
-    type t = Driver.iper
-
-    let compare = compare
-  end) in
   let s_mem x m =
     try
-      let _ = S.find x m in
+      let _ = Iper.Map.find x m in
       true
     with Not_found -> false
   in
   let rec insert_desc set up_sosa down_br n ip =
     if s_mem ip set then set
     else
-      let set = S.add ip (up_sosa, down_br) set in
+      let set = Iper.Map.add ip (up_sosa, down_br) set in
       if n = 0 then set
       else
         let u = Driver.get_family (pget conf base ip) in
@@ -322,6 +318,9 @@ let print_anniv conf base p dead_people level =
         in
         loop set 0
   in
+  let max_deg =
+    match p_getint conf.env "d" with Some d when d > 0 -> d | _ -> 0
+  in
   let set =
     let module P = Pqueue.Make (struct
       type t = Driver.iper * int * int
@@ -329,12 +328,18 @@ let print_anniv conf base p dead_people level =
       let leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2
     end) in
     let a = P.add (Driver.get_iper p, 0, 1) P.empty in
+    let max_asc = if max_deg > 0 then min level max_deg else level in
     let rec loop set a =
       if P.is_empty a then set
       else
         let (ip, n, up_sosa), a = P.take a in
-        let set = insert_desc set up_sosa [] (n + 3) ip in
-        if n >= level then set
+        let desc_lim =
+          if max_deg > 0 then min (n + 3) (max_deg - n) else n + 3
+        in
+        let set =
+          if desc_lim >= 0 then insert_desc set up_sosa [] desc_lim ip else set
+        in
+        if n >= max_asc then set
         else
           let a =
             match Driver.get_parents (pget conf base ip) with
@@ -348,13 +353,13 @@ let print_anniv conf base p dead_people level =
           in
           loop set a
     in
-    loop S.empty a
+    loop Iper.Map.empty a
   in
   let set =
-    S.fold
+    Iper.Map.fold
       (fun ip (up_sosa, down_br) set ->
         let u = Driver.get_family (pget conf base ip) in
-        let set = S.add ip (up_sosa, down_br, None) set in
+        let set = Iper.Map.add ip (up_sosa, down_br, None) set in
         if Array.length u = 0 then set
         else
           let rec loop set i =
@@ -362,10 +367,10 @@ let print_anniv conf base p dead_people level =
             else
               let cpl = Driver.foi base u.(i) in
               let c = Gutil.spouse ip cpl in
-              loop (S.add c (up_sosa, down_br, Some ip) set) (i + 1)
+              loop (Iper.Map.add c (up_sosa, down_br, Some ip) set) (i + 1)
           in
           loop set 0)
-      set S.empty
+      set Iper.Map.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
     Printf.sprintf {|<a href="%sm=RL&%s&b1=%d&%s&b2=%d">%s</a>|}
@@ -380,7 +385,7 @@ let print_anniv conf base p dead_people level =
     |> Adef.safe
   in
   let f_scan =
-    let list = ref (S.fold (fun ip b list -> (ip, b) :: list) set []) in
+    let list = ref (Iper.Map.fold (fun ip b list -> (ip, b) :: list) set []) in
     fun () ->
       match !list with
       | (x, b) :: l ->
@@ -396,7 +401,10 @@ let print_anniv conf base p dead_people level =
       (Adef.encoded (if dead_people then "AD" else "AN"))
   in
   match p_getint conf.env "v" with
-  | Some i -> BirthdayDisplay.gen_print conf base i f_scan dead_people
+  | Some i ->
+      BirthdayDisplay.gen_print conf base i f_scan
+        ~max_d:((2 * level) + 3)
+        ~mode dead_people
   | _ ->
       if dead_people then
         BirthdayDisplay.gen_print_menu_dead conf base f_scan mode

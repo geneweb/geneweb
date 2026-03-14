@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Def
 open Util
 module Driver = Geneweb_db.Driver
 
@@ -168,7 +167,7 @@ let string_of_start_date conf =
   let r = count conf in
   match extract_date r.start_date with
   | Some (d, m, y) ->
-      Dgreg
+      Adef.Dgreg
         ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, Dgregorian)
       |> DateDisplay.string_of_date conf
   | _ -> Util.safe_html r.start_date

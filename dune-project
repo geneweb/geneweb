@@ -19,6 +19,8 @@
   (sites (share hd))
   (depends
     (ocaml (>= 4.10))
+    geneweb-compat
+    geneweb-http
     (alcotest :with-test)
     benchmark
     (calendars (>= "2.0.0"))
@@ -29,6 +31,7 @@
     fmt
     logs
     logs-syslog
+    ptime
     jingoo
     markup
     ounit
@@ -45,7 +48,6 @@
     digestif
     pp_loc
     dune-site
-    xdg
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.28.1")))
   )
@@ -54,6 +56,20 @@
     zarith
   )
 )
+
+(package
+  (name geneweb-compat)
+  (synopsis "GeneWeb library for legacy support.")
+  (tags (geneweb legacy))
+  (depends
+    (ocaml (>= 4.10))))
+
+(package
+  (name geneweb-http)
+  (synopsis "HTTP 1.1 support for GeneWeb daemon.")
+  (depends
+    (ocaml (>= 4.10))
+    geneweb-compat))
 
 (package
   (name geneweb-rpc)

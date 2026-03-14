@@ -32,7 +32,7 @@ type gw_syntax =
       * sex
       * (somebody * sex) list
       * (string gen_fam_event_name
-        * cdate
+        * Adef.cdate
         * string
         * string
         * string
@@ -67,7 +67,7 @@ type gw_syntax =
       somebody
       * sex
       * (string gen_pers_event_name
-        * cdate
+        * Adef.cdate
         * string
         * string
         * string
@@ -106,12 +106,12 @@ val create_all_keys : bool ref
     gwplus format. *)
 
 val verbose : bool ref
-val out_file : string ref
 
-val comp_families : string -> unit
-(** Compile .gw file and save result to corresponding .gwo *)
+val compile : bname:string -> output:string -> string -> unit
+(** [compile ~bname ~output input] compiles the .gw file [input] and save result
+    to corresponding .gwo file [output]. *)
 
 (* Ajout pour l'API *)
 
-val date_of_string : string -> int -> date option
+val date_of_string : string -> int -> Adef.date option
 (** Parses [Def.date] from string that starts at pos [i] inside [s] *)

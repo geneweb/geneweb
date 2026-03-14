@@ -4,6 +4,7 @@ open Geneweb
 open Def
 
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 
 type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend
@@ -492,30 +493,30 @@ let make_date n1 n2 n3 =
                 else 0, 0
       in
       let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
-      {day = d; month = m; year = y; prec = Sure; delta = 0}
+      {Adef.day = d; month = m; year = y; prec = Sure; delta = 0}
   | None, Some m, Some y ->
       let m =
         match m with
           Right m -> m
         | Left m -> m
       in
-      {day = 0; month = m; year = y; prec = Sure; delta = 0}
+      {Adef.day = 0; month = m; year = y; prec = Sure; delta = 0}
   | None, None, Some y ->
-      {day = 0; month = 0; year = y; prec = Sure; delta = 0}
+      {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | Some y, None, None ->
-      {day = 0; month = 0; year = y; prec = Sure; delta = 0}
+      {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | _ -> raise (Stream.Error "bad date")
 
 let recover_date cal = function
-  | Dgreg (d, Dgregorian) ->
+  | Adef.Dgreg (d, Dgregorian) ->
     let d =
       match cal with
-      | Dgregorian -> d
+      | Adef.Dgregorian -> d
       | Djulian -> Calendar.gregorian_of_julian d
       | Dfrench -> Calendar.gregorian_of_french d
       | Dhebrew -> Calendar.gregorian_of_hebrew d
     in
-    Dgreg (d, cal)
+    Adef.Dgreg (d, cal)
   | d -> d
 
 [@@@ocaml.warning "-27"]
@@ -554,7 +555,7 @@ EXTEND
               let dmy2 =
                 match cal2 with
                 | Dgregorian ->
-                    {day2 = d2.day; month2 = d2.month;
+                    {Adef.day2 = d2.day; month2 = d2.month;
                      year2 = d2.year; delta2 = 0}
                 | Djulian ->
                     let dmy2 = Calendar.julian_of_gregorian d2 in
@@ -702,7 +703,7 @@ let preg_match pattern subject =
 
 let date_of_field d =
   if d = "" then None
-  else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Dtext d)
+  else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Adef.Dtext d)
   else
     let s = Stream.of_string (String.uppercase_ascii d) in
     date_str := d;
@@ -824,12 +825,12 @@ let this_year =
 
 let infer_death birth bapt =
   match birth, bapt with
-  | Some (Dgreg (d, _)), _ ->
+  | Some (Adef.Dgreg (d, _)), _ ->
     let a = this_year - d.year in
     if a > !dead_years then DeadDontKnowWhen
     else if a < !alive_years then NotDead
     else DontKnowIfDead
-  | _, Some (Dgreg (d, _)) ->
+  | _, Some (Adef.Dgreg (d, _)) ->
     let a = this_year - d.year in
     if a > !dead_years then DeadDontKnowWhen
     else if a < !alive_years then NotDead
@@ -3074,9 +3075,9 @@ let check_parents_sex persons families couples strings =
   done
 
 let neg_year_dmy = function
-  | {day = d; month = m; year = y; prec = OrYear dmy2; _} ->
+  | {Adef.day = d; month = m; year = y; prec = OrYear dmy2; _} ->
     let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
-    {day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0}
+    {Adef.day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0}
   | {day = d; month = m; year = y; prec = YearInt dmy2; _} ->
     let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
     {day = d; month = m; year = -abs y; prec = YearInt dmy2; delta = 0}
@@ -3084,7 +3085,7 @@ let neg_year_dmy = function
     {day = d; month = m; year = -abs y; prec = p; delta = 0}
 
 let neg_year = function
-  | Dgreg (d, cal) -> Dgreg (neg_year_dmy d, cal)
+  | Adef.Dgreg (d, cal) -> Adef.Dgreg (neg_year_dmy d, cal)
   | x -> x
 
 let neg_year_cdate cd = Date.cdate_of_date (neg_year (Date.date_of_cdate cd))
@@ -3181,7 +3182,7 @@ let speclist =
       Arg.String Secure.set_base_dir,
       Fmt.str
       "<DIR> Specify where the “bases” directory with databases is installed \
-       (default if empty is %S)." Secure.default_base_dir )
+       (default if empty is %S)." (Dirs.name Secure.default_base_dir) )
   ; ( "-o", Arg.Set_string out_file,
       "<file> Output database (default: <input file name>.gwb, a.gwb if not \
        available). Alphanumerics and -" )
@@ -3255,7 +3256,7 @@ let speclist =
     , " Put untreated GEDCOM tags in notes" )
   ; ( "-ds", Arg.Set_string default_source
     , " Set the source field for persons and families without source data" )
-  ; ( "-dates", Arg.String (fun s -> 
+  ; ( "-dates", Arg.String (fun s ->
           if s = "dates_md" then month_number_dates := MonthDayDates
           else if s = "dates_dm" then month_number_dates := DayMonthDates)
     , " Interpret months-numbered dates as year only (default) or month/day/year or day/month/year" )

@@ -19,8 +19,9 @@
 *.sh text eol=lf
 *.txt text
 *.1 text
-
 # Denote all files that are truly binary and should not be modified.
+*.bin binary
+*.gwo binary
 *.bmp binary
 *.ico binary
 *.icns binary

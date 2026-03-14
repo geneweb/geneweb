@@ -1,3 +1,5 @@
+module Compat = Geneweb_compat
+
 type meta = {
   version : string;
   maintainers : string list;
@@ -5,12 +7,10 @@ type meta = {
 }
 
 let parse fname =
-  let ic = open_in fname in
+  Compat.In_channel.with_open_text fname @@ fun ic ->
   let rec loop meta =
     match input_line ic with
-    | exception End_of_file ->
-        close_in ic;
-        meta
+    | exception End_of_file -> meta
     | s -> (
         match String.index_opt s ':' with
         | None -> loop meta

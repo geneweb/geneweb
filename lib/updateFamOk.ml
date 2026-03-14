@@ -276,7 +276,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   in
   let found_marriage :
       (Def.relation_kind
-      * Def.cdate
+      * Adef.cdate
       * 'string
       * 'string
       * 'string

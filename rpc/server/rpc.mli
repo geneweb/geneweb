@@ -15,6 +15,7 @@ val start :
   ?tls:bool ->
   ?certfile:string ->
   ?keyfile:string ->
+  ?max_payload_size:int ->
   handler ->
   unit
 (** [start ~interface ~port hdl] initializes an asynchronous RPC server based on
@@ -36,6 +37,7 @@ val start :
     - [tls]: Enables TLS support if set to [true] and valid certificates and
       private key files are provided. If [tls] is [true], connections are
       accepted only through TLS.
+    - [max_payload_size]: Specifies a maximum size for the payload per frame.
 
     @raise Invalid_argument
       if [tls] is [true] but [certfile] and [keyfile] is missing. *)

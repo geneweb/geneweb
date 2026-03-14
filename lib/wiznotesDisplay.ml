@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Def
 open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
@@ -129,15 +128,15 @@ let print_wizards_by_date conf list =
         fun tm ->
           let dmy =
             {
-              year = tm.Unix.tm_year + 1900;
+              Adef.year = tm.Unix.tm_year + 1900;
               month = tm.Unix.tm_mon + 1;
               day = 0;
               prec = Sure;
               delta = 0;
             }
           in
-          Dgreg (dmy, Dgregorian)
-          |> (DateDisplay.string_of_ondate conf :> Def.date -> string)
+          Adef.Dgreg (dmy, Dgregorian)
+          |> (DateDisplay.string_of_ondate conf :> Adef.date -> string)
           |> Utf8.capitalize_fst |> Output.print_sstring conf );
       ( (fun tm -> tm.Unix.tm_year),
         fun tm ->
@@ -387,7 +386,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     let tm = Unix.localtime date in
     let dmy =
       {
-        day = tm.Unix.tm_mday;
+        Adef.day = tm.Unix.tm_mday;
         month = tm.Unix.tm_mon + 1;
         year = 1900 + tm.Unix.tm_year;
         prec = Sure;

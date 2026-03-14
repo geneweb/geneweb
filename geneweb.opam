@@ -13,6 +13,8 @@ bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "dune" {>= "3.6"}
   "ocaml" {>= "4.10"}
+  "geneweb-compat"
+  "geneweb-http"
   "alcotest" {with-test}
   "benchmark"
   "calendars" {>= "2.0.0"}
@@ -23,6 +25,7 @@ depends: [
   "fmt"
   "logs"
   "logs-syslog"
+  "ptime"
   "jingoo"
   "markup"
   "ounit"
@@ -39,7 +42,6 @@ depends: [
   "digestif"
   "pp_loc"
   "dune-site"
-  "xdg"
   "utop" {with-dev-setup}
   "ocamlformat" {with-dev-setup & = "0.28.1"}
   "odoc" {with-doc}

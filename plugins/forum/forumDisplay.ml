@@ -2,7 +2,6 @@
 
 open Geneweb
 open Config
-open Def
 open Util
 open Forum
 module Gutil = Geneweb_db.Gutil

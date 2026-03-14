@@ -1,9 +1,9 @@
 val select_person :
   Config.config ->
   Geneweb_db.Driver.base ->
-  (Geneweb_db.Driver.person -> Def.date option) ->
+  (Geneweb_db.Driver.person -> Adef.date option) ->
   bool ->
-  (Geneweb_db.Driver.person * Def.dmy * Def.calendar) list * int
+  (Geneweb_db.Driver.person * Adef.dmy * Adef.calendar) list * int
 (** [select_person conf base get_date find_oldest] select 20 persons from the
     base according to the one of their date (birth, death, marriage, specific
     event, etc.) that could be get with [get_date]. Returns sorted by date
@@ -17,9 +17,9 @@ val select_person :
 val select_family :
   Config.config ->
   Geneweb_db.Driver.base ->
-  (Geneweb_db.Driver.family -> Def.date option) ->
+  (Geneweb_db.Driver.family -> Adef.date option) ->
   bool ->
-  (Geneweb_db.Driver.family * Def.dmy * Def.calendar) list * int
+  (Geneweb_db.Driver.family * Adef.dmy * Adef.calendar) list * int
 (** Same as [select_person] but dealing with families *)
 
 val death_date : Geneweb_db.Driver.person -> Adef.date option
@@ -29,7 +29,7 @@ val make_population_pyramid :
   nb_intervals:int ->
   interval:int ->
   limit:int ->
-  at_date:Def.dmy ->
+  at_date:Adef.dmy ->
   Config.config ->
   Geneweb_db.Driver.base ->
   int array * int array

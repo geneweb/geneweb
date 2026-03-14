@@ -2,6 +2,7 @@
 
 open Def
 module Driver = Geneweb_db.Driver
+module Compat = Geneweb_compat
 
 let magic_gwo = "GnWo000o"
 
@@ -15,7 +16,6 @@ let rgpd_dir = ref "None"
 let rgpd = ref false
 let verbose = ref false
 let semi_pub_cnt = ref 0
-let out_file = ref (Filename.concat Filename.current_dir_name "a")
 let roglo_special = ref false
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
@@ -32,7 +32,7 @@ type gw_syntax =
       * sex
       * (somebody * sex) list
       * (string gen_fam_event_name
-        * cdate
+        * Adef.cdate
         * string
         * string
         * string
@@ -66,7 +66,7 @@ type gw_syntax =
       somebody
       * sex
       * (string gen_pers_event_name
-        * cdate
+        * Adef.cdate
         * string
         * string
         * string
@@ -171,7 +171,7 @@ let date_of_string s i =
   in
   let precision, i =
     match s.[i] with
-    | '~' -> (About, succ i)
+    | '~' -> (Adef.About, succ i)
     | '?' -> (Maybe, succ i)
     | '>' -> (After, succ i)
     | '<' -> (Before, succ i)
@@ -217,13 +217,15 @@ let date_of_string s i =
             if month < 1 || month > 13 then error 2
             else if day < 1 || day > 31 then error 3
             else
-              let d = { day; month; year; prec = precision; delta = 0 } in
-              Some (Dgreg (d, Dgregorian), i)
+              let d = { Adef.day; month; year; prec = precision; delta = 0 } in
+              Some (Adef.Dgreg (d, Dgregorian), i)
         | None ->
             if year = 0 then None
             else if month < 1 || month > 13 then error 4
             else
-              let d = { day = 0; month; year; prec = precision; delta = 0 } in
+              let d =
+                { Adef.day = 0; month; year; prec = precision; delta = 0 }
+              in
               Some (Dgreg (d, Dgregorian), i))
     | None ->
         if undefined then
@@ -235,7 +237,9 @@ let date_of_string s i =
             Some (Dtext txt, String.length s)
           else failwith ("date_of_string " ^ s)
         else
-          let d = { day = 0; month = 0; year; prec = precision; delta = 0 } in
+          let d =
+            { Adef.day = 0; month = 0; year; prec = precision; delta = 0 }
+          in
           Some (Dgreg (d, Dgregorian), i)
   in
   let date =
@@ -245,12 +249,12 @@ let date_of_string s i =
         else if s.[i] = '|' then
           let year2, i = champ (succ i) in
           let (day2, month2, year2), i = dmy2 year2 i in
-          let dmy2 = { day2; month2; year2; delta2 = 0 } in
+          let dmy2 = { Adef.day2; month2; year2; delta2 = 0 } in
           Some (Dgreg ({ d with prec = OrYear dmy2 }, cal), i)
         else if i + 1 < String.length s && s.[i] = '.' && s.[i + 1] = '.' then
           let year2, i = champ (i + 2) in
           let (day2, month2, year2), i = dmy2 year2 i in
-          let dmy2 = { day2; month2; year2; delta2 = 0 } in
+          let dmy2 = { Adef.day2; month2; year2; delta2 = 0 } in
           Some (Dgreg ({ d with prec = YearInt dmy2 }, cal), i)
         else Some (dt, i)
     | Some ((Dtext _ as dt), i) -> Some (dt, i)
@@ -259,7 +263,7 @@ let date_of_string s i =
   let date =
     match date with
     | Some (Dgreg (d, _), i) -> (
-        if i = String.length s then Some (Dgreg (d, Dgregorian), i)
+        if i = String.length s then Some (Adef.Dgreg (d, Dgregorian), i)
         else
           match s.[i] with
           | 'G' -> Some (Dgreg (d, Dgregorian), i + 1)
@@ -533,12 +537,11 @@ let name_unaccent_lower s =
   copy 0 0
 
 (* read .auth file and build a consent_list of keys *)
-let auth_access fn sn oc l =
+let auth_access ~bname fn sn oc l =
   let access, l = get_access l in
   let fns = name_unaccent_lower fn |> Mutil.tr ' ' '_' in
   let sns = name_unaccent_lower sn |> Mutil.tr ' ' '_' in
   let frs = if access = SemiPublic then "SemiPublic" else "Other" in
-  let bname = Filename.basename !out_file |> Filename.remove_extension in
   let gwf_file =
     if Geneweb.GWPARAM.is_reorg_base bname then
       Geneweb.GWPARAM.config_reorg bname
@@ -875,7 +878,7 @@ let bogus_def p n = p = "?" || n = "?"
     - Events
     - Notes If can't parse person's sources use [comm_psources] instead. If
       can't parse bithdate use [comm_birth_place] instead. *)
-let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
+let set_infos ~bname fn sn occ sex comm_psources comm_birth_place str u l =
   let first_names_aliases, l = get_fst_names_aliases str l in
   let surnames_aliases, l = get_surnames_aliases str l in
   let public_name, l = get_pub_name l in
@@ -884,7 +887,7 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let aliases, l = get_aliases str l in
   let titles, l = get_titles str l in
   let access, l =
-    if !rgpd then rgpd_access fn sn occ l else auth_access fn sn occ l
+    if !rgpd then rgpd_access fn sn occ l else auth_access ~bname fn sn occ l
   in
   let occupation, l = get_occu l in
   let psources, l = get_sources l in
@@ -970,7 +973,7 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
     person already defined was parsed ([k] is a key to find corresponding
     definition). [np] is a person's surname. [rest] is a rest of line to parse.
     Could be used to parse familial witnesses. *)
-let parse_parent str l =
+let parse_parent ~bname str l =
   (* last name *)
   let np, l = get_name l in
   (* first name and occurence number *)
@@ -986,7 +989,7 @@ let parse_parent str l =
     (Undefined key, np, l)
   else
     let u = create_person () in
-    let u, l = set_infos pp np op u.sex "" "" str u l in
+    let u, l = set_infos ~bname pp np op u.sex "" "" str u l in
     (Defined u, np, l)
 
 (** Parses the line containing a children and returns a person [gen_person]
@@ -1012,7 +1015,7 @@ let parse_child str surname sex csrc cbp l =
 
 (** Parse relation type [Def.gen_relation] with a person outside of family block
     (foster parents, god parent, etc.). *)
-let get_relation str = function
+let get_relation ~bname str = function
   | "-" :: x :: l -> (
       let rtyp =
         match x with
@@ -1024,19 +1027,19 @@ let get_relation str = function
         | _ -> failwith str
       in
       if String.length x = 5 && x.[4] = ':' then (
-        let fk, _, l = parse_parent str l in
+        let fk, _, l = parse_parent ~bname str l in
         let l = match l with "+" :: l -> l | _ -> failwith str in
-        let mk, _, l = parse_parent str l in
+        let mk, _, l = parse_parent ~bname str l in
         if l <> [] then failwith str;
         { r_type = rtyp; r_fath = Some fk; r_moth = Some mk; r_sources = "" })
       else
         match l with
         | "fath:" :: l ->
-            let fk, _, l = parse_parent str l in
+            let fk, _, l = parse_parent ~bname str l in
             if l <> [] then failwith str;
             { r_type = rtyp; r_fath = Some fk; r_moth = None; r_sources = "" }
         | "moth:" :: l ->
-            let mk, _, l = parse_parent str l in
+            let mk, _, l = parse_parent ~bname str l in
             if l <> [] then failwith str;
             { r_type = rtyp; r_fath = None; r_moth = Some mk; r_sources = "" }
         | _ -> failwith str)
@@ -1107,7 +1110,7 @@ let loop_note line ic =
 (** Parse witnesses across the lines and returns list of [(wit,wsex,wk)] where
     wit is a witness definition/reference, [wsex] is a sex of witness and [wk]
     is a kind of witness relationship to the family. *)
-let loop_witn line ic =
+let loop_witn ~bname line ic =
   let rec loop_witn acc str =
     match fields str with
     | ("wit" | "wit:") :: l ->
@@ -1118,7 +1121,7 @@ let loop_witn line ic =
           | l -> (Neuter, l)
         in
         let wkind, l = get_event_witness_kind l in
-        let wk, _, l = parse_parent str l in
+        let wk, _, l = parse_parent ~bname str l in
         if l <> [] then failwith str;
         loop_witn ((wk, sex, wkind) :: acc) (input_a_line ic)
     | _ -> (List.rev acc, str)
@@ -1127,7 +1130,7 @@ let loop_witn line ic =
 
 (** Read and parse a gw file block from [ic]. Returns also next line if it's not
     the end of the file. *)
-let read_family ic fname = function
+let read_family ~bname ic fname = function
   (* Block that defines that file use utf-8 encoding *)
   | Some (_, [ "encoding:"; "utf-8" ]) -> F_enc_utf_8
   (* Block that defines that the file uses gwplus syntax *)
@@ -1135,14 +1138,14 @@ let read_family ic fname = function
   (* Family block *)
   | Some (str, "fam" :: l) -> (
       (* read father *)
-      let fath_key, surname, l = parse_parent str l in
+      let fath_key, surname, l = parse_parent ~bname str l in
       (* read relation between parents *)
       let relation_ss, marriage, marr_place, marr_note, marr_src, divorce, l =
         get_mar_date str l
       in
       let relation, fath_sex, moth_sex = relation_ss in
       (* read mother *)
-      let moth_key, _, l = parse_parent str l in
+      let moth_key, _, l = parse_parent ~bname str l in
       if l <> [] then failwith str;
       let line = read_line ic in
       (* read list of witnesses with their sex (if exists) *)
@@ -1155,7 +1158,7 @@ let read_family ic fname = function
                 | "f:" :: l -> (Female, l)
                 | l -> (Neuter, l)
               in
-              let wk, _, l = parse_parent str l in
+              let wk, _, l = parse_parent ~bname str l in
               if l <> [] then failwith str;
               let witn, line = loop (read_line ic) in
               ((wk, sex) :: witn, line)
@@ -1216,7 +1219,7 @@ let read_family ic fname = function
                     in
                     if l <> [] then failwith str;
                     (* On récupère les témoins *)
-                    let witn, line = loop_witn (input_a_line ic) ic in
+                    let witn, line = loop_witn ~bname (input_a_line ic) ic in
                     (* On récupère les notes *)
                     let notes, line = loop_note line ic in
                     let notes = Mutil.strip_all_trailing_spaces notes in
@@ -1236,7 +1239,9 @@ let read_family ic fname = function
               match read_line ic with
               | Some (str, "-" :: l) ->
                   let sex, l = get_optional_sexe l in
-                  let child, l = parse_child str surname sex csrc cbp l in
+                  let child, l =
+                    parse_child ~bname str surname sex csrc cbp l
+                  in
                   if l <> [] then failwith str else loop (child :: children)
               | Some (_, [ "end" ]) -> children
               | Some (str, _) -> failwith str
@@ -1328,7 +1333,7 @@ let read_family ic fname = function
   (* Personal relation block *)
   | Some (str, "rel" :: l) -> (
       (* get considered person *)
-      let sb, _, l = parse_parent str l in
+      let sb, _, l = parse_parent ~bname str l in
 
       let sex, l =
         match l with
@@ -1345,7 +1350,8 @@ let read_family ic fname = function
               try
                 let rec loop = function
                   | "end" -> []
-                  | x -> get_relation x (fields x) :: loop (input_a_line ic)
+                  | x ->
+                      get_relation ~bname x (fields x) :: loop (input_a_line ic)
                 in
                 loop (input_a_line ic)
               with End_of_file -> failwith "missing end rel"
@@ -1356,7 +1362,7 @@ let read_family ic fname = function
   (* Person's events block *)
   | Some (str, "pevt" :: l) ->
       (* get considered person *)
-      let sb, _, l = parse_parent str l in
+      let sb, _, l = parse_parent ~bname str l in
       if l <> [] then failwith str
       else
         let pevents =
@@ -1377,7 +1383,7 @@ let read_family ic fname = function
                 in
                 if l <> [] then failwith str;
                 (* On récupère les témoins *)
-                let witn, line = loop_witn (input_a_line ic) ic in
+                let witn, line = loop_witn ~bname (input_a_line ic) ic in
                 (* On récupère les notes *)
                 let notes, line = loop_note line ic in
                 let notes = Mutil.strip_all_trailing_spaces notes in
@@ -1394,48 +1400,47 @@ let read_family ic fname = function
 
 (** Read and return a block of .gw file. If [!no_fail] is disabled raises
     [Failure] exception. *)
-let read_family_1 ic fname line =
+let read_family_1 ~bname ic fname line =
   if !no_fail then
-    try read_family ic fname line with Failure str -> F_fail str
-  else read_family ic fname line
+    try read_family ~bname ic fname line with Failure str -> F_fail str
+  else read_family ~bname ic fname line
 
-(** Compile .gw file and save result to corresponding .gwo *)
-let comp_families x =
-  let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
+let detect_encoding ic =
+  match Bom.check ic with
+  | Bom.Utf8 -> E_utf_8
+  | bom when Bom.is_unsupported bom ->
+      failwith (Bom.to_string bom ^ " encoding not supported")
+  | _ -> E_iso_8859_1
+
+let compile ~bname oc input =
+  Compat.In_channel.with_open_text input @@ fun ic ->
+  let initial_encoding = detect_encoding ic in
+  output_string oc magic_gwo;
+  output_value oc (input : string);
+  let rec loop line encoding =
+    match read_family_1 ~bname (ic, encoding) input line with
+    | F_some (family, line) ->
+        output_value oc (family : gw_syntax);
+        loop line encoding
+    | F_enc_utf_8 -> loop (read_line (ic, E_utf_8)) E_utf_8
+    | F_gw_plus ->
+        create_all_keys := true;
+        loop (read_line (ic, encoding)) encoding
+    | F_none -> ()
+    | F_fail str ->
+        Fmt.pr "File %S, line %d:\nError: %s@." input !line_cnt str;
+        loop (read_line (ic, encoding)) encoding
+  in
+  loop (read_line (ic, initial_encoding)) initial_encoding
+
+let compile ~bname ~output input =
   line_cnt := 0;
-  let oc = open_out_bin out_file in
-  (try
-     let ic = open_in x in
-     let initial_encoding =
-       match Bom.check ic with
-       | Bom.Utf8 -> E_utf_8
-       | bom when Bom.is_unsupported bom ->
-           close_in ic;
-           failwith (Bom.to_string bom ^ " encoding not supported")
-       | _ -> E_iso_8859_1
-     in
-     output_string oc magic_gwo;
-     output_value oc (x : string);
-     let rec loop line encoding =
-       match read_family_1 (ic, encoding) x line with
-       | F_some (family, line) ->
-           output_value oc (family : gw_syntax);
-           loop line encoding
-       | F_enc_utf_8 -> loop (read_line (ic, E_utf_8)) E_utf_8
-       | F_gw_plus ->
-           create_all_keys := true;
-           loop (read_line (ic, encoding)) encoding
-       | F_none -> ()
-       | F_fail str ->
-           Printf.printf "File \"%s\", line %d:\n" x !line_cnt;
-           Printf.printf "Error: %s\n" str;
-           flush stdout;
-           loop (read_line (ic, encoding)) encoding
-     in
-     loop (read_line (ic, initial_encoding)) initial_encoding;
-     close_in ic
-   with e ->
-     close_out oc;
-     Mutil.rm out_file;
-     raise e);
-  close_out oc
+  Compat.Out_channel.with_open_gen
+    [ Open_wronly; Open_creat; Open_excl; Open_binary ]
+    0o644 output
+  @@ fun oc ->
+  try compile ~bname oc input
+  with exn ->
+    let bt = Printexc.get_raw_backtrace () in
+    Mutil.rm output;
+    Printexc.raise_with_backtrace exn bt

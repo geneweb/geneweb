@@ -6,7 +6,7 @@ type 'a event_name =
 
 type 'a event_item =
   'a event_name
-  * Def.cdate
+  * Adef.cdate
   * Geneweb_db.Driver.istr
   * Geneweb_db.Driver.istr
   * Geneweb_db.Driver.istr

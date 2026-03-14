@@ -7,6 +7,9 @@ open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Plugin = Geneweb_plugin
+module Server = Geneweb_http.Server
+module Code = Geneweb_http.Code
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
@@ -261,7 +264,7 @@ let person_selected_with_redirect conf base p =
       RelationDisplay.print conf base p p1
   | Some _ -> request_issue conf base ~key:"incorrect em value"
   | None ->
-      Wserver.http_redirect_temporarily
+      Server.http_redirect_temporarily
         (commd conf ^^^ Util.acces conf base p :> string)
 
 let updmenu_print = Perso.interp_templ "updmenu"
@@ -275,7 +278,7 @@ let unknown conf n =
     Output.print_string conf (Util.escape_html n);
     Output.print_sstring conf {|"|}
   in
-  Output.status conf Def.Not_Found;
+  Output.status conf Code.Not_Found;
   Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
@@ -448,7 +451,7 @@ let try_plugin list conf base_name m =
     else fun (ns, fn) ->
       (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base_name
   in
-  List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
+  List.exists fn (Hashtbl.find_all Plugin.ht m)
 
 let w_lock ~onerror fn conf (base_name : string option) =
   let bfile = !GWPARAM.bpath conf.bname in
@@ -504,16 +507,16 @@ let w_person ~none fn conf base =
 
 let w_wizard fn conf base =
   if conf.wizard then fn conf base
-  else if conf.just_friend_wizard then GWPARAM.output_error conf Def.Forbidden
+  else if conf.just_friend_wizard then GWPARAM.output_error conf Code.Forbidden
   else
     (* FIXME: send authentification headers *)
-    GWPARAM.output_error conf Def.Unauthorized
+    GWPARAM.output_error conf Code.Unauthorized
 
 let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base =
     let none conf =
-      if conf.bname = "" then GWPARAM.output_error conf Def.Bad_Request
+      if conf.bname = "" then GWPARAM.output_error conf Code.Bad_Request
       else (
         Notif.error
           ~title:(Util.transl conf "NOTIF_TT unknown base")
@@ -522,7 +525,7 @@ let treat_request =
              conf.bname);
         let conf = Notif.inject_pending conf in
         try Templ.output_simple conf Templ.Env.empty "index"
-        with _ -> GWPARAM.output_error conf Def.Not_Found)
+        with _ -> GWPARAM.output_error conf Code.Not_Found)
     in
     w_base ~none
   in
@@ -573,11 +576,11 @@ let treat_request =
             | Some list -> String.split_on_char ',' list |> List.map String.trim
           in
           if List.mem "*" plugins then
-            List.iter (fun (_, fn) -> fn conf bfile) !GwdPlugin.se
+            List.iter (fun (_, fn) -> fn conf bfile) !Plugin.se
           else
             List.iter
               (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile)
-              !GwdPlugin.se;
+              !Plugin.se;
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
           if not @@ try_plugin plugins conf bfile m then
             ((if
@@ -965,7 +968,7 @@ let treat_request =
                                ~key:"incorrect fallback for relation")))
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
-                 Output.status conf Def.OK;
+                 Output.status conf Code.OK;
                  Output.header conf "Content-type: text";
                  List.iter
                    (fun s ->

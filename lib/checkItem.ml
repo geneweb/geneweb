@@ -35,7 +35,7 @@ let strictly_before_dmy d1 d2 =
 
 let strictly_before d1 d2 =
   match (d1, d2) with
-  | Dgreg (d1, _), Dgreg (d2, _) -> strictly_before_dmy d1 d2
+  | Adef.Dgreg (d1, _), Adef.Dgreg (d2, _) -> strictly_before_dmy d1 d2
   | _ -> false
 
 let strictly_after_dmy d1 d2 =
@@ -43,21 +43,21 @@ let strictly_after_dmy d1 d2 =
 
 let strictly_after d1 d2 =
   match (d1, d2) with
-  | Dgreg (d1, _), Dgreg (d2, _) -> strictly_after_dmy d1 d2
+  | Adef.Dgreg (d1, _), Adef.Dgreg (d2, _) -> strictly_after_dmy d1 d2
   | _ -> false
 
 let strictly_younger age year =
-  match age.prec with
+  match age.Adef.prec with
   | After -> false
   | Sure | About | Maybe | Before | OrYear _ | YearInt _ -> age.year < year
 
 let strictly_older age year =
-  match age.prec with
+  match age.Adef.prec with
   | Before -> false
   | Sure | About | Maybe | After | OrYear _ | YearInt _ -> age.year > year
 
 let odate = function
-  | Some (Dgreg (d, _)) -> Some d
+  | Some (Adef.Dgreg (d, _)) -> Some d
   | Some (Dtext _) | None -> None
 
 let obirth x = Driver.get_birth x |> Date.cdate_to_dmy_opt
@@ -86,8 +86,8 @@ let check_person_age warning p =
   let aux d1 d2 =
     Date.time_elapsed_opt d1 d2
     |> Option.iter @@ fun a ->
-       if a.year < 0 then warning (BirthAfterDeath p)
-       else if d2.year > lim_date_death then (
+       if a.Adef.year < 0 then warning (BirthAfterDeath p)
+       else if d2.Adef.year > lim_date_death then (
          if strictly_older a max_death_after_lim_date_death then
            warning (DeadOld (p, a)))
        else if strictly_older a max_death_before_lim_date_death then
@@ -376,7 +376,7 @@ let close_siblings warning x np ifam =
           |> Option.iter @@ fun d ->
              (* On vérifie les jumeaux ou naissances proches. *)
              if
-               d.year = 0
+               d.Adef.year = 0
                && d.month < max_month_btw_sibl
                && (d.month <> 0 || d.day >= max_days_btw_sibl)
              then warning (CloseChildren (ifam, elder, x)))
@@ -509,9 +509,9 @@ let check_order_fevents base warning fam =
 
 let check_witness_pevents_aux warning origin evt date b d p witness_kind =
   match (b, d) with
-  | Some (Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
+  | Some (Adef.Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
       warning (PWitnessEventBeforeBirth (p, evt, origin))
-  | _, Some (Dgreg (d3, _)) when strictly_after_dmy date d3 ->
+  | _, Some (Adef.Dgreg (d3, _)) when strictly_after_dmy date d3 ->
       if
         witness_kind <> Def.Witness_Mentioned
         && witness_kind <> Def.Witness_Other
@@ -680,7 +680,7 @@ let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
   | Some ((d1, p1), (d2, p2)) ->
       Date.time_elapsed_opt d1 d2
       |> Option.iter @@ fun e ->
-         if e.year > max_siblings_gap then
+         if e.Adef.year > max_siblings_gap then
            warning (DistantChildren (ifam, p1, p2))
   | _ -> ()
 
@@ -731,9 +731,9 @@ let check_sources base misc ifam fam =
 
 let check_witness_fevents_aux warning fam evt date b d p witness_kind =
   match (b, d) with
-  | Some (Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
+  | Some (Adef.Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
       warning (FWitnessEventBeforeBirth (p, evt, Driver.get_ifam fam))
-  | _, Some (Dgreg (d3, _)) when strictly_after_dmy date d3 ->
+  | _, Some (Adef.Dgreg (d3, _)) when strictly_after_dmy date d3 ->
       if
         witness_kind <> Def.Witness_Mentioned
         && witness_kind <> Def.Witness_Other

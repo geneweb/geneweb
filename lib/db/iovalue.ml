@@ -203,7 +203,11 @@ let output_array_access oc arr_get arr_len pos =
   let rec loop pos i =
     if i = arr_len then pos
     else (
-      output_binary_int oc pos;
-      loop (pos + size (arr_get i)) (i + 1))
+      Position.output oc pos;
+      let pos = Position.incr pos (size (arr_get i)) in
+      loop pos (i + 1))
   in
-  loop (pos + output_value_header_size + array_header_size arr_len) 0
+  let pos =
+    Position.incr pos (output_value_header_size + array_header_size arr_len)
+  in
+  loop pos 0

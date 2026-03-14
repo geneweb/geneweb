@@ -3,13 +3,13 @@
 open Def
 
 val map_title_strings :
-  ?fd:(Def.date -> Def.date) -> ('a -> 'b) -> 'a gen_title -> 'b gen_title
+  ?fd:(Adef.date -> Adef.date) -> ('a -> 'b) -> 'a gen_title -> 'b gen_title
 (** Convert generic type used to represent name, id and the place of
     [Def.gen_title] into another one. If [fd] is present, apply it on the date
     of the start and date of the end of a title *)
 
 val map_pers_event :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Adef.date -> Adef.date) ->
   ('a -> 'c) ->
   ('b -> 'd) ->
   ('a, 'b) gen_pers_event ->
@@ -23,7 +23,7 @@ val map_pers_event :
       date of the personal event. *)
 
 val map_fam_event :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Adef.date -> Adef.date) ->
   ('a -> 'c) ->
   ('b -> 'd) ->
   ('a, 'b) gen_fam_event ->
@@ -46,7 +46,7 @@ val map_relation_ps :
       one. *)
 
 val map_person_ps :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Adef.date -> Adef.date) ->
   ('b -> 'd) ->
   ('c -> 'e) ->
   ('a, 'b, 'c) gen_person ->
@@ -69,7 +69,7 @@ val map_union_f : ('a -> 'b) -> 'a gen_union -> 'b gen_union
     [Def.gen_union] into another one. *)
 
 val map_family_ps :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Adef.date -> Adef.date) ->
   ('a -> 'b) ->
   ('c -> 'd) ->
   ('e -> 'f) ->

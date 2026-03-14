@@ -9,25 +9,46 @@ module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Sites = Geneweb_sites.Sites
+module Dirs = Geneweb_dirs
+module Plugin = Geneweb_plugin
+module Server = Geneweb_http.Server
+module Code = Geneweb_http.Code
 
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
 
-let pp_brackets pp_v ppf v = Fmt.pf ppf "[%a] " pp_v v
-let pp_h ~style ppf = pp_brackets Fmt.(styled style string) ppf
+let pp_brackets ~style pp = Fmt.(brackets @@ styled style @@ pp)
 
-let pp_header ppf (l, h) =
+let pp_level ppf l =
   match l with
-  | Logs.App -> Option.iter (pp_brackets Fmt.(styled `Cyan string) ppf) h
-  | Logs.Error -> pp_h ~style:`Red ppf (Option.value ~default:"ERROR" h)
-  | Logs.Warning -> pp_h ~style:`Yellow ppf (Option.value ~default:"WARNING" h)
-  | Logs.Info -> pp_h ~style:`Blue ppf (Option.value ~default:"INFO" h)
-  | Logs.Debug -> pp_h ~style:`Green ppf (Option.value ~default:"DEBUG" h)
+  | Logs.App -> ()
+  | Logs.Error -> pp_brackets ~style:`Red Fmt.string ppf "ERROR"
+  | Logs.Warning -> pp_brackets ~style:`Yellow Fmt.string ppf "WARN"
+  | Logs.Info -> pp_brackets ~style:`Blue Fmt.string ppf "INFO"
+  | Logs.Debug -> pp_brackets ~style:`Green Fmt.string ppf "DEBUG"
 
-let set_reporter fmt =
-  Logs.set_reporter @@ Logs_fmt.reporter ~pp_header ~dst:fmt ()
+let reporter ~predictable_mode ppf =
+  let report src level ~over k msgf =
+    let k ppf =
+      Format.pp_close_box ppf ();
+      Format.pp_print_newline ppf ();
+      over ();
+      k ()
+    in
+    msgf @@ fun ?header ?tags fmt ->
+    let timestamp =
+      if predictable_mode then Ptime.epoch else Ptime_clock.now ()
+    in
+    Format.fprintf ppf "%a%a: "
+      (pp_brackets ~style:`Magenta @@ Ptime.pp_rfc3339 ())
+      timestamp pp_level level;
+    Format.pp_open_box ppf 0;
+    Format.kfprintf k ppf fmt
+  in
+  { Logs.report }
 
-let setup_log t =
+let setup_log ~predictable_mode t =
+  let set_reporter ppf = Logs.set_reporter @@ reporter ~predictable_mode ppf in
   let set_file_reporter file =
     let oc =
       open_out_gen [ Open_creat; Open_append; Open_text ] 0o644 file.path
@@ -78,7 +99,7 @@ let make_gzip_output_conf ~level request =
   else
     let body_buf = Buffer.create 65536 in
     let headers_buf = Buffer.create 1024 in
-    let status_ref = ref Def.OK in
+    let status_ref = ref Code.OK in
     let flushed = ref false in
     let is_compressible = ref false in
     Some
@@ -116,9 +137,9 @@ let make_gzip_output_conf ~level request =
                   with _ -> (body, false)
                 else (body, false)
               in
-              let oc = Wserver.woc () in
-              let status_line = Wserver.string_of_status !status_ref in
-              if not !Wserver.cgi then
+              let oc = Server.woc () in
+              let status_line = Code.to_string !status_ref in
+              if not !Server.cgi then
                 Printf.fprintf oc "HTTP/1.0 %s\r\n" status_line
               else Printf.fprintf oc "Status: %s\r\n" status_line;
               if is_gzipped then begin
@@ -139,10 +160,10 @@ let make_gzip_output_conf ~level request =
 
 let output_conf =
   {
-    status = Wserver.http;
-    header = Wserver.header;
-    body = Wserver.print_string;
-    flush = Wserver.wflush;
+    status = Server.http;
+    header = Server.header;
+    body = Server.print_string;
+    flush = Server.wflush;
   }
 
 let ( // ) = Filename.concat
@@ -182,6 +203,19 @@ let parse_prefixes () =
   gw_prefix := Some p;
   Secure.add_assets p
 
+type plugin = {
+  (* Filesystem path to the plugin's directory. *)
+  path : string;
+  (* If [true], bypasses the checksum verification before loading. *)
+  unsafe : bool;
+  (* If [true], the plugin is loaded globally for all databases. *)
+  forced : bool;
+  (* If [true], [path] is treated as a parent directory containing multiple
+     sub-plugins to be discovered and loaded. If [false], [path] points
+     directly to a single plugin. *)
+  collection : bool;
+}
+
 let printer_conf = { Config.empty with output_conf }
 let auth_file = ref ""
 let cache_langs = ref []
@@ -201,9 +235,7 @@ let default_max_pending_requests = 150
 let max_pending_requests = ref default_max_pending_requests
 let no_host_address = ref false
 let only_addresses = ref []
-let plugins = ref []
-let forced_plugins = ref []
-let unsafe_plugins = ref []
+let plugins : plugin list ref = ref []
 let redirected_addr = ref None
 let robot_xcl = ref None
 let selected_addr = ref None
@@ -211,6 +243,7 @@ let selected_port = ref 2317
 let setup_link = ref false
 let trace_failed_passwd = ref false
 let debug = ref false
+let check = ref false
 let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
 let wizard_passwd = ref ""
@@ -302,7 +335,7 @@ let http conf status =
 
 let robots_txt conf =
   Logs.info (fun k -> k "Robot request");
-  Output.status conf Def.OK;
+  Output.status conf Code.OK;
   Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
   else (
@@ -311,7 +344,7 @@ let robots_txt conf =
 
 let refuse_log conf from =
   Logs.info (fun k -> k "Excluded: %s" from);
-  http conf Def.Forbidden;
+  http conf Code.Forbidden;
   Output.header conf "Content-type: text/html";
   Output.print_sstring conf
     "Your access has been disconnected by administrator.\n";
@@ -320,7 +353,7 @@ let refuse_log conf from =
 
 let only_log conf from =
   Logs.info (fun k -> k "Connection refused from %s" from);
-  http conf Def.OK;
+  http conf Code.OK;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
   Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
@@ -391,28 +424,64 @@ exception
   Register_plugin_failure of
     string * [ `dynlink_error of Dynlink.error | `string of string ]
 
-let register_plugin dir =
-  if !debug then print_endline (__LOC__ ^ ": " ^ dir);
-  if not (List.mem dir !unsafe_plugins || GwdPluginMD5.allowed dir) then
-    failwith dir;
-  let pname = Filename.basename dir in
-  let plugin = Filename.concat dir @@ "plugin_" ^ pname ^ ".cmxs" in
+let add_lex_dir dir =
+  Filesystem.walk_folder
+    (fun e () ->
+      match e with
+      | Filesystem.File s -> lexicon_list := (dir // s) :: !lexicon_list
+      | _ -> ())
+    dir ()
+
+let load_cmxs cmxs =
+  try Dynlink.loadfile cmxs
+  with Dynlink.Error e ->
+    raise (Register_plugin_failure (cmxs, `dynlink_error e))
+
+module MS = Map.Make (String)
+
+let check_plugin =
+  let sums = MS.of_seq @@ List.to_seq Plugin_checksums.checksums in
+  fun path ->
+    let pname = Filename.basename path in
+    match MS.find pname sums with
+    | exception Not_found -> false
+    | sum -> Plugin.checksum path = sum
+
+let load_plugin ~unsafe ~forced path =
+  let pname = Filename.basename path in
+  Logs.debug (fun k ->
+      k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
+  if not (unsafe || check_plugin path) then (
+    Logs.err (fun k ->
+        k "Refuse to load plugin %s for cause of wrong checksum." pname);
+    exit 1);
+  let pname = Filename.basename path in
+  let cmxs =
+    let s = Fmt.str "plugin_%s.cmxs" pname in
+    path // s
+  in
   lexicon_fname := !lexicon_fname ^ pname ^ ".";
-  let lex_dir = Filename.concat (Filename.concat dir "assets") "lex" in
-  if Sys.file_exists lex_dir then (
-    let lex = Sys.readdir lex_dir in
-    Array.sort compare lex;
-    Array.iter
-      (fun f ->
-        let f = Filename.concat lex_dir f in
-        if not (Sys.is_directory f) then lexicon_list := f :: !lexicon_list)
-      lex);
-  let assets = Filename.concat dir "assets" in
-  GwdPlugin.assets := assets;
-  (try Dynlink.loadfile plugin
-   with Dynlink.Error e ->
-     raise (Register_plugin_failure (plugin, `dynlink_error e)));
-  GwdPlugin.assets := ""
+  let lex_dir = path // "assets" // "lex" in
+  if Sys.file_exists lex_dir then add_lex_dir lex_dir;
+  Plugin.assets := path // "assets";
+  Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
+  load_cmxs cmxs
+
+let load_plugins { path; unsafe; forced; collection } =
+  if not collection then load_plugin ~unsafe ~forced path
+  else
+    match Plugin.compute_dependencies path with
+    | Ok deps ->
+        List.iter (fun d -> load_plugin ~unsafe ~forced (path // d)) deps
+    | Error cycle ->
+        Logs.err (fun k ->
+            k
+              "Cycle found while computing dependencies of the plugin \
+               collection %S:@ %a"
+              path
+              Fmt.(list ~sep:(const string " -> ") string)
+              cycle);
+        exit 1
 
 let alias_lang lang =
   if String.length lang < 2 then lang
@@ -537,7 +606,7 @@ let trace_auth base_env f =
 
 let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  Output.status conf Def.Unauthorized;
+  Output.status conf Code.Unauthorized;
   if !use_auth_digest_scheme then
     let nonce = digest_nonce conf.ctime in
     let _ =
@@ -804,7 +873,7 @@ let refresh_url conf bname =
     in
     serv ^ req
   in
-  http conf Def.OK;
+  http conf Code.OK;
   Output.header conf "Content-type: text/html";
   Output.printf conf
     "<head>\n\
@@ -1021,7 +1090,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
   let ok, wizard, friend, username =
-    if (not !Wserver.cgi) && (passwd = "w" || passwd = "f") then
+    if (not !Server.cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
         if wizard_passwd = "" && wizard_passwd_file = "" then
           (true, true, friend_passwd = "", "")
@@ -1069,15 +1138,13 @@ let basic_authorization from_addr request base_env passwd access_type utm
     if access_type = ATset then
       if wizard then
         let pwd_id = set_token utm from_addr base_file 'w' user username in
-        if !Wserver.cgi then (command, pwd_id)
-        else (base_file ^ "_" ^ pwd_id, "")
+        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
       else if friend then
         let pwd_id = set_token utm from_addr base_file 'f' user username in
-        if !Wserver.cgi then (command, pwd_id)
-        else (base_file ^ "_" ^ pwd_id, "")
-      else if !Wserver.cgi then (command, "")
+        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+      else if !Server.cgi then (command, "")
       else (base_file, "")
-    else if !Wserver.cgi then (command, passwd)
+    else if !Server.cgi then (command, passwd)
     else if passwd = "" then
       if auto = "auto" then
         let suffix = if wizard then "_w" else if friend then "_f" else "" in
@@ -1205,7 +1272,7 @@ let digest_authorization request base_env passwd utm base_file command =
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
   in
-  let command = if !Wserver.cgi then command else base_file in
+  let command = if !Server.cgi then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
     {
       ar_ok = true;
@@ -1303,7 +1370,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
   match access_type with
   | ATwizard (user, username) ->
       let command, passwd =
-        if !Wserver.cgi then (command, passwd)
+        if !Server.cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1322,7 +1389,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
       }
   | ATfriend (user, username) ->
       let command, passwd =
-        if !Wserver.cgi then (command, passwd)
+        if !Server.cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1341,7 +1408,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
       }
   | ATnormal ->
       let command, passwd =
-        if !Wserver.cgi then (command, "") else (base_file, "")
+        if !Server.cgi then (command, "") else (base_file, "")
       in
       {
         ar_ok = true;
@@ -1376,7 +1443,7 @@ let make_conf ~secret_salt from_addr request script_name env =
     Logs.warn (fun k -> k "%s" str));
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
-  let cgi = !Wserver.cgi in
+  let cgi = !Server.cgi in
   let command, base_file, passwd, env, access_type =
     let base_access, env =
       let x, env = extract_assoc "b" env in
@@ -1488,6 +1555,16 @@ let make_conf ~secret_salt from_addr request script_name env =
     with Not_found | Failure _ -> 150
   in
   let username, userkey = split_username ar.ar_name in
+  let forced_plugins =
+    List.fold_left
+      (fun acc { path; forced; _ } ->
+        if forced then Filename.basename path :: acc else acc)
+      [] !plugins
+    |> List.rev
+  in
+  let plugins =
+    List.fold_left (fun acc { path; _ } -> path :: acc) [] !plugins |> List.rev
+  in
   let conf =
     {
       from = from_addr;
@@ -1508,7 +1585,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       user_iper = None;
       auth_scheme = ar.ar_scheme;
       command = ar.ar_command;
-      indep_command = (if !Wserver.cgi then ar.ar_command else "geneweb") ^ "?";
+      indep_command = (if !Server.cgi then ar.ar_command else "geneweb") ^ "?";
       highlight =
         (try List.assoc "highlight_color" base_env
          with Not_found -> green_color);
@@ -1567,7 +1644,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       senv = [];
       cgi_passwd = ar.ar_passwd;
       henv =
-        ((if not !Wserver.cgi then []
+        ((if not !Server.cgi then []
           else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
           else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
         @ (if lang = "" then [] else [ ("lang", Mutil.encode lang) ])
@@ -1605,8 +1682,8 @@ let make_conf ~secret_salt from_addr request script_name env =
       etc_prefix = Option.get !etc_prefix;
       cgi;
       output_conf;
-      forced_plugins = !forced_plugins;
-      plugins = !plugins;
+      forced_plugins;
+      plugins;
       secret_salt = Some secret_salt;
       predictable_mode = !predictable_mode;
     }
@@ -1757,7 +1834,7 @@ let conf_and_connection =
     | None -> (
         let auth_err, auth =
           if conf.auth_file = "" then (false, "")
-          else if !Wserver.cgi then (true, "")
+          else if !Server.cgi then (true, "")
           else auth_err request conf.auth_file
         in
         let mode = Util.p_getenv conf.env "m" in
@@ -1768,7 +1845,7 @@ let conf_and_connection =
            in
            log_and_robot_check conf auth from request script_name
              (contents :> string));
-        match (!Wserver.cgi, auth_err, passwd_err) with
+        match (!Server.cgi, auth_err, passwd_err) with
         | true, true, _ ->
             if is_robot from then Robot.robot_error conf 0 0 else no_access conf
         | _, true, _ ->
@@ -1906,7 +1983,7 @@ type misc_fname =
 type content_encoding = No_encoding | Gzip | Brotli
 
 let content_misc conf len misc_fname encoding =
-  Output.status conf Def.OK;
+  Output.status conf Code.OK;
   let fname, t =
     match misc_fname with
     | Css fname -> (fname, "text/css; charset=UTF-8")
@@ -1940,11 +2017,11 @@ let find_misc_file conf name =
   if
     Sys.file_exists name
     && List.exists
-         (fun p -> Mutil.start_with (Filename.concat p "assets") 0 name)
+         (fun { path; _ } -> Mutil.start_with (path // "assets") 0 name)
          !plugins
   then name
   else
-    let name' = Filename.concat (!GWPARAM.etc_d conf.bname) name in
+    let name' = !GWPARAM.etc_d conf.bname // name in
     if Sys.file_exists name' then name'
     else
       let name' = Util.search_in_assets @@ Filename.concat "etc" name in
@@ -1970,7 +2047,7 @@ let print_misc_file conf misc_fname encoding =
           else
             let olen = min (Bytes.length buf) len in
             really_input ic buf 0 olen;
-            Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
+            Server.printf "%s" (Bytes.sub_string buf 0 olen);
             loop (len - olen)
         in
         loop len;
@@ -2256,7 +2333,13 @@ let geneweb_server ~predictable_mode () =
         secret_salt
     | _ -> retrieve_secret_salt ()
   in
-  Wserver.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+  (* FIXME: this hack is necessary to avoid a cyclic dependency between
+     `geneweb` and `geneweb-http`. We must remove it after refactoring
+     the encoded string subsystem. *)
+  let connection ~secret_salt x y z =
+    connection ~secret_salt x y (Adef.encoded z)
+  in
+  Server.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
     (connection ~secret_salt)
 
@@ -2345,8 +2428,8 @@ let make_sock_dir x =
   Filesystem.create_dir ~parent:true x;
   if Sys.unix then ()
   else (
-    Wserver.sock_in := Filename.concat x "gwd.sin";
-    Wserver.sock_out := Filename.concat x "gwd.sou");
+    Server.sock_in := Filename.concat x "gwd.sin";
+    Server.sock_out := Filename.concat x "gwd.sou");
   GWPARAM.sock_dir := x
 
 let arg_plugin_doc opt doc =
@@ -2372,46 +2455,16 @@ let arg_plugin opt doc =
   ( opt,
     Arg.Unit
       (fun () ->
-        let unsafe, force, s = arg_plugin_aux () in
-        if unsafe then unsafe_plugins := !unsafe_plugins @ [ s ];
-        if force then
-          forced_plugins := !forced_plugins @ [ Filename.basename s ];
-        plugins := !plugins @ [ s ]),
+        let unsafe, forced, path = arg_plugin_aux () in
+        plugins := !plugins @ [ { path; unsafe; forced; collection = false } ]),
     arg_plugin_doc opt doc )
 
 let arg_plugins opt doc =
   ( opt,
     Arg.Unit
       (fun () ->
-        let unsafe, force, s = arg_plugin_aux () in
-        let ps = Array.to_list (Sys.readdir s) in
-        let deps_ht = Hashtbl.create 0 in
-        let deps =
-          List.map
-            (fun pname ->
-              let dir = Filename.concat s pname in
-              if (not unsafe) && not (GwdPluginMD5.allowed dir) then failwith s;
-              Hashtbl.add deps_ht pname dir;
-              let f = Filename.concat dir "META" in
-              if Sys.file_exists f then
-                (pname, GwdPluginMETA.((parse f).depends))
-              else (pname, []))
-            ps
-        in
-        match GwdPluginDep.sort deps with
-        | GwdPluginDep.ErrorCycle _ -> assert false
-        | GwdPluginDep.Sorted deps ->
-            List.iter
-              (fun pname ->
-                try
-                  let s = Hashtbl.find deps_ht pname in
-                  if unsafe then unsafe_plugins := !unsafe_plugins @ [ s ];
-                  if force then forced_plugins := !forced_plugins @ [ pname ];
-                  plugins := !plugins @ [ s ]
-                with Not_found ->
-                  raise
-                    (Register_plugin_failure (pname, `string "Missing plugin")))
-              deps),
+        let unsafe, forced, path = arg_plugin_aux () in
+        plugins := !plugins @ [ { path; unsafe; forced; collection = true } ]),
     arg_plugin_doc opt doc )
 
 let print_version_commit () =
@@ -2443,6 +2496,11 @@ let set_predictable_mode () =
          security enhancements and caching.");
   predictable_mode := true
 
+let set_check_flag () =
+  check := true;
+  set_debug_flag ();
+  predictable_mode := true
+
 let parse_cmd () =
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
@@ -2460,7 +2518,7 @@ let parse_cmd () =
         Fmt.str
           "<DIR> Specify where the “bases” directory with databases is \
            installed (default if empty is %S)."
-          Secure.default_base_dir );
+          (Dirs.name Secure.default_base_dir) );
       ( "-wd",
         Arg.String make_sock_dir,
         "<DIR> Directory for socket communication (Windows) and access count."
@@ -2572,6 +2630,10 @@ let parse_cmd () =
       ( "-nolock",
         Arg.Set Lock.no_lock_flag,
         " Do not lock files before writing." );
+      ( "-check",
+        Arg.Unit set_check_flag,
+        " Run only the server startup sequence for test purpose. This flag \
+         implies -debug and -predictable_mode." );
       arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin.";
       arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.";
       ( "-version",
@@ -2646,8 +2708,8 @@ let parse_cmd () =
 
 let main () =
   if not Sys.unix then (
-    Wserver.sock_in := "gwd.sin";
-    Wserver.sock_out := "gwd.sou");
+    Server.sock_in := "gwd.sin";
+    Server.sock_out := "gwd.sou");
   let gwd_cmd =
     let argv_list = Array.to_list Sys.argv in
     let argv_list =
@@ -2679,8 +2741,10 @@ let main () =
     process "" false argv_list
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
-  List.iter register_plugin !plugins;
+  List.iter load_plugins !plugins;
   GWPARAM.init ();
+  (* FIXME: this line MUST be after plugin loading as plugins can modified
+     [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
   cache_lexicon ();
   List.iter
     (fun dbn ->
@@ -2709,15 +2773,16 @@ let main () =
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Mutil.particles_file = "" then
     Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
-  Wserver.stop_server :=
+  Server.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
   let query, cgi =
     try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
     with Not_found -> ("" |> Adef.encoded, !force_cgi)
   in
   Util.is_welcome := false;
+  if !check then exit 0;
   if cgi then (
-    Wserver.cgi := true;
+    Server.cgi := true;
     set_binary_mode_out stdout true;
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
@@ -2758,7 +2823,7 @@ let () =
   Logs.set_level ~all:true (Some Logs.Info);
   parse_cmd ();
   parse_prefixes ();
-  setup_log !log_file;
+  setup_log ~predictable_mode:!predictable_mode !log_file;
   Fmt_tty.setup_std_outputs ~style_renderer:`Ansi_tty ();
   try main () with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->

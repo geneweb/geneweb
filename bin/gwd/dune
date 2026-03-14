@@ -1,23 +1,26 @@
+(executable
+ (name generate_plugin_checksums)
+ (modules generate_plugin_checksums)
+ (libraries geneweb_plugin))
+
 (rule
- (target gwdPluginMD5.ml)
+ (target plugin_checksums.ml)
  (deps
-  (alias_rec %{project_root}/plugins/plugin)
-  (:maker mk_gwdPluginMD5.ml))
+  (glob_files_rec ../../plugins/*))
  (action
   (with-stdout-to
    %{target}
-   (run ocaml %{maker} %{project_root}/plugins))))
+   (run ./generate_plugin_checksums.exe %{project_root}/plugins))))
 
 (generate_sites_module
  (module geneweb_sites)
  (sites geneweb))
 
 (library
- (name gwd_lib)
  (public_name geneweb.gwd_lib)
- (wrapped true)
- (libraries geneweb wserver dune-site)
- (modules gwdPlugin request geneweb_sites))
+ (name gwd_lib)
+ (libraries geneweb geneweb_http geneweb.plugin dune-site)
+ (modules request geneweb_sites))
 
 (executable
  (package geneweb)
@@ -28,15 +31,16 @@
   dynlink
   geneweb
   geneweb.logs
+  geneweb.plugin
+  geneweb_http
   gwd_lib
   logs
-  logs.fmt
   logs-syslog
   logs-syslog.unix
+  ptime
   fmt
   fmt.tty
   str
   unix
-  uri
-  wserver)
- (modules base64 gwd gwdPluginDep gwdPluginMD5 gwdPluginMETA robot))
+  uri)
+ (modules base64 gwd plugin_checksums robot))

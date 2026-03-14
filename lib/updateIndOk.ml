@@ -362,8 +362,8 @@ let rec reconstitute_relations conf ext cnt =
       (r :: rl, ext)
   | None -> ([], ext)
 
-let reconstitute_death conf birth baptism death_place burial burial_place =
-  let d = Update.reconstitute_date conf "death" in
+let reconstitute_death_from d conf birth baptism death_place burial burial_place
+    =
   let dr =
     match p_getenv conf.env "death_reason" with
     | Some "Killed" -> Killed
@@ -389,8 +389,11 @@ let reconstitute_death conf birth baptism death_place burial burial_place =
       | Some d -> Death (dr, Date.cdate_of_date d)
       | None -> DeadDontKnowWhen)
 
-let reconstitute_burial conf burial_place =
-  let d = Update.reconstitute_date conf "burial" in
+let reconstitute_death conf birth baptism death_place burial burial_place =
+  let d = Update.reconstitute_date conf "death" in
+  reconstitute_death_from d conf birth baptism death_place burial burial_place
+
+let reconstitute_burial_from d conf burial_place =
   match p_getenv conf.env "burial" with
   | Some "UnknownBurial" | None -> (
       match (d, burial_place) with
@@ -400,12 +403,24 @@ let reconstitute_burial conf burial_place =
   | Some "Cremated" -> Cremated (Date.cdate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x)
 
+let reconstitute_burial conf burial_place =
+  let d = Update.reconstitute_date conf "burial" in
+  reconstitute_burial_from d conf burial_place
+
 (* TODO EVENT put this in Event *)
 let sort_pevents pevents =
   Event.sort_events
     (fun evt -> Event.Pevent evt.epers_name)
     (fun evt -> evt.epers_date)
     pevents
+
+let has_pevent_in_env conf tag =
+  let rec loop i =
+    match get_nth conf "e_name" i with
+    | None -> false
+    | Some n -> String.equal n tag || loop (i + 1)
+  in
+  loop 1
 
 let reconstitute_from_pevents pevents ext bi bp de bu =
   (* On tri les évènements pour être sûr. *)
@@ -593,14 +608,20 @@ let reconstitute_person conf =
     | Some "F" -> Female
     | Some _ | None -> Neuter
   in
-  let birth = Update.reconstitute_date conf "birth" in
+  let birth =
+    if has_pevent_in_env conf "#birt" then None
+    else Update.reconstitute_date conf "birth"
+  in
   let birth_place = only_printable (get conf "birth_place") in
   let birth_note =
     only_printable_or_nl
       (Mutil.strip_all_trailing_spaces (get conf "birth_note"))
   in
   let birth_src = only_printable (get conf "birth_src") in
-  let bapt = Update.reconstitute_date conf "bapt" in
+  let bapt =
+    if has_pevent_in_env conf "#bapt" then None
+    else Update.reconstitute_date conf "bapt"
+  in
   let bapt_place = only_printable (get conf "bapt_place") in
   let bapt_note =
     only_printable_or_nl
@@ -613,7 +634,11 @@ let reconstitute_person conf =
       (Mutil.strip_all_trailing_spaces (get conf "burial_note"))
   in
   let burial_src = only_printable (get conf "burial_src") in
-  let burial = reconstitute_burial conf burial_place in
+  let burial =
+    if has_pevent_in_env conf "#buri" || has_pevent_in_env conf "#crem" then
+      reconstitute_burial_from None conf burial_place
+    else reconstitute_burial conf burial_place
+  in
   let death_place = only_printable (get conf "death_place") in
   let death_note =
     only_printable_or_nl
@@ -621,7 +646,10 @@ let reconstitute_person conf =
   in
   let death_src = only_printable (get conf "death_src") in
   let death =
-    reconstitute_death conf birth bapt death_place burial burial_place
+    if has_pevent_in_env conf "#deat" then
+      reconstitute_death_from None conf birth bapt death_place burial
+        burial_place
+    else reconstitute_death conf birth bapt death_place burial burial_place
   in
   let death_place =
     match death with

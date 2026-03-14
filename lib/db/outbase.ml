@@ -16,17 +16,18 @@ let trace s =
     flush stderr)
 
 let count_error computed found =
-  Printf.eprintf "Count error. Computed %d. Found %d.\n" computed found;
-  flush stderr;
+  Format.eprintf "Position error. Computed %a. Found %a@." Position.pp computed
+    Position.pp found;
   exit 2
 
 let output_index_aux oc_inx oc_inx_acc ni =
-  let bpos = pos_out oc_inx in
+  let bpos = Position.pos_out oc_inx in
   Dutil.output_value_no_sharing oc_inx ni;
   let epos =
     Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni) bpos
   in
-  if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
+  let cpos = Position.pos_out oc_inx in
+  if Position.compare epos cpos <> 0 then count_error epos cpos
 
 let make_name_index base =
   let t = Array.make Dutil.table_size [] in
@@ -463,12 +464,13 @@ let output base =
   let oc = Secure.open_out_bin tmp_base in
   let oc_acc = Secure.open_out_bin tmp_base_acc in
   let output_array arrname arr =
-    let bpos = pos_out oc in
+    let bpos = Position.pos_out oc in
     if !verbose then Printf.eprintf "*** saving %s array\n" arrname;
     flush stderr;
     arr.output_array oc;
     let epos = Iovalue.output_array_access oc_acc arr.get arr.len bpos in
-    if epos <> pos_out oc then count_error epos (pos_out oc)
+    let cpos = Position.pos_out oc in
+    if Position.compare epos cpos <> 0 then count_error epos cpos
   in
   (try
      (* output header of "base" *)
@@ -487,29 +489,29 @@ let output base =
      Dutil.output_value_no_sharing oc
        (base.data.bnotes.Def.norigin_file : string);
      (* output arrays in the "base" and position for each element in the "base.acc" *)
-     let persons_array_pos = pos_out oc in
+     let persons_array_pos = Position.pos_out oc in
      output_array "persons" base.data.persons;
-     let ascends_array_pos = pos_out oc in
+     let ascends_array_pos = Position.pos_out oc in
      output_array "ascends" base.data.ascends;
-     let unions_array_pos = pos_out oc in
+     let unions_array_pos = Position.pos_out oc in
      output_array "unions" base.data.unions;
-     let families_array_pos = pos_out oc in
+     let families_array_pos = Position.pos_out oc in
      output_array "families" base.data.families;
-     let couples_array_pos = pos_out oc in
+     let couples_array_pos = Position.pos_out oc in
      output_array "couples" base.data.couples;
-     let descends_array_pos = pos_out oc in
+     let descends_array_pos = Position.pos_out oc in
      output_array "descends" base.data.descends;
-     let strings_array_pos = pos_out oc in
+     let strings_array_pos = Position.pos_out oc in
      output_array "strings" base.data.strings;
      (* output arrays position in the header *)
      seek_out oc array_start_indexes;
-     output_binary_int oc persons_array_pos;
-     output_binary_int oc ascends_array_pos;
-     output_binary_int oc unions_array_pos;
-     output_binary_int oc families_array_pos;
-     output_binary_int oc couples_array_pos;
-     output_binary_int oc descends_array_pos;
-     output_binary_int oc strings_array_pos;
+     Position.output oc persons_array_pos;
+     Position.output oc ascends_array_pos;
+     Position.output oc unions_array_pos;
+     Position.output oc families_array_pos;
+     Position.output oc couples_array_pos;
+     Position.output oc descends_array_pos;
+     Position.output oc strings_array_pos;
      base.data.families.clear_array ();
      base.data.descends.clear_array ();
      close_out oc;
