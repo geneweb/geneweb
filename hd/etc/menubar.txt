@@ -94,7 +94,7 @@
                     <div class="d-none alert-opt">[alert option]</div>
                     <div class="d-none alert-mod">[alert module]</div>
                   </div>
-                  <div id="p_mod_table"></div>
+                  <div id="p_mod_table" data-labels='{"individu":"Individual","parents":"Parents","unions":"Unions","fratrie":"Siblings","relations":"Relations","chronologie":"Timeline","notes":"Notes","sources":"Sources","arbres":"Trees","htrees":"H-trees","gr_parents":"Grandparents","ligne":"Lineage","data_3col":"3-col data","w":"w","x":"x","z":"z"}'></div>
                 </form>
                 <div class="form-group d-none d-md-block mx-1">
                   <img src="%images_prefix;modules/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">

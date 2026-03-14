@@ -113,13 +113,23 @@ HTML tags must be in `default_safe_html_allowed_tags` (`lib/util.ml`) or `safe_h
 
 ## Nicholas Spies notes to CLAUDE
 
-Make sure to update README.md OR other appropriate geneweb file(s) with the latest syntax that our changes have introduced, such as for inline links [[...]] and for images in the Notes field {{...}} .
+Make sure to update README.md OR other appropriate geneweb file(s) with the latest syntax that our changes have introduced, such as for inline links [[...]] and for images in the Notes field {{...}} and boldface of text display of ancestors and descendants.
 
-When requested to run geneweb, always do so using the SPIES database. Give me instructions how I can run geneweb myself, always with the spies database. Always use the standard port Geneweb uses (2317)
+When requested to run geneweb, always do so using the SPIES database. Give me instructions how I can run geneweb myself, always with the spies database. Always use the standard port Geneweb uses (2317).
 
-Make sure that nameing conventions follow those in the main geneweb github site and correct my geneweb fork files to conform; Pay attention to upper and lower case. 
+Make sure that naming conventions follow those in the main geneweb github site and correct my geneweb fork files to conform; Pay attention to upper and lower case.
 
+The /Applications/geneweb.app should be kept up to date with the latest changes.
 
+### Build and test workflow
 
+1. **Edit source** in `/Users/nspies/geneweb/` (git repo)
+2. **Build runtime** with `make distrib` — this populates `distribution/` with binaries, templates, plugins, etc.
+3. **Test locally** by running:
+   ```bash
+   cd distribution && gw/gwd -bd bases -p 2317
+   ```
+   Then open `http://localhost:2317/spies` in a browser.
+4. The SPIES database lives at `bases/spies.gwb` in the repo root. A symlink at `distribution/bases/spies.gwb` points there so `make distrib` does not need to copy it.
 
 

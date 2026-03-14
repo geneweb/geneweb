@@ -23,26 +23,10 @@
     z: ["custom"]
   };
 
-  // Display names for module labels (English)
-  const MODULE_LABELS = {
-    individu: "individual",
-    parents: "parents",
-    unions: "unions",
-    fratrie: "siblings",
-    relations: "relations",
-    chronologie: "timeline",
-    notes: "notes",
-    sources: "sources",
-    arbres: "trees",
-    htrees: "h-trees",
-    gr_parents: "grandparents",
-    ligne: "lineage",
-    data_3col: "3-col data",
-    w: "w",
-    x: "x",
-    z: "z"
-  };
-  
+  // Module labels are passed from the server-side template via data-labels
+  // attribute on #p_mod_table, so they respect the user's language setting.
+  let MODULE_LABELS = {};
+
   // Fast map for first-letter lookup
   const MODULE_MAP = new Map();
   for (const [name, opts] of Object.entries(MODULES)) {
@@ -75,9 +59,10 @@
       const buttons = options.map((opt, idx) => {
         const id = `pm_${module[0]}${idx + 1}`;
         DOM.buttons.set(id, { module, option: opt, index: idx });
+        const label = MODULE_LABELS[module] || module;
         return `<button class="btn btn-outline-primary btn-sm mr-1 text-nowrap"
-                  type="button" id="${id}" title="${module} ${opt}"
-                  data-toggle="popover" data-trigger="hover" data-placement="bottom" 
+                  type="button" id="${id}" title="${label} ${opt}"
+                  data-toggle="popover" data-trigger="hover" data-placement="bottom"
                   data-html="true" data-content="<img src='${DOM.imgPrefix}/${module}_${idx + 1}.jpg'>">${opt}</button>`;
       }).join('');
       
@@ -191,13 +176,26 @@
   function addModule(btnId) {
     const buttonInfo = DOM.buttons.get(btnId);
     if (!buttonInfo) return;
-    
+
     const moduleId = btnId.slice(3);
+    const val = DOM.input.val();
+
+    // Toggle: if already active, remove it
+    if (state.activeButtons.has(btnId)) {
+      const newVal = val.replace(moduleId, '');
+      DOM.input.val(newVal);
+      $(`#${btnId}`).removeClass('btn-primary').addClass('btn-outline-primary');
+      state.activeButtons.delete(btnId);
+      // Rebuild images from scratch
+      buildView();
+      return;
+    }
+
     const imgPath = `${DOM.imgPrefix}/${buttonInfo.module}_${buttonInfo.index + 1}.jpg`;
-    
-    DOM.input.val(DOM.input.val() + moduleId);
+
+    DOM.input.val(val + moduleId);
     DOM.builder.append(`<img class="rm" src="${imgPath}">\n`);
-    
+
     $(`#${btnId}`).removeClass('btn-outline-primary').addClass('btn-primary');
     state.activeButtons.add(btnId);
   }
@@ -248,6 +246,12 @@
     DOM.imgPrefix = $('.img-prfx').attr('data-prfx');
     DOM.bvar = $('#p_mod_bvar');
     
+    // Read translated labels from server-rendered data attribute
+    const labelData = $('#p_mod_table').attr('data-labels');
+    if (labelData) {
+      try { MODULE_LABELS = JSON.parse(labelData); } catch(e) {}
+    }
+
     // Generate and insert the table
     $('#p_mod_table').replaceWith(generateTable());
     
