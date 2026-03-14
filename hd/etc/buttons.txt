@@ -142,7 +142,7 @@
           href="%prefix_base_password;%access;&m=A%nn;
                    %foreach;env_binding;
                      %if;(env.key="t")&t=%if;(e.t!="Y")Y%else;Z%end;%nn;
-                     %elseif;(env.key="v" or env.key="only" or env.key="im" or env.key="gen")&%env.key=%env.val;%end;%nn;
+                     %elseif;(env.key="v" or env.key="only" or env.key="im" or env.key="gen" or env.key="hl")&%env.key=%env.val;%end;%nn;
                      %( TODO: quick fix dans un seul sens, préférer ajouter v0 sur le tableau par couples, changement de v0 intempestif ingérable sinon %)
                      %if;(env.key="v0")&v0=%if;(env.val=0)1%else;%env.val;%end;%end;%nn;
                    %end;%nn;
