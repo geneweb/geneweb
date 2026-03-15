@@ -534,6 +534,11 @@ td .rm-cell {
   transform: scale(1.1);
 }
 
+.dropdown-menu.dropdown-menu-transl,
+.dropdown-menu.dropdown-menu-transl-pmod {
+  border: 2px solid rgba(0, 0, 0, 0.3) !important;
+}
+
 .dropdown-menu-transl {
   -webkit-transform: translate(-16%, 0) !important;
   -o-transform: translate(-16%, 0) !important;
@@ -544,13 +549,20 @@ td .rm-cell {
   -webkit-transform: translate(-10%, 0) !important;
   -o-transform: translate(-10%, 0) !important;
   transform: translate(-10%, 0) !important;
-  max-height: 620px; /* fixme! */
-  overflow: scroll;
-  scrollbar-width: none;
+  min-width: 320px;
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .dropdown-menu-transl-pmod::-webkit-scrollbar {
-  display: none; /* hide p_mod scrollbar */
+  width: 6px;
+}
+
+.dropdown-menu-transl-pmod::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.5);
+  border-radius: 3px;
 }
 
 .ancmenu-implex {

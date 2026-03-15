@@ -121,6 +121,8 @@ Make sure that naming conventions follow those in the main geneweb github site a
 
 The /Applications/geneweb.app should be kept up to date with the latest changes.
 
+Always record a complete transcript of each session in separate files by date; tell me where they are to be found
+
 ### Build and test workflow
 
 1. **Edit source** in `/Users/nspies/geneweb/` (git repo)

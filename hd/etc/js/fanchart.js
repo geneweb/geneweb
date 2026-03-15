@@ -2655,11 +2655,7 @@ const SVGRenderer = {
       // Version background - applique les classes CSS pour les lieux et âges
       this.applyBackgroundClasses(path, p, options.type);
     } else {
-      if (options.type === 'marriage' && !p.marriage_place) {
-        path.setAttribute("class", ""); // Secteur de mariage sans lieu
-      } else {
-        this.applyInteractiveFeatures(path, p, options.type);
-      }
+      this.applyInteractiveFeatures(path, p, options.type);
     }
 
     g.append(path);
@@ -2816,21 +2812,31 @@ const SVGRenderer = {
       let html = `<h2>${t('marriage', 'Marriage')}</h2>`;
 
       const marriageDate = p.marriage_date_ || p.marriage_date;
-      if (marriageDate) {
-        html += `<div><strong>${t('date', 'Date')} :</strong> ${marriageDate}</div>`;
-      }
+      const ageYears = (s) => { if (!s || s === '?') return '?'; const m = s.match(/(\d+)\s*year/); return m ? m[1] : '?'; };
+      const h = ageYears(p.marriage_age_husband);
+      const w = ageYears(p.marriage_age_wife);
+      const hasAges = h !== '?' || w !== '?';
+      const hasData = marriageDate || p.marriage_place || years >= 0 || hasAges;
 
-      if (p.marriage_place) {
-        html += `<div><strong>${t('place', 'Place')} :</strong> ${p.marriage_place}</div>`;
-      }
+      if (!hasData) {
+        html += `<div>Unknown</div>`;
+      } else {
+        if (marriageDate) {
+          html += `<div><strong>${t('date', 'Date')} :</strong> ${marriageDate}</div>`;
+        }
 
-      if (years >= 0) {
-        const yearLabel = years === 1 ? t('marriage_year', 'year') : t('marriage_years', 'years');
-        html += `<div><strong>${t('duration', 'Duration')} :</strong> ${years} ${yearLabel}</div>`;
-      }
+        if (p.marriage_place) {
+          html += `<div><strong>${t('place', 'Place')} :</strong> ${p.marriage_place}</div>`;
+        }
 
-      if (p.marriage_age) {
-        html += `<div><strong>${t('marriage_age', 'Age at marriage')} :</strong> ${p.marriage_age}</div>`;
+        if (years >= 0) {
+          const yearLabel = years === 1 ? t('marriage_year', 'year') : t('marriage_years', 'years');
+          html += `<div><strong>${t('duration', 'Duration')} :</strong> ${years} ${yearLabel}</div>`;
+        }
+
+        if (hasAges) {
+          html += `<div><strong>${t('marriage_age', 'Ages at marriage')} :</strong> ${h} | ${w} years</div>`;
+        }
       }
 
       panel.innerHTML = html;
@@ -5277,7 +5283,16 @@ reRenderWithCurrentGenerations: function() {
     // Boutons de navigation
     $("b-no-buttons").onclick = function() {
       $("fanchart-controls").style.display = "none";
+      var rb = $("b-show-buttons");
+      if (rb) rb.style.display = "";
     };
+    var showBtn = $("b-show-buttons");
+    if (showBtn) {
+      showBtn.onclick = function() {
+        $("fanchart-controls").style.display = "";
+        showBtn.style.display = "none";
+      };
+    }
     $("b-help").onclick = function() {
       const helpPanel = $('navigation-help');
       if (helpPanel) {

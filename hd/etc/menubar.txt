@@ -212,6 +212,32 @@
               %if;(e.m!="ADD_FAM" and e.m!="MOD_FAM" and e.m!="MOD_IND" and e.m!="R" and e.m!="U")
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
+                <a class="dropdown-item" id="showages-toggle" href="%if;(evar.showages="on")%url_set.showages.off;%else;%url_set.showages.on;%end;"><i class="fa fa-hourglass-half fa-fw mr-2%if;(evar.showages="on") text-primary%end;"></i>%if;(evar.showages="on")Hide ages (y, m, d)%else;Show ages (y, m, d)%end;</a>%nn;
+                <script>
+                (function(){
+                  var sa=new URLSearchParams(location.search).get('showages');
+                  if(sa==='on')localStorage.setItem('showages','on');
+                  else if(sa==='off')localStorage.removeItem('showages');
+                  var pref=localStorage.getItem('showages');
+                  if(!sa&&pref==='on'){
+                    var u=new URL(location.href);u.searchParams.set('showages','on');
+                    location.replace(u);return;
+                  }
+                  if(pref==='on'||sa==='on'){
+                    document.addEventListener('click',function(e){
+                      var a=e.target.closest('a');
+                      if(!a||a.id==='showages-toggle'||a.target==='_blank')return;
+                      var h=a.getAttribute('href');
+                      if(!h||h.charAt(0)==='#'||h.indexOf('://')!==-1)return;
+                      if(h.indexOf('showages=')===-1){
+                        e.preventDefault();
+                        a.href=h+(h.indexOf('?')===-1?'?':'&')+'showages=on';
+                        a.click();
+                      }
+                    },true);
+                  }
+                })();
+                </script>
               %end;
               %( WIZARD | CHG_EVT / SND_IMAGE / MRG / DEL_IND / MRG_DUP / HIST_DIFF buttons %)
               %if;(iswiz=1)
