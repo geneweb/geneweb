@@ -5,6 +5,68 @@
 %( op_m=4 complete: evolved up to grand-children %)
 %( op_m=5 photos: complete with photos of spouse and children %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+%define;marriage_ages()
+  %if;(evar.showages="on")
+    %if;(computable_marriage_age and spouse.computable_marriage_age)
+      <span class="text-muted small"> — when %if;(sex=0)he%elseif;(sex=1)she%else;they%end; was%sp;
+      %marriage_age.ymd;%sp;
+      and %if;(spouse.sex=0)he%elseif;(spouse.sex=1)she%else;they%end; was%sp;
+      %spouse.marriage_age.ymd;</span>
+    %elseif;computable_marriage_age;
+      <span class="text-muted small"> — when %if;(sex=0)he%elseif;(sex=1)she%else;they%end; was%sp;
+      %marriage_age.ymd;</span>
+    %elseif;spouse.computable_marriage_age;
+      <span class="text-muted small"> — when %if;(spouse.sex=0)he%elseif;(spouse.sex=1)she%else;they%end; was%sp;
+      %spouse.marriage_age.ymd;</span>
+    %else;
+      <span class="text-muted small"> — (ages unknown)</span>
+    %end;
+  %end;
+%end;
+%define;child_birth_age()
+  %if;(evar.showages="on")
+    %if;(child.father_age_at_birth_ymd!="" and child.mother_age_at_birth_ymd!="")
+      <span class="text-muted small"> — when father was %child.father_age_at_birth_ymd;%sp;
+      and mother was %child.mother_age_at_birth_ymd;</span>
+    %elseif;(child.father_age_at_birth_ymd!="")
+      <span class="text-muted small"> — when father was %child.father_age_at_birth_ymd;</span>
+    %elseif;(child.mother_age_at_birth_ymd!="")
+      <span class="text-muted small"> — when mother was %child.mother_age_at_birth_ymd;</span>
+    %end;
+  %end;
+%end;
+%define;divorce_ages()
+  %if;(evar.showages="on")
+    %if;(computable_divorce_age and spouse.computable_divorce_age)
+      <span class="text-muted small"> — when %if;(sex=0)he%elseif;(sex=1)she%else;they%end; was%sp;
+      %divorce_age.ymd;%sp;
+      and %if;(spouse.sex=0)he%elseif;(spouse.sex=1)she%else;they%end; was%sp;
+      %spouse.divorce_age.ymd;</span>
+    %elseif;computable_divorce_age;
+      <span class="text-muted small"> — when %if;(sex=0)he%elseif;(sex=1)she%else;they%end; was%sp;
+      %divorce_age.ymd;</span>
+    %elseif;spouse.computable_divorce_age;
+      <span class="text-muted small"> — when %if;(spouse.sex=0)he%elseif;(spouse.sex=1)she%else;they%end; was%sp;
+      %spouse.divorce_age.ymd;</span>
+    %end;
+  %end;
+%end;
+%define;separation_ages()
+  %if;(evar.showages="on")
+    %if;(computable_separation_age and spouse.computable_separation_age)
+      <span class="text-muted small"> — when %if;(sex=0)he%elseif;(sex=1)she%else;they%end; was%sp;
+      %separation_age.ymd;%sp;
+      and %if;(spouse.sex=0)he%elseif;(spouse.sex=1)she%else;they%end; was%sp;
+      %spouse.separation_age.ymd;</span>
+    %elseif;computable_separation_age;
+      <span class="text-muted small"> — when %if;(sex=0)he%elseif;(sex=1)she%else;they%end; was%sp;
+      %separation_age.ymd;</span>
+    %elseif;spouse.computable_separation_age;
+      <span class="text-muted small"> — when %if;(spouse.sex=0)he%elseif;(spouse.sex=1)she%else;they%end; was%sp;
+      %spouse.separation_age.ymd;</span>
+    %end;
+  %end;
+%end;
 %define;relations_tree(z1)
     %reset_count;
     href="%prefix;spouse=on;m=RLM;image=%evar.image;&%nn;
@@ -157,6 +219,7 @@
       %apply;li_SD("spouse")
         <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
         %apply;short_display_person("spouse")
+        %apply;marriage_ages()
         %let;prev_count;%count;%in;
         %if;(has_witnesses)
           %sp;([witness/witnesses]w[:]
@@ -188,8 +251,8 @@
              <sup>%count;</sup>
           %end;
         %end;
-        %if;are_separated;, [separated] %on_separation_date;%end;
-        %if;are_divorced;, [divorced] %on_divorce_date;%end;
+        %if;are_separated;, [separated] %on_separation_date;%apply;separation_ages()%end;
+        %if;are_divorced;, [divorced] %on_divorce_date;%apply;divorce_ages()%end;
         %if;has_children;, %apply;havingchildren(nb_children)[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
@@ -201,6 +264,7 @@
                 %else;
                   %apply;short_display_person_noname("child")
                 %end;
+                %apply;child_birth_age()
               </li>
             %end;
           </ul>
@@ -228,6 +292,7 @@
     %end;
     <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
     %apply;short_display_person("spouse")
+    %apply;marriage_ages()
     %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_marriage_note)
       %sp;(%marriage_note;)%nn;
     %end;
@@ -261,6 +326,7 @@
             %else;
               %apply;short_display_person_noname("child")
             %end;
+            %apply;child_birth_age()
             </li>
           </ul>
         %end;
@@ -331,6 +397,7 @@
                       %if;(child.public_name!="" and child.public_name!=child.first_name)%child.first_name;<br>%end;
                       %if;(child.birth_date!="")%if;(child.sex=0) [*born]0%else;[*born]1%end; %child.on_birth_date;%end;
                       %if;(child.birth_place!="") %in_place; %child.birth_place;%end;
+                      %apply;child_birth_age()
                     %if;(count2=0)</li></ul>%end;
                   </div>
                 </div>
@@ -370,8 +437,8 @@
     
     %if;(are_divorced or are_separated)
       <div class="mb-1 text-muted">
-        %if;are_separated;[*separated]%if;(on_separation_date!="") %on_separation_date;%end;.%end;
-        %if;are_divorced;[*divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.%end;
+        %if;are_separated;[*separated]%if;(on_separation_date!="") %on_separation_date;%end;%apply;separation_ages().%end;
+        %if;are_divorced;[*divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;%apply;divorce_ages().%end;
       </div>
     %end;
     </li></ul>
@@ -386,6 +453,7 @@
       %apply;li_SD("spouse")
         <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
         %apply;short_display_person("spouse")
+        %apply;marriage_ages()
         %if;spouse.has_parents; ([parents][:]
           %apply;short_display_person("spouse.father")%sp;
           & %apply;short_display_person("spouse.mother"))%nn;
@@ -403,8 +471,8 @@
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
            <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;%nn;
-        %if;are_separated;, [separated]0 %on_separation_date;%end;
-        %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
+        %if;are_separated;, [separated]0 %on_separation_date;%apply;separation_ages()%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%apply;divorce_ages()%end;
         %if;has_children;, %apply;havingchildren(nb_children)[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
@@ -416,6 +484,7 @@
                 %else;
                   %apply;short_display_person_noname("child")
                 %end;
+                %apply;child_birth_age()
                 %if;child.has_families;
                   %foreach;child.family;
                     %if;(family_cnt!=1)
@@ -445,6 +514,7 @@
       %apply;li_SD("spouse")
         <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
         %apply;long_display_person("spouse")
+        %apply;marriage_ages()
         %if;spouse.has_parents;
           <span style="font-size: 90%%"><em> ([parents][:]
             %apply;short_display_person("spouse.father") &%sp;
@@ -464,8 +534,8 @@
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)%nn;
            <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
-        %if;are_separated;, [separated]0 %on_separation_date;%end;
-        %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
+        %if;are_separated;, [separated]0 %on_separation_date;%apply;separation_ages()%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%apply;divorce_ages()%end;
         %if;has_children;, %apply;havingchildren(nb_children)[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
@@ -473,6 +543,7 @@
             %foreach;child;
               %apply;li_SDC("child")
                 %apply;short_display_person("child")
+                %apply;child_birth_age()
                 %if;child.has_families;
                   %foreach;child.family;
                     %if;(family_cnt!=1)
@@ -554,6 +625,7 @@
         %end;
         <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
         %apply;display_horizontal("spouse")
+        %apply;marriage_ages()
         <span style="font-size: 90%%">
           %if;spouse.has_parents;<em> ([parents][:]
             %apply;short_display_person_f("spouse.father") &%sp;
@@ -573,8 +645,8 @@
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)%nn;
            <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
-        %if;are_separated;, [separated]0 %on_separation_date;%end;
-        %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
+        %if;are_separated;, [separated]0 %on_separation_date;%apply;separation_ages()%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%apply;divorce_ages()%end;
         %if;spouse.has_image;
               </td>
             </tr>
@@ -603,6 +675,7 @@
                       <td style="vertical-align: middle">
                 %end;
                 %apply;short_display_person_f("child")
+                %apply;child_birth_age()
                 %if;child.has_families;
                   %foreach;child.family;
                     %if;(family_cnt!=1)
