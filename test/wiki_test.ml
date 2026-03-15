@@ -61,13 +61,24 @@ let l =
     ([ WLnone (1, "["); WLnone (4, "[[w") ], "[[[w");
     ([ WLwizard (8, "hg", "") ], "[[w:hg]]");
     ([ WLwizard (14, "hg", "henri") ], "[[w:hg/henri]]");
-    ([ WLimage (22, ([], "photo"), "alt text", None) ], "[[image:photo/alt text]]");
-    ([ WLimage (30, ([], "photo"), "alt text", Some "200px") ], "[[image:photo/alt text/200px]]");
-    ( [ WLperson (22, ("samuel", "nicholas", 1), Some "Samuel Nicholas", None, None) ],
+    ( [ WLimage (22, ([], "photo"), "alt text", None) ],
+      "[[image:photo/alt text]]" );
+    ( [ WLimage (30, ([], "photo"), "alt text", Some "200px") ],
+      "[[image:photo/alt text/200px]]" );
+    ( [
+        WLperson
+          (22, ("samuel", "nicholas", 1), Some "Samuel Nicholas", None, None);
+      ],
       "[[Samuel Nicholas (1)]]" );
-    ( [ WLperson (20, ("samuel", "nicholas", 0), Some "Samuel Nicholas", None, None) ],
+    ( [
+        WLperson
+          (20, ("samuel", "nicholas", 0), Some "Samuel Nicholas", None, None);
+      ],
       "[[Samuel Nicholas]]" );
-    ( [ WLperson (28, ("jean paul", "sartre", 0), Some "Jean Paul Sartre", None, None) ],
+    ( [
+        WLperson
+          (28, ("jean paul", "sartre", 0), Some "Jean Paul Sartre", None, None);
+      ],
       "[[Jean Paul Sartre]]" );
     ( [ WLnone (1, "["); WLnone (2, "["); WLwizard (16, "hg", "henri") ],
       "[[[[w:hg/henri]]" );
@@ -88,8 +99,8 @@ let pp_token ppf tk =
         fam_marker
   | WLwizard (pos, wiz, name) -> Fmt.pf ppf "WLwizard (%d, %s, %s)" pos wiz name
   | WLimage (pos, (p, fname), alt, width) ->
-      Fmt.pf ppf "WLimage (%d, ([%s], %s), %s, %a)" pos
-        (String.concat "; " p) fname alt
+      Fmt.pf ppf "WLimage (%d, ([%s], %s), %s, %a)" pos (String.concat "; " p)
+        fname alt
         Fmt.(option ~none:(any "None") string)
         width
   | WLnone (pos, s) -> Fmt.pf ppf "WLnone (%d, %s)" pos s

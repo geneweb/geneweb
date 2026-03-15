@@ -2720,8 +2720,7 @@ let main () =
               let cwd = Sys.getcwd () in
               let dir = Filename.dirname cmd in
               let base = Filename.basename cmd in
-              if dir = Filename.current_dir_name then
-                Filename.concat cwd base
+              if dir = Filename.current_dir_name then Filename.concat cwd base
               else Filename.concat (Filename.concat cwd dir) base
             else cmd
           in

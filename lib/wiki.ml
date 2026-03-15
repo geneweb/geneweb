@@ -275,7 +275,7 @@ let syntax_links conf wi s =
     else if s.[i] = '%' then (
       Buffer.add_char buff '%';
       loop quot_lev pos (i + 1))
-    else if i < slen - 1 && s.[i] = '{' && s.[i + 1] = '{' then (
+    else if i < slen - 1 && s.[i] = '{' && s.[i + 1] = '{' then
       (* double-brace floated image syntax *)
       let j =
         let rec find_end j =
@@ -296,9 +296,7 @@ let syntax_links conf wi s =
                 match rest with a :: _ -> String.trim a | [] -> "right"
               in
               let width =
-                match rest with
-                | _ :: w :: _ -> String.trim w
-                | _ -> ""
+                match rest with _ :: w :: _ -> String.trim w | _ -> ""
               in
               let caption =
                 match rest with
@@ -323,7 +321,8 @@ let syntax_links conf wi s =
               let caption_html =
                 if caption <> "" then
                   Printf.sprintf
-                    "<figcaption style=\"font-size:0.85em;text-align:center\">%s</figcaption>"
+                    "<figcaption \
+                     style=\"font-size:0.85em;text-align:center\">%s</figcaption>"
                     caption
                 else ""
               in
@@ -336,7 +335,7 @@ let syntax_links conf wi s =
         loop quot_lev pos (j + 2))
       else (
         Buffer.add_char buff '{';
-        loop quot_lev pos (i + 1)))
+        loop quot_lev pos (i + 1))
     else if s.[i] = '{' then (
       let buff2 = Buffer.create 80 in
       let b, j =

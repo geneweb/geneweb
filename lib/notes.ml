@@ -431,7 +431,10 @@ let rewrite_key s oldk newk _file =
     if i >= slen then rs
     else
       match NotesLinks.misc_notes_link s i with
-      | WLpage (j, _, _, _, _) | WLwizard (j, _, _) | WLimage (j, _, _, _) | WLnone (j, _) ->
+      | WLpage (j, _, _, _, _)
+      | WLwizard (j, _, _)
+      | WLimage (j, _, _, _)
+      | WLnone (j, _) ->
           let ss = String.sub s i (j - i) in
           rebuild (rs ^ ss) j
       | WLperson (j, k, name, text, fam_marker) ->

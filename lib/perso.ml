@@ -71,7 +71,7 @@ let format_age_ymd age =
   let parts =
     (if y > 0 then [ string_of_int y ^ "y" ] else [])
     @ (if m > 0 then [ string_of_int m ^ "m" ] else [])
-    @ (if d > 0 then [ string_of_int d ^ "d" ] else [])
+    @ if d > 0 then [ string_of_int d ^ "d" ] else []
   in
   let formatted = if parts = [] then "0d" else String.concat ", " parts in
   Adef.safe (if prec_str = "" then formatted else prec_str ^ " " ^ formatted)
@@ -120,11 +120,9 @@ let eval_age_field_var conf ?(before_birth = false) age = function
       let parts =
         (if y > 0 then [ string_of_int y ^ "y" ] else [])
         @ (if m > 0 then [ string_of_int m ^ "m" ] else [])
-        @ (if d > 0 then [ string_of_int d ^ "d" ] else [])
+        @ if d > 0 then [ string_of_int d ^ "d" ] else []
       in
-      let formatted =
-        if parts = [] then "0d" else String.concat ", " parts
-      in
+      let formatted = if parts = [] then "0d" else String.concat ", " parts in
       Templ.VVstring
         (if prec_str = "" then formatted else prec_str ^ " " ^ formatted)
   | [ "prec" ] -> (
@@ -3850,17 +3848,17 @@ and eval_bool_person_field conf base env (p, p_auth) = function
               | Divorced d -> Date.cdate_to_gregorian_dmy_opt d
               | _ -> None
             in
-            (match
-               ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
-                 divorce_date_opt )
-             with
+            match
+              ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+                divorce_date_opt )
+            with
             | ( Some ({ prec = Sure | About | Maybe | Before | After; _ } as d1),
-                Some ({ prec = Sure | About | Maybe | Before | After; _ } as d2) )
-              ->
+                Some ({ prec = Sure | About | Maybe | Before | After; _ } as d2)
+              ) ->
                 let a = Date.time_elapsed d1 d2 in
                 a.year > 0
                 || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
-            | _ -> false)
+            | _ -> false
           else false
       | _ -> raise Not_found)
   | "computable_separation_age" -> (
@@ -3872,17 +3870,17 @@ and eval_bool_person_field conf base env (p, p_auth) = function
               | Separated d -> Date.cdate_to_gregorian_dmy_opt d
               | _ -> None
             in
-            (match
-               ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
-                 sep_date_opt )
-             with
+            match
+              ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+                sep_date_opt )
+            with
             | ( Some ({ prec = Sure | About | Maybe | Before | After; _ } as d1),
-                Some ({ prec = Sure | About | Maybe | Before | After; _ } as d2) )
-              ->
+                Some ({ prec = Sure | About | Maybe | Before | After; _ } as d2)
+              ) ->
                 let a = Date.time_elapsed d1 d2 in
                 a.year > 0
                 || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
-            | _ -> false)
+            | _ -> false
           else false
       | _ -> raise Not_found)
   | "has_approx_birth_date" ->
