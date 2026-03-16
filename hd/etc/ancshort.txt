@@ -1,5 +1,4 @@
 %( &t=N, ancestor short display included in ancsosa.txt %)
-%let;v0;%if;(e_v0!="" and e_v0>0)%e_v0;%else;0%end;%in;
 %if;(e.only="on" or v0=e_v)
   %reset_count;
   %foreach;ancestor_at_level;

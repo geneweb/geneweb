@@ -1,4 +1,7 @@
-<!-- $Id: perso_utils v7.1 13/08/2023 16:55:48 $ -->
+<!-- $Id: perso_utils v7.1 16/03/2026 07:12:03 $ -->
+%let;birth_symbol;%if;(b.birth_symbol!="")%b.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(b.death_symbol!="")%b.death_symbol;%else;&dagger;%end;%in;
+
 %define;setvar(nnn,vvv)
   %set_var.nnn.vvv;
 %end;

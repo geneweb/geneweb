@@ -38,14 +38,8 @@
 <div class="container%if;(e.t!="G")-fluid%end;%if;(e.t="Z") ml-2%end;">
 %if;not cancel_links;
   %include;menubar
-  %include;buttons
 %end;
-%let;e_v;%if;(e.v="")0%else;%e.v;%end;%in;
-%let;l_up;%if;(e.i1!="" or e.p1!="")1%end;%in;
-%let;birth_symbol;%if;(b.birth_symbol!="")%b.birth_symbol;%else;&deg;%end;%in;
-%let;death_symbol;%if;(b.death_symbol!="")%b.death_symbol;%else;&dagger;%end;%in;
-%( TODO: verify what is needed from perso_utils or on the contrary what can be merged in it, place it above head title if relying on it %)
-%include;perso_utils
+%include;buttons
 %define;link(aaa,xxx,nnn)
   %if;(e.cgl="on")xxx%else;<a id="i_nnn" href="%prefix;aaa">xxx</a>%end;
 %end;
@@ -53,8 +47,6 @@
   %if;(e.cgl="on")%xxx;%else;<a id="innn" href="%prefix;%xxx.access;">%xxx;</a>%end;
   %xxx.title;%xxx.dates;
 %end;
-
-%( Main %)
 %if;(e.templ!="templm")
 <h1 class="h3 mt-3%if;not cancel_links; ml-2%end;">%nn;
   %apply;a_of_b%with;
