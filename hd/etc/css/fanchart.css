@@ -122,15 +122,15 @@ svg {
 
 /* Boutons de contrôle */
 .btn-fanchart {
-  padding: 3px 6px;
-  border-radius: 4px;
+  padding: 6px 10px;
+  border-radius: 5px;
   border: 1px solid #dee2e6;
   background: white;
   color: #495057;
   transition: all 0.2s ease;
-  font-size: 1em;
-  width: 28px;
-  height: 28px;
+  font-size: 1.15em;
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
