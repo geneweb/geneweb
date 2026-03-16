@@ -276,7 +276,7 @@
     %end;
   </ul>
 %elseif;(op_m=2 and has_families)
-  %reset_count;%reset_count2;
+  %reset_count;%reset_count2;%reset_count1;
   %foreach;family;
     %incr_count;
     %if;(spouse.has_image)%incr_count2;%end;
@@ -317,19 +317,23 @@
           %end;</span>)%nn;
       %end;
       %if;(has_children)%nn;
-        , %apply;havingchildren(nb_children)[:]
-        %foreach;child;
-          <ul>
-            %apply;li_SDC("child")%nn;
-            %if;(bvar.always_surname="yes")
-              %apply;short_display_person("child")
-            %else;
-              %apply;short_display_person_noname("child")
-            %end;
-            %apply;child_birth_age()
-            </li>
-          </ul>
-        %end;
+        <div class="d-flex flex-column align-content-start ml-2 mt-1">
+          <div class="w-100">%apply;havingchildren(nb_children)[:]</div>
+          %foreach;child;
+            %incr_count1;
+            <div class="d-flex flex-row mt-1">%count1;.
+              <div class="ml-2 align-self-center">
+                %if;(bvar.always_surname="yes")
+                  %apply;short_display_person("child")
+                %else;
+                  %apply;short_display_person_noname("child")
+                %end;
+                %sp;(%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)
+                %apply;child_birth_age()
+              </div>
+            </div>
+          %end;
+        </div>
       %end;
     %end;
     %if;(count2>0)
@@ -379,7 +383,6 @@
           %let;prev_count;%count;%in;%( on garde la précédente valeur de count %)
             <div class="d-flex flex-column align-content-start ml-2 mt-1">
               <div class="w-100">%apply;havingchildren(nb_children)[:]</div>
-              %reset_count1;
               %foreach;child;
                 %incr_count1;
                 <div class="d-flex flex-row mt-1">%count1;.
@@ -393,7 +396,8 @@
                   %end;
                   <div class="ml-2 align-self-center">
                     %if;(count2=0)<ul>%apply;li_SDC("child")%end;%nn;
-                      %apply;short_display_person_noname("child")<br>
+                      %apply;short_display_person_noname("child")%nn;
+                      %if;(not child.has_image and not child.has_blason_self)%sp;(%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)%end;<br>
                       %if;(child.public_name!="" and child.public_name!=child.first_name)%child.first_name;<br>%end;
                       %if;(child.birth_date!="")%if;(child.sex=0) [*born]0%else;[*born]1%end; %child.on_birth_date;%end;
                       %if;(child.birth_place!="") %in_place; %child.birth_place;%end;
