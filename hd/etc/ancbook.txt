@@ -1,42 +1,6 @@
-%(
-   Display livre d'ascendance
-%)
-
+%( m=A ancestor book t=P, included  in ancsosa.txt %)
 %let;in_place;%if;roglo;-%else;[in (place)]%end;%in;
 
-%( Copie sans majuscules %)
-%define;tothegen(xx)
-  [to the %s generation:::xx]%nn;
-%end;
-
-%define;togen(xx)
-  %if;(xx = 0)[specify::generation/generations]0%nn;
-  %elseif;(xx = 1)[to the parents]%nn;
-  %elseif;(xx = 2)[to the grandparents]%nn;
-  %elseif;(xx = 3)[to the great-grandparents]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-%define;thegen(xx)
-  [the %s generation:::xx]%nn;
-%end;
-%define;gena(xx)
-  %if;(xx = 0)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 1)[*the parents]%nn;
-  %elseif;(xx = 2)[*the grandparents]%nn;
-  %elseif;(xx = 3)[*the great-grandparents]%nn;
-  %else;
-    %apply;thegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-%define;on_side(xx)
-  [*on %s's side:::xx]
-%end;
 %define;relation_type_txt(xx, sex)
   %if;("xx" = [adoptive father/adoptive mother/adoptive parents]2)
     %apply;capitalize(nth([adoptive father/adoptive mother/adoptive parents], sex))

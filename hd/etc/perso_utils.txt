@@ -1,4 +1,7 @@
-<!-- $Id: perso_utils v7.1 13/08/2023 16:55:48 $ -->
+<!-- $Id: perso_utils v7.1 16/03/2026 07:12:03 $ -->
+%let;birth_symbol;%if;(b.birth_symbol!="")%b.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(b.death_symbol!="")%b.death_symbol;%else;&dagger;%end;%in;
+
 %define;setvar(nnn,vvv)
   %set_var.nnn.vvv;
 %end;
@@ -8,9 +11,6 @@
 
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
-
-%define;ext_link(xx)
-%end;
 
 %( initialise le compteur à/avec la valeur passée en paramètre %)
 %define;init_count(prev_count)
@@ -213,6 +213,18 @@
   %end;
 %end;
 
+%define;togen(xx)
+  %if;(xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[to the parents]%nn;
+  %elseif;(xx = 2)[to the grandparents]%nn;
+  %elseif;(xx = 3)[to the great-grandparents]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+
 %define;togend(xx)
   %if;(xx = 0 and static_max_desc_level>0)([specify::generation/generations]0)%nn;
   %elseif;(xx = 1)[to the children]%nn;
@@ -226,10 +238,22 @@
 %end;
 
 %define;gend(xx)
-  %if;(e.xx = 0)[specify::generation/generations]0%nn;
-  %elseif;(e.xx = 1)[the children]%nn;
-  %elseif;(e.xx = 2)[the grandchildren]%nn;
-  %elseif;(e.xx = 3)[the great-grandchildren]%nn;
+  %if;(e.xx=0)[specify::generation/generations]0%nn;
+  %elseif;(e.xx=1)[the children]%nn;
+  %elseif;(e.xx=2)[the grandchildren]%nn;
+  %elseif;(e.xx=3)[the great-grandchildren]%nn;
+  %else;
+    %apply;thegen%with;
+      %apply;nth([nth (generation)], e.xx)
+    %end;
+  %end;
+%end;
+
+%define;gen(xx)
+  %if;(e.xx=0)[*specify::generation/generations]0%nn;
+  %elseif;(e.xx=1)[parents]%nn;
+  %elseif;(e.xx=2)[grand-parents]%nn;
+  %elseif;(e.xx=3)[great-grand-parents]%nn;
   %else;
     %apply;thegen%with;
       %apply;nth([nth (generation)], e.xx)
@@ -268,7 +292,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;" %nn;
+    %else;<a href="%prefix;%xx.access;" %nn;
         class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%nn;
     %end;
   %end;
@@ -282,7 +306,7 @@
   <div>
     %if;(xx.has_sosa and e.m!="")%apply;display_sosa("xx")%end;
     %if;(cancel_links or xx.is_restricted or is_self)<span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span>
-    %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span></a>%nn;
+    %else;<a href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span></a>%nn;
     %end;
     %if;(wizard and not cancel_links)
       <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
@@ -311,7 +335,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
     %if;(cancel_links or xx.is_restricted)%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
-    %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;" title="[*visualize/show/hide/summary]1 %xx;">%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
+    %else;<a href="%prefix;%xx.access;" title="[*visualize/show/hide/summary]1 %xx;">%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
     %end;
   %end;
   %if;(wizard and not cancel_links)
@@ -333,7 +357,7 @@
   %if;(cancel_links or nnn.is_restricted)
     %nnn;
   %else;
-    <a %apply;ext_link("nnn") href="%prefix;%nnn.access;">%nnn;</a>%nnn.title;
+    <a href="%prefix;%nnn.access;">%nnn;</a>%nnn.title;
   %end;
   %nnn.dates;%nl;
 %end;
@@ -371,7 +395,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;">%xx;</a>%nn;
+    %else;<a href="%prefix;%xx.access;">%xx;</a>%nn;
     %end;
     %if;xx.has_nobility_titles;
       %foreach;xx.nobility_title;, %nobility_title;%end;
