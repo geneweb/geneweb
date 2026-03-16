@@ -1,11 +1,20 @@
 <!-- $Id: modules/chronologie.txt v7.1 02/02/2026 20:06:28 $ -->
 %define;age_marker(xx)
   %if;(xx.years!="")
-    <span%if;(xx.months>0 or xx.days>0) title="%xx;"%end;
-      class="age-%nn;
-       %if;(xx.years>0)years">%if;(xx.years<10 and xx.sign="") %end;%xx.sign;%xx.years;%nn;
-       %elseif;(xx.months>0)months">%if;(xx.months<10 and xx.sign="") %end;%xx.sign;%xx.months;%nn;
-       %else;days">%if;(xx.days<10 and xx.sign="") %end;%xx.sign;%xx.days;%end;</span>
+    %if;(e.ageymd="on")
+      <span class="age-%nn;
+        %if;(xx.years>0)years%else;months%end;" style="font-variant-numeric:tabular-nums">%nn;
+        %if;(xx.sign!="")<span class="text-muted">%xx.sign;</span>%end;%nn;
+        %if;(xx.years<10)0%end;%xx.years; <span class="text-muted">|</span> %nn;
+        %if;(xx.months<10)0%end;%xx.months; <span class="text-muted">|</span> %nn;
+        %if;(xx.days<10)0%end;%xx.days;</span>
+    %else;
+      <span%if;(xx.months>0 or xx.days>0) title="%xx;"%end;
+        class="age-%nn;
+         %if;(xx.years>0)years">%if;(xx.years<10 and xx.sign="") %end;%xx.sign;%xx.years;%nn;
+         %elseif;(xx.months>0)months">%if;(xx.months<10 and xx.sign="") %end;%xx.sign;%xx.months;%nn;
+         %else;days">%if;(xx.days<10 and xx.sign="") %end;%xx.sign;%xx.days;%end;</span>
+    %end;
   %end;
 %end;
 
@@ -163,7 +172,7 @@
     %apply;add_in_sorted_list%with;%apply;sort_key("ccc.death_date")
       %and;%count2;
       %and;%if;(ccc.death_date!="")%ccc.death_date;%else;([missing date]0)%end;
-      %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;short_display_person("ccc")%if;(ccc.computable_death_age)%sp;(%ccc.death_age.short;)%end;
+      %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;short_display_person("ccc")%if;(ccc.computable_death_age)%sp;(%if;(e.ageymd="on")%if;(ccc.death_age.years<10)0%end;%ccc.death_age.years; <span class="text-muted">|</span> %if;(ccc.death_age.months<10)0%end;%ccc.death_age.months; <span class="text-muted">|</span> %if;(ccc.death_age.days<10)0%end;%ccc.death_age.days;%else;%ccc.death_age.short;%end;)%end;
       %and;
       %and;
       %and;%apply;age_marker("age_at_child_death")
@@ -220,6 +229,14 @@
             title="%if;(e.allevt!="on")[*visualize/show/hide/summary]1%else;%nn;
               [*visualize/show/hide/summary]2%end; [event/events]1 [parents] & [siblings]">
             <i class="fa fa-graduation-cap fa-fw"></i>
+          </a>
+        </div>
+        <div class="ml-1">
+          <a href="%if;(e.ageymd!="on")%url_set.ageymd.on;%else;%url_set.ageymd;%end;"
+            class="btn btn-outline-primary btn-sm border-0 px-0%if;(e.ageymd!="on") text-muted%end;" role="button"
+            title="%if;(e.ageymd!="on")[*visualize/show/hide/summary]1%else;%nn;
+              [*visualize/show/hide/summary]2%end; [year/month/day]0/[year/month/day]1/[year/month/day]2">
+            <i class="fa fa-hourglass-half fa-fw"></i>
           </a>
         </div>
       </div>
@@ -336,7 +353,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("father.death_date")
         %and;%count2;
         %and;%if;(father.death_date!="")%father.death_date;%else;([missing date]0)%end;%nn;
-        %and;%apply;a_of_b%with;[death]%and;[father/mother]0%end; %apply;short_display_person("father")%if;(father.computable_death_age)%sp;(%father.death_age.short;)%end;
+        %and;%apply;a_of_b%with;[death]%and;[father/mother]0%end; %apply;short_display_person("father")%if;(father.computable_death_age)%sp;(%if;(e.ageymd="on")%if;(father.death_age.years<10)0%end;%father.death_age.years; <span class="text-muted">|</span> %if;(father.death_age.months<10)0%end;%father.death_age.months; <span class="text-muted">|</span> %if;(father.death_age.days<10)0%end;%father.death_age.days;%else;%father.death_age.short;%end;)%end;
         %and;
         %and;
         %and;%apply;age_marker("age_at_father_death")
@@ -346,7 +363,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("mother.death_date")
         %and;%count2;
         %and;%if;(mother.death_date!="")%mother.death_date;%else;([missing date]0)%end;
-        %and;%apply;a_of_b%with;[death]%and;[father/mother]1%end; %apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age.short;)%end;
+        %and;%apply;a_of_b%with;[death]%and;[father/mother]1%end; %apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%if;(e.ageymd="on")%if;(mother.death_age.years<10)0%end;%mother.death_age.years; <span class="text-muted">|</span> %if;(mother.death_age.months<10)0%end;%mother.death_age.months; <span class="text-muted">|</span> %if;(mother.death_age.days<10)0%end;%mother.death_age.days;%else;%mother.death_age.short;%end;)%end;
         %and;
         %and;
         %and;%apply;age_marker("age_at_mother_death")
@@ -370,7 +387,7 @@
         %apply;add_in_sorted_list%with;%apply;sort_key("spouse.death_date")
           %and;%count2;
           %and;%if;(spouse.death_date!="")%spouse.death_date;%else;([missing date]0)%end;%nn;
-          %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end; %apply;short_display_person("spouse")%if;(spouse.computable_death_age)%sp;(%spouse.death_age.short;)%end;%nn;
+          %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end; %apply;short_display_person("spouse")%if;(spouse.computable_death_age)%sp;(%if;(e.ageymd="on")%if;(spouse.death_age.years<10)0%end;%spouse.death_age.years; <span class="text-muted">|</span> %if;(spouse.death_age.months<10)0%end;%spouse.death_age.months; <span class="text-muted">|</span> %if;(spouse.death_age.days<10)0%end;%spouse.death_age.days;%else;%spouse.death_age.short;%end;)%end;%nn;
           %and;%nn;
           %and;%nn;
           %and;%apply;age_marker("age_at_spouse_death")
@@ -386,9 +403,13 @@
     <tbody> 
       <thead>
         %(<td> </td>%)
-        <td class="text-right">[*date/dates]0</td>
-        <td>[*age]</td>
-        <td> </td>
+        <td class="text-right">[*event/events]0 [*date/dates]0</td>
+        %if;(e.ageymd="on")
+          <td class="text-center" style="font-variant-numeric:tabular-nums">YY <span class="text-muted">|</span> MM <span class="text-muted">|</span> DD</td>
+        %else;
+          <td>YY</td>
+        %end;
+        <td>[*event/events]0</td>
       </thead>
       %foreach;sorted_list_item;
         <tr class="align-top%if;(item.4="self_evt") bg-light
