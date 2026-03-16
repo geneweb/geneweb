@@ -86,6 +86,11 @@ val groupby :
     Ordering of elements is unspecified.
  *)
 
+val fold_right : ('a -> 'b -> 'b) -> 'a list -> 'b -> 'b
+(** [fold_right f l acc]
+    Tail recursive fold_right, with the added cost of a new list allocation and double traversal.
+ *)
+
 module Infix : sig
   val ( @?: ) : 'a option -> 'a list -> 'a list
   (** [ x @?: xs] is [cons_opt x xs].  *)
