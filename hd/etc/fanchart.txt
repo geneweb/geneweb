@@ -129,8 +129,8 @@
 <div class="fanchart-controls" id="fanchart-controls">
   <div class="control-section">
     <div class="btn-group-fanchart">
-      <button id="b-home" class="btn-fanchart" title="[*home]">
-        <i class="fa fa-house fa-fw"></i>
+      <button id="b-home" class="btn-fanchart" title="%first_name; %surname;">
+        <i class="fa fa-user fa-fw %sexcolor;"></i>
       </button>
       <button id="b-help" class="btn-fanchart" title="[*help and shortcuts]">
         <i class="fa fa-info fa-fw"></i>
@@ -301,6 +301,7 @@
 
 <script>
 var link_to_person = "%prefix;";
+var link_to_person_page = "%prefix;%access;";
 var max_gen = %e.v;;
 var tool = "%e.tool;";
 var implexMode = "%e.implex;" === "num" ? "numbered" :

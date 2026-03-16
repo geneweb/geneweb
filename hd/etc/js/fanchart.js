@@ -2850,20 +2850,16 @@ const SVGRenderer = {
       UIManager.toggleSort();
       return;
     }
-    // Pour la navigation vers les fiches, exiger Ctrl/Cmd
-    if (!e.ctrlKey && !e.metaKey) {
-      // Pas de navigation sans modificateur
-      return;
-    }
     if (!link_to_person) {
       alert("Erreur: Impossible d'accéder à la fiche individuelle");
       return;
     }
+    const useNewTab = e.ctrlKey || e.metaKey;
     const li = e.target.closest('li[data-location]');
 
     // Clic sur une personne (secteur du fanchart)
     if (person && person.fnk && person.snk) {
-      URLManager.navigateToPerson(person, true, false);
+      URLManager.navigateToPerson(person, useNewTab, false);
       return;
     }
 
@@ -5302,7 +5298,7 @@ reRenderWithCurrentGenerations: function() {
       }
     };
     $("b-home").onclick = () => {
-      window.location = link_to_person;
+      window.location = link_to_person_page || link_to_person;
     };
     $("b-rng").onclick = function() {
       const url = this.getAttribute("data-url");
