@@ -563,6 +563,14 @@ end = struct
     | `Surname -> integrity.surname = Some current_integrity_code
     | `First_name -> integrity.firstname = Some current_integrity_code
 
+  let is_integrity_empty kind integrity =
+    let integrity_kind =
+      match kind with
+      | `Surname -> integrity.surname
+      | `First_name -> integrity.firstname
+    in
+    integrity_kind = None
+
   let string_of_integrity integrity =
     Printf.sprintf "%s\n%s\n"
       (Option.value ~default:"" integrity.firstname)
@@ -623,7 +631,8 @@ end = struct
       is_ok
     in
     let index_integrity = read_index_integrity base in
-    integrity_matches kind index_integrity || check ()
+    integrity_matches kind index_integrity
+    || (is_integrity_empty kind index_integrity && check ())
 
   let has_index_integrity_file base =
     Sys.file_exists
