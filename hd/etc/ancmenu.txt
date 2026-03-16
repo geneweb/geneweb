@@ -248,10 +248,6 @@ function missing_events_options () {
               <label class="custom-control-label" for="boa_comm">[*marriage notes/marriages notes]0</label>
             </div>
             <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="boa_asc" name="asc">
-              <label class="custom-control-label" for="boa_asc">[*ascendants tree]</label>
-            </div>
-            <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="boa_src" name="src">
               <label class="custom-control-label" for="boa_src">[*source/sources]1</label>
             </div>
