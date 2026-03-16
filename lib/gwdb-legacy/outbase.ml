@@ -524,6 +524,8 @@ let update_modification_times ~base ~(kind : [< `First_name | `Surname ])
           (List.map (Filename.concat base.data.bdir) first_name_index_files)
 
 module Integrity : sig
+  type integrity
+
   val check_index_integrity :
     kind:[< `Surname | `First_name ] ->
     base:Dbdisk.dsk_base ->
@@ -533,6 +535,8 @@ module Integrity : sig
   val write_index_integrity :
     kind:[< `Surname | `First_name | `All ] -> base:Dbdisk.dsk_base -> unit
 
+  val read_index_integrity : Dbdisk.dsk_base -> integrity
+  val integrity_matches : [< `Surname | `First_name ] -> integrity -> bool
   val has_index_integrity_file : Dbdisk.dsk_base -> bool
 end = struct
   let index_integrity_fname = "index_integrity"
@@ -649,20 +653,22 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
       in
       let surname_already_initialized =
         are_already_initialized base surname_index_files
-        && Integrity.check_index_integrity ~kind ~base
-             ~index_file:Database.lowercase_surname_index_file
       in
       let first_name_already_initialized =
         are_already_initialized base first_name_index_files
-        && Integrity.check_index_integrity ~kind ~base
-             ~index_file:Database.lowercase_first_name_index_file
       in
       let generate_index, already_initialized =
         match kind with
         | `First_name ->
-            (generate_lowercase_first_name_index, first_name_already_initialized)
+            ( generate_lowercase_first_name_index,
+              first_name_already_initialized
+              && Integrity.check_index_integrity ~kind ~base
+                   ~index_file:Database.lowercase_first_name_index_file )
         | `Surname ->
-            (generate_lowercase_surname_index, surname_already_initialized)
+            ( generate_lowercase_surname_index,
+              surname_already_initialized
+              && Integrity.check_index_integrity ~kind ~base
+                   ~index_file:Database.lowercase_surname_index_file )
       in
       if not already_initialized then (
         base.Dbdisk.func.cleanup ();
@@ -684,8 +690,12 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
         Integrity.write_index_integrity ~kind ~base;
         base)
       else (
-        if not (Integrity.has_index_integrity_file base) then
-          Integrity.write_index_integrity ~kind ~base;
+        if
+          not
+            (Integrity.has_index_integrity_file base
+            && Integrity.integrity_matches kind
+                 (Integrity.read_index_integrity base))
+        then Integrity.write_index_integrity ~kind ~base;
         base))
 
 let output ?(save_mem = false) ?(tasks = []) base =
