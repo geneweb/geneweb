@@ -123,6 +123,10 @@ The /Applications/geneweb.app should be kept up to date with the latest changes.
 
 Always record a complete transcript of each session in separate files by date; tell me where they are to be found
 
+### Coding principles
+
+- **Never hardcode English strings** in templates or source code. Always use the GeneWeb lexicon (`hd/lang/lexicon.txt`) for user-visible text. Hardcoded strings create localization debt and will block upstream PRs. If the needed lexicon entry doesn't exist, either propose adding it to the lexicon or defer the change.
+
 ### Build and test workflow
 
 1. **Edit source** in `/Users/nspies/geneweb/` (git repo)
