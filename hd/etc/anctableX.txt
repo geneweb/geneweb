@@ -1,5 +1,5 @@
-<!-- $Id: anctableX.txt v7.1 14/03/2026 14:09:08 -->
-%( m=A&t=Y ancestor table by couple t=Y + &t=X and table upto an ancestor %)
+<!-- $Id: ancsosa > anctableX.txt v7.1 14/03/2026 14:09:08 -->
+%( m=A ancestor table by couple t=Y + &t=X and table upto an ancestor %)
 %define;link_parents()
   %if;(e.only!="on" and ancestor.father_sosa!="" and level<=l_v)
     %if;not cancel_links;<a href="#i%ancestor.father_sosa;"
@@ -7,8 +7,8 @@
       <strong>%ancestor.anc_sosa;</strong>
     %if;not cancel_links;</a>%end;
   %elseif;(wizard and not ancestor.has_parents and ancestor.first_name!="?" and ancestor.surname!="?")
-    %if;not cancel_links;<a class="text-danger" href="#mi%ancestor.index;"
-       onclick="window.open('%prefix;m=ADD_PAR&ip=%ancestor.index;');" %ltap;>%end;
+    %if;not cancel_links;<a class="text-danger" href="#mi%ancestor.index;" title="[*add::parents]"
+      onclick="window.open('%prefix;m=ADD_PAR&ip=%ancestor.index;');">%end;
       <strong>%ancestor.anc_sosa;</strong>
     %if;not cancel_links;</a>%end;
   %else;<strong>%ancestor.anc_sosa;</strong>
@@ -85,14 +85,14 @@
 
 %define;imgtdz(xx)
   %if;(e.im!=0 and e.image!="off" and xx.has_image)
-    <img class="imgtdz img-fluid w-50" src="%xx.image_url;" %lai; title="%xx;">%nn;
+    <img class="imgtdz img-fluid w-50" src="%xx.image_url;" alt="[image/images]0" title="%xx;">%nn;
   %end;
 %end;
 
 %define;link_dates(xx)
   %sp;
   %if;(wizard and not cancel_links)
-    <a id="mi%xx.index;" class="date table_big_anchor" href="#mi%xx.index;" %ltmp;
+    <a id="mi%xx.index;" class="date table_big_anchor" href="#mi%xx.index;" title="[*modify::person/persons]0" title="[*modify::person/persons]0"
        onclick="window.open('%prefix;m=MOD_IND&i=%xx.index;');" aria-labelledby="individual-form">%nn;
   %end;
   %if;(e.hl=1 and ((xx.has_birth_date and (xx.birth_date.prec!="" or xx.birth_date.day="" or xx.birth_date.month=""))
