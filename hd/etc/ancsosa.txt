@@ -999,7 +999,7 @@
         %end;
       </div>
       %if;(e.im="" and ancestor.has_image)
-        %if;not cancel_links;<a href="%ancestor.image_url;" target="_blank" title="TEST">%end;
+        %if;not cancel_links;<a href="%ancestor.image_url;" target="_blank" title="%ancestor;">%end;
           <img src="%ancestor.image_url;" class="rounded align-self-center ml-1 table-img-max-width"
             height="%if;(e.px!="")%e.px;%else;60%end;" alt="%ancestor;">
         %if;not cancel_links;</a>%end;

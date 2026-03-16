@@ -117,7 +117,7 @@
             %if;(e.tt=1 and xxx.title!=""), %xxx.title;%end;
           </div>
           %if;(e.im="" and xxx.has_image)
-            %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="TEST">%end;
+            %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="%xxx;">%end;
             <img src="%xxx.image_url;" class="rounded align-self-center ml-1 table-img-max-width"
              height="%if;(e.px!="")%e.px;%else;60%end;" alt="xxx">
             %if;not cancel_links;</a>%end;
@@ -146,7 +146,7 @@
         %apply;add_in_sorted_listc(xxx.index)
         <div class="d-flex justify-content-between">
           %if;(e.im="" and xxx.has_image)
-            %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="TEST">%end;
+            %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="%xxx;">%end;
             <img src="%xxx.image_url;" class="rounded align-self-center table-img-max-width"
              height="%if;(e.px!="")%e.px;%else;60%end;" alt="xxx">
             %if;not cancel_links;</a>%end;
