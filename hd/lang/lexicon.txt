@@ -15623,7 +15623,7 @@ tr: aynı adı taşıyan kişiler
 
     phonetic variants
 de: Phonetische Varianten
-en: phonétic variants
+en: phonetic variants
 fr: variantes phonétiques
 
     disordered firstnames
