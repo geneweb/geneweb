@@ -27,7 +27,7 @@
 %end;
 %define;addgraph(xxx)[*add/clear/show/edit the graph:::xxx]0%end;
 %if;(not cancel_links)
-  <nav class="navbar navbar-light justify-content-center navbar-expand-md pt-0 px-0%sp;
+  <nav class="navbar navbar-light justify-content-center navbar-expand-md pt-0 px-0 sticky-top bg-white%sp;
     %if;("MOD" in e.m or (e.ip!="" and "ADD" in e.m))mt-5%else;mt-1 mt-md-0%end;">
     <div class="btn-toolbar" role="toolbar">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
