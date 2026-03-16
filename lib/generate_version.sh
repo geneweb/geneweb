@@ -13,7 +13,7 @@ patch_file () {
 
 VER_SHORT=$(sed -n 's/^let ver = "\(.*\)"$/\1/p' "$FILE")
 VER=$(git describe --always --dirty --abbrev=7 2>/dev/null | sed 's/^v//' || echo "")
-SOURCE=$(git remote get-url origin 2>/dev/null | sed -n 's|^.*github.com[:/]\([^/]\+/[^/.]\+\)\(\.git\)\?$|\1|p' || echo "")
+SOURCE="geneweb/geneweb"
 BRANCH=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git branch -r --contains HEAD 2>/dev/null | head -n1 | tr -d ' ' || echo "")
 COMMIT_ID=$(git rev-parse --short HEAD 2>/dev/null || echo "")
 COMMIT_DATE=$(git show -s --date=short --pretty=format:'%cd' 2>/dev/null || echo "")
