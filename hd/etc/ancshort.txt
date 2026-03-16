@@ -1,0 +1,72 @@
+%( &t=N, ancestor short display included in ancsosa.txt %)
+%if;(e.only="on" or v0=e_v)
+  %reset_count;
+  %foreach;ancestor_at_level;
+    %if;(e_v>=0 and level=e_v)
+      <ul class="mb-2">%nl;
+        %foreach;ancestor;
+          %if;(ancestor.first_name!="?" and ancestor.surname!="?")
+            <li>%sp;
+              %if;(ancestor.interval!="")%ancestor.interval;
+              %else;
+                %if;(ancestor.same="")%incr_count;%end;
+                %ancestor.anc_sosa;%sp;
+                %if;(ancestor.same!="")=&gt;%else;-%end;%sp;
+                %apply;link%with;%ancestor.access;%and;
+                  %if;(ancestor.same!="")%ancestor.same;
+                  %else;%ancestor;%end;
+                  %and;%ancestor.index;
+                %end;
+                %if;(ancestor.same="")%ancestor.title;%ancestor.dates;
+                %else;
+                  %sp;(<a href="#i%ancestor.index;" title="[implex/implexes]0, [see above]">↑</a>)
+                %end;
+              %end;
+            </li>%nl;
+          %end;
+        %end;
+      </ul>
+    %end;
+  %end;
+%else;
+  %let;nb_gen;%apply;min(e_v, max_anc_level)%in;
+  %reset_count;
+  %foreach;ancestor_level(nb_gen)
+    %if;(level>=v0)
+      %apply;lazy_print%with;
+        %nl;%if;(level!=0)<div%if;not cancel_links; class="ml-2"%end;><b>[*generation/generations]0 %level;</b></div>%nl;%end;
+        <ul class="mb-2">%nl;
+      %end;
+      %foreach;ancestor;
+        %lazy_force;
+        %if;(ancestor.first_name!="?" and ancestor.surname!="?")
+          %if;(level!=0 and ancestor.same="")%incr_count;%end;
+          <li class="%if;ancestor.has_parents;goway%else;noway%end;">%nn;
+            %if;(e.sosab=16)%ancestor.anc_sosa.hexa;
+            %elseif;(e.sosab=8)%ancestor.anc_sosa.octal;
+            %else;%ancestor.anc_sosa;
+            %end;%sp;
+            %if;(ancestor.same!="")=&gt;%else;-%end;%sp;
+            %apply;link%with;%ancestor.access;%and;
+               %if;(ancestor.same!="")%nn;
+                 %if;(e.sosab=16)%ancestor.same.hexa;
+                 %elseif;(e.sosab=8)%ancestor.same.octal;
+                 %else;%ancestor.same;
+                 %end;
+               %else;%ancestor;
+               %end;%and;%ancestor.index;
+            %end;
+            %if;(ancestor.same!="")
+              %sp;(<a href="#i%ancestor.index;" title="[implex/implexes]0, [see above]">↑</a>)<br>
+            %end;
+            %if;(ancestor.same="")%ancestor.title;%ancestor.dates;%end;
+          </li>%nl;
+        %end;
+      %end;
+      %if;lazy_printed;
+        </ul>
+      %end;
+    %end;
+  %end;
+%end;
+<div class="ml-2">[*total][:] [him/her]s + %count; [ancestor/ancestors]n.</div>

@@ -1,7 +1,19 @@
 <!-- $Id: anctable.txt v7.1 14/03/2026 12:04:23 $ -->
 %( table_utils mutualize asc./desc. tables headers and common functions %)
 %include;table_utils
-
+%define;implex()
+  %if;(e.num!="on")<br>%end;
+  %if;(not cancel_links)
+    <a class="text-center" href="%prefix;em=R&ei=%index;&i=%ancestor.index;&et=M"
+      title="%ancestor; ([implex/implexes]0)[:] [relationship link between] %self;">%nn;
+  %end;==%nn;
+  %if;(not cancel_links)</a>%end;
+  %if;(e.num="on")<br>%else;%sp;%end;
+  <span%if;(not ancestor.has_parents) class="text-danger"%end;>%if;(e.sosab=16)%ancestor.same.hexa;
+  %elseif;(e.sosab=8)%ancestor.same.octal;
+  %else;%ancestor.same;
+  %end;</span>
+%end;
 %define;table_row()
   %lazy_force;
   %if;(level!=0 and ancestor.same="" and (ancestor.first_name!="?" and ancestor.surname!="?"))%incr_count;%end;
