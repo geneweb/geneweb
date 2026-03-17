@@ -1479,8 +1479,13 @@ let log conf from gauth request script_name contents =
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   if not (should_log_request contents referer user_agent) then ()
   else
+    let pp_pid ppf pid =
+      if conf.predictable_mode then Fmt.pf ppf "UNPREDICTABLE"
+      else Fmt.int ppf pid
+    in
     Log.info (fun k ->
-        k ~tags:timestamp "(%d) %s?%s\n%s%s%s%s%s" (Unix.getpid ()) script_name
+        k ~tags:timestamp "(PID: %a) %s?%s\n%s%s%s%s%s" pp_pid (Unix.getpid ())
+          script_name
           (if (not conf.debug) && String.length contents > 200 then
              Printf.sprintf "%s..." (String.sub contents 0 200)
            else contents)
