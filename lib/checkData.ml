@@ -88,6 +88,28 @@ let split_words s =
   in
   List.rev (collect_words [] 0 0)
 
+let place_suburb_sep_range s =
+  let len = String.length s in
+  if len > 0 && s.[0] = '[' then
+    match String.index_opt s ']' with
+    | Some i ->
+        let rec find_end j =
+          if j >= len then j
+          else
+            let c = Char.code s.[j] in
+            if c = 0x20 || c = 0x2D then find_end (j + 1)
+            else if
+              c = 0xE2
+              && j + 2 < len
+              && Char.code s.[j + 1] = 0x80
+              && (Char.code s.[j + 2] = 0x93 || Char.code s.[j + 2] = 0x94)
+            then find_end (j + 3)
+            else j
+        in
+        Some (i, find_end (i + 1))
+    | None -> None
+  else None
+
 (* Detect if a word is a Roman numeral with various notations:
    - Basic roman numerals: I, II, III, IV, V, etc.
    - French ordinals: Ier, Ire
@@ -539,10 +561,21 @@ let compiled_misc_errors_by_dict =
 
 let has_misc_typographic_errors dict_type s =
   let re = List.assoc dict_type (Lazy.force compiled_misc_errors_by_dict) in
-  try
-    ignore (Re.exec re s);
-    true
-  with Not_found -> false
+  let check str =
+    try
+      ignore (Re.exec re str);
+      true
+    with Not_found -> false
+  in
+  match dict_type with
+  | Places -> (
+      match place_suburb_sep_range s with
+      | Some (brk, main_s) ->
+          let sub = String.sub s 1 (brk - 1) in
+          let main = String.sub s main_s (String.length s - main_s) in
+          check sub || check main
+      | None -> check s)
+  | _ -> check s
 
 let find_misc_typographic_positions dict_type s conf =
   let replacements = get_applicable_replacements dict_type in
@@ -596,9 +629,16 @@ let find_misc_typographic_positions dict_type s conf =
       "chk_data ponctuation error breton trigram help" add_range_pos found_match;
     pos := match !found_match with Some p -> p | None -> !pos + 1
   done;
-  List.rev !errors
+  let errors = List.rev !errors in
+  match dict_type with
+  | Places -> (
+      match place_suburb_sep_range s with
+      | Some (sep_s, sep_e) ->
+          List.filter (fun e -> e.pos < sep_s || e.pos >= sep_e) errors
+      | None -> errors)
+  | _ -> errors
 
-let fix_misc_typographic_errors dict_type s =
+let apply_misc_fixes dict_type s =
   let replacements = get_applicable_replacements dict_type in
   let s =
     List.fold_left
@@ -613,6 +653,21 @@ let fix_misc_typographic_errors dict_type s =
       let c = Re.Group.get groups 1 in
       let h = Re.Group.get groups 2 in
       c ^ "ʼ" ^ h)
+
+let fix_misc_typographic_errors dict_type s =
+  match dict_type with
+  | Places -> (
+      match place_suburb_sep_range s with
+      | Some (brk, main_s) ->
+          let sub = String.sub s 1 (brk - 1) in
+          let sep = String.sub s brk (main_s - brk) in
+          let main = String.sub s main_s (String.length s - main_s) in
+          "["
+          ^ apply_misc_fixes dict_type sub
+          ^ sep
+          ^ apply_misc_fixes dict_type main
+      | None -> apply_misc_fixes dict_type s)
+  | _ -> apply_misc_fixes dict_type s
 
 (* Détermine si un caractère est latin, grec ou cyrillique *)
 let script_cache = Hashtbl.create 256
