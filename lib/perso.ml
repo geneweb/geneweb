@@ -68,13 +68,10 @@ let format_age_ymd age =
     | After -> ">"
     | OrYear _ | YearInt _ -> ""
   in
-  let parts =
-    (if y > 0 then [ string_of_int y ^ "y" ] else [])
-    @ (if m > 0 then [ string_of_int m ^ "m" ] else [])
-    @ if d > 0 then [ string_of_int d ^ "d" ] else []
+  let formatted =
+    Printf.sprintf "%s%d | %02d | %02d" prec_str y m d
   in
-  let formatted = if parts = [] then "0d" else String.concat ", " parts in
-  Adef.safe (if prec_str = "" then formatted else prec_str ^ " " ^ formatted)
+  Adef.safe formatted
 
 let eval_age_field_var conf ?(before_birth = false) age = function
   | [ "years" ] -> Templ.VVstring (string_of_int age.Adef.year)
@@ -117,14 +114,7 @@ let eval_age_field_var conf ?(before_birth = false) age = function
         | After -> ">"
         | OrYear _ | YearInt _ -> ""
       in
-      let parts =
-        (if y > 0 then [ string_of_int y ^ "y" ] else [])
-        @ (if m > 0 then [ string_of_int m ^ "m" ] else [])
-        @ if d > 0 then [ string_of_int d ^ "d" ] else []
-      in
-      let formatted = if parts = [] then "0d" else String.concat ", " parts in
-      Templ.VVstring
-        (if prec_str = "" then formatted else prec_str ^ " " ^ formatted)
+      Templ.VVstring (Printf.sprintf "%s%d | %02d | %02d" prec_str y m d)
   | [ "prec" ] -> (
       match age.prec with
       | Sure -> Templ.VVstring ""

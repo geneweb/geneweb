@@ -212,7 +212,7 @@
               %if;(e.m!="ADD_FAM" and e.m!="MOD_FAM" and e.m!="MOD_IND" and e.m!="R" and e.m!="U")
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
-                <a class="dropdown-item" id="showages-toggle" href="%if;(evar.showages="on")%url_set.showages.off;%else;%url_set.showages.on;%end;"><i class="fa fa-hourglass-half fa-fw mr-2%if;(evar.showages="on") text-primary%end;"></i>%if;(evar.showages="on")Hide ages (y, m, d)%else;Show ages (y, m, d)%end;</a>%nn;
+                <a class="dropdown-item" id="showages-toggle" href="%if;(evar.showages="on")%url_set.showages.off;%else;%url_set.showages.on;%end;" title="[*show ages at marriages, births, divorces]"><i class="fa fa-hourglass-half fa-fw mr-2%if;(evar.showages="on") text-primary%end;"></i>%if;(evar.showages="on")[show/hide ages at events]1%else;[show/hide ages at events]0%end;</a>%nn;
                 <script>
                 (function(){
                   var sa=new URLSearchParams(location.search).get('showages');

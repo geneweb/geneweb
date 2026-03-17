@@ -8946,6 +8946,26 @@ de: mit Orten
 en: with places
 fr: avec lieux
 
+    show/hide ages at events
+de: Alter bei Ereignissen anzeigen/Alter bei Ereignissen ausblenden
+en: show ages at events/hide ages at events
+fr: afficher les âges aux événements/masquer les âges aux événements
+
+    show ages at marriages, births, divorces
+de: Alter bei Hochzeiten, Geburten und Scheidungen anzeigen
+en: show ages at marriages, births, divorces
+fr: afficher les âges aux mariages, naissances, divorces
+
+    when %s was
+de: als %s war
+en: when %s was
+fr: quand %s avait
+
+    ages unknown
+de: Alter unbekannt
+en: ages unknown
+fr: âges inconnus
+
     father-in-law/mother-in-law
 af: skoonpa/skoonma
 br: tad-kaer/vamm-gaer
