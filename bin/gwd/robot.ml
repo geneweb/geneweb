@@ -141,10 +141,8 @@ let robot_excl () =
 
 let min_disp_req = ref 6
 
-let log_summary tm xcl nconn =
-  let local_tm = Unix.localtime tm in
-  Log.info (fun k ->
-      k "%s === ROBOT SUMMARY ===" (Mutil.sprintf_date local_tm :> string));
+let log_summary xcl nconn =
+  Log.info (fun k -> k "=== ROBOT SUMMARY ===");
   Log.info (fun k ->
       k "  Blocked IPs: %d, Monitored: %d" (List.length xcl.excl) nconn);
   Log.info (fun k ->
@@ -239,7 +237,7 @@ let check tm from max_call sec conf suicide =
         let four_hours = 4.0 *. 3600.0 in
         if tm -. xcl.last_summary > four_hours then (
           xcl.last_summary <- tm;
-          log_summary tm xcl nconn);
+          log_summary xcl nconn);
         refused
   in
   (match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with

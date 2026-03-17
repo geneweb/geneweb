@@ -146,8 +146,8 @@ let script conf (q : Adef.encoded_string) : Adef.safe_string =
     let fpath = if conf.cgi then file else Util.resolve_asset_file conf file in
     let src =
       match Util.hash_file_cached fpath with
-      | Some h -> file ^ "?hash=" ^ h
-      | None -> file
+      | Some h when not conf.predictable_mode -> file ^ "?hash=" ^ h
+      | Some _ | None -> file
     in
     Adef.safe
       (Printf.sprintf
