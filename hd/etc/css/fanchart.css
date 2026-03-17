@@ -89,12 +89,30 @@ svg {
   font-size: 0.95rem;
 }
 
+.btn-restore-controls {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 1000;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #999;
+  line-height: 1;
+}
+
+.btn-restore-controls:hover {
+  color: #ccc;
+}
+
 .control-section {
   margin-bottom: 8px;
 }
 
 .section-title {
-  font-size: 0.4rem;
+  font-size: 0.65rem;
   font-weight: 500;
   color: #6c757d;
   text-transform: uppercase;
@@ -104,8 +122,8 @@ svg {
 
 /* Boutons de contrôle */
 .btn-fanchart {
-  padding: 3px 6px;
-  border-radius: 4px;
+  padding: 6px 10px;
+  border-radius: 5px;
   border: 1px solid #dee2e6;
   background: white;
   color: #495057;

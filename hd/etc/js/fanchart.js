@@ -45,10 +45,7 @@ const Events = {
   findByClass: (cssClass) => EVENT_CONFIG.eventOrder.find(type => Events.cssClass(type) === cssClass),
   findBySvgPrefix: (prefix) => EVENT_CONFIG.eventOrder.find(type => Events.svgPrefix(type) === prefix),
   isValid: (type) => EVENT_CONFIG.eventOrder.includes(type),
-  translate: (type, count = 1) => {
-    const translationKey = count > 1 ? type + 's' : type;
-    return window.FC_TRANSLATIONS?.[translationKey] || type;
-  }
+  translate: (type, count = 1) => t(count > 1 ? type + 's' : type)
 };
 
 // ====== Configuration =======
@@ -56,7 +53,7 @@ const CONFIG = {
   security: 0.95,
   zoom_factor: 1.12,
   default_angle: 220,
-  available_angles: [180, 220, 359],
+  available_angles: [180, 220],
   a_r: [56, 56, 54, 54, 70, 72, 100, 150, 130, 90],
   a_m: ["S1", "C3", "C2", "C1", "R4", "R3", "R2", "R1", "R1", "R1"],
   text_mode_factors: { "C3": 1.10, "C2": 1.05 }, // Mode circulaire (parents/grand-parents)
@@ -234,7 +231,7 @@ const LayoutCalculator = {
 // ========== URLManager centralisé ==========
 const URLManager = {
   config: {
-    basePerson: link_to_person, // URL de base
+    basePerson: base_url, // URL de base
     defaultParams: { module: 'A', template: 'FC' }, // Paramètres par défaut
     specialParams: { place: { module: 'MOD_DATA', data: 'place' } } // Paramètres spéciaux
   },
@@ -937,7 +934,7 @@ const PlacesInterface = {
             <div class="place-events">
               ${this.generateEventItemsHTML(placeData)}
             </div>
-            <div class="place-count">${placeData.cnt || 0}</div>
+            <div class="place-count" title="${(placeData.cnt || 0)} ${(placeData.cnt || 0) > 1 ? t('events_for_place') : t('event_for_place')}">${placeData.cnt || 0}</div>
           </div>
         </div>
       </div>
@@ -1101,7 +1098,7 @@ const PlacesInterface = {
       </div>
       <div class="place-right">
         <div class="place-events">${eventItemsHTML}</div>
-        <div class="place-count">${placeData.cnt || 0}</div>
+        <div class="place-count" title="${(placeData.cnt || 0)} ${(placeData.cnt || 0) > 1 ? t('events_for_place') : t('event_for_place')}">${placeData.cnt || 0}</div>
       </div>
     `;
   },
@@ -1137,18 +1134,15 @@ const PlacesInterface = {
    * Mise à jour du résumé et support du survol des totaux
    */
   updateSummarySection: function() {
-    // Générations
     const genElement = this.cache.elements.panel.querySelector('.generation-count');
     if (genElement) {
-      const genLabel = window.FC_TRANSLATIONS?.[max_gen > 1 ? 'generations' : 'generation'] || 'génération';
+      const genLabel = t(max_gen > 1 ? 'generations' : 'generation');
       genElement.textContent = `${max_gen} ${genLabel}`;
     }
 
-    // Lieux
     const placeCount = Object.keys(lieux).length;
-    const placeLabel = window.FC_TRANSLATIONS?.[placeCount > 1 ? 'places' : 'place'] || 'lieu';
+    const placeLabel = t(placeCount > 1 ? 'places' : 'place');
     this.cache.elements.summaryPlaces.textContent = `${placeCount} ${placeLabel}`;
-
     // Statistiques par événement
     const stats = LocationDataBuilder.getEventStatistics();
 
@@ -1197,8 +1191,8 @@ const PlacesInterface = {
     });
 
     personsElement.textContent = personsWithPlaces;
-    const label = window.FC_TRANSLATIONS?.[personsWithPlaces > 1 ? 'persons' : 'person'] || 'personne';
-    personsElement.title = `${personsWithPlaces} ${label} avec lieux`;
+    const label = t(personsWithPlaces > 1 ? 'persons' : 'person');
+    personsElement.title = `${personsWithPlaces} ${label} ${t('with_places')}`;
   },
 
  /**
@@ -1424,8 +1418,8 @@ const PlacesPanelControls = {
 
     const button = document.querySelector('.sort-toggle');
     if (button) {
-      const key = sortMode === 'alphabetical' ? 'sort_alphabetically' : 'sort_by_frequency';
-      button.title = window.FC_TRANSLATIONS?.[key] || 'Changer le tri';
+      button.title = t(sortMode === 'alphabetical'
+        ? 'sort_alphabetically' : 'sort_by_frequency');
     }
   },
 
@@ -1443,6 +1437,12 @@ const PlacesPanelControls = {
       icon.className = panel.classList.contains('show-events')
         ? 'fas fa-lightbulb'
         : 'far fa-lightbulb';
+    }
+
+    // Update toggle button title
+    const btn = document.querySelector('.events-toggle');
+    if (btn) {
+      btn.title = showEvents ? t('hide_events') : t('show_events');
     }
 
     URLManager.updateCurrentURL();
@@ -2088,7 +2088,7 @@ const PlacesHighlighter = {
   highlightPersonSectorsByEvent: function(placesToHighlight, eventType) {
     // Validation du type d'événement
     if (!Events.isValid(eventType)) {
-      console.error(`PlacesHighlighter: Type d’événement invalide "${eventType}"`);
+      console.error(`PlacesHighlighter: Invalid event type "${eventType}"`);
       return;
     }
 
@@ -2377,7 +2377,7 @@ const CircularModeRenderer = {
         s1Text.setAttribute("fill", "#666");
         s1Text.textContent = "⬤"; // Point central discret
         const s1Title = svgEl("title");
-        s1Title.textContent = `${ancestor["S1"].fn} ${ancestor["S1"].sn} (enfant du couple)`;
+        s1Title.textContent = `${ancestor["S1"].fn} ${ancestor["S1"].sn} (${t('child_of_couple')})`;
         s1Text.appendChild(s1Title);
         centerGroup.appendChild(s1Text);
       }*/
@@ -2422,8 +2422,8 @@ const CircularModeRenderer = {
 
     const title = svgEl("title");
     title.textContent = person.has_parents
-      ? `Recentrer l’arbre sur ${person.fn} ${person.sn}`
-      : `${person.fn} ${person.sn} : aucun parent connu`;
+      ? `${t('recenter_tree_on')} ${person.fn} ${person.sn}`
+      : `${person.fn} ${person.sn} : ${t('no_known_parents')}`;
     text.appendChild(title);
 
     group.appendChild(text);
@@ -2626,10 +2626,6 @@ const SVGRenderer = {
     } else {
       circle.setAttribute("class", "link");
 
-      const title = svgEl("title");
-      title.textContent = `(Sosa 1) ${p.fn} ${p.sn} (${p.age_text})\nCtrl+clic pour la fiche individuelle`;
-      circle.appendChild(title);
-
       this.applyInteractiveFeatures(circle, p, 'person');
     }
 
@@ -2655,11 +2651,7 @@ const SVGRenderer = {
       // Version background - applique les classes CSS pour les lieux et âges
       this.applyBackgroundClasses(path, p, options.type);
     } else {
-      if (options.type === 'marriage' && !p.marriage_place) {
-        path.setAttribute("class", ""); // Secteur de mariage sans lieu
-      } else {
-        this.applyInteractiveFeatures(path, p, options.type);
-      }
+      this.applyInteractiveFeatures(path, p, options.type);
     }
 
     g.append(path);
@@ -2767,70 +2759,75 @@ const SVGRenderer = {
         }
         html += `</h2>`;
 
-      // Événements vitaux
+      // Vital events
       if (displayPerson.birth_date || displayPerson.birth_place) {
-        html += `<div><strong>Naissance :</strong> `;
+        html += `<div><strong>${t('birth')}${t('column')}</strong> `;
         if (displayPerson.birth_date) html += `${displayPerson.birth_date}`;
         if (displayPerson.birth_place) html += ` – ${displayPerson.birth_place}`;
         html += `</div>`;
       }
 
       if (displayPerson.baptism_date || displayPerson.baptism_place) {
-        html += `<div><strong>Baptême :</strong> `;
+        html += `<div><strong>${t('baptism')}${t('column')}</strong> `;
         if (displayPerson.baptism_date) html += `${displayPerson.baptism_date}`;
         if (displayPerson.baptism_place) html += ` – ${displayPerson.baptism_place}`;
         html += `</div>`;
       }
 
       if (displayPerson.death_date || displayPerson.death_place) {
-        html += `<div><strong>Décès :</strong> `;
+        html += `<div><strong>${t('death')}${t('column')}</strong> `;
         if (displayPerson.death_date) html += `${displayPerson.death_date}`;
         if (displayPerson.death_place) html += ` – ${displayPerson.death_place}`;
         html += `</div>`;
       }
 
       if (displayPerson.burial_date || displayPerson.burial_place) {
-        html += `<div><strong>Sépulture :</strong> `;
+        html += `<div><strong>${t('burial')}${t('column')}</strong> `;
         if (displayPerson.burial_date) html += `${displayPerson.burial_date}`;
         if (displayPerson.burial_place) html += ` – ${displayPerson.burial_place}`;
         html += `</div>`;
       }
 
       if (displayPerson.age_text) {
-        html += `<div><strong>Âge :</strong> ${displayPerson.age_text}</div>`;
+        html += `<div><strong>${t('age')}${t('column')}</strong> ${displayPerson.age_text}</div>`;
       }
 
-      // Notice d'implexe améliorée
+      // Implex notice
       if (isImplex) {
         const cloneCount = ImplexResolver.getAllClones(p.sosasame || currentSosa).length;
         html += `<div class="implex-notice">`;
-        html += `<strong>💡 Implexe :</strong> apparaît ${cloneCount + 1} fois.`;
+        html += `<strong>${t('implex')}${t('column')}</strong> ${t('appears')} ${cloneCount + 1} ${cloneCount + 1 > 1 ? t('times') : t('time')}.`;
         html += `</div>`;
       }
 
       panel.innerHTML = html;
 
     } else if (type === "marriage") {
-      // Code existant pour les mariages - copier depuis l'original
       const years = parseInt(p.marriage_length) || -1;
-      let html = `<h2>Mariage</h2>`;
+      let html = `<h2>${t('marriage')}</h2>`;
 
       const marriageDate = p.marriage_date_ || p.marriage_date;
-      if (marriageDate) {
-        html += `<div><strong>Date :</strong> ${marriageDate}</div>`;
-      }
+      const him = p.his_marriage_age || '?';
+      const her = p.her_marriage_age || '?';
+      const hasAges = him !== '?' || her !== '?';
+      const hasData = marriageDate || p.marriage_place || years >= 0 || hasAges;
 
-      if (p.marriage_place) {
-        html += `<div><strong>Lieu :</strong> ${p.marriage_place}</div>`;
-      }
-
-      if (years >= 0) {
-        const yearLabel = years === 1 ? "an" : "ans";
-        html += `<div><strong>Durée :</strong> ${years} ${yearLabel}</div>`;
-      }
-
-      if (p.marriage_age) {
-        html += `<div><strong>Âge au mariage :</strong> ${p.marriage_age} ans</div>`;
+      if (!hasData) {
+        html += `<div>${t('no_info_available')}</div>`;
+      } else {
+        if (marriageDate) {
+          html += `<div><strong>${t('date')}${t('column')}</strong> ${marriageDate}</div>`;
+        }
+        if (p.marriage_place) {
+          html += `<div><strong>${t('place')}${t('column')}</strong> ${p.marriage_place}</div>`;
+        }
+        if (hasAges) {
+          html += `<div><strong>${t('marriage_age')}${t('column')}</strong> ${him} | ${her} ${t('years_old')}</div>`;
+        }
+        if (years >= 0) {
+          const yearLabel = years === 1 ? t('marriage_year') : t('marriage_years');
+          html += `<div style="margin-top:4px;border-top:1px dotted #ddd;padding-top:4px"><strong>${t('duration')}${t('column')}</strong> ${years} ${yearLabel}</div>`;
+        }
       }
 
       panel.innerHTML = html;
@@ -2844,15 +2841,10 @@ const SVGRenderer = {
       UIManager.toggleSort();
       return;
     }
-    // Pour la navigation vers les fiches, exiger Ctrl/Cmd
     if (!e.ctrlKey && !e.metaKey) {
-      // Pas de navigation sans modificateur
       return;
     }
-    if (!link_to_person) {
-      alert("Erreur: Impossible d'accéder à la fiche individuelle");
-      return;
-    }
+    const useNewTab = e.ctrlKey || e.metaKey;
     const li = e.target.closest('li[data-location]');
 
     // Clic sur une personne (secteur du fanchart)
@@ -3138,7 +3130,7 @@ const SVGRenderer = {
       text.innerHTML = `<textPath xlink:href="#${pathId}" startOffset="50%" style="font-size:${fontSize}%;">&#x2716;</textPath>`;
     }
     const title = svgEl("title");
-    title.textContent = hasParents ? `Recentrer l’arbre sur ${p.fn} ${p.sn}` : `${p.fn} ${p.sn} : aucun parent connu`;
+    title.textContent = hasParents ? `${t('recenter_tree_on')} ${p.fn} ${p.sn}` : `${p.fn} ${p.sn} : ${t('no_known_parents')}`;
     text.appendChild(title);
     g.append(text);
     return text;
@@ -3451,18 +3443,16 @@ const UIManager = {
   addNavigationHelp: function() {
     var helpPanel = document.createElement('div');
     helpPanel.id = 'navigation-help';
-    helpPanel.style.display = 'none'; // Caché par défaut
+    helpPanel.style.display = 'none';
     helpPanel.innerHTML = `
-      <div class="help-title">💡 Aide Navigation</div>
-      <div><strong>Souris :</strong></div>
-      <div>– Glisser : déplacer l’arbre</div>
-      <div>– Molette : zoomer</div>
-      <div>– Survol : voir les détails</div>
-      <div><strong>Raccourcis :</strong></div>
-      <div>– <kbd>Ctrl</kbd>+clic : fiche individuelle</div>
-      <div>– ▲ : navigation sur ancêtre</div>
-      <div style="margin-top: 8px; text-align: center;">
-      </div>
+      <div class="help-title">${t('navigation_help')}</div>
+      <div>– ${t('help_drag')}</div>
+      <div>– ${t('help_wheel')}</div>
+      <div>– ${t('help_hover')}</div>
+      <div>– ${t('help_nav_ancestor')}</div>
+      <div>– ${t('help_right_drag')}</div>
+      <div>– ${t('help_click_lock')}</div>
+      <div>– Ctrl+${t('help_click_sheet')}</div>
     `;
     document.body.appendChild(helpPanel);
   },
@@ -3703,8 +3693,8 @@ const AgeHighlighter = {
 
     // D'abord, remettre toutes les catégories visibles
     const categoryTypes = [
-      { prefix: 'DA', title: 'Aucune personne dans cette tranche d’âge' },
-      { prefix: 'DAM', title: 'Aucun mariage dans cette tranche de durée' }
+      { prefix: 'DA', title: t('no_person_age_range') },
+      { prefix: 'DAM', title: t('no_marriage_duration_range') }
     ];
 
     categoryTypes.forEach(type => {
@@ -3822,7 +3812,7 @@ const AngleManager = {
   // Mettre à jour l'état visuel des boutons
   updateAngleButtons: function() {
     // Désactiver tous les boutons d'angle
-    [180, 220, 359, 360].forEach(angle => {
+    [180, 220, 360].forEach(angle => {
       const btn = $(`b-angle-${angle}`);
       if (btn) {
         // Actif si : c'est 360 et on est en mode circulaire, OU c'est l'angle courant hors mode circulaire
@@ -4110,7 +4100,7 @@ const ModernOverflowManager = {
     header.className = 'overflow-header';
     header.innerHTML = `
       <i class="fas fa-arrow-${position === 'above' ? 'up' : 'down'} fa-sm"></i>
-      ${items.length} lieu${items.length > 1 ? 'x' : ''} hors écran
+      ${items.length} ${items.length > 1 ? t('places_out_of_screen') : t('place_out_of_screen')}
     `;
 
     // Contenu - utilise uniquement la classe CSS existante
@@ -4666,14 +4656,6 @@ const FanchartApp = {
 
       addButton.classList.toggle("disabled", !canAdd);
       addButton.disabled = !canAdd;
-
-      if (max_gen < max_gen_loaded) {
-        addButton.title = "Afficher la génération suivante (données en mémoire)";
-      } else if (hasParentsAvailable) {
-        addButton.title = "Charger la génération suivante";
-      } else {
-        addButton.title = "Aucun parent dans la génération suivante";
-      }
     }
   },
 
@@ -5277,7 +5259,16 @@ reRenderWithCurrentGenerations: function() {
     // Boutons de navigation
     $("b-no-buttons").onclick = function() {
       $("fanchart-controls").style.display = "none";
+      var rb = $("b-show-buttons");
+      if (rb) rb.style.display = "";
     };
+    var showBtn = $("b-show-buttons");
+    if (showBtn) {
+      showBtn.onclick = function() {
+        $("fanchart-controls").style.display = "";
+        showBtn.style.display = "none";
+      };
+    }
     $("b-help").onclick = function() {
       const helpPanel = $('navigation-help');
       if (helpPanel) {
@@ -5286,8 +5277,8 @@ reRenderWithCurrentGenerations: function() {
         this.classList.toggle("active", !isVisible);
       }
     };
-    $("b-home").onclick = () => {
-      window.location = link_to_person;
+    $("b-home").onclick = function() {
+      window.location = this.getAttribute("data-url");
     };
     $("b-rng").onclick = function() {
       const url = this.getAttribute("data-url");
@@ -5326,17 +5317,17 @@ reRenderWithCurrentGenerations: function() {
       switch(implexMode) {
         case "reduced":
           implexMode = "numbered";
-          this.title = "Afficher tous les ancêtres";
+          this.title = t('show_all_ancestors');
           this.querySelector("i").className = "fa fa-comment fa-fw";
           break;
         case "numbered":
           implexMode = "full";
-          this.title = "Réduire les implexes";
+          this.title = t('collapse_implex');
           this.querySelector("i").className = "fa fa-comment-slash fa-fw";
           break;
         case "full":
           implexMode = "reduced";
-          this.title = "Numéroter les implexes";
+          this.title = t('number_implex');
           this.querySelector("i").className = "fa fa-comment-dots fa-fw";
           break;
       }
