@@ -2215,6 +2215,7 @@ tr: ölüm yaşı
 zh: 享年
 
     age at marriage
+de: Alter bei der Heirat
 en: age at marriage
 fr: âge au mariage
 
@@ -2250,6 +2251,11 @@ sl: živel(a)
 sv: livslängd
 tr: ölüm yaşı
 zh: 享年
+
+    ages of spouses
+de: Alter der Ehepartner
+en: ages of spouses
+fr: âges des conjoints
 
     alert module
 co: Modulu inaccettevule <strong id="alert-module-2"></strong>. Ci vole à stampittà un’iniziale du modulu accettevule.
@@ -4929,6 +4935,11 @@ de: Der <a href="https://de.wikipedia.org/wiki/Verwandtschaftskoeffizient">Verwa
 en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the minimum average percentage of shared DNA between two individuals.
 fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen minimum de gènes partagés entre deux individus.
 
+    half-disc/standard/double half-disc
+de: Halbscheibe/Standard/doppelte Halbscheibe
+en: half-disc/standard/double half-disc
+fr: demi-disque/standard/double demi-disque
+
     collapse implex
 co: ripiegà l’implessi
 de: Implex zusammenklappen
@@ -4937,6 +4948,11 @@ fr: réduire les implexes
 pt: reduzir os implexos
 sv: slå ihop implex
 tr: implex daraltma
+
+    colorize places
+de: Orte einfärben (Ereignisse durchlaufen)
+en: colorize places (cycle through events)
+fr: colorisation des lieux (cycle entre les événements)
 
     color
 af: kleur
@@ -7271,6 +7287,11 @@ sl: smrti
 sv: död
 tr: ölüm
 
+    death ages and marriage duration
+de: Sterbealter und Ehedauer
+en: death ages and marriage duration
+fr: âges décès et durées mariage
+
     death/deaths
 af: dood/dooie
 bg: смърт/смъртни случаи
@@ -8437,6 +8458,11 @@ ru: событие/события
 sv: händelse/Händelse
 tr: etkinlik/etkinlikler
 
+    event/events for this place
+de: Ereignis für diesen Ort/Ereignisse für diesen Ort
+en: event for this place/events for this place
+fr: événement pour ce lieu/événements pour ce lieu
+
     events to which %s was witness
 co: evenimenti induve %s era testimoniu
 de: Ereignisse, von denen %s Zeuge war
@@ -8790,6 +8816,76 @@ co: arburu in banderetta
 de: Fächerbaum
 en: fanchart
 fr: arbre en éventail
+
+    appears/time/times
+de: erscheint/Mal/Male
+en: appears/time/times
+fr: apparaît/fois/fois
+
+    duration
+de: Dauer
+en: duration
+fr: durée
+
+    font/default/large/readable
+de: Schriftart/Standard/groß/lesbar
+en: font/default/large/readable
+fr: police/défaut/grande/lisible
+
+    view/opening
+de: Ansicht/Öffnungswinkel
+en: view/opening angle
+fr: vue/ouverture
+
+    no information available
+de: keine Informationen verfügbar
+en: no information available
+fr: aucune information disponible
+
+    no known parents
+de: keine bekannten Eltern
+en: no known parents
+fr: aucun parent connu
+
+    no marriage in this duration range
+de: keine Ehe in diesem Dauerbereich
+en: no marriage in this duration range
+fr: aucun mariage dans cette tranche de durée
+
+    no person in this age range
+de: keine Person in dieser Altersgruppe
+en: no person in this age range
+fr: aucune personne dans cette tranche d’âge
+
+    number the implex
+de: Implex nummerieren
+en: number the implex
+fr: numéroter les implexes
+
+    place/places out of screen
+de: Ort außerhalb des Bildschirms/Orte außerhalb des Bildschirms
+en: place out of screen/places out of screen
+fr: lieu hors écran/lieux hors écran
+
+    recenter tree on
+de: Baum neu zentrieren auf
+en: recenter tree on
+fr: recentrer l’arbre sur
+
+    show all ancestors
+de: alle Vorfahren anzeigen
+en: show all ancestors
+fr: afficher tous les ancêtres
+
+    show controls
+de: Steuerung anzeigen
+en: show controls
+fr: afficher les contrôles
+
+    with places
+de: mit Orten
+en: with places
+fr: avec lieux
 
     father-in-law/mother-in-law
 af: skoonpa/skoonma
@@ -9950,6 +10046,11 @@ pt: não tem cônjuge nem filhos
 ru: супруг(а) и дети не известы
 sv: har ingen familj
 tr: eş ve çocuklar bilinmiyor
+
+    help and shortcuts
+de: Hilfe und Tastenkürzel
+en: help and shortcuts
+fr: aide et raccourcis
 
     help merge
 co: s’è nisuna hè selezziunata, e duie entrate seranu cuncatinate
@@ -15674,6 +15775,11 @@ de: Anzahl der Elemente in der Ortsliste
 en: number of elements kept in places list
 fr: nombre d'éléments à conserver dans la liste des places
 
+    places and events
+de: Orte & Ereignisse
+en: places & events
+fr: lieux & événements
+
     place/places
 af: plek
 bg: място
@@ -16804,6 +16910,11 @@ fr: retirer le dernier module ajouté
 pt: remover o último módulo adicionado
 sv: tag bort senast tillagda modul
 tr: son eklenen modülü kaldır
+
+    add/remove one generation
+de: eine Generation hinzufügen/eine Generation entfernen
+en: add one generation/remove one generation
+fr: ajouter une génération/retirer une génération
 
     reserved to friends or wizards
 co: riservatu à l’amichi è à i maghi
@@ -17965,6 +18076,16 @@ sl: kratek seznam
 sv: kort rapport
 tr: kısa ekran
 
+    drag/wheel/hover/lock/rotate
+de: Ziehen: verschieben/Rad: zoomen/Zeigen: Details/Klick Ort: fixieren/Rechtsklick: drehen (360°)
+en: drag: move/wheel: zoom/hover: details/click place: lock/right-drag: rotate (360°)
+fr: glisser : déplacer/molette : zoomer/survol : détails/clic lieu : verrouiller/clic droit : pivoter (360°)
+
+    click sheet/navigate
+de: Klick: Personenseite/Klick ▲: zum Vorfahren
+en: click: individual sheet/click ▲: navigate
+fr: clic : fiche individuelle/clic ▲ : naviguer
+
     shortcuts
 co: accurtatoghji di tastera
 de: Tastaturkürzel
@@ -18070,6 +18191,11 @@ sl: bi morala biti moški
 sv: borde vara man
 tr: erkek olmalı
 
+    show panel
+de: Seitenleiste anzeigen
+en: show panel
+fr: afficher le panneau
+
     show all
 co: affissà tutti i
 de: zeige alle
@@ -18167,7 +18293,7 @@ tr: son tıklamadan bu yana
 co: scala
 de: Größe
 en: scale
-fr: echelle
+fr: échelle
 pt: escala
 sv: skala
 tr: ölçek
