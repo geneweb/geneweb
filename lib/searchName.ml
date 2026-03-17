@@ -174,7 +174,7 @@ let person_is_misc_name conf base p k =
   let k = Name.strip_lower k in
   List.exists
     (fun n -> Name.strip n = k)
-    (Gwdb.person_misc_names base p (Util.nobtit conf base))
+    (Gwdb.person_misc_names base p (Person.nobtit conf base))
 
 let person_is_approx_key base p k =
   let k = Name.strip_lower k in

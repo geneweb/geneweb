@@ -153,7 +153,8 @@ let nobility_titles_list conf base p =
               t.Def.t_place,
               [ (t_date_start, t_date_end) ] )
             :: l)
-      (Util.nobtit conf base p) []
+      (Person.nobtit conf base p)
+      []
   in
   List.fold_right
     (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
@@ -607,11 +608,11 @@ let tree_generation_list conf base gv p =
                 let cpl = Gwdb.foi base ifam in
                 let fath =
                   let p = Util.pget conf base (Gwdb.get_father cpl) in
-                  if not @@ Util.is_empty_name p then Some p else None
+                  if not @@ Person.is_empty_name p then Some p else None
                 in
                 let moth =
                   let p = Util.pget conf base (Gwdb.get_mother cpl) in
-                  if not @@ Util.is_empty_name p then Some p else None
+                  if not @@ Person.is_empty_name p then Some p else None
                 in
                 let fo = Some ifam in
                 let base_prefix = conf.Config.bname in
@@ -2484,7 +2485,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           | None -> warning_use_has_parents_before_parent loc "mother" null_val)
       )
   | "nobility_title" :: sl -> (
-      match Util.main_title conf base p with
+      match Person.main_title conf base p with
       | Some t when p_auth ->
           let id = Gwdb.sou base t.Def.t_ident in
           let pl = Gwdb.sou base t.Def.t_place in
@@ -2933,8 +2934,11 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Some (`Url _url) -> true
       | Some (`Path _fname) -> false
       | None -> false)
-  | "has_nephews_or_nieces" -> Util.has_nephews_or_nieces conf base p
-  | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
+  | "has_nephews_or_nieces" ->
+      Option.value ~default:false
+        (Authorized.Person.has_nephews_or_nieces ~conf ~base
+           (Authorized.Person.make ~conf ~base (Gwdb.get_iper p)))
+  | "has_nobility_titles" -> p_auth && Person.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
       p_auth && (not conf.Config.no_note)
       && Gwdb.sou base (Gwdb.get_notes p) <> ""
@@ -3030,7 +3034,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_female" -> Gwdb.get_sex p = Def.Female
   | "is_male" -> Gwdb.get_sex p = Def.Male
   | "is_invisible" ->
-      not (Util.is_fully_visible_to_visitors conf base p)
+      not (Person.is_fully_visible_to_visitors conf base p)
       (* TODO remove is_private/public ? *)
   | "is_private" -> Gwdb.get_access p = Def.Private
   | "is_public" -> Gwdb.get_access p = Def.Public
@@ -3242,7 +3246,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "misc_names" ->
       if p_auth then
         let list =
-          Util.nobtit conf base
+          Person.nobtit conf base
           |> Gwdb.person_misc_names base p
           |> List.map Util.escape_html
         in
@@ -3522,7 +3526,7 @@ and eval_str_family_field env (ifam, _, _, _) = function
   | _ -> raise Not_found
 
 and simple_person_text conf base p p_auth : Adef.safe_string =
-  match Util.main_title conf base p with
+  match Person.main_title conf base p with
   | Some t when p_auth -> NameDisplay.title_html_of_person conf base p t
   | Some _ | None -> NameDisplay.fullname_html_of_person conf base p
 

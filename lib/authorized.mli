@@ -14,6 +14,7 @@ module rec Person : sig
   type t
 
   val make : conf:Config.config -> base:Gwdb.base -> Gwdb.iper -> t
+  val equal : t -> t -> bool
   val get_iper : t -> Gwdb.iper option
   val get_sex : t -> Def.sex option
   val get_first_name : t -> Gwdb.istr option
@@ -36,7 +37,13 @@ module rec Person : sig
   val get_family :
     conf:Config.config -> base:Gwdb.base -> t -> Family.t array option
 
+  val get_parents :
+    conf:Config.config -> base:Gwdb.base -> t -> Family.t option option
+
   val get_pevents : t -> Personal_event.t list option
+
+  val has_nephews_or_nieces :
+    conf:Config.config -> base:Gwdb.base -> t -> bool option
 end
 
 and Family : sig
@@ -44,6 +51,7 @@ and Family : sig
 
   val get_marriage : t -> Adef.cdate option
   val get_marriage_place : t -> Gwdb.istr option
+  val get_children : conf:Config.config -> base:Gwdb.base -> t -> Person.t array
 
   val get_spouse :
     conf:Config.config ->

@@ -538,9 +538,6 @@ let p_getint env label =
         int_of_string_opt (String.trim s))
   with Failure _ -> None
 
-let nobtit conf base p =
-  Gwdb.nobtitles base conf.Config.allowed_titles conf.Config.denied_titles p
-
 let strictly_after_private_years conf a =
   if a.Date.year > conf.Config.private_years then true
   else if a.year < conf.Config.private_years then false
@@ -593,20 +590,12 @@ let string_gen_person base p =
 let string_gen_family base fam =
   Futil.map_family_ps Fun.id Fun.id (fun ?format:_ -> Gwdb.sou base) fam
 
-let is_empty_name p =
-  Gwdb.is_quest_string (Gwdb.get_surname p)
-  && Gwdb.is_quest_string (Gwdb.get_first_name p)
-
-let is_fully_visible_to_visitors conf base p =
-  let conf = { conf with Config.wizard = false; friend = false } in
-  Person.is_visible conf base p
-
 (* TODO should probably not exists *)
 let is_public conf base p =
   Gwdb.get_access p = Def.Public
   || conf.Config.public_if_titles
      && Gwdb.get_access p = Def.IfTitles
-     && nobtit conf base p <> []
+     && Person.nobtit conf base p <> []
   || is_old_person conf (Gwdb.gen_person_of_person p)
 
 (* ********************************************************************** *)
@@ -733,12 +722,6 @@ let max_ancestor_level conf base ip max_lvl =
     (loop ~visited_nodes:Gwdb.IperMap.empty 0 ip)
     0
 
-let main_title conf base p =
-  let titles = nobtit conf base p in
-  match List.find_opt (fun x -> x.Def.t_name = Def.Tmain) titles with
-  | None -> ( match titles with x :: _ -> Some x | _ -> None)
-  | x -> x
-
 (* *********************************************************************** *)
 (*  [Fonc] one_title_text : base -> istr gen_title     *)
 
@@ -833,7 +816,7 @@ let update_family_loop conf base p s =
 
 let person_title conf base p =
   if Person.is_visible conf base p then
-    match main_title conf base p with
+    match Person.main_title conf base p with
     | Some t -> one_title_text base t
     | None -> Adef.safe ""
   else Adef.safe ""
@@ -1730,27 +1713,6 @@ let rchild_type_text conf t sex =
     | Def.FosterParent -> "foster son/foster daughter/foster child"
   in
   Adef.safe @@ transl_nth conf s (index_of_sex sex)
-
-let has_nephews_or_nieces conf base p =
-  let exception Ok in
-  try
-    let a = p in
-    match Gwdb.get_parents a with
-    | None -> false
-    | Some ifam ->
-        let fam = Gwdb.foi base ifam in
-        Array.iter
-          (fun ip ->
-            if ip = Gwdb.get_iper p then ()
-            else
-              Array.iter
-                (fun ifam ->
-                  if Array.length (Gwdb.get_children (Gwdb.foi base ifam)) > 0
-                  then raise Ok)
-                (Gwdb.get_family (pget conf base ip)))
-          (Gwdb.get_children fam);
-        false
-  with Ok -> true
 
 let h s = Digest.to_hex (Digest.string s)
 
