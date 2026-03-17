@@ -230,6 +230,39 @@ let search_by_name conf base n =
         [] list
   | None -> []
 
+let sort_person_list_aux sort base =
+  let default p1 p2 =
+    match
+      Utf8.alphabetic_order (Gwdb.p_surname base p1) (Gwdb.p_surname base p2)
+    with
+    | 0 -> (
+        match
+          Utf8.alphabetic_order
+            (Gwdb.p_first_name base p1)
+            (Gwdb.p_first_name base p2)
+        with
+        | 0 -> (
+            match compare (Gwdb.get_occ p1) (Gwdb.get_occ p2) with
+            | 0 -> compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
+            | c -> c)
+        | c -> c)
+    | c -> c
+  in
+  sort (fun p1 p2 ->
+      if Gwdb.get_iper p1 = Gwdb.get_iper p2 then 0
+      else
+        match Person.compare_by_dates p1 p2 with 0 -> default p1 p2 | c -> c)
+
+(* Sort list of persons by comparison with following order:
+   - Compare by birth and death date
+   - Compare by surname
+   - Compare by first name
+   - Compare by occurence number
+   - Compare by id
+   and also remove duplicates *)
+let sort_uniq_person_list : Gwdb.base -> Gwdb.person list -> Gwdb.person list =
+  sort_person_list_aux List.sort_uniq
+
 let search_key_aux aux conf base an =
   let acc = Gutil.person_not_a_key_find_all base an in
   let an, acc =
@@ -249,7 +282,7 @@ let search_key_aux aux conf base an =
       acc
   in
   let acc = aux conf base acc an in
-  Gutil.sort_uniq_person_list base acc
+  sort_uniq_person_list base acc
 
 let search_partial_key =
   search_key_aux (fun conf base acc an ->
