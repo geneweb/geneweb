@@ -741,8 +741,8 @@ const LocationDataBuilder = {
   },
 
   /**
-   * Construit l’array final lieux_a et assigne les IDs CSS pour la colorisation
-   * Transforme l’objet lieux en array utilisable par les fonctions de tri
+   * Construit l'array final lieux_a et assigne les IDs CSS pour la colorisation
+   * Transforme l'objet lieux en array utilisable par les fonctions de tri
    */
   buildFinalLocationArray: function() {
     if (!lieux || typeof lieux !== 'object') {
@@ -852,7 +852,7 @@ const LocationDataBuilder = {
   },
 
   /**
-   * Statistiques par type d’événement
+   * Statistiques par type d'événement
    * @returns {Object} Statistiques détaillées par type
    */
   getEventStatistics: function() {
@@ -2012,7 +2012,7 @@ const PlacesHighlighter = {
   },
 
   /**
-   * Surlignage spécialisé pour les totaux d’événement NBMDS
+   * Surlignage spécialisé pour les totaux d'événement NBMDS
    */
   highlightByEventType: function(eventType) {
     this.clearAllHighlights();
@@ -2088,7 +2088,7 @@ const PlacesHighlighter = {
   highlightPersonSectorsByEvent: function(placesToHighlight, eventType) {
     // Validation du type d'événement
     if (!Events.isValid(eventType)) {
-      console.error(`PlacesHighlighter: Type d’événement invalide "${eventType}"`);
+      console.error(`PlacesHighlighter: Type d'événement invalide "${eventType}"`);
       return;
     }
 
@@ -2422,8 +2422,8 @@ const CircularModeRenderer = {
 
     const title = svgEl("title");
     title.textContent = person.has_parents
-      ? `${t(‘recenter_tree_on’, ‘Recenter tree on’)} ${person.fn} ${person.sn}`
-      : `${person.fn} ${person.sn} : ${t(‘no_known_parents’, ‘no known parents’)}`;
+      ? `${t('recenter_tree_on', 'Recenter tree on')} ${person.fn} ${person.sn}`
+      : `${person.fn} ${person.sn} : ${t('no_known_parents', 'no known parents')}`;
     text.appendChild(title);
 
     group.appendChild(text);
@@ -2432,10 +2432,10 @@ const CircularModeRenderer = {
 
  /**
    * Secteur de mariage du couple central (mode 360°)
-   * Arc positioné à l’ouest, même structure que les mariages standards
+   * Arc positioné à l'ouest, même structure que les mariages standards
    *
    * @param {SVGElement} centerGroup - Groupe parent du centre
-   * @param {Object} s2 - Données de l’époux (marriage_date, marriage_place, marriage_length)
+   * @param {Object} s2 - Données de l'époux (marriage_date, marriage_place, marriage_length)
    * @param {number} r - Rayon du cercle central
    */
   renderCoupleMarriage: function(centerGroup, s2, r) {
@@ -3140,7 +3140,7 @@ const SVGRenderer = {
       text.innerHTML = `<textPath xlink:href="#${pathId}" startOffset="50%" style="font-size:${fontSize}%;">&#x2716;</textPath>`;
     }
     const title = svgEl("title");
-    title.textContent = hasParents ? `${t(‘recenter_tree_on’, ‘Recenter tree on’)} ${p.fn} ${p.sn}` : `${p.fn} ${p.sn} : ${t(‘no_known_parents’, ‘no known parents’)}`;
+    title.textContent = hasParents ? `${t('recenter_tree_on', 'Recenter tree on')} ${p.fn} ${p.sn}` : `${p.fn} ${p.sn} : ${t('no_known_parents', 'no known parents')}`;
     text.appendChild(title);
     g.append(text);
     return text;
@@ -3455,13 +3455,13 @@ const UIManager = {
     helpPanel.id = 'navigation-help';
     helpPanel.style.display = 'none'; // Caché par défaut
     helpPanel.innerHTML = `
-      <div class="help-title">💡 ${t(‘navigation_help’, ‘Navigation help’)}</div>
+      <div class="help-title">💡 ${t('navigation_help', 'Navigation help')}</div>
       <div><strong>🖱️</strong></div>
       <div>– drag : move</div>
       <div>– scroll : zoom</div>
       <div>– hover : details</div>
       <div><strong>⌨️</strong></div>
-      <div>– <kbd>Ctrl</kbd>+click : ${t(‘individual_sheet’, ‘individual sheet’)}</div>
+      <div>– <kbd>Ctrl</kbd>+click : ${t('individual_sheet', 'individual sheet')}</div>
       <div>– ▲ : ancestor</div>
       <div style="margin-top: 8px; text-align: center;">
       </div>
@@ -3705,8 +3705,8 @@ const AgeHighlighter = {
 
     // D'abord, remettre toutes les catégories visibles
     const categoryTypes = [
-      { prefix: ‘DA’, title: t(‘no_person_age_range’, ‘No person in this age range’) },
-      { prefix: ‘DAM’, title: t(‘no_marriage_duration_range’, ‘No marriage in this duration range’) }
+      { prefix: 'DA', title: t('no_person_age_range', 'No person in this age range') },
+      { prefix: 'DAM', title: t('no_marriage_duration_range', 'No marriage in this duration range') }
     ];
 
     categoryTypes.forEach(type => {
@@ -4146,7 +4146,7 @@ const ModernOverflowManager = {
     return section;
   },
 
-  // Trier selon l’ordre logique (parent avant enfant)
+  // Trier selon l'ordre logique (parent avant enfant)
   sortItemsByLogicalOrder: function(items) {
     return items.sort((a, b) => {
       const aPlace = a.placeName;
@@ -4179,7 +4179,7 @@ const ModernOverflowManager = {
     // Nettoyer toutes les sections d'overflow orphelines
     document.querySelectorAll('.overflow-section').forEach(el => el.remove());
 
-    // Réinitialiser l’état de traitement au cas où
+    // Réinitialiser l'état de traitement au cas où
     this.isProcessing = false;
   }
 };
@@ -4895,7 +4895,7 @@ const FanchartApp = {
   // Résoudre les implexes virtuellement
   getEffectivePerson: function(sosa) {
     let person = ancestor["S" + sosa];
-    // Si pas de personne à ce sosa, chercher si c’est un enfant d’implexe
+    // Si pas de personne à ce sosa, chercher si c'est un enfant d'implexe
     if (!person && implexMode !== "reduced") {
       const parentSosa = Math.floor(sosa / 2);
       const parentPerson = ancestor["S" + parentSosa];
@@ -4923,7 +4923,7 @@ const FanchartApp = {
   initializeStandardText: function() {
     const target = renderContext.target || $('fanchart-content') || fanchart;
     const standard = svgEl("text");
-    standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz 0123456789 ’'–-?~/";
+    standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz 0123456789 ''–-?~/";
     standard.setAttribute("id", "standard");
     standard.setAttribute("x", center_x);
     standard.setAttribute("y", center_y);
@@ -5070,7 +5070,7 @@ const FanchartApp = {
    * Rendu du secteur de mariage dans une couronne interne
    */
   renderMarriageSector: function(familyGroup, fatherSosa, position, person) {
-    // Créer le groupe mariage en premier dans l’ordre DOM
+    // Créer le groupe mariage en premier dans l'ordre DOM
     const marriageGroup = svgEl("g");
     marriageGroup.setAttribute("id", contextualId("M" + fatherSosa));
 
