@@ -1,3 +1,33 @@
+(subdir
+ bases
+ (rule
+  (target galichet.gwb)
+  (deps
+   (:gw_source ../../galichet.gw))
+  (action
+   (ignore-stderr
+    (run %{bin:gwc} -bd . %{gw_source} -f)))))
+
+(rule
+ (alias runtest)
+ (deps
+  ./bases/galichet.gwb
+  (glob_files_rec ./bases/*)
+  (glob_files_rec ../../hd/*)
+  (glob_files ./cgi-bin/*))
+ (action
+  (with-outputs-to
+   cgi_output.out
+   (setenv
+    GWD
+    %{bin:gwd}
+    (bash ./cgi_test.py)))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff cgi_output.expected cgi_output.out)))
+
 (cram
  (package geneweb)
  (deps

@@ -191,16 +191,16 @@ let parse_prefixes () =
     | _, Some s -> s
     | None, None -> default_images_prefix
   in
-  images_prefix := Some p;
+  set_images_prefix p;
   let p =
     match (!gw_prefix, !etc_prefix) with
     | Some s, None -> s // "etc"
     | _, Some s -> s
     | None, None -> default_etc_prefix
   in
-  etc_prefix := Some p;
+  set_etc_prefix p;
   let p = Option.value ~default:default_gw_prefix !gw_prefix in
-  gw_prefix := Some p;
+  set_gw_prefix p;
   Secure.add_assets p
 
 type plugin = {
