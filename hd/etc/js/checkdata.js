@@ -98,13 +98,15 @@ const CheckData = (() => {
     return f;
   };
 
-  const createContainer = (btn, field) => {
+const createContainer = (btn, field) => {
     const c = document.createElement('div');
     c.className = SELECTORS.editContainer.slice(1);
     
     const orig = document.createElement('div');
     orig.className = 'original-content';
-    orig.textContent = btn.textContent;
+    Array.from(btn.childNodes).forEach(
+      n => orig.appendChild(n.cloneNode(true))
+    );
     
     c.appendChild(orig);
     c.appendChild(field);
