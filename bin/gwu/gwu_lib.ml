@@ -319,7 +319,7 @@ let print_title opts base t =
   else
     match (t_date_start, t_date_end) with
     | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) ":"
-    | _ -> ());
+    | None, None -> ());
   print_title_date_option opts t_date_start;
   (if t.Def.t_nth <> 0 then Printf.ksprintf (oc opts) ":"
   else
@@ -406,7 +406,7 @@ let print_infos gen opts base is_child csrc cbp p =
         | Murdered -> Printf.ksprintf (oc opts) "m"
         | Executed -> Printf.ksprintf (oc opts) "e"
         | Disappeared -> Printf.ksprintf (oc opts) "s"
-        | _ -> ());
+        | Unspecified -> ());
         print_date opts (Date.date_of_cdate d)
     | DeadYoung -> Printf.ksprintf (oc opts) " mj"
     | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
@@ -416,7 +416,7 @@ let print_infos gen opts base is_child csrc cbp p =
             Date.od_of_cdate (Gwdb.get_baptism p) )
         with
         | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) " ?"
-        | _ -> ())
+        | None, None -> ())
     | OfCourseDead -> Printf.ksprintf (oc opts) " od"
     | NotDead -> ());
     print_if_no_empty opts base "#dp" (Gwdb.get_death_place p);
@@ -1230,7 +1230,7 @@ let print_relation_for_person opts base gen def_p r =
   let err_same_sex =
     match (fath, moth) with
     | Some fath, Some moth -> Gwdb.get_sex fath = Gwdb.get_sex moth
-    | _ -> false
+    | Some _, None | None, Some _ | None, None -> false
   in
   let print_err_one_relation p =
     Printf.ksprintf (oc opts) "- ";
@@ -1254,7 +1254,7 @@ let print_relation_for_person opts base gen def_p r =
         | Some fath, Some moth ->
             print_err_one_relation fath;
             print_err_one_relation moth
-        | _ -> ()
+        | Some _, None | None, Some _ | None, None -> ()
       else (
         Printf.ksprintf (oc opts) "- ";
         (match r.Def.r_type with
@@ -1272,7 +1272,7 @@ let print_relation_for_person opts base gen def_p r =
             if Gwdb.get_sex moth = Def.Female then
               Printf.ksprintf (oc opts) " moth"
             else Printf.ksprintf (oc opts) " fath"
-        | _ -> ());
+        | Some _, Some _ | None, None -> ());
         Printf.ksprintf (oc opts) ": ";
         (match (fath, moth) with
         | Some fath, None -> print_relation_parent gen opts base def_p fath
@@ -1286,7 +1286,7 @@ let print_relation_for_person opts base gen def_p r =
               print_relation_parent gen opts base def_p moth;
               Printf.ksprintf (oc opts) " + ";
               print_relation_parent gen opts base def_p fath)
-        | _ -> ());
+        | None, None -> ());
         Printf.ksprintf (oc opts) "\n")
 
 let print_relations_for_person mark opts base gen def_p is_definition p =
@@ -1299,7 +1299,7 @@ let print_relations_for_person mark opts base gen def_p is_definition p =
         | Some ip1, Some ip2 -> gen.per_sel ip1 && gen.per_sel ip2
         | Some ip1, _ -> gen.per_sel ip1
         | _, Some ip2 -> gen.per_sel ip2
-        | _ -> false)
+        | None, None -> false)
       (Gwdb.get_rparents p)
   in
   if

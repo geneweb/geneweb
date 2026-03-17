@@ -233,7 +233,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
               print_cousins_side_of conf base max_cnt (Util.pget conf base ia) p
                 br lev1 lev2 print_tips
               || some
-          | _ -> some
+          | Some [] | None -> some
         in
         loop (Sosa.inc sosa 1) some false
       else some

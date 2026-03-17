@@ -255,9 +255,12 @@ let rec check_ancestors base warning year year_tab ip ini_p =
     | CheckInfered (CheckBefore i) -> CheckInfered (CheckBefore (pred i))
     | CheckInfered (CheckAfter i) -> CheckInfered (CheckAfter (pred i))
     | CheckInfered (CheckOther i) -> CheckInfered (CheckOther (pred i))
-    | _ -> assert false
+    | CheckInfered (CheckInfered _) -> assert false
   in
-  let own = function CheckInfered _ -> false | _ -> true in
+  let own = function
+    | CheckInfered _ -> false
+    | CheckBefore _ | CheckAfter _ | CheckOther _ -> true
+  in
   let test a b p p' =
     match (a, b) with
     | ( CheckAfter y,

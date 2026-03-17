@@ -149,7 +149,7 @@ let check tm from max_call sec conf suicide =
                   xcl.excl;
                 Printf.fprintf oc "--- to restore access, delete file \"%s\"\n"
                   fname)
-        | _ -> ());
+        | [] | [ _ ] | _ :: _ :: _ :: _ -> ());
         let list, nconn =
           Ext_string.Map.fold
             (fun k w (list, nconn) ->

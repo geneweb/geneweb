@@ -273,7 +273,7 @@ let parse_upto lim =
         Stream.junk strm__;
         try loop (Buff.store len c) strm__
         with Stream.Failure -> raise (Stream.Error ""))
-    | _ -> raise Stream.Failure
+    | None -> raise Stream.Failure
   in
   loop 0
 
@@ -337,7 +337,7 @@ let get_variable (strm : _ Stream.t) =
     | Some c ->
         Stream.junk strm;
         loop (Buff.store len c)
-    | _ -> raise Stream.Failure
+    | None -> raise Stream.Failure
   in
   loop 0
 
@@ -351,7 +351,7 @@ let get_binding strm =
     | Some c ->
         Stream.junk strm;
         loop (Buff.store len c)
-    | _ -> raise Stream.Failure
+    | None -> raise Stream.Failure
   in
   loop 0
 
@@ -389,7 +389,7 @@ let variables bname =
       | Some _ ->
           Stream.junk strm;
           loop (vlist, flist)
-      | _ -> (vlist, flist)
+      | None -> (vlist, flist)
     in
     loop ([], [])
   in
@@ -539,7 +539,7 @@ let rec copy_from_stream conf print strm =
                   | Some c ->
                       Stream.junk strm;
                       loop (Buff.store len c)
-                  | _ -> Buff.get len
+                  | None -> Buff.get len
                 in
                 loop 0
               in
@@ -850,7 +850,7 @@ let basename s =
 let setup_gen conf =
   match p_getenv conf.env "v" with
   | Some fname -> print_file conf (basename fname)
-  | _ -> error conf "request needs \"v\" parameter"
+  | None -> error conf "request needs \"v\" parameter"
 
 let print_default_gwf_file conf =
   let gwf =
@@ -907,7 +907,7 @@ let simple conf =
     else ""
   in
   let out_file =
-    match p_getenv conf.env "o" with Some f -> strip_spaces f | _ -> ""
+    match p_getenv conf.env "o" with Some f -> strip_spaces f | None -> ""
   in
   let out_file =
     if ged = "" then out_file
@@ -940,7 +940,7 @@ let gwc_or_ged2gwb out_name_of_in_name conf =
   let in_file = if fname = "" then in_file else in_file ^ "/" ^ fname in
   let conf = conf_with_env conf "anon" in_file in
   let out_file =
-    match p_getenv conf.env "o" with Some f -> strip_spaces f | _ -> ""
+    match p_getenv conf.env "o" with Some f -> strip_spaces f | None -> ""
   in
   let out_file =
     if out_file = "" then out_name_of_in_name in_file else out_file
@@ -1267,7 +1267,7 @@ let delete_1 conf =
 
 let merge conf =
   let out_file =
-    match p_getenv conf.env "o" with Some f -> strip_spaces f | _ -> ""
+    match p_getenv conf.env "o" with Some f -> strip_spaces f | None -> ""
   in
   let conf = { conf with comm = "." } in
   let bases = selected conf.env in
@@ -1277,7 +1277,7 @@ let merge conf =
 
 let merge_1 conf =
   let out_file =
-    match p_getenv conf.env "o" with Some f -> strip_spaces f | _ -> ""
+    match p_getenv conf.env "o" with Some f -> strip_spaces f | None -> ""
   in
   let bases = selected conf.env in
   let dir = Sys.getcwd () in
@@ -1603,7 +1603,7 @@ let input_lexicon lang =
       |> open_in
     in
     let derived_lang =
-      match lindex lang '-' with Some i -> String.sub lang 0 i | _ -> ""
+      match lindex lang '-' with Some i -> String.sub lang 0 i | None -> ""
     in
     try
       (try
@@ -1657,7 +1657,7 @@ let setup (addr, req) comm (env_str : Adef.encoded_string) =
       let lang, env =
         match p_getenv env "lang" with
         | Some x -> (x, List.remove_assoc "lang" env)
-        | _ -> (!default_lang, env)
+        | None -> (!default_lang, env)
       in
       let lexicon = input_lexicon lang in
       { lang; comm; env; request = req; lexicon }

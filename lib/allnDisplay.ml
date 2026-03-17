@@ -267,7 +267,7 @@ let print_frequency ~at_least conf base is_surnames =
   print_frequency_any conf base is_surnames list len
 
 let print_alphabetic ~prefix ~all ~at_least ~fast ~index conf base is_surnames =
-  let ini = match prefix with Some k -> k | _ -> "" in
+  let ini = match prefix with Some k -> k | None -> "" in
   if (fast || Gwdb.nb_of_persons base >= 100_000) && ini = "" then (
     Gwdb.load_strings_array base;
     let list =
@@ -345,7 +345,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
   Hutil.trailer conf
 
 let print_short ~prefix ~at_least conf base is_surnames =
-  let ini = match prefix with Some k -> k | _ -> "" in
+  let ini = match prefix with Some k -> k | None -> "" in
   let () = if String.length ini < 2 then Gwdb.load_strings_array base in
   match Alln.select_names ~at_least conf base is_surnames ini max_int with
   | Alln.Specify _, _ -> Hutil.incorrect_request (Config.Trimmed.to_config conf)
