@@ -143,7 +143,7 @@
   </div>
 
   <div class="control-section">
-    <div class="section-title">Size</div>
+    <div class="section-title">[*size]</div>
     <div class="btn-group-fanchart">
       <button id="b-zoom-out" class="btn-fanchart" title="[*zoom/unzoom]1">
         <i class="fa fa-magnifying-glass-minus fa-fw"></i>
@@ -173,7 +173,7 @@
   </div>
 
   <div class="control-section">
-    <div class="section-title">Degrees</div>
+    <div class="section-title">[*degrees]</div>
     <div class="btn-group-fanchart">
       <button id="b-angle-180" class="btn-fanchart" title="[*half-disc view]">180̣</button>
       <button id="b-angle-220" class="btn-fanchart active" title="[*standard view]">220</button>
@@ -182,17 +182,17 @@
   </div>
 
   <div class="control-section">
-    <div class="section-title">Mode</div>
+    <div class="section-title">[*mode]</div>
     <div class="btn-group-fanchart">
       <button id="b-angle-360" class="btn-fanchart" title="[*circular mode]">360</button>
     </div>
   </div>
 
   <div class="control-section">
-    <div class="section-title">Font</div>
+    <div class="section-title">[*font]</div>
     <div class="btn-group-fanchart">
      <select id="font-selector" class="custom-select custom-select-sm mx-0">
-       <option value="">Default</option>
+       <option value="">[*default]</option>
        <option value="mono">Mono</option>
        <option value="serif">Serif</option>
        <option value="large">[*large]</option>
@@ -222,7 +222,7 @@
 
   </div>
 </div>
-<button id="b-show-buttons" class="btn-restore-controls" style="display:none;" title="Show controls">
+<button id="b-show-buttons" class="btn-restore-controls" style="display:none;" title="[*show controls]">
   <i class="fa fa-align-justify"></i>
 </button>
 <div id="container" style="position: relative;">
@@ -263,7 +263,7 @@
   <!-- Section de résumé avec compteurs -->
   <div class="summary-section">
     <i class="fas fa-lightbulb summary-helper-icon" title="[*total]"></i>
-    <div class="summary-places-info">0 [*place/places]1</div>
+    <div class="summary-places-info">0 [place/places]1</div>
     <div class="summary-events-table">
       <div class="summary-event-column">
         <span class="summary-event-label birth-label" title="[birth/births]1">N</span>
@@ -346,46 +346,66 @@ var children = {
 // Translation dictionary for fanchart.js
 window.FC_TRANSLATIONS = {
   // General
-  'no_info_available': "No information available",
-  'generation': "[*generation/generations]0",
-  'generations': "[*generation/generations]1",
-  'person': "[*person/persons]0",
-  'persons': "[*person/persons]1",
-  'occurrence': "[*occurence]0",
-  'occurrences': "[*occurence]1",
-  'place': "[*place/places]0",
-  'places': "[*place/places]1",
-  'event': "[*event/events]0",
-  'events': "[*event/events]1",
+  'no_info_available': "[*no information available]",
+  'generation': "[generation/generations]0",
+  'generations': "[generation/generations]1",
+  'person': "[person/persons]0",
+  'persons': "[person/persons]1",
+  'occurrence': "[occurence]0",
+  'occurrences': "[occurence]1",
+  'place': "[place/places]0",
+  'places': "[place/places]1",
+  'event': "[event/events]0",
+  'events': "[event/events]1",
   'birth': "[*birth]",
-  'births': "[*birth/births]1",
+  'births': "[birth/births]1",
   'baptism': "[*baptism]",
-  'baptisms': "[*baptism/baptisms]1",
+  'baptisms': "[baptism/baptisms]1",
   'marriage': "[*marriage/marriages]0",
-  'marriages': "[*marriage/marriages]1",
+  'marriages': "[marriage/marriages]1",
   'death': "[*death]",
-  'deaths': "[*death/deaths]1",
+  'deaths': "[death/deaths]1",
   'burial': "[*burial]",
-  'burials': "[*burial/burials]1",
+  'burials': "[burial/burials]1",
   'implex': "Implex",
   'age': "[*age]",
-  'date': "[*date/dates]0",
-  'duration': "Duration",
-  'marriage_age': "Ages at marriage",
-  'marriage_years': "years",
-  'marriage_year': "year",
-  'years_old': "[*years old]",
+  'date': "[date/dates]0",
+  'duration': "[*duration]",
+  'marriage_age': "[*ages at marriage]",
+  'marriage_years': "[years old]",
+  'marriage_year': "[years old]",
+  'years_old': "[years old]",
   // Navigation
-  'recenter_tree_on': "Recenter tree on",
-  'no_known_parents': "No known parents",
-  'individual_sheet': "Individual sheet",
-  'navigation_help': "Navigation help",
-  'ctrl_click_sheet': "Ctrl+click for individual sheet",
+  'recenter_tree_on': "[*recenter tree on]",
+  'no_known_parents': "[*no known parents]",
+  'individual_sheet': "[*individual sheet]",
+  'navigation_help': "[*help and shortcuts]",
+  'ctrl_click_sheet': "[*ctrl+click for individual sheet]",
+  'child_of_couple': "[*child of the couple]",
   // Errors
-  'error_access_sheet': "Error accessing individual sheet",
+  'error_access_sheet': "[*error accessing individual sheet]",
   // Interface
-  'sort_by_frequency': "Sort by frequency",
-  'sort_alphabetically': "Sort alphabetically",
+  'sort_by_frequency': "[*sort by frequency]",
+  'sort_alphabetically': "[*sort alphabetically]",
+  'with_places': "[*with places]",
+  // Implex button states
+  'show_all_ancestors': "[*show all ancestors]",
+  'collapse_implex': "[*collapse implex]",
+  'number_implex': "[*number the implex]",
+  // Generation button states
+  'display_next_gen_memory': "[*display next generation (in memory)]",
+  'load_next_gen': "[*load next generation]",
+  'no_parent_next_gen': "[*no parent in next generation]",
+  // Age legend
+  'no_person_age_range': "[*no person in this age range]",
+  'no_marriage_duration_range': "[*no marriage in this duration range]",
+  // Places panel
+  'place_out_of_screen': "[place/places out of screen]0",
+  'places_out_of_screen': "[place/places out of screen]1",
+  // Implex display
+  'appears': "[appears/time/times]0",
+  'time': "[appears/time/times]1",
+  'times': "[appears/time/times]2",
 };
 
 // Helper function to retrieve a translation

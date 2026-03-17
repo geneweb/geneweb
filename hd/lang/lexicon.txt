@@ -8816,6 +8816,136 @@ de: Fächerbaum
 en: fanchart
 fr: arbre en éventail
 
+    ages at marriage
+de: Alter bei Heirat
+en: ages at marriage
+fr: âges au mariage
+
+    appears/time/times
+de: erscheint/Mal/Male
+en: appears/time/times
+fr: apparaît/fois/fois
+
+    child of the couple
+de: Kind des Paares
+en: child of the couple
+fr: enfant du couple
+
+    ctrl+click for individual sheet
+de: Strg+Klick für die Personenseite
+en: Ctrl+click for individual sheet
+fr: Ctrl+clic pour la fiche individuelle
+
+    default
+de: Standard
+en: default
+fr: défaut
+
+    degrees
+de: Grad
+en: degrees
+fr: degrés
+
+    display next generation (in memory)
+de: nächste Generation anzeigen (Daten im Speicher)
+en: display next generation (in memory)
+fr: afficher la génération suivante (données en mémoire)
+
+    duration
+de: Dauer
+en: duration
+fr: durée
+
+    error accessing individual sheet
+de: Fehler: Zugriff auf die Personenseite nicht möglich
+en: error: cannot access individual sheet
+fr: erreur : impossible d'accéder à la fiche individuelle
+
+    font
+de: Schrift
+en: font
+fr: police
+
+    individual sheet
+de: Personenseite
+en: individual sheet
+fr: fiche individuelle
+
+    load next generation
+de: nächste Generation laden
+en: load next generation
+fr: charger la génération suivante
+
+    mode
+de: Modus
+en: mode
+fr: mode
+
+    no information available
+de: keine Informationen verfügbar
+en: no information available
+fr: aucune information disponible
+
+    no known parents
+de: keine bekannten Eltern
+en: no known parents
+fr: aucun parent connu
+
+    no marriage in this duration range
+de: keine Ehe in diesem Dauerbereich
+en: no marriage in this duration range
+fr: aucun mariage dans cette tranche de durée
+
+    no parent in next generation
+de: kein Elternteil in der nächsten Generation
+en: no parent in next generation
+fr: aucun parent dans la génération suivante
+
+    no person in this age range
+de: keine Person in dieser Altersgruppe
+en: no person in this age range
+fr: aucune personne dans cette tranche d'âge
+
+    number the implex
+de: Implex nummerieren
+en: number the implex
+fr: numéroter les implexes
+
+    place/places out of screen
+de: Ort außerhalb des Bildschirms/Orte außerhalb des Bildschirms
+en: place out of screen/places out of screen
+fr: lieu hors écran/lieux hors écran
+
+    recenter tree on
+de: Baum neu zentrieren auf
+en: recenter tree on
+fr: recentrer l'arbre sur
+
+    show all ancestors
+de: alle Vorfahren anzeigen
+en: show all ancestors
+fr: afficher tous les ancêtres
+
+    show controls
+de: Steuerung anzeigen
+en: show controls
+fr: afficher les contrôles
+
+    sort alphabetically
+de: alphabetisch sortieren
+en: sort alphabetically
+fr: trier par ordre alphabétique
+
+    sort by frequency
+de: nach Häufigkeit sortieren
+en: sort by frequency
+fr: trier par fréquence
+
+    with places
+de: mit Orten
+en: with places
+fr: avec lieux
+
     father-in-law/mother-in-law
 af: skoonpa/skoonma
 br: tad-kaer/vamm-gaer

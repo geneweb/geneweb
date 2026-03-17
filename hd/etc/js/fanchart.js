@@ -1198,7 +1198,7 @@ const PlacesInterface = {
 
     personsElement.textContent = personsWithPlaces;
     const label = window.FC_TRANSLATIONS?.[personsWithPlaces > 1 ? 'persons' : 'person'] || 'personne';
-    personsElement.title = `${personsWithPlaces} ${label} avec lieux`;
+    personsElement.title = `${personsWithPlaces} ${label} ${t('with_places', 'with places')}`;
   },
 
  /**
@@ -1425,7 +1425,7 @@ const PlacesPanelControls = {
     const button = document.querySelector('.sort-toggle');
     if (button) {
       const key = sortMode === 'alphabetical' ? 'sort_alphabetically' : 'sort_by_frequency';
-      button.title = window.FC_TRANSLATIONS?.[key] || 'Changer le tri';
+      button.title = window.FC_TRANSLATIONS?.[key] || t('sort_by_frequency', 'sort');
     }
   },
 
@@ -2377,7 +2377,7 @@ const CircularModeRenderer = {
         s1Text.setAttribute("fill", "#666");
         s1Text.textContent = "⬤"; // Point central discret
         const s1Title = svgEl("title");
-        s1Title.textContent = `${ancestor["S1"].fn} ${ancestor["S1"].sn} (enfant du couple)`;
+        s1Title.textContent = `${ancestor["S1"].fn} ${ancestor["S1"].sn} (${t('child_of_couple', 'child of the couple')})`;
         s1Text.appendChild(s1Title);
         centerGroup.appendChild(s1Text);
       }*/
@@ -2422,8 +2422,8 @@ const CircularModeRenderer = {
 
     const title = svgEl("title");
     title.textContent = person.has_parents
-      ? `Recentrer l’arbre sur ${person.fn} ${person.sn}`
-      : `${person.fn} ${person.sn} : aucun parent connu`;
+      ? `${t(‘recenter_tree_on’, ‘Recenter tree on’)} ${person.fn} ${person.sn}`
+      : `${person.fn} ${person.sn} : ${t(‘no_known_parents’, ‘no known parents’)}`;
     text.appendChild(title);
 
     group.appendChild(text);
@@ -2627,7 +2627,7 @@ const SVGRenderer = {
       circle.setAttribute("class", "link");
 
       const title = svgEl("title");
-      title.textContent = `(Sosa 1) ${p.fn} ${p.sn} (${p.age_text})\nCtrl+clic pour la fiche individuelle`;
+      title.textContent = `(Sosa 1) ${p.fn} ${p.sn} (${p.age_text})\n${t('ctrl_click_sheet', 'Ctrl+click for individual sheet')}`;
       circle.appendChild(title);
 
       this.applyInteractiveFeatures(circle, p, 'person');
@@ -2800,7 +2800,7 @@ const SVGRenderer = {
       if (isImplex) {
         const cloneCount = ImplexResolver.getAllClones(p.sosasame || currentSosa).length;
         html += `<div class="implex-notice">`;
-        html += `<strong>${t('implex', 'Implex')} :</strong> appears ${cloneCount + 1} times.`;
+        html += `<strong>${t('implex', 'Implex')} :</strong> ${t('appears', 'appears')} ${cloneCount + 1} ${cloneCount + 1 > 1 ? t('times', 'times') : t('time', 'time')}.`;
         html += `</div>`;
       }
 
@@ -2851,7 +2851,7 @@ const SVGRenderer = {
       return;
     }
     if (!link_to_person) {
-      alert("Erreur: Impossible d'accéder à la fiche individuelle");
+      alert(t('error_access_sheet', 'Error: cannot access individual sheet'));
       return;
     }
     const useNewTab = e.ctrlKey || e.metaKey;
@@ -3140,7 +3140,7 @@ const SVGRenderer = {
       text.innerHTML = `<textPath xlink:href="#${pathId}" startOffset="50%" style="font-size:${fontSize}%;">&#x2716;</textPath>`;
     }
     const title = svgEl("title");
-    title.textContent = hasParents ? `Recentrer l’arbre sur ${p.fn} ${p.sn}` : `${p.fn} ${p.sn} : aucun parent connu`;
+    title.textContent = hasParents ? `${t(‘recenter_tree_on’, ‘Recenter tree on’)} ${p.fn} ${p.sn}` : `${p.fn} ${p.sn} : ${t(‘no_known_parents’, ‘no known parents’)}`;
     text.appendChild(title);
     g.append(text);
     return text;
@@ -3455,14 +3455,14 @@ const UIManager = {
     helpPanel.id = 'navigation-help';
     helpPanel.style.display = 'none'; // Caché par défaut
     helpPanel.innerHTML = `
-      <div class="help-title">💡 Aide Navigation</div>
-      <div><strong>Souris :</strong></div>
-      <div>– Glisser : déplacer l’arbre</div>
-      <div>– Molette : zoomer</div>
-      <div>– Survol : voir les détails</div>
-      <div><strong>Raccourcis :</strong></div>
-      <div>– <kbd>Ctrl</kbd>+clic : fiche individuelle</div>
-      <div>– ▲ : navigation sur ancêtre</div>
+      <div class="help-title">💡 ${t(‘navigation_help’, ‘Navigation help’)}</div>
+      <div><strong>🖱️</strong></div>
+      <div>– drag : move</div>
+      <div>– scroll : zoom</div>
+      <div>– hover : details</div>
+      <div><strong>⌨️</strong></div>
+      <div>– <kbd>Ctrl</kbd>+click : ${t(‘individual_sheet’, ‘individual sheet’)}</div>
+      <div>– ▲ : ancestor</div>
       <div style="margin-top: 8px; text-align: center;">
       </div>
     `;
@@ -3705,8 +3705,8 @@ const AgeHighlighter = {
 
     // D'abord, remettre toutes les catégories visibles
     const categoryTypes = [
-      { prefix: 'DA', title: 'Aucune personne dans cette tranche d’âge' },
-      { prefix: 'DAM', title: 'Aucun mariage dans cette tranche de durée' }
+      { prefix: ‘DA’, title: t(‘no_person_age_range’, ‘No person in this age range’) },
+      { prefix: ‘DAM’, title: t(‘no_marriage_duration_range’, ‘No marriage in this duration range’) }
     ];
 
     categoryTypes.forEach(type => {
@@ -4112,7 +4112,7 @@ const ModernOverflowManager = {
     header.className = 'overflow-header';
     header.innerHTML = `
       <i class="fas fa-arrow-${position === 'above' ? 'up' : 'down'} fa-sm"></i>
-      ${items.length} lieu${items.length > 1 ? 'x' : ''} hors écran
+      ${items.length} ${items.length > 1 ? t('places_out_of_screen', 'places out of screen') : t('place_out_of_screen', 'place out of screen')}
     `;
 
     // Contenu - utilise uniquement la classe CSS existante
@@ -4670,11 +4670,11 @@ const FanchartApp = {
       addButton.disabled = !canAdd;
 
       if (max_gen < max_gen_loaded) {
-        addButton.title = "Afficher la génération suivante (données en mémoire)";
+        addButton.title = t('display_next_gen_memory', 'Display next generation (in memory)');
       } else if (hasParentsAvailable) {
-        addButton.title = "Charger la génération suivante";
+        addButton.title = t('load_next_gen', 'Load next generation');
       } else {
-        addButton.title = "Aucun parent dans la génération suivante";
+        addButton.title = t('no_parent_next_gen', 'No parent in next generation');
       }
     }
   },
@@ -5337,17 +5337,17 @@ reRenderWithCurrentGenerations: function() {
       switch(implexMode) {
         case "reduced":
           implexMode = "numbered";
-          this.title = "Afficher tous les ancêtres";
+          this.title = t('show_all_ancestors', 'Show all ancestors');
           this.querySelector("i").className = "fa fa-comment fa-fw";
           break;
         case "numbered":
           implexMode = "full";
-          this.title = "Réduire les implexes";
+          this.title = t('collapse_implex', 'Collapse implex');
           this.querySelector("i").className = "fa fa-comment-slash fa-fw";
           break;
         case "full":
           implexMode = "reduced";
-          this.title = "Numéroter les implexes";
+          this.title = t('number_implex', 'Number the implex');
           this.querySelector("i").className = "fa fa-comment-dots fa-fw";
           break;
       }
