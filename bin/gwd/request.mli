@@ -51,3 +51,20 @@ val person_selected_with_redirect :
 val incorrect_request : Geneweb.Config.config -> unit
 
 (**/**)
+
+module NG : sig
+  val ng :
+    ?person_selected_with_redirect:
+      (conf:Geneweb.Config.config ->
+      base:Gwdb.base ->
+      person:Gwdb.person ->
+      unit ->
+      unit) ->
+    ?specify:
+      (Geneweb.Config.config -> Gwdb.base -> string -> Gwdb.person list -> unit) ->
+    ?incorrect_request:(Geneweb.Config.config -> Gwdb.base -> unit) ->
+    ?relation_print:(Geneweb.Config.config -> Gwdb.base -> Gwdb.person -> unit) ->
+    Geneweb.Config.config ->
+    Gwdb.base ->
+    unit
+end

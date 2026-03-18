@@ -1,41 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let person_is_std_key conf base p k =
-  let k = Name.strip_lower k in
-  k = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
-  || List.exists
-       (fun n -> Name.strip n = k)
-       (Gwdb.person_misc_names base p (Geneweb.Person.nobtit conf base))
-
-let select_std_eq conf base pl k =
-  List.filter (fun p -> person_is_std_key conf base p k) pl
-
-let find_all conf base an =
-  let sosa_ref = Geneweb.Util.find_sosa_ref conf base in
-  let sosa_nb = Sosa.of_string an in
-  match (sosa_ref, sosa_nb) with
-  | Some p, Some n ->
-      if n <> Sosa.zero then
-        match Geneweb.Util.p_of_sosa conf base n p with
-        | Some p -> ([ p ], true)
-        | None -> ([], false)
-      else ([], false)
-  | Some _, None | None, Some _ | None, None -> (
-      let acc = Geneweb.SearchName.search_by_key conf base an in
-      match acc with
-      | Some acc -> ([ acc ], false)
-      | None ->
-          ( Geneweb.SearchName.search_key_aux
-              (fun conf base acc an ->
-                let spl = select_std_eq conf base acc an in
-                if spl = [] then
-                  if acc = [] then
-                    Geneweb.SearchName.search_by_name conf base an
-                  else acc
-                else spl)
-              conf base an,
-            false ))
-
 let relation_print conf base p =
   let p1 =
     match Geneweb.Util.p_getenv conf.Geneweb.Config.senv "ei" with
@@ -236,7 +200,7 @@ let very_unknown conf _ =
       | None -> incorrect_request conf)
 
 (* Print Not found page *)
-let unknown conf n =
+let unknown ?(with_status = true) conf n =
   let title _ =
     Geneweb.Util.transl conf "not found"
     |> Utf8.capitalize_fst
@@ -246,7 +210,7 @@ let unknown conf n =
     Geneweb.Output.print_string conf (Geneweb.Util.escape_html n);
     Geneweb.Output.print_sstring conf {|"|}
   in
-  Geneweb.Output.status conf Def.Not_Found;
+  if with_status then Geneweb.Output.status conf Def.Not_Found;
   Geneweb.Hutil.rheader conf title;
   Geneweb.Hutil.print_link_to_welcome conf false;
   Geneweb.Hutil.trailer conf
@@ -448,6 +412,147 @@ let w_wizard fn conf base =
   else
     (* FIXME: send authentification headers *)
     output_error conf Def.Unauthorized
+
+module NG = struct
+  module Util = struct
+    let person_is_std_key conf base p k =
+      let k = Name.strip_lower k in
+      k
+      = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
+      || List.exists
+           (fun n -> Name.strip n = k)
+           (Gwdb.person_misc_names base p (Geneweb.Person.nobtit conf base))
+
+    let select_std_eq conf base pl k =
+      List.filter (fun p -> person_is_std_key conf base p k) pl
+
+    let find_all conf base an =
+      let sosa_ref = Geneweb.Util.find_sosa_ref conf base in
+      let sosa_nb = Sosa.of_string an in
+      match (sosa_ref, sosa_nb) with
+      | Some p, Some n ->
+          if n <> Sosa.zero then
+            match Geneweb.Util.p_of_sosa conf base n p with
+            | Some p -> ([ p ], true)
+            | _ -> ([], false)
+          else ([], false)
+      | _ -> (
+          let acc = Geneweb.SearchName.search_by_key conf base an in
+          match acc with
+          | Some acc -> ([ acc ], false)
+          | None ->
+              ( Geneweb.SearchName.search_key_aux
+                  (fun conf base acc an ->
+                    let spl = select_std_eq conf base acc an in
+                    if spl = [] then
+                      if acc = [] then
+                        Geneweb.SearchName.search_by_name conf base an
+                      else acc
+                    else spl)
+                  conf base an,
+                false ))
+  end
+
+  let build_conf conf =
+    (* Rétro-compatibilité <= 6.06 *)
+    let env =
+      match Geneweb.Util.p_getenv conf.Geneweb.Config.env "n" with
+      | Some n -> (
+          match Geneweb.Util.p_getenv conf.env "t" with
+          | Some "P" -> ("fn", Mutil.encode n) :: conf.env
+          | Some "N" -> ("sn", Mutil.encode n) :: conf.env
+          | _ -> ("v", Mutil.encode n) :: conf.env)
+      | None -> conf.env
+    in
+    { conf with env }
+
+  (* Récupère le contenu non vide de la recherche. *)
+  let real_input conf label =
+    match Geneweb.Util.p_getenv conf.Geneweb.Config.env label with
+    | Some s -> if s = "" then None else Some s
+    | None -> None
+
+  (* Recherche par clé, sosa, alias ... *)
+  let search person_selected_with_redirect specify conf base n =
+    let pl, sosa_acc = Util.find_all conf base n in
+    match pl with
+    | [] ->
+        let query_params =
+          match
+            Geneweb.Page.Last_name_search.Query_params.from_env
+              (("v", Mutil.encode n) :: conf.env)
+          with
+          | None -> assert false
+          | Some query_params -> query_params
+        in
+        let sres =
+          Geneweb.Search_name_display.search_surname ~exact:query_params.exact
+            conf base n
+        in
+        Geneweb.Search_name_display.surname_print ~query_params conf base
+          (unknown ~with_status:false)
+          sres
+    | [ p ] ->
+        if
+          sosa_acc
+          || Gutil.person_of_string_key base n <> None
+          || Util.person_is_std_key conf base p n
+        then person_selected_with_redirect ~conf ~base ~person:p ()
+        else specify conf base n pl
+    | pl -> specify conf base n pl
+
+  let on_select_input_or_none person_selected_with_redirect specify
+      incorrect_request conf base (n, fn, sn) =
+    let search = search person_selected_with_redirect specify in
+    match (n, fn, sn) with
+    | Some n, _, _ -> search conf base n
+    | None, Some fn, Some sn -> search conf base (fn ^ " " ^ sn)
+    | None, Some fn, None ->
+        let query_params =
+          match
+            Geneweb.Page.First_name_search.Query_params.from_env
+              (("v", Mutil.encode fn) :: conf.Geneweb.Config.env)
+          with
+          | None -> assert false
+          | Some query_params -> query_params
+        in
+        Geneweb.Search_name_display.first_name_print ~query_params conf base
+    | None, None, Some sn ->
+        let query_params =
+          match
+            Geneweb.Page.Last_name_search.Query_params.from_env
+              (("v", Mutil.encode sn) :: conf.env)
+          with
+          | Some query_params -> query_params
+          | None -> assert false
+        in
+        let sres =
+          Geneweb.Search_name_display.search_surname ~exact:query_params.exact
+            conf base sn
+        in
+        Geneweb.Search_name_display.surname_print ~query_params conf base
+          (unknown ~with_status:false)
+          sres
+    | None, None, None -> incorrect_request conf base
+
+  let ng
+      ?(person_selected_with_redirect =
+        person_selected_with_redirect ~parameters:[]) ?(specify = specify)
+      ?(incorrect_request = fun conf _base -> incorrect_request conf)
+      ?(relation_print = relation_print) conf base =
+    let conf = build_conf conf in
+    (* Nouveau mode de recherche. *)
+    match Geneweb.Util.p_getenv conf.Geneweb.Config.env "select" with
+    | Some "input" | None ->
+        let n = real_input conf "v" in
+        let fn = real_input conf "fn" in
+        let sn = real_input conf "sn" in
+        on_select_input_or_none person_selected_with_redirect specify
+          incorrect_request conf base (n, fn, sn)
+    | Some i ->
+        relation_print conf base
+          (Geneweb.Util.pget conf base (Gwdb.iper_of_string i))
+end
 
 let treat_request =
   let w_lock =
@@ -673,95 +778,7 @@ let treat_request =
            | "MRG_MOD_IND_OK" ->
                w_wizard @@ w_lock @@ w_base
                @@ Geneweb.MergeIndOkDisplay.print_mod_merge
-           | "NG" -> (
-               w_base @@ fun conf base ->
-               (* Rétro-compatibilité <= 6.06 *)
-               let env =
-                 match Geneweb.Util.p_getenv conf.env "n" with
-                 | Some n -> (
-                     match Geneweb.Util.p_getenv conf.env "t" with
-                     | Some "P" -> ("fn", Mutil.encode n) :: conf.env
-                     | Some "N" -> ("sn", Mutil.encode n) :: conf.env
-                     | _ -> ("v", Mutil.encode n) :: conf.env)
-                 | None -> conf.env
-               in
-               let conf = { conf with env } in
-               (* Nouveau mode de recherche. *)
-               match Geneweb.Util.p_getenv conf.env "select" with
-               | Some "input" | None -> (
-                   (* Récupère le contenu non vide de la recherche. *)
-                   let real_input label =
-                     match Geneweb.Util.p_getenv conf.env label with
-                     | Some s -> if s = "" then None else Some s
-                     | None -> None
-                   in
-                   (* Recherche par clé, sosa, alias ... *)
-                   let search n =
-                     let pl, sosa_acc = find_all conf base n in
-                     match pl with
-                     | [] ->
-                         let query_params =
-                           match
-                             Geneweb.Page.Last_name_search.Query_params.from_env
-                               (("v", Mutil.encode n) :: conf.env)
-                           with
-                           | None -> assert false
-                           | Some query_params -> query_params
-                         in
-                         let sres =
-                           Geneweb.Search_name_display.search_surname
-                             ~exact:query_params.exact conf base n
-                         in
-                         Geneweb.Search_name_display.surname_print ~query_params
-                           conf base unknown sres
-                     | [ p ] ->
-                         if
-                           sosa_acc
-                           || Gutil.person_of_string_key base n <> None
-                           || person_is_std_key conf base p n
-                         then
-                           person_selected_with_redirect ~conf ~base ~person:p
-                             ()
-                         else specify conf base n pl
-                     | pl -> specify conf base n pl
-                   in
-                   match real_input "v" with
-                   | Some n -> search n
-                   | None -> (
-                       match (real_input "fn", real_input "sn") with
-                       | Some fn, Some sn -> search (fn ^ " " ^ sn)
-                       | Some fn, None ->
-                           let query_params =
-                             match
-                               Geneweb.Page.First_name_search.Query_params
-                               .from_env
-                                 (("v", Mutil.encode fn) :: conf.env)
-                             with
-                             | None -> assert false
-                             | Some query_params -> query_params
-                           in
-                           Geneweb.Search_name_display.first_name_print
-                             ~query_params conf base
-                       | None, Some sn ->
-                           let query_params =
-                             match
-                               Geneweb.Page.Last_name_search.Query_params
-                               .from_env
-                                 (("v", Mutil.encode sn) :: conf.env)
-                             with
-                             | Some query_params -> query_params
-                             | None -> assert false
-                           in
-                           let sres =
-                             Geneweb.Search_name_display.search_surname
-                               ~exact:query_params.exact conf base sn
-                           in
-                           Geneweb.Search_name_display.surname_print
-                             ~query_params conf base unknown sres
-                       | None, None -> incorrect_request conf base))
-               | Some i ->
-                   relation_print conf base
-                     (Geneweb.Util.pget conf base (Gwdb.iper_of_string i)))
+           | "NG" -> w_base NG.ng
            | "NOTES" -> w_base @@ Geneweb.NotesDisplay.print
            | "PS" -> w_base @@ Geneweb.PlaceDisplay.print_all_places_surnames
            | "R" -> w_base @@ w_person @@ relation_print
