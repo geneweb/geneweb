@@ -223,6 +223,60 @@ let string_of_on_hebrew_dmy conf d =
   in
   string_of_on_prec_dmy conf sy sy2 d
 
+(* ************************************************************************ *)
+(*  [Fonc] prec_text : config -> Def.dmy -> string                          *)
+
+(* ************************************************************************ *)
+
+(** [Description] : Renvoie la précision d'une date. [Args] :
+    - conf : configuration de la base
+    - d : Def.dmy [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
+let prec_text conf d =
+  match d.Adef.prec with
+  | About -> (
+      (* On utilise le dictionnaire pour être sur *)
+      (* que ce soit compréhensible de tous.      *)
+      match transl conf "about (short date)" with
+      | "ca" -> "ca "
+      | s -> s)
+  | Maybe -> "?"
+  | Before -> "<"
+  | After -> ">"
+  | OrYear _ -> "|"
+  | YearInt _ -> ".."
+  | Sure -> ""
+
+let string_of_french_dmy conf d =
+  let sy = code_french_date conf d.Adef.day d.month d.year in
+  let s =
+    match d.Adef.prec with
+    | OrYear d2 ->
+        let sy2 = code_french_date conf d2.Adef.day2 d2.month2 d2.year2 in
+        sy ^ " " ^ transl conf "or" ^ " " ^ sy2
+    | YearInt d2 ->
+        let sy2 = code_french_date conf d2.Adef.day2 d2.month2 d2.year2 in
+        transl conf "between (date)"
+        ^ " " ^ sy ^ " " ^ transl_nth conf "and" 0 ^ " " ^ sy2
+    | _ -> prec_text conf d ^ sy
+  in
+  Adef.safe s
+
+let string_of_hebrew_dmy conf d =
+  let sy = code_hebrew_date conf d.Adef.day d.month d.year in
+  let s =
+    match d.Adef.prec with
+    | OrYear d2 ->
+        let sy2 = code_hebrew_date conf d2.Adef.day2 d2.month2 d2.year2 in
+        sy ^ " " ^ transl conf "or" ^ " " ^ sy2
+    | YearInt d2 ->
+        let sy2 = code_hebrew_date conf d2.Adef.day2 d2.month2 d2.year2 in
+        transl conf "between (date)"
+        ^ " " ^ sy ^ " " ^ transl_nth conf "and" 0 ^ " " ^ sy2
+    | _ -> prec_text conf d ^ sy
+  in
+  Adef.safe s
+
 let string_of_prec_dmy conf s s2 d =
   Adef.safe
   @@
@@ -381,7 +435,7 @@ let french_gregorian_precision conf d =
     ^ " " ^ s1 ^ " " ^ transl_nth conf "and" 0 ^ " "
     ^ (string_of_on_dmy conf d2 :> string)
 
-let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
+let string_of_date_aux ?(link = true) ?(on = false) ?(dmy = string_of_dmy)
     ?(sep = Adef.safe " ") conf =
   let mk_link c d (s : Adef.safe_string) =
     Adef.safe
@@ -416,7 +470,9 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
       if link && d1.day > 0 then mk_link 'j' d1 s else s
   | Dgreg (d, Dfrench) -> (
       let d1 = Calendar.french_of_gregorian d in
-      let s = string_of_on_french_dmy conf d1 in
+      let s =
+        (if on then string_of_on_french_dmy else string_of_french_dmy) conf d1
+      in
       let s = if link && d1.day > 0 then mk_link 'f' d1 s else s in
       match d.prec with
       | Sure | About | Before | After | Maybe ->
@@ -429,7 +485,9 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
       | OrYear _ | YearInt _ -> s)
   | Dgreg (d, Dhebrew) -> (
       let d1 = Calendar.hebrew_of_gregorian d in
-      let s = string_of_on_hebrew_dmy conf d1 in
+      let s =
+        (if on then string_of_on_hebrew_dmy else string_of_hebrew_dmy) conf d1
+      in
       match d.prec with
       | Sure | About | Before | After | Maybe ->
           s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
@@ -437,7 +495,7 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
   | Dtext t -> "(" ^<^ (Util.escape_html t :> Adef.safe_string) ^>^ ")"
 
 let string_of_ondate ?link conf d =
-  (string_of_date_aux ?link ~dmy:string_of_on_dmy conf d :> string)
+  (string_of_date_aux ?link ~on:true ~dmy:string_of_on_dmy conf d :> string)
   |> Util.translate_eval |> Adef.safe
 
 let string_of_date conf = function
@@ -518,30 +576,6 @@ let string_of_age conf a =
       else if d >= 2 then string_of_int d ^ " " ^ transl conf "days old"
       else if d = 1 then transl conf "one day old"
       else "0"
-
-(* ************************************************************************ *)
-(*  [Fonc] prec_text : config -> Def.dmy -> string                          *)
-
-(* ************************************************************************ *)
-
-(** [Description] : Renvoie la précision d'une date. [Args] :
-    - conf : configuration de la base
-    - d : Def.dmy [Retour] : string [Rem] : Exporté en clair hors de ce module.
-*)
-let prec_text conf d =
-  match d.Adef.prec with
-  | About -> (
-      (* On utilise le dictionnaire pour être sur *)
-      (* que ce soit compréhensible de tous.      *)
-      match transl conf "about (short date)" with
-      | "ca" -> "ca "
-      | s -> s)
-  | Maybe -> "?"
-  | Before -> "<"
-  | After -> ">"
-  | OrYear _ -> "|"
-  | YearInt _ -> ".."
-  | Sure -> ""
 
 (* ************************************************************************ *)
 (*  [Fonc] month_text : Def.dmy -> string                                   *)

@@ -99,6 +99,7 @@ val code_french_year : config -> int -> string
 
 val string_of_date_aux :
   ?link:bool ->
+  ?on:bool ->
   ?dmy:(Config.config -> Adef.dmy -> Adef.safe_string) ->
   ?sep:Adef.safe_string ->
   Config.config ->
