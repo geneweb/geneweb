@@ -515,15 +515,17 @@ let update_modification_times ~base ~(kind : [< `First_name | `Surname ])
     ~first_name_index_files ~surname_index_files =
   match kind with
   | `First_name ->
-      if surname_already_initialized && not first_name_already_initialized then
+      if surname_already_initialized then
         List.iter Files.set_modification_time_to_now
           (List.map (Filename.concat base.Dbdisk.data.bdir) surname_index_files)
   | `Surname ->
-      if first_name_already_initialized && not surname_already_initialized then
+      if first_name_already_initialized then
         List.iter Files.set_modification_time_to_now
           (List.map (Filename.concat base.data.bdir) first_name_index_files)
 
 module Integrity : sig
+  type integrity
+
   val check_index_integrity :
     kind:[< `Surname | `First_name ] ->
     base:Dbdisk.dsk_base ->
@@ -533,6 +535,8 @@ module Integrity : sig
   val write_index_integrity :
     kind:[< `Surname | `First_name | `All ] -> base:Dbdisk.dsk_base -> unit
 
+  val read_index_integrity : Dbdisk.dsk_base -> integrity
+  val integrity_matches : [< `Surname | `First_name ] -> integrity -> bool
   val has_index_integrity_file : Dbdisk.dsk_base -> bool
 end = struct
   let index_integrity_fname = "index_integrity"
@@ -558,6 +562,14 @@ end = struct
     match kind with
     | `Surname -> integrity.surname = Some current_integrity_code
     | `First_name -> integrity.firstname = Some current_integrity_code
+
+  let is_integrity_empty kind integrity =
+    let integrity_kind =
+      match kind with
+      | `Surname -> integrity.surname
+      | `First_name -> integrity.firstname
+    in
+    integrity_kind = None
 
   let string_of_integrity integrity =
     Printf.sprintf "%s\n%s\n"
@@ -619,7 +631,8 @@ end = struct
       is_ok
     in
     let index_integrity = read_index_integrity base in
-    integrity_matches kind index_integrity || check ()
+    integrity_matches kind index_integrity
+    || (is_integrity_empty kind index_integrity && check ())
 
   let has_index_integrity_file base =
     Sys.file_exists
@@ -649,20 +662,22 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
       in
       let surname_already_initialized =
         are_already_initialized base surname_index_files
-        && Integrity.check_index_integrity ~kind ~base
-             ~index_file:Database.lowercase_surname_index_file
       in
       let first_name_already_initialized =
         are_already_initialized base first_name_index_files
-        && Integrity.check_index_integrity ~kind ~base
-             ~index_file:Database.lowercase_first_name_index_file
       in
       let generate_index, already_initialized =
         match kind with
         | `First_name ->
-            (generate_lowercase_first_name_index, first_name_already_initialized)
+            ( generate_lowercase_first_name_index,
+              first_name_already_initialized
+              && Integrity.check_index_integrity ~kind ~base
+                   ~index_file:Database.lowercase_first_name_index_file )
         | `Surname ->
-            (generate_lowercase_surname_index, surname_already_initialized)
+            ( generate_lowercase_surname_index,
+              surname_already_initialized
+              && Integrity.check_index_integrity ~kind ~base
+                   ~index_file:Database.lowercase_surname_index_file )
       in
       if not already_initialized then (
         base.Dbdisk.func.cleanup ();
@@ -684,8 +699,12 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
         Integrity.write_index_integrity ~kind ~base;
         base)
       else (
-        if not (Integrity.has_index_integrity_file base) then
-          Integrity.write_index_integrity ~kind ~base;
+        if
+          not
+            (Integrity.has_index_integrity_file base
+            && Integrity.integrity_matches kind
+                 (Integrity.read_index_integrity base))
+        then Integrity.write_index_integrity ~kind ~base;
         base))
 
 let output ?(save_mem = false) ?(tasks = []) base =
