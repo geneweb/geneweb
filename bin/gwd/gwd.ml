@@ -2638,6 +2638,11 @@ let parse_cmd () =
         Arg.Unit set_check_flag,
         " Run only the server startup sequence for test purpose. This flag \
          implies -debug and -predictable_mode." );
+      ( "-predictable_mode",
+        Arg.Unit set_predictable_mode,
+        " Turn on the predictable mode. In this mode, the behavior of the \
+         server is predictable, which is helpful for debugging or testing. \
+         (default: false)" );
       arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin.";
       arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.";
       ( "-version",
@@ -2684,11 +2689,6 @@ let parse_cmd () =
                 else
                   failwith "-cache-in-memory option unavailable for this build."),
             "<DATABASE> Preload this database in memory" );
-          ( "-predictable_mode",
-            Arg.Unit set_predictable_mode,
-            " Turn on the predictable mode. In this mode, the behavior of the \
-             server is predictable, which is helpful for debugging or testing. \
-             (default: false)" );
         ]
     else speclist
   in
