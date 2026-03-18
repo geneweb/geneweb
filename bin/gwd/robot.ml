@@ -142,9 +142,7 @@ let robot_excl () =
 let min_disp_req = ref 6
 
 let log_summary tm xcl nconn =
-  let local_tm = Unix.localtime tm in
-  Log.info (fun k ->
-      k "%s === ROBOT SUMMARY ===" (Mutil.sprintf_date local_tm :> string));
+  Log.info (fun k -> k "=== ROBOT SUMMARY ===");
   Log.info (fun k ->
       k "  Blocked IPs: %d, Monitored: %d" (List.length xcl.excl) nconn);
   Log.info (fun k ->

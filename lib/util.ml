@@ -543,7 +543,10 @@ let html ?(content_type = "text/html") conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
   Output.header conf "Content-type: %s; charset=%s" content_type charset;
   if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.ver;
-  Output.header conf "Date: %s" (string_of_ctime conf);
+  let date =
+    if conf.predictable_mode then "UNPREDICTABLE" else string_of_ctime conf
+  in
+  Output.header conf "Date: %s" date;
   Output.header conf "Connection: close"
 
 let unauthorized conf auth_type =

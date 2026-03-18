@@ -173,6 +173,8 @@ let substr_start_aux n s =
   in
   loop 0 n
 
+let value conf v = if conf.Config.predictable_mode then "UNPREDICTABLE" else v
+
 let rec eval_variable (conf : Config.config) = function
   | [ "base"; "name" ] -> conf.bname
   | [ "lang"; "full" ] ->
@@ -345,16 +347,16 @@ and eval_int conf n = function
 and eval_time_var conf = function
   | [ "hours" ] ->
       let hh, _, _ = conf.time in
-      Printf.sprintf "%02d" hh
+      value conf (Printf.sprintf "%02d" hh)
   | [ "minutes" ] ->
       let _, mm, _ = conf.time in
-      Printf.sprintf "%02d" mm
+      value conf (Printf.sprintf "%02d" mm)
   | [ "seconds" ] ->
       let _, _, ss = conf.time in
-      Printf.sprintf "%02d" ss
+      value conf (Printf.sprintf "%02d" ss)
   | [] ->
       let hh, mm, ss = conf.time in
-      Printf.sprintf "%02d:%02d:%02d" hh mm ss
+      value conf (Printf.sprintf "%02d:%02d:%02d" hh mm ss)
   | _ -> raise Not_found
 
 and eval_simple_variable conf = function
@@ -457,13 +459,13 @@ and eval_simple_variable conf = function
       String.concat "&" l
   | "url" -> url_aux ~pwd:true conf
   | "url_no_pwd" -> url_aux ~pwd:false conf
-  | "version" -> Version.ver
-  | "version_short" -> Version.ver_short
-  | "commit_id" -> Version.commit_id
-  | "commit_date" -> Version.commit_date
-  | "compil_date" -> Version.compil_date
-  | "branch" -> Version.branch
-  | "source" -> Version.src
+  | "version" -> value conf Version.ver
+  | "version_short" -> value conf Version.ver_short
+  | "commit_id" -> value conf Version.commit_id
+  | "commit_date" -> value conf Version.commit_date
+  | "compil_date" -> value conf Version.compil_date
+  | "branch" -> value conf Version.branch
+  | "source" -> value conf Version.src
   | "/" -> ""
   | _ -> raise Not_found
 

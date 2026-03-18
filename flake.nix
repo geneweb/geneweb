@@ -125,6 +125,7 @@
           packages = [
             ocamlWrapped
           ] ++ (with pkgs; [
+            brotli
             rlwrap
           ]) ++ (with ocamlPackages; [
             qcheck

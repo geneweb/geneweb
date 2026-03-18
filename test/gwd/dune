@@ -1,5 +1,19 @@
+(subdir
+ bases
+ (rule
+  (target galichet.gwb)
+  (deps
+   (:gw_source ../../galichet.gw))
+  (action
+   (ignore-stderr
+    (run %{bin:gwc} -bd . %{gw_source} -f)))))
+
 (cram
  (package geneweb)
  (deps
   %{bin:gwd}
+  ./bases/galichet.gwb
+  ./gwd-cgi.sh
+  (glob_files_rec ./bases/*)
+  (glob_files_rec ../../hd/*)
   (glob_files_rec ../../plugins/*)))

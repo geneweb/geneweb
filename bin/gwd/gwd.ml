@@ -191,16 +191,16 @@ let parse_prefixes () =
     | _, Some s -> s
     | None, None -> default_images_prefix
   in
-  images_prefix := Some p;
+  set_images_prefix p;
   let p =
     match (!gw_prefix, !etc_prefix) with
     | Some s, None -> s // "etc"
     | _, Some s -> s
     | None, None -> default_etc_prefix
   in
-  etc_prefix := Some p;
+  set_etc_prefix p;
   let p = Option.value ~default:default_gw_prefix !gw_prefix in
-  gw_prefix := Some p;
+  set_gw_prefix p;
   Secure.add_assets p
 
 type plugin = {
@@ -1705,8 +1705,12 @@ let log tm conf from gauth request script_name contents =
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   if not (should_log_request contents referer user_agent) then ()
   else
+    let pp_pid ppf pid =
+      if conf.predictable_mode then Fmt.pf ppf "UNPREDICTABLE"
+      else Fmt.int ppf pid
+    in
     Logs.info (fun k ->
-        k "(%d) %s?%s\n%s%s%s%s%s" (Unix.getpid ()) script_name
+        k "(PID: %a) %s?%s\n%s%s%s%s%s" pp_pid (Unix.getpid ()) script_name
           (if String.length contents > 200 then
              Printf.sprintf "%s..." (String.sub contents 0 200)
            else contents)
@@ -2634,6 +2638,11 @@ let parse_cmd () =
         Arg.Unit set_check_flag,
         " Run only the server startup sequence for test purpose. This flag \
          implies -debug and -predictable_mode." );
+      ( "-predictable_mode",
+        Arg.Unit set_predictable_mode,
+        " Turn on the predictable mode. In this mode, the behavior of the \
+         server is predictable, which is helpful for debugging or testing. \
+         (default: false)" );
       arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin.";
       arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.";
       ( "-version",
@@ -2680,11 +2689,6 @@ let parse_cmd () =
                 else
                   failwith "-cache-in-memory option unavailable for this build."),
             "<DATABASE> Preload this database in memory" );
-          ( "-predictable_mode",
-            Arg.Unit set_predictable_mode,
-            " Turn on the predictable mode. In this mode, the behavior of the \
-             server is predictable, which is helpful for debugging or testing. \
-             (default: false)" );
         ]
     else speclist
   in
