@@ -1096,7 +1096,7 @@ let treat_request =
              conf.bname body);
         Hutil.trailer conf
     in
-    if conf.debug then
+    if conf.debug && not conf.predictable_mode then
       Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
     else process ()
 

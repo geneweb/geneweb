@@ -89,12 +89,6 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           dune-cache: true
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-
-      - name: Install python dependencies
-        run: pip install pycurl certifi
-
       - name: Install Perl dependencies (Windows @v3)
         if: runner.os == 'Windows'
         run: cpan -j .github/ci-config/cpan-config.pm -T -f -i String::ShellQuote IPC::System::Simple;

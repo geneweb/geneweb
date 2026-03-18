@@ -127,10 +127,6 @@
           ] ++ (with pkgs; [
             brotli
             rlwrap
-            (python3.withPackages (p: with p; [
-              pycurl
-              certifi
-            ]))
           ]) ++ (with ocamlPackages; [
             qcheck
             qcheck-alcotest

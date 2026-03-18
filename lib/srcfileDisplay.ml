@@ -14,18 +14,30 @@ type counter = {
 }
 
 let get_date conf =
-  Printf.sprintf "%02d/%02d/%d" conf.today.day conf.today.month conf.today.year
+  if conf.predictable_mode then Format.sprintf "hidden"
+  else
+    Printf.sprintf "%02d/%02d/%d" conf.today.day conf.today.month
+      conf.today.year
 
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
 
+let default_count start_date =
+  {
+    welcome_cnt = 0;
+    request_cnt = 0;
+    start_date;
+    wizard_cnt = 0;
+    friend_cnt = 0;
+    normal_cnt = 0;
+  }
+
 let count conf =
   let _ = Util.test_cnt_d conf in
   let fname = !GWPARAM.adm_file (conf.bname ^ ".txt") in
+  let start_date = get_date conf in
   try
-    let ic = Secure.open_in fname in
-    let rd =
-      try
+    Secure.with_open_in_text fname (fun ic ->
         let wc = int_of_string (input_line ic) in
         let rc = int_of_string (input_line ic) in
         let d = input_line ic in
@@ -39,28 +51,8 @@ let count conf =
           wizard_cnt = wzc;
           friend_cnt = frc;
           normal_cnt = nrc;
-        }
-      with _ ->
-        {
-          welcome_cnt = 0;
-          request_cnt = 0;
-          start_date = get_date conf;
-          wizard_cnt = 0;
-          friend_cnt = 0;
-          normal_cnt = 0;
-        }
-    in
-    close_in ic;
-    rd
-  with _ ->
-    {
-      welcome_cnt = 0;
-      request_cnt = 0;
-      start_date = get_date conf;
-      wizard_cnt = 0;
-      friend_cnt = 0;
-      normal_cnt = 0;
-    }
+        })
+  with _ -> default_count start_date
 
 let write_counter conf r =
   let cnt_d = Util.test_cnt_d conf in
