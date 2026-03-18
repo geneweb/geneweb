@@ -2046,7 +2046,7 @@ let null_reopen flags fd =
    If the [random] argument is [false], the salt is always the same.
    The default is [true]. *)
 let generate_secret_salt ?(random = true) () =
-  if not random then ""
+  if not random then "UNPREDICTABLE"
   else
     try Geneweb_oidc.Oidc.generate_token ()
     with Sys_error _ | End_of_file ->
