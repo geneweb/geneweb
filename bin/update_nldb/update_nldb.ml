@@ -45,6 +45,7 @@ let notes_links s =
           in
           loop list_nt list_ind (pos + 1) j
       | NotesLinks.WLwizard (j, _, _) -> loop list_nt list_ind (pos + 1) j
+      | NotesLinks.WLimage (j, _, _, _) -> loop list_nt list_ind pos j
       | NotesLinks.WLnone (j, _) -> loop list_nt list_ind pos j
   in
   loop [] [] 1 0
