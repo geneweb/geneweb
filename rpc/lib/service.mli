@@ -62,6 +62,11 @@ module Search : sig
   (** [make ~fuel l] prepares a search service with a list [l] of inverted
       indexes, each with its name.
 
+      The service exposes two methods:
+      - [lookup name s size] searches the string [s] in the index [name] and
+        stops after at most [size] results.
+      - [info] returns the list of loaded indexes with their cardinals.
+
       The [fuel] argument sets an upper bound on the number of results returned
       by the lookup operation. If the requested size exceeds this limit, the
       request is not fully honored and at most [fuel] results are returned. *)
