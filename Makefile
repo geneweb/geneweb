@@ -46,14 +46,10 @@ fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
 	dune build @fmt --auto-promote
 
-.PHONY: clean-version
-clean-version:
-	@rm -f $(BUILD_DIR)/lib/version.ml
-
-build: clean-version
+build:
 	dune build
 
-build-geneweb: clean-version ## Build the geneweb package (libraries and binaries)
+build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
 	dune build @bin/all @lib/all
 	@printf "Done."
@@ -63,7 +59,7 @@ build-geneweb-rpc: ## Build the geneweb-rpc package
 	dune build @rpc/all
 	@printf "Done."
 
-gwd: clean-version ## Build ondy gwd/gwc executables
+gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
 	dune build bin/gwd bin/gwc
 	@printf "Done."

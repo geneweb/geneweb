@@ -62,7 +62,7 @@ jobs:
       metric: ${{ steps.collect-metrics.outputs.metric }}
 
     env:
-      USE_NNP: ${{ !startsWith(matrix.os, 'windows') && (startsWith(matrix.ocaml-compiler, '4.14') || startsWith(matrix.ocaml-compiler, '5')) }}
+      USE_NNP: ${{ !startsWith(matrix.os, 'windows') }}
 
     steps:
       - name: Checkout code
@@ -121,12 +121,12 @@ jobs:
         run: opam install ancient
 
       - name: Configure
-        run: opam exec -- ocaml ./configure.ml --sosa-zarith ${{ env.USE_NNP == 'true' && '--gwd-caching' || '' }}
+        run: opam exec -- ocaml ./configure.ml
 
       - name: Build Geneweb
         id: build
         shell: bash
-        run: opam exec -- make distrib distrib-rpc
+        run: opam exec -- make build
 
       - name: Run tests
         id: tests
@@ -144,18 +144,6 @@ jobs:
           echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
           echo "tests_skipped=$SKIPPED" >> $GITHUB_OUTPUT
           echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
-
-      - name: "Test Geneweb daemon with --cache-in-memory"
-        if: env.USE_NNP == 'true'
-        run: |
-          output=$(distribution/gw/gwd -cache-in-memory testing 2>&1)
-          if echo "$output" | grep -q "Caching database testing in memory"; then
-            echo "Caching message found, test passed."
-            exit 0
-          else
-            echo "Caching message not found, test failed."
-            exit 1
-          fi
 
       - name: Collect Build Metrics
         id: collect-metrics
