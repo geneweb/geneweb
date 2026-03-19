@@ -74,16 +74,22 @@ module Index = Geneweb_search.Index.Default
 module Analyze = Geneweb_search.Analyze
 
 module Search = struct
-  let lookup ~fuel idx =
+  let info indexes =
+    decl "info"
+      Desc.Syntax.(ret (list (tup2 string int)))
+      (Lwt_result.return
+      @@ List.map (fun (name, idx) -> (name, Index.cardinal idx)) indexes)
+
+  let lookup ~fuel indexes =
     decl "lookup"
       Desc.Syntax.(string @-> string @-> int @-> ret (list string))
       (fun name s size ->
-        match List.assoc name idx with
+        match List.assoc name indexes with
         | exception Not_found ->
             (* TODO: Methods could fail and emit errors. We can implement
                this by changing the return type of methods to Lwt_result.t *)
             Lwt_result.return []
-        | i ->
+        | idx ->
             let words =
               List.map
                 (fun Analyze.{ content; _ } -> content)
@@ -103,12 +109,12 @@ module Search = struct
               (* BUG: We can introduce duplicate in the output here. *)
               @@ List.to_seq
                    [
-                     Index.search words i;
-                     Index.search_prefix words i;
-                     Index.fuzzy_search ~max_dist:1 words i;
+                     Index.search words idx;
+                     Index.search_prefix words idx;
+                     Index.fuzzy_search ~max_dist:1 words idx;
                    ]
             in
             Lwt_result.return r)
 
-  let make ~fuel idx = empty |> add (lookup ~fuel idx)
+  let make ~fuel idx = empty |> add (info idx) |> add (lookup ~fuel idx)
 end

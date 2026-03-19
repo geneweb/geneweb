@@ -7,6 +7,9 @@ module type S = sig
   type word
   type entry
 
+  val cardinal : t -> int
+  (** [cardinal t] returns the number of words in the index. *)
+
   val of_seq : (word * entry) Seq.t -> t
   (** [of_seq s] creates a new inverted index from the sequence [s]. The
       sequence [s] is forced. *)
