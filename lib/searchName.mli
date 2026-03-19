@@ -38,7 +38,10 @@ val print :
       trouver la meilleure combinaison de résultat pour afficher la réponse
       la plus probable.                                                     *)
 
+val is_subset_pfx : string list -> string list -> bool
+
 val persons_starting_with :
+  remove_marital_names_match_only:bool ->
   conf:Config.config ->
   base:Gwdb.base ->
   filter:(Gwdb.person -> bool) ->
@@ -48,3 +51,11 @@ val persons_starting_with :
   Gwdb.iper list
 
 val search_by_sosa_in_env : Config.config -> Gwdb.base -> Gwdb.person option
+
+val filter_marital_names :
+  ?remove_marital_names_match_only:bool ->
+  (string -> bool) ->
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
+  bool
