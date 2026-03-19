@@ -784,7 +784,7 @@ let advanced_search conf base max_answers =
                          let ns = List.map Name.lower @@ Name.split n in
                          AdvancedSearchMatch.match_name ~search_list:n_list
                            ~mode ns)
-                       conf base "" p))
+                       conf base p))
         |> List.sort_uniq compare
       in
       if

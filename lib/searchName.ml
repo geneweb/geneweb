@@ -33,6 +33,23 @@ let start_with base pfx s =
   let s = Name.lower (strip_particle base s) in
   Ext_string.start_with pfx 0 s
 
+let is_matched_by_actual_surname match_name base p =
+  match Authorized.Person.get_surname p with
+  | Some istr -> match_name (Gwdb.sou base istr)
+  | None -> false
+
+let has_visible_marital_name match_name conf base p =
+  match Authorized.Person.get_family ~conf ~base p with
+  | Some fams ->
+      Array.exists
+        (fun fam ->
+          let sp = Authorized.Family.get_spouse ~conf ~base ~person:p fam in
+          Option.bind sp (fun sp ->
+              Some (is_matched_by_actual_surname match_name base sp))
+          = Some true)
+        fams
+  | None -> false
+
 type prefix = { kind : [ `First_name | `Surname ]; value : string }
 
 let persons_of_prefixes_stream max conf base filter other_pfxs main_pfx =
@@ -59,7 +76,17 @@ let persons_of_prefixes_stream max conf base filter other_pfxs main_pfx =
             (Name.split @@ Gwdb.sou base istr)
         in
         Hashtbl.add other_map (istr, other_pfx) value;
-        value
+        if Gwdb.get_sex p <> Def.Female then value
+        else
+          value
+          || has_visible_marital_name
+               (fun s ->
+                 List.exists
+                   (start_with base
+                      (Name.lower (strip_particle base other_pfx.value)))
+                   (Name.split s))
+               conf base
+               (Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
   in
   let rec consume n results main_stream =
     match Ext_seq.next main_stream with
@@ -111,30 +138,13 @@ let is_subset_pfx s1 s2 =
     s1
 
 let filter_marital_names ?(remove_marital_names_match_only = false) match_name
-    conf base pfx p =
-  let is_matched_by_actual_surname base pfx p =
-    match Authorized.Person.get_surname p with
-    | Some istr -> match_name (Gwdb.sou base istr)
-    | None -> false
-  in
-  let has_visible_marital_name conf base pfx p =
-    match Authorized.Person.get_family ~conf ~base p with
-    | Some fams ->
-        Array.exists
-          (fun fam ->
-            let sp = Authorized.Family.get_spouse ~conf ~base ~person:p fam in
-            Option.bind sp (fun sp ->
-                Some (is_matched_by_actual_surname base pfx sp))
-            = Some true)
-          fams
-    | None -> false
-  in
+    conf base p =
   Gwdb.get_sex p <> Def.Female
   ||
   let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper p) in
-  is_matched_by_actual_surname base pfx p
+  is_matched_by_actual_surname match_name base p
   || (not remove_marital_names_match_only)
-     && has_visible_marital_name conf base pfx p
+     && has_visible_marital_name match_name conf base p
 
 let match_name_starting_with base pfx n =
   is_subset_pfx
@@ -161,7 +171,7 @@ let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
             filter p
             && filter_marital_names ~remove_marital_names_match_only
                  (match_name_starting_with base main_prefix)
-                 conf base main_prefix.value p
+                 conf base p
           in
           ( Some main_prefix,
             other_prefixes,
@@ -173,7 +183,7 @@ let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
             filter p
             && filter_marital_names
                  (match_name_starting_with base main_prefix)
-                 conf base main_prefix.value p
+                 conf base p
           in
           ( Some main_prefix,
             first_name_prefixes @ other_prefixes,

@@ -57,6 +57,5 @@ val filter_marital_names :
   (string -> bool) ->
   Config.config ->
   Gwdb.base ->
-  string ->
   Gwdb.person ->
   bool
