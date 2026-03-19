@@ -105,6 +105,11 @@ let sort_by_len l =
   let cmp pfx1 pfx2 = String.length pfx2.value - String.length pfx1.value in
   List.sort cmp l
 
+let is_subset_pfx s1 s2 =
+  List.for_all
+    (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
+    s1
+
 let filter_marital_names ?(remove_marital_names_match_only = false) match_name
     conf base pfx p =
   let is_matched_by_actual_surname base pfx p =
@@ -131,6 +136,11 @@ let filter_marital_names ?(remove_marital_names_match_only = false) match_name
   || (not remove_marital_names_match_only)
      && has_visible_marital_name conf base pfx p
 
+let match_name_starting_with base pfx n =
+  is_subset_pfx
+    [ Name.lower (strip_particle base pfx.value) ]
+    (Name.split (Name.lower (strip_particle base n)))
+
 let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
     ~first_name_prefix ~surname_prefix ~limit =
   let l =
@@ -150,11 +160,7 @@ let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
           let filter p =
             filter p
             && filter_marital_names ~remove_marital_names_match_only
-              (fun s ->
-                 List.exists
-                   (start_with base
-                     (Name.lower (strip_particle base main_prefix.value)))
-                     (Name.split s))
+                 (match_name_starting_with base main_prefix)
                  conf base main_prefix.value p
           in
           ( Some main_prefix,
@@ -166,11 +172,7 @@ let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
           let filter p =
             filter p
             && filter_marital_names
-              (fun s ->
-                 List.exists
-                   (start_with base
-                     (Name.lower (strip_particle base main_prefix.value)))
-                     (Name.split s))
+                 (match_name_starting_with base main_prefix)
                  conf base main_prefix.value p
           in
           ( Some main_prefix,

@@ -58,11 +58,6 @@ let string_incl =
 let abbrev_lower x = Name.abbrev (Name.lower x)
 let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter
 
-let is_subset_pfx s1 s2 =
-  List.for_all
-    (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
-    s1
-
 module Fields : sig
   type search = And | Or
   type name = string
@@ -388,7 +383,7 @@ end = struct
       match mode with
       | `Exact -> Ext_list.elements_cmp
       | `Not_Exact -> Ext_list.is_subset
-      | `Not_Exact_Prefix -> is_subset_pfx
+      | `Not_Exact_Prefix -> SearchName.is_subset_pfx
     in
     fun x -> List.exists (fun s -> matching s x) search_list
 
@@ -1119,7 +1114,7 @@ let exact_matching_first_name_aliases ~first_name =
   filter_alias ~name:first_name ~matching:Ext_list.elements_cmp
 
 let prefix_matching_first_name_aliases ~first_name =
-  filter_alias ~name:first_name ~matching:is_subset_pfx
+  filter_alias ~name:first_name ~matching:SearchName.is_subset_pfx
 
 let matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:Ext_list.is_subset
@@ -1128,7 +1123,7 @@ let exact_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:Ext_list.elements_cmp
 
 let prefix_matching_surname_aliases ~surname =
-  filter_alias ~name:surname ~matching:is_subset_pfx
+  filter_alias ~name:surname ~matching:SearchName.is_subset_pfx
 
 let matching_alias_public_name_qualifiers ~string =
   filter_alias ~name:string ~matching:Ext_list.elements_cmp

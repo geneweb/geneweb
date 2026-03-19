@@ -38,6 +38,8 @@ val print :
       trouver la meilleure combinaison de résultat pour afficher la réponse
       la plus probable.                                                     *)
 
+val is_subset_pfx : string list -> string list -> bool
+
 val persons_starting_with :
   remove_marital_names_match_only:bool ->
   conf:Config.config ->
