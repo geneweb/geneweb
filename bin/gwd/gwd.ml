@@ -2743,8 +2743,12 @@ let main () =
   List.iter
     (fun dbn ->
       Logs.info (fun k -> k "Caching database %s in memory… %!" dbn);
-      let dbn = !GWPARAM.bpath dbn in
-      Driver.load_database dbn)
+      let bpath = !GWPARAM.bpath dbn in
+      try Driver.load_database bpath
+      with Sys_error _ ->
+        (* HOTFIX: we cannot print the Sys_error payload in tests. *)
+        Logs.err (fun k -> k "Cannot load the database %s" dbn);
+        exit 2)
     !cache_databases;
   if !auth_file <> "" && !force_cgi then
     Logs.warn (fun k ->
@@ -2841,7 +2845,7 @@ let () =
       Logs.err (fun k -> k "%s: %s" p (Dynlink.error_message e))
   | Register_plugin_failure (p, `string s) -> Logs.err (fun k -> k "%s: %s" p s)
   | exn ->
-      let bt = Printexc.get_backtrace () in
-      Logs.err (fun k -> k "%s" (Printexc.to_string exn));
-      if Printexc.backtrace_status () then
-        Logs.err (fun k -> k "Backtrace:@ %s" bt)
+      let exn = Printexc.to_string exn in
+      let lines = String.split_on_char '\n' @@ Printexc.get_backtrace () in
+      Logs.err (fun k -> k "@[%s@ %a@]" exn Fmt.(list ~sep:cut string) lines);
+      exit 2
