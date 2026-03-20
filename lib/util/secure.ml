@@ -12,7 +12,7 @@ let assets_r = ref [ "gw" ]
 
 let default_base_dir =
   let t = Dirs.make () in
-  Dirs.(data_home t // "geneweb" // "base")
+  Dirs.(data_home t // "geneweb" // "bases")
 
 let bd_r = ref (Dirs.path default_base_dir)
 

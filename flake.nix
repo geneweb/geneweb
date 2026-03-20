@@ -126,6 +126,7 @@
             ocamlWrapped
           ] ++ (with pkgs; [
             rlwrap
+            brotli
           ]) ++ (with ocamlPackages; [
             qcheck
             qcheck-alcotest
