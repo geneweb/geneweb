@@ -1,4 +1,4 @@
-<!-- $Id: notes_gallery.txt v7.1 29/12/2025 00:39:49 $ -->
+<!-- $Id: notes_gallery.txt v7.1 20/03/2026 05:14:20 $ -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,13 +21,13 @@
   <h1 id="h1" class="ml-3 mb-0">Chargement en cours…</h1>
   %if(wizard)
     <div class="small float-right mr-2">
-      (<a href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)
+      (<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)
     </div>
   %end;
   <div id="album-nav" class="d-none justify-content-center">
     <div class="p-2 bd-highlight"><a id="first" href="#" onclick="loadFirstImage(); return false;"><i class="fa-solid fa-backward"></i></a></div>
     <div class="p-2 bd-highlight"><a id="previous" href="#" onclick="loadPreviousImage(); return false;"><i class="fa-solid fa-caret-left"></i></a> </div>
-    <div class="p-2 bd-highlight"><a id="current"></a> / <a id="imageCount"></a></div>
+    <div class="p-2 bd-highlight"><span id="current"></span> / <span id="imageCount"></span></div>
     <div class="p-2 bd-highlight"><a id="next" href="#" onclick="loadNextImage(); return false;"><i class="fa-solid fa-caret-right"></i></a></div>
     <div class="p-2 bd-highlight"><a id="last" href="#" onclick="loadLastImage(); return false;"><i class="fa-solid fa-forward"></i></a></div>
   </div>
@@ -121,87 +121,106 @@ function get(v) { return v !== undefined ? v : ""; }
 
 function displayImage(img) {
   $("#map, #legend").empty();
+  $("#div_legend").addClass("d-none");
   $("#h1").html(json.title);
-  $("#description").html(json.desc);
+  $("#description").html(img.desc || json.desc || "");
   $("#image").attr("src", "%prefix;m=DOC&s=" + img.img);
   
   let cnt = 1, cnt_rlm = 1;
   const hasGroups = img.groups?.length;
-  
-  // Structure par groupe
-  if (hasGroups) {
-    const groupedItems = {};
-    
-    // Préparer les groupes
-    img.groups.forEach(g => {
-      groupedItems[g.name] = { label: g.label, items: [] };
-    });
-    
-    // Assigner les items aux groupes
-    img.map.forEach(r => {
-      if (!r.fn || !r.sn) return;
-      
-      const oc = get(r.oc) && r.oc != "0" ? `&oc=${r.oc}` : "";
-      const href = `%prefix;&p=${r.fn}&n=${r.sn}${oc}`;
-      const txt = `${r.fn} ${r.sn}`;
-      const comment = get(r.alt) ? ` (${r.alt})` : "";
-      const groupNum = r.group || 0;
-      
-      const item = {
-        id: cnt,
-        href: href,
-        txt: txt,
-        comment: comment,
-        groupNum: groupNum,
-        shape: get(r.shape),
-        coords: get(r.coords),
-        rlmParams: `&p${cnt_rlm}=${r.fn}&n${cnt_rlm}=${r.sn}${oc}`
-      };
-      
-      if (groupNum && groupedItems[groupNum]) {
-        groupedItems[groupNum].items.push(item);
+  const ungrouped = [];
+
+  img.map.forEach(r => {
+    const t = get(r.t) || "p";
+    let href, txt, rlmParams = "";
+    let comment = get(r.alt) ? ` (${r.alt})` : "";
+    if (t === "p") {
+      if (!r.fn && !r.sn) { cnt++; return; }
+      const oc = get(r.oc) && r.oc != "0"
+        ? `&oc=${r.oc}` : "";
+      href = `%prefix;&p=${r.fn}&n=${r.sn}${oc}`;
+      txt = `${r.fn} ${r.sn}`;
+      rlmParams =
+        `&p${cnt_rlm}=${r.fn}&n${cnt_rlm}=${r.sn}${oc}`;
+      cnt_rlm++;
+    } else if (t === "g") {
+      href = `%prefix;${get(r.href)}`;
+      txt = get(r.alt) || get(r.href);
+      comment = "";
+    } else if (t === "e") {
+      href = get(r.href);
+      txt = get(r.alt) || get(r.href);
+      comment = "";
+    } else { cnt++; return; }
+
+    const groupNum = r.group || 0;
+    const groupClass = (hasGroups && groupNum)
+      ? ` class='group${groupNum}'` : "";
+    const areaHtml = `<area id='area${cnt}'`
+      + ` shape='${get(r.shape)}'`
+      + ` coords='${get(r.coords)}'`
+      + ` alt='${txt}${comment}'`
+      + ` title='${txt}${comment}'`
+      + ` href='${href}'${groupClass}`
+      + ` target='_blank'>`;
+    const legendHtml = `<li class='legend' id='a${cnt}'>`
+      + `<span><a href="${href}" target='_blank'>`
+      + `${txt}</a>${comment}</span></li>`;
+
+    if (rlmParams) {
+      $("#rlm").attr("href",
+        $("#rlm").attr("href") + rlmParams);
+    }
+
+    const item = {
+      id: cnt, areaHtml: areaHtml,
+      legendHtml: legendHtml, groupNum: groupNum
+    };
+
+    if (hasGroups && groupNum) {
+      const bucket = img.groups.find(
+        g => g.name == groupNum);
+      if (bucket) {
+        if (!bucket._items) bucket._items = [];
+        bucket._items.push(item);
+      } else {
+        ungrouped.push(item);
       }
-      
-      cnt++; cnt_rlm++;
-    });
-    
-    // Générer HTML par groupe
-    Object.entries(groupedItems).forEach(([groupNum, group]) => {
-      const groupHtml = `
-        <div class="imap-group mb-2">
-          <div class="imap-group-legend" id="g${groupNum}">
-            <a href="#" title="[*lock group]">${group.label}</a>
-          </div>
-          <ul class="list-comma list-unstyled pl-3">
-            ${group.items.map(item => {
-              $("#map").append(`<area id='area${item.id}' shape='${item.shape}' coords='${item.coords}' alt='${item.txt}${item.comment}' title='${item.txt}${item.comment}' href='${item.href}' class='group${groupNum}' target='_blank'>`);
-              $("#rlm").attr("href", $("#rlm").attr("href") + item.rlmParams);
-              
-              return `<li class='legend' id='a${item.id}'><span><a href="${item.href}" target='_blank'>${item.txt}</a>${item.comment}</span></li>`;
-            }).join('')}
-          </ul>
-        </div>
-      `;
-      $("#legend").append(groupHtml);
-    });
-  } else {
-    img.map.forEach(r => {
-      if (!r.fn || !r.sn) return;
-      
-      const oc = get(r.oc) && r.oc != "0" ? `&oc=${r.oc}` : "";
-      const href = `%prefix;&p=${r.fn}&n=${r.sn}${oc}`;
-      const txt = `${r.fn} ${r.sn}`;
-      const comment = get(r.alt) ? ` (${r.alt})` : "";
-      
-      $("#map").append(`<area id='area${cnt}' shape='${get(r.shape)}' coords='${get(r.coords)}' alt='${txt}${comment}' title='${txt}${comment}' href='${href}' target='_blank'>`);
-      $("#legend").append(`<li class='legend' id='a${cnt}'><span><a href="${href}" target='_blank'>${txt}</a>${comment}</span></li>`);
-      $("#rlm").attr("href", $("#rlm").attr("href") + `&p${cnt_rlm}=${r.fn}&n${cnt_rlm}=${r.sn}${oc}`);
-      
-      cnt++; cnt_rlm++;
+    } else {
+      ungrouped.push(item);
+    }
+    cnt++;
+  });
+
+  // Render grouped items
+  if (hasGroups) {
+    img.groups.forEach(g => {
+      if (!g._items || !g._items.length) return;
+      let itemsHtml = "";
+      g._items.forEach(item => {
+        $("#map").append(item.areaHtml);
+        itemsHtml += item.legendHtml;
+      });
+      $("#legend").append(
+        `<div class="imap-group mb-2">`
+        + `<div class="imap-group-legend" id="g${g.name}">`
+        + `<a href="#" title="[*lock group]">`
+        + `${g.label}</a></div>`
+        + `<ul class="list-comma list-unstyled pl-3">`
+        + `${itemsHtml}</ul></div>`);
+      delete g._items;
     });
   }
-  
-  $("#div_legend").removeClass("d-none");
+
+  // Render ungrouped items
+  ungrouped.forEach(item => {
+    $("#map").append(item.areaHtml);
+    $("#legend").append(item.legendHtml);
+  });
+
+  if (cnt > 1 || ungrouped.length) {
+    $("#div_legend").removeClass("d-none");
+  }
   $("#image").maphilight(MAPHILIGHT_CONFIG);
 }
 
@@ -417,6 +436,12 @@ function loadCurrentImage() {
   displayImage(images_l[current]);
   $("#current").text(current + 1);
   $("#imageCount").text(imagesCount);
+  var $edit = $("#edit_link");
+  if ($edit.length) {
+    var base = "%prefix;m=MOD_NOTES&f=%e.f;";
+    $edit.attr("href", imagesCount > 1
+      ? base + "&img=" + (current + 1) : base);
+  }
 }
 
 function loadFirstImage() { current = 0; loadCurrentImage(); }

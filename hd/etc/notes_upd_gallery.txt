@@ -1,4 +1,4 @@
-<!-- $Id: notes_upd_gallery.txt v7.1 01/12/2024 22:18:54 $ -->
+<!-- $Id: notes_upd_gallery.txt v7.1 20/03/2026 05:14:28 $ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,7 +69,6 @@
     .legend-number { cursor: pointer; padding: 0 2px; }
     .legend-number:hover { text-decoration: underline; background-color: #f0f0f0; border-radius: 2px; }
     .group-highlight {background-color: #fff3cd !important; }
-
 </style>
   %include;hed
 </head>
@@ -82,28 +81,38 @@
 <div class="visually-hidden" aria-live="polite" id="status-updates"></div>
 <form id="form" class="mt-3 ml-2" method="post" action="%action;">
   <div class="row ml-3">
-    <div class="col-sm-12 col-lg-6">
-      <div class="form-group row">
+    <div class="col-sm-12 col-lg-9">
+      <div class="form-group row mb-0">
         <label for="page_title" class="col-sm-2 col-form-label">[*title/titles]0</label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="page_title">
         </div>
       </div>
-      <div class="form-group row">
-        <label for="page_desc" class="col-sm-2 col-form-label">Description</label>
-        <div class="col-sm-10">
-          <textarea class="form-control" id="page_desc" rows="2"></textarea>
-        </div>
+      <div id="album-nav" class="d-none justify-content-center mt-1 ml-2">
+        <div class="px-2"><a href="#" id="album-first" title="[*first]"><i class="fa-solid fa-backward"></i></a></div>
+        <div class="px-2"><a href="#" id="album-prev" title="[*previous]"><i class="fa-solid fa-caret-left"></i></a></div>
+        <div class="px-2"><span id="album-current">1</span> / <span id="album-count">1</span></div>
+        <div class="px-2"><a href="#" id="album-next" title="[*next]"><i class="fa-solid fa-caret-right"></i></a></div>
+        <div class="px-2"><a href="#" id="album-last" title="[*last]"><i class="fa-solid fa-forward"></i></a></div>
+        <div class="px-2"><a href="#" id="album-add" title="[*add::image/images]0"><i class="fa-solid fa-plus"></i></a></div>
+        <div class="pr-2 pl-3"><a href="#" id="album-remove" title="[*delete::image/images]0"><i class="fa-solid fa-trash-can text-danger"></i></a></div>
       </div>
-      <div class="form-group row">
+      <div class="form-group row my-1">
         <label for="fname" class="col-sm-2 col-form-label">[*file]</label>
-        <div class="col-sm-10">
-          <div class="input-group">
+        <div class="col-sm-10 d-flex align-items-center">
+          <div class="input-group flex-grow-1">
             <input id="fname" type="text" class="form-control" list="src_images">
             <datalist id="src_images">
               %src_images_list;
             </datalist>
           </div>
+          <a href="#" id="album-add-solo" class="d-none mx-2" title="[*add::image/images]0"><i class="fa-solid fa-plus"></i></a>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="page_desc" class="col-sm-2 col-form-label">[*description]</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" id="page_desc" rows="1"></textarea>
         </div>
       </div>
     </div>
@@ -197,6 +206,9 @@
 var table;
 var groupTable;
 var currentAreaCount = 0;
+var isAlbum = false;
+var albumCurrent = 0;
+var albumImages = [];
 
 // Maphilight configuration for genealogical photos
 const MAPHILIGHT_CONFIG = {
@@ -1276,32 +1288,35 @@ function initializePageContent(data, tableApi) {
     // Initialize form fields
     $("#page_title").val(data.title || '');
     $("#page_desc").val(data.desc || '');
+    if (isAlbum && albumImages[albumCurrent]
+        && albumImages[albumCurrent].desc) {
+      $("#page_desc").val(albumImages[albumCurrent].desc);
+    }
 
     // Initialize image if present
-    if (data.img) {
-        const $img = $("#image");
-        $img.attr("src", "%prefix;m=DOC&s=" + data.img);
-        $("#fname").val(data.img);
-
-        // Single image load handler
+    var imgFile = isAlbum ? albumImages[albumCurrent]?.img : data?.img;
+    if (imgFile) {
+        var $img = $("#image");
+        $img.attr("src", "%prefix;m=DOC&s=" + imgFile);
+        $("#fname").val(imgFile);
         $img.one("load", function() {
-            const width = this.width;
-            const height = this.height;
-
-            requestAnimationFrame(() => {
-                const $frame = $("#frame");
-                $frame.css({ width, height });
-                $frame.closest("#div_img_legend").css({ width });
+            var width = this.width, height = this.height;
+            requestAnimationFrame(function() {
+                var $frame = $("#frame");
+                $frame.css({ width: width, height: height });
+                $frame.closest("#div_img_legend").css({ width: width });
                 $img.maphilight(MAPHILIGHT_CONFIG);
             });
         });
     }
+    if (isAlbum) updateAlbumNav();
 
     // Initialize map and legend once
-    if (data.map?.length) {
+    var mapData = isAlbum ? albumImages[albumCurrent]?.map : data?.map;
+    if (mapData?.length) {
         $("#map, #ul_legend").empty();
-        data.map.forEach((item, index) => {
-            const areaIndex = ++currentAreaCount;
+        mapData.forEach(function(item) {
+            var areaIndex = ++currentAreaCount;
             updateAreaAndLegend(item, areaIndex);
         });
     }
@@ -1328,12 +1343,22 @@ function initTables() {
       }
 
       // Show tables if we have a valid image either in JSON or in form
-      const hasImage = Boolean(json.r?.img || json.img || $("#fname").val());
-      toggleTables(hasImage);
+      if (json.r?.images) {
+        isAlbum = true;
+        albumImages = json.r.images;
+        var p = new URLSearchParams(
+          window.location.search);
+        var si = parseInt(p.get("img")) || 0;
+        if (si > 0 && si <= albumImages.length) {
+          albumCurrent = si - 1;
+        }
+      }
+      var firstImg = isAlbum ? albumImages[albumCurrent] : json.r;
+      toggleTables(Boolean(firstImg?.img || $("#fname").val()));
 
       // Initialize main table
       table = $('#map_table').DataTable({
-        data: json.r?.map || [],
+        data: (isAlbum ? albumImages[albumCurrent]?.map : json.r?.map) || [],
         dom: 'rt',
         deferRender: false,
         paging: false,
@@ -1547,7 +1572,7 @@ function initTables() {
 
       // Initialize group table
       groupTable = $('#grp_table').DataTable({
-        data: json.r?.groups || [],
+        data: (isAlbum ? albumImages[albumCurrent]?.groups : json.r?.groups) || [],
         deferRender: false,
         paging: false,
         ordering: true,
@@ -1595,7 +1620,10 @@ function initTables() {
           }
         },
         initComplete: function() {
-          if (json.r?.groups) {
+          var hasGroups = isAlbum
+            ? albumImages[albumCurrent]?.groups
+            : json.r?.groups;
+          if (hasGroups) {
             groupTable = this.api();
             updateGroupsLegend();
             groupTable.on('draw', updateGroupsLegend);
@@ -1639,7 +1667,148 @@ function resetButtonHandler() {
     groupTable.clear().draw();
     toggleTables(false);
     currentAreaCount = 0;
+    if (isAlbum) {
+      albumImages = [{ img: "", map: [], groups: [] }];
+      albumCurrent = 0;
+      updateAlbumNav();
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+function saveAlbumCurrent() {
+  albumImages[albumCurrent] = {
+    img: $("#fname").val(),
+    desc: $("#page_desc").val(),
+    map: cleanMapEntries(),
+    groups: currentGroups()
+  };
+}
+
+function loadAlbumImage(index) {
+  albumCurrent = index;
+  var img = albumImages[index] || { img: "", map: [], groups: [] };
+
+  // Clear current state
+  table.clear();
+  groupTable.clear();
+  $("#map, #ul_legend, #ul_groups_legend").empty();
+  currentAreaCount = 0;
+
+  // Reload map data
+  if (img.map && img.map.length) {
+    table.rows.add(img.map);
+  }
+  table.draw(false);
+  if (img.groups && img.groups.length) {
+    groupTable.rows.add(img.groups);
+  }
+  groupTable.draw(false);
+  updateGroupsLegend();
+
+  // Update filename and load image
+  $("#fname").val(img.img || "");
+  $("#page_desc").val(img.desc || "");
+  var $img = $("#image");
+  var $frame = $("#frame");
+  if (img.img) {
+    $frame.show();
+    $img.attr("src", "%prefix;m=DOC&s=" + img.img);
+    toggleTables(true);
+    $img.one("load", function() {
+      var w = this.width, h = this.height;
+      requestAnimationFrame(function() {
+        $frame.css({ width: w, height: h });
+        $frame.closest("#div_img_legend")
+          .css({ width: w });
+        setTimeout(function() {
+          $img.maphilight(MAPHILIGHT_CONFIG);
+        }, 50);
+      });
+    });
+  } else {
+    $img.removeAttr("src");
+    $frame.hide();
+    toggleTables(false);
+  }
+  updateAlbumNav();
+}
+
+function updateAlbumNav() {
+  var n = albumImages.length;
+  $("#album-current").text(albumCurrent + 1);
+  $("#album-count").text(n);
+  if (n > 1) {
+    $("#album-nav").addClass("d-flex");
+    $("#album-add-solo").removeClass("d-inline")
+      .addClass("d-none");
+  } else {
+    $("#album-nav").removeClass("d-flex");
+    if (isAlbum) {
+      $("#album-add-solo").removeClass("d-none")
+        .addClass("d-inline");
+    }
+  }
+}
+
+function initAlbumHandlers() {
+  $("#album-first").click(function(e) {
+    e.preventDefault(); saveAlbumCurrent(); loadAlbumImage(0);
+  });
+  $("#album-prev").click(function(e) {
+    e.preventDefault();
+    if (albumCurrent > 0) { saveAlbumCurrent(); loadAlbumImage(albumCurrent - 1); }
+  });
+  $("#album-next").click(function(e) {
+    e.preventDefault();
+    if (albumCurrent < albumImages.length - 1) { saveAlbumCurrent(); loadAlbumImage(albumCurrent + 1); }
+  });
+  $("#album-last").click(function(e) {
+    e.preventDefault(); saveAlbumCurrent(); loadAlbumImage(albumImages.length - 1);
+  });
+  $("#album-add, #album-add-solo").click(function(e) {
+    e.preventDefault();
+    saveAlbumCurrent();
+    albumImages.push({ img: "", map: [], groups: [] });
+    $("#fname").val("");
+    loadAlbumImage(albumImages.length - 1);
+  });
+  $("#album-remove").click(function(e) {
+    e.preventDefault();
+    if (albumImages.length > 1) {
+      albumImages.splice(albumCurrent, 1);
+      if (albumCurrent >= albumImages.length) albumCurrent = albumImages.length - 1;
+      loadAlbumImage(albumCurrent);
+    }
+  });
+}
+
+function cleanMapEntries() {
+  return table.rows().data().toArray().map(function(item) {
+    var clean = {};
+    if (item.shape) clean.shape = item.shape;
+    if (item.coords) clean.coords = item.coords;
+    if (item.t) clean.t = item.t;
+    if (item.fn) clean.fn = item.fn;
+    if (item.sn) clean.sn = item.sn;
+    if (item.oc) clean.oc = item.oc;
+    if (item.href) clean.href = item.href;
+    if (item.alt) clean.alt = item.alt;
+    if (item.group) clean.group = item.group;
+    if (item.gw) clean.gw = item.gw;
+    if (clean.t === "p" || !clean.t) {
+      delete clean.misc; delete clean.href;
+      if (clean.fn && clean.sn) clean.gw = generateGwSyntax(clean);
+    } else if (clean.t === "g" || clean.t === "e") {
+      delete clean.fn; delete clean.sn; delete clean.oc; delete clean.gw;
+    }
+    return clean;
+  });
+}
+
+function currentGroups() {
+  return groupTable.rows().data().toArray().map(function(g, i) {
+    return { name: i + 1, label: g.label };
   });
 }
 
@@ -1650,58 +1819,25 @@ function resetButtonHandler() {
 function setupFormHandler() {
   $("#form").submit(function(event) {
     event.preventDefault();
-
-    // Create ordered map entries
-    const mapEntries = table.rows().data().toArray().map(item => {
-      const clean = {};
-      // Enforce property order for map entries
-      if (item.shape) clean.shape = item.shape;
-      if (item.coords) clean.coords = item.coords;
-      if (item.t) clean.t = item.t;
-      if (item.fn) clean.fn = item.fn;
-      if (item.sn) clean.sn = item.sn;
-      if (item.oc) clean.oc = item.oc;
-      if (item.href) clean.href = item.href;
-      if (item.alt) clean.alt = item.alt;
-      if (item.group) clean.group = item.group;
-      if (item.gw) clean.gw = item.gw;
-
-      // Clean based on type
-      if (clean.t === "p" || !clean.t) {
-        delete clean.misc;
-        delete clean.href;
-        if (clean.fn && clean.sn) {
-          clean.gw = generateGwSyntax(clean);
-        }
-      } else if (clean.t === "g" || clean.t === "e") {
-        delete clean.fn;
-        delete clean.sn;
-        delete clean.oc;
-        delete clean.gw;
-      }
-
-      return clean;
-    });
-
-    var res = {
-      title: $("#page_title").val(),
-      desc: $("#page_desc").val(),
-      img: $("#fname").val(),
-      map: mapEntries,
-      groups: groupTable.rows().data().toArray().map((group, index) => ({
-        name: index + 1,
-        label: group.label
-      }))
-    };
-
-    const title = $("#page_title").val() || "&hellip;";
-    // Format JSON with proper spacing and line breaks
-    const jsonString = JSON.stringify(res, null, 2)
+    var title = $("#page_title").val() || "&hellip;";
+    var res;
+    if (isAlbum) {
+      saveAlbumCurrent();
+      res = { title: title, desc: $("#page_desc").val(),
+        images: albumImages };
+    } else {
+      res = {
+        title: title, desc: $("#page_desc").val(),
+        img: $("#fname").val(),
+        map: cleanMapEntries(), groups: currentGroups()
+      };
+    }
+    var jsonString = JSON.stringify(res, null, 2)
       .replace(/\[\{/g, '[\n  {')
       .replace(/\}\]/g, '}\n]')
       .replace(/\}\,\{/g, '},\n  {');
-
-    $("#notes").val("TITLE=" + title + "\nTYPE=gallery\n" + jsonString);
+    $("#notes").val("TITLE=" + title
+      + "\nTYPE=gallery\n" + jsonString);
     $(this).unbind("submit").submit();
   });
 }
@@ -1731,7 +1867,7 @@ $("#image").on("load", function() {
 
             setTimeout(() => {
                 $this.maphilight(MAPHILIGHT_CONFIG);
-            }, 50);
+            }, 100);
         });
     });
 });
@@ -1784,7 +1920,11 @@ const HandlerManager = {
 
   imageChange: function() {
     const fname = $(this).val();
-    if (!fname) return;
+    if (!fname) {
+      $("#frame").hide();
+      toggleTables(false);
+      return;
+    }
 
     const img = $("#image");
     img.attr("src", "%prefix;m=DOC&s=" + fname);
@@ -1798,6 +1938,7 @@ const HandlerManager = {
         const height = this.height;
 
         requestAnimationFrame(() => {
+            $frame.show();
             $frame.css({ width, height });
             $frame.closest("#div_img_legend").css({ width });
 
@@ -1827,6 +1968,7 @@ $(document).on("change mouseover", "area", function() {
 
 $(document).ready(function() {
     initTables();
+    initAlbumHandlers();
     SelectionManager.init();
     TableManager.init();
     UIManager.init();
