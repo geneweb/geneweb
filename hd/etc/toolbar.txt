@@ -263,12 +263,15 @@ body {
 </div>
 <script>
 function init_gallery() {
-  const title = document.getElementById('page_title').value;
-  const fname = document.getElementById('fname').value;
-  const galleryData = { title, img: fname };
-  const galleryJson = JSON.stringify(galleryData, null, 2);
+  var title = document.getElementById('page_title').value;
+  var fname = document.getElementById('fname').value;
+  var data = {
+    title: title,
+    images: [{ img: fname, map: [], groups: [] }]
+  };
+  var json = JSON.stringify(data, null, 2);
   document.getElementById('notes_comments').value =
-    `TITLE=${title}\nTYPE=gallery\n${galleryJson}`;
+    'TITLE=' + title + '\nTYPE=gallery\n' + json;
   $(document.getElementById('init_gallery')).modal('hide');
 }
 </script>
