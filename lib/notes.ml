@@ -201,6 +201,7 @@ let safe_gallery conf base s =
                                 | "map", `List lmap ->
                                     ("map", `List (List.map safe_map lmap))
                                 | "img", `String s -> ("img", `String s)
+                                | "desc", `String s -> ("desc", `String (html s))
                                 | e -> e)
                               img_l)
                      | e -> e)
@@ -387,23 +388,37 @@ let replace_person person_json (new_fn, new_sn, new_oc) =
 (* Processes the map to replace target person
    with new values if the condition is met *)
 let update_map json oldk newk =
-  let map_data =
-    json |> Yojson.Basic.Util.member "map" |> Yojson.Basic.Util.to_list
-  in
-  let updated_map =
+  let update_map_list lmap =
     List.map
       (fun person_json ->
         let current_person = extract_pnoc person_json |> lower_key in
         if current_person = lower_key oldk then replace_person person_json newk
         else person_json)
-      map_data
+      lmap
   in
-  `Assoc
-    (List.map
-       (function
-         | "map", _ -> ("map", `List updated_map)
-         | field -> field (* Preserve all other top-level fields *))
-       (Yojson.Basic.Util.to_assoc json))
+  let update_fields l =
+    List.map
+      (function
+        | "map", `List lmap -> ("map", `List (update_map_list lmap))
+        | "images", `List imgs ->
+            ( "images",
+              `List
+                (List.map
+                   (function
+                     | `Assoc il ->
+                         `Assoc
+                           (List.map
+                              (function
+                                | "map", `List lmap ->
+                                    ("map", `List (update_map_list lmap))
+                                | e -> e)
+                              il)
+                     | e -> e)
+                   imgs) )
+        | field -> field)
+      l
+  in
+  `Assoc (update_fields (Yojson.Basic.Util.to_assoc json))
 
 let update_gallery s oldk newk =
   (* assumes the json part starts at the first { *)
@@ -424,7 +439,9 @@ let update_gallery s oldk newk =
 
 let rewrite_key s oldk newk _file =
   let s =
-    if Mutil.contains s "TYPE=gallery" then update_gallery s oldk newk else s
+    if Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album" then
+      update_gallery s oldk newk
+    else s
   in
   let slen = String.length s in
   let rec rebuild rs i =

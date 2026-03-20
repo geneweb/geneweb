@@ -4976,6 +4976,36 @@ de: Eine farbige Ecke zeigt das Vorhandensein von Notizen (blau), Quellen (gelb)
 en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
 fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
 
+    first
+af: eerste
+bg: първи
+br: kentañ
+ca: primer
+cs: první
+da: første
+de: erste
+en: first
+eo: unua
+es: primero
+et: esimene
+fi: ensimmäinen
+fr: premier
+he: ראשון
+is: fyrst
+it: primo
+lv: pirmais
+lt: pirmas
+nl: eerste
+no: første
+oc: primièr
+pl: pierwszy
+pt: primeiro
+ro: primul
+ru: первый
+sl: prvi
+sv: första
+zh: 第一
+
     first common ancestor
 af: eerste gemeenskaplike voorvader/eerste gemeenskaplike voorvaders
 ar: السلف المشترك الأول/الأسلاف المشتركة الأولى
@@ -11504,6 +11534,36 @@ pt: etiqueta
 sv: etikett
 tr: etiket
 
+    last
+af: laaste
+bg: последен
+br: diwezhañ
+ca: últim
+cs: poslední
+da: sidste
+de: letzte
+en: last
+eo: lasta
+es: último
+et: viimane
+fi: viimeinen
+fr: dernier
+he: אחרון
+is: síðast
+it: ultimo
+lv: pēdējais
+lt: paskutinis
+nl: laatste
+no: siste
+oc: darrièr
+pl: ostatni
+pt: último
+ro: ultimul
+ru: последний
+sl: zadnji
+sv: sista
+zh: 最后
+
     last diff
 co: ultima revisione
 de: letzte Revision
@@ -15640,6 +15700,36 @@ fr: variantes phonétiques
     data quality
 en: data quality
 fr: qualité des données
+
+    description
+af: beskrywing
+bg: описание
+br: deskrivadur
+ca: descripció
+cs: popis
+da: beskrivelse
+de: Beschreibung
+en: description
+eo: priskribo
+es: descripción
+et: kirjeldus
+fi: kuvaus
+fr: description
+he: תיאור
+is: lýsing
+it: descrizione
+lv: apraksts
+lt: aprašymas
+nl: beschrijving
+no: beskrivelse
+oc: descripcion
+pl: opis
+pt: descrição
+ro: descriere
+ru: описание
+sl: opis
+sv: beskrivning
+zh: 描述
 
     disordered firstnames
 de: ungeordnete Vornamen
