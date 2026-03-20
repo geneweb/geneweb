@@ -1,0 +1,1791 @@
+var table;
+var groupTable;
+var currentAreaCount = 0;
+var albumCurrent = 0;
+var albumImages = [];
+
+// Maphilight configuration for genealogical photos
+const MAPHILIGHT_CONFIG = {
+    alwaysOn: false,
+    stroke: true,
+    strokeColor: 'dba76a',
+    strokeWidth: 3,
+    strokeOpacity: 0.9,
+    fillColor: 'ffffff',
+    fillOpacity: 0,
+    neverOn: false,
+    fade: false,
+    shadow: false
+};
+
+// Utility function to safely get a value or return empty string if undefined
+const Utils = {
+    get: function(v) {
+        return (typeof v !== "undefined") ? v : "";
+    },
+    debounce: (func, wait) => {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+};
+const get = Utils.get;
+
+// Creates new row in map table and adds corresponding area and legend elements
+function addNewArea(x1, y1, x2, y2) {
+  if (x2 - x1 > 5 && y2 - y1 > 5) {
+    x1 = parseFloat(x1.toFixed(2));
+    y1 = parseFloat(y1.toFixed(2));
+    x2 = parseFloat(x2.toFixed(2));
+    y2 = parseFloat(y2.toFixed(2));
+    var areaIndex = ++currentAreaCount;
+    var coords = "" + x1 + "," + y1 + "," + x2 + "," + y2;
+    var new_row = table.row.add({ shape: "rect", coords: coords }).draw(false);
+
+    const displayText = formatAreaLabel(areaIndex, {});
+    $("#map").append(`<area id="area${areaIndex}" shape="rect" coords="${coords}"
+      alt="${areaIndex}" title="${areaIndex}">`);
+    new_row.node().id = "row" + areaIndex;
+    // Focus with a slight delay to ensure DOM is ready
+    setTimeout(() => {
+        const $firstNameInput = $(new_row.node()).find('td:eq(2) input');
+        if ($firstNameInput.length) {
+            $firstNameInput[0].focus();
+            $firstNameInput[0].select();
+        }
+    }, 0);
+    updateStatus(`Added new area ${areaIndex}`);
+  }
+}
+
+
+// Selection area drawing and interaction
+const SelectionManager = {
+  x1: 0,
+  y1: 0,
+  x2: 0,
+  y2: 0,
+  selection: false,
+  gMOUSEUP: false,
+  gMOUSEDOWN: false,
+  redrawMode: false,
+
+  // Get rectangular coordinates
+  getCoords: function() {
+    const x1 = Math.min(this.x1, this.x2);
+    const y1 = Math.min(this.y1, this.y2);
+    const x2 = Math.max(this.x1, this.x2);
+    const y2 = Math.max(this.y1, this.y2);
+    return `${x1},${y1},${x2},${y2}`;
+  },
+
+  init: function() {
+    $(document).mouseup(() => {
+      this.gMOUSEUP = true;
+      this.gMOUSEDOWN = false;
+    });
+
+    $(document).mousedown(() => {
+      this.gMOUSEUP = false;
+      this.gMOUSEDOWN = true;
+    });
+
+    this.initFrameHandlers();
+  },
+
+  initFrameHandlers: function() {
+    $("#frame").mousedown((event) => {
+      this.x1 = Math.round(event.pageX);
+      this.y1 = Math.round(event.pageY);
+      this.x2 = this.x1;
+      this.y2 = this.y1;
+      this.selection = true;
+    });
+
+    $("#frame").mousemove((event) => {
+      if (this.selection) {
+        this.x2 = Math.round(event.pageX);
+        this.y2 = Math.round(event.pageY);
+
+        const TOP = Math.min(this.y1, this.y2);
+        const LEFT = Math.min(this.x1, this.x2);
+        const WIDTH = Math.abs(this.x2 - this.x1);
+        const HEIGHT = Math.abs(this.y2 - this.y1);
+
+        $("#selection").css({
+          position: "absolute",
+          zIndex: 5000,
+          left: LEFT,
+          top: TOP,
+          width: WIDTH,
+          height: HEIGHT,
+        }).show();
+      }
+    });
+
+    $("#frame").mouseup(() => {
+        const pos = $("#frame").get(0).getBoundingClientRect();
+        let l_x1 = Math.min(this.x1, this.x2) - (pos.left + pageXOffset);
+        let l_x2 = Math.max(this.x1, this.x2) - (pos.left + pageXOffset);
+        let l_y1 = Math.min(this.y1, this.y2) - (pos.top + pageYOffset);
+        let l_y2 = Math.max(this.y1, this.y2) - (pos.top + pageYOffset);
+
+        if (this.redrawMode) {
+            const rowId = $("#redraw-target").data("current-row");
+            $(`#area${rowId}_prev`).remove();
+
+            if (Math.abs(l_x2 - l_x1) > 5 && Math.abs(l_y2 - l_y1) > 5) {
+                const coords = `${l_x1},${l_y1},${l_x2},${l_y2}`;
+                const rowElement = $(`#row${rowId}`);
+                if (rowElement.length) {
+                    const row = table.row(rowElement);
+                    let rowData = row.data() || {};
+                    rowData.coords = coords;
+                    row.data(rowData).draw(false);
+                    $("#map").append(`<area id="area${rowId}" shape="rect" coords="${coords}" alt="${rowId}" title="${rowId}">`);
+
+                    // Remove highlight and focus first input
+                    $(`#a${rowId} span`).removeClass('legend-highlighted');
+                    const $firstInput = rowElement.find('input:not(:disabled)').first();
+                    if ($firstInput.length) {
+                        setTimeout(() => {
+                            $firstInput.focus();
+                            $firstInput[0].setSelectionRange(0, $firstInput.val().length);
+                        }, 0);
+                    }
+                }
+            } else {
+                // Selection too small, restore original area
+                const originalCoords = $("#redraw-target").data("original-coords");
+                $(`#area${rowId}_prev`).remove();
+                $("#map").append(`<area id="area${rowId}" shape="rect" coords="${originalCoords}" alt="${rowId}" title="${rowId}">`);
+                $(`#a${rowId} span`).removeClass('legend-highlighted');
+            }
+            this.redrawMode = false;
+            $("#redraw-target").removeData();
+        } else {
+            addNewArea(l_x1, l_y1, l_x2, l_y2);
+        }
+
+        this.selection = false;
+        $("#selection").hide();
+    });
+
+    // Handler for clicking outside the frame to cancel redraw area
+    $(document).mouseup((e) => {
+        const rowId = $("#redraw-target").data("current-row");
+        const $target = $(e.target);
+
+        if ($target.closest('.redraw-area').length) {
+            return;
+        }
+
+        if ((this.redrawMode || (rowId && $(`#area${rowId}_prev`).length))
+            && !$target.closest("#frame").length) {
+
+            const rowId = $("#redraw-target").data("current-row");
+            if (!rowId) return;
+
+            $(`#area${rowId}_prev`).remove();
+
+            $('#image').maphilight(MAPHILIGHT_CONFIG);
+
+            if (rowId) {
+                const originalCoords = $("#redraw-target").data("original-coords");
+                if (originalCoords) {
+                    $("#map").append(`<area id="area${rowId}" shape="rect" coords="${originalCoords}" alt="${rowId}" title="${rowId}">`);
+                    $('#image').maphilight(MAPHILIGHT_CONFIG);
+                }
+
+                $(`#a${rowId} span`).removeClass('legend-highlighted');
+            }
+
+            this.redrawMode = false;
+            this.selection = false;
+            $("#redraw-target").removeData();
+            $("#selection").hide();
+        }
+    });
+
+    $("#frame").mouseenter(() => {
+      this.selection = this.gMOUSEDOWN;
+    });
+
+    $("#selection").mouseenter(() => {
+      this.selection = this.gMOUSEDOWN;
+    });
+
+    $("#frame").mouseleave(() => {
+      this.selection = false;
+    });
+  }
+};
+
+// Create HTML for groups legend with interactive highlighting
+function updateGroupsLegend() {
+    if (!groupTable) return;
+    const groups = groupTable.rows().data().toArray();
+    const $groupsLegend = $('#ul_groups_legend');
+
+    $groupsLegend.empty();
+
+    const labeledGroups = groups.filter(g => g.label);
+    if (labeledGroups.length > 0) {
+        $groupsLegend.append(labeledGroups.length === 1 ?
+            GW.i18n.group0 + GW.i18n.colon + ' ' :
+            GW.i18n.group1 + GW.i18n.colon + ' ');
+
+        groups.forEach(group => {
+            if (group.label) {
+                $groupsLegend.append(`
+                    <li class="group-legend" data-group="${group.name}">
+                        <span class="legend-number">${group.name}.</span> ${group.label}
+                    </li>
+                `);
+            }
+        });
+    }
+}
+
+// Handles all row movement operations in the data table
+// Manages up/down (↓↑) buttons and drag-drop functionality
+const TableManager = {
+    // Row-related operations
+    moveRow: function(direction) {
+        return function(event) {
+            event.preventDefault();
+            const row = $(this).closest("tr");
+            const targetRow = direction === "up" ? row.prev("tr") : row.next("tr");
+            if (targetRow.length) {
+                const currentRowData = table.row(row).data();
+                const targetRowData = table.row(targetRow).data();
+                table.row(row).data(targetRowData);
+                table.row(targetRow).data(currentRowData);
+                table.draw(false);
+            }
+        };
+    },
+
+    // Group-related operations  including adding, updating and labeling
+    // Add new group with next available number, calculating gaps in sequence
+    addGroup: function() {
+        let nextNumber = 1;
+        groupTable.rows().every(function() {
+            const num = parseInt(this.data().name);
+            if (num === nextNumber) nextNumber++;
+        });
+
+        groupTable.row.add({
+            name: nextNumber,
+            label: ""
+        }).draw();
+        groupTable.order([0, 'asc']).draw();
+        updateGroupsLegend();
+    },
+
+    updateGroupLabels: function() {
+        groupTable.rows().every(function() {
+            const data = this.data();
+            const groupNum = this.node().id.replace(/[a-z_]/g, "");
+            if (data.label) {
+                $(`#g${groupNum}`).html(`<span>${groupNum} : ${data.label}</span>`);
+            }
+        });
+    },
+
+    init: function() {
+        $("#map_table").on("click", ".btn-up", this.moveRow("up"));
+        $("#map_table").on("click", ".btn-down", this.moveRow("down"));
+        $("#add-group-btn").on("click", this.addGroup);
+    }
+};
+
+// UI interaction effects, hover states and accessibility features
+// Handles search, keyboard navigation and ARIA attributes
+const UIManager = {
+    init: function() {
+        $('#map_table').attr('role', 'grid');
+        $('.legend').attr('role', 'button');
+        $('#map_table th, #grp_table th').attr('scope', 'col');
+        $('#map_table tbody tr, #grp_table tbody tr').attr('role', 'row');
+        $('#map_table tbody td, #grp_table tbody td').attr('role', 'cell');
+        bindLegendKeyboardNavigation();
+    }
+};
+
+// Utility function to highlight groups
+function highlightGroup(groupNum) {
+    if (!groupNum) return;
+
+    $(`input[value="${groupNum}"]`).closest('tr').addClass('group-highlight');
+    $(`#g_row${groupNum}`).addClass('group-highlight');
+
+    $('area').each(function() {
+        const $area = $(this);
+        const rowId = $area.attr('id').replace('area', '');
+        const rowData = table.row(`#row${rowId}`).data();
+
+        if (rowData && rowData.group === groupNum) {
+            const highlightConfig = {
+                ...MAPHILIGHT_CONFIG,
+                alwaysOn: true,
+                strokeColor: 'ffd700',
+                strokeOpacity: 0.8,
+                fillColor: 'ffd700',
+                fillOpacity: 0.1
+            };
+
+            $area
+                .data('maphilight', highlightConfig)
+                .attr('class', `group${groupNum}`)
+                .trigger('alwaysOn.maphilight');
+        }
+    });
+}
+
+$(document).on("mouseout", "area", function(e) {
+    const $area = $(this);
+    const areaId = $area.attr("id").replace(/[a-z]/g, "");
+    const storedGroupClass = $area.data('originalGroup');
+
+    if (storedGroupClass) {
+        $area.addClass(storedGroupClass);
+
+        const groupConfig = {
+            ...MAPHILIGHT_CONFIG,
+            groupBy: `.${storedGroupClass}`
+        };
+
+        $area.data('maphilight', groupConfig);
+    } else {
+        $area.data('maphilight', MAPHILIGHT_CONFIG);
+    }
+
+    $('#image').maphilight(MAPHILIGHT_CONFIG);
+
+    $("#a" + areaId + " span").removeClass("in");
+    $("#row" + areaId).removeClass("in");
+});
+
+function updateStatus(message) {
+    $("#status-updates").text(message);
+}
+
+// Format text for display in titles and legends, based on type and available data
+function formatAreaLabel(areaIndex, data) {
+    if (!data || typeof data !== 'object') {
+        return `${areaIndex}.`;
+    }
+
+    const { fn, sn, alt, t, href } = data;
+    let txt = `${areaIndex}. `;
+
+    try {
+        if (!t || t === 'p') {
+            if (fn || sn) {
+                txt += `${fn || ''} ${sn || ''}`.trim();
+                if (alt) {
+                    txt += ` (${alt.trim()})`;
+                }
+            } else if (alt) {
+                txt += alt.trim();
+            }
+        } else if (t === 'g' || t === 'e') {
+            if (href) {
+                txt += alt ? `${href.trim()} (${alt.trim()})` : href.trim();
+            } else if (alt) {
+                txt += alt.trim();
+            }
+        }
+        return txt;
+    } catch (error) {
+        console.error("Error in formatAreaLabel:", error);
+        return `${areaIndex}.`;
+    }
+}
+
+// Creates HTML markup for legend entries with proper person/URL formatting and links
+function createLegendHTML(areaIndex, data) {
+    let num = `<span class="legend-number">${areaIndex}.</span> `;
+    if (!data) { return num; }
+    const { fn, sn, alt, t, href, oc } = data;
+
+    // Check if the area is being redrawn
+    let hl = '';
+    if ($("#redraw-target").data("current-row") == areaIndex) {
+        hl = ' class="legend-highlighted"';
+    }
+
+    // Handle person type
+    if (!t || t === 'p') {
+        if (fn || sn) {
+            const occNum = (get(oc) && oc !== "0") ? `&oc=${oc}` : '';
+            const linkText = fn + " " + sn;
+            return `<span${hl}>${num}<a href="${GW.prefix}&p=${encodeURIComponent(fn)}&n=${encodeURIComponent(sn)}${occNum}">${linkText}</a>${alt ? ` (${alt})` : ''}</span>`;
+        }
+    }
+    // Handle GeneWeb or external links
+    else if ((t === 'g' || t === 'e') && href) {
+        const baseUrl = t === 'g' ? GW.prefix : '';
+        const linkText = alt || href;
+
+        return `<span${hl}>${num}<a href="${baseUrl}${href}">${linkText}</a></span>`;
+    }
+
+    // Fallback for cases with only alt text
+    return `<span${hl}>${num}${alt || ''}</span>`;
+}
+
+
+
+/**
+ * Updates area map titles and legend entries with group handling
+ * @param {Object} data - Row data containing coordinates and metadata
+ * @param {number} areaIndex - Index for the area
+ */
+function updateAreaAndLegend(data, areaIndex) {
+    const displayText = formatAreaLabel(areaIndex, data);
+    const group = get(data.group);  // Récupère le groupe
+    const groupAttr = group ?
+        ` class="group${group}" data-maphilight='{"groupBy":".group${group}"}'` : '';
+
+    $("#map").append(`
+        <area id="area${areaIndex}"
+              shape="rect"
+              coords="${get(data.coords)}"
+              alt="${displayText}"
+              title="${displayText}"
+              role="button"
+              tabindex="0"
+              aria-label="${displayText}"${groupAttr}>
+    `);
+
+    $("#ul_legend").append(`
+        <li class="legend" id="a${areaIndex}">
+            ${createLegendHTML(areaIndex, data)}
+        </li>
+    `);
+}
+
+// Add to existing event handlers
+function bindLegendKeyboardNavigation() {
+    $("#ul_legend").on("keydown", ".legend-button", function(e) {
+        const key = e.key;
+        const $current = $(this);
+        const $items = $("#ul_legend .legend-button");
+        const currentIndex = $items.index($current);
+
+        switch(key) {
+            case "ArrowRight":
+            case "ArrowDown":
+                e.preventDefault();
+                const $next = $items.eq(currentIndex + 1);
+                if ($next.length) $next.focus();
+                break;
+            case "ArrowLeft":
+            case "ArrowUp":
+                e.preventDefault();
+                const $prev = $items.eq(currentIndex - 1);
+                if ($prev.length) $prev.focus();
+                break;
+            case "Home":
+                e.preventDefault();
+                $items.first().focus();
+                break;
+            case "End":
+                e.preventDefault();
+                $items.last().focus();
+                break;
+            case "Enter":
+            case " ":
+                e.preventDefault();
+                $(this).click();
+                break;
+        }
+    });
+}
+
+// Optimize updateLegendLinks with batched DOM updates
+const updateLegendLinks = () => {
+
+  table.rows().every(function(rowIdx) {
+    const rowData = this.data();
+    const row = this.node();
+    if (!row) return;
+
+    const areaIndex = row.id.replace(/[a-z]/g, "");
+    const displayText = formatAreaLabel(areaIndex, rowData);
+    const group = get(rowData.group);
+
+    // Update area attributes
+    const area = $(`#area${areaIndex}`);
+    if (area.length) {
+      area.attr({
+        "alt": displayText,
+        "title": displayText
+      });
+
+      if (group && group !== "0") {
+        area.attr("class", `group${group}`);
+        area.attr("data-maphilight", `{"groupBy":".group${group}"}`);
+      } else {
+        area.removeAttr("class").removeAttr("data-maphilight");
+      }
+    }
+
+    // Update legend HTML
+    const legendEntry = $(`#a${areaIndex}`);
+    if (legendEntry.length) {
+      legendEntry.html(createLegendHTML(areaIndex, rowData));
+    }
+  });
+};
+
+// Function to generate correct GW syntax
+function generateGwSyntax(data) {
+  if (!data.fn || !data.sn) return null;
+
+  let oc = get(data.oc);
+  let oc2 = (oc != "" && oc != 0) ? "/" + oc : "";
+  let txt = get(data.alt);
+  return "[[" + data.fn + "/" + data.sn + oc2 +
+         (txt ? "/" + data.fn + " " + data.sn : "") + "]]";
+}
+
+
+// Handles row reordering in the data table, ensuring consistency between
+// table data, DOM elements, and visual elements (areas, legends)
+//
+// Row reorder handling required careful consideration due to DataTables returning
+// a diff array containing all cascading position changes. The solution is to only
+// process the move of the specifically dragged row (identified by edit.triggerRow)
+// and ignore intermediate shifts.
+// Optimize row reordering to prevent forced reflows
+function handleAreaReorder(event, diff, edit) {
+  if (!diff.length) return;
+
+  const currentData = table.rows().data().toArray();
+  const draggedMove = diff.find(d => d.node.id === edit.triggerRow.node().id);
+
+  if (!draggedMove) return;
+
+  // Batch all DOM updates
+  requestAnimationFrame(() => {
+    // Remove moved item and insert at new position
+    const [movedItem] = currentData.splice(draggedMove.oldPosition, 1);
+    currentData.splice(draggedMove.newPosition, 0, movedItem);
+
+    // Update table data in one operation
+    table.clear().rows.add(currentData).draw(false);
+
+    // Batch DOM updates for areas and legends
+    const updates = currentData.map((rowData, index) => {
+      const rowNum = index + 1;
+      return () => {
+        const $row = $(table.row(index).node());
+        const $area = $(`#area${rowNum}`);
+        const $legend = $(`#a${rowNum}`);
+
+        $row.attr("id", `row${rowNum}`);
+
+        if ($area.length) {
+          const displayText = formatAreaLabel(rowNum, rowData);
+          $area.attr({ alt: displayText, title: displayText });
+        }
+
+        if ($legend.length) {
+          $legend.attr("id", `a${rowNum}`)
+                .html(createLegendHTML(rowNum, rowData));
+        }
+      };
+    });
+
+    // Execute all updates in next frame
+    requestAnimationFrame(() => {
+      updates.forEach(update => update());
+      $('#image').maphilight(MAPHILIGHT_CONFIG);
+    });
+  });
+}
+
+// Utility function for handling legend clicks
+function handleLegendClick(targetId, tablePrefix) {
+    const $row = $(`#${tablePrefix}${targetId}`);
+    if ($row.length) {
+        $row[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const $input = $row.find(tablePrefix === 'row' ? 'input:not(:disabled)' : 'input').first();
+        if ($input.length) {
+            $input.focus().select();
+        }
+    }
+}
+
+// Unified group hover handling for both table and legend
+function handleGroupHover(action, groupNum) {
+    if (!groupNum) return;
+
+    if (action === 'enter') {
+        // Highlight table rows and group row
+        $(`input[value="${groupNum}"]`).closest('tr').addClass('group-highlight');
+        $(`#g_row${groupNum}`).addClass('group-highlight');
+        $(`.group-legend[data-group="${groupNum}"]`).addClass('group-highlight');
+
+        // Highlight areas belonging to this group
+        $('area').each(function() {
+            const $area = $(this);
+            const rowId = $area.attr('id').replace('area', '');
+            const rowData = table.row(`#row${rowId}`).data();
+
+            if (rowData && rowData.group == groupNum) {
+                $area.data('maphilight', {
+                    ...MAPHILIGHT_CONFIG,
+                    alwaysOn: true,
+                    strokeColor: 'ffd700',
+                    strokeOpacity: 0.8,
+                    fillColor: 'ffd700',
+                    fillOpacity: 0.1
+                }).trigger('alwaysOn.maphilight');
+            }
+        });
+    } else {
+        // Remove all highlights
+        $('.group-highlight').removeClass('group-highlight');
+
+        // Reset area highlighting
+        $('area').each(function() {
+            const $area = $(this);
+            const rowId = $area.attr('id').replace('area', '');
+            const rowData = table.row(`#row${rowId}`).data();
+
+            if (rowData?.group) {
+                $area.data('maphilight', {
+                    ...MAPHILIGHT_CONFIG,
+                    groupBy: `.group${rowData.group}`
+                });
+            } else {
+                $area.data('maphilight', MAPHILIGHT_CONFIG);
+            }
+        });
+
+        $('#image').maphilight(MAPHILIGHT_CONFIG);
+    }
+}
+
+/**
+ * Binds all event handlers for the interactive mapping interface.
+ * Uses event delegation to minimize handler count and improve performance.
+ */
+function initializeHandlers() {
+    if (!table || !groupTable) return;
+
+   table
+        .on("change", ".update", function() {
+            let td = table.cell(this.closest('td'));
+            let tr = $(this).closest('tr');
+
+            td.data($(this).val()).draw();
+
+            if (this.nodeName == "SELECT") {
+
+                const isPersonType = $(this).val() === 'p';
+                const rowIndex = table.row(tr).index();
+                const rowData = table.row(rowIndex).data();
+                if (!isPersonType) {
+                    rowData.fn = '';
+                    rowData.sn = '';
+                    rowData.oc = '';
+                    delete rowData.gw;
+                    tr.find('.p-input').prop('disabled');
+                } else {
+                    rowData.href = '';
+                    tr.find('.u-input').prop('disabled');
+                }
+                table.row(rowIndex).data(rowData).draw(false);
+
+                setTimeout(() => {
+                    const firstInput = tr.find('td input:not(:disabled)').first();
+
+                    if (firstInput.length) {
+                        firstInput.focus();
+                    }
+                }, 0);
+            }
+        })
+        .on("keydown", "input, select, button", function(e) {
+            if (e.key === 'Tab') {
+                e.stopPropagation();
+                if (!e.shiftKey) {
+                    e.preventDefault();
+                    const $currentCell = $(this).closest('td');
+                    const $currentRow = $(this).closest('tr');
+                    const $nextRow = $currentRow.next('tr');
+
+                    const $cells = $currentRow.find('td:has(input:visible:not(:disabled), select:visible:not(:disabled), button:visible:not(:disabled))');
+                    const currentIndex = $cells.index($currentCell);
+
+                    let $nextInput;
+                    if (currentIndex < $cells.length - 1) {
+                        $nextInput = $cells.eq(currentIndex + 1)
+                            .find('input:visible:not(:disabled), select:visible:not(:disabled), button:visible:not(:disabled)')
+                            .first();
+                    } else if ($nextRow.length) {
+                        $nextInput = $nextRow.find('input:visible:not(:disabled), select:visible:not(:disabled), button:visible:not(:disabled)')
+                            .first();
+                    }
+
+                    if ($nextInput && $nextInput.length) {
+                        $nextInput.focus();
+                        if ($nextInput.is('input[type="text"]')) {
+                            $nextInput[0].setSelectionRange(0, $nextInput[0].value.length);
+                        }
+                    }
+                }
+            }
+        })
+        .on("mouseover", "tr", function(e) {
+             if ($(e.target).closest('.btn-up, .btn-down').length) return;
+
+            if (typeof $(this).attr("id") !== "undefined") {
+                var areaId = $(this).attr("id").replace(/[a-z]/g, "");
+                $("#area" + areaId).mouseover();
+                $("#a" + areaId + " span").addClass("in");
+                $(this).addClass("in");
+            }
+        })
+        .on("mouseout", "tr", function(e) {
+            if ($(e.target).closest('.btn-up, .btn-down').length) return;
+
+            if (typeof $(this).attr("id") !== "undefined") {
+                var areaId = $(this).attr("id").replace(/[a-z]/g, "");
+                $("#area" + areaId).mouseout();
+                $("#a" + areaId + " span").removeClass("in");
+                $(this).removeClass("in");
+            }
+        })
+        .on("click", ".redraw-area", function(e) {
+            e.preventDefault();
+            const row = $(this).closest("tr");
+            const rowId = row.attr("id").replace(/[a-z]/g, "");
+
+            if (rowId) {
+                const rowData = table.row(row).data();
+                const originalCoords = rowData.coords;
+
+                SelectionManager.redrawMode = true;
+                SelectionManager.selection = true;
+
+                $("#redraw-target").data({
+                    "current-row": rowId,
+                    "original-coords": originalCoords,
+                    "source-button": this
+                });
+
+                $(`#area${rowId}`).remove();
+                $("#map").append(`<area id="area${rowId}_prev" shape="rect" coords="${originalCoords}">`);
+
+                $(`#area${rowId}_prev`).data('maphilight', {
+                    ...MAPHILIGHT_CONFIG,
+                    strokeColor: 'ff9999',
+                    strokeOpacity: 0.5,
+                    fillColor: 'ff9999',
+                    fillOpacity: 0.2,
+                    alwaysOn: true
+                }).trigger('alwaysOn.maphilight');
+
+                $(`#a${rowId} span`).addClass('legend-highlighted');
+
+                $('html, body').animate({
+                    scrollTop: $("#frame").offset().top
+                }, 500);
+            }
+        })
+        .on('order.dt', function() {
+            $("#map, #ul_legend").empty();
+
+            table.rows({ order: 'current' }).every(function(index) {
+                const data = this.data();
+                const counter = index + 1;
+
+                $(this.node())
+                    .attr('id', `row${counter}`)
+                    .find('.drag-handle')
+                    .text(counter);
+
+                updateAreaAndLegend(data, counter);
+            });
+
+            $('#image').maphilight(MAPHILIGHT_CONFIG);
+        })
+        .on("row-reorder", handleAreaReorder)
+        .on('draw.dt', updateLegendLinks);
+        if (GW.hasFnList || GW.hasSnList) {
+          table.on('input', 'input[list]', function(e) {
+              const $input = $(this);
+              const listId = this.getAttribute('list');
+              if (!listId || !$input.closest('table').hasClass('dataTable')) return;
+
+              DatalistManager.handleDataTableInput(this, listId);
+          });
+        }
+
+    groupTable
+        .on("draw.dt", () => {
+            groupTable.columns.adjust();
+            updateGroupsLegend();
+        })
+       .on('change', '.update', function () {
+        const $input = $(this);
+        const $row = $input.closest('tr');
+        const row = groupTable.row($row);
+
+        if (!row.data()) {
+            console.error('Unable to update row: Row data not found.');
+            return;
+        }
+
+        const currentData = row.data();
+        currentData.label = $input.val();
+        row.data(currentData).draw(false);
+        updateGroupsLegend();
+        })
+        .on("mouseenter", "tr", function() {
+            const $row = $(this);
+            const id = $row.attr('id');
+            if (id && id.startsWith('g_row')) {
+                const groupNum = id.replace('g_row', '');
+                if (groupNum) {
+                    handleGroupHover('enter', groupNum);
+                }
+            }
+        })
+        .on("mouseleave", "tr", function() {
+            if ($(this).attr('id')?.startsWith('g_row')) {
+                handleGroupHover('leave');
+            }
+        });
+
+    $("#map_table, #grp_table")
+        .on("click", ".remove", function(event) {
+          const tr = $(this).closest("tr");
+          const tableId = tr.closest("table").attr("id");
+
+          if (tableId === "grp_table") {
+              groupTable.row(tr).remove().draw();
+              groupTable.order([0, 'asc']).draw();
+              updateGroupsLegend();
+          } else {
+              const currentData = table.rows().data().toArray();
+              const rowIndex = table.row(tr).index();
+              currentData.splice(rowIndex, 1);
+
+              $("#map, #ul_legend").empty();
+              table.clear();
+
+              currentData.forEach((data, idx) => {
+                  const areaIndex = idx + 1;
+                  table.row.add(data);
+                  updateAreaAndLegend(data, areaIndex);
+              });
+
+              table.draw();
+          }
+        });
+
+   // Special DataTable clear button functionality
+   // Handles input clearing and focus management
+    $(document).on('clearButton', 'input', function(e) {
+        e.stopPropagation();
+        const $input = $(e.target);
+        const $row = $input.closest('tr');
+        const $cell = $input.closest('td');
+        const tableId = $row.closest('table').attr('id');
+
+        // Only handle inputs in DataTables
+        if (!tableId || (tableId !== 'map_table' && tableId !== 'grp_table')) {
+            return;
+        }
+
+        const tableApi = tableId === 'map_table' ? window.table : window.groupTable;
+        const rowData = tableApi.row($row).data();
+
+        if (rowData) {
+            const rowIndex = tableApi.row($row).index();
+            const cellIndex = $cell.index();
+
+            const column = tableApi.cell($cell).index();
+            const columnField = tableApi.settings()[0].aoColumns[column.column].data;
+
+            if (columnField) {
+                rowData[columnField] = '';
+                tableApi.row($row).data(rowData).draw(false);
+
+                if (tableId === 'map_table') {
+                    const rowNum = $row.attr('id').replace('row', '');
+                    $(`#a${rowNum} span`).html(createLegendHTML(rowNum, rowData));
+                }
+
+                setTimeout(() => {
+                    const $newRow = $(tableApi.row(rowIndex).node());
+                    const $newCell = $newRow.find(`td:eq(${cellIndex})`);
+                    const $newInput = $newCell.find('input');
+                    if ($newInput.length) {
+                        $newInput.focus();
+                    }
+                }, 0);
+            }
+        }
+    });
+
+    // Hover legend
+    $("#ul_legend")
+        .on("mouseover", ".legend", function() {
+            const areaId = $(this).attr("id").replace(/[a-z]/g, "");
+            $("#area" + areaId).mouseover();
+            $("#row" + areaId).addClass("in");
+        })
+        .on("mouseout", ".legend", function() {
+            const areaId = $(this).attr("id").replace(/[a-z]/g, "");
+            $("#area" + areaId).mouseout();
+            $("#row" + areaId).removeClass("in");
+        })
+        .on("click", ".legend-number", function(e) {
+            e.stopPropagation();
+            const areaId = $(this).closest(".legend").attr("id").replace(/[a-z]/g, "");
+            const $row = $("#row" + areaId);
+            if ($row.length) {
+                $row[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const $input = $row.find('input:not(:disabled)').first();
+                if ($input.length) {
+                    $input.focus().select();
+                }
+            }
+        });
+
+    $("#map")
+        .on("mouseover", "area", function() {
+            const $area = $(this);
+            const areaId = $area.attr("id").replace(/[a-z]/g, "");
+
+            $area.data('maphilight', {
+                ...MAPHILIGHT_CONFIG,
+                strokeWidth: 2,
+                strokeOpacity: 1,
+                strokeColor: 'ffaa00'
+            }).trigger('alwaysOn.maphilight');
+
+            $(`#a${areaId} span`).addClass("in");
+            $("#row" + areaId).addClass("in");
+        })
+        .on("mouseout", "area", function() {
+            const $area = $(this);
+            const areaId = $area.attr("id").replace(/[a-z]/g, "");
+
+            $area.data('maphilight', MAPHILIGHT_CONFIG);
+            $('#image').maphilight(MAPHILIGHT_CONFIG);
+
+            $(`#a${areaId} span`).removeClass("in");
+            $("#row" + areaId).removeClass("in");
+        });
+
+    $("#ul_groups_legend")
+        .on("mouseenter", ".group-legend", function() {
+            handleGroupHover('enter', $(this).data('group'));
+        })
+        .on("mouseleave", ".group-legend", function() {
+            handleGroupHover('leave');
+        })
+        .on("click", ".legend-number", function(e) {
+            e.stopPropagation();
+            const groupNum = $(this).closest('.group-legend').data('group');
+            const $row = $(`#g_row${groupNum}`);
+            if ($row.length) {
+                $row[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const $input = $row.find('input').first();
+                if ($input.length) {
+                    $input.focus().select();
+                }
+            }
+        });
+
+    $("#ul_groups_legend, #grp_table tbody")
+        .on("mouseleave", "*", function() {
+            $('.group-highlight').removeClass('group-highlight');
+
+            $('area').each(function() {
+                const $area = $(this);
+                const rowId = $area.attr('id').replace('area', '');
+                const rowData = table.row(`#row${rowId}`).data();
+
+                if (rowData && rowData.group) {
+                    $area
+                        .data('maphilight', {
+                            ...MAPHILIGHT_CONFIG,
+                            groupBy: `.group${rowData.group}`
+                        })
+                        .attr('class', `group${rowData.group}`);
+                } else {
+                    $area.data('maphilight', MAPHILIGHT_CONFIG).removeAttr('class');
+                }
+            });
+
+            $('#image').maphilight(MAPHILIGHT_CONFIG);
+        });
+
+    // Handlers search
+    $('.search-input').on('input search', Utils.debounce((e) => {
+        const value = e.target.value;
+        const hasSearch = value.length > 0;
+
+        if (hasSearch) {
+            $('.drag-handle').css('cursor', 'default').attr('title', '');
+            $('.btn-up, .btn-down').css('visibility', 'hidden');
+            table.rowReorder.disable();
+        } else {
+            $('.drag-handle').css('cursor', 'grab').attr('title', GW.i18n.moveDrag);
+            $('.btn-up, .btn-down').css('visibility', '');
+            table.rowReorder.enable();
+        }
+        table.search(value).draw();
+    }, 300));
+
+    $('.search-input').on('keyup', (e) => {
+        if (e.key === 'Escape') {
+            e.target.value = '';
+            $('.drag-handle').css('cursor', 'grab').attr('title', GW.i18n.moveDrag);
+            $('.btn-up, .btn-down').css('visibility', '');
+            table.rowReorder.enable();
+            table.search('').draw();
+        }
+    });
+
+    // Handlers image redraw
+    $("#fname").on("input change", HandlerManager.imageChange);
+
+}
+
+// Separate function for initial dataTable content setup
+function initializePageContent(data, tableApi) {
+   // Setup search functionality
+    const $searchInput = $('<input type="text" placeholder="' + GW.i18n.search + '" class="form-control form-control-sm search-input">');
+    $(tableApi.table().header()).find('th:first').append($searchInput);
+    $('#search-clear').remove();
+
+    if (!data) return;
+
+    // Initialize form fields
+    $("#page_title").val(data.title || '');
+    $("#page_desc").val(data.desc || '');
+    if (albumImages[albumCurrent]?.desc) {
+      $("#page_desc").val(albumImages[albumCurrent].desc);
+    }
+
+    // Initialize image if present
+    var imgFile = albumImages[albumCurrent]?.img;
+    if (imgFile) {
+        var $img = $("#image");
+        $img.attr("src", GW.prefix + "m=DOC&s=" + imgFile);
+        $("#fname").val(imgFile);
+        $img.one("load", function() {
+            var width = this.width, height = this.height;
+            requestAnimationFrame(function() {
+                var $frame = $("#frame");
+                $frame.css({ width: width, height: height });
+                $frame.closest("#div_img_legend").css({ width: width });
+                $img.maphilight(MAPHILIGHT_CONFIG);
+            });
+        });
+    }
+    updateAlbumNav();
+
+    // Initialize map and legend once
+    var mapData = albumImages[albumCurrent]?.map;
+    if (mapData?.length) {
+        $("#map, #ul_legend").empty();
+        mapData.forEach(function(item) {
+            var areaIndex = ++currentAreaCount;
+            updateAreaAndLegend(item, areaIndex);
+        });
+    }
+}
+
+function toggleTables(show) {
+    if (show || $('input#fname').val()) {
+        $('#map_table, #grp_table').closest('table').show();
+    } else {
+        $('#map_table, #grp_table').closest('table').hide();
+    }
+}
+
+// Initialize both data tables with proper error handling and state management
+function initTables() {
+
+  // Fetch initial data
+  $.ajax({
+    url: GW.url + "&ajax=on",
+    success: function(json) {
+      if (!json || !json.digest) {
+        console.error("Invalid JSON response");
+        return;
+      }
+
+      // Show tables if we have a valid image either in JSON or in form
+      if (json.r?.images) {
+        albumImages = json.r.images;
+      } else if (json.r) {
+        albumImages = [{
+          img: json.r.img || "",
+          desc: json.r.desc || "",
+          map: json.r.map || [],
+          groups: json.r.groups || []
+        }];
+      }
+      var p = new URLSearchParams(window.location.search);
+      var si = parseInt(p.get("img")) || 0;
+      if (si > 0 && si <= albumImages.length) {
+        albumCurrent = si - 1;
+      }
+      var cur = albumImages[albumCurrent];
+      toggleTables(Boolean(cur?.img || $("#fname").val()));
+
+      // Initialize main table
+      table = $('#map_table').DataTable({
+        data: albumImages[albumCurrent]?.map || [],
+        dom: 'rt',
+        deferRender: false,
+        paging: false,
+        ordering: true,
+        order: [[0, 'asc']],
+        searching: true,
+        info: false,
+        autoWidth: false,
+        language: {
+           emptyTable: GW.i18n.emptyTable + '<br>' + GW.i18n.drawSelection
+        },
+        rowReorder: {
+          selector: 'div.drag-handle',
+          update: false,
+        },
+        columns: [
+          {
+            data: null,
+            type: 'num',
+            autoWidth: false,
+            orderable: false,
+            className: 'search-container border-right',
+            render: function(data, type, row, meta) {
+              if (type === 'sort') {
+                return (Number(meta.row) + 1);
+              }
+              return '<div class="d-inline-flex align-items-center w-100">' +
+                     '<button type="button" class="btn btn-sm btn-outline-secondary redraw-area border-0" title="' + GW.i18n.redraw + '"><i class="far fa-pen-to-square"></i></button>' +
+                     '<button type="button" class="btn btn-sm btn-outline-secondary btn-up ml-2" title="' + GW.i18n.moveUp + '">↑</button>' +
+                     '<button type="button" class="btn btn-sm btn-outline-secondary btn-down ml-1" title="' + GW.i18n.moveDown + '">↓</button>' +
+                     '<div class="ml-auto mr-1 drag-handle" title="' + GW.i18n.moveDrag + '">' + (Number(meta.row) + 1) + '</div></div>'
+            }
+          },
+          {
+            data: "t",
+            defaultContent: "p",
+            render: function(data, type, row, meta) {
+              if (type === 'display') {
+                const types = {
+                  p: GW.i18n.person,
+                  g: 'GeneWeb',
+                  e: 'Web'
+                };
+                let html = '<select class="form-control update type" row="' + meta.row + '">';
+                Object.entries(types).forEach(([value, label]) => {
+                  const selected = (data === value || (!data && value === 'p')) ? ' selected' : '';
+                  html += '<option value="' + value + '"' + selected + '>' + label + '</option>';
+                });
+                html += '</select>';
+                return html;
+              }
+              return data;
+            }
+          },
+          {
+            data: "fn",
+            type: "string",
+            defaultContent: "",
+            render: function(data, type, row) {
+                if (type === 'sort' || type === 'type') {
+                    return get(data).toLowerCase();
+                }
+                var disabled = (get(row.t) !== ""
+                    && row.t !== "p") ? " disabled" : "";
+                var dl = GW.hasFnList
+                    ? ' list="datalist_fnames" data-book="fn"'
+                    : '';
+                return '<input class="form-control update'
+                    + ' p-input" type="text" value="'
+                    + get(data) + '"' + disabled + dl + '>';
+            }
+          },
+          {
+            data: "sn",
+            type: "string",
+            defaultContent: "",
+            render: function(data, type, row) {
+                if (type === 'sort' || type === 'type') {
+                    return get(data).toLowerCase();
+                }
+                var disabled = (get(row.t) !== ""
+                    && row.t !== "p") ? " disabled" : "";
+                var dl = GW.hasSnList
+                    ? ' list="datalist_snames" data-book="sn"'
+                    : '';
+                return '<input class="form-control update'
+                    + ' p-input" type="text" value="'
+                    + get(data) + '"' + disabled + dl + '>';
+            }
+          },
+          {
+            data: "oc",
+            defaultContent: "",
+            orderable: false,
+            render: function(data, type, row) {
+              const disabled = (get(row.t) !== "" && row.t !== "p") ? " disabled" : "";
+              return '<input class="form-control update p-input clear-button" type="number" value="' + get(data) + '" min="0" step="1"' + disabled + '>';
+            }
+          },
+          {
+            data: "href",
+            defaultContent: "",
+            render: function(data, type, row) {
+              const disabled = (row.t !== "e" && row.t !== "g") ? " disabled" : "";
+              const placeholder = row.t === "e" ? ' placeholder="https://…"' :
+                                row.t === "g" ? ' placeholder="m=…"' : "";
+              return '<input class="form-control update u-input" type="text" value="' + get(data) + '"' + placeholder + disabled + '>';
+            }
+          },
+          {
+            data: "alt",
+            defaultContent: "",
+            render: function(data, type, row) {
+              return '<input class="form-control update" type="text" value="' + get(data) + '">';
+            }
+          },
+          {
+            data: "group",
+            type: "num",
+            render: function(data, type, row) {
+              if (type === "sort") {
+                return parseInt(data) || 0;
+                }
+                return '<input class="form-control update clear-button" type="number" value="' + get(data) + '" min="0" step="1">';
+            }
+          },
+          {
+            data: null,
+            orderable: false,
+            defaultContent: '<button type="button" class="btn btn-link text-danger remove px-1" title="' + GW.i18n.del + '"><i class="fa fa-trash-can"></i></button>'
+          },
+        ],
+        rowCallback: function(row, data, index) {
+          const rowId = row.getAttribute('id')?.replace(/[a-z]/g, "") || "";
+          if (!rowId) return;
+
+          // Update row data
+          if (data.t === "p" || !data.t) {
+            if (data.fn && data.sn) {
+              const oc = get(data.oc);
+              const oc2 = (oc && oc !== "0") ? "/" + oc : "";
+              const txt = get(data.alt);
+              data.gw = "[[" + data.fn + "/" + data.sn + oc2 +
+                       (txt ? "/" + data.fn + " " + data.sn : "") + "]]";
+            } else {
+              delete data.gw;
+            }
+          } else {
+            delete data.gw;
+          }
+
+          $(row).attr('id', `row${rowId}`);
+        },
+        initComplete: function() {
+          $("#digest").val(json.digest);
+          initializePageContent(json.r, this.api());
+        },
+        preDrawCallback: function(settings) {
+          const activeElement = document.activeElement;
+          if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT')) {
+              settings._focusInfo = {
+                  rowId: $(activeElement).closest('tr').attr('id'),
+                  cellIndex: $(activeElement).closest('td').index(),
+                  value: activeElement.value,
+                  selectionStart: activeElement.selectionStart,
+                  selectionEnd: activeElement.selectionEnd
+              };
+          }
+          return true;
+        },
+        drawCallback: function(settings) {
+            if (!settings || !settings._focusInfo) {
+                return;
+            }
+
+            const focusInfo = settings._focusInfo;
+
+            if (typeof focusInfo.rowId === 'undefined' ||
+                typeof focusInfo.cellIndex === 'undefined') {
+                return;
+            }
+
+            requestAnimationFrame(() => {
+                try {
+                    const row = $(`#${focusInfo.rowId}`);
+                    if (!row.length) {
+                        return;
+                    }
+
+                    const cell = row.find(`td:eq(${focusInfo.cellIndex})`);
+                    if (!cell.length) {
+                        return;
+                    }
+
+                    const input = cell.find('input, select').first();
+                    if (!input.length) {
+                        return;
+                    }
+
+                    // Restore focus
+                    input.focus();
+
+                    // Restore selection if applicable
+                    if (typeof input[0].setSelectionRange === 'function' &&
+                        typeof focusInfo.selectionStart === 'number' &&
+                        typeof focusInfo.selectionEnd === 'number') {
+                        input[0].setSelectionRange(
+                            focusInfo.selectionStart,
+                            focusInfo.selectionEnd
+                        );
+                    }
+                } catch (error) {
+                    console.warn('Error restoring focus:', error);
+                } finally {
+                    // Clean up
+                    delete settings._focusInfo;
+                }
+            });
+        }
+      });
+
+      // Initialize group table
+      groupTable = $('#grp_table').DataTable({
+        data: albumImages[albumCurrent]?.groups || [],
+        deferRender: false,
+        paging: false,
+        ordering: true,
+        searching: false,
+        info: false,
+        language: {
+           emptyTable: GW.i18n.emptyTable + '<br>' + GW.i18n.addGroup
+        },
+        columns: [
+          {
+            data: "name",
+            type: "numeric",
+            orderable: false,
+            render: function(data, type, row, meta) {
+              if (type === 'sort' || type === 'type') {
+                return parseInt(get(data)) || 0;
+              }
+              return '<div class="text-center">' + get(data) + '</div>';
+            }
+          },
+          {
+            data: "label",
+            orderable: false,
+            render: function(data, type, row, meta) {
+              if (type === "display") {
+                return '<input class="form-control update" type="text" ' +
+                       'value="' + get(data) + '" ' +
+                       'data-index="' + meta.row + '">';
+              }
+              return data;
+            }
+          },
+          {
+            data: null,
+            orderable: false,
+            defaultContent: '<button type="button" class="btn btn-link text-danger remove px-1" title="' + GW.i18n.del + '"><i class="fa fa-trash-can"></i></button>'
+          }
+        ],
+        rowCallback: function(row, data, index) {
+          $(row).attr('id', `g_row${index + 1}`);
+
+          const label = get(data.label);
+          if (label) {
+            $(`#g${index + 1}`).html(`<span>${index + 1} : ${label}</span>`);
+          }
+        },
+        initComplete: function() {
+          if (albumImages[albumCurrent]?.groups?.length) {
+            groupTable = this.api();
+            updateGroupsLegend();
+            groupTable.on('draw', updateGroupsLegend);
+          }
+        }
+      });
+
+      table.rows().every(function(rowIdx) {
+        const $row = $(this.node());
+        $row.attr('id', `row${rowIdx + 1}`);
+      });
+
+      // Initialize all event handlers after tables are ready
+      initializeHandlers();
+    },
+    error: function(xhr, status, error) {
+      console.error("Error fetching table data:", error);
+    }
+  });
+}
+
+// Handler for clearing image and resetting form butten
+function resetButtonHandler() {
+  $("#clear-all").click(function () {
+    $("#page_title").val("");
+    $("#page_desc").val("");
+    $("#fname").val("");
+    $("#frame").css({ width: "auto", height: "auto" });
+    $("#image").attr("src", "");
+    $("#image").parent("div").css({ background: "none", height: "auto" });
+    $("#selection").hide();
+    $("#map").empty();
+    $("#ul_legend, #ul_groups_legend").empty();
+    $('area').each(function() {
+      $(this).removeData('maphilight-configured');
+    });
+    $('#image').maphilight(MAPHILIGHT_CONFIG);
+    $('input').removeData('updateTimeout');
+    $('#redraw-target').removeData();
+    table.clear().draw();
+    groupTable.clear().draw();
+    toggleTables(false);
+    currentAreaCount = 0;
+    albumImages = [{ img: "", map: [], groups: [] }];
+    albumCurrent = 0;
+    updateAlbumNav();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+function saveAlbumCurrent() {
+  albumImages[albumCurrent] = {
+    img: $("#fname").val(),
+    desc: $("#page_desc").val(),
+    map: cleanMapEntries(),
+    groups: currentGroups()
+  };
+}
+
+function loadAlbumImage(index) {
+  albumCurrent = index;
+  var img = albumImages[index] || { img: "", map: [], groups: [] };
+
+  // Clear current state
+  table.clear();
+  groupTable.clear();
+  $("#map, #ul_legend, #ul_groups_legend").empty();
+  currentAreaCount = 0;
+
+  // Reload map data
+  if (img.map && img.map.length) {
+    table.rows.add(img.map);
+  }
+  table.draw(false);
+  if (img.groups && img.groups.length) {
+    groupTable.rows.add(img.groups);
+  }
+  groupTable.draw(false);
+  updateGroupsLegend();
+
+  // Update filename and load image
+  $("#fname").val(img.img || "");
+  $("#page_desc").val(img.desc || "");
+  var $img = $("#image");
+  var $frame = $("#frame");
+  if (img.img) {
+    $frame.show();
+    $img.attr("src", GW.prefix + "m=DOC&s=" + img.img);
+    toggleTables(true);
+    $img.one("load", function() {
+      var w = this.width, h = this.height;
+      requestAnimationFrame(function() {
+        $frame.css({ width: w, height: h });
+        $frame.closest("#div_img_legend")
+          .css({ width: w });
+        setTimeout(function() {
+          $img.maphilight(MAPHILIGHT_CONFIG);
+        }, 50);
+      });
+    });
+  } else {
+    $img.removeAttr("src");
+    $frame.hide();
+    toggleTables(false);
+  }
+  updateAlbumNav();
+}
+
+function updateAlbumNav() {
+  var n = albumImages.length;
+  $("#album-current").text(albumCurrent + 1);
+  $("#album-count").text(n);
+  if (n > 1) {
+    $("#album-nav").addClass("d-flex");
+    $("#album-add-solo").removeClass("d-inline")
+      .addClass("d-none");
+  } else {
+    $("#album-nav").removeClass("d-flex");
+    if ($("#fname").val()) {
+      $("#album-add-solo").removeClass("d-none")
+        .addClass("d-inline");
+    } else {
+      $("#album-add-solo").removeClass("d-inline")
+        .addClass("d-none");
+    }
+  }
+}
+
+function initAlbumHandlers() {
+  $("#album-first").click(function(e) {
+    e.preventDefault(); saveAlbumCurrent(); loadAlbumImage(0);
+  });
+  $("#album-prev").click(function(e) {
+    e.preventDefault();
+    if (albumCurrent > 0) { saveAlbumCurrent(); loadAlbumImage(albumCurrent - 1); }
+  });
+  $("#album-next").click(function(e) {
+    e.preventDefault();
+    if (albumCurrent < albumImages.length - 1) { saveAlbumCurrent(); loadAlbumImage(albumCurrent + 1); }
+  });
+  $("#album-last").click(function(e) {
+    e.preventDefault(); saveAlbumCurrent(); loadAlbumImage(albumImages.length - 1);
+  });
+  $("#album-add, #album-add-solo").click(function(e) {
+    e.preventDefault();
+    saveAlbumCurrent();
+    albumImages.push({ img: "", map: [], groups: [] });
+    $("#fname").val("");
+    loadAlbumImage(albumImages.length - 1);
+  });
+  $("#album-remove").click(function(e) {
+    e.preventDefault();
+    if (albumImages.length > 1) {
+      albumImages.splice(albumCurrent, 1);
+      if (albumCurrent >= albumImages.length) albumCurrent = albumImages.length - 1;
+      loadAlbumImage(albumCurrent);
+    }
+  });
+}
+
+function cleanMapEntries() {
+  return table.rows().data().toArray().map(function(item) {
+    var clean = {};
+    if (item.shape) clean.shape = item.shape;
+    if (item.coords) clean.coords = item.coords;
+    if (item.t) clean.t = item.t;
+    if (item.fn) clean.fn = item.fn;
+    if (item.sn) clean.sn = item.sn;
+    if (item.oc) clean.oc = item.oc;
+    if (item.href) clean.href = item.href;
+    if (item.alt) clean.alt = item.alt;
+    if (item.group) clean.group = item.group;
+    if (item.gw) clean.gw = item.gw;
+    if (clean.t === "p" || !clean.t) {
+      delete clean.misc; delete clean.href;
+      if (clean.fn && clean.sn) clean.gw = generateGwSyntax(clean);
+    } else if (clean.t === "g" || clean.t === "e") {
+      delete clean.fn; delete clean.sn; delete clean.oc; delete clean.gw;
+    }
+    return clean;
+  });
+}
+
+function currentGroups() {
+  return groupTable.rows().data().toArray().map(function(g, i) {
+    return { name: i + 1, label: g.label };
+  });
+}
+
+/**
+ * Handles form submission and prepares data for saving
+ * Formats JSON with proper spacing and validates data integrity
+ */
+function setupFormHandler() {
+  $("#form").submit(function(event) {
+    event.preventDefault();
+    var title = $("#page_title").val() || "&hellip;";
+    saveAlbumCurrent();
+    var res = { title: title, images: albumImages };
+    var jsonString = JSON.stringify(res, null, 2)
+      .replace(/\[\{/g, '[\n  {')
+      .replace(/\}\]/g, '}\n]')
+      .replace(/\}\,\{/g, '},\n  {');
+    $("#notes").val("TITLE=" + title
+      + "\nTYPE=gallery\n" + jsonString);
+    $(this).unbind("submit").submit();
+  });
+}
+
+// Efficiently handle image loading with debouncing
+function setupImageHandling() {
+  let loadTimeout;
+  const refreshMaphilight = () => {
+    if (loadTimeout) clearTimeout(loadTimeout);
+    loadTimeout = setTimeout(() => {
+      $("#image").maphilight(MAPHILIGHT_CONFIG);
+    }, 100);
+  };
+}
+
+$("#image").on("load", function() {
+    const $this = $(this);
+    const $frame = $("#frame");
+
+    requestAnimationFrame(() => {
+        const width = $this.width();
+        const height = $this.height();
+
+        requestAnimationFrame(() => {
+            $frame.css({ width, height });
+            $frame.closest("#div_img_legend").css({ width });
+
+            setTimeout(() => {
+                $this.maphilight(MAPHILIGHT_CONFIG);
+            }, 100);
+        });
+    });
+});
+
+const HandlerManager = {
+   updateGwSyntax: function(data) {
+    if (data.fn && data.sn) {
+      data.gw = generateGwSyntax(data);
+    } else {
+      delete data.gw;
+    }
+  },
+
+  handleGroupLabelUpdate: function(e) {
+    const $input = $(e.target);
+    const $tr = $input.closest('tr');
+    const rowIdx = groupTable.row($tr).index();
+    let currentData = groupTable.row(rowIdx).data();
+
+    currentData.label = $input.val();
+    groupTable.row(rowIdx).data(currentData).draw(false);
+    TableManager.updateGroupLabels();
+  },
+
+  removal: function(event) {
+    const tr = $(this).closest("tr");
+    const tableId = tr.closest("table").attr("id");
+
+    if (tableId === "grp_table") {
+        groupTable.row(tr).remove().draw();
+        groupTable.order([0, 'asc']).draw();
+        updateGroupsLegend();
+    } else {
+        const currentData = table.rows().data().toArray();
+        const rowIndex = table.row(tr).index();
+        currentData.splice(rowIndex, 1);
+
+        $("#map, #ul_legend").empty();
+        table.clear();
+
+        currentData.forEach((data, idx) => {
+            const areaIndex = idx + 1;
+            table.row.add(data);
+            updateAreaAndLegend(data, areaIndex);
+        });
+
+        table.draw();
+    }
+  },
+
+  imageChange: function() {
+    const fname = $(this).val();
+    if (!fname) {
+      $("#frame").hide();
+      toggleTables(false);
+      updateAlbumNav();
+      return;
+    }
+
+    const img = $("#image");
+    img.attr("src", GW.prefix + "m=DOC&s=" + fname);
+
+    let loadTimeout;
+    img.one("load", function () {
+        if (loadTimeout) clearTimeout(loadTimeout);
+
+        const $frame = $("#frame");
+        const width = this.width;
+        const height = this.height;
+
+        requestAnimationFrame(() => {
+            $frame.show();
+            $frame.css({ width, height });
+            $frame.closest("#div_img_legend").css({ width });
+
+            toggleTables(true);
+            updateAlbumNav();
+
+            loadTimeout = setTimeout(() => {
+                img.maphilight(MAPHILIGHT_CONFIG);
+            }, 100);
+        });
+    });
+  },
+};
+
+// Handles maphilight configuration for areas, including group highlighting
+$(document).on("change mouseover", "area", function() {
+  const $area = $(this);
+  const classes = $area.attr('class')?.split(' ') || [];
+  const groupClass = classes.find(c => c.startsWith('group'));
+
+  const config = {
+    ...MAPHILIGHT_CONFIG,
+    groupBy: groupClass ? `.${groupClass}` : false
+  };
+
+  $area.data('maphilight', config).trigger('alwaysOn.maphilight');
+});
+
+$(document).ready(function() {
+    initTables();
+    initAlbumHandlers();
+    SelectionManager.init();
+    TableManager.init();
+    UIManager.init();
+    setupFormHandler();
+    resetButtonHandler();
+    addClearButtonToInputs();
+    inputToBook.addNavigation();
+    if (typeof populateDatalists === 'function') {
+        populateDatalists();
+    }
+});
+
+jQuery.event.special.touchstart = {
+    setup: function( _, ns, handle ) {
+        this.addEventListener("touchstart", handle, { passive: !ns.includes("noPreventDefault") });
+    }
+};
+
+jQuery.event.special.touchmove = {
+    setup: function( _, ns, handle ) {
+        this.addEventListener("touchmove", handle, { passive: !ns.includes("noPreventDefault") });
+    }
+};
