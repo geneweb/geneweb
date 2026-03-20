@@ -60,7 +60,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          cpan -j .github/ci-config/cpan-config.pm -T -f -i String::ShellQuote IPC::System::Simple;
+          cpanm --notest String::ShellQuote IPC::System::Simple
           rm -f _opam/bin/x86_64-w64-mingw32-gcc.exe || true
           rm -f _opam/bin/i686-w64-mingw32-gcc.exe || true
 
