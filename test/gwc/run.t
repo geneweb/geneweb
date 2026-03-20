@@ -9,7 +9,7 @@
     source files end with .gw
     object files end with .gwo
   and [options] are:
-    -bd <DIR>                     Specify where the “bases” directory with databases is installed (default if empty is "$XDG_DATA_HOME/geneweb/base").
+    -bd <DIR>                     Specify where the “bases” directory with databases is installed (default if empty is "$XDG_DATA_HOME/geneweb/bases").
     -bnotes                       [drop|erase|first|merge] Behavior for base notes of the next file. [drop]: dropped. [erase]: erase the current content. [first]: dropped if current content is not empty. [merge]: concatenated to the current content. Default: merge
     -c                            Only compiling
     -cg                           Compute consanguinity

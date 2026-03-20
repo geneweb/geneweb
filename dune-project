@@ -48,6 +48,7 @@
     digestif
     pp_loc
     dune-site
+    conf-brotli
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.29.0")))
   )
