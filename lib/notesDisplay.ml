@@ -559,7 +559,7 @@ let print_mod conf base =
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
   else
     match List.assoc "TYPE" nenv with
-    | "gallery" | "album" ->
+    | ("gallery" | "album") when p_getenv conf.env "raw" = None ->
         Templ.output_simple conf Templ.Env.empty "notes_upd_gallery"
     | (exception Not_found) | _ ->
         let title _ =

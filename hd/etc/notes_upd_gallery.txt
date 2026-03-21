@@ -81,7 +81,7 @@
 <div class="visually-hidden" aria-live="polite" id="status-updates"></div>
 <form id="form" class="mt-3 ml-2" method="post" action="%action;">
   <div class="row ml-3">
-    <div class="col-sm-12 col-lg-9">
+    <div class="col-sm-12 col-lg-8">
       <div class="form-group row mb-0">
         <label for="page_title" class="col-sm-2 col-form-label">[*title/titles]0</label>
         <div class="col-sm-10">
@@ -176,7 +176,7 @@
       </div>
       <div class="mt-4 ml-2">
         <button type="submit" form="form" class="btn btn-primary" title="[*validate/delete]0">OK</button>
-        <a class="btn btn-outline-primary ml-2" href="%url_set.notmpl.on;">[*modify] [note/notes]0</a>
+        <a class="btn btn-outline-primary ml-2" href="%url_set.raw.on;">[*modify] [note/notes]0</a>
         <button type="button" class="btn btn-danger ml-4" id="clear-all" title="[*reset imap]1">[*reset imap]0</button>
       </div>
     </div>
