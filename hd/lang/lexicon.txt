@@ -6969,7 +6969,7 @@ ru: кремация
 sv: kremering
 tr: ölü yakma
 
-current value
+    current value
 bg: текуща стойност
 br: talvoud red
 ca: valor actual
@@ -6993,6 +6993,13 @@ pt: valor atual
 pt-br: valor atual
 ru: текущее значение
 sv: nuvarande värde
+
+    chronicle
+de: Chronik
+en: chronicle
+es: crónica
+it: cronaca
+fr: chronique
 
     custom event
 co: evenimentu persunalizatu
@@ -12028,6 +12035,11 @@ pt: vivo/a de/até
 ru: жил(а) с %s по %s
 sv: lever från/till
 tr: yaşamış/için
+
+    loading
+de: Ladevorgang läuft…
+en: loading in progress…
+fr: chargement en cours…
 
     lock group
 en: lock this group

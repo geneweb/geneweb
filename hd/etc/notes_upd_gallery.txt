@@ -88,6 +88,12 @@
           <input type="text" class="form-control" id="page_title">
         </div>
       </div>
+      <div class="form-group row my-1">
+        <label for="album_chronicle" class="col-sm-2 col-form-label">[*chronicle]</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" id="album_chronicle" rows="1"></textarea>
+        </div>
+      </div>
       <div id="album-nav" class="d-none justify-content-center mt-1 ml-2">
         <div class="px-2"><a href="#" id="album-first" title="[*first]"><i class="fa-solid fa-backward"></i></a></div>
         <div class="px-2"><a href="#" id="album-prev" title="[*previous]"><i class="fa-solid fa-caret-left"></i></a></div>
@@ -227,6 +233,6 @@ const GW = {
   }
 };
 </script>
-<script src="%etc_prefix;js/notes_upd_gallery.js?hash=%apply;hash%with;%etc_prefix;js/notes_upd_gallery.js%end;"></script>
+<script src="%etc_prefix;js/notes_upd_gallery.min.js?hash=%apply;hash%with;%etc_prefix;js/notes_upd_gallery.min.js%end;"></script>
 </body>
 </html>

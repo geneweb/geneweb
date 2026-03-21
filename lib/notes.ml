@@ -187,6 +187,7 @@ let safe_gallery conf base s =
     List.map
       (function
         | key, `String s when key = "title" -> (key, `String (html s))
+        | key, `String s when key = "chronicle" -> (key, `String (html s))
         | key, `String s when key = "desc" -> (key, `String (html s))
         | "map", `List lmap -> ("map", `List (List.map safe_map lmap))
         | "images", `List images_l ->
