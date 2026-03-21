@@ -91,7 +91,7 @@
       <div class="form-group row my-1">
         <label for="album_chronicle" class="col-sm-2 col-form-label">[*chronicle]</label>
         <div class="col-sm-10">
-          <textarea class="form-control" id="album_chronicle" rows="1"></textarea>
+          <textarea class="form-control" id="album_chronicle" rows="2"></textarea>
         </div>
       </div>
       <div id="album-nav" class="d-none justify-content-center mt-1 ml-2">

@@ -2230,12 +2230,15 @@ span.notesourcecolor {
   border-radius: .25rem .25rem 0 0;
 }
 
-.imap-gallery a + :last-child {
-  padding: .75rem;
-  color: #212529;
+.gallery-legend {
+  display: block;
+  line-height: 1.1rem;
+  padding: 6px 8px;
   font-size: .875rem;
-  text-align: center;
-  border-top: 1px solid #dee2e6;
+  color: #212529;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .imap-group {

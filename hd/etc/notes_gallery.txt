@@ -15,28 +15,25 @@
 <div class="container-fluid">
   %include;home
   <div class="small float-right mr-2 mt-2">
-    (<a href="%url;&ref=on"
-        title="[pages where page appears]"><-</a>)
+    (<a href="%url;&ref=on" title="[*gallery backlinks]"><-</a>)
+    %if(wizard)(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)%end;
   </div>
   <h1 id="h1" class="ml-3 mb-0">[*loading]</h1>
-  <p id="chronicle" class="ml-3 text-muted d-none"></p>
-  %if(wizard)
-    <div class="small float-right mr-2">
-      (<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)
-    </div>
-  %end;
+  <p id="chronicle" class="ml-3 mb-0 text-muted d-none"></p>
+  <div id="index-wall" class="flex-wrap mt-3 ml-3 d-none"></div>
   <div id="album-nav" class="d-none justify-content-center">
-    <div class="p-2 bd-highlight"><a id="first" href="#" onclick="loadFirstImage(); return false;"><i class="fa-solid fa-backward"></i></a></div>
-    <div class="p-2 bd-highlight"><a id="previous" href="#" onclick="loadPreviousImage(); return false;"><i class="fa-solid fa-caret-left"></i></a> </div>
+    <div class="p-2 bd-highlight"><a id="home" href="#" onclick="loadIndex(); return false;" title="[*gallery index]"><i class="fa-solid fa-house"></i></a></div>
+    <div class="p-2 bd-highlight"><a id="first" href="#" title="[*first]" onclick="loadFirstImage(); return false;"><i class="fa-solid fa-backward"></i></a></div>
+    <div class="p-2 bd-highlight"><a id="previous" href="#" title="[*previous]" onclick="loadPreviousImage(); return false;"><i class="fa-solid fa-caret-left"></i></a> </div>
     <div class="p-2 bd-highlight"><span id="current"></span> / <span id="imageCount"></span></div>
-    <div class="p-2 bd-highlight"><a id="next" href="#" onclick="loadNextImage(); return false;"><i class="fa-solid fa-caret-right"></i></a></div>
-    <div class="p-2 bd-highlight"><a id="last" href="#" onclick="loadLastImage(); return false;"><i class="fa-solid fa-forward"></i></a></div>
+    <div class="p-2 bd-highlight"><a id="next" href="#" title="[*next]" onclick="loadNextImage(); return false;"><i class="fa-solid fa-caret-right"></i></a></div>
+    <div class="p-2 bd-highlight"><a id="last" href="#" title="[*last]" onclick="loadLastImage(); return false;"><i class="fa-solid fa-forward"></i></a></div>
   </div>
-  <div class="d-inline-flex ml-3">
+  <div id="gallery-view" class="ml-3">
   <map id="map" name="map"></map>
   <div>
   <img id="image" usemap="#map" alt=""><!-- no src, managed on javascript side -->
-  <span id="description" class="ml-3 mt-3"></span>
+  <span id="description" class="mx-1"></span>
   </div>
   <div class="d-none ml-3" id="div_legend">%nn;
     [*on this image][:]
@@ -124,9 +121,6 @@ function displayImage(img) {
   $("#map, #legend").empty();
   $("#div_legend").addClass("d-none");
   $("#h1").html(json.title);
-  var chr = json.chronicle || "";
-  if (chr) { $("#chronicle").html(chr).removeClass("d-none"); }
-  else { $("#chronicle").addClass("d-none"); }
   $("#description").html(img.desc || json.desc || "");
   $("#image").attr("src", "%prefix;m=DOC&s=" + img.img);
   
@@ -436,41 +430,107 @@ $(document).on("click", ".imap-group-legend", function(e) {
   }
 });
 
+function updateNavButtons() {
+  $("#first, #previous").toggleClass("disabled text-muted",
+    current <= 0);
+  $("#next, #last").toggleClass("disabled text-muted",
+    current >= imagesCount - 1);
+}
+
 function loadCurrentImage() {
   displayImage(images_l[current]);
   $("#current").text(current + 1);
   $("#imageCount").text(imagesCount);
+  $("#index-wall").removeClass("d-flex").addClass("d-none");
+  $("#gallery-view").addClass("d-inline-flex").removeClass("d-none");
   if (imagesCount > 1) {
-    var u = new URL(window.location);
-    if (current > 0) u.searchParams.set("img", current + 1);
-    else u.searchParams.delete("img");
-    history.replaceState(null, "", u);
+    $("#album-nav").addClass("d-flex");
   }
+  var u = new URL(window.location);
+  u.searchParams.set("img", current + 1);
+  history.replaceState(null, "", u);
   var $edit = $("#edit_link");
   if ($edit.length) {
     var base = "%prefix;m=MOD_NOTES&f=%e.f;";
-    $edit.attr("href", imagesCount > 1
-      ? base + "&img=" + (current + 1) : base);
+    $edit.attr("href", base + "&img=" + (current + 1));
+  }
+  updateNavButtons();
+}
+
+function loadIndex() {
+  $("#map, #legend").empty();
+  $("#gallery-view").removeClass("d-inline-flex").addClass("d-none");
+  $("#index-wall").empty().addClass("d-flex").removeClass("d-none");
+  $("#h1").html(json.title);
+  var chr = json.chronicle || "";
+  if (chr) { $("#chronicle").html(chr).removeClass("d-none"); }
+  else { $("#chronicle").addClass("d-none"); }
+  $("#album-nav").removeClass("d-flex");
+  images_l.forEach(function(img, i) {
+    var desc = img.desc || "";
+    var label = desc ? (i + 1) + ". " + desc : ". " + (i + 1);
+    var url = "%prefix;m=DOC&s=" + img.img;
+    var html = '<div class="imap-gallery" data-img="' + (i + 1) + '"'
+      + ' data-toggle="tooltip" data-html="true"'
+      + ' title="' + label.replace(/"/g, '&quot;') + '"'
+      + ' style="cursor:pointer">'
+      + '<img src="' + url + '" alt="">'
+      + '<div class="gallery-legend">' + label + '</div></div>';
+    $("#index-wall").append(html);
+  });
+  $("#index-wall [data-toggle='tooltip']").tooltip();
+  var u = new URL(window.location);
+  u.searchParams.delete("img");
+  history.replaceState(null, "", u);
+  current = -1;
+  var $edit = $("#edit_link");
+  if ($edit.length) {
+    $edit.attr("href", "%prefix;m=MOD_NOTES&f=%e.f;");
   }
 }
 
-function loadFirstImage() { current = 0; loadCurrentImage(); }
-function loadLastImage() { current = imagesCount - 1; loadCurrentImage(); }
-function loadNextImage() { if (current < imagesCount - 1) { current++; loadCurrentImage(); } }
-function loadPreviousImage() { if (current > 0) { current--; loadCurrentImage(); } }
+function loadFirstImage() {
+  if (current <= 0) return;
+  current = 0; loadCurrentImage();
+}
+function loadLastImage() {
+  if (current >= imagesCount - 1) return;
+  current = imagesCount - 1; loadCurrentImage();
+}
+function loadNextImage() {
+  if (current >= imagesCount - 1) return;
+  current++; loadCurrentImage();
+}
+function loadPreviousImage() {
+  if (current <= 0) return;
+  current--; loadCurrentImage();
+}
 
 $(document).ready(function() {
+  $("#index-wall").on("click", "[data-img]", function(e) {
+    e.preventDefault();
+    current = parseInt($(this).data("img")) - 1;
+    loadCurrentImage();
+  });
   $.ajax("%url;&ajax=on")
     .done(function(j) {
       json = j;
-      images_l = j.images?.length ? j.images : [{ img: j.img, map: j.map, groups: j.groups }];
+      images_l = j.images?.length
+        ? j.images
+        : [{ img: j.img, map: j.map, groups: j.groups }];
       imagesCount = images_l.length;
+      document.title = json.title;
       var p = new URLSearchParams(window.location.search);
       var si = parseInt(p.get("img")) || 0;
-      if (si > 0 && si <= imagesCount) current = si - 1;
-      if (imagesCount > 1) $("#album-nav").addClass('d-flex');
-      document.title = json.title;
-      loadCurrentImage();
+      if (si > 0 && si <= imagesCount) {
+        current = si - 1;
+        loadCurrentImage();
+      } else if (imagesCount > 1) {
+        loadIndex();
+      } else {
+        current = 0;
+        loadCurrentImage();
+      }
     })
     .fail(() => $("#h1").text("Erreur de chargement"));
 });

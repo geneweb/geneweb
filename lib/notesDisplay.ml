@@ -325,15 +325,6 @@ let linked_page_rows conf base pg pgl =
            (wizname :> string)
            (Utf8.capitalize_fst (transl conf "base wizard notes")))
 
-let create_gallery_item conf fnotes nenv s =
-  let img_url, img_name = Notes.json_extract_img conf s
-  and title = try List.assoc "TITLE" nenv with Not_found -> "" in
-  Printf.sprintf
-    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s"><img src="%s" \
-       title="%s | %s" alt="%s"></a>%s</div>|}
-    (commd conf :> string)
-    fnotes img_url fnotes img_name img_name title
-
 let create_gallery_item_idx conf fnotes title (img_idx, img_url, _img_name, desc)
     =
   let max_len = 40 in
@@ -347,11 +338,9 @@ let create_gallery_item_idx conf fnotes title (img_idx, img_url, _img_name, desc
         if String.length s > max_len then String.sub s 0 (max_len - 1) ^ "…"
         else s
   in
-  let img_param =
-    if img_idx > 1 then Printf.sprintf "&img=%d" img_idx else ""
-  in
+  let img_param = Printf.sprintf "&img=%d" img_idx in
   Printf.sprintf
-    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s%s"><img src="%s" title="%s" alt="%s"></a>%s</div>|}
+    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s%s"><img src="%s" title="%s" alt="%s"><div class="gallery-legend">%s</div></a></div>|}
     (commd conf :> string)
     fnotes img_param img_url fnotes fnotes caption
 
@@ -359,7 +348,7 @@ let print_linked_list_gallery conf base ?key pgl =
   Output.printf conf "<div class=\"d-flex flex-wrap mt-3\">\n";
   List.iter
     (function
-      | Def.NLDB.PgMisc fnotes -> (
+      | Def.NLDB.PgMisc fnotes ->
           let nenv, s = read_notes base fnotes in
           let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
           let restrict_l =
@@ -372,24 +361,23 @@ let print_linked_list_gallery conf base ?key pgl =
             (restrict_l = [] || not (is_restricted conf base restrict_l))
             && (typ = "gallery" || typ = "album")
           then
-            match key with
-            | Some k ->
-                let title =
-                  try List.assoc "TITLE" nenv with Not_found -> ""
-                in
-                let items = Notes.json_gallery_items_for_key conf s k in
-                if items = [] then
-                  Output.print_sstring conf
-                    (create_gallery_item conf fnotes nenv s)
-                else
-                  List.iter
-                    (fun item ->
-                      Output.print_sstring conf
-                        (create_gallery_item_idx conf fnotes title item))
-                    items
-            | None ->
+            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+            let items =
+              match key with
+              | Some k -> Notes.json_gallery_items_for_key conf s k
+              | None -> []
+            in
+            let items =
+              if items <> [] then items
+              else
+                let u, n = Notes.json_extract_img conf s in
+                [ (1, u, n, "") ]
+            in
+            List.iter
+              (fun item ->
                 Output.print_sstring conf
-                  (create_gallery_item conf fnotes nenv s))
+                  (create_gallery_item_idx conf fnotes title item))
+              items
       | _ -> ())
     pgl;
   Output.print_sstring conf "</div>\n"
