@@ -18,7 +18,8 @@
     (<a href="%url;&ref=on"
         title="[pages where page appears]"><-</a>)
   </div>
-  <h1 id="h1" class="ml-3 mb-0">Chargement en cours…</h1>
+  <h1 id="h1" class="ml-3 mb-0">[*loading]</h1>
+  <p id="chronicle" class="ml-3 text-muted d-none"></p>
   %if(wizard)
     <div class="small float-right mr-2">
       (<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)
@@ -123,6 +124,9 @@ function displayImage(img) {
   $("#map, #legend").empty();
   $("#div_legend").addClass("d-none");
   $("#h1").html(json.title);
+  var chr = json.chronicle || "";
+  if (chr) { $("#chronicle").html(chr).removeClass("d-none"); }
+  else { $("#chronicle").addClass("d-none"); }
   $("#description").html(img.desc || json.desc || "");
   $("#image").attr("src", "%prefix;m=DOC&s=" + img.img);
   

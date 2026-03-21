@@ -1080,6 +1080,7 @@ function initializePageContent(data, tableApi) {
 
     // Initialize form fields
     $("#page_title").val(data.title || '');
+    $("#album_chronicle").val(data.chronicle || '');
     $("#page_desc").val(data.desc || '');
     if (albumImages[albumCurrent]?.desc) {
       $("#page_desc").val(albumImages[albumCurrent].desc);
@@ -1453,6 +1454,7 @@ function initTables() {
 function resetButtonHandler() {
   $("#clear-all").click(function () {
     $("#page_title").val("");
+    $("#album_chronicle").val("");
     $("#page_desc").val("");
     $("#fname").val("");
     $("#frame").css({ width: "auto", height: "auto" });
@@ -1626,7 +1628,8 @@ function setupFormHandler() {
     event.preventDefault();
     var title = $("#page_title").val() || "&hellip;";
     saveAlbumCurrent();
-    var res = { title: title, images: albumImages };
+    var chronicle = $("#album_chronicle").val();
+    var res = { title: title, chronicle: chronicle, images: albumImages };
     var jsonString = JSON.stringify(res, null, 2)
       .replace(/\[\{/g, '[\n  {')
       .replace(/\}\]/g, '}\n]')
