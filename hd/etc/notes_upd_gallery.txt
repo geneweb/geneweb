@@ -1,6 +1,6 @@
 <!-- $Id: notes_upd_gallery.txt v7.1 20/03/2026 05:14:28 $ -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="%lang;">
 <head>
   <title>[*reactive image map editor]</title>
   <meta name="robots" content="none">
@@ -128,7 +128,7 @@
       <div id="redraw-target" class="d-none"></div>
       <div id="frame" onmousedown="return false">
         <map id="map" name="map"></map>
-        <img id="image" usemap="#map" tabindex="0">
+        <img id="image" usemap="#map" tabindex="0" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
         <div id="selection" class="m-0 p-0"></div>
         <div id="groups" class="m-0 p-0"></div>
       </div>
