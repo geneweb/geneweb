@@ -11797,16 +11797,26 @@ tr: bağlantılı resimler
 zh: 关联图像
 
     linked albums help
-co: albumi o gallerie induve a persona hè referenzata
-de: Alben oder Gallerien, wo die Person verlinkt ist
-en: albums or galleries where person is referenced
-fr: albums ou galleries où la personne est citée
+co: immagini di gallerie induve a persona appare
+de: Galeriebilder, auf denen die Person erscheint
+en: gallery images where the person appears
+fr: images de galeries où la personne apparaît
 
     linked albums
-co: albumi o gallerie ligati
-de: verlinkte Alben oder Gallerien
-en: linked albums or galleries
-fr: albums ou galleries liés
+co: immagini di gallerie ligate
+de: verknüpfte Galeriebilder
+en: linked gallery images
+fr: images de galeries liées
+
+    gallery backlinks
+en: pages where this gallery appears
+fr: pages où cette galerie apparaît
+
+    gallery index
+co: indice di a galleria
+de: Galerieübersicht
+en: gallery index
+fr: index de la galerie
 
     linked pages (pages) help
 co: pagine o note induve a pagina hè referenzata
