@@ -11909,6 +11909,10 @@ de: verknüpfte Galeriebilder
 en: linked gallery images
 fr: images de galeries liées
 
+    gallery
+en: images gallery
+fr: galerie d’images
+
     gallery backlinks
 en: pages where this gallery appears
 fr: pages où cette galerie apparaît
@@ -12147,10 +12151,10 @@ ru: жил(а) с %s по %s
 sv: lever från/till
 tr: yaşamış/için
 
-    loading
-de: Ladevorgang läuft…
-en: loading in progress…
-fr: chargement en cours…
+    loading/error
+de: Ladevorgang läuft…/Ladefehler
+en: loading in progress…/loading error
+fr: chargement en cours…/erreur de chargement
 
     lock group
 en: lock this group
@@ -13358,8 +13362,8 @@ fr: modifier la section %d
     modify gallery
 co: mudificà a fiura (galleria)
 de: das Bild ändern (die Gallerie)
-en: modify the image (gallery)
-fr: modifier l'image (gallerie)
+en: modify the image (the gallery)
+fr: modifier l’image (la gallerie)
 
     modify person event order
 co: intervertisce l’evenimenti individuali
@@ -20420,6 +20424,10 @@ sk: zobraziť prvý vzťah
 sl: za prikaz prve sorodstvene povezave
 sv: för att se den första
 tr: i̇lkini görmek için
+
+    type
+en: type
+fr: type
 
     upto the %s generation
 af: tot die %s geslag
