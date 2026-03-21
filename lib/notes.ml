@@ -375,6 +375,44 @@ let _print_key label (fn, sn, oc) =
 
 let lower_key (fn, sn, oc) = (Name.lower fn, Name.lower sn, oc)
 
+let json_gallery_items_for_key conf s key =
+  let json = try Yojson.Basic.from_string s with _ -> `Null in
+  let lkey = lower_key key in
+  let has_key ml =
+    let l = match ml with `List l -> l | _ -> [] in
+    List.exists
+      (fun e -> Def.NLDB.equal_key (lower_key (extract_pnoc e)) lkey)
+      l
+  in
+  let url f =
+    if f = "" then "" else (Util.commd conf :> string) ^ "m=DOC&s=" ^ f
+  in
+  let str k l =
+    try match List.assoc k l with `String v -> v | _ -> ""
+    with Not_found -> ""
+  in
+  let process images =
+    let _, r =
+      List.fold_left
+        (fun (i, acc) img ->
+          let i = i + 1 in
+          match img with
+          | `Assoc il
+            when has_key (try List.assoc "map" il with Not_found -> `Null) ->
+              let f = str "img" il in
+              (i, (i, url f, f, str "desc" il) :: acc)
+          | _ -> (i, acc))
+        (0, []) images
+    in
+    List.rev r
+  in
+  match json with
+  | `Assoc l -> (
+      match List.assoc_opt "images" l with
+      | Some (`List imgs) -> process imgs
+      | _ -> process [ `Assoc l ])
+  | _ -> []
+
 let replace_person person_json (new_fn, new_sn, new_oc) =
   `Assoc
     (List.map

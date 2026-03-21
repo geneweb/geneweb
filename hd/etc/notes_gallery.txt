@@ -436,6 +436,12 @@ function loadCurrentImage() {
   displayImage(images_l[current]);
   $("#current").text(current + 1);
   $("#imageCount").text(imagesCount);
+  if (imagesCount > 1) {
+    var u = new URL(window.location);
+    if (current > 0) u.searchParams.set("img", current + 1);
+    else u.searchParams.delete("img");
+    history.replaceState(null, "", u);
+  }
   var $edit = $("#edit_link");
   if ($edit.length) {
     var base = "%prefix;m=MOD_NOTES&f=%e.f;";
@@ -455,6 +461,9 @@ $(document).ready(function() {
       json = j;
       images_l = j.images?.length ? j.images : [{ img: j.img, map: j.map, groups: j.groups }];
       imagesCount = images_l.length;
+      var p = new URLSearchParams(window.location.search);
+      var si = parseInt(p.get("img")) || 0;
+      if (si > 0 && si <= imagesCount) current = si - 1;
       if (imagesCount > 1) $("#album-nav").addClass('d-flex');
       document.title = json.title;
       loadCurrentImage();

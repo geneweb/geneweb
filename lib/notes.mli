@@ -124,6 +124,16 @@ val update_cache_linked_pages :
   Config.config -> mode -> Def.NLDB.key -> Def.NLDB.key -> int -> unit
 
 val json_extract_img : Config.config -> string -> string * string
+
+val json_gallery_items_for_key :
+  Config.config ->
+  string ->
+  Def.NLDB.key ->
+  (int * string * string * string) list
+(** [json_gallery_items_for_key conf s key] returns
+    [(img_index_1based, img_url, img_file, desc)] for each gallery image whose
+    map contains person [key]. *)
+
 val safe_gallery : Config.config -> Geneweb_db.Driver.base -> string -> string
 
 val get_linked_page_family :
