@@ -1,9 +1,11 @@
 val print_linked_list :
   Config.config ->
   Geneweb_db.Driver.base ->
+  ?key:Def.NLDB.key ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
   unit
-(** Displays the page list in argument *)
+(** Displays the page list. When [key] is provided, gallery items show only
+    images where that person appears. *)
 
 val print_what_links : Config.config -> Geneweb_db.Driver.base -> string -> unit
 

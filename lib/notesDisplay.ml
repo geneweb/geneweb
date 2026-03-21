@@ -334,11 +334,32 @@ let create_gallery_item conf fnotes nenv s =
     (commd conf :> string)
     fnotes img_url fnotes img_name img_name title
 
-let print_linked_list_gallery conf base pgl =
+let create_gallery_item_idx conf fnotes title (img_idx, img_url, _img_name, desc)
+    =
+  let max_len = 40 in
+  let caption =
+    match (title, desc) with
+    | "", "" -> fnotes
+    | t, "" -> t
+    | "", d -> d
+    | t, d ->
+        let s = t ^ " | " ^ d in
+        if String.length s > max_len then String.sub s 0 (max_len - 1) ^ "…"
+        else s
+  in
+  let img_param =
+    if img_idx > 1 then Printf.sprintf "&img=%d" img_idx else ""
+  in
+  Printf.sprintf
+    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s%s"><img src="%s" title="%s" alt="%s"></a>%s</div>|}
+    (commd conf :> string)
+    fnotes img_param img_url fnotes fnotes caption
+
+let print_linked_list_gallery conf base ?key pgl =
   Output.printf conf "<div class=\"d-flex flex-wrap mt-3\">\n";
   List.iter
     (function
-      | Def.NLDB.PgMisc fnotes ->
+      | Def.NLDB.PgMisc fnotes -> (
           let nenv, s = read_notes base fnotes in
           let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
           let restrict_l =
@@ -351,7 +372,24 @@ let print_linked_list_gallery conf base pgl =
             (restrict_l = [] || not (is_restricted conf base restrict_l))
             && (typ = "gallery" || typ = "album")
           then
-            Output.print_sstring conf (create_gallery_item conf fnotes nenv s)
+            match key with
+            | Some k ->
+                let title =
+                  try List.assoc "TITLE" nenv with Not_found -> ""
+                in
+                let items = Notes.json_gallery_items_for_key conf s k in
+                if items = [] then
+                  Output.print_sstring conf
+                    (create_gallery_item conf fnotes nenv s)
+                else
+                  List.iter
+                    (fun item ->
+                      Output.print_sstring conf
+                        (create_gallery_item_idx conf fnotes title item))
+                    items
+            | None ->
+                Output.print_sstring conf
+                  (create_gallery_item conf fnotes nenv s))
       | _ -> ())
     pgl;
   Output.print_sstring conf "</div>\n"
@@ -387,10 +425,10 @@ let print_linked_list_standard conf base pgl =
     pgl;
   Output.print_sstring conf "</table>"
 
-let print_linked_list conf base pgl =
+let print_linked_list conf base ?key pgl =
   match p_getenv conf.env "type" with
-  | Some "gallery" -> print_linked_list_gallery conf base pgl
-  | Some "album" -> print_linked_list_gallery conf base pgl
+  | Some "gallery" | Some "album" ->
+      print_linked_list_gallery conf base ?key pgl
   | _ -> print_linked_list_standard conf base pgl
 
 (* copied from perso.ml *)
@@ -435,7 +473,7 @@ let print_what_links_p conf base p =
         Output.print_sstring conf {|</a>|})
     in
     Hutil.header conf title;
-    print_linked_list conf base pgl;
+    print_linked_list conf base ~key pgl;
     Hutil.trailer conf)
   else Hutil.incorrect_request conf
 
