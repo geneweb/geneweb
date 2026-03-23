@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeneWeb Autocomplete - Démo intégration template</title>
+  <link rel="stylesheet" href="./autocomplete.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      background: #f5f5f5;
+    }
+    .gw-header {
+      background: #2c3e50;
+      color: #fff;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .gw-header h1 { font-size: 18px; font-weight: 400; margin: 0; }
+    .gw-header .status {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      background: #555;
+    }
+    .gw-header .status.ok { background: #27ae60; }
+    .gw-header .status.err { background: #c0392b; }
+
+    .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+
+    .info-box {
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      border-radius: 6px;
+      padding: 15px 20px;
+      margin-bottom: 25px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .info-box.warn {
+      background: #fff8e1;
+      border-color: #ffe082;
+    }
+    .info-box code {
+      background: #c8e6c9;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+    .info-box.warn code {
+      background: #ffe0b2;
+    }
+
+    .gw-form {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+    .gw-form h2 {
+      margin: 0 0 20px;
+      font-size: 16px;
+      color: #2c3e50;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .gw-form table { width: 100%; border-collapse: collapse; }
+    .gw-form td {
+      padding: 8px 5px;
+      vertical-align: top;
+    }
+    .gw-form td:first-child {
+      width: 140px;
+      font-weight: 600;
+      color: #555;
+      text-align: right;
+      padding-right: 15px;
+      white-space: nowrap;
+    }
+    .gw-form input[type="text"],
+    .gw-form input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .gw-form input[type="text"]:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    .gw-form-actions {
+      margin-top: 15px;
+      text-align: center;
+    }
+    .gw-form-actions button {
+      padding: 8px 25px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .config-panel {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .config-panel h3 { margin: 0 0 12px; font-size: 14px; }
+    .config-panel label { font-size: 13px; margin-right: 10px; }
+    .config-panel input[type="text"] {
+      padding: 5px 8px; border: 1px solid #ccc; border-radius: 3px;
+      font-size: 13px;
+    }
+    .config-panel button {
+      padding: 5px 15px; background: #27ae60; color: #fff;
+      border: none; border-radius: 3px; cursor: pointer; font-size: 13px;
+    }
+    .config-panel button.danger {
+      background: #c0392b;
+    }
+    .config-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .config-row input[type="text"].url-input { width: 280px; }
+    .config-row input[type="text"].base-input { width: 150px; }
+
+    /* Index info panel */
+    .index-info {
+      margin-top: 12px;
+      padding: 10px 15px;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 12px;
+      display: none;
+    }
+    .index-info.visible { display: block; }
+    .index-info h4 { margin: 0 0 6px; font-size: 13px; color: #333; }
+    .index-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .index-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+      border-radius: 12px;
+      font-size: 11px;
+      color: #1565c0;
+    }
+    .index-tag.matched {
+      background: #e8f5e9;
+      border-color: #a5d6a7;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+    .index-tag.unmatched {
+      background: #f5f5f5;
+      border-color: #ccc;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<div class="gw-header">
+  <h1>🌳 GeneWeb — Saisie d'un individu (démo)</h1>
+  <span class="status err" id="rpc-status">✗ Erreur : GenewebAutocomplete is not defined</span>
+</div>
+
+<div class="container">
+
+  <div class="info-box">
+    <strong>Démo d'intégration.</strong>
+    Cette page simule un formulaire de saisie GeneWeb avec des
+    <code>&lt;input list="..."&gt;</code> + <code>&lt;datalist&gt;</code>.
+    Le script <code>geneweb_autocomplete.js</code> les remplace par le widget
+    4 colonnes quand le serveur RPC est disponible.<br>
+    Les index sur le serveur sont des fichiers <code>basename.gz</code>.
+    Le nom utilisé dans les appels RPC est le basename sans extension
+    (ex: <code>HenriT_fnames</code>).
+  </div>
+
+  <!-- Panel de configuration -->
+  <div class="config-panel">
+    <h3>⚙️ Configuration RPC</h3>
+
+    <div class="config-row">
+      <label>URL WebSocket :</label>
+      <input type="text" id="rpc-url" class="url-input" value="ws://localhost:8080/search">
+    </div>
+
+    <div class="config-row">
+      <label>Nom de base :</label>
+      <input type="text" id="base-name" class="base-input" value="HenriT" placeholder="ex: HenriT">
+      <span style="font-size:11px; color:#888;">
+        → index RPC : <code><span id="index-preview">HenriT</span>_fnames</code> (fichier <code>.gz</code> sans extension)
+      </span>
+    </div>
+
+    <div class="config-row">
+      <button id="btn-connect" onclick="doConnect()">Connecter</button>
+      <button class="danger" onclick="doDisconnect()">Déconnecter</button>
+      <label style="margin-left: 10px;">
+        <input type="checkbox" id="chk-debug" onchange="toggleDebug()"> Debug
+      </label>
+    </div>
+
+    <!-- Info sur les index découverts -->
+    <div class="index-info" id="index-info">
+      <h4>Index disponibles sur le serveur :</h4>
+      <ul class="index-list" id="index-list"></ul>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Formulaire GeneWeb simulé
+       Les inputs ci-dessous sont IDENTIQUES à ce qu'on trouve dans
+       un template GeneWeb standard (upd.txt, perso.txt, etc.)
+       ============================================================ -->
+
+  <div class="gw-form">
+    <h2>Identité</h2>
+    <table>
+      <tbody><tr>
+        <td>Prénom :</td>
+        <td>
+          <input type="text" name="first_name" size="23" maxlength="200" list="list_fn" placeholder="Prénom...">
+          <datalist id="list_fn">
+            <option value="Jean">
+            </option><option value="Pierre">
+            </option><option value="Marie">
+          </option></datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Nom :</td>
+        <td>
+          <input type="text" name="surname" size="23" maxlength="200" list="list_sn" placeholder="Nom de famille...">
+          <datalist id="list_sn">
+            <option value="Dupont">
+            </option><option value="Martin">
+          </option></datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Qualificatif :</td>
+        <td>
+          <input type="text" name="qualifier" size="23" maxlength="200" list="list_qual" placeholder="Qualificatif...">
+          <datalist id="list_qual">
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Alias :</td>
+        <td>
+          <input type="text" name="alias" size="23" maxlength="200" list="list_ali" placeholder="Alias...">
+          <datalist id="list_ali">
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Nom public :</td>
+        <td>
+          <input type="text" name="pub_name" size="23" maxlength="200" list="list_pub" placeholder="Nom public...">
+          <datalist id="list_pub">
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Numéro :</td>
+        <td>
+          <input type="number" name="occ" size="5" value="0">
+        </td>
+      </tr>
+    </tbody></table>
+  </div>
+
+  <div class="gw-form">
+    <h2>Naissance</h2>
+    <table>
+      <tbody><tr>
+        <td>Lieu :</td>
+        <td>
+          <input type="text" name="birth_place" size="40" maxlength="200" list="list_pl" placeholder="Lieu de naissance...">
+          <datalist id="list_pl">
+            <option value="Paris">
+            </option><option value="Lyon">
+          </option></datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Source :</td>
+        <td>
+          <input type="text" name="birth_src" size="40" maxlength="200" list="list_src" placeholder="Source...">
+          <datalist id="list_src">
+            <option value="Archives départementales">
+          </option></datalist>
+        </td>
+      </tr>
+    </tbody></table>
+  </div>
+
+  <div class="gw-form">
+    <h2>Divers</h2>
+    <table>
+      <tbody><tr>
+        <td>Occupation :</td>
+        <td>
+          <input type="text" name="occupation" size="40" maxlength="200" list="list_occu" placeholder="Profession...">
+          <datalist id="list_occu">
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Titre :</td>
+        <td>
+          <input type="text" name="title" size="40" maxlength="200" list="list_titl" placeholder="Titre nobiliaire...">
+          <datalist id="list_titl">
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Domaine :</td>
+        <td>
+          <input type="text" name="estate" size="40" maxlength="200" list="list_estate" placeholder="Domaine...">
+          <datalist id="list_estate">
+          </datalist>
+        </td>
+      </tr>
+    </tbody></table>
+  </div>
+
+  <div class="gw-form-actions">
+    <button type="button" onclick="alert('Formulaire soumis (démo)')">
+      Valider les modifications
+    </button>
+  </div>
+
+  <div class="info-box warn" id="fallback-msg" style="display: block;">
+    <strong>Mode fallback.</strong>
+    Le serveur RPC n'est pas disponible.
+    Les datalists natifs du navigateur sont utilisés.
+  </div>
+
+</div>
+
+<script src="./autocomplete.js"></script>
+<script>
+  var statusEl = document.getElementById('rpc-status');
+  var fallbackMsg = document.getElementById('fallback-msg');
+
+  // Mettre à jour l'aperçu du nom d'index quand on tape le basename
+  document.getElementById('base-name').addEventListener('input', function() {
+    document.getElementById('index-preview').textContent = this.value || '???';
+  });
+
+  /**
+   * Construit le indexMap à partir du basename.
+   * Les noms d'index correspondent aux basenames des fichiers .gz
+   * sans l'extension (ex: "HenriT_fnames" pour "HenriT_fnames.gz").
+   */
+  function buildIndexMap(basename) {
+    var b = basename.trim();
+    return {
+      'list_fn':     b + '_fnames',
+      'list_sn':     b + '_snames',
+      'list_pl':     b + '_places',
+      'list_src':    b + '_sources',
+      'list_occu':   b + '_occupations',
+      'list_qual':   b + '_qualifiers',
+      'list_titl':   b + '_titles',
+      'list_estate': b + '_estates',
+      'list_ali':    b + '_aliases',
+      'list_pub':    b + '_pub_names'
+    };
+  }
+
+  /**
+   * Affiche les index découverts sur le serveur.
+   * serverIndexes = [{ name: string, count: int }]
+   */
+  function showIndexInfo(serverIndexes, indexMap) {
+    var panel = document.getElementById('index-info');
+    var list = document.getElementById('index-list');
+
+    if (!serverIndexes || serverIndexes.length === 0) {
+      panel.classList.remove('visible');
+      return;
+    }
+
+    // Construire l'ensemble des noms d'index utilisés par notre mapping
+    var usedNames = {};
+    for (var key in indexMap) {
+      usedNames[indexMap[key]] = key;
+    }
+
+    list.innerHTML = '';
+    serverIndexes.forEach(function(idx) {
+      var li = document.createElement('li');
+      li.textContent = idx.name + ' (' + idx.count + ')';
+      if (usedNames[idx.name]) {
+        li.className = 'index-tag matched';
+        li.title = 'Mappé vers ' + usedNames[idx.name];
+      } else {
+        li.className = 'index-tag unmatched';
+        li.title = 'Non utilisé par le formulaire';
+      }
+      list.appendChild(li);
+    });
+
+    panel.classList.add('visible');
+  }
+
+  async function doConnect() {
+    var url = document.getElementById('rpc-url').value.trim();
+    var basename = document.getElementById('base-name').value.trim();
+    var debug = document.getElementById('chk-debug').checked;
+
+    if (!basename) {
+      alert('Veuillez renseigner le nom de base (ex: HenriT)');
+      document.getElementById('base-name').focus();
+      return;
+    }
+
+    statusEl.textContent = '⏳ Connexion...';
+    statusEl.className = 'status';
+
+    var indexMap = buildIndexMap(basename);
+
+    try {
+      // Détruire une éventuelle session précédente
+      GenewebAutocomplete.destroy();
+
+      await GenewebAutocomplete.init({
+        rpcUrl: url,
+        debug: debug,
+        indexMap: indexMap,
+        minChars: 2,
+        debounceMs: 250,
+        maxResults: 90,
+        showRpcBadge: true
+      });
+
+      if (GenewebAutocomplete.isConnected()) {
+        statusEl.textContent = '✓ RPC connecté';
+        statusEl.className = 'status ok';
+        fallbackMsg.style.display = 'none';
+
+        // Afficher les index disponibles (serverIndexes = [{name, count}])
+        showIndexInfo(GenewebAutocomplete.serverIndexes, indexMap);
+      } else {
+        statusEl.textContent = '✗ RPC indisponible';
+        statusEl.className = 'status err';
+        fallbackMsg.style.display = 'block';
+        document.getElementById('index-info').classList.remove('visible');
+      }
+    } catch (e) {
+      statusEl.textContent = '✗ Erreur : ' + e.message;
+      statusEl.className = 'status err';
+      fallbackMsg.style.display = 'block';
+      document.getElementById('index-info').classList.remove('visible');
+    }
+  }
+
+  function doDisconnect() {
+    GenewebAutocomplete.destroy();
+    statusEl.textContent = '⏳ Non connecté';
+    statusEl.className = 'status';
+    fallbackMsg.style.display = 'block';
+    document.getElementById('index-info').classList.remove('visible');
+  }
+
+  function toggleDebug() {
+    console.log('Debug:', document.getElementById('chk-debug').checked,
+                '(reconnectez pour appliquer)');
+  }
+</script>
+
+
+
+</body></html>

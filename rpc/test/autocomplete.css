@@ -1,0 +1,99 @@
+/**
+ * GeneWeb Autocomplete - Progressive Enhancement
+ * Remplace les datalists natifs par un widget 4 colonnes
+ * avec recherche RPC (col1, col2, col3, col4).
+ *
+ * Les styles structurels (position, display, couleurs d'en-tête, layout)
+ * sont appliqués inline par le JS pour échapper aux styles globaux de la
+ * page hôte. Ce fichier ne contient que les styles qui ne peuvent pas
+ * être gérés inline : états interactifs, scrollbars, animations.
+ */
+
+/* Scrollbar discrète sur les listes */
+.gw-ac-items::-webkit-scrollbar       { width: 5px; }
+.gw-ac-items::-webkit-scrollbar-track { background: #f5f5f5; }
+.gw-ac-items::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+/* Items — états hover et sélection clavier */
+.gw-ac-item {
+  padding: 5px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #333;
+  transition: background 0.1s;
+  /* Reset contre les styles globaux de la page */
+  list-style: none !important;
+  margin: 0;
+  background: #fff;
+  font-style: normal;
+  text-decoration: none;
+  display: block;
+  box-sizing: border-box;
+}
+
+.gw-ac-item:last-child  { border-bottom: none; }
+.gw-ac-item:hover       { background: #e3f2fd !important; }
+.gw-ac-item.gw-ac-selected { background: #bbdefb !important; font-weight: 600; }
+
+/* Highlight de la partie matchée */
+.gw-ac-item .gw-ac-match {
+  font-weight: 700;
+  color: #1565c0;
+}
+
+/* Colonne vide */
+.gw-ac-empty {
+  padding: 12px 10px;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
+  font-style: italic;
+  list-style: none !important;
+  margin: 0;
+  display: block;
+}
+
+/* Indicateur de chargement */
+.gw-ac-loading {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+.gw-ac-loading::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  border-top-color: #1565c0;
+  border-radius: 50%;
+  animation: gw-ac-spin 0.6s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+@keyframes gw-ac-spin { to { transform: rotate(360deg); } }
+
+/* Badge statut RPC (optionnel) */
+.gw-ac-rpc-badge {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  pointer-events: none;
+}
+.gw-ac-rpc-badge.gw-ac-rpc-ok  { background: #4caf50; }
+.gw-ac-rpc-badge.gw-ac-rpc-err { background: #f44336; }
+
+/* Wrapper input — minimal, juste pour le positionnement du badge */
+.gw-ac-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
