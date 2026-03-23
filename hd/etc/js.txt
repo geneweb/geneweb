@@ -45,8 +45,13 @@
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;
-  %if;((roglo or b.rpc_datalist=1) and (is_welcome or upd_form=1))
-    <script src="%etc_prefix;js/rpc_client.js?hash=%apply;hash%with;%etc_prefix;js/rpc_client.js%end;"></script>
+  %( RPC autocomplete: self-configuring, see autocomplete.js.
+     rpc_server_url: "/search" (behind a proxy), "host:port/search" or a ws:// URL %)
+  %if;(b.rpc_datalist=1 and (is_welcome or upd_form=1))
+    <script src="%etc_prefix;js/autocomplete.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.js%end;"
+      data-rpc="%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;127.0.0.1:%if;(b.rpc_port!="")%b.rpc_port;%else;8080%end;/search%end;"
+      data-base="%base.name;"
+      data-debug="%if;(b.rpc_debug="yes")1%end;"></script>
   %end;
   %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
     <script src="%etc_prefix;js/line.js?hash=%apply;hash%with;%etc_prefix;js/line.js%end;"></script>
@@ -535,119 +540,18 @@ function populateDatalists() {
       .catch(err => console.error(`datalist_${t}:`, err));
   });
 }
-%( The gallery and the RPC fallback call populateDatalists() themselves. %)
-%if;(e.m!="MOD_GALLERY" and not (roglo or b.rpc_datalist=1))
-document.addEventListener('DOMContentLoaded', populateDatalists);
-%end;
-</script>
-%end;
-%if;((roglo or b.rpc_datalist=1) and (is_welcome or upd_form=1))
-<script>
-%( RPC-backed datalists for very large bases %)
-const RpcDatalistManager = {
-  client: null,
-  isConnected: false,
-  debounceTimers: {},
 
-  RPC_URL: 'ws://%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;localhost%end;:8080/search',
-
-  %( datalist_fnames -> <base>_fnames.cache %)
-  getCacheFile: function(datalistId) {
-    const type = datalistId.replace('datalist_', '');
-    return '%base.name;_' + type + '.cache';
-  },
-
-  init: async function() {
-    if (typeof Rpc === 'undefined') {
-      console.warn('RpcDatalistManager: rpc_client.js not loaded');
-      return false;
-    }
-
-    try {
-      this.client = new Rpc(this.RPC_URL);
-      this.client.lookup = async (...args) => {
-        const jargs = args.map(a => JSON.stringify(a));
-        const response = await this.client.call('lookup', jargs);
-        return JSON.parse(response);
-      };
-
-      %( Probe the server, give up after 3 s. %)
-      const testPromise = this.client.lookup('%base.name;_fnames.cache', '', 1);
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('RPC timeout')), 3000)
-      );
-      await Promise.race(%[testPromise, timeoutPromise%]);
-
-      this.isConnected = true;
-      console.log('RpcDatalistManager: Connecté au serveur RPC');
-      return true;
-    } catch (error) {
-      console.warn('RpcDatalistManager: Serveur RPC indisponible, fallback .gz', error);
-      this.isConnected = false;
-      return false;
-    }
-  },
-
-  populateDatalist: async function(datalistId, searchTerm) {
-    if (!this.isConnected || !this.client) return;
-
-    const dataList = document.getElementById(datalistId);
-    if (!dataList) return;
-
-    if (!searchTerm || searchTerm.length < 3) {
-      dataList.innerHTML = '';
-      return;
-    }
-
-    try {
-      const cacheFile = this.getCacheFile(datalistId);
-      const results = await this.client.lookup(cacheFile, searchTerm, 50);
-
-      const fragment = document.createDocumentFragment();
-      results.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item;
-        fragment.appendChild(opt);
-      });
-
-      dataList.innerHTML = '';
-      dataList.appendChild(fragment);
-    } catch (error) {
-      console.error(`RpcDatalistManager: Erreur lookup ${datalistId}`, error);
-    }
-  },
-
-  %( Bind every input whose list attribute starts with datalist_. %)
-  attachAllListeners: function() {
-    const self = this;
-    document.querySelectorAll('input[list^="datalist_"]').forEach(input => {
-      const datalistId = input.getAttribute('list');
-
-      input.addEventListener('input', function() {
-        clearTimeout(self.debounceTimers[datalistId]);
-        self.debounceTimers[datalistId] = setTimeout(() => {
-          self.populateDatalist(datalistId, this.value);
-        }, 100);
-      });
-
-      input.addEventListener('focus', function() {
-        if (this.value && this.value.length >= 2) {
-          self.populateDatalist(datalistId, this.value);
-        }
-      });
-    });
-  }
-};
-document.addEventListener('DOMContentLoaded', async () => {
-  if (await RpcDatalistManager.init()) {
-    RpcDatalistManager.attachAllListeners();
-  } else if (typeof populateDatalists === 'function') {
-    %( .gz fallback when the RPC server is unavailable %)
-    populateDatalists();
-  }
+%( The gallery calls populateDatalists() itself. With the RPC widget, the
+   .gz datalists are loaded only if the server is (or becomes) unavailable. %)
+%if;(e.m!="MOD_GALLERY")
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.GenewebAutocomplete) GenewebAutocomplete.onUnavailable(populateDatalists);
+  else populateDatalists();
 });
+%end;
 </script>
 %end;
+
 %if;(not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
 %define;language(x)
   %apply;nth%with;
@@ -861,6 +765,7 @@ function setupAutofocusInput() {
 document.addEventListener('DOMContentLoaded', setupAutofocusInput);
 </script>
 %end;
+
 %if;(e.m="MOD_DATA")
 <script>document.addEventListener('DOMContentLoaded', () => updateData.init());</script>
 %end;
