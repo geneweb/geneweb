@@ -35,6 +35,7 @@
 %let;datalist_snames;%if;(b.datalist_snames=1) list="datalist_snames"%end; data-book="sn"%in;
 %let;datalist_titles;%if;(b.datalist_titles=1) list="datalist_titles"%end; data-book="title"%in;
 %let;datalist_sources;%if;(b.datalist_sources=1) list="datalist_sources"%end; data-book="src"%in;
+
 %define;nav()
   <div class="container fixed-top">
     <nav class="navbar navbar-light justify-content-center mx-1" id="banner">
