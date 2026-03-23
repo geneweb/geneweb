@@ -1,4 +1,5 @@
 {
+module Fpath = Geneweb_fs.Fpath
 
 module State : sig
   type t = private {
@@ -557,7 +558,7 @@ and parse_let b closing st = parse
 
 and parse_include b closing st = parse
   | value as file {
-    let u = Ast.mk_include ~loc:(State.current_loc st) (`File file) in
+    let u = Ast.mk_include ~loc:(State.current_loc st) (`File (Fpath.of_string file)) in
     let st = State.push_token u st in
     parse_ast b closing st lexbuf
   }

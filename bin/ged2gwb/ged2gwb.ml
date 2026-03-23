@@ -5,6 +5,8 @@ open Def
 
 module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend
@@ -3179,7 +3181,7 @@ let out_file = ref "a"
 
 let speclist =
   [ ( "-bd",
-      Arg.String Secure.set_base_dir,
+      Arg.String (fun s -> Secure.set_base_dir (Fpath.of_string s)),
       Fmt.str
       "<DIR> Specify where the “bases” directory with databases is installed \
        (default if empty is %S)." (Dirs.name Secure.default_base_dir) )
@@ -3289,7 +3291,7 @@ let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
 
 let main () =
   Arg.parse speclist anonfun errmsg;
-  if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir (Fpath.of_string ".");
   if !in_file <> "" then
     close_in (open_in_bin_with_bom_check !in_file);
   let input_file =
@@ -3310,13 +3312,13 @@ let main () =
   let bname = !out_file in
   Geneweb.GWPARAM.check_base_exists bname;
   let _bdir = Geneweb.GWPARAM.create_base_and_config bname in
-  out_file := Filename.concat (Secure.base_dir ()) (bname ^ ".gwb");
+  let out_file = !Geneweb.GWPARAM.bpath bname in
   Geneweb.GWPARAM.init ();
   let arrays = make_arrays !in_file in
   Gc.compact ();
   let arrays = make_subarrays arrays in
   finish_base arrays ;
-  Driver.make !out_file !particles arrays @@ fun base ->
+  Driver.make out_file !particles arrays @@ fun base ->
   warning_month_number_dates ();
   if !do_check then begin
     let base_error x =

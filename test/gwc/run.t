@@ -9,7 +9,7 @@
     source files end with .gw
     object files end with .gwo
   and [options] are:
-    -bd <DIR>                     Specify where the “bases” directory with databases is installed (default if empty is "$XDG_DATA_HOME/geneweb/base").
+    -bd <DIR>                     Specify where the “bases” directory with databases is installed (default if empty is "$XDG_DATA_HOME/geneweb/bases").
     -bnotes                       [drop|erase|first|merge] Behavior for base notes of the next file. [drop]: dropped. [erase]: erase the current content. [first]: dropped if current content is not empty. [merge]: concatenated to the current content. Default: merge
     -c                            Only compiling
     -cg                           Compute consanguinity
@@ -76,7 +76,7 @@
   $ gwc -gwo -bd . ../galichet.gw -f
   Compilation: 0 min 0 sec
   Migration check for galichet:
-    Classic .gwf exists: true (galichet.gwf)
+    Classic .gwf exists: true (./galichet.gwf)
     Reorg .gwf exists: false
   Configuration kept
   
@@ -128,7 +128,7 @@
   $ gwc -bd . ../galichet.gwo -f
   Compilation: 0 min 0 sec
   Migration check for galichet:
-    Classic .gwf exists: true (galichet.gwf)
+    Classic .gwf exists: true (./galichet.gwf)
     Reorg .gwf exists: false
   Configuration kept
   
@@ -154,7 +154,7 @@
   $ gwc -bd . ../galichet.gw -f && cmp ../galichet.gwo galichet.gwo && rm galichet.gwo
   Compilation: 0 min 0 sec
   Migration check for galichet:
-    Classic .gwf exists: true (galichet.gwf)
+    Classic .gwf exists: true (./galichet.gwf)
     Reorg .gwf exists: false
   Configuration kept
   

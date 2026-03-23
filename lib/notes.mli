@@ -27,7 +27,8 @@ val update_notes_links_family :
   (_, Geneweb_db.Driver.ifam, Geneweb_db.Driver.istr) Def.gen_family ->
   unit
 
-val file_path : Config.config -> Geneweb_db.Driver.base -> string -> string
+val file_path :
+  Config.config -> Geneweb_db.Driver.base -> string -> Geneweb_fs.Fpath.t
 
 val read_notes :
   Geneweb_db.Driver.base -> string -> (string * string) list * string

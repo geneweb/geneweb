@@ -17,7 +17,7 @@ val gwu :
   Gwexport.gwexport_opts ->
   bool ->
   Geneweb_db.Driver.base ->
-  string ->
+  Geneweb_fs.Fpath.t ->
   string ->
   (string, (string -> unit) * bool ref * (unit -> unit)) Hashtbl.t ->
   (Geneweb_db.Driver.iper -> bool) * (Geneweb_db.Driver.ifam -> bool) ->

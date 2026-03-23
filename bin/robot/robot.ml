@@ -2,11 +2,11 @@
 (* Usage: robot <command> [options] *)
 
 open Printf
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let magic_robot = "GWRB0008"
-
-let get_robot_file () =
-  String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
+let get_robot_file () = Fpath.(Secure.base_dir () // ~$"cnt" // ~$"robot")
 
 module W = Map.Make (struct
   type t = string
@@ -93,12 +93,13 @@ let ip_matches_pattern ip pattern =
 
 let print_status () =
   let fname = get_robot_file () in
-  if not (Sys.file_exists fname) then printf "No robot file found at %s\n" fname
+  if not (File.file_exists fname) then
+    Fmt.pr "No robot file found at %a\n" Fpath.pp fname
   else
     match read_robot_file fname with
     | None -> printf "Cannot read robot file\n"
     | Some xcl ->
-        printf "Robot file: %s\n" fname;
+        Fmt.pr "Robot file: %a\n" Fpath.pp fname;
         let individual_ips, patterns =
           List.partition (fun (ip, _) -> not (String.contains ip '*')) xcl.excl
         in
@@ -145,7 +146,7 @@ let export_blacklist output_file =
   match read_robot_file fname with
   | None -> printf "No robot file found\n"
   | Some xcl ->
-      let oc = Secure.open_out output_file in
+      let oc = open_out output_file in
       fprintf oc "# Robot blacklist export\n";
       fprintf oc "# Format: IP<TAB>attempts\n";
       let tm = Unix.localtime (Unix.time ()) in
@@ -168,7 +169,7 @@ let import_blacklist input_file =
     | None -> { excl = []; who = W.empty; max_conn = (0, "") }
   in
 
-  let ic = Secure.open_in input_file in
+  let ic = open_in input_file in
   let imported = ref [] in
   let line_num = ref 0 in
   (try
@@ -404,11 +405,11 @@ let usage () =
   printf "  robot -add \"146.174.*\"\n";
   printf "  robot -add \"146.174.*,202.76.*,1.2.3.*\"\n";
   printf "  robot -export blacklist.txt\n";
-  printf "\nRobot file location: %s\n" (get_robot_file ())
+  printf "\nRobot file location: %s\n" (Fpath.to_string (get_robot_file ()))
 
 let rec parse_args = function
   | "-bd" :: basedir :: rest ->
-      Secure.set_base_dir basedir;
+      Secure.set_base_dir (Fpath.of_string basedir);
       parse_args rest
   | [ "-status" ] -> print_status ()
   | [ "-suggest" ] -> suggest_ranges 10
@@ -424,11 +425,6 @@ let rec parse_args = function
   | _ -> usage ()
 
 let () =
-  let default_base_dir =
-    if Sys.file_exists "bases" && Sys.is_directory "bases" then "bases"
-    else "../bases"
-  in
-  Secure.set_base_dir default_base_dir;
   match Array.to_list Sys.argv with
   | _ :: args -> parse_args args
   | [] -> usage ()

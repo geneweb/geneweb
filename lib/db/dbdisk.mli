@@ -87,7 +87,7 @@ type base_data = {
   (* Data base notes and extended page structure *)
   bnotes : Def.base_notes;
   (* Directory where database's files are stored *)
-  bdir : string;
+  bpath : Geneweb_fs.Fpath.t;
   perm : perm;
 }
 (** Data part of database *)

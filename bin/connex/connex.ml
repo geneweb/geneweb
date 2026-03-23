@@ -3,6 +3,7 @@
 open Def
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
+module Fpath = Geneweb_fs.Fpath
 
 let all = ref false
 let statistics = ref false
@@ -13,7 +14,7 @@ let ignore_files = ref true
 let ask_for_delete = ref 0
 let cnt_for_delete = ref 0
 let exact = ref false
-let bname = ref ""
+let bpath = ref None
 let is_html () = !output <> None
 
 let format_date () =
@@ -127,7 +128,7 @@ let effective_del base (ifam, fam) =
   Array.iter (kill_parents base) (Driver.get_children fam);
   Driver.delete_family base ifam
 
-let compute_connex base basename =
+let compute_connex bpath base =
   Driver.load_ascends_array base;
   Driver.load_unions_array base;
   Driver.load_couples_array base;
@@ -226,7 +227,7 @@ let compute_connex base basename =
   in
   let single_origin = List.length origins <= 1 in
   if is_html () then (
-    Printf.printf "<h3>Connected components of base %s</h3>\n" basename;
+    Fmt.pr "<h3>Connected components of base %a</h3>\n" Fpath.pp bpath;
     Printf.printf "Computed on %s<br>\n" date;
     Printf.printf {|<table border="1" cellpadding="4" |};
     Printf.printf {|cellspacing="0">|};
@@ -237,7 +238,7 @@ let compute_connex base basename =
       Printf.printf
         "<tr><th>Origin</th><th>Size</th><th>Father</th><th>Mother</th></tr>\n")
   else (
-    Printf.eprintf "Connected components of base %s\n" basename;
+    Fmt.pr "Connected components of base %a\n" Fpath.pp bpath;
     Printf.eprintf "Computed on %s\n\n" date);
   List.iter
     (fun (origin, nb, families, _ifam) ->
@@ -305,19 +306,31 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
+let raise_bad = Fmt.kstr (fun s -> raise (Arg.Bad s))
+
+let anonfun s =
+  match !bpath with
+  | None -> bpath := Some s
+  | Some _ -> raise_bad "Cannot treat several databases."
+
+let parse_cmd () =
+  Arg.parse speclist anonfun usage;
+  if Option.is_none !bpath then raise_bad "Missing file name."
+
 let () =
-  Arg.parse speclist (fun s -> bname := s) usage;
+  parse_cmd ();
+  let bpath = Fpath.of_string @@ Option.get !bpath in
   (match !output with
   | Some file ->
       let oc = open_out file in
       Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
   | None -> ());
   if !ask_for_delete > 0 then
-    let lock_file = Mutil.lock_file !bname in
+    let lock_file = Mutil.lock_file bpath in
     let on_exn exn bt =
       Format.eprintf "%a@." Lock.pp_exception (exn, bt);
       exit 2
     in
     Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-    Driver.with_database !bname (fun base -> compute_connex base !bname)
-  else Driver.with_database !bname (fun base -> compute_connex base !bname)
+    Driver.with_database bpath (compute_connex bpath)
+  else Driver.with_database bpath (compute_connex bpath)

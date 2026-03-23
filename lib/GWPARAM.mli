@@ -3,9 +3,9 @@ val errors_undef : string list ref
 val errors_other : string list ref
 val set_vars : string list ref
 val gwd_cmd : string ref
-val cnt_dir : string ref
-val sock_dir : string ref
-val bases : string ref
+val cnt_dir : Geneweb_fs.Fpath.t ref
+val sock_dir : Geneweb_fs.Fpath.t ref
+val bases : Geneweb_fs.Fpath.t ref
 
 val reorg : bool ref
 (** set to true when base is in reorg format *)
@@ -13,11 +13,11 @@ val reorg : bool ref
 val force : bool ref
 (** force creation of database if already existing *)
 
-val config_reorg : string -> string
-val config_legacy : string -> string
+val config_reorg : string -> Geneweb_fs.Fpath.t
+val config_legacy : string -> Geneweb_fs.Fpath.t
 
-type my_fun_2 = string -> string
-type my_fun_3 = string -> string -> string
+type my_fun_2 = string -> Geneweb_fs.Fpath.t
+type my_fun_3 = string -> string -> Geneweb_fs.Fpath.t
 
 val config : my_fun_2 ref
 val cnt_d : my_fun_2 ref
@@ -44,38 +44,37 @@ val test_reorg : string -> unit
 val check_base_exists : string -> unit
 (** Check if database exists and exit if so (unless -f flag is set) *)
 
-val create_base_and_config : string -> string
+val create_base_and_config : string -> Geneweb_fs.Fpath.t
 (** Create base directory and configuration. *)
 
 module Default : sig
-  val config : string -> string
-  val cnt_d : string -> string
-  val adm_file : string -> string
-  val portraits_d : string -> string
-  val src_d : string -> string
-  val etc_d : string -> string
-  val config_d : string -> string
-  val lang_d : string -> string -> string
-  val images_d : string -> string
-
-  val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ())] *)
+  val config : string -> Geneweb_fs.Fpath.t
+  val cnt_d : string -> Geneweb_fs.Fpath.t
+  val adm_file : string -> Geneweb_fs.Fpath.t
+  val portraits_d : string -> Geneweb_fs.Fpath.t
+  val src_d : string -> Geneweb_fs.Fpath.t
+  val etc_d : string -> Geneweb_fs.Fpath.t
+  val config_d : string -> Geneweb_fs.Fpath.t
+  val lang_d : string -> string -> Geneweb_fs.Fpath.t
+  val images_d : string -> Geneweb_fs.Fpath.t
+  val bpath : string -> Geneweb_fs.Fpath.t
 end
 
 module Legacy : sig
-  val config : string -> string
-  val cnt_d : string -> string
-  val adm_file : string -> string
-  val portraits_d : string -> string
-  val src_d : string -> string
-  val etc_d : string -> string
-  val config_d : string -> string
-  val lang_d : string -> string -> string
-  val images_d : string -> string
-
-  val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ()) (string ^ ".gwb") ] *)
+  val config : string -> Geneweb_fs.Fpath.t
+  val cnt_d : string -> Geneweb_fs.Fpath.t
+  val adm_file : string -> Geneweb_fs.Fpath.t
+  val portraits_d : string -> Geneweb_fs.Fpath.t
+  val src_d : string -> Geneweb_fs.Fpath.t
+  val etc_d : string -> Geneweb_fs.Fpath.t
+  val config_d : string -> Geneweb_fs.Fpath.t
+  val lang_d : string -> string -> Geneweb_fs.Fpath.t
+  val images_d : string -> Geneweb_fs.Fpath.t
+  val bpath : string -> Geneweb_fs.Fpath.t
 end
+
+val base_dir : unit -> Geneweb_fs.Fpath.t
+(** Returns the base directory. *)
 
 val output_error :
   ?headers:string list ->

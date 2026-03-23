@@ -5,10 +5,14 @@ open Util
 module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let file_path conf base fname =
-  String.concat Filename.dir_sep
-    [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
+  Fpath.(
+    !GWPARAM.bpath conf.bname
+    // ~$(Driver.base_notes_dir base)
+    // ~$(fname ^ ".txt"))
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -20,8 +24,19 @@ let read_notes base fnotes =
   let s = Driver.base_notes_read base fnotes in
   Wiki.split_title_and_text s
 
+let notes_aliases_noerr path =
+  try Util.notes_aliases path with Sys_error _ -> []
+
 let merge_possible_aliases conf db =
-  let aliases = Wiki.notes_aliases conf in
+  let aliases =
+    let path =
+      match List.assoc "notes_alias_file" conf.base_env with
+      | f -> Fpath.of_string f
+      | exception Not_found ->
+          Fpath.(!GWPARAM.bpath conf.bname // ~$"notes.alias")
+    in
+    notes_aliases_noerr path
+  in
   let db =
     List.map
       (fun (pg, (sl, il)) ->
@@ -295,10 +310,10 @@ let commit_notes conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    String.concat Filename.dir_sep
-      [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ]
+    Fpath.(
+      !GWPARAM.bpath conf.bname // ~$(Driver.base_notes_dir base) // ~$fname)
   in
-  Filesystem.create_dir ~parent:true (Filename.dirname fpath);
+  File.create_dir ~parent:true (Fpath.dirname fpath);
   (try Driver.commit_notes base fname s
    with Sys_error m ->
      Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
@@ -309,11 +324,12 @@ let commit_wiznotes conf base fnotes s =
   let pg = Def.NLDB.PgWizard fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    List.fold_left Filename.concat
-      (Util.bpath (conf.bname ^ ".gwb"))
-      [ Driver.base_wiznotes_dir base; fname ]
+    Fpath.(
+      !GWPARAM.bpath (conf.bname ^ ".gwb")
+      // ~$(Driver.base_wiznotes_dir base)
+      // ~$fname)
   in
-  Filesystem.create_dir ~parent:true (Filename.dirname fpath);
+  File.create_dir ~parent:true (Fpath.dirname fpath);
   Driver.commit_wiznotes base fname s;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s
@@ -663,7 +679,7 @@ type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 let cache_linked_pages_name = "cache_linked_pages"
 
 let get_linked_pages_fname conf =
-  Filename.concat (!GWPARAM.bpath conf.bname) cache_linked_pages_name
+  Fpath.(!GWPARAM.bpath conf.bname // ~$cache_linked_pages_name)
 
 let read_cache_linked_pages conf =
   let fname = get_linked_pages_fname conf in
@@ -673,16 +689,14 @@ let read_cache_linked_pages conf =
       close_in ic;
       ht
   | None ->
-      Printf.eprintf "%s not exist. Run update_nldb\n" fname;
+      Format.eprintf "%a not exist. Run update_nldb\n" Fpath.pp fname;
       let ht : cache_linked_pages_t = Hashtbl.create 10 in
       ht
 
 (* sync with update_nldb.ml if this changes *)
 let write_cache_linked_pages conf cache_linked_pages =
   let fname = get_linked_pages_fname conf in
-  let oc = open_out_bin fname in
-  output_value oc cache_linked_pages;
-  close_out oc
+  File.with_open_out_bin fname (fun oc -> output_value oc cache_linked_pages)
 
 let update_cache_linked_pages conf mode old_key new_key nbr =
   let ht = read_cache_linked_pages conf in

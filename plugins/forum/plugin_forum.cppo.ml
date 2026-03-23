@@ -8,6 +8,8 @@ end
 open Geneweb
 open Config
 module Plugin = Geneweb_plugin
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
 
 let ns = "forum"
 
@@ -25,7 +27,7 @@ let w_base =
   Gwd_lib.Request.w_base ~none
 
 let () =
-  Secure.add_assets !Plugin.assets ;
+  Secure.add_assets !Plugin.assets;
   Plugin.register ~ns
     [ "FORUM", (fun _assets -> w_base @@ wrapper ForumDisplay.print)
     ; "FORUM_ADD", (fun _assets -> w_base @@ wrapper ForumDisplay.print_add)

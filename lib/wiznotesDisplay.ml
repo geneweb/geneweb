@@ -4,27 +4,27 @@ open Config
 open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let wiz_dir conf base =
-  Filename.concat (Util.bpath conf.bname) (Driver.base_wiznotes_dir base)
+  Fpath.(!GWPARAM.bpath conf.bname // ~$(Driver.base_wiznotes_dir base))
 
-let wzfile wiznotes_dir wiz = Filename.concat wiznotes_dir (wiz ^ ".txt")
+let wzfile wiznotes_dir wiz = Fpath.(wiznotes_dir // ~$(wiz ^ ".txt"))
 
 let read_auth_file fname bname =
   let data = read_gen_auth_file fname bname in
   List.map
     (fun au ->
       let wizname =
-        try
-          let k = String.index au.au_info ':' in
-          String.sub au.au_info 0 k
-        with Not_found -> au.au_user
+        match String.index au.au_info ':' with
+        | exception Not_found -> au.au_user
+        | k -> String.sub au.au_info 0 k
       in
       let wizname =
-        try
-          let k = String.index wizname '|' in
-          String.sub au.au_info 0 k
-        with Not_found -> wizname
+        match String.index au.au_info '|' with
+        | exception Not_found -> wizname
+        | k -> String.sub au.au_info 0 k
       in
       let wizname, wizorder, islash =
         try
@@ -39,62 +39,58 @@ let read_auth_file fname bname =
     data
 
 let read_wizard_notes fname =
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic ->
+  match Secure.open_in fname with
+  | exception Sys_error _ -> ("", 0.)
+  | ic ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
       let date, len =
         try
-          let line = input_line ic in
-          if line = "WIZNOTES" then
-            let line = input_line ic in
-            (float_of_string line, 0)
-          else
-            let s = Unix.stat fname in
-            (s.Unix.st_mtime, Buff.store (Buff.mstore 0 line) '\n')
+          match input_line ic with
+          | "WIZNOTES" -> (float_of_string @@ input_line ic, 0)
+          | line ->
+              let s = File.stat fname in
+              (s.Unix.st_mtime, Buff.store (Buff.mstore 0 line) '\n')
         with End_of_file | Failure _ -> (0., 0)
       in
       let rec loop len =
-        match try Some (input_char ic) with End_of_file -> None with
-        | Some c -> loop (Buff.store len c)
-        | None ->
-            close_in ic;
-            len
+        match input_char ic with
+        | exception End_of_file -> len
+        | c -> loop (Buff.store len c)
       in
       let len = loop len in
       (Buff.get len, date)
-  | None -> ("", 0.)
 
 let write_wizard_notes fname nn =
-  if nn = "" then Mutil.rm fname
+  if nn = "" then File.remove ~force:true fname
   else
-    match try Some (Secure.open_out fname) with Sys_error _ -> None with
-    | Some oc ->
+    match Secure.open_out fname with
+    | exception Sys_error _ -> ()
+    | oc ->
+        Fun.protect ~finally:(fun () -> close_out_noerr oc) @@ fun () ->
         Printf.fprintf oc "WIZNOTES\n%.0f\n" (Unix.time ());
         output_string oc nn;
-        output_string oc "\n";
-        close_out oc
-    | None -> ()
+        output_string oc "\n"
 
 let wiznote_date wfile =
-  match try Some (Secure.open_in wfile) with Sys_error _ -> None with
-  | Some ic ->
+  match Secure.open_in wfile with
+  | exception Sys_error _ -> (Fpath.empty, 0.)
+  | ic ->
       let date =
         try
           let line = input_line ic in
           if line = "WIZNOTES" then float_of_string (input_line ic)
           else raise Exit
         with End_of_file | Failure _ | Exit ->
-          let s = Unix.stat wfile in
+          let s = File.stat wfile in
           s.Unix.st_mtime
       in
-      close_in ic;
       (wfile, date)
-  | None -> ("", 0.)
 
 let print_wizards_by_alphabetic_order conf list =
   let wprint_elem (wz, (wname, (_, islash)), wfile, stm) =
     let tm = Unix.localtime stm in
     let wlink =
-      (conf.wizard && conf.user = wz) || wfile <> "" || conf.manitou
+      (conf.wizard && conf.user = wz) || wfile <> Fpath.empty || conf.manitou
     in
     if wlink then (
       Output.print_sstring conf {|<a href="|};
@@ -178,7 +174,7 @@ let print_wizards_by_date conf list =
          if new_item then Output.print_sstring conf "</dt><dd>";
          let wname = if wname = "" then wz else wname in
          if not (prev = None || new_item) then Output.print_sstring conf ", ";
-         if (conf.wizard && conf.user = wz) || wfile <> "" then (
+         if (conf.wizard && conf.user = wz) || wfile <> Fpath.empty then (
            Output.print_sstring conf {|<a href="|};
            Output.print_string conf (commd conf);
            Output.print_sstring conf {|m=WIZNOTES&f=|};
@@ -219,7 +215,7 @@ let print_old_wizards conf list =
 
 let wizard_list_from_dir conf base =
   match
-    try Some (Sys.readdir (wiz_dir conf base)) with Sys_error _ -> None
+    try Some (File.readdir (wiz_dir conf base)) with Sys_error _ -> None
   with
   | Some arr ->
       List.fold_left
@@ -382,7 +378,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   in
   Output.print_string conf (Util.safe_html s);
   Output.print_sstring conf "</td></tr></table>";
-  if Sys.file_exists wfile then (
+  if File.file_exists wfile then (
     let tm = Unix.localtime date in
     let dmy =
       {
@@ -489,7 +485,8 @@ let print_view conf base =
 let commit_wiznotes conf base wz s =
   let wiznotes_dir = wiz_dir conf base in
   let fname = wzfile wiznotes_dir wz in
-  (try Unix.mkdir wiznotes_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
+  (try File.create_dir ~required_perm:0o755 wiznotes_dir
+   with File.File_error _ -> ());
   write_wizard_notes fname s;
   let pg = Def.NLDB.PgWizard wz in
   Notes.update_notes_links_db base pg s
@@ -523,7 +520,7 @@ let print_mod_ok conf base =
       false
 
 let wizard_denying wddir =
-  let fname = Filename.concat wddir "connected.deny" in
+  let fname = Fpath.(wddir // ~$"connected.deny") in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic ->
       let rec loop list =
@@ -539,7 +536,7 @@ let wizard_denying wddir =
 let print_connected_wizard conf first wddir wz tm_user =
   let wfile, stm = wiznote_date (wzfile wddir wz) in
   let tm = Unix.localtime stm in
-  if wfile <> "" then (
+  if wfile <> Fpath.empty then (
     Output.print_sstring conf "<a href=\"";
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=WIZNOTES&f=";
@@ -626,12 +623,13 @@ let connected_wizards conf base =
 
 let do_change_wizard_visibility conf base x set_vis =
   let wiznotes_dir = wiz_dir conf base in
-  if not @@ Sys.file_exists wiznotes_dir then Unix.mkdir wiznotes_dir 0o755;
+  if not @@ File.file_exists wiznotes_dir then
+    File.create_dir ~required_perm:0o755 wiznotes_dir;
   let denying = wizard_denying wiznotes_dir in
   let is_visible = not (List.mem conf.user denying) in
   (if ((not set_vis) && not is_visible) || (set_vis && is_visible) then ()
    else
-     let tmp_file = Filename.concat wiznotes_dir "1connected.deny" in
+     let tmp_file = Fpath.(wiznotes_dir // ~$"1connected.deny") in
      let oc = Secure.open_out tmp_file in
      let found =
        List.fold_left
@@ -644,9 +642,9 @@ let do_change_wizard_visibility conf base x set_vis =
      in
      if (not found) && not set_vis then Printf.fprintf oc "%s\n" conf.user;
      close_out oc;
-     let file = Filename.concat wiznotes_dir "connected.deny" in
-     Mutil.rm file;
-     Sys.rename tmp_file file);
+     let file = Fpath.(wiznotes_dir // ~$"connected.deny") in
+     File.remove ~force:true file;
+     File.rename tmp_file file);
   do_connected_wizards conf base x
 
 let change_wizard_visibility conf base =

@@ -1,6 +1,8 @@
 (* Copyright (c) 2006-2007 INRIA *)
-module Compat = Geneweb_compat
 open Dbdisk
+module Compat = Geneweb_compat
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let load_ascends_array base = base.data.ascends.load_array ()
 let load_unions_array base = base.data.unions.load_array ()
@@ -398,11 +400,10 @@ let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
     base tmp_fnames_inx tmp_fnames_dat
 
 let output_particles_file particles fname =
-  let oc = open_out fname in
-  List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
-  close_out oc
-
-let ( // ) = Filename.concat
+  File.with_open_out_text fname (fun oc ->
+      List.iter
+        (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s))
+        particles)
 
 (* TODO: these functions should be defined into [Gwdb_driver] but
    such a definition introduces a cyclic dependency between [Gwdb_driver]
@@ -412,7 +413,7 @@ let ( // ) = Filename.concat
 
 let output_notes base dst =
   let content = base.Dbdisk.data.bnotes.nread "" Def.RnAll in
-  Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content)
+  File.with_open_out_text dst (fun oc -> output_string oc content)
 
 (* Copy all the notes from "notes_d" of the database [base] into the
    destination directory [dst_dir]. *)
@@ -420,42 +421,43 @@ let output_notes_d base dst_dir =
   let l = base.data.bnotes.Def.efiles () in
   List.iter
     (fun f ->
-      let dst = dst_dir // (f ^ ".txt") in
-      Filesystem.create_dir ~parent:true @@ Filename.dirname dst;
+      let dst = Fpath.(dst_dir // ~$(f ^ ".txt")) in
+      File.create_dir ~parent:true @@ Fpath.dirname dst;
       (* TODO: The nread function is not an efficient way to copy a file.
-         We would use [Filesystem.copy_file] instead but [f] can be
+         We would use [File.copy_file] instead but [f] can be
          a file in memory too. We should use an enum type to distinguish
          these cases in [Def.base_notes]. *)
       let content = base.Dbdisk.data.bnotes.nread f Def.RnAll in
-      Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content))
+      File.with_open_out_text dst (fun oc -> output_string oc content))
     l
 
 let safe_rename src dst =
   try
-    Mutil.rm dst;
-    Sys.rename src dst
+    File.remove ~force:true dst;
+    File.rename src dst
   with _ ->
     (* Windows fallback to avoid "Permission denied" errors on files *)
-    Filesystem.copy_file src dst;
-    Mutil.rm src
+    File.copy_file src dst;
+    File.remove ~force:true src
 
 let output base =
   (* create database directory *)
-  let bname = base.data.bdir in
-  if not (Sys.file_exists bname) then Unix.mkdir bname 0o755;
+  let bpath = base.data.bpath in
+  if not (File.file_exists bpath) then
+    File.create_dir ~required_perm:0o755 base.data.bpath;
   (* temporary files *)
-  let tmp_particles = Filename.concat bname "1particles.txt" in
-  let tmp_base = Filename.concat bname "1base" in
-  let tmp_base_acc = Filename.concat bname "1base.acc" in
-  let tmp_names_inx = Filename.concat bname "1names.inx" in
-  let tmp_names_acc = Filename.concat bname "1names.acc" in
-  let tmp_snames_inx = Filename.concat bname "1snames.inx" in
-  let tmp_snames_dat = Filename.concat bname "1snames.dat" in
-  let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
-  let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
-  let tmp_strings_inx = Filename.concat bname "1strings.inx" in
-  let tmp_notes = Filename.concat bname "1notes" in
-  let tmp_notes_d = Filename.concat bname "1notes_d" in
+  let tmp_particles = Fpath.(bpath // ~$"1particles.txt") in
+  let tmp_base = Fpath.(bpath // ~$"1base") in
+  let tmp_base_acc = Fpath.(bpath // ~$"1base.acc") in
+  let tmp_names_inx = Fpath.(bpath // ~$"1names.inx") in
+  let tmp_names_acc = Fpath.(bpath // ~$"1names.acc") in
+  let tmp_snames_inx = Fpath.(bpath // ~$"1snames.inx") in
+  let tmp_snames_dat = Fpath.(bpath // ~$"1snames.dat") in
+  let tmp_fnames_inx = Fpath.(bpath // ~$"1fnames.inx") in
+  let tmp_fnames_dat = Fpath.(bpath // ~$"1fnames.dat") in
+  let tmp_strings_inx = Fpath.(bpath // ~$"1strings.inx") in
+  let tmp_notes = Fpath.(bpath // ~$"1notes") in
+  let tmp_notes_d = Fpath.(bpath // ~$"1notes_d") in
   load_ascends_array base;
   load_unions_array base;
   load_couples_array base;
@@ -581,49 +583,49 @@ let output base =
        in
        loop 0 0
      in
-     let oc = Secure.open_out_bin @@ Filename.concat bname "nb_persons" in
-     output_value oc nbp;
-     close_out oc
+     Secure.with_open_out_bin
+       Fpath.(bpath // ~$"nb_persons")
+       (fun oc -> output_value oc nbp)
    with e ->
-     (try close_out oc with _ -> ());
-     (try close_out oc_acc with _ -> ());
-     Mutil.rm tmp_base;
-     Mutil.rm tmp_base_acc;
-     Mutil.rm tmp_names_inx;
-     Mutil.rm tmp_names_acc;
-     Mutil.rm tmp_strings_inx;
-     Mutil.rm_rf tmp_notes_d;
+     close_out_noerr oc;
+     close_out_noerr oc_acc;
+     File.remove ~force:true tmp_base;
+     File.remove ~force:true tmp_base_acc;
+     File.remove ~force:true tmp_names_inx;
+     File.remove ~force:true tmp_names_acc;
+     File.remove ~force:true tmp_strings_inx;
+     File.remove ~force:true ~recursive:true tmp_notes_d;
      raise e);
-  safe_rename tmp_base (Filename.concat bname "base");
-  safe_rename tmp_base_acc (Filename.concat bname "base.acc");
-  safe_rename tmp_names_inx (Filename.concat bname "names.inx");
-  safe_rename tmp_names_acc (Filename.concat bname "names.acc");
-  safe_rename tmp_snames_dat (Filename.concat bname "snames.dat");
-  safe_rename tmp_snames_inx (Filename.concat bname "snames.inx");
-  safe_rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
-  safe_rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
-  safe_rename tmp_strings_inx (Filename.concat bname "strings.inx");
-  safe_rename tmp_particles (Filename.concat bname "particles.txt");
-  Mutil.rm (Filename.concat bname "notes");
-  if Sys.file_exists tmp_notes then
-    Sys.rename tmp_notes (Filename.concat bname "notes");
-  if Sys.file_exists tmp_notes_d then (
-    let notes_d = Filename.concat bname "notes_d" in
-    if Sys.file_exists notes_d then Mutil.rm_rf notes_d;
-    try Sys.rename tmp_notes_d notes_d
+  safe_rename tmp_base Fpath.(bpath // ~$"base");
+  safe_rename tmp_base_acc Fpath.(bpath // ~$"base.acc");
+  safe_rename tmp_names_inx Fpath.(bpath // ~$"names.inx");
+  safe_rename tmp_names_acc Fpath.(bpath // ~$"names.acc");
+  safe_rename tmp_snames_dat Fpath.(bpath // ~$"snames.dat");
+  safe_rename tmp_snames_inx Fpath.(bpath // ~$"snames.inx");
+  safe_rename tmp_fnames_dat Fpath.(bpath // ~$"fnames.dat");
+  safe_rename tmp_fnames_inx Fpath.(bpath // ~$"fnames.inx");
+  safe_rename tmp_strings_inx Fpath.(bpath // ~$"strings.inx");
+  safe_rename tmp_particles Fpath.(bpath // ~$"particles.txt");
+  let notes = Fpath.(bpath // ~$"notes") in
+  File.remove ~force:true notes;
+  if File.file_exists tmp_notes then File.rename tmp_notes notes;
+  if File.file_exists tmp_notes_d then (
+    let notes_d = Fpath.(bpath // ~$"notes_d") in
+    File.remove ~force:true ~recursive:true notes_d;
+    try File.rename tmp_notes_d notes_d
     with e ->
       trace
-        (Printf.sprintf "Error renaming %s to %s: %s. Retrying once."
-           tmp_notes_d notes_d (Printexc.to_string e));
+        (Format.asprintf "Error renaming %a to %a: %s. Retrying once." Fpath.pp
+           tmp_notes_d Fpath.pp notes_d (Printexc.to_string e));
       Unix.sleepf 0.5;
-      Sys.rename tmp_notes_d notes_d);
-  Mutil.rm (Filename.concat bname "patches");
-  Mutil.rm (Filename.concat bname "patches~");
-  Mutil.rm (Filename.concat bname "synchro_patches");
-  Mutil.rm (Filename.concat bname "notes_link");
-  Mutil.rm (Filename.concat bname "restrict");
-  Mutil.rm (Filename.concat bname "tstab_visitor");
-  Mutil.rm (Filename.concat bname "nb_persons");
+      File.rename tmp_notes_d notes_d);
+  File.remove ~force:true Fpath.(bpath // ~$"patches");
+  File.remove ~force:true Fpath.(bpath // ~$"patches~");
+  File.remove ~force:true Fpath.(bpath // ~$"synchro_patches");
+  File.remove ~force:true Fpath.(bpath // ~$"notes_link");
+  File.remove ~force:true Fpath.(bpath // ~$"restrict");
+  File.remove ~force:true Fpath.(bpath // ~$"tstab_visitor");
+  File.remove ~force:true Fpath.(bpath // ~$"nb_persons");
   (* FIXME: should not be present in this part of the code? *)
-  Mutil.rm (Filename.concat bname "tstab");
-  Mutil.rm (Filename.concat bname "tstab_visitor")
+  File.remove ~force:true Fpath.(bpath // ~$"tstab");
+  File.remove ~force:true Fpath.(bpath // ~$"tstab_visitor")

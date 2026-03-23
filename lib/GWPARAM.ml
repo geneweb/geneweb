@@ -5,6 +5,8 @@
 
 module Driver = Geneweb_db.Driver
 module Code = Geneweb_http.Code
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let nb_errors = ref 0
 let errors_undef = ref []
@@ -13,130 +15,128 @@ let set_vars = ref []
 let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
-let cnt_dir = ref ""
-let sock_dir = ref ""
+let cnt_dir : Fpath.t ref = ref Fpath.empty
+let sock_dir = ref Fpath.empty
 let bases = ref (Secure.base_dir ())
 
 let config_reorg bname =
   let bname = Filename.remove_extension bname in
-  String.concat Filename.dir_sep
-    [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
+  Fpath.(
+    Secure.base_dir () // ~$(bname ^ ".gwb") // ~$"config" // ~$(bname ^ ".gwf"))
 
 let config_legacy bname =
-  String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwf" ]
+  let bname = Filename.remove_extension bname in
+  Fpath.(Secure.base_dir () // ~$(bname ^ ".gwf"))
 
-type my_fun_2 = string -> string
-type my_fun_3 = string -> string -> string
+type my_fun_2 = string -> Fpath.t
+type my_fun_3 = string -> string -> Fpath.t
 
 (* Function references that will be set based on mode *)
 let config = ref config_legacy
-let cnt_d = ref (fun _ -> "")
-let adm_file = ref (fun _ -> "")
-let src_d = ref (fun _ -> "")
-let etc_d = ref (fun _ -> "")
-let config_d = ref (fun _ -> "")
-let lang_d = ref (fun _ _ -> "")
-let bpath = ref (fun _ -> "")
-let portraits_d = ref (fun _ -> "")
-let images_d = ref (fun _ -> "")
+let cnt_d = ref (fun _ -> Fpath.empty)
+let adm_file = ref (fun _ -> Fpath.empty)
+let src_d = ref (fun _ -> Fpath.empty)
+let etc_d = ref (fun _ -> Fpath.empty)
+let config_d = ref (fun _ -> Fpath.empty)
+let lang_d = ref (fun _ _ -> Fpath.empty)
+let bpath = ref (fun _ -> Fpath.empty)
+let portraits_d = ref (fun _ -> Fpath.empty)
+let images_d = ref (fun _ -> Fpath.empty)
 let clean_bname bname = Filename.remove_extension bname
-let path_concat parts = String.concat Filename.dir_sep parts
 let base_dir () = Secure.base_dir ()
 
 (* Module for reorg mode paths *)
 module Default = struct
+  let bname_with_ext bname = clean_bname bname ^ ".gwb"
   let config bname = config_reorg bname
 
   let cnt_d bname =
-    let bname = clean_bname bname in
-    if !sock_dir = "" then
-      cnt_dir :=
-        if bname <> "" then
-          path_concat [ base_dir (); bname ^ ".gwb"; "config"; "cnt" ]
-        else path_concat [ base_dir (); "cnt" ]
+    let bname_ext = bname_with_ext bname in
+    if Fpath.is_empty !sock_dir then
+      match bname with
+      | "" -> cnt_dir := Fpath.(base_dir () // ~$"cnt")
+      | _ ->
+          cnt_dir := Fpath.(base_dir () // ~$bname_ext // ~$"config" // ~$"cnt")
     else cnt_dir := !sock_dir;
     !cnt_dir
 
-  let adm_file file = Filename.concat !cnt_dir file
+  let adm_file file = Fpath.(!cnt_dir // ~$file)
 
   let portraits_d bname =
-    let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "portraits" ]
+    let bname_ext = bname_with_ext bname in
+    Fpath.(base_dir () // ~$bname_ext // ~$"documents" // ~$"portraits")
 
   let src_d bname =
-    let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "src" ]
+    let bname_ext = bname_with_ext bname in
+    Fpath.(base_dir () // ~$bname_ext // ~$"src")
 
   let etc_d bname =
-    let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "etc" ]
+    let bname_ext = bname_with_ext bname in
+    Fpath.(base_dir () // ~$bname_ext // ~$"etc")
 
   let config_d bname =
-    let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "config" ]
+    let bname_ext = bname_with_ext bname in
+    Fpath.(base_dir () // ~$bname_ext // ~$"config")
 
   let lang_d bname file =
-    let bname = clean_bname bname in
-    Filename.concat (path_concat [ base_dir (); bname ^ ".gwb"; "lang" ]) file
+    let bname_ext = bname_with_ext bname in
+    Fpath.(base_dir () // ~$bname_ext // ~$"lang" // ~$file)
 
   let images_d bname =
-    let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "images" ]
+    let bname_ext = bname_with_ext bname in
+    Fpath.(base_dir () // ~$bname_ext // ~$"documents" // ~$"images")
 
   let bpath bname =
-    let bname = clean_bname bname in
-    Filename.concat (base_dir ()) (bname ^ ".gwb")
+    let bname_ext = bname_with_ext bname in
+    Fpath.(base_dir () // ~$bname_ext)
 end
 
 (* Module for legacy mode paths *)
 module Legacy = struct
   let config = config_legacy
 
-  let cnt_d bname =
-    let _ = bname in
-    if !sock_dir = "" then cnt_dir := path_concat [ base_dir (); "cnt" ]
+  let cnt_d _bname =
+    if Fpath.is_empty !sock_dir then cnt_dir := Fpath.(base_dir () // ~$"cnt")
     else cnt_dir := !sock_dir;
     !cnt_dir
 
-  let adm_file file = Filename.concat !cnt_dir file
+  let adm_file file = Fpath.(!cnt_dir // ~$file)
 
   let portraits_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "images"; bname ]
+    Fpath.(base_dir () // ~$"images" // ~$bname)
 
   let src_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "src"; bname ]
+    Fpath.(base_dir () // ~$"src" // ~$bname)
 
   let etc_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "etc"; bname ]
+    Fpath.(base_dir () // ~$"etc" // ~$bname)
 
-  let config_d bname =
-    let _ = bname in
-    base_dir ()
+  let config_d _bname = base_dir ()
 
   let lang_d bname file =
     let bname = clean_bname bname in
-    Filename.concat (path_concat [ base_dir (); "lang"; bname ]) file
+    Fpath.(base_dir () // ~$"lang" // ~$bname // ~$file)
 
   let images_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "src"; bname; "images" ]
+    Fpath.(base_dir () // ~$"src" // ~$bname // ~$"images")
 
   let bpath bname =
     let bname = clean_bname bname in
-    Filename.concat (base_dir ()) (bname ^ ".gwb")
+    Fpath.(base_dir () // ~$(bname ^ ".gwb"))
 end
 
 (* Check if a base is in reorg format *)
 let is_reorg_base bname =
   let bname = Filename.remove_extension bname in
-  Sys.file_exists (config_reorg bname)
+  File.file_exists (config_reorg bname)
 
 (* Initialize path functions based on mode *)
 let init () =
-  Secure.add_assets Filename.current_dir_name;
+  Secure.add_assets (Fpath.of_string Filename.current_dir_name);
   if !reorg then (
     config := Default.config;
     cnt_d := Default.cnt_d;
@@ -196,82 +196,82 @@ let create_default_gwf config_path =
       "p_mod=";
     ]
   in
-  let oc = open_out config_path in
-  List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf_defaults;
-  close_out oc
+  File.with_open_out_text config_path (fun oc ->
+      List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf_defaults)
 
 let check_base_exists bname =
   let clean_bname = Filename.remove_extension bname in
-  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
-  if (not !force) && Sys.file_exists bdir then (
+  let bdir = Fpath.(Secure.base_dir () // ~$(clean_bname ^ ".gwb")) in
+  if (not !force) && File.file_exists bdir then (
     Printf.eprintf "Database \"%s\" already exists. Use -f to overwrite.\n"
       bname;
     exit 2)
 
 let rec create_base_and_config bname =
   let clean_bname = Filename.remove_extension bname in
-  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
+  let bpath = Fpath.(Secure.base_dir () // ~$(clean_bname ^ ".gwb")) in
   let user_wants_reorg = !reorg in
-  if Sys.file_exists bdir then
+  if File.file_exists bpath then
     migrate_gwf_bidirectional clean_bname user_wants_reorg;
-  Filesystem.create_dir bdir;
+  File.create_dir bpath;
   if
-    (not (Sys.file_exists (config_reorg clean_bname)))
-    && not (Sys.file_exists (config_legacy clean_bname))
+    (not (File.file_exists (config_reorg clean_bname)))
+    && not (File.file_exists (config_legacy clean_bname))
   then migrate_gwf_bidirectional clean_bname user_wants_reorg;
   Printf.eprintf "\n";
   reorg := user_wants_reorg;
   init ();
-  bdir
+  bpath
 
 and migrate_gwf_bidirectional bname user_wants_reorg =
   let bname = Filename.remove_extension bname in
-  let legacy_path = Filename.concat (Secure.base_dir ()) (bname ^ ".gwf") in
-  let reorg_path =
-    String.concat Filename.dir_sep
-      [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
-  in
-  let legacy_exists = Sys.file_exists legacy_path in
-  let reorg_exists = Sys.file_exists reorg_path in
+  let legacy_path = config_legacy bname in
+  let reorg_path = config_reorg bname in
+  let legacy_exists = File.file_exists legacy_path in
+  let reorg_exists = File.file_exists reorg_path in
   Printf.eprintf "Migration check for %s:\n" bname;
   Printf.eprintf "  Classic .gwf exists: %b%s\n" legacy_exists
-    (if legacy_exists then " (" ^ Filename.basename legacy_path ^ ")" else "");
+    (if legacy_exists then " (" ^ Fpath.to_string legacy_path ^ ")" else "");
   Printf.eprintf "  Reorg .gwf exists: %b%s\n" reorg_exists
-    (if reorg_exists then " (" ^ Filename.basename reorg_path ^ ")" else "");
+    (if reorg_exists then " (" ^ Fpath.to_string reorg_path ^ ")" else "");
   match (user_wants_reorg, legacy_exists, reorg_exists) with
   | true, true, false ->
       (* Migration classic → reorg *)
       Printf.eprintf "Migrating .gwf from classic to reorg mode:\n";
-      Filesystem.create_dir ~parent:true (Filename.dirname reorg_path);
+      File.create_dir ~parent:true (Fpath.dirname reorg_path);
       let timestamp = get_timestamp () in
-      let backup_path = legacy_path ^ ".classic." ^ timestamp in
-      Filesystem.copy_file legacy_path backup_path;
-      Printf.eprintf "  Backup created: %s\n" (Filename.basename backup_path);
-      Filesystem.copy_file legacy_path reorg_path;
-      Sys.remove legacy_path;
+      let backup_path =
+        Fpath.of_string (Fpath.to_string legacy_path ^ ".classic." ^ timestamp)
+      in
+      File.copy_file legacy_path backup_path;
+      Printf.eprintf "  Backup created: %s\n" (Fpath.basename backup_path);
+      File.copy_file legacy_path reorg_path;
+      File.remove legacy_path;
       Printf.eprintf "  Configuration migrated: %s\n"
-        (Filename.basename reorg_path)
+        (Fpath.basename reorg_path)
   | false, false, true ->
       (* Migration reorg → classic *)
       Printf.eprintf "Migrating .gwf from reorg to classic mode:\n";
       let timestamp = get_timestamp () in
-      let backup_path = reorg_path ^ ".reorg." ^ timestamp in
-      Filesystem.copy_file reorg_path backup_path;
-      Printf.eprintf "  Backup created: %s\n" (Filename.basename backup_path);
-      Filesystem.copy_file reorg_path legacy_path;
-      Sys.remove reorg_path;
+      let backup_path =
+        Fpath.of_string (Fpath.to_string reorg_path ^ ".reorg." ^ timestamp)
+      in
+      File.copy_file reorg_path backup_path;
+      Printf.eprintf "  Backup created: %s\n" (Fpath.basename backup_path);
+      File.copy_file reorg_path legacy_path;
+      File.remove reorg_path;
       Printf.eprintf "  Configuration migrated: %s\n"
-        (Filename.basename legacy_path)
+        (Fpath.basename legacy_path)
   | true, false, false ->
       (* Créer nouveau .gwf en mode reorg *)
-      Filesystem.create_dir ~parent:true (Filename.dirname reorg_path);
+      File.create_dir ~parent:true (Fpath.dirname reorg_path);
       Printf.eprintf "Creating default configuration: %s\n"
-        (Filename.basename reorg_path);
+        (Fpath.basename reorg_path);
       create_default_gwf reorg_path
   | false, false, false ->
       (* Créer nouveau .gwf en mode classic *)
       Printf.eprintf "Creating default configuration: %s\n"
-        (Filename.basename legacy_path);
+        (Fpath.basename legacy_path);
       create_default_gwf legacy_path
   | _, true, true ->
       (* Conflit : .gwf existe dans les deux modes *)
@@ -281,10 +281,13 @@ and migrate_gwf_bidirectional bname user_wants_reorg =
       Printf.eprintf "Warning: .gwf exists in both modes, keeping %s mode\n"
         keep_mode;
       let timestamp = get_timestamp () in
-      let backup_path = remove_path ^ "." ^ remove_mode ^ "." ^ timestamp in
-      Filesystem.copy_file remove_path backup_path;
-      Printf.eprintf "Backup created: %s\n" (Filename.basename backup_path);
-      Sys.remove remove_path
+      let backup_path =
+        Fpath.of_string
+          (Fpath.to_string remove_path ^ "." ^ remove_mode ^ "." ^ timestamp)
+      in
+      File.copy_file remove_path backup_path;
+      Printf.eprintf "Backup created: %s\n" (Fpath.basename backup_path);
+      File.remove remove_path
   | _ ->
       (* .gwf existe déjà au bon endroit selon l'intention utilisateur *)
       Printf.eprintf "Configuration kept\n";
@@ -293,7 +296,7 @@ and migrate_gwf_bidirectional bname user_wants_reorg =
 (* Utility functions for error handling *)
 let output_error =
   let output_file conf fn =
-    let ic = open_in fn in
+    let ic = Secure.open_in fn in
     try
       in_channel_length ic |> really_input_string ic
       |> Output.print_sstring conf;
@@ -414,13 +417,9 @@ let descendants _conf base family ip =
 let is_related conf base p =
   if conf.Config.userkey <> "" then
     let fname =
-      String.concat Filename.dir_sep
-        [
-          Secure.base_dir ();
-          conf.Config.bname ^ ".gwb";
-          "caches";
-          "family-" ^ conf.Config.userkey;
-        ]
+      Fpath.(
+        !bpath conf.Config.bname // ~$"caches"
+        // ~$("family-" ^ conf.Config.userkey))
     in
     match (List.assoc_opt "fmode" conf.Config.env :> string option) with
     | Some "on" -> (
@@ -467,12 +466,13 @@ let is_related conf base p =
             && List.mem (Driver.get_iper p) family
         | _ -> false)
     | _ ->
-        if Sys.file_exists fname then (
+        let fname_str = Fpath.to_string fname in
+        if Sys.file_exists fname_str then (
           try
-            Sys.remove fname;
+            Sys.remove fname_str;
             false
           with Sys_error _ ->
-            Printf.eprintf "Error when removing %s\n" fname;
+            Printf.eprintf "Error when removing %s\n" fname_str;
             false)
         else false
   else false

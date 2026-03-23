@@ -1,4 +1,5 @@
 module Compat = Geneweb_compat
+module Fpath = Geneweb_fs.Fpath
 
 type meta = {
   version : string;
@@ -6,8 +7,8 @@ type meta = {
   depends : string list;
 }
 
-let parse fname =
-  Compat.In_channel.with_open_text fname @@ fun ic ->
+let parse path =
+  Compat.In_channel.with_open_text (Fpath.to_string path) @@ fun ic ->
   let rec loop meta =
     match input_line ic with
     | exception End_of_file -> meta

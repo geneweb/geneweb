@@ -6,19 +6,20 @@
    correct open instead of hoping Secure do it for it *)
 
 module Dirs = Geneweb_dirs
-
-let ok_r = ref []
-let assets_r = ref [ "gw" ]
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
 
 let default_base_dir =
   let t = Dirs.make () in
-  Dirs.(data_home t // "geneweb" // "base")
+  Dirs.(data_home t // "geneweb" // "bases")
 
-let bd_r = ref (Dirs.path default_base_dir)
+let ok_r = ref []
+let assets_r : Fpath.t list ref = ref [ Fpath.of_string "gw" ]
+let bd_r = ref (Fpath.of_string @@ Dirs.path default_base_dir)
 
 (* [decompose: string -> string list] decompose a path into a list of
    directory and a basename. "a/b/c" -> [ "a" ; "b"; "c" ] *)
-let decompose =
+let decompose s =
   let rec loop r s =
     let b = Filename.basename s in
     if b = "" || b = Filename.current_dir_name || b = Filename.dir_sep then
@@ -29,17 +30,19 @@ let decompose =
     else if b = s then b :: r
     else loop (b :: r) (Filename.dirname s)
   in
-  loop []
+  loop [] s
+
+let decompose_fpath p = decompose (Fpath.to_string p)
 
 (* add asset to the list of allowed to acces assets *)
 let add_assets d =
   if not (List.mem d !assets_r) then (
     assets_r := List.rev (d :: List.rev !assets_r);
-    ok_r := decompose d :: !ok_r)
+    ok_r := decompose_fpath d :: !ok_r)
 
 (* set base dir to which acces could be allowed *)
 let set_base_dir d =
-  let ok = decompose d in
+  let ok = decompose_fpath d in
   bd_r := d;
   ok_r := ok :: (List.filter (( <> ) ok)) !ok_r
 
@@ -61,7 +64,8 @@ let list_check_prefix d df =
     character * it must either be relative to the local directory OR included in
     one of the allowed directories (base_dir or assets) * the relative part does
     not contain the '..' directory *)
-let check fname =
+let check path =
+  let fname = Fpath.to_string path in
   if String.contains fname '\000' then false
   else
     let df = decompose fname in
@@ -77,8 +81,9 @@ let check fname =
     in
     loop !ok_r
 
-let check_open fname =
-  if not (check fname) then (
+let check_open path =
+  let fname = Fpath.to_string path in
+  if not (check path) then (
     if Sys.unix then (
       Printf.eprintf "*** secure rejects open %s\n" (String.escaped fname);
       flush stderr);
@@ -86,42 +91,43 @@ let check_open fname =
 
 (* The following functions perform a [check] before opening the file,
    preventing potential attacks on the system. *)
-let with_ic openfun s f =
-  check_open s;
-  let ic = openfun s in
+let with_ic openfun path f =
+  check_open path;
+  let ic = openfun (Fpath.to_string path) in
   Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () -> f ic
 
-let with_oc openfun s f =
-  check_open s;
-  let oc = openfun s in
+let with_oc openfun path f =
+  check_open path;
+  let oc = openfun (Fpath.to_string path) in
   Fun.protect ~finally:(fun () -> close_out_noerr oc) @@ fun () -> f oc
 
-let open_in fname =
-  check_open fname;
-  Stdlib.open_in fname
+let open_in path =
+  check_open path;
+  Stdlib.open_in (Fpath.to_string path)
 
-let with_open_in_text s f = with_ic open_in s f
+let with_open_in_text path f = with_ic Stdlib.open_in path f
 
-let open_in_bin fname =
-  check_open fname;
-  Stdlib.open_in_bin fname
+let open_in_bin path =
+  check_open path;
+  Stdlib.open_in_bin (Fpath.to_string path)
 
-let with_open_in_bin s f = with_ic open_in_bin s f
+let with_open_in_bin path f = with_ic Stdlib.open_in_bin path f
 
-let open_out fname =
-  check_open fname;
-  Stdlib.open_out fname
+let open_out path =
+  check_open path;
+  Stdlib.open_out (Fpath.to_string path)
 
-let with_open_out_text s f = with_oc open_out s f
+let with_open_out_text path f = with_oc Stdlib.open_out path f
 
-let open_out_bin fname =
-  check_open fname;
-  Stdlib.open_out_bin fname
+let open_out_bin path =
+  check_open path;
+  Stdlib.open_out_bin (Fpath.to_string path)
 
-let with_open_out_bin s f = with_oc open_out_bin s f
+let with_open_out_bin path f = with_oc Stdlib.open_out_bin path f
 
-let open_out_gen mode perm fname =
-  check_open fname;
-  Stdlib.open_out_gen mode perm fname
+let open_out_gen mode perm path =
+  check_open path;
+  Stdlib.open_out_gen mode perm (Fpath.to_string path)
 
-let with_open_out_gen mode perm = with_oc @@ open_out_gen mode perm
+let with_open_out_gen mode perm path f =
+  with_oc (Stdlib.open_out_gen mode perm) path f

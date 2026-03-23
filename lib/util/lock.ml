@@ -1,4 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
 
 let no_lock_flag = ref false
 
@@ -11,10 +13,10 @@ let pp_exception ppf (exn, bt) =
   else Format.fprintf ppf "@[Raised exception %s@]" sexn
 
 let close_noerr fd = try Unix.close fd with _ -> ()
-let chmod_noerr fl perm = try Unix.chmod fl perm with _ -> ()
+let chmod_noerr fl perm = try File.chmod fl perm with _ -> ()
 
 let acquire_lock ~wait lock_file =
-  let fd = Unix.openfile lock_file Unix.[ O_RDWR; O_CREAT ] 0o666 in
+  let fd = File.openfile lock_file Unix.[ O_RDWR; O_CREAT ] 0o666 in
   chmod_noerr lock_file 0o666;
   if wait then Unix.lockf fd Unix.F_LOCK 0 else Unix.lockf fd Unix.F_TLOCK 0;
   fd
@@ -22,7 +24,7 @@ let acquire_lock ~wait lock_file =
 let release_lock_noerr fd = try Unix.lockf fd Unix.F_ULOCK 0 with _ -> ()
 
 let control ~on_exn ~wait ~lock_file k =
-  if !no_lock_flag || Filename.basename lock_file = ".lck" then k ()
+  if !no_lock_flag || Fpath.basename lock_file = ".lck" then k ()
   else
     match acquire_lock ~wait lock_file with
     | exception exn ->

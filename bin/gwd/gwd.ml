@@ -13,6 +13,9 @@ module Dirs = Geneweb_dirs
 module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
+module Compat = Geneweb_compat
 
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
@@ -210,11 +213,11 @@ let parse_prefixes () =
   etc_prefix := Some p;
   let p = Option.value ~default:default_gw_prefix !gw_prefix in
   gw_prefix := Some p;
-  Secure.add_assets p
+  Secure.add_assets (Fpath.of_string p)
 
 type plugin = {
-  (* Filesystem path to the plugin's directory. *)
-  path : string;
+  (* File path to the plugin's directory. *)
+  path : Fpath.t;
   (* If [true], bypasses the checksum verification before loading. *)
   unsafe : bool;
   (* If [true], the plugin is loaded globally for all databases. *)
@@ -235,8 +238,8 @@ let daemon = ref false
 let default_lang = ref "fr"
 let friend_passwd = ref ""
 let green_color = "#2f6400"
-let images_dir = ref ""
-let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
+let images_dir = ref Fpath.empty
+let lexicon_list = ref [ Fpath.(~$"lang" // ~$"lexicon.txt") ]
 let login_timeout = ref 1800
 let default_n_workers = 20
 let n_workers = ref default_n_workers
@@ -393,14 +396,14 @@ let lexicon_fname = ref (Filename.concat tmp "lexicon.bin.")
 (* NB: Lexicon will be impacted by plugins even if the base
    does not activate this plugin in .gwf file. *)
 let load_lexicon =
-  let lexicon_cache = Hashtbl.create 0 in
+  let lexicon_cache : (Fpath.t, _) Hashtbl.t = Hashtbl.create 0 in
   fun lang ->
-    let fname = !lexicon_fname ^ lang in
-    match Hashtbl.find_opt lexicon_cache fname with
-    | Some lex -> lex
-    | None ->
+    let path = Fpath.of_string @@ !lexicon_fname ^ lang in
+    match Hashtbl.find lexicon_cache path with
+    | lex -> lex
+    | exception Not_found ->
         let lex =
-          Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
+          Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic path
             (fun () ->
               let ht = Hashtbl.create 0 in
               let rec rev_iter fn = function
@@ -410,21 +413,22 @@ let load_lexicon =
                     fn hd
               in
               rev_iter
-                (fun fname ->
-                  let fname =
-                    let f = Util.search_in_assets fname in
-                    if Sys.file_exists f then f
+                (fun path ->
+                  let path =
+                    let f = Util.search_in_assets path in
+                    if File.file_exists f then f
                     else
-                      let bf = Filename.concat (Secure.base_dir ()) fname in
-                      if Sys.file_exists bf then bf else f
+                      let bf = Fpath.(Secure.base_dir () // path) in
+                      if File.file_exists bf then bf else f
                   in
-                  if Sys.file_exists fname then
-                    Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
-                  else Logs.warn (fun k -> k "File %s unavailable\n" fname))
+                  if File.file_exists path then
+                    Mutil.input_lexicon lang ht (fun () -> Secure.open_in path)
+                  else
+                    Logs.warn (fun k -> k "File %a unavailable\n" Fpath.pp path))
                 !lexicon_list;
               ht)
         in
-        Hashtbl.add lexicon_cache fname lex;
+        Hashtbl.add lexicon_cache path lex;
         lex
 
 let cache_lexicon () =
@@ -435,46 +439,46 @@ exception
     string * [ `dynlink_error of Dynlink.error | `string of string ]
 
 let add_lex_dir dir =
-  Filesystem.walk_folder
+  File.walk_folder
     (fun e () ->
       match e with
-      | Filesystem.File s -> lexicon_list := (dir // s) :: !lexicon_list
+      | File.File s -> lexicon_list := Fpath.concat dir s :: !lexicon_list
       | _ -> ())
     dir ()
 
-let load_cmxs cmxs =
-  try Dynlink.loadfile cmxs
+let load_cmxs path =
+  let p = Fpath.to_string path in
+  try Dynlink.loadfile p
   with Dynlink.Error e ->
-    raise (Register_plugin_failure (cmxs, `dynlink_error e))
+    raise (Register_plugin_failure (p, `dynlink_error e))
 
 module MS = Map.Make (String)
 
 let check_plugin =
   let sums = MS.of_seq @@ List.to_seq Plugin_checksums.checksums in
   fun path ->
-    let pname = Filename.basename path in
+    let pname = Fpath.basename path in
     match MS.find pname sums with
     | exception Not_found -> false
     | sum -> Plugin.checksum path = sum
 
 let load_plugin ~unsafe ~forced path =
-  let pname = Filename.basename path in
+  let pname = Fpath.basename path in
   Logs.debug (fun k ->
       k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
   if not (unsafe || check_plugin path) then (
     Logs.err (fun k ->
         k "Refuse to load plugin %s for cause of wrong checksum." pname);
     exit 1);
-  let pname = Filename.basename path in
   let cmxs =
     let s = Fmt.str "plugin_%s.cmxs" pname in
-    path // s
+    Fpath.(path // ~$s)
   in
   lexicon_fname := !lexicon_fname ^ pname ^ ".";
-  let lex_dir = path // "assets" // "lex" in
-  if Sys.file_exists lex_dir then add_lex_dir lex_dir;
-  Plugin.assets := path // "assets";
-  Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
+  let lex_dir = Fpath.(path // ~$"assets" // ~$"lex") in
+  if File.file_exists lex_dir then add_lex_dir lex_dir;
+  (Plugin.assets := Fpath.(path // ~$"assets"));
+  Fun.protect ~finally:(fun () -> Plugin.assets := Fpath.empty) @@ fun () ->
   load_cmxs cmxs
 
 let load_plugins { path; unsafe; forced; collection } =
@@ -482,13 +486,15 @@ let load_plugins { path; unsafe; forced; collection } =
   else
     match Plugin.compute_dependencies path with
     | Ok deps ->
-        List.iter (fun d -> load_plugin ~unsafe ~forced (path // d)) deps
+        List.iter
+          (fun d -> load_plugin ~unsafe ~forced Fpath.(path // ~$d))
+          deps
     | Error cycle ->
         Logs.err (fun k ->
             k
               "Cycle found while computing dependencies of the plugin \
-               collection %S:@ %a"
-              path
+               collection %a:@ %a"
+              (Fmt.quote Fpath.pp) path
               Fmt.(list ~sep:(const string " -> ") string)
               cycle);
         exit 1
@@ -496,7 +502,7 @@ let load_plugins { path; unsafe; forced; collection } =
 let alias_lang lang =
   if String.length lang < 2 then lang
   else
-    let fname = Util.search_in_assets (Filename.concat "lang" "alias_lg.txt") in
+    let fname = Util.search_in_assets Fpath.(~$"lang" // ~$"alias_lg.txt") in
     try
       let ic = Secure.open_in fname in
       let lang =
@@ -573,7 +579,9 @@ let print_redirected conf from request new_addr =
 
 let nonce_private_key =
   Lazy.from_fun (fun () ->
-      let fname = Filename.concat !GWPARAM.cnt_dir "gwd_private.txt" in
+      let fname =
+        Fpath.to_string Fpath.(!GWPARAM.cnt_dir // ~$"gwd_private.txt")
+      in
       let k =
         try
           let ic = open_in fname in
@@ -744,7 +752,7 @@ let compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
 
 let get_actlog check_from utm from_addr base_password =
   let fname = !GWPARAM.adm_file "actlog" in
-  (if not (Sys.file_exists fname) then
+  (if not (File.file_exists fname) then
      let oc = Secure.open_out fname in
      close_out oc);
   try
@@ -930,7 +938,10 @@ let allowed_denied_titles key extra_line env base_env () =
       let fname = List.assoc key base_env in
       if fname = "" then []
       else
-        let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
+        let ic =
+          Secure.open_in
+            (Fpath.concat (Secure.base_dir ()) (Fpath.of_string fname))
+        in
         let rec loop set =
           let line, eof =
             try (input_line ic, false) with End_of_file -> ("", true)
@@ -1569,7 +1580,7 @@ let make_conf ~secret_salt from_addr request script_name env =
   let forced_plugins =
     List.fold_left
       (fun acc { path; forced; _ } ->
-        if forced then Filename.basename path :: acc else acc)
+        if forced then Fpath.basename path :: acc else acc)
       [] !plugins
     |> List.rev
   in
@@ -1673,7 +1684,7 @@ let make_conf ~secret_salt from_addr request script_name env =
         (try
            let x = List.assoc "auth_file" base_env in
            if x = "" then !auth_file
-           else Filename.concat (!GWPARAM.bpath base_file) x
+           else Fpath.to_string Fpath.(!GWPARAM.bpath base_file // ~$x)
          with Not_found -> !auth_file);
       border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
       n_connect = None;
@@ -1748,7 +1759,10 @@ let auth_err request auth_file =
   else
     let auth = Mutil.extract_param "authorization: " '\r' request in
     if auth <> "" then
-      match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
+      match
+        try Some (Secure.open_in (Fpath.of_string auth_file))
+        with Sys_error _ -> None
+      with
       | Some ic -> (
           let auth =
             let i = String.length "Basic " in
@@ -1937,16 +1951,12 @@ let match_strings regexp s =
 let excluded from =
   let efname = chop_extension Sys.argv.(0) ^ ".xcl" in
   try
-    let ic = open_in efname in
+    Compat.In_channel.with_open_text efname @@ fun ic ->
     let rec loop () =
       match input_line ic with
-      | line when match_strings line from ->
-          close_in ic;
-          true
+      | line when match_strings line from -> true
       | _ -> loop ()
-      | exception End_of_file ->
-          close_in ic;
-          false
+      | exception End_of_file -> false
     in
     loop ()
   with Sys_error _ -> false
@@ -1979,35 +1989,35 @@ let image_request conf script_name env =
 (* pouvoir inclure une css, un fichier javascript (etc) facilement *)
 (* et que le cache du navigateur puisse prendre le relais.         *)
 type misc_fname =
-  | Css of string
-  | Eot of string
-  | Js of string
-  | Json of string
-  | Map of string
-  | Otf of string
-  | Other of string
-  | Png of string
-  | Svg of string
-  | Woff2 of string
-  | CacheGz of string
+  | Css
+  | Eot
+  | Js
+  | Json
+  | Map
+  | Otf
+  | Other
+  | Png
+  | Svg
+  | Woff2
+  | CacheGz
 
 type content_encoding = No_encoding | Gzip | Brotli
 
-let content_misc conf len misc_fname encoding =
+let content_misc conf len misc path encoding =
   Output.status conf Code.OK;
-  let fname, t =
-    match misc_fname with
-    | Css fname -> (fname, "text/css; charset=UTF-8")
-    | Eot fname -> (fname, "application/font-eot")
-    | Js fname -> (fname, "text/javascript; charset=UTF-8")
-    | Json fname -> (fname, "application/json; charset=UTF-8")
-    | Map fname -> (fname, "application/json")
-    | Otf fname -> (fname, "application/font-otf")
-    | Other fname -> (fname, "text/plain")
-    | Png fname -> (fname, "image/png")
-    | Svg fname -> (fname, "application/font-svg")
-    | Woff2 fname -> (fname, "application/font-woff2")
-    | CacheGz fname -> (fname, "application/gzip")
+  let t =
+    match misc with
+    | Css -> "text/css; charset=UTF-8"
+    | Eot -> "application/font-eot"
+    | Js -> "text/javascript; charset=UTF-8"
+    | Json -> "application/json; charset=UTF-8"
+    | Map -> "application/json"
+    | Otf -> "application/font-otf"
+    | Other -> "text/plain"
+    | Png -> "image/png"
+    | Svg -> "application/font-svg"
+    | Woff2 -> "application/font-woff2"
+    | CacheGz -> "application/gzip"
   in
   Output.header conf "Content-type: %s" t;
   Output.header conf "Content-length: %d" len;
@@ -2020,39 +2030,34 @@ let content_misc conf len misc_fname encoding =
       Output.header conf "Content-encoding: br";
       Output.header conf "Vary: Accept-Encoding");
   Output.header conf "Content-disposition: inline; filename=%s"
-    (Filename.basename fname);
+    (Fpath.basename path);
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
   Output.flush conf
 
 let find_misc_file conf name =
   if
-    Sys.file_exists name
+    File.file_exists name
     && List.exists
-         (fun { path; _ } -> Mutil.start_with (path // "assets") 0 name)
+         (fun { path; _ } ->
+           let s = Fpath.to_string @@ Fpath.(path // ~$"assets") in
+           Mutil.start_with s 0 (Fpath.to_string name))
          !plugins
   then name
   else
-    let name' = !GWPARAM.etc_d conf.bname // name in
-    if Sys.file_exists name' then name'
+    let name' = Fpath.(!GWPARAM.etc_d conf.bname // name) in
+    if File.file_exists name' then name'
     else
-      let name' = Util.search_in_assets @@ Filename.concat "etc" name in
-      if Sys.file_exists name' then name' else ""
+      let name' = Util.search_in_assets @@ Fpath.(~$"etc" // name) in
+      if File.file_exists name' then name' else Fpath.empty
 
-let print_misc_file conf misc_fname encoding =
-  match misc_fname with
-  | Css fname
-  | Js fname
-  | Json fname
-  | Otf fname
-  | Svg fname
-  | Eot fname
-  | Woff2 fname
-  | CacheGz fname -> (
+let print_misc_file conf misc path encoding =
+  match misc with
+  | Css | Js | Json | Otf | Svg | Eot | Woff2 | CacheGz -> (
       try
-        let ic = Secure.open_in_bin fname in
+        Secure.with_open_in_bin path @@ fun ic ->
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
-        content_misc conf len misc_fname encoding;
+        content_misc conf len misc path encoding;
         let rec loop len =
           if len = 0 then ()
           else
@@ -2062,15 +2067,14 @@ let print_misc_file conf misc_fname encoding =
             loop (len - olen)
         in
         loop len;
-        close_in ic;
         true
       with Sys_error _ -> false)
-  | Other _ -> false
-  | Map fname | Png fname ->
-      let ic = Secure.open_in_bin fname in
+  | Other -> false
+  | Map | Png ->
+      Secure.with_open_in_bin path @@ fun ic ->
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
-      content_misc conf len misc_fname No_encoding;
+      content_misc conf len misc path No_encoding;
       let rec loop len =
         if len = 0 then ()
         else
@@ -2080,14 +2084,13 @@ let print_misc_file conf misc_fname encoding =
           loop (len - olen)
       in
       loop len;
-      close_in ic;
       true
 
 let misc_request conf request fname =
   let is_compressible =
     Filename.check_suffix fname ".js" || Filename.check_suffix fname ".css"
   in
-  let actual_fname, encoding =
+  let path, encoding =
     if is_compressible then
       let candidates =
         (if client_accepts_encoding request "br" then [ (".br", Brotli) ]
@@ -2096,29 +2099,30 @@ let misc_request conf request fname =
         if client_accepts_encoding request "gzip" then [ (".gz", Gzip) ] else []
       in
       let rec try_candidates = function
-        | [] -> (find_misc_file conf fname, No_encoding)
+        | [] -> (find_misc_file conf (Fpath.of_string fname), No_encoding)
         | (ext, enc) :: rest ->
-            let path = find_misc_file conf (fname ^ ext) in
-            if path <> "" then (path, enc) else try_candidates rest
+            let path = find_misc_file conf (Fpath.of_string (fname ^ ext)) in
+            if not @@ Fpath.is_empty path then (path, enc)
+            else try_candidates rest
       in
       try_candidates candidates
-    else (find_misc_file conf fname, No_encoding)
+    else (find_misc_file conf (Fpath.of_string fname), No_encoding)
   in
-  if actual_fname <> "" then
-    let misc_fname =
-      if Filename.check_suffix fname ".css" then Css actual_fname
-      else if Filename.check_suffix fname ".js" then Js actual_fname
-      else if Filename.check_suffix fname ".json" then Json actual_fname
-      else if Filename.check_suffix fname ".map" then Map actual_fname
-      else if Filename.check_suffix fname ".otf" then Otf actual_fname
-      else if Filename.check_suffix fname ".svg" then Svg actual_fname
-      else if Filename.check_suffix fname ".eot" then Eot actual_fname
-      else if Filename.check_suffix fname ".woff2" then Woff2 actual_fname
-      else if Filename.check_suffix fname ".png" then Png actual_fname
-      else if Filename.check_suffix fname ".cache.gz" then CacheGz actual_fname
-      else Other actual_fname
+  if not @@ Fpath.is_empty path then
+    let misc =
+      if Filename.check_suffix fname ".css" then Css
+      else if Filename.check_suffix fname ".js" then Js
+      else if Filename.check_suffix fname ".json" then Json
+      else if Filename.check_suffix fname ".map" then Map
+      else if Filename.check_suffix fname ".otf" then Otf
+      else if Filename.check_suffix fname ".svg" then Svg
+      else if Filename.check_suffix fname ".eot" then Eot
+      else if Filename.check_suffix fname ".woff2" then Woff2
+      else if Filename.check_suffix fname ".png" then Png
+      else if Filename.check_suffix fname ".cache.gz" then CacheGz
+      else Other
     in
-    print_misc_file conf misc_fname encoding
+    print_misc_file conf misc path encoding
   else false
 
 let strip_quotes s =
@@ -2318,22 +2322,23 @@ let geneweb_server ~predictable_mode () =
   gw_prefix: %s
   etc_prefix: %s
   images_prefix: %s
-  images_dir: %s
+  images_dir: %a
   secure asset: %a|}
                   Version.src Version.branch Version.commit_id Sys.argv.(0)
                   (Sys.getcwd ()) (Option.get !gw_prefix)
                   (Option.get !etc_prefix)
                   (Option.get !images_prefix)
-                  !images_dir
-                  Fmt.(box @@ brackets @@ list ~sep:comma string)
+                  Fpath.pp !images_dir
+                  Fmt.(box @@ brackets @@ list ~sep:comma Fpath.pp)
                   (Secure.assets ())))
         in
         let () =
-          try
-            Filesystem.create_dir ~parent:true ~required_perm:0o755
-              !GWPARAM.cnt_dir
+          try File.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
           with Sys_error e ->
-            Logs.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
+            Logs.err (fun k ->
+                k "failure creating %s:@ %s"
+                  (Fpath.to_string !GWPARAM.cnt_dir)
+                  e)
         in
         (* A secret salt is added to the environment to ensure that workers
            use the same salt for digests on both Unix and Windows platforms. *)
@@ -2374,7 +2379,8 @@ let manage_cgi_timeout tmout =
 
 let geneweb_cgi ~secret_salt addr script_name contents =
   if Sys.unix then manage_cgi_timeout !conn_timeout;
-  (try Unix.mkdir !GWPARAM.cnt_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
+  (try File.create_dir ~required_perm:0o755 !GWPARAM.cnt_dir
+   with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
     try
       let v = Sys.getenv x in
@@ -2436,11 +2442,11 @@ let slashify s =
   String.init (String.length s) conv_char
 
 let make_sock_dir x =
-  Filesystem.create_dir ~parent:true x;
+  File.create_dir ~parent:true x;
   if Sys.unix then ()
   else (
-    Server.sock_in := Filename.concat x "gwd.sin";
-    Server.sock_out := Filename.concat x "gwd.sou");
+    Server.sock_in := Fpath.to_string Fpath.(x // ~$"gwd.sin");
+    Server.sock_out := Fpath.to_string Fpath.(x // ~$"gwd.sou"));
   GWPARAM.sock_dir := x
 
 let arg_plugin_doc opt doc =
@@ -2467,6 +2473,7 @@ let arg_plugin opt doc =
     Arg.Unit
       (fun () ->
         let unsafe, forced, path = arg_plugin_aux () in
+        let path = Fpath.of_string path in
         plugins := !plugins @ [ { path; unsafe; forced; collection = false } ]),
     arg_plugin_doc opt doc )
 
@@ -2475,6 +2482,7 @@ let arg_plugins opt doc =
     Arg.Unit
       (fun () ->
         let unsafe, forced, path = arg_plugin_aux () in
+        let path = Fpath.of_string path in
         plugins := !plugins @ [ { path; unsafe; forced; collection = true } ]),
     arg_plugin_doc opt doc )
 
@@ -2525,13 +2533,13 @@ let parse_cmd () =
            installed (default if empty is %S)."
           default_gw_prefix );
       ( "-bd",
-        Arg.String Secure.set_base_dir,
+        Arg.String (fun s -> Secure.set_base_dir (Fpath.of_string s)),
         Fmt.str
-          "<DIR> Specify where the “bases” directory with databases is \
+          "<DIR> Specify where the \"bases\" directory with databases is \
            installed (default if empty is %S)."
           (Dirs.name Secure.default_base_dir) );
       ( "-wd",
-        Arg.String make_sock_dir,
+        Arg.String (fun s -> make_sock_dir (Fpath.of_string s)),
         "<DIR> Directory for socket communication (Windows) and access count."
       );
       ( "-cache_langs",
@@ -2548,7 +2556,7 @@ let parse_cmd () =
         Arg.String
           (fun x ->
             set_etc_prefix x;
-            Secure.add_assets x),
+            Secure.add_assets (Fpath.of_string x)),
         "<DIR> Specify where the “etc” directory is installed (default if \
          empty is [-hd value]/etc)." );
       ( "-images_prefix",
@@ -2556,7 +2564,7 @@ let parse_cmd () =
         "<DIR> Specify where the “images” directory is installed (default if \
          empty is [-hd value]/images)." );
       ( "-images_dir",
-        Arg.String (fun x -> images_dir := x),
+        Arg.String (fun x -> images_dir := Fpath.of_string x),
         "<DIR> Same than previous but directory name relative to current." );
       ( "-a",
         Arg.String (fun x -> selected_addr := Some x),
@@ -2601,7 +2609,7 @@ let parse_cmd () =
         Arg.Set use_auth_digest_scheme,
         " Use Digest authorization scheme (more secure on passwords)" );
       ( "-add_lexicon",
-        Arg.String (Mutil.list_ref_append lexicon_list),
+        Arg.String (fun s -> lexicon_list := Fpath.of_string s :: !lexicon_list),
         "<FILE> Add file as lexicon." );
       ( "-particles",
         Arg.String (fun x -> Mutil.particles_file := x),
@@ -2743,8 +2751,8 @@ let main () =
   List.iter
     (fun dbn ->
       Logs.info (fun k -> k "Caching database %s in memory… %!" dbn);
-      let dbn = !GWPARAM.bpath dbn in
-      Driver.load_database dbn)
+      let bpath = !GWPARAM.bpath dbn in
+      Driver.load_database bpath)
     !cache_databases;
   if !auth_file <> "" && !force_cgi then
     Logs.warn (fun k ->
@@ -2754,10 +2762,11 @@ let main () =
            file");
   if !use_auth_digest_scheme && !force_cgi then
     Logs.warn (fun k -> k "-digest option is not compatible with CGI mode.");
-  (if !images_dir <> "" then
+  (if not @@ Fpath.is_empty !images_dir then
      let abs_dir =
        let f =
-         Util.search_in_assets (Filename.concat !images_dir "gwback.jpg")
+         Fpath.to_string
+           (Util.search_in_assets Fpath.(!images_dir // ~$"gwback.jpg"))
        in
        let d = Filename.dirname f in
        if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
@@ -2768,7 +2777,9 @@ let main () =
   if !Mutil.particles_file = "" then
     Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
   Server.stop_server :=
-    List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
+    List.fold_left Filename.concat
+      (Fpath.to_string !GWPARAM.cnt_dir)
+      [ "STOP_SERVER" ];
   let query, cgi =
     try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
     with Not_found -> ("" |> Adef.encoded, !force_cgi)

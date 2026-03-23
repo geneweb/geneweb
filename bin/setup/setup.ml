@@ -1,6 +1,9 @@
 open Geneweb
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
+module Compat = Geneweb_compat
 
 let port = ref 2316
 let gwd_port = ref 2317
@@ -407,30 +410,16 @@ let nth_field s n =
   in
   loop 0 0
 
-let file_contents fname =
-  try
-    let ic = open_in fname in
-    let rec loop len =
-      match try Some (input_char ic) with End_of_file -> None with
-      | Some '\r' -> loop len
-      | Some c -> loop (Buff.store len c)
-      | None ->
-          close_in ic;
-          Buff.get len
-    in
-    loop 0
-  with Sys_error _ -> ""
-
 let cut_at_equal s =
-  match String.index_opt s '=' with
-  | Some i ->
-      (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
-  | None -> (s, "")
+  match String.index s '=' with
+  | exception Not_found -> (s, "")
+  | i -> (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
 
 let loc_read_base_env bname =
-  let fname = !GWPARAM.config bname in
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic ->
+  match File.open_in_text (!GWPARAM.config bname) with
+  | exception Sys_error _ -> []
+  | ic ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
       let rec loop env =
         match try Some (input_line ic) with End_of_file -> None with
         | None ->
@@ -446,7 +435,6 @@ let loc_read_base_env bname =
             else loop (cut_at_equal s :: env)
       in
       loop []
-  | None -> []
 
 let rec split_string acc s =
   if String.length s < 80 then acc ^ s
@@ -536,8 +524,9 @@ let rec copy_from_stream conf print strm =
               (* see r *)
               let in_file = get_variable strm in
               let s =
-                file_contents
+                Compat.In_channel.with_open_text
                   (slashify_linux_dos (!bin_dir ^ "/setup/" ^ in_file))
+                  Compat.In_channel.input_all
               in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
               GWPARAM.test_reorg in_base;
@@ -1264,7 +1253,8 @@ let cleanup_1 conf =
     Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
     Printf.eprintf "$ rmdir old\\%s\n" in_base_dir);
   flush stderr;
-  Mutil.rm_rf (Filename.concat "old" in_base_dir);
+  File.remove ~force:true ~recursive:true
+    (Fpath.of_string (Filename.concat "old" in_base_dir));
   if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
   else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
   flush stderr;
@@ -1336,9 +1326,9 @@ let rename conf =
   let rename_cnt_files k v =
     (* we assume that etc/bname/cache has been renamed *)
     let dir = !GWPARAM.cnt_d k in
-    Printf.eprintf "Rename cnt files in %s\n" dir;
+    Printf.eprintf "Rename cnt files in %s\n" (Fpath.to_string dir);
     flush stderr;
-    let files = Sys.readdir dir in
+    let files = File.readdir dir in
     Array.iter
       (fun filename ->
         let k1 = k ^ "_" in
@@ -1348,13 +1338,14 @@ let rename conf =
             String.sub filename (String.length k1)
               (String.length filename - String.length k1)
           in
-          let old_path = Filename.concat dir filename in
-          let new_path = Filename.concat dir (v1 ^ suffix) in
+          let dir_s = Fpath.to_string dir in
+          let old_path = Filename.concat dir_s filename in
+          let new_path = Filename.concat dir_s (v1 ^ suffix) in
           Unix.rename old_path new_path;
           if Filename.remove_extension filename = k then
             let ext = Filename.extension filename in
-            let old_path = Filename.concat dir filename in
-            let new_path = Filename.concat dir (v ^ ext) in
+            let old_path = Filename.concat dir_s filename in
+            let new_path = Filename.concat dir_s (v ^ ext) in
             Unix.rename old_path new_path))
       files
   in
@@ -1375,12 +1366,18 @@ let rename conf =
                 Sys.rename (k ^ ".gwb") (v ^ ".gwb");
               if Sys.file_exists (k ^ ".gwf") then
                 Sys.rename (k ^ ".gwf") (v ^ ".gwf");
-              if Sys.file_exists (!GWPARAM.etc_d k) then
-                Sys.rename (!GWPARAM.etc_d k) (!GWPARAM.etc_d v);
-              if Sys.file_exists (!GWPARAM.src_d k) then
-                Sys.rename (!GWPARAM.src_d k) (!GWPARAM.src_d v);
-              if Sys.file_exists (!GWPARAM.portraits_d k) then
-                Sys.rename (!GWPARAM.portraits_d k) (!GWPARAM.portraits_d v)
+              if File.file_exists (!GWPARAM.etc_d k) then
+                Sys.rename
+                  (Fpath.to_string (!GWPARAM.etc_d k))
+                  (Fpath.to_string (!GWPARAM.etc_d v));
+              if File.file_exists (!GWPARAM.src_d k) then
+                Sys.rename
+                  (Fpath.to_string (!GWPARAM.src_d k))
+                  (Fpath.to_string (!GWPARAM.src_d v));
+              if File.file_exists (!GWPARAM.portraits_d k) then
+                Sys.rename
+                  (Fpath.to_string (!GWPARAM.portraits_d k))
+                  (Fpath.to_string (!GWPARAM.portraits_d v))
             end;
             rename_cnt_files k v
           with Sys_error msg ->
@@ -1405,7 +1402,11 @@ let rename conf =
 let delete conf = print_file conf "delete_1.htm"
 
 let delete_1 conf =
-  List.iter (fun (k, v) -> if v = "del" then Mutil.rm_rf (k ^ ".gwb")) conf.env;
+  List.iter
+    (fun (k, v) ->
+      if v = "del" then
+        File.remove ~force:true ~recursive:true (Fpath.of_string (k ^ ".gwb")))
+    conf.env;
   print_file conf "delete_ok.htm"
 
 let merge conf =
@@ -1496,11 +1497,16 @@ let gwf conf =
     let benv = loc_read_base_env in_base in
     let trailer =
       if !GWPARAM.reorg then
-        Filename.concat (!GWPARAM.lang_d in_base "") (in_base ^ ".trl")
+        Filename.concat
+          (Fpath.to_string (!GWPARAM.lang_d in_base ""))
+          (in_base ^ ".trl")
       else
-        Filename.concat "lang" (in_base ^ ".trl")
-        |> file_contents |> Util.escape_html
-        |> fun s -> (s :> string)
+        let s =
+          Compat.In_channel.with_open_text
+            (Filename.concat "lang" (in_base ^ ".trl"))
+            Compat.In_channel.input_all
+        in
+        (Util.escape_html s :> string)
     in
     let conf = { conf with env = benv @ (("trailer", trailer) :: conf.env) } in
     print_file conf "gwf_1.htm"
@@ -1514,47 +1520,37 @@ let gwf_1 conf =
   GWPARAM.test_reorg in_base;
   let benv = loc_read_base_env in_base in
   let vars, _ = variables "gwf_1.htm" in
-  let oc =
-    open_out
-      (if !GWPARAM.reorg then
-         Filename.concat (!GWPARAM.bpath in_base) in_base ^ ".gwf"
-       else in_base ^ ".gwf")
-  in
   let body_prop =
     match p_getenv conf.env "proposed_body_prop" with
     | Some "" | None -> s_getenv conf.env "body_prop"
     | Some x -> x
   in
-  Printf.fprintf oc "# File generated by \"setup\"\n\n";
-  List.iter
-    (fun k ->
-      match k with
-      | "body_prop" ->
-          if body_prop = "" then ()
-          else Printf.fprintf oc "body_prop=%s\n" body_prop
-      | _ -> Printf.fprintf oc "%s=%s\n" k (s_getenv conf.env k))
-    vars;
-  List.iter
-    (fun (k, v) ->
-      if List.mem k vars then () else Printf.fprintf oc "%s=%s\n" k v)
-    benv;
-  close_out oc;
+  File.with_open_out_text (!GWPARAM.config in_base) (fun oc ->
+      Printf.fprintf oc "# File generated by \"setup\"\n\n";
+      List.iter
+        (fun k ->
+          match k with
+          | "body_prop" ->
+              if body_prop = "" then ()
+              else Printf.fprintf oc "body_prop=%s\n" body_prop
+          | _ -> Printf.fprintf oc "%s=%s\n" k (s_getenv conf.env k))
+        vars;
+      List.iter
+        (fun (k, v) ->
+          if List.mem k vars then () else Printf.fprintf oc "%s=%s\n" k v)
+        benv);
   let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
-
   let trl_dir = !GWPARAM.etc_d in_base in
-  let trl_file = Filename.concat trl_dir "trl.txt" in
-  try Unix.mkdir trl_dir 0o755
-  with Unix.Unix_error (_, _, _) ->
-    ();
-    (try
-       if trl = "" then Sys.remove trl_file
-       else
-         let oc = open_out trl_file in
-         output_string oc trl;
-         output_string oc "\n";
-         close_out oc
-     with Sys_error _ -> ());
-    print_file conf "gwf_ok.htm"
+  let trl_file = Fpath.(trl_dir // ~$"trl.txt") in
+  (try File.create_dir trl_dir with Unix.Unix_error (_, _, _) -> ());
+  (try
+     if trl = "" then File.remove trl_file
+     else
+       File.with_open_out_text trl_file (fun oc ->
+           output_string oc trl;
+           output_string oc "\n")
+   with Sys_error _ -> ());
+  print_file conf "gwf_ok.htm"
 
 let gwd conf =
   let aenv = read_gwd_arg () in
@@ -1954,7 +1950,7 @@ let intro () =
         else (!default_lang, !default_lang)
     else (!default_lang, !default_lang)
   in
-  Secure.set_base_dir ".";
+  Secure.set_base_dir (Fpath.of_string ".");
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
   Printf.eprintf "Start gwsetup\n";

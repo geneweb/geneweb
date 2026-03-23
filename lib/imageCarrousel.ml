@@ -8,13 +8,15 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
-let cp = Filesystem.copy_file ~perm:0o666
+let cp = File.copy_file ~perm:0o666
 
 let rn fname s =
-  try if Sys.file_exists fname then Sys.rename fname s
+  try if File.file_exists fname then File.rename fname s
   with Failure _ ->
-    Printf.eprintf "Rn failed: %s to %s\n" fname s;
+    Format.eprintf "Rn failed: %a to %a\n" Fpath.pp fname Fpath.pp s;
     flush stderr
 
 type image_type = JPEG | GIF | PNG
@@ -74,21 +76,22 @@ let write_file fname content =
 
 let move_file_to_save dir file =
   try
-    let save_dir = Filename.concat dir "saved" in
-    Filesystem.create_dir ~parent:true save_dir;
-    let fname = Filename.basename file in
-    let orig_file = Filename.concat dir fname in
-    if not (Sys.file_exists orig_file) then
-      raise (Sys_error (Printf.sprintf "File not found: %s" orig_file));
-    let saved_file = Filename.concat save_dir fname in
-    if Sys.file_exists saved_file then Mutil.rm saved_file;
-    rn orig_file saved_file;
+    let save_dir = Fpath.(dir // ~$"saved") in
+    File.create_dir ~parent:true save_dir;
+    let fname = Fpath.basename file in
+    let orig_file = Fpath.(dir // ~$fname) in
+    if not (File.file_exists orig_file) then
+      raise
+        (Sys_error (Format.asprintf "File not found: %a" Fpath.pp orig_file));
+    let saved_file = Fpath.(save_dir // ~$fname) in
+    if File.file_exists saved_file then File.remove saved_file;
+    File.rename orig_file saved_file;
     let extensions = [ ".txt"; ".src" ] in
     List.iter
       (fun ext ->
-        let orig_ext = Filename.remove_extension orig_file ^ ext in
-        let saved_ext = Filename.remove_extension saved_file ^ ext in
-        if Sys.file_exists orig_ext then rn orig_ext saved_ext)
+        let orig_ext = Fpath.replace_extension orig_file ext in
+        let saved_ext = Fpath.replace_extension saved_file ext in
+        if File.file_exists orig_ext then File.rename orig_ext saved_ext)
       extensions;
     1
   with
@@ -100,34 +103,31 @@ let move_file_to_save dir file =
 let create_blason_stop conf base p =
   let blason_dir = !GWPARAM.portraits_d conf.bname in
   let blason_stop =
-    String.concat Filename.dir_sep
-      [ blason_dir; Image.default_image_filename "blasons" base p ^ ".stop" ]
+    Fpath.(
+      blason_dir // ~$(Image.default_image_filename "blasons" base p ^ ".stop"))
   in
-  let oc = open_out blason_stop in
+  let oc = Secure.open_out blason_stop in
   close_out oc;
-  blason_stop
+  Fpath.to_string blason_stop
 
 let move_blason_file conf base src dst =
   let blason_dir = !GWPARAM.portraits_d conf.bname in
   let blason_src =
-    String.concat Filename.dir_sep
-      [ blason_dir; Image.get_blason_name conf base src ]
+    Fpath.(blason_dir // ~$(Image.get_blason_name conf base src))
   in
   if
     Image.has_blason conf base src true
-    && Sys.file_exists blason_src
+    && File.file_exists blason_src
     && not (Image.has_blason conf base dst true)
   then (
     let blason_dst =
-      String.concat Filename.dir_sep
-        [
-          blason_dir;
-          Image.default_image_filename "blasons" base dst
-          ^ Filename.extension blason_src;
-        ]
+      Fpath.(
+        blason_dir
+        // ~$(Image.default_image_filename "blasons" base dst
+             ^ Fpath.extension blason_src))
     in
-    rn blason_src blason_dst;
-    blason_dst)
+    File.rename blason_src blason_dst;
+    Fpath.to_string blason_dst)
   else ""
 
 let normal_image_type s =
@@ -191,7 +191,7 @@ let dump_bad_image conf s =
   | Some "yes" -> (
       try
         (* Where will "bad-image"end up? *)
-        let oc = Secure.open_out_bin "bad-image" in
+        let oc = Secure.open_out_bin (Fpath.of_string "bad-image") in
         output_string oc s;
         flush oc;
         close_out oc
@@ -202,30 +202,36 @@ let dump_bad_image conf s =
 (* [| ".jpg"; ".jpeg"; ".png"; ".gif" |] *)
 
 let swap_files_aux dir file old_file =
-  let ext = Filename.extension file in
-  let old_ext = Filename.extension old_file in
-  let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
+  let ext = Fpath.extension file in
+  let old_ext = Fpath.extension old_file in
+  let tmp_file = Fpath.(dir // ~$"tempfile.tmp") in
   if ext <> old_ext then (
-    rn file (Filename.remove_extension old_file ^ ext);
-    rn old_file (Filename.remove_extension file ^ old_ext))
+    rn file
+      (Fpath.of_string
+         (Fpath.to_string (Fpath.remove_extension old_file) ^ ext));
+    rn old_file
+      (Fpath.of_string
+         (Fpath.to_string (Fpath.remove_extension file) ^ old_ext)))
   else (
     rn file tmp_file;
     rn old_file file;
     rn tmp_file old_file)
 
 let swap_files file old_file =
-  let dir = Filename.dirname file in
+  let dir = Fpath.dirname file in
   swap_files_aux dir file old_file;
-  let txt_file = Filename.remove_extension file ^ ".txt" in
-  let old_file = Filename.remove_extension old_file ^ ".txt" in
+  let txt_file = Fpath.replace_extension file ".txt" in
+  let old_file = Fpath.replace_extension old_file ".txt" in
   swap_files_aux dir txt_file old_file;
-  let src_file = Filename.remove_extension file ^ ".src" in
-  let old_file = Filename.remove_extension old_file ^ ".src" in
+  let src_file = Fpath.replace_extension file ".src" in
+  let old_file = Fpath.replace_extension old_file ".src" in
   swap_files_aux dir src_file old_file
 
 let clean_saved_portrait file =
   let file = Filename.remove_extension file in
-  Array.iter (fun ext -> Mutil.rm (file ^ ext)) Image.ext_list_1
+  Array.iter
+    (fun ext -> File.remove ~force:true (Fpath.of_string (file ^ ext)))
+    Image.ext_list_1
 
 (* TODO merge with Image.file_without_extension *)
 let get_extension conf keydir mode saved fname =
@@ -237,18 +243,19 @@ let get_extension conf keydir mode saved fname =
   let dir =
     match mode with
     | "portraits" | "blasons" -> !GWPARAM.portraits_d conf.bname
-    | _ -> Filename.concat (!GWPARAM.images_d conf.bname) keydir
+    | _ -> Fpath.(!GWPARAM.images_d conf.bname // ~$keydir)
   in
   let f =
-    if saved then String.concat Filename.dir_sep [ dir; "saved"; fname ]
-    else Filename.concat dir fname
+    if saved then Fpath.(dir // ~$"saved" // ~$fname)
+    else Fpath.(dir // ~$fname)
   in
-  if Sys.file_exists (f ^ ".jpg") then ".jpg"
-  else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
-  else if Sys.file_exists (f ^ ".png") then ".png"
-  else if Sys.file_exists (f ^ ".gif") then ".gif"
-  else if Sys.file_exists (f ^ ".url") then ".url"
-  else if Sys.file_exists (f ^ ".stop") then ".stop"
+  let f_str = Fpath.to_string f in
+  if Sys.file_exists (f_str ^ ".jpg") then ".jpg"
+  else if Sys.file_exists (f_str ^ ".jpeg") then ".jpeg"
+  else if Sys.file_exists (f_str ^ ".png") then ".png"
+  else if Sys.file_exists (f_str ^ ".gif") then ".gif"
+  else if Sys.file_exists (f_str ^ ".url") then ".url"
+  else if Sys.file_exists (f_str ^ ".stop") then ".stop"
   else "."
 
 (* ************************************************************************ *)
@@ -370,12 +377,13 @@ let effective_send_ok conf base p file =
       !GWPARAM.portraits_d conf.bname
     else !GWPARAM.images_d conf.bname
   in
-  Filesystem.create_dir ~parent:true dir;
+  File.create_dir ~parent:true dir;
   let fname =
-    Filename.concat dir
-      (if mode = "portraits" || mode = "blasons" then
-         fname ^ extension_of_type typ
-       else fname)
+    Fpath.(
+      dir
+      // ~$(if mode = "portraits" || mode = "blasons" then
+              fname ^ extension_of_type typ
+            else fname))
   in
   let _moved = move_file_to_save dir fname in
   write_file fname content;
@@ -460,14 +468,15 @@ let effective_send_c_ok conf base p file file_name =
   let dir =
     if mode = "portraits" || mode = "blasons" then
       !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
+    else Fpath.(!GWPARAM.images_d conf.bname // ~$keydir)
   in
-  Filesystem.create_dir ~parent:true dir;
+  File.create_dir ~parent:true dir;
   let fname =
-    Filename.concat dir
-      (if mode = "portraits" || mode = "blasons" then
-         keydir ^ extension_of_type typ
-       else file_name)
+    Fpath.(
+      dir
+      // ~$(if mode = "portraits" || mode = "blasons" then
+              keydir ^ extension_of_type typ
+            else file_name))
   in
   (* move pre-existing file to saved *)
   if mode = "portraits" || mode = "blasons" then
@@ -484,47 +493,52 @@ let effective_send_c_ok conf base p file file_name =
             Image.default_image_filename "portraits" base p
           else Image.default_image_filename "blasons" base p
         in
-        let dir = Filename.concat dir "saved" in
-        Filesystem.create_dir ~parent:true dir;
-        let fname = Filename.concat dir fname ^ ".url" in
+        let dir = Fpath.(dir // ~$"saved") in
+        File.create_dir ~parent:true dir;
+        let fname =
+          Fpath.of_string (Fpath.to_string Fpath.(dir // ~$fname) ^ ".url")
+        in
         try write_file fname url
         with _ ->
           incorrect conf
-            (Printf.sprintf "effective send (effective send url portrait %s)"
-               fname)
+            (Format.asprintf "effective send (effective send url portrait %a)"
+               Fpath.pp fname)
         (* TODO update person to supress url image *))
     | _ -> ()
   else if content <> "" then
-    if Sys.file_exists fname then
+    if File.file_exists fname then
       if move_file_to_save dir fname = 0 then
         incorrect conf "effective send (image)";
   let fname =
-    if image_url <> "" then Filename.concat dir image_name ^ ".url" else fname
+    if image_url <> "" then
+      Fpath.of_string (Fpath.to_string Fpath.(dir // ~$image_name) ^ ".url")
+    else fname
   in
   if content <> "" then
     try write_file fname content
     with _ ->
       incorrect conf
-        (Printf.sprintf "effective send (writing content file %s)" fname)
+        (Format.asprintf "effective send (writing content file %a)" Fpath.pp
+           fname)
   else if image_url <> "" then
     try write_file fname image_url
     with _ ->
       incorrect conf
-        (Printf.sprintf "effective send (writing .url file %s)" fname)
+        (Format.asprintf "effective send (writing .url file %a)" Fpath.pp fname)
   else ();
   if note <> Adef.safe "" then
-    let fname = Filename.remove_extension fname ^ ".txt" in
+    let fname = Fpath.replace_extension fname ".txt" in
     try write_file fname (note :> string)
     with _ ->
       incorrect conf
-        (Printf.sprintf "effective send (writing .txt file %s)" fname)
+        (Format.asprintf "effective send (writing .txt file %a)" Fpath.pp fname)
   else ();
   if source <> Adef.safe "" then
-    let fname = Filename.remove_extension fname ^ ".src" in
+    let fname = Fpath.replace_extension fname ".src" in
     try write_file fname (source :> string)
     with _ ->
       incorrect conf
-        (Printf.sprintf "effective send (writing .txt file %s)" fname)
+        (Format.asprintf "effective send (writing .src file %a)" Fpath.pp fname)
   else ();
   let changed =
     U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
@@ -594,7 +608,7 @@ let effective_delete_ok conf base p =
   let fname = Image.default_image_filename "portraits" base p in
   let ext = get_extension conf fname mode false fname in
   let dir = !GWPARAM.portraits_d conf.bname in
-  if move_file_to_save (fname ^ ext) dir = 0 then
+  if move_file_to_save dir (Fpath.of_string (fname ^ ext)) = 0 then
     incorrect conf "effective delete (ok)";
   let changed =
     U_Delete_image (Util.string_gen_person base (Driver.gen_person_of_person p))
@@ -639,25 +653,28 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
   let dir =
     if mode = "portraits" || mode = "blasons" then
       !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
+    else Fpath.(!GWPARAM.images_d conf.bname // ~$keydir)
   in
-  Filesystem.create_dir ~parent:true dir;
+  File.create_dir ~parent:true dir;
   (* TODO verify we dont destroy a saved image
       having the same name as portrait! *)
-  let orig_file =
-    if delete then String.concat Filename.dir_sep [ dir; "saved"; fname ]
-    else Filename.concat dir fname
+  let orig_file_path =
+    if delete then Fpath.(dir // ~$"saved" // ~$fname)
+    else Fpath.(dir // ~$fname)
   in
-  let orig_file =
-    if Filename.extension orig_file = ".url" && Sys.file_exists orig_file then
-      orig_file
-    else Filename.remove_extension orig_file |> Image.find_file_without_ext
+  let orig_file_path =
+    if
+      Fpath.extension orig_file_path = ".url" && File.file_exists orig_file_path
+    then orig_file_path
+    else Image.find_file_without_ext (Fpath.remove_extension orig_file_path)
   in
   (* FIXME basename *)
-  let file = Filename.basename orig_file in
-  if orig_file = "" then incorrect conf "empty file name"
+  let file = Fpath.of_string @@ Fpath.basename orig_file_path in
+  if Fpath.is_empty orig_file_path then incorrect conf "empty file name"
     (* if delete is on, we are talking about saved files *)
-  else if delete then Mutil.rm orig_file (* is it needed ?, move should do it *)
+  else if delete then
+    File.remove ~force:true
+      orig_file_path (* is it needed ?, move should do it *)
   else if move_file_to_save dir file = 0 then
     incorrect conf "effective delete (c_ok)";
   let changed =
@@ -677,9 +694,7 @@ let effective_copy_portrait_to_blason conf base p =
   in
   let keydir = Image.default_image_filename "portraits" base p in
   let create_url_file keydir url =
-    let fname =
-      Filename.concat (!GWPARAM.images_d conf.bname) (keydir ^ ".url")
-    in
+    let fname = Fpath.(!GWPARAM.images_d conf.bname // ~$(keydir ^ ".url")) in
     let oc = Secure.open_out_bin fname in
     output_string oc url;
     flush oc;
@@ -690,26 +705,26 @@ let effective_copy_portrait_to_blason conf base p =
   let fname, url =
     match Image.src_of_string conf (Driver.sou base (Driver.get_image p)) with
     | `Url u -> (create_url_file keydir u, true)
-    | _ -> (Image.default_image_filename "portraits" base p, false)
+    | _ ->
+        ( Fpath.of_string (Image.default_image_filename "portraits" base p),
+          false )
   in
   let ext =
-    if url then ".url" else get_extension conf keydir mode false fname
+    if url then ".url"
+    else get_extension conf keydir mode false (Fpath.to_string fname)
   in
-  let portrait_filename =
-    String.concat Filename.dir_sep [ dir; keydir ^ ext ]
-  in
+  let portrait_filename = Fpath.(dir // ~$(keydir ^ ext)) in
   let blason_filename =
-    String.concat Filename.dir_sep
-      [ dir; Image.default_image_filename "blasons" base p ^ ext ]
+    Fpath.(dir // ~$(Image.default_image_filename "blasons" base p ^ ext))
   in
   let has_blason_self = Image.has_blason conf base p true in
   (* attention, xxx.url has to be removed too *)
   let _deleted =
     (if has_blason_self then
        effective_delete_c_ok conf base
-         ~f_name:(Filename.basename blason_filename)
+         ~f_name:(Fpath.basename blason_filename)
          p
-     else "OK")
+     else "")
     <> ""
   in
   cp portrait_filename blason_filename;
@@ -726,25 +741,20 @@ let effective_copy_image_to_blason conf base p =
   let keydir = Image.default_image_filename "portraits" base p in
   let ext = Filename.extension fname in
   let blason_filename =
-    String.concat Filename.dir_sep
-      [
-        Image.portrait_folder conf;
-        Image.default_image_filename "blasons" base p ^ ext;
-      ]
+    Fpath.(
+      Image.portrait_folder conf
+      // ~$(Image.default_image_filename "blasons" base p ^ ext))
   in
   let has_blason_self = Image.has_blason conf base p true in
   let _deleted =
     (if has_blason_self then
        effective_delete_c_ok conf base
-         ~f_name:(Filename.basename blason_filename)
+         ~f_name:(Fpath.basename blason_filename)
          p
-     else "OK")
+     else "")
     <> ""
   in
-  let fname =
-    String.concat Filename.dir_sep
-      [ Image.carrousel_folder conf; keydir; fname ]
-  in
+  let fname = Fpath.(Image.carrousel_folder conf // ~$keydir // ~$fname) in
   cp fname blason_filename;
   History.record conf base
     (U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p)))
@@ -784,17 +794,16 @@ let effective_reset_c_ok conf base p =
   let dir =
     if mode = "portraits" || mode = "blasons" then
       !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
+    else Fpath.(!GWPARAM.images_d conf.bname // ~$keydir)
   in
   let file_in_new =
-    if ext <> "." then Filename.concat dir (file_name_no_ext ^ ext)
-    else Filename.concat dir (file_name_no_ext ^ old_ext)
+    if ext <> "." then Fpath.(dir // ~$(file_name_no_ext ^ ext))
+    else Fpath.(dir // ~$(file_name_no_ext ^ old_ext))
   in
   let file_in_old =
     if old_ext <> "." then
-      String.concat Filename.dir_sep
-        [ dir; "saved"; file_name_no_ext ^ old_ext ]
-    else String.concat Filename.dir_sep [ dir; "saved"; file_name_no_ext ^ ext ]
+      Fpath.(dir // ~$"saved" // ~$(file_name_no_ext ^ old_ext))
+    else Fpath.(dir // ~$"saved" // ~$(file_name_no_ext ^ ext))
   in
   swap_files file_in_new file_in_old;
   let changed =
@@ -866,11 +875,10 @@ let print_main_c conf base =
                       | None -> ""
                     else ""
                 | "PORTRAIT_TO_BLASON" ->
-                    Filename.basename
+                    Fpath.basename
                       (effective_copy_portrait_to_blason conf base p)
                 | "IMAGE_TO_BLASON" ->
-                    Filename.basename
-                      (effective_copy_image_to_blason conf base p)
+                    Fpath.basename (effective_copy_image_to_blason conf base p)
                 | "BLASON_STOP" ->
                     let has_blason_self = Image.has_blason conf base p true in
                     let has_blason = Image.has_blason conf base p false in

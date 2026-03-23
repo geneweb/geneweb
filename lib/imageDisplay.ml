@@ -8,6 +8,7 @@ let src = Logs.Src.create ~doc:"ImageDisplay" __MODULE__
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Code = Geneweb_http.Code
+module Fpath = Geneweb_fs.Fpath
 
 let print_placeholder_gendered_portrait conf p size =
   let image, alt =
@@ -42,12 +43,13 @@ let content conf ct len fname =
   Output.flush conf
 
 let print_image_file conf fname =
+  let fname_str = Fpath.to_string fname in
   let res =
     List.find_opt
       (fun (suff, _ctype) ->
         if
-          Filename.check_suffix fname suff
-          || Filename.check_suffix fname (String.uppercase_ascii suff)
+          Filename.check_suffix fname_str suff
+          || Filename.check_suffix fname_str (String.uppercase_ascii suff)
         then true
         else false)
       [
@@ -64,14 +66,14 @@ let print_image_file conf fname =
   match res with
   | None ->
       Error
-        (Format.sprintf "Could not find mime type from extension for file: %s"
-           fname)
+        (Format.asprintf "Could not find mime type from extension for file: %a"
+           Fpath.pp fname)
   | Some (_suff, ctype) -> (
       try
         let ic = Secure.open_in_bin fname in
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
-        content conf ctype len fname;
+        content conf ctype len fname_str;
         let rec loop len =
           if len = 0 then ()
           else
@@ -85,7 +87,7 @@ let print_image_file conf fname =
         Ok ()
       with Sys_error e ->
         Log.err (fun k ->
-            k "Error printing image file content for %s : %s" fname e);
+            k "Error printing image file content for %a : %s" Fpath.pp fname e);
         Error e)
 
 (* ************************************************************************** *)
@@ -141,8 +143,11 @@ let print_blason_aux conf base p =
 
 let print_source conf f =
   let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
-  let fname = Filename.concat (!GWPARAM.images_d conf.bname) fname in
-  if (conf.wizard || conf.friend) || Image.is_not_private_img conf fname then
+  let fname = Fpath.(!GWPARAM.images_d conf.bname // ~$fname) in
+  if
+    (conf.wizard || conf.friend)
+    || Image.is_not_private_img conf (Fpath.to_string fname)
+  then
     Result.fold ~ok:ignore
       ~error:(fun _ -> Hutil.incorrect_request conf)
       (print_image_file conf fname)

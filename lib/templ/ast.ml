@@ -1,4 +1,5 @@
 module Compat = Geneweb_compat
+module Fpath = Geneweb_fs.Fpath
 
 type desc =
   | Atext of string
@@ -14,7 +15,7 @@ type desc =
   | Aop1 of string * t
   | Aop2 of string * t * t
   | Aint of string
-  | Ainclude of [ `File of string | `Raw of string ]
+  | Ainclude of [ `File of Geneweb_fs.Fpath.t | `Raw of string ]
   | Apack of t list
 
 and t = { desc : desc; loc : Loc.t }
@@ -84,7 +85,7 @@ and equal { desc = d1; loc = l1 } { desc = d2; loc = l2 } =
 
 let pp_source ppf src =
   match src with
-  | `File f -> Fmt.pf ppf "File (%s)" f
+  | `File f -> Fmt.pf ppf "File (%a)" Fpath.pp f
   | `Raw s -> Fmt.pf ppf "Raw (%s)" s
 
 let pp_list pp_elt = Fmt.(box ~indent:2 @@ brackets @@ list ~sep:semi pp_elt)

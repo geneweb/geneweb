@@ -3,7 +3,7 @@
 
 open Config
 
-val wiz_dir : config -> Geneweb_db.Driver.base -> string
+val wiz_dir : config -> Geneweb_db.Driver.base -> Geneweb_fs.Fpath.t
 (** Returns the path to the wizard notes files associated to the base. *)
 
 val print : config -> Geneweb_db.Driver.base -> unit
