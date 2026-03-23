@@ -115,6 +115,9 @@
               logs
               yojson
               fmt
+              syslog-message # shouldn't be necessary
+              tyxml
+              progress
             ]);
           };
         };

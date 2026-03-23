@@ -14,8 +14,7 @@ let parse_ast ~src lexbuf =
   let st = Lexer.State.create ~src lexbuf in
   Lexer.parse_ast (Buffer.create 1024) [] st lexbuf |> fst
 
-let parse_file ~src fl =
-  Compat.In_channel.with_open_text fl @@ fun ic ->
+let parse_ic ~src ic =
   (* We do not use position feature of the Lexing module as our lexer does not
      produce a single token per call. Instead, we rely on
      `lex_abs_pos`, `lex_start_pos` and `lex_curr_pos` of [lexbuf] to compute
@@ -23,11 +22,14 @@ let parse_file ~src fl =
   let lexbuf = Lexing.from_channel ~with_positions:false ic in
   parse_ast ~src lexbuf
 
+let parse_file ~src fl = Compat.In_channel.with_open_text fl (parse_ic ~src)
+
 let parse_source ~cached src =
   match src with
   | `File fl ->
       if cached then with_cache (parse_file ~src) fl else parse_file ~src fl
   | `Raw s -> parse_ast ~src (Lexing.from_string ~with_positions:false s)
+  | `In_channel ic -> parse_ic ~src ic
 
 let comment fl =
   let s =

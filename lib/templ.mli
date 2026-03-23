@@ -1,5 +1,5 @@
 module Ast = Geneweb_templ.Ast
-module Loc = Geneweb_templ.Loc
+module Loc = Geneweb_loc
 
 module Env : sig
   type 'a t

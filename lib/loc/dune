@@ -1,0 +1,4 @@
+(library
+ (package geneweb)
+ (name geneweb_loc)
+ (libraries geneweb_compat fmt pp_loc))

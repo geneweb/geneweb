@@ -8,7 +8,7 @@ let src = Logs.Src.create ~doc:"Perso" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
-module Loc = Geneweb_templ.Loc
+module Loc = Geneweb_loc
 module Collection = Geneweb_db.Collection
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
