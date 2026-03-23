@@ -100,3 +100,12 @@ module Seq = struct
 
   include Seq
 end
+
+module String = struct
+  open String
+
+  let empty = ""
+  let is_empty s = Int.equal (length s) 0
+
+  include String
+end

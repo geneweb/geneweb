@@ -6,6 +6,7 @@ module Parser = Geneweb_templ.Parser
 module Ast = Geneweb_templ.Ast
 module Loc = Geneweb_templ.Loc
 module Driver = Geneweb_db.Driver
+module Compat = Geneweb_compat
 
 exception UnboundVar
 exception BadApplyArity
@@ -125,7 +126,7 @@ let setup_link (conf : Config.config) =
     let i = String.rindex s ':' in
     let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
     "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
-  with Not_found -> ""
+  with Not_found -> Compat.String.empty
 
 let esc s = (Util.escape_html s :> string)
 
@@ -134,7 +135,8 @@ let url_aux ?(pwd = true) (conf : Config.config) =
     List.filter_map
       (fun (k, v) ->
         let v = Adef.as_string v in
-        if ((k = "oc" || k = "ocz") && v = "0") || k = "" then None
+        if ((k = "oc" || k = "ocz") && v = "0") || Compat.String.is_empty k then
+          None
         else Some (Format.sprintf "%s=%s" k v))
       (conf.henv @ conf.senv @ conf.env)
   in
@@ -148,7 +150,9 @@ let url_aux ?(pwd = true) (conf : Config.config) =
 let find_sosa_ref (conf : Config.config) =
   let env = conf.henv @ conf.senv @ conf.env in
   let get_env evar env =
-    match List.assoc_opt evar env with Some s -> Adef.as_string s | None -> ""
+    match List.assoc_opt evar env with
+    | Some s -> Adef.as_string s
+    | None -> Compat.String.empty
   in
   let pz = get_env "pz" env in
   let nz = get_env "nz" env in
@@ -210,40 +214,45 @@ let rec eval_variable (conf : Config.config) = function
       List.fold_left
         (fun acc (k, v) ->
           let duplicate =
-            if is_duplicate k l then {| style="color:red"|} else ""
+            if is_duplicate k l then {| style="color:red"|}
+            else Compat.String.empty
           in
           acc
           ^ Format.sprintf "<b%s>%s</b>=%s<br>\n" duplicate k
               (if conf.wizard || not (List.mem k wizard_only) then
                  (Util.escape_html v :> string)
-               else if (Util.escape_html v :> string) = "" then ""
+               else if Compat.String.is_empty (Util.escape_html v :> string)
+               then Compat.String.empty
                else "####"))
-        "" l
+        Compat.String.empty l
   | [ "gwd"; "arglist" ] -> !GWPARAM.gwd_cmd
   | [ "bvar"; v ] | [ "b"; v ] -> (
-      try List.assoc v conf.base_env with Not_found -> "")
+      try List.assoc v conf.base_env with Not_found -> Compat.String.empty)
   | [ "connections"; "wizards" ] -> (
       match conf.n_connect with
-      | Some (_c, cw, _cf, _) -> if cw > 0 then Printf.sprintf "%d" cw else ""
-      | None -> "")
+      | Some (_c, cw, _cf, _) ->
+          if cw > 0 then Printf.sprintf "%d" cw else Compat.String.empty
+      | None -> Compat.String.empty)
   | [ "connections"; "friends" ] -> (
       match conf.n_connect with
-      | Some (_c, _cw, cf, _) -> if cf > 0 then Printf.sprintf "%d" cf else ""
-      | None -> "")
+      | Some (_c, _cw, cf, _) ->
+          if cf > 0 then Printf.sprintf "%d" cf else Compat.String.empty
+      | None -> Compat.String.empty)
   | [ "connections"; "total" ] -> (
       match conf.n_connect with
-      | Some (c, _cw, _cf, _) -> if c > 0 then Printf.sprintf "%d" c else ""
-      | None -> "")
+      | Some (c, _cw, _cf, _) ->
+          if c > 0 then Printf.sprintf "%d" c else Compat.String.empty
+      | None -> Compat.String.empty)
   | [ "evar"; v; "ns" ] | [ "e"; v; "ns" ] -> (
       try
         let vv = List.assoc v (conf.env @ conf.henv) in
         Mutil.gen_decode false vv |> esc
-      with Not_found -> "")
+      with Not_found -> Compat.String.empty)
   | [ "evar"; v ] | [ "e"; v ] -> (
       (* TODO verify if senv must be treated as well *)
       match Util.p_getenv (conf.env @ conf.henv) v with
       | Some vv -> esc vv
-      | None -> "")
+      | None -> Compat.String.empty)
   (* look for evar.vi scanning i down to 0 *)
   | [ "evar_cur"; v; i ] ->
       (* TODO same as evar *)
@@ -251,10 +260,10 @@ let rec eval_variable (conf : Config.config) = function
       let rec loop n =
         match Util.p_getenv (conf.env @ conf.henv) (v ^ string_of_int n) with
         | Some vv -> vv
-        | None -> if n > 0 then loop (n - 1) else ""
+        | None -> if n > 0 then loop (n - 1) else Compat.String.empty
       in
       loop n
-  | [ "link_next" ] -> ""
+  | [ "link_next" ] -> Compat.String.empty
   | [ "prefix_set"; pl ] ->
       let pl_l =
         match pl with
@@ -268,12 +277,15 @@ let rec eval_variable (conf : Config.config) = function
       (Util.commd ~excl:pl_l conf :> string)
   | [ "prefix_set"; evar; str ] ->
       let prefix = (Util.commd ~excl:[ evar ] conf :> string) in
-      let amp = if prefix.[String.length prefix - 1] = '?' then "" else "&" in
-      if str = "" then prefix
+      let amp =
+        if prefix.[String.length prefix - 1] = '?' then Compat.String.empty
+        else "&"
+      in
+      if Compat.String.is_empty str then prefix
       else prefix ^ Printf.sprintf "%s%s=%s" amp evar str
   | [ "random"; "init" ] ->
       Random.self_init ();
-      ""
+      Compat.String.empty
   | [ "random"; "bits" ] -> (
       try string_of_int (Random.bits ())
       with Failure _ | Invalid_argument _ -> raise Not_found)
@@ -293,7 +305,7 @@ let rec eval_variable (conf : Config.config) = function
       match int_of_string_opt n with
       | Some n ->
           let v =
-            Option.value ~default:""
+            Option.value ~default:Compat.String.empty
               (Util.p_getenv (conf.env @ conf.henv @ conf.senv) v)
           in
           substr_start_aux n v
@@ -312,7 +324,7 @@ let rec eval_variable (conf : Config.config) = function
   | [ "user"; "index" ] -> (
       match conf.user_iper with
       | Some ip -> Driver.Iper.to_string ip
-      | None -> "")
+      | None -> Compat.String.empty)
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
   | [ s ] -> eval_simple_variable conf s
@@ -326,12 +338,15 @@ and eval_sosa_ref conf sl =
   | [ "occ" ] -> occ
   | [ "index" ] -> i
   | [ "access" ] ->
-      if i <> "" then "i=" ^ i
-      else if fn <> "" || sn <> "" then
-        Format.sprintf "p=%s&n=%s&oc=%s" fn sn occ
-      else ""
+      if not @@ Compat.String.is_empty i then "i=" ^ i
+      else if
+        (not @@ Compat.String.is_empty fn) || (not @@ Compat.String.is_empty sn)
+      then Format.sprintf "p=%s&n=%s&oc=%s" fn sn occ
+      else Compat.String.empty
   | [] ->
-      let occ = if occ = "" then "" else "." ^ occ in
+      let occ =
+        if Compat.String.is_empty occ then Compat.String.empty else "." ^ occ
+      in
       Format.sprintf "%s%s %s" fn occ sn
   | _ -> "???1"
 
@@ -376,34 +391,35 @@ and eval_simple_variable conf = function
                         (Util.commd conf :> string)
                         cw
                     else string_of_int cw)
-               else "")
+               else Compat.String.empty)
             ^
             if cf > 0 then
               Printf.sprintf ", %s %d"
                 (Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 3)
                 cf
-            else ""
-          else ""
-      | None -> "")
+            else Compat.String.empty
+          else Compat.String.empty
+      | None -> Compat.String.empty)
   | "doctype" -> (Util.doctype :> string)
   | "highlight" -> conf.highlight
   | "gw_prefix" ->
       let s =
-        if conf.cgi then Adef.escaped conf.gw_prefix else Adef.escaped ""
+        if conf.cgi then Adef.escaped conf.gw_prefix
+        else Adef.escaped Compat.String.empty
       in
       let s = (s :> string) in
-      if s = "" then s else s ^ Filename.dir_sep
+      if Compat.String.is_empty s then s else s ^ Filename.dir_sep
   | "images_prefix" | "image_prefix" -> Util.images_prefix conf ^ "/"
   | "lang" -> conf.lang
   | "lang_fallback" -> (
       match List.assoc_opt conf.lang !Mutil.fallback with
       | Some l -> l
-      | None -> "")
+      | None -> Compat.String.empty)
   | "default_lang" -> conf.default_lang
   | "browser_lang" -> conf.browser_lang
   | "left" -> conf.left
   | "nl" -> "\n"
-  | "nn" -> ""
+  | "nn" -> Compat.String.empty
   | "plugins" ->
       let l = List.map Filename.basename conf.plugins in
       String.concat ", " l
@@ -426,19 +442,26 @@ and eval_simple_variable conf = function
   | "right" -> conf.right
   | "sosa_ref" -> (
       match find_sosa_ref conf with
-      | iz, _, _, _ when iz <> "" -> iz
-      | _, fn, sn, occ when fn <> "" || sn <> "" ->
-          let occ = if occ = "" then "" else "." ^ occ in
+      | iz, _, _, _ when not @@ Compat.String.is_empty iz -> iz
+      | _, fn, sn, occ
+        when (not @@ Compat.String.is_empty fn)
+             || (not @@ Compat.String.is_empty sn) ->
+          let occ =
+            if Compat.String.is_empty occ then Compat.String.empty
+            else "." ^ occ
+          in
           Format.sprintf "%s%s %s" fn occ sn
       | _ -> "???2")
-  | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
+  | "setup_link" ->
+      if conf.setup_link then " - " ^ setup_link conf else Compat.String.empty
   | "sp" -> " "
   | "static_path" | "etc_prefix" ->
       let s =
-        if conf.cgi then Adef.escaped conf.etc_prefix else Adef.escaped ""
+        if conf.cgi then Adef.escaped conf.etc_prefix
+        else Adef.escaped Compat.String.empty
       in
       let s = (s :> string) in
-      if s = "" then s else s ^ "/"
+      if Compat.String.is_empty s then s else s ^ "/"
   | "suffix" ->
       Log.warn (fun k -> k "%%suffix; is deprecated, use %%url_set instead");
       let l =
@@ -450,7 +473,8 @@ and eval_simple_variable conf = function
         List.filter_map
           (fun (k, v) ->
             let v = Adef.as_string v in
-            if ((k = "oc" || k = "ocz") && v = "0") || k = "" then None
+            if ((k = "oc" || k = "ocz") && v = "0") || Compat.String.is_empty k
+            then None
             else Some (Format.sprintf "%s=%s" k v))
           l
       in
@@ -464,7 +488,7 @@ and eval_simple_variable conf = function
   | "compil_date" -> Version.compil_date
   | "branch" -> Version.branch
   | "source" -> Version.src
-  | "/" -> ""
+  | "/" -> Compat.String.empty
   | _ -> raise Not_found
 
 let rec string_of_expr_val = function
@@ -513,7 +537,7 @@ let apply_format conf nth s1 s2 =
                       let i = String.index s2 ':' in
                       ( String.sub s2 0 i,
                         String.sub s2 (i + 1) (String.length s2 - i - 1) )
-                    with _ -> ("", "")
+                    with _ -> (Compat.String.empty, Compat.String.empty)
                   in
                   match Util.check_format "%s%s" s1 with
                   | Some s3 -> Printf.sprintf s3 s21 s22
@@ -572,7 +596,7 @@ let rec eval_ast conf Ast.{ desc; _ } =
   | ast -> not_impl "eval_ast" ast
 
 and eval_transl conf upp s c =
-  if c = "" && String.length s > 0 && s.[0] = '\n' then
+  if Compat.String.is_empty c && String.length s > 0 && s.[0] = '\n' then
     eval_transl_inline conf s
   else eval_transl_lexicon conf upp s c
 
@@ -607,7 +631,8 @@ and eval_transl_lexicon conf upp s c =
         String.sub s 0 (k + 1)
         ^ c
         ^
-        if String.length s = k + 1 || String.length s = k + 2 then ""
+        if String.length s = k + 1 || String.length s = k + 2 then
+          Compat.String.empty
         else if existing_choice then
           String.sub s (k + 2) (String.length s - k - 2)
         else String.sub s (k + 1) (String.length s - k - 1) )
@@ -616,7 +641,7 @@ and eval_transl_lexicon conf upp s c =
     let nth = try Some (int_of_string c) with Failure _ -> None in
     match split_at_coloncolon s with
     | None -> (
-        try apply_format conf nth s ""
+        try apply_format conf nth s Compat.String.empty
         with Failure _ ->
           raise Not_found
           (* TODO check the use of if c = "n" then s else Mutil.nominative s
@@ -649,7 +674,9 @@ and eval_transl_lexicon conf upp s c =
                 in
                 (* parse_templ handles only text, evars and translations *)
                 (* more complex parsing (%surname;, %if; ...) not available *)
-                List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
+                List.fold_left
+                  (fun s a -> s ^ eval_ast conf a)
+                  Compat.String.empty astl
               in
               let s4 = String.sub s2 (j + 1) (String.length s2 - j - 1) in
               let s2 = s3 ^ s4 in
@@ -664,7 +691,9 @@ and eval_transl_lexicon conf upp s c =
           let s3 =
             match nth with
             | Some n -> Util.transl_nth conf s2 n
-            | None -> if s2 = "" then "" else Util.transl conf s2
+            | None ->
+                if Compat.String.is_empty s2 then Compat.String.empty
+                else Util.transl conf s2
           in
           Util.transl_decline conf s1 s3)
   in
@@ -683,7 +712,9 @@ let templ_eval_var (conf : Config.config) = function
   | [ "false" ] -> VVbool false
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
-      VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
+      VVbool
+        (not @@ Compat.String.is_empty
+        @@ Mutil.extract_param "referer: " '\n' conf.request)
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
@@ -753,7 +784,7 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
               | [ e ] -> e
               | el ->
                   let sl = List.map string_of_expr_val el in
-                  VVstring (String.concat "" sl) ))
+                  VVstring (String.concat Compat.String.empty sl) ))
           ell
       in
       VVstring (eval_apply loc s vl)
@@ -795,7 +826,7 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
   | Apack al ->
       let vl = List.map (eval_expr ceva) al in
       let sl = List.map string_of_expr_val vl in
-      VVstring (String.concat "" sl)
+      VVstring (String.concat Compat.String.empty sl)
   | e -> raise_with_loc loc (Failure (not_impl "eval_expr" e))
 
 let eval_bool_expr conf (eval_var, eval_apply) e =
@@ -818,12 +849,12 @@ let eval_string_expr conf (eval_var, eval_apply) e =
   with Exc_located _ as exn ->
     let bt = Printexc.get_raw_backtrace () in
     Log.debug (fun k -> k "%a" pp_exception (exn, bt));
-    ""
+    Compat.String.empty
 
 let print_body_prop (conf : Config.config) =
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
-    with Not_found -> ""
+    with Not_found -> Compat.String.empty
   in
   Output.print_sstring conf (s ^ Util.body_prop conf)
 
@@ -889,7 +920,7 @@ let eval_subst loc f set_vother env xl vl a =
 
 let squeeze_spaces s =
   let rec loop i =
-    if i = String.length s then ""
+    if i = String.length s then Compat.String.empty
     else
       match s.[i] with
       | ' ' | '\n' | '\r' | '\t' -> loop (i + 1)
@@ -1000,12 +1031,12 @@ let rec eval_date_var conf jd = function
       try
         let _, md = Calendar.moon_phase_of_sdn jd in
         VVstring (string_of_int md)
-      with Failure _ -> VVstring "")
+      with Failure _ -> VVstring Compat.String.empty)
   | "moon_phase" :: sl -> (
       try
         let mp, _ = Calendar.moon_phase_of_sdn jd in
         eval_moon_phase_var mp sl
-      with Failure _ -> VVstring "")
+      with Failure _ -> VVstring Compat.String.empty)
   | [ "week_day" ] ->
       let wday =
         let jd_today = Calendar.sdn_of_gregorian conf.today in
@@ -1018,7 +1049,9 @@ let rec eval_date_var conf jd = function
 and eval_moon_phase_var mp = function
   | [ "hour" ] ->
       let s =
-        match mp with None -> "" | Some (_, hh, _) -> Printf.sprintf "%02d" hh
+        match mp with
+        | None -> Compat.String.empty
+        | Some (_, hh, _) -> Printf.sprintf "%02d" hh
       in
       VVstring s
   | [ "index" ] ->
@@ -1033,7 +1066,9 @@ and eval_moon_phase_var mp = function
       VVstring (string_of_int i)
   | [ "minute" ] ->
       let s =
-        match mp with None -> "" | Some (_, _, mm) -> Printf.sprintf "%02d" mm
+        match mp with
+        | None -> Compat.String.empty
+        | Some (_, _, mm) -> Printf.sprintf "%02d" mm
       in
       VVstring s
   | _ -> raise Not_found
@@ -1071,11 +1106,11 @@ let eval_var conf ifun env ep loc sl =
     | [ "trace"; s ] ->
         Printf.eprintf "***** %s; " s;
         flush stderr;
-        VVstring ""
+        VVstring Compat.String.empty
     | [ "tracenl"; s ] ->
         Printf.eprintf "***** %s\n" s;
         flush stderr;
-        VVstring ""
+        VVstring Compat.String.empty
     | s :: sl -> (
         match (get_val ifun.get_vother s env, sl) with
         | Some (VVother f), sl -> f sl
@@ -1130,7 +1165,7 @@ let rec eval conf ifun env =
     | [ e ] -> e
     | el ->
         let sl = List.map string_of_expr_val el in
-        VVstring (String.concat "" sl)
+        VVstring (String.concat Compat.String.empty sl)
   and eval_expr env ep (e : Ast.t) =
     let eval_apply = eval_apply env ep in
     let eval_var = eval_var conf ifun env ep in
@@ -1152,7 +1187,7 @@ let rec eval conf ifun env =
             al (env, [])
         in
         let sl = List.map (eval_ast env ep) al in
-        String.concat "" sl
+        String.concat Compat.String.empty sl
     | None -> (
         match (f, vl) with
         | "capitalize", [ (None, VVstring s) ] -> Utf8.capitalize_fst s
@@ -1168,13 +1203,13 @@ let rec eval conf ifun env =
             in
             match Util.hash_file_cached fpath with
             | Some hash -> hash
-            | None -> "")
+            | None -> Compat.String.empty)
         | "interp", [ (None, VVstring s) ] ->
             let astl =
               Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
                 (`Raw s)
             in
-            String.concat "" (eval_ast_list env ep astl)
+            String.concat Compat.String.empty (eval_ast_list env ep astl)
         | "language_name", [ (None, VVstring s) ] ->
             Translate.language_name s (Util.transl conf "!languages")
         | "url_encode", [ (None, VVstring s) ]
@@ -1192,10 +1227,12 @@ let rec eval conf ifun env =
             Util.translate_eval (Util.nth_field s1 n)
         | "nth_0", [ (None, VVstring s1); (None, VVstring s2) ] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
-            if Util.nth_field s1 n = "" then "0" else Util.nth_field s1 n
+            if Compat.String.is_empty @@ Util.nth_field s1 n then "0"
+            else Util.nth_field s1 n
         | "nth_c", [ (None, VVstring s1); (None, VVstring s2) ] -> (
             let n = try int_of_string s2 with Failure _ -> 0 in
-            try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
+            try Char.escaped (String.get s1 n)
+            with Invalid_argument _ -> Compat.String.empty)
         | "1000sep", [ (None, VVstring s) ] ->
             let n = try int_of_string s with Failure _ -> 0 in
             let sep = Util.transl conf "(thousand separator)" in
@@ -1231,7 +1268,7 @@ let rec eval conf ifun env =
     let al =
       if eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
     in
-    String.concat "" (List.map eval_ast al)
+    String.concat Compat.String.empty (List.map eval_ast al)
   and eval_for env ep iterator min max al =
     let rec loop env min max accu =
       let new_env = env in
@@ -1247,13 +1284,13 @@ let rec eval conf ifun env =
         int_of_string (eval_string_expr conf (eval_var, eval_apply) max)
       in
       if int_min < int_max then
-        let instr = String.concat "" (List.map eval_ast al) in
+        let instr = String.concat Compat.String.empty (List.map eval_ast al) in
         let accu = accu ^ instr in
         let a = Ast.mk_op2 "+" min (Ast.mk_int "1") in
         loop new_env a max accu
       else accu
     in
-    loop env min max ""
+    loop env min max Compat.String.empty
   in
   let rec print_ast env ep (Ast.{ desc; loc } as a) =
     match desc with
@@ -1373,8 +1410,8 @@ and print_simple_variable conf = function
   | "bases_list_links" ->
       let format_link bname =
         Format.sprintf {|<a href="%s%s">%s</a>|}
-          ((if conf.cgi then "?b=" else "") ^ bname)
-          (if conf.lang = conf.default_lang then ""
+          ((if conf.cgi then "?b=" else Compat.String.empty) ^ bname)
+          (if conf.lang = conf.default_lang then Compat.String.empty
            else (if conf.cgi then "&" else "?") ^ "lang=" ^ conf.lang)
           bname
       in
@@ -1405,7 +1442,7 @@ and print_simple_variable conf = function
               && f.[0] <> '~'
             then acc ^ Format.sprintf "<option>%s\n" f
             else acc)
-          "" f_list
+          Compat.String.empty f_list
       in
       Output.print_sstring conf res
   | _ -> raise Not_found

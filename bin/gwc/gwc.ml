@@ -289,7 +289,7 @@ let () =
   Secure.set_base_dir base_dir;
   GWPARAM.init ();
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
-  if !Db1link.particules_file = "" then
+  if Compat.String.is_empty !Db1link.particules_file then
     Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
   if !Gwcomp.verbose then
     if !Gwcomp.rgpd then

@@ -2,6 +2,7 @@ module Ezgw = Gwxjg_ezgw
 module Lexicon_parser = Gwxjg_lexicon_parser
 module Sosa = Geneweb_sosa
 module Db = Geneweb_db
+module Compat = Geneweb_compat
 open Geneweb
 open Jingoo
 open Jg_types
@@ -493,7 +494,7 @@ and mk_title conf base t =
   let ident = Tstr (Driver.sou base t.Def.t_ident) in
   let name =
     match t.t_name with
-    | Tmain -> Tstr ""
+    | Tmain -> Tstr Compat.String.empty
     | Tname s -> Tstr (Driver.sou base s)
     | Tnone -> Tnull
   in
@@ -695,7 +696,7 @@ and unsafe_mk_person conf base (p : Driver.person) =
   let image =
     Tstr
       (Image.get_portrait conf base p
-      |> Option.fold ~none:"" ~some:Image.src_to_string)
+      |> Option.fold ~none:Compat.String.empty ~some:Image.src_to_string)
   in
   let iper = Tstr (Driver.Iper.to_string iper') in
   let linked_page =
@@ -728,7 +729,8 @@ and unsafe_mk_person conf base (p : Driver.person) =
                safe
                  (List.fold_left
                     (Perso.linked_page_text conf base p s key)
-                    (Adef.safe "") db))
+                    (Adef.safe Compat.String.empty)
+                    db))
          else Tnull))
   in
   let titles = lazy_list (mk_title conf base) (Driver.get_titles p) in
@@ -1076,21 +1078,19 @@ let module_NAME base =
   in
   let particle =
     func_arg1_no_kw (function
-      | (Tstr s | Tsafe s) as x -> (
-          match get_particle s with
-          | "" -> Tnull
-          | s -> str_or_safe (String.trim s) x)
+      | (Tstr s | Tsafe s) as x ->
+          if Compat.String.is_empty @@ get_particle s then Tnull
+          else str_or_safe (String.trim s) x
       | _ -> assert false)
   in
   let without_particle =
     func_arg1_no_kw (function
-      | (Tstr s | Tsafe s) as x -> (
-          match get_particle s with
-          | "" -> Tstr s
-          | part ->
-              let l = String.length part in
-              let s = String.sub s l (String.length s - l) in
-              str_or_safe s x)
+      | (Tstr s | Tsafe s) as x ->
+          if Compat.String.is_empty @@ get_particle s then Tstr s
+          else
+            let l = String.length s in
+            let s = String.sub s l (String.length s - l) in
+            str_or_safe s x
       | _ -> assert false)
   in
   let lower =
@@ -1156,7 +1156,7 @@ let mk_env conf base =
              match Util.p_getenv conf.env "pz" with
              | None -> (
                  match List.assoc_opt "default_sosa_ref" conf.base_env with
-                 | Some n when n <> "" -> (
+                 | Some n when not (Compat.String.is_empty n) -> (
                      match Gutil.person_ht_find_all base n with
                      | [ ip ] -> get_n_mk_person conf base ip
                      | _ -> Tnull)
@@ -1236,7 +1236,7 @@ let trans ?(autoescape = true) (conf : Config.config) =
                  try unbox_string @@ arg "elision" with Not_found -> acc
                in
                if
-                 x <> ""
+                 (not (Compat.String.is_empty x))
                  && Unidecode.decode
                       (fun _ _ -> false)
                       (fun _ -> function
@@ -1253,7 +1253,9 @@ let trans ?(autoescape = true) (conf : Config.config) =
            if i < 0 then s else loop (conv s (Array.unsafe_get t i) ^ s) (i - 1)
          in
          let len = Array.length t in
-         loop (conv "" @@ Array.unsafe_get t @@ (len - 1)) (len - 2)
+         loop
+           (conv Compat.String.empty @@ Array.unsafe_get t @@ (len - 1))
+           (len - 2)
          |> Util.translate_eval)
     with Not_found -> Tstr (Printf.sprintf "{{%s|trans}}" @@ stringify @@ s)
   in
@@ -1277,7 +1279,7 @@ let alphabetic =
   func_arg2_no_kw @@ fun a b ->
   let str = function
     | Tsafe b | Tstr b -> b
-    | Tnull -> ""
+    | Tnull -> Compat.String.empty
     | _ -> failwith_type_error_2 "alphabetic" a b
   in
   Tint (Utf8.compare (str a) (str b))
@@ -1287,7 +1289,7 @@ let module_CAST =
     func_arg1_no_kw @@ function
     | Tstr _ as s -> s
     | Tsafe s -> Tstr s
-    | Tnull -> Tstr ""
+    | Tnull -> Tstr Compat.String.empty
     | Tint i -> Tstr (string_of_int i)
     | Tfloat f -> Tstr (string_of_float f)
     | Tbool b -> Tstr (string_of_bool b)

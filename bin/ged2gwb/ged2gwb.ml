@@ -1,10 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
-open Def
-
+module Compat = Geneweb_compat
 module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
+
+open Geneweb
+open Def
 
 type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend
@@ -51,7 +52,7 @@ let month_number_dates = ref NoMonthNumberDates
 let no_public_if_titles = ref false
 let first_names_brackets = ref None
 let untreated_in_notes = ref false
-let default_source = ref ""
+let default_source = ref Compat.String.empty
 let relation_status = ref Married
 let no_picture = ref false
 let do_check = ref true
@@ -61,7 +62,7 @@ let no_warn = ref false
 (* Reading input *)
 
 let line_cnt = ref 1
-let in_file = ref ""
+let in_file = ref Compat.String.empty
 
 let print_location pos =
   Printf.fprintf !log_oc "File \"%s\", line %d:\n" !in_file pos
@@ -273,7 +274,7 @@ and parse_text n r1 =
   parser
     [< r2 = get_to_eoln 0;
        l = get_lev_list [] (Char.chr (Char.code n + 1)) (* ? "get lev list" *) >] ->
-      (r1, r2, "", l)
+      (r1, r2, Compat.String.empty, l)
 and get_lev_list l n =
   parser
   | [< x = get_lev n; s >] -> get_lev_list (x :: l) n s
@@ -345,7 +346,7 @@ let strip c str =
     loop (String.length str - 1)
   in
   if start = 0 && stop = String.length str then str
-  else if start >= stop then ""
+  else if start >= stop then Compat.String.empty
   else String.sub str start (stop - start)
 
 let strip_spaces = strip ' '
@@ -362,7 +363,7 @@ let parse_name =
   let (f, s) = if invert then (s, f) else (f, s) in
   let f = strip_spaces f in
   let s = strip_spaces s in
-  ((if f = "" then "x" else f), (if s = "" then "?" else s))
+  ((if Compat.String.is_empty f then "x" else f), (if Compat.String.is_empty s then "?" else s))
 
 let rec find_field lab =
   function
@@ -391,10 +392,10 @@ let rec lexing_date =
   | [< ''0'..'9' as c; n = number (Buff.store 0 c) >] -> ("INT", n)
   | [< ''A'..'Z' as c; i = ident (Buff.store 0 c) >] -> ("ID", i)
   | [< ''('; len = text 0 >] -> ("TEXT", Buff.get len)
-  | [< ''.' >] -> ("", ".")
+  | [< ''.' >] -> (Compat.String.empty, ".")
   | [< '' ' | '\t' | '\013'; s >] -> lexing_date s
-  | [< _ = Stream.empty >] -> ("EOI", "")
-  | [< 'x >] -> ("", String.make 1 x)
+  | [< _ = Stream.empty >] -> ("EOI", Compat.String.empty)
+  | [< 'x >] -> (Compat.String.empty, String.make 1 x)
 and number len =
   parser
   | [< ''0'..'9' as c; a = number (Buff.store len c) >] -> a
@@ -461,7 +462,7 @@ let roman_int =
   in
   Grammar.Entry.of_parser date_g "roman int" p
 
-let date_str = ref ""
+let date_str = ref Compat.String.empty
 
 let make_date n1 n2 n3 =
   let n3 =
@@ -702,7 +703,7 @@ let preg_match pattern subject =
   try ignore (Str.search_forward re subject 0); true with Not_found -> false
 
 let date_of_field d =
-  if d = "" then None
+  if Compat.String.is_empty d then None
   else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Adef.Dtext d)
   else
     let s = Stream.of_string (String.uppercase_ascii d) in
@@ -747,7 +748,7 @@ let add_string gen s =
   try Hashtbl.find gen.g_hstr s
   with Not_found ->
     let i = gen.g_str.tlen in
-    assume_tab gen.g_str "";
+    assume_tab gen.g_str Compat.String.empty;
     gen.g_str.arr.(i) <- s;
     gen.g_str.tlen <- gen.g_str.tlen + 1;
     Hashtbl.add gen.g_hstr s i;
@@ -768,7 +769,7 @@ let per_index gen lab =
   try Hashtbl.find gen.g_hper lab
   with Not_found ->
     let i = gen.g_per.tlen in
-    assume_tab gen.g_per (Left3 "");
+    assume_tab gen.g_per (Left3 Compat.String.empty);
     gen.g_per.arr.(i) <- Left3 lab;
     gen.g_per.tlen <- gen.g_per.tlen + 1;
     Hashtbl.add gen.g_hper lab i;
@@ -780,7 +781,7 @@ let fam_index gen lab =
   try Hashtbl.find gen.g_hfam lab
   with Not_found ->
     let i = gen.g_fam.tlen in
-    assume_tab gen.g_fam (Left3 "");
+    assume_tab gen.g_fam (Left3 Compat.String.empty);
     gen.g_fam.arr.(i) <- Left3 lab;
     gen.g_fam.tlen <- gen.g_fam.tlen + 1;
     Hashtbl.add gen.g_hfam lab i;
@@ -799,7 +800,7 @@ let unknown_per i sex =
 let phony_per gen sex =
   let i = gen.g_per.tlen in
   let (person, ascend, union) = unknown_per i sex in
-  assume_tab gen.g_per (Left3 "");
+  assume_tab gen.g_per (Left3 Compat.String.empty);
   gen.g_per.tlen <- gen.g_per.tlen + 1;
   gen.g_per.arr.(i) <- Right3 (person, ascend, union);
   i
@@ -815,7 +816,7 @@ let unknown_fam gen i =
 let phony_fam gen =
   let i = gen.g_fam.tlen in
   let (fam, cpl, des) = unknown_fam gen i in
-  assume_tab gen.g_fam (Left3 "");
+  assume_tab gen.g_fam (Left3 Compat.String.empty);
   gen.g_fam.tlen <- gen.g_fam.tlen + 1;
   gen.g_fam.arr.(i) <- Right3 (fam, cpl, des);
   i
@@ -928,22 +929,22 @@ let uppercase_name = aux Utf8.uppercase
 let get_lev0 (strm__ : _ Stream.t) =
   let _ = line_start '0' strm__ in
   let _ =
-    try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
+    try skip_space strm__ with Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
   let r1 =
-    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
   let r2 =
-    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
   let r3 =
-    try get_to_eoln 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+    try get_to_eoln 0 strm__ with Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
   let l =
     try get_lev_list [] '1' strm__ with
-      Stream.Failure -> raise (Stream.Error "")
+      Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
-  let (rlab, rval) = if r2 = "" then r1, "" else r2, r1 in
+  let (rlab, rval) = if Compat.String.is_empty r2 then r1, Compat.String.empty else r2, r1 in
   let rval = utf8_of_string rval in
   let rcont = utf8_of_string r3 in
   {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l;
@@ -984,7 +985,7 @@ let extract_notes gen rl =
        List.fold_right
          (fun r lines ->
             r.rused <- true;
-            if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] = '@' then
+            if r.rlab = "NOTE" && not @@ Compat.String.is_empty r.rval && r.rval.[0] = '@' then
               let addr = extract_addr r.rval in
               match find_notes_record gen addr with
                 Some r ->
@@ -1007,7 +1008,7 @@ let rebuild_text r =
        let n = e.rval in
        let end_spc =
          if String.length n > 1 && n.[String.length n - 1] = ' ' then " "
-         else ""
+         else Compat.String.empty
        in
        let n = strip_spaces n in
        match e.rlab with
@@ -1020,14 +1021,14 @@ let notes_from_source_record rl =
   let title =
     match find_field "TITL" rl with
       Some l ->
-        let s = rebuild_text l in if s = "" then "" else "<b>" ^ s ^ "</b>"
-    | None -> ""
+        let s = rebuild_text l in if Compat.String.is_empty s then Compat.String.empty else "<b>" ^ s ^ "</b>"
+    | None -> Compat.String.empty
   in
   let text =
     match find_field "TEXT" rl with
       Some l ->
-        let s = rebuild_text l in if title = "" then s else "<br>\n" ^ s
-    | None -> ""
+        let s = rebuild_text l in if Compat.String.is_empty title then s else "<br>\n" ^ s
+    | None -> Compat.String.empty
   in
   title ^ text
 
@@ -1043,20 +1044,20 @@ let treat_notes gen rl =
          if Buffer.length buf = 0 then
            begin
              Buffer.add_string buf n;
-             Buffer.add_string buf (if end_spc then " " else "")
+             Buffer.add_string buf (if end_spc then " " else Compat.String.empty)
            end
          else if lab = "CONT" || lab = "NOTE" then
            begin
              Buffer.add_string buf "<br>\n";
              Buffer.add_string buf n;
-             Buffer.add_string buf (if end_spc then " " else "")
+             Buffer.add_string buf (if end_spc then " " else Compat.String.empty)
            end
-         else if n = "" then ()
+         else if Compat.String.is_empty n then ()
          else
            begin
-             Buffer.add_string buf (if spc then "\n" else "");
+             Buffer.add_string buf (if spc then "\n" else Compat.String.empty);
              Buffer.add_string buf n;
-             Buffer.add_string buf (if end_spc then " " else "")
+             Buffer.add_string buf (if end_spc then " " else Compat.String.empty)
            end)
       lines
   in
@@ -1070,18 +1071,19 @@ let treat_source gen r =
           let titl =
             match find_field "TITL" v.rsons with
               Some l -> rebuild_text l
-            | None -> ""
+            | None -> Compat.String.empty
           in
           let text =
             match find_field "TEXT" v.rsons with
               Some l -> rebuild_text l
-            | None -> ""
+            | None -> Compat.String.empty
           in
           let rcont = strip_spaces v.rcont in
-          if titl <> "" && text <> "" then "{" ^ titl ^ "} " ^ text
-          else if titl <> "" then titl
-          else if text <> "" then text
-          else if rcont <> "" then rcont
+          if not @@ Compat.String.is_empty titl && not @@ Compat.String.is_empty text then
+            "{" ^ titl ^ "} " ^ text
+          else if not @@ Compat.String.is_empty titl then titl
+          else if not @@ Compat.String.is_empty text then text
+          else if not @@ Compat.String.is_empty rcont then rcont
           else r.rval
         in
         src, v.rsons
@@ -1089,13 +1091,13 @@ let treat_source gen r =
         print_location r.rpos;
         Printf.fprintf !log_oc "Source %s not found\n" r.rval;
         flush !log_oc;
-        "", []
+        Compat.String.empty, []
   else strip_spaces r.rval, r.rsons
 
 let source gen r =
   match find_field "SOUR" r.rsons with
     Some r -> treat_source gen r
-  | _ -> "", []
+  | _ -> Compat.String.empty, []
 
 let p_index_from s i c =
   if i >= String.length s then String.length s
@@ -1108,10 +1110,10 @@ let decode_title s =
   let i2 = p_index_from s (i1 + 1) ',' in
   let title = strip_sub s 0 i1 in
   let (place, nth) =
-    if i1 = String.length s then "", 0
+    if i1 = String.length s then Compat.String.empty, 0
     else if i2 = String.length s then
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
-      try "", int_of_string s1 with Failure _ -> s1, 0
+      try Compat.String.empty, int_of_string s1 with Failure _ -> s1, 0
     else
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
       let s2 = strip_sub s (i2 + 1) (String.length s - i2 - 1) in
@@ -1133,9 +1135,10 @@ let list_of_string s =
 let purge_list list =
   List.fold_right
     (fun s list ->
-       match strip_spaces s with
-         "" -> list
-       | s -> s :: list)
+      if Compat.String.is_empty @@ strip_spaces s then
+        list
+      else
+        s :: list)
     list []
 
 let decode_date_interval pos s =
@@ -1157,7 +1160,7 @@ let treat_indi_title gen public_name r =
   let (name, title, place) =
     match find_field "NOTE" r.rsons with
       Some r ->
-        if title = "" then Tnone, strip_spaces r.rval, ""
+        if Compat.String.is_empty title then Tnone, strip_spaces r.rval, Compat.String.empty
         else if r.rval = public_name then Tmain, title, place
         else Tname (add_string gen (strip_spaces r.rval)), title, place
     | None -> Tnone, title, place
@@ -1169,7 +1172,7 @@ let treat_indi_title gen public_name r =
 let forward_adop gen ip lab which_parent =
   Hashtbl.add
     gen.g_adop lab
-    (ip, match which_parent with Some r when r.rval <> "" -> r.rval | _ -> "BOTH")
+    (ip, match which_parent with Some r when not @@ Compat.String.is_empty r.rval -> r.rval | _ -> "BOTH")
 
 let adop_parent gen ip r =
   let i = per_index gen r.rval in
@@ -1243,10 +1246,10 @@ let html_text_of_tags text rl =
     let len = Buff.store len ' ' in
     let len = Buff.mstore len r.rlab in
     let len =
-      if r.rval = "" then len else Buff.mstore (Buff.store len ' ') r.rval
+      if Compat.String.is_empty r.rval then len else Buff.mstore (Buff.store len ' ') r.rval
     in
     let len =
-      if r.rcont = "" then len else Buff.mstore (Buff.store len ' ') r.rcont
+      if Compat.String.is_empty r.rcont then len else Buff.mstore (Buff.store len ' ') r.rcont
     in
     totl len (lev + 1) r.rsons
   and totl len lev rl =
@@ -1254,7 +1257,7 @@ let html_text_of_tags text rl =
       (fun len r -> let len = Buff.store len '\n' in tot len lev r) len rl
   in
   let title =
-    if text = "" then "-- GEDCOM --" else "-- GEDCOM (" ^ text ^ ") --"
+    if Compat.String.is_empty text then "-- GEDCOM --" else "-- GEDCOM (" ^ text ^ ") --"
   in
   let len = 0 in
   let len = Buff.mstore len title in let len = totl len 1 rl in Buff.get len
@@ -1425,23 +1428,23 @@ let treat_indi_pevent gen ip r =
               let place =
                 match find_field "PLAC" r.rsons with
                   Some r -> strip_spaces r.rval
-                | _ -> ""
+                | _ -> Compat.String.empty
               in
-              let reason = "" in
+              let reason = Compat.String.empty in
               let note =
                 match find_all_fields "NOTE" r.rsons with
-                  [] -> ""
+                  [] -> Compat.String.empty
                 | rl -> treat_notes gen rl
               in
               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
               let note =
                 let name_info = strip_spaces r.rval in
-                if name_info = "" || r.rval = "Y" then note
+                if Compat.String.is_empty name_info || r.rval = "Y" then note
                 else name_info ^ "<br>\n" ^ note
               in
               let src =
                 match find_all_fields "SOUR" r.rsons with
-                  [] -> ""
+                  [] -> Compat.String.empty
                 | rl ->
                     let rec loop first src rl =
                       match rl with
@@ -1454,7 +1457,7 @@ let treat_indi_pevent gen ip r =
                           in
                           loop false src rl
                     in
-                    loop true "" rl
+                    loop true Compat.String.empty rl
               in
               let witnesses = find_event_witness gen "INDI" ip r in
               let evt =
@@ -1466,7 +1469,9 @@ let treat_indi_pevent gen ip r =
               in
               (* On ajoute que les évènements non vides, sauf *)
               (* s'il est spécifié qu'il faut l'ajouter.      *)
-              if date <> None || place <> "" || note <> "" || src <> "" ||
+              if date <> None || not @@ Compat.String.is_empty place ||
+              not @@ Compat.String.is_empty note ||
+              not @@ Compat.String.is_empty src ||
                  witnesses <> [| |] || r.rval = "Y"
               then
                 if name = Epers_Occupation then
@@ -1481,7 +1486,7 @@ let treat_indi_pevent gen ip r =
       (fun events r ->
          match find_field "TYPE" r.rsons with
            Some rr ->
-             if rr.rval <> "" then
+             if not @@ Compat.String.is_empty rr.rval then
                let name =
                  if List.mem rr.rval primary_pevents then
                    find_pevent_name_from_tag gen rr.rval rr.rval
@@ -1497,23 +1502,23 @@ let treat_indi_pevent gen ip r =
                let place =
                  match find_field "PLAC" r.rsons with
                    Some r -> strip_spaces r.rval
-                 | _ -> ""
+                 | _ -> Compat.String.empty
                in
-               let reason = "" in
+               let reason = String.empty in
                let note =
                  match find_all_fields "NOTE" r.rsons with
-                   [] -> ""
+                   [] -> Compat.String.empty
                  | rl -> treat_notes gen rl
                in
                (* Si le tag 1 XXX a des infos, on les ajoutes. *)
                let note =
                  let name_info = strip_spaces r.rval in
-                 if name_info = "" || r.rval = "Y" then note
+                 if Compat.String.is_empty name_info || r.rval = "Y" then note
                  else name_info ^ "<br>\n" ^ note
                in
                let src =
                  match find_all_fields "SOUR" r.rsons with
-                   [] -> ""
+                   [] -> Compat.String.empty
                  | rl ->
                      let rec loop first src rl =
                        match rl with
@@ -1526,7 +1531,7 @@ let treat_indi_pevent gen ip r =
                            in
                            loop false src rl
                      in
-                     loop true "" rl
+                     loop true Compat.String.empty rl
                in
                let witnesses = find_event_witness gen "INDI" ip r in
                let evt =
@@ -1543,8 +1548,10 @@ let treat_indi_pevent gen ip r =
                    Epers_Name n -> n <> string_empty
                  | _ -> false
                in
-               if has_epers_name || date <> None || place <> "" ||
-                  note <> "" || src <> "" || witnesses <> [| |]
+               if has_epers_name || date <> None ||
+                  not @@ Compat.String.is_empty place ||
+                  not @@ Compat.String.is_empty note ||
+                  not @@ Compat.String.is_empty src || witnesses <> [| |]
                then
                  evt :: events
                else events
@@ -1637,15 +1644,15 @@ let add_indi gen r =
       Some n ->
       begin match find_field "GIVN" n.rsons with
           Some r -> r.rval
-        | None -> ""
+        | None -> Compat.String.empty
       end
-    | None -> ""
+    | None -> Compat.String.empty
   in
   let (first_name, surname, occ, public_name, first_names_aliases) =
     match name_sons with
     | Some n ->
       let (f, s) = parse_name (Stream.of_string n.rval) in
-      let pn = "" in
+      let pn = Compat.String.empty in
       let fal = if givn = f then [] else [givn] in
       let (f, fal) =
         match !first_names_brackets with
@@ -1668,13 +1675,13 @@ let add_indi gen r =
               let (fn, fa) = first_enclosed ff in
               let accu =
                 if first then fn
-                else if fn <> "" then accu ^ " " ^ fn
+                else if not @@ Compat.String.is_empty fn then accu ^ " " ^ fn
                 else accu
               in
               loop false fa accu
             with Not_found -> if f = ff then f, fal else accu, ff :: fal
           in
-          loop true f ""
+          loop true f Compat.String.empty
         | None -> f, fal
       in
       let (f, pn, fal) =
@@ -1684,10 +1691,10 @@ let add_indi gen r =
           if j = String.length f then f, pn, fal
           else
             let fn = String.sub f i (j - i) in
-            if pn = "" && !extract_public_names then
+            if Compat.String.is_empty pn && !extract_public_names then
               if is_a_public_name f j then fn, f, fal
-              else if !extract_first_names then fn, "", f :: fal
-              else f, "", fal
+              else if !extract_first_names then fn, Compat.String.empty, f :: fal
+              else f, Compat.String.empty, fal
             else fn, pn, f :: fal
         else f, pn, fal
       in
@@ -1695,7 +1702,7 @@ let add_indi gen r =
       let fal =
         if !lowercase_first_names then List.map capitalize_name fal else fal
       in
-      let pn = if capitalize_name pn = f then "" else pn in
+      let pn = if capitalize_name pn = f then Compat.String.empty else pn in
       let pn = if !lowercase_first_names then capitalize_name pn else pn in
       let fal =
         List.fold_right (fun fa fal -> if fa = pn then fal else fa :: fal) fal []
@@ -1721,9 +1728,9 @@ let add_indi gen r =
       Some n ->
       begin match find_field "NICK" n.rsons with
           Some r -> r.rval
-        | None -> ""
+        | None -> Compat.String.empty
       end
-    | None -> ""
+    | None -> Compat.String.empty
   in
   let surname_aliases =
     match name_sons with
@@ -1755,10 +1762,10 @@ let add_indi gen r =
     match find_field "OBJE" r.rsons with
       Some r ->
       begin match find_field "FILE" r.rsons with
-          Some r -> if !no_picture then "" else r.rval
-        | None -> ""
+          Some r -> if !no_picture then Compat.String.empty else r.rval
+        | None -> Compat.String.empty
       end
-    | None -> ""
+    | None -> Compat.String.empty
   in
   let parents =
     match find_field "FAMC" r.rsons with
@@ -1776,7 +1783,7 @@ let add_indi gen r =
   in
   let notes =
     match find_all_fields "NOTE" r.rsons with
-      [] -> ""
+      [] -> Compat.String.empty
     | rl -> treat_notes gen rl
   in
   let titles =
@@ -1853,15 +1860,15 @@ let add_indi gen r =
       let p =
         match find_field "PLAC" r.rsons with
           Some r -> strip_spaces r.rval
-        | _ -> ""
+        | _ -> Compat.String.empty
       in
       let note =
         match find_all_fields "NOTE" r.rsons with
-          [] -> ""
+          [] -> Compat.String.empty
         | rl -> treat_notes gen rl
       in
       d, p, (note, []), source gen r
-    | None -> None, "", ("", []), ("", [])
+    | None -> None, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
   in
   let (bapt, bapt_place, (bapt_note, _), (bapt_src, bapt_nt)) =
     let ro =
@@ -1879,22 +1886,22 @@ let add_indi gen r =
       let p =
         match find_field "PLAC" r.rsons with
           Some r -> strip_spaces r.rval
-        | _ -> ""
+        | _ -> Compat.String.empty
       in
       let note =
         match find_all_fields "NOTE" r.rsons with
-          [] -> ""
+          [] -> Compat.String.empty
         | rl -> treat_notes gen rl
       in
       d, p, (note, []), source gen r
-    | None -> None, "", ("", []), ("", [])
+    | None -> None, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
   in
   let (death, death_place, (death_note, _), (death_src, death_nt)) =
     match find_field "DEAT" r.rsons with
     | Some r ->
       if r.rsons = [] then
-        if r.rval = "Y" then DeadDontKnowWhen, "", ("", []), ("", [])
-        else infer_death birth bapt, "", ("", []), ("", [])
+        if r.rval = "Y" then DeadDontKnowWhen, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
+        else infer_death birth bapt, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
       else
         let d =
           match find_field "DATE" r.rsons with
@@ -1908,15 +1915,15 @@ let add_indi gen r =
         let p =
           match find_field "PLAC" r.rsons with
           | Some r -> strip_spaces r.rval
-          | None -> ""
+          | None -> Compat.String.empty
         in
         let note =
           match find_all_fields "NOTE" r.rsons with
-          | [] -> ""
+          | [] -> Compat.String.empty
           | rl -> treat_notes gen rl
         in
         d, p, (note, []), source gen r
-    | None -> infer_death birth bapt, "", ("", []), ("", [])
+    | None -> infer_death birth bapt, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
   in
   let (burial, burial_place, (burial_note, _), (burial_src, burial_nt)) =
     let (buri, buri_place, (buri_note, _), (buri_src, buri_nt)) =
@@ -1924,8 +1931,8 @@ let add_indi gen r =
         Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then
-            Buried Date.cdate_None, "", ("", []), ("", [])
-          else UnknownBurial, "", ("", []), ("", [])
+            Buried Date.cdate_None, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
+          else UnknownBurial, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
         else
           let d =
             match find_field "DATE" r.rsons with
@@ -1935,23 +1942,23 @@ let add_indi gen r =
           let p =
             match find_field "PLAC" r.rsons with
               Some r -> strip_spaces r.rval
-            | _ -> ""
+            | _ -> Compat.String.empty
           in
           let note =
             match find_all_fields "NOTE" r.rsons with
-              [] -> ""
+              [] -> Compat.String.empty
             | rl -> treat_notes gen rl
           in
           Buried (Date.cdate_of_od d), p, (note, []), source gen r
-      | None -> UnknownBurial, "", ("", []), ("", [])
+      | None -> UnknownBurial, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
     in
     let (crem, crem_place, (crem_note, _), (crem_src, crem_nt)) =
       match find_field "CREM" r.rsons with
         Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then
-            Cremated Date.cdate_None, "", ("", []), ("", [])
-          else UnknownBurial, "", ("", []), ("", [])
+            Cremated Date.cdate_None, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
+          else UnknownBurial, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
         else
           let d =
             match find_field "DATE" r.rsons with
@@ -1961,15 +1968,15 @@ let add_indi gen r =
           let p =
             match find_field "PLAC" r.rsons with
               Some r -> strip_spaces r.rval
-            | _ -> ""
+            | _ -> Compat.String.empty
           in
           let note =
             match find_all_fields "NOTE" r.rsons with
-              [] -> ""
+              [] -> Compat.String.empty
             | rl -> treat_notes gen rl
           in
           Cremated (Date.cdate_of_od d), p, (note, []), source gen r
-      | None -> UnknownBurial, "", ("", []), ("", [])
+      | None -> UnknownBurial, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, [])
     in
     match buri, crem with
       UnknownBurial, Cremated _ ->
@@ -1980,14 +1987,20 @@ let add_indi gen r =
   let bapt =Date.cdate_of_od bapt in
   let (psources, psources_nt) =
     let (s, s_nt) = source gen r in
-    if s = "" then !default_source, s_nt else s, s_nt
+    if Compat.String.is_empty s then !default_source, s_nt else s, s_nt
   in
   let ext_notes =
     let concat_text s1 s2 s_sep =
-      let s = if s1 = "" && notes = "" || s2 = "" then "" else s_sep in
+      let s =
+        if Compat.String.is_empty s1 &&
+           Compat.String.is_empty notes || Compat.String.is_empty s2 then
+          Compat.String.empty
+        else
+          s_sep
+      in
       s1 ^ s ^ s2
     in
-    let text = concat_text "" (notes_from_source_record birth_nt) "<br>\n" in
+    let text = concat_text Compat.String.empty (notes_from_source_record birth_nt) "<br>\n" in
     let text = concat_text text (notes_from_source_record bapt_nt) "<br>\n" in
     let text =
       concat_text text (notes_from_source_record death_nt) "<br>\n"
@@ -2004,13 +2017,13 @@ let add_indi gen r =
         if rtl = [] then init
         else concat_text init (html_text_of_tags text rtl) "\n"
       in
-      let nt = remain_tags_in_notes "INDI" "" r.rsons in
+      let nt = remain_tags_in_notes "INDI" Compat.String.empty r.rsons in
       let nt = remain_tags_in_notes "BIRT SOUR" nt birth_nt in
       let nt = remain_tags_in_notes "BAPT SOUR" nt bapt_nt in
       let nt = remain_tags_in_notes "DEAT SOUR" nt death_nt in
       let nt = remain_tags_in_notes "BURI/CREM SOUR" nt burial_nt in
       let nt = remain_tags_in_notes "SOUR SOUR" nt psources_nt in
-      if nt = "" then text else text ^ "<pre>\n" ^ nt ^ "\n</pre>"
+      if Compat.String.is_empty nt then text else text ^ "<pre>\n" ^ nt ^ "\n</pre>"
     else text
   in
   (* Mise à jour des évènements principaux. *)
@@ -2051,7 +2064,8 @@ let add_indi gen r =
      surname = add_string gen surname; occ = occ;
      public_name = add_string gen public_name; image = add_string gen image;
      qualifiers =
-       if qualifier <> "" then [add_string gen qualifier] else [];
+       if not @@ Compat.String.is_empty qualifier then
+         [add_string gen qualifier] else [];
      aliases = List.map (add_string gen) aliases;
      first_names_aliases = List.map (add_string gen) first_names_aliases;
      surnames_aliases = List.map (add_string gen) surname_aliases;
@@ -2108,7 +2122,7 @@ let treat_fam_fevent gen ifath r =
     match find_all_fields "PLAC" r.rsons with
       r :: rl ->
         if String.uncapitalize_ascii r.rval = "unmarried" then
-          Efam_NoMarriage, ""
+          Efam_NoMarriage, Compat.String.empty
         else
           let place = strip_spaces r.rval in
           let rec loop =
@@ -2136,23 +2150,23 @@ let treat_fam_fevent gen ifath r =
               let place =
                 match find_field "PLAC" r.rsons with
                   Some r -> strip_spaces r.rval
-                | _ -> ""
+                | _ -> Compat.String.empty
               in
-              let reason = "" in
+              let reason = Compat.String.empty in
               let note =
                 match find_all_fields "NOTE" r.rsons with
-                  [] -> ""
+                  [] -> Compat.String.empty
                 | rl -> treat_notes gen rl
               in
               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
               let note =
                 let name_info = strip_spaces r.rval in
-                if name_info = "" || r.rval = "Y" then note
+                if Compat.String.is_empty name_info || r.rval = "Y" then note
                 else name_info ^ "<br>\n" ^ note
               in
               let src =
                 match find_all_fields "SOUR" r.rsons with
-                  [] -> ""
+                  [] -> Compat.String.empty
                 | rl ->
                     let rec loop first src rl =
                       match rl with
@@ -2165,7 +2179,7 @@ let treat_fam_fevent gen ifath r =
                           in
                           loop false src rl
                     in
-                    loop true "" rl
+                    loop true Compat.String.empty rl
               in
               let witnesses = find_fevent_witness gen "INDI" ifath r in
               (* Vérification du mariage. *)
@@ -2201,7 +2215,7 @@ let treat_fam_fevent gen ifath r =
       (fun events r ->
          match find_field "TYPE" r.rsons with
            Some rr ->
-             if rr.rval <> "" then
+             if not @@ Compat.String.is_empty rr.rval then
                let name =
                  if List.mem rr.rval primary_fevents then
                    find_fevent_name_from_tag gen rr.rval rr.rval
@@ -2217,23 +2231,23 @@ let treat_fam_fevent gen ifath r =
                let place =
                  match find_field "PLAC" r.rsons with
                    Some r -> strip_spaces r.rval
-                 | _ -> ""
+                 | _ -> Compat.String.empty
                in
-               let reason = "" in
+               let reason = Compat.String.empty in
                let note =
                  match find_all_fields "NOTE" r.rsons with
-                   [] -> ""
+                   [] -> Compat.String.empty
                  | rl -> treat_notes gen rl
                in
                (* Si le tag 1 XXX a des infos, on les ajoutes. *)
                let note =
                  let name_info = strip_spaces r.rval in
-                 if name_info = "" || r.rval = "Y" then note
+                 if Compat.String.is_empty name_info || r.rval = "Y" then note
                  else name_info ^ "<br>\n" ^ note
                in
                let src =
                  match find_all_fields "SOUR" r.rsons with
-                   [] -> ""
+                   [] -> Compat.String.empty
                  | rl ->
                      let rec loop first src rl =
                        match rl with
@@ -2246,7 +2260,7 @@ let treat_fam_fevent gen ifath r =
                            in
                            loop false src rl
                      in
-                     loop true "" rl
+                     loop true Compat.String.empty rl
                in
                let witnesses = find_fevent_witness gen "INDI" ifath r in
                let evt =
@@ -2264,8 +2278,10 @@ let treat_fam_fevent gen ifath r =
                    Efam_Name n -> n <> string_empty
                  | _ -> false
                in
-               if has_efam_name || date <> None || place <> "" ||
-                  note <> "" || src <> "" || witnesses <> [| |] ||
+               if has_efam_name || date <> None ||
+                  not @@ Compat.String.is_empty place ||
+                  not @@ Compat.String.is_empty note ||
+                  not @@ Compat.String.is_empty src || witnesses <> [| |] ||
                   List.mem name secondary_fevent_types
                then
                  evt :: events
@@ -2318,7 +2334,7 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
               in
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on ne met pas de lieu.            *)
-              let place = add_string gen "" in
+              let place = add_string gen Compat.String.empty in
               let marr = Married, date, place, evt.efam_note, evt.efam_src in
               let () = found_marriage := true in loop l marr witn div
         | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense |
@@ -2440,7 +2456,7 @@ let add_fam_norm gen r adop_list =
         match find_all_fields "PLAC" r.rsons with
           r :: rl ->
           if String.uncapitalize_ascii r.rval = "unmarried" then
-            NotMarried, ""
+            NotMarried, Compat.String.empty
           else
             let p = strip_spaces r.rval in
             let rec loop =
@@ -2452,7 +2468,7 @@ let add_fam_norm gen r adop_list =
               | [] -> relation, p
             in
             loop rl
-        | [] -> relation, ""
+        | [] -> relation, Compat.String.empty
       in
       let u =
         match find_field "TYPE" r.rsons with
@@ -2485,11 +2501,11 @@ let add_fam_norm gen r adop_list =
       in
       let note =
         match find_all_fields "NOTE" r.rsons with
-          [] -> ""
+          [] -> Compat.String.empty
         | rl -> treat_notes gen rl
       in
       u, d, p, (note, []), source gen r, witnesses
-    | None -> relation, None, "", ("", []), ("", []), []
+    | None -> relation, None, Compat.String.empty, (Compat.String.empty, []), (Compat.String.empty, []), []
   in
   let witnesses = Array.of_list witnesses in
   let div =
@@ -2508,18 +2524,18 @@ let add_fam_norm gen r adop_list =
   let fevents = treat_fam_fevent gen fath r in
   let comment =
     match find_all_fields "NOTE" r.rsons with
-      [] -> ""
+      [] -> Compat.String.empty
     | rl -> treat_notes gen rl
   in
   let (fsources, fsources_nt) =
     let (s, s_nt) = source gen r in
-    if s = "" then !default_source, s_nt else s, s_nt
+    if Compat.String.is_empty s then !default_source, s_nt else s, s_nt
   in
   let concat_text s1 s2 s_sep =
-    let s = if s1 = "" then "" else s_sep in s1 ^ s ^ s2
+    let s = if Compat.String.is_empty s1 then Compat.String.empty else s_sep in s1 ^ s ^ s2
   in
   let ext_sources =
-    let text = concat_text "" (notes_from_source_record marr_nt) "<br>\n" in
+    let text = concat_text Compat.String.empty (notes_from_source_record marr_nt) "<br>\n" in
     concat_text text (notes_from_source_record fsources_nt) "<br>\n"
   in
   let ext_notes =
@@ -2529,11 +2545,11 @@ let add_fam_norm gen r adop_list =
         if rtl = [] then init
         else concat_text init (html_text_of_tags text rtl) "\n"
       in
-      let nt = remain_tags_in_notes "FAM" "" r.rsons in
+      let nt = remain_tags_in_notes "FAM" Compat.String.empty r.rsons in
       let nt = remain_tags_in_notes "MARR SOUR" nt marr_nt in
       let nt = remain_tags_in_notes "SOUR SOUR" nt fsources_nt in
-      if nt = "" then "" else "<pre>\n" ^ nt ^ "\n</pre>"
-    else ""
+      if Compat.String.is_empty nt then Compat.String.empty else "<pre>\n" ^ nt ^ "\n</pre>"
+    else Compat.String.empty
   in
   let add_in_person_notes iper =
     match gen.g_per.arr.(iper) with
@@ -2541,8 +2557,8 @@ let add_fam_norm gen r adop_list =
     | Right3 (p, a, u) ->
       let notes = gen.g_str.arr.(p.notes) in
       let notes =
-        if notes = "" then ext_sources ^ ext_notes
-        else if ext_sources = "" then notes ^ "\n" ^ ext_notes
+        if Compat.String.is_empty notes then ext_sources ^ ext_notes
+        else if Compat.String.is_empty ext_sources then notes ^ "\n" ^ ext_notes
         else notes ^ "<br>\n" ^ ext_sources ^ ext_notes
       in
       let new_notes = add_string gen notes in
@@ -2550,7 +2566,7 @@ let add_fam_norm gen r adop_list =
       gen.g_per.arr.(iper) <- Right3 (p, a, u)
   in
   let _ =
-    if ext_notes = "" then ()
+    if ext_notes = Compat.String.empty then ()
     else begin add_in_person_notes fath; add_in_person_notes moth end
   in
   (* Mise à jour des évènements principaux. *)
@@ -2613,7 +2629,7 @@ let treat_header2 r =
   match find_field "PLAC" r.rsons with
     Some rr ->
       begin match find_field "FORM" rr.rsons with
-        Some rrr -> if rrr.rval <> "" then ()
+        Some rrr -> if not @@ Compat.String.is_empty rrr.rval then ()
       | None -> ()
       end
   | None -> ()
@@ -2663,16 +2679,16 @@ let find_lev0 (strm__ : _ Stream.t) =
   let bp = Stream.count strm__ in
   let _ = line_start '0' strm__ in
   let _ =
-    try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
+    try skip_space strm__ with Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
   let r1 =
-    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
   let r2 =
-    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
   let _ =
-    try skip_to_eoln strm__ with Stream.Failure -> raise (Stream.Error "")
+    try skip_to_eoln strm__ with Stream.Failure -> raise (Stream.Error Compat.String.empty)
   in
   bp, r1, r2
 
@@ -2872,14 +2888,14 @@ let add_parents_to_isolated gen =
 let make_arrays fname =
   let gen =
     {g_per = {arr = [| |]; tlen = 0}; g_fam = {arr = [| |]; tlen = 0};
-     g_str = {arr = [| |]; tlen = 0}; g_bnot = ""; g_ic = open_in_bin_with_bom_check fname;
+     g_str = {arr = [| |]; tlen = 0}; g_bnot = Compat.String.empty; g_ic = open_in_bin_with_bom_check fname;
      g_not = Hashtbl.create 3001; g_src = Hashtbl.create 3001;
      g_hper = Hashtbl.create 3001; g_hfam = Hashtbl.create 3001;
      g_hstr = Hashtbl.create 3001; g_hnam = Hashtbl.create 3001;
      g_adop = Hashtbl.create 3001; g_godp = []; g_prelated = [];
      g_frelated = []; g_witn = []}
   in
-  assert (add_string gen "" = string_empty);
+  assert (add_string gen Compat.String.empty = string_empty);
   assert (add_string gen "?" = string_quest);
   assert (add_string gen "x" = string_x);
   Printf.eprintf "*** pass 1 (note)\n";
@@ -2921,7 +2937,8 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
   in
   let strings = Array.sub g_str.arr 0 g_str.tlen in
   let bnotes =
-    {nread = (fun s _ -> if s = "" then g_bnot else ""); norigin_file = "";
+    {nread = (fun s _ -> if Compat.String.is_empty s then
+      g_bnot else Compat.String.empty); norigin_file = Compat.String.empty;
      efiles = fun _ -> []}
   in
   persons, families, strings, bnotes
@@ -3240,8 +3257,8 @@ let speclist =
         | Some i ->
           let a = String.sub s 0 i in
           let b = String.sub s (i + 1) (String.length s - i - 1) in
-          let a = if a = "" then !alive_years else int_of_string a in
-          let b = max a (if b = "" then !dead_years else int_of_string b) in
+          let a = if Compat.String.is_empty a then !alive_years else int_of_string a in
+          let b = max a (if Compat.String.is_empty b then !dead_years else int_of_string b) in
           alive_years := a ;
           dead_years := b ;
         | None -> raise (Arg.Bad "bad parameter for -udi")
@@ -3282,7 +3299,7 @@ let speclist =
   ] |> List.sort compare |> Arg.align
 
 let anonfun s =
-  if !in_file = "" then in_file := s
+  if Compat.String.is_empty !in_file then in_file := s
   else raise (Arg.Bad "Cannot treat several GEDCOM files")
 
 let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
@@ -3290,15 +3307,15 @@ let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
 let main () =
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
-  if !in_file <> "" then
+  if not @@ Compat.String.is_empty !in_file then
     close_in (open_in_bin_with_bom_check !in_file);
   let input_file =
-    if !in_file <> "" then
+    if not @@ Compat.String.is_empty !in_file then
       Filename.remove_extension !in_file
     else
       !in_file
   in
-  if input_file <> "" && (not (Array.mem "-o" Sys.argv)) then out_file := input_file;
+  if not @@ Compat.String.is_empty input_file && (not (Array.mem "-o" Sys.argv)) then out_file := input_file;
   out_file := Filename.basename !out_file |> Filename.remove_extension;
   if not (Mutil.good_name !out_file) then (
     (* Util.transl conf not available !*)

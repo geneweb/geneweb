@@ -1,8 +1,9 @@
 module Database = Geneweb_db.Database
 module Gwdb_gc = Geneweb_db.Db_gc
+module Compat = Geneweb_compat
 
 let dry_run = ref false
-let bname = ref ""
+let bname = ref Compat.String.empty
 
 let speclist =
   [ ("--dry-run", Arg.Set dry_run, " do not commit changes (only print)") ]
@@ -13,11 +14,10 @@ let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 let () =
   Arg.parse speclist anonfun usage;
   let bname =
-    match !bname with
-    | "" ->
-        Arg.usage speclist usage;
-        exit 1
-    | s -> s
+    if Compat.String.is_empty !bname then (
+      Arg.usage speclist usage;
+      exit 1)
+    else !bname
   in
   let dry_run = !dry_run in
   Secure.set_base_dir (Filename.dirname bname);

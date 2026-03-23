@@ -4,12 +4,13 @@ open Geneweb
 open Gwcomp
 open Def
 module Driver = Geneweb_db.Driver
+module Compat = Geneweb_compat
 
 (* From OCaml manual, integer in binary format is 4 bytes long. *)
 let sizeof_long = 4
 
 (** Default source field for persons and families without source data *)
-let default_source = ref ""
+let default_source = ref Compat.String.empty
 
 (** Base consistency check *)
 let do_check = ref true
@@ -145,7 +146,7 @@ let check_error ?(critical = false) gen msg =
 let set_error base gen x =
   Printf.printf "\nError: ";
   Check.print_base_error stdout base x;
-  check_error gen ""
+  check_error gen Compat.String.empty
 
 (** Function that will be called if base's checker will find a warning *)
 let set_warning base no_warn x =
@@ -189,7 +190,7 @@ let output_item_value oc v = Marshal.to_channel oc v [ Marshal.No_sharing ]
 let input_item_value ic = input_value ic
 
 (** Empty string *)
-let no_string = ""
+let no_string = Compat.String.empty
 
 (** Stores unique string (if not already present) inside the base's string array
     and associate this string to its index in mentioned array. Extens array if
@@ -213,7 +214,7 @@ let unique_string gen x =
 
 (** Dummy [family] with its empty [couple] and [descendants]. *)
 let no_family gen =
-  let empty_string = unique_string gen "" in
+  let empty_string = unique_string gen Compat.String.empty in
   let fam =
     {
       marriage = Date.cdate_None;
@@ -239,7 +240,7 @@ let no_family gen =
     with default value. Returns also empty [ascend] and [union] attached to the
     considered person. *)
 let make_person gen p n occ : min_person * ascend * union =
-  let empty_string = unique_string gen "" in
+  let empty_string = unique_string gen Compat.String.empty in
   let p =
     {
       m_first_name = unique_string gen p;
@@ -256,7 +257,7 @@ let make_person gen p n occ : min_person * ascend * union =
   (p, a, u)
 
 (** Dummy [min_person] with its empty [ascend] and [union]. *)
-let no_person gen = make_person gen "" "" 0
+let no_person gen = make_person gen Compat.String.empty Compat.String.empty 0
 
 (** Extends person's acendant's and union's arrays inside [gen.g_base] if
     needed. *)
@@ -481,14 +482,16 @@ let insert_undefined gen key =
     then (
       Printf.printf "\nError: Person defined with two spellings:\n";
       Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
-        (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
+        (match x.m_occ with
+        | 0 -> Compat.String.empty
+        | n -> "." ^ string_of_int n)
         key.pk_surname;
       Printf.printf "  \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
-        (match occ with 0 -> "" | n -> "." ^ string_of_int n)
+        (match occ with 0 -> Compat.String.empty | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
-      check_error gen "");
+      check_error gen Compat.String.empty);
   (x, ip)
 
 (** Insert person's definition in the base and modifies all coresponding fields
@@ -563,7 +566,9 @@ let insert_person gen so =
   if gen.g_def.(ip) then (
     let person_str =
       Printf.sprintf "%s%s %s" so.first_name
-        (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
+        (match x.m_occ with
+        | 0 -> Compat.String.empty
+        | n -> "." ^ string_of_int n)
         so.surname
     in
     Printf.printf "\nError: Person already defined: \"%s\"\n" person_str;
@@ -573,10 +578,10 @@ let insert_person gen so =
     then
       Printf.printf "as name: \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
-        (match occ with 0 -> "" | n -> "." ^ string_of_int n)
+        (match occ with 0 -> Compat.String.empty | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
     flush stdout;
-    check_error gen "")
+    check_error gen Compat.String.empty)
   else (* else set it as defined *)
     gen.g_def.(ip) <- true;
   if not gen.g_errored then
@@ -587,24 +592,30 @@ let insert_person gen so =
       (* print error about person defined with two spellings *)
       let msg =
         Printf.sprintf "Two spellings: \"%s%s %s\" vs \"%s%s %s\"" so.first_name
-          (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
+          (match x.m_occ with
+          | 0 -> Compat.String.empty
+          | n -> "." ^ string_of_int n)
           so.surname
           (p_first_name gen.g_base x)
-          (match occ with 0 -> "" | n -> "." ^ string_of_int n)
+          (match occ with
+          | 0 -> Compat.String.empty
+          | n -> "." ^ string_of_int n)
           (p_surname gen.g_base x)
       in
       Printf.printf "\nError: Person defined with two spellings:\n";
       Printf.printf "  \"%s%s %s\"\n" so.first_name
-        (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
+        (match x.m_occ with
+        | 0 -> Compat.String.empty
+        | n -> "." ^ string_of_int n)
         so.surname;
       Printf.printf "  \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
-        (match occ with 0 -> "" | n -> "." ^ string_of_int n)
+        (match occ with 0 -> Compat.String.empty | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
       check_error ~critical:true gen msg);
   if not gen.g_errored then (
-    let empty_string = unique_string gen "" in
+    let empty_string = unique_string gen Compat.String.empty in
     (* Convert [(_,_,string) gen_person] to [person]. Save all strings in base *)
     let x =
       {
@@ -644,7 +655,8 @@ let insert_person gen so =
         notes = empty_string;
         psources =
           unique_string gen
-            (if so.psources = "" then !default_source else so.psources);
+            (if Compat.String.is_empty so.psources then !default_source
+             else so.psources);
         key_index = ip;
       }
     in
@@ -828,10 +840,10 @@ let update_fevents_with_family gen fam =
           {
             efam_name = Efam_Divorce;
             efam_date = cd;
-            efam_place = unique_string gen "";
-            efam_reason = unique_string gen "";
-            efam_note = unique_string gen "";
-            efam_src = unique_string gen "";
+            efam_place = unique_string gen Compat.String.empty;
+            efam_reason = unique_string gen Compat.String.empty;
+            efam_note = unique_string gen Compat.String.empty;
+            efam_src = unique_string gen Compat.String.empty;
             efam_witnesses = [||];
           }
         in
@@ -842,10 +854,10 @@ let update_fevents_with_family gen fam =
           {
             efam_name = Efam_Separated;
             efam_date = Date.cdate_None;
-            efam_place = unique_string gen "";
-            efam_reason = unique_string gen "";
-            efam_note = unique_string gen "";
-            efam_src = unique_string gen "";
+            efam_place = unique_string gen Compat.String.empty;
+            efam_reason = unique_string gen Compat.String.empty;
+            efam_note = unique_string gen Compat.String.empty;
+            efam_src = unique_string gen Compat.String.empty;
             efam_witnesses = [||];
           }
         in
@@ -855,10 +867,10 @@ let update_fevents_with_family gen fam =
           {
             efam_name = Efam_Separated;
             efam_date = cd;
-            efam_place = unique_string gen "";
-            efam_reason = unique_string gen "";
-            efam_note = unique_string gen "";
-            efam_src = unique_string gen "";
+            efam_place = unique_string gen Compat.String.empty;
+            efam_reason = unique_string gen Compat.String.empty;
+            efam_note = unique_string gen Compat.String.empty;
+            efam_src = unique_string gen Compat.String.empty;
             efam_witnesses = [||];
           }
         in
@@ -958,7 +970,8 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   (* insert sources comment *)
   let fsources =
     unique_string gen
-      (if fo.fsources = "" then !default_source else fo.fsources)
+      (if Compat.String.is_empty fo.fsources then !default_source
+       else fo.fsources)
   in
   (* extend arrays if needed *)
   new_ifam gen;
@@ -1052,9 +1065,9 @@ let insert_pevents fname gen sb pevtl =
     Printf.printf "\nFile \"%s\"" fname;
     Printf.printf "\nError: Individual events already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.m_first_name)
-      (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
+      (if p.m_occ = 0 then Compat.String.empty else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
-    check_error gen "")
+    check_error gen Compat.String.empty)
   else
     (* sort evenets *)
     let pevents =
@@ -1102,19 +1115,19 @@ let insert_notes fname gen key str =
   with
   | Some ip ->
       let p = poi gen.g_base ip in
-      if sou gen.g_base p.m_notes <> "" then (
+      if not @@ Compat.String.is_empty @@ sou gen.g_base p.m_notes then (
         Printf.printf "\nFile \"%s\"" fname;
         Printf.printf "\nError: Notes already defined for \"%s%s %s\"\n"
           key.pk_first_name
-          (if occ = 0 then "" else "." ^ string_of_int occ)
+          (if occ = 0 then Compat.String.empty else "." ^ string_of_int occ)
           key.pk_surname;
-        check_error gen "")
+        check_error gen Compat.String.empty)
       else p.m_notes <- unique_string gen str
   | None ->
       Printf.printf "File \"%s\"\n" fname;
       Printf.printf "*** warning: undefined person: \"%s%s %s\"\n"
         key.pk_first_name
-        (if occ = 0 then "" else "." ^ string_of_int occ)
+        (if occ = 0 then Compat.String.empty else "." ^ string_of_int occ)
         key.pk_surname;
       flush stdout
 
@@ -1127,7 +1140,7 @@ let insert_bnotes fname gen nfname str =
     (* Convert path notation from 'dir1:dir2:file' to 'dir1/dir2/file'
        (if a valid path) *)
     let nfname =
-      if nfname = "" then ""
+      if Compat.String.is_empty nfname then Compat.String.empty
       else
         match NotesLinks.check_file_name nfname with
         | Some (dl, f) -> List.fold_right Filename.concat dl f
@@ -1139,13 +1152,15 @@ let insert_bnotes fname gen nfname str =
         | Drop -> assert false
         | Erase -> str
         | Merge -> old_nread nfname RnAll ^ str
-        | First -> ( match old_nread nfname RnAll with "" -> str | str -> str)
+        | First ->
+            let s = old_nread nfname RnAll in
+            if Compat.String.is_empty s then str else s
       in
       {
         nread = (fun f n -> if f = nfname then str else old_nread f n);
         norigin_file = fname;
         efiles =
-          (if nfname <> "" then
+          (if not @@ Compat.String.is_empty nfname then
              let efiles = gen.g_base.c_bnotes.efiles () in
              fun () -> nfname :: efiles
            else gen.g_base.c_bnotes.efiles);
@@ -1189,9 +1204,10 @@ let insert_relations fname gen sb sex rl =
       Printf.printf "\nFile \"%s\"" fname;
       Printf.printf "\nError: Relations already defined for \"%s%s %s\"\n"
         (sou gen.g_base p.m_first_name)
-        (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
+        (if p.m_occ = 0 then Compat.String.empty
+         else "." ^ string_of_int p.m_occ)
         (sou gen.g_base p.m_surname);
-      check_error gen "")
+      check_error gen Compat.String.empty)
   else (
     notice_sex gen p sex;
     let rl = List.map (insert_relation gen ip) rl in
@@ -1548,13 +1564,13 @@ let convert_persons per_index_ic per_ic persons =
     persons
 
 (** File containing the particles to use *)
-let particules_file = ref ""
+let particules_file = ref Compat.String.empty
 
 (** Returns list of particles from the file. If filename is empty string then
     returns default particles list *)
-let input_particles = function
-  | "" -> Mutil.default_particles
-  | file -> Mutil.input_particles file
+let input_particles file =
+  if Compat.String.is_empty file then Mutil.default_particles
+  else Mutil.input_particles file
 
 (** Empty base *)
 let empty_base : cbase =
@@ -1567,7 +1583,11 @@ let empty_base : cbase =
     c_descends = [||];
     c_strings = [||];
     c_bnotes =
-      { nread = (fun _ _ -> ""); norigin_file = ""; efiles = (fun _ -> []) };
+      {
+        nread = (fun _ _ -> Compat.String.empty);
+        norigin_file = Compat.String.empty;
+        efiles = (fun _ -> []);
+      };
   }
 
 (** Extract information from the [gen.g_base] and create database *)
@@ -1671,8 +1691,8 @@ let link ?(no_warn = false) next_family_fun bdir =
   let fi =
     {
       f_local_names = Hashtbl.create 20011;
-      f_curr_src_file = "";
-      f_curr_gwo_file = "";
+      f_curr_src_file = Compat.String.empty;
+      f_curr_gwo_file = Compat.String.empty;
       f_separate = false;
       f_shift = 0;
       f_bnotes = Merge;
@@ -1700,7 +1720,7 @@ let link ?(no_warn = false) next_family_fun bdir =
   in
   let per_index_ic = open_in_bin tmp_per_index in
   let per_ic = open_in_bin tmp_per in
-  let istr_empty = unique_string gen "" in
+  let istr_empty = unique_string gen Compat.String.empty in
   let istr_quest = unique_string gen "?" in
   assert (istr_empty = 0);
   assert (istr_quest = 1);

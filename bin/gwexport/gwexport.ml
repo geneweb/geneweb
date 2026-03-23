@@ -2,6 +2,7 @@ open Geneweb
 module Collection = Geneweb_db.Collection
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Compat = Geneweb_compat
 
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 
@@ -33,13 +34,13 @@ let default_opts =
     censor = 0;
     charset = Utf8;
     desc = None;
-    img_base_path = "";
+    img_base_path = Compat.String.empty;
     keys = [];
     aws = false;
     mem = false;
     no_notes = `none;
     no_picture = false;
-    oc = ("", prerr_string, fun () -> close_out stderr);
+    oc = (Compat.String.empty, prerr_string, fun () -> close_out stderr);
     parentship = false;
     picture_path = false;
     source = None;

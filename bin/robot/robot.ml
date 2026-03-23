@@ -1,6 +1,6 @@
 (* Robot blacklist manager for Geneweb *)
 (* Usage: robot <command> [options] *)
-
+module Compat = Geneweb_compat
 open Printf
 
 let magic_robot = "GWRB0008"
@@ -165,7 +165,7 @@ let import_blacklist input_file =
   let xcl =
     match read_robot_file fname with
     | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
+    | None -> { excl = []; who = W.empty; max_conn = (0, Compat.String.empty) }
   in
 
   let ic = Secure.open_in input_file in
@@ -176,7 +176,7 @@ let import_blacklist input_file =
        incr line_num;
        let line = input_line ic in
        let line = String.trim line in
-       if line <> "" && line.[0] <> '#' then
+       if (not (Compat.String.is_empty line)) && line.[0] <> '#' then
          try
            let ip, cnt =
              match String.split_on_char '\t' line with
@@ -214,7 +214,7 @@ let add_ip patterns_str =
     if String.contains patterns_str ',' then
       String.split_on_char ',' patterns_str
       |> List.map String.trim
-      |> List.filter (fun s -> s <> "")
+      |> List.filter (fun s -> not @@ Compat.String.is_empty s)
     else [ patterns_str ]
   in
 
@@ -229,7 +229,7 @@ let add_ip patterns_str =
   let xcl =
     match read_robot_file fname with
     | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
+    | None -> { excl = []; who = W.empty; max_conn = (0, Compat.String.empty) }
   in
 
   List.iter
@@ -275,7 +275,7 @@ let remove_ip ip =
   let xcl =
     match read_robot_file fname with
     | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
+    | None -> { excl = []; who = W.empty; max_conn = (0, Compat.String.empty) }
   in
   if List.mem_assoc ip xcl.excl then (
     xcl.excl <- List.remove_assoc ip xcl.excl;
@@ -285,7 +285,7 @@ let remove_ip ip =
 
 let clear_all () =
   let fname = get_robot_file () in
-  let xcl = { excl = []; who = W.empty; max_conn = (0, "") } in
+  let xcl = { excl = []; who = W.empty; max_conn = (0, Compat.String.empty) } in
   write_robot_file fname xcl;
   printf "Cleared all robot data\n"
 
@@ -293,8 +293,8 @@ let clear_monitoring () =
   let fname = get_robot_file () in
   let xcl =
     match read_robot_file fname with
-    | Some x -> { x with who = W.empty; max_conn = (0, "") }
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
+    | Some x -> { x with who = W.empty; max_conn = (0, Compat.String.empty) }
+    | None -> { excl = []; who = W.empty; max_conn = (0, Compat.String.empty) }
   in
   write_robot_file fname xcl;
   printf "Cleared monitoring data (kept blacklist)\n"

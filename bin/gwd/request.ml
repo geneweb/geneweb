@@ -10,6 +10,7 @@ module Gutil = Geneweb_db.Gutil
 module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Compat = Geneweb_compat
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
@@ -100,7 +101,8 @@ let process_titles conf base n p =
     (fun t ->
       match (t.t_name, Driver.get_public_name p) with
       | Tname s, _ -> compare_and_add t s
-      | _, pn when Driver.sou base pn <> "" -> compare_and_add t pn
+      | _, pn when not @@ Compat.String.is_empty @@ Driver.sou base pn ->
+          compare_and_add t pn
       | _ -> ())
     (nobtit conf base p);
   !tl
@@ -330,12 +332,12 @@ let make_henv conf base =
     else conf
   in
   let conf =
-    if conf.userkey = "" then conf
+    if Compat.String.is_empty conf.userkey then conf
     else
       let fn, oc, sn = GWPARAM.split_key conf.userkey in
       match
         Geneweb_db.Driver.person_of_key base fn sn
-          (if oc = "" then 0 else int_of_string oc)
+          (if Compat.String.is_empty oc then 0 else int_of_string oc)
       with
       | Some ip ->
           {
@@ -501,7 +503,7 @@ let w_base ~none fn conf (bfile : string option) =
           fn conf base)
 
 let w_person ~none fn conf base =
-  match find_person_in_env conf base "" with
+  match find_person_in_env conf base Compat.String.empty with
   | Some p -> fn conf base p
   | _ -> none conf base
 
@@ -516,7 +518,8 @@ let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base =
     let none conf =
-      if conf.bname = "" then GWPARAM.output_error conf Code.Bad_Request
+      if Compat.String.is_empty conf.bname then
+        GWPARAM.output_error conf Code.Bad_Request
       else (
         Notif.error
           ~title:(Util.transl conf "NOTIF_TT unknown base")
@@ -542,14 +545,14 @@ let treat_request =
       conf l
   in
   let handle_no_bfile conf l =
-    if conf.bname = "" then
+    if Compat.String.is_empty conf.bname then
       try Templ.output_simple conf Templ.Env.empty "index"
       with _ -> propose_base conf
     else print_page conf l
   in
   fun conf ->
     let bfile =
-      if conf.bname = "" then None
+      if Compat.String.is_empty conf.bname then None
       else
         let bfile =
           Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb")
@@ -581,7 +584,9 @@ let treat_request =
             List.iter
               (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile)
               !Plugin.se;
-          let m = Option.value ~default:"" (p_getenv conf.env "m") in
+          let m =
+            Option.value ~default:Compat.String.empty (p_getenv conf.env "m")
+          in
           if not @@ try_plugin plugins conf bfile m then
             ((if
                 List.assoc_opt "counter" conf.base_env <> Some "no"
@@ -753,7 +758,8 @@ let treat_request =
                      match p_getenv conf.env "ajax" with
                      | Some "on" ->
                          let charset =
-                           if conf.charset = "" then "utf-8" else conf.charset
+                           if Compat.String.is_empty conf.charset then "utf-8"
+                           else conf.charset
                          in
                          Output.header conf
                            "Content-type: application/json; charset=%s" charset;
@@ -810,7 +816,8 @@ let treat_request =
                      (* Récupère le contenu non vide de la recherche. *)
                      let real_input label =
                        match p_getenv conf.env label with
-                       | Some s -> if s = "" then None else Some s
+                       | Some s ->
+                           if Compat.String.is_empty s then None else Some s
                        | None -> None
                      in
                      (* Recherche par clé, sosa, alias ... *)
@@ -865,13 +872,14 @@ let treat_request =
                            match p_getenv conf.env "f" with
                            | Some f ->
                                if NotesLinks.check_file_name f <> None then f
-                               else ""
-                           | None -> ""
+                               else Compat.String.empty
+                           | None -> Compat.String.empty
                          in
                          NotesDisplay.print_what_links conf base fnotes
                      | _, Some "on" ->
                          let charset =
-                           if conf.charset = "" then "utf-8" else conf.charset
+                           if Compat.String.is_empty conf.charset then "utf-8"
+                           else conf.charset
                          in
                          Output.header conf
                            "Content-type: application/json; charset=%s" charset;
@@ -889,7 +897,7 @@ let treat_request =
                      let t_param =
                        match p_getenv conf.env "t" with
                        | Some t -> ("t", Mutil.encode t)
-                       | None -> ("t", Mutil.encode "")
+                       | None -> ("t", Mutil.encode Compat.String.empty)
                      in
                      let conf =
                        {
@@ -955,7 +963,9 @@ let treat_request =
                          RelationDisplay.print conf base p1 (Some p2)
                      | _ -> (
                          (* Fallback sur l'ancien format *)
-                         let p1_old = find_person_in_env conf base "" in
+                         let p1_old =
+                           find_person_in_env conf base Compat.String.empty
+                         in
                          let p2_old = find_person_in_env conf base "1" in
                          match (p1_old, p2_old) with
                          | Some p1, Some p2 ->
@@ -1001,7 +1011,9 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match Util.p_getenv conf.env "v" with
                  | Some f -> (
-                     match Util.find_person_in_env conf base "" with
+                     match
+                       Util.find_person_in_env conf base Compat.String.empty
+                     with
                      | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
                      | _ ->
                          Perso.interp_templ ("tp0_" ^ f) conf base
@@ -1037,15 +1049,16 @@ let treat_request =
         in
         Hutil.rheader conf title;
         let base_name =
-          if conf.cgi then Printf.sprintf "b=%s&" conf.bname else ""
+          if conf.cgi then Printf.sprintf "b=%s&" conf.bname
+          else Compat.String.empty
         in
         let user = transl_nth conf "user/password/cancel" 0 in
         let passwd = transl_nth conf "user/password/cancel" 1 in
         let referer =
           match Util.extract_value '?' (get_referer conf :> string) with
-          | exception Not_found -> ""
-          | referer when referer <> "" -> "&" ^ referer
-          | _ -> ""
+          | exception Not_found -> Compat.String.empty
+          | referer when not @@ Compat.String.is_empty referer -> "&" ^ referer
+          | _ -> Compat.String.empty
         in
         let body =
           if conf.cgi then

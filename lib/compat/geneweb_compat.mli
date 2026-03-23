@@ -142,3 +142,15 @@ module Seq : sig
 
       @since 4.14 *)
 end
+
+module String : sig
+  val empty : string
+  (** The empty string.
+
+      @since 4.13 *)
+
+  val is_empty : string -> bool
+  (** [is_empty s] is [true] if and only if [s] is an empty string.
+
+      @since 5.5 *)
+end

@@ -4,9 +4,10 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 module Dirs = Geneweb_dirs
+module Compat = Geneweb_compat
 
 let debug = ref false
-let fname = ref ""
+let fname = ref Compat.String.empty
 let errmsg = Format.sprintf "usage: %s [options] <file_name>" Sys.argv.(0)
 
 let speclist =
@@ -21,7 +22,7 @@ let speclist =
   ]
 
 let anonfun s =
-  if !fname = "" then fname := s
+  if Compat.String.is_empty !fname then fname := s
   else raise (Arg.Bad "Cannot treat several databases")
 
 let notes_links s =
@@ -75,7 +76,7 @@ let compute base bdir =
 
   Printf.eprintf "--- database notes\n";
   flush stderr;
-  let list = notes_links (Driver.base_notes_read base "") in
+  let list = notes_links (Driver.base_notes_read base Compat.String.empty) in
   (if list = ([], []) then ()
    else
      let pg = NLDB.PgNotes in
@@ -169,7 +170,7 @@ let compute base bdir =
     with Sys_error _ ->
       Printf.eprintf "Warning: error while reading misc notes %s\n" name
   in
-  loop Filename.current_dir_name "";
+  loop Filename.current_dir_name Compat.String.empty;
 
   let buffer = Buffer.create 1024 in
   let add_string istr =
@@ -261,7 +262,7 @@ let main () =
   Secure.set_base_dir ".";
   Arg.parse speclist anonfun errmsg;
   let bname = Filename.concat (Secure.base_dir ()) !fname in
-  if !fname = "" then (
+  if Compat.String.is_empty !fname then (
     Printf.eprintf "Missing database name\n";
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;

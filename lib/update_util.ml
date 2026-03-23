@@ -1,3 +1,4 @@
+module Compat = Geneweb_compat
 open Config
 open Def
 open Util
@@ -15,11 +16,11 @@ type create_info = Update.create_info = {
 let ci_empty =
   {
     ci_birth_date = None;
-    ci_birth_place = "";
+    ci_birth_place = Compat.String.empty;
     ci_death = DontKnowIfDead;
     ci_death_date = None;
-    ci_death_place = "";
-    ci_occupation = "";
+    ci_death_place = Compat.String.empty;
+    ci_occupation = Compat.String.empty;
     ci_public = false;
   }
 
@@ -88,7 +89,9 @@ let update_ci conf create key =
     | _ -> DontKnowIfDead
   in
   let occupation =
-    match p_getenv conf.env (key ^ "_occu") with Some s -> s | _ -> ""
+    match p_getenv conf.env (key ^ "_occu") with
+    | Some s -> s
+    | _ -> Compat.String.empty
   in
   let x =
     match create with
@@ -128,19 +131,20 @@ let eval_default_var conf s =
     let len = String.length sini in
     if String.length s > len && String.sub s 0 (String.length sini) = sini then
       String.sub s len (String.length s - len)
-    else ""
+    else Compat.String.empty
   in
 
   let v = extract_var "evar_" s in
-  if v <> "" then
+  if not @@ Compat.String.is_empty v then
     match p_getenv (conf.env @ conf.henv) v with
     | Some vv -> safe_val (Util.escape_html vv :> Adef.safe_string)
-    | None -> str_val ""
+    | None -> str_val Compat.String.empty
   else
     let v = extract_var "bvar_" s in
-    let v = if v = "" then extract_var "cvar_" s else v in
-    if v <> "" then
-      str_val (try List.assoc v conf.base_env with Not_found -> "")
+    let v = if Compat.String.is_empty v then extract_var "cvar_" s else v in
+    if not @@ Compat.String.is_empty v then
+      str_val
+        (try List.assoc v conf.base_env with Not_found -> Compat.String.empty)
     else raise Not_found
 
 let eval_date_field = function
@@ -154,12 +158,13 @@ let eval_date_field = function
       | Dtext _ -> None)
 
 let eval_is_cal cal = function
-  | Some (Adef.Dgreg (_, x)) -> if x = cal then "1" else ""
-  | Some (Dtext _) | None -> ""
+  | Some (Adef.Dgreg (_, x)) -> if x = cal then "1" else Compat.String.empty
+  | Some (Dtext _) | None -> Compat.String.empty
 
 let eval_is_prec cond = function
-  | Some (Adef.Dgreg ({ prec = x; _ }, _)) -> if cond x then "1" else ""
-  | Some (Dtext _) | None -> ""
+  | Some (Adef.Dgreg ({ prec = x; _ }, _)) ->
+      if cond x then "1" else Compat.String.empty
+  | Some (Dtext _) | None -> Compat.String.empty
 
 let add_precision s p =
   match p with
@@ -180,47 +185,49 @@ let eval_date_var od s =
       | Some (Dgreg (_, Djulian)) -> "julian"
       | Some (Dgreg (_, Dfrench)) -> "french"
       | Some (Dgreg (_, Dhebrew)) -> "hebrew"
-      | _ -> "")
+      | _ -> Compat.String.empty)
   | "day" -> (
       match eval_date_field od with
-      | Some d -> if d.Adef.day = 0 then "" else string_of_int d.Adef.day
-      | None -> "")
+      | Some d ->
+          if d.Adef.day = 0 then Compat.String.empty
+          else string_of_int d.Adef.day
+      | None -> Compat.String.empty)
   | "month" -> (
       match eval_date_field od with
       | Some d -> (
-          if d.Adef.month = 0 then ""
+          if d.Adef.month = 0 then Compat.String.empty
           else
             match od with
             | Some (Adef.Dgreg (_, Dfrench)) -> short_f_month d.Adef.month
             | _ -> string_of_int d.Adef.month)
-      | None -> "")
+      | None -> Compat.String.empty)
   | "orday" -> (
       match eval_date_field od with
       | Some d -> (
           match d.Adef.prec with
           | Adef.OrYear d2 | YearInt d2 ->
-              if d2.day2 = 0 then "" else string_of_int d2.day2
-          | _ -> "")
-      | None -> "")
+              if d2.day2 = 0 then Compat.String.empty else string_of_int d2.day2
+          | _ -> Compat.String.empty)
+      | None -> Compat.String.empty)
   | "ormonth" -> (
       match eval_date_field od with
       | Some d -> (
           match d.Adef.prec with
           | OrYear d2 | YearInt d2 -> (
-              if d2.month2 = 0 then ""
+              if d2.month2 = 0 then Compat.String.empty
               else
                 match od with
                 | Some (Adef.Dgreg (_, Dfrench)) -> short_f_month d2.month2
                 | _ -> string_of_int d2.month2)
-          | _ -> "")
-      | None -> "")
+          | _ -> Compat.String.empty)
+      | None -> Compat.String.empty)
   | "oryear" -> (
       match eval_date_field od with
       | Some d -> (
           match d.Adef.prec with
           | OrYear d2 | YearInt d2 -> string_of_int d2.year2
-          | _ -> "")
-      | None -> "")
+          | _ -> Compat.String.empty)
+      | None -> Compat.String.empty)
   | "prec" -> (
       match od with
       | Some (Adef.Dgreg ({ prec = Sure; _ }, _)) -> "sure"
@@ -230,20 +237,20 @@ let eval_date_var od s =
       | Some (Dgreg ({ prec = After; _ }, _)) -> "after"
       | Some (Dgreg ({ prec = OrYear _; _ }, _)) -> "oryear"
       | Some (Dgreg ({ prec = YearInt _; _ }, _)) -> "yearint"
-      | _ -> "")
+      | _ -> Compat.String.empty)
   | "text" -> (
       match od with
       | Some (Dtext s) -> Util.safe_html s |> Adef.as_string
-      | Some (Dgreg _) | None -> "")
+      | Some (Dgreg _) | None -> Compat.String.empty)
   | "year" -> (
       match eval_date_field od with
       | Some d -> string_of_int d.Adef.year
-      | None -> "")
+      | None -> Compat.String.empty)
   | "cal_french" -> eval_is_cal Adef.Dfrench od
   | "cal_gregorian" -> eval_is_cal Adef.Dgregorian od
   | "cal_hebrew" -> eval_is_cal Adef.Dhebrew od
   | "cal_julian" -> eval_is_cal Adef.Djulian od
-  | "prec_no" -> if od = None then "1" else ""
+  | "prec_no" -> if od = None then "1" else Compat.String.empty
   | "prec_sure" -> eval_is_prec (function Adef.Sure -> true | _ -> false) od
   | "prec_about" -> eval_is_prec (function Adef.About -> true | _ -> false) od
   | "prec_maybe" -> eval_is_prec (function Adef.Maybe -> true | _ -> false) od
@@ -265,12 +272,12 @@ let eval_create c = function
       | Update.Create
           (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)); _ }) ->
           let dmy = Calendar.french_of_gregorian dmy in
-          if dmy.day <> 0 then string_of_int dmy.day else ""
+          if dmy.day <> 0 then string_of_int dmy.day else Compat.String.empty
       | Update.Create
           (_, Some { ci_birth_date = Some (Dgreg ({ day = d; _ }, _)); _ })
         when d <> 0 ->
           string_of_int d
-      | _ -> "")
+      | _ -> Compat.String.empty)
   | "birth_month" -> (
       str_val
       @@
@@ -278,17 +285,18 @@ let eval_create c = function
       | Update.Create
           (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)); _ }) ->
           let dmy = Calendar.french_of_gregorian dmy in
-          if dmy.month <> 0 then short_f_month dmy.month else ""
+          if dmy.month <> 0 then short_f_month dmy.month
+          else Compat.String.empty
       | Update.Create
           (_, Some { ci_birth_date = Some (Dgreg ({ month = m; _ }, _)); _ })
         when m <> 0 ->
           string_of_int m
-      | _ -> "")
+      | _ -> Compat.String.empty)
   | "birth_place" -> (
       match c with
       | Update.Create (_, Some { ci_birth_place = pl; _ }) ->
           safe_val (Util.escape_html pl :> Adef.safe_string)
-      | _ -> str_val "")
+      | _ -> str_val Compat.String.empty)
   | "birth_year" -> (
       str_val
       @@
@@ -300,9 +308,9 @@ let eval_create c = function
               add_precision (string_of_int dmy.year) dmy.prec
           | Some (Dgreg ({ year = y; prec = p; _ }, _)) ->
               add_precision (string_of_int y) p
-          | Some _ -> ""
-          | None -> if ci.ci_public then "p" else "")
-      | _ -> "")
+          | Some _ -> Compat.String.empty
+          | None -> if ci.ci_public then "p" else Compat.String.empty)
+      | _ -> Compat.String.empty)
   | "death_day" -> (
       str_val
       @@
@@ -310,12 +318,12 @@ let eval_create c = function
       | Update.Create
           (_, Some { ci_death_date = Some (Dgreg (dmy, Dfrench)); _ }) ->
           let dmy = Calendar.french_of_gregorian dmy in
-          if dmy.day <> 0 then string_of_int dmy.day else ""
+          if dmy.day <> 0 then string_of_int dmy.day else Compat.String.empty
       | Update.Create
           (_, Some { ci_death_date = Some (Dgreg ({ day = d; _ }, _)); _ })
         when d <> 0 ->
           string_of_int d
-      | _ -> "")
+      | _ -> Compat.String.empty)
   | "death_month" -> (
       str_val
       @@
@@ -328,12 +336,12 @@ let eval_create c = function
           (_, Some { ci_death_date = Some (Dgreg ({ month = m; _ }, _)); _ })
         when m <> 0 ->
           string_of_int m
-      | _ -> "")
+      | _ -> Compat.String.empty)
   | "death_place" -> (
       match c with
       | Update.Create (_, Some { ci_death_place = pl; _ }) ->
           safe_val (Util.escape_html pl :> Adef.safe_string)
-      | _ -> str_val "")
+      | _ -> str_val Compat.String.empty)
   | "death_year" -> (
       str_val
       @@
@@ -350,13 +358,16 @@ let eval_create c = function
           add_precision (string_of_int y) p
       | Update.Create (_, Some { ci_death = death; ci_death_date = None; _ })
         -> (
-          match death with DeadDontKnowWhen -> "+" | NotDead -> "-" | _ -> "")
-      | _ -> "")
+          match death with
+          | DeadDontKnowWhen -> "+"
+          | NotDead -> "-"
+          | _ -> Compat.String.empty)
+      | _ -> Compat.String.empty)
   | "occupation" -> (
       match c with
       | Update.Create (_, Some { ci_occupation = occupation; _ }) ->
           safe_val (Util.escape_html occupation :> Adef.safe_string)
-      | _ -> str_val "")
+      | _ -> str_val Compat.String.empty)
   | "sex" -> (
       str_val
       @@
@@ -364,7 +375,7 @@ let eval_create c = function
       | Update.Create (Male, _) -> "male"
       | Update.Create (Female, _) -> "female"
       | Update.Create (Neuter, _) -> "neuter"
-      | _ -> "")
+      | _ -> Compat.String.empty)
   | _ -> raise Not_found
 
 let map_nosexcheck = function

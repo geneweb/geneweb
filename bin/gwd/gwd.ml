@@ -13,6 +13,7 @@ module Dirs = Geneweb_dirs
 module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Compat = Geneweb_compat
 
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
@@ -99,7 +100,8 @@ let client_accepts_encoding request encoding =
       in
       let p = String.trim part in
       Mutil.contains p encoding
-      && dominated (String.concat "" (String.split_on_char ' ' p))
+      && dominated
+           (String.concat Compat.String.empty (String.split_on_char ' ' p))
     in
     not (List.exists dominated_by_zero (String.split_on_char ',' accept))
 
@@ -226,16 +228,16 @@ type plugin = {
 }
 
 let printer_conf = { Config.empty with output_conf }
-let auth_file = ref ""
+let auth_file = ref Compat.String.empty
 let cache_langs = ref []
 let cache_databases = ref []
 let choose_browser_lang = ref false
 let conn_timeout = ref 120
 let daemon = ref false
 let default_lang = ref "fr"
-let friend_passwd = ref ""
+let friend_passwd = ref Compat.String.empty
 let green_color = "#2f6400"
-let images_dir = ref ""
+let images_dir = ref Compat.String.empty
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
 let login_timeout = ref 1800
 let default_n_workers = 20
@@ -255,7 +257,7 @@ let debug = ref false
 let check = ref false
 let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
-let wizard_passwd = ref ""
+let wizard_passwd = ref Compat.String.empty
 let predictable_mode = ref false
 let log_file : log ref = ref Stderr
 let verbosity_level = ref 6
@@ -306,11 +308,11 @@ type auth_report = {
 let split_username username =
   let l1 = String.split_on_char '|' username in
   match List.length l1 with
-  | 1 -> (username, "")
+  | 1 -> (username, Compat.String.empty)
   | 2 -> (List.nth l1 0, List.nth l1 1)
   | _ ->
       Logs.err (fun k -> k "Bad .auth key or sosa encoding");
-      (username, "")
+      (username, Compat.String.empty)
 
 let log_passwd_failed ar tm from request base_file =
   let referer = Mutil.extract_param "referer: " '\n' request in
@@ -323,7 +325,8 @@ let log_passwd_failed ar tm from request base_file =
   if !trace_failed_passwd then
     Logs.info (fun k -> k ~tags:timestamp " (%s)" (String.escaped ar.ar_uauth));
   Logs.info (fun k -> k "\n  From: %s\n  Agent: %s" from user_agent);
-  if referer <> "" then Logs.info (fun k -> k "  Referer: %s" referer)
+  if not @@ Compat.String.is_empty referer then
+    Logs.info (fun k -> k "  Referer: %s" referer)
 
 let copy_file conf fname =
   match Util.open_etc_file conf fname with
@@ -380,7 +383,7 @@ let index_from s o c =
 let index s c = index_from s 0 c
 
 let rec extract_assoc key = function
-  | [] -> ("", [])
+  | [] -> (Compat.String.empty, [])
   | ((k, v) as kv) :: kvl ->
       if k = key then (Mutil.decode v, kvl)
       else
@@ -474,8 +477,8 @@ let load_plugin ~unsafe ~forced path =
   let lex_dir = path // "assets" // "lex" in
   if Sys.file_exists lex_dir then add_lex_dir lex_dir;
   Plugin.assets := path // "assets";
-  Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
-  load_cmxs cmxs
+  Fun.protect ~finally:(fun () -> Plugin.assets := Compat.String.empty)
+  @@ fun () -> load_cmxs cmxs
 
 let load_plugins { path; unsafe; forced; collection } =
   if not collection then load_plugin ~unsafe ~forced path
@@ -523,7 +526,7 @@ let print_renamed conf new_n =
     let new_req =
       let len = String.length conf.bname in
       let rec loop i =
-        if i > String.length req then ""
+        if i > String.length req then Compat.String.empty
         else if i >= len && String.sub req (i - len) len = conf.bname then
           String.sub req 0 (i - len)
           ^ new_n
@@ -580,17 +583,17 @@ let nonce_private_key =
           let s =
             let rec loop () =
               match input_line ic with
-              | s when s = "" || s.[0] = '#' -> loop ()
+              | s when s = Compat.String.empty || s.[0] = '#' -> loop ()
               | s -> s
-              | exception End_of_file -> ""
+              | exception End_of_file -> Compat.String.empty
             in
             loop ()
           in
           close_in ic;
           s
-        with Sys_error _ -> ""
+        with Sys_error _ -> Compat.String.empty
       in
-      if k = "" then (
+      if Compat.String.is_empty k then (
         Random.self_init ();
         let k = Random.bits () in
         let oc = open_out fname in
@@ -638,14 +641,18 @@ let unauth_server conf ar =
     in
     Output.header conf
       "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\"" typ conf.bname
-      (if nonce = "" then "" else Printf.sprintf ",nonce=\"%s\"" nonce)
-      (if ar.ar_can_stale then ",stale=true" else "")
+      (if Compat.String.is_empty nonce then Compat.String.empty
+       else Printf.sprintf ",nonce=\"%s\"" nonce)
+      (if ar.ar_can_stale then ",stale=true" else Compat.String.empty)
   else
     Output.header conf "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
   let env =
     List.fold_left
       (fun l (k, v) ->
-        if k = "" || (k = "oc" && int_of_string (Mutil.decode v) = 0) then l
+        if
+          Compat.String.is_empty k
+          || (k = "oc" && int_of_string (Mutil.decode v) = 0)
+        then l
         else (k ^ "=" ^ Mutil.decode v) :: l)
       []
       (conf.henv @ conf.senv @ conf.env)
@@ -671,7 +678,7 @@ let unauth_server conf ar =
    Output.print_sstring conf "<li>\n";
    Output.printf conf {|%s : <a href="%s?%s%s%s">%s</a>|} (transl conf "access")
      conf.bname env
-     (if env = "" then "" else "&")
+     (if Compat.String.is_empty env then Compat.String.empty else "&")
      alt_bind alt_access;
    Output.print_sstring conf "</li>\n";
    Output.print_sstring conf "<li>\n";
@@ -684,7 +691,7 @@ let unauth_server conf ar =
   Hutil.trailer conf
 
 let gen_match_auth_file test_user_and_password auth_file base_file =
-  if auth_file = "" then None
+  if Compat.String.is_empty auth_file then None
   else
     let aul = read_gen_auth_file auth_file base_file in
     let rec loop = function
@@ -729,7 +736,8 @@ let match_simple_passwd sauth uauth =
       | None -> sauth = uauth)
 
 let basic_match_auth passwd auth_file uauth base_file =
-  if passwd <> "" && match_simple_passwd passwd uauth then Some ""
+  if (not @@ Compat.String.is_empty passwd) && match_simple_passwd passwd uauth
+  then Some Compat.String.empty
   else basic_match_auth_file uauth auth_file base_file
 
 type access_type =
@@ -762,7 +770,7 @@ let get_actlog check_from utm from_addr base_password =
           let c = line.[ispace + 1] in
           let user =
             let k = ispace + 3 in
-            if k >= String.length line then ""
+            if k >= String.length line then Compat.String.empty
             else String.sub line k (String.length line - k)
           in
           let len = String.length user in
@@ -770,7 +778,7 @@ let get_actlog check_from utm from_addr base_password =
             match String.index_opt user ' ' with
             | Some i ->
                 (String.sub user 0 i, String.sub user (i + 1) (len - i - 1))
-            | None -> (user, "")
+            | None -> (user, Compat.String.empty)
           in
           let list, r, changed =
             if utm -. tm >= tmout then (list, r, true)
@@ -807,8 +815,8 @@ let set_actlog list =
     List.iter
       (fun ((from, base_pw), (a, c, d, e)) ->
         Printf.fprintf oc "%.0f %s/%s %c%s%s\n" a from base_pw c
-          (if d = "" then "" else " " ^ d)
-          (if e = "" then "" else " " ^ e))
+          (if Compat.String.is_empty d then Compat.String.empty else " " ^ d)
+          (if Compat.String.is_empty e then Compat.String.empty else " " ^ e))
       list;
     close_out oc
   with Sys_error e -> Logs.warn (fun k -> k "Error opening actlog: %s" e)
@@ -838,10 +846,12 @@ let random_self_init () =
 let set_token utm from_addr base_file acc user username =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
   (* FIXME: we silently ignore errors if we cannot lock the database. *)
-  let on_exn _exn _bt = "" in
+  let on_exn _exn _bt = Compat.String.empty in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   random_self_init ();
-  let list, _, _ = get_actlog false utm "" "" in
+  let list, _, _ =
+    get_actlog false utm Compat.String.empty Compat.String.empty
+  in
   let x, xx =
     let base = base_file ^ "_" in
     let rec loop ntimes =
@@ -899,7 +909,7 @@ let refresh_url conf bname =
 
 let http_preferred_language request =
   let v = Mutil.extract_param "accept-language: " '\n' request in
-  if v = "" then ""
+  if Compat.String.is_empty v then Compat.String.empty
   else
     let s = String.lowercase_ascii v in
     let list =
@@ -919,7 +929,7 @@ let http_preferred_language request =
             if List.mem blang Version.available_languages then blang
             else loop list
           else loop list
-      | [] -> ""
+      | [] -> Compat.String.empty
     in
     loop list
 
@@ -928,16 +938,18 @@ let allowed_denied_titles key extra_line env base_env () =
   else
     try
       let fname = List.assoc key base_env in
-      if fname = "" then []
+      if fname = Compat.String.empty then []
       else
         let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
         let rec loop set =
           let line, eof =
-            try (input_line ic, false) with End_of_file -> ("", true)
+            try (input_line ic, false)
+            with End_of_file -> (Compat.String.empty, true)
           in
           let set =
             let line = if eof then extra_line |> Mutil.decode else line in
-            if line = "" || line.[0] = ' ' || line.[0] = '#' then set
+            if Compat.String.is_empty line || line.[0] = ' ' || line.[0] = '#'
+            then set
             else
               let line =
                 match String.index_opt line '/' with
@@ -962,22 +974,25 @@ let allowed_denied_titles key extra_line env base_env () =
 
 let allowed_titles env =
   let extra_line =
-    try List.assoc "extra_title" env with Not_found -> Adef.encoded ""
+    try List.assoc "extra_title" env
+    with Not_found -> Adef.encoded Compat.String.empty
   in
   allowed_denied_titles "allowed_titles_file" extra_line env
 
-let denied_titles = allowed_denied_titles "denied_titles_file" (Adef.encoded "")
+let denied_titles =
+  allowed_denied_titles "denied_titles_file" (Adef.encoded Compat.String.empty)
 
 let parse_digest s =
   let rec parse_main (strm__ : _ Stream.t) =
     match try Some (ident strm__) with Stream.Failure -> None with
     | Some s ->
         let _ =
-          try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
+          try spaces strm__
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         let kvl =
           try key_eq_val_list strm__
-          with Stream.Failure -> raise (Stream.Error "")
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         if s = "Digest" then kvl else []
     | _ -> []
@@ -987,7 +1002,7 @@ let parse_digest s =
         Stream.junk strm__;
         let len =
           try ident_kont (Buff.store 0 c) strm__
-          with Stream.Failure -> raise (Stream.Error "")
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         Buff.get len
     | _ -> raise Stream.Failure
@@ -1001,14 +1016,15 @@ let parse_digest s =
     match Stream.peek strm__ with
     | Some ' ' -> (
         Stream.junk strm__;
-        try spaces strm__ with Stream.Failure -> raise (Stream.Error ""))
+        try spaces strm__
+        with Stream.Failure -> raise (Stream.Error Compat.String.empty))
     | _ -> ()
   and key_eq_val_list (strm__ : _ Stream.t) =
     match try Some (key_eq_val strm__) with Stream.Failure -> None with
     | Some kv ->
         let kvl =
           try key_eq_val_list_kont strm__
-          with Stream.Failure -> raise (Stream.Error "")
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         kv :: kvl
     | _ -> []
@@ -1017,14 +1033,16 @@ let parse_digest s =
     | Some ',' ->
         Stream.junk strm__;
         let _ =
-          try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
+          try spaces strm__
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         let kv =
-          try key_eq_val strm__ with Stream.Failure -> raise (Stream.Error "")
+          try key_eq_val strm__
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         let kvl =
           try key_eq_val_list_kont strm__
-          with Stream.Failure -> raise (Stream.Error "")
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         kv :: kvl
     | _ -> []
@@ -1034,25 +1052,29 @@ let parse_digest s =
     | Some '=' ->
         Stream.junk strm__;
         let v =
-          try val_or_str strm__ with Stream.Failure -> raise (Stream.Error "")
+          try val_or_str strm__
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         (k, v)
-    | _ -> raise (Stream.Error "")
+    | _ -> raise (Stream.Error Compat.String.empty)
   and val_or_str (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
     | Some '"' ->
         Stream.junk strm__;
         let v =
-          try string 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+          try string 0 strm__
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         let _ =
-          try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
+          try spaces strm__
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         v
     | _ ->
         let v = any_val 0 strm__ in
         let _ =
-          try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
+          try spaces strm__
+          with Stream.Failure -> raise (Stream.Error Compat.String.empty)
         in
         v
   and string len (strm__ : _ Stream.t) =
@@ -1079,23 +1101,25 @@ let basic_authorization from_addr request base_env passwd access_type utm
     try List.assoc "wizard_passwd" base_env with Not_found -> !wizard_passwd
   in
   let wizard_passwd_file =
-    try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
+    try List.assoc "wizard_passwd_file" base_env
+    with Not_found -> Compat.String.empty
   in
   let friend_passwd =
     try List.assoc "friend_passwd" base_env with Not_found -> !friend_passwd
   in
   let friend_passwd_file =
-    try List.assoc "friend_passwd_file" base_env with Not_found -> ""
+    try List.assoc "friend_passwd_file" base_env
+    with Not_found -> Compat.String.empty
   in
   let passwd1 =
     let auth = Mutil.extract_param "authorization: " '\r' request in
-    if auth = "" then ""
+    if Compat.String.is_empty auth then Compat.String.empty
     else
       let s = "Basic " in
       if Mutil.start_with s 0 auth then
         let i = String.length s in
         Base64.decode (String.sub auth i (String.length auth - i))
-      else ""
+      else Compat.String.empty
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
@@ -1103,64 +1127,78 @@ let basic_authorization from_addr request base_env passwd access_type utm
   let ok, wizard, friend, username =
     if (not !Server.cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
-        if wizard_passwd = "" && wizard_passwd_file = "" then
-          (true, true, friend_passwd = "", "")
+        if
+          Compat.String.is_empty wizard_passwd
+          && Compat.String.is_empty wizard_passwd_file
+        then
+          (true, true, Compat.String.is_empty friend_passwd, Compat.String.empty)
         else
           match
             basic_match_auth wizard_passwd wizard_passwd_file uauth base_file
           with
           | Some username -> (true, true, false, username)
-          | None -> (false, false, false, "")
+          | None -> (false, false, false, Compat.String.empty)
       else if passwd = "f" then
-        if friend_passwd = "" && friend_passwd_file = "" then
-          (true, false, true, "")
+        if
+          Compat.String.is_empty friend_passwd
+          && Compat.String.is_empty friend_passwd_file
+        then (true, false, true, Compat.String.empty)
         else
           match
             basic_match_auth friend_passwd friend_passwd_file uauth base_file
           with
           | Some username -> (true, false, true, username)
-          | None -> (false, false, false, "")
+          | None -> (false, false, false, Compat.String.empty)
       else assert false
-    else if wizard_passwd = "" && wizard_passwd_file = "" then
-      (true, true, friend_passwd = "", "")
+    else if
+      Compat.String.is_empty wizard_passwd
+      && Compat.String.is_empty wizard_passwd_file
+    then (true, true, friend_passwd = Compat.String.empty, Compat.String.empty)
     else
       match
         basic_match_auth wizard_passwd wizard_passwd_file uauth base_file
       with
       | Some username -> (true, true, false, username)
       | _ -> (
-          if friend_passwd = "" && friend_passwd_file = "" then
-            (true, false, true, "")
+          if
+            Compat.String.is_empty friend_passwd
+            && Compat.String.is_empty friend_passwd_file
+          then (true, false, true, Compat.String.empty)
           else
             match
               basic_match_auth friend_passwd friend_passwd_file uauth base_file
             with
             | Some username -> (true, false, true, username)
-            | None -> (true, false, false, ""))
+            | None -> (true, false, false, Compat.String.empty))
   in
   let user =
     match String.index_opt uauth ':' with
     | Some i ->
         let s = String.sub uauth 0 i in
-        if s = wizard_passwd || s = friend_passwd then "" else s
-    | None -> ""
+        if s = wizard_passwd || s = friend_passwd then Compat.String.empty
+        else s
+    | None -> Compat.String.empty
   in
   let command, passwd =
     if access_type = ATset then
       if wizard then
         let pwd_id = set_token utm from_addr base_file 'w' user username in
-        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+        if !Server.cgi then (command, pwd_id)
+        else (base_file ^ "_" ^ pwd_id, Compat.String.empty)
       else if friend then
         let pwd_id = set_token utm from_addr base_file 'f' user username in
-        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
-      else if !Server.cgi then (command, "")
-      else (base_file, "")
+        if !Server.cgi then (command, pwd_id)
+        else (base_file ^ "_" ^ pwd_id, Compat.String.empty)
+      else if !Server.cgi then (command, Compat.String.empty)
+      else (base_file, Compat.String.empty)
     else if !Server.cgi then (command, passwd)
-    else if passwd = "" then
+    else if Compat.String.is_empty passwd then
       if auto = "auto" then
-        let suffix = if wizard then "_w" else if friend then "_f" else "" in
+        let suffix =
+          if wizard then "_w" else if friend then "_f" else Compat.String.empty
+        in
         (base_file ^ suffix, passwd)
-      else (base_file, "")
+      else (base_file, Compat.String.empty)
     else (base_file ^ "_" ^ passwd, passwd)
   in
   let auth_scheme =
@@ -1177,7 +1215,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
               String.sub passwd1 (i + 1) (String.length passwd1 - i - 1)
             in
             (u, p)
-        | None -> ("", passwd)
+        | None -> (Compat.String.empty, passwd)
       in
       HttpAuth (Basic { bs_realm = realm; bs_user = u; bs_pass = p })
   in
@@ -1200,11 +1238,11 @@ let bad_nonce_report command passwd_char =
     ar_command = command;
     ar_passwd = passwd_char;
     ar_scheme = NoAuth;
-    ar_user = "";
-    ar_name = "";
+    ar_user = Compat.String.empty;
+    ar_name = Compat.String.empty;
     ar_wizard = false;
     ar_friend = false;
-    ar_uauth = "";
+    ar_uauth = Compat.String.empty;
     ar_can_stale = true;
   }
 
@@ -1212,16 +1250,16 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
     base_file =
   let asch = HttpAuth (Digest ds) in
   let digest_match_simple_passwd () =
-    if wf_passwd = "" then false
+    if Compat.String.is_empty wf_passwd then false
     else
       let user, pass =
         match String.index_opt wf_passwd ':' with
         | Some i ->
             ( String.sub wf_passwd 0 i,
               String.sub wf_passwd (i + 1) (String.length wf_passwd - i - 1) )
-        | None -> ("", wf_passwd)
+        | None -> (Compat.String.empty, wf_passwd)
       in
-      (user = "" || user = ds.ds_username)
+      (Compat.String.is_empty user || user = ds.ds_username)
       && is_that_user_and_password asch ds.ds_username pass
   in
   if digest_match_simple_passwd () then
@@ -1233,10 +1271,10 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
         ar_passwd = passwd_char;
         ar_scheme = asch;
         ar_user = ds.ds_username;
-        ar_name = "";
+        ar_name = Compat.String.empty;
         ar_wizard = wiz;
         ar_friend = not wiz;
-        ar_uauth = "";
+        ar_uauth = Compat.String.empty;
         ar_can_stale = false;
       }
   else
@@ -1253,7 +1291,7 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
             ar_name = username;
             ar_wizard = wiz;
             ar_friend = not wiz;
-            ar_uauth = "";
+            ar_uauth = Compat.String.empty;
             ar_can_stale = false;
           }
     | None ->
@@ -1263,10 +1301,10 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
           ar_passwd = passwd_char;
           ar_scheme = asch;
           ar_user = ds.ds_username;
-          ar_name = "";
+          ar_name = Compat.String.empty;
           ar_wizard = false;
           ar_friend = false;
-          ar_uauth = "";
+          ar_uauth = Compat.String.empty;
           ar_can_stale = false;
         }
 
@@ -1275,42 +1313,49 @@ let digest_authorization request base_env passwd utm base_file command =
     try List.assoc "wizard_passwd" base_env with Not_found -> !wizard_passwd
   in
   let wizard_passwd_file =
-    try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
+    try List.assoc "wizard_passwd_file" base_env
+    with Not_found -> Compat.String.empty
   in
   let friend_passwd =
     try List.assoc "friend_passwd" base_env with Not_found -> !friend_passwd
   in
   let friend_passwd_file =
-    try List.assoc "friend_passwd_file" base_env with Not_found -> ""
+    try List.assoc "friend_passwd_file" base_env
+    with Not_found -> Compat.String.empty
   in
   let command = if !Server.cgi then command else base_file in
-  if wizard_passwd = "" && wizard_passwd_file = "" then
+  if
+    Compat.String.is_empty wizard_passwd
+    && Compat.String.is_empty wizard_passwd_file
+  then
     {
       ar_ok = true;
       ar_command = command;
-      ar_passwd = "";
+      ar_passwd = Compat.String.empty;
       ar_scheme = NoAuth;
-      ar_user = "";
-      ar_name = "";
+      ar_user = Compat.String.empty;
+      ar_name = Compat.String.empty;
       ar_wizard = true;
-      ar_friend = friend_passwd = "";
-      ar_uauth = "";
+      ar_friend = friend_passwd = Compat.String.empty;
+      ar_uauth = Compat.String.empty;
       ar_can_stale = false;
     }
   else if passwd = "w" || passwd = "f" then
     let auth = Mutil.extract_param "authorization: " '\r' request in
     if Mutil.start_with "Digest " 0 auth then
       let meth =
-        match Mutil.extract_param "GET " ' ' request with
-        | "" -> "POST"
-        | _ -> "GET"
+        if Compat.String.is_empty @@ Mutil.extract_param "GET " ' ' request then
+          "POST"
+        else "GET"
       in
       let _ =
         trace_auth base_env (fun oc ->
             Printf.fprintf oc "\nauth = \"%s\"\n" auth)
       in
       let digenv = parse_digest auth in
-      let get_digenv s = try List.assoc s digenv with Not_found -> "" in
+      let get_digenv s =
+        try List.assoc s digenv with Not_found -> Compat.String.empty
+      in
       let ds =
         {
           ds_username = get_digenv "username";
@@ -1354,25 +1399,28 @@ let digest_authorization request base_env passwd utm base_file command =
         ar_command = command;
         ar_passwd = passwd;
         ar_scheme = NoAuth;
-        ar_user = "";
-        ar_name = "";
+        ar_user = Compat.String.empty;
+        ar_name = Compat.String.empty;
         ar_wizard = false;
         ar_friend = false;
-        ar_uauth = "";
+        ar_uauth = Compat.String.empty;
         ar_can_stale = false;
       }
   else
-    let friend = friend_passwd = "" && friend_passwd_file = "" in
+    let friend =
+      Compat.String.is_empty friend_passwd
+      && Compat.String.is_empty friend_passwd_file
+    in
     {
       ar_ok = true;
       ar_command = command;
-      ar_passwd = "";
+      ar_passwd = Compat.String.empty;
       ar_scheme = NoAuth;
-      ar_user = "";
-      ar_name = "";
+      ar_user = Compat.String.empty;
+      ar_name = Compat.String.empty;
       ar_wizard = false;
       ar_friend = friend;
-      ar_uauth = "";
+      ar_uauth = Compat.String.empty;
       ar_can_stale = false;
     }
 
@@ -1382,7 +1430,8 @@ let authorization from_addr request base_env passwd access_type utm base_file
   | ATwizard (user, username) ->
       let command, passwd =
         if !Server.cgi then (command, passwd)
-        else if passwd = "" then (base_file, "")
+        else if Compat.String.is_empty passwd then
+          (base_file, Compat.String.empty)
         else (base_file ^ "_" ^ passwd, passwd)
       in
       let auth_scheme = TokenAuth { ts_user = user; ts_pass = passwd } in
@@ -1395,13 +1444,14 @@ let authorization from_addr request base_env passwd access_type utm base_file
         ar_name = username;
         ar_wizard = true;
         ar_friend = false;
-        ar_uauth = "";
+        ar_uauth = Compat.String.empty;
         ar_can_stale = false;
       }
   | ATfriend (user, username) ->
       let command, passwd =
         if !Server.cgi then (command, passwd)
-        else if passwd = "" then (base_file, "")
+        else if Compat.String.is_empty passwd then
+          (base_file, Compat.String.empty)
         else (base_file ^ "_" ^ passwd, passwd)
       in
       let auth_scheme = TokenAuth { ts_user = user; ts_pass = passwd } in
@@ -1414,23 +1464,24 @@ let authorization from_addr request base_env passwd access_type utm base_file
         ar_name = username;
         ar_wizard = false;
         ar_friend = true;
-        ar_uauth = "";
+        ar_uauth = Compat.String.empty;
         ar_can_stale = false;
       }
   | ATnormal ->
       let command, passwd =
-        if !Server.cgi then (command, "") else (base_file, "")
+        if !Server.cgi then (command, Compat.String.empty)
+        else (base_file, Compat.String.empty)
       in
       {
         ar_ok = true;
         ar_command = command;
         ar_passwd = passwd;
         ar_scheme = NoAuth;
-        ar_user = "";
-        ar_name = "";
+        ar_user = Compat.String.empty;
+        ar_name = Compat.String.empty;
         ar_wizard = false;
         ar_friend = false;
-        ar_uauth = "";
+        ar_uauth = Compat.String.empty;
         ar_can_stale = false;
       }
   | ATnone | ATset ->
@@ -1445,7 +1496,10 @@ let string_to_char_list s =
   exp (String.length s - 1) []
 
 let make_conf ~secret_salt from_addr request script_name env =
-  if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
+  if
+    (not @@ Compat.String.is_empty !allowed_tags_file)
+    && not (Sys.file_exists !allowed_tags_file)
+  then (
     let str =
       Printf.sprintf "Requested allowed_tags file (%s) absent"
         !allowed_tags_file
@@ -1458,11 +1512,12 @@ let make_conf ~secret_salt from_addr request script_name env =
   let command, base_file, passwd, env, access_type =
     let base_access, env =
       let x, env = extract_assoc "b" env in
-      if x <> "" || cgi then (x, env) else (script_name, env)
+      if (not @@ Compat.String.is_empty x) || cgi then (x, env)
+      else (script_name, env)
     in
     let bname, access =
       match String.split_on_char '_' base_access with
-      | [ bname ] -> (bname, "")
+      | [ bname ] -> (bname, Compat.String.empty)
       | [ bname; access ] -> (bname, access)
       | _ ->
           Logs.err (fun k -> k "bad bname: (%s)" base_access);
@@ -1488,7 +1543,8 @@ let make_conf ~secret_salt from_addr request script_name env =
   in
   let lang, env = extract_assoc "lang" env in
   let lang =
-    if lang = "" && !choose_browser_lang then http_preferred_language request
+    if Compat.String.is_empty lang && !choose_browser_lang then
+      http_preferred_language request
     else lang
   in
   let lang = alias_lang lang in
@@ -1496,27 +1552,30 @@ let make_conf ~secret_salt from_addr request script_name env =
     let x, env = extract_assoc "opt" env in
     match x with
     | "from" -> ("from", env)
-    | "" -> ("", env)
-    | _ -> ("", ("opt", Mutil.encode x) :: env)
+    | "" -> (Compat.String.empty, env)
+    | _ -> (Compat.String.empty, ("opt", Mutil.encode x) :: env)
   in
   let threshold_test, env = extract_assoc "threshold" env in
-  if threshold_test <> "" then
+  if not @@ Compat.String.is_empty threshold_test then
     RelationLink.threshold := int_of_string threshold_test;
   GWPARAM.test_reorg base_file;
   let base_env =
-    if base_file = "" then []
+    if Compat.String.is_empty base_file then []
     else Util.read_base_env base_file (Option.get !gw_prefix) !debug
   in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
-      if x = "" then !default_lang else x
+      if Compat.String.is_empty x then !default_lang else x
     with Not_found -> !default_lang
   in
   let browser_lang =
-    if !choose_browser_lang then http_preferred_language request else ""
+    if !choose_browser_lang then http_preferred_language request
+    else Compat.String.empty
   in
-  let default_lang = if browser_lang = "" then default_lang else browser_lang in
+  let default_lang =
+    if Compat.String.is_empty browser_lang then default_lang else browser_lang
+  in
   let vowels =
     match List.assoc_opt "vowels" base_env with
     | Some l ->
@@ -1529,7 +1588,9 @@ let make_conf ~secret_salt from_addr request script_name env =
         loop [] 0
     | _ -> [ "a"; "e"; "i"; "o"; "u"; "y" ]
   in
-  let lexicon_lang = if lang = "" then default_lang else lang in
+  let lexicon_lang =
+    if Compat.String.is_empty lang then default_lang else lang
+  in
   let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
   (* Il sera mis à jour par effet de bord dans request.ml       *)
@@ -1549,14 +1610,16 @@ let make_conf ~secret_salt from_addr request script_name env =
   in
   let manitou =
     try
-      ar.ar_wizard && ar.ar_user <> ""
+      ar.ar_wizard
+      && (not @@ Compat.String.is_empty ar.ar_user)
       && p_getenv env "manitou" <> Some "off"
       && List.assoc "manitou" base_env = ar.ar_user
     with Not_found -> false
   in
   let supervisor =
     try
-      ar.ar_wizard && ar.ar_user <> ""
+      ar.ar_wizard
+      && Compat.String.is_empty ar.ar_user
       && List.assoc "supervisor" base_env = ar.ar_user
     with Not_found -> false
   in
@@ -1600,7 +1663,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       highlight =
         (try List.assoc "highlight_color" base_env
          with Not_found -> green_color);
-      lang = (if lang = "" then default_lang else lang);
+      lang = (if Compat.String.is_empty lang then default_lang else lang);
       vowels;
       default_lang;
       browser_lang;
@@ -1656,10 +1719,14 @@ let make_conf ~secret_salt from_addr request script_name env =
       cgi_passwd = ar.ar_passwd;
       henv =
         ((if not !Server.cgi then []
-          else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
+          else if Compat.String.is_empty ar.ar_passwd then
+            [ ("b", Mutil.encode base_file) ]
           else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
-        @ (if lang = "" then [] else [ ("lang", Mutil.encode lang) ])
-        @ if from = "" then [] else [ ("opt", Mutil.encode from) ]);
+        @ (if Compat.String.is_empty lang then []
+           else [ ("lang", Mutil.encode lang) ])
+        @
+        if Compat.String.is_empty from then []
+        else [ ("opt", Mutil.encode from) ]);
       base_env;
       allowed_titles = Lazy.from_fun (allowed_titles env base_env);
       denied_titles = Lazy.from_fun (denied_titles env base_env);
@@ -1672,7 +1739,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       auth_file =
         (try
            let x = List.assoc "auth_file" base_env in
-           if x = "" then !auth_file
+           if Compat.String.is_empty x then !auth_file
            else Filename.concat (!GWPARAM.bpath base_file) x
          with Not_found -> !auth_file);
       border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
@@ -1722,18 +1789,24 @@ let log tm conf from gauth request script_name contents =
              Printf.sprintf "%s..." (String.sub contents 0 200)
            else contents)
           (Printf.sprintf "  From: %s" from)
-          (if gauth <> "" then Printf.sprintf "\n  User: %s" gauth else "")
+          (if not @@ Compat.String.is_empty gauth then
+             Printf.sprintf "\n  User: %s" gauth
+           else Compat.String.empty)
           (if conf.wizard && not conf.friend then
              Printf.sprintf "\n  User: %s%s(wizard)" conf.user
-               (if conf.user = "" then "" else " ")
+               (if Compat.String.is_empty conf.user then Compat.String.empty
+                else " ")
            else if conf.friend && not conf.wizard then
              Printf.sprintf "\n  User: %s%s(friend)" conf.user
-               (if conf.user = "" then "" else " ")
-           else "")
-          (if user_agent <> "" then Printf.sprintf "\n  Agent: %s" user_agent
-           else "")
-          (if referer <> "" then Printf.sprintf "\n  Referer: %s" referer
-           else ""))
+               (if Compat.String.is_empty conf.user then Compat.String.empty
+                else " ")
+           else Compat.String.empty)
+          (if not @@ Compat.String.is_empty user_agent then
+             Printf.sprintf "\n  Agent: %s" user_agent
+           else Compat.String.empty)
+          (if not @@ Compat.String.is_empty referer then
+             Printf.sprintf "\n  Referer: %s" referer
+           else Compat.String.empty))
 
 let is_robot from =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
@@ -1744,10 +1817,10 @@ let is_robot from =
   List.mem_assoc from robxcl.Robot.excl
 
 let auth_err request auth_file =
-  if auth_file = "" then (false, "")
+  if Compat.String.is_empty auth_file then (false, Compat.String.empty)
   else
     let auth = Mutil.extract_param "authorization: " '\r' request in
-    if auth <> "" then
+    if not @@ Compat.String.is_empty auth then
       match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
       | Some ic -> (
           let auth =
@@ -1844,8 +1917,9 @@ let conf_and_connection =
         Output.flush conf
     | None -> (
         let auth_err, auth =
-          if conf.auth_file = "" then (false, "")
-          else if !Server.cgi then (true, "")
+          if Compat.String.is_empty conf.auth_file then
+            (false, Compat.String.empty)
+          else if !Server.cgi then (true, Compat.String.empty)
           else auth_err request conf.auth_file
         in
         let mode = Util.p_getenv conf.env "m" in
@@ -1865,9 +1939,10 @@ let conf_and_connection =
               let auth_type =
                 let x =
                   try List.assoc "auth_file" conf.base_env
-                  with Not_found -> ""
+                  with Not_found -> Compat.String.empty
                 in
-                if x = "" then "GeneWeb service" else "database " ^ conf.bname
+                if Compat.String.is_empty x then "GeneWeb service"
+                else "database " ^ conf.bname
               in
               refuse_auth conf from auth auth_type
         | _, _, ({ ar_ok = false } as ar) ->
@@ -2036,7 +2111,7 @@ let find_misc_file conf name =
     if Sys.file_exists name' then name'
     else
       let name' = Util.search_in_assets @@ Filename.concat "etc" name in
-      if Sys.file_exists name' then name' else ""
+      if Sys.file_exists name' then name' else Compat.String.empty
 
 let print_misc_file conf misc_fname encoding =
   match misc_fname with
@@ -2099,12 +2174,13 @@ let misc_request conf request fname =
         | [] -> (find_misc_file conf fname, No_encoding)
         | (ext, enc) :: rest ->
             let path = find_misc_file conf (fname ^ ext) in
-            if path <> "" then (path, enc) else try_candidates rest
+            if not @@ Compat.String.is_empty path then (path, enc)
+            else try_candidates rest
       in
       try_candidates candidates
     else (find_misc_file conf fname, No_encoding)
   in
-  if actual_fname <> "" then
+  if not @@ Compat.String.is_empty actual_fname then
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css actual_fname
       else if Filename.check_suffix fname ".js" then Js actual_fname
@@ -2143,7 +2219,7 @@ let extract_multipart boundary str =
       if i = String.length str || str.[i] = '\n' || str.[i] = '\r' then (s, i)
       else loop (s ^ String.make 1 str.[i]) (i + 1)
     in
-    loop "" i
+    loop Compat.String.empty i
   in
   let boundary = "--" ^ boundary in
   let rec loop i =
@@ -2207,7 +2283,7 @@ let extract_multipart boundary str =
     List.fold_left
       (fun (str, sep) (v, x) ->
         if v = "file" then (str, sep) else (str ^^^ sep ^<^ v ^<^ "=" ^<^ x, "&"))
-      (Adef.encoded "", "")
+      (Adef.encoded Compat.String.empty, Compat.String.empty)
       env
   in
   (str, env)
@@ -2265,7 +2341,7 @@ let generate_secret_salt ?(random = true) () =
   if random then (
     Random.self_init ();
     string_of_int @@ Random.bits ())
-  else ""
+  else Compat.String.empty
 
 let retrieve_secret_salt () =
   match Unix.getenv "SECRET_SALT" with
@@ -2378,7 +2454,8 @@ let geneweb_cgi ~secret_salt addr script_name contents =
   let add k x request =
     try
       let v = Sys.getenv x in
-      if v = "" then raise Not_found else (k ^ ": " ^ v) :: request
+      if Compat.String.is_empty v then raise Not_found
+      else (k ^ ": " ^ v) :: request
     with Not_found -> request
   in
   let request = [] in
@@ -2408,7 +2485,9 @@ let arg_parse_in_file fname speclist anonfun errmsg =
     let list =
       let rec loop acc =
         match input_line ic with
-        | line -> loop (if line <> "" then line :: acc else acc)
+        | line ->
+            loop
+              (if not @@ Compat.String.is_empty line then line :: acc else acc)
         | exception End_of_file ->
             close_in ic;
             List.rev acc
@@ -2456,11 +2535,13 @@ let arg_plugin_aux () =
     | "-unsafe" -> (true, force, p)
     | "-force" -> (unsafe, true, p)
     | p' ->
-        assert (p = "");
+        assert (Compat.String.is_empty p);
         (unsafe, force, p')
   in
-  let rec loop ((_, _, p) as acc) = if p = "" then loop (aux acc) else acc in
-  loop (false, false, "")
+  let rec loop ((_, _, p) as acc) =
+    if Compat.String.is_empty p then loop (aux acc) else acc
+  in
+  loop (false, false, Compat.String.empty)
 
 let arg_plugin opt doc =
   ( opt,
@@ -2704,10 +2785,12 @@ let parse_cmd () =
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   (if Sys.unix then
      default_lang :=
-       let s = try Sys.getenv "LANG" with Not_found -> "" in
+       let s = try Sys.getenv "LANG" with Not_found -> Compat.String.empty in
        if List.mem s Version.available_languages then s
        else
-         let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+         let s =
+           try Sys.getenv "LC_CTYPE" with Not_found -> Compat.String.empty
+         in
          if String.length s >= 2 then
            let s = String.sub s 0 2 in
            if List.mem s Version.available_languages then s else "en"
@@ -2732,7 +2815,7 @@ let main () =
             process (acc ^ "<br><b>" ^ arg ^ "</b> ") false rest
           else process (acc ^ arg) false rest
     in
-    process "" false (Array.to_list Sys.argv)
+    process Compat.String.empty false (Array.to_list Sys.argv)
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter load_plugins !plugins;
@@ -2746,7 +2829,7 @@ let main () =
       let dbn = !GWPARAM.bpath dbn in
       Driver.load_database dbn)
     !cache_databases;
-  if !auth_file <> "" && !force_cgi then
+  if (not @@ Compat.String.is_empty !auth_file) && !force_cgi then
     Logs.warn (fun k ->
         k
           "-auth option is not compatible with CGI mode.\n\
@@ -2754,7 +2837,7 @@ let main () =
            file");
   if !use_auth_digest_scheme && !force_cgi then
     Logs.warn (fun k -> k "-digest option is not compatible with CGI mode.");
-  (if !images_dir <> "" then
+  (if not @@ Compat.String.is_empty !images_dir then
      let abs_dir =
        let f =
          Util.search_in_assets (Filename.concat !images_dir "gwback.jpg")
@@ -2763,15 +2846,15 @@ let main () =
        if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
      in
      images_prefix := Some ("file://" ^ slashify abs_dir));
-  GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
+  GWPARAM.cnt_dir := !GWPARAM.cnt_d Compat.String.empty;
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
-  if !Mutil.particles_file = "" then
+  if Compat.String.is_empty !Mutil.particles_file then
     Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
   Server.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
   let query, cgi =
     try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
-    with Not_found -> ("" |> Adef.encoded, !force_cgi)
+    with Not_found -> (Compat.String.empty |> Adef.encoded, !force_cgi)
   in
   Util.is_welcome := false;
   if !check then exit 0;
@@ -2789,12 +2872,15 @@ let main () =
     in
     let addr =
       try Sys.getenv "REMOTE_HOST"
-      with Not_found -> ( try Sys.getenv "REMOTE_ADDR" with Not_found -> "")
+      with Not_found -> (
+        try Sys.getenv "REMOTE_ADDR" with Not_found -> Compat.String.empty)
     in
     let script =
       try Sys.getenv "SCRIPT_NAME" with Not_found -> Sys.argv.(0)
     in
-    let secret_salt = match !cgi_secret_salt with None -> "" | Some s -> s in
+    let secret_salt =
+      match !cgi_secret_salt with None -> Compat.String.empty | Some s -> s
+    in
     geneweb_cgi ~secret_salt addr (Filename.basename script) query)
   else geneweb_server ~predictable_mode:!predictable_mode ()
 
