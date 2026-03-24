@@ -912,18 +912,19 @@ let this_year =
   let tm = Unix.localtime (Unix.time ()) in tm.Unix.tm_year + 1900
 
 let infer_death birth bapt =
-  match birth, bapt with
-  | Some (Date.Dgreg (d, _)), _ ->
+  let aux (d : Date.dmy) =
     let a = this_year - d.year in
     if a > !state.dead_years then Def.DeadDontKnowWhen
     else if a < !state.alive_years then NotDead
     else DontKnowIfDead
-  | _, Some (Date.Dgreg (d, _)) ->
-    let a = this_year - d.year in
-    if a > !state.dead_years then Def.DeadDontKnowWhen
-    else if a < !state.alive_years then NotDead
-    else DontKnowIfDead
-  | _ -> DontKnowIfDead
+  in
+  match birth with
+  | Some (Date.Dgreg (d, _)) -> aux d
+  | None | Some (Dtext _) -> (
+    match bapt with
+    | Some (Date.Dgreg (d, _)) -> aux d
+    | None | Some (Dtext _) -> DontKnowIfDead
+  )
 
 (* Fonctions utiles pour la mise en forme des noms. *)
 
