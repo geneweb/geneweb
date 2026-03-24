@@ -27,3 +27,6 @@ val print_placeholder_gendered_portrait :
   config -> Geneweb_db.Driver.person -> int -> unit
 (** prints html `<img>` tag of the default gendered portrait with square size
     [size] *)
+
+val get_folder_images : config -> string -> unit
+(** returns the list of image files contained in the folder fname *)
