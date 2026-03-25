@@ -9217,6 +9217,10 @@ de: Den Fehler automatisch korrigieren
 en: fix error automatically
 fr: fixer automatiquement l’erreur
 
+    folder
+en: folder
+fr: dossier
+
     font size
 co: dimensione di grafia
 de: Schriftgröße
