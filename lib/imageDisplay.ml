@@ -195,7 +195,9 @@ let print_html conf =
 
 let get_folder_images conf folder =
   let images_dir = !GWPARAM.images_d conf.bname in
-  let full_dir = String.concat Filename.dir_sep [images_dir; "albums"; folder ] in
+  let full_dir =
+    String.concat Filename.dir_sep [ images_dir; "albums"; folder ]
+  in
   let files =
     try
       let entries = Sys.readdir full_dir in
@@ -208,7 +210,8 @@ let get_folder_images conf folder =
           let ext = String.lowercase_ascii (Filename.extension name) in
           List.mem ext [ ".jpg"; ".jpeg"; ".png"; ".gif"; ".webp" ])
       |> List.sort String.compare
-      |> List.map (fun name -> String.concat Filename.dir_sep ["albums"; folder; name])
+      |> List.map (fun name ->
+          String.concat Filename.dir_sep [ "albums"; folder; name ])
     with Sys_error _ -> []
   in
   let json =

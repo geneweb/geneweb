@@ -1404,8 +1404,7 @@ and print_simple_variable conf = function
                 (Unix.stat full_path).st_kind = Unix.S_REG
                 && f.[0] <> '.'
                 && f.[0] <> '~'
-              then
-                acc ^ Format.sprintf "<option>%s\n" f
+              then acc ^ Format.sprintf "<option>%s\n" f
               else acc)
             "" f_list
         in
@@ -1417,9 +1416,13 @@ and print_simple_variable conf = function
           Log.warn (fun k ->
               k "src_images_list: %s (%s)" (Unix.error_message err) dir))
   | "src_folder_list" -> (
-      let albums_dir = Filename.concat (!GWPARAM.images_d conf.bname) "albums" in
+      let albums_dir =
+        Filename.concat (!GWPARAM.images_d conf.bname) "albums"
+      in
       try
-        let f_list = Sys.readdir albums_dir |> Array.to_list |> List.sort compare in
+        let f_list =
+          Sys.readdir albums_dir |> Array.to_list |> List.sort compare
+        in
         let res =
           List.fold_left
             (fun acc f ->
@@ -1435,7 +1438,8 @@ and print_simple_variable conf = function
           Log.warn (fun k -> k "src_ifolders_list: %s (%s)" msg albums_dir)
       | Unix.Unix_error (err, _, _) ->
           Log.warn (fun k ->
-              k "src_folders_list: %s (%s)" (Unix.error_message err) albums_dir))
+              k "src_folders_list: %s (%s)" (Unix.error_message err) albums_dir)
+      )
   | _ -> raise Not_found
 
 and print_variable conf sl =
