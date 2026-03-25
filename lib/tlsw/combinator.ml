@@ -1,17 +1,18 @@
 module Loc = Geneweb_loc
 
-type ('a, 'st) res = Ok of 'a * 'st | Fail of (unit -> string) * 'st
-type 'a t = { run : Input.t -> ('a, Input.t) res } [@@unboxed]
+type 'a t = { run : Input.t -> ('a, unit -> string) result * Input.t }
+[@@unboxed]
 
 let[@inline always] run t st = t.run st
-let ret a = { run = (fun st -> Ok (a, st)) }
+let ret a = { run = (fun st -> (Ok a, st)) }
 
 let fail fmt =
-  Fmt.kstr (fun s -> { run = (fun st -> Fail ((fun () -> s), st)) }) fmt
+  Fmt.kstr (fun s -> { run = (fun st -> (Error (fun () -> s), st)) }) fmt
 
 let bind t f =
   let run st =
-    match t.run st with Ok (a, st') -> (f a).run st' | Fail _ as r -> r
+    let r, st' = t.run st in
+    match r with Ok a -> (f a).run st' | Error _ as r -> (r, st')
   in
   { run }
 
@@ -19,20 +20,64 @@ let choice l =
   let run st =
     let rec loop l =
       match l with
-      | [] -> Fail ((fun () -> "non-exhaustive choice combinator"), st)
-      | t :: tx -> ( match t.run st with Ok _ as r -> r | Fail _ -> loop tx)
+      | [] -> (Error (fun () -> "non-exhaustive choice combinator"), st)
+      | t :: tx -> (
+          let r, st' = t.run st in
+          match r with Ok _ as r -> (r, st') | Error _ -> loop tx)
     in
     loop l
   in
   { run }
 
-let case l =
+let case l t =
   let run st =
     let rec loop l =
       match l with
-      | [] -> Fail ((fun () -> "non-exhaustive case combinator"), st)
+      | [] -> t.run st
       | (t1, t2) :: tx -> (
-          match t1.run st with Ok _ -> t2.run st | Fail _ -> loop tx)
+          let r, _st' = t1.run st in
+          match r with Ok _ -> t2.run st | Error _ -> loop tx)
+    in
+    loop l
+  in
+  { run }
+
+let case_with_recover ~recover l t =
+  let run st =
+    let rec loop l =
+      match l with
+      | [] -> t.run st
+      | (t1, t2) :: tx -> (
+          let start = Input.offset st in
+          let r, st' = t1.run st in
+          match r with
+          | Ok _ -> (
+              let r, st'' = t2.run st in
+              match r with
+              | Ok _ as r -> (r, st'')
+              | Error _ ->
+                  let stop = Input.offset st' in
+                  let loc = Loc.mk (Input.to_source st) start stop in
+                  (Ok (recover loc), st'))
+          | Error _ -> loop tx)
+    in
+    loop l
+  in
+  { run }
+
+let case ?recover l t =
+  match recover with
+  | Some recover -> case_with_recover ~recover l t
+  | None -> case l t
+
+let case2 l =
+  let run st =
+    let rec loop l =
+      match l with
+      | [] -> (Error (fun () -> "non-exhaustive choice combinator"), st)
+      | (t1, t2) :: tx -> (
+          let r, _st' = t1.run st in
+          match r with Ok _ -> t2.run st | Error _ -> loop tx)
     in
     loop l
   in
@@ -41,7 +86,10 @@ let case l =
 let ( let* ) = bind
 
 let ( <|> ) t1 t2 =
-  let run st = match t1.run st with Ok _ as r -> r | Fail _ -> t2.run st in
+  let run st =
+    let r, st' = t1.run st in
+    match r with Ok _ -> (r, st') | Error _ -> t2.run st
+  in
   { run }
 
 let ( *> ) t1 t2 =
@@ -55,9 +103,10 @@ let ( <* ) t1 t2 =
 
 let many t =
   let rec loop acc st =
-    match t.run st with
-    | Ok (a, st') -> loop (a :: acc) st'
-    | Fail _ -> Ok (List.rev acc, st)
+    let r, st' = t.run st in
+    match r with
+    | Ok a -> loop (a :: acc) st'
+    | Error _ -> (Ok (List.rev acc), st)
   in
   { run = loop [] }
 
@@ -68,24 +117,24 @@ let many1 t =
 
 let count t =
   let rec loop acc st =
-    match t.run st with
-    | Ok (_, st') -> loop (acc + 1) st'
-    | Fail _ -> Ok (acc, st)
+    let r, st' = t.run st in
+    match r with Ok _ -> loop (acc + 1) st' | Error _ -> (Ok acc, st)
   in
   { run = loop 0 }
 
-let until a =
+let until t =
   let run st =
     let buf = Buffer.create 17 in
     let rec loop st =
-      match a.run st with
-      | Ok _ -> Ok (Buffer.contents buf, st)
-      | Fail _ -> (
+      let r, st' = t.run st in
+      match r with
+      | Ok _ -> (Ok (Buffer.contents buf), st)
+      | Error _ -> (
           match Input.peak st with
           | Some c ->
               Buffer.add_char buf c;
               loop (Input.next st)
-          | None -> Ok (Buffer.contents buf, st))
+          | None -> (Ok (Buffer.contents buf), st))
     in
     loop st
   in
@@ -94,15 +143,17 @@ let until a =
 let skip t =
   let run st =
     let rec loop st =
-      match t.run st with Ok (_, st') -> loop st' | Fail _ -> Ok ((), st)
+      let r, st' = t.run st in
+      match r with Ok _ -> loop st' | Error _ -> (Ok (), st)
     in
     loop st
   in
   { run }
 
-let option a =
+let option t =
   let run st =
-    match a.run st with Ok (r, st) -> Ok (Some r, st) | Fail _ -> Ok (None, st)
+    let r, st' = t.run st in
+    match r with Ok r -> (Ok (Some r), st') | Error _ -> (Ok None, st)
   in
   { run }
 
@@ -111,23 +162,23 @@ let char c =
     match Input.peak st with
     | Some c' ->
         let st' = Input.next st in
-        if Char.equal c c' then Ok (c, st')
-        else Fail ((fun () -> Fmt.str "expected %C, got %C" c c'), st')
-    | None -> Fail ((fun () -> "expected input, reached end of file"), st)
+        if Char.equal c c' then (Ok c, st')
+        else (Error (fun () -> Fmt.str "expected %C, got %C" c c'), st')
+    | None -> (Error (fun () -> "expected input, reached end of file"), st)
   in
   { run }
 
 let string s =
   let len = String.length s in
   let rec loop i st =
-    if i = len then Ok (s, st)
+    if i = len then (Ok s, st)
     else
       match Input.peak st with
       | Some c ->
           let st' = Input.next st in
           if Char.equal s.[i] c then loop (i + 1) st'
-          else Fail ((fun () -> Fmt.str "expected %C, got %C" s.[i] c), st')
-      | None -> Fail ((fun () -> "expected input, reached end of file"), st)
+          else (Error (fun () -> Fmt.str "expected %C, got %C" s.[i] c), st')
+      | None -> (Error (fun () -> "expected input, reached end of file"), st)
   in
   { run = loop 0 }
 
@@ -137,29 +188,29 @@ let digit =
     | Some c ->
         let st' = Input.next st in
         let cd = Char.code c in
-        if 48 <= cd && cd <= 57 then Ok (cd - 48, st')
-        else Fail ((fun () -> Fmt.str "expected digit, got %C" c), st')
-    | None -> Fail ((fun () -> "expected digit, reached end of file"), st)
+        if 48 <= cd && cd <= 57 then (Ok (cd - 48), st')
+        else (Error (fun () -> Fmt.str "expected digit, got %C" c), st')
+    | None -> (Error (fun () -> "expected digit, reached end of file"), st)
   in
   { run }
 
 let int =
-  let rec loop r st =
-    match digit.run st with
-    | Ok (d, st') -> loop ((r * 10) + d) st'
-    | Fail _ -> Ok (r, st)
+  let rec loop acc st =
+    let r, st' = digit.run st in
+    match r with Ok d -> loop ((acc * 10) + d) st' | Error _ -> (Ok acc, st)
   in
-  let* r = digit in
-  { run = loop r }
+  let* acc = digit in
+  { run = loop acc }
 
 let located t =
   let run st =
     let start = Input.offset st in
-    match t.run st with
-    | Ok (r, st') ->
+    let x, st' = t.run st in
+    match x with
+    | Ok r ->
         let stop = Input.offset st' in
         let src = Input.to_source st' in
-        Ok ((r, Loc.mk src start stop), st')
-    | Fail _ as r -> r
+        (Ok (r, Loc.mk src start stop), st')
+    | Error _ as r -> (r, st')
   in
   { run }

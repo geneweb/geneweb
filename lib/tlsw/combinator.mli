@@ -1,11 +1,9 @@
 type +'a t
 (** Type of parsers that produce values of type ['a]. *)
 
-type ('a, 'st) res = Ok of 'a * 'st | Fail of (unit -> string) * 'st
-
 (** {2 Monadic operators} *)
 
-val run : 'a t -> Input.t -> ('a, Input.t) res
+val run : 'a t -> Input.t -> ('a, unit -> string) result * Input.t
 (** [run t st] executes the parser [t] starting from the initial state [st]. *)
 
 val ret : 'a -> 'a t
@@ -51,16 +49,18 @@ val option : 'a t -> 'a option t
 (** [option t] attempts to execute parser [t]. If [t] succeeds, its result is
     wrapped in [Some]. If [t] fails, [option t] succeeds and returns [None]. *)
 
-val case : (_ t * 'a t) list -> 'a t
-(** [case l] runs in order the first element of the pairs until one succeed.
-    Then it runs the second element. *)
+val case : ?recover:(Geneweb_loc.t -> 'a) -> (_ t * 'a t) list -> 'a t -> 'a t
+(** [case ?recover l] runs in order the first element of the pairs until one
+    succeed. Then it runs the second element. *)
+
+val case2 : (_ t * 'a t) list -> 'a t
 
 val until : _ t -> string t
 (** [until t] accumulates the input until the parser [t] succeeds. *)
 
 val skip : _ t -> unit t
-(** [skip t] executes [t], consuming input as [t] would, but discards its result.
-*)
+(** [skip t] executes [t], consuming input as [t] would, but discards its
+    result. *)
 
 val count : 'a t -> int t
 (** [count t] executes [t] and returns the number of characters consumed by [t].

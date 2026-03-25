@@ -27,7 +27,6 @@ let link_wizard_close = C.string "]]"
 let link_image_open = C.string "[[image:"
 let link_image_close = C.string "]]"
 let slash = C.string "/"
-let any = C.string ""
 
 (********** Parsing span *********)
 
@@ -113,7 +112,7 @@ let link_image =
 
 let link =
   C.(
-    case [
+    case2 [
       link_wizard_open, link_wizard;
       link_image_open, link_image;
       link_note_open, link_note;
@@ -164,9 +163,13 @@ let span_coercion p =
     let* r = p in
     ret (r :> Ast.span))
 
-let span =
+let span ~recover =
+  let recover =
+    if recover then Some (fun loc -> Ast.mk_span ~loc Highlight "error")
+    else None
+  in
   C.(
-    case [
+    case ?recover [
       bold_italic_del, bold_italic;
       bold_del, bold;
       italic_del, italic;
@@ -177,13 +180,12 @@ let span =
       link_wizard_open, span_coercion link_wizard;
       link_note_open, span_coercion link_note;
       link_person_open, span_coercion link_person;
-      any, plain
-    ])
+    ] plain)
     [@ocamlformat "disable"]
 
-let text =
+let text ~recover =
   C.(
-    let* l, loc = located @@ many1 span <* option eol in
+    let* l, loc = located @@ many1 (span ~recover) <* option eol in
     ret (Ast.mk_text ~loc l))
 
 (********* Parsing header *********)
@@ -225,17 +227,21 @@ let pre =
 
 (********* Parser list *********)
 
-let rec ul_at_lvl lvl =
+let rec ul_at_lvl ~recover lvl =
   C.(
     let* c = count ul_tk in
     if c != lvl then fail "expected a unordered list of level %d" lvl
     else
-      let* text_opt = option text in
+      let* text_opt = option (text ~recover) in
       let* nested, loc =
         located @@ option
-        @@ case [ (ul_tk, ul_at_lvl (lvl + 1)); (ol_tk, ol_at_lvl 1) ]
+        @@ case2
+             [
+               (ul_tk, ul_at_lvl ~recover (lvl + 1));
+               (ol_tk, ol_at_lvl ~recover 1);
+             ]
       in
-      let* tl = option @@ ul_at_lvl lvl in
+      let* tl = option @@ ul_at_lvl ~recover lvl in
       let tl = match tl with None -> [] | Some (_, tl) -> tl in
       match nested with
       | None ->
@@ -245,17 +251,21 @@ let rec ul_at_lvl lvl =
           let hd = Ast.mk_node ~loc text_opt nested_kind nested in
           ret (Ast.Unordered, hd :: tl))
 
-and ol_at_lvl lvl =
+and ol_at_lvl ~recover lvl =
   C.(
     let* c = count ol_tk in
     if c != lvl then fail "expected an ordered list of level %d" lvl
     else
-      let* text_opt = option text in
+      let* text_opt = option (text ~recover) in
       let* nested, loc =
         located @@ option
-        @@ case [ (ol_tk, ol_at_lvl (lvl + 1)); (ul_tk, ul_at_lvl 1) ]
+        @@ case2
+             [
+               (ol_tk, ol_at_lvl ~recover (lvl + 1));
+               (ul_tk, ul_at_lvl ~recover 1);
+             ]
       in
-      let* tl = option @@ ol_at_lvl lvl in
+      let* tl = option @@ ol_at_lvl ~recover lvl in
       let tl = match tl with None -> [] | Some (_, tl) -> tl in
       match nested with
       | None ->
@@ -265,14 +275,14 @@ and ol_at_lvl lvl =
           let hd = Ast.mk_node ~loc text_opt nested_kind nested in
           ret (Ast.Ordered, hd :: tl))
 
-let ul =
+let ul ~recover =
   C.(
-    let* (_, l), loc = located @@ ul_at_lvl 1 in
+    let* (_, l), loc = located @@ ul_at_lvl ~recover 1 in
     ret (Ast.mk_node ~loc None Unordered l))
 
-let ol =
+let ol ~recover =
   C.(
-    let* (_, l), loc = located @@ ol_at_lvl 1 in
+    let* (_, l), loc = located @@ ol_at_lvl ~recover 1 in
     ret (Ast.mk_node ~loc None Ordered l))
 
 (********* Parser rule *********)
@@ -284,11 +294,11 @@ let rule =
 
 (********* Parser indent *********)
 
-let indent =
+let indent ~recover =
   C.(
     let content =
       let* c = count indent_tk in
-      let* t = text in
+      let* t = text ~recover in
       ret (c, t)
     in
     let* (c, t), loc = located content in
@@ -306,13 +316,18 @@ let coercion p =
     let* r = p in
     ret (r :> Ast.t))
 
-let block =
+let block ~recover =
+  let r =
+    if recover then
+      Some (fun loc -> (Ast.(mk_text ~loc [ mk_span Plain "error" ]) :> Ast.t))
+    else None
+  in
   C.(
-    case [
+    case ?recover:r [
       pre_tk, pre;
       empty_line, newline;
       rule_tk, rule;
-      indent_tk, indent;
+      indent_tk, (indent ~recover);
       h6_del, h6;
       h5_del, h5;
       h4_del, h4;
@@ -322,10 +337,9 @@ let block =
       std_toc_tk, std_toc;
       short_toc_tk, short_toc;
       no_toc_tk, no_toc;
-      ul_tk, coercion ul;
-      ol_tk, coercion ol;
-      any, coercion text
-    ])
+      ul_tk, coercion @@ ul ~recover;
+      ol_tk, coercion @@ ol ~recover;
+    ] (coercion @@ text ~recover))
     [@ocamlformat "disable"]
 
 let parse parser ~on_err s =
@@ -333,8 +347,8 @@ let parse parser ~on_err s =
   let rec loop acc st =
     let start = Input.offset st in
     match C.run parser st with
-    | Ok (tk, st') -> loop (tk :: acc) st'
-    | Fail (err, st') ->
+    | Ok tk, st' -> loop (tk :: acc) st'
+    | Error err, st' ->
         if Input.eof st then List.rev acc
         else
           let stop = Input.offset st' in
@@ -347,4 +361,4 @@ let parse parser ~on_err s =
 type error_handler = loc:Geneweb_loc.t -> string -> unit
 
 let parse_links = parse link
-let parse = parse block
+let parse ~recover = parse (block ~recover)

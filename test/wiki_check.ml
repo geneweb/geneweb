@@ -51,7 +51,9 @@ let process_base ~mode ~in_memory bname =
         Logs.app (fun k -> k "Press enter to continue...@.");
         ignore (read_line () : string)
   in
-  let parse p s = ignore (Parser.parse ~on_err:(on_err p) s : Ast.t list) in
+  let parse p s =
+    ignore (Parser.parse ~recover:false ~on_err:(on_err p) s : Ast.t list)
+  in
   match mode with
   | Batch ->
       with_bar ~total @@ fun f ->
@@ -69,7 +71,7 @@ let process_gw fl =
           (Fmt.styled (`Fg `Red) pp_header)
           () err Loc.pp_with_source loc)
   in
-  ignore (Parser.parse ~on_err s : Ast.t list)
+  ignore (Parser.parse ~recover:true ~on_err s : Ast.t list)
 
 let run ~bd ~mode ~in_memory bases gws =
   Secure.set_base_dir bd;
