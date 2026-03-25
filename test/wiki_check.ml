@@ -52,7 +52,7 @@ let process_base ~mode ~in_memory bname =
         ignore (read_line () : string)
   in
   let parse p s =
-    ignore (Parser.parse ~recover:false ~on_err:(on_err p) s : Ast.t list)
+    ignore (Parser.parse ~recover:false ~on_err:(on_err p) s : Ast.block list)
   in
   match mode with
   | Batch ->

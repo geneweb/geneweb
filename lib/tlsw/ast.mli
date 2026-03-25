@@ -3,9 +3,9 @@ type +'a located = { desc : 'a; loc : Geneweb_loc.t }
 (** {2 Span language} *)
 
 type link_tag =
-  | Person of string * string * int option
-  | Note of string
-  | Wizard of string
+  | Person of { fn : string; sn : string; occ : int option }
+  | Note of { path : string }
+  | Wizard of { path : string }
   | Image of { path : string; width : string option }
 
 type link_desc = [ `Link of link_tag * string option ]
@@ -38,7 +38,7 @@ val mk_node : ?loc:Geneweb_loc.t -> text option -> kind -> node list -> node
 type size = One | Two | Three | Four | Five | Six
 type toc = Std | Short | No
 
-type block =
+type block_desc =
   [ `Header of size * string
   | `Toc of toc
   | `Newline
@@ -48,20 +48,20 @@ type block =
   | node_desc
   | text_desc ]
 
-and t = block located
+and block = block_desc located
 
-val equal : t -> t -> bool
+val equal : block -> block -> bool
 
 (** {2 Constructors for blocks} *)
 
-val mk_header : ?loc:Geneweb_loc.t -> size -> string -> t
-val mk_toc : ?loc:Geneweb_loc.t -> toc -> t
-val mk_indent : ?loc:Geneweb_loc.t -> int -> text -> t
-val mk_pre : ?loc:Geneweb_loc.t -> string -> t
-val mk_newline : ?loc:Geneweb_loc.t -> unit -> t
-val mk_rule : ?loc:Geneweb_loc.t -> unit -> t
+val mk_header : ?loc:Geneweb_loc.t -> size -> string -> block
+val mk_toc : ?loc:Geneweb_loc.t -> toc -> block
+val mk_indent : ?loc:Geneweb_loc.t -> int -> text -> block
+val mk_pre : ?loc:Geneweb_loc.t -> string -> block
+val mk_newline : ?loc:Geneweb_loc.t -> unit -> block
+val mk_rule : ?loc:Geneweb_loc.t -> unit -> block
 
 (** {2 Printers} *)
 
-val to_html : t -> Html_types.flow5 Tyxml.Html.elt
-val pp : t Fmt.t
+val to_html : block -> Html_types.flow5 Tyxml.Html.elt
+val pp : block Fmt.t

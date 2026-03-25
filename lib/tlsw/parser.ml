@@ -64,38 +64,38 @@ let link_person =
     let content =
       let* fn = firstname in
       let* sn = slash *> surname in
-      let* occ_opt = option (slash *> occ) in
-      let* text_opt = option (slash *> link_person_text) in
-      ret (fn, sn, occ_opt, text_opt)
+      let* occ = option (slash *> occ) in
+      let* text = option (slash *> link_person_text) in
+      ret (fn, sn, occ, text)
     in
-    let* (fn, sn, occ_opt, text_opt), loc =
+    let* (fn, sn, occ, text), loc =
       located (link_person_open *> content <* link_person_close)
     in
-    ret (Ast.mk_link ~loc (Person (fn, sn, occ_opt)) text_opt))
+    ret (Ast.mk_link ~loc Ast.(Person {fn; sn; occ}) text))
 
 let link_note =
   C.(
     let content =
-      let* fl = until (slash <|> link_note_close) in
+      let* path = until (slash <|> link_note_close) in
       let* text_opt = option (slash *> until link_note_close) in
-      ret (fl, text_opt)
+      ret (path, text_opt)
     in
-    let* (fl, text_opt), loc =
+    let* (path, text), loc =
       located (link_note_open *> content <* link_note_close)
     in
-    ret (Ast.mk_link ~loc (Note fl) text_opt))
+    ret (Ast.mk_link ~loc (Ast.Note { path }) text))
 
 let link_wizard =
   C.(
     let content =
-      let* fl = until (slash <|> link_wizard_close) in
-      let* text_opt = option (slash *> until link_wizard_close) in
-      ret (fl, text_opt)
+      let* path = until (slash <|> link_wizard_close) in
+      let* text = option (slash *> until link_wizard_close) in
+      ret (path, text)
     in
-    let* (fl, text_opt), loc =
+    let* (path, text), loc =
       located (link_wizard_open *> content <* link_wizard_close)
     in
-    ret (Ast.mk_link ~loc (Wizard fl) text_opt))
+    ret (Ast.mk_link ~loc (Ast.Wizard { path }) text))
 
 let link_image =
   C.(
@@ -314,12 +314,12 @@ let newline =
 let coercion p =
   C.(
     let* r = p in
-    ret (r :> Ast.t))
+    ret (r :> Ast.block))
 
 let block ~recover =
   let r =
     if recover then
-      Some (fun loc -> (Ast.(mk_text ~loc [ mk_span Plain "error" ]) :> Ast.t))
+      Some (fun loc -> (Ast.(mk_text ~loc [ mk_span Plain "error" ]) :> Ast.block))
     else None
   in
   C.(
@@ -342,11 +342,11 @@ let block ~recover =
     ] (coercion @@ text ~recover))
     [@ocamlformat "disable"]
 
-let parse parser ~on_err s =
+let parse t ~on_err s =
   let st = Input.of_string s in
   let rec loop acc st =
     let start = Input.offset st in
-    match C.run parser st with
+    match C.run t st with
     | Ok tk, st' -> loop (tk :: acc) st'
     | Error err, st' ->
         if Input.eof st then List.rev acc

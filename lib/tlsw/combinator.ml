@@ -3,8 +3,8 @@ module Loc = Geneweb_loc
 type 'a t = { run : Input.t -> ('a, unit -> string) result * Input.t }
 [@@unboxed]
 
-let[@inline always] run t st = t.run st
-let ret a = { run = (fun st -> (Ok a, st)) }
+let[@inline] run t st = t.run st
+let[@inline] ret a = { run = (fun st -> (Ok a, st)) }
 
 let fail fmt =
   Fmt.kstr (fun s -> { run = (fun st -> (Error (fun () -> s), st)) }) fmt
@@ -126,7 +126,7 @@ let until t =
   let run st =
     let buf = Buffer.create 17 in
     let rec loop st =
-      let r, st' = t.run st in
+      let r, _st' = t.run st in
       match r with
       | Ok _ -> (Ok (Buffer.contents buf), st)
       | Error _ -> (

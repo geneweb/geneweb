@@ -4,9 +4,9 @@ module Loc = Geneweb_loc
 type 'a located = { desc : 'a; loc : Geneweb_loc.t }
 
 type link_tag =
-  | Person of string * string * int option
-  | Note of string
-  | Wizard of string
+  | Person of { fn : string; sn : string; occ : int option }
+  | Note of { path : string }
+  | Wizard of { path : string }
   | Image of { path : string; width : string option }
 
 type link_desc = [ `Link of link_tag * string option ]
@@ -24,7 +24,7 @@ and node = node_desc located
 type size = One | Two | Three | Four | Five | Six
 type toc = Std | Short | No
 
-type block =
+type block_desc =
   [ `Header of size * string
   | `Toc of toc
   | `Newline
@@ -34,16 +34,16 @@ type block =
   | node_desc
   | text_desc ]
 
-and t = block located
+and block = block_desc located
 
 let equal t1 t2 = t1 = t2
 
 let pp_link_tag ppf t =
   match t with
-  | Person (fn, sn, occ) ->
+  | Person { fn; sn; occ } ->
       Fmt.pf ppf "Person (%S, %S, %a)" fn sn Fmt.(option int) occ
-  | Note fl -> Fmt.pf ppf "Note (%S)" fl
-  | Wizard fl -> Fmt.pf ppf "Wizard (%S)" fl
+  | Note { path } -> Fmt.pf ppf "Note (%S)" path
+  | Wizard { path } -> Fmt.pf ppf "Wizard (%S)" path
   | Image { path; width } ->
       Fmt.pf ppf "Image (%S, %a)" path Fmt.(option Dump.string) width
 
@@ -125,16 +125,16 @@ let[@inline always] mk_rule ?loc () = mk ?loc @@ `Rule
 
 let link_to_html (tag, s) =
   match tag with
-  | Person (fn, sn, occ) ->
+  | Person { fn; sn; occ } ->
       let s =
         Fmt.str "(%s/%s/%a) %a" fn sn Fmt.(option int) occ Fmt.(option string) s
       in
       Html.(span ~a:[ a_style "color: blue" ] [ txt s ])
-  | Note fl ->
-      let s = Fmt.str "(%s)%a" fl Fmt.(option string) s in
+  | Note { path } ->
+      let s = Fmt.str "(%s)%a" path Fmt.(option string) s in
       Html.(span ~a:[ a_style "color: red" ] [ txt s ])
-  | Wizard fl ->
-      let s = Fmt.str "(%s)%a" fl Fmt.(option string) s in
+  | Wizard { path } ->
+      let s = Fmt.str "(%s)%a" path Fmt.(option string) s in
       Html.(span ~a:[ a_style "color: green" ] [ txt s ])
   | Image { path; _ } ->
       let s = Fmt.str "(%s)%a" path Fmt.(option string) s in

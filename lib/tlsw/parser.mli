@@ -111,7 +111,7 @@
 
 type error_handler = loc:Geneweb_loc.t -> string -> unit
 
-val parse : recover:bool -> on_err:error_handler -> string -> Ast.t list
+val parse : recover:bool -> on_err:error_handler -> string -> Ast.block list
 (** [parse ~on_err s] parses the input [s] for the TLSW syntax. *)
 
 val parse_links : on_err:error_handler -> string -> Ast.link list
