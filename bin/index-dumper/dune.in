@@ -1,0 +1,4 @@
+(executable
+ (name index_dumper)
+ (public_name index-dumper)
+ (libraries geneweb %%%GWDB_PKG%%%))
