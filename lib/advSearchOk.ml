@@ -662,7 +662,7 @@ let advanced_search conf base max_answers =
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) unsafe_p search_type =
-    let pmatch =
+    let pmatch () =
       let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper unsafe_p) in
       let civil_match =
         lazy
@@ -735,7 +735,9 @@ let advanced_search conf base max_answers =
                ~dates:(getd @@ Fields.other_events_date ~gets ~search_type)
                ~places:(Lazy.force other_events_place_searched)
     in
-    if pmatch then (unsafe_p :: list, len + 1) else acc
+    if (not @@ SearchName.search_reject_p conf base unsafe_p) && pmatch () then
+      (unsafe_p :: list, len + 1)
+    else acc
   in
   let list, len =
     if "on" = gets "sosa_filter" then
@@ -778,10 +780,7 @@ let advanced_search conf base max_answers =
           n_list
         |> List.flatten |> List.flatten |> List.sort_uniq compare
         |> List.map (Gwdb.spi_find @@ persons_of base)
-        |> List.flatten
-        |> List.filter (fun person_id ->
-               person_id |> Gwdb.poi base |> Person.has_visible_name conf base)
-        |> List.sort_uniq compare
+        |> List.flatten |> List.sort_uniq compare
       in
       if
         sn_list <> []
