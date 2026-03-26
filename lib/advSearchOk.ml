@@ -764,7 +764,6 @@ let advanced_search conf base max_answers =
                       AdvancedSearchMatch.match_name ~search_list:n_list ~mode
                         ns)
                     conf base p)
-        |> List.sort_uniq compare
       in
       if
         sn_list <> []
