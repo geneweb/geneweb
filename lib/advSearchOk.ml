@@ -662,18 +662,18 @@ let advanced_search conf base max_answers =
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) unsafe_p search_type =
-    let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper unsafe_p) in
-    let civil_match =
-      lazy
-        (AdvancedSearchMatch.match_civil_status ~conf ~base ~p
-           ~sex:(gets "sex" |> sex_of_string)
-           ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
-           ~skip_sname ~first_name_list:fn_list ~surname_list:sn_list
-           ~alias_public_name_qualifiers
-           ~exact_first_name:(get_name_search_mode "exact_first_name")
-           ~exact_surname:(get_name_search_mode "exact_surname"))
-    in
     let pmatch =
+      let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper unsafe_p) in
+      let civil_match =
+        lazy
+          (AdvancedSearchMatch.match_civil_status ~conf ~base ~p
+             ~sex:(gets "sex" |> sex_of_string)
+             ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
+             ~skip_sname ~first_name_list:fn_list ~surname_list:sn_list
+             ~alias_public_name_qualifiers
+             ~exact_first_name:(get_name_search_mode "exact_first_name")
+             ~exact_surname:(get_name_search_mode "exact_surname"))
+      in
       match search_type with
       | Fields.Or ->
           let match_f ~date_field ~place_field or_f and_f =
