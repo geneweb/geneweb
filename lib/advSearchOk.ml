@@ -518,7 +518,6 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
                       AdvancedSearchMatch.match_name ~search_list:n_list ~mode
                         ns)
                     conf base p)
-        |> List.sort_uniq compare
       in
       if sn_list <> [] && query_params.surname_search_mode = `Not_Exact_Prefix
       then
