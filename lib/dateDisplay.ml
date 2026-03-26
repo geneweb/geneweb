@@ -488,7 +488,7 @@ let string_slash_of_date conf date =
             (translate_dmy conf (decode_dmy conf d1) Adef.Dfrench true)
             d1
       | Dhebrew ->
-          let d1 = Calendar.french_of_gregorian d in
+          let d1 = Calendar.hebrew_of_gregorian d in
           slashify_dmy
             (translate_dmy conf (decode_dmy conf d1) Adef.Dhebrew true)
             d1
