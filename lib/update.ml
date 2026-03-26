@@ -86,48 +86,63 @@ let infer_death_from_parents conf base fam =
   then OfCourseDead
   else DontKnowIfDead
 
-let rec infer_death conf base p =
-  let death =
-    infer_death_bb conf
-      (Date.od_of_cdate (Driver.get_birth p))
-      (Date.od_of_cdate (Driver.get_baptism p))
-  in
-  if death <> DontKnowIfDead then death
-  else
-    let death =
-      let families = Driver.get_family p in
-      let len = Array.length families in
-      let rec loop_families i =
-        if i = len then DontKnowIfDead
-        else
-          let fam = Driver.foi base families.(i) in
-          match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
-          | Some d -> infer_death_from_dmy conf d
-          | None ->
-              let death =
-                let children = Driver.get_children fam in
-                let len = Array.length children in
-                let rec loop_children j =
-                  if j = len then DontKnowIfDead
-                  else
-                    let death =
-                      infer_death conf base (Driver.poi base children.(j))
-                    in
-                    if death = OfCourseDead then OfCourseDead
-                    else loop_children (j + 1)
-                in
-                loop_children 0
-              in
-              if death = OfCourseDead then OfCourseDead
-              else loop_families (i + 1)
-      in
-      loop_families 0
-    in
-    if death <> DontKnowIfDead then death
+let infer_death conf base p =
+  let rec infer_death ~visited_persons conf base p =
+    if Driver.Iper.Set.mem (Driver.get_iper p) visited_persons then
+      (Def.DontKnowIfDead, visited_persons)
     else
-      match Driver.get_parents p with
-      | None -> DontKnowIfDead
-      | Some ifam -> infer_death_from_parents conf base (Driver.foi base ifam)
+      let visited_persons =
+        Driver.Iper.Set.add (Driver.get_iper p) visited_persons
+      in
+      let death =
+        infer_death_bb conf
+          (Date.od_of_cdate (Driver.get_birth p))
+          (Date.od_of_cdate (Driver.get_baptism p))
+      in
+      if death <> DontKnowIfDead then (death, visited_persons)
+      else
+        let death, visited_persons =
+          let families = Driver.get_family p in
+          let len = Array.length families in
+          let rec loop_families ~visited_persons i =
+            if i = len then (Def.DontKnowIfDead, visited_persons)
+            else
+              let fam = Driver.foi base families.(i) in
+              match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
+              | Some d -> (infer_death_from_dmy conf d, visited_persons)
+              | None ->
+                  let death, visited_persons =
+                    let children = Driver.get_children fam in
+                    let len = Array.length children in
+                    let rec loop_children ~visited_persons j =
+                      if j = len then (Def.DontKnowIfDead, visited_persons)
+                      else
+                        let death, visited_persons =
+                          infer_death ~visited_persons conf base
+                            (Driver.poi base children.(j))
+                        in
+                        if death = OfCourseDead then
+                          (OfCourseDead, visited_persons)
+                        else loop_children ~visited_persons (j + 1)
+                    in
+                    loop_children ~visited_persons 0
+                  in
+                  if death = OfCourseDead then (OfCourseDead, visited_persons)
+                  else loop_families ~visited_persons (i + 1)
+          in
+          loop_families ~visited_persons 0
+        in
+        let death =
+          if death <> DontKnowIfDead then death
+          else
+            match Driver.get_parents p with
+            | None -> DontKnowIfDead
+            | Some ifam ->
+                infer_death_from_parents conf base (Driver.foi base ifam)
+        in
+        (death, visited_persons)
+  in
+  fst @@ infer_death ~visited_persons:Driver.Iper.Set.empty conf base p
 
 (*let restrict_to_small_list el =
   let rec begin_list n rl el =
