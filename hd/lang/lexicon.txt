@@ -2612,6 +2612,11 @@ sv: /anor
 tr: /atalar
 zh: /祖先
 
+    ancestor mapping
+de: Ahnenkartierung
+en: ancestor mapping
+fr: cartographie ascendante
+
     ancestors (some)
 af: voorsate
 bg: предци
