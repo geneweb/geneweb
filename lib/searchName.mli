@@ -26,7 +26,8 @@ type name_components = {
   case : search_case;
 }
 
-val extract_name_components : config -> name_components
+val extract_name_components :
+  config -> Geneweb_db.Driver.base -> name_components
 
 val search_key_aux :
   (config ->
