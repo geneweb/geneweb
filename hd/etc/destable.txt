@@ -1,8 +1,8 @@
+<!-- $Id: destable.txt v7.1 14/03/2026 17:18:33 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;" id="scrollfix">
 <head>
-  <!-- $Id: destable.txt v7.1 11/10/2024 01:05:21 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
 <title>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
     %sp;[up to] %e.v; %if;(e.v>1)[generation/generations]1%else;[generation/generations]0%end;
@@ -103,9 +103,9 @@
           title="[*click] [notes sources show help]%sp;
                  %if;has_notes;[note/notes]1%if;has_psources; [and] [source/sources]1%end;
                  %elseif;has_psources;[source/sources]1%end;."
-          %apply;popover_params("right") data-html="true"
+          %apply;popover_params("right")
           data-content='%if;has_notes;%apply;clean_comment_tags(notes)%end;
-                        %if;has_psources;%if;has_notes;sources;<hr>%end;%apply;capitalize(psources)%end;'
+                        %if;has_psources;%if;has_notes;<hr>%end;%apply;capitalize(psources)%end;'
           data-title="%if;has_notes;[*note/notes]1%if;has_psources; [and] [source/sources]1%end;%elseif;has_psources;[*source/sources]1%end;"
         %end;>
         %apply;add_in_sorted_list(xxx.index)
@@ -117,9 +117,9 @@
             %if;(e.tt=1 and xxx.title!=""), %xxx.title;%end;
           </div>
           %if;(e.im="" and xxx.has_image)
-            %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="TEST">%end;
+            %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="%xxx;">%end;
             <img src="%xxx.image_url;" class="rounded align-self-center ml-1 table-img-max-width"
-             height="%if;(e.px!="")%e.px;%else;60%end;" alt="xxx">
+             height="%if;(e.px!="")%e.px;%else;60%end;" alt=" alt="%apply;a_of_b%with;[portrait]%and;%xxx;%end;">
             %if;not cancel_links;</a>%end;
           %end;
         </div>
@@ -146,9 +146,9 @@
         %apply;add_in_sorted_listc(xxx.index)
         <div class="d-flex justify-content-between">
           %if;(e.im="" and xxx.has_image)
-            %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="TEST">%end;
+            %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="%xxx;">%end;
             <img src="%xxx.image_url;" class="rounded align-self-center table-img-max-width"
-             height="%if;(e.px!="")%e.px;%else;60%end;" alt="xxx">
+             height="%if;(e.px!="")%e.px;%else;60%end;" alt="%apply;a_of_b%with;[portrait]%and;%xxx;%end;">
             %if;not cancel_links;</a>%end;
           %else;<div></div>
           %end;
@@ -243,26 +243,7 @@
              (nb_families>1 and
               ((xxx.spouse=zzz and ddd=family.index) or
                 (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
-          <td class="align-middle%if;(are_divorced or are_separated) divorced-side-border%end;
-            %if;(e.ns=1)
-              %if;has_marriage_note; note%if;has_marriage_source;source%end;%elseif;has_marriage_source; source%end;
-            %end;
-            %if;(e.hl=1 and marriage_place="") bg-ly-incomplete%end;"
-            rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"
-            title="TODO"
-            %if;(e.ns=1 and (has_marriage_note or has_marriage_source))
-              tabindex="0" %apply;popover_params("bottom")
-              data-content='%if;has_marriage_note;%apply;clean_comment_tags(marriage_note)
-                              %if;has_marriage_source;<hr>%end;%end;
-                            %if;has_marriage_source;%apply;capitalize(marriage_source)%end;'
-              data-title="%if;has_marriage_note;[*note/notes]1%if;has_marriage_source; [and] [source/sources]1%end;
-                          %elseif;has_marriage_source;[*source/sources]1%nn;
-                          %end;"%nn;
-            %end;>%nn;
-          %if;(marriage_place!="")
-            %marriage_place;%nn;
-          %end;
-          </td>
+          %apply;marr_place_td%with;%if;(e.t="I" and zzz.nb_families=1)2%end;%end;
         %end;
       %end;
       %if;(e.t="I" and nb_families>1 and "yyy"="desc")
@@ -271,7 +252,7 @@
     %end;
   %end;
   %reset_count2;
-%( Calcul nombre total d'enfants %)
+%( Calcul nombre total d’enfants %)
   %if;(zzz.has_families)
     %foreach;zzz.family;
       %if;zzz.has_children;
@@ -283,7 +264,7 @@
   %end;
   %let;nb_ch_tot_desc;%count2;%in;
   %reset_count2;
-%( Calcul nombre d'enfants de l'époux %)
+%( Calcul nombre d’enfants de l’époux %)
   %if;(e.t="I")
     %if;(xxx.has_families)
       %foreach;xxx.family;
@@ -306,7 +287,7 @@
     %end;
   %end;
   %let;nb_ch_tot_spous;%count2;%in;
-%( Nombre d'enfants %)
+%( Nombre d’enfants %)
   %if;(e.child="on")
     %if;(xxx.nb_families=0)
       <td%if;(e.hl=1) class="bg-lg"%end;></td>
@@ -573,7 +554,7 @@
     %apply;one_person("self", 0, l_v, 1, nb_families, 0)
   </div>
 %else;
-  <table id="destable" class="table-hover table-sm w-auto asc-desc-table mt-2">
+  <table id="destable" class="table table-hover table-sm w-auto asc-desc-table mt-2">
     %reset_count;
     %( table_header defined in perso_utils for both tables %)
     %apply;table_header()
