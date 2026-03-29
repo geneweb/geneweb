@@ -87,50 +87,49 @@ let infer_death_from_parents conf base fam =
   else DontKnowIfDead
 
 let infer_death conf base p =
-  let rec infer_death ~visited_persons conf base p =
-    if Driver.Iper.Set.mem (Driver.get_iper p) visited_persons then
-      (Def.DontKnowIfDead, visited_persons)
+  let rec aux ~visited conf base p =
+    if Driver.Iper.Set.mem (Driver.get_iper p) visited then
+      (DontKnowIfDead, visited)
     else
-      let visited_persons =
-        Driver.Iper.Set.add (Driver.get_iper p) visited_persons
-      in
+      let visited = Driver.Iper.Set.add (Driver.get_iper p) visited in
       let death =
         infer_death_bb conf
           (Date.od_of_cdate (Driver.get_birth p))
           (Date.od_of_cdate (Driver.get_baptism p))
       in
-      if death <> DontKnowIfDead then (death, visited_persons)
+      if death <> DontKnowIfDead then (death, visited)
       else
-        let death, visited_persons =
+        let death, visited =
           let families = Driver.get_family p in
           let len = Array.length families in
-          let rec loop_families ~visited_persons i =
-            if i = len then (Def.DontKnowIfDead, visited_persons)
+          let rec loop_families ~visited i =
+            if i = len then (DontKnowIfDead, visited)
             else
               let fam = Driver.foi base families.(i) in
               match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
-              | Some d -> (infer_death_from_dmy conf d, visited_persons)
+              | Some d ->
+                  let death = infer_death_from_dmy conf d in
+                  if death <> DontKnowIfDead then (death, visited)
+                  else loop_families ~visited (i + 1)
               | None ->
-                  let death, visited_persons =
+                  let death, visited =
                     let children = Driver.get_children fam in
                     let len = Array.length children in
-                    let rec loop_children ~visited_persons j =
-                      if j = len then (Def.DontKnowIfDead, visited_persons)
+                    let rec loop_children ~visited j =
+                      if j = len then (DontKnowIfDead, visited)
                       else
-                        let death, visited_persons =
-                          infer_death ~visited_persons conf base
-                            (Driver.poi base children.(j))
+                        let death, visited =
+                          aux ~visited conf base (Driver.poi base children.(j))
                         in
-                        if death = OfCourseDead then
-                          (OfCourseDead, visited_persons)
-                        else loop_children ~visited_persons (j + 1)
+                        if death = OfCourseDead then (OfCourseDead, visited)
+                        else loop_children ~visited (j + 1)
                     in
-                    loop_children ~visited_persons 0
+                    loop_children ~visited 0
                   in
-                  if death = OfCourseDead then (OfCourseDead, visited_persons)
-                  else loop_families ~visited_persons (i + 1)
+                  if death = OfCourseDead then (OfCourseDead, visited)
+                  else loop_families ~visited (i + 1)
           in
-          loop_families ~visited_persons 0
+          loop_families ~visited 0
         in
         let death =
           if death <> DontKnowIfDead then death
@@ -140,9 +139,9 @@ let infer_death conf base p =
             | Some ifam ->
                 infer_death_from_parents conf base (Driver.foi base ifam)
         in
-        (death, visited_persons)
+        (death, visited)
   in
-  fst @@ infer_death ~visited_persons:Driver.Iper.Set.empty conf base p
+  fst @@ aux ~visited:Driver.Iper.Set.empty conf base p
 
 (*let restrict_to_small_list el =
   let rec begin_list n rl el =
