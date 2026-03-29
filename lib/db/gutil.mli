@@ -52,10 +52,6 @@ val alphabetic : string -> string -> int
 val alphabetic_order : string -> string -> int
 (** Same as [alphabetic_utf_8] *)
 
-val arg_list_of_string : string -> string list
-(** Parse line and extract separated arguments ("" and '' are used to indlude
-    spaces inside the argument) *)
-
 val sort_person_list : Driver.base -> Driver.person list -> Driver.person list
 (** Sort list of persons by comparison with following order:
     - Compare by birth and death date

@@ -15,10 +15,10 @@ LOGS_DIR="../tmp"
 # beware that each image counts as one access
 
 "$BIN_DIR"/gwd \
-  -cgi \
-  -bd "$BASES_DIR" \
-  -hd "$BIN_DIR" \
-  -etc_prefix "../distribution/gw/etc" \
-  -blang \
-  -plugins -unsafe "$BIN_DIR"/plugins \
-  -log_level 7 -log "<stderr>" 2>> "$LOGS_DIR"/gwd.log
+  --cgi \
+  --bd "$BASES_DIR" \
+  --gw-prefix "$BIN_DIR" \
+  --etc-prefix "../distribution/gw/etc" \
+  --browser-lang \
+  --plugins u:"$BIN_DIR"/plugins \
+  --verbosity 7 --log "<stderr>" 2>> "$LOGS_DIR"/gwd.log
