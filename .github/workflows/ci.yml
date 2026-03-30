@@ -1,6 +1,11 @@
 name: Geneweb CI
 on:
   workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to test (leave empty for current branch)'
+        required: false
+        type: string
   pull_request:
     branches:
       - master
@@ -69,6 +74,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
+          ref: ${{ inputs.pr_number && format('refs/pull/{0}/merge', inputs.pr_number) || '' }}
 
       - name: Start Build Timer
         uses: ./.github/actions/ci-utils
