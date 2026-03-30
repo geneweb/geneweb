@@ -39,7 +39,7 @@
     ppx_deriving
     ppx_import
     stdlib-shims
-    (unidecode (= "0.2.0"))
+    (unidecode (>= "0.5.0"))
     uri
     uucp
     uunf
