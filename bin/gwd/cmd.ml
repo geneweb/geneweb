@@ -13,7 +13,7 @@ type plugin = { path : string; unsafe : bool; forced : bool; collection : bool }
 type t = {
   (* Directories *)
   base_dir : string;
-  socket_dir : string;
+  socket_dir : string option;
   gw_prefix : string;
   etc_prefix : string;
   images_prefix : string;
@@ -173,7 +173,6 @@ let pluginpath_conv =
 (* Directories commands *)
 let dirs_section = "DIRECTORIES"
 let default_base_dir = Secure.default_base_dir
-let default_socket_dir = ""
 
 let default_gw_prefix =
   match Sites.hd with
@@ -200,7 +199,7 @@ let socket_dir =
   in
   C.Arg.(
     value
-    & opt dirpath default_socket_dir
+    & opt (some dirpath) None
     & info [ "wd"; "socket-dir" ] ~docs:dirs_section ~doc)
 
 let gw_prefix =
@@ -402,7 +401,9 @@ let no_reverse_host =
 
 let ban_threshold =
   let doc =
-    "Bans IP addresses making more than $(docv) requests per second for a wi"
+    "Ban IP addresses making too many requests within a specific timeframe. \
+     The accepted input is of the form \"T1,T2\", where T1 is the maximum \
+     number of requests and T2 is the duration of the window."
   in
   C.Arg.(
     value
@@ -793,6 +794,12 @@ let arguments_in_file file =
   in
   Array.of_list @@ loop []
 
+let parse_lang s =
+  if String.length s >= 2 then Some (String.sub s 0 2) else None
+
+let env s =
+  match Sys.getenv_opt s with Some s when s = "LANG" -> parse_lang s | r -> r
+
 let parse ?file () =
   let argv_file =
     match file with Some f -> arguments_in_file f | None -> [||]
@@ -806,4 +813,4 @@ let parse ?file () =
         else Sys.argv.(i - l1))
   in
   let argv = preprocess_legacy_arguments argv in
-  Cmdliner.Cmd.eval_value' ~argv t
+  Cmdliner.Cmd.eval_value' ~env ~argv t

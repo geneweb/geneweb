@@ -15,7 +15,7 @@ type plugin = {
 type t = {
   (* Directories *)
   base_dir : string;
-  socket_dir : string;
+  socket_dir : string option;
   gw_prefix : string;
   etc_prefix : string;
   images_prefix : string;
@@ -72,7 +72,6 @@ val parse : ?file:string -> unit -> t Cmdliner.Cmd.eval_exit
 
 val default_images_prefix : string
 val default_images_dir : string
-val default_socket_dir : string
 val default_etc_prefix : string
 val default_connection_timeout : int
 val default_login_timeout : int

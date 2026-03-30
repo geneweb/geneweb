@@ -29,8 +29,8 @@ let images_prefix : string option ref = ref None
 let set_images_prefix s = images_prefix := Some s
 let etc_prefix : string option ref = ref None
 let set_etc_prefix s = etc_prefix := Some s
-let socket_dir = ref Cmd.default_socket_dir
-let set_socket_dir s = socket_dir := s
+let socket_dir : string option ref = ref None
+let set_socket_dir s = socket_dir := Some s
 let auth_file : string option ref = ref None
 let cache_langs : string list ref = ref []
 let cache_databases : string list ref = ref []

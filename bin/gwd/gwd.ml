@@ -2380,7 +2380,6 @@ let parse_cmd () =
       force_cgi := o.cgi;
       cgi_secret_salt := o.secret_salt;
       setup_link := o.setup_link;
-      GWPARAM.sock_dir := o.socket_dir;
       plugins := o.plugins;
       Lock.no_lock_flag := o.no_lock;
       Mutil.particles_file := Option.value ~default:"" o.particles_file;
@@ -2388,10 +2387,15 @@ let parse_cmd () =
   | `Exit code -> exit code
 
 let make_socket_dir socket_dir =
-  if Sys.win32 then (
-    Filesystem.create_dir ~parent:true socket_dir;
-    Server.sock_in := socket_dir // "gwd.sin";
-    Server.sock_out := socket_dir // "gwd.sou")
+  match socket_dir with
+  | Some p ->
+      GWPARAM.sock_dir := p;
+      Filesystem.create_dir ~parent:true p;
+      if Sys.win32 then (
+        Filesystem.create_dir ~parent:true p;
+        Server.sock_in := p // "gwd.sin";
+        Server.sock_out := p // "gwd.sou")
+  | None -> ()
 
 let switch_check () =
   debug := true;
