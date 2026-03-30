@@ -2,5 +2,4 @@
  (name geneweb_core)
  (public_name geneweb.core)
  (wrapped false)
- (synopsis "GeneWeb Core library")
  (libraries unix geneweb_def geneweb_db geneweb_sosa geneweb_util))
