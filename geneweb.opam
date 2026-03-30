@@ -43,7 +43,7 @@ depends: [
   "pp_loc"
   "dune-site"
   "utop" {with-dev-setup}
-  "ocamlformat" {with-dev-setup & = "0.28.1"}
+  "ocamlformat" {with-dev-setup & = "0.29.0"}
   "odoc" {with-doc}
 ]
 depopts: [

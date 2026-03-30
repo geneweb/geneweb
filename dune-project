@@ -49,7 +49,7 @@
     pp_loc
     dune-site
     (utop :with-dev-setup)
-    (ocamlformat (and :with-dev-setup (= "0.28.1")))
+    (ocamlformat (and :with-dev-setup (= "0.29.0")))
   )
   (depopts
     (ancient (>= 0.10.0))

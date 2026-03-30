@@ -44,7 +44,7 @@ jobs:
           dune-cache: true
 
       - name: Install ocamlformat
-        run: opam install dune ocamlformat.0.28.1
+        run: opam install dune ocamlformat.0.29.0
 
       - name: Check formatting with dune
         id: format-check
