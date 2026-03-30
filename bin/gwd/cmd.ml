@@ -797,8 +797,8 @@ let arguments_in_file file =
 let parse_lang s =
   if String.length s >= 2 then Some (String.sub s 0 2) else None
 
-let env s =
-  match Sys.getenv_opt s with Some s when s = "LANG" -> parse_lang s | r -> r
+let env k =
+  match Sys.getenv_opt k with Some s when k = "LANG" -> parse_lang s | r -> r
 
 let parse ?file () =
   let argv_file =

@@ -2392,7 +2392,6 @@ let make_socket_dir socket_dir =
       GWPARAM.sock_dir := p;
       Filesystem.create_dir ~parent:true p;
       if Sys.win32 then (
-        Filesystem.create_dir ~parent:true p;
         Server.sock_in := p // "gwd.sin";
         Server.sock_out := p // "gwd.sou")
   | None -> ()
