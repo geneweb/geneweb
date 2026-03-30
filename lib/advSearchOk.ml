@@ -811,7 +811,7 @@ let advanced_search conf base max_answers =
         in
         let rec loop ((_, len) as acc) = function
           | [] -> acc
-          | _ when len > max_answers -> acc
+          | _ when len >= max_answers -> acc
           | ip :: l ->
               loop
                 (match_person ~skip_fname ~skip_sname acc
