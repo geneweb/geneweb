@@ -416,9 +416,9 @@ let code_dmy_no_year conf d =
     String.trim (String.sub s ylen (slen - ylen))
   else s
 
-let french_gregorian_precision conf d =
-  let sdn_lo = Date.to_sdn ~from:Dfrench ~lower:true d in
-  let sdn_hi = Date.to_sdn ~from:Dfrench ~lower:false d - 1 in
+let calendar_gregorian_precision conf ~from d =
+  let sdn_lo = Date.to_sdn ~from ~lower:true d in
+  let sdn_hi = Date.to_sdn ~from ~lower:false d - 1 in
   if sdn_lo = sdn_hi then
     string_of_dmy conf (Calendar.gregorian_of_sdn Sure sdn_lo)
   else
@@ -478,7 +478,7 @@ let string_of_date_aux ?(link = true) ?(on = false) ?(dmy = string_of_dmy)
       | Sure | About | Before | After | Maybe ->
           let greg =
             if d1.day = 0 || d1.month = 0 then
-              french_gregorian_precision conf d1
+              calendar_gregorian_precision conf ~from:Dfrench d1
             else gregorian_precision conf d
           in
           s ^^^ sep ^^^ " (" ^<^ greg ^>^ ")"
@@ -490,7 +490,12 @@ let string_of_date_aux ?(link = true) ?(on = false) ?(dmy = string_of_dmy)
       in
       match d.prec with
       | Sure | About | Before | After | Maybe ->
-          s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
+          let greg =
+            if d1.day = 0 || d1.month = 0 then
+              calendar_gregorian_precision conf ~from:Dhebrew d1
+            else gregorian_precision conf d
+          in
+          s ^^^ sep ^^^ " (" ^<^ greg ^>^ ")"
       | OrYear _ | YearInt _ -> s)
   | Dtext t -> "(" ^<^ (Util.escape_html t :> Adef.safe_string) ^>^ ")"
 
