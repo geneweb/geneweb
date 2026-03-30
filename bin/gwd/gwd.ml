@@ -19,8 +19,6 @@ let timestamp_tag : unit Logs.Tag.def =
   Logs.Tag.def "timestamp" ~doc:"POSIX timestamp" Fmt.nop
 
 let timestamp = Logs.Tag.(empty |> add timestamp_tag ())
-let pp_brackets ~style pp = Fmt.(brackets @@ styled style @@ pp)
-
 let gzip_min_size = 1024
 
 let client_accepts_encoding request encoding =
@@ -2368,7 +2366,7 @@ let parse_cmd () =
       no_host_address := o.no_reverse_host;
       only_addresses := o.allowed_addresses;
       redirected_addr := o.redirect_interface;
-      robot_xcl := Obj.magic o.ban_threshold;
+      robot_xcl := o.ban_threshold;
       Robot.min_disp_req := o.min_disp_req;
       trace_failed_passwd := o.trace_failed_password;
       debug := o.debug;
@@ -2383,26 +2381,27 @@ let parse_cmd () =
       cgi_secret_salt := o.secret_salt;
       setup_link := o.setup_link;
       GWPARAM.sock_dir := o.socket_dir;
-      plugins := o.plugins
+      plugins := o.plugins;
+      Lock.no_lock_flag := o.no_lock;
+      Mutil.particles_file := Option.value ~default:"" o.particles_file;
+      Util.allowed_tags_file := Option.value ~default:"" o.allowed_tags_file
   | `Exit code -> exit code
 
 let make_socket_dir socket_dir =
-  Filesystem.create_dir ~parent:true socket_dir;
-  if not Sys.unix then (
+  if Sys.win32 then (
     Filesystem.create_dir ~parent:true socket_dir;
     Server.sock_in := socket_dir // "gwd.sin";
     Server.sock_out := socket_dir // "gwd.sou")
 
-let switch_check check =
+let switch_check () =
   debug := true;
   predictable_mode := true
 
-let switch_debug debug =
-  if debug then (
-    Printexc.record_backtrace true;
-    set_verbosity_level 7;
-    Logs.set_level ~all:true (Some Logs.Debug);
-    Sys.enable_runtime_warnings true)
+let switch_debug () =
+  Printexc.record_backtrace true;
+  set_verbosity_level 7;
+  Logs.set_level ~all:true (Some Logs.Debug);
+  Sys.enable_runtime_warnings true
 
 type opened_file = { path : string; mutable oc : out_channel option }
 
@@ -2475,8 +2474,9 @@ let () =
   parse_cmd ();
   Secure.add_assets @@ Option.get !gw_prefix;
   Secure.add_assets @@ Option.get !etc_prefix;
-  switch_check !check;
-  switch_debug !debug;
+  if !check then switch_check ();
+  if !debug then switch_debug ();
+  make_socket_dir !socket_dir;
   setup_log ~predictable_mode:!predictable_mode !log_file;
   Fmt_tty.setup_std_outputs ~style_renderer:`Ansi_tty ();
   try main () with

@@ -22,7 +22,7 @@ type t = {
   cache_databases : string list;
   lexicon_files : string list;
   cache_langs : string list;
-  particles_files : string option;
+  particles_file : string option;
   no_lock : bool;
   (* Security *)
   authorization_file : string option;
@@ -36,7 +36,7 @@ type t = {
   allowed_tags_file : string option;
   allowed_addresses : string list;
   no_reverse_host : bool;
-  ban_threshold : int;
+  ban_threshold : (int * int) option;
   min_disp_req : int;
   (* HTTP server *)
   interface : string option;
@@ -120,6 +120,24 @@ let unix_only_flag ~error t =
 
 (* Custom parsers *)
 
+let error fmt = Fmt.kstr (fun s -> Error s) fmt
+
+let ban_threshold_parser s =
+  match String.index s ',' with
+  | exception Not_found ->
+      error "Invalid threshold value. %S is not of the form: INT,INT" s
+  | i -> (
+      let f1 = String.sub s 0 i in
+      let f2 = String.sub s (i + 1) (String.length s - i - 1) in
+      match (int_of_string_opt f1, int_of_string_opt f2) with
+      | Some i1, Some i2 -> Ok (i1, i2)
+      | _ -> error "Invalid threshold value. %S is not of the form: INT,INT" s)
+
+let ban_threshold_conv =
+  C.Arg.Conv.make ~docv:"THRESHOLD" ~parser:ban_threshold_parser
+    ~pp:Fmt.(pair int int)
+    ()
+
 let log_parser s =
   match s with
   | "-" | "<stdout>" -> Ok Stdout
@@ -135,7 +153,6 @@ let log_pp ppf l =
   | File s -> Fmt.string ppf s
 
 let log_conv = C.Arg.Conv.make ~docv:"LOG" ~parser:log_parser ~pp:log_pp ()
-let error = Fmt.kstr (fun s -> Error s)
 
 let pluginpath_parser s =
   match String.index_from s 0 ':' with
@@ -205,9 +222,9 @@ let images_prefix =
 
 let images_dir =
   let doc =
-    "Same as --image-prefix but directory name relative to \n  current."
+    "Same as --images-prefix but directory name relative to \n  current."
   in
-  let deprecated = "Use `-images_prefix` instead." in
+  let deprecated = "Use `--images-prefix` instead." in
   C.Arg.(
     value
     & opt dirpath default_images_dir
@@ -253,6 +270,7 @@ let directories =
 (* Data management commands *)
 
 let data_section = "DATA MANAGEMENT"
+let default_lexicon_files = [ "lang" // "lexicon.txt" ]
 
 let cache_databases =
   let doc = "Load these databases in memory before starting the server." in
@@ -270,7 +288,7 @@ let lexicon_files =
   let doc = "Add file $(docv) as lexicon." in
   C.Arg.(
     value
-    & opt_all (list filepath) []
+    & opt_all (list filepath) [ default_lexicon_files ]
     & info [ "lexicon-file" ] ~docs:data_section ~doc)
 
 let lexicon_files =
@@ -283,7 +301,7 @@ let cache_langs =
   C.Arg.(
     value & opt (list string) [] & info [ "cache-lang" ] ~docs:data_section ~doc)
 
-let particles_files =
+let particles_file =
   let doc = "Particles file path." in
   C.Arg.(
     value
@@ -335,7 +353,7 @@ let secret_salt =
     & info [ "secret-salt" ] ~docs:security_section ~doc)
 
 let wizard_just_friend =
-  let doc = "Wizard just friend permanetly." in
+  let doc = "Wizard just friend permanently." in
   C.Arg.(
     value & flag
     & info [ "wjf"; "wizard-just-friend" ] ~docs:security_section ~doc)
@@ -384,11 +402,12 @@ let no_reverse_host =
 
 let ban_threshold =
   let doc =
-    "Bans IP addresses making more than $(docv) requests per second. Set \n\
-    \  to 0 to disable."
+    "Bans IP addresses making more than $(docv) requests per second for a wi"
   in
   C.Arg.(
-    value & opt int 0 & info [ "ban-threshold" ] ~docs:security_section ~doc)
+    value
+    & opt (some ban_threshold_conv) None
+    & info [ "ban-threshold" ] ~docs:security_section ~doc)
 
 let min_disp_req =
   let doc = "Set minimum traced requests by robot to $(docv)." in
@@ -510,18 +529,14 @@ let setup_link =
 let plugin_section = "PLUGIN"
 
 let plugin =
-  let doc =
-    "Specify where the “bases” directory with databases is installed."
-  in
+  let doc = "Load the plugin located in the directory $(docv)." in
   C.Arg.(
     value
     & opt_all (list pluginpath_conv) []
     & info [ "plugin" ] ~docs:plugin_section ~doc)
 
 let plugins =
-  let doc =
-    "Specify where the “bases” directory with databases is installed."
-  in
+  let doc = "Load all the plugins located in the directory $(docv)." in
   C.Arg.(
     value
     & opt_all (list pluginpath_conv) []
@@ -593,7 +608,7 @@ let no_fork =
 
 (* TODO: Remove this option after switching to the new CLI. *)
 let noop =
-  let doc = "Internal option. DO NOT USE" in
+  let doc = "Internal option. DO NOT USE." in
   C.Arg.(value & flag & info [ "noop" ] ~docs:tracing_section ~doc)
 
 let t =
@@ -617,7 +632,7 @@ let t =
   and+ cache_databases = cache_databases
   and+ lexicon_files = lexicon_files
   and+ cache_langs = cache_langs
-  and+ particles_files = particles_files
+  and+ particles_file = particles_file
   and+ no_lock = no_lock
   and+ authorization_file = authorization_file
   and+ digest_password = digest_password
@@ -662,7 +677,7 @@ let t =
     cache_databases;
     lexicon_files;
     cache_langs;
-    particles_files;
+    particles_file;
     no_lock;
     authorization_file;
     login_timeout;

@@ -24,7 +24,7 @@ type t = {
   cache_databases : string list;
   lexicon_files : string list;
   cache_langs : string list;
-  particles_files : string option;
+  particles_file : string option;
   no_lock : bool;
   (* Security *)
   authorization_file : string option;
@@ -38,7 +38,7 @@ type t = {
   allowed_tags_file : string option;
   allowed_addresses : string list;
   no_reverse_host : bool;
-  ban_threshold : int;
+  ban_threshold : (int * int) option;
   min_disp_req : int;
   (* HTTP server *)
   interface : string option;
@@ -81,4 +81,5 @@ val default_verbosity : int
 val default_max_pending_requests : int
 val default_n_workers : int
 val default_port : int
+val default_lexicon_files : string list
 val log_parser : string -> (log, string) result
