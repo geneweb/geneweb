@@ -59,21 +59,21 @@
 
 (package
   (name geneweb-compat)
-  (synopsis "GeneWeb library for legacy support.")
+  (synopsis "Geneweb library for legacy support")
   (tags (geneweb legacy))
   (depends
     (ocaml (>= 4.10))))
 
 (package
   (name geneweb-http)
-  (synopsis "HTTP 1.1 support for GeneWeb daemon.")
+  (synopsis "Geneweb library for HTTP support")
   (depends
     (ocaml (>= 4.10))
     geneweb-compat))
 
 (package
   (name geneweb-rpc)
-  (synopsis "RPC support for GeneWeb")
+  (synopsis "Geneweb library for RPC support")
   (tags (geneweb rpc json))
   (depends
     (ocaml (>= 4.10))
