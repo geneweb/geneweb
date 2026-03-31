@@ -1,4 +1,4 @@
-<!-- $Id: buttons.txt v7.1 19/02/2025 06:36:28 $ -->
+<!-- $Id: buttons.txt v7.1 31/03/2026 17:11:23 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 %( Boutons de configurations et d'options %)
 %let;l_v0;%if;(e.v!="")
@@ -11,6 +11,8 @@
          %elseif;(e.m="D")
            %if;(bvar.max_desc_level="" or bvar.max_desc_level>l_v0)%l_v0;%else;%bvar.max_desc_level;%end;
          %end;%in;
+%( TODO: homogeneize e_v/l_v usage at last in ancsosa linked templates %)
+%let;e_v;%l_v;%in;
 %let;v0;%if;(e.v0="")
           %if;(e.t="Y")1%else;0%end;
         %else;
