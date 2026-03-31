@@ -535,23 +535,18 @@ let error_family conf err =
   Update.print_return conf
 
 let check_parents conf cpl =
-  let check get i =
-    let fn, sn, _, _, _ = get cpl in
-    if fn = "" then
-      if sn <> "" then
-        Some
-          (Update.UERR_missing_first_name
-             (transl_nth conf "father/mother" i |> Adef.safe))
-      else None
-    else if sn = "" then
-      Some
-        (Update.UERR_missing_surname
-           (transl_nth conf "father/mother" i |> Adef.safe))
-    else None
+  let parents = Array.to_list (Adef.parent_array cpl) in
+  let rec loop i = function
+    | [] -> None
+    | (fn, sn, _, _, _) :: rest ->
+        let role = transl_nth conf "father/mother" i |> Adef.safe in
+        if fn = "" then
+          if sn <> "" then Some (Update.UERR_missing_first_name role)
+          else loop (i + 1) rest
+        else if sn = "" then Some (Update.UERR_missing_surname role)
+        else loop (i + 1) rest
   in
-  match check Gutil.father 0 with
-  | Some _ as err -> err
-  | None -> check Gutil.mother 1
+  loop 0 parents
 
 let check_family conf fam cpl :
     Update.update_error option * Update.update_error option =
@@ -631,28 +626,36 @@ let infer_origin_file_from_other_marriages base ifam ip =
   loop 0
 
 let infer_origin_file conf base ifam ncpl ndes =
-  let r = infer_origin_file_from_other_marriages base ifam (Adef.father ncpl) in
+  let npar_arr = Adef.parent_array ncpl in
   let r =
-    if r = None then
-      infer_origin_file_from_other_marriages base ifam (Adef.mother ncpl)
-    else r
+    Array.fold_left
+      (fun acc ip ->
+        match acc with
+        | Some _ -> acc
+        | None -> infer_origin_file_from_other_marriages base ifam ip)
+      None npar_arr
   in
   let r =
     match r with
     | Some r -> r
     | None -> (
-        let afath = Driver.poi base (Adef.father ncpl) in
-        let amoth = Driver.poi base (Adef.mother ncpl) in
-        match (Driver.get_parents afath, Driver.get_parents amoth) with
-        | Some if1, _
-          when Driver.sou base (Driver.get_origin_file (Driver.foi base if1))
-               <> "" ->
-            Driver.get_origin_file (Driver.foi base if1)
-        | _, Some if2
-          when Driver.sou base (Driver.get_origin_file (Driver.foi base if2))
-               <> "" ->
-            Driver.get_origin_file (Driver.foi base if2)
-        | _ ->
+        let parents_of ip = Driver.get_parents (Driver.poi base ip) in
+        let origin_of ifam = Driver.get_origin_file (Driver.foi base ifam) in
+        let found =
+          Array.fold_left
+            (fun acc ip ->
+              match acc with
+              | Some _ -> acc
+              | None -> (
+                  match parents_of ip with
+                  | Some pifam when Driver.sou base (origin_of pifam) <> "" ->
+                      Some (origin_of pifam)
+                  | _ -> None))
+            None npar_arr
+        in
+        match found with
+        | Some r -> r
+        | None ->
             let rec loop i =
               if i = Array.length ndes.children then
                 Driver.insert_string base ""
@@ -822,14 +825,14 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
-  let nfath_p = Driver.poi base (Adef.father ncpl) in
-  let nmoth_p = Driver.poi base (Adef.mother ncpl) in
+  let npar_arr = Adef.parent_array ncpl in
   let nfam = update_family_with_fevents conf base nfam in
   let nfam =
     (* En mode api, on gère directement la relation de même sexe. *)
     if conf.api_mode then { nfam with relation = sfam.relation } else nfam
   in
-  if not nsck then (
+  if (not nsck) && not conf.multi_parents then (
+    (* Sex assignment only makes sense for the classic binary couple. *)
     let exp sex p =
       let s = Driver.get_sex p in
       if s = Neuter then
@@ -837,15 +840,39 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
         Driver.patch_person base p.key_index p
       else if s <> sex then print_err_sex conf base p
     in
-    exp Male nfath_p;
-    exp Female nmoth_p);
-  if Adef.father ncpl = Adef.mother ncpl then print_err conf;
+    if Array.length npar_arr >= 1 then exp Male (Driver.poi base npar_arr.(0));
+    if Array.length npar_arr >= 2 then exp Female (Driver.poi base npar_arr.(1)));
+  (* Check for duplicate parents across the whole parent array. *)
+  let has_dup =
+    let n = Array.length npar_arr in
+    let rec loop i =
+      if i >= n then false
+      else if
+        Array.exists
+          (( = ) npar_arr.(i))
+          (Array.sub npar_arr (i + 1) (n - i - 1))
+      then true
+      else loop (i + 1)
+    in
+    loop 0
+  in
+  if has_dup then print_err conf;
   let origin_file = origin_file nfam ncpl ndes in
   let nfam = { nfam with origin_file; fam_index = fi } in
   Driver.patch_family base fi nfam;
-  Driver.patch_couple base fi ncpl;
+  (* patch_couple expects a binary Adef.couple (father/mother).
+     When multi_parents=true, ncpl is an Obj.magic-wrapped array;
+     we must convert back to a proper binary couple for the DB layer. *)
+  let db_cpl =
+    if conf.multi_parents then
+      Adef.couple
+        (if Array.length npar_arr >= 1 then npar_arr.(0) else Driver.Iper.dummy)
+        (if Array.length npar_arr >= 2 then npar_arr.(1) else Driver.Iper.dummy)
+    else ncpl
+  in
+  Driver.patch_couple base fi db_cpl;
   Driver.patch_descend base fi ndes;
-  (nfath_p, nmoth_p, nfam, ncpl, ndes)
+  (npar_arr, nfam, ncpl, ndes)
 
 let effective_mod conf base nsck sfam scpl sdes =
   let fi = sfam.fam_index in
@@ -868,7 +895,7 @@ let effective_mod conf base nsck sfam scpl sdes =
       else infer_origin_file conf base fi ncpl ndes
     else nfam.origin_file
   in
-  let _, _, nfam, ncpl, ndes =
+  let _, nfam, ncpl, ndes =
     aux_effective_mod conf base nsck sfam scpl sdes fi origin_file
   in
   let narr = Adef.parent_array ncpl in
@@ -895,7 +922,12 @@ let effective_mod conf base nsck sfam scpl sdes =
       Hashtbl.add cache ip a;
       a
   in
-  let same_parents = Adef.father ncpl = ofather && Adef.mother ncpl = omother in
+  let same_parents =
+    let narr = Adef.parent_array ncpl in
+    narr = [| ofather; omother |]
+    || Array.length narr = Array.length oarr
+       && Mutil.array_forall2 ( = ) narr oarr
+  in
   Array.iter
     (fun ip ->
       let a = find_asc ip in
@@ -945,7 +977,7 @@ let effective_mod conf base nsck sfam scpl sdes =
       nfam.witnesses
       (fwitnesses_of nfam.fevents)
   in
-  let pi = Adef.father ncpl in
+  let pi = (Adef.parent_array ncpl).(0) in
   Update.update_related_pointers base pi ol nl;
   (fi, nfam, ncpl, ndes)
 
@@ -956,17 +988,15 @@ let effective_add conf base nsck sfam scpl sdes =
       Driver.no_couple Driver.no_descend
   in
   let origin_file _nfam ncpl ndes = infer_origin_file conf base fi ncpl ndes in
-  let nfath_p, nmoth_p, nfam, ncpl, ndes =
+  let npar_arr, nfam, ncpl, ndes =
     aux_effective_mod conf base nsck sfam scpl sdes fi origin_file
   in
-  let nfath_u =
-    { family = Array.append (Driver.get_family nfath_p) [| fi |] }
-  in
-  let nmoth_u =
-    { family = Array.append (Driver.get_family nmoth_p) [| fi |] }
-  in
-  Driver.patch_union base (Adef.father ncpl) nfath_u;
-  Driver.patch_union base (Adef.mother ncpl) nmoth_u;
+  Array.iter
+    (fun ip ->
+      let np = Driver.poi base ip in
+      let nu = { family = Array.append (Driver.get_family np) [| fi |] } in
+      Driver.patch_union base ip nu)
+    npar_arr;
   Array.iter
     (fun ip ->
       let p = Driver.poi base ip in
@@ -979,7 +1009,7 @@ let effective_add conf base nsck sfam scpl sdes =
   let nl_witnesses = Array.to_list nfam.witnesses in
   let nl_fevents = fwitnesses_of nfam.fevents in
   let nl = List.append nl_witnesses nl_fevents in
-  Update.update_related_pointers base (Adef.father ncpl) [] nl;
+  Update.update_related_pointers base npar_arr.(0) [] nl;
   (fi, nfam, ncpl, ndes)
 
 let effective_inv conf base ip u ifam =
@@ -1108,15 +1138,14 @@ let print_family conf base (wl, ml) cpl des =
       if x <> "" then conf.henv <- ("dsrc", Mutil.encode x) :: conf.henv
   | None -> ());
   Output.print_sstring conf "<ul>\n";
-  Output.print_sstring conf "<li>";
-  Output.print_string conf
-    (referenced_person_text conf base (Driver.poi base (Adef.father cpl)));
-  Output.print_sstring conf "</li>";
-  Output.print_sstring conf "\n";
-  Output.print_sstring conf "<li>";
-  Output.print_string conf
-    (referenced_person_text conf base (Driver.poi base (Adef.mother cpl)));
-  Output.print_sstring conf "</li>";
+  Array.iter
+    (fun ip ->
+      Output.print_sstring conf "<li>";
+      Output.print_string conf
+        (referenced_person_text conf base (Driver.poi base ip));
+      Output.print_sstring conf "</li>";
+      Output.print_sstring conf "\n")
+    (Adef.parent_array cpl);
   Output.print_sstring conf "</ul>\n";
   if des.children <> [||] then (
     Output.print_sstring conf "<ul>\n";
@@ -1220,8 +1249,9 @@ let forbidden_disconnected conf scpl sdes =
   in
   if no_dec then
     if
-      get_create (Gutil.father scpl) = Update.Link
-      || get_create (Gutil.mother scpl) = Update.Link
+      Array.exists
+        (fun p -> get_create p = Update.Link)
+        (Adef.parent_array scpl)
     then false
     else Array.for_all (fun p -> get_create p <> Update.Link) sdes.children
   else false
@@ -1265,16 +1295,17 @@ let print_add o_conf base =
         let changed, act =
           let fam = Util.string_gen_family base fam in
           let ip, act =
+            let par = Adef.parent_array cpl in
             match p_getenv conf.env "ip" with
             | Some i -> (
                 let i = Driver.Iper.of_string i in
-                if Adef.mother cpl = i then (Adef.mother cpl, "af")
+                if Array.length par >= 2 && par.(1) = i then (par.(1), "af")
                 else
                   let a = Driver.poi base i in
                   match Driver.get_parents a with
                   | Some x when x = ifam -> (i, "aa")
-                  | _ -> (Adef.father cpl, "af"))
-            | None -> (Adef.father cpl, "af")
+                  | _ -> (par.(0), "af"))
+            | None -> (par.(0), "af")
           in
           match act with
           | "af" ->
@@ -1325,9 +1356,9 @@ let print_add_parents o_conf base =
     && sfam.fsources = Option.value ~default:"" (p_getenv conf.env "dsrc")
     && sfam.fam_index = Driver.Ifam.dummy
   then
-    match (Adef.father scpl, Adef.mother scpl, sdes.children) with
-    | ( (ff, fs, fo, Update.Link, _),
-        (mf, ms, mo, Update.Link, _),
+    match (not conf.multi_parents, Adef.parent_array scpl, sdes.children) with
+    | ( true,
+        [| (ff, fs, fo, Update.Link, _); (mf, ms, mo, Update.Link, _) |],
         [| (cf, cs, co, Update.Link, _) |] ) -> (
         match
           ( Driver.person_of_key base ff fs fo,

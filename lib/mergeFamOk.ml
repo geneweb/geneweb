@@ -274,13 +274,15 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
       (* TODO update_cache_linked_pages *)
       let changed =
         let gen_p =
+          let par = Adef.parent_array cpl in
           let p =
             match p_getenv conf.env "ip" with
             | Some i ->
                 let ip = Driver.Iper.of_string i in
-                if Adef.mother cpl = ip then Driver.poi base (Adef.mother cpl)
-                else Driver.poi base (Adef.father cpl)
-            | None -> Driver.poi base (Adef.father cpl)
+                if Array.length par >= 2 && par.(1) = ip then
+                  Driver.poi base par.(1)
+                else Driver.poi base par.(0)
+            | None -> Driver.poi base par.(0)
           in
           Util.string_gen_person base (Driver.gen_person_of_person p)
         in

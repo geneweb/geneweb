@@ -282,7 +282,13 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "digest" ] -> eval_string_env "digest" env
   | [ "divorce" ] -> eval_divorce fam
   | [ "divorce"; s ] -> eval_divorce' fam s
-  | "father" :: sl -> eval_key conf base (Gutil.father cpl) sl
+  | "father" :: sl ->
+      let arr = Gutil.parent_array cpl in
+      let k =
+        if Array.length arr >= 1 then arr.(0)
+        else ("", "", 0, Update.Create (Neuter, None), "")
+      in
+      eval_key conf base k sl
   | [ "fsources" ] ->
       safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | [ "is_first" ] -> eval_is_first env
@@ -294,7 +300,13 @@ and eval_simple_var conf base env (fam, cpl, des) = function
       safe_val (Util.escape_html fam.marriage_note :> Adef.safe_string)
   | [ "marriage_src" ] ->
       safe_val (Util.escape_html fam.marriage_src :> Adef.safe_string)
-  | "mother" :: sl -> eval_key conf base (Gutil.mother cpl) sl
+  | "mother" :: sl ->
+      let arr = Gutil.parent_array cpl in
+      let k =
+        if Array.length arr >= 2 then arr.(1)
+        else ("", "", 0, Update.Create (Neuter, None), "")
+      in
+      eval_key conf base k sl
   | [ "mrel" ] -> str_val (eval_relation_kind fam.relation)
   | [ "nb_fevents" ] -> str_val (string_of_int (List.length fam.fevents))
   | [ "origin_file" ] ->

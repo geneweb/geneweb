@@ -429,9 +429,7 @@ module Make (H : Digestif.S) = struct
     | Pacs -> string "Pacs"
     | Residence -> string "Residence"
 
-  let gen_couple feed_pers Adef.{ father; mother } =
-    feed_pers father <+> feed_pers mother
-
+  let gen_couple feed_pers cpl = array feed_pers (Adef.parent_array cpl)
   let gen_union feed_fam Def.{ family } = array feed_fam family
   let gen_descend feed_pers Def.{ children } = array feed_pers children
 

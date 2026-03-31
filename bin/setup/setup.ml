@@ -981,7 +981,7 @@ let ged2gwb_check conf =
 let gwc conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "gwc") in
-    exec_f conf (comm ^ parameters conf.env)
+    exec_f conf ("OCAMLRUNPARAM=b " ^ comm ^ parameters conf.env)
   in
   let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
   (try Sys.remove gwo with Sys_error _ -> ());
