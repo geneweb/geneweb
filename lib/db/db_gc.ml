@@ -65,7 +65,7 @@ let gc ?(dry_run = true) base =
       (* if family wasn't deleted *)
       if f.fam_index <> dummy_ifam then
         let _ = Futil.map_family_ps markp markf marks f in
-        let _ = Futil.map_couple_p false markp @@ base.data.couples.get i in
+        let _ = Adef.map_couple_p markp @@ base.data.couples.get i in
         let _ = Futil.map_descend_p markp @@ base.data.descends.get i in
         ()
   done;
@@ -143,7 +143,7 @@ let gc ?(dry_run = true) base =
     in
     let couples =
       Array.init lenf @@ fun i ->
-      Futil.map_couple_p false dst_iper @@ base.data.couples.get @@ src_ifam i
+      Adef.map_couple_p dst_iper @@ base.data.couples.get @@ src_ifam i
     in
     let descends =
       Array.init lenf @@ fun i ->

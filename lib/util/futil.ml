@@ -1,6 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-open Adef
 open Def
 
 external identity : 'a -> 'a = "%identity"
@@ -180,12 +179,7 @@ let map_family_ps ?(fd = identity) fp ff fs fam =
     fam_index = ff fam.fam_index;
   }
 
-let parent multi parent =
-  if not multi then Adef.parent parent else Adef.multi_parent parent
-
-let map_couple_p multi_parents fp cpl =
-  parent multi_parents (Array.map fp (parent_array cpl))
-
+let parent _multi_parent = Adef.parent
 let map_descend_p fp des = { children = Array.map fp des.children }
 
 let gen_person_misc_names sou empty_string quest_string first_name surname

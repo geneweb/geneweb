@@ -133,9 +133,9 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
       let cpl = Driver.foi base ifam in
       let cpl =
         if Driver.get_iper p2 = Driver.get_father cpl then
-          Gutil.couple false (Driver.get_iper p1) (Driver.get_mother cpl)
+          Adef.couple (Driver.get_iper p1) (Driver.get_mother cpl)
         else if Driver.get_iper p2 = Driver.get_mother cpl then
-          Gutil.couple false (Driver.get_father cpl) (Driver.get_iper p1)
+          Adef.couple (Driver.get_father cpl) (Driver.get_iper p1)
         else assert false
       in
       Driver.patch_couple base ifam cpl

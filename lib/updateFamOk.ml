@@ -499,7 +499,7 @@ let reconstitute_family conf base nsck =
       fsources;
       fam_index;
     }
-  and cpl = Futil.parent conf.multi_parents (Array.of_list parents)
+  and cpl = Adef.parent (Array.of_list parents)
   and des = { children = Array.of_list children } in
   (fam, cpl, des, ext)
 
@@ -808,9 +808,7 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
     match p_getenv conf.env "psrc" with Some s -> String.trim s | None -> ""
   in
   let ncpl =
-    Futil.map_couple_p conf.multi_parents
-      (Update.insert_person conf base psrc created_p)
-      scpl
+    Adef.map_couple_p (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
     Futil.map_family_ps
@@ -1386,7 +1384,7 @@ let print_mod_aux conf base callback =
   let sfam, scpl, sdes, ext = reconstitute_family conf base nsck in
   let redisp = Option.is_some (p_getenv conf.env "return") in
   let digest =
-    let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
+    let ini_sfam = UpdateFam.string_family_of base sfam.fam_index in
     let salt = Option.get conf.secret_salt in
     Update.digest_family ~salt ini_sfam
   in
@@ -1525,7 +1523,7 @@ let print_change_event_order conf base =
       let fam = update_family_with_fevents conf base fam in
       Driver.patch_family base fam.fam_index fam;
       let a = Driver.foi base fam.fam_index in
-      let cpl = Futil.parent conf.multi_parents (Driver.get_parent_array a) in
+      let cpl = Adef.parent (Driver.get_parent_array a) in
       let des = { children = Driver.get_children a } in
       let wl =
         let wl = ref [] in

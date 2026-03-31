@@ -35,25 +35,17 @@ type cdate =
   | Cnone
 
 type 'person gen_couple = { father : 'person; mother : 'person }
-and 'person gen_parents = { parent : 'person array }
 
-let father cpl =
-  if Obj.size (Obj.repr cpl) = 2 then cpl.father else (Obj.magic cpl).parent.(0)
-
-let mother cpl =
-  if Obj.size (Obj.repr cpl) = 2 then cpl.mother else (Obj.magic cpl).parent.(1)
-
+let[@inline] father cpl = cpl.father
+let[@inline] mother cpl = cpl.mother
 let couple father mother = { father; mother }
 let parent parent = { father = parent.(0); mother = parent.(1) }
+let parent_array cpl = [| cpl.father; cpl.mother |]
+let multi_couple father mother : 'person gen_couple = { father; mother }
+let multi_parent = parent
 
-let parent_array cpl =
-  if Obj.size (Obj.repr cpl) = 2 then [| cpl.father; cpl.mother |]
-  else (Obj.magic cpl).parent
-
-let multi_couple father mother : 'person gen_couple =
-  Obj.magic { parent = [| father; mother |] }
-
-let multi_parent parent : 'person gen_couple = Obj.magic { parent }
+let map_couple_p fp { father; mother } =
+  { father = fp father; mother = fp mother }
 
 type 'a astring = string
 type safe_string = [ `encoded | `escaped | `safe ] astring

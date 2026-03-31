@@ -221,11 +221,11 @@ let print_merge conf base =
       let fam2 = Driver.foi base (Driver.Ifam.of_string f2) in
       let sfam, sdes = reconstitute conf base ifam1 fam1 fam2 in
       let digest =
-        let ini_sfam = UpdateFam.string_family_of conf base ifam1 in
+        let ini_sfam = UpdateFam.string_family_of base ifam1 in
         Update.digest_family ini_sfam
       in
       let scpl =
-        Futil.map_couple_p conf.multi_parents
+        Adef.map_couple_p
           (UpdateFam.person_key base)
           (Driver.gen_couple_of_family (Driver.foi base sfam.fam_index))
       in

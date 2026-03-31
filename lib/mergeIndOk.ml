@@ -472,9 +472,9 @@ let redirect_added_families base p ip2 p2_family =
                   Driver.patch_person base ip w)
               evt.efam_witnesses)
           (Driver.get_fevents fam);
-        Gutil.couple false p.key_index (Driver.get_mother fam))
+        Adef.couple p.key_index (Driver.get_mother fam))
       else if ip2 = Driver.get_mother fam then
-        Gutil.couple false (Driver.get_father fam) p.key_index
+        Adef.couple (Driver.get_father fam) p.key_index
       else assert false
     in
     Driver.patch_couple base ifam cpl

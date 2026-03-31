@@ -270,8 +270,7 @@ let fixbase_ok conf base =
           (Driver.gen_family_of_family f)
       in
       let mkc f =
-        Futil.map_couple_p false Driver.Iper.to_string
-          (Driver.gen_couple_of_family f)
+        Adef.map_couple_p Driver.Iper.to_string (Driver.gen_couple_of_family f)
       in
       let mkd f =
         Futil.map_descend_p Driver.Iper.to_string

@@ -1444,6 +1444,12 @@ let string_to_char_list s =
   let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
   exp (String.length s - 1) []
 
+let warning_multi_parents () =
+  Logs.warn (fun k ->
+      k
+        "The multi-parents feature is deprecated. Setting it up will no longer \
+         have any effect.")
+
 let make_conf ~secret_salt from_addr request script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
     let str =
@@ -1576,6 +1582,8 @@ let make_conf ~secret_salt from_addr request script_name env =
   let plugins =
     List.fold_left (fun acc { path; _ } -> path :: acc) [] !plugins |> List.rev
   in
+  if List.assoc_opt "multi_parents" base_env = Some "yes" then
+    warning_multi_parents ();
   let conf =
     {
       from = from_addr;
@@ -1605,9 +1613,6 @@ let make_conf ~secret_salt from_addr request script_name env =
       default_lang;
       browser_lang;
       default_sosa_ref;
-      multi_parents =
-        (try List.assoc "multi_parents" base_env = "yes"
-         with Not_found -> false);
       authorized_wizards_notes =
         (try List.assoc "authorized_wizards_notes" base_env = "yes"
          with Not_found -> false);
