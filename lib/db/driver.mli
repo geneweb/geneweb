@@ -62,7 +62,7 @@ val make :
   * int Def.gen_ascend array
   * int Def.gen_union array)
   * ((int, int, int) Def.gen_family array
-    * int Def.gen_couple array
+    * int Adef.gen_couple array
     * int Def.gen_descend array)
   * string array
   * Def.base_notes ->
@@ -315,7 +315,7 @@ val get_titles : person -> title list
 val get_witnesses : family -> iper array
 (** Get array of family's witnesses ids *)
 
-val gen_couple_of_family : family -> iper Def.gen_couple
+val gen_couple_of_family : family -> iper Adef.gen_couple
 (** Extract [gen_couple] from [family]. *)
 
 val gen_descend_of_family : family -> iper Def.gen_descend
@@ -335,7 +335,9 @@ val gen_union_of_person : person -> ifam Def.gen_union
 
 val family_of_gen_family :
   base ->
-  (iper, ifam, istr) Def.gen_family * iper Def.gen_couple * iper Def.gen_descend ->
+  (iper, ifam, istr) Def.gen_family
+  * iper Adef.gen_couple
+  * iper Def.gen_descend ->
   family
 (** Create [family] from associated values. *)
 
@@ -369,7 +371,7 @@ val no_family : ifam -> (iper, ifam, istr) Def.gen_family
 val no_descend : iper Def.gen_descend
 (** Returns unitialised [gen_descend] *)
 
-val no_couple : iper Def.gen_couple
+val no_couple : iper Adef.gen_couple
 (** Returns unitialised [gen_couple] *)
 
 val nb_of_persons : base -> int
@@ -407,7 +409,7 @@ val patch_descend : base -> ifam -> iper Def.gen_descend -> unit
 (** Modify/add descendants of a family with a giving id. Modification stay
     blocked until call of [commit_patches]. *)
 
-val patch_couple : base -> ifam -> iper Def.gen_couple -> unit
+val patch_couple : base -> ifam -> iper Adef.gen_couple -> unit
 (** Modify/add couple of a family with a giving id. Modification stay blocked
     until call of [commit_patches]. *)
 
@@ -452,7 +454,7 @@ val insert_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
 val insert_family_with_couple_and_descendants :
   base ->
   (iper, ifam, istr) Def.gen_family ->
-  iper Def.gen_couple ->
+  iper Adef.gen_couple ->
   iper Def.gen_descend ->
   ifam
 (** [insert_family base f c d] Add a new family with its couple and descendants
@@ -472,7 +474,7 @@ val insert_person_with_union_and_ascendants :
     the [base]. Allocate and returns the fresh new id for this person. [p]
     SHOULD be defined using [dummy_iper]. *)
 
-val insert_couple : base -> ifam -> iper Def.gen_couple -> unit
+val insert_couple : base -> ifam -> iper Adef.gen_couple -> unit
 (** Same as [patch_descend] *)
 
 val delete_person : base -> iper -> unit

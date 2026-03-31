@@ -11,7 +11,7 @@ val print_update_fam :
   config ->
   Geneweb_db.Driver.base ->
   (Update.key, Geneweb_db.Driver.ifam, string) gen_family
-  * Update.key gen_couple
+  * Update.key Adef.gen_couple
   * Update.key gen_descend ->
   string ->
   unit
@@ -50,5 +50,5 @@ val string_family_of :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.ifam ->
   (Update.key, Geneweb_db.Driver.ifam, string) gen_family
-  * Update.key gen_couple
+  * Update.key Adef.gen_couple
   * Update.key gen_descend

@@ -10,7 +10,7 @@ type dsk_union = int Def.gen_union
 type dsk_family = (int, int, int) Def.gen_family
 (** Family's entry in the base *)
 
-type dsk_couple = int Def.gen_couple
+type dsk_couple = int Adef.gen_couple
 (** Family's couple entry in the base *)
 
 type dsk_descend = int Def.gen_descend

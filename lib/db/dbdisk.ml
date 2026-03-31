@@ -2,7 +2,7 @@ type dsk_person = (int, int, int) Def.gen_person
 type dsk_ascend = int Def.gen_ascend
 type dsk_union = int Def.gen_union
 type dsk_family = (int, int, int) Def.gen_family
-type dsk_couple = int Def.gen_couple
+type dsk_couple = int Adef.gen_couple
 type dsk_descend = int Def.gen_descend
 type dsk_title = int Def.gen_title
 

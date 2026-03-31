@@ -73,12 +73,6 @@ val parent_array : 'a gen_couple -> 'a array
 (** Returns array from [gen_couple]. First element of array is father, second -
     mother *)
 
-val multi_couple : 'a -> 'a -> 'a gen_couple
-(** @deprecated Use [couple] instead *)
-
-val multi_parent : 'a array -> 'a gen_couple
-(** @deprecated Use [parent] instead *)
-
 val map_couple_p : ('a -> 'b) -> 'a gen_couple -> 'b gen_couple
 (** Convert generic type used to represent father and mother inside
     [Def.gen_couple] into another one. *)

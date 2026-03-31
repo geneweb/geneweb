@@ -27,7 +27,7 @@ type somebody =
 (** Blocks that could appear in .gw file. *)
 type gw_syntax =
   | Family of
-      somebody gen_couple
+      somebody Adef.gen_couple
       * sex
       * sex
       * (somebody * sex) list

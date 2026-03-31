@@ -179,7 +179,6 @@ let map_family_ps ?(fd = identity) fp ff fs fam =
     fam_index = ff fam.fam_index;
   }
 
-let parent _multi_parent = Adef.parent
 let map_descend_p fp des = { children = Array.map fp des.children }
 
 let gen_person_misc_names sou empty_string quest_string first_name surname

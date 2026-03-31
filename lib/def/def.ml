@@ -262,9 +262,6 @@ type ('person, 'ifam, 'string) gen_family = {
 }
 (** Polymorphic type describing information about family. *)
 
-type 'person gen_couple = 'person Adef.gen_couple
-(** Alias to [Adef.gen_couple] *)
-
 (** Database errors describing bad specification of the person *)
 type 'person error =
   | AlreadyDefined of 'person

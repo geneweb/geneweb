@@ -34,10 +34,6 @@ let designation base p =
   let nom = Driver.p_surname base p in
   first_name ^ "." ^ string_of_int (Driver.get_occ p) ^ " " ^ nom
 
-let father = Adef.father
-let mother = Adef.mother
-let parent_array = Adef.parent_array
-
 let spouse ip cpl =
   if ip = Driver.get_father cpl then Driver.get_mother cpl
   else Driver.get_father cpl
