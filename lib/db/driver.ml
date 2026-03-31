@@ -441,7 +441,7 @@ type family = {
   base : base;
   ifam : ifam;
   mutable f : (iper, ifam, istr) Def.gen_family option;
-  mutable c : iper Def.gen_couple option;
+  mutable c : iper Adef.gen_couple option;
   mutable d : iper Def.gen_descend option;
 }
 

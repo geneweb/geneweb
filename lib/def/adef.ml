@@ -41,8 +41,6 @@ let[@inline] mother cpl = cpl.mother
 let couple father mother = { father; mother }
 let parent parent = { father = parent.(0); mother = parent.(1) }
 let parent_array cpl = [| cpl.father; cpl.mother |]
-let multi_couple father mother : 'person gen_couple = { father; mother }
-let multi_parent = parent
 
 let map_couple_p fp { father; mother } =
   { father = fp father; mother = fp mother }

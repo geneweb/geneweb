@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-
 exception Same_person
 
 val is_ancestor :
@@ -67,15 +65,6 @@ val sort_person_list : Driver.base -> Driver.person list -> Driver.person list
 val sort_uniq_person_list :
   Driver.base -> Driver.person list -> Driver.person list
 (** Same as [sort_person_list] but also remove duplicates *)
-
-val father : 'a gen_couple -> 'a
-(** Same as [Adef.father] *)
-
-val mother : 'a gen_couple -> 'a
-(** Same as [Adef.mother] *)
-
-val parent_array : 'a gen_couple -> 'a array
-(** Same as [Adef.parent_array] *)
 
 val find_free_occ : Driver.base -> string -> string -> int
 (** Find first free occurence number for the person with specified first name

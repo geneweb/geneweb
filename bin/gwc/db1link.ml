@@ -32,7 +32,7 @@ type union = int Def.gen_union
 type family = (int, int, int) Def.gen_family
 (** Family's entry in the base *)
 
-type couple = int Def.gen_couple
+type couple = int Adef.gen_couple
 (** Family's couple entry in the base *)
 
 type descend = int Def.gen_descend

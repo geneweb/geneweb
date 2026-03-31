@@ -19,7 +19,7 @@ val make :
   * int Def.gen_ascend array
   * int Def.gen_union array)
   * ((int, int, int) Def.gen_family array
-    * int Def.gen_couple array
+    * int Adef.gen_couple array
     * int Def.gen_descend array)
   * string array
   * Def.base_notes ->

@@ -10,7 +10,7 @@ type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend
 type union = int Def.gen_union
 type family = (int, int, int) Def.gen_family
-type couple = int Def.gen_couple
+type couple = int Adef.gen_couple
 type descend = int Def.gen_descend
 
 let log_oc = ref stdout

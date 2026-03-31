@@ -20,14 +20,14 @@ val effective_mod :
   Geneweb_db.Driver.base ->
   bool ->
   (Update.key, Geneweb_db.Driver.ifam, string) Def.gen_family ->
-  Update.key Def.gen_couple ->
+  Update.key Adef.gen_couple ->
   Update.key Def.gen_descend ->
   Geneweb_db.Driver.ifam
   * ( Geneweb_db.Driver.iper,
       Geneweb_db.Driver.ifam,
       Geneweb_db.Driver.istr )
     Def.gen_family
-  * Geneweb_db.Driver.iper Def.gen_couple
+  * Geneweb_db.Driver.iper Adef.gen_couple
   * Geneweb_db.Driver.iper Def.gen_descend
 
 val effective_del :
@@ -46,9 +46,9 @@ val all_checks_family :
     Geneweb_db.Driver.ifam,
     Geneweb_db.Driver.istr )
   Def.gen_family ->
-  Geneweb_db.Driver.iper Def.gen_couple ->
+  Geneweb_db.Driver.iper Adef.gen_couple ->
   Geneweb_db.Driver.iper Def.gen_descend ->
-  Update.key Def.gen_couple
+  Update.key Adef.gen_couple
   * Update.key Def.gen_descend
   * (('i array * 'j array) * ('i array * 'j array)) option ->
   CheckItem.base_warning list * CheckItem.base_misc list
@@ -77,7 +77,7 @@ val print_mod_aux :
      Geneweb_db.Driver.ifam,
      string )
    Def.gen_family ->
-  (string * string * int * Update.create * string) Def.gen_couple ->
+  (string * string * int * Update.create * string) Adef.gen_couple ->
   (string * string * int * Update.create * string) Def.gen_descend ->
   unit) ->
   unit
@@ -96,7 +96,7 @@ val print_change_event_order : Config.config -> Geneweb_db.Driver.base -> unit
 val check_family :
   Config.config ->
   (string * string * _ * _ * _, _, _) Def.gen_family ->
-  (string * string * _ * _ * _) Def.gen_couple ->
+  (string * string * _ * _ * _) Adef.gen_couple ->
   Update.update_error option * Update.update_error option
 (** [check_family conf fam cpl] Checks that no name is missing. *)
 
@@ -113,14 +113,14 @@ val effective_add :
   Geneweb_db.Driver.base ->
   bool ->
   (Update.key, 'a, string) Def.gen_family ->
-  Update.key Def.gen_couple ->
+  Update.key Adef.gen_couple ->
   Update.key Def.gen_descend ->
   Geneweb_db.Driver.ifam
   * ( Geneweb_db.Driver.iper,
       Geneweb_db.Driver.ifam,
       Geneweb_db.Driver.istr )
     Def.gen_family
-  * Geneweb_db.Driver.iper Def.gen_couple
+  * Geneweb_db.Driver.iper Adef.gen_couple
   * Geneweb_db.Driver.iper Def.gen_descend
 (** [effective_add conf base nsck sfam scpl sdes] Patch base without commiting
     changes. *)

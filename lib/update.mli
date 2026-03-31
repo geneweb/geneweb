@@ -138,7 +138,7 @@ val digest_person :
 val digest_family :
   ?salt:string ->
   (key, Geneweb_db.Driver.ifam, string) gen_family
-  * key gen_couple
+  * key Adef.gen_couple
   * key gen_descend ->
   string
 (** [digest_family ?salt fam] generates a digest of the family [fam]. The

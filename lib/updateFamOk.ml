@@ -549,9 +549,9 @@ let check_parents conf cpl =
            (transl_nth conf "father/mother" i |> Adef.safe))
     else None
   in
-  match check Gutil.father 0 with
+  match check Adef.father 0 with
   | Some _ as err -> err
-  | None -> check Gutil.mother 1
+  | None -> check Adef.mother 1
 
 let check_family conf fam cpl :
     Update.update_error option * Update.update_error option =
@@ -1055,7 +1055,7 @@ let is_created_or_already_there ochil_arr nchil schil =
 
 let need_check_noloop (scpl, sdes, onfs) =
   if
-    Array.exists is_a_link (Gutil.parent_array scpl)
+    Array.exists is_a_link (Adef.parent_array scpl)
     || Array.exists is_a_link sdes.children
   then
     match onfs with
@@ -1063,7 +1063,7 @@ let need_check_noloop (scpl, sdes, onfs) =
         (not
            (Mutil.array_forall2
               (is_created_or_already_there opar)
-              npar (Gutil.parent_array scpl)))
+              npar (Adef.parent_array scpl)))
         || not
              (Mutil.array_forall2
                 (is_created_or_already_there ochil)
@@ -1218,8 +1218,8 @@ let forbidden_disconnected conf scpl sdes =
   in
   if no_dec then
     if
-      get_create (Gutil.father scpl) = Update.Link
-      || get_create (Gutil.mother scpl) = Update.Link
+      get_create (Adef.father scpl) = Update.Link
+      || get_create (Adef.mother scpl) = Update.Link
     then false
     else Array.for_all (fun p -> get_create p <> Update.Link) sdes.children
   else false
