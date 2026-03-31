@@ -79,6 +79,10 @@ val multi_couple : 'a -> 'a -> 'a gen_couple
 val multi_parent : 'a array -> 'a gen_couple
 (** @deprecated Use [parent] instead *)
 
+val map_couple_p : ('a -> 'b) -> 'a gen_couple -> 'b gen_couple
+(** Convert generic type used to represent father and mother inside
+    [Def.gen_couple] into another one. *)
+
 type +'a astring = private string
 type safe_string = [ `encoded | `escaped | `safe ] astring
 type escaped_string = [ `encoded | `escaped ] astring

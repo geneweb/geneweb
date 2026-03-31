@@ -84,11 +84,6 @@ val map_family_ps :
       [Def.gen_family] into another one. If [fd] is present, apply it on it on
       every date (marriage, divorce, famillial events, etc.).*)
 
-val map_couple_p : bool -> ('a -> 'b) -> 'a gen_couple -> 'b gen_couple
-(** Convert generic type used to represent father and mother inside
-    [Def.gen_couple] into another one. If first argument is true then use
-    multi-parent functionality. *)
-
 val parent : bool -> 'a array -> 'a gen_couple
 (** @deprecated Use [Adef.parent] instead. *)
 

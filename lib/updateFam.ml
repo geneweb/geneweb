@@ -21,7 +21,7 @@ let person_key base ip =
   in
   (first_name, surname, occ, Update.Link, "")
 
-let string_family_of conf base ifam =
+let string_family_of base ifam =
   let fam = Driver.foi base ifam in
   let sfam =
     Futil.map_family_ps (person_key base)
@@ -30,8 +30,7 @@ let string_family_of conf base ifam =
       (Driver.gen_family_of_family fam)
   in
   let scpl =
-    Futil.map_couple_p conf.multi_parents (person_key base)
-      (Driver.gen_couple_of_family fam)
+    Adef.map_couple_p (person_key base) (Driver.gen_couple_of_family fam)
   in
   let sdes =
     Futil.map_descend_p (person_key base) (Driver.gen_descend_of_family fam)
@@ -644,7 +643,7 @@ let print_add conf base =
       fsources = default_source conf;
       fam_index = Driver.Ifam.dummy;
     }
-  and cpl = Gutil.couple conf.multi_parents fath moth
+  and cpl = Adef.couple fath moth
   and des = { children = [||] } in
   print_update_fam conf base (fam, cpl, des) digest
 
@@ -668,7 +667,7 @@ let print_add_parents conf base =
           fam_index = Driver.Ifam.dummy;
         }
       and cpl =
-        Gutil.couple conf.multi_parents
+        Adef.couple
           ( "",
             Driver.sou base (Driver.get_surname p),
             0,
@@ -692,7 +691,7 @@ let print_add_parents conf base =
 let print_mod conf base =
   match p_getenv conf.env "i" with
   | Some i ->
-      let sfam = string_family_of conf base (Driver.Ifam.of_string i) in
+      let sfam = string_family_of base (Driver.Ifam.of_string i) in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_family ~salt sfam in
       print_update_fam conf base sfam digest
@@ -813,7 +812,7 @@ let print_change_event_order conf base =
   | None -> Hutil.incorrect_request conf
   | Some i ->
       let i = Driver.Ifam.of_string i in
-      let sfam = string_family_of conf base i in
+      let sfam = string_family_of base i in
       let ifun =
         Templ.
           {

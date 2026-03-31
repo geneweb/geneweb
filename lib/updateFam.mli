@@ -47,7 +47,6 @@ val print_change_event_order : config -> Geneweb_db.Driver.base -> unit
 (** Displays the form for changing the order of events for a family *)
 
 val string_family_of :
-  config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.ifam ->
   (Update.key, Geneweb_db.Driver.ifam, string) gen_family

@@ -63,7 +63,6 @@ type config = {
   default_lang : string;
   browser_lang : string;
   default_sosa_ref : Geneweb_db.Driver.iper * Geneweb_db.Driver.person option;
-  multi_parents : bool;
   authorized_wizards_notes : bool;
   public_if_titles : bool;
   public_if_no_date : bool;
@@ -148,7 +147,6 @@ let empty =
     default_lang = "";
     browser_lang = "";
     default_sosa_ref = (Geneweb_db.Driver.Iper.dummy, None);
-    multi_parents = false;
     authorized_wizards_notes = false;
     public_if_titles = false;
     public_if_no_date = false;
