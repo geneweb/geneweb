@@ -155,13 +155,13 @@ module AdvancedSearchMatch : sig
     bool
 
   val match_marriage :
-    exact_place:bool ->
+    default:bool ->
     conf:Config.config ->
     base:Gwdb.base ->
     p:Authorized.Person.t ->
-    place:place option ->
-    default:bool ->
     dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
     bool
 
   module type Match = sig
@@ -286,7 +286,7 @@ end = struct
           match_other_event_place ~exact_place ~base ~place ~default:false ~p:e)
         (Event.other_events conf base p)
 
-  let match_marriage ~exact_place ~conf ~base ~p ~place ~default ~dates =
+  let match_marriage ~default ~conf ~base ~p ~dates ~place ~exact_place =
     let d1, d2 = dates in
     let test_date_place df =
       Array.exists
