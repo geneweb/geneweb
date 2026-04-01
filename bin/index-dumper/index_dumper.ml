@@ -58,14 +58,14 @@ let filenames ~path ~(kind : [ `Surname | `Firstname ])
   let path =
     if Filename.check_suffix path ".gwb" then path else path ^ ".gwb"
   in
-  let f fn = Filename.concat path fn in
-  match (index_type, kind) with
-  | `Lower, `Surname ->
-      { inx = f "snames_lower.inx"; dat = f "snames_lower.dat" }
-  | `Default, `Surname -> { inx = f "snames.inx"; dat = f "snames.dat" }
-  | `Lower, `Firstname ->
-      { inx = f "fnames_lower.inx"; dat = f "fnames_lower.dat" }
-  | `Default, `Firstname -> { inx = f "fnames.inx"; dat = f "fnames.dat" }
+  let inx_file, dat_file =
+    match (index_type, kind) with
+    | `Lower, `Surname -> ("snames_lower.inx", "snames_lower.dat")
+    | `Default, `Surname -> ("snames.inx", "snames.dat")
+    | `Lower, `Firstname -> ("fnames_lower.inx", "fnames_lower.dat")
+    | `Default, `Firstname -> ("fnames.inx", "fnames.dat")
+  in
+  { inx = Filename.concat path inx_file; dat = Filename.concat path dat_file }
 
 let dump_indexes ?key ~kind ~index_type path database =
   let fnames = filenames ~path ~kind ~index_type in
@@ -75,7 +75,9 @@ let dump_indexes ?key ~kind ~index_type path database =
 let main () =
   let key = ref "" in
   let options = [ ("-key", Arg.Set_string key, "set key to display") ] in
-  let usage = Printf.sprintf "Usage: %s <database-name>" Sys.argv.(0) in
+  let usage =
+    Printf.sprintf "Usage: %s [-key <name>] <database-name>" Sys.argv.(0)
+  in
   if Array.length Sys.argv < 2 then (
     Arg.usage options usage;
     exit 2)

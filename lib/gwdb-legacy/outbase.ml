@@ -288,7 +288,8 @@ let marital_names base p =
         [] unions.family
   | Male | Neuter -> []
 
-let output_surname_index base tmp_snames_inx tmp_snames_dat =
+let output_surname_index ?(include_marital_names = false) base tmp_snames_inx
+    tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.Dbdisk.data)
     (fun istr p1 p2 ->
@@ -307,7 +308,9 @@ let output_surname_index base tmp_snames_inx tmp_snames_dat =
             in
             if c' = 0 then compare p1.key_index p2.key_index else c'
           else c)
-    (fun p -> (p.surname :: p.surnames_aliases) @ marital_names base p)
+    (fun p ->
+      (p.surname :: p.surnames_aliases)
+      @ if include_marital_names then marital_names base p else [])
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
@@ -328,13 +331,16 @@ let compare_persons cmp_istr proj1 proj2 istr p1 p2 =
       let c = cmp_istr (proj1 p1) (proj1 p2) in
       if c = 0 then cmp_istr (proj2 p1) (proj2 p2) else c
 
-let output_surname_lower_index strings_ht base tmp_snames_inx tmp_snames_dat =
+let output_surname_lower_index ?(include_marital_names = false) strings_ht base
+    tmp_snames_inx tmp_snames_dat =
   let cmp_istr = Dutil.compare_snames_i_lower base.Dbdisk.data in
   let cmp_per =
     compare_persons cmp_istr (fun p -> p.Dbdisk.surname) (fun p -> p.first_name)
   in
   output_name_index_lower_aux strings_ht cmp_istr cmp_per
-    (fun p -> (p.surname :: p.surnames_aliases) @ marital_names base p)
+    (fun p ->
+      (p.surname :: p.surnames_aliases)
+      @ if include_marital_names then marital_names base p else [])
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
@@ -506,6 +512,20 @@ let generate_lowercase_first_name_index ~strings_data base =
   in
   { commit; rollback = remove_temporary_files }
 
+let generate_tmp_marital_surname_index base =
+  (* tmp index generation *)
+  let tmp_marital_surnames_inx = Dutil.snames_marital_inx true base in
+  let tmp_marital_surnames_dat = Dutil.snames_marital_dat true base in
+  output_surname_index ~include_marital_names:true base tmp_marital_surnames_inx
+    tmp_marital_surnames_dat
+
+let generate_tmp_marital_lowercase_surname_index strings_data base =
+  (* tmp index generation *)
+  let tmp_marital_surnames_inx = Dutil.snames_marital_lower_inx true base in
+  let tmp_marital_surnames_dat = Dutil.snames_marital_lower_dat true base in
+  output_surname_lower_index ~include_marital_names:true strings_data base
+    tmp_marital_surnames_inx tmp_marital_surnames_dat
+
 let generate_lowercase_surname_index ~strings_data base =
   let tmp_snames_lower_inx =
     Filename.concat base.Dbdisk.data.bdir "1snames_lower.inx"
@@ -513,15 +533,20 @@ let generate_lowercase_surname_index ~strings_data base =
   let tmp_snames_lower_dat =
     Filename.concat base.data.bdir "1snames_lower.dat"
   in
+  let tmp_snames_marital_lower_dat = Dutil.snames_marital_lower_dat true base in
+  let tmp_snames_marital_lower_inx = Dutil.snames_marital_lower_inx true base in
   let remove_temporary_files () =
     Files.rm tmp_snames_lower_inx;
-    Files.rm tmp_snames_lower_dat
+    Files.rm tmp_snames_lower_dat;
+    Files.rm tmp_snames_marital_lower_inx;
+    Files.rm tmp_snames_marital_lower_dat
   in
   let () =
     try
       trace "create surname lower index";
       output_surname_lower_index strings_data base tmp_snames_lower_inx
-        tmp_snames_lower_dat
+        tmp_snames_lower_dat;
+      generate_tmp_marital_lowercase_surname_index strings_data base
     with e ->
       remove_temporary_files ();
       raise e
@@ -533,12 +558,25 @@ let generate_lowercase_surname_index ~strings_data base =
     let lowercase_surname_index_file =
       Filename.concat base.data.bdir Database.lowercase_surname_index_file
     in
+    let lowercase_marital_surname_data_file =
+      Dutil.snames_marital_lower_dat false base
+    in
+    let lowercase_marital_surname_index_file =
+      Dutil.snames_marital_lower_inx false base
+    in
     Files.rm lowercase_surname_data_file;
     Sys.rename tmp_snames_lower_dat lowercase_surname_data_file;
     Files.rm lowercase_surname_index_file;
     Sys.rename tmp_snames_lower_inx lowercase_surname_index_file;
     Files.set_modification_time_to_now lowercase_surname_data_file;
-    Files.set_modification_time_to_now lowercase_surname_index_file
+    Files.set_modification_time_to_now lowercase_surname_index_file;
+
+    Files.rm lowercase_marital_surname_data_file;
+    Sys.rename tmp_snames_marital_lower_dat lowercase_marital_surname_data_file;
+    Files.rm lowercase_marital_surname_index_file;
+    Sys.rename tmp_snames_marital_lower_inx lowercase_marital_surname_index_file;
+    Files.set_modification_time_to_now lowercase_marital_surname_data_file;
+    Files.set_modification_time_to_now lowercase_marital_surname_index_file
   in
   { commit; rollback = remove_temporary_files }
 
@@ -566,6 +604,12 @@ let update_modification_times ~base ~(kind : [< `First_name | `Surname ])
 module Integrity : sig
   type integrity
 
+  module Code : sig
+    type t = Wellformed | PostMaritalGen
+
+    val current : t
+  end
+
   val check_index_integrity :
     kind:[< `Surname | `First_name ] ->
     base:Dbdisk.dsk_base ->
@@ -576,11 +620,40 @@ module Integrity : sig
     kind:[< `Surname | `First_name | `All ] -> base:Dbdisk.dsk_base -> unit
 
   val read_index_integrity : Dbdisk.dsk_base -> integrity
-  val integrity_matches : [< `Surname | `First_name ] -> integrity -> bool
+
+  val integrity_matches :
+    Code.t -> [< `Surname | `First_name ] -> integrity -> bool
+
   val has_index_integrity_file : Dbdisk.dsk_base -> bool
 end = struct
   let index_integrity_fname = "index_integrity"
-  let current_integrity_code = "20260219"
+
+  module Code : sig
+    type t = Wellformed | PostMaritalGen
+
+    val of_string : string -> t option
+    val to_string : t -> string
+    val current : t
+    val matches : t -> string -> bool
+  end = struct
+    let wellformed_index_integrity_code = 20260219
+    let post_marital_index_gen_integrity_code = 20260400
+
+    type t = Wellformed | PostMaritalGen
+
+    let current = Wellformed
+
+    let of_string = function
+      | "20260219" -> Some Wellformed
+      | "20260400" -> Some PostMaritalGen
+      | _ -> None
+
+    let to_string = function
+      | Wellformed -> string_of_int wellformed_index_integrity_code
+      | PostMaritalGen -> string_of_int post_marital_index_gen_integrity_code
+
+    let matches kind s = of_string s = Some kind
+  end
 
   type integrity = { firstname : string option; surname : string option }
 
@@ -598,10 +671,12 @@ end = struct
       close_in ic;
       integrity
 
-  let integrity_matches kind integrity =
-    match kind with
-    | `Surname -> integrity.surname = Some current_integrity_code
-    | `First_name -> integrity.firstname = Some current_integrity_code
+  let integrity_matches code kind integrity =
+    Option.value ~default:false
+      (match kind with
+      | `Surname -> Option.map (Code.matches Code.current) integrity.surname
+      | `First_name ->
+          Option.map (Code.matches Code.current) integrity.firstname)
 
   let is_integrity_empty kind integrity =
     let integrity_kind =
@@ -624,13 +699,13 @@ end = struct
     let new_integrity_code =
       match kind with
       | `Surname ->
-          { integrity_code with surname = Some current_integrity_code }
+          { integrity_code with surname = Some (Code.to_string Code.current) }
       | `First_name ->
-          { integrity_code with firstname = Some current_integrity_code }
+          { integrity_code with firstname = Some (Code.to_string Code.current) }
       | `All ->
           {
-            surname = Some current_integrity_code;
-            firstname = Some current_integrity_code;
+            surname = Some (Code.to_string Code.current);
+            firstname = Some (Code.to_string Code.current);
           }
     in
     let oc =
@@ -671,7 +746,7 @@ end = struct
       is_ok
     in
     let index_integrity = read_index_integrity base in
-    integrity_matches kind index_integrity
+    integrity_matches Code.current kind index_integrity
     || (is_integrity_empty kind index_integrity && check ())
 
   let has_index_integrity_file base =
@@ -742,7 +817,7 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
         if
           not
             (Integrity.has_index_integrity_file base
-            && Integrity.integrity_matches kind
+            && Integrity.integrity_matches Integrity.Code.current kind
                  (Integrity.read_index_integrity base))
         then Integrity.write_index_integrity ~kind ~base;
         base))
@@ -816,6 +891,7 @@ let output ?(save_mem = false) ?(tasks = []) base =
           Gc.compact ());
         trace "create surname index";
         output_surname_index base tmp_snames_inx tmp_snames_dat;
+        generate_tmp_marital_surname_index base;
         if save_mem then (
           trace "compacting";
           Gc.compact ());
@@ -864,6 +940,15 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
   Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
+
+  Files.rm (Dutil.snames_marital_inx false base);
+  Files.rm (Dutil.snames_marital_dat false base);
+  Sys.rename
+    (Dutil.snames_marital_inx true base)
+    (Dutil.snames_marital_inx false base);
+  Sys.rename
+    (Dutil.snames_marital_dat true base)
+    (Dutil.snames_marital_dat false base);
 
   pending_lowercase_surname_index_generation.commit ();
   pending_lowercase_first_name_index_generation.commit ();
