@@ -164,50 +164,46 @@ module AdvancedSearchMatch : sig
     exact_place:bool ->
     bool
 
-  module type Match = sig
-    val match_baptism :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  val match_baptism :
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 
-    val match_birth :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  val match_birth :
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 
-    val match_burial :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  val match_burial :
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 
-    val match_death :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  val match_death :
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 
-    val match_other_events :
-      conf:Config.config ->
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
-  end
-
-  module And : Match
+  val match_other_events :
+    conf:Config.config ->
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 end = struct
   type place = string * Gwdb.istr option
 
@@ -458,65 +454,20 @@ end = struct
     && match_married ~conf ~base ~p ~married
     && match_occupation ~base ~p ~occupation
 
-  module type Match = sig
-    val match_baptism :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
+      ~(place : place option) ~(exact_place : bool) =
+    date_f ~p ~default:true ~dates
+    && place_f ~exact_place ~base ~p ~place ~default:true
 
-    val match_birth :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  let match_baptism = match_and match_baptism_date match_baptism_place
+  let match_birth = match_and match_birth_date match_birth_place
+  let match_burial = match_and match_burial_date match_burial_place
+  let match_death = match_and match_death_date match_death_place
 
-    val match_burial :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
-
-    val match_death :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
-
-    val match_other_events :
-      conf:Config.config ->
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
-  end
-
-  module And = struct
-    let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
-        ~(place : place option) ~(exact_place : bool) =
-      date_f ~p ~default:true ~dates
-      && place_f ~exact_place ~base ~p ~place ~default:true
-
-    let match_baptism = match_and match_baptism_date match_baptism_place
-    let match_birth = match_and match_birth_date match_birth_place
-    let match_burial = match_and match_burial_date match_burial_place
-    let match_death = match_and match_death_date match_death_place
-
-    let match_other_events ~conf ~base =
-      match_and ~base
-        (match_other_events_date ~conf ~base)
-        (match_other_events_place ~conf)
-  end
+  let match_other_events ~conf ~base =
+    match_and ~base
+      (match_other_events_date ~conf ~base)
+      (match_other_events_place ~conf)
 end
 
 (* Search type can be AND or OR. *)
@@ -637,58 +588,45 @@ let advanced_search conf base max_answers =
              ~exact_first_name:(get_name_search_mode "exact_first_name")
              ~exact_surname:(get_name_search_mode "exact_surname"))
       in
-      match search_type with
-      | Fields.Or ->
-          let match_f ~date_field ~place_field and_f =
-            and_f ~base ~p
-              ~dates:(getd @@ date_field ~gets ~search_type)
-              ~place:(Lazy.force place_field) ~exact_place
-          in
-          Lazy.force civil_match
-          && (gets_opt "place" = None
-              && gets "date2_yyyy" = ""
-              && gets "date1_yyyy" = ""
-             || match_f ~date_field:Fields.bapt_date
-                  ~place_field:bapt_place_searched
-                  AdvancedSearchMatch.And.match_baptism
-             || match_f ~date_field:Fields.birth_date
-                  ~place_field:birth_place_searched
-                  AdvancedSearchMatch.And.match_birth
-             || match_f ~date_field:Fields.burial_date
-                  ~place_field:burial_place_searched
-                  AdvancedSearchMatch.And.match_burial
-             || match_f ~date_field:Fields.death_date
-                  ~place_field:death_place_searched
-                  AdvancedSearchMatch.And.match_death
-             || AdvancedSearchMatch.match_marriage ~conf ~base ~p ~exact_place
-                  ~default:false
-                  ~place:(Lazy.force marriage_place_searched)
-                  ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
-             || match_f ~date_field:Fields.other_events_date
-                  ~place_field:other_events_place_searched
-                  (AdvancedSearchMatch.And.match_other_events ~conf))
-      | Fields.And ->
-          Lazy.force civil_match
-          && AdvancedSearchMatch.And.match_baptism ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.bapt_date ~gets ~search_type)
-               ~place:(Lazy.force bapt_place_searched)
-          && AdvancedSearchMatch.And.match_birth ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.birth_date ~gets ~search_type)
-               ~place:(Lazy.force birth_place_searched)
-          && AdvancedSearchMatch.And.match_burial ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.burial_date ~gets ~search_type)
-               ~place:(Lazy.force burial_place_searched)
-          && AdvancedSearchMatch.And.match_death ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.death_date ~gets ~search_type)
-               ~place:(Lazy.force death_place_searched)
-          && AdvancedSearchMatch.match_marriage ~conf ~base ~p ~exact_place
-               ~default:true
-               ~place:(Lazy.force marriage_place_searched)
-               ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
-          && AdvancedSearchMatch.And.match_other_events ~conf ~base ~p
-               ~exact_place
-               ~dates:(getd @@ Fields.other_events_date ~gets ~search_type)
-               ~place:(Lazy.force other_events_place_searched)
+      let quick_check, check, default =
+        match search_type with
+        | Fields.Or ->
+            ( (fun () ->
+                gets_opt "place" = None
+                && gets "date2_yyyy" = ""
+                && gets "date1_yyyy" = ""),
+              List.exists,
+              false )
+        | Fields.And -> ((fun () -> false), List.for_all, true)
+      in
+      let match_ (f, date_field, place) =
+        f ~base ~p
+          ~dates:(getd @@ date_field ~gets ~search_type)
+          ~place:(Lazy.force place) ~exact_place
+      in
+      Lazy.force civil_match
+      && (quick_check ()
+         || check match_
+              [
+                ( AdvancedSearchMatch.match_baptism,
+                  Fields.bapt_date,
+                  bapt_place_searched );
+                ( AdvancedSearchMatch.match_birth,
+                  Fields.birth_date,
+                  birth_place_searched );
+                ( AdvancedSearchMatch.match_burial,
+                  Fields.burial_date,
+                  burial_place_searched );
+                ( AdvancedSearchMatch.match_death,
+                  Fields.death_date,
+                  death_place_searched );
+                ( AdvancedSearchMatch.match_marriage ~default ~conf,
+                  Fields.marriage_date,
+                  marriage_place_searched );
+                ( AdvancedSearchMatch.match_other_events ~conf,
+                  Fields.other_events_date,
+                  other_events_place_searched );
+              ])
     in
     if (not @@ SearchName.search_reject_p conf base unsafe_p) && pmatch () then
       (unsafe_p :: list, len + 1)
