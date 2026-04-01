@@ -208,7 +208,6 @@ module AdvancedSearchMatch : sig
   end
 
   module And : Match
-  module Or : Match
 end = struct
   type place = string * Gwdb.istr option
 
@@ -518,23 +517,6 @@ end = struct
         (match_other_events_date ~conf ~base)
         (match_other_events_place ~conf)
   end
-
-  module Or = struct
-    let match_or date_f place_f ~(base : Gwdb.base) ~p ~dates
-        ~(place : place option) ~(exact_place : bool) =
-      date_f ~p ~default:false ~dates
-      || place_f ~exact_place ~base ~p ~place ~default:false
-
-    let match_baptism = match_or match_baptism_date match_baptism_place
-    let match_birth = match_or match_birth_date match_birth_place
-    let match_burial = match_or match_burial_date match_burial_place
-    let match_death = match_or match_death_date match_death_place
-
-    let match_other_events ~conf ~base =
-      match_or ~base
-        (match_other_events_date ~conf ~base)
-        (match_other_events_place ~conf)
-  end
 end
 
 (* Search type can be AND or OR. *)
@@ -657,13 +639,10 @@ let advanced_search conf base max_answers =
       in
       match search_type with
       | Fields.Or ->
-          let match_f ~date_field ~place_field or_f and_f =
-            or_f ~base ~p
+          let match_f ~date_field ~place_field and_f =
+            and_f ~base ~p
               ~dates:(getd @@ date_field ~gets ~search_type)
               ~place:(Lazy.force place_field) ~exact_place
-            && and_f ~base ~p
-                 ~dates:(getd @@ date_field ~gets ~search_type)
-                 ~place:(Lazy.force place_field) ~exact_place
           in
           Lazy.force civil_match
           && (gets_opt "place" = None
@@ -671,19 +650,15 @@ let advanced_search conf base max_answers =
               && gets "date1_yyyy" = ""
              || match_f ~date_field:Fields.bapt_date
                   ~place_field:bapt_place_searched
-                  AdvancedSearchMatch.Or.match_baptism
                   AdvancedSearchMatch.And.match_baptism
              || match_f ~date_field:Fields.birth_date
                   ~place_field:birth_place_searched
-                  AdvancedSearchMatch.Or.match_birth
                   AdvancedSearchMatch.And.match_birth
              || match_f ~date_field:Fields.burial_date
                   ~place_field:burial_place_searched
-                  AdvancedSearchMatch.Or.match_burial
                   AdvancedSearchMatch.And.match_burial
              || match_f ~date_field:Fields.death_date
                   ~place_field:death_place_searched
-                  AdvancedSearchMatch.Or.match_death
                   AdvancedSearchMatch.And.match_death
              || AdvancedSearchMatch.match_marriage ~conf ~base ~p ~exact_place
                   ~default:false
@@ -691,7 +666,6 @@ let advanced_search conf base max_answers =
                   ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
              || match_f ~date_field:Fields.other_events_date
                   ~place_field:other_events_place_searched
-                  (AdvancedSearchMatch.Or.match_other_events ~conf)
                   (AdvancedSearchMatch.And.match_other_events ~conf))
       | Fields.And ->
           Lazy.force civil_match
