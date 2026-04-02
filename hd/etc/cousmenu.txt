@@ -199,15 +199,15 @@
                 <div class="d-inline-flex align-self-center">
                   <div class="d-inline-flex align-items-end mr-1">
                     %if;(vvv>0 and www=0)
-                      <button type="button" class="btn btn-sm py-0 mb-2 btn-light" data-dismiss="modal" data-toggle="modal" data-target="#modal_%expr(vvv-1)_www"><i class="fa-solid fa-arrow-down-long fa-fw fa-rotate-by" style="--fa-rotate-angle: 45deg;" title="%expr(vvv-1)/0 ancestors at g-1" data-toggle="tooltip"></i></button>
+                      <button type="button" class="btn btn-sm py-0 mb-2 btn-light" data-bs-dismiss="modal" data-toggle="modal" data-target="#modal_%expr(vvv-1)_www"><i class="fa-solid fa-arrow-down-long fa-fw fa-rotate-by" style="--fa-rotate-angle: 45deg;" title="%expr(vvv-1)/0 ancestors at g-1" data-toggle="tooltip"></i></button>
                     %end;
                   </div>
                   <div class="d-inline-flex flex-column mr-2">
                     <div>
-                      <button type="button" class="btn btn-sm py-0 mt-2 btn-light%if;(vvv=e_v and www=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_%if;(www=0)%expr(vvv+1)_0%else;vvv_%expr(www-1)%end;"><span title="%if;(www=0)%expr(vvv+1)/0%else;vvv/%expr(www-1)%end;" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-up-%if;(www=0)right-dots%else;long%end; fa-fw"></i>vvv</span></button>
+                      <button type="button" class="btn btn-sm py-0 mt-2 btn-light%if;(vvv=e_v and www=0) disabled%end;" data-bs-dismiss="modal" data-toggle="modal" data-target="#modal_%if;(www=0)%expr(vvv+1)_0%else;vvv_%expr(www-1)%end;"><span title="%if;(www=0)%expr(vvv+1)/0%else;vvv/%expr(www-1)%end;" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-up-%if;(www=0)right-dots%else;long%end; fa-fw"></i>vvv</span></button>
                     </div>
                     <div>
-                      <button type="button" class="btn btn-sm py-0 mt-1 btn-light%if;(cousdown=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_vvv_%expr(www+1)"><span title="vvv/%expr(www+1)" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-down-long fa-fw"></i>www</span></button>
+                      <button type="button" class="btn btn-sm py-0 mt-1 btn-light%if;(cousdown=0) disabled%end;" data-bs-dismiss="modal" data-toggle="modal" data-target="#modal_vvv_%expr(www+1)"><span title="vvv/%expr(www+1)" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-down-long fa-fw"></i>www</span></button>
                     </div>
                   </div>
                   <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www"
