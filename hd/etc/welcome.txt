@@ -79,7 +79,7 @@
       %elseif;(e.p!="" and e.n="")[*unknown first_name][:] %e.p;
       %elseif;(e.n!="" and e.p="")[*unknown surname][:] %e.n;
       %else;[*unknown person][:] %e.p;%if;(e.oc!="").%e.oc;%end; %e.n;%end;
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -209,7 +209,7 @@ fr: individus<br> tous reliés par des liens familiaux
 %if;just_friend_wizard;
   <div class="col mt-1">
     <div class="text-center alert alert-danger alert-dismissible fade show" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
       <span>
