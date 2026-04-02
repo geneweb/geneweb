@@ -89,48 +89,63 @@ let infer_death_from_parents conf base fam =
   then Def.OfCourseDead
   else DontKnowIfDead
 
-let rec infer_death conf base p =
-  let death =
-    infer_death_bb conf
-      (Date.od_of_cdate (Gwdb.get_birth p))
-      (Date.od_of_cdate (Gwdb.get_baptism p))
-  in
-  if death <> DontKnowIfDead then death
-  else
-    let death =
-      let families = Gwdb.get_family p in
-      let len = Array.length families in
-      let rec loop_families i =
-        if i = len then Def.DontKnowIfDead
-        else
-          let fam = Gwdb.foi base families.(i) in
-          match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-          | Some d -> infer_death_from_dmy conf d
-          | None ->
-              let death =
-                let children = Gwdb.get_children fam in
-                let len = Array.length children in
-                let rec loop_children j =
-                  if j = len then Def.DontKnowIfDead
-                  else
-                    let death =
-                      infer_death conf base (Gwdb.poi base children.(j))
-                    in
-                    if death = OfCourseDead then OfCourseDead
-                    else loop_children (j + 1)
-                in
-                loop_children 0
-              in
-              if death = OfCourseDead then OfCourseDead
-              else loop_families (i + 1)
-      in
-      loop_families 0
-    in
-    if death <> DontKnowIfDead then death
+let infer_death conf base p =
+  let rec infer_death ~visited_persons conf base p =
+    if Gwdb.IperSet.mem (Gwdb.get_iper p) visited_persons then
+      (Def.DontKnowIfDead, visited_persons)
     else
-      match Gwdb.get_parents p with
-      | None -> DontKnowIfDead
-      | Some ifam -> infer_death_from_parents conf base (Gwdb.foi base ifam)
+      let visited_persons =
+        Gwdb.IperSet.add (Gwdb.get_iper p) visited_persons
+      in
+      let death =
+        infer_death_bb conf
+          (Date.od_of_cdate (Gwdb.get_birth p))
+          (Date.od_of_cdate (Gwdb.get_baptism p))
+      in
+      if death <> DontKnowIfDead then (death, visited_persons)
+      else
+        let death, visited_persons =
+          let families = Gwdb.get_family p in
+          let len = Array.length families in
+          let rec loop_families ~visited_persons i =
+            if i = len then (Def.DontKnowIfDead, visited_persons)
+            else
+              let fam = Gwdb.foi base families.(i) in
+              match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+              | Some d -> (infer_death_from_dmy conf d, visited_persons)
+              | None ->
+                  let death, visited_persons =
+                    let children = Gwdb.get_children fam in
+                    let len = Array.length children in
+                    let rec loop_children ~visited_persons j =
+                      if j = len then (Def.DontKnowIfDead, visited_persons)
+                      else
+                        let death, visited_persons =
+                          infer_death ~visited_persons conf base
+                            (Gwdb.poi base children.(j))
+                        in
+                        if death = OfCourseDead then
+                          (OfCourseDead, visited_persons)
+                        else loop_children ~visited_persons (j + 1)
+                    in
+                    loop_children ~visited_persons 0
+                  in
+                  if death = OfCourseDead then (OfCourseDead, visited_persons)
+                  else loop_families ~visited_persons (i + 1)
+          in
+          loop_families ~visited_persons 0
+        in
+        let death =
+          if death <> DontKnowIfDead then death
+          else
+            match Gwdb.get_parents p with
+            | None -> DontKnowIfDead
+            | Some ifam ->
+                infer_death_from_parents conf base (Gwdb.foi base ifam)
+        in
+        (death, visited_persons)
+  in
+  fst @@ infer_death ~visited_persons:Gwdb.IperSet.empty conf base p
 
 let infer_event_date_from_witnesses ~base witnesses =
   let date_lower_bound, date_upper_bound =
