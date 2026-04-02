@@ -1079,7 +1079,8 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   if (not (GWPARAM.p_auth conf base p)) || cgl then s
   else
     "<a href=\""
-    ^<^ (commd ~excl:["em"; "ei"; "et"] conf ^^^ acces conf base p :> Adef.safe_string)
+    ^<^ (commd ~excl:[ "em"; "ei"; "et" ] conf ^^^ acces conf base p
+          :> Adef.safe_string)
     ^^^ (if with_id then "\" id=\"i" else "")
     ^<^ (if with_id then Driver.Iper.to_string iper else "")
     ^<^ "\">" ^<^ s ^>^ "</a>"
