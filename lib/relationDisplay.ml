@@ -93,7 +93,8 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
       ("", List.length excl_faml - 1)
       excl_faml
   in
-  commd conf ^^^ "em=R&ei=" ^<^ Driver.Iper.to_string ip1 ^<^ "&i="
+  commd ~excl:[ "em"; "ei"; "i"; "sp"; "bd"; "color"; "et" ] conf
+  ^^^ "em=R&ei=" ^<^ Driver.Iper.to_string ip1 ^<^ "&i="
   ^<^ Driver.Iper.to_string ip2
   ^<^ (if sps then "" else "&sp=0")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
@@ -152,7 +153,7 @@ let print_shortest_path conf base p1 p2 =
           |> cftransl conf "no known relationship link between %s and %s"
           |> Utf8.capitalize_fst |> Output.print_sstring conf;
           Output.print_sstring conf ".<br><p><span><a href=\"";
-          Output.print_string conf (commd conf);
+          Output.print_string conf (commd ~excl:[ "m" ] conf);
           Output.print_sstring conf "&m=R&";
           Output.print_string conf (acces conf base p1);
           Output.print_sstring conf "\">";
@@ -539,8 +540,9 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
            <img src="%s/picto_rel_small.png" alt="">
            <a href="%s">%s%s</a></li>|}
             (Util.images_prefix conf :> string)
-            (commd conf ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1="
-             ^<^ string_of_int x1 ^<^ "&"
+            (commd ~excl:[ "m"; "l1"; "l2"; "im" ] conf
+             ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1=" ^<^ string_of_int x1
+             ^<^ "&"
              ^<^ acces_n conf base (Adef.escaped "1") dp1
              ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
              ^<^ acces_n conf base (Adef.escaped "2") dp2
@@ -585,8 +587,9 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
         Output.print_sstring conf (Util.images_prefix conf);
         Output.print_sstring conf {|/picto_rel_small.png" alt="">|};
         let href =
-          commd conf ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1="
-          ^<^ string_of_int x1 ^<^ "&"
+          commd ~excl:[ "m"; "l1"; "l2"; "dag"; "im" ] conf
+          ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1=" ^<^ string_of_int x1
+          ^<^ "&"
           ^<^ acces_n conf base (Adef.escaped "1") dp1
           ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
           ^<^ acces_n conf base (Adef.escaped "2") dp2
@@ -699,7 +702,7 @@ let print_dag_links conf base p1 p2 rl =
             Output.print_sstring conf (Util.transl conf ":");
             Output.print_sstring conf " ");
           Output.print_sstring conf "<a href=\"";
-          Output.print_string conf (commd conf);
+          Output.print_string conf (commd ~excl:[ "m" ] conf);
           Output.print_sstring conf "m=RL&";
           Output.print_string conf (acces conf base a);
           Output.print_sstring conf "&";
@@ -774,7 +777,7 @@ let print_propose_upto conf base p1 p2 rl =
           </div>
         |}
           (Util.images_prefix conf :> string)
-          (commd conf :> string)
+          (commd ~excl:[ "m"; "t"; "l" ] conf :> string)
           (acces conf base p :> string)
           (acces_n conf base (Adef.escaped "1") a :> string)
           (string_of_int maxlen)
@@ -901,7 +904,7 @@ let print_main_relationship conf base long p1 p2 rel =
         |> cftransl conf "no known relationship link between %s and %s"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf {|.<br><p><span><a href="|};
-        Output.print_string conf (commd conf);
+        Output.print_string conf (commd ~excl:[ "m" ] conf);
         Output.print_sstring conf "&m=R&";
         Output.print_string conf (acces conf base p1);
         Output.print_sstring conf {|">|};
@@ -977,7 +980,7 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
           (List.rev pl2)
         |> fst
       in
-      commd conf ^^^ "m=RLM" ^<^ acc
+      commd ~excl:[ "t"; "i"; "m" ] conf ^^^ "m=RLM" ^<^ acc
 
 let print_no_relationship conf base pl =
   let title _ =
