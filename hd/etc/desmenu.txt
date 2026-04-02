@@ -94,7 +94,7 @@ function table_spouse_disabled () {
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tL" name="t" value="L" onclick="no_options ();long_display_options ()" checked>
         <label class="custom-control-label" for="tL"><i class="fa fa-align-justify fa-fw mr-1"></i>[*long display]%sp;
-          <span class="text-muted">
+          <span class="text-body-secondary">
             %if;(b.max_desc_level="" and max_desc_level>12)
               <br>%sp;([maximum] 12 [generation/generations]1)
             %elseif;(b.max_desc_level!="" and max_desc_level>b.max_desc_level)
@@ -131,11 +131,11 @@ function table_spouse_disabled () {
         </div>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="ld_witn" name="witn">
-          <label class="custom-control-label" for="ld_witn">[*witness/witnesses]1 <span class="text-muted">([marriage/marriages]1)</span></label>
+          <label class="custom-control-label" for="ld_witn">[*witness/witnesses]1 <span class="text-body-secondary">([marriage/marriages]1)</span></label>
         </div>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="ld_comm" name="comm">
-          <label class="custom-control-label" for="ld_comm">[*comment] <span class="text-muted">([marriage/marriages]1)</span></label>
+          <label class="custom-control-label" for="ld_comm">[*comment] <span class="text-body-secondary">([marriage/marriages]1)</span></label>
         </div>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="ld_inline" name="inline">
@@ -180,7 +180,7 @@ function table_spouse_disabled () {
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tT" name="t" value="T" onclick="no_options ()">
         <label class="custom-control-label" for="tT"><i class="fa fa-sitemap fa-fw mr-1"></i>[*descendants tree] <span class="text-info">✘</span>%sp;
-          <span class="text-muted">
+          <span class="text-body-secondary">
             %if;(b.max_desc_tree="" and max_desc_level>=4)
               ([maximum] 4 [generation/generations]1)
             %elseif;(b.max_desc_tree!="" and max_desc_level>=b.max_desc_tree)
@@ -209,7 +209,7 @@ function table_spouse_disabled () {
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tA" name="t" value="A" onclick="no_options ()">
         <label class="custom-control-label" for="tA"><i class="fa fa-arrow-down-a-z fa-fw mr-1"></i>D'Aboville%sp;
-          <span class="text-muted">
+          <span class="text-body-secondary">
             %if;(b.max_desc_level="" and max_desc_level>12)
               <br>%sp;([maximum] 12 [generation/generations]1)
             %elseif;(b.max_desc_level!="" and max_desc_level>b.max_desc_level)
@@ -230,7 +230,7 @@ function table_spouse_disabled () {
         <div class="custom-control custom-radio">
           <input type="radio" class="custom-control-input" id="tH" name="t" value="H" onclick="no_options ();table_options ()">
           <label class="custom-control-label" for="tH"><i class="fa fa-table fa-fw mr-1"></i>[*table] <span class="text-primary">✱</span><span class="text-info">✘</span>
-            <span class="text-muted">
+            <span class="text-body-secondary">
               %if;(b.max_desc_level="" and max_desc_level>12)
                 ([maximum] 12 [generation/generations]1)
               %elseif;(b.max_desc_level!="" and max_desc_level>b.max_desc_level)

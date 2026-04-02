@@ -56,14 +56,14 @@ module DictInfo = struct
         dict_type = CheckData.Fnames_alias;
         transl_key = "first name alias";
         url_param = "fna";
-        icon = "child text-muted";
+        icon = "child text-body-secondary";
         form_param = "d_fna";
       };
       {
         dict_type = CheckData.Snames_alias;
         transl_key = "surname alias";
         url_param = "sna";
-        icon = "user text-muted";
+        icon = "user text-body-secondary";
         form_param = "d_sna";
       };
       {
@@ -628,7 +628,7 @@ let print conf base =
     | None -> "")
     (match params.config_max with
     | Some c ->
-        Printf.sprintf {|<small class="ml-1 text-muted">%s</small>|}
+        Printf.sprintf {|<small class="ml-1 text-body-secondary">%s</small>|}
           (Utf8.capitalize_fst
              (Printf.sprintf
                 (Util.ftransl conf "chk_data limited to %d results")
@@ -873,7 +873,7 @@ let print_result_as_html conf result =
         ~content:(t conf "modification successful");
       if r.cache_updated then
         Output.printf conf
-          {|<div class="text-muted mt-2"><i class="fa fa-check-circle mr-1"></i>%s</div>|}
+          {|<div class="text-body-secondary mt-2"><i class="fa fa-check-circle mr-1"></i>%s</div>|}
           (t conf "cache updated");
       (match (r.nb_modified, r.elapsed) with
       | Some n, Some time when n > 1 ->

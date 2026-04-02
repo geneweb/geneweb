@@ -95,7 +95,7 @@
               <span
             %end;
               %let;spouses_dead;%if;(not cell.family.mother.is_dead and not cell.family.father.is_dead and cell.family.marriage_date.year!="")%if;(today.year-cell.family.marriage_date.year>100)1%end;%end;%in;
-              class="small font-italic text-center text-nowrap%if;(spouses_dead=1) text-danger%end;"
+              class="small fst-italic text-center text-nowrap%if;(spouses_dead=1) text-danger%end;"
               title="%if;(cell.family.marriage_date.year!="" and ((not (cell.family.father.is_dead and cell.family.mother.is_dead)) or ("-" in cell.family.date_s and cell.family.sep_date_s!="" and cell.family.marriage_date.prec="")))
                        %if;(cell.family.sep_date_s!="")
                          %apply;a_of_b%with;%expr(cell.family.sep_date_s-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;%nn;

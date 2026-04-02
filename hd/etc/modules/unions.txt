@@ -355,7 +355,7 @@
                 %elseif;(bvar.default_image="yes")
                   <img class="small_image rounded align-self-center ml-2" src="%images_prefix;img_unknown_%if;(witness.is_female)wo%elseif;(witness.is_male)%else;u_%end;man.png" alt="[missing image]" title="[witness/witnesses]0">
                 %(%else;
-                  <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>%)
+                  <span class="small_image noimage rounded align-self-center display-3 text-center text-body-secondary ml-2 pb-2">&nbsp;</span>%)
                 %end;
                 <div class="ml-2 align-self-center">%nn;
                   %apply;short_display_person_tree("witness")%if;(witness_kind!="") (%witness_kind;)%end;<br>
@@ -369,7 +369,7 @@
     %end;
     
     %if;(are_divorced or are_separated)
-      <div class="mb-1 text-muted">
+      <div class="mb-1 text-body-secondary">
         %if;are_separated;[*separated]%if;(on_separation_date!="") %on_separation_date;%end;.%end;
         %if;are_divorced;[*divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.%end;
       </div>

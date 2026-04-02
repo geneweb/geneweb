@@ -89,7 +89,7 @@ fr: Codes couleur
 ][:]
 <div>
   <ul>
-    <li><i class="fa fa-person fa-fw text-muted mr-2"></i>[*iftitles/public/semipublic/private]0[:]
+    <li><i class="fa fa-person fa-fw text-body-secondary mr-2"></i>[*iftitles/public/semipublic/private]0[:]
 [
 en: Public if has titles, if <code>public_if_title=yes</code> (parameter in gwf, default yes), otherwise private
 fr: Publique si titré, si <code>public_if_title=yes</code> (paramètre dans .gwf, défaut yes), sinon privé

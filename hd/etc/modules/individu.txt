@@ -12,7 +12,7 @@
   %else;
     %if;(cc>0)[close family]0%nn;
     %else;[*close family]0%nn;
-    %end; (<small class="text-muted">l1/l2</small>)%nn;
+    %end; (<small class="text-body-secondary">l1/l2</small>)%nn;
   %end
 %end;
 %define;rela()
@@ -42,7 +42,7 @@
       %end;
     %end;
     %if;(has_public_name or has_qualifiers)
-      <div class="font-weight-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</div>
+      <div class="fw-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</div>
     %end;
     %if;has_aliases;
       alias%sp;

@@ -123,7 +123,7 @@
     <div class="p-3 shadow">
     <dt><a href="#%ancestor.anc_sosa.v;" name="notes-%ancestor.anc_sosa.v;%if;("spec"!="")-spec%end;%apply;letter(child_cnt)"><b>%ancestor.anc_sosa;
     %if;("spec"!="")-spec%end;
-    %apply;letter(child_cnt)</b></a> <span class="small text-muted">(%child;%child.dates;)</span></dt>
+    %apply;letter(child_cnt)</b></a> <span class="small text-body-secondary">(%child;%child.dates;)</span></dt>
     <dd>
     %if;(e.notes="on" and (child.has_notes or child.has_event))
       <table><tr><td>
@@ -190,7 +190,7 @@
              and ancestor.same="")
           <div class="shadow p-3">
           <dt><b><a href="#%ancestor.anc_sosa.v;" name="notes-%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
-          <span class="small text-muted">(%ancestor;%ancestor.dates;)</span></dt>
+          <span class="small text-body-secondary">(%ancestor;%ancestor.dates;)</span></dt>
           <dd>
           %if;(e.notes="on" and (ancestor.has_notes or ancestor.has_event))
             <table><tr><td>

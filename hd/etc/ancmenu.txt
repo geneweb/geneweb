@@ -196,11 +196,11 @@ function missing_events_options () {
             </div>
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="ld_witn" name="relwitn">
-              <label class="custom-control-label" for="ld_witn">[*witness/witnesses]1<span class="text-muted"> ([marriage/marriages]1)</span></label>
+              <label class="custom-control-label" for="ld_witn">[*witness/witnesses]1<span class="text-body-secondary"> ([marriage/marriages]1)</span></label>
             </div>
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="ld_comm" name="comm">
-              <label class="custom-control-label" for="ld_comm">[*comment]<span class="text-muted"> ([marriage/marriages]1)</span></label>
+              <label class="custom-control-label" for="ld_comm">[*comment]<span class="text-body-secondary"> ([marriage/marriages]1)</span></label>
             </div>
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="ld_inline" name="inline">
@@ -382,7 +382,7 @@ function missing_events_options () {
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tT" name="t" value="T" onclick="tree_options()">
         <label class="custom-control-label" for="tT"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>[*ascendants tree] <span class="text-info">✘</span>%nn;
-          <div class="text-muted ml-4">%nn;
+          <div class="text-body-secondary ml-4">%nn;
             %if;(bvar.max_anc_tree="" and max_anc_level>=7)
               ([maximum] 7 [generation/generations]1)
             %elseif;(bvar.max_anc_tree!="" and max_anc_level>=bvar.max_anc_tree)
@@ -404,7 +404,7 @@ function missing_events_options () {
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tH" name="t" value="H" onclick="tree_options()">
         <label class="custom-control-label" for="tH"><i class="fa fa-code-branch  fa-rotate-90 fa-fw mr-1"></i>[*horizontal tree] <span class="text-info">✘</span>%nn;
-          <div class="text-muted ml-4">%nn;
+          <div class="text-body-secondary ml-4">%nn;
             %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
               ([maximum] 8 [generation/generations]1)
             %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
@@ -445,7 +445,7 @@ function missing_events_options () {
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tL" name="t" value="L" onclick="no_options()">
         <label class="custom-control-label" for="tL"><i class="fa fa-share-nodes fa-fw mr-1"></i>[*list/list (ancestors)]1%sp;
-          <span class="text-muted">%nn;
+          <span class="text-body-secondary">%nn;
             %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
               ([maximum] 8 [generation/generations]1)
             %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
@@ -562,7 +562,7 @@ ancStats.data.forEach(function(d) {
   $opt.data('pp_l', d.pp_l);
   if (d.v > maxAncLevel) {
     $opt.prop('disabled', true);
-    $opt.addClass('text-muted');
+    $opt.addClass('text-body-secondary');
   }
   $('#v').append($opt);
 });
@@ -585,7 +585,7 @@ $(document).ready(function() {
       var titleNum = isOnly ? (noa_l + path_l) : (noa + path);
       var title = titleNum + pp;
       var prefix = isOnly ? '[only] ' : '[up to] ';
-      var cls = el.disabled ? 'text-muted' : '';
+      var cls = el.disabled ? 'text-body-secondary' : '';
       var colDate = 'width:' + (isOnly ? '12' : '8') + 'rem';
 
       return '<div' + sty + ' class="d-flex justify-content-center ' + cls

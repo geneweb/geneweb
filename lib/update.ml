@@ -322,7 +322,7 @@ let print_same_name conf base p =
             Output.print_sstring conf {| class="font-italic text-info"|};
           Output.print_sstring conf ">";
           Output.print_sstring conf
-            {|<td class="text-right align-middle text-muted p-0 pr-2" style="width:2em">|};
+            {|<td class="text-right align-middle text-body-secondary p-0 pr-2" style="width:2em">|};
           Output.print_sstring conf (string_of_int (Driver.get_occ p));
           Output.print_sstring conf "</td>";
           (match occu_opt with
@@ -331,10 +331,11 @@ let print_same_name conf base p =
               (match max_len_opt with
               | Some n ->
                   Output.printf conf
-                    {|<td class="text-muted align-middle p-0 pr-1" style="width:%dem">|}
+                    {|<td class="text-body-secondary align-middle p-0 pr-1" style="width:%dem">|}
                     ((n / 2) + 1)
               | None ->
-                  Output.print_sstring conf {|<td class="text-muted p-0 pr-1">|});
+                  Output.print_sstring conf
+                    {|<td class="text-body-secondary p-0 pr-1">|});
               let occu = Driver.sou base (Driver.get_occupation p) in
               (match max_len_opt with
               | Some n when occu <> "" && String.length occu > n ->

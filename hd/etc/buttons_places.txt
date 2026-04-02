@@ -128,7 +128,7 @@
   %if;(e.display!="long")
     <span class="ml-2 mr-2" title="[*place filter]">[*filter][:]</span>
     <a role="button" class="btn-link ml-auto
-      %if;(ekeep="" or ekeep<2) disabled text-muted%end;"
+      %if;(ekeep="" or ekeep<2) disabled text-body-secondary%end;"
       href="%apply;url_set%with;keep%and;%if;(ekeep!="")%expr(ekeep-1)%else;1%end;%end;"
       title="[*place filter]">
       <i class="fas fa-minus fa-lg"></i>

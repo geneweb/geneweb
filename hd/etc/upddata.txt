@@ -60,8 +60,8 @@
       %if;(e.s="")[*select a letter]%else;[*hierarchical navigation]%end;
     </h2>
     <div class="btn-group" role="toolbar" aria-label="sub-caracter-selection-heading" id="book-navigation">
-      <div class="d-flex flex-column flex-sm-row list-group list-group-horizontal user-select-none font-weight-bold user-select-none ml-2">
-        <div%if;(e.s!="") id="book-sup-char-list"%end; class="d-inline-flex flex-wrap align-self-center mt-1 mt-sm-0 order-3 text-monospace">
+      <div class="d-flex flex-column flex-sm-row list-group list-group-horizontal user-select-none fw-bold user-select-none ml-2">
+        <div%if;(e.s!="") id="book-sup-char-list"%end; class="d-inline-flex flex-wrap align-self-center mt-1 mt-sm-0 order-3 font-monospace">
           %if;(nb_results>=1)
             %reset_count;
             %foreach;entry;
@@ -168,7 +168,7 @@
           <div class="d-flex align-items-center justify-content-center position-relative top-book-arrow w-10 h-100 border border-bottom-0 border-top-0 border-left-0 border-light">
             <a role="button" class="stretched-link w-100 mx-3" href="#top" title="[*return to top]" data-toggle="tooltip" data-placement="top" tabindex="-1"><i class="fa-solid fa-sort-up ml-sm-1 mt-1"></i></a>
           </div>
-          <div class="list-group-item-%if;(entry_ini=e.s)success%else;info%end; position-relative w-100 border font-weight-bold text-monospace">
+          <div class="list-group-item-%if;(entry_ini=e.s)success%else;info%end; position-relative w-100 border fw-bold font-monospace">
             %if;(entry_ini!=e.s)<a class="stretched-link ml-1" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;" title="[*search/case sensitive]0 “%escape.entry_ini;”">%end;
             <span class="ml-3">%visual_spaces.escape.entry_ini;</span>
             %if;(entry_ini!=e.s)</a>%end;
@@ -204,7 +204,7 @@
                   %if;is_modified;
                     <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-0%if;(e.data="src") ml-5%elseif;(e.data!="place") ml-sm-1%end;">
                       <div class="d-flex d-sm-inline-flex flex-row flex-sm-column align-self-start align-self-sm-center ml-5 ml-sm-4">
-                        <div class="font-weight-bold">[*modify]</div>
+                        <div class="fw-bold">[*modify]</div>
                         <div class="text-nowrap align-self-sm-center ml-2 ml-sm-0">%p_list;</div>
                       </div>
                   %end;
@@ -219,7 +219,7 @@
                           <input type="hidden" name="s" value="%e.s;">
                           %let;val;%if(entry_value.original=entry_value)%escape.printable.entry_value;%else;%escape.entry_value.original;%end;%in;
                           <div class="flex-grow-1">
-                            <div class="pl-2 mr-2 pr-sm-2 text-muted book-input-text">%nn;
+                            <div class="pl-2 mr-2 pr-sm-2 text-body-secondary book-input-text">%nn;
                               %if;(e.data="place" and suburb!="")
                                 %escape.entry_value;
                               %else;

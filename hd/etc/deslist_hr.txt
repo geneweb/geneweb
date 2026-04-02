@@ -109,7 +109,7 @@
       %if;(wizard and not cancel_links)
         <a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">
       %end;
-        <span class="small text-muted text-nowrap">%nn;
+        <span class="small text-body-secondary text-nowrap">%nn;
           %if;(are_engaged or are_married)&%elseif;are_not_married;X%end;
           %if;(on_marriage_date!="")%family.date_s;%end;
         </span>
@@ -289,7 +289,7 @@
           %end;
         </div>
         <div class="modal-footer py-1 bg-light">
-          <small class="text-muted w-100 text-center">
+          <small class="text-body-secondary w-100 text-center">
             <i class="fa fa-hand-pointer fa-fw"></i>
             %define;navwith(xx)[*navigate with someone:::xx]%end;
             %apply;navwith([an ancestor]0)
@@ -302,7 +302,7 @@
 <h3 class="mt-2 ml-2">%nn;
   %let;slf;%if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %dates%in;
   %if;(l_v=0)%slf;%else;
-    %apply;a_of_b_gr_eq_lev%with;[*descendants]%and;%slf;<small class="font-weight-lighter text-muted"> %apply;togend(l_v)</small>%end;
+    %apply;a_of_b_gr_eq_lev%with;[*descendants]%and;%slf;<small class="fw-lighter text-body-secondary"> %apply;togend(l_v)</small>%end;
   %end;
 </h3>
 <form id="filterbysurname" class="form-inline mt-2 d-none">

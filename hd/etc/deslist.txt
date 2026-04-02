@@ -199,7 +199,7 @@
     <div class="p-3 shadow">
       <dt>
         <a id="note-ctr" href="#person-ctr">ctr</a>%sp;
-        <span class="small text-muted">(%xx;%xx.dates;)</span>
+        <span class="small text-body-secondary">(%xx;%xx.dates;)</span>
       </dt>
       <dd>%apply;render_notes_content("xx")</dd>
     </div>
@@ -223,7 +223,7 @@
          %end;…
       </div>
       %if;(e.witn="on" and has_witnesses)
-        <div class="flex-grow-1 ml-3 small text-muted">
+        <div class="flex-grow-1 ml-3 small text-body-secondary">
           ([witness/witnesses]1[:]
           %foreach;witness;
             %if;(not is_first),%sp;%end;
@@ -239,7 +239,7 @@
     %apply;somebody_long_info("spouse")
     %apply;render_notes_sources_inline%with;spouse%and;ctr%end;
     %if;(e.comm="on" and (has_comment or has_marriage_note))
-      <span class="text-muted small"> (%comment;
+      <span class="text-body-secondary small"> (%comment;
         %if;has_marriage_note;%apply;clean_html_tags(marriage_note)%end;)
       </span>
     %end;
@@ -248,9 +248,9 @@
     %if;(curlev<maxlev)
       %if;(curlev=0 or e.t="M" and xx.is_male or e.t="F" and xx.is_female or e.t="L")
         %if;(family.desc_level < famlev)
-          <div class="ml-4 text-muted">[see further].</div>
+          <div class="ml-4 text-body-secondary">[see further].</div>
         %elseif;(family.desc_level > famlev)
-          <div class="ml-4 text-muted">[see above].</div>
+          <div class="ml-4 text-body-secondary">[see above].</div>
         %elseif;has_children;
           <div class="mt-2">
             %apply;havingchildren(nb_children)[:]
