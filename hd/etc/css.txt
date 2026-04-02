@@ -1,4 +1,4 @@
-  <!-- $Id: css.txt v7.1 06/08/2025 00:34:15 $ -->
+  <!-- $Id: css.txt v7.1 11/04/2026 02:10:10 $ -->
 %( Put here only properties that uses variables %)
 %if;(e.m="MISC_NOTES")
   <style>
@@ -10,10 +10,10 @@
 %if;(e.templ!="templ")
   %if;(bvar.use_cdn="yes")
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-        integrity="sha256-+IZRbz1B6ee9mUx/ejmonK+ulIP5A5bLDd6v6NHqXnI=
-                   sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N
-                   sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w=="
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=
+                   sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB
+                   sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA=="
         crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"
         integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=
@@ -28,7 +28,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer">
     %end;
   %else;
-  <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=4.6.2">
+  <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.8">
   <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
     %if;(e.m="A" and e.t="")
   <link rel="stylesheet" href="%etc_prefix;css/select2.min.css?version=4.1.0rc">
