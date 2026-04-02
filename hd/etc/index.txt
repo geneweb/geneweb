@@ -14,10 +14,10 @@
 
 <div class="mt-5">[*input database][:]</div>
 
-<form class="form-inline d-flex justify-content-center mt-2" method="get" action="%prefix;">
+<form class="d-flex justify-content-center mt-2" method="get" action="%prefix;">
   <input type="hidden" name="lang" value="%evar.lang;">
   <input name="b" placeholder="%bases_list;" class="form-control col-8">
-  <button type="submit" class="btn btn-outline-secondary ml-2" value="">Ok</button>
+  <button type="submit" class="btn btn-outline-secondary ms-2" value="">Ok</button>
 </form>
 
 %( TODO find server name and port number %)
@@ -43,7 +43,7 @@
   <a class="btn btn-outline-secondary" href="?lang=et%if;(evar.templ!="")&templ=%evar.templ;%end;" title="et">eesti</a>
   <a class="btn btn-outline-secondary" href="?lang=fi%if;(evar.templ!="")&templ=%evar.templ;%end;" title="fi">suomi</a>
   <a class="btn btn-outline-secondary" href="?lang=fr%if;(evar.templ!="")&templ=%evar.templ;%end;" title="fr">français</a>
-  <a class="btn btn-outline-secondary" href="?lang=he%if;(evar.templ!="")&templ=%evar.templ;%end;" title="he">עברית </a>
+  <a class="btn btn-outline-secondary" href="?lang=he%if;(evar.templ!="")&templ=%evar.templ;%end;" title="he">עברית</a>
   <a class="btn btn-outline-secondary" href="?lang=is%if;(evar.templ!="")&templ=%evar.templ;%end;" title="is">íslenska</a>
   <a class="btn btn-outline-secondary" href="?lang=it%if;(evar.templ!="")&templ=%evar.templ;%end;" title="it">italiano</a>
   <a class="btn btn-outline-secondary" href="?lang=lv%if;(evar.templ!="")&templ=%evar.templ;%end;" title="lv">Latviešu</a>
@@ -69,8 +69,8 @@
   <div class="btn-group">
     <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
     <img src="%images_prefix;logo_bas.png" alt="Logo GeneWeb"></a>
-    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;" 
-      class="ml-2" target="_blank" title="GeneWeb documentation MediaWiki">
+    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;"
+      class="ms-2" target="_blank" title="GeneWeb documentation MediaWiki">
     <img src="%images_prefix;logo_bas_mw.png" alt="Logo GeneWeb Mediawiki"></a>
   </div>
 </div>
