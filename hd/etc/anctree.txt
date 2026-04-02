@@ -43,7 +43,7 @@
   <div class="d-flex flex-column ml-3">
     <h3 class="display-5 ml-3">%nn;
       %apply;ttl()
-      <%if;(e.t="T" and e.v>2)span%else;div%end; class="text-small text-muted font-weight-lighter">%apply;togena(e.v)</%if;(e.t="T")span%else;div%end;>
+      <%if;(e.t="T" and e.v>2)span%else;div%end; class="text-small text-body-secondary fw-lighter">%apply;togena(e.v)</%if;(e.t="T")span%else;div%end;>
     </h3>
     %include;modules/arbre_vertical
   </div>

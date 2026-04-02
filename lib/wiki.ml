@@ -934,7 +934,7 @@ let print_mod_view_editor conf can_edit sub_part is_new_note =
       Format.sprintf
         {|<button type="submit" tabindex="6" title="%s"
     class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3">
-    <span class="font-weight-bold text-uppercase">%s</span>
+    <span class="fw-bold text-uppercase">%s</span>
     <i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
   </button>|}
         lbl lbl

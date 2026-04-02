@@ -366,7 +366,7 @@ let print_firstname_variants conf ?(filter = true) variants_set =
       else variants_set
     in
     if not (StrSet.is_empty filtered_variants) then (
-      Output.print_sstring conf {|<div class="font-weight-bold mb-3">|};
+      Output.print_sstring conf {|<div class="fw-bold mb-3">|};
       let title = Utf8.capitalize_fst (transl conf "search exact") in
       Mutil.list_iter_first
         (fun first fn ->
@@ -1091,7 +1091,7 @@ let print_several_possible_surnames x conf base (_, surname_groups) =
   let order (ord, _, _, _, _) = ord in
   let wprint_elem (_, txt, sn, count, is_alias) =
     if is_alias then
-      Output.printf conf "<em class='text-muted'>%s</em> [%d]"
+      Output.printf conf "<em class='text-body-secondary'>%s</em> [%d]"
         (escape_html txt :> string)
         count
     else

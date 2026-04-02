@@ -30,7 +30,7 @@
 %let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<static_max_anc_level)%bvar.max_anc_level;%else;%max_anc_level;%end;%in;
 %let;maxp;%expr(max+1)%in;
 %define;picklvl(vvv)
-  <a role="button" class="btn btn-sm btn-light%if;(vvv=e_v or (e_v>max and vvv=max)) disabled font-weight-bold text-white bg-dark%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;" onclick="showOverlay()"
+  <a role="button" class="btn btn-sm btn-light%if;(vvv=e_v or (e_v>max and vvv=max)) disabled fw-bold text-white bg-dark%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;" onclick="showOverlay()"
     aria-label="select ascending generation level vvv to display ancestors up to that degree."
     title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([ascending/descending (degree)]1 [up to] %max_desc_level;)%end;">vvv</a>%nn;
 %end;
@@ -189,7 +189,7 @@
                    %if;(cousins_cnt.vvv.www=1)[cousins.vvv.www]0%else;[cousins.vvv.www]1%end;%nn;
                   %end;
                 </a>%nn;
-                <small class="text-muted">%if;(extrapaths!=0) (+ %extrapaths;)%end;</small>
+                <small class="text-body-secondary">%if;(extrapaths!=0) (+ %extrapaths;)%end;</small>
                 %let;span;%min_date_vvv_www;-%max_date_vvv_www;%in;
                 <span class="h4">%if;not (10000 in span);%if;(min_date_vvv_www=max_date_vvv_www)%min_date_vvv_www;%else;%span;%end;%end;</span>
               </div>
@@ -254,9 +254,9 @@
     <div class='d-flex justify-content-center mt-1'>
       <div class='mr-4 h5'>
         <i class='fa-solid fa-arrow-up-right-dots fa-fw'></i>
-        <span class='font-weight-heavy'>vvv</span>
+        <span class='fw-heavy'>vvv</span>
         <i class='fa-solid fa-arrow-down-long'></i>
-        <span class='font-weight-heavy ml-1'>www</span>
+        <span class='fw-heavy ml-1'>www</span>
       </div>
       <div class='ml-4 h5'>
         <i class='fa-solid fa-dna fa-fw'></i>
@@ -294,7 +294,7 @@
               %let;tot;%apply;cous_paths_cnt%with;%i;%and;%k;%end;%in;
               %let;tot_next;%apply;cous_paths_cnt%with;%i;%and;%expr(k+1)%end;%in;
               %if;(i>1 and k=0)
-                <td class="h4 font-weight-light user-select-none text-left align-middle border-top-0 pb-3 pl-3">%nn;
+                <td class="h4 fw-light user-select-none text-left align-middle border-top-0 pb-3 pl-3">%nn;
                   %if;(maxa>4)%expr(maxa-j)%else;%end;
                 </td>
                 %if;(i>2)<td colspan="%expr(i-2)" class="border-0"></td>%end;
@@ -362,7 +362,7 @@
             %for;j;0;tt;%incr_count;%end;
           %end;
         %end;
-        <div><span class="text-muted" title="[ancestor/ancestors]1">%count;A</span>%nn;
+        <div><span class="text-body-secondary" title="[ancestor/ancestors]1">%count;A</span>%nn;
         %reset_count;
         %if;has_children;
           %for;i;1;cousins.max_d;
@@ -370,9 +370,9 @@
             %for;j;0;tt;%incr_count;%end;
           %end;
         %end;
-        <span class="text-muted" title="[descendants]">/%count;D</span></div>
+        <span class="text-body-secondary" title="[descendants]">/%count;D</span></div>
         %reset_count;%foreach;sorted_listc_item;%if;(item.2=0)%incr_count;%end;%end;
-        <div><span class="text-muted" title="[nb individuals]">%listc_size;P</span><span class="text-muted" title="[number of living persons]">/%count;L</span></div>
+        <div><span class="text-body-secondary" title="[nb individuals]">%listc_size;P</span><span class="text-body-secondary" title="[number of living persons]">/%count;L</span></div>
       </div>
     </div>
   </div>

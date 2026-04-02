@@ -659,7 +659,7 @@ let format_folder_entry conf depth r path_to is_current is_path view =
   let content =
     if is_current then
       Format.sprintf
-        {|<span class="text-muted">
+        {|<span class="text-body-secondary">
           <i class="far fa-folder-open fa-fw mr-2"></i>%s</span>|}
         (Util.escape_html r :> string)
     else
@@ -715,7 +715,7 @@ let format_file_entry conf depth d f n_type title view =
       icon
       (Util.escape_html f :> string)
       (if (title :> string) <> "" then
-         Format.sprintf {|<span class="text-muted ml-2">%s</span>|}
+         Format.sprintf {|<span class="text-body-secondary ml-2">%s</span>|}
            (title :> string)
        else "")
   else

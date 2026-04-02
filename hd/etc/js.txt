@@ -159,12 +159,12 @@
     if (nbinput == 4) {
       $('#input1').prop('disabled', false);
       $('#filterbysurname').removeClass("d-none");
-      $('#total').addClass("text-muted");
+      $('#total').addClass("text-body-secondary");
       $('#input1').focus(); }
     else {
       $('.filter').prop('disabled', true);
       $('#filterbysurname').addClass("d-none");
-      $('#total').removeClass("text-muted"); }
+      $('#total').removeClass("text-body-secondary"); }
   });
   $("#btnplus").on("click", function() {
     var len = $('.filter:text:not(:disabled)').length + 1;

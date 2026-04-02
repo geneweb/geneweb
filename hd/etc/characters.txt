@@ -1,7 +1,7 @@
 <!-- $Id: characters.txt v7.1 30/11/2023 20:52:12 $ -->
 %( Specific linked code in css.txt/js.txt %)
 <!-- $Id: characters.txt v7.1 08/12/2024 09:15:21 $ -->
-<span class="ch text-monospace">
+<span class="ch font-monospace">
 <a href="#" title="En Dash">–</a>
 <a href="#" title="Em Dash">—</a>
 <a href="#" title="Left Double Angle Quotation Mark">«</a>

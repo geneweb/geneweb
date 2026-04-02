@@ -65,7 +65,7 @@
 
 %define;info(xx)
   %if;(xx.has_nobility_titles)
-    <div class="font-italic">%xx.nobility_title;</div>
+    <div class="fst-italic">%xx.nobility_title;</div>
   %end;
   <div class="small">
     %if;(xx.has_occupation)
@@ -100,8 +100,8 @@
     or ((xx.has_birth_date or xx.has_baptism_date) and not xx.has_birth_place and not xx.has_baptism_place)))<span class="bg-ly-incomplete">%end;
   %apply;lazy_print(birth_symbol)
   %if;(xx.has_birth_date or xx.has_baptism_date)
-    %if;(xx.birth_date.year!="")<span class="text-monospace">%lazy_force;</span>%xx.slash_birth_date;%nn;
-    %elseif;(xx.baptism_date.year!="")<span class="text-monospace">%lazy_force;</span>%xx.slash_baptism_date;%nn;
+    %if;(xx.birth_date.year!="")<span class="font-monospace">%lazy_force;</span>%xx.slash_birth_date;%nn;
+    %elseif;(xx.baptism_date.year!="")<span class="font-monospace">%lazy_force;</span>%xx.slash_baptism_date;%nn;
     %end;
   %end;
   %if;(xx.has_birth_place or xx.has_baptism_place)
@@ -119,8 +119,8 @@
       or ((xx.has_death_date or xx.has_burial_date) and not xx.has_death_place and not xx.has_burial_place)))<span class="bg-ly-incomplete">%end;
     %apply;lazy_print(death_symbol)
     %if;(xx.has_death_date or xx.has_burial_date)
-      %if;(xx.death_date.year!="")<span class="text-monospace">%lazy_force;</span>%xx.slash_death_date;%nn;
-      %elseif;(xx.burial_date.year!="")<span class="text-monospace">%lazy_force;</span>%xx.slash_burial_date;%nn;
+      %if;(xx.death_date.year!="")<span class="font-monospace">%lazy_force;</span>%xx.slash_death_date;%nn;
+      %elseif;(xx.burial_date.year!="")<span class="font-monospace">%lazy_force;</span>%xx.slash_burial_date;%nn;
       %end;
     %end;
     %if;(xx.has_death_place or xx.has_burial_place)

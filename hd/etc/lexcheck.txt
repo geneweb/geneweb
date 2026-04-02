@@ -1,5 +1,5 @@
 %define;cous(xx,yy)
-<span class="text-muted">— [cousins.xx.yy]0</span><br>
+<span class="text-body-secondary">— [cousins.xx.yy]0</span><br>
 <span class="text-dark">— [cousins.xx.yy]1</span><br>
 <span class="text-primary">— [cousin.xx.yy:::½-]0</span><br>
 <span class="text-danger">— [cousin.xx.yy:::½-]1</span><br>

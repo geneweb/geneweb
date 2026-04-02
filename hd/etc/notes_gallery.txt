@@ -19,7 +19,7 @@
     %if(wizard)(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)%end;
   </div>
   <h1 id="h1" class="ml-3 mb-0">[*loading/error]0</h1>
-  <p id="chronicle" class="ml-3 mb-0 text-muted d-none"></p>
+  <p id="chronicle" class="ml-3 mb-0 text-body-secondary d-none"></p>
   <div id="index-wall" class="flex-wrap mt-3 ml-3 d-none"></div>
   <div id="album-nav" class="d-none justify-content-center">
     <div class="p-2 bd-highlight"><a id="home" href="#" onclick="loadIndex(); return false;" title="[*gallery index]"><i class="fa-solid fa-house"></i></a></div>
@@ -419,9 +419,9 @@ $(document).on("click", ".imap-group-legend", function(e) {
 });
 
 function updateNavButtons() {
-  $("#first, #previous").toggleClass("disabled text-muted",
+  $("#first, #previous").toggleClass("disabled text-body-secondary",
     current <= 0);
-  $("#next, #last").toggleClass("disabled text-muted",
+  $("#next, #last").toggleClass("disabled text-body-secondary",
     current >= imagesCount - 1);
 }
 

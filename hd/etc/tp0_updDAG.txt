@@ -39,7 +39,7 @@
         <i class="fas fa-arrow-down" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="align-middle font-weight-bold border-left px-3 line-number"></td>
+    <td class="align-middle fw-bold border-left px-3 line-number"></td>
     <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz" aria-label="[*first name/first names]1"></td>
     <td%mid;><input name="n" class="form-control reset_bd_text" size="30" value="zsnz" aria-label="[*surname/surnames]0"></td>
     <td%mid;><input name="oc" type="number" min="0" class="form-control reset_bd_text" value="zocz" aria-label="[*occ]0"></td>
@@ -73,11 +73,11 @@
         <i class="fas fa-arrow-down" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="n_p_oc align-middle font-weight-light border-left px-3"></td>
-    <td class="n_p_oc align-middle font-weight-light pl-3">zfnz</td>
-    <td class="n_p_oc align-middle font-weight-light pl-3">zsnz</td>
-    <td class="n_p_oc align-middle font-weight-light pl-3">zocz</td>
-    <td class="n_p_oc align-middle font-weight-light">zbdz</td>
+    <td class="n_p_oc align-middle fw-light border-left px-3"></td>
+    <td class="n_p_oc align-middle fw-light pl-3">zfnz</td>
+    <td class="n_p_oc align-middle fw-light pl-3">zsnz</td>
+    <td class="n_p_oc align-middle fw-light pl-3">zocz</td>
+    <td class="n_p_oc align-middle fw-light">zbdz</td>
     <td%mid;><input name="s" class="form-control reset_n_p_oc" size="30" value="zsz" aria-label="[*n° Sosa]"></td>
   </tr>
 %end;
@@ -149,7 +149,7 @@
       <tr>
         <th scope="col" class="border-top-0"></th>
         <th scope="col" class="border-top-0"></th>
-        <th scope="col" class="align-middle font-weight-bold border-left px-3">#</th>
+        <th scope="col" class="align-middle fw-bold border-left px-3">#</th>
         <th scope="col" class="align-middle pl-2">[*first name/first names]0</th>
         <th scope="col" class="align-middle pl-2">[*surname/surnames]0</th>
         <th scope="col" class="align-middle" style="width:90px">[*occ]1</th>

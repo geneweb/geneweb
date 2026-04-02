@@ -32,7 +32,7 @@ let print_matrix_cell conf base tstab persons i j cell_storage n =
     | None ->
         Output.printf conf
           {|<td class="rm-cell" data-id="§%s_§%s">
-            <span class="text-muted">—</span>
+            <span class="text-body-secondary">—</span>
           </td>|}
           (Driver.Iper.to_string iper_i)
           (Driver.Iper.to_string iper_j)

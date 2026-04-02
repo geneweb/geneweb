@@ -232,7 +232,7 @@
         <div class="btn-group mx-2">
           %for;i;1;7;
             <a href="%apply;url_set%with;vh%and;%i;%end;"
-              class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled font-weight-bold%end;" %nn;
+              class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled fw-bold%end;" %nn;
               title="%if;(evarvh!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end;">%i;</a>
           %end;
@@ -243,7 +243,7 @@
             title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%else;%nn;
                [*visualize/show/hide/summary]2%end; [half-brothers/half-sisters/half-siblings]2"
           >Sosa
-            <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
+            <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-body-secondary"></i>
           </a>
         </div>
         <div class="input-group input-group-sm ">

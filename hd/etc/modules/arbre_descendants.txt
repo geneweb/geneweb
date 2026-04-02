@@ -26,7 +26,7 @@
       href="%prefix;m=MOD_IND;i=%xxx.index;"
       title="[*modify::] %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
   %end;
-    <span class="font-italic">%nn;
+    <span class="fst-italic">%nn;
       %if;(xxx.dates!="")%xxx.dates;%nn;
       %elseif;(wizard and not cancel_links)-%nn;
       %elseif;(cancel_links)<br>
@@ -57,7 +57,7 @@
       %if;(wizard and not cancel_links)</a>%end;
     %else;
       <span class="small_image noimage rounded display-4 text-center%nn;
-        text-muted ml-0 h-100">%bvar.default_image_no;</span>
+        text-body-secondary ml-0 h-100">%bvar.default_image_no;</span>
     %end;
   %end;
   </div>

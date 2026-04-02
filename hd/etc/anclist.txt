@@ -126,7 +126,7 @@
       <button id="btnplus" type="button" class="btn btn-primary ml-2" title="[*add filter] (max 4)"><i class="fa fa-plus fa-fw"></i></button>
       <button id="btnclear" type="button" class="btn btn-danger ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
     </form>
-    <div class="text-monospace anclist_hr mt-2">
+    <div class="font-monospace anclist_hr mt-2">
       %let;sosa_v;%if;(sosa.v!="")%sosa.v;%else;1%end;%in;
       %if;((e.same="" or e.same=0) and self=sosa_ref)
         %apply;anc_row_hr("self", lvl, 1, "   ", "──╴", "   ")

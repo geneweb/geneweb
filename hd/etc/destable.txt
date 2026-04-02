@@ -453,7 +453,7 @@
 %( d’Aboville %)
 %define;list_row(xxx, prefx, fam_cnt, ch_cnt)
   %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
-  %if;("prefx"!="")<span class="text-monospace">prefx</span>%end;
+  %if;("prefx"!="")<span class="font-monospace">prefx</span>%end;
     %apply;image_MF("xxx")
   %apply;link%with;%xxx.access;%and;%xxx.first_name; %xxx.surname;%and;%xxx.index;%end;%nn;
   %if;(xxx.title!=""), %xxx.title;%end;

@@ -31,7 +31,7 @@
                 src="%images_prefix;img_unknown_%if;(child.is_female)wo%elseif;(child.is_male)%else;u_%end;man.png" alt="[missing image]"%nn;
                 title="%if;(child.is_male)[*a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[*a brother/a sister/a sibling]2%end;">
             %else;
-              <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
+              <span class="small_image noimage rounded align-self-center display-3 text-center text-body-secondary ml-2 pb-2">?</span>
             %end;
             <div class="media-body ml-2 align-self-center">%nn;
               %apply;short_display_person_tree("child")

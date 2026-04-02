@@ -448,7 +448,7 @@ let print_pyramid_table conf ~men ~wom ~nb_intervals ~interval ~row_label_side =
   in
   let side_html i =
     match row_label_side with
-    | Some f -> Printf.sprintf {|<td class="text-muted px-2">%s</td>|} (f i)
+    | Some f -> Printf.sprintf {|<td class="text-body-secondary px-2">%s</td>|} (f i)
     | None -> ""
   in
   let cls = if compact then " pyr-compact" else "" in
