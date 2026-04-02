@@ -68,7 +68,7 @@
           %elseif;(person.is_public or b.public_if_titles="yes" and person.has_titles)
             <i class="fa fa-person text-success mr-1"> </i>%nn;
           %else;
-            <i class="fa fa-person text-muted mr-1"> </i>%nn;
+            <i class="fa fa-person text-body-secondary mr-1"> </i>%nn;
           %end;
         %else;
           &nbsp;&nbsp;

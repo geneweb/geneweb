@@ -16,5 +16,5 @@
     %public_or_first_name; %qualifier_;%sp;
     %if;not cancel_links;<a href="%prefix;m=N&v=%surname_key;#i%index;">%end;%surname;%nn;
     %if;not cancel_links;</a>%end;
-    <span class="font-weight-light small">%dates;</span>
+    <span class="fw-light small">%dates;</span>
   </h1>

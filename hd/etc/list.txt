@@ -50,13 +50,13 @@
 %end;
 <div class="btn-toolbar mt-3 ml-3" role="toolbar" aria-label="Toolbar for list of individuals">
   <a role="button" href="%if;(e.dates!=0)%url_set.dates.0;%else;%url_set.dates;%end;"
-    class="btn-link%if;(e.dates!=0) text-muted%end;"
+    class="btn-link%if;(e.dates!=0) text-body-secondary%end;"
     title="%if;(e.dates!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date/dates]1">
     <i class="fa fa-calendar-days fa-fw fa-lg mr-1"></i>[*date/dates]1
   </a>
   <a role="button" href="%if;(e.parents!=0)%url_set.parents.0;%else;%url_set.parents;%end;"
     title="%if;(e.parents!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [parents]"
-    class="btn-link ml-3%if;(e.parents!=0) text-muted%end;">
+    class="btn-link ml-3%if;(e.parents!=0) text-body-secondary%end;">
     <i class="fa-solid fa-user-group fa-fa fa-lg mr-1"></i>[*parents]
     </a>
   %if;(e.nb!=1)
@@ -164,7 +164,7 @@
       %let;so;%item.1;%in;
       %let;access;%apply;get_value(myindex, "access")%in;
       %let;sex;%apply;get_value(myindex, "sex")%in;
-      %if;("on" in url)<span class="text-monospace mr-2">%apply;tags(myindex,"1", item.1)</span>%nn;%end;
+      %if;("on" in url)<span class="font-monospace mr-2">%apply;tags(myindex,"1", item.1)</span>%nn;%end;
       <a href="%prefix;%access;">%nn;
       %apply;get_value(myindex, "first_name")%sp;
       %apply;get_value(myindex, "surname")%nn;

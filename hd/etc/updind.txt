@@ -264,7 +264,7 @@
 %end;
 
 %define;selector_pevent(xcnt)
-  <select class="form-control custom-select font-weight-bold sortable-select" id="pevent_selectxcnt" onchange="show_pevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
+  <select class="form-control custom-select fw-bold sortable-select" id="pevent_selectxcnt" onchange="show_pevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
     <option value="" id="deletexcnt">[*select/delete an event]1</option>
     <option disabled>──────────────────</option>
     <option value="">[*custom event]</option>
@@ -475,7 +475,7 @@
       </div>
       <div class="col">
         <label id="pevent_label_selectorxcnt" style="display:none" class="other_evts w-100">
-          <input type="text" class="form-control font-weight-bold" name="e_namexcnt" value="%event.e_name;" id="e_namexcnt" placeholder="[*event/events]0"></label>
+          <input type="text" class="form-control fw-bold" name="e_namexcnt" value="%event.e_name;" id="e_namexcnt" placeholder="[*event/events]0"></label>
         </label>
       </div>
     </div>
@@ -953,7 +953,7 @@
         </div>
         <button type="submit" class="btn btn-primary btn-sm col-1 mx-auto">
           [*validate/delete]0<i class="fa fa-share fa-rotate-180 ml-2" aria-hidden="true"></i>
-          <span class="sr-only font-weight-bold">[*validate/delete]0</span>
+          <span class="sr-only fw-bold">[*validate/delete]0</span>
         </button>
       </div>
     </div>
@@ -1305,7 +1305,7 @@
         <div class="d-flex flex-column col-9">
           <textarea class="form-control insert-character-target no-clear-button ml-2" id="notes_comments" name="notes" rows="16">%notes;</textarea>%sq;
           <button type="submit" class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
-            <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
+            <span class="fw-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
           </button>
         </div>
         <div class="col mx-2 pl-0 pr-3 py-0">

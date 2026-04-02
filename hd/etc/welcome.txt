@@ -172,7 +172,7 @@
     </div>
   </div>
   <div class="my-0 order-3 order-md-2 flex-fill text-lg-center align-self-md-center">
-    <h1 class="font-weight-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
+    <h1 class="fw-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
     %if;(b.visitor_access!="no" or wizard or friend)
       <div class="d-flex justify-content-center">
         <span class="text-center %if;roglo;h5">%nn;
@@ -185,7 +185,7 @@ fr: contient
 en: individuals<br> all connected through familial relationships
 fr: individus<br> tous reliés par des liens familiaux
 ]
-%else;h4 font-weight-lighter">%base.real_nb_persons; %nn;
+%else;h4 fw-lighter">%base.real_nb_persons; %nn;
   %if;(base.real_nb_persons="0" or base.real_nb_persons="1")[person/persons]0%else;[person/persons]1%end;%end;</span>
         %if;(base.real_nb_persons!="0" and not predictable_mode)
           <a class="align-self-center ml-2 mb-2" href="%prefix;i=%apply;get_random(nb_persons.v)"
@@ -199,7 +199,7 @@ fr: individus<br> tous reliés par des liens familiaux
 <div class="d-flex justify-content-center">
   <div class="d-flex flex-column col-8">
     %if;(b.motd!="")%nn;
-      <div class="display-5 lead font-weight-light text-center">%apply;interp(b.motd)</div>
+      <div class="display-5 lead fw-light text-center">%apply;interp(b.motd)</div>
     %end;
     %if;(browsing_with_sosa_ref and b.visitor_access!="no")
       <div class="text-center">%apply;display_sosa_ref%with;%sosa_ref;%end;</div>
@@ -224,7 +224,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
 %end;
 %if;not (b.visitor_access!="no" or wizard or friend);
     %let;lg;%lang;%in;
-  <div class="text-lg-center alert alert-danger font-weight-bold" role="alert">
+  <div class="text-lg-center alert alert-danger fw-bold" role="alert">
     <i class="fa fa-triangle-exclamation fa-fw mr-2"></i>
     <span>%apply;get_visitor_access_msg(lg)</span>
     <span class="fa fa-triangle-exclamation fa-fw"></span>
@@ -242,19 +242,19 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                 <div class="d-flex flex-grow-1">
                   <div class="d-flex align-items-center ml-1 mr-2">
                     <abbr data-toggle="tooltip" data-placement="top" data-html="true"
-                       title="<div class='text-left font-weight-bold'><h5>[*search format][:]</h5>
+                       title="<div class='text-left fw-bold'><h5>[*search format][:]</h5>
                               1. [*person/persons]0[:]<br>
                                  a. [first name/first names]2 [surname/surnames]0 ¹<br>
-                                     <i class='font-weight-lighter'>John Doe</i><br><br>
+                                     <i class='fw-lighter'>John Doe</i><br><br>
                                  b. [first name/first names]2/[surname/surnames]0 ²/[occ]1 ³<br>
-                                     <i class='font-weight-lighter'>James William/Smith-Johnson/2<br>       James William/Smith-Johnson<br>
+                                     <i class='fw-lighter'>James William/Smith-Johnson/2<br>       James William/Smith-Johnson<br>
                                      James William/<br>       /Smith-Jonhson</i><br><br>
-                              2. [*surname/surnames]0 ¹[:] <i class='font-weight-lighter'>Doe</i><br><br>
-                              3. [*public name][:] <i class='font-weight-lighter'>James Smith</i><br><br>
-                              4. [*alias][:] <i class='font-weight-lighter'>Jimmy</i><br><br>
+                              2. [*surname/surnames]0 ¹[:] <i class='fw-lighter'>Doe</i><br><br>
+                              3. [*public name][:] <i class='fw-lighter'>James Smith</i><br><br>
+                              4. [*alias][:] <i class='fw-lighter'>Jimmy</i><br><br>
                               5. [*key]0[:] [first name/first names]2.[occ]1 [surname/surnames]0 ²<br>
-                                     <i class='font-weight-lighter'>James William.2 Smith-Johnson<br>       james william.2 smith johnson</i><br>
-                              <br><div class='font-weight-lighter small'>¹ [word/words]0<br>² [word/words]1<br>³ [optional/mandatory]0</div></div>">
+                                     <i class='fw-lighter'>James William.2 Smith-Johnson<br>       james william.2 smith johnson</i><br>
+                              <br><div class='fw-lighter small'>¹ [word/words]0<br>² [word/words]1<br>³ [optional/mandatory]0</div></div>">
                       <i class="far fa-circle-question text-primary text-primary"></i>
                     </abbr>
                   </div>
@@ -302,7 +302,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
               </div>
               <div class="d-flex flex-column align-items-center justify-content-between mt-3 mt-md-0 mx-0 mx-md-1 px-0 px-md-3 col-md-auto small">
                 <div class="d-flex flex-row flex-md-column justify-content-start mb-3 mb-md-0">
-                  <div class="align-self-md-start font-weight-bold mr-3 mr-md-0 mb-0 mb-md-1">[*first name/first names]1[:]</div>
+                  <div class="align-self-md-start fw-bold mr-3 mr-md-0 mb-0 mb-md-1">[*first name/first names]1[:]</div>
                   <div class="d-flex flex-row flex-md-column">
                     <div class="custom-control custom-checkbox mr-3 mr-md-0 mb-md-1" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*order hlp]">
                       <input class="custom-control-input" type="checkbox" name="p_order" id="p_order" value="on" tabindex="6">
@@ -314,7 +314,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                     </div>
                   </div>
                 </div>
-                <button id="global-search-inline" class="%if;(b.propose_titles!="no")d-none %end;btn btn-outline-primary font-weight-bolder w-100 w-md-auto py-2 mb-1"
+                <button id="global-search-inline" class="%if;(b.propose_titles!="no")d-none %end;btn btn-outline-primary fw-bolder w-100 w-md-auto py-2 mb-1"
                   type="submit"%if;(b.propose_titles="no") tabindex="7"%end;>
                   <i class="fa fa-magnifying-glass fa-lg fa-fw"></i>
                   [*search/case sensitive]0
@@ -365,7 +365,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           </form>
         %end;
         %if;(b.propose_titles!="no")
-          <button id="global-search" class="btn btn-outline-primary font-weight-bolder col-12 col-md-auto mt-1 mt-md-0%sp;
+          <button id="global-search" class="btn btn-outline-primary fw-bolder col-12 col-md-auto mt-1 mt-md-0%sp;
             %if;(b.propose_titles!="no")ml-md-auto mr-md-2 py-2%else;py-2%end;"
             type="submit" tabindex="%if;(b.propose_titles!="no")9%else;7%end;"
             data-toggle="tooltip" data-placement="right">

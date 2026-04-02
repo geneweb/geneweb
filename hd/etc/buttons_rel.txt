@@ -27,7 +27,7 @@
       %elseif;(e.m!="RL")
         <span class="%if;(e.et="S") border rounded%end;"
           title="[*shortest path]" aria-disabled="true">%nn;
-          <i class="fas fa-bezier-curve fa-fw text-muted"></i>%nn;
+          <i class="fas fa-bezier-curve fa-fw text-body-secondary"></i>%nn;
         </span>
       %end;
     %end;

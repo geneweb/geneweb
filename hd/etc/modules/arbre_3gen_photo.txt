@@ -56,7 +56,7 @@
   %elseif;(b.default_image="yes")
     <img height="75" src="%images_prefix;img_unknown_%if;(xx.sex=1)wo%end;man.png" alt="[missing image]">
   %(%else;
-    <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted"
+    <span class="image_small_size rounded px-3 pt-1 pb-2 text-body-secondary"
       %if;(father.has_parents and mother.has_image)%father.image_small_size;
       %elseif;(mother.has_parents and father.has_image)%mother.image_small_size;%end;>?</span>%)
   %end;
@@ -85,7 +85,7 @@
       %if;father.has_parents;
         <td></td>
         <td colspan="2">%apply;vt("father.father","","",vtbr)</td>
-        <td colspan="3" class="small align-text-center text-center font-italic col-1 px-1">%nn;
+        <td colspan="3" class="small align-text-center text-center fst-italic col-1 px-1">%nn;
           %apply;display_date_marriage_parent("father")</td>
         <td colspan="2">%apply;vt("father.mother","","",vtbr)</td>
         <td></td>
@@ -94,7 +94,7 @@
       %if;mother.has_parents;
         <td></td>
         <td colspan="2">%apply;vt("mother.father","","",vtbr)</td>
-        <td colspan="3" class="small align-text-center text-center font-italic col-1 px-1">%nn;
+        <td colspan="3" class="small align-text-center text-center fst-italic col-1 px-1">%nn;
           %apply;display_date_marriage_parent("mother")</td>
         <td colspan="2">%apply;vt("mother.mother","","",vtbr)</td>
         <td></td>
@@ -155,7 +155,7 @@
       <td colspan="3"></td>
       <td colspan="3">%apply;vt("father","","",1)</td>
       <td colspan="1"></td>
-      <td colspan="5" class="small align-text-center text-center font-italic col-1 px-0">%nn;
+      <td colspan="5" class="small align-text-center text-center fst-italic col-1 px-0">%nn;
         %apply;display_date_marriage_parent("self")%nn;
       </td>
       <td colspan="1"></td>

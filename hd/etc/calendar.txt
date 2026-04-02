@@ -76,7 +76,7 @@
 <div class="row mt-4 mb-2">
   <div class="col text-center">
     <h4 class="mb-1">[*calendar/calendars]1</h4>
-    <span class="text-muted" style="font-size:1.1rem">
+    <span class="text-body-secondary" style="font-size:1.1rem">
       %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;%nn;
       %if;(date.julian_day = today.julian_day) &mdash; %time;%end;
     </span>
@@ -92,8 +92,8 @@
 
   <div class="card mb-3 border-success">
     <div class="card-header bg-light py-2 px-3">
-      <span class="font-weight-bold text-success">[*gregorian/julian/french/hebrew]0</span>
-      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; 1582</span>
+      <span class="fw-bold text-success">[*gregorian/julian/french/hebrew]0</span>
+      <span class="small text-body-secondary fw-normal d-none d-sm-inline ml-2">&mdash; 1582</span>
     </div>
     <div class="card-body py-2 px-3">
       <table class="mx-auto"><tr>
@@ -104,8 +104,8 @@
 
   <div class="card mb-3 border-primary">
     <div class="card-header bg-light py-2 px-3">
-      <span class="font-weight-bold text-primary">[*gregorian/julian/french/hebrew]1</span>
-      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; 45 BC / Old Style</span>
+      <span class="fw-bold text-primary">[*gregorian/julian/french/hebrew]1</span>
+      <span class="small text-body-secondary fw-normal d-none d-sm-inline ml-2">&mdash; 45 BC / Old Style</span>
     </div>
     <div class="card-body py-2 px-3">
       <table class="mx-auto"><tr>
@@ -116,8 +116,8 @@
 
   <div class="card mb-3 border-danger">
     <div class="card-header bg-light py-2 px-3">
-      <span class="font-weight-bold text-danger">[*gregorian/julian/french/hebrew]2</span>
-      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; An I (1792) &ndash; XIV (1805)</span>
+      <span class="fw-bold text-danger">[*gregorian/julian/french/hebrew]2</span>
+      <span class="small text-body-secondary fw-normal d-none d-sm-inline ml-2">&mdash; An I (1792) &ndash; XIV (1805)</span>
     </div>
     <div class="card-body py-2 px-3">
       <table class="mx-auto"><tr>
@@ -128,8 +128,8 @@
 
   <div class="card mb-3 border-warning">
     <div class="card-header bg-light py-2 px-3">
-      <span class="font-weight-bold text-warning">[*gregorian/julian/french/hebrew]3</span>
-      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; Hillel II (~358) / 19y Metonic</span>
+      <span class="fw-bold text-warning">[*gregorian/julian/french/hebrew]3</span>
+      <span class="small text-body-secondary fw-normal d-none d-sm-inline ml-2">&mdash; Hillel II (~358) / 19y Metonic</span>
     </div>
     <div class="card-body py-2 px-3">
       <table class="mx-auto"><tr>
@@ -150,7 +150,7 @@
 
       <div class="mx-4 my-2 text-center">
         <div class="moon-vis" id="moonVis"></div>
-        <div class="small text-muted mt-1">
+        <div class="small text-body-secondary mt-1">
           %if;(date.moon_phase.index != 0)
             %apply;capitalize%with;%nn;
               %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
@@ -162,15 +162,15 @@
 
       <div class="mx-4 my-2 text-center">
         <div style="font-size:2rem;line-height:1">%date.moon_age;</div>
-        <div class="small text-muted">[*moon age/new moon/first quarter/full moon/last quarter]0</div>
+        <div class="small text-body-secondary">[*moon age/new moon/first quarter/full moon/last quarter]0</div>
       </div>
 
       <div class="mx-4 my-2 text-center">
-        <div class="text-monospace" style="font-size:1.4rem">
+        <div class="font-monospace" style="font-size:1.4rem">
           %if;(date.julian_day < 1000)%date.julian_day;
           %else;%date.julian_day.sep1000;%end;
         </div>
-        <div class="small text-muted">
+        <div class="small text-body-secondary">
           [*julian day]
           <span title="Fliegel & Van Flandern, CACM 1968 &#10;Epoch: 1 Jan 4713 BC (Julian), noon UT" style="cursor:help">&#9432;</span>
         </div>
