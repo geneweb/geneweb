@@ -52,11 +52,11 @@
   </div>
 %end;
 <div class="container">
-  <a tabindex="4" class="sr-only sr-only-focusable" href="#main-content">[*skip to main content]</a>
+  <a tabindex="4" class="visually-hidden visually-hidden-focusable" href="#main-content">[*skip to main content]</a>
   %let;len_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
   %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
   <nav class="navbar bg-light sticky-top justify-content-start py-1 mt-1 mb-0 px-1 mx-0" aria-labelledby="sub-caracter-selection-heading" id="fixed-nav">
-    <h2 id="sub-caracter-selection-heading" class="sr-only">
+    <h2 id="sub-caracter-selection-heading" class="visually-hidden">
       %if;(e.s="")[*select a letter]%else;[*hierarchical navigation]%end;
     </h2>
     <div class="btn-group" role="toolbar" aria-label="sub-caracter-selection-heading" id="book-navigation">
@@ -270,9 +270,9 @@
                             %if;(first)
                               %escape.other;<br><span class="ml-4">%escape.suburb;</span>
                             %else;
-                              <span class="sr-only">%escape.printable.other (</span>%nn;
+                              <span class="visually-hidden">%escape.printable.other (</span>%nn;
                               <span class="ml-4">%escape.suburb;</span>%nn;
-                              <span class="sr-only">)</span>
+                              <span class="visually-hidden">)</span>
                             %end;
                           %else;
                             %if;(e.data!="src")%escape.entry_value;%else;<span class="ml-3">%entry_value;</span>%end;

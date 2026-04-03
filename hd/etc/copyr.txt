@@ -83,9 +83,9 @@
             title="%apply;language_name(lang) – [*select lang]">
             <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="sr-only">lang</span>
+              <span class="visually-hidden">lang</span>
               <span class="text-uppercase">%lang;</span>
-              <span class="sr-only">, [select lang]</span>
+              <span class="visually-hidden">, [select lang]</span>
             </button>
             %if;(not is_printed_by_template)
               <div class="dropdown-menu scrollable-lang short" role="menu" aria-labelledby="dropdownMenu1">
@@ -165,7 +165,7 @@
             data-toggle="tooltip"
             title="%if;(e.templ!="templm")templm%else;default template%end;">%nn;
             <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
-            <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
+            <span class="visually-hidden">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
           </a>%nn;
           %if;predictable_mode;GeneWeb %version_short;
           %else;

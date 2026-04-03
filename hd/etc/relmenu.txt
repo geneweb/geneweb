@@ -124,11 +124,11 @@
           <label class="custom-control-label" for="radio_R">[*search/case sensitive]0 [any individual in the base][:]</label>
         </div>
         <div>
-          <label class="sr-only" for="pn">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
+          <label class="visually-hidden" for="pn">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
           <input type="search" id="pn" class="form-control mt-2" name="pn" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…" autofocus>
-          <label class="sr-only" for="firstname">[*first name/first names]0</label>
+          <label class="visually-hidden" for="firstname">[*first name/first names]0</label>
           <input type="search" id="firstname" class="form-control mt-2" name="p" placeholder="[*first name/first names]0">
-          <label class="sr-only" for="surname">[*surname/surnames]0</label>
+          <label class="visually-hidden" for="surname">[*surname/surnames]0</label>
           <input type="search" id="surname" class="form-control mt-2" name="n" placeholder="[*surname/surnames]0">
         </div>
       </div>

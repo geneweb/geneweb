@@ -129,7 +129,7 @@ function missing_events_options () {
     <div class="d-flex flex-column">
       <div class="d-flex flex-column">
         <div class="d-flex flex-column was-validated">
-          <label class="sr-only" for="v">[*specify::generation/generations]0[:]</label>
+          <label class="visually-hidden" for="v">[*specify::generation/generations]0[:]</label>
           <select class="custom-select" id="v" name="v" required
             title="[up to] 2^n-2 / [only] 2^(n-1)">
             <option value="" label=" "></option>

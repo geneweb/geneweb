@@ -94,7 +94,7 @@
         <a role="button" onclick="implex('%pp.sosa.v;')"
           title="[*implex/implexes]0, [see above] [*Sosa] %pp.sosa;">%end;
           <i class="fa fa-shuffle fa-fw fa-sm mx-1" aria-hidden="true"></i>
-          <span class="sr-only"> (==) </span>
+          <span class="visually-hidden"> (==) </span>
       %if;(not cancel_links)</a>%end;
     %end;
     <br>
@@ -105,7 +105,7 @@
   %end;
 %end;
 %define;input(xx)
-  <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
+  <label class="visually-hidden mt-2" for="inputxx">Filtre xx</label>
   <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control ml-1%if;(xx!=1) d-none%end;" disabled>
 %end;
 %define;definecujus(pp,nn)
