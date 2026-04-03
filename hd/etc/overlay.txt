@@ -1,7 +1,7 @@
 <div class="loading-overlay hidden">
   <div class="text-center">
     <div class="spinner-border text-light mb-3" role="status">
-      <span class="sr-only">Loading…</span>
+      <span class="visually-hidden">Loading…</span>
     </div>
     <h4>[*waiting overlay]0</h4>
     <p>[*waiting overlay]1</p>

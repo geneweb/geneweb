@@ -910,7 +910,7 @@ let print_new_note_input conf =
   let plh = Utf8.capitalize_fst (transl_nth conf "new note name" 0) in
   Output.printf conf
     {|<div class="row mb-3">
-  <label class="col-sm-2 col-form-label sr-only" for="new_f">%s</label>
+  <label class="col-sm-2 col-form-label visually-hidden" for="new_f">%s</label>
   <div class="col-sm-7">
     <input type="text" class="form-control form-control-lg" placeholder="%s"
       name="new_f" id="new_f" tabindex="4" autofocus required>

@@ -368,7 +368,7 @@ function table_spouse_disabled () {
           </div>
         </div>
         <div class="order-1">
-          <label class="sr-only" for="v">[*generation/generations]1[:]</label>
+          <label class="visually-hidden" for="v">[*generation/generations]1[:]</label>
           <select class="custom-select" id="v" name="v" required>
             <option value="" disabled selected>[*specify::generation/generations]0…</option>
             %foreach;descendant_level;

@@ -40,7 +40,7 @@
             <a id="load_once_p_mod" class="nav-link dropdown-toggle text-secondary dropdown-toggle-split" data-toggle="dropdown"
               href="#" role="button" aria-haspopup="true" aria-expanded="false" title="[*module]1">%nn;
               <span class="fas fa-address-card fa-fw mr-1" aria-hidden="true"></span>%nn;
-              <span class="sr-only">[*module]1</span></a>
+              <span class="visually-hidden">[*module]1</span></a>
             <div class="dropdown-menu dropdown-menu-transl-pmod">
               <div class="d-flex justify-content-around mx-1">
                 <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
@@ -86,7 +86,7 @@
                         href="%if;(e.wide!="")%url_set.wide;%else;%url_set.wide.on;%end;"
                         title="%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
                         <i class="fa fa-desktop fa-fw" aria-hidden="true"></i>%nn;
-                        <span class="sr-only">%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span></a>
+                        <span class="visually-hidden">%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span></a>
                     </div>
                   </div>
                   <div class="mx-2 mt-2">[*select module]</div>
@@ -110,20 +110,20 @@
                 <a class="nav-link text-secondary"
                   href="%if;(sosa_prev="? ?")%apply;url_set%with;m/i/p/n/oc%and;/%sosa_prev.index;///%end;%else;
                   %apply;url_set%with;m/i/p/n/oc%and;//%sosa_prev.first_name;/%sosa_prev.surname;/%sosa_prev.occ;%end;%end;"
-                  title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev; %sosa_prev.dates_notag;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="sr-only">&lt;</span></a>%nn;
+                  title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev; %sosa_prev.dates_notag;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="visually-hidden">&lt;</span></a>%nn;
               </li>
             %end;
             %if;(sosa_next.index!="")
               %if;(sosa_prev.index="")
                 <li class="nav-item" title="Sosa 1[:] %self; ">
-                  <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"><span class="far fa-circle-dot" aria-hidden="true"></span><span class="sr-only">·</span></a>%nn;
+                  <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"><span class="far fa-circle-dot" aria-hidden="true"></span><span class="visually-hidden">·</span></a>%nn;
                 </li>
               %end;
               <li class="nav-item">
                 <a class="nav-link text-secondary"
                   href="%if;(sosa_next="? ?")%apply;url_set%with;m/i/n/p/oc%and;/%sosa_next.index;///%end;%else;
                   %apply;url_set%with;m/i/p/n/oc%and;//%sosa_next.first_name_key;/%sosa_next.surname_key;/%sosa_next.occ;%end;%end;"
-                  title="[Sosa] %sosa_next.sosa;[:] %sosa_next; %sosa_next.dates_notag;"><span class="fa fa-chevron-right" aria-hidden="true"></span><span class="sr-only">></span></a>
+                  title="[Sosa] %sosa_next.sosa;[:] %sosa_next; %sosa_next.dates_notag;"><span class="fa fa-chevron-right" aria-hidden="true"></span><span class="visually-hidden">></span></a>
               </li>
             %end;
           %end;
@@ -135,7 +135,7 @@
                 <sup><span class="fa fa-user male" aria-hidden="true"></span></sup>%nn;
                 <sub><span class="fa fa-plus %sexcolor;" aria-hidden="true"></span></sub>%nn;
                 <sup><span class="fa fa-user female" aria-hidden="true"></span></sup>%nn;
-                <span class="sr-only">[*add::parents] [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)</span></a>
+                <span class="visually-hidden">[*add::parents] [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)</span></a>
             </li>
           %end;
           %( SELF button %)
@@ -143,14 +143,14 @@
             <a class="nav-link %if;(e.m="")active bg-light%end;" id="self"
               href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">%nn;
               <span class="fa fa-user-large fa-fw %sexcolor;" aria-hidden="true"></span>
-              <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span></a>
+              <span class="visually-hidden">%first_name;%if;(occ!=0).%occ%end; %surname;</span></a>
           </li>
           %( WIZARD | MOD_IND button %)
           %if;(iswiz=1)
             <li class="nav-item">
               <a class="nav-link %if;(e.m="MOD_IND" or e.m="MOD_IND_OK")active%end;" id="mod_ind" href="%prefix;m=MOD_IND&i=%index;" %laP;>%nn;
                 <span class="fa fa-user-pen fa-fw %sexcolor;" aria-hidden="true"></span>
-                <span class="sr-only">[*modify::person/persons]0 (P)</span></a>
+                <span class="visually-hidden">[*modify::person/persons]0 (P)</span></a>
             </li>
           %end;
           %( IND dropdown menu %)
@@ -163,7 +163,7 @@
                 %elseif;(is_public or (b.public_if_titles="yes" and has_titles))text-success%nn;
                 %else;text-body-secondary%nn;
                 %end;" aria-hidden="true"></span>%nn;
-              <span class="sr-only">[*tools] [person/persons]0</span></a>
+              <span class="visually-hidden">[*tools] [person/persons]0</span></a>
             <div class="dropdown-menu dropdown-menu-transl">
               %if;(wizard and b.wizard_passwd_file!="")
                 <a class="dropdown-item %if;(not has_wiznotes)text-danger%end;"
@@ -314,16 +314,16 @@
                 %if;(not is_male and not is_female)
                     <a class="nav-link" href="%prefix;m=ADD_FAM&ip=%index;&sex=M" title="[*add::relation/relations]0 ([M/F]0)">%nn;
                       <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user male"></span></span>%nn;
-                      <span class="sr-only">[*add::relation/relations]0 ([M/F]0)</span></a>
+                      <span class="visually-hidden">[*add::relation/relations]0 ([M/F]0)</span></a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="%prefix;m=ADD_FAM&ip=%index;&sex=F" title="[*add::relation/relations]0 ([M/F]1)">%nn;
                       <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user female"></span></span>%nn;
-                      <span class="sr-only">[*add::relation/relations]0 ([M/F]1)</span></a>
+                      <span class="visually-hidden">[*add::relation/relations]0 ([M/F]1)</span></a>
                 %else;
                   <a class="nav-link %if;(e.m="ADD_FAM")active%end;" id="add_fam" href="%prefix;m=ADD_FAM&ip=%index;" %laA;>%nn;
                     <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user %apply;othersexcolor(sex)"></span></span>%nn;
-                    <span class="sr-only">[*add::family/families]0 (A)</span></a>
+                    <span class="visually-hidden">[*add::family/families]0 (A)</span></a>
                 %end;
              </li>
             %else;
@@ -335,7 +335,7 @@
                     title="[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)"
                     accesskey="%a_k;">%nn;
                     <span class="fa fa-user-pen %sexcolor;" aria-hidden="true"></span><span class="fa fa-user %apply;spousesexcolor(spouse.sex)" aria-hidden="true"></span>%if;(nb_families!=1)<span class="small align-top"><sup>%family_cnt;</sup></span>%end;
-                    <span class="sr-only"> [*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span></a>
+                    <span class="visually-hidden"> [*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span></a>
                 </li>
               %end;
               %( Family dropdown menu %)
@@ -347,7 +347,7 @@
                    title="[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;">%nn;
                    <span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
                    <span class="fa fa-user-gear" aria-hidden="true"></span>%nn;
-                   <span class="sr-only">[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;</span></a>
+                   <span class="visually-hidden">[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;</span></a>
                 <div class="dropdown-menu dropdown-menu-transl">
                   %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
                   %elseif;(not is_male and not is_female)
@@ -362,7 +362,7 @@
                       <a class="dropdown-item" href="%prefix;m=INV_FAM&i=%index;&f=%family.index;"
                         title="[*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;">%nn;
                         <span class="fa fa-right-left fa-rotate-90 fa-fw mr-1"></span> [*invert::family/families]1%nn;
-                        <span class="sr-only"> %expr(family_cnt-1) [and] %family_cnt;</span></a>
+                        <span class="visually-hidden"> %expr(family_cnt-1) [and] %family_cnt;</span></a>
                       <div class="dropdown-divider"></div>
                     %end;
                     <span class="dropdown-header">[*marriage with] %spouse;</span>
@@ -459,7 +459,7 @@
                 data-i="%index;" data-p="%first_name_key;" data-n="%surname_key"%if;(occ!=0) data-oc="%occ;"%end;%sp;
                 data-self="%self; %dates_notag;">[*multi relations graph]</span>
               <div class="form-group px-3 mb-2">
-                <label for="description" class="sr-only">[*description]</label>
+                <label for="description" class="visually-hidden">[*description]</label>
                 <input type="text" id="description" class="form-control" placeholder="[*description]" title="&t=…">
               </div>
               <div class="btn-group d-flex pr-3" role="group">
@@ -469,7 +469,7 @@
                 </button>
                 <button class="dropdown-item col-1 pl-1 d-none" title="[*add/clear/show/edit the graph]1" id="clearGraphButton">
                   <i class="fa fa-trash-can fa-fw text-danger" aria-hidden="true"></i>
-                  <span class="sr-only">[*add/clear/show/edit the graph]1</span>
+                  <span class="visually-hidden">[*add/clear/show/edit the graph]1</span>
                 </button>
               </div>
               <div class="d-none" id="graphButtons">
@@ -479,7 +479,7 @@
                     <span>[*add/clear/show/edit the graph]2</span></a>
                   <a class="dropdown-item col-1 pl-1" title="[*add/clear/show/edit the graph]3" id="editGraphButton">
                     <i class="far fa-pen-to-square fa-fw" aria-hidden="true"></i>
-                    <span class="sr-only">[*add/clear/show/edit the graph]3</span></a>
+                    <span class="visually-hidden">[*add/clear/show/edit the graph]3</span></a>
                 </div>
               </div>
             </div>
@@ -491,14 +491,14 @@
                 title="[*display carrousel]">%nn;
                 <span class="far fa-image fa-fw mr-1" aria-hidden="true"></span>%nn;
                 <sup class="small">%carrousel_img_nbr;</sup>%nn;
-                <span class="sr-only">[*image/images]1</span></a>
+                <span class="visually-hidden">[*image/images]1</span></a>
             </li>
           %end;
           %if;(wizard and carrousel_img_nbr=0)
             <li class="nav-item">
               <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>%nn;
                 <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
-                <span class="sr-only">icon button</span></a>
+                <span class="visually-hidden">icon button</span></a>
             </li>
           %end;
           %( Linked notes bouton with count %)
@@ -508,7 +508,7 @@
                 title="[*linked pages help]">%nn;
                 <i class="fa fa-file-lines fa-fw" aria-hidden="true"></i>%nn;
                 <sup class="small">%linked_pages_nbr;</sup>%nn;
-                <span class="sr-only">file-lines icon</span></a>
+                <span class="visually-hidden">file-lines icon</span></a>
             </li>
             %if;(nb_linked_pages_type.gallery>0)
               <li class="nav-item">
@@ -518,7 +518,7 @@
                   %let;nbalb;%nb_linked_pages_type.album;%in;
                   <sup class="small">%nb_linked_pages_type.gallery;
                   %if;(nbalb!=0)+%nbalb;%end;</sup>
-                  <span class="sr-only">images icon</span></a>
+                  <span class="visually-hidden">images icon</span></a>
               </li>
             %end;
           %end;

@@ -28,7 +28,7 @@
   %include;buttons
 %end;
 %define;input(xx)
-  <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
+  <label class="visually-hidden mt-2" for="inputxx">Filtre xx</label>
   <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control ml-1%if;(xx!=1) d-none%end;" disabled>
 %end;
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
@@ -126,9 +126,9 @@
       %end;
       %if;(spouse.is_descendant and evar.implx="")
         %if;(not cancel_links)
-          <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i><span class="sr-only"> (==)</span></a>
+          <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i><span class="visually-hidden"> (==)</span></a>
         %else;
-          <i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i><span class="sr-only"> (==)</span>
+          <i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i><span class="visually-hidden"> (==)</span>
         %end;
       %end;
       </span>
@@ -225,10 +225,10 @@
     %( these children will not appear even though asking for desc up to generation n %)
     %if;(not cancel_links)
       <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i>%nn;
-        <span class="sr-only"> (==)</span></a>
+        <span class="visually-hidden"> (==)</span></a>
     %else;
       <i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i>%nn;
-      <span class="sr-only"> (==)</span></a>
+      <span class="visually-hidden"> (==)</span></a>
     %end;
   </span>
 %end;

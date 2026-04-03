@@ -11,7 +11,7 @@
     <input type="hidden" name="b" value="%bname_token;">
   %end;
   <div class="form-inline">
-    <label class="sr-only" for="k">[*place/places]0 (k)</label>
+    <label class="visually-hidden" for="k">[*place/places]0 (k)</label>
     <input type="search" class="form-control col-4 ml-2" name="k"
       id="k" value="%evar.k;"
       placeholder="%if;(evar.k!="")%evar.k;%else;[*place/places]0%end;">
