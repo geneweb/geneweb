@@ -309,7 +309,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                   </div>
                 </div>
                 <button id="global-search-inline" class="%if;(b.propose_titles!="no")d-none %end;btn btn-outline-primary fw-bolder w-100 w-md-auto py-2 mb-1"
-                  type="submit"%if;(b.propose_titles="no") tabindex="7"%end;>
+                  type="submit"%if;(b.propose_titles="no") tabindex="7"%end; >
                   <i class="fa fa-magnifying-glass fa-lg fa-fw"></i>
                   [*search/case sensitive]0
                 </button>
@@ -363,7 +363,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <button id="global-search" class="btn btn-outline-primary fw-bolder col-12 col-md-auto mt-1 mt-md-0%sp;
             %if;(b.propose_titles!="no")ms-md-auto me-md-2 py-2%else;py-2%end;"
             type="submit" tabindex="%if;(b.propose_titles!="no")9%else;7%end;"
-            data-bs-toggle="tooltip" data-bs-placement="right">
+            data-bs-toggle="tooltip" data-bs-placement="right" title="[*search/case sensitive]0">
             <i class="fa fa-magnifying-glass fa-lg fa-fw"></i>
             [*search/case sensitive]0
           </button>
