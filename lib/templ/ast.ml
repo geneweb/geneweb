@@ -147,14 +147,18 @@ let rec subst_desc sf desc =
   | Atext s -> Atext (sf s)
   | Avar (s, sl) -> (
       let s1 = sf s in
-      if
-        sl = []
-        &&
-          try
-            let _ = int_of_string s1 in
-            true
-          with Failure _ -> false
-      then Aint s1
+      let is_number s =
+        let len = String.length s in
+        if len = 0 then false
+        else
+          let start = if s.[0] = '-' then 1 else 0 in
+          start < len
+          && (let rec loop i =
+                i >= len || (s.[i] >= '0' && s.[i] <= '9' && loop (i + 1))
+              in
+              loop start)
+      in
+      if sl = [] && is_number s1 then Aint s1
       else
         let sl1 = List.map sf sl in
         match String.split_on_char '.' s1 with
