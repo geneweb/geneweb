@@ -368,16 +368,13 @@ let format_date_with_gregorian_precisions ~sep ~conf ~calendar d =
 (* ************************************************************************ *)
 
 (** [Description] : Traduit en fonction du calendrier, le mois et/ou l'année
-                    d'une date et renvoie le triplet conformément au format
-                    de la date.
-    [Args] :
-      - conf : configuration de la base
-      - (fst, snd, trd) : la date au bon format
-      - cal : calendar
-      - short : booléen pour savoir si on affiche au format court, e.g.
-                VD/Vendémiaire
-    [Retour] : (string * string * string) : date traduite
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+    d'une date et renvoie le triplet conformément au format de la date. [Args] :
+    - conf : configuration de la base
+    - (fst, snd, trd) : la date au bon format
+    - cal : calendar
+    - short : booléen pour savoir si on affiche au format court, e.g.
+      VD/Vendémiaire [Retour] : (string * string * string) : date traduite [Rem]
+      : Non exporté en clair hors de ce module. *)
 let translate_dmy conf (fst, snd, trd) cal short =
   let translate_month m =
     match cal with
@@ -410,13 +407,12 @@ let translate_dmy conf (fst, snd, trd) cal short =
   | "mmddyyyy" -> (translate_month fst, snd, translate_year trd)
   | _ -> (fst, translate_month snd, translate_year trd)
 
-(** [decode_dmy conf dmy]
-    Returns a triplet corresponding to day/month/year, arranged in
-    the order defined by [!dates order] keyword in the lexicon.
-    Supported formats are: "dmyyyy" / "mmddyyyy" / "yyyymmdd" / "ddmmyyyy" and "ddmmyy".
-    NB: "yy" and "yyyy" variants will produce the same output ([string_of_int] without padding)
-    If the format is not supported "ddmmyyyy" is used.
-*)
+(** [decode_dmy conf dmy] Returns a triplet corresponding to day/month/year,
+    arranged in the order defined by [!dates order] keyword in the lexicon.
+    Supported formats are: "dmyyyy" / "mmddyyyy" / "yyyymmdd" / "ddmmyyyy" and
+    "ddmmyy". NB: "yy" and "yyyy" variants will produce the same output
+    ([string_of_int] without padding) If the format is not supported "ddmmyyyy"
+    is used. *)
 let decode_dmy conf d =
   match Util.transl conf "!dates order" with
   | "dmyyyy" ->
@@ -574,18 +570,18 @@ let string_of_age conf a =
 
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie la précision d'une date.
-    [Args] :
-      - conf : configuration de la base
-      - d    : Date.dmy
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Renvoie la précision d'une date. [Args] :
+    - conf : configuration de la base
+    - d : Date.dmy [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let prec_text conf d =
   match d.Date.prec with
   | Date.About -> (
       (* On utilise le dictionnaire pour être sur *)
       (* que ce soit compréhensible de tous.      *)
-      match Util.transl conf "about (short date)" with "ca" -> "ca " | s -> s)
+      match Util.transl conf "about (short date)" with
+      | "ca" -> "ca "
+      | s -> s)
   | Date.Maybe -> "?"
   | Date.Before -> "<"
   | Date.After -> ">"
@@ -598,11 +594,9 @@ let prec_text conf d =
 
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie le mois d'une date.
-    [Args] :
-      - d : Date.dmy
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Renvoie le mois d'une date. [Args] :
+    - d : Date.dmy [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let month_text d = if d.Date.month = 0 then "" else string_of_int d.Date.month
 
 (* ************************************************************************ *)
@@ -610,11 +604,9 @@ let month_text d = if d.Date.month = 0 then "" else string_of_int d.Date.month
 
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie l'année d'une date.
-    [Args] :
-      - d : Date.dmy
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Renvoie l'année d'une date. [Args] :
+    - d : Date.dmy [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let year_text d =
   match d.Date.prec with
   | Date.OrYear d2 when d.Date.year <> d2.Date.year2 ->
@@ -632,10 +624,9 @@ let year_text d =
 
 (** [Description] : Renvoie la précision d'une date et l'année de la date.
     [Args] :
-      - conf : configuration de la base
-      - d    : Date.dmy
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    - conf : configuration de la base
+    - d : Date.dmy [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let prec_year_text conf d =
   let s =
     match d.Date.prec with
@@ -661,21 +652,16 @@ let prec_year_text conf d =
 
 (* ********************************************************************** *)
 
-(** [Description] : Renvoie la concatenation de l'année de naissance et
-      l'année de décès (si trouvée par get_birth_death_date). La précision
-      de la date est ajoutée pour chaque année.
-      L'affichage est le suivant :
-        * 1700-1780 (date naissance - date décès)
-        * 1700-     (naissance - décédé)
-        * 1700      (naissance - vivant)
-        * †1780     (pas date naissance - date décès)
-        * †         (pas date naissance - décédé)
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+(** [Description] : Renvoie la concatenation de l'année de naissance et l'année
+    de décès (si trouvée par get_birth_death_date). La précision de la date est
+    ajoutée pour chaque année. L'affichage est le suivant : * 1700-1780 (date
+    naissance - date décès) * 1700- (naissance - décédé) * 1700 (naissance -
+    vivant) * †1780 (pas date naissance - date décès) * † (pas date naissance -
+    décédé) [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let short_dates_text conf base p =
   Adef.safe
   @@
@@ -707,15 +693,13 @@ let short_dates_text conf base p =
 
 (* ********************************************************************** *)
 
-(** [Description] : Renvoie l'année de la date de mariage ansi que la
-                    précision de la date.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p1   : conjoint 1
-      - p2   : conjoint 2
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+(** [Description] : Renvoie l'année de la date de mariage ansi que la précision
+    de la date. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - p1 : conjoint 1
+    - p2 : conjoint 2 [Retour] : string [Rem] : Exporté en clair hors de ce
+      module. *)
 let short_marriage_date_text conf base fam p1 p2 =
   Adef.safe
   @@
