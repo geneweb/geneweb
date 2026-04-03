@@ -1,4 +1,4 @@
-<!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
+<!-- $Id: home.txt v7.1 03/04/2026 $ -->
 %define;display_sosa_ref(xx)
   [*sosa reference][:]
   <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
@@ -16,7 +16,7 @@
   <div class="d-flex flex-column fix_top fix_left home-xs">
     <a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix_no_senv;" title="[*home]">%nn;
       <i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i>%nn;
-      <i class="visually-hidden">[*home]</i>%nn;
+      <span class="visually-hidden">[*home]</span>%nn;
     </a>
     %if;(referer!="")
       <a tabindex="2" role="button" class="btn btn-sm btn-link p-0 border-0" href="%referer;" title="[*back]">%nn;
@@ -24,7 +24,7 @@
         <span class="visually-hidden">[*back]</span>%nn;
       </a>
     %end;
-    <a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-toggle="modal" data-target="#searchmodal"
+    <a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-bs-toggle="modal" data-bs-target="#searchmodal"
       accesskey="S" title="[*search/case sensitive]0">%nn;
       <i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="visually-hidden">[*search/case sensitive]0</span>%nn;
@@ -56,22 +56,22 @@
       </a>
     %end;
   </div>
-  <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+  <div class="modal" id="searchmodal" aria-labelledby="searchpopup" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-body" id="ModalSearch">
           <form id="collapse_search" method="get" action="%prefix;">
             %hidden;
             <input type="hidden" name="m" value="S">
-            <div class="d-flex flex-column flex-md-row justify-content-center">
-              <h3 class="rounded modal-title my-2 ml-3 ml-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h3>
+            <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
+              <h3 class="rounded modal-title my-2 ms-3 ms-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h3>
               <div class="col-12 col-md-8 mt-2 mt-md-0">
                 %if;(browsing_with_sosa_ref)
-                  <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
+                  <h5 class="ms-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
                 %end;
                 <label class="visually-hidden" for="fullname">Search person name</label>
                 <input type="search" id="fullname" class="form-control form-control-lg no-clear-button"
-                  name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end; [or] [key]0"
+                  name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end; [or] [key]0"
                   autofocus>
                 <label class="visually-hidden" for="p">Search firstname</label>
                 <input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2"
@@ -80,18 +80,18 @@
                 <input type="search" id="n" class="form-control form-control-lg no-clear-button mt-2"
                   name="n" placeholder="[*surname/surnames]0">
                 <div class="d-flex mt-2">
-                  <div class="ml-2">[*first name/first names]1</div>
-                  <div class="custom-control custom-checkbox ml-2 mr-3 mr-md-0 mb-md-1" data-toggle="tooltip" data-placement="bottom" title="[*order hlp]">
-                    <input class="custom-control-input" type="checkbox" name="p_order" id="p_order" value="on">
-                    <label class="custom-control-label d-flex align-items-center" for="p_order">[order]</label>
+                  <div class="ms-2">[*first name/first names]1</div>
+                  <div class="form-check ms-2 me-3 me-md-0 mb-md-1" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*order hlp]">
+                    <input class="form-check-input" type="checkbox" name="p_order" id="p_order" value="on">
+                    <label class="form-check-label d-flex align-items-center" for="p_order">[order]</label>
                   </div>
-                  <div class="custom-control custom-checkbox ml-2" data-toggle="tooltip" data-placement="bottom" title="[*not exact]1, [phonetic variants] [not exact hlp]">
-                    <input class="custom-control-input" type="checkbox" name="p_exact" id="p_exact" value="off">
-                    <label class="custom-control-label d-flex align-items-center" for="p_exact">[not exact]0</label>
+                  <div class="form-check ms-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*not exact]1, [phonetic variants] [not exact hlp]">
+                    <input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="off">
+                    <label class="form-check-label d-flex align-items-center" for="p_exact">[not exact]0</label>
                   </div>
                 </div>
               </div>
-              <button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> [*search/case sensitive]0</button>
+              <button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> [*search/case sensitive]0</button>
             </div>
           </form>
         </div>
