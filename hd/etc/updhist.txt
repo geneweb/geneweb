@@ -106,7 +106,7 @@
             %if;(first_name!="" and person.has_history)
               <a href="%prefix;m=HIST_DIFF&t=SUM&f=%person.history_file;">
                 <i class="fa fa-clock-rotate-left fa-fw" aria-hidden="true" title="[*visualize/show/hide/summary]1 [history]"></i>
-                <span class="sr-only">[history]</span></a>
+                <span class="visually-hidden">[history]</span></a>
             %else;
               &nbsp;
             %end;

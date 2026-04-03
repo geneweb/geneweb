@@ -3473,7 +3473,7 @@ let print_loading_overlay conf ?custom_translation_key () =
     {|<div class="loading-overlay hidden">
   <div class="text-center">
     <div class="spinner-border text-light mb-3" role="status">
-      <span class="sr-only">Loading…</span>
+      <span class="visually-hidden">Loading…</span>
     </div>
     <h4>%s</h4>
     <p>%s</p>

@@ -102,7 +102,7 @@
       %end;
     </div>
     <div class="col-10 col-lg ml-auto form-inline">
-      <label for="xvar_prec" class="sr-only col-form-label">[precision]0</label>
+      <label for="xvar_prec" class="visually-hidden col-form-label">[precision]0</label>
       <select class="form-control pl-lg-1 pr-lg-0 px-xl-2" name="xvar_prec" id="xvar_prec">
         %(<option value="-"%if;(xdt.prec="") selected%end;>&nbsp;</option>%)
         <option value="sure"%if;(xdt.prec="sure") selected%end;>[exact]0</option>
@@ -113,7 +113,7 @@
         <option value="oryear"%if;(xdt.prec="oryear") selected%end;>…[or]…</option>
         <option value="yearint"%if;(xdt.prec="yearint") selected%end;>…[between (date)]…</option>
       </select>
-      <label for="xvar_cal" class="sr-only col-form-label">[calendar/calendars]0</label>
+      <label for="xvar_cal" class="visually-hidden col-form-label">[calendar/calendars]0</label>
       <select class="form-control pl-lg-1 pr-lg-0 px-xl-2 ml-sm-1 ml-md-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
                                         changeCalendar('xvar_ormonth_sel','xvar_ormonth','%xdt.ormonth;',this)">
         <option value=""%if;(xdt.calendar="") selected%end;>
@@ -185,7 +185,7 @@
       %end;
     </div>
     <div class="col-10 col-lg">
-      <label for="xvar_text" class="col-form-label sr-only"></label>
+      <label for="xvar_text" class="col-form-label visually-hidden"></label>
       <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="…[or] [text]0">
     </div>
   </div>
@@ -217,29 +217,29 @@
     <span class="col-sm-2 col-form-label">[*kind]</span>
     <div class="col-sm-auto d-inline-flex">
       %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
-        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
       %elseif;([!dates order]0="mmddyyyy")
-        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
       %else;
-        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
       %end;
     </div>
-    <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place/places]0</label>%nn;
+    <label for="xvar_pl" class="%if;(verbose=true)visually-hidden%end; col-sm-1 col-form-label">[place/places]0</label>%nn;
     <div class="col">
       <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place/places]0"%datalist_places;>
     </div>
@@ -271,7 +271,7 @@
     <div class="col-sm-8">
       <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0"%datalist_fnames;%if;(evar.m="ADD_FAM" and xx.first_name="") autofocus%end; >
     </div>
-    <label for="paxcnt_occ" class="col-auto col-form-label sr-only">[*number]</label>
+    <label for="paxcnt_occ" class="col-auto col-form-label visually-hidden">[*number]</label>
     <div class="col-sm-2">
        <input class="form-control" type="number" name="paxcnt_occ" min="0" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" title="[*number] (occurence)">
     </div>
@@ -607,7 +607,7 @@
             %end;
           %end;
           <button type="submit" class="btn btn-outline-primary col-3 ml-auto mt-3 mr-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
-            <span class="fw-bold text-uppercase sr-only">[*validate/delete]0</span>
+            <span class="fw-bold text-uppercase visually-hidden">[*validate/delete]0</span>
             OK <i class="fa fa-share fa-rotate-180 fa-fw ml-1" aria-hidden="true"></i>
           </button>
       </div>

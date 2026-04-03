@@ -104,7 +104,7 @@
         <form class="form-inline" method="post" action="%action;">
           %hidden;
           <div class="input-group mt-1">
-            %(<label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>%)
+            %(<label for="w" class="visually-hidden">[user/password/cancel]0:[user/password/cancel]1</label>%)
             <input type="password" name="w" class="form-control"
               title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
               placeholder="[user/password/cancel]0:[user/password/cancel]1"
@@ -159,9 +159,9 @@
             title="%apply;language_name(lang) – [*select lang]">
             <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">%nn;
-              <span class="sr-only">lang</span>%nn;
+              <span class="visually-hidden">lang</span>%nn;
               <span class="text-uppercase">%lang;</span>%nn;
-              <span class="sr-only">, [select lang]</span>%nn;
+              <span class="visually-hidden">, [select lang]</span>%nn;
             </button>
             <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
               %apply;language_link()
@@ -273,7 +273,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                   </div>
                   <div class="d-flex flex-grow-1">
                     <div class="flex-grow-1 align-self-center">
-                      <label for="firstname" class="sr-only col-form-label">[*first name/first names]2</label>
+                      <label for="firstname" class="visually-hidden col-form-label">[*first name/first names]2</label>
                       <input type="search" id="firstname" class="form-control form-control-lg border-top-0"
                         name="p" placeholder="[*first name/first names]2" tabindex="2"
                         %if;(e.p!="") value="%e.p;"%end; list="datalist_fnames" data-book="fn">
@@ -291,7 +291,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                   </div>
                   <div class="d-flex flex-grow-1">
                     <div class="flex-grow-1 align-self-center">
-                      <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
+                      <label for="surname" class="visually-hidden col-form-label col-sm-2">[*surname/surnames]0</label>
                       <input type="search" id="surname" class="form-control form-control-lg border border-top-0"
                         title="[*word/words]1" data-toggle="tooltip"
                         name="n" placeholder="[*surname/surnames]0" tabindex="3"
@@ -348,7 +348,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
             <div class="d-flex align-items-center w-100 mb-2 mb-md-0">
               <a class="mr-2" role="button" data-toggle="tooltip" data-placement="bottom"
                 href="%prefix;m=TT" title="[*all the titles]"><i class="fa fa-list-ul fa-fw"></i></a>
-              <label for="titles" class="sr-only col-form-label">[*title/titles]0</label>
+              <label for="titles" class="visually-hidden col-form-label">[*title/titles]0</label>
               <input type="search" class="form-control border-top-0 border-right-0 border-left-0 w-100"
                 name="t" id="titles" placeholder="[*title/titles]0" tabindex="7"
                 list="datalist_titles" data-book="title">
@@ -356,7 +356,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
             <div class="d-flex align-items-center w-100 mb-2 mb-md-0 ml-0 ml-md-2">
               <a class="mr-2" role="button" data-toggle="tooltip" data-placement="bottom"
                 href="%prefix;m=TT&p=*" title="[*all the estates]"><i class="fa fa-list-ul fa-fw"></i></a>
-              <label for="estates" class="sr-only col-form-label">[*estate]0</label>
+              <label for="estates" class="visually-hidden col-form-label">[*estate]0</label>
               <input type="search" class="form-control border-top-0 border-right-0 border-left-0 w-100"
                 name="p" id="estates" placeholder="[*estate]0" tabindex="8"
                 list="datalist_estates" data-book="domain">
