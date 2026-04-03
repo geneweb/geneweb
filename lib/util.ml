@@ -2172,12 +2172,14 @@ let string_of_decimal_num conf f =
 
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
-  | Some i when i <> "" ->
-      let i = Geneweb_db.Driver.Iper.of_string i in
-      if Geneweb_db.Driver.iper_exists base i then
-        let p = pget conf base i in
-        if is_hidden p then None else Some p
-      else None
+  | Some i when i <> "" -> (
+      try
+        let i = Geneweb_db.Driver.Iper.of_string i in
+        if Geneweb_db.Driver.iper_exists base i then
+          let p = pget conf base i in
+          if is_hidden p then None else Some p
+        else None
+      with Failure _ -> None)
   | _ -> (
       match (p_getenv conf.env env_p, p_getenv conf.env env_n) with
       | None, Some n -> (
