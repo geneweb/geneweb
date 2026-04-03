@@ -14,7 +14,7 @@
 <body%body_prop;>
 <div class="container-fluid">
   %include;home
-  <div class="small float-right mr-2 mt-2">
+  <div class="small float-end mr-2 mt-2">
     (<a href="%url;&ref=on" title="[*gallery backlinks]">&lt;-</a>)
     %if(wizard)(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)%end;
   </div>

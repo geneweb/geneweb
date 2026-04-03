@@ -152,11 +152,11 @@
     <div>%apply;link3(xx.access, xx)</div>
     %apply;info("xx")
   </td>
-  <td class="align-middle text-left table_big_cell">%apply;link_dates("xx")</td>
+  <td class="align-middle text-start table_big_cell">%apply;link_dates("xx")</td>
 %end;
 
 %define;female_line(xx,z1)
-  <td class="align-middle text-left table_big_cell">%apply;link_dates("xx")</td>
+  <td class="align-middle text-start table_big_cell">%apply;link_dates("xx")</td>
   <td class="align-middle text-center%if;("z1"!="") z1%end;" aria-describedby="her-name-occupation-age-cell">
     %apply;imgtdz("xx")
     <div>%apply;link3(xx.access, xx)</div>
@@ -217,7 +217,7 @@
   %if;(ancestor.anc_sosa.v%2=0)
     <tr id="i%ancestor.anc_sosa.v;">
       %apply;male_line("ancestor","z1")
-      <td class="align-middle text-left table_big_cell">
+      <td class="align-middle text-start table_big_cell">
   %end;
   %if;(ancestor.same="")
     %foreach;ancestor.family;

@@ -590,11 +590,11 @@ $(document).ready(function() {
 
       return '<div' + sty + ' class="d-flex justify-content-center ' + cls
         + '" title="' + title + '">'
-        + '<span class="text-right" style="width:14rem">' + prefix + lex + '</span>'
+        + '<span class="text-end" style="width:14rem">' + prefix + lex + '</span>'
         + '<span class="text-center" style="' + colDate + '">' + per + '</span>'
-        + '<span class="text-right" style="width:10rem">+' + noa_l
+        + '<span class="text-end" style="width:10rem">+' + noa_l
         + '<span class="ancmenu-implex">' + path_l + '</span></span>'
-        + (isOnly ? '' : '<span class="text-right" style="width:12rem">' + noa
+        + (isOnly ? '' : '<span class="text-end" style="width:12rem">' + noa
           + '<span class="ancmenu-implex">' + path + '</span></span>')
         + '</div>';
     },

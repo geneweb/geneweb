@@ -319,10 +319,10 @@ let print_same_name conf base p =
           in
           Output.print_sstring conf "<tr";
           if is_original then
-            Output.print_sstring conf {| class="font-italic text-info"|};
+            Output.print_sstring conf {| class="fst-italic text-info"|};
           Output.print_sstring conf ">";
           Output.print_sstring conf
-            {|<td class="text-right align-middle text-body-secondary p-0 pr-2" style="width:2em">|};
+            {|<td class="text-end align-middle text-body-secondary p-0 pr-2" style="width:2em">|};
           Output.print_sstring conf (string_of_int (Driver.get_occ p));
           Output.print_sstring conf "</td>";
           (match occu_opt with
