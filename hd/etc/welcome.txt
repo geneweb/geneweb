@@ -21,7 +21,7 @@
 %apply;dl("estates")
 %define;display_sosa_ref(xx)
   [*sosa reference][:]
-  <href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
+  <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
 %end;
 %define;get_visitor_access_msg(lg)
   %if;(b.visitor_access_msg_lg!="")
@@ -72,8 +72,8 @@
 %end;
 %if;(e.i!="" or e.p!="" or e.n!="" or e.pn!="")
   <div class="d-flex justify-content-center">
-    <div class="alert alert alert-danger alert-dismissible fade show text-center w-75 m-2" role="alert">
-      %if(e.i!="")[*unknown index][:] %e.i;
+    <div class="alert alert-danger alert-dismissible fade show text-center w-75 m-2" role="alert">
+      %if;(e.i!="")[*unknown index][:] %e.i;
       %elseif;(e.pn!="")[*unknown person][:] %e.pn;
         %if;(e.p!="") %e.p;%end;%if;(e.n!="") %e.n;%end;
       %elseif;(e.p!="" and e.n="")[*unknown first_name][:] %e.p;
@@ -255,7 +255,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                               5. [*key]0[:] [first name/first names]2.[occ]1 [surname/surnames]0 ²<br>
                                      <i class='fw-lighter'>James William.2 Smith-Johnson<br>       james william.2 smith johnson</i><br>
                               <br><div class='fw-lighter small'>¹ [word/words]0<br>² [word/words]1<br>³ [optional/mandatory]0</div></div>">
-                      <i class="far fa-circle-question text-primary text-primary"></i>
+                      <i class="far fa-circle-question text-primary"></i>
                     </abbr>
                   </div>
                   <input type="search" id="fullname" class="form-control form-control-lg py-0 border border-top-0" autofocus tabindex="1"
@@ -340,7 +340,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           </div>
         </div>
       </form>
-      <div class="d-flex flex-wrap flex-md-no-wrap justify-content-center align-items-md-center mt-1 mt-md-3">
+      <div class="d-flex flex-wrap flex-md-nowrap justify-content-center align-items-md-center mt-1 mt-md-3">
         %if;(b.propose_titles!="no")
           <form id="title-search" class="d-flex flex-column flex-md-row align-items-start align-items-md-center col-12 col-md-9 ml-md-4" method="get" action="%action;">
             %hidden;
@@ -516,7 +516,8 @@ fr: Mon compte associatif
       %apply;book_button("domain","domain/domains","chess-rook")
       <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success ml-2"
         title="[*data typographic checker]"><i class="fas fa-spell-check"></i>
-      </a>    </div>
+      </a>
+    </div>
   </div>
 %end;
 <div class="d-flex mt-3">
