@@ -120,7 +120,7 @@
       </td>
     </tr>
     <tr>
-      <td class="text-left align-top pt-2">
+      <td class="text-start align-top pt-2">
         %apply;display_vertical("father")
       </td>
       <td class="align-top pt-2">
@@ -132,7 +132,7 @@
           %end;
         %end;
       </td>
-      <td class="text-left align-top pt-2">
+      <td class="text-start align-top pt-2">
         %apply;display_vertical("mother")
       </td>
     </tr>

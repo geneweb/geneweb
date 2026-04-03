@@ -38,7 +38,7 @@
 %if;(not cancel_links)
   <div class="col-12 d-flex justify-content-end my-1">
     %(TODO: navigation interne en cliquant sur le fond de cellule %)
-    <div class="text-right mr-3">
+    <div class="text-end mr-3">
       <a href="%if;(e.image!="")%url_set.image;%else;%url_set.image.0;%end;"
         class="btn btn-outline-primary btn-sm border-0 px-1"
         title="%if;(e.image=0)[*visualize/show/hide/summary]1%else;%nn;

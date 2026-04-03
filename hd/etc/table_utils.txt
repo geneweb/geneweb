@@ -110,13 +110,13 @@
     </tr>
     <tr>
     %if;(e.birth="on" and e.birth_place="on")
-      <th class="text-right pr-2 position-relative">[*date/dates]0
+      <th class="text-end pr-2 position-relative">[*date/dates]0
         %apply;rm("birth",[*date of birth])</th>
       <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("birth_place",[*birth place])</th>
     %end;
     %if;(e.baptism="on" and e.baptism_place="on")
-      <th class="text-right pr-2 position-relative" title="[*date of baptism]">[*date/dates]0
+      <th class="text-end pr-2 position-relative" title="[*date of baptism]">[*date/dates]0
         %apply;rm("baptism",[*date of baptism])</th>
       <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("baptism_place",[*baptism place])</th>
@@ -124,7 +124,7 @@
     %if;((e.marr_date="on" and e.marr_place="on") or
          (e.marr_date="on" and e.child="on") or (e.marr_place="on" and e.child="on"))
       %if;(e.marr_date="on")
-        <th class="%if;(e.marr_place!="on")text-center%else;text-right pr-2%end; position-relative">%nn;
+        <th class="%if;(e.marr_place!="on")text-center%else;text-end pr-2%end; position-relative">%nn;
           [*date/dates]0 %apply;rm("marr_date",[*date of marriage])</th>
       %end;
       %if;(e.marr_place="on")
@@ -138,13 +138,13 @@
       %end;
     %end;
     %if;(e.death="on" and e.death_place="on")
-      <th class="text-right pr-2 position-relative">[*date/dates]0
+      <th class="text-end pr-2 position-relative">[*date/dates]0
         %apply;rm("death",[*date of death])</th>
       <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("death_place",[*death place])</th>
     %end;
     %if;(e.burial="on" and e.burial_place="on")
-      <th class="text-right pr-2 position-relative">[*date/dates]0
+      <th class="text-end pr-2 position-relative">[*date/dates]0
         %apply;rm("burial",[*date of burial])</th>
       <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("burial_place",[*burial place])</th>
@@ -158,7 +158,7 @@
   %if;(e.yyy="on" and ("xxx"="ancestor" or ("xxx"!="ancestor" and fff=1)))
     <td%sp;
       %if;(("xxx"="ancestor" or ("xxx"!="ancestor" and e.t="H")) and xxx.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on" or e.child="on"))rowspan="%xxx.nb_families;" %end;
-      class="align-middle text-right%if;not cancel_links; table_big_cell%end;
+      class="align-middle text-end%if;not cancel_links; table_big_cell%end;
         %if;(e.hl=1)
           %if;((not xxx.has_yyy_date or xxx.yyy_date.month="" or xxx.yyy_date.day="" or xxx.yyy_date.prec!="") 
             and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) bg-ly-incomplete

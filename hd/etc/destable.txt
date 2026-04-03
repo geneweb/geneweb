@@ -125,7 +125,7 @@
         </div>
       </td>
     %elseif;(e.t="I")
-      <td class="align-middle text-right%if;(e.nowrap="on") text-nowrap%end;%nn;
+      <td class="align-middle text-end%if;(e.nowrap="on") text-nowrap%end;%nn;
         %if;(e.ns=1)
           %if;(xxx.has_notes and not xxx.has_psources) notespouse%nn;
           %elseif;(not xxx.has_notes and xxx.has_psources) sourcespouse%nn;
@@ -207,7 +207,7 @@
         %if;((nb_families=1 and "yyy"="desc") or (nb_families>1 and
             ((xxx.spouse=zzz and (ddd=family.index)) or
              (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
-          <td class="align-middle text-right%if;not cancel_links; table_big_cell%end;%if;(are_divorced or are_separated) divorced-side-border%end;
+          <td class="align-middle text-end%if;not cancel_links; table_big_cell%end;%if;(are_divorced or are_separated) divorced-side-border%end;
             %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;">
             %if;(wizard and not cancel_links)

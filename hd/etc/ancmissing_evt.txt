@@ -150,7 +150,7 @@
 
    %( ancestor %)
   <td %if;(xx.same!="")colspan="8"%else;%apply;td_missing_events_rowspan("xx")%end;
-    class="text-left align-middle" id="%xx.index;">
+    class="text-start align-middle" id="%xx.index;">
     %apply;image_MF("xx")
     %apply;short_display_person("xx")
     %if;(xx.same!="" and e.repeat="on")
@@ -215,7 +215,7 @@
       %if;xx.has_families;
         %foreach;xx.family;
           %if;(family_cnt=1)
-            <td class="text-left align-middle">
+            <td class="text-start align-middle">
               %apply;image_MF("spouse")
               %apply;short_display_person("spouse")
             </td>
@@ -225,7 +225,7 @@
         <td></td>
       %end;
     %else;
-      <td class="text-left align-middle">
+      <td class="text-start align-middle">
         %if;xx.has_families;
           %apply;image_MF("xx.spouse")
           %apply;short_display_person("xx.spouse")
@@ -466,7 +466,7 @@
   %foreach;xx.family;
     %if;(family_cnt!=1)
       <tr>
-        <td class="text-left align-middle">
+        <td class="text-start align-middle">
           %apply;image_MF("spouse")
           %apply;short_display_person("spouse")
         </td>
@@ -501,10 +501,10 @@
   <thead %mid;>
     <tr>
       <th %mid;>[*Sosa]</th>
-      <th class="text-left align-middle pl-2">[*person/persons]0</th>
+      <th class="text-start align-middle pl-2">[*person/persons]0</th>
       <th %mid;>[*date of birth]</th>
       <th %mid;>[*where born]</th>
-      <th class="text-left align-middle pl-2">%if;(e.marr="on")[*spouse/spouses]1%else;[*spouse/spouses]0%end;</th>
+      <th class="text-start align-middle pl-2">%if;(e.marr="on")[*spouse/spouses]1%else;[*spouse/spouses]0%end;</th>
       <th %mid;>[*date of marriage]</th>
       <th %mid;>[*where married]</th>
       <th %mid;>[*date of death]</th>
@@ -516,7 +516,7 @@
       %if;(level>=only_v)
         %if;(level!=0 and e.gen="on" and e.only!="on")
           <tr>
-            <th colspan="9" class="text-left border-0">[*generation/generations]0 %level;</th>
+            <th colspan="9" class="text-start border-0">[*generation/generations]0 %level;</th>
           </tr>
         %end;
         %foreach;ancestor;

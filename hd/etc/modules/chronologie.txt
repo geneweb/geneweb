@@ -386,7 +386,7 @@
     <tbody> 
       <thead>
         %(<td> </td>%)
-        <td class="text-right">[*date/dates]0</td>
+        <td class="text-end">[*date/dates]0</td>
         <td>[*age]</td>
         <td> </td>
       </thead>
@@ -394,7 +394,7 @@
         <tr class="align-top%if;(item.4="self_evt") bg-light
 %end;">
         %(<td class="align-middle">%item.1;</td>%)
-          <td class="align-middle text-right text-nowrap">%item.3;</td>
+          <td class="align-middle text-end text-nowrap">%item.3;</td>
           <td class="align-middle text-center text-nowrap px-2%nn;
             %if;(has_known_death=1 and item.1>my_death_sort) age-posthumous%end;">%item.7;</td>
           <td class="align-middle">
