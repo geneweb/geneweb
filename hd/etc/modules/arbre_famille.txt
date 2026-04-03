@@ -231,7 +231,7 @@
 %let;prefx;%if;(e.m="F")%prefix_set.pmod;%else;%prefix;%end;%in;
 %if;(not cancel_links)
   <div class="d-flex justify-content-end">
-    <div class="text-right mr-3">
+    <div class="text-end mr-3">
       <a href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
         class="btn btn-outline-%if;(e.im=0)primary%else;danger%end;"
         title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;%nn;

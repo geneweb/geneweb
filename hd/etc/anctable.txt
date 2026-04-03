@@ -110,7 +110,7 @@
     %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="bg-lg"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt=1)
-        <td class="align-middle text-right table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
+        <td class="align-middle text-end table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
           %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;">
           %if;(wizard and not cancel_links)
             <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
@@ -228,7 +228,7 @@
             </td>
           %end;
           %if;(e.marr_date="on")
-            <td class="align-middle text-right table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
+            <td class="align-middle text-end table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
               %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;">
               %if;(wizard and not cancel_links)
                 <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
@@ -332,7 +332,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         %if;((v0=1 and level=0) or level>=v0)
           %if;(only=0 and e.gen=1 and level!=0)
             <tr class="no-hover-highlight">
-              <th class="text-left border-0 gen-row" scope="row" colspan="%nb_col;">
+              <th class="text-start border-0 gen-row" scope="row" colspan="%nb_col;">
                 <span class="ml-1">[*generation/generations]0 %level;</span>
               </th>
             </tr>

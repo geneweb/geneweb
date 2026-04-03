@@ -242,7 +242,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                 <div class="d-flex flex-grow-1">
                   <div class="d-flex align-items-center ml-1 mr-2">
                     <abbr data-toggle="tooltip" data-placement="top" data-html="true"
-                       title="<div class='text-left fw-bold'><h5>[*search format][:]</h5>
+                       title="<div class='text-start fw-bold'><h5>[*search format][:]</h5>
                               1. [*person/persons]0[:]<br>
                                  a. [first name/first names]2 [surname/surnames]0 ¹<br>
                                      <i class='fw-lighter'>John Doe</i><br><br>

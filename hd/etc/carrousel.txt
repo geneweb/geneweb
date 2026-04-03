@@ -197,7 +197,7 @@
         </textarea>
         <div class="col-12 mt-2 px-0">
           <div class="d-flex">
-            <button type="submit" class="flex-grow-1 btn btn-primary text-wrap text-left py-2 submit-button" disabled>
+            <button type="submit" class="flex-grow-1 btn btn-primary text-wrap text-start py-2 submit-button" disabled>
               <span id="which_img_show" class="d-inline-block">[*send image with note and source]</span>
             </button>
             <button type="button" class="btn btn-secondary ml-2 d-none" id="btn-cancel-edit">

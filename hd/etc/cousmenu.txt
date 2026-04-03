@@ -163,7 +163,7 @@
           %let;extrapaths;%expr(cous_paths_cnt.vvv.www-listb_size)%in;
           <div class="modal-title bg-transparent">
             <div class="d-flex justify-content-around align-items-center">
-              <div class="d-inline-flex flex-column justify-content-around align-self-center text-left ml-4%if;(www=0) mr-5%end;">
+              <div class="d-inline-flex flex-column justify-content-around align-self-center text-start ml-4%if;(www=0) mr-5%end;">
                 <div>%listb_size %if;(cousins_cnt.vvv.www=1)[person/persons]0%else;[person/persons]1%end;
                 %if;(count!=0 and count!=cousins_cnt.vvv.www)
                   <div>
@@ -269,7 +269,7 @@
       <div class="order-2 w-75 align-self-center text-bottom ml-1">
         %if;(i=0 and k=0)[him/her]s%else;%apply;cousin_lex(i,k)%end;
       </div>
-      <div class="d-flex justify-content-end align-self-center text-right">
+      <div class="d-flex justify-content-end align-self-center text-end">
         <div class="h5 mt-2 py-0 pr-0
           text-%if;(vvv=0)info%elseif;(vvv%2=1)primary%else;danger%end;">%cousins_cnt.vvv.www;
           </div>
@@ -294,7 +294,7 @@
               %let;tot;%apply;cous_paths_cnt%with;%i;%and;%k;%end;%in;
               %let;tot_next;%apply;cous_paths_cnt%with;%i;%and;%expr(k+1)%end;%in;
               %if;(i>1 and k=0)
-                <td class="h4 fw-light user-select-none text-left align-middle border-top-0 pb-3 pl-3">%nn;
+                <td class="h4 fw-light user-select-none text-start align-middle border-top-0 pb-3 pl-3">%nn;
                   %if;(maxa>4)%expr(maxa-j)%else;%end;
                 </td>
                 %if;(i>2)<td colspan="%expr(i-2)" class="border-0"></td>%end;
@@ -353,7 +353,7 @@
           %(%if;has_parents;<span class="small"> [up to] %maxi; [generation/generations]1</span>%end;%)
         %end;
       </h3>
-      <div class="d-flex flex-column justify-content-end align-self-center text-right mr-1">
+      <div class="d-flex flex-column justify-content-end align-self-center text-end mr-1">
         %( quick count ascendants | TODO : filter by index to reduce asc./desc. implexes %)
         %reset_count;
         %if;has_parents;
