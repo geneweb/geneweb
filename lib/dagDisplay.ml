@@ -380,15 +380,11 @@ let rec eval_var conf base env _xx _loc = function
   | [ "static_max_desc_level" ] -> VVstring "10"
   | _ -> raise Not_found
 
-and eval_person_field_var _conf base _env (p, pauth) sl =
-  match sl with
+and eval_person_field_var _conf base _env (p, pauth) = function
   | "surname" when pauth -> VVstring (Driver.sou base (Driver.get_surname p))
   | "first_name" when pauth ->
       VVstring (Driver.sou base (Driver.get_first_name p))
-  | _ ->
-      VVstring
-        ((if pauth then "true " else "false ")
-        ^ Geneweb_db.Gutil.designation base p)
+  | _ -> raise Not_found
 
 and eval_dag_cell_var conf base env (colspan, align, td) = function
   | [ "access" ] -> (
