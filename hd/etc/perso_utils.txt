@@ -52,7 +52,7 @@
 %define;marr_wrench_to_bullet(xx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
-      <i class="fa fa-wrench fa-sm text-success" data-html="true" data-toggle="tooltip"
+      <i class="fa fa-wrench fa-sm text-success" data-bs-html="true" data-bs-toggle="tooltip"
         title="<div class='text-start'>[*modify::family/families]0 %self.surname;/%self.spouse.surname; ([wizard/wizards/friend/friends/exterior]0)<br>
 <b>[*him/her]0 %marriage_age;</b><br>
 %if;has_parents;%nn;
@@ -933,7 +933,7 @@
       %apply;setvar%with;ns%event.name;%and;
         %if;(b.event_tooltips="no")title="%apply;capitalize(event.name)"%nn;
         %else;
-          %if;(event.has_note or event.has_src)data-toggle="tooltip" data-html="true"
+          %if;(event.has_note or event.has_src)data-bs-toggle="tooltip" data-bs-html="true"
             title='<div class="text-wrap text-start">
               %if;event.has_note;<div><span class="fw-bold">%apply;a_of_b%with;[*note/notes]1%and;%event.name;%end;[:]</span> %event.note;.</div>%end;
               %if;event.has_src;<div%if;event.has_note; class="mt-2"%end;><span class="fw-bold">%apply;a_of_b%with;[*source/sources]1%and;%event.name;%end;[:]</span> %event.src;.</div>%end;</div>'
@@ -951,7 +951,7 @@
     %apply;setvar%with;ns[marriage event]%count;%and;
       %if;(b.event_tooltips="no")title="[marriage event]"%nn;
       %else;
-        %if;(has_marriage_note or has_marriage_source) data-toggle="tooltip" data-html="true"
+        %if;(has_marriage_note or has_marriage_source) data-bs-toggle="tooltip" data-bs-html="true"
           title='<div class="text-wrap text-start">
             %if;has_marriage_note;<div><span class="fw-bold">
               %apply;a_of_b%with;[*note/notes]1%and;
