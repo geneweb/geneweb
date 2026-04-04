@@ -1,5 +1,5 @@
 <!-- heading.txt 04/03/2026 02:32:58 -->
-  <h1 class="%if;("i2" in p_mod)text-center%else;text-xs-center text-md-left%end;">
+  <h1 class="%if;("i2" in p_mod)text-center%else;text-center text-md-start%end;">
     %if;(has_portrait and has_blason) %(has_portrait is false if no portrait !! TODO: FIXME!%)
       %if;not cancel_links;<a href="%blason_url;" target="_blank">%end;
        <img src="%blason_url;"%blason_small_size; class="mx-%if;("i3" in p_mod)1%else;2%end;" alt="[blason/blasons]0">%nn;

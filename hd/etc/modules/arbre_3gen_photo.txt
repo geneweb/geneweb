@@ -23,7 +23,7 @@
 %end;
 %( vtbr will show 2 vertical bars if one grandparents’ couple is divorced or separated
    this allows the central column carrying the marriage period for those case not to widen the table %)
-%define;setvar(nnn,vvv)%set_var.nnn.vvv;%end;
+%( %define;setvar(nnn,vvv)%set_var.nnn.vvv;%end; already in perso_utils %)
 %define;fam_dates(xx)
   %if;(spouse.access=xx.father.access and family.date_s!="")
     %apply;setvar%with;mar_xx%and;%family.date_s;%end;

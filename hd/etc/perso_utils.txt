@@ -1,4 +1,4 @@
-<!-- $Id: perso_utils v7.1 16/03/2026 07:12:03 $ -->
+<!-- $Id: perso_utils v7.1 04/04/2026 04:04:19 $ -->
 %let;birth_symbol;%if;(b.birth_symbol!="")%b.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(b.death_symbol!="")%b.death_symbol;%else;&dagger;%end;%in;
 
@@ -82,7 +82,7 @@
   %else;
     %if;cancel_links;⚲%sp;%else;class="fa fa-neuter neuter fa-xs%end;%nn;
   %end;
-  %if;not cancel_links; mr-1"></i>%nn;
+  %if;not cancel_links; me-1"></i>%nn;
     %if;wizard;</a>%end;
   %end;
 %end;
@@ -136,7 +136,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <span class="far fa-circle-dot text-success mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
+  <span class="far fa-circle-dot text-success me-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
 %end;
 
 %define;nav_with_sosa_ref(xxx)
@@ -313,8 +313,8 @@
     %end;
     <div class="text-nowrap fst-italic%nn;
         %(%if;(e.m="A" and xx.index!=index)
-          %if;(not xx.is_dead) mr-5%nn;
-          %else;%if;(xx.death_date.year="") mr-4%end;
+          %if;(not xx.is_dead) me-5%nn;
+          %else;%if;(xx.death_date.year="") me-4%end;
           %end;
         %end;%)"
          title="%if;(wizard and not cancel_links)[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
@@ -401,7 +401,7 @@
       %foreach;xx.nobility_title;, %nobility_title;%end;
     %end;
   %end;
-  <span style="font-size: 90%%">%nn;
+  <span class="small">%nn;
     %if;xx.has_birth_date;, %apply;nth([born],xx.sex) %xx.on_birth_date;
       %if;xx.birthday; ([happy birthday to you!])%end;
       %if;xx.has_birth_place; - %xx.birth_place;%end;
@@ -527,7 +527,7 @@
       %foreach;xx.nobility_title;, %nobility_title;%end;
     %end;
   %end;
-  <span style="font-size: 90%%">%nn;
+  <span class="small">%nn;
     %if;has_parents;
       %if;(xx.index=father.index or xx.index=mother.index)
         %if;(has_birth_date and xx.has_birth_date)%sp;
@@ -641,7 +641,7 @@
           <br><img src="%images_prefix;1pixel.png" width="13" height="13" alt="1px">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        <span class="ml-1">%apply;married_to("child", 0)</span>
+        <span class="ms-1">%apply;married_to("child", 0)</span>
         %apply;short_display_person("spouse")
       %end;
     %end;
@@ -744,8 +744,8 @@
 
 %( note that type_puce_desc add a <li> that need to be closed %)
 %define;desc_seq(yyy, bi)
-  <li class="list-unstyled">
-    <ul>
+  <li >
+    <ul class="list-unstyled">
       %foreach;child;
         %apply;type_puce_desc("child")
         %apply;image_MF("child")

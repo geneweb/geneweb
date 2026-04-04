@@ -14,7 +14,7 @@
     <div class="d-flex flex-wrap mb-1">
       %foreach;xx.child;
         %if;(index!=cond)
-          <div class="media d-inline-flex flex-row me-2 mb-1">
+          <div class="d-inline-flex flex-row me-2 mb-1">
             %if;child.has_image;
               %if;(e.cgl!="on")
                 <a href="%child.image_url;" class="align-self-center" target="_blank">
@@ -33,7 +33,7 @@
             %else;
               <span class="small_image noimage rounded align-self-center display-3 text-center text-body-secondary ms-2 pb-2">?</span>
             %end;
-            <div class="media-body ms-2 align-self-center">%nn;
+            <div class="ms-2 align-self-center">%nn;
               %apply;short_display_person_tree("child")
             </div>
           </div>
@@ -236,12 +236,12 @@
           <td style="vertical-align: top">
             %foreach;mother.family;
               %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
-                <ul>
+                <ul class="list-unstyled">
                   %apply;li_SD("spouse")
                     [with] %apply;very_short_display_person("spouse")
                   </li>
                   %if;has_children;
-                    <li class="list-unstyled"><ul>
+                    <li><ul>
                       %foreach;child;
                         %apply;long_display_siblings()
                       %end;
