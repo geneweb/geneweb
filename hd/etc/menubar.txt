@@ -423,8 +423,7 @@
           %( m=R relation dropdown menu %)
           <li class="nav-item dropdown">
             <a id="load_once_rlm_builder" class="nav-link dropdown-toggle text-secondary%if;(e.m="R" or e.m="F" or (e.m="C" and e.t="AN")) active%end;"
-              data-bs-toggle="dropdown" data-bs-auto-close="outside"
-              role="button" href="#" aria-expanded="false" title="[*relationship]">
+              data-bs-toggle="dropdown" role="button" href="#" aria-expanded="false" title="[*relationship]">
               <span class="fa fa-user-group"></span></a>
             <div class="dropdown-menu dropdown-menu-transl">
               <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;>
