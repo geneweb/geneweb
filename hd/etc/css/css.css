@@ -1,3 +1,9 @@
+.form-control-inline {
+  display: inline-block !important;
+  width: auto !important;
+  vertical-align: middle; 
+}
+
 /* Chronologie */
 .age-years { color: #0066cc; }
 .age-months { color: #000; }
