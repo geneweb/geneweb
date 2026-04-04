@@ -29,18 +29,6 @@ code {
   padding-bottom: 0.5rem;
 }
 
-/* Élargissement raisonnable du container pour les hautes résolutions */
-@media (min-width: 1600px) {
-  body .container {
-    width: 100%;
-    max-width: 1280px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-}
-
 body, .form-control {
   color: black !important;
 }
@@ -710,7 +698,7 @@ a.book-arrow:hover {
   scroll-margin-top: 5rem;
 }
 
-@include media-breakpoint-up(sm) {
+@include media-breakpoint-up(xs) {
   html {
     font-size: 1rem;
   }
