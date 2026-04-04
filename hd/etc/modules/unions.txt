@@ -7,7 +7,7 @@
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 %define;relations_tree(z1)
     %reset_count;
-    href="%prefix;spouse=on;m=RLM;image=%evar.image;&%nn;
+    href="%prefix;spouse=on;m=RLM;image=%e.image;&%nn;
       %foreach;witness;
         %incr_count;i%count;=%witness.index;&%nn;
         t%count;=[marriage event];%nn;
@@ -70,7 +70,6 @@
       </em>
     %end;
   %end;
-  (note1 union)
 %end;
 %define;picture(xxx,yyy)
   %if;not cancel_links;<a href="%xxx.yyy_url;" class="align-self-start" target="_blank">%end;
@@ -188,7 +187,7 @@
              <sup>%count;</sup>
           %end;
         %end;
-        %if;are_separated;, [separated] %on_separation_date;%end;
+        %if;are_separated;, [separated]0 %on_separation_date;%end;
         %if;are_divorced;, [divorced] %on_divorce_date;%end;
         %if;has_children;, %apply;havingchildren(nb_children)[:]
           %( On sauvegarde l'ancienne valeur de count %)
@@ -207,7 +206,7 @@
           %( On rétablie l'ancienne valeur de count %)
           %apply;init_count(prev_count)
         %end;
-        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+        %if;(e.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
       </li>
     %end;
   </ul>
@@ -365,7 +364,7 @@
           </div>
         %end;
       </div>
-      %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+      %if;(e.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
     %end;
     
     %if;(are_divorced or are_separated)
@@ -432,7 +431,7 @@
           %( On rétablie l'ancienne valeur de count %)
           %apply;init_count(prev_count)
         %end;
-        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+        %if;(e.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
       </li>
     %end;
   </ul>
@@ -524,7 +523,7 @@
           %( On rétablie l'ancienne valeur de count %)
           %apply;init_count(prev_count)
         %end;
-        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+        %if;(e.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
       </li>
     %end;
   </ul>
@@ -662,7 +661,7 @@
             %end;
           </ul>
         %end;
-        %if;(evar_opt="from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+        %if;(e.opt="from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
       </li>
     %end;
   </ul>
