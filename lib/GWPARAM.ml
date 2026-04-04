@@ -562,7 +562,7 @@ let wrap_output (conf : Config.config) (title : Adef.safe_string)
   Output.print_sstring conf conf.charset;
   Output.print_sstring conf {|">|};
   Output.print_sstring conf
-    {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
+    {|<meta name="viewport" content="width=device-width, initial-scale=1">|};
   Output.print_sstring conf {|</head>|};
   Output.print_sstring conf "<body>";
   content ();
