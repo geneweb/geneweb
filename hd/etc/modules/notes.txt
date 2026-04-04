@@ -24,7 +24,7 @@
   %if;(count>0 or has_linked_page.BNOTE and linked_page.BNOTE!="")
     <h2 class="mt-2">[*individual notes]</h2>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
-      <div class="ml-3>%apply;capitalize(linked_page.BNOTE)</div>
+      <div class="ms-3>%apply;capitalize(linked_page.BNOTE)</div>
     %end;
     <div class="ml-4 ind-notes">
       %notes;
@@ -34,7 +34,7 @@
     %( On remet les compteurs à zéro, on démarre à 1 - synchro avec unions.txt %)
     %reset_count;
     <div class="fam-notes">
-      <ul class="pl-0">
+      <ul class="ps-0">
         %foreach;family;
           %incr_count;
           %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
@@ -54,7 +54,7 @@
     </div>
   %end;
   %if;(has_linked_page.NOTE and linked_page.NOTE!="")
-    <div class="ml-3">%apply;capitalize(linked_page.NOTE)</div>
+    <div class="ms-3">%apply;capitalize(linked_page.NOTE)</div>
   %end;
 %elseif;((count>0 or count2>0) and op_m=2)
   <h3 id="notes" class="mt-2">[*note/notes]1</h3>
