@@ -334,7 +334,8 @@ let print_same_name conf base p =
                     {|<td class="text-body-secondary align-middle p-0 pr-1" style="width:%dem">|}
                     ((n / 2) + 1)
               | None ->
-                  Output.print_sstring conf {|<td class="text-body-secondary p-0 pr-1">|});
+                  Output.print_sstring conf
+                    {|<td class="text-body-secondary p-0 pr-1">|});
               let occu = Driver.sou base (Driver.get_occupation p) in
               (match max_len_opt with
               | Some n when occu <> "" && String.length occu > n ->
