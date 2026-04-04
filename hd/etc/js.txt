@@ -1,11 +1,13 @@
 <!-- $Id: js.txt v7.1 11/04/2026 02:05:28 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
-            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
-                       sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
-                       sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %if;not is_welcome;
+      <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
+              integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
+                         sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
+                         sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %end;
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
             integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=
                        sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI
@@ -38,7 +40,9 @@
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
   %else;
-    <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
+    %if;not is_welcome;
+      <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
+    %end;
     <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.8"></script>
     %if;((e.m="A" and e.t="") or "NOTES" in e.m)
       <script src="%etc_prefix;js/select2.min.js?version=4.1.0rc"></script>
