@@ -128,7 +128,7 @@
     %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
     or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
     or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK")
-      <script>$('body').scrollspy({ target: '#banner' })</script>
+      <script>new bootstrap.ScrollSpy(document.body, { target: '#banner' })</script>
     %end;
   %end;
 %end;
