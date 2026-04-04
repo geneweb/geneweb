@@ -38,7 +38,7 @@
 %if;(not cancel_links)
   <div class="col-12 d-flex justify-content-end my-1">
     %(TODO: navigation interne en cliquant sur le fond de cellule %)
-    <div class="text-end mr-3">
+    <div class="text-end me-3">
       <a href="%if;(e.image!="")%url_set.image;%else;%url_set.image.0;%end;"
         class="btn btn-outline-primary btn-sm border-0 px-1"
         title="%if;(e.image=0)[*visualize/show/hide/summary]1%else;%nn;
@@ -47,28 +47,28 @@
         <i class="fa fa-toggle-%if;(e.image=0)off%else;on%end;"></i>
       </a>%nn;
       <a href="%if;(e.siblings!="")%url_set.siblings;%else;%url_set.siblings.1;%end;"
-        class="btn btn-outline-primary btn-sm border-0 px-1 ml-1"
+        class="btn btn-outline-primary btn-sm border-0 px-1 ms-1"
         title="%if;(e.siblings!=1)[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [siblings]">
         <i class="fa fa-users mx-1"></i>
         <i class="fa fa-toggle-%if;(e.siblings!=1)off%else;on%end;"></i>
       </a>%nn;
       <a href="%if;(e.sosa!="")%url_set.sosa;%else;%url_set.sosa.1;%end;"
-        class="btn btn-outline-primary btn-sm border-0 px-1 ml-1"
+        class="btn btn-outline-primary btn-sm border-0 px-1 ms-1"
         title="%if;(e.sosa!=1)[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [Sosa]">
         <span class="mx-1">Sosa</span>
         <i class="fa fa-toggle-%if;(e.sosa!=1)off%else;on%end;"></i>
       </a>
       <a href="%if;(e.bp!="")%url_set.bp;%else;%url_set.bp.1;%end;"
-        class="btn btn-outline-primary btn-sm border-0 px-1 ml-1"
+        class="btn btn-outline-primary btn-sm border-0 px-1 ms-1"
         title="%if;(e.bp!=1)[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [birth place]">
         <span class="mx-1">[*birth place]</span>
         <i class="fa fa-toggle-%if;(e.bp!=1)off%else;on%end;"></i>
       </a>
       <a href="%if;(e.nav!="")%url_set.nav;%else;%url_set.nav.1;%end;"
-        class="btn btn-outline-primary btn-sm border-0 px-1 ml-1"
+        class="btn btn-outline-primary btn-sm border-0 px-1 ms-1"
         title="[*internal navigation]%(TODO: translation%)">
         <i class="fa fa-user"></i>
         <i class="fa fa-toggle-%if;(e.nav!=1)off%else;on%end;"></i>

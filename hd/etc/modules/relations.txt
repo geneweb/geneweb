@@ -76,16 +76,16 @@
     %if;(cnt>0)
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>%nn;
-          <img class="ml-2 mb-1" src="%images_prefix;gui_create.png" height="18" alt="Tree">%nn;
+          <img class="ms-2 mb-1" src="%images_prefix;gui_create.png" height="18" alt="Tree">%nn;
         </a>%nn;
       %end;
     %end;
   </h2>
-  <ul class="pl-4">
+  <ul class="ps-4">
   %foreach;relation;
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
-        <ul class="pl-4">
+        <ul class="ps-4">
           %apply;li_SDC("relation_him")
             %apply;short_display_person("relation_him")
           </li>
@@ -155,7 +155,7 @@
   %if;(count>0)
     <h3>[*relations of] %self;</h3>
   %end;
-  <ul  class="pl-4">
+  <ul  class="ps-4">
   %foreach;relation;
   %( godparents are displayed in timeline if has_event %)
     %if;(has_relation_him and has_relation_her)
@@ -224,7 +224,7 @@
   %if;(count>0)
     <h3>[*witnesses to events of] %self;</h3>
   %end;
-  <ul  class="pl-4">
+  <ul  class="ps-4">
     %foreach;event;%sp;
       %reset_count;
       %foreach;event_witness;
@@ -254,7 +254,7 @@
   %if;(count>0)
     <h3>%apply;str(self,sex)</h3>
   %end;
-  <ul  class="pl-4">
+  <ul  class="ps-4">
     %foreach;event_witness_relation;
       %apply;li_SDC("event_witness_relation.person")
         %apply;capitalize(event_witness_relation.event.name)%sp;

@@ -42,7 +42,7 @@
         <a href="%xxx.image_url;" class="normal_anchor" %nn;
           target="_blank" title="[*image/images]0 %xxx;">%nn;
       %end;
-        <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0" %nn;
+        <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ms-0 pe-0" %nn;
           src="%xxx.image_url;" alt="[image/images]0">%nn;
       %if;not cancel_links;</a>%end;
     %elseif;(bvar.default_image="yes")
@@ -51,13 +51,13 @@
           class="normal_anchor" target="_blank" %nn;
           title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%nn;
       %end;
-      <img class="small_image align-self-center rounded ml-0" style="height:70%%"
+      <img class="small_image align-self-center rounded ms-0" style="height:70%%"
         src="%images_prefix;img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
         alt="[missing image]">
       %if;(wizard and not cancel_links)</a>%end;
     %else;
       <span class="small_image noimage rounded display-4 text-center%nn;
-        text-body-secondary ml-0 h-100">%bvar.default_image_no;</span>
+        text-body-secondary ms-0 h-100">%bvar.default_image_no;</span>
     %end;
   %end;
   </div>
