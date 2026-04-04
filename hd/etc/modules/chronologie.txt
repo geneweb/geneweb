@@ -1,4 +1,4 @@
-<!-- $Id: modules/chronologie.txt v7.1 02/02/2026 20:06:28 $ -->
+<!-- $Id: modules/chronologie.txt v7.1 04/04/2026 06:50:49 $ -->
 %define;age_marker(xx)
   %if;(xx.years!="")
     <span%if;(xx.months>0 or xx.days>0) title="%xx;"%end;
@@ -383,67 +383,66 @@
   %end;
 
   <table class="table table-sm table-hover w-100">
-    <tbody> 
-      <thead>
-        %(<td> </td>%)
-        <td class="text-end">[*date/dates]0</td>
-        <td>[*age]</td>
-        <td> </td>
-      </thead>
-      %foreach;sorted_list_item;
-        <tr class="align-top%if;(item.4="self_evt") bg-light
-%end;">
-        %(<td class="align-middle">%item.1;</td>%)
-          <td class="align-middle text-end text-nowrap">%item.3;</td>
-          <td class="align-middle text-center text-nowrap px-2%nn;
-            %if;(has_known_death=1 and item.1>my_death_sort) age-posthumous%end;">%item.7;</td>
-          <td class="align-middle">
-            %if;(item.4="self_evt")
-              %reset_count2;
-              %foreach;event;
-                %incr_count2;
-                %if;(item.2=count2)
-                  %apply;capitalize(event.name)
-                  %if;event.has_spouse;%sp;[with] <span class="text-nowrap">%apply;short_display_person%with;event.spouse%end;</span>%end;
-                  %if;event.has_witnesses;
-                    %if;not cancel_links;<a %apply;event_tree(index)><img src="%images_prefix;gui_create.png" class="ms-2 mb-1" height="16" alt="Tree"></a>%end;
-                  %end;
-                  %if;(item.5!="")<div class="text-body-secondary">%item.5;</div>%end;
-                  %if;(event.name=[baptism] and has_relations)
-                    <div class="small text-body-secondary">
-                    %foreach;relation;
-                      %if;(has_relation_him and has_relation_her and relation_type=[godfather/godmother/godparents]2)
-                        <span class="text-nowrap">[*godfather/godmother/godparents]0[:] %apply;short_display_person("relation_him").</span>
-                        <span class="text-nowrap">[*godfather/godmother/godparents]1[:] %apply;short_display_person("relation_her").</span>
-                      %elseif;(has_relation_him and relation_type=[godfather/godmother/godparents]0)
-                        <span class="text-nowrap">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_him").</span>
-                      %elseif;(has_relation_her and relation_type=[godfather/godmother/godparents]1)
-                        <span class="text-nowrap">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_her").</span>
-                      %end;
-                    %end;
-                    </div>
-                  %end;
-                  %if;event.has_witnesses;
-                    <div class="small text-body-secondary">
-                      %apply;list_witness_of_kind("offi")
-                      %apply;list_witness_of_kind("reli")
-                      %apply;list_witness_of_kind("")
-                      %apply;list_witness_of_kind("ment")
-                      %apply;list_witness_of_kind("atte")
-                      %apply;list_witness_of_kind("info")
-                      %apply;list_witness_of_kind("othe")
-                    </div>
-                  %end;
-                  %if;(item.6!="")<div class="small text-body-secondary">%item.6;</div>%end;
+    <thead>
+      %(<td> </td>%)
+      <tr>
+      <th class="text-end">[*date/dates]0</tf>
+      <th>[*age]</th>
+      <th> </th>
+      </tr>
+    </thead>
+    %foreach;sorted_list_item;
+      <tr class="align-top%if;(item.4="self_evt") table-light%end;">
+      %(<td class="align-middle">%item.1;</td>%)
+        <td class="align-middle text-end text-nowrap">%item.3;</td>
+        <td class="align-middle text-center text-nowrap px-2%nn;
+          %if;(has_known_death=1 and item.1>my_death_sort) age-posthumous%end;">%item.7;</td>
+        <td class="align-middle">
+          %if;(item.4="self_evt")
+            %reset_count2;
+            %foreach;event;
+              %incr_count2;
+              %if;(item.2=count2)
+                %apply;capitalize(event.name)
+                %if;event.has_spouse;%sp;[with] <span class="text-nowrap">%apply;short_display_person%with;event.spouse%end;</span>%end;
+                %if;event.has_witnesses;
+                  %if;not cancel_links;<a %apply;event_tree(index)><img src="%images_prefix;gui_create.png" class="ms-2 mb-1" height="16" alt="Tree"></a>%end;
                 %end;
+                %if;(item.5!="")<div class="text-body-secondary">%item.5;</div>%end;
+                %if;(event.name=[baptism] and has_relations)
+                  <div class="small text-body-secondary">
+                  %foreach;relation;
+                    %if;(has_relation_him and has_relation_her and relation_type=[godfather/godmother/godparents]2)
+                      <span class="text-nowrap">[*godfather/godmother/godparents]0[:] %apply;short_display_person("relation_him").</span>
+                      <span class="text-nowrap">[*godfather/godmother/godparents]1[:] %apply;short_display_person("relation_her").</span>
+                    %elseif;(has_relation_him and relation_type=[godfather/godmother/godparents]0)
+                      <span class="text-nowrap">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_him").</span>
+                    %elseif;(has_relation_her and relation_type=[godfather/godmother/godparents]1)
+                      <span class="text-nowrap">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_her").</span>
+                    %end;
+                  %end;
+                  </div>
+                %end;
+                %if;event.has_witnesses;
+                  <div class="small text-body-secondary">
+                    %apply;list_witness_of_kind("offi")
+                    %apply;list_witness_of_kind("reli")
+                    %apply;list_witness_of_kind("")
+                    %apply;list_witness_of_kind("ment")
+                    %apply;list_witness_of_kind("atte")
+                    %apply;list_witness_of_kind("info")
+                    %apply;list_witness_of_kind("othe")
+                  </div>
+                %end;
+                %if;(item.6!="")<div class="small text-body-secondary">%item.6;</div>%end;
               %end;
-            %else;
-              %apply;capitalize(item.4)
-              %if;(item.5!="")<div class="text-body-secondary">%item.5;</div>%end;
             %end;
-          </td>
-        </tr>
-      %end;
-    </tbody>
+          %else;
+            %apply;capitalize(item.4)
+            %if;(item.5!="")<div class="text-body-secondary">%item.5;</div>%end;
+          %end;
+        </td>
+      </tr>
+    %end;
   </table>
 %end;
