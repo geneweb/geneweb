@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_famille.txt v7.1 17/12/2025 16:47:28 $ -->
+<!-- $Id: modules/arbre_famille.txt v7.1 04/04/2026 07:06:25 $ -->
 %define;short_display_person_image(xxx,yyy,zzz)
   %let;personinfo;%if;("xxx"="child")%sp;(%childrank;)%nn;
                   %elseif;("xxx"="child.spouse")
@@ -148,10 +148,10 @@
                             %else;
                               dark
                             %end;%sp;
-            %if;(ancestor.anc_sosa.v=10 or ancestor.anc_sosa.v=14)border-right-0 ms-1%end;%sp;
-            %if;(ancestor.anc_sosa.v=9 or ancestor.anc_sosa.v=13)border-left-0  me-1%end;
-            %if;(ancestor.anc_sosa.v=8 or ancestor.anc_sosa.v=12)border-right-0%end;%sp;
-            %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-left-0%end;">%nn;
+            %if;(ancestor.anc_sosa.v=10 or ancestor.anc_sosa.v=14)border-end-0 ms-1%end;%sp;
+            %if;(ancestor.anc_sosa.v=9 or ancestor.anc_sosa.v=13)border-start-0 me-1%end;
+            %if;(ancestor.anc_sosa.v=8 or ancestor.anc_sosa.v=12)border-end-0%end;%sp;
+            %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-start-0%end;">%nn;
             %if;(not ancestor.is_restricted)
               <a class="big_anchor list-group-item-action rounded-%if;ancestor.is_male;left%else;right%end;" 
                 href="%prefix;%ancestor.access;&m=F"
@@ -185,7 +185,7 @@
 %end;
 
 %define;border()
-  <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
+  <div class="w-50 border-end border-dark">&#8203;</div>
 %end;
 
 %define;short_display_person_spouse_image(xx,yy)
@@ -397,7 +397,7 @@
                 %if;(child.index=central_index)
                   %if;child.has_siblings;
                     <div class="d-flex justify-content-center">
-                      <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                      <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-end-0 border-start-0"></div>
                     </div>
                   %end;
                 %else;
@@ -464,7 +464,7 @@
               %foreach;child;
                 %if;(child.index=central_index)
                   <div class="d-flex justify-content-center">
-                    <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                    <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-end-0 border-start-0"></div>
                   </div>
                 %else;
                   %incr_count;
@@ -513,11 +513,11 @@
         %foreach;family;
           %if;(family_cnt=fam_cnt)
             %if;(spouse!="" or (e.half!=0 and nb_ch_tot>0))
-              <div class="border border-dark border-top-0 border-left-0 border-right-0 text-center">%if;(on_marriage_date!="" and  marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">&%marriage_date.year;%end;</a>%if;(nb_children!=0)  %nb_children;<i class="fa fa-child fa-fw"></i>%end;
+              <div class="border border-dark border-top-0 border-start-0 border-end-0 text-center">%if;(on_marriage_date!="" and  marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">&%marriage_date.year;%end;</a>%if;(nb_children!=0)  %nb_children;<i class="fa fa-child fa-fw"></i>%end;
               </div>
             %end;
             %if;(has_children or (e.half!=0 and nb_ch_tot>0))
-              <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;<br>&#8203;</div>
+              <div class="border border-dark border-bottom-0 border-top-0 border-start-0 w-50">&#8203;<br>&#8203;</div>
             %end;
           %end;
         %end;
@@ -662,7 +662,7 @@
                   %if;(child=selfspouse)
                     %if;(child.has_siblings)
                       <div class="d-flex justify-content-center">
-                        <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                        <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-end-0 border-start-0"></div>
                       </div>
                     %end;
                   %else;
@@ -725,7 +725,7 @@
                 %foreach;child;
                   %if;(child=selfspouse)
                     <div class="d-flex justify-content-center">
-                      <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                      <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-end-0 border-start-0"></div>
                     </div>
                   %else;
                     %incr_count;
