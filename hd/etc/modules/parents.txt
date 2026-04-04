@@ -143,7 +143,7 @@
   <h2>[*parents]</h2>
   <div class="d-inline-flex flex-wrap">
     %foreach;parent;
-      <div class="media %if;(parent.is_male)me-2%else;mb-1%end;">
+      <div class="%if;(parent.is_male)me-2%else;mb-1%end;">
         %if;parent.has_image;
           %if;(evar.cgl!="on") 
             <a href="%parent.image_url;" class="align-self-center" target="_blank">
@@ -163,7 +163,7 @@
         %else;
           <span class="small_image noimage rounded align-self-center display-3 text-center text-body-secondary ms-2 pb-2">?</span>
         %end;
-        <div class="media-body ms-2 align-self-center">
+        <div class="ms-2 align-self-center">
           %apply;short_display_person_tree("parent")
           <br>%if;parent.computable_age;%sp;%parent.age;%end;
           %if;parent.computable_death_age;%sp;%parent.death_age;%end;
