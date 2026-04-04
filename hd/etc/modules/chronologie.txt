@@ -99,7 +99,7 @@
     %if;browsing_with_sosa_ref;
       %incr_count;i%count;=%sosa_ref.index;&t%count;=sosa_1;%nn;
     %end;
-  " class="ml-2" title="[*relations tree]"
+  " class="ms-2" title="[*relations tree]"
    %reset_count;
 %end;
 
@@ -198,10 +198,10 @@
     <h2 class="my-1" id="c">[*time line]%nn;
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>%nn;
-          <img src="%images_prefix;gui_create.png" class="ml-1 mb-1" height="18" alt="Tree">
+          <img src="%images_prefix;gui_create.png" class="ms-1 mb-1" height="18" alt="Tree">
         </a>%nn;
       %else;
-        <img src="%images_prefix;gui_create.png" class="ml-1 mb-1" height="18" alt="Tree">
+        <img src="%images_prefix;gui_create.png" class="ms-1 mb-1" height="18" alt="Tree">
       %end;%nn;
     </h2>%nn;
     %if;not cancel_links;
@@ -211,10 +211,10 @@
             class="btn btn-outline-primary btn-sm border-0 px-0%if;(e.allmar!="on") text-body-secondary%end;" role="button"
             title="%if;(e.allmar!="on")[*visualize/show/hide/summary]1%else;%nn;
               [*visualize/show/hide/summary]2%end; [marriage/marriages]1 [spouse/spouses]1 & [child/children]1">
-            <i class="fa fa-shuffle fa-fw fa-sm mr-1"></i>
+            <i class="fa fa-shuffle fa-fw fa-sm me-1"></i>
           </a>
         </div>
-        <div class="ml-1">
+        <div class="ms-1">
           <a href="%if;(e.allevt!="on")%url_set.allevt.on;%else;%url_set.allevt;%end;"
             class="btn btn-outline-primary btn-sm border-0 px-0%if;(e.allevt!="on") text-body-secondary%end;" role="button"
             title="%if;(e.allevt!="on")[*visualize/show/hide/summary]1%else;%nn;
@@ -406,7 +406,7 @@
                   %apply;capitalize(event.name)
                   %if;event.has_spouse;%sp;[with] <span class="text-nowrap">%apply;short_display_person%with;event.spouse%end;</span>%end;
                   %if;event.has_witnesses;
-                    %if;not cancel_links;<a %apply;event_tree(index)><img src="%images_prefix;gui_create.png" class="ml-2 mb-1" height="16" alt="Tree"></a>%end;
+                    %if;not cancel_links;<a %apply;event_tree(index)><img src="%images_prefix;gui_create.png" class="ms-2 mb-1" height="16" alt="Tree"></a>%end;
                   %end;
                   %if;(item.5!="")<div class="text-body-secondary">%item.5;</div>%end;
                   %if;(event.name=[baptism] and has_relations)

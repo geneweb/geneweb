@@ -25,15 +25,15 @@
       <div class="mx-2">
         <a href="%apply;url_set%with;hi%and;%if;(e.hi="H" or e.hi="")I%end;%end;"
           class="btn btn-outline-primary">%if;(e.hi="H" or e.hi="")I%else;H%end;-tree</a>
-        <a href="%if;(e.sosa!="on")%url_set.sosa.on;%else;%url_set.sosa;%end;" class="btn btn-outline-primary ml-1"
+        <a href="%if;(e.sosa!="on")%url_set.sosa.on;%else;%url_set.sosa;%end;" class="btn btn-outline-primary ms-1"
           title="[*visualize/show/hide/summary]1 %if;(e.sosa="on")ASCII%else;HTML%end;">%nn;
           %if;(e.sosa!="on")HTML%else;ASCII%end; box drawing</a>
-        <a href="%if;(e.sms!="on")%url_set.sms.on;%else;%url_set.sms;%end;" class="btn btn-outline-primary ml-1"
+        <a href="%if;(e.sms!="on")%url_set.sms.on;%else;%url_set.sms;%end;" class="btn btn-outline-primary ms-1"
           title="%if;(e.sms!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [missing %s:::Sosa]0">%if;(e.sms!="on")·%else;x%end;</a>
-        <a href="%if;(e.cpl!="on")%url_set.cpl.on;%else;%url_set.cpl;%end;" class="btn btn-outline-primary ml-1"
+        <a href="%if;(e.cpl!="on")%url_set.cpl.on;%else;%url_set.cpl;%end;" class="btn btn-outline-primary ms-1"
           title="[*visualize/show/hide/summary]1%if;(e.cpl!="on") [couples]%else;[individuals]%end;">
           %if;(e.cpl!="on")<i class="fa fa-user-plus" aria-hidden="true"></i>%end;<i class="fa fa-user" aria-hidden="true"></i></a>
-        <a href="%if;(e.implx!="on")%url_set.implx.on;%else;%url_set.implx;%end;" class="btn btn-outline-primary ml-1"
+        <a href="%if;(e.implx!="on")%url_set.implx.on;%else;%url_set.implx;%end;" class="btn btn-outline-primary ms-1"
           title="%if;(e.implx!="on")[*implex links]%else;[*do not] [implex links]%end;">
           <i class="fa fa-shuffle fa-fw"></i></a>
       </div>
