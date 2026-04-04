@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_vertical.txt v7.1 04/03/2023 10:39:16 $ -->
+<!-- $Id: modules/arbre_vertical.txt v7.1 04/04/2026 06:50:37 $ -->
 %( Arbre ascendant vertical %)
 
 %define;a_tree_line()
