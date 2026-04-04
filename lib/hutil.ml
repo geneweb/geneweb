@@ -55,7 +55,7 @@ let header_without_http_nor_home conf title =
       {|</title>
 %s
 <meta charset="%s">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="shortcut icon" href="%s/favicon_gwd.png">
 <link rel="apple-touch-icon" href="%s/favicon_gwd.png">
 |}
