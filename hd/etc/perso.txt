@@ -1,8 +1,8 @@
+<!-- $Id: perso.txt %version; 04/04/2026 04:04:32 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: perso.txt %version; 02/03/2026 23:04:39 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -22,7 +22,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<a href="#content" class="visually-hidden visually-hidden-focusable ml-4">[*skip to main content]</a>
+<a href="#content" class="visually-hidden visually-hidden-focusable ms-4">[*skip to main content]</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
 %include;perso_utils
 %include;menubar
@@ -49,7 +49,6 @@
       %let;op_m;1%in;%include;modules/relations
     </div>
   </div>
-
 %else;
   %(Dynamic %)
   <div class="mt-2">
@@ -75,10 +74,5 @@
 </div>
 </div>
 %include;js
-<script>
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-</script>
 </body>
 </html>
