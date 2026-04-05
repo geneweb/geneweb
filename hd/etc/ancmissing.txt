@@ -1,4 +1,39 @@
 %( t=M, missing ancestor alphabeticaly &al=on and by generation, included in ancsosa.txt %)
+%define;dates_in_interval(xx)
+  %if;(evar.after!="" and
+       (xx.birth_date.year="" and
+        xx.baptism_date.year="" and
+        xx.death_date.year="" and
+        xx.burial_date.year="" and
+        xx.cremated_date.year="" or
+        xx.birth_date.year!="" and
+        xx.birth_date.year<evar.after or
+        xx.baptism_date.year!="" and
+        xx.baptism_date.year<evar.after or
+        xx.death_date.year!="" and
+        xx.death_date.year<evar.after or
+        xx.burial_date.year!="" and
+        xx.burial_date.year<evar.after or
+        xx.cremated_date.year!="" and
+        xx.cremated_date.year<evar.after) or
+       evar.before!="" and
+       (xx.birth_date.year="" and
+        xx.baptism_date.year="" and
+        xx.death_date.year="" and
+        xx.burial_date.year="" and
+        xx.cremated_date.year="" or
+        xx.birth_date.year!="" and
+        xx.birth_date.year>evar.before or
+        xx.baptism_date.year!="" and
+        xx.baptism_date.year>evar.before or
+        xx.death_date.year!="" and
+        xx.death_date.year>evar.before or
+        xx.burial_date.year!="" and
+        xx.burial_date.year>evar.before or
+        xx.cremated_date.year!="" and
+        xx.cremated_date.year>evar.before))false%nn;
+  %else;true%end;
+%end;
 %define;living_interval_dates(xxx, yyy)
   %if;(e.after!="" and e.before!="")
     ,%sp;[living between %s and %s:::xxx:yyy]
@@ -50,7 +85,7 @@
         %if;(not xx.has_parents and xx.first_name!="?" and xx.surname!="?")
           %foreach;xx.family;
             %if;(spouse.first_name!="?" and spouse.surname!="?")
-              %if;(family_cnt > 1),%sp;%end;
+              %if;(family_cnt>1),%sp;%end;
               %apply;image_MF("spouse")
               %apply;link(spouse.access, spouse, spouse.index)
             %end;
@@ -60,10 +95,9 @@
     </td>
   %end;
 %end;
-
 %if;(e.al="on") %( missing ancestors alphabetically %)
   %let;nb_gen;%apply;min(e_v, max_anc_level)%in;
-  <div class="ml-2">
+  <div class="ms-2">
     %apply;togena(nb_gen)
     %apply;living_interval_dates(e.after, e.before).
   </div>
@@ -91,8 +125,7 @@
         %if;(ancestor.first_name!="?" and ancestor.surname!="?" and (not ancestor.has_parents or (ancestor.has_families and (ancestor.spouse.first_name="?" and ancestor.spouse.surname="?"))))
           %if;(dates_in_interval(ancestor.var)="true")
             %incr_count;
-            %apply;add_in_sorted_list%with;
-              %ancestor.surname_end;
+            %apply;add_in_sorted_list%with;%ancestor.surname_end;
               %and;%ancestor.first_name;
               %and;%ancestor.surname_begin;
               %and;%ancestor.access;
@@ -131,37 +164,41 @@
   %end;
   <ul class="missing_ancestors_sort">
     %if;(nb_ind<=100)
-      <li>%nn;
-      %(<a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>%)
+      <li id="a_%apply;hexa(initial(item.1))">%nn;
       <table class="table table-sm w-auto asc-desc-table">
-        <tr>
-          <th width="20%%">[*person/persons]0</th>
-          %if;(e.birth="on")
-            <th %if;(e.death="on")width="30%%"%else;width="60%%"%end;>[*birth date and birth place]</th>
-          %end;
-          %if;(e.death="on")
-            <th %if;(e.birth="on")width="30%%"%else;width="60%%"%end;>[*death date and death place]</th>
-          %end;
-          <th width="10%%">[*missing parents]</th>
-          <th width="10%%">[*missing spouse]</th>
-        </tr>
+        <thead>
+          <tr>
+            <th>[*person/persons]0</th>
+            %if;(e.birth="on")
+              <th>[*birth date and birth place]</th>
+            %end;
+            %if;(e.death="on")
+              <th>[*death date and death place]</th>
+            %end;
+            <th>[*missing parents]</th>
+            <th>[*missing spouse]</th>
+          </tr>
+        </thead>
+        <tbody>
     %end;
     %foreach;sorted_list_item;
       %if;(initial(prev_item.1)!=initial(item.1) and nb_ind > 100)
-        <li>%nn;
-        <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+        <li id="a_%apply;hexa(initial(item.1))">%nn;
         <table class="table table-sm w-auto asc-desc-table">
-          <tr>
-            <th width="20%%">[*person/persons]0</th>
-            %if;(e.birth="on")
-              <th %if;(e.death="on")width="30%%"%else;width="60%%"%end;>[*birth date and birth place]</th>
-            %end;
-            %if;(e.death="on")
-              <th %if;(e.birth="on")width="30%%"%else;width="60%%"%end;>[*death date and death place]</th>
-            %end;
-            <th width="10%%">[*missing parents]</th>
-            <th width="10%%">[*missing spouse]</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>[*person/persons]0</th>
+              %if;(e.birth="on")
+                <th>[*birth date and birth place]</th>
+              %end;
+              %if;(e.death="on")
+                <th>[*death date and death place]</th>
+              %end;
+              <th>[*missing parents]</th>
+              <th>[*missing spouse]</th>
+            </tr>
+          </thead>
+          <tbody>
       %end;
       <tr>
         <td>
@@ -178,26 +215,28 @@
         %if;(e.death="on")
           <td>%item.8;</td>
         %end;
-        <td align="center">
+        <td class="text-center">
           %item.9;
           %if;(initial(item.9)="x")%incr_count;%incr_count;%end;
         </td>
-        <td align="center">
+        <td class="text-center">
           %item.10;
           %if;(initial(item.10)="x")%incr_count;%end;
         </td>
       </tr>
       %if;(initial(item.1)!=initial(next_item.1) and nb_ind > 100)
+        </tbody>
         </table>
         </li>
       %end;
     %end;
     %if;(nb_ind<=100)
+      </tbody>
       </table>
       </li>
     %end;
   </ul>
-  <p style="clear:both;">[*total][:] %count; [person/persons]n</p>
+  <p style="clear:both;">[*total][:] %count; [person/persons]n</p>
 %else; %( missing ancestors by generation %)
   %let;nb_gen;%apply;min(e_v, max_anc_level)%in;
   <p>
@@ -219,34 +258,38 @@
   </table>
   %reset_count;
   <table class="table table-sm w-auto asc-desc-table">
-    <tr class="align-middle">
-      <th>[*missing sosa]</th>
-      <th>[*missing parents]</th>
-      <th>[*missing spouse]</th>
-      <th>[*person/persons]0</th>
-      %if;(e.birth="on") <th>[*birth date and birth place]</th> %incr_count; %end;
-      %if;(e.death="on") <th>[*death date and death place]</th> %incr_count; %end;
-      %if;(e.spouse="on") <th>[*spouse/spouses]1</th> %incr_count; %end;
-    </tr>
+    <thead>
+      <tr class="align-middle">
+        <th>[*missing sosa]</th>
+        <th>[*missing parents]</th>
+        <th>[*missing spouse]</th>
+        <th>[*person/persons]0</th>
+        %if;(e.birth="on") <th>[*birth date and birth place]</th> %incr_count; %end;
+        %if;(e.death="on") <th>[*death date and death place]</th> %incr_count; %end;
+        %if;(e.spouse="on") <th>[*spouse/spouses]1</th> %incr_count; %end;
+      </tr>
+    </thead>
+    <tbody>
     %let;nb_col;%expr(count + 4)%in;
     %reset_count;
     %foreach;ancestor_level(nb_gen)
+    
       %apply;lazy_print%with;
         <tr>
-          <th align="left" colspan="%nb_col;">[*generation/generations]0 %expr(level+1)</th>
+          <th class="text-start" colspan="%nb_col;">[*generation/generations]0 %expr(level+1)</th>
         </tr>
       %end;
       %foreach;ancestor;
         %if;(ancestor.same="")
           %if;(not ancestor.has_parents and ancestor.first_name!="?" and ancestor.surname!="?")
-            %if;(dates_in_interval(ancestor.var)="true")
+            %if;(dates_in_interval(ancestor.var)="true" or 1=1)
               %incr_count;%incr_count;
               %lazy_force;
               <tr>
                 <td>
                   %expr(ancestor.anc_sosa.v*2) - %expr(ancestor.anc_sosa.v*2+1)
                 </td>
-                <td align="center"> x </td>
+                <td class="text-center"> x </td>
                 <td> &nbsp; </td>
                 <td>
                   %apply;image_MF("ancestor")
@@ -262,11 +305,9 @@
                 %incr_count;
                 %lazy_force;
                 <tr>
-                  <td>
-                    %expr(ancestor.anc_sosa.v*2)
-                  </td>
+                  <td>%expr(ancestor.anc_sosa.v*2)</td>
                   <td> &nbsp; </td>
-                  <td align="center"> x </td>
+                  <td class="text-center"> x </td>
                   <td>
                     %apply;image_MF("ancestor.mother")
                     %apply;link(ancestor.mother.access, ancestor.mother, ancestor.mother.index)
@@ -281,11 +322,9 @@
                 %incr_count;
                 %lazy_force;
                 <tr>
-                  <td>
-                    %expr(ancestor.anc_sosa.v*2+1)
-                  </td>
+                  <td>%expr(ancestor.anc_sosa.v*2+1)</td>
                   <td> &nbsp; </td>
-                  <td align="center"> x </td>
+                  <td class="text-center"> x </td>
                   <td>
                     %apply;image_MF("ancestor.father")
                     %apply;link(ancestor.father.access, ancestor.father, ancestor.father.index)
@@ -299,6 +338,7 @@
         %end;
       %end;
     %end;
+    </tbody>
   </table>
-  <p>[*total][:] %count; [person/persons]n</p>
+  <p>[*total][:] %count; [person/persons]n</p>
 %end;
