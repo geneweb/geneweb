@@ -33,7 +33,7 @@
 <div class="container%if;(evar.wide="on")-fluid%end;">
 %include;perso_utils
 %include;menubar
-<div class="alert alert-warning pl-5" role="alert">
+<div class="alert alert-warning px-4" role="alert">
   [*select person to compute relationship]
 </div>
 %define;on_side(xxx)
@@ -159,9 +159,9 @@
 %end;
 
 %if;(count!="" and count>1)
-<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;&tt=%apply;tt_url()"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-diagram-project fa-rotate-270 mr-1"></i></span> Graphe RLM</a>
-%if;(evar.v2=0 or evar.v2="")<a id="asc" class="ml-3" href="%prefix;m=A&t=T&%access;&spouse=on&v=%expr(evar.v1+1)"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>Graphe ASC.</a>%end;
-%if;(evar.v1=0 and evar.v2>0)<a id="desc" class="ml-3" href="%prefix;m=D&t=T&%access;&spouse=on&v=%evar.v2;"><i class="fa fa-sitemap fa-fw mr-1"></i>Graphe DESC.</a>%end;
+<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;&tt=%apply;tt_url()"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-diagram-project fa-rotate-270 me-1"></i></span> Graphe RLM</a>
+%if;(evar.v2=0 or evar.v2="")<a id="asc" class="ms-3" href="%prefix;m=A&t=T&%access;&spouse=on&v=%expr(evar.v1+1)"><i class="fa fa-sitemap fa-rotate-180 fa-fw me-1"></i>Graphe ASC.</a>%end;
+%if;(evar.v1=0 and evar.v2>0)<a id="desc" class="ms-3" href="%prefix;m=D&t=T&%access;&spouse=on&v=%evar.v2;"><i class="fa fa-sitemap fa-fw me-1"></i>Graphe DESC.</a>%end;
 %end;
 
 <div class="my-3">Total[:] %if;(evar.v2=0)%expr(count-count2)%else;%count;%end; %if;(count=0 or count=1)[person/persons]0%else;[person/persons]1%end;.</div>
