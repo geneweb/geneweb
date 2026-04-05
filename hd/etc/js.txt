@@ -157,6 +157,22 @@
   });
 </script>
 %end;
+%if;((e.m="A" or e.m="D") and e.t="")
+<script>
+function initBsValidation() {
+  document.querySelectorAll('.needs-validation').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', initBsValidation);
+</script>
+%end;
 %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
 <script%if;(e.templ!="") type="text/javascript"%end;>
  <!--
