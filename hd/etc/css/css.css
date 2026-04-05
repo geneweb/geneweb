@@ -205,9 +205,25 @@ td .rm-cell {
 }
 
 /* cousins relation table m=C */
+#quickrel .btn-light {
+  background-color: #f8f9fa;   /* fond quasi-blanc : le p-1 crée le cadre blanc visible */
+  border-color: #f8f9fa;       /* bordure quasi-blanche sur beige = effet 3D subtil */
+}
+
+.modal .listitems > .card {
+  display: inline-block;
+  width: 100%;
+  break-inside: avoid;
+  margin-bottom: .5rem;
+}
+
 .toggle-button:focus {
   outline: none; /* On generation picker, hide the toggle +/- button outline+shadow */
   box-shadow: none;
+}
+
+#quickrel td {
+  background-color: transparent !important;
 }
 
 #quickrel tr {
@@ -244,12 +260,12 @@ td .rm-cell {
   font-weight: 300;
 }
 
-.h-15p {
-  height: 15px;
+.h-10p {
+  height: 10px;
 }
 
-.h-5 {
-  height: 5rem;
+.h-4 {
+  height: 4rem;
 }
 
 .z-index1 {
