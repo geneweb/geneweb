@@ -225,12 +225,12 @@
           </div>
         </div>
         <div class="modal-body">
-          <div class=""%( style="column-count:
+          <div style="column-count:3; column-gap:1rem;"%( style="column-count:
             %if;(cous_paths_cnt.vvv.www>511)5%nn;
             %elseif;(cous_paths_cnt.vvv.www>127)4%nn;
             %elseif;(cous_paths_cnt.vvv.www>31)3
             %elseif;(cous_paths_cnt.vvv.www>9)2%else;1%end;"%)>
-            <ul class="list-group bg-transparent listitems">
+            <ul class="list-group bg-transparent listitems" style="padding:0; list-style:none;">
               %foreach;sorted_list_item;%item.2;%end;
             </ul>
           </div>
