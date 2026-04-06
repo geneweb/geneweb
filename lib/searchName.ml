@@ -974,7 +974,6 @@ let search_fullname conf base fn sn =
       k "      search_fullname: %d results" (List.length persons));
   match persons with
   | [] -> { exact = []; partial = []; spouse = [] }
-  | [ p ] -> { exact = [ Driver.get_iper p ]; partial = []; spouse = [] }
   | pl ->
       let opts =
         { order = false; exact1 = true; incl_aliases = false; absolute = false }
