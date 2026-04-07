@@ -1,4 +1,5 @@
-{ buildDunePackage
+{
+  buildDunePackage,
 }:
 
 buildDunePackage (finalAttrs: {
@@ -8,6 +9,6 @@ buildDunePackage (finalAttrs: {
 
   src = fetchTarball {
     url = "https://github.com/geneweb/unidecode/archive/refs/tags/v${finalAttrs.version}.tar.gz";
-    sha256 = "87ccf6a1da1aa7a8d3c0278940934df7c887a50d28485b668dea1d654d066631";
+    sha256 = "1jyggxm5mz52pnd0sp63d3b7c6rhba2s0vwawc3d4aqksa07qglp";
   };
 })
