@@ -1,4 +1,5 @@
-{ buildDunePackage
+{
+  buildDunePackage,
 }:
 
 buildDunePackage (finalAttrs: {
