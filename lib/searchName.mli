@@ -48,3 +48,4 @@ val persons_starting_with :
   Gwdb.iper list
 
 val search_by_sosa_in_env : Config.config -> Gwdb.base -> Gwdb.person option
+val search_reject_p : Config.config -> Gwdb.base -> Gwdb.person -> bool
