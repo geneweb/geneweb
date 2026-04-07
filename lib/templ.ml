@@ -4,7 +4,7 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Parser = Geneweb_templ.Parser
 module Ast = Geneweb_templ.Ast
-module Loc = Geneweb_templ.Loc
+module Loc = Geneweb_loc
 module Driver = Geneweb_db.Driver
 
 exception UnboundVar

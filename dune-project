@@ -48,6 +48,10 @@
     digestif
     pp_loc
     dune-site
+    tyxml
+    cmdliner
+    progress
+    logs
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.29.0")))
   )

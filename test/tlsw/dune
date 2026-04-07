@@ -1,0 +1,16 @@
+(executable
+ (name parse)
+ (libraries geneweb_tlsw geneweb_compat pp_loc tyxml))
+
+(rule
+ (deps
+  (:input ./input.txt))
+ (action
+  (with-stdout-to
+   output.html
+   (run ./parse.exe %{input}))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff expected.html output.html)))
