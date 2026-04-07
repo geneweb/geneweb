@@ -477,12 +477,8 @@ let generate_base ~keep_patch base =
   { commit; rollback = remove_temporary_files }
 
 let generate_lowercase_first_name_index ~strings_data base =
-  let tmp_fnames_lower_inx =
-    Filename.concat base.Dbdisk.data.bdir "1fnames_lower.inx"
-  in
-  let tmp_fnames_lower_dat =
-    Filename.concat base.data.bdir "1fnames_lower.dat"
-  in
+  let tmp_fnames_lower_inx = Dutil.fnames_lower_inx_path ~temp:true base in
+  let tmp_fnames_lower_dat = Dutil.fnames_lower_dat_path ~temp:true base in
   let remove_temporary_files () =
     Files.rm tmp_fnames_lower_inx;
     Files.rm tmp_fnames_lower_dat
@@ -497,12 +493,8 @@ let generate_lowercase_first_name_index ~strings_data base =
       raise e
   in
   let commit () =
-    let lowercase_first_name_data_file =
-      Filename.concat base.data.bdir Database.lowercase_first_name_data_file
-    in
-    let lowercase_first_name_index_file =
-      Filename.concat base.data.bdir Database.lowercase_first_name_index_file
-    in
+    let lowercase_first_name_data_file = Dutil.fnames_lower_dat_path base in
+    let lowercase_first_name_index_file = Dutil.fnames_lower_inx_path base in
     Files.rm lowercase_first_name_data_file;
     Sys.rename tmp_fnames_lower_dat lowercase_first_name_data_file;
     Files.rm lowercase_first_name_index_file;
@@ -514,27 +506,35 @@ let generate_lowercase_first_name_index ~strings_data base =
 
 let generate_tmp_marital_surname_index base =
   (* tmp index generation *)
-  let tmp_marital_surnames_inx = Dutil.snames_marital_inx true base in
-  let tmp_marital_surnames_dat = Dutil.snames_marital_dat true base in
+  let tmp_marital_surnames_inx =
+    Dutil.snames_marital_inx_path ~temp:true base
+  in
+  let tmp_marital_surnames_dat =
+    Dutil.snames_marital_dat_path ~temp:true base
+  in
   output_surname_index ~include_marital_names:true base tmp_marital_surnames_inx
     tmp_marital_surnames_dat
 
 let generate_tmp_marital_lowercase_surname_index strings_data base =
   (* tmp index generation *)
-  let tmp_marital_surnames_inx = Dutil.snames_marital_lower_inx true base in
-  let tmp_marital_surnames_dat = Dutil.snames_marital_lower_dat true base in
+  let tmp_marital_surnames_inx =
+    Dutil.snames_marital_lower_inx_path ~temp:true base
+  in
+  let tmp_marital_surnames_dat =
+    Dutil.snames_marital_lower_dat_path ~temp:true base
+  in
   output_surname_lower_index ~include_marital_names:true strings_data base
     tmp_marital_surnames_inx tmp_marital_surnames_dat
 
 let generate_lowercase_surname_index ~strings_data base =
-  let tmp_snames_lower_inx =
-    Filename.concat base.Dbdisk.data.bdir "1snames_lower.inx"
+  let tmp_snames_lower_inx = Dutil.snames_lower_inx_path ~temp:true base in
+  let tmp_snames_lower_dat = Dutil.snames_lower_dat_path ~temp:true base in
+  let tmp_snames_marital_lower_dat =
+    Dutil.snames_marital_lower_dat_path ~temp:true base
   in
-  let tmp_snames_lower_dat =
-    Filename.concat base.data.bdir "1snames_lower.dat"
+  let tmp_snames_marital_lower_inx =
+    Dutil.snames_marital_lower_inx_path ~temp:true base
   in
-  let tmp_snames_marital_lower_dat = Dutil.snames_marital_lower_dat true base in
-  let tmp_snames_marital_lower_inx = Dutil.snames_marital_lower_inx true base in
   let remove_temporary_files () =
     Files.rm tmp_snames_lower_inx;
     Files.rm tmp_snames_lower_dat;
@@ -552,17 +552,13 @@ let generate_lowercase_surname_index ~strings_data base =
       raise e
   in
   let commit () =
-    let lowercase_surname_data_file =
-      Filename.concat base.data.bdir Database.lowercase_surname_data_file
-    in
-    let lowercase_surname_index_file =
-      Filename.concat base.data.bdir Database.lowercase_surname_index_file
-    in
+    let lowercase_surname_data_file = Dutil.snames_lower_dat_path base in
+    let lowercase_surname_index_file = Dutil.snames_lower_inx_path base in
     let lowercase_marital_surname_data_file =
-      Dutil.snames_marital_lower_dat false base
+      Dutil.snames_marital_lower_dat_path base
     in
     let lowercase_marital_surname_index_file =
-      Dutil.snames_marital_lower_inx false base
+      Dutil.snames_marital_lower_inx_path base
     in
     Files.rm lowercase_surname_data_file;
     Sys.rename tmp_snames_lower_dat lowercase_surname_data_file;
@@ -764,16 +760,10 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
     true
     (fun () ->
       let first_name_index_files =
-        [
-          Database.lowercase_first_name_data_file;
-          Database.lowercase_first_name_index_file;
-        ]
+        [ Dutil.fnames_lower_dat; Dutil.fnames_lower_inx ]
       in
       let surname_index_files =
-        [
-          Database.lowercase_surname_data_file;
-          Database.lowercase_surname_index_file;
-        ]
+        [ Dutil.snames_lower_dat; Dutil.snames_lower_inx ]
       in
       let surname_already_initialized =
         are_already_initialized base surname_index_files
@@ -787,12 +777,12 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
             ( generate_lowercase_first_name_index,
               first_name_already_initialized
               && Integrity.check_index_integrity ~kind ~base
-                   ~index_file:Database.lowercase_first_name_index_file )
+                   ~index_file:Dutil.fnames_lower_inx )
         | `Surname ->
             ( generate_lowercase_surname_index,
               surname_already_initialized
               && Integrity.check_index_integrity ~kind ~base
-                   ~index_file:Database.lowercase_surname_index_file )
+                   ~index_file:Dutil.snames_lower_inx )
       in
       if not already_initialized then (
         base.Dbdisk.func.cleanup ();
@@ -830,10 +820,10 @@ let output ?(save_mem = false) ?(tasks = []) base =
   let tmp_particles = Filename.concat bname "1particles.txt" in
   let tmp_names_inx = Filename.concat bname "1names.inx" in
   let tmp_names_acc = Filename.concat bname "1names.acc" in
-  let tmp_snames_inx = Filename.concat bname "1snames.inx" in
-  let tmp_snames_dat = Filename.concat bname "1snames.dat" in
-  let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
-  let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
+  let tmp_snames_inx = Dutil.snames_inx_path ~temp:true base in
+  let tmp_snames_dat = Dutil.snames_dat_path ~temp:true base in
+  let tmp_fnames_inx = Dutil.fnames_inx_path ~temp:true base in
+  let tmp_fnames_dat = Dutil.fnames_dat_path ~temp:true base in
   let tmp_strings_inx = Filename.concat bname "1strings.inx" in
   let tmp_notes = Filename.concat bname "1notes" in
   let tmp_notes_d = Filename.concat bname "1notes_d" in
@@ -932,23 +922,23 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
   Files.rm (Filename.concat bname "names.acc");
   Sys.rename tmp_names_acc (Filename.concat bname "names.acc");
-  Files.rm (Filename.concat bname "snames.dat");
-  Sys.rename tmp_snames_dat (Filename.concat bname "snames.dat");
-  Files.rm (Filename.concat bname "snames.inx");
-  Sys.rename tmp_snames_inx (Filename.concat bname "snames.inx");
-  Files.rm (Filename.concat bname "fnames.dat");
-  Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
-  Files.rm (Filename.concat bname "fnames.inx");
-  Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
+  Files.rm (Dutil.snames_dat_path base);
+  Sys.rename tmp_snames_dat (Dutil.snames_dat_path base);
+  Files.rm (Dutil.snames_inx_path base);
+  Sys.rename tmp_snames_inx (Dutil.snames_inx_path base);
+  Files.rm (Dutil.fnames_dat_path base);
+  Sys.rename tmp_fnames_dat (Dutil.fnames_dat_path base);
+  Files.rm (Dutil.fnames_inx_path base);
+  Sys.rename tmp_fnames_inx (Dutil.fnames_inx_path base);
 
-  Files.rm (Dutil.snames_marital_inx false base);
-  Files.rm (Dutil.snames_marital_dat false base);
+  Files.rm (Dutil.snames_marital_inx_path base);
+  Files.rm (Dutil.snames_marital_dat_path base);
   Sys.rename
-    (Dutil.snames_marital_inx true base)
-    (Dutil.snames_marital_inx false base);
+    (Dutil.snames_marital_inx_path ~temp:true base)
+    (Dutil.snames_marital_inx_path base);
   Sys.rename
-    (Dutil.snames_marital_dat true base)
-    (Dutil.snames_marital_dat false base);
+    (Dutil.snames_marital_dat_path ~temp:true base)
+    (Dutil.snames_marital_dat_path base);
 
   pending_lowercase_surname_index_generation.commit ();
   pending_lowercase_first_name_index_generation.commit ();
