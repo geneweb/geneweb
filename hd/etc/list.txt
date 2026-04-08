@@ -32,7 +32,7 @@
 %end;
 %( %qvar.index.marriage_places; renvoie une chaine avec les places de mariage, séparées par des | %)
 %define;get_marriage(myindex)
-  %qvar.myindex.marriage_places;
+  %qvar.myindex.marriage_places_raw;
 %end;
 %define;get_value(myindex,param)
   %if;("param"="father" or "param"="mother")
@@ -97,13 +97,13 @@
 </div>
 
 %define;nbmds(xx,yy,tt,kk)
-  %if;(xx!="" and xx="kk")yy%nn;
+  %if;("xx"!="" and "xx"="kk")yy%nn;
   %else;%if;("tt"=1)&nbsp;%end;
   %end;
 %end;
 
 %define;nbmds_m(xx,yy,tt,kk)
-  %if;(xx!="" and ("kk" is_substr xx or xx="kk"))yy%nn;
+  %if;("xx"!="" and ("kk" is_substr "xx" or "xx"="kk"))yy%nn;
   %else;%if;("tt"=1)&nbsp;%end;
   %end;
 %end;
