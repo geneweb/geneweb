@@ -799,6 +799,8 @@ end = struct
     if test_string conf x then search ^ " " ^ map_field (gets conf x)
     else search
 
+  let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
+
   (* Returns the place and date request. (e.g.: ...in Paris between 1800 and 1900) *)
   let get_place_date_request conf place_prefix_field_name date_prefix_field_name
       search =
@@ -885,8 +887,6 @@ end = struct
   let sosa_field conf base search =
     let s = sosa conf base in
     if search = "" then s else if s = "" then search else search ^ ", " ^ s
-
-  let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
 
   let map_field ~conf ~key s =
     if get_name_search_mode (gets conf) key = `Not_Exact_Prefix then s ^ "..."
