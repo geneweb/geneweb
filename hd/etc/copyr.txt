@@ -169,7 +169,7 @@
           </a>%nn;
           %if;predictable_mode;GeneWeb %version_short;
           %else;
-            <a href="https://github.com/%source;/tree/%commit_id;"
+            <a href="https://github.com/%source_repo;/tree/%commit_id;"
                data-toggle="tooltip" data-html="true"
                title="[*branch/branches]0 %branch; [compiled on] %compil_date;%nn;
                %if;not is_printed_by_template;&#010;
