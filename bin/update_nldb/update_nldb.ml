@@ -4,6 +4,8 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 module Dirs = Geneweb_dirs
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let debug = ref false
 let fname = ref ""
@@ -12,7 +14,7 @@ let errmsg = Format.sprintf "usage: %s [options] <file_name>" Sys.argv.(0)
 let speclist =
   [
     ( "-bd",
-      Arg.String Secure.set_base_dir,
+      Arg.String (fun s -> Secure.set_base_dir (Fpath.of_string s)),
       Fmt.str
         "<DIR> Specify where the bases directory with databases is installed \
          (default if empty is %S)."
@@ -52,14 +54,14 @@ let notes_links s =
 
 type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 
-let save_cache_linked_pages bdir cache_linked_pages =
-  let oc = open_out_bin (Filename.concat bdir Notes.cache_linked_pages_name) in
-  output_value oc cache_linked_pages;
-  close_out oc
+let save_cache_linked_pages bpath cache_linked_pages =
+  File.with_open_out_bin Fpath.(bpath // ~$Notes.cache_linked_pages_name)
+  @@ fun oc -> output_value oc cache_linked_pages
 
-let compute base bdir =
-  let bdir =
-    if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
+let compute base bpath =
+  let bpath =
+    if Fpath.check_suffix bpath ".gwb" then bpath
+    else Fpath.of_string (Fpath.to_string bpath ^ ".gwb")
   in
   let nb_ind = Driver.nb_of_persons base in
   let nb_fam = Driver.nb_of_families base in
@@ -85,7 +87,7 @@ let compute base bdir =
   flush stderr;
   (try
      let files =
-       Sys.readdir (Filename.concat bdir (Driver.base_wiznotes_dir base))
+       File.readdir Fpath.(bpath // ~$(Driver.base_wiznotes_dir base))
      in
      for i = 0 to Array.length files - 1 do
        try
@@ -100,8 +102,7 @@ let compute base bdir =
              match notes_links (Driver.base_wiznotes_read base wizid) with
              | [], [] -> ()
              | (_list_nt, list_ind) as list ->
-                 Printf.eprintf "%s... " wizid;
-                 flush stderr;
+                 Fmt.epr "%s... @." wizid;
                  let pg = NLDB.PgWizard wizid in
                  db := NotesLinks.add_in_db !db pg list;
                  let list_ind =
@@ -117,18 +118,16 @@ let compute base bdir =
          Printf.eprintf "Warning: error while reading wizardnotes %s\n"
            files.(i)
      done;
-     Printf.eprintf "\n";
-     flush stderr
+     Fmt.epr "@."
    with Sys_error _ ->
      Printf.eprintf "Warning: error while reading wizardnotes dir\n");
 
-  Printf.eprintf "--- misc notes\n";
-  flush stderr;
-  let ndir = Filename.concat bdir (Driver.base_notes_dir base) in
+  Fmt.epr "--- misc notes@.";
+  let ndir = Fpath.(bpath // ~$(Driver.base_notes_dir base)) in
   let rec loop dir name =
     try
-      let cdir = Filename.concat ndir dir in
-      let files = Sys.readdir cdir in
+      let cdir = Fpath.concat ndir dir in
+      let files = File.readdir cdir in
       for i = 0 to Array.length files - 1 do
         let file = files.(i) in
         if
@@ -138,8 +137,10 @@ let compute base bdir =
         then
           if Filename.check_suffix file ".txt" then (
             let fnotes = Filename.chop_suffix file ".txt" in
-            let file = Filename.concat dir fnotes in
-            match notes_links (Driver.base_notes_read base file) with
+            let file = Fpath.(dir // ~$fnotes) in
+            match
+              notes_links (Driver.base_notes_read base (Fpath.to_string file))
+            with
             | [], [] -> ()
             | (_list_nt, list_ind) as list ->
                 let fnotes =
@@ -161,7 +162,8 @@ let compute base bdir =
                   (fun (key, _) -> update_cache_linked_pages key)
                   list_ind)
           else
-            loop (Filename.concat dir file)
+            loop
+              Fpath.(dir // ~$file)
               (if name = "" then file
                else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep file)
       done;
@@ -169,7 +171,7 @@ let compute base bdir =
     with Sys_error _ ->
       Printf.eprintf "Warning: error while reading misc notes %s\n" name
   in
-  loop Filename.current_dir_name "";
+  loop (Fpath.of_string Filename.current_dir_name) "";
 
   let buffer = Buffer.create 1024 in
   let add_string istr =
@@ -255,22 +257,21 @@ let compute base bdir =
   Driver.write_nldb base !db;
 
   (* Save the cache_linked_pages to a file *)
-  save_cache_linked_pages bdir cache_linked_pages
+  save_cache_linked_pages bpath cache_linked_pages
 
 let main () =
-  Secure.set_base_dir ".";
+  Secure.set_base_dir (Fpath.of_string ".");
   Arg.parse speclist anonfun errmsg;
-  let bname = Filename.concat (Secure.base_dir ()) !fname in
+  let bpath = !GWPARAM.bpath !fname in
   if !fname = "" then (
-    Printf.eprintf "Missing database name\n";
-    Printf.eprintf "Use option -help for usage\n";
-    flush stderr;
+    Fmt.epr "Missing database name\n";
+    Fmt.epr "Use option -help for usage@.";
     exit 2);
-  Driver.with_database bname @@ fun base ->
+  Driver.with_database bpath @@ fun base ->
   Sys.catch_break true;
   Driver.load_strings_array base;
   Driver.load_unions_array base;
-  try compute base bname
+  try compute base bpath
   with Sys.Break ->
     Printf.eprintf "\n";
     flush stderr

@@ -4,6 +4,8 @@ open Geneweb
 open Gwcomp
 open Def
 module Driver = Geneweb_db.Driver
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 (* From OCaml manual, integer in binary format is 4 bytes long. *)
 let sizeof_long = 4
@@ -1571,7 +1573,7 @@ let empty_base : cbase =
   }
 
 (** Extract information from the [gen.g_base] and create database *)
-let make_base bname gen per_index_ic per_ic k =
+let make_base bpath gen per_index_ic per_ic k =
   let _ =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
@@ -1623,7 +1625,7 @@ let make_base bname gen per_index_ic per_ic k =
     gen.g_base.c_strings <- [||];
     a
   in
-  Driver.make bname
+  Driver.make bpath
     (input_particles !particules_file)
     ( (persons, ascends, unions),
       (families, couples, descends),
@@ -1631,43 +1633,37 @@ let make_base bname gen per_index_ic per_ic k =
       gen.g_base.c_bnotes )
     k
 
-(** Write content in the file *)
-let write_file_contents fname text =
-  let oc = open_out fname in
-  output_string oc text;
-  close_out oc
-
 (** Create and fill a file for every wizard note *)
-let output_wizard_notes bdir wiznotes =
-  let wizdir = Filename.concat bdir "wiznotes" in
+let output_wizard_notes bpath wiznotes =
+  let wizdir = Fpath.(bpath // ~$"wiznotes") in
   if wiznotes <> [] then (
     (* FIXME ad hoc solution. wiznotes should be handled same as notes_d *)
     (* not necessarily true! notes_d is part of base, wiznotes is not *)
-    if not @@ Sys.file_exists wizdir then Unix.mkdir wizdir 0o755;
+    if not @@ File.file_exists wizdir then
+      File.create_dir ~required_perm:0o755 wizdir;
     List.iter
       (fun (wizid, text) ->
-        let fname = Filename.concat wizdir wizid ^ ".txt" in
-        write_file_contents fname text)
+        File.with_open_out_text Fpath.(wizdir // ~$(wizid ^ ".txt"))
+        @@ fun oc -> output_string oc text)
       wiznotes)
 
 (** Create file that contains command used to call this program *)
-let output_command_line bdir =
-  let oc = open_out (Filename.concat bdir "command.txt") in
+let output_command_line bpath =
+  File.with_open_out_text Fpath.(bpath // ~$"command.txt") @@ fun oc ->
   Printf.fprintf oc "%s" Sys.argv.(0);
   for i = 1 to Array.length Sys.argv - 1 do
     Printf.fprintf oc " %s" Sys.argv.(i)
   done;
-  Printf.fprintf oc "\n";
-  close_out oc
+  Printf.fprintf oc "\n"
 
 (** Link .gwo files and create a database. *)
-let link ?(no_warn = false) next_family_fun bdir =
-  let tmp_dir = Filename.concat bdir "gw_tmp" in
-  Mutil.mkdir_p tmp_dir;
-  let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
-  let tmp_per = Filename.concat tmp_dir "gwc_per" in
-  let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
-  let tmp_fam = Filename.concat tmp_dir "gwc_fam" in
+let link ?(no_warn = false) next_family_fun bpath =
+  let tmp_dir = Fpath.(bpath // ~$"gw_tmp") in
+  File.mkdir_p tmp_dir;
+  let tmp_per_index = Fpath.(tmp_dir // ~$"gwc_per_index") in
+  let tmp_per = Fpath.(tmp_dir // ~$"gwc_per") in
+  let tmp_fam_index = Fpath.(tmp_dir // ~$"gwc_fam_index") in
+  let tmp_fam = Fpath.(tmp_dir // ~$"gwc_fam") in
   let fi =
     {
       f_local_names = Hashtbl.create 20011;
@@ -1692,14 +1688,14 @@ let link ?(no_warn = false) next_family_fun bdir =
       g_def = [||];
       g_first_av_occ = Hashtbl.create 1;
       g_errored = false;
-      g_per_index = open_out_bin tmp_per_index;
-      g_per = open_out_bin tmp_per;
-      g_fam_index = open_out_bin tmp_fam_index;
-      g_fam = open_out_bin tmp_fam;
+      g_per_index = File.open_out_bin tmp_per_index;
+      g_per = File.open_out_bin tmp_per;
+      g_fam_index = File.open_out_bin tmp_fam_index;
+      g_fam = File.open_out_bin tmp_fam;
     }
   in
-  let per_index_ic = open_in_bin tmp_per_index in
-  let per_ic = open_in_bin tmp_per in
+  let per_index_ic = File.open_in_bin tmp_per_index in
+  let per_ic = File.open_in_bin tmp_per in
   let istr_empty = unique_string gen "" in
   let istr_quest = unique_string gen "?" in
   assert (istr_empty = 0);
@@ -1720,7 +1716,7 @@ let link ?(no_warn = false) next_family_fun bdir =
   Hashtbl.clear gen.g_strings;
   Hashtbl.clear gen.g_names;
   Hashtbl.clear fi.f_local_names;
-  make_base bdir gen per_index_ic per_ic @@ fun base ->
+  make_base bpath gen per_index_ic per_ic @@ fun base ->
   Hashtbl.clear gen.g_patch_p;
   Gc.full_major ();
   close_in per_index_ic;
@@ -1732,12 +1728,12 @@ let link ?(no_warn = false) next_family_fun bdir =
     if !do_consang then (
       ignore @@ ConsangAll.compute base true;
       Driver.sync base);
-    output_wizard_notes bdir gen.g_wiznotes;
-    output_command_line bdir;
-    Mutil.rm_rf tmp_dir;
+    output_wizard_notes bpath gen.g_wiznotes;
+    output_command_line bpath;
+    File.remove ~recursive:true ~force:true tmp_dir;
     true)
   else (
-    Mutil.rm_rf tmp_dir;
+    File.remove ~recursive:true ~force:true tmp_dir;
     Printf.eprintf "*** database NOT created due to errors\n";
     flush stderr;
     false)

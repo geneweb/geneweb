@@ -6,6 +6,9 @@ open Gwexport
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
+module Compat = Geneweb_compat
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let old_gw = ref false
 let only_file = ref ""
@@ -968,28 +971,8 @@ let get_persons_with_notes m list =
   in
   Array.fold_right List.cons m.m_chil list
 
-let notes_aliases bdir =
-  let fname = Filename.concat bdir "notes.alias" in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic ->
-      let rec loop list =
-        match try Some (input_line ic) with End_of_file -> None with
-        | Some s ->
-            let list =
-              try
-                let i = String.index s ' ' in
-                ( String.sub s 0 i,
-                  String.sub s (i + 1) (String.length s - i - 1) )
-                :: list
-              with Not_found -> list
-            in
-            loop list
-        | None ->
-            close_in ic;
-            list
-      in
-      loop []
-  | None -> []
+let notes_aliases_noerr path =
+  try Util.notes_aliases path with Sys_error _ -> []
 
 let print_notes_for_person opts base gen p =
   let print_witness_in_notes witnesses =
@@ -1435,21 +1418,6 @@ let connected_families base fam_sel ifam cpl =
   in
   loop [ ifam ] [] [ Driver.get_father cpl ]
 
-let read_file_contents fname =
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic -> (
-      let len = ref 0 in
-      try
-        let rec loop () =
-          len := Buff.store !len (input_char ic);
-          loop ()
-        in
-        loop ()
-      with End_of_file ->
-        close_in ic;
-        Buff.get !len)
-  | None -> ""
-
 type separate = ToSeparate | NotScanned | BeingScanned | Scanned
 
 let rec find_ancestors base surn p list =
@@ -1638,9 +1606,10 @@ let rs_printf opts s =
   in
   loop true 0
 
-let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
+let gwu opts isolated base (in_dir : Fpath.t) out_dir src_oc_ht
+    (per_sel, fam_sel) =
   if out_dir <> "" && not (Sys.file_exists out_dir) then
-    Filesystem.create_dir ~parent:true out_dir;
+    File.create_dir ~parent:true (Fpath.of_string out_dir);
   let to_separate = separate base in
   let out_oc_first = ref true in
   let _ofile, oc, close = opts.oc in
@@ -1669,6 +1638,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
     let fam_done =
       Geneweb_db.Driver.ifam_marker (Geneweb_db.Driver.ifams base) false
     in
+    let notes_alias = notes_aliases_noerr Fpath.(in_dir // ~$"notes.alias") in
     {
       mark;
       mark_rel;
@@ -1677,7 +1647,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       fam_done;
       notes_pl_p = [];
       ext_files = [];
-      notes_alias = notes_aliases in_dir;
+      notes_alias;
       pevents_pl_p = [];
     }
   in
@@ -1796,18 +1766,14 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       Printf.ksprintf oc "\nend notes-db\n";
       ignore (add_linked_files gen (fun _ -> "database notes") s [] : _ list));
     (try
-       let files =
-         Sys.readdir (Filename.concat in_dir (Driver.base_wiznotes_dir base))
-       in
+       let wdir = Fpath.(in_dir // ~$(Driver.base_wiznotes_dir base)) in
+       let files = File.readdir wdir in
        Array.sort compare files;
        for i = 0 to Array.length files - 1 do
          let file = files.(i) in
          if Filename.check_suffix file ".txt" then
-           let wfile =
-             List.fold_left Filename.concat in_dir
-               [ Driver.base_wiznotes_dir base; file ]
-           in
-           let s = read_file_contents wfile in
+           let wfile = Fpath.(wdir // ~$file) in
+           let s = File.with_open_in_text wfile In_channel.input_all in
            ignore
              (add_linked_files gen (fun _ -> "wizard \"" ^ file ^ "\"") s []
                : _ list)
@@ -1853,14 +1819,14 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
 
     (* gen.ext_files does not list all files in notes_d. Format is note_link *)
     let ext_files_1 = List.map (fun (f, _) -> f) gen.ext_files in
-    let notes_d = Filename.concat in_dir (Driver.base_notes_dir base) in
-    let notes_d_length = String.length notes_d in
+    let notes_d = Fpath.(in_dir // ~$(Driver.base_notes_dir base)) in
+    let notes_d_length = String.length @@ Fpath.to_string notes_d in
     let ext_files_2 =
-      Filesystem.walk_folder ~recursive:true
+      File.walk_folder ~recursive:true
         (fun fl files ->
           match fl with
-          | File f when Filename.check_suffix f ".txt" ->
-              Filename.chop_suffix f ".txt" :: files
+          | File f when Filename.check_suffix (Fpath.to_string f) ".txt" ->
+              Filename.chop_suffix (Fpath.to_string f) ".txt" :: files
           | File _ | Dir _ | Exn _ ->
               (* TODO: we may print a warning for errors. *)
               files)
@@ -1888,9 +1854,10 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
     let ext_files_2 = List.map (fun f -> (f, dummy)) ext_files_2 in
     List.iter
       (fun (f, _) ->
-        let fn = Filename.concat notes_d f ^ ".txt" in
+        let fn = Fpath.(notes_d // ~$(f ^ ".txt")) in
         let s =
-          if Sys.file_exists fn then read_file_contents fn
+          if File.file_exists fn then
+            File.with_open_in_text fn In_channel.input_all
           else (
             Printf.eprintf "Missing file: %s\n" f;
             "")
@@ -1910,19 +1877,18 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht
     in
     try
-      let files =
-        Sys.readdir (Filename.concat in_dir (Driver.base_wiznotes_dir base))
-      in
+      let wdir = Fpath.(in_dir // ~$(Driver.base_wiznotes_dir base)) in
+      let files = File.readdir wdir in
       Array.sort compare files;
       for i = 0 to Array.length files - 1 do
         let file = files.(i) in
         if Filename.check_suffix file ".txt" then (
           let wizid = Filename.chop_suffix file ".txt" in
-          let wfile =
-            List.fold_left Filename.concat in_dir
-              [ Driver.base_wiznotes_dir base; file ]
+          let wfile = Fpath.(wdir // ~$file) in
+          let s =
+            String.trim
+            @@ File.with_open_in_text wfile Compat.In_channel.input_all
           in
-          let s = String.trim (read_file_contents wfile) in
           Printf.ksprintf oc "\nwizard-note %s\n" wizid;
           rs_printf opts s;
           Printf.ksprintf oc "\nend wizard-note\n")

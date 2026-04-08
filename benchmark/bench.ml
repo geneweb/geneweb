@@ -7,6 +7,8 @@ module UpdateData = Geneweb.UpdateData
 module Perso = Geneweb.Perso
 module BirthDeath = Geneweb.BirthDeath
 module Check = Geneweb.Check
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let style = ref Benchmark.Auto
 
@@ -112,11 +114,12 @@ let bench () =
     ]
   in
   match Sys.getenv_opt "BENCH_BASE" with
-  | Some bname when bname <> "" ->
+  | Some bpath when bpath <> "" ->
       let conf = Config.empty in
+      let bpath = Fpath.of_string bpath in
       let bench_w_base ?t ?(load = []) name fn args =
-        Secure.set_base_dir (Filename.dirname bname);
-        Driver.with_database bname @@ fun base ->
+        Secure.set_base_dir (Fpath.dirname bpath);
+        Driver.with_database bpath @@ fun base ->
         List.iter (fun load -> load base) load;
         let r = bench ?t name (fn base) args in
         r

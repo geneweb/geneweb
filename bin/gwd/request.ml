@@ -10,6 +10,8 @@ module Gutil = Geneweb_db.Gutil
 module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
@@ -445,21 +447,22 @@ let propose_base conf =
   Output.print_sstring conf "</button></li></ul>";
   Hutil.trailer conf
 
-let try_plugin list conf base_name m =
+let try_plugin list conf (bpath : Fpath.t option) m =
   let fn =
-    if List.mem "*" list then fun (_, fn) -> fn conf base_name
+    if List.mem "*" list then fun (_, fn) -> fn conf bpath
     else fun (ns, fn) ->
-      (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base_name
+      (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf bpath
   in
   List.exists fn (Hashtbl.find_all Plugin.ht m)
 
-let w_lock ~onerror fn conf (base_name : string option) =
-  let bfile = !GWPARAM.bpath conf.bname in
+(* FIXME: XXXXXX *)
+let w_lock ~onerror fn conf (bpath : Fpath.t option) =
   (* FIXME: we lost the backtrace because onerror does not handle it. *)
   Lock.control
-    ~on_exn:(fun _exn _bt -> onerror conf base_name)
-    ~wait:true ~lock_file:(Mutil.lock_file bfile)
-  @@ fun () -> fn conf base_name
+    ~on_exn:(fun _exn _bt -> onerror conf bpath)
+    ~wait:true
+    ~lock_file:(Mutil.lock_file @@ Option.get bpath)
+  @@ fun () -> fn conf bpath
 
 let nldb_check_done = ref false
 
@@ -473,11 +476,11 @@ let check_nldb_format conf base =
           (Util.transl conf "NOTIF incompatible notes_links")
     | `Ok | `NoFile -> ())
 
-let w_base ~none fn conf (bfile : string option) =
-  match bfile with
+let w_base ~none fn conf (bpath : Fpath.t option) =
+  match bpath with
   | None -> none conf
-  | Some bfile ->
-      Driver.with_database bfile (fun base ->
+  | Some bpath ->
+      Driver.with_database bpath (fun base ->
           let conf = make_henv conf base in
           let conf = make_senv conf base in
           let conf =
@@ -541,20 +544,18 @@ let treat_request =
          | _ -> person_selected conf base p)
       conf l
   in
-  let handle_no_bfile conf l =
+  let handle_no_bpath conf l =
     if conf.bname = "" then
       try Templ.output_simple conf Templ.Env.empty "index"
       with _ -> propose_base conf
     else print_page conf l
   in
   fun conf ->
-    let bfile =
+    let bpath =
       if conf.bname = "" then None
       else
-        let bfile =
-          Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb")
-        in
-        if Sys.file_exists bfile then Some bfile else None
+        let bpath = !GWPARAM.bpath conf.bname in
+        if File.file_exists bpath then Some bpath else None
     in
     let process () =
       if
@@ -568,7 +569,7 @@ let treat_request =
           w_base
             (fun conf base ->
               request_issue conf base ~level:`Error ~key:"wizards cant write")
-            conf bfile
+            conf bpath
         else
           let plugins =
             match List.assoc_opt "plugins" conf.Config.base_env with
@@ -576,13 +577,13 @@ let treat_request =
             | Some list -> String.split_on_char ',' list |> List.map String.trim
           in
           if List.mem "*" plugins then
-            List.iter (fun (_, fn) -> fn conf bfile) !Plugin.se
+            List.iter (fun (_, fn) -> fn conf bpath) !Plugin.se
           else
             List.iter
-              (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile)
+              (fun (ns, fn) -> if List.mem ns plugins then fn conf bpath)
               !Plugin.se;
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
-          if not @@ try_plugin plugins conf bfile m then
+          if not @@ try_plugin plugins conf bpath m then
             ((if
                 List.assoc_opt "counter" conf.base_env <> Some "no"
                 && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
@@ -604,14 +605,14 @@ let treat_request =
              in
              match m with
              | "" -> (
-                 match bfile with
-                 | Some bfile -> (
+                 match bpath with
+                 | Some bpath -> (
                      (* We attempt to load the database in order to detect issues. *)
                      try
-                       Driver.with_database bfile ignore;
+                       Driver.with_database bpath ignore;
                        print_page
-                     with _ -> handle_no_bfile)
-                 | None -> handle_no_bfile)
+                     with _ -> handle_no_bpath)
+                 | None -> handle_no_bpath)
              | "A" -> AscendDisplay.print |> w_person |> w_base
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
              | "ADD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_add
@@ -1026,7 +1027,7 @@ let treat_request =
                       m);
                  let conf = Notif.inject_pending conf in
                  SrcfileDisplay.print_welcome conf base)
-              conf bfile)
+              conf bpath)
       else
         let title _ =
           Printf.sprintf "%s %s %s"

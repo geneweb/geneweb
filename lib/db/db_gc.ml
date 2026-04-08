@@ -154,7 +154,7 @@ let gc ?(dry_run = true) base =
     in
     let bnotes = base.data.bnotes in
     let particles = base.data.particles_txt in
-    let bname = base.data.bdir in
+    let bpath = base.data.bpath in
     base.data.persons.clear_array ();
     base.data.ascends.clear_array ();
     base.data.unions.clear_array ();
@@ -162,7 +162,7 @@ let gc ?(dry_run = true) base =
     base.data.couples.clear_array ();
     base.data.descends.clear_array ();
     base.data.strings.clear_array ();
-    Database.make bname particles
+    Database.make bpath particles
       ( (persons, ascends, unions),
         (families, couples, descends),
         strings,

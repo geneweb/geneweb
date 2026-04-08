@@ -1,4 +1,6 @@
 (* Copyright (c) 2006-2007 INRIA *)
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
 
 let rec list_limit n l =
   if n <= 0 then []
@@ -90,8 +92,6 @@ let print_callstack ?(max = 5) () =
 
 let verbose = ref true
 let particles_file = ref ""
-let rm fname = if Sys.file_exists fname then Sys.remove fname
-let mv src dst = if Sys.file_exists src then Sys.rename src dst
 
 let list_iter_first f = function
   | [] -> ()
@@ -172,17 +172,7 @@ let decline case s =
 let nominative s =
   match String.rindex_opt s ':' with Some _ -> decline 'n' s | _ -> s
 
-let mkdir_p ?(perm = 0o755) d =
-  let rec loop d =
-    let d1 = Filename.dirname d in
-    if d1 <> d && String.length d1 < String.length d then loop d1;
-    if not (Sys.file_exists d) then
-      try Unix.mkdir d perm
-      with Unix.Unix_error (_, _, _) -> Printf.eprintf "Failed mkdir: %s\n" d
-  in
-  loop d
-
-let lock_file bname = Filename.remove_extension bname ^ ".lck"
+let lock_file bname = Fpath.replace_extension bname ".lck"
 
 let initial n =
   let rec loop i =
@@ -479,7 +469,7 @@ let read_fallback lang fname =
       fallback := [ ("co", "fr"); ("oc", "fr"); ("br", "fr"); ("bg", "ru") ]
 
 let input_lexicon lang ht open_fname =
-  read_fallback lang "lexicon.gwf";
+  read_fallback lang (Fpath.of_string "lexicon.gwf");
   let ic = open_fname () in
   let lang =
     match String.index_opt lang '.' with
@@ -704,31 +694,6 @@ let list_slice a b list =
   in
   list_slice a (b - a) list
 
-let input_file_ic ic =
-  let len = in_channel_length ic in
-  if Sys.unix then (
-    let bytes = Bytes.create len in
-    really_input ic bytes 0 len;
-    Bytes.unsafe_to_string bytes)
-  else if len = 0 then ""
-  else
-    let buffer = Buffer.create len in
-    let rec loop () =
-      match input_line ic with
-      | line ->
-          Buffer.add_string buffer line;
-          let pos = pos_in ic in
-          if
-            pos < len
-            || (seek_in ic @@ (pos - 1);
-                input_char ic)
-               = '\n'
-          then Buffer.add_char buffer '\n';
-          loop ()
-      | exception End_of_file -> Buffer.contents buffer
-    in
-    loop ()
-
 let normalize_utf_8 s =
   let b = Buffer.create (String.length s * 3) in
   let n = Uunf.create `NFC in
@@ -882,7 +847,7 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
   if not Sys.unix then ignore wait;
 
   assert (Secure.check fname);
-  let fd = Unix.openfile fname [ Unix.O_RDWR; Unix.O_CREAT ] 0o666 in
+  let fd = File.openfile fname [ Unix.O_RDWR; Unix.O_CREAT ] 0o666 in
 
   if Sys.unix then (
     try Unix.lockf fd (if wait then Unix.F_LOCK else Unix.F_TLOCK) 0
@@ -1122,8 +1087,8 @@ let rev_input_line ic pos (rbuff, rpos) =
 let search_file_opt directories fname =
   let rec loop = function
     | hd :: tl ->
-        let f = Filename.concat hd fname in
-        if Sys.file_exists f then Some f else loop tl
+        let f = Fpath.(hd // ~$fname) in
+        if File.file_exists f then Some f else loop tl
     | [] -> None
   in
   loop directories
@@ -1156,43 +1121,6 @@ let ls_r dirs =
           loop acc rest)
   in
   loop [] dirs
-
-let check_permissions path =
-  try
-    let stats = Unix.stat path in
-    let perms = stats.Unix.st_perm in
-    if perms land 0o200 = 0 then
-      Printf.eprintf "File is not writable: %s\n" path;
-    try Unix.access path [ Unix.W_OK ]
-    with Unix.Unix_error _ ->
-      Printf.eprintf "Current process does not have write permission: %s\n" path
-  with e ->
-    Printf.eprintf "Error checking permissions for %s: %s\n" path
-      (Printexc.to_string e)
-
-let rm_rf f =
-  if Sys.file_exists f then (
-    let all_paths = ls_r [ f ] in
-    List.iter check_permissions all_paths;
-    let directories, files = List.partition Sys.is_directory all_paths in
-    List.iter
-      (fun file ->
-        try
-          let ic = open_in_bin file in
-          close_in ic;
-          Sys.remove file
-        with e ->
-          Printf.eprintf "Error handling file %s: %s\n" file
-            (Printexc.to_string e))
-      files;
-    List.iter
-      (fun dir ->
-        try Unix.rmdir dir
-        with e ->
-          Printf.eprintf "Error deleting directory %s: %s\n" dir
-            (Printexc.to_string e))
-      (List.rev directories))
-  else Printf.eprintf "Path does not exist: %s\n" f
 
 let rec filter_map fn = function
   | [] -> []

@@ -89,6 +89,7 @@ ambiguity.
 
 ### `%include;` is Parse-Time AST Inlining
 
+<<<<<<< HEAD
 Resolved at **parse time** by the lexer. The included file's AST is
 inlined (and cached). Not a runtime file load. Variables from the
 parent are visible in the included file.
@@ -201,3 +202,11 @@ Collection.iter : ('a -> unit) -> 'a Collection.t -> unit
 
 Always check `Util.authorized_age conf base p` before exposing
 date-based information.
+=======
+1. Never disable compiler warnings
+2. Never remove code in `test/` directory - you can add tests
+3. Never use the `Obj` module from OCaml stdlib
+4. Don't use global mutable state (global references) - prefer passing data as arguments
+5. Don't use `List.nth`, `List.concat`, or `@` from OCaml stdlib
+6. Always run check formatting before creating commits
+>>>>>>> f45da82bd (Add a type to handle paths)

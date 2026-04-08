@@ -1,4 +1,5 @@
 module Compat = Geneweb_compat
+module Fpath = Geneweb_fs.Fpath
 
 let with_cache (type a b) (f : a -> b) : a -> b =
   let cache : (a, b) Hashtbl.t = Hashtbl.create 17 in
@@ -15,7 +16,7 @@ let parse_ast ~src lexbuf =
   Lexer.parse_ast (Buffer.create 1024) [] st lexbuf |> fst
 
 let parse_file ~src fl =
-  Compat.In_channel.with_open_text fl @@ fun ic ->
+  Compat.In_channel.with_open_text (Fpath.to_string fl) @@ fun ic ->
   (* We do not use position feature of the Lexing module as our lexer does not
      produce a single token per call. Instead, we rely on
      `lex_abs_pos`, `lex_start_pos` and `lex_curr_pos` of [lexbuf] to compute
@@ -31,9 +32,9 @@ let parse_source ~cached src =
 
 let comment fl =
   let s =
-    match Filename.extension fl with
-    | ".css" | ".js" -> Fmt.str "/* %s */\n" fl
-    | _ -> Fmt.str "<!-- %s -->\n" fl
+    match Fpath.extension fl with
+    | ".css" | ".js" -> Fmt.str "/* %a */\n" Fpath.pp fl
+    | _ -> Fmt.str "<!-- %a -->\n" Fpath.pp fl
   in
   Ast.mk_text s
 

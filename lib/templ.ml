@@ -6,6 +6,8 @@ module Parser = Geneweb_templ.Parser
 module Ast = Geneweb_templ.Ast
 module Loc = Geneweb_templ.Loc
 module Driver = Geneweb_db.Driver
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 exception UnboundVar
 exception BadApplyArity
@@ -43,10 +45,7 @@ let on_exn e bt =
   incr GWPARAM.nb_errors;
   Log.debug (fun k -> k "%a" pp_exception (e, bt))
 
-let resolve_include conf _loc fl =
-  let r = Util.etc_file_name conf fl in
-  (* Log.debug (fun k -> k "%a: resolved %s into: %s" Loc.pp loc fl r); *)
-  r
+let resolve_include conf _loc fl = Util.etc_file_name conf (Fpath.to_string fl)
 
 let parse conf fl =
   let fl = Util.etc_file_name conf fl in
@@ -405,7 +404,7 @@ and eval_simple_variable conf = function
   | "nl" -> "\n"
   | "nn" -> ""
   | "plugins" ->
-      let l = List.map Filename.basename conf.plugins in
+      let l = List.map Fpath.basename conf.plugins in
       String.concat ", " l
   | "bname" -> conf.bname
   | "token" -> conf.cgi_passwd
@@ -1164,7 +1163,8 @@ let rec eval conf ifun env =
             String.concat " " wl
         | "hash", [ (None, VVstring file) ] -> (
             let fpath =
-              if conf.cgi then file else Util.resolve_asset_file conf file
+              if conf.cgi then Fpath.of_string file
+              else Util.resolve_asset_file conf file
             in
             match Util.hash_file_cached fpath with
             | Some hash -> hash
@@ -1395,12 +1395,12 @@ and print_simple_variable conf = function
   | "src_images_list" -> (
       let dir = !GWPARAM.images_d conf.bname in
       try
-        let f_list = Sys.readdir dir |> Array.to_list |> List.sort compare in
+        let f_list = File.readdir dir |> Array.to_list |> List.sort compare in
         List.iter
           (fun f ->
-            let full_path = Filename.concat dir f in
+            let full_path = Fpath.(dir // ~$f) in
             if
-              (Unix.stat full_path).st_kind = Unix.S_REG
+              (File.stat full_path).st_kind = Unix.S_REG
               && f.[0] <> '.'
               && f.[0] <> '~'
             then
@@ -1408,10 +1408,11 @@ and print_simple_variable conf = function
           f_list
       with
       | Sys_error msg ->
-          Log.warn (fun k -> k "src_images_list: %s (%s)" msg dir)
+          Log.warn (fun k -> k "src_images_list: %s (%a)" msg Fpath.pp dir)
       | Unix.Unix_error (err, _, _) ->
           Log.warn (fun k ->
-              k "src_images_list: %s (%s)" (Unix.error_message err) dir))
+              k "src_images_list: %s (%a)" (Unix.error_message err) Fpath.pp dir)
+      )
   | _ -> raise Not_found
 
 and print_variable conf sl =

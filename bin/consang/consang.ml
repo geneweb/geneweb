@@ -2,8 +2,9 @@
 
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
 
-let fname = ref ""
+let bpath = ref None
 let scratch = ref false
 let verbosity = ref 2
 let fast = ref false
@@ -22,26 +23,30 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
+let raise_bad = Fmt.kstr (fun s -> raise (Arg.Bad s))
+
 let anonfun s =
-  if !fname = "" then fname := s
-  else raise (Arg.Bad "Cannot treat several databases")
+  match !bpath with
+  | None -> bpath := Some s
+  | Some _ -> raise_bad "Cannot treat several databases"
+
+let parse_cmd () =
+  Arg.parse speclist anonfun errmsg;
+  if Option.is_none !bpath then raise_bad "Missing file name."
 
 let () =
   Logs.set_reporter (Logs_fmt.reporter ());
-  Arg.parse speclist anonfun errmsg;
-  if !fname = "" then (
-    Printf.eprintf "Missing file name\n";
-    Printf.eprintf "Use option -help for usage@.";
-    exit 2);
+  parse_cmd ();
   if !verbosity = 0 then Mutil.verbose := false;
-  Secure.set_base_dir (Filename.dirname !fname);
-  let lock_file = Mutil.lock_file !fname in
+  let bpath = Fpath.of_string @@ Option.get !bpath in
+  Secure.set_base_dir (Fpath.dirname bpath);
+  let lock_file = Mutil.lock_file bpath in
   let on_exn exn bt =
     Logs.err (fun k -> k "%a" Lock.pp_exception (exn, bt));
     exit 2
   in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  Driver.with_database !fname (fun base ->
+  Driver.with_database bpath (fun base ->
       if !fast then (
         Driver.load_persons_array base;
         Driver.load_families_array base;

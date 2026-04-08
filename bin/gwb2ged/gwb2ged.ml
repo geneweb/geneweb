@@ -1,4 +1,5 @@
 module Driver = Geneweb_db.Driver
+module Fpath = Geneweb_fs.Fpath
 
 let with_indexes = ref false
 
@@ -7,12 +8,10 @@ let speclist opts =
   :: Gwexport.speclist opts
   |> List.sort compare |> Arg.align
 
-let bname = ref None
+let bpath = ref None
 
 let anonfun s =
-  if !bname = None then (
-    Secure.set_base_dir (Filename.dirname s);
-    bname := Some s)
+  if !bpath = None then bpath := Some s
   else raise (Arg.Bad "Cannot treat several databases")
 
 let ansel_warning =
@@ -24,9 +23,8 @@ let () =
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
   if !opts.Gwexport.charset = Gwexport.Ansel then
     Printf.eprintf "%s\n%!" ansel_warning;
-  match !bname with
-  | None -> raise @@ Arg.Bad "Expect a database"
-  | Some bname ->
-      Driver.with_database bname @@ fun base ->
-      let select = Gwexport.select base !opts [] in
-      Gwb2gedLib.gwb2ged base !with_indexes !opts select
+  let bpath = Fpath.of_string @@ Option.get !bpath in
+  Secure.set_base_dir (Fpath.dirname bpath);
+  Driver.with_database bpath @@ fun base ->
+  let select = Gwexport.select base !opts [] in
+  Gwb2gedLib.gwb2ged base !with_indexes !opts select

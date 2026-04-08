@@ -40,7 +40,7 @@ type base_data = {
   particles_txt : string list;
   particles : Re.re Lazy.t;
   bnotes : Def.base_notes;
-  bdir : string;
+  bpath : Geneweb_fs.Fpath.t;
   perm : perm;
 }
 

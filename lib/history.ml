@@ -6,9 +6,11 @@ open Def
 open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 (* S: Fail if conf.bname is undefined? *)
-let file_name conf = Filename.concat (Util.bpath conf.bname) "history"
+let file_name conf = Fpath.(!GWPARAM.bpath conf.bname // ~$"history")
 
 (* Record history when committing updates *)
 
@@ -463,7 +465,7 @@ and eval_person_field_var conf base env p = function
       let sn = Driver.sou base (Driver.get_surname p) in
       let occ = Driver.get_occ p in
       let person_file = HistoryDiff.history_file fn sn occ in
-      VVbool (Sys.file_exists (HistoryDiff.history_path conf person_file))
+      VVbool (File.file_exists (HistoryDiff.history_path conf person_file))
   | [ "history_file" ] ->
       let fn = Driver.sou base (Driver.get_first_name p) in
       let sn = Driver.sou base (Driver.get_surname p) in

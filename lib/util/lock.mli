@@ -6,7 +6,7 @@ val pp_exception : Format.formatter -> exn * Printexc.raw_backtrace -> unit
 val control :
   on_exn:(exn -> Printexc.raw_backtrace -> 'a) ->
   wait:bool ->
-  lock_file:string ->
+  lock_file:Geneweb_fs.Fpath.t ->
   (unit -> 'a) ->
   'a
 (** [control ~on_exn ~wait ~lock_file k] tries to acquire a lock on [lock_file]

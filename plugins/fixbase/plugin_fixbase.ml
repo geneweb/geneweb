@@ -3,6 +3,8 @@ open Config
 module Driver = Geneweb_db.Driver
 module Plugin = Geneweb_plugin
 module Code = Geneweb_http.Code
+module File = Geneweb_fs.File
+module Fpath = Geneweb_fs.Fpath
 
 let arg_f_parents = "f_parents"
 let arg_f_children = "f_children"
@@ -388,9 +390,9 @@ let fixbase_ok conf base =
     in
     let tstab () =
       if UI.enabled conf "tstab" then (
-        let bname = !GWPARAM.bpath conf.bname in
-        Mutil.rm (Filename.concat bname "tstab_visitor");
-        Mutil.rm (Filename.concat bname "tstab");
+        let bpath = !GWPARAM.bpath conf.bname in
+        File.remove ~force:true Fpath.(bpath // ~$"tstab_visitor");
+        File.remove ~force:true Fpath.(bpath // ~$"tstab");
         Output.print_sstring conf {|<p>|};
         Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_tstab");
         Output.print_sstring conf {|</p>|})

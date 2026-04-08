@@ -4,9 +4,14 @@ let src = Logs.Src.create ~doc:"Image" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 let path_str path =
-  match path with Some (`Path pa) -> pa | Some (`Url u) -> u | None -> ""
+  match path with
+  | Some (`Path pa) -> Fpath.to_string pa
+  | Some (`Url u) -> u
+  | None -> ""
 
 let portrait_folder conf = !GWPARAM.portraits_d conf.bname
 let carrousel_folder conf = !GWPARAM.images_d conf.bname
@@ -38,14 +43,12 @@ let ext_list_2 = [| ".jpg"; ".jpeg"; ".png"; ".gif"; ".url"; ".stop" |]
 
 let find_img_opt f =
   let exists ext =
-    let fname = f ^ ext in
-    if Sys.file_exists fname then Some fname else None
+    let fname = Fpath.of_string (Fpath.to_string f ^ ext) in
+    if File.file_exists fname then Some fname else None
   in
   match exists ".url" with
   | Some f ->
-      let ic = open_in f in
-      let url = input_line ic in
-      close_in ic;
+      let url = File.with_open_in_text f input_line in
       Some (`Url url)
   | None -> (
       match exists ".stop" with
@@ -56,31 +59,34 @@ let find_img_opt f =
           | Some f -> Some (`Path f)))
 
 let find_file_without_ext f =
+  let f_str = Fpath.to_string f in
   let exists ext =
-    let fname = f ^ ext in
-    if Sys.file_exists fname then Some fname else None
+    let fname = Fpath.of_string (f_str ^ ext) in
+    if File.file_exists fname then Some fname else None
   in
-  let ext = Filename.extension f in
+  let ext = Filename.extension f_str in
   (* file f happens to have correct extension *)
   if Array.mem ext ext_list_2 then f
   else
-    match Mutil.array_find_map exists ext_list_2 with None -> "" | Some f -> f
+    match Mutil.array_find_map exists ext_list_2 with
+    | None -> Fpath.empty
+    | Some f -> f
 
 (** [full_image_path mode conf base p] is [Some path] if [p] has a portrait or a
     blason. [path] is a the full path of the file with file extension. *)
 let full_image_path mode conf base p saved =
   (* TODO why is extension not in filename..? *)
   let s = default_image_filename_aux mode base p saved in
-  let f = Filename.concat (portrait_folder conf) s in
+  let f = Fpath.(portrait_folder conf // ~$s) in
   match find_img_opt f with
   | Some (`Path _) as full_path -> full_path
   | Some (`Url _) as full_url -> full_url
   | None -> None
 
 let path_of_filename conf fname =
-  let fname1 = Filename.concat (!GWPARAM.images_d conf.bname) fname in
-  if Sys.file_exists fname1 then fname1
-  else Util.search_in_assets (Filename.concat "images" fname)
+  let path = Fpath.(!GWPARAM.images_d conf.bname // ~$fname) in
+  if File.file_exists path then path
+  else Util.search_in_assets Fpath.(~$"images" // ~$fname)
 
 let png_size ic =
   let magic = really_input_string ic 4 in
@@ -155,14 +161,14 @@ let jpeg_size ic =
 let size_from_path fname =
   (* TODO: size and mime type should be in db *)
   let res =
-    if fname = "" then Error ()
+    if fname = Fpath.empty then Error ()
     else
       try
         let ic = Secure.open_in_bin fname in
         let r =
           try
             (* TODO: should match on mime type here *)
-            match String.lowercase_ascii @@ Filename.extension fname with
+            match String.lowercase_ascii @@ Fpath.extension fname with
             | ".jpeg" | ".jpg" -> jpeg_size ic
             | ".png" -> png_size ic
             | ".gif" -> gif_size ic
@@ -175,7 +181,7 @@ let size_from_path fname =
   in
   res
 
-let src_to_string = function `Url s | `Path s -> s
+let src_to_string = function `Url s -> s | `Path p -> Fpath.to_string p
 
 let scale_to_fit ~max_w ~max_h ~w ~h =
   let w, h =
@@ -237,11 +243,9 @@ let urlorpath_of_string conf s =
     (* FIXME basename does not work with sub fodlers *)
     let s = Filename.basename s in
     match List.assoc_opt "images_path" conf.base_env with
-    | Some p when p <> "" -> `Path (Filename.concat p s)
-    | Some _ | None ->
-        let fname = Filename.concat (portrait_folder conf) s in
-        `Path fname
-  else `Path s
+    | Some p when p <> "" -> `Path Fpath.(~$p // ~$s)
+    | Some _ | None -> `Path Fpath.(portrait_folder conf // ~$s)
+  else `Path (Fpath.of_string s)
 
 let src_of_string conf s =
   if s = "" then `Empty
@@ -270,16 +274,17 @@ let parse_src_with_size_info conf s =
 let get_old_portrait_or_blason conf base mode p =
   if has_access_to_image mode conf base p then
     let f =
-      Filename.concat (portrait_folder conf)
-        (default_image_filename_aux mode base p true)
+      Fpath.(
+        portrait_folder conf // ~$(default_image_filename_aux mode base p true))
     in
     find_img_opt f
   else None
 
 let get_portrait_aux conf base p saved =
   let f =
-    Filename.concat (portrait_folder conf)
-      (default_image_filename_aux "portraits" base p saved)
+    Fpath.(
+      portrait_folder conf
+      // ~$(default_image_filename_aux "portraits" base p saved))
   in
   if has_access_to_image "portraits" conf base p then
     if not saved then
@@ -289,7 +294,7 @@ let get_portrait_aux conf base p saved =
           | Error _e -> None
           | Ok (s, _size) -> Some s)
       | `Url _s as url -> Some url
-      | `Path p as path -> if Sys.file_exists p then Some path else None
+      | `Path p as path -> if File.file_exists p then Some path else None
       | `Empty -> full_image_path "portraits" conf base p false
     else find_img_opt f
   else None
@@ -299,12 +304,12 @@ let get_old_portrait conf base p = get_portrait_aux conf base p true
 
 let get_portrait_name_aux conf base p saved =
   let name = default_image_filename_aux "portraits" base p saved in
-  let f = Filename.concat (portrait_folder conf) name in
-  Printf.eprintf "Get_portrait_name: %s, %s\n" name f;
+  let f = Fpath.(portrait_folder conf // ~$name) in
+  Format.eprintf "Get_portrait_name: %s, %a\n" name Fpath.pp f;
   match find_img_opt f with
   | Some (`Path p) ->
-      Printf.eprintf "Path %s\n" p;
-      Filename.basename p
+      Format.eprintf "Path %a\n" Fpath.pp p;
+      Fpath.basename p
   | Some (`Url u) ->
       Printf.eprintf "Url %s\n" u;
       Filename.basename name ^ ".url"
@@ -326,7 +331,7 @@ let get_blason_aux conf base p self saved =
           match parse_src_with_size_info conf s_info with
           | Error _e -> None
           | Ok (s, _size) -> Some s)
-      | `Path p when Filename.extension p = ".stop" -> None
+      | `Path p when Fpath.extension p = ".stop" -> None
       | `Path p -> Some (`Path p)
       | `Url u -> Some (`Url u)
       | `Empty -> (
@@ -345,9 +350,9 @@ let get_old_blason conf base p self = get_blason_aux conf base p self true
 
 let get_blason_name_aux conf base p saved =
   let name = default_image_filename_aux "blasons" base p saved in
-  let f = Filename.concat (portrait_folder conf) name in
+  let f = Fpath.(portrait_folder conf // ~$name) in
   match find_img_opt f with
-  | Some (`Path p) -> Filename.basename p
+  | Some (`Path p) -> Fpath.basename p
   | Some (`Url _u) -> name ^ ".url"
   | None -> ""
 
@@ -357,7 +362,7 @@ let get_old_blason_name conf base p = get_blason_name_aux conf base p true
 let has_blason conf base p self =
   match get_blason conf base p self with
   | None -> false
-  | Some (`Path p) when Filename.extension p = ".stop" -> false
+  | Some (`Path p) when Fpath.extension p = ".stop" -> false
   | Some (`Path _p) -> true
   | Some (`Url _u) -> true
 
@@ -365,7 +370,7 @@ let has_blason_stop conf base p =
   match
     src_of_string conf (path_str (full_image_path "blasons" conf base p false))
   with
-  | `Path p when Filename.extension p = ".stop" -> true
+  | `Path p when Fpath.extension p = ".stop" -> true
   | _ -> false
 
 let get_blason_owner conf base p =
@@ -400,33 +405,34 @@ let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
   else
     let p_dir = !GWPARAM.portraits_d conf.bname in
     let i_dir = !GWPARAM.images_d conf.bname in
-    let old_carrousel = Filename.concat i_dir old_key in
-    let new_carrousel = Filename.concat i_dir new_key in
-    (if Sys.file_exists old_carrousel && Sys.is_directory old_carrousel then
-       try Sys.rename old_carrousel new_carrousel
+    let old_carrousel = Fpath.(i_dir // ~$old_key) in
+    let new_carrousel = Fpath.(i_dir // ~$new_key) in
+    (if File.file_exists old_carrousel && File.is_directory old_carrousel then
+       try File.rename old_carrousel new_carrousel
        with Sys_error e ->
          Log.err (fun k ->
-             k "Error renaming carrousel directory %s to %s: %s" old_carrousel
-               new_carrousel e));
+             k "Error renaming carrousel directory %a to %a: %s" Fpath.pp
+               old_carrousel Fpath.pp new_carrousel e));
     let rename_files_with_extensions dir base_name =
       Array.iter
         (fun ext ->
           let blason =
             if Filename.check_suffix base_name ".blason" then ".blason" else ""
           in
-          let old_file = Filename.concat dir (base_name ^ ext) in
-          if Sys.file_exists old_file then
-            let new_file = Filename.concat dir (new_key ^ blason ^ ext) in
-            try Sys.rename old_file new_file
+          let old_file = Fpath.(dir // ~$(base_name ^ ext)) in
+          if File.file_exists old_file then
+            let new_file = Fpath.(dir // ~$(new_key ^ blason ^ ext)) in
+            try File.rename old_file new_file
             with Sys_error e ->
               Log.err (fun k ->
-                  k "Error renaming %s to %s: %s" old_file new_file e))
+                  k "Error renaming %a to %a: %s" Fpath.pp old_file Fpath.pp
+                    new_file e))
         [| ".jpg"; ".jpeg"; ".png"; ".gif"; ".stop" |]
     in
     rename_files_with_extensions p_dir old_key;
     rename_files_with_extensions p_dir (old_key ^ ".blason");
-    let saved_dir = Filename.concat p_dir "saved" in
-    if Sys.file_exists saved_dir then (
+    let saved_dir = Fpath.(p_dir // ~$"saved") in
+    if File.file_exists saved_dir then (
       rename_files_with_extensions saved_dir old_key;
       rename_files_with_extensions saved_dir (old_key ^ ".blason"))
 
@@ -439,7 +445,7 @@ let get_portrait_with_size conf base p =
         | Ok (s, size) -> Some (s, Some size))
     | `Url _s as url -> Some (url, None)
     | `Path p as path ->
-        if Sys.file_exists p then
+        if File.file_exists p then
           Some (path, size_from_path p |> Result.to_option)
         else None
     | `Empty -> (
@@ -462,7 +468,7 @@ let get_blason_with_size conf base p self =
           | Ok (s, size) -> Some (s, Some size))
       | `Url _s as url -> Some (url, None)
       | `Path p as path ->
-          if Sys.file_exists p then
+          if File.file_exists p then
             Some (path, size_from_path p |> Result.to_option)
           else None
       | `Empty -> (
@@ -488,15 +494,17 @@ let carrousel_file_path conf base p fname old =
     let dir = default_image_filename "portraits" base p in
     if old then Filename.concat dir "saved" else dir
   in
-  String.concat Filename.dir_sep
-    ([ carrousel_folder conf; dir ] @ if fname = "" then [] else [ fname ])
+  Fpath.(carrousel_folder conf // ~$dir // fname)
 
 let get_carrousel_file_content conf base p fname kind old =
-  let fname =
-    Filename.chop_extension (carrousel_file_path conf base p fname old) ^ kind
+  let fpath =
+    Fpath.of_string
+      (Fpath.to_string
+         (Fpath.chop_extension (carrousel_file_path conf base p fname old))
+      ^ kind)
   in
-  if Sys.file_exists fname then (
-    let ic = Secure.open_in fname in
+  if File.file_exists fpath then (
+    let ic = Secure.open_in fpath in
     let s = really_input_string ic (in_channel_length ic) in
     close_in ic;
     if s = "" then None else Some s)
@@ -514,13 +522,13 @@ let get_carrousel_img_aux conf base p old =
   in
   let get_carrousel_img fname =
     let path = carrousel_file_path conf base p fname old in
-    find_img_opt (Filename.chop_extension path)
+    find_img_opt (Fpath.chop_extension path)
   in
   if not (has_access_to_carrousel conf base p) then []
   else
-    let f = carrousel_file_path conf base p "" old in
+    let f = carrousel_file_path conf base p Fpath.empty old in
     try
-      if Sys.file_exists f && Sys.is_directory f then
+      if File.file_exists f && File.is_directory f then
         Array.fold_left
           (fun acc f1 ->
             let ext = Filename.extension f1 in
@@ -529,22 +537,24 @@ let get_carrousel_img_aux conf base p old =
               && f1.[0] <> '.'
               && (Array.mem ext ext_list_1 || ext = ".url")
             then
+              let f1 = Fpath.of_string f1 in
               match get_carrousel_img f1 with
               | None -> acc
               | Some (`Path path) ->
                   (path, "", get_carrousel_img_src f1, get_carrousel_img_note f1)
                   :: acc
               | Some (`Url url) ->
-                  ( Filename.chop_extension (Filename.basename f1) ^ ".url",
+                  ( Fpath.of_string
+                      (Filename.chop_extension (Fpath.basename f1) ^ ".url"),
                     url,
                     get_carrousel_img_src f1,
                     get_carrousel_img_note f1 )
                   :: acc
             else acc)
-          [] (Sys.readdir f)
+          [] (File.readdir f)
       else []
     with Sys_error e ->
-      Log.err (fun k -> k "carrousel error: %s, %s" f e);
+      Log.err (fun k -> k "carrousel error: %a, %s" Fpath.pp f e);
       []
 
 let get_carrousel_imgs conf base p = get_carrousel_img_aux conf base p false

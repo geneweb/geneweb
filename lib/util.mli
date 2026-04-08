@@ -19,15 +19,15 @@ val make_link :
     disabled state appropriately. The data_attrs parameter allows custom data-*
     attributes for JavaScript interaction. *)
 
-val hash_file : string -> string option
+val hash_file : Geneweb_fs.Fpath.t -> string option
 (** [hash_file path] Compute the MD5 hash of the file at [path]. Returns
     [Some hex] on success or [None] if the file couldn’t be read. *)
 
-val hash_file_cached : string -> string option
+val hash_file_cached : Geneweb_fs.Fpath.t -> string option
 (** [hash_file_cached path] Like [hash_file], but memoizes by file modification
     time to avoid recomputing the hash on repeated calls. *)
 
-val resolve_asset_file : Config.config -> string -> string
+val resolve_asset_file : Config.config -> string -> Geneweb_fs.Fpath.t
 (** [resolve_asset_file conf name] Find and return the full filesystem path for
     asset [name] according to base directory and Secure.assets(). *)
 
@@ -43,16 +43,14 @@ val time_debug :
   config -> float -> int -> string list -> string list -> string list -> unit
 (** prints the query duration and reports it in the "home" section *)
 
-val bpath : string -> string
-(** Alias for !GWPARAM.bpath *)
-
-val search_in_assets : string -> string
+val search_in_assets : Geneweb_fs.Fpath.t -> Geneweb_fs.Fpath.t
 (** Checks that the file in argument belong to one of the asserts dir (defined
     in the Secure module) *)
 
-val etc_file_name : Config.config -> string -> string
+val etc_file_name : Config.config -> string -> Geneweb_fs.Fpath.t
 
-val open_etc_file : Config.config -> string -> (in_channel * string) option
+val open_etc_file :
+  Config.config -> string -> (in_channel * Geneweb_fs.Fpath.t) option
 (** [open_etc_file conf fname] search for template {i etc/fname.txt} inside the
     base directory or inside one of assets directories. Returns input channel
     and the path to given template. *)
@@ -69,7 +67,7 @@ val escache_value : Geneweb_db.Driver.base -> Adef.encoded_string
 val commit_patches : config -> Geneweb_db.Driver.base -> unit
 (** Commits the patches and logs the modification *)
 
-val update_wf_trace : config -> string -> unit
+val update_wf_trace : config -> Geneweb_fs.Fpath.t -> unit
 
 val get_referer : config -> Adef.escaped_string
 (** Get referer (the page you came from to the current page) page from HTTP
@@ -727,7 +725,7 @@ val display_options : config -> Adef.escaped_string
 type cache_visited_t =
   (string, (Geneweb_db.Driver.iper * string) list) Hashtbl.t
 
-val cache_visited : config -> string
+val cache_visited : config -> Geneweb_fs.Fpath.t
 val read_visited : config -> cache_visited_t
 val record_visited : config -> Geneweb_db.Driver.iper -> unit
 
@@ -840,8 +838,8 @@ val designation :
 val has_children : Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 val get_bases_list : ?format_fun:(string -> string) -> unit -> string list
 
-val test_cnt_d : config -> string
-(** tests if cnt_d exists and creaets it if needed *)
+val test_cnt_d : config -> Geneweb_fs.Fpath.t
+(** tests if cnt_d exists and creates it if needed *)
 
 val extract_value : char -> string -> string
 (** [extract_value delimiter s] Assuming that the string [s] is of the form
@@ -909,4 +907,6 @@ val evar_buttons : config -> string -> evar_button list -> string -> unit
     toggle evar *)
 
 val url_set_aux : config -> string -> string list -> string list -> string
+
+val notes_aliases : Geneweb_fs.Fpath.t -> (string * string) list
 (** *)

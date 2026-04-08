@@ -166,7 +166,8 @@ module Make (W : Word.S) (E : Entry) = struct
 
                 let pattern = p
                 let max_dist = max_dist
-              end) in
+              end)
+          in
           A ((module A), A.init))
         ps
     in

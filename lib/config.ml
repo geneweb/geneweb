@@ -112,7 +112,7 @@ type config = {
      if false, the base name is the last element of the uri path: .../base?... *)
   cgi : bool;
   forced_plugins : string list;
-  plugins : string list;
+  plugins : Geneweb_fs.Fpath.t list;
   secret_salt : string option;
   predictable_mode : bool;
 }

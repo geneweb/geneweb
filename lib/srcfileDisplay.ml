@@ -3,6 +3,8 @@
 open Config
 open Util
 module Driver = Geneweb_db.Driver
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 type counter = {
   mutable welcome_cnt : int;
@@ -64,7 +66,7 @@ let count conf =
 
 let write_counter conf r =
   let cnt_d = Util.test_cnt_d conf in
-  let fname = Filename.concat cnt_d (conf.bname ^ ".txt") in
+  let fname = Fpath.(cnt_d // ~$(conf.bname ^ ".txt")) in
   try
     let oc = Secure.open_out_bin fname in
     output_string oc (string_of_int r.welcome_cnt);
@@ -107,9 +109,9 @@ let set_wizard_and_friend_traces conf =
 
 let incr_counter f conf =
   let bpath = !GWPARAM.bpath conf.bname in
-  if conf.bname = "" || not (Sys.file_exists bpath) then None
+  if conf.bname = "" || not (File.file_exists bpath) then None
   else (
-    ignore (Util.test_cnt_d conf : string);
+    ignore (Util.test_cnt_d conf : Fpath.t);
     let lock_file = !GWPARAM.adm_file (conf.bname ^ ".lck") in
     (* FIXME: we silently ignore errors if we cannot acquire the lock on the
        database. *)
@@ -131,34 +133,32 @@ let incr_request_counter =
   incr_counter (fun r -> r.request_cnt <- r.request_cnt + 1)
 
 let lang_file_name conf fname =
-  let fname1 =
-    Filename.concat
-      (!GWPARAM.lang_d conf.bname conf.lang)
-      (Filename.basename fname ^ ".txt")
+  let path =
+    Fpath.(
+      !GWPARAM.lang_d conf.bname conf.lang
+      // ~$(Filename.basename fname ^ ".txt"))
   in
-  if Sys.file_exists fname1 then fname1
+  if File.file_exists path then path
   else
     search_in_assets
-      (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
+      Fpath.(~$(conf.lang) // ~$(Filename.basename fname ^ ".txt"))
 
 let any_lang_file_name conf fname =
-  let fname1 =
-    Filename.concat
-      (!GWPARAM.lang_d conf.bname "")
-      (Filename.basename fname ^ ".txt")
+  let path =
+    Fpath.(
+      !GWPARAM.lang_d conf.bname "" // ~$(Filename.basename fname ^ ".txt"))
   in
-  if Sys.file_exists fname1 then fname1
+  if File.file_exists path then path
   else
-    search_in_assets (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
+    search_in_assets
+      Fpath.(~$(conf.lang) // ~$(Filename.basename fname ^ ".txt"))
 
 let source_file_name conf fname =
-  let fname1 =
-    List.fold_right Filename.concat
-      [ !GWPARAM.src_d conf.bname; conf.lang ]
-      (fname ^ ".txt")
+  let path =
+    Fpath.(!GWPARAM.src_d conf.bname // ~$(conf.lang) // ~$(fname ^ ".txt"))
   in
-  if Sys.file_exists fname1 then fname1
-  else Filename.concat (!GWPARAM.src_d conf.bname) (fname ^ ".txt")
+  if File.file_exists path then path
+  else Fpath.(!GWPARAM.src_d conf.bname // ~$(fname ^ ".txt"))
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y)) with _ -> None
@@ -321,12 +321,12 @@ let rec copy_from_stream conf base strm mode =
     | 'a' -> conf.auth_file <> ""
     | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
     | 'f' -> conf.friend
-    | 'h' -> Sys.file_exists (History.file_name conf)
+    | 'h' -> File.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
     | 'm' -> Driver.read_nldb base <> []
     | 'n' -> not (Driver.base_notes_are_empty base "")
-    | 'o' -> Sys.file_exists (WiznotesDisplay.wiz_dir conf base)
+    | 'o' -> File.file_exists (WiznotesDisplay.wiz_dir conf base)
     | 'p' -> (
         match List.assoc_opt (get_variable strm) conf.base_env with
         | Some "" | None -> false
@@ -428,15 +428,15 @@ and src_translate conf base nomin strm echo mode =
     if !echo then Output.print_sstring conf s
 
 and copy_from_file conf base name mode =
-  let fname =
+  let path =
     match mode with
     | Lang -> any_lang_file_name conf name
     | Source -> source_file_name conf name
   in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic -> copy_from_channel conf base ic mode
-  | None ->
-      Output.printf conf "<em>... file not found: \"%s.txt\"</em><br>" name
+  match Secure.open_in path with
+  | exception Sys_error e ->
+      Output.printf conf "<em>Cannot open file %s: %s</em><br/>" name e
+  | ic -> copy_from_channel conf base ic mode
 
 and copy_from_channel conf base ic mode =
   copy_from_stream conf base (Stream.of_channel ic) mode;
@@ -449,21 +449,19 @@ let gen_print mode conf base fname =
   let channel =
     match mode with
     | Lang -> (
-        try Some (Secure.open_in (lang_file_name conf fname))
-        with Sys_error _ -> (
-          try Some (Secure.open_in (any_lang_file_name conf fname))
-          with Sys_error _ -> None))
-    | Source -> (
-        try Some (Secure.open_in (source_file_name conf fname))
-        with Sys_error _ -> None)
+        match Secure.open_in @@ lang_file_name conf fname with
+        | exception Sys_error _ ->
+            Secure.open_in @@ any_lang_file_name conf fname
+        | ic -> ic)
+    | Source -> Secure.open_in @@ source_file_name conf fname
   in
   match channel with
-  | Some ic ->
+  | ic ->
       (* title is supplied in fname.txt file *)
       Hutil.header_with_title conf (fun _ -> ());
       copy_from_channel conf base ic mode;
       Hutil.trailer conf
-  | _ ->
+  | exception Sys_error _ ->
       let title _ = Output.print_sstring conf "Error" in
       Hutil.header ~error:true conf title;
       Output.print_sstring conf "<ul><li>Cannot access file \"";
@@ -503,7 +501,7 @@ let eval_var conf base env () _loc = function
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> VVbool (Lazy.force v <> None)
       | _ -> raise Not_found)
-  | [ "has_history" ] -> VVbool (Sys.file_exists (History.file_name conf))
+  | [ "has_history" ] -> VVbool (File.file_exists (History.file_name conf))
   | [ "has_misc_notes" ] -> VVbool (Driver.read_nldb base <> [])
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "nb_accesses" ] ->
@@ -536,7 +534,7 @@ let eval_var conf base env () _loc = function
   | [ "start_date" ] ->
       VVstring (string_of_start_date conf : Adef.safe_string :> string)
   | [ "wiznotes_dir_exists" ] ->
-      VVbool (Sys.file_exists (WiznotesDisplay.wiz_dir conf base))
+      VVbool (File.file_exists (WiznotesDisplay.wiz_dir conf base))
   | _ -> raise Not_found
 
 let print_foreach _conf _print_ast _eval_expr = raise Not_found
@@ -578,7 +576,7 @@ let print_welcome conf base =
 
 (* code déplacé et modifié pour gérer advanced.txt *)
 let print conf base fname =
-  if Sys.file_exists (Util.etc_file_name conf fname) then
+  if File.file_exists (Util.etc_file_name conf fname) then
     let ifun =
       Templ.
         {

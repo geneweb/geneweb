@@ -1,0 +1,4 @@
+(library
+ (package geneweb)
+ (name geneweb_fs)
+ (libraries geneweb_compat unix))

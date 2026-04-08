@@ -1,6 +1,9 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk
+module Compat = Geneweb_compat
+module Fpath = Geneweb_fs.Fpath
+module File = Geneweb_fs.File
 
 type istr = int
 type ifam = int
@@ -76,7 +79,7 @@ let spi_next (spi : string_person_index) istr = spi.next istr
 type base = dsk_base
 
 let sou base i = base.data.strings.get i
-let bname base = Filename.(remove_extension @@ basename base.data.bdir)
+let bname base = Filename.remove_extension @@ Fpath.basename base.data.bpath
 let nb_of_persons base = base.data.persons.len
 let nb_of_real_persons base = base.func.nb_of_real_persons ()
 let nb_of_families base = base.data.families.len
@@ -122,13 +125,13 @@ let clear_base base =
   clear_families_array base
 
 (* Map of loaded read-only databases in memory. *)
-let loaded_databases : (string, dsk_base) Hashtbl.t = Hashtbl.create 17
+let loaded_databases : (Fpath.t, dsk_base) Hashtbl.t = Hashtbl.create 17
 
-let load_database bname =
-  match Hashtbl.find loaded_databases bname with
+let load_database bpath =
+  match Hashtbl.find loaded_databases bpath with
   | exception Not_found ->
-      Database.with_database ~read_only:true bname (fun base ->
-          Hashtbl.add loaded_databases bname base;
+      Database.with_database ~read_only:true bpath (fun base ->
+          Hashtbl.add loaded_databases bpath base;
           load_persons_array base;
           load_ascends_array base;
           load_unions_array base;
@@ -136,12 +139,12 @@ let load_database bname =
           load_descends_array base;
           load_families_array base;
           load_strings_array base)
-  | _base -> Fmt.failwith "'%s' is already loaded in memory" bname
+  | _base -> Fmt.failwith "%a is already loaded in memory" Fpath.pp bpath
 
-let with_database bname k =
-  match Hashtbl.find loaded_databases bname with
+let with_database bpath k =
+  match Hashtbl.find loaded_databases bpath with
   | exception Not_found ->
-      Database.with_database ~read_only:false bname (fun base ->
+      Database.with_database ~read_only:false bpath (fun base ->
           Fun.protect ~finally:(fun () -> clear_base base) @@ fun () -> k base)
   | _base ->
       (* FIXME: We cannot reuse [_base] because it contains closures that
@@ -149,13 +152,13 @@ let with_database bname k =
          on disk before each request to process the latest version of the
          base. Otherwise, workers could keep different old versions in
          memory. *)
-      Database.with_database ~read_only:true bname k
+      Database.with_database ~read_only:true bpath k
 
 let date_of_last_change base =
   let s =
-    let bdir = base.data.bdir in
-    try Unix.stat (Filename.concat bdir "patches")
-    with Unix.Unix_error (_, _, _) -> Unix.stat (Filename.concat bdir "base")
+    let bpath = base.data.bpath in
+    try File.stat Fpath.(bpath // ~$"patches")
+    with Unix.Unix_error (_, _, _) -> File.stat Fpath.(bpath // ~$"base")
   in
   s.Unix.st_mtime
 
@@ -271,41 +274,37 @@ let sync ?(scratch = false) base =
     raise Def.(HttpExn (Forbidden, __LOC__))
   else Outbase.output base
 
-let make bname particles arrays k =
-  Database.make bname particles arrays (sync ~scratch:true);
-  with_database bname k
+let make bpath particles arrays k =
+  Database.make bpath particles arrays (sync ~scratch:true);
+  with_database bpath k
 
-let bfname base fname = Filename.concat base.data.bdir fname
+let bfname base fname = Fpath.(base.data.bpath // ~$fname)
 
 module NLDB = struct
   let magic = "GWNL0011"
   let warned = ref false
 
   let check_format base =
-    let fname = bfname base "notes_links" in
-    match try Some (open_in_bin fname) with Sys_error _ -> None with
-    | Some ic ->
-        let ok = Mutil.check_magic magic ic in
-        close_in ic;
-        if ok then `Ok else `BadFormat
-    | None -> `NoFile
+    let path = bfname base "notes_links" in
+    match File.open_in_bin path with
+    | exception Sys_error _ -> `NoFile
+    | ic ->
+        Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+        if Mutil.check_magic magic ic then `Ok else `BadFormat
 
   let read base =
-    let fname = bfname base "notes_links" in
-    match try Some (open_in_bin fname) with Sys_error _ -> None with
-    | Some ic ->
-        let r =
-          if Mutil.check_magic magic ic then
-            (input_value ic : (iper, iper) Def.NLDB.t)
-          else (
-            if not !warned then (
-              warned := true;
-              Logs.warn (fun m -> m "Unsupported nldb format in %s" fname));
-            [])
-        in
-        close_in_noerr ic;
-        r
-    | None -> []
+    let path = bfname base "notes_links" in
+    match File.open_in_bin path with
+    | exception Sys_error _ -> []
+    | ic ->
+        Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+        if Mutil.check_magic magic ic then
+          (input_value ic : (iper, iper) Def.NLDB.t)
+        else (
+          if not !warned then (
+            warned := true;
+            Logs.warn (fun m -> m "Unsupported nldb format in %a" Fpath.pp path));
+          [])
 
   let write base db =
     if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
@@ -313,13 +312,12 @@ module NLDB = struct
       let fname_tmp = bfname base "1notes_links" in
       let fname_def = bfname base "notes_links" in
       let fname_back = bfname base "notes_links~" in
-      let oc = open_out_bin fname_tmp in
-      output_string oc magic;
-      output_value oc (db : (iper, ifam) Def.NLDB.t);
-      close_out oc;
-      Mutil.rm fname_back;
-      Mutil.mv fname_def fname_back;
-      Sys.rename fname_tmp fname_def
+      File.with_open_out_bin fname_tmp (fun oc ->
+          output_string oc magic;
+          output_value oc (db : (iper, ifam) Def.NLDB.t));
+      File.remove ~force:true fname_back;
+      File.rename fname_def fname_back;
+      File.rename fname_tmp fname_def
 end
 
 let check_nldb_format = NLDB.check_format
@@ -331,15 +329,13 @@ let base_wiznotes_dir _base = "wiznotes"
 
 let base_notes_read_file base fname mode =
   try
-    let ic = Secure.open_in @@ Filename.concat base.data.bdir fname in
-    let str =
-      match mode with
-      | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
-      | Def.Rn1Ln -> ( try input_line ic with End_of_file -> "")
-      | Def.RnAll -> Mutil.input_file_ic ic
-    in
-    close_in ic;
-    str
+    Secure.with_open_in_text
+      Fpath.(base.data.bpath // ~$fname)
+      (fun ic ->
+        match mode with
+        | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
+        | Def.Rn1Ln -> ( try input_line ic with End_of_file -> "")
+        | Def.RnAll -> Compat.In_channel.input_all ic)
   with Sys_error _ -> ""
 
 let base_notes_read_aux base fnotes mode =
@@ -543,9 +539,9 @@ let ifam_marker c i = Collection.Marker.make (fun i -> i) c i
 let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
 
 let read_or_create_visible base =
-  let fname = Filename.concat base.data.bdir "restrict" in
+  let fname = Fpath.(base.data.bpath // ~$"restrict") in
   let visible =
-    if Sys.file_exists fname then (
+    if File.file_exists fname then (
       let ic = Secure.open_in_bin fname in
       let visible =
         if Mutil.check_magic Mutil.executable_magic ic then input_value ic
@@ -561,7 +557,7 @@ let read_or_create_visible base =
 let base_visible_write base =
   if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
   else
-    let fname = Filename.concat base.data.bdir "restrict" in
+    let fname = Fpath.(base.data.bpath // ~$"restrict") in
     match !visible_ref with
     | Some visible ->
         let oc = Secure.open_out_bin fname in

@@ -4,4 +4,4 @@ type meta = private {
   depends : string list;
 }
 
-val parse : string -> meta
+val parse : Geneweb_fs.Fpath.t -> meta
