@@ -142,22 +142,22 @@ let[@inline] mk_int ?loc x = mk ?loc (Aint x)
 let[@inline] mk_include ?loc x = mk ?loc (Ainclude x)
 let[@inline] mk_pack ?loc l = mk ?loc (Apack l)
 
+let is_number s =
+  let len = String.length s in
+  if len = 0 then false
+  else
+    let start = if s.[0] = '-' then 1 else 0 in
+    start < len
+    && (let rec loop i =
+          i >= len || (s.[i] >= '0' && s.[i] <= '9' && loop (i + 1))
+        in
+        loop start)
+
 let rec subst_desc sf desc =
   match desc with
   | Atext s -> Atext (sf s)
   | Avar (s, sl) -> (
       let s1 = sf s in
-      let is_number s =
-        let len = String.length s in
-        if len = 0 then false
-        else
-          let start = if s.[0] = '-' then 1 else 0 in
-          start < len
-          && (let rec loop i =
-                i >= len || (s.[i] >= '0' && s.[i] <= '9' && loop (i + 1))
-              in
-              loop start)
-      in
       if sl = [] && is_number s1 then Aint s1
       else
         let sl1 = List.map sf sl in
