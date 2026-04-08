@@ -324,6 +324,14 @@ document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
     }
   });
 });
+// Restaurer le tooltip natif au survol via title=, que BS5 mange en l'instanciant comme Popover
+document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').forEach(el => {
+  const helpText = el.getAttribute('data-bs-original-title');
+  if (helpText) {
+    el.addEventListener('mouseenter', () => el.setAttribute('title', helpText));
+    el.addEventListener('mouseleave', () => el.removeAttribute('title'));
+  }
+});
 </script>
 %end;
 <script>

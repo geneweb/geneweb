@@ -18,7 +18,7 @@
 %end;
 <h1 class="mt-1 mx-3">%nn;
   [*geneweb parameters]%nn;
-  <i class="fa fa-hat-wizard fa-xs text-success ml-2"
+  <i class="fa fa-hat-wizard fa-xs text-success ms-2"
      title="[*wizard/wizards/friend/friends/exterior]1"
      aria-hidden="true" alt="green [*wizard/wizards/friend/friends/exterior]1 icon"></i>%nn;
 </h1>
