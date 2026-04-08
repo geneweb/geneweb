@@ -192,3 +192,31 @@ let print_html conf =
           Output.print_string conf v)
         conf.env;
       Output.print_sstring conf "\"></body></html>"
+
+let get_folder_images conf folder =
+  let images_dir = !GWPARAM.images_d conf.bname in
+  let full_dir =
+    String.concat Filename.dir_sep [ images_dir; "albums"; folder ]
+  in
+  let files =
+    try
+      let entries = Sys.readdir full_dir in
+      Array.to_list entries
+      |> List.filter (fun name ->
+          let full_path = Filename.concat full_dir name in
+          (try (Unix.stat full_path).Unix.st_kind = Unix.S_REG
+           with Unix.Unix_error _ -> false)
+          &&
+          let ext = String.lowercase_ascii (Filename.extension name) in
+          List.mem ext [ ".jpg"; ".jpeg"; ".png"; ".gif"; ".webp" ])
+      |> List.sort String.compare
+      |> List.map (fun name ->
+          String.concat Filename.dir_sep [ "albums"; folder; name ])
+    with Sys_error _ -> []
+  in
+  let json =
+    "[" ^ String.concat "," (List.map (fun f -> "\"" ^ f ^ "\"") files) ^ "]"
+  in
+  Output.header conf "Content-type: application/json";
+  Output.print_sstring conf json;
+  Output.flush conf

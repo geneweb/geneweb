@@ -1067,6 +1067,26 @@ function initializeHandlers() {
     // Handlers image redraw
     $("#fname").on("input change", HandlerManager.imageChange);
 
+    // Mutual exclusivity between single-file and folder inputs
+    $("#fname").on("input change", function() {
+      if ($(this).val()) {
+        $("#folder_name").val("").prop("disabled", true);
+      } else {
+        $("#folder_name").prop("disabled", false);
+      }
+    });
+
+    $("#folder_name").on("input change", function() {
+      if ($(this).val()) {
+        $("#fname").val("").prop("disabled", true);
+        $("#frame").hide();
+        toggleTables(false);
+        updateAlbumNav();
+      } else {
+        $("#fname").prop("disabled", false);
+      }
+    });
+
 }
 
 // Separate function for initial dataTable content setup
@@ -1092,6 +1112,8 @@ function initializePageContent(data, tableApi) {
         var $img = $("#image");
         $img.attr("src", GW.prefix + "m=DOC&s=" + imgFile);
         $("#fname").val(imgFile);
+        // A pre-existing single image locks the folder input
+        $("#folder_name").prop("disabled", true);
         $img.one("load", function() {
             var width = this.width, height = this.height;
             requestAnimationFrame(function() {
@@ -1577,7 +1599,8 @@ function initAlbumHandlers() {
     e.preventDefault();
     saveAlbumCurrent();
     albumImages.push({ img: "", map: [], groups: [] });
-    $("#fname").val("");
+    $("#fname").val("").prop("disabled", false);
+    $("#folder_name").val("").prop("disabled", false);
     loadAlbumImage(albumImages.length - 1);
   });
   $("#album-remove").click(function(e) {
@@ -1587,6 +1610,37 @@ function initAlbumHandlers() {
       if (albumCurrent >= albumImages.length) albumCurrent = albumImages.length - 1;
       loadAlbumImage(albumCurrent);
     }
+  });
+
+  $("#album-from-folder").click(function(e) {
+    e.preventDefault();
+    var folder = $("#folder_name").val().trim();
+    if (!folder) return;
+
+    // Request the server-side list of images for this folder.
+    // The endpoint returns a JSON array of filename strings.
+    $.ajax({
+      url: GW.prefix + "m=FOLDER_IMAGES&folder=" + encodeURIComponent(folder),
+      success: function(data) {
+        var files = Array.isArray(data) ? data : (data.images || []);
+        if (!files.length) {
+          updateStatus("No images found in folder: " + folder);
+          return;
+        }
+        // Build one album slot per file, preserving folder order
+        albumImages = files.map(function(f) {
+          return { img: f, map: [], groups: [] };
+        });
+        albumCurrent = 0;
+        // Single-file input is now irrelevant — keep it clear and enabled
+        $("#fname").val("").prop("disabled", false);
+        loadAlbumImage(0);
+        updateStatus("Loaded " + files.length + " image(s) from folder \u201c" + folder + "\u201d");
+      },
+      error: function() {
+        updateStatus("Error loading folder: " + folder);
+      }
+    });
   });
 }
 
@@ -1635,7 +1689,7 @@ function setupFormHandler() {
       .replace(/\}\]/g, '}\n]')
       .replace(/\}\,\{/g, '},\n  {');
     $("#notes").val("TITLE=" + title
-      + "\nTYPE=gallery\n" + jsonString);
+      + "\nTYPE=" + (albumImages.length > 1 ? "album" : "gallery") + "\n" + jsonString);
     $(this).unbind("submit").submit();
   });
 }

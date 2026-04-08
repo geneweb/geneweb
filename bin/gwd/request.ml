@@ -698,6 +698,11 @@ let treat_request =
                      ImageDisplay.print_html conf)
              | "F" -> w_base @@ w_person @@ Perso.interp_templ "family"
              | "FIM" -> w_base @@ ImageDisplay.print_blason
+             | "FOLDER_IMAGES" -> (
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "folder" with
+                 | Some fname -> ImageDisplay.get_folder_images conf fname
+                 | None -> request_issue conf base ~key:"missing folder name")
              | "H" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
