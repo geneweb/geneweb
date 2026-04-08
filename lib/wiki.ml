@@ -182,52 +182,112 @@ end = struct
     Ast.{ desc; loc }
 end
 
-let pp_person_link conf ppf (fn, sn, oc) =
-  let fn = encode fn in
-  let sn = encode sn in
-  Fmt.pf ppf "%sp=%s;n=%s%a" (command conf) fn sn Fmt.(option ~none:nop int) oc
+module Printer = struct
+  let pp_person_link conf ppf (fn, sn, oc) =
+    let fn = encode fn in
+    let sn = encode sn in
+    let pp_oc ppf oc = Fmt.pf ppf "&oc=%d" oc in
+    Fmt.pf ppf "%sp=%s;n=%s%a" (command conf) fn sn Fmt.(option ~none:nop pp_oc) oc
 
-let pp_note_link conf ppf (path, anchor, wizard) =
-  let path = encode path in
-  if wizard then Fmt.pf ppf "%sm=WIZNOTES&f=%s" (command conf) path
-  else
-    match anchor with
-    | Some a ->
-        let a = encode a in
-        Fmt.pf ppf "%sm=WIZNOTES&f=%s#%s" (command conf) path a
-    | None -> Fmt.pf ppf "%sm=WIZNOTES&f=%s" (command conf) path
+  let pp_note_link conf ppf (path, anchor, wizard) =
+    let path = encode path in
+    if wizard then Fmt.pf ppf "%sm=WIZNOTES&f=%s" (command conf) path
+    else
+      match anchor with
+      | Some a ->
+          let a = encode a in
+          Fmt.pf ppf "%sm=WIZNOTES&f=%s#%s" (command conf) path a
+      | None -> Fmt.pf ppf "%sm=WIZNOTES&f=%s" (command conf) path
 
-let pp_image_link conf ppf path =
-  let path = encode path in
-  Fmt.pf ppf "%sm=IM&s=%s" (command conf) path
+  let pp_image_link conf ppf path =
+    let path = encode path in
+    Fmt.pf ppf "%sm=IM&s=%s" (command conf) path
 
-let _link_to_html conf (tag, text) =
-  let a ~cls ?text uri =
-    let s = Option.value ~default:uri text in
-    Html.(a ~a:[ a_href uri; a_class [ cls ] ] [ txt s ])
-  in
-  let img ~cls ?width ?alt src =
-    let alt = Option.value ~default:"" alt in
-    let attrs =
-      match width with
-      | Some w ->
-          let s = Fmt.str "max-width: %s" w in
-          [ Html.a_style s ]
-      | None -> []
+  let link_to_html conf (tag, text) =
+    let a ~cls ?text uri =
+      let s = Option.value ~default:uri text in
+      Html.(a ~a:[ a_href uri; a_class [ cls ] ] [ txt s ])
     in
-    let attrs = Html.a_class [ cls ] :: attrs in
-    Html.(img ~a:attrs ~src ~alt ())
-  in
-  match tag with
-  | Tlsw.Ast.Person { fn; sn; oc } ->
-      let lk = Fmt.str "%a" (pp_person_link conf) (fn, sn, oc) in
-      a ~cls:"person-link" ?text lk
-  | Note { path; anchor; wizard } ->
-      let lk = Fmt.str "%a" (pp_note_link conf) (path, anchor, wizard) in
-      a ~cls:"note-link" ?text lk
-  | Image { path; width; _ } ->
-      let src = Fmt.str "%a" (pp_image_link conf) path in
-      img ~cls:"image-link" ?width ?alt:text src
+    let img ~cls ?width ?alt src =
+      let alt = Option.value ~default:"" alt in
+      let attrs =
+        match width with
+        | Some w ->
+            let s = Fmt.str "max-width: %s" w in
+            [ Html.a_style s ]
+        | None -> []
+      in
+      let attrs = Html.a_class [ cls ] :: attrs in
+      Html.(img ~a:attrs ~src ~alt ())
+    in
+    match tag with
+    | Tlsw.Ast.Person { fn; sn; oc } ->
+        let lk = Fmt.str "%a" (pp_person_link conf) (fn, sn, oc) in
+        a ~cls:"person-link" ?text lk
+    | Note { path; anchor; wizard } ->
+        let lk = Fmt.str "%a" (pp_note_link conf) (path, anchor, wizard) in
+        a ~cls:"note-link" ?text lk
+    | Image { path; width; _ } ->
+        let src = Fmt.str "%a" (pp_image_link conf) path in
+        img ~cls:"image-link" ?width ?alt:text src
+
+  let span_to_html conf Tlsw.Ast.{ desc; _ } =
+    let open Tlsw.Ast in
+    match desc with
+    | `Link l -> link_to_html conf l
+    | `Span (tag, s) -> (
+        match tag with
+        | Plain -> Html.txt s
+        | Italic -> Html.(i [ txt s ])
+        | Bold -> Html.(b [ txt s ])
+        | BoldItalic -> Html.(b [ i [ txt s ] ])
+        | Strike ->
+            Html.(span ~a:[ a_style "text-decoration: line-through" ] [ txt s ])
+        | Underline ->
+            Html.(span ~a:[ a_style "text-decoration: underline" ] [ txt s ])
+        | Highlight -> Html.(mark [ txt s ])
+        | Error -> Html.(span ~a:[ a_style "color: red" ] [ txt s ]))
+
+  let text_desc_to_html conf (`Text l) = List.map (span_to_html conf) l
+  let text_to_html conf Tlsw.Ast.{ desc; _ } = text_desc_to_html conf desc
+
+  let rec node_desc_to_html conf (`Node (t, k, l)) =
+    let l = node_list_to_html conf k l in
+    match t with
+    | Some t -> Html.(li (text_to_html conf t @ [ l ]))
+    | None -> Html.(li [ l ])
+
+  and node_list_to_html conf k l =
+    let open Tlsw.Ast in
+    let l = List.map (fun { desc; _ } -> node_desc_to_html conf desc) l in
+    match l with
+    | [] -> Html.(txt "")
+    | _ -> ( match k with Ordered -> Html.(ol l) | Unordered -> Html.(ul l))
+
+  let to_html conf Tlsw.Ast.{ desc; _ } =
+    let open Tlsw.Ast in
+    match desc with
+    | `Header (One, s) -> Html.(h1 [ txt s ])
+    | `Header (Two, s) -> Html.(h2 [ txt s ])
+    | `Header (Three, s) -> Html.(h3 [ txt s ])
+    | `Header (Four, s) -> Html.(h4 [ txt s ])
+    | `Header (Five, s) -> Html.(h5 [ txt s ])
+    | `Header (Six, s) -> Html.(h6 [ txt s ])
+    | `Toc Std -> Html.(div [ txt "__TOC__" ])
+    | `Toc Short -> Html.(div [ txt "__SHORT_TOC__" ])
+    | `Toc No -> Html.(div [ txt "__NOTOC__" ])
+    | `Indent (lvl, t) ->
+        let s = Fmt.str "text-indent: %d%%;" (lvl * 5) in
+        Html.(p ~a:[ a_style s ] @@ text_to_html conf t)
+    | `Pre s -> Html.(pre [ txt s ])
+    | `Node (None, k, l) -> node_list_to_html conf k l
+    | `Node (Some _, _, _) ->
+        (* Top level lists never contain text. *)
+        assert false
+    | `Newline -> Html.br ()
+    | `Rule -> Html.hr ()
+    | #text_desc as t -> Html.(p @@ text_desc_to_html conf t)
+end
 
 let first_cnt = 1
 let tab lev s = String.make (2 * lev) ' ' ^ s
@@ -893,23 +953,24 @@ and select_list_lines conf prompt list = function
       else (List.rev list, s :: sl)
   | [] -> (List.rev list, [])
 
-let html_of_tlsw conf s =
-  let lines, _ = lines_list_of_string s in
-  let sections_nums =
-    match sections_nums_of_tlsw_lines lines with [ _ ] -> [] | l -> l
-  in
-  hotl conf (Some lines) first_cnt None sections_nums [] ("" :: lines)
+let html_of_tlsw _conf _s = assert false
+  (* let lines, _ = lines_list_of_string s in *)
+  (* let sections_nums = *)
+  (*   match sections_nums_of_tlsw_lines lines with [ _ ] -> [] | l -> l *)
+  (* in *)
+  (* hotl conf (Some lines) first_cnt None sections_nums [] ("" :: lines) *)
 
 let html_of_tlsw2 conf base s =
   Logs.debug (fun k -> k "%a" Fmt.text s);
   let on_err ~loc e =
     Logs.debug (fun k -> k "Syntax error: %s@ %a" e Loc.pp_with_source loc)
   in
-  let ctx = Process.make conf base ~cancel_links:false ~always_show_links:false in
+  let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
+  let ctx = Process.make conf base ~cancel_links ~always_show_links:false in
   let l =
     Tlsw.Parser.parse ~recover:true ~on_err s
     |> Seq.map (Process.process_block ctx)
-    |> Seq.map Tlsw.Ast.to_html
+    |> Seq.map (Printer.to_html conf)
   in
   Fmt.str "%a" Fmt.(seq Html.(pp_elt ~encode:Fun.id ~indent:true ())) l
 
