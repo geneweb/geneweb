@@ -111,8 +111,12 @@
 
 type error_handler = loc:Geneweb_loc.t -> string -> unit
 
-val parse : recover:bool -> on_err:error_handler -> string -> Ast.block list
+val is_valid_path : string -> bool
+(** [is_valid_path s] checks if [s] is a path with colons as directory
+    delimitator. *)
+
+val parse : recover:bool -> on_err:error_handler -> string -> Ast.block Seq.t
 (** [parse ~on_err s] parses the input [s] for the TLSW syntax. *)
 
-val parse_links : on_err:error_handler -> string -> Ast.link list
+val parse_links : on_err:error_handler -> string -> Ast.link Seq.t
 (** [parse_links ~on_err s] *)

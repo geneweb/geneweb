@@ -21,7 +21,7 @@ let read_notes base fnotes =
   Wiki.split_title_and_text s
 
 let merge_possible_aliases conf db =
-  let aliases = Wiki.notes_aliases conf in
+  let aliases = Wiki.parse_notes_aliases conf in
   let db =
     List.map
       (fun (pg, (sl, il)) ->

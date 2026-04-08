@@ -56,6 +56,8 @@ val make_edit_button :
 val html_of_tlsw : config -> string -> string list
 (** Parses a whole TLSW text to a list of strings *)
 
+val html_of_tlsw2 : config -> Geneweb_db.Driver.base -> string -> string
+
 val html_with_summary_of_tlsw :
   config -> wiki_info -> (bool * string * string) option -> string -> string
 (** HTML displaying a table of content for a TLSW file *)
@@ -109,7 +111,7 @@ val print_mod_ok :
 
 (*S: shouldn't the following functions be defined elsewhere? *)
 
-val notes_aliases : config -> (string * string) list
+val parse_notes_aliases : config -> (string * string) list
 (** Reads the notes alias file (conf.base_env.notes_alias_file or
     base_path/notes.alias). File format is "KEY value\n...", returns the list of
     (KEY,value) *)

@@ -18,14 +18,14 @@ let h3_del = C.string "==="
 let h4_del = C.string "===="
 let h5_del = C.string "====="
 let h6_del = C.string "======"
-let link_person_open = C.string "[["
-let link_person_close = C.string "]]"
-let link_note_open = C.string "[[["
-let link_note_close = C.string "]]]"
-let link_wizard_open = C.string "[[w:"
-let link_wizard_close = C.string "]]"
-let link_image_open = C.string "[[image:"
-let link_image_close = C.string "]]"
+let person_link_open = C.string "[["
+let person_link_close = C.string "]]"
+let note_link_open = C.string "[[["
+let note_link_close = C.string "]]]"
+let wizard_link_open = C.string "[[w:"
+let wizard_link_close = C.string "]]"
+let image_link_open = C.string "[[image:"
+let image_link_close = C.string "]]"
 let slash = C.string "/"
 
 (********** Parsing span *********)
@@ -53,70 +53,79 @@ let strike = span_text strike_del strike_del Strike
 let underline = span_text underline_del underline_del Underline
 let highlight = span_text highlight_open highlight_close Highlight
 
+(********* Parsing paths *********)
+
+let path =
+  C.(
+    take_while1 (fun c ->
+        match c with
+        | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' | '.' | ':' -> true
+        | _ -> false))
+
 (********* Parsing links *********)
 
-let link_person =
+let person_link =
   C.(
-    let firstname = until (slash <|> link_person_close) in
-    let surname = until (slash <|> link_person_close) in
-    let occ = C.int in
-    let link_person_text = until link_person_close in
+    let firstname = until (slash <|> person_link_close) in
+    let surname = until (slash <|> person_link_close) in
+    let oc = C.int in
+    let link_person_text = until person_link_close in
     let content =
       let* fn = firstname in
       let* sn = slash *> surname in
-      let* occ = option (slash *> occ) in
+      let* oc = option (slash *> oc) in
       let* text = option (slash *> link_person_text) in
-      ret (fn, sn, occ, text)
+      ret (fn, sn, oc, text)
     in
-    let* (fn, sn, occ, text), loc =
-      located (link_person_open *> content <* link_person_close)
+    let* (fn, sn, oc, text), loc =
+      located (person_link_open *> content <* person_link_close)
     in
-    ret (Ast.mk_link ~loc Ast.(Person {fn; sn; occ}) text))
+    ret (Ast.mk_person_link ~loc ~fn ~sn ?oc text))
 
-let link_note =
+let note_link =
   C.(
     let content =
-      let* path = until (slash <|> link_note_close) in
-      let* text_opt = option (slash *> until link_note_close) in
-      ret (path, text_opt)
+      let* p = path in
+      let* text_opt = option (slash *> until note_link_close) in
+      ret (p, text_opt)
     in
-    let* (path, text), loc =
-      located (link_note_open *> content <* link_note_close)
+    let* (p, text), loc =
+      located (note_link_open *> content <* note_link_close)
     in
-    ret (Ast.mk_link ~loc (Ast.Note { path }) text))
+    ret (Ast.mk_note_link ~loc ~path:p ~wizard:false text))
 
-let link_wizard =
+let wizard_link =
   C.(
     let content =
-      let* path = until (slash <|> link_wizard_close) in
-      let* text = option (slash *> until link_wizard_close) in
-      ret (path, text)
+      let* p = path in
+      let* text = option (slash *> until wizard_link_close) in
+      ret (p, text)
     in
-    let* (path, text), loc =
-      located (link_wizard_open *> content <* link_wizard_close)
+    let* (p, text), loc =
+      located (wizard_link_open *> content <* wizard_link_close)
     in
-    ret (Ast.mk_link ~loc (Ast.Wizard { path }) text))
+    ret (Ast.mk_note_link ~loc ~path:p ~wizard:true text))
 
-let link_image =
+let image_link =
   C.(
     let content =
-      let* path = until (slash <|> link_image_close) in
-      let* alt_opt = option (slash *> until (slash <|> link_image_close)) in
-      let* width = option (slash *> until link_image_close) in
+      let* path = until (slash <|> image_link_close) in
+      let* alt_opt = option (slash *> until (slash <|> image_link_close)) in
+      let* width = option (slash *> until image_link_close) in
       ret (path, width, alt_opt)
     in
     let* (path, width, alt_opt), loc =
-      located (link_image_open *> content <* link_image_close)
+      located (image_link_open *> content <* image_link_close)
     in
-    ret (Ast.mk_link ~loc (Image { path; width }) alt_opt))
+    ret (Ast.mk_image_link ~loc ~path ?width alt_opt))
 
 let link =
   C.(
     case2 [
-      link_wizard_open, link_wizard;
-      link_image_open, link_image;
-      link_note_open, link_note;
-      link_person_open, link_person;
+      wizard_link_open, wizard_link;
+      image_link_open, image_link;
+      note_link_open, note_link;
+      person_link_open, person_link;
     ])
     [@ocamlformat "disable"]
 
@@ -147,7 +156,7 @@ let special =
   <|> strike_del
   <|> underline_del
   <|> highlight_open
-  <|> link_person_open)
+  <|> person_link_open)
   [@ocamlformat "disable"]
 
 let plain =
@@ -176,10 +185,10 @@ let span ~recover =
       strike_del, strike;
       underline_del, underline;
       highlight_open, highlight;
-      link_image_open, span_coercion link_image;
-      link_wizard_open, span_coercion link_wizard;
-      link_note_open, span_coercion link_note;
-      link_person_open, span_coercion link_person;
+      image_link_open, span_coercion image_link;
+      wizard_link_open, span_coercion wizard_link;
+      note_link_open, span_coercion note_link;
+      person_link_open, span_coercion person_link;
     ] plain)
     [@ocamlformat "disable"]
 
@@ -319,7 +328,8 @@ let coercion p =
 let block ~recover =
   let r =
     if recover then
-      Some (fun loc -> (Ast.(mk_text ~loc [ mk_span Plain "error" ]) :> Ast.block))
+      Some
+        (fun loc -> (Ast.(mk_text ~loc [ mk_span Plain "error" ]) :> Ast.block))
     else None
   in
   C.(
@@ -344,21 +354,26 @@ let block ~recover =
 
 let parse t ~on_err s =
   let st = Input.of_string s in
-  let rec loop acc st =
+  let rec loop st () =
     let start = Input.offset st in
     match C.run t st with
-    | Ok tk, st' -> loop (tk :: acc) st'
+    | Ok tk, st' -> Seq.Cons (tk, loop st')
     | Error err, st' ->
-        if Input.eof st then List.rev acc
+        if Input.eof st then Seq.Nil
         else
           let stop = Input.offset st' in
           let loc = Loc.mk (Input.to_source st') start stop in
           on_err ~loc (err ());
-          acc
+          Seq.Nil
   in
-  loop [] st
+  loop st
 
 type error_handler = loc:Geneweb_loc.t -> string -> unit
+
+let is_valid_path s =
+  match fst @@ C.run path @@ Input.of_string s with
+  | Ok _ -> true
+  | Error _ -> false
 
 let parse_links = parse link
 let parse ~recover = parse (block ~recover)

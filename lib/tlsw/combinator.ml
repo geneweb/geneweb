@@ -115,6 +115,37 @@ let many1 t =
   let* xs = many t in
   ret (x :: xs)
 
+let take_while p =
+  let run st =
+    let buf = Buffer.create 17 in
+    let rec loop st =
+      match Input.peak st with
+      | Some c when p c ->
+          Buffer.add_char buf c;
+          loop (Input.next st)
+      | Some _ | None -> (Ok (Buffer.contents buf), st)
+    in
+    loop st
+  in
+  { run }
+
+let take_while1 p =
+  let run st =
+    let buf = Buffer.create 17 in
+    let rec loop st =
+      match Input.peak st with
+      | Some c when p c ->
+          Buffer.add_char buf c;
+          loop (Input.next st)
+      | Some _ | None ->
+          if Buffer.length buf = 0 then
+            (Error (fun () -> Fmt.str "expect something"), st)
+          else (Ok (Buffer.contents buf), st)
+    in
+    loop st
+  in
+  { run }
+
 let count t =
   let rec loop acc st =
     let r, st' = t.run st in

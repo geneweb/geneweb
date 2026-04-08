@@ -30,7 +30,8 @@
  (libraries qcheck qcheck-alcotest geneweb_compat geneweb_search))
 
 (executable
- (name wiki_check)
+ (package geneweb)
+ (public_name wiki_check)
  (modules wiki_check)
  (libraries
   geneweb_compat

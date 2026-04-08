@@ -52,7 +52,7 @@ let process_base ~mode ~in_memory bname =
         ignore (read_line () : string)
   in
   let parse p s =
-    ignore (Parser.parse ~recover:false ~on_err:(on_err p) s : Ast.block list)
+    ignore (Parser.parse ~recover:false ~on_err:(on_err p) s : Ast.block Seq.t)
   in
   match mode with
   | Batch ->
@@ -71,7 +71,7 @@ let process_gw fl =
           (Fmt.styled (`Fg `Red) pp_header)
           () err Loc.pp_with_source loc)
   in
-  ignore (Parser.parse ~recover:true ~on_err s : Ast.t list)
+  ignore (Parser.parse ~recover:true ~on_err s : Ast.block Seq.t)
 
 let run ~bd ~mode ~in_memory bases gws =
   Secure.set_base_dir bd;

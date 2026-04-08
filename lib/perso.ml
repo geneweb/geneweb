@@ -1579,17 +1579,19 @@ let mode_local env =
 let get_note_or_source conf base
     ?(p = Driver.empty_person base Driver.Iper.dummy) auth no_note
     note_or_source =
+  let _ = p in
   let note_or_source = Driver.sou base note_or_source in
   if auth && not no_note then
     (* TODO investigate the use of i in env *)
     (* in notes, %i becomes index. Other use ??  *)
-    let env =
-      [
-        ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
-        ('k', fun () -> Image.default_image_filename "portraits" base p);
-      ]
-    in
-    let lines = Wiki.html_of_tlsw conf note_or_source in
+    (* let env = *)
+    (*   [ *)
+    (*     ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p)); *)
+    (*     ('k', fun () -> Image.default_image_filename "portraits" base p); *)
+    (*   ] *)
+    (* in *)
+    Wiki.html_of_tlsw2 conf base note_or_source |> Adef.safe |> safe_val
+    (* let lines = Wiki.html_of_tlsw conf note_or_source in
     let lines =
       (* remove enclosing <p> .. </p> if any *)
       if List.compare_length_with lines 2 > 0 then
@@ -1602,7 +1604,7 @@ let get_note_or_source conf base
       else lines
     in
     Notes.source_note_with_env conf base env (String.concat "\n" lines)
-    |> safe_val
+    |> safe_val *)
   else null_val
 
 let date_aux conf p_auth date =

@@ -3,6 +3,10 @@
 open Def
 open Config
 open Util
+module Tlsw = Geneweb_tlsw
+module Loc = Geneweb_loc
+module Html = Tyxml.Html
+module Driver = Geneweb_db.Driver
 
 (* TLSW: Text Language Stolen to Wikipedia
    = title level 1 =
@@ -37,6 +41,194 @@ open Util
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
+let encode s = (Mutil.encode s :> string)
+let command conf = (Util.commd conf :> string)
+let ( // ) = Filename.concat
+
+let parse_notes_aliases conf =
+  let fname =
+    match List.assoc "notes_alias_file" conf.base_env with
+    | f -> f
+    | exception Not_found -> !GWPARAM.bpath conf.bname // "notes.alias"
+  in
+  match Secure.open_in fname with
+  | exception Sys_error _ -> []
+  | ic ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+      let rec loop acc =
+        match input_line ic with
+        | exception End_of_file -> acc
+        | line ->
+            let acc =
+              match String.index line ' ' with
+              | exception Not_found -> acc
+              | i ->
+                  let x = String.sub line 0 i in
+                  let y =
+                    String.sub line (i + 1) (String.length line - i - 1)
+                  in
+                  (x, y) :: acc
+            in
+            loop acc
+      in
+      loop []
+
+module Process : sig
+  type t
+
+  val make : Config.config -> Driver.base -> cancel_links:bool -> always_show_links:bool -> t
+  val process_block : t -> Tlsw.Ast.block -> Tlsw.Ast.block
+end = struct
+  module Ast = Tlsw.Ast
+  module MS = Map.Make (String)
+
+  type t = {
+    conf : Config.config;
+    base : Driver.base;
+    cancel_links : bool;
+    always_show_links : bool;
+    notes_aliases : string MS.t;
+  }
+
+  let fix_path path = String.map (fun c -> if c = ':' then '/' else c) path
+
+  let make conf base ~cancel_links ~always_show_links =
+    let notes_aliases =
+      parse_notes_aliases conf |> List.to_seq
+      |> Seq.filter_map (fun (x, path) ->
+          if Tlsw.Parser.is_valid_path path then
+            let path = fix_path path in
+            if Sys.file_exists path then Some (x, path)
+            else None
+          else
+            None
+      )
+      |> MS.of_seq
+    in
+    { conf; base; cancel_links; always_show_links; notes_aliases }
+
+  let process_person ctx fn sn oc text =
+    let name = match text with Some t -> t | None -> Fmt.str "%s %s" fn sn in
+    let fn = Name.lower fn in
+    let sn = Name.lower sn in
+    let oc = Option.value ~default:0 oc in
+    let tag = Ast.Person { fn; sn; oc = Some oc } in
+    if ctx.always_show_links then `Link (tag, Some name)
+    else if Util.person_exists ctx.conf ctx.base (fn, sn, oc) then
+      if ctx.cancel_links then `Span (Ast.Plain, name)
+      else `Link (tag, Some name)
+    else
+      let name =
+        if ctx.conf.hide_names then Util.private_txt ctx.conf "" else name
+      in
+      `Span (Ast.Error, name)
+
+  let process_note ctx ~path ?anchor ~wizard text =
+    let text = Option.value ~default:path text in
+    if ctx.cancel_links then `Span (Ast.Plain, text)
+    else
+      if wizard then
+        let path = fix_path path in
+        `Link (Ast.Note { path; anchor; wizard }, Some text)
+      else
+        let path =
+          match MS.find path ctx.notes_aliases with
+          | exception Not_found -> fix_path path
+          | f -> f
+        in
+        `Link (Ast.Note { path; anchor; wizard }, Some text)
+
+  let process_image _ctx ~path ?width text =
+    if Tlsw.Parser.is_valid_path path then
+      let path = fix_path path in
+      `Link (Ast.Image { path; width }, text)
+    else
+      let text = Option.value ~default:path text in
+      `Span (Ast.Highlight, text)
+
+  let process_link ctx (tag, text) =
+    match tag with
+    | Tlsw.Ast.Person { fn; sn; oc } -> process_person ctx fn sn oc text
+    | Note { path; anchor; wizard } ->
+        process_note ctx ~path ?anchor ~wizard text
+    | Image { path; width } -> process_image ctx ~path ?width text
+
+  let process_span_desc ctx desc =
+    match desc with `Link l -> process_link ctx l | `Span _ -> desc
+
+  let process_span ctx Ast.{ desc; loc } =
+    let desc = process_span_desc ctx desc in
+    Ast.{ desc; loc }
+
+  let process_text_desc ctx (`Text l) =
+    let l = List.map (process_span ctx) l in
+    `Text l
+
+  let process_text ctx Ast.{ desc; loc } =
+    let desc = process_text_desc ctx desc in
+    Ast.{ desc; loc }
+
+  let process_node_list ctx (`Node (t, k, l)) =
+    let t = Option.map (process_text ctx) t in
+    `Node (t, k, l)
+
+  let process_block ctx (Ast.{ desc; loc } : Ast.block) =
+    let desc =
+      match desc with
+      | `Node _ as x -> process_node_list ctx x
+      | `Text _ as x -> process_text_desc ctx x
+      | _ -> desc
+    in
+    Ast.{ desc; loc }
+end
+
+let pp_person_link conf ppf (fn, sn, oc) =
+  let fn = encode fn in
+  let sn = encode sn in
+  Fmt.pf ppf "%sp=%s;n=%s%a" (command conf) fn sn Fmt.(option ~none:nop int) oc
+
+let pp_note_link conf ppf (path, anchor, wizard) =
+  let path = encode path in
+  if wizard then Fmt.pf ppf "%sm=WIZNOTES&f=%s" (command conf) path
+  else
+    match anchor with
+    | Some a ->
+        let a = encode a in
+        Fmt.pf ppf "%sm=WIZNOTES&f=%s#%s" (command conf) path a
+    | None -> Fmt.pf ppf "%sm=WIZNOTES&f=%s" (command conf) path
+
+let pp_image_link conf ppf path =
+  let path = encode path in
+  Fmt.pf ppf "%sm=IM&s=%s" (command conf) path
+
+let _link_to_html conf (tag, text) =
+  let a ~cls ?text uri =
+    let s = Option.value ~default:uri text in
+    Html.(a ~a:[ a_href uri; a_class [ cls ] ] [ txt s ])
+  in
+  let img ~cls ?width ?alt src =
+    let alt = Option.value ~default:"" alt in
+    let attrs =
+      match width with
+      | Some w ->
+          let s = Fmt.str "max-width: %s" w in
+          [ Html.a_style s ]
+      | None -> []
+    in
+    let attrs = Html.a_class [ cls ] :: attrs in
+    Html.(img ~a:attrs ~src ~alt ())
+  in
+  match tag with
+  | Tlsw.Ast.Person { fn; sn; oc } ->
+      let lk = Fmt.str "%a" (pp_person_link conf) (fn, sn, oc) in
+      a ~cls:"person-link" ?text lk
+  | Note { path; anchor; wizard } ->
+      let lk = Fmt.str "%a" (pp_note_link conf) (path, anchor, wizard) in
+      a ~cls:"note-link" ?text lk
+  | Image { path; width; _ } ->
+      let src = Fmt.str "%a" (pp_image_link conf) path in
+      img ~cls:"image-link" ?width ?alt:text src
+
 let first_cnt = 1
 let tab lev s = String.make (2 * lev) ' ' ^ s
 
@@ -69,34 +261,6 @@ let make_edit_button conf ?(mode = "") fnotes ?(cnt = None) () =
     {|<a href="%s" class="align-self-center ml-3 mb-1"
   title="%s">(%s)</a>|}
     href title (transl conf "modify")
-
-let notes_aliases conf =
-  let fname =
-    match List.assoc_opt "notes_alias_file" conf.base_env with
-    | Some f -> f
-    | None -> Filename.concat (Util.bpath conf.bname) "notes.alias"
-  in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic ->
-      let rec loop list =
-        match try Some (input_line ic) with End_of_file -> None with
-        | Some s ->
-            let list =
-              (* S: is it replacable by `String.split_on_char ' '` s? *)
-              try
-                let i = String.index s ' ' in
-                ( String.sub s 0 i,
-                  String.sub s (i + 1) (String.length s - i - 1) )
-                :: list
-              with Not_found -> list
-            in
-            loop list
-        | None ->
-            close_in ic;
-            list
-      in
-      loop []
-  | None -> []
 
 let map_notes aliases f = try List.assoc f aliases with Not_found -> f
 let fname_of_path (dirs, file) = List.fold_right Filename.concat dirs file
@@ -307,7 +471,7 @@ let syntax_links conf wi s =
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->
           let text = bold_italic_syntax text in
           let fpath, fname =
-            let aliases = notes_aliases conf in
+            let aliases = parse_notes_aliases conf in
             let fname = map_notes aliases fname1 in
             match NotesLinks.check_file_name fname with
             | Some fpath -> (fpath, fname)
@@ -735,6 +899,19 @@ let html_of_tlsw conf s =
     match sections_nums_of_tlsw_lines lines with [ _ ] -> [] | l -> l
   in
   hotl conf (Some lines) first_cnt None sections_nums [] ("" :: lines)
+
+let html_of_tlsw2 conf base s =
+  Logs.debug (fun k -> k "%a" Fmt.text s);
+  let on_err ~loc e =
+    Logs.debug (fun k -> k "Syntax error: %s@ %a" e Loc.pp_with_source loc)
+  in
+  let ctx = Process.make conf base ~cancel_links:false ~always_show_links:false in
+  let l =
+    Tlsw.Parser.parse ~recover:true ~on_err s
+    |> Seq.map (Process.process_block ctx)
+    |> Seq.map Tlsw.Ast.to_html
+  in
+  Fmt.str "%a" Fmt.(seq Html.(pp_elt ~encode:Fun.id ~indent:true ())) l
 
 let html_with_summary_of_tlsw conf wi edit_opt s =
   let lines, no_toc = lines_list_of_string s in

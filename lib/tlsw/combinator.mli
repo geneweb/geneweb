@@ -33,6 +33,9 @@ val int : int t
 
 (** {2 Basic combinators} *)
 
+val take_while : (char -> bool) -> string t
+val take_while1 : (char -> bool) -> string t
+
 val choice : 'a t list -> 'a t
 (** [choice l] attemps to run the parsers in the list [l] in order. It succeeds
     with the result of the first parser that succeeds. *)

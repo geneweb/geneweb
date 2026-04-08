@@ -4,14 +4,23 @@ module Loc = Geneweb_loc
 type 'a located = { desc : 'a; loc : Geneweb_loc.t }
 
 type link_tag =
-  | Person of { fn : string; sn : string; occ : int option }
-  | Note of { path : string }
-  | Wizard of { path : string }
+  | Person of { fn : string; sn : string; oc : int option }
+  | Note of { path : string; anchor : string option; wizard : bool }
   | Image of { path : string; width : string option }
 
 type link_desc = [ `Link of link_tag * string option ]
 type link = link_desc located
-type tag = Plain | Italic | Bold | BoldItalic | Strike | Underline | Highlight
+
+type tag =
+  | Plain
+  | Italic
+  | Bold
+  | BoldItalic
+  | Strike
+  | Underline
+  | Highlight
+  | Error
+
 type span_desc = [ `Span of tag * string | link_desc ]
 type span = span_desc located
 type text_desc = [ `Text of span list ]
@@ -40,10 +49,10 @@ let equal t1 t2 = t1 = t2
 
 let pp_link_tag ppf t =
   match t with
-  | Person { fn; sn; occ } ->
-      Fmt.pf ppf "Person (%S, %S, %a)" fn sn Fmt.(option int) occ
-  | Note { path } -> Fmt.pf ppf "Note (%S)" path
-  | Wizard { path } -> Fmt.pf ppf "Wizard (%S)" path
+  | Person { fn; sn; oc } ->
+      Fmt.pf ppf "Person (%S, %S, %a)" fn sn Fmt.(option int) oc
+  | Note { path; anchor; wizard } ->
+      Fmt.pf ppf "Note (%S, %a, %b)" path Fmt.(option string) anchor wizard
   | Image { path; width } ->
       Fmt.pf ppf "Image (%S, %a)" path Fmt.(option Dump.string) width
 
@@ -56,6 +65,7 @@ let pp_tag ppf t =
   | Strike -> Fmt.pf ppf "Strike"
   | Underline -> Fmt.pf ppf "Underline"
   | Highlight -> Fmt.pf ppf "Highlight"
+  | Error -> Fmt.pf ppf "Error"
 
 let pp_size ppf sz =
   match sz with
@@ -111,31 +121,39 @@ let pp_block ppf t =
   | #text_desc as t -> pp_text_desc ppf t
 
 let pp ppf { desc; _ } = pp_block ppf desc
-let[@inline always] mk ?(loc = Loc.dummy) desc = { desc; loc }
-let[@inline always] mk_link ?loc x y = mk ?loc @@ `Link (x, y)
-let[@inline always] mk_span ?loc x y = mk ?loc @@ `Span (x, y)
-let[@inline always] mk_node ?loc x y z = mk ?loc @@ `Node (x, y, z)
-let[@inline always] mk_header ?loc x y = mk ?loc @@ `Header (x, y)
-let[@inline always] mk_toc ?loc x = mk ?loc @@ `Toc x
-let[@inline always] mk_text ?loc x = mk ?loc @@ `Text x
-let[@inline always] mk_indent ?loc x y = mk ?loc @@ `Indent (x, y)
-let[@inline always] mk_pre ?loc x = mk ?loc @@ `Pre x
-let[@inline always] mk_newline ?loc () = mk ?loc @@ `Newline
-let[@inline always] mk_rule ?loc () = mk ?loc @@ `Rule
+let[@inline] mk ?(loc = Loc.dummy) desc = { desc; loc }
+let[@inline] mk_link ?loc x y = mk ?loc @@ `Link (x, y)
+let[@inline] mk_span ?loc x y = mk ?loc @@ `Span (x, y)
+
+let[@inline] mk_person_link ?loc ~fn ~sn ?oc =
+  mk_link ?loc (Person { fn; sn; oc })
+
+let[@inline] mk_note_link ?loc ~path ?anchor ~wizard =
+  if wizard && Option.is_some anchor then failwith "mk_note_link";
+  mk_link ?loc (Note { path; anchor; wizard })
+
+let[@inline] mk_image_link ?loc ~path ?width =
+  mk_link ?loc (Image { path; width })
+
+let[@inline] mk_node ?loc x y z = mk ?loc @@ `Node (x, y, z)
+let[@inline] mk_header ?loc x y = mk ?loc @@ `Header (x, y)
+let[@inline] mk_toc ?loc x = mk ?loc @@ `Toc x
+let[@inline] mk_text ?loc x = mk ?loc @@ `Text x
+let[@inline] mk_indent ?loc x y = mk ?loc @@ `Indent (x, y)
+let[@inline] mk_pre ?loc x = mk ?loc @@ `Pre x
+let[@inline] mk_newline ?loc () = mk ?loc @@ `Newline
+let[@inline] mk_rule ?loc () = mk ?loc @@ `Rule
 
 let link_to_html (tag, s) =
   match tag with
-  | Person { fn; sn; occ } ->
+  | Person { fn; sn; oc } ->
       let s =
-        Fmt.str "(%s/%s/%a) %a" fn sn Fmt.(option int) occ Fmt.(option string) s
+        Fmt.str "(%s/%s/%a) %a" fn sn Fmt.(option int) oc Fmt.(option string) s
       in
       Html.(span ~a:[ a_style "color: blue" ] [ txt s ])
-  | Note { path } ->
+  | Note { path; anchor = _; wizard = _ } ->
       let s = Fmt.str "(%s)%a" path Fmt.(option string) s in
       Html.(span ~a:[ a_style "color: red" ] [ txt s ])
-  | Wizard { path } ->
-      let s = Fmt.str "(%s)%a" path Fmt.(option string) s in
-      Html.(span ~a:[ a_style "color: green" ] [ txt s ])
   | Image { path; _ } ->
       let s = Fmt.str "(%s)%a" path Fmt.(option string) s in
       Html.(span ~a:[ a_style "color: yellow" ] [ txt s ])
@@ -153,7 +171,8 @@ let span_to_html { desc; _ } =
           Html.(span ~a:[ a_style "text-decoration: line-through" ] [ txt s ])
       | Underline ->
           Html.(span ~a:[ a_style "text-decoration: underline" ] [ txt s ])
-      | Highlight -> Html.(mark [ txt s ]))
+      | Highlight -> Html.(mark [ txt s ])
+      | Error -> Html.(span ~a:[ a_style "color: red" ] [ txt s ]))
 
 let text_desc_to_html (`Text l) = List.map span_to_html l
 let text_to_html { desc; _ } = text_desc_to_html desc

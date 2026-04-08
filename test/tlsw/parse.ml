@@ -9,7 +9,7 @@ let on_err ~loc err =
   exit 1
 
 let tlsw_to_html name s =
-  let l = Parser.parse ~on_err ~recover:true s |> List.map Ast.to_html in
+  let l = Parser.parse ~on_err ~recover:true s |> Seq.map Ast.to_html |> List.of_seq in
   Html.(
     html
       (head (title (txt name)) [])
