@@ -55,7 +55,7 @@
       <div class="small">
         <span title="%xx.nb_families; [relation/relations]1">%xx.nb_families; &</span>
         <span title="[*number of children]">%xx.nb_children;%nn;
-          <i class="fa fa-child fa-sm ml-1"></i></span>
+          <i class="fa fa-child fa-sm ms-1"></i></span>
       </div>
     %end;
   %else;
@@ -92,7 +92,7 @@
 %define;link_dates(xx)
   %sp;
   %if;(wizard and not cancel_links)
-    <a id="mi%xx.index;" class="date table_big_anchor" href="#mi%xx.index;" title="[*modify::person/persons]0" title="[*modify::person/persons]0"
+    <a id="mi%xx.index;" class="date table_big_anchor" href="#mi%xx.index;" title="[*modify::person/persons]0"
        onclick="window.open('%prefix;m=MOD_IND&i=%xx.index;');" aria-labelledby="individual-form">%nn;
   %end;
   %if;(e.hl=1 and ((xx.has_birth_date and (xx.birth_date.prec!="" or xx.birth_date.day="" or xx.birth_date.month=""))
@@ -147,7 +147,7 @@
     %apply;link_parents()
     %apply;nb_fam("xx")
   </td>
-  <td class="align-middle text-center%if;("z1"!="") z1%end;" aria-describedby="him-name-occupation-age-cell">
+  <td class="align-middle text-center%if;("z1"!="") z1%end;">
     %apply;imgtdz("xx")
     <div>%apply;link3(xx.access, xx)</div>
     %apply;info("xx")
@@ -157,7 +157,7 @@
 
 %define;female_line(xx,z1)
   <td class="align-middle text-start table_big_cell">%apply;link_dates("xx")</td>
-  <td class="align-middle text-center%if;("z1"!="") z1%end;" aria-describedby="her-name-occupation-age-cell">
+  <td class="align-middle text-center%if;("z1"!="") z1%end;">
     %apply;imgtdz("xx")
     <div>%apply;link3(xx.access, xx)</div>
     %apply;info("xx")
@@ -184,7 +184,7 @@
 
 %define;link_marriage(yy)
   %if;(wizard and not cancel_links)
-    <a id="mf%family.index;" class="date p_%left;%if;(yy=1) table_big_anchor%end" href="#mf%family.index;"
+    <a id="mf%family.index;" class="date p_%left;%if;(yy=1) table_big_anchor%end;" href="#mf%family.index;"
       title="[*modify] [family/families]0" onclick="window.open('%prefix;m=MOD_FAM&i=%family.index;&ip=%index;');">%nn;
   %end;
       <div class="sure_dates%ancestor.has_linked_page.MARRIAGE;%ancestor.spouse.has_linked_page.MARRIAGE;
@@ -279,7 +279,7 @@
     %end;
   %end;
   <tfoot>
-    <tr><td colspan="7" align="center">%nn;
+    <tr><td colspan="7" class="text-center">%nn;
       [*total][:] %count;/%expr(2^(l_v+1)-2^v0) [ancestor/ancestors]n.</td>
     </tr>
   </tfoot>
@@ -288,7 +288,8 @@
 %empty_sorted_list;
 %reset_count;
 <table id="anctableX" class="table table-hover table-sm w-auto
-  asc-desc-table%if;not cancel_links; ml-2%end;">
+  asc-desc-table%if;not cancel_links; ms-2%end;">
+  %( attention width= est déprécié en HTML5 mais reste bien supporté par les navigateurs %)
   <colgroup>
     <col width="4%%">
     <col width="20%%">
