@@ -1436,7 +1436,7 @@ let compile ~bname oc input =
 let compile ~bname ~output input =
   line_cnt := 0;
   Compat.Out_channel.with_open_gen
-    [ Open_wronly; Open_creat; Open_excl; Open_binary ]
+    [ Open_wronly; Open_creat; Open_binary ]
     0o644 output
   @@ fun oc ->
   try compile ~bname oc input
