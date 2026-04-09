@@ -2789,7 +2789,9 @@ let main () =
     with Not_found -> ("" |> Adef.encoded, !force_cgi)
   in
   Util.is_welcome := false;
-  if !check then exit 0;
+  if !check then (
+    Logs.debug (fun k -> k "End of check mode.");
+    exit 0);
   if cgi then (
     Server.cgi := true;
     set_binary_mode_out stdout true;
