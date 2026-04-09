@@ -39,6 +39,9 @@ end
 module Out_channel = struct
   type t = out_channel
 
+  let stdout = Stdlib.stdout
+  let stderr = Stdlib.stderr
+
   let with_open openfun s f =
     let oc = openfun s in
     Fun.protect ~finally:(fun () -> Stdlib.close_out_noerr oc) (fun () -> f oc)

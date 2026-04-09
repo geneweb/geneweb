@@ -63,6 +63,12 @@ module Out_channel : sig
   type t = out_channel
   (** The type of output channel. *)
 
+  val stdout : t
+  (** The standard output for the process. *)
+
+  val stderr : t
+  (** The standard error output for the process. *)
+
   val with_open_bin : string -> (t -> 'a) -> 'a
   (** [with_open_bin fn f] opens a channel [oc] on file [fn] and returns [f oc].
       After [f] returns, either with a value or by raising an exception, [oc] is

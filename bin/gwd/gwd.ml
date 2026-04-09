@@ -81,8 +81,8 @@ let setup_log ~predictable_mode t =
         (Sys.Signal_handle (fun _ -> refresh_file_reporter file))
   in
   match t with
-  | Stdout -> set_reporter @@ oc_to_fmt Out_channel.stdout
-  | Stderr -> set_reporter @@ oc_to_fmt Out_channel.stderr
+  | Stdout -> set_reporter @@ oc_to_fmt Compat.Out_channel.stdout
+  | Stderr -> set_reporter @@ oc_to_fmt Compat.Out_channel.stderr
   | File file ->
       set_file_reporter file;
       set_sighup_signal file
