@@ -39,6 +39,9 @@ end
 module Out_channel = struct
   type t = out_channel
 
+  let stdout = Stdlib.stdout
+  let stderr = Stdlib.stderr
+
   let with_open openfun s f =
     let oc = openfun s in
     Fun.protect ~finally:(fun () -> Stdlib.close_out_noerr oc) (fun () -> f oc)
@@ -51,6 +54,8 @@ module Out_channel = struct
 
   let flush = Stdlib.flush
   let output = Stdlib.output
+
+  external isatty : t -> bool = "caml_sys_isatty"
 end
 
 module List = struct

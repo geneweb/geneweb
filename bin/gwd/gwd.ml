@@ -13,6 +13,7 @@ module Dirs = Geneweb_dirs
 module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Compat = Geneweb_compat
 
 type opened_file = { path : string; mutable oc : out_channel }
 type log = Stdout | Stderr | File of opened_file | Syslog
@@ -65,6 +66,11 @@ let setup_log ~predictable_mode t =
     file.oc <- oc;
     set_reporter @@ Format.formatter_of_out_channel oc
   in
+  let oc_to_fmt oc =
+    if Compat.Out_channel.isatty oc then
+      Fmt_tty.setup ~style_renderer:`Ansi_tty oc
+    else Format.formatter_of_out_channel oc
+  in
   let refresh_file_reporter file =
     close_out_noerr file.oc;
     set_file_reporter file
@@ -75,8 +81,8 @@ let setup_log ~predictable_mode t =
         (Sys.Signal_handle (fun _ -> refresh_file_reporter file))
   in
   match t with
-  | Stdout -> set_reporter Format.std_formatter
-  | Stderr -> set_reporter Format.err_formatter
+  | Stdout -> set_reporter @@ oc_to_fmt Compat.Out_channel.stdout
+  | Stderr -> set_reporter @@ oc_to_fmt Compat.Out_channel.stderr
   | File file ->
       set_file_reporter file;
       set_sighup_signal file
@@ -2783,7 +2789,9 @@ let main () =
     with Not_found -> ("" |> Adef.encoded, !force_cgi)
   in
   Util.is_welcome := false;
-  if !check then exit 0;
+  if !check then (
+    Logs.debug (fun k -> k "End of check mode.");
+    exit 0);
   if cgi then (
     Server.cgi := true;
     set_binary_mode_out stdout true;
@@ -2827,7 +2835,6 @@ let () =
   parse_cmd ();
   parse_prefixes ();
   setup_log ~predictable_mode:!predictable_mode !log_file;
-  Fmt_tty.setup_std_outputs ~style_renderer:`Ansi_tty ();
   try main () with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Logs.err (fun k ->
