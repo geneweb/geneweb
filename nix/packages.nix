@@ -2,6 +2,7 @@
   system,
   inputs,
   framePointerSupport ? false,
+  overlays ? [ ],
   ...
 }:
 let
@@ -9,5 +10,5 @@ let
 in
 import inputs.nixpkgs {
   inherit system;
-  overlays = [ genewebOverlay ];
+  overlays = overlays ++ [ genewebOverlay ];
 }
