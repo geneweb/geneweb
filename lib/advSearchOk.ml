@@ -1,25 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let get_number var key env = Util.p_getint env (var ^ "_" ^ key)
-
-let reconstitute_date_dmy conf var =
-  match get_number var "yyyy" conf.Config.env with
-  | Some y -> (
-      match get_number var "mm" conf.Config.env with
-      | Some m -> (
-          match get_number var "dd" conf.Config.env with
-          | Some d ->
-              if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
-                Some
-                  Date.{ day = d; month = m; year = y; prec = Sure; delta = 0 }
-              else None
-          | None ->
-              if m >= 1 && m <= 12 then
-                Some { day = 0; month = m; year = y; prec = Sure; delta = 0 }
-              else None)
-      | None -> Some { day = 0; month = 0; year = y; prec = Sure; delta = 0 })
-  | None -> None
-
 let rec skip_spaces x i =
   if i = String.length x then i
   else if String.unsafe_get x i = ' ' then skip_spaces x (i + 1)
@@ -56,78 +36,11 @@ let string_incl =
         b
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
-let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter
 
 let is_subset_pfx s1 s2 =
   List.for_all
     (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
     s1
-
-module Fields : sig
-  type search = And | Or
-  type name = string
-
-  val get_event_field_name :
-    (string -> string) -> string -> string -> search -> name
-
-  val bapt_date : gets:(string -> string) -> search_type:search -> name
-  val birth_date : gets:(string -> string) -> search_type:search -> name
-  val death_date : gets:(string -> string) -> search_type:search -> name
-  val burial_date : gets:(string -> string) -> search_type:search -> name
-  val marriage_date : gets:(string -> string) -> search_type:search -> name
-  val other_events_date : gets:(string -> string) -> search_type:search -> name
-  val bapt_place : gets:(string -> string) -> search_type:search -> name
-  val birth_place : gets:(string -> string) -> search_type:search -> name
-  val death_place : gets:(string -> string) -> search_type:search -> name
-  val burial_place : gets:(string -> string) -> search_type:search -> name
-  val marriage_place : gets:(string -> string) -> search_type:search -> name
-  val other_events_place : gets:(string -> string) -> search_type:search -> name
-end = struct
-  type search = And | Or
-  type name = string
-
-  (* Get the field name of an event criteria depending of the search type. *)
-  let get_event_field_name gets event_criteria event_name search_type =
-    match search_type with
-    | And -> event_name ^ "_" ^ event_criteria
-    | Or -> if "on" = gets ("event_" ^ event_name) then event_criteria else ""
-
-  let bapt_date ~gets ~search_type =
-    get_event_field_name gets "date" "bapt" search_type
-
-  let birth_date ~gets ~search_type =
-    get_event_field_name gets "date" "birth" search_type
-
-  let death_date ~gets ~search_type =
-    get_event_field_name gets "date" "death" search_type
-
-  let burial_date ~gets ~search_type =
-    get_event_field_name gets "date" "burial" search_type
-
-  let marriage_date ~gets ~search_type =
-    get_event_field_name gets "date" "marriage" search_type
-
-  let other_events_date ~gets ~search_type =
-    get_event_field_name gets "date" "other_events" search_type
-
-  let bapt_place ~gets ~search_type =
-    get_event_field_name gets "place" "bapt" search_type
-
-  let birth_place ~gets ~search_type =
-    get_event_field_name gets "place" "birth" search_type
-
-  let death_place ~gets ~search_type =
-    get_event_field_name gets "place" "death" search_type
-
-  let burial_place ~gets ~search_type =
-    get_event_field_name gets "place" "burial" search_type
-
-  let marriage_place ~gets ~search_type =
-    get_event_field_name gets "place" "marriage" search_type
-
-  let other_events_place ~gets ~search_type =
-    get_event_field_name gets "place" "other_events" search_type
-end
 
 module AdvancedSearchMatch : sig
   type place = string * Gwdb.istr option
@@ -143,8 +56,8 @@ module AdvancedSearchMatch : sig
     base:Gwdb.base ->
     p:Authorized.Person.t ->
     sex:Def.sex ->
-    married:string ->
-    occupation:string ->
+    married:bool option ->
+    occupation:string option ->
     first_name_list:string list ->
     surname_list:string list ->
     alias_public_name_qualifiers:string list ->
@@ -155,60 +68,55 @@ module AdvancedSearchMatch : sig
     bool
 
   val match_marriage :
-    exact_place:bool ->
+    default:bool ->
     conf:Config.config ->
     base:Gwdb.base ->
     p:Authorized.Person.t ->
-    place:place option ->
-    default:bool ->
     dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
     bool
 
-  module type Match = sig
-    val match_baptism :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  val match_baptism :
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 
-    val match_birth :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  val match_birth :
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 
-    val match_burial :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  val match_burial :
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 
-    val match_death :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  val match_death :
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 
-    val match_other_events :
-      conf:Config.config ->
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
-  end
-
-  module And : Match
-  module Or : Match
+  val match_other_events :
+    conf:Config.config ->
+    base:Gwdb.base ->
+    p:Authorized.Person.t ->
+    dates:Date.dmy option * Date.dmy option ->
+    place:place option ->
+    exact_place:bool ->
+    bool
 end = struct
   type place = string * Gwdb.istr option
 
@@ -229,19 +137,18 @@ end = struct
   let match_sex ~p ~sex =
     sex = Def.Neuter || Authorized.Person.get_sex p = Some sex
 
-  let married_cmp ~conf ~base p = function
-    | "Y" ->
-        Option.fold ~none:false
-          (Authorized.Person.get_family ~conf ~base p)
-          ~some:(( <> ) [||])
-    | "N" ->
-        Option.fold ~none:false
-          (Authorized.Person.get_family ~conf ~base p)
-          ~some:(( = ) [||])
-    | _ -> true
+  let married_cmp ~conf ~base p married =
+    if married then
+      Option.fold ~none:false
+        (Authorized.Person.get_family ~conf ~base p)
+        ~some:(( <> ) [||])
+    else
+      Option.fold ~none:false
+        (Authorized.Person.get_family ~conf ~base p)
+        ~some:(( = ) [||])
 
   let match_married ~conf ~base ~p ~married =
-    married = "" || married_cmp ~conf ~base p married
+    Option.fold married ~none:true ~some:(married_cmp ~conf ~base p)
 
   let exact_place_wrapper ~get ~exact_place ~base ~p ~(place : place option)
       ~default =
@@ -287,7 +194,7 @@ end = struct
           match_other_event_place ~exact_place ~base ~place ~default:false ~p:e)
         (Event.other_events conf base p)
 
-  let match_marriage ~exact_place ~conf ~base ~p ~place ~default ~dates =
+  let match_marriage ~default ~conf ~base ~p ~dates ~place ~exact_place =
     let d1, d2 = dates in
     let test_date_place df =
       Array.exists
@@ -341,11 +248,11 @@ end = struct
               Ext_option.return_if (not @@ is_delimiter c) (fun () -> c))
         (Utf8.unaccent @@ Utf8.lowercase s)
     in
-    occupation = ""
-    || Option.fold ~none:false
-         ~some:(fun occupation' ->
-           string_incl (clean occupation) (clean @@ Gwdb.sou base occupation'))
-         (Authorized.Person.get_occupation p)
+    Option.fold occupation ~none:true ~some:(fun occupation ->
+        Option.fold ~none:false
+          ~some:(fun occupation' ->
+            string_incl (clean occupation) (clean @@ Gwdb.sou base occupation'))
+          (Authorized.Person.get_occupation p))
 
   let match_baptism_date =
     match_date ~df:(fun p ->
@@ -459,96 +366,21 @@ end = struct
     && match_married ~conf ~base ~p ~married
     && match_occupation ~base ~p ~occupation
 
-  module type Match = sig
-    val match_baptism :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
+      ~(place : place option) ~(exact_place : bool) =
+    date_f ~p ~default:true ~dates
+    && place_f ~exact_place ~base ~p ~place ~default:true
 
-    val match_birth :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
+  let match_baptism = match_and match_baptism_date match_baptism_place
+  let match_birth = match_and match_birth_date match_birth_place
+  let match_burial = match_and match_burial_date match_burial_place
+  let match_death = match_and match_death_date match_death_place
 
-    val match_burial :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
-
-    val match_death :
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
-
-    val match_other_events :
-      conf:Config.config ->
-      base:Gwdb.base ->
-      p:Authorized.Person.t ->
-      dates:Date.dmy option * Date.dmy option ->
-      place:place option ->
-      exact_place:bool ->
-      bool
-  end
-
-  module And = struct
-    let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
-        ~(place : place option) ~(exact_place : bool) =
-      date_f ~p ~default:true ~dates
-      && place_f ~exact_place ~base ~p ~place ~default:true
-
-    let match_baptism = match_and match_baptism_date match_baptism_place
-    let match_birth = match_and match_birth_date match_birth_place
-    let match_burial = match_and match_burial_date match_burial_place
-    let match_death = match_and match_death_date match_death_place
-
-    let match_other_events ~conf ~base =
-      match_and ~base
-        (match_other_events_date ~conf ~base)
-        (match_other_events_place ~conf)
-  end
-
-  module Or = struct
-    let match_or date_f place_f ~(base : Gwdb.base) ~p ~dates
-        ~(place : place option) ~(exact_place : bool) =
-      date_f ~p ~default:false ~dates
-      || place_f ~exact_place ~base ~p ~place ~default:false
-
-    let match_baptism = match_or match_baptism_date match_baptism_place
-    let match_birth = match_or match_birth_date match_birth_place
-    let match_burial = match_or match_burial_date match_burial_place
-    let match_death = match_or match_death_date match_death_place
-
-    let match_other_events ~conf ~base =
-      match_or ~base
-        (match_other_events_date ~conf ~base)
-        (match_other_events_place ~conf)
-  end
+  let match_other_events ~conf ~base =
+    match_and ~base
+      (match_other_events_date ~conf ~base)
+      (match_other_events_place ~conf)
 end
-
-(* Search type can be AND or OR. *)
-let get_search_type gets =
-  match gets "search_type" with "OR" -> Fields.Or | _ -> Fields.And
-
-let get_name_search_mode gets key =
-  let key_pfx = key ^ "_prefix" in
-  let value_pfx = gets key_pfx in
-  let value = gets key in
-  if value = "on" then `Exact
-  else if value_pfx = "on" then `Not_Exact_Prefix
-  else if value = "pfx" then `Not_Exact_Prefix
-  else `Not_Exact
 
 (*
   Search for other persons in the base matching with the provided infos.
@@ -568,33 +400,9 @@ let get_name_search_mode gets key =
    a person from the base to match. (ie. "Pierre-Jean de Bourbon de Vallois" matches
    with "Jean Pierre de Vallois de Bourbon" but not with "Jean de Bourbon")
 *)
-let advanced_search conf base max_answers =
-  let hs = Hashtbl.create 73 in
-  let hd = Hashtbl.create 73 in
-  let getd x =
-    match Hashtbl.find_opt hd x with
-    | Some v -> v
-    | None ->
-        let v =
-          ( reconstitute_date_dmy conf (x ^ "1"),
-            reconstitute_date_dmy conf (x ^ "2") )
-        in
-        Hashtbl.add hd x v;
-        v
-  in
-  let gets x =
-    match Hashtbl.find_opt hs x with
-    | Some v -> v
-    | None ->
-        let v =
-          match Util.p_getenv conf.Config.env x with Some v -> v | None -> ""
-        in
-        Hashtbl.add hs x v;
-        v
-  in
-
-  let exact_place = "on" = gets "exact_place" in
-
+let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
+    base =
+  let max_answers = Option.value ~default:max_int query_params.limit in
   let place_with_istr =
     let memo : (string * (string * Gwdb.istr option)) list ref = ref [] in
     fun str ->
@@ -607,39 +415,28 @@ let advanced_search conf base max_answers =
           res
   in
 
-  let gets_opt x =
-    let value = gets x in
-    Ext_option.return_if (value <> "") (fun () -> value)
-  in
   let fn_list =
     List.map Name.lower
-    @@ Option.fold ~none:[] ~some:Name.split (gets_opt "first_name")
+    @@ Option.fold ~none:[] ~some:Name.split query_params.first_name
   in
   let sn_list =
     List.map Name.lower
-    @@ Option.fold ~none:[] ~some:Name.split (gets_opt "surname")
+    @@ Option.fold ~none:[] ~some:Name.split query_params.surname
   in
 
   let alias_public_name_qualifiers =
     List.map Name.lower
-    @@ Option.fold ~none:[] ~some:Name.split
-         (gets_opt "alias_pubname_qualifiers")
+    @@ Option.fold ~none:[] ~some:Name.split query_params.alias
   in
 
-  let search_type = get_search_type gets in
+  let search_type = query_params.event_search_mode in
 
-  let place_searched place_field =
+  let place_searched event_kind =
     lazy
-      (Option.map place_with_istr (gets_opt @@ place_field ~gets ~search_type))
+      (Option.map place_with_istr
+         (Page.Advanced_search.Query_params.get_event_place ~event_kind
+            query_params))
   in
-  let birth_place_searched = place_searched Fields.birth_place in
-  let bapt_place_searched = place_searched Fields.bapt_place in
-  let burial_place_searched = place_searched Fields.burial_place in
-  let death_place_searched = place_searched Fields.death_place in
-  let marriage_place_searched = place_searched Fields.marriage_place in
-  let other_events_place_searched = place_searched Fields.other_events_place in
-
-  let get_name_search_mode = get_name_search_mode gets in
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) unsafe_p search_type =
@@ -648,86 +445,50 @@ let advanced_search conf base max_answers =
       let civil_match =
         lazy
           (AdvancedSearchMatch.match_civil_status ~conf ~base ~p
-             ~sex:(gets "sex" |> sex_of_string)
-             ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
-             ~skip_sname ~first_name_list:fn_list ~surname_list:sn_list
+             ~sex:query_params.sex ~married:query_params.married
+             ~occupation:query_params.occupation ~skip_fname ~skip_sname
+             ~first_name_list:fn_list ~surname_list:sn_list
              ~alias_public_name_qualifiers
-             ~exact_first_name:(get_name_search_mode "exact_first_name")
-             ~exact_surname:(get_name_search_mode "exact_surname"))
+             ~exact_first_name:query_params.first_name_search_mode
+             ~exact_surname:query_params.surname_search_mode)
       in
-      match search_type with
-      | Fields.Or ->
-          let match_f ~date_field ~place_field or_f and_f =
-            or_f ~base ~p
-              ~dates:(getd @@ date_field ~gets ~search_type)
-              ~place:(Lazy.force place_field) ~exact_place
-            && and_f ~base ~p
-                 ~dates:(getd @@ date_field ~gets ~search_type)
-                 ~place:(Lazy.force place_field) ~exact_place
-          in
-          Lazy.force civil_match
-          && (gets_opt "place" = None
-              && gets "date2_yyyy" = ""
-              && gets "date1_yyyy" = ""
-             || match_f ~date_field:Fields.bapt_date
-                  ~place_field:bapt_place_searched
-                  AdvancedSearchMatch.Or.match_baptism
-                  AdvancedSearchMatch.And.match_baptism
-             || match_f ~date_field:Fields.birth_date
-                  ~place_field:birth_place_searched
-                  AdvancedSearchMatch.Or.match_birth
-                  AdvancedSearchMatch.And.match_birth
-             || match_f ~date_field:Fields.burial_date
-                  ~place_field:burial_place_searched
-                  AdvancedSearchMatch.Or.match_burial
-                  AdvancedSearchMatch.And.match_burial
-             || match_f ~date_field:Fields.death_date
-                  ~place_field:death_place_searched
-                  AdvancedSearchMatch.Or.match_death
-                  AdvancedSearchMatch.And.match_death
-             || AdvancedSearchMatch.match_marriage ~conf ~base ~p ~exact_place
-                  ~default:false
-                  ~place:(Lazy.force marriage_place_searched)
-                  ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
-             || match_f ~date_field:Fields.other_events_date
-                  ~place_field:other_events_place_searched
-                  (AdvancedSearchMatch.Or.match_other_events ~conf)
-                  (AdvancedSearchMatch.And.match_other_events ~conf))
-      | Fields.And ->
-          Lazy.force civil_match
-          && AdvancedSearchMatch.And.match_baptism ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.bapt_date ~gets ~search_type)
-               ~place:(Lazy.force bapt_place_searched)
-          && AdvancedSearchMatch.And.match_birth ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.birth_date ~gets ~search_type)
-               ~place:(Lazy.force birth_place_searched)
-          && AdvancedSearchMatch.And.match_burial ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.burial_date ~gets ~search_type)
-               ~place:(Lazy.force burial_place_searched)
-          && AdvancedSearchMatch.And.match_death ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.death_date ~gets ~search_type)
-               ~place:(Lazy.force death_place_searched)
-          && AdvancedSearchMatch.match_marriage ~conf ~base ~p ~exact_place
-               ~default:true
-               ~place:(Lazy.force marriage_place_searched)
-               ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
-          && AdvancedSearchMatch.And.match_other_events ~conf ~base ~p
-               ~exact_place
-               ~dates:(getd @@ Fields.other_events_date ~gets ~search_type)
-               ~place:(Lazy.force other_events_place_searched)
+      let check, default =
+        match search_type with
+        | `Or -> (List.exists, false)
+        | `And -> (List.for_all, true)
+      in
+      let match_ (f, event_kind) =
+        query_params.events = []
+        || f ~base ~p
+             ~dates:
+               (Page.Advanced_search.Query_params.get_event_dates ~event_kind
+                  query_params)
+             ~place:(Lazy.force @@ place_searched event_kind)
+             ~exact_place:query_params.event_exact_place
+      in
+      Lazy.force civil_match
+      && check match_
+           [
+             (AdvancedSearchMatch.match_baptism, `Baptism);
+             (AdvancedSearchMatch.match_birth, `Birth);
+             (AdvancedSearchMatch.match_burial, `Burial);
+             (AdvancedSearchMatch.match_death, `Death);
+             (AdvancedSearchMatch.match_marriage ~default ~conf, `Marriage);
+             (AdvancedSearchMatch.match_other_events ~conf, `Other);
+           ]
     in
     if (not @@ SearchName.search_reject_p conf base unsafe_p) && pmatch () then
       (unsafe_p :: list, len + 1)
     else acc
   in
   let list, len =
-    if "on" = gets "sosa_filter" then
+    if query_params.only_root_ancestors then
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
           let rec loop p (set, acc) =
             if not (Gwdb.IperSet.mem (Gwdb.get_iper p) set) then
               let set = Gwdb.IperSet.add (Gwdb.get_iper p) set in
-              let acc = match_person acc p search_type in
+              let acc = match_person acc p query_params.event_search_mode in
               match Gwdb.get_parents p with
               | Some ifam ->
                   let fam = Gwdb.foi base ifam in
@@ -760,9 +521,7 @@ let advanced_search conf base max_answers =
         |> List.map (Gwdb.spi_find @@ persons_of base)
         |> List.flatten |> List.sort_uniq compare
       in
-      if
-        sn_list <> []
-        && get_name_search_mode "exact_surname" = `Not_Exact_Prefix
+      if sn_list <> [] && query_params.surname_search_mode = `Not_Exact_Prefix
       then
         let filter p =
           let r =
@@ -773,13 +532,13 @@ let advanced_search conf base max_answers =
         in
         let list =
           SearchName.persons_starting_with ~conf ~base ~filter
-            ~first_name_prefix:"" ~surname_prefix:(gets "surname")
+            ~first_name_prefix:""
+            ~surname_prefix:(Option.value ~default:"" query_params.surname)
             ~limit:max_answers
         in
         (List.map (Gwdb.poi base) list, List.length list)
       else if
-        fn_list <> []
-        && get_name_search_mode "exact_first_name" = `Not_Exact_Prefix
+        fn_list <> [] && query_params.first_name_search_mode = `Not_Exact_Prefix
       then
         let filter p =
           let r =
@@ -790,8 +549,9 @@ let advanced_search conf base max_answers =
         in
         let list =
           SearchName.persons_starting_with ~conf ~base ~filter
-            ~first_name_prefix:(gets "first_name") ~surname_prefix:""
-            ~limit:max_answers
+            ~first_name_prefix:
+              (Option.value ~default:"" query_params.first_name)
+            ~surname_prefix:"" ~limit:max_answers
         in
         (List.map (Gwdb.poi base) list, List.length list)
       else
@@ -800,14 +560,13 @@ let advanced_search conf base max_answers =
             ( false,
               true,
               list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-                sn_list
-                (get_name_search_mode "exact_surname") )
+                sn_list query_params.surname_search_mode )
           else
             ( true,
               false,
               list_aux Gwdb.base_strings_of_first_name
                 Gwdb.persons_of_first_name fn_list
-                (get_name_search_mode "exact_first_name") )
+                query_params.first_name_search_mode )
         in
         let rec loop ((_, len) as acc) = function
           | [] -> acc
@@ -833,65 +592,62 @@ let advanced_search conf base max_answers =
   (List.rev list, len)
 
 module SearchingFields : sig
-  val gets : Config.config -> string -> string
-  val map_field : conf:Config.config -> key:string -> string -> string
+  val map_field :
+    search_mode:[ `Exact | `Not_Exact | `Not_Exact_Prefix ] -> string -> string
 
-  val string_field :
-    ?map_field:(string -> string) -> Config.config -> string -> string -> string
+  val string_field : ?map_field:(string -> string) -> string -> string -> string
 
-  val sosa : Config.config -> Gwdb.base -> string
-  val sosa_field : Config.config -> Gwdb.base -> string -> string
+  val sosa :
+    query_params:Page.Advanced_search.Query_params.t ->
+    Config.config ->
+    Gwdb.base ->
+    string
+
+  val sosa_field :
+    query_params:Page.Advanced_search.Query_params.t ->
+    Config.config ->
+    Gwdb.base ->
+    string ->
+    string
 
   val get_place_date_request :
-    Config.config -> string -> string -> string -> string
+    Config.config ->
+    string ->
+    Date.dmy option * Date.dmy option ->
+    string ->
+    string
 
-  val test_string : Config.config -> string -> bool
-  val test_date : Config.config -> string -> bool
-  val event_search : Config.config -> Fields.search -> int -> string
-  val sex : Config.config -> int
-  val union : Config.config -> int
-  val first_name : Config.config -> string
-  val surname : Config.config -> string
-  val occupation : Config.config -> string
-  val events : Config.config -> string
-  val other_aliases : Config.config -> string
+  val test_string : string -> bool
+  val test_date : Date.dmy option * Date.dmy option -> bool
+
+  val event_search :
+    query_params:Page.Advanced_search.Query_params.t -> Config.config -> string
+
+  val sex : Page.Advanced_search.Query_params.t -> int
+  val union : Page.Advanced_search.Query_params.t -> int
+  val first_name : Page.Advanced_search.Query_params.t -> string
+  val surname : Page.Advanced_search.Query_params.t -> string
+  val occupation : Page.Advanced_search.Query_params.t -> string
+
+  val events :
+    query_params:Page.Advanced_search.Query_params.t -> Config.config -> string
+
+  val other_aliases : Page.Advanced_search.Query_params.t -> string
 end = struct
-  let gets conf x =
-    match Util.p_getenv conf.Config.env x with
-    | Some v when v <> "" -> v
-    | _ ->
-        let rec loop acc i =
-          let k = x ^ "_" ^ string_of_int i in
-          match Util.p_getenv conf.Config.env k with
-          | Some v ->
-              loop
-                (if acc = "" then v
-                else if v = "" then acc
-                else acc ^ " / " ^ v)
-                (i + 1)
-          | None -> acc
-        in
-        loop "" 1
-
-  let getd conf x =
-    (reconstitute_date_dmy conf (x ^ "1"), reconstitute_date_dmy conf (x ^ "2"))
-
-  let test_string conf x = gets conf x <> ""
-
-  let test_date conf x =
-    reconstitute_date_dmy conf (x ^ "1") <> None
-    || reconstitute_date_dmy conf (x ^ "2") <> None
+  let test_string x = x <> ""
+  let test_date (date1, date2) = date1 <> None || date2 <> None
 
   (* Fonction pour tester un simple champ texte (e.g: first_name). *)
-  let string_field ?(map_field = Fun.id) conf x search =
-    if test_string conf x then search ^ " " ^ map_field (gets conf x)
-    else search
+  let string_field ?(map_field = Fun.id) x search =
+    if test_string x then search ^ " " ^ map_field x else search
+
+  let sex (query_params : Page.Advanced_search.Query_params.t) =
+    match query_params.sex with Male -> 0 | Female -> 1 | Neuter -> 2
 
   (* Returns the place and date request. (e.g.: ...in Paris between 1800 and 1900) *)
-  let get_place_date_request conf place_prefix_field_name date_prefix_field_name
-      search =
+  let get_place_date_request conf place date search =
     let search =
-      match getd conf date_prefix_field_name with
+      match date with
       | Some d1, Some d2 ->
           Printf.sprintf "%s %s %s %s %s" search
             (Util.transl conf "between (date)")
@@ -908,60 +664,54 @@ end = struct
             (DateDisplay.string_of_dmy conf d2 :> string)
       | None, None -> search
     in
-    if test_string conf place_prefix_field_name then
-      search ^ " "
-      ^ Util.transl conf "in (place)"
-      ^ " "
-      ^ gets conf place_prefix_field_name
+    if test_string place then
+      search ^ " " ^ Util.transl conf "in (place)" ^ " " ^ place
     else search
 
   let events =
     [|
-      ("birth", "born");
-      ("bapt", "baptized");
-      ("marriage", "married");
-      ("death", "died");
-      ("burial", "buried");
-      ("other_events", "other_events");
+      (`Birth, "born");
+      (`Baptism, "baptized");
+      (`Marriage, "married");
+      (`Death, "died");
+      (`Burial, "buried");
+      (`Other, "other_events");
     |]
 
   (* Returns the event request. (e.g.: born in...) *)
-  let get_event_field_request conf place_prefix_field_name
-      date_prefix_field_name event_name search search_type sex =
+  let get_event_field_request conf place date event_name search search_type sex
+      =
     (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
     let sep =
       if search = "" then ""
-      else match search_type with Fields.And -> ", " | Or -> " / "
+      else match search_type with `And -> ", " | `Or -> " / "
     in
     let search =
-      if
-        test_string conf place_prefix_field_name
-        || test_date conf date_prefix_field_name
-      then search ^ sep ^ Util.transl_nth conf event_name sex
+      if test_string place || test_date date then
+        search ^ sep ^ Util.transl_nth conf event_name sex
       else search
     in
     (* The place and date have to be shown after each event only for the AND request. *)
     match search_type with
-    | Fields.And ->
-        get_place_date_request conf place_prefix_field_name
-          date_prefix_field_name search
-    | Or -> search
+    | `And -> get_place_date_request conf place date search
+    | `Or -> search
 
-  let build_event_search conf search_type sex event_search (s1, s2) =
-    let date_field_name =
-      Fields.get_event_field_name (gets conf) "date" s1 search_type
+  let build_event_search ~query_params conf event_search (event_kind, s2) =
+    let date =
+      Page.Advanced_search.Query_params.get_event_dates ~event_kind query_params
     in
-    let place_field_name =
-      Fields.get_event_field_name (gets conf) "place" s1 search_type
+    let place =
+      Page.Advanced_search.Query_params.get_event_place ~event_kind query_params
     in
-    get_event_field_request conf place_field_name date_field_name s2
-      event_search search_type sex
+    get_event_field_request conf
+      (Option.value ~default:"" place)
+      date s2 event_search query_params.event_search_mode (sex query_params)
 
-  let event_search conf search_type sex =
-    Array.fold_left (build_event_search conf search_type sex) "" events
+  let event_search ~query_params conf =
+    Array.fold_left (build_event_search ~query_params conf) "" events
 
-  let sosa conf base =
-    if gets conf "sosa_filter" <> "" then
+  let sosa ~(query_params : Page.Advanced_search.Query_params.t) conf base =
+    if query_params.only_root_ancestors then
       match Util.find_sosa_ref conf base with
       | None -> ""
       | Some p ->
@@ -970,66 +720,77 @@ end = struct
             (NameDisplay.fullname_html_of_person conf base p :> string)
     else ""
 
-  let sosa_field conf base search =
-    let s = sosa conf base in
+  let sosa_field ~query_params conf base search =
+    let s = sosa ~query_params conf base in
     if search = "" then s else if s = "" then search else search ^ ", " ^ s
 
-  let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
+  let map_field ~search_mode s =
+    if search_mode = `Not_Exact_Prefix then s ^ "..." else s
 
-  let map_field ~conf ~key s =
-    if get_name_search_mode (gets conf) key = `Not_Exact_Prefix then s ^ "..."
-    else s
+  let first_name (query_params : Page.Advanced_search.Query_params.t) =
+    map_field ~search_mode:query_params.first_name_search_mode
+      (Option.value ~default:"" query_params.first_name)
 
-  let first_name conf =
-    let fn = gets conf "first_name" in
-    map_field ~conf ~key:"exact_first_name" fn
+  let surname (query_params : Page.Advanced_search.Query_params.t) =
+    map_field ~search_mode:query_params.surname_search_mode
+      (Option.value ~default:"" query_params.surname)
 
-  let surname conf =
-    let sn = gets conf "surname" in
-    map_field ~conf ~key:"exact_surname" sn
+  let occupation (query_params : Page.Advanced_search.Query_params.t) =
+    Option.value ~default:"" query_params.occupation
 
-  let occupation conf = gets conf "occu"
-
-  let events conf =
-    let search_type = get_search_type (gets conf) in
-    let event_string = event_search conf search_type (sex conf) in
+  let events ~(query_params : Page.Advanced_search.Query_params.t) conf =
+    let event_string = event_search ~query_params conf in
     (* Adding the place and date at the end for the OR request. *)
-    match search_type with
-    | And -> event_string
-    | Fields.Or ->
+    match query_params.event_search_mode with
+    | `And -> event_string
+    | `Or ->
+        let place, date =
+          match query_params.events with
+          | [] -> (None, (None, None))
+          | (_, event) :: _ -> (event.place, event.dates)
+        in
         if
-          gets conf "place" != ""
-          || gets conf "date2_yyyy" != ""
-          || gets conf "date1_yyyy" != ""
-        then get_place_date_request conf "place" "date" event_string
+          Option.is_some place
+          || Option.is_some (snd date)
+          || Option.is_some (fst date)
+        then
+          get_place_date_request conf
+            (Option.value ~default:"" place)
+            date event_string
         else event_string
 
-  let union conf = match gets conf "married" with "Y" -> 0 | "N" -> 1 | _ -> 2
-  let other_aliases conf = gets conf "alias_pubname_qualifiers"
+  let union (query_params : Page.Advanced_search.Query_params.t) =
+    match query_params.married with
+    | Some true -> 0
+    | Some false -> 1
+    | None -> 2
+
+  let other_aliases (query_params : Page.Advanced_search.Query_params.t) =
+    Option.value ~default:"" query_params.alias
 end
 
 (*
   Returns a description string for the current advanced search results in the correct language.
   e.g. "Search all Pierre, born in Paris, died in Paris"
 *)
-let searching_fields conf base =
-  let gets = SearchingFields.gets conf in
-  let sex = SearchingFields.sex conf in
-  let search_type = get_search_type gets in
+let searching_fields ~(query_params : Page.Advanced_search.Query_params.t) conf
+    base =
   let search = "" in
-  let map_field key = SearchingFields.map_field ~conf ~key in
+  let map_field search_mode = SearchingFields.map_field ~search_mode in
   let search =
     SearchingFields.string_field
-      ~map_field:(map_field "exact_first_name")
-      conf "first_name" search
+      ~map_field:(map_field query_params.first_name_search_mode)
+      (Option.value ~default:"" query_params.first_name)
+      search
   in
   let search =
     SearchingFields.string_field
-      ~map_field:(map_field "exact_surname")
-      conf "surname" search
+      ~map_field:(map_field query_params.surname_search_mode)
+      (Option.value ~default:"" query_params.surname)
+      search
   in
-  let search = SearchingFields.sosa_field conf base search in
-  let event_search = SearchingFields.event_search conf search_type sex in
+  let search = SearchingFields.sosa_field ~query_params conf base search in
+  let event_search = SearchingFields.event_search ~query_params conf in
   let search =
     if search = "" then event_search
     else if event_search = "" then search
@@ -1037,35 +798,48 @@ let searching_fields conf base =
   in
   (* Adding the place and date at the end for the OR request. *)
   let search =
-    match search_type with
-    | And -> search
-    | Fields.Or ->
+    match query_params.event_search_mode with
+    | `And -> search
+    | `Or ->
+        let place, date =
+          match query_params.events with
+          | [] -> (None, (None, None))
+          | (_, event) :: _ -> (event.place, event.dates)
+        in
         if
-          gets "place" != ""
-          || gets "date2_yyyy" != ""
-          || gets "date1_yyyy" != ""
-        then SearchingFields.get_place_date_request conf "place" "date" search
+          Option.is_some place
+          || Option.is_some (snd date)
+          || Option.is_some (fst date)
+        then
+          SearchingFields.get_place_date_request conf
+            (Option.value ~default:"" place)
+            date search
         else search
   in
   let search =
-    let marriage_place_field_name =
-      Fields.get_event_field_name gets "place" "marriage" search_type
+    let marriage_place =
+      Page.Advanced_search.Query_params.get_event_place ~event_kind:`Marriage
+        query_params
     in
     if
       not
-        (SearchingFields.test_string conf marriage_place_field_name
-        || SearchingFields.test_date conf "marriage")
+        (SearchingFields.test_string (Option.value ~default:"" marriage_place)
+        || SearchingFields.test_date
+             (Page.Advanced_search.Query_params.get_event_dates
+                ~event_kind:`Marriage query_params))
     then
       let sep = if search <> "" then ", " else "" in
-      if gets "married" = "Y" then
-        search ^ sep ^ Util.transl conf "having a family"
-      else if gets "married" = "N" then
-        search ^ sep ^ Util.transl conf "having no family"
-      else search
+      match query_params.married with
+      | Some true -> search ^ sep ^ Util.transl conf "having a family"
+      | Some false -> search ^ sep ^ Util.transl conf "having no family"
+      | None -> search
     else search
   in
   let sep = if search <> "" then "," else "" in
-  Adef.safe @@ SearchingFields.string_field conf "occu" (search ^ sep)
+  Adef.safe
+  @@ SearchingFields.string_field
+       (Option.value ~default:"" query_params.occupation)
+       (search ^ sep)
 
 let filter_alias ~name ~matching =
   let search_list = List.map Name.lower (Name.split name) in
