@@ -1401,12 +1401,26 @@ let opendb bname =
       perm;
     }
   in
-  let snames_inx = Dutil.snames_inx in
-  let snames_dat = Dutil.snames_dat in
+  let choose_index (marital_index, marital_data)
+      (non_marital_index, non_marital_data) =
+    if
+      Sys.file_exists (Filename.concat bname marital_data)
+      && Sys.file_exists (Filename.concat bname marital_index)
+    then (marital_index, marital_data)
+    else (non_marital_index, non_marital_data)
+  in
+  let snames_inx, snames_dat =
+    choose_index
+      (Dutil.snames_marital_inx, Dutil.snames_marital_dat)
+      (Dutil.snames_inx, Dutil.snames_dat)
+  in
+  let lowercase_surname_index_file, lowercase_surname_data_file =
+    choose_index
+      (Dutil.snames_marital_lower_inx, Dutil.snames_marital_lower_dat)
+      (Dutil.snames_lower_inx, Dutil.snames_lower_dat)
+  in
   let fnames_inx = Dutil.fnames_inx in
   let fnames_dat = Dutil.fnames_dat in
-  let lowercase_surname_index_file = Dutil.snames_lower_inx in
-  let lowercase_surname_data_file = Dutil.snames_lower_dat in
   let lowercase_first_name_index_file = Dutil.fnames_lower_inx in
   let lowercase_first_name_data_file = Dutil.fnames_lower_dat in
   let persons_of_name = persons_of_name bname patches.h_name in

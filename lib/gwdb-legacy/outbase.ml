@@ -655,7 +655,7 @@ end = struct
 
     type t = Wellformed | PostMaritalGen
 
-    let current = Wellformed
+    let current = PostMaritalGen
 
     let of_string = function
       | "20260219" -> Some Wellformed
