@@ -51,6 +51,8 @@ module Out_channel = struct
 
   let flush = Stdlib.flush
   let output = Stdlib.output
+
+  external isatty : t -> bool = "caml_sys_isatty"
 end
 
 module List = struct

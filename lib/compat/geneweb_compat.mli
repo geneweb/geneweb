@@ -93,6 +93,12 @@ module Out_channel : sig
 
       @raise Invalid_argument
         if [pos] and [len] do not designate a valid range of [buf]. *)
+
+  val isatty : t -> bool
+  (** [isatty oc] is [true] if [oc] refers to a terminal or console window,
+      [false] otherwise.
+
+      @since 5.1 *)
 end
 
 module List : sig
