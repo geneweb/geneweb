@@ -749,7 +749,7 @@ let legacy_arguments =
     ("-p", "--port");
     ("-particles", "--particles-file");
     ("-plugin", "--plugin");
-    ("-plugins", "--plugin");
+    ("-plugins", "--plugins");
     ("-redirect", "--redirect-interface");
     ("-robot_xcl", "--ban-threshold");
     ("-setup_link", "--setup-link");
