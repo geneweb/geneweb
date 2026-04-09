@@ -1773,7 +1773,7 @@ let match_strings regexp s =
   loop 0 0
 
 let excluded from =
-  let efname = Filename.chop_extension Sys.argv.(0) ^ ".xcl" in
+  let efname = Filename.remove_extension Sys.argv.(0) ^ ".xcl" in
   try
     let ic = open_in efname in
     let rec loop () =
