@@ -2336,12 +2336,13 @@ let has_root_privileges () =
     || Unix.getegid () = root
 
 let parse_cmd () =
-  (* Cmd_legacy.parse () *)
-  let file =
-    let f = Sys.argv.(0) ^ ".arg" in
-    if Sys.file_exists f then Some f else None
-  in
-  match Cmd.parse ?file () with
+  let arg_file = Sys.argv.(0) ^ ".arg" in
+  if Sys.file_exists arg_file then
+    Fmt.epr
+      "The file %S is ignored. If you want to pass additional arguments to \
+       gwd, we recommend writing a wrapper shell script."
+      arg_file;
+  match Cmd.parse () with
   | `Ok o ->
       selected_addr := o.interface;
       selected_port := o.port;

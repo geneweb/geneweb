@@ -785,32 +785,12 @@ let preprocess_legacy_arguments =
               "--noop"
           | exception Not_found -> a))
 
-let arguments_in_file file =
-  Compat.In_channel.with_open_text file @@ fun ic ->
-  let rec loop acc =
-    match input_line ic with
-    | exception End_of_file -> List.rev acc
-    | l -> loop (l :: acc)
-  in
-  Array.of_list @@ loop []
-
 let parse_lang s =
   if String.length s >= 2 then Some (String.sub s 0 2) else None
 
 let env k =
   match Sys.getenv_opt k with Some s when k = "LANG" -> parse_lang s | r -> r
 
-let parse ?file () =
-  let argv_file =
-    match file with Some f -> arguments_in_file f | None -> [||]
-  in
-  let argv =
-    let l1 = Array.length argv_file in
-    let l2 = Array.length Sys.argv in
-    Array.init (l1 + l2) (fun i ->
-        if i = 0 then Sys.argv.(0)
-        else if i <= l1 then argv_file.(i - 1)
-        else Sys.argv.(i - l1))
-  in
-  let argv = preprocess_legacy_arguments argv in
+let parse () =
+  let argv = preprocess_legacy_arguments Sys.argv in
   Cmdliner.Cmd.eval_value' ~env ~argv t
