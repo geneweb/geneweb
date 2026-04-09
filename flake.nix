@@ -34,7 +34,17 @@
         };
         overlays.default = import ./nix/overlay.nix { inherit system inputs; };
         formatter = pkgs.nixfmt;
-        devShells.default = import ./nix/devshell.nix { inherit system inputs; };
+        devShells = {
+          default = import ./nix/devshell.nix { inherit system inputs; };
+          ocaml4 = import ./nix/devshell.nix {
+            inherit system inputs;
+            overlays = [
+              (super: self: {
+                ocamlPackages = self.ocaml-ng.ocamlPackages_4_14;
+              })
+            ];
+          };
+        };
       }
     );
 }

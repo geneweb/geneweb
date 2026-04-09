@@ -1,7 +1,12 @@
-{ system, inputs, ... }:
+{
+  system,
+  inputs,
+  overlays ? [ ],
+  ...
+}:
 let
   pkgs = import ./packages.nix {
-    inherit system inputs;
+    inherit system inputs overlays;
     framePointerSupport = true;
   };
   ocamlPackages = pkgs.ocamlPackages;
