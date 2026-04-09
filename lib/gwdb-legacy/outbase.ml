@@ -526,6 +526,10 @@ let generate_tmp_marital_lowercase_surname_index strings_data base =
   output_surname_lower_index ~include_marital_names:true strings_data base
     tmp_marital_surnames_inx tmp_marital_surnames_dat
 
+let generate_all_tmp_marital_surname_indexes strings_data base =
+  generate_tmp_marital_surname_index base;
+  generate_tmp_marital_lowercase_surname_index strings_data base
+
 let generate_lowercase_surname_index ~strings_data base =
   let tmp_snames_lower_inx = Dutil.snames_lower_inx_path ~temp:true base in
   let tmp_snames_lower_dat = Dutil.snames_lower_dat_path ~temp:true base in
@@ -535,18 +539,22 @@ let generate_lowercase_surname_index ~strings_data base =
   let tmp_snames_marital_lower_inx =
     Dutil.snames_marital_lower_inx_path ~temp:true base
   in
+  let tmp_snames_marital_dat = Dutil.snames_marital_dat_path ~temp:true base in
+  let tmp_snames_marital_inx = Dutil.snames_marital_inx_path ~temp:true base in
   let remove_temporary_files () =
     Files.rm tmp_snames_lower_inx;
     Files.rm tmp_snames_lower_dat;
     Files.rm tmp_snames_marital_lower_inx;
-    Files.rm tmp_snames_marital_lower_dat
+    Files.rm tmp_snames_marital_lower_dat;
+    Files.rm tmp_snames_marital_inx;
+    Files.rm tmp_snames_marital_dat
   in
   let () =
     try
       trace "create surname lower index";
       output_surname_lower_index strings_data base tmp_snames_lower_inx
         tmp_snames_lower_dat;
-      generate_tmp_marital_lowercase_surname_index strings_data base
+      generate_all_tmp_marital_surname_indexes strings_data base
     with e ->
       remove_temporary_files ();
       raise e
@@ -560,6 +568,8 @@ let generate_lowercase_surname_index ~strings_data base =
     let lowercase_marital_surname_index_file =
       Dutil.snames_marital_lower_inx_path base
     in
+    let marital_surname_data_file = Dutil.snames_marital_dat_path base in
+    let marital_surname_index_file = Dutil.snames_marital_inx_path base in
     Files.rm lowercase_surname_data_file;
     Sys.rename tmp_snames_lower_dat lowercase_surname_data_file;
     Files.rm lowercase_surname_index_file;
@@ -572,8 +582,16 @@ let generate_lowercase_surname_index ~strings_data base =
     Files.rm lowercase_marital_surname_index_file;
     Sys.rename tmp_snames_marital_lower_inx lowercase_marital_surname_index_file;
     Files.set_modification_time_to_now lowercase_marital_surname_data_file;
-    Files.set_modification_time_to_now lowercase_marital_surname_index_file
+    Files.set_modification_time_to_now lowercase_marital_surname_index_file;
+
+    Files.rm marital_surname_data_file;
+    Sys.rename tmp_snames_marital_dat marital_surname_data_file;
+    Files.rm marital_surname_index_file;
+    Sys.rename tmp_snames_marital_inx marital_surname_index_file;
+    Files.set_modification_time_to_now marital_surname_data_file;
+    Files.set_modification_time_to_now marital_surname_index_file
   in
+
   { commit; rollback = remove_temporary_files }
 
 let are_already_initialized base index_files =
@@ -881,7 +899,6 @@ let output ?(save_mem = false) ?(tasks = []) base =
           Gc.compact ());
         trace "create surname index";
         output_surname_index base tmp_snames_inx tmp_snames_dat;
-        generate_tmp_marital_surname_index base;
         if save_mem then (
           trace "compacting";
           Gc.compact ());
@@ -930,15 +947,6 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Sys.rename tmp_fnames_dat (Dutil.fnames_dat_path base);
   Files.rm (Dutil.fnames_inx_path base);
   Sys.rename tmp_fnames_inx (Dutil.fnames_inx_path base);
-
-  Files.rm (Dutil.snames_marital_inx_path base);
-  Files.rm (Dutil.snames_marital_dat_path base);
-  Sys.rename
-    (Dutil.snames_marital_inx_path ~temp:true base)
-    (Dutil.snames_marital_inx_path base);
-  Sys.rename
-    (Dutil.snames_marital_dat_path ~temp:true base)
-    (Dutil.snames_marital_dat_path base);
 
   pending_lowercase_surname_index_generation.commit ();
   pending_lowercase_first_name_index_generation.commit ();
