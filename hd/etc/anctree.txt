@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-<!-- $Id: anctree.txt v7.1 07/09/2023 04:06:52 $ -->
+<!-- $Id: anctree.txt v7.1 11/04/2026 00:52:32 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 %define;ttl()
   %apply;a_of_b%with;
@@ -21,7 +21,7 @@
 %include;hed
 %message_to_wizard;
 %let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
-<div class="container%if;(e_v>3 and e.t!="A" and e.t!="C"))-fluid%end; pb-6">
+<div class="container%if;(e_v>3 and e.t!="A" and e.t!="C")-fluid%end; pb-6">
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar
@@ -40,10 +40,12 @@
   %include;modules/arbre_hi_indexes
   %include;modules/arbre_hi
 %elseif;(e.t="A" or e.t="C" or e.t="T")
-  <div class="d-flex flex-column ml-3">
-    <h3 class="display-5 ml-3">%nn;
+  <div class="d-flex flex-column ms-3">
+    <h3 class="display-5 ms-3">%nn;
       %apply;ttl()
-      <%if;(e.t="T" and e.v>2)span%else;div%end; class="text-small text-body-secondary fw-lighter">%apply;togena(e.v)</%if;(e.t="T")span%else;div%end;>
+      <%if;(e.t="T" and e.v>2)span%else;div%end;
+        class="text-small text-body-secondary fw-lighter">
+        %apply;togena(e.v)</%if;(e.t="T" and e.v>2)span%else;div%end;>
     </h3>
     %include;modules/arbre_vertical
   </div>
