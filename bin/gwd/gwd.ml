@@ -24,13 +24,22 @@ let timestamp_tag : unit Logs.Tag.def =
 let timestamp = Logs.Tag.(empty |> add timestamp_tag ())
 let pp_brackets ~style pp = Fmt.(brackets @@ styled style @@ pp)
 
-let pp_level ppf l =
-  match l with
+let pp_level ppf level =
+  match level with
   | Logs.App -> ()
   | Logs.Error -> pp_brackets ~style:`Red Fmt.string ppf "ERROR"
   | Logs.Warning -> pp_brackets ~style:`Yellow Fmt.string ppf "WARN"
   | Logs.Info -> pp_brackets ~style:`Blue Fmt.string ppf "INFO"
   | Logs.Debug -> pp_brackets ~style:`Green Fmt.string ppf "DEBUG"
+
+let pp_header ppf timestamp level =
+  match level with
+  | Logs.App -> ()
+  | _ ->
+    Format.fprintf ppf "%a%a: "
+      Fmt.(
+        option ~none:nop @@ pp_brackets ~style:`Magenta (Ptime.pp_rfc3339 ()))
+      timestamp pp_level level
 
 let reporter ~predictable_mode ppf =
   let report src level ~over k msgf =
@@ -48,10 +57,7 @@ let reporter ~predictable_mode ppf =
       else
       Some (Ptime_clock.now ())
     in
-    Format.fprintf ppf "%a%a: "
-      Fmt.(
-        option ~none:nop @@ pp_brackets ~style:`Magenta (Ptime.pp_rfc3339 ()))
-      timestamp pp_level level;
+    pp_header ppf timestamp level;
     Format.pp_open_box ppf 0;
     Format.kfprintf k ppf fmt
   in
