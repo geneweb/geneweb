@@ -1460,33 +1460,6 @@ let merge_1 conf =
   if rc > 1 then print_file conf "err_standard.htm"
   else print_file conf "create_ok.htm"
 
-let read_gwd_arg () =
-  let fname = Filename.concat !setup_dir "gwd.arg" in
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic ->
-      let list =
-        let rec loop list =
-          match try Some (input_line ic) with End_of_file -> None with
-          | Some "" -> loop list
-          | Some s -> loop (s :: list)
-          | None -> list
-        in
-        loop []
-      in
-      close_in ic;
-      let rec loop env = function
-        | x :: l ->
-            if x.[0] = '-' then
-              let x = String.sub x 1 (String.length x - 1) in
-              match l with
-              | y :: l when y.[0] <> '-' -> loop ((x, y) :: env) l
-              | _ -> loop ((x, "") :: env) l
-            else loop env l
-        | [] -> List.rev env
-      in
-      loop [] (List.rev list)
-  | None -> []
-
 let gwf conf =
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
@@ -1555,38 +1528,6 @@ let gwf_1 conf =
          close_out oc
      with Sys_error _ -> ());
     print_file conf "gwf_ok.htm"
-
-let gwd conf =
-  let aenv = read_gwd_arg () in
-  let get v = try List.assoc v aenv with Not_found -> "" in
-  let conf =
-    {
-      conf with
-      env =
-        ("default_lang", get "lang")
-        :: ("only", get "only")
-        :: ("log", Filename.basename (get "log"))
-        :: conf.env;
-    }
-  in
-  print_file conf "gwd.htm"
-
-let gwd_1 conf =
-  let oc = open_out (Filename.concat !setup_dir "gwd.arg") in
-  let print_param k =
-    match p_getenv conf.env k with
-    | Some v when v <> "" -> Printf.fprintf oc "-%s\n%s\n" k v
-    | _ -> ()
-  in
-  if p_getenv conf.env "setup_link" <> None then
-    Printf.fprintf oc "-setup_link\n";
-  print_param "only";
-  (match p_getenv conf.env "default_lang" with
-  | Some v when v <> "" -> Printf.fprintf oc "-lang\n%s\n" v
-  | _ -> ());
-  print_param "log";
-  close_out oc;
-  print_file conf "gwd_ok.htm"
 
 let ged2gwb conf =
   let rc =
@@ -1705,8 +1646,6 @@ let setup_comm_ok conf = function
       | _ -> update_nldb conf "update_nldb_ok.htm")
   | "gwf" -> gwf conf
   | "gwf_1" -> gwf_1 conf
-  | "gwd" -> gwd conf
-  | "gwd_1" -> gwd_1 conf
   | "cache_files" -> (
       match p_getenv conf.env "opt" with
       | Some "check" -> cache_files_check conf
@@ -1881,22 +1820,6 @@ let copy_text lang fname =
       ();
       exit 2
 
-let set_gwd_default_language_if_absent lang =
-  let env = read_gwd_arg () in
-  let fname = Filename.concat !setup_dir "gwd.arg" in
-  match try Some (open_out fname) with Sys_error _ -> None with
-  | Some oc ->
-      let lang_found = ref false in
-      List.iter
-        (fun (k, v) ->
-          Printf.fprintf oc "-%s\n" k;
-          if k = "lang" then lang_found := true;
-          if v <> "" then Printf.fprintf oc "%s\n" v)
-        env;
-      if not !lang_found then Printf.fprintf oc "-lang\n%s\n" lang;
-      close_out oc
-  | None -> ()
-
 let daemon = ref false
 
 let usage =
@@ -1939,64 +1862,63 @@ let null_reopen flags fd =
 let setup_available_languages = [ "de"; "en"; "es"; "fr"; "it"; "lv"; "sv" ]
 
 let intro () =
-  let default_gwd_lang, default_setup_lang =
+  let default_setup_lang =
     if Sys.unix then
       let s = try Sys.getenv "LANG" with Not_found -> "" in
       if List.mem s Version.available_languages then
-        (s, if List.mem s setup_available_languages then s else "en")
+        if List.mem s setup_available_languages then s else "en"
       else
         let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
         if String.length s >= 2 then
           let s = String.sub s 0 2 in
           if List.mem s Version.available_languages then
-            (s, if List.mem s setup_available_languages then s else "en")
-          else (!default_lang, !default_lang)
-        else (!default_lang, !default_lang)
-    else (!default_lang, !default_lang)
+            if List.mem s setup_available_languages then s else "en"
+          else !default_lang
+        else !default_lang
+    else !default_lang
   in
   Secure.set_base_dir ".";
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
-  Printf.eprintf "Start gwsetup\n";
-  flush stderr;
+  Printf.eprintf "Start gwsetup\n%!";
   default_lang := default_setup_lang;
-  let gwd_lang, setup_lang =
-    if !daemon then
-      if Sys.unix then (
-        let setup_lang =
-          if String.length !lang_param < 2 then default_setup_lang
-          else !lang_param
-        in
+
+  let get_lang () =
+    if String.length !lang_param >= 2 then !lang_param else default_setup_lang
+  in
+
+  let setup_lang =
+    if !daemon && Sys.unix then begin
+      let addr =
         let only = only_addr () in
-        let addr =
-          if only <> "127.0.0.1" && only <> "::1" then only else "localhost"
-        in
-        Printf.printf "To start, open location http://%s:%d/\n" addr !port;
-        flush stdout;
-        if Unix.fork () = 0 then (
-          Unix.close Unix.stdin;
-          null_reopen [ Unix.O_WRONLY ] Unix.stdout)
-        else exit 0;
-        (default_gwd_lang, setup_lang))
-      else (default_gwd_lang, default_setup_lang)
-    else
-      let gwd_lang, setup_lang =
-        if String.length !lang_param < 2 then (
+        if only <> "127.0.0.1" && only <> "::1" then only else "localhost"
+      in
+      Printf.printf "To start, open location http://%s:%d/\n%!" addr !port;
+      if Unix.fork () = 0 then begin
+        Unix.close Unix.stdin;
+        null_reopen [ Unix.O_WRONLY ] Unix.stdout
+      end
+      else exit 0;
+      get_lang ()
+    end
+    else if !daemon then default_setup_lang
+    else begin
+      let lang =
+        if String.length !lang_param >= 2 then !lang_param
+        else begin
           copy_text "" "intro.txt";
           let x = String.lowercase_ascii (input_line stdin) in
-          if String.length x < 2 then (default_gwd_lang, default_setup_lang)
-          else
-            let x = String.sub x 0 2 in
-            (x, x))
-        else (!lang_param, !lang_param)
+          if String.length x >= 2 then String.sub x 0 2 else default_setup_lang
+        end
       in
-      copy_text setup_lang (Filename.concat "lang" "intro.txt");
+      copy_text lang (Filename.concat "lang" "intro.txt");
       let only = only_addr () in
       if only <> "127.0.0.1" && only <> "::1" then
         Printf.printf "       http://%s:%d/\n" only !port;
-      (gwd_lang, setup_lang)
+      lang
+    end
   in
-  set_gwd_default_language_if_absent gwd_lang;
+
   default_lang := setup_lang;
   if not Sys.unix then (
     Unix.putenv "GWLANG" setup_lang;
