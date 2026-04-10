@@ -241,13 +241,7 @@ let load_lexicon =
           Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
             (fun () ->
               let ht = Hashtbl.create 0 in
-              let rec rev_iter fn = function
-                | [] -> ()
-                | hd :: tl ->
-                    rev_iter fn tl;
-                    fn hd
-              in
-              rev_iter
+              List.iter
                 (fun fname ->
                   let fname =
                     let f = Util.search_in_assets fname in
@@ -276,7 +270,7 @@ let add_lex_dir dir =
   Filesystem.walk_folder
     (fun e () ->
       match e with
-      | Filesystem.File s -> lexicon_list := (dir // s) :: !lexicon_list
+      | Filesystem.File s -> lexicon_list := !lexicon_list @ [ dir // s ]
       | _ -> ())
     dir ()
 

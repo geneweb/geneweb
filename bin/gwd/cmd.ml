@@ -288,7 +288,7 @@ let lexicon_files =
   C.Arg.(
     value
     & opt_all (list filepath) [ default_lexicon_files ]
-    & info [ "lexicon-file" ] ~docs:data_section ~doc)
+    & info [ "add-lexicon" ] ~docs:data_section ~doc)
 
 let lexicon_files =
   let open C.Term.Syntax in
@@ -715,7 +715,7 @@ let t =
 let legacy_arguments =
   [
     ("-a", "-i");
-    ("-add_lexicon", "--lexicon-file");
+    ("-add_lexicon", "--add-lexicon");
     ("-allowed_tags", "--allowed-tags-file");
     ("-auth", "--authorization-file");
     ("-bd", "--bd");
