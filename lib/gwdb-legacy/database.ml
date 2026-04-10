@@ -1013,22 +1013,17 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
     in
     iper_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
 
-let lowercase_first_name_index_file = "fnames_lower.inx"
-let lowercase_first_name_data_file = "fnames_lower.dat"
-let lowercase_surname_index_file = "snames_lower.inx"
-let lowercase_surname_data_file = "snames_lower.dat"
-
 let persons_stream_of_first_name_prefix =
-  persons_stream_of_prefix ~inx_lower_fname:lowercase_first_name_index_file
-    ~dat_lower_fname:lowercase_first_name_data_file ~inx_fname:"fnames.inx"
-    ~dat_fname:"fnames.dat"
+  persons_stream_of_prefix ~inx_lower_fname:Dutil.fnames_lower_inx
+    ~dat_lower_fname:Dutil.fnames_lower_dat ~inx_fname:Dutil.fnames_inx
+    ~dat_fname:Dutil.fnames_dat
     ~proj:(fun p -> p.first_name :: p.first_names_aliases)
     ~has_changed:first_name_changed
 
 let persons_stream_of_surname_prefix =
-  persons_stream_of_prefix ~inx_lower_fname:lowercase_surname_index_file
-    ~dat_lower_fname:lowercase_surname_data_file ~inx_fname:"snames.inx"
-    ~dat_fname:"snames.dat"
+  persons_stream_of_prefix ~inx_lower_fname:Dutil.snames_lower_inx
+    ~dat_lower_fname:Dutil.snames_lower_dat ~inx_fname:Dutil.snames_inx
+    ~dat_fname:Dutil.snames_dat
     ~proj:(fun p -> p.surname :: p.surnames_aliases)
     ~has_changed:surname_changed
 
@@ -1406,6 +1401,28 @@ let opendb bname =
       perm;
     }
   in
+  let choose_index (marital_index, marital_data)
+      (non_marital_index, non_marital_data) =
+    if
+      Sys.file_exists (Filename.concat bname marital_data)
+      && Sys.file_exists (Filename.concat bname marital_index)
+    then (marital_index, marital_data)
+    else (non_marital_index, non_marital_data)
+  in
+  let snames_inx, snames_dat =
+    choose_index
+      (Dutil.snames_marital_inx, Dutil.snames_marital_dat)
+      (Dutil.snames_inx, Dutil.snames_dat)
+  in
+  let lowercase_surname_index_file, lowercase_surname_data_file =
+    choose_index
+      (Dutil.snames_marital_lower_inx, Dutil.snames_marital_lower_dat)
+      (Dutil.snames_lower_inx, Dutil.snames_lower_dat)
+  in
+  let fnames_inx = Dutil.fnames_inx in
+  let fnames_dat = Dutil.fnames_dat in
+  let lowercase_first_name_index_file = Dutil.fnames_lower_inx in
+  let lowercase_first_name_data_file = Dutil.fnames_lower_dat in
   let persons_of_name = persons_of_name bname patches.h_name in
   let base_func =
     {
@@ -1418,16 +1435,16 @@ let opendb bname =
           ( (fun p -> p.surname :: p.surnames_aliases),
             surname_changed,
             snd patches.h_person,
-            "snames.inx",
-            "snames.dat",
+            snames_inx,
+            snames_dat,
             bname );
       persons_of_first_name =
         persons_of_first_name version base_data
           ( (fun p -> p.first_name :: p.first_names_aliases),
             first_name_changed,
             snd patches.h_person,
-            "fnames.inx",
-            "fnames.dat",
+            fnames_inx,
+            fnames_dat,
             bname );
       persons_of_lower_surname =
         (if
@@ -1446,8 +1463,8 @@ let opendb bname =
             ( (fun p -> p.surname :: p.surnames_aliases),
               surname_changed,
               snd patches.h_person,
-              "snames.inx",
-              "snames.dat",
+              snames_inx,
+              snames_dat,
               bname ));
       persons_of_lower_first_name =
         (if
@@ -1467,8 +1484,8 @@ let opendb bname =
             ( (fun p -> p.first_name :: p.first_names_aliases),
               first_name_changed,
               snd patches.h_person,
-              "fnames.inx",
-              "fnames.dat",
+              fnames_inx,
+              fnames_dat,
               bname ));
       persons_stream_of_first_name_prefix =
         persons_stream_of_first_name_prefix ~insert_string ~base_data ~version
