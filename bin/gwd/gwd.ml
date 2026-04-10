@@ -36,10 +36,10 @@ let pp_header ppf timestamp level =
   match level with
   | Logs.App -> ()
   | _ ->
-    Format.fprintf ppf "%a%a: "
-      Fmt.(
-        option ~none:nop @@ pp_brackets ~style:`Magenta (Ptime.pp_rfc3339 ()))
-      timestamp pp_level level
+      Format.fprintf ppf "%a%a: "
+        Fmt.(
+          option ~none:nop @@ pp_brackets ~style:`Magenta (Ptime.pp_rfc3339 ()))
+        timestamp pp_level level
 
 let reporter ~predictable_mode ppf =
   let report src level ~over k msgf =
@@ -53,9 +53,7 @@ let reporter ~predictable_mode ppf =
     let timestamp =
       Option.bind tags @@ fun tags ->
       Option.bind (Logs.Tag.find timestamp_tag tags) @@ fun () ->
-      if predictable_mode then Some Ptime.epoch
-      else
-      Some (Ptime_clock.now ())
+      if predictable_mode then Some Ptime.epoch else Some (Ptime_clock.now ())
     in
     pp_header ppf timestamp level;
     Format.pp_open_box ppf 0;
