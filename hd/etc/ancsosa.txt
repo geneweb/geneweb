@@ -35,7 +35,7 @@
 <body%body_prop; id="ancsosa">
 %include;hed
 %message_to_wizard;
-<div class="container%if;(e.t!="G")-fluid%end;%if;(e.t="Z") ml-2%end;">
+<div class="container%if;(e.t!="G")-fluid%end;%if;(e.t="Z") ms-2%end;">
 %if;not cancel_links;
   %include;menubar
 %end;
@@ -48,7 +48,7 @@
   %xxx.title;%xxx.dates;
 %end;
 %if;(e.templ!="templm")
-<h1 class="h3 mt-3%if;not cancel_links; ml-2%end;">%nn;
+<h1 class="h3 mt-3%if;not cancel_links; ms-2%end;">%nn;
   %apply;a_of_b%with;
     %if;(e.t="M")
       %if;(e.evt="on")[*missing events]%else;[*missing ancestors]%end;%nn;
@@ -67,7 +67,7 @@
       %sp;%if;(e.t="G")%apply;togena(l_v)%else;%apply;tothenthgen(l_v)%end;
     %end;
   %if;(e.t="D") [up to] %p_of_index.1; %if;(e_v > 4) %apply;togena(e_v)%end;%end;
-  %if;(e.t="X")<div class="ml-3">[only] [up to] %pvar.1; %pvar.1.dates;</div>%end;
+  %if;(e.t="X")<div class="ms-3">[only] [up to] %pvar.1; %pvar.1.dates;</div>%end;
 </h1>
 %end;
 %if;(e.t="D") %( ancestors up to somebody %)
@@ -78,7 +78,7 @@
         <li>[*generation/generations]0 %level;%nl;
         <ul>
       %end;
-      %if;(level<=e.l + 1)
+      %if;(level<=e.l+1)
         %foreach;ancestor;
           %if;(ancestor.same="" and ancestor.is_descendant)
             %lazy_force;

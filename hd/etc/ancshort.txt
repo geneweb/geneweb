@@ -69,4 +69,4 @@
     %end;
   %end;
 %end;
-<div class="ml-2">[*total][:] [him/her]s + %count; [ancestor/ancestors]n.</div>
+<div class="ms-2">[*total][:] [him/her]s + %count; [ancestor/ancestors]n.</div>
