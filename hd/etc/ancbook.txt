@@ -34,18 +34,18 @@
 %end;
 
 %define;display_date(xx, with_rowspan)
-  <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
+  <td align="right" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
     %if;xx.has_birth_date;%xx.slash_birth_date;
     %elseif;xx.has_baptism_date;%xx.slash_baptism_date;
     %else;<span class="fp_date_empty">&nbsp;</span>
     %end;
   </td>
-  <td align="center" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
+  <td class="text-center" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
     %if;(xx.has_birth_date or xx.has_baptism_date or xx.has_death_date or xx.has_burial_date) -
     %else; &nbsp;
     %end;
   </td>
-  <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
+  <td align="right" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
     %if;xx.has_death_date;%xx.slash_death_date;
     %elseif;xx.has_burial_date;%xx.slash_burial_date;
     %else;<span class="fp_date_empty">&nbsp;</span>
@@ -58,7 +58,7 @@
     %if;(family_cnt != 1)
       <tr>
         <td>%spouse;</td>
-        <td align="center">%nb_children;</td>
+        <td class="text-center">%nb_children;</td>
       </tr>
     %end;
   %end;
@@ -75,7 +75,7 @@
         %end;
       %end;
     </td>
-    <td align="center">
+    <td class="text-center">
       %foreach;xx.family;
         %if;(family_cnt = 1)
           %nb_children;
@@ -100,7 +100,7 @@
 %end;
 
 %define;display_union(xx)
-  <table class="fp_table" cellspacing="0">
+  <table class="fp_table">
     <tr>
       <td width="28"><img src="%images_prefix;marriage.png"></td>
       <td>
@@ -153,7 +153,7 @@
   </table><br>
 
   %if;(evar.children = "on" and has_children)
-    <table class="fp_table_children" cellspacing="0">
+    <table class="fp_table_children">
       <tr class="fp_grey">
         <td>[*child/children]1</td>
         <td colspan="3">[*date/dates]1</td>
@@ -178,34 +178,26 @@
 %end;
 
 %define;print_long_ind(xx)
-  <div class="fp_person">
-    <table width="100%%">
-      <tr>
-        <td>
-          <table>
-            <tr>
-              <td><h2><span class="highlight"><a name="ind_%xx.index;">%xx;</a></span></h2></td>
-              <td>%apply;image_MF("xx")</td>
-            </tr>
-          </table>
-        </td>
-        <td align="right">
-          %if;(evar.sosa = "on" and xx.has_sosa)
-            <span>
-              <img src="%images_prefix;sosa.png" alt="sosa" title="sosa"> [*Sosa] %xx.sosa;
-            </span>
-          %end;
-        </td>
-      </tr>
-    </table>
+  <article class="fp_person">
+    <header class="d-flex justify-content-between align-items-center">
+      <h2 id="ind_%xx.index;" class="d-flex align-items-center mb-0 px-2">
+        <span class="highlight me-2">%xx;</span>
+        %apply;image_MF("xx")
+      </h2>
+      %if;(evar.sosa = "on" and xx.has_sosa)
+        <span>
+          <img src="%images_prefix;sosa.png" alt="" aria-hidden="true"> [*Sosa] %xx.sosa;
+        </span>
+      %end;
+    </header>
     <div class="fp_person_info">
       %if;(e.im="" and xx.has_image)
-        <table width="100%%">
+        <table class="w-100">
           <tr>
-            <td width="30">
-              <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0" border="0">
+            <td>
+              <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0" >
             </td>
-            <td valign="top">
+            <td class="align-top">
       %end;
       <ul class="fp_person_info_ul">
         %if;xx.has_aliases;
@@ -279,10 +271,10 @@
         </td></tr></table>
       %end;
     </div>
-  </div>
+  </article>
 
   %if;(evar.parents = "on" and xx.has_parents)
-    <table class="fp_table_parent" cellspacing="0">
+    <table class="fp_table_paren">
       <tr><th colspan="2">[*parents]</th></tr>
       <tr>
         <td>
@@ -314,15 +306,16 @@
   %end;
 
   %if;(evar.siblings = "on" and (xx.has_siblings or (xx.has_parents and (xx.father.nb_families > 1 or xx.mother.nb_families > 1))))
-    <div style="page-break-inside:avoid;">
-      <table class="fp_table_siblings" cellspacing="0">
+    <div class="fp-no-break">
+
+      <table class="fp_table_siblings">
         %if;xx.has_siblings;
           <tr><th colspan="6">[*full siblings]</th></tr>
           <tr class="fp_grey">
             <td>[*name]</td>
             <td colspan="3">[*date/dates]1</td>
             <td>[*spouse/spouses]0</td>
-            <td align="center">[*child/children]1</td>
+            <td class="text-center">[*child/children]1</td>
           </tr>
           %foreach;xx.father.child;
             %apply;display_siblings("child", child_cnt)
@@ -352,7 +345,7 @@
                 <td>[*name]</td>
                 <td colspan="3">[*date/dates]1</td>
                 <td>[*spouse/spouses]0</td>
-                <td align="center">[*child/children]1</td>
+                <td class="text-center">[*child/children]1</td>
               </tr>
               %if;(half_father != 0)
                 %foreach;xx.father.family;
@@ -398,8 +391,9 @@
     %end;
   %end;
   %if;(evar.rel = "on" and (xx.has_relations or count > 0))
-    <div style="page-break-inside:avoid;">
-      <table class="fp_table_relations" cellspacing="0">
+    <div class="fp-no-break">
+
+      <table class="fp_table_relations">
         <tr><th colspan="4" class="background-color">[*relation/relations]1</th></tr>
         <tr class="fp_grey">
           <td class="borderna">[*name]</td>
@@ -488,8 +482,9 @@
   %end;
 
   %if;(evar.marr = "on" and xx.has_families)
-    <div style="page-break-inside:avoid;">
-      <table class="fp_table_marriage" cellspacing="0">
+    <div class="fp-no-break">
+
+      <table class="fp_table_marriage">
         <tr>
           <th>
             [*marriage/marriages]f %if;(evar.children = "on" and xx.has_children) [and] [child/children]c%end;
@@ -508,8 +503,9 @@
   %end;
 
   %if;(evar.note = "on" and (xx.has_notes or xx.has_event))
-    <div style="page-break-inside:avoid;">
-      <table class="fp_table" cellspacing="0">
+    <div class="fp-no-break">
+
+      <table class="fp_table">
         <tr><th>[*note/notes]1</th></tr>
         <tr><td class="fp_notes">
           %xx.notes;
@@ -517,21 +513,21 @@
             <table>
               %foreach;xx.event;
                 <tr>
-                  <td valign="top" style="white-space: nowrap;" width="1">
+                  <td class="align-top text-nowrap">
                     <span class="edate">
                       %if;event.has_date;%event.date; :
                       %else;--- :
                       %end;
                     </span>
                   </td>
-                  <td valign="top">
+                  <td class="align-top">
                     <span>
                       %apply;capitalize(event.name)%sp;
                       %if;event.has_spouse;([with] %event.spouse;)%end;
                       %if;event.has_place; - %event.place; %end;
                     </span>
                     %if;event.has_witnesses;
-                      <p style="margin:0;">
+                      <p class="m-0">
                         %foreach;event_witness;
                           <span>%apply;capitalize(event_witness_kind)[:]</span>
                           %apply;short_display_person("event_witness")<br>
@@ -551,8 +547,9 @@
   %end;
 
   %if;(evar.src = "on" and xx.has_sources)
-    <div style="page-break-inside:avoid;">
-      <table class="fp_table" cellspacing="0">
+    <div class="fp-no-break">
+
+      <table class="fp_table">
         <tr><th>[*source/sources]1</th></tr>
         <tr>
           <td>
@@ -571,12 +568,10 @@
 <div class="page_max mx-3">
   %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
   %if;(evar.v > 1)
-    <span width=100%%">
-      <hr>
-      %apply;capitalize(nth([summary book ascendants], 3))%nn;
-      %if;(evar.only="on"). [*only] %apply;gena(nb_gen)%else;%sp;%apply;togen(nb_gen)%end;.
-      <hr>
-    </span>
+    <hr>
+    %apply;capitalize(nth([summary book ascendants], 3))%nn;
+    %if;(evar.only="on"). [*only] %apply;gena(nb_gen)%else;%sp;%apply;togen(nb_gen)%end;.
+    <hr>
     <ul class="fp_ul_summary">
       %foreach;ancestor_level(nb_gen)
         %if;(level>0)
@@ -599,7 +594,7 @@
         %end;
       %end;
     </ul>
-    <p style="page-break-after:always;">&nbsp;</p>
+    <p class="fp-page-break">&nbsp;</p>
   %end;
 
   %foreach;ancestor_level(nb_gen)
@@ -608,7 +603,7 @@
         %if;(ancestor.same = "")
           %apply;print_long_ind("ancestor")
           %if;(not (is_last and level = nb_gen))
-            <p style="page-break-after:always;">&nbsp;</p>
+            <p class="fp-page-break">&nbsp;</p>
           %end;
         %end;
       %end;
