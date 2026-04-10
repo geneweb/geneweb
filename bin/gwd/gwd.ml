@@ -42,10 +42,10 @@ let reporter ~predictable_mode ppf =
     msgf @@ fun ?header ?tags fmt ->
     let timestamp =
       Option.bind tags @@ fun tags ->
+      Option.bind (Logs.Tag.find timestamp_tag tags) @@ fun () ->
       if predictable_mode then Some Ptime.epoch
       else
-        Option.bind (Logs.Tag.find timestamp_tag tags) @@ fun () ->
-        Some (Ptime_clock.now ())
+      Some (Ptime_clock.now ())
     in
     Format.fprintf ppf "%a%a: "
       Fmt.(
