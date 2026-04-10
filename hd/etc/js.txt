@@ -174,54 +174,99 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
 </script>
 %end;
 %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
-<script%if;(e.templ!="") type="text/javascript"%end;>
- <!--
-   $("#btnshowfilter").on("click", function() {
-    var nbinput = $('input.filter:text:disabled').length;
-    if (nbinput == 4) {
-      $('#input1').prop('disabled', false);
-      $('#filterbysurname').removeClass("d-none");
-      $('#total').addClass("text-body-secondary");
-      $('#input1').focus(); }
-    else {
-      $('.filter').prop('disabled', true);
-      $('#filterbysurname').addClass("d-none");
-      $('#total').removeClass("text-body-secondary"); }
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterbysurname');
+    const btnShow = document.getElementById('btnshowfilter');
+    const btnPlus = document.getElementById('btnplus');
+    const btnClear = document.getElementById('btnclear');
+    const totalEl = document.getElementById('total');
+    const filters = document.querySelectorAll('input.filter');
+    const extraFilters = document.querySelectorAll('input.extrafilter');
+
+    if (!btnShow || !filterForm) return;
+
+    btnShow.addEventListener('click', function() {
+      const allDisabled = Array.from(filters)
+        .every(function(el) { return el.disabled; });
+      if (allDisabled) {
+        const input1 = document.getElementById('input1');
+        input1.disabled = false;
+        filterForm.classList.remove('d-none');
+        if (totalEl) totalEl.classList.add('text-body-secondary');
+        input1.focus();
+      } else {
+        filters.forEach(function(el) { el.disabled = true; });
+        filterForm.classList.add('d-none');
+        if (totalEl) totalEl.classList.remove('text-body-secondary');
+      }
+    });
+
+    if (btnPlus) {
+      btnPlus.addEventListener('click', function() {
+        const activeCount = Array.from(filters)
+          .filter(function(el) { return !el.disabled; }).length;
+        const next = document.getElementById('input' + (activeCount + 1));
+        if (!next) return;
+        next.classList.remove('d-none');
+        next.disabled = false;
+        next.focus();
+        if (activeCount + 1 === 4) {
+          btnPlus.classList.add('disabled');
+          btnPlus.setAttribute('tabindex', '-1');
+        }
+      });
+    }
+
+    if (btnClear) {
+      btnClear.addEventListener('click', function() {
+        extraFilters.forEach(function(el) {
+          el.value = '';
+          el.classList.add('d-none');
+          el.disabled = true;
+        });
+        const input1 = document.getElementById('input1');
+        input1.value = '';
+        input1.focus();
+        btnPlus.classList.remove('disabled');
+        btnPlus.removeAttribute('tabindex');
+        document.querySelectorAll('[data-surname]')
+          .forEach(function(el) { el.classList.remove('d-none'); });
+      });
+    }
+
+    filters.forEach(function(input) {
+      input.addEventListener('input', function() {
+        let v1 = document.getElementById('input1').value || '_';
+        const v2 = document.getElementById('input2').value;
+        const v3 = document.getElementById('input3').value;
+        const v4 = document.getElementById('input4').value;
+        const all = document.querySelectorAll('[data-surname]');
+        all.forEach(function(el) { el.classList.add('d-none'); });
+        [v1, v2, v3, v4].forEach(function(v) {
+          if (v === '') return;
+          document.querySelectorAll('[data-surname*="' + v + '"]')
+            .forEach(function(el) { el.classList.remove('d-none'); });
+        });
+      });
+    });
   });
-  $("#btnplus").on("click", function() {
-    var len = $('.filter:text:not(:disabled)').length + 1;
-    $('#input'+len).removeClass("d-none").prop('disabled', false).focus();
-    if (len == 5) { $("#btnplus").addClass("disabled").attr('tabindex', '-1'); }
-  });
-  $("#btnclear").on("click", function() {
-    $('.extrafilter').val('').addClass("d-none").prop('disabled', true);
-    $('#input1').val('').focus();
-    $('#btnplus').removeClass('disabled').removeAttr('tabindex');
-    $('*[data-surname]').removeClass("d-none");
-  });
-  $('.filter').on("input", function(e) {
-    var input1 = $("#input1").val();
-    var input2 = $("#input2").val();
-    var input3 = $("#input3").val();
-    var input4 = $("#input4").val();
-    var input5 = $("#input5").val();
-    if (input1 == "") { var input1 = "_"; }
-    $('[data-surname]').addClass("d-none");
-    $('[data-surname*="' + input1 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input2 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input3 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input4 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input5 + '"]').removeClass("d-none");
-  });
+
   function implex(xx) {
-    $('[class^="sosa_"]').css("background-color","");
-    $('.sosa_'+xx).add('.sosa_implex_'+xx).css("background-color","#CCFFFF");
+    document.querySelectorAll('[class^="sosa_"]').forEach(function(el) {
+      el.style.backgroundColor = '';
+    });
+    document.querySelectorAll('.sosa_' + xx + ', .sosa_implex_' + xx)
+      .forEach(function(el) { el.style.backgroundColor = '#CCFFFF'; });
   }
+
   function implexdesc(xx) {
-    $('a[data-index]').css("background-color","");
-    $('a[data-index="' + xx + '"]').css("background-color","#CCFFFF");
+    document.querySelectorAll('a[data-index]').forEach(function(a) {
+      a.style.backgroundColor = '';
+    });
+    document.querySelectorAll('a[data-index="' + xx + '"]')
+      .forEach(function(a) { a.style.backgroundColor = '#CCFFFF'; });
   }
-  -->
 </script>
 %end;
 %( Functions for character.txt %)

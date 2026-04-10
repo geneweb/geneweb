@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anclist.txt v7.1 04/03/2023 09:51:04 $ -->
+  <!-- $Id: anclist.txt v7.1 11/04/2026 00:19:28 $ -->
   <title>%nn;
-    %if;(e.t = "F")- [*surnames branch] -%nn;
+    %if;(e.t="F")- [*surnames branch] -%nn;
     %else;
       %apply;a_of_b%with;
-        %if;(e.t = "M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
+        %if;(e.t="M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
       %and;
-        %if;(public_name != "")%public_name;%else;%first_name;%end;
-        %if;(qualifier != "") %qualifier;%end;
+        %if;(public_name!="")%public_name;%else;%first_name;%end;
+        %if;(qualifier!="") %qualifier;%end;
         %sp;%surname;
       %end;
     %end;
@@ -30,10 +30,10 @@
   %include;buttons
 %end;
 %let;lvl;
-  %if;(b.max_anc_level = "")%apply;min(e.v, max_anc_level, 7)
+  %if;(b.max_anc_level="")%apply;min(e.v, max_anc_level, 7)
   %else;%apply;min(e.v, max_anc_level, b.max_anc_level)%end;
 %in;
-<h3 class="mt-2 ml-2">%nn;
+<h3 class="mt-2 ms-2">%nn;
   %if;(e.t="F")
     %apply;a_of_b%with;[*surnames branch]%and;
       %if;(public_name!="")%public_name;%else;%first_name;%end;
@@ -59,7 +59,7 @@
   %foreach;ancestor_level
     %if;(e.v!="" and level<=e.v)
       %foreach;ancestor
-        %if;(ancestor.same != "")%incr_count;%end;
+        %if;(ancestor.same!="")%incr_count;%end;
       %end;
     %end;
   %end;
@@ -68,10 +68,10 @@
 %define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 0)
     <ul class="fa-ul">
-      <li><span class="fa-li"><i class="fa fa-person male fa-fw mr-1"></i></span><a href="%prefix;
+      <li><span class="fa-li"><i class="fa fa-person male fa-fw me-1"></i></span><a href="%prefix;
         %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
         %apply;ancestors_by_list("xx.father", nnn - 1)</li>
-      <li><span class="fa-li"><i class="fa fa-person-dress female fa-fw mr-1"></i></span><a href="%prefix;
+      <li><span class="fa-li"><i class="fa fa-person-dress female fa-fw me-1"></i></span><a href="%prefix;
         %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
         %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
     </ul>
@@ -106,7 +106,7 @@
 %end;
 %define;input(xx)
   <label class="visually-hidden mt-2" for="inputxx">Filtre xx</label>
-  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control ml-1%if;(xx!=1) d-none%end;" disabled>
+  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control w-auto ms-1%if;(xx!=1) d-none%end;" disabled>
 %end;
 %define;definecujus(pp,nn)
   %if;(nn=0)[*define Cujus:::pp]0%elseif;(nn=1)[*define Cujus:::pp]1%end;
@@ -120,12 +120,12 @@
     %apply;ancestors_by_list("self", lvl)
   %elseif;(e.t="H")
     %( horizontal ascendency %)
-    <form id="filterbysurname" class="form-inline mt-2 d-none">
-      <div class="form-control px-0 border-0">[*filter by]</div>
-      <div>%apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)</div>
-      <button id="btnplus" type="button" class="btn btn-primary ml-2" title="[*add filter] (max 4)"><i class="fa fa-plus fa-fw"></i></button>
-      <button id="btnclear" type="button" class="btn btn-danger ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
-    </form>
+    <form id="filterbysurname" class="d-flex flex-wrap align-items-center mt-2 d-none">
+      <span class="me-2">[*filter by]</span>
+      %apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)
+       <button id="btnplus" type="button" class="btn btn-primary ms-2" title="[*add filter] (max 4)"><i class="fa fa-plus fa-fw"></i></button>
+       <button id="btnclear" type="button" class="btn btn-danger ms-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
+     </form>
     <div class="font-monospace anclist_hr mt-2">
       %let;sosa_v;%if;(sosa.v!="")%sosa.v;%else;1%end;%in;
       %if;((e.same="" or e.same=0) and self=sosa_ref)
@@ -180,23 +180,23 @@
         <div class="d-inline-flex align-items-center">
           [*sort by/date begin/alphabetic order/nb individuals/nb events]0
           <a role="button" href="%url_set.sort;"
-            class="ml-1 btn btn-link%if;(e.sort="") disabled" aria-disabled="true%end;">
-            <i class="fa-solid fa-arrow-down-a-z mr-1"></i>
+            class="ms-1 btn btn-link%if;(e.sort="") disabled" aria-disabled="true%end;">
+            <i class="fa-solid fa-arrow-down-a-z me-1"></i>
             [sort by/date begin/alphabetic order/nb individuals/nb events]2</a>
           <a role="button" href="%url_set.sort.plc;"
             class="btn btn-link%if;(e.sort="plc") disabled" aria-disabled="true%end;">
-            <i class="fa-solid fa-arrow-down-a-z mr-1"></i>[place/places]1</a>
+            <i class="fa-solid fa-arrow-down-a-z me-1"></i>[place/places]1</a>
           <a role="button" href="%url_set.sort.date;"
             class="btn btn-link%if;(e.sort="date") disabled" aria-disabled="true%end;">
-            <i class="fa-regular fa-calendar-days mr-1"></i>
+            <i class="fa-regular fa-calendar-days me-1"></i>
             [sort by/date begin/alphabetic order/nb individuals/nb events]1</a>
           <a role="button" href="%url_set.sort.ind;"
             class="btn btn-link%if;(e.sort="ind") disabled" aria-disabled="true%end;">
-            <i class="fa-solid fa-arrow-down-wide-short mr-1"></i>
+            <i class="fa-solid fa-arrow-down-wide-short me-1"></i>
             [sort by/date begin/alphabetic order/nb individuals/nb events]3</a>
           <a role="button" href="%url_set.sort.evt;"
             class="btn btn-link%if;(e.sort="evt") disabled" aria-disabled="true%end;">
-            <i class="fa-solid fa-arrow-down-wide-short mr-1"></i>
+            <i class="fa-solid fa-arrow-down-wide-short me-1"></i>
             [sort by/date begin/alphabetic order/nb individuals/nb events]4</a>
         </div>
       %end;
@@ -215,32 +215,32 @@
       <tbody>
       %foreach;sorted_list_item;
         <tr>
-          <td>%item.2;%item.3</td>
+          <td>%item.2;%item.3;</td>
           <td>%item.4;</td>
-          <td align="center">
-            %if;(item.5 = "&lt;")
+          <td class="text-center">
+            %if;(item.5="&lt;")
               /%item.6;
-            %elseif;(item.5 = "&gt;")
+            %elseif;(item.5="&gt;")
               %item.6;/
-            %elseif;(item.5 = "|" or item.5 = "..")
+            %elseif;(item.5="|" or item.5="..")
               %item.6;
             %else;
               %item.5;%item.6;
             %end;
           </td>
-          <td align="center">
-            %if;(item.7 = "&lt;")
-              /%item.7;
-            %elseif;(item.7 = "&gt;")
+          <td class="text-center">
+            %if;(item.7="&lt;")
+              /%item.8;
+            %elseif;(item.7="&gt;")
               %item.8;/
-            %elseif;(item.7 = "|" or item.7 = "..")
+            %elseif;(item.7="|" or item.7="..")
               %item.8;
             %else;
               %item.7;%item.8;
             %end;
           </td>
-          <td align="center">%item.9;</td>
-          <td align="center">%item.10;</td>
+          <td class="text-center">%item.9;</td>
+          <td class="text-center">%item.10;</td>
         </tr>
       %end;
       </tbody>
@@ -266,20 +266,20 @@
     %end;
     %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
     %if;(count > 100)
-      <span class="ml-3">[*number of branches][:]</span>
+      <span class="ms-3">[*number of branches][:]</span>
       %foreach;sorted_list_item;
-        %if;(prev_item.2 != item.2)
+        %if;(prev_item.2!=item.2)
           <a href="#a_%apply;hexa(item.2)">%item.2;</a>
         %end;
       %end;
     %end;
     %if;(not cancel_links)
-      <div class="ml-3 mb-3">
-        [*help surname branch].</br>
+      <div class="ms-3 mb-3">
+        [*help surname branch].<br>
         <b>[*sort by/branch/alphabetic order]0</b>
-        <i class="fa fa-code-fork ml-2"></i>
+        <i class="fa fa-code-fork ms-2"></i>
         [sort by/branch/alphabetic order]1
-        <i class="fa-solid fa-arrow-down-a-z ml-2"></i>
+        <i class="fa-solid fa-arrow-down-a-z ms-2"></i>
         <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;">%nn;
           [sort by/branch/alphabetic order]2</a>
       </div>
@@ -296,8 +296,8 @@
           </tr></thead>
       %end;
       %foreach;sorted_list_item;
-        %if;(prev_item.2 != item.2 and count > 100)
-          <div name="a_%apply;hexa(item.2)"><table class="table table-sm w-auto asc-desc-table">
+        %if;(prev_item.2!=item.2 and count > 100)
+          <div id="a_%apply;hexa(item.2)"><table class="table table-sm w-auto asc-desc-table">
             <thead><tr>
               <th>[*surname/surnames]0</th>
               <th>[*nb branches]</th>
@@ -309,8 +309,8 @@
           <td>
             %item.3;%item.4;
           </td>
-          <td align="center">
-            %if;(e.cgl != "on")
+          <td class="text-center">
+            %if;(e.cgl!="on")
               <a href="%prefix;m=DAG&%item.5;&sn=%item.3;%item.4;">%item.2;</a>
             %else;
               %item.2;
@@ -320,28 +320,28 @@
             %item.6;
           </td>
           <td>
-            %if;(item.7 = "&lt;")
+            %if;(item.7="&lt;")
               /%item.8;
-            %elseif;(item.7 = "&gt;")
+            %elseif;(item.7="&gt;")
               %item.8;/
-            %elseif;(item.7 = "|" or item.7 = "..")
+            %elseif;(item.7="|" or item.7="..")
               %item.8;
             %else;
               %item.7;%item.8;
             %end;%nn;
             -%nn;
-            %if;(item.9 = "&lt;")
+            %if;(item.9="&lt;")
               /%item.10;
-            %elseif;(item.9 = "&gt;")
+            %elseif;(item.9="&gt;")
               %item.10;/
-            %elseif;(item.9 = "|" or item.9 = "..")
+            %elseif;(item.9="|" or item.9="..")
               %item.10;
             %else;
               %item.9;%item.10;
             %end;
           </td>
         </tr>
-        %if;(item.2 != next_item.2 and count > 100)
+        %if;(item.2!=next_item.2 and count > 100)
           </table></div>
         %end;
       %end;
@@ -356,13 +356,13 @@
     %( surnames branch %)
     %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
     %if;(not cancel_links)
-      <div class="ml-3 mb-3">
+      <div class="ms-3 mb-3">
         [*help surname branch].<br>
         <b>[*sort by/branch/alphabetic order]0</b>
-        <i class="fa fa-code-fork ml-2"></i>
+        <i class="fa fa-code-fork ms-2"></i>
         <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;&sort=on">%nn;
           [sort by/branch/alphabetic order]1</a>%nn;
-        <i class="fa-solid fa-arrow-down-a-z ml-2"></i> [sort by/branch/alphabetic order]2
+        <i class="fa-solid fa-arrow-down-a-z ms-2"></i> [sort by/branch/alphabetic order]2
       </div>
     %end;
     <table class="table table-sm w-auto asc-desc-table">
@@ -380,8 +380,8 @@
           <td>
             %ancestor.surname_end;%ancestor.surname_begin;
           </td>
-          <td align="center">
-            %if;(e.cgl != "on")
+          <td class="text-center">
+            %if;(e.cgl!="on")
               <a href="%prefix;m=DAG&%ancestor.sosa_access;&sn=%ancestor.surname;">%ancestor.nb_times;</a>
             %else;
               %ancestor.nb_times;
@@ -391,21 +391,21 @@
             %ancestor.place;
           </td>
           <td>
-            %if;(ancestor.date_begin.prec = "&#60;")
+            %if;(ancestor.date_begin.prec="&#60;")
               /%ancestor.date_begin.year;%nn;
-            %elseif;(ancestor.date_begin.prec = "&#62;")
+            %elseif;(ancestor.date_begin.prec="&#62;")
               %ancestor.date_begin.year;/%nn;
-            %elseif;(ancestor.date_begin.prec = "|" or ancestor.date_begin.prec = "..")
+            %elseif;(ancestor.date_begin.prec="|" or ancestor.date_begin.prec="..")
               %ancestor.date_begin.year;%nn;
             %else;
               %ancestor.date_begin.prec;%ancestor.date_begin.year;%nn;
             %end;
             -%nn;
-            %if;(ancestor.date_end.prec = "&#60;")
+            %if;(ancestor.date_end.prec="&#60;")
               /%ancestor.date_end.year;%nn;
-            %elseif;(ancestor.date_end.prec = "&#62;")
+            %elseif;(ancestor.date_end.prec="&#62;")
               %ancestor.date_end.year;/%nn;
-            %elseif;(ancestor.date_end.prec = "|" or ancestor.date_end.prec = "..")
+            %elseif;(ancestor.date_end.prec="|" or ancestor.date_end.prec="..")
               %ancestor.date_end.year;%nn;
             %else;
               %ancestor.date_end.prec;%ancestor.date_end.year;%nn;
