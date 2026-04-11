@@ -7,6 +7,10 @@
     li.parent { list-style-type: disc; list-style-image: url('%images_prefix;left.png'); }
   </style>
 %end;
+%if;(b.underline_hyperlink="no")
+<style>   a:not(.btn):not(.nav-link) { text-decoration: none; }
+</style>
+%end;
 %if;(e.templ!="templ")
   %if;(bvar.use_cdn="yes")
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
