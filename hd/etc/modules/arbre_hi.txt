@@ -45,21 +45,21 @@
   <span style="top:%ttt;px;left:%lll;px;font-family:monospace;">x</span>
   <script>
     $(window).on("load", function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, z-index:1});
+      GeneWeb.line(document.getElementById('hi-tree1'), x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
     });
   </script>
 %end;
 %define;implexs(x0,y0,x1,y1)
   <script>
     $(window).on("load", function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
+      GeneWeb.line(document.getElementById('hi-tree1'), x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
     });
   </script>
 %end;
 %define;line(x0,y0,x1,y1)
   <script>
     $(window).on("load", function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, z-index:-1});
+      GeneWeb.line(document.getElementById('hi-tree1'), x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
     });
   </script>
 %end;
