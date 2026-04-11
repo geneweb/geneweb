@@ -474,9 +474,6 @@ td .rm-cell {
   font-weight: 500;
   border: none !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-}
-
-.ajax-notification {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -485,18 +482,17 @@ td .rm-cell {
   animation: slideInRight 0.3s ease-out;
 }
 
-.ajax-notification .close {
+.ajax-notification.removing {
+  animation: slideOutRight 0.3s ease-in;
+}
+
+.ajax-notification .btn-close {
   outline: none;
   opacity: 0.7;
   transition: opacity 0.2s;
 }
-
-.ajax-notification .close:hover {
+.ajax-notification .btn-close:hover {
   opacity: 1;
-}
-
-.ajax-notification.removing {
-  animation: slideOutRight 0.3s ease-in;
 }
 
 @keyframes slideInRight {
@@ -519,31 +515,10 @@ td .rm-cell {
   50% { transform: scale(1.2); }
 }
 
-
-/* Style pour le bouton pendant le chargement */
 .btn.loading {
   pointer-events: none;
   opacity: 0.8;
 }
-
-/* Amélioration visuelle des notifications */
-.ajax-notification {
-  font-size: 0.9em;
-  font-weight: 500;
-  border: none !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
-}
-
-.ajax-notification .close {
-  outline: none;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.ajax-notification .close:hover {
-  opacity: 1;
-}
-
 
 /* Toolbar and characters panel */
 /* Light grey background color highlight for the toolbar characters.txt */

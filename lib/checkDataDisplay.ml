@@ -294,7 +294,7 @@ let render_dict_section_streaming conf base dict filtrd_entries sel_err_types =
   Output.printf conf
     {|<div class="card mt-3">
       <div class="card-header">
-        <h3 class="font-weight bold mb-0">%s</h3>
+        <h3 class="fw-bold mb-0">%s</h3>
       </div>
       <div class="card-body">|}
     dict_title;
@@ -348,7 +348,7 @@ let render_dict_section conf base dict filtrd_entries sel_err_types =
   Printf.bprintf buf
     {|<div class="card mt-3">
         <div class="card-header">
-          <h3 class="font-weight bold mb-0">%s</h3>
+          <h3 class="fw-bold mb-0">%s</h3>
         </div>
         <div class="card-body">|}
     dict_title;
@@ -616,7 +616,7 @@ let print conf base =
       (tn conf "chk_data use database/cache" 0);
   Output.printf conf
     {|
-          <div class="form-group mb-0">
+          <div class="mb-0">
             <label for="max-results" class="mb-0">%s%s</label>
             <input type="number" class="form-control" name="max" id="max-results" min="1" step="1" value="%s"%s>%s
           </div>|}
