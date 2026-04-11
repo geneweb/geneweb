@@ -24,9 +24,9 @@ var notifIcons={
         ic=notifIcons[x.level]||'fa-circle-info',
         h='<div class="toast show border-'+x.level+'" role="alert">'+
           '<div class="toast-header bg-'+x.level+' text-white">'+
-          '<i class="fa '+ic+' mr-2"></i><strong class="mr-auto">'+ti+'</strong>'+
-          '<button type="button" class="close text-white ml-2 mb-1" onclick="this.closest(\'.toast\').remove()">'+
-          '<span>&times;</span></button></div>'+
+          '<i class="fa '+ic+' me-2"></i><strong class="me-auto">'+ti+'</strong>'+
+          '<button type="button" class="btn-close ms-2" aria-label="Close" onclick="this.closest(\'.toast\').remove()">'+
+          '</button></div>'+
           '<div class="toast-body">'+x.message+'</div></div>';
     c.insertAdjacentHTML('beforeend',h);
   });
