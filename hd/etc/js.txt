@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 17/01/2026 10:39:33 $ -->
+<!-- $Id: js.txt v7.1 11/04/2026 02:05:28 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     %if;not is_welcome;
@@ -9,7 +9,9 @@
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            %( TODO integrity %)
+            integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=
+                       sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI
+                       sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %if;((e.m="A" and e.t="") or "NOTES" in e.m)
       <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
