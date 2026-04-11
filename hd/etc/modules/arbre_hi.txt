@@ -25,7 +25,6 @@
 #hi-tree1 a{position:absolute;line-height:10pt;}
 </style>
 <script>
-  <!--
   function over1(xx)
   {
    document.getElementById(xx).style.%if;(evarso="on")outline="#C0FEFF solid 6px"%else;backgroundColor="#CBFECE"%end;;
@@ -36,7 +35,6 @@
    document.getElementById(xx).style.%if;(evarso="on")outline="none"%else;backgroundColor=""%end;;
    return false;
   }
-  -->
 </script>
 %define;implexc(x0,y0,x1,y1)
   %( TODO : fix ugly hack, originaly it was %top/%left without substractions needed %)
@@ -44,22 +42,25 @@
   %let;lll;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))%expr(left-hbc)%else;%expr(left-4)%end;%in;
   <span style="top:%ttt;px;left:%lll;px;font-family:monospace;">x</span>
   <script>
-    $(window).on("load", function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, z-index:1});
+    window.addEventListener('load', function () {
+      GeneWeb.line(document.getElementById('hi-tree1'),
+        x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
     });
   </script>
 %end;
 %define;implexs(x0,y0,x1,y1)
   <script>
-    $(window).on("load", function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
+    window.addEventListener('load', function () {
+      GeneWeb.line(document.getElementById('hi-tree1'),
+        x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
     });
   </script>
 %end;
 %define;line(x0,y0,x1,y1)
   <script>
-    $(window).on("load", function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, z-index:-1});
+    window.addEventListener('load', function () {
+      GeneWeb.line(document.getElementById('hi-tree1'),
+        x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
     });
   </script>
 %end;
