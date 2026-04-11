@@ -481,16 +481,16 @@ let print_pyramid_totals conf ~string_of_nb ~label_key ~sum_men ~sum_wom =
 
 let print_pyramid_form_tail conf ~interval ~limit =
   Output.printf conf
-    {|<label for="int" class="ml-3">%s</label>
+    {|<label for="int" class="ms-3">%s</label>
 <input type="number" id="int" name="int"
-       value="%d" class="form-control col-1 ml-2"
+       value="%d" class="form-control col-1 ms-2"
        step="1" min="1" max="130">
-<label for="lim" class="ml-3">%s</label>
+<label for="lim" class="ms-3">%s</label>
 <input type="number" id="lim" name="lim"
-       value="%d" class="form-control col-1 ml-2"
+       value="%d" class="form-control col-1 ms-2"
        step="1" min="0">
 <button type="submit"
-        class="btn btn-primary ml-3">OK</button>|}
+        class="btn btn-primary ms-3">OK</button>|}
     (Utf8.capitalize_fst (transl conf "interval"))
     interval
     (Utf8.capitalize_fst (transl conf "limit"))
@@ -536,7 +536,7 @@ let print_population_pyramid conf base =
     let title _ =
       Output.printf conf
         {|<a href="%sm=POP_PYR" title="%s"
-  class="btn btn-secondary btn-sm mb-1 mr-3">&#176;</a>%s (%s)|}
+  class="btn btn-secondary btn-sm mb-1 me-3">&#176;</a>%s (%s)|}
         commd_s
         (Utf8.capitalize_fst (transl conf "population pyramid"))
         (Utf8.capitalize_fst (transl conf "death pyramid"))
@@ -551,12 +551,12 @@ let print_population_pyramid conf base =
       ~label_key:"number of deceased persons" ~sum_men ~sum_wom;
     open_form {|<input type="hidden" name="t" value="D">|};
     Output.printf conf
-      {|<label for="from" class="mr-1">%s</label>
+      {|<label for="from" class="me-1">%s</label>
 <input type="number" id="from" name="from" value="%d"
-  class="form-control col-1 ml-1" step="1">
-<label for="to" class="ml-3 mr-1">… %s</label>
+  class="form-control col-1 ms-1" step="1">
+<label for="to" class="ms-3 me-1">… %s</label>
 <input type="number" id="to" name="to" value="%d"
-  class="form-control col-1 ml-1" step="1">|}
+  class="form-control col-1 ms-1" step="1">|}
       (Utf8.capitalize_fst (transl_nth conf "from/to (date year)" 0))
       from_year
       (transl_nth conf "from/to (date year)" 1)
@@ -578,7 +578,7 @@ let print_population_pyramid conf base =
     let title _ =
       Output.printf conf
         {|<a href="%sm=POP_PYR&t=D&from=1900&to=%d" title="%s"
-  class="btn btn-secondary btn-sm mb-1 mr-3">&dagger;</a>%s (%d)|}
+  class="btn btn-secondary btn-sm mb-1 me-3">&dagger;</a>%s (%d)|}
         commd_s conf.today.year
         (Utf8.capitalize_fst (transl conf "death pyramid"))
         (Utf8.capitalize_fst (transl conf "population pyramid"))
@@ -595,7 +595,7 @@ let print_population_pyramid conf base =
     Output.printf conf
       {|<label for="yr">%s</label>
 <input type="number" id="yr" name="y" value="%d"
-  class="form-control col-1 ml-2" step="1">|}
+  class="form-control col-1 ms-2" step="1">|}
       (Utf8.capitalize_fst (transl_nth conf "year/month/day" 0))
       at_year;
     print_pyramid_form_tail conf ~interval ~limit;

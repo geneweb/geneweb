@@ -82,7 +82,7 @@ let print_variant_controls conf suggestions =
   let extra = get_extra_surnames conf in
   Output.print_sstring conf
     {|<input type="text" list="sn-var-dl" id="sn-var-in"
-  class="form-control form-control-sm ml-3" style="width:10em"
+  class="form-control form-control-sm ms-3" style="width:10em"
   autocomplete="off">
 <button type="button" id="sn-var-btn"
   class="btn btn-outline-secondary btn-sm mx-0"
@@ -92,8 +92,8 @@ let print_variant_controls conf suggestions =
     (fun i sn ->
       Output.printf conf
         {|<a href="%s"
- class="badge badge-info mr-1 mb-1"
->%s <i class="fa fa-xmark ml-1"></i></a>|}
+ class="badge badge-info me-1 mb-1"
+>%s <i class="fa fa-xmark ms-1"></i></a>|}
         (url_removing_extra conf i)
         (Util.escape_html sn :> string))
     extra;
@@ -154,21 +154,21 @@ let print_nav_variant_bar conf suggestions ~current_mode ~name ?branch_count ()
     display_by;
   (match current_mode with
   | `Branch ->
-      Output.printf conf {|<i class="fa fa-code-fork ml-3 mr-1"></i>%s|}
+      Output.printf conf {|<i class="fa fa-code-fork ms-3 me-1"></i>%s|}
         branch_l;
       (match branch_count with
       | Some n -> Output.printf conf " (%d)" n
       | None -> ());
       Output.printf conf
-        {|<i class="fa fa-arrow-down-a-z ml-3 mr-1"></i>\
+        {|<i class="fa fa-arrow-down-a-z ms-3 me-1"></i>\
 <a href="%s" rel="nofollow">%s</a>|}
         alpha_url alpha_l
   | `Alphabetic ->
       Output.printf conf
-        {|<i class="fa fa-code-fork ml-3 mr-1"></i>\
+        {|<i class="fa fa-code-fork ms-3 me-1"></i>\
 <a href="%s" rel="nofollow">%s</a>|}
         branch_url branch_l;
-      Output.printf conf {|<i class="fa fa-arrow-down-a-z ml-3 mr-1"></i>%s|}
+      Output.printf conf {|<i class="fa fa-arrow-down-a-z ms-3 me-1"></i>%s|}
         alpha_l);
   Output.print_sstring conf {|</div>|};
   print_variant_controls conf suggestions;
@@ -410,7 +410,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
     let cnt =
       if not is_active then ""
       else
-        Printf.sprintf {|<span class="badge badge-light ml-2">%d</span>|} count
+        Printf.sprintf {|<span class="badge badge-light ms-2">%d</span>|} count
     in
     let tt = if is_active then "delete" else "add" in
     let title = Utf8.capitalize_fst (transl conf tt) in
@@ -425,7 +425,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
           anchor
     in
     Printf.sprintf
-      {|<div class="btn-group btn-group-sm mr-2" role="group">
+      {|<div class="btn-group btn-group-sm me-2" role="group">
           %s
           <a href="%s" class="btn btn-%s" title="%s">%s%s</a>
         </div>|}
@@ -456,7 +456,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
     let badge2 =
       if not is_active then ""
       else
-        Printf.sprintf {|<span class="badge badge-light ml-2">%d</span>|} cnt2
+        Printf.sprintf {|<span class="badge badge-light ms-2">%d</span>|} cnt2
     in
     let btn_cls = if is_active then "primary" else "outline-primary" in
     Printf.sprintf
@@ -527,7 +527,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
     in
     Output.printf conf
       {|<a href="%s" class="btn btn-primary btn-sm">
-          <i class="fa fa-search-plus mr-1"></i>%s
+          <i class="fa fa-search-plus me-1"></i>%s
         </a>|}
       url
       (Utf8.capitalize_fst (transl conf "searching all"))
@@ -984,7 +984,7 @@ let print_alphabetic_index conf list extract_name count_persons threshold =
   in
 
   if List.length letter_groups > threshold then (
-    Output.printf conf {|<div class="mb-2 ml-3">|};
+    Output.printf conf {|<div class="mb-2 ms-3">|};
     List.iter
       (fun (letter, entries) ->
         let total_entries = List.length entries in
@@ -992,7 +992,7 @@ let print_alphabetic_index conf list extract_name count_persons threshold =
           List.fold_left (fun acc item -> acc + count_persons item) 0 entries
         in
         Output.printf conf
-          {|<a href="#%s" class="btn btn-outline-secondary btn-sm mr-1 mb-1" title="%d %s, %d %s">%s</a>|}
+          {|<a href="#%s" class="btn btn-outline-secondary btn-sm me-1 mb-1" title="%d %s, %d %s">%s</a>|}
           letter total_entries
           (transl_nth conf "surname/surnames"
              (if total_entries = 1 then 0 else 1))
@@ -1111,8 +1111,8 @@ let print_several_possible_surnames x conf base (_, surname_groups) =
         <strong>%s</strong><br>
         <small>%s</small>
       </div>
-      <a href="%sm=SN&n=%s" class="btn btn-info btn-sm ml-3">
-        <i class="fa fa-list-ul mr-1"></i>%s
+      <a href="%sm=SN&n=%s" class="btn btn-info btn-sm ms-3">
+        <i class="fa fa-list-ul me-1"></i>%s
       </a>
     </div>
   </div>|}
