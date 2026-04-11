@@ -1178,16 +1178,16 @@ function initTables() {
             type: 'num',
             autoWidth: false,
             orderable: false,
-            className: 'search-container border-right',
+            className: 'search-container border-end',
             render: function(data, type, row, meta) {
               if (type === 'sort') {
                 return (Number(meta.row) + 1);
               }
               return '<div class="d-inline-flex align-items-center w-100">' +
                      '<button type="button" class="btn btn-sm btn-outline-secondary redraw-area border-0" title="' + GW.i18n.redraw + '"><i class="far fa-pen-to-square"></i></button>' +
-                     '<button type="button" class="btn btn-sm btn-outline-secondary btn-up ml-2" title="' + GW.i18n.moveUp + '">↑</button>' +
-                     '<button type="button" class="btn btn-sm btn-outline-secondary btn-down ml-1" title="' + GW.i18n.moveDown + '">↓</button>' +
-                     '<div class="ml-auto mr-1 drag-handle" title="' + GW.i18n.moveDrag + '">' + (Number(meta.row) + 1) + '</div></div>'
+                     '<button type="button" class="btn btn-sm btn-outline-secondary btn-up ms-2" title="' + GW.i18n.moveUp + '">↑</button>' +
+                     '<button type="button" class="btn btn-sm btn-outline-secondary btn-down ms-1" title="' + GW.i18n.moveDown + '">↓</button>' +
+                     '<div class="ms-auto me-1 drag-handle" title="' + GW.i18n.moveDrag + '">' + (Number(meta.row) + 1) + '</div></div>'
             }
           },
           {
@@ -1200,7 +1200,7 @@ function initTables() {
                   g: 'GeneWeb',
                   e: 'Web'
                 };
-                let html = '<select class="form-control update type" row="' + meta.row + '">';
+                let html = '<select class="form-select form-select-sm update type" row="' + meta.row + '">';
                 Object.entries(types).forEach(([value, label]) => {
                   const selected = (data === value || (!data && value === 'p')) ? ' selected' : '';
                   html += '<option value="' + value + '"' + selected + '>' + label + '</option>';
@@ -1275,12 +1275,11 @@ function initTables() {
           },
           {
             data: "group",
-            type: "num",
             render: function(data, type, row) {
               if (type === "sort") {
                 return parseInt(data) || 0;
-                }
-                return '<input class="form-control update clear-button" type="number" value="' + get(data) + '" min="0" step="1">';
+              }
+              return '<input class="form-control update clear-button" type="number" value="' + get(data) + '" min="0" step="1">';
             }
           },
           {
@@ -1543,17 +1542,14 @@ function updateAlbumNav() {
   $("#album-current").text(albumCurrent + 1);
   $("#album-count").text(n);
   if (n > 1) {
-    $("#album-nav").addClass("d-flex");
-    $("#album-add-solo").removeClass("d-inline")
-      .addClass("d-none");
+    $("#album-nav").removeClass("d-none").addClass("d-flex");
+    $("#album-add-solo").removeClass("d-inline").addClass("d-none");
   } else {
-    $("#album-nav").removeClass("d-flex");
+    $("#album-nav").removeClass("d-flex").addClass("d-none");
     if ($("#fname").val()) {
-      $("#album-add-solo").removeClass("d-none")
-        .addClass("d-inline");
+      $("#album-add-solo").removeClass("d-none").addClass("d-inline");
     } else {
-      $("#album-add-solo").removeClass("d-inline")
-        .addClass("d-none");
+      $("#album-add-solo").removeClass("d-inline").addClass("d-none");
     }
   }
 }
