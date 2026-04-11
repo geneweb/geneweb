@@ -1,61 +1,6 @@
 <!-- $Id: upd_js.txt v7.1 06/01/2026 02:00:03 $ -->
 %( Input datalists and function to populate all datalists %)
-%if;("CHG_EVT" in e.m)
-
-<script>
- $('.up').click(function () {
-   var $li = $(this).parent();
-   $li.find('.pos').val(function(i, old){return --old});
-   $li.prev().find('.pos').val(function(i, old){return ++old});
-   if ($li.is(':first-child'))
-     $('#sort_list').append($li);
-   else
-     $li.insertBefore($li.prev());
-
-   if ($li.is(':first-child')) {
-     $li.find('.up').css('visibility', 'hidden');
-     $li.next().find('.up').css('visibility', 'visible');
-   }
-   if ($li.next().is(':last-child')) {
-     $li.next().find('.down').css('visibility', 'hidden');
-     $li.find('.down').css('visibility', 'visible');
-   }
- });
-
- $('.down').click(function () {
-   var $li = $(this).parent();
-   $li.find('.pos').val(function(i, old){return ++old});
-   $li.next().find('.pos').val(function(i, old){return --old});
-   if ($li.is(':last-child'))
-     $('#sort_list').prepend($li);
-   else
-     $li.insertAfter($li.next());
-
-   if ($li.is(':last-child')) {
-     $li.find('.down').css('visibility', 'hidden');
-     $li.prev().find('.down').css('visibility', 'visible');
-   }
-   if ($li.prev().is(':first-child')) {
-     $li.prev().find('.up').css('visibility', 'hidden');
-     $li.find('.up').css('visibility', 'visible');
-   }
- });
-
- $(document).ready(function(){
-   $(".up").each(function(){
-     var $li = $(this).parent();
-     if ($li.is(':first-child'))
-       $(this).css('visibility', 'hidden');
-   });
-   $(".down").each(function(){
-     var $li = $(this).parent();
-     if ($li.is(':last-child'))
-       $(this).css('visibility', 'hidden');
-   });
- });
-</script>
-%else;
-
+%if;(not "CHG_EVT" in e.m)
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
 %apply;dl("fnames")
 %apply;dl("snames")
@@ -236,5 +181,47 @@ function changeCalendar(e, v, m, c) {
     '<select class="form-select form-control-inline ps-sm-1 pe-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ms-sm-2 ms-md-3%end;" name="' + v + '" style="display:inline-block;width:auto">' +
     options + '</select>';
 }
+</script>
+%else;
+%( m=CHG_EVT %)
+<script>
+ (function() {
+  const list = document.getElementById('sort_list');
+  if (!list) return;
+
+  function updatePositions(li) {
+    // Re-numérote les .pos selon l'ordre DOM actuel
+    list.querySelectorAll(':scope > li').forEach((item, idx) => {
+      const pos = item.querySelector('.pos');
+      if (pos) pos.value = idx + 1;
+    });
+  }
+
+  function refreshArrows() {
+    const items = list.querySelectorAll(':scope > li');
+    items.forEach((li, idx) => {
+      const up = li.querySelector('.up');
+      const down = li.querySelector('.down');
+      if (up) up.style.visibility = (idx === 0) ? 'hidden' : 'visible';
+      if (down) down.style.visibility = (idx === items.length - 1) ? 'hidden' : 'visible';
+    });
+  }
+
+  list.addEventListener('click', function(e) {
+    const btn = e.target.closest('.up, .down');
+    if (!btn) return;
+    const li = btn.closest('li');
+    if (!li) return;
+    if (btn.classList.contains('up') && li.previousElementSibling) {
+      li.parentNode.insertBefore(li, li.previousElementSibling);
+    } else if (btn.classList.contains('down') && li.nextElementSibling) {
+      li.parentNode.insertBefore(li.nextElementSibling, li);
+    }
+    updatePositions();
+    refreshArrows();
+  });
+
+  refreshArrows();
+})();
 </script>
 %end;

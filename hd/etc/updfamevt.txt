@@ -13,15 +13,18 @@
 %include;hed
 <div class="container">
 %include;home
+%( TODO:  %define;sort_events_form(event_type, action..) template unique ind/fam %)
 <h1>[*changed order of family's events]</h1>
 
 %define;one_fevent(xcnt)
-  <li id="sort_list" class="list-group-item d-flex align-items-center">
+  <li class="list-group-item d-flex align-items-center">
     <input type="hidden" name="e_idxcnt" value="xcnt">
-    <input type="hidden" class="pos" name="e_posxcnt" size="2" maxlength="2" value="xcnt">
-    <button type="button" class="btn btn-primary up me-2" title="[*move up/down]0">
+    <input type="hidden" class="pos" name="e_posxcnt" value="xcnt">
+    <button type="button" class="btn btn-primary up me-2" 
+      title="[*move up/down]0" aria-label="[*move up/down]0">
       <i class="fa-solid fa-up-long"></i></button>
-    <button type="button" class="btn btn-primary down me-2" title="[*move up/down]1">
+    <button type="button" class="btn btn-primary down me-2"
+      title="[*move up/down]1" aria-label="[*move up/down]1">
       <i class="fa-solid fa-down-long"></i></button>
     %event_str;
   </li>
@@ -38,7 +41,7 @@
         %apply;one_fevent(cnt)
       %end;
     </ul>
-    <input type="submit" class="btn btn-primary ms-4 mt-2" value="Ok">
+    <input type="submit" class="btn btn-primary ms-4 mt-2" value="OK">
   </form>
 %end;
 
