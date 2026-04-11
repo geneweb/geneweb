@@ -1,6 +1,6 @@
 <!-- $Id: upd_js.txt v7.1 06/01/2026 02:00:03 $ -->
 %( Input datalists and function to populate all datalists %)
-%if;(not "CHG_EVT" in e.m)
+%if;not ("CHG_EVT" in e.m);
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
 %apply;dl("fnames")
 %apply;dl("snames")
