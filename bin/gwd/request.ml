@@ -918,7 +918,9 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "select" with
                  | Some "input" -> (
-                     let components = SearchName.extract_name_components conf in
+                     let components =
+                       SearchName.extract_name_components conf base
+                     in
                      let fn = components.first_name in
                      let sn = components.surname in
                      let search n =
