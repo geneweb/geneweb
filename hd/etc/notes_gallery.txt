@@ -14,13 +14,13 @@
 <body%body_prop;>
 <div class="container-fluid">
   %include;home
-  <div class="small float-end mr-2 mt-2">
+  <div class="small float-end me-2 mt-2">
     (<a href="%url;&ref=on" title="[*gallery backlinks]">&lt;-</a>)
-    %if(wizard)(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)%end;
+    %if;wizard;(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)%end;
   </div>
-  <h1 id="h1" class="ml-3 mb-0">[*loading/error]0</h1>
-  <p id="chronicle" class="ml-3 mb-0 text-body-secondary d-none"></p>
-  <div id="index-wall" class="flex-wrap mt-3 ml-3 d-none"></div>
+  <h1 id="h1" class="ms-3 mb-0">[*loading/error]0</h1>
+  <p id="chronicle" class="ms-3 mb-0 text-body-secondary d-none"></p>
+  <div id="index-wall" class="flex-wrap mt-3 ms-3 d-none"></div>
   <div id="album-nav" class="d-none justify-content-center">
     <div class="p-2 bd-highlight"><a id="home" href="#" onclick="loadIndex(); return false;" title="[*gallery index]"><i class="fa-solid fa-house"></i></a></div>
     <div class="p-2 bd-highlight"><a id="first" href="#" title="[*first]" onclick="loadFirstImage(); return false;"><i class="fa-solid fa-backward"></i></a></div>
@@ -29,20 +29,20 @@
     <div class="p-2 bd-highlight"><a id="next" href="#" title="[*next]" onclick="loadNextImage(); return false;"><i class="fa-solid fa-caret-right"></i></a></div>
     <div class="p-2 bd-highlight"><a id="last" href="#" title="[*last]" onclick="loadLastImage(); return false;"><i class="fa-solid fa-forward"></i></a></div>
   </div>
-  <div id="gallery-view" class="ml-3">
+  <div id="gallery-view" class="ms-3">
     <map id="map" name="map"></map>
     <div>
       <!-- next img pops a w3c error “no src” attribute: managed on javascript side -->
       <img id="image" usemap="#map" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
       <span id="description" class="mx-1"></span>
     </div>
-    <div class="d-none ml-3" id="div_legend">%nn;
+    <div class="d-none ms-3" id="div_legend">%nn;
       [*on this image][:]
       <a id="rlm" href="%prefix;m=RLM" title="[*relations tree]"><img src="%image_prefix;/gui_create.png" height="18" alt="relation tree"></a>
-      <div id="legend" class="list-comma list-unstyled pl-1"></div>
+      <div id="legend" class="list-comma list-unstyled ps-1"></div>
     </div>
     <div class="d-none" id="div_unknown">%nn;
-      [*unknown person][:]%nn; <ul id="unknown" class="d-inline list-comma list-unstyled pl-0"></ul>
+      [*unknown person][:]%nn; <ul id="unknown" class="d-inline list-comma list-unstyled ps-0"></ul>
     </div>
   </div>
 </div>
@@ -192,7 +192,7 @@ function displayImage(img) {
         + `<div class="imap-group-legend" id="g${g.name}">`
         + `<a href="#" title="[*lock group]">`
         + `${g.label}</a></div>`
-        + `<ul class="list-comma list-unstyled pl-3">`
+        + `<ul class="list-comma list-unstyled ps-3">`
         + `${itemsHtml}</ul></div>`);
       delete g._items;
     });
@@ -432,7 +432,9 @@ function loadCurrentImage() {
   $("#index-wall").removeClass("d-flex").addClass("d-none");
   $("#gallery-view").addClass("d-inline-flex").removeClass("d-none");
   if (imagesCount > 1) {
-    $("#album-nav").addClass("d-flex");
+    $("#album-nav").removeClass("d-none").addClass("d-flex");
+  } else {
+    $("#album-nav").removeClass("d-flex").addClass("d-none");
   }
   var u = new URL(window.location);
   u.searchParams.set("img", current + 1);
@@ -453,7 +455,7 @@ function loadIndex() {
   var chr = json.chronicle || "";
   if (chr) { $("#chronicle").html(chr).removeClass("d-none"); }
   else { $("#chronicle").addClass("d-none"); }
-  $("#album-nav").removeClass("d-flex");
+  $("#album-nav").removeClass("d-flex").addClass("d-none");
   images_l.forEach(function(img, i) {
     var desc = img.desc || "";
     var label = desc ? (i + 1) + ". " + desc : ". " + (i + 1);
