@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: dag.txt v7.1 18/08/2023 15:06:13 $ -->
+  <!-- $Id: dag.txt v7.1 20/04/2026 01:59:32 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(e.slices="on")[*display by slices/slice width/overlap/total width]0%nn;
@@ -25,7 +25,7 @@
   [of%s:::xxx]
 %end;
 <div class="d-flex">
-<h3 class="mt-2 ml-3 text-no-wrap">%nn;
+<h3 class="mt-2 ms-3 text-nowrap">%nn;
   %if;(e.m="D")
     %if;(e.t="TV")[*compact descendants tree]
     %else;[*descendants tree]
@@ -59,7 +59,7 @@
 </h3>
 
 %if;(e.m="DAG")
-<div class="ml-auto">
+<div class="ms-auto">
   %include;buttons_dag
 </div>
 %end;
@@ -79,23 +79,28 @@
 %if;(link_next!="" and not cancel_links)
   %include;buttons_rel
 %end;
-<table id="dag" class="mt-2 mb-6 ml-4">
+<table id="dag" class="mt-2 ms-4">
 %foreach;dag_line;
-  <tr align="left">
+  <tr class="text-start">
   %foreach;dag_cell;
-    <td class="%if;(e.m="D" or e.m="RL")align-top%elseif;(e.m="A")align-bottom%end; px-0"
+    %( TODO: the stretched-link wrapper below is currently ineffective — empty
+         position-relative container means the ::after has zero click surface.
+         Clickability relies on <a> tags inside %dag_cell.item;.
+         Needs URL inventory of dag callers (m=D/A/RL/RLM/DAG/R, em=R, dag=on…)
+         before deciding: restructure (position-relative on td + nested-link
+         handling), drop the stretched-link block, or coordinate refactor with
+         dagDisplay.ml %)
+    <td class="px-0 align-%if;(e.m="D" or e.m="RL")top%elseif;(e.m="A")bottom%end;%sp;
+      text-%if;(dag_cell.align="left")start%elseif;(dag_cell.align="right")end%else;center%end;"
       %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;
-      style="line-height:%if;(dag_cell.item!="")1%nn;
-                         %elseif;dag_cell.is_bar;1%nn;
-                         %elseif;dag_cell.is_nothing;0%else;0%end;;"%nn;
-    %if;(e.im="") valign="bottom"%end;
-    align="%dag_cell.align;">
+      style="line-height:%if;(dag_cell.item!="" or dag_cell.is_bar)1%else;0%end;">
     %if;dag_cell.is_nothing;&nbsp;%nn;
     %elseif;dag_cell.is_bar;
       %if;(dag_cell.bar_link!="" and not cancel_links)
          %( added em!=R here condition because first button_rel is static and does the same
            No! each vbar has a different action, suppressing a particular path %)
-        <a href="%dag_cell.bar_link;" title="[*suppress this path]">│</a>%nn;
+        <a href="%dag_cell.bar_link;" title="[*suppress this path]"
+          aria-label="[*suppress this path]">│</a>%nn;
       %else;│%end;
     %elseif;(dag_cell.text!="")%dag_cell.text;
     %elseif;(dag_cell.item!="")
@@ -113,8 +118,7 @@
           %end;
         %end;
       %end;
-      <div class="d-flex-row flex-column justify-content-between
-        %if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
+      <div%if;(dag_cell.item!="") class="mx-1"%end;>%dag_cell.item;</div>
     %else;
       %( TODO : trouver une condition pour un hr stylisé pour les conjoints %)
       %if;dag_cell.is_hr_left;
