@@ -1,5 +1,61 @@
 <!-- $Id: upd_js.txt v7.1 06/01/2026 02:00:03 $ -->
 %( Input datalists and function to populate all datalists %)
+%if;("CHG_EVT" in e.m)
+
+<script>
+ $('.up').click(function () {
+   var $li = $(this).parent();
+   $li.find('.pos').val(function(i, old){return --old});
+   $li.prev().find('.pos').val(function(i, old){return ++old});
+   if ($li.is(':first-child'))
+     $('#sort_list').append($li);
+   else
+     $li.insertBefore($li.prev());
+
+   if ($li.is(':first-child')) {
+     $li.find('.up').css('visibility', 'hidden');
+     $li.next().find('.up').css('visibility', 'visible');
+   }
+   if ($li.next().is(':last-child')) {
+     $li.next().find('.down').css('visibility', 'hidden');
+     $li.find('.down').css('visibility', 'visible');
+   }
+ });
+
+ $('.down').click(function () {
+   var $li = $(this).parent();
+   $li.find('.pos').val(function(i, old){return ++old});
+   $li.next().find('.pos').val(function(i, old){return --old});
+   if ($li.is(':last-child'))
+     $('#sort_list').prepend($li);
+   else
+     $li.insertAfter($li.next());
+
+   if ($li.is(':last-child')) {
+     $li.find('.down').css('visibility', 'hidden');
+     $li.prev().find('.down').css('visibility', 'visible');
+   }
+   if ($li.prev().is(':first-child')) {
+     $li.prev().find('.up').css('visibility', 'hidden');
+     $li.find('.up').css('visibility', 'visible');
+   }
+ });
+
+ $(document).ready(function(){
+   $(".up").each(function(){
+     var $li = $(this).parent();
+     if ($li.is(':first-child'))
+       $(this).css('visibility', 'hidden');
+   });
+   $(".down").each(function(){
+     var $li = $(this).parent();
+     if ($li.is(':last-child'))
+       $(this).css('visibility', 'hidden');
+   });
+ });
+</script>
+%else;
+
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
 %apply;dl("fnames")
 %apply;dl("snames")
@@ -181,3 +237,4 @@ function changeCalendar(e, v, m, c) {
     options + '</select>';
 }
 </script>
+%end;
