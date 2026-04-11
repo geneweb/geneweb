@@ -1,8 +1,8 @@
-<!-- $Id: deslist.txt v7.1 20/12/2025 06:45:09 $ -->
-<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
+  <!-- $Id: deslist.txt v7.1 11/04/2026 02:10:46 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -177,7 +177,7 @@
 %define;render_notes_sources_inline(xx, ctr)
   %if;((e.notes="on" and (xx.has_notes or xx.has_event) and e.inline="on")
        or (e.src="on" and xx.has_sources and e.inline="on"))
-    <div class="mt-2 mb-3 ml-4 mr-2 p-3 shadow">
+    <div class="mt-2 mb-3 ms-4 me-2 p-3 shadow">
       %if;(e.notes="on" and (xx.has_notes or xx.has_event))
         <div class="h5">[*note/notes]0</div>
       %end;
@@ -198,7 +198,7 @@
         or (e.src="on" and xx.has_sources))
     <div class="p-3 shadow">
       <dt>
-        <a id="note-ctr" href="#person-ctr">ctr</a>%sp;
+        <a id="note-ctr" href="#person-ctr" aria-label="return to person ctr">ctr</a>%sp;
         <span class="small text-body-secondary">(%xx;%xx.dates;)</span>
       </dt>
       <dd>%apply;render_notes_content("xx")</dd>
@@ -223,7 +223,7 @@
          %end;…
       </div>
       %if;(e.witn="on" and has_witnesses)
-        <div class="flex-grow-1 ml-3 small text-body-secondary">
+        <div class="flex-grow-1 ms-3 small text-body-secondary">
           ([witness/witnesses]1[:]
           %foreach;witness;
             %if;(not is_first),%sp;%end;
@@ -248,14 +248,14 @@
     %if;(curlev<maxlev)
       %if;(curlev=0 or e.t="M" and xx.is_male or e.t="F" and xx.is_female or e.t="L")
         %if;(family.desc_level < famlev)
-          <div class="ml-4 text-body-secondary">[see further].</div>
+          <div class="ms-4 text-body-secondary">[see further].</div>
         %elseif;(family.desc_level > famlev)
-          <div class="ml-4 text-body-secondary">[see above].</div>
+          <div class="ms-4 text-body-secondary">[see above].</div>
         %elseif;has_children;
           <div class="mt-2">
             %apply;havingchildren(nb_children)[:]
             %family.set_infinite_desc_level;
-            <ol class="desc-gen desc-gen-%expr(curlev%4) mt-1 %if;(curlev=0) pl-4%end;">
+            <ol class="desc-gen desc-gen-%expr(curlev%4) mt-1 %if;(curlev=0) ps-4%end;">
               %foreach;child;
                 <li>
                   %if;(e.alwsurn="yes")
@@ -303,7 +303,7 @@
     <h3 class="mt-2">
       %if;(e.notes="on")[*note/notes]1%else;[*source/sources]1%end;
     </h3>
-    <dl class="ml-0">
+    <dl class="ms-0">
       %reset_count;%reset_desc_level;
       %apply;notes_by_list("self", 0, xx, 0, 1)%nl;
     </dl>
