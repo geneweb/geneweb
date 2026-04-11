@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updindevt.txt v7.1 15/10/2023 19:54:09 $ -->
+  <!-- $Id: updindevt.txt v7.1 11/04/2026 03:18:21 $ -->
   <title>[*modify::person/persons]0</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -18,10 +18,12 @@
 %define;one_pevent(xcnt)
   <li class="list-group-item d-flex align-items-center">
     <input type="hidden" name="e_idxcnt" value="xcnt">
-    <input type="hidden" class="pos" name="e_posxcnt" size="2" maxlength="2" value="xcnt">
-    <button type="button" class="btn btn-primary up mr-2" title="[*move up/down]0">
+    <input type="hidden" class="pos" name="e_posxcnt" value="xcnt">
+    <button type="button" class="btn btn-primary up me-2" 
+      title="[*move up/down]0" aria-label="[*move up/down]0">
       <i class="fa-solid fa-up-long"></i></button>
-    <button type="button" class="btn btn-primary down mr-2" title="[*move up/down]1">
+    <button type="button" class="btn btn-primary down me-2"
+      title="[*move up/down]1" aria-label="[*move up/down]1">
       <i class="fa-solid fa-down-long"></i></button>
     %event_str;
   </li>
@@ -37,7 +39,7 @@
         %apply;one_pevent(cnt)
       %end;
     </ul>
-    <input type="submit" class="btn btn-primary ml-4 mt-2" value="Ok">
+    <input type="submit" class="btn btn-primary ms-4 mt-2" value="OK">
   </form>
 %end;
 
@@ -48,57 +50,6 @@
 </div>
 %include;js
 %query_time;
-<script>
- $('.up').click(function () {
-   var $li = $(this).parent();
-   $li.find('.pos').val(function(i, old){return --old});
-   $li.prev().find('.pos').val(function(i, old){return ++old});
-   if ($li.is(':first-child'))
-     $('#sort_list').append($li);
-   else
-     $li.insertBefore($li.prev());
-
-   if ($li.is(':first-child')) {
-     $li.find('.up').css('visibility', 'hidden');
-     $li.next().find('.up').css('visibility', 'visible');
-   }
-   if ($li.next().is(':last-child')) {
-     $li.next().find('.down').css('visibility', 'hidden');
-     $li.find('.down').css('visibility', 'visible');
-   }
- });
-
- $('.down').click(function () {
-   var $li = $(this).parent();
-   $li.find('.pos').val(function(i, old){return ++old});
-   $li.next().find('.pos').val(function(i, old){return --old});
-   if ($li.is(':last-child'))
-     $('#sort_list').prepend($li);
-   else
-     $li.insertAfter($li.next());
-
-   if ($li.is(':last-child')) {
-     $li.find('.down').css('visibility', 'hidden');
-     $li.prev().find('.down').css('visibility', 'visible');
-   }
-   if ($li.prev().is(':first-child')) {
-     $li.prev().find('.up').css('visibility', 'hidden');
-     $li.find('.up').css('visibility', 'visible');
-   }
- });
-
- $(document).ready(function(){
-   $(".up").each(function(){
-     var $li = $(this).parent();
-     if ($li.is(':first-child'))
-       $(this).css('visibility', 'hidden');
-   });
-   $(".down").each(function(){
-     var $li = $(this).parent();
-     if ($li.is(':last-child'))
-       $(this).css('visibility', 'hidden');
-   });
- });
-</script>
+%include;upd_js.txt
 </body>
 </html>
