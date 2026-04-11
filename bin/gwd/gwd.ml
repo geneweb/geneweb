@@ -1554,6 +1554,396 @@ let log_and_robot_check conf auth from request script_name contents =
   conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide);
   log conf from auth request script_name contents
 
+let oidc_states_file () = !GWPARAM.adm_file "oidc_states"
+let oidc_tokens_file () = !GWPARAM.adm_file "oidc_tokens"
+
+let read_oidc_states () =
+  let fname = oidc_states_file () in
+  if not (Sys.file_exists fname) then []
+  else
+    try
+      let ic = Secure.open_in fname in
+      let now = Unix.time () in
+      let rec loop acc =
+        match input_line ic with
+        | line -> (
+            match String.split_on_char ' ' line with
+            | [ state; nonce; base_name; ts_str ] ->
+                let ts = float_of_string ts_str in
+                if now -. ts < 300.0 then
+                  loop ((state, (nonce, base_name, ts)) :: acc)
+                else loop acc
+            | _ -> loop acc)
+        | exception End_of_file ->
+            close_in ic;
+            List.rev acc
+      in
+      loop []
+    with Sys_error _ -> []
+
+let write_oidc_states entries =
+  let fname = oidc_states_file () in
+  try
+    let oc = Secure.open_out fname in
+    List.iter
+      (fun (state, (nonce, base_name, ts)) ->
+        Printf.fprintf oc "%s %s %s %.0f\n" state nonce base_name ts)
+      entries;
+    close_out oc
+  with Sys_error _ -> ()
+
+let add_oidc_state state nonce base_name ts =
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let on_exn _exn _bt = () in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+  let entries = read_oidc_states () in
+  let entries = (state, (nonce, base_name, ts)) :: entries in
+  write_oidc_states entries
+
+let take_oidc_state state =
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let on_exn _exn _bt = None in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+  let entries = read_oidc_states () in
+  match List.assoc_opt state entries with
+  | None -> None
+  | Some v ->
+      let entries = List.filter (fun (k, _) -> k <> state) entries in
+      write_oidc_states entries;
+      Some v
+
+let read_oidc_id_tokens () =
+  let fname = oidc_tokens_file () in
+  if not (Sys.file_exists fname) then []
+  else
+    try
+      let ic = Secure.open_in fname in
+      let rec loop acc =
+        match input_line ic with
+        | line -> (
+            match String.split_on_char ' ' line with
+            | from_addr :: base_token :: rest ->
+                let id_token = String.concat " " rest in
+                if id_token <> "" then
+                  loop (((from_addr, base_token), id_token) :: acc)
+                else loop acc
+            | _ -> loop acc)
+        | exception End_of_file ->
+            close_in ic;
+            List.rev acc
+      in
+      loop []
+    with Sys_error _ -> []
+
+let write_oidc_id_tokens entries =
+  let fname = oidc_tokens_file () in
+  try
+    let oc = Secure.open_out fname in
+    List.iter
+      (fun ((from_addr, base_token), id_token) ->
+        Printf.fprintf oc "%s %s %s\n" from_addr base_token id_token)
+      entries;
+    close_out oc
+  with Sys_error _ -> ()
+
+let store_oidc_id_token from_addr base_token id_token =
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let on_exn _exn _bt = () in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+  let entries = read_oidc_id_tokens () in
+  let entries =
+    List.filter (fun ((f, b), _) -> f <> from_addr || b <> base_token) entries
+  in
+  let entries = ((from_addr, base_token), id_token) :: entries in
+  write_oidc_id_tokens entries
+
+let take_oidc_id_token from_addr base_token =
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let on_exn _exn _bt = None in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+  let entries = read_oidc_id_tokens () in
+  match List.assoc_opt (from_addr, base_token) entries with
+  | None -> None
+  | Some id_token ->
+      let entries =
+        List.filter
+          (fun ((f, b), _) -> f <> from_addr || b <> base_token)
+          entries
+      in
+      write_oidc_id_tokens entries;
+      Some id_token
+
+let read_oidc_config base_env =
+  match List.assoc_opt "oidc_provider_url" base_env with
+  | None | Some "" -> None
+  | Some provider_url ->
+      let client_id =
+        try List.assoc "oidc_client_id" base_env with Not_found -> ""
+      in
+      let client_secret =
+        try
+          let file = List.assoc "oidc_client_secret_file" base_env in
+          if file <> "" then (
+            let ic = open_in file in
+            let s = String.trim (input_line ic) in
+            close_in ic;
+            s)
+          else raise Not_found
+        with Not_found | Sys_error _ | End_of_file -> (
+          try List.assoc "oidc_client_secret" base_env with Not_found -> "")
+      in
+      let redirect_uri =
+        try List.assoc "oidc_redirect_uri" base_env with Not_found -> ""
+      in
+      let user_claim =
+        try List.assoc "oidc_user_claim" base_env with Not_found -> "email"
+      in
+      let users_file =
+        try List.assoc "oidc_users_file" base_env with Not_found -> ""
+      in
+      if client_id = "" || client_secret = "" || redirect_uri = "" then None
+      else
+        Some
+          ( provider_url,
+            client_id,
+            client_secret,
+            redirect_uri,
+            user_claim,
+            users_file )
+
+let oidc_redirect conf url =
+  Output.status conf Code.Moved_Temporarily;
+  Output.header conf "Location: %s" url;
+  Output.flush conf
+
+let oidc_error_page conf msg =
+  Output.status conf Code.Internal_Server_Error;
+  Output.header conf "Content-type: text/html; charset=utf-8";
+  Output.print_sstring conf "<html><head><title>OIDC Error</title></head><body>";
+  Output.print_sstring conf "<h1>Authentication Error</h1><p>";
+  Output.print_sstring conf (Util.escape_html msg :> string);
+  Output.print_sstring conf "</p><p><a href=\"";
+  Output.print_sstring conf conf.command;
+  Output.print_sstring conf "\">Back</a></p></body></html>";
+  Output.flush conf
+
+let handle_oidc_login conf base_env base_file =
+  match read_oidc_config base_env with
+  | None -> oidc_error_page conf "OIDC not configured for this base"
+  | Some
+      ( provider_url,
+        client_id,
+        _client_secret,
+        redirect_uri,
+        _user_claim,
+        _users_file ) -> (
+      match Geneweb_oidc.Oidc.discover provider_url with
+      | Error e ->
+          oidc_error_page conf
+            (Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e)
+      | Ok provider ->
+          let state = Geneweb_oidc.Oidc.generate_state () in
+          let nonce = Geneweb_oidc.Oidc.generate_nonce () in
+          add_oidc_state state nonce base_file (Unix.time ());
+          let url =
+            Geneweb_oidc.Oidc.authorization_url provider ~client_id
+              ~redirect_uri ~state ~nonce
+          in
+          oidc_redirect conf url)
+
+let handle_oidc_callback conf base_env from_addr base_file utm =
+  let code = Util.p_getenv conf.env "code" in
+  let state = Util.p_getenv conf.env "state" in
+  let error = Util.p_getenv conf.env "error" in
+  match error with
+  | Some err ->
+      let desc =
+        match Util.p_getenv conf.env "error_description" with
+        | Some d -> err ^ ": " ^ d
+        | None -> err
+      in
+      oidc_error_page conf ("IdP returned error: " ^ desc)
+  | None -> (
+      match (code, state) with
+      | None, _ -> oidc_error_page conf "Missing 'code' parameter in callback"
+      | _, None -> oidc_error_page conf "Missing 'state' parameter in callback"
+      | Some code, Some state -> (
+          match take_oidc_state state with
+          | None -> oidc_error_page conf "Invalid or expired state parameter"
+          | Some (nonce, expected_base, _ts) -> (
+              if expected_base <> base_file then
+                oidc_error_page conf "State does not match this base"
+              else
+                match read_oidc_config base_env with
+                | None -> oidc_error_page conf "OIDC not configured"
+                | Some
+                    ( provider_url,
+                      client_id,
+                      client_secret,
+                      redirect_uri,
+                      user_claim,
+                      users_file ) -> (
+                    match Geneweb_oidc.Oidc.discover provider_url with
+                    | Error e ->
+                        oidc_error_page conf
+                          (Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e)
+                    | Ok provider -> (
+                        match
+                          Geneweb_oidc.Oidc.exchange_code provider ~client_id
+                            ~client_secret ~redirect_uri ~code
+                        with
+                        | Error e ->
+                            oidc_error_page conf
+                              (Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e)
+                        | Ok token_resp -> (
+                            match
+                              Geneweb_oidc.Oidc.verify_and_decode_id_token
+                                ~jwks_uri:provider.jwks_uri ~client_id
+                                ~issuer:provider.issuer ~nonce
+                                token_resp.id_token
+                            with
+                            | Error e ->
+                                oidc_error_page conf
+                                  (Format.asprintf "%a"
+                                     Geneweb_oidc.Oidc.pp_error e)
+                            | Ok claims ->
+                                let claim_value =
+                                  match List.assoc_opt user_claim claims with
+                                  | Some v -> v
+                                  | None -> (
+                                      match List.assoc_opt "sub" claims with
+                                      | Some v -> v
+                                      | None -> "")
+                                in
+                                if claim_value = "" then
+                                  oidc_error_page conf
+                                    ("No '" ^ user_claim
+                                   ^ "' claim found in id_token")
+                                else
+                                  let role, display_name, person_key =
+                                    if users_file = "" then
+                                      (None, claim_value, "")
+                                    else
+                                      let users_path =
+                                        if Filename.is_relative users_file then
+                                          Filename.concat (Secure.base_dir ())
+                                            users_file
+                                        else users_file
+                                      in
+                                      match
+                                        Geneweb_oidc.Oidc.read_users_file
+                                          users_path
+                                      with
+                                      | Error _ -> (None, claim_value, "")
+                                      | Ok mappings -> (
+                                          match
+                                            Geneweb_oidc.Oidc.lookup_user
+                                              mappings claim_value
+                                          with
+                                          | Some m ->
+                                              ( Some m.role,
+                                                m.display_name,
+                                                m.person_key )
+                                          | None -> (None, claim_value, ""))
+                                  in
+                                  let acc, _is_wizard =
+                                    match role with
+                                    | Some `Wizard -> ('w', true)
+                                    | Some `Friend -> ('f', false)
+                                    | None -> ('v', false)
+                                  in
+                                  if acc = 'v' then begin
+                                    let url =
+                                      if !Server.cgi then
+                                        conf.command ^ "?b=" ^ base_file
+                                      else base_file
+                                    in
+                                    oidc_redirect conf url
+                                  end
+                                  else begin
+                                    let username =
+                                      if person_key <> "" then
+                                        display_name ^ "|" ^ person_key
+                                      else display_name
+                                    in
+                                    let pwd_id =
+                                      set_token utm from_addr base_file acc
+                                        claim_value username
+                                    in
+                                    let base_token = base_file ^ "_" ^ pwd_id in
+
+                                    store_oidc_id_token from_addr base_token
+                                      token_resp.id_token;
+
+                                    let url =
+                                      if !Server.cgi then
+                                        conf.command ^ "?b=" ^ base_file ^ "&w="
+                                        ^ pwd_id
+                                      else base_token
+                                    in
+                                    oidc_redirect conf url
+                                  end))))))
+
+let handle_oidc_logout conf base_env from_addr base_file =
+  let base_token =
+    match conf.auth_scheme with
+    | TokenAuth { ts_pass; _ } when ts_pass <> "" -> base_file ^ "_" ^ ts_pass
+    | _ -> ""
+  in
+  let id_token_opt =
+    if base_token = "" then None else take_oidc_id_token from_addr base_token
+  in
+
+  let base_url =
+    if !Server.cgi then conf.command ^ "?b=" ^ base_file else base_file
+  in
+  match read_oidc_config base_env with
+  | None -> oidc_redirect conf base_url
+  | Some
+      ( provider_url,
+        _client_id,
+        _client_secret,
+        redirect_uri,
+        _user_claim,
+        _users_file ) -> (
+      let post_logout_uri = redirect_uri in
+      match Geneweb_oidc.Oidc.discover provider_url with
+      | Error _ -> oidc_redirect conf base_url
+      | Ok provider -> (
+          match id_token_opt with
+          | None -> oidc_redirect conf base_url
+          | Some id_token -> (
+              match
+                Geneweb_oidc.Oidc.logout_url provider ~id_token_hint:id_token
+                  ~post_logout_redirect_uri:post_logout_uri
+              with
+              | None -> oidc_redirect conf base_url
+              | Some url -> oidc_redirect conf url)))
+
+let handle_oidc_mode conf base_env from_addr base_file utm mode =
+  match mode with
+  | Some "OIDC_LOGIN" ->
+      handle_oidc_login conf base_env base_file;
+      true
+  | Some "OIDC_CALLBACK" ->
+      handle_oidc_callback conf base_env from_addr base_file utm;
+      true
+  | Some "OIDC_LOGOUT" ->
+      handle_oidc_logout conf base_env from_addr base_file;
+      true
+  | _ ->
+      let has_code = Util.p_getenv conf.env "code" <> None in
+      let has_state = Util.p_getenv conf.env "state" <> None in
+      let has_error = Util.p_getenv conf.env "error" <> None in
+      if
+        ((has_code && has_state) || (has_error && has_state))
+        && read_oidc_config base_env <> None
+      then begin
+        handle_oidc_callback conf base_env from_addr base_file utm;
+        true
+      end
+      else false
+
 let conf_and_connection =
   let slow_query_threshold =
     match Sys.getenv_opt "GWD_SLOW_QUERY_THRESHOLD" with
@@ -1579,89 +1969,94 @@ let conf_and_connection =
         script_name env
     in
     let m = Util.p_getenv env "m" in
-    let is_binary =
-      match m with
-      | Some
-          ( "IM" | "IM_C" | "IM_C_S" | "IMH" | "FIM" | "SRC" | "DOC" | "DOCH"
-          | "IMA" ) ->
-          true
-      | _ -> false
-    in
-    let gzip_level =
-      match List.assoc_opt "gzip_html_compression" conf.base_env with
-      | Some s -> (
-          match int_of_string_opt s with
-          | Some n when n >= 1 && n <= 9 -> n
-          | _ -> 0)
-      | None -> 6
-    in
-    let enable_gzip () =
-      if gzip_level > 0 && not is_binary then
-        match make_gzip_output_conf ~level:gzip_level request with
-        | Some gzip_oc -> conf.output_conf <- gzip_oc
-        | None -> ()
-    in
-    match !redirected_addr with
-    | Some addr ->
-        print_redirected conf from request addr;
-        Output.flush conf
-    | None -> (
-        let auth_err, auth =
-          if conf.auth_file = "" then (false, "")
-          else if !Server.cgi then (true, "")
-          else auth_err request conf.auth_file
-        in
-        let mode = Util.p_getenv conf.env "m" in
-        (if mode <> Some "IM" then
-           let contents =
-             if List.mem_assoc "log_pwd" env then Adef.encoded "..."
-             else contents
-           in
-           log_and_robot_check conf auth from request script_name
-             (contents :> string));
-        match (!Server.cgi, auth_err, passwd_err) with
-        | true, true, _ ->
-            if is_robot from then Robot.robot_error conf 0 0 else no_access conf
-        | _, true, _ ->
-            if is_robot from then Robot.robot_error conf 0 0
-            else
-              let auth_type =
-                let x =
-                  try List.assoc "auth_file" conf.base_env
-                  with Not_found -> ""
+
+    if handle_oidc_mode conf conf.base_env conf.from conf.bname (Unix.time ()) m
+    then ()
+    else
+      let is_binary =
+        match m with
+        | Some
+            ( "IM" | "IM_C" | "IM_C_S" | "IMH" | "FIM" | "SRC" | "DOC" | "DOCH"
+            | "IMA" ) ->
+            true
+        | _ -> false
+      in
+      let gzip_level =
+        match List.assoc_opt "gzip_html_compression" conf.base_env with
+        | Some s -> (
+            match int_of_string_opt s with
+            | Some n when n >= 1 && n <= 9 -> n
+            | _ -> 0)
+        | None -> 6
+      in
+      let enable_gzip () =
+        if gzip_level > 0 && not is_binary then
+          match make_gzip_output_conf ~level:gzip_level request with
+          | Some gzip_oc -> conf.output_conf <- gzip_oc
+          | None -> ()
+      in
+      match !redirected_addr with
+      | Some addr ->
+          print_redirected conf from request addr;
+          Output.flush conf
+      | None -> (
+          let auth_err, auth =
+            if conf.auth_file = "" then (false, "")
+            else if !Server.cgi then (true, "")
+            else auth_err request conf.auth_file
+          in
+          let mode = Util.p_getenv conf.env "m" in
+          (if mode <> Some "IM" then
+             let contents =
+               if List.mem_assoc "log_pwd" env then Adef.encoded "..."
+               else contents
+             in
+             log_and_robot_check conf auth from request script_name
+               (contents :> string));
+          match (!Server.cgi, auth_err, passwd_err) with
+          | true, true, _ ->
+              if is_robot from then Robot.robot_error conf 0 0
+              else no_access conf
+          | _, true, _ ->
+              if is_robot from then Robot.robot_error conf 0 0
+              else
+                let auth_type =
+                  let x =
+                    try List.assoc "auth_file" conf.base_env
+                    with Not_found -> ""
+                  in
+                  if x = "" then "GeneWeb service" else "database " ^ conf.bname
                 in
-                if x = "" then "GeneWeb service" else "database " ^ conf.bname
-              in
-              refuse_auth conf from auth auth_type
-        | _, _, ({ ar_ok = false; _ } as ar) ->
-            if is_robot from then Robot.robot_error conf 0 0
-            else begin
-              let tm = Unix.time () in
-              let lock_file = !GWPARAM.adm_file "gwd.lck" in
-              let on_exn _exn _bt = () in
-              Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
-                  log_passwd_failed ar tm from request conf.bname);
-              unauth_server conf ar
-            end
-        | _ -> (
-            enable_gzip ();
-            try
-              let t1 = Unix.gettimeofday () in
-              Request.treat_request conf;
-              Output.flush conf;
-              let t2 = Unix.gettimeofday () in
-              if t2 -. t1 > slow_query_threshold then
-                Log.warn (fun k ->
-                    k "%s slow query (%.3f)"
-                      (context conf contents : Adef.encoded_string :> string)
-                      (t2 -. t1))
-            with
-            | Exit -> ()
-            | Def.HttpExn (code, _) as exn ->
-                let bt = Printexc.get_raw_backtrace () in
-                GWPARAM.output_error conf code;
-                Log.err (fun k ->
-                    k "%a" (pp_exception ~predictable_mode) (exn, bt))))
+                refuse_auth conf from auth auth_type
+          | _, _, ({ ar_ok = false; _ } as ar) ->
+              if is_robot from then Robot.robot_error conf 0 0
+              else begin
+                let tm = Unix.time () in
+                let lock_file = !GWPARAM.adm_file "gwd.lck" in
+                let on_exn _exn _bt = () in
+                Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
+                    log_passwd_failed ar tm from request conf.bname);
+                unauth_server conf ar
+              end
+          | _ -> (
+              enable_gzip ();
+              try
+                let t1 = Unix.gettimeofday () in
+                Request.treat_request conf;
+                Output.flush conf;
+                let t2 = Unix.gettimeofday () in
+                if t2 -. t1 > slow_query_threshold then
+                  Log.warn (fun k ->
+                      k "%s slow query (%.3f)"
+                        (context conf contents : Adef.encoded_string :> string)
+                        (t2 -. t1))
+              with
+              | Exit -> ()
+              | Def.HttpExn (code, _) as exn ->
+                  let bt = Printexc.get_raw_backtrace () in
+                  GWPARAM.output_error conf code;
+                  Log.err (fun k ->
+                      k "%a" (pp_exception ~predictable_mode) (exn, bt))))
 
 let match_strings regexp s =
   let rec loop i j =

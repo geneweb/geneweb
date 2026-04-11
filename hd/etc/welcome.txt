@@ -122,6 +122,12 @@
         %end;
         </div>
       %end;
+      %if;(b.oidc_provider_url!="" and not wizard and not friend)
+        <div class="btn-group btn-group-xs mt-1 w-100" role="group">
+          <a href="%prefix;m=OIDC_LOGIN" class="btn btn-sm btn-outline-info text-nowrap w-100" role="button">
+            <i class="fas fa-right-to-bracket mr-2" aria-hidden="true"></i>SSO Login</a>
+        </div>
+      %end;
       %let;username;%if;(user.name="")%user.ident;%else;%user.name;%end;%in;
       %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!=""))
         or (friend and (b.friend_passwd_file!="" or b.friend_passwd!="")))
@@ -130,7 +136,11 @@
           href="%prefix;m=S&pn=%apply;url_encode(userk)"%sp;
           %if;(user.key="")title="[*no user key]" data-bs-toggle="tooltip"%end;>%nn;
           %if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %username;</a>
+        %if;(b.oidc_provider_url!="")
+        <a class="btn btn-sm btn-outline-danger mt-1 w-100" href="%prefix;m=OIDC_LOGOUT" role="button"><i class="fas fa-right-from-bracket mr-1" aria-hidden="true"></i>[*disconnect]</a>
+        %else;
         <a class="btn btn-sm btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-right-from-bracket mr-1" aria-hidden="true"></i>[*disconnect]</a>
+        %end;
       %end;
     </div>
   </div>
