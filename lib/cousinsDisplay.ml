@@ -195,6 +195,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     loop Sosa.one lev1
   in
   let last_sosa = Sosa.twice first_sosa in
+  Perso.interp_templ "buttons_cousins" conf base p;
   Util.print_tips_relationship conf;
   if lev1 > 1 then Output.print_sstring conf "<ul>";
   let some =
@@ -241,10 +242,6 @@ let print_cousins conf base p lev1 lev2 =
   in
   Hutil.header conf title;
   Output.print_sstring conf "<div>";
-  (*include_templ conf "cousins_tools";*)
-  Output.print_sstring conf "<h3>";
-  title false;
-  Output.print_sstring conf "</h3>";
   Output.print_sstring conf "</div>";
   cnt := 0;
   (* Construction de la table des sosa de la base *)

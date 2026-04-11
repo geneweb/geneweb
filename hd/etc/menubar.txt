@@ -530,7 +530,7 @@
   %if;(not (e.ip!="" and "D_FAM" in e.m or "D_PAR" in e.m))
     %include;home
   %end;
-  %if;(evar.m="C" and e.v1!="" or e.v2!="" and not cancel_links)
+  %if;(evar.m="C" and (e.v1!="" or e.v2!="") and not cancel_links)
     %include;buttons_cousins
   %end;
 %end;
