@@ -262,7 +262,7 @@ and eval_simple_var conf base env xx = function
           (Utf8.capitalize (transl conf "list of linked persons"))
           (List.length p_list)
       in
-      let tail = Printf.sprintf "<i class=\"fa fa-user fa-xs ml-1\"></i></a>" in
+      let tail = Printf.sprintf "<i class=\"fa fa-user fa-xs ms-1\"></i></a>" in
       Printf.sprintf "%s%s%s%s" head body title tail |> str_val
   | [ s ] -> (
       try bool_val (eval_simple_bool_var conf base env xx s)

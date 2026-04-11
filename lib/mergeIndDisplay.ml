@@ -22,7 +22,7 @@ let print_differences conf base branches p1 p2 =
     then (
       let aux i x chk =
         Output.print_sstring conf
-          {|<div class="custom-control custom-radio ml-3">|};
+          {|<div class="custom-control custom-radio ms-3">|};
         Output.print_sstring conf
           {|<input class="custom-control-input" type="radio" id="|};
         Output.print_sstring conf name;

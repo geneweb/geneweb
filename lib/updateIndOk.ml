@@ -1054,13 +1054,13 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
     let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
     Output.printf conf
       "<span class=\"unselectable float-start\">%s%s</span>\n\
-       <span class=\"float-start ml-1\">%s/%s%s</span>\n\
+       <span class=\"float-start ms-1\">%s/%s%s</span>\n\
        <br>"
       (Utf8.capitalize_fst (transl conf "old name"))
       (transl conf ":") ofn osn soocc;
     Output.printf conf
       "<span class=\"unselectable float-start\">%s%s</span>\n\
-       <span class=\"float-start ml-1\">%s/%s%s</span>\n\
+       <span class=\"float-start ms-1\">%s/%s%s</span>\n\
        <br>"
       (Utf8.capitalize_fst (transl conf "new name"))
       (transl conf ":") nfn nsn snocc;
