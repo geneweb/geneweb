@@ -177,7 +177,7 @@
       [*modify::family/families]0%if;(nb_families = 1) %end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
-      <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index">%nn;
+      <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index;">%nn;
       [*delete::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
