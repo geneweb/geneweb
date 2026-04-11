@@ -479,6 +479,12 @@
 #welcome_logo=
 #welcome_logo_style=
 
+# Bootstrap 5 displays hyperlinks underlined by default (unlike version 4)
+# Underlines improve accessibility by making links distinguishable without
+# relying on color alone, which benefits color-blind and low-vision users.
+# Set to “no” to remove underlines from all links.
+#underline_hyperlink=no
+
 # css_prop
 # The file stylesheet.css must be in the directory "css".
 # Customize the default.css stylesheet or create your own one and
