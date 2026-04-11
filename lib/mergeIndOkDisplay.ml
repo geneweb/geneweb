@@ -49,7 +49,7 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
         Output.print_sstring conf " ";
         Output.print_sstring conf n);
       Output.print_sstring conf (transl conf ":");
-      Output.print_sstring conf {|</span> <span class="float-start ml-1">|};
+      Output.print_sstring conf {|</span> <span class="float-start ms-1">|};
       Output.print_string conf (Util.escape_html ofn);
       Output.print_sstring conf {|/|};
       Output.print_string conf (Util.escape_html osn);

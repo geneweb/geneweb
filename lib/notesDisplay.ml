@@ -92,7 +92,7 @@ let print_search_form conf from_note =
   | None -> ());
   Output.print_sstring conf "\">";
   Output.print_sstring conf "<input type=\"checkbox\" name=\"c\" value=\"on\"";
-  Output.printf conf " class=\"form-check-input ml-2\" id=\"case\"%s>"
+  Output.printf conf " class=\"form-check-input ms-2\" id=\"case\"%s>"
     (match p_getenv conf.env "c" with
     | Some "on" -> " checked"
     | Some _ | None -> "");
@@ -131,7 +131,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
       Format.sprintf
         {|
  <a href="%sm=NOTES&f=%s&ref=on"
-     class="align-self-center ml-3 mb-1"
+     class="align-self-center ms-3 mb-1"
      title="%s">(<-)</a>|}
         (commd conf :> string)
         (fnotes :> string)
@@ -660,7 +660,7 @@ let format_folder_entry conf depth r path_to is_current is_path view =
     if is_current then
       Format.sprintf
         {|<span class="text-body-secondary">
-          <i class="far fa-folder-open fa-fw mr-2"></i>%s</span>|}
+          <i class="far fa-folder-open fa-fw me-2"></i>%s</span>|}
         (Util.escape_html r :> string)
     else
       let title_attr =
@@ -675,13 +675,13 @@ let format_folder_entry conf depth r path_to is_current is_path view =
       if view then
         Format.sprintf
           {|<a href="%sm=MISC_NOTES&d=%s"%s>
-            <i class="far fa-folder-open fa-fw mr-2"></i>%s</a>|}
+            <i class="far fa-folder-open fa-fw me-2"></i>%s</a>|}
           (commd conf :> string)
           (Mutil.encode path_to :> string)
           title_attr
           (Util.escape_html r :> string)
       else
-        Format.sprintf {|<i class="far fa-folder-open fa-fw mr-2"%s></i>%s|}
+        Format.sprintf {|<i class="far fa-folder-open fa-fw me-2"%s></i>%s|}
           title_attr
           (Util.escape_html r :> string)
   in
@@ -707,7 +707,7 @@ let format_file_entry conf depth d f n_type title view =
     Format.sprintf
       {|<div class="mt-1"%s>
          <a class="%s" href="%sm=%sNOTES&f=%s">
-           <i class="far fa-%s fa-fw mr-2"></i>%s</a>%s</div>|}
+           <i class="far fa-%s fa-fw me-2"></i>%s</a>%s</div>|}
       margin color
       (commd conf :> string)
       mod_edit
@@ -715,13 +715,13 @@ let format_file_entry conf depth d f n_type title view =
       icon
       (Util.escape_html f :> string)
       (if (title :> string) <> "" then
-         Format.sprintf {|<span class="text-body-secondary ml-2">%s</span>|}
+         Format.sprintf {|<span class="text-body-secondary ms-2">%s</span>|}
            (title :> string)
        else "")
   else
     Format.sprintf
       {|<div class="mt-2"%s>
-         <i class="far fa-%s fa-fw mr-2"></i>
+         <i class="far fa-%s fa-fw me-2"></i>
          <span class="text">%s</span></div>|}
       margin icon
       (Util.escape_html f :> string)
@@ -731,7 +731,7 @@ let format_back_button conf d =
   Format.sprintf
     {|<div class="mb-3">
         <a href="%sm=MISC_NOTES%s" class="btn btn-outline-primary">
-          <i class="fa fa-arrow-left mr-2"></i>%s</a></div>|}
+          <i class="fa fa-arrow-left me-2"></i>%s</a></div>|}
     (commd conf :> string)
     (match String.rindex_opt d NotesLinks.char_dir_sep with
     | Some i -> "&d=" ^ String.sub d 0 i
@@ -766,7 +766,7 @@ let print_misc_notes conf base =
   Hutil.header conf (fun _ -> ());
   Output.print_sstring conf
     (Format.sprintf
-       {|<h1 class="mb-3" title="%s"><i class="far fa-clipboard fa-sm mr-3"></i>%s</h1>|}
+       {|<h1 class="mb-3" title="%s"><i class="far fa-clipboard fa-sm me-3"></i>%s</h1>|}
        (transl conf "miscellaneous notes help" |> Utf8.capitalize_fst)
        (if d <> "" then d
         else transl conf "miscellaneous notes" |> Utf8.capitalize_fst));
@@ -841,7 +841,7 @@ let print_misc_notes conf base =
       format_folder_entry conf 0 ".." "" false true true
       |> Output.print_sstring conf;
       path_hierarchy d);
-    Output.print_sstring conf {|<div class="ml-2">|};
+    Output.print_sstring conf {|<div class="ms-2">|};
     List.iter (fun d -> one_folder d true) dirs_in_db;
     List.iter (fun f -> one_file f true) files_in_db;
     Output.print_sstring conf "</div>");
@@ -869,7 +869,7 @@ let print_misc_notes conf base =
       ([], []) ls
   in
   if dirs <> [] || files <> [] then (
-    Output.print_sstring conf {|<div class="ml-2">|};
+    Output.print_sstring conf {|<div class="ms-2">|};
     Output.print_sstring conf
       (Format.sprintf
          {|<h2 class="h3 mt-3 mb-1" title="%s">%s

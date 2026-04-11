@@ -86,7 +86,7 @@
             %end;
           %end;
         </div>
-        <div class="d-flex col-12 order-1">
+        <div class="d-flex order-1">
           <div class="d-flex flex-row align-self-center">
             %if;(e.s="")%apply;other_books()%end;
             %if;(e.data!="" and e.s="")
@@ -231,12 +231,11 @@
                               %if;(b.notextarea!="yes" or e.data="src" or e.data="place")
                                 <textarea class="form-control ps-2 pe-2" id="nx_input" name="nx_input" rows="1"
                                          maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                                         placeholder="%val;"%if;(e.data!="fn" and e.data!="sn") autofocus%end; required>%val;</textarea>
+                                         placeholder="%val;" autofocus required>%val;</textarea>
                               %else;
                                 <input type="text" class="form-control flex-grow-1 ps-2 pe-1" id="nx_input" name="nx_input"
                                       maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                                      value="%val;" placeholder="%val;"
-                                      %if;(e.data!="fn" and e.data!="sn") autofocus%end; aria-label="[*modify]" required>
+                                      value="%val;" placeholder="%val;" autofocus aria-label="[*modify]" required>
                               %end;
                               %if;(e.data="fn")
                                 <div class="form-check form-check-inline ms-sm-2">

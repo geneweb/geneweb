@@ -189,7 +189,7 @@ let print conf base =
       (Util.transl_nth conf "relationship table" 3 |> Utf8.capitalize_fst);
     Output.printf conf
       {|<a href="%s" class="btn btn-outline-primary">
-          <i class="fas fa-edit mr-1"></i>%s</a></div>|}
+          <i class="fas fa-edit me-1"></i>%s</a></div>|}
       (tp_link conf)
       (Util.transl_nth conf "add/clear/show/edit the graph" 3
       |> Utf8.capitalize_fst);
