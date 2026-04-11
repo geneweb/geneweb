@@ -209,16 +209,19 @@ const RelationMatrix = (() => {
       html += '<td>' + path.l2 + '</td></tr>';
     });
 
-    html += '<tfoot><td><i class="fa-solid fa-person-arrow-up-from-line"></i></td>';
+    html += '</tbody>';
+    html += '<tfoot><tr>';
+    html += '<td><i class="fa-solid fa-person-arrow-up-from-line"></i></td>';
     html += '<td class="person"><a href="' + makePersonUrl(p1Iper) + '">' + p1Name + '</a></td>';
     html += '<td class="person"><a href="' + makePersonUrl(p2Iper) + '">' + p2Name + '</a></td>';
-    html += '<td><i class="fa-solid fa-person-arrow-down-to-line fa-flip-horizontal"></i></td></tfoot>';
-    html += '</tbody></table>';
+    html += '<td><i class="fa-solid fa-person-arrow-down-to-line fa-flip-horizontal"></i></td>';
+    html += '</tr></tfoot>';
+    html += '</table>';
 
     const table = document.getElementById('rm-table');
     html += '<div class="text-center">';
     html += '<strong><a href="' + cellData.url + '" target="_blank">' + cellData.data.total + ' ' + table.dataset.linksLabel + '</a></strong>';
-    html += '<br><span class="text-muted">' + table.dataset.coeffLabel + ' : ' + cellData.data.coeff + '</span>';
+    html += '<br><span class="text-body-secondary">' + table.dataset.coeffLabel + ' : ' + cellData.data.coeff + '</span>';
     html += '</div>';
 
     // Ajouter les liens somme
@@ -247,7 +250,9 @@ const RelationMatrix = (() => {
   }
 
   function showRelationModal(data) {
-    const modal = $('#rmModal');
+    const modalEl = document.getElementById('rmModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
     const modalBody = document.getElementById('rmModalBody');
 
     let htmlContent = '<div class="rm-modal-container">';
@@ -262,7 +267,7 @@ const RelationMatrix = (() => {
     htmlContent += '</div>';
 
     modalBody.innerHTML = htmlContent;
-    modal.modal('show');
+    modal.show();
 
     setTimeout(() => {
       modalBody.scrollTop = modalBody.scrollHeight;

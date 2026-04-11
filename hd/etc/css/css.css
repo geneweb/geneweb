@@ -2365,34 +2365,32 @@ span.notesourcecolor {
 
 /* Relationships matrix */
 .rm-head {
-  background-color: #f8f9fa;
+  --bs-table-bg: #f8f9fa;
   vertical-align: middle !important;
   white-space: nowrap;
-  border-bottom: 0px;
   min-height: 60px;
-
 }
 .rm-thead {
-  background-color: #f8f9fa;
+  --bs-table-bg: #f8f9fa;
   font-weight: bold;
-  border-top: 0px;
+  
 }
 .rm-cell {
-  background-color: #fff;
+  --bs-table-bg: #fff;
   vertical-align: middle !important;
   text-align: center;
   cursor: pointer;
   line-height: 1rem;
 }
 .rm-cell a {
-  text-decoratione: none;
+  text-decoration: none;
 }
 .rm-cell:hover {
-  background-color: #e9ecef;
+  --bs-table-bg: #e9ecef;
   line-height: 1rem;
 }
 .rm-diag {
-  background-color: #bcd3eb;
+  --bs-table-bg: #bcd3eb;
   color: white;
   vertical-align: middle !important;
   text-align: center;
@@ -2400,15 +2398,15 @@ span.notesourcecolor {
   min-width: 60px;
 }
 .rm-empty {
-  background-color: transparent;
+  --bs-table-bg: transparent;
   border: none !important;
   text-align: center;
 }
 .rm-hl0 {
-  background-color: rgba(255, 193, 7, 0.3) !important;
+  --bs-table-bg: rgba(255, 193, 7, 0.3) !important;
 }
 .rm-hl1 {
-  background-color: rgba(40, 167, 69, 0.3) !important;
+  --bs-table-bg: rgba(40, 167, 69, 0.3) !important;
 }
 .rm-hl0.rm-hl1 {
   background: linear-gradient(45deg, rgba(255, 193, 7, 0.5) 50%, rgba(40, 167, 69, 0.5) 50%) !important;
@@ -2427,17 +2425,9 @@ span.notesourcecolor {
   font-size: 13px !important;
   padding: 8px 12px !important;
 }
-#rm-table [data-toggle="tooltip"] .tooltip.top .tooltip-arrow {
-  border-top-color: #ddd !important;
-}
-#rm-table [data-toggle="tooltip"] .tooltip.bottom .tooltip-arrow {
-  border-bottom-color: #ddd !important;
-}
-#rm-table [data-toggle="tooltip"] .tooltip.left .tooltip-arrow {
-  border-left-color: #ddd !important;
-}
-#rm-table [data-toggle="tooltip"] .tooltip.right .tooltip-arrow {
-  border-right-color: #ddd !important;
+#rm-table tr:first-child th:first-child {
+  --bs-table-bg: transparent;
+  border: none !important;
 }
 
 /* Calendar tool: moon visualization */
