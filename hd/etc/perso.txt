@@ -32,7 +32,7 @@
 %if;(evar.p_mod="zz" or (bvar.p_mod="zz" and evar.p_mod="") or
     (bvar.p_mod="" and evar.p_mod=""))
   %(Statique%)
-  <div class="rox col-12">
+  <div class="row col-12">
       %let;op_m;3%in;%include;modules/heading
   </div>
   <div class="row col-12">
