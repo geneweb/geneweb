@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: calendar.txt v7.1 2026/03 $ -->
+  <!-- $Id: calendar.txt v7.1 11/04/2026 01:41:22 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
 %include;css
 </head>
@@ -24,7 +24,7 @@
 
 %define;fun_month(ccc, nnn, vvv, lll)
   <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="mccc1">&lsaquo;</button></td>
-  <td><select class="form-control form-control-sm text-center" style="text-align-last:center" name="mccc">
+  <td><select class="form-select form-select-sm text-center" style="text-align-last:center" name="mccc">
         %foreach;integer_range(1, vvv)
           <option value="%integer;"%nn;
            %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
@@ -57,7 +57,7 @@
 %end;
 
 %define;calendar(ccc, nnn, vvv, lll, fun_yyy)
-  %if;([!dates order] = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
+  %if;([!dates order] = "ddmmyy" or [!dates order] = "ddmmyyyy" or [!dates order] = "dmyyyy")
     %apply;fun_day("ccc", "nnn")
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
     %apply;fun_yyy("ccc", "nnn")
@@ -76,7 +76,7 @@
 <div class="row mt-4 mb-2">
   <div class="col text-center">
     <h4 class="mb-1">[*calendar/calendars]1</h4>
-    <span class="text-muted" style="font-size:1.1rem">
+    <span class="text-body-secondary" style="font-size:1.1rem">
       %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;%nn;
       %if;(date.julian_day = today.julian_day) &mdash; %time;%end;
     </span>
@@ -92,8 +92,8 @@
 
   <div class="card mb-3 border-success">
     <div class="card-header bg-light py-2 px-3">
-      <span class="font-weight-bold text-success">[*gregorian/julian/french/hebrew]0</span>
-      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; 1582</span>
+      <span class="fw-bold text-success">[*gregorian/julian/french/hebrew]0</span>
+      <span class="small text-body-secondary fw-normal d-none d-sm-inline ms-2">&mdash; 1582</span>
     </div>
     <div class="card-body py-2 px-3">
       <table class="mx-auto"><tr>
@@ -104,8 +104,8 @@
 
   <div class="card mb-3 border-primary">
     <div class="card-header bg-light py-2 px-3">
-      <span class="font-weight-bold text-primary">[*gregorian/julian/french/hebrew]1</span>
-      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; 45 BC / Old Style</span>
+      <span class="fw-bold text-primary">[*gregorian/julian/french/hebrew]1</span>
+      <span class="small text-body-secondary fw-normal d-none d-sm-inline ms-2">&mdash; 45 BC / Old Style</span>
     </div>
     <div class="card-body py-2 px-3">
       <table class="mx-auto"><tr>
@@ -116,8 +116,8 @@
 
   <div class="card mb-3 border-danger">
     <div class="card-header bg-light py-2 px-3">
-      <span class="font-weight-bold text-danger">[*gregorian/julian/french/hebrew]2</span>
-      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; An I (1792) &ndash; XIV (1805)</span>
+      <span class="fw-bold text-danger">[*gregorian/julian/french/hebrew]2</span>
+      <span class="small text-body-secondary fw-normal d-none d-sm-inline ms-2">&mdash; An I (1792) &ndash; XIV (1805)</span>
     </div>
     <div class="card-body py-2 px-3">
       <table class="mx-auto"><tr>
@@ -128,8 +128,8 @@
 
   <div class="card mb-3 border-warning">
     <div class="card-header bg-light py-2 px-3">
-      <span class="font-weight-bold text-warning">[*gregorian/julian/french/hebrew]3</span>
-      <span class="small text-muted font-weight-normal d-none d-sm-inline ml-2">&mdash; Hillel II (~358) / 19y Metonic</span>
+      <span class="fw-bold text-warning">[*gregorian/julian/french/hebrew]3</span>
+      <span class="small text-body-secondary fw-normal d-none d-sm-inline ms-2">&mdash; Hillel II (~358) / 19y Metonic</span>
     </div>
     <div class="card-body py-2 px-3">
       <table class="mx-auto"><tr>
@@ -150,7 +150,7 @@
 
       <div class="mx-4 my-2 text-center">
         <div class="moon-vis" id="moonVis"></div>
-        <div class="small text-muted mt-1">
+        <div class="small text-body-secondary mt-1">
           %if;(date.moon_phase.index != 0)
             %apply;capitalize%with;%nn;
               %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
@@ -162,15 +162,15 @@
 
       <div class="mx-4 my-2 text-center">
         <div style="font-size:2rem;line-height:1">%date.moon_age;</div>
-        <div class="small text-muted">[*moon age/new moon/first quarter/full moon/last quarter]0</div>
+        <div class="small text-body-secondary">[*moon age/new moon/first quarter/full moon/last quarter]0</div>
       </div>
 
       <div class="mx-4 my-2 text-center">
-        <div class="text-monospace" style="font-size:1.4rem">
+        <div class="font-monospace" style="font-size:1.4rem">
           %if;(date.julian_day < 1000)%date.julian_day;
           %else;%date.julian_day.sep1000;%end;
         </div>
-        <div class="small text-muted">
+        <div class="small text-body-secondary">
           [*julian day]
           <span title="Fliegel & Van Flandern, CACM 1968 &#10;Epoch: 1 Jan 4713 BC (Julian), noon UT" style="cursor:help">&#9432;</span>
         </div>

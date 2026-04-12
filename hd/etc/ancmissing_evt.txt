@@ -111,6 +111,8 @@
 %define;display_edit_ind_btn(label)
   %if;(wizard and not cancel_links)
     <div>
+      %( ⚠ BUG : "#label" est l'ancre littérale, pas la valeur du paramètre.
+         Devrait être "#%label;" pour pointer vers "birth" ou "death" selon l'appel. %)
       <a href="%prefix;m=MOD_IND&i=%ancestor.index;#label" title="[modify::person/persons]0">
         <i class="fa fa-wrench fa-lg"></i>
       </a>
@@ -148,9 +150,9 @@
     %xx.anc_sosa;
   </td>
 
-   %( ancestor %)
+  %( ancestor %)
   <td %if;(xx.same!="")colspan="8"%else;%apply;td_missing_events_rowspan("xx")%end;
-    class="text-left align-middle" id="%xx.index;">
+    class="text-start align-middle" id="%xx.index;">
     %apply;image_MF("xx")
     %apply;short_display_person("xx")
     %if;(xx.same!="" and e.repeat="on")
@@ -215,7 +217,7 @@
       %if;xx.has_families;
         %foreach;xx.family;
           %if;(family_cnt=1)
-            <td class="text-left align-middle">
+            <td class="text-start align-middle">
               %apply;image_MF("spouse")
               %apply;short_display_person("spouse")
             </td>
@@ -225,7 +227,7 @@
         <td></td>
       %end;
     %else;
-      <td class="text-left align-middle">
+      <td class="text-start align-middle">
         %if;xx.has_families;
           %apply;image_MF("xx.spouse")
           %apply;short_display_person("xx.spouse")
@@ -466,7 +468,7 @@
   %foreach;xx.family;
     %if;(family_cnt!=1)
       <tr>
-        <td class="text-left align-middle">
+        <td class="text-start align-middle">
           %apply;image_MF("spouse")
           %apply;short_display_person("spouse")
         </td>
@@ -494,17 +496,17 @@
 %end;
 
 %( Main %)
-%let;nb_gena;%apply;min(e.v, max_anc_level)%in;
+%let;nb_gena;%apply;min(e_v, max_anc_level)%in;
 %let;only_v;%if;(e.only="on")%nb_gena;%else;0%end;%in;
-<div class="ml-2">%if;(e.only="on")[only] %apply;gena(only_v+1)%else;%apply;togena(nb_gena)%end;.</div>
+<div class="ms-2">%if;(e.only="on")[only] %apply;gena(only_v+1)%else;%apply;togena(nb_gena)%end;.</div>
 <table class="table table-bordered table-sm asc-desc-table w-auto m-2 text-center">
-  <thead %mid;>
+  <thead>
     <tr>
       <th %mid;>[*Sosa]</th>
-      <th class="text-left align-middle pl-2">[*person/persons]0</th>
+      <th class="text-start align-middle ps-2">[*person/persons]0</th>
       <th %mid;>[*date of birth]</th>
       <th %mid;>[*where born]</th>
-      <th class="text-left align-middle pl-2">%if;(e.marr="on")[*spouse/spouses]1%else;[*spouse/spouses]0%end;</th>
+      <th class="text-start align-middle ps-2">%if;(e.marr="on")[*spouse/spouses]1%else;[*spouse/spouses]0%end;</th>
       <th %mid;>[*date of marriage]</th>
       <th %mid;>[*where married]</th>
       <th %mid;>[*date of death]</th>
@@ -516,23 +518,23 @@
       %if;(level>=only_v)
         %if;(level!=0 and e.gen="on" and e.only!="on")
           <tr>
-            <th colspan="9" class="text-left border-0">[*generation/generations]0 %level;</th>
+            <th colspan="9" class="text-start border-0">[*generation/generations]0 %level;</th>
           </tr>
         %end;
         %foreach;ancestor;
-            %apply;has_missing_events("ancestor")
-            %if;(count>0 and ancestor!="? ?")
-              %if;(ancestor.same="" or e.repeat="on")
-                <tr>
-                  %apply;table_missing_events("ancestor")
-                </tr>
-                %if;(ancestor.same="" and (e.marr="on" or (is_first and level=0)) and ancestor.nb_families > 1)
-                  %apply;table_family_missing_events("ancestor")
-                %end;
+          %apply;has_missing_events("ancestor")
+          %if;(count>0 and ancestor!="? ?")
+            %if;(ancestor.same="" or e.repeat="on")
+              <tr>
+                %apply;table_missing_events("ancestor")
+              </tr>
+              %if;(ancestor.same="" and (e.marr="on" or (is_first and level=0)) and ancestor.nb_families > 1)
+                %apply;table_family_missing_events("ancestor")
               %end;
             %end;
+          %end;
         %end;
       %end;
     %end;
-  <tbody>
+  </tbody>
 </table>

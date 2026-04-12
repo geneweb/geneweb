@@ -13,7 +13,7 @@
 </title>
 <meta name="robots" content="none">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
 <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
 %include;css
@@ -21,7 +21,7 @@
 <body%body_prop;>
 %include;hed
 %include;perso_utils
-<a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
+<a href="#content" class="visually-hidden visually-hidden-focusable">Skip navigation menu</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
   %include;menubar
   %message_to_wizard;

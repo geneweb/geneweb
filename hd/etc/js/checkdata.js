@@ -345,7 +345,7 @@ const createContainer = (btn, field) => {
       
       if (result.nb_modified !== null && result.elapsed_time !== null) {
         const statsDiv = document.createElement('div');
-        statsDiv.className = 'small text-center mr-2';
+        statsDiv.className = 'small text-center me-2';
         statsDiv.textContent = `+${result.nb_modified}`;
         statsDiv.insertAdjacentHTML('beforeend', '<br>');
         statsDiv.insertAdjacentText('beforeend', 
@@ -501,8 +501,7 @@ const createContainer = (btn, field) => {
     
     const closeBtn = document.createElement('button');
     closeBtn.type = 'button';
-    closeBtn.className = 'close ml-2';
-    closeBtn.innerHTML = '&times;';
+    closeBtn.className = 'btn-close ms-2';
     
     content.appendChild(msgSpan);
     content.appendChild(closeBtn);

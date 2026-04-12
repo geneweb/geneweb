@@ -78,7 +78,7 @@ let print_children conf base ipl =
   List.iter
     (fun ip ->
       let p = Driver.poi base ip in
-      Output.print_sstring conf {|<li class="mt-3"><span class="ml-2">|};
+      Output.print_sstring conf {|<li class="mt-3"><span class="ms-2">|};
       Output.print_string conf
         (reference conf base p (gen_person_text conf base p));
       Output.print_string conf (DateDisplay.short_dates_text conf base p);

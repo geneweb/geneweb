@@ -4753,6 +4753,11 @@ de: einen Vorfahren auswählen
 en: choose an ancestor
 fr: choisir un ancêtre
 
+    choose an image
+de: ein Bild auswählen
+en: choose an image
+fr: choisir une image
+
     circumcision
 co: circuncisione
 de: Beschneidung

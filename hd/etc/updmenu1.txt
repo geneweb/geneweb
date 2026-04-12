@@ -6,7 +6,7 @@
   <title>[*update]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
   %include;favicon
   %include;css
@@ -177,7 +177,7 @@
       [*modify::family/families]0%if;(nb_families = 1) %end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
-      <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index">%nn;
+      <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index;">%nn;
       [*delete::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>

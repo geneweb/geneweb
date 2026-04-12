@@ -66,7 +66,7 @@ let make_edit_button conf ?(mode = "") fnotes ?(cnt = None) () =
           (Printf.sprintf (ftransl conf "modify note section %d") n)
   in
   Format.sprintf
-    {|<a href="%s" class="align-self-center ml-3 mb-1"
+    {|<a href="%s" class="align-self-center ms-3 mb-1"
   title="%s">(%s)</a>|}
     href title (transl conf "modify")
 
@@ -538,7 +538,7 @@ let summary_of_tlsw_lines conf short lines =
         {|<div id="summary">
   <div class="d-flex align-items-center">
     <h2>0 – %s</h2>
-    <a href="#" class="toc-toggle ml-2">(%s)</a>
+    <a href="#" class="toc-toggle ms-2">(%s)</a>
   </div>
 <div id="toc-content">|}
         (Utf8.capitalize_fst (message_txt conf 3))
@@ -881,7 +881,7 @@ let print_mod_view_header conf can_edit (mode : Adef.encoded_string)
     if can_edit then
       Format.sprintf
         {|<a href="%sm=%s%s%s"
-    class="btn btn-sm btn-outline-primary align-self-center ml-3 mt-1">%s</a>|}
+    class="btn btn-sm btn-outline-primary align-self-center ms-3 mt-1">%s</a>|}
         (commd conf :> string)
         (mode :> string)
         (if has_v then "&v=" ^ string_of_int v else "")
@@ -889,7 +889,7 @@ let print_mod_view_header conf can_edit (mode : Adef.encoded_string)
         (Utf8.capitalize_fst (message_txt conf 0))
     else ""
   in
-  Output.print_sstring conf {|<div class="d-flex mr-2">
+  Output.print_sstring conf {|<div class="d-flex me-2">
   <h1>|};
   title false;
   Output.printf conf {|</h1>%s
@@ -910,7 +910,7 @@ let print_new_note_input conf =
   let plh = Utf8.capitalize_fst (transl_nth conf "new note name" 0) in
   Output.printf conf
     {|<div class="row mb-3">
-  <label class="col-sm-2 col-form-label sr-only" for="new_f">%s</label>
+  <label class="col-sm-2 col-form-label visually-hidden" for="new_f">%s</label>
   <div class="col-sm-7">
     <input type="text" class="form-control form-control-lg" placeholder="%s"
       name="new_f" id="new_f" tabindex="4" autofocus required>
@@ -934,8 +934,8 @@ let print_mod_view_editor conf can_edit sub_part is_new_note =
       Format.sprintf
         {|<button type="submit" tabindex="6" title="%s"
     class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3">
-    <span class="font-weight-bold text-uppercase">%s</span>
-    <i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
+    <span class="fw-bold text-uppercase">%s</span>
+    <i class="fa fa-share fa-rotate-180 fa-fw ms-2" aria-hidden="true"></i>
   </button>|}
         lbl lbl
     else ""

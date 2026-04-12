@@ -121,9 +121,9 @@
        (e.src="on" and child.has_sources or
         e.notes="on" and (child.has_notes or child.has_event)))
     <div class="p-3 shadow">
-    <dt><a href="#%ancestor.anc_sosa.v;" name="notes-%ancestor.anc_sosa.v;%if;("spec"!="")-spec%end;%apply;letter(child_cnt)"><b>%ancestor.anc_sosa;
+    <dt id="notes-%ancestor.anc_sosa.v;%if;("spec"!="")-spec%end;%apply;letter(child_cnt)"><a href="#%ancestor.anc_sosa.v;"><b>%ancestor.anc_sosa;
     %if;("spec"!="")-spec%end;
-    %apply;letter(child_cnt)</b></a> <span class="small text-muted">(%child;%child.dates;)</span></dt>
+    %apply;letter(child_cnt)</b></a> <span class="small text-body-secondary">(%child;%child.dates;)</span></dt>
     <dd>
     %if;(e.notes="on" and (child.has_notes or child.has_event))
       <table><tr><td>
@@ -132,7 +132,7 @@
           <table>
             %foreach;child.event;
               <tr>
-                <td valign="top" style="white-space: nowrap;" width="1">
+                <td class="align-top text-nowrap">
                   <span class="edate">
                     %if;event.has_date;%event.date; :
                     %else;--- :
@@ -177,9 +177,8 @@
 %end;
 
 %define;long_display_notes()
-  <h3>
+  <h3 id="ns">
     %if;(e.notes="on")[*note/notes]1%else;[*source/sources]1%end;
-    <a name="ns">&nbsp;</a>
   </h3>
   <dl>
   %foreach;ancestor_level;
@@ -189,52 +188,53 @@
               e.notes="on" and (ancestor.has_notes or ancestor.has_event))
              and ancestor.same="")
           <div class="shadow p-3">
-          <dt><b><a href="#%ancestor.anc_sosa.v;" name="notes-%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
-          <span class="small text-muted">(%ancestor;%ancestor.dates;)</span></dt>
-          <dd>
-          %if;(e.notes="on" and (ancestor.has_notes or ancestor.has_event))
-            <table><tr><td>
-              %ancestor.notes;
-              %if;ancestor.has_event;
-                <table>
-                  %foreach;ancestor.event;
-                    <tr>
-                      <td class="align-top text-nowrap" width="1%">
-                        <span class="edate">
-                          %if;event.has_date;%event.date; :
-                          %else;--- :
-                          %end;
-                        </span>
-                      </td>
-                      <td class="align-top">
-                        <span>
-                          %apply;capitalize(event.name)%sp;
-                          %if;event.has_spouse;([with] %event.spouse;)%end;
-                          %if;event.has_place; - %event.place; %end;
-                        </span>
-                        %if;event.has_witnesses;
-                          %foreach;event_witness;
-                            <span>%apply;capitalize(event_witness_kind) :</span>
-                            %apply;short_display_person("event_witness")<br>
-                          %end;
-                        %end;
-                        %if;event.has_note;<div>%event.note;</div>%end;
-                          %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
-                      </td>
-                    </tr>
+            <dt id="notes-%ancestor.anc_sosa.v;"><b><a href="#%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
+              <span class="small text-body-secondary">(%ancestor;%ancestor.dates;)</span>
+            </dt>
+            <dd>
+              %if;(e.notes="on" and (ancestor.has_notes or ancestor.has_event))
+                <table><tr><td>
+                  %ancestor.notes;
+                  %if;ancestor.has_event;
+                    <table>
+                      %foreach;ancestor.event;
+                        <tr>
+                          <td class="align-top text-nowrap" width="1%">
+                            <span class="edate">
+                              %if;event.has_date;%event.date; :
+                              %else;--- :
+                              %end;
+                            </span>
+                          </td>
+                          <td class="align-top">
+                            <span>
+                              %apply;capitalize(event.name)%sp;
+                              %if;event.has_spouse;([with] %event.spouse;)%end;
+                              %if;event.has_place; - %event.place; %end;
+                            </span>
+                            %if;event.has_witnesses;
+                              %foreach;event_witness;
+                                <span>%apply;capitalize(event_witness_kind) :</span>
+                                %apply;short_display_person("event_witness")<br>
+                              %end;
+                            %end;
+                            %if;event.has_note;<div>%event.note;</div>%end;
+                              %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                          </td>
+                        </tr>
+                      %end;
+                    </table>
                   %end;
-                </table>
+                </td></tr></table>
               %end;
-            </td></tr></table>
-          %end;
-          %if;(e.src="on" and ancestor.has_sources)
-            %if;(e.notes="on" and (ancestor.has_notes or ancestor.has_event))<hr>%end;
-            <div class="h5 small"><b>[*source/sources]1</b></div>
-            <div class="small">
-              %foreach;ancestor.source;%apply;capitalize(source_type)[:] %source;.<br>%end;
-            </div>
-          %end;
-          </dd>
+              %if;(e.src="on" and ancestor.has_sources)
+                %if;(e.notes="on" and (ancestor.has_notes or ancestor.has_event))<hr>%end;
+                <div class="h5 small"><b>[*source/sources]1</b></div>
+                <div class="small">
+                  %foreach;ancestor.source;%apply;capitalize(source_type)[:] %source;.<br>%end;
+                </div>
+              %end;
+            </dd>
           </div>
         %end;
         %if;(e.siblings="on" and
@@ -274,7 +274,7 @@
 
 %define;personal_notes()
   %if;((e.notes="on" and (ancestor.has_notes or ancestor.has_event) or e.src="on" and ancestor.has_sources) and e.inline!="on")
-   %sp;<sup><small>(<a href="#notes-%ancestor.anc_sosa.v;">%if;(e.notes="on")[see] [note/notes]0%else;%[source/sources]1%end; %ancestor.anc_sosa;</a>)</small></sup>.
+   %sp;<sup><small>(<a href="#notes-%ancestor.anc_sosa.v;">%if;(e.notes="on")[see] [note/notes]0%else;[source/sources]1%end; %ancestor.anc_sosa;</a>)</small></sup>.
   %end;
 %end;
 
@@ -292,7 +292,7 @@
   %if;(ancestor.index=self.index)%apply;personal_notes() %apply;parents_links()%end;
   %if;(ancestor.index!=index and e.inline="on"). %apply;parents_links()%end;
   %if;((e.notes="on" and (ancestor.has_notes or ancestor.has_event) and e.inline="on") or (e.src="on" and ancestor.has_sources and e.inline="on"))%nn;
-    <div class="mt-2 mb-3 ml-4 mr-2 p-3 shadow">
+    <div class="mt-2 mb-3 ms-4 me-2 p-3 shadow">
       %if;(e.notes="on" and (ancestor.has_notes or ancestor.has_event))
         <div class="h5">[*note/notes]0</div>
         %apply;clean_comment_tags(ancestor.notes)
@@ -300,7 +300,7 @@
           <table>
             %foreach;ancestor.event;
               <tr>
-                <td valign="top" style="white-space: nowrap;" width="1">
+                <td class="align-top text-nowrap">
                   <span class="edate">
                     %if;event.has_date;%event.date; :
                     %else;--- :
@@ -361,7 +361,7 @@
     %apply;somebody_long_info("child")
     %apply;somebody_extra_info("child")
     %if;((e.notes="on" and (child.has_notes or child.has_event) and e.inline="on") or (e.src="on" and child.has_sources and e.inline="on"))
-      .<div class="my-2 ml-4 mr-2 p-3 shadow">
+      .<div class="my-2 ms-4 me-2 p-3 shadow">
         %if;(e.notes="on" and (child.has_notes or child.has_event))
           <div class="h5">[*note/notes]1</div> %apply;clean_comment_tags(child.notes)
           %if;child.has_event;
@@ -407,13 +407,13 @@
       </div>
     %elseif;((e.notes="on" and (child.has_notes or child.has_event) or e.src="on" and child.has_sources) and e.inline!="on")%sp;
       <sup><small>(<a href="#notes-%ancestor.anc_sosa.v;%if;("spec"!="")-spec%end;%apply;letter(child_cnt)">%nn;
-        %if;(e.notes="on")[note/notes]0%else;%[[*source/sources]1%end;
+        %if;(e.notes="on")[*note/notes]0%else;[source/sources]1%end;
          %ancestor.anc_sosa;%if;("spec"!="")-spec%end;%apply;letter(child_cnt)
       </a>)</small></sup>%nn;
     %end;
     %if;not child.has_families;.%else;…%end;
     %foreach;child.family;
-      <div class="my-1 ml-3 mr-2 px-2 py-1 shadow">…
+      <div class="my-1 ms-3 me-2 px-2 py-1 shadow">…
         %apply;married_to%with;child%and;0%end; %apply;somebody("spouse")
         %if;(nb_children=0)%else;, %apply;havingchildren(nb_children)%end;
         %if;are_divorced; ; [divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;
@@ -432,8 +432,8 @@
 %end;
 
 %define;display_remarriage(xx)
-  <div class="mt-2 p-1%if;(ancestor.anc_sosa.v!=1 or (ancestor.anc_sosa.v=1 and "xx"="ancestor.spouse")) pl-3%sp;
-    border-left border-%if;(xx.sex=0)primary%else;danger%end; shadow%end;">
+  <div class="mt-2 p-1%if;(ancestor.anc_sosa.v!=1 or (ancestor.anc_sosa.v=1 and "xx"="ancestor.spouse")) ps-3%sp;
+    border-start border-%if;(xx.sex=0)primary%else;danger%end; shadow%end;">
     <b>%xx;</b>%sp;
     %apply;marriage_timing%with;%apply;getvar%with;main_date%end;%and;%marriage_date.julian_day;%end;%sp;
     %apply;married_to%with;xx%and;0%end; %apply;somebody("spouse")
@@ -513,14 +513,14 @@
     %if;(e_v!="" and level=e_v)
       %foreach;ancestor;
         %if;(ancestor.same!="")
-            <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>[:]
-            [see] <b><a href="#%ancestor.same_v;">%ancestor.same;</a></b>.
+          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>[:]
+          [see] <b><a href="#%ancestor.same_v;">%ancestor.same;</a></b>.
         %else;
-            <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
-            %apply;long_display_ancestor_personal()
-            %if;(ancestor.index!=self.index)
-              <div class="my-1">%apply;long_display_ancestor_families()</div>
-            %end;
+          <b id="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</b>
+          %apply;long_display_ancestor_personal()
+          %if;(ancestor.index!=self.index)
+           <div class="my-1">%apply;long_display_ancestor_families()</div>
+          %end;
         %end;
       %end;
     %end;
@@ -535,10 +535,10 @@
       %if;(level>0)<h4 class="mt-2">[*generation/generations]0 %level;</h4>%end;
       %foreach;ancestor;
         %if;(ancestor.same!="")
-          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</a></b>[:]
-          [see] <b><a href="#%ancestor.same_v;">%ancestor.same;</a></b>.
+          <b id="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</b>[:]
+          [see] <b id="#%ancestor.same_v;">%ancestor.same;</b>.
         %else;
-          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</a></b>
+          <b id="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;.</b>
           %apply;long_display_ancestor_personal()
           <div class="my-1">%apply;long_display_ancestor_families()</div>
         %end;

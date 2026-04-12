@@ -2,8 +2,8 @@
 %( Boutons de configurations et d'options pour les calculs de relations %)
 %let;e_sp;%if;(e.sp!="")0%else;1%end;%in;
 %let;e_im;%if;(e.im!="")0%else;1%end;%in;
-<div class="btn-toolbar my-2 ml-5" role="toolbar"
-  arial-label="config buttons toolbar">
+<div class="btn-toolbar my-2 ms-5" role="toolbar"
+  aria-label="config buttons toolbar">
   <div class="d-flex">
     %let;has_ij;%if;(e.i!="" and e.ei!="")1%elseif;(is_printed_by_template and person_index.1!="" and person_index.2!="")1%end;%in;
     %if;(has_ij=1)
@@ -27,12 +27,12 @@
       %elseif;(e.m!="RL")
         <span class="%if;(e.et="S") border rounded%end;"
           title="[*shortest path]" aria-disabled="true">%nn;
-          <i class="fas fa-bezier-curve fa-fw text-muted"></i>%nn;
+          <i class="fas fa-bezier-curve fa-fw text-body-secondary"></i>%nn;
         </span>
       %end;
     %end;
     %if;(is_printed_by_template and has_ij="1")
-      <a class="ml-2%if;(e.et="A") border rounded%end;"
+      <a class="ms-2%if;(e.et="A") border rounded%end;"
         href="%prefix_no_senv;&em=R&et=A%nn;
           %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
           %else;&i=%person_index.1;&ei=%person_index.2;%nn;
@@ -43,7 +43,7 @@
           %if;(e.color!="")&color=%e.color;%end;%nn;"
         title="[*relationship link/relationship links]1" accesskey="^">%nn;
         <i class="fa fa-user-group fa-fw"></i></a>
-      <a class="ml-2%if;(e.et="M") border rounded%end;"
+      <a class="ms-2%if;(e.et="M") border rounded%end;"
         href="%prefix_no_senv;&em=R&et=M
           %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
           %else;&i=%person_index.1;&ei=%person_index.2;%nn;
@@ -65,33 +65,33 @@
       <span class="invisible"><i class="fa fa-chevron-up fa-fw"></i></span>
     %end;
   </div>
-  <div class="d-flex col-5 ml-5">
+  <div class="d-flex col-5 ms-5">
     <a href="%if;(e_im=1)%url_set.im.0;%else;%url_set.im;%end;"
       %if;(e.dag="on") class="disabled"%end;
       title="%if;(e_im=1)[*visualize/show/hide/summary]2%else;
           [*visualize/show/hide/summary]1%end; [image/images]0">
       <i class="far fa-image fa-lg%if;(e_im=0) text-danger%end;"></i></a>
-    <a class="ml-2"
+    <a class="ms-2"
       href="%if;(e_sp=1)%url_set.sp.0;%else;%url_set.sp;%end;"
        %if;(e.dag="on") class="disabled"%end;
        title="%if;(e_sp=1)[*visualize/show/hide/summary]2%else;
           [*visualize/show/hide/summary]1%end; [spouse/spouses]1">
       <i class="fa fa-user male p-0"></i>%if;(e.sp!="")<i class="fa fa-user female p-0"></i>%end;</a>
     %if;(e.i!="" and e.ei!="")
-      <a class="ml-2" href="%apply;url_set%with;i/ei%and;%e.ei;/%e.i;%end;"
+      <a class="ms-2" href="%apply;url_set%with;i/ei%and;%e.ei;/%e.i;%end;"
         title="[*invert] [person/persons]1">
         <i class="fa fa-people-arrows fa-fw"></i></a>
     %elseif;(evar.i1!="" and person_index.1!="" and evar.i2!="" and person_index.2!="")
-      <a class="ml-2"
+      <a class="ms-2"
         href="%apply;url_set%with;i1/i2/pn%and;%person_index.2;/%person_index.1;%end;"
         title="[*invert] [person/persons]1">
         <i class="fas fa-people-arrows fa-lg fa-fw"></i></a>
     %end;
-    <a class="ml-2"
+    <a class="ms-2"
       href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;"
       target="_blank">
       <i class="fa fa-shuffle fa-fw" title="[*dag]"></i></a>
-    <a class="ml-2" href="%url_set.cgl.on;" target="_blank">
+    <a class="ms-2" href="%url_set.cgl.on;" target="_blank">
       <i class="fa fa-link-slash fa-fw" title="[*cancel GeneWeb links]"></i></a>
     %if;(e.m="RLM")
       <a class="ml-4" title="[*add/clear/show/edit the graph]3"

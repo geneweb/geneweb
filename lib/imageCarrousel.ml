@@ -302,7 +302,7 @@ let print_send_image conf base mode p =
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf
-    {|<input type="file" class="form-control-file ml-1" name="file" accept="image/*">|};
+    {|<input type="file" class="form-control-file ms-1" name="file" accept="image/*">|};
   (match
      Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env
    with
@@ -312,7 +312,7 @@ let print_send_image conf base mode p =
       Output.print_sstring conf " bytes)</p>"
   | None -> ());
   Output.print_sstring conf
-    {|<span>></span><button type="submit" class="btn btn-primary ml-3">|};
+    {|<span>></span><button type="submit" class="btn btn-primary ms-3">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></div></form>";

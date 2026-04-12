@@ -127,7 +127,7 @@
           title="%if;(evar.image="off")[*visualize/show/hide/summary]1%else;%nn;
              [*visualize/show/hide/summary]2%end; [image/images]0">
           <i class="fa fa-image fa-fw"></i>
-          <i class="fa fa-toggle-%if;(evar.image="off")off%else;on%end; text-muted"></i>
+          <i class="fa fa-toggle-%if;(evar.image="off")off%else;on%end; text-body-secondary"></i>
         </a>
     </div>
     %if;(evarv>1 and evar.t="T")
@@ -138,7 +138,7 @@
             title="%if;(evar.marriage!="on")[*visualize/show/hide/summary]1%else;%nn;
                [*visualize/show/hide/summary]2%end; [date of marriage]">
             <i class="fa fa-image fa-fw"></i>
-            <i class="fa fa-toggle-%if;(evar.marriage!="on")off%else;on%end; text-muted"></i>
+            <i class="fa fa-toggle-%if;(evar.marriage!="on")off%else;on%end; text-body-secondary"></i>
           </a>
       </div>
     %end;

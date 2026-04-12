@@ -1,17 +1,18 @@
-<!-- $Id: js.txt v7.1 17/01/2026 10:39:33 $ -->
+<!-- $Id: js.txt v7.1 11/04/2026 02:05:28 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
-            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
-                       sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
-                       sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=
+                       sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI
+                       sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha256-GRJrh0oydT1CwS36bBeJK/2TggpaUQC6GzTaTQdZm0k=
-                       sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct
-                       sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
+    %( %if;((e.m="A" and e.t="") or "NOTES" in e.m) TODO verify if select2 is needed on NOTES %)
+    %if;(e.m="A" and e.t="")
+      <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
+              integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
+                         sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
+                         sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
       <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
               integrity="sha256-9yRP/2EFlblE92vzCA10469Ctd0jT48HnmmMw5rJZrA=
                          sha384-d3UHjPdzJkZuk5H3qKYMLRyWLAQBJbby2yr2Q58hXXtAGF8RSNO9jpLDlKKPv5v3
@@ -38,9 +39,9 @@
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
   %else;
-    <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
-    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=4.6.1"></script>
-    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
+    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.8"></script>
+    %if;(e.m="A" and e.t="")
+      <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
       <script src="%etc_prefix;js/select2.min.js?version=4.1.0rc"></script>
       <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
     %end;
@@ -54,8 +55,8 @@
   %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
     <script src="%etc_prefix;js/rpc_client.min.js?hash=%apply;hash%with;%etc_prefix;js/rpc_client.min.js%end;"></script>
   %end;
-  %if;(e.m="A" and e.t="T" and e.t1="CT")
-    <script src="%etc_prefix;js/jquery.line.js"></script>
+  %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
+    <script src="%etc_prefix;js/line.js?hash=%apply;hash%with;%etc_prefix;js/line.js%end;"></script>
   %end;
   %if;(e.m="CHK_DATA")
     <script src="%etc_prefix;js/checkdata.min.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.min.js%end;"></script>
@@ -124,7 +125,7 @@
     %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
     or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
     or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK")
-      <script>$('body').scrollspy({ target: '#banner' })</script>
+      <script>new bootstrap.ScrollSpy(document.body, { target: '#banner' })</script>
     %end;
   %end;
 %end;
@@ -153,55 +154,116 @@
   });
 </script>
 %end;
+%if;((e.m="A" or e.m="D") and e.t="")
+<script>
+function initBsValidation() {
+  document.querySelectorAll('.needs-validation').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', initBsValidation);
+</script>
+%end;
 %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
-<script%if;(e.templ!="") type="text/javascript"%end;>
- <!--
-   $("#btnshowfilter").on("click", function() {
-    var nbinput = $('input.filter:text:disabled').length;
-    if (nbinput == 4) {
-      $('#input1').prop('disabled', false);
-      $('#filterbysurname').removeClass("d-none");
-      $('#total').addClass("text-muted");
-      $('#input1').focus(); }
-    else {
-      $('.filter').prop('disabled', true);
-      $('#filterbysurname').addClass("d-none");
-      $('#total').removeClass("text-muted"); }
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterbysurname');
+    const btnShow = document.getElementById('btnshowfilter');
+    const btnPlus = document.getElementById('btnplus');
+    const btnClear = document.getElementById('btnclear');
+    const totalEl = document.getElementById('total');
+    const filters = document.querySelectorAll('input.filter');
+    const extraFilters = document.querySelectorAll('input.extrafilter');
+
+    if (!btnShow || !filterForm) return;
+
+    btnShow.addEventListener('click', function() {
+      const allDisabled = Array.from(filters)
+        .every(function(el) { return el.disabled; });
+      if (allDisabled) {
+        const input1 = document.getElementById('input1');
+        input1.disabled = false;
+        filterForm.classList.remove('d-none');
+        if (totalEl) totalEl.classList.add('text-body-secondary');
+        input1.focus();
+      } else {
+        filters.forEach(function(el) { el.disabled = true; });
+        filterForm.classList.add('d-none');
+        if (totalEl) totalEl.classList.remove('text-body-secondary');
+      }
+    });
+
+    if (btnPlus) {
+      btnPlus.addEventListener('click', function() {
+        const activeCount = Array.from(filters)
+          .filter(function(el) { return !el.disabled; }).length;
+        const next = document.getElementById('input' + (activeCount + 1));
+        if (!next) return;
+        next.classList.remove('d-none');
+        next.disabled = false;
+        next.focus();
+        if (activeCount + 1 === 4) {
+          btnPlus.classList.add('disabled');
+          btnPlus.setAttribute('tabindex', '-1');
+        }
+      });
+    }
+
+    if (btnClear) {
+      btnClear.addEventListener('click', function() {
+        extraFilters.forEach(function(el) {
+          el.value = '';
+          el.classList.add('d-none');
+          el.disabled = true;
+        });
+        const input1 = document.getElementById('input1');
+        input1.value = '';
+        input1.focus();
+        btnPlus.classList.remove('disabled');
+        btnPlus.removeAttribute('tabindex');
+        document.querySelectorAll('[data-surname]')
+          .forEach(function(el) { el.classList.remove('d-none'); });
+      });
+    }
+
+    filters.forEach(function(input) {
+      input.addEventListener('input', function() {
+        let v1 = document.getElementById('input1').value || '_';
+        const v2 = document.getElementById('input2').value;
+        const v3 = document.getElementById('input3').value;
+        const v4 = document.getElementById('input4').value;
+        const all = document.querySelectorAll('[data-surname]');
+        all.forEach(function(el) { el.classList.add('d-none'); });
+        [v1, v2, v3, v4].forEach(function(v) {
+          if (v === '') return;
+          document.querySelectorAll('[data-surname*="' + v + '"]')
+            .forEach(function(el) { el.classList.remove('d-none'); });
+        });
+      });
+    });
   });
-  $("#btnplus").on("click", function() {
-    var len = $('.filter:text:not(:disabled)').length + 1;
-    $('#input'+len).removeClass("d-none").prop('disabled', false).focus();
-    if (len == 5) { $("#btnplus").addClass("disabled").attr('tabindex', '-1'); }
-  });
-  $("#btnclear").on("click", function() {
-    $('.extrafilter').val('').addClass("d-none").prop('disabled', true);
-    $('#input1').val('').focus();
-    $('#btnplus').removeClass('disabled').removeAttr('tabindex');
-    $('*[data-surname]').removeClass("d-none");
-  });
-  $('.filter').on("input", function(e) {
-    var input1 = $("#input1").val();
-    var input2 = $("#input2").val();
-    var input3 = $("#input3").val();
-    var input4 = $("#input4").val();
-    var input5 = $("#input5").val();
-    if (input1 == "") { var input1 = "_"; }
-    $('[data-surname]').addClass("d-none");
-    $('[data-surname*="' + input1 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input2 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input3 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input4 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input5 + '"]').removeClass("d-none");
-  });
+
   function implex(xx) {
-    $('[class^="sosa_"]').css("background-color","");
-    $('.sosa_'+xx).add('.sosa_implex_'+xx).css("background-color","#CCFFFF");
+    document.querySelectorAll('[class^="sosa_"]').forEach(function(el) {
+      el.style.backgroundColor = '';
+    });
+    document.querySelectorAll('.sosa_' + xx + ', .sosa_implex_' + xx)
+      .forEach(function(el) { el.style.backgroundColor = '#CCFFFF'; });
   }
+
   function implexdesc(xx) {
-    $('a[data-index]').css("background-color","");
-    $('a[data-index="' + xx + '"]').css("background-color","#CCFFFF");
+    document.querySelectorAll('a[data-index]').forEach(function(a) {
+      a.style.backgroundColor = '';
+    });
+    document.querySelectorAll('a[data-index="' + xx + '"]')
+      .forEach(function(a) { a.style.backgroundColor = '#CCFFFF'; });
   }
-  -->
 </script>
 %end;
 %( Functions for character.txt %)
@@ -293,17 +355,27 @@ function setupToolbarSticky() {
 %( Popover functions for anc/destables %)
 %if;((e.m="A" and e.t="Z") or (e.m="D" and (e.t="H" or e.t="I")))
 <script>
-$('[data-toggle="popover"]').popover({
-  html: true,
-  trigger: "focus",
-  delay: { hide: 250 }
-})
-$('.popover-dismiss').popover({
-  trigger: 'focus'
-})
-$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
-$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
-$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
+document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+  new bootstrap.Popover(el, {
+    html: true,
+    trigger: 'focus',
+    delay: { hide: 250 },
+    allowList: {
+      ...bootstrap.Tooltip.Default.allowList,
+      dl: [],
+      dt: [],
+      dd: []
+    }
+  });
+});
+// Restaurer le tooltip natif au survol via title=, que BS5 mange en l'instanciant comme Popover
+document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').forEach(el => {
+  const helpText = el.getAttribute('data-bs-original-title');
+  if (helpText) {
+    el.addEventListener('mouseenter', () => el.setAttribute('title', helpText));
+    el.addEventListener('mouseleave', () => el.removeAttribute('title'));
+  }
+});
 </script>
 %end;
 <script>
@@ -311,11 +383,11 @@ $.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 // Manages enhanced input field behaviors (navigation, interaction)
 const inputToBook = {
   addNavigation: function() {
-    // Use event delegation for dynamically added inputs
-    $(document).on('mousedown', 'input[data-book]', function(event) {
-      if (event.ctrlKey && event.button === 0) {
+    document.addEventListener('mousedown', function(event) {
+      const input = event.target.closest('input[data-book]');
+      if (input && event.ctrlKey && event.button === 0) {
         event.preventDefault();
-        inputToBook.openBook(this.value, $(this).data('book'));
+        inputToBook.openBook(input.value, input.dataset.book);
       }
     });
   },
@@ -345,55 +417,51 @@ const inputToBook = {
 // Controls unified search functionality with a shared submit button
 // Handles both main person search and optional title search forms
 function initializeWelcomeSearchFunctionality() {
-  const searchForms = {
-    main: document.getElementById('main-search'),
-    title: document.getElementById('title-search')
-  };
+  const mainForm = document.getElementById('main-search');
+  const titleForm = document.getElementById('title-search');
   const searchBtn = document.getElementById('global-search');
+  if (!searchBtn) return;
+
+  const defaultText = '[*search/case sensitive]0';
 
   function hasInput(form) {
     return form && Array.from(form.querySelectorAll('input[type="search"]'))
                       .some(input => input.value.trim() !== '');
   }
+
   function closeAlertsAndCleanURL() {
-    $('.alert').alert('close');
+    document.querySelectorAll('.alert').forEach(el => {
+      bootstrap.Alert.getOrCreateInstance(el).close();
+    });
     const url = new URL(window.location.href);
     const bParam = url.searchParams.get('b');
     url.search = '';
-    if (bParam !== null) {
-      url.searchParams.set('b', bParam); // on remet b=
-    }
+    if (bParam !== null) url.searchParams.set('b', bParam);
     window.history.replaceState({}, '', url);
   }
-  function getTooltip() {
-    if (hasInput(searchForms.main)) {
-      return '[*search/case sensitive]0 [person/persons]0';
+
+  function updateTooltip() {
+    const instance = bootstrap.Tooltip.getInstance(searchBtn);
+    if (!instance) return;
+    let text = defaultText;
+    if (hasInput(mainForm)) text = '[*search/case sensitive]0 [person/persons]0';
+    else if (titleForm && hasInput(titleForm)) text = '[*search/case sensitive]0 [title/titles]0/[estate]0';
+    instance.setContent({ '.tooltip-inner': text });
+    if (text !== defaultText) {
+      instance.show();
+    } else {
+      instance.hide();
     }
-    if (searchForms.title && hasInput(searchForms.title)) {
-      return '[*search/case sensitive]0 [title/titles]0/[estate]0';
-    }
-    return '';
   }
 
-  $(searchBtn).tooltip({
-    title: getTooltip,
-    trigger: 'hover'
-  });
-
-  Object.values(searchForms).forEach(form => {
+  [mainForm, titleForm].forEach(form => {
     if (!form) return;
-
     form.querySelectorAll('input[type="search"]').forEach(input => {
       input.addEventListener('input', () => {
-        if (hasInput(form)) {
-          closeAlertsAndCleanURL();
-        }
-        $(searchBtn).tooltip('hide')
-                   .attr('data-original-title', getTooltip())
-                   .tooltip('show');
+        if (hasInput(form)) closeAlertsAndCleanURL();
+        updateTooltip();
       });
     });
-
     form.addEventListener('keypress', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -403,27 +471,34 @@ function initializeWelcomeSearchFunctionality() {
   });
 
   searchBtn.addEventListener('click', () => {
-    if (hasInput(searchForms.main)) {
-      searchForms.main.submit();
-    }
-    else if (searchForms.title && hasInput(searchForms.title)) {
-      searchForms.title.submit();
-    }
+    if (hasInput(mainForm)) mainForm.submit();
+    else if (titleForm && hasInput(titleForm)) titleForm.submit();
   });
 }
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
 function initializeLazyModules() {
-  $('#load_once_p_mod').one('click', () => $.getScript('%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;'));
-  $('#load_once_copylink').one('click', () => $.getScript('%etc_prefix;js/copylink.js?hash=%apply;hash%with;%etc_prefix;js/copylink.js%end;'));
-  $('#load_once_rlm_builder').one('click', () => $.getScript('%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;'));
+  function loadScriptOnce(buttonId, scriptUrl) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    btn.addEventListener('click', function handler() {
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      document.head.appendChild(script);
+      btn.removeEventListener('click', handler);
+    });
+  }
+  loadScriptOnce('load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
+  loadScriptOnce('load_once_copylink', '%etc_prefix;js/copylink.js?hash=%apply;hash%with;%etc_prefix;js/copylink.js%end;');
+  loadScriptOnce('load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
 }
 %end;
 %if;(e.templ="" and not is_welcome)
 // Focus on found autofocus input in opening BS modal
 function setupModalAutofocus() {
-  $('.modal').on('shown.bs.modal', function() {
-    $(this).find('[autofocus]').focus();
+  document.addEventListener('shown.bs.modal', function(event) {
+    const autofocusEl = event.target.querySelector('[autofocus]');
+    if (autofocusEl) autofocusEl.focus();
   });
 }
 %end;
@@ -464,14 +539,20 @@ function setupFloatingPlaceholders() {
 %if;(e.m="NOTES" or e.m="WIZNOTES")
 // TOC toggle for NOTES and WIZNOTES
 function setupTocToggle() {
-  const toggleTocText = function() {
-    return $('#toc-content').is(':hidden')
+  const tocContent = document.getElementById('toc-content');
+  if (!tocContent) return;
+  function toggleTocText() {
+    return tocContent.hidden
       ? '([visualize/show/hide/summary]1)'
       : '([visualize/show/hide/summary]2)';
-  };
-  $('.toc-toggle').on('click', function() {
-    $('#toc-content').toggle();
-    $('.toc-toggle').text(toggleTocText());
+  }
+  document.querySelectorAll('.toc-toggle').forEach(btn => {
+    btn.addEventListener('click', function() {
+      tocContent.hidden = !tocContent.hidden;
+      document.querySelectorAll('.toc-toggle').forEach(b => {
+        b.textContent = toggleTocText();
+      });
+    });
   });
 }
 %end;
@@ -737,14 +818,15 @@ function populateDatalists() {
 }
 %end;
 const initTooltips = () => {
-  const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
-  if (tooltipElements.length > 0) {
-    $(tooltipElements).tooltip({
-      trigger: 'hover',
-      delay: { show: 200, hide: 50 },
-      container: 'body',
-    });
-  }
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    if (!bootstrap.Tooltip.getInstance(el)) {
+      new bootstrap.Tooltip(el, {
+        trigger: 'hover',
+        delay: { show: 200, hide: 50 },
+        container: 'body'
+      });
+    }
+  });
 };
 function safeInitialize(fn) {
   try {
@@ -793,9 +875,7 @@ document.addEventListener('DOMContentLoaded', () => {
     %end;
   %end;
 %end;
-%if;(is_welcome or "MOD_DATA" in e.m or e.m="RM")
-  initTooltips();
-%end;
+initTooltips();
 %if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
   if (typeof initializeLazyModules === 'function') {
     initializeLazyModules();

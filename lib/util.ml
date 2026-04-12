@@ -1064,7 +1064,7 @@ let mod_ind_link conf p (s : Adef.safe_string) =
     let s = (s :> string) in
     let href = "m=MOD_IND&i=" ^ Driver.Iper.to_string (Driver.get_iper p) in
     let txt =
-      if s = "" then {|<i class="fa fa-wrench fa-xs ml-1" alt=" (edit)"></i>|}
+      if s = "" then {|<i class="fa fa-wrench fa-xs ms-1" alt=" (edit)"></i>|}
       else s
     in
     Format.sprintf {|<a href="%s%s">%s</a>|} (commd conf :> string) href txt
@@ -3473,7 +3473,7 @@ let print_loading_overlay conf ?custom_translation_key () =
     {|<div class="loading-overlay hidden">
   <div class="text-center">
     <div class="spinner-border text-light mb-3" role="status">
-      <span class="sr-only">Loading…</span>
+      <span class="visually-hidden">Loading…</span>
     </div>
     <h4>%s</h4>
     <p>%s</p>
@@ -3531,8 +3531,8 @@ let evar_buttons conf _query_string evar_l title_text =
         acc
         ^ Printf.sprintf
             {|<a href="%s"
-            class="btn btn-outline-secondary btn-sm ml-auto">
-            <i class="fa fa-%s mr-1"></i>%s</a>|}
+            class="btn btn-outline-secondary btn-sm ms-auto">
+            <i class="fa fa-%s me-1"></i>%s</a>|}
             toggle_url
             (if toggle then "plus" else "minus")
             button_text)

@@ -1,11 +1,11 @@
-<!-- $Id: notes_gallery.txt v7.1 20/03/2026 05:14:20 $ -->
+<!-- $Id: notes_gallery.txt v8.0 12/04/2026 - vanilla JS, maphilight v2 API $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
   <title>[*gallery]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%image_prefix;favicon_gwd.png">
   <link rel="apple-touch-icon" href="%image_prefix;favicon_gwd.png">
   %include;css
@@ -14,13 +14,13 @@
 <body%body_prop;>
 <div class="container-fluid">
   %include;home
-  <div class="small float-right mr-2 mt-2">
+  <div class="small float-end me-2 mt-2">
     (<a href="%url;&ref=on" title="[*gallery backlinks]">&lt;-</a>)
-    %if(wizard)(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)%end;
+    %if;wizard;(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)%end;
   </div>
-  <h1 id="h1" class="ml-3 mb-0">[*loading/error]0</h1>
-  <p id="chronicle" class="ml-3 mb-0 text-muted d-none"></p>
-  <div id="index-wall" class="flex-wrap mt-3 ml-3 d-none"></div>
+  <h1 id="h1" class="ms-3 mb-0">[*loading/error]0</h1>
+  <p id="chronicle" class="ms-3 mb-0 text-body-secondary d-none"></p>
+  <div id="index-wall" class="flex-wrap mt-3 ms-3 d-none"></div>
   <div id="album-nav" class="d-none justify-content-center">
     <div class="p-2 bd-highlight"><a id="home" href="#" onclick="loadIndex(); return false;" title="[*gallery index]"><i class="fa-solid fa-house"></i></a></div>
     <div class="p-2 bd-highlight"><a id="first" href="#" title="[*first]" onclick="loadFirstImage(); return false;"><i class="fa-solid fa-backward"></i></a></div>
@@ -29,38 +29,30 @@
     <div class="p-2 bd-highlight"><a id="next" href="#" title="[*next]" onclick="loadNextImage(); return false;"><i class="fa-solid fa-caret-right"></i></a></div>
     <div class="p-2 bd-highlight"><a id="last" href="#" title="[*last]" onclick="loadLastImage(); return false;"><i class="fa-solid fa-forward"></i></a></div>
   </div>
-  <div id="gallery-view" class="ml-3">
-    <map id="map" name="map"></map>
+  <div id="gallery-view" class="ms-3">
+    <map id="imap-notes" name="imap-notes"></map>
     <div>
-      <!-- next img pops a w3c error “no src” attribute: managed on javascript side -->
-      <img id="image" usemap="#map" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+      <img id="image" usemap="#imap-notes" alt="" hidden>
       <span id="description" class="mx-1"></span>
     </div>
-    <div class="d-none ml-3" id="div_legend">%nn;
+    <div class="d-none ms-3" id="div_legend">%nn;
       [*on this image][:]
       <a id="rlm" href="%prefix;m=RLM" title="[*relations tree]"><img src="%image_prefix;/gui_create.png" height="18" alt="relation tree"></a>
-      <div id="legend" class="list-comma list-unstyled pl-1"></div>
+      <div id="legend" class="list-comma list-unstyled ps-1"></div>
     </div>
     <div class="d-none" id="div_unknown">%nn;
-      [*unknown person][:]%nn; <ul id="unknown" class="d-inline list-comma list-unstyled pl-0"></ul>
+      [*unknown person][:]%nn; <ul id="unknown" class="d-inline list-comma list-unstyled ps-0"></ul>
     </div>
   </div>
 </div>
 %include;trl
 %include;copyr
-
 %include;js
 %query_time;
-%if;(b.use_cdn="yes")
-  <script src="https://cdn.jsdelivr.net/npm/maphilight@1.4.2/jquery.maphilight.min.js"
-    integrity="sha256-CMISu7vXb6gfvgekngAzo/Mk2GOoFeLy9UIqjtJrt5Y=
-               sha384-+gw07sufgVITpP4bHCQQeafUY2NQfyPBM3+931FUWejozbZ0+hCcd8dTUP4epnQK
-               sha512-1YiTT24MNHA6DRzyu+w9F5Egc8evYlyEnzSSTD4/M7q42xEb5fSpNgn0+1CPy3evubHs3xdlh8uXgae0DOhR7Q=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-%else;
-  <script src="%etc_prefix;js/jquery.maphilight.min.js?version=1.4.2"></script>
-%end;
+<script src="%etc_prefix;js/maphilight.min.js?hash=%apply;hash%with;%etc_prefix;js/maphilight.min.js%end;"></script>
 <script>
+'use strict';
+
 const MAPHILIGHT_CONFIG = {
   fillColor: 'ff0000',
   fillOpacity: 0.15,
@@ -72,103 +64,126 @@ const MAPHILIGHT_CONFIG = {
 
 // palette alternant chaud/froid/pastel + bon contraste avec bleu #007bbf (0.3 opacity)
 const GROUP_COLORS = %[
-  'ff6b6b', // 1. Rouge corail
-  'a0c4ff', // 2. Bleu ciel
-  'ffd93d', // 3. Jaune doré
-  'c7ceea', // 4. Lavande
-  'ffaaa5', // 5. Pêche
-  '4ecdc4', // 6. Cyan
-  'fdcb6e', // 7. Jaune moutarde
-  'ff8b94', // 8. Rose
-  '74b9ff', // 9. Bleu clair
-  'ffc3a0', // 10. Abricot
-  'a8e6cf', // 11. Vert menthe
-  'ffc6ff', // 12. Rose bonbon
-  'b4f8c8', // 13. Vert pastel
-  'ff7675', // 14. Rouge doux
-  '89e5e5', // 15. Turquoise clair
-  'ffeaa7', // 16. Jaune pâle
-  'd4a5ff', // 17. Violet pastel
-  'fab1a0', // 18. Saumon
-  'c7f0db', // 19. Vert d'eau
-  'fd79a8', // 20. Rose vif
-  'fff3cd', // 21. Crème
-  'ffccf9', // 22. Mauve rosé
-  'ffe0f0', // 23. Rose poudré
-  'ffd9e8'  // 24. Rose très pâle
+  'ff6b6b', 'a0c4ff', 'ffd93d', 'c7ceea', 'ffaaa5', '4ecdc4',
+  'fdcb6e', 'ff8b94', '74b9ff', 'ffc3a0', 'a8e6cf', 'ffc6ff',
+  'b4f8c8', 'ff7675', '89e5e5', 'ffeaa7', 'd4a5ff', 'fab1a0',
+  'c7f0db', 'fd79a8', 'fff3cd', 'ffccf9', 'ffe0f0', 'ffd9e8'
 %];
 
 let current = 0;
 let imagesCount = 0;
 let json, images_l;
-let groupLocked = {};
+const groupLocked = {};      // { group1: true, group2: false, ... }
+const lockedColors = {};     // { area3: 'ff6b6b', ... } — par id d'area
+let colorOffset = 0;
 
-function get(v) { return v !== undefined ? v : ""; }
+// --- Small DOM helpers -------------------------------------------------
+const $$  = (sel, root) => (root || document).querySelector(sel);
+const $$$ = (sel, root) => (root || document).querySelectorAll(sel);
+const get = v => v !== undefined ? v : '';
+
+function emptyNode(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+
+// Highlight config pour une area donnée, en tenant compte de son état locké.
+// Retourne la config à passer à maphilight.set().
+function configFor(area, opts) {
+  opts = opts || {};
+  const color = lockedColors[area.id];
+  if (color) {
+    return {
+      ...MAPHILIGHT_CONFIG,
+      alwaysOn: true,
+      fillColor: color,
+      strokeColor: color,
+      fillOpacity: opts.boost ? 0.5 : 0.2,
+      groupBy: false
+    };
+  }
+  if (opts.hover) {
+    return { ...MAPHILIGHT_CONFIG, alwaysOn: true, groupBy: false };
+  }
+  return MAPHILIGHT_CONFIG;
+}
+
+// Met à jour la couleur de fond du label de légende associé à une area.
+function paintLegend(areaId, color) {
+  const legendLink = $$('#' + areaId.replace('area', 'a') + ' span a');
+  if (legendLink) legendLink.style.backgroundColor = color || '';
+}
+
+// Unifie l'entrée en highlight (hover area OU hover legend item)
+function enterArea(area) {
+  const color = lockedColors[area.id];
+  maphilight.set(area, configFor(area, { hover: true, boost: !!color }));
+  paintLegend(area.id, color ? '#' + color + 'aa' : '#ffccaa');
+}
+
+function leaveArea(area) {
+  const color = lockedColors[area.id];
+  maphilight.set(area, configFor(area));
+  paintLegend(area.id, color ? '#' + color + '66' : '');
+}
+
+// --- Image rendering ---------------------------------------------------
 
 function displayImage(img) {
-  $("#map, #legend").empty();
-  $("#div_legend").addClass("d-none");
-  $("#h1").html(json.title);
-  $("#description").html(img.desc || json.desc || "");
-  $("#image").attr("src", "%prefix;m=DOC&s=" + img.img);
-  
+  const map = $$('#imap-notes');
+  const legend = $$('#legend');
+  emptyNode(map);
+  emptyNode(legend);
+  $$('#div_legend').classList.add('d-none');
+  $$('#h1').innerHTML = json.title;
+  $$('#description').innerHTML = img.desc || json.desc || '';
+  const imageEl = $$('#image');
+  imageEl.src = '%prefix;m=DOC&s=' + img.img;
+  imageEl.hidden = false;
+
   let cnt = 1, cnt_rlm = 1;
   const hasGroups = img.groups?.length;
   const ungrouped = [];
+  const rlmEl = $$('#rlm');
 
   img.map.forEach(r => {
-    const t = get(r.t) || "p";
-    let href, txt, rlmParams = "";
-    let comment = get(r.alt) ? ` (${r.alt})` : "";
-    if (t === "p") {
+    const t = get(r.t) || 'p';
+    let href, txt, rlmParams = '';
+    let comment = get(r.alt) ? ` (${r.alt})` : '';
+    if (t === 'p') {
       if (!r.fn && !r.sn) { cnt++; return; }
-      const oc = get(r.oc) && r.oc != "0"
-        ? `&oc=${r.oc}` : "";
+      const oc = get(r.oc) && r.oc != '0' ? `&oc=${r.oc}` : '';
       href = `%prefix;&p=${r.fn}&n=${r.sn}${oc}`;
       txt = `${r.fn} ${r.sn}`;
-      rlmParams =
-        `&p${cnt_rlm}=${r.fn}&n${cnt_rlm}=${r.sn}${oc}`;
+      rlmParams = `&p${cnt_rlm}=${r.fn}&n${cnt_rlm}=${r.sn}${oc}`;
       cnt_rlm++;
-    } else if (t === "g") {
+    } else if (t === 'g') {
       href = `%prefix;${get(r.href)}`;
       txt = get(r.alt) || get(r.href);
-      comment = "";
-    } else if (t === "e") {
+      comment = '';
+    } else if (t === 'e') {
       href = get(r.href);
       txt = get(r.alt) || get(r.href);
-      comment = "";
+      comment = '';
     } else { cnt++; return; }
 
     const groupNum = r.group || 0;
-    const groupClass = (hasGroups && groupNum)
-      ? ` class='group${groupNum}'` : "";
-    const areaHtml = `<area id='area${cnt}'`
-      + ` shape='${get(r.shape)}'`
-      + ` coords='${get(r.coords)}'`
-      + ` alt='${txt}${comment}'`
-      + ` title='${txt}${comment}'`
-      + ` href='${href}'${groupClass}`
-      + ` target='_blank'>`;
-    const legendHtml = `<li class='legend' id='a${cnt}'>`
-      + `<span><a href="${href}" target='_blank'>`
-      + `${txt}</a>${comment}</span></li>`;
+    const groupClass = (hasGroups && groupNum) ? ` class='group${groupNum}'` : '';
+    const areaHtml =
+      `<area id='area${cnt}' shape='${get(r.shape)}' coords='${get(r.coords)}'` +
+      ` alt='${txt}${comment}' title='${txt}${comment}'` +
+      ` href='${href}'${groupClass} target='_blank'>`;
+    const legendHtml =
+      `<li class='legend' id='a${cnt}'>` +
+      `<span><a href="${href}" target='_blank'>${txt}</a>${comment}</span></li>`;
 
     if (rlmParams) {
-      $("#rlm").attr("href",
-        $("#rlm").attr("href") + rlmParams);
+      rlmEl.setAttribute('href', rlmEl.getAttribute('href') + rlmParams);
     }
 
-    const item = {
-      id: cnt, areaHtml: areaHtml,
-      legendHtml: legendHtml, groupNum: groupNum
-    };
+    const item = { id: cnt, areaHtml, legendHtml, groupNum };
 
     if (hasGroups && groupNum) {
-      const bucket = img.groups.find(
-        g => g.name == groupNum);
+      const bucket = img.groups.find(g => g.name == groupNum);
       if (bucket) {
-        if (!bucket._items) bucket._items = [];
-        bucket._items.push(item);
+        (bucket._items ||= []).push(item);
       } else {
         ungrouped.push(item);
       }
@@ -181,335 +196,263 @@ function displayImage(img) {
   // Render grouped items
   if (hasGroups) {
     img.groups.forEach(g => {
-      if (!g._items || !g._items.length) return;
-      let itemsHtml = "";
+      if (!g._items?.length) return;
+      let itemsHtml = '';
       g._items.forEach(item => {
-        $("#map").append(item.areaHtml);
+        map.insertAdjacentHTML('beforeend', item.areaHtml);
         itemsHtml += item.legendHtml;
       });
-      $("#legend").append(
-        `<div class="imap-group mb-2">`
-        + `<div class="imap-group-legend" id="g${g.name}">`
-        + `<a href="#" title="[*lock group]">`
-        + `${g.label}</a></div>`
-        + `<ul class="list-comma list-unstyled pl-3">`
-        + `${itemsHtml}</ul></div>`);
+      legend.insertAdjacentHTML('beforeend',
+        `<div class="imap-group mb-2">` +
+        `<div class="imap-group-legend" id="g${g.name}">` +
+        `<a href="#" title="[*lock group]">${g.label}</a></div>` +
+        `<ul class="list-comma list-unstyled ps-3">${itemsHtml}</ul></div>`);
       delete g._items;
     });
   }
 
   // Render ungrouped items
   ungrouped.forEach(item => {
-    $("#map").append(item.areaHtml);
-    $("#legend").append(item.legendHtml);
+    map.insertAdjacentHTML('beforeend', item.areaHtml);
+    legend.insertAdjacentHTML('beforeend', item.legendHtml);
   });
 
   if (cnt > 1 || ungrouped.length) {
-    $("#div_legend").removeClass("d-none");
+    $$('#div_legend').classList.remove('d-none');
   }
-  $("#image").maphilight(MAPHILIGHT_CONFIG);
+  maphilight(imageEl, MAPHILIGHT_CONFIG);
 }
 
-$(document).on("mouseover", "area", function() {
-  const $area = $(this);
-  const areaId = $area.attr('id');
-  const groupClass = $area.attr('class');
+// --- Event delegation --------------------------------------------------
 
-  if (groupClass && groupLocked[groupClass]) {
-    const lockedColor = $area.data('locked-color');
-    if (lockedColor) {
-      $area.data('maphilight', {
-        ...MAPHILIGHT_CONFIG,
-        alwaysOn: true,
-        fillColor: lockedColor,
-        fillOpacity: 0.5,
-        strokeColor: lockedColor,
-        groupBy: false
-      }).trigger('alwaysOn.maphilight');
-
-      $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '#' + lockedColor + 'aa');
-    }
-  } else {
-    $area.data('maphilight', { ...MAPHILIGHT_CONFIG, alwaysOn: true, groupBy: false }).trigger('alwaysOn.maphilight');
-    $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '#ffccaa');
-  }
+// Hover sur une area (image map)
+document.addEventListener('mouseover', e => {
+  const area = e.target.closest('area');
+  if (area) enterArea(area);
+});
+document.addEventListener('mouseout', e => {
+  const area = e.target.closest('area');
+  if (area) leaveArea(area);
 });
 
-$(document).on("mouseout", "area", function() {
-  const $area = $(this);
-  const areaId = $area.attr('id');
-  const groupClass = $area.attr('class');
-
-  if (groupClass && groupLocked[groupClass]) {
-    const lockedColor = $area.data('locked-color');
-    if (lockedColor) {
-      $area.data('maphilight', {
-        ...MAPHILIGHT_CONFIG,
-        alwaysOn: true,
-        fillColor: lockedColor,
-        fillOpacity: 0.2,
-        strokeColor: lockedColor,
-        groupBy: false
-      }).trigger('alwaysOn.maphilight');
-
-      $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '#' + lockedColor + '66');
-    }
-  } else {
-    $area.data('maphilight', MAPHILIGHT_CONFIG).trigger('alwaysOn.maphilight');
-    $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '');
-  }
+// Hover sur un item de légende individuel (pas le label de groupe)
+document.addEventListener('mouseover', e => {
+  const li = e.target.closest('.legend:not(.imap-group-legend)');
+  if (!li) return;
+  const area = $$('#' + li.id.replace('a', 'area'));
+  if (area) enterArea(area);
+});
+document.addEventListener('mouseout', e => {
+  const li = e.target.closest('.legend:not(.imap-group-legend)');
+  if (!li) return;
+  const area = $$('#' + li.id.replace('a', 'area'));
+  if (area) leaveArea(area);
 });
 
-$(document).on("mouseover", ".legend:not(.imap-group-legend)", function() {
-  const areaId = $(this).attr('id').replace('a', 'area');
-  const $area = $('#' + areaId);
-  const groupClass = $area.attr('class');
-
-  if (groupClass && groupLocked[groupClass]) {
-    const lockedColor = $area.data('locked-color');
-    if (lockedColor) {
-      $area.data('maphilight', {
-        ...MAPHILIGHT_CONFIG,
-        alwaysOn: true,
-        fillColor: lockedColor,
-        fillOpacity: 0.5,
-        strokeColor: lockedColor,
-        groupBy: false
-      }).trigger('alwaysOn.maphilight');
-
-      $(this).find('span a').css('background-color', '#' + lockedColor + 'aa');
-    }
-  } else {
-    $(this).find('span a').css('background-color', '#ffccaa');
-    $area.data('maphilight', { ...MAPHILIGHT_CONFIG, alwaysOn: true, groupBy: false }).trigger('alwaysOn.maphilight');
-  }
-});
-
-$(document).on("mouseout", ".legend:not(.imap-group-legend)", function() {
-  const areaId = $(this).attr('id').replace('a', 'area');
-  const $area = $('#' + areaId);
-  const groupClass = $area.attr('class');
-
-  if (groupClass && groupLocked[groupClass]) {
-    const lockedColor = $area.data('locked-color');
-    if (lockedColor) {
-      $area.data('maphilight', {
-        ...MAPHILIGHT_CONFIG,
-        alwaysOn: true,
-        fillColor: lockedColor,
-        fillOpacity: 0.2,
-        strokeColor: lockedColor,
-        groupBy: false
-      }).trigger('alwaysOn.maphilight');
-
-      $(this).find('span a').css('background-color', '#' + lockedColor + '66');
-    }
-  } else {
-    $(this).find('span a').css('background-color', '');
-    $area.data('maphilight', MAPHILIGHT_CONFIG).trigger('alwaysOn.maphilight');
-  }
-});
-
-let colorOffset = 0;
-
-$(document).on("mouseover", ".imap-group-legend", function() {
-  const groupNum = $(this).attr('id').replace('g', '');
-  const groupClass = 'group' + groupNum;
-  
+// Hover sur un label de groupe : colore toutes ses areas d'une palette tournante
+// (effet éphémère : s'annule au mouseout sauf si le groupe est locké)
+document.addEventListener('mouseover', e => {
+  const label = e.target.closest('.imap-group-legend');
+  if (!label) return;
+  const groupClass = 'group' + label.id.replace('g', '');
   if (groupLocked[groupClass]) return;
-  
-  $('.' + groupClass).each(function(index) {
-    const $area = $(this);
-    const areaId = $area.attr('id');
+
+  $$$('.' + groupClass).forEach((area, index) => {
     const color = GROUP_COLORS%[(colorOffset + index) % GROUP_COLORS.length%];
-    
-    $area.data('maphilight', {
-      ...MAPHILIGHT_CONFIG,
-      alwaysOn: true,
-      fillColor: color,
-      strokeColor: color,
-      groupBy: false
-    }).trigger('alwaysOn.maphilight');
-    
-    $area.data('locked-color', color);
-    $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '#' + color + '66');
+    lockedColors[area.id] = color;
+    maphilight.set(area, {
+      ...MAPHILIGHT_CONFIG, alwaysOn: true,
+      fillColor: color, strokeColor: color, groupBy: false
+    });
+    paintLegend(area.id, '#' + color + '66');
   });
 });
 
-$(document).on("mouseout", ".imap-group-legend", function() {
-  const groupNum = $(this).attr('id').replace('g', '');
-  const groupClass = 'group' + groupNum;
-  
+document.addEventListener('mouseout', e => {
+  const label = e.target.closest('.imap-group-legend');
+  if (!label) return;
+  const groupClass = 'group' + label.id.replace('g', '');
   if (groupLocked[groupClass]) return;
-  
-  const groupSize = $('.' + groupClass).length;
-  colorOffset += groupSize;
-  
-  $('.' + groupClass).each(function() {
-    const $area = $(this);
-    const areaId = $area.attr('id');
-    
-    $area.removeData('locked-color');
-    $area.data('maphilight', MAPHILIGHT_CONFIG).trigger('alwaysOn.maphilight');
-    $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '');
+
+  const areas = $$$('.' + groupClass);
+  colorOffset += areas.length;
+  areas.forEach(area => {
+    delete lockedColors[area.id];
+    maphilight.set(area, MAPHILIGHT_CONFIG);
+    paintLegend(area.id, '');
   });
 });
 
-$(document).on("click", ".imap-group-legend", function(e) {
+// Clic sur un label de groupe : lock/unlock
+document.addEventListener('click', e => {
+  const label = e.target.closest('.imap-group-legend');
+  if (!label) return;
   e.preventDefault();
-  const groupNum = $(this).attr('id').replace('g', '');
-  const groupClass = 'group' + groupNum;
-  
+  const groupClass = 'group' + label.id.replace('g', '');
+
+  // Si on lock un nouveau groupe, délocker tous les autres d'abord
   if (!groupLocked[groupClass]) {
-    Object.keys(groupLocked).forEach(otherGroup => {
-      if (groupLocked[otherGroup]) {
-        groupLocked[otherGroup] = false;
-        $('.imap-group-legend').removeClass('imap-locked');
-        
-        $('area[class^="group"]').each(function() {
-          const areaId = $(this).attr('id');
-          $(this).removeData('locked-color');
-          $(this).data('maphilight', MAPHILIGHT_CONFIG).trigger('alwaysOn.maphilight');
-          $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '');
+    Object.keys(groupLocked).forEach(other => {
+      if (groupLocked[other]) {
+        groupLocked[other] = false;
+        $$$('.imap-group-legend').forEach(el => el.classList.remove('imap-locked'));
+        $$$('area[class^="group"]').forEach(area => {
+          delete lockedColors[area.id];
+          maphilight.set(area, MAPHILIGHT_CONFIG);
+          paintLegend(area.id, '');
         });
       }
     });
   }
-  
+
   groupLocked[groupClass] = !groupLocked[groupClass];
-  $(this).toggleClass('imap-locked');
-  
+  label.classList.toggle('imap-locked');
+
+  const areas = $$$('.' + groupClass);
   if (groupLocked[groupClass]) {
-    let needsColors = false;
-    $('.' + groupClass).first().each(function() {
-      if (!$(this).data('locked-color')) needsColors = true;
-    });
-    
-    if (needsColors) {
-      $('.' + groupClass).each(function(index) {
-        const color = GROUP_COLORS%[(colorOffset + index) % GROUP_COLORS.length%];
-        $(this).data('locked-color', color);
+    // Assigner les couleurs si pas déjà fait (cas click direct sans hover préalable)
+    const firstArea = areas[0];
+    if (firstArea && !lockedColors[firstArea.id]) {
+      areas.forEach((area, index) => {
+        lockedColors[area.id] = GROUP_COLORS%[(colorOffset + index) % GROUP_COLORS.length%];
       });
-      colorOffset += $('.' + groupClass).length;
+      colorOffset += areas.length;
     }
-    
-    $('.' + groupClass).each(function() {
-      const color = $(this).data('locked-color');
-      const areaId = $(this).attr('id');
-      
-      $(this).data('maphilight', {
-        ...MAPHILIGHT_CONFIG,
-        alwaysOn: true,
-        fillColor: color,
-        fillOpacity: 0.2,
-        strokeColor: color,
-        groupBy: false
-      }).trigger('alwaysOn.maphilight');
-      
-      $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '#' + color + '66');
+    areas.forEach(area => {
+      const color = lockedColors[area.id];
+      maphilight.set(area, {
+        ...MAPHILIGHT_CONFIG, alwaysOn: true,
+        fillColor: color, strokeColor: color,
+        fillOpacity: 0.2, groupBy: false
+      });
+      paintLegend(area.id, '#' + color + '66');
     });
   } else {
-    $('.' + groupClass).each(function() {
-      const areaId = $(this).attr('id');
-      $(this).removeData('locked-color');
-      $(this).data('maphilight', MAPHILIGHT_CONFIG).trigger('alwaysOn.maphilight');
-      $('#' + areaId.replace('area', 'a') + ' span a').css('background-color', '');
+    areas.forEach(area => {
+      delete lockedColors[area.id];
+      maphilight.set(area, MAPHILIGHT_CONFIG);
+      paintLegend(area.id, '');
     });
   }
 });
 
+// --- Navigation --------------------------------------------------------
+
 function updateNavButtons() {
-  $("#first, #previous").toggleClass("disabled text-muted",
-    current <= 0);
-  $("#next, #last").toggleClass("disabled text-muted",
-    current >= imagesCount - 1);
+  const atStart = current <= 0;
+  const atEnd   = current >= imagesCount - 1;
+  ['#first', '#previous'].forEach(sel => {
+    const el = $$(sel);
+    if (!el) return;
+    el.classList.toggle('disabled', atStart);
+    el.classList.toggle('text-body-secondary', atStart);
+  });
+  ['#next', '#last'].forEach(sel => {
+    const el = $$(sel);
+    if (!el) return;
+    el.classList.toggle('disabled', atEnd);
+    el.classList.toggle('text-body-secondary', atEnd);
+  });
 }
 
 function loadCurrentImage() {
   displayImage(images_l[current]);
-  $("#current").text(current + 1);
-  $("#imageCount").text(imagesCount);
-  $("#index-wall").removeClass("d-flex").addClass("d-none");
-  $("#gallery-view").addClass("d-inline-flex").removeClass("d-none");
+  $$('#current').textContent = current + 1;
+  $$('#imageCount').textContent = imagesCount;
+  $$('#index-wall').classList.remove('d-flex');
+  $$('#index-wall').classList.add('d-none');
+  $$('#gallery-view').classList.add('d-inline-flex');
+  $$('#gallery-view').classList.remove('d-none');
+  const nav = $$('#album-nav');
   if (imagesCount > 1) {
-    $("#album-nav").addClass("d-flex");
+    nav.classList.remove('d-none'); nav.classList.add('d-flex');
+  } else {
+    nav.classList.remove('d-flex'); nav.classList.add('d-none');
   }
-  var u = new URL(window.location);
-  u.searchParams.set("img", current + 1);
-  history.replaceState(null, "", u);
-  var $edit = $("#edit_link");
-  if ($edit.length) {
-    var base = "%prefix;m=MOD_NOTES&f=%e.f;";
-    $edit.attr("href", base + "&img=" + (current + 1));
+  const u = new URL(window.location);
+  u.searchParams.set('img', current + 1);
+  history.replaceState(null, '', u);
+  const edit = $$('#edit_link');
+  if (edit) {
+    edit.setAttribute('href', '%prefix;m=MOD_NOTES&f=%e.f;&img=' + (current + 1));
   }
   updateNavButtons();
 }
 
 function loadIndex() {
-  $("#map, #legend").empty();
-  $("#gallery-view").removeClass("d-inline-flex").addClass("d-none");
-  $("#index-wall").empty().addClass("d-flex").removeClass("d-none");
-  $("#h1").html(json.title);
-  var chr = json.chronicle || "";
-  if (chr) { $("#chronicle").html(chr).removeClass("d-none"); }
-  else { $("#chronicle").addClass("d-none"); }
-  $("#album-nav").removeClass("d-flex");
-  images_l.forEach(function(img, i) {
-    var desc = img.desc || "";
-    var label = desc ? (i + 1) + ". " + desc : ". " + (i + 1);
-    var url = "%prefix;m=DOC&s=" + img.img;
-    var html = '<div class="imap-gallery" data-img="' + (i + 1) + '"'
-      + ' data-toggle="tooltip" data-html="true"'
-      + ' title="' + label.replace(/"/g, '&quot;') + '"'
-      + ' style="cursor:pointer">'
-      + '<img src="' + url + '" alt="">'
-      + '<div class="gallery-legend">' + label + '</div></div>';
-    $("#index-wall").append(html);
+  emptyNode($$('#imap-notes'));
+  emptyNode($$('#legend'));
+  $$('#gallery-view').classList.remove('d-inline-flex');
+  $$('#gallery-view').classList.add('d-none');
+  const wall = $$('#index-wall');
+  emptyNode(wall);
+  wall.classList.add('d-flex');
+  wall.classList.remove('d-none');
+  $$('#h1').innerHTML = json.title;
+  const chr = json.chronicle || '';
+  const chrEl = $$('#chronicle');
+  if (chr) { chrEl.innerHTML = chr; chrEl.classList.remove('d-none'); }
+  else { chrEl.classList.add('d-none'); }
+  $$('#album-nav').classList.remove('d-flex');
+  $$('#album-nav').classList.add('d-none');
+
+  images_l.forEach((img, i) => {
+    const desc = img.desc || '';
+    const label = desc ? (i + 1) + '. ' + desc : '. ' + (i + 1);
+    const url = '%prefix;m=DOC&s=' + img.img;
+    const html =
+      `<div class="imap-gallery" data-img="${i + 1}"` +
+      ` data-bs-toggle="tooltip" data-bs-html="true"` +
+      ` title="${label.replace(/"/g, '&quot;')}"` +
+      ` style="cursor:pointer">` +
+      `<img src="${url}" alt="">` +
+      `<div class="gallery-legend">${label}</div></div>`;
+    wall.insertAdjacentHTML('beforeend', html);
   });
-  $("#index-wall [data-toggle='tooltip']").tooltip();
-  var u = new URL(window.location);
-  u.searchParams.delete("img");
-  history.replaceState(null, "", u);
+
+  // BS5 tooltip init (remplace $.tooltip() de BS4)
+  $$$('#index-wall [data-bs-toggle="tooltip"]').forEach(
+    el => new bootstrap.Tooltip(el));
+
+  const u = new URL(window.location);
+  u.searchParams.delete('img');
+  history.replaceState(null, '', u);
   current = -1;
-  var $edit = $("#edit_link");
-  if ($edit.length) {
-    $edit.attr("href", "%prefix;m=MOD_NOTES&f=%e.f;");
-  }
+  const edit = $$('#edit_link');
+  if (edit) edit.setAttribute('href', '%prefix;m=MOD_NOTES&f=%e.f;');
 }
 
-function loadFirstImage() {
-  if (current <= 0) return;
-  current = 0; loadCurrentImage();
-}
-function loadLastImage() {
-  if (current >= imagesCount - 1) return;
-  current = imagesCount - 1; loadCurrentImage();
-}
-function loadNextImage() {
-  if (current >= imagesCount - 1) return;
-  current++; loadCurrentImage();
-}
-function loadPreviousImage() {
-  if (current <= 0) return;
-  current--; loadCurrentImage();
-}
+function loadFirstImage()    { if (current <= 0) return; current = 0; loadCurrentImage(); }
+function loadLastImage()     { if (current >= imagesCount - 1) return; current = imagesCount - 1; loadCurrentImage(); }
+function loadNextImage()     { if (current >= imagesCount - 1) return; current++; loadCurrentImage(); }
+function loadPreviousImage() { if (current <= 0) return; current--; loadCurrentImage(); }
 
-$(document).ready(function() {
-  $("#index-wall").on("click", "[data-img]", function(e) {
+// --- Boot --------------------------------------------------------------
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Click sur une vignette de l'index
+  $$('#index-wall').addEventListener('click', e => {
+    const tile = e.target.closest('[data-img]');
+    if (!tile) return;
     e.preventDefault();
-    current = parseInt($(this).data("img")) - 1;
+    current = parseInt(tile.dataset.img, 10) - 1;
     loadCurrentImage();
   });
-  $.ajax("%url;&ajax=on")
-    .done(function(j) {
+
+  fetch('%url;&ajax=on')
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(j => {
       json = j;
       images_l = j.images?.length
         ? j.images
         : [{ img: j.img, map: j.map, groups: j.groups }];
       imagesCount = images_l.length;
       document.title = json.title;
-      var p = new URLSearchParams(window.location.search);
-      var si = parseInt(p.get("img")) || 0;
+      const p = new URLSearchParams(window.location.search);
+      const si = parseInt(p.get('img'), 10) || 0;
       if (si > 0 && si <= imagesCount) {
         current = si - 1;
         loadCurrentImage();
@@ -520,7 +463,7 @@ $(document).ready(function() {
         loadCurrentImage();
       }
     })
-    .fail(() => $("#h1").text("[*loading/error]1"));
+    .catch(() => { $$('#h1').textContent = '[*loading/error]1'; });
 });
 </script>
 </body>

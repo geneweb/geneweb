@@ -1,11 +1,11 @@
-<!-- $Id: advanced.txt v7.1 19/10/2023 04:14:58 $ -->
+<!-- $Id: advanced.txt v7.1 10/04/2026 23:15:53 $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
   <title>[*advanced request]0</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
 %include;css
 </head>
@@ -16,27 +16,48 @@
 <h1 class="mt-2">[*advanced request]0</h1>
 
 %define;date(xx,zz)
+  %let;day_input;type="number" min="1" max="31" size="2" maxlength="2" placeholder=" "%in;
+  %let;month_input;type="number" min="1" max="12" size="2" maxlength="2" placeholder=" "%in;
+  %let;year_input;type="text" size="4" maxlength="4" placeholder=" "%in;
   %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
-    <label for="xxzz_dd" class="form-control-label">
-    <input type="number" class="form-control" name="xx_datezz_dd" id="xxzz_dd" min="1" max="12"> [year/month/day]2 </label>
-    <label for="xxzz_mm" class="form-control-label">
-    <input type="number" class="form-control" name="xx_datezz_mm" id="xxzz_mm" min="1" max="31"> [year/month/day]1 </label>
-    <label for="xxzz_yyyy" class="form-control-label">
-    <input type="text" class="form-control" name="xx_datezz_yyyy" id="xxzz_yyyy" size="4"> [year/month/day]0</label>
+    <label>
+      <input class="form-control form-control-inline" name="xx_datezz_dd" id="xxzz_dd" %day_input;>
+      <span class="ms-1">[year/month/day]2</span>
+    </label>
+    <label>
+      <input class="form-control form-control-inline ms-2" name="xx_datezz_mm" id="xxzz_mm" %month_input;>
+      <span class="ms-1">[year/month/day]1</span>
+    </label>
+    <label>
+      <input class="form-control form-control-inline ms-2" name="xx_datezz_yyyy" id="xxzz_yyyy" %year_input;>
+      <span class="ms-1">[year/month/day]0</span>
+    </label>
   %elseif;([!dates order]0 = "mmddyyyy")
-    <label for="xxzz_mm" class="form-control-label">
-    <input type="number" class="form-control" name="xx_datezz_mm" id="xxzz_mm" min="1" max="12"> [year/month/day]1 </label>
-    <label for="xxzz_dd" class="form-control-label">
-    <input type="number" class="form-control" name="xx_datezz_dd" id="xxzz_dd" min="1" max="31"> [year/month/day]2 </label>
-    <label for="xxzz_yyyy" class="form-control-label">
-    <input type="text" class="form-control" name="xx_datezz_yyyy" id="xxzz_yyyy" size="4"> [year/month/day]0</label>
+    <label>
+      <input class="form-control form-control-inline" name="xx_datezz_mm" id="xxzz_mm" %month_input;>
+      <span class="ms-1">[year/month/day]1</span>
+    </label>
+    <label>
+      <input class="form-control form-control-inline ms-2" name="xx_datezz_dd" id="xxzz_dd" %day_input;>
+      <span class="ms-1">[year/month/day]2</span>
+    </label>
+    <label>
+      <input class="form-control form-control-inline ms-2" name="xx_datezz_yyyy" id="xxzz_yyyy" %year_input;>
+      <span class="ms-1">[year/month/day]0</span>
+    </label>
   %else;
-    <label for="xxzz_yyyy" class="form-control-label">
-    <input type="text" class="form-control" name="xx_datezz_yyyy" id="xxzz_yyyy" size="2"> [year/month/day]0 </label>
-    <label for="xxzz_mm" class="form-control-label">
-    <input type="number" class="form-control" name="xx_datezz_mm" id="xxzz_mm" min="1" max="12"> [year/month/day]1 </label>
-    <label for="xxzz_dd" class="form-control-label">
-    <input type="number" class="form-control" name="xx_datezz_dd" id="xxzz_dd" min="1" max="31"> [year/month/day]2</label>
+    <label>
+      <input class="form-control form-control-inline" name="xx_datezz_yyyy" id="xxzz_yyyy" %year_input;>
+      <span class="ms-1">[year/month/day]0</span>
+    </label>
+    <label>
+      <input class="form-control form-control-inline ms-2" name="xx_datezz_mm" id="xxzz_mm" %month_input;>
+      <span class="ms-1">[year/month/day]1</span>
+    </label>
+    <label>
+      <input class="form-control form-control-inline ms-2" name="xx_datezz_dd" id="xxzz_dd" %day_input;>
+      <span class="ms-1">[year/month/day]2</span>
+    </label>
   %end;
 %end;
 
@@ -48,7 +69,7 @@
         %if;("xx"="death")
           </div>
           <div class="mb-2">
-            <select class="form-control" name="death">
+            <select class="form-select" name="death">
               <option value="Dead">[*died]2</option>
               <option value="NotDead">[*alive]2</option>
               <option value="DontKnowIfDead">[*maybe alive]</option>
@@ -57,8 +78,8 @@
         %end;
         %if;("xx"="marriage")
           </div>
-          <div class="form-inline col">
-            <span class="form-control-label mr-2">[*married][:]</span>
+          <div class="d-flex flex-wrap align-items-center col">
+            <span class="col-form-label me-2">[*married]</span>
             <div class="form-check form-check-inline">
               <input type="radio" class="form-check-input" name="married" id="mY" value="Y">
               <label class="form-check-label" for="mY" >[Y/N]0</label>
@@ -82,13 +103,13 @@
     </div>
     <div class="row">
       <p class="col-2 col-form-label">[*after]</p>
-      <div class="col-9 form-inline">
+      <div class="col-9 d-flex flex-wrap align-items-center">
         %apply;date("xx",1)
       </div>
     </div>
     <div class="row">
       <p class="col-2 col-form-label">[*before]</p>
-      <div class="col-9 form-inline">
+      <div class="col-9 d-flex flex-wrap align-items-center">
         %apply;date("xx",2)
       </div>
     </div>
@@ -100,7 +121,7 @@
   <input type="hidden" name="m" value="AS_OK">
   <div class="row">
     <div class="col-6">
-          <span class="form-control-label mr-2">[*search type][:]</span>
+          <span class="col-form-label me-2">[*search type][:]</span>
           <div class="form-check form-check-inline">
             <input type="radio" class="form-check-input" name="search_type" id="stAND" value="AND" checked>
             <label class="form-check-label" for="stAND" title="AND">AND</label>
@@ -111,14 +132,14 @@
           </div>
     </div>
   </div>
-  <div class="row">
+  <div class="row mt-2">
     <div class="col-6">
       <div class="row">
         <div class="col-3">
           <h4>[*person/persons]0</h4>
         </div>
         <div class="form-inline col">
-          <span class="form-control-label mr-2">[*sex][:]</span>
+          <span class="col-form-label me-2">[*sex]</span>
           <div class="form-check form-check-inline">
             <input type="radio" class="form-check-input" name="sex" id="sexM" value="M">
             <label class="form-check-label" for="sexM" title="[male/female/neuter]0">[M/F]0</label>
@@ -135,9 +156,9 @@
        </div>
        <div class="row">
         <label for="first_name" class="col-form-label col-3">[*first name/first names]0</label>
-        <div class="col-9">
-          <input type="text" class="form-control" name="first_name" id="first_name" placeholder="[*first name/first names]0">
-          <div class="ml-4">
+        <div class="col-9 d-flex align-items-center">
+          <input type="text" class="form-control me-3" name="first_name" id="first_name" placeholder="[*first name/first names]0">
+          <div class="form-check text-nowrap mb-0 ms-2 me-1">
             <input class="form-check-input" type="checkbox" id="exact_first_name" name="exact_first_name" value="on" checked>
             <label class="form-check-label" for="exact_first_name">[*exact]</label>
           </div>
@@ -145,11 +166,11 @@
       </div>
       <div class="row">
         <label for="surname" class="col-form-label col-3">[*surname/surnames]0</label>
-        <div class="col-9">
-          <input type="text" class="form-control" name="surname" id="surname" placeholder="[*surname/surnames]0">
-          <div class="ml-4">
-            <input class="form-check-input" type="checkbox" id="exact_surname" name="exact_surname" value="on">
-            <label class="form-check-label" for="exact_surname" checked>[*exact]</label>
+        <div class="col-9 d-flex align-items-center">
+          <input type="text" class="form-control me-3" name="surname" id="surname" placeholder="[*surname/surnames]0">
+          <div class="form-check text-nowrap mb-0 ms-2 me-1">
+            <input class="form-check-input" type="checkbox" id="exact_surname" name="exact_surname" value="on" checked>
+            <label class="form-check-label" for="exact_surname">[*exact]</label>
           </div>
         </div>
       </div>
@@ -170,15 +191,15 @@
     %apply;event("death","death")
     %apply;event("burial","burial")
   </div>
-  <div class="row justify-content-center">
-    <div class="form-inline">
-      <label for="max" class="mr-2">[*maximum]</label>
+  <div class="row">
+    <div class="d-inline-flex w-auto align-items-center">
+      <label for="max" class="me-2">[*maximum]</label>
       <input type="number" class="form-control" name="max" id="max" min="0" max="50000" value="150" step="50">
-      <span class="ml-2">[person/persons]1</span>
+      <span class="ms-2">[person/persons]1</span>
     </div>
   </div>
-  <div class="row justify-content-center mt-3">
-    <button type="submit" class="btn btn-outline-primary btn-lg">[*search/case sensitive]0</button>
+  <div class="d-flex justify-content-center mt-3">
+    <button type="submit" class="btn btn-outline-primary btn-lg w-auto text-center">[*search/case sensitive]0</button>
   </div>
 </form>
 %include;trl

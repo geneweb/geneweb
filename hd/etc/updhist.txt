@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist.txt v7.1 24/6/2024 05:24:40 $ -->
+  <!-- $Id: updhist.txt v7.1 11/04/2026 03:47:37 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
 %include;css
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %include;hed
 %message_to_wizard;
 <div class="container">
@@ -18,26 +18,24 @@
 <h1>[*history of updates]</h1>
 %define;search_form()
   %if;(wizard or friend)
-    <form class="d-flex form-inline mb-2" method="get" action="%action;">
+    <form class="d-flex align-items-center gap-3 mb-2" method="get" action="%action;">
       %hidden;
       <input type="hidden" name="m" value="HIST_SEARCH">
       %if;(e.m="HIST_SEARCH" and found)
         <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
       %end;
-      <div class="input-group">
-        <input type="text" class="form-control w-25" placeholder="[*search/case sensitive]0"
-          name="s" maxlength="40" value="%e.s.ns;">
-        <div class="input-group-append">
-          <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
-        </div>
+      <div class="input-group w-auto">
+        <input type="text" class="form-control" placeholder="[*search/case sensitive]0"
+          name="s" maxlength="40" value="%e.s.ns;" aria-label="[*search/case sensitive]0">
+        <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
       </div>
-      <label class="my-1 ml-3 mr-2" for="rows">[*number of rows]</label>
-      <input type="number" class="form-control" id="rows" title="[*number of rows]"
+      <label for="rows" class="col-form-label text-nowrap mb-0">[*number of rows]</label>
+      <input type="number" class="form-control w-auto" id="rows" title="[*number of rows]"
          name="k" value="%kk;" min="0" max="150" step="10">
-      <div class="custom-control custom-checkbox ml-3">
-        <input type="checkbox" class="custom-control-input" name="c" value="on" id="case"
+      <div class="form-check text-nowrap">
+        <input type="checkbox" class="form-check-input" name="c" value="on" id="case"
           %if;("main"!="true" and e.c="on") checked%end;>
-        <label class="custom-control-label" for="case">[*search/case sensitive]1</label>
+        <label class="form-check-label" for="case">[*search/case sensitive]1</label>
       </div>
     </form>
   %end;
@@ -47,13 +45,17 @@
 %let;wiz;%if;(e.wiz!="" and e.n="")%e.wiz;%end;%in;
 %define;table()
   <table class="table table-sm table-hover px-1">
-    <thead class="thead-default">
+    <caption class="visually-hidden">[*history of updates]</caption>
+    <thead class="table-light">
       <tr>
         <th>[*date/dates]0</th>
         <th>[*person/persons]0</th>
         <th>[*wizard/wizards/friend/friends/exterior]0</th>
         <th>[*update]</th>
-        %if;(bvar.history_diff="yes")<th class="text-center"><i class="fa fa-clock-rotate-left fa-fw text-dark" title="[*history]"></i></th>%end;
+        %if;(bvar.history_diff="yes")<th class="text-center">
+          <i class="fa fa-clock-rotate-left fa-fw text-dark"
+            title="[*history]" aria-hidden="true"></i>
+            <span class="visually-hidden">[history]</span></th>%end;
       </tr>
     </thead>
     %foreach;history_line(kk, e.pos, wiz)
@@ -62,19 +64,18 @@
         <td>
         %if;is_person;
           %if;(person.is_private)
-            <i class="fa fa-person text-danger mr-1"> </i>%nn;
+            <i class="fa fa-person text-danger me-1"> </i>%nn;
           %elseif;(person.is_semi_public)
-            <i class="fa fa-person text-warning mr-1"> </i>%nn;
+            <i class="fa fa-person text-warning me-1"> </i>%nn;
           %elseif;(person.is_public or b.public_if_titles="yes" and person.has_titles)
-            <i class="fa fa-person text-success mr-1"> </i>%nn;
+            <i class="fa fa-person text-success me-1"> </i>%nn;
           %else;
-            <i class="fa fa-person text-muted mr-1"> </i>%nn;
+            <i class="fa fa-person text-body-secondary me-1"> </i>%nn;
           %end;
         %else;
           &nbsp;&nbsp;
         %end;
         %if;(first_name!="")
-          <!--%first_name;/%occ;/%surname;-->
           <a href="%prefix;%person.access;">%person;</a>%nn;
           <a href="%prefix;m=MOD_IND&i=%person.index;">%person.dates;</a> %person.title;
         %elseif;is_note;
@@ -106,7 +107,7 @@
             %if;(first_name!="" and person.has_history)
               <a href="%prefix;m=HIST_DIFF&t=SUM&f=%person.history_file;">
                 <i class="fa fa-clock-rotate-left fa-fw" aria-hidden="true" title="[*visualize/show/hide/summary]1 [history]"></i>
-                <span class="sr-only">[history]</span></a>
+                <span class="visually-hidden">[history]</span></a>
             %else;
               &nbsp;
             %end;
@@ -168,7 +169,7 @@
 
 %define;nav()
   %if;(pos!="")
-   <form class="form-inline" method="get" action="%action;">
+   <form method="get" action="%action;">
      %hidden;
      <input type="hidden" name="m" value="HIST">
      <input type="hidden" name="k" value="%e.k;">

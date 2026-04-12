@@ -150,23 +150,23 @@
   (action
     (run brotli -f -q 11 %{input})))
 (rule
-  (target jquery.maphilight.min.js.gz)
-  (deps (:input jquery.maphilight.min.js))
+  (target maphilight.min.js.gz)
+  (deps (:input maphilight.min.js))
   (action
     (run gzip -9 -k -f %{input})))
 (rule
-  (target jquery.maphilight.min.js.br)
-  (deps (:input jquery.maphilight.min.js))
+  (target maphilight.min.js.br)
+  (deps (:input maphilight.min.js))
   (action
     (run brotli -f -q 11 %{input})))
 (rule
-  (target jquery.line.js.gz)
-  (deps (:input jquery.line.js))
+  (target line.js.gz)
+  (deps (:input line.js))
   (action
     (run gzip -9 -k -f %{input})))
 (rule
-  (target jquery.line.js.br)
-  (deps (:input jquery.line.js))
+  (target line.js.br)
+  (deps (:input line.js))
   (action
     (run brotli -f -q 11 %{input})))
 (rule

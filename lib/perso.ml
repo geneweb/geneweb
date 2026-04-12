@@ -6253,10 +6253,12 @@ let print_isolated conf base =
       list;
     Output.print_sstring conf "</ul>\n"
   in
-  let up = " <a href=\"#isolated-top\" class=\"small text-muted ml-2\">^</a>" in
+  let up =
+    " <a href=\"#isolated-top\" class=\"small text-body-secondary ms-2\">^</a>"
+  in
   let print_sub plist id lbl list =
     if list <> [] then (
-      Output.printf conf "<h4 class=\"ml-3\" id=\"%s\">%s (%d)%s</h4>\n" id
+      Output.printf conf "<h4 class=\"ms-3\" id=\"%s\">%s (%d)%s</h4>\n" id
         (Utf8.capitalize_fst lbl) (List.length list) up;
       plist list)
   in

@@ -43,13 +43,13 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
     Output.printf conf (ftransl conf "name changed. updated linked pages");
     Output.print_sstring conf "</div>";
     let aux n txt ofn osn oocc =
-      Output.print_sstring conf {|<span class="unselectable float-left">|};
+      Output.print_sstring conf {|<span class="unselectable float-start">|};
       transl conf txt |> Utf8.capitalize_fst |> Output.print_sstring conf;
       if n = "" then (
         Output.print_sstring conf " ";
         Output.print_sstring conf n);
       Output.print_sstring conf (transl conf ":");
-      Output.print_sstring conf {|</span> <span class="float-left ml-1">|};
+      Output.print_sstring conf {|</span> <span class="float-start ms-1">|};
       Output.print_string conf (Util.escape_html ofn);
       Output.print_sstring conf {|/|};
       Output.print_string conf (Util.escape_html osn);

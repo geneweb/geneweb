@@ -1,4 +1,4 @@
-<!-- $Id: perso_utils v7.1 16/03/2026 07:12:03 $ -->
+<!-- $Id: perso_utils v7.1 04/04/2026 04:04:19 $ -->
 %let;birth_symbol;%if;(b.birth_symbol!="")%b.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(b.death_symbol!="")%b.death_symbol;%else;&dagger;%end;%in;
 
@@ -52,8 +52,8 @@
 %define;marr_wrench_to_bullet(xx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
-      <i class="fa fa-wrench fa-sm text-success" data-html="true" data-toggle="tooltip"
-        title="<div class='text-left'>[*modify::family/families]0 %self.surname;/%self.spouse.surname; ([wizard/wizards/friend/friends/exterior]0)<br>
+      <i class="fa fa-wrench fa-sm text-success" data-bs-html="true" data-bs-toggle="tooltip"
+        title="<div class='text-start'>[*modify::family/families]0 %self.surname;/%self.spouse.surname; ([wizard/wizards/friend/friends/exterior]0)<br>
 <b>[*him/her]0 %marriage_age;</b><br>
 %if;has_parents;%nn;
 — [father/mother]0 %father.marriage_age;<br>
@@ -82,7 +82,7 @@
   %else;
     %if;cancel_links;⚲%sp;%else;class="fa fa-neuter neuter fa-xs%end;%nn;
   %end;
-  %if;not cancel_links; mr-1"></i>%nn;
+  %if;not cancel_links; me-1"></i>%nn;
     %if;wizard;</a>%end;
   %end;
 %end;
@@ -136,7 +136,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <span class="far fa-circle-dot text-success mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
+  <span class="far fa-circle-dot text-success me-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
 %end;
 
 %define;nav_with_sosa_ref(xxx)
@@ -297,7 +297,7 @@
     %end;
   %end;
   %if;(cancel_links or not wizard)<span%else;<a href="%prefix;m=MOD_IND&i=%xx.index;"%end;%sp;
-    title="%if;not (cancel_links or not wizard)[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end; %if;xx.computable_age;(%xx.age;)%elseif;xx.computable_death_age;(%xx.death_age;)%end;" class="text-nowrap font-italic">%if;(xx.dates!="")%xx.dates;%end;
+    title="%if;not (cancel_links or not wizard)[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end; %if;xx.computable_age;(%xx.age;)%elseif;xx.computable_death_age;(%xx.death_age;)%end;" class="text-nowrap fst-italic">%if;(xx.dates!="")%xx.dates;%end;
   %if;(cancel_links or not wizard)</span>%else;</a>%end;
   %if;(xx.title!=""), %xx.title;%end;%nn;
 %end;
@@ -311,10 +311,10 @@
     %if;(wizard and not cancel_links)
       <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
     %end;
-    <div class="text-nowrap font-italic%nn;
+    <div class="text-nowrap fst-italic%nn;
         %(%if;(e.m="A" and xx.index!=index)
-          %if;(not xx.is_dead) mr-5%nn;
-          %else;%if;(xx.death_date.year="") mr-4%end;
+          %if;(not xx.is_dead) me-5%nn;
+          %else;%if;(xx.death_date.year="") me-4%end;
           %end;
         %end;%)"
          title="%if;(wizard and not cancel_links)[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
@@ -340,7 +340,7 @@
   %end;
   %if;(wizard and not cancel_links)
   <a href="%prefix;m=MOD_IND&i=%xx.index;">%end;
-  <span class="text-nowrap font-italic"
+  <span class="text-nowrap fst-italic"
     title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
            %if;(xx.computable_age) (%xx.age;)%elseif;xx.computable_death_age; (%xx.death_age;)%end;">%nn;
     %xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
@@ -401,7 +401,7 @@
       %foreach;xx.nobility_title;, %nobility_title;%end;
     %end;
   %end;
-  <span style="font-size: 90%%">%nn;
+  <span class="small">%nn;
     %if;xx.has_birth_date;, %apply;nth([born],xx.sex) %xx.on_birth_date;
       %if;xx.birthday; ([happy birthday to you!])%end;
       %if;xx.has_birth_place; - %xx.birth_place;%end;
@@ -527,7 +527,7 @@
       %foreach;xx.nobility_title;, %nobility_title;%end;
     %end;
   %end;
-  <span style="font-size: 90%%">%nn;
+  <span class="small">%nn;
     %if;has_parents;
       %if;(xx.index=father.index or xx.index=mother.index)
         %if;(has_birth_date and xx.has_birth_date)%sp;
@@ -641,7 +641,7 @@
           <br><img src="%images_prefix;1pixel.png" width="13" height="13" alt="1px">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        <span class="ml-1">%apply;married_to("child", 0)</span>
+        <span class="ms-1">%apply;married_to("child", 0)</span>
         %apply;short_display_person("spouse")
       %end;
     %end;
@@ -744,8 +744,8 @@
 
 %( note that type_puce_desc add a <li> that need to be closed %)
 %define;desc_seq(yyy, bi)
-  <li class="list-unstyled">
-    <ul>
+  <li >
+    <ul class="list-unstyled">
       %foreach;child;
         %apply;type_puce_desc("child")
         %apply;image_MF("child")
@@ -760,7 +760,7 @@
             <br>
             └ %apply;detail_wedding()%sp;
             %apply;short_display_person("spouse")
-            %if;(nb_children!=0)<div class="float-right">%nb_children;</div>%end;
+            %if;(nb_children!=0)<div class="float-end">%nb_children;</div>%end;
           %end;
         %else;
           %( %apply;not_married_no_descendants() ciseaux non affiché %)
@@ -933,10 +933,10 @@
       %apply;setvar%with;ns%event.name;%and;
         %if;(b.event_tooltips="no")title="%apply;capitalize(event.name)"%nn;
         %else;
-          %if;(event.has_note or event.has_src)data-toggle="tooltip" data-html="true"
-            title='<div class="text-wrap text-left">
-              %if;event.has_note;<div><span class="font-weight-bold">%apply;a_of_b%with;[*note/notes]1%and;%event.name;%end;[:]</span> %event.note;.</div>%end;
-              %if;event.has_src;<div%if;event.has_note; class="mt-2"%end;><span class="font-weight-bold">%apply;a_of_b%with;[*source/sources]1%and;%event.name;%end;[:]</span> %event.src;.</div>%end;</div>'
+          %if;(event.has_note or event.has_src)data-bs-toggle="tooltip" data-bs-html="true"
+            title='<div class="text-wrap text-start">
+              %if;event.has_note;<div><span class="fw-bold">%apply;a_of_b%with;[*note/notes]1%and;%event.name;%end;[:]</span> %event.note;.</div>%end;
+              %if;event.has_src;<div%if;event.has_note; class="mt-2"%end;><span class="fw-bold">%apply;a_of_b%with;[*source/sources]1%and;%event.name;%end;[:]</span> %event.src;.</div>%end;</div>'
           %else;title="%apply;capitalize(event.name)"%nn;
           %end;
         %end;
@@ -951,12 +951,12 @@
     %apply;setvar%with;ns[marriage event]%count;%and;
       %if;(b.event_tooltips="no")title="[marriage event]"%nn;
       %else;
-        %if;(has_marriage_note or has_marriage_source) data-toggle="tooltip" data-html="true"
-          title='<div class="text-wrap text-left">
-            %if;has_marriage_note;<div><span class="font-weight-bold">
+        %if;(has_marriage_note or has_marriage_source) data-bs-toggle="tooltip" data-bs-html="true"
+          title='<div class="text-wrap text-start">
+            %if;has_marriage_note;<div><span class="fw-bold">
               %apply;a_of_b%with;[*note/notes]1%and;
                 %if;(count!=1) %apply;nth%with;[nth]%and;%count;%end;%end; [marriage event]%end;[:]</span> %marriage_note;.</div>%end;
-            %if;has_marriage_source;<div%if;has_marriage_note; class="mt-2"%end;><span class="font-weight-bold">%apply;a_of_b%with;[*source/sources]1%and;%if;(count!=1) %apply;nth%with;[nth]%and;%count;%end;%end; [marriage event]%end;[:]</span> %marriage_source;.</div>%end;</div>'
+            %if;has_marriage_source;<div%if;has_marriage_note; class="mt-2"%end;><span class="fw-bold">%apply;a_of_b%with;[*source/sources]1%and;%if;(count!=1) %apply;nth%with;[nth]%and;%count;%end;%end; [marriage event]%end;[:]</span> %marriage_source;.</div>%end;</div>'
         %else;title="[marriage event]"%nn;
         %end;
       %end;

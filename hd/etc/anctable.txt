@@ -1,4 +1,4 @@
-<!-- $Id: anctable.txt v7.1 14/03/2026 12:04:23 $ -->
+<!-- $Id: anctable.txt v7.1 08/04/2026 23:05:03 $ -->
 %( table_utils mutualize asc./desc. tables headers and common functions %)
 %include;table_utils
 %define;implex()
@@ -50,7 +50,7 @@
   %end;
 %( Ancêtre %)
   <td%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;%sp;
-      class="align-middle%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
+      class="align-middle%if;(e.nowrap="on") text-nowrap%end; ps-2%nn;
     %if;(e.ns=1)
         %if;(ancestor.has_notes) note%if;(ancestor.has_psources)source%end;%elseif;(ancestor.has_psources) source%end;
     %end;
@@ -61,9 +61,9 @@
              %if;(ancestor.has_notes)[note/notes]1%if;(ancestor.has_psources) [and] [source/sources]1%end;
              %elseif;(ancestor.has_psources)[source/sources]1%end;."
       %apply;popover_params("right")
-      data-content='%if;(ancestor.has_notes)%apply;clean_comment_tags(ancestor.notes)%end;
+      data-bs-content='%if;(ancestor.has_notes)%apply;clean_comment_tags(ancestor.notes)%end;
                     %if;(ancestor.has_psources)%if;(ancestor.has_notes)<hr>%end;%apply;capitalize(ancestor.psources)%end;'
-      data-title="%if;(ancestor.has_notes)[*note/notes]1%if;(ancestor.has_psources) [and] [source/sources]1%end;
+      data-bs-title="%if;(ancestor.has_notes)[*note/notes]1%if;(ancestor.has_psources) [and] [source/sources]1%end;
                   %elseif;(ancestor.has_psources)[*source/sources]1%end;"
     %end;>
     <div class="d-flex justify-content-between">
@@ -77,7 +77,7 @@
       </div>
       %if;(e.im="" and ancestor.has_image)
         %if;not cancel_links;<a href="%ancestor.image_url;" target="_blank" title="%ancestor; img">%end;
-          <img src="%ancestor.image_url;" class="rounded align-self-center ml-1 table-img-max-width"
+          <img src="%ancestor.image_url;" class="rounded align-self-center ms-1 table-img-max-width"
             height="%if;(e.px!="")%e.px;%else;60%end;" alt="%ancestor;">
         %if;not cancel_links;</a>%end;
       %end;
@@ -110,7 +110,7 @@
     %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="bg-lg"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt=1)
-        <td class="align-middle text-right table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
+        <td class="align-middle text-end table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
           %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;">
           %if;(wizard and not cancel_links)
             <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
@@ -154,9 +154,9 @@
                     %elseif;has_fsources; source%end;
                   %end;"
                 %if;(e.ns=1 and (has_fsources or has_fnotes)) tabindex="0" %apply;popover_params("bottom")
-                data-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
+                data-bs-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
                               %if;has_fsources;%if;has_fnotes;<hr>%end;%fsources;%end;'
-                data-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
+                data-bs-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
                            %elseif;has_fsources;[*source/sources]1%end;"%nn;
                 %end;>
             %nb_children;</td>
@@ -211,12 +211,12 @@
                 %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
               or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;"
               %if;(e.ns=1 and (spouse.has_psources or spouse.has_pnotes)) tabindex="0" %apply;popover_params("bottom")
-              data-content='%if;(spouse.has_pnotes)%apply;clean_comment_tags(spouse.pnotes)%end;
+              data-bs-content='%if;(spouse.has_pnotes)%apply;clean_comment_tags(spouse.pnotes)%end;
                             %if;(spouse.has_psources)
                               %if;(spouse.has_pnotes)<hr>%end;
                               %spouse.psources;
                             %end;'
-                title="%if;(spouse.has_psources or spouse.has_pnotes)
+              data-bs-title="%if;(spouse.has_psources or spouse.has_pnotes)
                          %if;(spouse.has_pnotes and not spouse.has_psources)[*note/notes]1%nn;
                          %elseif;(not spouse.has_pnotes and spouse.has_psources)[*source/sources]1%nn;
                          %elseif;(spouse.has_pnotes and spouse.has_psources)[*note/notes]1 [and] [source/sources]1%nn;
@@ -228,7 +228,7 @@
             </td>
           %end;
           %if;(e.marr_date="on")
-            <td class="align-middle text-right table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
+            <td class="align-middle text-end table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
               %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;">
               %if;(wizard and not cancel_links)
                 <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
@@ -259,7 +259,7 @@
                 %end;
               %end;"%sp;
               %if;(e.ns=1 and (has_fnotes or has_fsources)) tabindex="0" %apply;popover_params("bottom")
-                data-content='%if;(has_fnotes)%apply;clean_comment_tags(fnotes)%end;
+                data-bs-content='%if;(has_fnotes)%apply;clean_comment_tags(fnotes)%end;
                               %if;(has_fsources)
                                 %if;(has_fnotes)<hr>%end;
                                 %apply;capitalize(fsources)
@@ -332,8 +332,8 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         %if;((v0=1 and level=0) or level>=v0)
           %if;(only=0 and e.gen=1 and level!=0)
             <tr class="no-hover-highlight">
-              <th class="text-left border-0 gen-row" scope="row" colspan="%nb_col;">
-                <span class="ml-1">[*generation/generations]0 %level;</span>
+              <th class="text-start border-0 gen-row" scope="row" colspan="%nb_col;">
+                <span class="ms-1">[*generation/generations]0 %level;</span>
               </th>
             </tr>
           %end;

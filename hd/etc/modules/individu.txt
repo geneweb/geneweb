@@ -12,7 +12,7 @@
   %else;
     %if;(cc>0)[close family]0%nn;
     %else;[*close family]0%nn;
-    %end; (<small class="text-muted">l1/l2</small>)%nn;
+    %end; (<small class="text-body-secondary">l1/l2</small>)%nn;
   %end
 %end;
 %define;rela()
@@ -42,7 +42,7 @@
       %end;
     %end;
     %if;(has_public_name or has_qualifiers)
-      <div class="font-weight-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</div>
+      <span class="d-block fw-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</span>
     %end;
     %if;has_aliases;
       alias%sp;
@@ -52,7 +52,6 @@
         %lazy_force;
         <b>%alias;</b>%nn;
       %end;
-      <br>
     %end;
     %( Nobility title format:
          “13ᵉ prince de Monaco (Rainier III, 9 mai 1949–6 avril 2005)” %)
@@ -60,7 +59,7 @@
       %foreach;nobility_title;%nn;
         %if;not is_first;,%sp;%end;
         %nobility_title;%nn;
-      %end;<br>
+      %end;
       %( Currently unused because it lacks concatenation of places in hyperlinks
       %foreach;nob_title;%nn;
         %if;not is_first;,%sp;%end;
@@ -83,14 +82,14 @@
     %end;
     %if;(has_linked_page.HEAD and linked_page.HEAD!="")%linked_page.HEAD;%end;
     %if;has_first_names_aliases;
-      <div>%apply;lazy_print("")
+      <span class="d-block">%apply;lazy_print("")
         %apply;link(first_name,"P")/%sq;
         %foreach;first_name_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
           %apply;link(first_name_alias,"P")
         %end;
-      </div>
+      </span>
     %end;%sp;
     %if;has_surnames_aliases;
       %apply;lazy_print("")
@@ -204,7 +203,7 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="%if;not roglo;fa-ul%end;%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
+  <ul class="%if;not roglo;fa-ul%end;%if;(not (has_image or b.default_image="yes")) ps-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
       <li %apply;getvar%with;ns[birth]%end;>
         %if;(not roglo)<span class="fa-li"><i class="fas fa-baby"></i></span>%end;
@@ -341,13 +340,13 @@
   %end;
 %end;
 %define;border()
-  <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
+  <div class="w-50 border-end border-dark">&#8203;</div>
 %end;
 %if;(e.m!="MOD_IND")
   %if;(op_m=1)
     %apply;portrait()
     %apply;etat_civil()
-    <div class="mt-2 mb-1 ml-2">
+    <div class="mt-2 mb-1 ms-2">
       %apply;detailed_names()
     </div>
 

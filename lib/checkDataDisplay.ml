@@ -56,14 +56,14 @@ module DictInfo = struct
         dict_type = CheckData.Fnames_alias;
         transl_key = "first name alias";
         url_param = "fna";
-        icon = "child text-muted";
+        icon = "child text-body-secondary";
         form_param = "d_fna";
       };
       {
         dict_type = CheckData.Snames_alias;
         transl_key = "surname alias";
         url_param = "sna";
-        icon = "user text-muted";
+        icon = "user text-body-secondary";
         form_param = "d_sna";
       };
       {
@@ -294,7 +294,7 @@ let render_dict_section_streaming conf base dict filtrd_entries sel_err_types =
   Output.printf conf
     {|<div class="card mt-3">
       <div class="card-header">
-        <h3 class="font-weight bold mb-0">%s</h3>
+        <h3 class="fw-bold mb-0">%s</h3>
       </div>
       <div class="card-body">|}
     dict_title;
@@ -348,7 +348,7 @@ let render_dict_section conf base dict filtrd_entries sel_err_types =
   Printf.bprintf buf
     {|<div class="card mt-3">
         <div class="card-header">
-          <h3 class="font-weight bold mb-0">%s</h3>
+          <h3 class="fw-bold mb-0">%s</h3>
         </div>
         <div class="card-body">|}
     dict_title;
@@ -374,7 +374,7 @@ let render_missing_cache_warning conf missing_caches =
     let msg = tn conf "chk_data cache file not found" 0 ^ t conf ":" in
     Buffer.add_string buf
       {|<div class="alert alert-danger mt-2">
-          <i class="fa fa-exclamation-triangle mr-2"></i>|};
+          <i class="fa fa-exclamation-triangle me-2"></i>|};
     Buffer.add_string buf msg;
     Buffer.add_string buf " ";
     Buffer.add_string buf
@@ -429,7 +429,7 @@ let render_dict_checkboxes_two_columns conf selected_dicts =
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="%s" id="%s" value="1"%s>
               <label class="form-check-label" for="%s">
-                <i class="fa fa-%s fa-fw mr-1"></i>%s
+                <i class="fa fa-%s fa-fw me-1"></i>%s
               </label>
             </div>|}
           info.form_param id
@@ -439,7 +439,7 @@ let render_dict_checkboxes_two_columns conf selected_dicts =
       infos
   in
   Buffer.add_string buf {|
-          <div class="w-auto mr-4">|};
+          <div class="w-auto me-4">|};
   render_group left_col;
   Buffer.add_string buf {|
           </div>
@@ -563,7 +563,7 @@ let print conf base =
         </div>
         <div class="mt-auto align-self-center">
           <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle-dicts">
-            <i class="fa fa-square-check mr-1"></i>%s
+            <i class="fa fa-square-check me-1"></i>%s
           </button>
         </div>
       </div>
@@ -575,15 +575,15 @@ let print conf base =
       <div class="card-body d-flex flex-column">%s
         <div class="mt-2 align-self-center">
           <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle-errors">
-            <i class="fa fa-square-check mr-1"></i>%s
+            <i class="fa fa-square-check me-1"></i>%s
           </button>
         </div>
       </div>
     </div>
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fa fa-cog fa-sm mr-2"></i>%s</h5>
-        <abbr title="%s"><i class="fa fa-circle-question mr-1"></i>↑↓</abbr>
+        <h5 class="mb-0"><i class="fa fa-cog fa-sm me-2"></i>%s</h5>
+        <abbr title="%s"><i class="fa fa-circle-question me-1"></i>↑↓</abbr>
       </div>
       <div class="card-body d-flex flex-column">|}
     (Util.commd conf :> string)
@@ -609,14 +609,14 @@ let print conf base =
           <div class="form-check mb-1">
             <input class="form-check-input" type="checkbox" name="nocache" id="use-db" value="1"%s>
             <label class="form-check-label" for="use-db">
-              <i class="fa fa-database mr-2"></i>%s
+              <i class="fa fa-database me-2"></i>%s
             </label>
           </div>|}
       (if params.nocache_checked then " checked" else "")
       (tn conf "chk_data use database/cache" 0);
   Output.printf conf
     {|
-          <div class="form-group mb-0">
+          <div class="mb-0">
             <label for="max-results" class="mb-0">%s%s</label>
             <input type="number" class="form-control" name="max" id="max-results" min="1" step="1" value="%s"%s>%s
           </div>|}
@@ -628,7 +628,7 @@ let print conf base =
     | None -> "")
     (match params.config_max with
     | Some c ->
-        Printf.sprintf {|<small class="ml-1 text-muted">%s</small>|}
+        Printf.sprintf {|<small class="ms-1 text-body-secondary">%s</small>|}
           (Utf8.capitalize_fst
              (Printf.sprintf
                 (Util.ftransl conf "chk_data limited to %d results")
@@ -638,7 +638,7 @@ let print conf base =
     {|
           <div class="text-center py-1 px-3 mt-auto">
             <button type="submit" class="btn btn-primary w-100" data-action="validate-submit">
-              <i class="fa fa-magnifying-glass mr-2"></i>%s
+              <i class="fa fa-magnifying-glass me-2"></i>%s
             </button>
           </div>
         </div>
@@ -651,7 +651,7 @@ let print conf base =
     Output.printf conf
       {|
   <div class="alert alert-info mt-3">
-    <i class="fa fa-database mr-2"></i>%s
+    <i class="fa fa-database me-2"></i>%s
   </div>
   <div id="cd" data-ok-title="%s">
 |}
@@ -873,7 +873,7 @@ let print_result_as_html conf result =
         ~content:(t conf "modification successful");
       if r.cache_updated then
         Output.printf conf
-          {|<div class="text-muted mt-2"><i class="fa fa-check-circle mr-1"></i>%s</div>|}
+          {|<div class="text-body-secondary mt-2"><i class="fa fa-check-circle me-1"></i>%s</div>|}
           (t conf "cache updated");
       (match (r.nb_modified, r.elapsed) with
       | Some n, Some time when n > 1 ->
@@ -881,7 +881,7 @@ let print_result_as_html conf result =
             Util.transl_nth conf "modification/modifications" 1
           in
           Output.printf conf
-            {|<div class="text-info mt-2"><i class="fa fa-info-circle mr-1"></i>%d %s — %.1f s</div>|}
+            {|<div class="text-info mt-2"><i class="fa fa-info-circle me-1"></i>%d %s — %.1f s</div>|}
             n modif_word time
       | _ -> ());
       send_validation_result_to_opener conf result;

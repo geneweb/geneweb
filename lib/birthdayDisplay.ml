@@ -80,10 +80,10 @@ method="get" action="%s">|}
   Util.hidden_env conf;
   mode ();
   Output.printf conf
-    {|<label class="mr-2" for="v_month">%s</label>
+    {|<label class="me-2" for="v_month">%s</label>
   <select class="form-control form-control-lg %s" name="v" id="v_month">%s</select>|}
     (Utf8.capitalize_fst (transl_nth conf "year/month/day" 1))
-    (if is_cousins then "mr-3" else "mr-2")
+    (if is_cousins then "me-3" else "me-2")
     month_options;
   if is_cousins then
     Output.printf conf
@@ -102,7 +102,7 @@ method="get" action="%s">|}
       (Utf8.capitalize_fst (transl_nth conf "degree of kinship" 0))
       d_val max_d max_d;
   Output.printf conf
-    {|<button type="submit" class="btn btn-primary btn-lg ml-2">%s</button>
+    {|<button type="submit" class="btn btn-primary btn-lg ms-2">%s</button>
 </form>|}
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   end_centered conf

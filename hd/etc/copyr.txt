@@ -1,4 +1,4 @@
-<!-- $Id: copyr.txt %version; 18/12/2023 22:03:44 $ -->
+<!-- $Id: copyr.txt %version; 03/04/2026 $ -->
 %define;language(x)
   %apply;nth%with;
     af/ar/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/%nn;
@@ -76,20 +76,19 @@
       %end;
 
       <!-- Language selector and connections info -->
-      <div class="d-flex flex-row align-items-lg-end mt-0 ml-3 border-0">
+      <div class="d-flex flex-row align-items-lg-end mt-0 ms-3 border-0">
         %if;(e.templ="" and not (roglo and is_welcome)
           and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
-          <div class="btn-group dropup" data-toggle="tooltip" data-placement="left"
+          <div class="btn-group dropup" data-bs-toggle="tooltip" data-bs-placement="left"
             title="%apply;language_name(lang) – [*select lang]">
             <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="sr-only">lang</span>
+              data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="visually-hidden">lang</span>
               <span class="text-uppercase">%lang;</span>
-              <span class="sr-only">, [select lang]</span>
+              <span class="visually-hidden">, [select lang]</span>
             </button>
             %if;(not is_printed_by_template)
-              <div class="dropdown-menu scrollable-lang short" role="menu" aria-labelledby="dropdownMenu1">
-                <!-- Language options remain the same -->
+              <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
                 <a class="dropdown-item" href="%url_set.lang_file.af;">af</a>
                 <a class="dropdown-item" href="%url_set.lang_file.ar;">ar</a>
                 <a class="dropdown-item" href="%url_set.lang_file.bg;">bg</a>
@@ -125,7 +124,7 @@
                 <a class="dropdown-item" href="%url_set.lang_file.zh;">zh</a>
               </div>
             %else;
-              <div class="dropdown-menu scrollable-lang" role="menu" aria-labelledby="dropdownMenu1">
+              <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
                 %apply;language_link()
               </div>
             %end;
@@ -133,23 +132,24 @@
         %end;
         <!-- Connections info -->
         %if;(connections.total!="" and b.hide_connections!="yes")
-          <div class="d-flex flex-column justify-items-center align-items-center small ml-1 ml-md-3">
+          <div class="d-flex flex-column justify-items-center align-items-center small ms-1 ms-md-3"
+            aria-label="[*connection/connections]1" role="status">
             %if;(connections.friends!="" and connections.friends>0)<span>%connections.friends;
-              %if;(connections.friends=1) [wizard/wizards/friend/friends/exterior]2
-              %else; [wizard/wizards/friend/friends/exterior]3
+              %if;(connections.friends=1) [wizard/wizards/friend/friends/exterior]2
+              %else; [wizard/wizards/friend/friends/exterior]3
               %end;</span>
             %end;
             %if;(connections.wizards!="" and connections.wizards>0)
               %if;(wizard)
                 <a href="%prefix;m=CONN_WIZ">%connections.wizards;%nn;
               %else;%connections.wizards;%nn;
-              %end; %nn;
+              %end; %nn;
               %if;(connections.wizards=1)[wizard/wizards/friend/friends/exterior]0
               %else;[wizard/wizards/friend/friends/exterior]1
               %end;
               %if;(wizard)</a>%end;
             %end;
-            %if;(connections.total>0)<span>%connections.total; %nn;
+            %if;(connections.total>0)<span>%connections.total; %nn;
               %if;(connections.total=1)[connection/connections]0
               %else;[connection/connections]1
               %end;</span>
@@ -158,34 +158,39 @@
         %end;
       </div>
       <!-- Footer links and copyright -->
-      <div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
-        <div class="ml-auto mb-0">
-          <a role="button" class="mr-2"
-            href="%if;(e.templ!="templm")%url_set.templ_file.templm;%end;"
-            data-toggle="tooltip"
-            title="%if;(e.templ!="templm")templm%else;default template%end;">%nn;
-            <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
-            <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
-          </a>%nn;
-          %if;predictable_mode;GeneWeb %version_short;
-          %else;
-            <a href="https://github.com/%source;/tree/%commit_id;"
-               data-toggle="tooltip" data-html="true"
-               title="[*branch/branches]0 %branch; [compiled on] %compil_date;%nn;
-               %if;not is_printed_by_template;&#010;
-               %else;<br>%end;[from commit] %commit_id; (%commit_date)">%nn;
-              GeneWeb %version_short;</a>
-          %end;
+      <div class="d-flex flex-column justify-content-md-end align-self-center ms-1 ms-md-3 ms-lg-4">
+        <div class="text-nowrap">
+          <a role="button" class="me-2"
+              href="%if;(e.templ!="templm")%url_set.templ_file.templm;%end;"
+              aria-label="[*switch template] %if;(e.templ!="templm")templm%else;default%end;"
+              data-bs-toggle="tooltip"
+              title="%if;(e.templ!="templm")templm%else;default template%end;">%nn;
+              <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
+              <span class="visually-hidden">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
+            </a>%nn;
+            %if;predictable_mode;GeneWeb %version_short;
+            %else;
+              <a href="https://github.com/%source;/tree/%commit_id;"
+                 data-bs-toggle="tooltip" data-bs-html="true"
+                 title="[*branch/branches]0 %branch; [compiled on] %compil_date;%nn;
+                 %if;not is_printed_by_template;&#010;
+                 %else;<br>%end;[from commit] %commit_id; (%commit_date)">%nn;
+                GeneWeb %version_short;</a>
+            %end;
         </div>
-        <div class="btn-group mt-0 ml-1">
-          <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer noopener">INRIA</a> 1998-2007</span>
+        <div class="btn-group mt-0 ms-1">
+          <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer noopener">INRIA</a> 1998-2007</span>
           <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;"
-             class="ml-1" target="_blank" rel="noreferrer noopener" data-toggle="tooltip" title="GeneWeb Wiki">%nn;
-            <i class="fab fa-wikipedia-w"></i>
+             class="ms-1" target="_blank" rel="noreferrer noopener"
+             data-bs-toggle="tooltip" title="GeneWeb Wiki">%nn;
+            <i class="fab fa-wikipedia-w" aria-hidden="true"></i>
+            <span class="visually-hidden">GeneWeb Wiki</span>
           </a>
           <a href="https://github.com/geneweb/geneweb"
-             class="ml-1" target="_blank" rel="noreferrer noopener" data-toggle="tooltip" title="GeneWeb Github">%nn;
-            <i class="fab fa-github"></i>
+             class="ms-1" target="_blank" rel="noreferrer noopener"
+             data-bs-toggle="tooltip" title="GeneWeb Github">%nn;
+            <i class="fab fa-github" aria-hidden="true"></i>
+            <span class="visually-hidden">GeneWeb Github</span>
           </a>
         </div>
       </div>

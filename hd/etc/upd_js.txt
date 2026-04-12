@@ -1,5 +1,6 @@
 <!-- $Id: upd_js.txt v7.1 06/01/2026 02:00:03 $ -->
 %( Input datalists and function to populate all datalists %)
+%if;not ("CHG_EVT" in e.m);
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
 %apply;dl("fnames")
 %apply;dl("snames")
@@ -177,7 +178,50 @@ function changeCalendar(e, v, m, c) {
   }
   
   document.getElementById(e).innerHTML = 
-    '<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">' +
+    '<select class="form-select form-control-inline ps-sm-1 pe-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ms-sm-2 ms-md-3%end;" name="' + v + '" style="display:inline-block;width:auto">' +
     options + '</select>';
 }
 </script>
+%else;
+%( m=CHG_EVT %)
+<script>
+ (function() {
+  const list = document.getElementById('sort_list');
+  if (!list) return;
+
+  function updatePositions(li) {
+    // Re-numérote les .pos selon l'ordre DOM actuel
+    list.querySelectorAll(':scope > li').forEach((item, idx) => {
+      const pos = item.querySelector('.pos');
+      if (pos) pos.value = idx + 1;
+    });
+  }
+
+  function refreshArrows() {
+    const items = list.querySelectorAll(':scope > li');
+    items.forEach((li, idx) => {
+      const up = li.querySelector('.up');
+      const down = li.querySelector('.down');
+      if (up) up.style.visibility = (idx === 0) ? 'hidden' : 'visible';
+      if (down) down.style.visibility = (idx === items.length - 1) ? 'hidden' : 'visible';
+    });
+  }
+
+  list.addEventListener('click', function(e) {
+    const btn = e.target.closest('.up, .down');
+    if (!btn) return;
+    const li = btn.closest('li');
+    if (!li) return;
+    if (btn.classList.contains('up') && li.previousElementSibling) {
+      li.parentNode.insertBefore(li, li.previousElementSibling);
+    } else if (btn.classList.contains('down') && li.nextElementSibling) {
+      li.parentNode.insertBefore(li.nextElementSibling, li);
+    }
+    updatePositions();
+    refreshArrows();
+  });
+
+  refreshArrows();
+})();
+</script>
+%end;

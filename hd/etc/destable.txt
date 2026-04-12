@@ -1,4 +1,4 @@
-<!-- $Id: destable.txt v7.1 14/03/2026 17:18:33 $ -->
+<!-- $Id: destable.txt v7.1 08/04/2026 23:04:55 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;" id="scrollfix">
@@ -9,14 +9,14 @@
 </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
 %include;css
 </head>
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container-fluid pl-4">
+<div class="container-fluid ps-4">
 %if;not cancel_links;
   %include;menubar
 %end;
@@ -29,7 +29,7 @@
 %end;
 %apply;setvar%with;descname%and;%apply;desc(l_v)%end;
 %let;desc;%if;("0" in get_var.descname)0%else;%get_var.descname;%end;%in;
-<h1 class="h3 mt-3%if;not cancel_links; ml-1%end;">%nn;
+<h1 class="h3 mt-3%if;not cancel_links; ms-1%end;">%nn;
   %if;(l_v!=0)
     %apply;a_of_b%with;
       %if;(only=1 and desc!=0)%apply;capitalize(desc)
@@ -93,7 +93,7 @@
 %( Descendant (et son conjoint en mode I) %)
   %if;(famx=1)
     %if;("yyy"="desc")
-      <td class="align-middle%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
+      <td class="align-middle%if;(e.nowrap="on") text-nowrap%end; ps-2%nn;
         %if;(e.ns=1)
           %if;has_notes; note%if;has_psources;source%end;%elseif;has_psources; source%end;
         %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
@@ -104,9 +104,9 @@
                  %if;has_notes;[note/notes]1%if;has_psources; [and] [source/sources]1%end;
                  %elseif;has_psources;[source/sources]1%end;."
           %apply;popover_params("right")
-          data-content='%if;has_notes;%apply;clean_comment_tags(notes)%end;
+          data-bs-content='%if;has_notes;%apply;clean_comment_tags(notes)%end;
                         %if;has_psources;%if;has_notes;<hr>%end;%apply;capitalize(psources)%end;'
-          data-title="%if;has_notes;[*note/notes]1%if;has_psources; [and] [source/sources]1%end;%elseif;has_psources;[*source/sources]1%end;"
+          data-bs-title="%if;has_notes;[*note/notes]1%if;has_psources; [and] [source/sources]1%end;%elseif;has_psources;[*source/sources]1%end;"
         %end;>
         %apply;add_in_sorted_list(xxx.index)
         %apply;add_in_sorted_listc(xxx.index)
@@ -118,14 +118,14 @@
           </div>
           %if;(e.im="" and xxx.has_image)
             %if;not cancel_links;<a href="%xxx.image_url;" target="_blank" title="%xxx;">%end;
-            <img src="%xxx.image_url;" class="rounded align-self-center ml-1 table-img-max-width"
-             height="%if;(e.px!="")%e.px;%else;60%end;" alt=" alt="%apply;a_of_b%with;[portrait]%and;%xxx;%end;">
+            <img src="%xxx.image_url;" class="rounded align-self-center ms-1 table-img-max-width"
+             height="%if;(e.px!="")%e.px;%else;60%end;" alt="%apply;a_of_b%with;[portrait]%and;%xxx;%end;">
             %if;not cancel_links;</a>%end;
           %end;
         </div>
       </td>
     %elseif;(e.t="I")
-      <td class="align-middle text-right%if;(e.nowrap="on") text-nowrap%end;%nn;
+      <td class="align-middle text-end%if;(e.nowrap="on") text-nowrap%end;%nn;
         %if;(e.ns=1)
           %if;(xxx.has_notes and not xxx.has_psources) notespouse%nn;
           %elseif;(not xxx.has_notes and xxx.has_psources) sourcespouse%nn;
@@ -134,10 +134,10 @@
         %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
               or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) bg-ly-incomplete%end;"%nn;
         %if;(e.ns=1 and (xxx.has_notes or xxx.has_psources)) tabindex="0" %apply;popover_params("right")
-          data-content='%if;(xxx.has_notes)%apply;clean_comment_tags(xxx.notes)%end;
+          data-bs-content='%if;(xxx.has_notes)%apply;clean_comment_tags(xxx.notes)%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
                         %if;(xxx.has_psources)%apply;capitalize(xxx.psources)%end;'
-          title="%if;(xxx.has_notes and not xxx.has_psources)[*note/notes]1%nn;
+          data-bs-title="%if;(xxx.has_notes and not xxx.has_psources)[*note/notes]1%nn;
                 %elseif;(not xxx.has_notes and xxx.has_psources)[*source/sources]1%nn;
                 %elseif;(xxx.has_notes and xxx.has_psources)[*note/notes]1 [and] [source/sources]1%nn;
                 %end;"%nn;
@@ -176,20 +176,20 @@
     %else;
       %foreach;xxx.family;
         %if;(family_cnt=fam_cnt)
-          <td class="align-middle%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
+          <td class="align-middle%if;(e.nowrap="on") text-nowrap%end; ps-2%nn;
           %if;(e.ns=1)
             %if;(spouse.has_notes) note%if;(spouse.has_psources)source%end;
             %elseif;(spouse.has_psources) source%end;
           %end;
           %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn" or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;"%nn;
           %if;(e.ns=1 and (spouse.has_notes or spouse.has_psources)) tabindex="0" %apply;popover_params("bottom")
-            data-content='%if;(spouse.has_notes)%apply;clean_comment_tags(spouse.notes)%end;
+            data-bs-content='%if;(spouse.has_notes)%apply;clean_comment_tags(spouse.notes)%end;
                           %if;(spouse.has_psources)%if;(spouse.has_notes)<hr>%end;%apply;capitalize(spouse.psources)%end;'
             title="%if;(spouse.has_notes)[*note/notes]1%if;(spouse.has_psources) [and] [source/sources]1%end;
                   %elseif;(spouse.has_psources)[*source/sources]1%end;"%nn;
           %end;>%nn;
             %apply;add_in_sorted_list(spouse.index)
-            %if;(zzz.nb_families>1)<span class="mr-1">%apply;letter(family_cnt)</span>%end;
+            %if;(zzz.nb_families>1)<span class="me-1">%apply;letter(family_cnt)</span>%end;
             %apply;image_MF("spouse")
             %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
             %if;(e.tt=1 and spouse.title!=""), %spouse.title;%end;
@@ -207,7 +207,7 @@
         %if;((nb_families=1 and "yyy"="desc") or (nb_families>1 and
             ((xxx.spouse=zzz and (ddd=family.index)) or
              (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
-          <td class="align-middle text-right%if;not cancel_links; table_big_cell%end;%if;(are_divorced or are_separated) divorced-side-border%end;
+          <td class="align-middle text-end%if;not cancel_links; table_big_cell%end;%if;(are_divorced or are_separated) divorced-side-border%end;
             %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;">
             %if;(wizard and not cancel_links)
@@ -302,9 +302,9 @@
             %end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"%nn;
             %if;(e.ns=1 and (has_fnotes or has_fsources)) tabindex="0" %apply;popover_params("bottom")
-              data-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
+              data-bs-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
                             %if;has_fsources;%if;has_fnotes;<hr>%end;%apply;capitalize(fsources)%end;'
-              data-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
+              data-bs-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
                       %elseif;has_fsources;[*source/sources]1%nn;
                       %end;"%nn;
             %end;>%nn;
@@ -453,7 +453,7 @@
 %( d’Aboville %)
 %define;list_row(xxx, prefx, fam_cnt, ch_cnt)
   %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
-  %if;("prefx"!="")<span class="text-monospace">prefx</span>%end;
+  %if;("prefx"!="")<span class="font-monospace">prefx</span>%end;
     %apply;image_MF("xxx")
   %apply;link%with;%xxx.access;%and;%xxx.first_name; %xxx.surname;%and;%xxx.index;%end;%nn;
   %if;(xxx.title!=""), %xxx.title;%end;
@@ -572,7 +572,7 @@
             <th scope="row" colspan="%nb_col;" class="border-0 gen-row">
               <div class="d-flex">
                 <span>[*generation/generations]0 %expr(lev+1)</span>
-                <span class="ml-auto">%apply;desc_count(lev+1,1,1,0,0)</span>
+                <span class="ms-auto">%apply;desc_count(lev+1,1,1,0,0)</span>
               </div>
             </th>
           </tr>

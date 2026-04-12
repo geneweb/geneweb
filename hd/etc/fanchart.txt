@@ -184,7 +184,7 @@
   <div class="control-section">
     <div class="section-title">[*font/default/large/readable]0</div>
     <div class="btn-group-fanchart">
-     <select id="font-selector" class="custom-select custom-select-sm mx-0">
+     <select id="font-selector" class="form-select form-select-sm mx-0">
        <option value="">[*font/default/large/readable]1</option>
        <option value="mono">Mono</option>
        <option value="serif">Serif</option>
@@ -272,7 +272,7 @@
       </div>
     </div>
     <div class="summary-persons">
-      <i class="fas fa-user summary-persons-icon" title="[*person/persons]1"></i>
+      <i class="fa fa-user summary-persons-icon" title="[*person/persons]1"></i>
       <span class="summary-persons-count">0</span>
     </div>
     <div class="summary-total-events" title="[*event/events]1">0</div>

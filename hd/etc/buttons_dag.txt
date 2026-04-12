@@ -63,117 +63,116 @@
 %let;next_sibling_access;%get_var.nextsiblingaccess;%in;
 %if;(not cancel_links and (e.m="A" or e.m="D"))
 <nav class="navbar fixed-bottom navbar-light bg-light justify-content-center py-0">
-  <div class="btn-toolbar align-items-center%if;(e.m="D" or e.dag="on") mt-1%end;" role="toolbar" arial-label="asc/dsc button group">
-    <div class="btn-group border rounded mr-1" role="group" aria-label="ascendant tree button group">
-      <a role="button" href="%prefix_base_password;m=A&t=A%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")&%env.key=%env.val;%end;%end;"
-        class="btn btn-outline-primary border-%if;(e.t!="A")0%else;2 disabled font-weight-bold%end;%if;(withparents!=1) disabled%end; px-2 pt-1 h-100"
-        title="[*male line/female line]0"><i class="fas fa-mars fa-lg"></i><br>Agna.</a>
-      <a role="button" href="%prefix_base_password;m=A&t=T%foreach;env_binding;%if;(env.key!="m" and env.key!="t")&%env.key=%env.val;%end;%end;"
-        class="btn btn-outline-primary border-%if;(e.m="A" and e.t="T")2 disabled font-weight-bold%else;0%end;%if;(withparents!=1) disabled%end; px-3 pt-1 h-100"
-        title="[*ascendants tree]"><i class="fas fa-code-fork fa-lg"></i><br>Asc.</a>
-      <a role="button" href="%prefix_base_password;m=A&t=C%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")&%env.key=%env.val;%end;%end;"
-        class="btn btn-outline-primary border-%if;(e.t!="C")0%else;2 disabled font-weight-bold%end;%if;(withparents!=1) disabled%end; px-2 pt-1 h-100"
-        title="[*male line/female line]1"><i class="fas fa-venus fa-lg"></i><br>Cogn.</a>
+  <div class="btn-toolbar align-items-center%if;(e.m="D" or e.dag="on") mt-1%end;" role="toolbar" aria-label="asc/dsc button group">
+    <div class="btn-group border rounded me-1" role="group" aria-label="ascendant tree button group">
+      <a href="%prefix_base_password;m=A&t=A%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")&%env.key=%env.val;%end;%end;"
+        class="btn btn-outline-primary border-%if;(e.t!="A")0%else;2 disabled fw-bold%end;%if;(withparents!=1) disabled%end; px-2 pt-1 h-100"
+        title="[*male line/female line]0"><i class="fas fa-mars fa-lg" aria-hidden="true"></i><br>Agna.</a>
+      <a href="%prefix_base_password;m=A&t=T%foreach;env_binding;%if;(env.key!="m" and env.key!="t")&%env.key=%env.val;%end;%end;"
+        class="btn btn-outline-primary border-%if;(e.m="A" and e.t="T")2 disabled fw-bold%else;0%end;%if;(withparents!=1) disabled%end; px-3 pt-1 h-100"
+        title="[*ascendants tree]"><i class="fas fa-code-fork fa-lg" aria-hidden="true"></i><br>Asc.</a>
+      <a href="%prefix_base_password;m=A&t=C%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")&%env.key=%env.val;%end;%end;"
+        class="btn btn-outline-primary border-%if;(e.t!="C")0%else;2 disabled fw-bold%end;%if;(withparents!=1) disabled%end; px-2 pt-1 h-100"
+        title="[*male line/female line]1"><i class="fas fa-venus fa-lg" aria-hidden="true"></i><br>Cogn.</a>
     </div>
-    <div class="btn-group border rounded mr-1">
-      <a role="button" href="%prefix_base_password;m=D&t=T%foreach;env_binding;%if;(env.key!="m" and env.key!="t")&%env.key=%env.val;%end;%end;"
-        class="btn btn-outline-primary border-%if;(e.m="D" and e.t="T")2 disabled font-weight-bold%else;0%end; pt-1"
-        title="[*descendants tree]"><i class="fas fa-sitemap fa-lg"></i><br>Desc.</a>
-        <a role="button" href="%prefix_base_password;m=D&t=V%foreach;env_binding;%if;(env.key!="m" and env.key!="t")&%env.key=%env.val;%end;%end;"
-        class="btn btn-outline-primary border-%if;(e.m="D" and e.t="V")2 disabled font-weight-bold%else;0%end; pt-1"
-        title="[*descendants tree]"><i class="fas fa-sitemap fa-sm"></i><br>V</a>
-      <a role="button" class="btn btn-outline-primary border-%if;(e.m="D" and e.t="TV")2 disabled font-weight-bold%else;0%end; pt-1"
+    <div class="btn-group border rounded me-1">
+      <a href="%prefix_base_password;m=D&t=T%foreach;env_binding;%if;(env.key!="m" and env.key!="t")&%env.key=%env.val;%end;%end;"
+        class="btn btn-outline-primary border-%if;(e.m="D" and e.t="T")2 disabled fw-bold%else;0%end; pt-1"
+        title="[*descendants tree]"><i class="fas fa-sitemap fa-lg" aria-hidden="true"></i><br>Desc.</a>
+        <a href="%prefix_base_password;m=D&t=V%foreach;env_binding;%if;(env.key!="m" and env.key!="t")&%env.key=%env.val;%end;%end;"
+        class="btn btn-outline-primary border-%if;(e.m="D" and e.t="V")2 disabled fw-bold%else;0%end; pt-1"
+        title="[*descendants tree]"><i class="fas fa-sitemap fa-sm" aria-hidden="true"></i><br>V</a>
+      <a class="btn btn-outline-primary border-%if;(e.m="D" and e.t="TV")2 disabled fw-bold%else;0%end; pt-1"
         href="%prefix_base_password;m=D&t=TV%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag" and env.key!="oi")&%env.key=%env.val;%end;%end;"
-        title="%if;(e.t!="TV")[*visualize/show/hide/summary]1 [compact form]%end;"><i class="fas fa-code-fork fa-rotate-180 fa-lg"></i><br>Short</a>
+        title="%if;(e.t!="TV")[*visualize/show/hide/summary]1 [compact form]%end;"><i class="fas fa-code-fork fa-rotate-180 fa-lg" aria-hidden="true"></i><br>Short</a>
     </div>
-    <div class="d-flex flex-column justify-content-center mr-1">
+    <div class="d-flex flex-column justify-content-center me-1">
       <div class="d-flex flex-nowrap justify-content-center mx-1">
         <div class="border rounded order-%if;(e.mf=1)1%else;3%end;">
-          <a role="button" class="d-flex btn btn-sm btn-outline-%if;(e.dag="on" or (e.dag!="on" and mother_access="") or (e.dag!="on" and e.m="A" and not mother.has_parents))dark disabled%else;primary%end; border-0" href="%prefix_base_password;m=%e.m;&t=%e.t;&%mother_access;&%nn;
+          <a class="d-flex btn btn-sm btn-outline-%if;(e.dag="on" or (e.dag!="on" and mother_access="") or (e.dag!="on" and e.m="A" and not mother.has_parents))dark disabled%else;primary%end; border-0" href="%prefix_base_password;m=%e.m;&t=%e.t;&%mother_access;&%nn;
             %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i" or env.key="v" or env.key="pz" or env.key="nz" or env.key="ocz" or env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;v=%if;(e.m="D" and e.v<maxlev)%expr(e.v+1)%else;%e.v;%end;"
             title="[*navigate on tree] [with] %if;(e.m="D")[father/mother]1[:]&#10;%mother_access;&#10;v=%if;(e.v<maxlev)%expr(e.v+1)%else;%expr(e.v) (max)%end;%else;[the father/the mother/a parent]1 %mother.first_name; %mother.surname;%end;">%nn;
-            <span%if;(e.mf=1) class="order-2"%end;>[*father/mother]1</span><i class="fas fa-arrow-turn-up fa-sm%if;(e.mf=1) fa-flip-horizontal order-1 mr%else; ml%end;-2 align-self-center"></i>%nn;
+            <span%if;(e.mf=1) class="order-2"%end;>[*father/mother]1</span><i class="fas fa-arrow-turn-up fa-sm%if;(e.mf=1) fa-flip-horizontal order-1 me%else; ms%end;-2 align-self-center" aria-hidden="true"></i>%nn;
           </a>
         </div>
         <div class="border rounded mx-1 order-2">
-          <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A" and e.t="T" and e.dag!="on")primary%else;dark disabled%end; border-%if;(e.m="A" and e.mf=1)2%else;0%end;"
+          <a class="btn btn-sm btn-outline-%if;(e.m="A" and e.t="T" and e.dag!="on")primary%else;dark disabled%end; border-%if;(e.m="A" and e.mf=1)2%else;0%end;"
             href="%if;(e.mf!=1)%url_set.mf.1;%else;%url_set.mf;%end;"
             title="[*invert] %if;(e.mf=1)[father/mother]1/[father/mother]0%else;[father/mother]0/[father/mother]1%end;">%nn;
-            <i class="fas fa-arrow-right-arrow-left fa-sm"></i>%nn;
+            <i class="fas fa-arrow-right-arrow-left fa-sm" aria-hidden="true"></i>%nn;
           </a>
         </div>
         <div class="border rounded order-%if;(e.mf=1)3%else;1%end;">
-          <a role="button" class="d-flex btn btn-sm btn-outline-%if;(e.dag="on" or (e.dag!="on" and father_access="") or (e.dag!="on" and e.m="A" and not father.has_parents))dark disabled%else;primary%end; border-0" href="%prefix_base_password;m=%e.m;&t=%e.t;&%father_access;&%nn;
+          <a class="d-flex btn btn-sm btn-outline-%if;(e.dag="on" or (e.dag!="on" and father_access="") or (e.dag!="on" and e.m="A" and not father.has_parents))dark disabled%else;primary%end; border-0" href="%prefix_base_password;m=%e.m;&t=%e.t;&%father_access;&%nn;
             %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i" or env.key="v" or env.key="pz" or env.key="nz" or env.key="ocz" or env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;v=%if;(e.m="D" and e.v<maxlev)%expr(e.v+1)%else;%e.v;%end;"
             title="[*navigate on tree] [with] %if;(e.m="D")[father/mother]0[:]&#10;%father_access;&#10;v=%if;(e.v<maxlev)%expr(e.v+1)%else;%expr(e.v) (max)%end;%else;[the father/the mother/a parent]0 %father.first_name; %father.surname;%end;">%nn;
-            <i class="fas fa-arrow-turn-up fa-sm%if;(e.mf=1) order-2 ml%else; fa-flip-horizontal mr%end;-2 align-self-center"></i><span%if;(e.mf=1) class="order-1"%end;>[*father/mother]0</span>%nn;
+            <i class="fas fa-arrow-turn-up fa-sm%if;(e.mf=1) order-2 ms%else; fa-flip-horizontal me%end;-2 align-self-center" aria-hidden="true"></i><span%if;(e.mf=1) class="order-1"%end;>[*father/mother]0</span>%nn;
           </a>
         </div>
       </div>
       <div class="d-inline-flex flex-nowrap justify-content-around align-items-center my-1">
-        <a role="button" class="btn btn-sm btn-outline-%if;(prev_sibling_access="" or "%" in prev_sibling_access)dark disabled%else;primary%end; border rounded" href="%prefix_base_password;%prev_sibling_access;&%nn;
+        <a class="btn btn-sm btn-outline-%if;(prev_sibling_access="" or "%" in prev_sibling_access)dark disabled%else;primary%end; border rounded" href="%prefix_base_password;%prev_sibling_access;&%nn;
           %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i"))%env.key;=%env.val;&%end;%end;"
-          title="[*navigate on tree] [with] [previous sibling]2 %if;(dtree=1)%prev_sibling_access;%else;%get_var.prevsiblingname;%end;"><i class="fas fa-angle-left"></i></a>
+          title="[*navigate on tree] [with] [previous sibling]2 %if;(dtree=1)%prev_sibling_access;%else;%get_var.prevsiblingname;%end;"><i class="fas fa-angle-left" aria-hidden="true"></i></a>
         <span class="user-select-none small">[*siblings]</span>
-        <a role="button" class="btn btn-sm btn-outline-%if;(next_sibling_access="" or "%" in next_sibling_access)dark disabled%else;primary%end; border rounded" href="%prefix_base_password;%next_sibling_access;&%nn;
+        <a class="btn btn-sm btn-outline-%if;(next_sibling_access="" or "%" in next_sibling_access)dark disabled%else;primary%end; border rounded" href="%prefix_base_password;%next_sibling_access;&%nn;
             %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i"))%env.key;=%env.val;&%end;%end;"
-            title="[*navigate on tree] [with] [next sibling]2 %if;(dtree=1)%next_sibling_access;%else;%get_var.nextsiblingname;%end;"><i class="fas fa-angle-right"></i></a>
+            title="[*navigate on tree] [with] [next sibling]2 %if;(dtree=1)%next_sibling_access;%else;%get_var.nextsiblingname;%end;"><i class="fas fa-angle-right" aria-hidden="true"></i></a>
       </div>
     </div>
     <div>
       <div class="btn-group border rounded" role="group" aria-label="generation pickup buttons group">
         <span class="btn btn-sm btn-primary disabled border border-info rounded-left mt-0 w-100 h-100">[*generation/generations]0</span>
         %if;(maxlev>9 and evarv>5)
-          <a role="button" href="%apply;url_set%with;v%and;%expr(evarv-1)%end;"
-            class="btn btn-sm btn-outline-primary font-weight-bold border-0 px-2"
-            title="(-1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1 (max %maxlev;)">−</a>
+          <a href="%apply;url_set%with;v%and;%expr(evarv-1)%end;"
+            class="btn btn-sm btn-outline-primary fw-bold border-0 px-2"
+            aria-label="[*visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1"
+            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1 (max %maxlev;)">−</a>
         %end;
         %for;i;minv;maxv;
-          <a role="button" id="v%i;" class="btn btn-sm px-%if;(i<10)2%else;1%end; btn-outline-primary border-%if;(evarv=i)2 rounded disabled font-weight-bold%else;0%end;" %if;(evarv!=i)href="%apply;url_set%with;v%and;%expr(i)%end;"%end;%sp;
-            title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
-            %end; %if;(i=maxlev)(max)%end;">%i;%(%if;(evarv=i)<br>^%end;%)</a>
+          <a id="v%i;" class="btn btn-sm px-%if;(i<10)2%else;1%end; btn-outline-primary border-%if;(evarv=i)2 rounded fw-bold%else;0%end;"
+            %if;(evarv!=i)href="%apply;url_set%with;v%and;%expr(i)%end;"%else;aria-current="page"%end;
+            title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
+            %end; %if;(i=maxlev)(max)%end;">%i;</a>
         %end;
         %if;(maxlev>9 and maxlev-evarv>=5)
-          <a role="button" href="%apply;url_set%with;v%and;%expr(evarv+1)%end;"
-            class="btn btn-sm btn-outline-primary font-weight-bold border-0 px-2"
+          <a href="%apply;url_set%with;v%and;%expr(evarv+1)%end;"
+            class="btn btn-sm btn-outline-primary fw-bold border-0 px-2"
+            aria-label="[*visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1"
             title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
         %end;
       </div>
       <div class="d-flex align-self-center my-1">
-        <div class="border rounded mr-1">
-          <a role="button" class="btn btn-sm btn-outline-%if;(e.dag="on")primary border-2%elseif;(e.t="C" or e.t="A" or e.t="V" or e.t="TV")dark disabled border-0%else;primary border-0%end;"
-        href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;"
-        title="%if;(e.dag!="on")[*dag on/dag off]0%else;[*dag on/dag off]1%end; ([dag])">
-          <i class="fa fa-shuffle fa-fw fa-lg"></i>Dag</a>
-        </div>
-        <div class="border rounded mr-1">
-          <a role="button" class="btn btn-sm btn-outline-primary border-%if;(e.im!=0)2%else;0%end; h-100"
+        <div class="btn-group btn-group-sm" role="group" aria-label="[*visualize/show/hide/summary]1">
+          <a class="btn btn-outline-%if;(e.dag="on")primary border-2%elseif;(e.t="C" or e.t="A" or e.t="V" or e.t="TV")dark disabled border-0%else;primary border-0%end;"
+            href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;"
+            aria-pressed="%if;(e.dag="on")true%else;false%end;"
+            title="%if;(e.dag!="on")[*dag on/dag off]0%else;[*dag on/dag off]1%end; ([dag])">
+            <i class="fa fa-shuffle fa-sm me-1" aria-hidden="true"></i>Dag</a>
+          <a class="btn btn-outline-primary border-%if;(e.im!=0)2%else;0%end;"
             href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
+            aria-pressed="%if;(e.im!=0)true%else;false%end;"
             title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
-            <i class="fa fa-image fa-sm mr-1"></i>[*image/images]1
+            <i class="fa fa-image fa-sm me-1" aria-hidden="true"></i>[*image/images]1
           </a>
-        </div>
-        <div class="border rounded mr-1">
-          <a role="button" class="btn btn-sm btn-outline-%if;(e.dag="on" or e.t="A" or e.t="C" or e.t="V")dark disabled border-0%else;primary%end; border-%if;(e.ma!=0)2%else;0%end; w-100 h-100"
+          <a class="btn btn-outline-%if;(e.dag="on" or e.t="A" or e.t="C" or e.t="V")dark disabled border-0%else;primary%end; border-%if;(e.ma!=0)2%else;0%end;"
             href="%if;(e.ma!=0)%url_set.ma.0;%else;%url_set.ma%end;"
+            aria-pressed="%if;(e.ma!=0)true%else;false%end;"
             title="%if;(e.ma!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date of marriage]">
-            <i class="fa fa-venus-mars fa-sm mr-1"></i>[*marriage/marriages]1
+            <i class="fa fa-venus-mars fa-sm me-1" aria-hidden="true"></i>[*marriage/marriages]1
           </a>
-        </div>
-        <div class="border rounded mr-1">
-          <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp!=0)2%else;0%end; w-100 h-100"
+          <a class="btn btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp!=0)2%else;0%end;"
             href="%if;(e.sp!=0)%url_set.sp.0;%else;%url_set.sp;%end;"
+            aria-pressed="%if;(e.sp!=0)true%else;false%end;"
             title="%if;(e.sp!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
-            <i class="fa fa-user-plus fa-sm mr-1"></i>[*spouse/spouses]1
+            <i class="fa fa-user-plus fa-sm me-1" aria-hidden="true"></i>[*spouse/spouses]1
           </a>
-        </div>
-        <div class="border rounded mr-1">
-          <a role="button" class="btn btn-sm btn-outline-primary mr-2 border-0 w-100 h-100"
+          <a class="btn btn-outline-primary me-2 border-0"
             href="%url_set.cgl.on;" target="_blank">
-            <i class="fa fa-link-slash fa-sm mr-1" title="[*cancel GeneWeb links]"></i>Cgl</a>
+            <i class="fa fa-link-slash fa-sm me-1" title="[*cancel GeneWeb links]" aria-hidden="true"></i>Cgl</a>
         </div>
         %(%if;(e.slices!="on" and e.notab!="on" and e.t!="TV")
-          <a role="button" class="btn btn-sm"
+          <a class="btn btn-sm"
           href="%prefix_base_password;%foreach;env_binding;%env.key;=%env.val;&%end;notab=on&slices=on" accesskey="/"
           title="[*display by slices/slice width/overlap/total width]0">//</a>
         %end;%)
@@ -184,19 +183,20 @@
 </nav>
 %end;
 %if;(not cancel_links and (e.m="RLM" or e.m="DAG"))
-  <div class="btn-group ml-auto align-items-center mr-5" role="group" arial-label="RLM button group">
+  <div class="btn-group ms-auto align-items-center me-5" role="group" aria-label="RLM button group">
     <a class="btn btn-outline-primary border-0" title="[*add/clear/show/edit the graph]3"
       href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
-      <i class="far fa-pen-to-square fa-lg fa-fw"></i> [*modify]</a>
-    <a role="button" class="btn btn-outline-%if;(e.im=0)primary%else;danger%end; ml-1 border-0"
+      <i class="far fa-pen-to-square fa-lg fa-fw" aria-hidden="true"></i> [*modify]</a>
+    <a class="btn btn-outline-%if;(e.im=0)primary%else;danger%end; ms-1 border-0"
       href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
+      aria-pressed="%if;(e.im!=0)true%else;false%end;"
       title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
-      <i class="fa fa-image fa-lg fa-fw"></i> [*image/images]1</a>
-    <a role="button" class="btn btn-outline-%if;(e.sp=0)primary%else;danger%end; ml-1 border-0"
+      <i class="fa fa-image fa-lg fa-fw" aria-hidden="true"></i> [*image/images]1</a>
+    <a class="btn btn-outline-%if;(e.sp=0)primary%else;danger%end; ms-1 border-0"
       href="%if;(e.sp!=0)%url_set.sp.0;%else;%url_set.sp;%end;"
+      aria-pressed="%if;(e.sp!=0)true%else;false%end;"
       title="%if;(e.sp!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
-      <i class="fa fa-user-plus fa-sm mr-1"></i>[*spouse/spouses]1</a>
-    <a role="button" class="btn btn-outline-primary ml-1 border-0" href="%url_set.cgl.on;"
-      title="[*cancel GeneWeb links]"><i class="fa fa-link-slash fa-lg fa-fw"></i> Cgl</a>
+      <i class="fa fa-user-plus fa-sm me-1" aria-hidden="true"></i>[*spouse/spouses]1</a>
+    <a class="btn btn-outline-primary ms-1 border-0" href="%url_set.cgl.on;" title="[*cancel GeneWeb links]"><i class="fa fa-link-slash fa-lg fa-fw" aria-hidden="true"></i> Cgl</a>
   </div>
 %end;

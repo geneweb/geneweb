@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_famille.txt v7.1 17/12/2025 16:47:28 $ -->
+<!-- $Id: modules/arbre_famille.txt v7.1 04/04/2026 07:06:25 $ -->
 %define;short_display_person_image(xxx,yyy,zzz)
   %let;personinfo;%if;("xxx"="child")%sp;(%childrank;)%nn;
                   %elseif;("xxx"="child.spouse")
@@ -41,7 +41,7 @@
                   %end;
   %in;
   
-  <div class="d-flex justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; %if;("xxx"="mother" or "xxx"="spouse.mother")ml-1%elseif;("xxx"="father" or "xxx"="spouse.father")mr-1%else;pr-0 w-100%end;%if;(e.im!=0) pl-0 py-0%end;
+  <div class="d-flex justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; %if;("xxx"="mother" or "xxx"="spouse.mother")ms-1%elseif;("xxx"="father" or "xxx"="spouse.father")me-1%else;pe-0 w-100%end;%if;(e.im!=0) ps-0 py-0%end;
   %if;("xxx"="father.father" or "xxx"="mother.father") translate-left-1
   %elseif;("xxx"="spouse.father.father" or "xxx"="spouse.mother.father") translate-right-1
   %end;">
@@ -56,7 +56,7 @@
           <a href="%xxx.image_url;" class="normal_anchor"
             target="_blank" title="[*image/images]0 %xxx;%personinfo;">%nn;
         %end;
-          <img class="image-arbre-famille %if;not cancel_links;fade_image%end; rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0">%nn;
+          <img class="image-arbre-famille %if;not cancel_links;fade_image%end; rounded ms-0 pe-0" src="%xxx.image_url;" alt="[image/images]0">%nn;
         %if;not cancel_links;</a>%end;
       %elseif;(b.default_image="yes")
         %if;(wizard and not cancel_links)
@@ -64,16 +64,16 @@
             class="normal_anchor" target="_blank"
             title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;%personinfo;">%nn;
         %end;
-        <img class="image-arbre-famille rounded ml-0"
+        <img class="image-arbre-famille rounded ms-0"
           src="%images_prefix;img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
           alt="[missing image]">
         %if;(wizard and not cancel_links)</a>%end;
       %else;
-        <span class="image-arbre-placeholder ml-0 pb-2">?</span>
+        <span class="image-arbre-placeholder ms-0 pb-2">?</span>
       %end;
     %end;
     </div>
-    <div class="d-flex flex-column justify-content-center overflow-hidden ml-2">
+    <div class="d-flex flex-column justify-content-center overflow-hidden ms-2">
     %(%if;(xxx.has_sosa)%apply;display_sosa("xxx")%end;
       %apply;image_MF("xxx")%)
       %if;(not (cancel_links or xxx.is_restricted))
@@ -93,7 +93,7 @@
         <a class="normal_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;"
           title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;%personinfo;">%nn;
       %end;
-      <span class="text-muted">%nn;
+      <span class="text-body-secondary">%nn;
         %if;(xxx.dates!="")%xxx.dates;
         %elseif;(wizard and not cancel_links)-
         %elseif;(cancel_links)<br>
@@ -148,10 +148,10 @@
                             %else;
                               dark
                             %end;%sp;
-            %if;(ancestor.anc_sosa.v=10 or ancestor.anc_sosa.v=14)border-right-0 ml-1%end;%sp;
-            %if;(ancestor.anc_sosa.v=9 or ancestor.anc_sosa.v=13)border-left-0  mr-1%end;
-            %if;(ancestor.anc_sosa.v=8 or ancestor.anc_sosa.v=12)border-right-0%end;%sp;
-            %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-left-0%end;">%nn;
+            %if;(ancestor.anc_sosa.v=10 or ancestor.anc_sosa.v=14)border-end-0 ms-1%end;%sp;
+            %if;(ancestor.anc_sosa.v=9 or ancestor.anc_sosa.v=13)border-start-0 me-1%end;
+            %if;(ancestor.anc_sosa.v=8 or ancestor.anc_sosa.v=12)border-end-0%end;%sp;
+            %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-start-0%end;">%nn;
             %if;(not ancestor.is_restricted)
               <a class="big_anchor list-group-item-action rounded-%if;ancestor.is_male;left%else;right%end;" 
                 href="%prefix;%ancestor.access;&m=F"
@@ -185,7 +185,7 @@
 %end;
 
 %define;border()
-  <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
+  <div class="w-50 border-end border-dark">&#8203;</div>
 %end;
 
 %define;short_display_person_spouse_image(xx,yy)
@@ -195,7 +195,7 @@
       <div class="d-flex flex-row">
         <div class="%if;(e.image!="off")d-flex flex-column%else;align-self-center%end;">
           %if;(e.im!=0)%apply;border()%end;
-          <span class="align-self-center %if;(child.marriage_date.year="")mx-4%else;ml-1 mr-2%end; text-nowrap">&%if;(child.marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">%child.marriage_date.year;</a>%end;</span>
+          <span class="align-self-center %if;(child.marriage_date.year="")mx-4%else;ms-1 me-2%end; text-nowrap">&%if;(child.marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">%child.marriage_date.year;</a>%end;</span>
           %if;(e.im!=0 and nb_children>0)
             <div class="text-center">
               %if;(not cancel_links)
@@ -231,7 +231,7 @@
 %let;prefx;%if;(e.m="F")%prefix_set.pmod;%else;%prefix;%end;%in;
 %if;(not cancel_links)
   <div class="d-flex justify-content-end">
-    <div class="text-right mr-3">
+    <div class="text-end me-3">
       <a href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
         class="btn btn-outline-%if;(e.im=0)primary%else;danger%end;"
         title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;%nn;
@@ -263,18 +263,18 @@
 %let;fam_cnt;%if;(e.fam!="")%e.fam;%else;1%end;%in;
 <div class="col-12 d-flex mt-2">
   %( Grand-parents et parents individu %)
-  <div class="col-6 px-0 mr-1 align-self-end">
+  <div class="col-6 px-0 me-1 align-self-end">
     %if;(has_parents)
       <div class="d-flex">
         <div class="col-6 px-0 align-self-end">
           <div class="d-flex flex-column">
             %if;father.has_parents;
               %if;(not cancel_links)
-                <div class="d-flex justify-content-around px-2 mr-1">
+                <div class="d-flex justify-content-around px-2 me-1">
                   %apply;ancestorlv4("ancestor",8,9,10,11)
                 </div>
               %end;
-              <div class="list-group mr-1 d-flex align-items-stretch">
+              <div class="list-group me-1 d-flex align-items-stretch">
                 %apply;short_display_person_image("father.father", "yes", "")
                 %apply;short_display_person_image("father.mother", "yes", "")
               </div>
@@ -291,11 +291,11 @@
           <div class="d-flex flex-column">
             %if;mother.has_parents;
               %if;(not cancel_links)
-                <div class="d-flex justify-content-around px-2 ml-1">
+                <div class="d-flex justify-content-around px-2 ms-1">
                   %apply;ancestorlv4("ancestor",12,13,14,15)
                 </div>
               %end;
-              <div class="list-group ml-1">
+              <div class="list-group ms-1">
                 %apply;short_display_person_image("mother.father", "yes", "")
                 %apply;short_display_person_image("mother.mother", "yes", "")
               </div>
@@ -318,7 +318,7 @@
   </div>
 
   %( Grand-parents et parents conjoint %)
-  <div class="col-6 px-0 ml-1 align-self-end">
+  <div class="col-6 px-0 ms-1 align-self-end">
     %foreach;family;
       %if;(family_cnt=fam_cnt)
         %if;(spouse!="" and spouse.has_parents)
@@ -327,11 +327,11 @@
               <div class="d-flex flex-column">
                 %if;spouse.father.has_parents;
                   %if;(not cancel_links)
-                    <div class="d-flex justify-content-around px-2 mr-1">
+                    <div class="d-flex justify-content-around px-2 me-1">
                       %apply;ancestorlv4("spouse.ancestor",8,9,10,11)
                     </div>
                   %end;
-                  <div class="list-group mr-1">
+                  <div class="list-group me-1">
                     %apply;short_display_person_image("spouse.father.father", "yes", "")
                     %apply;short_display_person_image("spouse.father.mother", "yes", "")
                   </div>
@@ -348,11 +348,11 @@
               <div class="d-flex flex-column">
                 %if;spouse.mother.has_parents;
                   %if;(not cancel_links)
-                    <div class="d-flex justify-content-around px-2 ml-1">
+                    <div class="d-flex justify-content-around px-2 ms-1">
                       %apply;ancestorlv4("spouse.ancestor",12,13,14,15)
                     </div>
                   %end;
-                  <div class="list-group ml-1">
+                  <div class="list-group ms-1">
                     %apply;short_display_person_image("spouse.mother.father", "yes", "")
                     %apply;short_display_person_image("spouse.mother.mother", "yes", "")
                   </div>
@@ -379,8 +379,8 @@
 
 <div class="col-12 d-flex px-1">
   %( Individu et sa fratrie %)
-  <div class="col%if;not has_families;-6%end; pr-0 pl-2">
-    <div class="%if;not has_families;d-flex justify-content-center mx-5%else;ml-3%end;">
+  <div class="col%if;not has_families;-6%end; pe-0 ps-2">
+    <div class="%if;not has_families;d-flex justify-content-center mx-5%else;ms-3%end;">
       %let;selfsex; (%if;(self.is_male)[him/her]0%else;[him/her]1%end;)%in;
       %apply;short_display_person_image("self", "force", "")
       %let;selfsex;%in;
@@ -389,7 +389,7 @@
       %let;fath;%father.index;%in;
       %let;moth;%mother.index;%in;
       %foreach;father.family;
-        <div class="row px-0 ml-1">
+        <div class="row px-0 ms-1">
           %if;(father.spouse.index=moth or e.half!=0)
             <div class="col list-group order-2">
               %reset_count;%reset_count1;%reset_count2;
@@ -397,7 +397,7 @@
                 %if;(child.index=central_index)
                   %if;child.has_siblings;
                     <div class="d-flex justify-content-center">
-                      <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                      <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-end-0 border-start-0"></div>
                     </div>
                   %end;
                 %else;
@@ -457,14 +457,14 @@
         </div>
       %end;
       %foreach;mother.family;
-        <div class="row mt-1 ml-1">
+        <div class="row mt-1 ms-1">
           %if;(mother.spouse.index!=fath and e.half!=0)
             <div class="col list-group order-2">
               %reset_count;%reset_count1;%reset_count2;
               %foreach;child;
                 %if;(child.index=central_index)
                   <div class="d-flex justify-content-center">
-                    <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                    <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-end-0 border-start-0"></div>
                   </div>
                 %else;
                   %incr_count;
@@ -513,11 +513,11 @@
         %foreach;family;
           %if;(family_cnt=fam_cnt)
             %if;(spouse!="" or (e.half!=0 and nb_ch_tot>0))
-              <div class="border border-dark border-top-0 border-left-0 border-right-0 text-center">%if;(on_marriage_date!="" and  marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">&%marriage_date.year;%end;</a>%if;(nb_children!=0)  %nb_children;<i class="fa fa-child fa-fw"></i>%end;
+              <div class="border border-dark border-top-0 border-start-0 border-end-0 text-center">%if;(on_marriage_date!="" and  marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">&%marriage_date.year;%end;</a>%if;(nb_children!=0)  %nb_children;<i class="fa fa-child fa-fw"></i>%end;
               </div>
             %end;
             %if;(has_children or (e.half!=0 and nb_ch_tot>0))
-              <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;<br>&#8203;</div>
+              <div class="border border-dark border-bottom-0 border-top-0 border-start-0 w-50">&#8203;<br>&#8203;</div>
             %end;
           %end;
         %end;
@@ -597,9 +597,9 @@
   %url_set.xxx.yyy;
 %end;
   %( Conjoint et sa fratrie %)
-  <div class="%if;not has_families;d-none%else;col%end; pl-0 pr-2">
+  <div class="%if;not has_families;d-none%else;col%end; ps-0 pe-2">
     %( Conjoint·s %)
-      <div class="mr-3">
+      <div class="me-3">
         %let;famcount;%nb_families;%in;
         %foreach;family;
           %if;(spouse!="")
@@ -614,11 +614,11 @@
              %if;(family_cnt=fam_cnt)
                %apply;short_display_person_image("spouse", "yes", "")
              %else;
-              <a class="d-flex list-group-item list-group-item-dark ml-2 pl-0 pr-2 py-0"
+              <a class="d-flex list-group-item list-group-item-dark ms-2 ps-0 pe-2 py-0"
                 href="%apply;url%with;fam%and;%if;(family_cnt!=1)%family_cnt;%end;%end;"
                 title="[*visualize/show/hide/summary]1 %spouse;%spouserank;">
-                <span class="ml-2">(%family_cnt;)</span>
-                <span class="ml-1">%spouse;</span>
+                <span class="ms-2">(%family_cnt;)</span>
+                <span class="ms-1">%spouse;</span>
                 %if;(nb_children>0)
                   %reset_count;%reset_count1;%reset_count2;
                   %foreach;child;
@@ -654,7 +654,7 @@
         %let;spmoth;%self.spouse.mother;%in;
         %let;spmothfn;%if;(self.spouse.mother.public_name!="")%self.spouse.mother.public_name%else;%self.spouse.mother.first_name;%end;%in;
         %foreach;spouse.father.family;
-          <div class="row ml-1">
+          <div class="row ms-1">
             %if;(spouse=spfath or spouse=spmoth or e.half!=0)
               <div class="col list-group order-2">
                 %reset_count;%reset_count1;%reset_count2;
@@ -662,7 +662,7 @@
                   %if;(child=selfspouse)
                     %if;(child.has_siblings)
                       <div class="d-flex justify-content-center">
-                        <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                        <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-end-0 border-start-0"></div>
                       </div>
                     %end;
                   %else;
@@ -718,14 +718,14 @@
           </div>
         %end;
         %foreach;spouse.mother.family;
-          <div class="row ml-1">
+          <div class="row ms-1">
             %if;(not (spouse=spfath or spouse=spmoth) and e.half!=0)
               <div class="col list-group order-2">
                 %reset_count;%reset_count1;%reset_count2;
                 %foreach;child;
                   %if;(child=selfspouse)
                     <div class="d-flex justify-content-center">
-                      <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                      <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-end-0 border-start-0"></div>
                     </div>
                   %else;
                     %incr_count;

@@ -15,7 +15,7 @@
         %apply;rm%with;num%and;%if;(e.m="D")[*d'Aboville]%elseif;(e.m="A")[Sosa number]%end;%end;</th>
       %incr_count;
     %end;
-    <th scope="col" class="pl-2 align-middle no-hover" rowspan="2">[*person/persons]0</th>
+    <th scope="col" class="ps-2 align-middle no-hover" rowspan="2">[*person/persons]0</th>
     %incr_count;
     %if;(e.birth="on" and e.birth_place="on")
       <th class="text-center position-relative" colspan="2">[*birth]
@@ -44,7 +44,7 @@
       %incr_count;
     %end;
     %if;(e.marr="on" and (e.m="A" or (e.m="D" and e.t="H")))
-      <th scope="col" class="pl-2 align-middle position-relative" rowspan="2">[*spouse/spouses]1
+      <th scope="col" class="ps-2 align-middle position-relative" rowspan="2">[*spouse/spouses]1
         %apply;rm("marr","")</th>
       %incr_count;
     %end;
@@ -103,32 +103,32 @@
       %incr_count;
     %end;
     %if;(e.occu="on")
-      <th scope="col" class="pl-2 align-middle position-relative" rowspan="2">[*occupation/occupations]1
+      <th scope="col" class="ps-2 align-middle position-relative" rowspan="2">[*occupation/occupations]1
         %apply;rm("occu","")</th>
       %incr_count;
     %end;
     </tr>
     <tr>
     %if;(e.birth="on" and e.birth_place="on")
-      <th class="text-right pr-2 position-relative">[*date/dates]0
+      <th class="text-end pe-2 position-relative">[*date/dates]0
         %apply;rm("birth",[*date of birth])</th>
-      <th class="pl-2 position-relative">[*place/places]0
+      <th class="ps-2 position-relative">[*place/places]0
         %apply;rm("birth_place",[*birth place])</th>
     %end;
     %if;(e.baptism="on" and e.baptism_place="on")
-      <th class="text-right pr-2 position-relative" title="[*date of baptism]">[*date/dates]0
+      <th class="text-end pe-2 position-relative" title="[*date of baptism]">[*date/dates]0
         %apply;rm("baptism",[*date of baptism])</th>
-      <th class="pl-2 position-relative">[*place/places]0
+      <th class="ps-2 position-relative">[*place/places]0
         %apply;rm("baptism_place",[*baptism place])</th>
     %end;
     %if;((e.marr_date="on" and e.marr_place="on") or
          (e.marr_date="on" and e.child="on") or (e.marr_place="on" and e.child="on"))
       %if;(e.marr_date="on")
-        <th class="%if;(e.marr_place!="on")text-center%else;text-right pr-2%end; position-relative">%nn;
+        <th class="%if;(e.marr_place!="on")text-center%else;text-end pe-2%end; position-relative">%nn;
           [*date/dates]0 %apply;rm("marr_date",[*date of marriage])</th>
       %end;
       %if;(e.marr_place="on")
-        <th class="%if;(e.marr_date!="on")text-center%else;pl-2%end; position-relative">
+        <th class="%if;(e.marr_date!="on")text-center%else;ps-2%end; position-relative">
           [*place/places]0 %apply;rm("marr_place",[*marriage place])</th>
       %end;
       %if;(e.child="on")
@@ -138,27 +138,27 @@
       %end;
     %end;
     %if;(e.death="on" and e.death_place="on")
-      <th class="text-right pr-2 position-relative">[*date/dates]0
+      <th class="text-end pe-2 position-relative">[*date/dates]0
         %apply;rm("death",[*date of death])</th>
-      <th class="pl-2 position-relative">[*place/places]0
+      <th class="ps-2 position-relative">[*place/places]0
         %apply;rm("death_place",[*death place])</th>
     %end;
     %if;(e.burial="on" and e.burial_place="on")
-      <th class="text-right pr-2 position-relative">[*date/dates]0
+      <th class="text-end pe-2 position-relative">[*date/dates]0
         %apply;rm("burial",[*date of burial])</th>
-      <th class="pl-2 position-relative">[*place/places]0
+      <th class="ps-2 position-relative">[*place/places]0
         %apply;rm("burial_place",[*burial place])</th>
     %end;
   </tr></thead>
 %end;
-%define;popover_params(xxx)data-toggle="popover" data-selector="true"%if;("xxx"!="") data-placement="xxx"%end; %end;
+%define;popover_params(xxx)data-bs-toggle="popover"%if;("xxx"!="") data-bs-placement="xxx"%end; %end;
 %define;date_popup(xxx,yyy,fff)
   %let;xxx;%if;(e.m="A")ancestor%elseif;(e.m="D")self%end;%in;
   %let;symb;%if;("yyy"="birth")°%elseif;("yyy"="death" and xxx.is_dead)†%end;%in;
   %if;(e.yyy="on" and ("xxx"="ancestor" or ("xxx"!="ancestor" and fff=1)))
     <td%sp;
       %if;(("xxx"="ancestor" or ("xxx"!="ancestor" and e.t="H")) and xxx.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on" or e.child="on"))rowspan="%xxx.nb_families;" %end;
-      class="align-middle text-right%if;not cancel_links; table_big_cell%end;
+      class="align-middle text-end%if;not cancel_links; table_big_cell%end;
         %if;(e.hl=1)
           %if;((not xxx.has_yyy_date or xxx.yyy_date.month="" or xxx.yyy_date.day="" or xxx.yyy_date.prec!="") 
             and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) bg-ly-incomplete
@@ -209,12 +209,12 @@
         %if;(e.ns=1 or e.yyy="on")."%end;
         %if;(e.ns=1 and (xxx.has_yyy_note or xxx.has_yyy_source)) tabindex="0"
           %apply;popover_params("bottom")
-          data-content='%if;xxx.has_yyy_note;%apply;clean_comment_tags%with;%apply;capitalize(xxx.yyy_note)%end;%end;
+          data-bs-content='%if;xxx.has_yyy_note;%apply;clean_comment_tags%with;%apply;capitalize(xxx.yyy_note)%end;%end;
                         %if;xxx.has_yyy_source;
                           %if;xxx.has_yyy_note;<hr>%end;
                           %apply;clean_comment_tags%with;%apply;capitalize(xxx.yyy_source)%end;
                         %end;'
-          data-title="%apply;place_title("xxx","yyy",1)"
+          data-bs-title="%apply;place_title("xxx","yyy",1)"
         %end;>
       %if;xxx.has_yyy_place;%xxx.yyy_place;%end;
     </td>
@@ -239,13 +239,13 @@
       %if;(wizard and e.marr_date="on")[notes sources edit on date]%end;."%end;
     %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0"
       %apply;popover_params("bottom")
-      data-content='%if;has_marriage_note;%apply;clean_comment_tags(marriage_note)
+      data-bs-content='%if;has_marriage_note;%apply;clean_comment_tags(marriage_note)
                       %if;has_marriage_source;<hr>%end;%end;
                     %if;has_marriage_source;%apply;capitalize(marriage_source)%end;'
-      data-title="%apply;a_of_b%with;
+      data-bs-title="%apply;a_of_b%with;
         %if;has_marriage_note;[*note/notes]1%if;has_marriage_source; [and] [source/sources]1%end;
         %elseif;has_marriage_source;[*source/sources]1%end;
-      %and;[*marriage/marriages]0%end;"%nn;
+      %and;[marriage/marriages]0%end;"%nn;
     %end;>%nn;
     %if;(marriage_place!="")%marriage_place;%else;&nbsp;%end;%nn;
   </td>

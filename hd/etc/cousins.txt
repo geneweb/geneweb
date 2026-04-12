@@ -23,7 +23,7 @@
 <title>%apply;tt()</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
 %include;css
 </head>
@@ -33,7 +33,7 @@
 <div class="container%if;(evar.wide="on")-fluid%end;">
 %include;perso_utils
 %include;menubar
-<div class="alert alert-warning pl-5" role="alert">
+<div class="alert alert-warning px-4" role="alert">
   [*select person to compute relationship]
 </div>
 %define;on_side(xxx)
