@@ -55,9 +55,7 @@
 %include;copyr
 %end;
 </div>
-%if;(not (e.t="T" and e.t1="CT"))
 %include;js
-%end;
 %query_time;
 </body>
 </html>

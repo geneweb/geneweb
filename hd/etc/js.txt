@@ -1,19 +1,18 @@
 <!-- $Id: js.txt v7.1 11/04/2026 02:05:28 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    %if;("NOTES" in e.m or (e.m="A" and e.t=""))
-      <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
-              integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
-                         sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
-                         sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    %end;
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
             integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=
                        sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI
                        sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
+    %( %if;((e.m="A" and e.t="") or "NOTES" in e.m) TODO verify if select2 is needed on NOTES %)
+    %if;(e.m="A" and e.t="")
+      <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
+              integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
+                         sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
+                         sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
       <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
               integrity="sha256-9yRP/2EFlblE92vzCA10469Ctd0jT48HnmmMw5rJZrA=
                          sha384-d3UHjPdzJkZuk5H3qKYMLRyWLAQBJbby2yr2Q58hXXtAGF8RSNO9jpLDlKKPv5v3
@@ -40,11 +39,9 @@
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
   %else;
-    %if;("NOTES" in e.m or (e.m="A" and e.t=""))
-      <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
-    %end;
     <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.8"></script>
-    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
+    %if;(e.m="A" and e.t="")
+      <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
       <script src="%etc_prefix;js/select2.min.js?version=4.1.0rc"></script>
       <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
     %end;
@@ -58,7 +55,7 @@
   %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
     <script src="%etc_prefix;js/rpc_client.min.js?hash=%apply;hash%with;%etc_prefix;js/rpc_client.min.js%end;"></script>
   %end;
-  %if;(e.m="A" and e.t="T" and e.t1="CT")
+  %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
     <script src="%etc_prefix;js/line.js?hash=%apply;hash%with;%etc_prefix;js/line.js%end;"></script>
   %end;
   %if;(e.m="CHK_DATA")
