@@ -1220,6 +1220,10 @@ let allowed_plugins ~loaded_plugins base_env =
   | Allowed s ->
       List.of_seq @@ SS.to_seq @@ SS.filter (fun p -> SS.mem p s) loaded_set
 
+let oidc_cookie_access :
+    (string list -> string -> (char * string * string) option) ref =
+  ref (fun _ _ -> None)
+
 let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
     script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
@@ -1262,6 +1266,17 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
     in
     let command = script_name in
     (command, bname, passwd, env, access_type)
+  in
+
+  let access_type =
+    match access_type with
+    | ATnone -> (
+        match !oidc_cookie_access request base_file with
+        | Some (acc, user, username) ->
+            if acc = 'w' then ATwizard (user, username)
+            else ATfriend (user, username)
+        | None -> ATnone)
+    | _ -> access_type
   in
   let lang, env = extract_assoc "lang" env in
   let lang = if lang = "" then http_preferred_language request else lang in
@@ -1555,7 +1570,7 @@ let log_and_robot_check conf auth from request script_name contents =
   log conf from auth request script_name contents
 
 let oidc_states_file () = !GWPARAM.adm_file "oidc_states"
-let oidc_tokens_file () = !GWPARAM.adm_file "oidc_tokens"
+let oidc_sessions_file () = !GWPARAM.adm_file "oidc_sessions"
 
 let read_oidc_states () =
   let fname = oidc_states_file () in
@@ -1612,20 +1627,34 @@ let take_oidc_state state =
       write_oidc_states entries;
       Some v
 
-let read_oidc_id_tokens () =
-  let fname = oidc_tokens_file () in
+let read_oidc_sessions () =
+  let fname = oidc_sessions_file () in
   if not (Sys.file_exists fname) then []
   else
     try
       let ic = Secure.open_in fname in
+      let tmout = float_of_int !login_timeout in
+      let now = Unix.time () in
       let rec loop acc =
         match input_line ic with
         | line -> (
             match String.split_on_char ' ' line with
-            | from_addr :: base_token :: rest ->
-                let id_token = String.concat " " rest in
-                if id_token <> "" then
-                  loop (((from_addr, base_token), id_token) :: acc)
+            | cookie :: ts_str :: from :: base :: acc_str :: id_tok :: user
+              :: rest
+              when String.length acc_str = 1 ->
+                let ts = float_of_string ts_str in
+                let username = String.concat " " rest in
+                if now -. ts < tmout then
+                  loop
+                    (( cookie,
+                       ts,
+                       from,
+                       base,
+                       acc_str.[0],
+                       id_tok,
+                       user,
+                       username )
+                    :: acc)
                 else loop acc
             | _ -> loop acc)
         | exception End_of_file ->
@@ -1635,43 +1664,116 @@ let read_oidc_id_tokens () =
       loop []
     with Sys_error _ -> []
 
-let write_oidc_id_tokens entries =
-  let fname = oidc_tokens_file () in
+let write_oidc_sessions entries =
+  let fname = oidc_sessions_file () in
   try
     let oc = Secure.open_out fname in
     List.iter
-      (fun ((from_addr, base_token), id_token) ->
-        Printf.fprintf oc "%s %s %s\n" from_addr base_token id_token)
+      (fun (cookie, ts, from, base, acc, id_tok, user, username) ->
+        Printf.fprintf oc "%s %.0f %s %s %c %s %s%s\n" cookie ts from base acc
+          id_tok user
+          (if username = "" then "" else " " ^ username))
       entries;
     close_out oc
   with Sys_error _ -> ()
 
-let store_oidc_id_token from_addr base_token id_token =
+let add_oidc_session cookie_token from_addr base_name access_char id_token user
+    username =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
   let on_exn _exn _bt = () in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  let entries = read_oidc_id_tokens () in
+  let entries = read_oidc_sessions () in
+  let now = Unix.time () in
   let entries =
-    List.filter (fun ((f, b), _) -> f <> from_addr || b <> base_token) entries
+    ( cookie_token,
+      now,
+      from_addr,
+      base_name,
+      access_char,
+      id_token,
+      user,
+      username )
+    :: entries
   in
-  let entries = ((from_addr, base_token), id_token) :: entries in
-  write_oidc_id_tokens entries
+  write_oidc_sessions entries
 
-let take_oidc_id_token from_addr base_token =
+let lookup_oidc_session cookie_token base_name =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
   let on_exn _exn _bt = None in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  let entries = read_oidc_id_tokens () in
-  match List.assoc_opt (from_addr, base_token) entries with
+  let entries = read_oidc_sessions () in
+  let found = ref None in
+  let now = Unix.time () in
+  let entries =
+    List.map
+      (fun ((cookie, _ts, from, base, acc, id_tok, user, username) as entry) ->
+        if cookie = cookie_token && base = base_name then begin
+          found := Some (acc, user, username);
+
+          (cookie, now, from, base, acc, id_tok, user, username)
+        end
+        else entry)
+      entries
+  in
+  if !found <> None then write_oidc_sessions entries;
+  !found
+
+let remove_oidc_session cookie_token base_name =
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let on_exn _exn _bt = None in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+  let entries = read_oidc_sessions () in
+  let id_token_ref = ref None in
+  let entries =
+    List.filter
+      (fun (cookie, _ts, _from, base, _acc, id_tok, _user, _username) ->
+        if cookie = cookie_token && base = base_name then begin
+          id_token_ref := Some id_tok;
+          false
+        end
+        else true)
+      entries
+  in
+  write_oidc_sessions entries;
+  !id_token_ref
+
+let mk_oidc_cookie_token () =
+  random_self_init ();
+  let rec loop len =
+    if len = 32 then Buff.get len
+    else
+      let v = Char.code 'a' + Random.int 26 in
+      loop (Buff.store len (Char.chr v))
+  in
+  loop 0
+
+let extract_oidc_cookie request cookie_name =
+  let cookie_hdr = Mutil.extract_param "cookie: " '\n' request in
+  if cookie_hdr = "" then None
+  else
+    let prefix = cookie_name ^ "=" in
+    let prefix_len = String.length prefix in
+    let pairs = String.split_on_char ';' cookie_hdr in
+    let rec find = function
+      | [] -> None
+      | pair :: rest ->
+          let pair = String.trim pair in
+          if
+            String.length pair > prefix_len
+            && String.sub pair 0 prefix_len = prefix
+          then
+            Some (String.sub pair prefix_len (String.length pair - prefix_len))
+          else find rest
+    in
+    find pairs
+
+let get_oidc_cookie_access request base_name =
+  let cookie_name = "gw_oidc_" ^ base_name in
+  match extract_oidc_cookie request cookie_name with
   | None -> None
-  | Some id_token ->
-      let entries =
-        List.filter
-          (fun ((f, b), _) -> f <> from_addr || b <> base_token)
-          entries
-      in
-      write_oidc_id_tokens entries;
-      Some id_token
+  | Some cookie_token -> lookup_oidc_session cookie_token base_name
+
+let () = oidc_cookie_access := get_oidc_cookie_access
 
 let read_oidc_config base_env =
   match List.assoc_opt "oidc_provider_url" base_env with
@@ -1866,59 +1968,76 @@ let handle_oidc_callback conf base_env from_addr base_file utm =
                                         display_name ^ "|" ^ person_key
                                       else display_name
                                     in
-                                    let pwd_id =
-                                      set_token utm from_addr base_file acc
-                                        claim_value username
+                                    let cookie_token =
+                                      mk_oidc_cookie_token ()
                                     in
-                                    let base_token = base_file ^ "_" ^ pwd_id in
+                                    add_oidc_session cookie_token from_addr
+                                      base_file acc token_resp.id_token
+                                      claim_value username;
 
-                                    store_oidc_id_token from_addr base_token
-                                      token_resp.id_token;
-
+                                    let cookie_name = "gw_oidc_" ^ base_file in
                                     let url =
                                       if !Server.cgi then
-                                        conf.command ^ "?b=" ^ base_file ^ "&w="
-                                        ^ pwd_id
-                                      else base_token
+                                        conf.command ^ "?b=" ^ base_file
+                                      else base_file
                                     in
-                                    oidc_redirect conf url
+                                    Output.status conf Code.Moved_Temporarily;
+                                    Output.header conf
+                                      "Set-Cookie: %s=%s; Path=/; HttpOnly; \
+                                       SameSite=Lax"
+                                      cookie_name cookie_token;
+                                    Output.header conf "Location: %s" url;
+                                    Output.flush conf
                                   end))))))
 
-let handle_oidc_logout conf base_env from_addr base_file =
-  let base_token =
-    match conf.auth_scheme with
-    | TokenAuth { ts_pass; _ } when ts_pass <> "" -> base_file ^ "_" ^ ts_pass
-    | _ -> ""
-  in
-  let id_token_opt =
-    if base_token = "" then None else take_oidc_id_token from_addr base_token
-  in
+let handle_oidc_logout conf base_env _from_addr base_file =
+  let cookie_name = "gw_oidc_" ^ base_file in
 
+  let id_token_opt =
+    match extract_oidc_cookie conf.request cookie_name with
+    | Some cookie_token -> remove_oidc_session cookie_token base_file
+    | None -> None
+  in
   let base_url =
     if !Server.cgi then conf.command ^ "?b=" ^ base_file else base_file
   in
+
+  let clear_cookie conf =
+    Output.header conf
+      "Set-Cookie: %s=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" cookie_name
+  in
   match read_oidc_config base_env with
-  | None -> oidc_redirect conf base_url
+  | None ->
+      Output.status conf Code.Moved_Temporarily;
+      clear_cookie conf;
+      Output.header conf "Location: %s" base_url;
+      Output.flush conf
   | Some
       ( provider_url,
         _client_id,
         _client_secret,
         redirect_uri,
         _user_claim,
-        _users_file ) -> (
+        _users_file ) ->
       let post_logout_uri = redirect_uri in
-      match Geneweb_oidc.Oidc.discover provider_url with
-      | Error _ -> oidc_redirect conf base_url
-      | Ok provider -> (
-          match id_token_opt with
-          | None -> oidc_redirect conf base_url
-          | Some id_token -> (
-              match
-                Geneweb_oidc.Oidc.logout_url provider ~id_token_hint:id_token
-                  ~post_logout_redirect_uri:post_logout_uri
-              with
-              | None -> oidc_redirect conf base_url
-              | Some url -> oidc_redirect conf url)))
+      let logout_target =
+        match Geneweb_oidc.Oidc.discover provider_url with
+        | Error _ -> base_url
+        | Ok provider -> (
+            match id_token_opt with
+            | None -> base_url
+            | Some id_token -> (
+                match
+                  Geneweb_oidc.Oidc.logout_url provider ~id_token_hint:id_token
+                    ~post_logout_redirect_uri:post_logout_uri
+                with
+                | None -> base_url
+                | Some url -> url))
+      in
+      Output.status conf Code.Moved_Temporarily;
+      clear_cookie conf;
+      Output.header conf "Location: %s" logout_target;
+      Output.flush conf
 
 let handle_oidc_mode conf base_env from_addr base_file utm mode =
   match mode with
