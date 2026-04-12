@@ -129,8 +129,8 @@
         </div>
       %end;
       %let;username;%if;(user.name="")%user.ident;%else;%user.name;%end;%in;
-      %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!=""))
-        or (friend and (b.friend_passwd_file!="" or b.friend_passwd!="")))
+      %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!="" or b.oidc_provider_url!=""))
+        or (friend and (b.friend_passwd_file!="" or b.friend_passwd!="" or b.oidc_provider_url!="")))
         <a class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom"
           %let;userk;%if;(user.key!="")%user.key;%elseif;(user.name!="")%user.name;%else;%user.ident;%end;%in;
           href="%prefix;m=S&pn=%apply;url_encode(userk)"%sp;
