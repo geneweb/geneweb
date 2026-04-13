@@ -1,15 +1,5 @@
 
 (rule
-  (target select2-maximize-height.min.js.gz)
-  (deps (:input select2-maximize-height.min.js))
-  (action
-    (run gzip -9 -k -f %{input})))
-(rule
-  (target select2-maximize-height.min.js.br)
-  (deps (:input select2-maximize-height.min.js))
-  (action
-    (run brotli -f -q 11 %{input})))
-(rule
   (target chart.umd.min.js.gz)
   (deps (:input chart.umd.min.js))
   (action
@@ -130,13 +120,13 @@
   (action
     (run brotli -f -q 11 %{input})))
 (rule
-  (target select2.min.js.gz)
-  (deps (:input select2.min.js))
+  (target tom-select.complete.min.js.gz)
+  (deps (:input tom-select.complete.min.js))
   (action
     (run gzip -9 -k -f %{input})))
 (rule
-  (target select2.min.js.br)
-  (deps (:input select2.min.js))
+  (target tom-select.complete.min.js.br)
+  (deps (:input tom-select.complete.min.js))
   (action
     (run brotli -f -q 11 %{input})))
 (rule

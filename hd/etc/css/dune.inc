@@ -20,13 +20,13 @@
   (action
     (run brotli -f -q 11 %{input})))
 (rule
-  (target select2.min.css.gz)
-  (deps (:input select2.min.css))
+  (target tom-select.bootstrap5.min.css.gz)
+  (deps (:input tom-select.bootstrap5.min.css))
   (action
     (run gzip -9 -k -f %{input})))
 (rule
-  (target select2.min.css.br)
-  (deps (:input select2.min.css))
+  (target tom-select.bootstrap5.min.css.br)
+  (deps (:input tom-select.bootstrap5.min.css))
   (action
     (run brotli -f -q 11 %{input})))
 (rule

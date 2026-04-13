@@ -25,17 +25,17 @@
                    sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer">
     %if;(e.m="A" and e.t="")
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
-        integrity="sha256-zaSoHBhwFdle0scfGEFUCwggPN7F+ip9XRglo8IWb4w=
-                   sha384-OXVF05DQEe311p6ohU11NwlnX08FzMCsyoXzGOaL+83dKAb3qS17yZJxESl8YrJQ
-                   sha512-aD9ophpFQ61nFZP6hXYu4Q/b/USW7rpLCQLX6Bi0WJHXNO7Js/fUENpBQf/+P4NtpzNX0jSgR5zVvPOJp+W2Kg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.6.0/dist/css/tom-select.bootstrap5.min.css"
+            integrity="sha256-Re4GjTaUjj1cCjvRlSe/GXl4eWsdaw9i6rGP3dZAz0U=
+                       sha384-z6AZlnJhO1v0Hf2T9heqc6XR1Ne5ueqeib8tGuOoYszbRbFERt/8vJ7lhGepc6Dq
+                       sha512-UMTADIauTri6MICQEdZg1itCV6i6xbYFK6oTbGR9pRCYfyUhqb/8WPPYCZBlm0JOLv1NER0dUbuoAK/w3yZvnQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer">
     %end;
   %else;
-  <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.8">
-  <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
+    <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.8">
+    <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
     %if;(e.m="A" and e.t="")
-  <link rel="stylesheet" href="%etc_prefix;css/select2.min.css?version=4.1.0rc">
+      <link rel="stylesheet" href="%etc_prefix;css/tom-select.bootstrap5.min.css?version=2.6.0">
     %end;
   %end;
 %end;
