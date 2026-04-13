@@ -534,120 +534,146 @@ function missing_events_options() {
 <script>
 const ancStats = %anc_stats_json;;
 const maxAncLevel = %max_anc_level;;
+
 const ANC_COLORS = {
-  prev: 'rgba(155,200,255,.5)',
-  uniq: 'rgba(210,230,255,.5)',
-  path: 'rgba(255,210,180,.5)',
+  prev:  'rgba(155,200,255,.5)',
+  uniq:  'rgba(210,230,255,.5)',
+  path:  'rgba(255,210,180,.5)',
   empty: 'rgba(255,255,255,0)',
   level: 'rgba(180,200,220,.5)'
 };
 
+// I18N : strings injectées par Geneweb (placeholders à brancher sur le système de trad)
+const I18N = {
+  only:           "[only]",
+  upTo:           "[up to]",
+  placeholderOnly: "… [specify::generation/generations]0 ([only], max " + maxAncLevel + ")",
+  placeholderUpTo: "… [specify::generation/generations]0 ([up to], max " + maxAncLevel + ")"
+};
+
+// Gradients : retournent UNIQUEMENT la valeur CSS, pas l'attribut entier
 function gradientCumul(gc) {
   if (!gc) return '';
   const { prev, unique, paths } = gc;
-  return ' style="background:linear-gradient(90deg,'
-    + `${ANC_COLORS.prev} ${prev}%,`
-    + `${ANC_COLORS.uniq} ${prev}%,`
-    + `${ANC_COLORS.uniq} ${unique}%,`
-    + `${ANC_COLORS.path} ${unique}%,`
-    + `${ANC_COLORS.path} ${paths}%,`
-    + `${ANC_COLORS.empty} ${paths}%)"`;
+  return 'linear-gradient(90deg,'
+    + ANC_COLORS.prev  + ' ' + prev   + '%,'
+    + ANC_COLORS.uniq  + ' ' + prev   + '%,'
+    + ANC_COLORS.uniq  + ' ' + unique + '%,'
+    + ANC_COLORS.path  + ' ' + unique + '%,'
+    + ANC_COLORS.path  + ' ' + paths  + '%,'
+    + ANC_COLORS.empty + ' ' + paths  + '%)';
 }
 
 function gradientLevel(gl) {
   if (!gl) return '';
   const { unique, paths } = gl;
-  return ' style="background:linear-gradient(90deg,'
-    + `${ANC_COLORS.level} ${unique}%,`
-    + `${ANC_COLORS.path} ${unique}%,`
-    + `${ANC_COLORS.path} ${paths}%,`
-    + `${ANC_COLORS.empty} ${paths}%)"`;
+  return 'linear-gradient(90deg,'
+    + ANC_COLORS.level + ' ' + unique + '%,'
+    + ANC_COLORS.path  + ' ' + unique + '%,'
+    + ANC_COLORS.path  + ' ' + paths  + '%,'
+    + ANC_COLORS.empty + ' ' + paths  + '%)';
 }
 
-// Inject options from JSON
+// Injection des <option> natives dans le <select id="v"> pour le fallback no-JS
+// (Tom Select recevra les données complètes via `options:` ci-dessous)
+const selectEl = document.getElementById('v');
 ancStats.data.forEach(function(d) {
-  var $opt = $('<option>', { value: d.v, text: d.t });
-  $opt.data('noa', d.noa);
-  $opt.data('noa_l', d.noa_l);
-  $opt.data('path', d.path);
-  $opt.data('path_l', d.path_l);
-  $opt.data('per', d.per);
-  $opt.data('gc', d.gc);
-  $opt.data('gl', d.gl);
-  $opt.data('pp', d.pp);
-  $opt.data('pp_l', d.pp_l);
+  const opt = document.createElement('option');
+  opt.value = d.v;
+  opt.textContent = d.t;
   if (d.v > maxAncLevel) {
-    $opt.prop('disabled', true);
-    $opt.addClass('text-body-secondary');
+    opt.disabled = true;
+    opt.classList.add('text-body-secondary');
   }
-  $('#v').append($opt);
+  selectEl.appendChild(opt);
 });
 
-$(document).ready(function() {
-  $('#v').select2({
-    templateResult: function(el) {
-      var $el = $(el.element);
-      var isOnly = $('#only').is(':checked');
-      var sty = isOnly
-        ? gradientLevel($el.data('gl'))
-        : gradientCumul($el.data('gc'));
-      var lex = el.text || '';
-      var per = $el.data('per') || '';
-      var noa_l = $el.data('noa_l') || '';
-      var path_l = $el.data('path_l') || '';
-      var noa = $el.data('noa') || '';
-      var path = $el.data('path') || '';
-      var pp = $el.data(isOnly ? 'pp_l' : 'pp') || '';
-      var titleNum = isOnly ? (noa_l + path_l) : (noa + path);
-      var title = titleNum + pp;
-      var prefix = isOnly ? '[only] ' : '[up to] ';
-      var cls = el.disabled ? 'text-body-secondary' : '';
-      var colDate = 'width:' + (isOnly ? '12' : '8') + 'rem';
+// État du mode capturé en closure — relu par render via refreshOptions/refreshItems
+let onlyMode = document.getElementById('only').checked;
 
-      return '<div' + sty + ' class="d-flex justify-content-center ' + cls
-        + '" title="' + title + '">'
-        + '<span class="text-end" style="width:14rem">' + prefix + lex + '</span>'
-        + '<span class="text-center" style="' + colDate + '">' + per + '</span>'
-        + '<span class="text-end" style="width:10rem">+' + noa_l
-        + '<span class="ancmenu-implex">' + path_l + '</span></span>'
-        + (isOnly ? '' : '<span class="text-end" style="width:12rem">' + noa
-          + '<span class="ancmenu-implex">' + path + '</span></span>')
+const tsAnc = new TomSelect('#v', {
+  valueField:  'v',
+  labelField:  't',
+  searchField: 't',
+  options:     ancStats.data,
+  maxOptions:  100,
+  placeholder: onlyMode ? I18N.placeholderOnly : I18N.placeholderUpTo,
+  controlInput: null,
+
+  render: {
+    option: function(data, escape) {
+      const isDisabled = data.v > maxAncLevel;
+      const bg     = onlyMode ? gradientLevel(data.gl) : gradientCumul(data.gc);
+      const prefix = onlyMode ? I18N.only : I18N.upTo;
+      const cls    = isDisabled ? 'text-body-secondary' : '';
+      const colDate = 'width:' + (onlyMode ? '12' : '8') + 'rem';
+
+      // Champs numériques contrôlés serveur — laissés bruts (cf. §5)
+      const noa_l  = data.noa_l  || 0;
+      const path_l = data.path_l || 0;
+      const noa    = data.noa    || 0;
+      const path   = data.path   || 0;
+      const implexL = path_l ? '<span class="ancmenu-implex">' + path_l + '</span>' : '';
+      const implexC = path   ? '<span class="ancmenu-implex">' + path   + '</span>' : '';
+
+      // Composition du title : tout vient de la base → tout est échappé
+      const titleNum = (onlyMode ? (noa_l + path_l) : (noa + path)) + '';
+      const titleStr = escape(titleNum + (data.pp || ''));
+
+      const colCumul = onlyMode
+        ? ''
+        : '<span class="text-end" style="width:12rem">'
+            + noa + implexC
+          + '</span>';
+
+      return '<div class="d-flex justify-content-center ' + cls + '"'
+        + (bg ? ' style="background:' + bg + '"' : '')
+        + ' title="' + titleStr + '">'
+          + '<span class="text-end" style="width:14rem">'
+            + escape(prefix) + ' ' + escape(data.t || '')
+          + '</span>'
+          + '<span class="text-center" style="' + colDate + '">'
+            + escape(data.per || '')
+          + '</span>'
+          + '<span class="text-end" style="width:10rem">+'
+            + noa_l + implexL
+          + '</span>'
+          + colCumul
         + '</div>';
     },
-    templateSelection: function(el) {
-      var isOnly = $('#only').is(':checked');
-      var noa = $(el.element).data(isOnly ? 'noa_l' : 'noa') || '';
-      var path = $(el.element).data(isOnly ? 'path_l' : 'path') || '';
-      var noa2 = $(el.element).data(isOnly ? 'noa' : 'noa_l') || '';
-      var path2 = $(el.element).data(isOnly ? 'path' : 'path_l') || '';
-      var noaHtml = noa
-        ? ' (' + noa + '<span class="ancmenu-implex">' + path + '</span>)'
-        : '';
-      var noa2Html = noa2
-        ? ' (' + noa2 + '<span class="ancmenu-implex">' + path2 + '</span>)'
-        : '';
-      return '<span class="onlycheck">'
-        + (isOnly ? '[only]' : '[up to]') + '</span>'
-        + '<span>' + el.text + '</span>'
-        + '<span class="ms-auto noa">' + noaHtml + '</span>'
-        + '<span class="d-none noa_l">' + noa2Html + '</span>';
-    },
-    escapeMarkup: function(markup) { return markup; },
-    width: "resolve",
-    allowClear: false,
-    placeholder: "… [specify::generation/generations]0 (max " + maxAncLevel + ")",
-    theme: "classic"
-  }).maximizeSelect2Height();
 
-  $("body").on('change', '#only', function() {
-    ($('#only').is(':checked'))
-      ? ($('.onlycheck').text('[only]'),
-         $('.noa').addClass('d-none'),
-         $('.noa_l').removeClass('d-none'))
-      : ($('.onlycheck').text('[up to]'),
-         $('.noa').removeClass('d-none'),
-         $('.noa_l').addClass('d-none'));
-  });
+    item: function(data, escape) {
+      const prefix = onlyMode ? I18N.only : I18N.upTo;
+      const noa    = onlyMode ? (data.noa_l  || 0) : (data.noa  || 0);
+      const path   = onlyMode ? (data.path_l || 0) : (data.path || 0);
+      const implex = path ? '<span class="ancmenu-implex">' + path + '</span>' : '';
+      const noaHtml = noa ? ' (' + noa + implex + ')' : '';
+
+      return '<div class="d-flex align-items-center">'
+        + '<span class="onlycheck">' + escape(prefix) + '</span>'
+        + ' '
+        + '<span>' + escape(data.t || '') + '</span>'
+        + '<span class="ms-auto noa">' + noaHtml + '</span>'
+        + '</div>';
+    }
+  }
+});
+
+function setAncPlaceholder() {
+  const txt = onlyMode ? I18N.placeholderOnly : I18N.placeholderUpTo;
+  tsAnc.wrapper.style.setProperty('--ts-placeholder', JSON.stringify(txt));
+}
+setAncPlaceholder();
+
+document.getElementById('only').addEventListener('change', function(e) {
+  onlyMode = e.target.checked;
+  setAncPlaceholder();
+  tsAnc.clearCache();
+  tsAnc.refreshOptions(false);
+  const cur = tsAnc.getValue();
+  if (cur) {
+    tsAnc.updateOption(cur, tsAnc.options[cur]);
+  }
 });
 </script>
 </body>

@@ -1132,9 +1132,16 @@ div.anchor_upd {
   }
 }
 
-/* Force select2 results padding to 0 */
-.select2-results__option {
-  padding:0px
+/* Tom select */
+#v + .ts-wrapper .ts-dropdown-content {
+  max-height: calc(100vh - 220px);
+  min-height: 12rem;
+}
+
+.ts-wrapper.single:not(.has-items) .ts-control::before {
+  content: var(--ts-placeholder, '');
+  color: var(--bs-secondary-color);
+  pointer-events: none;
 }
 
 /* Capitalization unavailable in note from Ocaml
