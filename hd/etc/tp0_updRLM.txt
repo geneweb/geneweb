@@ -2,10 +2,10 @@
 <html lang="%lang;">
 <head>
   <title>[*modify::tree]</title>
-  <meta name="robots" content="none"%/>
+  <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="shortcut icon" href"%images_prefix;favicon_gwd.png">
   <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
   %include;css
 </head>
@@ -28,7 +28,7 @@
         <i class="fas fa-minus" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="align-middle text-center text-nowrap pr-3">
+    <td class="align-middle text-center text-nowrap pe-3">
       <button type="button" class="btn btn-secondary btn-sm row_move_up"
               title="[*add/insert/delete/up/down row]3"
               aria-label="[*add/insert/delete/up/down row aria-label]3">
@@ -40,7 +40,7 @@
         <i class="fas fa-arrow-down" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="align-middle fw-bold border-left px-3 line-number"></td>
+    <td class="align-middle fw-bold border-start px-3 line-number"></td>
     <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz" aria-label="[*first name/first names]1"></td>
     <td%mid;><input name="n" class="form-control reset_bd_text" size="30" value="zsnz" aria-label="[*surname/surnames]0"></td>
     <td%mid;><input name="oc" type="number" min="0" class="form-control reset_bd_text" value="zocz" aria-label="[*occ]0"></td>
@@ -52,7 +52,7 @@
   %if;(e.izz!="" or e.pzz!="")
     %let;datespan;
       %if;pvar.zz.exist;
-        <div class="d-flex flex-column justify-content-center" style="line-height: 0.9;">
+        <div class="d-flex flex-column justify-content-center" style="line-height: 1;">
           %if;pvar.zz.has_birth_date;
             <div aria-label="[*birth date]">° %pvar.zz.slash_birth_date;</div>
           %elseif;pvar.zz.has_baptism_date;
@@ -112,17 +112,17 @@
       <tr>
         <th scope="col" class="border-top-0"></th>
         <th scope="col" class="border-top-0"></th>
-        <th scope="col" class="align-middle fw-bold border-left px-3">#</th>
-        <th scope="col" class="align-middle pl-2">[*first name/first names]0</th>
-        <th scope="col" class="align-middle pl-2">[*surname/surnames]0</th>
+        <th scope="col" class="align-middle fw-bold border-start px-3">#</th>
+        <th scope="col" class="align-middle ps-2">[*first name/first names]0</th>
+        <th scope="col" class="align-middle ps-2">[*surname/surnames]0</th>
         <th scope="col" class="align-middle" style="width:90px">[*occ]1</th>
         <th scope="col" class="align-middle">
-          <div class="d-flex flex-column justify-content-center" style="line-height:0.9">
+          <div class="d-flex flex-column justify-content-center" style="line-height:1">
             <div>[*birth]</div>
             <div>[*death]</div>
           </div>
         </th>
-        <th scope="col" class="align-middle pl-2">[*text]</th>
+        <th scope="col" class="align-middle ps-2">[*text]</th>
       </tr>
     </thead>
     <tbody>
@@ -135,33 +135,33 @@
     </tbody>
     <tfoot>
       <td colspan="8" class="text-center p-2">
-        <button type="button" class="btn btn-success row_add mr-4"
+        <button type="button" class="btn btn-success row_add me-4"
                 title="[*add/insert/delete/up/down row]0">
-          <i class="fas fa-plus mr-2" aria-hidden="true"></i>%nn;
+          <i class="fas fa-plus me-2" aria-hidden="true"></i>%nn;
           [*add/insert/delete/up/down row aria-label]0
         </button>
-        <button type="button" class="btn btn-outline-info mr-2" id="refreshForm"
+        <button type="button" class="btn btn-outline-info me-2" id="refreshForm"
                 title="[*RLM update data/save data/show graph]0" disabled>
-           <span class="mr-2">
+           <span class="me-2">
              <i class="fas fa-check toggle-icon"></i>
              <i class="fas fa-rotate toggle-icon d-none"></i>
            </span>[*validate/delete]0
         </button>
         <script id="rlm-data" type="application/json">%[%apply;one_pvar_json(1)%]</script>
-        <button type="button" class="btn btn-info mr-4" id="saveRLM"
+        <button type="button" class="btn btn-info me-4" id="saveRLM"
                 title="[*RLM update data/save data/show graph]1" disabled>
-          <span class="mr-2">
+          <span class="me-2">
             <i class="fas fa-download toggle-icon"></i>
             <i class="fas fa-check toggle-icon d-none"></i>
           </span>[*save]
         </button>
-        <button type="button" class="btn btn-primary mr-4" id="showGraph"
+        <button type="button" class="btn btn-primary me-4" id="showGraph"
                 title="[*RLM update data/save data/show graph]2 (RLM)" disabled>
-          <i class="fas fa-eye mr-2"></i>[*add/clear/show/edit the graph]2
+          <i class="fas fa-eye me-2"></i>[*add/clear/show/edit the graph]2
         </button>
         <button type="button" class="btn btn-warning" id="showMatrix"
           title="[*relationship table]1 (RM)" onclick="showOverlay()" disabled>
-          <i class="fas fa-table-cells mr-2"></i>[*relationship table]0
+          <i class="fas fa-table-cells me-2"></i>[*relationship table]0
         </button>
       </td>
     </tfoot>
@@ -177,145 +177,257 @@
 %include;js
 %query_time;
 <script>
-function updateLineNumbers() {
-  var lineNumber = 1;
-  $('tbody tr:visible:not(.last_row)').each(function() {
-    $(this).find('.line-number').text(lineNumber++);
+(function () {
+  const tbody = document.querySelector('#upd tbody') || document.querySelector('tbody');
+
+  // ---------- helpers ----------
+  const isVisible = (el) => el && el.offsetParent !== null;
+  const visibleRows = () =>
+    Array.from(tbody.querySelectorAll('tr')).filter(isVisible);
+  const visibleNonLast = () =>
+    visibleRows().filter(r => !r.classList.contains('last_row'));
+
+  const rowIndex = (row) =>
+    Array.prototype.indexOf.call(row.parentNode.children, row);
+
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  // ---------- line numbers + arrows ----------
+  function updateLineNumbers() {
+    let n = 1;
+    visibleNonLast().forEach(row => {
+      const cell = row.querySelector('.line-number');
+      if (cell) cell.textContent = n++;
+    });
+  }
+
+  function updateArrowVisibility() {
+    tbody.querySelectorAll('.row_move_up, .row_move_down')
+         .forEach(b => b.style.visibility = 'visible');
+
+    const rows = visibleRows();
+    if (rows.length) {
+      const upBtn = rows[0].querySelector('.row_move_up');
+      if (upBtn) upBtn.style.visibility = 'hidden';
+    }
+    // jQuery `tbody tr:last` = dernier <tr> du tbody, indépendamment de :visible
+    const all = tbody.querySelectorAll('tr');
+    if (all.length) {
+      const downBtn = all[all.length - 1].querySelector('.row_move_down');
+      if (downBtn) downBtn.style.visibility = 'hidden';
+    }
+    updateLineNumbers();
+  }
+
+  function toggleIcons(buttonSelector) {
+    const btn = typeof buttonSelector === 'string' ? $(buttonSelector) : buttonSelector;
+    if (!btn) return;
+    btn.querySelectorAll('.toggle-icon').forEach(i => i.classList.toggle('d-none'));
+  }
+
+  // ---------- template cloning ----------
+  function cloneTemplate() {
+    const tpl = document.getElementById('template_line').cloneNode(true);
+    tpl.removeAttribute('id');
+    tpl.removeAttribute('style');
+    return tpl;
+  }
+
+  // ---------- delegated click handler (row ops) ----------
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button, .row_add, .row_del, .row_move_up, .row_move_down');
+    if (!btn) return;
+
+    if (btn.classList.contains('row_add')) {
+      const newRow = cloneTemplate();
+      if (btn.closest('tfoot')) {
+        tbody.appendChild(newRow);
+      } else {
+        const ref = btn.closest('tr');
+        ref.parentNode.insertBefore(newRow, ref);
+      }
+      const firstInput = newRow.querySelector('input');
+      if (firstInput) firstInput.focus();
+      updateArrowVisibility();
+      return;
+    }
+
+    if (btn.classList.contains('row_del')) {
+      btn.closest('tr').remove();
+      updateArrowVisibility();
+      return;
+    }
+
+    if (btn.classList.contains('row_move_up')) {
+      const row = btn.closest('tr');
+      if (rowIndex(row) > 1) {
+        const prev = row.previousElementSibling;
+        if (prev) row.parentNode.insertBefore(row, prev);
+        updateArrowVisibility();
+      }
+      return;
+    }
+
+    if (btn.classList.contains('row_move_down')) {
+      const row = btn.closest('tr');
+      const vis = visibleRows();
+      const lastBody = vis[vis.length - 1];
+      if (row !== lastBody) {
+        const next = row.nextElementSibling;
+        if (next) row.parentNode.insertBefore(row, next.nextElementSibling);
+        updateArrowVisibility();
+      }
+    }
   });
-}
-function updateArrowVisibility() {
-  $('.row_move_up, .row_move_down').css('visibility', 'visible');
-  $('tbody tr:visible:first .row_move_up').css('visibility', 'hidden');
-  $('tbody tr:last .row_move_down').css('visibility', 'hidden');
-  updateLineNumbers();
-}
-function toggleIcons(buttonId) {
-  $(buttonId + ' .toggle-icon').toggleClass('d-none');
-}
-$(document).on( "click", ".row_add", function() {
-  var newRow = $("#template_line").clone().removeAttr("id").removeAttr("style");
-  if($(this).closest('tfoot').length) {
-    $('tbody').append(newRow.get(0));
-  } else {
-    $(this).closest("tr").before(newRow.get(0));
+
+  // ---------- delegated change handler ----------
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.classList.contains('reset_bd_text')) {
+      const cell = t.closest('tr').querySelector('.bd_text');
+      if (cell) cell.innerHTML = '';
+    }
+  });
+
+  // ---------- save RLM (localStorage) ----------
+  const saveBtn = $('#saveRLM');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const src = $('#rlm-data');
+      if (!src) return;
+      const jsonText = src.innerHTML.trim();
+      try {
+        const jsonData = JSON.parse(jsonText);
+        localStorage.setItem('inds', JSON.stringify(jsonData));
+        toggleIcons('#saveRLM');
+        setTimeout(() => toggleIcons('#saveRLM'), 2000);
+      } catch (err) {
+        console.error('Invalid JSON data in #rlm-data', err);
+      }
+    });
   }
-  newRow.find('input:first').focus();
-  updateArrowVisibility();
-});
-$(document).on( "click", ".row_del", function() {
-  $(this).closest('tr').remove();
-  updateArrowVisibility();
-});
-$(document).on("click", ".row_move_up", function() {
-  var row = $(this).closest("tr");
-  if(row.index() > 1) {
-    row.insertBefore(row.prev());
-    updateArrowVisibility();
-  }
-});
-$(document).on("click", ".row_move_down", function() {
-  var row = $(this).closest("tr");
-  var lastBodyRow = $('tbody tr:visible:last');
-  if(!row.is(lastBodyRow)) {
-    row.insertAfter(row.next());
-    updateArrowVisibility();
-  }
-});
-$(document).on( "change", ".reset_bd_text", function() {
-  $(this).closest( "tr" ).children( ".bd_text").html( "" );
-});
-$('#saveRLM').on('click', function() {
-  const jsonText = $('#rlm-data').html().trim();
-  try {
-    const jsonData = JSON.parse(jsonText);
-    localStorage.setItem('inds', JSON.stringify(jsonData));
-    toggleIcons('#saveRLM');
-    setTimeout(() => toggleIcons('#saveRLM'), 2000);
-  } catch (e) {
-    console.error("Invalid JSON data in #rlm-data", e);
-  }
-});
-function buildUrl(mode = 'RLM') {
-  var dataIndex = 1;
-  var params = new URLSearchParams();
-  params.set('m', mode);
-  if (mode === 'TP') params.set('v', 'updRLM');
-  var currentParams = new URLSearchParams(window.location.search);
-  var b = currentParams.get('b');
-  if (b) params.set('b', b);
-  $('tbody tr:visible').each(function() {
-    var $row = $(this);
-    var firstName = $row.find("input[name='p']").val().trim();
-    var lastName = $row.find("input[name='n']").val().trim();
-    if (firstName !== "" || lastName !== "") {
-      if (firstName !== "") params.set('p' + dataIndex, firstName);
-      if (lastName !== "") params.set('n' + dataIndex, lastName);
-      var oc = $row.find("input[name='oc']").val();
-      if (oc !== "" && oc !== "0") {
-        params.set('oc' + dataIndex, oc);
+
+  // ---------- URL builder ----------
+  function buildUrl(mode) {
+    mode = mode || 'RLM';
+    let dataIndex = 1;
+    const params = new URLSearchParams();
+    params.set('m', mode);
+    if (mode === 'TP') params.set('v', 'updRLM');
+
+    const currentParams = new URLSearchParams(window.location.search);
+    const b = currentParams.get('b');
+    if (b) params.set('b', b);
+
+    visibleRows().forEach(row => {
+      const pIn  = row.querySelector("input[name='p']");
+      const nIn  = row.querySelector("input[name='n']");
+      if (!pIn || !nIn) return;
+      const firstName = pIn.value.trim();
+      const lastName  = nIn.value.trim();
+      if (firstName === '' && lastName === '') return;
+
+      if (firstName !== '') params.set('p' + dataIndex, firstName);
+      if (lastName  !== '') params.set('n' + dataIndex, lastName);
+
+      const ocIn = row.querySelector("input[name='oc']");
+      if (ocIn) {
+        const oc = ocIn.value;
+        if (oc !== '' && oc !== '0') params.set('oc' + dataIndex, oc);
       }
       if (mode === 'RLM') {
-        var text = $row.find("input[name='t']").val().trim();
-        if (text !== "") {
-          params.set('t' + dataIndex, text);
+        const tIn = row.querySelector("input[name='t']");
+        if (tIn) {
+          const text = tIn.value.trim();
+          if (text !== '') params.set('t' + dataIndex, text);
         }
       }
       dataIndex++;
-    }
-  });
-  return '?' + params.toString();
-}
-$('#refreshForm').on('click', function() {
-  window.location.href = buildUrl('TP');
-});
-$('#showGraph').on('click', function() {
-  window.location.href = buildUrl('RLM');
-});
-$('#showMatrix').on('click', function() {
-  window.location.href = buildUrl('RM');
-});
-function checkFormValidity() {
-  const warningRows = $('tbody tr.bg-warning, tbody tr .bg-warning').length;
-  const validRows = $('tbody tr:visible').length - warningRows;
-  const noErrors = warningRows === 0;
-  if (noErrors && validRows >= 2) {
-    $('#saveRLM, #showGraph, #showMatrix').prop('disabled', false);
-  } else {
-    $('.alert-warning').removeClass('d-none');
+    });
+
+    return '?' + params.toString();
   }
-}
-$(document).ready(function() {
-  updateArrowVisibility();
-  checkFormValidity();
-  setTimeout(() => {
-    const $firstWarning = $('tbody tr.bg-warning:first input[name="p"]');
-    if ($firstWarning.length > 0) {
-      const input = $firstWarning[0];
-      $firstWarning.focus();
-      if (input.setSelectionRange) {
-        input.setSelectionRange(input.value.length, input.value.length);
-      }
+
+  // ---------- top-level navigation buttons ----------
+  const refreshBtn  = $('#refreshForm');
+  const showGraph   = $('#showGraph');
+  const showMatrix  = $('#showMatrix');
+
+  if (refreshBtn) refreshBtn.addEventListener('click', () => {
+    window.location.href = buildUrl('TP');
+  });
+  if (showGraph) showGraph.addEventListener('click', () => {
+    window.location.href = buildUrl('RLM');
+  });
+  if (showMatrix) showMatrix.addEventListener('click', () => {
+    window.location.href = buildUrl('RM');
+  });
+
+  // ---------- form validity ----------
+  function checkFormValidity() {
+    const warningRows = tbody.querySelectorAll('tr.bg-warning, tr .bg-warning').length;
+    const validRows = visibleRows().length - warningRows;
+    const noErrors = warningRows === 0;
+    if (noErrors && validRows >= 2) {
+      ['#saveRLM', '#showGraph', '#showMatrix'].forEach(sel => {
+        const el = $(sel);
+        if (el) el.disabled = false;
+      });
     } else {
-      $('#saveRLM').focus();
+      $$('.alert-warning').forEach(a => a.classList.remove('d-none'));
     }
-  }, 300);
-  const enableRefresh = () => {
-    if ($('#refreshForm').prop('disabled')) {
-      $('#refreshForm').prop('disabled', false);
+  }
+
+  // ---------- enable refresh on edits ----------
+  function enableRefresh() {
+    if (refreshBtn && refreshBtn.disabled) {
+      refreshBtn.disabled = false;
       setTimeout(checkFormValidity, 100);
       toggleIcons('#refreshForm');
     }
-  };
-  $(document)
-    .on('input change', 'tbody input', enableRefresh)
-    .on('click', '.row_add, .row_del, .row_move_up, .row_move_down', enableRefresh)
-    .on('keydown', function(e) {
-      if (e.key === 'Enter' && !$('#refreshForm').prop('disabled')) {
-        e.preventDefault();
-        $('#refreshForm').click();
+  }
+
+  document.addEventListener('input',  (e) => {
+    if (e.target.closest('tbody') && e.target.matches('input')) enableRefresh();
+  });
+  document.addEventListener('change', (e) => {
+    if (e.target.closest('tbody') && e.target.matches('input')) enableRefresh();
+  });
+  document.addEventListener('click',  (e) => {
+    if (e.target.closest('.row_add, .row_del, .row_move_up, .row_move_down')) enableRefresh();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && refreshBtn && !refreshBtn.disabled) {
+      e.preventDefault();
+      refreshBtn.click();
+    }
+  });
+
+  // ---------- init ----------
+  function init() {
+    updateArrowVisibility();
+    checkFormValidity();
+    setTimeout(() => {
+      const firstWarning = tbody.querySelector('tr.bg-warning input[name="p"]');
+      if (firstWarning) {
+        firstWarning.focus();
+        if (firstWarning.setSelectionRange) {
+          const len = firstWarning.value.length;
+          firstWarning.setSelectionRange(len, len);
+        }
+      } else if (saveBtn) {
+        saveBtn.focus();
       }
-    });
-});
+    }, 300);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
 </body>
 </html>

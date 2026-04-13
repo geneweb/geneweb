@@ -2,7 +2,7 @@
 <html lang="%lang;">
 <head>
   <title>[*modify::tree]</title>
-  <meta name="robots" content="none"%/>
+  <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
@@ -27,7 +27,7 @@
         <i class="fas fa-user-minus" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="align-middle text-center text-nowrap pr-3">
+    <td class="align-middle text-center text-nowrap pe-3">
       <button type="button" class="btn btn-secondary btn-sm row_move_up"
               title="[*add/insert/delete/up/down person]3"
               aria-label="[*add/insert/delete/up/down person aria-label]3">
@@ -39,7 +39,7 @@
         <i class="fas fa-arrow-down" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="align-middle fw-bold border-left px-3 line-number"></td>
+    <td class="align-middle fw-bold border-start px-3 line-number"></td>
     <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz" aria-label="[*first name/first names]1"></td>
     <td%mid;><input name="n" class="form-control reset_bd_text" size="30" value="zsnz" aria-label="[*surname/surnames]0"></td>
     <td%mid;><input name="oc" type="number" min="0" class="form-control reset_bd_text" value="zocz" aria-label="[*occ]0"></td>
@@ -61,7 +61,7 @@
         <i class="fas fa-minus" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="align-middle text-center text-nowrap pr-3">
+    <td class="align-middle text-center text-nowrap pe-3">
       <button type="button" class="btn btn-outline-secondary btn-sm row_move_up"
               title="[*add/insert/delete/up/down row]3"
               aria-label="[*add/insert/delete/up/down row aria-label]3">
@@ -73,17 +73,17 @@
         <i class="fas fa-arrow-down" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="n_p_oc align-middle fw-light border-left px-3"></td>
-    <td class="n_p_oc align-middle fw-light pl-3">zfnz</td>
-    <td class="n_p_oc align-middle fw-light pl-3">zsnz</td>
-    <td class="n_p_oc align-middle fw-light pl-3">zocz</td>
+    <td class="n_p_oc align-middle fw-light border-start px-3"></td>
+    <td class="n_p_oc align-middle fw-light ps-3">zfnz</td>
+    <td class="n_p_oc align-middle fw-light ps-3">zsnz</td>
+    <td class="n_p_oc align-middle fw-light ps-3">zocz</td>
     <td class="n_p_oc align-middle fw-light">zbdz</td>
     <td%mid;><input name="s" class="form-control reset_n_p_oc" size="30" value="zsz" aria-label="[*n° Sosa]"></td>
   </tr>
 %end;
 %define;one_p_line(zz)
   %let;datespan;
-    <div class="d-flex flex-column justify-content-center" style="line-height: 0.9;">
+    <div class="d-flex flex-column justify-content-center" style="line-height: 1;">
       %if;pvar.zz.has_birth_date;
         <div aria-label="[*birth date]">° %pvar.zz.slash_birth_date;</div>
       %elseif;pvar.zz.has_baptism_date;
@@ -149,9 +149,9 @@
       <tr>
         <th scope="col" class="border-top-0"></th>
         <th scope="col" class="border-top-0"></th>
-        <th scope="col" class="align-middle fw-bold border-left px-3">#</th>
-        <th scope="col" class="align-middle pl-2">[*first name/first names]0</th>
-        <th scope="col" class="align-middle pl-2">[*surname/surnames]0</th>
+        <th scope="col" class="align-middle fw-bold border-start px-3">#</th>
+        <th scope="col" class="align-middle ps-2">[*first name/first names]0</th>
+        <th scope="col" class="align-middle ps-2">[*surname/surnames]0</th>
         <th scope="col" class="align-middle" style="width:90px">[*occ]1</th>
         <th scope="col" class="align-middle">
           <div class="d-flex flex-column justify-content-center" style="line-height:0.9">
@@ -159,7 +159,7 @@
             <div>[*death]</div>
           </div>
         </th>
-        <th scope="col" class="align-middle pl-2">[Sosa]</th>
+        <th scope="col" class="align-middle ps-2">[Sosa]</th>
       </tr>
     </thead>
     <tbody>
@@ -170,12 +170,12 @@
     <tfoot>
       <tr>
         <td colspan="8" class="text-center p-2">
-          <button type="button" class="btn btn-success row_add_p_before mr-3"
+          <button type="button" class="btn btn-success row_add_p_before me-3"
                   title="[*add/insert/delete/up/down person]0">
             <i class="fas fa-user-plus" aria-hidden="true"></i>
             [*add/insert/delete/up/down person aria-label]0
           </button>
-          <button type="button" class="btn btn-outline-success row_add_s_before mr-3"
+          <button type="button" class="btn btn-outline-success row_add_s_before me-3"
                   title="[*add/insert/delete/up/down row]0">
             <i class="fas fa-plus" aria-hidden="true"></i>
             [*add/insert/delete/up/down row aria-label]0
@@ -196,176 +196,228 @@
 %include;js
 %query_time;
 <script>
-function updateLineNumbers() {
-  var lineNumber = 1;
-  $('tbody tr:visible').each(function() {
-    if($(this).hasClass('row_p')) {
-      $(this).find('.line-number').text(lineNumber++);
-    } else if($(this).hasClass('row_s')) {
-      $(this).find('.line-number').text(''); // Ancestor lines don't get numbers
-    }
-  });
-}
-function updateArrowVisibility() {
-  $('.row_move_up, .row_move_down').css('visibility', 'visible');
-  var visibleRows = $('tbody tr:visible');
-  var personRows = visibleRows.filter('.row_p');
+(function () {
+  const tbody = document.querySelector('#upd tbody');
+  const form  = document.getElementById('upd');
 
-  personRows.each(function(index) {
-    if(index === 0) {
-      $(this).find('.row_move_up').css('visibility', 'hidden');
-    }
-    if(index === personRows.length - 1) {
-      $(this).find('.row_move_down').css('visibility', 'hidden');
-    }
-  });
+  // ---------- helpers ----------
+  const visibleRows = () =>
+    Array.from(tbody.querySelectorAll('tr')).filter(r => r.offsetParent !== null);
 
-  personRows.each(function() {
-    var personRow = $(this);
-    var ancestorGroup = personRow.nextUntil('.row_p').filter('.row_s');
+  const nextUntil = (el, sel) => {
+    const out = [];
+    let n = el.nextElementSibling;
+    while (n && !n.matches(sel)) { out.push(n); n = n.nextElementSibling; }
+    return out;
+  };
+  const prevMatching = (el, sel) => {
+    let n = el.previousElementSibling;
+    while (n && !n.matches(sel)) n = n.previousElementSibling;
+    return n;
+  };
+  const nextMatching = (el, sel) => {
+    let n = el.nextElementSibling;
+    while (n && !n.matches(sel)) n = n.nextElementSibling;
+    return n;
+  };
+  const rowIndex = (row) =>
+    Array.prototype.indexOf.call(row.parentNode.children, row);
 
-    if(ancestorGroup.length <= 1) {
-      ancestorGroup.find('.row_move_up, .row_move_down').css('visibility', 'hidden');
+  // ---------- line numbers + arrows ----------
+  function updateLineNumbers() {
+    let n = 1;
+    visibleRows().forEach(row => {
+      const cell = row.querySelector('.line-number');
+      if (!cell) return;
+      if (row.classList.contains('row_p'))      cell.textContent = n++;
+      else if (row.classList.contains('row_s')) cell.textContent = '';
+    });
+  }
+
+  function updateArrowVisibility() {
+    tbody.querySelectorAll('.row_move_up, .row_move_down')
+         .forEach(b => b.style.visibility = 'visible');
+
+    const rows    = visibleRows();
+    const persons = rows.filter(r => r.classList.contains('row_p'));
+
+    persons.forEach((row, i) => {
+      if (i === 0)
+        row.querySelector('.row_move_up').style.visibility = 'hidden';
+      if (i === persons.length - 1)
+        row.querySelector('.row_move_down').style.visibility = 'hidden';
+    });
+
+    persons.forEach(personRow => {
+      const group = nextUntil(personRow, '.row_p').filter(r => r.classList.contains('row_s'));
+      if (group.length <= 1) {
+        group.forEach(r => r.querySelectorAll('.row_move_up, .row_move_down')
+                             .forEach(b => b.style.visibility = 'hidden'));
+      } else {
+        group[0].querySelector('.row_move_up').style.visibility = 'hidden';
+        group[group.length - 1].querySelector('.row_move_down').style.visibility = 'hidden';
+      }
+    });
+
+    updateLineNumbers();
+  }
+
+  // ---------- template cloning ----------
+  function cloneTemplate(id) {
+    const tpl = document.getElementById(id).cloneNode(true);
+    tpl.removeAttribute('id');
+    tpl.removeAttribute('style');
+    return tpl;
+  }
+  function insertOrAppend(triggerBtn, ...newRows) {
+    if (triggerBtn.closest('tfoot')) {
+      newRows.forEach(r => tbody.appendChild(r));
     } else {
-      ancestorGroup.first().find('.row_move_up').css('visibility', 'hidden');
-      ancestorGroup.last().find('.row_move_down').css('visibility', 'hidden');
+      const ref = triggerBtn.closest('tr');
+      newRows.forEach(r => ref.parentNode.insertBefore(r, ref));
+    }
+  }
+
+  // ---------- delegated click handler ----------
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    if (btn.classList.contains('row_add_p_before')) {
+      const p = cloneTemplate('template_line_p');
+      const s = cloneTemplate('template_line_s');
+      insertOrAppend(btn, p, s);
+      const firstInput = p.querySelector('input');
+      if (firstInput) firstInput.focus();
+      updateArrowVisibility();
+      return;
+    }
+
+    if (btn.classList.contains('row_add_s_before')) {
+      const s = cloneTemplate('template_line_s');
+      insertOrAppend(btn, s);
+      const firstInput = s.querySelector('input');
+      if (firstInput) firstInput.focus();
+      updateArrowVisibility();
+      return;
+    }
+
+    if (btn.classList.contains('row_del')) {
+      const row = btn.closest('tr');
+      if (row.classList.contains('row_p')) {
+        nextUntil(row, '.row_p').forEach(r => r.remove());
+        row.remove();
+      } else if (row.classList.contains('row_s')) {
+        const prev = row.previousElementSibling;
+        const next = row.nextElementSibling;
+        if ((prev && prev.classList.contains('row_s')) ||
+            (next && next.classList.contains('row_s'))) {
+          row.remove();
+        }
+      }
+      updateArrowVisibility();
+      return;
+    }
+
+    if (btn.classList.contains('row_move_up')) {
+      const row = btn.closest('tr');
+      if (row.classList.contains('row_s')) {
+        const prev = row.previousElementSibling;
+        if (rowIndex(row) > 2 && prev && prev.classList.contains('row_s')) {
+          row.parentNode.insertBefore(row, prev);
+        }
+      } else if (row.classList.contains('row_p')) {
+        if (rowIndex(row) > 3) {
+          const target = prevMatching(row, '.row_p');
+          if (!target) return;
+          const tail   = nextUntil(row, '.row_p');
+          target.before(row);
+          let anchor = row;
+          tail.forEach(r => {
+            anchor.parentNode.insertBefore(r, anchor.nextElementSibling);
+            anchor = r;
+          });
+        }
+      }
+      updateArrowVisibility();
+      return;
+    }
+
+    if (btn.classList.contains('row_move_down')) {
+      const row = btn.closest('tr');
+      if (row.classList.contains('row_s')) {
+        const next = nextMatching(row, '.row_s');
+        if (next) next.after(row);
+      } else if (row.classList.contains('row_p')) {
+        const tail   = nextUntil(row, '.row_p');
+        const target = nextMatching(row, '.row_p');
+        if (target) {
+          const targetTail = nextUntil(target, '.row_p');
+          const lastOfTarget = targetTail.length ? targetTail[targetTail.length - 1] : target;
+          lastOfTarget.after(row);
+          let anchor = row;
+          tail.forEach(r => {
+            anchor.after(r);
+            anchor = r;
+          });
+        }
+      }
+      updateArrowVisibility();
     }
   });
 
-  updateLineNumbers();
-}
-$(document).ready(function() {
-  updateArrowVisibility();
-});
-$(document).on("click", ".row_add_p_before", function() {
-  var newRowP = $("#template_line_p").clone().removeAttr("id").removeAttr("style");
-  var newRowS = $("#template_line_s").clone().removeAttr("id").removeAttr("style");
-
-  if($(this).closest('tfoot').length) {
-    $('tbody').append(newRowP.get(0));
-    $('tbody').append(newRowS.get(0));
-  } else {
-    $(this).closest("tr").before(newRowP.get(0));
-    $(this).closest("tr").before(newRowS.get(0));
-  }
-
-  newRowP.find('input:first').focus();
-  updateArrowVisibility();
-});
-$(document).on("click", ".row_add_s_before", function() {
-  var newRowS = $("#template_line_s").clone().removeAttr("id").removeAttr("style");
-
-  if($(this).closest('tfoot').length) {
-    $('tbody').append(newRowS.get(0));
-  } else {
-    $(this).closest("tr").before(newRowS.get(0));
-  }
-
-  newRowS.find('input:first').focus();
-  updateArrowVisibility();
-});
-$(document).on("click", ".row_del", function() {
-  var row = $(this).closest("tr");
-  if(row.hasClass("row_p")) {
-    // Delete person + all following ancestor rows until next person
-    var row_s_next = row.nextUntil(".row_p");
-    row_s_next.remove();
-    row.remove();
-  } else if(row.hasClass("row_s")) {
-    // Only delete ancestor if there are other ancestors
-    if(row.prev().hasClass("row_s") || row.next().hasClass("row_s")) {
-      row.remove();
+  // ---------- delegated change handler ----------
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.classList.contains('reset_bd_text')) {
+      const cell = t.closest('tr').querySelector('.bd_text');
+      if (cell) cell.innerHTML = '';
     }
-  }
-  updateArrowVisibility();
-});
-$(document).on("click", ".row_move_up", function() {
-  var row = $(this).closest("tr");
-  if(row.hasClass("row_s")) {
-    // Move ancestor up within ancestor group
-    if(row.index() > 2 && row.prev().hasClass("row_s")) {
-      row.insertBefore(row.prev());
-    }
-  } else if(row.hasClass("row_p")) {
-    // Move entire person block (person + ancestors) up
-    if(row.index() > 3) {
-      var row_prev = row.prevAll(".row_p").first();
-      var row_s_next = row.nextUntil(".row_p");
-      row.insertBefore(row_prev);
-      row_s_next.each(function() {
-        $(this).insertAfter(row);
-        row = $(this); // Update reference for chaining
-      });
-    }
-  }
-  updateArrowVisibility();
-});
-$(document).on("click", ".row_move_down", function() {
-  var row = $(this).closest("tr");
-  if(row.hasClass("row_s")) {
-    // Move ancestor down within ancestor group
-    var row_next = row.next(".row_s");
-    if(row_next.length) {
-      row.insertAfter(row_next);
-    }
-  } else if(row.hasClass("row_p")) {
-    // Move entire person block down
-    var row_s_next = row.nextUntil(".row_p");
-    var row_target = row.nextAll(".row_p").first();
-    if(row_target.length) {
-      var target_ancestors = row_target.nextUntil(".row_p");
-      if(target_ancestors.length) {
-        row.insertAfter(target_ancestors.last());
-      } else {
-        row.insertAfter(row_target);
-      }
-      row_s_next.each(function() {
-        $(this).insertAfter(row);
-        row = $(this);
-      });
-    }
-  }
-  updateArrowVisibility();
-});
-$(document).on("change", ".reset_bd_text", function() {
-  $(this).closest("tr").children(".bd_text").html("");
-});
-$(document).on("change", ".reset_n_p_oc", function() {
-  $(this).closest("tr").children(".n_p_oc").html("");
-});
-$("#upd").submit(function(event) {
-  event.preventDefault();
-  var gi = 1;
-
-  $('tbody tr:visible').each(function() {
-    var $row = $(this);
-
-    if($row.hasClass("row_p")) {
-      var firstName = $row.find("input[name='p']").val().trim();
-      var lastName = $row.find("input[name='n']").val().trim();
-
-      if(firstName !== "" && lastName !== "") {
-        $row.find("input[name='oc']").attr("name", "oc" + gi);
-        $row.find("input[name='p']").attr("name", "p" + gi);
-        $row.find("input[name='n']").attr("name", "n" + gi);
-        $row.find("input[name='t']").attr("name", "t" + gi);
-      } else {
-        $row.find("input").prop("disabled", true);
-      }
-    } else if($row.hasClass("row_s")) {
-      var sosaValue = $row.find("input[name='s']").val().trim();
-
-      if(sosaValue !== "") {
-        $row.find("input[name='s']").attr("name", "s" + gi);
-        gi++; // Only increment on ancestor rows with data
-      } else {
-        $row.find("input").prop("disabled", true);
-      }
+    if (t.classList.contains('reset_n_p_oc')) {
+      t.closest('tr').querySelectorAll('.n_p_oc').forEach(c => c.innerHTML = '');
     }
   });
 
-  $(this).unbind('submit').submit();
-});
+  // ---------- submit: renommage indexé ----------
+  let bypass = false;
+  form.addEventListener('submit', (e) => {
+    if (bypass) return;
+    e.preventDefault();
+    let gi = 1;
+
+    visibleRows().forEach(row => {
+      if (row.classList.contains('row_p')) {
+        const p  = row.querySelector("input[name='p']");
+        const n  = row.querySelector("input[name='n']");
+        const oc = row.querySelector("input[name='oc']");
+        const t  = row.querySelector("input[name='t']");
+        if (p && n && p.value.trim() !== '' && n.value.trim() !== '') {
+          if (oc) oc.name = 'oc' + gi;
+          p.name = 'p' + gi;
+          n.name = 'n' + gi;
+          if (t) t.name = 't' + gi;
+        } else {
+          row.querySelectorAll('input').forEach(i => i.disabled = true);
+        }
+      } else if (row.classList.contains('row_s')) {
+        const s = row.querySelector("input[name='s']");
+        if (s && s.value.trim() !== '') {
+          s.name = 's' + gi;
+          gi++;
+        } else {
+          row.querySelectorAll('input').forEach(i => i.disabled = true);
+        }
+      }
+    });
+
+    bypass = true;
+    form.submit();
+  });
+
+  // ---------- init ----------
+  document.addEventListener('DOMContentLoaded', updateArrowVisibility);
+  if (document.readyState !== 'loading') updateArrowVisibility();
+})();
 </script>
 </body>
 </html>
