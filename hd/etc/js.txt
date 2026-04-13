@@ -121,10 +121,13 @@
     or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
     or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js"
-      integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/6.0.1/autosize.min.js"
+            integrity="sha256-VCHx3GCDnd156mCM5EM9bJTj7mhMrrwg2tAab9B1vQs=
+                       sha384-Q9KD03bmEL9H3t9KOxcdN2YplobIplv9iv7srJG5fI9U22Pw0uvKgHwtI32TTG3U
+                       sha512-OjjaC+tijryqhyPqy7jWSPCRj7fcosu1zreTX1k+OWSwu6uSqLLQ2kxaqL9UpR7xFaPsCwhMf1bQABw2rCxMbg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   %else;
-     <script src="%etc_prefix;js/autosize.min.js?version=4.0.2"></script>
+     <script src="%etc_prefix;js/autosize.min.js?version=6.0.1"></script>
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;
