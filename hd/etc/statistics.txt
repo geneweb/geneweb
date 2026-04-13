@@ -17,7 +17,7 @@
 
 <div class="container-fluid px-3 px-lg-5 mt-3">
 <h1 class="h3 mb-3">
-  <i class="fa fa-chart-bar mr-2"></i>[*statistics] — %bname;
+  <i class="fa fa-chart-bar me-2"></i>[*statistics] — %bname;
 </h1>
 
 <div id="stats-loading" class="text-center py-5">
@@ -27,7 +27,7 @@
   <p class="mt-2 text-body-secondary">[*loading…]</p>
 </div>
 
-<div id="stats-content" style="display:none">
+<div id="stats-content" class="d-none">
 
 <!-- KPI cards -->
 <div class="row mb-3" id="kpi-row"></div>
@@ -35,15 +35,15 @@
 <!-- Demographics -->
 <div class="row mb-3">
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*sex]1</h6>
+    <h2 class="h6 card-title text-body-secondary">[*sex]1</h2>
     <canvas id="ch-sex" height="220"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*alive]0/[died]0</h6>
+    <h2 class="h6 card-title text-body-secondary">[*alive]0/[died]0</h2>
     <canvas id="ch-alive" height="220"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*relation/relations]1</h6>
+    <h2 class="h6 card-title text-body-secondary">[*relation/relations]1</h2>
     <canvas id="ch-relations" height="220"></canvas>
   </div></div></div>
 </div>
@@ -51,11 +51,11 @@
 <!-- Births & Deaths + Marriages by decade -->
 <div class="row mb-3">
   <div class="col-md-6"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*birth/births]1 &amp; [*death/deaths]1</h6>
+    <h2 class="h6 card-title text-body-secondary">[*birth/births]1 &amp; [*death/deaths]1</h2>
     <canvas id="ch-bd-decade" height="150"></canvas>
   </div></div></div>
   <div class="col-md-6"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*marriage/marriages]1</h6>
+    <h2 class="h6 card-title text-body-secondary">[*marriage/marriages]1</h2>
     <canvas id="ch-mar-decade" height="150"></canvas>
   </div></div></div>
 </div>
@@ -63,11 +63,11 @@
 <!-- Age at marriage and death -->
 <div class="row mb-3">
   <div class="col-md-6"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*age at marriage]</h6>
+    <h2 class="h6 card-title text-body-secondary">[*age at marriage]</h2>
     <canvas id="ch-age-mar" height="150"></canvas>
   </div></div></div>
   <div class="col-md-6"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*age at death]</h6>
+    <h2 class="h6 card-title text-body-secondary">[*age at death]</h2>
     <canvas id="ch-age-death" height="150"></canvas>
   </div></div></div>
 </div>
@@ -75,7 +75,7 @@
 <!-- Life expectancy by century -->
 <div class="row mb-3">
   <div class="col-12"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*life expectancy]</h6>
+    <h2 class="h6 card-title text-body-secondary">[*life expectancy]</h2>
     <canvas id="ch-life-exp" height="90"></canvas>
   </div></div></div>
 </div>
@@ -84,15 +84,15 @@
 <!-- Births/Marriage/Deaths by month -->
 <div class="row mb-3">
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*birth/births]1 / [year/month/day]1</h6>
+    <h2 class="h6 card-title text-body-secondary">[*birth/births]1 / [year/month/day]1</h2>
     <canvas id="ch-birth-month" height="180"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*marriage/marriages]1 / [year/month/day]1</h6>
+    <h2 class="h6 card-title text-body-secondary">[*marriage/marriages]1 / [year/month/day]1</h2>
     <canvas id="ch-mar-month" height="180"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*death/deaths]1 / [year/month/day]1</h6>
+    <h2 class="h6 card-title text-body-secondary">[*death/deaths]1 / [year/month/day]1</h2>
     <canvas id="ch-death-month" height="180"></canvas>
   </div></div></div>
 </div>
@@ -100,15 +100,15 @@
 <!-- Top surnames + firstnames -->
 <div class="row mb-3">
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">Top [*surname/surnames]1</h6>
+    <h2 class="h6 card-title text-body-secondary">Top [*surname/surnames]1</h2>
     <canvas id="ch-surnames" height="300"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">Top [*first name/first names]1 &#9794;</h6>
+    <h2 class="h6 card-title text-body-secondary">Top [*first name/first names]1 &#9794;</h2>
     <canvas id="ch-fn-m" height="300"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">Top [*first name/first names]1 &#9792;</h6>
+    <h2 class="h6 card-title text-body-secondary">Top [*first name/first names]1 &#9792;</h2>
     <canvas id="ch-fn-f" height="300"></canvas>
   </div></div></div>
 </div>
@@ -116,15 +116,15 @@
 <!-- Top places -->
 <div class="row mb-3">
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">Top [*place/places]1 ([*birth/births]1)</h6>
+    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([*birth/births]1)</h2>
     <canvas id="ch-bp" height="300"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">Top [*place/places]1 ([*marriage/marriages]1)</h6>
+    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([*marriage/marriages]1)</h2>
     <canvas id="ch-mp" height="300"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">Top [*place/places]1 ([*death/deaths]1)</h6>
+    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([*death/deaths]1)</h2>
     <canvas id="ch-dp" height="300"></canvas>
   </div></div></div>
 </div>
@@ -132,15 +132,15 @@
 <!-- Top profession + remariages + childrenCompleteness -->
 <div class="row mb-3">
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">Top [*occupation/occupations]1</h6>
+    <h2 class="h6 card-title text-body-secondary">Top [*occupation/occupations]1</h2>
     <canvas id="ch-occupations" height="260"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*number of unions]</h6>
+    <h2 class="h6 card-title text-body-secondary">[*number of unions]</h2>
     <canvas id="ch-remarriage" height="260"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*number of children]</h6>
+    <h2 class="h6 card-title text-body-secondary">[*number of children]</h2>
     <canvas id="ch-children" height="260"></canvas>
   </div></div></div>
 </div>
@@ -148,7 +148,7 @@
 <!-- Completeness -->
 <div class="row mb-3">
   <div class="col-4"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*data quality]</h6>
+    <h2 class="h6 card-title text-body-secondary">[*data quality]</h2>
     <canvas id="ch-completeness" height="250"></canvas>
   </div></div></div>
 </div>
@@ -156,7 +156,7 @@
 <!-- Quick links -->
 <div class="row mb-4">
   <div class="col-12"><div class="card"><div class="card-body">
-    <h6 class="card-title text-body-secondary">[*other statistics]</h6>
+    <h2 class="h6 card-title text-body-secondary">[*other statistics]</h2>
     <div class="d-flex flex-wrap">
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LB">[*latest births]</a>
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LD">[*latest deaths]</a>
@@ -372,8 +372,8 @@ fetch(GW.url).then(function(r) {
   moBar("ch-birth-month", D.births_by_month, C.m);
   moBar("ch-death-month", D.deaths_by_month, C.f);
 
-  document.getElementById("stats-loading").style.display = "none";
-  document.getElementById("stats-content").style.display = "block";
+  document.getElementById('stats-content').classList.remove('d-none');
+  document.getElementById('stats-loading').classList.add('d-none');
 }).catch(function(err) {
   document.getElementById("stats-loading").innerHTML = '<div class="alert alert-danger">'+err.message+'</div>';
 });
