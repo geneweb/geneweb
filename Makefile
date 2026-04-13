@@ -126,10 +126,11 @@ endif
 	cp -R hd/* $(DISTRIB_DIR)/gw/
 	rm $(DISTRIB_DIR)/gw/dune
 	rm $(DISTRIB_DIR)/gw/etc/js/checkdata.js
+	rm $(DISTRIB_DIR)/gw/etc/js/fanchart.js
+	rm $(DISTRIB_DIR)/gw/etc/js/maphilight.js
 	rm $(DISTRIB_DIR)/gw/etc/js/notes_upd_gallery.js
 	rm $(DISTRIB_DIR)/gw/etc/js/p_mod.js
 	rm $(DISTRIB_DIR)/gw/etc/js/relationmatrix.js
-	rm $(DISTRIB_DIR)/gw/etc/js/fanchart.js
 	@printf "\n\033[1;1m└ Compressing large JS/CSS assets\033[0m\n"
 	@for f in $(DISTRIB_DIR)/gw/etc/js/*.min.js; do \
 	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 4500 ]; then \
