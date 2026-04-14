@@ -7,7 +7,7 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Iper = Driver.Iper
 
-let src = Logs.Src.create ~doc:"SearchName" __MODULE__
+let src = Logs.Src.create ~doc:"SearchName" "SEARCH"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 

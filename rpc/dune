@@ -1,0 +1,18 @@
+(library
+ (public_name geneweb-rpc.lib)
+ (name geneweb_rpc)
+ (modes byte native)
+ (libraries
+  geneweb.search
+  geneweb.util
+  httpun
+  httpun-lwt-unix
+  httpun-ws
+  tls
+  lwt
+  yojson
+  fmt
+  logs
+  logs.lwt)
+ (preprocess
+  (pps lwt_ppx)))
