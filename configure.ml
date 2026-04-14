@@ -6,14 +6,40 @@
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 
+let warning_sosa_legacy () =
+  Format.eprintf
+    "The option --sosa-legacy has no longer effect. To use the legacy \
+     implementation, DO NOT install zarith in your opam switch and recompile \
+     GeneWeb.@."
+
+let warning_sosa_zarith () =
+  Format.eprintf
+    "The option --sosa-zarith has no longer effect. To use the Zarith \
+     implementation, install zarith in your opam switch and recompile \
+     GeneWeb.@."
+
+let warning_syslog () =
+  Format.eprintf
+    "The option --syslog has no longer effect. The syslog option is always \
+     enabled.@."
+
+let warning_gwd_caching () =
+  Format.eprintf
+    "The option --gwd-caching has no longer effect. To enable cache in memory \
+     feature, install ancient in your opam switch and recompile GeneWeb.@."
+
 let speclist =
   [
-    ("--sosa-legacy", Arg.Unit ignore, " Use legacy Sosa module implementation");
+    ( "--sosa-legacy",
+      Arg.Unit warning_sosa_legacy,
+      " Use legacy Sosa module implementation" );
     ( "--sosa-zarith",
-      Arg.Unit ignore,
+      Arg.Unit warning_sosa_zarith,
       " Use Sosa module implementation based on `zarith` library" );
-    ("--syslog", Arg.Unit ignore, " Log gwd errors using syslog");
-    ("--gwd-caching", Arg.Unit ignore, " Enable database preloading (Unix-only)");
+    ("--syslog", Arg.Unit warning_syslog, " Log gwd errors using syslog");
+    ( "--gwd-caching",
+      Arg.Unit warning_gwd_caching,
+      " Enable database preloading (Unix-only)" );
   ]
   |> List.sort compare |> Arg.align
 
