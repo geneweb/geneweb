@@ -144,8 +144,6 @@ let string_of_sockaddr = function
   | Unix.ADDR_UNIX s -> s
   | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
 
-let sockaddr_of_string s = Unix.ADDR_UNIX s
-
 let timeout_handler ~timeout _ =
   try
     if !printing_state = Nothing then http Code.OK;
@@ -320,38 +318,58 @@ let accept_connections ~timeout ~n_workers callback socket =
   if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
   else accept_connections_windows socket
 
+let resolve_addr ?addr port =
+  let port = string_of_int port in
+  match addr with
+  | Some a -> Unix.getaddrinfo a port []
+  | None -> Unix.getaddrinfo "" port [ Unix.AI_PASSIVE ]
+
+let try_addresses l =
+  let rec loop l =
+    match l with
+    | Unix.{ ai_family; ai_socktype; ai_addr; _ } :: l -> (
+        let socket = Unix.socket ai_family ai_socktype 0 in
+        Unix.setsockopt socket Unix.SO_REUSEADDR true;
+        match Unix.bind socket ai_addr with
+        | exception _ -> loop l
+        | () -> Some socket)
+    | [] -> None
+  in
+  loop l
+
 let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
-  | exception Not_found ->
+  | exception Not_found -> (
       check_stopping ();
-      let socket, addr =
-        match addr with
-        | Some a ->
-            let a =
-              try Unix.inet_addr_of_string a
-              with Failure _ -> (Unix.gethostbyname a).Unix.h_addr_list.(0)
-            in
-            let domain = Unix.domain_of_sockaddr (Unix.ADDR_INET (a, 0)) in
-            (Unix.socket domain Unix.SOCK_STREAM 0, a)
-        | None -> (
-            try
-              let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
-              Unix.setsockopt s Unix.IPV6_ONLY false;
-              (s, Unix.inet6_addr_any)
-            with Unix.Unix_error (Unix.EAFNOSUPPORT, _, _) ->
-              (Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0, Unix.inet_addr_any))
-      in
-      Unix.setsockopt socket Unix.SO_REUSEADDR true;
-      Unix.bind socket (Unix.ADDR_INET (addr, port));
-      Unix.listen socket max_pending_requests;
-      let tm = Unix.localtime (Unix.time ()) in
-      Log.info (fun k ->
-          k "Ready %4d-%02d-%02d %02d:%02d." (1900 + tm.Unix.tm_year)
-            (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min);
-      if n_workers = 0 then ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
-      accept_connections ~timeout ~n_workers callback socket
+      match resolve_addr ?addr port with
+      | (exception _) | [] ->
+          (* TODO: move this code in `gwd.ml` *)
+          Log.err (fun k ->
+              k "Cannot resolve the interface %a:%i."
+                Fmt.(option ~none:(const string "any") string)
+                addr port);
+          exit 2
+      | l -> (
+          match try_addresses l with
+          | None ->
+              (* TODO: move this code in `gwd.ml` *)
+              Log.err (fun k ->
+                  k "Cannot bind any interface for %a:%i."
+                    Fmt.(option ~none:(const string "any") string)
+                    addr port);
+              exit 2
+          | Some socket ->
+              Unix.listen socket max_pending_requests;
+              let tm = Unix.localtime (Unix.time ()) in
+              Log.info (fun k ->
+                  k "Ready %4d-%02d-%02d %02d:%02d." (1900 + tm.Unix.tm_year)
+                    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour
+                    tm.Unix.tm_min);
+              if n_workers = 0 then
+                ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
+              accept_connections ~timeout ~n_workers callback socket))
   | s ->
-      let addr = sockaddr_of_string s in
+      let addr = Unix.ADDR_UNIX s in
       let client_socket = Unix.openfile !sock_in [ Unix.O_RDONLY ] 0 in
       let oc = open_out_bin !sock_out in
       wserver_oc := oc;

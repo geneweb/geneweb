@@ -1,4 +1,8 @@
 # Unreleased
+
+## Gwd
+- Use `getaddrinfo` to retrieve addresses from the operating system (#2757)
+
 ## Breaking changes
 - Deprecate the multi-parents feature (#2726)
 - The `gwd.arg` is ignored and a warning is printed if there is such a
