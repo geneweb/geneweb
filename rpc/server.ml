@@ -7,8 +7,11 @@ module Payload = Httpun_ws.Payload
 module S = Httpun_lwt_unix.Server
 module Y = Yojson.Safe
 module U = Yojson.Safe.Util
-module Json_rpc = Geneweb_rpc.Json_rpc
 open Lwt.Infix
+
+let src = Logs.Src.create ~doc:"Rpc server" "RPC"
+
+module Log = (val Logs_lwt.src_log src : Logs_lwt.LOG)
 
 (* This module is responsible for configuring the server of `httpun-ws` for our
    specific use case. The only challenging part lies in properly handling and
@@ -31,7 +34,7 @@ let rpc_handler ~task_timeout handler sockaddr target content =
     match Json_rpc.Request.of_json j with
     | Ok request -> (
         let%lwt () =
-          Logs_lwt.debug (fun k ->
+          Log.debug (fun k ->
               k "Received the Request object from %a:@ %a" Util.pp_sockaddr
                 sockaddr Json_rpc.Request.pp request)
         in
@@ -43,7 +46,7 @@ let rpc_handler ~task_timeout handler sockaddr target content =
         match%lwt res with
         | `Return (response, duration) ->
             let%lwt () =
-              Logs_lwt.debug (fun k ->
+              Log.debug (fun k ->
                   k "Response message to %a (in %a):@ %a" Util.pp_sockaddr
                     sockaddr Util.pp_duration duration Json_rpc.Response.pp
                     response)
@@ -51,7 +54,7 @@ let rpc_handler ~task_timeout handler sockaddr target content =
             Lwt.return @@ response_to_string response
         | `Timeout ->
             let%lwt () =
-              Logs_lwt.debug (fun k ->
+              Log.debug (fun k ->
                   k "Timout while processing request from %a." Util.pp_sockaddr
                     sockaddr)
             in
@@ -62,7 +65,7 @@ let rpc_handler ~task_timeout handler sockaddr target content =
             Lwt.return @@ response_to_string err)
     | Error e ->
         let%lwt () =
-          Logs_lwt.debug (fun k ->
+          Log.debug (fun k ->
               k "The client sent an invalid Request object:@ %a@ error: %s"
                 (Y.pretty_print ~std:true) j e)
         in
@@ -70,7 +73,7 @@ let rpc_handler ~task_timeout handler sockaddr target content =
         Lwt.return @@ response_to_string err
   with U.Type_error (s, _) ->
     let%lwt () =
-      Logs_lwt.debug (fun k ->
+      Log.debug (fun k ->
           k "The client sent an invalid JSON message:@ %s@ Parser error:@ %s"
             content s)
     in
@@ -82,9 +85,10 @@ let rpc_handler ~task_timeout handler sockaddr target content =
    This will not terminate the server, but the WebSocket connection may be
    lost. *)
 let log_ws_handler_exn sockaddr exn =
+  let bt = Printexc.get_raw_backtrace () in
   Logs.err (fun k ->
       k "Exception raised while processing request for %a:@ %a" Util.pp_sockaddr
-        sockaddr Util.pp_exn exn)
+        sockaddr Util.pp_exception (exn, bt))
 
 let read_full_payload ~total payload k =
   let buf = Bigstringaf.create total in
@@ -175,15 +179,20 @@ let http_error_handler _sockaddr ?request:_ error handle =
    and the program must terminate. Any other exceptions should be treated as
    bugs, as they should have been handled earlier. *)
 let log_server_exn exn =
-  Logs.err (fun k -> k "Uncaught exception in the server:@ %a" Util.pp_exn exn);
+  let bt = Printexc.get_raw_backtrace () in
+  Logs.err (fun k ->
+      k "Uncaught exception in the server:@ %a" Util.pp_exception (exn, bt));
   raise exn
 
-let resolve_addr interface port =
-  Lwt_unix.getaddrinfo interface (Int.to_string port)
-    [ Unix.(AI_FAMILY PF_INET) ]
+let resolve_addr ?interface port =
+  let port = Int.to_string port in
+  let flags = [ Unix.(AI_FAMILY PF_INET) ] in
+  match interface with
+  | Some i -> Lwt_unix.getaddrinfo i port flags
+  | None -> Lwt_unix.getaddrinfo "" port (Unix.AI_PASSIVE :: flags)
 
-let start ~interface ~port ?max_connection ?idle_timeout ?task_timeout
-    ?(tls = false) ?certfile ?keyfile ?max_payload_size user_handler =
+let start ?interface ~port ?max_requests ?timeout ?task_timeout ?(tls = false)
+    ?certfile ?keyfile ?max_payload_size user_handler =
   let create_connection_handler =
     match (tls, certfile, keyfile) with
     | true, Some certfile, Some keyfile ->
@@ -209,7 +218,7 @@ let start ~interface ~port ?max_connection ?idle_timeout ?task_timeout
         Util.protect
           ~finally:(fun () ->
             let%lwt () = Fd_manager.close fd_manager fd in
-            Logs_lwt.info (fun k ->
+            Log.info (fun k ->
                 k "Close connection of %a" Util.pp_sockaddr sockaddr))
           (fun () -> create_connection_handler request_handler sockaddr fd)
       with exn ->
@@ -217,19 +226,20 @@ let start ~interface ~port ?max_connection ?idle_timeout ?task_timeout
            the connection or the TLS negotiation fail. Any other exceptions
            should be treated as bugs, as they should have been handled
            earlier. *)
-        Logs_lwt.info (fun k ->
+        let bt = Printexc.get_raw_backtrace () in
+        Log.info (fun k ->
             k "Uncaught exception raised in connection handler of %a:@ %a"
-              Util.pp_sockaddr sockaddr Util.pp_exn exn)
+              Util.pp_sockaddr sockaddr Util.pp_exception (exn, bt))
     else
-      Logs_lwt.info (fun k ->
+      Log.info (fun k ->
           k "Refused the connection from %a" Util.pp_sockaddr sockaddr)
   in
 
-  let fd_manager = Fd_manager.make ?max_connection ?idle_timeout () in
+  let fd_manager = Fd_manager.make ?max_connection:max_requests ?timeout () in
   Fd_manager.loop fd_manager;
   Lwt.dont_wait
     (fun () ->
-      match%lwt resolve_addr interface port with
+      match%lwt resolve_addr ?interface port with
       | Unix.{ ai_addr = sockaddr; _ } :: _ ->
           (* FIXME: It seems there is a bug in lwt_ppx with type annotations.
              We should write:
@@ -243,7 +253,11 @@ let start ~interface ~port ?max_connection ?idle_timeout ?task_timeout
               (connection_handler fd_manager)
           in
           let _ : Lwt_io.server = server in
-          Logs_lwt.info (fun k ->
+          Log.info (fun k ->
               k "Server listening on %a..." Util.pp_sockaddr sockaddr)
-      | _ -> Logs_lwt.err (fun k -> k "Cannot resolve %s:%d..." interface port))
+      | _ ->
+          Log.err (fun k ->
+              k "Cannot resolve %a:%d..."
+                Fmt.(option ~none:(const string "any") string)
+                interface port))
     log_server_exn

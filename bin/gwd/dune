@@ -17,10 +17,37 @@
  (sites geneweb))
 
 (library
+ (name geneweb_rpc_opt)
+ (libraries
+  gwd_lib
+  geneweb_compat
+  geneweb_rpc
+  logs.lwt
+  lwt.unix
+  (select
+   rpc.ml
+   from
+   (-> rpc.imp.ml)
+   (geneweb-rpc -> rpc.dum.ml)))
+ (modules rpc))
+
+(library
  (public_name geneweb.gwd_lib)
  (name gwd_lib)
- (libraries geneweb geneweb_http geneweb.plugin dune-site cmdliner)
- (modules request geneweb_sites cmd cmd_legacy robot))
+ (libraries
+  geneweb
+  geneweb_http
+  geneweb_rpc
+  geneweb_compat
+  geneweb.plugin
+  dune-site
+  cmdliner
+  ptime
+  logs-syslog
+  logs-syslog.unix
+  fmt.tty
+  logs.fmt)
+ (modules request geneweb_sites cmd cmd_legacy reporter robot))
 
 (executable
  (package geneweb)
@@ -33,13 +60,13 @@
   geneweb.logs
   geneweb.plugin
   geneweb_http
+  geneweb_search
+  geneweb_rpc_opt
+  lwt
+  lwt.unix
   gwd_lib
   logs
-  logs-syslog
-  logs-syslog.unix
-  ptime
   fmt
-  fmt.tty
   str
   unix
   uri)

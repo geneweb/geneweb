@@ -2,7 +2,7 @@ open Config
 open Util
 open UpdateData
 
-let src = Logs.Src.create ~doc:"UpdateDataDisplay" __MODULE__
+let src = Logs.Src.create ~doc:"UpdateDataDisplay" "DAG"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa

@@ -2,7 +2,7 @@ open Config
 open Def
 open Util
 
-let src = Logs.Src.create ~doc:"ImageCarrousel" __MODULE__
+let src = Logs.Src.create ~doc:"ImageCarrousel" "IMAGE"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver

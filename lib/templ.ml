@@ -1,4 +1,4 @@
-let src = Logs.Src.create ~doc:"Templ" __MODULE__
+let src = Logs.Src.create ~doc:"Templ" "TEMPL"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa

@@ -4,7 +4,7 @@ open Config
 open Util
 open Notes
 
-let src = Logs.Src.create ~doc:"NotesDisplay" __MODULE__
+let src = Logs.Src.create ~doc:"NotesDisplay" "NOTES"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
