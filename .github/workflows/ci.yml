@@ -117,9 +117,6 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update -qq
 
-      - name: Pin conf-brotli fix
-        run: opam pin conf-brotli .github/opam-pins/conf-brotli/ --no-action
-
       # The uucp library seems to push old OCaml compiler to their limits,
       # see https://github.com/ocaml/ocaml/issues/14166. This is a workaround
       # to avoid this error by increasing the stack limit of the current shell.
