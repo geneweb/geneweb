@@ -1,16 +1,13 @@
 type handler =
-  Unix.sockaddr ->
-  string ->
-  Geneweb_rpc.Json_rpc.Request.t ->
-  Geneweb_rpc.Json_rpc.Response.t Lwt.t
+  Unix.sockaddr -> string -> Json_rpc.Request.t -> Json_rpc.Response.t Lwt.t
 (** Type of user handler. This first argument is client socket address and the
     second argument is the request object. *)
 
 val start :
-  interface:string ->
+  ?interface:string ->
   port:int ->
-  ?max_connection:int ->
-  ?idle_timeout:float ->
+  ?max_requests:int ->
+  ?timeout:float ->
   ?task_timeout:float ->
   ?tls:bool ->
   ?certfile:string ->
@@ -28,9 +25,9 @@ val start :
     The server listens on the specified [interface] and [port].
 
     Optional parameters:
-    - [max_connection]: Limits the number of concurrent connections per client
-      if specified; otherwise, no limit is enforced.
-    - [idle_timeout]: Specifies the duration (in seconds) after which idle
+    - [max_requests]: Limits the number of concurrent connections per client if
+      specified; otherwise, no limit is enforced.
+    - [timeout]: Specifies the duration (in seconds) after which idle
       connections are closed if specified; otherwise no limit is enforced.
     - [task_timeout]: Specifies the duration (in seconds) after which tasks are
       canceled. Note that this timeout may not cancel non-cooperative tasks.

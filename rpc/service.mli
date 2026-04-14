@@ -56,18 +56,3 @@ module PingPong : sig
   val echo : (string -> string res, string) meth
   val srv : t
 end
-
-module Search : sig
-  val make : fuel:int -> (string * Geneweb_search.Index.Default.t) list -> t
-  (** [make ~fuel l] prepares a search service with a list [l] of inverted
-      indexes, each with its name.
-
-      The service exposes two methods:
-      - [lookup name s size] searches the string [s] in the index [name] and
-        stops after at most [size] results.
-      - [info] returns the list of loaded indexes with their cardinals.
-
-      The [fuel] argument sets an upper bound on the number of results returned
-      by the lookup operation. If the requested size exceeds this limit, the
-      request is not fully honored and at most [fuel] results are returned. *)
-end

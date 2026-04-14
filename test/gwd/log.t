@@ -7,14 +7,18 @@ except through the NO_COLOR environment variable. If this test fails, try
 setting NO_COLOR before investigating further.
 $ export NO_COLOR=1
 
-  $ gwd --check --debug 2>&1 | tr -d '\r' | cat -v
+  $ gwd --check 2>&1 | tr -d '\r' | cat -v
+  DEBUG GWD  Starting the HTTP server...
   DEBUG GWD  End of check mode.
 
-  $ gwd --check --debug --log '<stdout>' | tr -d '\r' | cat -v
+  $ gwd --check --log '<stdout>' | tr -d '\r' | cat -v
+  DEBUG GWD  Starting the HTTP server...
   DEBUG GWD  End of check mode.
 
-  $ gwd --check --debug --log '<stderr>' 2>&1 | tr -d '\r' | cat -v
+  $ gwd --check --log '<stderr>' 2>&1 | tr -d '\r' | cat -v
+  DEBUG GWD  Starting the HTTP server...
   DEBUG GWD  End of check mode.
 
-  $ gwd --check --debug --log foo && tr -d '\r' < foo | cat -v
+  $ gwd --check --log foo && tr -d '\r' < foo | cat -v
+  DEBUG GWD  Starting the HTTP server...
   DEBUG GWD  End of check mode.

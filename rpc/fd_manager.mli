@@ -1,11 +1,11 @@
 type t
 (** Type of the file descriptor manager. *)
 
-val make : ?max_connection:int -> ?idle_timeout:float -> unit -> t
+val make : ?max_connection:int -> ?timeout:float -> unit -> t
 (** [make ()] creates a file descriptor manager.
 
-    If [max_connection], respectively [idle_timeout], is omitted, there will be
-    no limit. *)
+    If [max_connection], respectively [timeout], is omitted, there will be no
+    limit. *)
 
 val add : t -> Lwt_unix.file_descr -> bool Lwt.t
 (** [add t fd] adds the file descriptor [fd] to the manager [t]. Return [false]
