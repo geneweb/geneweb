@@ -6,7 +6,7 @@
 %let;maxlev;%if;(e.cpl="on")13%else;12%end;%nn;%in;
 %(evarv;, %evarhi;, %evarim;, %evarso;, %evarma;<br>%)
 %(minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;)%)
-<div class="d-flex ml-5">
+<div class="d-flex ms-5">
   %if;not cancel_links;
     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
       <div class="btn-group mx-2">

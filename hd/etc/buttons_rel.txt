@@ -56,7 +56,7 @@
         <i class="fa fa-ring fa-fw"></i></a>
     %end;
     %if;(e.et="A" or e.et="M")
-      <a class="ml-3"
+      <a class="ms-3"
         href="%if;(e.long!="on")%url_set.long.on;%else;%url_set.long;%end;"
         title="%if;(e.long!="on")[*long display]1%else;
             [*visualize/show/hide/summary]2 [long display]%end; ">%nn;
@@ -94,7 +94,7 @@
     <a class="ms-2" href="%url_set.cgl.on;" target="_blank">
       <i class="fa fa-link-slash fa-fw" title="[*cancel GeneWeb links]"></i></a>
     %if;(e.m="RLM")
-      <a class="ml-4" title="[*add/clear/show/edit the graph]3"
+      <a class="ms-4" title="[*add/clear/show/edit the graph]3"
           href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
         <i class="far fa-pen-to-square fa-lg fa-fw"></i>
       </a>

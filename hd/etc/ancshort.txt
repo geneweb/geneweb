@@ -34,7 +34,7 @@
   %foreach;ancestor_level(nb_gen)
     %if;(level>=v0)
       %apply;lazy_print%with;
-        %nl;%if;(level!=0)<div%if;not cancel_links; class="ml-2"%end;><b>[*generation/generations]0 %level;</b></div>%nl;%end;
+        %nl;%if;(level!=0)<div%if;not cancel_links; class="ms-2"%end;><b>[*generation/generations]0 %level;</b></div>%nl;%end;
         <ul class="mb-2">%nl;
       %end;
       %foreach;ancestor;
