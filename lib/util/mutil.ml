@@ -135,11 +135,11 @@ let colon_to_at_word s ibeg iend =
         in
         let i_start = i + 3 in
         let j = inext in
-        if i_start < j then begin
-          if s.[i_start] = '+' || s.[i_start] = '-' then
+        if i_start < j then
+          begin if s.[i_start] = '+' || s.[i_start] = '-' then
             has_modification := true
           else has_replacement := true
-        end;
+          end;
         detect_mixing inext
     in
     detect_mixing iendroot;
