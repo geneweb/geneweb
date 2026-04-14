@@ -39,11 +39,12 @@ let ( // ) = Filename.concat
 
 let iter_path_entries f path =
   let rec loop path =
-    match (Filename.dirname path, Filename.basename path) with
-    | ("." | "/"), _ -> f path
-    | path, base ->
-        loop path;
-        f (path // base)
+    let dir = Filename.dirname path in
+    if dir = path then f path
+    else begin
+      loop dir;
+      f (dir // Filename.basename path)
+    end
   in
   loop path
 
