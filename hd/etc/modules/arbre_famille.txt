@@ -115,7 +115,7 @@
   %if;("xx"="spouse")<div class="col-4 p-2"></div>%end;
     <div class="%if;("xx"="spouse" or "xx"="" or "xx"="ancestor")col-6 mx-1
       %elseif;("xx"="father" or "xx"="mother" or "xx"="spouse.father" or "xx"="spouse.mother")w-75 align-self-center mx-1%end;
-      %if;("xx"="spouse")mr-5 ml-auto%elseif;("xx"="")mr-auto ml-5%end; text-center rounded-top %if;(wizard)list-group-item-secondary%end;">
+      %if;("xx"="spouse")me-5 ms-auto%elseif;("xx"="")me-auto ms-5%end; text-center rounded-top %if;(wizard)list-group-item-secondary%end;">
       %if;(wizard)
         <a href="%prefix;m=ADD_PAR;ip=yy;" class="text-center align-self-center"
           title="%apply;a_of_b%with;[*add] [missing parents]%and;%if;("xx"="spouse")%spouse;%elseif;("xx"="")%self;%else;%xx;%end;%end;">
@@ -626,7 +626,7 @@
                     %if;child.is_male;%incr_count1;%end;
                     %if;child.is_female;%incr_count2;%end;
                   %end;
-                  <span class="ml-auto">%nn;
+                  <span class="ms-auto">%nn;
                   (%if;(count2=0 and count1!=0)
                     %if;(count1=1)[a son/a daughter/a child]0%nn;
                     %elseif;(count1>1)%apply;in_full(count1,0) [sons/daughters/children]0%nn;

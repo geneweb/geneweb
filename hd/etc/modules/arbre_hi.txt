@@ -18,7 +18,7 @@
 %let;wbs;%if;cgi;40%else;%expr(40*evarscl/100)%end;%in;
 %let;hb1;%if;cgi;22%else;%expr(22*evarscl/100)%end;%in; %( dimensions de la boite sosa %)
 %let;wb1;%if;cgi;38%else;%expr(38*evarscl/100)%end;%in;
-<style type="text/css">
+<style>
 #hi-tree1 {position:relative;left:10px;}
 #hi-tree1 tt{position:absolute;line-height:10pt;font-family:monospace;}
 #hi-tree1 span{position:absolute;line-height:10pt;margin:%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))8px 12px%else;0px 4px%end;}
@@ -531,7 +531,7 @@
  [*aa:::bb:tt]
 %end;
 
-<h2 class="display-5 ml-5 mt-2">%apply;my_title("ancestors tree of", evarhi, first_name) %surname; %dates (%evarv; [generation/generations]1)</h2>
+<h2 class="display-5 ms-5 mt-2">%apply;my_title("ancestors tree of", evarhi, first_name) %surname; %dates (%evarv; [generation/generations]1)</h2>
 %let;boxsize;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))2%else;1%end;%in;
 %if;((evarcpl="on" and evarv < 4) or (evarcpl!="on" and evarv < 3))
   [*compact tree][:] [specify::generation/generations]0 > 3.

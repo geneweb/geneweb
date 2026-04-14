@@ -127,7 +127,7 @@
                      %elseif;(env.key!="")&%env.key=%env.val;%end;%nn;
                    %end;"
                    title="%if;(e.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]">%nn;
-            <i class="fas fa-user male pe-0" aria-hidden="true"></i><i class="fas fa-user %if;(e.t!="H")fe%end;male pl-0 me-2" aria-hidden="true"></i>%nn;
+            <i class="fas fa-user male pe-0" aria-hidden="true"></i><i class="fas fa-user %if;(e.t!="H")fe%end;male ps-0 me-2" aria-hidden="true"></i>%nn;
             [*spouses info]%nn;
           </a>
         %end;

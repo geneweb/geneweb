@@ -89,24 +89,24 @@ fr: Codes couleur
 ][:]
 <div>
   <ul>
-    <li><i class="fa fa-person fa-fw text-body-secondary mr-2"></i>[*iftitles/public/semipublic/private]0[:]
+    <li><i class="fa fa-person fa-fw text-body-secondary me-2"></i>[*iftitles/public/semipublic/private]0[:]
 [
 en: Public if has titles, if <code>public_if_title=yes</code> (parameter in gwf, default yes), otherwise private
 fr: Publique si titré, si <code>public_if_title=yes</code> (paramètre dans .gwf, défaut yes), sinon privé
 ];
-    <li><i class="fa fa-person fa-fw text-success mr-2"></i>[*iftitles/public/semipublic/private]1[:] 
+    <li><i class="fa fa-person fa-fw text-success me-2"></i>[*iftitles/public/semipublic/private]1[:] 
 [
 en: Visible for everyone
 fr: Visible pour tout le monde
 ];
 %if;(b.semi_public="yes")
-    <li><i class="fa fa-person fa-fw text-warning mr-2"></i>[*iftitles/public/semipublic/private]2[:]
+    <li><i class="fa fa-person fa-fw text-warning me-2"></i>[*iftitles/public/semipublic/private]2[:]
 [
 en: Visible for <span class="text-success">friends</span> having HalfPublic status (consenting), other <span class="text-success">friends</span> see only firstname and surname
 fr: Visible pour les <span class="text-success">amis</span> consentants (marqués SemiPublic), les autre <span class="text-success">amis</span> ne voient que nom et prénom
 ];
 %end;
-    <li><i class="fa fa-person fa-fw text-danger mr-2"></i>[*iftitles/public/semipublic/private]3[:]
+    <li><i class="fa fa-person fa-fw text-danger me-2"></i>[*iftitles/public/semipublic/private]3[:]
 [
 en: Never visible except for himself when logged as <span class="text-success">friend</span>
 fr: Invisible pour tous sauf lui même (si connecté comme <span class="text-success">ami</span>)
