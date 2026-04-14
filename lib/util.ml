@@ -347,7 +347,6 @@ let nb_fields s =
   loop 1 0
 
 let tnf s = "[" ^ s ^ "]"
-
 let transl conf w = try Hashtbl.find conf.lexicon w with Not_found -> tnf w
 
 let transl_nth conf w n =
