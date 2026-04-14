@@ -10,6 +10,10 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+(* [deprecated] TYPE=album is accepted on read for backward compatibility
+   with notes, all new notes always write TYPE=gallery. *)
+let norm_type = function "album" -> "gallery" | t -> t
+
 let is_ancestor conf base anc =
   let restrict_for_spouses =
     try List.assoc "restrict_for_spouses" conf.base_env = "yes"
@@ -195,7 +199,16 @@ let fmt_fnote_title conf base fnotes =
     if String.trim fnote_title = "" then no_title else fnote_title
   with Not_found -> no_title
 
-let linked_page_rows conf base pg pgl =
+let person_query_suffix conf base = function
+  | None -> ""
+  | Some p -> "&" ^ (Util.acces conf base p :> string)
+
+let person_to_key base p =
+  let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+  let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+  (fn, sn, Driver.get_occ p)
+
+let linked_page_rows conf base ?person pg pgl =
   let typ = p_getenv conf.env "type" in
   match (pg, typ) with
   | Def.NLDB.PgInd ip, _ ->
@@ -266,7 +279,12 @@ let linked_page_rows conf base pg pgl =
            (Util.safe_html fnote_title :> string))
   | Def.NLDB.PgMisc fnotes, typ ->
       let nenv, _ = read_notes base fnotes in
-      let n_type = try List.assoc "TYPE" nenv with Not_found -> "" in
+      let n_type =
+        try norm_type (List.assoc "TYPE" nenv) with Not_found -> ""
+      in
+      let kq =
+        if n_type = "gallery" then person_query_suffix conf base person else ""
+      in
       if match typ with Some t when t = "" -> t = n_type | _ -> true then (
         let fnote_title = fmt_fnote_title conf base fnotes in
         if conf.wizard then
@@ -274,28 +292,26 @@ let linked_page_rows conf base pg pgl =
             (Format.sprintf
                {|
 <td class="text-center">
-  <a href="%sm=MOD_NOTES&f=%s" title="%s"><i class="%s"></i></a>
+  <a href="%sm=MOD_NOTES&f=%s%s" title="%s"><i class="%s"></i></a>
 </td>|}
                (commd conf :> string)
-               (Util.uri_encode fnotes)
+               (Util.uri_encode fnotes) kq
                (Utf8.capitalize_fst
                   (transl conf
                      (if n_type = "gallery" then "modify gallery"
-                      else if n_type = "album" then "modify album"
                       else "modify note")))
-               (if n_type = "gallery" || n_type = "album" then
-                  "far fa-image fa-fw"
+               (if n_type = "gallery" then "far fa-image fa-fw"
                 else "far fa-file-lines fa-fw"));
         Output.print_sstring conf
           (Format.sprintf
              {|
-<td><a href="%sm=NOTES&f=%s">%s</a></td>
+<td><a href="%sm=NOTES&f=%s%s">%s</a></td>
 <td>%s</td>%s|}
              (commd conf :> string)
-             (Util.uri_encode fnotes)
+             (Util.uri_encode fnotes) kq
              (fnotes :> string)
              (Util.safe_html fnote_title :> string)
-             (if pgl then
+             (if pgl || n_type = "gallery" then
                 Format.sprintf
                   {|
 <td><a href="%sm=NOTES&f=%s&ref=on"
@@ -327,8 +343,8 @@ let linked_page_rows conf base pg pgl =
            (wizname :> string)
            (Utf8.capitalize_fst (transl conf "base wizard notes")))
 
-let create_gallery_item_idx conf fnotes title (img_idx, img_url, _img_name, desc)
-    =
+let create_gallery_item_idx conf base person fnotes title
+    (img_idx, img_url, _img_name, desc) =
   let max_len = 40 in
   let caption =
     match (title, desc) with
@@ -341,18 +357,21 @@ let create_gallery_item_idx conf fnotes title (img_idx, img_url, _img_name, desc
         else s
   in
   let img_param = Printf.sprintf "&img=%d" img_idx in
+  let kq = person_query_suffix conf base person in
   Printf.sprintf
-    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s%s"><img src="%s" title="%s" alt="%s"><div class="gallery-legend">%s</div></a></div>|}
+    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s%s%s"><img src="%s" title="%s" alt="%s"><div class="gallery-legend">%s</div></a></div>|}
     (commd conf :> string)
-    fnotes img_param img_url fnotes fnotes caption
+    (Util.uri_encode fnotes) kq img_param img_url fnotes fnotes caption
 
-let print_linked_list_gallery conf base ?key pgl =
+let print_linked_list_gallery conf base ?person pgl =
   Output.printf conf "<div class=\"d-flex flex-wrap mt-3\">\n";
   List.iter
     (function
       | Def.NLDB.PgMisc fnotes ->
           let nenv, s = read_notes base fnotes in
-          let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
+          let typ =
+            try norm_type (List.assoc "TYPE" nenv) with Not_found -> ""
+          in
           let restrict_l =
             try List.assoc "RESTRICT" nenv with Not_found -> ""
           in
@@ -361,12 +380,13 @@ let print_linked_list_gallery conf base ?key pgl =
           in
           if
             (restrict_l = [] || not (is_restricted conf base restrict_l))
-            && (typ = "gallery" || typ = "album")
+            && typ = "gallery"
           then
             let title = try List.assoc "TITLE" nenv with Not_found -> "" in
             let items =
-              match key with
-              | Some k -> Notes.json_gallery_items_for_key conf s k
+              match person with
+              | Some p ->
+                  Notes.json_gallery_items_for_key conf s (person_to_key base p)
               | None -> []
             in
             let items =
@@ -378,13 +398,13 @@ let print_linked_list_gallery conf base ?key pgl =
             List.iter
               (fun item ->
                 Output.print_sstring conf
-                  (create_gallery_item_idx conf fnotes title item))
+                  (create_gallery_item_idx conf base person fnotes title item))
               items
       | _ -> ())
     pgl;
   Output.print_sstring conf "</div>\n"
 
-let print_linked_list_standard conf base pgl =
+let print_linked_list_standard conf base ?person pgl =
   let db = notes_links_db conf base false in
   Output.print_sstring conf
     "\n<table class=\"table table-borderless table-striped w-auto mt-3\">";
@@ -406,20 +426,19 @@ let print_linked_list_standard conf base pgl =
               | Some _ -> true
               | None -> false
             in
-            linked_page_rows conf base pg pgl;
+            linked_page_rows conf base ?person pg pgl;
             Output.print_sstring conf "</tr>\n")
       | _ ->
           Output.print_sstring conf "\n<tr>";
-          linked_page_rows conf base pg false;
+          linked_page_rows conf base ?person pg false;
           Output.print_sstring conf "</tr>\n")
     pgl;
   Output.print_sstring conf "</table>"
 
-let print_linked_list conf base ?key pgl =
+let print_linked_list conf base ?person pgl =
   match p_getenv conf.env "type" with
-  | Some "gallery" | Some "album" ->
-      print_linked_list_gallery conf base ?key pgl
-  | _ -> print_linked_list_standard conf base pgl
+  | Some "gallery" -> print_linked_list_gallery conf base ?person pgl
+  | _ -> print_linked_list_standard conf base ?person pgl
 
 (* copied from perso.ml *)
 let simple_person_text conf base p p_auth : Adef.safe_string =
@@ -432,19 +451,14 @@ let simple_person_text conf base p p_auth : Adef.safe_string =
 
 let print_what_links_p conf base p =
   if authorized_age conf base p then (
-    let key =
-      let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-      let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
-      (fn, sn, Driver.get_occ p)
-    in
+    let key = person_to_key base p in
     let db = Driver.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     let pgl = Notes.links_to_ind conf base db key None in
     let title h =
       let lnkd_typ, lnkd_typ_help =
         match p_getenv conf.env "type" with
-        | Some "gallery" | Some "album" ->
-            ("linked albums", "linked albums help")
+        | Some "gallery" -> ("linked galleries", "linked galleries help")
         | _ -> ("linked pages", "linked pages help")
       in
       Format.sprintf {|<span title="%s">%s</span>|}
@@ -463,7 +477,7 @@ let print_what_links_p conf base p =
         Output.print_sstring conf {|</a>|})
     in
     Hutil.header conf title;
-    print_linked_list conf base ~key pgl;
+    print_linked_list conf base ~person:p pgl;
     Hutil.trailer conf)
   else Hutil.incorrect_request conf
 
@@ -503,8 +517,8 @@ let read_notes_from_conf conf base =
 let print_json conf base =
   let nenv, s = read_notes_from_conf conf base in
   let s =
-    match List.assoc "TYPE" nenv with
-    | "album" | "gallery" -> Notes.safe_gallery conf base s
+    match norm_type (List.assoc "TYPE" nenv) with
+    | "gallery" -> Notes.safe_gallery conf base s
     | (exception Not_found) | _ -> s
   in
   Output.print_sstring conf s
@@ -524,9 +538,8 @@ let print conf base =
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
   else
-    match List.assoc "TYPE" nenv with
-    | "album" | "gallery" ->
-        Templ.output_simple conf Templ.Env.empty "notes_gallery"
+    match norm_type (List.assoc "TYPE" nenv) with
+    | "gallery" -> Templ.output_simple conf Templ.Env.empty "notes_gallery"
     | (exception Not_found) | _ -> (
         let title = try List.assoc "TITLE" nenv with Not_found -> "" in
         let title = Util.safe_html title in
@@ -560,8 +573,8 @@ let print_mod conf base =
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
   else
-    match List.assoc "TYPE" nenv with
-    | ("gallery" | "album") when p_getenv conf.env "raw" = None ->
+    match norm_type (List.assoc "TYPE" nenv) with
+    | "gallery" when p_getenv conf.env "raw" = None ->
         Templ.output_simple conf Templ.Env.empty "notes_upd_gallery"
     | (exception Not_found) | _ ->
         let title _ =

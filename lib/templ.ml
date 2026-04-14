@@ -1392,6 +1392,26 @@ and print_simple_variable conf = function
       let query_time = Unix.gettimeofday () -. conf.query_start in
       Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
         !GWPARAM.errors_other !GWPARAM.set_vars
+  | "src_albums_list" -> (
+      let dir = !GWPARAM.albums_d conf.bname in
+      let collect entry acc =
+        match entry with
+        | Filesystem.Dir path ->
+            let name = Filename.basename path in
+            if name <> "" && name.[0] <> '.' then name :: acc else acc
+        | Filesystem.File _ | Filesystem.Exn _ -> acc
+      in
+      try
+        Filesystem.walk_folder collect dir []
+        |> List.sort String.compare
+        |> List.iter (fun f ->
+            Output.printf conf "<option>%s\n" (Util.escape_html f :> string))
+      with
+      | Sys_error msg ->
+          Log.warn (fun k -> k "src_albums_list: %s (%s)" msg dir)
+      | Unix.Unix_error (err, _, _) ->
+          Log.warn (fun k ->
+              k "src_albums_list: %s (%s)" (Unix.error_message err) dir))
   | "src_images_list" -> (
       let dir = !GWPARAM.images_d conf.bname in
       try

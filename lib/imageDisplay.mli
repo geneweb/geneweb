@@ -27,3 +27,17 @@ val print_placeholder_gendered_portrait :
   config -> Geneweb_db.Driver.person -> int -> unit
 (** prints html `<img>` tag of the default gendered portrait with square size
     [size] *)
+
+val print_folder_images_json : config -> string option -> unit
+(** [print_folder_images_json conf folder] sends a JSON array of image paths
+    found in [albums_d/folder], as `albums/folder/file.jpg`… Only regular files
+    whose extension is in [Image.ext_list_1] are included, sorted
+    alphabetically. If [folder] is [None] or contains unsafe path components, an
+    empty array is returned. Response [Content-type: application/json]. *)
+
+val print_album_image : config -> unit
+(** [print_album_image conf] serves the album image whose path is given by
+    the [s] environment parameter, resolved under [!GWPARAM.albums_d]. The
+    path may include subdirectories (e.g. `vacances/foo.jpg`). Paths
+    containing [..] or [\\] components are rejected. Access is granted to
+    wizards, friends, or for non-private images. *)

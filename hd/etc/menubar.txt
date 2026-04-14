@@ -513,12 +513,11 @@
             %if;(nb_linked_pages_type.gallery>0)
               <li class="nav-item">
                 <a class="nav-link text-secondary" href="%url_set.m_type.LINKED_gallery"
-                  title="[*linked albums help]">%nn;
-                  <i class="fa fa-images fa-fw me-1" aria-hidden="true"></i>%nn;
-                  %let;nbalb;%nb_linked_pages_type.album;%in;
-                  <sup class="small">%nb_linked_pages_type.gallery;
-                  %if;(nbalb!=0)+%nbalb;%end;</sup>
-                  <span class="visually-hidden">images icon</span></a>
+                   title="[*linked galleries help]">
+                  <i class="fa fa-images fa-fw me-1" aria-hidden="true"></i>
+                  <sup class="small">%nb_linked_pages_type.gallery;</sup>
+                  <span class="visually-hidden">images icon</span>
+                </a>
               </li>
             %end;
           %end;

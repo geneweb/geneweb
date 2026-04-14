@@ -1138,6 +1138,10 @@ div.anchor_upd {
   min-height: 12rem;
 }
 
+#fname + .ts-wrapper .ts-dropdown-content {
+  max-height: 20rem;
+}
+
 .ts-wrapper.single:not(.has-items) .ts-control::before {
   content: var(--ts-placeholder, '');
   color: var(--bs-secondary-color);

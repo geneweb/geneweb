@@ -88,6 +88,56 @@ let print_image_file conf fname =
             k "Error printing image file content for %s : %s" fname e);
         Error e)
 
+let safe_folder f =
+  f <> ""
+  && (not (Mutil.contains f ".."))
+  && (not (String.contains f '/'))
+  && not (String.contains f '\\')
+
+let print_folder_images_json conf folder =
+  let files =
+    match folder with
+    | Some f when safe_folder f -> (
+        let dir = Filename.concat (!GWPARAM.albums_d conf.bname) f in
+        let collect entry acc =
+          match entry with
+          | Filesystem.File path ->
+              let ext = String.lowercase_ascii (Filename.extension path) in
+              if Array.mem ext Image.ext_list_1 then
+                String.concat "/" [ "albums"; f; Filename.basename path ] :: acc
+              else acc
+          | Filesystem.Dir _ | Filesystem.Exn _ -> acc
+        in
+        try Filesystem.walk_folder collect dir [] |> List.sort String.compare
+        with _ -> [])
+    | _ -> []
+  in
+  let json =
+    Yojson.Basic.to_string (`List (List.map (fun s -> `String s) files))
+  in
+  Output.status conf Code.OK;
+  Output.header conf "Content-type: application/json; charset=utf-8";
+  Output.print_sstring conf json;
+  Output.flush conf
+
+let print_album_image conf =
+  match Util.p_getenv conf.env "s" with
+  | Some f when f <> "" ->
+      let fname =
+        if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
+      in
+      if Mutil.contains fname ".." || String.contains fname '\\' then
+        Hutil.incorrect_request conf
+      else
+        let fname = Filename.concat (!GWPARAM.albums_d conf.bname) fname in
+        if conf.wizard || conf.friend || Image.is_not_private_img conf fname
+        then
+          Result.fold ~ok:ignore
+            ~error:(fun _ -> Hutil.incorrect_request conf)
+            (print_image_file conf fname)
+        else Hutil.incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
+
 (* ************************************************************************** *)
 (*  [Fonc] print_portrait : Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit *)
 (* ************************************************************************** *)

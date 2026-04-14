@@ -24,7 +24,7 @@
                    sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a
                    sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer">
-    %if;(e.m="A" and e.t="")
+    %if;((e.m="A" and e.t="") or e.m="MOD_NOTES")
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.6.0/dist/css/tom-select.bootstrap5.min.css"
             integrity="sha256-Re4GjTaUjj1cCjvRlSe/GXl4eWsdaw9i6rGP3dZAz0U=
                        sha384-z6AZlnJhO1v0Hf2T9heqc6XR1Ne5ueqeib8tGuOoYszbRbFERt/8vJ7lhGepc6Dq
@@ -34,7 +34,7 @@
   %else;
     <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.8">
     <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
-    %if;(e.m="A" and e.t="")
+    %if;((e.m="A" and e.t="") or e.m="MOD_NOTES")
       <link rel="stylesheet" href="%etc_prefix;css/tom-select.bootstrap5.min.css?version=2.6.0">
     %end;
   %end;

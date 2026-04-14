@@ -3,6 +3,7 @@ var groupTable;
 var currentAreaCount = 0;
 var albumCurrent = 0;
 var albumImages = [];
+let fnameTS = null;
 
 // Maphilight configuration for genealogical photos
 const MAPHILIGHT_CONFIG = {
@@ -258,24 +259,25 @@ function updateGroupsLegend() {
     if (!groupsLegend) return;
 
     groupsLegend.innerHTML = '';
-
     const labeledGroups = groups.filter(g => g.label);
-    if (labeledGroups.length > 0) {
-        const header = (labeledGroups.length === 1)
-            ? GW.i18n.group0 + GW.i18n.colon + ' '
-            : GW.i18n.group1 + GW.i18n.colon + ' ';
-        groupsLegend.insertAdjacentText('beforeend', header);
-
-        groups.forEach(group => {
-            if (group.label) {
-                groupsLegend.insertAdjacentHTML('beforeend', `
-                    <li class="group-legend" data-group="${group.name}">
-                        <span class="legend-number">${group.name}.</span> ${group.label}
-                    </li>
-                `);
-            }
-        });
+    if (labeledGroups.length === 0) {
+        groupsLegend.classList.add('d-none');
+        return;
     }
+    groupsLegend.classList.remove('d-none');
+    const header = (labeledGroups.length === 1)
+        ? GW.i18n.group0 + GW.i18n.colon + ' '
+        : GW.i18n.group1 + GW.i18n.colon + ' ';
+    groupsLegend.insertAdjacentText('beforeend', header);
+    groups.forEach(group => {
+        if (group.label) {
+            groupsLegend.insertAdjacentHTML('beforeend', `
+                <li class="group-legend" data-group="${group.name}">
+                    <span class="legend-number">${group.name}.</span> ${group.label}
+                </li>
+            `);
+        }
+    });
 }
 
 // Handles all row movement operations in the data table
@@ -664,8 +666,16 @@ function handleGroupHover(action, groupNum) {
     if (!groupNum) return;
 
     if (action === 'enter') {
-        document.querySelectorAll(`input[value="${groupNum}"]`).forEach(inp => {
-            inp.closest('tr')?.classList.add('group-highlight');
+        table.rows().every(function() {
+            if (this.data().group == groupNum) {
+                const node = this.node();
+                node?.classList.add('group-highlight');
+                const id = node?.id?.replace('row', '');
+                if (id) {
+                    document.getElementById(`a${id}`)
+                        ?.classList.add('group-highlight');
+                }
+            }
         });
         document.getElementById(`g_row${groupNum}`)?.classList.add('group-highlight');
         document.querySelectorAll(`.group-legend[data-group="${groupNum}"]`)
@@ -897,13 +907,13 @@ function initializeHandlers() {
             row.data(currentData).draw(false);
             updateGroupsLegend();
         })
-        .on('mouseenter', 'tr', function() {
+        .on('mouseover', 'tr', function() {
             if (this.id && this.id.startsWith('g_row')) {
                 const groupNum = this.id.replace('g_row', '');
                 if (groupNum) handleGroupHover('enter', groupNum);
             }
         })
-        .on('mouseleave', 'tr', function() {
+        .on('mouseout', 'tr', function() {
             if (this.id?.startsWith('g_row')) handleGroupHover('leave');
         });
 
@@ -1039,10 +1049,12 @@ function initializeHandlers() {
     // -------------------------------------------------------------------------
     const ulGroups = document.getElementById('ul_groups_legend');
     if (ulGroups) {
-        delegate(ulGroups, 'mouseenter', '.group-legend', function() {
+        delegate(ulGroups, 'mouseover', '.group-legend', function(e) {
+            if (this.contains(e.relatedTarget)) return;
             handleGroupHover('enter', this.dataset.group);
         });
-        delegate(ulGroups, 'mouseleave', '.group-legend', function() {
+        delegate(ulGroups, 'mouseout', '.group-legend', function(e) {
+            if (this.contains(e.relatedTarget)) return;
             handleGroupHover('leave');
         });
         delegate(ulGroups, 'click', '.legend-number', function(e) {
@@ -1155,15 +1167,18 @@ function initializePageContent(data, tableApi) {
 
     // Initialize image if present
     const imgFile = albumImages[albumCurrent]?.img;
-    if (imgFile) {
-        const img = document.getElementById('image');
-        img.src = GW.prefix + 'm=DOC&s=' + imgFile;
-        setVal('fname', imgFile);
+    const img = document.getElementById('image');
+    if (imgFile && img) {
+        fnameSet(imgFile);
+        img.src = '';           // clear previous image immediately
+        img.hidden = false;
+        // Attach listener BEFORE setting src to catch cached-image synchronous load
         img.addEventListener('load', function onLoad() {
             const width = img.width, height = img.height;
             requestAnimationFrame(() => {
                 const frame = document.getElementById('frame');
                 if (frame) {
+                    frame.style.display = '';
                     frame.style.width = width + 'px';
                     frame.style.height = height + 'px';
                     const legendContainer = frame.closest('#div_img_legend');
@@ -1172,6 +1187,18 @@ function initializePageContent(data, tableApi) {
                 maphilight(img, MAPHILIGHT_CONFIG);
             });
         }, { once: true });
+        img.onerror = () => {
+            img.src = '';
+            img.hidden = true;
+            const frame = document.getElementById('frame');
+            if (frame) frame.style.display = 'none';
+            toggleTables(false);
+            img.onerror = null;
+        };
+        // Correct IMA/DOC routing, set LAST
+        img.src = imgFile.startsWith('albums/')
+            ? GW.prefix + 'm=IMA&s=' + encodeURI(imgFile.substring(7))
+            : GW.prefix + 'm=DOC&s=' + encodeURI(imgFile);
     }
     updateAlbumNav();
 
@@ -1230,7 +1257,7 @@ function initTables() {
             // -----------------------------------------------------------------
             table = new DataTable('#map_table', {
                 data: albumImages[albumCurrent]?.map || [],
-                dom: 'rt',
+                layout: { topStart: null, topEnd: null, bottomStart: null, bottomEnd: null },
                 deferRender: false,
                 paging: false,
                 ordering: true,
@@ -1399,6 +1426,7 @@ function initTables() {
             // -----------------------------------------------------------------
             groupTable = new DataTable('#grp_table', {
                 data: albumImages[albumCurrent]?.groups || [],
+                layout: { topStart: null, topEnd: null, bottomStart: null, bottomEnd: null },
                 deferRender: false, paging: false, ordering: true,
                 searching: false, info: false,
                 language: { emptyTable: GW.i18n.emptyTable + '<br>' + GW.i18n.addGroup },
@@ -1500,6 +1528,19 @@ function saveAlbumCurrent() {
     };
 }
 
+function fnameSet(value) {
+    if (!fnameTS) {
+        const el = document.getElementById('fname');
+        if (el) el.value = value || '';
+        return;
+    }
+    if (!value) { fnameTS.clear(true); return; }
+    if (!fnameTS.options[value]) {
+        fnameTS.addOption({ value: value, text: value });
+    }
+    fnameTS.setValue(value, true);
+}
+
 function loadAlbumImage(index) {
     albumCurrent = index;
     const imgData = albumImages[index] || { img: '', map: [], groups: [] };
@@ -1520,8 +1561,7 @@ function loadAlbumImage(index) {
     updateGroupsLegend();
 
     // Update filename and load image
-    const fnameEl = document.getElementById('fname');
-    if (fnameEl) fnameEl.value = imgData.img || '';
+    fnameSet(imgData.img);
     const descEl = document.getElementById('page_desc');
     if (descEl) descEl.value = imgData.desc || '';
 
@@ -1529,13 +1569,18 @@ function loadAlbumImage(index) {
     const frameEl = document.getElementById('frame');
 
     if (imgData.img) {
-        if (frameEl) frameEl.style.display = '';
-        imgEl.src = GW.prefix + 'm=DOC&s=' + imgData.img;
-        toggleTables(true);
+        const src = imgData.img.startsWith('albums/')
+            ? GW.prefix + 'm=IMA&s=' + encodeURI(imgData.img.substring(7))
+            : GW.prefix + 'm=DOC&s=' + encodeURI(imgData.img);
+        // Clear previous image immediately to prevent bleed-through on 404
+        imgEl.src = '';
+        imgEl.hidden = false;
+        // Attach listener BEFORE setting src to catch cached-image synchronous load
         imgEl.addEventListener('load', function onLoad() {
             const w = imgEl.width, h = imgEl.height;
             requestAnimationFrame(() => {
                 if (frameEl) {
+                    frameEl.style.display = '';
                     frameEl.style.width = w + 'px';
                     frameEl.style.height = h + 'px';
                     const legendContainer = frameEl.closest('#div_img_legend');
@@ -1544,75 +1589,185 @@ function loadAlbumImage(index) {
                 maphilight(imgEl, MAPHILIGHT_CONFIG);
             });
         }, { once: true });
+        imgEl.onerror = () => {
+            imgEl.src = '';
+            imgEl.hidden = true;
+            if (frameEl) frameEl.style.display = 'none';
+            toggleTables(false);
+            imgEl.onerror = null;
+        };
+        imgEl.src = src;   // set LAST
+        toggleTables(true);
     } else {
-        imgEl.removeAttribute('src');
+        imgEl.onerror = null;
+        imgEl.src = '';
+        imgEl.hidden = true;
         if (frameEl) frameEl.style.display = 'none';
         toggleTables(false);
     }
     updateAlbumNav();
+    const u = new URL(window.location);
+    u.searchParams.set('img', index + 1);
+    history.replaceState(null, '', u);
 }
 
 function updateAlbumNav() {
     const n = albumImages.length;
     const cur = document.getElementById('album-current');
-    const cnt = document.getElementById('album-count');
     if (cur) cur.textContent = albumCurrent + 1;
+    const cnt = document.getElementById('album-count');
     if (cnt) cnt.textContent = n;
 
+    const multi = n > 1;
     const nav = document.getElementById('album-nav');
-    const addSolo = document.getElementById('album-add-solo');
-    if (n > 1) {
-        nav?.classList.remove('d-none');
-        nav?.classList.add('d-flex');
-        addSolo?.classList.remove('d-inline');
-        addSolo?.classList.add('d-none');
-    } else {
-        nav?.classList.remove('d-flex');
-        nav?.classList.add('d-none');
-        const hasFname = document.getElementById('fname')?.value;
-        if (hasFname) {
-            addSolo?.classList.remove('d-none');
-            addSolo?.classList.add('d-inline');
-        } else {
-            addSolo?.classList.remove('d-inline');
-            addSolo?.classList.add('d-none');
-        }
+    if (nav) {
+        nav.classList.toggle('d-none', !multi);
+        nav.classList.toggle('d-flex', multi);
     }
+    const actions = document.getElementById('album-actions');
+    const target = document.getElementById(
+        multi ? 'album-actions-mount-nav' : 'album-actions-mount-solo');
+    if (actions && target && actions.parentElement !== target) {
+        target.appendChild(actions);
+    }
+    const removeBtn = document.getElementById('album-remove');
+    if (removeBtn) removeBtn.classList.toggle('d-none', !multi);
+    const atStart = albumCurrent <= 0;
+    const atEnd = albumCurrent >= n - 1;
+    ['album-first', 'album-prev'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.toggle('disabled', atStart);
+            el.classList.toggle('text-body-secondary', atStart);
+        }
+    });
+    ['album-next', 'album-last'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.toggle('disabled', atEnd);
+            el.classList.toggle('text-body-secondary', atEnd);
+        }
+    });
+
 }
 
 function initAlbumHandlers() {
-    const bind = (id, fn) => {
-        document.getElementById(id)?.addEventListener('click', (e) => {
+    const bind = (id, handler) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', (e) => {
             e.preventDefault();
-            fn();
+            handler(e);
         });
     };
-    bind('album-first', () => { saveAlbumCurrent(); loadAlbumImage(0); });
-    bind('album-prev',  () => {
-        if (albumCurrent > 0) { saveAlbumCurrent(); loadAlbumImage(albumCurrent - 1); }
-    });
-    bind('album-next',  () => {
-        if (albumCurrent < albumImages.length - 1) { saveAlbumCurrent(); loadAlbumImage(albumCurrent + 1); }
-    });
-    bind('album-last',  () => { saveAlbumCurrent(); loadAlbumImage(albumImages.length - 1); });
 
     const addFn = () => {
         saveAlbumCurrent();
-        albumImages.push({ img: '', map: [], groups: [] });
-        const fnameEl = document.getElementById('fname');
-        if (fnameEl) fnameEl.value = '';
-        loadAlbumImage(albumImages.length - 1);
+        const insertAt = albumCurrent + 1;
+        albumImages.splice(insertAt, 0,
+            { img: '', desc: '', map: [], groups: [] });
+        loadAlbumImage(insertAt);
     };
     bind('album-add', addFn);
-    bind('album-add-solo', addFn);
 
     bind('album-remove', () => {
         if (albumImages.length > 1) {
             albumImages.splice(albumCurrent, 1);
-            if (albumCurrent >= albumImages.length) albumCurrent = albumImages.length - 1;
+            if (albumCurrent >= albumImages.length) {
+                albumCurrent = albumImages.length - 1;
+            }
             loadAlbumImage(albumCurrent);
         }
     });
+
+    bind('album-first', () => { saveAlbumCurrent(); loadAlbumImage(0); });
+    bind('album-prev', () => {
+        if (albumCurrent > 0) {
+            saveAlbumCurrent();
+            loadAlbumImage(albumCurrent - 1);
+        }
+    });
+    bind('album-next', () => {
+        if (albumCurrent < albumImages.length - 1) {
+            saveAlbumCurrent();
+            loadAlbumImage(albumCurrent + 1);
+        }
+    });
+    bind('album-last', () => {
+        saveAlbumCurrent();
+        loadAlbumImage(albumImages.length - 1);
+    });
+}
+
+function initFnameSelect() {
+    const fnameEl = document.getElementById('fname');
+    if (!fnameEl || typeof TomSelect === 'undefined') return;
+
+    const buildOpts = (listId, optgroup) =>
+        [...document.querySelectorAll('#' + listId + ' option')]
+            .map(o => ({ value: o.value, text: o.value, optgroup }));
+
+    const folderOpts = buildOpts('src_albums', 'folders');
+    const imageOpts = buildOpts('src_images', 'images');
+
+    fnameTS = new TomSelect(fnameEl, {
+        options: [...folderOpts, ...imageOpts],
+        optgroups: [
+            { value: 'folders', label: GW.i18n?.folders || 'folders' },
+            { value: 'images', label: GW.i18n?.images || 'images' }
+        ],
+        optgroupField: 'optgroup',
+        labelField: 'text',
+        valueField: 'value',
+        searchField: ['text'],
+        create: true,
+        maxItems: 1,
+        hideSelected: true,
+        placeholder: fnameEl.placeholder,
+        render: {
+            option: (data, escape) => {
+                const icon = data.optgroup === 'folders'
+                    ? '<i class="fa-solid fa-folder text-body-secondary me-1"></i>'
+                    : '<i class="fa-regular fa-image text-body-secondary me-1"></i>';
+                return '<div>' + icon + escape(data.text) + '</div>';
+            }
+        },
+        onItemAdd: (value) => {
+            const opt = fnameTS.options[value];
+            if (opt?.optgroup === 'folders') importFolder(value);
+        }
+    });
+}
+
+function importFolder(folder) {
+    fetch(GW.prefix + 'm=FOLDER_IMAGES&folder='
+        + encodeURIComponent(folder))
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(files => {
+            if (!Array.isArray(files) || !files.length) {
+                updateStatus('No images found in folder: ' + folder);
+                fnameTS?.clear(true);
+                return;
+            }
+            fnameTS?.clear(true);
+            const newEntries = files.map(f =>
+                ({ img: f, desc: '', map: [], groups: [] }));
+            if (!albumImages[albumCurrent].img) {
+                albumImages.splice(albumCurrent, 1, ...newEntries);
+                loadAlbumImage(albumCurrent);
+            } else {
+                saveAlbumCurrent();
+                const insertAt = albumCurrent + 1;
+                albumImages.splice(insertAt, 0, ...newEntries);
+                loadAlbumImage(insertAt);
+            }
+            updateStatus('Added ' + files.length +
+                ' image(s) from "' + folder + '"');
+        })
+        .catch(err => updateStatus(
+            'Error loading folder: ' + folder + ' -- ' + err.message));
 }
 
 function cleanMapEntries() {
@@ -1676,30 +1831,6 @@ function setupFormHandler() {
     };
 
     form.addEventListener('submit', onSubmit);
-}
-
-// Global image load handler: re-size frame and re-init maphilight on any src change.
-// Runs on DOMContentLoaded to ensure #image exists.
-function setupGlobalImageLoadHandler() {
-    const img = document.getElementById('image');
-    if (!img) return;
-
-    img.addEventListener('load', function() {
-        const frame = document.getElementById('frame');
-        requestAnimationFrame(() => {
-            const width  = img.width;
-            const height = img.height;
-            requestAnimationFrame(() => {
-                if (frame) {
-                    frame.style.width  = width  + 'px';
-                    frame.style.height = height + 'px';
-                    const legendContainer = frame.closest('#div_img_legend');
-                    if (legendContainer) legendContainer.style.width = width + 'px';
-                }
-                maphilight(img, MAPHILIGHT_CONFIG);
-            });
-        });
-    });
 }
 
 const HandlerManager = {
@@ -1793,7 +1924,7 @@ document.addEventListener('DOMContentLoaded', () => {
     UIManager.init();
     setupFormHandler();
     resetButtonHandler();
-    setupGlobalImageLoadHandler();
+    initFnameSelect();
 
     if (typeof addClearButtonToInputs === 'function') addClearButtonToInputs();
     if (typeof inputToBook !== 'undefined' && inputToBook.addNavigation) {

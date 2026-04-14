@@ -1663,8 +1663,9 @@ let conf_and_connection =
     let m = Util.p_getenv env "m" in
     let is_binary =
       match m with
-      | Some ("IM" | "IM_C" | "IM_C_S" | "IMH" | "FIM" | "SRC" | "DOC" | "DOCH")
-        ->
+      | Some
+          ( "IM" | "IM_C" | "IM_C_S" | "IMH" | "FIM" | "SRC" | "DOC" | "DOCH"
+          | "IMA" ) ->
           true
       | _ -> false
     in

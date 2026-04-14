@@ -586,6 +586,7 @@ let treat_request =
             ((if
                 List.assoc_opt "counter" conf.base_env <> Some "no"
                 && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
+                && m <> "IMA"
               then
                 match
                   if only_special_env conf.env then
@@ -698,6 +699,12 @@ let treat_request =
                      ImageDisplay.print_html conf)
              | "F" -> w_base @@ w_person @@ Perso.interp_templ "family"
              | "FIM" -> w_base @@ ImageDisplay.print_blason
+             | "FOLDER_IMAGES" ->
+                 w_base @@ fun conf _base ->
+                 if conf.wizard then
+                   ImageDisplay.print_folder_images_json conf
+                     (Util.p_getenv conf.env "folder")
+                 else Hutil.incorrect_request conf
              | "H" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
@@ -712,6 +719,8 @@ let treat_request =
                  @@ fun conf _ -> HistoryDiffDisplay.print_clean_ok conf
              | "HIST_DIFF" -> w_base @@ HistoryDiffDisplay.print
              | "HIST_SEARCH" -> w_base @@ History.print_search
+             | "IMA" ->
+                 w_base @@ fun conf _base -> ImageDisplay.print_album_image conf
              | "IM_C" -> w_base @@ ImageCarrousel.print_c ~saved:false
              | "IM_C_S" -> w_base @@ ImageCarrousel.print_c ~saved:true
              | "IM" -> w_base @@ ImageDisplay.print
