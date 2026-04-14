@@ -1,4 +1,4 @@
-<!-- $Id: notes_gallery.txt v8.0 12/04/2026 - vanilla JS, maphilight v2 API $ -->
+<!-- $Id: notes_gallery.txt v8.0 22/04/2026 - vanilla JS, maphilight v2 API $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
@@ -14,9 +14,14 @@
 <body%body_prop;>
 <div class="container-fluid">
   %include;home
-  <div class="small float-end me-2 mt-2">
-    (<a href="%url;&ref=on" title="[*gallery backlinks]">&lt;-</a>)
-    %if;wizard;(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)%end;
+  <div class="d-flex small float-end me-2 mt-2 gap-2">
+    %if;((e.p!="" and e.n!="") or e.i!="")
+      %let;acc;%if;(b.access_by_key="yes")p=%e.p;&n=%e.n;%if;(e.oc!="" or e.oc!=0)&oc=%e.oc;%end;%else;i=%e.i;%end;%in;
+      <div>(<a href="%prefix;m=LINKED&type=gallery&%acc;"
+        title="[*linked galleries help]"><i class="fa-solid fa-images"></i></a>)</div>
+    %end;
+    <div>(<a href="%url;&ref=on" title="[*linked galleries help]">&lt;-</a>)</div>
+    %if;wizard;<div>(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)</div>%end;
   </div>
   <h1 id="h1" class="ms-3 mb-0">[*loading/error]0</h1>
   <p id="chronicle" class="ms-3 mb-0 text-body-secondary d-none"></p>
@@ -135,7 +140,9 @@ function displayImage(img) {
   $$('#h1').innerHTML = json.title;
   $$('#description').innerHTML = img.desc || json.desc || '';
   const imageEl = $$('#image');
-  imageEl.src = '%prefix;m=DOC&s=' + img.img;
+  imageEl.src = img.img.startsWith('albums/')
+    ? '%prefix;m=IMA&s=' + img.img.substring(7)
+    : '%prefix;m=DOC&s=' + img.img;
   imageEl.hidden = false;
 
   let cnt = 1, cnt_rlm = 1;
@@ -398,14 +405,16 @@ function loadIndex() {
 
   images_l.forEach((img, i) => {
     const desc = img.desc || '';
-    const label = desc ? (i + 1) + '. ' + desc : '. ' + (i + 1);
-    const url = '%prefix;m=DOC&s=' + img.img;
+    const label = desc ? (i + 1) + '. ' + desc : String(i + 1);
+    const tooltip = desc
+      ? ` data-bs-toggle="tooltip" data-bs-html="true" title="${desc.replace(/"/g, '&quot;')}"`
+      : '';
+    const url = img.img.startsWith('albums/')
+      ? '%prefix;m=IMA&s=' + img.img.substring(7)
+      : '%prefix;m=DOC&s=' + img.img;
     const html =
-      `<div class="imap-gallery" data-img="${i + 1}"` +
-      ` data-bs-toggle="tooltip" data-bs-html="true"` +
-      ` title="${label.replace(/"/g, '&quot;')}"` +
-      ` style="cursor:pointer">` +
-      `<img src="${url}" alt="">` +
+      `<div class="imap-gallery" data-img="${i + 1}"${tooltip}` +
+      ` style="cursor:pointer">` + `<img src="${url}" alt="">` +
       `<div class="gallery-legend">${label}</div></div>`;
     wall.insertAdjacentHTML('beforeend', html);
   });

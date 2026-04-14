@@ -22,7 +22,10 @@ function addClearButtonToInputs() {
     function initializeInput(element) {
         if (element.type === 'hidden' || 
             element.style.display === 'none' ||
-            getComputedStyle(element).display === 'none') {
+            getComputedStyle(element).display === 'none' ||
+            element.classList.contains('no-clear-button') ||
+            element.closest('.ts-wrapper') ||
+            element.tabIndex === -1) {
             return;
         }
         if (element.dataset.clearInitialized) {

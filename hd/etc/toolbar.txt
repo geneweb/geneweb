@@ -232,45 +232,46 @@ body {
       </div>
       <div class="modal-body">
         <div class="mb-3 row">
-          <label for="page_title" class="col-sm-2 col-form-label">[*title/titles]0</label>
+          <label for="ig_page_title" class="col-sm-2 col-form-label">[*title/titles]0</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="page_title" name="page_title">
-            <div class="invalid-feedback">
-              [*title/titles]0 [*is required]
-            </div>
+            <input type="text" class="form-control" id="ig_page_title" name="ig_page_title">
           </div>
         </div>
-        <div class="mb-3 row">
-          <label for="fname" class="col-sm-2 col-form-label">[*file]</label>
+        <div class="mb-2 row">
+          <label for="ig_fname" class="col-sm-2 col-form-label">[*file]</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="fname" name="fname" list="src_images">
-            <div class="invalid-feedback">
-              [*file] [*is required]
-            </div>
-            <datalist id="src_images">
+            <input type="text" class="form-control" id="ig_fname" name="ig_fname"
+                   list="ig_src_images" placeholder="[*choose an image]">
+            <datalist id="ig_src_images">
               %src_images_list;
+            </datalist>
+          </div>
+        </div>
+        <div class="mb-2 row">
+          <div class="col-sm-2 text-center">
+            <span class="text-body-secondary small">[or]</span>
+          </div>
+          <div class="col-sm-10"></div>
+        </div>
+        <div class="mb-3 row">
+          <label for="ig_folder" class="col-sm-2 col-form-label">[*folder/folders]0</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="ig_folder" name="ig_folder"
+                   list="ig_src_folders" placeholder="[*choose a folder]">
+            <datalist id="ig_src_folders">
+              %src_albums_list;
             </datalist>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="init_gallery();">OK</button>
+        <button type="button" class="btn btn-primary" id="ig_ok_btn">OK</button>
       </div>
     </div>
   </div>
 </div>
 <script>
-function init_gallery() {
-  var title = document.getElementById('page_title').value;
-  var fname = document.getElementById('fname').value;
-  var data = {
-    title: title,
-    images: [{ img: fname, map: [], groups: [] }]
-  };
-  var json = JSON.stringify(data, null, 2);
-  document.getElementById('notes_comments').value =
-    'TITLE=' + title + '\nTYPE=gallery\n' + json;
-  bootstrap.Modal.getInstance(document.getElementById('init_gallery')).hide();
-}
+const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
 </script>
+<script src="%etc_prefix;js/init_gallery.min.js?hash=%apply;hash%with;%etc_prefix;js/init_gallery.min.js%end;"></script>
 %end;

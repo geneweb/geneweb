@@ -1954,6 +1954,18 @@ sl: dodaj %tv podatke/počisti podatke/pokaži graf/uredi podatke
 sv: lägg till %tpå datan/rensa datan/visa grafen/redigera datan
 tr: veriye %tekle/veriyi temizle/grafiği göster/veriyi düzenle
 
+    choose a folder
+en: choose a folder
+fr: choisir un dossier
+
+    choose a file or a folder
+en: choose a file or a folder
+fr: choisir un fichier ou un dossier
+
+    folder/folders
+en: folder/folders
+fr: dossier/dossiers
+
     adhesion
 co: adesione
 de: Beitritt
@@ -11902,17 +11914,17 @@ sv: länkade bilder
 tr: bağlantılı resimler
 zh: 关联图像
 
-    linked albums help
-co: immagini di gallerie induve a persona appare
-de: Galeriebilder, auf denen die Person erscheint
-en: gallery images where the person appears
-fr: images de galeries où la personne apparaît
+    linked galleries
+co: gallerie ligate
+de: verknüpfte Galerien
+en: linked galleries
+fr: galeries liées
 
-    linked albums
-co: immagini di gallerie ligate
-de: verknüpfte Galeriebilder
-en: linked gallery images
-fr: images de galeries liées
+    linked galleries help
+co: gallerie induve a persona appare
+de: Galerien, in denen die Person erscheint
+en: galleries where the person appears
+fr: galeries où la personne apparaît
 
     gallery
 en: images gallery
@@ -13365,10 +13377,10 @@ en: modify the section %d
 fr: modifier la section %d
 
     modify gallery
-co: mudificà a fiura (galleria)
-de: das Bild ändern (die Gallerie)
-en: modify the image (the gallery)
-fr: modifier l’image (la gallerie)
+co: mudificà a fiura&#047;galleria
+de: das Bild ändern&#047;die Gallerie
+en: modify the image&#047;the gallery
+fr: modifier l’image&#047;la gallerie
 
     modify person event order
 co: intervertisce l’evenimenti individuali

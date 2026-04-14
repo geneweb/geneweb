@@ -29,6 +29,7 @@ val lang_d : my_fun_3 ref
 val bpath : my_fun_2 ref
 val portraits_d : my_fun_2 ref
 val images_d : my_fun_2 ref
+val albums_d : my_fun_2 ref
 
 (* S: Move it to gwd_lib?  *)
 
@@ -57,6 +58,7 @@ module Default : sig
   val config_d : string -> string
   val lang_d : string -> string -> string
   val images_d : string -> string
+  val albums_d : string -> string
 
   val bpath : string -> string
   (** [Filename.concat (Secure.base_dir ())] *)
@@ -72,6 +74,7 @@ module Legacy : sig
   val config_d : string -> string
   val lang_d : string -> string -> string
   val images_d : string -> string
+  val albums_d : string -> string
 
   val bpath : string -> string
   (** [Filename.concat (Secure.base_dir ()) (string ^ ".gwb") ] *)

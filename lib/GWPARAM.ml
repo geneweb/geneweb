@@ -39,6 +39,7 @@ let lang_d = ref (fun _ _ -> "")
 let bpath = ref (fun _ -> "")
 let portraits_d = ref (fun _ -> "")
 let images_d = ref (fun _ -> "")
+let albums_d = ref (fun _ -> "")
 let clean_bname bname = Filename.remove_extension bname
 let path_concat parts = String.concat Filename.dir_sep parts
 let base_dir () = Secure.base_dir ()
@@ -83,6 +84,10 @@ module Default = struct
     let bname = clean_bname bname in
     path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "images" ]
 
+  let albums_d bname =
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "albums" ]
+
   let bpath bname =
     let bname = clean_bname bname in
     Filename.concat (base_dir ()) (bname ^ ".gwb")
@@ -124,6 +129,10 @@ module Legacy = struct
     let bname = clean_bname bname in
     path_concat [ base_dir (); "src"; bname; "images" ]
 
+  let albums_d bname =
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); "src"; bname; "albums" ]
+
   let bpath bname =
     let bname = clean_bname bname in
     Filename.concat (base_dir ()) (bname ^ ".gwb")
@@ -147,7 +156,8 @@ let init () =
     lang_d := Default.lang_d;
     bpath := Default.bpath;
     portraits_d := Default.portraits_d;
-    images_d := Default.images_d)
+    images_d := Default.images_d;
+    albums_d := Default.albums_d)
   else (
     config := Legacy.config;
     cnt_d := Legacy.cnt_d;
@@ -158,7 +168,8 @@ let init () =
     lang_d := Legacy.lang_d;
     bpath := Legacy.bpath;
     portraits_d := Legacy.portraits_d;
-    images_d := Legacy.images_d)
+    images_d := Legacy.images_d;
+    albums_d := Legacy.albums_d)
 
 let test_reorg bname =
   if !reorg || is_reorg_base bname then (
