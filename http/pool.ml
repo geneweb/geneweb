@@ -10,7 +10,7 @@ let add_worker t k =
   | 0 ->
       (try
          while true do
-           k @@ Unix.getpid ()
+           k ()
          done
        with e ->
          let bt = Printexc.get_raw_backtrace () in

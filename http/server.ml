@@ -270,11 +270,10 @@ let accept_connection_windows socket =
 
 let accept_connections_windows socket =
   while true do
-    try accept_connection_windows socket with
-    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-        Log.info (fun k -> k "%s" (Printexc.to_string e))
-    | Sys_error msg as e when msg = "Broken pipe" ->
-        Log.info (fun k -> k "%s" (Printexc.to_string e))
+    try accept_connection_windows socket
+    with e ->
+      let bt = Printexc.get_raw_backtrace () in
+      Log.info (fun k -> k "%a" Util.pp_exception (e, bt))
   done
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
@@ -296,9 +295,8 @@ let with_timeout ~timeout handler f =
     Fun.protect ~finally g)
   else f ()
 
-let accept_connection_unix ~timeout callback socket pid =
+let accept_connection_unix ~timeout callback socket () =
   let client_socket, client_addr = My_unix.accept_noeintr socket in
-  Log.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   connection_closed := false;
   wserver_sock := client_socket;
@@ -313,7 +311,7 @@ let accept_connections_unix ~timeout ~n_workers callback socket =
   else
     (* We avoid forking in the case, which is helpful for debugging. *)
     while true do
-      try accept_connection_unix ~timeout callback socket (Unix.getpid ())
+      try accept_connection_unix ~timeout callback socket ()
       with e ->
         let bt = Printexc.get_raw_backtrace () in
         Log.info (fun k -> k "%a" Util.pp_exception (e, bt))
@@ -323,11 +321,11 @@ let accept_connections ~timeout ~n_workers callback socket =
   if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
   else accept_connections_windows socket
 
-let resolve_addr ?addr port =
+let resolve_addr ?interface port =
   let port = string_of_int port in
   let hints = [ Unix.AI_SOCKTYPE Unix.SOCK_STREAM ] in
-  match addr with
-  | Some a -> Unix.getaddrinfo a port hints
+  match interface with
+  | Some i -> Unix.getaddrinfo i port hints
   | None -> Unix.getaddrinfo "" port (Unix.AI_PASSIVE :: hints)
 
 let pp_sockaddr ppf s =
@@ -348,17 +346,17 @@ let try_addresses l =
   in
   loop l
 
-let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
+let start ?interface ~port ?(timeout = 0) ~max_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
   | exception Not_found -> (
       check_stopping ();
-      match resolve_addr ?addr port with
+      match resolve_addr ?interface port with
       | (exception _) | [] ->
           (* TODO: move this code in `gwd.ml` *)
           Log.err (fun k ->
               k "Cannot resolve the interface %a:%i."
                 Fmt.(option ~none:(const string "any") string)
-                addr port);
+                interface port);
           exit 2
       | l -> (
           match try_addresses l with
@@ -367,10 +365,10 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
               Log.err (fun k ->
                   k "Cannot bind any interface for %a:%i."
                     Fmt.(option ~none:(const string "any") string)
-                    addr port);
+                    interface port);
               exit 2
           | Some (addr, socket) ->
-              Unix.listen socket max_pending_requests;
+              Unix.listen socket max_requests;
               Log.info (fun k ->
                   k ~tags:timestamp "Ready on %a." pp_sockaddr addr);
               if n_workers = 0 then

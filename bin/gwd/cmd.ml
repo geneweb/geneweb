@@ -10,6 +10,13 @@ let ( // ) = Filename.concat
 type log = Stdout | Stderr | File of string | Syslog
 type plugin = { path : string; unsafe : bool; forced : bool; collection : bool }
 
+type connection = {
+  interface : string option;
+  port : int;
+  timeout : float;
+  max_requests : int;
+}
+
 type t = {
   (* Directories *)
   base_dir : string;
@@ -18,6 +25,7 @@ type t = {
   etc_prefix : string;
   images_prefix : string;
   images_dir : string;
+  index_dir : string;
   (* Data management *)
   cache_databases : string list;
   lexicon_files : string list;
@@ -38,15 +46,18 @@ type t = {
   no_reverse_host : bool;
   ban_threshold : (int * int) option;
   min_disp_req : int;
+  tls : (string * string) option;
   (* HTTP server *)
-  interface : string option;
+  http_connection : connection;
   redirect_interface : string option;
-  port : int;
-  connection_timeout : int;
-  max_pending_requests : int;
   n_workers : int;
   cgi : bool;
   daemon : bool;
+  (* RPC server *)
+  rpc : bool;
+  rpc_connection : connection;
+  index_fuel : int;
+  task_timeout : float;
   (* Web interface *)
   default_lang : string;
   (* Plugins *)
@@ -182,6 +193,7 @@ let default_gw_prefix =
 let default_images_prefix = default_gw_prefix // "images"
 let default_etc_prefix = default_gw_prefix // "etc"
 let default_images_dir = ""
+let default_index_dir = default_gw_prefix // "etc"
 
 let base_dir =
   let doc = "$(docv) is the directory where GeneWeb databases are stored." in
@@ -238,7 +250,22 @@ let etc_prefix =
     & opt (some dirpath) None
     & info [ "etc-prefix" ] ~docs:dirs_section ~doc)
 
-let parse_directories bd wd gw_prefix images_prefix etc_prefix images_dir =
+let index_dir =
+  let doc = "Specify the directory for index files." in
+  C.Arg.(
+    value
+    & opt dirpath default_index_dir
+    & info [ "idx"; "index-dir" ] ~docs:dirs_section ~doc)
+
+let directories =
+  let open C.Term.Syntax in
+  let+ base_dir = base_dir
+  and+ socket_dir = socket_dir
+  and+ gw_prefix = gw_prefix
+  and+ images_prefix = images_prefix
+  and+ etc_prefix = etc_prefix
+  and+ images_dir = images_dir
+  and+ index_dir = index_dir in
   let images_prefix =
     match (gw_prefix, images_prefix) with
     | Some s, None -> s // "images"
@@ -252,18 +279,13 @@ let parse_directories bd wd gw_prefix images_prefix etc_prefix images_dir =
     | None, None -> default_etc_prefix
   in
   let gw_prefix = Option.value ~default:default_gw_prefix gw_prefix in
-  (bd, wd, gw_prefix, images_prefix, etc_prefix, images_dir)
-
-let directories =
-  let open C.Term.Syntax in
-  let+ base_dir = base_dir
-  and+ socket_dir = socket_dir
-  and+ gw_prefix = gw_prefix
-  and+ images_prefix = images_prefix
-  and+ etc_prefix = etc_prefix
-  and+ images_dir = images_dir in
-  parse_directories base_dir socket_dir gw_prefix images_prefix etc_prefix
-    images_dir
+  ( base_dir,
+    socket_dir,
+    gw_prefix,
+    images_prefix,
+    etc_prefix,
+    images_dir,
+    index_dir )
 
 (* Data management commands *)
 
@@ -413,20 +435,84 @@ let min_disp_req =
   C.Arg.(
     value & opt int 0 & info [ "min-disp-req" ] ~docs:security_section ~doc)
 
+let crt =
+  let doc =
+    "Path to the TLS certificate file. The certificate is only used by the RPC \
+     server."
+  in
+  C.Arg.(
+    value
+    & opt (some filepath) None
+    & info [ "c"; "crt" ] ~docs:security_section ~doc)
+
+let key =
+  let doc =
+    "Path to the private key file for TLS. The private key is only used by the \
+     RPC server."
+  in
+  C.Arg.(
+    value
+    & opt (some filepath) None
+    & info [ "k"; "key" ] ~docs:security_section ~doc)
+
+let parse_tls crt key =
+  match (crt, key) with
+  | Some crt, Some key -> `Ok (Some (crt, key))
+  | None, None -> `Ok None
+  | _ ->
+      `Error
+        ( false,
+          "You must specify both a TLS certificate and key to enable \
+           connection encryption, or neither to leave it disabled." )
+
+let tls =
+  let open C.Term.Syntax in
+  C.Term.ret
+  @@
+  let+ crt = crt and+ key = key in
+  parse_tls crt key
 (* HTTP server commands *)
 
 let http_section = "HTTP SERVER"
-let default_port = 2317
-let default_connection_timeout = 120
-let default_max_pending_requests = 150
+let default_http_port = 2317
+let default_http_max_requests = 150
+let default_http_timeout = 150.
 let default_n_workers = 20
 
-let interface =
+let http_interface =
   let doc = "Bind the HTTP server to the network interface $(docv)." in
   C.Arg.(
     value
     & opt (some string) None
     & info [ "i"; "interface" ] ~docs:http_section ~docv:"INTERFACE" ~doc)
+
+let http_port =
+  let doc = "Set the TCP port listen by the HTTP server to $(docv)." in
+  C.Arg.(
+    value & opt int default_http_port
+    & info [ "p"; "port" ] ~docs:http_section ~docv:"PORT" ~doc)
+
+let http_timeout =
+  let doc = "Connection timeout (UNIX only)." in
+  C.Arg.(
+    value
+    & opt float default_http_timeout
+    & info [ "http-timeout" ] ~docs:http_section ~doc)
+
+let http_max_requests =
+  let doc = "Maximum number of pending requests handled by the HTTP server." in
+  C.Arg.(
+    value
+    & opt int default_http_max_requests
+    & info [ "max-requests" ] ~docs:http_section ~doc)
+
+let http_connection =
+  let open C.Term.Syntax in
+  let+ interface = http_interface
+  and+ port = http_port
+  and+ timeout = http_timeout
+  and+ max_requests = http_max_requests in
+  { interface; port; timeout; max_requests }
 
 let redirect_interface =
   let doc = "Send a message to say that this service has been redirected." in
@@ -436,30 +522,6 @@ let redirect_interface =
     & info
         [ "redirect-interface"; "redirect" ]
         ~docs:http_section ~docv:"INTERFACE" ~doc)
-
-let port =
-  let doc = "Set the TCP port listen by the HTTP server to $(docv)." in
-  C.Arg.(
-    value & opt int default_port
-    & info [ "p"; "port" ] ~docs:http_section ~docv:"PORT" ~doc)
-
-let connection_timeout =
-  let doc = "Connection timeout (UNIX only)" in
-  let error = "--connection-timeout is available only on UNIX." in
-  C.Arg.(
-    unix_only_opt ~error ~default:default_connection_timeout
-    & value
-    & opt (some int) None
-    & info [ "connection-timeout" ] ~docs:http_section ~doc)
-
-let max_pending_requests =
-  let doc = "Maximum number of pending requests handled by the server." in
-  let error = "--max-pending-requests is available only on UNIX." in
-  C.Arg.(
-    unix_only_opt ~error ~default:default_max_pending_requests
-    & value
-    & opt (some int) None
-    & info [ "max-pending-requests" ] ~docs:http_section ~doc)
 
 let max_clients =
   let doc = "Maximum number of clients treated at the same time (UNIX only)." in
@@ -492,6 +554,92 @@ let cgi =
 let daemon =
   let doc = "Run the process in the background (UNIX only)." in
   C.Arg.(value & flag & info [ "daemon" ] ~docs:http_section ~doc)
+
+(* RPC server commands *)
+let rpc_section = "RPC SERVER"
+let default_rpc_port = 8080
+let default_rpc_max_requests = 150
+let default_rpc_timeout = 150.
+let default_tls_rpc_port = 8443
+let default_index_fuel = 50
+let default_task_timeout = 10.
+
+let rpc =
+  let doc = "Enable the RPC server." in
+  C.Arg.(value & flag & info [ "rpc" ] ~docs:rpc_section ~doc)
+
+let rpc_interface =
+  let doc =
+    "Bind the RPC server to the network interface $(docv). The default is the \
+     same interface for the HTTP server."
+  in
+  C.Arg.(
+    value
+    & opt (some string) None
+    & info [ "ri"; "rpc-interface" ] ~docs:rpc_section ~docv:"INTERFACE" ~doc)
+
+let rpc_port =
+  let doc =
+    Fmt.str
+      "Set the TCP port listen by the RPC server to $(docv). The default is %d \
+       without TLS and %d with TLS."
+      default_rpc_port default_tls_rpc_port
+  in
+  C.Arg.(
+    value
+    & opt (some int) None
+    & info [ "rp"; "rpc-port" ] ~docs:rpc_section ~docv:"PORT" ~doc)
+
+let rpc_timeout =
+  let doc = "Connection timeout." in
+  C.Arg.(
+    value
+    & opt float default_rpc_timeout
+    & info [ "rpc-timeout" ] ~docs:rpc_section ~doc)
+
+let rpc_max_requests =
+  let doc = "Maximum number of pending requests handled by the RPC server." in
+  C.Arg.(
+    value
+    & opt int default_rpc_max_requests
+    & info [ "rpc-max-requests" ] ~docs:rpc_section ~doc)
+
+let rpc_connection =
+  let open C.Term.Syntax in
+  let+ interface = rpc_interface
+  and+ port = rpc_port
+  and+ timeout = rpc_timeout
+  and+ max_requests = rpc_max_requests
+  and+ tls = tls
+  and+ http_interface = http_interface in
+  let interface =
+    match http_interface with Some _ -> interface | None -> http_interface
+  in
+  let port =
+    match port with
+    | Some p -> p
+    | None -> (
+        match tls with
+        | Some _ -> default_tls_rpc_port
+        | None -> default_rpc_port)
+  in
+  { interface; port; timeout; max_requests }
+
+let index_fuel =
+  let doc = "Maximum number of answers per index request." in
+  C.Arg.(
+    value & opt int default_index_fuel
+    & info [ "index-fuel" ] ~docs:rpc_section ~doc)
+
+let task_timeout =
+  let doc =
+    "Define the task timeout (in seconds) per task. $(docv) must be a positive \
+     number."
+  in
+  C.Arg.(
+    value
+    & opt float default_task_timeout
+    & info [ "task-timeout" ] ~docs:rpc_section ~doc)
 
 (* Web interface commands *)
 
@@ -638,7 +786,13 @@ let t =
   in
   C.Cmd.make (C.Cmd.info "gwd" ~envs ~version:Version.ver ~doc)
   @@
-  let+ base_dir, socket_dir, gw_prefix, images_prefix, etc_prefix, images_dir =
+  let+ ( base_dir,
+         socket_dir,
+         gw_prefix,
+         images_prefix,
+         etc_prefix,
+         images_dir,
+         index_dir ) =
     directories
   and+ cache_databases = cache_databases
   and+ lexicon_files = lexicon_files
@@ -658,15 +812,17 @@ let t =
   and+ allowed_addresses = allowed_addresses
   and+ ban_threshold = ban_threshold
   and+ min_disp_req = min_disp_req
-  and+ interface = interface
+  and+ tls = tls
+  and+ http_connection = http_connection
   and+ redirect_interface = redirect_interface
-  and+ port = port
-  and+ connection_timeout = connection_timeout
-  and+ max_pending_requests = max_pending_requests
   and+ _ : int = max_clients
   and+ n_workers = n_workers
   and+ cgi = cgi
   and+ daemon = daemon
+  and+ rpc = rpc
+  and+ rpc_connection = rpc_connection
+  and+ index_fuel = index_fuel
+  and+ task_timeout = task_timeout
   and+ default_lang = default_lang
   and+ _ : bool = browser_lang
   and+ _ : bool = setup_link
@@ -682,6 +838,7 @@ let t =
     gw_prefix;
     images_prefix;
     images_dir;
+    index_dir;
     etc_prefix;
     cache_databases;
     lexicon_files;
@@ -701,14 +858,16 @@ let t =
     no_reverse_host;
     ban_threshold;
     min_disp_req;
-    interface;
+    tls;
+    http_connection;
     redirect_interface;
-    port;
-    connection_timeout;
-    max_pending_requests;
     n_workers;
     cgi;
     daemon;
+    rpc;
+    rpc_connection;
+    index_fuel;
+    task_timeout;
     default_lang;
     plugins;
     debug;
@@ -745,7 +904,7 @@ let legacy_arguments =
     ("-log_level", "--verbosity");
     ("-login_tmout", "--login-timeout");
     ("-max_clients", "--max-clients");
-    ("-max_pending_requests", "--max-pending-requests");
+    ("-max_pending_requests", "--max-requests");
     ("-min_disp_req", "--min-disp-req");
     ("-no_host_address", "--no-reverse-host");
     ("-no-fork", "--no-fork");
