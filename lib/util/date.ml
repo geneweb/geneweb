@@ -424,7 +424,9 @@ let convert ~from ~to_ dmy =
 let normalize_interval ~calendar date =
   let to_interval ~calendar date =
     let date' =
-      gregorian_of_sdn ~prec:date.prec (to_sdn ~from:calendar date + date.delta)
+      convert ~from:Dgregorian ~to_:calendar
+        (gregorian_of_sdn ~prec:date.prec
+           (to_sdn ~from:calendar date + date.delta))
     in
     { date with delta = 0; prec = YearInt (dmy2_of_dmy date') }
   in
