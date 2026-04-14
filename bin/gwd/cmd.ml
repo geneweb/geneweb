@@ -187,10 +187,11 @@ let default_images_dir = ""
 
 let base_dir =
   let doc = "$(docv) is the directory where GeneWeb databases are stored." in
+  let absent = Dirs.name default_base_dir in
   C.Arg.(
     value
-    & opt dirpath (Dirs.name default_base_dir)
-    & info [ "bd"; "base-dir" ] ~docs:dirs_section ~doc)
+    & opt dirpath (Dirs.path default_base_dir)
+    & info [ "bd"; "base-dir" ] ~absent ~docs:dirs_section ~doc)
 
 let socket_dir =
   let doc =
