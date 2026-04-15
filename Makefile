@@ -40,7 +40,11 @@ endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
 .PHONY: info
 
-fmt build build-geneweb gwd install uninstall: info
+refresh-version:
+	@rm -f _build/default/lib/version.ml
+PHONY: refresh-version
+
+fmt build build-geneweb gwd distrib install uninstall: info refresh-version
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
@@ -73,7 +77,7 @@ uninstall: ## Uninstall geneweb using dune
 	dune build @install
 	dune uninstall
 
-distrib: info ## Build the project and copy what is necessary for distribution
+distrib: ## Build the project and copy what is necessary for distribution
 	dune build --release @bin/all @lib/all
 	@printf "Done.\n"
 	@rm -rf $(DISTRIB_DIR)
