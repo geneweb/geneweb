@@ -2149,13 +2149,14 @@ let geneweb_server ~predictable_mode () =
   commit: %s
   gwd: %s
   working_dir: %s
+  base_dir: %s
   gw_prefix: %s
   etc_prefix: %s
   images_prefix: %s
   images_dir: %s
   secure asset: %a|}
                   Version.src Version.branch Version.commit_id Sys.argv.(0)
-                  (Sys.getcwd ()) (Option.get !gw_prefix)
+                  (Sys.getcwd ()) (Secure.base_dir ()) (Option.get !gw_prefix)
                   (Option.get !etc_prefix)
                   (Option.get !images_prefix)
                   !images_dir
