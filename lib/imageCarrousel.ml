@@ -957,7 +957,7 @@ let print conf base =
       let fn = Driver.p_first_name base p in
       let sn = Driver.p_surname base p in
       if fn = "?" || sn = "?" then Hutil.incorrect_request conf
-      else print_send_image conf base "portraist" p
+      else print_send_image conf base "portraits" p
 
 let print_family conf base =
   match p_getenv conf.env "i" with
