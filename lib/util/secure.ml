@@ -14,7 +14,22 @@ let default_base_dir =
   let t = Dirs.make () in
   Dirs.(data_home t // "geneweb" // "bases")
 
-let bd_r = ref (Dirs.path default_base_dir)
+let bd_r =
+  let ( / ) = Filename.concat in
+  let candidates =
+    [
+      "bases";
+      Filename.parent_dir_name / "bases";
+      Filename.dirname Sys.executable_name / Filename.parent_dir_name / "bases";
+    ]
+  in
+  let rec first_existing = function
+    | [] -> Dirs.path default_base_dir
+    | d :: rest ->
+        if Sys.file_exists d && Sys.is_directory d then d
+        else first_existing rest
+  in
+  ref (first_existing candidates)
 
 (* [decompose: string -> string list] decompose a path into a list of
    directory and a basename. "a/b/c" -> [ "a" ; "b"; "c" ] *)
