@@ -11,6 +11,11 @@ endif
 
 -include Makefile.local
 
+.PHONY: info refresh-version fmt build build-geneweb build-geneweb-rpc gwd \
+        install uninstall distrib distrib-rpc doc opendoc test bench \
+        bench-marshal bench-tabulate clean ci ocp-indent help bundle \
+        dmg clean-bundle
+
 # Variables for packagers.
 DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
@@ -38,11 +43,9 @@ ifneq ($(COMMIT_COMMENT),)
 	@printf '\n$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
 endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
-.PHONY: info
 
 refresh-version:
 	@rm -f _build/default/lib/version.ml
-PHONY: refresh-version
 
 fmt build build-geneweb gwd distrib install uninstall: info refresh-version
 
@@ -71,7 +74,6 @@ gwd: ## Build ondy gwd/gwc executables
 install: ## Install geneweb using dune
 	dune build @install
 	dune install
-.PHONY: install
 
 uninstall: ## Uninstall geneweb using dune
 	dune build @install
@@ -181,28 +183,22 @@ distrib-rpc: build-geneweb-rpc
 	gzip -9 -k -f $(DISTRIB_DIR)/gw/etc/js/rpc_client.min.js
 	@echo "Done."
 
-.PHONY: build build-geneweb build-geneweb-rpc gwd fmt install uninstall distrib
-
 # [END] Installation / Distribution section
 
 doc: ## Documentation generation
 doc:
 	dune build @doc
-.PHONY: doc
 
 opendoc: doc
 	xdg-open $(ODOC_DIR)/index.html
-.PHONY: opendoc
 
 test: ## Run tests
 test:
 	@dune build @runtest
-.PHONY: test
 
 bench: ## Run benchmarks
 bench:
 	dune build @runbench
-.PHONY: bench
 
 BENCH_FILE?=geneweb-bench.bin
 
@@ -213,20 +209,17 @@ ifdef BENCH_NAME
 else
 	 $(error BENCH_NAME variable is empty)
 endif
-.PHONY: bench-marshal
 
 bench-tabulate: ## Read BENCH_FILE and print a report
 bench-tabulate:
 	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
 	@rm -f $(BENCH_FILE)
-.PHONY: bench-tabulate
 
 clean:
 	@echo -n "Cleaning…"
 	@rm -rf $(DISTRIB_DIR)
 	@rm -rf _build
 	@echo " Done."
-.PHONY: clean
 
 ci: ## Run tests, skip known failures
 ci:
@@ -238,13 +231,11 @@ ocp-indent:
 		echo $$f ; \
 		ocp-indent -i $$f ; \
 	done
-.PHONY: ocp-indent
 
 .DEFAULT_GOAL := help
 help:
 	@clear;grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' Makefile | awk 'BEGIN {FS = ":.*?#\
 # "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /[33m/'
-.PHONY: help
 
 bundle: distrib ## Create macOS app bundle
 ifeq ($(OS_TYPE),Darwin)
@@ -258,7 +249,6 @@ ifeq ($(OS_TYPE),Darwin)
 else
 	@echo "❌ Bundle creation is only supported on macOS"
 endif
-.PHONY: bundle
 
 dmg: bundle ## Create macOS DMG installer
 ifeq ($(OS_TYPE),Darwin)
@@ -272,7 +262,6 @@ ifeq ($(OS_TYPE),Darwin)
 else
 	@echo "❌ DMG creation is only supported on macOS"
 endif
-.PHONY: dmg
 
 clean-bundle: ## Remove generated bundle and DMG
 	@echo "Cleaning macOS artifacts…"
@@ -280,4 +269,3 @@ clean-bundle: ## Remove generated bundle and DMG
 	@rm -f GeneWeb-*.dmg
 	@rm -f install_geneweb.sh
 	@echo "Done."
-.PHONY: clean-bundle
