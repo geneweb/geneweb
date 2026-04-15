@@ -317,19 +317,10 @@ let get_old_portrait_name conf base p = get_portrait_name_aux conf base p true
 let get_blason_aux conf base p self saved =
   if has_access_to_image "blasons" conf base p then
     let rec loop p =
-      match
-        src_of_string conf
-          (path_str (full_image_path "blasons" conf base p saved))
-      with
-      | `Src_with_size_info s when Filename.extension s = ".stop" -> None
-      | `Src_with_size_info _s as s_info -> (
-          match parse_src_with_size_info conf s_info with
-          | Error _e -> None
-          | Ok (s, _size) -> Some s)
-      | `Path p when Filename.extension p = ".stop" -> None
-      | `Path p -> Some (`Path p)
-      | `Url u -> Some (`Url u)
-      | `Empty -> (
+      match full_image_path "blasons" conf base p saved with
+      | Some (`Path p) when Filename.extension p = ".stop" -> None
+      | Some _ as result -> result
+      | None -> (
           match Driver.get_parents p with
           | Some ifam when not self ->
               let cpl = Driver.foi base ifam in
