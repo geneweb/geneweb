@@ -76,22 +76,30 @@ let topological_sort (type a) (t : (a * a list) list) : (a list, a list) result
   | l -> Ok (List.rev l)
   | exception Cycle l -> Error (List.rev l)
 
+let is_plugin_dir path =
+  let pname = Filename.basename path in
+  let file = Fmt.str "plugin_%s.cmxs" pname in
+  Sys.file_exists (path // file)
+
 let compute_dependencies path =
   let deps =
     Filesystem.walk_folder
       (fun e acc ->
         match e with
         | Dir d ->
-            let meta_file = d // "META" in
-            MS.update (Filename.basename d)
-              (fun o ->
-                match o with
-                | Some _ -> o
-                | None ->
-                    if Sys.file_exists meta_file then
-                      Some Meta.(parse meta_file).depends
-                    else Some [])
-              acc
+            if is_plugin_dir d then
+              let meta_file = d // "META" in
+              let pname = Filename.basename d in
+              MS.update pname
+                (fun o ->
+                  match o with
+                  | Some _ -> o
+                  | None ->
+                      if Sys.file_exists meta_file then
+                        Some Meta.(parse meta_file).depends
+                      else Some [])
+                acc
+            else acc
         | Exn { path = _; exn; bt } -> Printexc.raise_with_backtrace exn bt
         | _ -> acc)
       path MS.empty

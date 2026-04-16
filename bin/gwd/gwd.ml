@@ -293,23 +293,26 @@ let check_plugin =
 
 let load_plugin ~unsafe ~forced path =
   let pname = Filename.basename path in
-  Logs.debug (fun k ->
-      k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
-  if not (unsafe || check_plugin path) then (
-    Logs.err (fun k ->
-        k "Refuse to load plugin %s for cause of wrong checksum." pname);
-    exit 1);
-  let pname = Filename.basename path in
-  let cmxs =
-    let s = Fmt.str "plugin_%s.cmxs" pname in
-    path // s
-  in
-  lexicon_fname := !lexicon_fname ^ pname ^ ".";
-  let lex_dir = path // "assets" // "lex" in
-  if Sys.file_exists lex_dir then add_lex_dir lex_dir;
-  Plugin.assets := path // "assets";
-  Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
-  load_cmxs cmxs
+  if not @@ Plugin.is_plugin_dir path then
+    Logs.err (fun k -> k "%S is not a plugin directory." path)
+  else (
+    Logs.debug (fun k ->
+        k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
+    if not (unsafe || check_plugin path) then (
+      Logs.err (fun k ->
+          k "Refuse to load plugin %s for cause of wrong checksum." pname);
+      exit 1);
+    let pname = Filename.basename path in
+    let cmxs =
+      let s = Fmt.str "plugin_%s.cmxs" pname in
+      path // s
+    in
+    lexicon_fname := !lexicon_fname ^ pname ^ ".";
+    let lex_dir = path // "assets" // "lex" in
+    if Sys.file_exists lex_dir then add_lex_dir lex_dir;
+    Plugin.assets := path // "assets";
+    Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
+    load_cmxs cmxs)
 
 let load_plugins Cmd.{ path; unsafe; forced; collection } =
   if not collection then load_plugin ~unsafe ~forced path
