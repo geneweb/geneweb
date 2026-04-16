@@ -3,26 +3,27 @@
 type handler = Unix.sockaddr * string list -> string -> string -> unit
 
 val start :
-  ?addr:string ->
+  ?interface:string ->
   port:int ->
   ?timeout:int ->
-  max_pending_requests:int ->
+  max_requests:int ->
   n_workers:int ->
   handler ->
   unit
-(** [Wserver.start ~secret_salt ?addr ~port ?timeout ~n_workers callback] starts
-    a HTTP 1.1 server that listens on the address [addr] and port [port].
+(** [Wserver.start ~secret_salt ?interface ~port ?timeout ~max_requests
+     ~n_workers callback] starts a HTTP 1.1 server that listens on the interface
+    [interface] and port [port].
 
     On Unix, worker jobs managed by [n_workers] workers have a time limit of
     [timeout]. If [timeout] is [0], there is no limit. This is the default.
 
-    The [max_pending_requests] argument specified the maximum number of pending
-    requests that the server can store. If the queue is full, new requests are
-    ignored until space becomes available.
+    The [max_requests] argument specified the maximum number of pending requests
+    that the server can store. If the queue is full, new requests are ignored
+    until space becomes available.
 
     When a client connects, [callback] is invoked with the arguments
-    [(addr, request) path query] where:
-    - [addr] is the client address,
+    [(interface, request) path query] where:
+    - [interface] is the client interface,
     - [request] is the client request,
     - [path] is the path of the request,
     - [query] is the query content.

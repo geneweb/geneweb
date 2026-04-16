@@ -2,7 +2,7 @@
 
 module Compat = Geneweb_compat
 
-let src = Logs.Src.create ~doc:"Wserver" __MODULE__
+let src = Logs.Src.create ~doc:"HTTP server" "HTTP"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
@@ -267,11 +267,10 @@ let accept_connection_windows socket =
 
 let accept_connections_windows socket =
   while true do
-    try accept_connection_windows socket with
-    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-        Log.info (fun k -> k "%s" (Printexc.to_string e))
-    | Sys_error msg as e when msg = "Broken pipe" ->
-        Log.info (fun k -> k "%s" (Printexc.to_string e))
+    try accept_connection_windows socket
+    with e ->
+      let bt = Printexc.get_raw_backtrace () in
+      Log.info (fun k -> k "%a" Util.pp_exception (e, bt))
   done
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
@@ -293,9 +292,8 @@ let with_timeout ~timeout handler f =
     Fun.protect ~finally g)
   else f ()
 
-let accept_connection_unix ~timeout callback socket pid =
+let accept_connection_unix ~timeout callback socket () =
   let client_socket, client_addr = My_unix.accept_noeintr socket in
-  Log.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   connection_closed := false;
   wserver_sock := client_socket;
@@ -310,7 +308,7 @@ let accept_connections_unix ~timeout ~n_workers callback socket =
   else
     (* We avoid forking in the case, which is helpful for debugging. *)
     while true do
-      try accept_connection_unix ~timeout callback socket (Unix.getpid ())
+      try accept_connection_unix ~timeout callback socket ()
       with e ->
         let bt = Printexc.get_raw_backtrace () in
         Log.info (fun k -> k "%a" Util.pp_exception (e, bt))
@@ -320,19 +318,19 @@ let accept_connections ~timeout ~n_workers callback socket =
   if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
   else accept_connections_windows socket
 
-let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
+let start ?interface ~port ?(timeout = 0) ~max_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
   | exception Not_found ->
       check_stopping ();
-      let socket, addr =
-        match addr with
-        | Some a ->
-            let a =
-              try Unix.inet_addr_of_string a
-              with Failure _ -> (Unix.gethostbyname a).Unix.h_addr_list.(0)
+      let socket, interface =
+        match interface with
+        | Some i ->
+            let i =
+              try Unix.inet_addr_of_string i
+              with Failure _ -> (Unix.gethostbyname i).Unix.h_addr_list.(0)
             in
-            let domain = Unix.domain_of_sockaddr (Unix.ADDR_INET (a, 0)) in
-            (Unix.socket domain Unix.SOCK_STREAM 0, a)
+            let domain = Unix.domain_of_sockaddr (Unix.ADDR_INET (i, 0)) in
+            (Unix.socket domain Unix.SOCK_STREAM 0, i)
         | None -> (
             try
               let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
@@ -342,8 +340,8 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
               (Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0, Unix.inet_addr_any))
       in
       Unix.setsockopt socket Unix.SO_REUSEADDR true;
-      Unix.bind socket (Unix.ADDR_INET (addr, port));
-      Unix.listen socket max_pending_requests;
+      Unix.bind socket (Unix.ADDR_INET (interface, port));
+      Unix.listen socket max_requests;
       let tm = Unix.localtime (Unix.time ()) in
       Log.info (fun k ->
           k "Ready %4d-%02d-%02d %02d:%02d." (1900 + tm.Unix.tm_year)

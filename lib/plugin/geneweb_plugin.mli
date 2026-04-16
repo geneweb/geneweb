@@ -47,6 +47,10 @@ val checksum : string -> string
 (** [checksum path] computes the SHA-256 sum of the cmxs files containes in the
     directory [path]. *)
 
+val is_plugin_dir : string -> bool
+(** [is_plugin_dir path] checks if [path] is the directory of a GeneWeb plugin.
+*)
+
 val compute_dependencies : string -> (string list, string list) result
 (** [compute_dependencies path] returns a topologically sorted list of all
     plugins found in [path] for safe loading.

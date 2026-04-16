@@ -12,6 +12,13 @@ type plugin = {
           directly to a single plugin. *)
 }
 
+type connection = {
+  interface : string option;
+  port : int;
+  timeout : float;
+  max_requests : int;
+}
+
 type t = {
   (* Directories *)
   base_dir : string;
@@ -20,6 +27,7 @@ type t = {
   etc_prefix : string;
   images_prefix : string;
   images_dir : string;
+  index_dir : string;
   (* Data management *)
   cache_databases : string list;
   lexicon_files : string list;
@@ -40,15 +48,18 @@ type t = {
   no_reverse_host : bool;
   ban_threshold : (int * int) option;
   min_disp_req : int;
+  tls : (string * string) option;
   (* HTTP server *)
-  interface : string option;
+  http_connection : connection;
   redirect_interface : string option;
-  port : int;
-  connection_timeout : int;
-  max_pending_requests : int;
   n_workers : int;
   cgi : bool;
   daemon : bool;
+  (* RPC server *)
+  rpc : bool;
+  rpc_connection : connection;
+  index_fuel : int;
+  task_timeout : float;
   (* Web interface *)
   default_lang : string;
   browser_lang : bool;
@@ -73,11 +84,11 @@ val parse : unit -> t Cmdliner.Cmd.eval_exit
 val default_images_prefix : string
 val default_images_dir : string
 val default_etc_prefix : string
-val default_connection_timeout : int
+val default_http_timeout : float
 val default_login_timeout : int
 val default_default_lang : string
 val default_verbosity : int
-val default_max_pending_requests : int
+val default_http_max_requests : int
 val default_n_workers : int
-val default_port : int
+val default_http_port : int
 val log_parser : string -> (log, string) result
