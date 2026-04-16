@@ -869,26 +869,39 @@
 %let;o14;%apply;nth_c%with;%p_mod;%and;%expr(29)%end;%in;
 %let;m15;%apply;nth_c%with;%p_mod;%and;%expr(30)%end;%in;
 %let;o15;%apply;nth_c%with;%p_mod;%and;%expr(31)%end;%in;
+%let;m16;%apply;nth_c%with;%p_mod;%and;%expr(32)%end;%in;
+%let;o16;%apply;nth_c%with;%p_mod;%and;%expr(33)%end;%in;
+%let;m17;%apply;nth_c%with;%p_mod;%and;%expr(34)%end;%in;
+%let;o17;%apply;nth_c%with;%p_mod;%and;%expr(35)%end;%in;
+%let;m18;%apply;nth_c%with;%p_mod;%and;%expr(36)%end;%in;
+%let;o18;%apply;nth_c%with;%p_mod;%and;%expr(37)%end;%in;
+%let;m19;%apply;nth_c%with;%p_mod;%and;%expr(38)%end;%in;
+%let;o19;%apply;nth_c%with;%p_mod;%and;%expr(39)%end;%in;
 
 %let;perso_module_a;arbres%in;
 %let;perso_module_c;chronologie%in;
-%let;perso_module_d;data_3col%in;
+%let;perso_module_d;documents%in;
 %let;perso_module_f;fratrie%in;
 %let;perso_module_g;gr_parents%in;
 %let;perso_module_h;htrees%in;
 %let;perso_module_i;individu%in;
 %let;perso_module_l;ligne%in;
 %let;perso_module_n;notes%in;
+%let;perso_module_d;documents%in;
 %let;perso_module_p;parents%in;
 %let;perso_module_r;relations%in;
 %let;perso_module_s;sources%in;
 %let;perso_module_u;unions%in;
-%let;perso_module_t;test%in;
+%let;perso_module_t;trois_col%in;
+%let;perso_module_w;w_mod_perso%in;
+%let;perso_module_x;x_mod_perso%in;
+%let;perso_module_y;y_mod_perso%in;
+%let;perso_module_z;test%in;
 
-%let;abc;acdfghilnprsut%in;
+%let;abc;acdfghilnprsutwxyz%in;
 %( compute nbr of entries in p_mod %)
 %reset_count;
-%for;i;0;15;
+%for;i;0;19;
   %let;mnb;%apply;mm(i)%in;
   %if;(mnb!="")%incr_count;%end;
 %end;

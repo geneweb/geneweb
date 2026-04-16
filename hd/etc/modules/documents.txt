@@ -1,0 +1,52 @@
+<!-- $Id: modules/documents.txt v7.1 21/04/2026 22:37:42 $ -->
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+%let;d_width;%if;(b.documents_width!="")%b.documents_width;%else;150%end;%in;
+%let;d_size;%if;(d_width<100)18%elseif;(d_width<180)24%elseif;(d_width<280)32%elseif;(d_width<400)40%else;48%end;%in;
+%let;d_icon;%expr(d_size / 2)%in;
+%if;(carrousel_img_nbr>0)
+  <div id="mod_documents">
+    <h2 class="h3 mt-2 mb-2">%nn;
+      %if;(carrousel_img_nbr=1)[*document/documents]0%else;[*document/documents]1%end;%nn;
+    </h2>
+    <div class="d-flex flex-wrap column-gap-3 row-gap-5 align-items-start">
+      %foreach;img_in_carrousel;
+        <div class="position-relative align-self-start" style="width: %d_width;px;">
+          <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;"
+            class="d-flex"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            title="%carrousel_img_raw;">
+            %if;("http" in url_in_env)
+              <img class="rounded d-block w-100" src="%url_in_env;" loading="lazy" alt="%carrousel_img_raw;">
+            %else;
+              <img class="rounded d-block w-100" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" loading="lazy" alt="%carrousel_img_raw;">
+            %end;
+          </a>
+          %if;(carrousel_img_note!="" or carrousel_img_src!="")
+            <div class="position-absolute end-0 d-flex gap-1" style="transform: translate(-0.25rem, -20%%);">
+              %if;(carrousel_img_note!="")
+                <span class="d-inline-flex align-items-center justify-content-center bg-body border rounded-circle shadow-sm"
+                  style="width: %d_size;px; height: %d_size;px; font-size: %d_icon;px;"
+                  tabindex="0"
+                  data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
+                  title='<div class="text-start"><strong>[*note/notes]0[:]</strong><br>%carrousel_img_note;</div>'>
+                  <i class="fa fa-file-lines text-info-emphasis" aria-hidden="true"></i>
+                  <span class="visually-hidden">[*note/notes]0</span>
+                </span>
+              %end;
+              %if;(carrousel_img_src!="")
+                <span class="d-inline-flex align-items-center justify-content-center bg-body border rounded-circle shadow-sm"
+                  style="width: %d_size;px; height: %d_size;px; font-size: %d_icon;px;"
+                  tabindex="0"
+                  data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
+                  title='<div class="text-start"><strong>[*source/sources]0[:]</strong><br>%carrousel_img_src;</div>'>
+                  <i class="fa fa-box-archive text-warning-emphasis" aria-hidden="true"></i>
+                  <span class="visually-hidden">[*source/sources]0</span>
+                </span>
+              %end;
+            </div>
+          %end;
+        </div>
+      %end;
+    </div>
+  </div>
+%end;
