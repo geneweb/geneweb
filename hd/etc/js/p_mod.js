@@ -17,11 +17,13 @@ const PMod = (() => {
     arbres: ['ascendants', 'horizontal', 'compact', 'descendants'],
     htrees: ['+3-3 gen.', 'famille', '6 gen', '8 gen', 'HI'],
     gr_parents: ['standard', 'three cols'],
+    documents: ['standard'],
     ligne: ['standard'],
-    data_3col: ['standard'],
-    w: ['personnel'],
-    x: ['personnel'],
-    z: ['personnel']
+    trois_col: ['standard'],
+    w_mod_perso: ['op_m=1', 'op_m=2', 'op_m=3'],
+    x_mod_perso: ['op_m=1', 'op_m=2', 'op_m=3'],
+    y_mod_perso: ['op_m=1', 'op_m=2', 'op_m=3'],
+    z_test: ['op_m=1', 'op_m=2', 'op_m=3']
   };
 
   // Map rapide lookup par première lettre

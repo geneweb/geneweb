@@ -14413,6 +14413,10 @@ sl: brez poroke
 sv: ogifta
 tr: evli değil
 
+    document/documents
+en: document/documents
+fr: document/documents
+
     note/notes
 af: nota/notas
 ar: بطاقة/بطاقات

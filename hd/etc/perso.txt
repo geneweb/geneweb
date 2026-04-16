@@ -49,6 +49,11 @@
       %let;op_m;1%in;%include;modules/relations
     </div>
   </div>
+  %if;(b.show_documents="yes")
+    <div class="row col-12">
+      %let;op_m;1%in;%include;modules/documents
+    </div>
+  %end;
 %else;
   %(Dynamic %)
   <div class="mt-2">
