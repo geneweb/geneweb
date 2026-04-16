@@ -57,3 +57,10 @@
   [DEBUG]: Loading plugin (unsafe = true, forced = true) no_index...
   [DEBUG]: Loading plugin (unsafe = true, forced = true) xhtml...
   [DEBUG]: End of check mode.
+
+  $ gwd --check --plugin ../../plugins/foo
+  [ERROR]: "../../plugins/foo" is not a plugin directory.
+  [DEBUG]: End of check mode.
+
+  $ mkdir -p ./foo/bar && gwd --check --plugins ./foo; rm -Rf foo
+  [DEBUG]: End of check mode.
