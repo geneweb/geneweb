@@ -56,7 +56,6 @@ let propose_months conf ?max_d mode =
     match p_getint conf.env "d" with Some d when d >= 0 -> d | _ -> 6
   in
   let max_d = match max_d with Some d -> d | None -> 250 in
-
   let sel_month =
     match p_getint conf.env "v" with
     | Some v when v >= 1 && v <= 12 -> v
@@ -72,40 +71,35 @@ let propose_months conf ?max_d mode =
     done;
     Buffer.contents buf
   in
-  begin_centered conf;
   Output.printf conf
-    {|<form class="form-inline justify-content-center my-3"
+    {|<form class="d-flex align-items-center justify-content-center gap-3 my-3"
 method="get" action="%s">|}
     conf.command;
   Util.hidden_env conf;
   mode ();
   Output.printf conf
-    {|<label class="me-2" for="v_month">%s</label>
-  <select class="form-control form-control-lg %s" name="v" id="v_month">%s</select>|}
+    {|<label for="v_month">%s</label>
+  <select class="form-select form-select-lg w-auto" name="v" id="v_month">%s</select>|}
     (Utf8.capitalize_fst (transl_nth conf "year/month/day" 1))
-    (if is_cousins then "me-3" else "me-2")
     month_options;
   if is_cousins then
     Output.printf conf
-      {|<label class="mx-2" for="d_deg">%s</label>
-  <div class="input-group input-group-lg">
-    <div class="input-group-prepend">
-      <button type="button" class="btn btn-outline-secondary"
-        onclick="var i=document.getElementById('d_deg');
-        i.value=Math.max(0,+i.value-1)">&minus;</button></div>
+      {|<label for="d_deg">%s</label>
+  <div class="input-group input-group-lg" style="width:auto">
+    <button type="button" class="btn btn-outline-secondary"
+      onclick="var i=document.getElementById('d_deg');
+      i.value=Math.max(0,+i.value-1)">&minus;</button>
     <input type="number" name="d" id="d_deg" class="form-control text-center"
       value="%d" min="0" max="%d" style="width:4em">
-    <div class="input-group-append">
-      <button type="button" class="btn btn-outline-secondary"
-        onclick="var i=document.getElementById('d_deg');
-        i.value=Math.min(%d,+i.value+1)">+</button></div></div>|}
+    <button type="button" class="btn btn-outline-secondary"
+      onclick="var i=document.getElementById('d_deg');
+      i.value=Math.min(%d,+i.value+1)">+</button></div>|}
       (Utf8.capitalize_fst (transl_nth conf "degree of kinship" 0))
       d_val max_d max_d;
   Output.printf conf
-    {|<button type="submit" class="btn btn-primary btn-lg ms-2">%s</button>
+    {|<button type="submit" class="btn btn-primary btn-lg">%s</button>
 </form>|}
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  end_centered conf
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
 
 let gen_print conf base mois f_scan ?max_d ?mode dead_people =
   let tab = Array.make 31 [] in
