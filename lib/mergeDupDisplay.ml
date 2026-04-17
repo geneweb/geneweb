@@ -48,11 +48,10 @@ let print_input_excl conf string_of_i excl excl_name =
   if (s :> string) <> "" then Util.hidden_input conf excl_name s
 
 let print_submit conf name value =
-  Output.print_sstring conf {|<input type="submit" name="|};
-  Output.print_sstring conf name;
-  Output.print_sstring conf {|" value="|};
-  Output.print_sstring conf (transl_nth conf "Y/N" value);
-  Output.print_sstring conf {|" style="margin-right:4px">|}
+  Output.printf conf
+    {|<button type="submit" name="%s" class="btn %s me-2">%s</button>|} name
+    (if value = 0 then "btn-primary" else "btn-outline-secondary")
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" value))
 
 let print_cand_ind conf base (ip, _p) (iexcl, fexcl) ip1 ip2 =
   let title _ =
@@ -63,7 +62,7 @@ let print_cand_ind conf base (ip, _p) (iexcl, fexcl) ip1 ip2 =
   print_link conf base (Driver.poi base ip1);
   Output.print_sstring conf "</li><li>";
   print_link conf base (Driver.poi base ip2);
-  Output.print_sstring conf "</li></ul><p>";
+  Output.print_sstring conf "</li></ul><div class=\"mt-2\">";
   transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf " ?\n";
   (* FIXME: trans *)
@@ -83,7 +82,7 @@ let print_cand_ind conf base (ip, _p) (iexcl, fexcl) ip1 ip2 =
   Util.hidden_input conf "select" (Driver.Iper.to_string ip2 |> Mutil.encode);
   print_submit conf "answer_y" 0;
   print_submit conf "answer_n" 1;
-  Output.print_sstring conf "</form></p>";
+  Output.print_sstring conf "</form></div>";
   Hutil.trailer conf
 
 let print_cand_fam conf base (ip, _p) (iexcl, fexcl) ifam1 ifam2 =

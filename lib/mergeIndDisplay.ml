@@ -21,23 +21,14 @@ let print_differences conf base branches p1 p2 =
       && x1 <> x2
     then (
       let aux i x chk =
-        Output.print_sstring conf
-          {|<div class="custom-control custom-radio ms-3">|};
-        Output.print_sstring conf
-          {|<input class="custom-control-input" type="radio" id="|};
-        Output.print_sstring conf name;
-        Output.print_sstring conf (string_of_int i);
-        Output.print_sstring conf {|" name="|};
-        Output.print_sstring conf name;
-        Output.print_sstring conf {|" value="|};
-        Output.print_sstring conf (string_of_int i);
-        Output.print_sstring conf {|"|};
-        if chk && check then Output.print_sstring conf " checked";
-        Output.print_sstring conf {|>|};
-        Output.printf conf {|<label class="custom-control-label" for="|};
-        Output.print_sstring conf name;
-        Output.print_sstring conf (string_of_int i);
-        Output.print_sstring conf {|">|};
+        Output.printf conf
+          {|<div class="form-check ms-3%s">
+<input class="form-check-input" type="radio" id="%s%d" name="%s" value="%d"%s>
+<label class="form-check-label" for="%s%d">|}
+          (if i = 1 then " mb-2" else "")
+          name i name i
+          (if chk && check then " checked" else "")
+          name i;
         Output.print_string conf x;
         Output.print_sstring conf {|</label></div>|}
       in

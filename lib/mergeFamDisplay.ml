@@ -54,19 +54,22 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     let x1 : Adef.safe_string = proj fam1 in
     let x2 : Adef.safe_string = proj fam2 in
     if (x1 :> string) <> "" && (x2 :> string) <> "" && x1 <> x2 then (
+      let nm = (name :> string) in
       Output.print_sstring conf "<h4>";
       Output.print_string conf (Adef.safe_fn Utf8.capitalize_fst title);
-      Output.print_sstring conf
-        "</h4><ul><li><input type=\"radio\" class=\"form-control\" name=\"";
-      Output.print_string conf name;
-      Output.print_sstring conf "\" value=\"1\" checked>";
-      Output.print_string conf x1;
-      Output.print_sstring conf
-        "</li><li><input type=\"radio\" class=\"form-control\" name=\"";
-      Output.print_string conf name;
-      Output.print_sstring conf "\" value=\"2\">";
-      Output.print_string conf x2;
-      Output.print_sstring conf "</li></ul>")
+      Output.print_sstring conf "</h4>";
+      let aux i x checked =
+        Output.printf conf
+          {|<div class="form-check ms-2"><input class="form-check-input" type="radio" name="%s" id="%s%d" value="%d"%s>
+<label class="form-check-label" for="%s%d">|}
+          nm nm i i
+          (if checked then " checked" else "")
+          nm i;
+        Output.print_string conf x;
+        Output.print_sstring conf {|</label></div>|}
+      in
+      aux 1 x1 true;
+      aux 2 x2 false)
   in
   Output.print_sstring conf "<form method=\"post\" action=\"";
   Output.print_sstring conf conf.command;
