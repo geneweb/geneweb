@@ -120,6 +120,10 @@ val string_of_prec_dmy :
 val code_french_date : Config.config -> int -> int -> int -> string
 
 val gregorian_precision :
-  ?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string
+  ?with_short_month:bool ->
+  calendar:Date.calendar ->
+  Config.config ->
+  Date.dmy ->
+  Adef.safe_string
 
 val code_julian_date : Config.config -> Date.dmy -> string

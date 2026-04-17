@@ -219,10 +219,7 @@ let rec string_of_on_prec_dmy_aux ?(with_gregorian_precisions = true) ~calendar
   let gregorian_precision d =
     Ext_option.return_if
       (with_gregorian_precisions && calendar <> Date.Dgregorian)
-      (fun () ->
-        Adef.as_string
-        @@ gregorian_precision conf
-             (Date.convert ~from:calendar ~to_:Date.Dgregorian d))
+      (fun () -> Adef.as_string @@ gregorian_precision conf ~calendar d)
   in
   match d.Date.prec with
   | Date.Sure -> string_of_dmy d.Date.day d.Date.month sy
@@ -289,8 +286,11 @@ and string_of_dmy ?with_short_month conf d =
     (fun conf s s2 d -> string_of_prec_dmy conf s s2 d.Date.prec)
     conf d
 
-and gregorian_precision ?with_short_month conf d =
-  let d = Date.normalize_interval ~calendar:Date.Dgregorian d in
+and gregorian_precision ?with_short_month ~calendar conf d =
+  let d =
+    Date.normalize_interval ~calendar:Dgregorian
+      (Date.convert ~from:calendar ~to_:Dgregorian d)
+  in
   let format_date d =
     if d.Date.delta = 0 then
       Adef.as_string @@ string_of_dmy ?with_short_month conf d
@@ -356,8 +356,7 @@ let format_date_with_gregorian_precisions ~sep ~conf ~calendar d =
   | Date.Sure | Date.About | Date.Before | Date.After | Date.Maybe ->
       let open Def in
       s ^^^ sep ^^^ " ("
-      ^<^ gregorian_precision conf
-            (Date.convert ~from:(to_calendar calendar) ~to_:Date.Dgregorian d)
+      ^<^ gregorian_precision conf ~calendar:(to_calendar calendar) d
       ^>^ ")"
   | Date.OrYear _ | Date.YearInt _ -> s
 
