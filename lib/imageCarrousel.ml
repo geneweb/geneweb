@@ -289,33 +289,35 @@ let print_send_image conf base mode p =
   in
   Hutil.header conf title;
   Output.printf conf
-    "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
+    {|<form method="post" action="%s" enctype="multipart/form-data">|}
     conf.command;
   Output.print_sstring conf
-    "<div class=\"d-inline-flex align-items-center mt-2\">\n";
+    {|<div class="d-flex align-items-center gap-2 mt-2 flex-wrap">|};
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_C_OK");
   Util.hidden_input conf "i"
     (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
   Util.hidden_input conf "mode" (Adef.encoded mode);
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file"));
-  Output.print_sstring conf (Util.transl conf ":");
-  Output.print_sstring conf " ";
+  Output.print_sstring conf {|<label for="file" class="visually-hidden">|};
   Output.print_sstring conf
-    {|<input type="file" class="form-control-file ms-1" name="file" accept="image/*">|};
+    (Utf8.capitalize_fst (transl conf "choose an image"));
+  Output.print_sstring conf (Util.transl conf ":");
+  Output.print_sstring conf {|</label>|};
+  Output.print_sstring conf
+    {|<input type="file" class="form-control w-50" id="file" name="file" accept="image/*">|};
+  Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
+  transl_nth conf "validate/delete" 0
+  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf {|</button></div>|};
   (match
      Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env
    with
   | Some len ->
-      Output.print_sstring conf "<p>(maximum authorized size = ";
-      Output.print_sstring conf (string_of_int len);
-      Output.print_sstring conf " bytes)</p>"
+      Output.printf conf
+        {|<p class="text-body-secondary small mt-1">(maximum authorized size = %d bytes)</p>|}
+        len
   | None -> ());
-  Output.print_sstring conf
-    {|<span>></span><button type="submit" class="btn btn-primary ms-3">|};
-  transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button></div></form>";
+  Output.print_sstring conf {|</form>|};
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
