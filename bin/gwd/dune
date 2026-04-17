@@ -37,7 +37,6 @@
   logs
   logs-syslog
   logs-syslog.unix
-  ptime
   fmt
   fmt.tty
   str

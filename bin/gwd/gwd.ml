@@ -16,10 +16,7 @@ module Code = Geneweb_http.Code
 module Compat = Geneweb_compat
 open Cmd_legacy
 
-let timestamp_tag : unit Logs.Tag.def =
-  Logs.Tag.def "timestamp" ~doc:"POSIX timestamp" Fmt.nop
-
-let timestamp = Logs.Tag.(empty |> add timestamp_tag ())
+let timestamp = Logs.Tag.(empty |> add Server.timestamp_tag ())
 let gzip_min_size = 1024
 
 let client_accepts_encoding request encoding =
@@ -2113,65 +2110,72 @@ let retrieve_secret_salt () =
       exit 1
   | s -> s
 
-let geneweb_server ~predictable_mode () =
+let daemonize ~daemon k =
+  assert Sys.unix;
+  if daemon then
+    match Unix.fork () with
+    | 0 ->
+        Unix.close Unix.stdin;
+        null_reopen [ Unix.O_WRONLY ] Unix.stdout;
+        null_reopen [ Unix.O_WRONLY ] Unix.stderr;
+        k ()
+    | _ -> exit 0
+  else k ()
+
+let create_cnt_dir () =
+  try Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
+  with Sys_error e ->
+    Logs.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
+
+let pp_item pp ppf (name, v) =
+  Fmt.pf ppf "%a: %a@\n" Fmt.(styled (`Fg `Blue) string) name pp v
+
+let display_infos ?interface ~port () =
+  let hostname =
+    match interface with None -> Unix.gethostname () | Some a -> a
+  in
+  let git_info =
+    [
+      ("source", Version.src);
+      ("branch", Version.branch);
+      ("commit", Version.commit_id);
+    ]
+  in
+  let path_info =
+    [
+      ("gwd", Sys.argv.(0));
+      ("working_dir", Sys.getcwd ());
+      ("gw_prefix", Option.get !gw_prefix);
+      ("etc_prefix", Option.get !etc_prefix);
+      ("images_prefix", Option.get !images_prefix);
+      ("images_dir", !images_dir);
+    ]
+  in
+  Logs.app (fun k ->
+      let s =
+        Fmt.str "Geneweb %s\nListen to %s:%d..." Version.ver hostname port
+      in
+      k "%a" Fmt.(styled (`Fg `Green) string) s);
+  Logs.app (fun k -> k "Type CTRL+C to stop the service");
+  Logs.app (fun k ->
+      k "\n%a%a%a: %a"
+        Fmt.(list (pp_item string))
+        git_info
+        Fmt.(list (pp_item Dump.string))
+        path_info
+        Fmt.(styled (`Fg `Blue) string)
+        "assets"
+        Fmt.(box @@ list ~sep:comma Dump.string)
+        (Secure.assets ()))
+
+let geneweb_server ?interface ~port ~daemon ~predictable_mode () =
   let secret_salt =
     match Unix.getenv "WSERVER" with
+    | _ -> retrieve_secret_salt ()
     | exception Not_found ->
-        let hostn =
-          match !selected_addr with
-          | Some addr -> addr
-          | None -> ( try Unix.gethostname () with _ -> "computer")
-        in
-        let () =
-          if !daemon then
-            match Unix.fork () with
-            | 0 ->
-                Unix.close Unix.stdin;
-                null_reopen [ Unix.O_WRONLY ] Unix.stdout;
-                null_reopen [ Unix.O_WRONLY ] Unix.stderr
-            | _ -> exit 0
-          else (
-            Logs.app (fun k ->
-                k
-                  {|  GeneWeb %s
-
-  Possible addresses:
-    http://localhost:%d/base
-    http://127.0.0.1:%d/base
-    http://%s:%d/base
-    where “base” is the name of the database.
-
-  Type “Ctrl+C” to stop the service.
-|}
-                  Version.ver !selected_port !selected_port hostn !selected_port);
-            Logs.debug (fun k ->
-                k
-                  {| Gwd parameters:
-  source: %s
-  branch: %s
-  commit: %s
-  gwd: %s
-  working_dir: %s
-  gw_prefix: %s
-  etc_prefix: %s
-  images_prefix: %s
-  images_dir: %s
-  secure asset: %a|}
-                  Version.src Version.branch Version.commit_id Sys.argv.(0)
-                  (Sys.getcwd ()) (Option.get !gw_prefix)
-                  (Option.get !etc_prefix)
-                  (Option.get !images_prefix)
-                  !images_dir
-                  Fmt.(box @@ brackets @@ list ~sep:comma string)
-                  (Secure.assets ())))
-        in
-        let () =
-          try
-            Filesystem.create_dir ~parent:true ~required_perm:0o755
-              !GWPARAM.cnt_dir
-          with Sys_error e ->
-            Logs.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
-        in
+        daemonize ~daemon @@ fun () ->
+        display_infos ?interface ~port ();
+        create_cnt_dir ();
         (* A secret salt is added to the environment to ensure that workers
            use the same salt for digests on both Unix and Windows platforms. *)
         let secret_salt =
@@ -2179,7 +2183,6 @@ let geneweb_server ~predictable_mode () =
         in
         Unix.putenv "SECRET_SALT" secret_salt;
         secret_salt
-    | _ -> retrieve_secret_salt ()
   in
   (* FIXME: this hack is necessary to avoid a cyclic dependency between
      `geneweb` and `geneweb-http`. We must remove it after refactoring
@@ -2243,7 +2246,7 @@ let slashify s =
   let conv_char i = match s.[i] with '\\' -> '/' | x -> x in
   String.init (String.length s) conv_char
 
-let main () =
+let main ?interface ~port ~daemon ~predictable_mode () =
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2325,7 +2328,7 @@ let main () =
     in
     let secret_salt = match !cgi_secret_salt with None -> "" | Some s -> s in
     geneweb_cgi ~secret_salt addr (Filename.basename script) query)
-  else geneweb_server ~predictable_mode:!predictable_mode ()
+  else geneweb_server ?interface ~port ~daemon ~predictable_mode ()
 
 let has_root_privileges () =
   if not Sys.unix then false
@@ -2385,7 +2388,8 @@ let parse_cmd () =
       plugins := o.plugins;
       Lock.no_lock_flag := o.no_lock;
       Mutil.particles_file := Option.value ~default:"" o.particles_file;
-      Util.allowed_tags_file := Option.value ~default:"" o.allowed_tags_file
+      Util.allowed_tags_file := Option.value ~default:"" o.allowed_tags_file;
+      o
   | `Exit code -> exit code
 
 let make_socket_dir socket_dir =
@@ -2441,7 +2445,7 @@ let reporter ~predictable_mode ppf =
     msgf @@ fun ?header ?tags fmt ->
     let timestamp =
       Option.bind tags @@ fun tags ->
-      Option.bind (Logs.Tag.find timestamp_tag tags) @@ fun () ->
+      Option.bind (Logs.Tag.find Server.timestamp_tag tags) @@ fun () ->
       if predictable_mode then Some Ptime.epoch else Some (Ptime_clock.now ())
     in
     pp_header ppf timestamp level;
@@ -2486,14 +2490,17 @@ let () =
        security section of the documentation.";
     exit 1);
   Logs.set_level ~all:true (Some Logs.Info);
-  parse_cmd ();
-  Secure.add_assets @@ Option.get !gw_prefix;
-  Secure.add_assets @@ Option.get !etc_prefix;
-  if !check then switch_check ();
-  if !debug then switch_debug ();
-  make_socket_dir !socket_dir;
-  setup_log ~predictable_mode:!predictable_mode !log_file;
-  try main () with
+  let opts = parse_cmd () in
+  Secure.add_assets opts.gw_prefix;
+  Secure.add_assets opts.etc_prefix;
+  if opts.check then switch_check ();
+  if opts.debug then switch_debug ();
+  make_socket_dir opts.socket_dir;
+  setup_log ~predictable_mode:opts.predictable_mode opts.log;
+  try
+    main ?interface:opts.interface ~port:opts.port ~daemon:opts.daemon
+      ~predictable_mode:opts.predictable_mode ()
+  with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Logs.err (fun k ->
           k

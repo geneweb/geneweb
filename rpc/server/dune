@@ -15,6 +15,7 @@
   logs
   logs.fmt
   logs.lwt
+  ptime
   yojson)
  (preprocess
   (pps lwt_ppx)))

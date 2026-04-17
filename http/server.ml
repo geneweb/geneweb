@@ -4,6 +4,11 @@ module Compat = Geneweb_compat
 
 let src = Logs.Src.create ~doc:"Wserver" __MODULE__
 
+let timestamp_tag : unit Logs.Tag.def =
+  Logs.Tag.def "timestamp" ~doc:"POSIX timestamp" Fmt.nop
+
+let timestamp = Logs.Tag.(empty |> add timestamp_tag ())
+
 module Log = (val Logs.src_log src : Logs.LOG)
 
 type handler = Unix.sockaddr * string list -> string -> string -> unit
@@ -325,6 +330,11 @@ let resolve_addr ?addr port =
   | Some a -> Unix.getaddrinfo a port hints
   | None -> Unix.getaddrinfo "" port (Unix.AI_PASSIVE :: hints)
 
+let pp_sockaddr ppf s =
+  match s with
+  | Unix.ADDR_UNIX s -> Fmt.string ppf s
+  | ADDR_INET (a, p) -> Fmt.pf ppf "%s:%d" (Unix.string_of_inet_addr a) p
+
 let try_addresses l =
   let rec loop l =
     match l with
@@ -333,7 +343,7 @@ let try_addresses l =
         Unix.setsockopt socket Unix.SO_REUSEADDR true;
         match Unix.bind socket ai_addr with
         | exception _ -> loop l
-        | () -> Some socket)
+        | () -> Some (ai_addr, socket))
     | [] -> None
   in
   loop l
@@ -359,13 +369,10 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
                     Fmt.(option ~none:(const string "any") string)
                     addr port);
               exit 2
-          | Some socket ->
+          | Some (addr, socket) ->
               Unix.listen socket max_pending_requests;
-              let tm = Unix.localtime (Unix.time ()) in
               Log.info (fun k ->
-                  k "Ready %4d-%02d-%02d %02d:%02d." (1900 + tm.Unix.tm_year)
-                    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour
-                    tm.Unix.tm_min);
+                  k ~tags:timestamp "Ready on %a." pp_sockaddr addr);
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
               accept_connections ~timeout ~n_workers callback socket))

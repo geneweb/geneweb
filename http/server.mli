@@ -2,6 +2,8 @@
 
 type handler = Unix.sockaddr * string list -> string -> string -> unit
 
+val timestamp_tag : unit Logs.Tag.def
+
 val start :
   ?addr:string ->
   port:int ->
