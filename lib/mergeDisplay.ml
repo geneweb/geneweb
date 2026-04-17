@@ -60,48 +60,41 @@ let print conf base p =
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
   Util.hidden_input conf "i"
     (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+  let ph =
+    Format.sprintf "%s.%s %s"
+      (transl_nth conf "first name/first names" 0)
+      (transl conf "number")
+      (transl_nth conf "surname/surnames" 0)
+  in
   Output.print_sstring conf
-    "<span class=\"form-row align-items-center\"><span \
-     class=\"col-auto\"><span class=\"custom-control custom-radio\"><input \
-     type=\"radio\" class=\"custom-control-input\" name=\"select\" \
-     id=\"input\" value=\"input\" checked><label \
-     class=\"custom-control-label\"for=\"input\">";
+    {|<div class="form-check d-flex align-items-center gap-2 mb-2">|};
+  Output.print_sstring conf
+    {|<input class="form-check-input" type="radio" name="select" id="input" value="input" checked>|};
+  Output.print_sstring conf
+    {|<label class="form-check-label text-nowrap" for="input">|};
   Output.print_sstring conf (transl conf "any individual in the base");
-  Output.print_sstring conf
-    "</label></span></span><span class=\"col-auto\"><input type=\"text\" \
-     class=\"form-control\" name=\"n\" placeholder=\"";
-  Output.print_sstring conf (transl_nth conf "first name/first names" 0);
-  Output.print_sstring conf ".";
-  Output.print_sstring conf (transl conf "number");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "surname/surnames" 0);
-  Output.print_sstring conf "\" title=\"";
-  Output.print_sstring conf (transl_nth conf "first name/first names" 0);
-  Output.print_sstring conf ".";
-  Output.print_sstring conf (transl conf "number");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "surname/surnames" 0);
-  Output.print_sstring conf
-    "\" size=\"50\" id=\"inlineinput\" autofocus></span></span>";
+  Output.print_sstring conf {|</label>|};
+  Output.printf conf
+    {|<input type="text" class="form-control form-control-sm w-auto" name="n" id="inlineinput" placeholder="%s" title="%s" size="50" autofocus>|}
+    ph ph;
+  Output.print_sstring conf {|</div>|};
   if list <> [] then
     List.iter
       (fun p ->
-        Output.print_sstring conf "<div class=\"custom-control custom-radio\">";
+        Output.print_sstring conf {|<div class="form-check ms-1">|};
         Output.print_sstring conf
-          "<input type=\"radio\" class=\"custom-control-input\" \
-           name=\"select\" id=\"";
+          {|<input type="radio" class="form-check-input" name="select" id="|};
         Output.print_string conf
           (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-        Output.print_sstring conf "\" value=\"";
+        Output.print_sstring conf {|" value="|};
         Output.print_string conf
           (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-        Output.print_sstring conf "\">\n";
-        Output.print_sstring conf "<label class=\"custom-control-label\" for=\"";
+        Output.print_sstring conf {|"><label class="form-check-label" for="|};
         Output.print_string conf
           (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-        Output.print_sstring conf "\">";
+        Output.print_sstring conf {|">|};
         print_person_info conf base p;
-        Output.print_sstring conf "</label></div>")
+        Output.print_sstring conf {|</label></div>|})
       list;
   Output.print_sstring conf
     {|<button type="submit" class="btn btn-primary btn-lg mt-2">|};
