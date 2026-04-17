@@ -612,6 +612,12 @@ let noop =
   let doc = "Internal option. DO NOT USE." in
   C.Arg.(value & flag & info [ "noop" ] ~docs:tracing_section ~doc)
 
+let debug_flags =
+  let open C.Term.Syntax in
+  let+ debug = debug and+ check = check and+ verbosity = verbosity in
+  let debug = if check then true else debug in
+  (debug, check, verbosity)
+
 let t =
   let open C.Term.Syntax in
   let doc = "Geneweb daemon" in
@@ -661,9 +667,7 @@ let t =
   and+ browser_lang = browser_lang
   and+ setup_link = setup_link
   and+ plugins = plugins
-  and+ debug = debug
-  and+ check = check
-  and+ verbosity = verbosity
+  and+ debug, check, verbosity = debug_flags
   and+ log = log
   and+ trace_failed_password = trace_failed_password
   and+ _ : bool = no_fork
