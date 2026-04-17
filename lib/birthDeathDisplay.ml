@@ -142,8 +142,7 @@ let print_death conf base =
     in
     aux 0 (fst ages_nb) (fst ages_sum);
     aux 1 (snd ages_nb) (snd ages_sum);
-    Output.print_sstring conf
-      {|<br><div align="center"><hr width="50%"></div><br>|};
+    Output.print_sstring conf {|<hr class="w-50 my-3">|};
     let aux name def =
       string_of_int
       @@
@@ -156,40 +155,36 @@ let print_death conf base =
     in
     let bm = aux "bm" (if conf.predictable_mode then 1 else conf.today.month) in
     let bd = aux "bd" (if conf.predictable_mode then 1 else conf.today.day) in
-    Output.print_sstring conf {|<form method="get" action="|};
-    Output.print_sstring conf conf.command;
-    Output.print_sstring conf {|"><p>|};
+    Output.printf conf
+      {|<form method="get" action="%s">
+    <div class="d-flex align-items-center gap-2 mt-2">|}
+      conf.command;
     Util.hidden_env conf;
     Util.hidden_input conf "m" (Adef.encoded "LD");
-    Output.print_sstring conf
-    @@ Printf.sprintf
-         (fcapitale (ftransl conf "the latest %t deaths"))
-         (fun _ ->
-           {|<input name="k" value="|} ^ string_of_int len
-           ^ {|" size="4" maxlength="4">|});
-    Output.print_sstring conf "\n... (";
-    Output.print_sstring conf (transl conf "before");
-    Output.print_sstring conf "...\n";
-    let aux name value size =
-      Output.print_sstring conf {|<input name="|};
-      Output.print_sstring conf name;
-      Output.print_sstring conf {|" value="|};
-      Output.print_sstring conf value;
-      Output.print_sstring conf {|" size="|};
-      Output.print_sstring conf size;
-      Output.print_sstring conf {|" maxlength="|};
-      Output.print_sstring conf size;
-      Output.print_sstring conf {|">|}
+    let label_k =
+      Printf.sprintf
+        (fcapitale (ftransl conf "the latest %t deaths"))
+        (fun () -> string_of_int len)
     in
-    aux "by" by "4";
-    aux "bm" bm "2";
-    aux "bd" bd "2";
-    Output.print_sstring conf ")";
-    Output.print_sstring conf
-      {|<button type="submit" class="btn btn-primary btn-lg">|};
+    Output.printf conf
+      {|<label for="ld_k">%s</label>
+<input type="number" id="ld_k" name="k" value="%d"
+  class="form-control" style="width:10ch" step="1" min="1">|}
+      label_k len;
+    (* TODO: reorder YYYYMMDD inputs function of chosen langage *)
+    Output.printf conf
+      {|<label for="ld_by">%s</label>
+    <input type="number" id="ld_by" name="by" value="%s"
+      class="form-control" style="width:10ch">
+    <input type="number" id="ld_bm" name="bm" value="%s"
+      class="form-control" style="width:8ch" min="1" max="12">
+    <input type="number" id="ld_bd" name="bd" value="%s"
+      class="form-control" style="width:8ch" min="1" max="31">|}
+      (transl conf "before") by bm bd;
+    Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
     transl_nth conf "validate/delete" 0
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf "</button></p></form>");
+    Output.print_sstring conf {|</button></div></form>|});
   Hutil.trailer conf
 
 let print_oldest_alive conf base =
@@ -461,10 +456,10 @@ let print_pyramid_table conf ~men ~wom ~nb_intervals ~interval ~row_label_side =
     in
     Output.printf conf
       {|<tr>%s
-  <td class="text-right">%s %s</td>
-  <td class="text-center px-1">%s</td>
-  <td>%s %s</td>
-%s</tr>|}
+    <td class="text-end">%s %s</td>
+    <td class="text-center px-1">%s</td>
+    <td>%s %s</td>
+  %s</tr>|}
       (side_html i) (nb_html nm) (bar nm "pyr_male.png") center
       (bar nw "pyr_female.png") (nb_html nw) (side_html i)
   done;
@@ -483,14 +478,13 @@ let print_pyramid_form_tail conf ~interval ~limit =
   Output.printf conf
     {|<label for="int" class="ms-3">%s</label>
 <input type="number" id="int" name="int"
-       value="%d" class="form-control col-1 ms-2"
+       value="%d" class="form-control" style="width:8ch"
        step="1" min="1" max="130">
 <label for="lim" class="ms-3">%s</label>
 <input type="number" id="lim" name="lim"
-       value="%d" class="form-control col-1 ms-2"
+       value="%d" class="form-control" style="width:8ch"
        step="1" min="0">
-<button type="submit"
-        class="btn btn-primary ms-3">OK</button>|}
+<button type="submit" class="btn btn-primary ms-3">OK</button>|}
     (Utf8.capitalize_fst (transl conf "interval"))
     interval
     (Utf8.capitalize_fst (transl conf "limit"))
@@ -510,7 +504,7 @@ let print_population_pyramid conf base =
   let open_form hidden_extra =
     Output.printf conf
       {|<form method="get" class="mt-2" action="%s">
-<div class="form-inline">|}
+  <div class="d-flex align-items-center flex-wrap gap-2">|}
       commd_s;
     hidden_env conf;
     Util.hidden_input conf "m" (Adef.encoded "POP_PYR");
@@ -538,7 +532,7 @@ let print_population_pyramid conf base =
         {|<a href="%sm=POP_PYR" title="%s"
   class="btn btn-secondary btn-sm mb-1 me-3">&#176;</a>%s (%s)|}
         commd_s
-        (Utf8.capitalize_fst (transl conf "population pyramid"))
+        (Utf8.capitalize_fst (transl conf "pon pyramid"))
         (Utf8.capitalize_fst (transl conf "death pyramid"))
         range
     in
@@ -551,13 +545,13 @@ let print_population_pyramid conf base =
       ~label_key:"number of deceased persons" ~sum_men ~sum_wom;
     open_form {|<input type="hidden" name="t" value="D">|};
     Output.printf conf
-      {|<label for="from" class="me-1">%s</label>
+      {|<label for="from">%s</label>
 <input type="number" id="from" name="from" value="%d"
-  class="form-control col-1 ms-1" step="1">
-<label for="to" class="ms-3 me-1">… %s</label>
+  class="form-control" style="width:10ch" step="1">
+<label for="to">… %s</label>
 <input type="number" id="to" name="to" value="%d"
-  class="form-control col-1 ms-1" step="1">|}
-      (Utf8.capitalize_fst (transl_nth conf "from/to (date year)" 0))
+  class="form-control" style="width:10ch" step="1">|}
+      (transl_nth conf "from/to (date year)" 0 |> Utf8.capitalize_fst)
       from_year
       (transl_nth conf "from/to (date year)" 1)
       to_year;
@@ -595,8 +589,8 @@ let print_population_pyramid conf base =
     Output.printf conf
       {|<label for="yr">%s</label>
 <input type="number" id="yr" name="y" value="%d"
-  class="form-control col-1 ms-2" step="1">|}
-      (Utf8.capitalize_fst (transl_nth conf "year/month/day" 0))
+  class="form-control" style="width:9ch" step="1">|}
+      (transl_nth conf "year/month/day" 0 |> Utf8.capitalize_fst)
       at_year;
     print_pyramid_form_tail conf ~interval ~limit;
     Output.print_sstring conf {|</div></form>|};
