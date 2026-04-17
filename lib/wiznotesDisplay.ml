@@ -232,31 +232,35 @@ let wizard_list_from_dir conf base =
   | None -> []
 
 let print_search_form conf from_wiz =
-  Output.print_sstring conf {|<table><tr><td align="|};
-  Output.print_sstring conf conf.right;
-  Output.print_sstring conf {|"><form method="GET" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|"><p>|};
+  Output.printf conf
+    {|<div class="mt-3">
+<form class="d-flex align-items-center gap-2" method="get" action="%s">|}
+    conf.command;
   hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "WIZNOTES_SEARCH");
-  Output.print_sstring conf {|<input name="s" size="30" maxlength="40" value="|};
+  if from_wiz <> "" then Util.hidden_input conf "z" (Mutil.encode from_wiz);
+  Output.print_sstring conf
+    {|<input name="s" size="30" maxlength="40" class="form-control w-auto" value="|};
   (match p_getenv conf.env "s" with
   | Some s -> Output.print_string conf (Util.escape_html s)
   | None -> ());
   Output.print_sstring conf {|">|};
-  if from_wiz <> "" then Util.hidden_input conf "z" (Mutil.encode from_wiz);
-  Output.print_sstring conf
-    {|<br><label><input type="checkbox" name="c" value="on"|};
-  (match p_getenv conf.env "c" with
-  | Some "on" -> Output.print_sstring conf " checked=\"checked\""
-  | Some _ | None -> ());
-  Output.print_sstring conf {|>|};
-  Output.print_sstring conf (transl_nth conf "search/case sensitive" 1);
-  Output.print_sstring conf {| |};
-  Output.print_sstring conf {|</label><input type="submit" value="|};
+  Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
+  Output.printf conf
+    {|<input type="checkbox" name="c" value="on" class="form-check-input" id="wiz_case"%s>|}
+    (match p_getenv conf.env "c" with
+    | Some "on" -> " checked"
+    | Some _ | None -> "");
+  Output.printf conf
+    {|<label class="form-check-label" for="wiz_case">%s</label>|}
+    (transl_nth conf "search/case sensitive" 1);
+  Output.print_sstring conf {|</div>|};
+  Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
   transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf {|"></p></form></td></tr></table>|}
+  Output.print_sstring conf {|</button>
+</form>
+</div>|}
 
 let print_main conf base auth_file =
   let wiztxt =

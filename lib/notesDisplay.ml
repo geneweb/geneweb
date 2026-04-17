@@ -73,10 +73,11 @@ let rec is_restricted conf base anc_l =
       if is_ancestor conf base anc then false else is_restricted conf base l
 
 let print_search_form conf from_note =
-  Output.print_sstring conf "<div class=\"form-group mt-3\">\n";
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
+  Output.printf conf
+    {|<div class="mt-3">
+<form class="d-flex align-items-center gap-2" method="get" action="%s">|}
+    conf.command;
   hidden_env conf;
-  Output.print_sstring conf "<div class=\"form-check form-check-inline\">";
   Output.print_sstring conf
     {|<input type="hidden" name="m" value="MISC_NOTES_SEARCH">|};
   (match from_note with
@@ -85,20 +86,21 @@ let print_search_form conf from_note =
       Output.print_string conf (Util.escape_html n);
       Output.print_sstring conf {|">|}
   | None -> ());
-  Output.print_sstring conf {|<input type="text" name="s" size="40"|};
-  Output.print_sstring conf {| class="form-control col-8" value="|};
+  Output.print_sstring conf
+    {|<input type="text" name="s" size="40" class="form-control w-auto" value="|};
   (match p_getenv conf.env "s" with
   | Some s -> Output.print_string conf (Util.escape_html s)
   | None -> ());
   Output.print_sstring conf "\">";
-  Output.print_sstring conf "<input type=\"checkbox\" name=\"c\" value=\"on\"";
-  Output.printf conf " class=\"form-check-input ms-2\" id=\"case\"%s>"
+  Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
+  Output.printf conf
+    {|<input type="checkbox" name="c" value="on" class="form-check-input" id="case"%s>|}
     (match p_getenv conf.env "c" with
     | Some "on" -> " checked"
     | Some _ | None -> "");
-  Output.print_sstring conf "<label class=\"form-check-label\" for=\"case\">";
-  Output.printf conf "%s" (transl_nth conf "search/case sensitive" 1);
-  Output.print_sstring conf "</label></div>\n";
+  Output.printf conf {|<label class="form-check-label" for="case">%s</label>|}
+    (transl_nth conf "search/case sensitive" 1);
+  Output.print_sstring conf "</div>";
   Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
   transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
