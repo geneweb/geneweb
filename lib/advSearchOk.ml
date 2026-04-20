@@ -739,39 +739,6 @@ let advanced_search conf base max_answers =
           |> snd
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
-      let list_aux ?(filter_marital = false) strings_of persons_of n_list mode =
-        let persons =
-          List.map
-            (fun x ->
-              let eq =
-                AdvancedSearchMatch.match_name ~search_list:n_list ~mode
-              in
-              let istrs = strings_of base x in
-              List.fold_left
-                (fun acc istr ->
-                  let str = Mutil.nominative (Gwdb.sou base istr) in
-                  if eq (List.map Name.lower @@ Name.split str) then istr :: acc
-                  else acc)
-                [] istrs)
-            n_list
-          |> List.flatten |> List.sort_uniq compare
-          |> List.map (Gwdb.spi_find @@ persons_of base)
-          |> List.flatten
-        in
-        if filter_marital then
-          List.filter
-            (fun person_id ->
-              let p = Gwdb.poi base person_id in
-              let match_name n =
-                let ns = List.map Name.lower @@ Name.split n in
-                AdvancedSearchMatch.match_name ~search_list:n_list ~mode ns
-              in
-              SearchName.filter_marital_names
-                ~remove_marital_names_match_only:(fn_list = []) match_name conf
-                base p)
-            persons
-        else persons
-      in
       if
         sn_list <> []
         && get_name_search_mode "exact_surname" = `Not_Exact_Prefix
@@ -809,17 +776,53 @@ let advanced_search conf base max_answers =
         in
         (List.map (Gwdb.poi base) list, List.length list)
       else
+        let persons_of_name_list strings_of persons_of n_list mode =
+          List.map
+            (fun x ->
+              let eq =
+                AdvancedSearchMatch.match_name ~search_list:n_list ~mode
+              in
+              let istrs = strings_of base x in
+              List.fold_left
+                (fun acc istr ->
+                  let str = Mutil.nominative (Gwdb.sou base istr) in
+                  if eq (List.map Name.lower @@ Name.split str) then istr :: acc
+                  else acc)
+                [] istrs)
+            n_list
+          |> List.flatten |> List.sort_uniq compare
+          |> List.map (Gwdb.spi_find @@ persons_of base)
+          |> List.flatten
+        in
+
         let skip_fname, skip_sname, list =
           if sn_list <> [] then
-            ( false,
-              true,
-              list_aux ~filter_marital:true Gwdb.base_strings_of_surname
-                Gwdb.persons_of_surname sn_list
-                (get_name_search_mode "exact_surname") )
+            let name_search_mode = get_name_search_mode "exact_surname" in
+            let list =
+              persons_of_name_list Gwdb.base_strings_of_surname
+                Gwdb.persons_of_surname sn_list name_search_mode
+            in
+            let list =
+              if fn_list = [] then
+                List.filter
+                  (fun person_id ->
+                    let p = Gwdb.poi base person_id in
+                    let match_name n =
+                      let ns = List.map Name.lower @@ Name.split n in
+                      AdvancedSearchMatch.match_name ~search_list:sn_list
+                        ~mode:name_search_mode ns
+                    in
+                    SearchName.filter_marital_names
+                      ~remove_marital_names_match_only:true match_name conf base
+                      p)
+                  list
+              else list
+            in
+            (false, true, list)
           else
             ( true,
               false,
-              list_aux Gwdb.base_strings_of_first_name
+              persons_of_name_list Gwdb.base_strings_of_first_name
                 Gwdb.persons_of_first_name fn_list
                 (get_name_search_mode "exact_first_name") )
         in
