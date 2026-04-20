@@ -317,7 +317,7 @@ let output_surname_index ?(include_marital_names = false) base tmp_snames_inx
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.Dbdisk.data)
-    (fun istr p1 p2 -> Int.compare p1.key_index p2.key_index)
+    (fun _ p1 p2 -> Int.compare p1.key_index p2.key_index)
     (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
 
