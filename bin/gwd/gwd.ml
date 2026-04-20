@@ -2111,7 +2111,6 @@ let retrieve_secret_salt () =
   | s -> s
 
 let daemonize ~daemon k =
-  assert Sys.unix;
   if daemon then
     match Unix.fork () with
     | 0 ->
@@ -2126,6 +2125,8 @@ let create_cnt_dir () =
   try Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
   with Sys_error e ->
     Logs.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
+
+let slashify = String.map (fun c -> match c with '\\' -> '/' | _ -> c)
 
 let pp_item pp ppf (name, v) =
   Fmt.pf ppf "%a: %a@\n" Fmt.(styled (`Fg `Blue) string) name pp v
@@ -2151,6 +2152,13 @@ let display_infos ?interface ~port () =
       ("images_dir", !images_dir);
     ]
   in
+  let pp_path ppf s =
+    (* FIXME: The path on Windows are displayed with `\`. We need to replace
+       them with `/`. After introduction an abstract type for paths, this
+       transform should be done in a single printer. *)
+    let s = slashify s in
+    Fmt.Dump.string ppf s
+  in
   Logs.app (fun k ->
       let s =
         Fmt.str "Geneweb %s\nListen to %s:%d..." Version.ver hostname port
@@ -2161,7 +2169,7 @@ let display_infos ?interface ~port () =
       k "\n%a%a%a: %a"
         Fmt.(list (pp_item string))
         git_info
-        Fmt.(list (pp_item Dump.string))
+        Fmt.(list (pp_item pp_path))
         path_info
         Fmt.(styled (`Fg `Blue) string)
         "assets"
@@ -2241,10 +2249,6 @@ let read_input len =
        done
      with End_of_file -> ());
     Buffer.contents buff
-
-let slashify s =
-  let conv_char i = match s.[i] with '\\' -> '/' | x -> x in
-  String.init (String.length s) conv_char
 
 let main ?interface ~port ~daemon ~predictable_mode () =
   let gwd_cmd =
