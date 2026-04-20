@@ -190,7 +190,7 @@ let base_dir =
   let absent = Dirs.name default_base_dir in
   C.Arg.(
     value
-    & opt dirpath (Dirs.path default_base_dir)
+    & opt dirpath (Secure.base_dir ())
     & info [ "bd"; "base-dir" ] ~absent ~docs:dirs_section ~doc)
 
 let socket_dir =
