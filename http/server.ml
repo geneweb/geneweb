@@ -320,9 +320,10 @@ let accept_connections ~timeout ~n_workers callback socket =
 
 let resolve_addr ?addr port =
   let port = string_of_int port in
+  let hints = [ Unix.AI_SOCKTYPE Unix.SOCK_STREAM ] in
   match addr with
-  | Some a -> Unix.getaddrinfo a port []
-  | None -> Unix.getaddrinfo "" port [ Unix.AI_PASSIVE ]
+  | Some a -> Unix.getaddrinfo a port hints
+  | None -> Unix.getaddrinfo "" port (Unix.AI_PASSIVE :: hints)
 
 let try_addresses l =
   let rec loop l =
