@@ -421,7 +421,7 @@ let convert ~from ~to_ dmy =
           prec = YearInt (convert_dmy2 ~from ~to_ dmy2);
         }
 
-let normalize_interval ~calendar date =
+let mangle_for_display ~calendar date =
   let to_interval ~calendar date =
     let date' =
       convert ~from:Dgregorian ~to_:calendar

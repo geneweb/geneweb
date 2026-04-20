@@ -288,7 +288,7 @@ and string_of_dmy ?with_short_month conf d =
 
 and gregorian_precision ?with_short_month ~calendar conf d =
   let d =
-    Date.normalize_interval ~calendar:Dgregorian
+    Date.mangle_for_display ~calendar:Dgregorian
       (Date.convert ~from:calendar ~to_:Dgregorian d)
   in
   let format_date d =
