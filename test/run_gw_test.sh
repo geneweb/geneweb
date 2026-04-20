@@ -126,33 +126,38 @@ fi
 if test "$GWD2START" && test -z "$cgitest"; then
 if test -n "$LEXICON"; then
     test -f "$LEXICON" || { echo "invalid LEXICON $LEXICON file"; exit 1; }
-    gwdopt="$gwdopt --add_lexicon $LEXICON"
+    gwdopt="$gwdopt --add-lexicon=$LEXICON"
 fi
 
 if test -n "$TAGS"; then
     test -f "$TAGS" || { echo "invalid TAGS $TAGS file"; exit 1; }
-    gwdopt="$gwdopt --allowed_tags $TAGS"
+    gwdopt="$gwdopt --allowed-tags=$TAGS"
 fi
 if test "$test_diff" || test "$set_ref"; then
-    gwdopt="$gwdopt -predictable_mode -n_workers 0"
+    gwdopt="$gwdopt --predictable-mode --n-workers=0"
+fi
+if test -n "$debug"; then
+    gwdopt="$gwdopt --debug"
 fi
 
 pgrep gwd >/dev/null && \
     { killall gwd || { echo "unable to kill previous gwd process"; exit 1; }; }
 
+test -n "$debug" && set -x
 OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
-  -setup_link \
-  -bd $BASES_DIR \
-  -hd $BIN_DIR \
+  --setup-link \
+  --bd=$BASES_DIR \
+  --hd=$BIN_DIR \
   $gwdopt \
-  -trace_failed_passwd \
-  -robot_xcl 10000,1 \
-  -conn_tmout 3600 \
-  -lang en \
-  -log "<stderr>" \
-  -plugins -unsafe $BIN_DIR/plugins \
+  --trace-failed-password \
+  --ban-threshold=10000,1 \
+  --connection-timeout=3600 \
+  --default-lang=en \
+  --log='<stderr>' \
+  --plugins=uf:$BIN_DIR/plugins \
   2>> $GWDLOG &
 fi
+set +x
 
 if test "$test_diff" || test "$set_ref"; then
   for xx in run new; do # /tmp/new not used at this time
@@ -277,7 +282,7 @@ update_gwf () {
     fi
 }
 
-test -n "$debug" && set -x
+#test -n "$debug" && set -x
 if test -z "$cgitest"; then
 #!/bin/bash
 
