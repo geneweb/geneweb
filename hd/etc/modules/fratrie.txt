@@ -44,7 +44,7 @@
 %end;
 
 %if;(has_parents and has_siblings)
-  <h2 class="mt-2 mt-lg-0 w-100">%nn;
+  <h2 class="h3 mt-2 mt-lg-0 w-100">%nn;
     %if;(b.full_siblings!="no")
       [*full siblings]%nn;
     %else;
@@ -146,7 +146,7 @@
 %(aaa2 %half_father;, %half_mother;<br>%)
 
 %if;(op_m=1 and has_parents and (half_father!=0 or half_mother!=0))
-  <h2>[*half-brothers/half-sisters/half-siblings]2</h2>
+  <h2 class="h3">[*half-brothers/half-sisters/half-siblings]2</h2>
   %if;(half_father!=0)
       %apply;on_side%with;%apply;very_short_display_person("father")%end;
       %if;(father.nb_families>1 and half_father!=0)
@@ -195,7 +195,7 @@
     %end;
 %( frères et sœurs complet : deux listes de demi-frères côte-à-côte %)
 %elseif;(op_m=3 and has_parents and (half_father!=0 or half_mother!=0))
-  <h2>[*half-brothers/half-sisters/half-siblings]2</h2>
+  <h2 class="h3">[*half-brothers/half-sisters/half-siblings]2</h2>
   <table class="table w-100">
       <tr>
         %if;(half_father!=0)
@@ -256,7 +256,7 @@
     </table>
 %( Freres et soeurs complet photo (from ex-templf) %)
 %elseif;(op_m=4 and has_parents and (half_father!=0 or half_mother!=0))
-  <h2>[*half-brothers/half-sisters/half-siblings]2</h2>
+  <h2 class="h3">[*half-brothers/half-sisters/half-siblings]2</h2>
   <table style="border-width:%border;;width:100%%">
     <tr>
       %foreach;parent;
