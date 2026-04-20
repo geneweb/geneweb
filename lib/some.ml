@@ -1295,12 +1295,36 @@ let search_surname_list conf base x =
 let search_surname_print conf base _not_found_fun x =
   let extra = get_extra_surnames conf in
   let list0, iperl0, _name_inj = search_surname_list conf base x in
-  let extra_names =
-    List.concat_map
+  (* For alternates given via v1, v2, ..., match strictly: accept only
+     strip_lower equality with the query, suppressing the crush_lower
+     phonetic fallback of [persons_of_fsname]. Unlike the primary query
+     [x], these variants are explicit user selections (typically picked
+     from suggestions) and must not bring in unrelated surnames that
+     merely share a phonetic key. *)
+  let extra_results =
+    List.map
       (fun q ->
         let l, _, _ = search_surname_list conf base q in
-        List.concat_map (fun (_, (strl, _)) -> StrSet.elements strl) l)
+        let qs = Name.strip_lower q in
+        List.filter
+          (fun (_, (strl, _)) ->
+            StrSet.exists (fun s -> Name.strip_lower s = qs) strl)
+          l)
       extra
+  in
+  let extra_names =
+    List.concat_map
+      (fun l -> List.concat_map (fun (_, (strl, _)) -> StrSet.elements strl) l)
+      extra_results
+  in
+  let extra_iperl =
+    List.fold_left
+      (fun acc l ->
+        List.fold_left
+          (fun acc (_, (_, il)) ->
+            List.fold_left (fun s i -> Iper.Set.add i s) acc il)
+          acc l)
+      Iper.Set.empty extra_results
   in
   let primary_strl =
     List.fold_left
@@ -1323,12 +1347,7 @@ let search_surname_print conf base _not_found_fun x =
   match p_getenv conf.env "o" with
   | Some "i" ->
       let iperl_set =
-        List.fold_left
-          (fun acc q ->
-            let _, ip, _ = search_surname_list conf base q in
-            List.fold_left (fun s i -> Iper.Set.add i s) acc ip)
-          (List.fold_left (fun s i -> Iper.Set.add i s) Iper.Set.empty iperl0)
-          extra
+        List.fold_left (fun s i -> Iper.Set.add i s) extra_iperl iperl0
       in
       let iperl = Iper.Set.elements iperl_set in
       let pl =
@@ -1345,12 +1364,7 @@ let search_surname_print conf base _not_found_fun x =
       print_family_alphabetic ~extra_names ~suggestions x conf base pl
   | _ -> (
       let all_iperl =
-        List.fold_left
-          (fun acc q ->
-            let _, ip, _ = search_surname_list conf base q in
-            List.fold_left (fun s i -> Iper.Set.add i s) acc ip)
-          (List.fold_left (fun s i -> Iper.Set.add i s) Iper.Set.empty iperl0)
-          extra
+        List.fold_left (fun s i -> Iper.Set.add i s) extra_iperl iperl0
         |> Iper.Set.elements
       in
       let bhl = select_ancestors conf base names_lower all_iperl in
