@@ -118,7 +118,7 @@
       %incr_count2;
     %end;
   %end;
-  <h2 class="mt-2 w-100">
+  <h2 class="h3 mt-2 w-100">
     %if;(op_m!=1)
       %if;(count2>0)
         [*marriage/marriages]f%nn;

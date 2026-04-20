@@ -72,7 +72,7 @@
   %foreach;event_witness_relation;%incr_count;%end;
   %let;cnt;%count;%in;
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
-  <h2>[*relation/relations]1%nn;
+  <h2 class="h3">[*relation/relations]1%nn;
     %if;(cnt>0)
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>%nn;
@@ -126,7 +126,7 @@
 %( relation_complete includes witness of his events and witness at other's events %)
 %elseif;(op_m=2 and rel_nbr>0)
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
-  <h2 id="relations" >[*relation/relations]1
+  <h2  class="h3" id="relations" >[*relation/relations]1
   %if;(not cancel_links)
     <a %apply;relations_tree(l_ref)>
     <img src="%images_prefix;gui_create.png" height="20" alt="Tree">

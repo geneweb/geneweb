@@ -12,7 +12,7 @@
            %end;%nn;
 %in;
 %if;((op_m=1 or op_m=3 or op_m=4 or (op_m=5 and op_ph=0)) and has_parents)
-  <h2>[*parents]</h2>
+  <h2 class="h3">[*parents]</h2>
   <ul>
   %apply;li_SD("father")
   %if;(op_m=1 or op_m=3)
@@ -84,7 +84,7 @@
         %end;
       </td>
       <td>
-        <h2>[*parents]</h2>
+        <h2 class="h3">[*parents]</h2>
         %if;(has_birth_date and (father.has_birth_date or mother.has_birth_date))
           <table style="border-width:%border;">
             <tr>
@@ -140,7 +140,7 @@
 
 %( Parents photo %)
 %elseif;(op_m=2 and has_parents)
-  <h2>[*parents]</h2>
+  <h2 class="h3">[*parents]</h2>
   <div class="d-inline-flex flex-wrap">
     %foreach;parent;
       <div class="%if;(parent.is_male)me-2%else;mb-1%end;">

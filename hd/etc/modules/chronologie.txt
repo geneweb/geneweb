@@ -195,7 +195,7 @@
   %let;evarevp;%if;(e.allevt!="" and e.allevt="on")1%else;0%end;%in; %(events parents %)
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
   <div class="d-flex justify-content-between">
-    <h2 class="my-1" id="c">[*time line]%nn;
+    <h2 class="h3 my-1" id="c">[*time line]%nn;
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>%nn;
           <img src="%images_prefix;gui_create.png" class="ms-1 mb-1" height="18" alt="Tree">
