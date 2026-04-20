@@ -31,14 +31,15 @@ let select (type a)
         let x = get base i in
         match get_date x with
         | Some (Adef.Dgreg (d, cal)) ->
+            let d_greg = Date.approx_gregorian ~from:cal d in
             let aft =
               match ref_date with
-              | Some ref_date -> Date.compare_dmy ref_date d <= 0
+              | Some ref_date -> Date.compare_dmy ref_date d_greg <= 0
               | None -> false
             in
             if aft then (q, len)
             else
-              let e = (x, d, cal) in
+              let e = (x, d_greg, cal) in
               if len < n then (Q.add e q, len + 1)
               else (snd (Q.take (Q.add e q)), len)
         | _ -> (q, len))
