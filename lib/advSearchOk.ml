@@ -740,30 +740,37 @@ let advanced_search conf base max_answers =
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
       let list_aux ?(filter_marital = false) strings_of persons_of n_list mode =
-        List.map
-          (fun x ->
-            let eq = AdvancedSearchMatch.match_name ~search_list:n_list ~mode in
-            let istrs = strings_of base x in
-            List.fold_left
-              (fun acc istr ->
-                let str = Mutil.nominative (Gwdb.sou base istr) in
-                if eq (List.map Name.lower @@ Name.split str) then istr :: acc
-                else acc)
-              [] istrs)
-          n_list
-        |> List.flatten |> List.sort_uniq compare
-        |> List.map (Gwdb.spi_find @@ persons_of base)
-        |> List.flatten
-        |> List.filter (fun person_id ->
-               person_id |> Gwdb.poi base |> fun p ->
-               (not filter_marital)
-               || SearchName.filter_marital_names
-                    ~remove_marital_names_match_only:(fn_list = [])
-                    (fun n ->
-                      let ns = List.map Name.lower @@ Name.split n in
-                      AdvancedSearchMatch.match_name ~search_list:n_list ~mode
-                        ns)
-                    conf base p)
+        let persons =
+          List.map
+            (fun x ->
+              let eq =
+                AdvancedSearchMatch.match_name ~search_list:n_list ~mode
+              in
+              let istrs = strings_of base x in
+              List.fold_left
+                (fun acc istr ->
+                  let str = Mutil.nominative (Gwdb.sou base istr) in
+                  if eq (List.map Name.lower @@ Name.split str) then istr :: acc
+                  else acc)
+                [] istrs)
+            n_list
+          |> List.flatten |> List.sort_uniq compare
+          |> List.map (Gwdb.spi_find @@ persons_of base)
+          |> List.flatten
+        in
+        if filter_marital then
+          List.filter
+            (fun person_id ->
+              let p = Gwdb.poi base person_id in
+              let match_name n =
+                let ns = List.map Name.lower @@ Name.split n in
+                AdvancedSearchMatch.match_name ~search_list:n_list ~mode ns
+              in
+              SearchName.filter_marital_names
+                ~remove_marital_names_match_only:(fn_list = []) match_name conf
+                base p)
+            persons
+        else persons
       in
       if
         sn_list <> []
