@@ -92,7 +92,7 @@ let print_variant_controls conf suggestions =
     (fun i sn ->
       Output.printf conf
         {|<a href="%s"
- class="badge badge-info me-1 mb-1"
+ class="badge text-bg-primary me-1 mb-1"
 >%s <i class="fa fa-xmark ms-1"></i></a>|}
         (url_removing_extra conf i)
         (Util.escape_html sn :> string))
@@ -410,7 +410,8 @@ let first_name_print_list_multi conf base x1 sections_groups =
     let cnt =
       if not is_active then ""
       else
-        Printf.sprintf {|<span class="badge badge-light ms-2">%d</span>|} count
+        Printf.sprintf {|<span class="badge text-bg-light ms-2">%d</span>|}
+          count
     in
     let tt = if is_active then "delete" else "add" in
     let title = Utf8.capitalize_fst (transl conf tt) in
@@ -451,12 +452,12 @@ let first_name_print_list_multi conf base x1 sections_groups =
     let badge1 =
       if not is_active then " / "
       else
-        Printf.sprintf {|<span class="badge badge-light mx-2">%d</span>|} cnt1
+        Printf.sprintf {|<span class="badge text-bg-light mx-2">%d</span>|} cnt1
     in
     let badge2 =
       if not is_active then ""
       else
-        Printf.sprintf {|<span class="badge badge-light ms-2">%d</span>|} cnt2
+        Printf.sprintf {|<span class="badge text-bg-light ms-2">%d</span>|} cnt2
     in
     let btn_cls = if is_active then "primary" else "outline-primary" in
     Printf.sprintf
