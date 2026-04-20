@@ -2161,7 +2161,8 @@ let display_infos ?interface ~port () =
   in
   Logs.app (fun k ->
       let s =
-        Fmt.str "Geneweb %s\nListen to %s:%d..." Version.ver hostname port
+        Fmt.str "Geneweb %s\nListen to http://%s:%d/base" Version.ver hostname
+          port
       in
       k "%a" Fmt.(styled (`Fg `Green) string) s);
   Logs.app (fun k -> k "Type CTRL+C to stop the service");
@@ -2173,7 +2174,7 @@ let display_infos ?interface ~port () =
         path_info
         Fmt.(styled (`Fg `Blue) string)
         "assets"
-        Fmt.(box @@ list ~sep:comma Dump.string)
+        Fmt.(box @@ list ~sep:comma pp_path)
         (Secure.assets ()))
 
 let geneweb_server ?interface ~port ~daemon ~predictable_mode () =
