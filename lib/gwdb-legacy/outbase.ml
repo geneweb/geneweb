@@ -275,7 +275,7 @@ let marital_names base p =
   match p.Dbdisk.sex with
   | Female ->
       let get_other iper (cpl : Dbdisk.dsk_couple) =
-        if Int.compare (Adef.father cpl) iper = 0 then Adef.mother cpl
+        if Int.equal (Adef.father cpl) iper then Adef.mother cpl
         else Adef.father cpl
       in
       let unions = base.Dbdisk.data.unions.get p.Dbdisk.key_index in
