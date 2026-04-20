@@ -110,7 +110,7 @@ val to_sdn : from:calendar -> ?lower:bool -> dmy -> int
 (** Convert a [dmy] in calendar [from] to SDN
     if dmy is a partial date (month|day = 0) then return the SDN of a lower bound *)
 
-val convert : from:calendar -> to_:calendar -> dmy -> dmy
+val convert : ?light:bool -> from:calendar -> to_:calendar -> dmy -> dmy
 (** [convert ~from ~to_ dmy] Converts a [dmy] from calendar [from] to calendar [to_];
     Correctly convert [dmy.prec]
     Can convert partial date, and recover partial dates after converting them back,

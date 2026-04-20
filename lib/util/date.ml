@@ -37,6 +37,9 @@ and precision = Adef.precision =
   (* inteval *)
   | YearInt of dmy2
 
+let is_partial date = date.day = 0 || date.month = 0
+let has_delta date = date.delta <> 0
+
 (* compress concrete date if it's possible *)
 let compress d =
   let simple =
@@ -346,7 +349,7 @@ let islamic_of_sdn ~prec sdn =
    that it was a partial date.
 
    BUG : with day>0 and month=0 we do not recover a partial date correctly. *)
-let convert ~from ~to_ dmy =
+let convert ?(light = false) ~from ~to_ dmy =
   if from = to_ then dmy
   else
     let dmy_tuple_of_sdn ~to_ sdn =
@@ -401,43 +404,77 @@ let convert ~from ~to_ dmy =
     let day, month, year, delta =
       convert_aux ~from ~to_ ~day ~month ~year ~delta
     in
-    match prec with
-    | (Sure | About | Maybe | Before | After) as p ->
-        { day; month; year; delta; prec = p }
-    | OrYear dmy2 ->
+    let date =
+      match prec with
+      | (Sure | About | Maybe | Before | After) as p ->
+          { day; month; year; delta; prec = p }
+      | OrYear dmy2 ->
+          {
+            day;
+            month;
+            year;
+            delta;
+            prec = OrYear (convert_dmy2 ~from ~to_ dmy2);
+          }
+      | YearInt dmy2 ->
+          {
+            day;
+            month;
+            year;
+            delta;
+            prec = YearInt (convert_dmy2 ~from ~to_ dmy2);
+          }
+    in
+    if not (light && (is_partial dmy || has_delta dmy)) then date
+    else
+      let to_partial_date date =
         {
-          day;
-          month;
-          year;
-          delta;
-          prec = OrYear (convert_dmy2 ~from ~to_ dmy2);
+          date with
+          day = (if dmy.day = 0 then 0 else date.day);
+          month = (if dmy.month = 0 then 0 else date.month);
+          delta = 0;
         }
-    | YearInt dmy2 ->
-        {
-          day;
-          month;
-          year;
-          delta;
-          prec = YearInt (convert_dmy2 ~from ~to_ dmy2);
-        }
+      in
+      match date.prec with
+      | Sure | Maybe | OrYear _ | YearInt _ -> date
+      | About | After -> to_partial_date date
+      | Before ->
+          let day, month, year, delta =
+            dmy_tuple_of_sdn ~to_ (to_sdn ~from:to_ date + date.delta)
+          in
+          to_partial_date { day; month; year; delta; prec = Before }
 
 let mangle_for_display ~calendar date =
-  let to_interval ~calendar date =
+  let to_interval ~light ~calendar date =
     let date' =
-      convert ~from:Dgregorian ~to_:calendar
+      convert ~light ~from:Dgregorian ~to_:calendar
         (gregorian_of_sdn ~prec:date.prec
            (to_sdn ~from:calendar date + date.delta))
     in
     { date with delta = 0; prec = YearInt (dmy2_of_dmy date') }
   in
   match date.prec with
-  | OrYear _ -> date
-  | Sure | About | Maybe | Before | After ->
-      if date.delta = 0 then date else to_interval ~calendar date
+  | Maybe | OrYear _ -> date
+  | Sure ->
+      if date.delta = 0 then date else to_interval ~light:false ~calendar date
+  | (About | After) as prec ->
+      if not @@ has_delta date then date
+      else { (to_interval ~light:true ~calendar date) with prec }
+  | Before ->
+      if not @@ has_delta date then date
+      else
+        let date =
+          match (to_interval ~light:true ~calendar date).prec with
+          | Sure | About | Maybe | Before | After | OrYear _ -> assert false
+          | YearInt date -> dmy_of_dmy2 date
+        in
+        { date with prec = Before }
   | YearInt date' ->
-      {
-        (to_interval ~calendar (dmy_of_dmy2 date')) with
-        day = date.day;
-        month = date.month;
-        year = date.year;
-      }
+      if not @@ has_delta date then date
+      else
+        {
+          (to_interval ~calendar ~light:false (dmy_of_dmy2 date')) with
+          day = date.day;
+          month = date.month;
+          year = date.year;
+        }

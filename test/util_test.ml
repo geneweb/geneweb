@@ -359,6 +359,87 @@ let datedisplay_string_of_date () =
   test "d[i |'marzu 1975" Dgregorian (0, 3, 1975);
   test "4 d[i sittembre 1974" Dgregorian (4, 9, 1974)
 
+let datedisplay_gregorian_precision () =
+  let conf =
+    let lexicon = Hashtbl.create 0 in
+    let lang = "fr" in
+    let () = Secure.add_assets "../../../../geneweb-resources" in
+    let () =
+      Mutil.input_lexicon lang lexicon (fun () ->
+          Secure.open_in @@ Geneweb.Util.search_in_assets
+          @@ Filename.concat "lang" "lexicon.txt")
+    in
+    { Geneweb.Config.empty with env = [ ("lang", Mutil.encode lang) ]; lexicon }
+  in
+  let test ~__POS__ ~expected ~calendar date =
+    Alcotest.check' ~pos:__POS__ Alcotest.string ~msg:"" ~expected
+      ~actual:
+        (Str.global_replace
+           (Str.regexp_string "&nbsp;")
+           " "
+           (Adef.as_string
+           @@ Geneweb.DateDisplay.gregorian_precision ~calendar conf date))
+  in
+  test ~__POS__ ~expected:"23 décembre 1796" ~calendar:Dfrench
+    { day = 3; month = 4; year = 5; delta = 0; prec = Sure };
+  test ~__POS__ ~expected:"vers 23 décembre 1796" ~calendar:Dfrench
+    { day = 3; month = 4; year = 5; delta = 0; prec = About };
+  test ~__POS__ ~expected:"entre 23 décembre 1796 et 25 décembre 1796"
+    ~calendar:Dfrench
+    {
+      day = 3;
+      month = 4;
+      year = 5;
+      delta = 0;
+      prec = YearInt { day2 = 5; month2 = 4; year2 = 5; delta2 = 0 };
+    };
+  test ~__POS__ ~expected:"entre 21 décembre 1796 et 19 janvier 1797"
+    ~calendar:Dfrench
+    { day = 0; month = 4; year = 5; delta = 0; prec = Sure };
+  test ~__POS__ ~expected:"vers 1796" ~calendar:Dfrench
+    { day = 0; month = 0; year = 5; delta = 0; prec = About };
+  test ~__POS__ ~expected:"vers décembre 1796" ~calendar:Dfrench
+    { day = 0; month = 4; year = 5; delta = 0; prec = About };
+  test ~__POS__ ~expected:"avant 1797" ~calendar:Dfrench
+    { day = 0; month = 0; year = 5; delta = 0; prec = Before };
+  test ~__POS__ ~expected:"avant janvier 1797" ~calendar:Dfrench
+    { day = 0; month = 4; year = 5; delta = 0; prec = Before };
+  test ~__POS__ ~expected:"après 1796" ~calendar:Dfrench
+    { day = 0; month = 0; year = 5; delta = 0; prec = After };
+  test ~__POS__ ~expected:"après décembre 1796" ~calendar:Dfrench
+    { day = 0; month = 4; year = 5; delta = 0; prec = After };
+  test ~__POS__
+    ~expected:"peut-être entre le 22 septembre 1796 et le 21 septembre 1797"
+    ~calendar:Dfrench
+    { day = 0; month = 0; year = 5; delta = 0; prec = Maybe };
+  test ~__POS__
+    ~expected:"peut-être entre le 21 décembre 1796 et le 19 janvier 1797"
+    ~calendar:Dfrench
+    { day = 0; month = 4; year = 5; delta = 0; prec = Maybe };
+  test ~__POS__ ~expected:"entre 22 septembre 1796 et 22 septembre 1801"
+    ~calendar:Dfrench
+    {
+      day = 0;
+      month = 0;
+      year = 5;
+      delta = 0;
+      prec = YearInt { day2 = 0; month2 = 0; year2 = 9; delta2 = 0 };
+    };
+  test ~__POS__
+    ~expected:
+      "entre le 22 septembre 1796 et le 21 septembre 1797 ou entre le 23 \
+       septembre 1800 et le 22 septembre 1801"
+    ~calendar:Dfrench
+    {
+      day = 0;
+      month = 0;
+      year = 5;
+      delta = 0;
+      prec = OrYear { day2 = 0; month2 = 0; year2 = 9; delta2 = 0 };
+    };
+  test ~__POS__ ~expected:"vers 2000" ~calendar:Dgregorian
+    { day = 0; month = 0; year = 2000; delta = 100; prec = About }
+
 let html_text_content () =
   let module Expected : sig
     type t
@@ -564,6 +645,8 @@ let v =
       [
         Alcotest.test_case "DateDisplay.string_of_date" `Quick
           datedisplay_string_of_date;
+        Alcotest.test_case "DateDisplay.gregorian_precision" `Quick
+          datedisplay_gregorian_precision;
       ] );
     ("html", [ Alcotest.test_case "text-content" `Quick html_text_content ]);
   ]

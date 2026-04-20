@@ -289,7 +289,7 @@ and string_of_dmy ?with_short_month conf d =
 and gregorian_precision ?with_short_month ~calendar conf d =
   let d =
     Date.mangle_for_display ~calendar:Dgregorian
-      (Date.convert ~from:calendar ~to_:Dgregorian d)
+      (Date.convert ~light:true ~from:calendar ~to_:Dgregorian d)
   in
   let format_date d =
     if d.Date.delta = 0 then
@@ -310,8 +310,11 @@ and gregorian_precision ?with_short_month ~calendar conf d =
   in
   let s =
     match d.Date.prec with
-    | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After ->
-        format_date d
+    | Date.Sure | Date.About | Date.Before | Date.After -> format_date d
+    | Date.Maybe ->
+        Printf.sprintf "%s %s"
+          (Util.transl conf "possibly (date)")
+          (format_date { d with prec = Sure })
     | Date.OrYear d2 ->
         Printf.sprintf "%s %s %s"
           (format_date { d with Date.prec = Date.Sure })
