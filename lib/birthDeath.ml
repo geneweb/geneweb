@@ -103,16 +103,17 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
         | Some dmy ->
             if Date.compare_dmy dmy at_date <= 0 then
               let a = Date.time_elapsed dmy at_date in
-              let j = min nb_intervals (a.year / interval) in
-              if
-                (dea = NotDead || (dea = DontKnowIfDead && a.year < limit))
-                ||
-                match Date.dmy_of_death dea with
-                | None -> false
-                | Some d -> Date.compare_dmy d at_date > 0
-              then
-                if sex = Male then men.(j) <- men.(j) + 1
-                else wom.(j) <- wom.(j) + 1)
+              if a.year >= 0 then
+                let j = min nb_intervals (a.year / interval) in
+                if
+                  (dea = NotDead || (dea = DontKnowIfDead && a.year < limit))
+                  ||
+                  match Date.dmy_of_death dea with
+                  | None -> false
+                  | Some d -> Date.compare_dmy d at_date > 0
+                then
+                  if sex = Male then men.(j) <- men.(j) + 1
+                  else wom.(j) <- wom.(j) + 1)
     (Driver.ipers base);
   (men, wom)
 
@@ -133,7 +134,7 @@ let make_death_pyramid ~nb_intervals ~interval ~limit ~from_year ~to_year conf
               | None -> ()
               | Some bd ->
                   let a = Date.time_elapsed bd dd in
-                  if limit = 0 || a.year <= limit then
+                  if a.year >= 0 && (limit = 0 || a.year <= limit) then
                     let j = min nb_intervals (a.year / interval) in
                     if sex = Male then men.(j) <- men.(j) + 1
                     else wom.(j) <- wom.(j) + 1))
