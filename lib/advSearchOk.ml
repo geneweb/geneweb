@@ -431,12 +431,7 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
 
   let search_type = query_params.event_search_mode in
 
-  let place_searched event_kind =
-    lazy
-      (Option.map place_with_istr
-         (Page.Advanced_search.Query_params.get_event_place ~event_kind
-            query_params))
-  in
+  let place_searched place = lazy (Option.map place_with_istr place) in
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) unsafe_p search_type =
@@ -457,25 +452,23 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
         | `Or -> (List.exists, false)
         | `And -> (List.for_all, true)
       in
-      let match_ (f, event_kind) =
-        query_params.events = []
-        || f ~base ~p
-             ~dates:
-               (Page.Advanced_search.Query_params.get_event_dates ~event_kind
-                  query_params)
-             ~place:(Lazy.force @@ place_searched event_kind)
-             ~exact_place:query_params.event_exact_place
+      let match_
+          (event_kind, (event : Page.Advanced_search.Query_params.Event.t)) =
+        let f =
+          match event_kind with
+          | `Baptism -> AdvancedSearchMatch.match_baptism
+          | `Birth -> AdvancedSearchMatch.match_birth
+          | `Burial -> AdvancedSearchMatch.match_burial
+          | `Death -> AdvancedSearchMatch.match_death
+          | `Marriage -> AdvancedSearchMatch.match_marriage ~default ~conf
+          | `Other -> AdvancedSearchMatch.match_other_events ~conf
+        in
+        f ~base ~p ~dates:event.dates
+          ~place:(Lazy.force @@ place_searched event.place)
+          ~exact_place:query_params.event_exact_place
       in
       Lazy.force civil_match
-      && check match_
-           [
-             (AdvancedSearchMatch.match_baptism, `Baptism);
-             (AdvancedSearchMatch.match_birth, `Birth);
-             (AdvancedSearchMatch.match_burial, `Burial);
-             (AdvancedSearchMatch.match_death, `Death);
-             (AdvancedSearchMatch.match_marriage ~default ~conf, `Marriage);
-             (AdvancedSearchMatch.match_other_events ~conf, `Other);
-           ]
+      && (query_params.events = [] || check match_ query_params.events)
     in
     if (not @@ SearchName.search_reject_p conf base unsafe_p) && pmatch () then
       (unsafe_p :: list, len + 1)
