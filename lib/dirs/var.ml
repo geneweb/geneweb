@@ -8,7 +8,9 @@ type _ content =
 type 'a t = { name : string; content : 'a content }
 
 let ( // ) = Filename.concat
-let name { name; _ } = Fmt.str "$%s" name
+
+let name ?(escaped = false) { name; _ } =
+  if escaped then Fmt.str "\\$%s" name else Fmt.str "$%s" name
 
 let concat { name; content = One s } suffix =
   let name = name ^ "/" ^ suffix in
