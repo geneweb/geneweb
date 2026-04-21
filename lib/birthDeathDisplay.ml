@@ -78,6 +78,14 @@ let print_death conf base =
     let _, ages_sum, ages_nb =
       List.fold_left
         (fun (last_month_txt, ages_sum, ages_nb) (p, d, cal) ->
+          let is_friend =
+            if
+              (try List.assoc "roglo" conf.base_env = "yes"
+               with Not_found -> false)
+              && Driver.get_access p = SemiPublic
+            then {|<i class="fa fa-person fa-fw text-warning"></i> |}
+            else ""
+          in
           let month_txt = month_txt conf d cal in
           if month_txt <> last_month_txt then (
             if (last_month_txt :> string) <> "" then
@@ -107,7 +115,7 @@ let print_death conf base =
                   (Some a, ages_sum, ages_nb)
                 else (None, ages_sum, ages_nb)
           in
-          Output.print_sstring conf "<li><b>";
+          Output.print_sstring conf (Printf.sprintf "<li>%s<b>" is_friend);
           Output.print_string conf (referenced_person_text conf base p);
           Output.print_sstring conf "</b>, ";
           Output.print_sstring conf
