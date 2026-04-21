@@ -2,8 +2,9 @@ type one
 type many
 type 'a var
 
-val name : 'a var -> string
-(** [name v] returns the standard name of the variable. *)
+val name : ?escaped:bool -> 'a var -> string
+(** [name ?escaped v] returns the standard name of the variable. The flag
+    [escaped] escapes dollars to be printable in man pages. *)
 
 val path : one var -> string
 (** [path v] returns the path contained in the variable. *)
