@@ -312,14 +312,17 @@ let ascii_of_macintosh s =
   in
   String.init (String.length s) conv_char
 
-let utf8_of_string s =
-  match !state.charset with
-  | Ansel -> Utf8.utf_8_of_iso_8859_1 (Geneweb.Ansel.to_iso_8859_1 s)
-  | Ansi -> Utf8.utf_8_of_iso_8859_1 s
-  | Ascii -> Utf8.utf_8_of_iso_8859_1 s
-  | Msdos -> Utf8.utf_8_of_iso_8859_1 (ascii_of_msdos s)
-  | MacIntosh -> Utf8.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
-  | Utf8 -> s
+  let utf8_of_string s =
+    let s =
+      match !state.charset with
+      | Ansel -> Utf8.utf_8_of_iso_8859_1 (Geneweb.Ansel.to_iso_8859_1 s)
+      | Ansi -> Utf8.utf_8_of_iso_8859_1 s
+      | Ascii -> Utf8.utf_8_of_iso_8859_1 s
+      | Msdos -> Utf8.utf_8_of_iso_8859_1 (ascii_of_msdos s)
+      | MacIntosh -> Utf8.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
+      | Utf8 -> s
+    in
+    Utf8.normalize s
 
 let rec get_lev n =
   parser
