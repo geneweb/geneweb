@@ -16,7 +16,8 @@ val lower : string -> string
 val title : string -> string
 (** Apply uppercasing to the first letter of each name (sequence of
     alphabetic characters) part, and lowercasing to the rest of the
-    text. *)
+    text. To work correctly, this function should operate on normalized
+    UTF-8 strings, e.g. via the function [Utf8.normalize]. *)
 
 val abbrev : string -> string
 (** Remplace by an abbreviation or remove particles inside the name *)
