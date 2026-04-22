@@ -45,8 +45,27 @@
 
 %if;(not cancel_links)
   <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
-    <div class="d-flex flex-wrap justify-content-md-end align-items-center">
-      <!-- legal notices -->
+      <div class="d-flex justify-content-between w-100 px-5">
+      %( permalink %)
+      <div class="btn-group mx-3 mt-3">
+        <a id="permalink_url" href="%url_set.opt.noindex;"></a>&nbsp;
+        <a id="permalink_url_pwd" href="%url_set.opt.noindexpwd;"></a>
+        <button type="button" class="btn btn-sm btn-outline-secondary ms-2"
+          title="[permalink]0"
+          onclick="navigator.clipboard.writeText(document.getElementById('permalink_url').href)
+                   .then(() => { this.innerHTML='<i class=\'fa fa-check\'></i>'; 
+                                 setTimeout(() => this.innerHTML='<i class=\'fa fa-copy\'></i>', 1500); })">
+          <i class="fa fa-copy"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary ms-2"
+          title="[permalink]1"
+          onclick="navigator.clipboard.writeText(document.getElementById('permalink_url_pwd').href)
+                   .then(() => { this.innerHTML='<i class=\'fa fa-check\'></i>'; 
+                                 setTimeout(() => this.innerHTML='<i class=\'fa fa-copy\'></i>', 1500); })">
+          <i class="fa fa-copy"></i>
+        </button>
+      </div>
+      %( legal notices %)
       %if;is_printed_by_template;
         %if;(notice1=1)
             %apply;notice("notice1", lang)
