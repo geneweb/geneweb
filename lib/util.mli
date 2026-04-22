@@ -79,6 +79,8 @@ val clean_html_tags : string -> string
 val clean_comment_tags : string -> string
 val uri_encode : string -> string
 val uri_decode : string -> string
+val key_to_pnoc : bool -> string -> string
+val p_to_poc : string -> string
 
 val html : ?content_type:string -> config -> unit
 (** Prints HTTP response headers with giving content type (default :

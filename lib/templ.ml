@@ -1177,6 +1177,9 @@ let rec eval conf ifun env =
             String.concat "" (eval_ast_list env ep astl)
         | "language_name", [ (None, VVstring s) ] ->
             Translate.language_name s (Util.transl conf "!languages")
+        | "key_to_pnoc", [ (None, VVstring s) ] -> Util.key_to_pnoc true s
+        | "p_to_poc", [ (None, VVstring s) ] -> Util.p_to_poc s
+        | "key_to_pocn", [ (None, VVstring s) ] -> Util.key_to_pnoc false s
         | "url_encode", [ (None, VVstring s) ]
         | "uri_encode", [ (None, VVstring s) ] ->
             Util.uri_encode s

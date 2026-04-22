@@ -503,8 +503,9 @@
           %end;
           %( Linked notes bouton with count %)
           %if;has_linked_pages;
+            %let;poc;%apply;p_to_poc(e.p)%in;
             <li class="nav-item">
-              <a class="nav-link text-secondary" href="%url_set.m.LINKED;"
+              <a class="nav-link text-secondary" href="%apply;url_set%with;m/p%and;LINKED/%poc;%end;"
                 title="[*linked pages help]">%nn;
                 <i class="fa fa-file-lines fa-fw" aria-hidden="true"></i>%nn;
                 <sup class="small">%linked_pages_nbr;</sup>%nn;
@@ -512,7 +513,7 @@
             </li>
             %if;(nb_linked_pages_type.gallery>0)
               <li class="nav-item">
-                <a class="nav-link text-secondary" href="%url_set.m_type.LINKED_gallery"
+                <a class="nav-link text-secondary" href="%apply;url_set%with;m/p/type%and;LINKED/%poc;/gallery%end;"
                   title="[*linked albums help]">%nn;
                   <i class="fa fa-images fa-fw me-1" aria-hidden="true"></i>%nn;
                   %let;nbalb;%nb_linked_pages_type.album;%in;

@@ -774,6 +774,37 @@ let clean_comment_tags s = Str.global_replace (Str.regexp "<!--.*-->") "" s
 let uri_encode s = Uri.pct_encode ~component:`Query s
 let uri_decode s = try Uri.pct_decode s with _ -> s
 
+let key_to_pnoc pnoc key =
+  let key = String.map (fun c -> if c = '+' then ' ' else c) key in
+  let spaceIdx =
+    match String.rindex_opt key ' ' with
+    | None -> String.length key
+    | Some i -> i
+  in
+  let fn_oc = String.sub key 0 spaceIdx in
+  let sn = String.sub key (spaceIdx + 1) (String.length key - spaceIdx - 1) in
+  let fn, oc =
+    match String.rindex_opt fn_oc '.' with
+    | None -> (fn_oc, "0")
+    | Some i ->
+        ( String.sub fn_oc 0 i,
+          String.sub fn_oc (i + 1) (String.length fn_oc - i - 1) )
+  in
+  let oc_part = if oc = "0" then "" else Printf.sprintf "&oc=%s" oc in
+  if pnoc then Printf.sprintf "p=%s&n=%s%s" fn sn oc_part
+  else Printf.sprintf "p=%s.%s&n=%s" fn oc sn
+
+let p_to_poc fn_oc =
+  let fn, oc =
+    match String.rindex_opt fn_oc '.' with
+    | None -> (fn_oc, "0")
+    | Some i ->
+        ( String.sub fn_oc 0 i,
+          String.sub fn_oc (i + 1) (String.length fn_oc - i - 1) )
+  in
+  let oc_part = if oc = "0" then "" else Printf.sprintf "&oc=%s" oc in
+  Printf.sprintf "%s%s" fn oc_part
+
 let hidden_textarea conf k v =
   Output.print_sstring conf {|<textarea style="display:none;" name="|};
   Output.print_string conf (escape_html k);
