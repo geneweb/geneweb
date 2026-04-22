@@ -41,7 +41,7 @@ let title s =
   let t = ref true in
   let cmap u =
     let r = if !t then Uucp.Case.Map.to_upper u else Uucp.Case.Map.to_lower u in
-    t := not (Uucp.Alpha.is_alphabetic u);
+    t := is_compound_name_separator u;
     r
   in
   Utf8.cmap_utf_8 cmap s
