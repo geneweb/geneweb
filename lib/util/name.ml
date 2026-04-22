@@ -34,6 +34,9 @@ let lower s =
   in
   copy false 0 0
 
+let is_compound_name_separator c =
+  List.exists (fun c' -> Uchar.equal c (Uchar.of_char c')) [ ' '; '-' ]
+
 let title s =
   let t = ref true in
   let cmap u =
@@ -183,7 +186,7 @@ let split_callback fn s =
   let open String in
   let j = ref (length s) in
   for i = length s - 1 downto 0 do
-    if match unsafe_get s i with ' ' | '-' -> true | _ -> false then (
+    if is_compound_name_separator @@ Uchar.of_char @@ unsafe_get s i then (
       fn (i + 1) (!j - i - 1);
       j := i)
   done;
