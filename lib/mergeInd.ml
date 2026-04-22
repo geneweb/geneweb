@@ -139,22 +139,22 @@ let effective_merge_ind conf base (warning : Warning.base_warning -> unit) p1 p2
         (if Gwdb.get_sex p2 <> Neuter then Gwdb.get_sex p2 else Gwdb.get_sex p1);
       birth =
         (if Gwdb.get_birth p1 = Date.cdate_None then Gwdb.get_birth p2
-        else Gwdb.get_birth p1);
+         else Gwdb.get_birth p1);
       birth_place = get_string Gwdb.get_birth_place;
       birth_src = get_string Gwdb.get_birth_src;
       baptism =
         (if Gwdb.get_baptism p1 = Date.cdate_None then Gwdb.get_baptism p2
-        else Gwdb.get_baptism p1);
+         else Gwdb.get_baptism p1);
       baptism_place = get_string Gwdb.get_baptism_place;
       baptism_src = get_string Gwdb.get_baptism_src;
       death =
         (if Gwdb.get_death p1 = DontKnowIfDead then Gwdb.get_death p2
-        else Gwdb.get_death p1);
+         else Gwdb.get_death p1);
       death_place = get_string Gwdb.get_death_place;
       death_src = get_string Gwdb.get_death_src;
       burial =
         (if Gwdb.get_burial p1 = UnknownBurial then Gwdb.get_burial p2
-        else Gwdb.get_burial p1);
+         else Gwdb.get_burial p1);
       burial_place = get_string Gwdb.get_burial_place;
       burial_src = get_string Gwdb.get_burial_src;
       occupation = get_string Gwdb.get_occupation;
@@ -243,19 +243,19 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
       (Gwdb.gen_family_of_family fam1) with
       marriage =
         (if Gwdb.get_marriage fam1 = Date.cdate_None then Gwdb.get_marriage fam2
-        else Gwdb.get_marriage fam1);
+         else Gwdb.get_marriage fam1);
       marriage_place =
         (if Gwdb.is_empty_string (Gwdb.get_marriage_place fam1) then
-         Gwdb.get_marriage_place fam2
-        else Gwdb.get_marriage_place fam1);
+           Gwdb.get_marriage_place fam2
+         else Gwdb.get_marriage_place fam1);
       marriage_src =
         (if Gwdb.is_empty_string (Gwdb.get_marriage_src fam1) then
-         Gwdb.get_marriage_src fam2
-        else Gwdb.get_marriage_src fam1);
+           Gwdb.get_marriage_src fam2
+         else Gwdb.get_marriage_src fam1);
       fsources =
         (if Gwdb.is_empty_string (Gwdb.get_fsources fam1) then
-         Gwdb.get_fsources fam2
-        else Gwdb.get_fsources fam1);
+           Gwdb.get_fsources fam2
+         else Gwdb.get_fsources fam1);
     }
   in
   let des1 =
@@ -338,12 +338,12 @@ let merge conf base p1 p2 propose_merge_ind propose_merge_fam =
   in
   if changes_done then Util.commit_patches conf base;
   (if ok then
-   let changed =
-     let p1 = Gwdb.gen_person_of_person p1 in
-     let p2 = Gwdb.gen_person_of_person p2 in
-     Def.U_Merge_person (p2, p1, p1)
-   in
-   History.record conf base changed "fp");
+     let changed =
+       let p1 = Gwdb.gen_person_of_person p1 in
+       let p2 = Gwdb.gen_person_of_person p2 in
+       Def.U_Merge_person (p2, p1, p1)
+     in
+     History.record conf base changed "fp");
   Update.delete_topological_sort conf base;
   (ok, List.rev !rev_wl)
 

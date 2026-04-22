@@ -308,16 +308,13 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Gwdb.ifam list) =
   Gwdb.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
   width_search [ ip1 ] 0 [ ip2 ] 0
 
-(** [simplify_path conf base path]
-    Removes unnecessary people from the path
+(** [simplify_path conf base path] Removes unnecessary people from the path
     (e.g. half sibling when only parents are useful)
 
-    [ (HalfSibling|Sibling|Child) as x -> Child -> HalfSibling ]
-    becomes [ x -> Mate -> Child ]
+    [ (HalfSibling|Sibling|Child) as x -> Child -> HalfSibling ] becomes
+    [ x -> Mate -> Child ]
 
-    [ HalfSibling -> Parent ]
-    becomes [ Parent -> Mate -> Mate -> Parent ]
- *)
+    [ HalfSibling -> Parent ] becomes [ Parent -> Mate -> Mate -> Parent ] *)
 let simplify_path base path =
   let get get i =
     let p = Gwdb.poi base i in
@@ -343,7 +340,7 @@ let simplify_path base path =
       :: tl ->
         x
         :: (if father i1 = father i2 then (mother i2, Mate)
-           else (father i2, Mate))
+            else (father i2, Mate))
         :: simplify tl
     | ((i1, _r1) as x1) :: (i2, HalfSibling) :: (i3, Parent) :: tl ->
         if father i1 = father i2 then

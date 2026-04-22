@@ -37,24 +37,24 @@ type gw_syntax =
         Def.gen_family
       * (Gwdb.iper, Gwdb.iper, string) Def.gen_person Def.gen_descend
       (** Family definition block. Contains:
-      - Family couple (father's and mother's definition/reference)
-      - Father's sex
-      - Mother's sex
-      - List of witnesses definition/reference with their sex.
-      - List of information about every family event (name, date,
-        place, reason, source, notes and witnesses)
-      - Family definition
-      - Children (descendants) *)
+          - Family couple (father's and mother's definition/reference)
+          - Father's sex
+          - Mother's sex
+          - List of witnesses definition/reference with their sex.
+          - List of information about every family event (name, date, place,
+            reason, source, notes and witnesses)
+          - Family definition
+          - Children (descendants) *)
   | Notes of key * string
-      (** Block that defines personal notes. First element represents
-      reference to person. Second is note's content. *)
+      (** Block that defines personal notes. First element represents reference
+          to person. Second is note's content. *)
   | Relations of
       somebody * Def.sex assumption * (somebody, string) Def.gen_relation list
       (** Block that defines relations of a person with someone outisde of
-      family block. Contains:
-      - Concerned person definition/reference
-      - Sex of person
-      - List of his relations. *)
+          family block. Contains:
+          - Concerned person definition/reference
+          - Sex of person
+          - List of his relations. *)
   | Pevent of
       somebody
       * Def.sex assumption
@@ -66,23 +66,23 @@ type gw_syntax =
         * string
         * (somebody * Def.sex assumption * Def.witness_kind * string) list)
         list
-      (** Block that defines events of a person. Specific to gwplus format. Contains:
-      - Concerned person definition/reference
-      - Sex of person
-      - List of information about every personal event (name, date,
-      place, reason, source, notes and witnesses)*)
+      (** Block that defines events of a person. Specific to gwplus format.
+          Contains:
+          - Concerned person definition/reference
+          - Sex of person
+          - List of information about every personal event (name, date, place,
+            reason, source, notes and witnesses)*)
   | Bnotes of string * string
-      (** Block that defines database notes and extended pages.
-      First string represents name of extended page ("" for
-      database notes, only one for file).
-      Second is note's or page's content. *)
+      (** Block that defines database notes and extended pages. First string
+          represents name of extended page ("" for database notes, only one for
+          file). Second is note's or page's content. *)
   | Wnotes of string * string
-      (** Block that defines wizard notes.
-      First string represents wizard's id.
-      Second is note's content. *)
+      (** Block that defines wizard notes. First string represents wizard's id.
+          Second is note's content. *)
 
 val check_magic : string -> in_channel -> unit
-(** Checks a .gwo header and prints fails if header is absent or not compatible. *)
+(** Checks a .gwo header and prints fails if header is absent or not compatible.
+*)
 
 val comp_families : State.t -> string -> unit
 (** Compile .gw file and save result to corresponding .gwo *)

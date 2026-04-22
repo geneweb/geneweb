@@ -43,9 +43,9 @@ let compute base bdir =
   flush stderr;
   let list = notes_links (Gwdb.base_notes_read base "") in
   (if list = ([], []) then ()
-  else
-    let pg = Def.NLDB.PgNotes in
-    db := Geneweb.NotesLinks.add_in_db !db pg list);
+   else
+     let pg = Def.NLDB.PgNotes in
+     db := Geneweb.NotesLinks.add_in_db !db pg list);
   Printf.eprintf "--- wizard notes\n";
   flush stderr;
   (try
@@ -100,8 +100,8 @@ let compute base bdir =
         else
           loop (Filename.concat dir file)
             (if name = "" then file
-            else
-              Printf.sprintf "%s%c%s" name Geneweb.NotesLinks.char_dir_sep file)
+             else
+               Printf.sprintf "%s%c%s" name Geneweb.NotesLinks.char_dir_sep file)
       done;
       flush stderr
     with Sys_error _ -> ()
