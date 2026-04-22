@@ -14,8 +14,9 @@ val lower : string -> string
     (except '.') are replaced by space. *)
 
 val title : string -> string
-(** Apply uppercasing to the first letter of each name (sequence of alphabetic characters) part,
-    and lowercasing to the rest of the text. *)
+(** Apply uppercasing to the first letter of each name (sequence of
+    alphabetic characters) part, and lowercasing to the rest of the
+    text. *)
 
 val abbrev : string -> string
 (** Remplace by an abbreviation or remove particles inside the name *)
