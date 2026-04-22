@@ -1,0 +1,38 @@
+name: Opam installation
+on:
+  push:
+    paths:
+      - '*.opam'
+  pull_request:
+    paths:
+      - '*.opam'
+
+env:
+  OPAMYES: true
+
+jobs:
+  opam:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Ocaml with v3
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5
+
+      - name: Install geneweb-compat
+        run: opam install ./geneweb-compat.opam
+
+      - name: Install geneweb-http
+        run: opam install ./geneweb-http.opam
+
+      - name: Install geneweb
+        run: opam install ./geneweb.opam
+
+      - name: Install geneweb-rpc
+        run: opam install ./geneweb-rpc.opam
+
+      - name: Check binaries
+        run: opam exec -- gwd --check
