@@ -70,7 +70,10 @@
   (synopsis "Geneweb library for HTTP support")
   (depends
     (ocaml (>= 4.10))
-    geneweb-compat))
+    camlp-streams
+    geneweb-compat
+    logs
+    fmt))
 
 (package
   (name geneweb-rpc)
