@@ -1,5 +1,5 @@
-type one
-type many
+type one = private One
+type many = private Many
 
 type _ content =
   | One : string -> one content
