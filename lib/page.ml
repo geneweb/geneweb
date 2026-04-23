@@ -264,9 +264,9 @@ module Advanced_search = struct
         in
         {
           first_name = gets_opt "first_name";
-          first_name_search_mode = get_name_search_mode gets "first_name";
+          first_name_search_mode = get_name_search_mode gets "exact_first_name";
           surname = gets_opt "surname";
-          surname_search_mode = get_name_search_mode gets "surname";
+          surname_search_mode = get_name_search_mode gets "exact_surname";
           alias = gets_opt "alias_pubname_qualifiers";
           sex = gets "sex" |> sex_of_string;
           married;
