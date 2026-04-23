@@ -344,43 +344,20 @@ let is_semi_public p = Driver.get_access p = Def.SemiPublic
 
 (* assumes fn+sn, fn sn, fn.occ+sn, fn.occ sn *)
 let split_key key =
-  let dot = String.index_opt key '.' in
-  let plus = String.index_opt key '+' in
-
-  match (dot, plus) with
-  | Some d, _ ->
-      (* Has dot: firstname.occ separator *)
-      let space_after_dot =
-        try Some (String.index_from key (d + 1) ' ') with Not_found -> None
+  let key = String.map (fun c -> if c = '+' then ' ' else c) key in
+  match String.index_opt key ' ' with
+  | None -> ("?", "", "?") (* FIXME could be (key, "", "?") or ("?", "", key) *)
+  | Some sep ->
+      let fn_oc = String.sub key 0 sep in
+      let sn = String.sub key (sep + 1) (String.length key - sep - 1) in
+      let fn, oc =
+        match String.rindex_opt fn_oc '.' with
+        | None -> (fn_oc, "")
+        | Some d ->
+            ( String.sub fn_oc 0 d,
+              String.sub fn_oc (d + 1) (String.length fn_oc - d - 1) )
       in
-      let plus_after_dot =
-        match plus with Some p when p > d -> Some p | _ -> None
-      in
-      let sn_sep =
-        match (space_after_dot, plus_after_dot) with
-        | Some s, Some p -> min s p (* Use whichever comes first *)
-        | Some s, None -> s
-        | None, Some p -> p
-        | None, None -> -1
-      in
-      if sn_sep <> -1 then
-        ( String.sub key 0 d,
-          String.sub key (d + 1) (sn_sep - d - 1),
-          String.sub key (sn_sep + 1) (String.length key - sn_sep - 1) )
-      else ("?", "", "?")
-  | None, Some p ->
-      (* No dot but has plus: firstname+surname *)
-      ( String.sub key 0 p,
-        "",
-        String.sub key (p + 1) (String.length key - p - 1) )
-  | None, None -> (
-      (* No dot or plus: use first space *)
-      match String.index_opt key ' ' with
-      | Some s ->
-          ( String.sub key 0 s,
-            "",
-            String.sub key (s + 1) (String.length key - s - 1) )
-      | None -> ("?", "", "?"))
+      (fn, oc, sn)
 
 (* Determine if person is related to the current user *)
 let ancestors _conf base max_generations family ip =
