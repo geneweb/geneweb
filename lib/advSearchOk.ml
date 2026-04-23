@@ -612,7 +612,7 @@ let advanced_search_without_names conf base match_person max_answers =
   result
 
 let advanced_search_without_prefix conf base (match_person : match_person)
-    max_answers sn_list fn_list get_name_search_mode =
+    max_answers sn_list fn_list first_name_search_mode surname_search_mode =
   let persons_of_name_list strings_of persons_of n_list mode =
     List.map
       (fun x ->
@@ -632,10 +632,9 @@ let advanced_search_without_prefix conf base (match_person : match_person)
 
   let skip_fname, skip_sname, list =
     if sn_list <> [] then
-      let name_search_mode = get_name_search_mode "exact_surname" in
       let list =
         persons_of_name_list Gwdb.base_strings_of_surname
-          Gwdb.persons_of_surname sn_list name_search_mode
+          Gwdb.persons_of_surname sn_list surname_search_mode
       in
       let list =
         if fn_list = [] then
@@ -645,7 +644,7 @@ let advanced_search_without_prefix conf base (match_person : match_person)
               let match_name n =
                 let ns = List.map Name.lower @@ Name.split n in
                 AdvancedSearchMatch.match_name ~search_list:sn_list
-                  ~mode:name_search_mode ns
+                  ~mode:surname_search_mode ns
               in
               SearchName.filter_marital_names
                 ~remove_marital_names_match_only:true match_name conf base p)
@@ -657,8 +656,7 @@ let advanced_search_without_prefix conf base (match_person : match_person)
       ( true,
         false,
         persons_of_name_list Gwdb.base_strings_of_first_name
-          Gwdb.persons_of_first_name fn_list
-          (get_name_search_mode "exact_first_name") )
+          Gwdb.persons_of_first_name fn_list first_name_search_mode )
   in
   let rec loop ((_, len) as acc) = function
     | [] -> acc
@@ -859,8 +857,12 @@ let advanced_search conf base max_answers =
       | [], [] ->
           advanced_search_without_names conf base match_person max_answers
       | _ ->
+          let first_name_search_mode =
+            get_name_search_mode "exact_first_name"
+          in
+          let surname_search_mode = get_name_search_mode "exact_surname" in
           advanced_search_without_prefix conf base match_person max_answers
-            sn_list fn_list get_name_search_mode
+            sn_list fn_list first_name_search_mode surname_search_mode
   in
   (List.rev list, len)
 
