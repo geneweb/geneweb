@@ -588,15 +588,15 @@ let advanced_search_surname_prefix conf base (match_person : match_person)
   (List.map (Gwdb.poi base) list, List.length list)
 
 let advanced_search_first_name_prefix conf base (match_person : match_person)
-    max_answers gets =
+    max_answers first_name_prefix =
   let filter p =
     let r = match_person ~skip_fname:true ~skip_sname:false ([], 0) p in
     r <> ([], 0)
   in
   let list =
     SearchName.persons_starting_with ~remove_marital_names_match_only:false
-      ~conf ~base ~filter ~first_name_prefix:(gets "first_name")
-      ~surname_prefix:"" ~limit:max_answers
+      ~conf ~base ~filter ~first_name_prefix ~surname_prefix:""
+      ~limit:max_answers
   in
   (List.map (Gwdb.poi base) list, List.length list)
 
@@ -853,8 +853,9 @@ let advanced_search conf base max_answers =
             remove_marital_names_match_only surname_prefix
       | _ :: _, _
         when get_name_search_mode "exact_first_name" = `Not_Exact_Prefix ->
+          let first_name_prefix = gets "first_name" in
           advanced_search_first_name_prefix conf base match_person max_answers
-            gets
+            first_name_prefix
       | [], [] ->
           advanced_search_without_names conf base match_person max_answers
       | _ ->
