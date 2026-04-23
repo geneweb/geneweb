@@ -738,114 +738,113 @@ let advanced_search conf base max_answers =
             (Gwdb.IperSet.empty, ([], 0))
           |> snd
       | None -> ([], 0)
-    else if fn_list <> [] || sn_list <> [] then
-      if
-        sn_list <> []
-        && get_name_search_mode "exact_surname" = `Not_Exact_Prefix
-      then
-        let filter p =
-          let r =
-            match_person ~skip_fname:false ~skip_sname:true ([], 0) p
-              search_type
+    else
+      match (fn_list, sn_list) with
+      | _, _ :: _ when get_name_search_mode "exact_surname" = `Not_Exact_Prefix
+        ->
+          let filter p =
+            let r =
+              match_person ~skip_fname:false ~skip_sname:true ([], 0) p
+                search_type
+            in
+            r <> ([], 0)
           in
-          r <> ([], 0)
-        in
-        let list =
-          SearchName.persons_starting_with
-            ~remove_marital_names_match_only:(fn_list = []) ~conf ~base ~filter
-            ~first_name_prefix:"" ~surname_prefix:(gets "surname")
-            ~limit:max_answers
-        in
-        (List.map (Gwdb.poi base) list, List.length list)
-      else if
-        fn_list <> []
-        && get_name_search_mode "exact_first_name" = `Not_Exact_Prefix
-      then
-        let filter p =
-          let r =
-            match_person ~skip_fname:true ~skip_sname:false ([], 0) p
-              search_type
+          let list =
+            SearchName.persons_starting_with
+              ~remove_marital_names_match_only:(fn_list = []) ~conf ~base
+              ~filter ~first_name_prefix:"" ~surname_prefix:(gets "surname")
+              ~limit:max_answers
           in
-          r <> ([], 0)
-        in
-        let list =
-          SearchName.persons_starting_with
-            ~remove_marital_names_match_only:false ~conf ~base ~filter
-            ~first_name_prefix:(gets "first_name") ~surname_prefix:""
-            ~limit:max_answers
-        in
-        (List.map (Gwdb.poi base) list, List.length list)
-      else
-        let persons_of_name_list strings_of persons_of n_list mode =
-          List.map
-            (fun x ->
-              let eq =
-                AdvancedSearchMatch.match_name ~search_list:n_list ~mode
-              in
-              let istrs = strings_of base x in
-              List.fold_left
-                (fun acc istr ->
-                  let str = Mutil.nominative (Gwdb.sou base istr) in
-                  if eq (List.map Name.lower @@ Name.split str) then istr :: acc
-                  else acc)
-                [] istrs)
-            n_list
-          |> List.flatten |> List.sort_uniq compare
-          |> List.map (Gwdb.spi_find @@ persons_of base)
-          |> List.flatten
-        in
+          (List.map (Gwdb.poi base) list, List.length list)
+      | _ :: _, _
+        when get_name_search_mode "exact_first_name" = `Not_Exact_Prefix ->
+          let filter p =
+            let r =
+              match_person ~skip_fname:true ~skip_sname:false ([], 0) p
+                search_type
+            in
+            r <> ([], 0)
+          in
+          let list =
+            SearchName.persons_starting_with
+              ~remove_marital_names_match_only:false ~conf ~base ~filter
+              ~first_name_prefix:(gets "first_name") ~surname_prefix:""
+              ~limit:max_answers
+          in
+          (List.map (Gwdb.poi base) list, List.length list)
+      | [], [] ->
+          Gwdb.load_persons_array base;
+          let result =
+            Gwdb.Collection.fold_until
+              (fun (_, len) -> len < max_answers)
+              (fun acc i ->
+                match_person acc (Util.pget conf base i) search_type)
+              ([], 0) (Gwdb.ipers base)
+          in
+          Gwdb.clear_persons_array base;
+          result
+      | _ ->
+          let persons_of_name_list strings_of persons_of n_list mode =
+            List.map
+              (fun x ->
+                let eq =
+                  AdvancedSearchMatch.match_name ~search_list:n_list ~mode
+                in
+                let istrs = strings_of base x in
+                List.fold_left
+                  (fun acc istr ->
+                    let str = Mutil.nominative (Gwdb.sou base istr) in
+                    if eq (List.map Name.lower @@ Name.split str) then
+                      istr :: acc
+                    else acc)
+                  [] istrs)
+              n_list
+            |> List.flatten |> List.sort_uniq compare
+            |> List.map (Gwdb.spi_find @@ persons_of base)
+            |> List.flatten
+          in
 
-        let skip_fname, skip_sname, list =
-          if sn_list <> [] then
-            let name_search_mode = get_name_search_mode "exact_surname" in
-            let list =
-              persons_of_name_list Gwdb.base_strings_of_surname
-                Gwdb.persons_of_surname sn_list name_search_mode
-            in
-            let list =
-              if fn_list = [] then
-                List.filter
-                  (fun person_id ->
-                    let p = Gwdb.poi base person_id in
-                    let match_name n =
-                      let ns = List.map Name.lower @@ Name.split n in
-                      AdvancedSearchMatch.match_name ~search_list:sn_list
-                        ~mode:name_search_mode ns
-                    in
-                    SearchName.filter_marital_names
-                      ~remove_marital_names_match_only:true match_name conf base
-                      p)
-                  list
-              else list
-            in
-            (false, true, list)
-          else
-            ( true,
-              false,
-              persons_of_name_list Gwdb.base_strings_of_first_name
-                Gwdb.persons_of_first_name fn_list
-                (get_name_search_mode "exact_first_name") )
-        in
-        let rec loop ((_, len) as acc) = function
-          | [] -> acc
-          | _ when len >= max_answers -> acc
-          | ip :: l ->
-              loop
-                (match_person ~skip_fname ~skip_sname acc
-                   (Util.pget conf base ip) search_type)
-                l
-        in
-        loop ([], 0) list
-    else (
-      Gwdb.load_persons_array base;
-      let result =
-        Gwdb.Collection.fold_until
-          (fun (_, len) -> len < max_answers)
-          (fun acc i -> match_person acc (Util.pget conf base i) search_type)
-          ([], 0) (Gwdb.ipers base)
-      in
-      Gwdb.clear_persons_array base;
-      result)
+          let skip_fname, skip_sname, list =
+            if sn_list <> [] then
+              let name_search_mode = get_name_search_mode "exact_surname" in
+              let list =
+                persons_of_name_list Gwdb.base_strings_of_surname
+                  Gwdb.persons_of_surname sn_list name_search_mode
+              in
+              let list =
+                if fn_list = [] then
+                  List.filter
+                    (fun person_id ->
+                      let p = Gwdb.poi base person_id in
+                      let match_name n =
+                        let ns = List.map Name.lower @@ Name.split n in
+                        AdvancedSearchMatch.match_name ~search_list:sn_list
+                          ~mode:name_search_mode ns
+                      in
+                      SearchName.filter_marital_names
+                        ~remove_marital_names_match_only:true match_name conf
+                        base p)
+                    list
+                else list
+              in
+              (false, true, list)
+            else
+              ( true,
+                false,
+                persons_of_name_list Gwdb.base_strings_of_first_name
+                  Gwdb.persons_of_first_name fn_list
+                  (get_name_search_mode "exact_first_name") )
+          in
+          let rec loop ((_, len) as acc) = function
+            | [] -> acc
+            | _ when len >= max_answers -> acc
+            | ip :: l ->
+                loop
+                  (match_person ~skip_fname ~skip_sname acc
+                     (Util.pget conf base ip) search_type)
+                  l
+          in
+          loop ([], 0) list
   in
   (List.rev list, len)
 
