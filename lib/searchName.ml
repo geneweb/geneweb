@@ -1319,18 +1319,20 @@ let dispatch_search_methods conf base query search_order fn_options =
 
 let rec handle_search_results conf base query fn_options components specify
     results =
+  let redirect_to_person ip =
+    record_visited conf ip;
+    let p = Driver.poi base ip in
+    Geneweb_http.Server.http_redirect_temporarily
+      (Adef.(Util.commd conf ^^^ Util.acces conf base p) :> string)
+  in
   let { exact; partial; spouse } = results in
   match exact with
-  | [ single_exact ] ->
-      record_visited conf single_exact;
-      Perso.print conf base (Driver.poi base single_exact)
+  | [ single_exact ] -> redirect_to_person single_exact
   | _ -> (
       let all_persons = exact @ partial @ spouse in
       match all_persons with
       | [] -> SrcfileDisplay.print_welcome conf base
-      | [ single_person ] ->
-          record_visited conf single_person;
-          Perso.print conf base (Driver.poi base single_person)
+      | [ single_person ] -> redirect_to_person single_person
       | _multiple_persons -> (
           let exact_persons = List.map (Driver.poi base) exact in
           let partial_persons = List.map (Driver.poi base) partial in
@@ -1348,9 +1350,7 @@ let rec handle_search_results conf base query fn_options components specify
                 spouse_persons
           | ParsedName { format = `Space; _ }
             when fn_options.exact1 && List.length exact_persons = 1 ->
-              let person = List.hd exact_persons in
-              record_visited conf (Driver.get_iper person);
-              Perso.print conf base person
+              redirect_to_person (Driver.get_iper (List.hd exact_persons))
           | _ ->
               specify conf base query exact_persons partial_persons
                 spouse_persons))
