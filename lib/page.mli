@@ -35,3 +35,39 @@ module All_names_list : sig
     val from_env : Config.env -> t
   end
 end
+
+module Advanced_search : sig
+  module Query_params : sig
+    module Event : sig
+      type kind = [ `Birth | `Baptism | `Marriage | `Death | `Burial | `Other ]
+
+      type t = private {
+        place : string option;
+        dates : Date.dmy option * Date.dmy option;
+      }
+    end
+
+    type t = private {
+      first_name : string option;
+      first_name_search_mode : [ `Exact | `Not_Exact | `Not_Exact_Prefix ];
+      surname : string option;
+      surname_search_mode : [ `Exact | `Not_Exact | `Not_Exact_Prefix ];
+      alias : string option;
+      sex : Def.sex;
+      married : bool option;
+      only_root_ancestors : bool;
+      occupation : string option;
+      events : (Event.kind * Event.t) list;
+      event_search_mode : [ `Or | `And ];
+      event_exact_place : bool;
+      limit : int option;
+    }
+
+    val get_event_place : event_kind:Event.kind -> t -> string option
+
+    val get_event_dates :
+      event_kind:Event.kind -> t -> Date.dmy option * Date.dmy option
+
+    val from_env : Config.env -> t option
+  end
+end
