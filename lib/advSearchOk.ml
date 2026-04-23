@@ -558,7 +558,16 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
 
   let search_type = query_params.event_search_mode in
 
-  let place_searched place = lazy (Option.map place_with_istr place) in
+  let place_searched event_kind =
+    lazy
+      (Option.map place_with_istr
+         (Option.bind
+            (List.find_opt (fun (k, _) -> k = event_kind) query_params.events)
+            (fun (_, e) -> e.Page.Advanced_search.Query_params.Event.place)))
+  in
+
+  let surname_search_mode = query_params.surname_search_mode in
+  let first_name_search_mode = query_params.first_name_search_mode in
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) unsafe_p =
@@ -571,8 +580,8 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
              ~occupation:query_params.occupation ~skip_fname ~skip_sname
              ~first_name_list:fn_list ~surname_list:sn_list
              ~alias_public_name_qualifiers
-             ~exact_first_name:query_params.first_name_search_mode
-             ~exact_surname:query_params.surname_search_mode)
+             ~exact_first_name:first_name_search_mode
+             ~exact_surname:surname_search_mode)
       in
       let check, default =
         match search_type with
@@ -591,7 +600,7 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           | `Other -> AdvancedSearchMatch.match_other_events ~conf
         in
         f ~base ~p ~dates:event.dates
-          ~place:(Lazy.force @@ place_searched event.place)
+          ~place:(Lazy.force @@ place_searched event_kind)
           ~exact_place:query_params.event_exact_place
       in
       Lazy.force civil_match
@@ -621,8 +630,6 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
       | [], [] ->
           advanced_search_without_names conf base match_person max_answers
       | _ ->
-          let first_name_search_mode = query_params.first_name_search_mode in
-          let surname_search_mode = query_params.surname_search_mode in
           advanced_search_without_prefix conf base match_person max_answers
             sn_list fn_list first_name_search_mode surname_search_mode
   in
