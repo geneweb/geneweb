@@ -456,7 +456,8 @@ let mangle_for_display ~calendar date =
   match date.prec with
   | Maybe | OrYear _ -> date
   | Sure ->
-      if date.delta = 0 then date else to_interval ~light:false ~calendar date
+      if not @@ has_delta date then date
+      else to_interval ~light:false ~calendar date
   | (About | After) as prec ->
       if not @@ has_delta date then date
       else { (to_interval ~light:true ~calendar date) with prec }
