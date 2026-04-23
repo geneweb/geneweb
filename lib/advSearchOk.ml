@@ -844,17 +844,19 @@ let advanced_search conf base max_answers =
     if "on" = gets "sosa_filter" then
       advanced_search_sosa conf base match_person
     else
-      match (fn_list, sn_list) with
-      | _, _ :: _ when surname_search_mode = `Not_Exact_Prefix ->
+      match
+        ((surname_search_mode, sn_list), (first_name_search_mode, fn_list))
+      with
+      | (`Not_Exact_Prefix, _ :: _), _ ->
           let surname_prefix = gets "surname" in
           let remove_marital_names_match_only = fn_list = [] in
           advanced_search_surname_prefix conf base match_person max_answers
             remove_marital_names_match_only surname_prefix
-      | _ :: _, _ when first_name_search_mode = `Not_Exact_Prefix ->
+      | _, (`Not_Exact_Prefix, _ :: _) ->
           let first_name_prefix = gets "first_name" in
           advanced_search_first_name_prefix conf base match_person max_answers
             first_name_prefix
-      | [], [] ->
+      | (_, []), (_, []) ->
           advanced_search_without_names conf base match_person max_answers
       | _ ->
           advanced_search_without_prefix conf base match_person max_answers
