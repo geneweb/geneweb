@@ -282,3 +282,34 @@ let insert_lowered_name_suffix_istrs ~insert_string ~base_data ~istr =
   List.filter_map
     (fun s -> if s <> "" then Some (insert_string s) else None)
     lowered_strings
+
+let tmp_fname fname = "1" ^ fname
+
+let fpath fname ?(temp = false) base =
+  let fname = if temp then tmp_fname fname else fname in
+  Filename.concat base.Dbdisk.data.bdir fname
+
+let snames_dat = "snames.dat"
+let snames_inx = "snames.inx"
+let snames_lower_dat = "snames_lower.dat"
+let snames_lower_inx = "snames_lower.inx"
+let snames_dat_path = fpath snames_dat
+let snames_inx_path = fpath snames_inx
+let snames_lower_dat_path = fpath snames_lower_dat
+let snames_lower_inx_path = fpath snames_lower_inx
+let snames_marital_dat = "snames_marital.dat"
+let snames_marital_inx = "snames_marital.inx"
+let snames_marital_lower_dat = "snames_marital_lower.dat"
+let snames_marital_lower_inx = "snames_marital_lower.inx"
+let snames_marital_dat_path = fpath snames_marital_dat
+let snames_marital_inx_path = fpath snames_marital_inx
+let snames_marital_lower_dat_path = fpath snames_marital_lower_dat
+let snames_marital_lower_inx_path = fpath snames_marital_lower_inx
+let fnames_dat = "fnames.dat"
+let fnames_inx = "fnames.inx"
+let fnames_lower_inx = "fnames_lower.inx"
+let fnames_lower_dat = "fnames_lower.dat"
+let fnames_dat_path = fpath fnames_dat
+let fnames_inx_path = fpath fnames_inx
+let fnames_lower_inx_path = fpath fnames_lower_inx
+let fnames_lower_dat_path = fpath fnames_lower_dat
