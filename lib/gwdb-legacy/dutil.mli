@@ -132,3 +132,28 @@ val insert_lowered_name_suffix_istrs :
   base_data:Dbdisk.base_data ->
   istr:int ->
   int list
+
+val snames_dat : string
+val snames_inx : string
+val snames_lower_dat : string
+val snames_lower_inx : string
+val snames_marital_dat : string
+val snames_marital_inx : string
+val snames_marital_lower_dat : string
+val snames_marital_lower_inx : string
+val snames_dat_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val snames_inx_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val snames_lower_dat_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val snames_lower_inx_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val snames_marital_dat_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val snames_marital_inx_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val snames_marital_lower_dat_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val snames_marital_lower_inx_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val fnames_dat : string
+val fnames_inx : string
+val fnames_dat_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val fnames_inx_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val fnames_lower_dat : string
+val fnames_lower_inx : string
+val fnames_lower_dat_path : ?temp:bool -> Dbdisk.dsk_base -> string
+val fnames_lower_inx_path : ?temp:bool -> Dbdisk.dsk_base -> string
