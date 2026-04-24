@@ -549,7 +549,11 @@ and search_phonetic conf base query =
       let p = Driver.poi base ip in
       let sn = Driver.sou base (Driver.get_surname p) in
       let sn_crushed = Name.crush_lower sn in
-      Mutil.contains sn_crushed query_crushed)
+      (* Short crush codes (<=2 chars) require exact equality to avoid
+         e.g. "Le" (-> "l") matching every name containing an "l" phoneme.
+         Longer codes are specific enough that substring containment is safe. *)
+      if String.length query_crushed <= 2 then sn_crushed = query_crushed
+      else Mutil.contains sn_crushed query_crushed)
     all_results
 
 and search_firstname_phonetic conf base query =
@@ -564,7 +568,11 @@ and search_firstname_phonetic conf base query =
       let p = Driver.poi base ip in
       let fn = Driver.sou base (Driver.get_first_name p) in
       let fn_crushed = Name.crush_lower fn in
-      Mutil.contains fn_crushed query_crushed)
+      (* Short crush codes (<=2 chars) require exact equality to avoid
+         "lea" (-> "l") matching "Louis" (-> "ls"), "Jean Louis" (-> "jnl"),
+         etc.  Longer codes are specific enough for substring containment. *)
+      if String.length query_crushed <= 2 then fn_crushed = query_crushed
+      else Mutil.contains fn_crushed query_crushed)
     all_results
 
 let deduplicate_collect ipers f =
@@ -920,21 +928,45 @@ let search_firstname alias_cache conf base query opts =
                 f ip))
             lst
         in
+        (* When the phonetic crush code is very short (<=2 chars), substring
+           containment is too broad: "lea"->"l" would match "Louis"->"ls",
+           "Jean Louis"->"jnl", etc.  Require exact crush equality instead. *)
+        let phonetic_matches fn_crushed =
+          if String.length query_crushed <= 2 then fn_crushed = query_crushed
+          else Mutil.contains fn_crushed query_crushed
+        in
         process_list direct_included_results (fun ip ->
             let n, _ = normalize_person ip in
             if Mutil.contains n.lower nq.lower then
               contains_query := ip :: !contains_query
             else
               let fn_crushed = Name.crush_lower n.lower in
-              if Mutil.contains fn_crushed query_crushed then
+              if phonetic_matches fn_crushed then
                 other_phonetic := ip :: !other_phonetic);
         process_list all_phonetic (fun ip ->
             let n, _ = normalize_person ip in
             if Mutil.contains n.lower nq.lower then
               contains_query := ip :: !contains_query
-            else other_phonetic := ip :: !other_phonetic);
+            else
+              let fn_crushed =
+                Name.crush_lower
+                  (normalize_for_phonetic
+                     (Name.lower
+                        (Driver.sou base
+                           (Driver.get_first_name (Driver.poi base ip)))))
+              in
+              if phonetic_matches fn_crushed then
+                other_phonetic := ip :: !other_phonetic);
         process_list partial_phonetic (fun ip ->
-            other_phonetic := ip :: !other_phonetic);
+            let fn_crushed =
+              Name.crush_lower
+                (normalize_for_phonetic
+                   (Name.lower
+                      (Driver.sou base
+                         (Driver.get_first_name (Driver.poi base ip)))))
+            in
+            if phonetic_matches fn_crushed then
+              other_phonetic := ip :: !other_phonetic);
         let included_iper = List.rev !contains_query in
         let included_variants =
           List.fold_left
