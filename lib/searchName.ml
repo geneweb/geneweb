@@ -1073,8 +1073,8 @@ let search_fullname cache conf base fn variants_sn =
                     StringCache.get_cached cache base (Driver.get_first_name p)
                   in
                   let fn1_crushed = Name.crush_lower fn1 in
-                  Mutil.contains fn1_crushed fn_crushed
-                  || Mutil.contains fn_crushed fn1_crushed)
+                  if String.length fn_crushed <= 2 then fn1_crushed = fn_crushed
+                  else Mutil.contains fn1_crushed fn_crushed)
               pl
           in
           partial @ phonetic_extra
@@ -1124,8 +1124,9 @@ let search_fullname cache conf base fn variants_sn =
                         (Driver.get_first_name p)
                     in
                     let fn1_crushed = Name.crush_lower fn1 in
-                    Mutil.contains fn1_crushed fn_crushed
-                    || Mutil.contains fn_crushed fn1_crushed)
+                    if String.length fn_crushed <= 2 then
+                      fn1_crushed = fn_crushed
+                    else Mutil.contains fn1_crushed fn_crushed)
                 spouses
             in
             spouse_substr @ phonetic_extra
