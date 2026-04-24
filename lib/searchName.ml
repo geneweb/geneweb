@@ -1411,18 +1411,20 @@ let execute_search_method cache alias_cache conf base query method_ fn_options =
       let fn = Option.value components.first_name ~default:"" in
       let sn = Option.value components.surname ~default:query in
       let oc = Option.value components.oc ~default:"" in
-      let variants = generate_apostrophe_variants sn in
-      let results =
-        search_fullname cache conf base
-          (if oc <> "" then fn ^ "." ^ oc else fn)
-          variants
-      in
-      Log.debug (fun k ->
-          k "    Method FullName: %d+%d+%d results"
-            (List.length results.exact)
-            (List.length results.partial)
-            (List.length results.spouse));
-      results
+      if fn = "" then { exact = []; partial = []; spouse = [] }
+      else
+        let variants = generate_apostrophe_variants sn in
+        let results =
+          search_fullname cache conf base
+            (if oc <> "" then fn ^ "." ^ oc else fn)
+            variants
+        in
+        Log.debug (fun k ->
+            k "    Method FullName: %d+%d+%d results"
+              (List.length results.exact)
+              (List.length results.partial)
+              (List.length results.spouse));
+        results
   | ApproxKey ->
       let persons =
         search_approx_key_with_alias_cache alias_cache conf base query
