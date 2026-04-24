@@ -32,7 +32,7 @@
 %end;
 %( %qvar.index.marriage_places; renvoie une chaine avec les places de mariage, séparées par des | %)
 %define;get_marriage(myindex)
-  %qvar.myindex.marriage_places;
+  %qvar.myindex.marriage_places_raw;
 %end;
 %define;get_value(myindex,param)
   %if;("param"="father" or "param"="mother")
@@ -72,7 +72,7 @@
 %let;opt;%nn;
   %if;(e.data="place")
   %if;(e.bi="on")&bi=on%end;%nn;
-  %if;(e.ba="on")&bp=on%end;%nn;
+  %if;(e.ba="on")&ba=on%end;%nn;
   %if;(e.ma="on")&ma=on%end;%nn;
   %if;(e.de="on")&de=on%end;%nn;
   %if;(e.bu="on")&bu=on%end;%nn;
@@ -97,13 +97,13 @@
 </div>
 
 %define;nbmds(xx,yy,tt,kk)
-  %if;(xx!="" and xx="kk")yy%nn;
+  %if;("xx"!="" and "xx"="kk")yy%nn;
   %else;%if;("tt"=1)&nbsp;%end;
   %end;
 %end;
 
 %define;nbmds_m(xx,yy,tt,kk)
-  %if;(xx!="" and ("kk" is_substr xx or xx="kk"))yy%nn;
+  %if;("xx"!="" and ("kk" is_substr "xx" or "xx"="kk"))yy%nn;
   %else;%if;("tt"=1)&nbsp;%end;
   %end;
 %end;
@@ -115,11 +115,11 @@
   %let;marriageplace;%apply;get_marriage(myindex)%in;
   %let;deathplace;%apply;get_value(myindex, "death_place_raw")%in;
   %let;burialplace;%apply;get_value(myindex, "burial_place_raw")%in;
-  %apply;nbmds("birthplace","N","tt","ss")%nn;
-  %apply;nbmds("baptismplace","B","tt","ss")%nn;
-  %apply;nbmds_m("marriageplace","M","tt","ss")%nn;
-  %apply;nbmds("deathplace","D","tt","ss")%nn;
-  %apply;nbmds("burialplace","S","tt","ss")%nn;
+  %apply;nbmds(birthplace,"N","tt","ss")%nn;
+  %apply;nbmds(baptismplace,"B","tt","ss")%nn;
+  %apply;nbmds_m(marriageplace,"M","tt","ss")%nn;
+  %apply;nbmds(deathplace,"D","tt","ss")%nn;
+  %apply;nbmds(burialplace,"S","tt","ss")%nn;
 %end;
 
 %empty_sorted_list
