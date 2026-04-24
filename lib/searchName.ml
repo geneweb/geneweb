@@ -1066,7 +1066,8 @@ let search_fullname cache conf base fn variants_sn =
             List.filter
               (fun p ->
                 let ip = Driver.get_iper p in
-                if Iper.Set.mem ip already then false
+                if Iper.Set.mem ip already || search_reject_p conf base p then
+                  false
                 else
                   let fn1 =
                     StringCache.get_cached cache base (Driver.get_first_name p)
@@ -1115,7 +1116,8 @@ let search_fullname cache conf base fn variants_sn =
               List.filter
                 (fun p ->
                   let ip = Driver.get_iper p in
-                  if Iper.Set.mem ip already then false
+                  if Iper.Set.mem ip already || search_reject_p conf base p then
+                    false
                   else
                     let fn1 =
                       StringCache.get_cached cache base
