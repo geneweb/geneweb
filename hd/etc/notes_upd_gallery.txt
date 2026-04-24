@@ -95,6 +95,19 @@ li.in { background-color: #FFE8CC; }
 }
 
 .legend-highlighted { background-color: #FFD2D2 !important; }
+
+/* --- Drag cursor --- */
+#reorder_table tbody td:not(.reorder-btns) {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+#reorder_table tbody tr.reorder-dragging { opacity: 0.4; }
+#reorder_table tbody tr.reorder-placeholder {
+    background: #fff3cd;
+    border: 2px dashed #ffc107;
+}
+#reorder_table tbody img { -webkit-user-drag: none; pointer-events: none; }
 </style>
   %include;hed
 </head>
@@ -126,6 +139,10 @@ li.in { background-color: #FFE8CC; }
         <span><span id="album-current">1</span> / <span id="album-count">1</span></span>
         <a href="#" id="album-next" title="[*next]"><i class="fa-solid fa-caret-right"></i></a>
         <a href="#" id="album-last" title="[*last]"><i class="fa-solid fa-forward"></i></a>
+        <a href="#" id="album-reorder" title="[*reorder images]"
+          data-bs-toggle="modal" data-bs-target="#reorder_modal">
+          <i class="fa fa-up-down"></i>
+        </a>
         <div id="album-actions-mount-nav" class="d-inline-flex gap-2"></div>
       </div>
       <div class="row my-1">
@@ -216,6 +233,36 @@ li.in { background-color: #FFE8CC; }
   <input id="notes" type="hidden" name="notes">
 </form>
 </div>
+
+%( BS Modal to sort images %)
+<div class="modal fade" id="reorder_modal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">[*reorder images]</h5>
+        <button type="button" class="btn-close"
+          data-bs-dismiss="modal" aria-label="[*close]"></button>
+      </div>
+      <div class="modal-body">
+        <table id="reorder_table" class="table table-sm">
+          <thead>
+            <tr>
+              <th></th>
+              <th>#</th>
+              <th>[*thumbnail]</th>
+              <th>[*file]</th>
+              <th>[*description]</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="reorder_ok">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
 %include;trl
 %include;copyr
 %include;js
@@ -226,8 +273,14 @@ li.in { background-color: #FFE8CC; }
                sha384-VWibGBgfcDJ7Qtht0Cb7opkjtHfvi69xPCGei0rukalknLpxVh6uvlaOx3m3pfJ7
                sha512-MudHr1io3GS94n+c4mu2U6RFQr4fgT4GTbyQzQQUl871gKF7zJUEDFv/sfJ0hSDbv+KhRe+IIo0Jgp5HRAXpdw=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html5sortable@0.14.0/dist/html5sortable.min.js"
+    integrity="sha256-Pdhnnt/Bc9u+ysgXiOXZBrGT8dwi4mZOdzMhxvWIbd8=
+               sha384-cZfTSiLzVQDaBN1hjURm6ODfx0fOTGTXsYmUXLq97heMPd6gsXI/NlPgIUg4mj07
+               sha512-B/yiMlkxhtHzzJxPa5kNOO/+8cq0Fj4ndMUxVo2kGunCCH8g8XrPnzqg+sOon3hQ8RaEY2YytH+PIseTtfstjg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 %else;
   <script src="%etc_prefix;js/datatables.min.js?version=dt-3.0.0+rr-2.0.0-beta.1"></script>
+  <script src="%etc_prefix;js/html5sortable.min.js?version=0.14.0"></script>
 %end;
 <script src="%etc_prefix;js/maphilight.min.js?hash=%apply;hash%with;%etc_prefix;js/maphilight.min.js%end;"></script>
 <script>

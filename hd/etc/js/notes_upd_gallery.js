@@ -1916,6 +1916,93 @@ const HandlerManager = {
     },
 };
 
+function populateReorderModal() {
+    const esc = s => {
+        const d = document.createElement('div');
+        d.textContent = s ?? '';
+        return d.innerHTML;
+    };
+    const tbody = document.querySelector('#reorder_table tbody');
+    tbody.innerHTML = '';
+    albumImages.forEach((img, i) => {
+        const thumbSrc = img.img.startsWith('albums/')
+            ? GW.prefix + 'm=IMA&s=' + encodeURI(img.img.substring(7))
+            : GW.prefix + 'm=DOC&s=' + encodeURI(img.img);
+        tbody.insertAdjacentHTML('beforeend', `
+            <tr data-idx="${i}">
+              <td class="text-nowrap reorder-btns align-middle">
+                <button type="button" class="btn btn-sm btn-outline-secondary reorder-up" draggable="false" title="${GW.i18n.moveUp}">
+                  <i class="fa-solid fa-arrow-up" draggable="false"></i></button>
+                <button type="button" class="btn btn-sm btn-outline-secondary reorder-down" draggable="false" title="${GW.i18n.moveDown}">
+                  <i class="fa-solid fa-arrow-down" draggable="false"></i></button>
+              </td>
+              <td class="reorder-num ps-2 border-start align-middle" title="${GW.i18n.moveDrag}">${i + 1}</td>
+              <td title="${GW.i18n.moveDrag}"><img src="${thumbSrc}" style="max-height:60px"></td>
+              <td title="${GW.i18n.moveDrag}">${esc(img.img)}</td>
+              <td title="${GW.i18n.moveDrag}">${esc(img.desc || '')}</td>
+            </tr>`);
+    });
+
+    refreshReorderNumbers();
+
+    // Initialize html5sortable on each populate
+    sortable(tbody, {
+        items: 'tr',
+        placeholderClass: 'reorder-placeholder',
+        draggingClass: 'reorder-dragging'
+    });
+}
+
+function refreshReorderNumbers() {
+    const rows = document.querySelectorAll('#reorder_table tbody tr');
+    rows.forEach((tr, i) => {
+        const cell = tr.querySelector('.reorder-num');
+        if (cell) cell.textContent = i + 1;
+        tr.querySelector('.reorder-up')?.classList
+            .toggle('invisible', i === 0);
+        tr.querySelector('.reorder-down')?.classList
+            .toggle('invisible', i === rows.length - 1);
+    });
+}
+
+function initReorderModal() {
+    const tbody = document.querySelector('#reorder_table tbody');
+    if (!tbody) return;
+
+    // Up/down click (delegation, attached once)
+    tbody.addEventListener('click', e => {
+        const btn = e.target.closest('.reorder-up, .reorder-down');
+        if (!btn) return;
+        const tr = btn.closest('tr');
+        if (!tr) return;
+        const up = btn.classList.contains('reorder-up');
+        if (up && tr.previousElementSibling) {
+            tbody.insertBefore(tr, tr.previousElementSibling);
+        } else if (!up && tr.nextElementSibling) {
+            tbody.insertBefore(tr.nextElementSibling, tr);
+        }
+        refreshReorderNumbers();
+    });
+
+    // Sortable triggers this after any drag update
+    tbody.addEventListener('sortupdate', refreshReorderNumbers);
+
+    // OK button
+    document.getElementById('reorder_ok')?.addEventListener('click', () => {
+        const newOrder = [];
+        tbody.querySelectorAll('tr').forEach(tr => {
+            newOrder.push(albumImages[parseInt(tr.dataset.idx)]);
+        });
+        const currentImg = albumImages[albumCurrent];
+        albumImages = newOrder;
+        albumCurrent = albumImages.indexOf(currentImg);
+        if (albumCurrent < 0) albumCurrent = 0;
+        bootstrap.Modal.getInstance(
+            document.getElementById('reorder_modal')).hide();
+        loadAlbumImage(albumCurrent);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initTables();
     initAlbumHandlers();
@@ -1931,4 +2018,8 @@ document.addEventListener('DOMContentLoaded', () => {
         inputToBook.addNavigation();
     }
     if (typeof populateDatalists === 'function') populateDatalists();
+    
+    initReorderModal();
+    document.getElementById('reorder_modal')
+        ?.addEventListener('show.bs.modal', populateReorderModal);
 });

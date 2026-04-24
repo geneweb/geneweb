@@ -11914,6 +11914,14 @@ sv: länkade bilder
 tr: bağlantılı resimler
 zh: 关联图像
 
+    reorder images
+en: reorder images
+fr: réordonner les images
+
+    thumbnail
+en: thumbnail
+fr: vignette
+
     linked galleries
 co: gallerie ligate
 de: verknüpfte Galerien
