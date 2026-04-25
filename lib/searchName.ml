@@ -119,8 +119,6 @@ let find_apostrophe_opt s =
   in
   aux 0
 
-let has_apostrophe s = Option.is_some (find_apostrophe_opt s)
-
 let generate_apostrophe_variants s =
   let apostrophes = [ "'"; "\xE2\x80\x99"; "\xCA\xBC"; "\xCA\xBB" ] in
   match find_apostrophe_opt s with
@@ -379,13 +377,13 @@ let search_by_key conf base an =
   | None -> None
   | Some ip -> Util.pget_opt conf base ip
 
-let search_sosa_opt conf base query =
-  match search_by_sosa conf base query with
+let search_key_opt conf base query =
+  match search_by_key conf base query with
   | None -> []
   | Some p -> [ Driver.get_iper p ]
 
-let search_key_opt conf base query =
-  match search_by_key conf base query with
+let search_sosa_opt conf base query =
+  match search_by_sosa conf base query with
   | None -> []
   | Some p -> [ Driver.get_iper p ]
 
@@ -1385,7 +1383,11 @@ let execute_search_method cache alias_cache conf base query method_ fn_options =
       Log.debug (fun k -> k "    Method Sosa: %d results" (List.length results));
       { exact = results; partial = []; spouse = [] }
   | Key ->
-      let results = search_key_opt conf base query in
+      let results =
+        generate_apostrophe_variants query
+        |> List.concat_map (fun v -> search_key_opt conf base v)
+        |> List.sort_uniq compare
+      in
       Log.debug (fun k -> k "    Method Key: %d results" (List.length results));
       { exact = results; partial = []; spouse = [] }
   | Surname ->
@@ -1563,45 +1565,22 @@ and display_surname_results conf base _query surname all_persons =
           Some.print_several_possible_surnames surname conf base
             ([], multiple_surnames))
 
-(* Top-level search entry point.
-   Apostrophe variants are only expanded here for FirstName search, which
-   does not handle them internally.  All other methods (FullName, ApproxKey,
-   Surname, PartialKey) already expand apostrophe variants themselves, so
-   iterating over variants at this level would produce duplicates.
-   Fresh StringCache and AliasCache instances are created here and threaded
-   through the call chain so each request starts with a clean cache scoped
-   to the current base, with no global mutable state. *)
+(* Top-level search entry point.  Fresh StringCache and AliasCache
+   instances are created here and threaded through the call chain so each
+   request starts with a clean cache scoped to the current base, with no
+   global mutable state.  All search methods handle apostrophe variants
+   internally (search_by_key included); no per-variant iteration is needed
+   at this level. *)
 let search conf base query search_order fn_options specify =
   let cache = StringCache.create () in
   let alias_cache = AliasCache.create () in
-  let variants =
-    if List.mem FirstName search_order && has_apostrophe query then
-      generate_apostrophe_variants query
-    else [ query ]
+  let results =
+    dispatch_search_methods cache alias_cache conf base query search_order
+      fn_options
   in
-  if List.length variants > 1 then
-    Log.debug (fun k ->
-        k "  %d apostrophe variants: %s" (List.length variants)
-          (String.concat ", " variants));
-  let final_results =
-    List.fold_left
-      (fun acc variant ->
-        let results =
-          dispatch_search_methods cache alias_cache conf base variant
-            search_order fn_options
-        in
-        {
-          exact = acc.exact @ results.exact;
-          partial = acc.partial @ results.partial;
-          spouse = acc.spouse @ results.spouse;
-        })
-      { exact = []; partial = []; spouse = [] }
-      variants
-  in
-  let deduplicated = remove_duplicates final_results in
   let components = extract_name_components conf base in
   handle_search_results alias_cache conf base query fn_options components
-    specify deduplicated
+    specify results
 
 (* ========================================================================= *)
 (* Section 7: Main Entry Point                                              *)
