@@ -135,7 +135,8 @@ let sort_by_first_name base persons_with_titles =
     with_fn
   |> List.map (fun (p, tl, _) -> (p, tl))
 
-let print_person_list conf base query title_opt persons_with_titles =
+let print_person_list conf base alias_cache query title_opt persons_with_titles
+    =
   Logs.debug (fun k ->
       k "Print_person_list: %d" (List.length persons_with_titles));
   match persons_with_titles with
@@ -157,7 +158,9 @@ let print_person_list conf base query title_opt persons_with_titles =
             SosaCache.print_sosa conf base p true
           else Output.print_sstring conf {|<span class="bullet">•</span>|};
           Output.print_sstring conf "</span>";
-          let alias = Some.AliasCache.get_alias (Driver.get_iper p) in
+          let alias =
+            Some.AliasCache.get_alias alias_cache (Driver.get_iper p)
+          in
           let snalias =
             Driver.get_surnames_aliases p |> List.map (Driver.sou base)
           in
@@ -172,7 +175,7 @@ let print_person_list conf base query title_opt persons_with_titles =
         persons_with_titles;
       Output.print_sstring conf "</ul>\n"
 
-let specify conf base n pl1 pl2 pl3 =
+let specify conf base alias_cache n pl1 pl2 pl3 =
   let title _ =
     Output.printf conf "%s%s %s"
       (Util.escape_html n :> string)
@@ -207,21 +210,21 @@ let specify conf base n pl1 pl2 pl3 =
      let ptll12 = process_list pl12 in
      let ptll21 = process_list pl21 in
      let title = transl conf "alias" |> Utf8.capitalize_fst in
-     print_person_list conf base n (Some title) (ptll11 @ ptll21);
+     print_person_list conf base alias_cache n (Some title) (ptll11 @ ptll21);
      let title = transl_nth conf "surname/surnames" 0 |> Utf8.capitalize_fst in
-     print_person_list conf base n (Some title) ptll12)
+     print_person_list conf base alias_cache n (Some title) ptll12)
    else
      let ptll1 = process_list pl1 in
-     print_person_list conf base n None ptll1);
+     print_person_list conf base alias_cache n None ptll1);
   if pl22 <> [] then
     let ptll22 = process_list pl22 in
     let title = transl conf "other possibilities" |> Utf8.capitalize_fst in
-    print_person_list conf base n (Some title) ptll22
+    print_person_list conf base alias_cache n (Some title) ptll22
   else ();
   let ptll3 = process_list pl3 in
   if ptll3 <> [] then
     let title = transl conf "with spouse name" |> Utf8.capitalize_fst in
-    print_person_list conf base n (Some title) ptll3
+    print_person_list conf base alias_cache n (Some title) ptll3
   else ();
   (* FIXME why are those else () needed ? *)
   Hutil.trailer conf
@@ -797,8 +800,9 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
                  | Some v ->
-                     Some.search_surname_print conf base Some.surname_not_found
-                       v
+                     let alias_cache = Some.AliasCache.create () in
+                     Some.search_surname_print conf base alias_cache
+                       Some.surname_not_found v
                  | _ -> AllnDisplay.print_surnames conf base)
              | "NG" -> (
                  w_base @@ fun conf base ->
@@ -826,15 +830,22 @@ let treat_request =
                      let search n =
                        let pl, sosa_acc = find_all conf base n in
                        match pl with
-                       | [] -> Some.search_surname_print conf base unknown n
+                       | [] ->
+                           let alias_cache = Some.AliasCache.create () in
+                           Some.search_surname_print conf base alias_cache
+                             unknown n
                        | [ p ] ->
                            if
                              sosa_acc
                              || Gutil.person_of_string_key base n <> None
                              || person_is_std_key conf base p n
                            then person_selected_with_redirect conf base p
-                           else specify conf base n pl [] []
-                       | pl -> specify conf base n pl [] []
+                           else
+                             let alias_cache = Some.AliasCache.create () in
+                             specify conf base alias_cache n pl [] []
+                       | pl ->
+                           let alias_cache = Some.AliasCache.create () in
+                           specify conf base alias_cache n pl [] []
                      in
                      match real_input "v" with
                      | Some n -> search n
@@ -856,7 +867,9 @@ let treat_request =
                                  env = ("sn", Mutil.encode sn) :: conf.env;
                                }
                              in
-                             Some.search_surname_print conf base unknown sn
+                             let alias_cache = Some.AliasCache.create () in
+                             Some.search_surname_print conf base alias_cache
+                               unknown sn
                          | None, None ->
                              request_issue conf base
                                ~key:"missing fn and sn for search"))
@@ -933,17 +946,20 @@ let treat_request =
                      let fn = components.first_name in
                      let sn = components.surname in
                      let search n =
+                       let alias_cache = Some.AliasCache.create () in
                        let pl, sosa_acc = find_all conf base n in
                        match pl with
-                       | [] -> Some.search_surname_print conf base unknown n
+                       | [] ->
+                           Some.search_surname_print conf base alias_cache
+                             unknown n
                        | [ p ] ->
                            if
                              sosa_acc
                              || Gutil.person_of_string_key base n <> None
                              || person_is_std_key conf base p n
                            then person_selected_with_redirect conf base p
-                           else specify conf base n pl [] []
-                       | pl -> specify conf base n pl [] []
+                           else specify conf base alias_cache n pl [] []
+                       | pl -> specify conf base alias_cache n pl [] []
                      in
                      match p_getenv conf.env "v" with
                      | Some n -> search n

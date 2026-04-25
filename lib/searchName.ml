@@ -182,23 +182,6 @@ module StringCache = struct
         s
 end
 
-(* Alias cache scoped to a single search request to avoid cross-base
-   pollution when gwd serves multiple bases.  The cache is created at the
-   top of [search] and threaded explicitly through the call chain; there is
-   no global mutable state. *)
-module AliasCache = struct
-  type t = (Driver.Iper.t, string option) Hashtbl.t
-
-  let create () : t = Hashtbl.create 200
-  let add_direct (cache : t) iper = Hashtbl.replace cache iper None
-
-  let add_alias (cache : t) iper alias_str =
-    Hashtbl.replace cache iper (Some alias_str)
-
-  let get_alias (cache : t) iper =
-    match Hashtbl.find_opt cache iper with Some (Some s) -> Some s | _ -> None
-end
-
 (* ========================================================================= *)
 (* Section 3: Core Search Functions                                         *)
 (* ========================================================================= *)
@@ -264,7 +247,7 @@ let select_approx_key alias_cache conf base pl k =
     (fun p pl ->
       let iper = Driver.get_iper p in
       if person_is_approx_key base p k then (
-        AliasCache.add_direct alias_cache iper;
+        Some.AliasCache.add_direct alias_cache iper;
         p :: pl)
       else
         let k_stripped = Name.strip_lower k in
@@ -279,11 +262,11 @@ let select_approx_key alias_cache conf base pl k =
         match matched_alias with
         | Some alias_istr ->
             let alias_str = Driver.sou base alias_istr in
-            AliasCache.add_alias alias_cache iper alias_str;
+            Some.AliasCache.add_alias alias_cache iper alias_str;
             p :: pl
         | None ->
             if person_is_misc_name conf base p k then (
-              AliasCache.add_direct alias_cache iper;
+              Some.AliasCache.add_direct alias_cache iper;
               p :: pl)
             else pl)
     pl []
@@ -366,7 +349,7 @@ let search_key_aux aux conf base an =
   Gutil.sort_uniq_person_list base result
 
 let search_approx_key conf base an =
-  let alias_cache = AliasCache.create () in
+  let alias_cache = Some.AliasCache.create () in
   search_key_aux (select_approx_key alias_cache) conf base an
 
 let search_approx_key' alias_cache conf base an =
@@ -735,7 +718,7 @@ let search_firstname_phonetic_split alias_cache conf base query =
   in
   let firstname_variants = ref Mutil.StrSet.empty in
   let classify ip =
-    AliasCache.add_direct alias_cache ip;
+    Some.AliasCache.add_direct alias_cache ip;
     let p = Driver.poi base ip in
     let fn = Driver.sou base (Driver.get_first_name p) in
     let fn_norm = normalize_for_phonetic (Name.lower fn) in
@@ -780,7 +763,7 @@ let search_firstname_phonetic_ngrams alias_cache conf base query =
         let fn_norm = normalize_for_phonetic fn_lower in
         let fn_norm_crushed = Name.crush fn_norm in
         if Mutil.contains fn_norm_crushed query_norm_crushed then (
-          AliasCache.add_direct alias_cache ip;
+          Some.AliasCache.add_direct alias_cache ip;
           Some ip)
         else None)
   in
@@ -838,13 +821,13 @@ let search_firstname alias_cache conf base query opts =
         (fun istr -> Driver.spi_find (Driver.persons_of_first_name base) istr)
         exact_istrl
     in
-    List.iter (fun ip -> AliasCache.add_direct alias_cache ip) exact_ips;
+    List.iter (fun ip -> Some.AliasCache.add_direct alias_cache ip) exact_ips;
     let other_ips =
       List.concat_map
         (fun istr -> Driver.spi_find (Driver.persons_of_first_name base) istr)
         other_istrl
     in
-    List.iter (fun ip -> AliasCache.add_direct alias_cache ip) other_ips;
+    List.iter (fun ip -> Some.AliasCache.add_direct alias_cache ip) other_ips;
     let normalize_person ip =
       let p = Driver.poi base ip in
       let fn = Driver.sou base (Driver.get_first_name p) in
@@ -869,7 +852,7 @@ let search_firstname alias_cache conf base query opts =
       if opts.incl_aliases then (
         let aliases = search_firstname_aliases conf base query in
         List.iter
-          (fun (ip, alias) -> AliasCache.add_alias alias_cache ip alias)
+          (fun (ip, alias) -> Some.AliasCache.add_alias alias_cache ip alias)
           aliases;
         let norm_alias =
           List.map (fun (ip, _) -> normalize_person ip) aliases
@@ -898,7 +881,7 @@ let search_firstname alias_cache conf base query opts =
             let perm_query_crushed = Name.crush_lower perm_query in
             let perm_direct = search_firstname_direct conf base perm_query in
             List.iter
-              (fun ip -> AliasCache.add_direct alias_cache ip)
+              (fun ip -> Some.AliasCache.add_direct alias_cache ip)
               perm_direct;
             let perm_alias =
               if opts.incl_aliases then
@@ -906,7 +889,8 @@ let search_firstname alias_cache conf base query opts =
               else []
             in
             List.iter
-              (fun (ip, alias) -> AliasCache.add_alias alias_cache ip alias)
+              (fun (ip, alias) ->
+                Some.AliasCache.add_alias alias_cache ip alias)
               perm_alias;
             let perm_all = perm_direct @ List.map fst perm_alias in
             let filtered_perm =
@@ -1466,7 +1450,7 @@ let execute_search_method cache alias_cache conf base components query method_
         List.partition
           (fun p ->
             let iper = Driver.get_iper p in
-            match AliasCache.get_alias alias_cache iper with
+            match Some.AliasCache.get_alias alias_cache iper with
             | Some _ -> true
             | None -> false)
           persons
@@ -1540,23 +1524,23 @@ let rec handle_search_results alias_cache conf base query fn_options components
           let spouse_persons = List.map (Driver.poi base) spouse in
           match components.case with
           | SurnameOnly sn ->
-              display_surname_results conf base query sn all_persons
+              display_surname_results conf base alias_cache query sn all_persons
           | ParsedName { first_name = None; surname = Some sn; _ } ->
-              display_surname_results conf base query sn all_persons
+              display_surname_results conf base alias_cache query sn all_persons
           | ParsedName { first_name = Some fn; surname = None; _ } ->
-              display_firstname_results conf base fn fn_options
+              display_firstname_results conf base alias_cache fn fn_options
                 (search_firstname alias_cache conf base fn fn_options)
           | FirstNameSurname (_fn, _sn) ->
-              specify conf base query exact_persons partial_persons
+              specify conf base alias_cache query exact_persons partial_persons
                 spouse_persons
           | ParsedName { format = `Space; _ }
             when fn_options.exact1 && List.length exact_persons = 1 ->
               redirect_to_person (Driver.get_iper (List.hd exact_persons))
           | _ ->
-              specify conf base query exact_persons partial_persons
+              specify conf base alias_cache query exact_persons partial_persons
                 spouse_persons))
 
-and display_firstname_results conf base query fn_options results =
+and display_firstname_results conf base alias_cache query fn_options results =
   let include_aliases = fn_options.incl_aliases in
   let is_partial = not fn_options.exact1 in
   let make_section ipers =
@@ -1585,22 +1569,25 @@ and display_firstname_results conf base query fn_options results =
         | 2 | 3 -> is_partial && secs <> []
         | _ -> false)
   in
-  Some.first_name_print_list_multi conf base query sections_groups
+  Some.first_name_print_list_multi conf base alias_cache query sections_groups
 
-and display_surname_results conf base _query surname all_persons =
+and display_surname_results conf base alias_cache _query surname all_persons =
   let surname_groups = group_by_surname base all_persons in
   match surname_groups with
   | [ (single_surname, _) ] ->
-      Some.search_surname_print conf base (fun _conf _x -> ()) single_surname
+      Some.search_surname_print conf base alias_cache
+        (fun _conf _x -> ())
+        single_surname
   | multiple_surnames -> (
       match p_getenv conf.env "m" with
       | Some "SN" ->
-          Some.print_surname_details conf base surname multiple_surnames
+          Some.print_surname_details conf base alias_cache surname
+            multiple_surnames
       | _ ->
-          Some.print_several_possible_surnames surname conf base
+          Some.print_several_possible_surnames surname conf base alias_cache
             ([], multiple_surnames))
 
-(* Top-level search entry point.  Fresh StringCache and AliasCache
+(* Top-level search entry point.  Fresh StringCache and Some.AliasCache
    instances are created here and threaded through the call chain so each
    request starts with a clean cache scoped to the current base, with no
    global mutable state.  All search methods handle apostrophe variants
@@ -1608,7 +1595,7 @@ and display_surname_results conf base _query surname all_persons =
    at this level. *)
 let search conf base query search_order fn_options specify =
   let cache = StringCache.create () in
-  let alias_cache = AliasCache.create () in
+  let alias_cache = Some.AliasCache.create () in
   let components = extract_name_components conf base in
   let results =
     dispatch_search_methods cache alias_cache conf base components query
@@ -1672,9 +1659,9 @@ let print conf base specify =
       log_case (Printf.sprintf "PersonName (%s)" pn);
       search_with pn name_order
   | FirstNameOnly fn ->
-      let alias_cache = AliasCache.create () in
+      let alias_cache = Some.AliasCache.create () in
       let results = search_firstname alias_cache conf base fn fn_options in
-      display_firstname_results conf base fn fn_options results
+      display_firstname_results conf base alias_cache fn fn_options results
   | SurnameOnly sn ->
       log_case (Printf.sprintf "SurnameOnly '%s'" sn);
       search_with sn surname_order

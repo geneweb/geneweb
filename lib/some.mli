@@ -1,8 +1,20 @@
 module AliasCache : sig
-  val clear : unit -> unit
-  val add_alias : Geneweb_db.Driver.Iper.t -> string -> unit
-  val add_direct : Geneweb_db.Driver.Iper.t -> unit
-  val get_alias : Geneweb_db.Driver.Iper.t -> string option
+  type t
+
+  val create : unit -> t
+  (** Per-request cache mapping iper to an optional alias string. Used to
+      display [alias] tags next to person names in result lists when the person
+      matched a query via one of their aliases. *)
+
+  val add_alias : t -> Geneweb_db.Driver.Iper.t -> string -> unit
+  (** Register that this iper matched via the given alias string. *)
+
+  val add_direct : t -> Geneweb_db.Driver.Iper.t -> unit
+  (** Register that this iper matched directly (not via an alias). *)
+
+  val get_alias : t -> Geneweb_db.Driver.Iper.t -> string option
+  (** [Some alias] if the iper matched via that alias, [None] otherwise
+      (including for ipers never registered). *)
 end
 
 val surname_not_found : Config.config -> string -> unit
@@ -35,6 +47,7 @@ val persons_of_fsname :
 val search_surname_print :
   Config.config ->
   Geneweb_db.Driver.base ->
+  AliasCache.t ->
   (Config.config -> string -> unit) ->
   string ->
   unit
@@ -42,16 +55,18 @@ val search_surname_print :
 val print_surname_details :
   Config.config ->
   Geneweb_db.Driver.base ->
+  AliasCache.t ->
   string ->
   (string * Geneweb_db.Driver.person list) list ->
   unit
-(** [print_multiple_display conf base query surnames_groups] displays multiple
-    surname groups with their associated persons. Used when a search returns
-    multiple surname matches. *)
+(** [print_multiple_display conf base alias_cache query surnames_groups]
+    displays multiple surname groups with their associated persons. Used when a
+    search returns multiple surname matches. *)
 
 val first_name_print_sections :
   Config.config ->
   Geneweb_db.Driver.base ->
+  AliasCache.t ->
   (string * Geneweb_db.Driver.person list) list ->
   rev:bool ->
   unit
@@ -59,6 +74,7 @@ val first_name_print_sections :
 val first_name_print_list_multi :
   Config.config ->
   Geneweb_db.Driver.base ->
+  AliasCache.t ->
   string ->
   (int * (string * Geneweb_db.Driver.person list) list * bool * Mutil.StrSet.t)
   list ->
@@ -68,6 +84,7 @@ val print_several_possible_surnames :
   string ->
   Config.config ->
   Geneweb_db.Driver.base ->
+  AliasCache.t ->
   'a * (string * Geneweb_db.Driver.person list) list ->
   unit
 
