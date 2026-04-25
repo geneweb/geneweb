@@ -630,13 +630,6 @@ let mk_specify_title conf kw n _ =
   Output.print_sstring conf {| |};
   Output.print_sstring conf (transl conf "specify")
 
-let rec merge_insert ((sstr, (strl, iperl)) as x) = function
-  | ((sstr1, (strl1, iperl1)) as y) :: l ->
-      if sstr < sstr1 then x :: y :: l
-      else if sstr > sstr1 then y :: merge_insert x l
-      else (sstr, (StrSet.union strl strl1, iperl @ iperl1)) :: l
-  | [] -> [ x ]
-
 let persons_of_absolute base_strings_of persons_of get_field conf base x =
   let istrl = base_strings_of base x in
   List.fold_right
@@ -1274,37 +1267,41 @@ let select_ancestors conf base names_lower ipl =
     [] ipl
 
 let search_surname_list conf base x =
-  let list, name_inj =
+  let raw, name_inj =
     if p_getenv conf.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 942, 29)))
+    else if x = "" then ([], fun _ -> assert false)
     else
       persons_of_fsname conf base Driver.base_strings_of_surname
         (Driver.spi_find (Driver.persons_of_surname base))
         Driver.get_surname x
   in
+  (* Aggregate raw entries by Name.lower str:
+     - merge StrSet of original strings sharing the same lower form
+     - accumulate iperl (using rev_append to avoid quadratic @)
+     A single Hashtbl pass replaces the former
+     [List.fold_right merge_insert] which was O(N^2).
+     The trailing fold collecting iperl is folded in here too. *)
+  let groups : (string, StrSet.t * Driver.iper list) Hashtbl.t =
+    Hashtbl.create (List.length raw)
+  in
+  let all_iperl = ref Iper.Set.empty in
+  List.iter
+    (fun (str, _, iperl) ->
+      let key = Name.lower str in
+      let strl, prev_iperl =
+        match Hashtbl.find_opt groups key with
+        | Some (s, ipl) -> (StrSet.add str s, List.rev_append iperl ipl)
+        | None -> (StrSet.singleton str, iperl)
+      in
+      Hashtbl.replace groups key (strl, prev_iperl);
+      List.iter (fun ip -> all_iperl := Iper.Set.add ip !all_iperl) iperl)
+    raw;
   let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
-      list
+    Hashtbl.fold (fun k v acc -> (k, v) :: acc) groups []
+    |> List.sort (fun (k1, _) (k2, _) -> String.compare k1 k2)
   in
-  let list = List.fold_right merge_insert list [] in
-  let iperl, _ =
-    List.fold_right
-      (fun (str, (_, iperl1)) (iperl, strl) ->
-        let len = List.length iperl1 in
-        let strl =
-          try
-            let len1 = List.assoc str strl in
-            (str, len + len1) :: List.remove_assoc str strl
-          with Not_found -> (str, len) :: strl
-        in
-        (List.fold_right Iper.Set.add iperl1 iperl, strl))
-      list (Iper.Set.empty, [])
-  in
-  (list, Iper.Set.elements iperl, name_inj)
+  (list, Iper.Set.elements !all_iperl, name_inj)
 
 let search_surname_print conf base alias_cache _not_found_fun x =
   let extra = get_extra_surnames conf in
