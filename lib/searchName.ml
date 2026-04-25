@@ -472,6 +472,48 @@ let search_for_multiple_fn cache conf base fn pl opts =
   Log.debug (fun k -> k "          result: %d" (List.length result));
   result
 
+(* Partition a person list into (exact, partial) in a single pass:
+   exact   = persons matching with opts.exact1 = true
+   partial = persons matching with opts.exact1 = false (which includes
+             everything in exact, by construction of match_fn_lists).
+   Equivalent in result to two consecutive search_for_multiple_fn calls
+   (one with exact1=true, one with exact1=false) but traverses pl once
+   and looks up StringCache once per person. *)
+let partition_for_multiple_fn cache conf base fn pl opts =
+  let fn_l = cut_words fn in
+  let opts_partial = { opts with exact1 = false } in
+  let exact, partial =
+    List.fold_left
+      (fun (ex, pa) p ->
+        if search_reject_p conf base p then (ex, pa)
+        else
+          let fn1 =
+            StringCache.get_cached cache base (Driver.get_first_name p)
+          in
+          let fn1_l = split_normalize false fn1 in
+          let fn2 =
+            StringCache.get_cached cache base (Driver.get_public_name p)
+          in
+          let fn2_l = split_normalize false fn2 in
+          let m_partial =
+            match_fn_lists fn_l fn1_l opts_partial
+            || match_fn_lists fn_l fn2_l opts_partial
+          in
+          if not m_partial then (ex, pa)
+          else
+            let m_exact =
+              opts.exact1
+              && (match_fn_lists fn_l fn1_l opts
+                 || match_fn_lists fn_l fn2_l opts)
+            in
+            if m_exact then (p :: ex, pa) else (ex, p :: pa))
+      ([], []) pl
+  in
+  Log.debug (fun k ->
+      k "        partition_for_multiple_fn: %d exact, %d partial"
+        (List.length exact) (List.length partial));
+  (exact, partial)
+
 let rec search_surname conf base x =
   let variants = generate_apostrophe_variants x in
   let exact_results = search_exact conf base variants in
@@ -1048,9 +1090,10 @@ let search_fullname cache conf base fn variants_sn =
       let opts =
         { order = false; exact1 = true; incl_aliases = false; absolute = false }
       in
-      let exact = search_for_multiple_fn cache conf base fn pl opts in
       let opts_partial = { opts with exact1 = false } in
-      let partial = search_for_multiple_fn cache conf base fn pl opts_partial in
+      let exact, partial =
+        partition_for_multiple_fn cache conf base fn pl opts
+      in
       (* Phonetic crush fallback for fn: catches typos / double-letter
          differences like "fereol" vs "Ferreol" where substring matching
          fails but Name.crush_lower matches. Only applied to persons not
@@ -1158,10 +1201,8 @@ let search_partial_key cache conf base query =
     let opts =
       { order = false; exact1 = true; incl_aliases = false; absolute = false }
     in
-    let exact = search_for_multiple_fn cache conf base fn persons opts in
-    let partial =
-      search_for_multiple_fn cache conf base fn persons
-        { opts with exact1 = false }
+    let exact, partial =
+      partition_for_multiple_fn cache conf base fn persons opts
     in
     {
       exact = persons_to_ipers exact;
