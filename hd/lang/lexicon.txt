@@ -11915,10 +11915,12 @@ tr: bağlantılı resimler
 zh: 关联图像
 
     reorder images
+de: Bilder umsortieren
 en: reorder images
 fr: réordonner les images
 
     thumbnail
+de: Miniaturbild
 en: thumbnail
 fr: vignette
 
@@ -11935,10 +11937,12 @@ en: galleries where the person appears
 fr: galeries où la personne apparaît
 
     gallery
+de: Bildergalerie
 en: images gallery
 fr: galerie d’images
 
     gallery backlinks
+de: Seiten mit dieser Galerie
 en: pages where this gallery appears
 fr: pages où cette galerie apparaît
 
@@ -11956,7 +11960,7 @@ fr: pages ou notes où la page est citée
 
     linked pages help
 co: note, pagine, albumi o gallerie induve a persona hè referenzata
-de: Notizen, Seiten, Alben oder Gallerien, wo die Person erwähnt wird
+de: Notizen, Seiten, Alben oder Galerien, wo die Person erwähnt wird
 en: notes, pages, albums or galleries where person is referenced
 fr: notes, pages, albums ou galleries où la personne est citée
 
@@ -12182,6 +12186,7 @@ en: loading in progress…/loading error
 fr: chargement en cours…/erreur de chargement
 
     lock group
+de: diese Gruppe verriegeln
 en: lock this group
 fr: verrouiller ce groupe
 
@@ -13386,7 +13391,7 @@ fr: modifier la section %d
 
     modify gallery
 co: mudificà a fiura&#047;galleria
-de: das Bild ändern&#047;die Gallerie
+de: das Bild&#047;die Galerie ändern
 en: modify the image&#047;the gallery
 fr: modifier l’image&#047;la gallerie
 
@@ -13977,7 +13982,7 @@ tr: yeni ad
 
     new note name
 co: nome di a nota nova/nota nova
-de: Name der neuen Notiz/neuen Notiz
+de: Name der neuen Notiz/neue Notiz
 en: name of the new note/new note
 fr: nom de la nouvelle note/nouvelle note
 
@@ -14414,6 +14419,7 @@ sv: ogifta
 tr: evli değil
 
     document/documents
+de: Dokument/Dokumente
 en: document/documents
 fr: document/documents
 
@@ -14459,7 +14465,7 @@ ca: nota modificada
 co: nota mudificata
 cs: poznámka změněna
 da: note ændret
-de: geänderte Notiz
+de: Notiz geändert
 en: note modified
 eo: noto modifita
 es: nota modificada
@@ -14562,7 +14568,7 @@ en: Configuration error
 fr: Erreur de configuration
 
     NOTIF incorrect person env
-de: Ungültige Person-Konfiguration (em=, ei=, ep=, en=, eoc=).
+de: Ungültige Personen-Konfiguration (em=, ei=, ep=, en=, eoc=).
 en: Invalid person configuration (em=, ei=, ep=, en=, eoc=).
 fr: Configuration de personne incorrecte (em=, ei=, ep=, en=, eoc=).
 
@@ -14587,7 +14593,7 @@ en: Missing <b>s=</b> parameter for m=DOC.
 fr: Paramètre <b>s=</b> manquant pour m=DOC.
 
     NOTIF_TT missing p and n for relation
-de: Fehlender Parameters
+de: Fehlende Parameter
 en: Missing parameters
 fr: Paramètres manquant
 
@@ -14617,7 +14623,7 @@ en: Persons for relation computation not found.
 fr: Personnes pour le calcul de relation introuvables.
 
     NOTIF_TT missing fn and sn for search
-de: Fehlender Parameters
+de: Fehlende Parameter
 en: Missing parameters
 fr: Paramètres manquant
 
@@ -14627,7 +14633,7 @@ en: Missing <b>fn=</b> and <b>sn=</b> parameters for search.
 fr: Paramètres <b>fn=</b> et <b>sn=</b> manquants pour la recherche.
 
     NOTIF_TT incompatible notes_links
-de: Inkompatibles verknüpfte Notizen Format
+de: Format der verknüpften Notizen ist inkompatibel
 en: Incompatible linked notes format
 fr: Format des notes liées incompatible
 
@@ -14909,6 +14915,7 @@ en: number of rows
 fr: nombre de lignes
 
     number of unions
+de: Anzahl der Beziehungen
 en: number of unions
 fr: nombre de relations
 
@@ -15854,6 +15861,7 @@ en: phonetic variants
 fr: variantes phonétiques
 
     data quality
+de: Datenqualität
 en: data quality
 fr: qualité des données
 
@@ -17419,10 +17427,12 @@ fr: fichiers non référencés au format [[[fichier]]] ou référencés par des 
 
     files not in db
 co: schedarii micca referenzati
+de: nicht referenzierte Dateien
 en: files not referenced
 fr: fichiers non référencés 
 
     files not in db help
+de: nicht referenzierte Dateien in den Notizen oder Seiten (update_nldb ausführen könnte notwendig sein)
 en: files not referenced in notes or pages (running update_nldb may be necessary)
 fr: fichiers non référencés dans les notes ou pages (exécuter update_nldb peut être nécessaire)
 
@@ -20208,6 +20218,7 @@ sv: detta forum har moderator
 tr: bu forum yönetilmektedir
 
     this notes file already exists
+de: der Name dieser neuen Notiz wird bereits verwendet
 en: the name of this new note is already used
 fr: le nom de cette nouvelle note est déjà utilisé
 
