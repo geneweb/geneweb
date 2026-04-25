@@ -1056,8 +1056,17 @@ let search_fullname cache conf base fn variants_sn =
   let fn = String.map (fun c -> if c = '-' then ' ' else c) fn in
   (* Gather surname-matching persons via search_surname (exact then phonetic
      fallback) instead of AdvSearchOk with exact_surname=on.  This allows
-     phonetic matching when the query spelling differs from the stored surname
-     (e.g. "dapzol" finding "Dazpol"). *)
+     phonetic matching when the query spelling differs from the stored
+     surname (e.g. "dapzol" finds "Dazpol").
+
+     Note: AdvSearchOk.advanced_search reads many keys from conf.env (place,
+     dates, occupation, sex, etc.) — search_surname only consumes the query
+     string.  This is the correct behaviour for the m=S route, which is the
+     simple search dispatcher; the advanced-search filters belong to m=AS_OK
+     which routes to AdvSearchOk.print directly and never reaches this code
+     path.  If the simple-search URL ever needs to honour additional filters
+     in the future, the right fix is to wrap search_surname results in a
+     post-filter rather than reintroducing AdvSearchOk here. *)
   let all_iper =
     List.fold_left
       (fun acc sn ->
