@@ -672,11 +672,12 @@ let search_firstname_direct conf base query =
 (* Search first-name aliases, trying all apostrophe variants of both the
    query and the stored alias strings. *)
 let search_firstname_aliases conf base query =
-  let query_lower_variants = generate_apostrophe_variants (Name.lower query) in
+  let query_variants = generate_apostrophe_variants query in
+  let query_lower_variants = List.map Name.lower query_variants in
   let all_misc_matches =
     List.concat_map
       (fun variant -> Gutil.person_not_a_key_find_all base variant)
-      (generate_apostrophe_variants query)
+      query_variants
     |> List.sort_uniq compare
   in
   List.fold_left
