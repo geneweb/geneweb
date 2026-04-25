@@ -987,23 +987,12 @@ let search_firstname alias_cache conf base query opts =
             if Mutil.contains n.lower nq.lower then
               contains_query := ip :: !contains_query
             else
-              let fn_crushed =
-                Name.crush_lower
-                  (normalize_for_phonetic
-                     (Name.lower
-                        (Driver.sou base
-                           (Driver.get_first_name (Driver.poi base ip)))))
-              in
+              let fn_crushed = Name.crush_lower n.lower in
               if phonetic_matches fn_crushed then
                 other_phonetic := ip :: !other_phonetic);
         process_list partial_phonetic (fun ip ->
-            let fn_crushed =
-              Name.crush_lower
-                (normalize_for_phonetic
-                   (Name.lower
-                      (Driver.sou base
-                         (Driver.get_first_name (Driver.poi base ip)))))
-            in
+            let n, _ = normalize_person ip in
+            let fn_crushed = Name.crush_lower n.lower in
             if phonetic_matches fn_crushed then
               other_phonetic := ip :: !other_phonetic);
         let included_iper = List.rev !contains_query in
