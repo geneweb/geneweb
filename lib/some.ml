@@ -48,17 +48,17 @@ let extra_surname_url_params conf =
 
 (* TODO: generic functions, expose in perso.ml? *)
 let url_excluding conf exclude_keys =
-  let l =
-    List.fold_left
-      (fun acc (k, _) -> List.remove_assoc k acc)
-      conf.env (conf.henv @ conf.senv)
+  let add_keys set kvs =
+    List.fold_left (fun acc (k, _) -> StrSet.add k acc) set kvs
   in
+  let header_keys = add_keys (add_keys StrSet.empty conf.henv) conf.senv in
   let suffix =
     List.filter_map
       (fun (k, v) ->
-        if k = "" || List.mem k exclude_keys then None
+        if k = "" || StrSet.mem k header_keys || List.mem k exclude_keys then
+          None
         else Some (k ^ "=" ^ Adef.as_string v))
-      l
+      conf.env
     |> String.concat "&"
   in
   (commd conf :> string) ^ suffix
