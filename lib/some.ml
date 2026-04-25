@@ -660,10 +660,12 @@ let persons_of_absolute_surname =
 let has_children_with_that_name conf base des names =
   let absolute = p_getenv conf.env "t" = Some "A" in
   let norm = if absolute then Fun.id else Name.lower in
-  let module S = Set.Make (String) in
-  let targets = S.of_list (List.map norm names) in
+  let targets =
+    List.fold_left (fun acc s -> StrSet.add (norm s) acc) StrSet.empty names
+  in
   Array.exists
-    (fun ip -> S.mem (norm (Driver.p_surname base (pget conf base ip))) targets)
+    (fun ip ->
+      StrSet.mem (norm (Driver.p_surname base (pget conf base ip))) targets)
     (Driver.get_children des)
 
 (* List selection bullets *)
@@ -710,10 +712,10 @@ let alphabetic1 n1 n2 = Gutil.alphabetic_utf_8 n1 n2
 
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 
-let print_branch conf base psn ~primary names =
-  let module S = Set.Make (String) in
-  let names_set = S.of_list (List.map Name.lower names) in
-  let primary_set = S.of_list (List.map Name.lower primary) in
+(* Receives the names_set and primary_set already computed
+   by the caller to avoid rebuilding them on each branch traversal.
+   names_set and primary_set are Sets of Name.lower-normalized strings. *)
+let print_branch conf base psn ~names_set ~primary_set names =
   let unsel_list = unselected_bullets conf in
   let rec loop p =
     let u = pget conf base (Driver.get_iper p) in
@@ -723,13 +725,11 @@ let print_branch conf base psn ~primary names =
           let fam = Driver.foi base ifam in
           let c = Gutil.spouse (Driver.get_iper p) fam in
           let c = pget conf base c in
-          (* C1: names list instead of single name *)
           let down = has_children_with_that_name conf base fam names in
-          (* C2: names membership instead of = name *)
           let down =
             if
               Driver.get_sex p = Female
-              && S.mem (Name.lower (Driver.p_surname base c)) names_set
+              && StrSet.mem (Name.lower (Driver.p_surname base c)) names_set
             then false
             else down
           in
@@ -760,10 +760,10 @@ let print_branch conf base psn ~primary names =
       Output.print_string conf
         (render p
            (if is_hide_names conf p && not (authorized_age conf base p) then
-              Adef.safe "x" (* C3: names membership instead of = name *)
+              Adef.safe "x"
             else if
               (not psn) && (not with_sn)
-              && S.mem (Name.lower (Driver.p_surname base p)) primary_set
+              && StrSet.mem (Name.lower (Driver.p_surname base p)) primary_set
             then gen_person_text ~sn:false conf base p
             else gen_person_text conf base p));
       Output.print_sstring conf close_tag;
@@ -805,11 +805,13 @@ let print_branch conf base psn ~primary names =
   in
   loop
 
-let print_one_branch conf base bh psn ~primary names =
+(* Internal helper: receives pre-computed name sets to avoid rebuilding
+   them per branch traversal. *)
+let print_one_branch conf base bh psn ~names_set ~primary_set names =
   Output.print_sstring conf "<ul>";
   let p = bh.bh_ancestor in
   if bh.bh_well_named_ancestors = [] then
-    print_branch conf base psn ~primary names p
+    print_branch conf base psn ~names_set ~primary_set names p
   else (
     Output.print_sstring conf "<li>";
     if is_hidden p then Output.print_sstring conf "&lt;&lt;"
@@ -817,7 +819,7 @@ let print_one_branch conf base bh psn ~primary names =
       wprint_geneweb_link conf (Util.acces conf base p) (Adef.safe "&lt;&lt;");
     Output.print_sstring conf "<ul>";
     List.iter
-      (fun p -> print_branch conf base psn ~primary names p)
+      (fun p -> print_branch conf base psn ~names_set ~primary_set names p)
       bh.bh_well_named_ancestors;
     Output.print_sstring conf "</ul></li>");
   Output.print_sstring conf "</ul>"
@@ -937,7 +939,16 @@ let print_one_surname_by_branch conf base x xl ~extra_names ~suggestions
   Util.print_tips_relationship conf;
   print_nav_variant_bar conf suggestions ~current_mode:`Branch ~name:x
     ~branch_count:len ();
-
+  let names_set =
+    List.fold_left
+      (fun acc s -> StrSet.add (Name.lower s) acc)
+      StrSet.empty names
+  in
+  let primary_set =
+    List.fold_left
+      (fun acc s -> StrSet.add (Name.lower s) acc)
+      StrSet.empty primary
+  in
   (* -- Branch listing -- *)
   Output.print_sstring conf {|<div id="surname_by_branch">|};
   if len > 1 && br = None then begin
@@ -951,7 +962,7 @@ let print_one_surname_by_branch conf base x xl ~extra_names ~suggestions
              (commd conf :> string)
              (Mutil.encode str :> string)
              extra_params n n;
-           print_one_branch conf base bh psn ~primary names;
+           print_one_branch conf base bh psn ~names_set ~primary_set names;
            Output.print_sstring conf "</dd>";
            n + 1)
          1 ancestors;
@@ -962,7 +973,7 @@ let print_one_surname_by_branch conf base x xl ~extra_names ~suggestions
     @@ List.fold_left
          (fun n bh ->
            if br = None || br = Some n then
-             print_one_branch conf base bh psn ~primary names;
+             print_one_branch conf base bh psn ~names_set ~primary_set names;
            n + 1)
          1 ancestors;
   Output.print_sstring conf "</div>";
