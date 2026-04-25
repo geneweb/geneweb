@@ -203,9 +203,6 @@ let not_found conf txt x =
   Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
-let _first_name_not_found conf =
-  not_found conf (transl conf "first name not found")
-
 let surname_not_found conf = not_found conf (transl conf "surname not found")
 
 let persons_of_fsname conf base base_strings_of_fsname find proj x =
@@ -1314,7 +1311,7 @@ let search_surname_list conf base x =
   in
   (list, Iper.Set.elements !all_iperl, name_inj)
 
-let search_surname_print conf base alias_cache _not_found_fun x =
+let search_surname_print conf base alias_cache not_found_fun x =
   let extra = get_extra_surnames conf in
   let list0, iperl0, _name_inj = search_surname_list conf base x in
   (* For alternates given via v1, v2, ..., match strictly: accept only
@@ -1403,7 +1400,7 @@ let search_surname_print conf base alias_cache _not_found_fun x =
       in
       match bhl with
       | [] ->
-          if extra = [] then _not_found_fun conf x
+          if extra = [] then not_found_fun conf x
           else SrcfileDisplay.print_welcome conf base
       | _ ->
           let canonical_str =
