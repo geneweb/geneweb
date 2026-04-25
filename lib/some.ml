@@ -8,6 +8,10 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Iper = Driver.Iper
 
+let src = Logs.Src.create ~doc:"Some" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
 module AliasCache = struct
   let cache = Hashtbl.create 1000
   let clear () = Hashtbl.clear cache
@@ -371,12 +375,11 @@ let print_firstname_variants conf ?(filter = true) variants_set =
       Mutil.list_iter_first
         (fun first fn ->
           if not first then Output.print_sstring conf ", ";
-          Output.printf conf {|<a href="%sm=S&p=%s&t=A" title="%s">%s</a> (%s)|}
+          Output.printf conf {|<a href="%sm=S&p=%s&t=A" title="%s">%s</a>|}
             (commd conf :> string)
             (Mutil.encode fn :> string)
             title
-            (escape_html fn :> string)
-            (Name.crush_lower fn))
+            (escape_html fn :> string))
         (StrSet.elements filtered_variants);
       Output.print_sstring conf "</div>\n")
 
@@ -542,16 +545,16 @@ let first_name_print_list_multi conf base x1 sections_groups =
         (make_btn_grp "permuted-variants" permuted_count order_url p_order_on
            (transl_nth conf "first names exact/included/permuted" 2
            |> Utf8.capitalize_fst));
-    let x1_crush = Name.crush_lower x1 in
+    Log.debug (fun k ->
+        k "first_name_print_list_multi: query crush = %s" (Name.crush_lower x1));
     Output.print_sstring conf
       (make_dual_btn_grp "included-variants" included_count "phonetic-variants"
          phonetic_count
-         (transl_nth conf "not exact" 1 |> Utf8.capitalize_fst)
+         (transl conf "first names included" |> Utf8.capitalize_fst)
          (transl conf "not exact hlp")
          (transl_nth conf "first names exact/included/permuted" 1
          |> Utf8.capitalize_fst)
-         ((transl conf "phonetic variants" |> Utf8.capitalize_fst)
-         ^ " (" ^ x1_crush ^ ")")
+         (transl conf "phonetic variants" |> Utf8.capitalize_fst)
          exact_url (not p_exact_on)));
   Output.print_sstring conf "</div>";
   Output.printf conf {|<div><h2 class="h3 my-2">%s (%d)</h2>|}
