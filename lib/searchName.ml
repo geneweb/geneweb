@@ -1017,6 +1017,11 @@ let group_by_surname base ipers =
     ipers;
   Hashtbl.fold (fun sn persons acc -> (sn, List.rev persons) :: acc) groups []
 
+let iper_set_of_lists lists =
+  List.fold_left
+    (List.fold_left (fun s p -> Iper.Set.add (Driver.get_iper p) s))
+    Iper.Set.empty lists
+
 let search_fullname cache conf base fn variants_sn =
   let variants_sn = List.sort_uniq compare variants_sn in
   Log.debug (fun k ->
@@ -1056,11 +1061,7 @@ let search_fullname cache conf base fn variants_sn =
         let fn_crushed = Name.crush_lower fn in
         if fn_crushed = "" then partial
         else
-          let already =
-            List.fold_left
-              (fun s p -> Iper.Set.add (Driver.get_iper p) s)
-              Iper.Set.empty (exact @ partial)
-          in
+          let already = iper_set_of_lists [ exact; partial ] in
           let phonetic_extra =
             List.filter
               (fun p ->
@@ -1105,12 +1106,7 @@ let search_fullname cache conf base fn variants_sn =
           let fn_crushed = Name.crush_lower fn in
           if fn_crushed = "" then spouse_substr
           else
-            let already =
-              List.fold_left
-                (fun s p -> Iper.Set.add (Driver.get_iper p) s)
-                Iper.Set.empty
-                (exact @ partial @ spouse_substr)
-            in
+            let already = iper_set_of_lists [ exact; partial; spouse_substr ] in
             let phonetic_extra =
               List.filter
                 (fun p ->
