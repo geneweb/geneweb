@@ -145,6 +145,7 @@ val print :
   Geneweb_db.Driver.base ->
   (config ->
   Geneweb_db.Driver.base ->
+  Some.AliasCache.t ->
   string ->
   Geneweb_db.Driver.person list ->
   Geneweb_db.Driver.person list ->

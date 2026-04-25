@@ -13,11 +13,16 @@ let src = Logs.Src.create ~doc:"Some" __MODULE__
 module Log = (val Logs.src_log src : Logs.LOG)
 
 module AliasCache = struct
-  let cache = Hashtbl.create 1000
-  let clear () = Hashtbl.clear cache
-  let add_alias iper alias = Hashtbl.replace cache iper (Some alias)
-  let add_direct iper = Hashtbl.replace cache iper None
-  let get_alias iper = try Hashtbl.find cache iper with Not_found -> None
+  type t = (Driver.Iper.t, string option) Hashtbl.t
+
+  let create () : t = Hashtbl.create 200
+  let add_direct (cache : t) iper = Hashtbl.replace cache iper None
+
+  let add_alias (cache : t) iper alias_str =
+    Hashtbl.replace cache iper (Some alias_str)
+
+  let get_alias (cache : t) iper =
+    match Hashtbl.find_opt cache iper with Some (Some s) -> Some s | _ -> None
 end
 
 let get_extra_surnames conf =
@@ -242,7 +247,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   in
   (l, name_inj)
 
-let print_elem conf base is_surname ?(rev = false) (p, xl) =
+let print_elem conf base alias_cache is_surname ?(rev = false) (p, xl) =
   Mutil.list_iter_first
     (fun first x ->
       let iper = Driver.get_iper x in
@@ -286,7 +291,7 @@ let print_elem conf base is_surname ?(rev = false) (p, xl) =
           (if p = "" then (Adef.escaped "?" :> string)
            else (escape_html p :> string));
       Buffer.add_string buf "</a>";
-      (match AliasCache.get_alias (Driver.get_iper x) with
+      (match AliasCache.get_alias alias_cache (Driver.get_iper x) with
       | Some alias -> Printf.bprintf buf " [%s]" (escape_html alias :> string)
       | None -> ());
       Buffer.add_string buf (DateDisplay.short_dates_text conf base x :> string);
@@ -301,7 +306,7 @@ let first_char s =
     let len = Utf8.next s 0 in
     if len < String.length s then String.sub s 0 len else s
 
-let first_name_print_sections conf base listes ~rev =
+let first_name_print_sections conf base alias_cache listes ~rev =
   let group_persons l =
     if rev then
       (* Grouper par prénom *)
@@ -348,7 +353,8 @@ let first_name_print_sections conf base listes ~rev =
         let prefix = if rev then "v-" else "" in
         print_alphab_list conf ~prefix
           (fun (ord, _, _) -> first_char ord)
-          (fun (_, txt, ipl) -> print_elem conf base true ~rev (txt, ipl))
+          (fun (_, txt, ipl) ->
+            print_elem conf base alias_cache true ~rev (txt, ipl))
           list))
     listes
 
@@ -383,7 +389,7 @@ let print_firstname_variants conf ?(filter = true) variants_set =
         (StrSet.elements filtered_variants);
       Output.print_sstring conf "</div>\n")
 
-let first_name_print_list_multi conf base x1 sections_groups =
+let first_name_print_list_multi conf base alias_cache x1 sections_groups =
   let print_section_header id title count =
     Output.printf conf {|<h2 class="h3 mt-4 mb-2" id="%s">%s (%d)</h2>|} id
       title count
@@ -572,14 +578,14 @@ let first_name_print_list_multi conf base x1 sections_groups =
       | 0 ->
           if main_count > 1 && not (StrSet.is_empty variants_set) then
             print_firstname_variants conf variants_set;
-          first_name_print_sections conf base sections ~rev
+          first_name_print_sections conf base alias_cache sections ~rev
       | 1 when include_aliases && section_count > 0 ->
           print_section_header "alias"
             (transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst)
             section_count;
           if not (StrSet.is_empty variants_set) then
             print_firstname_variants conf ~filter:false variants_set;
-          first_name_print_sections conf base sections ~rev
+          first_name_print_sections conf base alias_cache sections ~rev
       | 4 when p_order_on && section_count > 0 ->
           print_section_header "permuted-variants"
             (transl_nth conf "first names exact/included/permuted" 2
@@ -587,7 +593,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
             section_count;
           if not (StrSet.is_empty variants_set) then
             print_firstname_variants conf ~filter:false variants_set;
-          first_name_print_sections conf base sections ~rev
+          first_name_print_sections conf base alias_cache sections ~rev
       | 2 when (not p_exact_on) && section_count > 0 ->
           print_section_header "included-variants"
             (transl_nth conf "first names exact/included/permuted" 1
@@ -595,7 +601,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
             section_count;
           if not (StrSet.is_empty variants_set) then
             print_firstname_variants conf variants_set;
-          first_name_print_sections conf base sections ~rev
+          first_name_print_sections conf base alias_cache sections ~rev
       | 3 when (not p_exact_on) && section_count > 0 ->
           let title =
             if nb_words > 1 then
@@ -609,7 +615,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
             {|<h2 class="h3 mt-4 mb-2" id="phonetic-variants">%s (%d)</h2>|}
             title section_count;
           print_firstname_variants conf ~filter:false variants_set;
-          first_name_print_sections conf base sections ~rev
+          first_name_print_sections conf base alias_cache sections ~rev
       | _ -> ())
     sections_groups;
   Output.print_sstring conf "</div></div>";
@@ -1012,7 +1018,8 @@ let print_alphabetic_index conf list extract_name count_persons threshold =
     true)
   else false
 
-let print_several_possible_surnames x conf base (_, surname_groups) =
+let print_several_possible_surnames x conf base _alias_cache (_, surname_groups)
+    =
   let fx = x in
   let title = mk_specify_title conf (transl_nth conf "surname/surnames" 0) fx in
   let surname_count = List.length surname_groups in
@@ -1130,7 +1137,8 @@ let print_several_possible_surnames x conf base (_, surname_groups) =
     (Utf8.capitalize_fst (transl_nth conf "surname details" 1) :> string);
   Hutil.trailer conf
 
-let print_family_alphabetic ?(extra_names = []) ~suggestions x conf base liste =
+let print_family_alphabetic ?(extra_names = []) ~suggestions x conf base
+    alias_cache liste =
   let homonymes =
     let list =
       List.fold_left
@@ -1211,7 +1219,7 @@ let print_family_alphabetic ?(extra_names = []) ~suggestions x conf base liste =
         ();
       print_alphab_list conf
         (fun (p, _) -> first_char p)
-        (print_elem conf base false)
+        (print_elem conf base alias_cache false)
         liste;
       Hutil.trailer conf
 
@@ -1298,7 +1306,7 @@ let search_surname_list conf base x =
   in
   (list, Iper.Set.elements iperl, name_inj)
 
-let search_surname_print conf base _not_found_fun x =
+let search_surname_print conf base alias_cache _not_found_fun x =
   let extra = get_extra_surnames conf in
   let list0, iperl0, _name_inj = search_surname_list conf base x in
   (* For alternates given via v1, v2, ..., match strictly: accept only
@@ -1367,7 +1375,8 @@ let search_surname_print conf base _not_found_fun x =
             else acc)
           iperl []
       in
-      print_family_alphabetic ~extra_names ~suggestions x conf base pl
+      print_family_alphabetic ~extra_names ~suggestions x conf base alias_cache
+        pl
   | _ -> (
       let all_iperl =
         List.fold_left (fun s i -> Iper.Set.add i s) extra_iperl iperl0
@@ -1395,7 +1404,7 @@ let search_surname_print conf base _not_found_fun x =
           print_one_surname_by_branch conf base x primary_strl ~extra_names
             ~suggestions (bhl, canonical_str))
 
-let print_surname_details conf base query_string surnames_groups =
+let print_surname_details conf base _alias_cache query_string surnames_groups =
   let title_text =
     Printf.sprintf "%s \"%s\": %s"
       (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0))
