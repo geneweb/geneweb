@@ -1407,7 +1407,8 @@ let remove_duplicates (results : search_results) =
     spouse = spouse_filtered;
   }
 
-let execute_search_method cache alias_cache conf base query method_ fn_options =
+let execute_search_method cache alias_cache conf base components query method_
+    fn_options =
   match method_ with
   | Sosa ->
       let results = search_sosa_opt conf base query in
@@ -1436,7 +1437,6 @@ let execute_search_method cache alias_cache conf base query method_ fn_options =
         spouse = [];
       }
   | FullName ->
-      let components = extract_name_components conf base in
       let fn = Option.value components.first_name ~default:"" in
       let sn = Option.value components.surname ~default:query in
       let oc = Option.value components.oc ~default:"" in
@@ -1481,15 +1481,15 @@ let execute_search_method cache alias_cache conf base query method_ fn_options =
             (List.length results.spouse));
       results
 
-let dispatch_search_methods cache alias_cache conf base query search_order
-    fn_options =
+let dispatch_search_methods cache alias_cache conf base components query
+    search_order fn_options =
   let all_results = { exact = []; partial = []; spouse = [] } in
   let combined_results =
     List.fold_left
       (fun acc method_ ->
         let (results : search_results) =
-          execute_search_method cache alias_cache conf base query method_
-            fn_options
+          execute_search_method cache alias_cache conf base components query
+            method_ fn_options
         in
         ({
            exact = List.rev_append acc.exact results.exact;
@@ -1603,11 +1603,11 @@ and display_surname_results conf base _query surname all_persons =
 let search conf base query search_order fn_options specify =
   let cache = StringCache.create () in
   let alias_cache = AliasCache.create () in
-  let results =
-    dispatch_search_methods cache alias_cache conf base query search_order
-      fn_options
-  in
   let components = extract_name_components conf base in
+  let results =
+    dispatch_search_methods cache alias_cache conf base components query
+      search_order fn_options
+  in
   handle_search_results alias_cache conf base query fn_options components
     specify results
 
