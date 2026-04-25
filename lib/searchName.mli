@@ -28,6 +28,28 @@ type name_components = {
 
 val extract_name_components :
   config -> Geneweb_db.Driver.base -> name_components
+(** [extract_name_components conf base] parses the search request URL parameters
+    [p] (first name), [n] (surname), and [pn] (combined person-name string) into
+    a {!name_components} record describing what was provided and how to dispatch
+    the search.
+
+    The [base] argument is required to access the configured surname particles
+    ({!Geneweb_db.Driver.base_particles}) so that a query like
+    ["henri de foresta"] is recognised as fn = "henri", sn = "de foresta" — see
+    {!parse_person_name} for the parsing rules.
+
+    The seven cases:
+    - [p], [n], [pn] all empty → [NoInput]
+    - [pn] alone → parsed by {!parse_person_name}
+    - [n] alone → [SurnameOnly]
+    - [p] alone → [FirstNameOnly]
+    - [p] and [n] → [FirstNameSurname]
+    - [n] and [pn] → [SurnameOnly] (pn ignored, n wins)
+    - [p] and [pn] → [PersonName] (pn merged with p)
+
+    @param conf Search request configuration (env, base_env)
+    @param base Genealogical database
+    @return The parsed name components and dispatch case *)
 
 val search_key_aux :
   (config ->
