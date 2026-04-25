@@ -392,16 +392,15 @@ let search_key_opt conf base query =
 let match_fn_lists fn_l fn1_l opts =
   let qlist = List.map normalize_query fn_l in
   let nlist = List.map normalize_name fn1_l in
-  let nset =
-    if opts.exact1 then
-      List.fold_left
-        (fun acc n -> Mutil.StrSet.add n.normalized acc)
-        Mutil.StrSet.empty nlist
-    else Mutil.StrSet.empty
-  in
   let passes_basic_test =
     if opts.exact1 then
-      List.for_all (fun q -> Mutil.StrSet.mem q.normalized nset) qlist
+      let qsorted =
+        List.sort compare (List.map (fun q -> q.normalized) qlist)
+      in
+      let nsorted =
+        List.sort compare (List.map (fun n -> n.normalized) nlist)
+      in
+      qsorted = nsorted
     else
       List.for_all
         (fun q ->
