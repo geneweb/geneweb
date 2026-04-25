@@ -369,7 +369,7 @@ let search_approx_key conf base an =
   let alias_cache = AliasCache.create () in
   search_key_aux (select_approx_key alias_cache) conf base an
 
-let search_approx_key_with_alias_cache alias_cache conf base an =
+let search_approx_key' alias_cache conf base an =
   search_key_aux (select_approx_key alias_cache) conf base an
 
 let search_by_key conf base an =
@@ -1455,9 +1455,7 @@ let execute_search_method cache alias_cache conf base query method_ fn_options =
               (List.length results.spouse));
         results
   | ApproxKey ->
-      let persons =
-        search_approx_key_with_alias_cache alias_cache conf base query
-      in
+      let persons = search_approx_key' alias_cache conf base query in
       let exact_matches, partial_matches =
         List.partition
           (fun p ->
