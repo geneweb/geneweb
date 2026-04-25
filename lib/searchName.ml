@@ -759,15 +759,16 @@ let search_with_ngrams_complement conf base _query query_words =
       search_firstname_phonetic conf base crushed
     with _ -> []
 
-let search_firstname_with_aliases_and_ngrams alias_cache conf base query =
+(* Phonetic ngrams complement: searches the first-name index using
+   crush(concat(query_words)) as a single-token n-gram, then keeps only
+   results whose normalized crushed first name contains the query's
+   normalized crush.  Caller is responsible for any alias handling — this
+   function does not invoke search_firstname_aliases. *)
+let search_firstname_phonetic_ngrams alias_cache conf base query =
   let query_lower = Name.lower query in
   let query_norm = normalize_for_phonetic query_lower in
   let query_norm_crushed = Name.crush query_norm in
   let query_words = cut_words query_lower in
-  let alias_results = search_firstname_aliases conf base query in
-  List.iter
-    (fun (ip, alias) -> AliasCache.add_alias alias_cache ip alias)
-    alias_results;
   let phonetic_iper =
     search_with_ngrams_complement conf base query query_words
   in
@@ -784,12 +785,10 @@ let search_firstname_with_aliases_and_ngrams alias_cache conf base query =
         else None)
   in
   Log.debug (fun k ->
-      k
-        "  Phonetic + ngrams: %d candidates -> %d after dedup (will be split \
-         into included/phonetic)"
+      k "  Phonetic ngrams: %d candidates -> %d after dedup"
         (List.length phonetic_iper)
         (List.length phonetic_results));
-  (alias_results, phonetic_results)
+  phonetic_results
 
 (* Search first names with full apostrophe-variant support.
    Renamed from search_firstname_with_cache: no caching was ever performed
@@ -945,9 +944,7 @@ let search_firstname alias_cache conf base query opts =
         let direct_included_results = List.map snd direct_included in
         let phonetic_ngrams =
           if opts.incl_aliases then
-            snd
-              (search_firstname_with_aliases_and_ngrams alias_cache conf base
-                 query)
+            search_firstname_phonetic_ngrams alias_cache conf base query
           else []
         in
         let exact_phonetic, partial_phonetic, _ =
