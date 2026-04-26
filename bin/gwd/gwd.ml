@@ -269,7 +269,7 @@ let add_lex_dir dir =
   Filesystem.walk_folder
     (fun e () ->
       match e with
-      | Filesystem.File s -> lexicon_list := !lexicon_list @ [ dir // s ]
+      | Filesystem.File s -> lexicon_list := !lexicon_list @ [ s ]
       | _ -> ())
     dir ()
 
