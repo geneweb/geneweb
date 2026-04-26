@@ -553,6 +553,20 @@ let eval_predefined_apply conf _env f vl =
   | "uri_decode", [ s ] -> Util.uri_decode s
   | _ -> raise Not_found
 
+let propose_base conf =
+  let title _ = Output.print_sstring conf "Base" in
+  Hutil.header conf title;
+  Output.print_sstring conf {|<ul><li><form method="GET" action="|};
+  Output.print_sstring conf conf.indep_command;
+  Output.print_sstring conf {|">|};
+  Output.print_sstring conf {|<input name="b" size="40"> =&gt; |};
+  Output.print_sstring conf
+    {|<button type="submit" class="btn btn-secondary btn-lg">|};
+  Util.transl_nth conf "validate/delete" 0
+  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf "</button></li></ul>";
+  Hutil.trailer conf
+
 let print_welcome conf base =
   Util.is_welcome := true;
   Fun.protect ~finally:(fun () -> Util.is_welcome := false) @@ fun () ->
