@@ -11,221 +11,6 @@ module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 
-let person_is_std_key conf base p k =
-  let k = Name.strip_lower k in
-  if
-    k
-    = Name.strip_lower
-        (Driver.p_first_name base p ^ " " ^ Driver.p_surname base p)
-  then true
-  else if
-    List.exists
-      (fun n -> Name.strip n = k)
-      (Driver.person_misc_names base p (nobtit conf base))
-  then true
-  else false
-
-let select_std_eq conf base pl k =
-  List.fold_right
-    (fun p pl -> if person_is_std_key conf base p k then p :: pl else pl)
-    pl []
-
-let find_all conf base an =
-  let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
-  match (sosa_ref, sosa_nb) with
-  | Some p, Some n ->
-      if n <> Sosa.zero then
-        match Util.branch_of_sosa conf base n p with
-        | Some (p :: _) -> ([ p ], true)
-        | _ -> ([], false)
-      else ([], false)
-  | _ ->
-      let acc = Option.to_list @@ SearchName.search_by_key conf base an in
-      if acc <> [] then (acc, false)
-      else
-        ( SearchName.search_key_aux
-            (fun conf base acc an ->
-              let spl = select_std_eq conf base acc an in
-              if spl = [] then
-                if acc = [] then SearchName.search_by_name conf base an else acc
-              else spl)
-            conf base an,
-          false )
-
-let _relation_print conf base p =
-  let p1 =
-    match p_getenv conf.senv "ei" with
-    | Some i ->
-        conf.senv <- [];
-        let i = Driver.Iper.of_string i in
-        if Geneweb_db.Driver.iper_exists base i then Some (pget conf base i)
-        else None
-    | None -> (
-        match find_person_in_env conf base "1" with
-        | Some p1 ->
-            conf.senv <- [];
-            Some p1
-        | None -> None)
-  in
-  RelationDisplay.print conf base p p1
-
-let process_titles conf base n p =
-  let n_crushed = Name.crush_lower n in
-  let tl = ref [] in
-  let add_title t =
-    tl :=
-      let rec add_rec = function
-        | t1 :: tl1 ->
-            if
-              Driver.Istr.equal t1.t_ident t.t_ident
-              && Driver.Istr.equal t1.t_place t.t_place
-            then t1 :: tl1
-            else t1 :: add_rec tl1
-        | [] -> [ t ]
-      in
-      add_rec !tl
-  in
-  let compare_and_add t pn =
-    let pn = Driver.sou base pn in
-    if Name.crush_lower pn = n_crushed then add_title t
-    else
-      match Driver.get_qualifiers p with
-      | nn :: _ ->
-          let nn = Driver.sou base nn in
-          if Name.crush_lower (pn ^ " " ^ nn) = n_crushed then add_title t
-      | _ -> ()
-  in
-  List.iter
-    (fun t ->
-      match (t.t_name, Driver.get_public_name p) with
-      | Tname s, _ -> compare_and_add t s
-      | _, pn when Driver.sou base pn <> "" -> compare_and_add t pn
-      | _ -> ())
-    (nobtit conf base p);
-  !tl
-
-let sort_by_birth_date persons_with_titles =
-  let with_dates =
-    List.rev_map
-      (fun (p, tl) ->
-        let bi = Driver.get_birth p in
-        let bi = if bi = Date.cdate_None then Driver.get_baptism p else bi in
-        (p, tl, Date.cdate_to_dmy_opt bi))
-      persons_with_titles
-  in
-  List.sort
-    (fun (_, _, dmy1) (_, _, dmy2) -> Option.compare Date.compare_dmy dmy2 dmy1)
-    with_dates
-  |> List.rev_map (fun (p, tl, _) -> (p, tl))
-
-let sort_by_first_name base persons_with_titles =
-  let with_fn =
-    List.rev_map
-      (fun (p, tl) ->
-        let fn = Driver.get_first_name p in
-        (p, tl, fn))
-      persons_with_titles
-  in
-  List.sort
-    (fun (_, _, fn1) (_, _, fn2) ->
-      Geneweb_db.Dutil.compare_fnames
-        (Some.name_unaccent (Driver.sou base fn1))
-        (Some.name_unaccent (Driver.sou base fn2)))
-    with_fn
-  |> List.map (fun (p, tl, _) -> (p, tl))
-
-let print_person_list conf base query title_opt persons_with_titles =
-  Logs.debug (fun k ->
-      k "Print_person_list: %d" (List.length persons_with_titles));
-  match persons_with_titles with
-  | [] -> ()
-  | _ ->
-      (match title_opt with
-      | Some title ->
-          Output.print_sstring conf title;
-          Output.print_sstring conf "\n"
-      | None -> ());
-      Output.print_sstring conf {|<ul class="fa-ul">|};
-      Output.print_sstring conf "\n";
-      List.iter
-        (fun (p, _titles) ->
-          Output.print_sstring conf {|<li><span class="fa-li">|};
-          Output.print_sstring conf "\n";
-          let sosa_num = SosaCache.get_sosa_person p in
-          if Geneweb_sosa.gt sosa_num Geneweb_sosa.zero then
-            SosaCache.print_sosa conf base p true
-          else Output.print_sstring conf {|<span class="bullet">•</span>|};
-          Output.print_sstring conf "</span>";
-          let alias = Some.AliasCache.get_alias (Driver.get_iper p) in
-          let snalias =
-            Driver.get_surnames_aliases p |> List.map (Driver.sou base)
-          in
-          let snalias =
-            if snalias = [] then None
-            else
-              try Some (List.find (fun al -> Name.lower al = query) snalias)
-              with Not_found -> None
-          in
-          Update.print_person_parents_and_spouses conf base ~alias ~snalias p;
-          Output.print_sstring conf "</li>\n")
-        persons_with_titles;
-      Output.print_sstring conf "</ul>\n"
-
-let specify conf base n pl1 pl2 pl3 =
-  let title _ =
-    Output.printf conf "%s%s %s"
-      (Util.escape_html n :> string)
-      (transl conf ":") (transl conf "specify")
-  in
-  let n = Name.lower n in
-  let split_pl n pl =
-    List.fold_left
-      (fun (acc1, acc2) p ->
-        let aliases =
-          Driver.get_aliases p
-          |> List.map (Driver.sou base)
-          |> List.map Name.lower
-        in
-        if List.mem n aliases then (p :: acc1, acc2) else (acc1, p :: acc2))
-      ([], []) pl
-  in
-  Hutil.header conf title;
-  Util.print_tips_relationship conf;
-  let with_fn = p_getenv conf.env "sort_fn" = Some "on" in
-  SosaCache.build_sosa_ht conf base;
-  let process_list pl =
-    pl
-    |> List.map (fun p -> (p, process_titles conf base n p))
-    |> if with_fn then sort_by_first_name base else sort_by_birth_date
-  in
-  (* identify alias matches in pl1 and pl2 *)
-  let pl11, pl12 = split_pl n pl1 in
-  let pl21, pl22 = split_pl n pl2 in
-  (if pl11 @ pl21 <> [] then (
-     let ptll11 = process_list pl11 in
-     let ptll12 = process_list pl12 in
-     let ptll21 = process_list pl21 in
-     let title = transl conf "alias" |> Utf8.capitalize_fst in
-     print_person_list conf base n (Some title) (ptll11 @ ptll21);
-     let title = transl_nth conf "surname/surnames" 0 |> Utf8.capitalize_fst in
-     print_person_list conf base n (Some title) ptll12)
-   else
-     let ptll1 = process_list pl1 in
-     print_person_list conf base n None ptll1);
-  if pl22 <> [] then
-    let ptll22 = process_list pl22 in
-    let title = transl conf "other possibilities" |> Utf8.capitalize_fst in
-    print_person_list conf base n (Some title) ptll22
-  else ();
-  let ptll3 = process_list pl3 in
-  if ptll3 <> [] then
-    let title = transl conf "with spouse name" |> Utf8.capitalize_fst in
-    print_person_list conf base n (Some title) ptll3
-  else ();
-  (* FIXME why are those else () needed ? *)
-  Hutil.trailer conf
-
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
@@ -267,9 +52,7 @@ let person_selected_with_redirect conf base p =
       Server.http_redirect_temporarily
         (commd conf ^^^ Util.acces conf base p :> string)
 
-let updmenu_print = Perso.interp_templ "updmenu"
-
-(* Print Not found page *)
+(* Print “Not found” page *)
 let unknown conf n =
   let title _ =
     transl conf "not found" |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -282,53 +65,47 @@ let unknown conf n =
   Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
+let redirect_or_specify =
+  PersonLookup.redirect_or_specify ~not_found:unknown
+    ~redirect_to_person:person_selected_with_redirect
+
 let make_henv conf base =
+  (* Collect henv extensions in reverse, prepend to conf.henv at the end. *)
+  let extras = ref [] in
+  let add_extra k v = extras := (k, v) :: !extras in
+  let add_param param =
+    match Util.p_getenv conf.env param with
+    | Some s -> add_extra param (Mutil.encode s)
+    | None -> ()
+  in
   let conf =
     match Util.find_sosa_ref conf base with
     | Some p ->
-        let x =
-          let first_name = Driver.p_first_name base p in
-          let surname = Driver.p_surname base p in
-          if Util.accessible_by_key conf base p first_name surname then
-            [
-              ("pz", Name.lower first_name |> Mutil.encode);
-              ("nz", Name.lower surname |> Mutil.encode);
-              ("ocz", Driver.get_occ p |> string_of_int |> Mutil.encode);
-            ]
-          else
-            [
-              ("iz", Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-            ]
-        in
-        { conf with henv = conf.henv @ x }
+        let first_name = Driver.p_first_name base p in
+        let surname = Driver.p_surname base p in
+        if Util.accessible_by_key conf base p first_name surname then (
+          add_extra "pz" (Name.lower first_name |> Mutil.encode);
+          add_extra "nz" (Name.lower surname |> Mutil.encode);
+          add_extra "ocz" (Driver.get_occ p |> string_of_int |> Mutil.encode))
+        else
+          add_extra "iz"
+            (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+        conf
     | None -> conf
   in
-  let conf =
-    match p_getenv conf.env "dsrc" with
-    | Some "" | None -> conf
-    | Some s -> { conf with henv = conf.henv @ [ ("dsrc", Mutil.encode s) ] }
-  in
-  let conf =
-    match p_getenv conf.env "templ" with
-    | None -> conf
-    | Some s -> { conf with henv = conf.henv @ [ ("templ", Mutil.encode s) ] }
-  in
-  let conf =
-    match Util.p_getenv conf.env "escache" with
-    | Some _ ->
-        { conf with henv = conf.henv @ [ ("escache", escache_value base) ] }
-    | None -> conf
-  in
-  let conf =
-    if Util.p_getenv conf.env "manitou" = Some "off" then
-      { conf with henv = conf.henv @ [ ("manitou", Adef.encoded "off") ] }
-    else conf
-  in
-  let conf =
-    if Util.p_getenv conf.env "fmode" = Some "on" then
-      { conf with henv = conf.henv @ [ ("fmode", Adef.encoded "on") ] }
-    else conf
-  in
+  (match p_getenv conf.env "dsrc" with
+  | Some "" | None -> ()
+  | Some s -> add_extra "dsrc" (Mutil.encode s));
+  (match p_getenv conf.env "templ" with
+  | None -> ()
+  | Some s -> add_extra "templ" (Mutil.encode s));
+  (match Util.p_getenv conf.env "escache" with
+  | Some _ -> add_extra "escache" (escache_value base)
+  | None -> ());
+  if Util.p_getenv conf.env "manitou" = Some "off" then
+    add_extra "manitou" (Adef.encoded "off");
+  if Util.p_getenv conf.env "fmode" = Some "on" then
+    add_extra "fmode" (Adef.encoded "on");
   let conf =
     if conf.userkey = "" then conf
     else
@@ -348,13 +125,12 @@ let make_henv conf base =
           }
       | None -> conf
   in
-  let aux param conf =
-    match Util.p_getenv conf.env param with
-    | Some s -> { conf with henv = conf.henv @ [ (param, Mutil.encode s) ] }
-    | None -> conf
-  in
-  aux "alwsurn" conf |> aux "pure_xhtml" |> aux "size" |> aux "p_mod"
-  |> aux "wide"
+  add_param "alwsurn";
+  add_param "pure_xhtml";
+  add_param "size";
+  add_param "p_mod";
+  add_param "wide";
+  { conf with henv = conf.henv @ List.rev !extras }
 
 let special_vars =
   [
@@ -387,28 +163,26 @@ let only_special_env env =
 
 let make_senv conf base =
   let set_senv conf vm vi =
-    let aux k v conf =
-      if p_getenv conf.env k = Some v then
-        { conf with senv = conf.senv @ [ (k, Mutil.encode v) ] }
-      else conf
+    (* Accumulate senv extensions in reverse, prepend to base senv at the end.
+       The base senv starts with [("em", vm); ("ei", vi)] and extras are
+       appended in declaration order. *)
+    let extras = ref [] in
+    let add_extra k v = extras := (k, v) :: !extras in
+    let add_if_eq k v =
+      if p_getenv conf.env k = Some v then add_extra k (Mutil.encode v)
     in
-    let conf =
-      { conf with senv = [ ("em", vm); ("ei", vi) ] } |> aux "long" "on"
-    in
-    let conf =
-      match p_getenv conf.env "et" with
-      | Some x -> { conf with senv = conf.senv @ [ ("et", Mutil.encode x) ] }
-      | _ -> conf
-    in
-    let conf = aux "cgl" "on" conf in
-    let conf =
-      match p_getenv conf.env "bd" with
-      | None | Some ("0" | "") -> conf
-      | Some x -> { conf with senv = conf.senv @ [ ("bd", Mutil.encode x) ] }
-    in
-    match p_getenv conf.env "color" with
-    | Some x -> { conf with senv = conf.senv @ [ ("color", Mutil.encode x) ] }
-    | _ -> conf
+    add_if_eq "long" "on";
+    (match p_getenv conf.env "et" with
+    | Some x -> add_extra "et" (Mutil.encode x)
+    | _ -> ());
+    add_if_eq "cgl" "on";
+    (match p_getenv conf.env "bd" with
+    | None | Some ("0" | "") -> ()
+    | Some x -> add_extra "bd" (Mutil.encode x));
+    (match p_getenv conf.env "color" with
+    | Some x -> add_extra "color" (Mutil.encode x)
+    | _ -> ());
+    { conf with senv = ("em", vm) :: ("ei", vi) :: List.rev !extras }
   in
   let get x = Util.p_getenv conf.env x in
   match (get "em", get "ei", get "ep", get "en", get "eoc") with
@@ -431,20 +205,6 @@ let make_senv conf base =
       set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
-let propose_base conf =
-  let title _ = Output.print_sstring conf "Base" in
-  Hutil.header conf title;
-  Output.print_sstring conf {|<ul><li><form method="GET" action="|};
-  Output.print_sstring conf conf.indep_command;
-  Output.print_sstring conf {|">|};
-  Output.print_sstring conf {|<input name="b" size="40"> =&gt; |};
-  Output.print_sstring conf
-    {|<button type="submit" class="btn btn-secondary btn-lg">|};
-  transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button></li></ul>";
-  Hutil.trailer conf
-
 let try_plugin list conf base_name m =
   let fn =
     if List.mem "*" list then fun (_, fn) -> fn conf base_name
@@ -461,6 +221,12 @@ let w_lock ~onerror fn conf (base_name : string option) =
     ~wait:true ~lock_file:(Mutil.lock_file bfile)
   @@ fun () -> fn conf base_name
 
+(* Module-level ref used as an init-once guard: the nldb format check
+   reads the on-disk index header once per gwd process lifetime to
+   avoid reissuing the warning notification on every request. The
+   guard is set before the check so that two simultaneous requests
+   don't both emit the notification. This is one of the few legacy
+   refs left in this file; do not add more. *)
 let nldb_check_done = ref false
 
 let check_nldb_format conf base =
@@ -512,6 +278,11 @@ let w_wizard fn conf base =
     (* FIXME: send authentification headers *)
     GWPARAM.output_error conf Code.Unauthorized
 
+(* The closures w_lock, w_base, w_person, print_page and handle_no_bfile
+   are constructed once at module load time (treat_request being a value
+   binding, not a function definition) and shared across every request.
+   The actual per-request entry point is the [fun conf -> ...] at the
+   end of this binding. *)
 let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base =
@@ -544,7 +315,7 @@ let treat_request =
   let handle_no_bfile conf l =
     if conf.bname = "" then
       try Templ.output_simple conf Templ.Env.empty "index"
-      with _ -> propose_base conf
+      with _ -> SrcfileDisplay.propose_base conf
     else print_page conf l
   in
   fun conf ->
@@ -788,7 +559,7 @@ let treat_request =
              | "MRG_IND" ->
                  w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print
              | "MRG_IND_OK" ->
-                 (* despite the _OK suffix, this one does not actually update databse *)
+                 (* Despite the _OK suffix, this one does not actually update databse *)
                  w_wizard @@ w_base @@ MergeIndOkDisplay.print_merge
              | "MRG_MOD_IND_OK" ->
                  w_wizard @@ w_lock @@ w_base
@@ -797,12 +568,13 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
                  | Some v ->
-                     Some.search_surname_print conf base Some.surname_not_found
-                       v
+                     let alias_cache = Some.AliasCache.create () in
+                     Some.search_surname_print conf base alias_cache
+                       Some.surname_not_found v
                  | _ -> AllnDisplay.print_surnames conf base)
              | "NG" -> (
                  w_base @@ fun conf base ->
-                 (* Rétro-compatibilité <= 6.06 *)
+                 (* Backward compatibility for <= 6.07 *)
                  let env =
                    match p_getenv conf.env "n" with
                    | Some n -> (
@@ -813,34 +585,20 @@ let treat_request =
                    | None -> conf.env
                  in
                  let conf = { conf with env } in
-                 (* Nouveau mode de recherche. *)
                  match p_getenv conf.env "select" with
                  | Some "input" | None -> (
-                     (* Récupère le contenu non vide de la recherche. *)
+                     (* Read non-empty search input fields *)
                      let real_input label =
                        match p_getenv conf.env label with
                        | Some s -> if s = "" then None else Some s
                        | None -> None
                      in
-                     (* Recherche par clé, sosa, alias ... *)
-                     let search n =
-                       let pl, sosa_acc = find_all conf base n in
-                       match pl with
-                       | [] -> Some.search_surname_print conf base unknown n
-                       | [ p ] ->
-                           if
-                             sosa_acc
-                             || Gutil.person_of_string_key base n <> None
-                             || person_is_std_key conf base p n
-                           then person_selected_with_redirect conf base p
-                           else specify conf base n pl [] []
-                       | pl -> specify conf base n pl [] []
-                     in
                      match real_input "v" with
-                     | Some n -> search n
+                     | Some n -> redirect_or_specify conf base n
                      | None -> (
                          match (real_input "fn", real_input "sn") with
-                         | Some fn, Some sn -> search (fn ^ " " ^ sn)
+                         | Some fn, Some sn ->
+                             redirect_or_specify conf base (fn ^ " " ^ sn)
                          | Some fn, None ->
                              let conf =
                                {
@@ -848,7 +606,7 @@ let treat_request =
                                  env = ("p", Mutil.encode fn) :: conf.env;
                                }
                              in
-                             SearchName.print conf base specify
+                             SearchName.print conf base Some.specify
                          | None, Some sn ->
                              let conf =
                                {
@@ -856,7 +614,9 @@ let treat_request =
                                  env = ("sn", Mutil.encode sn) :: conf.env;
                                }
                              in
-                             Some.search_surname_print conf base unknown sn
+                             let alias_cache = Some.AliasCache.create () in
+                             Some.search_surname_print conf base alias_cache
+                               unknown sn
                          | None, None ->
                              request_issue conf base
                                ~key:"missing fn and sn for search"))
@@ -894,11 +654,19 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
                  | Some v ->
-                     (* Redirection vers m=S pour compatibilité *)
-                     let t_param =
+                     (* m=P&v=fn is a legacy route now served by m=S&p=fn.
+                        Rebuild conf.env stripping the legacy keys (m, v, t)
+                        and reinjecting the canonical ones in a single
+                        traversal. *)
+                     let t_value =
                        match p_getenv conf.env "t" with
-                       | Some t -> ("t", Mutil.encode t)
-                       | None -> ("t", Mutil.encode "")
+                       | Some t -> t
+                       | None -> ""
+                     in
+                     let env_clean =
+                       List.filter
+                         (fun (k, _) -> k <> "m" && k <> "v" && k <> "t")
+                         conf.env
                      in
                      let conf =
                        {
@@ -906,15 +674,13 @@ let treat_request =
                          env =
                            ("m", Mutil.encode "S")
                            :: ("p", Mutil.encode v)
-                           :: t_param
-                           :: List.remove_assoc "m"
-                                (List.remove_assoc "v"
-                                   (List.remove_assoc "t" conf.env));
+                           :: ("t", Mutil.encode t_value)
+                           :: env_clean;
                        }
                      in
-                     SearchName.print conf base specify
+                     SearchName.print conf base Some.specify
                  | None ->
-                     (* Index alphabétique des prénoms avec tri=F ou tri=A *)
+                     (* Alphabetic first-name index, sortable by F or A. *)
                      AllnDisplay.print_first_names conf base)
              | "PERSO" ->
                  w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
@@ -927,27 +693,17 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "select" with
                  | Some "input" -> (
-                     let components = SearchName.extract_name_components conf in
+                     let components =
+                       SearchName.extract_name_components conf base
+                     in
                      let fn = components.first_name in
                      let sn = components.surname in
-                     let search n =
-                       let pl, sosa_acc = find_all conf base n in
-                       match pl with
-                       | [] -> Some.search_surname_print conf base unknown n
-                       | [ p ] ->
-                           if
-                             sosa_acc
-                             || Gutil.person_of_string_key base n <> None
-                             || person_is_std_key conf base p n
-                           then person_selected_with_redirect conf base p
-                           else specify conf base n pl [] []
-                       | pl -> specify conf base n pl [] []
-                     in
                      match p_getenv conf.env "v" with
-                     | Some n -> search n
+                     | Some n -> redirect_or_specify conf base n
                      | None -> (
                          match (fn, sn) with
-                         | Some fn, Some sn -> search (fn ^ " " ^ sn)
+                         | Some fn, Some sn ->
+                             redirect_or_specify conf base (fn ^ " " ^ sn)
                          | _ ->
                              request_issue conf base
                                ~key:"missing p and n for relation"))
@@ -956,14 +712,14 @@ let treat_request =
                        (pget conf base (Driver.Iper.of_string i))
                        (find_person_in_env_pref conf base "e")
                  | _ -> (
-                     (* Tout le code du cas R doit être dans une seule expression *)
+                     (* All R-case logic must be in a single expression. *)
                      let p1_new = find_person_in_env conf base "1" in
                      let p2_new = find_person_in_env conf base "2" in
                      match (p1_new, p2_new) with
                      | Some p1, Some p2 ->
                          RelationDisplay.print conf base p1 (Some p2)
                      | _ -> (
-                         (* Fallback sur l'ancien format *)
+                         (* Fallback on legacy parameter format. *)
                          let p1_old = find_person_in_env conf base "" in
                          let p2_old = find_person_in_env conf base "1" in
                          match (p1_old, p2_old) with
@@ -989,7 +745,8 @@ let treat_request =
              | "RM" -> w_base @@ RelationMatrixDisplay.print
              | "RLM" -> w_base @@ RelationDisplay.print_multi
              | "S" | "SN" ->
-                 w_base @@ fun conf base -> SearchName.print conf base specify
+                 w_base @@ fun conf base ->
+                 SearchName.print conf base Some.specify
              | "SND_IMAGE" ->
                  w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print
              | "SND_IMAGE_OK" ->
@@ -1017,7 +774,8 @@ let treat_request =
                            (Driver.empty_person base Driver.Iper.dummy))
                  | None -> request_issue conf base ~key:"missing v param")
              | "TT" -> w_base @@ TitleDisplay.print
-             | "U" -> w_wizard @@ w_base @@ w_person @@ updmenu_print
+             | "U" ->
+                 w_wizard @@ w_base @@ w_person @@ Perso.interp_templ "updmenu"
              | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
                  w_wizard @@ w_base @@ WiznotesDisplay.print_view
              | "WIZNOTES" when conf.authorized_wizards_notes ->
