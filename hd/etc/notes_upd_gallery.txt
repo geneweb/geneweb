@@ -306,7 +306,9 @@ const GW = {
     group0: "[*group/groups]0",
     group1: "[*group/groups]1",
     colon: "[:]",
-    lockGroup: "[*lock group]"
+    lockGroup: "[*lock group]",
+    addItem: "[*add]",
+    noResult: "[*no match]",
   }
 };
 </script>

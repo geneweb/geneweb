@@ -1729,7 +1729,14 @@ function initFnameSelect() {
                     ? '<i class="fa-solid fa-folder text-body-secondary me-1"></i>'
                     : '<i class="fa-regular fa-image text-body-secondary me-1"></i>';
                 return '<div>' + icon + escape(data.text) + '</div>';
-            }
+            },
+            option_create: (data, escape) =>
+                '<div class="create">' +
+                (GW.i18n.addItem || 'Add') + ' <strong>' +
+                escape(data.input) + '</strong>&hellip;</div>',
+            no_results: () =>
+                '<div class="no-results">' +
+                (GW.i18n.noResult || 'No results found') + '</div>'
         },
         onItemAdd: (value) => {
             const opt = fnameTS.options[value];
