@@ -52,8 +52,6 @@ let person_selected_with_redirect conf base p =
       Server.http_redirect_temporarily
         (commd conf ^^^ Util.acces conf base p :> string)
 
-let updmenu_print = Perso.interp_templ "updmenu"
-
 (* Print “Not found” page *)
 let unknown conf n =
   let title _ =
@@ -776,7 +774,8 @@ let treat_request =
                            (Driver.empty_person base Driver.Iper.dummy))
                  | None -> request_issue conf base ~key:"missing v param")
              | "TT" -> w_base @@ TitleDisplay.print
-             | "U" -> w_wizard @@ w_base @@ w_person @@ updmenu_print
+             | "U" ->
+                 w_wizard @@ w_base @@ w_person @@ Perso.interp_templ "updmenu"
              | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
                  w_wizard @@ w_base @@ WiznotesDisplay.print_view
              | "WIZNOTES" when conf.authorized_wizards_notes ->
