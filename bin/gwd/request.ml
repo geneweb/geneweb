@@ -127,52 +127,42 @@ let unknown conf n =
   Hutil.trailer conf
 
 let make_henv conf base =
+  (* Collect henv extensions in reverse, prepend to conf.henv at the end. *)
+  let extras = ref [] in
+  let add_extra k v = extras := (k, v) :: !extras in
+  let add_param param =
+    match Util.p_getenv conf.env param with
+    | Some s -> add_extra param (Mutil.encode s)
+    | None -> ()
+  in
   let conf =
     match Util.find_sosa_ref conf base with
     | Some p ->
-        let x =
-          let first_name = Driver.p_first_name base p in
-          let surname = Driver.p_surname base p in
-          if Util.accessible_by_key conf base p first_name surname then
-            [
-              ("pz", Name.lower first_name |> Mutil.encode);
-              ("nz", Name.lower surname |> Mutil.encode);
-              ("ocz", Driver.get_occ p |> string_of_int |> Mutil.encode);
-            ]
-          else
-            [
-              ("iz", Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-            ]
-        in
-        { conf with henv = conf.henv @ x }
+        let first_name = Driver.p_first_name base p in
+        let surname = Driver.p_surname base p in
+        if Util.accessible_by_key conf base p first_name surname then (
+          add_extra "pz" (Name.lower first_name |> Mutil.encode);
+          add_extra "nz" (Name.lower surname |> Mutil.encode);
+          add_extra "ocz" (Driver.get_occ p |> string_of_int |> Mutil.encode))
+        else
+          add_extra "iz"
+            (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+        conf
     | None -> conf
   in
-  let conf =
-    match p_getenv conf.env "dsrc" with
-    | Some "" | None -> conf
-    | Some s -> { conf with henv = conf.henv @ [ ("dsrc", Mutil.encode s) ] }
-  in
-  let conf =
-    match p_getenv conf.env "templ" with
-    | None -> conf
-    | Some s -> { conf with henv = conf.henv @ [ ("templ", Mutil.encode s) ] }
-  in
-  let conf =
-    match Util.p_getenv conf.env "escache" with
-    | Some _ ->
-        { conf with henv = conf.henv @ [ ("escache", escache_value base) ] }
-    | None -> conf
-  in
-  let conf =
-    if Util.p_getenv conf.env "manitou" = Some "off" then
-      { conf with henv = conf.henv @ [ ("manitou", Adef.encoded "off") ] }
-    else conf
-  in
-  let conf =
-    if Util.p_getenv conf.env "fmode" = Some "on" then
-      { conf with henv = conf.henv @ [ ("fmode", Adef.encoded "on") ] }
-    else conf
-  in
+  (match p_getenv conf.env "dsrc" with
+  | Some "" | None -> ()
+  | Some s -> add_extra "dsrc" (Mutil.encode s));
+  (match p_getenv conf.env "templ" with
+  | None -> ()
+  | Some s -> add_extra "templ" (Mutil.encode s));
+  (match Util.p_getenv conf.env "escache" with
+  | Some _ -> add_extra "escache" (escache_value base)
+  | None -> ());
+  if Util.p_getenv conf.env "manitou" = Some "off" then
+    add_extra "manitou" (Adef.encoded "off");
+  if Util.p_getenv conf.env "fmode" = Some "on" then
+    add_extra "fmode" (Adef.encoded "on");
   let conf =
     if conf.userkey = "" then conf
     else
@@ -192,13 +182,12 @@ let make_henv conf base =
           }
       | None -> conf
   in
-  let aux param conf =
-    match Util.p_getenv conf.env param with
-    | Some s -> { conf with henv = conf.henv @ [ (param, Mutil.encode s) ] }
-    | None -> conf
-  in
-  aux "alwsurn" conf |> aux "pure_xhtml" |> aux "size" |> aux "p_mod"
-  |> aux "wide"
+  add_param "alwsurn";
+  add_param "pure_xhtml";
+  add_param "size";
+  add_param "p_mod";
+  add_param "wide";
+  { conf with henv = conf.henv @ List.rev !extras }
 
 let special_vars =
   [
@@ -231,28 +220,26 @@ let only_special_env env =
 
 let make_senv conf base =
   let set_senv conf vm vi =
-    let aux k v conf =
-      if p_getenv conf.env k = Some v then
-        { conf with senv = conf.senv @ [ (k, Mutil.encode v) ] }
-      else conf
+    (* Accumulate senv extensions in reverse, prepend to base senv at the end.
+       The base senv starts with [("em", vm); ("ei", vi)] and extras are
+       appended in declaration order. *)
+    let extras = ref [] in
+    let add_extra k v = extras := (k, v) :: !extras in
+    let add_if_eq k v =
+      if p_getenv conf.env k = Some v then add_extra k (Mutil.encode v)
     in
-    let conf =
-      { conf with senv = [ ("em", vm); ("ei", vi) ] } |> aux "long" "on"
-    in
-    let conf =
-      match p_getenv conf.env "et" with
-      | Some x -> { conf with senv = conf.senv @ [ ("et", Mutil.encode x) ] }
-      | _ -> conf
-    in
-    let conf = aux "cgl" "on" conf in
-    let conf =
-      match p_getenv conf.env "bd" with
-      | None | Some ("0" | "") -> conf
-      | Some x -> { conf with senv = conf.senv @ [ ("bd", Mutil.encode x) ] }
-    in
-    match p_getenv conf.env "color" with
-    | Some x -> { conf with senv = conf.senv @ [ ("color", Mutil.encode x) ] }
-    | _ -> conf
+    add_if_eq "long" "on";
+    (match p_getenv conf.env "et" with
+    | Some x -> add_extra "et" (Mutil.encode x)
+    | _ -> ());
+    add_if_eq "cgl" "on";
+    (match p_getenv conf.env "bd" with
+    | None | Some ("0" | "") -> ()
+    | Some x -> add_extra "bd" (Mutil.encode x));
+    (match p_getenv conf.env "color" with
+    | Some x -> add_extra "color" (Mutil.encode x)
+    | _ -> ());
+    { conf with senv = ("em", vm) :: ("ei", vi) :: List.rev !extras }
   in
   let get x = Util.p_getenv conf.env x in
   match (get "em", get "ei", get "ep", get "en", get "eoc") with
