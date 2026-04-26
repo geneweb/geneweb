@@ -245,7 +245,7 @@ let escape_attribute =
           loop (istr + 1) (ibuf + 1))
 
 let is_hide_names conf p =
-  if conf.hide_names || Driver.get_access p = Private then true else false
+  if conf.hide_names && Driver.get_access p = Private then true else false
 
 let search_in_path p s =
   let rec loop = function
