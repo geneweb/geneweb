@@ -53,23 +53,6 @@ let find_all conf base an =
             conf base an,
           false )
 
-let _relation_print conf base p =
-  let p1 =
-    match p_getenv conf.senv "ei" with
-    | Some i ->
-        conf.senv <- [];
-        let i = Driver.Iper.of_string i in
-        if Geneweb_db.Driver.iper_exists base i then Some (pget conf base i)
-        else None
-    | None -> (
-        match find_person_in_env conf base "1" with
-        | Some p1 ->
-            conf.senv <- [];
-            Some p1
-        | None -> None)
-  in
-  RelationDisplay.print conf base p p1
-
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
