@@ -11,44 +11,48 @@ module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 
-let person_is_std_key conf base p k =
-  let k = Name.strip_lower k in
-  if
-    k
-    = Name.strip_lower
-        (Driver.p_first_name base p ^ " " ^ Driver.p_surname base p)
-  then true
-  else if
-    List.exists
-      (fun n -> Name.strip n = k)
-      (Driver.person_misc_names base p (nobtit conf base))
-  then true
-  else false
+(* Tests whether [input] is a recognized identifier for [p]: either
+   "firstname surname" (modulo Name.strip_lower) or one of the person's
+   misc names (titles, public names, qualifiers, aliases). *)
+let person_matches_input conf base p input =
+  let input = Name.strip_lower input in
+  input
+  = Name.strip_lower (Driver.p_first_name base p ^ " " ^ Driver.p_surname base p)
+  || List.exists
+       (fun n -> Name.strip n = input)
+       (Driver.person_misc_names base p (nobtit conf base))
 
-let select_std_eq conf base pl k =
-  List.fold_right
-    (fun p pl -> if person_is_std_key conf base p k then p :: pl else pl)
-    pl []
+(* Resolves [input] string to a list of persons, used by free-form-input
+   routes (m=R, m=NG).  Returns [(persons, sosa_acc)] where [sosa_acc]
+   is true when the result came via the Sosa path — callers use that
+   flag to decide whether to redirect directly or render a specify page.
 
-let find_all conf base an =
+   Strategies tried in order:
+   - Sosa number against the base's sosa-reference;
+   - exact unique key via SearchName.search_by_key;
+   - approximate match via SearchName.search_key_aux, preferring
+     strict input matches but falling back to search_by_name. *)
+let lookup_person_by_input conf base input =
   let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
+  let sosa_nb = try Some (Sosa.of_string input) with _ -> None in
   match (sosa_ref, sosa_nb) with
   | Some p, Some n when n <> Sosa.zero -> (
       match Util.branch_of_sosa conf base n p with
       | Some (p :: _) -> ([ p ], true)
       | _ -> ([], false))
   | _ -> (
-      match SearchName.search_by_key conf base an with
+      match SearchName.search_by_key conf base input with
       | Some p -> ([ p ], false)
       | None ->
-          let aux conf base acc an =
-            let spl = select_std_eq conf base acc an in
-            if spl <> [] then spl
+          let aux conf base acc input =
+            let strict =
+              List.filter (fun p -> person_matches_input conf base p input) acc
+            in
+            if strict <> [] then strict
             else if acc <> [] then acc
-            else SearchName.search_by_name conf base an
+            else SearchName.search_by_name conf base input
           in
-          (SearchName.search_key_aux aux conf base an, false))
+          (SearchName.search_key_aux aux conf base input, false))
 
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
@@ -636,7 +640,7 @@ let treat_request =
                      in
                      (* Recherche par clé, sosa, alias ... *)
                      let search n =
-                       let pl, sosa_acc = find_all conf base n in
+                       let pl, sosa_acc = lookup_person_by_input conf base n in
                        match pl with
                        | [] ->
                            let alias_cache = Some.AliasCache.create () in
@@ -646,7 +650,7 @@ let treat_request =
                            if
                              sosa_acc
                              || Gutil.person_of_string_key base n <> None
-                             || person_is_std_key conf base p n
+                             || person_matches_input conf base p n
                            then person_selected_with_redirect conf base p
                            else
                              let alias_cache = Some.AliasCache.create () in
@@ -761,7 +765,7 @@ let treat_request =
                      let sn = components.surname in
                      let search n =
                        let alias_cache = Some.AliasCache.create () in
-                       let pl, sosa_acc = find_all conf base n in
+                       let pl, sosa_acc = lookup_person_by_input conf base n in
                        match pl with
                        | [] ->
                            Some.search_surname_print conf base alias_cache
@@ -770,7 +774,7 @@ let treat_request =
                            if
                              sosa_acc
                              || Gutil.person_of_string_key base n <> None
-                             || person_is_std_key conf base p n
+                             || person_matches_input conf base p n
                            then person_selected_with_redirect conf base p
                            else Some.specify conf base alias_cache n pl [] []
                        | pl -> Some.specify conf base alias_cache n pl [] []
