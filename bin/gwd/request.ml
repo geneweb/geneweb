@@ -718,11 +718,19 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
                  | Some v ->
-                     (* Redirection vers m=S pour compatibilité *)
-                     let t_param =
+                     (* m=P&v=fn is a legacy route now served by m=S&p=fn.
+                        Rebuild conf.env stripping the legacy keys (m, v, t)
+                        and reinjecting the canonical ones in a single
+                        traversal. *)
+                     let t_value =
                        match p_getenv conf.env "t" with
-                       | Some t -> ("t", Mutil.encode t)
-                       | None -> ("t", Mutil.encode "")
+                       | Some t -> t
+                       | None -> ""
+                     in
+                     let env_clean =
+                       List.filter
+                         (fun (k, _) -> k <> "m" && k <> "v" && k <> "t")
+                         conf.env
                      in
                      let conf =
                        {
@@ -730,15 +738,13 @@ let treat_request =
                          env =
                            ("m", Mutil.encode "S")
                            :: ("p", Mutil.encode v)
-                           :: t_param
-                           :: List.remove_assoc "m"
-                                (List.remove_assoc "v"
-                                   (List.remove_assoc "t" conf.env));
+                           :: ("t", Mutil.encode t_value)
+                           :: env_clean;
                        }
                      in
                      SearchName.print conf base Some.specify
                  | None ->
-                     (* Index alphabétique des prénoms avec tri=F ou tri=A *)
+                     (* Alphabetic first-name index, sortable by F or A. *)
                      AllnDisplay.print_first_names conf base)
              | "PERSO" ->
                  w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
