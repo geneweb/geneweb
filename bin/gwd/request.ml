@@ -110,6 +110,26 @@ let unknown conf n =
   Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
+(* Resolve [input] via {!lookup_person_by_input} and dispatch the result:
+   - empty result → search_surname_print with the [unknown] fallback;
+   - single hit reachable as a key/Sosa/canonical name → redirect to the
+     person directly;
+   - single hit otherwise, or multiple hits → render the specify page.
+   Shared between the m=R and m=NG legacy routes. *)
+let redirect_or_specify conf base input =
+  let alias_cache = Some.AliasCache.create () in
+  let pl, sosa_acc = lookup_person_by_input conf base input in
+  match pl with
+  | [] -> Some.search_surname_print conf base alias_cache unknown input
+  | [ p ] ->
+      if
+        sosa_acc
+        || Gutil.person_of_string_key base input <> None
+        || person_matches_input conf base p input
+      then person_selected_with_redirect conf base p
+      else Some.specify conf base alias_cache input pl [] []
+  | pl -> Some.specify conf base alias_cache input pl [] []
+
 let make_henv conf base =
   (* Collect henv extensions in reverse, prepend to conf.henv at the end. *)
   let extras = ref [] in
@@ -618,7 +638,7 @@ let treat_request =
                  | _ -> AllnDisplay.print_surnames conf base)
              | "NG" -> (
                  w_base @@ fun conf base ->
-                 (* Rétro-compatibilité <= 6.06 *)
+                 (* Rétro-compatibilité <= 6.07 *)
                  let env =
                    match p_getenv conf.env "n" with
                    | Some n -> (
@@ -629,7 +649,6 @@ let treat_request =
                    | None -> conf.env
                  in
                  let conf = { conf with env } in
-                 (* Nouveau mode de recherche. *)
                  match p_getenv conf.env "select" with
                  | Some "input" | None -> (
                      (* Récupère le contenu non vide de la recherche. *)
@@ -638,32 +657,12 @@ let treat_request =
                        | Some s -> if s = "" then None else Some s
                        | None -> None
                      in
-                     (* Recherche par clé, sosa, alias ... *)
-                     let search n =
-                       let pl, sosa_acc = lookup_person_by_input conf base n in
-                       match pl with
-                       | [] ->
-                           let alias_cache = Some.AliasCache.create () in
-                           Some.search_surname_print conf base alias_cache
-                             unknown n
-                       | [ p ] ->
-                           if
-                             sosa_acc
-                             || Gutil.person_of_string_key base n <> None
-                             || person_matches_input conf base p n
-                           then person_selected_with_redirect conf base p
-                           else
-                             let alias_cache = Some.AliasCache.create () in
-                             Some.specify conf base alias_cache n pl [] []
-                       | pl ->
-                           let alias_cache = Some.AliasCache.create () in
-                           Some.specify conf base alias_cache n pl [] []
-                     in
                      match real_input "v" with
-                     | Some n -> search n
+                     | Some n -> redirect_or_specify conf base n
                      | None -> (
                          match (real_input "fn", real_input "sn") with
-                         | Some fn, Some sn -> search (fn ^ " " ^ sn)
+                         | Some fn, Some sn ->
+                             redirect_or_specify conf base (fn ^ " " ^ sn)
                          | Some fn, None ->
                              let conf =
                                {
@@ -763,27 +762,12 @@ let treat_request =
                      in
                      let fn = components.first_name in
                      let sn = components.surname in
-                     let search n =
-                       let alias_cache = Some.AliasCache.create () in
-                       let pl, sosa_acc = lookup_person_by_input conf base n in
-                       match pl with
-                       | [] ->
-                           Some.search_surname_print conf base alias_cache
-                             unknown n
-                       | [ p ] ->
-                           if
-                             sosa_acc
-                             || Gutil.person_of_string_key base n <> None
-                             || person_matches_input conf base p n
-                           then person_selected_with_redirect conf base p
-                           else Some.specify conf base alias_cache n pl [] []
-                       | pl -> Some.specify conf base alias_cache n pl [] []
-                     in
                      match p_getenv conf.env "v" with
-                     | Some n -> search n
+                     | Some n -> redirect_or_specify conf base n
                      | None -> (
                          match (fn, sn) with
-                         | Some fn, Some sn -> search (fn ^ " " ^ sn)
+                         | Some fn, Some sn ->
+                             redirect_or_specify conf base (fn ^ " " ^ sn)
                          | _ ->
                              request_issue conf base
                                ~key:"missing p and n for relation"))
@@ -792,14 +776,14 @@ let treat_request =
                        (pget conf base (Driver.Iper.of_string i))
                        (find_person_in_env_pref conf base "e")
                  | _ -> (
-                     (* Tout le code du cas R doit être dans une seule expression *)
+                     (* All R-case logic must be in a single expression. *)
                      let p1_new = find_person_in_env conf base "1" in
                      let p2_new = find_person_in_env conf base "2" in
                      match (p1_new, p2_new) with
                      | Some p1, Some p2 ->
                          RelationDisplay.print conf base p1 (Some p2)
                      | _ -> (
-                         (* Fallback sur l'ancien format *)
+                         (* Fallback on legacy parameter format. *)
                          let p1_old = find_person_in_env conf base "" in
                          let p2_old = find_person_in_env conf base "1" in
                          match (p1_old, p2_old) with
