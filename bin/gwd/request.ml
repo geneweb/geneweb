@@ -11,49 +11,6 @@ module Plugin = Geneweb_plugin
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 
-(* Tests whether [input] is a recognized identifier for [p]: either
-   "firstname surname" (modulo Name.strip_lower) or one of the person's
-   misc names (titles, public names, qualifiers, aliases). *)
-let person_matches_input conf base p input =
-  let input = Name.strip_lower input in
-  input
-  = Name.strip_lower (Driver.p_first_name base p ^ " " ^ Driver.p_surname base p)
-  || List.exists
-       (fun n -> Name.strip n = input)
-       (Driver.person_misc_names base p (nobtit conf base))
-
-(* Resolves [input] string to a list of persons, used by free-form-input
-   routes (m=R, m=NG).  Returns [(persons, sosa_acc)] where [sosa_acc]
-   is true when the result came via the Sosa path — callers use that
-   flag to decide whether to redirect directly or render a specify page.
-
-   Strategies tried in order:
-   - Sosa number against the base's sosa-reference;
-   - exact unique key via SearchName.search_by_key;
-   - approximate match via SearchName.search_key_aux, preferring
-     strict input matches but falling back to search_by_name. *)
-let lookup_person_by_input conf base input =
-  let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string input) with _ -> None in
-  match (sosa_ref, sosa_nb) with
-  | Some p, Some n when n <> Sosa.zero -> (
-      match Util.branch_of_sosa conf base n p with
-      | Some (p :: _) -> ([ p ], true)
-      | _ -> ([], false))
-  | _ -> (
-      match SearchName.search_by_key conf base input with
-      | Some p -> ([ p ], false)
-      | None ->
-          let aux conf base acc input =
-            let strict =
-              List.filter (fun p -> person_matches_input conf base p input) acc
-            in
-            if strict <> [] then strict
-            else if acc <> [] then acc
-            else SearchName.search_by_name conf base input
-          in
-          (SearchName.search_key_aux aux conf base input, false))
-
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
@@ -97,7 +54,7 @@ let person_selected_with_redirect conf base p =
 
 let updmenu_print = Perso.interp_templ "updmenu"
 
-(* Print Not found page *)
+(* Print “Not found” page *)
 let unknown conf n =
   let title _ =
     transl conf "not found" |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -110,25 +67,9 @@ let unknown conf n =
   Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
-(* Resolve [input] via {!lookup_person_by_input} and dispatch the result:
-   - empty result → search_surname_print with the [unknown] fallback;
-   - single hit reachable as a key/Sosa/canonical name → redirect to the
-     person directly;
-   - single hit otherwise, or multiple hits → render the specify page.
-   Shared between the m=R and m=NG legacy routes. *)
-let redirect_or_specify conf base input =
-  let alias_cache = Some.AliasCache.create () in
-  let pl, sosa_acc = lookup_person_by_input conf base input in
-  match pl with
-  | [] -> Some.search_surname_print conf base alias_cache unknown input
-  | [ p ] ->
-      if
-        sosa_acc
-        || Gutil.person_of_string_key base input <> None
-        || person_matches_input conf base p input
-      then person_selected_with_redirect conf base p
-      else Some.specify conf base alias_cache input pl [] []
-  | pl -> Some.specify conf base alias_cache input pl [] []
+let redirect_or_specify =
+  PersonLookup.redirect_or_specify ~not_found:unknown
+    ~redirect_to_person:person_selected_with_redirect
 
 let make_henv conf base =
   (* Collect henv extensions in reverse, prepend to conf.henv at the end. *)
