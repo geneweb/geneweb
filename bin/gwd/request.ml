@@ -70,165 +70,6 @@ let _relation_print conf base p =
   in
   RelationDisplay.print conf base p p1
 
-let process_titles conf base n p =
-  let n_crushed = Name.crush_lower n in
-  let tl = ref [] in
-  let add_title t =
-    tl :=
-      let rec add_rec = function
-        | t1 :: tl1 ->
-            if
-              Driver.Istr.equal t1.t_ident t.t_ident
-              && Driver.Istr.equal t1.t_place t.t_place
-            then t1 :: tl1
-            else t1 :: add_rec tl1
-        | [] -> [ t ]
-      in
-      add_rec !tl
-  in
-  let compare_and_add t pn =
-    let pn = Driver.sou base pn in
-    if Name.crush_lower pn = n_crushed then add_title t
-    else
-      match Driver.get_qualifiers p with
-      | nn :: _ ->
-          let nn = Driver.sou base nn in
-          if Name.crush_lower (pn ^ " " ^ nn) = n_crushed then add_title t
-      | _ -> ()
-  in
-  List.iter
-    (fun t ->
-      match (t.t_name, Driver.get_public_name p) with
-      | Tname s, _ -> compare_and_add t s
-      | _, pn when Driver.sou base pn <> "" -> compare_and_add t pn
-      | _ -> ())
-    (nobtit conf base p);
-  !tl
-
-let sort_by_birth_date persons_with_titles =
-  let with_dates =
-    List.rev_map
-      (fun (p, tl) ->
-        let bi = Driver.get_birth p in
-        let bi = if bi = Date.cdate_None then Driver.get_baptism p else bi in
-        (p, tl, Date.cdate_to_dmy_opt bi))
-      persons_with_titles
-  in
-  List.sort
-    (fun (_, _, dmy1) (_, _, dmy2) -> Option.compare Date.compare_dmy dmy2 dmy1)
-    with_dates
-  |> List.rev_map (fun (p, tl, _) -> (p, tl))
-
-let sort_by_first_name base persons_with_titles =
-  let with_fn =
-    List.rev_map
-      (fun (p, tl) ->
-        let fn = Driver.get_first_name p in
-        (p, tl, fn))
-      persons_with_titles
-  in
-  List.sort
-    (fun (_, _, fn1) (_, _, fn2) ->
-      Geneweb_db.Dutil.compare_fnames
-        (Some.name_unaccent (Driver.sou base fn1))
-        (Some.name_unaccent (Driver.sou base fn2)))
-    with_fn
-  |> List.map (fun (p, tl, _) -> (p, tl))
-
-let print_person_list conf base alias_cache query title_opt persons_with_titles
-    =
-  Logs.debug (fun k ->
-      k "Print_person_list: %d" (List.length persons_with_titles));
-  match persons_with_titles with
-  | [] -> ()
-  | _ ->
-      (match title_opt with
-      | Some title ->
-          Output.print_sstring conf title;
-          Output.print_sstring conf "\n"
-      | None -> ());
-      Output.print_sstring conf {|<ul class="fa-ul">|};
-      Output.print_sstring conf "\n";
-      List.iter
-        (fun (p, _titles) ->
-          Output.print_sstring conf {|<li><span class="fa-li">|};
-          Output.print_sstring conf "\n";
-          let sosa_num = SosaCache.get_sosa_person p in
-          if Geneweb_sosa.gt sosa_num Geneweb_sosa.zero then
-            SosaCache.print_sosa conf base p true
-          else Output.print_sstring conf {|<span class="bullet">•</span>|};
-          Output.print_sstring conf "</span>";
-          let alias =
-            Some.AliasCache.get_alias alias_cache (Driver.get_iper p)
-          in
-          let snalias =
-            Driver.get_surnames_aliases p |> List.map (Driver.sou base)
-          in
-          let snalias =
-            if snalias = [] then None
-            else
-              try Some (List.find (fun al -> Name.lower al = query) snalias)
-              with Not_found -> None
-          in
-          Update.print_person_parents_and_spouses conf base ~alias ~snalias p;
-          Output.print_sstring conf "</li>\n")
-        persons_with_titles;
-      Output.print_sstring conf "</ul>\n"
-
-let specify conf base alias_cache n pl1 pl2 pl3 =
-  let title _ =
-    Output.printf conf "%s%s %s"
-      (Util.escape_html n :> string)
-      (transl conf ":") (transl conf "specify")
-  in
-  let n = Name.lower n in
-  let split_pl n pl =
-    List.fold_left
-      (fun (acc1, acc2) p ->
-        let aliases =
-          Driver.get_aliases p
-          |> List.map (Driver.sou base)
-          |> List.map Name.lower
-        in
-        if List.mem n aliases then (p :: acc1, acc2) else (acc1, p :: acc2))
-      ([], []) pl
-  in
-  Hutil.header conf title;
-  Util.print_tips_relationship conf;
-  let with_fn = p_getenv conf.env "sort_fn" = Some "on" in
-  SosaCache.build_sosa_ht conf base;
-  let process_list pl =
-    pl
-    |> List.map (fun p -> (p, process_titles conf base n p))
-    |> if with_fn then sort_by_first_name base else sort_by_birth_date
-  in
-  (* identify alias matches in pl1 and pl2 *)
-  let pl11, pl12 = split_pl n pl1 in
-  let pl21, pl22 = split_pl n pl2 in
-  (if pl11 @ pl21 <> [] then (
-     let ptll11 = process_list pl11 in
-     let ptll12 = process_list pl12 in
-     let ptll21 = process_list pl21 in
-     let title = transl conf "alias" |> Utf8.capitalize_fst in
-     print_person_list conf base alias_cache n (Some title) (ptll11 @ ptll21);
-     let title = transl_nth conf "surname/surnames" 0 |> Utf8.capitalize_fst in
-     print_person_list conf base alias_cache n (Some title) ptll12)
-   else
-     let ptll1 = process_list pl1 in
-     print_person_list conf base alias_cache n None ptll1);
-  if pl22 <> [] then
-    let ptll22 = process_list pl22 in
-    let title = transl conf "other possibilities" |> Utf8.capitalize_fst in
-    print_person_list conf base alias_cache n (Some title) ptll22
-  else ();
-  let ptll3 = process_list pl3 in
-  if ptll3 <> [] then
-    let title = transl conf "with spouse name" |> Utf8.capitalize_fst in
-    print_person_list conf base alias_cache n (Some title) ptll3
-  else ();
-  (* FIXME why are those else () needed ? *)
-  Hutil.trailer conf
-
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
@@ -842,10 +683,10 @@ let treat_request =
                            then person_selected_with_redirect conf base p
                            else
                              let alias_cache = Some.AliasCache.create () in
-                             specify conf base alias_cache n pl [] []
+                             Some.specify conf base alias_cache n pl [] []
                        | pl ->
                            let alias_cache = Some.AliasCache.create () in
-                           specify conf base alias_cache n pl [] []
+                           Some.specify conf base alias_cache n pl [] []
                      in
                      match real_input "v" with
                      | Some n -> search n
@@ -859,7 +700,7 @@ let treat_request =
                                  env = ("p", Mutil.encode fn) :: conf.env;
                                }
                              in
-                             SearchName.print conf base specify
+                             SearchName.print conf base Some.specify
                          | None, Some sn ->
                              let conf =
                                {
@@ -925,7 +766,7 @@ let treat_request =
                                    (List.remove_assoc "t" conf.env));
                        }
                      in
-                     SearchName.print conf base specify
+                     SearchName.print conf base Some.specify
                  | None ->
                      (* Index alphabétique des prénoms avec tri=F ou tri=A *)
                      AllnDisplay.print_first_names conf base)
@@ -958,8 +799,8 @@ let treat_request =
                              || Gutil.person_of_string_key base n <> None
                              || person_is_std_key conf base p n
                            then person_selected_with_redirect conf base p
-                           else specify conf base alias_cache n pl [] []
-                       | pl -> specify conf base alias_cache n pl [] []
+                           else Some.specify conf base alias_cache n pl [] []
+                       | pl -> Some.specify conf base alias_cache n pl [] []
                      in
                      match p_getenv conf.env "v" with
                      | Some n -> search n
@@ -1007,7 +848,8 @@ let treat_request =
              | "RM" -> w_base @@ RelationMatrixDisplay.print
              | "RLM" -> w_base @@ RelationDisplay.print_multi
              | "S" | "SN" ->
-                 w_base @@ fun conf base -> SearchName.print conf base specify
+                 w_base @@ fun conf base ->
+                 SearchName.print conf base Some.specify
              | "SND_IMAGE" ->
                  w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print
              | "SND_IMAGE_OK" ->
