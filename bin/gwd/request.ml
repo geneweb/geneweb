@@ -223,6 +223,12 @@ let w_lock ~onerror fn conf (base_name : string option) =
     ~wait:true ~lock_file:(Mutil.lock_file bfile)
   @@ fun () -> fn conf base_name
 
+(* Module-level ref used as an init-once guard: the nldb format check
+   reads the on-disk index header once per gwd process lifetime to
+   avoid reissuing the warning notification on every request. The
+   guard is set before the check so that two simultaneous requests
+   don't both emit the notification. This is one of the few legacy
+   refs left in this file; do not add more. *)
 let nldb_check_done = ref false
 
 let check_nldb_format conf base =
@@ -274,6 +280,11 @@ let w_wizard fn conf base =
     (* FIXME: send authentification headers *)
     GWPARAM.output_error conf Code.Unauthorized
 
+(* The closures w_lock, w_base, w_person, print_page and handle_no_bfile
+   are constructed once at module load time (treat_request being a value
+   binding, not a function definition) and shared across every request.
+   The actual per-request entry point is the [fun conf -> ...] at the
+   end of this binding. *)
 let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base =
@@ -550,7 +561,7 @@ let treat_request =
              | "MRG_IND" ->
                  w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print
              | "MRG_IND_OK" ->
-                 (* despite the _OK suffix, this one does not actually update databse *)
+                 (* Despite the _OK suffix, this one does not actually update databse *)
                  w_wizard @@ w_base @@ MergeIndOkDisplay.print_merge
              | "MRG_MOD_IND_OK" ->
                  w_wizard @@ w_lock @@ w_base
@@ -565,7 +576,7 @@ let treat_request =
                  | _ -> AllnDisplay.print_surnames conf base)
              | "NG" -> (
                  w_base @@ fun conf base ->
-                 (* Rétro-compatibilité <= 6.07 *)
+                 (* Backward compatibility for <= 6.07 *)
                  let env =
                    match p_getenv conf.env "n" with
                    | Some n -> (
@@ -578,7 +589,7 @@ let treat_request =
                  let conf = { conf with env } in
                  match p_getenv conf.env "select" with
                  | Some "input" | None -> (
-                     (* Récupère le contenu non vide de la recherche. *)
+                     (* Read non-empty search input fields *)
                      let real_input label =
                        match p_getenv conf.env label with
                        | Some s -> if s = "" then None else Some s
