@@ -207,20 +207,6 @@ let make_senv conf base =
       set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
-let propose_base conf =
-  let title _ = Output.print_sstring conf "Base" in
-  Hutil.header conf title;
-  Output.print_sstring conf {|<ul><li><form method="GET" action="|};
-  Output.print_sstring conf conf.indep_command;
-  Output.print_sstring conf {|">|};
-  Output.print_sstring conf {|<input name="b" size="40"> =&gt; |};
-  Output.print_sstring conf
-    {|<button type="submit" class="btn btn-secondary btn-lg">|};
-  transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button></li></ul>";
-  Hutil.trailer conf
-
 let try_plugin list conf base_name m =
   let fn =
     if List.mem "*" list then fun (_, fn) -> fn conf base_name
@@ -320,7 +306,7 @@ let treat_request =
   let handle_no_bfile conf l =
     if conf.bname = "" then
       try Templ.output_simple conf Templ.Env.empty "index"
-      with _ -> propose_base conf
+      with _ -> SrcfileDisplay.propose_base conf
     else print_page conf l
   in
   fun conf ->
