@@ -51,7 +51,7 @@
         %if;(lazy_printed)/%end;
         %lazy_force;
         <b>%alias;</b>%nn;
-      %end;
+      %end;<br>
     %end;
     %( Nobility title format:
          “13ᵉ prince de Monaco (Rainier III, 9 mai 1949–6 avril 2005)” %)
