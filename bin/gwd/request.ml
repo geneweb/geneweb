@@ -34,24 +34,21 @@ let find_all conf base an =
   let sosa_ref = Util.find_sosa_ref conf base in
   let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
   match (sosa_ref, sosa_nb) with
-  | Some p, Some n ->
-      if n <> Sosa.zero then
-        match Util.branch_of_sosa conf base n p with
-        | Some (p :: _) -> ([ p ], true)
-        | _ -> ([], false)
-      else ([], false)
-  | _ ->
-      let acc = Option.to_list @@ SearchName.search_by_key conf base an in
-      if acc <> [] then (acc, false)
-      else
-        ( SearchName.search_key_aux
-            (fun conf base acc an ->
-              let spl = select_std_eq conf base acc an in
-              if spl = [] then
-                if acc = [] then SearchName.search_by_name conf base an else acc
-              else spl)
-            conf base an,
-          false )
+  | Some p, Some n when n <> Sosa.zero -> (
+      match Util.branch_of_sosa conf base n p with
+      | Some (p :: _) -> ([ p ], true)
+      | _ -> ([], false))
+  | _ -> (
+      match SearchName.search_by_key conf base an with
+      | Some p -> ([ p ], false)
+      | None ->
+          let aux conf base acc an =
+            let spl = select_std_eq conf base acc an in
+            if spl <> [] then spl
+            else if acc <> [] then acc
+            else SearchName.search_by_name conf base an
+          in
+          (SearchName.search_key_aux aux conf base an, false))
 
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
