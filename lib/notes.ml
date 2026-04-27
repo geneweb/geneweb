@@ -165,6 +165,79 @@ let json_extract_img conf s =
   | Some img -> (image_url_from_path conf img, img)
   | None -> ("", "")
 
+let extract_pnoc json =
+  let fn =
+    try
+      json
+      |> Yojson.Basic.Util.member "fn"
+      |> Yojson.Basic.Util.to_string_option |> Option.value ~default:""
+    with _ -> ""
+  in
+  let sn =
+    try
+      json
+      |> Yojson.Basic.Util.member "sn"
+      |> Yojson.Basic.Util.to_string_option |> Option.value ~default:""
+    with _ -> ""
+  in
+  let oc =
+    try
+      match json |> Yojson.Basic.Util.member "oc" with
+      | `String oc_str -> ( try int_of_string oc_str with _ -> 0)
+      | `Int oc_int -> oc_int
+      | _ -> 0
+    with _ -> 0
+  in
+  (fn, sn, oc)
+
+let mark_pnocs_validity base s =
+  let mark_one e =
+    match e with
+    | `Assoc l ->
+        let t =
+          try match List.assoc "t" l with `String s -> s | _ -> ""
+          with Not_found -> ""
+        in
+        if t = "" || t = "p" then
+          let fn, sn, oc = extract_pnoc (`Assoc l) in
+          if fn = "" || sn = "" then `Assoc l
+          else
+            let ok =
+              Driver.person_of_key base (Name.lower fn) (Name.lower sn) oc
+              <> None
+            in
+            `Assoc (l @ [ ("valid", `Bool ok) ])
+        else `Assoc l
+    | other -> other
+  in
+  let walk_image_fields l =
+    List.map
+      (function
+        | "map", `List lmap -> ("map", `List (List.map mark_one lmap))
+        | other -> other)
+      l
+  in
+  let walk_top_fields l =
+    List.map
+      (function
+        | "map", `List lmap -> ("map", `List (List.map mark_one lmap))
+        | "images", `List imgs ->
+            ( "images",
+              `List
+                (List.map
+                   (function
+                     | `Assoc img_l -> `Assoc (walk_image_fields img_l)
+                     | other -> other)
+                   imgs) )
+        | other -> other)
+      l
+  in
+  let json = try Yojson.Basic.from_string s with _ -> `Assoc [] in
+  let json =
+    match json with `Assoc l -> `Assoc (walk_top_fields l) | _ -> `Assoc []
+  in
+  Yojson.Basic.to_string json
+
 let safe_gallery conf base s =
   let html s =
     let s =
@@ -181,7 +254,6 @@ let safe_gallery conf base s =
     in
     Util.string_with_macros conf [] s
   in
-
   let safe_map e =
     match e with
     | `Assoc l ->
@@ -355,31 +427,6 @@ TYPE=gallery
    "group":"1"},{...}],
  "groups":[]}
 *)
-
-let extract_pnoc json =
-  let fn =
-    try
-      json
-      |> Yojson.Basic.Util.member "fn"
-      |> Yojson.Basic.Util.to_string_option |> Option.value ~default:""
-    with _ -> ""
-  in
-  let sn =
-    try
-      json
-      |> Yojson.Basic.Util.member "sn"
-      |> Yojson.Basic.Util.to_string_option |> Option.value ~default:""
-    with _ -> ""
-  in
-  let oc =
-    try
-      match json |> Yojson.Basic.Util.member "oc" with
-      | `String oc_str -> ( try int_of_string oc_str with _ -> 0)
-      | `Int oc_int -> oc_int
-      | _ -> 0
-    with _ -> 0
-  in
-  (fn, sn, oc)
 
 let _print_key label (fn, sn, oc) =
   Printf.eprintf "Key: %s: %s.%d %s\n" label fn oc sn

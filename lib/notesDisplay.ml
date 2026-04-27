@@ -518,7 +518,8 @@ let print_json conf base =
   let nenv, s = read_notes_from_conf conf base in
   let s =
     match norm_type (List.assoc "TYPE" nenv) with
-    | "gallery" -> Notes.safe_gallery conf base s
+    | "gallery" ->
+        Notes.safe_gallery conf base (Notes.mark_pnocs_validity base s)
     | (exception Not_found) | _ -> s
   in
   Output.print_sstring conf s
@@ -553,6 +554,11 @@ let print_mod_json conf base =
     List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" nenv ^ s
   in
   let digest = Mutil.digest s_digest in
+  let s =
+    match norm_type (List.assoc "TYPE" nenv) with
+    | "gallery" -> Notes.mark_pnocs_validity base s
+    | (exception Not_found) | _ -> s
+  in
   Output.printf conf "{\"digest\":\"%s\",\"r\":%s}" digest s
 
 let print_mod conf base =

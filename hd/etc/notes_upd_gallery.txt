@@ -313,5 +313,6 @@ const GW = {
 };
 </script>
 <script src="%etc_prefix;js/notes_upd_gallery.min.js?hash=%apply;hash%with;%etc_prefix;js/notes_upd_gallery.min.js%end;"></script>
+<script src="%etc_prefix;js/person_picker.min.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.min.js%end;"></script>
 </body>
 </html>

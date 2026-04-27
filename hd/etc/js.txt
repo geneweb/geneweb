@@ -56,6 +56,12 @@
    <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
   %end;
 %end;
+%if;(e.v="updRLM" or e.m="MRG")
+<script>
+const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
+</script>
+<script src="%etc_prefix;js/person_picker.min.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.min.js%end;"></script>
+%end;
 %if;(e.m="CHK_DATA")
 <script>
   function showOverlay() {
