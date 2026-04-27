@@ -11959,10 +11959,10 @@ en: pages or notes where page is referenced
 fr: pages ou notes où la page est citée
 
     linked pages help
-co: note, pagine, albumi o gallerie induve a persona hè referenzata
-de: Notizen, Seiten, Alben oder Galerien, wo die Person erwähnt wird
-en: notes, pages, albums or galleries where person is referenced
-fr: notes, pages, albums ou galleries où la personne est citée
+co: note, pagine o gallerie induve a persona hè referenzata
+de: Notizen, Seiten oder Galerien, wo die Person erwähnt wird
+en: notes, pages or galleries where person is referenced
+fr: notes, pages ou galleries où la personne est citée
 
     linked pages
 bg: свързани страници
