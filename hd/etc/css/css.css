@@ -2423,3 +2423,21 @@ span.notesourcecolor {
 .moon-vis .lit{position:absolute;top:0;height:100%;
   background:linear-gradient(135deg,#fffde7,#fff9c4);
   border-radius:50%}
+
+/* pnoc validation rules for tp0_updRLM and notes_upd_gallery */
+tr.row-invalid > * {
+    --bs-table-bg: var(--bs-danger-bg-subtle);
+    --bs-table-bg-state: var(--bs-danger-bg-subtle);
+}
+tr.row-valid-flash > * {
+    --bs-table-bg: var(--bs-success-bg-subtle);
+    --bs-table-bg-state: var(--bs-success-bg-subtle);
+}
+input.row-invalid {
+    background-color: var(--bs-danger-bg-subtle);
+    border-color: var(--bs-danger-border-subtle);
+}
+input.row-valid-flash {
+    background-color: var(--bs-success-bg-subtle);
+    border-color: var(--bs-success-border-subtle);
+}

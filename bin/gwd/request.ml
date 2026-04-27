@@ -684,6 +684,8 @@ let treat_request =
                      AllnDisplay.print_first_names conf base)
              | "PERSO" ->
                  w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
+             | "PNOC_LOOKUP" ->
+                 w_base @@ fun conf base -> PersonPicker.lookup_print conf base
              | "POP_PYR" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_population_pyramid
              | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c

@@ -144,3 +144,14 @@ val get_linked_page_family :
   Adef.safe_string
 (** [get_linked_page_family conf base ifam tag] returns backlink HTML for family
     [ifam] and header tag [tag] (e.g. "MARIAGE"). *)
+
+val mark_pnocs_validity : Geneweb_db.Driver.base -> string -> string
+(** [mark_pnocs_validity base s] augments the gallery JSON [s]: every map entry
+    that designates a person ([t] empty or ["p"]) and has both [fn] and [sn]
+    non-empty receives an additional ["valid"] boolean field indicating whether
+    the [(fn, sn, oc)] triple resolves to a person via [Driver.person_of_key]
+    (lowercased keys, default [oc=0]). Entries for GeneWeb internal ([t="g"]) or
+    external ([t="e"]) links, and entries with incomplete keys, are returned
+    unchanged. Used by both the gallery viewer and the gallery editor to seed
+    client-side validity state without requiring per-row API round-trips at page
+    load. *)

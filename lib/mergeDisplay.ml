@@ -75,7 +75,7 @@ let print conf base p =
   Output.print_sstring conf (transl conf "any individual in the base");
   Output.print_sstring conf {|</label>|};
   Output.printf conf
-    {|<input type="text" class="form-control form-control-sm w-auto" name="n" id="inlineinput" placeholder="%s" title="%s" size="50" autofocus>|}
+    {|<input type="text" class="form-control form-control-sm w-auto pnoc-input" name="n" id="inlineinput" placeholder="%s" title="%s" size="50" autofocus>|}
     ph ph;
   Output.print_sstring conf {|</div>|};
   if list <> [] then

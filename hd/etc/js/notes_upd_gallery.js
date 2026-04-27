@@ -878,7 +878,13 @@ function initializeHandlers() {
             if (img) maphilight.refresh(img);
         })
         .on('row-reorder', handleAreaReorder)
-        .on('draw.dt', updateLegendLinks);
+        .on('draw.dt', updateLegendLinks)
+        
+        .on('focusout', 'td input.update', function () {
+            const tr = this.closest('tr');
+            if (!tr || !table) return;
+            validateRow(tr, table.row(tr).data(), { flash: true });
+        });
 
     if (GW.hasFnList || GW.hasSnList) {
         table.on('input', 'input[list]', function(e) {
@@ -1353,6 +1359,15 @@ function initTables() {
                         defaultContent: '<button type="button" class="btn btn-link text-danger remove px-1" title="' + GW.i18n.del + '"><i class="fa fa-trash-can"></i></button>'
                     },
                 ],
+                createdRow: function(row, data) {
+                    if ((!data.t || data.t === 'p') &&
+                        data.fn && data.sn &&
+                        typeof data.valid === 'boolean') {
+                        if (!data.valid) row.classList.add('row-invalid');
+                        row.dataset.pnocChecked =
+                            data.fn + '|' + data.sn + '|' + (data.oc || '0');
+                    }
+                },
                 rowCallback: function(row, data, index) {
                     const rowId = row.getAttribute('id')?.replace(/[a-z]/g, '') || '';
                     if (!rowId) return;
@@ -2008,6 +2023,33 @@ function initReorderModal() {
             document.getElementById('reorder_modal')).hide();
         loadAlbumImage(albumCurrent);
     });
+}
+
+function validateRow(tr, data, opts) {
+    if (!tr || !data) return Promise.resolve();
+    if ((data.t && data.t !== 'p') || !data.fn || !data.sn) {
+        tr.classList.remove('row-invalid');
+        delete tr.dataset.pnocChecked;
+        return Promise.resolve();
+    }
+    const sig = data.fn + '|' + data.sn + '|' + (data.oc || '0');
+    if (tr.dataset.pnocChecked === sig) return Promise.resolve();
+    return PersonPicker.checkExact(data.fn, data.sn, data.oc || 0)
+        .then(ok => {
+            tr.dataset.pnocChecked = sig;
+            tr.classList.toggle('row-invalid', !ok);
+            if (ok && opts && opts.flash) {
+                tr.classList.add('row-valid-flash');
+                setTimeout(() => tr.classList.remove('row-valid-flash'), 900);
+            }
+        });
+}
+
+function validateAllPnocs() {
+    if (!table) return;
+    const data = table.rows().data().toArray();
+    const nodes = table.rows().nodes();
+    Promise.all(data.map((d, i) => validateRow(nodes[i], d)));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
