@@ -25,6 +25,9 @@ let print_img conf img =
   Output.print_string conf img;
   Output.print_sstring conf {|" alt="" title="">|}
 
+let print_robots_tag_noindex_follow_header conf =
+  Output.robots_tag_header ~index:false ~follow:true conf
+
 (** [Description] : A partir de l'affichage par branches, permet
                     d'afficher les liens pour un affichage par ordre
                     alphabétique.
@@ -334,7 +337,10 @@ let persons_of_absolute_surname =
 let search_first_name_print
     ~(query_params : Page.First_name_search.Query_params.t) conf base list =
   match list with
-  | [] -> first_name_not_found conf query_params.first_name
+  | [] ->
+      print_robots_tag_noindex_follow_header (Config.Trimmed.from_config conf);
+
+      first_name_not_found conf query_params.first_name
   | [ (_, (strl, iperl)) ] ->
       let iperl = List.sort_uniq compare iperl in
       let pl = List.map (Util.pget conf base) iperl in
@@ -344,6 +350,8 @@ let search_first_name_print
             if Person.has_visible_name conf base p then p :: pl else pl)
           pl []
       in
+      if List.length iperl < 2 then
+        print_robots_tag_noindex_follow_header (Config.Trimmed.from_config conf);
       first_name_print_list ~exact:query_params.exact conf base
         query_params.first_name strl pl
   | _ ->
@@ -865,15 +873,18 @@ type surname_search_result = {
 
 let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
     base not_found_fun { iperl; list; bhl } =
+  let block_search_engine_indexation = List.length iperl < 2 in
   match query_params.display_mode with
   | `List ->
       let pl =
         List.fold_right (fun ip ipl -> Util.pget conf base ip :: ipl) iperl []
       in
       let pl = List.filter (fun p -> Person.has_visible_name conf base p) pl in
+      if block_search_engine_indexation then
+        print_robots_tag_noindex_follow_header (Config.Trimmed.from_config conf);
       print_family_alphabetic query_params.last_name conf base pl
   | `Branch -> (
-      let print_canonical ?status () =
+      let print_search_engine_headers ?status () =
         let canonical_url =
           Page.Last_name_search.canonical_url
             ~conf:(Config.Trimmed.from_config conf)
@@ -888,21 +899,24 @@ let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
             Lang.all
         in
         Option.iter (Output.status conf) status;
+        if block_search_engine_indexation then
+          print_robots_tag_noindex_follow_header
+            (Config.Trimmed.from_config conf);
         Output.link_header
           (Config.Trimmed.from_config conf)
           canonical_url ~alternate_urls
       in
       match (bhl, list) with
       | [], _ ->
-          print_canonical ~status:Def.Not_Found ();
+          print_search_engine_headers ~status:Def.Not_Found ();
           not_found_fun conf query_params.last_name
       | _, [ (s, (strl, _)) ] ->
-          print_canonical ();
+          print_search_engine_headers ();
           print_one_surname_by_branch ~exact:query_params.exact conf base
             query_params.last_name strl (bhl, s)
       | _ ->
           let strl = List.map fst list in
-          print_canonical ();
+          print_search_engine_headers ();
           print_several_possible_surnames query_params.last_name
             (Config.Trimmed.from_config conf)
             base (bhl, strl))
