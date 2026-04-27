@@ -20,7 +20,7 @@
       <div>(<a href="%prefix;m=LINKED&type=gallery&%acc;"
         title="[*linked galleries help]"><i class="fa-solid fa-images"></i></a>)</div>
     %end;
-    <div>(<a href="%url;&ref=on" title="[*linked galleries help]">&lt;-</a>)</div>
+    <div>(<a href="%url;&ref=on" title="[*gallery backlinks]">&lt;-</a>)</div>
     %if;wizard;<div>(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)</div>%end;
   </div>
   <h1 id="h1" class="ms-3 mb-0">[*loading/error]0</h1>
