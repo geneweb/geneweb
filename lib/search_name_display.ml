@@ -331,6 +331,26 @@ let persons_of_absolute_surname =
   persons_of_absolute Gwdb.base_strings_of_surname Gwdb.persons_of_surname
     Gwdb.get_surname
 
+let search_first_name_print
+    ~(query_params : Page.First_name_search.Query_params.t) conf base list =
+  match list with
+  | [] -> first_name_not_found conf query_params.first_name
+  | [ (_, (strl, iperl)) ] ->
+      let iperl = List.sort_uniq compare iperl in
+      let pl = List.map (Util.pget conf base) iperl in
+      let pl =
+        List.fold_right
+          (fun p pl ->
+            if Person.has_visible_name conf base p then p :: pl else pl)
+          pl []
+      in
+      first_name_print_list ~exact:query_params.exact conf base
+        query_params.first_name strl pl
+  | _ ->
+      select_first_name
+        (Config.Trimmed.from_config conf)
+        query_params.first_name list
+
 let first_name_print ~(query_params : Page.First_name_search.Query_params.t)
     conf base =
   let list =
@@ -964,25 +984,5 @@ let search_first_name ~exact conf base x : first_name_search_result =
       list
   in
   List.fold_right merge_insert list []
-
-let search_first_name_print
-    ~(query_params : Page.First_name_search.Query_params.t) conf base list =
-  match list with
-  | [] -> first_name_not_found conf query_params.first_name
-  | [ (_, (strl, iperl)) ] ->
-      let iperl = List.sort_uniq compare iperl in
-      let pl = List.map (Util.pget conf base) iperl in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-            if Person.has_visible_name conf base p then p :: pl else pl)
-          pl []
-      in
-      first_name_print_list ~exact:query_params.exact conf base
-        query_params.first_name strl pl
-  | _ ->
-      select_first_name
-        (Config.Trimmed.from_config conf)
-        query_params.first_name list
 
 let fn_search_result_is_empty l = l = []
