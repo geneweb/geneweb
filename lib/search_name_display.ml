@@ -370,23 +370,7 @@ let first_name_print ~(query_params : Page.First_name_search.Query_params.t)
       list
   in
   let list = List.fold_right merge_insert list [] in
-  match list with
-  | [] -> first_name_not_found conf query_params.first_name
-  | [ (_, (strl, iperl)) ] ->
-      let iperl = List.sort_uniq compare iperl in
-      let pl = List.map (Util.pget conf base) iperl in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-            if Person.has_visible_name conf base p then p :: pl else pl)
-          pl []
-      in
-      first_name_print_list ~exact:query_params.exact conf base
-        query_params.first_name strl pl
-  | _ ->
-      select_first_name
-        (Config.Trimmed.from_config conf)
-        query_params.first_name list
+  search_first_name_print ~query_params conf base list
 
 let has_children_with_that_name ~exact conf base des name =
   let compare_name n1 n2 =
