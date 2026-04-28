@@ -14,8 +14,8 @@
 %include;hed
 %let;mid;%sp;class="align-middle"%in;
 %let;max_index;%pvar.highest;%in;
-%define;one_pvar_line(znz,zfnz,zsnz,zocz,zbdz,ztz,zparamz)
-  <trzparamz>
+%define;one_pvar_line(znz,zfnz,zsnz,zocz,zbdz,ztz,zclassz)
+  <tr class="zclassz"%if;("znz"!="") data-pnoc-checked="zfnz|zsnz|%if;("zocz"="")0%else;zocz%end;"%end;>
     <td class="align-middle text-center text-nowrap px-3">
       <button type="button" class="btn btn-success btn-sm row_add"
               title="[*add/insert/delete/up/down row]1"
@@ -73,7 +73,7 @@
     %if;(pvar.zz.exist)
       %apply;one_pvar_line("zz", pvar.zz.first_name, pvar.zz.surname, pvar.zz.occ, datespan, e.tzz, "")
     %else;
-      %apply;one_pvar_line("zz", e.pzz, e.nzz, e.oczz, datespan, e.tzz, " class='bg-warning'")
+      %apply;one_pvar_line("zz", e.pzz, e.nzz, e.oczz, datespan, e.tzz, "row-invalid")
     %end;
   %end;
   %if;(zz<=max_index)
@@ -97,9 +97,6 @@
 <div class="container-xl">
 <form id="upd">
   <div class="h2 m-3">[*add/clear/show/edit the graph]3 RM/RLM</div>
-  <div class="d-flex">
-  <div class="alert alert-warning mx-auto d-none">[*RLM unknowns persons]</div>
-  </div>
   %hidden;
   <input type="hidden" name="m" value='RLM'>
   %apply;my_hidden("spouse")
@@ -126,7 +123,7 @@
       </tr>
     </thead>
     <tbody>
-      %apply;one_pvar_line("", "", "", "", "", "", " id='template_line' style='display:none;'")
+      %apply;one_pvar_line("", "", "", "", "", "", "template_line d-none")
       %if;(e.i0!="" and e.p0!="")
         %apply;one_pvar(0)
       %else;
@@ -135,27 +132,20 @@
     </tbody>
     <tfoot>
       <td colspan="8" class="text-center p-2">
-        <button type="button" class="btn btn-success row_add me-4"
+        <button type="button" class="btn btn-success row_add me-3"
                 title="[*add/insert/delete/up/down row]0">
           <i class="fas fa-plus me-2" aria-hidden="true"></i>%nn;
           [*add/insert/delete/up/down row aria-label]0
         </button>
-        <button type="button" class="btn btn-outline-info me-2" id="refreshForm"
-                title="[*RLM update data/save data/show graph]0" disabled>
-           <span class="me-2">
-             <i class="fas fa-check toggle-icon"></i>
-             <i class="fas fa-rotate toggle-icon d-none"></i>
-           </span>[*validate/delete]0
-        </button>
         <script id="rlm-data" type="application/json">%[%apply;one_pvar_json(1)%]</script>
-        <button type="button" class="btn btn-info me-4" id="saveRLM"
+        <button type="button" class="btn btn-primary me-3" id="saveRLM"
                 title="[*RLM update data/save data/show graph]1" disabled>
           <span class="me-2">
             <i class="fas fa-download toggle-icon"></i>
             <i class="fas fa-check toggle-icon d-none"></i>
           </span>[*save]
         </button>
-        <button type="button" class="btn btn-primary me-4" id="showGraph"
+        <button type="button" class="btn btn-primary me-3" id="showGraph"
                 title="[*RLM update data/save data/show graph]2 (RLM)" disabled>
           <i class="fas fa-eye me-2"></i>[*add/clear/show/edit the graph]2
         </button>
@@ -228,9 +218,8 @@
 
   // ---------- template cloning ----------
   function cloneTemplate() {
-    const tpl = document.getElementById('template_line').cloneNode(true);
-    tpl.removeAttribute('id');
-    tpl.removeAttribute('style');
+    const tpl = document.querySelector('.template_line').cloneNode(true);
+    tpl.classList.remove('template_line', 'd-none');
     return tpl;
   }
 
@@ -290,7 +279,7 @@
     }
   });
 
-  // ---------- save RLM (localStorage) ----------
+  // save RLM (localStorage)
   const saveBtn = $('#saveRLM');
   if (saveBtn) {
     saveBtn.addEventListener('click', () => {
@@ -314,7 +303,6 @@
     let dataIndex = 1;
     const params = new URLSearchParams();
     params.set('m', mode);
-    if (mode === 'TP') params.set('v', 'updRLM');
 
     const currentParams = new URLSearchParams(window.location.search);
     const b = currentParams.get('b');
@@ -350,13 +338,9 @@
   }
 
   // ---------- top-level navigation buttons ----------
-  const refreshBtn  = $('#refreshForm');
   const showGraph   = $('#showGraph');
   const showMatrix  = $('#showMatrix');
 
-  if (refreshBtn) refreshBtn.addEventListener('click', () => {
-    window.location.href = buildUrl('TP');
-  });
   if (showGraph) showGraph.addEventListener('click', () => {
     window.location.href = buildUrl('RLM');
   });
@@ -364,52 +348,84 @@
     window.location.href = buildUrl('RM');
   });
 
-  // ---------- form validity ----------
+  // form validity
   function checkFormValidity() {
-    const warningRows = tbody.querySelectorAll('tr.bg-warning, tr .bg-warning').length;
+    const warningRows = tbody.querySelectorAll('tr.row-invalid').length;
     const validRows = visibleRows().length - warningRows;
-    const noErrors = warningRows === 0;
-    if (noErrors && validRows >= 2) {
-      ['#saveRLM', '#showGraph', '#showMatrix'].forEach(sel => {
-        const el = $(sel);
-        if (el) el.disabled = false;
-      });
-    } else {
-      $$('.alert-warning').forEach(a => a.classList.remove('d-none'));
-    }
+    const enable = warningRows === 0 && validRows >= 2;
+    ['#saveRLM', '#showGraph', '#showMatrix'].forEach(sel => {
+      const el = $(sel);
+      if (el) el.disabled = !enable;
+    });
   }
 
-  // ---------- enable refresh on edits ----------
-  function enableRefresh() {
-    if (refreshBtn && refreshBtn.disabled) {
-      refreshBtn.disabled = false;
-      setTimeout(checkFormValidity, 100);
-      toggleIcons('#refreshForm');
-    }
+  // pnoc validation (live, on edit only)
+  function rowKey(row) {
+    const p  = row.querySelector("input[name='p']");
+    const n  = row.querySelector("input[name='n']");
+    const oc = row.querySelector("input[name='oc']");
+    return {
+      fn: p  ? p.value.trim()  : '',
+      sn: n  ? n.value.trim()  : '',
+      oc: oc ? (oc.value.trim() || '0') : '0'
+    };
   }
 
-  document.addEventListener('input',  (e) => {
-    if (e.target.closest('tbody') && e.target.matches('input')) enableRefresh();
-  });
-  document.addEventListener('change', (e) => {
-    if (e.target.closest('tbody') && e.target.matches('input')) enableRefresh();
-  });
-  document.addEventListener('click',  (e) => {
-    if (e.target.closest('.row_add, .row_del, .row_move_up, .row_move_down')) enableRefresh();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && refreshBtn && !refreshBtn.disabled) {
-      e.preventDefault();
-      refreshBtn.click();
+function validateRow(row, opts) {
+    if (!row || row.classList.contains('last_row')) return Promise.resolve();
+    const k = rowKey(row);
+    if (!k.fn && !k.sn) {
+      row.classList.remove('row-invalid');
+      delete row.dataset.pnocChecked;
+      checkFormValidity();
+      return Promise.resolve();
     }
+    if (!k.fn || !k.sn) {
+      row.classList.add('row-invalid');
+      delete row.dataset.pnocChecked;
+      checkFormValidity();
+      return Promise.resolve();
+    }
+    const sig = k.fn + '|' + k.sn + '|' + k.oc;
+    if (row.dataset.pnocChecked === sig) return Promise.resolve();
+    return PersonPicker.checkExact(k.fn, k.sn, k.oc).then(ok => {
+      row.dataset.pnocChecked = sig;
+      row.classList.toggle('row-invalid', !ok);
+      if (ok && opts && opts.flash) {
+        row.classList.add('row-valid-flash');
+        setTimeout(() => row.classList.remove('row-valid-flash'), 900);
+      }
+      checkFormValidity();
+    });
+  }
+
+  document.addEventListener('focusout', (e) => {
+    const inp = e.target.closest("tbody input[name='p'], tbody input[name='n'], tbody input[name='oc']");
+    if (!inp) return;
+    validateRow(inp.closest('tr'), { flash: true });
   });
 
-  // ---------- init ----------
-  function init() {
+  // active row tracking
+  document.addEventListener('focusin', (e) => {
+    const inp = e.target.closest(
+      "tbody input[name='p'], tbody input[name='n'], " +
+      "tbody input[name='oc'], tbody input[name='t']");
+    if (!inp) return;
+    const row = inp.closest('tr');
+    if (!row) return;
+    tbody.querySelectorAll('tr.row-active').forEach(r => {
+      if (r !== row) r.classList.remove('row-active');
+    });
+    row.classList.add('row-active');
+  });
+
+  // init
+function init() {
     updateArrowVisibility();
     checkFormValidity();
     setTimeout(() => {
-      const firstWarning = tbody.querySelector('tr.bg-warning input[name="p"]');
+      const firstWarning = tbody.querySelector(
+        'tr.row-invalid input[name="p"]');
       if (firstWarning) {
         firstWarning.focus();
         if (firstWarning.setSelectionRange) {

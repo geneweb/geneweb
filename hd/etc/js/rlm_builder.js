@@ -1,4 +1,4 @@
-<!-- $Id: js/rlm_builder.js v7.1 04/04/2026 01:56:46 $ -->
+<!-- $Id: js/rlm_builder.js v7.1 28/04/2026 03:36:41 $ -->
 
 'use strict';
 
@@ -46,13 +46,20 @@ if (RLM) {
     graphBtns.classList.toggle('d-none', !hasData);
   }
 
+  function indLabel(ind) {
+    if (ind.p && ind.n) {
+      return ind.p + ' ' + ind.n + (ind.oc && ind.oc !== '0' ? '.' + ind.oc : '');
+    }
+    return ind.self || ('i=' + (ind.i || '?'));
+  }
+
   function buildUrlAndTooltip(storedInds) {
     let url = '';
     let tooltip = '';
     storedInds.forEach((ind, idx) => {
       const num = idx + 1;
       url += buildUrlParams(ind, num);
-      tooltip += `${num}. ${ind.self} (${ind.i ? 'i=' + ind.i : ''}${ind.p ? '/' + ind.p : ''}${ind.n ? '/' + ind.n : ''}${ind.oc && !ind.i ? '/' + ind.oc : ''}${ind.t ? '/' + ind.t : ''})\n`;
+      tooltip += `${num}. ${indLabel(ind)}${ind.t ? ' — ' + ind.t : ''}\n`;
     });
     return { url, tooltip: tooltip.trim() };
   }
