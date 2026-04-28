@@ -118,10 +118,15 @@ let mutil_string_of_int_sep () =
 
 let name_title () =
   let test exp =
-    List.iter (fun s -> (Alcotest.check Alcotest.string) "" exp (Name.title s))
+    List.iter (fun s ->
+        (Alcotest.check Alcotest.string) "" exp (Name.title @@ Utf8.normalize s))
   in
   test "Jean-Baptiste"
-    [ "jean-baptiste"; "JEAN-baptiste"; "Jean-Baptiste"; "jeaN-baptistE" ]
+    [ "jean-baptiste"; "JEAN-baptiste"; "Jean-Baptiste"; "jeaN-baptistE" ];
+  test "Françoise" [ "Françoise"; "Françoise" ];
+  test "Françoise Rose"
+    [ "Françoise Rose"; "Françoise rose"; "Françoise Rose"; "Françoise rose" ];
+  test "Léon!e" [ "léon!e" ]
 
 let utf8_sub () =
   let test ?pad e s i j =
