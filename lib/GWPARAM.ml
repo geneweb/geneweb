@@ -317,7 +317,7 @@ let output_error =
     Output.header conf "Connection: close";
     List.iter (Output.header conf "%s") headers;
     Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
-    match content with
+    (match content with
     | Some content -> Output.print_string conf content
     | None -> (
         let code =
@@ -340,7 +340,8 @@ let output_error =
         | None -> (
             match fname "en" with
             | Some fn -> output_file conf fn
-            | None -> Output.print_sstring conf ""))
+            | None -> Output.print_sstring conf "")));
+    Output.flush conf
 
 let is_semi_public p = Driver.get_access p = Def.SemiPublic
 
