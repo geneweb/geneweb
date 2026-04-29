@@ -2833,7 +2833,7 @@ let start_equiv_with case_sens s m i =
 
 let rec in_text case_sens s m =
   let rec loop in_tag i =
-    if i = String.length m then false
+    if i >= String.length m then false
     else if in_tag then loop (m.[i] <> '>') (i + 1)
     else if m.[i] = '<' then loop true (i + 1)
     else if m.[i] = '[' && i + 1 < String.length m && m.[i + 1] = '[' then
