@@ -886,6 +886,7 @@ let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
         List.fold_right (fun ip ipl -> Util.pget conf base ip :: ipl) iperl []
       in
       let pl = List.filter (fun p -> Person.has_visible_name conf base p) pl in
+      print_canonical ();
       print_family_alphabetic query_params.last_name conf base pl
   | `Branch -> (
       match (bhl, list) with
