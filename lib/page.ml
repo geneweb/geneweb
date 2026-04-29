@@ -298,3 +298,41 @@ module Advanced_search = struct
         (fun () -> query_params)
   end
 end
+
+module Family_book = struct
+  module Query_params = struct
+    type t = {
+      only_references : bool;
+      page : string option;
+      section : int option;
+    }
+
+    let from_env env =
+      let only_references = Util.p_getenv env "ref" = Some "on" in
+      let page =
+        Option.bind (Util.p_getenv env "f") (fun f ->
+            Ext_option.return_if
+              (NotesLinks.check_file_name f <> None)
+              (fun () -> f)
+            (* Usefulness? *))
+      in
+      let section = Util.p_getint env "v" in
+      { only_references; page; section }
+
+    let canonicalize query_params =
+      let page = Option.map (fun page -> ("f", page)) query_params.page in
+      let section =
+        Option.map
+          (fun section -> ("v", Int.to_string section))
+          query_params.section
+      in
+      let only_references =
+        Ext_option.return_if query_params.only_references (fun () ->
+            ("ref", "on"))
+      in
+      let open Ext_list.Infix in
+      ("m", "NOTES") @:: page @?: section @?: only_references @?: []
+  end
+
+  include Make_url (Query_params)
+end
