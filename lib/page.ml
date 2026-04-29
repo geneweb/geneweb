@@ -15,31 +15,31 @@ module Last_name_search = struct
           let exact = Util.p_getenv env "t" = Some "A" in
           { last_name; display_mode; exact })
         (Util.p_getenv env "v")
+
+    let url_query query_params =
+      let last_name =
+        ( "v",
+          (if query_params.exact then Fun.id else Name.lower)
+            query_params.last_name )
+      in
+      let display_mode =
+        match query_params.display_mode with
+        | `Branch -> None
+        | `List -> Some ("o", "i")
+      in
+      let exact =
+        Ext_option.return_if query_params.exact (fun () -> ("t", "A"))
+      in
+      let open Ext_list.Infix in
+      ("m", "N") @:: display_mode @?: last_name @:: exact @?: []
   end
 
-  let url_query (query_params : Query_params.t) =
-    let last_name =
-      ( "v",
-        (if query_params.exact then Fun.id else Name.lower)
-          query_params.last_name )
-    in
-    let display_mode =
-      match query_params.display_mode with
-      | `Branch -> None
-      | `List -> Some ("o", "i")
-    in
-    let exact =
-      Ext_option.return_if query_params.exact (fun () -> ("t", "A"))
-    in
-    let open Ext_list.Infix in
-    ("m", "N") @:: display_mode @?: last_name @:: exact @?: []
-
   let canonical_url ~conf query_params =
-    let query = url_query query_params in
+    let query = Query_params.url_query query_params in
     Canonical_url.make ~conf ~query
 
   let alternate_url ~conf ~lang query_params =
-    let query = url_query query_params in
+    let query = Query_params.url_query query_params in
     Localized_url.make ~conf ~lang ~query
 end
 
