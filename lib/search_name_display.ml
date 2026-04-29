@@ -868,12 +868,9 @@ let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
         query_params
     in
     let alternate_urls =
-      List.map
-        (fun lang ->
-          Page.Last_name_search.alternate_url
-            ~conf:(Config.Trimmed.from_config conf)
-            ~lang query_params)
-        Lang.all
+      Page.Last_name_search.alternate_urls
+        ~conf:(Config.Trimmed.from_config conf)
+        query_params
     in
     Option.iter (Output.status conf) status;
     Output.link_header

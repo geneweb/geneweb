@@ -5,16 +5,16 @@ module Make_url (Query_params : sig
 end) : sig
   val canonical_url : conf:Config.Trimmed.t -> Query_params.t -> Canonical_url.t
 
-  val alternate_url :
-    conf:Config.Trimmed.t -> lang:Lang.t -> Query_params.t -> Localized_url.t
+  val alternate_urls :
+    conf:Config.Trimmed.t -> Query_params.t -> Localized_url.t list
 end = struct
   let canonical_url ~conf query_params =
     let query = Query_params.canonicalize query_params in
     Canonical_url.make ~conf ~query
 
-  let alternate_url ~conf ~lang query_params =
+  let alternate_urls ~conf query_params =
     let query = Query_params.canonicalize query_params in
-    Localized_url.make ~conf ~lang ~query
+    List.map (fun lang -> Localized_url.make ~conf ~lang ~query) Lang.all
 end
 
 module Last_name_search = struct
