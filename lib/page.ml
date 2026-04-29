@@ -16,7 +16,7 @@ module Last_name_search = struct
           { last_name; display_mode; exact })
         (Util.p_getenv env "v")
 
-    let url_query query_params =
+    let canonicalize query_params =
       let last_name =
         ( "v",
           (if query_params.exact then Fun.id else Name.lower)
@@ -35,11 +35,11 @@ module Last_name_search = struct
   end
 
   let canonical_url ~conf query_params =
-    let query = Query_params.url_query query_params in
+    let query = Query_params.canonicalize query_params in
     Canonical_url.make ~conf ~query
 
   let alternate_url ~conf ~lang query_params =
-    let query = Query_params.url_query query_params in
+    let query = Query_params.canonicalize query_params in
     Localized_url.make ~conf ~lang ~query
 end
 
