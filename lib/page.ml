@@ -1,3 +1,22 @@
+module Make_url (Query_params : sig
+  type t
+
+  val canonicalize : t -> (string * string) list
+end) : sig
+  val canonical_url : conf:Config.Trimmed.t -> Query_params.t -> Canonical_url.t
+
+  val alternate_url :
+    conf:Config.Trimmed.t -> lang:Lang.t -> Query_params.t -> Localized_url.t
+end = struct
+  let canonical_url ~conf query_params =
+    let query = Query_params.canonicalize query_params in
+    Canonical_url.make ~conf ~query
+
+  let alternate_url ~conf ~lang query_params =
+    let query = Query_params.canonicalize query_params in
+    Localized_url.make ~conf ~lang ~query
+end
+
 module Last_name_search = struct
   module Query_params = struct
     type t = {
@@ -34,13 +53,7 @@ module Last_name_search = struct
       ("m", "N") @:: display_mode @?: last_name @:: exact @?: []
   end
 
-  let canonical_url ~conf query_params =
-    let query = Query_params.canonicalize query_params in
-    Canonical_url.make ~conf ~query
-
-  let alternate_url ~conf ~lang query_params =
-    let query = Query_params.canonicalize query_params in
-    Localized_url.make ~conf ~lang ~query
+  include Make_url (Query_params)
 end
 
 module First_name_search = struct
