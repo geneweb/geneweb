@@ -23,14 +23,16 @@ module Last_name_search = struct
         (if query_params.exact then Fun.id else Name.lower)
           query_params.last_name )
     in
-    let display_mode, exact =
+    let display_mode =
       match query_params.display_mode with
-      | `Branch ->
-          (None, Ext_option.return_if query_params.exact (fun () -> ("t", "A")))
-      | `List -> (Some ("o", "i"), None)
+      | `Branch -> None
+      | `List -> Some ("o", "i")
+    in
+    let exact =
+      Ext_option.return_if query_params.exact (fun () -> ("t", "A"))
     in
     let open Ext_list.Infix in
-    ("m", "N") @:: last_name @:: exact @?: display_mode @?: []
+    ("m", "N") @:: display_mode @?: last_name @:: exact @?: []
 
   let canonical_url ~conf query_params =
     let query = url_query query_params in
