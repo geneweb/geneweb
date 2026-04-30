@@ -11,8 +11,8 @@ module Last_name_search : sig
 
   val canonical_url : conf:Config.Trimmed.t -> Query_params.t -> Canonical_url.t
 
-  val alternate_url :
-    conf:Config.Trimmed.t -> lang:Lang.t -> Query_params.t -> Localized_url.t
+  val alternate_urls :
+    conf:Config.Trimmed.t -> Query_params.t -> Localized_url.t list
 end
 
 module First_name_search : sig
@@ -70,4 +70,21 @@ module Advanced_search : sig
 
     val from_env : Config.env -> t option
   end
+end
+
+module Family_book : sig
+  module Query_params : sig
+    type t = private {
+      only_references : bool;
+      page : string option;
+      section : int option;
+    }
+
+    val from_env : Config.env -> t
+  end
+
+  val canonical_url : conf:Config.Trimmed.t -> Query_params.t -> Canonical_url.t
+
+  val alternate_urls :
+    conf:Config.Trimmed.t -> Query_params.t -> Localized_url.t list
 end
