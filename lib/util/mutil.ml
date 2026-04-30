@@ -226,7 +226,18 @@ let input_particles fname =
             let particle = Buff.get len in
             loop (particle :: Utf8.uppercase particle :: list) 0
       | '\r' -> loop list len
-      | '#' -> loop list len
+      | '#' ->
+          (* Line comment: skip the rest of the line. If a particle was being
+             accumulated (len > 0), discard it — a '#' mid-token is malformed. *)
+          let rec skip () =
+            match input_char ic with
+            | '\n' -> loop list 0
+            | _ -> skip ()
+            | exception End_of_file ->
+                close_in ic;
+                List.rev list
+          in
+          skip ()
       | c -> loop list (Buff.store len c)
       | exception End_of_file ->
           close_in ic;
@@ -266,7 +277,10 @@ let tr c1 c2 s =
 let unsafe_tr c1 c2 s =
   match String.rindex_opt s c1 with
   | Some _ ->
-      let bytes = Bytes.unsafe_of_string s in
+      (* Use Bytes.of_string (not unsafe_of_string) to avoid mutating shared
+         string memory, which would be a data-corruption hazard in a
+         multi-request server. *)
+      let bytes = Bytes.of_string s in
       for i = 0 to Bytes.length bytes - 1 do
         if Bytes.unsafe_get bytes i = c1 then Bytes.unsafe_set bytes i c2
       done;
@@ -584,6 +598,8 @@ let array_assoc k a =
   loop 0
 
 let string_of_int_sep sep x =
+  let neg = x < 0 in
+  let x = abs x in
   let digits, len =
     let rec loop (d, l) x =
       if x = 0 then (d, l)
@@ -592,17 +608,26 @@ let string_of_int_sep sep x =
     loop ([], 0) x
   in
   let digits, len = if digits = [] then ([ '0' ], 1) else (digits, len) in
+  let len = if neg then len + 1 else len in
   let slen = String.length sep in
-  let s = Bytes.create (len + ((len - 1) / 3 * slen)) in
+  (* number of digit characters (without sign) *)
+  let dlen = if neg then len - 1 else len in
+  let s = Bytes.create (len + ((dlen - 1) / 3 * slen)) in
+  let start =
+    if neg then (
+      Bytes.set s 0 '-';
+      1)
+    else 0
+  in
   let _ =
     List.fold_left
       (fun (i, j) c ->
         Bytes.set s j c;
-        if i < len - 1 && (len - 1 - i) mod 3 = 0 then (
+        if i < dlen - 1 && (dlen - 1 - i) mod 3 = 0 then (
           String.blit sep 0 s (j + 1) slen;
           (i + 1, j + 1 + slen))
         else (i + 1, j + 1))
-      (0, 0) digits
+      (0, start) digits
   in
   Bytes.unsafe_to_string s
 
@@ -902,7 +927,7 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
           r
       | Some _ -> None
       | None -> Some (read ic)
-    with _ -> None
+    with End_of_file | Failure _ | Invalid_argument _ -> None
   in
   match read () with
   | Some v ->
@@ -1104,7 +1129,7 @@ let rev_input_line ic pos (rbuff, rpos) =
   let rev_input_line pos =
     if pos <= 0 then raise End_of_file
     else
-      let _ = seek_in ic pos in
+      let () = seek_in ic pos in
       let rec loop pos =
         if pos <= 0 then (get_n_reset (), pos)
         else
@@ -1177,12 +1202,9 @@ let rm_rf f =
     let directories, files = List.partition Sys.is_directory all_paths in
     List.iter
       (fun file ->
-        try
-          let ic = open_in_bin file in
-          close_in ic;
-          Sys.remove file
+        try Sys.remove file
         with e ->
-          Printf.eprintf "Error handling file %s: %s\n" file
+          Printf.eprintf "Error deleting file %s: %s\n" file
             (Printexc.to_string e))
       files;
     List.iter
