@@ -646,7 +646,6 @@ let default_safe_html_allowed_tags =
     ("http://www.w3.org/1999/xhtml", "map");
     ("http://www.w3.org/1999/xhtml", "object");
     ("http://www.w3.org/1999/xhtml", "ol");
-    ("http://www.w3.org/1999/xhtml", "ol");
     ("http://www.w3.org/1999/xhtml", "p");
     ("http://www.w3.org/1999/xhtml", "param");
     ("http://www.w3.org/1999/xhtml", "pre");
@@ -743,7 +742,10 @@ let safe_html_aux escape_text escape_attribute s =
         | `OK :: tl ->
             stack := tl;
             `End_element
-        | _ -> failwith (__FILE__ ^ " " ^ string_of_int __LINE__))
+        | _ ->
+            Log.warn (fun k ->
+                k "safe_html: unexpected End_element with empty tag stack");
+            `Comment "")
     | e -> e
   in
   string s
@@ -1556,12 +1558,14 @@ let http_string s i =
     in
     let j =
       let rec loop j =
-        match s.[j - 1] with
-        | ')' | ',' | '.' | ':' | ';' ->
-            if s.[j - 1] = ')' && par = 0 then j
-            else if s.[j - 1] = ')' && par < 0 then j - 1
-            else loop (j - 1)
-        | _ -> j
+        if j = 0 then j
+        else
+          match s.[j - 1] with
+          | ')' | ',' | '.' | ':' | ';' ->
+              if s.[j - 1] = ')' && par = 0 then j
+              else if s.[j - 1] = ')' && par < 0 then j - 1
+              else loop (j - 1)
+          | _ -> j
       in
       loop j
     in
@@ -1833,7 +1837,7 @@ let raw_string_of_place _conf place =
 
 let string_of_place _conf place = raw_string_of_place _conf place |> escape_html
 let menu_threshold = 20
-let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
+let is_number t = t <> "" && match t.[0] with '1' .. '9' -> true | _ -> false
 
 let hexa_string s =
   let s' = Bytes.create (2 * String.length s) in
@@ -2144,10 +2148,9 @@ let string_of_decimal_num conf f =
     in
     let needs_approx = sig_digits > 4 in
     let localized =
-      String.map
-        (function
-          | '.' -> String.get (transl conf "(decimal separator)") 0 | c -> c)
-        s
+      let sep = transl conf "(decimal separator)" in
+      let dec_char = if String.length sep > 0 then sep.[0] else '.' in
+      String.map (function '.' -> dec_char | c -> c) s
     in
     if needs_approx then "≃ " ^ localized else localized
   else if abs_f > 0.0 then
@@ -2158,10 +2161,9 @@ let string_of_decimal_num conf f =
     let m_str = Str.global_replace (Str.regexp "0+$") "" m_str in
     let m_str = Str.global_replace (Str.regexp "\\.$") "" m_str in
     let m_loc =
-      String.map
-        (function
-          | '.' -> String.get (transl conf "(decimal separator)") 0 | c -> c)
-        m_str
+      let sep = transl conf "(decimal separator)" in
+      let dec_char = if String.length sep > 0 then sep.[0] else '.' in
+      String.map (function '.' -> dec_char | c -> c) m_str
     in
     let exp_str =
       if exp < 0 then "−" ^ string_of_int (abs exp) else string_of_int exp
@@ -2716,7 +2718,7 @@ let update_wf_trace conf fname =
     let dtlen = String.length dt in
     let rec loop found r = function
       | x :: l ->
-          if String.length x > dtlen + 2 then
+          if String.length x >= dtlen + 2 then
             let u = String.sub x (dtlen + 1) (String.length x - dtlen - 1) in
             if u = conf.user then loop true ((dt, u) :: r) l
             else loop found ((String.sub x 0 dtlen, u) :: r) l
@@ -2816,24 +2818,27 @@ let read_gen_auth_file fname base_file =
   with Sys_error _ -> []
 
 let start_equiv_with case_sens s m i =
-  let rec test i j =
-    if j = String.length s then Some i
-    else if i = String.length m then None
-    else if case_sens then if m.[i] = s.[j] then test (i + 1) (j + 1) else None
+  if String.length s = 0 then Some i
+  else
+    let rec test i j =
+      if j = String.length s then Some i
+      else if i = String.length m then None
+      else if case_sens then
+        if m.[i] = s.[j] then test (i + 1) (j + 1) else None
+      else
+        match Name.next_chars_if_equiv m i s j with
+        | Some (i, j) -> test i j
+        | None -> None
+    in
+    if case_sens then if m.[i] = s.[0] then test (i + 1) 1 else None
     else
-      match Name.next_chars_if_equiv m i s j with
+      match Name.next_chars_if_equiv m i s 0 with
       | Some (i, j) -> test i j
       | None -> None
-  in
-  if case_sens then if m.[i] = s.[0] then test (i + 1) 1 else None
-  else
-    match Name.next_chars_if_equiv m i s 0 with
-    | Some (i, j) -> test i j
-    | None -> None
 
 let rec in_text case_sens s m =
   let rec loop in_tag i =
-    if i = String.length m then false
+    if i >= String.length m then false
     else if in_tag then loop (m.[i] <> '>') (i + 1)
     else if m.[i] = '<' then loop true (i + 1)
     else if m.[i] = '[' && i + 1 < String.length m && m.[i + 1] = '[' then
@@ -2857,7 +2862,7 @@ let rec in_text case_sens s m =
 let html_highlight case_sens h s =
   let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
   let rec loop in_tag i len =
-    if i = String.length s then Buff.get len
+    if i >= String.length s then Buff.get len
     else if in_tag then loop (s.[i] <> '>') (i + 1) (Buff.store len s.[i])
     else if s.[i] = '<' then loop true (i + 1) (Buff.store len s.[i])
     else
