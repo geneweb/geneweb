@@ -52,8 +52,8 @@ GWDLOGCGI=/tmp/gwd.log # associated error log
 CLEANLOG=1
 SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
 CRLMAXTIME=5
-FAILING_CONDITIONS='CRITICAL|ERROR|Failed'
-WARNING_CONDITIONS='WARNING'
+FAILING_CONDITIONS='CRITICAL|ERROR|Failed|Invalid'
+WARNING_CONDITIONS='WARN'
 GREPOPT='-q'
 
 # this is the data for specific persons
@@ -282,20 +282,26 @@ update_gwf () {
     fi
 }
 
-#test -n "$debug" && set -x
-if test -z "$cgitest"; then
-#!/bin/bash
 
+check_server_start () {
+test -n "$debug" && set -x
 # Script to monitor a process using the 'crl ""' command
 # The script will exit once the process is detected as alive
 # Maximum 10 attempts before giving up
+process="$1"
 
 MAX_ATTEMPTS=10
 attempt=0
 
 # first call to verify DBNAME access, that will exit here.
 while [ $attempt -lt $MAX_ATTEMPTS ]; do
-  crl "" >/dev/null 2>&1
+  if test "$process" = "gwd" ; then
+    srvlog="$GWDLOG"
+    crl "" >/dev/null 2>&1
+  else
+    srvlog="gwsetup.log"
+    curl localhost:2316 >/dev/null 2>&1
+  fi
   if [ $? -eq 0 ]; then
     break
   else
@@ -304,12 +310,14 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
 done
 if [ $attempt -eq $MAX_ATTEMPTS ]; then
-  echo "gwd does not seem to be running after $attempt trys\nhave a look to $GWDLOG"
+  echo "$process does not seem to be running after $attempt trys\nhave a look to $srvlog"
   exit 1
 else
-  echo "gwd start after $attempt trys"
+  echo "$process started after $attempt trys"
 fi
-fi
+}
+
+test -z "$cgitest" && check_server_start 'gwd'
 
 crl "m=S&n=$FN+$SN&p="
 crl "p=$FN&n=$SN&oc=$OC"
@@ -502,20 +510,29 @@ if test "$GWD2START" && test -z "$cgitest"; then
     pgrep gwsetup >/dev/null && \
         { killall gwsetup || { echo "unable to kill previous gwsetup process"; exit 1; }; }
 
-    cd $BASES_DIR
-    OCAMLRUNPARAM=b $SUDOPRFX ../gw/gwsetup \
-      -gd ../gw \
-      -lang en \
-      > gwsetup.log 2>&1 &
-    echo "gwsetup ready for manual tests"
-    #open "../START.htm"
-    echo "access http://localhost:2316 for that."
+    test -n "$debug" && set -x
+    sh -c "cd $BASES_DIR;
+    OCAMLRUNPARAM=b $SUDOPRFX ../gw/gwsetup -gd ../gw -lang en >gwsetup.log 2>&1 &"
+    set +x
+    check_server_start 'gwsetup'
+    grep -E "$FAILING_CONDITIONS" $BASES_DIR/gwsetup.log && \
+        {
+            echo "error reported in $BASES_DIR/gwsetup.log"
+            RC=$(($RC+1))
+        } || \
+        {
+            echo "gwsetup ready for manual tests"
+            echo "access http://localhost:2316 for that."
+        }
 fi
 
 if test -f "$GWDLOG"; then
 echo "$GWDLOG reported traces (empty if no failure):"
 grep -vw "Predictable mode must not be" $GWDLOG | grep -E "$WARNING_CONDITIONS"
 grep -B1 -E "$FAILING_CONDITIONS" $GWDLOG && RC=$(($RC+1))
+else
+echo "unable to access $GWDLOG"
+RC=$(($RC+1))
 fi
 if test "$RC" != 0; then
     echo "$0 failed, at least $RC detected error(s)."
