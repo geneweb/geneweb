@@ -640,16 +640,29 @@ let print_warning conf base (w : Warning.base_warning) =
       let before = Array.of_list before in
       let after = Array.of_list after in
       print_order_changed conf print_list before after
-  | CloseChildren (ifam, c1, c2) ->
-      let cpl = Gwdb.foi base ifam in
-      Output.printf conf
-        (Util.fcapitale
-           (Util.ftransl conf
-              "the following children of %t and %t are born very close"))
-        (fun _ ->
-          (someone_strong base (Gwdb.poi base (Gwdb.get_father cpl)) :> string))
-        (fun _ ->
-          (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl)) :> string));
+  | CloseChildren ((ifam1, c1), (ifam2, c2)) ->
+      let () =
+        let cpl = Gwdb.foi base ifam1 in
+        if Gwdb.eq_ifam ifam1 ifam2 then
+          Output.printf conf
+            (Util.fcapitale
+               (Util.ftransl conf
+                  "the following children of %t and %t are born very close"))
+            (fun _ ->
+              (someone_strong base (Gwdb.poi base (Gwdb.get_father cpl))
+                :> string))
+            (fun _ ->
+              (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl))
+                :> string))
+        else
+          Output.printf conf
+            (Util.fcapitale
+               (Util.ftransl conf
+                  "the following children of %t are born very close"))
+            (fun () ->
+              (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl))
+                :> string))
+      in
       Output.print_sstring conf ":\n<ul><li>";
       print_first_name_strong conf base c1;
       Output.print_string conf (DateDisplay.short_dates_text conf base c1);
@@ -657,16 +670,29 @@ let print_warning conf base (w : Warning.base_warning) =
       print_first_name_strong conf base c2;
       Output.print_string conf (DateDisplay.short_dates_text conf base c2);
       Output.print_sstring conf "</li></ul>\n"
-  | DistantChildren (ifam, p1, p2) ->
-      let cpl = Gwdb.foi base ifam in
-      Output.printf conf
-        (Util.fcapitale
-           (Util.ftransl conf
-              "the following children of %t and %t are born very distant"))
-        (fun _ ->
-          (someone_strong base (Gwdb.poi base (Gwdb.get_father cpl)) :> string))
-        (fun _ ->
-          (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl)) :> string));
+  | DistantChildren ((ifam1, p1), (ifam2, p2)) ->
+      let () =
+        let cpl = Gwdb.foi base ifam1 in
+        if Gwdb.eq_ifam ifam1 ifam2 then
+          Output.printf conf
+            (Util.fcapitale
+               (Util.ftransl conf
+                  "the following children of %t and %t are born very distant"))
+            (fun _ ->
+              (someone_strong base (Gwdb.poi base (Gwdb.get_father cpl))
+                :> string))
+            (fun _ ->
+              (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl))
+                :> string))
+        else
+          Output.printf conf
+            (Util.fcapitale
+               (Util.ftransl conf
+                  "the following children of %t are born very distant"))
+            (fun () ->
+              (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl))
+                :> string))
+      in
       Output.print_sstring conf ":<ul><li>";
       print_first_name_strong conf base p1;
       Output.print_string conf (DateDisplay.short_dates_text conf base p1);

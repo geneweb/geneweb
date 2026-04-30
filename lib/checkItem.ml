@@ -342,11 +342,11 @@ let changed_marriages_order base warning p =
     in
     loop 0 (Gwdb.get_family p))
 
-let close_siblings warning x np ifam =
+let close_siblings warning x np =
   match np with
   | None -> ()
   | Some (elder, d1) -> (
-      match Date.cdate_to_dmy_opt (Gwdb.get_birth x) with
+      match Date.cdate_to_dmy_opt (Gwdb.get_birth @@ snd x) with
       | None -> ()
       | Some d2 ->
           Date.time_elapsed_opt d1 d2
@@ -356,22 +356,24 @@ let close_siblings warning x np ifam =
                d.Date.year = 0
                && d.month < max_month_btw_sibl
                && (d.month <> 0 || d.day >= max_days_btw_sibl)
-             then warning (Warning.CloseChildren (ifam, elder, x)))
+             then warning (Warning.CloseChildren (elder, x)))
 
-let born_after_his_elder_sibling warning x b np ifam des =
+let born_after_his_elder_sibling ~base warning (ifam_x, x) b np =
   match np with
   | None -> ()
-  | Some (elder, d1) -> (
-      match b with
-      | Some d2 ->
-          if strictly_after_dmy d1 d2 then
-            warning (Warning.ChildrenNotInOrder (ifam, des, elder, x))
-      | None -> (
-          match Date.dmy_of_death (Gwdb.get_death x) with
-          | None -> ()
-          | Some d2 ->
-              if strictly_after_dmy d1 d2 then
-                warning (ChildrenNotInOrder (ifam, des, elder, x))))
+  | Some ((ifam_elder, elder), d1) -> (
+      if Gwdb.eq_ifam ifam_elder ifam_x then
+        let des = Gwdb.foi base ifam_elder in
+        match b with
+        | Some d2 ->
+            if strictly_after_dmy d1 d2 then
+              warning (Warning.ChildrenNotInOrder (ifam_elder, des, elder, x))
+        | None -> (
+            match Date.dmy_of_death (Gwdb.get_death x) with
+            | None -> ()
+            | Some d2 ->
+                if strictly_after_dmy d1 d2 then
+                  warning (ChildrenNotInOrder (ifam_elder, des, elder, x))))
 
 let siblings_gap gap child = function
   | None -> gap
@@ -700,29 +702,52 @@ let check_pevents base (warning : Warning.base_warning -> unit) p =
   (* check another witness dates where person is a witness *)
   check_person_dates_as_witness base warning p
 
-let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
+let check_siblings ?(onchange = true) base warning ~mother callback =
   let children =
     if onchange then (
-      let b = Gwdb.get_children fam in
-      match sort_children base b with
-      | None -> b
-      | Some (b, a) ->
-          warning (Warning.ChangedOrderOfChildren (ifam, fam, b, a));
-          a)
-    else Gwdb.get_children fam
+      let b = Gwdb.children_of_p base mother in
+      List.iter
+        (fun (ifam, b) ->
+          Option.iter
+            (fun ifam ->
+              Option.iter
+                (fun (b, a) ->
+                  let ifam = Gwdb.ifam_of_string ifam in
+                  warning
+                    (Warning.ChangedOrderOfChildren
+                       (ifam, Gwdb.foi base ifam, b, a)))
+                (sort_children base (Array.of_list b)))
+            ifam)
+        (Ext_list.groupby
+           ~key:(fun child_id ->
+             Option.map Gwdb.string_of_ifam
+               (Gwdb.get_parents @@ Gwdb.poi base child_id))
+           ~value:Fun.id b);
+      b)
+    else Gwdb.children_of_p base mother
   in
   let _, gap =
-    Array.fold_left
-      (fun (np, gap) child ->
+    List.fold_left
+      (fun (np, gap) (ifam, child) ->
         let child = Gwdb.poi base child in
         let b = obirth child in
-        let gap = siblings_gap gap child b in
-        born_after_his_elder_sibling warning child b np ifam fam;
-        close_siblings warning child np ifam;
-        callback child;
-        let np = match b with Some d -> Some (child, d) | None -> np in
+        let gap = siblings_gap gap (ifam, child) b in
+        born_after_his_elder_sibling ~base warning (ifam, child) b np;
+        close_siblings warning (ifam, child) np;
+        callback child (Gwdb.poi base (Gwdb.get_father @@ Gwdb.foi base ifam));
+        let np =
+          match b with Some d -> Some ((ifam, child), d) | None -> np
+        in
         (np, gap))
-      (None, None) children
+      (None, None)
+      (List.filter_map
+         (fun child_id ->
+           Option.map
+             (fun family_id -> (family_id, child_id))
+             (Gwdb.get_parents @@ Gwdb.poi base child_id))
+         (Option.fold ~none:children
+            ~some:(fun (_, child_ids) -> Array.to_list child_ids)
+            (sort_children base (Array.of_list children))))
   in
   match gap with
   | None -> ()
@@ -730,10 +755,10 @@ let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
       Date.time_elapsed_opt d1 d2
       |> Option.iter @@ fun e ->
          if e.Date.year > max_siblings_gap then
-           warning (DistantChildren (ifam, p1, p2))
+           warning (DistantChildren (p1, p2))
 
-let check_children ?(onchange = true) base warning (ifam, fam) fath moth =
-  check_siblings ~onchange base warning (ifam, fam) @@ fun child ->
+let check_children ?(onchange = true) base warning moth =
+  check_siblings ~onchange base warning ~mother:moth @@ fun child fath ->
   check_pevents base warning child;
   child_born_after_his_parent warning child fath;
   child_born_after_his_parent warning child moth;
@@ -926,7 +951,7 @@ let family ?(onchange = true) base (warning : Warning.base_warning -> unit) ifam
   (* check parents marraige *)
   check_parents base warning fam fath moth;
   (* check children *)
-  check_children ~onchange base warning (ifam, fam) fath moth;
+  check_children ~onchange base warning moth;
   if onchange then (
     changed_fevents_order warning (ifam, fam);
     let father = Gwdb.poi base (Gwdb.get_father fam) in
@@ -991,7 +1016,7 @@ let on_person_update base warning p =
       let moth = Gwdb.poi base @@ Gwdb.get_mother fam in
       child_born_after_his_parent warning p fath;
       child_born_after_his_parent warning p moth;
-      check_siblings base warning (i, fam) ignore
+      check_siblings base warning ~mother:moth (fun _ _ -> ())
   | None -> ());
   let birth_opt = Date.cdate_to_dmy_opt (Gwdb.get_birth p) in
   let death_opt = Date.dmy_of_death @@ Gwdb.get_death p in
@@ -1055,8 +1080,10 @@ let person_warnings conf base p =
       Gwdb.eq_iper iper ifather || Gwdb.eq_iper iper imother
     in
     function
-    | Warning.CloseChildren (ifam, p1, p2)
-      when not (is_one_of_children p p1 p2 || is_one_of_parents p ifam) ->
+    | Warning.CloseChildren ((ifam1, p1), (ifam2, p2))
+      when not
+             (is_one_of_children p p1 p2
+             || (is_one_of_parents p ifam1 && is_one_of_parents p ifam2)) ->
         false
     | _ -> true
   in
@@ -1070,7 +1097,7 @@ let person_warnings conf base p =
   Array.iter
     (fun ifam ->
       check_siblings ~onchange:false base filter
-        (ifam, Gwdb.foi base ifam)
-        ignore)
+        ~mother:(Gwdb.poi base (Gwdb.get_mother @@ Gwdb.foi base ifam))
+        (fun _ _ -> ()))
     (Gwdb.get_family p);
   Warning.handle_homonymous base (Warning.BaseWarningSet.elements !w)

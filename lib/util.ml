@@ -2339,10 +2339,12 @@ let auth_warning conf base w =
   | BirthAfterDeath p -> pauth p
   | ChildrenNotInOrder (ifam, _, elder, x) ->
       pauth elder && pauth x && fauth ifam
-  | CloseChildren (ifam, c1, c2) -> pauth c1 && pauth c2 && fauth ifam
+  | CloseChildren ((ifam1, c1), (ifam2, c2)) ->
+      pauth c1 && pauth c2 && fauth ifam1 && fauth ifam2
   | DeadOld (p, _) -> pauth p
   | DeadTooEarlyToBeFather (father, child) -> pauth father && pauth child
-  | DistantChildren (ifam, p1, p2) -> pauth p1 && pauth p2 && fauth ifam
+  | DistantChildren ((ifam1, p1), (ifam2, p2)) ->
+      pauth p1 && pauth p2 && fauth ifam1 && fauth ifam2
   | FEventOrder (p, _, _) -> pauth p
   | FWitnessEventAfterDeath (p, _, fam) -> pauth p && fauth fam
   | FWitnessEventBeforeBirth (p, _, fam) -> pauth p && fauth fam

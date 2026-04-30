@@ -123,12 +123,19 @@ let print_base_warning oc base (w : Warning.base_warning) =
   | ChangedOrderOfPersonEvents (p, _, _) ->
       Printf.fprintf oc "Changed order of person's events for %s\n"
         (designation base p)
-  | CloseChildren (ifam, c1, c2) ->
-      let cpl = Gwdb.foi base ifam in
-      Printf.fprintf oc
-        "The following children of\n  %s\nand\n  %s\nare born very close:\n"
-        (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
-        (designation base (Gwdb.poi base (Gwdb.get_mother cpl)));
+  | CloseChildren ((ifam1, c1), (ifam2, c2)) ->
+      let () =
+        let cpl = Gwdb.foi base ifam1 in
+        if Gwdb.eq_ifam ifam1 ifam2 then
+          Printf.fprintf oc
+            "The following children of\n  %s\nand\n  %s\nare born very close:\n"
+            (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
+            (designation base (Gwdb.poi base (Gwdb.get_mother cpl)))
+        else
+          Printf.fprintf oc
+            "The following children of\n  %s\nare born very close:\n"
+            (designation base (Gwdb.poi base (Gwdb.get_mother cpl)))
+      in
       Printf.fprintf oc "- %s\n" (designation base c1);
       Printf.fprintf oc "- %s\n" (designation base c2)
   | DeadOld (p, a) ->
@@ -139,12 +146,23 @@ let print_base_warning oc base (w : Warning.base_warning) =
       Printf.fprintf oc
         "is born more than 2 years after the death of his/her father";
       Printf.fprintf oc " %s\n" (designation base father)
-  | DistantChildren (ifam, p1, p2) ->
-      let cpl = Gwdb.foi base ifam in
-      Printf.fprintf oc
-        "The following children of\n  %s\nand\n  %s\nare born very distant:\n"
-        (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
-        (designation base (Gwdb.poi base (Gwdb.get_mother cpl)));
+  | DistantChildren ((ifam1, p1), (ifam2, p2)) ->
+      let () =
+        let cpl = Gwdb.foi base ifam1 in
+        if Gwdb.eq_ifam ifam1 ifam2 then
+          Printf.fprintf oc
+            "The following children of\n\
+            \  %s\n\
+             and\n\
+            \  %s\n\
+             are born very distant:\n"
+            (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
+            (designation base (Gwdb.poi base (Gwdb.get_mother cpl)))
+        else
+          Printf.fprintf oc
+            "The following children of\n  %s\nare born very distant:\n"
+            (designation base (Gwdb.poi base (Gwdb.get_mother cpl)))
+      in
       Printf.fprintf oc "- %s\n" (designation base p1);
       Printf.fprintf oc "- %s\n" (designation base p2)
   | FEventOrder (p, e1, e2) ->
