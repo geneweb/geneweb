@@ -691,20 +691,33 @@ let treat_request =
              | "PPS" -> w_base @@ Place.print_all_places_surnames
              | "R" -> (
                  w_base @@ fun conf base ->
+                 let r_not_found conf q =
+                   let title = transl conf "not found" |> Utf8.capitalize_fst in
+                   Notif.warning ~title
+                     (Printf.sprintf "%s: \"%s\"" title
+                        (Util.escape_html q :> string));
+                   let conf = Notif.inject_pending conf in
+                   match find_person_in_env_pref conf base "e" with
+                   | Some p -> RelationDisplay.print conf base p None
+                   | None -> SrcfileDisplay.print_welcome conf base
+                 in
+                 let lookup =
+                   PersonLookup.redirect_or_specify ~not_found:r_not_found
+                     ~redirect_to_person:person_selected_with_redirect
+                 in
                  match p_getenv conf.env "select" with
                  | Some "input" -> (
-                     let components =
-                       SearchName.extract_name_components conf base
-                     in
-                     let fn = components.first_name in
-                     let sn = components.surname in
+                     let c = SearchName.extract_name_components conf base in
                      match p_getenv conf.env "v" with
-                     | Some n -> redirect_or_specify conf base n
+                     | Some n -> lookup conf base n
                      | None -> (
-                         match (fn, sn) with
-                         | Some fn, Some sn ->
-                             redirect_or_specify conf base (fn ^ " " ^ sn)
-                         | _ ->
+                         match (c.first_name, c.surname, c.person_name) with
+                         | Some fn, Some sn, _ ->
+                             lookup conf base (fn ^ " " ^ sn)
+                         | Some fn, None, _ -> lookup conf base fn
+                         | None, Some sn, _ -> lookup conf base sn
+                         | None, None, Some pn -> lookup conf base pn
+                         | None, None, None ->
                              request_issue conf base
                                ~key:"missing p and n for relation"))
                  | Some i when Option.is_some (int_of_string_opt i) ->
