@@ -181,6 +181,14 @@ function changeCalendar(e, v, m, c) {
     '<select class="form-select form-control-inline ps-sm-1 pe-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ms-sm-2 ms-md-3%end;" name="' + v + '" style="display:inline-block;width:auto">' +
     options + '</select>';
 }
+
+function initCalendarMonthSelects() {
+  document.querySelectorAll('select[id$="_cal"]').forEach(sel => {
+    if (sel.value === 'F' || sel.value === 'H') {
+      sel.dispatchEvent(new Event('change'));
+    }
+  });
+}
 </script>
 %else;
 %( m=CHG_EVT %)
