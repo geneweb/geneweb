@@ -545,23 +545,29 @@ and search_exact conf base variants =
    full table scan, so it stays efficient on large bases. *)
 and search_word_in_surname conf base word =
   let word_lower = Name.lower word in
-  let is_word_in str =
-    List.exists (( = ) word_lower) (cut_words (Name.lower str))
-  in
-  let found = ref Iper.Set.empty in
-  (try
-     let list, _name_inj =
-       Some.persons_of_fsname conf base Driver.base_strings_of_surname
-         (Driver.spi_find (Driver.persons_of_surname base))
-         Driver.get_surname word
-     in
-     List.iter
-       (fun (str, _, iperl) ->
-         if is_word_in str then
-           List.iter (fun ip -> found := Iper.Set.add ip !found) iperl)
-       list
-   with _ -> ());
-  Iper.Set.elements !found
+  (* Skip very short tokens: a query like "Le" or "du" would otherwise
+     match every compound surname containing those particles ("Le Bel",
+     "du Vivier", etc.). Three characters and up are specific enough.
+     This shortcut also returns [[]] when the user enters an empty query. *)
+  if String.length word_lower <= 2 then []
+  else
+    let is_word_in str =
+      List.exists (( = ) word_lower) (cut_words (Name.lower str))
+    in
+    let found = ref Iper.Set.empty in
+    (try
+       let list, _name_inj =
+         Some.persons_of_fsname conf base Driver.base_strings_of_surname
+           (Driver.spi_find (Driver.persons_of_surname base))
+           Driver.get_surname word
+       in
+       List.iter
+         (fun (str, _, iperl) ->
+           if is_word_in str then
+             List.iter (fun ip -> found := Iper.Set.add ip !found) iperl)
+         list
+     with _ -> ());
+    Iper.Set.elements !found
 
 and search_phonetic_generic conf base query base_strings spi_find _get_name =
   try
