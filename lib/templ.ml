@@ -271,6 +271,10 @@ let rec eval_variable (conf : Config.config) = function
       let amp = if prefix.[String.length prefix - 1] = '?' then "" else "&" in
       if str = "" then prefix
       else prefix ^ Printf.sprintf "%s%s=%s" amp evar str
+  | "prefix_clear" :: el ->
+      let prefix = (Util.commd ~excl:el conf :> string) in
+      let amp = if prefix.[String.length prefix - 1] = '?' then "" else "&" in
+      Printf.sprintf "%s%s" prefix amp
   | [ "random"; "init" ] ->
       Random.self_init ();
       ""
