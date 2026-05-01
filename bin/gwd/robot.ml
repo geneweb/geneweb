@@ -3,7 +3,7 @@
 open Geneweb
 open Config
 
-let src = Logs.Src.create ~doc:"Robot" __MODULE__
+let src = Logs.Src.create ~doc:"Robot" "ROBOT"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Code = Geneweb_http.Code
