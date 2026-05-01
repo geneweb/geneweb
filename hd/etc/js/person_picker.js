@@ -11,20 +11,31 @@
         };
     }
 
+    function endpoint(qs) {
+        const base = (window.GW && GW.prefix || '').replace(/\?$/, '?');
+        const sep = base.endsWith('?') || base.endsWith('&') ? '' :
+                    base.indexOf('?') >= 0 ? '&' : '?';
+        return fetch(base + sep + 'm=PNOC_LOOKUP&' + qs)
+            .then(r => r.ok && (r.headers.get('content-type') || '').indexOf('json') >= 0
+                ? r.json() : [])
+            .catch(() => []);
+    }
+
     function lookup(q, limit) {
-        return fetch(GW.prefix + 'm=PNOC_LOOKUP&q=' +
-            encodeURIComponent(q) + '&n=' + (limit || 20))
-            .then(r => r.ok ? r.json() : []);
+        return endpoint('q=' + encodeURIComponent(q) +
+            '&n=' + (limit || 20));
     }
 
     function checkExact(fn, sn, oc) {
         if (!fn || !sn) return Promise.resolve(false);
-        return fetch(GW.prefix + 'm=PNOC_LOOKUP&exact=1' +
-            '&fn=' + encodeURIComponent(fn) +
-            '&sn=' + encodeURIComponent(sn) +
-            '&oc=' + (oc || 0))
-            .then(r => r.ok ? r.json() : [])
+        return endpoint('exact=1&fn=' + encodeURIComponent(fn) +
+            '&sn=' + encodeURIComponent(sn) + '&oc=' + (oc || 0))
             .then(arr => arr.length > 0);
+    }
+
+    function flashValid(el) {
+        el.classList.add('row-valid-flash');
+        setTimeout(() => el.classList.remove('row-valid-flash'), 900);
     }
 
     function create(el, opts) {
@@ -50,65 +61,59 @@
                     '<div>' + escape(data.label) + '</div>',
                 no_results: () =>
                     '<div class="no-results">' +
-                    ((GW.i18n && GW.i18n.noResult) || 'No results found') +
-                    '</div>'
+                    ((window.GW && GW.i18n && GW.i18n.noResult)
+                        || 'No results found') + '</div>'
             }
         });
     }
 
-function bindGroup(opts) {
+    function bindGroup(opts) {
         const { fn, sn, oc, gate, link } = opts;
         if (!fn || !sn || !oc) return;
+        if (gate && gate.dataset.pnocBound) return;
+        if (gate) gate.dataset.pnocBound = '1';
         const inputs = [fn, sn, oc];
         const isActive = () => !gate || gate.value === 'link';
 
         function paint(state) {
+            const invalid = state === 'invalid';
+            const flash = state === 'flash';
             inputs.forEach(el => {
-                el.classList.toggle('row-invalid', state === 'invalid');
-                if (state === 'flash') {
-                    el.classList.add('row-valid-flash');
-                    setTimeout(
-                        () => el.classList.remove('row-valid-flash'), 900);
-                }
+                el.classList.toggle('row-invalid', invalid);
+                if (flash) flashValid(el);
             });
             if (link) {
-                if (state === 'invalid') {
-                    link.classList.add('disabled', 'opacity-50');
+                link.classList.toggle('disabled', invalid);
+                link.classList.toggle('opacity-50', invalid);
+                if (invalid) {
                     link.setAttribute('aria-disabled', 'true');
                     link.setAttribute('tabindex', '-1');
-                } else if (state === 'valid' || state === 'flash') {
-                    link.classList.remove('disabled', 'opacity-50');
+                } else {
                     link.removeAttribute('aria-disabled');
                     link.removeAttribute('tabindex');
                 }
             }
         }
 
-        function clear() {
-            inputs.forEach(el => el.classList.remove('row-invalid'));
-        }
-
         function run(flash) {
-            if (!isActive()) { clear(); return Promise.resolve(); }
+            if (!isActive()) { paint('neutral'); return Promise.resolve(); }
             const f = fn.value.trim();
             const s = sn.value.trim();
             const o = (oc.value || '0').trim() || '0';
-            if (!f || !s) {
-                paint('invalid');
+            if (!f || !s) { paint('invalid'); return Promise.resolve(); }
+            const sig = f + '|' + s + '|' + o;
+            if (gate && gate.dataset.pnocChecked === sig) {
                 return Promise.resolve();
             }
-            const sig = f + '|' + s + '|' + o;
-            if (gate && gate.dataset.pnocChecked === sig) return Promise.resolve();
-            return checkExact(f, s, parseInt(o, 10)).then(ok => {
+            return checkExact(f, s, o).then(ok => {
                 if (gate) gate.dataset.pnocChecked = sig;
                 paint(ok ? (flash ? 'flash' : 'valid') : 'invalid');
             });
         }
 
-        inputs.forEach(el => el.addEventListener('focusout', () => run(true)));
-        if (gate) {
-            gate.addEventListener('change', () => run(false));
-        }
+        inputs.forEach(el =>
+            el.addEventListener('focusout', () => run(true)));
+        if (gate) gate.addEventListener('change', () => run(false));
         run(false);
     }
 
@@ -116,9 +121,9 @@ function bindGroup(opts) {
         document.querySelectorAll('select[id$="_p_selct"]').forEach(gate => {
             const pre = gate.id.slice(0, -'_p_selct'.length);
             bindGroup({
-                fn:   document.getElementById(pre + '_fn'),
-                sn:   document.getElementById(pre + '_sn'),
-                oc:   document.getElementById(pre + '_occ'),
+                fn: document.getElementById(pre + '_fn'),
+                sn: document.getElementById(pre + '_sn'),
+                oc: document.getElementById(pre + '_occ'),
                 gate,
                 link: document.querySelector(
                     '#' + pre + '_p_selct_mod a')
@@ -126,6 +131,14 @@ function bindGroup(opts) {
         });
     }
 
+    /**
+     * Parses a GeneWeb key string. Two formats:
+     *  - "fn.occ sn"  (canonical)
+     *  - "fn sn"      (last-space split, oc=0)
+     * The bare fallback does not consult base particles, so
+     * "de la Croix" parses as fn="de la" sn="Croix". Users with
+     * particle surnames should use the canonical form.
+     */
     function parseGeneWebKey(s) {
         if (!s) return null;
         const t = s.trim();
@@ -143,9 +156,11 @@ function bindGroup(opts) {
     }
 
     function bindInput(el, options) {
-        if (!el) return;
+        if (!el || el.dataset.pnocBound) return;
+        el.dataset.pnocBound = '1';
         options = options || {};
         const parse = options.parse || parseGeneWebKey;
+
         function run(flash) {
             const k = parse(el.value);
             if (!k || !k.fn || !k.sn) {
@@ -158,13 +173,10 @@ function bindGroup(opts) {
             return checkExact(k.fn, k.sn, k.oc || 0).then(ok => {
                 el.dataset.pnocChecked = sig;
                 el.classList.toggle('row-invalid', !ok);
-                if (ok && flash) {
-                    el.classList.add('row-valid-flash');
-                    setTimeout(
-                        () => el.classList.remove('row-valid-flash'), 900);
-                }
+                if (ok && flash) flashValid(el);
             });
         }
+
         el.addEventListener('focusout', () => run(true));
         if (el.value) run(false);
     }
