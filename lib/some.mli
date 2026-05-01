@@ -137,3 +137,6 @@ val print_surname_details :
     query, with all matching persons listed under their surname header rather
     than via the multi-page navigation used by
     {!print_several_possible_surnames}. *)
+
+val name_unaccent : string -> string
+(** calls Name.unaccent_utf8 false (no lower) on all characters of the string *)
