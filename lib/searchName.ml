@@ -529,6 +529,40 @@ and search_exact conf base variants =
     variants;
   Iper.Set.elements !exact_iperl
 
+(* Find persons whose surname *contains* [word] as a whitespace-delimited
+   token, even when it is not the full surname.  For example, a query of
+   "vivier" will match "de Lagoutte du Vivier" because "vivier" is one of
+   the words of that compound surname.
+
+   Strategy: use the surname index entry for [word] (same entry point as
+   search_exact / search_phonetic) which yields a list of (stored_string,
+   _, iperl) triples.  Keep only those where Name.lower stored_string
+   contains [word_lower] as a *word* (not just a substring) — this avoids
+   matching "Levivier" or "Viviereau" while correctly matching "de
+   Lagoutte du Vivier".
+
+   This is intentionally a post-filter on the index result set, not a
+   full table scan, so it stays efficient on large bases. *)
+and search_word_in_surname conf base word =
+  let word_lower = Name.lower word in
+  let is_word_in str =
+    List.exists (( = ) word_lower) (cut_words (Name.lower str))
+  in
+  let found = ref Iper.Set.empty in
+  (try
+     let list, _name_inj =
+       Some.persons_of_fsname conf base Driver.base_strings_of_surname
+         (Driver.spi_find (Driver.persons_of_surname base))
+         Driver.get_surname word
+     in
+     List.iter
+       (fun (str, _, iperl) ->
+         if is_word_in str then
+           List.iter (fun ip -> found := Iper.Set.add ip !found) iperl)
+       list
+   with _ -> ());
+  Iper.Set.elements !found
+
 and search_phonetic_generic conf base query base_strings spi_find _get_name =
   try
     let istrl = base_strings base query in
@@ -1048,7 +1082,12 @@ let search_fullname cache conf base fn variants_sn =
     List.fold_left
       (fun acc sn ->
         let exact_b, phon_b = search_surname conf base sn in
-        exact_b @ phon_b @ acc)
+        (* Also find persons whose compound surname contains [sn] as a
+           whitespace-delimited word, e.g. "de Lagoutte du Vivier" for
+           query "vivier".  Without this, only exact and phonetic matches
+           on the full surname would be considered. *)
+        let word_b = search_word_in_surname conf base sn in
+        exact_b @ phon_b @ word_b @ acc)
       [] variants_sn
     |> List.sort_uniq compare
   in
@@ -1374,15 +1413,31 @@ and parse_dot_separated original_pn pn dot_pos =
 (* Section 5: Search Orchestration                                          *)
 (* ========================================================================= *)
 
+(* Priority order when an iper appears in multiple result piles:
+   exact > spouse > partial.
+
+   Exact wins for direct query matches.  Spouse wins over partial because
+   a person found as a spouse-by-surname match (via FullName) carries the
+   information "this person is here because of their spouse", which is
+   the right context to display them in.  If [remove_duplicates] kept
+   them in partial instead, they would lose that context — appearing in
+   the main list as if matched directly. *)
 let remove_duplicates (results : search_results) =
-  let seen = Hashtbl.create (List.length results.exact) in
+  let seen =
+    Hashtbl.create (List.length results.exact + List.length results.spouse)
+  in
   List.iter (fun ip -> Hashtbl.add seen ip ()) results.exact;
+  let spouse_filtered =
+    List.filter
+      (fun ip ->
+        if Hashtbl.mem seen ip then false
+        else (
+          Hashtbl.add seen ip ();
+          true))
+      results.spouse
+  in
   let partial_filtered =
     List.filter (fun ip -> not (Hashtbl.mem seen ip)) results.partial
-  in
-  List.iter (fun ip -> Hashtbl.add seen ip ()) partial_filtered;
-  let spouse_filtered =
-    List.filter (fun ip -> not (Hashtbl.mem seen ip)) results.spouse
   in
   {
     exact = results.exact;
