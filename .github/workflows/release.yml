@@ -56,16 +56,10 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-version }}
 
-      - name: Install Perl dependencies and remove locked mingw gcc shim (Windows)
+      - name: Remove locked mingw gcc shim (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          curl -fsSL https://cpanmin.us | perl - --notest IPC::System::Simple String::ShellQuote
-          for pkg in conf-perl-ipc-system-simple conf-perl-string-shellquote; do
-            d=".pins/$pkg"; mkdir -p "$d"
-            printf 'opam-version: "2.0"\nsynopsis: "Pin bypass"\nmaintainer: "ci"\nbuild: ["true"]\ninstall: ["true"]\n' > "$d/opam"
-            opam pin add "$pkg" "$d" --yes --no-action
-          done
           rm -f _opam/bin/x86_64-w64-mingw32-gcc.exe || true
           rm -f _opam/bin/i686-w64-mingw32-gcc.exe || true
 
