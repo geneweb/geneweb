@@ -1135,7 +1135,6 @@ div.anchor_upd {
 /* Tom select */
 #v + .ts-wrapper .ts-dropdown-content {
   max-height: calc(100vh - 220px);
-  min-height: 12rem;
 }
 
 #fname + .ts-wrapper .ts-dropdown-content {
@@ -1146,6 +1145,18 @@ div.anchor_upd {
   content: var(--ts-placeholder, '');
   color: var(--bs-secondary-color);
   pointer-events: none;
+}
+
+/* Hover / keyboard-active indicator pour les options Tom Select.
+   La shorthand inline `style="background:..."` réinitialise
+   background-color à transparent, ce qui neutralise la règle par
+   défaut de Tom Select (.ts-dropdown .active { background-color: ... }).
+   On peint donc un overlay via inset box-shadow : ordre CSS garanti
+   par-dessus background-image, sous le contenu → dégradé conservé,
+   texte net, repère franc (barre + teinte). */
+.ts-dropdown .option.active {
+  box-shadow: inset 4px 0 0 var(--bs-primary),
+              inset 0 0 0 9999px rgba(var(--bs-primary-rgb), .15);
 }
 
 /* Capitalization unavailable in note from Ocaml
