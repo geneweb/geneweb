@@ -1151,7 +1151,7 @@
         <input type="number" class="form-control" name="rxcnt_xvar_occ" min="0" value="%relation.xrel.occ;" id="rxcnt_xvar_occ" placeholder="">
       </div>
       <div class="col-sm-2">
-        <select class="form-select" name="rxcnt_xvar_p" id="rxcnt_xvar_p_selct">
+        <select class="form-select" name="rxcnt_xvar_p" id="rxcnt_xvar_p_selct"%if;(relation.xrel.index!="-1") data-pnoc-checked="%relation.xrel.first_name;|%relation.xrel.surname;|%if;(relation.xrel.occ!="" and relation.xrel.occ!="0")%relation.xrel.occ;%else;0%end;"%end;>
           <option value="link"%if;relation.xrel.link; selected%end;>[*link]0</option>
           <option value="create"%if;relation.xrel.create; selected%end;>[*create]0</option>
         </select>

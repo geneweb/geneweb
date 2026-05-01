@@ -282,7 +282,7 @@
       <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0"%datalist_snames;>
     </div>
     <div class="col-sm-2">
-      <select class="form-select" id="paxcnt_p_selct" name="paxcnt_p">
+      <select class="form-select" id="paxcnt_p_selct" name="paxcnt_p"%if;(xx.index!="-1") data-pnoc-checked="%xx.first_name;|%xx.surname;|%if;(xx.occ!="" and xx.occ!="0")%xx.occ;%else;0%end;"%end;>
         <option value="create"%if;(xx.create="create") selected%end;>[*create]0</option>
         <option value="link"%if;(xx.create="link") selected%end;>[*link]0</option>
       </select>
@@ -380,7 +380,7 @@
     <div class="row">
       <h5 class="col-form-label col-2">[*witness/witness/witnesses]0 wcnt</h5>
       <div class="col-2">
-        <select class="form-select" name="excnt_witnwcnt_p" id="excnt_witnwcnt_p_selct">
+        <select class="form-select" name="excnt_witnwcnt_p" id="excnt_witnwcnt_p_selct"%if;(fwitness.index!="-1") data-pnoc-checked="%fwitness.first_name;|%fwitness.surname;|%if;(fwitness.occ!="" and fwitness.occ!="0")%fwitness.occ;%else;0%end;"%end;>
           <option value="create"%if;((fwitness.surname="" and fwitness.first_name="") or fwitness.create="create") selected%end;>[*create]0</option>
           <option value="link"%if;(fwitness.create="link") selected%end;>[*link]0</option>
         </select>
@@ -655,7 +655,7 @@
     <hr class="w-100">
     <h5 class="col-form-label col-sm-2 text-uppercase">%apply;nth%with;[nth]%and;%cnt;%end; [*child/children]0</h5>
     <div class="col-sm-2">
-      <select class="form-select" name="chxcnt_p" id="chxcnt_p_selct">
+      <select class="form-select" name="chxcnt_p" id="chxcnt_p_selct"%if;(child.index!="-1") data-pnoc-checked="%child.first_name;|%child.surname;|%if;(child.occ!="" and child.occ!="0")%child.occ;%else;0%end;"%end;>
         <option value="link"%if;(child.create="link") selected%end;>[*link]0</option>
         <option value="create"%if;(child.create="create") selected%end;>[*create]0</option>
       </select>

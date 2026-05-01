@@ -56,6 +56,76 @@
         });
     }
 
+function bindGroup(opts) {
+        const { fn, sn, oc, gate, link } = opts;
+        if (!fn || !sn || !oc) return;
+        const inputs = [fn, sn, oc];
+        const isActive = () => !gate || gate.value === 'link';
+
+        function paint(state) {
+            inputs.forEach(el => {
+                el.classList.toggle('row-invalid', state === 'invalid');
+                if (state === 'flash') {
+                    el.classList.add('row-valid-flash');
+                    setTimeout(
+                        () => el.classList.remove('row-valid-flash'), 900);
+                }
+            });
+            if (link) {
+                if (state === 'invalid') {
+                    link.classList.add('disabled', 'opacity-50');
+                    link.setAttribute('aria-disabled', 'true');
+                    link.setAttribute('tabindex', '-1');
+                } else if (state === 'valid' || state === 'flash') {
+                    link.classList.remove('disabled', 'opacity-50');
+                    link.removeAttribute('aria-disabled');
+                    link.removeAttribute('tabindex');
+                }
+            }
+        }
+
+        function clear() {
+            inputs.forEach(el => el.classList.remove('row-invalid'));
+        }
+
+        function run(flash) {
+            if (!isActive()) { clear(); return Promise.resolve(); }
+            const f = fn.value.trim();
+            const s = sn.value.trim();
+            const o = (oc.value || '0').trim() || '0';
+            if (!f || !s) {
+                paint('invalid');
+                return Promise.resolve();
+            }
+            const sig = f + '|' + s + '|' + o;
+            if (gate && gate.dataset.pnocChecked === sig) return Promise.resolve();
+            return checkExact(f, s, parseInt(o, 10)).then(ok => {
+                if (gate) gate.dataset.pnocChecked = sig;
+                paint(ok ? (flash ? 'flash' : 'valid') : 'invalid');
+            });
+        }
+
+        inputs.forEach(el => el.addEventListener('focusout', () => run(true)));
+        if (gate) {
+            gate.addEventListener('change', () => run(false));
+        }
+        run(false);
+    }
+
+    function autoBindGroups() {
+        document.querySelectorAll('select[id$="_p_selct"]').forEach(gate => {
+            const pre = gate.id.slice(0, -'_p_selct'.length);
+            bindGroup({
+                fn:   document.getElementById(pre + '_fn'),
+                sn:   document.getElementById(pre + '_sn'),
+                oc:   document.getElementById(pre + '_occ'),
+                gate,
+                link: document.querySelector(
+                    '#' + pre + '_p_selct_mod a')
+            });
+        });
+    }
+
     function parseGeneWebKey(s) {
         if (!s) return null;
         const t = s.trim();
@@ -100,11 +170,12 @@
     }
 
     window.PersonPicker = {
-        create, lookup, checkExact, bindInput, parseGeneWebKey
+        create, lookup, checkExact, bindInput, parseGeneWebKey, bindGroup
     };
 
     function autoBind() {
         document.querySelectorAll('.pnoc-input').forEach(bindInput);
+        autoBindGroups();
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', autoBind);

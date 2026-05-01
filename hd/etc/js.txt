@@ -56,7 +56,7 @@
    <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
   %end;
 %end;
-%if;(e.v="updRLM" or e.m="MRG")
+%if;(e.v="updRLM" or e.m="MRG" or "MOD_IND" in e.m or "MOD_FAM" in e.m or "ADD_FAM" in e.m)
 <script>
 const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
 </script>
