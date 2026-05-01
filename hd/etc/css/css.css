@@ -2452,3 +2452,6 @@ input.row-valid-flash {
     background-color: var(--bs-success-bg-subtle);
     border-color: var(--bs-success-border-subtle);
 }
+a.disabled {
+    pointer-events: none;
+}
