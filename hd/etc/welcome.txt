@@ -125,7 +125,7 @@
       %if;(b.oidc_provider_url!="" and not wizard and not friend)
         <div class="btn-group btn-group-xs mt-1 w-100" role="group">
           <a href="%prefix;m=OIDC_LOGIN" class="btn btn-sm btn-outline-info text-nowrap w-100" role="button">
-            <i class="fas fa-right-to-bracket mr-2" aria-hidden="true"></i>SSO Login</a>
+            <i class="fas fa-right-to-bracket mr-2" aria-hidden="true"></i>%if;(b.oidc_login_label!="")%bvar.oidc_login_label;%else;SSO Login%end;</a>
         </div>
       %end;
       %let;username;%if;(user.name="")%user.ident;%else;%user.name;%end;%in;
