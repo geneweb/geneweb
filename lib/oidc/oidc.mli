@@ -108,6 +108,8 @@ val verify_and_decode_id_token :
 (** [read_users_file filename] reads an OIDC user mapping file.
     Format: [claim_value:role:display_name] or
     [claim_value:role:display_name:person_key] per line.
+    [person_key] uses the standard GeneWeb format: [firstname.occ+surname]
+    (e.g. [christian.0+de vulpillieres]).
     Lines starting with [#] are comments. *)
 val read_users_file : string -> (user_mapping list, error) result
 
