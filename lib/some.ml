@@ -547,8 +547,6 @@ let print_elem conf base alias_cache is_surname ?(rev = false) (p, xl) =
 
 let print_person_list conf base alias_cache query title_opt persons_with_titles
     =
-  Logs.debug (fun k ->
-      k "Print_person_list: %d" (List.length persons_with_titles));
   match persons_with_titles with
   | [] -> ()
   | _ ->
