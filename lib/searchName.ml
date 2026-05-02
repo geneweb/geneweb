@@ -1357,9 +1357,14 @@ let rec extract_name_components conf base =
    "henry de foresta" becomes "henry/de foresta" and the existing slash
    parser can correctly split fn from sn.  Apostrophe variants of each
    word-suffix are tried against the compiled particle regexp so that
-   "renaud d'harcourt" is handled regardless of apostrophe encoding.
-   The matched variant (not the original suffix) is used after the slash
-   so that the stored apostrophe form is forwarded to surname search. *)
+   "renaud d'harcourt" is detected as having a particle regardless of
+   the apostrophe encoding used in the input.
+
+   The original suffix string is preserved verbatim after the slash:
+   downstream apostrophe variant generation (generate_apostrophe_variants
+   in search_fullname, search_by_name, etc.) handles the typographic form
+   matching against the stored data, so the input form must not be
+   canonicalised here. *)
 and insert_slash_before_particle base pn =
   let re = Driver.base_particles base in
   let words = String.split_on_char ' ' pn in
@@ -1371,13 +1376,13 @@ and insert_slash_before_particle base pn =
       else
         let suffix = String.concat " " (list_drop i words) in
         let variants = generate_apostrophe_variants suffix in
-        match
-          List.find_opt (fun v -> Mutil.get_particle re v <> "") variants
-        with
-        | Some matched_variant ->
-            let fn_part = String.concat " " (list_take i words) in
-            fn_part ^ "/" ^ matched_variant
-        | None -> aux (i + 1)
+        let has_particle =
+          List.exists (fun v -> Mutil.get_particle re v <> "") variants
+        in
+        if has_particle then
+          let fn_part = String.concat " " (list_take i words) in
+          fn_part ^ "/" ^ suffix
+        else aux (i + 1)
     in
     aux 1
 
