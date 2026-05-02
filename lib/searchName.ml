@@ -292,6 +292,7 @@ let search_by_name conf base n =
   | None -> []
   | Some i ->
       let fn = String.sub n1 0 i in
+      let fn_variants = generate_apostrophe_variants fn in
       let sn_raw = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let sn_variants = generate_apostrophe_variants sn_raw in
       List.concat_map
@@ -316,7 +317,11 @@ let search_by_name conf base n =
                         split_normalize false
                           (Driver.sou base (Driver.get_public_name p))
                       in
-                      if List.mem fn fn1_l || List.mem fn fn2_l then p :: pl
+                      if
+                        List.exists
+                          (fun fnv -> List.mem fnv fn1_l || List.mem fnv fn2_l)
+                          fn_variants
+                      then p :: pl
                       else pl)
                 pl ipl)
             [] p_of_sn_l)
@@ -448,6 +453,11 @@ let search_for_multiple_fn cache conf base fn pl opts =
   Log.debug (fun k -> k "          result: %d" (List.length result));
   result
 
+let iper_set_of_lists lists =
+  List.fold_left
+    (List.fold_left (fun s p -> Iper.Set.add (Driver.get_iper p) s))
+    Iper.Set.empty lists
+
 (* Partition a person list into (exact, partial) in a single pass:
    exact   = persons matching with opts.exact1 = true
    partial = persons matching with opts.exact1 = false (which includes
@@ -488,6 +498,29 @@ let partition_for_multiple_fn cache conf base fn pl opts =
   Log.debug (fun k ->
       k "        partition_for_multiple_fn: %d exact, %d partial"
         (List.length exact) (List.length partial));
+  (exact, partial)
+
+(* Iterate partition_for_multiple_fn over a list of fn variants,
+   union the results, dedupe by iper, and restore the
+   exact ⊂ partial invariant across variants: an iper that
+   passes exact1=true for any one fn variant is classified as
+   exact globally, even if it would only pass exact1=false for
+   another variant. *)
+let partition_for_multiple_fn_variants cache conf base variants_fn pl opts =
+  let exact, partial =
+    List.fold_left
+      (fun (ex_acc, pa_acc) fn_v ->
+        let ex, pa = partition_for_multiple_fn cache conf base fn_v pl opts in
+        (List.rev_append ex ex_acc, List.rev_append pa pa_acc))
+      ([], []) variants_fn
+  in
+  let cmp a b = compare (Driver.get_iper a) (Driver.get_iper b) in
+  let exact = List.sort_uniq cmp exact in
+  let exact_ipers = iper_set_of_lists [ exact ] in
+  let partial =
+    List.sort_uniq cmp partial
+    |> List.filter (fun p -> not (Iper.Set.mem (Driver.get_iper p) exact_ipers))
+  in
   (exact, partial)
 
 let rec search_surname conf base x =
@@ -1061,16 +1094,16 @@ let group_by_surname base ipers =
     ipers;
   Hashtbl.fold (fun sn persons acc -> (sn, List.rev persons) :: acc) groups []
 
-let iper_set_of_lists lists =
-  List.fold_left
-    (List.fold_left (fun s p -> Iper.Set.add (Driver.get_iper p) s))
-    Iper.Set.empty lists
-
-let search_fullname cache conf base fn variants_sn =
+let search_fullname cache conf base variants_fn variants_sn =
   let variants_sn = List.sort_uniq compare variants_sn in
+  let variants_fn =
+    List.map (String.map (fun c -> if c = '-' then ' ' else c)) variants_fn
+    |> List.sort_uniq compare
+  in
   Log.debug (fun k ->
-      k "      search_fullname: variants: %s" (String.concat ", " variants_sn));
-  let fn = String.map (fun c -> if c = '-' then ' ' else c) fn in
+      k "      search_fullname: fn variants: %s; sn variants: %s"
+        (String.concat ", " variants_fn)
+        (String.concat ", " variants_sn));
   (* Gather surname-matching persons via search_surname (exact then phonetic
      fallback) instead of AdvSearchOk with exact_surname=on.  This allows
      phonetic matching when the query spelling differs from the stored
@@ -1110,33 +1143,39 @@ let search_fullname cache conf base fn variants_sn =
       in
       let opts_partial = { opts with exact1 = false } in
       let exact, partial =
-        partition_for_multiple_fn cache conf base fn pl opts
+        partition_for_multiple_fn_variants cache conf base variants_fn pl opts
       in
       (* Phonetic crush fallback for fn: catches typos / double-letter
          differences like "fereol" vs "Ferreol" where substring matching
          fails but Name.crush_lower matches. Only applied to persons not
          already captured by the exact or partial passes above. *)
       let partial =
-        let fn_crushed = Name.crush_lower fn in
-        if fn_crushed = "" then partial
+        let fn_crushed_variants =
+          List.map Name.crush_lower variants_fn
+          |> List.filter (fun s -> s <> "")
+          |> List.sort_uniq String.compare
+        in
+        if fn_crushed_variants = [] then partial
         else
           let already = iper_set_of_lists [ exact; partial ] in
           let phonetic_extra =
             List.filter
               (fun p ->
                 let ip = Driver.get_iper p in
-                if Iper.Set.mem ip already || search_reject_p conf base p then
-                  false
+                if Iper.Set.mem ip already then false
                 else
                   let fn1 =
                     StringCache.get_cached cache base (Driver.get_first_name p)
                   in
                   let fn1_crushed = Name.crush_lower fn1 in
-                  if String.length fn_crushed <= 2 then fn1_crushed = fn_crushed
-                  else Mutil.contains fn1_crushed fn_crushed)
+                  List.exists
+                    (fun q_crush ->
+                      if String.length q_crush <= 2 then fn1_crushed = q_crush
+                      else Mutil.contains fn1_crushed q_crush)
+                    fn_crushed_variants)
               pl
           in
-          partial @ phonetic_extra
+          List.rev_append phonetic_extra partial
       in
       (* Reuse all_iper (already gathered above) for the spouse search to
          avoid redundant search_surname calls and duplicate results. *)
@@ -1158,12 +1197,24 @@ let search_fullname cache conf base fn variants_sn =
               [] all_iper
           in
           let spouse_substr =
-            search_for_multiple_fn cache conf base fn spouses opts_partial
+            List.fold_left
+              (fun acc fn_v ->
+                List.rev_append
+                  (search_for_multiple_fn cache conf base fn_v spouses
+                     opts_partial)
+                  acc)
+              [] variants_fn
+            |> List.sort_uniq (fun a b ->
+                compare (Driver.get_iper a) (Driver.get_iper b))
           in
           (* Same phonetic crush fallback as for direct persons: catches
              first-name near-misses like "margerite" vs "Marguerite". *)
-          let fn_crushed = Name.crush_lower fn in
-          if fn_crushed = "" then spouse_substr
+          let fn_crushed_variants =
+            List.map Name.crush_lower variants_fn
+            |> List.filter (fun s -> s <> "")
+            |> List.sort_uniq String.compare
+          in
+          if fn_crushed_variants = [] then spouse_substr
           else
             let already = iper_set_of_lists [ exact; partial; spouse_substr ] in
             let phonetic_extra =
@@ -1178,12 +1229,14 @@ let search_fullname cache conf base fn variants_sn =
                         (Driver.get_first_name p)
                     in
                     let fn1_crushed = Name.crush_lower fn1 in
-                    if String.length fn_crushed <= 2 then
-                      fn1_crushed = fn_crushed
-                    else Mutil.contains fn1_crushed fn_crushed)
+                    List.exists
+                      (fun q_crush ->
+                        if String.length q_crush <= 2 then fn1_crushed = q_crush
+                        else Mutil.contains fn1_crushed q_crush)
+                      fn_crushed_variants)
                 spouses
             in
-            spouse_substr @ phonetic_extra
+            List.rev_append phonetic_extra spouse_substr
         else []
       in
       {
@@ -1219,8 +1272,10 @@ let search_partial_key cache conf base query =
     let opts =
       { order = false; exact1 = true; incl_aliases = false; absolute = false }
     in
+    let variants_fn = generate_apostrophe_variants fn in
     let exact, partial =
-      partition_for_multiple_fn cache conf base fn persons opts
+      partition_for_multiple_fn_variants cache conf base variants_fn persons
+        opts
     in
     {
       exact = persons_to_ipers exact;
@@ -1486,12 +1541,13 @@ let execute_search_method cache alias_cache conf base components query method_
       let oc = Option.value components.oc ~default:"" in
       if fn = "" then { exact = []; partial = []; spouse = [] }
       else
-        let variants = generate_apostrophe_variants sn in
-        let results =
-          search_fullname cache conf base
-            (if oc <> "" then fn ^ "." ^ oc else fn)
-            variants
+        let variants_sn = generate_apostrophe_variants sn in
+        let variants_fn =
+          let base_variants = generate_apostrophe_variants fn in
+          if oc = "" then base_variants
+          else List.map (fun v -> v ^ "." ^ oc) base_variants
         in
+        let results = search_fullname cache conf base variants_fn variants_sn in
         Log.debug (fun k ->
             k "    Method FullName: %d+%d+%d results"
               (List.length results.exact)
