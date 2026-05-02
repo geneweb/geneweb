@@ -789,9 +789,15 @@ let insert_at_position_in_family children ip ipl =
   in
   loop (Array.to_list children) ipl
 
-let select_ancestors conf base names_lower ipl =
+(* In absolute mode (t=A), is_known compares stored surnames strictly,
+   without Name.lower normalisation. Otherwise the search is case-
+   insensitive and apostrophe-typography-insensitive via Name.lower. *)
+let select_ancestors conf base names ipl =
+  let absolute = p_getenv conf.env "t" = Some "A" in
   let is_known p =
-    List.mem (Name.lower (Driver.sou base (Driver.get_surname p))) names_lower
+    let stored = Driver.sou base (Driver.get_surname p) in
+    if absolute then List.mem stored names
+    else List.mem (Name.lower stored) names
   in
   List.fold_left
     (fun bhl ip ->
@@ -1697,9 +1703,10 @@ let search_surname_print conf base alias_cache not_found_fun x =
       ((x :: extra) @ StrSet.elements primary_strl @ extra_names)
   in
   let suggestions = collect_surname_suggestions conf base iperl0 all_names in
-  let names_lower =
-    List.map Name.lower (StrSet.elements primary_strl @ extra_names)
-    |> List.sort_uniq String.compare
+  let names =
+    let raw = StrSet.elements primary_strl @ extra_names in
+    if p_getenv conf.env "t" = Some "A" then List.sort_uniq String.compare raw
+    else List.map Name.lower raw |> List.sort_uniq String.compare
   in
   let queries_lower =
     List.map Name.lower (x :: extra) |> List.sort_uniq String.compare
@@ -1729,7 +1736,7 @@ let search_surname_print conf base alias_cache not_found_fun x =
         List.fold_left (fun s i -> Iper.Set.add i s) extra_iperl iperl0
         |> Iper.Set.elements
       in
-      let bhl = select_ancestors conf base names_lower all_iperl in
+      let bhl = select_ancestors conf base names all_iperl in
       let bhl =
         List.map
           (fun bh ->
