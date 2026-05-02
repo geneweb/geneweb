@@ -547,8 +547,6 @@ let print_elem conf base alias_cache is_surname ?(rev = false) (p, xl) =
 
 let print_person_list conf base alias_cache query title_opt persons_with_titles
     =
-  Logs.debug (fun k ->
-      k "Print_person_list: %d" (List.length persons_with_titles));
   match persons_with_titles with
   | [] -> ()
   | _ ->
@@ -672,6 +670,16 @@ type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
    names_set and primary_set are Sets of Name.lower-normalized strings. *)
 let print_branch conf base psn ~names_set ~primary_set names =
   let unsel_list = unselected_bullets conf in
+  let absolute = p_getenv conf.env "t" = Some "A" in
+  let strict_names_set =
+    if absolute then
+      List.fold_left (fun s x -> StrSet.add x s) StrSet.empty names
+    else StrSet.empty
+  in
+  let child_keeps_name p =
+    if absolute then StrSet.mem (Driver.p_surname base p) strict_names_set
+    else true
+  in
   let rec loop p =
     let u = pget conf base (Driver.get_iper p) in
     let family_list =
@@ -746,7 +754,11 @@ let print_branch conf base psn ~names_set ~primary_set names =
              (match select with
              | Some (_, true) ->
                  Output.print_sstring conf "<ul>";
-                 Array.iter (fun e -> loop (pget conf base e)) children;
+                 Array.iter
+                   (fun e ->
+                     let cp = pget conf base e in
+                     if child_keeps_name cp then loop cp)
+                   children;
                  Output.print_sstring conf "</ul>"
              | Some (_, false) -> ()
              | None ->
@@ -791,9 +803,15 @@ let insert_at_position_in_family children ip ipl =
   in
   loop (Array.to_list children) ipl
 
-let select_ancestors conf base names_lower ipl =
+(* In absolute mode (t=A), is_known compares stored surnames strictly,
+   without Name.lower normalisation. Otherwise the search is case-
+   insensitive and apostrophe-typography-insensitive via Name.lower. *)
+let select_ancestors conf base names ipl =
+  let absolute = p_getenv conf.env "t" = Some "A" in
   let is_known p =
-    List.mem (Name.lower (Driver.sou base (Driver.get_surname p))) names_lower
+    let stored = Driver.sou base (Driver.get_surname p) in
+    if absolute then List.mem stored names
+    else List.mem (Name.lower stored) names
   in
   List.fold_left
     (fun bhl ip ->
@@ -1699,9 +1717,10 @@ let search_surname_print conf base alias_cache not_found_fun x =
       ((x :: extra) @ StrSet.elements primary_strl @ extra_names)
   in
   let suggestions = collect_surname_suggestions conf base iperl0 all_names in
-  let names_lower =
-    List.map Name.lower (StrSet.elements primary_strl @ extra_names)
-    |> List.sort_uniq String.compare
+  let names =
+    let raw = StrSet.elements primary_strl @ extra_names in
+    if p_getenv conf.env "t" = Some "A" then List.sort_uniq String.compare raw
+    else List.map Name.lower raw |> List.sort_uniq String.compare
   in
   let queries_lower =
     List.map Name.lower (x :: extra) |> List.sort_uniq String.compare
@@ -1731,7 +1750,7 @@ let search_surname_print conf base alias_cache not_found_fun x =
         List.fold_left (fun s i -> Iper.Set.add i s) extra_iperl iperl0
         |> Iper.Set.elements
       in
-      let bhl = select_ancestors conf base names_lower all_iperl in
+      let bhl = select_ancestors conf base names all_iperl in
       let bhl =
         List.map
           (fun bh ->
