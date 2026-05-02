@@ -670,6 +670,16 @@ type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
    names_set and primary_set are Sets of Name.lower-normalized strings. *)
 let print_branch conf base psn ~names_set ~primary_set names =
   let unsel_list = unselected_bullets conf in
+  let absolute = p_getenv conf.env "t" = Some "A" in
+  let strict_names_set =
+    if absolute then
+      List.fold_left (fun s x -> StrSet.add x s) StrSet.empty names
+    else StrSet.empty
+  in
+  let child_keeps_name p =
+    if absolute then StrSet.mem (Driver.p_surname base p) strict_names_set
+    else true
+  in
   let rec loop p =
     let u = pget conf base (Driver.get_iper p) in
     let family_list =
@@ -744,7 +754,11 @@ let print_branch conf base psn ~names_set ~primary_set names =
              (match select with
              | Some (_, true) ->
                  Output.print_sstring conf "<ul>";
-                 Array.iter (fun e -> loop (pget conf base e)) children;
+                 Array.iter
+                   (fun e ->
+                     let cp = pget conf base e in
+                     if child_keeps_name cp then loop cp)
+                   children;
                  Output.print_sstring conf "</ul>"
              | Some (_, false) -> ()
              | None ->
