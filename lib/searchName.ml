@@ -1258,6 +1258,12 @@ let search_partial_key cache conf base query =
         (String.sub n1 0 i, String.sub n1 (i + 1) (String.length n1 - i - 1))
     | _ -> ("", n1)
   in
+  let sn_variants = List.map Name.lower (generate_apostrophe_variants sn) in
+  let strict_sn p =
+    let stored = Name.lower (Driver.sou base (Driver.get_surname p)) in
+    List.mem stored sn_variants
+  in
+  let pl = List.filter strict_sn pl in
   let persons =
     if pl <> [] then pl
     else
@@ -1265,7 +1271,7 @@ let search_partial_key cache conf base query =
         { conf with env = ("surname", Adef.encoded sn) :: conf.env }
       in
       let persons, _ = AdvSearchOk.advanced_search conf_sn base max_int in
-      persons
+      List.filter strict_sn persons
   in
   if persons = [] then { exact = []; partial = []; spouse = [] }
   else
