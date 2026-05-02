@@ -120,15 +120,35 @@ let find_apostrophe_opt s =
   aux 0
 
 let generate_apostrophe_variants s =
-  let apostrophes = [ "'"; "\xE2\x80\x99"; "\xCA\xBC"; "\xCA\xBB" ] in
+  (* Include a plain space as a variant so that e.g. "o brien" (stored
+     without apostrophe) is found when the query is "o'brien", and
+     conversely "o'brien" is found when querying "o brien".
+     The space variant is only generated when the apostrophe (or space)
+     follows a single-character prefix — the typical French/Irish elision
+     pattern (o', d', l', j', …). *)
+  let apostrophes = [ "'"; " "; "\xE2\x80\x99"; "\xCA\xBC"; "\xCA\xBB" ] in
+  let apostrophes_no_space = [ "'"; "\xE2\x80\x99"; "\xCA\xBC"; "\xCA\xBB" ] in
   match find_apostrophe_opt s with
-  | None -> [ s ]
+  | None -> (
+      (* Query has no apostrophe. If it has a space at position 1
+         (single-char prefix, e.g. "o brien"), generate apostrophe variants
+         in place of that space. Otherwise leave as-is. *)
+      match String.index_opt s ' ' with
+      | Some pos when pos = 1 ->
+          let prefix = String.sub s 0 pos in
+          let suffix = String.sub s (pos + 1) (String.length s - pos - 1) in
+          List.map (fun apo -> prefix ^ apo ^ suffix) apostrophes
+          |> List.sort_uniq String.compare
+      | _ -> [ s ])
   | Some (pos, len) ->
+      (* Query has an apostrophe. Generate all apostrophe variants, and also
+         a space variant if the apostrophe follows a single-char prefix. *)
+      let variants = if pos = 1 then apostrophes else apostrophes_no_space in
       List.map
         (fun apo ->
           String.sub s 0 pos ^ apo
           ^ String.sub s (pos + len) (String.length s - pos - len))
-        apostrophes
+        variants
       |> List.sort_uniq String.compare
 
 let empty_sn_or_fn base p =
@@ -1648,34 +1668,91 @@ let rec handle_search_results alias_cache conf base query fn_options components
       (Adef.(Util.commd conf ^^^ Util.acces conf base p) :> string)
   in
   let { exact; partial; spouse } = results in
-  match exact with
-  | [ single_exact ] -> redirect_to_person single_exact
-  | _ -> (
-      let all_persons = exact @ partial @ spouse in
-      match all_persons with
-      | [] -> SrcfileDisplay.print_welcome conf base
-      | [ single_person ] -> redirect_to_person single_person
-      | _multiple_persons -> (
-          let exact_persons = List.map (Driver.poi base) exact in
-          let partial_persons = List.map (Driver.poi base) partial in
-          let spouse_persons = List.map (Driver.poi base) spouse in
-          match components.case with
-          | SurnameOnly sn ->
-              display_surname_results conf base alias_cache query sn all_persons
-          | ParsedName { first_name = None; surname = Some sn; _ } ->
-              display_surname_results conf base alias_cache query sn all_persons
-          | ParsedName { first_name = Some fn; surname = None; _ } ->
-              display_firstname_results conf base alias_cache fn fn_options
-                (search_firstname alias_cache conf base fn fn_options)
-          | FirstNameSurname (_fn, _sn) ->
-              specify conf base alias_cache query exact_persons partial_persons
-                spouse_persons
-          | ParsedName { format = `Space; _ }
-            when fn_options.exact1 && List.length exact_persons = 1 ->
-              redirect_to_person (Driver.get_iper (List.hd exact_persons))
+  let all_persons = exact @ partial @ spouse in
+  match all_persons with
+  | [] -> SrcfileDisplay.print_welcome conf base
+  | [ single_person ] -> redirect_to_person single_person
+  | _multiple_persons -> (
+      let exact_persons = List.map (Driver.poi base) exact in
+      let partial_persons = List.map (Driver.poi base) partial in
+      let spouse_persons = List.map (Driver.poi base) spouse in
+      (* Find persons that are a true fn+sn exact match (direct or via
+         spouse) after apostrophe normalisation. *)
+      let norm s =
+        let buf = Buffer.create (String.length s) in
+        let i = ref 0 in
+        while !i < String.length s do
+          (match s.[!i] with
+          | '\'' -> Buffer.add_char buf '\''
+          | '\xE2'
+            when !i + 2 < String.length s
+                 && s.[!i + 1] = '\x80'
+                 && s.[!i + 2] = '\x99' ->
+              Buffer.add_char buf '\'';
+              i := !i + 2
+          | '\xCA'
+            when !i + 1 < String.length s
+                 && (s.[!i + 1] = '\xBC' || s.[!i + 1] = '\xBB') ->
+              Buffer.add_char buf '\'';
+              i := !i + 1
+          | c -> Buffer.add_char buf c);
+          i := !i + 1
+        done;
+        Name.lower (Buffer.contents buf)
+      in
+      (* Returns the list of persons that are exact matches:
+         - direct: fn+sn both match the query
+         - spouse: fn matches and at least one spouse sn matches *)
+      let exact_matches qfn_l qsn_l =
+        (* Direct: fn+sn both match, searched across exact and partial. *)
+        let direct =
+          List.filter
+            (fun p ->
+              norm (Driver.sou base (Driver.get_first_name p)) = qfn_l
+              && norm (Driver.sou base (Driver.get_surname p)) = qsn_l)
+            (exact_persons @ partial_persons)
+        in
+        let via_spouse =
+          List.filter
+            (fun p ->
+              norm (Driver.sou base (Driver.get_first_name p)) = qfn_l
+              && Array.exists
+                   (fun ifam ->
+                     let fam = Driver.foi base ifam in
+                     let ip = Driver.get_iper p in
+                     let sp_ip =
+                       if ip = Driver.get_father fam then Driver.get_mother fam
+                       else Driver.get_father fam
+                     in
+                     let sp = Driver.poi base sp_ip in
+                     norm (Driver.sou base (Driver.get_surname sp)) = qsn_l)
+                   (Driver.get_family p))
+            spouse_persons
+        in
+        (* Direct matches take priority over spouse matches. *)
+        if direct <> [] then direct else via_spouse
+      in
+      match components.case with
+      | SurnameOnly sn ->
+          display_surname_results conf base alias_cache query sn all_persons
+      | ParsedName { first_name = None; surname = Some sn; _ } ->
+          display_surname_results conf base alias_cache query sn all_persons
+      | ParsedName { first_name = Some fn; surname = None; _ } ->
+          display_firstname_results conf base alias_cache fn fn_options
+            (search_firstname alias_cache conf base fn fn_options)
+      | FirstNameSurname (_fn, _sn) ->
+          specify conf base alias_cache query exact_persons partial_persons
+            spouse_persons
+      | ParsedName { first_name = Some qfn; surname = Some qsn; _ } -> (
+          let matches = exact_matches (norm qfn) (norm qsn) in
+          match matches with
+          | [ single ] -> redirect_to_person (Driver.get_iper single)
           | _ ->
               specify conf base alias_cache query exact_persons partial_persons
-                spouse_persons))
+                spouse_persons)
+      | _ ->
+          specify conf base alias_cache query exact_persons partial_persons
+            spouse_persons)
 
 and display_firstname_results conf base alias_cache query fn_options results =
   let include_aliases = fn_options.incl_aliases in
