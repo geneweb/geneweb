@@ -45,8 +45,34 @@
 
 %if;(not cancel_links)
   <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
-    <div class="d-flex flex-wrap justify-content-md-end align-items-center">
-      <!-- legal notices -->
+      <div class="d-flex justify-content-between w-100 px-5">
+      %( permalink %)
+      <div class="btn-group mx-3 mt-3">
+        <a id="permalink_url" href="%url_set.opt.noindex;"></a>&nbsp;
+        [*permalink]%sp;
+        <button type="button" class="btn btn-sm btn-outline-secondary ms-2"
+          title="[*copy permalink]"
+          onclick="fetch(document.getElementById('permalink_url').href)
+            .then(r => r.text())
+            .then(text => {
+              const tmp = document.createElement('div');
+              tmp.innerHTML = text;
+              const href = tmp.querySelector('a')?.href || text.trim();
+              console.log('href:', href);
+              return href.replace(/&opt=noindex/g, '').replace(/\?opt=noindex&?/g, '?');
+            })
+            .then(url => {
+              console.log('copying:', url);
+              return navigator.clipboard.writeText(url.trim());
+            })
+            .then(() => { this.innerHTML='<i class=\'fa fa-copy\'></i> ✓'; 
+                          setTimeout(() => this.innerHTML='<i class=\'fa fa-copy\'></i>', 1500); })
+            .catch(() => { this.innerHTML='<i class=\'fa fa-times\'></i>'; 
+                           setTimeout(() => this.innerHTML='<i class=\'fa fa-copy\'></i>', 1500); })">
+          <i class="fa fa-copy"></i>
+        </button>
+      </div>
+      %( legal notices %)
       %if;is_printed_by_template;
         %if;(notice1=1)
             %apply;notice("notice1", lang)
