@@ -224,6 +224,8 @@ and eval_simple_var conf base env p = function
       match get_env "last" env with
       | Vbool x -> bool_val x
       | _ -> raise Not_found)
+  | [ "is_public" ] -> VVbool (p.access = Public)
+  | [ "is_semi_public" ] -> VVbool (p.access = SemiPublic)
   | [ "nb_pevents" ] -> str_val (string_of_int (List.length p.pevents))
   | [ "not_dead" ] -> bool_val (p.death = NotDead)
   | [ "notes" ] -> safe_val (Util.escape_html p.notes :> Adef.safe_string)
