@@ -200,16 +200,6 @@
   (action
     (run brotli -f -q 11 %{input})))
 (rule
-  (target init_gallery.min.js.gz)
-  (deps (:input init_gallery.min.js))
-  (action
-    (run gzip -9 -k -f %{input})))
-(rule
-  (target init_gallery.min.js.br)
-  (deps (:input init_gallery.min.js))
-  (action
-    (run brotli -f -q 11 %{input})))
-(rule
   (target html5sortable.min.js.gz)
   (deps (:input html5sortable.min.js))
   (action

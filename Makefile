@@ -127,7 +127,6 @@ endif
 	rm $(DISTRIB_DIR)/gw/dune
 	rm $(DISTRIB_DIR)/gw/etc/js/checkdata.js
 	rm $(DISTRIB_DIR)/gw/etc/js/fanchart.js
-	rm $(DISTRIB_DIR)/gw/etc/js/init_gallery.js
 	rm $(DISTRIB_DIR)/gw/etc/js/maphilight.js
 	rm $(DISTRIB_DIR)/gw/etc/js/notes_upd_gallery.js
 	rm $(DISTRIB_DIR)/gw/etc/js/p_mod.js

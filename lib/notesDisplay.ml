@@ -285,6 +285,10 @@ let linked_page_rows conf base ?person pg pgl =
       let kq =
         if n_type = "gallery" then person_query_suffix conf base person else ""
       in
+      let view_route = if n_type = "gallery" then "GALLERY" else "NOTES" in
+      let mod_route =
+        if n_type = "gallery" then "MOD_GALLERY" else "MOD_NOTES"
+      in
       if match typ with Some t when t = "" -> t = n_type | _ -> true then (
         let fnote_title = fmt_fnote_title conf base fnotes in
         if conf.wizard then
@@ -292,10 +296,10 @@ let linked_page_rows conf base ?person pg pgl =
             (Format.sprintf
                {|
 <td class="text-center">
-  <a href="%sm=MOD_NOTES&f=%s%s" title="%s"><i class="%s"></i></a>
+  <a href="%sm=%s&f=%s%s" title="%s"><i class="%s"></i></a>
 </td>|}
                (commd conf :> string)
-               (Util.uri_encode fnotes) kq
+               mod_route (Util.uri_encode fnotes) kq
                (Utf8.capitalize_fst
                   (transl conf
                      (if n_type = "gallery" then "modify gallery"
@@ -305,18 +309,19 @@ let linked_page_rows conf base ?person pg pgl =
         Output.print_sstring conf
           (Format.sprintf
              {|
-<td><a href="%sm=NOTES&f=%s%s">%s</a></td>
+<td><a href="%sm=%s&f=%s%s">%s</a></td>
 <td>%s</td>%s|}
              (commd conf :> string)
-             (Util.uri_encode fnotes) kq
+             view_route (Util.uri_encode fnotes) kq
              (fnotes :> string)
              (Util.safe_html fnote_title :> string)
              (if pgl || n_type = "gallery" then
                 Format.sprintf
                   {|
-<td><a href="%sm=NOTES&f=%s&ref=on"
+<td><a href="%sm=%s&f=%s&ref=on"
        title="%s"><-</a></td>|}
                   (commd conf :> string)
+                  view_route
                   (fnotes :> string)
                   (Utf8.capitalize_fst
                      (transl conf "linked pages (pages) help"))
@@ -359,7 +364,7 @@ let create_gallery_item_idx conf base person fnotes title
   let img_param = Printf.sprintf "&img=%d" img_idx in
   let kq = person_query_suffix conf base person in
   Printf.sprintf
-    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s%s%s"><img src="%s" title="%s" alt="%s"><div class="gallery-legend">%s</div></a></div>|}
+    {|<div class="imap-gallery"><a href="%sm=GALLERY&f=%s%s%s"><img src="%s" title="%s" alt="%s"><div class="gallery-legend">%s</div></a></div>|}
     (commd conf :> string)
     (Util.uri_encode fnotes) kq img_param img_url fnotes fnotes caption
 
@@ -514,16 +519,6 @@ let read_notes_from_conf conf base =
   in
   read_notes base fnotes
 
-let print_json conf base =
-  let nenv, s = read_notes_from_conf conf base in
-  let s =
-    match norm_type (List.assoc "TYPE" nenv) with
-    | "gallery" ->
-        Notes.safe_gallery conf base (Notes.mark_pnocs_validity base s)
-    | (exception Not_found) | _ -> s
-  in
-  Output.print_sstring conf s
-
 let print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
@@ -539,26 +534,19 @@ let print conf base =
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
   else
-    match norm_type (List.assoc "TYPE" nenv) with
-    | "gallery" -> Templ.output_simple conf Templ.Env.empty "notes_gallery"
-    | (exception Not_found) | _ -> (
-        let title = try List.assoc "TITLE" nenv with Not_found -> "" in
-        let title = Util.safe_html title in
-        match p_getint conf.env "v" with
-        | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-        | None -> print_whole_notes conf base fnotes title s None)
+    let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+    let title = Util.safe_html title in
+    match p_getint conf.env "v" with
+    | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+    | None -> print_whole_notes conf base fnotes title s None
 
-let print_mod_json conf base =
+let print_mod_gallery_json conf base =
   let nenv, s = read_notes_from_conf conf base in
   let s_digest =
     List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" nenv ^ s
   in
   let digest = Mutil.digest s_digest in
-  let s =
-    match norm_type (List.assoc "TYPE" nenv) with
-    | "gallery" -> Notes.mark_pnocs_validity base s
-    | (exception Not_found) | _ -> s
-  in
+  let s = Notes.mark_pnocs_validity base s in
   Output.printf conf "{\"digest\":\"%s\",\"r\":%s}" digest s
 
 let print_mod conf base =
@@ -579,23 +567,18 @@ let print_mod conf base =
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
   else
-    match norm_type (List.assoc "TYPE" nenv) with
-    | "gallery" when p_getenv conf.env "raw" = None ->
-        Templ.output_simple conf Templ.Env.empty "notes_upd_gallery"
-    | (exception Not_found) | _ ->
-        let title _ =
-          Output.print_sstring conf
-            (Utf8.capitalize_fst (transl conf "base notes"));
-          if is_new_note then (
-            Output.print_sstring conf " — ";
-            Output.print_sstring conf
-              (Utf8.capitalize_fst (transl_nth conf "new note name" 1)))
-          else if fnotes <> "" then (
-            Output.print_sstring conf " — ";
-            Output.print_sstring conf fnotes)
-        in
-        Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
-          nenv s
+    let title _ =
+      Output.print_sstring conf (Utf8.capitalize_fst (transl conf "base notes"));
+      if is_new_note then (
+        Output.print_sstring conf " — ";
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (transl_nth conf "new note name" 1)))
+      else if fnotes <> "" then (
+        Output.print_sstring conf " — ";
+        Output.print_sstring conf fnotes)
+    in
+    Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title nenv
+      s
 
 let print_mod_ok conf base =
   let fname = function
@@ -712,6 +695,7 @@ let format_folder_entry conf depth r path_to is_current is_path view =
 let format_file_entry conf depth d f n_type title view =
   let view = view || can_see conf d in
   let icon = match n_type with "gallery" -> "image" | _ -> "file-lines" in
+  let route = match n_type with "gallery" -> "GALLERY" | _ -> "NOTES" in
   let color, mod_edit =
     let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
     let f = notes_d ^ Filename.dir_sep ^ d ^ NotesLinks.dir_sep ^ f ^ ".txt" in
@@ -727,11 +711,11 @@ let format_file_entry conf depth d f n_type title view =
   if view then
     Format.sprintf
       {|<div class="mt-1"%s>
-         <a class="%s" href="%sm=%sNOTES&f=%s">
+         <a class="%s" href="%sm=%s%s&f=%s">
            <i class="far fa-%s fa-fw me-2"></i>%s</a>%s</div>|}
       margin color
       (commd conf :> string)
-      mod_edit
+      mod_edit route
       (Mutil.encode (if d = "" then f else d ^ ":" ^ f) :> string)
       icon
       (Util.escape_html f :> string)
@@ -766,6 +750,59 @@ let format_simple_filename d f =
   if String.length f > prefix_len && String.sub f 0 prefix_len = prefix then
     String.sub f prefix_len (String.length f - prefix_len)
   else f
+
+let check_note_access ~is_new conf base =
+  let fnotes =
+    if is_new then ""
+    else
+      match p_getenv conf.env "f" with
+      | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      | None -> ""
+  in
+  let nenv, _s = if is_new then ([], "") else read_notes base fnotes in
+  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
+  let restrict_l =
+    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+  in
+  restrict_l = [] || not (is_restricted conf base restrict_l)
+
+let print_gallery conf base =
+  if check_note_access ~is_new:false conf base then
+    Templ.output_simple conf Templ.Env.empty "notes_gallery"
+  else
+    Output.print_sstring conf
+      (transl conf "note is restricted" |> Utf8.capitalize_fst)
+
+let print_mod_gallery_ok conf base =
+  let fname = function
+    | Some f ->
+        let f = Mutil.tr ' ' '_' f in
+        if NotesLinks.check_file_name f <> None then f else ""
+    | None -> ""
+  in
+  let edit_mode _ = if conf.wizard then Some "GALLERY" else None in
+  let read_string = read_notes base in
+  let commit = Notes.commit_notes conf base in
+  let fname_saved = Wiki.do_mod_ok conf edit_mode fname read_string commit in
+  let url =
+    Printf.sprintf "%sm=GALLERY&f=%s"
+      (commd conf :> string)
+      (Mutil.encode fname_saved :> string)
+  in
+  Geneweb_http.Server.http_redirect_temporarily url
+
+let print_gallery_json conf base =
+  let _, s = read_notes_from_conf conf base in
+  let s = Notes.safe_gallery conf base (Notes.mark_pnocs_validity base s) in
+  Output.print_sstring conf s
+
+let print_mod_gallery conf base =
+  let is_new = Util.p_getenv conf.env "new" <> None in
+  if check_note_access ~is_new conf base then
+    Templ.output_simple conf Templ.Env.empty "notes_upd_gallery"
+  else
+    Output.print_sstring conf
+      (transl conf "note is restricted" |> Utf8.capitalize_fst)
 
 let print_misc_notes conf base =
   let d = match p_getenv conf.env "d" with Some d -> d | None -> "" in

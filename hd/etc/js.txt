@@ -6,7 +6,7 @@
                        sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI
                        sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    %if;((e.m="A" and e.t="") or e.m="MOD_NOTES")
+    %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <script src="https://cdn.jsdelivr.net/npm/tom-select@2.6.0/dist/js/tom-select.complete.min.js"
               integrity="sha256-/xuwMq7lcOSlC8tEFkJsHCEM/2U2rqAn3Fhp+pCz0qY=
                          sha384-A/OhuVi7Pu3OK0LZqDw5rUUVpqZdcqxIyZTjfjxT0v8Y3VsdpFvQChtHCOSobZTL
@@ -29,7 +29,7 @@
     %end;
   %else;
     <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.8"></script>
-    %if;((e.m="A" and e.t="") or e.m="MOD_NOTES")
+    %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <script src="%etc_prefix;js/tom-select.complete.min.js?version=2.6.0"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")

@@ -1094,8 +1094,7 @@ let print_ok conf wi edit_mode fname title_is_1st s =
   print_sub_part conf wi conf.wizard edit_mode fname v lines;
   Hutil.trailer conf
 
-let print_mod_ok conf wi edit_mode fname read_string commit string_filter
-    title_is_1st =
+let do_mod_ok conf edit_mode fname read_string commit =
   let new_fname = Util.p_getenv conf.env "new_f" in
   let fname =
     match new_fname with
@@ -1111,7 +1110,7 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
       if Sys.file_exists new_fn_path then Update.error_same_file conf
   | _ -> ());
   match edit_mode fname with
-  | Some edit_mode ->
+  | Some _ ->
       let old_string =
         let e, s = read_string fname in
         List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
@@ -1125,13 +1124,25 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
         match Util.p_getenv conf.env "digest" with Some s -> s | None -> ""
       in
       if digest <> Mutil.digest old_string then Update.error_digest conf
-      else
+      else begin
         let s =
           match Util.p_getint conf.env "v" with
           | Some v -> insert_sub_part old_string v sub_part
           | None -> sub_part
         in
-        if s <> old_string then commit fname s;
-        let sub_part = string_filter sub_part in
-        print_ok conf wi edit_mode fname title_is_1st sub_part
+        if s <> old_string then commit fname s
+      end;
+      fname
+  | None ->
+      Hutil.incorrect_request conf;
+      ""
+
+let print_mod_ok conf wi edit_mode fname read_string commit string_filter
+    title_is_1st =
+  let fname_resolved = do_mod_ok conf edit_mode fname read_string commit in
+  match edit_mode fname_resolved with
+  | Some em ->
+      let _, s = read_string fname_resolved in
+      let sub_part = string_filter s in
+      print_ok conf wi em fname_resolved title_is_1st sub_part
   | None -> Hutil.incorrect_request conf

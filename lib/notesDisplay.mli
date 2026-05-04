@@ -39,30 +39,28 @@ val print_what_links_p : Config.config -> Driver.base -> Driver.person -> unit
 
 val print : Config.config -> Driver.base -> unit
 (** [print conf base] renders the base-wide notes page (URL [m=NOTES] without
-    [f], or with [f] pointing to a specific miscellaneous note). Parses the
-    note's [TYPE] header: if [TYPE=gallery] (or the deprecated [TYPE=album]),
-    hands off to the gallery viewer template [notes_gallery]; otherwise renders
-    a standard wiki-formatted note page. *)
-
-val print_json : Config.config -> Driver.base -> unit
-(** [print_json conf base] outputs the raw note content (no HTML wrapping) for
-    JavaScript consumers (gallery viewer, editor). For gallery notes, the
-    payload is first run through {!Notes.safe_gallery} to sanitize embedded HTML
-    in [alt], [desc], [title], [chronicle] fields. *)
+    [f], or with [f] pointing to a specific miscellaneous note). Renders a
+    standard wiki-formatted note page. *)
 
 val print_mod : Config.config -> Driver.base -> unit
 (** [print_mod conf base] renders the edit form for a note. Reads the target
-    note via [f] in the URL environment. For gallery notes without the [raw=on]
-    query flag, serves the dedicated [notes_upd_gallery] template (reactive
-    image-map editor). Otherwise serves the plain textarea form. If the note has
-    a [RESTRICT] header listing non-authorized keys, refuses the edit with an
-    explanatory page. *)
+    note via [f] in the URL environment. Serves the plain textarea form. If the
+    note has a [RESTRICT] header listing non-authorized keys, refuses the edit
+    with an explanatory page. *)
 
-val print_mod_json : Config.config -> Driver.base -> unit
-(** [print_mod_json conf base] returns the note content formatted for AJAX
-    consumption by the gallery editor. Unlike {!print_json}, this variant
-    preserves edit-mode structure (including restricted fields) and is intended
-    for authenticated editors only. *)
+val print_gallery_json : Config.config -> Driver.base -> unit
+(** [print_gallery_json conf base] outputs the gallery note content as JSON (no
+    HTML wrapping) for the gallery viewer. The payload is run through
+    {!Notes.mark_pnocs_validity} to annotate each map entry with its [valid]
+    flag, then {!Notes.safe_gallery} to sanitize embedded HTML in [alt], [desc],
+    [title], [chronicle] fields. *)
+
+val print_mod_gallery_json : Config.config -> Driver.base -> unit
+(** [print_mod_gallery_json conf base] returns the gallery note content
+    formatted for AJAX consumption by the gallery editor. Computes a digest over
+    the raw [k=v\n] header lines and the body for concurrent-edit detection,
+    then annotates map entries via {!Notes.mark_pnocs_validity} before
+    serialization. *)
 
 val print_mod_ok : Config.config -> Driver.base -> unit
 (** [print_mod_ok conf base] processes the POST submission of an edited note.
@@ -71,6 +69,27 @@ val print_mod_ok : Config.config -> Driver.base -> unit
     and merges if the note was a gallery (via {!Notes.update_cache_linked_pages}
     and {!Notes.rewrite_key}), and records a history entry. Redirects to the
     view page on success. *)
+
+val print_gallery : Config.config -> Driver.base -> unit
+(** [print_gallery conf base] renders the gallery viewer template
+    [notes_gallery] for the note identified by [f] in the URL environment. The
+    note content is fetched asynchronously by the template via
+    [m=GALLERY&ajax=on] (handled by {!print_gallery_json}). Refuses access if
+    the note has a [RESTRICT] header listing non-authorized keys *)
+
+val print_mod_gallery : Config.config -> Driver.base -> unit
+(** [print_mod_gallery conf base] renders the gallery editor template
+    [notes_upd_gallery]. With [new] in the URL env, serves an empty editor for a
+    brand-new gallery (the user supplies the filename via the form). Otherwise
+    loads the existing note identified by [f]. Refuses access on [RESTRICT]
+    mismatch. *)
+
+val print_mod_gallery_ok : Config.config -> Driver.base -> unit
+(** [print_mod_gallery_ok conf base] processes the POST submission of an edited
+    or newly-created gallery: validates the digest and commits to disk via
+    {!Wiki.do_mod_ok}, then issues an HTTP 302 redirect to
+    [m=GALLERY&f=<saved_fname>]. The standard Post/Redirect/Get pattern: the
+    browser ends up on the gallery viewer URL with no double POST on refresh. *)
 
 val print_misc_notes : Config.config -> Driver.base -> unit
 (** [print_misc_notes conf base] renders the directory listing of miscellaneous

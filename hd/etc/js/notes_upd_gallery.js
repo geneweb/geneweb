@@ -1231,13 +1231,23 @@ function toggleTables(show) {
 
 // Initialize both data tables with proper error handling and state management
 function initTables() {
-    fetch(GW.url + '&ajax=on')
-        .then(r => r.json())
+    const isNew = new URLSearchParams(window.location.search).has('new');
+    // MD5("") matches Mutil.digest "" used server-side for new-note digest check
+    const source = isNew
+        ? Promise.resolve({
+            digest: 'd41d8cd98f00b204e9800998ecf8427e',
+            r: { title: '', chronicle: '', images: [] }
+          })
+        : fetch(GW.url + '&ajax=on').then(r => r.json());
+    source
         .then(json => {
             if (!json || !json.digest) {
                 console.error('Invalid JSON response');
                 return;
             }
+            // Set digest IMMEDIATELY, independently of DataTable lifecycle
+            const digestEl = document.getElementById('digest');
+            if (digestEl) digestEl.value = json.digest;
 
             if (json.r?.images) {
                 albumImages = json.r.images;
@@ -1833,26 +1843,30 @@ function currentGroups() {
 function setupFormHandler() {
     const form = document.getElementById('form');
     if (!form) return;
-
-    const onSubmit = (event) => {
-        event.preventDefault();
-        const title = document.getElementById('page_title')?.value || '&hellip;';
-        saveAlbumCurrent();
-        const chronicle = document.getElementById('album_chronicle')?.value || '';
-        const res = { title, chronicle, images: albumImages };
+    form.addEventListener('submit', () => {
+        const fnameInput = document.getElementById('fnotes_name');
+        const title = document.getElementById('page_title')?.value
+            || fnameInput?.value
+            || '…';
+        if (typeof table !== 'undefined' && table) saveAlbumCurrent();
+        const chronicle =
+            document.getElementById('album_chronicle')?.value || '';
+        const images = Array.isArray(albumImages) ? albumImages : [];
+        const res = { title, chronicle, images };
         const jsonString = JSON.stringify(res, null, 2)
             .replace(/\[\{/g, '[\n  {')
             .replace(/\}\]/g, '}\n]')
             .replace(/\}\,\{/g, '},\n  {');
-
-        const notes = document.getElementById('notes');
-        if (notes) notes.value = 'TITLE=' + title + '\nTYPE=gallery\n' + jsonString;
-
-        form.removeEventListener('submit', onSubmit);
-        form.submit();
-    };
-
-    form.addEventListener('submit', onSubmit);
+        const notesEl = document.getElementById('notes');
+        if (notesEl) {
+            notesEl.value =
+                'TITLE=' + title + '\nTYPE=gallery\n' + jsonString;
+        }
+        const newFEl = document.getElementById('new_f');
+        if (newFEl && fnameInput) {
+            newFEl.value = fnameInput.value.trim();
+        }
+    });
 }
 
 const HandlerManager = {
