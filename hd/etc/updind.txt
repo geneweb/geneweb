@@ -708,6 +708,26 @@
   %)
   %apply;insert_witness(xcnt, "0", "evt_name")
 %end;
+
+%if;roglo;
+  %if;is_semi_public;
+    <h2>
+    <span style="color:red">ATTENTION</span>
+    </h2>
+    Vous vous apprétez à modifier les données concernant un Ami.<br>
+    Si vous changez son patronyme, son prénom ou son numéro d'occurrence sans prévenir l'administration de Roglo,<br>
+    ceci aura pour effet (indésirable) de supprimer l'accès "Ami" de cette personne
+    jusqu'à ce que les nouvelles informations<br>
+    soient répercutées dans la base des Amis de Roglo
+    gérée par le service Assoconnect (1 à 2 semaine de délai!).<br>
+    Assurez vous tout d'abord que les modifications projetées ne vont pas à l'encontre du consentement de l'interessé.<br>
+    Envoyer ensuite un mail à <a href="mailto:association@association-roglo.fr
+    ?subject=Modification de %first_name.%occ %surname">association@association-roglo.fr</a>
+    pour faire procéder à la correction en y joignant bien sûr tous<br>
+    les éléments de la modification projetée.
+  %end;
+%end;
+
 %let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
 <form name="upd" method="post" action="%action;">
   <div class="row">
