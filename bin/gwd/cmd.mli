@@ -51,7 +51,6 @@ type t = {
   daemon : bool;
   (* Web interface *)
   default_lang : string;
-  setup_link : bool;
   (* Plugin *)
   plugins : plugin list;
   (* Tracing & debugging *)

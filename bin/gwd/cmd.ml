@@ -49,7 +49,6 @@ type t = {
   daemon : bool;
   (* Web interface *)
   default_lang : string;
-  setup_link : bool;
   (* Plugins *)
   plugins : plugin list;
   (* Tracing & debugging *)
@@ -522,9 +521,13 @@ let setup_link =
   let doc =
     "Display a shortcut link at the bottom of the pages to gwsetup tool."
   in
+  let deprecated =
+    "This option is noop. The setup link is displayed by default. Use the gwf \
+     option to turn it off."
+  in
   C.Arg.(
     value & flag
-    & info [ "setup-link" ] ~docs:web_interface_section ~docv:"URL" ~doc)
+    & info [ "setup-link" ] ~deprecated ~docs:web_interface_section ~doc)
 
 (* Plugin commands *)
 
@@ -666,7 +669,7 @@ let t =
   and+ daemon = daemon
   and+ default_lang = default_lang
   and+ _ : bool = browser_lang
-  and+ setup_link = setup_link
+  and+ _ : bool = setup_link
   and+ plugins = plugins
   and+ debug, check, verbosity = debug_flags
   and+ log = log
@@ -707,7 +710,6 @@ let t =
     cgi;
     daemon;
     default_lang;
-    setup_link;
     plugins;
     debug;
     check;

@@ -145,7 +145,6 @@ pgrep gwd >/dev/null && \
 
 test -n "$debug" && set -x
 OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
-  --setup-link \
   --bd=$BASES_DIR \
   --hd=$BIN_DIR \
   $gwdopt \
