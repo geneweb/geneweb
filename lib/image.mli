@@ -22,6 +22,13 @@ val parse_src_with_size_info :
   [< `Src_with_size_info of string ] ->
   ([> `Path of string | `Url of string ] * (int * int), string) result
 
+val key_dir_basename : string -> string -> int -> string
+(** [key_dir_basename fn sn oc] returns the canonical basename used for per-key
+    file storage (portraits, image directories, blasons): lower- cased, with
+    spaces replaced by underscores. Source of truth for any path computation
+    involving an individual key. e.g.
+    [key_dir_basename "Jean Marc" "DUPONT" 0 = "jean_marc.0.dupont"]. *)
+
 (* TODO this should be removed *)
 val default_image_filename :
   string -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> string

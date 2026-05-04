@@ -551,6 +551,7 @@ let treat_request =
              | "LD" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_death
              | "LINKED" -> w_base @@ w_person @@ NotesDisplay.print_what_links_p
+             | "LIST_IMAGES" -> w_wizard @@ w_base @@ ListImages.print
              | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
              | "LM" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_marriage

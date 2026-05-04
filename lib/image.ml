@@ -11,16 +11,19 @@ let path_str path =
 let portrait_folder conf = !GWPARAM.portraits_d conf.bname
 let carrousel_folder conf = !GWPARAM.images_d conf.bname
 
+let key_dir_basename first_name surname occ =
+  let sp2_ = Mutil.tr ' ' '_' in
+  let f = sp2_ (Name.lower first_name) in
+  let s = sp2_ (Name.lower surname) in
+  Format.sprintf "%s.%d.%s" f occ s
+
 (** [default_portrait_filename_of_key fn sn occ] is the default filename of the
     corresponding person's portrait. WITHOUT its file extenssion. e.g:
     default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is
     "jean_claude.3.dupond" *)
 let default_image_filename_of_key mode first_name surname occ =
-  let sp2_ = Mutil.tr ' ' '_' in
-  let f = sp2_ (Name.lower first_name) in
-  let s = sp2_ (Name.lower surname) in
-  if mode = "blasons" then Format.sprintf "%s.%d.%s.blason" f occ s
-  else Format.sprintf "%s.%d.%s" f occ s
+  let basename = key_dir_basename first_name surname occ in
+  if mode = "blasons" then basename ^ ".blason" else basename
 
 let default_image_filename_aux mode base p saved =
   let name =
