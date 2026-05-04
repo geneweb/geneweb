@@ -49,7 +49,6 @@ type t = {
   daemon : bool;
   (* Web interface *)
   default_lang : string;
-  browser_lang : bool;
   setup_link : bool;
   (* Plugins *)
   plugins : plugin list;
@@ -502,8 +501,8 @@ let default_default_lang = "fr"
 
 let default_lang =
   let doc =
-    "Set the fallback language for the user interface if no \n\
-    \  language is specified."
+    "Set the fallback language for the user interface if no language is \
+     specified."
   in
   C.Arg.(
     value
@@ -512,10 +511,12 @@ let default_lang =
 
 let browser_lang =
   let doc =
-    "Select the user interface language based on the client\n  configuration."
+    "Select the user interface language based on the client configuration."
   in
+  let deprecated = "This option is noop" in
   C.Arg.(
-    value & flag & info [ "browser-lang" ] ~docs:web_interface_section ~doc)
+    value & flag
+    & info [ "browser-lang" ] ~deprecated ~docs:web_interface_section ~doc)
 
 let setup_link =
   let doc =
@@ -664,7 +665,7 @@ let t =
   and+ cgi = cgi
   and+ daemon = daemon
   and+ default_lang = default_lang
-  and+ browser_lang = browser_lang
+  and+ _ : bool = browser_lang
   and+ setup_link = setup_link
   and+ plugins = plugins
   and+ debug, check, verbosity = debug_flags
@@ -706,7 +707,6 @@ let t =
     cgi;
     daemon;
     default_lang;
-    browser_lang;
     setup_link;
     plugins;
     debug;

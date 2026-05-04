@@ -34,7 +34,6 @@ let set_socket_dir s = socket_dir := Some s
 let auth_file : string option ref = ref None
 let cache_langs : string list ref = ref []
 let cache_databases : string list ref = ref []
-let choose_browser_lang = ref false
 let conn_timeout = ref Cmd.default_connection_timeout
 let daemon = ref false
 let friend_passwd : string option ref = ref None
