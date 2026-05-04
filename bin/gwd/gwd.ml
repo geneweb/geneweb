@@ -1456,7 +1456,8 @@ let make_conf ~secret_salt from_addr request script_name env =
       public_if_no_date =
         (try List.assoc "public_if_no_date" base_env = "yes"
          with Not_found -> false);
-      setup_link = !setup_link;
+      setup_link =
+        (try List.assoc "setup_link" base_env <> "no" with Not_found -> true);
       access_by_key =
         (try List.assoc "access_by_key" base_env = "yes"
          with Not_found -> ar.ar_wizard && ar.ar_friend);
@@ -2384,7 +2385,6 @@ let parse_cmd () =
       verbosity_level := o.verbosity;
       force_cgi := o.cgi;
       cgi_secret_salt := o.secret_salt;
-      setup_link := o.setup_link;
       plugins := o.plugins;
       Lock.no_lock_flag := o.no_lock;
       Mutil.particles_file := Option.value ~default:"" o.particles_file;

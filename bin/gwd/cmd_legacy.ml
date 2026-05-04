@@ -50,7 +50,6 @@ let redirected_addr : string option ref = ref None
 let robot_xcl : (int * int) option ref = ref None
 let selected_addr : string option ref = ref None
 let selected_port = ref Cmd.default_port
-let setup_link = ref false
 let trace_failed_passwd = ref false
 let debug = ref false
 let check = ref false
