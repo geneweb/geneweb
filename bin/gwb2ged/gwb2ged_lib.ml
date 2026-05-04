@@ -471,7 +471,7 @@ let ged_date_dmy opts dt cal =
       | (Sure | About | Maybe | Before | After | YearInt _) as prec -> prec
       | OrYear date -> YearInt date
     in
-    Date.normalize_interval ~calendar:cal { dt with prec }
+    Date.mangle_for_display ~calendar:cal { dt with prec }
   in
   (match dt.Date.prec with
   | Sure -> ()
