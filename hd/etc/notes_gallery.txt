@@ -21,7 +21,7 @@
         title="[*linked galleries help]"><i class="fa-solid fa-images"></i></a>)</div>
     %end;
     <div>(<a href="%url;&ref=on" title="[*gallery backlinks]">&lt;-</a>)</div>
-    %if;wizard;<div>(<a id="edit_link" href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)</div>%end;
+    %if;wizard;<div>(<a id="edit_link" href="%prefix;m=MOD_GALLERY&f=%e.f;">[modify::]</a>)</div>%end;
   </div>
   <h1 id="h1" class="ms-3 mb-0">[*loading/error]0</h1>
   <p id="chronicle" class="ms-3 mb-0 text-body-secondary d-none"></p>
@@ -381,7 +381,7 @@ function loadCurrentImage() {
   history.replaceState(null, '', u);
   const edit = $$('#edit_link');
   if (edit) {
-    edit.setAttribute('href', '%prefix;m=MOD_NOTES&f=%e.f;&img=' + (current + 1));
+    edit.setAttribute('href', '%prefix;m=MOD_GALLERY&f=%e.f;&img=' + (current + 1));
   }
   updateNavButtons();
 }
@@ -428,7 +428,7 @@ function loadIndex() {
   history.replaceState(null, '', u);
   current = -1;
   const edit = $$('#edit_link');
-  if (edit) edit.setAttribute('href', '%prefix;m=MOD_NOTES&f=%e.f;');
+  if (edit) edit.setAttribute('href', '%prefix;m=MOD_GALLERY&f=%e.f;');
 }
 
 function loadFirstImage()    { if (current <= 0) return; current = 0; loadCurrentImage(); }

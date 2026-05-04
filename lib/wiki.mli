@@ -116,3 +116,22 @@ val notes_aliases : config -> (string * string) list
 
 val map_notes : (string * string) list -> string -> string
 (** Given an alias list, finds the corresponding alias for a given string *)
+
+val do_mod_ok :
+  config ->
+  (string -> string option) ->
+  (* edit_mode *)
+  (string option -> string) ->
+  (* fname *)
+  (string -> (string * string) list * string) ->
+  (* read_string *)
+  (string -> string -> unit) ->
+  (* commit *)
+  string
+(** [do_mod_ok conf edit_mode fname read_string commit] performs the same digest
+    check, conflict detection and commit as {!print_mod_ok} but returns the
+    resolved [fname] without rendering any page. The caller is responsible for
+    the response (typically an HTTP redirect or a custom view). On digest
+    mismatch, malformed request, or filename conflict, the appropriate error
+    page is emitted and the function raises (the implementation of those error
+    helpers terminates the request flow). *)

@@ -476,6 +476,43 @@ let treat_request =
                    ImageDisplay.print_folder_images_json conf
                      (Util.p_getenv conf.env "folder")
                  else Hutil.incorrect_request conf
+             | "GALLERY" ->
+                 w_base (fun conf base ->
+                     match
+                       (p_getenv conf.env "ref", p_getenv conf.env "ajax")
+                     with
+                     | Some "on", _ ->
+                         let fnotes =
+                           match p_getenv conf.env "f" with
+                           | Some f ->
+                               if NotesLinks.check_file_name f <> None then f
+                               else ""
+                           | None -> ""
+                         in
+                         NotesDisplay.print_what_links conf base fnotes
+                     | _, Some "on" ->
+                         let charset =
+                           if conf.charset = "" then "utf-8" else conf.charset
+                         in
+                         Output.header conf
+                           "Content-type: application/json; charset=%s" charset;
+                         NotesDisplay.print_gallery_json conf base
+                     | _ -> NotesDisplay.print_gallery conf base)
+             | "MOD_GALLERY" ->
+                 w_wizard
+                 @@ w_base (fun conf base ->
+                     match p_getenv conf.env "ajax" with
+                     | Some "on" ->
+                         let charset =
+                           if conf.charset = "" then "utf-8" else conf.charset
+                         in
+                         Output.header conf
+                           "Content-type: application/json; charset=%s" charset;
+                         NotesDisplay.print_mod_gallery_json conf base
+                     | _ -> NotesDisplay.print_mod_gallery conf base)
+             | "MOD_GALLERY_OK" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ NotesDisplay.print_mod_gallery_ok
              | "H" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
@@ -527,18 +564,7 @@ let treat_request =
              | "MOD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_mod
              | "MOD_IND" -> w_wizard @@ w_base @@ UpdateInd.print_mod
              | "MOD_IND_OK" -> w_wizard @@ w_base @@ UpdateIndOk.print_mod
-             | "MOD_NOTES" ->
-                 w_wizard
-                 @@ w_base (fun conf base ->
-                     match p_getenv conf.env "ajax" with
-                     | Some "on" ->
-                         let charset =
-                           if conf.charset = "" then "utf-8" else conf.charset
-                         in
-                         Output.header conf
-                           "Content-type: application/json; charset=%s" charset;
-                         NotesDisplay.print_mod_json conf base
-                     | _ -> NotesDisplay.print_mod conf base)
+             | "MOD_NOTES" -> w_wizard @@ w_base @@ NotesDisplay.print_mod
              | "MOD_NOTES_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
              | "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
@@ -626,10 +652,8 @@ let treat_request =
                        (find_person_in_env_pref conf base "e"))
              | "NOTES" ->
                  w_base (fun conf base ->
-                     match
-                       (p_getenv conf.env "ref", p_getenv conf.env "ajax")
-                     with
-                     | Some "on", _ ->
+                     match p_getenv conf.env "ref" with
+                     | Some "on" ->
                          let fnotes =
                            match p_getenv conf.env "f" with
                            | Some f ->
@@ -638,13 +662,6 @@ let treat_request =
                            | None -> ""
                          in
                          NotesDisplay.print_what_links conf base fnotes
-                     | _, Some "on" ->
-                         let charset =
-                           if conf.charset = "" then "utf-8" else conf.charset
-                         in
-                         Output.header conf
-                           "Content-type: application/json; charset=%s" charset;
-                         NotesDisplay.print_json conf base
                      | _ -> NotesDisplay.print conf base)
              | "OA" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_oldest_alive
