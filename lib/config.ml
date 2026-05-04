@@ -66,7 +66,7 @@ type config = {
   authorized_wizards_notes : bool;
   public_if_titles : bool;
   public_if_no_date : bool;
-  mutable setup_link : bool;
+  setup_link : bool;
   access_by_key : bool;
   private_years : int;
   private_years_death : int;
@@ -87,7 +87,7 @@ type config = {
   denied_titles : string list Lazy.t;
   request : string list;
   lexicon : (string, string) Hashtbl.t;
-  mutable charset : string;
+  charset : string;
   is_rtl : bool;
   left : string;
   right : string;
