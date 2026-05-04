@@ -2,6 +2,7 @@ open Geneweb
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 
+let interface = ref "localhost"
 let port = ref 2316
 let gwd_port = ref 2317
 let default_lang = ref "en"
@@ -9,7 +10,6 @@ let setup_dir = ref "."
 let bin_dir = ref ""
 let base_dir = ref (Filename.concat Filename.current_dir_name "bases")
 let lang_param = ref ""
-let only_file = ref ""
 let bname = ref ""
 let no_o = ref true
 
@@ -292,11 +292,6 @@ let server_string conf =
 
 let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 
-let only_file_name =
-  lazy
-    (if !only_file = "" then Filename.concat !setup_dir "only.txt"
-     else Filename.concat !setup_dir !only_file)
-
 (* this set of macros are used within translations, hence the repeat of some *)
 (* like %l, %L, %P, ... and they may be different! %G  *)
 let macro conf = function
@@ -318,7 +313,6 @@ let macro conf = function
   | 'x' -> stringify !bin_dir
   | 'v' -> strip_spaces (s_getenv conf.env "odir")
   | 'w' -> slashify (Sys.getcwd ())
-  | 'y' -> Filename.basename (Lazy.force only_file_name)
   | 'z' -> string_of_int !port
   | 'D' -> transl conf "!doc"
   | 'G' -> transl conf "!geneweb"
@@ -1676,32 +1670,6 @@ let setup_comm conf comm =
       setup_gen { conf with env = [ ("lang", conf.lang); ("v", "main.htm") ] }
   | None -> setup_comm_ok conf comm
 
-let string_of_sockaddr = function
-  | Unix.ADDR_UNIX s -> s
-  | Unix.ADDR_INET (a, _) ->
-      let str = Unix.string_of_inet_addr a in
-      if str = "::ffff:127.0.0.1" then "::1"
-      else if String.length str > 7 && String.sub str 0 7 = "::ffff:" then
-        String.sub str 7 (String.length str - 7)
-      else str
-
-let only_addr () =
-  let local_addr =
-    try
-      let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
-      Unix.close s;
-      Unix.string_of_inet_addr Unix.inet6_addr_loopback
-    with Unix.Unix_error (Unix.EAFNOSUPPORT, _, _) ->
-      Unix.string_of_inet_addr Unix.inet_addr_loopback
-  in
-  let fname = Lazy.force only_file_name in
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic ->
-      let v = try input_line ic with End_of_file -> local_addr in
-      close_in ic;
-      v
-  | None -> local_addr
-
 let lindex s c =
   let rec pos i =
     if i = String.length s then None
@@ -1761,7 +1729,7 @@ let input_lexicon lang =
       raise e
   with Sys_error _ -> t
 
-let setup (addr, req) comm (env_str : Adef.encoded_string) =
+let setup (_addr, req) comm (env_str : Adef.encoded_string) =
   let conf =
     let env = create_env env_str in
     if env = [] && (comm = "" || String.length comm = 2) then
@@ -1779,18 +1747,9 @@ let setup (addr, req) comm (env_str : Adef.encoded_string) =
       let lexicon = input_lexicon lang in
       { lang; comm; env; request = req; lexicon }
   in
-  let saddr = string_of_sockaddr addr in
-  let s = only_addr () in
   (* FIXME lang is a conf variable rather that env variable!! *)
   let conf = conf_with_env conf "lang" conf.lang in
-  if s <> saddr then (
-    let conf = { conf with env = [ ("anon", saddr); ("o", s) ] } in
-    Printf.eprintf "Invalid request from \"%s\"; only \"%s\" accepted.\n" saddr
-      s;
-    flush stderr;
-    print_file conf "err_acc.htm")
-  else if conf.comm = "" then print_file conf "welcome.htm"
-  else setup_comm conf comm
+  if conf.comm = "" then print_file conf "welcome.htm" else setup_comm conf comm
 
 let wrap_setup a b (c : Adef.encoded_string) =
   if not Sys.unix then (
@@ -1825,6 +1784,11 @@ let daemon = ref false
 let usage =
   "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
 
+let deprecated_only () =
+  Format.eprintf
+    "The -only option is deprecated. You must use -i to bind the gwsetup \
+     server on a safe interface."
+
 let speclist =
   [
     (* TODO -bd seems to be flatly ignored in setup.ml *)
@@ -1837,12 +1801,15 @@ let speclist =
       ^ string_of_int !gwd_port ^ "); > 1024 for normal users." );
     ("-lang", Arg.String (fun x -> lang_param := x), "<string> default lang");
     ("-daemon", Arg.Set daemon, " Unix daemon mode.");
+    ( "-i",
+      Arg.String (fun s -> interface := s),
+      "Bind gwsetup to this interface." );
     ( "-p",
       Arg.Int (fun x -> port := x),
       "<number> Select a port number (default = " ^ string_of_int !port
       ^ "); > 1024 for normal users." );
     ( "-only",
-      Arg.String (fun s -> only_file := s),
+      Arg.Unit deprecated_only,
       "<file> File containing the only authorized address" );
     ("-gd", Arg.String (fun x -> setup_dir := x), "<string> gwsetup directory");
     ( "-bindir",
@@ -1889,11 +1856,6 @@ let intro () =
 
   let setup_lang =
     if !daemon && Sys.unix then begin
-      let addr =
-        let only = only_addr () in
-        if only <> "127.0.0.1" && only <> "::1" then only else "localhost"
-      in
-      Printf.printf "To start, open location http://%s:%d/\n%!" addr !port;
       if Unix.fork () = 0 then begin
         Unix.close Unix.stdin;
         null_reopen [ Unix.O_WRONLY ] Unix.stdout
@@ -1912,9 +1874,6 @@ let intro () =
         end
       in
       copy_text lang (Filename.concat "lang" "intro.txt");
-      let only = only_addr () in
-      if only <> "127.0.0.1" && only <> "::1" then
-        Printf.printf "       http://%s:%d/\n" only !port;
       lang
     end
   in
@@ -1926,11 +1885,28 @@ let intro () =
   Printf.printf "\n";
   flush stdout
 
+let reporter ppf =
+  let report _src _level ~over k msgf =
+    let k ppf =
+      Format.pp_close_box ppf ();
+      Format.pp_print_newline ppf ();
+      over ();
+      k ()
+    in
+    msgf @@ fun ?header:_ ?tags:_ fmt ->
+    Format.pp_open_box ppf 0;
+    Format.kfprintf k ppf fmt
+  in
+  { Logs.report }
+
 let () =
+  Logs.set_level ~all:true (Some Logs.Info);
+  Logs.set_reporter (reporter Format.err_formatter);
   if Sys.unix then intro ()
   else if Sys.getenv_opt "WSERVER" = None then intro ();
   (* FIXME: this hack is necessary to avoid a cyclic dependency between
      `geneweb` and `geneweb-http`. We must remove it after refactoring
      the encoded string subsystem. *)
   let wrap_setup x y z = wrap_setup x y (Adef.encoded z) in
-  Server.start ~port:!port ~max_pending_requests:150 ~n_workers:1 wrap_setup
+  Server.start ~addr:!interface ~port:!port ~max_pending_requests:150
+    ~n_workers:1 wrap_setup
