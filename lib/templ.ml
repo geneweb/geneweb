@@ -1398,11 +1398,28 @@ and print_simple_variable conf = function
         !GWPARAM.errors_other !GWPARAM.set_vars
   | "src_albums_list" -> (
       let dir = !GWPARAM.albums_d conf.bname in
+      let has_image path =
+        try
+          let entries = Sys.readdir path in
+          Array.exists
+            (fun f ->
+              let full = Filename.concat path f in
+              try
+                (Unix.stat full).st_kind = Unix.S_REG
+                && f <> ""
+                && f.[0] <> '.'
+                && f.[0] <> '~'
+                && ListImages.image_extension f
+              with Unix.Unix_error _ -> false)
+            entries
+        with Sys_error _ | Unix.Unix_error _ -> false
+      in
       let collect entry acc =
         match entry with
         | Filesystem.Dir path ->
             let name = Filename.basename path in
-            if name <> "" && name.[0] <> '.' then name :: acc else acc
+            if name <> "" && name.[0] <> '.' && has_image path then name :: acc
+            else acc
         | Filesystem.File _ | Filesystem.Exn _ -> acc
       in
       try

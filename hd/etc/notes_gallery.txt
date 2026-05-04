@@ -9,6 +9,7 @@
   <link rel="shortcut icon" href="%image_prefix;favicon_gwd.png">
   <link rel="apple-touch-icon" href="%image_prefix;favicon_gwd.png">
   %include;css
+  <style>html { scrollbar-gutter: stable; }</style>
   %include;hed
 </head>
 <body%body_prop;>
@@ -132,23 +133,27 @@ function leaveArea(area) {
 // --- Image rendering ---------------------------------------------------
 
 function displayImage(img) {
-  const map = $$('#imap-notes');
-  const legend = $$('#legend');
-  emptyNode(map);
-  emptyNode(legend);
-  $$('#div_legend').classList.add('d-none');
-  $$('#h1').innerHTML = json.title;
-  $$('#description').innerHTML = img.desc || json.desc || '';
-  const imageEl = $$('#image');
-  imageEl.src = img.img.startsWith('albums/')
-    ? '%prefix;m=IMA&s=' + img.img.substring(7)
-    : '%prefix;m=DOC&s=' + img.img;
-  imageEl.hidden = false;
+    const map = $$('#imap-notes');
+    const legend = $$('#legend');
+    emptyNode(map);
+    emptyNode(legend);
+    $$('#div_legend').classList.add('d-none');
+    const rlmEl = $$('#rlm');
+    if (rlmEl) {
+        rlmEl.style.display = 'none';
+        rlmEl.setAttribute('href', '%prefix;m=RLM');
+    }
+    $$('#h1').innerHTML = json.title;
+    $$('#description').innerHTML = img.desc || json.desc || '';
+    const imageEl = $$('#image');
+    imageEl.src = img.img.startsWith('albums/')
+        ? '%prefix;m=IMA&s=' + img.img.substring(7)
+        : '%prefix;m=DOC&s=' + img.img;
+    imageEl.hidden = false;
 
-  let cnt = 1, cnt_rlm = 1;
-  const hasGroups = img.groups?.length;
-  const ungrouped = [];
-  const rlmEl = $$('#rlm');
+    let cnt = 1, cnt_rlm = 1;
+    const hasGroups = img.groups?.length;
+    const ungrouped = [];
 
   img.map.forEach(r => {
     const t = get(r.t) || 'p';
@@ -224,9 +229,17 @@ function displayImage(img) {
     legend.insertAdjacentHTML('beforeend', item.legendHtml);
   });
 
-  if (cnt > 1 || ungrouped.length) {
-    $$('#div_legend').classList.remove('d-none');
+  const hasIdentified = cnt_rlm > 1;
+  const hasMultiple = cnt_rlm > 2;
+  if (hasIdentified) {
+      $$('#div_legend').classList.remove('d-none');
+  } else {
+      $$('#div_legend').classList.add('d-none');
   }
+  if (rlmEl) {
+      rlmEl.style.display = hasMultiple ? '' : 'none';
+  }
+
   maphilight(imageEl, MAPHILIGHT_CONFIG);
 }
 

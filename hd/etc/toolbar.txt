@@ -212,9 +212,8 @@ body {
           </div>
           %if;(e.m="MOD_NOTES")
             <div class="nav-item me-2">
-              <a class="nav-link" href="%prefix;m=MOD_GALLERY&new"
-                 title="[*create gallery]">
-                <i class="far fa-images"></i> [*create gallery]
+              <a class="nav-link" href="%prefix;m=MOD_GALLERY&new" title="[*create gallery]1">
+                <i class="far fa-images"></i> [*create gallery]0
               </a>
             </div>
           %end;
