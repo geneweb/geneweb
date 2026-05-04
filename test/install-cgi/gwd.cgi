@@ -19,6 +19,5 @@ LOGS_DIR="../tmp"
   --bd "$BASES_DIR" \
   --gw-prefix "$BIN_DIR" \
   --etc-prefix "../distribution/gw/etc" \
-  --browser-lang \
   --plugins u:"$BIN_DIR"/plugins \
   --verbosity 7 --log "<stderr>" 2>> "$LOGS_DIR"/gwd.log

@@ -1331,10 +1331,7 @@ let make_conf ~secret_salt from_addr request script_name env =
     (command, bname, passwd, env, access_type)
   in
   let lang, env = extract_assoc "lang" env in
-  let lang =
-    if lang = "" && !choose_browser_lang then http_preferred_language request
-    else lang
-  in
+  let lang = if lang = "" then http_preferred_language request else lang in
   let lang = alias_lang lang in
   let from, env =
     let x, env = extract_assoc "opt" env in
@@ -1357,9 +1354,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       if x = "" then !default_lang else x
     with Not_found -> !default_lang
   in
-  let browser_lang =
-    if !choose_browser_lang then http_preferred_language request else ""
-  in
+  let browser_lang = http_preferred_language request in
   let default_lang = if browser_lang = "" then default_lang else browser_lang in
   let vowels =
     match List.assoc_opt "vowels" base_env with
@@ -2365,7 +2360,6 @@ let parse_cmd () =
       auth_file := o.authorization_file;
       cache_langs := o.cache_langs;
       cache_databases := o.cache_databases;
-      choose_browser_lang := o.browser_lang;
       conn_timeout := o.connection_timeout;
       daemon := o.daemon;
       friend_passwd := o.friend_password;
