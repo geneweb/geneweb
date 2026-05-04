@@ -2,7 +2,6 @@
 [Welcome to GeneWeb] %q
 
 [Go to your Web browser and open one of the following addresses:]
-       http://127.0.0.1:%z/
        http://localhost:%z/
 
 [Warning: for this program to work, you must not close this window!]
