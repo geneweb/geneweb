@@ -1,8 +1,8 @@
-<!-- $Id: notes_upd_gallery.txt v7.1 20/03/2026 05:14:28 $ -->
+<!-- $Id: notes_upd_gallery.txt v7.1 06/05/2026 02:07:12 $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <title>[*reactive image map editor]</title>
+  <title>[*gallery editor]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="%etc_prefix;css/datatables.min.css?version=dt-3.0.0+rr-2.0.0-beta.1">
   %end;
   <style>
+html { scrollbar-gutter: stable; }
+
 /* --- Layout helpers --- */
 .visually-hidden {
     position: absolute; width: 1px; height: 1px;
@@ -115,12 +117,12 @@ li.in { background-color: #FFE8CC; }
 <a href="#map_table" class="skip-link">Skip to data table</a>
 <div class="container-fluid">
 %include;home
-<h1 class="mt-1 ms-4">[*reactive image map editor]</h1>
+<h1 class="mt-1 ms-4">[*gallery editor]</h1>
 <div id="fd_error"></div>
 <div class="visually-hidden" aria-live="polite" id="status-updates"></div>
 <form id="form" class="mt-3 ms-2" method="post" action="%action;">
   <div class="row ms-3">
-    <div class="col-sm-12 col-lg-8">
+    <div class="col-12 col-lg-10 col-xl-9">
       %if;(e.f="")
         <div class="row">
           <label for="fnotes_name" class="col-sm-2 col-form-label">[*name]</label>
@@ -131,13 +133,13 @@ li.in { background-color: #FFE8CC; }
           </div>
         </div>
       %end;
-      <div class="row">
+      <div class="row mt-2">
         <label for="page_title" class="col-sm-2 col-form-label">[*title/titles]0</label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="page_title">
         </div>
       </div>
-      <div class="row mt-1">
+      <div class="row">
         <label for="album_chronicle" class="col-sm-2 col-form-label">[*chronicle]</label>
         <div class="col-sm-10">
           <textarea class="form-control" id="album_chronicle" rows="2"></textarea>
@@ -150,22 +152,33 @@ li.in { background-color: #FFE8CC; }
         <a href="#" id="album-next" title="[*next]"><i class="fa-solid fa-caret-right"></i></a>
         <a href="#" id="album-last" title="[*last]"><i class="fa-solid fa-forward"></i></a>
         <a href="#" id="album-reorder" title="[*reorder images]"
-          data-bs-toggle="modal" data-bs-target="#reorder_modal">
+          data-bs-toggle="modal" data-bs-target="#reorder_modal">%nn;
           <i class="fa fa-up-down"></i>
         </a>
         <div id="album-actions-mount-nav" class="d-inline-flex gap-2"></div>
       </div>
-      <div class="row my-1">
+      <div class="row mt-1">
         <label for="fname" class="col-sm-2 col-form-label">[*file]/[folder/folders]0</label>
         <div class="col-sm-10 d-flex align-items-center pe-1">
           <div class="flex-grow-1">
-            <input id="fname" type="text" class="form-control no-clear-button" placeholder="[*choose a file or a folder]">
+            <input id="fname" type="text" class="form-control no-clear-button"
+                   placeholder="[*choose a file or a folder]">
             <datalist id="src_images">%src_images_list;</datalist>
             <datalist id="src_albums">%src_albums_list;</datalist>
           </div>
+          <div id="add_key_inline" class="d-none ms-1" style="min-width: 220px;">
+            <input id="add_key_input" type="text" class="form-control p-input"
+                   placeholder="[first name/first names]1.[occurence]0.[surname/surnames]0">
+          </div>
+          <button type="button" id="add_key_validate"
+                  class="btn btn-sm btn-outline-info mx-1 d-none"
+                  disabled title="[*add::key]1">
+            <i class="fa-solid fa-check"></i>
+          </button>
           <div id="album-actions-mount-solo" class="pe-2">
             <div id="album-actions" class="d-inline-flex align-items-center gap-2 ms-2">
               <a href="#" id="album-add" class="me-1" title="[*add::image/images]0"><i class="fa-solid fa-file-circle-plus"></i></a>
+              <a href="#" id="add_key_btn" class="me-1" title="[*add::key]1"><i class="fa-solid fa-folder-plus"></i></a>
               <a href="#" id="album-remove" class="d-none text-danger" title="[*delete::image/images]0"><i class="fa-solid fa-trash-can"></i></a>
             </div>
           </div>
@@ -179,7 +192,7 @@ li.in { background-color: #FFE8CC; }
       </div>
     </div>
   </div>
-  <div class="mt-1 mx-3">
+  <div class="mt-3 mx-3">
     <div id="div_img_legend" class="ms-2">
       <div id="redraw-target" class="d-none"></div>
       <div id="frame" onmousedown="return false">
@@ -276,6 +289,32 @@ li.in { background-color: #FFE8CC; }
     </div>
   </div>
 </div>
+%( BS Modal for batch directory import validation %)
+<div class="modal fade" id="confirm_import_modal" tabindex="-1"
+     aria-labelledby="confirm_import_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirm_import_label">
+          <i class="fa-solid fa-folder-plus text-warning me-2"></i>
+          [*add::image/images]1
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="[*user/password/cancel]2"></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm_import_message"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal">[*user/password/cancel]2</button>
+        <button type="button" class="btn btn-primary"
+                id="confirm_import_ok">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 %include;trl
 %include;copyr
 %include;js
@@ -305,8 +344,9 @@ const GW = {
   hasSnList: %if;(b.datalist_snames=1)true%else;false%end;,
   i18n: {
     person: "[*person/persons]0",
-    folders: "[*folder/folders]1",
+    folders: "[*folder/folders]1 “albums”",
     images: "[*image/images]1",
+    keyDirs: "[*individual images]",
     emptyTable: "[*table without data]",
     drawSelection: "[*draw selection]",
     addGroup: "[*add a group]",
@@ -322,6 +362,9 @@ const GW = {
     lockGroup: "[*lock group]",
     addItem: "[*add]",
     noResult: "[*no match]",
+    listImagesDir: "[*list/add images from directory]0",
+    addImagesDir: "[*list/add images from directory]1",
+    confirmImportFolder: "[*confirm import folder]"
   }
 };
 </script>

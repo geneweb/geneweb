@@ -5254,6 +5254,11 @@ sv: konfigurationsparametrar
 tr: yapılandırma parametreleri
 zh: 配置参数
 
+    confirm import folder
+en: import {n} images from directory “{f}”?
+fr: importer {n} images depuis le répertoire « {f} » ?
+de: {n} Bilder aus dem Verzeichnis „{f}” importieren?
+
     confirmation
 co: cresima
 de: Firmung
@@ -6954,6 +6959,11 @@ sk: vytvor
 sl: ustvari
 sv: skapa
 tr: oluştur
+
+    create gallery
+de: Galerie/eine neue Galerie erstellen/eine neue Galerie ausgehend von diesem Bild erstellen
+en: gallery/create a new gallery/create a new gallery starting with this image
+fr: galerie/créer une nouvelle galerie/créer une nouvelle galerie à partir de cette image
 
     cremated
 af: veras
@@ -11065,6 +11075,11 @@ sl: seznam mož/žena (brez potomcev)
 sv: förteckning över makarna (icke ättlingar)
 tr: eşler dizini (nesil yok)
 
+    individual images
+de: persönliche Bilder (Schlüsselverzeichnisse)
+en: individual images (key directories)
+fr: images individuelles (répertoires clés)
+
     individual notes
 co: note nant’à l’individuu
 de: Hinweise zur Person
@@ -11946,6 +11961,40 @@ de: Seiten mit dieser Galerie
 en: pages where this gallery appears
 fr: pages où cette galerie apparaît
 
+    gallery editor
+af: interaktiewe galerie-redigeerder
+bg: редактор на интерактивни галерии
+br: kizellerez galeriioù etrekwezhiat
+ca: editor de galeries interactives
+co: editore di gallerie interattive
+cs: editor interaktivních galerií
+da: editor for interaktive gallerier
+de: Editor für interaktive Galerien
+en: interactive gallery editor
+eo: redaktilo de interagaj galerioj
+es: editor de galerías interactivas
+et: interaktiivsete galeriide redaktor
+fi: interaktiivisten gallerioiden editori
+fr: éditeur de galeries interactives
+he: עורך גלריות אינטראקטיביות
+is: ritill fyrir gagnvirk myndasöfn
+it: editor di gallerie interattive
+lt: interaktyvių galerijų redaktorius
+lv: interaktīvo galeriju redaktors
+nl: editor voor interactieve galerijen
+no: editor for interaktive gallerier
+oc: editor de galariás interactives
+pl: edytor interaktywnych galerii
+pt: editor de galerias interativas
+pt-br: editor de galerias interativas
+ro: editor de galerii interactive
+ru: редактор интерактивных галерей
+sk: editor interaktívnych galérií
+sl: urejevalnik interaktivnih galerij
+sv: redigerare för interaktiva gallerier
+tr: etkileşimli galeri düzenleyicisi
+zh: 交互式图库编辑器
+
     gallery index
 co: indice di a galleria
 de: Galerieübersicht
@@ -11993,6 +12042,11 @@ sk: spojené stránky
 sl: povezane strani
 sv: länkade sidor
 tr: bağlantılı sayfalar
+
+    list/add images from directory
+de: alle Bilder aus diesem Verzeichnis auflisten/alle Bilder aus diesem Verzeichnis zur aktuellen Galerie hinzufügen
+en: list all images from this directory/add all images from this directory to current gallery
+fr: lister toutes les images de ce répertoire/ajouter toutes les images de ce répertoire à la galerie courante
 
     list eclair
 co: lista rapida
@@ -16450,41 +16504,6 @@ sl: prikaži naključnega posameznika
 sv: visa en slumpmässig individ
 tr: rastgele bir bireyi göster
 zh: 显示随机个体
-
-    reactive image map editor
-af: redigeerder van reaktiewe beeldkaarte
-bg: редактор на интерактивни картографски изображения
-br: kizellerez kartenn skeudennoù kenwerzhel
-ca: editor de mapes d'imatges reactives
-co: editore di cartugrafia di fiura reattiva
-cs: editor map reaktivních obrázků
-da: editor for reaktive billedkort
-de: Editor für interaktive Bildkarten
-en: reactive image map editor
-eo: redaktilo de reagaj bildmapoj
-es: editor de mapas de imágenes reactivas
-et: reaktiivsete pildikaartide redaktor
-fi: reaktiivisten kuvakarttojen editori
-fr: éditeur de carte d’image réactive
-he: עורך מפת תמונה אינטראקטיבית
-is: ritill fyrir viðbragðskortamyndir
-it: editor di mappe di immagini reattive
-lt: reaguojančių vaizdo žemėlapių redaktorius
-lv: interaktīvo attēlu karšu redaktors
-nl: editor voor reactieve afbeeldingskaarten
-no: editor for reaktive bildekart
-oc: editor de mapas d’imatges reactivas
-pl: edytor map obrazów reaktywnych
-pt: editor de mapas de imagens reativas
-pt-br: editor de mapas de imagens reativas
-ro: editor de hărți de imagini reactive
-ru: редактор интерактивных карт изображений
-sk: editor máp reaktívnych obrázkov
-sl: urejevalnik odzivnih slikovnih kart
-sv: redigerare för reaktiva bildkartor
-tr: reaktif resim haritası düzenleyicisi
-zh: 响应式图像地图编辑器
-
 
     recensement
 co: censimentu

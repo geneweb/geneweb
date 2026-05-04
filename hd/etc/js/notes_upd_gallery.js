@@ -40,6 +40,7 @@ const get = Utils.get;
 
 // Creates new row in map table and adds corresponding area and legend elements
 function addNewArea(x1, y1, x2, y2) {
+    if (!table) return;
     if (x2 - x1 > 5 && y2 - y1 > 5) {
         x1 = parseFloat(x1.toFixed(2));
         y1 = parseFloat(y1.toFixed(2));
@@ -556,6 +557,7 @@ function bindLegendKeyboardNavigation() {
 
 // Optimize updateLegendLinks with batched DOM updates
 const updateLegendLinks = () => {
+    if (!table) return;
     table.rows().every(function(rowIdx) {
         const rowData = this.data();
         const row = this.node();
@@ -599,12 +601,12 @@ function generateGwSyntax(data) {
            (txt ? '/' + data.fn + ' ' + data.sn : '') + ']]';
 }
 
-
 // Handles row reordering in the data table, ensuring consistency between
 // table data, DOM elements, and visual elements (areas, legends).
 // DataTables returns a diff array with cascading position changes; we only
 // process the specifically dragged row (edit.triggerRow).
 function handleAreaReorder(event, diff, edit) {
+    if (!table) return;
     if (!diff.length) return;
 
     const currentData = table.rows().data().toArray();
@@ -1231,13 +1233,21 @@ function toggleTables(show) {
 
 // Initialize both data tables with proper error handling and state management
 function initTables() {
-    const isNew = new URLSearchParams(window.location.search).has('new');
+    const params = new URLSearchParams(window.location.search);
+    const isNew = params.has('new');
+    const seedSrc = params.get('src');
     // MD5("") matches Mutil.digest "" used server-side for new-note digest check
     const source = isNew
         ? Promise.resolve({
             digest: 'd41d8cd98f00b204e9800998ecf8427e',
-            r: { title: '', chronicle: '', images: [] }
-          })
+            r: {
+                title: '',
+                chronicle: '',
+                images: seedSrc
+                    ? [{ img: seedSrc, desc: '', map: [], groups: [] }]
+                    : []
+            }
+        })
         : fetch(GW.url + '&ajax=on').then(r => r.json());
     source
         .then(json => {
@@ -1249,8 +1259,10 @@ function initTables() {
             const digestEl = document.getElementById('digest');
             if (digestEl) digestEl.value = json.digest;
 
-            if (json.r?.images) {
+            if (json.r?.images?.length) {
                 albumImages = json.r.images;
+            } else if (json.r?.images) {
+                albumImages = [{ img: '', desc: '', map: [], groups: [] }];
             } else if (json.r) {
                 albumImages = [{
                     img: json.r.img || '',
@@ -1258,6 +1270,8 @@ function initTables() {
                     map: json.r.map || [],
                     groups: json.r.groups || []
                 }];
+            } else {
+                albumImages = [{ img: '', desc: '', map: [], groups: [] }];
             }
 
             const p = new URLSearchParams(window.location.search);
@@ -1501,6 +1515,8 @@ function initTables() {
 
             // Initialize all event handlers after tables are ready
             initializeHandlers();
+            // Init Tom Select picker now that albumImages is populated
+            initFnameSelect();
         })
         .catch(error => {
             console.error('Error fetching table data:', error);
@@ -1545,8 +1561,9 @@ function resetButtonHandler() {
 }
 
 function saveAlbumCurrent() {
+    const cur = albumImages[albumCurrent] || { img: '', map: [], groups: [] };
     albumImages[albumCurrent] = {
-        img:    document.getElementById('fname')?.value || '',
+        img:    cur.img || '',
         desc:   document.getElementById('page_desc')?.value || '',
         map:    cleanMapEntries(),
         groups: currentGroups()
@@ -1556,7 +1573,10 @@ function saveAlbumCurrent() {
 function fnameSet(value) {
     if (!fnameTS) {
         const el = document.getElementById('fname');
-        if (el) el.value = value || '';
+        if (el) {
+            el.value = value || '';
+            el.dispatchEvent(new Event('change'));
+        }
         return;
     }
     if (!value) { fnameTS.clear(true); return; }
@@ -1567,73 +1587,80 @@ function fnameSet(value) {
 }
 
 function loadAlbumImage(index) {
-    albumCurrent = index;
-    const imgData = albumImages[index] || { img: '', map: [], groups: [] };
+    restoringSelection = true;
+    try {
+        albumCurrent = index;
+        const imgData = albumImages[index] || { img: '', map: [], groups: [] };
 
-    // Clear current state
-    table.clear();
-    groupTable.clear();
-    ['map', 'ul_legend', 'ul_groups_legend'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.innerHTML = '';
-    });
-    currentAreaCount = 0;
+        if (table) table.clear();
+        if (groupTable) groupTable.clear();
+        ['map', 'ul_legend', 'ul_groups_legend'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.innerHTML = '';
+        });
+        currentAreaCount = 0;
 
-    // Reload map data
-    if (imgData.map?.length) table.rows.add(imgData.map);
-    table.draw(false);
-    if (imgData.groups?.length) groupTable.rows.add(imgData.groups);
-    groupTable.draw(false);
-    updateGroupsLegend();
+        if (table) {
+            if (imgData.map?.length) table.rows.add(imgData.map);
+            table.draw(false);
+        }
+        if (groupTable) {
+            if (imgData.groups?.length) groupTable.rows.add(imgData.groups);
+            groupTable.draw(false);
+        }
+        updateGroupsLegend();
 
-    // Update filename and load image
-    fnameSet(imgData.img);
-    const descEl = document.getElementById('page_desc');
-    if (descEl) descEl.value = imgData.desc || '';
+        // Update filename and load image
+        fnameSet(imgData.img);
+        const descEl = document.getElementById('page_desc');
+        if (descEl) descEl.value = imgData.desc || '';
 
-    const imgEl = document.getElementById('image');
-    const frameEl = document.getElementById('frame');
+        const imgEl = document.getElementById('image');
+        const frameEl = document.getElementById('frame');
 
-    if (imgData.img) {
-        const src = imgData.img.startsWith('albums/')
-            ? GW.prefix + 'm=IMA&s=' + encodeURI(imgData.img.substring(7))
-            : GW.prefix + 'm=DOC&s=' + encodeURI(imgData.img);
-        // Clear previous image immediately to prevent bleed-through on 404
-        imgEl.src = '';
-        imgEl.hidden = false;
-        // Attach listener BEFORE setting src to catch cached-image synchronous load
-        imgEl.addEventListener('load', function onLoad() {
-            const w = imgEl.width, h = imgEl.height;
-            requestAnimationFrame(() => {
-                if (frameEl) {
-                    frameEl.style.display = '';
-                    frameEl.style.width = w + 'px';
-                    frameEl.style.height = h + 'px';
-                    const legendContainer = frameEl.closest('#div_img_legend');
-                    if (legendContainer) legendContainer.style.width = w + 'px';
-                }
-                maphilight(imgEl, MAPHILIGHT_CONFIG);
-            });
-        }, { once: true });
-        imgEl.onerror = () => {
+        if (imgData.img) {
+            const src = imgData.img.startsWith('albums/')
+                ? GW.prefix + 'm=IMA&s=' + encodeURI(imgData.img.substring(7))
+                : GW.prefix + 'm=DOC&s=' + encodeURI(imgData.img);
+            // Clear previous image immediately to prevent bleed-through on 404
+            imgEl.src = '';
+            imgEl.hidden = false;
+            // Attach listener BEFORE setting src to catch cached-image synchronous load
+            imgEl.addEventListener('load', function onLoad() {
+                const w = imgEl.width, h = imgEl.height;
+                requestAnimationFrame(() => {
+                    if (frameEl) {
+                        frameEl.style.display = '';
+                        frameEl.style.width = w + 'px';
+                        frameEl.style.height = h + 'px';
+                        const legendContainer = frameEl.closest('#div_img_legend');
+                        if (legendContainer) legendContainer.style.width = w + 'px';
+                    }
+                    maphilight(imgEl, MAPHILIGHT_CONFIG);
+                });
+            }, { once: true });
+            imgEl.onerror = () => {
+                imgEl.src = '';
+                imgEl.hidden = true;
+                if (frameEl) frameEl.style.display = 'none';
+                toggleTables(false);
+                imgEl.onerror = null;
+            };
+            imgEl.src = src;   // set LAST
+            toggleTables(true);
+        } else {
+            imgEl.onerror = null;
             imgEl.src = '';
             imgEl.hidden = true;
             if (frameEl) frameEl.style.display = 'none';
             toggleTables(false);
-            imgEl.onerror = null;
-        };
-        imgEl.src = src;   // set LAST
-        toggleTables(true);
-    } else {
-        imgEl.onerror = null;
-        imgEl.src = '';
-        imgEl.hidden = true;
-        if (frameEl) frameEl.style.display = 'none';
-        toggleTables(false);
+        }
+        updateAlbumNav();
+        const u = new URL(window.location);
+        u.searchParams.set('img', index + 1);
+        history.replaceState(null, '', u);
+    } finally {
+        restoringSelection = false;
     }
-    updateAlbumNav();
-    const u = new URL(window.location);
-    u.searchParams.set('img', index + 1);
-    history.replaceState(null, '', u);
 }
 
 function updateAlbumNav() {
@@ -1723,50 +1750,391 @@ function initAlbumHandlers() {
     });
 }
 
+function renderTomOption(data, escape) {
+    const isFolder = data.kind === 'folder';
+    const isOpen = data.expanded === true;
+    const indent = data.indent ? 'ms-4' : '';
+    let icon;
+    let title = '';
+    if (isFolder) {
+        if (isOpen) {
+            icon = '<i class="fa-solid fa-folder-open text-warning me-2"></i>';
+            title = ' title="' + escape(GW.i18n?.addImagesDir || '') + '"';
+        } else {
+            icon = '<i class="fa-solid fa-folder text-body-secondary me-2"></i>';
+            title = ' title="' + escape(GW.i18n?.listImagesDir || '') + '"';
+        }
+    } else {
+        icon = '<i class="fa-regular fa-image text-body-secondary me-2"></i>';
+    }
+    return '<div class="' + indent + '"' + title + '>'
+        + icon + escape(data.text) + '</div>';
+}
+
+function confirmModal(message) {
+    return new Promise(resolve => {
+        const modalEl = document.getElementById('confirm_import_modal');
+        if (!modalEl) {
+            // fallback
+            resolve(confirm(message));
+            return;
+        }
+        document.getElementById('confirm_import_message').textContent = message;
+        const okBtn = document.getElementById('confirm_import_ok');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        let resolved = false;
+        const onOk = () => {
+            resolved = true;
+            modal.hide();
+            resolve(true);
+        };
+        const onHidden = () => {
+            okBtn.removeEventListener('click', onOk);
+            modalEl.removeEventListener('hidden.bs.modal', onHidden);
+            if (!resolved) resolve(false);
+        };
+        okBtn.addEventListener('click', onOk);
+        modalEl.addEventListener('hidden.bs.modal', onHidden);
+        modal.show();
+    });
+}
+
+function importFolderEntries(opt) {
+    const children = Object.values(fnameTS.options)
+        .filter(o => o.parentFolder === opt.value && o.kind === 'image');
+    if (!children.length) return;
+    const n = children.length;
+    const msg = (GW.i18n?.confirmImportFolder
+        || 'Import {n} images from "{f}"?')
+        .replace('{n}', n)
+        .replace('{f}', opt.text);
+    confirmModal(msg).then(ok => {
+        if (!ok) return;
+        const paths = children.map(o => imagePathFor(o));
+        insertImagesAfterCurrent(paths);
+        updateStatus('Added ' + n + ' image(s) from "' + opt.text + '"');
+        fnameTS.blur();
+    });
+}
+
+function expandFolder(opt) {
+    let url;
+    if (opt.optgroup === 'keys') {
+        url = GW.prefix + 'm=LIST_IMAGES&src=key'
+            + '&p=' + encodeURIComponent(opt.keyData.fn)
+            + '&n=' + encodeURIComponent(opt.keyData.sn)
+            + '&oc=' + encodeURIComponent(opt.keyData.oc);
+    } else {
+        url = GW.prefix + 'm=LIST_IMAGES&src=albums'
+            + '&dir=' + encodeURIComponent(opt.value);
+    }
+
+    fetch(url)
+        .then(r => r.json())
+        .then(arr => {
+            const entry = Array.isArray(arr) ? arr[0] : null;
+            if (!entry) return;
+            const files = entry.files || [];
+            if (!files.length && !(entry.subdirs || []).length) {
+                updateStatus('Empty folder: ' + opt.text);
+                return;
+            }
+            // Mark folder expanded (icon swap)
+            fnameTS.updateOption(opt.value, { ...opt, expanded: true });
+
+            files.forEach((f, i) => {
+                const childValue = (opt.optgroup === 'keys')
+                    ? entry.key + '/' + f
+                    : opt.value + '/' + f;
+                if (!fnameTS.options[childValue]) {
+                    fnameTS.addOption({
+                        value: childValue,
+                        text: f,
+                        optgroup: opt.optgroup,
+                        kind: 'image',
+                        indent: true,
+                        parentFolder: opt.value,
+                        sortOrder: opt.sortOrder + 0.001 * (i + 1)
+                    });
+                }
+            });
+
+            (entry.subdirs || []).forEach((sub, i) => {
+                const subValue = opt.optgroup === 'keys'
+                    ? 'keysub:' + opt.keyData.key + '/' + sub.name
+                    : opt.value + '/' + sub.name;
+                if (!fnameTS.options[subValue]) {
+                    fnameTS.addOption({
+                        value: subValue,
+                        text: sub.name,
+                        optgroup: opt.optgroup,
+                        kind: 'folder',
+                        indent: true,
+                        parentFolder: opt.value,
+                        keyData: opt.keyData,
+                        subdirOf: opt.value,
+                        sortOrder: opt.sortOrder + 0.0005 * (i + 1)
+                    });
+                }
+            });
+
+            // Force dropdown re-render with new options visible
+            fnameTS.clearCache();
+            fnameTS.close();
+            fnameTS.open();
+        })
+        .catch(err => updateStatus('Error: ' + err.message));
+}
+
+let restoringSelection = false;
+
+let pendingImageAdds = [];
+
+function handleTomItemRemove(value) {
+    const opt = fnameTS.options[value];
+    if (!opt) return;
+    const path = imagePathFor(opt);
+    const idx = pendingImageAdds.indexOf(path);
+    if (idx >= 0) pendingImageAdds.splice(idx, 1);
+}
+
+function handleTomItemAdd(value) {
+    if (restoringSelection) return;
+    const opt = fnameTS.options[value];
+    if (!opt) return;
+    if (opt.kind === 'folder') {
+        if (!opt.expanded) {
+            expandFolder(opt);
+        } else {
+            importFolderEntries(opt);
+        }
+        fnameTS.removeItem(value, true);
+        return;
+    }
+    const path = imagePathFor(opt);
+    if (!pendingImageAdds.includes(path)) {
+        pendingImageAdds.push(path);
+    }
+}
+
+function onDropdownClose() {
+    // Capture user intent before flushing
+    const tagsBeforeFlush = fnameTS.items.slice();
+    const curBefore = albumImages[albumCurrent];
+    const userClearedCurrent =
+        curBefore && curBefore.img &&
+        !tagsBeforeFlush.includes(curBefore.img) &&
+        pendingImageAdds.length === 0;
+
+    flushPendingAdds();
+
+    restoringSelection = true;
+    try {
+        fnameTS.clear(true);
+        if (userClearedCurrent) {
+            // User explicitly removed the current image's tag and added
+            // nothing: clear albumImages[albumCurrent].img too
+            albumImages[albumCurrent] = albumImages[albumCurrent] || {};
+            albumImages[albumCurrent].img = '';
+            loadAlbumImage(albumCurrent);
+        } else {
+            // Restore tag for the (possibly new) current image
+            const cur = albumImages[albumCurrent];
+            if (cur && cur.img) {
+                if (!fnameTS.options[cur.img]) {
+                    fnameTS.addOption({
+                        value: cur.img,
+                        text: cur.img.split('/').pop(),
+                        optgroup: 'images',
+                        kind: 'image'
+                    });
+                }
+                fnameTS.setValue(cur.img, true);
+            }
+        }
+    } finally {
+        restoringSelection = false;
+    }
+}
+
+function flushPendingAdds() {
+    if (!pendingImageAdds.length) return;
+    let paths = pendingImageAdds.slice();
+    pendingImageAdds = [];
+
+    // Drop the current image if user re-selected it (no-op intent)
+    const cur = albumImages[albumCurrent];
+    if (cur && cur.img) {
+        paths = paths.filter(p => p !== cur.img);
+    }
+    if (!paths.length) return;
+
+    if (!cur || !cur.img) {
+        const first = paths.shift();
+        albumImages[albumCurrent] = albumImages[albumCurrent]
+            || { img: '', desc: '', map: [], groups: [] };
+        albumImages[albumCurrent].img = first;
+        loadAlbumImage(albumCurrent);
+        if (paths.length) {
+            insertImagesAfterCurrent(paths);
+        }
+    } else {
+        insertImagesAfterCurrent(paths);
+    }
+}
+
+function imagePathFor(opt) {
+    // For a child image option, the value is "<parentFolder>/<filename>"
+    // For an album folder: "albums/<dir>/<filename>"
+    // For a key folder:    "<key>/<filename>"
+    if (opt.optgroup === 'folders' && !opt.parentFolder) {
+        // Plain image at root
+        return opt.value;
+    }
+    if (opt.optgroup === 'keys' && opt.kind === 'image') {
+        return opt.value; // already "<key>/<filename>"
+    }
+    if (opt.optgroup === 'folders' && opt.kind === 'image') {
+        return 'albums/' + opt.value;
+    }
+    return opt.value;
+}
+
+function insertImagesAfterCurrent(paths) {
+    const newEntries = paths.map(p =>
+        ({ img: p, desc: '', map: [], groups: [] }));
+    const cur = albumImages[albumCurrent];
+    if (!cur || !cur.img) {
+        albumImages.splice(albumCurrent, 1, ...newEntries);
+        if (albumCurrent >= albumImages.length) {
+            albumCurrent = albumImages.length - 1;
+        }
+        loadAlbumImage(albumCurrent);
+    } else {
+        saveAlbumCurrent();
+        const insertAt = albumCurrent + 1;
+        albumImages.splice(insertAt, 0, ...newEntries);
+        loadAlbumImage(insertAt);
+    }
+}
+
 function initFnameSelect() {
     const fnameEl = document.getElementById('fname');
-    if (!fnameEl || typeof TomSelect === 'undefined') return;
+    if (!fnameEl) return;
+    if (typeof TomSelect === 'undefined') {
+        console.warn('TomSelect not loaded; gallery filename picker disabled');
+        return;
+    }
 
-    const buildOpts = (listId, optgroup) =>
+    const buildOptsFromDatalist = (listId, optgroup) =>
         [...document.querySelectorAll('#' + listId + ' option')]
-            .map(o => ({ value: o.value, text: o.value, optgroup }));
+            .map(o => ({
+                value: o.value,
+                text: o.value,
+                optgroup,
+                kind: optgroup === 'folders' ? 'folder' : 'image'
+            }));
 
-    const folderOpts = buildOpts('src_albums', 'folders');
-    const imageOpts = buildOpts('src_images', 'images');
+    const folderOpts = buildOptsFromDatalist('src_albums', 'folders');
+    const imageOpts = buildOptsFromDatalist('src_images', 'images');
 
-    fnameTS = new TomSelect(fnameEl, {
-        options: [...folderOpts, ...imageOpts],
-        optgroups: [
-            { value: 'folders', label: GW.i18n?.folders || 'folders' },
-            { value: 'images', label: GW.i18n?.images || 'images' }
-        ],
-        optgroupField: 'optgroup',
-        labelField: 'text',
-        valueField: 'value',
-        searchField: ['text'],
-        create: true,
-        maxItems: 1,
-        hideSelected: true,
-        placeholder: fnameEl.placeholder,
-        render: {
-            option: (data, escape) => {
-                const icon = data.optgroup === 'folders'
-                    ? '<i class="fa-solid fa-folder text-body-secondary me-1"></i>'
-                    : '<i class="fa-regular fa-image text-body-secondary me-1"></i>';
-                return '<div>' + icon + escape(data.text) + '</div>';
+    // Build batch query for already-known keys
+    const seenKeys = new Set();
+    const rawKeys = [];
+    if (Array.isArray(albumImages)) {
+        albumImages.forEach(img => {
+            (img.map || []).forEach(m => {
+                if ((!m.t || m.t === 'p') && m.fn && m.sn) {
+                    const oc = m.oc || '0';
+                    const id = m.fn + '|' + m.sn + '|' + oc;
+                    if (seenKeys.has(id)) return;
+                    seenKeys.add(id);
+                    rawKeys.push(m.fn + '.' + oc + '.' + m.sn);
+                }
+            });
+        });
+    }
+
+    const keyOptsPromise = rawKeys.length
+        ? fetch(GW.prefix + 'm=PNOC_LOOKUP&keys=' +
+                encodeURIComponent(rawKeys.join(';')))
+            .then(r => r.json())
+            .then(arr => arr
+                .filter(p => p.has_keydir)
+                .map(p => ({
+                    value: 'key:' + p.key,
+                    text: p.label,
+                    optgroup: 'keys',
+                    kind: 'folder',
+                    keyData: { key: p.key, label: p.label,
+                               fn: p.fn, sn: p.sn, oc: String(p.oc || 0) }
+                })))
+            .catch(() => [])
+        : Promise.resolve([]);
+
+    keyOptsPromise.then(keyOpts => {
+        const allOpts = [...keyOpts, ...folderOpts, ...imageOpts]
+            .map((o, i) => ({ ...o, sortOrder: i }));
+
+        fnameTS = new TomSelect(fnameEl, {
+            options: allOpts,
+            optgroups: [
+                { value: 'keys',    label: GW.i18n?.keyDirs || 'Individual images' },
+                { value: 'folders', label: GW.i18n?.folders   || 'Folders'    },
+                { value: 'images',  label: GW.i18n?.images    || 'Images'     }
+            ],
+            optgroupField: 'optgroup',
+            labelField: 'text',
+            valueField: 'value',
+            searchField: ['text'],
+            sortField: { field: 'sortOrder', direction: 'asc' },
+            create: true,
+            maxItems: null,
+            plugins: ['remove_button'],
+            hideSelected: false,
+            persist: false,
+            placeholder: fnameEl.placeholder,
+            render: {
+                option: renderTomOption,
+                item: (data, escape) => {
+                    // Tag affiché après sélection : toujours le chemin complet
+                    const path = data.kind === 'image' && data.parentFolder
+                        ? (data.optgroup === 'folders'
+                            ? 'albums/' + data.value
+                            : data.value)
+                        : data.value;
+                    return '<div>' + escape(path) + '</div>';
+                },
+                option_create: (data, escape) =>
+                    '<div class="create">'
+                    + (GW.i18n.addItem || 'Add') + ' <strong>'
+                    + escape(data.input) + '</strong>&hellip;</div>',
+                no_results: () =>
+                    '<div class="no-results">'
+                    + (GW.i18n.noResult || 'No results') + '</div>'
             },
-            option_create: (data, escape) =>
-                '<div class="create">' +
-                (GW.i18n.addItem || 'Add') + ' <strong>' +
-                escape(data.input) + '</strong>&hellip;</div>',
-            no_results: () =>
-                '<div class="no-results">' +
-                (GW.i18n.noResult || 'No results found') + '</div>'
-        },
-        onItemAdd: (value) => {
-            const opt = fnameTS.options[value];
-            if (opt?.optgroup === 'folders') importFolder(value);
+            onItemAdd: handleTomItemAdd,
+            onItemRemove: handleTomItemRemove
+        });
+        
+        fnameTS.on('dropdown_close', onDropdownClose);
+        
+        const cur = albumImages[albumCurrent];
+        if (cur && cur.img) {
+            if (!fnameTS.options[cur.img]) {
+                fnameTS.addOption({
+                    value: cur.img,
+                    text: cur.img.split('/').pop(),
+                    optgroup: 'images',
+                    kind: 'image'
+                });
+            }
+            restoringSelection = true;
+            fnameTS.setValue(cur.img, true);
+            restoringSelection = false;
         }
+        
+        initAddKeyUi();
     });
 }
 
@@ -1778,7 +2146,8 @@ function importFolder(folder) {
             return r.json();
         })
         .then(files => {
-            if (!Array.isArray(files) || !files.length) {
+            files = Array.isArray(files) ? files : (files?.images || []);
+            if (!files.length) {
                 updateStatus('No images found in folder: ' + folder);
                 fnameTS?.clear(true);
                 return;
@@ -1786,8 +2155,13 @@ function importFolder(folder) {
             fnameTS?.clear(true);
             const newEntries = files.map(f =>
                 ({ img: f, desc: '', map: [], groups: [] }));
-            if (!albumImages[albumCurrent].img) {
+
+            const cur = albumImages[albumCurrent];
+            if (!cur || !cur.img) {
                 albumImages.splice(albumCurrent, 1, ...newEntries);
+                if (albumCurrent >= albumImages.length) {
+                    albumCurrent = albumImages.length - 1;
+                }
                 loadAlbumImage(albumCurrent);
             } else {
                 saveAlbumCurrent();
@@ -1803,6 +2177,7 @@ function importFolder(folder) {
 }
 
 function cleanMapEntries() {
+    if (!table) return [];
     return table.rows().data().toArray().map(item => {
         const clean = {};
         if (item.shape)  clean.shape  = item.shape;
@@ -1830,6 +2205,7 @@ function cleanMapEntries() {
 }
 
 function currentGroups() {
+    if (!groupTable) return [];
     return groupTable.rows().data().toArray().map((g, i) => ({
         name: i + 1,
         label: g.label
@@ -1844,11 +2220,12 @@ function setupFormHandler() {
     const form = document.getElementById('form');
     if (!form) return;
     form.addEventListener('submit', () => {
+        if (typeof table !== 'undefined' && table) saveAlbumCurrent();
+        flushPendingAdds();
         const fnameInput = document.getElementById('fnotes_name');
         const title = document.getElementById('page_title')?.value
             || fnameInput?.value
-            || '…';
-        if (typeof table !== 'undefined' && table) saveAlbumCurrent();
+            || '';
         const chronicle =
             document.getElementById('album_chronicle')?.value || '';
         const images = Array.isArray(albumImages) ? albumImages : [];
@@ -1858,9 +2235,10 @@ function setupFormHandler() {
             .replace(/\}\]/g, '}\n]')
             .replace(/\}\,\{/g, '},\n  {');
         const notesEl = document.getElementById('notes');
-        if (notesEl) {
+        const titleHeader = title ? 'TITLE=' + title + '\n' : '';
+        if (notesEl) { 
             notesEl.value =
-                'TITLE=' + title + '\nTYPE=gallery\n' + jsonString;
+                titleHeader + 'TYPE=gallery\n' + jsonString;
         }
         const newFEl = document.getElementById('new_f');
         if (newFEl && fnameInput) {
@@ -1919,6 +2297,9 @@ const HandlerManager = {
     imageChange: function() {
         // `this` is the #fname input (addEventListener binds it)
         const fname = this.value;
+        // Tom Select serializes multi-select as CSV in the native input;
+        // skip these transient states (filenames don't contain commas)
+        if (fname.indexOf(',') >= 0) return;
         if (!fname) {
             const frame = document.getElementById('frame');
             if (frame) frame.style.display = 'none';
@@ -1961,9 +2342,10 @@ function populateReorderModal() {
     const tbody = document.querySelector('#reorder_table tbody');
     tbody.innerHTML = '';
     albumImages.forEach((img, i) => {
-        const thumbSrc = img.img.startsWith('albums/')
-            ? GW.prefix + 'm=IMA&s=' + encodeURI(img.img.substring(7))
-            : GW.prefix + 'm=DOC&s=' + encodeURI(img.img);
+        const imgPath = img.img || '';
+        const thumbSrc = imgPath.startsWith('albums/')
+            ? GW.prefix + 'm=IMA&s=' + encodeURI(imgPath.substring(7))
+            : GW.prefix + 'm=DOC&s=' + encodeURI(imgPath);
         tbody.insertAdjacentHTML('beforeend', `
             <tr data-idx="${i}">
               <td class="text-nowrap reorder-btns align-middle">
@@ -2049,14 +2431,94 @@ function validateRow(tr, data, opts) {
     const sig = data.fn + '|' + data.sn + '|' + (data.oc || '0');
     if (tr.dataset.pnocChecked === sig) return Promise.resolve();
     return PersonPicker.checkExact(data.fn, data.sn, data.oc || 0)
-        .then(ok => {
+        .then(p => {
+            const ok = !!p;
             tr.dataset.pnocChecked = sig;
             tr.classList.toggle('row-invalid', !ok);
-            if (ok && opts && opts.flash) {
-                tr.classList.add('row-valid-flash');
-                setTimeout(() => tr.classList.remove('row-valid-flash'), 900);
+            if (ok) {
+                addKeyToPicker(p);
+                if (opts && opts.flash) {
+                    tr.classList.add('row-valid-flash');
+                    setTimeout(() => tr.classList.remove('row-valid-flash'), 900);
+                }
             }
         });
+}
+
+function addKeyToPicker(person) {
+    if (!fnameTS || !person || !person.key) return;
+    if (!person.has_keydir) {
+      updateStatus('No key directory: ' + (person.label || person.key));
+      return;
+    }
+    const value = 'key:' + person.key;
+    if (fnameTS.options[value]) return;
+    const maxSort = Math.max(0, ...Object.values(fnameTS.options)
+        .filter(o => o.optgroup === 'keys')
+        .map(o => o.sortOrder || 0));
+    fnameTS.addOption({
+        value,
+        text: person.label || person.key,
+        optgroup: 'keys',
+        kind: 'folder',
+        keyData: {
+            key: person.key,
+            label: person.label,
+            fn: person.fn,
+            sn: person.sn,
+            oc: String(person.oc || 0)
+        },
+        sortOrder: maxSort + 0.5
+    });
+}
+
+function initAddKeyUi() {
+    const toggle = document.getElementById('add_key_btn');
+    const inline = document.getElementById('add_key_inline');
+    const input = document.getElementById('add_key_input');
+    const validateBtn = document.getElementById('add_key_validate');
+    if (!toggle || !inline || !input || !validateBtn) return;
+
+    toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        const showing = !inline.classList.contains('d-none');
+        if (showing) {
+            inline.classList.add('d-none');
+            validateBtn.classList.add('d-none');
+            input.value = '';
+            input.classList.remove('row-invalid');
+            validateBtn.disabled = true;
+        } else {
+            inline.classList.remove('d-none');
+            validateBtn.classList.remove('d-none');
+            input.focus();
+        }
+    });
+
+    PersonPicker.bindInput(input);
+
+    input.addEventListener('input', () => {
+        const k = PersonPicker.parseGeneWebKey(input.value);
+        validateBtn.disabled = !(k && k.fn && k.sn);
+    });
+
+    validateBtn.addEventListener('click', () => {
+        const k = PersonPicker.parseGeneWebKey(input.value);
+        if (!k || !k.fn || !k.sn) return;
+        PersonPicker.checkExact(k.fn, k.sn, k.oc || 0).then(p => {
+            if (!p) {
+                input.classList.add('row-invalid');
+                return;
+            }
+            addKeyToPicker(p);
+            input.value = '';
+            input.classList.remove('row-invalid');
+            validateBtn.disabled = true;
+            inline.classList.add('d-none');
+            validateBtn.classList.add('d-none');
+            fnameTS?.open();
+        });
+    });
 }
 
 function validateAllPnocs() {
@@ -2074,7 +2536,6 @@ document.addEventListener('DOMContentLoaded', () => {
     UIManager.init();
     setupFormHandler();
     resetButtonHandler();
-    initFnameSelect();
 
     if (typeof addClearButtonToInputs === 'function') addClearButtonToInputs();
     if (typeof inputToBook !== 'undefined' && inputToBook.addNavigation) {

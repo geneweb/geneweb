@@ -377,7 +377,10 @@
               <i class="far fa-file-image fa-fw text-primary"></i></a>
             <a href="%prefix;m=IMAGE_TO_BLASON&i=%index;&mode=blasons&file_name=%carrousel_img;"
               title="[*copy image to blason]">
-              <i class="fa fa-user-shield text-success"></i></a>
+              <i class="fa fa-user-shield fa-xs text-success me-1"></i></a>
+            <a href="%prefix;m=MOD_GALLERY&new&src=%keydir;/%carrousel_img;"
+              title="[*create gallery]2">
+               <i class="fa-regular fa-images fa-xs text-info"></i></a>
             <samp class="text-truncate ms-1" title="%images_store;%X;%carrousel;%X;%carrousel_img_raw;">%carrousel_img_raw;</samp>
             <div class="ms-auto">
               <a role="button"
