@@ -246,21 +246,26 @@ let print_what_links conf base fnotes =
   Option.iter (print_linked_list conf base) (List.assoc_opt fnotes db);
   Hutil.trailer conf
 
+let canonical_urls ~conf query_params =
+  ( Page.Family_book.canonical_url ~conf query_params,
+    Page.Family_book.alternate_urls ~conf query_params )
+
 let print conf base =
-  let fnotes =
-    match Util.p_getenv conf.Config.env "f" with
-    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
-    | None -> ""
-  in
-  match Util.p_getenv conf.Config.env "ref" with
-  | Some "on" -> print_what_links conf base fnotes
-  | _ -> (
-      let nenv, s = Notes.read_notes base fnotes in
-      let title = Option.value (List.assoc_opt "TITLE" nenv) ~default:"" in
-      let title = Util.safe_html title in
-      match Util.p_getint conf.Config.env "v" with
-      | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-      | None -> print_whole_notes conf base fnotes title s None)
+  let query_params = Page.Family_book.Query_params.from_env conf.Config.env in
+  let fnotes = Option.value ~default:"" query_params.page in
+  if query_params.only_references then print_what_links conf base fnotes
+  else
+    let nenv, s = Notes.read_notes base fnotes in
+    let title = Option.value (List.assoc_opt "TITLE" nenv) ~default:"" in
+    let title = Util.safe_html title in
+    let () =
+      let conf = Config.Trimmed.from_config conf in
+      let canonical_url, alternate_urls = canonical_urls ~conf query_params in
+      Output.link_header ~alternate_urls conf canonical_url
+    in
+    match query_params.section with
+    | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+    | None -> print_whole_notes conf base fnotes title s None
 
 let print_mod conf base =
   let fnotes =
