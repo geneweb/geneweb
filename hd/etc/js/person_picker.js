@@ -27,10 +27,10 @@
     }
 
     function checkExact(fn, sn, oc) {
-        if (!fn || !sn) return Promise.resolve(false);
+        if (!fn || !sn) return Promise.resolve(null);
         return endpoint('exact=1&fn=' + encodeURIComponent(fn) +
             '&sn=' + encodeURIComponent(sn) + '&oc=' + (oc || 0))
-            .then(arr => arr.length > 0);
+            .then(arr => arr.length > 0 ? arr[0] : null);
     }
 
     function flashValid(el) {
@@ -105,7 +105,8 @@
             if (gate && gate.dataset.pnocChecked === sig) {
                 return Promise.resolve();
             }
-            return checkExact(f, s, o).then(ok => {
+            return checkExact(f, s, o).then(p => {
+                const ok = !!p;
                 if (gate) gate.dataset.pnocChecked = sig;
                 paint(ok ? (flash ? 'flash' : 'valid') : 'invalid');
             });
@@ -170,7 +171,8 @@
             }
             const sig = k.fn + '|' + k.sn + '|' + (k.oc || 0);
             if (el.dataset.pnocChecked === sig) return Promise.resolve();
-            return checkExact(k.fn, k.sn, k.oc || 0).then(ok => {
+            return checkExact(k.fn, k.sn, k.oc || 0).then(p => {
+                const ok = !!p;
                 el.dataset.pnocChecked = sig;
                 el.classList.toggle('row-invalid', !ok);
                 if (ok && flash) flashValid(el);
