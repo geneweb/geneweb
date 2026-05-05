@@ -573,15 +573,15 @@ let print_start conf base =
     in
     [ ("sosa_ref", Vsosa_ref sosa_ref_l) ]
   in
+  let trimmed_conf = Config.Trimmed.from_config conf in
   let canonical_url, alternate_urls =
-    let conf = Config.Trimmed.from_config conf in
     let query = [] in
-    ( Canonical_url.make ~conf ~query,
-      List.map (fun lang -> Localized_url.make ~conf ~lang ~query) Lang.all )
+    ( Canonical_url.make ~conf:trimmed_conf ~query,
+      List.map
+        (fun lang -> Localized_url.make ~conf:trimmed_conf ~lang ~query)
+        Lang.all )
   in
-  Output.link_header
-    (Config.Trimmed.from_config conf)
-    ~alternate_urls canonical_url;
+  Output.link_header trimmed_conf ~alternate_urls canonical_url;
   Hutil.interp conf "welcome"
     {
       Templ.eval_var = eval_var conf base;
