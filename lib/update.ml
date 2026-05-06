@@ -343,7 +343,7 @@ let string_of_error conf =
   | UERR_sex_undefined (f, s, o) ->
       Printf.sprintf
         (Util.fcapitale (Util.ftransl conf "undefined sex for %t"))
-        (fun _ -> (fso f s o :> string))
+        (fun () -> (fso f s o :> string))
       |> Adef.safe
   | UERR_unknow_person (f, s, o) ->
       let open Def in
@@ -355,11 +355,11 @@ let string_of_error conf =
          (Util.fcapitale
             (Util.ftransl conf "name %s already used by %tthis person%t"))
          ("\"" ^ (fso_p base p :> string) ^ "\"")
-         (fun _ ->
+         (fun () ->
            Printf.sprintf "<a href=\"%s%s\">"
              (Util.commd conf : Adef.escaped_string :> string)
              (Util.acces conf base p : Adef.escaped_string :> string))
-         (fun _ -> "</a>")
+         (fun () -> "</a>")
       ^
       if var = "" then "."
       else
@@ -393,7 +393,7 @@ let string_of_error conf =
   | UERR_already_has_parents (base, p) ->
       Printf.sprintf
         (Util.fcapitale (Util.ftransl conf "%t already has parents"))
-        (fun _ ->
+        (fun () ->
           (NameDisplay.referenced_person_text conf base p
             : Adef.safe_string
             :> string))
@@ -521,14 +521,14 @@ let print_warning conf base (w : Warning.base_warning) =
         (Util.fcapitale
            (Util.ftransl conf
               "the difference of age between %t and %t is quite important"))
-        (fun _ -> (someone_strong base p1 :> string))
-        (fun _ -> (someone_strong base p2 :> string));
+        (fun () -> (someone_strong base p1 :> string))
+        (fun () -> (someone_strong base p2 :> string));
       Output.print_sstring conf (Util.transl conf ":");
       Output.print_sstring conf " ";
       Output.print_string conf (DateDisplay.string_of_age conf a)
   | BirthAfterDeath p ->
       Output.printf conf (Util.ftransl conf "%t died before his/her birth")
-        (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+        (fun () -> (someone_strong_n_short_dates conf base p :> string))
   | ChangedOrderOfChildren (ifam, _, before, after) ->
       let cpl = Gwdb.foi base ifam in
       let fath = Gwdb.poi base (Gwdb.get_father cpl) in
@@ -565,9 +565,9 @@ let print_warning conf base (w : Warning.base_warning) =
         (Util.fcapitale
            (Util.ftransl conf
               "the following children of %t and %t are not in order"))
-        (fun _ ->
+        (fun () ->
           (someone_strong base (Gwdb.poi base (Gwdb.get_father cpl)) :> string))
-        (fun _ ->
+        (fun () ->
           (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl)) :> string));
       Output.print_sstring conf ":\n<ul><li>";
       print_first_name_strong conf base elder;
@@ -648,10 +648,10 @@ let print_warning conf base (w : Warning.base_warning) =
             (Util.fcapitale
                (Util.ftransl conf
                   "the following children of %t and %t are born very close"))
-            (fun _ ->
+            (fun () ->
               (someone_strong base (Gwdb.poi base (Gwdb.get_father cpl))
                 :> string))
-            (fun _ ->
+            (fun () ->
               (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl))
                 :> string))
         else
@@ -678,10 +678,10 @@ let print_warning conf base (w : Warning.base_warning) =
             (Util.fcapitale
                (Util.ftransl conf
                   "the following children of %t and %t are born very distant"))
-            (fun _ ->
+            (fun () ->
               (someone_strong base (Gwdb.poi base (Gwdb.get_father cpl))
                 :> string))
-            (fun _ ->
+            (fun () ->
               (someone_strong base (Gwdb.poi base (Gwdb.get_mother cpl))
                 :> string))
         else
@@ -713,31 +713,31 @@ let print_warning conf base (w : Warning.base_warning) =
       Output.printf conf
         (Util.ftransl conf
            "%t is born more than 2 years after the death of his/her father %t")
-        (fun _ -> (someone_strong_n_short_dates conf base child :> string))
-        (fun _ -> (someone_strong_n_short_dates conf base father :> string))
+        (fun () -> (someone_strong_n_short_dates conf base child :> string))
+        (fun () -> (someone_strong_n_short_dates conf base father :> string))
   | FEventOrder (p, e1, e2) ->
       Output.printf conf
         (Util.fcapitale (Util.ftransl conf "%t's %s before his/her %s"))
-        (fun _ -> (someone_strong base p :> string))
+        (fun () -> (someone_strong base p :> string))
         (Util.string_of_fevent_name conf base e1.efam_name :> string)
         (Util.string_of_fevent_name conf base e2.efam_name :> string)
   | FWitnessEventAfterDeath (p, e, _) ->
       Output.printf conf
         (Util.fcapitale
            (Util.ftransl conf "%t witnessed the %s after his/her death"))
-        (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+        (fun () -> (someone_strong_n_short_dates conf base p :> string))
         (Util.string_of_fevent_name conf base e.efam_name :> string)
   | FWitnessEventBeforeBirth (p, e, _) ->
       Output.printf conf
         (Util.fcapitale
            (Util.ftransl conf "%t witnessed the %s before his/her birth"))
-        (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+        (fun () -> (someone_strong_n_short_dates conf base p :> string))
         (Util.string_of_fevent_name conf base e.efam_name :> string)
   | IncoherentSex (p, _, _) ->
       Output.printf conf
         (Util.fcapitale
            (Util.ftransl conf "%t's sex is not coherent with his/her relations"))
-        (fun _ -> (someone_strong base p :> string))
+        (fun () -> (someone_strong base p :> string))
   | IncoherentAncestorDate (anc, p) ->
       Output.printf conf "%s has a younger ancestor %s"
         (someone_strong base p :> string)
@@ -746,17 +746,17 @@ let print_warning conf base (w : Warning.base_warning) =
       Output.printf conf
         (Util.fcapitale
            (Util.ftransl conf "marriage had occurred after the death of %t"))
-        (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+        (fun () -> (someone_strong_n_short_dates conf base p :> string))
   | MarriageDateBeforeBirth p ->
       Output.printf conf
         (Util.fcapitale
            (Util.ftransl conf "marriage had occurred before the birth of %t"))
-        (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+        (fun () -> (someone_strong_n_short_dates conf base p :> string))
   | MotherDeadBeforeChildBirth (mother, child) ->
       Output.printf conf
         (Util.ftransl conf "%t is born after the death of his/her mother %t")
-        (fun _ -> (someone_strong_n_short_dates conf base child :> string))
-        (fun _ -> (someone_strong_n_short_dates conf base mother :> string))
+        (fun () -> (someone_strong_n_short_dates conf base child :> string))
+        (fun () -> (someone_strong_n_short_dates conf base mother :> string))
   | ParentBornAfterChild (p, c) ->
       Output.print_string conf (someone_strong base p);
       Output.print_sstring conf " ";
@@ -799,26 +799,26 @@ let print_warning conf base (w : Warning.base_warning) =
   | PEventOrder (p, e1, e2) ->
       Output.printf conf
         (Util.fcapitale (Util.ftransl conf "%t's %s before his/her %s"))
-        (fun _ -> (someone_strong base p :> string))
+        (fun () -> (someone_strong base p :> string))
         (Util.string_of_pevent_name conf base e1.epers_name :> string)
         (Util.string_of_pevent_name conf base e2.epers_name :> string)
   | PWitnessEventAfterDeath (p, e, _origin) ->
       Output.printf conf
         (Util.fcapitale
            (Util.ftransl conf "%t witnessed the %s after his/her death"))
-        (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+        (fun () -> (someone_strong_n_short_dates conf base p :> string))
         (Util.string_of_pevent_name conf base e.epers_name :> string)
   | PWitnessEventBeforeBirth (p, e, _origin) ->
       Output.printf conf
         (Util.fcapitale
            (Util.ftransl conf "%t witnessed the %s before his/her birth"))
-        (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+        (fun () -> (someone_strong_n_short_dates conf base p :> string))
         (Util.string_of_pevent_name conf base e.epers_name :> string)
   | TitleDatesError (p, t) ->
       Output.printf conf
         (Util.fcapitale (Util.ftransl conf "%t has incorrect title dates: %t"))
-        (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (fun _ ->
+        (fun () -> (someone_strong_n_short_dates conf base p :> string))
+        (fun () ->
           let open Def in
           ("<strong>"
            ^<^ (Util.safe_html @@ Gwdb.sou base t.t_ident)
@@ -837,11 +837,11 @@ let print_warning conf base (w : Warning.base_warning) =
   | UndefinedSex p ->
       Output.printf conf
         (Util.fcapitale (Util.ftransl conf "undefined sex for %t"))
-        (fun _ -> (someone_strong base p :> string))
+        (fun () -> (someone_strong base p :> string))
   | YoungForMarriage (p, a, _) | OldForMarriage (p, a, _) ->
       Output.print_string conf (someone_strong base p);
       Output.print_sstring conf " ";
-      Output.printf conf (Util.ftransl conf "married at age %t") (fun _ ->
+      Output.printf conf (Util.ftransl conf "married at age %t") (fun () ->
           (DateDisplay.string_of_age conf a :> string))
 
 let print_warnings conf base (wl : Warning.base_warning list) =
