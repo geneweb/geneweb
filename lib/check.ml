@@ -142,7 +142,7 @@ let print_base_warning oc base (w : Warning.base_warning) =
   | DistantChildren (ifam, p1, p2) ->
       let cpl = Gwdb.foi base ifam in
       Printf.fprintf oc
-        "The following children of\n  %s\nand\n  %s\nare born very close:\n"
+        "The following children of\n  %s\nand\n  %s\nare born very distant:\n"
         (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
         (designation base (Gwdb.poi base (Gwdb.get_mother cpl)));
       Printf.fprintf oc "- %s\n" (designation base p1);
