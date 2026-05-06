@@ -70,6 +70,6 @@ build: [
   ["cmdliner" "install" "tool-support"
               "--update-opam-install=%{_:name}%.install"
               "_build/install/default/bin/gwd" {os-family != "windows"}
-              "_build/install/default/bin/gwd.exe" {os-family = "windows"}
+              "_build/install/default/bin/gwd.exe:gwd" {os-family = "windows"}
               "_build/cmdliner-install"]
 ]
