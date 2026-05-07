@@ -1,4 +1,0 @@
-(library
- (public_name geneweb.plugin)
- (name geneweb_plugin)
- (libraries geneweb geneweb_compat digestif))

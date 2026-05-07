@@ -1,17 +1,22 @@
-(rule
- (target plugin_forum.ml)
- (deps
-  (source_tree assets)
-  (:included
-   %{project_root}/plugins/forum/forum.ml
-   %{project_root}/plugins/forum/forumDisplay.ml)
-  (:src plugin_forum.cppo.ml))
- (action
-  (run %{bin:cppo} %{src} -o %{target})))
+(library
+ (public_name geneweb-plugins.forum_impl)
+ (name forum_impl)
+ (libraries geneweb.register geneweb.gwd_lib geneweb-plugins.sites)
+ (preprocess
+  (pps ppx_deriving.show)))
 
-(executable
- (name plugin_forum)
- (libraries geneweb geneweb.gwd_lib geneweb.plugin geneweb_http)
- (modes
-  (native plugin))
- (modules plugin_forum))
+(plugin
+ (package geneweb-plugins)
+ (name forum)
+ (libraries geneweb-plugins.forum_impl)
+ (site
+  (geneweb plugins)))
+
+(install
+ (package geneweb-plugins)
+ (section
+  (site
+   (geneweb-plugins assets)))
+ (files
+  (glob_files_rec
+   (assets/** with_prefix forum))))

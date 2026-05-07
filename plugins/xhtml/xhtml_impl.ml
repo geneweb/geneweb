@@ -1,12 +1,9 @@
 open Geneweb
 open Config
-module Plugin = Geneweb_plugin
+module Registration = Geneweb_register.Registration
 
-let ns = "cgl"
-
-let () =
-  Plugin.register_se ~ns @@ fun _assets conf _base ->
-  if Util.p_getenv conf.env "cgl" = Some "on" then
+let hook conf _base =
+  if Util.p_getenv conf.env "xhtml" = Some "on" then
     let buffer_status = ref None in
     let buffer_headers = ref [] in
     let buffer_body = Buffer.create 1023 in
@@ -26,15 +23,25 @@ let () =
           flush = previous_flush;
         };
       (match !buffer_status with Some s -> Output.status conf s | None -> ());
-      List.iter (Output.header conf "%s") (List.rev !buffer_headers);
+      List.iter
+        (fun s ->
+          Output.header conf "%s"
+          @@
+            try
+              Scanf.sscanf s "Content-type: %_s; charset=%s" (fun c ->
+                  "Content-type: application/xhtml+xml; charset=" ^ c)
+            with _ -> (
+              try
+                Scanf.sscanf s "Content-type: %_s"
+                  "Content-type: application/xhtml+xml"
+              with _ -> s))
+        (List.rev !buffer_headers);
       let open Markup in
-      buffer buffer_body |> parse_html |> signals
-      |> map (function
-        | `Start_element (("http://www.w3.org/1999/xhtml", "a"), _) ->
-            `Start_element (("http://www.w3.org/1999/xhtml", "span"), [])
-        | x -> x)
-      |> write_html |> to_string |> Output.print_sstring conf;
+      buffer buffer_body |> parse_html |> signals |> write_xml |> to_string
+      |> Output.print_sstring conf;
       Output.flush conf;
       Buffer.reset buffer_body
     in
     conf.output_conf <- { status; header; body; flush }
+
+let () = Registration.register ~name:"xhtml" [ hook ] []

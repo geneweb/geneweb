@@ -52,7 +52,7 @@ build-geneweb-rpc: ## Build the geneweb-rpc package
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
-	dune build bin/gwd bin/gwc
+	dune build @bin/gwd/all @bin/gwc/all
 	@printf "Done."
 
 distrib: ## Build the project and copy what is necessary for distribution

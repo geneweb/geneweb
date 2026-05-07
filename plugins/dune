@@ -1,0 +1,9 @@
+(generate_sites_module
+ (module sites)
+ (sites geneweb-plugins))
+
+(library
+ (public_name geneweb-plugins.sites)
+ (name geneweb_plugins_sites)
+ (modules sites)
+ (libraries dune-site))

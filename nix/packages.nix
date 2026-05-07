@@ -7,4 +7,5 @@ pkgs.lib.makeScope pkgs.ocamlPackages.newScope (self: {
   geneweb-http = self.callPackage ./geneweb-http.nix { };
   geneweb = self.callPackage ./geneweb.nix { };
   geneweb-rpc = self.callPackage ./geneweb-rpc.nix { };
+  geneweb-plugins = self.callPackage ./geneweb-plugins.nix { };
 })

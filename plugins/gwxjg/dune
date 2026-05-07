@@ -1,18 +1,13 @@
 (ocamllex gwxjg_lexicon_parser)
 
 (library
- (name plugin_gwxjg_lib)
- (public_name geneweb.plugin_gwxjg_lib)
- (libraries unix geneweb jingoo)
- (flags
-  (:standard -w -42-40))
- (modules gwxjg_ezgw gwxjg_data gwxjg_trans gwxjg_lexicon_parser))
+ (public_name geneweb-plugins.gwxjg_impl)
+ (name gwxjg_impl)
+ (libraries geneweb geneweb.register unix jingoo))
 
-(executable
- (name plugin_gwxjg)
- (libraries geneweb.plugin plugin_gwxjg_lib)
- (embed_in_plugin_libraries plugin_gwxjg_lib)
- (flags -linkall)
- (modes
-  (native plugin))
- (modules plugin_gwxjg))
+(plugin
+ (package geneweb-plugins)
+ (name gwxjg)
+ (libraries geneweb-plugins.gwxjg_impl)
+ (site
+  (geneweb plugins)))

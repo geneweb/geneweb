@@ -4,11 +4,9 @@ module Driver = Geneweb_db.Driver
 module Iper = Driver.Iper
 module Ifam = Driver.Ifam
 module Gutil = Geneweb_db.Gutil
-module Plugin = Geneweb_plugin
+module Registration = Geneweb_register.Registration
 module Code = Geneweb_http.Code
 module Server = Geneweb_http.Server
-
-let ns = "export"
 
 let w_lock =
   Gwd_lib.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf)
@@ -149,4 +147,5 @@ let export conf base =
       true
 
 let () =
-  Plugin.register ~ns [ ("EXPORT", fun _assets -> w_lock @@ w_base @@ export) ]
+  Registration.register ~name:"export" []
+    [ ("EXPORT", w_lock @@ w_base @@ export) ]

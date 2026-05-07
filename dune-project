@@ -1,4 +1,4 @@
-(lang dune 3.8)
+(lang dune 3.11)
 (using dune_site 0.1)
 (generate_opam_files true)
 
@@ -16,7 +16,7 @@
   (description "GeneWeb is an open source genealogy software written in OCaml. \
     It comes with a Web interface and can be used off-line or as a Web service.")
   (tags (genealogy))
-  (sites (share hd))
+  (sites (share hd) (lib plugins))
   (depends
     ocaml
     geneweb-compat
@@ -26,7 +26,6 @@
     (calendars (>= "2.0.0"))
     (camlp5 (>= "8.03.00"))
     camlp-streams
-    cppo
     decompress
     fmt
     logs
@@ -97,3 +96,11 @@
     promise_jsoo
     yojson
     fmt))
+
+(package
+  (name geneweb-plugins)
+  (synopsis "Geneweb plugins")
+  (sites (share assets))
+  (depends
+    ocaml
+    (geneweb (= :version))))

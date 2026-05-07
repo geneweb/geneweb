@@ -8,9 +8,8 @@ open Gwd_lib
 module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module Sites = Geneweb_sites.Sites
 module Dirs = Geneweb_dirs
-module Plugin = Geneweb_plugin
+module Registration = Geneweb_register.Registration
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 module Compat = Geneweb_compat
@@ -20,12 +19,15 @@ let src = Logs.Src.create ~doc:"Gwd" "GWD "
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
-let pp_exception ppf (exn, bt) =
-  let pp_header ppf pid = Fmt.pf ppf "Uncaught exception in process %d:" pid in
+let pp_exception ~predictable_mode ppf (exn, bt) =
+  let pp_header ppf () =
+    if predictable_mode then Fmt.pf ppf "Uncaught exception: "
+    else Fmt.pf ppf "Uncaught exception in process %d:" (Unix.getpid ())
+  in
   let pp_header = Fmt.(styled (`Fg `Red) pp_header) in
   let exn = Printexc.to_string exn in
   let bt = Printexc.raw_backtrace_to_string bt in
-  Fmt.pf ppf "%a@ %s@ %a" pp_header (Unix.getpid ()) exn Fmt.lines bt
+  Fmt.pf ppf "%a@ %s@ %a" pp_header () exn Fmt.lines bt
 
 let timestamp = Logs.Tag.(empty |> add Server.timestamp_tag ())
 let gzip_min_size = 1024
@@ -272,10 +274,6 @@ let load_lexicon =
 let cache_lexicon () =
   List.iter (fun x -> ignore @@ load_lexicon x) !cache_langs
 
-exception
-  Register_plugin_failure of
-    string * [ `dynlink_error of Dynlink.error | `string of string ]
-
 let add_lex_dir dir =
   Filesystem.walk_folder
     (fun e () ->
@@ -284,65 +282,32 @@ let add_lex_dir dir =
       | _ -> ())
     dir ()
 
-let load_cmxs cmxs =
-  try Dynlink.loadfile cmxs
-  with Dynlink.Error e ->
-    raise (Register_plugin_failure (cmxs, `dynlink_error e))
-
 module MS = Map.Make (String)
 
-let check_plugin =
-  let sums = MS.of_seq @@ List.to_seq Plugin_checksums.checksums in
-  fun path ->
-    let pname = Filename.basename path in
-    match MS.find pname sums with
-    | exception Not_found -> false
-    | sum -> Plugin.checksum path = sum
+let assets_of_plugin name =
+  let path = (List.hd @@ Sites.Sites.plugins) // name in
+  path // "assets"
 
-type loaded_plugin = { name : string; unsafe : bool; forced : bool }
+let load_plugin Cmd.{ name } =
+  Log.debug (fun k -> k "Loading plugin %s..." name);
+  lexicon_fname := !lexicon_fname ^ name ^ ".";
+  let lex_dir = assets_of_plugin name // "lex" in
+  if Sys.file_exists lex_dir then add_lex_dir lex_dir;
+  try Sites.Plugins.Plugins.load name
+  with _ ->
+    (* FIXME: We cannot print the exception as it contains a user-specific
+       path. *)
+    Log.err (fun k -> k "Cannot load the plugin %s" name);
+    exit 1
 
-let load_plugin ~unsafe ~forced path =
-  let pname = Filename.basename path in
-  if not @@ Plugin.is_plugin_dir path then (
-    Log.err (fun k -> k "%S is not a plugin directory." path);
-    exit 1)
-  else (
-    Log.debug (fun k ->
-        k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
-    if not (unsafe || check_plugin path) then (
-      Log.err (fun k ->
-          k "Refuse to load plugin %s for cause of wrong checksum." pname);
-      exit 1);
-    let pname = Filename.basename path in
-    let cmxs =
-      let s = Fmt.str "plugin_%s.cmxs" pname in
-      path // s
-    in
-    lexicon_fname := !lexicon_fname ^ pname ^ ".";
-    let lex_dir = path // "assets" // "lex" in
-    if Sys.file_exists lex_dir then add_lex_dir lex_dir;
-    Plugin.assets := path // "assets";
-    Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
-    load_cmxs cmxs;
-    { name = pname; unsafe; forced })
+let load_all_plugins () =
+  Log.debug (fun k -> k "Loading all the plugins...");
+  Sites.Plugins.Plugins.load_all ()
 
-let load_plugins Cmd.{ path; unsafe; forced; collection } =
-  if not collection then [ load_plugin ~unsafe ~forced path ]
-  else
-    match Plugin.compute_dependencies path with
-    | Ok deps ->
-        List.fold_left
-          (fun acc d -> load_plugin ~unsafe ~forced (path // d) :: acc)
-          [] deps
-    | Error cycle ->
-        Log.err (fun k ->
-            k
-              "Cycle found while computing dependencies of the plugin \
-               collection %S:@ %a"
-              path
-              Fmt.(list ~sep:(const string " -> ") string)
-              cycle);
-        exit 1
+let load_plugins plugins =
+  match plugins with
+  | Cmd.All -> load_all_plugins ()
+  | List l -> List.iter load_plugin l
 
 let alias_lang lang =
   if String.length lang < 2 then lang
@@ -1247,23 +1212,16 @@ end
 
 let allowed_plugins ~loaded_plugins base_env =
   let loaded_set =
-    List.fold_left
-      (fun acc { name; _ } -> SS.add name acc)
-      SS.empty loaded_plugins
-  in
-  let forced_set =
-    List.fold_left
-      (fun acc { name; forced; _ } -> if forced then SS.add name acc else acc)
-      SS.empty loaded_plugins
+    List.fold_left (fun acc name -> SS.add name acc) SS.empty loaded_plugins
   in
   let gwf_plugins = Gwf.parse_plugins base_env in
   match gwf_plugins with
   | All -> List.of_seq @@ SS.to_seq loaded_set
   | Allowed s ->
-      let s = SS.union s forced_set in
       List.of_seq @@ SS.to_seq @@ SS.filter (fun p -> SS.mem p s) loaded_set
 
-let make_conf ~loaded_plugins ~secret_salt from_addr request script_name env =
+let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
+    script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
     let str =
       Printf.sprintf "Requested allowed_tags file (%s) absent"
@@ -1497,7 +1455,7 @@ let make_conf ~loaded_plugins ~secret_salt from_addr request script_name env =
       output_conf;
       allowed_plugins;
       secret_salt = Some secret_salt;
-      predictable_mode = !predictable_mode;
+      predictable_mode;
     }
   in
   GWPARAM.cnt_dir := !GWPARAM.cnt_d conf.bname;
@@ -1607,7 +1565,8 @@ let conf_and_connection =
     ^<^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
     ^<^ contents
   in
-  fun ~loaded_plugins
+  fun ~predictable_mode
+    ~loaded_plugins
     ~secret_salt
     from
     request
@@ -1616,7 +1575,8 @@ let conf_and_connection =
     env
   ->
     let conf, passwd_err =
-      make_conf ~loaded_plugins ~secret_salt from request script_name env
+      make_conf ~predictable_mode ~loaded_plugins ~secret_salt from request
+        script_name env
     in
     let m = Util.p_getenv env "m" in
     let is_binary =
@@ -1700,7 +1660,8 @@ let conf_and_connection =
             | Def.HttpExn (code, _) as exn ->
                 let bt = Printexc.get_raw_backtrace () in
                 GWPARAM.output_error conf code;
-                Log.err (fun k -> k "%a" pp_exception (exn, bt))))
+                Log.err (fun k ->
+                    k "%a" (pp_exception ~predictable_mode) (exn, bt))))
 
 let match_strings regexp s =
   let rec loop i j =
@@ -1777,19 +1738,19 @@ type content_encoding = No_encoding | Gzip | Brotli
 
 let content_misc conf len misc_fname encoding =
   Output.status conf Code.OK;
-  let fname, t =
+  let t =
     match misc_fname with
-    | Css fname -> (fname, "text/css; charset=UTF-8")
-    | Eot fname -> (fname, "application/font-eot")
-    | Js fname -> (fname, "text/javascript; charset=UTF-8")
-    | Json fname -> (fname, "application/json; charset=UTF-8")
-    | Map fname -> (fname, "application/json")
-    | Otf fname -> (fname, "application/font-otf")
-    | Other fname -> (fname, "text/plain")
-    | Png fname -> (fname, "image/png")
-    | Svg fname -> (fname, "application/font-svg")
-    | Woff2 fname -> (fname, "application/font-woff2")
-    | CacheGz fname -> (fname, "application/gzip")
+    | Css _ -> "text/css; charset=UTF-8"
+    | Eot _ -> "application/font-eot"
+    | Js _ -> "text/javascript; charset=UTF-8"
+    | Json _ -> "application/json; charset=UTF-8"
+    | Map _ -> "application/json"
+    | Otf _ -> "application/font-otf"
+    | Other _ -> "text/plain"
+    | Png _ -> "image/png"
+    | Svg _ -> "application/font-svg"
+    | Woff2 _ -> "application/font-woff2"
+    | CacheGz _ -> "application/gzip"
   in
   Output.header conf "Content-type: %s" t;
   Output.header conf "Content-length: %d" len;
@@ -1805,13 +1766,15 @@ let content_misc conf len misc_fname encoding =
   Output.header conf "Connection: close";
   Output.flush conf
 
+let find_misc_file_of_plugins name =
+  List.exists
+    (fun pname ->
+      let assets_dir = assets_of_plugin pname in
+      Mutil.start_with assets_dir 0 name)
+    (Registration.all_registered ())
+
 let find_misc_file conf name =
-  if
-    Sys.file_exists name
-    && List.exists
-         (fun Cmd.{ path; _ } -> Mutil.start_with (path // "assets") 0 name)
-         !plugins
-  then name
+  if Sys.file_exists name && find_misc_file_of_plugins name then name
   else
     let name' = !GWPARAM.etc_d conf.bname // name in
     if Sys.file_exists name' then name'
@@ -2003,8 +1966,8 @@ let build_env request (contents : Adef.encoded_string) :
     extract_multipart boundary contents
   else (contents, Util.create_env contents)
 
-let connection ~loaded_plugins ~secret_salt (addr, request) script_name
-    contents0 =
+let connection ~predictable_mode ~loaded_plugins ~secret_salt (addr, request)
+    script_name contents0 =
   let from =
     match addr with
     | Unix.ADDR_UNIX x -> x
@@ -2029,8 +1992,8 @@ let connection ~loaded_plugins ~secret_salt (addr, request) script_name
           (not (image_request printer_conf script_name env))
           && not (misc_request printer_conf request script_name)
         then
-          conf_and_connection ~loaded_plugins ~secret_salt from request
-            script_name contents env
+          conf_and_connection ~predictable_mode ~loaded_plugins ~secret_salt
+            from request script_name contents env
       with Exit -> ()
 
 let null_reopen flags fd =
@@ -2124,7 +2087,7 @@ let display_infos ?interface ~port () =
         Fmt.(box @@ list ~sep:comma pp_path)
         (Secure.assets ()))
 
-let geneweb_server ~loaded_plugins ?interface ~port ~daemon ~predictable_mode ()
+let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
     =
   let secret_salt =
     match Unix.getenv "WSERVER" with
@@ -2147,7 +2110,7 @@ let geneweb_server ~loaded_plugins ?interface ~port ~daemon ~predictable_mode ()
   let connection x y z = connection x y (Adef.encoded z) in
   Server.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
-    (connection ~loaded_plugins ~secret_salt)
+    (connection ~predictable_mode ~loaded_plugins ~secret_salt)
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -2200,7 +2163,7 @@ let read_input len =
      with End_of_file -> ());
     Buffer.contents buff
 
-let main ?interface ~port ~daemon ~predictable_mode () =
+let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2215,10 +2178,8 @@ let main ?interface ~port ~daemon ~predictable_mode () =
     process "" false (Array.to_list Sys.argv)
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
-  let loaded_plugins =
-    List.fold_left (fun acc p -> load_plugins p :: acc) [] !plugins
-    |> List.concat
-  in
+  load_plugins plugins;
+  let loaded_plugins = Registration.all_registered () in
   GWPARAM.init ();
   (* FIXME: this line MUST be after plugin loading as plugins can modified
      [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
@@ -2284,10 +2245,10 @@ let main ?interface ~port ~daemon ~predictable_mode () =
       try Sys.getenv "SCRIPT_NAME" with Not_found -> Sys.argv.(0)
     in
     let secret_salt = match !cgi_secret_salt with None -> "" | Some s -> s in
-    geneweb_cgi ~loaded_plugins ~secret_salt addr (Filename.basename script)
-      query)
+    geneweb_cgi ~predictable_mode ~loaded_plugins ~secret_salt addr
+      (Filename.basename script) query)
   else
-    geneweb_server ~loaded_plugins ?interface ~port ~daemon ~predictable_mode ()
+    geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
 
 let has_root_privileges () =
   if not Sys.unix then false
@@ -2337,12 +2298,10 @@ let parse_cmd () =
       digest_password := o.digest_password;
       wizard_just_friend := o.wizard_just_friend;
       wizard_passwd := o.wizard_password;
-      predictable_mode := o.predictable_mode;
       log_file := o.log;
       verbosity_level := o.verbosity;
       force_cgi := o.cgi;
       cgi_secret_salt := o.secret_salt;
-      plugins := o.plugins;
       Lock.no_lock_flag := o.no_lock;
       Mutil.particles_file := Option.value ~default:"" o.particles_file;
       Util.allowed_tags_file := Option.value ~default:"" o.allowed_tags_file;
@@ -2359,9 +2318,7 @@ let make_socket_dir socket_dir =
         Server.sock_out := p // "gwd.sou")
   | None -> ()
 
-let switch_check () =
-  debug := true;
-  predictable_mode := true
+let switch_check () = debug := true
 
 let switch_debug () =
   Printexc.record_backtrace true;
@@ -2416,7 +2373,7 @@ let reporter ~predictable_mode ppf =
 
 let setup_log ~predictable_mode t =
   Printexc.set_uncaught_exception_handler (fun exn bt ->
-      Log.err (fun k -> k "%a" pp_exception (exn, bt)));
+      Log.err (fun k -> k "%a" (pp_exception ~predictable_mode) (exn, bt)));
   let set_reporter ppf = Logs.set_reporter @@ reporter ~predictable_mode ppf in
   let refresh o =
     Option.iter close_out_noerr o.oc;
@@ -2460,8 +2417,8 @@ let () =
   make_socket_dir opts.socket_dir;
   setup_log ~predictable_mode:opts.predictable_mode opts.log;
   try
-    main ?interface:opts.interface ~port:opts.port ~daemon:opts.daemon
-      ~predictable_mode:opts.predictable_mode ()
+    main ~plugins:opts.plugins ?interface:opts.interface ~port:opts.port
+      ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ()
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Log.err (fun k ->
@@ -2479,6 +2436,3 @@ let () =
              1024 are reserved to the system. Please, read the security \
              section of the documentation."
             !selected_port)
-  | Register_plugin_failure (p, `dynlink_error e) ->
-      Log.err (fun k -> k "%s: %s" p (Dynlink.error_message e))
-  | Register_plugin_failure (p, `string s) -> Log.err (fun k -> k "%s: %s" p s)

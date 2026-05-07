@@ -1,8 +1,9 @@
 open Geneweb
 open Config
 module Driver = Geneweb_db.Driver
-module Plugin = Geneweb_plugin
+module Registration = Geneweb_register.Registration
 module Code = Geneweb_http.Code
+module Sites = Geneweb_plugins_sites.Sites.Sites
 
 let arg_f_parents = "f_parents"
 let arg_f_children = "f_children"
@@ -433,18 +434,19 @@ let fixbase_ok conf base =
         GWPARAM.output_error conf Code.Service_Unavailable)
       ~wait:false ~lock_file process
 
-let ns = "fixbase"
+let ( // ) = Filename.concat
 
-let _ =
-  let aux fn _assets conf base =
+let () =
+  Secure.add_assets @@ (List.hd Sites.assets // "fixbase");
+  let aux fn conf base =
     if if opt_manitou then conf.manitou else conf.wizard then (
       fn conf base;
       true)
     else false
   in
   let w_base = Gwd_lib.Request.w_base ~none:(fun _ -> false) in
-  Plugin.register ~ns
+  Registration.register ~name:"fixbase" []
     [
-      ("FIXBASE", fun assets -> w_base @@ aux fixbase assets);
-      ("FIXBASE_OK", fun assets -> w_base @@ aux fixbase_ok assets);
+      ("FIXBASE", w_base @@ aux fixbase);
+      ("FIXBASE_OK", w_base @@ aux fixbase_ok);
     ]
