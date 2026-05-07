@@ -1,5 +1,11 @@
-(executable
- (name plugin_cgl)
- (libraries geneweb geneweb.plugin geneweb_http)
- (modes
-  (native plugin)))
+(library
+ (public_name geneweb-plugins.cgl_impl)
+ (name cgl_impl)
+ (libraries geneweb.register))
+
+(plugin
+ (package geneweb-plugins)
+ (name cgl)
+ (libraries geneweb-plugins.cgl_impl)
+ (site
+  (geneweb plugins)))

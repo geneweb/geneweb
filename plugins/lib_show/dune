@@ -1,6 +1,0 @@
-(executable
- (name plugin_lib_show)
- (embed_in_plugin_libraries geneweb.def_show)
- (flags -linkall)
- (modes
-  (native plugin)))

@@ -1,4 +1,3 @@
-module Sites = Geneweb_sites.Sites
 module GWPARAM = Geneweb.GWPARAM
 module Version = Geneweb.Version
 module Compat = Geneweb_compat
@@ -8,7 +7,8 @@ module C = Cmdliner
 let ( // ) = Filename.concat
 
 type log = Stdout | Stderr | File of string | Syslog
-type plugin = { path : string; unsafe : bool; forced : bool; collection : bool }
+type plugin = { name : string } [@@unboxed]
+type plugins = All | List of plugin list
 
 type t = {
   (* Directories *)
@@ -27,7 +27,6 @@ type t = {
   (* Security *)
   authorization_file : string option;
   login_timeout : int;
-  predictable_mode : bool;
   secret_salt : string option;
   wizard_just_friend : bool;
   wizard_password : string option;
@@ -50,10 +49,11 @@ type t = {
   (* Web interface *)
   default_lang : string;
   (* Plugins *)
-  plugins : plugin list;
+  plugins : plugins;
   (* Tracing & debugging *)
   debug : bool;
   check : bool;
+  predictable_mode : bool;
   verbosity : int;
   log : log;
   trace_failed_password : bool;
@@ -152,28 +152,12 @@ let log_pp ppf l =
 
 let log_conv = C.Arg.Conv.make ~docv:"LOG" ~parser:log_parser ~pp:log_pp ()
 
-let pluginpath_parser s =
-  match String.index_from s 0 ':' with
-  | exception Not_found -> Ok (s, false, false)
-  | offset -> (
-      let len = String.length s in
-      let postfix = String.sub s (offset + 1) (len - offset - 1) in
-      match String.sub s 0 offset with
-      | "u" -> Ok (postfix, true, false)
-      | "f" -> Ok (postfix, false, true)
-      | "uf" | "fu" -> Ok (postfix, true, true)
-      | prefix -> error "Unexpected prefix %S" prefix)
-
-let pluginpath_conv =
-  let pp ppf (s, unsafe, forced) = Fmt.pf ppf "(%s, %b, %b)" s unsafe forced in
-  C.Arg.Conv.make ~docv:"PLUGIN_PATH" ~parser:pluginpath_parser ~pp ()
-
 (* Directories commands *)
 let dirs_section = "DIRECTORIES"
 let default_base_dir = Secure.default_base_dir
 
 let default_gw_prefix =
-  match Sites.hd with
+  match Sites.Sites.hd with
   | s :: _ -> s
   | _ ->
       (* This case occurs if gwd hasn't been installed with dune. *)
@@ -330,17 +314,6 @@ let login_timeout =
     value
     & opt int default_login_timeout
     & info [ "login-timeout" ] ~docs:security_section ~doc)
-
-let predictable_mode =
-  let doc =
-    "Turn on the predictable mode. In this mode, the behavior of the server is \
-     predictable, which is helpful for debugging or testing (UNIX only). This\n\
-    \     option MUST not be used in production."
-  in
-  let error = "--predictable-mode is available only on UNIX." in
-  C.Arg.(
-    unix_only_flag ~error & value & flag
-    & info [ "predictable-mode" ] ~docs:security_section ~doc)
 
 let secret_salt =
   let doc = "Add a secret salt to form digests." in
@@ -533,36 +506,33 @@ let setup_link =
 
 let plugin_section = "PLUGIN"
 
-let plugin =
-  let doc = "Load the plugin located in the directory $(docv)." in
+let load_plugins =
+  let doc = "Load the list of plugins." in
   C.Arg.(
     value
-    & opt_all (list pluginpath_conv) []
-    & info [ "plugin" ] ~docs:plugin_section ~doc)
+    & opt_all (list string) []
+    & info [ "load-plugins" ] ~docs:plugin_section ~doc)
 
-let plugins =
-  let doc = "Load all the plugins located in the directory $(docv)." in
-  C.Arg.(
-    value
-    & opt_all (list pluginpath_conv) []
-    & info [ "plugins" ] ~docs:plugin_section ~doc)
+let load_all_plugins =
+  let doc = "Load all the plugins." in
+  C.Arg.(value & flag & info [ "load-all-plugins" ] ~docs:plugin_section ~doc)
 
-let plugins =
+let plugin_flags =
   let open C.Term.Syntax in
-  let+ plugin = plugin and+ plugins = plugins in
-  let acc =
-    List.fold_left
-      (fun acc (path, unsafe, forced) ->
-        { path; unsafe; forced; collection = false } :: acc)
-      [] (List.concat plugin)
-  in
-  let acc =
-    List.fold_left
-      (fun acc (path, unsafe, forced) ->
-        { path; unsafe; forced; collection = true } :: acc)
-      acc (List.concat plugins)
-  in
-  List.rev acc
+  C.Term.ret
+  @@
+  let+ load_plugins = load_plugins and+ load_all_plugins = load_all_plugins in
+  match (load_plugins, load_all_plugins) with
+  | _ :: _, true ->
+      `Error
+        ( false,
+          "you cannot use both --load-plugins and --load-all-plugins options" )
+  | [], true -> `Ok All
+  | l, false ->
+      let acc =
+        List.fold_left (fun acc name -> { name } :: acc) [] (List.concat l)
+      in
+      `Ok (List (List.rev acc))
 
 (* Tracing & debugging commands *)
 
@@ -583,6 +553,17 @@ let check =
      -debug."
   in
   C.Arg.(value & flag & info [ "check" ] ~docs:tracing_section ~doc)
+
+let predictable_mode =
+  let doc =
+    "Turn on the predictable mode. In this mode, the behavior of the server is \
+     predictable, which is helpful for debugging or testing (UNIX only). This\n\
+    \     option MUST not be used in production."
+  in
+  let error = "--predictable-mode is available only on UNIX." in
+  C.Arg.(
+    unix_only_flag ~error & value & flag
+    & info [ "predictable-mode" ] ~docs:security_section ~doc)
 
 let verbosity =
   let doc =
@@ -618,9 +599,13 @@ let noop =
 
 let debug_flags =
   let open C.Term.Syntax in
-  let+ debug = debug and+ check = check and+ verbosity = verbosity in
+  let+ debug = debug
+  and+ check = check
+  and+ verbosity = verbosity
+  and+ predictable_mode = predictable_mode in
   let debug = if check then true else debug in
-  (debug, check, verbosity)
+  let predictable_mode = if check then true else predictable_mode in
+  (debug, check, verbosity, predictable_mode)
 
 let t =
   let open C.Term.Syntax in
@@ -648,7 +633,6 @@ let t =
   and+ authorization_file = authorization_file
   and+ digest_password = digest_password
   and+ login_timeout = login_timeout
-  and+ predictable_mode = predictable_mode
   and+ secret_salt = secret_salt
   and+ wizard_just_friend = wizard_just_friend
   and+ wizard_password = wizard_password
@@ -670,8 +654,8 @@ let t =
   and+ default_lang = default_lang
   and+ _ : bool = browser_lang
   and+ _ : bool = setup_link
-  and+ plugins = plugins
-  and+ debug, check, verbosity = debug_flags
+  and+ plugins = plugin_flags
+  and+ debug, check, verbosity, predictable_mode = debug_flags
   and+ log = log
   and+ trace_failed_password = trace_failed_password
   and+ _ : bool = no_fork
@@ -690,7 +674,6 @@ let t =
     no_lock;
     authorization_file;
     login_timeout;
-    predictable_mode;
     secret_salt;
     wizard_just_friend;
     wizard_password;
@@ -713,6 +696,7 @@ let t =
     plugins;
     debug;
     check;
+    predictable_mode;
     verbosity;
     log;
     trace_failed_password;
@@ -754,8 +738,8 @@ let legacy_arguments =
     ("-only", "--allowed-address");
     ("-p", "--port");
     ("-particles", "--particles-file");
-    ("-plugin", "--plugin");
-    ("-plugins", "--plugins");
+    ("-plugin", "--load-plugins");
+    ("-plugins", "--load-all-plugins");
     ("-redirect", "--redirect-interface");
     ("-robot_xcl", "--ban-threshold");
     ("-setup_link", "--setup-link");

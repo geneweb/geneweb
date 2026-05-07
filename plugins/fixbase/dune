@@ -1,12 +1,26 @@
-(executable
- (name plugin_fixbase)
+(library
+ (public_name geneweb-plugins.fixbase_impl)
+ (name fixbase_impl)
  (libraries
-  geneweb
+  geneweb.register
+  geneweb.def_show
   geneweb.gwd_lib
-  geneweb.plugin
-  geneweb_def_show
-  geneweb_http)
+  geneweb-plugins.sites)
  (preprocess
-  (pps ppx_deriving.show))
- (modes
-  (native plugin)))
+  (pps ppx_deriving.show)))
+
+(plugin
+ (package geneweb-plugins)
+ (name fixbase)
+ (libraries geneweb-plugins.fixbase_impl)
+ (site
+  (geneweb plugins)))
+
+(install
+ (package geneweb-plugins)
+ (section
+  (site
+   (geneweb-plugins assets)))
+ (files
+  (glob_files_rec
+   (assets/** with_prefix fixbase))))

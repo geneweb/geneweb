@@ -1,16 +1,6 @@
 type log = Stdout | Stderr | File of string | Syslog
-
-type plugin = {
-  path : string;  (** Filesystem path to the plugin's directory. *)
-  unsafe : bool;
-      (** If [true], bypasses the checksum verification before loading. *)
-  forced : bool;
-      (** If [true], the plugin is loaded globally for all databases. *)
-  collection : bool;
-      (** If [true], [path] is treated as a parent directory containing multiple
-          sub-plugins to be discovered and loaded. If [false], [path] points
-          directly to a single plugin. *)
-}
+type plugin = { name : string } [@@unboxed]
+type plugins = All | List of plugin list
 
 type t = {
   (* Directories *)
@@ -29,7 +19,6 @@ type t = {
   (* Security *)
   authorization_file : string option;
   login_timeout : int;
-  predictable_mode : bool;
   secret_salt : string option;
   wizard_just_friend : bool;
   wizard_password : string option;
@@ -52,10 +41,11 @@ type t = {
   (* Web interface *)
   default_lang : string;
   (* Plugin *)
-  plugins : plugin list;
+  plugins : plugins;
   (* Tracing & debugging *)
   debug : bool;
   check : bool;
+  predictable_mode : bool;
   verbosity : int;
   log : log;
   trace_failed_password : bool;

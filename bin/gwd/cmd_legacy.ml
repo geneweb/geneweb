@@ -45,7 +45,6 @@ let n_workers = ref Cmd.default_n_workers
 let max_pending_requests = ref Cmd.default_max_pending_requests
 let no_host_address = ref false
 let only_addresses : string list ref = ref []
-let plugins : Cmd.plugin list ref = ref []
 let redirected_addr : string option ref = ref None
 let robot_xcl : (int * int) option ref = ref None
 let selected_addr : string option ref = ref None
@@ -59,7 +58,6 @@ let check = ref false
 let digest_password = ref false
 let wizard_just_friend = ref false
 let wizard_passwd : string option ref = ref None
-let predictable_mode = ref false
 let log_file : Cmd.log ref = ref Cmd.Stderr
 let verbosity_level = ref Cmd.default_verbosity
 let set_verbosity_level lvl = verbosity_level := lvl

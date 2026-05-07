@@ -46,6 +46,7 @@
                 geneweb-http
                 geneweb
                 geneweb-rpc
+                geneweb-plugins
                 ;
             };
 

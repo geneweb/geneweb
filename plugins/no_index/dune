@@ -1,0 +1,11 @@
+(library
+ (public_name geneweb-plugins.no_index_impl)
+ (name no_index_impl)
+ (libraries geneweb.register geneweb.gwd_lib))
+
+(plugin
+ (package geneweb-plugins)
+ (name no_index)
+ (libraries geneweb-plugins.no_index_impl)
+ (site
+  (geneweb plugins)))

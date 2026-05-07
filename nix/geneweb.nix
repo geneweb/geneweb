@@ -4,13 +4,13 @@
   alcotest,
   ancient,
   brotli,
+  cmdliner,
   pcre2,
   benchmark,
   calendars,
   dune-site,
   camlp5,
   camlp-streams,
-  cmdliner,
   decompress,
   fmt,
   logs,
@@ -35,7 +35,6 @@
   pp_loc,
   ptime,
   not-ocamlfind,
-  cppo,
   geneweb-compat,
   geneweb-http,
 }:
@@ -49,7 +48,6 @@ buildDunePackage {
   nativeBuildInputs = [
     brotli
     not-ocamlfind
-    cppo
     camlp5
   ];
 

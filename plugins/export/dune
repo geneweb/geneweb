@@ -1,17 +1,15 @@
-(executable
- (name plugin_export)
+(library
+ (public_name geneweb-plugins.export_impl)
+ (name export_impl)
  (libraries
-  geneweb
-  geneweb.plugin
-  geneweb.gwb2ged_lib
+  geneweb.register
   geneweb.gwd_lib
-  geneweb.gwexport_lib
-  geneweb.gwu_lib)
- (embed_in_plugin_libraries
-  geneweb.gwexport_lib
-  geneweb.gwu_lib
-  geneweb.gwb2ged_lib)
- (flags
-  (:standard -w -40-27))
- (modes
-  (native plugin)))
+  geneweb.gwb2ged_lib
+  geneweb.gwu_lib))
+
+(plugin
+ (package geneweb-plugins)
+ (name export)
+ (libraries geneweb-plugins.export_impl)
+ (site
+  (geneweb plugins)))

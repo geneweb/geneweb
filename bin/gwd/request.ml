@@ -7,7 +7,7 @@ open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module Plugin = Geneweb_plugin
+module Registration = Geneweb_register.Registration
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 
@@ -205,16 +205,9 @@ let make_senv conf base =
       set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
-let try_plugin conf base_name m =
-  let h (ns, fn) =
-    Logs.debug (fun k -> k "allowed: %s@." ns);
-    Logs.debug (fun k ->
-        k "plugins: %a@."
-          Fmt.(box @@ parens @@ list ~sep:comma string)
-          conf.allowed_plugins);
-    List.mem ns conf.allowed_plugins && fn conf base_name
-  in
-  List.exists h (Hashtbl.find_all Plugin.ht m)
+let try_plugin conf base_name meth =
+  Registration.try_handlers ~meth (fun ~name handler ->
+      List.mem name conf.allowed_plugins && handler conf base_name)
 
 let w_lock ~onerror fn conf (base_name : string option) =
   let bfile = !GWPARAM.bpath conf.bname in
@@ -345,10 +338,8 @@ let treat_request =
             conf bfile
         else
           let () =
-            List.iter
-              (fun (ns, fn) ->
-                if List.mem ns conf.allowed_plugins then fn conf bfile)
-              !Plugin.se
+            Registration.call_hooks (fun ~name hook ->
+                if List.mem name conf.allowed_plugins then hook conf bfile)
           in
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
           if not @@ try_plugin conf bfile m then

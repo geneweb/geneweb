@@ -1,37 +1,36 @@
-(executable
- (name generate_plugin_checksums)
- (modules generate_plugin_checksums)
- (libraries geneweb_plugin))
-
-(rule
- (target plugin_checksums.ml)
- (deps
-  (glob_files_rec ../../plugins/*))
- (action
-  (with-stdout-to
-   %{target}
-   (run ./generate_plugin_checksums.exe %{project_root}/plugins))))
-
 (generate_sites_module
- (module geneweb_sites)
- (sites geneweb))
+ (module sites)
+ (sites geneweb)
+ (plugins
+  (geneweb plugins)))
+
+(library
+ (public_name geneweb.register)
+ (name geneweb_register)
+ (modules registration)
+ (libraries geneweb geneweb_compat))
 
 (library
  (public_name geneweb.gwd_lib)
  (name gwd_lib)
- (libraries geneweb geneweb_http geneweb.plugin dune-site cmdliner)
- (modules request geneweb_sites cmd cmd_legacy robot))
+ (libraries
+  geneweb
+  geneweb_http
+  geneweb_register
+  dune-site
+  dune-site.plugins
+  cmdliner)
+ (modules request sites cmd cmd_legacy robot))
 
 (executable
  (package geneweb)
  (name gwd)
  (public_name gwd)
- (flags -linkall)
  (libraries
   dynlink
   geneweb
-  geneweb.plugin
   geneweb_http
+  geneweb_register
   gwd_lib
   logs
   logs-syslog
@@ -41,4 +40,4 @@
   str
   unix
   uri)
- (modules base64 gwd plugin_checksums))
+ (modules base64 gwd))
