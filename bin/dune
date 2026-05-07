@@ -1,0 +1,13 @@
+(executable
+ (name generate_cmdliner_rules)
+ (modules generate_cmdliner_rules)
+ (libraries fmt geneweb_util))
+
+(executable
+ (name generate_flags)
+ (modules generate_flags))
+
+(rule
+ (with-stdout-to
+  flags.dune
+  (run ./generate_flags.exe %{ocaml-config:os_type})))
