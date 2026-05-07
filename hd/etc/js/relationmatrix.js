@@ -2,6 +2,12 @@
 const RelationMatrix = (() => {
   'use strict';
 
+  // Escape user-supplied text before HTML interpolation. Names from
+  // window.rmData.names go through this; coeff strings do not (they
+  // ship intentional markup like <sup> from the OCaml side).
+  const esc = s => String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
+
   /* Détection du mode CGI et stockage du paramètre base */
   const urlParams = new URLSearchParams(window.location.search);
   const baseParam = urlParams.get('b');
@@ -85,16 +91,16 @@ const RelationMatrix = (() => {
       const url2 = makePersonUrl(group.anc2.p);
       const rlUrl2 = makeRelationLinkUrl(group.anc2.p, l1, p1Iper, l2, p2Iper);
 
-      return '<span class="text-nowrap"><a href="' + url1 + '">' + name1 + '</a>' +
+      return '<span class="text-nowrap"><a href="' + url1 + '">' + esc(name1) + '</a>' +
              ' [<a href="' + rlUrl1 + '">' + group.anc1.c + '</a>]</span>' +
-             ' <span class="text-nowrap">&amp; <a href="' + url2 + '">' + name2 + '</a>' +
+             ' <span class="text-nowrap">&amp; <a href="' + url2 + '">' + esc(name2) + '</a>' +
              ' [<a href="' + rlUrl2 + '">' + group.anc2.c + '</a>]</span>';
     } else {
       const name = getPersonName(group.anc.p);
       const url = makePersonUrl(group.anc.p);
       const rlUrl = makeRelationLinkUrl(group.anc.p, l1, p1Iper, l2, p2Iper);
 
-      return '<span class="text-nowrap"><a href="' + url + '">' + name + '</a>' +
+      return '<span class="text-nowrap"><a href="' + url + '">' + esc(name) + '</a>' +
              ' [<a href="' + rlUrl + '">' + group.anc.c + '</a>]</span>';
     }
   }
@@ -160,13 +166,13 @@ const RelationMatrix = (() => {
 
       const url = makeRelationLinkUrl(anc.iper, l1s, p1Iper, l2s, p2Iper);
       let result = '<span class="text-nowrap"><a href="' +
-                   makePersonUrl(anc.iper) + '">' + anc.name +
+                   makePersonUrl(anc.iper) + '">' + esc(anc.name) +
                    '</a> [<a href="' + url + '">' + anc.total + '</a>]</span>';
 
       if (anc.partner) {
         const pUrl = makeRelationLinkUrl(anc.partner.iper, l1s, p1Iper, l2s, p2Iper);
         result += ' <span class="text-nowrap">&amp; <a href="' +
-                  makePersonUrl(anc.partner.iper) + '">' + anc.partner.name +
+                  makePersonUrl(anc.partner.iper) + '">' + esc(anc.partner.name) +
                   '</a> [<a href="' + pUrl + '">' + anc.partner.total +
                   '</a>]</span>';
       }
@@ -180,7 +186,7 @@ const RelationMatrix = (() => {
     return html;
   }
 
-  function renderAllLevels(cellData) {
+  function renderAllLevels(cellData, url) {
     let html = '';
 
     const p1Iper = cellData.i1 ? cellData.i1.p : '';
@@ -212,15 +218,15 @@ const RelationMatrix = (() => {
     html += '</tbody>';
     html += '<tfoot><tr>';
     html += '<td><i class="fa-solid fa-person-arrow-up-from-line"></i></td>';
-    html += '<td class="person"><a href="' + makePersonUrl(p1Iper) + '">' + p1Name + '</a></td>';
-    html += '<td class="person"><a href="' + makePersonUrl(p2Iper) + '">' + p2Name + '</a></td>';
+    html += '<td class="person"><a href="' + makePersonUrl(p1Iper) + '">' + esc(p1Name) + '</a></td>';
+    html += '<td class="person"><a href="' + makePersonUrl(p2Iper) + '">' + esc(p2Name) + '</a></td>';
     html += '<td><i class="fa-solid fa-person-arrow-down-to-line fa-flip-horizontal"></i></td>';
     html += '</tr></tfoot>';
     html += '</table>';
 
     const table = document.getElementById('rm-table');
     html += '<div class="text-center">';
-    html += '<strong><a href="' + cellData.url + '" target="_blank">' + cellData.data.total + ' ' + table.dataset.linksLabel + '</a></strong>';
+    html += '<strong><a href="' + url + '" target="_blank" rel="noopener noreferrer">' + cellData.data.total + ' ' + table.dataset.linksLabel + '</a></strong>';
     html += '<br><span class="text-body-secondary">' + table.dataset.coeffLabel + ' : ' + cellData.data.coeff + '</span>';
     html += '</div>';
 
@@ -278,25 +284,28 @@ const RelationMatrix = (() => {
     const parts = dataId.split('_');
     const iper1 = parts[0].replace('§', '');
     const iper2 = parts[1].replace('§', '');
-    const cellData = Object.values(window.rmData.cells).find(cell =>
-      (cell.i1.p === iper1 && cell.i2.p === iper2) ||
-      (cell.i1.p === iper2 && cell.i2.p === iper1)
+    const cellData = Object.values(window.rmData.cells).find(entry=>
+      (entry.i1.p === iper1 && entry.i2.p === iper2) ||
+      (entry.i1.p === iper2 && entry.i2.p === iper1)
     );
-    cellData.url = url;
-    showRelationModal(cellData);
+    if (!cellData) {
+      console.error('No matching cell data for', dataId);
+      return;
+    }
+    showRelationModal(cellData, url);
   }
 
-  function showRelationModal(data) {
+  function showRelationModal(data, url) {
     const modalEl = document.getElementById('rmModal');
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
     const modalBody = document.getElementById('rmModalBody');
 
     let htmlContent = '<div class="rm-modal-container">';
-    htmlContent += renderAllLevels(data);
+    htmlContent += renderAllLevels(data, url);
 
     // Section debug compacte, uniquement si &debug en URL
-    if (window.location.search.includes('debug')) {
+    if (urlParams.has('debug')) {
       htmlContent += '<details class="rm-debug"><summary>Debug JSON</summary>';
       htmlContent += '<pre>' + JSON.stringify(data, null, 2) + '</pre></details>';
     }
