@@ -4391,11 +4391,11 @@ de: Karussell
 en: carrousel
 fr: carrousel
 
-    case sensitive
+    case
 co: maiuscule è alette
 de: Groß-/Kleinschreibung
-en: case sensitive
-fr: capitales et accents
+en: case sensitive/accents
+fr: majuscules/accents
 
     case sensitive title
 co: tene contu di e maiuscule è alette
