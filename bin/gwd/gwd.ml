@@ -2089,6 +2089,7 @@ let display_infos () =
   let path_info =
     [
       ("gwd", Sys.argv.(0));
+      ("bases_dir", Secure.base_dir ());
       ("working_dir", Sys.getcwd ());
       ("gw_prefix", Option.get !gw_prefix);
       ("etc_prefix", Option.get !etc_prefix);

@@ -57,9 +57,11 @@
             meta.description = "Run gwd server.";
           };
 
-          devShells.default =
-            pkgs.mkShell {
-              packages = with pkgs.ocamlPackages; [
+          devShells.default = pkgs.mkShell {
+              packages = (with pkgs; [
+                makeself
+              ])
+              ++ (with pkgs.ocamlPackages; [
                 qcheck
                 qcheck-alcotest
                 alcotest
@@ -71,7 +73,7 @@
                 ocamlformat
                 oui
                 dead_code_analyzer
-              ];
+              ]);
 
               inputsFrom = [
                 self.packages.${system}.geneweb-compat

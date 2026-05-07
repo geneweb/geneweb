@@ -9,5 +9,8 @@
  (package geneweb)
  (name gwb2ged)
  (public_name gwb2ged)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (modules gwb2ged)
  (libraries geneweb gwb2ged_lib gwu_lib str unix))
