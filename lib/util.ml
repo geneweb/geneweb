@@ -2168,8 +2168,8 @@ let string_of_decimal_num conf f =
     let exp_str =
       if exp < 0 then "−" ^ string_of_int (abs exp) else string_of_int exp
     in
-    Printf.sprintf "<span class=\"no-wrap\">≃ %s × 10<sup>%s</sup></span>" m_loc
-      exp_str
+    Printf.sprintf "<span class=\"text-nowrap\">≃ %s × 10<sup>%s</sup></span>"
+      m_loc exp_str
   else "0"
 
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
