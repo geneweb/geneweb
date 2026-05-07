@@ -1,246 +1,63 @@
-.PHONY: info refresh-version fmt build build-geneweb build-geneweb-rpc gwd \
-        install uninstall distrib distrib-rpc doc opendoc test bench \
-        bench-marshal bench-tabulate clean ci ocp-indent help bundle \
-        dmg clean-bundle
+DUNE?=dune
+DOCKER?=docker
+ODOC_DIR?=_build/default/_doc/_html
+OPAM?=opam
+TAG?=dev
 
-# OS / extension detection
-ifeq ($(OS),Windows_NT)
-  OS_TYPE := Win
-  EXT := .exe
-else
-  OS_TYPE := $(shell uname -s)
-  EXT :=
-endif
-
-# Variables for packagers.
-DISTRIB_DIR=distribution
-BUILD_DIR=_build/default
-BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
-ODOC_DIR=$(BUILD_DIR)/_doc/_html
-
-# [BEGIN] Generated files section
-
-COMPIL_DATE := $(shell date +'%Y-%m-%d')
-COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
-COMMIT_ID := $(shell git rev-parse --short HEAD)
-COMMIT_TITLE := $(shell git log -1 --pretty="%s" | sed "s/\"/\\\"/g")
-COMMIT_COMMENT:= $(shell git log -1 --pretty="%b" | sed "s/\"/\\\"/g")
-BRANCH := $(shell git symbolic-ref --quiet --short HEAD || git branch -r --contains HEAD | head -n1 | tr -d ' ')
-SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
-VERSION := $(shell awk -F\" '/^let ver =/ {print $$2}' lib/version.txt)
-OCAMLV := $(shell ocamlopt --version)
-
-info:
-	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with OCaml $(OCAMLV).\n\n'
-	@printf 'Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. '
-	@printf 'Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n'
-	@printf '  \033[1;1m%s\033[0m\n' '$(subst ','\'',$(COMMIT_TITLE))'
-ifneq ($(COMMIT_COMMENT),)
-	@printf '\n$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
-endif
-	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
-
-fmt build build-geneweb gwd distrib install uninstall: info
-
-fmt: ## Format Ocaml code
-	@printf "\n\033[1;1mOcamlformat\033[0m\n"
-	dune fmt
+fmt:
+	$(DUNE) fmt
 
 build:
-	dune build
+	$(DUNE) build @install
 
-build-geneweb: ## Build the geneweb package (libraries and binaries)
-	@printf "\n\033[1;1mBuilding executables\033[0m\n"
-	dune build @bin/all @lib/all
-	@printf "Done."
+build-geneweb:
+	$(DUNE) build @bin/all @lib/all
 
-build-geneweb-rpc: ## Build the geneweb-rpc package
-	@printf "\033[1;1mBuilding Geneweb RPC package\033[0m\n"
-	dune build @rpc/all
-	@printf "Done."
+build-geneweb-rpc:
+	$(DUNE) build @rpc/all
 
-gwd: ## Build ondy gwd/gwc executables
-	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
-	dune build @bin/gwd/all @bin/gwc/all
-	@printf "Done."
+build-gwd:
+	$(DUNE) build @bin/gwd/all @bin/gwc/all
 
-distrib: ## Build the project and copy what is necessary for distribution
-	dune build --release @bin/all @lib/all
-	@printf "Done.\n"
-	@rm -rf $(DISTRIB_DIR)
-	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
-	mkdir $(DISTRIB_DIR)
-	mkdir -p $(DISTRIB_DIR)/bases
-	cp CHANGES.md $(DISTRIB_DIR)/CHANGES.txt
-	cp LICENSE $(DISTRIB_DIR)/LICENSE.txt
-	cp etc/README.txt $(DISTRIB_DIR)/.
-	cp etc/LISEZMOI.txt $(DISTRIB_DIR)/.
-	cp etc/START.htm $(DISTRIB_DIR)/.
-ifeq ($(OS_TYPE),Win)
-	cp etc/Windows/gwd.bat $(DISTRIB_DIR)
-	cp etc/Windows/gwsetup.bat $(DISTRIB_DIR)
-	cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt
-	cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt
-	cp -f etc/ROBOT.txt $(DISTRIB_DIR)/ROBOT.txt
-else ifeq ($(OS_TYPE),Darwin)
-	cp etc/gwd.sh $(DISTRIB_DIR)/gwd.command
-	cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.command
-	cp etc/geneweb.sh $(DISTRIB_DIR)/geneweb.command
-else
-	cp etc/gwd.sh $(DISTRIB_DIR)/gwd.sh
-	cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.sh
-	cp etc/geneweb.sh $(DISTRIB_DIR)/geneweb.sh
-endif
-	mkdir $(DISTRIB_DIR)/gw
-	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
-	@printf "\n\033[1;1m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
-	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT)
-	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT)
-	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT)
-	cp $(BUILD_DISTRIB_DIR)ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT)
-	cp $(BUILD_DISTRIB_DIR)cache_files/cache_files.exe $(DISTRIB_DIR)/gw/cache_files$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT)
-	cp $(BUILD_DISTRIB_DIR)robot/robot.exe $(DISTRIB_DIR)/gw/robot$(EXT)
-	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT)
-	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT)
-	@printf "\n\033[1;1m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
-	cp -R hd/* $(DISTRIB_DIR)/gw/
-	rm $(DISTRIB_DIR)/gw/dune
-	rm $(DISTRIB_DIR)/gw/etc/js/dune
-	rm $(DISTRIB_DIR)/gw/etc/js/dune.inc
-	for f in $(DISTRIB_DIR)/gw/etc/js/*.js ; do \
-	  [ -e "$$f" ] || continue ; \
-	  case "$$f" in *.min.js) continue ;; esac ; \
-	  if [ -f "$${f%.js}.min.js" ]; then rm -f "$$f" ; fi ; \
-	done
-	@printf "\n\033[1;1m└ Compressing large JS/CSS assets\033[0m\n"
-	@for f in $(DISTRIB_DIR)/gw/etc/js/*.min.js; do \
-	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 4500 ]; then \
-	    printf "gzip -9 -k %s\n" "$$f"; \
-	    gzip -9 -k -f "$$f"; \
-	    printf "brotli %s\n" "$$f"; \
-	    brotli -f -q 11 "$$f"; \
-	  fi; \
-	done
-	@for f in $(DISTRIB_DIR)/gw/etc/css/*.css; do \
-	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 10000 ]; then \
-	    printf "gzip -9 -k %s\n" "$$f"; \
-	    gzip -9 -k -f "$$f"; \
-	    printf "brotli %s\n" "$$f"; \
-	    brotli -f -q 11 "$$f"; \
-	  fi; \
-	done
-	mkdir $(DISTRIB_DIR)/gw/setup
-	@printf "\n\033[1;1m└ Copy plugins in $(DISTRIB_DIR)/gw/plugins\033[0m\n"
-	mkdir $(DISTRIB_DIR)/gw/plugins
-	@for P in $(shell ls plugins); do \
-	  if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ] ; then \
-	    mkdir $(DISTRIB_DIR)/gw/plugins/$$P; \
-	    printf "cp %s %s\n" "$(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs" "$(DISTRIB_DIR)/gw/plugins/$$P/"; \
-	    cp $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs $(DISTRIB_DIR)/gw/plugins/$$P/; \
-	    if [ -d plugins/$$P/assets ] ; then \
-	      printf "cp -R %s %s\n" "$(BUILD_DIR)/plugins/$$P/assets" "$(DISTRIB_DIR)/gw/plugins/$$P/"; \
-	      cp -R $(BUILD_DIR)/plugins/$$P/assets $(DISTRIB_DIR)/gw/plugins/$$P/; \
-	    fi; \
-	    if [ -f $(BUILD_DIR)/plugins/$$P/META ] ; then \
-	      printf "cp %s %s\n" "$(BUILD_DIR)/plugins/$$P/META" "$(DISTRIB_DIR)/gw/plugins/$$P/"; \
-	      cp $(BUILD_DIR)/plugins/$$P/META $(DISTRIB_DIR)/gw/plugins/$$P/; \
-	    fi; \
-	  fi; \
-	done
-	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
-	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n\n"
+bundle:
+	TAG="$(TAG)" ./scripts/generate_bundle.sh
 
-distrib-rpc: distrib
-	dune build --release @rpc/all
-	@printf "\n\n\033[1;1m└ Copy RPC server executable and js client to distribution\033[0m\n"
-	mkdir -p $(DISTRIB_DIR)/gw/etc/js
-	cp $(BUILD_DIR)/rpc/server/server.exe $(DISTRIB_DIR)/gw/rpc_server$(EXT)
-	cp $(BUILD_DIR)/rpc/test/rpc_client.bc.js $(DISTRIB_DIR)/gw/etc/js/rpc_client.js
-	cp $(BUILD_DIR)/rpc/test/rpc_client.bc.js.gz $(DISTRIB_DIR)/gw/etc/js/rpc_client.js.gz
-	cp $(BUILD_DIR)/rpc/test/rpc_client.bc.js.br $(DISTRIB_DIR)/gw/etc/js/rpc_client.js.br
-	@echo "Done."
+bundle-static:
+	TAG="$(TAG)" LINKING_MODE=static ./scripts/generate_bundle.sh
 
-# [END] Installation / Distribution section
+deps:
+	$(OPAM) pin oui \
+		'https://github.com/Halbaroth/ocaml-universal-installer.git#allow-statically-linked-artifacts'
+	$(OPAM) pin ancient \
+		'https://github.com/OCamlPro/ocaml-ancient.git#0fbe48c744e5e400565a91367dc7937e151efc8f'
+	$(OPAM) install . --deps-only --with-test
 
-doc: ## Documentation generation
+docker:
+	$(DOCKER) build -t gwd --target gwd .
+	$(DOCKER) build -t gwsetup --target gwsetup .
+
+static:
+	$(DOCKER) build \
+		--build-arg TAG="$(TAG)" \
+		-t geneweb-static -f Dockerfile.static . -o .
+
 doc:
-	dune build @doc
+	$(DUNE) build @doc
 
 opendoc: doc
 	xdg-open $(ODOC_DIR)/index.html
 
-test: ## Run tests
-test:
-	@dune build @runtest
+test: build
+	$(DUNE) runtest
 
-ci: ## Run tests, skip known failures
-ci:
-	@GENEWEB_CI=on dune build @runtest
+ci: build
+	GENEWEB_CI=on $(DUNE) build @runtest
 
-bench: ## Run benchmarks
 bench:
-	dune build @runbench
-
-BENCH_FILE?=geneweb-bench.bin
-
-bench-marshal: ## Run benchmarks and record the result
-bench-marshal:
-ifdef BENCH_NAME
-	dune exec benchmark/bench.exe -- --marshal --name ${BENCH_NAME} ${BENCH_FILE}
-else
-	 $(error BENCH_NAME variable is empty)
-endif
-
-bench-tabulate: ## Read BENCH_FILE and print a report
-bench-tabulate:
-	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
-	@rm -f $(BENCH_FILE)
+	$(DUNE) build @runbench
 
 clean:
-	@echo -n "Cleaning…"
-	@rm -rf $(DISTRIB_DIR)
-	@rm -rf _build
-	@echo " Done."
+	$(DUNE) clean
 
-.DEFAULT_GOAL := help
-help:
-	@clear;grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' Makefile | awk 'BEGIN {FS = ":.*?#\
-# "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /[33m/'
-
-bundle: distrib ## Create macOS app bundle
-ifeq ($(OS_TYPE),Darwin)
-	@printf "\n\033[1;1m=== Creating macOS bundle ===\033[0m\n"
-	@if [ ! -f "create_bundle.sh" ]; then \
-		echo "❌ create_bundle.sh not found"; \
-		exit 1; \
-	fi
-	./create_bundle.sh
-	@printf "\n\033[1;1m✅ Bundle created: GeneWeb.app\033[0m\n"
-else
-	@echo "❌ Bundle creation is only supported on macOS"
-endif
-
-dmg: bundle ## Create macOS DMG installer
-ifeq ($(OS_TYPE),Darwin)
-	@printf "\n\033[1;1m=== Creating DMG installer ===\033[0m\n"
-	@if [ ! -f "create_dmg.sh" ]; then \
-		echo "❌ create_dmg.sh not found"; \
-		exit 1; \
-	fi
-	./create_dmg.sh
-	@printf "\n\033[1;1m✅ DMG created\033[0m\n"
-else
-	@echo "❌ DMG creation is only supported on macOS"
-endif
-
-clean-bundle: ## Remove generated bundle and DMG
-	@echo "Cleaning macOS artifacts…"
-	@rm -rf GeneWeb.app
-	@rm -f GeneWeb-*.dmg
-	@rm -f install_geneweb.sh
-	@echo "Done."
+.PHONY: all fmt build build-geneweb build-geneweb-rpc bundle bundle-static \
+	doc opendoc test ci bench clean
