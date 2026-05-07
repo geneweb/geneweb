@@ -1,4 +1,4 @@
-name: Geneweb Doc
+name: GeneWeb Documentation
 on:
   workflow_dispatch:
   push:

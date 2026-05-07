@@ -2,4 +2,7 @@
  (package geneweb)
  (name cache_files)
  (public_name cache_files)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (libraries decompress.gz unix str geneweb))

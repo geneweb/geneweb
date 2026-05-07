@@ -2,4 +2,7 @@
  (package geneweb)
  (name setup)
  (public_name gwsetup)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (libraries logs unix str geneweb_http geneweb))

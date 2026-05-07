@@ -6,6 +6,10 @@
 (cram
  (package geneweb-plugins)
  (applies_to plugins)
+ ; Dynamically loading is not supported for
+ ; statically linked binaries.
+ (enabled_if
+  (<> %{env:LINKING_MODE=} "static"))
  (deps
   (package geneweb-plugins)
   %{bin:gwd}

@@ -1,4 +1,4 @@
-name: Geneweb CI
+name: GeneWeb CI
 on:
   workflow_dispatch:
     inputs:
@@ -25,7 +25,6 @@ on:
       - '.ocamlformat'
       - '.ocamlformat-ignore'
       - 'geneweb.iss'
-      - 'geneweb.opam.template'
   push:
     branches:
       - master
@@ -45,10 +44,8 @@ on:
       - '.ocamlformat'
       - '.ocamlformat-ignore'
       - 'geneweb.iss'
-      - 'geneweb.opam.template'
 
 env:
-  DUNE_PROFILE: "dev"
   OPAMYES: true
 
 jobs:
@@ -102,11 +99,9 @@ jobs:
         shell: bash
         run: |
           curl -fsSL https://cpanmin.us | perl - --notest IPC::System::Simple String::ShellQuote
-          for pkg in conf-perl-ipc-system-simple conf-perl-string-shellquote; do
-            d=".pins/$pkg"; mkdir -p "$d"
-            printf 'opam-version: "2.0"\nsynopsis: "Pin bypass"\nmaintainer: "ci"\nbuild: ["true"]\ninstall: ["true"]\n' > "$d/opam"
-            opam pin add "$pkg" "$d" --yes --no-action
-          done
+          opam install --assume-depexts \
+            conf-perl-ipc-system-simple \
+            conf-perl-string-shellquote
 
       - name: Remove locked mingw gcc shim if present
         if: runner.os == 'Windows'
