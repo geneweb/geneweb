@@ -193,26 +193,7 @@ let print conf base =
       (tp_link conf)
       (Util.transl_nth conf "add/clear/show/edit the graph" 3
       |> Utf8.capitalize_fst);
-    if List.length pl >= 2 then (
-      let persons = Array.of_list pl in
-      print_matrix_table conf base persons;
-      Output.print_sstring conf
-        {|<script>
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('#rm-table [data-bs-toggle="tooltip"]')
-    .forEach(el => new bootstrap.Tooltip(el, { customClass: 'rm-tooltip' }));
-  document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    .forEach(el => bootstrap.Tooltip.getOrCreateInstance(el));
-  document.querySelectorAll('.table [data-id]').forEach(cell => {
-    const ids = cell.dataset.id.split('_');
-    const toggle = () => {
-      document.querySelectorAll('[data-id*="' + ids[0] + '"]').forEach(el => el.classList.toggle('rm-hl0'));
-      if (ids[1] && ids[1] !== ids[0])
-        document.querySelectorAll('[data-id*="' + ids[1] + '"]').forEach(el => el.classList.toggle('rm-hl1'));
-    };
-    cell.addEventListener('mouseenter', toggle);
-    cell.addEventListener('mouseleave', toggle);
-  });
-});
-</script>|});
+    (if List.length pl >= 2 then
+       let persons = Array.of_list pl in
+       print_matrix_table conf base persons);
     Hutil.trailer conf
