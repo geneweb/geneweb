@@ -36,8 +36,8 @@ val print_folder_images_json : config -> string option -> unit
     empty array is returned. Response [Content-type: application/json]. *)
 
 val print_album_image : config -> unit
-(** [print_album_image conf] serves the album image whose path is given by
-    the [s] environment parameter, resolved under [!GWPARAM.albums_d]. The
-    path may include subdirectories (e.g. `vacances/foo.jpg`). Paths
-    containing [..] or [\\] components are rejected. Access is granted to
-    wizards, friends, or for non-private images. *)
+(** [print_album_image conf] serves the album image whose path is given by the
+    [s] environment parameter, resolved under [!GWPARAM.albums_d]. The path may
+    include subdirectories (e.g. `vacances/foo.jpg`). Paths containing “..” or
+    “\\” components are rejected. Access is granted to wizards, friends, or for
+    non-private images. *)
