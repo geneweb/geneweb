@@ -349,7 +349,7 @@ let find_in conf x ini =
   in
   List.fold_left
     (fun acc ini ->
-      let ini = low ini in
+      let ini = ini in
       acc
       &&
       if any || List.length inil > 1 then
