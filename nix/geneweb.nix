@@ -1,6 +1,4 @@
 {
-  lib,
-  buildDunePackage,
   alcotest,
   ancient,
   brotli,
@@ -8,35 +6,40 @@
   crunch,
   pcre2,
   benchmark,
+  brotli,
+  buildDunePackage,
   calendars,
-  dune-site,
-  camlp5,
   camlp-streams,
+  camlp5,
+  cmdliner,
   decompress,
-  fmt,
-  logs,
-  logs-syslog,
-  jingoo,
-  markup,
-  ounit,
-  ppx_blob,
-  ppx_deriving,
-  qcheck,
-  qcheck-alcotest,
-  stdlib-shims,
-  unidecode,
-  uutf,
-  uunf,
-  uucp,
-  re,
-  uri,
-  yojson,
   digestif,
-  pp_loc,
-  ptime,
-  not-ocamlfind,
+  dune-site,
+  fmt,
   geneweb-compat,
   geneweb-http,
+  jingoo,
+  lib,
+  logs,
+  logs-syslog,
+  markup,
+  not-ocamlfind,
+  ounit,
+  pcre2,
+  pp_loc,
+  ppx_blob,
+  ppx_deriving,
+  ptime,
+  qcheck,
+  qcheck-alcotest,
+  re,
+  stdlib-shims,
+  unidecode,
+  uri,
+  uucp,
+  uunf,
+  uutf,
+  yojson,
 }:
 
 buildDunePackage {
@@ -47,9 +50,10 @@ buildDunePackage {
 
   nativeBuildInputs = [
     brotli
-    not-ocamlfind
     camlp5
     crunch
+    cmdliner
+    not-ocamlfind
   ];
 
   buildInputs = [
@@ -59,35 +63,35 @@ buildDunePackage {
   ];
 
   propagatedBuildInputs = [
-    geneweb-compat
-    geneweb-http
     ancient
-    cmdliner
-    pcre2
     benchmark
     calendars
-    dune-site
-    camlp5
     camlp-streams
+    camlp5
+    cmdliner
     decompress
+    digestif
+    dune-site
     fmt
+    geneweb-compat
+    geneweb-http
+    jingoo
     logs
     logs-syslog
-    jingoo
     markup
     ounit
+    pcre2
+    pp_loc
     ppx_blob
     ppx_deriving
+    ptime
+    re
     stdlib-shims
     unidecode
-    uutf
-    uunf
-    uucp
-    re
     uri
+    uucp
+    uunf
+    uutf
     yojson
-    digestif
-    pp_loc
-    ptime
   ];
 }

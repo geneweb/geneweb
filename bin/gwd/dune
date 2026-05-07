@@ -26,6 +26,9 @@
  (package geneweb)
  (name gwd)
  (public_name gwd)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (libraries
   dynlink
   geneweb
@@ -41,3 +44,25 @@
   unix
   uri)
  (modules gwd))
+
+(rule
+ (target
+  (dir cmdliner-support))
+ (deps gwd.exe)
+ (action
+  (ignore-stdout
+   (run cmdliner install tool-support ./gwd.exe:gwd cmdliner-support))))
+
+(rule
+ (deps
+  (:input cmdliner-support))
+ (action
+  (with-stdout-to
+   cmdliner-support-files.inc
+   (run ../generate_cmdliner_rules.exe %{input}))))
+
+(install
+ (package geneweb)
+ (section share_root)
+ (files
+  (include ./cmdliner-support-files.inc)))

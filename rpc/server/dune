@@ -2,6 +2,9 @@
  (package geneweb-rpc)
  (name server)
  (public_name gwd-rpc)
+ (flags
+  (:standard
+   (:include ../../bin/flags.dune)))
  (libraries
   geneweb_rpc
   lwt
@@ -19,3 +22,25 @@
   yojson)
  (preprocess
   (pps lwt_ppx)))
+
+(rule
+ (target
+  (dir cmdliner-support))
+ (deps server.exe)
+ (action
+  (ignore-stdout
+   (run cmdliner install tool-support ./server.exe:gwd-rpc cmdliner-support))))
+
+(rule
+ (deps
+  (:input cmdliner-support))
+ (action
+  (with-stdout-to
+   cmdliner-support-files.inc
+   (run ../../bin/generate_cmdliner_rules.exe %{input}))))
+
+(install
+ (package geneweb-rpc)
+ (section share_root)
+ (files
+  (include ./cmdliner-support-files.inc)))

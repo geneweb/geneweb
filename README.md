@@ -102,7 +102,7 @@ normally.
 On Unix systems, ports below 1024 require elevated privileges.
 
 **Linux** — use capabilities:
-```sh
+```console
 sudo setcap 'cap_net_bind_service=+ep' gwd
 ./gwd -p 80
 ```
