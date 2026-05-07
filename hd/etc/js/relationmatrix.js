@@ -11,22 +11,15 @@ const RelationMatrix = (() => {
   /* Détection du mode CGI et stockage du paramètre base */
   const urlParams = new URLSearchParams(window.location.search);
   const baseParam = urlParams.get('b');
+  const labels = {};
 
   function getPersonName(iper) {
     if (!iper) return 'N/A';
-    if (window.rmData && window.rmData.names && window.rmData.names[iper]) {
-      return window.rmData.names[iper];
-    }
-    return 'iper:' + iper;
+    return window.rmData?.names?.[iper] ?? 'iper:' + iper;
   }
 
   function makePersonUrl(iper) {
     return '?' + (baseParam ? 'b=' + baseParam + '&' : '') + 'i=' + iper;
-  }
-
-  function makeEditUrl(iper) {
-    return '?' + (baseParam ? 'b=' + baseParam + '&' : '') +
-           'm=MOD_IND&i=' + iper;
   }
 
   /* URL vers le graphe de parenté m=RL (dag=on affiche tous les chemins) */
@@ -52,12 +45,12 @@ const RelationMatrix = (() => {
       let partner = null;
       let partnerIdx = -1;
 
-      if (anc1.f && anc1.f.length > 0) {
+      if (anc1.f?.length) {
         for (let idx2 = idx1 + 1; idx2 < ancestors.length; idx2++) {
           if (processed.has(idx2)) continue;
 
           const anc2 = ancestors[idx2];
-          if (anc2.f && anc2.f.length > 0) {
+          if (anc2.f?.length) {
             const commonFamily = anc1.f.some(f1 => anc2.f.includes(f1));
             if (commonFamily) {
               partner = anc2;
@@ -111,7 +104,7 @@ const RelationMatrix = (() => {
 
     // Collecter tous les ancêtres et leurs niveaux
     sortedPaths.forEach(path => {
-      if (path.anc && path.anc.length > 0) {
+      if (path.anc?.length) {
         path.anc.forEach(anc => {
           if (!ancestorLevels.has(anc.p)) {
             ancestorLevels.set(anc.p, {
@@ -189,8 +182,8 @@ const RelationMatrix = (() => {
   function renderAllLevels(cellData, url) {
     let html = '';
 
-    const p1Iper = cellData.i1 ? cellData.i1.p : '';
-    const p2Iper = cellData.i2 ? cellData.i2.p : '';
+    const p1Iper = cellData.i1?.p ?? '';
+    const p2Iper = cellData.i2?.p ?? '';
     const p1Name = getPersonName(p1Iper);
     const p2Name = getPersonName(p2Iper);
     const sortedPaths = [...cellData.data.paths].sort((a, b) => {
@@ -200,9 +193,9 @@ const RelationMatrix = (() => {
     html += '<table class="table table-sm mb-1">';
     html += '<tbody>';
 
-    sortedPaths.forEach((path, index) => {
+    sortedPaths.forEach(path => {
       let ancestorsHtml = '';
-      if (path.anc && path.anc.length > 0) {
+      if (path.anc?.length) {
         const groups = groupAncestorsByCouples(path.anc);
         const formattedGroups = groups.map(group =>
           formatAncestorGroup(group, path.l1, p1Iper, path.l2, p2Iper)
@@ -223,11 +216,9 @@ const RelationMatrix = (() => {
     html += '<td><i class="fa-solid fa-person-arrow-down-to-line fa-flip-horizontal"></i></td>';
     html += '</tr></tfoot>';
     html += '</table>';
-
-    const table = document.getElementById('rm-table');
     html += '<div class="text-center">';
-    html += '<strong><a href="' + url + '" target="_blank" rel="noopener noreferrer">' + cellData.data.total + ' ' + table.dataset.linksLabel + '</a></strong>';
-    html += '<br><span class="text-body-secondary">' + table.dataset.coeffLabel + ' : ' + cellData.data.coeff + '</span>';
+    html += '<strong><a href="' + url + '" target="_blank" rel="noopener noreferrer">' + cellData.data.total + ' ' + labels.links + '</a></strong>';
+    html += '<br><span class="text-body-secondary">' + labels.coeff + ' : ' + cellData.data.coeff + '</span>';
     html += '</div>';
 
     // Ajouter les liens somme
@@ -312,22 +303,23 @@ const RelationMatrix = (() => {
 
     htmlContent += '</div>';
 
+    modalEl.addEventListener('shown.bs.modal', () => {
+      modalBody.scrollTop = modalBody.scrollHeight;
+    }, { once: true });
     modalBody.innerHTML = htmlContent;
     modal.show();
-
-    setTimeout(() => {
-      modalBody.scrollTop = modalBody.scrollHeight;
-    }, 100);
   }
 
   return {
     init: function() {
       const rmTable = document.getElementById('rm-table');
       if (!rmTable) return;
+      labels.links = rmTable.dataset.linksLabel;
+      labels.coeff = rmTable.dataset.coeffLabel;
       initTooltips(rmTable);
       initHover(rmTable);
-      if (!window.rmData || !window.rmData.cells) {
-        console.error('rmData non disponible');
+      if (!window.rmData?.cells) {
+        console.error('rmData unavailable');
         return;
       }
       rmTable.addEventListener('click', handleCellClick);
