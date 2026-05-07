@@ -1,4 +1,4 @@
-/* relationMatrix.js - Gestion des modals pour le tableau de parenté */
+/* relationMatrix.js - Gestion des modals et hovers pour le tableau de parenté */
 const RelationMatrix = (() => {
   'use strict';
 
@@ -230,6 +230,43 @@ const RelationMatrix = (() => {
     return html;
   }
 
+  // Hover row/col highlight (rm-hl0 = row person, rm-hl1 = col person).
+  // Anchored selectors avoid false positives between ipers sharing a
+  // numeric prefix (e.g. "4" vs "43198").
+  function clearHighlights(table) {
+    table.querySelectorAll('.rm-hl0, .rm-hl1')
+      .forEach(el => el.classList.remove('rm-hl0', 'rm-hl1'));
+  }
+
+  function paintPerson(table, id, cls) {
+    if (!id) return;
+    table.querySelectorAll(
+      '[data-id^="' + id + '_"], [data-id$="_' + id + '"]'
+    ).forEach(el => el.classList.add(cls));
+  }
+
+  // Re-create tooltips with rm-tooltip styling. Dispose any instance
+  // already created by the global initTooltips of js.txt to ensure the
+  // customClass is applied regardless of init order.
+  function initTooltips(table) {
+    table.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+      bootstrap.Tooltip.getInstance(el)?.dispose();
+      new bootstrap.Tooltip(el, { customClass: 'rm-tooltip' });
+    });
+  }
+
+  function initHover(table) {
+    table.addEventListener('mouseover', event => {
+      const t = event.target.closest('[data-id]');
+      if (!t || !table.contains(t)) return;
+      const [a, b] = t.dataset.id.split('_');
+      clearHighlights(table);
+      paintPerson(table, a, 'rm-hl0');
+      if (b && b !== a) paintPerson(table, b, 'rm-hl1');
+    });
+    table.addEventListener('mouseleave', () => clearHighlights(table));
+  }
+
   /* Gestionnaire de clic sur les cellules */
   function handleCellClick(event) {
     const cell = event.target.closest('.rm-cell');
@@ -276,15 +313,15 @@ const RelationMatrix = (() => {
 
   return {
     init: function() {
+      const rmTable = document.getElementById('rm-table');
+      if (!rmTable) return;
+      initTooltips(rmTable);
+      initHover(rmTable);
       if (!window.rmData || !window.rmData.cells) {
         console.error('rmData non disponible');
         return;
       }
-
-      const rmTable = document.getElementById('rm-table');
-      if (rmTable) {
-        rmTable.addEventListener('click', handleCellClick);
-      }
+      rmTable.addEventListener('click', handleCellClick);
     }
   };
 
