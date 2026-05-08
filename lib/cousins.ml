@@ -133,10 +133,6 @@ let sibling_has_desc_lev conf base lev (ip, _) =
 
 (* begin cousins *)
 
-let cousins_table = Array.make_matrix 1 1 []
-let tm = Unix.localtime (Unix.time ())
-let today_year = tm.Unix.tm_year + 1900
-
 let update_min_max (min, max) date =
   ((if date < min then date else min), if date > max then date else max)
 
@@ -196,6 +192,10 @@ let max_descendant_level conf base ip max_lvl =
   loop0 [ ip ] 0
 
 let get_min_max_dates base l =
+  let today_year =
+    let tm = Unix.localtime (Unix.time ()) in
+    tm.Unix.tm_year + 1900
+  in
   let rec loop (min, max) = function
     | [] -> (min, max)
     | one_cousin :: l -> (
