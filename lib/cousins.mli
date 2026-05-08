@@ -17,8 +17,6 @@ type cousins_i_j = one_cousin list
 type cousins_sparse
 (** Sparse structure storing cousins at each ancestor/descendant level *)
 
-val cousins_table : cousins_i_j array array
-
 val default_max_cnt : int
 (** Default number of relatives that could be listed at the same page *)
 
