@@ -5487,16 +5487,10 @@ sv: kopiera länken
 tr: bağlantıyı panoya kopyala
 
     copy permalink
-co: cupià u permaliame in u preme’papei
-de: Permalink kopieren in die Zwischenablage
-en: copy the permalink to the clipboard. Add _f (friends) or _w (wizards) to the base name if you wish that the link to carry this privilege.
-fr: copier le permalien dans le presse-papier. Ajoutez _f (amis) ou _w (magicien) au nom de la base si vous souhaitez que le lien porte ce privilège.
-
-    permalink
-co: permaliame
-de: Permalink
-en: permalink
-fr: permalien 
+co: cupià u permaliame
+de: Permalink kopieren
+en: copy the permalink
+fr: copier le permalien
 
     country
 co: statu
