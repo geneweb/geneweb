@@ -502,6 +502,310 @@ let cousins_implex_cnt sparse _conf _base l1 l2 _p =
       cnt + try Hashtbl.find ip_counts ip with Not_found -> 0)
     0 cousl0
 
+let prec_string = function
+  | Adef.Sure -> ""
+  | Before -> "<"
+  | After -> ">"
+  | About -> "~"
+  | Maybe -> "?"
+  | OrYear _ -> "|"
+  | YearInt _ -> ".."
+
+let json_date_opt cd =
+  match Date.od_of_cdate cd with
+  | Some (Dgreg (dmy, _)) when dmy.year <> 0 ->
+      let int_or_null n = if n > 0 then `Int n else `Null in
+      `Assoc
+        [
+          ("y", `Int dmy.year);
+          ("m", int_or_null dmy.month);
+          ("d", int_or_null dmy.day);
+          ("p", `String (prec_string dmy.prec));
+        ]
+  | _ -> `Null
+
+let iper_or_null ip =
+  if ip = Driver.Iper.dummy then `Null else `String (Driver.Iper.to_string ip)
+
+(* Pair raw [one_cousin] entries within a cell by their (ip, ifam chain):
+   two descendants of an ancestor couple appear with identical [ifaml],
+   seeded from each parent. Aggregate chain multiplicity per (ip,
+   canonicalized ancestor pair) into [nbr]. A singleton (one ancestor) is
+   a half-relation where the other parent of the top family is not in
+   self's ancestor list. *)
+let pair_paths (paths : one_cousin list) =
+  let by_chain = Hashtbl.create 64 in
+  List.iter
+    (fun (ip, ifaml, anc, lvl) ->
+      let key = (ip, ifaml) in
+      let s, _ =
+        try Hashtbl.find by_chain key with Not_found -> (Iper.Set.empty, lvl)
+      in
+      Hashtbl.replace by_chain key (Iper.Set.add anc s, lvl))
+    paths;
+  let canon a b = if compare a b <= 0 then (a, Some b) else (b, Some a) in
+  let by_pair = Hashtbl.create 64 in
+  Hashtbl.iter
+    (fun (ip, _) (anc_set, lvl) ->
+      let pair =
+        match Iper.Set.elements anc_set with
+        | [ a ] -> (a, None)
+        | [ a; b ] -> canon a b
+        | _ -> (Driver.Iper.dummy, None)
+      in
+      let key = (ip, pair) in
+      let n, l0 = try Hashtbl.find by_pair key with Not_found -> (0, lvl) in
+      Hashtbl.replace by_pair key (n + 1, l0))
+    by_chain;
+  Hashtbl.fold
+    (fun (ip, (a1, a2)) (nbr, lvl) acc -> (ip, a1, a2, nbr, lvl) :: acc)
+    by_pair []
+
+let path_to_json (ip, a1, a2, nbr, lvl) =
+  `Assoc
+    [
+      ("ip", `String (Driver.Iper.to_string ip));
+      ("a1", iper_or_null a1);
+      ("a2", match a2 with None -> `Null | Some a -> iper_or_null a);
+      ("nbr", `Int nbr);
+      ("lvl", `Int lvl);
+    ]
+
+let span_to_json (smin, smax) =
+  let absent = (smin = 0 && smax = 0) || (smin = 10000 && smax = -10000) in
+  if absent then `Assoc [ ("min_yr", `Null); ("max_yr", `Null) ]
+  else `Assoc [ ("min_yr", `Int smin); ("max_yr", `Int smax) ]
+
+let cell_label conf i j =
+  let key = Printf.sprintf "cousins.%d.%d" i j in
+  let s = Util.transl_nth conf key 0 in
+  let p = Util.transl_nth conf key 1 in
+  let tt_key = key ^ " tt" in
+  let tt_raw = Util.transl conf tt_key in
+  let tt =
+    if tt_raw = tt_key || tt_raw = Printf.sprintf "[%s]" tt_key then `Null
+    else `String tt_raw
+  in
+  (s, p, tt)
+
+let collect_all_ipers sparse =
+  CoordMap.fold
+    (fun _ paths acc ->
+      List.fold_left
+        (fun acc (ip, _, anc, _) -> Iper.Set.add ip (Iper.Set.add anc acc))
+        acc paths)
+    sparse.data Iper.Set.empty
+
+let collect_persons conf base ipers =
+  let meta_tbl = Hashtbl.create (Iper.Set.cardinal ipers + 1) in
+  let persons_rev =
+    Iper.Set.fold
+      (fun ip acc ->
+        let p = Driver.poi base ip in
+        let alive =
+          let p_auth = Util.authorized_age conf base p in
+          match Driver.get_death p with
+          | NotDead | DontKnowIfDead -> true
+          | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> not p_auth
+        in
+        let has_par = Driver.get_parents p <> None in
+        let has_child = Array.length (Driver.get_family p) > 0 in
+        let fn = Driver.sou base (Driver.get_first_name p) in
+        let sn = Driver.sou base (Driver.get_surname p) in
+        let oc = Driver.get_occ p in
+        Hashtbl.add meta_tbl ip (alive, has_child, Driver.get_sex p, fn, sn);
+        let sex =
+          match Driver.get_sex p with Male -> 0 | Female -> 1 | Neuter -> 2
+        in
+        let vis = Util.authorized_age conf base p in
+        let dates =
+          if vis then (DateDisplay.short_dates_text_notag conf base p :> string)
+          else ""
+        in
+        let birth = json_date_opt (Driver.get_birth p) in
+        let death =
+          match Driver.get_death p with
+          | Death (_, cd) -> json_date_opt cd
+          | _ -> `Null
+        in
+        let fn_key = Name.lower fn in
+        let sn_key = Name.lower sn in
+        let age_d =
+          if vis then
+            match age_days conf base p with Some n -> `Int n | None -> `Null
+          else `Null
+        in
+        let json =
+          `Assoc
+            [
+              ("fn", `String fn);
+              ("sn", `String sn);
+              ("fn_key", `String fn_key);
+              ("sn_key", `String sn_key);
+              ("oc", `Int oc);
+              ("sex", `Int sex);
+              ("alive", `Bool alive);
+              ("has_par", `Bool has_par);
+              ("has_child", `Bool has_child);
+              ("vis", `Bool vis);
+              ("dates", `String dates);
+              ("birth", birth);
+              ("death", death);
+              ("age_d", age_d);
+            ]
+        in
+        (Driver.Iper.to_string ip, json) :: acc)
+      ipers []
+  in
+  (List.rev persons_rev, meta_tbl)
+
+let cell_counts meta_tbl paired =
+  let dist_set =
+    List.fold_left
+      (fun s (ip, _, _, _, _) -> Iper.Set.add ip s)
+      Iper.Set.empty paired
+  in
+  let alive_set =
+    Iper.Set.filter
+      (fun ip ->
+        match Hashtbl.find_opt meta_tbl ip with
+        | Some (alive, _, _, _, _) -> alive
+        | None -> false)
+      dist_set
+  in
+  let no_desc_n =
+    Iper.Set.fold
+      (fun ip acc ->
+        match Hashtbl.find_opt meta_tbl ip with
+        | Some (_, has_child, _, _, _) when not has_child -> acc + 1
+        | _ -> acc)
+      dist_set 0
+  in
+  let n_paths =
+    List.fold_left (fun acc (_, _, _, nbr, _) -> acc + nbr) 0 paired
+  in
+  ( n_paths,
+    Iper.Set.cardinal dist_set,
+    Iper.Set.cardinal alive_set,
+    no_desc_n,
+    dist_set,
+    alive_set )
+
+let cell_to_json conf meta_tbl i j paths min_max =
+  let paired = pair_paths paths in
+  let n_paths, n_dist, n_alive, n_no_desc, dist_set, alive_set =
+    cell_counts meta_tbl paired
+  in
+  let label_s, label_p, tt = cell_label conf i j in
+  let name_of ip =
+    match Hashtbl.find_opt meta_tbl ip with
+    | Some (_, _, _, fn, sn) -> fn ^ " " ^ sn
+    | None -> ""
+  in
+  let sex_of ip =
+    match Hashtbl.find_opt meta_tbl ip with
+    | Some (_, _, s, _, _) -> s
+    | None -> Neuter
+  in
+  let path_tt (ip, a1, a2, _nbr, _lvl) =
+    if j = 0 || a1 = Driver.Iper.dummy then `Null
+    else
+      let label =
+        Util.transl_nth conf
+          (Printf.sprintf "cousin.0.%d" j)
+          (Util.index_of_sex (sex_of ip))
+      in
+      let ancs =
+        match a2 with
+        | None -> name_of a1
+        | Some b -> name_of a1 ^ " " ^ Util.transl conf "and" ^ " " ^ name_of b
+      in
+      `String (Util.transl_a_of_b conf label ancs ancs)
+  in
+  let path_json p =
+    match path_to_json p with
+    | `Assoc l -> `Assoc (l @ [ ("tt", path_tt p) ])
+    | other -> other
+  in
+  let json =
+    `Assoc
+      [
+        ("i", `Int i);
+        ("j", `Int j);
+        ("label_s", `String label_s);
+        ("label_p", `String label_p);
+        ("tt", tt);
+        ( "cnt",
+          `Assoc
+            [
+              ("paths", `Int n_paths);
+              ("dist", `Int n_dist);
+              ("alive", `Int n_alive);
+              ("no_desc", `Int n_no_desc);
+            ] );
+        ("span", span_to_json min_max);
+        ("paths", `List (List.map path_json paired));
+      ]
+  in
+  (json, dist_set, alive_set)
+
+let cousins_to_json conf base self_p sparse =
+  let self_iper = Driver.get_iper self_p in
+  let ipers = collect_all_ipers sparse in
+  let persons, meta_tbl = collect_persons conf base ipers in
+  let non_empty = CoordMap.filter (fun _ paths -> paths <> []) sparse.data in
+  let cells_rev, anc_acc, desc_acc, dist_acc, alive_acc =
+    CoordMap.fold
+      (fun (i, j) paths (cs, anc, desc, dist, alive) ->
+        let mm =
+          try CoordMap.find (i, j) sparse.dates with Not_found -> (0, 0)
+        in
+        let json, dset, aset = cell_to_json conf meta_tbl i j paths mm in
+        let anc = if i >= 1 && j = 0 then Iper.Set.union anc dset else anc in
+        let desc = if i = 0 && j >= 1 then Iper.Set.union desc dset else desc in
+        ( json :: cs,
+          anc,
+          desc,
+          Iper.Set.union dist dset,
+          Iper.Set.union alive aset ))
+      non_empty
+      ([], Iper.Set.empty, Iper.Set.empty, Iper.Set.empty, Iper.Set.empty)
+  in
+  let cells = List.rev cells_rev in
+  let totals =
+    `Assoc
+      [
+        ("anc", `Int (Iper.Set.cardinal anc_acc));
+        ("desc", `Int (Iper.Set.cardinal desc_acc));
+        ("dist", `Int (Iper.Set.cardinal dist_acc));
+        ("alive", `Int (Iper.Set.cardinal alive_acc));
+      ]
+  in
+  let lvl =
+    match p_getenv conf.env "v" with
+    | Some v -> ( try int_of_string v with _ -> 0)
+    | None -> 0
+  in
+  let max_a, max_d =
+    CoordMap.fold
+      (fun (i, j) _ (ma, md) -> (max ma i, max md j))
+      non_empty (0, 0)
+  in
+  let abk = List.assoc_opt "access_by_key" conf.base_env = Some "yes" in
+  `Assoc
+    [
+      ("version", `Int 1);
+      ("abk", `Bool abk);
+      ("wizard", `Bool conf.wizard);
+      ("lvl", `Int lvl);
+      ("max_anc_lvl", `Int max_a);
+      ("max_desc_lvl", `Int max_d);
+      ("self_iper", `String (Driver.Iper.to_string self_iper));
+      ("persons", `Assoc persons);
+      ("cells", `List cells);
+      ("totals", totals);
+    ]
+
 (* tableau des ascendants de p *)
 let init_asc_cnt conf base p =
   let max_a_l = max_ancestor_level conf base (Driver.get_iper p) 0 in
