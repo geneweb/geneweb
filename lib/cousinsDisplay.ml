@@ -407,7 +407,27 @@ let print_anniv conf base p dead_people level =
         BirthdayDisplay.gen_print_menu_dead conf base f_scan mode
       else BirthdayDisplay.gen_print_menu_birth conf base f_scan mode
 
-let cousmenu_print = Perso.interp_templ "cousmenu"
+let escape_lt_for_inline_script s =
+  let b = Buffer.create (String.length s) in
+  String.iter
+    (function '<' -> Buffer.add_string b "\\u003c" | c -> Buffer.add_char b c)
+    s;
+  Buffer.contents b
+
+let emit_cousins_json conf base p =
+  let sparse = Cousins.init_cousins_cnt conf base p in
+  let json = Cousins.cousins_to_json conf base p sparse in
+  let json_str = escape_lt_for_inline_script (Yojson.Safe.to_string json) in
+  Output.print_sstring conf
+    "\n<script id=\"cousins-data\" type=\"application/json\">";
+  Output.print_sstring conf json_str;
+  Output.print_sstring conf "</script>\n";
+  if List.assoc_opt "cousins_json_debug" conf.base_env = Some "yes" then
+    try
+      let oc = open_out "/tmp/cousins_debug.json" in
+      output_string oc (Yojson.Safe.pretty_to_string json);
+      close_out oc
+    with _ -> ()
 
 let print conf base p =
   let max_lvl = max_cousin_level conf in
@@ -431,4 +451,6 @@ let print conf base p =
       print_cousins conf base p lvl1 lvl2
   | _, _, Some (("AN" | "AD") as t) when conf.wizard || conf.friend ->
       print_anniv conf base p (t = "AD") max_lvl
-  | _ -> cousmenu_print conf base p
+  | _ ->
+      Perso.interp_templ "cousmenu" conf base p;
+      emit_cousins_json conf base p

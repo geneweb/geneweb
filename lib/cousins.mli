@@ -152,3 +152,63 @@ val init_asc_cnt :
 (** Builds array of ancestors by level. Index 0 = person, 1 = parents, etc. Each
     entry contains all ancestor paths to that level (including duplicates for
     implex detection). *)
+
+val cousins_to_json :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  cousins_sparse ->
+  Yojson.Safe.t
+(** Serializes the full cousins sparse structure as a single JSON value suitable
+    for inline injection into the cousmenu template and for consumption by the
+    frontend.
+
+    Persons are deduplicated into a top-level dict keyed by iper string; cells
+    reference persons by iper. Performs exactly one [Driver.poi] per distinct
+    iper.
+
+    Each person carries:
+    - display strings [fn], [sn] (raw) and URL-normalized [p_key], [n_key] (via
+      [Name.lower], identical to template [%first_name_key;] / [%surname_key;])
+      for building [m=P] links and stable sort keys
+    - [oc] (occurrence), [sex] (0 Neuter, 1 Male, 2 Female)
+    - [alive], [has_par], [has_child], [vis] booleans; [vis] reflects
+      [Util.authorized_age]
+    - [dates] formatted string from [DateDisplay.short_dates_text]
+    - [birth] / [death] structured objects [{ y; m; d; p }] or [`Null]: [y] is
+      non-zero year (else date absent); [m], [d] are [`Null] when partial (0);
+      [p] is the precision marker ([""] Sure, ["<"] Before, [">"] After, ["~"]
+      About, ["?"] Maybe, ["|"] OrYear, [".."] YearInt).
+    - [age_d] precomputed age in days from [Perso.age_days] ([`Null] if bounds
+      incomplete), matching v1 [jd_age_] semantics ([death_jd - birth_jd] if
+      dead, [today_jd - birth_jd] if alive).
+
+    Output shape (informal):
+    {[
+    { version: 1; abk: bool; wizard: bool; lvl: int;
+      max_anc_lvl: int; max_desc_lvl: int;
+      self_iper: string;
+      persons: { <iper>: { fn; sn; p_key; n_key; oc; sex;
+                           alive; has_par; has_child; vis; dates;
+                           birth: { y; m; d; p } | null;
+                           death: { y; m; d; p } | null;
+                           age_d: int | null } };
+      cells: [ { i; j; label_s; label_p; tt;
+                 cnt: { paths; dist; alive; no_desc };
+                 span: { min_yr; max_yr };
+                 paths: [ { ip; a1; a2; nbr; lvl } ]
+      totals: { anc; desc; dist; alive } }
+    ]}
+
+    Non-visible persons are still emitted with [vis=false] but with empty
+    [dates] and null [age_d]. [alive] follows the perso.ml is_dead convention:
+    true for NotDead/DontKnowIfDead/OfCourseDead, and true for
+    Death/DeadYoung/DeadDontKnowWhen if not p_auth.
+
+    Each [paths] entry is a *pivot pair* aggregating raw cousin records by
+    common [ifam] chain. [a1] is the principal ancestor (or [`Null] for the self
+    cell), [a2] the spouse on the top family of the chain ([`Null] for a
+    half-relation where the spouse is not in self's ancestor list). [nbr] counts
+    distinct descent chains through this exact pivot pair: > 1 indicates implex.
+    Within a cell a same [ip] may appear in multiple entries, one per distinct
+    pivot pair. *)
