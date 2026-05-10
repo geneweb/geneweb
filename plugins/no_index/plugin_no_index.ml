@@ -118,14 +118,8 @@ let w_base =
   Gwd_lib.Request.w_base ~none
 
 let no_index conf base =
-  let opt1 =
-    Util.p_getenv conf.env "opt" = Some "no_index"
-    || Util.p_getenv conf.env "opt" = Some "noindex"
-  in
-  let opt2 =
-    Util.p_getenv conf.env "opt" = Some "no_index_pwd"
-    || Util.p_getenv conf.env "opt" = Some "noindexpwd"
-  in
+  let opt1 = Util.p_getenv conf.env "opt" = Some "no_index" in
+  let opt2 = Util.p_getenv conf.env "opt" = Some "no_index_pwd" in
   if opt1 || opt2 then (
     let link = url_no_index conf base opt2 in
     Output.print_sstring conf {|<a href="|};
