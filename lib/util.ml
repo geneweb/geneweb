@@ -3658,3 +3658,117 @@ let url_set_aux conf url evar_l str_l =
   in
 
   Format.sprintf "%s?%s" href (reorder conf url_env)
+
+let url_no_index conf base pwd =
+  let scratch s = Mutil.encode (Name.lower (Driver.sou base s)) in
+  let get_a_person v =
+    try
+      let i = Driver.Iper.of_string (Mutil.decode v) in
+      let p = pget conf base i in
+      if
+        (is_hide_names conf p && not (authorized_age conf base p))
+        || is_hidden p
+      then None
+      else
+        let f = scratch (Driver.get_first_name p) in
+        let s = scratch (Driver.get_surname p) in
+        let oc = string_of_int (Driver.get_occ p) |> Adef.encoded in
+        Some (f, s, oc)
+    with Failure _ -> None
+  in
+  let get_a_family v =
+    try
+      let i = Driver.Ifam.of_string (Mutil.decode v) in
+      let fam = Driver.foi base i in
+      let p = pget conf base (Driver.get_father fam) in
+      let f = scratch (Driver.get_first_name p) in
+      let s = scratch (Driver.get_surname p) in
+      if
+        (f : Adef.encoded_string :> string) = ""
+        || (s : Adef.encoded_string :> string) = ""
+      then None
+      else
+        let oc = string_of_int (Driver.get_occ p) |> Adef.encoded in
+        let u = pget conf base (Driver.get_father fam) in
+        let n =
+          let rec loop k =
+            if (Driver.get_family u).(k) = i then
+              string_of_int k |> Adef.encoded
+            else loop (k + 1)
+          in
+          loop 0
+        in
+        Some (f, s, oc, n)
+    with Failure _ -> None
+  in
+  let env =
+    let rec loop :
+        (string * Adef.encoded_string) list ->
+        (string * Adef.encoded_string) list = function
+      | [] -> []
+      | ("opt", s) :: l
+        when (s :> string) = "no_index" || (s :> string) = "noindex" ->
+          loop l
+      | ("opt", s) :: l
+        when (s :> string) = "no_index_pwd" || (s :> string) = "noindexpwd" ->
+          loop l
+      | (("dsrc" | "escache" | "templ"), _) :: l -> loop l
+      | ("i", v) :: l -> new_env "i" v (fun x -> x) l
+      | ("ei", v) :: l -> new_env "ei" v (fun x -> "e" ^ x) l
+      | (k, v) :: l when String.length k = 2 && k.[0] = 'i' ->
+          let c = String.make 1 k.[1] in
+          new_env k v (fun x -> x ^ c) l
+      | (k, (v : Adef.encoded_string)) :: l
+        when String.length k > 2 && k.[0] = 'e' && k.[1] = 'f' ->
+          new_fam_env k v (fun x -> x ^ k) l
+      | kv :: l -> kv :: loop l
+    and new_env k (v : Adef.encoded_string) c l :
+        (string * Adef.encoded_string) list =
+      match get_a_person v with
+      | Some (f, s, oc) ->
+          if (oc :> string) = "0" then (c "p", f) :: (c "n", s) :: loop l
+          else (c "p", f) :: (c "n", s) :: (c "oc", oc) :: loop l
+      | None -> (k, v) :: loop l
+    and new_fam_env k (v : Adef.encoded_string) c l =
+      match get_a_family v with
+      | Some (f, s, oc, n) ->
+          let l = loop l in
+          let l = if (n :> string) = "0" then l else (c "f", n) :: l in
+          if (oc :> string) = "0" then (c "p", f) :: (c "n", s) :: l
+          else (c "p", f) :: (c "n", s) :: (c "oc", oc) :: l
+      | None -> (k, v) :: loop l
+    in
+    loop conf.env
+  in
+  let addr =
+    let pref =
+      let s = get_request_string conf in
+      match String.rindex_opt s '?' with
+      | Some i -> String.sub s 0 i
+      | None -> s
+    in
+    let pref =
+      if pwd then pref
+      else
+        match String.rindex_opt pref '_' with
+        | Some i -> String.sub pref 0 i
+        | None -> pref
+    in
+    get_server_string conf ^ pref
+  in
+  let suff : Adef.encoded_string =
+    List.fold_right
+      (fun (x, v) s ->
+        if (v : Adef.encoded_string :> string) <> "" then
+          let eq = "=" in
+          let amp =
+            if (s : Adef.encoded_string :> string) = "" then "" else "&"
+          in
+          x ^ eq ^ (v :> string) ^ amp ^ (s :> string) |> Adef.encoded
+        else s)
+      (("lang", Mutil.encode conf.lang) :: env)
+      (Adef.encoded "")
+  in
+  if conf.cgi then
+    addr ^ "?b=" ^ (conf.bname :> string) ^ "&" ^ (suff :> string)
+  else addr ^ "?" ^ (suff :> string)

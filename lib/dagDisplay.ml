@@ -233,7 +233,8 @@ let eval_predefined_apply f vl =
             | "min" -> max_int
             | "max" -> 0 - max_int
             | _ -> raise Not_found)
-        | VVstring s -> int_of_string s
+        | VVstring s -> (
+            try int_of_string s with Failure _ -> raise Not_found)
         | _ -> raise Not_found)
       vl
   in

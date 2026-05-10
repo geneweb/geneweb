@@ -1,52 +1,59 @@
 function copyToClipboard(text) {
-    if (window.clipboardData && window.clipboardData.setData) {
-        return clipboardData.setData("Text", text);
-
-    } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
-        var textarea = document.createElement("textarea");
-        textarea.textContent = text;
-        textarea.style.position = "fixed";
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-            return document.execCommand("copy");
-        } catch (ex) {
-            console.warn("Copy to clipboard failed.", ex);
-            return false;
-        } finally {
-            document.body.removeChild(textarea);
-        }
-    }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(function(err) {
+      console.warn("Clipboard write failed.", err);
+    });
+    return;
+  }
+  // Fallback legacy
+  var textarea = document.createElement("textarea");
+  textarea.textContent = text;
+  textarea.style.position = "fixed";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand("copy");
+  } catch (ex) {
+    console.warn("Copy to clipboard failed.", ex);
+  } finally {
+    document.body.removeChild(textarea);
+  }
 }
 
-    var simplecopybtn = document.querySelector(".simple-copy");
-    var simpledata = simplecopybtn.dataset.wikilink;
-    var fullcopybtn = document.querySelector(".full-copy");
-    var fulldata = fullcopybtn.dataset.wikilink;
+// simple-copy / full-copy (optionnels)
+var simplecopybtn = document.querySelector(".simple-copy");
+var fullcopybtn   = document.querySelector(".full-copy");
 
-    simplecopybtn.addEventListener("click", function(event) {
-    var result = copyToClipboard(simpledata);
-});
-    fullcopybtn.addEventListener("click", function(event) {
-    var result = copyToClipboard(fulldata);
-});
+if (simplecopybtn) {
+  simplecopybtn.addEventListener("click", function() {
+    copyToClipboard(simplecopybtn.dataset.wikilink);
+  });
+}
+if (fullcopybtn) {
+  fullcopybtn.addEventListener("click", function() {
+    copyToClipboard(fullcopybtn.dataset.wikilink);
+  });
+}
 
-    var permacopybtn = document.querySelector(".permalink-copy");
-    var permafcopybtn = document.querySelector(".permalink-friend-copy");
-    var permawcopybtn = document.querySelector(".permalink-wizard-copy");
-    var query = permacopybtn.dataset.query;
-    var bname = permacopybtn.dataset.bname;
-    var origin = window.location.origin;
-    var permaurl = origin + (bname != "" ? "/" + bname : window.location.pathname) + "?" + query;
-    var permaurlf = origin + "/" + bname + "_f?" + query;
-    var permaurlw = origin + "/" + bname + "_w?" + query;
+// permalink buttons — délégation sur document pour couvrir menubar ET copyright
+document.addEventListener("click", function(event) {
+  var btn = event.target.closest(".permalink-copy, .permalink-friend-copy, .permalink-wizard-copy");
+  if (!btn) return;
 
-    permacopybtn.addEventListener("click", function(event) {
-    var result = copyToClipboard(permaurl);
-});
-    permafcopybtn.addEventListener("click", function(event) {
-    var result = copyToClipboard(permaurlf);
-});
-    permawcopybtn.addEventListener("click", function(event) {
-    var result = copyToClipboard(permaurlw);
+  var permacopybtn = document.querySelector(".permalink-copy");
+  var query  = permacopybtn.dataset.query;
+  var bname  = permacopybtn.dataset.bname;
+  var origin = window.location.origin;
+
+  var permaurl  = origin + (bname !== "" ? "/" + bname   : window.location.pathname) + "?" + query;
+  var permaurlf = origin + "/" + bname + "_f?" + query;
+  var permaurlw = origin + "/" + bname + "_w?" + query;
+
+  if (btn.classList.contains("permalink-friend-copy")) {
+    copyToClipboard(permaurlf);
+  } else if (btn.classList.contains("permalink-wizard-copy")) {
+    copyToClipboard(permaurlw);
+  } else {
+    copyToClipboard(permaurl);
+  }
 });

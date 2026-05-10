@@ -910,3 +910,7 @@ val evar_buttons : config -> string -> evar_button list -> string -> unit
 
 val url_set_aux : config -> string -> string list -> string list -> string
 (** *)
+
+val url_no_index : Config.config -> Geneweb_db.Driver.base -> bool -> string
+(** return a new url where all i=xxx values have been replaced by p= & n= & oc=
+    the lase argument governs the presence of the password/token *)

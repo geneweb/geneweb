@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 11/04/2026 02:05:28 $ -->
+<!-- $Id: js.txt v7.1 12/05/2026 02:05:28 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -490,8 +490,17 @@ function initializeLazyModules() {
     });
   }
   loadScriptOnce('load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
-  loadScriptOnce('load_once_copylink', '%etc_prefix;js/copylink.js?hash=%apply;hash%with;%etc_prefix;js/copylink.js%end;');
   loadScriptOnce('load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
+
+  // Chargement conditionnel de copylink.js : déclenché par bouton OU par présence directe dans le DOM
+  const copylinkUrl = '%etc_prefix;js/copylink.js?hash=%apply;hash%with;%etc_prefix;js/copylink.js%end;';
+  if (document.querySelector('.permalink-copy, .permalink-friend-copy, .permalink-wizard-copy')) {
+    const script = document.createElement('script');
+    script.src = copylinkUrl;
+    document.head.appendChild(script);
+  } else {
+    loadScriptOnce('load_once_copylink', copylinkUrl);
+  }
 }
 %end;
 %if;(e.templ="" and not is_welcome)

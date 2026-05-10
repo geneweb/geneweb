@@ -1,4 +1,5 @@
-<!-- $Id: copyr.txt %version; 03/04/2026 $ -->
+<!-- $Id: copyr.txt %version; 12/05/2026 $ -->
+%let;iswiz;%if;(b.wizard_just_friend!="yes" and wizard)1%end;%in;
 %define;language(x)
   %apply;nth%with;
     af/ar/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/%nn;
@@ -43,9 +44,71 @@
 %let;notice2;%apply;test_notice("notice2", lang)%in;
 %let;notice3;%apply;test_notice("notice3", lang)%in;
 
+%( Js function to extract url, clean it and adjust basename %)
+<script>
+function get_url(btn, suffix) {
+  var originalHTML = btn.innerHTML;
+  fetch(document.getElementById('permalink_url').href)
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var tmp = document.createElement('div');
+      tmp.innerHTML = text;
+      var a = tmp.querySelector('a');
+      var url = (a ? a.getAttribute('href') : text.trim())
+        .replace(/[&?]opt=noindex/g, '').replace(/\?&/, '?');
+      if (suffix !== '') {
+        var qmark = url.indexOf('?');
+        var base = qmark >= 0 ? url.substring(0, qmark) : url;
+        var query = qmark >= 0 ? url.substring(qmark) : '';
+        if (query.match(/[?&]b=/)) {
+          query = query.replace(/([?&]b=)([^&]*)/, function(m, sep, bname) {
+            return sep + bname + suffix;
+          });
+        } else {
+          base = base + suffix;
+        }
+        return base + query;
+      }
+      return url;
+    })
+    .then(function(url){ return navigator.clipboard.writeText(url); })
+    .then(function(){ btn.innerHTML='<i class=\'fa fa-copy\'></i> \u2713';
+      setTimeout(function(){ btn.innerHTML=originalHTML; }, 1500); })
+    .catch(function(err){ console.error(err);
+      btn.innerHTML='<i class=\'fa fa-times\'></i>';
+      setTimeout(function(){ btn.innerHTML=originalHTML; }, 1500); });
+}
+</script>
+
 %if;(not cancel_links)
   <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
-    <div class="d-flex flex-wrap justify-content-md-end align-items-center">
+      <div class="d-flex justify-content-between w-100 px-5">
+        <div class="btn-group mx-3 mt-3">
+
+        <!-- Permalinks -->
+          <a id="permalink_url" href="%url_set.opt.noindex;"></a>&nbsp;
+          [*copy permalink]
+          <button type="button" class="btn btn-sm btn-outline-secondary ms-2"
+            title="[*copy permalink] ([wizard/wizards/friend/friends/exterior]4)"
+            onclick="get_url(this, '')">
+            <i class="fa fa-copy"></i> [wizard/wizards/friend/friends/exterior]4
+          </button>
+          %if;(friend or iswiz=1)
+            <button type="button" class="btn btn-sm btn-outline-secondary ms-1"
+              title="[*copy permalink] ([wizard/wizards/friend/friends/exterior]2)"
+              onclick="get_url(this, '_f')">
+              <i class="fa fa-copy"></i> [wizard/wizards/friend/friends/exterior]2
+            </button>
+          %end;
+          %if;(iswiz=1)
+            <button type="button" class="btn btn-sm btn-outline-secondary ms-1"
+              title="[*copy permalink] ([wizard/wizards/friend/friends/exterior]0)"
+              onclick="get_url(this, '_w')">
+              <i class="fa fa-copy"></i> [wizard/wizards/friend/friends/exterior]0
+            </button>
+          %end;
+        </div>
+
       <!-- legal notices -->
       %if;is_printed_by_template;
         %if;(notice1=1)
