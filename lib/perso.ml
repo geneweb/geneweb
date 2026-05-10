@@ -4026,26 +4026,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "age_days" -> (
       if not p_auth then null_val
       else
-        match Date.od_of_cdate (Driver.get_birth p) with
-        | Some (Dgreg (birth_dmy, cal)) ->
-            let from =
-              if birth_dmy.day > 0 && birth_dmy.month > 0 then Adef.Dgregorian
-              else cal
-            in
-            let birth_sdn = Date.to_sdn ~from birth_dmy in
-            let end_sdn =
-              match Date.date_of_death (Driver.get_death p) with
-              | Some (Dgreg (death_dmy, cal2)) ->
-                  let from2 =
-                    if death_dmy.day > 0 && death_dmy.month > 0 then
-                      Adef.Dgregorian
-                    else cal2
-                  in
-                  Date.to_sdn ~from:from2 death_dmy
-              | _ -> Date.to_sdn ~from:Dgregorian conf.today
-            in
-            VVstring (string_of_int (end_sdn - birth_sdn))
-        | _ -> null_val)
+        match age_days conf base p with
+        | Some n -> VVstring (string_of_int n)
+        | None -> null_val)
   | "alias" -> (
       match Driver.get_aliases p with
       | nn :: _ when p_auth ->
