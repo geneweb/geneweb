@@ -116,8 +116,7 @@ type config = {
   etc_prefix : string;
       (* in CGI mode, provides location of etc files to Apache for direct loading *)
   cgi : bool;
-  forced_plugins : string list;
-  plugins : string list;
+  allowed_plugins : string list;
   secret_salt : string option;
       (** Secret salt generated at the server startup. The salt is used in
           form's digests to enhance security. *)

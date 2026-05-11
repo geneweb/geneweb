@@ -408,9 +408,7 @@ and eval_simple_variable conf = function
   | "left" -> conf.left
   | "nl" -> "\n"
   | "nn" -> ""
-  | "plugins" ->
-      let l = List.map Filename.basename conf.plugins in
-      String.concat ", " l
+  | "plugins" -> String.concat ", " conf.allowed_plugins
   | "bname" -> conf.bname
   | "token" -> conf.cgi_passwd
   | "bname_token" -> String.concat "_" [ conf.bname; conf.cgi_passwd ]
