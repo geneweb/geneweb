@@ -18,7 +18,7 @@
   (tags (genealogy))
   (sites (share hd))
   (depends
-    (ocaml (>= 4.10))
+    ocaml
     geneweb-compat
     geneweb-http
     (alcotest :with-test)
@@ -62,14 +62,13 @@
   (name geneweb-compat)
   (synopsis "Geneweb library for legacy support")
   (tags (geneweb legacy))
-  (depends
-    (ocaml (>= 4.10))))
+  (depends ocaml))
 
 (package
   (name geneweb-http)
   (synopsis "Geneweb library for HTTP support")
   (depends
-    (ocaml (>= 4.10))
+    ocaml
     camlp-streams
     geneweb-compat
     logs
@@ -80,7 +79,7 @@
   (synopsis "Geneweb library for RPC support")
   (tags (geneweb rpc json))
   (depends
-    (ocaml (>= 4.10))
+    ocaml
     (geneweb (= :version))
     (qcheck :with-test)
     (qcheck-alcotest :with-test)
