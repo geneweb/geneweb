@@ -229,6 +229,14 @@ td .rm-cell {
   margin-bottom: .5rem;
 }
 
+.min-w-0 {
+  min-width: 0;
+}
+
+.text-small {
+  font-size: .875em;
+}
+
 .toggle-button:focus {
   outline: none; /* On generation picker, hide the toggle +/- button outline+shadow */
   box-shadow: none;
@@ -282,6 +290,23 @@ td .rm-cell {
 
 .z-index1 {
   z-index:1;
+}
+
+.mh-alive-swatch {
+  display:inline-block;
+  width:.5em;
+  height:1.2em;
+  vertical-align:-.1em;
+  background-color:rgba(245,231,216,.9)
+}
+
+#cousins-root{
+  --c-aged:rgba(245,231,216,.9);
+  --c-aged-strong:rgba(245,231,216,1);
+  --c-aged-soft:rgba(255,235,210,1);
+  --c-live:rgba(255,255,255,1);
+  --c-dead:rgba(245,245,235,1);
+  --c-fade:rgba(248,249,250,0);
 }
 
 /* Highlight invisible caracters */
@@ -743,7 +768,7 @@ p {
 }
 
 /* Relation menu table */
-#quickrel.table td{
+#quickrel.table td {
   padding: 0px;
   line-height:1em;
 }
