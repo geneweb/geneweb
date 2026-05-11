@@ -18547,6 +18547,10 @@ pt: filhos/filhas/filhos
 sv: söner/döttrar/barn
 tr: oğulları/kızları/çocukları
 
+    sorted by
+en: sorted by
+fr: trié par
+
     sort by/branch/alphabetic order
 co: urganizà da :/ghjemba/ordine alfabeticu
 de: sortieren nach: /Zweige/Alphabet

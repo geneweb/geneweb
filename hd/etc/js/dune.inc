@@ -209,3 +209,13 @@
   (deps (:input html5sortable.min.js))
   (action
     (run brotli -f -q 11 %{input})))
+(rule
+  (target cousins.min.js.gz)
+  (deps (:input cousins.min.js))
+  (action
+    (run gzip -9 -k -f %{input})))
+(rule
+  (target cousins.min.js.br)
+  (deps (:input cousins.min.js))
+  (action
+    (run brotli -f -q 11 %{input})))
