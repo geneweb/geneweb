@@ -495,7 +495,13 @@ let ged_date_dmy opts dt cal =
   | Sure | About | Maybe | Before | After -> ()
 
 let ged_date opts = function
-  | Date.Dgreg (d, (Dgregorian | Dislamic)) -> ged_date_dmy opts d Dgregorian
+  | Date.Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
+  | Dgreg (d, Dislamic) ->
+      let lighten date =
+        Date.convert ~light:true ~from:Dislamic ~to_:Dgregorian
+          (Date.convert ~from:Dgregorian ~to_:Dislamic date)
+      in
+      ged_date_dmy opts (lighten d) Dgregorian
   | Dgreg (d, Djulian) ->
       ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Djulian d) Djulian
   | Dgreg (d, Dfrench) ->
