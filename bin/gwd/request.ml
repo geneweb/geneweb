@@ -205,13 +205,16 @@ let make_senv conf base =
       set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
-let try_plugin list conf base_name m =
-  let fn =
-    if List.mem "*" list then fun (_, fn) -> fn conf base_name
-    else fun (ns, fn) ->
-      (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base_name
+let try_plugin conf base_name m =
+  let h (ns, fn) =
+    Logs.debug (fun k -> k "allowed: %s@." ns);
+    Logs.debug (fun k ->
+        k "plugins: %a@."
+          Fmt.(box @@ parens @@ list ~sep:comma string)
+          conf.allowed_plugins);
+    List.mem ns conf.allowed_plugins && fn conf base_name
   in
-  List.exists fn (Hashtbl.find_all Plugin.ht m)
+  List.exists h (Hashtbl.find_all Plugin.ht m)
 
 let w_lock ~onerror fn conf (base_name : string option) =
   let bfile = !GWPARAM.bpath conf.bname in
@@ -341,19 +344,14 @@ let treat_request =
               request_issue conf base ~level:`Error ~key:"wizards cant write")
             conf bfile
         else
-          let plugins =
-            match List.assoc_opt "plugins" conf.Config.base_env with
-            | None -> []
-            | Some list -> String.split_on_char ',' list |> List.map String.trim
-          in
-          if List.mem "*" plugins then
-            List.iter (fun (_, fn) -> fn conf bfile) !Plugin.se
-          else
+          let () =
             List.iter
-              (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile)
-              !Plugin.se;
+              (fun (ns, fn) ->
+                if List.mem ns conf.allowed_plugins then fn conf bfile)
+              !Plugin.se
+          in
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
-          if not @@ try_plugin plugins conf bfile m then
+          if not @@ try_plugin conf bfile m then
             ((if
                 List.assoc_opt "counter" conf.base_env <> Some "no"
                 && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"

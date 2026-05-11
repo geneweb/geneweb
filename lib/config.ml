@@ -111,8 +111,7 @@ type config = {
   (* if true, the base name is in the b argument of the query string: ?b=BASE&...
      if false, the base name is the last element of the uri path: .../base?... *)
   cgi : bool;
-  forced_plugins : string list;
-  plugins : string list;
+  allowed_plugins : string list;
   secret_salt : string option;
   predictable_mode : bool;
 }
@@ -188,8 +187,7 @@ let empty =
     cgi = false;
     output_conf =
       { status = ignore; header = ignore; body = ignore; flush = ignore };
-    forced_plugins = [];
-    plugins = [];
+    allowed_plugins = [];
     secret_salt = None;
     predictable_mode = false;
   }

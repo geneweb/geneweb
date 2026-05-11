@@ -288,10 +288,13 @@ let check_plugin =
     | exception Not_found -> false
     | sum -> Plugin.checksum path = sum
 
+type loaded_plugin = { name : string; unsafe : bool; forced : bool }
+
 let load_plugin ~unsafe ~forced path =
   let pname = Filename.basename path in
-  if not @@ Plugin.is_plugin_dir path then
-    Logs.err (fun k -> k "%S is not a plugin directory." path)
+  if not @@ Plugin.is_plugin_dir path then (
+    Logs.err (fun k -> k "%S is not a plugin directory." path);
+    exit 1)
   else (
     Logs.debug (fun k ->
         k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
@@ -309,14 +312,17 @@ let load_plugin ~unsafe ~forced path =
     if Sys.file_exists lex_dir then add_lex_dir lex_dir;
     Plugin.assets := path // "assets";
     Fun.protect ~finally:(fun () -> Plugin.assets := "") @@ fun () ->
-    load_cmxs cmxs)
+    load_cmxs cmxs;
+    { name = pname; unsafe; forced })
 
 let load_plugins Cmd.{ path; unsafe; forced; collection } =
-  if not collection then load_plugin ~unsafe ~forced path
+  if not collection then [ load_plugin ~unsafe ~forced path ]
   else
     match Plugin.compute_dependencies path with
     | Ok deps ->
-        List.iter (fun d -> load_plugin ~unsafe ~forced (path // d)) deps
+        List.fold_left
+          (fun acc d -> load_plugin ~unsafe ~forced (path // d) :: acc)
+          [] deps
     | Error cycle ->
         Logs.err (fun k ->
             k
@@ -1288,7 +1294,39 @@ let warning_multi_parents () =
         "The multi-parents feature is deprecated. Setting it up will no longer \
          have any effect.")
 
-let make_conf ~secret_salt from_addr request script_name env =
+module SS = Set.Make (String)
+
+module Gwf = struct
+  type gwf_plugins = All | Allowed of SS.t
+
+  let parse_plugins base_env =
+    let l =
+      match List.assoc_opt "plugins" base_env with
+      | None -> []
+      | Some list -> String.split_on_char ',' list |> List.map String.trim
+    in
+    match l with [ "*" ] -> All | l -> Allowed (SS.of_seq @@ List.to_seq l)
+end
+
+let allowed_plugins ~loaded_plugins base_env =
+  let loaded_set =
+    List.fold_left
+      (fun acc { name; _ } -> SS.add name acc)
+      SS.empty loaded_plugins
+  in
+  let forced_set =
+    List.fold_left
+      (fun acc { name; forced; _ } -> if forced then SS.add name acc else acc)
+      SS.empty loaded_plugins
+  in
+  let gwf_plugins = Gwf.parse_plugins base_env in
+  match gwf_plugins with
+  | All -> List.of_seq @@ SS.to_seq loaded_set
+  | Allowed s ->
+      let s = SS.union s forced_set in
+      List.of_seq @@ SS.to_seq @@ SS.filter (fun p -> SS.mem p s) loaded_set
+
+let make_conf ~loaded_plugins ~secret_salt from_addr request script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
     let str =
       Printf.sprintf "Requested allowed_tags file (%s) absent"
@@ -1405,17 +1443,7 @@ let make_conf ~secret_salt from_addr request script_name env =
     with Not_found | Failure _ -> 150
   in
   let username, userkey = split_username ar.ar_name in
-  let forced_plugins =
-    List.fold_left
-      (fun acc Cmd.{ path; forced; _ } ->
-        if forced then Filename.basename path :: acc else acc)
-      [] !plugins
-    |> List.rev
-  in
-  let plugins =
-    List.fold_left (fun acc Cmd.{ path; _ } -> path :: acc) [] !plugins
-    |> List.rev
-  in
+  let allowed_plugins = allowed_plugins ~loaded_plugins base_env in
   if List.assoc_opt "multi_parents" base_env = Some "yes" then
     warning_multi_parents ();
   let conf =
@@ -1533,8 +1561,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       etc_prefix = Option.get !etc_prefix;
       cgi;
       output_conf;
-      forced_plugins;
-      plugins;
+      allowed_plugins;
       secret_salt = Some secret_salt;
       predictable_mode = !predictable_mode;
     }
@@ -1646,7 +1673,8 @@ let conf_and_connection =
     ^<^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
     ^<^ contents
   in
-  fun ~secret_salt
+  fun ~loaded_plugins
+    ~secret_salt
     from
     request
     script_name
@@ -1654,7 +1682,7 @@ let conf_and_connection =
     env
   ->
     let conf, passwd_err =
-      make_conf ~secret_salt from request script_name env
+      make_conf ~loaded_plugins ~secret_salt from request script_name env
     in
     let m = Util.p_getenv env "m" in
     let is_binary =
@@ -2055,7 +2083,8 @@ let build_env request (contents : Adef.encoded_string) :
     extract_multipart boundary contents
   else (contents, Util.create_env contents)
 
-let connection ~secret_salt (addr, request) script_name contents0 =
+let connection ~loaded_plugins ~secret_salt (addr, request) script_name
+    contents0 =
   let from =
     match addr with
     | Unix.ADDR_UNIX x -> x
@@ -2080,7 +2109,8 @@ let connection ~secret_salt (addr, request) script_name contents0 =
           (not (image_request printer_conf script_name env))
           && not (misc_request printer_conf request script_name)
         then
-          conf_and_connection ~secret_salt from request script_name contents env
+          conf_and_connection ~loaded_plugins ~secret_salt from request
+            script_name contents env
       with Exit -> ()
 
 let null_reopen flags fd =
@@ -2174,7 +2204,8 @@ let display_infos ?interface ~port () =
         Fmt.(box @@ list ~sep:comma pp_path)
         (Secure.assets ()))
 
-let geneweb_server ?interface ~port ~daemon ~predictable_mode () =
+let geneweb_server ~loaded_plugins ?interface ~port ~daemon ~predictable_mode ()
+    =
   let secret_salt =
     match Unix.getenv "WSERVER" with
     | _ -> retrieve_secret_salt ()
@@ -2193,12 +2224,10 @@ let geneweb_server ?interface ~port ~daemon ~predictable_mode () =
   (* FIXME: this hack is necessary to avoid a cyclic dependency between
      `geneweb` and `geneweb-http`. We must remove it after refactoring
      the encoded string subsystem. *)
-  let connection ~secret_salt x y z =
-    connection ~secret_salt x y (Adef.encoded z)
-  in
+  let connection x y z = connection x y (Adef.encoded z) in
   Server.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
-    (connection ~secret_salt)
+    (connection ~loaded_plugins ~secret_salt)
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -2218,7 +2247,7 @@ let manage_cgi_timeout tmout =
     let _ = Unix.alarm tmout in
     ()
 
-let geneweb_cgi ~secret_salt addr script_name contents =
+let geneweb_cgi ~loaded_plugins ~secret_salt addr script_name contents =
   if Sys.unix then manage_cgi_timeout !conn_timeout;
   (try Unix.mkdir !GWPARAM.cnt_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
@@ -2234,7 +2263,9 @@ let geneweb_cgi ~secret_salt addr script_name contents =
   let request = add "accept-encoding" "HTTP_ACCEPT_ENCODING" request in
   let request = add "referer" "HTTP_REFERER" request in
   let request = add "user-agent" "HTTP_USER_AGENT" request in
-  connection ~secret_salt (Unix.ADDR_UNIX addr, request) script_name contents
+  connection ~loaded_plugins ~secret_salt
+    (Unix.ADDR_UNIX addr, request)
+    script_name contents
 
 let read_input len =
   if len >= 0 then really_input_string stdin len
@@ -2263,7 +2294,10 @@ let main ?interface ~port ~daemon ~predictable_mode () =
     process "" false (Array.to_list Sys.argv)
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
-  List.iter load_plugins !plugins;
+  let loaded_plugins =
+    List.fold_left (fun acc p -> load_plugins p :: acc) [] !plugins
+    |> List.concat
+  in
   GWPARAM.init ();
   (* FIXME: this line MUST be after plugin loading as plugins can modified
      [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
@@ -2329,8 +2363,10 @@ let main ?interface ~port ~daemon ~predictable_mode () =
       try Sys.getenv "SCRIPT_NAME" with Not_found -> Sys.argv.(0)
     in
     let secret_salt = match !cgi_secret_salt with None -> "" | Some s -> s in
-    geneweb_cgi ~secret_salt addr (Filename.basename script) query)
-  else geneweb_server ?interface ~port ~daemon ~predictable_mode ()
+    geneweb_cgi ~loaded_plugins ~secret_salt addr (Filename.basename script)
+      query)
+  else
+    geneweb_server ~loaded_plugins ?interface ~port ~daemon ~predictable_mode ()
 
 let has_root_privileges () =
   if not Sys.unix then false

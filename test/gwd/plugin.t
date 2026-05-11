@@ -60,7 +60,7 @@
 
   $ gwd --check --plugin ../../plugins/foo
   [ERROR]: "../../plugins/foo" is not a plugin directory.
-  [DEBUG]: End of check mode.
+  [1]
 
   $ mkdir -p ./foo/bar && gwd --check --plugins ./foo; rm -Rf foo
   [DEBUG]: End of check mode.
