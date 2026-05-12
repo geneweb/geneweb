@@ -55,9 +55,8 @@ let pp_header ppf timestamp src level =
 type opened_file = { path : string; mutable backend : backend option }
 
 let reporter ~predictable_mode { ppf; flush; _ } =
-  let std_formatter = Fmt_tty.setup ~style_renderer:`Ansi_tty stdout in
   let report src level ~over k msgf =
-    let ppf = match level with Logs.App -> std_formatter | _ -> ppf in
+    (* let ppf = match level with Logs.App -> std_formatter | _ -> ppf in *)
     let k ppf =
       Format.pp_close_box ppf ();
       Format.pp_print_newline ppf ();

@@ -1908,5 +1908,5 @@ let () =
      `geneweb` and `geneweb-http`. We must remove it after refactoring
      the encoded string subsystem. *)
   let wrap_setup x y z = wrap_setup x y (Adef.encoded z) in
-  Server.start ~interface:!interface ~port:!port ~max_requests:150
-    ~n_workers:1 wrap_setup
+  Server.start ~interface:!interface ~port:!port ~max_requests:150 ~n_workers:1
+    wrap_setup

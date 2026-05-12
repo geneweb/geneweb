@@ -645,12 +645,15 @@ let error fmt = Fmt.kstr (fun s -> `Error (false, s)) fmt
 
 let rpc_flags =
   let open C.Term.Syntax in
-  C.Term.ret @@
-  let+ rpc_connection and+ rpc and+ index_fuel and+ task_timeout in
+  C.Term.ret
+  @@
+  let+ rpc_connection = rpc_connection
+  and+ rpc = rpc
+  and+ index_fuel = index_fuel
+  and+ task_timeout = task_timeout in
   if Option.is_some rpc_connection.interface && not rpc then
     error "You must use `--rpc` option to turn RPC server on."
-  else
-    `Ok (rpc, rpc_connection, index_fuel, task_timeout)
+  else `Ok (rpc, rpc_connection, index_fuel, task_timeout)
 
 (* Web interface commands *)
 
