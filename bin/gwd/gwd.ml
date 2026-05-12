@@ -16,6 +16,10 @@ module Code = Geneweb_http.Code
 module Compat = Geneweb_compat
 open Cmd_legacy
 
+let src = Logs.Src.create ~doc:"Gwd" "GWD "
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
 let timestamp = Logs.Tag.(empty |> add Server.timestamp_tag ())
 let gzip_min_size = 1024
 
@@ -145,21 +149,21 @@ let split_username username =
   | 1 -> (username, "")
   | 2 -> (List.nth l1 0, List.nth l1 1)
   | _ ->
-      Logs.err (fun k -> k "Bad .auth key or sosa encoding");
+      Log.err (fun k -> k "Bad .auth key or sosa encoding");
       (username, "")
 
 let log_passwd_failed ar tm from request base_file =
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
-  Logs.info (fun k ->
+  Log.info (fun k ->
       k "%s (%d) %s_%s => failed (%s)"
         (Mutil.sprintf_date tm :> string)
         (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user);
   if !trace_failed_passwd then
-    Logs.info (fun k -> k ~tags:timestamp " (%s)" (String.escaped ar.ar_uauth));
-  Logs.info (fun k -> k "\n  From: %s\n  Agent: %s" from user_agent);
-  if referer <> "" then Logs.info (fun k -> k "  Referer: %s" referer)
+    Log.info (fun k -> k ~tags:timestamp " (%s)" (String.escaped ar.ar_uauth));
+  Log.info (fun k -> k "\n  From: %s\n  Agent: %s" from user_agent);
+  if referer <> "" then Log.info (fun k -> k "  Referer: %s" referer)
 
 let copy_file conf fname =
   match Util.open_etc_file conf fname with
@@ -179,7 +183,7 @@ let http conf status =
   Output.header conf "Content-type: text/html; charset=iso-8859-1"
 
 let robots_txt conf =
-  Logs.info (fun k -> k "Robot request");
+  Log.info (fun k -> k "Robot request");
   Output.status conf Code.OK;
   Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
@@ -188,7 +192,7 @@ let robots_txt conf =
     Output.print_sstring conf "Disallow: /\n")
 
 let refuse_log conf from =
-  Logs.info (fun k -> k "Excluded: %s" from);
+  Log.info (fun k -> k "Excluded: %s" from);
   http conf Code.Forbidden;
   Output.header conf "Content-type: text/html";
   Output.print_sstring conf
@@ -197,14 +201,14 @@ let refuse_log conf from =
   ()
 
 let only_log conf from =
-  Logs.info (fun k -> k "Connection refused from %s" from);
+  Log.info (fun k -> k "Connection refused from %s" from);
   http conf Code.OK;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
   Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
 
 let refuse_auth conf from auth auth_type =
-  Logs.info (fun k ->
+  Log.info (fun k ->
       k ~tags:timestamp
         "Access failed --- From: %s --- Basic realm: %s --- Response: %s" from
         auth_type auth);
@@ -241,7 +245,7 @@ let load_lexicon =
       in
       if Sys.file_exists fname then
         Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
-      else Logs.warn (fun k -> k "File %s unavailable\n" fname)
+      else Log.warn (fun k -> k "File %s unavailable\n" fname)
     in
     let fname = !lexicon_fname ^ lang in
     match Hashtbl.find_opt lexicon_cache fname with
@@ -293,13 +297,13 @@ type loaded_plugin = { name : string; unsafe : bool; forced : bool }
 let load_plugin ~unsafe ~forced path =
   let pname = Filename.basename path in
   if not @@ Plugin.is_plugin_dir path then (
-    Logs.err (fun k -> k "%S is not a plugin directory." path);
+    Log.err (fun k -> k "%S is not a plugin directory." path);
     exit 1)
   else (
-    Logs.debug (fun k ->
+    Log.debug (fun k ->
         k "Loading plugin (unsafe = %b, forced = %b) %s..." unsafe forced pname);
     if not (unsafe || check_plugin path) then (
-      Logs.err (fun k ->
+      Log.err (fun k ->
           k "Refuse to load plugin %s for cause of wrong checksum." pname);
       exit 1);
     let pname = Filename.basename path in
@@ -324,7 +328,7 @@ let load_plugins Cmd.{ path; unsafe; forced; collection } =
           (fun acc d -> load_plugin ~unsafe ~forced (path // d) :: acc)
           [] deps
     | Error cycle ->
-        Logs.err (fun k ->
+        Log.err (fun k ->
             k
               "Cycle found while computing dependencies of the plugin \
                collection %S:@ %a"
@@ -360,11 +364,11 @@ let alias_lang lang =
 let log_redirect from request req =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
   let on_exn exn bt =
-    Logs.info (fun k -> k "%a\n" Lock.pp_exception (exn, bt))
+    Log.info (fun k -> k "%a\n" Lock.pp_exception (exn, bt))
   in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   let referer = Mutil.extract_param "referer: " '\n' request in
-  Logs.info (fun k ->
+  Log.info (fun k ->
       k ~tags:timestamp "%s --- From: %s --- Referer: %s" req from referer)
 
 let print_redirected conf from request new_addr =
@@ -606,7 +610,7 @@ let get_actlog check_from utm from_addr base_password =
     in
     loop false ATnormal []
   with Sys_error e ->
-    Logs.warn (fun k -> k "Error opening (get) actlog: %s" e);
+    Log.warn (fun k -> k "Error opening (get) actlog: %s" e);
     ([], ATnormal, false)
 
 let set_actlog list =
@@ -620,7 +624,7 @@ let set_actlog list =
           (if e = "" then "" else " " ^ e))
       list;
     close_out oc
-  with Sys_error e -> Logs.warn (fun k -> k "Error opening actlog: %s" e)
+  with Sys_error e -> Log.warn (fun k -> k "Error opening actlog: %s" e)
 
 let get_token check_from utm from_addr base_password =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
@@ -1219,7 +1223,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
           base_file command
 
 let warning_multi_parents () =
-  Logs.warn (fun k ->
+  Log.warn (fun k ->
       k
         "The multi-parents feature is deprecated. Setting it up will no longer \
          have any effect.")
@@ -1263,7 +1267,7 @@ let make_conf ~loaded_plugins ~secret_salt from_addr request script_name env =
         !allowed_tags_file
     in
     GWPARAM.errors_other := str :: !GWPARAM.errors_other;
-    Logs.warn (fun k -> k "%s" str));
+    Log.warn (fun k -> k "%s" str));
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
   let cgi = !Server.cgi in
@@ -1277,7 +1281,7 @@ let make_conf ~loaded_plugins ~secret_salt from_addr request script_name env =
       | [ bname ] -> (bname, "")
       | [ bname; access ] -> (bname, access)
       | _ ->
-          Logs.err (fun k -> k "bad bname: (%s)" base_access);
+          Log.err (fun k -> k "bad bname: (%s)" base_access);
           assert false
     in
     let bases = Util.get_bases_list () in
@@ -1513,7 +1517,7 @@ let log conf from gauth request script_name contents =
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   if not (should_log_request contents referer user_agent) then ()
   else
-    Logs.info (fun k ->
+    Log.info (fun k ->
         k ~tags:timestamp "(%d) %s?%s\n%s%s%s%s%s" (Unix.getpid ()) script_name
           (if String.length contents > 200 then
              Printf.sprintf "%s..." (String.sub contents 0 200)
@@ -1682,12 +1686,12 @@ let conf_and_connection =
         | _ -> (
             enable_gzip ();
             let printexc bt exn =
-              Logs.err (fun k ->
+              Log.err (fun k ->
                   k "%s %s"
                     (context conf contents :> string)
                     (Printexc.to_string exn));
               if Printexc.backtrace_status () then
-                Logs.err (fun k -> k "Backtrace:@ %s" bt)
+                Log.err (fun k -> k "Backtrace:@ %s" bt)
             in
             try
               let t1 = Unix.gettimeofday () in
@@ -1695,7 +1699,7 @@ let conf_and_connection =
               Output.flush conf;
               let t2 = Unix.gettimeofday () in
               if t2 -. t1 > slow_query_threshold then
-                Logs.warn (fun k ->
+                Log.warn (fun k ->
                     k "%s slow query (%.3f)"
                       (context conf contents : Adef.encoded_string :> string)
                       (t2 -. t1))
@@ -2061,7 +2065,7 @@ let generate_secret_salt ?(random = true) () =
 let retrieve_secret_salt () =
   match Unix.getenv "SECRET_SALT" with
   | exception Not_found ->
-      Logs.err (fun k ->
+      Log.err (fun k ->
           k "Secret salt missing, the worker %d cannot continue its job."
             (Unix.getpid ()));
       exit 1
@@ -2081,7 +2085,7 @@ let daemonize ~daemon k =
 let create_cnt_dir () =
   try Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
   with Sys_error e ->
-    Logs.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
+    Log.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
 
 let slashify = String.map (fun c -> match c with '\\' -> '/' | _ -> c)
 
@@ -2116,15 +2120,15 @@ let display_infos ?interface ~port () =
     let s = slashify s in
     Fmt.Dump.string ppf s
   in
-  Logs.app (fun k ->
+  Log.app (fun k ->
       let s =
         Fmt.str "Geneweb %s\nListen to http://%s:%d/base" Version.ver hostname
           port
       in
       k "%a" Fmt.(styled (`Fg `Green) string) s);
-  Logs.app (fun k -> k "Type CTRL+C to stop the service");
-  Logs.app (fun k ->
-      k "\n%a%a%a: %a"
+  Log.app (fun k -> k "Type CTRL+C to stop the service");
+  Log.app (fun k ->
+      k "\n%a%a%a: %a@\n"
         Fmt.(list (pp_item string))
         git_info
         Fmt.(list (pp_item pp_path))
@@ -2234,22 +2238,22 @@ let main ?interface ~port ~daemon ~predictable_mode () =
   cache_lexicon ();
   List.iter
     (fun dbn ->
-      Logs.info (fun k -> k "Caching database %s in memory… %!" dbn);
+      Log.info (fun k -> k "Caching database %s in memory… %!" dbn);
       let bpath = !GWPARAM.bpath dbn in
       try Driver.load_database bpath
       with Sys_error _ ->
         (* HOTFIX: we cannot print the Sys_error payload in tests. *)
-        Logs.err (fun k -> k "Cannot load the database %s" dbn);
+        Log.err (fun k -> k "Cannot load the database %s" dbn);
         exit 2)
     !cache_databases;
   if Option.is_some !auth_file && !force_cgi then
-    Logs.warn (fun k ->
+    Log.warn (fun k ->
         k
           "-auth option is not compatible with CGI mode.\n\
           \ Use instead friend_passwd_file= and wizard_passwd_file= in .cgf \
            file");
   if !digest_password && !force_cgi then
-    Logs.warn (fun k -> k "-digest option is not compatible with CGI mode.");
+    Log.warn (fun k -> k "-digest option is not compatible with CGI mode.");
   (if !images_dir <> "" then
      let abs_dir =
        let f =
@@ -2271,7 +2275,7 @@ let main ?interface ~port ~daemon ~predictable_mode () =
   in
   Util.is_welcome := false;
   if !check then (
-    Logs.debug (fun k -> k "End of check mode.");
+    Log.debug (fun k -> k "End of check mode.");
     exit 0);
   if cgi then (
     Server.cgi := true;
@@ -2380,27 +2384,31 @@ let switch_debug () =
 
 type opened_file = { path : string; mutable oc : out_channel option }
 
-let pp_brackets ~style pp = Fmt.(brackets @@ styled style @@ pp)
+let pp_brackets ~style pp ppf x = Fmt.pf ppf "%a " Fmt.(styled style @@ pp) x
 
 let pp_level ppf l =
   match l with
   | Logs.App -> ()
   | Logs.Error -> pp_brackets ~style:`Red Fmt.string ppf "ERROR"
-  | Logs.Warning -> pp_brackets ~style:`Yellow Fmt.string ppf "WARN"
-  | Logs.Info -> pp_brackets ~style:`Blue Fmt.string ppf "INFO"
+  | Logs.Warning -> pp_brackets ~style:`Yellow Fmt.string ppf "WARN "
+  | Logs.Info -> pp_brackets ~style:`Blue Fmt.string ppf "INFO "
   | Logs.Debug -> pp_brackets ~style:`Green Fmt.string ppf "DEBUG"
 
-let pp_header ppf timestamp level =
+let pp_header ppf timestamp src level =
   match level with
   | Logs.App -> ()
   | _ ->
-      Format.fprintf ppf "%a%a: "
+      Format.fprintf ppf "%a%a%a" pp_level level
+        Fmt.(pp_brackets ~style:`Magenta string)
+        (Logs.Src.name src)
         Fmt.(
-          option ~none:nop @@ pp_brackets ~style:`Magenta (Ptime.pp_rfc3339 ()))
-        timestamp pp_level level
+          option ~none:nop @@ pp_brackets ~style:`Yellow (Ptime.pp_rfc3339 ()))
+        timestamp
 
 let reporter ~predictable_mode ppf =
-  let report _src level ~over k msgf =
+  let std_formatter = Fmt_tty.setup ~style_renderer:`Ansi_tty stdout in
+  let report src level ~over k msgf =
+    let ppf = match level with Logs.App -> std_formatter | _ -> ppf in
     let k ppf =
       Format.pp_close_box ppf ();
       Format.pp_print_newline ppf ();
@@ -2413,7 +2421,7 @@ let reporter ~predictable_mode ppf =
       Option.bind (Logs.Tag.find Server.timestamp_tag tags) @@ fun () ->
       if predictable_mode then Some Ptime.epoch else Some (Ptime_clock.now ())
     in
-    pp_header ppf timestamp level;
+    pp_header ppf timestamp src level;
     Format.pp_open_box ppf 0;
     Format.kfprintf k ppf fmt
   in
@@ -2467,27 +2475,26 @@ let () =
       ~predictable_mode:opts.predictable_mode ()
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
-      Logs.err (fun k ->
+      Log.err (fun k ->
           k
             "Error: the port %d is already used by another GeneWeb daemon or \
              by another program. Solution: kill the other program or launch \
              GeneWeb with another port number (option -p)"
             !selected_port)
   | Unix.Unix_error (Unix.ENOTCONN, _, _) when Sys.unix ->
-      Logs.warn (fun k ->
-          k "Unix.Unix_error(Unix.ENOTCONN, \"shutdown\", \"\")")
+      Log.warn (fun k -> k "Unix.Unix_error(Unix.ENOTCONN, \"shutdown\", \"\")")
   | Unix.Unix_error (Unix.EACCES, "bind", _) when Sys.unix ->
-      Logs.err (fun k ->
+      Log.err (fun k ->
           k
             "Error: invalid access to the port %d: users port number less than \
              1024 are reserved to the system. Please, read the security \
              section of the documentation."
             !selected_port)
   | Register_plugin_failure (p, `dynlink_error e) ->
-      Logs.err (fun k -> k "%s: %s" p (Dynlink.error_message e))
-  | Register_plugin_failure (p, `string s) -> Logs.err (fun k -> k "%s: %s" p s)
+      Log.err (fun k -> k "%s: %s" p (Dynlink.error_message e))
+  | Register_plugin_failure (p, `string s) -> Log.err (fun k -> k "%s: %s" p s)
   | exn ->
       let exn = Printexc.to_string exn in
       let lines = String.split_on_char '\n' @@ Printexc.get_backtrace () in
-      Logs.err (fun k -> k "@[%s@ %a@]" exn Fmt.(list ~sep:cut string) lines);
+      Log.err (fun k -> k "@[%s@ %a@]" exn Fmt.(list ~sep:cut string) lines);
       exit 2

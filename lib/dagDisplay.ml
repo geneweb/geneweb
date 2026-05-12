@@ -4,7 +4,7 @@ open Def
 open Util
 open Dag
 
-let src = Logs.Src.create ~doc:"DagDisplay" __MODULE__
+let src = Logs.Src.create ~doc:"DagDisplay" "DAG "
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver

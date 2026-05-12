@@ -1,6 +1,6 @@
 open Config
 
-let src = Logs.Src.create ~doc:"Image" __MODULE__
+let src = Logs.Src.create ~doc:"Image" "IMG "
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
