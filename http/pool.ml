@@ -1,4 +1,4 @@
-let src = Logs.Src.create ~doc:"Pool" __MODULE__
+let src = Logs.Src.create ~doc:"Pool" "POOL"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 

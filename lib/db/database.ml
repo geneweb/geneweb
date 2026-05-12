@@ -3,7 +3,7 @@
 open Dbdisk
 open Def
 
-let src = Logs.Src.create ~doc:"Database" __MODULE__
+let src = Logs.Src.create ~doc:"Database" "BASE"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 

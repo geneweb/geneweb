@@ -1,5 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+let src = Logs.Src.create ~doc:"Driver" "DRV "
+
+module Log = (val Logs.src_log src : Logs.LOG)
 open Dbdisk
 
 type istr = int
@@ -300,7 +303,7 @@ module NLDB = struct
           else (
             if not !warned then (
               warned := true;
-              Logs.warn (fun m -> m "Unsupported nldb format in %s" fname));
+              Log.warn (fun m -> m "Unsupported nldb format in %s" fname));
             [])
         in
         close_in_noerr ic;

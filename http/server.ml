@@ -2,7 +2,7 @@
 
 module Compat = Geneweb_compat
 
-let src = Logs.Src.create ~doc:"Wserver" __MODULE__
+let src = Logs.Src.create ~doc:"HTTP" "HTTP"
 
 let timestamp_tag : unit Logs.Tag.def =
   Logs.Tag.def "timestamp" ~doc:"POSIX timestamp" Fmt.nop
