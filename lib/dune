@@ -22,7 +22,6 @@
   geneweb_sosa
   geneweb_util
   geneweb_templ
-  geneweb_logs
   yojson
   markup
   re

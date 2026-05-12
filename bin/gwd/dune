@@ -30,7 +30,6 @@
  (libraries
   dynlink
   geneweb
-  geneweb.logs
   geneweb.plugin
   geneweb_http
   gwd_lib
