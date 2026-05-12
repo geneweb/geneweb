@@ -7,7 +7,7 @@ module Reporter = Gwd_lib.Reporter
 module Compat = Geneweb_compat
 
 let is_available = true
-let src = Logs.Src.create ~doc:"Rpc" "RPC"
+let src = Logs.Src.create ~doc:"Rpc" "RPC "
 
 module Log = (val Logs.src_log src : Logs.LOG)
 

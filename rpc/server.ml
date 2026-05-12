@@ -9,7 +9,7 @@ module Y = Yojson.Safe
 module U = Yojson.Safe.Util
 open Lwt.Infix
 
-let src = Logs.Src.create ~doc:"Rpc server" "RPC"
+let src = Logs.Src.create ~doc:"Rpc server" "RPC "
 
 module Log = (val Logs_lwt.src_log src : Logs_lwt.LOG)
 

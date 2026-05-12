@@ -2153,7 +2153,6 @@ let geneweb_server ~loaded_plugins ?interface ~port ~daemon ~predictable_mode ()
     | _ -> retrieve_secret_salt ()
     | exception Not_found ->
         daemonize ~daemon @@ fun () ->
-        display_infos ?interface ~port ();
         create_cnt_dir ();
         (* A secret salt is added to the environment to ensure that workers
            use the same salt for digests on both Unix and Windows platforms. *)
@@ -2449,11 +2448,12 @@ let () =
   make_socket_dir opts.socket_dir;
   match Sys.getenv "GENEWEB_MODE" with
   | exception Not_found ->
-      if opts.rpc then start_rpc_worker ();
+      let Cmd.{ interface; port; _ } = opts.http_connection in
       Reporter.setup ~predictable_mode:!predictable_mode Reporter.make_backend
         !log_file;
+      display_infos ?interface ~port ();
+      if opts.rpc then start_rpc_worker ();
       Log.debug (fun k -> k "Starting the HTTP server...");
-      let Cmd.{ interface; port; _ } = opts.http_connection in
       start_http ?interface ~port ~daemon:opts.daemon
         ~predictable_mode:opts.predictable_mode ~check:opts.check ()
   | "rpc" ->

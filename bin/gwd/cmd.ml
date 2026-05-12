@@ -564,10 +564,6 @@ let default_tls_rpc_port = 8443
 let default_index_fuel = 50
 let default_task_timeout = 10.
 
-let rpc =
-  let doc = "Enable the RPC server." in
-  C.Arg.(value & flag & info [ "rpc" ] ~docs:rpc_section ~doc)
-
 let rpc_interface =
   let doc =
     "Bind the RPC server to the network interface $(docv). The default is the \
@@ -625,6 +621,10 @@ let rpc_connection =
   in
   { interface; port; timeout; max_requests }
 
+let rpc =
+  let doc = "Enable the RPC server." in
+  C.Arg.(value & flag & info [ "rpc" ] ~docs:rpc_section ~doc)
+
 let index_fuel =
   let doc = "Maximum number of answers per index request." in
   C.Arg.(
@@ -640,6 +640,17 @@ let task_timeout =
     value
     & opt float default_task_timeout
     & info [ "task-timeout" ] ~docs:rpc_section ~doc)
+
+let error fmt = Fmt.kstr (fun s -> `Error (false, s)) fmt
+
+let rpc_flags =
+  let open C.Term.Syntax in
+  C.Term.ret @@
+  let+ rpc_connection and+ rpc and+ index_fuel and+ task_timeout in
+  if Option.is_some rpc_connection.interface && not rpc then
+    error "You must use `--rpc` option to turn RPC server on."
+  else
+    `Ok (rpc, rpc_connection, index_fuel, task_timeout)
 
 (* Web interface commands *)
 
@@ -819,10 +830,7 @@ let t =
   and+ n_workers = n_workers
   and+ cgi = cgi
   and+ daemon = daemon
-  and+ rpc = rpc
-  and+ rpc_connection = rpc_connection
-  and+ index_fuel = index_fuel
-  and+ task_timeout = task_timeout
+  and+ rpc, rpc_connection, index_fuel, task_timeout = rpc_flags
   and+ default_lang = default_lang
   and+ _ : bool = browser_lang
   and+ _ : bool = setup_link
