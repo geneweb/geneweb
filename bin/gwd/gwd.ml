@@ -351,37 +351,6 @@ let alias_lang lang =
       lang
     with Sys_error _ -> lang
 
-let print_renamed conf new_n =
-  let link =
-    let req = Util.get_request_string conf in
-    let new_req =
-      let len = String.length conf.bname in
-      let rec loop i =
-        if i > String.length req then ""
-        else if i >= len && String.sub req (i - len) len = conf.bname then
-          String.sub req 0 (i - len)
-          ^ new_n
-          ^ String.sub req i (String.length req - i)
-        else loop (i + 1)
-      in
-      loop 0
-    in
-    Util.get_protocol conf ^ "://" ^ Util.get_server_string conf ^ new_req
-  in
-  let env =
-    Templ.Env.(
-      empty
-      |> add "old" (Templ.Vstring (Mutil.encode conf.bname))
-      |> add "new" (Templ.Vstring (Mutil.encode new_n))
-      |> add "link" (Templ.Vstring (Mutil.encode link)))
-  in
-  try Templ.output_simple conf env "renamed"
-  with _ ->
-    let title _ = Output.printf conf "%s -&gt; %s" conf.bname new_n in
-    Hutil.header conf title;
-    Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link;
-    Hutil.trailer conf
-
 let log_redirect from request req =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
   let on_exn exn bt =
@@ -695,41 +664,6 @@ let set_token utm from_addr base_file acc user username =
   let list = ((from_addr, xx), (utm, acc, user, username)) :: list in
   set_actlog list;
   x
-
-let index_not_name s =
-  let rec loop i =
-    if i = String.length s then i
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' -> loop (i + 1)
-      | _ -> i
-  in
-  loop 0
-
-let refresh_url conf bname =
-  let url =
-    let serv = "http://" ^ Util.get_server_string conf in
-    let req =
-      if conf.cgi then
-        let str = Util.get_request_string conf in
-        let scriptname = String.sub str 0 (String.index str '?') in
-        scriptname ^ "?b=" ^ bname
-      else "/" ^ bname ^ "?"
-    in
-    serv ^ req
-  in
-  http conf Code.OK;
-  Output.header conf "Content-type: text/html";
-  Output.printf conf
-    "<head>\n\
-     <meta http-equiv=\"REFRESH\"\n\
-     content=\"1;URL=%s\">\n\
-     </head>\n\
-     <body>\n\
-     <a href=\"%s\">%s</a>\n\
-     </body>"
-    url url url;
-  raise Exit
 
 let http_preferred_language request =
   let v = Mutil.extract_param "accept-language: " '\n' request in
@@ -1278,10 +1212,6 @@ let authorization from_addr request base_env passwd access_type utm base_file
         basic_authorization from_addr request base_env passwd access_type utm
           base_file command
 
-let string_to_char_list s =
-  let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
-  exp (String.length s - 1) []
-
 let warning_multi_parents () =
   Logs.warn (fun k ->
       k
@@ -1551,7 +1481,7 @@ let should_log_request contents referer user_agent =
   (* Log the request only if it's NOT one of these useless types *)
   not (is_browser_probe || is_favicon)
 
-let log tm conf from gauth request script_name contents =
+let log conf from gauth request script_name contents =
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   if not (should_log_request contents referer user_agent) then ()
@@ -1633,7 +1563,7 @@ let log_and_robot_check conf auth from request script_name contents =
   in
   let suicide = Util.p_getenv conf.env "suicide" <> None in
   conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide);
-  log tm conf from auth request script_name contents
+  log conf from auth request script_name contents
 
 let conf_and_connection =
   let slow_query_threshold =
@@ -1711,7 +1641,7 @@ let conf_and_connection =
                 if x = "" then "GeneWeb service" else "database " ^ conf.bname
               in
               refuse_auth conf from auth auth_type
-        | _, _, ({ ar_ok = false } as ar) ->
+        | _, _, ({ ar_ok = false; _ } as ar) ->
             if is_robot from then Robot.robot_error conf 0 0
             else begin
               let tm = Unix.time () in
@@ -2413,7 +2343,6 @@ let switch_debug () =
   Sys.enable_runtime_warnings true
 
 type opened_file = { path : string; mutable oc : out_channel option }
-type log = Stdout | Stderr | File of opened_file | Syslog
 
 let pp_brackets ~style pp = Fmt.(brackets @@ styled style @@ pp)
 
@@ -2435,14 +2364,14 @@ let pp_header ppf timestamp level =
         timestamp pp_level level
 
 let reporter ~predictable_mode ppf =
-  let report src level ~over k msgf =
+  let report _src level ~over k msgf =
     let k ppf =
       Format.pp_close_box ppf ();
       Format.pp_print_newline ppf ();
       over ();
       k ()
     in
-    msgf @@ fun ?header ?tags fmt ->
+    msgf @@ fun ?header:_ ?tags fmt ->
     let timestamp =
       Option.bind tags @@ fun tags ->
       Option.bind (Logs.Tag.find Server.timestamp_tag tags) @@ fun () ->
