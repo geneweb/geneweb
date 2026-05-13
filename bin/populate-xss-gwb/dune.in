@@ -1,0 +1,4 @@
+(executable
+ (name populate_xss_gwb)
+ (public_name populate-xss-gwb)
+ (libraries geneweb %%%GWDB_PKG%%%))
