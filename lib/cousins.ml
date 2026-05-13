@@ -305,6 +305,105 @@ let cleanup_old_cache_files cache_dir ttl_hours =
         with _ -> ())
       files
 
+let sparse_slice_to_json key level slice =
+  let path_to_cache_json (ip, ifaml, anc, lvl) =
+    `List
+      [
+        `String (Driver.Iper.to_string ip);
+        `List (List.map (fun f -> `String (Driver.Ifam.to_string f)) ifaml);
+        `String (Driver.Iper.to_string anc);
+        `Int lvl;
+      ]
+  in
+  let cell_to_cache_json (i, j) paths (smin, smax) =
+    `Assoc
+      [
+        ("i", `Int i);
+        ("j", `Int j);
+        ("paths", `List (List.map path_to_cache_json paths));
+        ("min_y", `Int smin);
+        ("max_y", `Int smax);
+      ]
+  in
+  let cells =
+    CoordMap.fold
+      (fun coord paths acc ->
+        let mm =
+          try CoordMap.find coord slice.dates with Not_found -> (0, 0)
+        in
+        cell_to_cache_json coord paths mm :: acc)
+      slice.data []
+  in
+  `Assoc
+    [
+      ("version", `Int 1);
+      ("key", `String key);
+      ("level", `Int level);
+      ("cells", `List cells);
+    ]
+
+let sparse_slice_of_json key level json =
+  let path_of_cache_json = function
+    | `List [ `String ip; `List ifaml; `String anc; `Int lvl ] ->
+        let ifaml =
+          List.map
+            (function
+              | `String s -> Driver.Ifam.of_string s
+              | _ -> failwith "cousins cache: ifam")
+            ifaml
+        in
+        (Driver.Iper.of_string ip, ifaml, Driver.Iper.of_string anc, lvl)
+    | _ -> failwith "cousins cache: path"
+  in
+  match json with
+  | `Assoc f ->
+      (match (List.assoc "key" f, List.assoc "level" f) with
+      | `String k, `Int l when k = key && l = level -> ()
+      | _ -> failwith "cousins cache: key/level mismatch");
+      let cells =
+        match List.assoc "cells" f with
+        | `List l -> l
+        | _ -> failwith "cousins cache: cells"
+      in
+      List.fold_left
+        (fun acc -> function
+          | `Assoc cf ->
+              let geti k =
+                match List.assoc k cf with
+                | `Int n -> n
+                | _ -> failwith ("cousins cache: " ^ k)
+              in
+              let paths =
+                match List.assoc "paths" cf with
+                | `List l -> List.map path_of_cache_json l
+                | _ -> failwith "cousins cache: paths"
+              in
+              set_cell acc (geti "i") (geti "j") paths
+                (geti "min_y", geti "max_y")
+          | _ -> failwith "cousins cache: cell")
+        empty_sparse cells
+  | _ -> failwith "cousins cache: json"
+
+let read_or_build_level_json cache_file key level build =
+  let from_cache () =
+    try Some (sparse_slice_of_json key level (Yojson.Safe.from_file cache_file))
+    with _ ->
+      (if Sys.file_exists cache_file then
+         try Sys.remove cache_file with _ -> ());
+      None
+  in
+  match from_cache () with
+  | Some s -> s
+  | None ->
+      let s = build () in
+      (try
+         let oc = open_out cache_file in
+         output_string oc
+           (Yojson.Safe.to_string (sparse_slice_to_json key level s));
+         close_out oc
+       with _ -> ());
+      s
+
 let init_cousins_cnt conf base p =
   let v_param =
     match p_getenv conf.Config.env "v" with
@@ -359,59 +458,33 @@ let init_cousins_cnt conf base p =
   let cache_dir =
     Filename.concat
       (Filename.concat (!GWPARAM.bpath conf.bname) "caches")
-      "cousins_levels"
+      "cousins_json"
   in
   let sparse =
     match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
     | Some "yes" ->
         Filesystem.create_dir ~parent:true cache_dir;
-
         let ttl_hours =
           match List.assoc_opt "cache_cousins_ttl" conf.Config.base_env with
           | Some s -> ( try int_of_string s with _ -> 1)
           | None -> 1
         in
         if ttl_hours > 0 then cleanup_old_cache_files cache_dir ttl_hours;
-
         let rec load_levels acc level =
           if level > max_a_l then merge_sparse_list (List.rev acc)
           else
             let cache_file =
-              Filename.concat cache_dir (Printf.sprintf "%s_level_%d" key level)
+              Filename.concat cache_dir
+                (Printf.sprintf "%s_level_%d.json" key level)
             in
             let level_sparse =
-              try
-                let cached_key, cached_lev, partial =
-                  Mutil.read_or_create_value cache_file (fun () ->
-                      let cumul = merge_sparse_list (List.rev acc) in
-                      let full =
-                        if level = 0 then build_level_0 ()
-                        else build_level_i cumul level
-                      in
-                      let partial = extract_level full level in
-                      (key, level, partial))
-                in
-                if cached_key = key && cached_lev = level then partial
-                else (
-                  Sys.remove cache_file;
+              read_or_build_level_json cache_file key level (fun () ->
                   let cumul = merge_sparse_list (List.rev acc) in
                   let full =
                     if level = 0 then build_level_0 ()
                     else build_level_i cumul level
                   in
-                  let partial = extract_level full level in
-                  ignore
-                    (Mutil.read_or_create_value cache_file (fun () ->
-                         (key, level, partial)));
-                  partial)
-              with _ ->
-                if Sys.file_exists cache_file then Sys.remove cache_file;
-                let cumul = merge_sparse_list (List.rev acc) in
-                let full =
-                  if level = 0 then build_level_0 ()
-                  else build_level_i cumul level
-                in
-                extract_level full level
+                  extract_level full level)
             in
             load_levels (level_sparse :: acc) (level + 1)
         in
