@@ -10,7 +10,7 @@ module Iper = Driver.Iper
 (* ========================================================================= *)
 (* Section 1: Module setup and configuration utilities                       *)
 (* ========================================================================= *)
-let src = Logs.Src.create ~doc:"Some" __MODULE__
+let src = Logs.Src.create ~doc:"Some" "SOME"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 

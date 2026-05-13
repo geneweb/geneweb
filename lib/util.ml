@@ -3,7 +3,7 @@
 open Config
 open Def
 
-let src = Logs.Src.create ~doc:"Util" __MODULE__
+let src = Logs.Src.create ~doc:"Util" "UTIL"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
@@ -123,7 +123,7 @@ let read_base_env bname gw_prefix debug =
   else (
     if debug then
       Log.info (fun k ->
-          k "No configuration file %s found, see %s for example" fname1
+          k "No configuration file %s found,@ see %s for example" fname1
             (Filename.concat gw_prefix "a.gwf"));
     [])
 

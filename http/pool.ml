@@ -1,4 +1,4 @@
-let src = Logs.Src.create ~doc:"Pool" __MODULE__
+let src = Logs.Src.create ~doc:"Pool" "POOL"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
@@ -10,7 +10,7 @@ let add_worker t k =
   | 0 ->
       (try
          while true do
-           k @@ Unix.getpid ()
+           k ()
          done
        with e ->
          let bt = Printexc.get_raw_backtrace () in

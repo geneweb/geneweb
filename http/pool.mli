@@ -4,7 +4,7 @@ val src : Logs.src
 type t
 (** Type of a worker pool for workers. *)
 
-val start : int -> (int -> unit) -> unit
+val start : int -> (unit -> unit) -> unit
 (** [start n k] creates a worker pool of [n] workers and executes the function
     [k] in each of them.
 
