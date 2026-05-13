@@ -1,6 +1,7 @@
 (rule
  (target version.ml)
  (deps
+  (universe)
   (:script ./generate_version.sh)
   (:input ./version.txt))
  (action
