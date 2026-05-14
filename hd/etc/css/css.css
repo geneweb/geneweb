@@ -242,6 +242,10 @@ td .rm-cell {
   box-shadow: none;
 }
 
+#quickrel.pre-hydrate {
+  visibility: hidden;
+}
+
 #quickrel td {
   background-color: transparent !important;
 }
@@ -299,6 +303,18 @@ td .rm-cell {
   vertical-align:-.1em;
   background-color:rgba(245,231,216,.9)
 }
+
+.lvl-active {
+  font-weight: 700;
+  color: #fff;
+  background-color: var(--bs-dark);
+  pointer-events: none;
+}
+
+/* Visibility coexists with .invisible (set by hydrateMatrix for empty cells):
+   - .invisible reserves layout space, used inside the displayed range
+   - .beyond-lvl removes from flow, used outside the displayed ceiling */
+.beyond-lvl { display: none; }
 
 #cousins-root{
   --c-aged:rgba(245,231,216,.9);

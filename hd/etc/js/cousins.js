@@ -28,7 +28,7 @@ window.Cousins = (function () {
       fade:       get('--c-fade'),
     };
 
-    /* ---- 1. State (merge-friendly maps for Phase D upserts) ---- */
+    /* ---- 1. State (merge-friendly maps) ---- */
     const PREFIX  = root.dataset.prefix || '';
     const SELF_IP = raw.self_iper;
     const IS_ABK     = !!raw.abk;
@@ -39,6 +39,107 @@ window.Cousins = (function () {
     const persons = new Map();
     for (const c of raw.cells) cells.set(c.i + ':' + c.j, c);
     for (const [ip, p] of Object.entries(raw.persons)) persons.set(ip, p);
+
+/* ---- Phase D: per-level loading, stable per-level URLs ---- */
+    const loaded  = new Set([0]);
+    const pending = new Map();
+
+    const levelUrl = (n) =>
+      PREFIX + 'i=' + enc(SELF_IP) + '&m=C&json_level=' + n;
+
+
+    function mergeLevel(resp) {
+      if (!resp || !Array.isArray(resp.cells)) return false;
+      if (resp.persons)
+        for (const [ip, p] of Object.entries(resp.persons))
+          persons.set(ip, p);
+      for (const c of resp.cells) cells.set(c.i + ':' + c.j, c);
+      return resp.cells.length > 0;
+    }
+
+    function fetchLevel(n) {
+      if (loaded.has(n)) return Promise.resolve(true);
+      if (pending.has(n)) return pending.get(n);
+      const pr = fetch(levelUrl(n), { headers: { Accept: 'application/json' } })
+        .then((r) => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then((resp) => {
+          const nonEmpty = mergeLevel(resp);
+          loaded.add(n);
+          pending.delete(n);
+          return nonEmpty;
+        })
+        .catch((e) => {
+          pending.delete(n);
+          return false;
+        });
+      pending.set(n, pr);
+      return pr;
+    }
+
+    async function ensureLevels(upTo) {
+      for (let n = 1; n <= upTo; n++) {
+        const nonEmpty = await fetchLevel(n);
+        hydrateMatrix();
+        applyDisplayLvl(displayLvl);
+        renderTotals();
+        if (!nonEmpty) break;
+      }
+    }
+
+    /* ---- in-page generation navigation ---- */
+    let displayLvl = LVL;
+
+    function setActiveButton(n) {
+      const bar = document.getElementById('lvl-toolbar');
+      if (!bar) return;
+      bar.querySelectorAll('button[data-lvl]').forEach((b) => {
+        b.classList.toggle('lvl-active', (b.dataset.lvl | 0) === n);
+      });
+    }
+
+    function getMatrixMax() {
+      const t = document.getElementById('quickrel');
+      return t ? (t.dataset.matrixMax | 0) : 0;
+    }
+
+    function lvlTrueMax() {
+      let m = getMatrixMax();
+      document.querySelectorAll('#lvl-toolbar button[data-lvl]')
+        .forEach((b) => { const v = b.dataset.lvl | 0; if (v > m) m = v; });
+      return m;
+    }
+
+    async function navigateToLvl(n) {
+      if (n === displayLvl) return;
+      if (n > displayLvl) {
+        if (n > getMatrixMax()) await expandMatrixToMax();
+        await withOverlay(ensureLevels(n));
+      }
+      displayLvl = n;
+      applyDisplayLvl(n);
+      applyContainerWidth(n);
+      setActiveButton(n);
+      syncUrl(n);
+    }
+
+    function syncUrl(n) {
+      const u = new URL(window.location);
+      u.searchParams.set('v', n);
+      history.replaceState(null, '', u);
+    }
+
+    (function initLvlNav() {
+      const bar = document.getElementById('lvl-toolbar');
+      if (!bar) return;
+      bar.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-lvl]');
+        if (!btn) return;
+        navigateToLvl(btn.dataset.lvl | 0);
+      });
+    })();
 
     /* ---- 2. Helpers ---- */
     const L = (k) => lex[k] || '';
@@ -67,6 +168,18 @@ window.Cousins = (function () {
     function sexClass(s) {
       return s === 0 ? 'primary' : s === 1 ? 'danger' : 'dark';
     }
+
+    /* Replace a missing translation marker [cousins.i.k] by a compact i/k.
+       The server inserts "[cousins.i.k]" when the lexicon entry is absent;
+       we render the bare degree pair instead, which is more legible at high
+       v than verbose labels and avoids unwrapped long words breaking the
+       column layout. */
+    const MISSING_LABEL = /^\[cousins\.(\d+)\.(\d+)\]+$/;
+    function legibleLabel(s) {
+      const m = MISSING_LABEL.exec(s);
+      return m ? m[1] + '/' + m[2] : s;
+    }
+
     /* per-cell ip → multiplicity, used for nbr_N filter classes */
     function pathMult(cell) {
       const m = new Map();
@@ -132,19 +245,21 @@ window.Cousins = (function () {
           if (wrap) wrap.classList.add('invisible');
           return;
         }
+        if (wrap) wrap.classList.remove('invisible');
         const cnt = cell.cnt;
         const isSelf = i + k === 0;
 
         const labelHtml = isSelf
           ? L('him_her')
-          : (cnt.dist === 1 ? cell.label_s : cell.label_p);
+          : (cnt.dist === 1 ? legibleLabel(cell.label_s)
+                            : legibleLabel(cell.label_p));
         const tip = buildTip(labelHtml, i, k, cell.tt);
         btn.removeAttribute('title');
         btn.setAttribute('data-bs-original-title', tip);
 
         const lblEl = btn.querySelector('.cell-label');
         if (lblEl) {
-          lblEl.innerHTML = isSelf ? L('him_her') : cell.label_p;
+          lblEl.innerHTML = isSelf ? L('him_her') : legibleLabel(cell.label_p);
         }
         const cntEl = btn.querySelector('.cell-count');
         if (cntEl) cntEl.textContent = cnt.dist;
@@ -169,6 +284,39 @@ window.Cousins = (function () {
       });
     }
 
+    /* Hide entire <tr> rows whose every matrix <td> is beyond the ceiling.
+       Without this pass, descending leaves the generation-number cell
+       (which has no data-lvl-i) standing alone on an otherwise empty row. */
+    function applyDisplayLvl(displayLvl) {
+      const grid = root.querySelector('#quickrel');
+      if (!grid) return;
+      grid.querySelectorAll('td[data-lvl-i]').forEach((td) => {
+        const i = td.dataset.lvlI | 0;
+        td.classList.toggle('beyond-lvl', i > displayLvl);
+      });
+      grid.querySelectorAll('tr').forEach((tr) => {
+        const cells = tr.querySelectorAll('td[data-lvl-i]');
+        if (cells.length === 0) return;
+        let allBeyond = true;
+        cells.forEach((td) => {
+          if (!td.classList.contains('beyond-lvl')) allBeyond = false;
+        });
+        tr.classList.toggle('beyond-lvl', allBeyond);
+      });
+    }
+
+    function applyContainerWidth(n) {
+      const c = document.getElementById('cousins-container');
+      if (!c) return;
+      if (n > 6) {
+        c.classList.remove('container');
+        c.classList.add('container-fluid');
+      } else {
+        c.classList.remove('container-fluid');
+        c.classList.add('container');
+      }
+    }
+
     /* ---- 4. Modal (single reusable shell) ---- */
     const modalEl = document.getElementById('cousins-modal');
     const listEl  = document.getElementById('cousins-modal-list');
@@ -176,9 +324,9 @@ window.Cousins = (function () {
 
     modalEl.addEventListener('show.bs.modal', function (ev) {
       const trig = ev.relatedTarget;
-      if (!trig) return;
-      const key = trig.dataset.cell;
-      const cell = cells.get(key);
+      const host = trig && trig.closest('[data-cell]');
+      if (!host) return;
+      const cell = cells.get(host.dataset.cell);
       if (cell) populateModal(cell);
     });
 
@@ -455,6 +603,12 @@ window.Cousins = (function () {
     const cmpListItems   = (m) => cmpBy(m, x => x.dataset.ip);
 
     /* ---- 5. Card ---- */
+    /* Two distinct multiplicities — do not conflate:
+         - nbr (mult.get(ip)): total paths reaching this ip across all
+           ancestor pairs of the cell. Drives the nbr_N filter class and
+           the data-multi badge (per-person aggregate).
+         - path.nbr (RLM block below): chain multiplicity of THIS single
+           (ip, ancestor-pair) path. Drives the RLM superscript only. */
     function renderCard(tpl, path, lvlA, lvlD, span, mult) {
       const p = persons.get(path.ip);
       if (!p) return null;
@@ -593,15 +747,95 @@ window.Cousins = (function () {
       return 'linear-gradient(90deg,' + g.join(',') + ')';
     }
 
-    /* ---- 6. Totals ---- */
+    /* ---- 6. Totals (derived from merged state, dedup by iper) ---- */
     function renderTotals() {
-      const t = raw.totals;
       const tot = document.getElementById('cousins-totals');
       if (!tot) return;
-      tot.querySelector('.tot-anc').textContent   = t.anc + 'A';
-      tot.querySelector('.tot-desc').textContent  = '/' + t.desc + 'D';
-      tot.querySelector('.tot-alive').textContent = t.alive + 'L';
-      tot.querySelector('.tot-dist').textContent  = '/' + t.dist  + 'P';
+      const anc = new Set(), desc = new Set();
+      const dist = new Set(), alive = new Set();
+      for (const [key, cell] of cells.entries()) {
+        const [i, j] = key.split(':').map(Number);
+        for (const path of cell.paths) {
+          const ip = path.ip;
+          dist.add(ip);
+          if (i >= 1 && j === 0) anc.add(ip);
+          else if (i === 0 && j >= 1) desc.add(ip);
+          const p = persons.get(ip);
+          if (p && p.alive) alive.add(ip);
+        }
+      }
+      tot.querySelector('.tot-anc').textContent   = anc.size + 'A';
+      tot.querySelector('.tot-desc').textContent  = '/' + desc.size + 'D';
+      tot.querySelector('.tot-alive').textContent = alive.size + 'L';
+      tot.querySelector('.tot-dist').textContent  = '/' + dist.size + 'P';
+    }
+
+    /* ---- overlay around fetches that may take server time ---- */
+    let overlayTimer = null;
+    let overlayDepth = 0;
+
+    function showOverlayDelayed(delayMs) {
+      if (overlayTimer) return;
+      overlayTimer = setTimeout(() => {
+        overlayTimer = null;
+        if (overlayDepth > 0 && typeof window.showOverlay === 'function')
+          window.showOverlay();
+      }, delayMs);
+    }
+
+    function hideOverlayIfDone() {
+      if (overlayDepth > 0) return;
+      if (overlayTimer) { clearTimeout(overlayTimer); overlayTimer = null; }
+      if (typeof window.hideOverlay === 'function') window.hideOverlay();
+    }
+
+    async function withOverlay(promise, delayMs) {
+      overlayDepth++;
+      showOverlayDelayed(delayMs == null ? 200 : delayMs);
+      try { return await promise; }
+      finally { overlayDepth--; hideOverlayIfDone(); }
+    }
+
+    /* ---- matrix expansion by tier (matrix_v), data-driven guard ---- */
+    async function expandMatrixTo(target) {
+      const want = Math.min(target, lvlTrueMax());
+      if (want <= getMatrixMax()) return;       /* already covered */
+      const u = new URL(window.location.href);
+      u.searchParams.set('matrix_v', String(want));
+      try {
+        await withOverlay((async () => {
+          const r = await fetch(u.toString(),
+            { headers: { Accept: 'text/html' } });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const html = await r.text();
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const newTable = doc.getElementById('quickrel');
+          const oldTable = document.getElementById('quickrel');
+          if (!newTable || !oldTable) throw new Error('table not found');
+          oldTable.replaceWith(newTable);
+          hydrateMatrix();
+          applyDisplayLvl(displayLvl);
+          ensureTooltips(document);
+          newTable.classList.remove('pre-hydrate');
+        })(), 0);
+      } catch (e) {
+        console.error('expandMatrixTo failed', e);
+      }
+    }
+
+    function initToggleLvl() {
+      document.querySelectorAll('.toggle-lev .btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.high-lev, .toggle-lev .btn')
+            .forEach(function (el) { el.classList.toggle('d-none'); });
+        });
+      });
+      const tl = document.querySelector('.toggle-lev');
+      if (!tl) return;
+      const caution = tl.dataset.caution || '';
+      document.querySelectorAll('.high-lev .btn').forEach(function (btn) {
+        btn.title = btn.title + caution;
+      });
     }
 
     /* ---- 7. Tooltips page-wide + toggle-lvl ---- */
@@ -626,26 +860,15 @@ window.Cousins = (function () {
       });
     }
 
-    function initToggleLvl() {
-      document.querySelectorAll('.toggle-lev .btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          document.querySelectorAll('.high-lev, .toggle-lev .btn')
-            .forEach(function (el) { el.classList.toggle('d-none'); });
-        });
-      });
-      const tl = document.querySelector('.toggle-lev');
-      if (!tl) return;
-      const caution = tl.dataset.caution || '';
-      document.querySelectorAll('.high-lev .btn').forEach(function (btn) {
-        btn.title = btn.title + caution;
-      });
-    }
-
     /* ---- 8. Entry ---- */
     hydrateMatrix();
+    applyDisplayLvl(LVL);
     renderTotals();
     ensureTooltips(document);
     initToggleLvl();
+    setActiveButton(LVL);
+    document.getElementById('quickrel')?.classList.remove('pre-hydrate');
+    if (LVL > 0) withOverlay(ensureLevels(LVL), 0);
   }
 
   return { init };

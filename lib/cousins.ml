@@ -404,15 +404,18 @@ let read_or_build_level_json cache_file key level build =
        with _ -> ());
       s
 
-let init_cousins_cnt conf base p =
-  let v_param =
-    match p_getenv conf.Config.env "v" with
-    | Some v -> ( try int_of_string v with _ -> 0)
-    | None -> 0
-  in
+let init_cousins_cnt conf base ?up_to p =
   let max_a_l =
-    max_ancestor_level conf base (Driver.get_iper p)
-      (if v_param > 0 then v_param + 1 else 0)
+    match up_to with
+    | Some n -> n
+    | None ->
+        let v_param =
+          match p_getenv conf.Config.env "v" with
+          | Some v -> ( try int_of_string v with _ -> 0)
+          | None -> 0
+        in
+        max_ancestor_level conf base (Driver.get_iper p)
+          (if v_param > 0 then v_param + 1 else 1)
   in
   let build_level_0 () =
     let () = Driver.load_ascends_array base in
@@ -877,6 +880,37 @@ let cousins_to_json conf base self_p sparse =
       ("persons", `Assoc persons);
       ("cells", `List cells);
       ("totals", totals);
+    ]
+
+let cousins_level_to_json conf base sparse level =
+  let selected =
+    CoordMap.filter (fun (i, _) paths -> i = level && paths <> []) sparse.data
+  in
+  let ipers =
+    CoordMap.fold
+      (fun _ paths acc ->
+        List.fold_left
+          (fun acc (ip, _, anc, _) -> Iper.Set.add ip (Iper.Set.add anc acc))
+          acc paths)
+      selected Iper.Set.empty
+  in
+  let persons, meta_tbl = collect_persons conf base ipers in
+  let cells =
+    CoordMap.fold
+      (fun (i, j) paths acc ->
+        let mm =
+          try CoordMap.find (i, j) sparse.dates with Not_found -> (0, 0)
+        in
+        let json, _, _ = cell_to_json conf meta_tbl i j paths mm in
+        json :: acc)
+      selected []
+  in
+  `Assoc
+    [
+      ("version", `Int 1);
+      ("level", `Int level);
+      ("persons", `Assoc persons);
+      ("cells", `List cells);
     ]
 
 (* tableau des ascendants de p *)
