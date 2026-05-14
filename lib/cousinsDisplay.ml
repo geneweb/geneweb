@@ -415,8 +415,24 @@ let escape_lt_for_inline_script s =
   Buffer.contents b
 
 let emit_cousins_json conf base p =
-  let sparse = Cousins.init_cousins_cnt conf base p in
-  let json = Cousins.cousins_to_json conf base p sparse in
+  let slice0 = Cousins.init_cousins_cnt conf base ~up_to:0 p in
+  let json =
+    match Cousins.cousins_level_to_json conf base slice0 0 with
+    | `Assoc fields ->
+        let lvl =
+          match p_getenv conf.env "v" with
+          | Some v -> ( try int_of_string v with _ -> 0)
+          | None -> 0
+        in
+        let abk = List.assoc_opt "access_by_key" conf.base_env = Some "yes" in
+        `Assoc
+          (("abk", `Bool abk)
+          :: ("wizard", `Bool conf.wizard)
+          :: ("lvl", `Int lvl)
+          :: ("self_iper", `String (Driver.Iper.to_string (Driver.get_iper p)))
+          :: fields)
+    | other -> other
+  in
   let json_str = escape_lt_for_inline_script (Yojson.Safe.to_string json) in
   Output.print_sstring conf
     "\n<script id=\"cousins-data\" type=\"application/json\">";
@@ -429,28 +445,44 @@ let emit_cousins_json conf base p =
       close_out oc
     with _ -> ()
 
+let print_cousins_json_level conf base p =
+  let level =
+    match p_getint conf.env "json_level" with Some n when n >= 0 -> n | _ -> 0
+  in
+  let sparse = Cousins.init_cousins_cnt conf base ~up_to:level p in
+  let json = Cousins.cousins_level_to_json conf base sparse level in
+  let ttl_s =
+    match List.assoc_opt "cache_cousins_tool" conf.base_env with
+    | Some "yes" -> (
+        match List.assoc_opt "cache_cousins_ttl" conf.base_env with
+        | Some s -> ( try int_of_string s * 3600 with _ -> 3600)
+        | None -> 3600)
+    | _ -> 0
+  in
+  Output.header conf "Content-type: application/json; charset=UTF-8";
+  Output.header conf "Cache-control: private, max-age=%d" ttl_s;
+  Output.print_sstring conf (Yojson.Safe.to_string json)
+
 let print conf base p =
-  let max_lvl = max_cousin_level conf in
-  (* v1 is the number of generation we go up to get a common ancestor,
-     v2 is the number of generation we go down from the ancestor.
-     e.g.
-          (v1,v2) = (1,1) are their sisters/brothers
-          (v1,v2) = (2,2) are their "cousins" *)
-  match
-    (p_getint conf.env "v1", p_getint conf.env "v2", p_getenv conf.env "t")
-  with
-  | Some 1, Some 1, _ | Some 0, _, _ | _, Some 0, _ ->
-      Perso.interp_templ "cousins" conf base p
-  | Some lvl1, _, _ ->
-      let lvl1 = min (max 1 lvl1) max_lvl in
-      let lvl2 =
-        match p_getint conf.env "v2" with
-        | Some lvl2 -> min (max 1 lvl2) max_lvl
-        | None -> lvl1
-      in
-      print_cousins conf base p lvl1 lvl2
-  | _, _, Some (("AN" | "AD") as t) when conf.wizard || conf.friend ->
-      print_anniv conf base p (t = "AD") max_lvl
-  | _ ->
-      Perso.interp_templ "cousmenu" conf base p;
-      emit_cousins_json conf base p
+  match p_getint conf.env "json_level" with
+  | Some _ -> print_cousins_json_level conf base p
+  | _ -> (
+      let max_lvl = max_cousin_level conf in
+      match
+        (p_getint conf.env "v1", p_getint conf.env "v2", p_getenv conf.env "t")
+      with
+      | Some 1, Some 1, _ | Some 0, _, _ | _, Some 0, _ ->
+          Perso.interp_templ "cousins" conf base p
+      | Some lvl1, _, _ ->
+          let lvl1 = min (max 1 lvl1) max_lvl in
+          let lvl2 =
+            match p_getint conf.env "v2" with
+            | Some lvl2 -> min (max 1 lvl2) max_lvl
+            | None -> lvl1
+          in
+          print_cousins conf base p lvl1 lvl2
+      | _, _, Some (("AN" | "AD") as t) when conf.wizard || conf.friend ->
+          print_anniv conf base p (t = "AD") max_lvl
+      | _ ->
+          Perso.interp_templ "cousmenu" conf base p;
+          emit_cousins_json conf base p)

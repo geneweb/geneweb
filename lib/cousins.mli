@@ -61,10 +61,16 @@ val sibling_has_desc_lev :
 (** Same as [has_desc_lev] but for a sibling as returned by [siblings]. *)
 
 val init_cousins_cnt :
-  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> cousins_sparse
-(** Builds sparse structure of cousins at each (l1, l2) level. For each cousin,
-    records their families, common ancestor, and genealogical distance, along
-    with birth/death date ranges. Supports optional disk caching. *)
+  config ->
+  Geneweb_db.Driver.base ->
+  ?up_to:int ->
+  Geneweb_db.Driver.person ->
+  cousins_sparse
+(** Builds the sparse cousins structure up to an ancestor level. When [up_to] is
+    given, that level is the explicit ceiling and no base-wide ancestor scan is
+    performed. When omitted, the ceiling is derived from the [v] URL parameter
+    via [max_ancestor_level]. Uses and populates the per-level disk cache when
+    [cache_cousins_tool=yes]. *)
 
 val min_max_date :
   cousins_sparse ->
@@ -212,3 +218,9 @@ val cousins_to_json :
     distinct descent chains through this exact pivot pair: > 1 indicates implex.
     Within a cell a same [ip] may appear in multiple entries, one per distinct
     pivot pair. *)
+
+val cousins_level_to_json :
+  config -> Geneweb_db.Driver.base -> cousins_sparse -> int -> Yojson.Safe.t
+(** Serializes the cells at the given ancestor level and the persons they
+    reference. The client merges levels into its in-memory state and derives
+    page-wide totals from the merge. *)
