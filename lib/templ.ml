@@ -412,6 +412,7 @@ and eval_simple_variable conf = function
   | "bname" -> conf.bname
   | "token" -> conf.cgi_passwd
   | "bname_token" -> String.concat "_" [ conf.bname; conf.cgi_passwd ]
+  | "permalink" -> (Permalink.script conf (Permalink.query_aux conf) :> string)
   | "prefix" -> (Util.commd conf :> string)
   | "prefix_base" -> (Util.commd ~pwd:false conf :> string)
   | "prefix_base_password" -> (Util.commd conf :> string)

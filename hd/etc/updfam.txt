@@ -18,6 +18,7 @@
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
+  %permalink;
   %include;css
 </head>
 <body%body_prop; id="family">

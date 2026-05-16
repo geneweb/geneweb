@@ -1,5 +1,5 @@
 
-plugins=cgl,fixbase,forum,no_index
+plugins=cgl,fixbase,forum
 wizard_passwd=wiz:wiz
 friend_passwd=fr:fr
 

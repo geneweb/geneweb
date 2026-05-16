@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%image_prefix;favicon_gwd.png">
   <link rel="apple-touch-icon" href="%image_prefix;favicon_gwd.png">
+  %permalink;
   %include;css
   %if;(b.use_cdn="yes")
     <link href="https://cdn.datatables.net/v/bs5/dt-3.0.0-beta.1/rr-2.0.0-beta.1/datatables.min.css" rel="stylesheet"

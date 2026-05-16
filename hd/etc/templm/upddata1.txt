@@ -9,6 +9,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
   <script type="text/javascript">
   <!--

@@ -154,7 +154,7 @@
           %end;
           %( IND dropdown menu %)
           <li class="nav-item dropdown">
-            <a id="load_once_copylink" class="nav-link dropdown-toggle text-secondary %if;(e.m="CHG_EVT_IND_ORD" or e.m="SND_IMAGE" or e.m="MRG" or e.m="DEL_IND")active%end;"
+            <a class="nav-link dropdown-toggle text-secondary %if;(e.m="CHG_EVT_IND_ORD" or e.m="SND_IMAGE" or e.m="MRG" or e.m="DEL_IND")active%end;"
                data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" title="[*tools] [person/persons]0">%nn;
               <span class="fa fa-user-gear
                 %if;is_private;text-danger%nn;
@@ -244,36 +244,6 @@
                   %end;
                 %end;
               %end;
-              %( Copy permalink/f/w buttons %)
-              %define;copylink(xx)
-                [*copy link %s:::xx]
-              %end;
-              <div class="dropdown-divider"></div>
-              %if;(not cgi and wizard or friend)<div class="btn-group pe-4 gap-1" role="group">%end;
-                <button class="dropdown-item permalink-copy pe-0" type="button"
-                  title="%apply;copylink([wizard/wizards/friend/friends/exterior]4)" 
-                  data-bname="%if;not cgi;%base.name;%end;"
-                  data-query="%if;cgi;b=%base.name;&%end;%nn;
-                    p=%first_name_key;&n=%surname_key;%if;(occ!="0")&oc=%occ;%end;
-                    %foreach;env_binding;
-                      %if;(env.key!="i" and env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="b" and env.key!="" and not (env.key="ocz" and env.val="0"))&%env.key=%env.val;%end;
-                    %end;"><i class="fas fa-link fa-fw me-2"></i>[*copy permalink] [wizard/wizards/friend/friends/exterior]4</button>
-                %if;not cgi;
-                  %if;not (friend or iswiz=1)<div class="d-none">%end;
-                    <button class="disabled dropdown-item mx-0 px-0">/</button>
-                    <button class="px-0 dropdown-item permalink-friend-copy" type="button"
-                      title="%apply;copylink([wizard/wizards/friend/friends/exterior]2)">%nn;
-                      [wizard/wizards/friend/friends/exterior]2</button>
-                  %if;not (friend or iswiz=1)</div>%end;
-                  %if;(iswiz!=1)<div class="d-none">%end;
-                    <button class="disabled dropdown-item mx-0 px-0">/</button>
-                    <button class="px-0 dropdown-item permalink-wizard-copy" type="button"
-                      title="%apply;copylink([wizard/wizards/friend/friends/exterior]0)">%nn;
-                      [wizard/wizards/friend/friends/exterior]0</button>%nn;
-                  %if;(iswiz!=1)</div>%end;
-                %end;
-              %if;(not cgi and wizard or friend)</div>%end;
-              
               %( WIZARD | Copy wikitext button %)
               %if;(self!="? ?")
                 %if;(iswiz!=1)<div class="d-none">%end;
