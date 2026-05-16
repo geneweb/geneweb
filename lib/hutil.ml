@@ -79,6 +79,7 @@ let header_without_http_nor_home conf title =
   Output.print_sstring conf str1;
   title true;
   Output.print_sstring conf str2;
+  Output.print_string conf (Permalink.script conf (Permalink.query_aux conf));
   Templ.output_simple conf Templ.Env.empty "css";
   Output.print_sstring conf "</head>\n";
   let s =

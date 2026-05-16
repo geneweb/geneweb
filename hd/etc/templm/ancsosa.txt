@@ -25,6 +25,7 @@
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
 </head>
 

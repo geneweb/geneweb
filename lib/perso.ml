@@ -4442,6 +4442,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match (p_auth, fst (Util.get_approx_death_date_place conf base p)) with
       | true, Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
       | _ -> null_val)
+  | "permalink" ->
+      VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | "prev_fam_father" -> (
       match get_env "prev_fam" env with
       | Vfam (_, _, (ifath, _, _), _) ->

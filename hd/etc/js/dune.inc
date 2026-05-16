@@ -80,13 +80,13 @@
   (action
     (run brotli -f -q 11 %{input})))
 (rule
-  (target copylink.js.gz)
-  (deps (:input copylink.js))
+  (target permalink.min.js.gz)
+  (deps (:input permalink.min.js))
   (action
     (run gzip -9 -k -f %{input})))
 (rule
-  (target copylink.js.br)
-  (deps (:input copylink.js))
+  (target permalink.min.js.br)
+  (deps (:input permalink.min.js))
   (action
     (run brotli -f -q 11 %{input})))
 (rule

@@ -12,6 +12,7 @@
   <meta name="robots" content="none"/>
   <meta charset="utf-8">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"/>
+  %permalink;
   %include;css
   %include;js_upd
   %include;updind_updfam
