@@ -1,16 +1,17 @@
 val print :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
-(** Displays the menu that lists all person's relatives depending on ancestor
-    and his descandant levels specified by [conf.env] variables {i v1} (for
-    ancestor) and {i v2} for his descandant. For exemple :
+(** Entry point for [m=C] (Cousins). Dispatches on [conf.env]:
 
-    "v1" = 1, "v2" = 1 - Displays all person's siblings (mount to the person's
-    parent (ancestor of level 1) and lists all his children (descandant of level
-    1)); "v1" = 2, "v2" = 2 - Displays all cousins; "v1" = 2, "v2" = 1 -
-    Displays all uncles/aunts; "v1" = 1, "v2" = 2 - Displays all nieces/nephews;
-    etc.
-
-    Variable "t" is used to display anniversaries for relatives like
-    [BirthdayDisplay.gen_print]. If nor of those variables are defined, prints
-    menu that allows to access the most common relatives (except for direct
-    relatives) like cousins, siblings, uncles/aunts, etc. *)
+    - [json_level=N] → JSON endpoint: writes the [N]-th level slice with
+      [Content-type: application/json], consumed by [cousmenu.js] to pull levels
+      incrementally.
+    - [v1=1] and [v2=1], or [v1=0], or [v2=0] → renders the [cousins] template
+      (close relatives: siblings, direct ancestors, direct descendants).
+    - [v1] set together with any [v2] → classic HTML matrix rendered by
+      [print_cousins], iterating Sosa branches up to [v1] and listing
+      descendants down to [v2], capped by [max_cousins].
+    - [t=AN] or [t=AD], wizard or friend only → anniversaries page over the
+      relatives set via [BirthdayDisplay.gen_print].
+    - otherwise → renders the [cousmenu] template (menu view) and inlines the
+      level-0 cousins JSON in a [<script id="cousins-data">] block for
+      [cousmenu.js] to bootstrap from. *)
