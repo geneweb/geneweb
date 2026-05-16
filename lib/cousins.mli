@@ -1,64 +1,81 @@
 open Config
 
+module CoordMap : Map.S with type key = int * int
+(** Coordinate map keyed by [(l1, l2)] cell, where [l1] is ancestor depth and
+    [l2] descendant depth from the common ancestor. Backs the two fields of
+    [cousins_sparse] below. *)
+
 type one_cousin =
   Geneweb_db.Driver.iper
   * Geneweb_db.Driver.ifam list
   * Geneweb_db.Driver.iper
   * int
-(** Represents a cousin relationship:
-    - cousin's iper
-    - list of families linking cousin to common ancestor
-    - common ancestor's iper
-    - genealogical distance level *)
+(** Raw cousin record produced when expanding [init_cousins_cnt]. Fields:
+    - [iper] : the cousin's person id
+    - [ifam list] : family chain from the cousin up to the common ancestor,
+      innermost first; last entry is the ancestor's parental family
+    - [iper] : the common ancestor's person id
+    - [int] : genealogical distance level (used by [cousins_fold]) *)
 
 type cousins_i_j = one_cousin list
-(** List of cousins at a specific (l1, l2) degree *)
+(** All cousin records at one [(l1, l2)] cell of the matrix, where [l1] is the
+    ancestor depth and [l2] the descendant depth from that ancestor. *)
 
-type cousins_sparse
-(** Sparse structure storing cousins at each ancestor/descendant level *)
-
-val default_max_cnt : int
-(** Default number of relatives that could be listed at the same page *)
+type cousins_sparse = {
+  data : one_cousin list CoordMap.t;
+  dates : (int * int) CoordMap.t;
+  max_i : int;
+  max_j : int;
+}
+(** Sparse [(l1, l2) -> cousins_i_j] map paired with a sibling
+    [(l1, l2) -> (min_year, max_year)] map for per-cell date spans, plus cached
+    [max_i] / [max_j] populated bounds. Both maps share their key set; an absent
+    key denotes an empty cell. Built once per request by [init_cousins_cnt];
+    consumed read-only by every other function below and by the JSON serializers
+    in [Cousins_display]. *)
 
 val max_cousin_level : config -> int
-(** Maximum cousin level from config, defaults to 6 *)
+(** [max_cousins_level] from the [.gwf], defaults to 6. Clamps the [v1] and [v2]
+    URL parameters in the classic HTML renderer. *)
 
 val max_ancestor_level :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> int -> int
-(** Computes max ancestor level for a person. Priority: URL param > gwf config >
-    fallback. Returns actual computed level capped by configured limit. *)
+(** [max_ancestor_level conf base ip max_lvl] returns the actual height of the
+    ascending tree rooted at [ip], capped from above. The cap is [max_lvl] when
+    positive, else [max_anc_level] from the [.gwf], else 12. Returns 0 if [ip]
+    has no parents. *)
 
 val max_descendant_level :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> int -> int
-(** Computes max descendant level for a person. Priority: URL param > gwf config
-    > fallback. Returns actual computed level capped by limit. *)
+(** Symmetric to [max_ancestor_level] for descent. Cap is [max_lvl] when
+    positive, else [max_desc_level] from the [.gwf], else 16. *)
 
 val children_of_fam :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.ifam ->
   Geneweb_db.Driver.iper list
-(** Returns list of children of the given family *)
+(** Children of one family as a list, no filtering. *)
 
 val siblings :
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.iper ->
   (Geneweb_db.Driver.iper * (Geneweb_db.Driver.iper * Def.sex)) list
-(** Returns list of person's siblings including half-siblings. Each sibling is
-    annotated with parent's id and sex. For full siblings, father's annotation
-    is preserved. *)
+(** Full and half siblings of [ip]. Each entry is paired with the parent through
+    whom the link runs: [(parent_iper, parent_sex)]. Full siblings appear once
+    with the father's annotation; half-siblings appear once per shared parent.
+    Empty when [ip] has no parents. *)
 
 val has_desc_lev :
   config -> Geneweb_db.Driver.base -> int -> Geneweb_db.Driver.person -> bool
-(** Tells if person has descendants at given level. Level 1 = children, level 2
-    = grandchildren, etc. *)
-
-val br_inter_is_empty : ('a * 'b) list -> ('a * 'c) list -> bool
-(** Tells if two family branches don't intersect *)
+(** [has_desc_lev conf base lev p] tests whether [p] has at least one descendant
+    exactly at generation [lev] (1 = children, 2 = grandchildren, …).
+    Short-circuits on the first match. *)
 
 val sibling_has_desc_lev :
   config -> Geneweb_db.Driver.base -> int -> Geneweb_db.Driver.iper * 'a -> bool
-(** Same as [has_desc_lev] but for a sibling as returned by [siblings]. *)
+(** [has_desc_lev] curried over a sibling pair [(ip, _)] as produced by
+    [siblings]. *)
 
 val init_cousins_cnt :
   config ->
@@ -66,23 +83,24 @@ val init_cousins_cnt :
   ?up_to:int ->
   Geneweb_db.Driver.person ->
   cousins_sparse
-(** Builds the sparse cousins structure up to an ancestor level. When [up_to] is
-    given, that level is the explicit ceiling and no base-wide ancestor scan is
-    performed. When omitted, the ceiling is derived from the [v] URL parameter
-    via [max_ancestor_level]. Uses and populates the per-level disk cache when
-    [cache_cousins_tool=yes]. *)
+(** Builds the full sparse cousin matrix for person [p] up to some ancestor
+    depth. The ceiling, in priority order:
+    - [up_to] when provided — explicit, no base-wide ancestor scan (used by the
+      incremental JSON endpoint)
+    - [v] URL parameter when present and positive — effective ceiling is [v + 1]
+    - [max_ancestor_level] computed on [p] otherwise
 
-val min_max_date :
-  cousins_sparse ->
-  config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  bool ->
-  string ->
-  string ->
-  int option
-(** Returns min or max birth/death year for cousins at level (l1, l2). The bool
-    parameter selects min (true) or max (false). *)
+    Uses and populates the per-level disk cache when [cache_cousins_tool=yes] in
+    the [.gwf]; cache files live in [caches/cousins_json/<key>_level_N.json]
+    where [<key>] is [strip_lower(surname).occ.strip_lower(first_name)]. *)
+
+val extract_level : cousins_sparse -> int -> cousins_sparse
+(** [extract_level sparse level] returns a sub-sparse keeping only the cells of
+    the form [(level, j)] of [sparse], with their date entries copied over. The
+    result's [max_i] is set to [level]; its [max_j] is the largest [j] with a
+    non-empty cell at that level. Used by [Cousins_display] to feed
+    [cousins_level_to_json] with a single-level slice rather than the full
+    sparse plus a [level] argument. *)
 
 val max_l1_l2 :
   cousins_sparse ->
@@ -90,8 +108,26 @@ val max_l1_l2 :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   int * int
-(** Returns (max_ancestor_level, max_descendant_level) where data exists in the
-    sparse structure. *)
+(** [(max_anc, max_desc)] over populated cells of [sparse]: [max_anc] is the
+    largest [l1] with a non-empty [(l1, 0)] cell; [max_desc] is the largest
+    [j - i] across all populated cells. Legacy template-binding shape: [conf],
+    [base] and [person] are ignored. *)
+
+val min_max_date :
+  cousins_sparse ->
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  [ `Min | `Max ] ->
+  string ->
+  string ->
+  int option
+(** [min_max_date sparse _ _ _ pick l1 l2] returns the min year ([`Min]) or the
+    max year ([`Max]) aggregated over cell
+    [(int_of_string l1, int_of_string l2)]. Returns [None] when [l1] or [l2] is
+    not a valid integer, or when the cell has no dated cousin. Legacy
+    template-binding shape: [conf], [base] and [person] are accepted for
+    signature uniformity and ignored. *)
 
 val cousins_l1_l2_aux :
   cousins_sparse ->
@@ -101,9 +137,14 @@ val cousins_l1_l2_aux :
   string ->
   Geneweb_db.Driver.person ->
   one_cousin list option
-(** Returns list of cousins at specified (l1, l2) level where l1 = generations
-    up to common ancestor, l2 = generations down from ancestor. Examples: (0,0)
-    = self, (1,1) = siblings, (2,1) = uncles/aunts, (2,2) = cousins. *)
+(** [cousins_l1_l2_aux sparse _ _ l1 l2 _] returns the raw cousin list at cell
+    [(int_of_string l1, int_of_string l2)]. Reference points:
+    - [(0, 0)] : self
+    - [(1, 1)] : siblings
+    - [(2, 1)] : aunts / uncles
+    - [(2, 2)] : first cousins
+
+    Raises [Failure] on non-integer arguments. Legacy template-binding shape. *)
 
 val cousins_implex_cnt :
   cousins_sparse ->
@@ -113,8 +154,11 @@ val cousins_implex_cnt :
   string ->
   Geneweb_db.Driver.person ->
   int
-(** Counts cousins at level (l1, l2) already seen at levels l < l2, used to
-    detect implex (multiple relationship paths). *)
+(** Number of cousin records in cell [(l1, l2)] whose [iper] also appears in
+    some shallower cell [(l1, l2')] with [l2' < l2]. Semantically relevant for
+    the ancestor column [(i, 0)] (implex / multi-path ascendancy); for other
+    cells the value is computed identically but its interpretation is less
+    clear. Legacy template-binding shape. *)
 
 val cousins_fold :
   one_cousin list ->
@@ -122,105 +166,51 @@ val cousins_fold :
   * (Geneweb_db.Driver.ifam list list * Geneweb_db.Driver.iper list * int)
   * int list)
   list
-(** Groups one_cousin entries by iper, assembling multiple relationship paths
-    under a single person. Returns (iper, (families, ancestors, path_count),
-    levels). *)
+(** Groups raw [one_cousin] records by [iper], aggregating multiple relationship
+    paths leading to the same cousin:
+    - [iper] : the cousin's id
+    - [ifam list list] : the family chains, one inner list per distinct path
+    - [iper list] : distinct common ancestors reached
+    - [int] : path count
+    - [int list] : per-path levels
 
-val anc_cnt_aux :
-  ?asc_cnt:one_cousin list array ->
-  config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  bool ->
-  Geneweb_db.Driver.person ->
-  one_cousin list option
-(** Returns ancestors at level (if bool=true) or up to level (if bool=false).
-    Level 1 = parents, level 2 = grandparents, etc.
-    @param asc_cnt
-      Pre-computed ancestor array from {!init_asc_cnt} for caching across
-      multiple calls on the same person. If omitted, computed internally. *)
-
-val desc_cnt_aux :
-  config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  bool ->
-  Geneweb_db.Driver.person ->
-  one_cousin list option
-(** Returns descendants at level (if bool=true) or up to level (if bool=false).
-    Level 1 = children, level 2 = grandchildren, etc. *)
+    Used internally by [cousins_implex_cnt] and historically by template
+    [foreach;cousin;] iteration. *)
 
 val init_asc_cnt :
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   one_cousin list array
-(** Builds array of ancestors by level. Index 0 = person, 1 = parents, etc. Each
-    entry contains all ancestor paths to that level (including duplicates for
-    implex detection). *)
+(** Pre-computes the per-level ancestor array for [p]. Index 0 holds [p]
+    himself, index 1 his parents, etc., up to
+    [max_ancestor_level conf base (get_iper p) 0]. Each entry retains every path
+    reaching that level (duplicates preserved so implex counts remain accurate).
+    Intended to be passed as [?asc_cnt] of [anc_cnt_aux] when calling it several
+    times on the same person. *)
 
-val cousins_to_json :
+val anc_cnt_aux :
+  ?asc_cnt:one_cousin list array ->
   config ->
   Geneweb_db.Driver.base ->
+  [ `At_level of int | `Up_to of int ] ->
   Geneweb_db.Driver.person ->
-  cousins_sparse ->
-  Yojson.Safe.t
-(** Serializes the full cousins sparse structure as a single JSON value suitable
-    for inline injection into the cousmenu template and for consumption by the
-    frontend.
+  one_cousin list option
+(** [anc_cnt_aux ?asc_cnt conf base mode p] returns ancestors of [p]:
+    - exactly at level [n] when [mode] is [`At_level n]
+    - the union of levels [1 .. n] when [mode] is [`Up_to n]
 
-    Persons are deduplicated into a top-level dict keyed by iper string; cells
-    reference persons by iper. Performs exactly one [Driver.poi] per distinct
-    iper.
+    Returns [None] when the requested level exceeds the pre-computed depth.
+    @param asc_cnt
+      reuse a pre-computed array from [init_asc_cnt] across several calls on the
+      same person; when omitted it is rebuilt internally. *)
 
-    Each person carries:
-    - display strings [fn], [sn] (raw) and URL-normalized [p_key], [n_key] (via
-      [Name.lower], identical to template [%first_name_key;] / [%surname_key;])
-      for building [m=P] links and stable sort keys
-    - [oc] (occurrence), [sex] (0 Neuter, 1 Male, 2 Female)
-    - [alive], [has_par], [has_child], [vis] booleans; [vis] reflects
-      [Util.authorized_age]
-    - [dates] formatted string from [DateDisplay.short_dates_text]
-    - [birth] / [death] structured objects [{ y; m; d; p }] or [`Null]: [y] is
-      non-zero year (else date absent); [m], [d] are [`Null] when partial (0);
-      [p] is the precision marker ([""] Sure, ["<"] Before, [">"] After, ["~"]
-      About, ["?"] Maybe, ["|"] OrYear, [".."] YearInt).
-    - [age_d] precomputed age in days from [Perso.age_days] ([`Null] if bounds
-      incomplete), matching v1 [jd_age_] semantics ([death_jd - birth_jd] if
-      dead, [today_jd - birth_jd] if alive).
-
-    Output shape (informal):
-    {[
-    { version: 1; abk: bool; wizard: bool; lvl: int;
-      max_anc_lvl: int; max_desc_lvl: int;
-      self_iper: string;
-      persons: { <iper>: { fn; sn; p_key; n_key; oc; sex;
-                           alive; has_par; has_child; vis; dates;
-                           birth: { y; m; d; p } | null;
-                           death: { y; m; d; p } | null;
-                           age_d: int | null } };
-      cells: [ { i; j; label_s; label_p; tt;
-                 cnt: { paths; dist; alive; no_desc };
-                 span: { min_yr; max_yr };
-                 paths: [ { ip; a1; a2; nbr; lvl } ]
-      totals: { anc; desc; dist; alive } }
-    ]}
-
-    Non-visible persons are still emitted with [vis=false] but with empty
-    [dates] and null [age_d]. [alive] follows the perso.ml is_dead convention:
-    true for NotDead/DontKnowIfDead/OfCourseDead, and true for
-    Death/DeadYoung/DeadDontKnowWhen if not p_auth.
-
-    Each [paths] entry is a *pivot pair* aggregating raw cousin records by
-    common [ifam] chain. [a1] is the principal ancestor (or [`Null] for the self
-    cell), [a2] the spouse on the top family of the chain ([`Null] for a
-    half-relation where the spouse is not in self's ancestor list). [nbr] counts
-    distinct descent chains through this exact pivot pair: > 1 indicates implex.
-    Within a cell a same [ip] may appear in multiple entries, one per distinct
-    pivot pair. *)
-
-val cousins_level_to_json :
-  config -> Geneweb_db.Driver.base -> cousins_sparse -> int -> Yojson.Safe.t
-(** Serializes the cells at the given ancestor level and the persons they
-    reference. The client merges levels into its in-memory state and derives
-    page-wide totals from the merge. *)
+val desc_cnt_aux :
+  config ->
+  Geneweb_db.Driver.base ->
+  [ `At_level of int | `Up_to of int ] ->
+  Geneweb_db.Driver.person ->
+  one_cousin list option
+(** Symmetric to [anc_cnt_aux] for descent. With [`Up_to n] the result is
+    additionally deduplicated by [iper] (latest path wins) — a property that
+    [anc_cnt_aux] does not enforce. *)
