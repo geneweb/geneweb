@@ -499,8 +499,8 @@ function moveWelcomeLangSelect() {
   const group = sel ? sel.closest('.btn-group') : null;
   const loginBox = document.getElementById('gw-login');
   if (!group || !loginBox) return;
-  grp.classList.remove('dropup');
-  grp.classList.add('dropdown');
+  group.classList.remove('dropup');
+  group.classList.add('dropdown');
   loginBox.appendChild(group);
 }
 %end;
