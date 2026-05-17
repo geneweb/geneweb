@@ -229,9 +229,21 @@ td .rm-cell {
   margin-bottom: .5rem;
 }
 
+.min-w-0 {
+  min-width: 0;
+}
+
+.text-small {
+  font-size: .875em;
+}
+
 .toggle-button:focus {
   outline: none; /* On generation picker, hide the toggle +/- button outline+shadow */
   box-shadow: none;
+}
+
+#quickrel.pre-hydrate {
+  visibility: hidden;
 }
 
 #quickrel td {
@@ -282,6 +294,35 @@ td .rm-cell {
 
 .z-index1 {
   z-index:1;
+}
+
+.mh-alive-swatch {
+  display:inline-block;
+  width:.5em;
+  height:1.2em;
+  vertical-align:-.1em;
+  background-color:rgba(245,231,216,.9)
+}
+
+.lvl-active {
+  font-weight: 700;
+  color: #fff;
+  background-color: var(--bs-dark);
+  pointer-events: none;
+}
+
+/* Visibility coexists with .invisible (set by hydrateMatrix for empty cells):
+   - .invisible reserves layout space, used inside the displayed range
+   - .beyond-lvl removes from flow, used outside the displayed ceiling */
+.beyond-lvl { display: none; }
+
+#cousins-root{
+  --c-aged:rgba(245,231,216,.9);
+  --c-aged-strong:rgba(245,231,216,1);
+  --c-aged-soft:rgba(255,235,210,1);
+  --c-live:rgba(255,255,255,1);
+  --c-dead:rgba(245,245,235,1);
+  --c-fade:rgba(248,249,250,0);
 }
 
 /* Highlight invisible caracters */
@@ -743,7 +784,7 @@ p {
 }
 
 /* Relation menu table */
-#quickrel.table td{
+#quickrel.table td {
   padding: 0px;
   line-height:1em;
 }

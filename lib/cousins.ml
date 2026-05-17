@@ -1,5 +1,4 @@
 open Def
-open Util
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
@@ -58,29 +57,25 @@ let set_cell sparse i j value dates_val =
     max_j = max sparse.max_j j;
   }
 
-let default_max_cnt = 2000
-
 let max_cousin_level conf =
   let default_max_cousin_lvl = 6 in
   try int_of_string (List.assoc "max_cousins_level" conf.Config.base_env)
   with Not_found | Failure _ -> default_max_cousin_lvl
 
 let children_of base u =
-  let result = ref [] in
-  Array.iter
-    (fun ifam ->
-      let des = Driver.foi base ifam in
-      Array.iter
-        (fun child -> result := child :: !result)
-        (Driver.get_children des))
-    (Driver.get_family u);
-  !result
+  Array.fold_left
+    (fun acc ifam ->
+      Array.fold_left
+        (fun acc child -> child :: acc)
+        acc
+        (Driver.get_children (Driver.foi base ifam)))
+    [] (Driver.get_family u)
 
 let children_of_fam base ifam =
   Array.to_list (Driver.get_children @@ Driver.foi base ifam)
 
 let siblings_by conf base iparent ip =
-  let list = children_of base (pget conf base iparent) in
+  let list = children_of base (Util.pget conf base iparent) in
   List.filter (( <> ) ip) list
 
 let merge_siblings l1 l2 =
@@ -96,7 +91,7 @@ let merge_siblings l1 l2 =
   filter_unique [] (List.rev_append l1 l2)
 
 let siblings conf base ip =
-  match Driver.get_parents (pget conf base ip) with
+  match Driver.get_parents (Util.pget conf base ip) with
   | None -> []
   | Some ifam ->
       let cpl = Driver.foi base ifam in
@@ -119,23 +114,12 @@ let rec has_desc_lev conf base lev u =
       (fun ifam ->
         let des = Driver.foi base ifam in
         Array.exists
-          (fun ip -> has_desc_lev conf base (lev - 1) (pget conf base ip))
+          (fun ip -> has_desc_lev conf base (lev - 1) (Util.pget conf base ip))
           (Driver.get_children des))
       (Driver.get_family u)
 
-let br_inter_is_empty b1 b2 =
-  List.for_all (fun (ip, _) -> not (List.mem_assoc ip b2)) b1
-
-(* Algorithms *)
-
 let sibling_has_desc_lev conf base lev (ip, _) =
-  has_desc_lev conf base lev (pget conf base ip)
-
-(* begin cousins *)
-
-let cousins_table = Array.make_matrix 1 1 []
-let tm = Unix.localtime (Unix.time ())
-let today_year = tm.Unix.tm_year + 1900
+  has_desc_lev conf base lev (Util.pget conf base ip)
 
 let update_min_max (min, max) date =
   ((if date < min then date else min), if date > max then date else max)
@@ -157,7 +141,7 @@ let max_ancestor_level conf base ip max_lvl =
     else if not (Collection.Marker.get mark ip) then (
       Collection.Marker.set mark ip true;
       x := max !x level;
-      match Driver.get_parents (pget conf base ip) with
+      match Driver.get_parents (Util.pget conf base ip) with
       | Some ifam ->
           let cpl = Driver.foi base ifam in
           loop (succ level) (Driver.get_father cpl);
@@ -177,27 +161,33 @@ let max_descendant_level conf base ip max_lvl =
       | Some v when v <> "" -> int_of_string v
       | _ -> 16
   in
-  let childs_of_ip ip =
-    let faml = Array.to_list (Driver.get_family (Driver.poi base ip)) in
-    List.fold_left
+  let children_of_ip acc ip =
+    Array.fold_left
       (fun acc ifam ->
-        Array.to_list (Driver.get_children (Driver.foi base ifam)) @ acc)
-      [] faml
+        Array.fold_left
+          (fun acc child -> child :: acc)
+          acc
+          (Driver.get_children (Driver.foi base ifam)))
+      acc
+      (Driver.get_family (Driver.poi base ip))
   in
-  let rec loop0 current_level lev =
+  let rec loop current_level lev =
     if current_level = [] then lev
     else if lev >= limit then limit
     else
-      let next_level =
-        List.fold_left (fun acc ip -> childs_of_ip ip @ acc) [] current_level
-      in
-      if next_level = [] then lev else loop0 next_level (lev + 1)
+      let next_level = List.fold_left children_of_ip [] current_level in
+      if next_level = [] then lev else loop next_level (lev + 1)
   in
-  loop0 [ ip ] 0
+  loop [ ip ] 0
 
 let get_min_max_dates base l =
-  let rec loop (min, max) = function
-    | [] -> (min, max)
+  let today_year =
+    let tm = Unix.localtime (Unix.time ()) in
+    tm.Unix.tm_year + 1900
+  in
+  let no_year = (10000, -10000) in
+  let rec loop (lo, hi) = function
+    | [] -> (lo, hi)
     | one_cousin :: l -> (
         let ip, _, _, _ = one_cousin in
         let not_dead = Driver.get_death (Driver.poi base ip) = NotDead in
@@ -217,31 +207,36 @@ let get_min_max_dates base l =
               | _ -> true
             in
             if birth && death then
-              let min, max = update_min_max (min, max) b.year in
-              let min, max = update_min_max (min, max) d.year in
-              loop (min, max) l
+              let lo, hi = update_min_max (lo, hi) b.year in
+              let lo, hi = update_min_max (lo, hi) d.year in
+              loop (lo, hi) l
             else if birth && not death then
-              loop (update_min_max (min, max) b.year) l
+              loop (update_min_max (lo, hi) b.year) l
             else if (not birth) && death then
-              loop (update_min_max (min, max) d.year) l
-            else loop (min, max) l
+              loop (update_min_max (lo, hi) d.year) l
+            else loop (lo, hi) l
         | Some (Dgreg (b, _)), _ -> (
             match b.prec with
             | After | Before | About | Maybe | OrYear _ | YearInt _ ->
-                if not_dead then loop (update_min_max (min, max) today_year) l
-                else loop (min, max) l
+                if not_dead then loop (update_min_max (lo, hi) today_year) l
+                else loop (lo, hi) l
             | _ ->
-                let min, max = update_min_max (min, max) b.year in
-                if not_dead then loop (update_min_max (min, max) today_year) l
-                else loop (min, max) l)
+                let lo, hi = update_min_max (lo, hi) b.year in
+                if not_dead then loop (update_min_max (lo, hi) today_year) l
+                else loop (lo, hi) l)
         | _, Some (Dgreg (d, _)) -> (
             match d.prec with
             | After | Before | About | Maybe | OrYear _ | YearInt _ ->
-                loop (min, max) l
-            | _ -> loop (update_min_max (min, max) d.year) l)
-        | _, _ -> loop (min, max) l)
+                loop (lo, hi) l
+            | _ -> loop (update_min_max (lo, hi) d.year) l)
+        | _, _ -> loop (lo, hi) l)
   in
-  loop (10000, -10000) l
+  loop no_year l
+
+let is_unknown base ip =
+  let p = Driver.poi base ip in
+  Driver.sou base (Driver.get_first_name p) = "?"
+  && Driver.sou base (Driver.get_surname p) = "?"
 
 let rec ascendants base acc l =
   match l with
@@ -254,8 +249,14 @@ let rec ascendants base acc l =
           let cpl = Driver.foi base ifam in
           let ifath = Driver.get_father cpl in
           let imoth = Driver.get_mother cpl in
-          let acc = (ifath, [], ifath, lev + 1) :: acc in
-          let acc = (imoth, [], imoth, lev + 1) :: acc in
+          let acc =
+            if is_unknown base ifath then acc
+            else (ifath, [], ifath, lev + 1) :: acc
+          in
+          let acc =
+            if is_unknown base imoth then acc
+            else (imoth, [], imoth, lev + 1) :: acc
+          in
           ascendants base acc l)
 
 (* descendants des ip de liste1 sauf ceux présents dans liste2 *)
@@ -276,7 +277,7 @@ let descendants_aux base liste1 liste2 =
               let children = Driver.get_children (Driver.foi base ifam) in
               Array.fold_right
                 (fun ipch acc ->
-                  if Iper.Set.mem ipch excluded then acc
+                  if Iper.Set.mem ipch excluded || is_unknown base ipch then acc
                   else (ipch, ifam :: ifaml, ipar0, lev - 1) :: acc)
                 children acc)
             [] fams
@@ -305,15 +306,117 @@ let cleanup_old_cache_files cache_dir ttl_hours =
         with _ -> ())
       files
 
-let init_cousins_cnt conf base p =
-  let v_param =
-    match p_getenv conf.Config.env "v" with
-    | Some v -> ( try int_of_string v with _ -> 0)
-    | None -> 0
+let sparse_slice_to_json key level slice =
+  let path_to_cache_json (ip, ifaml, anc, lvl) =
+    `List
+      [
+        `String (Driver.Iper.to_string ip);
+        `List (List.map (fun f -> `String (Driver.Ifam.to_string f)) ifaml);
+        `String (Driver.Iper.to_string anc);
+        `Int lvl;
+      ]
   in
+  let cell_to_cache_json (i, j) paths (smin, smax) =
+    `Assoc
+      [
+        ("i", `Int i);
+        ("j", `Int j);
+        ("paths", `List (List.map path_to_cache_json paths));
+        ("min_y", `Int smin);
+        ("max_y", `Int smax);
+      ]
+  in
+  let cells =
+    CoordMap.fold
+      (fun coord paths acc ->
+        let mm =
+          try CoordMap.find coord slice.dates with Not_found -> (0, 0)
+        in
+        cell_to_cache_json coord paths mm :: acc)
+      slice.data []
+  in
+  `Assoc
+    [
+      ("version", `Int 1);
+      ("key", `String key);
+      ("level", `Int level);
+      ("cells", `List cells);
+    ]
+
+let sparse_slice_of_json key level json =
+  let path_of_cache_json = function
+    | `List [ `String ip; `List ifaml; `String anc; `Int lvl ] ->
+        let ifaml =
+          List.map
+            (function
+              | `String s -> Driver.Ifam.of_string s
+              | _ -> failwith "cousins cache: ifam")
+            ifaml
+        in
+        (Driver.Iper.of_string ip, ifaml, Driver.Iper.of_string anc, lvl)
+    | _ -> failwith "cousins cache: path"
+  in
+  match json with
+  | `Assoc f ->
+      (match (List.assoc "key" f, List.assoc "level" f) with
+      | `String k, `Int l when k = key && l = level -> ()
+      | _ -> failwith "cousins cache: key/level mismatch");
+      let cells =
+        match List.assoc "cells" f with
+        | `List l -> l
+        | _ -> failwith "cousins cache: cells"
+      in
+      List.fold_left
+        (fun acc -> function
+          | `Assoc cf ->
+              let geti k =
+                match List.assoc k cf with
+                | `Int n -> n
+                | _ -> failwith ("cousins cache: " ^ k)
+              in
+              let paths =
+                match List.assoc "paths" cf with
+                | `List l -> List.map path_of_cache_json l
+                | _ -> failwith "cousins cache: paths"
+              in
+              set_cell acc (geti "i") (geti "j") paths
+                (geti "min_y", geti "max_y")
+          | _ -> failwith "cousins cache: cell")
+        empty_sparse cells
+  | _ -> failwith "cousins cache: json"
+
+let read_or_build_level_json cache_file key level build =
+  let from_cache () =
+    try Some (sparse_slice_of_json key level (Yojson.Safe.from_file cache_file))
+    with _ ->
+      (if Sys.file_exists cache_file then
+         try Sys.remove cache_file with _ -> ());
+      None
+  in
+  match from_cache () with
+  | Some s -> s
+  | None ->
+      let s = build () in
+      (try
+         let oc = open_out cache_file in
+         output_string oc
+           (Yojson.Safe.to_string (sparse_slice_to_json key level s));
+         close_out oc
+       with _ -> ());
+      s
+
+let init_cousins_cnt conf base ?up_to p =
   let max_a_l =
-    max_ancestor_level conf base (Driver.get_iper p)
-      (if v_param > 0 then v_param + 1 else 0)
+    match up_to with
+    | Some n -> n
+    | None ->
+        let v_param =
+          match Util.p_getenv conf.Config.env "v" with
+          | Some v -> ( try int_of_string v with _ -> 0)
+          | None -> 0
+        in
+        max_ancestor_level conf base (Driver.get_iper p)
+          (if v_param > 0 then v_param + 1 else 1)
   in
   let build_level_0 () =
     let () = Driver.load_ascends_array base in
@@ -352,66 +455,40 @@ let init_cousins_cnt conf base p =
         let s = set_cell cumul_sparse i 0 liste dates in
         loop2 1 s
   in
-  let fn = Name.strip_lower @@ Driver.sou base @@ Driver.get_surname p in
-  let sn = Name.strip_lower @@ Driver.sou base @@ Driver.get_first_name p in
+  let fn = Name.strip_lower @@ Driver.sou base @@ Driver.get_first_name p in
+  let sn = Name.strip_lower @@ Driver.sou base @@ Driver.get_surname p in
   let occ = Driver.get_occ p in
   let key = Format.sprintf "%s.%d.%s" fn occ sn in
   let cache_dir =
     Filename.concat
       (Filename.concat (!GWPARAM.bpath conf.bname) "caches")
-      "cousins_levels"
+      "cousins_json"
   in
   let sparse =
     match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
     | Some "yes" ->
         Filesystem.create_dir ~parent:true cache_dir;
-
         let ttl_hours =
           match List.assoc_opt "cache_cousins_ttl" conf.Config.base_env with
           | Some s -> ( try int_of_string s with _ -> 1)
           | None -> 1
         in
         if ttl_hours > 0 then cleanup_old_cache_files cache_dir ttl_hours;
-
         let rec load_levels acc level =
           if level > max_a_l then merge_sparse_list (List.rev acc)
           else
             let cache_file =
-              Filename.concat cache_dir (Printf.sprintf "%s_level_%d" key level)
+              Filename.concat cache_dir
+                (Printf.sprintf "%s_level_%d.json" key level)
             in
             let level_sparse =
-              try
-                let cached_key, cached_lev, partial =
-                  Mutil.read_or_create_value cache_file (fun () ->
-                      let cumul = merge_sparse_list (List.rev acc) in
-                      let full =
-                        if level = 0 then build_level_0 ()
-                        else build_level_i cumul level
-                      in
-                      let partial = extract_level full level in
-                      (key, level, partial))
-                in
-                if cached_key = key && cached_lev = level then partial
-                else (
-                  Sys.remove cache_file;
+              read_or_build_level_json cache_file key level (fun () ->
                   let cumul = merge_sparse_list (List.rev acc) in
                   let full =
                     if level = 0 then build_level_0 ()
                     else build_level_i cumul level
                   in
-                  let partial = extract_level full level in
-                  ignore
-                    (Mutil.read_or_create_value cache_file (fun () ->
-                         (key, level, partial)));
-                  partial)
-              with _ ->
-                if Sys.file_exists cache_file then Sys.remove cache_file;
-                let cumul = merge_sparse_list (List.rev acc) in
-                let full =
-                  if level = 0 then build_level_0 ()
-                  else build_level_i cumul level
-                in
-                extract_level full level
+                  extract_level full level)
             in
             load_levels (level_sparse :: acc) (level + 1)
         in
@@ -425,20 +502,18 @@ let init_cousins_cnt conf base p =
   sparse
 
 (* for cousins_dates.(l1).(l2) determine min or max date *)
-let min_max_date sparse _conf _base _p min_max l1 l2 =
+let min_max_date sparse _conf _base _p mode l1 l2 =
   let i = try int_of_string l1 with Failure _ -> -1 in
   let j = try int_of_string l2 with Failure _ -> -1 in
   match (i, j) with
   | -1, _ | _, -1 -> None
-  | _, _ ->
-      let min, max = get_dates sparse i j in
-      if min = 0 && max = 0 then None
-      else if min_max then Some min
-      else Some max
+  | _, _ -> (
+      let lo, hi = get_dates sparse i j in
+      if lo = 0 && hi = 0 then None
+      else match mode with `Min -> Some lo | `Max -> Some hi)
 
 (* determine non empty max ancestor level (max_i)
-   and non empty max descendant level
-*)
+   and non empty max descendant level *)
 let max_l1_l2 sparse _conf _base _p =
   let max_a =
     let rec loop i =
@@ -524,33 +599,35 @@ let init_desc_cnt conf base p =
   done;
   desc_cnt
 
-let anc_cnt_aux ?asc_cnt conf base lev at_to p =
+let anc_cnt_aux ?asc_cnt conf base mode p =
   let asc_cnt =
     match asc_cnt with Some a -> a | None -> init_asc_cnt conf base p
   in
-  if at_to then if lev < Array.length asc_cnt then Some asc_cnt.(lev) else None
-  else
-    let rec loop acc i =
-      if i > lev || i >= Array.length asc_cnt then Some acc
-      else loop (List.rev_append asc_cnt.(i) acc) (i + 1)
-    in
-    loop [] 1
+  match mode with
+  | `At_level lev ->
+      if lev < Array.length asc_cnt then Some asc_cnt.(lev) else None
+  | `Up_to lev ->
+      let rec loop acc i =
+        if i > lev || i >= Array.length asc_cnt then Some acc
+        else loop (List.rev_append asc_cnt.(i) acc) (i + 1)
+      in
+      loop [] 1
 
-let desc_cnt_aux conf base lev at_to p =
-  let cous = Hashtbl.create 10000 in
+let desc_cnt_aux conf base mode p =
   let desc_cnt = init_desc_cnt conf base p in
-  if at_to then
-    if lev < Array.length desc_cnt then Some desc_cnt.(lev) else None
-  else
-    let rec loop i =
-      if i > lev || i > Array.length desc_cnt - 1 then
-        Some (Hashtbl.fold (fun _k v acc -> v :: acc) cous [])
-      else (
-        (* several cousins records with same ip, different faml! *)
-        List.iter
-          (fun (ip, faml, ianc, lvl) ->
-            Hashtbl.replace cous ip (ip, faml, ianc, lvl))
-          desc_cnt.(i);
-        loop (i + 1))
-    in
-    loop 0
+  match mode with
+  | `At_level lev ->
+      if lev < Array.length desc_cnt then Some desc_cnt.(lev) else None
+  | `Up_to lev ->
+      let cous = Hashtbl.create (Array.length desc_cnt * 8) in
+      let rec loop i =
+        if i > lev || i > Array.length desc_cnt - 1 then
+          Some (Hashtbl.fold (fun _k v acc -> v :: acc) cous [])
+        else (
+          List.iter
+            (fun (ip, faml, ianc, lvl) ->
+              Hashtbl.replace cous ip (ip, faml, ianc, lvl))
+            desc_cnt.(i);
+          loop (i + 1))
+      in
+      loop 0

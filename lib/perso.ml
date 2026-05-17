@@ -2640,28 +2640,21 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
       match get_env "level" env with
       | Vint lev -> (
           let asc_cnt = get_asc_cnt conf base p in
-          match path_mode with
-          | Paths_cnt_raw -> (
-              let list1 = Cousins.anc_cnt_aux ~asc_cnt conf base lev at_to p in
-              match list1 with
-              | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
-              | None -> raise Not_found)
-          | Paths_cnt -> (
-              let list1 = Cousins.anc_cnt_aux ~asc_cnt conf base lev at_to p in
-              match list1 with
-              | Some list1 ->
+          let mode = if at_to then `At_level lev else `Up_to lev in
+          match Cousins.anc_cnt_aux ~asc_cnt conf base mode p with
+          | None -> raise Not_found
+          | Some list1 -> (
+              match path_mode with
+              | Paths_cnt_raw -> VVstring (eval_int conf (List.length list1) sl)
+              | Paths_cnt ->
                   VVstring
                     (eval_int conf
                        (List.length (Cousins.cousins_fold list1))
                        sl)
-              | None -> raise Not_found)
-          | Paths -> (
-              let l = Cousins.anc_cnt_aux ~asc_cnt conf base lev at_to p in
-              match l with
-              | Some l -> (
+              | Paths -> (
                   match get_env "cousins" env with
                   | Vcousl cl ->
-                      cl := Cousins.cousins_fold l;
+                      cl := Cousins.cousins_fold list1;
                       let l1, l2 = l1_l2 in
                       (match get_env "v1_v2" env with
                       | Vcous_level (v1, v2) ->
@@ -2669,8 +2662,7 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
                           v2 := l2
                       | _ -> ());
                       VVstring ""
-                  | _ -> raise Not_found)
-              | None -> raise Not_found))
+                  | _ -> raise Not_found)))
       | _ -> raise Not_found)
 
 and eval_desc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
@@ -2678,45 +2670,37 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
   | sl -> (
       match get_env "level" env with
       | Vint lev -> (
+          let mode = if at_to then `At_level lev else `Up_to lev in
+          let result = Cousins.desc_cnt_aux conf base mode p in
           match path_mode with
           | Paths_cnt_raw -> (
-              let list1 = Cousins.desc_cnt_aux conf base lev at_to p in
-              match list1 with
+              match result with
               | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
               | None -> raise Not_found)
           | Paths_cnt -> (
-              let list1 = Cousins.desc_cnt_aux conf base lev at_to p in
-              match list1 with
+              match result with
               | Some l ->
                   VVstring
                     (eval_int conf (List.length (Cousins.cousins_fold l)) sl)
               | None -> raise Not_found)
           | Paths -> (
-              let l = Cousins.desc_cnt_aux conf base lev at_to p in
-              match l with
-              | Some l -> (
-                  match get_env "cousins" env with
-                  | Vcousl cl ->
-                      cl := Cousins.cousins_fold l;
-                      let l1, l2 = l1_l2 in
-                      (match get_env "v1_v2" env with
-                      | Vcous_level (v1, v2) ->
-                          v1 := l1;
-                          v2 := l2
-                      | _ -> ());
-                      VVstring ""
-                  | _ -> VVstring "")
-              | None -> (
-                  match get_env "cousins" env with
-                  | Vcousl cl ->
-                      cl := [];
-                      (match get_env "v1_v2" env with
-                      | Vcous_level (v1, v2) ->
-                          v1 := 0;
-                          v2 := 0
-                      | _ -> ());
-                      VVstring ""
-                  | _ -> VVstring "")))
+              let cl_val, l1, l2 =
+                match result with
+                | Some l ->
+                    let l1, l2 = l1_l2 in
+                    (Cousins.cousins_fold l, l1, l2)
+                | None -> ([], 0, 0)
+              in
+              match get_env "cousins" env with
+              | Vcousl cl ->
+                  cl := cl_val;
+                  (match get_env "v1_v2" env with
+                  | Vcous_level (v1, v2) ->
+                      v1 := l1;
+                      v2 := l2
+                  | _ -> ());
+                  VVstring ""
+              | _ -> VVstring ""))
       | _ -> raise Not_found)
 
 and eval_item_field_var ell = function
@@ -3132,13 +3116,13 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       | _ -> VVstring "")
   | [ "cous_paths_min_date"; l1; l2 ] -> (
       let sparse = get_cousins_sparse conf base p in
-      match Cousins.min_max_date sparse conf base p true l1 l2 with
-      | Some min -> VVstring (string_of_int min)
+      match Cousins.min_max_date sparse conf base p `Min l1 l2 with
+      | Some y -> VVstring (string_of_int y)
       | None -> raise Not_found)
   | [ "cous_paths_max_date"; l1; l2 ] -> (
       let sparse = get_cousins_sparse conf base p in
-      match Cousins.min_max_date sparse conf base p false l1 l2 with
-      | Some max -> VVstring (string_of_int max)
+      match Cousins.min_max_date sparse conf base p `Max l1 l2 with
+      | Some y -> VVstring (string_of_int y)
       | None -> raise Not_found)
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
       let sparse = get_cousins_sparse conf base p in
@@ -4026,26 +4010,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "age_days" -> (
       if not p_auth then null_val
       else
-        match Date.od_of_cdate (Driver.get_birth p) with
-        | Some (Dgreg (birth_dmy, cal)) ->
-            let from =
-              if birth_dmy.day > 0 && birth_dmy.month > 0 then Adef.Dgregorian
-              else cal
-            in
-            let birth_sdn = Date.to_sdn ~from birth_dmy in
-            let end_sdn =
-              match Date.date_of_death (Driver.get_death p) with
-              | Some (Dgreg (death_dmy, cal2)) ->
-                  let from2 =
-                    if death_dmy.day > 0 && death_dmy.month > 0 then
-                      Adef.Dgregorian
-                    else cal2
-                  in
-                  Date.to_sdn ~from:from2 death_dmy
-              | _ -> Date.to_sdn ~from:Dgregorian conf.today
-            in
-            VVstring (string_of_int (end_sdn - birth_sdn))
-        | _ -> null_val)
+        match age_days conf base p with
+        | Some n -> VVstring (string_of_int n)
+        | None -> null_val)
   | "alias" -> (
       match Driver.get_aliases p with
       | nn :: _ when p_auth ->

@@ -836,6 +836,35 @@ let is_old_person conf p =
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
+let age_days conf _base p =
+  match Date.od_of_cdate (Driver.get_birth p) with
+  | Some (Dgreg (birth_dmy, cal)) -> (
+      let from =
+        if birth_dmy.day > 0 && birth_dmy.month > 0 then Adef.Dgregorian
+        else cal
+      in
+      try
+        let birth_sdn = Date.to_sdn ~from birth_dmy in
+        let end_sdn =
+          match Date.date_of_death (Driver.get_death p) with
+          | Some (Dgreg (death_dmy, cal2)) ->
+              let from2 =
+                if death_dmy.day > 0 && death_dmy.month > 0 then Adef.Dgregorian
+                else cal2
+              in
+              Some (Date.to_sdn ~from:from2 death_dmy)
+          | _ -> (
+              match Driver.get_death p with
+              | NotDead | DontKnowIfDead ->
+                  Some (Date.to_sdn ~from:Dgregorian conf.today)
+              | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> None)
+        in
+        match end_sdn with
+        | Some e when e >= birth_sdn -> Some (e - birth_sdn)
+        | _ -> None
+      with _ -> None)
+  | _ -> None
+
 let authorized_age conf base p = GWPARAM.p_auth conf base p
 
 let is_restricted (conf : config) base (ip : Driver.iper) =

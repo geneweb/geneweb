@@ -62,6 +62,9 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
 </script>
 <script src="%etc_prefix;js/person_picker.min.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.min.js%end;"></script>
 %end;
+%if;(e.m="C" and e.t="")
+<script src="%etc_prefix;js/cousins.min.js?hash=%apply;hash%with;%etc_prefix;js/cousins.min.js%end;"></script>
+%end;
 %if;(e.m="CHK_DATA")
 <script>
   function showOverlay() {
@@ -927,6 +930,11 @@ initTooltips();
     } else {
       window.addEventListener('load', () => CheckData.init());
     }
+  }
+%end;
+%if;(e.m="C" and e.t="")
+  if (typeof Cousins !== 'undefined' && Cousins.init) {
+    Cousins.init();
   }
 %end;
 });

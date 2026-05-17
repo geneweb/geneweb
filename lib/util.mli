@@ -142,6 +142,26 @@ val authorized_age :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 (** Alias to !GWPARAM.p_auth *)
 
+val age_days :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  int option
+(** Returns age in days, calendar-aware via [Date.to_sdn].
+
+    For dead persons whose death date is known and complete enough to derive an
+    SDN, computes (death_sdn - birth_sdn). For other persons, computes
+    (today_sdn - birth_sdn) using [conf.today].
+
+    Returns [None] when birth date is missing, when neither birth nor death dmy
+    holds enough day/month to derive an SDN with the appropriate calendar
+    context, or when arithmetic raises.
+
+    Calendar handling follows the project convention: for dmy with day > 0 &&
+    month > 0, the dmy has been normalized to Gregorian and we pass
+    [~from:Adef.Dgregorian]; for partial dmy, the original calendar tag is used.
+*)
+
 val is_old_person :
   config ->
   ( Geneweb_db.Driver.iper,
