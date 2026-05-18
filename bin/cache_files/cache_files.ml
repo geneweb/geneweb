@@ -47,17 +47,13 @@ let write_cache_file bname fname data =
 let write_checkdata_cache bname fname entries =
   let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in
   let file = !cache_dir // filename in
-  let oc = Secure.open_out_bin file in
-  let finally () = try close_out oc with Sys_error _ -> () in
-  Fun.protect ~finally @@ fun () -> Marshal.to_channel oc entries []
+  Secure.with_open_out_bin file @@ fun oc -> Marshal.to_channel oc entries []
 
 let read_checkdata_cache bname fname =
   let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in
   let file = !cache_dir // filename in
   if Sys.file_exists file then
-    let ic = Secure.open_in_bin file in
-    let finally () = try close_in ic with Sys_error _ -> () in
-    Fun.protect ~finally @@ fun () ->
+    Secure.with_open_in_bin file @@ fun ic ->
     try
       let entries = (Marshal.from_channel ic : checkdata_entry list) in
       Some (List.map snd entries)

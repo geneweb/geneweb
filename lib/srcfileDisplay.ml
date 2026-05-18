@@ -23,7 +23,7 @@ let count conf =
   let _ = Util.test_cnt_d conf in
   let fname = !GWPARAM.adm_file (conf.bname ^ ".txt") in
   try
-    let ic = Secure.open_in fname in
+    Secure.with_open_in_text fname @@ fun ic ->
     let rd =
       try
         let wc = int_of_string (input_line ic) in
@@ -50,7 +50,6 @@ let count conf =
           normal_cnt = 0;
         }
     in
-    close_in ic;
     rd
   with _ ->
     {
@@ -66,7 +65,7 @@ let write_counter conf r =
   let cnt_d = Util.test_cnt_d conf in
   let fname = Filename.concat cnt_d (conf.bname ^ ".txt") in
   try
-    let oc = Secure.open_out_bin fname in
+    Secure.with_open_out_bin fname @@ fun oc ->
     output_string oc (string_of_int r.welcome_cnt);
     output_string oc "\n";
     output_string oc (string_of_int r.request_cnt);
@@ -78,8 +77,7 @@ let write_counter conf r =
     output_string oc (string_of_int r.friend_cnt);
     output_string oc "\n";
     output_string oc (string_of_int r.normal_cnt);
-    output_string oc "\n";
-    close_out oc
+    output_string oc "\n"
   with _ -> ()
 
 let set_wizard_and_friend_traces conf =
@@ -433,9 +431,9 @@ and copy_from_file conf base name mode =
     | Lang -> any_lang_file_name conf name
     | Source -> source_file_name conf name
   in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic -> copy_from_channel conf base ic mode
-  | None ->
+  match Secure.open_in fname with
+  | ic -> copy_from_channel conf base ic mode
+  | exception Sys_error _ ->
       Output.printf conf "<em>... file not found: \"%s.txt\"</em><br>" name
 
 and copy_from_channel conf base ic mode =
@@ -449,13 +447,16 @@ let gen_print mode conf base fname =
   let channel =
     match mode with
     | Lang -> (
-        try Some (Secure.open_in (lang_file_name conf fname))
-        with Sys_error _ -> (
-          try Some (Secure.open_in (any_lang_file_name conf fname))
-          with Sys_error _ -> None))
+        match Secure.open_in @@ lang_file_name conf fname with
+        | ic -> Some ic
+        | exception Sys_error _ -> (
+            match Secure.open_in @@ any_lang_file_name conf fname with
+            | ic -> Some ic
+            | exception Sys_error _ -> None))
     | Source -> (
-        try Some (Secure.open_in (source_file_name conf fname))
-        with Sys_error _ -> None)
+        match Secure.open_in (source_file_name conf fname) with
+        | ic -> Some ic
+        | exception Sys_error _ -> None)
   in
   match channel with
   | Some ic ->

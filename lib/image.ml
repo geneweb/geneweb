@@ -4,6 +4,7 @@ let src = Logs.Src.create ~doc:"Image" "IMG "
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
+module Compat = Geneweb_compat
 
 let path_str path =
   match path with Some (`Path pa) -> pa | Some (`Url u) -> u | None -> ""
@@ -161,7 +162,7 @@ let size_from_path fname =
     if fname = "" then Error ()
     else
       try
-        let ic = Secure.open_in_bin fname in
+        Secure.with_open_in_bin fname @@ fun ic ->
         let r =
           try
             (* TODO: should match on mime type here *)
@@ -172,7 +173,6 @@ let size_from_path fname =
             | _s -> Error ()
           with End_of_file -> Error ()
         in
-        close_in ic;
         r
       with Sys_error _e -> Error ()
   in
@@ -489,11 +489,9 @@ let get_carrousel_file_content conf base p fname kind old =
   let fname =
     Filename.chop_extension (carrousel_file_path conf base p fname old) ^ kind
   in
-  if Sys.file_exists fname then (
-    let ic = Secure.open_in fname in
-    let s = really_input_string ic (in_channel_length ic) in
-    close_in ic;
-    if s = "" then None else Some s)
+  if Sys.file_exists fname then
+    let s = Secure.with_open_in_text fname Compat.In_channel.input_all in
+    if s = "" then None else Some s
   else None
 
 (* get list of files in carrousel *)
