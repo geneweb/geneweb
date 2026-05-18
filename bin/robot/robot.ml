@@ -28,26 +28,21 @@ let output_excl oc xcl =
 
 let read_robot_file fname =
   try
-    let ic = Secure.open_in_bin fname in
+    Secure.with_open_in_bin fname @@ fun ic ->
     let b = really_input_string ic (String.length magic_robot) in
-    if b <> magic_robot then (
-      close_in ic;
+    if b <> magic_robot then
       if b = "GWRB0007" then (
         printf "Error: Old format detected.\n";
         printf "Please start gwd once to migrate.\n";
         exit 1)
       else (
         printf "Error: Invalid robot file format.\n";
-        exit 1));
-    let v = (input_value ic : excl) in
-    close_in ic;
-    Some v
+        exit 1);
+    Some (input_value ic : excl)
   with _ -> None
 
 let write_robot_file fname xcl =
-  let oc = Secure.open_out_bin fname in
-  output_excl oc xcl;
-  close_out oc
+  Secure.with_open_out_bin fname @@ fun oc -> output_excl oc xcl
 
 let is_valid_ip ip =
   if String.contains ip '*' then
@@ -145,7 +140,7 @@ let export_blacklist output_file =
   match read_robot_file fname with
   | None -> printf "No robot file found\n"
   | Some xcl ->
-      let oc = Secure.open_out output_file in
+      Secure.with_open_out_text output_file @@ fun oc ->
       fprintf oc "# Robot blacklist export\n";
       fprintf oc "# Format: IP<TAB>attempts\n";
       let tm = Unix.localtime (Unix.time ()) in
@@ -153,7 +148,6 @@ let export_blacklist output_file =
         (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
         tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
       List.iter (fun (ip, cnt) -> fprintf oc "%s\t%d\n" ip !cnt) xcl.excl;
-      close_out oc;
       printf "Exported %d entries to %s\n" (List.length xcl.excl) output_file
 
 let import_blacklist input_file =

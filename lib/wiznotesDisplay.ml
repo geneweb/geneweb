@@ -39,8 +39,9 @@ let read_auth_file fname bname =
     data
 
 let read_wizard_notes fname =
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic ->
+  match Secure.open_in fname with
+  | ic ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
       let date, len =
         try
           let line = input_line ic in
@@ -61,22 +62,23 @@ let read_wizard_notes fname =
       in
       let len = loop len in
       (Buff.get len, date)
-  | None -> ("", 0.)
+  | exception Sys_error _ -> ("", 0.)
 
 let write_wizard_notes fname nn =
   if nn = "" then Mutil.rm fname
   else
-    match try Some (Secure.open_out fname) with Sys_error _ -> None with
-    | Some oc ->
+    match Secure.open_out fname with
+    | oc ->
+        Fun.protect ~finally:(fun () -> close_out_noerr oc) @@ fun () ->
         Printf.fprintf oc "WIZNOTES\n%.0f\n" (Unix.time ());
         output_string oc nn;
-        output_string oc "\n";
-        close_out oc
-    | None -> ()
+        output_string oc "\n"
+    | exception Sys_error _ -> ()
 
 let wiznote_date wfile =
-  match try Some (Secure.open_in wfile) with Sys_error _ -> None with
-  | Some ic ->
+  match Secure.open_in wfile with
+  | ic ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
       let date =
         try
           let line = input_line ic in
@@ -86,9 +88,8 @@ let wiznote_date wfile =
           let s = Unix.stat wfile in
           s.Unix.st_mtime
       in
-      close_in ic;
       (wfile, date)
-  | None -> ("", 0.)
+  | exception Sys_error _ -> ("", 0.)
 
 let print_wizards_by_alphabetic_order conf list =
   let wprint_elem (wz, (wname, (_, islash)), wfile, stm) =
@@ -528,8 +529,9 @@ let print_mod_ok conf base =
 
 let wizard_denying wddir =
   let fname = Filename.concat wddir "connected.deny" in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic ->
+  match Secure.open_in fname with
+  | ic ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
       let rec loop list =
         match try Some (input_line ic) with End_of_file -> None with
         | Some wname -> loop (wname :: list)
@@ -538,7 +540,7 @@ let wizard_denying wddir =
             List.rev list
       in
       loop []
-  | None -> []
+  | exception Sys_error _ -> []
 
 let print_connected_wizard conf first wddir wz tm_user =
   let wfile, stm = wiznote_date (wzfile wddir wz) in
@@ -636,7 +638,7 @@ let do_change_wizard_visibility conf base x set_vis =
   (if ((not set_vis) && not is_visible) || (set_vis && is_visible) then ()
    else
      let tmp_file = Filename.concat wiznotes_dir "1connected.deny" in
-     let oc = Secure.open_out tmp_file in
+     Secure.with_open_out_text tmp_file @@ fun oc ->
      let found =
        List.fold_left
          (fun found wz ->
@@ -647,7 +649,6 @@ let do_change_wizard_visibility conf base x set_vis =
          false denying
      in
      if (not found) && not set_vis then Printf.fprintf oc "%s\n" conf.user;
-     close_out oc;
      let file = Filename.concat wiznotes_dir "connected.deny" in
      Mutil.rm file;
      Sys.rename tmp_file file);

@@ -78,6 +78,7 @@ let spi_next (spi : string_person_index) istr = spi.next istr
 
 type base = dsk_base
 
+let ( // ) = Filename.concat
 let sou base i = base.data.strings.get i
 let bname base = Filename.(remove_extension @@ basename base.data.bdir)
 let nb_of_persons base = base.data.persons.len
@@ -286,29 +287,25 @@ module NLDB = struct
 
   let check_format base =
     let fname = bfname base "notes_links" in
-    match try Some (open_in_bin fname) with Sys_error _ -> None with
-    | Some ic ->
-        let ok = Mutil.check_magic magic ic in
-        close_in ic;
-        if ok then `Ok else `BadFormat
-    | None -> `NoFile
+    match open_in_bin fname with
+    | ic ->
+        Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+        if Mutil.check_magic magic ic then `Ok else `BadFormat
+    | exception Sys_error _ -> `NoFile
 
   let read base =
     let fname = bfname base "notes_links" in
-    match try Some (open_in_bin fname) with Sys_error _ -> None with
-    | Some ic ->
-        let r =
-          if Mutil.check_magic magic ic then
-            (input_value ic : (iper, iper) Def.NLDB.t)
-          else (
-            if not !warned then (
-              warned := true;
-              Log.warn (fun m -> m "Unsupported nldb format in %s" fname));
-            [])
-        in
-        close_in_noerr ic;
-        r
-    | None -> []
+    match open_in_bin fname with
+    | ic ->
+        Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+        if Mutil.check_magic magic ic then
+          (input_value ic : (iper, iper) Def.NLDB.t)
+        else (
+          if not !warned then (
+            warned := true;
+            Log.warn (fun m -> m "Unsupported nldb format in %s" fname));
+          [])
+    | exception Sys_error _ -> []
 
   let write base db =
     if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
@@ -334,14 +331,13 @@ let base_wiznotes_dir _base = "wiznotes"
 
 let base_notes_read_file base fname mode =
   try
-    let ic = Secure.open_in @@ Filename.concat base.data.bdir fname in
+    Secure.with_open_in_text (base.data.bdir // fname) @@ fun ic ->
     let str =
       match mode with
       | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
       | Def.Rn1Ln -> ( try input_line ic with End_of_file -> "")
       | Def.RnAll -> Mutil.input_file_ic ic
     in
-    close_in ic;
     str
   with Sys_error _ -> ""
 
@@ -548,14 +544,13 @@ let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
 let read_or_create_visible base =
   let fname = Filename.concat base.data.bdir "restrict" in
   let visible =
-    if Sys.file_exists fname then (
-      let ic = Secure.open_in_bin fname in
+    if Sys.file_exists fname then
+      Secure.with_open_in_bin fname @@ fun ic ->
       let visible =
         if Mutil.check_magic Mutil.executable_magic ic then input_value ic
         else Hashtbl.create (nb_of_persons base)
       in
-      close_in ic;
-      visible)
+      visible
     else Hashtbl.create (nb_of_persons base)
   in
   visible_ref := Some visible;
@@ -567,10 +562,9 @@ let base_visible_write base =
     let fname = Filename.concat base.data.bdir "restrict" in
     match !visible_ref with
     | Some visible ->
-        let oc = Secure.open_out_bin fname in
+        Secure.with_open_out_bin fname @@ fun oc ->
         output_string oc Mutil.executable_magic;
-        output_value oc visible;
-        close_out oc
+        output_value oc visible
     | None -> ()
 
 let base_visible_get base fct i =

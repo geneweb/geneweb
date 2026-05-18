@@ -349,23 +349,19 @@ let alias_lang lang =
   else
     let fname = Util.search_in_assets (Filename.concat "lang" "alias_lg.txt") in
     try
-      let ic = Secure.open_in fname in
-      let lang =
-        let rec loop () =
-          match input_line ic with
-          | line -> (
-              match String.index_opt line '=' with
-              | Some i ->
-                  if lang = String.sub line 0 i then
-                    String.sub line (i + 1) (String.length line - i - 1)
-                  else loop ()
-              | None -> loop ())
-          | exception End_of_file -> lang
-        in
-        loop ()
+      Secure.with_open_in_text fname @@ fun ic ->
+      let rec loop () =
+        match input_line ic with
+        | line -> (
+            match String.index_opt line '=' with
+            | Some i ->
+                if lang = String.sub line 0 i then
+                  String.sub line (i + 1) (String.length line - i - 1)
+                else loop ()
+            | None -> loop ())
+        | exception End_of_file -> lang
       in
-      close_in ic;
-      lang
+      loop ()
     with Sys_error _ -> lang
 
 let log_redirect from request req =
@@ -1837,7 +1833,7 @@ let print_misc_file conf misc_fname encoding =
   | Woff2 fname
   | CacheGz fname -> (
       try
-        let ic = Secure.open_in_bin fname in
+        Secure.with_open_in_bin fname @@ fun ic ->
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
         content_misc conf len misc_fname encoding;
@@ -1850,12 +1846,11 @@ let print_misc_file conf misc_fname encoding =
             loop (len - olen)
         in
         loop len;
-        close_in ic;
         true
       with Sys_error _ -> false)
   | Other _ -> false
   | Map fname | Png fname ->
-      let ic = Secure.open_in_bin fname in
+      Secure.with_open_in_bin fname @@ fun ic ->
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
       content_misc conf len misc_fname No_encoding;
@@ -1868,7 +1863,6 @@ let print_misc_file conf misc_fname encoding =
           loop (len - olen)
       in
       loop len;
-      close_in ic;
       true
 
 let misc_request conf request fname =

@@ -14,6 +14,8 @@ type family = dsk_family
 type couple = dsk_couple
 type descend = dsk_descend
 
+let ( // ) = Filename.concat
+
 let move_with_backup src dst =
   Mutil.rm (dst ^ "~");
   Mutil.mv dst (dst ^ "~");
@@ -130,15 +132,15 @@ let old_persons_of_first_name_or_surname base_data params =
 
     let compare = Dutil.compare_snames_i base_data
   end) in
-  let fname_dat = Filename.concat bname names_dat in
+  let fname_dat = bname // names_dat in
   let bt =
     let btr = ref None in
     fun () ->
       match !btr with
       | Some bt -> bt
       | None ->
-          let fname_inx = Filename.concat bname names_inx in
-          let ic_inx = Secure.open_in_bin fname_inx in
+          let fname_inx = bname // names_inx in
+          Secure.with_open_in_bin fname_inx @@ fun ic_inx ->
           (*
           let ab1 = Gc.allocated_bytes () in
           *)
@@ -150,7 +152,6 @@ let old_persons_of_first_name_or_surname base_data params =
             names_inx (ab2 -. ab1);
           flush stderr;
           *)
-          close_in ic_inx;
           btr := Some bt;
           bt
   in
@@ -158,7 +159,7 @@ let old_persons_of_first_name_or_surname base_data params =
     let ipera =
       try
         let pos = IstrTree.find istr (bt ()) in
-        let ic_dat = Secure.open_in_bin fname_dat in
+        Secure.with_open_in_bin fname_dat @@ fun ic_dat ->
         seek_in ic_dat pos;
         let len = input_binary_int ic_dat in
         let rec read_loop ipera len =
@@ -168,7 +169,6 @@ let old_persons_of_first_name_or_surname base_data params =
             read_loop (iper :: ipera) (len - 1)
         in
         let ipera = read_loop [] len in
-        close_in ic_dat;
         ipera
       with Not_found -> []
     in
@@ -248,14 +248,13 @@ let binary_search_next arr cmp =
 
 let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
   let proj, person_patches, names_inx, names_dat, bname = params in
-  let fname_dat = Filename.concat bname names_dat in
+  let fname_dat = bname // names_dat in
   (* content of "snames.inx" *)
   let bt =
     lazy
-      (let fname_inx = Filename.concat bname names_inx in
-       let ic_inx = Secure.open_in_bin fname_inx in
+      (let fname_inx = bname // names_inx in
+       Secure.with_open_in_bin fname_inx @@ fun ic_inx ->
        let bt : (int * int) array = input_value ic_inx in
-       close_in ic_inx;
        bt)
   in
   (* ordered by string name's ids attached to the patched persons *)
@@ -288,7 +287,7 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
           if k = istr then 0 else cmp_str base_data s (base_data.strings.get k)
         in
         let pos = snd @@ bt.(binary_search bt cmp) in
-        let ic_dat = Secure.open_in_bin fname_dat in
+        Secure.with_open_in_bin fname_dat @@ fun ic_dat ->
         seek_in ic_dat pos;
         let len = input_binary_int ic_dat in
         let rec read_loop ipera len =
@@ -298,7 +297,6 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
             read_loop (iper :: ipera) (len - 1)
         in
         let ipera = read_loop [] len in
-        close_in ic_dat;
         ipera
       with Not_found -> []
     in
@@ -379,29 +377,25 @@ let persons_of_name bname patches =
   fun s ->
     let i = Dutil.name_index s in
     let ai =
-      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
-      let ai =
-        let fname_inx_acc = Filename.concat bname "names.acc" in
-        if Sys.file_exists fname_inx_acc then (
-          Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
-          seek_in ic_inx_acc (Iovalue.sizeof_long * i);
-          let pos = Position.input ic_inx_acc in
-          Position.seek_in ic_inx pos;
-          (Iovalue.input ic_inx : int array))
-        else
-          let a =
-            match !t with
-            | Some a -> a
-            | None ->
-                seek_in ic_inx Dutil.int_size;
-                let a : Dutil.name_index_data = input_value ic_inx in
-                t := Some a;
-                a
-          in
-          a.(i)
-      in
-      close_in ic_inx;
-      ai
+      Secure.with_open_in_bin (bname // "names.inx") @@ fun ic_inx ->
+      let fname_inx_acc = bname // "names.acc" in
+      if Sys.file_exists fname_inx_acc then (
+        Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
+        seek_in ic_inx_acc (Iovalue.sizeof_long * i);
+        let pos = Position.input ic_inx_acc in
+        Position.seek_in ic_inx pos;
+        (Iovalue.input ic_inx : int array))
+      else
+        let a =
+          match !t with
+          | Some a -> a
+          | None ->
+              seek_in ic_inx Dutil.int_size;
+              let a : Dutil.name_index_data = input_value ic_inx in
+              t := Some a;
+              a
+        in
+        a.(i)
     in
     match Hashtbl.find patches i with
     | patches ->
@@ -415,30 +409,26 @@ let old_strings_of_fsname bname strings (_, person_patches) =
   fun s ->
     let i = Dutil.name_index s in
     let r =
-      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
-      let ai =
-        let fname_inx_acc = Filename.concat bname "names.acc" in
-        if Sys.file_exists fname_inx_acc then (
-          Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
-          seek_in ic_inx_acc (Iovalue.sizeof_long * (Dutil.table_size + i));
-          let pos = Position.input ic_inx_acc in
-          Position.seek_in ic_inx pos;
-          (Iovalue.input ic_inx : int array))
-        else
-          let a =
-            match !t with
-            | Some a -> a
-            | None ->
-                let pos = Position.input ic_inx in
-                Position.seek_in ic_inx pos;
-                let a : Dutil.strings_of_fsname = input_value ic_inx in
-                t := Some a;
-                a
-          in
-          a.(i)
-      in
-      close_in ic_inx;
-      ai
+      Secure.with_open_in_bin (bname // "names.inx") @@ fun ic_inx ->
+      let fname_inx_acc = bname // "names.acc" in
+      if Sys.file_exists fname_inx_acc then (
+        Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
+        seek_in ic_inx_acc (Iovalue.sizeof_long * (Dutil.table_size + i));
+        let pos = Position.input ic_inx_acc in
+        Position.seek_in ic_inx pos;
+        (Iovalue.input ic_inx : int array))
+      else
+        let a =
+          match !t with
+          | Some a -> a
+          | None ->
+              let pos = Position.input ic_inx in
+              Position.seek_in ic_inx pos;
+              let a : Dutil.strings_of_fsname = input_value ic_inx in
+              t := Some a;
+              a
+        in
+        a.(i)
     in
     Hashtbl.fold
       (fun _ p acc ->
@@ -466,32 +456,28 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
   fun s ->
     let i = Dutil.name_index s in
     let r =
-      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
-      let ai =
-        let fname_inx_acc = Filename.concat bname "names.acc" in
-        if Sys.file_exists fname_inx_acc then (
-          Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
-          seek_in ic_inx_acc
-            (Iovalue.sizeof_long * ((offset_acc * Dutil.table_size) + i));
-          let pos = input_binary_int ic_inx_acc in
-          seek_in ic_inx pos;
-          (Iovalue.input ic_inx : int array))
-        else
-          let a =
-            match !t with
-            | Some a -> a
-            | None ->
-                seek_in ic_inx offset_inx;
-                let pos = Position.input ic_inx in
-                Position.seek_in ic_inx pos;
-                let a : Dutil.strings_of_fsname = input_value ic_inx in
-                t := Some a;
-                a
-          in
-          a.(i)
-      in
-      close_in ic_inx;
-      ai
+      Secure.with_open_in_bin (bname // "names.inx") @@ fun ic_inx ->
+      let fname_inx_acc = bname // "names.acc" in
+      if Sys.file_exists fname_inx_acc then (
+        Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
+        seek_in ic_inx_acc
+          (Iovalue.sizeof_long * ((offset_acc * Dutil.table_size) + i));
+        let pos = input_binary_int ic_inx_acc in
+        seek_in ic_inx pos;
+        (Iovalue.input ic_inx : int array))
+      else
+        let a =
+          match !t with
+          | Some a -> a
+          | None ->
+              seek_in ic_inx offset_inx;
+              let pos = Position.input ic_inx in
+              Position.seek_in ic_inx pos;
+              let a : Dutil.strings_of_fsname = input_value ic_inx in
+              t := Some a;
+              a
+        in
+        a.(i)
     in
     Hashtbl.fold
       (fun _ p acc ->
@@ -529,17 +515,15 @@ let verbose = Mutil.verbose
 
 let make_visible_record_access perm bname persons =
   let visible_ref = ref None in
-  let fname = Filename.concat bname "restrict" in
+  let fname = bname // "restrict" in
   let read_or_create_visible () =
     let visible =
       try
-        let ic = Secure.open_in fname in
+        Secure.with_open_in_text fname @@ fun ic ->
         if Sys.unix && !verbose then (
           Printf.eprintf "*** read restrict file\n";
           flush stderr);
-        let visible = input_value ic in
-        close_in ic;
-        visible
+        input_value ic
       with Sys_error _ -> Array.make persons.len VsNone
     in
     visible_ref := Some visible;
@@ -550,12 +534,11 @@ let make_visible_record_access perm bname persons =
     | Some visible ->
         if perm = RDONLY then raise (HttpExn (Forbidden, __LOC__))
         else
-          let oc = Secure.open_out fname in
+          Secure.with_open_out_text fname @@ fun oc ->
           if Sys.unix && !verbose then (
             Printf.eprintf "*** write restrict file\n";
             flush stderr);
-          output_value oc visible;
-          close_out oc
+          output_value oc visible
     | None -> ()
   in
   let v_get fct i =
@@ -871,7 +854,7 @@ let input_patches bname =
   let fname = Filename.concat bname "patches" in
   if Sys.file_exists fname then
     try
-      let ic = Secure.open_in_bin fname in
+      Secure.with_open_in_bin fname @@ fun ic ->
       let r =
         if check_patch_magic ic then (input_value ic : patches_ht)
         else (
@@ -893,16 +876,15 @@ let input_patches bname =
           List.iter (add (ref 0, ht.h_name)) !(patches.Old.p_name);
           ht)
       in
-      close_in ic;
       Ok r
     with _ -> Error (Printf.sprintf "%s: corrupted file" fname)
   else Ok (empty_patch_ht ())
 
 let input_synchro bname =
   try
-    let ic = Secure.open_in_bin (Filename.concat bname "synchro_patches") in
+    Secure.with_open_in_bin (Filename.concat bname "synchro_patches")
+    @@ fun ic ->
     let r : synchro_patch = input_value ic in
-    close_in ic;
     r
   with _ -> { synch_list = [] }
 
@@ -1153,9 +1135,7 @@ let with_database ?(read_only = false) bname k =
           (snd pending.h_person) (nbp_read ())
       in
       let tmp_nbp_fname = nbp_fname ^ "_tmp" in
-      let oc = Secure.open_out_bin tmp_nbp_fname in
-      output_value oc nbp;
-      close_out oc;
+      Secure.with_open_out_bin tmp_nbp_fname (fun oc -> output_value oc nbp);
       let aux (n, ht) (n', ht') =
         n := !n';
         Hashtbl.iter (Hashtbl.replace ht) ht';
@@ -1170,15 +1150,13 @@ let with_database ?(read_only = false) bname k =
       aux patches.h_descend pending.h_descend;
       aux patches.h_string pending.h_string;
       (* update "patches" file *)
-      let tmp_fname = Filename.concat bname "1patches" in
-      let fname = Filename.concat bname "patches" in
-      let tm_oc = Secure.open_out_bin tm_fname in
-      output_string tm_oc (tm : Adef.safe_string :> string);
-      close_out tm_oc;
-      let oc_tmp = Secure.open_out_bin tmp_fname in
-      output_string oc_tmp magic_patch;
-      Dutil.output_value_no_sharing oc_tmp (patches : patches_ht);
-      close_out oc_tmp;
+      let tmp_fname = bname // "1patches" in
+      let fname = bname // "patches" in
+      Secure.with_open_out_bin tm_fname (fun oc ->
+          output_string oc (tm : Adef.safe_string :> string));
+      Secure.with_open_out_bin tmp_fname (fun oc ->
+          output_string oc magic_patch;
+          Dutil.output_value_no_sharing oc (patches : patches_ht));
       move_with_backup tmp_nbp_fname nbp_fname;
       move_with_backup tmp_fname fname;
       commit_synchro ();
@@ -1269,21 +1247,17 @@ let with_database ?(read_only = false) bname k =
       else Filename.concat "notes_d" (fnotes ^ ".txt")
     in
     try
-      let ic = Secure.open_in (Filename.concat bname fname) in
-      let str =
-        match rn_mode with
-        | RnDeg -> if in_channel_length ic = 0 then "" else " "
-        | Rn1Ln -> ( try input_line ic with End_of_file -> "")
-        | RnAll ->
-            let rec loop len =
-              match input_char ic with
-              | exception End_of_file -> Buff.get len
-              | c -> loop (Buff.store len c)
-            in
-            loop 0
-      in
-      close_in ic;
-      str
+      Secure.with_open_in_text (bname // fname) @@ fun ic ->
+      match rn_mode with
+      | RnDeg -> if in_channel_length ic = 0 then "" else " "
+      | Rn1Ln -> ( try input_line ic with End_of_file -> "")
+      | RnAll ->
+          let rec loop len =
+            match input_char ic with
+            | exception End_of_file -> Buff.get len
+            | c -> loop (Buff.store len c)
+          in
+          loop 0
     with Sys_error _ -> ""
   in
   let commit_notes =
@@ -1298,10 +1272,8 @@ let with_database ?(read_only = false) bname k =
       let fname = Filename.concat bname fname in
       (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
       (try Sys.rename fname (fname ^ "~") with _ -> ());
-      if s <> "" then (
-        let oc = Secure.open_out fname in
-        output_string oc s;
-        close_out oc)
+      if s <> "" then
+        Secure.with_open_out_text fname (fun oc -> output_string oc s)
   in
   let commit_wiznotes =
     if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
@@ -1317,10 +1289,8 @@ let with_database ?(read_only = false) bname k =
         in
         (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
         (try Sys.rename fname (fname ^ "~") with _ -> ());
-        if s <> "" then (
-          let oc = Secure.open_out fname in
-          output_string oc s;
-          close_out oc))
+        if s <> "" then
+          Secure.with_open_out_text fname (fun oc -> output_string oc s))
   in
   let ext_files () =
     Filesystem.walk_folder ~recursive:true
