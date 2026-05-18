@@ -8,14 +8,9 @@ type t = { workers : (worker, unit) Hashtbl.t } [@@unboxed]
 let add_worker t k =
   match Unix.fork () with
   | 0 ->
-      (try
-         while true do
-           k @@ Unix.getpid ()
-         done
-       with e ->
-         let bt = Printexc.get_raw_backtrace () in
-         Logs.info (fun k -> k "%a" Util.pp_exception (e, bt)));
-      exit 1
+      while true do
+        k @@ Unix.getpid ()
+      done
   | pid ->
       Log.debug (fun k -> k "Creating worker %d" pid);
       Hashtbl.replace t.workers { pid } ()
