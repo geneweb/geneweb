@@ -4,11 +4,11 @@ let no_lock_flag = ref false
 
 (* TODO: move this generic function in a more appropriate location. *)
 let pp_exception ppf (exn, bt) =
-  let sexn = Printexc.to_string exn in
-  if Printexc.backtrace_status () then
-    Format.fprintf ppf "@[Raised exception %s:@ %s@]" sexn
-      (Printexc.raw_backtrace_to_string bt)
-  else Format.fprintf ppf "@[Raised exception %s@]" sexn
+  let pp_header ppf pid = Fmt.pf ppf "Uncaught exception in process %d:" pid in
+  let pp_header = Fmt.(styled (`Fg `Red) pp_header) in
+  let exn = Printexc.to_string exn in
+  let bt = Printexc.raw_backtrace_to_string bt in
+  Fmt.pf ppf "%a@ %s@ %a" pp_header (Unix.getpid ()) exn Fmt.lines bt
 
 let close_noerr fd = try Unix.close fd with _ -> ()
 let chmod_noerr fl perm = try Unix.chmod fl perm with _ -> ()

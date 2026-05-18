@@ -313,10 +313,7 @@ let accept_connections_unix ~timeout ~n_workers callback socket =
   else
     (* We avoid forking in the case, which is helpful for debugging. *)
     while true do
-      try accept_connection_unix ~timeout callback socket (Unix.getpid ())
-      with e ->
-        let bt = Printexc.get_raw_backtrace () in
-        Log.info (fun k -> k "%a" Util.pp_exception (e, bt))
+      accept_connection_unix ~timeout callback socket (Unix.getpid ())
     done
 
 let accept_connections ~timeout ~n_workers callback socket =

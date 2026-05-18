@@ -20,6 +20,13 @@ let src = Logs.Src.create ~doc:"Gwd" "GWD "
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
+let pp_exception ppf (exn, bt) =
+  let pp_header ppf pid = Fmt.pf ppf "Uncaught exception in process %d:" pid in
+  let pp_header = Fmt.(styled (`Fg `Red) pp_header) in
+  let exn = Printexc.to_string exn in
+  let bt = Printexc.raw_backtrace_to_string bt in
+  Fmt.pf ppf "%a@ %s@ %a" pp_header (Unix.getpid ()) exn Fmt.lines bt
+
 let timestamp = Logs.Tag.(empty |> add Server.timestamp_tag ())
 let gzip_min_size = 1024
 
@@ -1685,14 +1692,6 @@ let conf_and_connection =
             end
         | _ -> (
             enable_gzip ();
-            let printexc bt exn =
-              Log.err (fun k ->
-                  k "%s %s"
-                    (context conf contents :> string)
-                    (Printexc.to_string exn));
-              if Printexc.backtrace_status () then
-                Log.err (fun k -> k "Backtrace:@ %s" bt)
-            in
             try
               let t1 = Unix.gettimeofday () in
               Request.treat_request conf;
@@ -1706,12 +1705,9 @@ let conf_and_connection =
             with
             | Exit -> ()
             | Def.HttpExn (code, _) as exn ->
-                let bt = Printexc.get_backtrace () in
+                let bt = Printexc.get_raw_backtrace () in
                 GWPARAM.output_error conf code;
-                printexc bt exn
-            | exn ->
-                let bt = Printexc.get_backtrace () in
-                printexc bt exn))
+                Log.err (fun k -> k "%a" pp_exception (exn, bt))))
 
 let match_strings regexp s =
   let rec loop i j =
@@ -2428,6 +2424,8 @@ let reporter ~predictable_mode ppf =
   { Logs.report }
 
 let setup_log ~predictable_mode t =
+  Printexc.set_uncaught_exception_handler (fun exn bt ->
+      Log.err (fun k -> k "%a" pp_exception (exn, bt)));
   let set_reporter ppf = Logs.set_reporter @@ reporter ~predictable_mode ppf in
   let refresh o =
     Option.iter close_out_noerr o.oc;
@@ -2493,8 +2491,3 @@ let () =
   | Register_plugin_failure (p, `dynlink_error e) ->
       Log.err (fun k -> k "%s: %s" p (Dynlink.error_message e))
   | Register_plugin_failure (p, `string s) -> Log.err (fun k -> k "%s: %s" p s)
-  | exn ->
-      let exn = Printexc.to_string exn in
-      let lines = String.split_on_char '\n' @@ Printexc.get_backtrace () in
-      Log.err (fun k -> k "@[%s@ %a@]" exn Fmt.(list ~sep:cut string) lines);
-      exit 2
