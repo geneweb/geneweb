@@ -258,17 +258,13 @@ td .rm-cell {
   line-height: 2rem;
 }
 
-.border-double {
-  border-style: double;
-}
-
 .border-left-5 {
   border-left-width: 5px;
+  border-left-style: solid;
 }
 
-.border-right-5-black {
-  border-right-width: 5px;
-  border-right-color: black;
+.border-double {
+  border-left-style: double !important;
 }
 
 .overflow-y-scroll {
