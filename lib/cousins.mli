@@ -77,6 +77,12 @@ val sibling_has_desc_lev :
 (** [has_desc_lev] curried over a sibling pair [(ip, _)] as produced by
     [siblings]. *)
 
+val clear_cousins_cache :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
+(** Deletes the per-level disk cache of [p]
+    ([caches/cousins_json/<key>_level_*.json]); no-op when the cache directory
+    is absent. Backs the wizard cache-reset action of [m=C]. *)
+
 val init_cousins_cnt :
   config ->
   Geneweb_db.Driver.base ->

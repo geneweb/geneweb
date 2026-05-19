@@ -405,6 +405,30 @@ let read_or_build_level_json cache_file key level build =
        with _ -> ());
       s
 
+let cousins_cache_dir conf =
+  Filename.concat
+    (Filename.concat (!GWPARAM.bpath conf.Config.bname) "caches")
+    "cousins_json"
+
+let cousins_cache_key base p =
+  let fn = Name.strip_lower @@ Driver.sou base @@ Driver.get_first_name p in
+  let sn = Name.strip_lower @@ Driver.sou base @@ Driver.get_surname p in
+  Format.sprintf "%s.%d.%s" fn (Driver.get_occ p) sn
+
+let clear_cousins_cache conf base p =
+  let dir = cousins_cache_dir conf in
+  if Sys.file_exists dir then
+    let pfx = cousins_cache_key base p ^ "_level_" in
+    let n = String.length pfx in
+    Array.iter
+      (fun f ->
+        if
+          Filename.check_suffix f ".json"
+          && String.length f >= n
+          && String.sub f 0 n = pfx
+        then try Sys.remove (Filename.concat dir f) with _ -> ())
+      (Sys.readdir dir)
+
 let init_cousins_cnt conf base ?up_to p =
   let max_a_l =
     match up_to with
@@ -455,15 +479,8 @@ let init_cousins_cnt conf base ?up_to p =
         let s = set_cell cumul_sparse i 0 liste dates in
         loop2 1 s
   in
-  let fn = Name.strip_lower @@ Driver.sou base @@ Driver.get_first_name p in
-  let sn = Name.strip_lower @@ Driver.sou base @@ Driver.get_surname p in
-  let occ = Driver.get_occ p in
-  let key = Format.sprintf "%s.%d.%s" fn occ sn in
-  let cache_dir =
-    Filename.concat
-      (Filename.concat (!GWPARAM.bpath conf.bname) "caches")
-      "cousins_json"
-  in
+  let key = cousins_cache_key base p in
+  let cache_dir = cousins_cache_dir conf in
   let sparse =
     match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
     | Some "yes" ->

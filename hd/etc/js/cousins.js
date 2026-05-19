@@ -40,13 +40,12 @@ window.Cousins = (function () {
     for (const c of raw.cells) cells.set(c.i + ':' + c.j, c);
     for (const [ip, p] of Object.entries(raw.persons)) persons.set(ip, p);
 
-/* ---- Phase D: per-level loading, stable per-level URLs ---- */
+    /* ---- per-level loading, stable per-level URLs ---- */
     const loaded  = new Set([0]);
     const pending = new Map();
 
     const levelUrl = (n) =>
       PREFIX + 'i=' + enc(SELF_IP) + '&m=C&json_level=' + n;
-
 
     function mergeLevel(resp) {
       if (!resp || !Array.isArray(resp.cells)) return false;
@@ -57,10 +56,20 @@ window.Cousins = (function () {
       return resp.cells.length > 0;
     }
 
+    let forceReload = false;
+    try {
+      if (sessionStorage.getItem('cousinsReload')) {
+        forceReload = true;
+        sessionStorage.removeItem('cousinsReload');
+      }
+    } catch (e) { /* ignore */ }
+
     function fetchLevel(n) {
       if (loaded.has(n)) return Promise.resolve(true);
       if (pending.has(n)) return pending.get(n);
-      const pr = fetch(levelUrl(n), { headers: { Accept: 'application/json' } })
+      const pr = fetch(levelUrl(n),
+        { headers: { Accept: 'application/json' },
+          cache: forceReload ? 'reload' : 'default' })
         .then((r) => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
@@ -156,13 +165,13 @@ window.Cousins = (function () {
     function rUrl(ip)     {
       return PREFIX + 'em=R&et=A&ei=' + SELF_IP + '&i=' + ip;
     }
-    function rlmUrl(path, lvlA, lvlD) {
+    function rlmUrl(ip, path, lvlA, lvlD) {
       const anc = path.a1 || path.a2 || SELF_IP;
       const i1 = lvlA === 0 ? SELF_IP : anc;
       const dag = (path.nbr | 0) > 1 ? '&dag=on' : '';
       return PREFIX + 'm=RL&i=' + i1
            + '&l1=' + lvlA + '&i1=' + SELF_IP
-           + '&l2=' + lvlD + '&i2=' + path.ip + dag;
+           + '&l2=' + lvlD + '&i2=' + ip + dag;
     }
 
     function sexClass(s) {
@@ -180,12 +189,6 @@ window.Cousins = (function () {
       return m ? m[1] + '/' + m[2] : s;
     }
 
-    /* per-cell ip → multiplicity, used for nbr_N filter classes */
-    function pathMult(cell) {
-      const m = new Map();
-      for (const p of cell.paths) m.set(p.ip, (m.get(p.ip) || 0) + (p.nbr | 0 || 1));
-      return m;
-    }
     function thousandsSep(n) {
       return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     }
@@ -205,6 +208,21 @@ window.Cousins = (function () {
         }
         if (on) el.classList.add('border-dark', 'border-end');
       });
+    }
+
+    function nameOf(ip) {
+      const p = persons.get(ip);
+      return p ? p.fn + ' ' + p.sn : '';
+    }
+    function gIdx(s) { return (s === 0 || s === 1) ? s : 2; }
+    function relTip(j, a1, a2, idx) {
+      const t = lex.rel && lex.rel[j];
+      const noun = t ? (t[idx] || t[2] || '') : '';
+      let ancs = nameOf(a1);
+      if (a2) ancs += ' ' + (L('and') || '&') + ' ' + nameOf(a2);
+      return (raw.ttfmt || '\u0001N \u0001A')
+        .split('\u0001N').join(noun)
+        .split('\u0001A').join(ancs);
     }
 
     /* ---- 3. Matrix hydration ---- */
@@ -362,7 +380,8 @@ window.Cousins = (function () {
     }
 
     function populateModal(cell) {
-      const { i, j, cnt, paths } = cell;
+      currentCell = cell;
+      const { i, j, cnt } = cell;
       const isSelf = i + j === 0;
       const labelH = isSelf
         ? L('him_her')
@@ -426,7 +445,7 @@ window.Cousins = (function () {
       /* Position 1 — diagonal descend-i (only on ancestor column) */
       if (j === 0 && i > 0)
         cloneNav('cousins-nav-diag-tpl', navUp,
-                 i - 1, 0, null, cellExists(i - 1, 0));
+                 i - 1, 0, i, cellExists(i - 1, 0));
 
       /* Position 2 top — ascend (always rendered) */
       if (j === 0)
@@ -434,7 +453,7 @@ window.Cousins = (function () {
                  i + 1, 0, i, cellExists(i + 1, 0));
       else
         cloneNav('cousins-nav-up-cous-tpl', navDn,
-                 i, j - 1, j, cellExists(i, j - 1));
+                 i, j - 1, i, cellExists(i, j - 1));
 
       /* Position 2 bottom — descend-j (always rendered) */
       cloneNav('cousins-nav-down-tpl', navDn,
@@ -463,18 +482,27 @@ window.Cousins = (function () {
       }
 
       /* Cards */
-      const np = paths.length;
+      const mode   = sortTypes[sortIdx].type;
+      const groups = buildGroups(cell.entries, mode);
+      const np = groups.length;
       colsEl.style.columnCount = np > 31 ? 3 : 2;
-
-      const mult = pathMult(cell);
       listEl.innerHTML = '';
-      const tpl = document.getElementById('cousins-card-tpl');
-      const sorted =
-        paths.slice().sort(cmpPaths(sortTypes[sortIdx].type));
-      for (const path of sorted) {
-        const node = renderCard(tpl, path, i, j, cell.span, mult);
-        if (node) listEl.appendChild(node);
+      const tpl    = document.getElementById('cousins-card-tpl');
+      const segTpl = document.getElementById('cousins-seg-tpl');
+      const memTpl = document.getElementById('cousins-mem-tpl');
+      const cmpG   = cmpPaths(mode);
+      groups.forEach(function (g) {
+        g.rep = g.ips.reduce(function (m, ip) {
+          return cmpG({ ip: ip }, { ip: m }) < 0 ? ip : m;
+        }, g.ips[0]);
+      });
+      groups.sort((a, b) => cmpG({ ip: a.rep }, { ip: b.rep }));
+      const frag = document.createDocumentFragment();
+      for (const group of groups) {
+        const node = renderCard(tpl, segTpl, memTpl, group, i, j, cell.span);
+        if (node) frag.appendChild(node);
       }
+      listEl.replaceChildren(frag);
       applySortLabel();
       ensureTooltips(modalEl);
     }
@@ -484,6 +512,9 @@ window.Cousins = (function () {
        the NEXT entry; with sortIdx=0 the button advertises 'surname',
        which matches the initial HTML rendering of the button. */
     const sortTypes = [
+      { type: 'relation',
+        icon: 'fa-people-roof',
+        label: sortBtn.dataset.lblRelation },
       { type: 'birth',
         icon: 'fa-cake-candles',
         label: sortBtn.dataset.lblBirth },
@@ -495,6 +526,7 @@ window.Cousins = (function () {
         label: sortBtn.dataset.lblAge },
     ];
     let sortIdx = 0;
+    let currentCell = null;
 
     function applySortLabel() {
       const cur  = sortTypes[sortIdx];
@@ -509,17 +541,10 @@ window.Cousins = (function () {
       if (cla) cla.textContent = cur.label;
     }
 
-    function sortList() {
-      const items = Array.from(listEl.querySelectorAll('li'));
-      items.sort(cmpListItems(sortTypes[sortIdx].type));
-      items.forEach(function (li) { listEl.appendChild(li); });
-    }
-
     modalEl.addEventListener('click', function (ev) {
       if (ev.target.closest('.sortbtn')) {
         sortIdx = (sortIdx + 1) % sortTypes.length;
-        sortList();
-        applySortLabel();
+        if (currentCell) populateModal(currentCell);
         return;
       }
       const nav = ev.target.closest('.cous-hed-nav-btn');
@@ -530,14 +555,24 @@ window.Cousins = (function () {
       }
     });
 
+    listEl.addEventListener('click', function (ev) {
+      if (ev.target.closest('a, button')) return;
+      const li = ev.target.closest('li[data-nav]');
+      if (li) window.location.href = li.dataset.nav;
+    });
+
+    function rlmUrlOf(ips, label) {
+      let s = PREFIX + 'm=RLM&i1=' + SELF_IP;
+      ips.forEach((ip, k) => { s += '&i' + (k + 2) + '=' + ip; });
+      if (label) s += '&t1=' + encodeURIComponent(label);
+      return s;
+    }
+
     function buildRlmUrl(cell) {
-      const params = ['m=RLM', 'i1=' + SELF_IP];
-      cell.paths.forEach((p, k) => params.push('i' + (k + 2) + '=' + p.ip));
-      if (cell.i + cell.j !== 0) {
-        const label = (cell.label_p || '').replace(/<[^>]*>/g, '');
-        params.push('t1=' + encodeURIComponent(label));
-      }
-      return PREFIX + params.join('&');
+      const label = (cell.i + cell.j !== 0)
+        ? (cell.label_p || '').replace(/<[^>]*>/g, '')
+        : null;
+      return rlmUrlOf(cell.entries.map((e) => e.ip), label);
     }
 
     /* Sort primitives over JSON person objects. fn_key/sn_key are
@@ -590,6 +625,12 @@ window.Cousins = (function () {
             || cmpStr(a.fn_key, b.fn_key)
             || cmpNum(a.oc | 0, b.oc | 0);
       },
+      relation: function (a, b) {
+        return cmpStr(a.sn_key, b.sn_key)
+            || cmpDate(a.birth, b.birth)
+            || cmpStr(a.fn_key, b.fn_key)
+            || cmpNum(a.oc | 0, b.oc | 0);
+      },
     };
 
     function cmpBy(mode, getIp) {
@@ -600,80 +641,173 @@ window.Cousins = (function () {
       };
     }
     const cmpPaths = (m) => cmpBy(m, x => x.ip);
-    const cmpListItems   = (m) => cmpBy(m, x => x.dataset.ip);
 
     /* ---- 5. Card ---- */
     /* Two distinct multiplicities — do not conflate:
-         - nbr (mult.get(ip)): total paths reaching this ip across all
-           ancestor pairs of the cell. Drives the nbr_N filter class and
-           the data-multi badge (per-person aggregate).
-         - path.nbr (RLM block below): chain multiplicity of THIS single
-           (ip, ancestor-pair) path. Drives the RLM superscript only. */
-    function renderCard(tpl, path, lvlA, lvlD, span, mult) {
-      const p = persons.get(path.ip);
-      if (!p) return null;
-      const dead   = !p.alive;
-      const noDesc = !p.has_child;
-      const nbr    = mult.get(path.ip) || 1;
+         - group.mult: total paths reaching this person across all
+           ancestor pairs of the cell. Drives the nbr_N filter class
+           and the data-multi badge (per-person aggregate).
+         - path.nbr: chain multiplicity of ONE (ancestor-pair) path.
+           Drives the per-line RLM superscript only. */
+    function renderCard(tpl, segTpl, memTpl, group, lvlA, lvlD, span) {
+      const mode  = sortTypes[sortIdx].type;
+      const isRel = mode === 'relation';
+      const ips   = group.ips;
+      const rep   = persons.get(ips[0]);
+      if (!rep) return null;
+      const nbr = group.mult || 1;
 
       const node = tpl.content.firstElementChild.cloneNode(true);
       node.classList.add('nbr_' + nbr);
-      node.classList.add('border-' + sexClass(p.sex));
-      if (noDesc) node.classList.add('border-double');
-      if (dead)   node.classList.add('border-right-5-black');
       if (nbr > 1) node.dataset.multi = String(nbr);
 
-      const bg = ageGradient(p, span, dead);
-      if (bg) node.style.background = bg;
-
-      node.dataset.ip = path.ip;
-
-      const nav = node.querySelector('.card-nav');
-      nav.href = pUrlNav(p, path.ip);
-      nav.title = L('navigation');
-
-      const rA = node.querySelector('.card-r');
-      rA.href  = rUrl(path.ip);
-      rA.title = L('rel_links_p');
-
-      const rlm = node.querySelector('.card-rlm');
-      if (lvlD !== 0) {
-        const a1P = path.a1 ? persons.get(path.a1) : null;
-        const a2P = path.a2 ? persons.get(path.a2) : null;
-        let primP = a1P, secP = a2P;
-        if (a1P && a2P && a2P.sex === 0 && a1P.sex !== 0) {
-          primP = a2P; secP = a1P;
+      const cmp = cmpPaths(mode);
+      let sortedIps;
+      if (isRel) {
+        const sibMin = new Map();
+        for (const ip of ips) {
+          const p = persons.get(ip);
+          if (!p) continue;
+          const s = group.sib.get(ip);
+          const y = (p.birth && p.birth.y) ? p.birth.y : 99999;
+          if (!sibMin.has(s) || y < sibMin.get(s)) sibMin.set(s, y);
         }
-        rlm.href = rlmUrl(path, lvlA, lvlD);
-        rlm.title = path.tt || '';
-        rlm.hidden = false;
-        const k = path.nbr | 0;
-        const sup = k > 1 ? '<small class="me-1">' + k + '</small>' : '';
-        const ico = function (p) {
-          return p
-            ? '<i class="fa-solid fa-user fa-sm text-'
-              + sexClass(p.sex) + '"></i>'
-            : '';
-        };
-        rlm.innerHTML = sup + ico(primP) + ico(secP);
-      }
-
-      const nm = node.querySelector('.card-name');
-      nm.href = pUrl(p, path.ip);
-      nm.textContent = p.sn + ' ' + p.fn;
-      nm.title = ageTitle(p);
-
-      const ed = node.querySelector('.card-edit');
-      if (IS_WIZ) {
-        const a = document.createElement('a');
-        a.href = PREFIX + 'm=MOD_IND&i=' + path.ip;
-        a.title = L('modify');
-        a.textContent = p.dates || (dead ? '†' : '°');
-        ed.appendChild(a);
+        sortedIps = ips.slice().sort(function (a, b) {
+          const pa = persons.get(a), pb = persons.get(b);
+          const sa = group.sib.get(a), sb = group.sib.get(b);
+          return cmpStr(pa.sn_key, pb.sn_key)
+              || cmpNum(sibMin.get(sa), sibMin.get(sb))
+              || cmpStr(sa, sb)
+              || cmpDate(pa.birth, pb.birth)
+              || cmpStr(pa.fn_key, pb.fn_key)
+              || cmpNum(pa.oc | 0, pb.oc | 0);
+        });
       } else {
-        ed.textContent = p.dates || (dead ? '†' : '°');
+        sortedIps = ips.slice().sort((a, b) => cmp({ ip: a }, { ip: b }));
       }
+      node.dataset.ip = sortedIps[0];
+
+      const segsBox = node.querySelector('.card-segs');
+      const segs = [];
+      let prevSib = null, seg = null;
+      for (const ip of sortedIps) {
+        const sib = group.sib.get(ip);
+        if (sib !== prevSib) { seg = { ips: [] }; segs.push(seg); }
+        prevSib = sib;
+        seg.ips.push(ip);
+      }
+
+      const ico = (q) => q
+        ? '<i class="fa-solid fa-user fa-sm text-'
+          + sexClass(q.sex) + '"></i>'
+        : '';
+
+      segs.forEach(function (s, si) {
+        if (si > 0) {
+          const hr = document.createElement('hr');
+          hr.className = 'p-0 m-0';
+          segsBox.appendChild(hr);
+        }
+        const segNode = segTpl.content.firstElementChild.cloneNode(true);
+        const ul = segNode.querySelector('.seg-mem');
+
+        for (const ip of s.ips) {
+          const p = persons.get(ip);
+          if (!p) continue;
+          const dead = !p.alive;
+          const row = memTpl.content.firstElementChild.cloneNode(true);
+          row.classList.add('border-' + sexClass(p.sex));
+          if (!p.has_child) row.classList.add('border-double');
+          const bg = ageGradient(p, span, dead);
+          if (bg) row.style.background = bg;
+          row.dataset.nav = pUrlNav(p, ip);
+          row.title = L('navigation');
+          const nm = row.querySelector('.card-name');
+          nm.href = pUrl(p, ip);
+          nm.textContent = p.sn + ' ' + p.fn;
+          nm.title = ageTitle(p);
+          const ed = row.querySelector('.card-edit');
+          if (IS_WIZ) {
+            const a = document.createElement('a');
+            a.href = PREFIX + 'm=MOD_IND&i=' + ip;
+            a.title = L('modify');
+            a.textContent = p.dates || (dead ? '†' : '°');
+            ed.appendChild(a);
+          } else {
+            ed.textContent = p.dates || (dead ? '†' : '°');
+          }
+          const rA = row.querySelector('.card-r');
+          rA.href  = rUrl(ip);
+          rA.title = L('rel_links_p');
+          ul.appendChild(row);
+        }
+
+        if (lvlD !== 0) {
+          const single = s.ips.length === 1;
+          const rlm = segNode.querySelector('.seg-rlm');
+          rlm.hidden = false;
+          if (isRel) {
+            const ancs = new Set();
+            group.paths.forEach((p) => {
+              if (p.a1) ancs.add(p.a1);
+              if (p.a2) ancs.add(p.a2);
+            });
+            rlm.href = rlmUrlOf([...ancs, ...s.ips]);
+          } else {
+            rlm.href = rlmUrl(s.ips[0], group.paths[0], lvlA, lvlD);
+          }
+          const idx = single
+            ? gIdx((persons.get(s.ips[0]) || {}).sex)
+            : 2;
+          rlm.title = group.paths
+            .map((pp) => relTip(lvlD, pp.a1, pp.a2, idx))
+            .join(' ; ');
+          rlm.innerHTML = group.paths.map(function (path) {
+            const a1P = path.a1 ? persons.get(path.a1) : null;
+            const a2P = path.a2 ? persons.get(path.a2) : null;
+            let primP = a1P, secP = a2P;
+            if (a1P && a2P && a2P.sex === 0 && a1P.sex !== 0) {
+              primP = a2P; secP = a1P;
+            }
+            const c = path.nbr | 0;
+            return '<span class="d-block">'
+              + (c > 1 ? '<small class="me-1">' + c + '</small>' : '')
+              + ico(primP) + ico(secP) + '</span>';
+          }).join('');
+        }
+        segsBox.appendChild(segNode);
+      });
       return node;
+    }
+
+    function entrySig(e) {
+      return e.paths
+        .map((p) => p.a1 + '|' + p.a2 + '|' + p.nbr + '|' + p.lvl)
+        .sort()
+        .join(';');
+    }
+
+    function buildGroups(entries, mode) {
+      if (mode !== 'relation')
+        return entries.map((e) => ({
+          ips: [e.ip], mult: e.mult, paths: e.paths,
+          sib: new Map([[e.ip, e.sib]]),
+        }));
+      const h = new Map();
+      const order = [];
+      for (const e of entries) {
+        const key = entrySig(e);
+        let g = h.get(key);
+        if (!g) {
+          g = { ips: [], mult: e.mult, paths: e.paths,
+                sib: new Map() };
+          h.set(key, g);
+          order.push(key);
+        }
+        g.ips.push(e.ip);
+        g.sib.set(e.ip, e.sib);
+      }
+      return order.map((k) => h.get(k));
     }
 
     function ageTitle(p) {
@@ -755,8 +889,8 @@ window.Cousins = (function () {
       const dist = new Set(), alive = new Set();
       for (const [key, cell] of cells.entries()) {
         const [i, j] = key.split(':').map(Number);
-        for (const path of cell.paths) {
-          const ip = path.ip;
+        for (const entry of cell.entries) {
+          const ip = entry.ip;
           dist.add(ip);
           if (i >= 1 && j === 0) anc.add(ip);
           else if (i === 0 && j >= 1) desc.add(ip);
@@ -837,6 +971,20 @@ window.Cousins = (function () {
         btn.title = btn.title + caution;
       });
     }
+
+    const resetBtn = document.querySelector('.cacheresetbtn');
+    if (resetBtn)
+      resetBtn.addEventListener('click', async function () {
+        resetBtn.disabled = true;
+        try {
+          await withOverlay(fetch(
+            PREFIX + 'm=C&i=' + SELF_IP
+            + '&v=' + (raw.lvl || 0) + '&reset=on',
+            { cache: 'no-store' }), 0);
+        } catch (e) { /* ignore */ }
+        try { sessionStorage.setItem('cousinsReload', '1'); } catch (e) {}
+        location.reload();
+      });
 
     /* ---- 7. Tooltips page-wide + toggle-lvl ---- */
     const TOOLTIP_ALLOWLIST = (() => {

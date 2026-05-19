@@ -459,15 +459,22 @@ let pair_paths (paths : Cousins.one_cousin list) =
     (fun (ip, (a1, a2)) (nbr, lvl) acc -> (ip, a1, a2, nbr, lvl) :: acc)
     by_pair []
 
-let path_to_json ~tt (ip, a1, a2, nbr, lvl) =
+let group_by_iper paired =
+  let h = Hashtbl.create 64 in
+  List.iter
+    (fun (ip, a1, a2, nbr, lvl) ->
+      let mult, subs = try Hashtbl.find h ip with Not_found -> (0, []) in
+      Hashtbl.replace h ip (mult + nbr, (a1, a2, nbr, lvl) :: subs))
+    paired;
+  Hashtbl.fold (fun ip (mult, subs) acc -> (ip, mult, subs) :: acc) h []
+
+let sub_path_to_json (a1, a2, nbr, lvl) =
   `Assoc
     [
-      ("ip", `String (Driver.Iper.to_string ip));
       ("a1", iper_or_null a1);
       ("a2", match a2 with None -> `Null | Some a -> iper_or_null a);
       ("nbr", `Int nbr);
       ("lvl", `Int lvl);
-      ("tt", tt);
     ]
 
 let span_to_json (smin, smax) =
@@ -579,36 +586,34 @@ let cell_counts meta_tbl paired =
   in
   (n_paths, Iper.Set.cardinal dist_set, Iper.Set.cardinal alive_set, no_desc_n)
 
-let cell_to_json conf meta_tbl i j paths min_max =
+let sib_of conf base ip =
+  match Driver.get_parents (Util.pget conf base ip) with
+  | Some ifam -> Driver.Ifam.to_string ifam
+  | None -> "@" ^ Driver.Iper.to_string ip
+
+let cell_to_json conf base meta_tbl i j paths min_max =
   let paired = pair_paths paths in
   let n_paths, n_dist, n_alive, n_no_desc = cell_counts meta_tbl paired in
   let label_s, label_p, tt = cell_label conf i j in
-  let name_of ip =
-    match Hashtbl.find_opt meta_tbl ip with
-    | Some (_, _, _, fn, sn) -> fn ^ " " ^ sn
-    | None -> ""
+  let entry_json (ip, mult, subs) =
+    let subs =
+      List.sort
+        (fun (_, _, n1, l1) (_, _, n2, l2) ->
+          match compare l1 l2 with 0 -> compare n2 n1 | c -> c)
+        subs
+    in
+    `Assoc
+      [
+        ("ip", `String (Driver.Iper.to_string ip));
+        ("sib", `String (sib_of conf base ip));
+        ("mult", `Int mult);
+        ( "paths",
+          `List
+            (List.map
+               (fun (a1, a2, nbr, lvl) -> sub_path_to_json (a1, a2, nbr, lvl))
+               subs) );
+      ]
   in
-  let sex_of ip =
-    match Hashtbl.find_opt meta_tbl ip with
-    | Some (_, _, s, _, _) -> s
-    | None -> Neuter
-  in
-  let path_tt (ip, a1, a2, _nbr, _lvl) =
-    if j = 0 || a1 = Driver.Iper.dummy then `Null
-    else
-      let label =
-        Util.transl_nth conf
-          (Printf.sprintf "cousin.0.%d" j)
-          (Util.index_of_sex (sex_of ip))
-      in
-      let ancs =
-        match a2 with
-        | None -> name_of a1
-        | Some b -> name_of a1 ^ " " ^ Util.transl conf "and" ^ " " ^ name_of b
-      in
-      `String (Util.transl_a_of_b conf label ancs ancs)
-  in
-  let path_json p = path_to_json ~tt:(path_tt p) p in
   let json =
     `Assoc
       [
@@ -626,7 +631,7 @@ let cell_to_json conf meta_tbl i j paths min_max =
               ("no_desc", `Int n_no_desc);
             ] );
         ("span", span_to_json min_max);
-        ("paths", `List (List.map path_json paired));
+        ("entries", `List (List.map entry_json (group_by_iper paired)));
       ]
   in
   json
@@ -649,13 +654,14 @@ let cousins_level_to_json conf base (slice : Cousins.cousins_sparse) =
           let mm =
             try CoordMap.find (i, j) slice.dates with Not_found -> (0, 0)
           in
-          cell_to_json conf meta_tbl i j paths mm :: acc)
+          cell_to_json conf base meta_tbl i j paths mm :: acc)
       slice.data []
   in
   `Assoc
     [
       ("version", `Int 1);
       ("level", `Int slice.max_i);
+      ("ttfmt", `String (Util.transl_a_of_b conf "\001N" "\001A" "\001A"));
       ("persons", `Assoc persons);
       ("cells", `List cells);
     ]
@@ -713,27 +719,38 @@ let print_cousins_json_level conf base p =
   Output.print_sstring conf (Yojson.Safe.to_string json)
 
 let print conf base p =
-  match Util.p_getint conf.env "json_level" with
-  | Some _ -> print_cousins_json_level conf base p
+  match Util.p_getenv conf.env "reset" with
+  | Some ("on" | "1") when conf.wizard ->
+      Cousins.clear_cousins_cache conf base p;
+      let v =
+        match Util.p_getint conf.env "v" with Some n when n > 0 -> n | _ -> 0
+      in
+      let _ = Cousins.init_cousins_cnt conf base ~up_to:v p in
+      Output.header conf "Content-type: application/json; charset=UTF-8";
+      Output.header conf "Cache-control: no-store";
+      Output.print_sstring conf "{\"ok\":true}"
   | _ -> (
-      let max_lvl = Cousins.max_cousin_level conf in
-      match
-        ( Util.p_getint conf.env "v1",
-          Util.p_getint conf.env "v2",
-          Util.p_getenv conf.env "t" )
-      with
-      | Some 1, Some 1, _ | Some 0, _, _ | _, Some 0, _ ->
-          Perso.interp_templ "cousins" conf base p
-      | Some lvl1, _, _ ->
-          let lvl1 = min (max 1 lvl1) max_lvl in
-          let lvl2 =
-            match Util.p_getint conf.env "v2" with
-            | Some lvl2 -> min (max 1 lvl2) max_lvl
-            | None -> lvl1
-          in
-          print_cousins conf base p lvl1 lvl2
-      | _, _, Some (("AN" | "AD") as t) when conf.wizard || conf.friend ->
-          print_anniv conf base p (t = "AD") max_lvl
-      | _ ->
-          Perso.interp_templ "cousmenu" conf base p;
-          emit_cousins_json conf base p)
+      match Util.p_getint conf.env "json_level" with
+      | Some _ -> print_cousins_json_level conf base p
+      | _ -> (
+          let max_lvl = Cousins.max_cousin_level conf in
+          match
+            ( Util.p_getint conf.env "v1",
+              Util.p_getint conf.env "v2",
+              Util.p_getenv conf.env "t" )
+          with
+          | Some 1, Some 1, _ | Some 0, _, _ | _, Some 0, _ ->
+              Perso.interp_templ "cousins" conf base p
+          | Some lvl1, _, _ ->
+              let lvl1 = min (max 1 lvl1) max_lvl in
+              let lvl2 =
+                match Util.p_getint conf.env "v2" with
+                | Some lvl2 -> min (max 1 lvl2) max_lvl
+                | None -> lvl1
+              in
+              print_cousins conf base p lvl1 lvl2
+          | _, _, Some (("AN" | "AD") as t) when conf.wizard || conf.friend ->
+              print_anniv conf base p (t = "AD") max_lvl
+          | _ ->
+              Perso.interp_templ "cousmenu" conf base p;
+              emit_cousins_json conf base p))

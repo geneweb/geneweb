@@ -56,6 +56,11 @@
 %end;
 %if;(max!=0 and not (max=1 and not has_children))
   <div id="lvl-toolbar" class="d-flex flex-wrap align-self-center btn-toolbar py-0 mx-3 mt-1" role="toolbar" aria-label="buttons to select maximum ascending level v">
+    %if;wizard;
+    <button type="button" class="btn btn-sm btn-light btn-sm cacheresetbtn"
+            data-bs-toggle="tooltip" title="[*refresh cache files]">%nn;
+      <i class="fa-solid fa-rotate fa-fw"></i></button>
+    %end;
     <span>%for;i;min;maxp;%if;(i=13)<span class="high-lev%if;(e_v<=12) d-none%end;">%end;%apply;picklvl(i)%if;(i=max and max>12)</span>%end;%end;
       %if;(max>12)
         <span class="toggle-lev ms-1" data-caution=". [*high generation caution]">
@@ -161,11 +166,12 @@
                     </span>
                   </a>
                   <button type="button" class="btn btn-light p-2 sortbtn"
+                          data-lbl-relation="[relationship link/relationship links]0"
+                          data-lbl-birth="[birth]0"
                           data-lbl-surname="[surname/surnames]0"
-                          data-lbl-age="[age]0"
-                          data-lbl-birth="[birth]0">
+                          data-lbl-age="[age]0">
                     <i class="fa-solid fa-user fa-fw me-1 sorticon"></i>[*sort by/branch/alphabetic order]0<br>
-                    <span class="sorttype">[surname/surnames]0</span>
+                    <span class="sorttype">[birth]0</span>
                   </button>
                 </div>
               </div>
@@ -227,22 +233,26 @@
     </div>
   </div>
 </template>
-
 <template id="cousins-card-tpl">
-  <li class="card position-relative rounded-3 border-top-0 border-bottom-0 me-2
-             border-left-5">
-    <div class="d-flex align-items-center">
-      <div class="flex-grow-1 min-w-0 px-2 text-truncate">
-        <a class="card-nav stretched-link" role="button" href="#"></a>
-        <a class="card-name position-relative z-2" href="#"></a>%nn;
-        <span class="card-edit ms-1 position-relative z-2"></span>
-      </div>
-      <div class="d-flex flex-column flex-shrink-0 align-items-center
-                  mx-1 position-relative z-3 lh-1">
-        <a class="card-r" href="#"><i class="fa-solid fa-link fa-xs"></i></a>
-        <a class="card-rlm" href="#" hidden></a>
-      </div>
-    </div>
+  <li class="card position-relative rounded-3 overflow-hidden me-2">
+    <div class="card-segs"></div>
+  </li>
+</template>
+<template id="cousins-seg-tpl">
+  <div class="position-relative d-flex align-items-center">
+    <ul class="seg-mem list-unstyled flex-grow-1 min-w-0 my-0"></ul>
+    <a class="seg-rlm position-absolute top-50 end-0 translate-middle-y
+              me-1 lh-1 z-3" href="#" hidden></a>
+  </div>
+</template>
+<template id="cousins-mem-tpl">
+  <li class="position-relative d-flex align-items-center text-truncate
+             px-2 pe-5 border-top-0 border-bottom-0 border-left-5 z-0"
+      role="link" tabindex="0" style="cursor:pointer">
+    <a class="card-name position-relative z-2 text-truncate" href="#"></a>%nn;
+    <span class="card-edit ms-1 position-relative z-2"></span>%nn;
+    <a class="card-r ms-1 position-relative z-3" href="#">%nn;
+      <i class="fa-solid fa-link fa-xs"></i></a>
   </li>
 </template>
 </section>
@@ -266,7 +276,20 @@
   "degree_kinship_s": "[degree of kinship]0",
   "degree_kinship_p": "[degree of kinship]1",
   "show_all":         "[show all]",
-  "rel_links_p":      "[relationship link/relationship links]1"
+  "rel_links_p":      "[relationship link/relationship links]1",
+  "and":              "[and]",
+  "rel": {
+    "1":  %["[cousin.0.1]0","[cousin.0.1]1","[cousin.0.1]2"%],
+    "2":  %["[cousin.0.2]0","[cousin.0.2]1","[cousin.0.2]2"%],
+    "3":  %["[cousin.0.3]0","[cousin.0.3]1","[cousin.0.3]2"%],
+    "4":  %["[cousin.0.4]0","[cousin.0.4]1","[cousin.0.4]2"%],
+    "5":  %["[cousin.0.5]0","[cousin.0.5]1","[cousin.0.5]2"%],
+    "6":  %["[cousin.0.6]0","[cousin.0.6]1","[cousin.0.6]2"%],
+    "7":  %["[cousin.0.7]0","[cousin.0.7]1","[cousin.0.7]2"%],
+    "8":  %["[cousin.0.8]0","[cousin.0.8]1","[cousin.0.8]2"%],
+    "9":  %["[cousin.0.9]0","[cousin.0.9]1","[cousin.0.9]2"%],
+    "10": %["[cousin.0.10]0","[cousin.0.10]1","[cousin.0.10]2"%]
+  }
 }</script>
 %include;js
 %query_time;

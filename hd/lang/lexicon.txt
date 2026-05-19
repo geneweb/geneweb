@@ -8936,6 +8936,10 @@ de: Baum neu zentrieren auf
 en: recenter tree on
 fr: recentrer l’arbre sur
 
+    refresh cache files
+en: refresh cached files
+fr: rafraîchir les données en cache
+
     show all ancestors
 de: alle Vorfahren anzeigen
 en: show all ancestors
