@@ -146,6 +146,7 @@
   var langTog = document.getElementById("dropdownMenu1");
   var langGrp = langTog ? langTog.closest(".btn-group") : null;
   var copyr = document.getElementById("copyr");
+  var navbar = document.querySelector(".navbar.fixed-bottom");
   if (anchor && anchor.parentNode) {
     root.classList.add("me-2");
     anchor.parentNode.insertBefore(root, anchor);
@@ -155,6 +156,12 @@
   } else if (copyr) {
     root.classList.add("me-2");
     copyr.insertBefore(root, copyr.firstChild);
+  } else if (navbar) {
+    placement = "top";
+    root.style.cssText =
+      "position:absolute;inset-block:0;inset-inline-start:.5rem;" +
+      "display:flex;align-items:center;z-index:2";
+    navbar.appendChild(root);
   } else {
     placement = "right";
     root.style.cssText =
@@ -162,6 +169,8 @@
       "z-index:1030";
     if (getComputedStyle(document.body).position === "static")
       document.body.style.position = "relative";
+    document.body.style.minHeight = "100vh";
+    document.body.style.minHeight = "100dvh";
     document.body.appendChild(root);
   }
 
