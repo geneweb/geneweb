@@ -21,7 +21,7 @@
 %include;menubar
 %include;modules/arbre_descendants
 %include;trl
-%include;copyr
+
 </div>
 %include;js
 %query_time;
