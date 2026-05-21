@@ -222,11 +222,8 @@ td .rm-cell {
   border-color: #f8f9fa;       /* bordure quasi-blanche sur beige = effet 3D subtil */
 }
 
-.modal .listitems > .card {
-  display: inline-block;
-  width: 100%;
-  break-inside: avoid;
-  margin-bottom: .5rem;
+#cousins-modal .modal-dialog {
+  max-width: min(calc(90vw), 2000px);
 }
 
 .min-w-0 {
@@ -265,6 +262,22 @@ td .rm-cell {
 
 .border-double {
   border-left-style: double !important;
+}
+
+.cous-cols {
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.cous-cols > .cous-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
 .overflow-y-scroll {

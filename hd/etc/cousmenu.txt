@@ -136,7 +136,7 @@
   %apply;table()
   <div class="modal fade overflow-y-scroll" id="cousins-modal"
        tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl w-100" style="max-width:1500px">
+    <div class="modal-dialog modal-xl w-100">
       <div class="modal-content bg-transparent border-0">
         <div class="mh-header position-relative p-2 pb-1 rounded-3 bg-linen">
           <div class="modal-title bg-transparent">
@@ -179,9 +179,9 @@
           </div>
         </div>
         <div class="modal-body pt-2">
-          <div class="d-inline-flex align-items-center small text-body-secondary
-                      bg-white rounded-2 px-2 py-1 ms-3 mb-2">
-            <i class="fa-solid fa-fw me-1 sortcuricon"></i>
+          <div class="d-flex justify-content-center small text-body-secondary
+                      bg-white rounded-2 px-2 py-1 mx-3 mb-2">
+            <i class="sortcuricon"></i>
             <span class="me-1">[*sorted by]</span>
             <span class="sortcurlabel"></span>
           </div>
@@ -196,10 +196,9 @@
 
 %define;btn_tpl(xxx,yyy)
   <template id="cousins-xxx">
-    <button type="button" class="btn btn-sm py-0 btn-light cous-hed-nav-btn">
+    <button type="button" class="btn btn-sm py-0 btn-light cous-hed-nav-btn" data-bs-toggle="tooltip">
       <i class="fa-solid fa-yyy fa-fw
-         %if;("xxx"!="nav-diag-tpl")"%else; fa-rotate-by" style="--fa-rotate-angle:45deg"%end;
-         data-bs-toggle="tooltip"></i>
+         %if;("xxx"!="nav-diag-tpl")"%else; fa-rotate-by" style="--fa-rotate-angle:45deg"%end;></i>
          %if;("xxx"!="nav-diag-tpl")<span class="nav-val"></span>%end;
     </button>
   </template>
@@ -249,7 +248,8 @@
   <li class="position-relative d-flex align-items-center text-truncate
              px-2 pe-5 border-top-0 border-bottom-0 border-left-5 z-0"
       role="link" tabindex="0" style="cursor:pointer">
-    <a class="card-name position-relative z-2 text-truncate" href="#"></a>%nn;
+    <a class="card-name position-relative z-2 text-truncate"
+       href="#" data-bs-toggle="tooltip" data-bs-placement="top"></a>%nn;
     <span class="card-edit ms-1 position-relative z-2"></span>%nn;
     <a class="card-r ms-1 position-relative z-3" href="#">%nn;
       <i class="fa-solid fa-link fa-xs"></i></a>

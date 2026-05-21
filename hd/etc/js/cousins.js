@@ -361,8 +361,7 @@ window.Cousins = (function () {
       const btn = node.matches('button') ? node : node.querySelector('button');
       btn.dataset.cell = ti + ':' + tk;
       if (!enabled) btn.classList.add('disabled');
-      const tip = node.querySelector('[data-bs-toggle="tooltip"]');
-      if (tip) tip.setAttribute('data-bs-original-title', ti + '/' + tk);
+      btn.setAttribute('data-bs-original-title', ti + '/' + tk);
       const valSpan = node.querySelector('.nav-val');
       if (valSpan && val != null) valSpan.textContent = val;
       container.appendChild(node);
@@ -377,6 +376,36 @@ window.Cousins = (function () {
           const t = bootstrap.Tooltip.getInstance(el);
           if (t) t.dispose();
         });
+    }
+
+    function balanceColumns(host, colCount) {
+      if (colCount < 2) return;
+      const items = Array.from(host.children);
+      if (items.length === 0) return;
+      const heights = items.map((el) => el.offsetHeight);
+      const cols = Array.from({ length: colCount },
+        () => ({ h: 0, items: [] }));
+      for (let i = 0; i < items.length; i++) {
+        let min = 0;
+        for (let k = 1; k < cols.length; k++)
+          if (cols[k].h < cols[min].h) min = k;
+        cols[min].items.push(items[i]);
+        cols[min].h += heights[i];
+      }
+      host.classList.add('cous-cols');
+      host.innerHTML = '';
+      for (const c of cols) {
+        const div = document.createElement('div');
+        div.className = 'cous-col';
+        for (const it of c.items) div.appendChild(it);
+        host.appendChild(div);
+      }
+    }
+
+    function scheduleBalance(colCount) {
+      const run = () => balanceColumns(listEl, colCount);
+      if (modalEl.classList.contains('show')) requestAnimationFrame(run);
+      else modalEl.addEventListener('shown.bs.modal', run, { once: true });
     }
 
     function populateModal(cell) {
@@ -482,10 +511,12 @@ window.Cousins = (function () {
       }
 
       /* Cards */
-      const mode   = sortTypes[sortIdx].type;
-      const groups = buildGroups(cell.entries, mode);
-      const np = groups.length;
-      colsEl.style.columnCount = np > 31 ? 3 : 2;
+      listEl.classList.remove('cous-cols');
+      const mode     = sortTypes[sortIdx].type;
+      const groups   = buildGroups(cell.entries, mode);
+      const colCount = cell.cnt.dist > 60 ? 3 : 2;
+      const grouped  = mode === 'relation';
+      colsEl.style.columnCount = grouped ? '' : colCount;
       listEl.innerHTML = '';
       const tpl    = document.getElementById('cousins-card-tpl');
       const segTpl = document.getElementById('cousins-seg-tpl');
@@ -502,9 +533,27 @@ window.Cousins = (function () {
         const node = renderCard(tpl, segTpl, memTpl, group, i, j, cell.span);
         if (node) frag.appendChild(node);
       }
+      if (window.bootstrap && bootstrap.Tooltip) {
+        listEl.querySelectorAll('[data-bs-toggle="tooltip"]')
+          .forEach((el) => {
+            const t = bootstrap.Tooltip.getInstance(el);
+            if (t) t.dispose();
+          });
+      }
+      if (window.bootstrap && bootstrap.Popover) {
+        listEl.querySelectorAll('[data-bs-toggle="popover"]')
+          .forEach((el) => {
+            const p = bootstrap.Popover.getInstance(el);
+            if (p) p.dispose();
+          });
+      }
       listEl.replaceChildren(frag);
+      if (grouped) scheduleBalance(colCount);
+      
       applySortLabel();
       ensureTooltips(modalEl);
+      ensureTooltips(listEl);
+      ensurePopovers(listEl);
     }
 
     const sortBtn = modalEl.querySelector('.sortbtn');
@@ -513,7 +562,7 @@ window.Cousins = (function () {
        which matches the initial HTML rendering of the button. */
     const sortTypes = [
       { type: 'relation',
-        icon: 'fa-people-roof',
+        icon: 'fa-bezier-curve',
         label: sortBtn.dataset.lblRelation },
       { type: 'birth',
         icon: 'fa-cake-candles',
@@ -533,11 +582,11 @@ window.Cousins = (function () {
       const next = sortTypes[(sortIdx + 1) % sortTypes.length];
       const ic = sortBtn.querySelector('.sorticon');
       const tp = sortBtn.querySelector('.sorttype');
-      if (ic) ic.className = 'fa-solid ' + next.icon + ' fa-fw me-1 sorticon';
+      if (ic) ic.className = 'fa-solid ' + next.icon + ' fa-fw me-1 mt-1 sorticon';
       if (tp) tp.textContent = next.label;
       const cic = modalEl.querySelector('.sortcuricon');
       const cla = modalEl.querySelector('.sortcurlabel');
-      if (cic) cic.className = 'fa-solid ' + cur.icon + ' fa-fw me-1 sortcuricon';
+      if (cic) cic.className = 'fa-solid ' + cur.icon + ' fa-fw me-1 mt-1 sortcuricon';
       if (cla) cla.textContent = cur.label;
     }
 
@@ -560,6 +609,27 @@ window.Cousins = (function () {
       const li = ev.target.closest('li[data-nav]');
       if (li) window.location.href = li.dataset.nav;
     });
+
+    if (!root._popoverHooked) {
+      root._popoverHooked = true;
+
+      document.addEventListener('click', function (ev) {
+        if (ev.target.closest('.popover a[href]')) {
+          ev.stopImmediatePropagation();
+        }
+      }, true);
+
+      document.addEventListener('click', function (ev) {
+        if (!window.bootstrap || !bootstrap.Popover) return;
+        if (ev.target.closest('.popover')) return;
+        if (ev.target.closest('[data-bs-toggle="popover"]')) return;
+        document.querySelectorAll('[data-bs-toggle="popover"]')
+          .forEach((el) => {
+            const p = bootstrap.Popover.getInstance(el);
+            if (p) p.hide();
+          });
+      });
+    }
 
     function rlmUrlOf(ips, label) {
       let s = PREFIX + 'm=RLM&i1=' + SELF_IP;
@@ -702,6 +772,27 @@ window.Cousins = (function () {
           + sexClass(q.sex) + '"></i>'
         : '';
 
+      const pathIcons = (path) => {
+        const a1P = path.a1 ? persons.get(path.a1) : null;
+        const a2P = path.a2 ? persons.get(path.a2) : null;
+        let primP = a1P, secP = a2P;
+        if (a1P && a2P && a2P.sex === 0 && a1P.sex !== 0) {
+          primP = a2P; secP = a1P;
+        }
+        const c = path.nbr | 0;
+        return (c > 1 ? '<small class="me-1">' + c + '</small>' : '')
+             + ico(primP) + ico(secP);
+      };
+      const pathHref = (path, sIps) => {
+        if (isRel) {
+          const ancs = new Set();
+          if (path.a1) ancs.add(path.a1);
+          if (path.a2) ancs.add(path.a2);
+          return rlmUrlOf([...ancs, ...sIps]);
+        }
+        return rlmUrl(sIps[0], path, lvlA, lvlD);
+      };
+
       segs.forEach(function (s, si) {
         if (si > 0) {
           const hr = document.createElement('hr');
@@ -744,36 +835,46 @@ window.Cousins = (function () {
 
         if (lvlD !== 0) {
           const single = s.ips.length === 1;
-          const rlm = segNode.querySelector('.seg-rlm');
-          rlm.hidden = false;
-          if (isRel) {
-            const ancs = new Set();
-            group.paths.forEach((p) => {
-              if (p.a1) ancs.add(p.a1);
-              if (p.a2) ancs.add(p.a2);
-            });
-            rlm.href = rlmUrlOf([...ancs, ...s.ips]);
-          } else {
-            rlm.href = rlmUrl(s.ips[0], group.paths[0], lvlA, lvlD);
-          }
           const idx = single
             ? gIdx((persons.get(s.ips[0]) || {}).sex)
             : 2;
-          rlm.title = group.paths
-            .map((pp) => relTip(lvlD, pp.a1, pp.a2, idx))
-            .join(' ; ');
-          rlm.innerHTML = group.paths.map(function (path) {
-            const a1P = path.a1 ? persons.get(path.a1) : null;
-            const a2P = path.a2 ? persons.get(path.a2) : null;
-            let primP = a1P, secP = a2P;
-            if (a1P && a2P && a2P.sex === 0 && a1P.sex !== 0) {
-              primP = a2P; secP = a1P;
-            }
-            const c = path.nbr | 0;
-            return '<span class="d-block">'
-              + (c > 1 ? '<small class="me-1">' + c + '</small>' : '')
-              + ico(primP) + ico(secP) + '</span>';
-          }).join('');
+          const rlm = segNode.querySelector('.seg-rlm');
+          rlm.hidden = false;
+          if (group.paths.length === 1) {
+            const path = group.paths[0];
+            rlm.href = pathHref(path, s.ips);
+            rlm.setAttribute('data-bs-toggle', 'tooltip');
+            rlm.setAttribute('data-bs-html', 'true');
+            rlm.setAttribute('data-bs-placement', 'left');
+            rlm.setAttribute('data-bs-title',
+              '<div class="d-flex align-items-center gap-2">'
+              + '<span class="text-nowrap">' + pathIcons(path) + '</span>'
+              + '<span>' + relTip(lvlD, path.a1, path.a2, idx) + '</span>'
+              + '</div>');
+            rlm.innerHTML = pathIcons(path);
+          } else {
+            rlm.removeAttribute('href');
+            rlm.setAttribute('role', 'button');
+            rlm.setAttribute('tabindex', '0');
+            rlm.setAttribute('data-bs-toggle', 'popover');
+            rlm.setAttribute('data-bs-html', 'true');
+            rlm.setAttribute('data-bs-trigger', 'click');
+            rlm.removeAttribute('title');
+            const items = group.paths.map(function (path) {
+              return '<li><a href="' + pathHref(path, s.ips)
+                + '" class="d-flex align-items-center'
+                + ' text-decoration-none gap-2">'
+                + '<span class="text-nowrap">' + pathIcons(path) + '</span>'
+                + '<span>' + relTip(lvlD, path.a1, path.a2, idx) + '</span>'
+                + '</a></li>';
+            }).join('');
+            rlm.setAttribute('data-bs-content',
+              '<ul class="list-unstyled m-0 d-flex flex-column gap-2">'
+              + items + '</ul>');
+            rlm.innerHTML =
+              '<span class="badge rounded-pill badge-sm text-bg-light">'
+              + group.paths.length + '</span>';
+          }
         }
         segsBox.appendChild(segNode);
       });
@@ -1004,6 +1105,19 @@ window.Cousins = (function () {
           html: true, allowList: TOOLTIP_ALLOWLIST,
           trigger: 'hover focus',
           delay: { show: 80, hide: 30 }, container: 'body'
+        });
+      });
+    }
+
+    function ensurePopovers(scope) {
+      if (!window.bootstrap || !bootstrap.Popover) return;
+      scope.querySelectorAll('[data-bs-toggle="popover"]').forEach((el) => {
+        if (bootstrap.Popover.getInstance(el)) return;
+        new bootstrap.Popover(el, {
+          container: 'body',
+          html: true,
+          sanitize: false,
+          trigger: 'click',
         });
       });
     }
