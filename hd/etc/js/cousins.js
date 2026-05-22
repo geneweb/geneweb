@@ -44,8 +44,10 @@ window.Cousins = (function () {
     const loaded  = new Set([0]);
     const pending = new Map();
 
+    const ESCACHE = raw.escache || '';
     const levelUrl = (n) =>
-      PREFIX + 'i=' + enc(SELF_IP) + '&m=C&json_level=' + n;
+      PREFIX + 'i=' + enc(SELF_IP) + '&m=C&json_level=' + n
+      + (ESCACHE ? '&v=' + enc(ESCACHE) : '');
 
     function mergeLevel(resp) {
       if (!resp || !Array.isArray(resp.cells)) return false;

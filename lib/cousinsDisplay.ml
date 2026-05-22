@@ -677,10 +677,12 @@ let emit_cousins_json conf base p =
           | None -> 0
         in
         let abk = List.assoc_opt "access_by_key" conf.base_env = Some "yes" in
+        let escache = (Util.escache_value base :> string) in
         `Assoc
           (("abk", `Bool abk)
           :: ("wizard", `Bool conf.wizard)
           :: ("lvl", `Int lvl)
+          :: ("escache", `String escache)
           :: ("self_iper", `String (Driver.Iper.to_string (Driver.get_iper p)))
           :: fields)
     | other -> other
@@ -706,16 +708,9 @@ let print_cousins_json_level conf base p =
   let sparse = Cousins.init_cousins_cnt conf base ~up_to:level p in
   let slice = Cousins.extract_level sparse level in
   let json = cousins_level_to_json conf base slice in
-  let ttl_s =
-    match List.assoc_opt "cache_cousins_tool" conf.base_env with
-    | Some "yes" -> (
-        match List.assoc_opt "cache_cousins_ttl" conf.base_env with
-        | Some s -> ( try int_of_string s * 3600 with _ -> 3600)
-        | None -> 3600)
-    | _ -> 0
-  in
   Output.header conf "Content-type: application/json; charset=UTF-8";
-  Output.header conf "Cache-control: private, max-age=%d" ttl_s;
+  Output.header conf "Cache-control: private, max-age=%d, immutable"
+    (60 * 60 * 24 * 365);
   Output.print_sstring conf (Yojson.Safe.to_string json)
 
 let print conf base p =
@@ -753,4 +748,5 @@ let print conf base p =
               print_anniv conf base p (t = "AD") max_lvl
           | _ ->
               Perso.interp_templ "cousmenu" conf base p;
-              emit_cousins_json conf base p))
+              emit_cousins_json conf base p;
+              Output.print_sstring conf "</body>\n</html>\n"))
