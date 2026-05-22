@@ -39,6 +39,7 @@ let content conf ct len fname =
     (Filename.basename fname);
   (* TODO: Utiliser un cache public pour les images non personelles. *)
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
+  Output.header conf "Connection: close";
   Output.flush conf
 
 let print_image_file conf fname =
@@ -117,6 +118,7 @@ let print_folder_images_json conf folder =
   in
   Output.status conf Code.OK;
   Output.header conf "Content-type: application/json; charset=utf-8";
+  Output.header conf "Connection: close";
   Output.print_sstring conf json;
   Output.flush conf
 

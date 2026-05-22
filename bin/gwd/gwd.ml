@@ -187,12 +187,14 @@ let copy_file conf fname =
 
 let http conf status =
   Output.status conf status;
-  Output.header conf "Content-type: text/html; charset=iso-8859-1"
+  Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Output.header conf "Connection: close"
 
 let robots_txt conf =
   Log.info (fun k -> k "Robot request");
   Output.status conf Code.OK;
   Output.header conf "Content-type: text/plain";
+  Output.header conf "Connection: close";
   if copy_file conf "robots" then ()
   else (
     Output.print_sstring conf "User-Agent: *\n";
@@ -201,7 +203,6 @@ let robots_txt conf =
 let refuse_log conf from =
   Log.info (fun k -> k "Excluded: %s" from);
   http conf Code.Forbidden;
-  Output.header conf "Content-type: text/html";
   Output.print_sstring conf
     "Your access has been disconnected by administrator.\n";
   let _ = (copy_file conf "refuse" : bool) in
@@ -210,7 +211,6 @@ let refuse_log conf from =
 let only_log conf from =
   Log.info (fun k -> k "Connection refused from %s" from);
   http conf Code.OK;
-  Output.header conf "Content-type: text/html; charset=iso-8859-1";
   Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
   Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
 
@@ -1811,6 +1811,7 @@ let content_misc conf len misc_fname encoding =
   Output.header conf "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
+  Output.header conf "Connection: close";
   Output.flush conf
 
 let find_misc_file conf name =
@@ -2161,6 +2162,7 @@ let geneweb_server ~loaded_plugins ?interface ~port ~daemon ~predictable_mode ()
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Output.header conf "Connection: close";
   Output.print_sstring conf "<head><title>Time out</title></head>\n";
   Output.print_sstring conf "<body><h1>Time out</h1>\n";
   Output.printf conf "Computation time > %d second(s)\n" tmout;

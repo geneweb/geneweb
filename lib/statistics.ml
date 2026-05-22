@@ -716,8 +716,8 @@ let print_json conf base =
   family_pass conf a by_cache auth_cache base;
   let buf = Buffer.create 16384 in
   emit_json buf base a;
-  let charset = if conf.charset = "" then "utf-8" else conf.charset in
-  Output.header conf "Content-type: application/json; charset=%s" charset;
+  Output.header conf "Content-type: application/json; charset=utf-8";
+  Output.header conf "Connection: close";
   Output.print_sstring conf (Buffer.contents buf);
   Output.flush conf
 

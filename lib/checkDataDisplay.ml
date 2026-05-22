@@ -819,6 +819,7 @@ let print_result_as_json conf result =
           ]
   in
   Output.header conf "Content-type: application/json";
+  Output.header conf "Connection: close";
   Output.print_sstring conf (Yojson.Basic.to_string json);
   Output.flush conf
 

@@ -938,6 +938,7 @@ let print_main_c conf base =
                   let redirect_url = base_url ^ params_string in
                   Output.status conf Code.Moved_Temporarily;
                   Output.header conf "Location: %s" redirect_url;
+                  Output.header conf "Connection: close";
                   Output.flush conf)
           | None -> Hutil.incorrect_request conf ~comment:"missing person index"
           )

@@ -120,4 +120,5 @@ let lookup_print conf base =
   in
   Output.status conf Geneweb_http.Code.OK;
   Output.header conf "Content-type: application/json; charset=utf-8";
+  Output.header conf "Connection: close";
   Output.print_sstring conf json

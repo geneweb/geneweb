@@ -711,6 +711,7 @@ let print_cousins_json_level conf base p =
   Output.header conf "Content-type: application/json; charset=UTF-8";
   Output.header conf "Cache-control: private, max-age=%d, immutable"
     (60 * 60 * 24 * 365);
+  Output.header conf "Connection: close";
   Output.print_sstring conf (Yojson.Safe.to_string json)
 
 let print conf base p =
@@ -723,6 +724,7 @@ let print conf base p =
       let _ = Cousins.init_cousins_cnt conf base ~up_to:v p in
       Output.header conf "Content-type: application/json; charset=UTF-8";
       Output.header conf "Cache-control: no-store";
+      Output.header conf "Connection: close";
       Output.print_sstring conf "{\"ok\":true}"
   | _ -> (
       match Util.p_getint conf.env "json_level" with
