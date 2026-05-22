@@ -93,7 +93,7 @@ let make_gzip_output_conf ~level request =
               let oc = Server.woc () in
               let status_line = Code.to_string !status_ref in
               if not !Server.cgi then
-                Printf.fprintf oc "HTTP/1.0 %s\r\n" status_line
+                Printf.fprintf oc "HTTP/1.1 %s\r\n" status_line
               else Printf.fprintf oc "Status: %s\r\n" status_line;
               if is_gzipped then begin
                 output_string oc "Content-Encoding: gzip\r\n";
