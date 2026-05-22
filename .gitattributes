@@ -1,24 +1,29 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
 # Explicitly declare text files you want to always be normalized and converted
 # to native line endings on checkout.
+# Normalize text files to LF by default across platforms.
+# Explicit CRLF is kept only for native Windows-specific files.
+
 *.bat text eol=crlf
-*.config text
-*.cgi text
-*.css text
-*.gw text
-*.gwf text
-*.htm text
-*.html text
-*.in text
 *.iss text eol=crlf
-*.js text
-*.md text
-*.ml text
-*.mli text
-*.opam text
+
+*.config text eol=lf
+*.cgi text eol=lf
+*.css text eol=lf
+*.gw text eol=lf
+*.gwf text eol=lf
+*.htm text eol=lf
+*.html text eol=lf
+*.in text eol=lf
+*.js text eol=lf
+*.md text eol=lf
+*.ml text eol=lf
+*.mli text eol=lf
+*.opam text eol=lf
 *.sh text eol=lf
-*.txt text
-*.1 text
+*.txt text eol=lf
+*.1 text eol=lf
+
 # Denote all files that are truly binary and should not be modified.
 *.bin binary
 *.gwo binary
@@ -27,4 +32,5 @@
 *.icns binary
 *.jpg binary
 *.png binary
+*.woff2 binary
 test/ged2gw.t/*.GED binary
