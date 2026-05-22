@@ -31,17 +31,17 @@
 %define;get_sub(nn,ss)
   %substr_start.nn.ss;
 %end;
-%( %qvar.index.marriage_places; renvoie une chaine avec les places de mariage, séparées par des | %)
+%( %p_of_index.index.marriage_places; renvoie une chaine avec les places de mariage, séparées par des | %)
 %define;get_marriage(myindex)
-  %qvar.myindex.marriage_places_raw;
+  %p_of_index.myindex.marriage_places_raw;
 %end;
 %define;get_value(myindex,param)
   %if;("param"="father" or "param"="mother")
-    %if;(qvar.myindex.has_parents)
-      %qvar.myindex.param;
+    %if;(p_of_index.myindex.has_parents)
+      %p_of_index.myindex.param;
     %end;
   %else;
-    %qvar.myindex.param;
+    %p_of_index.myindex.param;
   %end;
 %end;
 %if;(e.data="place")

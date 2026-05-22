@@ -2444,6 +2444,11 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
            else "")
         ^ "&")
   | "pvar" :: v :: sl -> (
+      (* %pvar.v.surname;
+         direct access to a person defined as iv or pv, nv, ocv in the url
+         get highest index in a list of iN or pN
+         test for existence of person iv or pv, nv, ocv
+      *)
       match v with
       | "highest" ->
           let max_index =
@@ -2471,45 +2476,37 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           | None -> (
               match sl with [ "exist" ] -> VVbool false | _ -> raise Not_found))
       )
-  | "qvar" :: v :: sl ->
-      (* %qvar.index_v.surname;
-         direct access to a person whose index value is v
-      *)
-      let v1 = Driver.Iper.of_string v in
-      let v0 = int_of_string v in
-      if v0 >= 0 && v0 < Driver.nb_of_persons base then
-        let ep = make_ep conf base v1 in
-        if is_hidden (fst ep) then raise Not_found
-        else eval_person_field_var conf base env ep loc sl
-      else raise Not_found
-  | "p_of_index" :: v :: sl ->
+  | "p_of_index" :: v :: sl -> (
       (* %p_of_index.index_v.surname;
          direct access to a person whose index value is v
       *)
-      let i = int_of_string v in
-      if i >= 0 && i < Driver.nb_of_persons base then
-        let ip = Driver.Iper.of_string v in
-        let ep = make_ep conf base ip in
-        if is_hidden (fst ep) then str_val ""
-        else eval_person_field_var conf base env ep loc sl
-      else raise Not_found
-  | "f_of_index" :: v :: sl ->
+      match int_of_string_opt v with
+      | Some i when i >= 0 && i < Driver.nb_of_persons base ->
+          let ip = Driver.Iper.of_string v in
+          let ep = make_ep conf base ip in
+          if is_hidden (fst ep) then str_val ""
+          else eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found)
+  | "f_of_index" :: v :: sl -> (
       (* %f_of_index.index_v.marriage_date;
          direct access to a family whose index value is v
       *)
-      let i = int_of_string v in
-      if i >= 0 && i < Driver.nb_of_families base then
-        let ifam = Driver.Ifam.of_string v in
-        let f, c, a = make_efam conf base (Driver.get_iper a) ifam in
-        eval_family_field_var conf base env (ifam, f, c, a) loc sl
-      else raise Not_found
+      match int_of_string_opt v with
+      | Some i when i >= 0 && i < Driver.nb_of_families base ->
+          let ifam = Driver.Ifam.of_string v in
+          let f, c, a = make_efam conf base (Driver.get_iper a) ifam in
+          eval_family_field_var conf base env (ifam, f, c, a) loc sl
+      | _ -> raise Not_found)
   | [ "set_count"; n; v ] -> (
       match n with
       | "1" | "2" | "3" -> (
           match get_env ("count" ^ n) env with
-          | Vcnt c ->
-              c := int_of_string v;
-              VVstring ""
+          | Vcnt c -> (
+              match int_of_string_opt v with
+              | Some i ->
+                  c := i;
+                  VVstring ""
+              | _ -> raise Not_found)
           | _ -> raise Not_found)
       | _ -> raise Not_found)
   | [ "get_var"; name ] -> (
@@ -2552,18 +2549,21 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
         | Some p -> p
         | None -> if j = 0 then raise Not_found else find_base_p (j - 1)
       in
-      let p0 = find_base_p (int_of_string i) in
-      (* find sosa identified by si= of that person *)
-      match p_getint conf.env ("s" ^ i) with
-      | Some s -> (
-          let s0 = Sosa.of_int s in
-          let ip0 = Driver.get_iper p0 in
-          match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
-          | Some (p :: _) ->
-              let p_auth = authorized_age conf base p in
-              eval_person_field_var conf base env (p, p_auth) loc sl
-          | _ -> raise Not_found)
-      | None -> raise Not_found)
+      match int_of_string_opt i with
+      | Some v -> (
+          let p0 = find_base_p v in
+          (* find sosa identified by si= of that person *)
+          match p_getint conf.env ("s" ^ i) with
+          | Some s -> (
+              let s0 = Sosa.of_int s in
+              let ip0 = Driver.get_iper p0 in
+              match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
+              | Some (p :: _) ->
+                  let p_auth = authorized_age conf base p in
+                  eval_person_field_var conf base env (p, p_auth) loc sl
+              | _ -> raise Not_found)
+          | None -> raise Not_found)
+      | _ -> raise Not_found)
   | "sosa_anc" :: s :: sl -> (
       (* %sosa_anc.sosa.first_name;
          direct access to a person whose sosa relative to sosa_ref is s
