@@ -764,8 +764,16 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
             set l2)
         (Iper.Set.add ia Iper.Set.empty)
         l1
-      |> Iper.Set.elements
     in
+    let set =
+      if p_getenv conf.env "sib" = Some "on" then
+        List.fold_left
+          (fun s (ip, _) -> Iper.Set.add ip s)
+          set
+          (Cousins.siblings conf base ip2)
+      else set
+    in
+    let set = Iper.Set.elements set in
     let spl =
       List.fold_right
         (fun (ip, s) spl ->

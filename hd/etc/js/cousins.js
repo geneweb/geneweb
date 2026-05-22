@@ -173,6 +173,22 @@ window.Cousins = (function () {
            + '&l1=' + lvlA + '&i1=' + SELF_IP
            + '&l2=' + lvlD + '&i2=' + ip + dag;
     }
+    function pParams(p, ip, sfx) {
+      if (IS_ABK && p) {
+        const oc = p.oc ? '&oc' + sfx + '=' + p.oc : '';
+        return 'p' + sfx + '=' + enc(p.fn_key)
+             + '&n' + sfx + '=' + enc(p.sn_key) + oc;
+      }
+      return 'i' + sfx + '=' + ip;
+    }
+    function rlSibUrl(ancIp, sibIp, lvlA, lvlD) {
+      return PREFIX + 'm=RL&dag=on&sib=on&im=0'
+           + '&' + pParams(persons.get(ancIp), ancIp, '')
+           + '&' + pParams(persons.get(SELF_IP), SELF_IP, '1')
+           + '&l1=' + lvlA
+           + '&' + pParams(persons.get(sibIp), sibIp, '2')
+           + '&l2=' + lvlD;
+    }
 
     function sexClass(s) {
       return s === 0 ? 'primary' : s === 1 ? 'danger' : 'dark';
@@ -785,10 +801,9 @@ window.Cousins = (function () {
       };
       const pathHref = (path, sIps) => {
         if (isRel) {
-          const ancs = new Set();
-          if (path.a1) ancs.add(path.a1);
-          if (path.a2) ancs.add(path.a2);
-          return rlmUrlOf([...ancs, ...sIps]);
+          const ancIp = lvlA === 0 ? SELF_IP
+                                   : (path.a1 || path.a2 || SELF_IP);
+          return rlSibUrl(ancIp, sIps[0], lvlA, lvlD);
         }
         return rlmUrl(sIps[0], path, lvlA, lvlD);
       };
