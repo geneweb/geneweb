@@ -1477,9 +1477,6 @@ let number_of_descendants_aux conf base env all_levels sl eval_int =
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
-let undo_parentheses s =
-  Str.global_replace (Str.regexp " ?(\\([^)]*\\))") ", \\1" s
-
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl
   with Not_found -> eval_compound_var conf base env ep loc sl
@@ -3882,9 +3879,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "birth_place_raw" ->
       if p_auth then
-        safe_val
-          (Util.escape_html (Driver.sou base (Driver.get_birth_place p))
-            :> Adef.safe_string)
+        Driver.sou base (Driver.get_birth_place p)
+        |> Place.normalize_place_parens |> str_val
       else null_val
   | "birth_note" ->
       Driver.get_birth_note p
@@ -3898,9 +3894,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "baptism_place_raw" ->
       if p_auth then
-        safe_val
-          (Util.escape_html (Driver.sou base (Driver.get_baptism_place p))
-            :> Adef.safe_string)
+        Driver.sou base (Driver.get_baptism_place p)
+        |> Place.normalize_place_parens |> str_val
       else null_val
   | "baptism_note" ->
       Driver.get_baptism_note p
@@ -3914,9 +3909,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "burial_place_raw" ->
       if p_auth then
-        safe_val
-          (Util.escape_html (Driver.sou base (Driver.get_burial_place p))
-            :> Adef.safe_string)
+        Driver.sou base (Driver.get_burial_place p)
+        |> Place.normalize_place_parens |> str_val
       else null_val
   | "burial_note" ->
       Driver.get_burial_note p
@@ -3983,9 +3977,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "death_place_raw" ->
       if p_auth then
-        safe_val
-          (Util.escape_html (Driver.sou base (Driver.get_death_place p))
-            :> Adef.safe_string)
+        Driver.sou base (Driver.get_death_place p)
+        |> Place.normalize_place_parens |> str_val
       else null_val
   | "death_note" ->
       Driver.get_death_note p
@@ -4155,10 +4148,11 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "marriage_places_raw" ->
       List.fold_left
         (fun acc ifam ->
-          acc
-          ^ (if acc = "" then "" else "|")
-          ^ Driver.sou base (Driver.get_marriage_place (Driver.foi base ifam))
-          |> undo_parentheses)
+          let pl =
+            Driver.sou base (Driver.get_marriage_place (Driver.foi base ifam))
+            |> Place.normalize_place_parens (* per-place, before concat *)
+          in
+          acc ^ (if acc = "" then "" else "|") ^ pl)
         ""
         (Array.to_list (Driver.get_family p))
       |> str_val

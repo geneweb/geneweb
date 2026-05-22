@@ -1323,6 +1323,13 @@ let with_database ?(read_only = false) bname k =
     }
   in
   let persons_of_name = persons_of_name bname patches.h_name in
+  let iter_patched_persons f =
+    Hashtbl.iter (fun i _ -> f i) (snd patches.h_person)
+  in
+  let iter_patched_families f =
+    Hashtbl.iter (fun i _ -> f i) (snd patches.h_family)
+  in
+  let sou_nopending i = im_strings.im_get i in
   let base_func =
     {
       person_of_key = person_of_key persons strings persons_of_name;
@@ -1358,6 +1365,9 @@ let with_database ?(read_only = false) bname k =
       nb_of_real_persons = nbp_read;
       iper_exists;
       ifam_exists;
+      iter_patched_persons;
+      iter_patched_families;
+      sou_nopending;
     }
   in
   k { data = base_data; func = base_func; version }
@@ -1434,6 +1444,9 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       nb_of_real_persons = (fun _ -> assert false);
       iper_exists = (fun _ -> assert false);
       ifam_exists = (fun _ -> assert false);
+      iter_patched_persons = (fun _ -> assert false);
+      iter_patched_families = (fun _ -> assert false);
+      sou_nopending = (fun _ -> assert false);
     }
   in
   k { data; func; version = GnWb0024 }
