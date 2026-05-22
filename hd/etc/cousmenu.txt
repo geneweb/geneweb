@@ -33,7 +33,7 @@
     %dates;%sp;
     %if;(e_v=0 and not has_parents)[and] [a descendant]0%else;[and] [close family]
     %end;
-  </h3>
+  </h1>
   <div id="cousins-totals" class="d-flex flex-column ms-3 flex-shrink-0 my-2">
     <div class="text-end">
       <span class="tot-anc" title="[ancestor/ancestors]1"></span>%nn;
@@ -57,32 +57,32 @@
 %if;(max!=0 and not (max=1 and not has_children))
   <div id="lvl-toolbar" class="d-flex flex-wrap align-self-center btn-toolbar py-0 mx-3 mt-1" role="toolbar" aria-label="buttons to select maximum ascending level v">
     %if;wizard;
-    <button type="button" class="btn btn-sm btn-light btn-sm cacheresetbtn"
+    <button type="button" class="btn btn-sm btn-light btn-sm me-2 cacheresetbtn"
             data-bs-toggle="tooltip" title="[*refresh cache files]">%nn;
       <i class="fa-solid fa-rotate fa-fw"></i></button>
     %end;
-    <span>%for;i;min;maxp;%if;(i=13)<span class="high-lev%if;(e_v<=12) d-none%end;">%end;%apply;picklvl(i)%if;(i=max and max>12)</span>%end;%end;
-      %if;(max>12)
-        <span class="toggle-lev ms-1" data-caution=". [*high generation caution]">
-          <button type="button" class="btn btn-sm btn-danger py-1 m-0" title="[*visualize/show/hide/summary]1 [high generation levels] ([up to] %max;).&#010;[*high generation caution]" ><i class="fa fa-plus"></i></button>
-          <button type="button" class="btn btn-sm btn-light btn-rounded py-1 m-0 d-none" title="[*visualize/show/hide/summary]2 [high generation levels]"><i class="fa fa-minus"></i></button>
-        </span>
-      %end;
-    </span>
+    %for;i;min;maxp;%if;(max>12 and i=13)<span class="high-lev%if;(e_v<=12) d-none%end;">%end;%apply;picklvl(i)%if;(max>12 and i=max)</span>%end;%end;
+    %if;(max>12)
+      <span class="toggle-lev ms-1" data-caution=".
+[*high generation caution]">
+        <button type="button" class="btn btn-sm btn-danger py-1 m-0" title="[*visualize/show/hide/summary]1 [high generation levels] ([up to] %max;).&#010;[*high generation caution]" ><i class="fa fa-plus"></i></button>
+        <button type="button" class="btn btn-sm btn-light btn-rounded py-1 m-0 d-none" title="[*visualize/show/hide/summary]2 [high generation levels]"><i class="fa fa-minus"></i></button>
+      </span>
+    %end;
   </div>
 %end;
 
 %define;link_cousin(vvv,www)
   <button type="button" data-bs-toggle="tooltip" data-bs-html="true" data-cell="vvv:www"
     class="p-1 mx-1 btn-light position-relative%if;(vvv+www=0) disabled%end; h-4">
-    <div class="d-flex justify-content-around stretched-link h-100"
+    <span class="d-flex justify-content-around stretched-link h-100"
       data-bs-toggle="modal" data-bs-target="#cousins-modal">
-      <div class="cell-label order-2 w-75 align-self-center text-bottom ms-1"></div>
-      <div class="d-flex justify-content-end align-self-center text-end">
-        <div class="cell-count h5 mt-2 py-0 pe-0
-          text-%if;(vvv=0)info%elseif;(vvv%2=1)primary%else;danger%end;"></div>
-      </div>
-    </div>
+      <span class="cell-label order-2 w-75 align-self-center text-bottom ms-1"></span>
+      <span class="d-flex justify-content-end align-self-center text-end">
+        <span class="cell-count h5 mt-2 py-0 pe-0
+          text-%if;(vvv=0)info%elseif;(vvv%2=1)primary%else;danger%end;"></span>
+      </span>
+    </span>
   </button>
 %end;
 %( table of cousins.j-vvv+i.i c(k,i) | table size = v × (v+%cousins.max_d;)
@@ -258,6 +258,7 @@
 </section>
 %include;trl
 %include;copyr
+  </div>
 </div>
 %include;overlay
 <script id="cousins-lex" type="application/json">{
@@ -293,5 +294,5 @@
 }</script>
 %include;js
 %query_time;
-</body>
-</html>
+%( closing tags </body></html> are emited by cousinsDisplay.print 
+   so that extra json fetched <script>s emited afer template are contained in body %)

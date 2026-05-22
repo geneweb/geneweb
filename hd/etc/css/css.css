@@ -320,6 +320,11 @@ td .rm-cell {
   pointer-events: none;
 }
 
+/* .high-lev wraps buttons 13..max for the toggle target; with display:contents
+   it becomes layout-transparent so its children participate in #lvl-toolbar's
+   flex-wrap directly. .d-none overrides via !important so hiding still works. */
+.high-lev { display: contents; }
+
 /* Visibility coexists with .invisible (set by hydrateMatrix for empty cells):
    - .invisible reserves layout space, used inside the displayed range
    - .beyond-lvl removes from flow, used outside the displayed ceiling */
@@ -2273,10 +2278,6 @@ span.notesourcecolor {
 .popover{
     word-wrap: break-word;
     max-width: 40%;
-}
-
-.d-flex.flex-wrap {
-  gap: 0.5rem;
 }
 
 #welcome .flex-wrap {
