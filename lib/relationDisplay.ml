@@ -587,7 +587,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
         Output.print_sstring conf (Util.images_prefix conf);
         Output.print_sstring conf {|/picto_rel_small.png" alt="">|};
         let href =
-          commd ~excl:[ "m"; "l1"; "l2"; "dag"; "im" ] conf
+          commd ~excl:[ "m"; "l1"; "l2"; "dag"; "im"; "em"; "ei"; "et" ] conf
           ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1=" ^<^ string_of_int x1
           ^<^ "&"
           ^<^ acces_n conf base (Adef.escaped "1") dp1
@@ -702,7 +702,7 @@ let print_dag_links conf base p1 p2 rl =
             Output.print_sstring conf (Util.transl conf ":");
             Output.print_sstring conf " ");
           Output.print_sstring conf "<a href=\"";
-          Output.print_string conf (commd ~excl:[ "m" ] conf);
+          Output.print_string conf (commd ~excl:[ "m"; "em"; "ei"; "et" ] conf);
           Output.print_sstring conf "m=RL&";
           Output.print_string conf (acces conf base a);
           Output.print_sstring conf "&";

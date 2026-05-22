@@ -45,7 +45,7 @@
   %elseif;(e.m="RL")[*path between]
       %person_index.1.first_name; %person_index.1.surname;
       %sp;[and]
-      %person_index.2.first_name; %person_index.2.surname;
+      %person_index.2.first_name; %person_index.2.surname;%if;(e.sib="on") ([with] [siblings])%end;
   %else;[*shortest path]
   %end;
   %if;(e.m="A" or e.m="D")
