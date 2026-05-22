@@ -66,6 +66,12 @@ type base_func = {
   nb_of_real_persons : unit -> int;
   iper_exists : int -> bool;
   ifam_exists : int -> bool;
+  iter_patched_persons : (int -> unit) -> unit;
+      (** Iterate over all iper present in the patches hashtable. *)
+  iter_patched_families : (int -> unit) -> unit;
+      (** Iterate over all ifam present in the patches hashtable. *)
+  sou_nopending : int -> string;
+      (** Read a string from the base without patches (im_get). *)
 }
 
 type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024

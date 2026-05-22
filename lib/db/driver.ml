@@ -877,3 +877,40 @@ let nobtitles base allowed_titles denied_titles p =
 
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
+
+(*  Returns the directory path of the database on disk. *)
+let bdir base = base.data.bdir
+
+(* ------------------------------------------------------------------ *)
+(* Accès sans patches (base principale uniquement)                    *)
+(* ------------------------------------------------------------------ *)
+
+(** Lit la chaîne [i] depuis la base principale, sans tenir compte des patches
+    en mémoire. Utilisé par le cache PPS pour connaître l'ancienne valeur d'un
+    champ avant une modification. *)
+let sou_nopending base i = base.data.strings.get_nopending i
+
+(** Construit un objet [person] dont les données sont lues depuis la base
+    principale (sans patches). Les champs [a] et [u] restent lazy (None) et
+    seront chargés depuis la base patchée si besoin. *)
+let poi_nopending base iper =
+  let p = base.data.persons.get_nopending iper in
+  { base; iper; p = Some p; a = None; u = None }
+
+(** Construit un objet [family] dont les données sont lues depuis la base
+    principale (sans patches). *)
+let foi_nopending base ifam =
+  let f = base.data.families.get_nopending ifam in
+  { base; ifam; f = Some f; c = None; d = None }
+
+(* ------------------------------------------------------------------ *)
+(* Itération sur les entrées patchées                                  *)
+(* ------------------------------------------------------------------ *)
+
+(** Itère [f] sur tous les [iper] présents dans le fichier patches, c'est-à-dire
+    les personnes modifiées depuis le dernier [gwc]. Ordre non spécifié. *)
+let iter_patched_ipers base f = base.func.Dbdisk.iter_patched_persons f
+
+(** Itère [f] sur tous les [ifam] présents dans le fichier patches, c'est-à-dire
+    les familles modifiées depuis le dernier [gwc]. Ordre non spécifié. *)
+let iter_patched_ifams base f = base.func.Dbdisk.iter_patched_families f

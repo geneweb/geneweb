@@ -144,6 +144,16 @@ type base_func = {
   (* Tells if family with giving id exists in the base.
      Pending patches are also considered. *)
   ifam_exists : int -> bool;
+  (* Iterate over all iper present in the committed patches hashtable.
+     Used by the PPS cache to enumerate persons modified since the last gwc. *)
+  iter_patched_persons : (int -> unit) -> unit;
+  (* Iterate over all ifam present in the committed patches hashtable.
+     Used by the PPS cache to enumerate families modified since the last gwc. *)
+  iter_patched_families : (int -> unit) -> unit;
+  (* Read a string from the base without taking committed or pending patches
+     into account (uses im_get directly).
+     Used by the PPS cache to retrieve the pre-patch value of a place string. *)
+  sou_nopending : int -> string;
 }
 (** Functionality part of database. Every modification of the base is stored in
     {i patches} file. Note that, every modification firstly is pendent and
