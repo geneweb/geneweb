@@ -109,8 +109,8 @@ let parse_keys env =
   head @ collect 1 []
 
 let print conf _base =
-  let charset = if conf.charset = "" then "utf-8" else conf.charset in
-  Output.header conf "Content-type: application/json; charset=%s" charset;
+  Output.header conf "Content-type: application/json; charset=utf-8";
+  Output.header conf "Connection: close";
   let src = match p_getenv conf.env "src" with Some s -> s | None -> "key" in
   let dir = p_getenv conf.env "dir" in
   let json =

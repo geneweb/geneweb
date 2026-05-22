@@ -489,11 +489,9 @@ let treat_request =
                          in
                          NotesDisplay.print_what_links conf base fnotes
                      | _, Some "on" ->
-                         let charset =
-                           if conf.charset = "" then "utf-8" else conf.charset
-                         in
                          Output.header conf
-                           "Content-type: application/json; charset=%s" charset;
+                           "Content-type: application/json; charset=utf-8";
+                         Output.header conf "Connection: close";
                          NotesDisplay.print_gallery_json conf base
                      | _ -> NotesDisplay.print_gallery conf base)
              | "MOD_GALLERY" ->
@@ -501,11 +499,8 @@ let treat_request =
                  @@ w_base (fun conf base ->
                      match p_getenv conf.env "ajax" with
                      | Some "on" ->
-                         let charset =
-                           if conf.charset = "" then "utf-8" else conf.charset
-                         in
                          Output.header conf
-                           "Content-type: application/json; charset=%s" charset;
+                           "Content-type: application/json; charset=utf-8";
                          NotesDisplay.print_mod_gallery_json conf base
                      | _ -> NotesDisplay.print_mod_gallery conf base)
              | "MOD_GALLERY_OK" ->
@@ -765,7 +760,8 @@ let treat_request =
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
                  Output.status conf Code.OK;
-                 Output.header conf "Content-type: text";
+                 Output.header conf "Content-type: text/plain";
+                 Output.header conf "Connection: close";
                  List.iter
                    (fun s ->
                      Output.print_sstring conf s;

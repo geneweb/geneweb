@@ -313,6 +313,8 @@ let output_error =
   in
   fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
     Output.status conf code;
+    Output.header conf "Content-type: text/html; charset=utf-8";
+    Output.header conf "Connection: close";
     List.iter (Output.header conf "%s") headers;
     Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
     match content with

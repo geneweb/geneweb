@@ -540,8 +540,7 @@ let string_of_ctime conf =
     lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 
 let html ?(content_type = "text/html") conf =
-  let charset = if conf.charset = "" then "utf-8" else conf.charset in
-  Output.header conf "Content-type: %s; charset=%s" content_type charset;
+  Output.header conf "Content-type: %s; charset=utf-8" content_type;
   if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.ver;
   Output.header conf "Date: %s" (string_of_ctime conf);
   Output.header conf "Connection: close"
@@ -551,6 +550,7 @@ let unauthorized conf auth_type =
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
   Output.header conf "Content-type: text/html; charset=%s" conf.charset;
+  Output.header conf "Connection: close";
   Output.print_sstring conf "<head><title>Access failed</title></head>\n";
   Output.print_sstring conf "<body><h1>Access failed</h1>\n";
   Output.printf conf "<ul><li>%s</ul>\n" auth_type;
