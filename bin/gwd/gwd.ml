@@ -1808,9 +1808,7 @@ let content_misc conf len misc_fname encoding =
   | Brotli ->
       Output.header conf "Content-encoding: br";
       Output.header conf "Vary: Accept-Encoding");
-  Output.header conf "Content-disposition: inline; filename=%s"
-    (Filename.basename fname);
-  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
+  Output.header conf "Cache-control: public, max-age=%d" (60 * 60 * 24 * 365);
   Output.header conf "Connection: close";
   Output.flush conf
 
