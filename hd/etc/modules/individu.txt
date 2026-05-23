@@ -65,7 +65,7 @@
         %if;not is_first;,%sp;%end;
         %if;(nob_title.nth!="" and nob_title.nth>0)%apply;nth%with;[nth]%and;%nob_title.nth;%end; %end;%nn;
         %if;not cancel_links;
-          <a href="%prefix;m=TT&sm=S&t=%apply;uri_encode(nob_title.title)&p=%if;(nob_title.places!="")%apply;uri_encode(nob_title.places)%end;">%nn;
+          <a href="%prefix;m=TT&sm=S&t=%apply;url_encode(nob_title.title)&p=%if;(nob_title.places!="")%apply;uri_encode(nob_title.places)%end;">%nn;
         %end;
           %nob_title.title;%if;(nob_title.places!="")%sp;%nob_title.places;%end;%nn;
         %if;not cancel_links;</a>%end;
