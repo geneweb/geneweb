@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 11/04/2026 02:05:28 $ -->
+<!-- $Id: js.txt v7.1 23/05/2026 05:02:11 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -830,6 +830,53 @@ function populateDatalists() {
 
   datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
 }
+%end;
+%if;(e.templ="" and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
+%define;language(x)
+  %apply;nth%with;
+    af/ar/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/%nn;
+    it/lt/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
+    %and;x%end;
+%end;
+%( Hydrate the language selector skeleton emitted by copyr.txt. Names come
+   from the !languages lexicon entry, translated server-side for the
+   current lang. %)
+(() => {
+  const menu = document.getElementById('language-menu');
+  if (!menu) return;
+  const names = {%nn;
+    %for;i;0;32;%let;l1;%apply;language(i)%in;%nn;
+      %if;(i>0),%end;'%l1;':'%apply;language_name(l1)'%nn;
+    %end;
+  };
+  const def = '%b.default_lang;';
+  %( TODO file= is stripped to flush any image-upload param carried over a
+     lang switch; legacy hack inherited from the lang_file pattern in
+     copyr.txt, should move to the request handler. %)
+  const hrefFor = t => {
+    const u = new URL(window.location.href);
+    u.searchParams.delete('file');
+    if (t === def) u.searchParams.delete('lang');
+    else u.searchParams.set('lang', t);
+    return u.pathname + u.search + u.hash;
+  };
+  const frag = document.createDocumentFragment();
+  for (const l of Object.keys(names)) {
+    if (l === '%lang;') continue;
+    const a = document.createElement('a');
+    a.className = 'dropdown-item' + (l === def ? ' bg-warning' : '');
+    a.id = 'lang_' + l;
+    a.href = hrefFor(l);
+    const code = document.createElement('code');
+    code.textContent = (l === 'pt-br' ? l : l + '\u00a0\u00a0\u00a0') + ' ';
+    a.appendChild(code);
+    const n = names%[l%];
+    a.appendChild(document.createTextNode(
+      n.charAt(0).toUpperCase() + n.slice(1)));
+    frag.appendChild(a);
+  }
+  menu.appendChild(frag);
+})();
 %end;
 const initTooltips = () => {
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
