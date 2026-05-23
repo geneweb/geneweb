@@ -56,7 +56,7 @@
       </a>
     %end;
   </div>
-  <div class="modal" id="searchmodal" aria-labelledby="searchpopup" aria-hidden="true">
+  <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-body" id="ModalSearch">

@@ -1,4 +1,5 @@
-  <!-- $Id: css.txt v7.1 11/04/2026 02:10:10 $ -->
+  <!-- $Id: css.txt v7.1 23/05/2026 18:51:27 $ -->
+<meta name="format-detection" content="telephone=no">
 %( Put here only properties that uses variables %)
 %if;(e.m="MISC_NOTES")
   <style>
@@ -8,8 +9,7 @@
   </style>
 %end;
 %if;(b.underline_hyperlink="no")
-<style>   a:not(.btn):not(.nav-link) { text-decoration: none; }
-</style>
+<style>a:not(.btn):not(.nav-link) { text-decoration: none; }</style>
 %end;
 %if;(e.templ!="templ")
   %if;(bvar.use_cdn="yes")

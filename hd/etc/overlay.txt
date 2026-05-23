@@ -3,7 +3,7 @@
     <div class="spinner-border text-light mb-3" role="status">
       <span class="visually-hidden">Loading…</span>
     </div>
-    <h4>[*waiting overlay]0</h4>
+    <div class="h4">[*waiting overlay]0</div>
     <p>[*waiting overlay]1</p>
   </div>
 </div>
