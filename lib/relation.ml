@@ -161,25 +161,34 @@ let rec belongs_to_branch ip dist = function
 
 (* FIXME: remove Array.to_list and List.hd !!*)
 let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
-  let anc, _ = List.hd list in
+  let anc =
+    match list with
+    | (a, _) :: _ -> a
+    | [] -> failwith "Relation.get_piece_of_branch: empty ancestor list"
+  in
   let rec loop ip dist =
     if dist <= len1 then []
     else
-      let lens = proj @@ Collection.Marker.get reltab ip in
-      let rec loop1 = function
-        | ifam :: ifaml ->
-            let rec loop2 = function
-              | ipc :: ipl ->
-                  if belongs_to_branch ipc dist lens then
-                    let dist = dist - 1 in
-                    if dist <= len2 then ipc :: loop ipc dist else loop ipc dist
-                  else loop2 ipl
-              | [] -> loop1 ifaml
-            in
-            loop2 (Array.to_list (Driver.get_children (Driver.foi base ifam)))
-        | [] -> []
+      let lens = proj (Collection.Marker.get reltab ip) in
+      let families = Driver.get_family (Util.pget conf base ip) in
+      let nf = Array.length families in
+      let rec loop_fam i =
+        if i >= nf then []
+        else
+          let children = Driver.get_children (Driver.foi base families.(i)) in
+          let nc = Array.length children in
+          let rec loop_chi j =
+            if j >= nc then loop_fam (i + 1)
+            else
+              let ipc = children.(j) in
+              if belongs_to_branch ipc dist lens then
+                let dist = dist - 1 in
+                if dist <= len2 then ipc :: loop ipc dist else loop ipc dist
+              else loop_chi (j + 1)
+          in
+          loop_chi 0
       in
-      loop1 (Array.to_list (Driver.get_family (Util.pget conf base ip)))
+      loop_fam 0
   in
   loop (Driver.get_iper anc) x
 
