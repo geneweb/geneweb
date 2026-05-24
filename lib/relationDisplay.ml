@@ -334,27 +334,21 @@ let print_shortest_path conf base p1 p2 =
         | _ ->
             let conf = { conf with is_printed_by_template = false } in
             Templ.output_simple conf Templ.Env.empty "buttons_rel");
-        if excl_faml = [] then (
-          ([ s1; s2 ] : Adef.safe_string list :> string list)
-          |> Util.cftransl conf "no known relationship link between %s and %s"
-          |> Utf8.capitalize_fst |> Output.print_sstring conf;
-          Output.print_sstring conf ".<br><p><span><a href=\"";
-          Output.print_string conf (Util.commd ~excl:[ "m" ] conf);
-          Output.print_sstring conf "&m=R&";
-          Output.print_string conf (Util.acces conf base p1);
-          Output.print_sstring conf "\">";
-          Util.transl_nth conf "try another/relationship computing" 0
-          |> Utf8.capitalize_fst |> Output.print_sstring conf;
-          Output.print_sstring conf "</a> ";
-          Util.transl_nth conf "try another/relationship computing" 1
-          |> Output.print_sstring conf;
-          Output.print_sstring conf "</span></p>")
-        else (
-          Output.print_sstring conf "<ul><li>";
-          Output.print_string conf s1;
-          Output.print_sstring conf "</li><li>";
-          Output.print_string conf s2;
-          Output.print_sstring conf "</ul>");
+        if excl_faml = [] then
+          Output.printf conf
+            {|%s.<br><p><span><a href="%s&m=R&%s">%s</a> %s</span></p>|}
+            (([ s1; s2 ] : Adef.safe_string list :> string list)
+            |> Util.cftransl conf "no known relationship link between %s and %s"
+            |> Utf8.capitalize_fst)
+            (Util.commd ~excl:[ "m" ] conf :> string)
+            (Util.acces conf base p1 :> string)
+            (Util.transl_nth conf "try another/relationship computing" 0
+            |> Utf8.capitalize_fst)
+            (Util.transl_nth conf "try another/relationship computing" 1)
+        else
+          Output.printf conf "<ul><li>%s</li><li>%s</ul>"
+            (s1 : Adef.safe_string :> string)
+            (s2 : Adef.safe_string :> string);
         Hutil.trailer conf
 
 let parents_label conf base ctx = function
