@@ -61,7 +61,7 @@ let compute_cell_data conf base tstab p1 p2 =
   let ip2 = Driver.get_iper p2 in
   match Relation.compute_simple_relationship conf base tstab ip1 ip2 with
   | None -> None
-  | Some (paths, total, coeff, _) -> Some { paths; total; coeff }
+  | Some (paths, total, coeff, _, _) -> Some { paths; total; coeff }
 
 (* Fonction utilitaire pour obtenir le nom simple d'une personne *)
 let get_person_simple_name base person =

@@ -295,12 +295,17 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
           { l1; l2; anc = anc_list })
         rl
     in
-    Some (paths_with_ifams, total, relationship, ancestors_with_ifam)
+    Some
+      ( paths_with_ifams,
+        total,
+        relationship,
+        ancestors_with_ifam,
+        tab.Consang.reltab )
 
 let compute_simple_relationship_compat conf base tstab ip1 ip2 =
   match compute_simple_relationship conf base tstab ip1 ip2 with
   | None -> None
-  | Some (paths, total, relationship, _) ->
+  | Some (paths, total, relationship, _, reltab) ->
       let rl =
         List.map
           (fun path ->
@@ -310,7 +315,6 @@ let compute_simple_relationship_compat conf base tstab ip1 ip2 =
             (path.l1, path.l2, person_list))
           paths
       in
-      let reltab = (Consang.make_relationship_info base tstab).Consang.reltab in
       Some (rl, total, relationship, reltab)
 
 let known_spouses_list conf base p excl_p =

@@ -94,17 +94,22 @@ val compute_simple_relationship :
   (path_f list
   * Geneweb_sosa.t
   * float
-  * (Geneweb_db.Driver.iper * Geneweb_db.Driver.ifam) list)
+  * (Geneweb_db.Driver.iper * Geneweb_db.Driver.ifam) list
+  * ( Geneweb_db.Driver.iper,
+      Consang.relationship )
+    Geneweb_db.Collection.Marker.t)
   option
 (** [compute_simple_relationship conf base tstab ip1 ip2] computes the
     relationship between [ip1] and [ip2] using the topological sort [tstab]
     (typically built via {!Util.create_topological_sort}). Returns:
     - [None] when no relationship exists;
-    - [Some (paths, total, coefficient, anc_ifams)] otherwise, where [paths]
-      groups {!path_f} by [(l1, l2)] cell, [total] is the cumulated path
+    - [Some (paths, total, coefficient, anc_ifams, reltab)] otherwise, where
+      [paths] groups {!path_f} by [(l1, l2)] cell, [total] is the cumulated path
       multiplicity as a Sosa number, [coefficient] is the consanguinity
-      coefficient, and [anc_ifams] is the raw [(ancestor_iper, ifam)] list from
-      {!Consang.relationship_and_links}.
+      coefficient, [anc_ifams] is the raw [(ancestor_iper, ifam)] list from
+      {!Consang.relationship_and_links}, and [reltab] is the Consang marker
+      built for this computation (made available to avoid recomputing it in
+      callers that need both shapes).
 
     Used by {!Geneweb.RelationMatrix} which works directly on cells.
     Higher-level callers should prefer {!compute_relationship} which also
