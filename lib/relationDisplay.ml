@@ -778,42 +778,34 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
     (fun (a, n) ->
       Output.print_sstring conf "<li>\n";
       Output.print_string conf (Util.person_title_text conf base a);
-      Output.print_sstring conf "\n<em>(";
-      Output.print_sstring conf (string_of_int n);
-      Output.print_sstring conf " ";
-      (if n = 1 then 0 else 1)
-      |> Util.transl_nth conf "relationship link/relationship links"
-      |> Output.print_sstring conf;
-      Output.print_sstring conf ")</em> &nbsp;";
-      if not long then (
-        let propose_dag = n > 1 && n <= 10 in
-        let dp1 = match pp1 with Some p -> p | _ -> p1 in
-        let dp2 = match pp2 with Some p -> p | _ -> p2 in
-        Output.print_sstring conf {|<img src="|};
-        Output.print_sstring conf (Util.images_prefix conf);
-        Output.print_sstring conf {|/picto_rel_small.png" alt="">|};
-        let href =
-          Util.commd
-            ~excl:[ "m"; "l1"; "l2"; "dag"; "im"; "em"; "ei"; "et" ]
-            conf
-          ^^^ "m=RL&" ^<^ Util.acces conf base a ^^^ "&l1=" ^<^ string_of_int x1
-          ^<^ "&"
-          ^<^ Util.acces_n conf base (Adef.escaped "1") dp1
-          ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
-          ^<^ Util.acces_n conf base (Adef.escaped "2") dp2
-          ^^^ (if pp1 = None then Adef.escaped ""
-               else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
-          ^^^ (if pp2 = None then Adef.escaped ""
-               else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
-          ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
-          ^>^ if img then "" else "&im=0"
-        in
-        Output.print_sstring conf {|<a href="|};
-        Output.print_string conf href;
-        Output.print_sstring conf {|">|};
-        Util.transl conf "see" |> Utf8.capitalize_fst
-        |> Output.print_sstring conf;
-        Output.print_sstring conf "</a>");
+      Output.printf conf {|<em>(%d %s)</em> &nbsp;|} n
+        (Util.transl_nth conf "relationship link/relationship links"
+           (if n = 1 then 0 else 1));
+      (if not long then
+         let propose_dag = n > 1 && n <= 10 in
+         let dp1 = match pp1 with Some p -> p | _ -> p1 in
+         let dp2 = match pp2 with Some p -> p | _ -> p2 in
+         let href =
+           Util.commd
+             ~excl:[ "m"; "l1"; "l2"; "dag"; "im"; "em"; "ei"; "et" ]
+             conf
+           ^^^ "m=RL&" ^<^ Util.acces conf base a ^^^ "&l1="
+           ^<^ string_of_int x1 ^<^ "&"
+           ^<^ Util.acces_n conf base (Adef.escaped "1") dp1
+           ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
+           ^<^ Util.acces_n conf base (Adef.escaped "2") dp2
+           ^^^ (if pp1 = None then Adef.escaped ""
+                else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
+           ^^^ (if pp2 = None then Adef.escaped ""
+                else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
+           ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
+           ^>^ if img then "" else "&im=0"
+         in
+         Output.printf conf
+           {|<img class="mr-1 align-self-center" src="%s/picto_rel_small.png" alt=""><a href="%s">%s</a>|}
+           (Util.images_prefix conf :> string)
+           (href :> string)
+           (Util.transl conf "see" |> Utf8.capitalize_fst));
       Output.print_sstring conf "</li>")
     list;
   Output.print_sstring conf "</ul>";
