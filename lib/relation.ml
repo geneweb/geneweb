@@ -159,17 +159,27 @@ let rec belongs_to_branch ip dist = function
       else belongs_to_branch ip dist lens
   | [] -> false
 
-(* FIXME: remove Array.to_list and List.hd !!*)
-let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
+type branch_pos = {
+  reltab : (Driver.iper, Consang.relationship) Collection.Marker.t;
+  ancestors : (Driver.person * int) list;
+  degree : int;
+}
+
+type branch_ctx = {
+  pos : branch_pos;
+  proj : Consang.relationship -> (int * int * Driver.iper list) list;
+}
+
+let get_piece_of_branch conf base ctx (len1, len2) =
   let anc =
-    match list with
+    match ctx.pos.ancestors with
     | (a, _) :: _ -> a
     | [] -> failwith "Relation.get_piece_of_branch: empty ancestor list"
   in
   let rec loop ip dist =
     if dist <= len1 then []
     else
-      let lens = proj (Collection.Marker.get reltab ip) in
+      let lens = ctx.proj (Collection.Marker.get ctx.pos.reltab ip) in
       let families = Driver.get_family (Util.pget conf base ip) in
       let nf = Array.length families in
       let rec loop_fam i =
@@ -190,7 +200,7 @@ let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
       in
       loop_fam 0
   in
-  loop (Driver.get_iper anc) x
+  loop (Driver.get_iper anc) ctx.pos.degree
 
 let compute_simple_relationship conf base tstab ip1 ip2 =
   let tab = Consang.make_relationship_info base tstab in

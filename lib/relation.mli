@@ -52,25 +52,36 @@ val get_shortest_path_relation :
 
 (** {1 Path inspection} *)
 
+type branch_pos = {
+  reltab :
+    ( Geneweb_db.Driver.iper,
+      Consang.relationship )
+    Geneweb_db.Collection.Marker.t;
+  ancestors : (Geneweb_db.Driver.person * int) list;
+  degree : int;
+}
+(** Position information common to all branch-related label lookups: the Consang
+    marker, the ancestor list at the current relationship cell, and the depth at
+    which to start descending. *)
+
+type branch_ctx = {
+  pos : branch_pos;
+  proj : Consang.relationship -> (int * int * Geneweb_db.Driver.iper list) list;
+}
+(** Full branch context: position plus the projection that selects which side of
+    the consang lens ([lens1] or [lens2]) {!get_piece_of_branch} should follow
+    to disambiguate gendered kinship labels. *)
+
 val get_piece_of_branch :
   config ->
   Geneweb_db.Driver.base ->
-  ((( Geneweb_db.Driver.iper,
-      Consang.relationship )
-    Geneweb_db.Collection.Marker.t
-   * (Geneweb_db.Driver.person * int) list)
-  * int)
-  * (Consang.relationship -> (int * int * Geneweb_db.Driver.iper list) list) ->
+  branch_ctx ->
   int * int ->
   Geneweb_db.Driver.iper list
-(** [get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2)]
-    walks the [proj] sub-branches of the ancestor [List.hd list] (whose Consang
-    relationship is in [reltab]) at degree [x], collecting the iper of every
-    person strictly above degree [len2] and at most [len1]. Used by
-    {!Geneweb.RelationDisplay} to pick witness persons that disambiguate
-    gendered kinship labels (e.g. choosing between "uncle" and "aunt"). The
-    nested-tuple shape mirrors the call site verbatim and is intended to be
-    flattened in a future refactor. *)
+(** [get_piece_of_branch conf base ctx (len1, len2)] walks the [ctx.proj]
+    sub-branches of the first ancestor in [ctx.pos.ancestors] (whose Consang
+    relationship is in [ctx.pos.reltab]) at depth [ctx.pos.degree], collecting
+    the iper of every person strictly above degree [len2] and at most [len1]. *)
 
 (** {1 Relationship computation} *)
 

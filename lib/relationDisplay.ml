@@ -283,6 +283,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   ^<^ (if sps then "" else "&sp=0")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
 
+(* FIXME: remove Array.to_list ?!*)
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then (
     let title _ =
@@ -355,16 +356,16 @@ let print_shortest_path conf base p1 p2 =
           Output.print_sstring conf "</ul>");
         Hutil.trailer conf
 
-let parents_label conf base info = function
+let parents_label conf base ctx = function
   | 1 -> Util.transl conf "the parents" |> Adef.safe
   | 2 ->
       let txt = Util.transl conf "grand-parents" in
       let is =
         if Util.nb_fields txt = 2 then
-          match Relation.get_piece_of_branch conf base info (1, 1) with
+          match Relation.get_piece_of_branch conf base ctx (1, 1) with
           | [ ip1 ] ->
               if Driver.get_sex (Util.pget conf base ip1) = Male then 0 else 1
-          | _ -> (* must be a bug *) 0
+          | _ -> 0
         else 0
       in
       Util.nth_field txt is |> Adef.safe
@@ -372,10 +373,10 @@ let parents_label conf base info = function
       let txt = Util.transl conf "great-grand-parents" in
       let is =
         if Util.nb_fields txt = 2 then
-          match Relation.get_piece_of_branch conf base info (1, 1) with
+          match Relation.get_piece_of_branch conf base ctx (1, 1) with
           | [ ip1 ] ->
               if Driver.get_sex (Util.pget conf base ip1) = Male then 0 else 1
-          | _ -> (* must be a bug *) 0
+          | _ -> 0
         else 0
       in
       Util.nth_field txt is |> Adef.safe
@@ -393,7 +394,7 @@ let parent_in_law_label conf child_sex parent_sex =
   if Util.nb_fields txt = 2 then Util.nth_field txt is |> Adef.safe
   else Util.nth_field txt ((2 * Util.index_of_sex child_sex) + is) |> Adef.safe
 
-let ancestor_label conf base info x sex =
+let ancestor_label conf base ctx x sex =
   let is = Util.index_of_sex sex in
   match x with
   | 1 -> Util.transl_nth conf "the father/the mother/a parent" is |> Adef.safe
@@ -401,11 +402,11 @@ let ancestor_label conf base info x sex =
       let txt = Util.transl conf "a grandfather/a grandmother/a grandparent" in
       let is =
         if Util.nb_fields txt = 6 then
-          match Relation.get_piece_of_branch conf base info (1, 1) with
+          match Relation.get_piece_of_branch conf base ctx (1, 1) with
           | [ ip1 ] ->
               if Driver.get_sex (Util.pget conf base ip1) = Male then is
               else is + 3
-          | _ -> (* must be a bug *) is
+          | _ -> is
         else is
       in
       Util.nth_field txt is |> Adef.safe
@@ -416,11 +417,11 @@ let ancestor_label conf base info x sex =
       in
       let is =
         if Util.nb_fields txt = 6 then
-          match Relation.get_piece_of_branch conf base info (1, 1) with
+          match Relation.get_piece_of_branch conf base ctx (1, 1) with
           | [ ip1 ] ->
               if Driver.get_sex (Util.pget conf base ip1) = Male then is
               else is + 3
-          | _ -> (* must be a bug *) is
+          | _ -> is
         else is
       in
       Util.nth_field txt is |> Adef.safe
@@ -438,7 +439,7 @@ let child_in_law_label conf sex_child sex_parent =
   if Util.nb_fields txt = 2 then Util.nth_field txt is |> Adef.safe
   else Util.nth_field txt ((2 * Util.index_of_sex sex_parent) + is) |> Adef.safe
 
-let descendant_label conf base info x p =
+let descendant_label conf base pos x p =
   let is = Util.index_of_sex (Driver.get_sex p) in
   match x with
   | 1 -> Util.transl_nth conf "a son/a daughter/a child" is |> Adef.safe
@@ -446,12 +447,12 @@ let descendant_label conf base info x p =
       let txt = Util.transl conf "a grandson/a granddaughter/a grandchild" in
       let is =
         if Util.nb_fields txt = 6 then
-          let info = (info, fun r -> r.Consang.lens2) in
-          match Relation.get_piece_of_branch conf base info (1, 1) with
+          let ctx = { Relation.pos; proj = (fun r -> r.Consang.lens2) } in
+          match Relation.get_piece_of_branch conf base ctx (1, 1) with
           | [ ip1 ] ->
               if Driver.get_sex (Util.pget conf base ip1) = Male then is
               else is + 3
-          | _ -> (* must be a bug *) is
+          | _ -> is
         else is
       in
       Util.nth_field txt is |> Adef.safe
@@ -462,8 +463,8 @@ let descendant_label conf base info x p =
       in
       let is =
         if Util.nb_fields txt = 12 then
-          let info = (info, fun r -> r.Consang.lens2) in
-          match Relation.get_piece_of_branch conf base info (1, 2) with
+          let ctx = { Relation.pos; proj = (fun r -> r.Consang.lens2) } in
+          match Relation.get_piece_of_branch conf base ctx (1, 2) with
           | [ ip1; ip2 ] ->
               let is =
                 if Driver.get_sex (Util.pget conf base ip1) = Male then is
@@ -471,7 +472,7 @@ let descendant_label conf base info x p =
               in
               if Driver.get_sex (Util.pget conf base ip2) = Male then is
               else is + 3
-          | _ -> (* must be a bug *) is
+          | _ -> is
         else is
       in
       Util.nth_field txt is |> Adef.safe
@@ -512,19 +513,19 @@ let brother_in_law_label conf brother_sex self_sex =
   if Util.nb_fields txt = 2 then Util.nth_field txt is |> Adef.safe
   else Util.nth_field txt ((2 * Util.index_of_sex self_sex) + is) |> Adef.safe
 
-let uncle_label conf base info x p =
+let uncle_label conf base pos x p =
   let is = Util.index_of_sex (Driver.get_sex p) in
   match x with
   | 1 ->
       let txt = "an uncle/an aunt" in
       let is =
         if Util.nb_fields txt = 4 then
-          let info = (info, fun r -> r.Consang.lens1) in
-          match Relation.get_piece_of_branch conf base info (1, 1) with
+          let ctx = { Relation.pos; proj = (fun r -> r.Consang.lens1) } in
+          match Relation.get_piece_of_branch conf base ctx (1, 1) with
           | [ ip1 ] ->
               if Driver.get_sex (Util.pget conf base ip1) = Male then is
               else is + 2
-          | _ -> (* must be a bug *) is
+          | _ -> is
         else is
       in
       Templ.apply_format conf (Some is) txt "" |> Adef.safe
@@ -532,12 +533,12 @@ let uncle_label conf base info x p =
       let txt = "a great-uncle/a great-aunt" in
       let is =
         if Util.nb_fields txt = 4 then
-          let info = (info, fun r -> r.Consang.lens1) in
-          match Relation.get_piece_of_branch conf base info (1, 1) with
+          let ctx = { Relation.pos; proj = (fun r -> r.Consang.lens1) } in
+          match Relation.get_piece_of_branch conf base ctx (1, 1) with
           | [ ip1 ] ->
               if Driver.get_sex (Util.pget conf base ip1) = Male then is
               else is + 2
-          | _ -> (* must be a bug *) is
+          | _ -> is
         else is
       in
       Templ.apply_format conf (Some is) txt "" |> Adef.safe
@@ -570,7 +571,6 @@ let same_parents conf base p1 p2 =
 
 let print_link_name conf base n p1 p2 sol =
   let pp1, pp2, (x1, x2, list), reltab = sol in
-  let info = (reltab, list) in
   if Util.is_hide_names conf p2 && not (Util.authorized_age conf base p2) then
     Output.print_sstring conf "x x"
   else Output.print_string conf @@ Util.person_title_text conf base p2;
@@ -594,14 +594,21 @@ let print_link_name conf base n p1 p2 sol =
           false,
           sp2 )
       else
-        let info = ((info, x1), fun r -> r.Consang.lens1) in
-        (ancestor_label conf base info x1 (Driver.get_sex p2), sp1, sp2)
+        let ctx =
+          {
+            Relation.pos = { Relation.reltab; ancestors = list; degree = x1 };
+            proj = (fun r -> r.Consang.lens1);
+          }
+        in
+        (ancestor_label conf base ctx x1 (Driver.get_sex p2), sp1, sp2)
     else if x1 = 0 then
       if sp2 && x2 = 1 then
         ( child_in_law_label conf (Driver.get_sex ini_p2) (Driver.get_sex ini_p1),
           sp1,
           false )
-      else (descendant_label conf base (info, x2) x2 p2, sp1, sp2)
+      else
+        let pos = { Relation.reltab; ancestors = list; degree = x2 } in
+        (descendant_label conf base pos x2 p2, sp1, sp2)
     else if x2 = x1 then
       if x2 = 1 && not (same_parents conf base p2 p1) then
         (half_brother_label conf (Driver.get_sex p2), sp1, sp2)
@@ -611,12 +618,19 @@ let print_link_name conf base n p1 p2 sol =
           false,
           false )
       else (brother_label conf x1 (Driver.get_sex p2), sp1, sp2)
-    else if x2 = 1 then (uncle_label conf base (info, x1) (x1 - x2) p2, sp1, sp2)
+    else if x2 = 1 then
+      let pos = { Relation.reltab; ancestors = list; degree = x1 } in
+      (uncle_label conf base pos (x1 - x2) p2, sp1, sp2)
     else if x1 = 1 then (nephew_label conf (x2 - x1) p2, sp1, sp2)
     else if x2 < x1 then
       let s =
-        let info = ((info, x1), fun r -> r.Consang.lens1) in
-        let s = ancestor_label conf base info (x1 - x2) Neuter in
+        let ctx =
+          {
+            Relation.pos = { Relation.reltab; ancestors = list; degree = x1 };
+            proj = (fun r -> r.Consang.lens1);
+          }
+        in
+        let s = ancestor_label conf base ctx (x1 - x2) Neuter in
         Util.transl_a_of_gr_eq_gen_lev conf
           (brother_label conf x2 (Driver.get_sex p2)
             : Adef.safe_string
@@ -630,13 +644,14 @@ let print_link_name conf base n p1 p2 sol =
       let s =
         let sm = brother_label conf x1 Male in
         let sf = brother_label conf x1 Female in
-        let d = descendant_label conf base (info, x2) (x2 - x1) p2 in
+        let pos = { Relation.reltab; ancestors = list; degree = x2 } in
+        let d = descendant_label conf base pos (x2 - x1) p2 in
         let s =
           if sm = sf then sm
           else
-            let info = ((info, x2), fun r -> r.Consang.lens2) in
+            let ctx = { Relation.pos; proj = (fun r -> r.Consang.lens2) } in
             match
-              Relation.get_piece_of_branch conf base info (x2 - x1, x2 - x1)
+              Relation.get_piece_of_branch conf base ctx (x2 - x1, x2 - x1)
             with
             | [ ip2 ] ->
                 if Driver.get_sex (Util.pget conf base ip2) = Male then sm
@@ -817,10 +832,12 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   Output.print_sstring conf (Util.transl conf "at the same time");
   Output.print_sstring conf " ";
   let lab proj x =
-    let info = (((reltab, list), x), proj) in
+    let ctx =
+      { Relation.pos = { Relation.reltab; ancestors = list; degree = x }; proj }
+    in
     match list with
-    | [ (a, _) ] -> ancestor_label conf base info x (Driver.get_sex a)
-    | _ -> parents_label conf base info x
+    | [ (a, _) ] -> ancestor_label conf base ctx x (Driver.get_sex a)
+    | _ -> parents_label conf base ctx x
   in
   let print pp p (alab : Adef.safe_string) =
     let s = Util.gen_person_title_text Util.no_reference conf base p in
