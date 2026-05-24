@@ -503,6 +503,11 @@ val nth_field : string -> int -> string
     - nth_field "a/b/</c>/d" 2 = </c>
     - nth_field "a/b/</c>/d" 3 = d *)
 
+val nb_fields : string -> int
+(** [nb_fields s] returns the number of ['/']-separated fields in [s], the
+    lexicon variant count. Companion of {!nth_field}: [nb_fields "a/b/c" = 3].
+*)
+
 val cftransl : config -> string -> string list -> string
 val translate_eval : string -> string
 

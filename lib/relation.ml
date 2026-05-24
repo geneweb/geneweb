@@ -8,30 +8,16 @@ module Iper = Driver.Iper
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 
-let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
-
 (* find shortest path :
  * parents, siblings, mates and children are at distance 1.
  *)
 type famlink = Self | Parent | Sibling | HalfSibling | Mate | Child
-
-type 'a dag_ind = {
-  di_val : 'a;
-  mutable di_famc : 'a dag_fam;
-  mutable di_fams : 'a dag_fam;
-}
-
-and 'a dag_fam = {
-  mutable df_pare : 'a dag_ind list;
-  df_chil : 'a dag_ind list;
-}
-
 type person_id = Driver.iper
 type family_id = Driver.ifam
 type path_count = int
 type degree = int
 
-(** Structure compacte pour les chemins de parenté
+(** Structure compacte pour les chemins de parent?
     - p : person identifier (iper)
     - f : family identifiers list (ifams)
     - c : count of paths through this ancestor
@@ -41,169 +27,7 @@ type degree = int
 
 type anc_f = { p : Driver.iper; f : Driver.ifam list; c : int }
 type path_f = { l1 : int; l2 : int; anc : anc_f list }
-
-let dag_ind_list_of_path path =
-  let indl, _ =
-    let merge l1 l2 = if l1 == l2 then l1 else l1 @ l2 in
-    List.fold_left
-      (fun (indl, prev_ind) (ip, fl) ->
-        let ind, indl =
-          try (List.find (fun di -> di.di_val = Some ip) indl, indl)
-          with Not_found ->
-            let rec ind = { di_val = Some ip; di_famc = famc; di_fams = fams }
-            and famc = { df_pare = []; df_chil = [ ind ] }
-            and fams = { df_pare = [ ind ]; df_chil = [] } in
-            (ind, ind :: indl)
-        in
-        let fam =
-          match prev_ind with
-          | None -> { df_pare = []; df_chil = [] }
-          | Some p_ind -> (
-              match fl with
-              | Parent ->
-                  {
-                    df_pare = merge p_ind.di_famc.df_pare ind.di_fams.df_pare;
-                    df_chil = merge p_ind.di_famc.df_chil ind.di_fams.df_chil;
-                  }
-              | Child ->
-                  {
-                    df_pare = merge p_ind.di_fams.df_pare ind.di_famc.df_pare;
-                    df_chil = merge p_ind.di_fams.df_chil ind.di_famc.df_chil;
-                  }
-              | Sibling | HalfSibling ->
-                  {
-                    df_pare = merge p_ind.di_famc.df_pare ind.di_famc.df_pare;
-                    df_chil = merge p_ind.di_famc.df_chil ind.di_famc.df_chil;
-                  }
-              | Mate ->
-                  {
-                    df_pare = merge p_ind.di_fams.df_pare ind.di_fams.df_pare;
-                    df_chil = merge p_ind.di_fams.df_chil ind.di_fams.df_chil;
-                  }
-              | Self -> { df_pare = []; df_chil = [] })
-        in
-        List.iter (fun ind -> ind.di_famc <- fam) fam.df_chil;
-        List.iter (fun ind -> ind.di_fams <- fam) fam.df_pare;
-        (indl, Some ind))
-      ([], None) (List.rev path)
-  in
-  indl
-
-let add_missing_parents_of_siblings conf base indl =
-  List.fold_right
-    (fun ind indl ->
-      let indl =
-        match ind.di_famc with
-        | { df_pare = []; df_chil = [ _ ] } -> indl
-        | { df_pare = []; df_chil = children } ->
-            let ipl =
-              List.fold_right
-                (fun ind ipl ->
-                  match ind.di_val with
-                  | Some ip ->
-                      let ip =
-                        match Driver.get_parents (pget conf base ip) with
-                        | Some ifam -> Driver.get_father (Driver.foi base ifam)
-                        | None -> assert false
-                      in
-                      if List.mem ip ipl then ipl else ip :: ipl
-                  | _ -> assert false)
-                children []
-            in
-            let fams = { df_pare = []; df_chil = children } in
-            let indl1 =
-              List.fold_left
-                (fun indl ip ->
-                  let rec indp =
-                    { di_val = Some ip; di_famc = famc; di_fams = fams }
-                  and famc = { df_pare = []; df_chil = [ indp ] } in
-                  fams.df_pare <- indp :: fams.df_pare;
-                  indp :: indl)
-                [] ipl
-            in
-            List.iter (fun ind -> ind.di_famc <- fams) children;
-            indl1 @ indl
-        | _ -> indl
-      in
-      ind :: indl)
-    indl []
-
-let dag_fam_list_of_ind_list indl =
-  List.fold_left
-    (fun faml ind ->
-      let faml =
-        if List.memq ind.di_famc faml then faml else ind.di_famc :: faml
-      in
-      if List.memq ind.di_fams faml then faml else ind.di_fams :: faml)
-    [] indl
-
-let add_phony_children indl faml =
-  List.fold_right
-    (fun fam indl ->
-      match fam with
-      | { df_pare = [ _ ]; df_chil = [] } -> indl
-      | { df_pare = pare; df_chil = [] } ->
-          let rec ind = { di_val = None; di_famc = famc; di_fams = fams }
-          and famc = { df_pare = pare; df_chil = [ ind ] }
-          and fams = { df_pare = [ ind ]; df_chil = [] } in
-          List.iter (fun ind -> ind.di_fams <- famc) pare;
-          ind :: indl
-      | _ -> indl)
-    faml indl
-
-let add_common_parent base ip1 ip2 set =
-  let a1 = Driver.poi base ip1 in
-  let a2 = Driver.poi base ip2 in
-  match (Driver.get_parents a1, Driver.get_parents a2) with
-  | Some ifam1, Some ifam2 ->
-      let cpl1 = Driver.foi base ifam1 in
-      let cpl2 = Driver.foi base ifam2 in
-      if Driver.get_father cpl1 = Driver.get_father cpl2 then
-        Iper.Set.add (Driver.get_father cpl1) set
-      else if Driver.get_mother cpl1 = Driver.get_mother cpl2 then
-        Iper.Set.add (Driver.get_mother cpl1) set
-      else set
-  | _ -> set
-
-let ind_set_of_relation_path base path =
-  let set, _ =
-    List.fold_left
-      (fun (set, prev_ip) (ip, fl) ->
-        let set =
-          match fl with
-          | Parent | Child | Self | Mate -> set
-          | Sibling | HalfSibling -> (
-              match prev_ip with
-              | Some prev_ip -> add_common_parent base prev_ip ip set
-              | None -> set)
-        in
-        (Iper.Set.add ip set, Some ip))
-      (Iper.Set.empty, None) (List.rev path)
-  in
-  Iper.Set.elements set
-
 type node = NotVisited | Visited of (bool * Driver.iper * famlink)
-
-let excl_faml conf base =
-  let rec loop list i =
-    match p_getenv conf.Config.env ("ef" ^ string_of_int i) with
-    | Some k -> loop (Driver.Ifam.of_string k :: list) (i + 1)
-    | None -> (
-        match find_person_in_env conf base ("ef" ^ string_of_int i) with
-        | Some p ->
-            let n =
-              p_getint conf.env ("fef" ^ string_of_int i)
-              |> Option.value ~default:0
-            in
-            let list =
-              if n < Array.length (Driver.get_family p) then
-                (Driver.get_family p).(n) :: list
-              else list
-            in
-            loop list (i + 1)
-        | None -> list)
-  in
-  loop [] 0
 
 let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
     =
@@ -387,14 +211,6 @@ let simplify_path base path =
     if path = path' then path else loop path'
   in
   loop path
-
-let nb_fields s =
-  let rec loop cnt i =
-    if i = String.length s then cnt
-    else if s.[i] = '/' then loop (cnt + 1) (i + 1)
-    else loop cnt (i + 1)
-  in
-  loop 1 0
 
 let rec belongs_to_branch ip dist = function
   | (n, _, ipl) :: lens ->

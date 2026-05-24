@@ -327,6 +327,14 @@ let nth_field w n =
   let i1, i2 = if i2 = i1 then nth_field_abs w 0 else (i1, i2) in
   String.sub w i1 (i2 - i1)
 
+let nb_fields s =
+  let rec loop cnt i =
+    if i = String.length s then cnt
+    else if s.[i] = '/' then loop (cnt + 1) (i + 1)
+    else loop cnt (i + 1)
+  in
+  loop 1 0
+
 let tnf s = "[" ^ s ^ "]"
 let transl conf w = try Hashtbl.find conf.lexicon w with Not_found -> tnf w
 
