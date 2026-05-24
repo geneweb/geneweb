@@ -351,6 +351,13 @@ let print_shortest_path conf base p1 p2 =
             (s2 : Adef.safe_string :> string);
         Hutil.trailer conf
 
+let with_generation conf base_str n =
+  base_str ^ " "
+  ^ Printf.sprintf
+      (Util.ftransl conf "of the %s generation")
+      (Util.transl_nth conf "nth (generation)" n)
+  |> Adef.safe
+
 let parents_label conf base ctx = function
   | 1 -> Util.transl conf "the parents" |> Adef.safe
   | 2 ->
@@ -375,13 +382,7 @@ let parents_label conf base ctx = function
         else 0
       in
       Util.nth_field txt is |> Adef.safe
-  | n ->
-      Util.transl conf "ancestors (some)"
-      ^ " "
-      ^ Printf.sprintf
-          (Util.ftransl conf "of the %s generation")
-          (Util.transl_nth conf "nth (generation)" n)
-      |> Adef.safe
+  | n -> with_generation conf (Util.transl conf "ancestors (some)") n
 
 let parent_in_law_label conf child_sex parent_sex =
   let txt = Util.transl conf "the father-in-law/the mother-in-law" in
@@ -420,13 +421,7 @@ let ancestor_label conf base ctx x sex =
         else is
       in
       Util.nth_field txt is |> Adef.safe
-  | n ->
-      Util.transl_nth conf "an ancestor" is
-      ^ " "
-      ^ Printf.sprintf
-          (Util.ftransl conf "of the %s generation")
-          (Util.transl_nth conf "nth (generation)" n)
-      |> Adef.safe
+  | n -> with_generation conf (Util.transl_nth conf "an ancestor" is) n
 
 let child_in_law_label conf sex_child sex_parent =
   let txt = Util.transl conf "a son-in-law/a daughter-in-law" in
@@ -471,13 +466,7 @@ let descendant_label conf base pos x p =
         else is
       in
       Util.nth_field txt is |> Adef.safe
-  | n ->
-      Util.transl_nth conf "a descendant" is
-      ^ " "
-      ^ Printf.sprintf
-          (Util.ftransl conf "of the %s generation")
-          (Util.transl_nth conf "nth (generation)" n)
-      |> Adef.safe
+  | n -> with_generation conf (Util.transl_nth conf "a descendant" is) n
 
 (* transl_nth does a plain translation *)
 (* apply_format handles %s, %d after the nth selection *)
@@ -538,12 +527,9 @@ let uncle_label conf base pos x p =
       in
       Templ.apply_format conf (Some is) txt "" |> Adef.safe
   | n ->
-      Templ.apply_format conf (Some is) "an uncle/an aunt" ""
-      ^ " "
-      ^ Printf.sprintf
-          (Util.ftransl conf "of the %s generation")
-          (Util.transl_nth conf "nth (generation)" n)
-      |> Adef.safe
+      with_generation conf
+        (Templ.apply_format conf (Some is) "an uncle/an aunt" "")
+        n
 
 let nephew_label conf x p =
   let is = Util.index_of_sex (Driver.get_sex p) in
@@ -553,12 +539,9 @@ let nephew_label conf x p =
       Templ.apply_format conf (Some is) "a great-nephew/a great-niece" ""
       |> Adef.safe
   | n ->
-      Templ.apply_format conf (Some is) "a nephew/a niece" ""
-      ^ " "
-      ^ Printf.sprintf
-          (Util.ftransl conf "of the %s generation")
-          (Util.transl_nth conf "nth (generation)" n)
-      |> Adef.safe
+      with_generation conf
+        (Templ.apply_format conf (Some is) "a nephew/a niece" "")
+        n
 
 let same_parents conf base p1 p2 =
   Driver.get_parents (Util.pget conf base (Driver.get_iper p1))
