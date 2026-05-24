@@ -78,11 +78,9 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
           Array.fold_right
             (fun child children -> (child, Child, ifam) :: children)
             (Driver.get_children fam)
-            [
-              (Driver.get_father fam, Mate, ifam);
-              (Driver.get_mother fam, Mate, ifam);
-            ]
-          @ nb)
+            ((Driver.get_father fam, Mate, ifam)
+            :: (Driver.get_mother fam, Mate, ifam)
+            :: nb))
       (Driver.get_family (Util.pget conf base iper))
       (Option.fold ~none:[] ~some:parse_fam
          (Driver.get_parents (Util.pget conf base iper)))
