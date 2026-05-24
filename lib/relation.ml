@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Iper = Driver.Iper
@@ -43,7 +42,7 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
                 (fun child children -> (child, HalfSibling, fam) :: children)
                 (Driver.get_children (Driver.foi base fam))
                 children)
-          (Driver.get_family (pget conf base (Driver.get_mother fam)))
+          (Driver.get_family (Util.pget conf base (Driver.get_mother fam)))
           []
       in
       let result =
@@ -56,7 +55,7 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
                 (fun child children -> (child, HalfSibling, fam) :: children)
                 (Driver.get_children (Driver.foi base fam))
                 children)
-          (Driver.get_family (pget conf base (Driver.get_father fam)))
+          (Driver.get_family (Util.pget conf base (Driver.get_father fam)))
           result
       in
       let result =
@@ -84,9 +83,9 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
               (Driver.get_mother fam, Mate, ifam);
             ]
           @ nb)
-      (Driver.get_family (pget conf base iper))
+      (Driver.get_family (Util.pget conf base iper))
       (Option.fold ~none:[] ~some:parse_fam
-         (Driver.get_parents (pget conf base iper)))
+         (Driver.get_parents (Util.pget conf base iper)))
   in
   let rec make_path path vertex =
     match path with
@@ -179,7 +178,7 @@ let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
             loop2 (Array.to_list (Driver.get_children (Driver.foi base ifam)))
         | [] -> []
       in
-      loop1 (Array.to_list (Driver.get_family (pget conf base ip)))
+      loop1 (Array.to_list (Driver.get_family (Util.pget conf base ip)))
   in
   loop (Driver.get_iper anc) x
 
@@ -219,7 +218,7 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
       List.fold_left
         (fun rl i ->
           let u = Collection.Marker.get tab.Consang.reltab i in
-          let p = pget conf base i in
+          let p = Util.pget conf base i in
           List.fold_left
             (fun rl (len1, n1, _) ->
               List.fold_left
@@ -295,7 +294,8 @@ let known_spouses_list conf base p excl_p =
   Array.fold_left
     (fun spl ifam ->
       let sp =
-        pget conf base (Gutil.spouse (Driver.get_iper p) (Driver.foi base ifam))
+        Util.pget conf base
+          (Gutil.spouse (Driver.get_iper p) (Driver.foi base ifam))
       in
       if
         Driver.sou base (Driver.get_first_name sp) <> "?"

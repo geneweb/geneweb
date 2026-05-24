@@ -2,9 +2,6 @@
 
 open Config
 open Def
-open Util
-open Dag2html
-open Relation
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Iper = Driver.Iper
@@ -41,27 +38,27 @@ let dag_ind_list_of_path path =
           | None -> { df_pare = []; df_chil = [] }
           | Some p_ind -> (
               match fl with
-              | Parent ->
+              | Relation.Parent ->
                   {
                     df_pare = merge p_ind.di_famc.df_pare ind.di_fams.df_pare;
                     df_chil = merge p_ind.di_famc.df_chil ind.di_fams.df_chil;
                   }
-              | Child ->
+              | Relation.Child ->
                   {
                     df_pare = merge p_ind.di_fams.df_pare ind.di_famc.df_pare;
                     df_chil = merge p_ind.di_fams.df_chil ind.di_famc.df_chil;
                   }
-              | Sibling | HalfSibling ->
+              | Relation.Sibling | Relation.HalfSibling ->
                   {
                     df_pare = merge p_ind.di_famc.df_pare ind.di_famc.df_pare;
                     df_chil = merge p_ind.di_famc.df_chil ind.di_famc.df_chil;
                   }
-              | Mate ->
+              | Relation.Mate ->
                   {
                     df_pare = merge p_ind.di_fams.df_pare ind.di_fams.df_pare;
                     df_chil = merge p_ind.di_fams.df_chil ind.di_fams.df_chil;
                   }
-              | Self -> { df_pare = []; df_chil = [] })
+              | Relation.Self -> { df_pare = []; df_chil = [] })
         in
         List.iter (fun ind -> ind.di_famc <- fam) fam.df_chil;
         List.iter (fun ind -> ind.di_fams <- fam) fam.df_pare;
@@ -83,7 +80,7 @@ let add_missing_parents_of_siblings conf base indl =
                   match ind.di_val with
                   | Some ip ->
                       let ip =
-                        match Driver.get_parents (pget conf base ip) with
+                        match Driver.get_parents (Util.pget conf base ip) with
                         | Some ifam -> Driver.get_father (Driver.foi base ifam)
                         | None -> assert false
                       in
@@ -152,8 +149,9 @@ let ind_set_of_relation_path base path =
       (fun (set, prev_ip) (ip, fl) ->
         let set =
           match fl with
-          | Parent | Child | Self | Mate -> set
-          | Sibling | HalfSibling -> (
+          | Relation.Parent | Relation.Child | Relation.Self | Relation.Mate ->
+              set
+          | Relation.Sibling | Relation.HalfSibling -> (
               match prev_ip with
               | Some prev_ip -> add_common_parent base prev_ip ip set
               | None -> set)
@@ -165,13 +163,13 @@ let ind_set_of_relation_path base path =
 
 let excl_faml conf base =
   let rec loop list i =
-    match p_getenv conf.Config.env ("ef" ^ string_of_int i) with
+    match Util.p_getenv conf.Config.env ("ef" ^ string_of_int i) with
     | Some k -> loop (Driver.Ifam.of_string k :: list) (i + 1)
     | None -> (
-        match find_person_in_env conf base ("ef" ^ string_of_int i) with
+        match Util.find_person_in_env conf base ("ef" ^ string_of_int i) with
         | Some p ->
             let n =
-              p_getint conf.env ("fef" ^ string_of_int i)
+              Util.p_getint conf.env ("fef" ^ string_of_int i)
               |> Option.value ~default:0
             in
             let list =
@@ -190,11 +188,11 @@ let dag_of_ind_dag_list indl =
       (fun ind (indl, cnt) -> ((ind, cnt) :: indl, cnt + 1))
       indl ([], 0)
   in
-  let idag_of_di_ind ind = idag_of_int (List.assq ind indl) in
+  let idag_of_di_ind ind = Dag2html.idag_of_int (List.assq ind indl) in
   List.map
     (fun (ind, cnt) ->
       {
-        pare = List.map idag_of_di_ind ind.di_famc.df_pare;
+        Dag2html.pare = List.map idag_of_di_ind ind.di_famc.df_pare;
         valu =
           (match ind.di_val with
           | Some ic -> Def.Left ic
@@ -209,11 +207,11 @@ let dag_of_relation_path conf base path =
   let faml = dag_fam_list_of_ind_list indl in
   let indl = add_phony_children indl faml in
   let nl = dag_of_ind_dag_list indl in
-  let d = { dag = Array.of_list (List.rev nl) } in
+  let d = { Dag2html.dag = Array.of_list (List.rev nl) } in
   let set =
     List.fold_left
       (fun set n ->
-        match n.valu with
+        match n.Dag2html.valu with
         | Def.Left ip -> Iper.Set.add ip set
         | Def.Right _ -> set)
       Iper.Set.empty nl
@@ -225,7 +223,7 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let invert = Util.p_getenv conf.env "invert" = Some "on" in
   let set, d = dag_of_relation_path conf base path in
   let page_title =
-    transl conf "relationship" |> Utf8.capitalize_fst |> Adef.safe
+    Util.transl conf "relationship" |> Utf8.capitalize_fst |> Adef.safe
   in
   let hts =
     DagDisplay.make_tree_hts conf base elem_txt vbar_txt invert set [] d
@@ -233,13 +231,13 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   DagDisplay.print_dag_page conf base page_title hts next_txt
 
 let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
-  if p_getenv conf.env "new" <> Some "on" then
+  if Util.p_getenv conf.env "new" <> Some "on" then
     old_print_relationship_dag conf base elem_txt vbar_txt path next_txt
   else
     let invert = Util.p_getenv conf.env "invert" = Some "on" in
     let set = ind_set_of_relation_path base path in
     let page_title =
-      transl conf "relationship" |> Utf8.capitalize_fst |> Adef.safe
+      Util.transl conf "relationship" |> Utf8.capitalize_fst |> Adef.safe
     in
     DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set []
       page_title next_txt
@@ -251,12 +249,12 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
     | _, _ -> true
   in
   let bd =
-    match p_getenv conf.env "bd" with
+    match Util.p_getenv conf.env "bd" with
     | None | Some ("0" | "") -> Adef.escaped ""
     | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string)
   in
   let color =
-    match p_getenv conf.env "color" with
+    match Util.p_getenv conf.env "color" with
     | None -> Adef.escaped ""
     | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string)
   in
@@ -267,7 +265,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
       ("", List.length excl_faml - 1)
       excl_faml
   in
-  commd ~excl:[ "em"; "ei"; "i"; "sp"; "bd"; "color"; "et" ] conf
+  Util.commd ~excl:[ "em"; "ei"; "i"; "sp"; "bd"; "color"; "et" ] conf
   ^^^ "em=R&ei=" ^<^ Driver.Iper.to_string ip1 ^<^ "&i="
   ^<^ Driver.Iper.to_string ip2
   ^<^ (if sps then "" else "&sp=0")
@@ -276,8 +274,8 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then (
     let title _ =
-      transl conf "relationship" |> Utf8.capitalize_fst
-      |> Output.print_sstring conf
+      Util.transl conf "relationship"
+      |> Utf8.capitalize_fst |> Output.print_sstring conf
     in
     Hutil.header conf title;
     Hutil.trailer conf)
@@ -285,7 +283,7 @@ let print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let next_txt = next_relation_link_txt conf ip1 ip2 (ifam :: excl_faml) in
     let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
     let vbar_txt ip =
-      let u = pget conf base ip in
+      let u = Util.pget conf base ip in
       let excl_faml = Array.to_list (Driver.get_family u) @ excl_faml in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
@@ -296,45 +294,45 @@ let print_shortest_path conf base p1 p2 =
   let ip2 = Driver.get_iper p2 in
   if ip1 = ip2 then (
     let title _ =
-      transl conf "relationship" |> Utf8.capitalize_fst
-      |> Output.print_sstring conf
+      Util.transl conf "relationship"
+      |> Utf8.capitalize_fst |> Output.print_sstring conf
     in
     Hutil.header conf title;
-    transl conf "it is the same person!"
+    Util.transl conf "it is the same person!"
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf "\n";
     Hutil.trailer conf)
   else
     let excl_faml = excl_faml conf base in
     let title _ =
-      transl conf "relationship" |> Utf8.capitalize_fst
-      |> Output.print_sstring conf
+      Util.transl conf "relationship"
+      |> Utf8.capitalize_fst |> Output.print_sstring conf
     in
-    match get_shortest_path_relation conf base ip1 ip2 excl_faml with
+    match Relation.get_shortest_path_relation conf base ip1 ip2 excl_faml with
     | Some (path, ifam) ->
         print_relation_path conf base ip1 ip2 path ifam excl_faml
     | None ->
-        let s1 = gen_person_title_text reference conf base p1 in
-        let s2 = gen_person_title_text reference conf base p2 in
+        let s1 = Util.gen_person_title_text Util.reference conf base p1 in
+        let s2 = Util.gen_person_title_text Util.reference conf base p2 in
         Hutil.header conf title;
-        (match p_getenv conf.env "cgl" with
+        (match Util.p_getenv conf.env "cgl" with
         | Some "on" -> ()
         | _ ->
             let conf = { conf with is_printed_by_template = false } in
             Templ.output_simple conf Templ.Env.empty "buttons_rel");
         if excl_faml = [] then (
           ([ s1; s2 ] : Adef.safe_string list :> string list)
-          |> cftransl conf "no known relationship link between %s and %s"
+          |> Util.cftransl conf "no known relationship link between %s and %s"
           |> Utf8.capitalize_fst |> Output.print_sstring conf;
           Output.print_sstring conf ".<br><p><span><a href=\"";
-          Output.print_string conf (commd ~excl:[ "m" ] conf);
+          Output.print_string conf (Util.commd ~excl:[ "m" ] conf);
           Output.print_sstring conf "&m=R&";
-          Output.print_string conf (acces conf base p1);
+          Output.print_string conf (Util.acces conf base p1);
           Output.print_sstring conf "\">";
-          transl_nth conf "try another/relationship computing" 0
+          Util.transl_nth conf "try another/relationship computing" 0
           |> Utf8.capitalize_fst |> Output.print_sstring conf;
           Output.print_sstring conf "</a> ";
-          transl_nth conf "try another/relationship computing" 1
+          Util.transl_nth conf "try another/relationship computing" 1
           |> Output.print_sstring conf;
           Output.print_sstring conf "</span></p>")
         else (
@@ -346,132 +344,137 @@ let print_shortest_path conf base p1 p2 =
         Hutil.trailer conf
 
 let parents_label conf base info = function
-  | 1 -> transl conf "the parents" |> Adef.safe
+  | 1 -> Util.transl conf "the parents" |> Adef.safe
   | 2 ->
-      let txt = transl conf "grand-parents" in
+      let txt = Util.transl conf "grand-parents" in
       let is =
-        if nb_fields txt = 2 then
-          match get_piece_of_branch conf base info (1, 1) with
+        if Util.nb_fields txt = 2 then
+          match Relation.get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if Driver.get_sex (pget conf base ip1) = Male then 0 else 1
+              if Driver.get_sex (Util.pget conf base ip1) = Male then 0 else 1
           | _ -> (* must be a bug *) 0
         else 0
       in
-      nth_field txt is |> Adef.safe
+      Util.nth_field txt is |> Adef.safe
   | 3 ->
-      let txt = transl conf "great-grand-parents" in
+      let txt = Util.transl conf "great-grand-parents" in
       let is =
-        if nb_fields txt = 2 then
-          match get_piece_of_branch conf base info (1, 1) with
+        if Util.nb_fields txt = 2 then
+          match Relation.get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if Driver.get_sex (pget conf base ip1) = Male then 0 else 1
+              if Driver.get_sex (Util.pget conf base ip1) = Male then 0 else 1
           | _ -> (* must be a bug *) 0
         else 0
       in
-      nth_field txt is |> Adef.safe
+      Util.nth_field txt is |> Adef.safe
   | n ->
-      transl conf "ancestors (some)"
+      Util.transl conf "ancestors (some)"
       ^ " "
       ^ Printf.sprintf
-          (ftransl conf "of the %s generation")
-          (transl_nth conf "nth (generation)" n)
+          (Util.ftransl conf "of the %s generation")
+          (Util.transl_nth conf "nth (generation)" n)
       |> Adef.safe
 
 let parent_in_law_label conf child_sex parent_sex =
-  let txt = transl conf "the father-in-law/the mother-in-law" in
-  let is = index_of_sex parent_sex in
-  if nb_fields txt = 2 then nth_field txt is |> Adef.safe
-  else nth_field txt ((2 * index_of_sex child_sex) + is) |> Adef.safe
+  let txt = Util.transl conf "the father-in-law/the mother-in-law" in
+  let is = Util.index_of_sex parent_sex in
+  if Util.nb_fields txt = 2 then Util.nth_field txt is |> Adef.safe
+  else Util.nth_field txt ((2 * Util.index_of_sex child_sex) + is) |> Adef.safe
 
 let ancestor_label conf base info x sex =
-  let is = index_of_sex sex in
+  let is = Util.index_of_sex sex in
   match x with
-  | 1 -> transl_nth conf "the father/the mother/a parent" is |> Adef.safe
+  | 1 -> Util.transl_nth conf "the father/the mother/a parent" is |> Adef.safe
   | 2 ->
-      let txt = transl conf "a grandfather/a grandmother/a grandparent" in
+      let txt = Util.transl conf "a grandfather/a grandmother/a grandparent" in
       let is =
-        if nb_fields txt = 6 then
-          match get_piece_of_branch conf base info (1, 1) with
+        if Util.nb_fields txt = 6 then
+          match Relation.get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if Driver.get_sex (pget conf base ip1) = Male then is else is + 3
+              if Driver.get_sex (Util.pget conf base ip1) = Male then is
+              else is + 3
           | _ -> (* must be a bug *) is
         else is
       in
-      nth_field txt is |> Adef.safe
+      Util.nth_field txt is |> Adef.safe
   | 3 ->
       let txt =
-        transl conf
+        Util.transl conf
           "a great-grandfather/a great-grandmother/a great-grandparent"
       in
       let is =
-        if nb_fields txt = 6 then
-          match get_piece_of_branch conf base info (1, 1) with
+        if Util.nb_fields txt = 6 then
+          match Relation.get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if Driver.get_sex (pget conf base ip1) = Male then is else is + 3
+              if Driver.get_sex (Util.pget conf base ip1) = Male then is
+              else is + 3
           | _ -> (* must be a bug *) is
         else is
       in
-      nth_field txt is |> Adef.safe
+      Util.nth_field txt is |> Adef.safe
   | n ->
-      transl_nth conf "an ancestor" is
+      Util.transl_nth conf "an ancestor" is
       ^ " "
       ^ Printf.sprintf
-          (ftransl conf "of the %s generation")
-          (transl_nth conf "nth (generation)" n)
+          (Util.ftransl conf "of the %s generation")
+          (Util.transl_nth conf "nth (generation)" n)
       |> Adef.safe
 
 let child_in_law_label conf sex_child sex_parent =
-  let txt = transl conf "a son-in-law/a daughter-in-law" in
-  let is = index_of_sex sex_child in
-  if nb_fields txt = 2 then nth_field txt is |> Adef.safe
-  else nth_field txt ((2 * index_of_sex sex_parent) + is) |> Adef.safe
+  let txt = Util.transl conf "a son-in-law/a daughter-in-law" in
+  let is = Util.index_of_sex sex_child in
+  if Util.nb_fields txt = 2 then Util.nth_field txt is |> Adef.safe
+  else Util.nth_field txt ((2 * Util.index_of_sex sex_parent) + is) |> Adef.safe
 
 let descendant_label conf base info x p =
-  let is = index_of_sex (Driver.get_sex p) in
+  let is = Util.index_of_sex (Driver.get_sex p) in
   match x with
-  | 1 -> transl_nth conf "a son/a daughter/a child" is |> Adef.safe
+  | 1 -> Util.transl_nth conf "a son/a daughter/a child" is |> Adef.safe
   | 2 ->
-      let txt = transl conf "a grandson/a granddaughter/a grandchild" in
+      let txt = Util.transl conf "a grandson/a granddaughter/a grandchild" in
       let is =
-        if nb_fields txt = 6 then
+        if Util.nb_fields txt = 6 then
           let info = (info, fun r -> r.Consang.lens2) in
-          match get_piece_of_branch conf base info (1, 1) with
+          match Relation.get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if Driver.get_sex (pget conf base ip1) = Male then is else is + 3
+              if Driver.get_sex (Util.pget conf base ip1) = Male then is
+              else is + 3
           | _ -> (* must be a bug *) is
         else is
       in
-      nth_field txt is |> Adef.safe
+      Util.nth_field txt is |> Adef.safe
   | 3 ->
       let txt =
-        transl conf "a great-grandson/a great-granddaughter/a great-grandchild"
+        Util.transl conf
+          "a great-grandson/a great-granddaughter/a great-grandchild"
       in
       let is =
-        if nb_fields txt = 12 then
+        if Util.nb_fields txt = 12 then
           let info = (info, fun r -> r.Consang.lens2) in
-          match get_piece_of_branch conf base info (1, 2) with
+          match Relation.get_piece_of_branch conf base info (1, 2) with
           | [ ip1; ip2 ] ->
               let is =
-                if Driver.get_sex (pget conf base ip1) = Male then is
+                if Driver.get_sex (Util.pget conf base ip1) = Male then is
                 else is + 6
               in
-              if Driver.get_sex (pget conf base ip2) = Male then is else is + 3
+              if Driver.get_sex (Util.pget conf base ip2) = Male then is
+              else is + 3
           | _ -> (* must be a bug *) is
         else is
       in
-      nth_field txt is |> Adef.safe
+      Util.nth_field txt is |> Adef.safe
   | n ->
-      transl_nth conf "a descendant" is
+      Util.transl_nth conf "a descendant" is
       ^ " "
       ^ Printf.sprintf
-          (ftransl conf "of the %s generation")
-          (transl_nth conf "nth (generation)" n)
+          (Util.ftransl conf "of the %s generation")
+          (Util.transl_nth conf "nth (generation)" n)
       |> Adef.safe
 
 (* transl_nth does a plain translation *)
 (* apply_format handles %s, %d after the nth selection *)
 let brother_label conf x sex : Adef.safe_string =
-  let is = index_of_sex sex in
+  let is = Util.index_of_sex sex in
   let str =
     match x with
     | 1 -> Templ.apply_format conf (Some is) "a brother/a sister/a sibling" ""
@@ -480,34 +483,35 @@ let brother_label conf x sex : Adef.safe_string =
     | 4 -> Templ.apply_format conf (Some is) "a 3rd cousin" ""
     | n ->
         Printf.sprintf
-          (ftransl_nth conf "a %s cousin" is)
-          (transl_nth conf "nth (cousin)" (n - 1))
+          (Util.ftransl_nth conf "a %s cousin" is)
+          (Util.transl_nth conf "nth (cousin)" (n - 1))
   in
   Adef.safe str
 
 let half_brother_label conf sex =
-  let is = index_of_sex sex in
+  let is = Util.index_of_sex sex in
   Templ.apply_format conf (Some is)
     "a half-brother/a half-sister/a half-sibling" ""
   |> Adef.safe
 
 let brother_in_law_label conf brother_sex self_sex =
-  let txt = transl conf "a brother-in-law/a sister-in-law" in
-  let is = index_of_sex brother_sex in
-  if nb_fields txt = 2 then nth_field txt is |> Adef.safe
-  else nth_field txt ((2 * index_of_sex self_sex) + is) |> Adef.safe
+  let txt = Util.transl conf "a brother-in-law/a sister-in-law" in
+  let is = Util.index_of_sex brother_sex in
+  if Util.nb_fields txt = 2 then Util.nth_field txt is |> Adef.safe
+  else Util.nth_field txt ((2 * Util.index_of_sex self_sex) + is) |> Adef.safe
 
 let uncle_label conf base info x p =
-  let is = index_of_sex (Driver.get_sex p) in
+  let is = Util.index_of_sex (Driver.get_sex p) in
   match x with
   | 1 ->
       let txt = "an uncle/an aunt" in
       let is =
-        if nb_fields txt = 4 then
+        if Util.nb_fields txt = 4 then
           let info = (info, fun r -> r.Consang.lens1) in
-          match get_piece_of_branch conf base info (1, 1) with
+          match Relation.get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if Driver.get_sex (pget conf base ip1) = Male then is else is + 2
+              if Driver.get_sex (Util.pget conf base ip1) = Male then is
+              else is + 2
           | _ -> (* must be a bug *) is
         else is
       in
@@ -515,11 +519,12 @@ let uncle_label conf base info x p =
   | 2 ->
       let txt = "a great-uncle/a great-aunt" in
       let is =
-        if nb_fields txt = 4 then
+        if Util.nb_fields txt = 4 then
           let info = (info, fun r -> r.Consang.lens1) in
-          match get_piece_of_branch conf base info (1, 1) with
+          match Relation.get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if Driver.get_sex (pget conf base ip1) = Male then is else is + 2
+              if Driver.get_sex (Util.pget conf base ip1) = Male then is
+              else is + 2
           | _ -> (* must be a bug *) is
         else is
       in
@@ -528,12 +533,12 @@ let uncle_label conf base info x p =
       Templ.apply_format conf (Some is) "an uncle/an aunt" ""
       ^ " "
       ^ Printf.sprintf
-          (ftransl conf "of the %s generation")
-          (transl_nth conf "nth (generation)" n)
+          (Util.ftransl conf "of the %s generation")
+          (Util.transl_nth conf "nth (generation)" n)
       |> Adef.safe
 
 let nephew_label conf x p =
-  let is = index_of_sex (Driver.get_sex p) in
+  let is = Util.index_of_sex (Driver.get_sex p) in
   match x with
   | 1 -> Templ.apply_format conf (Some is) "a nephew/a niece" "" |> Adef.safe
   | 2 ->
@@ -543,25 +548,25 @@ let nephew_label conf x p =
       Templ.apply_format conf (Some is) "a nephew/a niece" ""
       ^ " "
       ^ Printf.sprintf
-          (ftransl conf "of the %s generation")
-          (transl_nth conf "nth (generation)" n)
+          (Util.ftransl conf "of the %s generation")
+          (Util.transl_nth conf "nth (generation)" n)
       |> Adef.safe
 
 let same_parents conf base p1 p2 =
-  Driver.get_parents (pget conf base (Driver.get_iper p1))
-  = Driver.get_parents (pget conf base (Driver.get_iper p2))
+  Driver.get_parents (Util.pget conf base (Driver.get_iper p1))
+  = Driver.get_parents (Util.pget conf base (Driver.get_iper p2))
 
 let print_link_name conf base n p1 p2 sol =
   let pp1, pp2, (x1, x2, list), reltab = sol in
   let info = (reltab, list) in
-  if is_hide_names conf p2 && not (authorized_age conf base p2) then
+  if Util.is_hide_names conf p2 && not (Util.authorized_age conf base p2) then
     Output.print_sstring conf "x x"
-  else Output.print_string conf @@ person_title_text conf base p2;
+  else Output.print_string conf @@ Util.person_title_text conf base p2;
   Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "is");
+  Output.print_sstring conf (Util.transl conf "is");
   if n > 1 then (
     Output.print_sstring conf " ";
-    Output.print_sstring conf (transl conf "also");
+    Output.print_sstring conf (Util.transl conf "also");
     Output.print_sstring conf " ")
   else Output.print_sstring conf " ";
   let s, sp1, sp2 =
@@ -600,7 +605,7 @@ let print_link_name conf base n p1 p2 sol =
       let s =
         let info = ((info, x1), fun r -> r.Consang.lens1) in
         let s = ancestor_label conf base info (x1 - x2) Neuter in
-        transl_a_of_gr_eq_gen_lev conf
+        Util.transl_a_of_gr_eq_gen_lev conf
           (brother_label conf x2 (Driver.get_sex p2)
             : Adef.safe_string
             :> string)
@@ -618,12 +623,15 @@ let print_link_name conf base n p1 p2 sol =
           if sm = sf then sm
           else
             let info = ((info, x2), fun r -> r.Consang.lens2) in
-            match get_piece_of_branch conf base info (x2 - x1, x2 - x1) with
+            match
+              Relation.get_piece_of_branch conf base info (x2 - x1, x2 - x1)
+            with
             | [ ip2 ] ->
-                if Driver.get_sex (pget conf base ip2) = Male then sm else sf
+                if Driver.get_sex (Util.pget conf base ip2) = Male then sm
+                else sf
             | _ -> sm
         in
-        transl_a_of_gr_eq_gen_lev conf
+        Util.transl_a_of_gr_eq_gen_lev conf
           (d : Adef.safe_string :> string)
           (s : Adef.safe_string :> string)
           (s : Adef.safe_string :> string)
@@ -633,8 +641,9 @@ let print_link_name conf base n p1 p2 sol =
   in
   let s =
     if sp2 then
-      transl_a_of_gr_eq_gen_lev conf
-        (transl_nth conf "the spouse" (index_of_sex (Driver.get_sex p2)))
+      Util.transl_a_of_gr_eq_gen_lev conf
+        (Util.transl_nth conf "the spouse"
+           (Util.index_of_sex (Driver.get_sex p2)))
         (s : Adef.safe_string :> string)
         (s : Adef.safe_string :> string)
       |> Adef.safe
@@ -645,11 +654,11 @@ let print_link_name conf base n p1 p2 sol =
       match pp1 with
       | Some pp1 ->
           let s' =
-            Driver.get_sex pp1 |> index_of_sex
-            |> transl_nth conf "the spouse"
+            Driver.get_sex pp1 |> Util.index_of_sex
+            |> Util.transl_nth conf "the spouse"
             |> Adef.safe
           in
-          transl_a_of_gr_eq_gen_lev conf
+          Util.transl_a_of_gr_eq_gen_lev conf
             (s : Adef.safe_string :> string)
             (s' : Adef.safe_string :> string)
             (s' : Adef.safe_string :> string)
@@ -657,21 +666,21 @@ let print_link_name conf base n p1 p2 sol =
       | None -> s
     else s
   in
-  let s1 = "<strong>" ^<^ std_color conf s ^>^ "</strong>" in
+  let s1 = "<strong>" ^<^ Util.std_color conf s ^>^ "</strong>" in
   let s2 =
-    if is_hide_names conf p1 && not (authorized_age conf base p1) then
+    if Util.is_hide_names conf p1 && not (Util.authorized_age conf base p1) then
       Adef.safe "x x"
-    else gen_person_title_text no_reference conf base p1
+    else Util.gen_person_title_text Util.no_reference conf base p1
   in
   let s =
     if x2 < x1 then
-      transl_a_of_b conf
+      Util.transl_a_of_b conf
         (s1 : Adef.safe_string :> string)
         (s2 : Adef.safe_string :> string)
         (s2 : Adef.safe_string :> string)
       |> Adef.safe
     else
-      transl_a_of_gr_eq_gen_lev conf
+      Util.transl_a_of_gr_eq_gen_lev conf
         (s1 : Adef.safe_string :> string)
         (s2 : Adef.safe_string :> string)
         (s2 : Adef.safe_string :> string)
@@ -681,7 +690,7 @@ let print_link_name conf base n p1 p2 sol =
   Output.print_sstring conf ".\n"
 
 let string_of_big_int conf i =
-  let sep = transl conf "(thousand separator)" in
+  let sep = Util.transl conf "(thousand separator)" in
   let rec glop i =
     if i = 0 then ""
     else
@@ -702,7 +711,7 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
         (if n < 0 then "***" else string_of_big_int conf n);
       Output.print_sstring conf " ";
       Output.print_sstring conf
-        (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
+        (Util.transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
       Output.print_sstring conf "</em>\n";
       if not long then
         let propose_dag = n > 1 && n <= 10 in
@@ -714,22 +723,23 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
            <img src="%s/picto_rel_small.png" alt="">
            <a href="%s">%s%s</a></li>|}
             (Util.images_prefix conf :> string)
-            (commd ~excl:[ "m"; "l1"; "l2"; "im" ] conf
-             ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1=" ^<^ string_of_int x1
-             ^<^ "&"
-             ^<^ acces_n conf base (Adef.escaped "1") dp1
+            (Util.commd ~excl:[ "m"; "l1"; "l2"; "im" ] conf
+             ^^^ "m=RL&" ^<^ Util.acces conf base a ^^^ "&l1="
+             ^<^ string_of_int x1 ^<^ "&"
+             ^<^ Util.acces_n conf base (Adef.escaped "1") dp1
              ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
-             ^<^ acces_n conf base (Adef.escaped "2") dp2
+             ^<^ Util.acces_n conf base (Adef.escaped "2") dp2
              ^^^ (if pp1 = None then Adef.escaped ""
-                  else "&" ^<^ acces_n conf base (Adef.escaped "3") p1)
+                  else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
              ^^^ (if pp2 = None then Adef.escaped ""
-                  else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
+                  else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
              ^^^ (if propose_dag then Adef.escaped "&dag=on"
                   else Adef.escaped "")
              ^>^ if img then "" else "&im=0"
               :> string)
-            (transl conf "see" |> Utf8.capitalize_fst)
-            (if n > 1 && not propose_dag then transl conf " the first branch"
+            (Util.transl conf "see" |> Utf8.capitalize_fst)
+            (if n > 1 && not propose_dag then
+               Util.transl conf " the first branch"
              else "")
         in
         Output.print_sstring conf str)
@@ -740,17 +750,17 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   let img = Util.get_opt conf "im" true in
   let pp1, pp2, (x1, x2, list), reltab = sol in
   Output.print_sstring conf {|<ul class="li_relationship"><li>|};
-  transl conf "indeed," |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Util.transl conf "indeed," |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf " <ul>";
   List.iter
     (fun (a, n) ->
       Output.print_sstring conf "<li>\n";
-      Output.print_string conf (person_title_text conf base a);
+      Output.print_string conf (Util.person_title_text conf base a);
       Output.print_sstring conf "\n<em>(";
       Output.print_sstring conf (string_of_int n);
       Output.print_sstring conf " ";
       (if n = 1 then 0 else 1)
-      |> transl_nth conf "relationship link/relationship links"
+      |> Util.transl_nth conf "relationship link/relationship links"
       |> Output.print_sstring conf;
       Output.print_sstring conf ")</em> &nbsp;";
       if not long then (
@@ -761,33 +771,38 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
         Output.print_sstring conf (Util.images_prefix conf);
         Output.print_sstring conf {|/picto_rel_small.png" alt="">|};
         let href =
-          commd ~excl:[ "m"; "l1"; "l2"; "dag"; "im"; "em"; "ei"; "et" ] conf
-          ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1=" ^<^ string_of_int x1
+          Util.commd
+            ~excl:[ "m"; "l1"; "l2"; "dag"; "im"; "em"; "ei"; "et" ]
+            conf
+          ^^^ "m=RL&" ^<^ Util.acces conf base a ^^^ "&l1=" ^<^ string_of_int x1
           ^<^ "&"
-          ^<^ acces_n conf base (Adef.escaped "1") dp1
+          ^<^ Util.acces_n conf base (Adef.escaped "1") dp1
           ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
-          ^<^ acces_n conf base (Adef.escaped "2") dp2
+          ^<^ Util.acces_n conf base (Adef.escaped "2") dp2
           ^^^ (if pp1 = None then Adef.escaped ""
-               else "&" ^<^ acces_n conf base (Adef.escaped "3") p1)
+               else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
           ^^^ (if pp2 = None then Adef.escaped ""
-               else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
+               else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
           ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
           ^>^ if img then "" else "&im=0"
         in
         Output.print_sstring conf {|<a href="|};
         Output.print_string conf href;
         Output.print_sstring conf {|">|};
-        transl conf "see" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+        Util.transl conf "see" |> Utf8.capitalize_fst
+        |> Output.print_sstring conf;
         Output.print_sstring conf "</a>");
       Output.print_sstring conf "</li>")
     list;
   Output.print_sstring conf "</ul>";
   let is_are =
-    match list with [ _ ] -> transl conf "is" | _ -> transl conf "are"
+    match list with
+    | [ _ ] -> Util.transl conf "is"
+    | _ -> Util.transl conf "are"
   in
   Output.print_sstring conf is_are;
   Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "at the same time");
+  Output.print_sstring conf (Util.transl conf "at the same time");
   Output.print_sstring conf " ";
   let lab proj x =
     let info = (((reltab, list), x), proj) in
@@ -796,16 +811,18 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
     | _ -> parents_label conf base info x
   in
   let print pp p (alab : Adef.safe_string) =
-    let s = gen_person_title_text no_reference conf base p in
+    let s = Util.gen_person_title_text Util.no_reference conf base p in
     let s =
       match pp with
-      | None -> transl_a_of_b conf (alab :> string) (s :> string) (s :> string)
+      | None ->
+          Util.transl_a_of_b conf (alab :> string) (s :> string) (s :> string)
       | Some pp ->
-          transl_a_of_gr_eq_gen_lev conf
+          Util.transl_a_of_gr_eq_gen_lev conf
             (let s =
-               transl_nth conf "the spouse" (index_of_sex (Driver.get_sex pp))
+               Util.transl_nth conf "the spouse"
+                 (Util.index_of_sex (Driver.get_sex pp))
              in
-             transl_a_of_b conf (alab :> string) s s)
+             Util.transl_a_of_b conf (alab :> string) s s)
             (s :> string)
             (s :> string)
     in
@@ -869,26 +886,31 @@ let print_dag_links conf base p1 p2 rl =
         let dp1 = match pp1 with Some p -> p | _ -> p1 in
         let dp2 = match pp2 with Some p -> p | _ -> p2 in
         if nt > 1 && nn > 1 && nn < max_br then (
-          let a = pget conf base ip in
+          let a = Util.pget conf base ip in
           if not is_anc then (
             Output.print_sstring conf "<li>";
-            Output.print_string conf (person_title_text conf base a);
+            Output.print_string conf (Util.person_title_text conf base a);
             Output.print_sstring conf (Util.transl conf ":");
             Output.print_sstring conf " ");
           Output.print_sstring conf "<a href=\"";
-          Output.print_string conf (commd ~excl:[ "m"; "em"; "ei"; "et" ] conf);
+          Output.print_string conf
+            (Util.commd ~excl:[ "m"; "em"; "ei"; "et" ] conf);
           Output.print_sstring conf "m=RL&";
-          Output.print_string conf (acces conf base a);
+          Output.print_string conf (Util.acces conf base a);
           Output.print_sstring conf "&";
-          Output.print_string conf (acces_n conf base (Adef.escaped "1") dp1);
+          Output.print_string conf
+            (Util.acces_n conf base (Adef.escaped "1") dp1);
           Output.print_sstring conf "&";
-          Output.print_string conf (acces_n conf base (Adef.escaped "2") dp2);
+          Output.print_string conf
+            (Util.acces_n conf base (Adef.escaped "2") dp2);
           if pp1 <> None then (
             Output.print_sstring conf "&";
-            Output.print_string conf (acces_n conf base (Adef.escaped "3") p1));
+            Output.print_string conf
+              (Util.acces_n conf base (Adef.escaped "3") p1));
           if pp2 <> None then (
             Output.print_sstring conf "&";
-            Output.print_string conf (acces_n conf base (Adef.escaped "4") p2));
+            Output.print_string conf
+              (Util.acces_n conf base (Adef.escaped "4") p2));
           let l1, l2 =
             List.fold_left
               (fun (l1, l2) (_, _, (x1, x2, list), _) ->
@@ -916,15 +938,15 @@ let print_dag_links conf base p1 p2 rl =
             l2;
           if not img then Output.print_sstring conf "&im=0";
           if not sps then Output.print_sstring conf "&sp=0";
-          if p_getenv conf.env "bd" = Some "on" then
+          if Util.p_getenv conf.env "bd" = Some "on" then
             Output.print_sstring conf "&bd=on";
           Output.print_sstring conf {|&dag=on">|};
-          if is_anc then Output.print_sstring conf (transl conf "tree")
+          if is_anc then Output.print_sstring conf (Util.transl conf "tree")
           else (
             Output.print_sstring conf (string_of_int nn);
             Output.print_sstring conf " ";
             Output.print_sstring conf
-              (transl_nth conf "relationship link/relationship links" 1));
+              (Util.transl_nth conf "relationship link/relationship links" 1));
           Output.print_sstring conf "</a>";
           if not is_anc then Output.print_sstring conf "</li>" else rest := true))
       anc_map;
@@ -941,7 +963,9 @@ let print_propose_upto conf base p1 p2 rl =
           rl 0
       in
       let p, a = if x1 = 0 then (p2, p1) else (p1, p2) in
-      let s = (person_title_text conf base p : Adef.safe_string :> string) in
+      let s =
+        (Util.person_title_text conf base p : Adef.safe_string :> string)
+      in
       let str =
         Printf.sprintf
           {|
@@ -951,14 +975,16 @@ let print_propose_upto conf base p1 p2 rl =
           </div>
         |}
           (Util.images_prefix conf :> string)
-          (commd ~excl:[ "m"; "t"; "l" ] conf :> string)
-          (acces conf base p :> string)
-          (acces_n conf base (Adef.escaped "1") a :> string)
+          (Util.commd ~excl:[ "m"; "t"; "l" ] conf :> string)
+          (Util.acces conf base p :> string)
+          (Util.acces_n conf base (Adef.escaped "1") a :> string)
           (string_of_int maxlen)
-          (transl_a_of_b conf (transl_nth conf "ancestor/ancestors" 1) s s
-          |> translate_eval |> Utf8.capitalize_fst)
-          ((person_title_text conf base a : Adef.safe_string :> string)
-          |> transl_decline conf "up to")
+          (Util.transl_a_of_b conf
+             (Util.transl_nth conf "ancestor/ancestors" 1)
+             s s
+          |> Util.translate_eval |> Utf8.capitalize_fst)
+          ((Util.person_title_text conf base a : Adef.safe_string :> string)
+          |> Util.transl_decline conf "up to")
       in
       Output.print_sstring conf str
   | _ -> ()
@@ -976,7 +1002,7 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
   let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
   match (b1, b2) with
   | Some b1, Some b2 ->
-      let bd = Option.value ~default:0 (p_getint conf.env "bd") in
+      let bd = Option.value ~default:0 (Util.p_getint conf.env "bd") in
       let td_prop =
         match Util.p_getenv conf.env "color" with
         | None | Some "" -> Adef.safe ""
@@ -1024,22 +1050,22 @@ let print_main_relationship conf base long p1 p2 rel =
     match rel with None -> Sosa.zero | Some (_, total, _) -> total
   in
   let title _ =
-    transl conf "relationship" |> Utf8.capitalize_fst
-    |> Output.print_sstring conf;
+    Util.transl conf "relationship"
+    |> Utf8.capitalize_fst |> Output.print_sstring conf;
     if not (Sosa.eq total Sosa.zero) then (
       Output.print_sstring conf " (";
       Output.print_sstring conf
-        (Sosa.to_string_sep (transl conf "(thousand separator)") total);
+        (Sosa.to_string_sep (Util.transl conf "(thousand separator)") total);
       Output.print_sstring conf " ";
       (if Sosa.eq total Sosa.one then 0 else 1)
-      |> transl_nth conf "relationship link/relationship links"
+      |> Util.transl_nth conf "relationship link/relationship links"
       |> Output.print_sstring conf;
       Output.print_sstring conf ")")
   in
   Hutil.header conf title;
   Output.print_sstring conf
     "\n<!-- Generated by RelationDisplay.print_main_relationship -->\n";
-  (match p_getenv conf.env "cgl" with
+  (match Util.p_getenv conf.env "cgl" with
   | Some "on" -> ()
   | _ ->
       let conf = { conf with is_printed_by_template = false } in
@@ -1048,40 +1074,40 @@ let print_main_relationship conf base long p1 p2 rel =
   | Some ("off" | "0"), _ | _, Some "off" ->
       conf.senv <- conf.senv @ [ ("sp", Mutil.encode "0") ]
   | _, _ -> ());
-  (match p_getenv conf.env "cgl" with
+  (match Util.p_getenv conf.env "cgl" with
   | Some "on" -> conf.senv <- conf.senv @ [ ("cgl", Mutil.encode "on") ]
   | _ -> ());
-  (match p_getenv conf.env "bd" with
+  (match Util.p_getenv conf.env "bd" with
   | None | Some ("0" | "") -> ()
   | Some x -> conf.senv <- conf.senv @ [ ("bd", Mutil.encode x) ]);
-  (match p_getenv conf.env "color" with
+  (match Util.p_getenv conf.env "color" with
   | None | Some "" -> ()
   | Some x -> conf.senv <- conf.senv @ [ ("color", Mutil.encode x) ]);
   (match rel with
   | None ->
       if Driver.get_iper p1 = Driver.get_iper p2 then (
-        transl conf "it is the same person!"
+        Util.transl conf "it is the same person!"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf " ")
       else (
         ([
-           gen_person_title_text reference conf base p1;
-           gen_person_title_text reference conf base p2;
+           Util.gen_person_title_text Util.reference conf base p1;
+           Util.gen_person_title_text Util.reference conf base p2;
          ]
           : Adef.safe_string list
           :> string list)
-        |> cftransl conf "no known relationship link between %s and %s"
+        |> Util.cftransl conf "no known relationship link between %s and %s"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf {|.<br><p><span><a href="|};
-        Output.print_string conf (commd ~excl:[ "m" ] conf);
+        Output.print_string conf (Util.commd ~excl:[ "m" ] conf);
         Output.print_sstring conf "&m=R&";
-        Output.print_string conf (acces conf base p1);
+        Output.print_string conf (Util.acces conf base p1);
         Output.print_sstring conf {|">|};
-        transl_nth conf "try another/relationship computing" 0
+        Util.transl_nth conf "try another/relationship computing" 0
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf "</a> ";
         Output.print_sstring conf
-          (transl_nth conf "try another/relationship computing" 1);
+          (Util.transl_nth conf "try another/relationship computing" 1);
         Output.print_sstring conf ".</span></p>")
   | Some (rl, _, relationship) ->
       let a1 = p1 in
@@ -1103,16 +1129,16 @@ let print_main_relationship conf base long p1 p2 rel =
       if long then () else print_dag_links conf base p1 p2 rl;
       if
         (not all_by_marr)
-        && authorized_age conf base p1
-        && authorized_age conf base p2
+        && Util.authorized_age conf base p1
+        && Util.authorized_age conf base p2
         && Driver.get_consang a1 != Adef.fix (-1)
         && Driver.get_consang a2 != Adef.fix (-1)
       then (
         Output.print_sstring conf "<p>\n";
         Output.printf conf "<em>%s%s %s%%</em>"
-          (Utf8.capitalize_fst (transl conf "relationship"))
+          (Utf8.capitalize_fst (Util.transl conf "relationship"))
           (Util.transl conf ":")
-          (string_of_decimal_num conf
+          (Util.string_of_decimal_num conf
              (round_2_dec
                 (Adef.float_of_fix (Adef.fix_of_float relationship) *. 100.0)));
         Output.print_sstring conf "</p>\n");
@@ -1149,18 +1175,18 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
           (List.rev pl2)
         |> fst
       in
-      commd ~excl:[ "t"; "i"; "m" ] conf ^^^ "m=RLM" ^<^ acc
+      Util.commd ~excl:[ "t"; "i"; "m" ] conf ^^^ "m=RLM" ^<^ acc
 
 let print_no_relationship conf base pl =
   let title _ =
-    transl conf "tree" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    Util.transl conf "tree" |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Output.print_sstring conf "<ul>";
   List.iter
     (fun p ->
       Output.print_sstring conf "<li>";
-      Output.print_string conf (referenced_person_title_text conf base p);
+      Output.print_string conf (Util.referenced_person_title_text conf base p);
       Output.print_sstring conf "</li>")
     pl;
   Output.print_sstring conf "</ul>";
@@ -1187,7 +1213,7 @@ let print_multi_relation conf base pl lim assoc_txt =
       | p1 :: (p2 :: _ as pl) -> (
           let ip1 = Driver.get_iper p1 in
           let ip2 = Driver.get_iper p2 in
-          match get_shortest_path_relation conf base ip1 ip2 [] with
+          match Relation.get_shortest_path_relation conf base ip1 ip2 [] with
           | Some (path1, _) ->
               let path =
                 match path with
@@ -1222,11 +1248,12 @@ let print_multi_relation conf base pl lim assoc_txt =
 
 let print_base_loop conf base p =
   let title _ =
-    transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    Util.transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
   Output.printf conf
-    (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
+    (Util.fcapitale
+       (Util.ftransl conf "loop in database: %s is his/her own ancestor"))
     (Util.update_family_loop conf base p
        (Util.designation base p : Adef.escaped_string :> Adef.safe_string)
       :> string);
@@ -1236,15 +1263,17 @@ let print_base_loop conf base p =
 let print conf base p p1 =
   match p1 with
   | Some p1 -> (
-      match p_getenv conf.env "et" with
+      match Util.p_getenv conf.env "et" with
       | Some "S" -> print_shortest_path conf base p1 p
       | x -> (
           let by_marr = x = Some "M" in
           let long =
-            match p_getenv conf.env "long" with Some "on" -> true | _ -> false
+            match Util.p_getenv conf.env "long" with
+            | Some "on" -> true
+            | _ -> false
           in
           match
-            try Left (compute_relationship conf base by_marr p1 p)
+            try Left (Relation.compute_relationship conf base by_marr p1 p)
             with Consang.TopologicalSortError p -> Right p
           with
           | Left rel -> print_main_relationship conf base long p1 p rel
@@ -1264,9 +1293,9 @@ let print_multi conf base =
     let pl =
       let rec loop pl i =
         let k = string_of_int i in
-        match find_person_in_env conf base k with
+        match Util.find_person_in_env conf base k with
         | Some p ->
-            (match p_getenv conf.env ("t" ^ k) with
+            (match Util.p_getenv conf.env ("t" ^ k) with
             | Some x -> Hashtbl.add assoc_txt (Driver.get_iper p) x
             | None -> ());
             loop (p :: pl) (i + 1)
@@ -1274,5 +1303,5 @@ let print_multi conf base =
       in
       loop [] 1
     in
-    let lim = Option.value ~default:0 (p_getint conf.env "lim") in
+    let lim = Option.value ~default:0 (Util.p_getint conf.env "lim") in
     print_multi_relation conf base pl lim assoc_txt
