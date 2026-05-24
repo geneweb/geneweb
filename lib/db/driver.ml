@@ -70,6 +70,12 @@ end
 module Ifam = I
 module Iper = I
 
+type synchro_patch = Database.synchro_patch = {
+  mutable synch_list : (string * int list * int list) list;
+}
+
+let input_synchro = Database.input_synchro
+
 type string_person_index = Dbdisk.string_person_index
 
 let spi_find spi = spi.find

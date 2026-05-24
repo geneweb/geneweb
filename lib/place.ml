@@ -64,9 +64,8 @@ let has_suburb s = String.unsafe_get s 0 = '['
 let re_parens = Str.regexp " ?(\\([^)]*\\))"
 
 (** Normalise parenthesised place components to comma-separated form. "Granville
-    (Manche)" -> "Granville, Manche" "Granville, Manche (50400)" -> "Granville,
-    Manche, 50400" Fast path: strings without '(' are returned unchanged with no
-    allocation. *)
+    (Manche)" -> "Granville, Manche" Fast path: strings without '(' are returned
+    unchanged with no allocation. *)
 let normalize_place_parens s =
   if String.contains s '(' then Str.global_replace re_parens ", \\1" s else s
 
@@ -159,7 +158,6 @@ let fold_place_long inverted s =
 (* TODO see how to merge these two fold_place_long *)
 let fold_place_long_v6 inverted s =
   let len = String.length s in
-  (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
   let rec loop iend list i ibeg =
     if i = iend then
       if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
@@ -218,7 +216,6 @@ let fold_place_short inverted s =
     else default ()
 
 let places_to_string inverse pl =
-  (* TODO reverse ??*)
   let pl = if inverse then List.rev pl else pl in
   let rec loop acc first = function
     | p :: l -> loop (p ^ (if first then "" else ", ") ^ acc) false l
@@ -251,13 +248,8 @@ let get_opt conf =
   String.concat "" l
 
 (** Heuristic initial hashtable size derived from conf.nb_of_persons. Estimate:
-    1 distinct place per 200 persons, clamped [1024, 2^18], rounded up to next
-    power of two to minimise Hashtbl rehashing. *)
-let ht_initial_size conf =
-  let np = conf.nb_of_persons in
-  let estimate = max 1024 (min (1 lsl 18) (np / 200)) in
-  let rec next_pow2 n = if n >= estimate then n else next_pow2 (n lsl 1) in
-  next_pow2 1024
+    1 distinct place per 200 persons, clamped [1024, 2^18]. *)
+let ht_initial_size conf = max 1024 (min (1 lsl 18) (conf.nb_of_persons / 200))
 
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
@@ -321,128 +313,40 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ht;
   array
 
-(** Finalise la liste brute [(istr_surname, iper) list] issue du scan nopatch en
-    une liste [(surname_string, iper list) list] triée, identique au résultat de
-    [fn] dans [print_all_places_surnames_aux]. *)
-let finalise_entry base_nop v =
-  let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
-  let rec loop acc = function
-    | [] -> acc
-    | (sn_istr, iper) :: tl -> (
-        let sn_str = Driver.sou_nopending base_nop sn_istr in
-        match acc with
-        | (sn', ipl) :: rest when sn_str = sn' ->
-            loop ((sn', iper :: ipl) :: rest) tl
-        | _ -> loop ((sn_str, [ iper ]) :: acc) tl)
-  in
-  loop [] v
+(** Predicate: should this person event be included given the current flags. *)
+let person_event_selected ~add_birth ~add_baptism ~add_death ~add_burial
+    (name : Driver.istr Def.gen_pers_event_name) =
+  match name with
+  | Epers_Birth -> add_birth
+  | Epers_Baptism -> add_baptism
+  | Epers_Death -> add_death
+  | Epers_Burial -> add_burial
+  | Epers_Cremation -> add_burial
+  | _ -> false
 
-(** Scan de la base principale SANS patches. Retourne un
-    [Place_cache.entry array] sérialisable. N'utilise que [get_nopending] /
-    [sou_nopending] pour rester indépendant des modifications web en cours. *)
-let get_all_nopatch conf base ~add_birth ~add_baptism ~add_death ~add_burial
-    ~add_marriage fold_place =
-  (* table : clé -> (istr_surname * iper) list  (accumulateur brut) *)
-  let ht : (string list * string, (Driver.istr * Driver.iper) list) Hashtbl.t =
-    Hashtbl.create (ht_initial_size conf)
-  in
-  let ht_add_nop key sn_istr iper =
-    match Hashtbl.find_opt ht key with
-    | Some prev -> Hashtbl.replace ht key ((sn_istr, iper) :: prev)
-    | None -> Hashtbl.add ht key [ (sn_istr, iper) ]
-  in
-  (* --- Personnes --- *)
-  if add_birth || add_baptism || add_death || add_burial then
-    Collection.iter
-      (fun iper ->
-        (* authorized_age via poi (avec patches) ; lieux via poi_nopending. *)
-        let p_obj = Driver.poi base iper in
-        if authorized_age conf base p_obj then begin
-          let p_nop = Driver.poi_nopending base iper in
-          let aux b get_pl =
-            if b then
-              let x = get_pl p_nop in
-              if not (Driver.Istr.is_empty x) then begin
-                let key =
-                  Driver.sou_nopending base x
-                  |> normalize_place_parens |> fold_place
-                in
-                ht_add_nop key (Driver.get_surname p_nop) iper
-              end
-          in
-          aux add_birth Driver.get_birth_place;
-          aux add_baptism Driver.get_baptism_place;
-          aux add_death Driver.get_death_place;
-          aux add_burial Driver.get_burial_place
-        end)
-      (Geneweb_db.Driver.ipers base);
-  (* --- Familles --- *)
-  if add_marriage then
-    Collection.iter
-      (fun ifam ->
-        let fam_nop = Driver.foi_nopending base ifam in
-        let pl = Driver.get_marriage_place fam_nop in
-        if not (Driver.Istr.is_empty pl) then begin
-          let key =
-            Driver.sou_nopending base pl |> normalize_place_parens |> fold_place
-          in
-          let fath = Driver.get_father fam_nop in
-          let moth = Driver.get_mother fam_nop in
-          let pf = Driver.poi base fath in
-          let pm = Driver.poi base moth in
-          if authorized_age conf base pf && authorized_age conf base pm then begin
-            let sn_f = Driver.get_surname (Driver.poi_nopending base fath) in
-            let sn_m = Driver.get_surname (Driver.poi_nopending base moth) in
-            match Hashtbl.find_opt ht key with
-            | Some prev ->
-                Hashtbl.replace ht key ((sn_f, fath) :: (sn_m, moth) :: prev)
-            | None -> Hashtbl.add ht key [ (sn_f, fath); (sn_m, moth) ]
-          end
-        end)
-      (Geneweb_db.Driver.ifams base);
-  (* --- Finalisation --- *)
-  let len = Hashtbl.length ht in
-  let arr = Array.make len Place_cache.dummy_entry in
-  let idx = ref 0 in
-  Hashtbl.iter
-    (fun k v ->
-      Array.unsafe_set arr !idx (k, finalise_entry base v);
-      incr idx)
-    ht;
-  arr
+(** Predicate: should this family event be included given the current flags. *)
+let family_event_selected ~add_marriage
+    (name : Driver.istr Def.gen_fam_event_name) =
+  match name with
+  | Efam_Marriage -> add_marriage
+  | Efam_MarriageBann -> add_marriage
+  | Efam_MarriageContract -> add_marriage
+  | Efam_MarriageLicense -> add_marriage
+  | Efam_PACS -> add_marriage
+  | Efam_Residence -> add_marriage
+  | _ -> false
 
-(** Applique le delta des patches sur un tableau de cache chargé depuis le
-    disque. Coût : O(|patches|) — typiquement quelques centaines d'entrées entre
-    deux exécutions de gwc. *)
-let apply_patches_delta conf base (cached : Place_cache.entry array) ~add_birth
-    ~add_baptism ~add_death ~add_burial ~add_marriage fold_place filter =
-  (* Reconstruire une hashtable mutable depuis le cache *)
+(** Convert the new flat cache format into the presentation format expected by
+    [print_html_places_surnames_*].
+
+    The cache is unfiltered; filtering by event type, authorised age, and
+    initial-letter [filter] is applied here at query time. *)
+let cache_to_array conf base (cache : Place_cache.t) ~add_birth ~add_baptism
+    ~add_death ~add_burial ~add_marriage fold_place filter =
   let ht : (string list * string, (string * Driver.iper list) list) Hashtbl.t =
-    Hashtbl.create (Array.length cached * 2)
+    Hashtbl.create (Hashtbl.length cache.Place_cache.persons)
   in
-  Array.iter (fun (k, v) -> Hashtbl.add ht k v) cached;
-
-  (* --- Helpers ---------------------------------------------------- *)
-
-  (* Retire [iper] de toutes les listes associées à [key] dans [ht].
-      Supprime l'entrée si elle devient vide. *)
-  let remove_iper_from key iper =
-    match Hashtbl.find_opt ht key with
-    | None -> ()
-    | Some snl ->
-        let snl' =
-          List.filter_map
-            (fun (sn, ipl) ->
-              let ipl' = List.filter (fun i -> i <> iper) ipl in
-              if ipl' = [] then None else Some (sn, ipl'))
-            snl
-        in
-        if snl' = [] then Hashtbl.remove ht key else Hashtbl.replace ht key snl'
-  in
-
-  (* Ajoute [iper] sous le nom de famille [sn_str] à la clé [key].
-      Sans doublon. *)
-  let add_iper_to key sn_str iper =
+  let add_iper key sn_str iper =
     if filter key then
       match Hashtbl.find_opt ht key with
       | None -> Hashtbl.add ht key [ (sn_str, [ iper ]) ]
@@ -456,122 +360,62 @@ let apply_patches_delta conf base (cached : Place_cache.entry array) ~add_birth
           in
           Hashtbl.replace ht key snl'
   in
-
-  (* Traite un champ de lieu pour une personne patchée :
-      retire l'ancienne contribution (lue via nopending),
-      ajoute la nouvelle (lue via get courant).
-      [get_pl] : Driver.person -> Driver.istr  — même getter pour les deux
-      lectures car le type [Driver.person] est opaque dans les deux cas. *)
-  let process_person_event b get_pl p_nop iper =
-    if b then begin
-      (* Ancienne valeur : base principale sans patches *)
-      let old_istr = get_pl p_nop in
-      if not (Driver.Istr.is_empty old_istr) then
-        remove_iper_from
-          (Driver.sou_nopending base old_istr
-          |> normalize_place_parens |> fold_place)
-          iper;
-      (* Nouvelle valeur : base avec patches *)
-      let p_new = Driver.poi base iper in
-      let new_istr = get_pl p_new in
-      if not (Driver.Istr.is_empty new_istr) then begin
-        let key =
-          Driver.sou base new_istr |> normalize_place_parens |> fold_place
-        in
-        if authorized_age conf base p_new then
-          add_iper_to key (Driver.sou base (Driver.get_surname p_new)) iper
-      end
-    end
+  Hashtbl.iter
+    (fun place events ->
+      let key = normalize_place_parens place |> fold_place in
+      List.iter
+        (fun (evname, iper) ->
+          if
+            person_event_selected ~add_birth ~add_baptism ~add_death ~add_burial
+              evname
+          then
+            let p = Driver.poi base iper in
+            if authorized_age conf base p then
+              let sn = Driver.sou base (Driver.get_surname p) in
+              add_iper key sn iper)
+        events)
+    cache.Place_cache.persons;
+  Hashtbl.iter
+    (fun place events ->
+      let key = normalize_place_parens place |> fold_place in
+      List.iter
+        (fun (evname, ifam) ->
+          if family_event_selected ~add_marriage evname then
+            let fam = Driver.foi base ifam in
+            let fath = Driver.get_father fam in
+            let moth = Driver.get_mother fam in
+            let pf = Driver.poi base fath in
+            let pm = Driver.poi base moth in
+            if authorized_age conf base pf && authorized_age conf base pm then begin
+              let sn_f = Driver.sou base (Driver.get_surname pf) in
+              let sn_m = Driver.sou base (Driver.get_surname pm) in
+              add_iper key sn_f fath;
+              add_iper key sn_m moth
+            end)
+        events)
+    cache.Place_cache.families;
+  let len = Hashtbl.length ht in
+  let dummy : (string list * string) * (string * Driver.iper list) list =
+    (([], ""), [])
   in
+  let arr = Array.make len dummy in
+  let idx = ref 0 in
+  Hashtbl.iter
+    (fun k v ->
+      Array.unsafe_set arr !idx (k, v);
+      incr idx)
+    ht;
+  arr
 
-  (* --- Personnes patchées ----------------------------------------- *)
-  Driver.iter_patched_ipers base (fun iper ->
-      let p_nop = Driver.poi_nopending base iper in
-      process_person_event add_birth Driver.get_birth_place p_nop iper;
-      process_person_event add_baptism Driver.get_baptism_place p_nop iper;
-      process_person_event add_death Driver.get_death_place p_nop iper;
-      process_person_event add_burial Driver.get_burial_place p_nop iper);
-
-  (* --- Familles patchées ------------------------------------------ *)
-  if add_marriage then
-    Driver.iter_patched_ifams base (fun ifam ->
-        let fam_nop = Driver.foi_nopending base ifam in
-        let old_pl = Driver.get_marriage_place fam_nop in
-        let fam_new = Driver.foi base ifam in
-        let new_pl = Driver.get_marriage_place fam_new in
-        let fath = Driver.get_father fam_new in
-        let moth = Driver.get_mother fam_new in
-        let pf = Driver.poi base fath in
-        let pm = Driver.poi base moth in
-        (* Retirer les anciennes contributions *)
-        if not (Driver.Istr.is_empty old_pl) then begin
-          let old_key =
-            Driver.sou_nopending base old_pl
-            |> normalize_place_parens |> fold_place
-          in
-          remove_iper_from old_key fath;
-          remove_iper_from old_key moth
-        end;
-        (* Ajouter les nouvelles *)
-        if
-          (not (Driver.Istr.is_empty new_pl))
-          && authorized_age conf base pf
-          && authorized_age conf base pm
-        then begin
-          let new_key =
-            Driver.sou base new_pl |> normalize_place_parens |> fold_place
-          in
-          add_iper_to new_key (Driver.sou base (Driver.get_surname pf)) fath;
-          add_iper_to new_key (Driver.sou base (Driver.get_surname pm)) moth
-        end);
-
-  (* --- Reconstruire le tableau final avec filtre ------------------ *)
-  Hashtbl.fold (fun k v acc -> if filter k then (k, v) :: acc else acc) ht []
-  |> Array.of_list
-
-(** Point d'entrée principal : charge le cache si valide, sinon reconstruit
-    depuis la base, puis applique le delta patches. Remplace l'appel direct à
-    [get_all] dans [print_all_places_surnames_aux]. *)
+(** Main entry point for the PPS index. Loads the cache from disk if valid,
+    rebuilds it otherwise, then converts to the presentation format with event
+    filtering applied. *)
 let get_all_cached conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage fold_place filter =
   let bdir = Driver.bdir base in
-  let flags =
-    Place_cache.
-      {
-        add_birth;
-        add_baptism;
-        add_death;
-        add_burial;
-        add_marriage;
-        inverted =
-          (try List.assoc "places_inverted" conf.base_env = "yes"
-           with Not_found -> false);
-      }
-  in
-  let path = Place_cache.cache_path bdir flags in
-  (* Charge ou (re)construit le cache de base (sans patches) *)
-  let base_arr : Place_cache.entry array =
-    let build () =
-      Log.info (fun k -> k "Building PPS cache: %s" path);
-      let arr =
-        get_all_nopatch conf base ~add_birth ~add_baptism ~add_death ~add_burial
-          ~add_marriage fold_place
-      in
-      Place_cache.write_cache path arr;
-      arr
-    in
-    if Place_cache.cache_is_valid bdir path then
-      match Place_cache.read_cache path with
-      | Some arr ->
-          Log.info (fun k ->
-              k "PPS cache loaded: %s (%d entries)" path (Array.length arr));
-          arr
-      | None -> build ()
-    else build ()
-  in
-  (* Applique le delta patches par-dessus le cache *)
-  apply_patches_delta conf base base_arr ~add_birth ~add_baptism ~add_death
-    ~add_burial ~add_marriage fold_place filter
+  let cache = Place_cache.get_or_build bdir conf base in
+  cache_to_array conf base cache ~add_birth ~add_baptism ~add_death ~add_burial
+    ~add_marriage fold_place filter
 
 let rec sort_place_utf8 k1 k2 =
   match (k1, k2) with
@@ -588,13 +432,9 @@ let clean_ps ps =
   if ps.[0] = '(' && ps.[len - 1] = ')' then String.sub ps 1 (len - 2) else ps
 
 let find_in conf x ini =
-  (* look at possibility to have ini=aaa, bbb or aaa (bbb) *)
   let word = p_getenv conf.env "word" = Some "on" in
-  (* full words *)
   let case = p_getenv conf.env "case" = Some "on" in
-  (* case sensitive *)
   let any = p_getenv conf.env "any" = Some "on" in
-  (* anywhere in place list *)
   let low s = if not case then Name.lower s else s in
   let inil = String.split_on_char ',' ini in
   let inil =
@@ -698,7 +538,6 @@ let strip_pl keep pll =
 
 let print_html_places_surnames_short conf _base _link_to_ind
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
-  (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let long = p_getenv conf.env "display" = Some "long" in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
@@ -707,8 +546,6 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let opt = get_opt conf in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let l = Array.to_list arry in
-  (* build new list of (places, ipl) *)
-  (* accumulate snl according to keep *)
   let new_l =
     let rec loop prev_pl acc_snl acc_l = function
       | ((pl, _sub), snl) :: l when prev_pl = strip_pl keep pl ->
@@ -727,7 +564,6 @@ let print_html_places_surnames_short conf _base _link_to_ind
     in
     loop [] [] [] l
   in
-  (* sort *)
   let new_l =
     if a_sort then
       List.sort
@@ -747,7 +583,6 @@ let print_html_places_surnames_short conf _base _link_to_ind
         new_l
     else new_l
   in
-  (* accumulate snl entries with same pl value *)
   let new_l =
     let rec loop prev acc_snl acc_l new_l =
       match (new_l, prev) with
@@ -817,7 +652,6 @@ let print_html_places_surnames_short conf _base _link_to_ind
 
 let print_html_places_surnames_long conf base link_to_ind
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
-  (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let k =
     (Mutil.encode (match p_getenv conf.env "k" with Some s -> s | _ -> "")
       :> string)
@@ -829,7 +663,6 @@ let print_html_places_surnames_long conf base link_to_ind
   let opt = get_opt conf in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let l = Array.to_list arry in
-  (* sort global list according to a_sort, f_sort *)
   let l =
     if f_sort then
       List.sort
@@ -842,7 +675,6 @@ let print_html_places_surnames_long conf base link_to_ind
     else l
   in
   let print_sn (sn, ips) (pl, _sub) =
-    (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
     let places = places_to_string true pl in
     if link_to_ind then (
@@ -863,7 +695,6 @@ let print_html_places_surnames_long conf base link_to_ind
   let print_sn_list (pl, sub) (snl : (string * Driver.iper list) list) =
     Output.printf conf "<li>%s\n" (if sub <> "" then sub else "");
     let snl =
-      (* sort surname list according to a_sort, f_sort *)
       if f_sort then
         List.sort
           (fun (_, ipl1) (_, ipl2) ->
@@ -903,7 +734,6 @@ let print_html_places_surnames_long conf base link_to_ind
                   (x1 :: l1);
                 loop1 [] (x2 :: l2, sub))
           | _ -> Output.print_sstring conf "</ul></li>\n"
-          (* FIXME was assert false!! *)
         in
         loop1 prev (pl, sub);
         print_sn_list (pl, sub) snl;
@@ -920,43 +750,14 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
     try List.assoc "places_inverted" conf.base_env = "yes"
     with Not_found -> false
   in
-  (* ------------------------------------------------------------------
-     On utilise get_all_cached au lieu du scan complet get_all.
-     - Première requête (cache absent ou périmé) : reconstruit le cache
-       depuis la base nopatch, puis applique le delta patches.
-     - Requêtes suivantes : charge le cache en quelques ms, applique
-       le delta patches (O(|patches|)).
-     - Après gwc : le cache est périmé (mtime base > mtime cache) et
-       sera reconstruit automatiquement à la prochaine requête.
-     ------------------------------------------------------------------ *)
   let fold = fold_place_long inverted in
+  (* Always use the cache; demote to short display a posteriori if the
+     result exceeds the threshold. *)
   let arry =
-    if short then
-      (* Mode short : on utilise encore get_all direct pour pouvoir
-         lever List_too_long et basculer en mode court.
-         Le cache ne sert qu'en mode long/normal. *)
-      get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
-        ~add_marriage ([], "") [] fold filter
-        (fun prev p ->
-          let value = (Driver.get_surname p, Driver.get_iper p) in
-          match prev with Some l -> value :: l | None -> [ value ])
-        (fun v ->
-          let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
-          let rec loop acc l =
-            match (l, acc) with
-            | [], _ -> acc
-            | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc
-              when Driver.sou base sn = sn' ->
-                loop ((sn', iper :: iper_list) :: tl_acc) tl_list
-            | (sn, iper) :: tl_list, _ ->
-                loop ((Driver.sou base sn, [ iper ]) :: acc) tl_list
-          in
-          loop [] v)
-        max_length
-    else
-      get_all_cached conf base ~add_birth ~add_baptism ~add_death ~add_burial
-        ~add_marriage fold filter
+    get_all_cached conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      ~add_marriage fold filter
   in
+  let short = short || Array.length arry > max_length in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let title _ =
     Output.printf conf "%s / %s"
@@ -1032,20 +833,8 @@ let print_all_places_surnames conf base =
         )
     | None -> ("", fun _ -> true)
   in
-  try
-    print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
-      ~add_death ~add_burial ~add_marriage lim false filter
-  with List_too_long ->
-    let conf =
-      {
-        conf with
-        env =
-          ("display", Adef.encoded "short")
-          :: List.remove_assoc "display" conf.env;
-      }
-    in
-    print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
-      ~add_death ~add_burial ~add_marriage lim true filter
+  print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism ~add_death
+    ~add_burial ~add_marriage lim false filter
 
 let print_list conf _base =
   let ifun =

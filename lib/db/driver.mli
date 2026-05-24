@@ -383,6 +383,17 @@ val iter_patched_ifams : base -> (ifam -> unit) -> unit
     committed patches hashtable, i.e. families modified or added since the last
     [gwc] run. Order is unspecified. *)
 
+type synchro_patch = {
+  mutable synch_list : (string * int list * int list) list;
+}
+(** Timestamped history of base modifications. Each entry
+    [(timestamp, ipers, ifams)] records the integer indices of persons and
+    families modified during one commit. *)
+
+val input_synchro : string -> synchro_patch
+(** [input_synchro bdir] reads the [synchro_patches] file from [bdir]. Returns
+    an empty patch list if the file does not exist. *)
+
 val no_person : iper -> (iper, iper, istr) Def.gen_person
 (** Returns unitialised [gen_person] with giving id *)
 
