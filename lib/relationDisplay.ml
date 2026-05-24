@@ -163,8 +163,6 @@ let ind_set_of_relation_path base path =
   in
   Iper.Set.elements set
 
-type node = NotVisited | Visited of (bool * Driver.iper * famlink)
-
 let excl_faml conf base =
   let rec loop list i =
     match p_getenv conf.Config.env ("ef" ^ string_of_int i) with
@@ -1020,11 +1018,6 @@ let print_path conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
     (fun (a, _) -> print_one_path conf base found a p1 p2 pp1 pp2 l1 l2)
     list;
   Output.print_sstring conf "\n"
-
-type 'a env = Vother of 'a | Vnone
-
-let get_vother = function Vother x -> Some x | _ -> None
-let set_vother x = Vother x
 
 let print_main_relationship conf base long p1 p2 rel =
   let total =
