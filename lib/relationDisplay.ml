@@ -1121,26 +1121,22 @@ let print_main_relationship conf base long p1 p2 rel =
         Util.transl conf "it is the same person!"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf " ")
-      else (
-        ([
-           Util.gen_person_title_text Util.reference conf base p1;
-           Util.gen_person_title_text Util.reference conf base p2;
-         ]
-          : Adef.safe_string list
-          :> string list)
-        |> Util.cftransl conf "no known relationship link between %s and %s"
-        |> Utf8.capitalize_fst |> Output.print_sstring conf;
-        Output.print_sstring conf {|.<br><p><span><a href="|};
-        Output.print_string conf (Util.commd ~excl:[ "m" ] conf);
-        Output.print_sstring conf "&m=R&";
-        Output.print_string conf (Util.acces conf base p1);
-        Output.print_sstring conf {|">|};
-        Util.transl_nth conf "try another/relationship computing" 0
-        |> Utf8.capitalize_fst |> Output.print_sstring conf;
-        Output.print_sstring conf "</a> ";
-        Output.print_sstring conf
-          (Util.transl_nth conf "try another/relationship computing" 1);
-        Output.print_sstring conf ".</span></p>")
+      else
+        Output.printf conf
+          {|%s.<br><p><span><a href="%s&m=R&%s">%s</a> %s.</span></p>|}
+          (([
+              Util.gen_person_title_text Util.reference conf base p1;
+              Util.gen_person_title_text Util.reference conf base p2;
+            ]
+             : Adef.safe_string list
+             :> string list)
+          |> Util.cftransl conf "no known relationship link between %s and %s"
+          |> Utf8.capitalize_fst)
+          (Util.commd ~excl:[ "m" ] conf :> string)
+          (Util.acces conf base p1 :> string)
+          (Util.transl_nth conf "try another/relationship computing" 0
+          |> Utf8.capitalize_fst)
+          (Util.transl_nth conf "try another/relationship computing" 1)
   | Some (rl, _, relationship) ->
       let a1 = p1 in
       let a2 = p2 in
