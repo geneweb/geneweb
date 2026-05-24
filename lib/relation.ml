@@ -8,16 +8,10 @@ module Iper = Driver.Iper
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 
-(* find shortest path :
- * parents, siblings, mates and children are at distance 1.
- *)
+(* Find shortest path: parents, siblings, mates and children are at distance 1. *)
 type famlink = Self | Parent | Sibling | HalfSibling | Mate | Child
-type person_id = Driver.iper
-type family_id = Driver.ifam
-type path_count = int
-type degree = int
 
-(** Structure compacte pour les chemins de parent?
+(** Compact structure for the relationship paths
     - p : person identifier (iper)
     - f : family identifiers list (ifams)
     - c : count of paths through this ancestor
@@ -158,59 +152,6 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
   Collection.Marker.set mark_per ip1 @@ Visited (true, ip1, Self);
   Collection.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
   width_search [ ip1 ] 0 [ ip2 ] 0
-
-(** [simplify_path conf base path] Removes unnecessary people from the path
-    (e.g. half sibling when only parents are useful)
-
-    [ (HalfSibling|Sibling|Child) as x -> Child -> HalfSibling ] becomes
-    [ x -> Mate -> Child ]
-
-    [ HalfSibling -> Parent ] becomes [ Parent -> Mate -> Mate -> Parent ] *)
-let simplify_path base path =
-  let get get i =
-    let p = Driver.poi base i in
-    match Driver.get_parents p with
-    | None -> assert false
-    | Some parents -> get (Driver.foi base parents)
-  in
-  let aux get_field ht i =
-    match Hashtbl.find_opt ht i with
-    | Some r -> r
-    | None ->
-        let r = get get_field i in
-        Hashtbl.add ht i r;
-        r
-  in
-  let mother = aux Driver.get_mother (Hashtbl.create 0) in
-  let father = aux Driver.get_father (Hashtbl.create 0) in
-  let rec simplify = function
-    | [] -> []
-    | ((i1, (HalfSibling | Sibling | Child)) as x)
-      :: (i2, Child)
-      :: (_, HalfSibling)
-      :: tl ->
-        x
-        :: (if father i1 = father i2 then (mother i2, Mate)
-            else (father i2, Mate))
-        :: simplify tl
-    | ((i1, _r1) as x1) :: (i2, HalfSibling) :: (i3, Parent) :: tl ->
-        if father i1 = father i2 then
-          x1
-          :: (father i2, Parent)
-          :: (mother i2, Mate)
-          :: (if mother i2 = i3 then simplify tl else (i3, Mate) :: simplify tl)
-        else
-          x1
-          :: (mother i2, Parent)
-          :: (father i2, Mate)
-          :: (if father i2 = i3 then simplify tl else (i3, Mate) :: simplify tl)
-    | x :: tl -> x :: simplify tl
-  in
-  let rec loop path =
-    let path' = simplify path in
-    if path = path' then path else loop path'
-  in
-  loop path
 
 let rec belongs_to_branch ip dist = function
   | (n, _, ipl) :: lens ->
