@@ -35,6 +35,12 @@
 %define;get_marriage(myindex)
   %p_of_index.myindex.marriage_places_raw;
 %end;
+%define;get_pevents(myindex)
+  %qvar.myindex.pevents_places_raw;
+%end;
+%define;get_fevents(myindex)
+  %qvar.myindex.fevents_places_raw;
+%end;
 %define;get_value(myindex,param)
   %if;("param"="father" or "param"="mother")
     %if;(p_of_index.myindex.has_parents)
@@ -77,6 +83,8 @@
   %if;(e.ma="on")&ma=on%end;%nn;
   %if;(e.de="on")&de=on%end;%nn;
   %if;(e.bu="on")&bu=on%end;%nn;
+  %if;(e.pe="on")&pe=on%end;%nn;
+  %if;(e.fe="on")&fe=on%end;%nn;
   %if;(e.long="on")&long=on%end;%nn;
   %if;(e.f_sort="on")&f_sort=on%end;
   %end;
@@ -93,7 +101,9 @@
     %apply;evt("ba",[baptism],"B")
     %apply;evt("ma",[marriage event],"M")
     %apply;evt("de",[death],"D")
-    %apply;evt("bu",[burial],"S").
+    %apply;evt("bu",[burial],"S")
+    %apply;evt("pe",[other person events],"P")
+    %apply;evt("fe",[other family events],"F").
   %end;
 </div>
 
@@ -113,12 +123,16 @@
   %let;myindex;xx%in;
   %let;birthplace;%apply;get_value(myindex, "birth_place_raw")%in;
   %let;baptismplace;%apply;get_value(myindex, "baptism_place_raw")%in;
-  %let;marriageplace;%apply;get_marriage(myindex)%in;
+  %let;marriageplace;%apply;get_marriages(myindex)%in;
+  %let;peventsplace;%apply;get_pevents(myindex)%in;
+  %let;feventsplace;%apply;get_fevents(myindex)%in;
   %let;deathplace;%apply;get_value(myindex, "death_place_raw")%in;
   %let;burialplace;%apply;get_value(myindex, "burial_place_raw")%in;
   %apply;nbmds(birthplace,"N","tt","ss")%nn;
   %apply;nbmds(baptismplace,"B","tt","ss")%nn;
   %apply;nbmds_m(marriageplace,"M","tt","ss")%nn;
+  %apply;nbmds_m(peventsplace,"P","tt","ss")%nn;
+  %apply;nbmds_m(feventsplace,"F","tt","ss")%nn;
   %apply;nbmds(deathplace,"D","tt","ss")%nn;
   %apply;nbmds(burialplace,"S","tt","ss")%nn;
 %end;
@@ -205,6 +219,7 @@
           %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
            and env.key!="k"
            and env.key!="bi" and env.key!="ba" and env.key!="ma" and env.key!="de" and env.key!="bu"
+           and env.key!="pe" and env.key!="fe"
            and env.key!="surn" and env.key!="datesort" and env.key!="i0")&%env.key;=%env.val;%nn;
           %elseif;(env.key="i0")&i%e.nb;=%env.val;%end;%nn;
           %end;%nn;

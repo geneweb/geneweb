@@ -50,13 +50,25 @@
         %if;(evar.bu!="" and evar.bu="on") checked%end;>
       <label class="form-check-label" title="[*burial place]" for="bu">[*burial]</label>
     </div>
+    <div class="form-check m-0">
+      <input type="checkbox" class="form-check-input" name="pe" id="pe" value="on"
+        %if;(evar.pe!="" and evar.pe="on") checked%end;>
+      <label class="form-check-label" title="[*other person events title]" for="pe">[*other person events]</label>
+    </div>
+    <div class="form-check m-0">
+      <input type="checkbox" class="form-check-input" name="fe" id="fe" value="on"
+        %if;(evar.fe!="" and evar.fe="on") checked%end;>
+      <label class="form-check-label" title="[*other family events title]" for="fe">[*other family events]</label>
+    </div>
     <div class="form-check m-0 ms-2">
       <input type="checkbox" class="form-check-input" name="all" id="all" value="on"
         %if;((evar.bi!="" and evar.bi="on") and
              (evar.ba!="" and evar.ba="on") and
              (evar.ma!="" and evar.ma="on") and
              (evar.de!="" and evar.de="on") and
-             (evar.bu!="" and evar.bu="on")) checked%end;>
+             (evar.bu!="" and evar.bu="on") and
+             (evar.pe!="" and evar.pe="on") and
+             (evar.fe!="" and evar.fe="on")) checked%end;>
       <label class="form-check-label" title="[*all]" for="all">[*all]</label>
     </div>
   </div>
@@ -131,7 +143,7 @@ function toggle(btnId, state) {
 }
 
 // Ids des 5 cases d'événements (ordre préservé)
-const eventIds = ["bi", "ba", "ma", "de", "bu"];
+const eventIds = ["bi", "ba", "ma", "de", "bu", "pe", "fe"];
 
 // Met à jour la case "all" selon l'état des 5 cases d'événements.
 // CORRECTIF : l'original testait `bp` deux fois et ignorait `bu`
