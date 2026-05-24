@@ -4313,6 +4313,39 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         ""
         (Array.to_list (Driver.get_family p))
       |> str_val
+  | "pevents_places_raw" ->
+      List.fold_left
+        (fun acc evt ->
+          match evt.epers_name with
+          | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+          | Epers_Cremation ->
+              acc
+          | _ ->
+              let pl =
+                Driver.sou base evt.epers_place |> Place.normalize_place_parens
+              in
+              if pl = "" then acc else acc ^ (if acc = "" then "" else "|") ^ pl)
+        "" (Driver.get_pevents p)
+      |> str_val
+  | "fevents_places_raw" ->
+      List.fold_left
+        (fun acc ifam ->
+          List.fold_left
+            (fun acc evt ->
+              match evt.efam_name with
+              | Efam_Marriage -> acc
+              | _ ->
+                  let pl =
+                    Driver.sou base evt.efam_place
+                    |> Place.normalize_place_parens
+                  in
+                  if pl = "" then acc
+                  else acc ^ (if acc = "" then "" else "|") ^ pl)
+            acc
+            (Driver.get_fevents (Driver.foi base ifam)))
+        ""
+        (Array.to_list (Driver.get_family p))
+      |> str_val
   | "mother_age_at_birth" ->
       string_of_parent_age conf base ep Driver.get_mother |> safe_val
   | "misc_names" ->

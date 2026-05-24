@@ -8522,6 +8522,14 @@ ru: событие/события
 sv: händelse/Händelse
 tr: etkinlik/etkinlikler
 
+    other person events
+en: person events
+fr: événements personnels
+
+    other family events
+en: family events
+fr: événements famille
+
     event/events for this place
 de: Ereignis für diesen Ort/Ereignisse für diesen Ort
 en: event for this place/events for this place

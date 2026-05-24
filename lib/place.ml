@@ -237,6 +237,8 @@ let get_opt conf =
         "de";
         "bu";
         "ma";
+        "pe";
+        "fe";
         "f_sort";
         "up";
         "a_sort";
@@ -315,17 +317,17 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
 
 (** Predicate: should this person event be included given the current flags. *)
 let person_event_selected ~add_birth ~add_baptism ~add_death ~add_burial
-    (name : Driver.istr Def.gen_pers_event_name) =
+    ~add_pevents (name : Driver.istr Def.gen_pers_event_name) =
   match name with
   | Epers_Birth -> add_birth
   | Epers_Baptism -> add_baptism
   | Epers_Death -> add_death
   | Epers_Burial -> add_burial
   | Epers_Cremation -> add_burial
-  | _ -> false
+  | _ -> add_pevents
 
 (** Predicate: should this family event be included given the current flags. *)
-let family_event_selected ~add_marriage
+let family_event_selected ~add_marriage ~add_fevents
     (name : Driver.istr Def.gen_fam_event_name) =
   match name with
   | Efam_Marriage -> add_marriage
@@ -334,7 +336,7 @@ let family_event_selected ~add_marriage
   | Efam_MarriageLicense -> add_marriage
   | Efam_PACS -> add_marriage
   | Efam_Residence -> add_marriage
-  | _ -> false
+  | _ -> add_fevents
 
 (** Convert the new flat cache format into the presentation format expected by
     [print_html_places_surnames_*].
@@ -342,7 +344,8 @@ let family_event_selected ~add_marriage
     The cache is unfiltered; filtering by event type, authorised age, and
     initial-letter [filter] is applied here at query time. *)
 let cache_to_array conf base (cache : Place_cache.t) ~add_birth ~add_baptism
-    ~add_death ~add_burial ~add_marriage fold_place filter =
+    ~add_death ~add_burial ~add_marriage ~add_pevents ~add_fevents fold_place
+    filter =
   let ht : (string list * string, (string * Driver.iper list) list) Hashtbl.t =
     Hashtbl.create (Hashtbl.length cache.Place_cache.persons)
   in
@@ -367,7 +370,7 @@ let cache_to_array conf base (cache : Place_cache.t) ~add_birth ~add_baptism
         (fun (evname, iper) ->
           if
             person_event_selected ~add_birth ~add_baptism ~add_death ~add_burial
-              evname
+              ~add_pevents evname
           then
             let p = Driver.poi base iper in
             if authorized_age conf base p then
@@ -380,7 +383,7 @@ let cache_to_array conf base (cache : Place_cache.t) ~add_birth ~add_baptism
       let key = normalize_place_parens place |> fold_place in
       List.iter
         (fun (evname, ifam) ->
-          if family_event_selected ~add_marriage evname then
+          if family_event_selected ~add_marriage ~add_fevents evname then
             let fam = Driver.foi base ifam in
             let fath = Driver.get_father fam in
             let moth = Driver.get_mother fam in
@@ -411,11 +414,11 @@ let cache_to_array conf base (cache : Place_cache.t) ~add_birth ~add_baptism
     rebuilds it otherwise, then converts to the presentation format with event
     filtering applied. *)
 let get_all_cached conf base ~add_birth ~add_baptism ~add_death ~add_burial
-    ~add_marriage fold_place filter =
+    ~add_marriage ~add_pevents ~add_fevents fold_place filter =
   let bdir = Driver.bdir base in
   let cache = Place_cache.get_or_build bdir conf base in
   cache_to_array conf base cache ~add_birth ~add_baptism ~add_death ~add_burial
-    ~add_marriage fold_place filter
+    ~add_marriage ~add_pevents ~add_fevents fold_place filter
 
 let rec sort_place_utf8 k1 k2 =
   match (k1, k2) with
@@ -745,7 +748,8 @@ let print_html_places_surnames_long conf base link_to_ind
   Output.print_sstring conf "</ul>\n"
 
 let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
-    ~add_death ~add_burial ~add_marriage max_length short filter =
+    ~add_death ~add_burial ~add_marriage ~add_pevents ~add_fevents max_length
+    short filter =
   let inverted =
     try List.assoc "places_inverted" conf.base_env = "yes"
     with Not_found -> false
@@ -755,7 +759,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
      result exceeds the threshold. *)
   let arry =
     get_all_cached conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      ~add_marriage fold filter
+      ~add_marriage ~add_pevents ~add_fevents fold filter
   in
   let short = short || Array.length arry > max_length in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
@@ -821,6 +825,8 @@ let print_all_places_surnames conf base =
   let add_baptism = p_getenv conf.env "ba" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
+  let add_pevents = p_getenv conf.env "pe" = Some "on" in
+  let add_fevents = p_getenv conf.env "fe" = Some "on" in
   let lim =
     try int_of_string @@ List.assoc "short_place_threshold" conf.base_env
     with _ -> 500
@@ -834,7 +840,7 @@ let print_all_places_surnames conf base =
     | None -> ("", fun _ -> true)
   in
   print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism ~add_death
-    ~add_burial ~add_marriage lim false filter
+    ~add_burial ~add_marriage ~add_pevents ~add_fevents lim false filter
 
 let print_list conf _base =
   let ifun =
