@@ -283,7 +283,6 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   ^<^ (if sps then "" else "&sp=0")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
 
-(* FIXME: remove Array.to_list ?!*)
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then (
     let title _ =
@@ -297,7 +296,9 @@ let print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
     let vbar_txt ip =
       let u = Util.pget conf base ip in
-      let excl_faml = Array.to_list (Driver.get_family u) @ excl_faml in
+      let excl_faml =
+        Array.fold_right List.cons (Driver.get_family u) excl_faml
+      in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
     print_relationship_dag conf base elem_txt vbar_txt path next_txt
