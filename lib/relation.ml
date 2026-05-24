@@ -111,17 +111,17 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
       (List.rev p2)
   in
   let one_step_further source queue =
-    let rec loop1 newvertexlist = function
+    let rec loop1 newvertexlist newcount = function
       | vertex :: vertexlist ->
-          let rec loop2 result = function
+          let rec loop2 result count = function
             | (iper, fl, ifam) :: neighbourslist -> (
                 match Collection.Marker.get mark_per iper with
                 | NotVisited ->
                     Collection.Marker.set mark_per iper
                       (Visited (source, vertex, fl));
-                    loop2 (iper :: result) neighbourslist
+                    loop2 (iper :: result) (count + 1) neighbourslist
                 | Visited (s, v, f) ->
-                    if s = source then loop2 result neighbourslist
+                    if s = source then loop2 result count neighbourslist
                     else
                       let p1 = make_path [ (iper, fl) ] vertex in
                       let p2 = make_path [ (iper, f) ] v in
@@ -129,29 +129,33 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
                         if source then merge_path p2 p1 else merge_path p1 p2
                       in
                       Left (path, ifam))
-            | [] -> loop1 result vertexlist
+            | [] -> loop1 result count vertexlist
           in
-          loop2 newvertexlist (neighbours vertex)
-      | [] -> Right newvertexlist
+          loop2 newvertexlist newcount (neighbours vertex)
+      | [] -> Right (newvertexlist, newcount)
     in
-    loop1 [] queue
+    loop1 [] 0 queue
   in
-  let rec width_search queue1 visited1 queue2 visited2 =
-    if queue1 = [] || queue2 = [] then None
-    else if visited1 > visited2 then
-      let visited2 = visited2 + List.length queue2 in
-      match one_step_further false queue2 with
-      | Left (path, ifam) -> Some (path, ifam)
-      | Right queue2 -> width_search queue1 visited1 queue2 visited2
-    else
-      let visited1 = visited1 + List.length queue1 in
-      match one_step_further true queue1 with
-      | Left (path, ifam) -> Some (path, ifam)
-      | Right queue1 -> width_search queue1 visited1 queue2 visited2
+  let rec width_search queue1 len1 visited1 queue2 len2 visited2 =
+    match (queue1, queue2) with
+    | [], _ | _, [] -> None
+    | _ -> (
+        if visited1 > visited2 then
+          let visited2 = visited2 + len2 in
+          match one_step_further false queue2 with
+          | Left (path, ifam) -> Some (path, ifam)
+          | Right (queue2, len2) ->
+              width_search queue1 len1 visited1 queue2 len2 visited2
+        else
+          let visited1 = visited1 + len1 in
+          match one_step_further true queue1 with
+          | Left (path, ifam) -> Some (path, ifam)
+          | Right (queue1, len1) ->
+              width_search queue1 len1 visited1 queue2 len2 visited2)
   in
   Collection.Marker.set mark_per ip1 @@ Visited (true, ip1, Self);
   Collection.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
-  width_search [ ip1 ] 0 [ ip2 ] 0
+  width_search [ ip1 ] 1 0 [ ip2 ] 1 0
 
 let rec belongs_to_branch ip dist = function
   | (n, _, ipl) :: lens ->
