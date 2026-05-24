@@ -90,7 +90,10 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
     | (_, Self) :: _ -> path
     | _ -> (
         match Collection.Marker.get mark_per vertex with
-        | NotVisited -> assert false
+        | NotVisited ->
+            failwith
+              "Relation.get_shortest_path_relation.make_path: vertex marked \
+               NotVisited during path reconstruction"
         | Visited (_, v, f) -> make_path ((vertex, f) :: path) v)
   in
   let merge_path p1 p2 =
@@ -334,9 +337,6 @@ let combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
         pl2 sl)
     pl1 sl
 
-let sp p = Some p
-let no_sp _ = None
-
 let compute_relationship conf base by_marr p1 p2 =
   let ip1 = Driver.get_iper p1 in
   let ip2 = Driver.get_iper p2 in
@@ -352,17 +352,29 @@ let compute_relationship conf base by_marr p1 p2 =
         let sl =
           match sol with
           | Some ((_, 0, _) :: _, _, _, _) -> sl
-          | _ -> combine_relationship conf base tstab [ p1 ] spl2 no_sp sp sl
+          | _ ->
+              combine_relationship conf base tstab [ p1 ] spl2
+                (fun _ -> None)
+                (fun p -> Some p)
+                sl
         in
         let sl =
           match sol with
           | Some ((0, _, _) :: _, _, _, _) -> sl
-          | _ -> combine_relationship conf base tstab spl1 [ p2 ] sp no_sp sl
+          | _ ->
+              combine_relationship conf base tstab spl1 [ p2 ]
+                (fun p -> Some p)
+                (fun _ -> None)
+                sl
         in
         match (sol, sl) with
         | Some ((x1, x2, _) :: _, _, _, _), _ when x1 = 0 || x2 = 0 -> sl
         | _, ((_, _, (x1, x2, _)) :: _, _, _) :: _ when x1 = 0 || x2 = 0 -> sl
-        | _ -> combine_relationship conf base tstab spl1 spl2 sp sp sl
+        | _ ->
+            combine_relationship conf base tstab spl1 spl2
+              (fun p -> Some p)
+              (fun p -> Some p)
+              sl
       else []
     in
     let all_sol, rel =
