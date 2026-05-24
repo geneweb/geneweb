@@ -77,18 +77,28 @@ let add_missing_parents_of_siblings conf base indl =
         | { df_pare = []; df_chil = [ _ ] } -> indl
         | { df_pare = []; df_chil = children } ->
             let ipl =
-              List.fold_right
-                (fun ind ipl ->
-                  match ind.di_val with
-                  | Some ip ->
-                      let ip =
-                        match Driver.get_parents (Util.pget conf base ip) with
-                        | Some ifam -> Driver.get_father (Driver.foi base ifam)
-                        | None -> assert false
-                      in
-                      if List.mem ip ipl then ipl else ip :: ipl
-                  | _ -> assert false)
-                children []
+              let _, ipl =
+                List.fold_right
+                  (fun ind (seen, ipl) ->
+                    match ind.di_val with
+                    | Some ip ->
+                        let ip =
+                          match Driver.get_parents (Util.pget conf base ip) with
+                          | Some ifam ->
+                              Driver.get_father (Driver.foi base ifam)
+                          | None ->
+                              failwith
+                                "add_missing_parents_of_siblings: child \
+                                 without parents"
+                        in
+                        if Iper.Set.mem ip seen then (seen, ipl)
+                        else (Iper.Set.add ip seen, ip :: ipl)
+                    | None ->
+                        failwith
+                          "add_missing_parents_of_siblings: vertex without iper")
+                  children (Iper.Set.empty, [])
+              in
+              ipl
             in
             let fams = { df_pare = []; df_chil = children } in
             let indl1 =
