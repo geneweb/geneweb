@@ -22,7 +22,9 @@ let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
 let dag_ind_list_of_path path =
   let indl, _ =
-    let merge l1 l2 = if l1 == l2 then l1 else l1 @ l2 in
+    let merge l1 l2 =
+      if l1 == l2 then l1 else List.rev_append (List.rev l1) l2
+    in
     List.fold_left
       (fun (indl, prev_ind) (ip, fl) ->
         let ind, indl =
@@ -100,7 +102,7 @@ let add_missing_parents_of_siblings conf base indl =
                 [] ipl
             in
             List.iter (fun ind -> ind.di_famc <- fams) children;
-            indl1 @ indl
+            List.rev_append (List.rev indl1) indl
         | _ -> indl
       in
       ind :: indl)
