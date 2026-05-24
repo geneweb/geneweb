@@ -1082,19 +1082,27 @@ let print_main_relationship conf base long p1 p2 rel =
   | _ ->
       let conf = { conf with is_printed_by_template = false } in
       Templ.output_simple conf Templ.Env.empty "buttons_rel");
-  (match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-  | Some ("off" | "0"), _ | _, Some "off" ->
-      conf.senv <- conf.senv @ [ ("sp", Mutil.encode "0") ]
-  | _, _ -> ());
-  (match Util.p_getenv conf.env "cgl" with
-  | Some "on" -> conf.senv <- conf.senv @ [ ("cgl", Mutil.encode "on") ]
-  | _ -> ());
-  (match Util.p_getenv conf.env "bd" with
-  | None | Some ("0" | "") -> ()
-  | Some x -> conf.senv <- conf.senv @ [ ("bd", Mutil.encode x) ]);
-  (match Util.p_getenv conf.env "color" with
-  | None | Some "" -> ()
-  | Some x -> conf.senv <- conf.senv @ [ ("color", Mutil.encode x) ]);
+  let extras =
+    List.filter_map
+      (fun x -> x)
+      [
+        (match
+           (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse")
+         with
+        | Some ("off" | "0"), _ | _, Some "off" -> Some ("sp", Mutil.encode "0")
+        | _ -> None);
+        (match Util.p_getenv conf.env "cgl" with
+        | Some "on" -> Some ("cgl", Mutil.encode "on")
+        | _ -> None);
+        (match Util.p_getenv conf.env "bd" with
+        | None | Some ("0" | "") -> None
+        | Some x -> Some ("bd", Mutil.encode x));
+        (match Util.p_getenv conf.env "color" with
+        | None | Some "" -> None
+        | Some x -> Some ("color", Mutil.encode x));
+      ]
+  in
+  conf.senv <- List.rev_append (List.rev conf.senv) extras;
   (match rel with
   | None ->
       if Driver.get_iper p1 = Driver.get_iper p2 then (
