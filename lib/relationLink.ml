@@ -30,6 +30,8 @@ type info = {
   td_prop : Adef.safe_string;
 }
 
+let has_border info = info.bd > 0 || (info.td_prop :> string) <> ""
+
 type dist = { mutable dmin : int; mutable dmax : int; mark : bool }
 
 let infinity = 1000
@@ -212,7 +214,7 @@ let spouse_text conf base end_sp ip ipl =
 
 let print_someone_and_spouse conf base info in_tab ip n ipl =
   let s, d, spo = spouse_text conf base n ip ipl in
-  if in_tab && (info.bd > 0 || (info.td_prop :> string) <> "") then (
+  if in_tab && has_border info then (
     Output.print_sstring conf {|<table style="border:|};
     Output.print_sstring conf (string_of_int info.bd);
     Output.print_sstring conf {|px solid"|};
@@ -230,7 +232,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
         Output.print_string conf
           (DagDisplay.image_txt conf base (pget conf base ip))
     | _ -> ());
-  if in_tab && (info.bd > 0 || (info.td_prop :> string) <> "") then
+  if in_tab && has_border info then
     Output.print_sstring conf "</td></tr></table>"
 
 let rec print_both_branches conf base info pl1 pl2 =
@@ -385,7 +387,7 @@ let other_parent_text_if_same conf base info =
   | _ -> None
 
 let print_someone_and_other_parent_if_same conf base info =
-  if info.bd > 0 || (info.td_prop :> string) <> "" then (
+  if has_border info then (
     Output.print_sstring conf {|<table style="border:|};
     Output.print_sstring conf (string_of_int info.bd);
     Output.print_sstring conf {|px solid"|};
@@ -402,8 +404,7 @@ let print_someone_and_other_parent_if_same conf base info =
       Output.print_string conf
         (DagDisplay.image_txt conf base (pget conf base ip))
   | None -> ());
-  if info.bd > 0 || (info.td_prop :> string) <> "" then
-    Output.print_sstring conf "</td></tr></table>"
+  if has_border info then Output.print_sstring conf "</td></tr></table>"
 
 let rec list_iter_hd_tl f = function
   | x :: l ->
@@ -518,8 +519,7 @@ let print_two_branches_with_table conf base info =
 
 let print_relation_path conf base info =
   if info.b1 = [] || info.b2 = [] then (
-    if info.bd > 0 || (info.td_prop :> string) <> "" then
-      print_one_branch_with_table conf base info
+    if has_border info then print_one_branch_with_table conf base info
     else print_one_branch_no_table conf base info;
     if
       info.pb1 <> None || info.nb1 <> None || info.pb2 <> None
