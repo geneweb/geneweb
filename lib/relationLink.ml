@@ -455,43 +455,21 @@ let print_one_branch_with_table conf base info =
   Output.print_sstring conf "</tr>\n";
   Output.print_sstring conf "</table>\n"
 
-let print_two_branches_with_pre conf base info =
-  let sz = 79 in
-  Output.print_sstring conf "<pre>\n";
-  print_pre_center conf sz (someone_text conf base info.ip);
-  (match other_parent_text_if_same conf base info with
-  | Some (s, _) -> print_pre_center conf sz s
-  | None -> ());
-  print_pre_center conf sz (Adef.safe "|");
-  print_pre_center conf sz (Adef.safe @@ String.make (sz / 2) '_');
-  print_both_branches_pre conf base info sz info.b1 info.b2;
-  if
-    info.pb1 <> None || info.nb1 <> None || info.pb2 <> None || info.nb2 <> None
-  then (
-    Output.print_sstring conf "\n";
-    (if info.pb1 <> None || info.nb1 <> None then
-       let s = prev_next_1_text conf base info info.pb1 info.nb1 in
-       print_pre_left conf sz s);
-    if info.pb2 <> None || info.nb2 <> None then
-      let s = prev_next_2_text conf base info info.pb2 info.nb2 in
-      print_pre_right conf sz s);
-  Output.print_sstring conf "</pre>\n"
-
 let print_two_branches_with_table conf base info =
   Output.printf conf
     "<table border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
     conf.border;
-  Output.printf conf "<tr align=\"%s\">\n" "left";
+  Output.print_sstring conf "<tr align=\"left\">\n";
   Output.print_sstring conf "<td colspan=\"3\" align=\"center\">";
   print_someone_and_other_parent_if_same conf base info;
   Output.print_sstring conf "</td>";
   Output.print_sstring conf "</tr>\n";
-  Output.printf conf "<tr align=\"%s\">\n" "left";
+  Output.print_sstring conf "<tr align=\"left\">\n";
   Output.print_sstring conf "<td colspan=\"3\" align=\"center\">";
   Output.print_sstring conf "|";
   Output.print_sstring conf "</td>";
   Output.print_sstring conf "</tr>\n";
-  Output.printf conf "<tr align=\"%s\">\n" "left";
+  Output.print_sstring conf "<tr align=\"left\">\n";
   Output.printf conf "<td align=\"%s\">" conf.right;
   Output.printf conf "<hr class=\"%s\">\n" conf.right;
   Output.print_sstring conf "</td>\n";
