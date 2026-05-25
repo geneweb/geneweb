@@ -122,10 +122,15 @@ let rec next_branch_same_len conf base dist backward missing ia sa ipl =
                 let cpl = Driver.foi base ifam in
                 next_branch_same_len conf base dist false missing
                   (Driver.get_mother cpl) Female ipl
-            | _ -> failwith "next_branch_same_len")
+            | _ ->
+                failwith
+                  "RelationLink.next_branch_same_len: parent missing on Male \
+                   side")
         | Neuter ->
-            Fmt.failwith "sex of %s is Neuter!"
-              (Gutil.designation base (Driver.poi base ia)))
+            failwith
+              (Printf.sprintf
+                 "RelationLink.next_branch_same_len: sex of %s is Neuter"
+                 (Gutil.designation base (Driver.poi base ia))))
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist true missing ia sa ipl
@@ -159,8 +164,12 @@ let rec prev_branch_same_len conf base dist backward missing ia sa ipl =
                 let cpl = Driver.foi base ifam in
                 prev_branch_same_len conf base dist false missing
                   (Driver.get_father cpl) Male ipl
-            | _ -> failwith "prev_branch_same_len")
-        | Neuter -> assert false)
+            | _ ->
+                failwith
+                  "RelationLink.prev_branch_same_len: parent missing on Female \
+                   side")
+        | Neuter ->
+            failwith "RelationLink.prev_branch_same_len: unexpected Neuter sex")
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     prev_branch_same_len conf base dist true missing ia sa ipl
