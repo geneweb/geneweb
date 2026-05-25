@@ -9,61 +9,6 @@ module Iper = Driver.Iper
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
 
-(* Printing for browsers without tables *)
-
-let pre_text_size txt =
-  let txt = (txt : Adef.safe_string :> string) in
-  let rec normal len i =
-    if i = String.length txt then len
-    else if txt.[i] = '<' then in_tag len (i + 1)
-    else if txt.[i] = '&' then in_char (len + 1) (i + 1)
-    else normal (len + 1) (i + 1)
-  and in_tag len i =
-    if i = String.length txt then len
-    else if txt.[i] = '>' then normal len (i + 1)
-    else in_tag len (i + 1)
-  and in_char len i =
-    if i = String.length txt then len
-    else if txt.[i] = ';' then normal len (i + 1)
-    else in_char len (i + 1)
-  in
-  normal 0 0
-
-let print_pre_center conf sz txt =
-  for _i = 1 to (sz - pre_text_size txt) / 2 do
-    Output.print_sstring conf " "
-  done;
-  Output.print_string conf txt;
-  Output.print_sstring conf "\n"
-
-let print_pre_left conf sz txt =
-  let tsz = pre_text_size txt in
-  if tsz < (sz / 2) - 1 then
-    for _i = 2 to ((sz / 2) - 1 - tsz) / 2 do
-      Output.print_sstring conf " "
-    done;
-  Output.print_sstring conf " ";
-  Output.print_string conf txt;
-  Output.print_sstring conf "\n"
-
-let print_pre_right conf sz txt =
-  let tsz = pre_text_size txt in
-  if tsz < (sz / 2) - 1 then (
-    for _i = 1 to sz / 2 do
-      Output.print_sstring conf " "
-    done;
-    for _i = 1 to ((sz / 2) - 1 - tsz) / 2 do
-      Output.print_sstring conf " "
-    done;
-    ())
-  else
-    for _i = 1 to sz - pre_text_size txt - 1 do
-      Output.print_sstring conf " "
-    done;
-  Output.print_sstring conf " ";
-  Output.print_string conf txt;
-  Output.print_sstring conf "\n"
-
 (* Algorithm *)
 
 type info = {
@@ -317,34 +262,6 @@ let rec print_both_branches conf base info pl1 pl2 =
     | None -> Output.print_sstring conf "&nbsp;");
     Output.print_sstring conf "</td></tr>";
     print_both_branches conf base info pl1 pl2
-
-let rec print_both_branches_pre conf base info sz pl1 pl2 =
-  if pl1 = [] && pl2 = [] then ()
-  else
-    let p1, pl1 =
-      match pl1 with (p1, _) :: pl1 -> (Some p1, pl1) | [] -> (None, [])
-    in
-    let p2, pl2 =
-      match pl2 with (p2, _) :: pl2 -> (Some p2, pl2) | [] -> (None, [])
-    in
-    let s1 = if p1 <> None then "|" else " " in
-    let s2 = if p2 <> None then "|" else " " in
-    print_pre_center conf sz (Adef.safe @@ s1 ^ String.make (sz / 2) ' ' ^ s2);
-    (match p1 with
-    | Some p1 ->
-        print_pre_left conf sz (someone_text conf base p1);
-        let s, d, _ = spouse_text conf base info.sp1 p1 pl1 in
-        if (s : Adef.safe_string :> string) <> "" then
-          print_pre_left conf sz ("&amp;" ^<^ d ^^^ " " ^<^ s)
-    | None -> Output.print_sstring conf "\n");
-    (match p2 with
-    | Some p2 ->
-        print_pre_right conf sz (someone_text conf base p2);
-        let s, d, _ = spouse_text conf base info.sp2 p2 pl2 in
-        if (s : Adef.safe_string :> string) <> "" then
-          print_pre_right conf sz ("&amp;" ^<^ d ^^^ " " ^<^ s)
-    | None -> Output.print_sstring conf "\n");
-    print_both_branches_pre conf base info sz pl1 pl2
 
 let include_marr conf base (n : Adef.escaped_string) =
   match find_person_in_env conf base (n :> string) with
@@ -600,14 +517,8 @@ let print_two_branches_with_table conf base info =
   Output.print_sstring conf "</table>"
 
 let print_relation_path conf base info =
-  let with_table =
-    match p_getenv conf.env "tab" with
-    | Some "on" -> true
-    | Some "off" -> false
-    | _ -> not (browser_doesnt_have_tables conf)
-  in
   if info.b1 = [] || info.b2 = [] then (
-    if (info.bd > 0 || (info.td_prop :> string) <> "") && with_table then
+    if info.bd > 0 || (info.td_prop :> string) <> "" then
       print_one_branch_with_table conf base info
     else print_one_branch_no_table conf base info;
     if
@@ -620,8 +531,7 @@ let print_relation_path conf base info =
       if info.pb2 <> None || info.nb2 <> None then
         print_prev_next_2 conf base info info.pb2 info.nb2;
       Output.print_sstring conf "</p>"))
-  else if with_table then print_two_branches_with_table conf base info
-  else print_two_branches_with_pre conf base info
+  else print_two_branches_with_table conf base info
 
 let print_relation_ok conf base info =
   let title _ =
