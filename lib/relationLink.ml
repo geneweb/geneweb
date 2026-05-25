@@ -225,19 +225,14 @@ let spouse_text conf base end_sp ip ipl =
 
 let print_someone_and_spouse conf base info in_tab ip n ipl =
   let s, d, spo = spouse_text conf base n ip ipl in
-  if in_tab && has_border info then (
-    Output.print_sstring conf {|<table style="border:|};
-    Output.print_sstring conf (string_of_int info.bd);
-    Output.print_sstring conf {|px solid"|};
-    Output.print_string conf info.td_prop;
-    Output.print_sstring conf {|><tr><td align="center">|});
+  if in_tab && has_border info then
+    Output.printf conf
+      {|<table style="border:%dpx solid"%s><tr><td align="center">|} info.bd
+      (info.td_prop :> string);
   Output.print_string conf (someone_text conf base ip);
   Output.print_string conf (DagDisplay.image_txt conf base (pget conf base ip));
   if (s :> string) <> "" then (
-    Output.print_sstring conf "<br>&amp;";
-    Output.print_string conf d;
-    Output.print_sstring conf " ";
-    Output.print_string conf s;
+    Output.printf conf {|<br>&amp;%s %s|} (d :> string) (s :> string);
     match spo with
     | Some ip ->
         Output.print_string conf
@@ -255,16 +250,12 @@ let rec print_both_branches conf base info pl1 pl2 =
     let p2, pl2 =
       match pl2 with (p2, _) :: pl2 -> (Some p2, pl2) | [] -> (None, [])
     in
-    Output.print_sstring conf {|<tr align="|};
-    Output.print_sstring conf conf.left;
-    Output.print_sstring conf {|">|};
-    Output.print_sstring conf {|<td align="center">|};
-    Output.print_sstring conf (if p1 <> None then "|" else "&nbsp;");
-    Output.print_sstring conf {|</td><td>&nbsp;</td><td align="center">|};
-    Output.print_sstring conf (if p2 <> None then "|" else "&nbsp;");
-    Output.print_sstring conf {|</td></tr><tr align="|};
-    Output.print_sstring conf conf.left;
-    Output.print_sstring conf {|"><td valign="top" align="center">|};
+    Output.printf conf
+      {|<tr align="%s"><td align="center">%s</td><td>&nbsp;</td><td align="center">%s</td></tr><tr align="%s"><td valign="top" align="center">|}
+      conf.left
+      (if p1 <> None then "|" else "&nbsp;")
+      (if p2 <> None then "|" else "&nbsp;")
+      conf.left;
     (match p1 with
     | Some p1 -> print_someone_and_spouse conf base info true p1 info.sp1 pl1
     | None -> Output.print_sstring conf "&nbsp;");
@@ -442,53 +433,49 @@ let print_one_branch_with_table conf base info =
   let b = if info.b1 = [] then info.b2 else info.b1 in
   let sp = if info.b1 = [] then info.sp2 else info.sp1 in
   Output.printf conf
-    "<table border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
+    {|<table border="%d" cellspacing="0" cellpadding="0" width="100%%">
+<tr><td align="center">
+|}
     conf.border;
-  Output.print_sstring conf "<tr>\n";
-  Output.print_sstring conf "<td align=\"center\">\n";
   print_someone_and_spouse conf base info true info.ip sp b;
   Output.print_sstring conf "</td>\n";
   list_iter_hd_tl
     (fun (ip1, _) ipl1 ->
-      Output.print_sstring conf "<tr>\n";
-      Output.print_sstring conf "<td align=\"center\">\n";
-      Output.print_sstring conf "|";
-      Output.print_sstring conf "</td>\n";
-      Output.print_sstring conf "</tr>\n";
-      Output.print_sstring conf "<tr>\n";
-      Output.print_sstring conf "<td align=\"center\">\n";
+      Output.print_sstring conf
+        {|<tr><td align="center">|</td></tr>
+<tr><td align="center">
+|};
       print_someone_and_spouse conf base info true ip1 sp ipl1;
-      Output.print_sstring conf "</td>\n";
-      Output.print_sstring conf "</tr>\n")
+      Output.print_sstring conf {|</td></tr>
+|})
     b;
-  Output.print_sstring conf "</tr>\n";
-  Output.print_sstring conf "</table>\n"
+  Output.print_sstring conf {|</tr>
+</table>
+|}
 
 let print_two_branches_with_table conf base info =
   Output.printf conf
-    "<table border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
+    {|<table border="%d" cellspacing="0" cellpadding="0" width="100%%">
+<tr align="left">
+<td colspan="3" align="center">|}
     conf.border;
-  Output.print_sstring conf "<tr align=\"left\">\n";
-  Output.print_sstring conf "<td colspan=\"3\" align=\"center\">";
   print_someone_and_other_parent_if_same conf base info;
-  Output.print_sstring conf "</td>";
-  Output.print_sstring conf "</tr>\n";
-  Output.print_sstring conf "<tr align=\"left\">\n";
-  Output.print_sstring conf "<td colspan=\"3\" align=\"center\">";
-  Output.print_sstring conf "|";
-  Output.print_sstring conf "</td>";
-  Output.print_sstring conf "</tr>\n";
-  Output.print_sstring conf "<tr align=\"left\">\n";
-  Output.printf conf "<td align=\"%s\">" conf.right;
-  Output.printf conf "<hr class=\"%s\">\n" conf.right;
-  Output.print_sstring conf "</td>\n";
-  Output.print_sstring conf "<td>";
-  Output.print_sstring conf "<hr class=\"full\">\n";
-  Output.print_sstring conf "</td>\n";
-  Output.printf conf "<td align=\"%s\">" conf.left;
-  Output.printf conf "<hr class=\"%s\">\n" conf.left;
-  Output.print_sstring conf "</td>\n";
-  Output.print_sstring conf "</tr>\n";
+  Output.print_sstring conf
+    {|</td></tr>
+<tr align="left">
+<td colspan="3" align="center">|</td></tr>
+<tr align="left">
+|};
+  Output.printf conf
+    {|<td align="%s"><hr class="%s">
+</td>
+<td><hr class="full">
+</td>
+<td align="%s"><hr class="%s">
+</td>
+</tr>
+|}
+    conf.right conf.right conf.left conf.left;
   print_both_branches conf base info info.b1 info.b2;
   if
     info.pb1 <> None || info.nb1 <> None || info.pb2 <> None || info.nb2 <> None
@@ -498,7 +485,7 @@ let print_two_branches_with_table conf base info =
       Output.print_sstring conf "<br>";
       print_prev_next_1 conf base info info.pb1 info.nb1)
     else Output.print_sstring conf "&nbsp;";
-    Output.print_sstring conf "</td><td>&nbsp;</td><td>";
+    Output.print_sstring conf {|</td><td>&nbsp;</td><td>|};
     if info.pb2 <> None || info.nb2 <> None then (
       Output.print_sstring conf "<br>";
       print_prev_next_2 conf base info info.pb2 info.nb2)
