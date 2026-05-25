@@ -2696,10 +2696,6 @@ let is_that_user_and_password auth_scheme user passwd =
         in
         that_response_would_be = ds.ds_response
 
-let browser_doesnt_have_tables conf =
-  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
-  String.lowercase_ascii user_agent = "lynx"
-
 let of_course_died conf p =
   match Date.cdate_to_dmy_opt (Driver.get_birth p) with
   | Some d ->

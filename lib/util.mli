@@ -687,7 +687,6 @@ val rchild_type_text : config -> relation_type -> int -> Adef.safe_string
 val has_nephews_or_nieces :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 
-val browser_doesnt_have_tables : config -> bool
 val doctype : Adef.safe_string
 
 val begin_centered : config -> unit

@@ -301,7 +301,6 @@ type src_mode = Lang | Source
 
 let rec copy_from_stream conf base strm mode =
   let echo = ref true in
-  let no_tables = browser_doesnt_have_tables conf in
   let push_echo, pop_echo =
     let stack = ref [] in
     ( (fun x ->
@@ -321,7 +320,7 @@ let rec copy_from_stream conf base strm mode =
     | 'f' -> conf.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
-    | 'l' -> no_tables
+    | 'l' -> false
     | 'm' -> Driver.read_nldb base <> []
     | 'n' -> not (Driver.base_notes_are_empty base "")
     | 'o' -> Sys.file_exists (WiznotesDisplay.wiz_dir conf base)
@@ -348,24 +347,6 @@ let rec copy_from_stream conf base strm mode =
     while true do
       match Stream.next strm with
       | '[' -> src_translate conf base true strm echo mode
-      | '<' when no_tables && !echo -> (
-          let c = Stream.next strm in
-          let slash, c = if c = '/' then ("/", Stream.next strm) else ("", c) in
-          let atag, c =
-            let rec loop len = function
-              | ('>' | ' ' | '\n') as c -> (Buff.get len, c)
-              | c -> loop (Buff.store len c) (Stream.next strm)
-            in
-            loop 0 c
-          in
-          match atag with
-          | "table" | "tr" | "td" ->
-              let rec loop = function
-                | '>' -> ()
-                | _ -> loop (Stream.next strm)
-              in
-              loop c
-          | _ -> Output.printf conf "<%s%s%c" slash atag c)
       | '%' -> (
           let c = Stream.next strm in
           match c with
