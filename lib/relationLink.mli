@@ -45,13 +45,6 @@ type info = {
 (** Parameters describing a single rendered relation path, populated from URL
     parameters by [print] and consumed by [print_relation_path]. *)
 
-val threshold : int ref
-(** Depth threshold below which [make_dist_tab] returns a phony table (constant
-    [0] / [infinity]) instead of computing the real distance table; spares the
-    topological sort on short paths. Mutated from [bin/gwd/gwd.ml] via a CLI
-    flag; legacy mutable global, candidate for relocation to [conf.env] (see
-    cleanup plan C5). *)
-
 val make_dist_tab :
   config ->
   Geneweb_db.Driver.base ->
@@ -62,8 +55,11 @@ val make_dist_tab :
     the ancestors of [ia] up to depth [maxlev]. [dmin ip] (resp. [dmax ip])
     returns the minimum (resp. maximum) number of generations on an ascending
     path from [ip] to [ia], among paths of length at most [maxlev]. Used as
-    input to [find_first_branch] to prune the search. Returns a phony table when
-    [maxlev] is at or below [threshold]. *)
+    input to [find_first_branch] to prune the search.
+
+    Returns a phony table when [maxlev] is at or below the depth threshold read
+    from the URL parameter [rel_threshold] (default [10]); this spares the
+    topological sort on short paths. *)
 
 val find_first_branch :
   config ->

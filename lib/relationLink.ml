@@ -35,7 +35,6 @@ let has_border info = info.bd > 0 || (info.td_prop :> string) <> ""
 type dist = { mutable dmin : int; mutable dmax : int; mark : bool }
 
 let infinity = 1000
-let threshold = ref 10
 let phony_dist_tab = ((fun _ -> 0), fun _ -> infinity)
 
 let tsort_leq tstab x y =
@@ -43,7 +42,10 @@ let tsort_leq tstab x y =
   else Collection.Marker.get tstab x < Collection.Marker.get tstab y
 
 let make_dist_tab conf base ia maxlev =
-  if maxlev <= !threshold then phony_dist_tab
+  let threshold =
+    Util.p_getint conf.env "rel_threshold" |> Option.value ~default:10
+  in
+  if maxlev <= threshold then phony_dist_tab
   else
     let tstab = Util.create_topological_sort conf base in
     let module Pq = Pqueue.Make (struct

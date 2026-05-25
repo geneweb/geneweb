@@ -1315,9 +1315,6 @@ let make_conf ~loaded_plugins ~secret_salt from_addr request script_name env =
     | "" -> ("", env)
     | _ -> ("", ("opt", Mutil.encode x) :: env)
   in
-  let threshold_test, env = extract_assoc "threshold" env in
-  if threshold_test <> "" then
-    RelationLink.threshold := int_of_string threshold_test;
   GWPARAM.test_reorg base_file;
   let base_env =
     if base_file = "" then []
