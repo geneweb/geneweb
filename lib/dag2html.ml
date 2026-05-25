@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
+(* $Id: dag2html.ml v7.1 25/05/2026 15:28:06 ddr Exp $ *)
 
 type 'a dag = { mutable dag : 'a node array }
 and 'a node = { mutable pare : idag list; valu : 'a; mutable chil : idag list }
@@ -257,7 +257,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
                     in
                     if l = j && next_l = next_j then
                       (1, LeftA, TDnothing)
-                      :: (colspan, CenterA, ph (TDbar None))
+                      :: (colspan, CenterA, TDnothing)
                       :: (1, LeftA, TDnothing) :: les
                     else if l = j then
                       (1, LeftA, ph (TDhr CenterA))
