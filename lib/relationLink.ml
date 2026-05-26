@@ -2,7 +2,6 @@
 
 open Config
 open Def
-open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Iper = Driver.Iper
@@ -53,7 +52,7 @@ let make_dist_tab conf base ia maxlev =
     let dist = Driver.iper_marker (Driver.ipers base) default in
     let q = ref Pq.empty in
     let add_children ip =
-      let u = pget conf base ip in
+      let u = Util.pget conf base ip in
       for i = 0 to Array.length (Driver.get_family u) - 1 do
         let des = Driver.foi base (Driver.get_family u).(i) in
         for j = 0 to Array.length (Driver.get_children des) - 1 do
@@ -71,7 +70,7 @@ let make_dist_tab conf base ia maxlev =
     while not (Pq.is_empty !q) do
       let k, nq = Pq.take !q in
       q := nq;
-      match Driver.get_parents (pget conf base k) with
+      match Driver.get_parents (Util.pget conf base k) with
       | Some ifam ->
           let cpl = Driver.foi base ifam in
           let dfath = Collection.Marker.get dist (Driver.get_father cpl) in
@@ -91,7 +90,7 @@ let find_first_branch conf base (dmin, dmax) ia =
     else if len = 0 then None
     else if len < dmin ip || len > dmax ip then None
     else
-      match Driver.get_parents (pget conf base ip) with
+      match Driver.get_parents (Util.pget conf base ip) with
       | Some ifam -> (
           let cpl = Driver.foi base ifam in
           match
@@ -113,7 +112,7 @@ let rec next_branch_same_len conf base dist backward missing ia sa ipl =
         | Female ->
             next_branch_same_len conf base dist true (missing + 1) ip sp ipl1
         | Male -> (
-            match Driver.get_parents (pget conf base ip) with
+            match Driver.get_parents (Util.pget conf base ip) with
             | Some ifam ->
                 let cpl = Driver.foi base ifam in
                 next_branch_same_len conf base dist false missing
@@ -131,7 +130,7 @@ let rec next_branch_same_len conf base dist backward missing ia sa ipl =
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist true missing ia sa ipl
   else
-    match Driver.get_parents (pget conf base ia) with
+    match Driver.get_parents (Util.pget conf base ia) with
     | Some ifam ->
         let cpl = Driver.foi base ifam in
         next_branch_same_len conf base dist false (missing - 1)
@@ -155,7 +154,7 @@ let rec prev_branch_same_len conf base dist backward missing ia sa ipl =
         | Male ->
             prev_branch_same_len conf base dist true (missing + 1) ip sp ipl1
         | Female -> (
-            match Driver.get_parents (pget conf base ip) with
+            match Driver.get_parents (Util.pget conf base ip) with
             | Some ifam ->
                 let cpl = Driver.foi base ifam in
                 prev_branch_same_len conf base dist false missing
@@ -170,7 +169,7 @@ let rec prev_branch_same_len conf base dist backward missing ia sa ipl =
   else if missing < fst dist ia || missing > snd dist ia then
     prev_branch_same_len conf base dist true missing ia sa ipl
   else
-    match Driver.get_parents (pget conf base ia) with
+    match Driver.get_parents (Util.pget conf base ia) with
     | Some ifam ->
         let cpl = Driver.foi base ifam in
         prev_branch_same_len conf base dist false (missing - 1)
@@ -188,14 +187,14 @@ let find_prev_branch conf base dist ia sa ipl =
 (* Printing *)
 
 let someone_text conf base ip =
-  let p = pget conf base ip in
-  referenced_person_title_text conf base p
+  let p = Util.pget conf base ip in
+  Util.referenced_person_title_text conf base p
   ^^^ DateDisplay.short_dates_text conf base p
 
 let spouse_text conf base end_sp ip ipl =
-  match (ipl, (p_getenv conf.env "sp", p_getenv conf.env "opt")) with
+  match (ipl, (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "opt")) with
   | (ips, _) :: _, (None, _ | _, Some "spouse") -> (
-      let a = pget conf base ips in
+      let a = Util.pget conf base ips in
       match Driver.get_parents a with
       | Some ifam ->
           let fam = Driver.foi base ifam in
@@ -205,8 +204,8 @@ let spouse_text conf base end_sp ip ipl =
           in
           let d =
             DateDisplay.short_marriage_date_text conf base fam
-              (pget conf base (Driver.get_father fam))
-              (pget conf base (Driver.get_mother fam))
+              (Util.pget conf base (Driver.get_father fam))
+              (Util.pget conf base (Driver.get_mother fam))
           in
           (someone_text conf base sp, d, Some sp)
       | _ -> (Adef.safe "", Adef.safe "", None))
@@ -223,12 +222,12 @@ let print_someone_and_spouse conf base ip n ipl =
   let s, d, spo = spouse_text conf base n ip ipl in
   Output.printf conf "%s%s"
     (someone_text conf base ip :> string)
-    (DagDisplay.image_txt conf base (pget conf base ip) :> string);
+    (DagDisplay.image_txt conf base (Util.pget conf base ip) :> string);
   if (s :> string) <> "" then
     let spouse_image =
       match spo with
       | Some sp_ip ->
-          (DagDisplay.image_txt conf base (pget conf base sp_ip) :> string)
+          (DagDisplay.image_txt conf base (Util.pget conf base sp_ip) :> string)
       | None -> ""
     in
     Output.printf conf "<div>&amp;%s %s%s</div>"
@@ -272,22 +271,24 @@ let rec print_both_branches conf base info pl1 pl2 =
     print_both_branches conf base info pl1 pl2
 
 let include_marr conf base (n : Adef.escaped_string) =
-  match find_person_in_env conf base (n :> string) with
-  | Some p -> "&" ^<^ acces_n conf base n p
+  match Util.find_person_in_env conf base (n :> string) with
+  | Some p -> "&" ^<^ Util.acces_n conf base n p
   | None -> Adef.escaped ""
 
 let sign_text conf base sign info b1 b2 c1 c2 =
   let sps = Util.get_opt conf "sp" true in
   let img = Util.get_opt conf "im" true in
   let href =
-    commd conf ^^^ "m=RL&"
-    ^<^ acces_n conf base (Adef.escaped "1") (pget conf base info.ip1)
+    Util.commd conf ^^^ "m=RL&"
+    ^<^ Util.acces_n conf base (Adef.escaped "1") (Util.pget conf base info.ip1)
     ^^^ "&"
-    ^<^ acces_n conf base (Adef.escaped "2") (pget conf base info.ip2)
+    ^<^ Util.acces_n conf base (Adef.escaped "2") (Util.pget conf base info.ip2)
     ^^^ "&b1="
-    ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b1))
+    ^<^ Sosa.to_string
+          (Util.old_sosa_of_branch conf base ((info.ip, info.sp) :: b1))
     ^<^ "&b2="
-    ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
+    ^<^ Sosa.to_string
+          (Util.old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
     ^<^ "&c1=" ^<^ string_of_int c1 ^<^ "&c2=" ^<^ string_of_int c2
     ^<^ Adef.escaped (if sps then "" else "&sp=0")
     ^^^ Adef.escaped (if img then "" else "&im=0")
@@ -358,8 +359,8 @@ let other_parent_text_if_same conf base info =
   match (info.b1, info.b2) with
   | (sib1, _) :: _, (sib2, _) :: _ -> (
       match
-        ( Driver.get_parents (pget conf base sib1),
-          Driver.get_parents (pget conf base sib2) )
+        ( Driver.get_parents (Util.pget conf base sib1),
+          Driver.get_parents (Util.pget conf base sib2) )
       with
       | Some ifam1, Some ifam2 -> (
           let cpl1 = Driver.foi base ifam1 in
@@ -378,8 +379,8 @@ let other_parent_text_if_same conf base info =
               let d =
                 DateDisplay.short_marriage_date_text conf base
                   (Driver.foi base ifam1)
-                  (pget conf base (Driver.get_father cpl1))
-                  (pget conf base (Driver.get_mother cpl1))
+                  (Util.pget conf base (Driver.get_father cpl1))
+                  (Util.pget conf base (Driver.get_mother cpl1))
               in
               Some ("&amp;" ^<^ d ^^^ " " ^<^ someone_text conf base ip, ip)
           | _ -> None)
@@ -390,13 +391,13 @@ let print_someone_and_other_parent_if_same conf base info =
   Output.print_string conf (someone_text conf base info.ip);
   Output.print_sstring conf "\n";
   Output.print_string conf
-    (DagDisplay.image_txt conf base (pget conf base info.ip));
+    (DagDisplay.image_txt conf base (Util.pget conf base info.ip));
   match other_parent_text_if_same conf base info with
   | Some (s, ip) ->
       Output.print_sstring conf "<br>";
       Output.print_string conf s;
       Output.print_string conf
-        (DagDisplay.image_txt conf base (pget conf base ip))
+        (DagDisplay.image_txt conf base (Util.pget conf base ip))
   | None -> ()
 
 let rec list_iter_hd_tl f = function
@@ -471,7 +472,7 @@ let print_relation_path conf base info =
 
 let print_relation_ok conf base info =
   let title _ =
-    transl_nth conf "relationship link/relationship links" 0
+    Util.transl_nth conf "relationship link/relationship links" 0
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     (match (info.pb1, info.nb1) with
     | None, None -> ()
@@ -485,7 +486,7 @@ let print_relation_ok conf base info =
         Output.print_sstring conf (string_of_int info.c2)
   in
   Hutil.header conf title;
-  (match p_getenv conf.env "cgl" with
+  (match Util.p_getenv conf.env "cgl" with
   | Some "on" -> ()
   | _ ->
       let conf = { conf with is_printed_by_template = false } in
@@ -495,29 +496,33 @@ let print_relation_ok conf base info =
 
 let print_relation_no_dag conf base po ip1 ip2 =
   let params =
-    match (po, p_getint conf.env "l1", p_getint conf.env "l2") with
+    match (po, Util.p_getint conf.env "l1", Util.p_getint conf.env "l2") with
     | Some p, Some l1, Some l2 ->
         let ip = Driver.get_iper p in
         let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
         let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
         let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
-        Some (ip, Driver.get_sex (pget conf base ip), dist, b1, b2, 1, 1)
+        Some (ip, Driver.get_sex (Util.pget conf base ip), dist, b1, b2, 1, 1)
     | _ -> (
-        match (p_getenv conf.env "b1", p_getenv conf.env "b2") with
+        match (Util.p_getenv conf.env "b1", Util.p_getenv conf.env "b2") with
         | Some b1str, Some b2str -> (
             let n1 = Sosa.of_string b1str in
             let n2 = Sosa.of_string b2str in
             match
-              ( old_branch_of_sosa conf base ip1 n1,
-                old_branch_of_sosa conf base ip2 n2 )
+              ( Util.old_branch_of_sosa conf base ip1 n1,
+                Util.old_branch_of_sosa conf base ip2 n2 )
             with
             | Some ((ia1, sa1) :: b1), Some ((ia2, _) :: b2) ->
                 if ia1 = ia2 then
                   let c1 =
-                    match p_getint conf.env "c1" with Some n -> n | None -> 0
+                    match Util.p_getint conf.env "c1" with
+                    | Some n -> n
+                    | None -> 0
                   in
                   let c2 =
-                    match p_getint conf.env "c2" with Some n -> n | None -> 0
+                    match Util.p_getint conf.env "c2" with
+                    | Some n -> n
+                    | None -> 0
                   in
                   let dist =
                     if c1 > 0 || c2 > 0 then
@@ -544,8 +549,8 @@ let print_relation_no_dag conf base po ip1 ip2 =
       let nb2 =
         if c2 = 0 then None else find_next_branch conf base dist ip sp b2
       in
-      let sp1 = find_person_in_env conf base "3" in
-      let sp2 = find_person_in_env conf base "4" in
+      let sp1 = Util.find_person_in_env conf base "3" in
+      let sp2 = Util.find_person_in_env conf base "4" in
       let info =
         { ip; sp; ip1; ip2; b1; b2; c1; c2; pb1; pb2; nb1; nb2; sp1; sp2 }
       in
@@ -587,7 +592,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
         l1
     in
     let set =
-      if p_getenv conf.env "sib" = Some "on" then
+      if Util.p_getenv conf.env "sib" = Some "on" then
         List.fold_left
           (fun s (ip, _) -> Iper.Set.add ip s)
           set
@@ -598,7 +603,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
     let spl =
       List.fold_right
         (fun (ip, s) spl ->
-          match find_person_in_env conf base s with
+          match Util.find_person_in_env conf base s with
           | Some sp -> (ip, (Driver.get_iper sp, None)) :: spl
           | None -> spl)
         [ (ip1, "3"); (ip2, "4") ]
@@ -631,10 +636,10 @@ let int_list s =
   loop 0 0
 
 let print_relation conf base p1 p2 =
-  let l1 = p_getenv conf.env "l1" in
-  let l2 = p_getenv conf.env "l2" in
-  let po = find_person_in_env conf base "" in
-  match (p_getenv conf.env "dag", po, l1, l2) with
+  let l1 = Util.p_getenv conf.env "l1" in
+  let l2 = Util.p_getenv conf.env "l2" in
+  let po = Util.find_person_in_env conf base "" in
+  match (Util.p_getenv conf.env "dag", po, l1, l2) with
   | Some "on", Some p, Some l1, Some l2 ->
       print_relation_dag conf base p (Driver.get_iper p1) (Driver.get_iper p2)
         (int_list l1) (int_list l2)
@@ -644,7 +649,8 @@ let print_relation conf base p1 p2 =
 
 let print conf base =
   match
-    (find_person_in_env conf base "1", find_person_in_env conf base "2")
+    ( Util.find_person_in_env conf base "1",
+      Util.find_person_in_env conf base "2" )
   with
   | Some p1, Some p2 -> print_relation conf base p1 p2
   | _ -> Hutil.incorrect_request conf ~comment:"relationLink: p1, p2 missing"
