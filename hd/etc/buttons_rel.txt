@@ -71,12 +71,12 @@
   </div>
   <div class="d-flex col-5 ms-5 gap-2">
     <a href="%if;(e_im=1)%url_set.im.0;%else;%url_set.im;%end;"
-      %if;(e.dag="on") class="disabled"%end;
+      %if;(e.dag="on" and e.m!="RL") class="disabled"%end;
       title="%if;(e_im=1)[*visualize/show/hide/summary]2%else;
           [*visualize/show/hide/summary]1%end; [image/images]0">
       <i class="far fa-image fa-lg%if;(e_im=0) text-danger%end;"></i></a>
     <a href="%if;(e_sp=1)%url_set.sp.0;%else;%url_set.sp;%end;"
-       %if;(e.dag="on") class="disabled"%end;
+       %if;(e.dag="on" and e.m!="RL") class="disabled"%end;
        title="%if;(e_sp=1)[*visualize/show/hide/summary]2%else;
           [*visualize/show/hide/summary]1%end; [spouse/spouses]1">
       <i class="fa fa-user male p-0"></i>%if;(e.sp!="")<i class="fa fa-user female p-0"></i>%end;</a>

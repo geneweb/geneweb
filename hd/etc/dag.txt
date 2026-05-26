@@ -80,6 +80,36 @@
 %if;(link_next!="" and not cancel_links)
   %include;buttons_rel
 %end;
+%( ============================================================================
+   DAG cell properties (set by html_table_struct in lib/dag2html.ml)
+
+   STRUCTURAL TESTS — exactly one of these is true per cell:
+     dag_cell.is_nothing      TDnothing      empty filler (column padding,
+                                              no content, collapses vertically)
+     dag_cell.is_bar          TDbar          vertical connector pipe │
+                                              (text character)
+     dag_cell.text   <> ""    TDtext         literal HTML fragment
+                                              (navigation labels, etc.)
+     dag_cell.item   <> ""    TDitem         person block (name, dates,
+                                              spouse, image)
+     (none of the above)      TDhr CenterA   horizontal divider, middle
+                                              or full-width segment
+
+   TDhr SUB-DISCRIMINATION (only meaningful when none of the above is true):
+     dag_cell.is_hr_left      TDhr LeftA     left half of a generation
+                                              divider (joins from above-left)
+     dag_cell.is_hr_right     TDhr RightA    right half (joins above-right)
+     (neither)                TDhr CenterA   middle / full
+
+   ATTRIBUTES (available on every cell):
+     dag_cell.colspan         grid units the cell spans (default 1)
+     dag_cell.align           "left" | "right" | "center" — text-alignment
+                              hint from the layout
+     dag_cell.index           iper string of the person ("-1" for ghost
+                              cells — skip clickable navigation in that case)
+     dag_cell.bar_link        href for clickable bars (m=RLM path
+                              suppression); empty when the bar is not a link
+============================================================================ %)
 <table id="dag" class="mt-2 ms-4">
 %foreach;dag_line;
   <tr class="text-start">
@@ -91,10 +121,12 @@
          before deciding: restructure (position-relative on td + nested-link
          handling), drop the stretched-link block, or coordinate refactor with
          dagDisplay.ml %)
-    <td class="px-0 align-%if;(e.m="D" or e.m="RL")top%elseif;(e.m="A")bottom%end;%sp;
-      text-%if;(dag_cell.align="left")start%elseif;(dag_cell.align="right")end%else;center%end;"
-      %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;
-      style="line-height:%if;(dag_cell.item!="" or dag_cell.is_bar)1%else;0%end;">
+    <td class="dag-cell%nn;
+      %if;dag_cell.is_bar; dag-bar%end;%nn;
+      %if;(dag_cell.is_nothing or (dag_cell.text="" and dag_cell.item="" and not dag_cell.is_bar)) dag-collapse%end;%nn;
+      %sp;align-%if;(e.m="D" or e.m="RL")top%elseif;(e.m="A")bottom%end;%nn;
+      %sp;text-%if;(dag_cell.align="left")start%elseif;(dag_cell.align="right")end%else;center%end;"
+      %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;>
     %if;dag_cell.is_nothing;&nbsp;%nn;
     %elseif;dag_cell.is_bar;
       %if;(dag_cell.bar_link!="" and not cancel_links)
@@ -135,7 +167,9 @@
   </tr>
 %end;
 </table>
-
+%if;(e.m="RL")
+%include;copyr
+%end;
 %include;trl
 </div>
 %include;js

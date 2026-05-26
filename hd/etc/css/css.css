@@ -1270,13 +1270,50 @@ span.image_small_size {
   border-width: thin
 }
 
-/* Fix dag line height */
-table#dag {
-  empty-cells: show;
+/* Relationship tree renderers
+   Two implementations share the same visual layout:
+     .rl-table  — relationLink.ml (m=RL)
+     #dag       — dag2html.ml + dag.txt (m=RL&dag=on, m=D, m=A, m=RLM,
+                                          m=DAG, em=R) */
+
+/* Generation dividers — overrides Bootstrap's hr defaults. */
+table hr {
+  margin: 0;
+  border: 0;
+  border-top: 2px solid currentColor;
+  opacity: 0.5;
 }
-tr#dag, td#dag {
-  font-family:Noto Sans;
-  vertical-align:top;
+table hr.left  { width: 50%; margin-right: 50%; }
+table hr.right { width: 50%; margin-left: 50%; }
+
+/* relationLink */
+.rl-table {
+  border-collapse: collapse;
+  text-align: center;
+}
+.rl-table td { padding: 3px 0; }
+.rl-table tr.rl-bar td {
+  padding: 0;
+  line-height: 1;
+  font-family: 'dejavu_sans_mono', monospace;
+}
+
+/* DAG */
+#dag                          { border-collapse: collapse; }
+#dag td                       { padding: 0; }
+#dag .dag-bar                 { line-height: 1.06; }
+#dag .dag-collapse            { line-height: 0; }
+#dag .dag-cell > div.mx-1     { margin: 2px 0.25rem; }
+
+/* Connectors faded against text; text-shadow thickens pipes to ~2px
+   to match the 2px HR without depending on a font. */
+.rl-table hr, .rl-table .rl-bar, .rl-table tr.rl-bar td,
+#dag hr, #dag .dag-bar {
+  color: #7c7c7c;
+  opacity: 0.8;
+}
+.rl-table .rl-bar, .rl-table tr.rl-bar td, #dag .dag-bar {
+  text-shadow: 0.5px 0 currentColor, -0.5px 0 currentColor;
 }
 
 /* Sex symbol color */
@@ -2117,36 +2154,6 @@ div.select:hover ul
 {
   display:block;
   z-index:100;
-}
-
-/* --- Ascendants/Descendants trees --- */
-table hr
-{
-  border-top: solid 1px black;
-  border-left: 0;
-  border-right: 0;
-  border-bottom: 0;
-  margin:0;
-}
-
-hr.left
-{
-  margin-left:0;
-  margin-right: 50%;
-  width: 50%;
-}
-
-hr.right
-{
-  margin-left: 50%;
-  margin-right: 0;
-  width: 50%;
-}
-
-hr.full
-{
-  margin-left: 0;
-  margin-right: 0;
 }
 
 /* --- Ascendants/Descendants liste rédigée --- */

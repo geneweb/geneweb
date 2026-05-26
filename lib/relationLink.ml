@@ -26,11 +26,7 @@ type info = {
   nb2 : (Driver.iper * sex) list option;
   sp1 : Driver.person option;
   sp2 : Driver.person option;
-  bd : int;
-  td_prop : Adef.safe_string;
 }
-
-let has_border info = info.bd > 0 || (info.td_prop :> string) <> ""
 
 type dist = { mutable dmin : int; mutable dmax : int; mark : bool }
 
@@ -223,23 +219,22 @@ let spouse_text conf base end_sp ip ipl =
       | _ -> (Adef.safe "", Adef.safe "", None))
   | _ -> (Adef.safe "", Adef.safe "", None)
 
-let print_someone_and_spouse conf base info in_tab ip n ipl =
+let print_someone_and_spouse conf base ip n ipl =
   let s, d, spo = spouse_text conf base n ip ipl in
-  if in_tab && has_border info then
-    Output.printf conf
-      {|<table style="border:%dpx solid"%s><tr><td align="center">|} info.bd
-      (info.td_prop :> string);
-  Output.print_string conf (someone_text conf base ip);
-  Output.print_string conf (DagDisplay.image_txt conf base (pget conf base ip));
-  if (s :> string) <> "" then (
-    Output.printf conf {|<br>&amp;%s %s|} (d :> string) (s :> string);
-    match spo with
-    | Some ip ->
-        Output.print_string conf
-          (DagDisplay.image_txt conf base (pget conf base ip))
-    | _ -> ());
-  if in_tab && has_border info then
-    Output.print_sstring conf "</td></tr></table>"
+  Output.printf conf "%s%s"
+    (someone_text conf base ip :> string)
+    (DagDisplay.image_txt conf base (pget conf base ip) :> string);
+  if (s :> string) <> "" then
+    let spouse_image =
+      match spo with
+      | Some sp_ip ->
+          (DagDisplay.image_txt conf base (pget conf base sp_ip) :> string)
+      | None -> ""
+    in
+    Output.printf conf "<div>&amp;%s %s%s</div>"
+      (d :> string)
+      (s :> string)
+      spouse_image
 
 let rec print_both_branches conf base info pl1 pl2 =
   if pl1 = [] && pl2 = [] then ()
@@ -250,21 +245,30 @@ let rec print_both_branches conf base info pl1 pl2 =
     let p2, pl2 =
       match pl2 with (p2, _) :: pl2 -> (Some p2, pl2) | [] -> (None, [])
     in
+    let bar1 = if p1 <> None then "│" else "&nbsp;" in
+    let bar2 = if p2 <> None then "│" else "&nbsp;" in
     Output.printf conf
-      {|<tr align="%s"><td align="center">%s</td><td>&nbsp;</td><td align="center">%s</td></tr><tr align="%s"><td valign="top" align="center">|}
-      conf.left
-      (if p1 <> None then "|" else "&nbsp;")
-      (if p2 <> None then "|" else "&nbsp;")
-      conf.left;
+      {|<tr class="rl-bar">
+  <td>%s</td>
+  <td>&nbsp;</td>
+  <td>%s</td>
+</tr>
+<tr>
+  <td class="align-top">|}
+      bar1 bar2;
     (match p1 with
-    | Some p1 -> print_someone_and_spouse conf base info true p1 info.sp1 pl1
+    | Some p1 -> print_someone_and_spouse conf base p1 info.sp1 pl1
     | None -> Output.print_sstring conf "&nbsp;");
     Output.print_sstring conf
-      {|</td><td>&nbsp;</td><td valign="top" align="center">|};
+      {|</td>
+  <td>&nbsp;</td>
+  <td class="align-top">|};
     (match p2 with
-    | Some p2 -> print_someone_and_spouse conf base info true p2 info.sp2 pl2
+    | Some p2 -> print_someone_and_spouse conf base p2 info.sp2 pl2
     | None -> Output.print_sstring conf "&nbsp;");
-    Output.print_sstring conf "</td></tr>";
+    Output.print_sstring conf {|</td>
+</tr>
+|};
     print_both_branches conf base info pl1 pl2
 
 let include_marr conf base (n : Adef.escaped_string) =
@@ -287,12 +291,6 @@ let sign_text conf base sign info b1 b2 c1 c2 =
     ^<^ "&c1=" ^<^ string_of_int c1 ^<^ "&c2=" ^<^ string_of_int c2
     ^<^ Adef.escaped (if sps then "" else "&sp=0")
     ^^^ Adef.escaped (if img then "" else "&im=0")
-    ^^^ (match p_getenv conf.env "bd" with
-      | None | Some ("0" | "") -> Adef.escaped ""
-      | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
-    ^^^ (match p_getenv conf.env "color" with
-      | None | Some "" -> Adef.escaped ""
-      | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
     ^^^ include_marr conf base (Adef.escaped "3")
     ^^^ include_marr conf base (Adef.escaped "4")
   in
@@ -389,24 +387,17 @@ let other_parent_text_if_same conf base info =
   | _ -> None
 
 let print_someone_and_other_parent_if_same conf base info =
-  if has_border info then (
-    Output.print_sstring conf {|<table style="border:|};
-    Output.print_sstring conf (string_of_int info.bd);
-    Output.print_sstring conf {|px solid"|};
-    Output.print_string conf info.td_prop;
-    Output.print_sstring conf {|><tr><td align="center">|});
   Output.print_string conf (someone_text conf base info.ip);
   Output.print_sstring conf "\n";
   Output.print_string conf
     (DagDisplay.image_txt conf base (pget conf base info.ip));
-  (match other_parent_text_if_same conf base info with
+  match other_parent_text_if_same conf base info with
   | Some (s, ip) ->
       Output.print_sstring conf "<br>";
       Output.print_string conf s;
       Output.print_string conf
         (DagDisplay.image_txt conf base (pget conf base ip))
-  | None -> ());
-  if has_border info then Output.print_sstring conf "</td></tr></table>"
+  | None -> ()
 
 let rec list_iter_hd_tl f = function
   | x :: l ->
@@ -414,89 +405,58 @@ let rec list_iter_hd_tl f = function
       list_iter_hd_tl f l
   | [] -> ()
 
-let print_one_branch_no_table conf base info =
+let print_one_branch conf base info =
   let b = if info.b1 = [] then info.b2 else info.b1 in
   let sp = if info.b1 = [] then info.sp2 else info.sp1 in
-  Output.print_sstring conf "<div style=\"text-align:center\">\n";
-  print_someone_and_spouse conf base info false info.ip sp b;
-  Output.print_sstring conf "<br>\n";
+  Output.print_sstring conf {|<div class="text-center">|};
+  print_someone_and_spouse conf base info.ip sp b;
+  Output.print_sstring conf "<br>";
   list_iter_hd_tl
     (fun (ip1, _) ipl1 ->
-      Output.print_sstring conf "|";
-      Output.print_sstring conf "<br>\n";
-      print_someone_and_spouse conf base info false ip1 sp ipl1;
-      Output.print_sstring conf "<br>\n")
+      Output.print_sstring conf {|<span class="rl-bar">│</span><br>|};
+      print_someone_and_spouse conf base ip1 sp ipl1;
+      Output.print_sstring conf "<br>")
     b;
-  Output.print_sstring conf "</div>\n"
-
-let print_one_branch_with_table conf base info =
-  let b = if info.b1 = [] then info.b2 else info.b1 in
-  let sp = if info.b1 = [] then info.sp2 else info.sp1 in
-  Output.printf conf
-    {|<table border="%d" cellspacing="0" cellpadding="0" width="100%%">
-<tr><td align="center">
-|}
-    conf.border;
-  print_someone_and_spouse conf base info true info.ip sp b;
-  Output.print_sstring conf "</td>\n";
-  list_iter_hd_tl
-    (fun (ip1, _) ipl1 ->
-      Output.print_sstring conf
-        {|<tr><td align="center">|</td></tr>
-<tr><td align="center">
-|};
-      print_someone_and_spouse conf base info true ip1 sp ipl1;
-      Output.print_sstring conf {|</td></tr>
-|})
-    b;
-  Output.print_sstring conf {|</tr>
-</table>
-|}
+  Output.print_sstring conf "</div>"
 
 let print_two_branches_with_table conf base info =
-  Output.printf conf
-    {|<table border="%d" cellspacing="0" cellpadding="0" width="100%%">
-<tr align="left">
-<td colspan="3" align="center">|}
-    conf.border;
+  Output.print_sstring conf
+    {|<table class="rl-table w-100 lh-1">
+<tr><td colspan="3">|};
   print_someone_and_other_parent_if_same conf base info;
   Output.print_sstring conf
-    {|</td></tr>
-<tr align="left">
-<td colspan="3" align="center">|</td></tr>
-<tr align="left">
-|};
-  Output.printf conf
-    {|<td align="%s"><hr class="%s">
-</td>
-<td><hr class="full">
-</td>
-<td align="%s"><hr class="%s">
-</td>
+    {|</td>
+</tr><tr class="rl-bar"><td colspan="3">│</td></tr>
+<tr class="rl-bar">
+  <td><hr class="right"></td>
+  <td><hr class="full"></td>
+  <td><hr class="left"></td>
 </tr>
-|}
-    conf.right conf.right conf.left conf.left;
+</tr>
+|};
   print_both_branches conf base info info.b1 info.b2;
   if
     info.pb1 <> None || info.nb1 <> None || info.pb2 <> None || info.nb2 <> None
   then (
-    Output.print_sstring conf {|<tr align="left"><td>|};
-    if info.pb1 <> None || info.nb1 <> None then (
-      Output.print_sstring conf "<br>";
-      print_prev_next_1 conf base info info.pb1 info.nb1)
+    Output.print_sstring conf {|<tr>
+  <td>|};
+    if info.pb1 <> None || info.nb1 <> None then
+      print_prev_next_1 conf base info info.pb1 info.nb1
     else Output.print_sstring conf "&nbsp;";
-    Output.print_sstring conf {|</td><td>&nbsp;</td><td>|};
-    if info.pb2 <> None || info.nb2 <> None then (
-      Output.print_sstring conf "<br>";
-      print_prev_next_2 conf base info info.pb2 info.nb2)
+    Output.print_sstring conf {|</td>
+  <td>&nbsp;</td>
+  <td>|};
+    if info.pb2 <> None || info.nb2 <> None then
+      print_prev_next_2 conf base info info.pb2 info.nb2
     else Output.print_sstring conf "&nbsp;";
-    Output.print_sstring conf "</td></tr>");
-  Output.print_sstring conf "</table>"
+    Output.print_sstring conf {|</td>
+</tr>
+|});
+  Output.print_sstring conf "</table>\n"
 
 let print_relation_path conf base info =
   if info.b1 = [] || info.b2 = [] then (
-    if has_border info then print_one_branch_with_table conf base info
-    else print_one_branch_no_table conf base info;
+    print_one_branch conf base info;
     if
       info.pb1 <> None || info.nb1 <> None || info.pb2 <> None
       || info.nb2 <> None
@@ -530,7 +490,6 @@ let print_relation_ok conf base info =
   | _ ->
       let conf = { conf with is_printed_by_template = false } in
       Templ.output_simple conf Templ.Env.empty "buttons_rel");
-  Output.print_sstring conf {|<p style="clear:both">|};
   print_relation_path conf base info;
   Hutil.trailer conf
 
@@ -587,32 +546,8 @@ let print_relation_no_dag conf base po ip1 ip2 =
       in
       let sp1 = find_person_in_env conf base "3" in
       let sp2 = find_person_in_env conf base "4" in
-      let bd = match p_getint conf.env "bd" with Some x -> x | None -> 0 in
-      let td_prop =
-        match Util.p_getenv conf.env "color" with
-        | None | Some "" -> Adef.safe ""
-        | Some x ->
-            (" class=\"" ^<^ Mutil.encode x ^>^ "\"" :> Adef.safe_string)
-      in
       let info =
-        {
-          ip;
-          sp;
-          ip1;
-          ip2;
-          b1;
-          b2;
-          c1;
-          c2;
-          pb1;
-          pb2;
-          nb1;
-          nb2;
-          sp1;
-          sp2;
-          bd;
-          td_prop;
-        }
+        { ip; sp; ip1; ip2; b1; b2; c1; c2; pb1; pb2; nb1; nb2; sp1; sp2 }
       in
       print_relation_ok conf base info
   | _ ->

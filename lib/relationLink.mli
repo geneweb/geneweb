@@ -37,10 +37,6 @@ type info = {
   sp2 : Geneweb_db.Driver.person option;
       (** Optional terminal spouse displayed at the [ip2] endpoint (URL
           parameter [4]). *)
-  bd : int;  (** Border thickness in pixels (URL parameter [bd]). *)
-  td_prop : Adef.safe_string;
-      (** CSS [class="..."] attribute applied to cells when the [color] URL
-          parameter is set; empty otherwise. *)
 }
 (** Parameters describing a single rendered relation path, populated from URL
     parameters by [print] and consumed by [print_relation_path]. *)
@@ -79,14 +75,11 @@ val find_first_branch :
 val print_relation_path : config -> Geneweb_db.Driver.base -> info -> unit
 (** [print_relation_path conf base info] renders the relation path described by
     [info] as HTML. Switches between a single-branch display (when one of
-    [info.b1], [info.b2] is empty) and a two-branch display, and between a plain
-    layout and a bordered [<table>] layout depending on whether [info.bd] is
-    non-zero or [info.td_prop] is non-empty. *)
+    [info.b1], [info.b2] is empty) and a two-branch display. *)
 
 val print : config -> Geneweb_db.Driver.base -> unit
 (** Entry point for the [m=RL] route. Parses URL parameters [1], [2]
     (endpoints), [dag] (rendering mode), [l1], [l2] (branch lengths), [b1], [b2]
     (branch Sosa numbers), [c1], [c2] (branch indices for prev/next), [3], [4]
-    (terminal spouses), [bd], [color] (border and color decoration), [sib]
-    (siblings flag), then dispatches to the DAG renderer when [dag=on] or to the
-    branch renderer otherwise. *)
+    (terminal spouses), [sib] (siblings flag), then dispatches to the DAG
+    renderer when [dag=on] or to the branch renderer otherwise. *)

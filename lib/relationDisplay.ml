@@ -260,16 +260,6 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
     | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in
-  let bd =
-    match Util.p_getenv conf.env "bd" with
-    | None | Some ("0" | "") -> Adef.escaped ""
-    | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string)
-  in
-  let color =
-    match Util.p_getenv conf.env "color" with
-    | None -> Adef.escaped ""
-    | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string)
-  in
   let sl, _ =
     List.fold_left
       (fun (sl, i) ifam ->
@@ -277,11 +267,11 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
       ("", List.length excl_faml - 1)
       excl_faml
   in
-  Util.commd ~excl:[ "em"; "ei"; "i"; "sp"; "bd"; "color"; "et" ] conf
+  Util.commd ~excl:[ "em"; "ei"; "i"; "sp"; "et" ] conf
   ^^^ "em=R&ei=" ^<^ Driver.Iper.to_string ip1 ^<^ "&i="
   ^<^ Driver.Iper.to_string ip2
   ^<^ (if sps then "" else "&sp=0")
-  ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
+  ^<^ Adef.escaped ("&et=S" ^ sl)
 
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then (
@@ -937,8 +927,6 @@ let print_dag_links conf base p1 p2 rl =
             l2;
           if not img then Output.print_sstring conf "&im=0";
           if not sps then Output.print_sstring conf "&sp=0";
-          if Util.p_getenv conf.env "bd" = Some "on" then
-            Output.print_sstring conf "&bd=on";
           Output.print_sstring conf {|&dag=on">|};
           if is_anc then Output.print_sstring conf (Util.transl conf "tree")
           else (
@@ -1001,13 +989,6 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
   let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
   match (b1, b2) with
   | Some b1, Some b2 ->
-      let bd = Option.value ~default:0 (Util.p_getint conf.env "bd") in
-      let td_prop =
-        match Util.p_getenv conf.env "color" with
-        | None | Some "" -> Adef.safe ""
-        | Some x ->
-            (" class=\"" ^<^ Mutil.encode x ^>^ "\"" :> Adef.safe_string)
-      in
       let info =
         RelationLink.
           {
@@ -1025,8 +1006,6 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
             nb2 = None;
             sp1;
             sp2;
-            bd;
-            td_prop;
           }
       in
       if not (List.mem (b1, b2) !found) then (
@@ -1079,12 +1058,6 @@ let print_main_relationship conf base long p1 p2 rel =
         (match Util.p_getenv conf.env "cgl" with
         | Some "on" -> Some ("cgl", Mutil.encode "on")
         | _ -> None);
-        (match Util.p_getenv conf.env "bd" with
-        | None | Some ("0" | "") -> None
-        | Some x -> Some ("bd", Mutil.encode x));
-        (match Util.p_getenv conf.env "color" with
-        | None | Some "" -> None
-        | Some x -> Some ("color", Mutil.encode x));
       ]
   in
   conf.senv <- List.rev_append (List.rev conf.senv) extras;
