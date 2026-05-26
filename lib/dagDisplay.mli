@@ -5,7 +5,17 @@ val image_txt :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   Adef.safe_string
-(** Generate HTML for person's portrait image. *)
+(** [image_txt conf base p] returns the HTML fragment displaying [p]'s portrait
+    below the DAG cell text, or the empty string when no portrait is available
+    or when the URL parameter [im] is disabled (default [true]: image is shown).
+
+    Resolves the portrait via {!Image.get_portrait_with_size} and dispatches on
+    its source kind:
+    - [`Path]: local image, scaled to fit within 100x75 px, wrapped in a link to
+      [m=IM] unless [cgl=on];
+    - [`Url] with explicit size: external URL, sized as provided;
+    - [`Url] without size: external URL, height defaulted to 75 px to keep
+      neighbouring cells vertically aligned. *)
 
 type item =
   | Item of Geneweb_db.Driver.person * Adef.safe_string
@@ -23,8 +33,23 @@ val make_tree_hts :
   list ->
   (Geneweb_db.Driver.iper, 'a) Def.choice Dag2html.dag ->
   (int * Dag2html.align * Adef.safe_string Dag2html.table_data) array array
-(** Build HTML table structure from DAG.
-    [make_tree_hts conf base elem_txt vbar_txt invert set spl dag] *)
+(** [make_tree_hts conf base elem_txt vbar_txt invert set spl dag] lays [dag]
+    out as a 2D HTML cell matrix later consumed by {!print_dag_page}.
+
+    - [elem_txt]: builds the display text of a real person node (typically a
+      titled link plus dates, wrapped as an {!item}).
+    - [vbar_txt]: builds the link target of the vertical bar drawn above each
+      person (usually a navigation URL to that person's page).
+    - [invert]: when [true], descendants are placed at the top and ancestors at
+      the bottom (used by descendant trees); otherwise the reverse.
+    - [set]: persons participating in the DAG; used to filter out spouses whose
+      iper is already a node.
+    - [spl]: external spouse pairs [(ip, (sp_ip, ifam_opt))] rendered next to
+      childless leaves (relation paths with terminal spouses).
+
+    Also reads the URL parameters [nogroup] (disable sibling grouping),
+    [sp]/[spouse] (toggle spouse display) and [bd] (border width around cells).
+    Returns [[||]] when the layout is empty. *)
 
 val print_dag_page :
   Config.config ->
@@ -63,4 +88,14 @@ val make_and_print_dag :
     - [next_txt]: link text for pagination (empty if none) *)
 
 val print : Config.config -> Geneweb_db.Driver.base -> unit
-(** Entry point for m=DAG request. *)
+(** [print conf base] is the entry point for the [m=DAG] request.
+
+    When the URL carries person keys ([pN]/[nN]/[ocN]) but no Sosa branch ([sN]
+    absent for every [N]), the keys are resolved against [base] and the request
+    is rewritten with [iN=] identifiers, then served as an HTTP 302 redirect.
+    This canonicalises bookmarks and shared links to the stable iper form.
+
+    Otherwise the DAG is built from {!Dag.get_dag_elems} (which honours both
+    [iN] and [pN]/[nN]/[ocN]+[sN] combinations) and rendered via
+    {!make_and_print_dag}. The [invert=on] URL parameter flips the tree
+    orientation; the page title is the localised ["tree"] translation. *)
