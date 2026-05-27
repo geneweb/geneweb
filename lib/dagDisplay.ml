@@ -256,16 +256,18 @@ let find_sibling_aux base td next_or_prev =
   match td with
   | Dag2html.TDitem (ip, _, _) | Dag2html.TDtext (ip, _) -> (
       match Driver.get_parents (Driver.poi base ip) with
-      | Some ifam ->
+      | Some ifam -> (
           let sib = Driver.get_children (Driver.foi base ifam) in
-          (* array *)
-          let i = ref (-1) in
-          let _ = Array.iteri (fun n s -> if ip = s then i := n else ()) sib in
-          let cond =
-            if next_or_prev then !i >= 0 && !i < Array.length sib - 1
-            else !i >= 1
+          (* TODO Ocaml 5.1+: use Array.find_index *)
+          let rec find_idx i =
+            if i >= Array.length sib then None
+            else if sib.(i) = ip then Some i
+            else find_idx (i + 1)
           in
-          if cond then Some sib.(!i + if next_or_prev then 1 else -1) else None
+          match (find_idx 0, next_or_prev) with
+          | Some idx, true when idx < Array.length sib - 1 -> Some sib.(idx + 1)
+          | Some idx, false when idx >= 1 -> Some sib.(idx - 1)
+          | _ -> None)
       | None -> None)
   | _ -> None
 
