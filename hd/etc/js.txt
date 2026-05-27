@@ -1,4 +1,5 @@
 <!-- $Id: js.txt v7.1 23/05/2026 05:02:11 $ -->
+%if;not cancel_links;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -992,3 +993,4 @@ initTooltips();
 });
 </script>
 %end;
+%end;%( closing initial “not cancel_links”, not indented for convenience %)

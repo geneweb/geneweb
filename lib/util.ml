@@ -128,27 +128,37 @@ let read_base_env bname gw_prefix debug =
     [])
 
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
-  (*Printf.eprintf "Errors set_vars:\n";
+  let disabled =
+    match p_getenv conf.env "cgl" with
+    | Some "on" -> true
+    | _ -> (
+        match p_getenv conf.env "templ" with
+        | Some t when t <> "" -> true
+        | _ -> false)
+  in
+  if disabled then ()
+  else begin
+    (*Printf.eprintf "Errors set_vars:\n";
     List.iter (fun e -> Printf.eprintf "%s\n" e) set_vars;*)
-  let errors_undef = List.sort_uniq compare errors_undef in
-  let errors_undef =
-    List.filter
-      (fun e -> not (List.exists (fun s -> Mutil.contains e s) set_vars))
-      errors_undef
-  in
-  let nb_errors =
-    nb_errors + List.length errors_undef + List.length errors_other
-  in
-  let err_list1 = String.concat "," errors_undef in
-  let err_list2 = String.concat "," errors_other in
-  match
-    (List.assoc_opt "hide_querytime_bugs" conf.base_env, conf.predictable_mode)
-  with
-  | _, true | Some "yes", _ -> ()
-  | _, _ ->
-      Output.print_sstring conf
-        (Printf.sprintf
-           {|<script>
+    let errors_undef = List.sort_uniq compare errors_undef in
+    let errors_undef =
+      List.filter
+        (fun e -> not (List.exists (fun s -> Mutil.contains e s) set_vars))
+        errors_undef
+    in
+    let nb_errors =
+      nb_errors + List.length errors_undef + List.length errors_other
+    in
+    let err_list1 = String.concat "," errors_undef in
+    let err_list2 = String.concat "," errors_other in
+    match
+      (List.assoc_opt "hide_querytime_bugs" conf.base_env, conf.predictable_mode)
+    with
+    | _, true | Some "yes", _ -> ()
+    | _, _ ->
+        Output.print_sstring conf
+          (Printf.sprintf
+             {|<script>
   var q_time = %.3f;
   var nb_errors = %d;
   var errors_list = "\u{000A}%s%s";
@@ -174,11 +184,12 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
     }
   }
 </script>|}
-           query_time nb_errors
-           (if errors_undef <> [] then
-              Printf.sprintf "Unbound variable(s): %s. " err_list1
-            else "")
-           err_list2)
+             query_time nb_errors
+             (if errors_undef <> [] then
+                Printf.sprintf "Unbound variable(s): %s. " err_list1
+              else "")
+             err_list2)
+  end
 
 let escape_aux count blit str =
   let strlen = String.length str in

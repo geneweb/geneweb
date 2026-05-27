@@ -93,45 +93,56 @@ let query_aux conf =
   query_of_env conf (List.filter (fun kv -> not (drop kv)) conf.env)
 
 let script conf (q : Adef.encoded_string) : Adef.safe_string =
-  let esc s =
-    let b = Buffer.create (String.length s + 8) in
-    String.iter
-      (function
-        | '"' -> Buffer.add_string b "\\\""
-        | '\\' -> Buffer.add_string b "\\\\"
-        | '<' -> Buffer.add_string b "\\u003c"
-        | '/' -> Buffer.add_string b "\\/"
-        | c -> Buffer.add_char b c)
-      s;
-    Buffer.contents b
+  let disabled =
+    match Util.p_getenv conf.env "cgl" with
+    | Some "on" -> true
+    | _ -> (
+        match Util.p_getenv conf.env "templ" with
+        | Some t when t <> "" -> true
+        | _ -> false)
   in
-  let trn s n = esc (Util.transl_nth conf s n) in
-  let cap = esc (Utf8.capitalize_fst (Util.transl conf "copy permalink")) in
-  let role = if conf.wizard then 2 else if conf.friend then 1 else 0 in
-  let vr = "wizard/wizards/friend/friends/exterior" in
-  let buf = Buffer.create 256 in
-  Buffer.add_string buf (Printf.sprintf {|{"q":"%s"|} (esc (q :> string)));
-  if role > 0 then Buffer.add_string buf (Printf.sprintf {|,"r":%d|} role);
-  Buffer.add_string buf
-    (Printf.sprintf {|,"t":{"c":"%s","p":"%s"|} cap (trn vr 4));
-  if role >= 1 then
-    Buffer.add_string buf (Printf.sprintf {|,"f":"%s"|} (trn vr 2));
-  if role >= 2 then
-    Buffer.add_string buf (Printf.sprintf {|,"w":"%s"|} (trn vr 0));
-  Buffer.add_string buf "}}";
-  let json = Buffer.contents buf in
-  let pfx =
-    let p = if conf.cgi then conf.etc_prefix else "" in
-    if p = "" then "" else p ^ "/"
-  in
-  let file = pfx ^ "js/permalink.min.js" in
-  let fpath = if conf.cgi then file else Util.resolve_asset_file conf file in
-  let src =
-    match Util.hash_file_cached fpath with
-    | Some h -> file ^ "?hash=" ^ h
-    | None -> file
-  in
-  Adef.safe
-    (Printf.sprintf
-       "<script>window.GWPERMA=%s;</script>\n<script defer src=\"%s\"></script>"
-       json src)
+  if disabled then Adef.safe ""
+  else
+    let esc s =
+      let b = Buffer.create (String.length s + 8) in
+      String.iter
+        (function
+          | '"' -> Buffer.add_string b "\\\""
+          | '\\' -> Buffer.add_string b "\\\\"
+          | '<' -> Buffer.add_string b "\\u003c"
+          | '/' -> Buffer.add_string b "\\/"
+          | c -> Buffer.add_char b c)
+        s;
+      Buffer.contents b
+    in
+    let trn s n = esc (Util.transl_nth conf s n) in
+    let cap = esc (Utf8.capitalize_fst (Util.transl conf "copy permalink")) in
+    let role = if conf.wizard then 2 else if conf.friend then 1 else 0 in
+    let vr = "wizard/wizards/friend/friends/exterior" in
+    let buf = Buffer.create 256 in
+    Buffer.add_string buf (Printf.sprintf {|{"q":"%s"|} (esc (q :> string)));
+    if role > 0 then Buffer.add_string buf (Printf.sprintf {|,"r":%d|} role);
+    Buffer.add_string buf
+      (Printf.sprintf {|,"t":{"c":"%s","p":"%s"|} cap (trn vr 4));
+    if role >= 1 then
+      Buffer.add_string buf (Printf.sprintf {|,"f":"%s"|} (trn vr 2));
+    if role >= 2 then
+      Buffer.add_string buf (Printf.sprintf {|,"w":"%s"|} (trn vr 0));
+    Buffer.add_string buf "}}";
+    let json = Buffer.contents buf in
+    let pfx =
+      let p = if conf.cgi then conf.etc_prefix else "" in
+      if p = "" then "" else p ^ "/"
+    in
+    let file = pfx ^ "js/permalink.min.js" in
+    let fpath = if conf.cgi then file else Util.resolve_asset_file conf file in
+    let src =
+      match Util.hash_file_cached fpath with
+      | Some h -> file ^ "?hash=" ^ h
+      | None -> file
+    in
+    Adef.safe
+      (Printf.sprintf
+         "<script>window.GWPERMA=%s;</script>\n\
+          <script defer src=\"%s\"></script>"
+         json src)
