@@ -28,6 +28,7 @@ val make_dag :
     - Each person in [ipers] becomes a node with [valu = Left iper]
     - Parent/child links are restricted to persons within [ipers]
     - Couples without common children in [ipers] get a synthetic "spouse node"
-      with [valu = Right n] to maintain graph connectivity
+      with [valu = Right n] to maintain graph connectivity.
 
-    Uses {!Ipermap} internally for efficient iper-to-idag lookup. *)
+    Uses {!Geneweb_db.Driver.Iper.Map} internally for efficient iper-to-idag
+    lookup. *)
