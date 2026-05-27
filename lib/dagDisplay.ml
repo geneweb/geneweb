@@ -66,6 +66,9 @@ let image_txt conf base p =
   Adef.safe
   @@
   if img then
+    let wrap inner =
+      Printf.sprintf {|<div class="text-center">%s</div>|} inner
+    in
     match Image.get_portrait_with_size conf base p with
     | None -> ""
     | Some (`Path s, size_opt) ->
@@ -75,42 +78,18 @@ let image_txt conf base p =
           | Some (w, h) -> Image.scale_to_fit ~max_w ~max_h ~w ~h
           | None -> (0, max_h)
         in
-        Printf.sprintf
-          {|
-            <br>
-            <center>
-              <table border="0">
-                <tr align="left"><td>%s</td></tr>
-              </table>
-            </center>|}
-          (image_normal_txt conf base p s w h |> Adef.as_string)
+        wrap (image_normal_txt conf base p s w h |> Adef.as_string)
     | Some (`Url url, Some (width, height)) ->
-        let url_p = Util.commd conf ^^^ Util.acces conf base p in
-        Printf.sprintf
-          {|
-            <br>
-            <center>
-              <table border="0">
-                <tr align="left"><td>%s</td></tr>
-              </table>
-            </center>|}
+        let url_p = commd conf ^^^ acces conf base p in
+        wrap
           (image_url_txt conf url_p (Util.escape_html url) ~width:(Some width)
              ~height
           |> Adef.as_string)
     | Some (`Url url, None) ->
-        let url_p = Util.commd conf ^^^ Util.acces conf base p in
-        let height = 75 in
-        (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
-        Printf.sprintf
-          {|
-            <br>
-            <center>
-              <table border="0" style="height:%spx">
-                <tr align="left"><td>%s</td></tr>
-              </table>
-            </center>|}
-          (string_of_int height)
-          (image_url_txt conf url_p (Util.escape_html url) ~width:None ~height
+        let url_p = commd conf ^^^ acces conf base p in
+        wrap
+          (image_url_txt conf url_p (Util.escape_html url) ~width:None
+             ~height:75
           |> Adef.as_string)
   else ""
 
@@ -173,7 +152,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
             let from_spl = try [ List.assq ip spl ] with Not_found -> [] in
             if from_spl <> [] then from_spl
             else if spouse_on then
-              let p = pget conf base ip in
+              let p = Util.pget conf base ip in
               Array.fold_left
                 (fun list ifam ->
                   let cpl = Driver.foi base ifam in
