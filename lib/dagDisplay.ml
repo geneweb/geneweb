@@ -80,13 +80,13 @@ let image_txt conf base p =
         in
         wrap (image_normal_txt conf base p s w h |> Adef.as_string)
     | Some (`Url url, Some (width, height)) ->
-        let url_p = commd conf ^^^ acces conf base p in
+        let url_p = Util.commd conf ^^^ Util.acces conf base p in
         wrap
           (image_url_txt conf url_p (Util.escape_html url) ~width:(Some width)
              ~height
           |> Adef.as_string)
     | Some (`Url url, None) ->
-        let url_p = commd conf ^^^ acces conf base p in
+        let url_p = Util.commd conf ^^^ Util.acces conf base p in
         wrap
           (image_url_txt conf url_p (Util.escape_html url) ~width:None
              ~height:75
@@ -109,6 +109,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in
+  let nowrap inner = {|<span class="text-nowrap">|} ^<^ inner ^>^ "</span>" in
   let indi_ip n =
     match n.Dag2html.valu with Left ip -> ip | Right _ -> Driver.Iper.dummy
   in
@@ -117,7 +118,8 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | Left ip ->
         let p = Util.pget conf base ip in
         let txt =
-          image_txt conf base p ^^^ string_of_item conf base (elem_txt p)
+          image_txt conf base p
+          ^^^ nowrap (string_of_item conf base (elem_txt p))
         in
         let spouses =
           if ((spouse_on && n.chil <> []) || n.pare = []) && not invert then
@@ -179,8 +181,10 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                       (Driver.foi base ifam) p ps
                 | _ -> Adef.safe ""
               in
-              txt ^^^ "<br>&amp;" ^<^ d ^^^ " "
-              ^<^ string_of_item conf base (elem_txt ps)
+              txt ^^^ "<br>"
+              ^<^ nowrap
+                    ("&amp;" ^<^ d ^^^ " "
+                    ^<^ string_of_item conf base (elem_txt ps))
               ^^^ image_txt conf base ps)
           txt spouses
     | Right _ -> Adef.safe "&nbsp;"
