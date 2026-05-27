@@ -123,7 +123,7 @@ let string_of_item conf base = function
       ^^^ if (s :> string) = "" then Adef.safe "" else " " ^<^ s
 
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
-  let set_lookup = List.fold_left (Fun.flip Iper.Set.add) Iper.Set.empty set in
+  let set_lookup = Iper.Set.of_list set in
   let no_group = Util.p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with

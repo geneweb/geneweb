@@ -26,16 +26,13 @@ let get_dag_elems conf base =
   in
   Iper.Set.elements (loop None Iper.Set.empty 1)
 
-type ('a, 'b) sum = ('a, 'b) Def.choice
-
 let make_dag conf base ipers =
   let ipers_arr = Array.of_list ipers in
   let n = Array.length ipers_arr in
   let iper_to_idag =
-    Array.fold_left
-      (fun (map, i) ip -> (Iper.Map.add ip (Dag2html.idag_of_int i) map, i + 1))
-      (Iper.Map.empty, 0) ipers_arr
-    |> fst
+    Array.to_seqi ipers_arr
+    |> Seq.map (fun (i, ip) -> (ip, Dag2html.idag_of_int i))
+    |> Iper.Map.of_seq
   in
   let find_idag ip = Iper.Map.find_opt ip iper_to_idag in
   let nodes =

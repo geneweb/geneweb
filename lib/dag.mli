@@ -15,8 +15,6 @@ val get_dag_elems :
     For each (person, sosa) pair, collects all ancestors along the Sosa branch.
     Returns the union of all collected persons without duplicates. *)
 
-type ('a, 'b) sum = ('a, 'b) Def.choice
-
 val make_dag :
   Config.config ->
   Geneweb_db.Driver.base ->
