@@ -1,7 +1,5 @@
 open Config
-open Dag2html
 open Def
-open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
@@ -35,7 +33,7 @@ let make_dag conf base ipers =
   let n = Array.length ipers_arr in
   let iper_to_idag =
     Array.fold_left
-      (fun (map, i) ip -> (Iper.Map.add ip (idag_of_int i) map, i + 1))
+      (fun (map, i) ip -> (Iper.Map.add ip (Dag2html.idag_of_int i) map, i + 1))
       (Iper.Map.empty, 0) ipers_arr
     |> fst
   in
@@ -44,7 +42,7 @@ let make_dag conf base ipers =
     Array.map
       (fun ip ->
         let pare =
-          match Driver.get_parents (pget conf base ip) with
+          match Driver.get_parents (Util.pget conf base ip) with
           | Some ifam ->
               let fam = Driver.foi base ifam in
               List.filter_map find_idag
@@ -52,7 +50,7 @@ let make_dag conf base ipers =
           | None -> []
         in
         let chil =
-          let person = pget conf base ip in
+          let person = Util.pget conf base ip in
           Driver.get_family person
           |> Array.fold_left
                (fun acc ifam ->
@@ -66,7 +64,7 @@ let make_dag conf base ipers =
                []
           |> List.rev
         in
-        { pare; valu = Left ip; chil })
+        { Dag2html.pare; valu = Left ip; chil })
       ipers_arr
   in
   let nodes =
@@ -74,9 +72,9 @@ let make_dag conf base ipers =
       if i >= Array.length nodes then nodes
       else
         match nodes.(i) with
-        | { valu = Left ip; chil; _ } ->
+        | { Dag2html.valu = Left ip; chil; _ } ->
             let ifams =
-              Driver.get_family (pget conf base ip) |> Array.to_list
+              Driver.get_family (Util.pget conf base ip) |> Array.to_list
             in
             let nodes, next_id =
               List.fold_left
@@ -85,17 +83,18 @@ let make_dag conf base ipers =
                   let spouse_ip = Gutil.spouse ip cpl in
                   match find_idag spouse_ip with
                   | Some spouse_idag ->
-                      let j = int_of_idag spouse_idag in
-                      if chil = [] && nodes.(j).chil = [] then (
+                      let j = Dag2html.int_of_idag spouse_idag in
+                      if chil = [] && nodes.(j).Dag2html.chil = [] then (
                         let new_node =
                           {
-                            pare = [ idag_of_int i; spouse_idag ];
+                            Dag2html.pare =
+                              [ Dag2html.idag_of_int i; spouse_idag ];
                             valu = Right next_id;
                             chil = [];
                           }
                         in
                         let nodes = Array.append nodes [| new_node |] in
-                        let new_idag = idag_of_int next_id in
+                        let new_idag = Dag2html.idag_of_int next_id in
                         nodes.(i) <- { (nodes.(i)) with chil = [ new_idag ] };
                         nodes.(j) <- { (nodes.(j)) with chil = [ new_idag ] };
                         (nodes, next_id + 1))
@@ -103,7 +102,7 @@ let make_dag conf base ipers =
                         List.iter
                           (fun child_idag ->
                             if not (List.mem child_idag nodes.(j).chil) then (
-                              let child_idx = int_of_idag child_idag in
+                              let child_idx = Dag2html.int_of_idag child_idag in
                               nodes.(j) <-
                                 {
                                   (nodes.(j)) with
@@ -118,8 +117,8 @@ let make_dag conf base ipers =
                         List.iter
                           (fun child_idag ->
                             if not (List.mem child_idag chil) then (
-                              let self_idag = idag_of_int i in
-                              let child_idx = int_of_idag child_idag in
+                              let self_idag = Dag2html.idag_of_int i in
+                              let child_idx = Dag2html.int_of_idag child_idag in
                               nodes.(i) <-
                                 { (nodes.(i)) with chil = child_idag :: chil };
                               nodes.(child_idx) <-
@@ -127,7 +126,7 @@ let make_dag conf base ipers =
                                   (nodes.(child_idx)) with
                                   pare = self_idag :: nodes.(child_idx).pare;
                                 }))
-                          nodes.(j).chil;
+                          nodes.(j).Dag2html.chil;
                         (nodes, next_id))
                       else (nodes, next_id)
                   | None -> (nodes, next_id))
@@ -138,4 +137,4 @@ let make_dag conf base ipers =
     in
     add_spouse_nodes nodes n 0
   in
-  { dag = nodes }
+  { Dag2html.dag = nodes }

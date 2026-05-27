@@ -1,8 +1,5 @@
 open Config
-open Dag2html
 open Def
-open Util
-open Dag
 
 let src = Logs.Src.create ~doc:"DagDisplay" "DAG "
 
@@ -12,17 +9,17 @@ module Iper = Driver.Iper
 module Server = Geneweb_http.Server
 
 let image_normal_txt conf base p fname width height =
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt = Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
   let k = Image.default_image_filename "portraits" base p in
   let r =
     Format.sprintf
       {|<img src="%sm=IM&d=%s&%s&k=%s"%s%s alt="%s" title="%s"
         style="%s %s">|}
-      (commd conf : Adef.escaped_string :> string)
+      (Util.commd conf : Adef.escaped_string :> string)
       (string_of_int
       @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-      (acces conf base p : Adef.escaped_string :> string)
+      (Util.acces conf base p : Adef.escaped_string :> string)
       k
       (if width = 0 then "" else " width=" ^ string_of_int width)
       (if height = 0 then "" else " height=" ^ string_of_int height)
@@ -30,17 +27,17 @@ let image_normal_txt conf base p fname width height =
       (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
       (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
   in
-  (if p_getenv conf.env "cgl" = Some "on" then r
+  (if Util.p_getenv conf.env "cgl" = Some "on" then r
    else
      Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
-       (commd conf : Adef.escaped_string :> string)
-       (acces conf base p : Adef.escaped_string :> string)
+       (Util.commd conf : Adef.escaped_string :> string)
+       (Util.acces conf base p : Adef.escaped_string :> string)
        k r)
   |> Adef.safe
 
 let image_url_txt conf url_p url ~width ~height =
   let width = Option.value ~default:0 width in
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt = Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0) in
   let size =
     Format.sprintf "%s %s"
       (if width = 0 then "" else Format.sprintf {|width="%d"|} width)
@@ -58,7 +55,7 @@ let image_url_txt conf url_p url ~width ~height =
   in
   Adef.safe
   @@
-  if p_getenv conf.env "cgl" = Some "on" then s
+  if Util.p_getenv conf.env "cgl" = Some "on" then s
   else
     Format.sprintf {|<a href="%s">%s</a>|}
       (url_p : Adef.escaped_string :> string)
@@ -88,7 +85,7 @@ let image_txt conf base p =
             </center>|}
           (image_normal_txt conf base p s w h |> Adef.as_string)
     | Some (`Url url, Some (width, height)) ->
-        let url_p = commd conf ^^^ acces conf base p in
+        let url_p = Util.commd conf ^^^ Util.acces conf base p in
         Printf.sprintf
           {|
             <br>
@@ -101,7 +98,7 @@ let image_txt conf base p =
              ~height
           |> Adef.as_string)
     | Some (`Url url, None) ->
-        let url_p = commd conf ^^^ acces conf base p in
+        let url_p = Util.commd conf ^^^ Util.acces conf base p in
         let height = 75 in
         (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
         Printf.sprintf
@@ -127,7 +124,7 @@ let string_of_item conf base = function
 
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let set_lookup = List.fold_left (Fun.flip Iper.Set.add) Iper.Set.empty set in
-  let no_group = p_getenv conf.env "nogroup" = Some "on" in
+  let no_group = Util.p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
     | Some ("off" | "0"), _ | _, Some "off" -> false
@@ -135,12 +132,12 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   in
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let indi_ip n =
-    match n.valu with Left ip -> ip | Right _ -> Driver.Iper.dummy
+    match n.Dag2html.valu with Left ip -> ip | Right _ -> Driver.Iper.dummy
   in
   let indi_txt n =
-    match n.valu with
+    match n.Dag2html.valu with
     | Left ip ->
-        let p = pget conf base ip in
+        let p = Util.pget conf base ip in
         let txt =
           image_txt conf base p ^^^ string_of_item conf base (elem_txt p)
         in
@@ -148,9 +145,9 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
           if ((spouse_on && n.chil <> []) || n.pare = []) && not invert then
             List.fold_left
               (fun list id ->
-                match d.dag.(int_of_idag id).valu with
+                match d.Dag2html.dag.(Dag2html.int_of_idag id).valu with
                 | Left cip -> (
-                    match Driver.get_parents (pget conf base cip) with
+                    match Driver.get_parents (Util.pget conf base cip) with
                     | Some ifam ->
                         let cpl = Driver.foi base ifam in
                         if ip = Driver.get_father cpl then
@@ -173,9 +170,10 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
           (fun txt (ips, ifamo) ->
             if Iper.Set.mem ips set_lookup then txt
             else
-              let ps = pget conf base ips in
+              let ps = Util.pget conf base ips in
               let auth =
-                authorized_age conf base p && authorized_age conf base ps
+                Util.authorized_age conf base p
+                && Util.authorized_age conf base ps
               in
               let d =
                 match ifamo with
@@ -191,7 +189,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | Right _ -> Adef.safe "&nbsp;"
   in
   let indi_txt n : Adef.safe_string =
-    let bd = match n.valu with Left _ -> bd | _ -> 0 in
+    let bd = match n.Dag2html.valu with Left _ -> bd | _ -> 0 in
     if bd > 0 then
       {|<table border="|} ^<^ string_of_int bd
       ^<^ {|"><tr align="left"><td align="center">|} ^<^ indi_txt n
@@ -199,9 +197,11 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     else indi_txt n
   in
   let vbar_txt n =
-    match n.valu with Left ip -> vbar_txt ip | _ -> Adef.escaped ""
+    match n.Dag2html.valu with Left ip -> vbar_txt ip | _ -> Adef.escaped ""
   in
-  let phony n = match n.valu with Left _ -> false | Right _ -> true in
+  let phony n =
+    match n.Dag2html.valu with Left _ -> false | Right _ -> true
+  in
   let t = Dag2html.table_of_dag phony false invert no_group d in
   if Array.length t.table = 0 then [||]
   else Dag2html.html_table_struct indi_ip indi_txt vbar_txt phony d t
@@ -252,7 +252,7 @@ let eval_predefined_apply f vl =
 
 let parents_access_aux conf base td get_parent =
   match td with
-  | TDitem (ip, _, _) | TDtext (ip, _) -> (
+  | Dag2html.TDitem (ip, _, _) | Dag2html.TDtext (ip, _) -> (
       match Driver.get_parents (Driver.poi base ip) with
       | Some ifam ->
           let cpl = Driver.foi base ifam in
@@ -263,7 +263,7 @@ let parents_access_aux conf base td get_parent =
 
 let has_sibling_aux base td next_or_prev =
   match td with
-  | TDitem (ip, _, _) | TDtext (ip, _) -> (
+  | Dag2html.TDitem (ip, _, _) | Dag2html.TDtext (ip, _) -> (
       match Driver.get_parents (Driver.poi base ip) with
       | Some ifam ->
           let sib = Driver.get_children (Driver.foi base ifam) in
@@ -314,7 +314,7 @@ let rec eval_var conf base env _xx _loc = function
       | Vestring s -> VVstring (s :> string)
       | _ -> VVstring "")
   | [ "person_index" ] -> (
-      match find_person_in_env conf base "" with
+      match Util.find_person_in_env conf base "" with
       | Some p -> VVstring (Driver.Iper.to_string (Driver.get_iper p))
       | None -> VVstring "")
   (* person_index.x -> i=, p=, n=, oc= *)
@@ -324,25 +324,29 @@ let rec eval_var conf base env _xx _loc = function
   (* same thing in perso.ml, but differences! *)
   | [ "person_index"; x; sl ] -> (
       let find_person =
-        match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
+        match x with
+        | "e" -> Util.find_person_in_env_pref
+        | _ -> Util.find_person_in_env
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
       | Some p ->
-          let auth = authorized_age conf base p in
+          let auth = Util.authorized_age conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep sl
       | None -> (
-          match p_getenv conf.env s with
+          match Util.p_getenv conf.env s with
           | Some s when Option.is_some (int_of_string_opt s) ->
               let p = Driver.poi base (Driver.Iper.of_string s) in
-              let auth = authorized_age conf base p in
+              let auth = Util.authorized_age conf base p in
               let ep = (p, auth) in
               eval_person_field_var conf base env ep sl
           | _ -> VVstring ""))
   | [ "person_index"; x ] -> (
       let find_person =
-        match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
+        match x with
+        | "e" -> Util.find_person_in_env_pref
+        | _ -> Util.find_person_in_env
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
@@ -504,13 +508,13 @@ and print_foreach_dag_line print_ast env hts al =
 
 let print_dag_page conf base page_title hts next_txt =
   let p =
-    match find_person_in_env conf base "" with
+    match Util.find_person_in_env conf base "" with
     | Some p -> p
     | None -> Driver.poi base Driver.Iper.dummy
   in
   let env =
     Templ.Env.empty |> Templ.Env.add "p" (Vind p)
-    |> Templ.Env.add "p_auth" (Vbool (authorized_age conf base p))
+    |> Templ.Env.add "p_auth" (Vbool (Util.authorized_age conf base p))
     |> Templ.Env.add "count" (Vcnt (ref 0))
     |> Templ.Env.add "count1" (Vcnt (ref 0))
     |> Templ.Env.add "count2" (Vcnt (ref 0))
@@ -534,7 +538,7 @@ let print_dag_page conf base page_title hts next_txt =
 
 let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
     next_txt =
-  let d = make_dag conf base set in
+  let d = Dag.make_dag conf base set in
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
   print_dag_page conf base page_title hts next_txt
 
@@ -563,13 +567,16 @@ let print conf base =
       (fun idx ->
         let k = string_of_int idx in
         (* Traiter p* *)
-        (match p_getenv conf.env ("p" ^ k) with
+        (match Util.p_getenv conf.env ("p" ^ k) with
         | Some fn when fn <> "" -> (
-            let sn = Option.value ~default:"" (p_getenv conf.env ("n" ^ k)) in
+            let sn =
+              Option.value ~default:"" (Util.p_getenv conf.env ("n" ^ k))
+            in
             let oc =
               try
                 int_of_string
-                  (Option.value ~default:"0" (p_getenv conf.env ("oc" ^ k)))
+                  (Option.value ~default:"0"
+                     (Util.p_getenv conf.env ("oc" ^ k)))
               with _ -> 0
             in
             match Driver.person_of_key base fn sn oc with
@@ -579,7 +586,7 @@ let print conf base =
                   :: !converted_params
             | None -> ())
         | _ -> ());
-        match p_getenv conf.env ("s" ^ k) with
+        match Util.p_getenv conf.env ("s" ^ k) with
         | Some s when s <> "" ->
             converted_params :=
               ("s" ^ k ^ "=" ^ (Mutil.encode s :> string)) :: !converted_params
@@ -592,7 +599,7 @@ let print conf base =
     in
     Server.http_redirect_temporarily clean_url)
   else
-    let set = get_dag_elems conf base in
+    let set = Dag.get_dag_elems conf base in
     let elem_txt p = Item (p, Adef.safe "") in
     let vbar_txt _ = Adef.escaped "" in
     let invert = Util.p_getenv conf.env "invert" = Some "on" in
