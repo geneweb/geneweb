@@ -64,37 +64,52 @@ let make_dag conf base ipers =
         { Dag2html.pare; valu = Left ip; chil })
       ipers_arr
   in
+  let max_extra =
+    Array.fold_left
+      (fun acc -> function
+        | { Dag2html.valu = Left ip; _ } ->
+            acc + Array.length (Driver.get_family (Util.pget conf base ip))
+        | _ -> acc)
+      0 nodes
+  in
   let nodes =
-    let rec add_spouse_nodes nodes next_id i =
-      if i >= Array.length nodes then nodes
+    if max_extra = 0 then nodes
+    else
+      let arr =
+        Array.make (n + max_extra)
+          { Dag2html.pare = []; valu = Right (-1); chil = [] }
+      in
+      Array.blit nodes 0 arr 0 n;
+      arr
+  in
+  let nodes =
+    let rec add_spouse_nodes next_id i =
+      if i >= n then next_id
       else
         match nodes.(i) with
-        | { Dag2html.valu = Left ip; chil; _ } ->
+        | { valu = Left ip; chil; _ } ->
             let ifams =
               Driver.get_family (Util.pget conf base ip) |> Array.to_list
             in
-            let nodes, next_id =
+            let next_id =
               List.fold_left
-                (fun (nodes, next_id) ifam ->
+                (fun next_id ifam ->
                   let cpl = Driver.foi base ifam in
                   let spouse_ip = Gutil.spouse ip cpl in
                   match find_idag spouse_ip with
                   | Some spouse_idag ->
                       let j = Dag2html.int_of_idag spouse_idag in
-                      if chil = [] && nodes.(j).Dag2html.chil = [] then (
-                        let new_node =
+                      if chil = [] && nodes.(j).chil = [] then (
+                        let new_idag = Dag2html.idag_of_int next_id in
+                        nodes.(next_id) <-
                           {
-                            Dag2html.pare =
-                              [ Dag2html.idag_of_int i; spouse_idag ];
+                            pare = [ Dag2html.idag_of_int i; spouse_idag ];
                             valu = Right next_id;
                             chil = [];
-                          }
-                        in
-                        let nodes = Array.append nodes [| new_node |] in
-                        let new_idag = Dag2html.idag_of_int next_id in
+                          };
                         nodes.(i) <- { (nodes.(i)) with chil = [ new_idag ] };
                         nodes.(j) <- { (nodes.(j)) with chil = [ new_idag ] };
-                        (nodes, next_id + 1))
+                        next_id + 1)
                       else if chil <> nodes.(j).chil then (
                         List.iter
                           (fun child_idag ->
@@ -123,15 +138,17 @@ let make_dag conf base ipers =
                                   (nodes.(child_idx)) with
                                   pare = self_idag :: nodes.(child_idx).pare;
                                 }))
-                          nodes.(j).Dag2html.chil;
-                        (nodes, next_id))
-                      else (nodes, next_id)
-                  | None -> (nodes, next_id))
-                (nodes, next_id) ifams
+                          nodes.(j).chil;
+                        next_id)
+                      else next_id
+                  | None -> next_id)
+                next_id ifams
             in
-            add_spouse_nodes nodes next_id (i + 1)
-        | _ -> add_spouse_nodes nodes next_id (i + 1)
+            add_spouse_nodes next_id (i + 1)
+        | _ -> add_spouse_nodes next_id (i + 1)
     in
-    add_spouse_nodes nodes n 0
+    let final_next_id = add_spouse_nodes n 0 in
+    if final_next_id = Array.length nodes then nodes
+    else Array.sub nodes 0 final_next_id
   in
   { Dag2html.dag = nodes }
