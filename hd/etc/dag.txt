@@ -124,7 +124,7 @@
     <td class="dag-cell%nn;
       %if;dag_cell.is_bar; dag-bar%end;%nn;
       %if;(dag_cell.is_nothing or (dag_cell.text="" and dag_cell.item="" and not dag_cell.is_bar)) dag-collapse%end;%nn;
-      %sp;align-%if;(e.m="D" or e.m="RL")top%elseif;(e.m="A")bottom%end;%nn;
+      %if;(e.m="D" or e.m="RLM") align-top%elseif;(e.m="A" or e.m="RL") align-bottom%end;
       %sp;text-%if;(dag_cell.align="left")start%elseif;(dag_cell.align="right")end%else;center%end;"
       %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;>
     %if;dag_cell.is_nothing;&nbsp;%nn;

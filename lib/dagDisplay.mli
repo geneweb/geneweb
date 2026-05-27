@@ -1,21 +1,30 @@
 (** DAG (Directed Acyclic Graph) display for genealogical trees. *)
 
 val image_txt :
+  ?reserve:bool ->
   Config.config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   Adef.safe_string
-(** [image_txt conf base p] returns the HTML fragment displaying [p]'s portrait
-    below the DAG cell text, or the empty string when no portrait is available
-    or when the URL parameter [im] is disabled (default [true]: image is shown).
+(** [image_txt ?reserve conf base p] returns the HTML fragment displaying [p]'s
+    portrait below the DAG cell text, or the empty string when the URL parameter
+    [im] is disabled (default [true]: image is shown).
+
+    [reserve] (default [false]) controls vertical-alignment reservation:
+    - [false]: a missing portrait yields the empty string; a present one is
+      centred in a [text-center] wrapper at its natural height (spouse images,
+      [m=RL] renderer);
+    - [true]: the portrait — present or not — is wrapped in a fixed-height
+      [dag-img-slot] so the name lines of every cell in a row stay aligned
+      regardless of which persons carry a portrait (self image, [align-top] DAG
+      modes).
 
     Resolves the portrait via {!Image.get_portrait_with_size} and dispatches on
     its source kind:
     - [`Path]: local image, scaled to fit within 100x75 px, wrapped in a link to
       [m=IM] unless [cgl=on];
     - [`Url] with explicit size: external URL, sized as provided;
-    - [`Url] without size: external URL, height defaulted to 75 px to keep
-      neighbouring cells vertically aligned. *)
+    - [`Url] without size: external URL, height defaulted to 75 px. *)
 
 type item =
   | Item of Geneweb_db.Driver.person * Adef.safe_string

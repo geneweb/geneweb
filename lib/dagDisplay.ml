@@ -60,16 +60,15 @@ let image_url_txt conf url_p url ~width ~height =
       (url_p : Adef.escaped_string :> string)
       s
 
-let image_txt conf base p =
+let image_txt ?(reserve = false) conf base p =
   let img = Util.get_opt conf "im" true in
   Adef.safe
   @@
   if img then
-    let wrap inner =
-      Printf.sprintf {|<div class="text-center">%s</div>|} inner
-    in
+    let cls = if reserve then "dag-img-slot" else "text-center" in
+    let wrap inner = Printf.sprintf {|<div class="%s">%s</div>|} cls inner in
     match Image.get_portrait_with_size conf base p with
-    | None -> ""
+    | None -> if reserve then wrap "" else ""
     | Some (`Path s, size_opt) ->
         let max_w, max_h = (100, 75) in
         let w, h =
@@ -279,13 +278,31 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
             | _ -> ())
           row)
       t.Dag2html.table;
+    let align_top =
+      match Util.p_getenv conf.env "m" with
+      | Some ("D" | "RLM") -> true
+      | _ -> false
+    in
+    let has_portrait ip =
+      Image.get_portrait_with_size conf base (Util.pget conf base ip) <> None
+    in
+    let graph_has_portrait =
+      align_top
+      && Util.get_opt conf "im" true
+      && Array.exists
+           (fun n ->
+             match n.Dag2html.valu with
+             | Left ip -> (not (is_suppressed ip)) && has_portrait ip
+             | Right _ -> false)
+           d.Dag2html.dag
+    in
     let indi_txt n =
       match n.Dag2html.valu with
       | Left ip when is_suppressed ip -> Adef.safe ""
       | Left ip ->
           let p = Util.pget conf base ip in
           let txt =
-            image_txt conf base p
+            image_txt ~reserve:graph_has_portrait conf base p
             ^^^ nowrap (string_of_item conf base (elem_txt p))
           in
           let spouses, via_connector_iperse =

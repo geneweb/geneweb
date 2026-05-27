@@ -1304,6 +1304,12 @@ table hr.right { width: 50%; margin-left: 50%; }
 #dag .dag-bar                 { line-height: 1.06; }
 #dag .dag-collapse            { line-height: 0; }
 #dag .dag-cell > div.mx-1     { margin: 2px 0.25rem; }
+#dag .dag-img-slot {
+  min-height: 75px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
 
 /* Connectors faded against text; text-shadow thickens pipes to ~2px
    to match the 2px HR without depending on a font. */
