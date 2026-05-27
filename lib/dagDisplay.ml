@@ -283,6 +283,16 @@ let track_set_var name =
     in
     GWPARAM.set_vars := name :: !GWPARAM.set_vars
 
+let eval_vars_var lv name = function
+  | None ->
+      track_set_var name;
+      Templ.VVstring (List.assoc name !lv)
+  | Some value ->
+      if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
+      lv := (name, value) :: !lv;
+      track_set_var name;
+      Templ.VVstring ""
+
 let rec eval_var conf base env _xx _loc = function
   | [ "browsing_with_sosa_ref" ] -> (
       match (Util.p_getenv conf.env "pz", Util.p_getenv conf.env "nz") with
@@ -353,20 +363,11 @@ let rec eval_var conf base env _xx _loc = function
       | None -> VVstring "")
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
-      | Vvars lv ->
-          track_set_var name;
-          let vv =
-            try List.assoc name !lv with Not_found -> raise Not_found
-          in
-          VVstring vv
-      | _ -> raise Not_found)
+      | Vvars lv -> eval_vars_var lv name None
+      | _ -> VVstring "")
   | [ "set_var"; name; value ] -> (
       match get_env "vars" env with
-      | Vvars lv ->
-          if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
-          lv := (name, value) :: !lv;
-          track_set_var name;
-          VVstring ""
+      | Vvars lv -> eval_vars_var lv name (Some value)
       | _ -> raise Not_found)
   (* TODO set real values *)
   | [ "static_max_anc_level" ] -> VVstring "10"
