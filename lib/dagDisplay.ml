@@ -252,7 +252,7 @@ let parents_access_aux conf base td get_parent =
       | None -> VVstring "")
   | _ -> VVstring ""
 
-let has_sibling_aux base td next_or_prev =
+let find_sibling_aux base td next_or_prev =
   match td with
   | Dag2html.TDitem (ip, _, _) | Dag2html.TDtext (ip, _) -> (
       match Driver.get_parents (Driver.poi base ip) with
@@ -270,7 +270,7 @@ let has_sibling_aux base td next_or_prev =
   | _ -> None
 
 let sibling_access_aux conf base td next_or_prev =
-  match has_sibling_aux base td next_or_prev with
+  match find_sibling_aux base td next_or_prev with
   | Some s_ip ->
       Templ.VVstring (Util.acces conf base (Driver.poi base s_ip) :> string)
   | None -> raise Not_found
@@ -399,11 +399,11 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
   | [ "colspan" ] -> VVstring (string_of_int colspan)
   | [ "father"; "access" ] -> parents_access_aux conf base td Driver.get_father
   | [ "has_next_sibling" ] -> (
-      match has_sibling_aux base td true with
+      match find_sibling_aux base td true with
       | Some _ -> VVbool true
       | None -> VVbool false)
   | [ "has_prev_sibling" ] -> (
-      match has_sibling_aux base td false with
+      match find_sibling_aux base td false with
       | Some _ -> VVbool true
       | None -> VVbool false)
   | [ "index" ] -> (
