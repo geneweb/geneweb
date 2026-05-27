@@ -130,7 +130,6 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in
-  let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let indi_ip n =
     match n.Dag2html.valu with Left ip -> ip | Right _ -> Driver.Iper.dummy
   in
@@ -187,14 +186,6 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
               ^^^ image_txt conf base ps)
           txt spouses
     | Right _ -> Adef.safe "&nbsp;"
-  in
-  let indi_txt n : Adef.safe_string =
-    let bd = match n.Dag2html.valu with Left _ -> bd | _ -> 0 in
-    if bd > 0 then
-      {|<table border="|} ^<^ string_of_int bd
-      ^<^ {|"><tr align="left"><td align="center">|} ^<^ indi_txt n
-      ^>^ {|</td></tr></table>|}
-    else indi_txt n
   in
   let vbar_txt n =
     match n.Dag2html.valu with Left ip -> vbar_txt ip | _ -> Adef.escaped ""
