@@ -275,6 +275,14 @@ let sibling_access_aux conf base td next_or_prev =
       Templ.VVstring (Util.acces conf base (Driver.poi base s_ip) :> string)
   | None -> raise Not_found
 
+let track_set_var name =
+  if not (List.mem name !GWPARAM.set_vars) then
+    let name =
+      if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+      else name
+    in
+    GWPARAM.set_vars := name :: !GWPARAM.set_vars
+
 let rec eval_var conf base env _xx _loc = function
   | [ "browsing_with_sosa_ref" ] -> (
       match (Util.p_getenv conf.env "pz", Util.p_getenv conf.env "nz") with
@@ -346,12 +354,7 @@ let rec eval_var conf base env _xx _loc = function
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
       | Vvars lv ->
-          (if not (List.mem name !GWPARAM.set_vars) then
-             let name =
-               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-               else name
-             in
-             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          track_set_var name;
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
@@ -362,12 +365,7 @@ let rec eval_var conf base env _xx _loc = function
       | Vvars lv ->
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
-          (if not (List.mem name !GWPARAM.set_vars) then
-             let name =
-               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-               else name
-             in
-             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          track_set_var name;
           VVstring ""
       | _ -> raise Not_found)
   (* TODO set real values *)
@@ -438,12 +436,7 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
       | Vvars lv ->
-          (if not (List.mem name !GWPARAM.set_vars) then
-             let name =
-               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-               else name
-             in
-             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          track_set_var name;
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
@@ -454,12 +447,7 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
       | Vvars lv ->
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
-          (if not (List.mem name !GWPARAM.set_vars) then
-             let name =
-               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-               else name
-             in
-             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          track_set_var name;
           VVstring ""
       | _ -> raise Not_found)
   | _ -> raise Not_found
