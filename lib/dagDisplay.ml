@@ -162,7 +162,26 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                 | Right _ -> list)
               [] n.chil
           else if n.chil = [] then
-            try [ List.assq ip spl ] with Not_found -> []
+            (* Childless leaf: spl (relation-path terminal spouses, e.g. m=RL
+             endpoints i3/i4) has priority to keep m=RL output unchanged. When
+             spl is empty (m=RLM, m=DAG) and spouse display is on, fall back to
+             the database families so childless leaves still expose their
+             spouses inline; spouses already in [set] are dropped downstream. *)
+            (* TODO inline spouses are stacked in DB family order and each
+               carries its portrait; review ordering and image coherence
+               for the multi-spouse case. *)
+            let from_spl = try [ List.assq ip spl ] with Not_found -> [] in
+            if from_spl <> [] then from_spl
+            else if spouse_on then
+              let p = pget conf base ip in
+              Array.fold_left
+                (fun list ifam ->
+                  let cpl = Driver.foi base ifam in
+                  let sp_ip = Geneweb_db.Gutil.spouse ip cpl in
+                  if List.mem_assoc sp_ip list then list
+                  else (sp_ip, Some ifam) :: list)
+                [] (Driver.get_family p)
+            else []
           else []
         in
         List.fold_left
