@@ -916,15 +916,15 @@ let tablify ids phony no_optim no_group d =
       let t = { table = Array.append t.table [| Array.of_list new_row |] } in
       let t =
         if no_group && not (has_phony_children phony d t) then t
-        else
-          let _ = if no_optim then () else equilibrate ids t in
-          let _ = group_elem t in
-          let _ = group_ghost t in
-          let _ = group_children t in
-          let _ = group_span_by_common_children d t in
+        else (
+          if not no_optim then equilibrate ids t;
+          group_elem t;
+          group_ghost t;
+          group_children t;
+          group_span_by_common_children d t;
           let t = if no_optim then t else treat_gaps t in
-          let _ = group_span_last_row t in
-          t
+          group_span_last_row t;
+          t)
       in
       loop t
   in
@@ -1355,6 +1355,6 @@ let table_of_dag phony no_optim invert no_group d =
   let d = if invert then invert_dag d else d in
   let t = tablify ids phony no_optim no_group d in
   let t = if invert then invert_table t else t in
-  let _ = fall ids t in
+  fall ids t;
   fall2_right ids t |> fall2_left ids |> shorten_too_long ids |> top_adjust
   |> bottom_adjust
