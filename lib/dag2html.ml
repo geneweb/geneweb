@@ -1279,50 +1279,34 @@ let try_shorten_too_long ids t i j =
       else Some (do_shorten_too_long ids t i j j2)
   | _ -> None
 
-let fall2_right ids t =
+type scan_dir = Forward | Backward
+
+let iterate_to_fixpoint dir try_fn t =
   let rec loop_i i t =
     if i <= 0 then t
     else
-      let rec loop_j j t =
-        if j < 0 then loop_i (i - 1) t
-        else
-          match try_fall2_right ids t i j with
-          | Some t -> loop_i (Array.length t.table - 1) t
-          | None -> loop_j (j - 1) t
+      let len = Array.length t.table.(i) in
+      let start, in_bounds, next =
+        match dir with
+        | Forward -> (1, (fun j -> j < len), fun j -> j + 1)
+        | Backward -> (len - 2, (fun j -> j >= 0), fun j -> j - 1)
       in
-      loop_j (Array.length t.table.(i) - 2) t
+      let rec loop_j j t =
+        if not (in_bounds j) then loop_i (i - 1) t
+        else
+          match try_fn t i j with
+          | Some t -> loop_i (Array.length t.table - 1) t
+          | None -> loop_j (next j) t
+      in
+      loop_j start t
   in
   loop_i (Array.length t.table - 1) t
 
-let fall2_left ids t =
-  let rec loop_i i t =
-    if i <= 0 then t
-    else
-      let rec loop_j j t =
-        if j >= Array.length t.table.(i) then loop_i (i - 1) t
-        else
-          match try_fall2_left ids t i j with
-          | Some t -> loop_i (Array.length t.table - 1) t
-          | None -> loop_j (j + 1) t
-      in
-      loop_j 1 t
-  in
-  loop_i (Array.length t.table - 1) t
+let fall2_right ids t = iterate_to_fixpoint Backward (try_fall2_right ids) t
+let fall2_left ids t = iterate_to_fixpoint Forward (try_fall2_left ids) t
 
 let shorten_too_long ids t =
-  let rec loop_i i t =
-    if i <= 0 then t
-    else
-      let rec loop_j j t =
-        if j >= Array.length t.table.(i) then loop_i (i - 1) t
-        else
-          match try_shorten_too_long ids t i j with
-          | Some t -> loop_i (Array.length t.table - 1) t
-          | None -> loop_j (j + 1) t
-      in
-      loop_j 1 t
-  in
-  loop_i (Array.length t.table - 1) t
+  iterate_to_fixpoint Forward (try_shorten_too_long ids) t
 
 (* top_adjust:
    deletes all empty rows that might have appeared on top of the table
