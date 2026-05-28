@@ -1,4 +1,6 @@
-(* $Id: dag2html.ml v7.1 25/05/2026 15:28:06 ddr Exp $ *)
+(* $Id: dag2html.ml v7.1 28/05/2026 15:29:17 ddr Exp $ *)
+
+(* === Types and identifier generation === *)
 
 type 'a dag = { mutable dag : 'a node array }
 and 'a node = { mutable pare : idag list; valu : 'a; mutable chil : idag list }
@@ -28,7 +30,7 @@ let new_ghost_id ids =
   ids.next_ghost <- ids.next_ghost + 1;
   ghost_id_of_int ids.next_ghost
 
-(* creating the html table structure *)
+(* === HTML table rendering === *)
 
 type align = LeftA | CenterA | RightA
 
@@ -300,7 +302,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
   in
   Array.of_list (List.rev hts)
 
-(* transforming dag into table *)
+(* === DAG to table: building blocks === *)
 
 let ancestors d =
   let rec loop i =
@@ -403,6 +405,8 @@ let insert_columns t nb j =
   { table = t1 }
 
 let rec gcd a b = if a < b then gcd b a else if b = 0 then a else gcd b (a mod b)
+
+(* === DAG to table: row generation and grouping === *)
 
 let treat_new_row ids d t =
   let i = Array.length t.table - 1 in
@@ -930,6 +934,8 @@ let tablify ids phony no_optim no_group d =
   in
   loop t
 
+(* === Ghost-fall compaction heuristics === *)
+
 let fall ids t =
   for i = 1 to Array.length t.table - 1 do
     let line = t.table.(i) in
@@ -1274,10 +1280,10 @@ let fall2_left ids t = iterate_to_fixpoint Forward (try_fall2_left ids) t
 let shorten_too_long ids t =
   iterate_to_fixpoint Forward (try_shorten_too_long ids) t
 
-(* top_adjust:
-   deletes all empty rows that might have appeared on top of the table
-   after the falls *)
+(* === Border trimming and vertical inversion === *)
 
+(* top_adjust deletes all empty rows that might have appeared
+   on top of the table after the falls *)
 let top_adjust t =
   let di =
     let rec loop i =
@@ -1299,10 +1305,8 @@ let top_adjust t =
     { table = Array.sub t.table 0 (Array.length t.table - di) })
   else t
 
-(* bottom_adjust:
-   deletes all empty rows that might have appeared on bottom of the table
-   after the falls *)
-
+(* bottom_adjust deletes all empty rows that might have appeared
+   on bottom of the table after the falls *)
 let bottom_adjust t =
   let last_i =
     let rec loop i =
@@ -1320,8 +1324,6 @@ let bottom_adjust t =
   if last_i < Array.length t.table - 1 then
     { table = Array.sub t.table 0 (last_i + 1) }
   else t
-
-(* invert *)
 
 let invert_dag d =
   let d = { dag = Array.copy d.dag } in
@@ -1348,7 +1350,7 @@ let invert_table t =
   done;
   t'
 
-(* main *)
+(* === Entry point === *)
 
 let table_of_dag phony no_optim invert no_group d =
   let ids = make_id_gen () in
