@@ -1,5 +1,35 @@
 (* $Id: dag2html.ml v7.1 28/05/2026 15:29:17 ddr Exp $ *)
 
+(* DAG to HTML table layout engine.
+
+   Two stages, both driven from [table_of_dag]:
+   1. [table_of_dag] lays the DAG on a 2D grid of cells;
+   2. [html_table_struct] turns that grid into the matrix of logical HTML
+      cells consumed by DagDisplay.
+   The public contract of both is documented in dag2html.mli; this header
+   records only the internal vocabulary used throughout the file.
+
+   Grid cell ([elem]):
+   - [Elem id]   a real DAG node;
+   - [Ghost gid] a vertical continuation of a node across rows; all the
+                 cells of one continuation share the same [ghost_id];
+   - [Nothing]   padding or trimmed area.
+   [span_id] groups horizontally adjacent cells of a row into one logical
+   span; the grouping passes proceed by making neighbours share a
+   [span_id].
+
+   Identifier allocation is threaded through an [id_gen] created once per
+   [table_of_dag] call, not a module-global counter.
+
+   Index conventions in the layout passes:
+   - [i] / [j]        current row / column;
+   - [i1] [i2] [i3]   vertical bounds of a block being moved;
+   - [j1] [j2]        horizontal bounds of a block;
+   - a "ghost run" is a vertical sequence of [Ghost] cells sharing a span.
+
+   [phony] marks a synthetic node (e.g. a spouse-pair connector): it is
+   positioned like a real node but rendered as a plain bar. *)
+
 (* === Types and identifier generation === *)
 
 type 'a dag = { mutable dag : 'a node array }
