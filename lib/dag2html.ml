@@ -997,20 +997,20 @@ let fall ids t =
     loop 0
   done
 
+let shifted_cell ids t i1 i2 i j =
+  if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+  else { elem = Nothing; span = new_span_id ids }
+
 let fall2_cool_right ids t i1 i2 j1 j2 =
   let span = t.table.(i2 - 1).(j1).span in
   for i = i2 - 1 downto 0 do
     for j = j1 to j2 - 1 do
-      t.table.(i).(j) <-
-        (if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-         else { elem = Nothing; span = new_span_id ids })
+      t.table.(i).(j) <- shifted_cell ids t i1 i2 i j
     done
   done;
   for i = Array.length t.table - 1 downto 0 do
     for j = j2 to Array.length t.table.(i) - 1 do
-      t.table.(i).(j) <-
-        (if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-         else { elem = Nothing; span = new_span_id ids })
+      t.table.(i).(j) <- shifted_cell ids t i1 i2 i j
     done
   done;
   let old_span = t.table.(i2 - 1).(j1).span in
@@ -1026,16 +1026,12 @@ let fall2_cool_left ids t i1 i2 j1 j2 =
   let span = t.table.(i2 - 1).(j2).span in
   for i = i2 - 1 downto 0 do
     for j = j1 + 1 to j2 do
-      t.table.(i).(j) <-
-        (if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-         else { elem = Nothing; span = new_span_id ids })
+      t.table.(i).(j) <- shifted_cell ids t i1 i2 i j
     done
   done;
   for i = Array.length t.table - 1 downto 0 do
     for j = j1 downto 0 do
-      t.table.(i).(j) <-
-        (if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-         else { elem = Nothing; span = new_span_id ids })
+      t.table.(i).(j) <- shifted_cell ids t i1 i2 i j
     done
   done;
   let old_span = t.table.(i2 - 1).(j2).span in
@@ -1046,6 +1042,21 @@ let fall2_cool_left ids t i1 i2 j1 j2 =
       loop (j - 1))
   in
   loop j2
+
+let grow_table_rows ids t target_height =
+  if target_height <= Array.length t.table then t
+  else
+    let rec loop cnt t =
+      if cnt = 0 then t
+      else
+        let new_line =
+          Array.init
+            (Array.length t.table.(0))
+            (fun _ -> { elem = Nothing; span = new_span_id ids })
+        in
+        loop (cnt - 1) { table = Array.append t.table [| new_line |] }
+    in
+    loop (target_height - Array.length t.table) t
 
 let do_fall2_right ids t i1 i2 j1 j2 =
   let i3 =
@@ -1063,23 +1074,7 @@ let do_fall2_right ids t i1 i2 j1 j2 =
     in
     loop_i (Array.length t.table - 1)
   in
-  let new_height = i3 + i2 - i1 in
-  let t =
-    if new_height > Array.length t.table then
-      let rec loop cnt t =
-        if cnt = 0 then t
-        else
-          let new_line =
-            Array.init
-              (Array.length t.table.(0))
-              (fun _ -> { elem = Nothing; span = new_span_id ids })
-          in
-          let t = { table = Array.append t.table [| new_line |] } in
-          loop (cnt - 1) t
-      in
-      loop (new_height - Array.length t.table) t
-    else t
-  in
+  let t = grow_table_rows ids t (i3 + i2 - i1) in
   fall2_cool_right ids t i1 i2 j1 j2;
   t
 
@@ -1099,23 +1094,7 @@ let do_fall2_left ids t i1 i2 j1 j2 =
     in
     loop_i (Array.length t.table - 1)
   in
-  let new_height = i3 + i2 - i1 in
-  let t =
-    if new_height > Array.length t.table then
-      let rec loop cnt t =
-        if cnt = 0 then t
-        else
-          let new_line =
-            Array.init
-              (Array.length t.table.(0))
-              (fun _ -> { elem = Nothing; span = new_span_id ids })
-          in
-          let t = { table = Array.append t.table [| new_line |] } in
-          loop (cnt - 1) t
-      in
-      loop (new_height - Array.length t.table) t
-    else t
-  in
+  let t = grow_table_rows ids t (i3 + i2 - i1) in
   fall2_cool_left ids t i1 i2 j1 j2;
   t
 
@@ -1131,19 +1110,17 @@ let do_shorten_too_long ids t i1 j1 j2 =
   done;
   t
 
+let ghost_run_top t i j =
+  let rec loop i =
+    if i < 0 then 0
+    else match t.table.(i).(j).elem with Ghost _ -> loop (i - 1) | _ -> i + 1
+  in
+  loop (i - 1)
+
 let try_fall2_right ids t i j =
   match t.table.(i).(j).elem with
   | Ghost _ ->
-      let i1 =
-        let rec loop i =
-          if i < 0 then 0
-          else
-            match t.table.(i).(j).elem with
-            | Ghost _ -> loop (i - 1)
-            | _ -> i + 1
-        in
-        loop (i - 1)
-      in
+      let i1 = ghost_run_top t i j in
       let separated1 =
         let rec loop i =
           if i < 0 then true
@@ -1180,16 +1157,7 @@ let try_fall2_right ids t i j =
 let try_fall2_left ids t i j =
   match t.table.(i).(j).elem with
   | Ghost _ ->
-      let i1 =
-        let rec loop i =
-          if i < 0 then 0
-          else
-            match t.table.(i).(j).elem with
-            | Ghost _ -> loop (i - 1)
-            | _ -> i + 1
-        in
-        loop (i - 1)
-      in
+      let i1 = ghost_run_top t i j in
       let separated1 =
         let rec loop i =
           if i < 0 then true
