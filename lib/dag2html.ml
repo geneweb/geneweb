@@ -1044,19 +1044,17 @@ let fall2_cool_left ids t i1 i2 j1 j2 =
   loop j2
 
 let grow_table_rows ids t target_height =
-  if target_height <= Array.length t.table then t
+  let len = Array.length t.table in
+  if target_height <= len then t
   else
-    let rec loop cnt t =
-      if cnt = 0 then t
-      else
-        let new_line =
-          Array.init
-            (Array.length t.table.(0))
-            (fun _ -> { elem = Nothing; span = new_span_id ids })
-        in
-        loop (cnt - 1) { table = Array.append t.table [| new_line |] }
-    in
-    loop (target_height - Array.length t.table) t
+    let width = Array.length t.table.(0) in
+    let table = Array.make target_height [||] in
+    Array.blit t.table 0 table 0 len;
+    for i = len to target_height - 1 do
+      table.(i) <-
+        Array.init width (fun _ -> { elem = Nothing; span = new_span_id ids })
+    done;
+    { table }
 
 let do_fall2_right ids t i1 i2 j1 j2 =
   let i3 =
