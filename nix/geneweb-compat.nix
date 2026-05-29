@@ -1,9 +1,10 @@
 {
+  lib,
   buildDunePackage,
 }:
 
 buildDunePackage {
   pname = "geneweb-compat";
-  src = ../.;
+  src = lib.cleanSource ../.;
   version = "dev";
 }

@@ -1,4 +1,5 @@
 {
+  lib,
   buildDunePackage,
   ancient,
   brotli,
@@ -8,6 +9,7 @@
   dune-site,
   camlp5,
   camlp-streams,
+  cmdliner,
   decompress,
   fmt,
   logs,
@@ -38,7 +40,7 @@
 buildDunePackage {
   pname = "geneweb";
   version = "dev";
-  src = ../.;
+  src = lib.cleanSource ../.;
 
   nativeBuildInputs = [
     brotli
@@ -51,6 +53,7 @@ buildDunePackage {
     geneweb-compat
     geneweb-http
     ancient
+    cmdliner
     pcre2
     benchmark
     calendars

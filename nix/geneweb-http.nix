@@ -1,4 +1,5 @@
 {
+  lib,
   buildDunePackage,
   geneweb-compat,
   camlp-streams,
@@ -8,7 +9,7 @@
 
 buildDunePackage {
   pname = "geneweb-http";
-  src = ../.;
+  src = lib.cleanSource ../.;
   version = "dev";
 
   buildInputs = [
