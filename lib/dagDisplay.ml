@@ -110,94 +110,283 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | _, _ -> true
   in
   let nowrap inner = {|<span class="text-nowrap">|} ^<^ inner ^>^ "</span>" in
-  let indi_ip n =
-    match n.Dag2html.valu with Left ip -> ip | Right _ -> Driver.Iper.dummy
+  (* A spouse hook is a Left node with no parents whose children are
+     exclusively Right connectors to another Left parent: a spouse the
+     DAG builder anchored with no further path in the set. The depth
+     layout cannot co-position it with its partner, so it would render as
+     an isolated cell. Surface hooks inline and suppress their cell; when
+     both sides are hooks the lower idag stays primary. *)
+  let other_left_parent cn ip =
+    List.find_map
+      (fun pid ->
+        match d.Dag2html.dag.(Dag2html.int_of_idag pid).Dag2html.valu with
+        | Left pip when pip <> ip -> Some pip
+        | _ -> None)
+      cn.Dag2html.pare
   in
-  let indi_txt n =
+  let is_hook_node n =
     match n.Dag2html.valu with
     | Left ip ->
-        let p = Util.pget conf base ip in
-        let txt =
-          image_txt conf base p
-          ^^^ nowrap (string_of_item conf base (elem_txt p))
-        in
-        let spouses =
-          if ((spouse_on && n.chil <> []) || n.pare = []) && not invert then
-            List.fold_left
-              (fun list id ->
-                match d.Dag2html.dag.(Dag2html.int_of_idag id).valu with
-                | Left cip -> (
-                    match Driver.get_parents (Util.pget conf base cip) with
-                    | Some ifam ->
-                        let cpl = Driver.foi base ifam in
-                        if ip = Driver.get_father cpl then
-                          if List.mem_assoc (Driver.get_mother cpl) list then
-                            list
-                          else (Driver.get_mother cpl, Some ifam) :: list
-                        else if ip = Driver.get_mother cpl then
-                          if List.mem_assoc (Driver.get_father cpl) list then
-                            list
-                          else (Driver.get_father cpl, Some ifam) :: list
-                        else list
-                    | None -> list)
-                | Right _ -> list)
-              [] n.chil
-          else if n.chil = [] then
-            (* Childless leaf: spl (relation-path terminal spouses, e.g. m=RL
-             endpoints i3/i4) has priority to keep m=RL output unchanged. When
-             spl is empty (m=RLM, m=DAG) and spouse display is on, fall back to
-             the database families so childless leaves still expose their
-             spouses inline; spouses already in [set] are dropped downstream. *)
-            (* TODO inline spouses are stacked in DB family order and each
-               carries its portrait; review ordering and image coherence
-               for the multi-spouse case. *)
-            let from_spl = try [ List.assq ip spl ] with Not_found -> [] in
-            if from_spl <> [] then from_spl
-            else if spouse_on then
-              let p = Util.pget conf base ip in
-              Array.fold_left
-                (fun list ifam ->
-                  let cpl = Driver.foi base ifam in
-                  let sp_ip = Geneweb_db.Gutil.spouse ip cpl in
-                  if List.mem_assoc sp_ip list then list
-                  else (sp_ip, Some ifam) :: list)
-                [] (Driver.get_family p)
-            else []
-          else []
-        in
-        List.fold_left
-          (fun txt (ips, ifamo) ->
-            if Iper.Set.mem ips set_lookup then txt
-            else
-              let ps = Util.pget conf base ips in
-              let auth =
-                Util.authorized_age conf base p
-                && Util.authorized_age conf base ps
+        n.Dag2html.pare = [] && n.Dag2html.chil <> []
+        && List.for_all
+             (fun cid ->
+               let cn = d.Dag2html.dag.(Dag2html.int_of_idag cid) in
+               match cn.Dag2html.valu with
+               | Right _ -> other_left_parent cn ip <> None
+               | _ -> false)
+             n.Dag2html.chil
+    | _ -> false
+  in
+  let suppressed_hooks =
+    let n_arr = d.Dag2html.dag in
+    let len = Array.length n_arr in
+    let rec loop i acc =
+      if i = len then acc
+      else
+        let n = n_arr.(i) in
+        let acc =
+          match n.Dag2html.valu with
+          | Left ip when is_hook_node n ->
+              let dominated =
+                List.exists
+                  (fun cid ->
+                    let cn = n_arr.(Dag2html.int_of_idag cid) in
+                    List.exists
+                      (fun pid ->
+                        let pi = Dag2html.int_of_idag pid in
+                        pi <> i
+                        &&
+                        match n_arr.(pi).Dag2html.valu with
+                        | Left _ -> (not (is_hook_node n_arr.(pi))) || pi < i
+                        | _ -> false)
+                      cn.Dag2html.pare)
+                  n.Dag2html.chil
               in
-              let d =
-                match ifamo with
-                | Some ifam when auth ->
-                    DateDisplay.short_marriage_date_text conf base
-                      (Driver.foi base ifam) p ps
-                | _ -> Adef.safe ""
-              in
-              txt ^^^ "<br>"
-              ^<^ nowrap
-                    ("&amp;" ^<^ d ^^^ " "
-                    ^<^ string_of_item conf base (elem_txt ps))
-              ^^^ image_txt conf base ps)
-          txt spouses
-    | Right _ -> Adef.safe "&nbsp;"
+              if dominated then Iper.Set.add ip acc else acc
+          | _ -> acc
+        in
+        loop (i + 1) acc
+    in
+    loop 0 Iper.Set.empty
+  in
+  let is_suppressed ip = Iper.Set.mem ip suppressed_hooks in
+  let indi_ip n =
+    match n.Dag2html.valu with Left ip -> ip | Right _ -> Driver.Iper.dummy
   in
   let vbar_txt n =
     match n.Dag2html.valu with Left ip -> vbar_txt ip | _ -> Adef.escaped ""
   in
   let phony n =
-    match n.Dag2html.valu with Left _ -> false | Right _ -> true
+    match n.Dag2html.valu with Left ip -> is_suppressed ip | Right _ -> true
   in
   let t = Dag2html.table_of_dag phony false invert no_group d in
   if Array.length t.table = 0 then [||]
-  else Dag2html.html_table_struct indi_ip indi_txt vbar_txt phony d t
+  else
+    let pos = Array.make (Array.length d.Dag2html.dag) None in
+    Array.iteri
+      (fun i row ->
+        Array.iteri
+          (fun j cell ->
+            match cell.Dag2html.elem with
+            | Dag2html.Elem e -> pos.(Dag2html.int_of_idag e) <- Some (i, j)
+            | _ -> ())
+          row)
+      t.Dag2html.table;
+    (* A connector is local when its two Left parents share a grid row
+       with no person cell between them: the layout co-positioned the
+       couple and drew the bracket. Otherwise the spouse is displaced. *)
+    let connector_is_local i =
+      match
+        List.filter
+          (fun pid ->
+            match d.Dag2html.dag.(Dag2html.int_of_idag pid).Dag2html.valu with
+            | Left _ -> true
+            | _ -> false)
+          d.Dag2html.dag.(i).Dag2html.pare
+      with
+      | [ pa; pb ] -> (
+          match
+            (pos.(Dag2html.int_of_idag pa), pos.(Dag2html.int_of_idag pb))
+          with
+          | Some (ra, ca), Some (rb, cb) when ra = rb ->
+              let lo = min ca cb and hi = max ca cb in
+              let rec scan j =
+                if j >= hi then true
+                else
+                  match t.Dag2html.table.(ra).(j).Dag2html.elem with
+                  | Dag2html.Elem e -> (
+                      match
+                        d.Dag2html.dag.(Dag2html.int_of_idag e).Dag2html.valu
+                      with
+                      | Left _ -> false
+                      | Right _ -> scan (j + 1))
+                  | _ -> scan (j + 1)
+              in
+              scan (lo + 1)
+          | _ -> false)
+      | _ -> false
+    in
+    let local =
+      Array.mapi
+        (fun i n ->
+          match n.Dag2html.valu with
+          | Right _ ->
+              connector_is_local i
+              && not
+                   (List.exists
+                      (fun p ->
+                        match
+                          d.Dag2html.dag.(Dag2html.int_of_idag p).Dag2html.valu
+                        with
+                        | Left ip -> is_suppressed ip
+                        | _ -> false)
+                      n.Dag2html.pare)
+          | _ -> false)
+        d.Dag2html.dag
+    in
+    let local_spouse_iperse =
+      let acc = ref Iper.Set.empty in
+      Array.iteri
+        (fun i n ->
+          if local.(i) then
+            List.iter
+              (fun pid ->
+                match
+                  d.Dag2html.dag.(Dag2html.int_of_idag pid).Dag2html.valu
+                with
+                | Left ip -> acc := Iper.Set.add ip !acc
+                | _ -> ())
+              n.Dag2html.pare)
+        d.Dag2html.dag;
+      !acc
+    in
+    (* Blank every cell of every displaced connector and every suppressed
+       hook: both are surfaced inline beside their partner. Connectors
+       span several columns, so all their cells must be nulled. Local
+       connectors are kept to preserve the bracket. *)
+    Array.iter
+      (fun row ->
+        Array.iter
+          (fun cell ->
+            match cell.Dag2html.elem with
+            | Dag2html.Elem e -> (
+                let k = Dag2html.int_of_idag e in
+                match d.Dag2html.dag.(k).Dag2html.valu with
+                | Right _ when not local.(k) ->
+                    cell.Dag2html.elem <- Dag2html.Nothing
+                | Left ip when is_suppressed ip ->
+                    cell.Dag2html.elem <- Dag2html.Nothing
+                | _ -> ())
+            | _ -> ())
+          row)
+      t.Dag2html.table;
+    let indi_txt n =
+      match n.Dag2html.valu with
+      | Left ip when is_suppressed ip -> Adef.safe ""
+      | Left ip ->
+          let p = Util.pget conf base ip in
+          let txt =
+            image_txt conf base p
+            ^^^ nowrap (string_of_item conf base (elem_txt p))
+          in
+          let spouses, via_connector_iperse =
+            if n.chil <> [] && (spouse_on || n.pare = []) && not invert then
+              List.fold_left
+                (fun (list, vcs) id ->
+                  let cn = d.Dag2html.dag.(Dag2html.int_of_idag id) in
+                  match cn.Dag2html.valu with
+                  | Left cip -> (
+                      match Driver.get_parents (Util.pget conf base cip) with
+                      | Some ifam ->
+                          let cpl = Driver.foi base ifam in
+                          if ip = Driver.get_father cpl then
+                            if List.mem_assoc (Driver.get_mother cpl) list then
+                              (list, vcs)
+                            else
+                              ((Driver.get_mother cpl, Some ifam) :: list, vcs)
+                          else if ip = Driver.get_mother cpl then
+                            if List.mem_assoc (Driver.get_father cpl) list then
+                              (list, vcs)
+                            else
+                              ((Driver.get_father cpl, Some ifam) :: list, vcs)
+                          else (list, vcs)
+                      | None -> (list, vcs))
+                  | Right _ -> (
+                      match other_left_parent cn ip with
+                      | Some sp_ip
+                        when (not (Iper.Set.mem sp_ip local_spouse_iperse))
+                             && not (List.mem_assoc sp_ip list) ->
+                          let p = Util.pget conf base ip in
+                          let ifam_opt =
+                            Array.fold_left
+                              (fun acc ifam ->
+                                if acc <> None then acc
+                                else
+                                  let cpl = Driver.foi base ifam in
+                                  if Geneweb_db.Gutil.spouse ip cpl = sp_ip then
+                                    Some ifam
+                                  else None)
+                              None (Driver.get_family p)
+                          in
+                          ((sp_ip, ifam_opt) :: list, Iper.Set.add sp_ip vcs)
+                      | _ -> (list, vcs)))
+                ([], Iper.Set.empty) n.chil
+            else if n.chil = [] then
+              (* Childless leaf: spl (relation-path terminal spouses, e.g. m=RL
+             endpoints i3/i4) has priority to keep m=RL output unchanged. When
+             spl is empty (m=RLM, m=DAG) and spouse display is on, fall back to
+             the database families so childless leaves still expose their
+             spouses inline; spouses already in [set] are dropped downstream. *)
+              (* TODO inline spouses are stacked in DB family order and each
+               carries its portrait; review ordering and spouse positionning
+               coherence for the multi-spouse case. *)
+              let from_spl = try [ List.assq ip spl ] with Not_found -> [] in
+              if from_spl <> [] then (from_spl, Iper.Set.empty)
+              else if spouse_on then
+                let p = Util.pget conf base ip in
+                let l =
+                  Array.fold_left
+                    (fun list ifam ->
+                      let cpl = Driver.foi base ifam in
+                      let sp_ip = Geneweb_db.Gutil.spouse ip cpl in
+                      if List.mem_assoc sp_ip list then list
+                      else (sp_ip, Some ifam) :: list)
+                    [] (Driver.get_family p)
+                in
+                (l, Iper.Set.empty)
+              else ([], Iper.Set.empty)
+            else ([], Iper.Set.empty)
+          in
+          List.fold_left
+            (fun txt (ips, ifamo) ->
+              let skip =
+                Iper.Set.mem ips set_lookup
+                && (not (is_suppressed ips))
+                && not (Iper.Set.mem ips via_connector_iperse)
+              in
+              if skip then txt
+              else
+                let ps = Util.pget conf base ips in
+                let auth =
+                  Util.authorized_age conf base p
+                  && Util.authorized_age conf base ps
+                in
+                let d =
+                  match ifamo with
+                  | Some ifam when auth ->
+                      DateDisplay.short_marriage_date_text conf base
+                        (Driver.foi base ifam) p ps
+                  | _ -> Adef.safe ""
+                in
+                txt ^^^ "<br>"
+                ^<^ nowrap
+                      ("&amp;" ^<^ d ^^^ " "
+                      ^<^ string_of_item conf base (elem_txt ps))
+                ^^^ image_txt conf base ps)
+            txt spouses
+      | Right _ -> Adef.safe "&nbsp;"
+    in
+    Dag2html.html_table_struct indi_ip indi_txt vbar_txt phony d t
 
 type 'a env =
   | Vbool of bool
