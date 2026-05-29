@@ -173,6 +173,7 @@
 %include;trl
 </div>
 %include;js
+<script defer src="js/dagSvg.js"></script>
 %query_time;
 </body>
 </html>
