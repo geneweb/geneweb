@@ -48,8 +48,8 @@ val make_tree_hts :
       childless leaves (relation paths with terminal spouses).
 
     Also reads the URL parameters [nogroup] (disable sibling grouping),
-    [sp]/[spouse] (toggle spouse display) and [bd] (border width around cells).
-    Returns [[||]] when the layout is empty. *)
+    [sp]/[spouse] (toggle spouse display). Returns [[||]] when the layout is
+    empty. *)
 
 val print_dag_page :
   Config.config ->
@@ -90,12 +90,8 @@ val make_and_print_dag :
 val print : Config.config -> Geneweb_db.Driver.base -> unit
 (** [print conf base] is the entry point for the [m=DAG] request.
 
-    When the URL carries person keys ([pN]/[nN]/[ocN]) but no Sosa branch ([sN]
-    absent for every [N]), the keys are resolved against [base] and the request
-    is rewritten with [iN=] identifiers, then served as an HTTP 302 redirect.
-    This canonicalises bookmarks and shared links to the stable iper form.
-
-    Otherwise the DAG is built from {!Dag.get_dag_elems} (which honours both
-    [iN] and [pN]/[nN]/[ocN]+[sN] combinations) and rendered via
-    {!make_and_print_dag}. The [invert=on] URL parameter flips the tree
-    orientation; the page title is the localised ["tree"] translation. *)
+    The person set is collected by {!Dag.get_dag_elems} from the indexed URL
+    parameters ([iN] or [pN]/[nN]/[ocN]) and their Sosa branches ([sN]), then
+    laid out and rendered by {!make_and_print_dag}. The [invert=on] parameter
+    flips the tree orientation; the page title is the localised ["tree"]
+    translation. *)

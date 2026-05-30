@@ -14,8 +14,7 @@ let image_normal_txt conf base p fname width height =
   let k = Image.default_image_filename "portraits" base p in
   let r =
     Format.sprintf
-      {|<img src="%sm=IM&d=%s&%s&k=%s"%s%s alt="%s" title="%s"
-        style="%s %s">|}
+      {|<img src="%sm=IM&d=%s&%s&k=%s"%s%s alt="%s" title="%s" style="%s %s">|}
       (Util.commd conf : Adef.escaped_string :> string)
       (string_of_int
       @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
@@ -44,9 +43,9 @@ let image_url_txt conf url_p url ~width ~height =
       (if height = 0 then "" else Format.sprintf {|height="%d"|} height)
   in
   let style =
-    Format.sprintf "%spx;%spx;"
-      (if width = 0 then "" else "max-width:" ^ string_of_int width)
-      (if height = 0 then "" else "max-height:" ^ string_of_int height)
+    Format.sprintf "%s%s"
+      (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
+      (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
   in
   let s =
     Format.sprintf {|<img src="%s" alt="%s" title="%s" %s style="%s">|}
@@ -371,7 +370,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                   Util.authorized_age conf base p
                   && Util.authorized_age conf base ps
                 in
-                let d =
+                let md =
                   match ifamo with
                   | Some ifam when auth ->
                       DateDisplay.short_marriage_date_text conf base
@@ -380,7 +379,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                 in
                 txt ^^^ "<br>"
                 ^<^ nowrap
-                      ("&amp;" ^<^ d ^^^ " "
+                      ("&amp;" ^<^ md ^^^ " "
                       ^<^ string_of_item conf base (elem_txt ps))
                 ^^^ image_txt conf base ps)
             txt spouses
@@ -405,7 +404,6 @@ let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
-(* TODO should vl be Vint list and f = max|min, not a string?*)
 let eval_predefined_apply f vl =
   let vl =
     List.map
@@ -469,11 +467,12 @@ let sibling_access_aux conf base td next_or_prev =
   | None -> raise Not_found
 
 let track_set_var name =
+  let name =
+    if name <> "" && name.[0] = ' ' then
+      String.sub name 1 (String.length name - 1)
+    else name
+  in
   if not (List.mem name !GWPARAM.set_vars) then
-    let name =
-      if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-      else name
-    in
     GWPARAM.set_vars := name :: !GWPARAM.set_vars
 
 let eval_vars_var lv name = function
