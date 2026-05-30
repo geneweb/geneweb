@@ -86,7 +86,6 @@ val get_piece_of_branch :
 (** {1 Relationship computation} *)
 
 val compute_simple_relationship :
-  config ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, int) Geneweb_db.Collection.Marker.t ->
   Geneweb_db.Driver.iper ->
@@ -99,9 +98,9 @@ val compute_simple_relationship :
       Consang.relationship )
     Geneweb_db.Collection.Marker.t)
   option
-(** [compute_simple_relationship conf base tstab ip1 ip2] computes the
-    relationship between [ip1] and [ip2] using the topological sort [tstab]
-    (typically built via {!Util.create_topological_sort}). Returns:
+(** [compute_simple_relationship base tstab ip1 ip2] computes the relationship
+    between [ip1] and [ip2] using the topological sort [tstab] (typically built
+    via {!Util.create_topological_sort}). Returns:
     - [None] when no relationship exists;
     - [Some (paths, total, coefficient, anc_ifams, reltab)] otherwise, where
       [paths] groups {!path_f} by [(l1, l2)] cell, [total] is the cumulated path

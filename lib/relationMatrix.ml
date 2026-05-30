@@ -56,10 +56,10 @@ let find_best_inverted_path paths =
   find_shortest_path inverted_paths
 
 (* Calculer les données d'une cellule *)
-let compute_cell_data conf base tstab p1 p2 =
+let compute_cell_data base tstab p1 p2 =
   let ip1 = Driver.get_iper p1 in
   let ip2 = Driver.get_iper p2 in
-  match Relation.compute_simple_relationship conf base tstab ip1 ip2 with
+  match Relation.compute_simple_relationship base tstab ip1 ip2 with
   | None -> None
   | Some (paths, total, coeff, _, _) -> Some { paths; total; coeff }
 

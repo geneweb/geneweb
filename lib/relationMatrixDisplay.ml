@@ -20,7 +20,7 @@ let print_matrix_cell conf base tstab persons i j cell_storage n =
         match triangular_get cell_storage i j n with
         | Some cached -> Some cached
         | None ->
-            let data = compute_cell_data conf base tstab person_i person_j in
+            let data = compute_cell_data base tstab person_i person_j in
             triangular_set cell_storage i j n data;
             data)
       else

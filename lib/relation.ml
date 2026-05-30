@@ -194,7 +194,7 @@ let get_piece_of_branch conf base ctx (len1, len2) =
   in
   loop (Driver.get_iper anc) ctx.pos.degree
 
-let compute_simple_relationship conf base tstab ip1 ip2 =
+let compute_simple_relationship base tstab ip1 ip2 =
   let tab = Consang.make_relationship_info base tstab in
   let relationship, ancestors_with_ifam =
     Consang.relationship_and_links base tab true ip1 ip2
@@ -230,14 +230,13 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
       List.fold_left
         (fun rl i ->
           let u = Collection.Marker.get tab.Consang.reltab i in
-          let p = Util.pget conf base i in
           List.fold_left
             (fun rl (len1, n1, _) ->
               List.fold_left
                 (fun rl (len2, n2, _) ->
                   let n = n1 * n2 in
                   let n = if n1 < 0 || n2 < 0 || n < 0 then -1 else n in
-                  (len1, len2, (p, n)) :: rl)
+                  (len1, len2, (i, n)) :: rl)
                 rl u.Consang.lens2)
             rl u.Consang.lens1)
         [] ancestors
@@ -261,16 +260,15 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
     in
     let paths_with_ifams =
       List.map
-        (fun (l1, l2, person_count_list) ->
+        (fun (l1, l2, iper_count_list) ->
           let count_table = Hashtbl.create 17 in
           List.iter
-            (fun (person, cnt) ->
-              let iper = Driver.get_iper person in
+            (fun (iper, cnt) ->
               let current =
                 try Hashtbl.find count_table iper with Not_found -> 0
               in
               Hashtbl.replace count_table iper (current + cnt))
-            person_count_list;
+            iper_count_list;
           let anc_list =
             Hashtbl.fold
               (fun iper count acc ->
@@ -290,8 +288,8 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
         ancestors_with_ifam,
         tab.Consang.reltab )
 
-let compute_simple_relationship_compat conf base tstab ip1 ip2 =
-  match compute_simple_relationship conf base tstab ip1 ip2 with
+let compute_simple_relationship_compat base tstab ip1 ip2 =
+  match compute_simple_relationship base tstab ip1 ip2 with
   | None -> None
   | Some (paths, total, relationship, _, reltab) ->
       let rl =
@@ -332,14 +330,14 @@ let merge_relations rl1 rl2 =
       else compare (none_rank po21 po22) (none_rank po11 po12))
     rl1 rl2
 
-let combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
+let combine_relationship base tstab pl1 pl2 f_sp1 f_sp2 sl =
   List.fold_right
     (fun p1 sl ->
       List.fold_right
         (fun p2 sl ->
           let sol =
-            compute_simple_relationship_compat conf base tstab
-              (Driver.get_iper p1) (Driver.get_iper p2)
+            compute_simple_relationship_compat base tstab (Driver.get_iper p1)
+              (Driver.get_iper p2)
           in
           match sol with
           | Some (rl, total, _, reltab) ->
@@ -355,7 +353,7 @@ let compute_relationship conf base by_marr p1 p2 =
   if ip1 = ip2 then None
   else
     let tstab = Util.create_topological_sort conf base in
-    let sol = compute_simple_relationship_compat conf base tstab ip1 ip2 in
+    let sol = compute_simple_relationship_compat base tstab ip1 ip2 in
     let sol_by_marr =
       if by_marr then
         let spl1 = known_spouses_list conf base p1 p2 in
@@ -365,7 +363,7 @@ let compute_relationship conf base by_marr p1 p2 =
           match sol with
           | Some ((_, 0, _) :: _, _, _, _) -> sl
           | _ ->
-              combine_relationship conf base tstab [ p1 ] spl2
+              combine_relationship base tstab [ p1 ] spl2
                 (fun _ -> None)
                 (fun p -> Some p)
                 sl
@@ -374,7 +372,7 @@ let compute_relationship conf base by_marr p1 p2 =
           match sol with
           | Some ((0, _, _) :: _, _, _, _) -> sl
           | _ ->
-              combine_relationship conf base tstab spl1 [ p2 ]
+              combine_relationship base tstab spl1 [ p2 ]
                 (fun p -> Some p)
                 (fun _ -> None)
                 sl
@@ -383,7 +381,7 @@ let compute_relationship conf base by_marr p1 p2 =
         | Some ((x1, x2, _) :: _, _, _, _), _ when x1 = 0 || x2 = 0 -> sl
         | _, ((_, _, (x1, x2, _)) :: _, _, _) :: _ when x1 = 0 || x2 = 0 -> sl
         | _ ->
-            combine_relationship conf base tstab spl1 spl2
+            combine_relationship base tstab spl1 spl2
               (fun p -> Some p)
               (fun p -> Some p)
               sl
