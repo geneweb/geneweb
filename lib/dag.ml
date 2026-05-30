@@ -38,8 +38,9 @@ let make_dag conf base ipers =
   let nodes =
     Array.map
       (fun ip ->
+        let person = Util.pget conf base ip in
         let pare =
-          match Driver.get_parents (Util.pget conf base ip) with
+          match Driver.get_parents person with
           | Some ifam ->
               let fam = Driver.foi base ifam in
               List.filter_map find_idag
@@ -47,7 +48,6 @@ let make_dag conf base ipers =
           | None -> []
         in
         let chil =
-          let person = Util.pget conf base ip in
           Driver.get_family person
           |> Array.fold_left
                (fun acc ifam ->
