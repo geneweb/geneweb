@@ -32,37 +32,25 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
     else
       let fam = Driver.foi base ifam in
       Collection.Marker.set mark_fam ifam true;
-      let result =
+      let half_siblings parent acc =
         Array.fold_right
-          (fun fam children ->
-            if ifam = fam then children
-            else if Collection.Marker.get mark_fam fam then children
+          (fun ifam2 children ->
+            if ifam = ifam2 || Collection.Marker.get mark_fam ifam2 then
+              children
             else
               Array.fold_right
-                (fun child children -> (child, HalfSibling, fam) :: children)
-                (Driver.get_children (Driver.foi base fam))
+                (fun child children -> (child, HalfSibling, ifam2) :: children)
+                (Driver.get_children (Driver.foi base ifam2))
                 children)
-          (Driver.get_family (Util.pget conf base (Driver.get_mother fam)))
-          []
+          (Driver.get_family (Util.pget conf base parent))
+          acc
       in
-      let result =
-        Array.fold_right
-          (fun fam children ->
-            if ifam = fam then children
-            else if Collection.Marker.get mark_fam fam then children
-            else
-              Array.fold_right
-                (fun child children -> (child, HalfSibling, fam) :: children)
-                (Driver.get_children (Driver.foi base fam))
-                children)
-          (Driver.get_family (Util.pget conf base (Driver.get_father fam)))
-          result
-      in
+      let result = half_siblings (Driver.get_mother fam) [] in
+      let result = half_siblings (Driver.get_father fam) result in
       let result =
         Array.fold_right
           (fun child children -> (child, Sibling, ifam) :: children)
-          (Driver.get_children (Driver.foi base ifam))
-          result
+          (Driver.get_children fam) result
       in
       (Driver.get_father fam, Parent, ifam)
       :: (Driver.get_mother fam, Parent, ifam)
