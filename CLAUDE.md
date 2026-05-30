@@ -16,7 +16,7 @@ individuals (Roglo.eu: 11M+ records). Version 7.1 (beta2, December
 opam install . --deps-only    # install dependencies
 dune build                    # incremental build
 dune runtest                  # run tests
-dune fmt                      # auto-format (ocamlformat 0.28.1)
+dune fmt                      # auto-format (ocamlformat 0.29)
 make distrib                  # build release distribution
 ```
 
@@ -101,7 +101,7 @@ For template `templx` on base `mybase`:
 
 ### Frontend Stack
 
-Bootstrap 4.6, jQuery, Chart.js 4.5.1 (UMD, not ESM), Font Awesome,
+Bootstrap 5.3.8, jQuery, Chart.js 4.5.1 (UMD, not ESM), Font Awesome,
 Leaflet 2.0 alpha. CSS/JS assets in `hd/etc/css/` and `hd/etc/js/`
 use template wrappers (`css.txt`, `js.txt`) for conditional includes.
 Regenerate `.min.js` (Terser) after editing any `.js` file.
