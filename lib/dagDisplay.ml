@@ -628,20 +628,11 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
       | _ -> VVstring "")
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
-      | Vvars lv ->
-          track_set_var name;
-          let vv =
-            try List.assoc name !lv with Not_found -> raise Not_found
-          in
-          VVstring vv
+      | Vvars lv -> eval_vars_var lv name None
       | _ -> VVstring "")
   | [ "set_var"; name; value ] -> (
       match get_env "vars" env with
-      | Vvars lv ->
-          if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
-          lv := (name, value) :: !lv;
-          track_set_var name;
-          VVstring ""
+      | Vvars lv -> eval_vars_var lv name (Some value)
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
