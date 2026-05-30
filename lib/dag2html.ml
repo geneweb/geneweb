@@ -114,7 +114,7 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
     in
     loop 0
   in
-  let line_elem_txt i =
+  let padded_row i td_of =
     let les =
       let rec loop les j =
         if j = Array.length t.table.(i) then les
@@ -129,54 +129,30 @@ let html_table_struct indi_ip indi_txt vbar_txt phony d t =
             loop (j + 1)
           in
           let colspan = cell_colspan_factor * (next_j - j) in
-          let les = (1, LeftA, TDnothing) :: les in
           let les =
-            let td =
-              if t.table.(i).(j).elem = Nothing then TDnothing
-              else elem_txt t.table.(i).(j).elem
-            in
-            (colspan - 2, CenterA, td) :: les
+            (1, LeftA, TDnothing)
+            :: (colspan - 2, CenterA, td_of j)
+            :: (1, LeftA, TDnothing) :: les
           in
-          let les = (1, LeftA, TDnothing) :: les in
           loop les next_j
       in
       loop [] 0
     in
     Array.of_list (List.rev les)
   in
+  let line_elem_txt i =
+    padded_row i (fun j ->
+        if t.table.(i).(j).elem = Nothing then TDnothing
+        else elem_txt t.table.(i).(j).elem)
+  in
   let vbars_txt k i =
-    let les =
-      let rec loop les j =
-        if j = Array.length t.table.(i) then les
-        else
-          let x = t.table.(i).(j) in
-          let next_j =
-            let rec loop j =
-              if j = Array.length t.table.(i) then j
-              else if t.table.(i).(j) = x then loop (j + 1)
-              else j
-            in
-            loop (j + 1)
-          in
-          let colspan = cell_colspan_factor * (next_j - j) in
-          let les = (1, LeftA, TDnothing) :: les in
-          let les =
-            let td =
-              if
-                (k > 0 && t.table.(k - 1).(j).elem = Nothing)
-                || t.table.(k).(j).elem = Nothing
-              then TDnothing
-              else if phony t.table.(i).(j).elem then TDnothing
-              else bar_txt (k <> i) t.table.(i).(j).elem
-            in
-            (colspan - 2, CenterA, td) :: les
-          in
-          let les = (1, LeftA, TDnothing) :: les in
-          loop les next_j
-      in
-      loop [] 0
-    in
-    Array.of_list (List.rev les)
+    padded_row i (fun j ->
+        if
+          (k > 0 && t.table.(k - 1).(j).elem = Nothing)
+          || t.table.(k).(j).elem = Nothing
+        then TDnothing
+        else if phony t.table.(i).(j).elem then TDnothing
+        else bar_txt (k <> i) t.table.(i).(j).elem)
   in
   let alone_bar_txt i =
     let les =
