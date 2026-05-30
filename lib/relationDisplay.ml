@@ -1179,26 +1179,59 @@ let print_multi_relation conf base pl lim
       in
       loop lim [] pl
   in
+  let merge path path1 =
+    match path with
+    | [] -> path1
+    | _ -> (
+        match List.rev path1 with
+        | _ :: tl -> List.rev_append tl path
+        | [] -> path)
+  in
+  let linked = ref Iper.Set.empty in
+  let note path1 =
+    List.iter (fun (ip, _) -> linked := Iper.Set.add ip !linked) path1
+  in
   let path =
-    let rec loop path = function
-      | p1 :: (p2 :: _ as pl) -> (
-          let ip1 = Driver.get_iper p1 in
-          let ip2 = Driver.get_iper p2 in
-          match Relation.get_shortest_path_relation conf base ip1 ip2 [] with
-          | Some (path1, _) ->
-              let path =
-                match path with
-                | [] -> path1
-                | _ -> (
-                    match List.rev path1 with
-                    | _ :: path1 -> List.rev_append path1 path
-                    | [] -> path)
-              in
-              loop path pl
-          | None -> loop path pl)
-      | [ _ ] | [] -> path
+    let rec loop path anchor = function
+      | [] -> path
+      | p :: rest -> (
+          match anchor with
+          | None -> loop path (Some p) rest
+          | Some a -> (
+              match
+                Relation.get_shortest_path_relation conf base
+                  (Driver.get_iper a) (Driver.get_iper p) []
+              with
+              | Some (path1, _) ->
+                  note path1;
+                  loop (merge path path1) (Some p) rest
+              | None -> loop path anchor rest))
     in
-    loop [] pl1
+    loop [] None pl1
+  in
+  let path =
+    match pl1 with
+    | first :: (_ :: _ as tl) -> (
+        let last = List.nth tl (List.length tl - 1) in
+        let ipf = Driver.get_iper first and ipl = Driver.get_iper last in
+        if Iper.Set.mem ipf !linked && Iper.Set.mem ipl !linked then path
+        else
+          match Relation.get_shortest_path_relation conf base ipl ipf [] with
+          | Some (path1, _) ->
+              note path1;
+              merge path path1
+          | None -> path)
+    | _ -> path
+  in
+  (* Persons reached by no path become standalone nodes, prepended so
+     dag_ind_list_of_path, folding the reversed path, processes them last
+     and leaves the connected chain's prev_ind intact. *)
+  let path =
+    List.fold_left
+      (fun path p ->
+        let ip = Driver.get_iper p in
+        if Iper.Set.mem ip !linked then path else (ip, Relation.Self) :: path)
+      path pl1
   in
   if path = [] then print_no_relationship conf base pl
   else
