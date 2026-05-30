@@ -1367,9 +1367,7 @@ let invert_table t =
     t'.table.(i) <-
       Array.init
         (Array.length t.table.(0))
-        (fun j ->
-          let d = t.table.(len - 1 - i).(j) in
-          { elem = d.elem; span = d.span });
+        (fun j -> copy_data t.table.(len - 1 - i).(j));
     if i < len - 1 then
       for j = 0 to Array.length t'.table.(i) - 1 do
         t'.table.(i).(j).span <- t.table.(len - 2 - i).(j).span
