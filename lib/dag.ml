@@ -107,8 +107,10 @@ let make_dag conf base ipers =
                             valu = Right next_id;
                             chil = [];
                           };
-                        nodes.(i) <- { (nodes.(i)) with chil = [ new_idag ] };
-                        nodes.(j) <- { (nodes.(j)) with chil = [ new_idag ] };
+                        nodes.(i) <-
+                          { (nodes.(i)) with chil = new_idag :: nodes.(i).chil };
+                        nodes.(j) <-
+                          { (nodes.(j)) with chil = new_idag :: nodes.(j).chil };
                         next_id + 1)
                       else if chil <> nodes.(j).chil then (
                         List.iter
@@ -132,7 +134,10 @@ let make_dag conf base ipers =
                               let self_idag = Dag2html.idag_of_int i in
                               let child_idx = Dag2html.int_of_idag child_idag in
                               nodes.(i) <-
-                                { (nodes.(i)) with chil = child_idag :: chil };
+                                {
+                                  (nodes.(i)) with
+                                  chil = child_idag :: nodes.(i).chil;
+                                };
                               nodes.(child_idx) <-
                                 {
                                   (nodes.(child_idx)) with
