@@ -334,17 +334,14 @@ let known_spouses_list conf base p excl_p =
     [] (Driver.get_family u)
 
 let merge_relations rl1 rl2 =
+  let none_rank po1 po2 =
+    (if po1 = None then 1 else 0) + if po2 = None then 1 else 0
+  in
   List.merge
     (fun (po11, po12, (l11, l12, _), _) (po21, po22, (l21, l22, _), _) ->
-      if l11 + l12 < l21 + l22 then -1
-      else if l11 + l12 > l21 + l22 then 1
-      else if l11 < l21 then -1
-      else if l11 > l21 then 1
-      else if po11 = None && po12 = None then -1
-      else if po21 = None && po22 = None then 1
-      else if po11 = None || po21 = None then -1
-      else if po21 = None || po22 = None then 1
-      else -1)
+      if l11 + l12 <> l21 + l22 then compare (l11 + l12) (l21 + l22)
+      else if l11 <> l21 then compare l11 l21
+      else compare (none_rank po21 po22) (none_rank po11 po12))
     rl1 rl2
 
 let combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
