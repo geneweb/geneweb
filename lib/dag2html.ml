@@ -71,16 +71,13 @@ type 'a table_data =
   | TDbar of Adef.escaped_string option
   | TDnothing
 
-type 'a html_table_line = (int * align * 'a table_data) array
-type 'a html_table = 'a html_table_line array
-
 module IdagSet = Set.Make (struct
   type t = idag
 
   let compare a b = Int.compare (int_of_idag a) (int_of_idag b)
 end)
 
-(** Each logical cell maps to 3 HTML columns: left-pad, content, right-pad *)
+(* Each logical cell maps to 3 HTML columns: left-pad, content, right-pad *)
 let cell_colspan_factor = 3
 
 let html_table_struct indi_ip indi_txt vbar_txt phony d t =

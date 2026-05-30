@@ -69,13 +69,6 @@ type 'a table_data =
           first occurrence of the bar in a multi-row run. *)
   | TDnothing  (** Padding cell. *)
 
-type 'a html_table_line = (int * align * 'a table_data) array
-(** One row of the output matrix: a sequence of [(colspan, align, data)]
-    triples. *)
-
-type 'a html_table = 'a html_table_line array
-(** Full output matrix returned by {!html_table_struct}. *)
-
 val html_table_struct :
   ('a node -> Geneweb_db.Driver.iper) ->
   ('a node -> 'b) ->
@@ -98,8 +91,12 @@ val html_table_struct :
 
     Each logical row of [t] is expanded into up to three matrix rows: an
     optional vertical-bar row above, the cell row itself, and an optional
-    horizontal-rule row below grouping siblings. Each logical column expands
-    into three HTML columns (left padding, content, right padding). *)
+    horizontal-rule row below grouping siblings. Each logical row of [t] is
+    emitted as a cell row; between two consecutive logical rows the converter
+    inserts connector rows: a vertical-bar row linking each cell to the row
+    below and, where a row holds sibling groups, horizontal-rule rows drawing
+    the brackets. A logical row therefore expands to between one and six matrix
+    rows. *)
 
 val table_of_dag :
   ('a node -> bool) -> bool -> bool -> bool -> 'a dag -> idag table
