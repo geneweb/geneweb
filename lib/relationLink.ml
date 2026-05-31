@@ -53,10 +53,12 @@ let make_dist_tab conf base ia maxlev =
     let q = ref Pq.empty in
     let add_children ip =
       let u = Util.pget conf base ip in
-      for i = 0 to Array.length (Driver.get_family u) - 1 do
-        let des = Driver.foi base (Driver.get_family u).(i) in
-        for j = 0 to Array.length (Driver.get_children des) - 1 do
-          let k = (Driver.get_children des).(j) in
+      let fams = Driver.get_family u in
+      for i = 0 to Array.length fams - 1 do
+        let des = Driver.foi base fams.(i) in
+        let chil = Driver.get_children des in
+        for j = 0 to Array.length chil - 1 do
+          let k = chil.(j) in
           let d = Collection.Marker.get dist k in
           if not d.mark then (
             Collection.Marker.set dist k
@@ -75,10 +77,10 @@ let make_dist_tab conf base ia maxlev =
           let cpl = Driver.foi base ifam in
           let dfath = Collection.Marker.get dist (Driver.get_father cpl) in
           let dmoth = Collection.Marker.get dist (Driver.get_mother cpl) in
-          (Collection.Marker.get dist k).dmin <- min dfath.dmin dmoth.dmin + 1;
-          (Collection.Marker.get dist k).dmax <- max dfath.dmax dmoth.dmax + 1;
-          if (Collection.Marker.get dist k).dmin > maxlev then ()
-          else add_children k
+          let dk = Collection.Marker.get dist k in
+          dk.dmin <- min dfath.dmin dmoth.dmin + 1;
+          dk.dmax <- max dfath.dmax dmoth.dmax + 1;
+          if dk.dmin > maxlev then () else add_children k
       | None -> ()
     done;
     ( (fun ip -> (Collection.Marker.get dist ip).dmin),
