@@ -1212,7 +1212,7 @@ let print_multi_relation conf base pl lim
   let path =
     match pl1 with
     | first :: (_ :: _ as tl) -> (
-        let last = List.nth tl (List.length tl - 1) in
+        let last = List.fold_left (fun _ p -> p) first tl in
         let ipf = Driver.get_iper first and ipl = Driver.get_iper last in
         if Iper.Set.mem ipf !linked && Iper.Set.mem ipl !linked then path
         else
