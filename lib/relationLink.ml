@@ -220,8 +220,8 @@ let spouse_text conf base end_sp ip ipl =
       | _ -> (Adef.safe "", Adef.safe "", None))
   | _ -> (Adef.safe "", Adef.safe "", None)
 
-let print_someone_and_spouse conf base ip n ipl =
-  let s, d, spo = spouse_text conf base n ip ipl in
+let print_someone_and_spouse conf base ip end_sp ipl =
+  let s, d, spo = spouse_text conf base end_sp ip ipl in
   Output.printf conf "%s%s"
     (someone_text conf base ip :> string)
     (DagDisplay.image_txt conf base (Util.pget conf base ip) :> string);
@@ -435,7 +435,6 @@ let print_two_branches_with_table conf base info =
   <td><hr class="full"></td>
   <td><hr class="left"></td>
 </tr>
-</tr>
 |};
   print_both_branches conf base info info.b1 info.b2;
   if
@@ -517,14 +516,10 @@ let print_relation_no_dag conf base po ip1 ip2 =
             | Some ((ia1, sa1) :: b1), Some ((ia2, _) :: b2) ->
                 if ia1 = ia2 then
                   let c1 =
-                    match Util.p_getint conf.env "c1" with
-                    | Some n -> n
-                    | None -> 0
+                    Util.p_getint conf.env "c1" |> Option.value ~default:0
                   in
                   let c2 =
-                    match Util.p_getint conf.env "c2" with
-                    | Some n -> n
-                    | None -> 0
+                    Util.p_getint conf.env "c2" |> Option.value ~default:0
                   in
                   let dist =
                     if c1 > 0 || c2 > 0 then
