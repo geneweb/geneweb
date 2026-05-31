@@ -1,5 +1,28 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+(* Descendant rendering for the [m=D] request.
+
+   [print] dispatches on the [t] URL parameter: most modes are rendered by
+   a template (see descendDisplay.mli), the others by functions of this
+   module. Two families of functions coexist:
+
+   1. List / table / index renderings ([print_aboville],
+      [display_descendants_*], [display_descendant_*], [display_spouse_index],
+      [display_descendant_with_table]).
+   2. Tree renderings laid out on an HTML cell matrix consumed by DagDisplay:
+      [print_tree] (centred tree) and [print_vaucher_tree] (compact tree,
+      after Jean Vaucher, U. of Montreal — see issue #414).
+
+   Vaucher layout vocabulary:
+   - a cell is [(ncols, align, table_data)]: [ncols] logical columns spanned,
+     horizontal [align], and the [Dag2html.table_data] payload;
+   - a row is [(lastx, cells)] where [lastx] is the rightmost column already
+     filled, used to pack cells left to right;
+   - [tdal] is the list of rows being built. [p_pos]/[f_pos] place persons and
+     spouses by a pre-order walk (one logical column per node, shifted right on
+     collision); [complete_rows]/[clean_rows]/[expand_cell]/[correct_spouses]/
+     [manage_vbars] then normalise the matrix before conversion to [hts]. *)
+
 open Config
 open Def
 open Dag2html
@@ -1554,8 +1577,9 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   let lx = if lx > -1 then lx else -1 in
   let tdal =
     tdal_add tdal ir
-      (td_fill lx (x - 1)
-      @ td_cell 1 CenterA (Driver.get_iper p) txt (Adef.safe ""))
+      (List.rev_append
+         (td_fill lx (x - 1))
+         (td_cell 1 CenterA (Driver.get_iper p) txt (Adef.safe "")))
       x
   in
   (tdal, x)
@@ -1624,8 +1648,9 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let lx = if lx > -1 then lx else -1 in
   let tdal =
     tdal_add tdal ir2
-      (td_fill lx (x - 1)
-      @ td_cell 1 CenterA (Driver.get_iper sp) txt (Adef.safe flag))
+      (List.rev_append
+         (td_fill lx (x - 1))
+         (td_cell 1 CenterA (Driver.get_iper sp) txt (Adef.safe flag)))
       x
   in
   (* rox 4: Hbar over kids *)
@@ -1633,7 +1658,9 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     let lx = lastx tdal (ir2 + 1) in
     let lx = if lx > -1 then lx else -1 in
     let tdal =
-      tdal_add tdal (ir2 + 1) (td_fill lx (x1 - 1) @ td_hbar x1 xn) xn
+      tdal_add tdal (ir2 + 1)
+        (List.rev_append (td_fill lx (x1 - 1)) (td_hbar x1 xn))
+        xn
     in
     (tdal, x)
   else (tdal, x)
@@ -1675,35 +1702,34 @@ let correct_spouses tdal =
     match row with
     | (nc1, a1, t1) :: (nc2, a2, t2) :: (nc3, a3, t3) :: row -> (
         match (t1, t2, t3) with
-        | TDitem (_, _, f1), TDnothing, TDitem (_, _, f3) ->
-            let f11 = String.split_on_char '-' (f1 :> string) in
-            let f31 = String.split_on_char '-' (f3 :> string) in
-            if List.length f11 = 2 && List.length f31 = 2 then
-              let fam1 = List.nth f11 0 in
-              let fl1 = List.nth f11 1 in
-              let fam3 = List.nth f31 0 in
-              let fl3 = List.nth f31 1 in
-              if fam1 = fam3 && fl1 = "spouse_no_d" && fl3 = "spouse" then
+        | TDitem (_, _, f1), TDnothing, TDitem (_, _, f3) -> (
+            match
+              ( String.split_on_char '-' (f1 :> string),
+                String.split_on_char '-' (f3 :> string) )
+            with
+            | [ fam1; fl1 ], [ fam3; fl3 ] ->
+                if fam1 = fam3 && fl1 = "spouse_no_d" && fl3 = "spouse" then
+                  regroup
+                    ((nc3, a3, t3) :: (nc2, a2, t2) :: row)
+                    ((nc1, a1, t1) :: new_row)
+                else if fam1 = fam3 && fl1 = "spouse" && fl3 = "spouse_no_d"
+                then
+                  regroup
+                    ((nc1, a1, t1) :: (nc3, a3, t3) :: row)
+                    ((nc2, a2, t2) :: new_row)
+                else
+                  regroup
+                    ((nc2, a2, t2) :: (nc3, a3, t3) :: row)
+                    ((nc1, a1, t1) :: new_row)
+            | _ ->
                 regroup
-                  ([ (nc3, a3, t3); (nc2, a2, t2) ] @ row)
-                  ([ (nc1, a1, t1) ] @ new_row)
-              else if fam1 = fam3 && fl1 = "spouse" && fl3 = "spouse_no_d" then
-                regroup
-                  ([ (nc1, a1, t1); (nc3, a3, t3) ] @ row)
-                  ([ (nc2, a2, t2) ] @ new_row)
-              else
-                regroup
-                  ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
-                  ([ (nc1, a1, t1) ] @ new_row)
-            else
-              regroup
-                ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
-                ([ (nc1, a1, t1) ] @ new_row)
+                  ((nc2, a2, t2) :: (nc3, a3, t3) :: row)
+                  ((nc1, a1, t1) :: new_row))
         | _ ->
             regroup
-              ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
-              ([ (nc1, a1, t1) ] @ new_row))
-    | _ -> List.rev (List.rev row @ new_row)
+              ((nc2, a2, t2) :: (nc3, a3, t3) :: row)
+              ((nc1, a1, t1) :: new_row))
+    | _ -> List.rev (List.rev_append row new_row)
   in
   let tdal =
     let rec loop tdal new_tdal =
@@ -1724,17 +1750,17 @@ let expand_cell tdal =
         | TDnothing, TDitem _, TDnothing ->
             if nc1 > 2 && nc3 > 2 then
               expand
-                ([ (nc2 + 2, a2, t2); (nc3 - 1, a3, t3) ] @ row)
-                ([ (nc1 - 1, a1, t1) ] @ new_row)
+                ((nc2 + 2, a2, t2) :: (nc3 - 1, a3, t3) :: row)
+                ((nc1 - 1, a1, t1) :: new_row)
             else
               expand
-                ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
-                ([ (nc1, a1, t1) ] @ new_row)
+                ((nc2, a2, t2) :: (nc3, a3, t3) :: row)
+                ((nc1, a1, t1) :: new_row)
         | _ ->
             expand
-              ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
-              ([ (nc1, a1, t1) ] @ new_row))
-    | _ -> List.rev (List.rev row @ new_row)
+              ((nc2, a2, t2) :: (nc3, a3, t3) :: row)
+              ((nc1, a1, t1) :: new_row))
+    | _ -> List.rev (List.rev_append row new_row)
   in
   let tdal =
     let rec loop tdal new_tdal =
