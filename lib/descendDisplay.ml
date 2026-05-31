@@ -72,7 +72,7 @@ let display_descendants_level conf base max_level ancestor =
               else if level = max_level then
                 if
                   Driver.p_first_name base x = "x"
-                  || Collection.Marker.get levt ix != level
+                  || Collection.Marker.get levt ix <> level
                 then list
                 else x :: list
               else if level < max_level then
@@ -197,8 +197,7 @@ let close_to_end conf base marks max_lev lev p =
 
 let labelled conf base marks max_lev lev ip =
   let a = pget conf base ip in
-  let u = a in
-  Array.length (Driver.get_family u) <> 0
+  Array.length (Driver.get_family a) <> 0
   &&
   match Driver.get_parents a with
   | Some ifam ->
@@ -207,8 +206,7 @@ let labelled conf base marks max_lev lev ip =
       Array.exists
         (fun ie ->
           let e = pget conf base ie in
-          let u = e in
-          Array.length (Driver.get_family u) <> 0
+          Array.length (Driver.get_family e) <> 0
           && not (close_to_end conf base marks max_lev lev e))
         el
   | _ -> false
@@ -478,9 +476,7 @@ let print_elem conf base paths precision (n, pll) =
         (surname_without_particle base n |> Util.escape_html);
       Output.print_sstring conf " ";
       gen_person_text ~sn:false conf base p
-      (* FIXME où est ce reference ?? <> au reference l.1384 *)
-      |> reference conf base p
-      |> Output.print_string conf;
+      |> reference conf base p |> Output.print_string conf;
       Output.print_sstring conf " ";
       Output.print_string conf (surname_particle base n |> Util.escape_html);
       Output.print_sstring conf "</strong>";
@@ -874,11 +870,10 @@ let print_person_table conf base p lab =
           fn ();
           Output.print_sstring conf "</td>")
       in
-      let u = p in
       for i = 1 to nb_families - 1 do
-        let cpl = Driver.foi base (Driver.get_family u).(i) in
+        let cpl = Driver.foi base (Driver.get_family p).(i) in
         let spouse = pget conf base (Gutil.spouse (Driver.get_iper p) cpl) in
-        let fam = Driver.foi base (Driver.get_family u).(i) in
+        let fam = Driver.foi base (Driver.get_family p).(i) in
         Output.print_sstring conf "<tr>\n";
         aux i "marr" (fun () ->
             ImageDisplay.print_placeholder_gendered_portrait conf spouse 11;
@@ -888,7 +883,7 @@ let print_person_table conf base p lab =
         aux i "marr_date" (fun () ->
             if authorized_age conf base p && authorized_age conf base spouse
             then
-              let fam = Driver.foi base (Driver.get_family u).(i) in
+              let fam = Driver.foi base (Driver.get_family p).(i) in
               match Date.od_of_cdate (Driver.get_marriage fam) with
               | Some d ->
                   DateDisplay.string_slash_of_date conf d
@@ -1293,14 +1288,13 @@ let print_aboville conf base max_level p =
     else Output.print_string conf lab;
     Output.print_string conf (referenced_person_title_text conf base p);
     Output.print_string conf (DateDisplay.short_dates_text conf base p);
-    let u = p in
     if lev < max_level then
-      for i = 0 to Array.length (Driver.get_family u) - 1 do
-        let cpl = Driver.foi base (Driver.get_family u).(i) in
+      for i = 0 to Array.length (Driver.get_family p) - 1 do
+        let cpl = Driver.foi base (Driver.get_family p).(i) in
         let spouse = pget conf base (Gutil.spouse (Driver.get_iper p) cpl) in
         Output.print_sstring conf "&amp;";
         if authorized_age conf base p && authorized_age conf base spouse then
-          let fam = Driver.foi base (Driver.get_family u).(i) in
+          let fam = Driver.foi base (Driver.get_family p).(i) in
           match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
           | Some d ->
               Output.print_sstring conf {|<font size="-2"><em>|};
@@ -1314,9 +1308,9 @@ let print_aboville conf base max_level p =
     Output.print_sstring conf "<br>";
     if lev < max_level then
       let rec loop_fam cnt_chil i =
-        if i = Array.length (Driver.get_family u) then ()
+        if i = Array.length (Driver.get_family p) then ()
         else
-          let des = Driver.foi base (Driver.get_family u).(i) in
+          let des = Driver.foi base (Driver.get_family p).(i) in
           let rec loop_chil cnt_chil j =
             if j = Array.length (Driver.get_children des) then
               loop_fam cnt_chil (i + 1)
@@ -1368,7 +1362,7 @@ let td_hbar x1 xn =
   match xn - x1 with
   | 0 -> [ (1, CenterA, TDnothing) ]
   | 1 -> [ (1, CenterA, TDhr CenterA) ]
-  | _n ->
+  | _ ->
       [
         (1, LeftA, TDhr LeftA);
         (xn - x1 - 1, CenterA, TDhr CenterA);
