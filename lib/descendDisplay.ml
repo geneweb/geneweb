@@ -1831,7 +1831,7 @@ let rec find_ancestors base iap ip list v =
         else list
       in
       let list =
-        if v > 1 && not (iap = ifath) then
+        if v > 1 && not (iap = imoth) then
           find_ancestors base iap imoth list (v - 1)
         else list
       in
