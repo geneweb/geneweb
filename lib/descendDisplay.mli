@@ -1,4 +1,10 @@
-(* Public functions for API (plugin v7_descend) *)
+(* Copyright (c) 1998-2007 INRIA *)
+
+(** Descendant rendering for the [m=D] request.
+
+    Entry points consumed by gwd (request dispatch) and by the [v7_descend]
+    plugin. {!print} is the dispatcher; the other values render one specific [t]
+    mode and are exported because the plugin calls them directly. *)
 
 val display_descendants_level :
   Config.config ->
@@ -6,7 +12,7 @@ val display_descendants_level :
   int ->
   Geneweb_db.Driver.person ->
   unit
-(** Displays only descendants for specified level in unordered lists *)
+(** Displays the descendants of a single generation as an unordered list. *)
 
 val display_descendants_with_numbers :
   Config.config ->
@@ -14,8 +20,8 @@ val display_descendants_with_numbers :
   int ->
   Geneweb_db.Driver.person ->
   unit
-(** Displays descendants with numerated by letter list. Title links to
-    descendats index *)
+(** Displays descendants as a letter-numbered list; the title links to the
+    descendants index. *)
 
 val display_descendant_index :
   Config.config ->
@@ -23,7 +29,7 @@ val display_descendant_index :
   int ->
   Geneweb_db.Driver.person ->
   unit
-(** Displays index of descendants *)
+(** Displays the index of descendants. *)
 
 val display_spouse_index :
   Config.config ->
@@ -31,7 +37,8 @@ val display_spouse_index :
   int ->
   Geneweb_db.Driver.person ->
   unit
-(** Displays index of descendant's spouses *)
+(** Displays the index of the descendants' spouses (themselves not descendants).
+*)
 
 val display_descendant_with_table :
   Config.config ->
@@ -39,8 +46,8 @@ val display_descendant_with_table :
   int ->
   Geneweb_db.Driver.person ->
   unit
-(** Displays descendants in the table where rows are ordered by D'Aboville
-    number. *)
+(** Displays descendants in a table whose rows are ordered by d'Aboville number.
+*)
 
 val print_tree :
   Config.config ->
@@ -48,7 +55,7 @@ val print_tree :
   int ->
   Geneweb_db.Driver.person ->
   unit
-(** Displays tree of descendants *)
+(** Displays a centred tree of descendants. *)
 
 val print_aboville :
   Config.config ->
@@ -56,39 +63,38 @@ val print_aboville :
   int ->
   Geneweb_db.Driver.person ->
   unit
-(** Displays descendants as follows :
+(** Displays descendants in indented d'Aboville form, e.g.:
 
-    person | desc1 | desc2 | | desc21 | desc3 *)
+    person | desc1 | desc2 | | desc21 | desc3 *)
 
 val desmenu_print :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
-(** Prints form that allows to customise display of descendants *)
+(** Prints the form used to customise the descendants display. *)
 
 val print :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
-(** Displays the descendants of the selected in [conv.env] person. Descendants
-    could be displayed by different ways depending on variable {i t} in
-    [conv.env] environement:
+(** Displays the descendants of the person selected through [conf.env]. The
+    rendering depends on the [t] parameter.
 
-    - "L" dispalying descendants in unordered list
-    - "F" same as "L" but displays only female line
-    - "M" same as "L" but displays only female line
-    - "H" table dispalying
-    - "I" table dispalying with spouses information
-    - "A" numerated list (d'Aboville)
-    - "V" displaying a tree of descendants
+    Template-rendered modes:
+    - "L": descendants as an unordered list;
+    - "F": as "L", restricted to the female line;
+    - "M": as "L", restricted to the male line;
+    - "D": descendants list, [deslist_hr] template;
+    - "H": table;
+    - "I": table including spouse information;
+    - "A": table ordered by d'Aboville number;
+    - "V": descendants tree.
 
-    Previous dispalyings are done by template evaluation. Next ones are done by
-    functions inside this module:
+    Modes rendered by the functions of this module:
+    - "B": {!print_aboville};
+    - "S": {!display_descendants_level};
+    - "K": {!display_descendant_with_table};
+    - "N": {!display_descendants_with_numbers};
+    - "G": {!display_descendant_index};
+    - "C": {!display_spouse_index};
+    - "T": {!print_tree};
+    - "TV": compact descendants tree (Jean Vaucher layout).
 
-    - "B" for [print_aboville]
-    - "S" for [display_descendants_level]
-    - "K" for [display_descendant_with_table]
-    - "N" for [display_descendants_with_numbers]
-    - "G" for [display_descendant_index]
-    - "C" for [display_spouse_index]
-    - "T" for [print_tree]
-
-    Variable {i v} is used to select maximal level to descend for descendant
-    displaying (1 for children, 2 for grandchildren, etc). If {i t} variable
-    isn't defined, then displays the form that allows customising of display. *)
+    The [v] parameter sets the maximum depth (1 = children, 2 = grandchildren,
+    …). When [t] is absent, the customisation form is displayed. *)
