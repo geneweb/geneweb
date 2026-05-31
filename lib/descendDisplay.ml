@@ -1402,7 +1402,7 @@ let td_hbar x1 xn =
 
 (* regular cell, centered, with text as content (may contain |<br>) *)
 let td_cell cols align ip text flags =
-  [ (cols, align, TDitem (ip, Adef.safe text, flags)) ]
+  [ (cols, align, TDitem (ip, text, flags)) ]
 
 (* tdal is   (int   *    list      ) list           *)
 (*           (lastx      list of td) list of rows   *)
@@ -1413,18 +1413,6 @@ let tdal_add tdal ir elem nx =
   let _, row = tdal.(ir) in
   tdal.(ir) <- (nx, row @ elem);
   tdal
-
-let get_bd_td_prop conf =
-  let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
-  let td_prop =
-    match Util.p_getenv conf.env "td" with
-    | Some x -> " " ^ x
-    | None -> (
-        match Util.p_getenv conf.env "color" with
-        | None | Some "" -> ""
-        | Some x -> " class=\"" ^ x ^ "\"")
-  in
-  (bd, td_prop)
 
 let reference conf base p s =
   let cgl =
@@ -1442,30 +1430,17 @@ let reference conf base p s =
       s
 
 let get_text conf base p img cgl =
-  let bd, td_prop = get_bd_td_prop conf in
   let auth = authorized_age conf base p in
   let txt = person_title_text conf base p in
   let txt =
-    if cgl then (txt :> string) else reference conf base p (txt :> string)
+    if cgl then (txt :> Adef.safe_string)
+    else Adef.safe (reference conf base p (txt :> string))
   in
   let txt =
-    if auth then txt ^ (DateDisplay.short_dates_text conf base p :> string)
-    else txt
+    if auth then txt ^^^ DateDisplay.short_dates_text conf base p else txt
   in
   let has_image = Image.get_portrait conf base p |> Option.is_some in
-  let txt =
-    if has_image && img then txt ^ (DagDisplay.image_txt conf base p :> string)
-    else txt
-  in
-  let txt =
-    if bd > 0 || td_prop <> "" then
-      Printf.sprintf
-        "<table style=\"border: %dpx solid\"><tr><td \
-         align=\"center\"%s>%s</td></tr></table>"
-        bd td_prop txt
-    else txt
-  in
-  txt
+  if has_image && img then txt ^^^ DagDisplay.image_txt conf base p else txt
 
 let lastx tdal ir = fst tdal.(ir)
 
@@ -1566,11 +1541,13 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
         "class=\"normal_anchor px-3 btn-outline-primary border-0\""
         (Utf8.capitalize_fst (Util.transl conf "partial"))
   in
-  let txt = if ir > 0 then only ^ "<br>" ^ txt else txt in
+  let txt = if ir > 0 then Adef.safe (only ^ "<br>") ^^^ txt else txt in
   (* ajouter un marqueur ici si enfants et on ne continue pas !!   *)
   let continue = only_anc = [] || ifaml <> [] in
   let br = if img then "" else "<br>" in
-  let txt = if (not continue) && descendants then txt ^ br ^ "+" else txt in
+  let txt =
+    if (not continue) && descendants then txt ^^^ Adef.safe (br ^ "+") else txt
+  in
   let lx = if lx > -1 then lx else -1 in
   let tdal =
     tdal_add tdal ir
@@ -1626,17 +1603,20 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let m_txt =
     (* families are scanned in reverse order *)
     let f_nbr = string_of_int ifam_nbr in
-    "<span class=\"text-nowrap\">"
-    ^ (if last || only_one then "" else "…")
-    ^ (if only_one then " &amp;" else " &amp;<sup>" ^ f_nbr ^ "</sup>")
-    ^ (marr_d :> string)
-    ^ (if first || only_one then "" else "…")
-    ^ "</span>"
-    ^ if only_one && not marr then "" else "<br>"
+    Adef.safe "<span class=\"text-nowrap\">"
+    ^^^ (if last || only_one then Adef.safe "" else Adef.safe "…")
+    ^^^ (if only_one then Adef.safe " &amp;"
+         else Adef.safe (" &amp;<sup>" ^ f_nbr ^ "</sup>"))
+    ^^^ marr_d
+    ^^^ (if first || only_one then Adef.safe "" else Adef.safe "…")
+    ^^^ Adef.safe "</span>"
+    ^^^ if only_one && not marr then Adef.safe "" else Adef.safe "<br>"
   in
-  let txt = txt ^ if kids <> [] then br_sp else "" in
-  let txt = if sps then m_txt ^ txt else if v > 0 then m_txt else "" in
-  let txt = if v > 0 && kids <> [] then txt ^ "<br>|" else txt in
+  let txt = if kids <> [] then txt ^^^ Adef.safe br_sp else txt in
+  let txt =
+    if sps then m_txt ^^^ txt else if v > 0 then m_txt else Adef.safe ""
+  in
+  let txt = if v > 0 && kids <> [] then txt ^^^ Adef.safe "<br>|" else txt in
   let flag =
     Driver.Ifam.to_string ifam
     ^ if v > 0 && kids <> [] then "-spouse_no_d" else "-spouse"
