@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Util
 module Driver = Geneweb_db.Driver
 module Iper = Driver.Iper
 
@@ -18,11 +17,11 @@ let print_ancestors_dag conf base v p =
       let set = Iper.Set.add ip set in
       if lev <= 0 then set
       else
-        match Driver.get_parents (pget conf base ip) with
+        match Driver.get_parents (Util.pget conf base ip) with
         | Some ifam ->
             let cpl = Driver.foi base ifam in
             let get_left, get_right =
-              match p_getenv conf.env "mf" with
+              match Util.p_getenv conf.env "mf" with
               | Some "1" -> (Driver.get_father, Driver.get_mother)
               | _ -> (Driver.get_mother, Driver.get_father)
             in
@@ -33,13 +32,12 @@ let print_ancestors_dag conf base v p =
     loop Iper.Set.empty v (Driver.get_iper p) |> Iper.Set.elements
   in
   let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
-  (* Récupère les options d'affichage. *)
   let options = Util.display_options conf in
   let vbar_txt ip =
-    let p = pget conf base ip in
+    let p = Util.pget conf base ip in
     Printf.sprintf {|%s%s&m=A&t=T&dag=on&v=%d%s |}
-      (commd conf :> string)
-      (acces conf base p :> string)
+      (Util.commd conf :> string)
+      (Util.acces conf base p :> string)
       v
       (options :> string)
     |> Adef.escaped
@@ -54,7 +52,7 @@ let print conf base p =
   match
     ( Util.p_getenv conf.env "t",
       Util.p_getenv conf.env "dag",
-      p_getint conf.env "v" )
+      Util.p_getint conf.env "v" )
   with
   | Some "T", Some "on", Some v -> print_ancestors_dag conf base v p
   | _ ->
