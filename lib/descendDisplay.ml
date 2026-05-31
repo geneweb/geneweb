@@ -1017,9 +1017,6 @@ let make_tree_hts conf base gv p =
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let sps = Util.get_opt conf "sp" true in
   let img = Util.get_opt conf "im" true in
-  let _cgl =
-    match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
-  in
   let td_prop =
     match Util.p_getenv conf.env "color" with
     | None | Some "" -> Adef.safe ""
@@ -1428,7 +1425,7 @@ let reference conf base p s =
       (Utf8.capitalize_fst (Util.transl conf "open individual page"))
       s
 
-let get_text conf base p filler img cgl =
+let get_text conf base p img cgl =
   let bd, td_prop = get_bd_td_prop conf in
   let auth = authorized_age conf base p in
   let txt = person_title_text conf base p in
@@ -1439,21 +1436,10 @@ let get_text conf base p filler img cgl =
     if auth then txt ^ (DateDisplay.short_dates_text conf base p :> string)
     else txt
   in
-  let vbar_image =
-    (* TODO check if necessary *)
-    if filler && img && false then
-      Printf.sprintf
-        "<div class=\"flex-grow-1\"><img src=\"%sm=IM&v=vbar.jpg\" \
-         class=\"img-fluid\"></div>\n"
-        (commd conf :> string)
-    else ""
-  in
   let has_image = Image.get_portrait conf base p |> Option.is_some in
   let txt =
-    txt
-    ^
-    if has_image && img then (DagDisplay.image_txt conf base p :> string)
-    else vbar_image
+    if has_image && img then txt ^ (DagDisplay.image_txt conf base p :> string)
+    else txt
   in
   let txt =
     if bd > 0 || td_prop <> "" then
@@ -1468,11 +1454,6 @@ let get_text conf base p filler img cgl =
 let lastx tdal ir =
   let x, _ = List.nth tdal ir in
   x
-
-let _both_parents_in_only_anc p sp only_anc =
-  let ip = Driver.get_iper p in
-  let isp = Driver.get_iper sp in
-  List.mem ip only_anc && List.mem isp only_anc
 
 let get_spouse base iper ifam =
   let f = Driver.foi base ifam in
@@ -1558,7 +1539,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
     | Some p -> "&iz=" ^ Driver.Iper.to_string (Driver.get_iper p)
     | None -> ""
   in
-  let txt = get_text conf base p (ifaml <> [] && sps) img cgl in
+  let txt = get_text conf base p img cgl in
   let only =
     if cgl then "|"
     else
@@ -1583,25 +1564,6 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
       @ td_cell 1 CenterA (Driver.get_iper p) txt (Adef.safe ""))
       x
   in
-  (* row 2: Hbar over sps *)
-  (* TODO review
-     let tdal =
-       if v >= 1 && ifaml<>[] then
-         let lx = lastx tdal (ir+1) in
-         let lx = if lx > -1 then lx else -1 in
-         if only_anc = [] && x1 <> xn then
-           tdal_add tdal (ir+1)
-             ((td_fill lx (x1 - 1))
-             @ (td_hbar x1 xn))
-             xn
-         else
-           tdal_add tdal (ir+1)
-             ((td_fill lx (x - 1))
-             @ (td_cell 1 CenterA Geneweb_db.dummy_iper "|" (Adef.safe "")))
-             x
-       else tdal
-     in
-  *)
   (tdal, x)
 
 (* ifam_nbr = -1 = 1 family, otherwize rank *)
@@ -1611,8 +1573,6 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let continue = only_anc = [] || List.mem ifam only_anc in
   let lx = lastx tdal ir2 + 2 in
   let x = if lx > x0 then lx else x0 in
-  (*let x1 = x in
-    let xn = x in *)
   let kids =
     Array.fold_left
       (fun l k -> Driver.poi base k :: l)
@@ -1639,7 +1599,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     else (tdal, x, x, x)
   in
   (* row 3: spouses *)
-  let txt = get_text conf base sp (kids <> [] && sps) img cgl in
+  let txt = get_text conf base sp img cgl in
   let has_image = Image.get_portrait conf base p |> Option.is_some in
   let br_sp = if has_image && img then "" else "<br>" in
   let auth = authorized_age conf base p && authorized_age conf base sp in
@@ -1879,20 +1839,6 @@ let make_vaucher_tree_hts conf base gv p =
   let hts = Array.of_list (List.rev hts0) in
   hts
 
-let safe_vaucher_tree hts =
-  Array.map
-    (fun x ->
-      Array.map
-        (fun (i, al, s) ->
-          match s with
-          | TDitem (ip, s, t) -> (i, al, TDitem (ip, s, t))
-          | TDtext (ip, t) -> (i, al, TDtext (ip, t))
-          | TDhr align -> (i, al, TDhr align)
-          | TDbar s -> (i, al, TDbar s)
-          | TDnothing -> (i, al, TDnothing))
-        x)
-    hts
-
 let print_vaucher_tree conf base v p =
   let gv = min (limit_by_tree conf) v in
   let page_title =
@@ -1902,10 +1848,8 @@ let print_vaucher_tree conf base v p =
     |> Adef.safe
   in
   let hts = make_vaucher_tree_hts conf base gv p in
-  let hts = safe_vaucher_tree hts in
-  (* just to verify hts structure !! *)
   DagDisplay.print_dag_page conf base page_title hts (Adef.escaped "")
-(* ******** end of J Vaucher tree ********* *)
+(* ******** end of J. Vaucher tree ********* *)
 
 let print conf base p =
   let templ =
