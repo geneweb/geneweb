@@ -1409,18 +1409,9 @@ let td_cell cols align ip text flags =
 
 (* add elem to row ir. Update lastx *)
 let tdal_add tdal ir elem nx =
-  let tdal =
-    let rec loop tdal new_tdal ir elem nx =
-      match tdal with
-      | [] -> new_tdal
-      | (x, row) :: tdal ->
-          if ir = 0 then
-            let new_row = (nx, row @ elem) in
-            new_row :: loop tdal new_tdal (ir - 1) elem nx
-          else (x, row) :: loop tdal new_tdal (ir - 1) elem nx
-    in
-    loop tdal [] ir elem nx
-  in
+  let tdal = Array.copy tdal in
+  let _, row = tdal.(ir) in
+  tdal.(ir) <- (nx, row @ elem);
   tdal
 
 let get_bd_td_prop conf =
@@ -1476,9 +1467,7 @@ let get_text conf base p img cgl =
   in
   txt
 
-let lastx tdal ir =
-  let x, _ = List.nth tdal ir in
-  x
+let lastx tdal ir = fst tdal.(ir)
 
 let get_spouse base iper ifam =
   let f = Driver.foi base ifam in
@@ -1695,13 +1684,7 @@ let complete_rows tdal =
   in
   List.rev tdal
 
-let init_tdal gv =
-  let rec loop tdal v =
-    match v with
-    | -1 -> tdal (* 4 rows per generation  (3 if sps=off) *)
-    | _ -> loop ((0, []) :: (0, []) :: (0, []) :: (0, []) :: tdal) (v - 1)
-  in
-  loop [] gv
+let init_tdal gv = Array.make (4 * (gv + 1)) (0, [])
 
 (* bring back spouses together *)
 (* Spouse_no_d, TDnothing, Spouse becomes TDnothing, Spouse_no_d, Spouse *)
@@ -1857,6 +1840,7 @@ let make_vaucher_tree_hts conf base gv p =
   in
   let tdal = init_tdal gv in
   let tdal, _ = p_pos conf base p 0 gv 0 tdal only_anc sps img marr cgl in
+  let tdal = Array.to_list tdal in
   let tdal = complete_rows tdal in
   let tdal = clean_rows tdal in
   let tdal = expand_cell tdal in
