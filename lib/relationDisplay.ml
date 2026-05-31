@@ -336,7 +336,7 @@ let print_shortest_path conf base p1 p2 =
             |> Utf8.capitalize_fst)
             (Util.transl_nth conf "try another/relationship computing" 1)
         else
-          Output.printf conf "<ul><li>%s</li><li>%s</ul>"
+          Output.printf conf "<ul><li>%s</li><li>%s</li></ul>"
             (s1 : Adef.safe_string :> string)
             (s2 : Adef.safe_string :> string);
         Hutil.trailer conf
