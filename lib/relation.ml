@@ -9,15 +9,6 @@ module Collection = Geneweb_db.Collection
 
 (* Find shortest path: parents, siblings, mates and children are at distance 1. *)
 type famlink = Self | Parent | Sibling | HalfSibling | Mate | Child
-
-(** Compact structure for the relationship paths
-    - p : person identifier (iper)
-    - f : family identifiers list (ifams)
-    - c : count of paths through this ancestor
-    - l1 : ascending degrees from person 1
-    - l2 : ascendante degrees from/descending degrees to person 2
-    - anc : ancestors list for this path *)
-
 type anc_f = { p : Driver.iper; f : Driver.ifam list; c : int }
 type path_f = { l1 : int; l2 : int; anc : anc_f list }
 type node = NotVisited | Visited of (bool * Driver.iper * famlink)
@@ -57,6 +48,7 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
       :: result
   in
   let neighbours iper =
+    let p = Util.pget conf base iper in
     Array.fold_right
       (fun ifam nb ->
         if Collection.Marker.get mark_fam ifam then nb
@@ -69,9 +61,8 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
             ((Driver.get_father fam, Mate, ifam)
             :: (Driver.get_mother fam, Mate, ifam)
             :: nb))
-      (Driver.get_family (Util.pget conf base iper))
-      (Option.fold ~none:[] ~some:parse_fam
-         (Driver.get_parents (Util.pget conf base iper)))
+      (Driver.get_family p)
+      (Option.fold ~none:[] ~some:parse_fam (Driver.get_parents p))
   in
   let rec make_path path vertex =
     match path with
@@ -205,7 +196,7 @@ let compute_simple_relationship base tstab ip1 ip2 =
     List.iter
       (fun (iper, ifam) ->
         let existing =
-          try Hashtbl.find ifam_table iper with Not_found -> []
+          Option.value ~default:[] (Hashtbl.find_opt ifam_table iper)
         in
         if not (List.mem ifam existing) then
           Hashtbl.replace ifam_table iper (ifam :: existing))
@@ -265,7 +256,7 @@ let compute_simple_relationship base tstab ip1 ip2 =
           List.iter
             (fun (iper, cnt) ->
               let current =
-                try Hashtbl.find count_table iper with Not_found -> 0
+                Option.value ~default:0 (Hashtbl.find_opt count_table iper)
               in
               Hashtbl.replace count_table iper (current + cnt))
             iper_count_list;
@@ -273,7 +264,7 @@ let compute_simple_relationship base tstab ip1 ip2 =
             Hashtbl.fold
               (fun iper count acc ->
                 let ifams =
-                  try Hashtbl.find ifam_table iper with Not_found -> []
+                  Option.value ~default:[] (Hashtbl.find_opt ifam_table iper)
                 in
                 { p = iper; f = ifams; c = count } :: acc)
               count_table []
@@ -304,7 +295,6 @@ let compute_simple_relationship_compat base tstab ip1 ip2 =
       Some (rl, total, relationship, reltab)
 
 let known_spouses_list conf base p excl_p =
-  let u = p in
   Array.fold_left
     (fun spl ifam ->
       let sp =
@@ -317,7 +307,7 @@ let known_spouses_list conf base p excl_p =
         && Driver.get_iper sp <> Driver.get_iper excl_p
       then sp :: spl
       else spl)
-    [] (Driver.get_family u)
+    [] (Driver.get_family p)
 
 let merge_relations rl1 rl2 =
   let none_rank po1 po2 =
