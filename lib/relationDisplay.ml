@@ -28,12 +28,13 @@ let dag_ind_list_of_path path =
     List.fold_left
       (fun (indl, prev_ind) (ip, fl) ->
         let ind, indl =
-          try (List.find (fun di -> di.di_val = Some ip) indl, indl)
-          with Not_found ->
-            let rec ind = { di_val = Some ip; di_famc = famc; di_fams = fams }
-            and famc = { df_pare = []; df_chil = [ ind ] }
-            and fams = { df_pare = [ ind ]; df_chil = [] } in
-            (ind, ind :: indl)
+          match List.find_opt (fun di -> di.di_val = Some ip) indl with
+          | Some ind -> (ind, indl)
+          | None ->
+              let rec ind = { di_val = Some ip; di_famc = famc; di_fams = fams }
+              and famc = { df_pare = []; df_chil = [ ind ] }
+              and fams = { df_pare = [ ind ]; df_chil = [] } in
+              (ind, ind :: indl)
         in
         let fam =
           match prev_ind with
@@ -844,8 +845,8 @@ let print_dag_links conf base p1 p2 rl =
         List.fold_left
           (fun anc_map (p, n) ->
             let pp1, pp2, nn, nt, maxlev =
-              try Iper.Map.find (Driver.get_iper p) anc_map
-              with Not_found -> (pp1, pp2, 0, 0, 0)
+              Option.value ~default:(pp1, pp2, 0, 0, 0)
+                (Iper.Map.find_opt (Driver.get_iper p) anc_map)
             in
             if nn >= max_br then anc_map
             else
@@ -1128,12 +1129,12 @@ let multi_relation_next_txt conf pl2 lim
         List.fold_left
           (fun (acc, n) p ->
             let acc =
-              try
-                "&t" ^<^ string_of_int n ^<^ "="
-                ^<^ (Driver.get_iper p |> Hashtbl.find assoc_txt |> Mutil.encode
-                      :> Adef.escaped_string)
-                ^^^ acc
-              with Not_found -> acc
+              match Hashtbl.find_opt assoc_txt (Driver.get_iper p) with
+              | Some txt ->
+                  "&t" ^<^ string_of_int n ^<^ "="
+                  ^<^ (Mutil.encode txt :> Adef.escaped_string)
+                  ^^^ acc
+              | None -> acc
             in
             let acc =
               "&i" ^<^ string_of_int n ^<^ "="
@@ -1237,12 +1238,10 @@ let print_multi_relation conf base pl lim
   else
     let elem_txt p =
       let content =
-        try
-          let txt = Hashtbl.find assoc_txt (Driver.get_iper p) in
-          if txt <> "" then
+        match Hashtbl.find_opt assoc_txt (Driver.get_iper p) with
+        | Some txt when txt <> "" ->
             "<b>(" ^<^ (Util.escape_html txt :> Adef.safe_string) ^>^ ")</b>"
-          else Adef.safe ""
-        with Not_found -> Adef.safe ""
+        | _ -> Adef.safe ""
       in
       DagDisplay.Item (p, content)
     in
