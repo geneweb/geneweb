@@ -281,74 +281,75 @@ let display_spouse conf base marks paths fam p c =
     Output.print_sstring conf "</b></tt>)")
   else Output.print_string conf (DateDisplay.short_dates_text conf base c)
 
-let total = ref 0
-
-let print_family_locally conf base marks paths max_lev lev p1 c1 e =
-  let rec loop lev p =
+let print_family_locally conf base marks paths max_lev lev p1 c1 e total =
+  let rec loop total lev p =
     if lev < max_lev then
-      ignore
-      @@ Array.fold_left
-           (fun (cnt, first, need_br) ifam ->
-             let fam = Driver.foi base ifam in
-             let c = Gutil.spouse (Driver.get_iper p) fam in
-             let el = Driver.get_children fam in
-             let c = pget conf base c in
-             if need_br then Output.print_sstring conf "<br>";
-             if not first then print_repeat_child conf base p1 c1 p;
-             display_spouse conf base marks paths fam p c;
-             Output.print_sstring conf "\n";
-             let print_children =
-               Driver.get_sex p = Male
-               || not (Collection.Marker.get marks (Driver.get_iper c))
-             in
-             if print_children then
-               Output.printf conf "<ol start=\"%d\">\n" (succ cnt);
-             let cnt =
-               Array.fold_left
-                 (fun cnt ie ->
-                   let e = pget conf base ie in
-                   if print_children then (
-                     Output.print_sstring conf "<li type=\"A\"> ";
-                     print_child conf base p c e;
-                     Output.print_sstring conf "\n";
-                     incr total;
-                     if succ lev = max_lev then
-                       Array.iteri
-                         (fun i ifam ->
-                           let fam = Driver.foi base ifam in
-                           let c1 = Gutil.spouse ie fam in
-                           let el = Driver.get_children fam in
-                           let c1 = pget conf base c1 in
-                           if i <> 0 then (
-                             Output.print_sstring conf "<br>";
-                             print_repeat_child conf base p c e);
-                           display_spouse conf base marks paths fam e c1;
-                           if Array.length el <> 0 then
-                             Output.print_sstring conf ".....";
-                           Output.print_sstring conf "\n")
-                         (Driver.get_family (pget conf base ie))
-                     else loop (succ lev) e);
-                   succ cnt)
-                 cnt el
-             in
-             if print_children then Output.print_sstring conf "</ol>\n";
-             (cnt, false, not print_children))
-           (0, true, false) (Driver.get_family p)
+      let _, _, _, total =
+        Array.fold_left
+          (fun (cnt, first, need_br, total) ifam ->
+            let fam = Driver.foi base ifam in
+            let c = Gutil.spouse (Driver.get_iper p) fam in
+            let el = Driver.get_children fam in
+            let c = pget conf base c in
+            if need_br then Output.print_sstring conf "<br>";
+            if not first then print_repeat_child conf base p1 c1 p;
+            display_spouse conf base marks paths fam p c;
+            Output.print_sstring conf "\n";
+            let print_children =
+              Driver.get_sex p = Male
+              || not (Collection.Marker.get marks (Driver.get_iper c))
+            in
+            if print_children then
+              Output.printf conf "<ol start=\"%d\">\n" (succ cnt);
+            let cnt, total =
+              Array.fold_left
+                (fun (cnt, total) ie ->
+                  let e = pget conf base ie in
+                  let total =
+                    if print_children then (
+                      Output.print_sstring conf "<li type=\"A\"> ";
+                      print_child conf base p c e;
+                      Output.print_sstring conf "\n";
+                      let total = total + 1 in
+                      if succ lev = max_lev then (
+                        Array.iteri
+                          (fun i ifam ->
+                            let fam = Driver.foi base ifam in
+                            let c1 = Gutil.spouse ie fam in
+                            let el = Driver.get_children fam in
+                            let c1 = pget conf base c1 in
+                            if i <> 0 then (
+                              Output.print_sstring conf "<br>";
+                              print_repeat_child conf base p c e);
+                            display_spouse conf base marks paths fam e c1;
+                            if Array.length el <> 0 then
+                              Output.print_sstring conf ".....";
+                            Output.print_sstring conf "\n")
+                          (Driver.get_family (pget conf base ie));
+                        total)
+                      else loop total (succ lev) e)
+                    else total
+                  in
+                  (succ cnt, total))
+                (cnt, total) el
+            in
+            if print_children then Output.print_sstring conf "</ol>\n";
+            (cnt, false, not print_children, total))
+          (0, true, false, total) (Driver.get_family p)
+      in
+      total
+    else total
   in
-  loop lev e
-
-let last_label = ref (Adef.escaped "")
+  loop total lev e
 
 let print_family conf base marks paths max_lev lev p =
   if lev <> 0 then (
     Output.print_sstring conf "<tt><b>";
     Output.print_string conf (label_of_path paths p);
     Output.print_sstring conf "</b></tt>.<br>");
-  let lab = label_of_path paths p in
-  if lab < !last_label then failwith "print_family" else last_label := lab;
-  ignore
+  snd
   @@ Array.fold_left
-       (fun cnt ifam ->
+       (fun (cnt, total) ifam ->
          let fam = Driver.foi base ifam in
          let c = Gutil.spouse (Driver.get_iper p) fam in
          let el = Driver.get_children fam in
@@ -360,50 +361,55 @@ let print_family conf base marks paths max_lev lev p =
          Output.print_sstring conf {|<ol start="|};
          Output.print_sstring conf (succ cnt |> string_of_int);
          Output.print_sstring conf {|">|};
-         let cnt =
+         let cnt, total =
            Array.fold_left
-             (fun cnt ie ->
+             (fun (cnt, total) ie ->
                let e = pget conf base ie in
-               if
-                 Driver.get_sex p = Male
-                 || not (Collection.Marker.get marks (Driver.get_iper c))
-               then (
-                 Output.print_sstring conf {|<li type="A">|};
-                 print_child conf base p c e;
-                 incr total;
-                 Output.print_sstring conf " ";
-                 if labelled conf base marks max_lev lev ie then (
-                   Output.print_sstring conf " =&gt; <tt><b>";
-                   Output.print_string conf (label_of_path paths e);
-                   Output.print_sstring conf "</b></tt> ")
-                 else if succ lev = max_lev then
-                   Array.iter
-                     (fun ifam ->
-                       let fam = Driver.foi base ifam in
-                       let c = Gutil.spouse ie fam in
-                       let el = Driver.get_children fam in
-                       let c = pget conf base c in
-                       display_spouse conf base marks paths fam e c;
-                       if Array.length el <> 0 then
-                         Output.print_sstring conf ".....";
-                       Output.print_sstring conf "\n")
-                     (Driver.get_family (pget conf base ie))
-                 else
-                   print_family_locally conf base marks paths max_lev (succ lev)
-                     p c e);
-               succ cnt)
-             cnt el
+               let total =
+                 if
+                   Driver.get_sex p = Male
+                   || not (Collection.Marker.get marks (Driver.get_iper c))
+                 then (
+                   Output.print_sstring conf {|<li type="A">|};
+                   print_child conf base p c e;
+                   let total = total + 1 in
+                   Output.print_sstring conf " ";
+                   if labelled conf base marks max_lev lev ie then (
+                     Output.print_sstring conf " =&gt; <tt><b>";
+                     Output.print_string conf (label_of_path paths e);
+                     Output.print_sstring conf "</b></tt> ";
+                     total)
+                   else if succ lev = max_lev then (
+                     Array.iter
+                       (fun ifam ->
+                         let fam = Driver.foi base ifam in
+                         let c = Gutil.spouse ie fam in
+                         let el = Driver.get_children fam in
+                         let c = pget conf base c in
+                         display_spouse conf base marks paths fam e c;
+                         if Array.length el <> 0 then
+                           Output.print_sstring conf ".....";
+                         Output.print_sstring conf "\n")
+                       (Driver.get_family (pget conf base ie));
+                     total)
+                   else
+                     print_family_locally conf base marks paths max_lev
+                       (succ lev) p c e total)
+                 else total
+               in
+               (succ cnt, total))
+             (cnt, total) el
          in
          Output.print_sstring conf "</ol>";
-         cnt)
-       0 (Driver.get_family p)
+         (cnt, total))
+       (0, 0) (Driver.get_family p)
 
 let print_families conf base marks paths max_lev =
-  let rec loop lev p =
-    if lev < max_lev then (
-      print_family conf base marks paths max_lev lev p;
-      Array.iter
-        (fun ifam ->
+  let rec loop total lev p =
+    if lev < max_lev then
+      let total = total + print_family conf base marks paths max_lev lev p in
+      Array.fold_left
+        (fun total ifam ->
           let fam = Driver.foi base ifam in
           let c = Gutil.spouse (Driver.get_iper p) fam in
           let el = Driver.get_children fam in
@@ -412,15 +418,18 @@ let print_families conf base marks paths max_lev =
             Driver.get_sex p = Male
             || not (Collection.Marker.get marks (Driver.get_iper c))
           then
-            Array.iter
-              (fun ie ->
+            Array.fold_left
+              (fun total ie ->
                 let e = pget conf base ie in
                 if labelled conf base marks max_lev lev ie then
-                  loop (succ lev) e)
-              el)
-        (Driver.get_family p))
+                  loop total (succ lev) e
+                else total)
+              total el
+          else total)
+        total (Driver.get_family p)
+    else total
   in
-  loop 0
+  loop 0 0
 
 let display_descendants_with_numbers conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -445,7 +454,6 @@ let display_descendants_with_numbers conf base max_level ancestor =
   in
   let paths = Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) [] in
   Hutil.header conf title;
-  total := 0;
   Output.print_string conf (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
   (if authorized_age conf base p then
@@ -457,12 +465,12 @@ let display_descendants_with_numbers conf base max_level ancestor =
   Output.print_sstring conf ".<p>";
   mark_descendants conf base marks max_level (Driver.get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
-  print_families conf base marks paths max_level ancestor;
-  if !total > 1 then (
+  let total = print_families conf base marks paths max_level ancestor in
+  if total > 1 then (
     Output.print_sstring conf "<p>";
     Output.printf conf "%s%s %d %s"
       (Utf8.capitalize_fst (transl conf "total"))
-      (Util.transl conf ":") !total
+      (Util.transl conf ":") total
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
     if max_level > 1 then
       Output.printf conf " (%s)" (transl conf "spouses not included");
