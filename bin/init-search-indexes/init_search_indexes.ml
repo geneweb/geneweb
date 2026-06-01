@@ -1,17 +1,17 @@
 let initialize_search_indexes database =
-  let on_lock_error () =
-    Lock.print_try_again ();
-    raise Exit
-  in
   Gwdb.load_persons_array database;
   Gwdb.load_strings_array database;
-  let database =
-    Gwdb.initialize_lowercase_name_index ~on_lock_error ~kind:`First_name
-      database
-  in
-  let database =
-    Gwdb.initialize_lowercase_name_index ~on_lock_error ~kind:`Surname database
-  in
+  Gwdb.sync ~save_mem:false
+    ~tasks:
+      [
+        (fun () -> Geneweb.Caches.write_caches database);
+        (fun () ->
+          let conf =
+            Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname database)
+          in
+          Geneweb.Sosa_cache.write_static_sosa_cache ~conf ~base:database);
+      ]
+    database;
   Gwdb.clear_persons_array database;
   Gwdb.clear_strings_array database
 
@@ -22,8 +22,14 @@ let main () =
     Arg.usage options usage;
     exit 2)
   else
+    let on_lock_error () =
+      Lock.print_try_again ();
+      raise Exit
+    in
     Arg.parse options
       (fun database ->
+        Lock.control (Files.lock_file database) false ~onerror:on_lock_error
+        @@ fun () ->
         let database =
           let () = Secure.set_base_dir @@ Filename.dirname database in
           try Gwdb.open_base database
