@@ -296,110 +296,160 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
              | Right _ -> false)
            d.Dag2html.dag
     in
+    let spouses_of n =
+      match n.Dag2html.valu with
+      | Left ip ->
+          if n.chil <> [] && (spouse_on || n.pare = []) && not invert then
+            List.fold_left
+              (fun (list, vcs) id ->
+                let cn = d.Dag2html.dag.(Dag2html.int_of_idag id) in
+                match cn.Dag2html.valu with
+                | Left cip -> (
+                    match Driver.get_parents (Util.pget conf base cip) with
+                    | Some ifam ->
+                        let cpl = Driver.foi base ifam in
+                        if ip = Driver.get_father cpl then
+                          if List.mem_assoc (Driver.get_mother cpl) list then
+                            (list, vcs)
+                          else ((Driver.get_mother cpl, Some ifam) :: list, vcs)
+                        else if ip = Driver.get_mother cpl then
+                          if List.mem_assoc (Driver.get_father cpl) list then
+                            (list, vcs)
+                          else ((Driver.get_father cpl, Some ifam) :: list, vcs)
+                        else (list, vcs)
+                    | None -> (list, vcs))
+                | Right _ -> (
+                    match other_left_parent cn ip with
+                    | Some sp_ip
+                      when (not (Iper.Set.mem sp_ip local_spouse_iperse))
+                           && not (List.mem_assoc sp_ip list) ->
+                        let p = Util.pget conf base ip in
+                        let ifam_opt =
+                          Array.fold_left
+                            (fun acc ifam ->
+                              if acc <> None then acc
+                              else
+                                let cpl = Driver.foi base ifam in
+                                if Geneweb_db.Gutil.spouse ip cpl = sp_ip then
+                                  Some ifam
+                                else None)
+                            None (Driver.get_family p)
+                        in
+                        ((sp_ip, ifam_opt) :: list, Iper.Set.add sp_ip vcs)
+                    | _ -> (list, vcs)))
+              ([], Iper.Set.empty) n.chil
+          else if n.chil = [] then
+            (* Childless leaf: spl (relation-path terminal spouses, e.g. m=RL
+             endpoints i3/i4) has priority to keep m=RL output unchanged. When
+             spl is empty (m=RLM, m=DAG) and spouse display is on, fall back to
+             the database families so childless leaves still expose their
+             spouses inline; spouses already in [set] are dropped downstream. *)
+            let from_spl = try [ List.assq ip spl ] with Not_found -> [] in
+            if from_spl <> [] then (from_spl, Iper.Set.empty)
+            else if spouse_on then
+              let fams = Driver.get_family (Util.pget conf base ip) in
+              let len = Array.length fams in
+              if len = 0 then ([], Iper.Set.empty)
+              else
+                let ifam = fams.(len - 1) in
+                let fam = Driver.foi base ifam in
+                match (Driver.get_divorce fam, Driver.get_separation fam) with
+                | Def.Divorced _, _ | _, Def.Separated _ -> ([], Iper.Set.empty)
+                | _ ->
+                    ( [ (Geneweb_db.Gutil.spouse ip fam, Some ifam) ],
+                      Iper.Set.empty )
+            else ([], Iper.Set.empty)
+          else ([], Iper.Set.empty)
+      | _ -> ([], Iper.Set.empty)
+    in
+    let skip vcs ips =
+      Iper.Set.mem ips set_lookup
+      && (not (is_suppressed ips))
+      && not (Iper.Set.mem ips vcs)
+    in
+    let top =
+      match Util.p_getenv conf.env "top" with
+      | Some ("1" | "on") -> true
+      | _ -> false
+    in
+    let graph_has_spouse, graph_has_spouse_portrait =
+      Array.fold_left
+        (fun (hs, hsp) n ->
+          let spouses, vcs = spouses_of n in
+          let shown =
+            List.filter (fun (ips, _) -> not (skip vcs ips)) spouses
+          in
+          ( hs || shown <> [],
+            hsp
+            || List.exists
+                 (fun (ips, _) ->
+                   Image.get_portrait conf base (Util.pget conf base ips)
+                   |> Option.is_some)
+                 shown ))
+        (false, false) d.Dag2html.dag
+    in
     let indi_txt n =
       match n.Dag2html.valu with
       | Left ip when is_suppressed ip -> Adef.safe ""
       | Left ip ->
           let p = Util.pget conf base ip in
+          let spouses, via_connector_iperse = spouses_of n in
+          let shown =
+            List.filter
+              (fun (ips, _) -> not (skip via_connector_iperse ips))
+              spouses
+          in
+          let block ~head ~img_first ~reserve pe =
+            let line =
+              nowrap (head ^^^ string_of_item conf base (elem_txt pe))
+            in
+            let img = image_txt ~reserve conf base pe in
+            if img_first then img ^^^ line else line ^^^ img
+          in
+          let spouse (ips, ifamo) =
+            let ps = Util.pget conf base ips in
+            let auth =
+              Util.authorized_age conf base p
+              && Util.authorized_age conf base ps
+            in
+            let md =
+              match ifamo with
+              | Some ifam when auth ->
+                  DateDisplay.short_marriage_date_text conf base
+                    (Driver.foi base ifam) p ps
+              | _ -> Adef.safe ""
+            in
+            "<br>"
+            ^<^ block
+                  ~head:(("&amp;" ^<^ md) ^>^ " ")
+                  ~img_first:false ~reserve:graph_has_spouse_portrait ps
+          in
+          let main =
+            block ~head:(Adef.safe "") ~img_first:true
+              ~reserve:graph_has_portrait p
+          in
           let txt =
-            image_txt ~reserve:graph_has_portrait conf base p
-            ^^^ nowrap (string_of_item conf base (elem_txt p))
+            List.fold_left (fun txt sp -> txt ^^^ spouse sp) main shown
           in
-          let spouses, via_connector_iperse =
-            if n.chil <> [] && (spouse_on || n.pare = []) && not invert then
-              List.fold_left
-                (fun (list, vcs) id ->
-                  let cn = d.Dag2html.dag.(Dag2html.int_of_idag id) in
-                  match cn.Dag2html.valu with
-                  | Left cip -> (
-                      match Driver.get_parents (Util.pget conf base cip) with
-                      | Some ifam ->
-                          let cpl = Driver.foi base ifam in
-                          if ip = Driver.get_father cpl then
-                            if List.mem_assoc (Driver.get_mother cpl) list then
-                              (list, vcs)
-                            else
-                              ((Driver.get_mother cpl, Some ifam) :: list, vcs)
-                          else if ip = Driver.get_mother cpl then
-                            if List.mem_assoc (Driver.get_father cpl) list then
-                              (list, vcs)
-                            else
-                              ((Driver.get_father cpl, Some ifam) :: list, vcs)
-                          else (list, vcs)
-                      | None -> (list, vcs))
-                  | Right _ -> (
-                      match other_left_parent cn ip with
-                      | Some sp_ip
-                        when (not (Iper.Set.mem sp_ip local_spouse_iperse))
-                             && not (List.mem_assoc sp_ip list) ->
-                          let p = Util.pget conf base ip in
-                          let ifam_opt =
-                            Array.fold_left
-                              (fun acc ifam ->
-                                if acc <> None then acc
-                                else
-                                  let cpl = Driver.foi base ifam in
-                                  if Geneweb_db.Gutil.spouse ip cpl = sp_ip then
-                                    Some ifam
-                                  else None)
-                              None (Driver.get_family p)
-                          in
-                          ((sp_ip, ifam_opt) :: list, Iper.Set.add sp_ip vcs)
-                      | _ -> (list, vcs)))
-                ([], Iper.Set.empty) n.chil
-            else if n.chil = [] then
-              (* Childless leaf: spl (relation-path terminal spouses, e.g. m=RL
-             endpoints i3/i4) has priority to keep m=RL output unchanged. When
-             spl is empty (m=RLM, m=DAG) and spouse display is on, fall back to
-             the database families so childless leaves still expose their
-             spouses inline; spouses already in [set] are dropped downstream. *)
-              (* TODO inline spouses are stacked in DB family order and each
-               carries its portrait; review ordering and spouse positionning
-               coherence for the multi-spouse case. *)
-              let from_spl = try [ List.assq ip spl ] with Not_found -> [] in
-              if from_spl <> [] then (from_spl, Iper.Set.empty)
-              else if spouse_on then
-                let p = Util.pget conf base ip in
-                let l =
-                  Array.fold_left
-                    (fun list ifam ->
-                      let cpl = Driver.foi base ifam in
-                      let sp_ip = Geneweb_db.Gutil.spouse ip cpl in
-                      if List.mem_assoc sp_ip list then list
-                      else (sp_ip, Some ifam) :: list)
-                    [] (Driver.get_family p)
-                in
-                (l, Iper.Set.empty)
-              else ([], Iper.Set.empty)
-            else ([], Iper.Set.empty)
+          let spouse_shown_elsewhere =
+            Array.exists
+              (fun ifam ->
+                Iper.Set.mem
+                  (Geneweb_db.Gutil.spouse ip (Driver.foi base ifam))
+                  set_lookup)
+              (Driver.get_family p)
           in
-          List.fold_left
-            (fun txt (ips, ifamo) ->
-              let skip =
-                Iper.Set.mem ips set_lookup
-                && (not (is_suppressed ips))
-                && not (Iper.Set.mem ips via_connector_iperse)
-              in
-              if skip then txt
-              else
-                let ps = Util.pget conf base ips in
-                let auth =
-                  Util.authorized_age conf base p
-                  && Util.authorized_age conf base ps
-                in
-                let md =
-                  match ifamo with
-                  | Some ifam when auth ->
-                      DateDisplay.short_marriage_date_text conf base
-                        (Driver.foi base ifam) p ps
-                  | _ -> Adef.safe ""
-                in
-                txt ^^^ "<br>"
-                ^<^ nowrap
-                      ("&amp;" ^<^ md ^^^ " "
-                      ^<^ string_of_item conf base (elem_txt ps))
-                ^^^ image_txt conf base ps)
-            txt spouses
+          if
+            shown <> [] || (not graph_has_spouse)
+            || ((not top) && spouse_shown_elsewhere)
+          then txt
+          else
+            let slot =
+              if graph_has_spouse_portrait then
+                Adef.safe {|<div class="dag-img-slot"></div>|}
+              else Adef.safe ""
+            in
+            (txt ^>^ "<br>&nbsp;") ^^^ slot
       | Right _ -> Adef.safe "&nbsp;"
     in
     Dag2html.html_table_struct indi_ip indi_txt vbar_txt phony d t
@@ -607,6 +657,10 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
         | _ -> "")
   | [ "colspan" ] -> VVstring (string_of_int colspan)
   | [ "father"; "access" ] -> parents_access_aux conf base td Driver.get_father
+  | [ "flags" ] -> (
+      match td with
+      | TDitem (_ip, _s, t) -> VVstring (t : Adef.safe_string :> string)
+      | _ -> VVstring "")
   | [ "has_next_sibling" ] -> (
       match find_sibling_aux base td true with
       | Some _ -> VVbool true

@@ -40,12 +40,12 @@
   %include;modules/arbre_hi
 %elseif;(e.t="A" or e.t="C" or e.t="T")
   <div class="d-flex flex-column ms-3">
-    <h3 class="display-5 ms-3">%nn;
+    <h1 class="h4 ms-3">%nn;
       %apply;ttl()
-      <%if;(e.t="T" and e.v>2)span%else;div%end;
-        class="text-small text-body-secondary fw-lighter">
-        %apply;togena(e.v)</%if;(e.t="T" and e.v>2)span%else;div%end;>
-    </h3>
+      <%if;((e.t="T" or e.t="A" or e.t="C") and e.v>2)span%else;div%end;%sp;
+        class="fw-lighter">%nn;
+        %apply;togena(e.v)</%if;((e.t="T" or e.t="A" or e.t="C") and e.v>2)span%else;div%end;>
+    </h1>
     %include;modules/arbre_vertical
   </div>
 %else;

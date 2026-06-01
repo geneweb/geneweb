@@ -1299,13 +1299,26 @@ table hr.right { width: 50%; margin-left: 50%; }
 }
 
 /* DAG */
-#dag                          { border-collapse: collapse; }
-#dag td                       { padding: 0; }
-#dag .dag-bar                 { line-height: 1.06; }
-#dag .dag-collapse            { line-height: 0; }
-#dag .dag-cell > div.mx-1     { margin: 2px 0.25rem; }
+#dag {
+  border-collapse: collapse;
+  text-align: center;
+  margin-bottom: 100px;
+}
+#dag.dag-top td { vertical-align: top; }
+#dag.dag-top td.dag-pers { vertical-align: bottom; }
+#dag.dag-bottom td { vertical-align: bottom; }
+#dag td { padding: 0; line-height: 1.06; }
+#dag td:empty { min-width: 0.8em; }
+#dag .dag-date { font-size: 0.80em; color: var(--color-text-secondary, #6c757d); }
+#dag-svg-overlay a.dag-link line { transition: stroke .12s, stroke-width .12s; }
+#dag-svg-overlay a.dag-link:hover line:not([stroke="transparent"]) {
+  stroke: var(--color-link, #0d6efd);
+  stroke-width: 2;
+}
+#dag td > :first-child:has(img) { margin-bottom: 0.2em; }
+#dag td > :last-child:has(img)  { margin-top: 0.2em; }
 #dag .dag-img-slot {
-  min-height: 75px;
+  min-height: 65px;
   display: flex;
   align-items: flex-end;
   justify-content: center;

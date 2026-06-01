@@ -1095,6 +1095,27 @@ let print_aboville conf base max_level p =
   loop_ind 0 (Adef.safe "") p;
   Hutil.trailer conf
 
+let nowrap s = {|<span class="text-nowrap">|} ^<^ s ^>^ "</span>"
+let dag_date s = {|<span class="text-nowrap dag-date">|} ^<^ s ^>^ "</span>"
+
+let person_lines ?(pre = Adef.safe "") ~link conf base p auth =
+  let name =
+    match Util.main_title conf base p with
+    | Some _ -> link (Util.person_title_text conf base p)
+    | None ->
+        let fn = Util.gen_person_text ~sn:false conf base p in
+        let sn =
+          (Driver.p_surname base p |> Util.escape_html :> Adef.safe_string)
+        in
+        link ((nowrap fn ^>^ "<br>") ^^^ nowrap sn)
+  in
+  let name =
+    if (pre :> string) = "" then name else (dag_date pre ^>^ "<br>") ^^^ name
+  in
+  if auth then
+    (name ^>^ "<br>") ^^^ dag_date (DateDisplay.short_dates_text conf base p)
+  else name
+
 let make_tree_hts conf base gv p =
   let sps = Util.get_opt conf "sp" true in
   let img = Util.get_opt conf "im" true in
@@ -1184,8 +1205,7 @@ let make_tree_hts conf base gv p =
                  else if Array.length (Driver.get_children des) = 1 then
                    let u = Util.pget conf base (Driver.get_children des).(0) in
                    let ncol = nb_column 0 (v - 1) u in
-                   ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar None)
-                   :: tdl
+                   ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDnothing) :: tdl
                  else
                    let rec loop tdl i =
                      if i = Array.length (Driver.get_children des) then tdl
@@ -1230,14 +1250,12 @@ let make_tree_hts conf base gv p =
             else Array.length (Driver.get_family p)
           in
           let txt =
-            Util.reference conf base p (Util.person_title_text conf base p)
+            person_lines ~link:(Util.reference conf base p) conf base p auth
           in
           let txt =
-            if auth then txt ^^^ DateDisplay.short_dates_text conf base p
-            else txt
-          in
-          let txt =
-            if img then txt ^^^ DagDisplay.image_txt conf base p else txt
+            if not img then txt
+            else if sps then DagDisplay.image_txt conf base p ^^^ txt
+            else txt ^^^ DagDisplay.image_txt conf base p
           in
           ( (2 * ncol) - 1,
             Dag2html.CenterA,
@@ -1271,22 +1289,15 @@ let make_tree_hts conf base gv p =
                 Util.pget conf base (Gutil.spouse (Driver.get_iper p) fam)
               in
               let s =
-                let sp =
-                  Util.pget conf base (Gutil.spouse (Driver.get_iper p) fam)
+                let md =
+                  if auth then
+                    DateDisplay.short_marriage_date_text conf base fam p sp
+                  else Adef.safe ""
                 in
-                let txt =
-                  Util.reference conf base sp
-                    (Util.person_title_text conf base sp)
-                in
-                let txt =
-                  if auth then txt ^^^ DateDisplay.short_dates_text conf base sp
-                  else txt
-                in
-                "&amp;"
-                ^<^ (if auth then
-                       DateDisplay.short_marriage_date_text conf base fam p sp
-                     else Adef.safe "")
-                ^^^ "&nbsp;" ^<^ txt
+                let pre = ({|<i>|}  ^<^ "&amp;" ^<^ md ^>^ "</i>") in
+                person_lines ~pre
+                  ~link:(Util.reference conf base sp)
+                  conf base sp auth
                 ^^^ DagDisplay.image_txt conf base sp
               in
               ( (2 * ncol) - 1,
@@ -1435,14 +1446,10 @@ let anchored_reference conf base p s =
 
 let get_text conf base p img cgl =
   let auth = Util.authorized_age conf base p in
-  let txt = Util.person_title_text conf base p in
-  let txt =
-    if cgl then (txt :> Adef.safe_string)
-    else Adef.safe (anchored_reference conf base p (txt :> string))
+  let link (s : Adef.safe_string) =
+    if cgl then s else Adef.safe (anchored_reference conf base p (s :> string))
   in
-  let txt =
-    if auth then txt ^^^ DateDisplay.short_dates_text conf base p else txt
-  in
+  let txt = person_lines ~link conf base p auth in
   let has_image = Image.get_portrait conf base p |> Option.is_some in
   if has_image && img then txt ^^^ DagDisplay.image_txt conf base p else txt
 

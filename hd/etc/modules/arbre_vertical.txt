@@ -252,7 +252,7 @@
         %if;not cancel_links;</a>%end;
       </div>
     %end;
-    %if;(xx!=self)<div>|</div>%end;
+    %if;(xx!=self)<div class="py-0">|</div>%end;
   %end;%nl;
 %end;
 %let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;

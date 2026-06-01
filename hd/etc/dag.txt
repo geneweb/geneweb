@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: dag.txt v7.1 20/04/2026 01:59:32 $ -->
+  <!-- $Id: dag.txt v7.1 06/06/2026 05:19:45 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(e.slices="on")[*display by slices/slice width/overlap/total width]0%nn;
@@ -107,73 +107,43 @@
                               hint from the layout
      dag_cell.index           iper string of the person ("-1" for ghost
                               cells — skip clickable navigation in that case)
-     dag_cell.bar_link        href for clickable bars (m=RLM path
-                              suppression); empty when the bar is not a link
+     dag_cell.bar_link        href for clickable bars: re-root navigation
+                              link (m=D/A trees); empty otherwise
 ============================================================================ %)
-<table id="dag" class="mt-2 ms-4">
+<table id="dag" class="mt-2 ms-4%if;(e.m="D") dag-top%elseif;(e.m="A") dag-bottom%end;">
 %foreach;dag_line;
-  <tr class="text-start">
+  <tr>
   %foreach;dag_cell;
-    %( TODO: the stretched-link wrapper below is currently ineffective — empty
-         position-relative container means the ::after has zero click surface.
-         Clickability relies on <a> tags inside %dag_cell.item;.
-         Needs URL inventory of dag callers (m=D/A/RL/RLM/DAG/R, em=R, dag=on…)
-         before deciding: restructure (position-relative on td + nested-link
-         handling), drop the stretched-link block, or coordinate refactor with
-         dagDisplay.ml %)
-    <td class="dag-cell%nn;
-      %if;dag_cell.is_bar; dag-bar%end;%nn;
-      %if;(dag_cell.is_nothing or (dag_cell.text="" and dag_cell.item="" and not dag_cell.is_bar)) dag-collapse%end;%nn;
-      %if;(e.m="D" or e.m="RLM") align-top%elseif;(e.m="A" or e.m="RL") align-bottom%end;
-      %sp;text-%if;(dag_cell.align="left")start%elseif;(dag_cell.align="right")end%else;center%end;"
-      %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;>
-    %if;dag_cell.is_nothing;&nbsp;%nn;
-    %elseif;dag_cell.is_bar;
-      %if;(dag_cell.bar_link!="" and not cancel_links)
-         %( added em!=R here condition because first button_rel is static and does the same
-           No! each vbar has a different action, suppressing a particular path %)
-        <a href="%dag_cell.bar_link;" title="[*suppress this path]"
-          aria-label="[*suppress this path]">│</a>%nn;
-      %else;│%end;
-    %elseif;(dag_cell.text!="")%dag_cell.text;
-    %elseif;(dag_cell.item!="")
-      %if;(line_nbr!=0 and dag_cell.index!="-1")
-        %if;(e.m="RLM" or e.dag="on" or e.em="R")
-          <a href="%prefix;i=%dag_cell.index;" title="[*open this individual page]"></a>
-        %else;
-          %if;(not cancel_links)
-            <div class="position-relative">
-              <a href="%prefix_set.pmod;i=%dag_cell.index;&m=D&t=TV&%foreach;env_binding;%nn;
-                %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
-                   env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;"
-                class="stretched-link" title="[*navigation with this individual]"></a>
-            </div>
-          %end;
-        %end;
-      %end;
-      <div%if;(dag_cell.item!="") class="mx-1"%end;>%dag_cell.item;</div>
-    %else;
-      %( TODO : trouver une condition pour un hr stylisé pour les conjoints %)
-      %if;dag_cell.is_hr_left;
-        <hr class="%left;">%nn;
-      %elseif;dag_cell.is_hr_right;
-        <hr class="%right;">%nn;
+    <td%if;dag_cell.is_bar; class="dag-bar"
+        %elseif;(e.m="D" and e.t="T" and e.sp!="0" and dag_cell.item!="" and dag_cell.flags="") class="dag-pers"%end;
+        %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;>%nn;
+      %if;dag_cell.is_nothing;%elseif;dag_cell.is_bar;
+        %if;(dag_cell.bar_link!="" and not cancel_links)
+          <a href="%dag_cell.bar_link;" title="[*navigation with this individual]"
+            aria-label="[*navigation with this individual]">│</a>%nn;
+        %else;│%end;
+      %elseif;(dag_cell.text!="")%dag_cell.text;
+      %elseif;(dag_cell.item!="")%dag_cell.item;
       %else;
-        <hr class="full">%nn;
+        <hr class="%if;dag_cell.is_hr_left;%left;
+                   %elseif;dag_cell.is_hr_right;%right;
+                   %else;full%end;">%nn;
       %end;
-    %end;
     </td>
   %end;
   </tr>
 %end;
 </table>
-%if;(e.m="RL")
+%if;(e.m="RL" or e.m="RLM")
 %include;copyr
 %end;
 %include;trl
 </div>
 %include;js
-<script defer src="js/dagSvg.js"></script>
+%( TODO: support m=D&t=TV %)
+%if;(not ((e.m!="D" and e.t="V")) and not cancel_links)
+<script defer src="%etc_prefix/js/dagSvg.js?hash=%apply;hash%with;%etc_prefix;js/dagSvg.js%end;"></script>
+%end;
 %query_time;
 </body>
 </html>

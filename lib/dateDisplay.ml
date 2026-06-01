@@ -705,8 +705,7 @@ let short_marriage_date_text conf base fam p1 p2 =
   @@
   if authorized_age conf base p1 && authorized_age conf base p2 then
     match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
-    | Some d ->
-        "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
+    | Some d -> "<small>" ^ prec_year_text conf d ^ "</small>"
     | None -> ""
   else ""
 

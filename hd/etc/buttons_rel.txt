@@ -89,11 +89,14 @@
         title="[*invert] [person/persons]1">
         <i class="fas fa-people-arrows fa-lg fa-fw"></i></a>
     %end;
-    <a href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;"
-      target="_blank">
+    <a href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;">
       <i class="fa fa-shuffle fa-fw" title="[*dag]"></i></a>
+    <a href="%if;(e.top!="1")%url_set.top.1;%else;%url_set.top;%end;">
+      <i class="fa fa-arrow-%if;(e.top="1")down%else;up%end; fa-fw"
+        title="align not inlined couple to the top or center"></i></a>
     <a href="%url_set.cgl.on;" target="_blank">
       <i class="fa fa-link-slash fa-fw" title="[*cancel GeneWeb links]"></i></a>
+      
     %if;(e.m="RLM")
       <a class="ms-2" title="[*add/clear/show/edit the graph]3"
           href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
