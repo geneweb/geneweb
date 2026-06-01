@@ -25,7 +25,6 @@
 
 open Config
 open Def
-open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
@@ -37,38 +36,38 @@ let limit_by_tree conf =
 
 let text_to conf = function
   | 0 ->
-      transl_nth conf "generation/generations" 0
-      |> transl_decline conf "specify"
+      Util.transl_nth conf "generation/generations" 0
+      |> Util.transl_decline conf "specify"
       |> Adef.safe
-  | 1 -> transl conf "to the children" |> Adef.safe
-  | 2 -> transl conf "to the grandchildren" |> Adef.safe
-  | 3 -> transl conf "to the great-grandchildren" |> Adef.safe
+  | 1 -> Util.transl conf "to the children" |> Adef.safe
+  | 2 -> Util.transl conf "to the grandchildren" |> Adef.safe
+  | 3 -> Util.transl conf "to the great-grandchildren" |> Adef.safe
   | i ->
       Printf.sprintf
-        (ftransl conf "upto the %s generation")
-        (transl_nth conf "nth (generation)" i)
+        (Util.ftransl conf "upto the %s generation")
+        (Util.transl_nth conf "nth (generation)" i)
       |> Adef.safe
 
 let text_level conf = function
   | 0 ->
-      transl_nth conf "generation/generations" 0
-      |> transl_decline conf "specify"
+      Util.transl_nth conf "generation/generations" 0
+      |> Util.transl_decline conf "specify"
       |> Adef.safe
-  | 1 -> transl conf "the children" |> Adef.safe
-  | 2 -> transl conf "the grandchildren" |> Adef.safe
-  | 3 -> transl conf "the great-grandchildren" |> Adef.safe
+  | 1 -> Util.transl conf "the children" |> Adef.safe
+  | 2 -> Util.transl conf "the grandchildren" |> Adef.safe
+  | 3 -> Util.transl conf "the great-grandchildren" |> Adef.safe
   | i ->
       Printf.sprintf
-        (ftransl conf "the %s generation")
-        (transl_nth conf "nth (generation)" i)
+        (Util.ftransl conf "the %s generation")
+        (Util.transl_nth conf "nth (generation)" i)
       |> Adef.safe
 
 let descendants_title conf base p h =
-  let s1 = gen_person_text conf base p in
-  let s2 = if h then gen_person_text ~html:false conf base p else s1 in
-  translate_eval
-    (transl_a_of_gr_eq_gen_lev conf
-       (transl conf "descendants")
+  let s1 = Util.gen_person_text conf base p in
+  let s2 = if h then Util.gen_person_text ~html:false conf base p else s1 in
+  Util.translate_eval
+    (Util.transl_a_of_gr_eq_gen_lev conf
+       (Util.transl conf "descendants")
        (s1 :> string)
        (s2 :> string))
   |> Utf8.capitalize_fst |> Output.print_sstring conf
@@ -86,7 +85,7 @@ let display_descendants_level conf base max_level ancestor =
         let enfants = Driver.get_children des in
         Array.fold_left
           (fun list ix ->
-            let x = pget conf base ix in
+            let x = Util.pget conf base ix in
             if Collection.Marker.get mark ix then list
             else
               let _ = Collection.Marker.set mark ix true in
@@ -98,13 +97,13 @@ let display_descendants_level conf base max_level ancestor =
                 then list
                 else x :: list
               else if level < max_level then
-                get_level (succ level) (pget conf base ix) list
+                get_level (succ level) (Util.pget conf base ix) list
               else list)
           list enfants)
       list (Driver.get_family u)
   in
   let len = ref 0 in
-  let list = get_level 1 (pget conf base (Driver.get_iper ancestor)) [] in
+  let list = get_level 1 (Util.pget conf base (Driver.get_iper ancestor)) [] in
   let list =
     List.sort
       (fun p1 p2 ->
@@ -140,21 +139,22 @@ let display_descendants_level conf base max_level ancestor =
     Output.print_sstring conf (string_of_int !len);
     Output.print_sstring conf " ";
     Output.print_sstring conf
-      (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
+      (Util.translate_eval ("@(c)" ^ Util.transl_nth conf "person/persons" 1));
     Output.print_sstring conf ")");
   Output.print_sstring conf ".<p>";
-  print_alphab_list conf
+  Util.print_alphab_list conf
     (fun (p, _) ->
-      if is_hidden p then "?"
+      if Util.is_hidden p then "?"
       else
         String.sub (Driver.p_surname base p)
           (Mutil.initial (Driver.p_surname base p))
           1)
     (fun (p, c) ->
       Output.print_sstring conf " ";
-      Output.print_string conf (referenced_person_title_text conf base p);
+      Output.print_string conf (Util.referenced_person_title_text conf base p);
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
-      if (not (is_hidden p)) && c > 1 then Output.printf conf " <em>(%d)</em>" c;
+      if (not (Util.is_hidden p)) && c > 1 then
+        Output.printf conf " <em>(%d)</em>" c;
       Output.print_sstring conf "\n")
     list;
   Hutil.trailer conf
@@ -168,10 +168,10 @@ let mark_descendants conf base marks max_lev ip =
       Array.iter
         (fun ifam ->
           let el = Driver.get_children (Driver.foi base ifam) in
-          Array.iter (fun e -> loop (succ lev) e (pget conf base e)) el)
+          Array.iter (fun e -> loop (succ lev) e (Util.pget conf base e)) el)
         (Driver.get_family u))
   in
-  loop 0 ip (pget conf base ip)
+  loop 0 ip (Util.pget conf base ip)
 
 let label_descendants conf base marks paths max_lev =
   let rec loop path lev p =
@@ -190,7 +190,7 @@ let label_descendants conf base marks paths max_lev =
                  then (
                    let path = Char.chr (Char.code 'A' + cnt) :: path in
                    Collection.Marker.set paths e path;
-                   loop path (succ lev) (pget conf base e));
+                   loop path (succ lev) (Util.pget conf base e));
                  succ cnt)
                cnt el)
            0 (Driver.get_family p)
@@ -211,14 +211,16 @@ let close_to_end conf base marks max_lev lev p =
           if Driver.get_sex p = Male || not (Collection.Marker.get marks c) then
             if dlev = close_lev then Array.length el = 0
             else
-              Array.for_all (fun e -> short (succ dlev) (pget conf base e)) el
+              Array.for_all
+                (fun e -> short (succ dlev) (Util.pget conf base e))
+                el
           else true)
         (Driver.get_family p)
     in
     short 1 p
 
 let labelled conf base marks max_lev lev ip =
-  let a = pget conf base ip in
+  let a = Util.pget conf base ip in
   Array.length (Driver.get_family a) <> 0
   &&
   match Driver.get_parents a with
@@ -227,7 +229,7 @@ let labelled conf base marks max_lev lev ip =
       let el = Driver.get_children fam in
       Array.exists
         (fun ie ->
-          let e = pget conf base ie in
+          let e = Util.pget conf base ie in
           Array.length (Driver.get_family e) <> 0
           && not (close_to_end conf base marks max_lev lev e))
         el
@@ -249,10 +251,10 @@ let print_child conf base p1 p2 e =
        && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p2)
   then
     Output.print_string conf
-      (referenced_person_text_without_surname conf base e)
+      (Util.referenced_person_text_without_surname conf base e)
   else (
     Output.print_sstring conf " ";
-    Output.print_string conf (referenced_person_text conf base e));
+    Output.print_string conf (Util.referenced_person_text conf base e));
   Output.print_sstring conf "</strong>";
   Output.print_string conf (DateDisplay.short_dates_text conf base e)
 
@@ -263,8 +265,8 @@ let print_repeat_child conf base p1 p2 e =
     && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p1)
     || Driver.get_sex p2 = Male
        && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p2)
-  then Output.print_string conf (gen_person_text ~sn:false conf base e)
-  else Output.print_string conf (gen_person_text conf base e);
+  then Output.print_string conf (Util.gen_person_text ~sn:false conf base e)
+  else Output.print_string conf (Util.gen_person_text conf base e);
   Output.print_sstring conf "</em>"
 
 let display_spouse conf base marks paths fam p c =
@@ -272,7 +274,7 @@ let display_spouse conf base marks paths fam p c =
   Output.print_string conf
     (DateDisplay.short_marriage_date_text conf base fam p c);
   Output.print_sstring conf " <strong> ";
-  Output.print_string conf (referenced_person_text conf base c);
+  Output.print_string conf (Util.referenced_person_text conf base c);
   Output.print_sstring conf "</strong>";
   if Collection.Marker.get marks (Driver.get_iper c) then (
     Output.print_sstring conf " (<b class=\"font-monospace\">";
@@ -289,7 +291,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e total =
             let fam = Driver.foi base ifam in
             let c = Gutil.spouse (Driver.get_iper p) fam in
             let el = Driver.get_children fam in
-            let c = pget conf base c in
+            let c = Util.pget conf base c in
             if need_br then Output.print_sstring conf "<br>";
             if not first then print_repeat_child conf base p1 c1 p;
             display_spouse conf base marks paths fam p c;
@@ -303,7 +305,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e total =
             let cnt, total =
               Array.fold_left
                 (fun (cnt, total) ie ->
-                  let e = pget conf base ie in
+                  let e = Util.pget conf base ie in
                   let total =
                     if print_children then (
                       Output.print_sstring conf "<li type=\"A\"> ";
@@ -316,7 +318,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e total =
                             let fam = Driver.foi base ifam in
                             let c1 = Gutil.spouse ie fam in
                             let el = Driver.get_children fam in
-                            let c1 = pget conf base c1 in
+                            let c1 = Util.pget conf base c1 in
                             if i <> 0 then (
                               Output.print_sstring conf "<br>";
                               print_repeat_child conf base p c e);
@@ -324,7 +326,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e total =
                             if Array.length el <> 0 then
                               Output.print_sstring conf ".....";
                             Output.print_sstring conf "\n")
-                          (Driver.get_family (pget conf base ie));
+                          (Driver.get_family (Util.pget conf base ie));
                         total)
                       else loop total (succ lev) e)
                     else total
@@ -352,9 +354,9 @@ let print_family conf base marks paths max_lev lev p =
          let fam = Driver.foi base ifam in
          let c = Gutil.spouse (Driver.get_iper p) fam in
          let el = Driver.get_children fam in
-         let c = pget conf base c in
+         let c = Util.pget conf base c in
          Output.print_sstring conf "<strong> ";
-         Output.print_string conf (referenced_person_text conf base p);
+         Output.print_string conf (Util.referenced_person_text conf base p);
          Output.print_sstring conf "</strong>";
          display_spouse conf base marks paths fam p c;
          Output.print_sstring conf {|<ol start="|};
@@ -363,7 +365,7 @@ let print_family conf base marks paths max_lev lev p =
          let cnt, total =
            Array.fold_left
              (fun (cnt, total) ie ->
-               let e = pget conf base ie in
+               let e = Util.pget conf base ie in
                let total =
                  if
                    Driver.get_sex p = Male
@@ -385,12 +387,12 @@ let print_family conf base marks paths max_lev lev p =
                          let fam = Driver.foi base ifam in
                          let c = Gutil.spouse ie fam in
                          let el = Driver.get_children fam in
-                         let c = pget conf base c in
+                         let c = Util.pget conf base c in
                          display_spouse conf base marks paths fam e c;
                          if Array.length el <> 0 then
                            Output.print_sstring conf ".....";
                          Output.print_sstring conf "\n")
-                       (Driver.get_family (pget conf base ie));
+                       (Driver.get_family (Util.pget conf base ie));
                      total)
                    else
                      print_family_locally conf base marks paths max_lev
@@ -413,14 +415,14 @@ let print_families conf base marks paths max_lev =
           let fam = Driver.foi base ifam in
           let c = Gutil.spouse (Driver.get_iper p) fam in
           let el = Driver.get_children fam in
-          let c = pget conf base c in
+          let c = Util.pget conf base c in
           if
             Driver.get_sex p = Male
             || not (Collection.Marker.get marks (Driver.get_iper c))
           then
             Array.fold_left
               (fun total ie ->
-                let e = pget conf base ie in
+                let e = Util.pget conf base ie in
                 if labelled conf base marks max_lev lev ie then
                   loop total (succ lev) e
                 else total)
@@ -436,15 +438,15 @@ let display_descendants_with_numbers conf base max_level ancestor =
   let title h =
     if h then descendants_title conf base ancestor h
     else
-      wprint_geneweb_link conf
+      Util.wprint_geneweb_link conf
         ("m=D&i="
          ^ Driver.Iper.to_string (Driver.get_iper ancestor)
          ^ "&v=" ^ string_of_int max_level ^ "&t=G"
         |> Adef.escaped)
-        (let s1 = gen_person_text conf base ancestor in
-         let s2 = gen_person_text ~html:true conf base ancestor in
-         transl_a_of_gr_eq_gen_lev conf
-           (transl conf "descendants")
+        (let s1 = Util.gen_person_text conf base ancestor in
+         let s2 = Util.gen_person_text ~html:true conf base ancestor in
+         Util.transl_a_of_gr_eq_gen_lev conf
+           (Util.transl conf "descendants")
            (s1 : Adef.safe_string :> string)
            (s2 : Adef.safe_string :> string)
          |> Utf8.capitalize_fst |> Adef.safe)
@@ -456,7 +458,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   Hutil.header conf title;
   Output.print_string conf (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
-  (if authorized_age conf base p then
+  (if Util.authorized_age conf base p then
      match (Date.od_of_cdate (Driver.get_birth p), Driver.get_death p) with
      | Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
      | _ -> ());
@@ -469,11 +471,11 @@ let display_descendants_with_numbers conf base max_level ancestor =
   if total > 1 then (
     Output.print_sstring conf "<p>";
     Output.printf conf "%s%s %d %s"
-      (Utf8.capitalize_fst (transl conf "total"))
+      (Utf8.capitalize_fst (Util.transl conf "total"))
       (Util.transl conf ":") total
-      (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
+      (Util.translate_eval ("@(c)" ^ Util.transl_nth conf "person/persons" 1));
     if max_level > 1 then
-      Output.printf conf " (%s)" (transl conf "spouses not included");
+      Output.printf conf " (%s)" (Util.transl conf "spouses not included");
     Output.print_sstring conf ".\n");
   Hutil.trailer conf
 
@@ -487,7 +489,7 @@ let print_ref conf base paths p =
       (fun ifam ->
         let c = Gutil.spouse (Driver.get_iper p) (Driver.foi base ifam) in
         if Collection.Marker.get paths c <> [] then (
-          let c = pget conf base c in
+          let c = Util.pget conf base c in
           Output.print_sstring conf " =&gt; ";
           Output.print_string conf
             (Driver.p_first_name base c |> Util.escape_html);
@@ -504,12 +506,12 @@ let print_elem conf base paths precision (n, pll) =
   | [ [ p ] ] ->
       Output.print_sstring conf "<strong>";
       Output.print_string conf
-        (surname_without_particle base n |> Util.escape_html);
+        (Util.surname_without_particle base n |> Util.escape_html);
       Output.print_sstring conf " ";
-      gen_person_text ~sn:false conf base p
-      |> reference conf base p |> Output.print_string conf;
+      Util.gen_person_text ~sn:false conf base p
+      |> Util.reference conf base p |> Output.print_string conf;
       Output.print_sstring conf " ";
-      Output.print_string conf (surname_particle base n |> Util.escape_html);
+      Output.print_string conf (Util.surname_particle base n |> Util.escape_html);
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       print_ref conf base paths p;
@@ -517,8 +519,8 @@ let print_elem conf base paths precision (n, pll) =
   | pll ->
       Output.print_sstring conf "<strong>";
       Output.print_string conf
-        (surname_without_particle base n |> Util.escape_html);
-      Output.print_string conf (surname_particle base n |> Util.escape_html);
+        (Util.surname_without_particle base n |> Util.escape_html);
+      Output.print_string conf (Util.surname_particle base n |> Util.escape_html);
       Output.print_sstring conf "</strong><ul>";
       List.iter
         (fun pl ->
@@ -526,13 +528,13 @@ let print_elem conf base paths precision (n, pll) =
           List.iter
             (fun p ->
               Output.print_sstring conf "<li><strong>";
-              wprint_geneweb_link conf (acces conf base p)
+              Util.wprint_geneweb_link conf (Util.acces conf base p)
                 (Driver.p_first_name base p |> Util.escape_html
                   :> Adef.safe_string);
               Output.print_sstring conf "</strong>";
               if several && precision then (
                 Output.print_sstring conf "<em>";
-                specify_homonymous conf base p true;
+                Util.specify_homonymous conf base p true;
                 Output.print_sstring conf "</em>");
               Output.print_string conf
                 (DateDisplay.short_dates_text conf base p);
@@ -542,7 +544,7 @@ let print_elem conf base paths precision (n, pll) =
       Output.print_sstring conf "</ul>"
 
 let sort_and_display conf base paths precision list =
-  let list = List.map (pget conf base) list in
+  let list = List.map (Util.pget conf base) list in
   let list =
     List.sort
       (fun p1 p2 ->
@@ -591,10 +593,11 @@ let display_descendant_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title h =
     let txt =
-      transl conf "index of the descendants" |> Utf8.capitalize_fst |> Adef.safe
+      Util.transl conf "index of the descendants"
+      |> Utf8.capitalize_fst |> Adef.safe
     in
     if not h then
-      wprint_geneweb_link conf
+      Util.wprint_geneweb_link conf
         ("m=D&i="
          ^ Driver.Iper.to_string (Driver.get_iper ancestor)
          ^ "&v=" ^ string_of_int max_level ^ "&t=C"
@@ -612,13 +615,14 @@ let display_descendant_index conf base max_level ancestor =
   let list =
     Collection.fold
       (fun acc i ->
-        let p = pget conf base i in
+        let p = Util.pget conf base i in
         if Collection.Marker.get paths i <> [] then
           if
             Driver.p_first_name base p <> "?"
             && Driver.p_surname base p <> "?"
             && Driver.p_first_name base p <> "x"
-            && ((not (is_hide_names conf p)) || authorized_age conf base p)
+            && ((not (Util.is_hide_names conf p))
+               || Util.authorized_age conf base p)
           then Driver.get_iper p :: acc
           else acc
         else acc)
@@ -630,7 +634,7 @@ let display_descendant_index conf base max_level ancestor =
 let display_spouse_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title _ =
-    transl conf "index of the spouses (non descendants)"
+    Util.transl conf "index of the spouses (non descendants)"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
@@ -643,7 +647,7 @@ let display_spouse_index conf base max_level ancestor =
   let list =
     Collection.fold
       (fun acc i ->
-        let p = pget conf base i in
+        let p = Util.pget conf base i in
         if Collection.Marker.get paths i <> [] then
           if
             Driver.p_first_name base p <> "?"
@@ -656,13 +660,13 @@ let display_spouse_index conf base max_level ancestor =
                   Gutil.spouse (Driver.get_iper p) (Driver.foi base ifam)
                 in
                 if Collection.Marker.get paths c = [] then
-                  let c = pget conf base c in
+                  let c = Util.pget conf base c in
                   if
                     Driver.p_first_name base c <> "?"
                     && Driver.p_surname base c <> "?"
                     && Driver.p_first_name base p <> "x"
-                    && ((not (is_hide_names conf c))
-                       || authorized_age conf base c)
+                    && ((not (Util.is_hide_names conf c))
+                       || Util.authorized_age conf base c)
                     && not (List.mem (Driver.get_iper c) acc)
                   then Driver.get_iper c :: acc
                   else acc
@@ -689,29 +693,29 @@ let display_spouse_index conf base max_level ancestor =
 let print_desc_table_header conf =
   let nb_col = ref 2 in
   Output.print_sstring conf {|<tr class="descends_table_header"><th>|};
-  transl conf "n° d'Aboville"
+  Util.transl conf "n° d'Aboville"
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</th><th>";
-  transl_nth conf "person/persons" 0
+  Util.transl_nth conf "person/persons" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</th>";
   let aux get txt =
-    if p_getenv conf.env get = Some "on" then (
+    if Util.p_getenv conf.env get = Some "on" then (
       Output.print_sstring conf "<th>";
       incr nb_col;
       txt |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf "</th>")
   in
-  aux "birth" (transl conf "date of birth");
-  aux "birth_place" (transl conf "where born");
-  aux "marr" (transl_nth conf "spouse/spouses" 1);
-  aux "marr_date" (transl conf "date of marriage");
-  aux "marr_place" (transl conf "where married");
-  aux "child" (transl conf "nb children");
-  aux "death" (transl conf "date of death");
-  aux "death_place" (transl conf "where dead");
-  aux "death_age" (transl conf "age at death");
-  aux "occu" (transl_nth conf "occupation/occupations" 1);
+  aux "birth" (Util.transl conf "date of birth");
+  aux "birth_place" (Util.transl conf "where born");
+  aux "marr" (Util.transl_nth conf "spouse/spouses" 1);
+  aux "marr_date" (Util.transl conf "date of marriage");
+  aux "marr_place" (Util.transl conf "where married");
+  aux "child" (Util.transl conf "nb children");
+  aux "death" (Util.transl conf "date of death");
+  aux "death_place" (Util.transl conf "where dead");
+  aux "death_age" (Util.transl conf "age at death");
+  aux "occu" (Util.transl_nth conf "occupation/occupations" 1);
   Output.print_sstring conf "</tr>";
   !nb_col
 
@@ -733,8 +737,8 @@ let print_person_table conf base p lab =
   let birth, birth_place =
     if
       p_auth
-      && (p_getenv conf.env "birth" = Some "on"
-         || p_getenv conf.env "birth_place" = Some "on")
+      && (Util.p_getenv conf.env "birth" = Some "on"
+         || Util.p_getenv conf.env "birth_place" = Some "on")
     then
       let date, place = Util.get_approx_birth_date_place conf base p in
       let date =
@@ -748,8 +752,8 @@ let print_person_table conf base p lab =
   let death, death_place =
     if
       p_auth
-      && (p_getenv conf.env "death" = Some "on"
-         || p_getenv conf.env "death_place" = Some "on")
+      && (Util.p_getenv conf.env "death" = Some "on"
+         || Util.p_getenv conf.env "death_place" = Some "on")
     then
       let date, place = Util.get_approx_death_date_place conf base p in
       let date =
@@ -764,9 +768,9 @@ let print_person_table conf base p lab =
   let rowspan =
     if
       nb_families > 1
-      && (p_getenv conf.env "marr" = Some "on"
-         || p_getenv conf.env "marr_date" = Some "on"
-         || p_getenv conf.env "marr_place" = Some "on")
+      && (Util.p_getenv conf.env "marr" = Some "on"
+         || Util.p_getenv conf.env "marr_date" = Some "on"
+         || Util.p_getenv conf.env "marr_place" = Some "on")
     then Adef.safe ("rowspan=\"" ^ string_of_int nb_families ^ "\"")
     else Adef.safe ""
   in
@@ -784,16 +788,16 @@ let print_person_table conf base p lab =
   td (fun () ->
       ImageDisplay.print_placeholder_gendered_portrait conf p 11;
       Output.print_sstring conf " ";
-      Output.print_string conf (referenced_person_title_text conf base p);
+      Output.print_string conf (Util.referenced_person_title_text conf base p);
       Output.print_sstring conf "&nbsp;");
-  if p_getenv conf.env "birth" = Some "on" then
+  if Util.p_getenv conf.env "birth" = Some "on" then
     td (fun () -> Output.print_string conf birth);
-  if p_getenv conf.env "birth_place" = Some "on" then
+  if Util.p_getenv conf.env "birth_place" = Some "on" then
     td (fun () ->
         Output.print_string conf birth_place;
         Output.print_sstring conf "&nbsp;");
   let aux ?alt ?attr gets f =
-    if List.exists (fun get -> p_getenv conf.env get = Some "on") gets then (
+    if List.exists (fun get -> Util.p_getenv conf.env get = Some "on") gets then (
       Output.print_sstring conf "<td";
       (match attr with
       | Some attr ->
@@ -810,7 +814,9 @@ let print_person_table conf base p lab =
       Output.print_sstring conf ">";
       if nb_families > 0 then
         let fam = Driver.foi base (Driver.get_family p).(0) in
-        let spouse = pget conf base (Gutil.spouse (Driver.get_iper p) fam) in
+        let spouse =
+          Util.pget conf base (Gutil.spouse (Driver.get_iper p) fam)
+        in
         f fam spouse
       else Output.print_sstring conf "&nbsp;";
       Output.print_sstring conf "</td>")
@@ -819,11 +825,14 @@ let print_person_table conf base p lab =
   aux [ "marr" ] (fun _fam spouse ->
       ImageDisplay.print_placeholder_gendered_portrait conf spouse 11;
       Output.print_sstring conf " ";
-      Output.print_string conf (referenced_person_text conf base spouse);
+      Output.print_string conf (Util.referenced_person_text conf base spouse);
       Output.print_sstring conf " &nbsp;");
   aux [ "marr_date" ] (fun fam spouse ->
       let mdate =
-        if authorized_age conf base p && authorized_age conf base spouse then
+        if
+          Util.authorized_age conf base p
+          && Util.authorized_age conf base spouse
+        then
           match Date.od_of_cdate (Driver.get_marriage fam) with
           | Some d -> DateDisplay.string_slash_of_date conf d
           | None -> Adef.safe "&nbsp;"
@@ -831,7 +840,8 @@ let print_person_table conf base p lab =
       in
       Output.print_string conf mdate);
   aux [ "marr_place" ] (fun fam spouse ->
-      if authorized_age conf base p && authorized_age conf base spouse then
+      if Util.authorized_age conf base p && Util.authorized_age conf base spouse
+      then
         Driver.get_marriage_place fam
         |> Driver.sou base |> Util.string_of_place conf
         |> Output.print_string conf;
@@ -842,13 +852,13 @@ let print_person_table conf base p lab =
       Output.print_sstring conf
         (Driver.get_children fam |> Array.length |> string_of_int);
       Output.print_sstring conf " &nbsp;");
-  if p_getenv conf.env "death" = Some "on" then
+  if Util.p_getenv conf.env "death" = Some "on" then
     td (fun () -> Output.print_string conf death);
-  if p_getenv conf.env "death_place" = Some "on" then
+  if Util.p_getenv conf.env "death_place" = Some "on" then
     td (fun () ->
         Output.print_string conf death_place;
         Output.print_sstring conf " &nbsp;");
-  if p_getenv conf.env "death_age" = Some "on" then
+  if Util.p_getenv conf.env "death_age" = Some "on" then
     td (fun () ->
         (if p_auth then
            match Gutil.get_birth_death_date p with
@@ -857,7 +867,7 @@ let print_person_table conf base p lab =
                approx )
              when d1 <> d2 ->
                if not ((not approx) && d1.prec = Sure && d2.prec = Sure) then (
-                 transl_decline conf "possibly (date)" ""
+                 Util.transl_decline conf "possibly (date)" ""
                  |> Output.print_sstring conf;
                  Output.print_sstring conf " ");
                Date.time_elapsed d1 d2
@@ -865,7 +875,7 @@ let print_person_table conf base p lab =
                |> Output.print_string conf
            | _ -> ());
         Output.print_sstring conf " &nbsp;");
-  if p_getenv conf.env "occu" = Some "on" then
+  if Util.p_getenv conf.env "occu" = Some "on" then
     td (fun () ->
         if p_auth then
           Driver.get_occupation p |> Driver.sou base |> Util.escape_html
@@ -877,12 +887,12 @@ let print_person_table conf base p lab =
   (* un <tr> afin d'avoir une mise en page utilisant des rowspan.   *)
   if nb_families > 1 then
     if
-      p_getenv conf.env "marr" = Some "on"
-      || p_getenv conf.env "marr_date" = Some "on"
-      || p_getenv conf.env "marr_place" = Some "on"
+      Util.p_getenv conf.env "marr" = Some "on"
+      || Util.p_getenv conf.env "marr_date" = Some "on"
+      || Util.p_getenv conf.env "marr_place" = Some "on"
     then
       let aux ?attr i get fn =
-        if p_getenv conf.env get = Some "on" then (
+        if Util.p_getenv conf.env get = Some "on" then (
           Output.print_sstring conf {|<td style="border-top:none; |};
           if nb_families - 1 <> i then
             Output.print_sstring conf "border-bottom:none;";
@@ -903,16 +913,21 @@ let print_person_table conf base p lab =
       in
       for i = 1 to nb_families - 1 do
         let cpl = Driver.foi base (Driver.get_family p).(i) in
-        let spouse = pget conf base (Gutil.spouse (Driver.get_iper p) cpl) in
+        let spouse =
+          Util.pget conf base (Gutil.spouse (Driver.get_iper p) cpl)
+        in
         let fam = Driver.foi base (Driver.get_family p).(i) in
         Output.print_sstring conf "<tr>\n";
         aux i "marr" (fun () ->
             ImageDisplay.print_placeholder_gendered_portrait conf spouse 11;
             Output.print_sstring conf " ";
-            Output.print_string conf (referenced_person_text conf base spouse);
+            Output.print_string conf
+              (Util.referenced_person_text conf base spouse);
             Output.print_sstring conf "&nbsp;");
         aux i "marr_date" (fun () ->
-            if authorized_age conf base p && authorized_age conf base spouse
+            if
+              Util.authorized_age conf base p
+              && Util.authorized_age conf base spouse
             then
               let fam = Driver.foi base (Driver.get_family p).(i) in
               match Date.od_of_cdate (Driver.get_marriage fam) with
@@ -922,7 +937,9 @@ let print_person_table conf base p lab =
               | None -> Output.print_sstring conf "&nbsp;"
             else Output.print_sstring conf "&nbsp;");
         aux i "marr_place" (fun () ->
-            if authorized_age conf base p && authorized_age conf base spouse
+            if
+              Util.authorized_age conf base p
+              && Util.authorized_age conf base spouse
             then
               Driver.get_marriage_place cpl
               |> Driver.sou base |> Util.string_of_place conf
@@ -968,7 +985,8 @@ let build_desc conf base l : ('a * Adef.safe_string) list =
               Array.fold_left
                 (fun accu ip ->
                   let _ = incr cnt in
-                  (pget conf base ip, lab ^>^ string_of_int !cnt ^ ".") :: accu)
+                  (Util.pget conf base ip, lab ^>^ string_of_int !cnt ^ ".")
+                  :: accu)
                 accu (Driver.get_children fam))
             accu (Driver.get_family p)
         in
@@ -1003,12 +1021,12 @@ let display_descendant_with_table conf base max_lev p =
           let nl = build_desc conf base refl in
           loop (lev + 1) nb_col true nl nl
     | (p, (lab : Adef.safe_string)) :: q ->
-        if first && lev > 0 && p_getenv conf.env "gen" = Some "on" then (
+        if first && lev > 0 && Util.p_getenv conf.env "gen" = Some "on" then (
           Output.print_sstring conf "<tr>";
           Output.print_sstring conf {|<th align="left" colspan="|};
           Output.print_sstring conf (string_of_int nb_col);
           Output.print_sstring conf {|">|};
-          transl_nth conf "generation/generations" 0
+          Util.transl_nth conf "generation/generations" 0
           |> Utf8.capitalize_fst |> Output.print_sstring conf;
           Output.print_sstring conf " ";
           Output.print_sstring conf (string_of_int lev);
@@ -1030,12 +1048,12 @@ let display_descendant_with_table conf base max_lev p =
     [ (p, Adef.safe "") ]
     [ (p, Adef.safe "") ];
   Output.print_sstring conf "</table><p>";
-  transl conf "total" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Util.transl conf "total" |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf (string_of_int !nb_pers);
   Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "person/persons" 1);
+  Output.print_sstring conf (Util.transl_nth conf "person/persons" 1);
   Output.print_sstring conf "</p>";
   Hutil.trailer conf
 
@@ -1053,7 +1071,7 @@ let make_tree_hts conf base gv p =
     if Array.length (Driver.get_children des) = 0 then n + 1
     else
       Array.fold_left
-        (fun n iper -> nb_column n (v - 1) (pget conf base iper))
+        (fun n iper -> nb_column n (v - 1) (Util.pget conf base iper))
         n (Driver.get_children des)
   in
   let vertical_bar_txt v tdl po =
@@ -1067,8 +1085,8 @@ let make_tree_hts conf base gv p =
           let options = Util.display_options conf in
           let ncol = nb_column 0 (v - 1) p in
           let vbar_txt =
-            commd conf ^^^ "m=D&t=T&v=" ^<^ string_of_int gv ^<^ "&" ^<^ options
-            ^^^ "&" ^<^ acces conf base p
+            Util.commd conf ^^^ "m=D&t=T&v=" ^<^ string_of_int gv ^<^ "&"
+            ^<^ options ^^^ "&" ^<^ Util.acces conf base p
           in
           ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar (Some vbar_txt))
       | None -> (1, Dag2html.LeftA, Dag2html.TDnothing)
@@ -1126,7 +1144,7 @@ let make_tree_hts conf base gv p =
                  if Array.length (Driver.get_children des) = 0 then
                    (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
                  else if Array.length (Driver.get_children des) = 1 then
-                   let u = pget conf base (Driver.get_children des).(0) in
+                   let u = Util.pget conf base (Driver.get_children des).(0) in
                    let ncol = nb_column 0 (v - 1) u in
                    ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar None)
                    :: tdl
@@ -1135,7 +1153,7 @@ let make_tree_hts conf base gv p =
                      if i = Array.length (Driver.get_children des) then tdl
                      else
                        let iper = (Driver.get_children des).(i) in
-                       let u = pget conf base iper in
+                       let u = Util.pget conf base iper in
                        let tdl =
                          if i > 0 then
                            let align = Dag2html.CenterA in
@@ -1173,7 +1191,9 @@ let make_tree_hts conf base gv p =
             if v > 1 then nb_column 0 (v - 1) p
             else Array.length (Driver.get_family p)
           in
-          let txt = reference conf base p (person_title_text conf base p) in
+          let txt =
+            Util.reference conf base p (Util.person_title_text conf base p)
+          in
           let txt =
             if auth then txt ^^^ DateDisplay.short_dates_text conf base p
             else txt
@@ -1209,13 +1229,16 @@ let make_tree_hts conf base gv p =
             let td =
               let fam = Driver.foi base ifam in
               let ncol = if v > 1 then fam_nb_column 0 (v - 1) fam else 1 in
-              let sp = pget conf base (Gutil.spouse (Driver.get_iper p) fam) in
+              let sp =
+                Util.pget conf base (Gutil.spouse (Driver.get_iper p) fam)
+              in
               let s =
                 let sp =
-                  pget conf base (Gutil.spouse (Driver.get_iper p) fam)
+                  Util.pget conf base (Gutil.spouse (Driver.get_iper p) fam)
                 in
                 let txt =
-                  reference conf base sp (person_title_text conf base sp)
+                  Util.reference conf base sp
+                    (Util.person_title_text conf base sp)
                 in
                 let txt =
                   if auth then txt ^^^ DateDisplay.short_dates_text conf base sp
@@ -1251,12 +1274,13 @@ let make_tree_hts conf base gv p =
                   else
                     let age_auth =
                       Array.for_all
-                        (fun ip -> authorized_age conf base (pget conf base ip))
+                        (fun ip ->
+                          Util.authorized_age conf base (Util.pget conf base ip))
                         (Driver.get_children des)
                     in
                     Array.fold_right
                       (fun iper gen ->
-                        let g = (pget conf base iper, age_auth) in
+                        let g = (Util.pget conf base iper, age_auth) in
                         Some g :: gen)
                       (Driver.get_children des) gen)
                 (Driver.get_family p) gen
@@ -1292,10 +1316,10 @@ let make_tree_hts conf base gv p =
 let print_tree conf base v p =
   let gv = min (limit_by_tree conf) v in
   let page_title =
-    let s = gen_person_text ~html:false conf base p in
-    translate_eval
-      (transl_a_of_gr_eq_gen_lev conf
-         (transl conf "descendants")
+    let s = Util.gen_person_text ~html:false conf base p in
+    Util.translate_eval
+      (Util.transl_a_of_gr_eq_gen_lev conf
+         (Util.transl conf "descendants")
          (s : Adef.safe_string :> string)
          (s : Adef.safe_string :> string))
     |> Adef.safe
@@ -1305,7 +1329,7 @@ let print_tree conf base v p =
 
 let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
-  let num_aboville = p_getenv conf.env "num" = Some "on" in
+  let num_aboville = Util.p_getenv conf.env "num" = Some "on" in
   Hutil.header conf (descendants_title conf base p);
   (text_to conf max_level : Adef.safe_string :> string)
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -1316,14 +1340,19 @@ let print_aboville conf base max_level p =
       Output.print_string conf lab;
       Output.print_sstring conf "</span>")
     else Output.print_string conf lab;
-    Output.print_string conf (referenced_person_title_text conf base p);
+    Output.print_string conf (Util.referenced_person_title_text conf base p);
     Output.print_string conf (DateDisplay.short_dates_text conf base p);
     if lev < max_level then
       for i = 0 to Array.length (Driver.get_family p) - 1 do
         let cpl = Driver.foi base (Driver.get_family p).(i) in
-        let spouse = pget conf base (Gutil.spouse (Driver.get_iper p) cpl) in
+        let spouse =
+          Util.pget conf base (Gutil.spouse (Driver.get_iper p) cpl)
+        in
         Output.print_sstring conf "&amp;";
-        if authorized_age conf base p && authorized_age conf base spouse then
+        if
+          Util.authorized_age conf base p
+          && Util.authorized_age conf base spouse
+        then
           let fam = Driver.foi base (Driver.get_family p).(i) in
           match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
           | Some d ->
@@ -1332,7 +1361,8 @@ let print_aboville conf base max_level p =
               Output.print_sstring conf "</em></small> "
           | None -> Output.print_sstring conf " "
         else Output.print_sstring conf " ";
-        Output.print_string conf (referenced_person_title_text conf base spouse);
+        Output.print_string conf
+          (Util.referenced_person_title_text conf base spouse);
         Output.print_string conf (DateDisplay.short_dates_text conf base spouse)
       done;
     Output.print_sstring conf "<br>";
@@ -1350,7 +1380,7 @@ let print_aboville conf base max_level p =
                  else
                    lab
                    ^>^ {|<span class="descends_aboville_pipe">&nbsp;</span>|})
-                (pget conf base (Driver.get_children des).(j));
+                (Util.pget conf base (Driver.get_children des).(j));
               loop_chil (cnt_chil + 1) (j + 1))
           in
           loop_chil cnt_chil 0
@@ -1413,27 +1443,23 @@ let tdal_add tdal ir elem nx =
   tdal.(ir) <- (nx, row @ elem);
   tdal
 
-let reference conf base p s =
-  let cgl =
-    match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
-  in
-  let iper = Driver.get_iper p in
-  if is_hidden p || cgl then s
+let anchored_reference conf base p s =
+  if Util.is_hidden p then s
   else
     Printf.sprintf
       {|<a href="%s%s" id="i%s" class="normal_anchor" title="%s">%s</a>|}
-      (commd conf :> string)
-      (acces conf base p :> string)
-      (Driver.Iper.to_string iper)
+      (Util.commd conf :> string)
+      (Util.acces conf base p :> string)
+      (Driver.Iper.to_string (Driver.get_iper p))
       (Utf8.capitalize_fst (Util.transl conf "open individual page"))
       s
 
 let get_text conf base p img cgl =
-  let auth = authorized_age conf base p in
-  let txt = person_title_text conf base p in
+  let auth = Util.authorized_age conf base p in
+  let txt = Util.person_title_text conf base p in
   let txt =
     if cgl then (txt :> Adef.safe_string)
-    else Adef.safe (reference conf base p (txt :> string))
+    else Adef.safe (anchored_reference conf base p (txt :> string))
   in
   let txt =
     if auth then txt ^^^ DateDisplay.short_dates_text conf base p else txt
@@ -1513,7 +1539,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   in
   (* row 1: person *)
   let vv =
-    match p_getenv conf.env "v" with Some v -> "&v=" ^ v | None -> "&v=4"
+    match Util.p_getenv conf.env "v" with Some v -> "&v=" ^ v | None -> "&v=4"
   in
   let pp = Util.find_person_in_env conf base "" in
   let pp_index =
@@ -1532,7 +1558,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
     if cgl then "|"
     else
       Printf.sprintf "<a href=\"%sm=D&t=TV%s%s%s%s%s%s\" %s title=\"%s\">│</a>"
-        (commd conf :> string)
+        (Util.commd conf :> string)
         vv pz_index pp_index
         ("&oi=" ^ Driver.Iper.to_string (Driver.get_iper p))
         (if sps then "" else "&sp=0")
@@ -1593,7 +1619,9 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let txt = get_text conf base sp img cgl in
   let has_image = Image.get_portrait conf base p |> Option.is_some in
   let br_sp = if has_image && img then "" else "<br>" in
-  let auth = authorized_age conf base p && authorized_age conf base sp in
+  let auth =
+    Util.authorized_age conf base p && Util.authorized_age conf base sp
+  in
   let fam = Driver.foi base ifam in
   let marr_d =
     if marr && auth then DateDisplay.short_family_dates_text conf base true fam
@@ -1837,9 +1865,9 @@ let make_vaucher_tree_hts conf base gv p =
 let print_vaucher_tree conf base v p =
   let gv = min (limit_by_tree conf) v in
   let page_title =
-    translate_eval
+    Util.translate_eval
       (let s = (Util.gen_person_text conf base p ~html:false :> string) in
-       transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s s)
+       Util.transl_a_of_gr_eq_gen_lev conf (Util.transl conf "descendants") s s)
     |> Adef.safe
   in
   let hts = make_vaucher_tree_hts conf base gv p in
@@ -1848,7 +1876,7 @@ let print_vaucher_tree conf base v p =
 
 let print conf base p =
   let templ =
-    match p_getenv conf.env "t" with
+    match Util.p_getenv conf.env "t" with
     | Some ("F" | "L" | "M") -> "deslist"
     | Some "D" -> "deslist_hr"
     | Some ("H" | "I" | "A") -> "destable"
@@ -1858,7 +1886,7 @@ let print conf base p =
   in
   if templ <> "" then Perso.interp_templ templ conf base p
   else
-    match (p_getenv conf.env "t", p_getint conf.env "v") with
+    match (Util.p_getenv conf.env "t", Util.p_getint conf.env "v") with
     | Some "B", Some v -> print_aboville conf base v p
     | Some "S", Some v -> display_descendants_level conf base v p
     | Some "K", Some v -> display_descendant_with_table conf base v p
