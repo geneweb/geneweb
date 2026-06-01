@@ -276,9 +276,9 @@ let display_spouse conf base marks paths fam p c =
   Output.print_string conf (referenced_person_text conf base c);
   Output.print_sstring conf "</strong>";
   if Collection.Marker.get marks (Driver.get_iper c) then (
-    Output.print_sstring conf " (<tt><b>";
+    Output.print_sstring conf " (<b class=\"font-monospace\">";
     Output.print_string conf (label_of_path paths c);
-    Output.print_sstring conf "</b></tt>)")
+    Output.print_sstring conf "</b>)")
   else Output.print_string conf (DateDisplay.short_dates_text conf base c)
 
 let print_family_locally conf base marks paths max_lev lev p1 c1 e total =
@@ -344,9 +344,9 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e total =
 
 let print_family conf base marks paths max_lev lev p =
   if lev <> 0 then (
-    Output.print_sstring conf "<tt><b>";
+    Output.print_sstring conf "<b class=\"font-monospace\">";
     Output.print_string conf (label_of_path paths p);
-    Output.print_sstring conf "</b></tt>.<br>");
+    Output.print_sstring conf "</b>.<br>");
   snd
   @@ Array.fold_left
        (fun (cnt, total) ifam ->
@@ -375,9 +375,10 @@ let print_family conf base marks paths max_lev lev p =
                    let total = total + 1 in
                    Output.print_sstring conf " ";
                    if labelled conf base marks max_lev lev ie then (
-                     Output.print_sstring conf " =&gt; <tt><b>";
+                     Output.print_sstring conf
+                       " =&gt; <b class=\"font-monospace\">";
                      Output.print_string conf (label_of_path paths e);
-                     Output.print_sstring conf "</b></tt> ";
+                     Output.print_sstring conf "</b> ";
                      total)
                    else if succ lev = max_lev then (
                      Array.iter
@@ -479,9 +480,9 @@ let display_descendants_with_numbers conf base max_level ancestor =
 
 let print_ref conf base paths p =
   if Collection.Marker.get paths (Driver.get_iper p) <> [] then (
-    Output.print_sstring conf " =&gt; <tt><b>";
+    Output.print_sstring conf " =&gt; <b class=\"font-monospace\">";
     Output.print_string conf (label_of_path paths p);
-    Output.print_sstring conf "</b></tt>")
+    Output.print_sstring conf "</b>")
   else
     Array.iter
       (fun ifam ->
@@ -493,9 +494,9 @@ let print_ref conf base paths p =
             (Driver.p_first_name base c |> Util.escape_html);
           Output.print_sstring conf " ";
           Output.print_string conf (Driver.p_surname base c |> Util.escape_html);
-          Output.print_sstring conf " <tt><b>";
+          Output.print_sstring conf {| <b class="font-monospace">|};
           Output.print_string conf (label_of_path paths c);
-          Output.print_sstring conf "</b></tt>"))
+          Output.print_sstring conf "</b>"))
       (Driver.get_family p)
 
 let print_elem conf base paths precision (n, pll) =
@@ -1040,15 +1041,8 @@ let display_descendant_with_table conf base max_lev p =
   Hutil.trailer conf
 
 let make_tree_hts conf base gv p =
-  let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let sps = Util.get_opt conf "sp" true in
   let img = Util.get_opt conf "im" true in
-  let td_prop =
-    match Util.p_getenv conf.env "color" with
-    | None | Some "" -> Adef.safe ""
-    | Some x ->
-        " class=\"" ^<^ (Util.escape_html x :> Adef.safe_string) ^>^ "\""
-  in
   let rec nb_column n v u =
     if v = 0 then n + max 1 (Array.length (Driver.get_family u))
     else if Array.length (Driver.get_family u) = 0 then n + 1
@@ -1173,13 +1167,6 @@ let make_tree_hts conf base gv p =
           let txt =
             if img then txt ^^^ DagDisplay.image_txt conf base p else txt
           in
-          let txt =
-            if bd > 0 || (td_prop :> string) <> "" then
-              {|<table style="border:|} ^<^ string_of_int bd
-              ^<^ {|px solid"><tr><td align="center"|} ^<^ td_prop ^^^ {|>|}
-              ^<^ txt ^>^ {|</td></tr></table>|}
-            else txt
-          in
           ( (2 * ncol) - 1,
             CenterA,
             TDitem (Driver.get_iper p, txt, Adef.safe "") )
@@ -1221,13 +1208,6 @@ let make_tree_hts conf base gv p =
                      else Adef.safe "")
                 ^^^ "&nbsp;" ^<^ txt
                 ^^^ DagDisplay.image_txt conf base sp
-              in
-              let s =
-                if bd > 0 || (td_prop :> string) <> "" then
-                  {|<table style="border:|} ^<^ string_of_int bd
-                  ^<^ {|px solid"><tr><td align="center" |} ^<^ td_prop
-                  ^^^ {|>|} ^<^ s ^>^ {|</td></tr></table>|}
-                else s
               in
               ( (2 * ncol) - 1,
                 CenterA,
@@ -1313,9 +1293,9 @@ let print_aboville conf base max_level p =
   Output.print_sstring conf ".<br><p>";
   let rec loop_ind lev lab p =
     if num_aboville then (
-      Output.print_sstring conf "<tt>";
+      Output.print_sstring conf "<span class=\"font-monospace\">";
       Output.print_string conf lab;
-      Output.print_sstring conf "</tt>")
+      Output.print_sstring conf "</span>")
     else Output.print_string conf lab;
     Output.print_string conf (referenced_person_title_text conf base p);
     Output.print_string conf (DateDisplay.short_dates_text conf base p);
@@ -1328,9 +1308,9 @@ let print_aboville conf base max_level p =
           let fam = Driver.foi base (Driver.get_family p).(i) in
           match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
           | Some d ->
-              Output.print_sstring conf {|<font size="-2"><em>|};
+              Output.print_sstring conf "<small><em>";
               Output.print_sstring conf (DateDisplay.prec_year_text conf d);
-              Output.print_sstring conf "</em></font> "
+              Output.print_sstring conf "</em></small> "
           | None -> Output.print_sstring conf " "
         else Output.print_sstring conf " ";
         Output.print_string conf (referenced_person_title_text conf base spouse);

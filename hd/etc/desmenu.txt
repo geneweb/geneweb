@@ -160,28 +160,6 @@ function table_spouse_disabled() {
           <label class="form-check-label" for="ld_inline">[*display notes and sources inline]</label>
         </div>
       </div>
-      %( BORDER AND COLOR NICE TO COPY TO RELMENU
-      <div class="ms-4">
-        <label>
-          [*border]
-          <input type="number" class="form-control" name="bd" min="0" max="50" value="0"%/>
-        </label>
-        <br>
-        <table style="padding:0">
-          <tr>
-            <td class="text-%left;">[*color]</td>
-            <td class="ms-1">
-              <input type="radio" name="color" value="" checked="checked"%/>
-            </td>
-            <td class="bg1"><input type="radio" name="color" value="bg1"%/></td>
-            <td class="bg2"><input type="radio" name="color" value="bg2"%/></td>
-            <td class="bg3"><input type="radio" name="color" value="bg3"%/></td>
-            <td class="bg4"><input type="radio" name="color" value="bg4"%/></td>
-            <td class="bg5"><input type="radio" name="color" value="bg5"%/></td>
-            <td class="bg6"><input type="radio" name="color" value="bg6"%/></td>
-          </tr>
-        </table>
-      </div> %)
       <hr>
       <div class="form-check">
         <input type="radio" class="form-check-input" id="tT" name="t" value="T"
