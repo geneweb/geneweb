@@ -1768,27 +1768,9 @@ let clean_rows tdal =
   in
   List.rev tdal
 
-(* manage vbars    *)
-(* suppress lines containing only vbars *)
-(* in one colums, if there is nothing between two vbars, insert vbars *)
-(* vbar = [1, Dag2html.CenterA,  Dag2html.TDtext "|"] filler is [(xn - x1), Dag2html.CenterA, Dag2html.TDnothing] *)
-let manage_vbars tdal =
-  let vbar_only_in_row row =
-    List.fold_left
-      (fun res (_, _, td) ->
-        if
-          td <> Dag2html.TDnothing
-          && td <> Dag2html.TDtext (Driver.Iper.dummy, Adef.safe "|")
-        then false && res
-        else true && res)
-      true row
-  in
-  let tdal =
-    List.fold_left
-      (fun acc row -> if vbar_only_in_row row then acc else row :: acc)
-      [] tdal
-  in
-  List.rev tdal
+let drop_empty_rows tdal =
+  let row_is_empty = List.for_all (fun (_, _, td) -> td = Dag2html.TDnothing) in
+  List.filter (fun row -> not (row_is_empty row)) tdal
 
 (* build a list of families (ifam) between iap and ip *)
 let rec find_ancestors base iap ip list v =
@@ -1835,7 +1817,7 @@ let make_vaucher_tree_hts conf base gv p =
   let tdal = expand_cell tdal in
   let tdal = expand_cell tdal in
   let tdal = correct_spouses tdal in
-  let tdal = manage_vbars tdal in
+  let tdal = drop_empty_rows tdal in
   let hts0 = List.fold_left (fun acc row -> Array.of_list row :: acc) [] tdal in
   let hts = Array.of_list (List.rev hts0) in
   hts
