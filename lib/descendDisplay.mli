@@ -67,10 +67,6 @@ val print_aboville :
 
     person | desc1 | desc2 | | desc21 | desc3 *)
 
-val desmenu_print :
-  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
-(** Prints the form used to customise the descendants display. *)
-
 val print :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
 (** Displays the descendants of the person selected through [conf.env]. The

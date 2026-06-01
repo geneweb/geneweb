@@ -1035,6 +1035,69 @@ let display_descendant_with_table conf base max_lev p =
   Output.print_sstring conf "</p>";
   Hutil.trailer conf
 
+let print_aboville conf base max_level p =
+  let max_level = min (Perso.limit_desc conf) max_level in
+  let num_aboville = Util.p_getenv conf.env "num" = Some "on" in
+  Hutil.header conf (descendants_title conf base p);
+  (text_to conf max_level : Adef.safe_string :> string)
+  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf ".<br><p>";
+  let rec loop_ind lev lab p =
+    if num_aboville then (
+      Output.print_sstring conf "<span class=\"font-monospace\">";
+      Output.print_string conf lab;
+      Output.print_sstring conf "</span>")
+    else Output.print_string conf lab;
+    Output.print_string conf (Util.referenced_person_title_text conf base p);
+    Output.print_string conf (DateDisplay.short_dates_text conf base p);
+    if lev < max_level then
+      for i = 0 to Array.length (Driver.get_family p) - 1 do
+        let cpl = Driver.foi base (Driver.get_family p).(i) in
+        let spouse =
+          Util.pget conf base (Gutil.spouse (Driver.get_iper p) cpl)
+        in
+        Output.print_sstring conf "&amp;";
+        if
+          Util.authorized_age conf base p
+          && Util.authorized_age conf base spouse
+        then
+          let fam = Driver.foi base (Driver.get_family p).(i) in
+          match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
+          | Some d ->
+              Output.print_sstring conf "<small><em>";
+              Output.print_sstring conf (DateDisplay.prec_year_text conf d);
+              Output.print_sstring conf "</em></small> "
+          | None -> Output.print_sstring conf " "
+        else Output.print_sstring conf " ";
+        Output.print_string conf
+          (Util.referenced_person_title_text conf base spouse);
+        Output.print_string conf (DateDisplay.short_dates_text conf base spouse)
+      done;
+    Output.print_sstring conf "<br>";
+    if lev < max_level then
+      let rec loop_fam cnt_chil i =
+        if i = Array.length (Driver.get_family p) then ()
+        else
+          let des = Driver.foi base (Driver.get_family p).(i) in
+          let rec loop_chil cnt_chil j =
+            if j = Array.length (Driver.get_children des) then
+              loop_fam cnt_chil (i + 1)
+            else (
+              loop_ind (lev + 1)
+                (if num_aboville then lab ^>^ string_of_int cnt_chil ^ "."
+                 else
+                   lab
+                   ^>^ {|<span class="descends_aboville_pipe">&nbsp;</span>|})
+                (Util.pget conf base (Driver.get_children des).(j));
+              loop_chil (cnt_chil + 1) (j + 1))
+          in
+          loop_chil cnt_chil 0
+      in
+      loop_fam 1 0
+  in
+  loop_ind 0 (Adef.safe "") p;
+  Hutil.trailer conf
+
 let make_tree_hts conf base gv p =
   let sps = Util.get_opt conf "sp" true in
   let img = Util.get_opt conf "im" true in
@@ -1304,71 +1367,6 @@ let print_tree conf base v p =
   in
   let hts = make_tree_hts conf base gv p in
   DagDisplay.print_dag_page conf base page_title hts (Adef.escaped "")
-
-let print_aboville conf base max_level p =
-  let max_level = min (Perso.limit_desc conf) max_level in
-  let num_aboville = Util.p_getenv conf.env "num" = Some "on" in
-  Hutil.header conf (descendants_title conf base p);
-  (text_to conf max_level : Adef.safe_string :> string)
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf ".<br><p>";
-  let rec loop_ind lev lab p =
-    if num_aboville then (
-      Output.print_sstring conf "<span class=\"font-monospace\">";
-      Output.print_string conf lab;
-      Output.print_sstring conf "</span>")
-    else Output.print_string conf lab;
-    Output.print_string conf (Util.referenced_person_title_text conf base p);
-    Output.print_string conf (DateDisplay.short_dates_text conf base p);
-    if lev < max_level then
-      for i = 0 to Array.length (Driver.get_family p) - 1 do
-        let cpl = Driver.foi base (Driver.get_family p).(i) in
-        let spouse =
-          Util.pget conf base (Gutil.spouse (Driver.get_iper p) cpl)
-        in
-        Output.print_sstring conf "&amp;";
-        if
-          Util.authorized_age conf base p
-          && Util.authorized_age conf base spouse
-        then
-          let fam = Driver.foi base (Driver.get_family p).(i) in
-          match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
-          | Some d ->
-              Output.print_sstring conf "<small><em>";
-              Output.print_sstring conf (DateDisplay.prec_year_text conf d);
-              Output.print_sstring conf "</em></small> "
-          | None -> Output.print_sstring conf " "
-        else Output.print_sstring conf " ";
-        Output.print_string conf
-          (Util.referenced_person_title_text conf base spouse);
-        Output.print_string conf (DateDisplay.short_dates_text conf base spouse)
-      done;
-    Output.print_sstring conf "<br>";
-    if lev < max_level then
-      let rec loop_fam cnt_chil i =
-        if i = Array.length (Driver.get_family p) then ()
-        else
-          let des = Driver.foi base (Driver.get_family p).(i) in
-          let rec loop_chil cnt_chil j =
-            if j = Array.length (Driver.get_children des) then
-              loop_fam cnt_chil (i + 1)
-            else (
-              loop_ind (lev + 1)
-                (if num_aboville then lab ^>^ string_of_int cnt_chil ^ "."
-                 else
-                   lab
-                   ^>^ {|<span class="descends_aboville_pipe">&nbsp;</span>|})
-                (Util.pget conf base (Driver.get_children des).(j));
-              loop_chil (cnt_chil + 1) (j + 1))
-          in
-          loop_chil cnt_chil 0
-      in
-      loop_fam 1 0
-  in
-  loop_ind 0 (Adef.safe "") p;
-  Hutil.trailer conf
-
-let desmenu_print = Perso.interp_templ "desmenu"
 
 (* new descendant tree algorithm *)
 (* based on the work of Jean Vaucher (U of Montreal) *)
@@ -1855,4 +1853,4 @@ let print conf base p =
     | Some "C", Some v -> display_spouse_index conf base v p
     | Some "T", Some v -> print_tree conf base v p
     | Some "TV", Some v -> print_vaucher_tree conf base v p
-    | _ -> desmenu_print conf base p
+    | _ -> Perso.interp_templ "desmenu" conf base p
