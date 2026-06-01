@@ -20,7 +20,7 @@
      filled, used to pack cells left to right;
    - [tdal] is the list of rows being built. [p_pos]/[f_pos] place persons and
      spouses by a pre-order walk (one logical column per node, shifted right on
-     collision); [complete_rows]/[clean_rows]/[expand_cell]/[correct_spouses]/
+     collision); [complete_rows]/[strip_lastx]/[expand_cell]/[correct_spouses]/
      [manage_vbars] then normalise the matrix before conversion to [hts]. *)
 
 open Config
@@ -1418,9 +1418,8 @@ let td_cell cols align ip text flags =
   [ (cols, align, Dag2html.TDitem (ip, text, flags)) ]
 
 let tdal_add tdal ir elem nx =
-  let tdal = Array.copy tdal in
   let _, row = tdal.(ir) in
-  tdal.(ir) <- (nx, row @ elem);
+  tdal.(ir) <- (nx, List.rev_append elem row);
   tdal
 
 let anchored_reference conf base p s =
@@ -1639,7 +1638,8 @@ let complete_rows tdal =
       | [] -> new_td
       | (x, row) :: tdal ->
           if max_col - x > 0 then
-            loop tdal ((max_col, row @ td_fill x max_col) :: new_td)
+            loop tdal
+              ((max_col, List.rev_append (td_fill x max_col) row) :: new_td)
           else loop tdal ((x, row) :: new_td)
     in
     loop tdal []
@@ -1731,25 +1731,7 @@ let expand_cell tdal =
   in
   List.rev tdal
 
-(* Drop the per-row last_x bookkeeping and reverse each row: during
-   placement cells are appended right-anchored, this restores
-   left-to-right order. *)
-let clean_rows tdal =
-  let tdal =
-    let rec loop tdal new_tdal =
-      match tdal with
-      | [] -> new_tdal
-      | (_x, row) :: tdal ->
-          let rec loop2 row new_row =
-            match row with
-            | [] -> loop tdal (new_row :: new_tdal)
-            | td :: row -> loop2 row (td :: new_row)
-          in
-          loop2 row []
-    in
-    loop tdal []
-  in
-  List.rev tdal
+let strip_lastx tdal = List.map snd tdal
 
 let drop_empty_rows tdal =
   let row_is_empty = List.for_all (fun (_, _, td) -> td = Dag2html.TDnothing) in
@@ -1797,7 +1779,7 @@ let make_vaucher_tree_hts conf base gv p =
   let tdal, _ = p_pos conf base p 0 gv 0 tdal only_anc sps img marr cgl in
   let tdal = Array.to_list tdal in
   let tdal = complete_rows tdal in
-  let tdal = clean_rows tdal in
+  let tdal = strip_lastx tdal in
   let tdal = expand_cell tdal in
   let tdal = expand_cell tdal in
   let tdal = correct_spouses tdal in
