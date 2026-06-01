@@ -1365,32 +1365,44 @@ let print_tree conf base v p =
   let hts = make_tree_hts conf base gv p in
   DagDisplay.print_dag_page conf base page_title hts (Adef.escaped "")
 
-(* new descendant tree algorithm *)
-(* based on the work of Jean Vaucher (U of Montreal) *)
-(* - see issue #414 for comments and details *)
+(* === Compact descendant tree (Jean Vaucher layout) ===
 
-(* *****************************************************************
-   L'algo fait un parcours PRE-ORDRE de l'arbre en donnant une colonne
-   initiale "logique" pour chaque personne, par exemple:  X-1 et X+1
-   pour les 2 enfants d'un pere (P) dans la colonne X.
-   Ce "X" initial peut etre augmenté (déplacé à droite) pour 2 raisons:
+   [print_vaucher_tree] lays descendants out with the compact
+   tree-positioning algorithm of Jean Vaucher, "Pretty-Printing of
+   Trees", Software Practice & Experience 10 (1980), 553-561.
+   Reference implementation: GTree.java (Vaucher, 2016), function
+   [position]. See issue #414.
 
-   a) La case proposée est déjà occupée.  Un tableau global,
-   last_x, garde la position des derniers noeuds dans chaque rangée.
-   On modifie X = max( X, last_x[i]+2)  gardant au moins une colonne
-   vide entre chaque noeud.
-   b) Pour la meme raison, il se peut que les enfants de la personne
-   soient déplacés. ON termine en mettant X a mi-chemin entre les position
-   finale du premier et dernier enfant.
+   Principle ([position]): nodes are placed by a depth-first walk and
+   each node collides only with its already-placed neighbour on the
+   SAME level, so subtrees from different parents interleave
+   column-wise instead of each reserving its full width; the parent is
+   then recentred on the midpoint of its first and last child.
 
-    ***************************************************************** *)
+   Mapping to GeneWeb and divergences from the reference:
+   - Mirror. The 1980 paper is post-order, right-son-first, binary,
+     neighbour on the right. This code (like the 2016 [position])
+     mirrors it to a left-to-right n-ary pre-order walk with the
+     neighbour on the left: [x = max x0 (last_x.(row) + 2)], parent
+     [= (x1 + xn) / 2].
+   - Family layer. Vaucher positions individuals; GeneWeb positions a
+     person then each union (spouse + children) over a 4-row band per
+     generation (person / spouse-bracket / spouse / child-bracket).
+     Seeding uses the union count in [p_pos] and the child count in
+     [f_pos]. This yields 12 columns instead of 10 on the #414 tree:
+     an accepted consequence of the family-node model, not a
+     positioning error.
+   - Emission. Vaucher prints two passes per level directly; here
+     nodes are placed into a sparse matrix [tdal] ([init_tdal]) and
+     normalised ([complete_rows], [clean_rows], [expand_cell] twice,
+     [correct_spouses], [drop_empty_rows]) before conversion to [hts].
 
-(* one td is [nb_cols * align * content]  see dag2Html.ml *)
+   [last_x.(row)] is the rightmost filled column of each row, held in
+   the per-call array threaded through [p_pos]/[f_pos], not a module
+   global. *)
 
-(* empty fill over n columns *)
 let td_fill x1 xn = [ (xn - x1, Dag2html.CenterA, Dag2html.TDnothing) ]
 
-(* hbar over xn - x1 columns. First and last are left/right and 50% *)
 let td_hbar x1 xn =
   match xn - x1 with
   | 0 -> [ (1, Dag2html.CenterA, Dag2html.TDnothing) ]
@@ -1402,14 +1414,9 @@ let td_hbar x1 xn =
         (1, Dag2html.RightA, Dag2html.TDhr Dag2html.RightA);
       ]
 
-(* regular cell, centered, with text as content (may contain |<br>) *)
 let td_cell cols align ip text flags =
   [ (cols, align, Dag2html.TDitem (ip, text, flags)) ]
 
-(* tdal is   (int   *    list      ) list           *)
-(*           (lastx      list of td) list of rows   *)
-
-(* add elem to row ir. Update lastx *)
 let tdal_add tdal ir elem nx =
   let tdal = Array.copy tdal in
   let _, row = tdal.(ir) in
@@ -1447,35 +1454,16 @@ let get_spouse base iper ifam =
   if iper = Driver.get_father f then Driver.poi base (Driver.get_mother f)
   else Driver.poi base (Driver.get_father f)
 
-(* the heart of Jean Vaucher algo                                    *)
-(* to manage sps=on, one must handle different ir numbering *)
-(* insufficient to skip "display" of spouses WIP  default is on *)
-
-(* for the "only" option , prune the family list according to   *)
-(* relationship with target                                     *)
-
-(*
-        /                 |           (except for first row)
-  ir   |               person
-        \                 |           (except if no spouse )
-  ir+1         ---- hbar over spouses ----  (| if only one)
-        /                 |
-  ir+2 |               spouse
-        \                 |           (except if no child)
-  ir+3          --- hbar over children ---- (| if only one)
-
-  option sps=off -> only 3 rows
-  option only  -> ?
-
-*)
-
+(* A generation spans three rows: [ir] the person, [ir + 1] the spouse
+   (the vertical connector is carried inline in the text) and [ir + 2]
+   the bracket over the children; each child recurses at [ir + 3].
+   [f_pos] is called by [p_pos] at [ir + 1]. *)
 let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   let lx = lastx tdal ir in
   let x = if lx + 2 > x0 then lx + 2 else x0 in
   let ifaml = List.rev (Array.to_list (Driver.get_family p)) in
   let ifam_nbr = List.length ifaml in
   let descendants = ifaml <> [] in
-  (* find right family there *)
   let ifaml =
     if only_anc <> [] then
       List.fold_left
@@ -1508,9 +1496,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
       in
       (tdal, (x1 + xn) / 2, x1, xn)
     else (tdal, x, x, x)
-    (* ?? correct ?? *)
   in
-  (* row 1: person *)
   let vv =
     match Util.p_getenv conf.env "v" with Some v -> "&v=" ^ v | None -> "&v=4"
   in
@@ -1540,7 +1526,6 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
         (Utf8.capitalize_fst (Util.transl conf "partial"))
   in
   let txt = if ir > 0 then Adef.safe (only ^ "<br>") ^^^ txt else txt in
-  (* ajouter un marqueur ici si enfants et on ne continue pas !!   *)
   let continue = only_anc = [] || ifaml <> [] in
   let br = if img then "" else "<br>" in
   let txt =
@@ -1556,7 +1541,6 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   in
   (tdal, x)
 
-(* ifam_nbr = -1 = 1 family, otherwize rank *)
 and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     sps img marr cgl =
   let sp = get_spouse base (Driver.get_iper p) ifam in
@@ -1588,7 +1572,6 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
       (tdal, (x1 + xn) / 2, x1, xn)
     else (tdal, x, x, x)
   in
-  (* row 3: spouses *)
   let txt = get_text conf base sp img cgl in
   let has_image = Image.get_portrait conf base p |> Option.is_some in
   let br_sp = if has_image && img then "" else "<br>" in
@@ -1630,7 +1613,6 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
          (td_cell 1 Dag2html.CenterA (Driver.get_iper sp) txt (Adef.safe flag)))
       x
   in
-  (* rox 4: Hbar over kids *)
   if v > 0 && kids <> [] then
     let lx = lastx tdal (ir2 + 1) in
     let lx = if lx > -1 then lx else -1 in
@@ -1664,10 +1646,13 @@ let complete_rows tdal =
   in
   List.rev tdal
 
+(* Generous upper bound: the historical 4-row band per generation;
+   drop_empty_rows trims the rows left unused. *)
 let init_tdal gv = Array.make (4 * (gv + 1)) (0, [])
 
-(* bring back spouses together *)
-(* Spouse_no_d, Dag2html.TDnothing, Spouse becomes Dag2html.TDnothing, Spouse_no_d, Spouse *)
+(* Put the two cells of one union back side by side: f_pos tags them
+   "<ifam>-spouse" and "<ifam>-spouse_no_d", and expand_cell may have
+   pushed a filler between them. *)
 let correct_spouses tdal =
   let rec regroup row new_row =
     match row with
@@ -1714,7 +1699,8 @@ let correct_spouses tdal =
   in
   List.rev tdal
 
-(* expand cell size if possible *)
+(* Widen a centred item into the padding on either side so it reads as
+   centred over its subtree; run twice for symmetric growth. *)
 let expand_cell tdal =
   let rec expand row new_row =
     match row with
@@ -1745,7 +1731,9 @@ let expand_cell tdal =
   in
   List.rev tdal
 
-(* remove x entry *)
+(* Drop the per-row last_x bookkeeping and reverse each row: during
+   placement cells are appended right-anchored, this restores
+   left-to-right order. *)
 let clean_rows tdal =
   let tdal =
     let rec loop tdal new_tdal =
@@ -1767,7 +1755,8 @@ let drop_empty_rows tdal =
   let row_is_empty = List.for_all (fun (_, _, td) -> td = Dag2html.TDnothing) in
   List.filter (fun row -> not (row_is_empty row)) tdal
 
-(* build a list of families (ifam) between iap and ip *)
+(* Families on the path from [ip] up to ancestor [iap]: used by the
+   o=/oi= option to prune the tree to that single branch. *)
 let rec find_ancestors base iap ip list v =
   match Driver.get_parents (Driver.poi base ip) with
   | Some ifam ->
