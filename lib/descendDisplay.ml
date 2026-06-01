@@ -242,14 +242,15 @@ let label_of_path paths p =
   in
   Driver.get_iper p |> Collection.Marker.get paths |> loop
 
+let child_drops_surname p1 p2 e =
+  Driver.get_sex p1 = Male
+  && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p1)
+  || Driver.get_sex p2 = Male
+     && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p2)
+
 let print_child conf base p1 p2 e =
   Output.print_sstring conf "<strong>";
-  if
-    Driver.get_sex p1 = Male
-    && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p1)
-    || Driver.get_sex p2 = Male
-       && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p2)
-  then
+  if child_drops_surname p1 p2 e then
     Output.print_string conf
       (Util.referenced_person_text_without_surname conf base e)
   else (
@@ -260,12 +261,8 @@ let print_child conf base p1 p2 e =
 
 let print_repeat_child conf base p1 p2 e =
   Output.print_sstring conf "<em>";
-  if
-    Driver.get_sex p1 = Male
-    && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p1)
-    || Driver.get_sex p2 = Male
-       && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p2)
-  then Output.print_string conf (Util.gen_person_text ~sn:false conf base e)
+  if child_drops_surname p1 p2 e then
+    Output.print_string conf (Util.gen_person_text ~sn:false conf base e)
   else Output.print_string conf (Util.gen_person_text conf base e);
   Output.print_sstring conf "</em>"
 
