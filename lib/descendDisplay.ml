@@ -796,19 +796,10 @@ let print_person_table conf base p lab =
     td (fun () ->
         Output.print_string conf birth_place;
         Output.print_sstring conf "&nbsp;");
-  let aux ?alt ?attr gets f =
+  let aux ?alt ?(cls = "") gets f =
     if List.exists (fun get -> Util.p_getenv conf.env get = Some "on") gets then (
       Output.print_sstring conf "<td";
-      (match attr with
-      | Some attr ->
-          (* TODO?: why is only the last string used? *)
-          let attr =
-            List.fold_left
-              (fun _acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"")
-              "" attr
-          in
-          Output.print_sstring conf attr
-      | None -> ());
+      if cls <> "" then Output.printf conf {| class="%s"|} cls;
       if nb_families > 1 then
         Output.print_sstring conf {| style="border-bottom:none"|};
       Output.print_sstring conf ">";
@@ -846,9 +837,7 @@ let print_person_table conf base p lab =
         |> Driver.sou base |> Util.string_of_place conf
         |> Output.print_string conf;
       Output.print_sstring conf " &nbsp;");
-  aux [ "child" ]
-    ~attr:[ ("align", "center") ]
-    (fun fam _spouse ->
+  aux [ "child" ] ~cls:"text-center" (fun fam _spouse ->
       Output.print_sstring conf
         (Driver.get_children fam |> Array.length |> string_of_int);
       Output.print_sstring conf " &nbsp;");
@@ -891,22 +880,14 @@ let print_person_table conf base p lab =
       || Util.p_getenv conf.env "marr_date" = Some "on"
       || Util.p_getenv conf.env "marr_place" = Some "on"
     then
-      let aux ?attr i get fn =
+      let aux ?(cls = "") i get fn =
         if Util.p_getenv conf.env get = Some "on" then (
           Output.print_sstring conf {|<td style="border-top:none; |};
           if nb_families - 1 <> i then
             Output.print_sstring conf "border-bottom:none;";
           Output.print_sstring conf "\"";
-          (match attr with
-          | Some attr ->
-              (* TODO?: why is only the last string used? *)
-              let attr =
-                List.fold_left
-                  (fun _acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"")
-                  "" attr
-              in
-              Output.print_sstring conf attr
-          | None -> ());
+          if cls <> "" then Output.printf conf {| class="%s"|} cls;
+          Output.print_sstring conf {|>|};
           Output.print_sstring conf {|>|};
           fn ();
           Output.print_sstring conf "</td>")
@@ -945,10 +926,7 @@ let print_person_table conf base p lab =
               |> Driver.sou base |> Util.string_of_place conf
               |> Output.print_string conf;
             Output.print_sstring conf " &nbsp;");
-        aux
-          ~attr:[ ("align", "center") ]
-          i "child"
-          (fun () ->
+        aux ~cls:"text-center" i "child" (fun () ->
             Output.print_sstring conf
               (Driver.get_children fam |> Array.length |> string_of_int);
             Output.print_sstring conf " &nbsp;");
@@ -1023,7 +1001,7 @@ let display_descendant_with_table conf base max_lev p =
     | (p, (lab : Adef.safe_string)) :: q ->
         if first && lev > 0 && Util.p_getenv conf.env "gen" = Some "on" then (
           Output.print_sstring conf "<tr>";
-          Output.print_sstring conf {|<th align="left" colspan="|};
+          Output.print_sstring conf {|<th class="text-start" colspan="|};
           Output.print_sstring conf (string_of_int nb_col);
           Output.print_sstring conf {|">|};
           Util.transl_nth conf "generation/generations" 0
