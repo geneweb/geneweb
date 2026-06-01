@@ -1464,11 +1464,13 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   let ifam_nbr = List.length ifaml in
   let descendants = ifaml <> [] in
   let ifaml =
-    if only_anc <> [] then
-      List.fold_left
-        (fun acc ifam -> if List.mem ifam only_anc then ifam :: acc else acc)
-        [] ifaml
-    else ifaml
+    if sps then ifaml
+    else if v > 0 then
+      List.filter
+        (fun ifam ->
+          Array.length (Driver.get_children (Driver.foi base ifam)) > 0)
+        ifaml
+    else []
   in
   let tdal, x, _x1, _xn =
     if v >= 0 && ifaml <> [] then
@@ -1594,11 +1596,14 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     ^^^ Adef.safe "</span>"
     ^^^ if only_one && not marr then Adef.safe "" else Adef.safe "<br>"
   in
-  let txt = if kids <> [] then txt ^^^ Adef.safe br_sp else txt in
   let txt =
-    if sps then m_txt ^^^ txt else if v > 0 then m_txt else Adef.safe ""
+    if sps then
+      let txt = if kids <> [] then txt ^^^ Adef.safe br_sp else txt in
+      let txt = m_txt ^^^ txt in
+      if v > 0 && kids <> [] then txt ^^^ Adef.safe "<br>|" else txt
+    else if v > 0 && kids <> [] then Adef.safe "|"
+    else Adef.safe ""
   in
-  let txt = if v > 0 && kids <> [] then txt ^^^ Adef.safe "<br>|" else txt in
   let flag =
     Driver.Ifam.to_string ifam
     ^ if v > 0 && kids <> [] then "-spouse_no_d" else "-spouse"
@@ -1646,9 +1651,10 @@ let complete_rows tdal =
   in
   List.rev tdal
 
-(* Generous upper bound: the historical 4-row band per generation;
-   drop_empty_rows trims the rows left unused. *)
-let init_tdal gv = Array.make (4 * (gv + 1)) (0, [])
+(* Three rows per generation: person, spouse, child bracket. Vaucher's
+   bracket over multiple unions is not drawn; GeneWeb marks them with
+   &1/&2 superscripts instead (see #414). *)
+let init_tdal gv = Array.make (3 * (gv + 1)) (0, [])
 
 (* Put the two cells of one union back side by side: f_pos tags them
    "<ifam>-spouse" and "<ifam>-spouse_no_d", and expand_cell may have
