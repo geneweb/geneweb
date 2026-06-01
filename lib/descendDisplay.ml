@@ -25,7 +25,6 @@
 
 open Config
 open Def
-open Dag2html
 open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
@@ -1058,7 +1057,9 @@ let make_tree_hts conf base gv p =
         n (Driver.get_children des)
   in
   let vertical_bar_txt v tdl po =
-    let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
+    let tdl =
+      if tdl = [] then [] else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+    in
     let td =
       match po with
       | Some (p, _) ->
@@ -1069,8 +1070,8 @@ let make_tree_hts conf base gv p =
             commd conf ^^^ "m=D&t=T&v=" ^<^ string_of_int gv ^<^ "&" ^<^ options
             ^^^ "&" ^<^ acces conf base p
           in
-          ((2 * ncol) - 1, CenterA, TDbar (Some vbar_txt))
-      | None -> (1, LeftA, TDnothing)
+          ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar (Some vbar_txt))
+      | None -> (1, Dag2html.LeftA, Dag2html.TDnothing)
     in
     td :: tdl
   in
@@ -1079,45 +1080,56 @@ let make_tree_hts conf base gv p =
     Array.of_list (List.rev tdl)
   in
   let spouses_vertical_bar_txt v tdl po =
-    let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
+    let tdl =
+      if tdl = [] then [] else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+    in
     match po with
     | Some (p, _) when Array.length (Driver.get_family p) > 0 ->
         fst
         @@ Array.fold_left
              (fun (tdl, first) ifam ->
-               let tdl = if first then tdl else (1, LeftA, TDnothing) :: tdl in
+               let tdl =
+                 if first then tdl
+                 else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+               in
                let des = Driver.foi base ifam in
                let td =
                  if Array.length (Driver.get_children des) = 0 then
-                   (1, LeftA, TDnothing)
+                   (1, Dag2html.LeftA, Dag2html.TDnothing)
                  else
                    let ncol = fam_nb_column 0 (v - 1) des in
-                   ((2 * ncol) - 1, CenterA, TDbar None)
+                   ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar None)
                in
                (td :: tdl, false))
              (tdl, true) (Driver.get_family p)
-    | _ -> (1, LeftA, TDnothing) :: tdl
+    | _ -> (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
   in
   let spouses_vertical_bar v gen =
     let tdl = List.fold_left (spouses_vertical_bar_txt v) [] gen in
     Array.of_list (List.rev tdl)
   in
   let horizontal_bar_txt v tdl po =
-    let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
+    let tdl =
+      if tdl = [] then [] else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+    in
     match po with
     | Some (p, _) when Array.length (Driver.get_family p) > 0 ->
         fst
         @@ Array.fold_left
              (fun (tdl, first) ifam ->
-               let tdl = if first then tdl else (1, LeftA, TDnothing) :: tdl in
+               let tdl =
+                 if first then tdl
+                 else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+               in
                let des = Driver.foi base ifam in
                let tdl =
                  if Array.length (Driver.get_children des) = 0 then
-                   (1, LeftA, TDnothing) :: tdl
+                   (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
                  else if Array.length (Driver.get_children des) = 1 then
                    let u = pget conf base (Driver.get_children des).(0) in
                    let ncol = nb_column 0 (v - 1) u in
-                   ((2 * ncol) - 1, CenterA, TDbar None) :: tdl
+                   ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar None)
+                   :: tdl
                  else
                    let rec loop tdl i =
                      if i = Array.length (Driver.get_children des) then tdl
@@ -1126,32 +1138,34 @@ let make_tree_hts conf base gv p =
                        let u = pget conf base iper in
                        let tdl =
                          if i > 0 then
-                           let align = CenterA in
-                           (1, align, TDhr align) :: tdl
+                           let align = Dag2html.CenterA in
+                           (1, align, Dag2html.TDhr align) :: tdl
                          else tdl
                        in
                        let ncol = nb_column 0 (v - 1) u in
                        let align =
-                         if i = 0 then RightA
+                         if i = 0 then Dag2html.RightA
                          else if i = Array.length (Driver.get_children des) - 1
-                         then LeftA
-                         else CenterA
+                         then Dag2html.LeftA
+                         else Dag2html.CenterA
                        in
-                       let td = ((2 * ncol) - 1, align, TDhr align) in
+                       let td = ((2 * ncol) - 1, align, Dag2html.TDhr align) in
                        loop (td :: tdl) (i + 1)
                    in
                    loop tdl 0
                in
                (tdl, false))
              (tdl, true) (Driver.get_family p)
-    | _ -> (1, LeftA, TDnothing) :: tdl
+    | _ -> (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
   in
   let horizontal_bars v gen =
     let tdl = List.fold_left (horizontal_bar_txt v) [] gen in
     Array.of_list (List.rev tdl)
   in
   let person_txt v tdl po =
-    let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
+    let tdl =
+      if tdl = [] then [] else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+    in
     let td =
       match po with
       | Some (p, auth) ->
@@ -1168,14 +1182,16 @@ let make_tree_hts conf base gv p =
             if img then txt ^^^ DagDisplay.image_txt conf base p else txt
           in
           ( (2 * ncol) - 1,
-            CenterA,
-            TDitem (Driver.get_iper p, txt, Adef.safe "") )
-      | None -> (1, LeftA, TDnothing)
+            Dag2html.CenterA,
+            Dag2html.TDitem (Driver.get_iper p, txt, Adef.safe "") )
+      | None -> (1, Dag2html.LeftA, Dag2html.TDnothing)
     in
     td :: tdl
   in
   let spouses_txt v tdl po =
-    let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
+    let tdl =
+      if tdl = [] then [] else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+    in
     match po with
     | Some (p, auth) when Array.length (Driver.get_family p) > 0 ->
         let rec loop tdl i =
@@ -1184,7 +1200,10 @@ let make_tree_hts conf base gv p =
             let ifam = (Driver.get_family p).(i) in
             let tdl =
               if i > 0 then
-                (1, LeftA, TDtext (Driver.Iper.dummy, Adef.safe "...")) :: tdl
+                ( 1,
+                  Dag2html.LeftA,
+                  Dag2html.TDtext (Driver.Iper.dummy, Adef.safe "...") )
+                :: tdl
               else tdl
             in
             let td =
@@ -1210,13 +1229,13 @@ let make_tree_hts conf base gv p =
                 ^^^ DagDisplay.image_txt conf base sp
               in
               ( (2 * ncol) - 1,
-                CenterA,
-                TDitem (Driver.get_iper sp, s, Adef.safe "spouse_x") )
+                Dag2html.CenterA,
+                Dag2html.TDitem (Driver.get_iper sp, s, Adef.safe "spouse_x") )
             in
             loop (td :: tdl) (i + 1)
         in
         loop tdl 0
-    | _ -> (1, LeftA, TDnothing) :: tdl
+    | _ -> (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
   in
   let next_gen gen =
     List.fold_right
@@ -1366,23 +1385,23 @@ let desmenu_print = Perso.interp_templ "desmenu"
 (* one td is [nb_cols * align * content]  see dag2Html.ml *)
 
 (* empty fill over n columns *)
-let td_fill x1 xn = [ (xn - x1, CenterA, TDnothing) ]
+let td_fill x1 xn = [ (xn - x1, Dag2html.CenterA, Dag2html.TDnothing) ]
 
 (* hbar over xn - x1 columns. First and last are left/right and 50% *)
 let td_hbar x1 xn =
   match xn - x1 with
-  | 0 -> [ (1, CenterA, TDnothing) ]
-  | 1 -> [ (1, CenterA, TDhr CenterA) ]
+  | 0 -> [ (1, Dag2html.CenterA, Dag2html.TDnothing) ]
+  | 1 -> [ (1, Dag2html.CenterA, Dag2html.TDhr Dag2html.CenterA) ]
   | _ ->
       [
-        (1, LeftA, TDhr LeftA);
-        (xn - x1 - 1, CenterA, TDhr CenterA);
-        (1, RightA, TDhr RightA);
+        (1, Dag2html.LeftA, Dag2html.TDhr Dag2html.LeftA);
+        (xn - x1 - 1, Dag2html.CenterA, Dag2html.TDhr Dag2html.CenterA);
+        (1, Dag2html.RightA, Dag2html.TDhr Dag2html.RightA);
       ]
 
 (* regular cell, centered, with text as content (may contain |<br>) *)
 let td_cell cols align ip text flags =
-  [ (cols, align, TDitem (ip, text, flags)) ]
+  [ (cols, align, Dag2html.TDitem (ip, text, flags)) ]
 
 (* tdal is   (int   *    list      ) list           *)
 (*           (lastx      list of td) list of rows   *)
@@ -1533,7 +1552,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
     tdal_add tdal ir
       (List.rev_append
          (td_fill lx (x - 1))
-         (td_cell 1 CenterA (Driver.get_iper p) txt (Adef.safe "")))
+         (td_cell 1 Dag2html.CenterA (Driver.get_iper p) txt (Adef.safe "")))
       x
   in
   (tdal, x)
@@ -1607,7 +1626,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     tdal_add tdal ir2
       (List.rev_append
          (td_fill lx (x - 1))
-         (td_cell 1 CenterA (Driver.get_iper sp) txt (Adef.safe flag)))
+         (td_cell 1 Dag2html.CenterA (Driver.get_iper sp) txt (Adef.safe flag)))
       x
   in
   (* rox 4: Hbar over kids *)
@@ -1647,13 +1666,15 @@ let complete_rows tdal =
 let init_tdal gv = Array.make (4 * (gv + 1)) (0, [])
 
 (* bring back spouses together *)
-(* Spouse_no_d, TDnothing, Spouse becomes TDnothing, Spouse_no_d, Spouse *)
+(* Spouse_no_d, Dag2html.TDnothing, Spouse becomes Dag2html.TDnothing, Spouse_no_d, Spouse *)
 let correct_spouses tdal =
   let rec regroup row new_row =
     match row with
     | (nc1, a1, t1) :: (nc2, a2, t2) :: (nc3, a3, t3) :: row -> (
         match (t1, t2, t3) with
-        | TDitem (_, _, f1), TDnothing, TDitem (_, _, f3) -> (
+        | ( Dag2html.TDitem (_, _, f1),
+            Dag2html.TDnothing,
+            Dag2html.TDitem (_, _, f3) ) -> (
             match
               ( String.split_on_char '-' (f1 :> string),
                 String.split_on_char '-' (f3 :> string) )
@@ -1698,7 +1719,7 @@ let expand_cell tdal =
     match row with
     | (nc1, a1, t1) :: (nc2, a2, t2) :: (nc3, a3, t3) :: row -> (
         match (t1, t2, t3) with
-        | TDnothing, TDitem _, TDnothing ->
+        | Dag2html.TDnothing, Dag2html.TDitem _, Dag2html.TDnothing ->
             if nc1 > 2 && nc3 > 2 then
               expand
                 ((nc2 + 2, a2, t2) :: (nc3 - 1, a3, t3) :: row)
@@ -1744,12 +1765,14 @@ let clean_rows tdal =
 (* manage vbars    *)
 (* suppress lines containing only vbars *)
 (* in one colums, if there is nothing between two vbars, insert vbars *)
-(* vbar = [1, CenterA,  TDtext "|"] filler is [(xn - x1), CenterA, TDnothing] *)
+(* vbar = [1, Dag2html.CenterA,  Dag2html.TDtext "|"] filler is [(xn - x1), Dag2html.CenterA, Dag2html.TDnothing] *)
 let manage_vbars tdal =
   let vbar_only_in_row row =
     List.fold_left
       (fun res (_, _, td) ->
-        if td <> TDnothing && td <> TDtext (Driver.Iper.dummy, Adef.safe "|")
+        if
+          td <> Dag2html.TDnothing
+          && td <> Dag2html.TDtext (Driver.Iper.dummy, Adef.safe "|")
         then false && res
         else true && res)
       true row
