@@ -9,7 +9,7 @@ homepage: "https://geneweb.org"
 doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
-  "dune" {>= "3.6"}
+  "dune" {>= "3.8"}
   "ocaml"
   "odoc" {with-doc}
 ]
