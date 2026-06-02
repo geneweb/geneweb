@@ -16727,6 +16727,38 @@ sl: zveza
 sv: släktskap
 tr: ilişki
 
+    estimated average percentage of shared DNA
+af: beraamde gemiddelde persentasie gedeelde DNA
+bg: приблизителен среден процент споделена ДНК
+br: pourvezet keid argen ar c’hen ADN rannet
+ca: percentatge mitjà estimat d’ADN compartit
+co: percentuale media stimata di DNA condiviso
+cs: odhadovaný průměrný procentní podíl sdílené DNA
+da: estimeret gennemsnitlig procentdel delt DNA
+de: geschätzter durchschnittlicher Prozentsatz gemeinsamer DNA
+en: estimated average percentage of shared DNA
+eo: laŭtaksa averaĝa procento de komuna DNA
+es: porcentaje medio estimado de ADN compartido
+et: hinnanguline keskmine jagatud DNA protsent
+fi: arvioitu keskimääräinen jaetun DNA:n osuus
+fr: pourcentage moyen estimé d’ADN partagé
+he: אחוז ממוצע משוער של DNA משותף
+is: áætlað meðaltal sameiginlegs DNA í prósentum
+it: percentuale media stimata di DNA condiviso
+lt: apskaičiuotas vidutinis bendros DNR procentas
+lv: aptuvenais kopīgās DNS vidējais procentuālais daudzums
+nl: geschat gemiddeld percentage gedeeld DNA
+no: estimert gjennomsnittlig prosentandel delt DNA
+oc: percentatge mejan estimat d’ADN partejat
+pl: szacowany średni procent wspólnego DNA
+pt: percentagem média estimada de ADN partilhado
+ro: procent mediu estimat de ADN partajat
+ru: оценочный средний процент общей ДНК
+sk: odhadovaný priemerný percentuálny podiel zdieľanej DNA
+sl: ocenjeni povprečni odstotek deljene DNK
+sv: uppskattad genomsnittlig andel delat DNA
+tr: tahmini ortalama paylaşılan DNA yüzdesi
+
     relationship coefficient/percentage
 af: verwantskapskoëfficiënt/verwantskappersentasie
 bg: коефициент на родство/процент на родство

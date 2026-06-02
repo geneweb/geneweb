@@ -1100,20 +1100,27 @@ let print_main_relationship conf base long p1 p2 rel =
         rl;
       Output.print_sstring conf "\n";
       if long then () else print_dag_links conf base p1 p2 rl;
-      if
-        (not all_by_marr)
-        && Util.authorized_age conf base p1
-        && Util.authorized_age conf base p2
-        && Driver.get_consang a1 != Adef.fix (-1)
-        && Driver.get_consang a2 != Adef.fix (-1)
-      then
-        Output.printf conf {|<p><em>%s%s %s%%</em></p>
-|}
-          (Utf8.capitalize_fst (Util.transl conf "relationship"))
-          (Util.transl conf ":")
-          (Util.string_of_decimal_num conf
-             (round_2_dec
-                (Adef.float_of_fix (Adef.fix_of_float relationship) *. 100.0)));
+      (if
+         (not all_by_marr)
+         && Util.authorized_age conf base p1
+         && Util.authorized_age conf base p2
+         && Driver.get_consang a1 != Adef.fix (-1)
+         && Driver.get_consang a2 != Adef.fix (-1)
+       then
+         let pct =
+           Adef.float_of_fix (Adef.fix_of_float relationship) *. 100.0
+         in
+         let pct_dna = pct *. 2.0 in
+         let colon = Util.transl conf ":" in
+         Output.printf conf {|<div>%s (Malécot)%s %s%%<br>%s%s %s%%</div>|}
+           (Utf8.capitalize_fst
+              (Util.transl_nth conf "relationship coefficient/percentage" 0))
+           colon
+           (Util.string_of_decimal_num conf (round_2_dec pct))
+           (Utf8.capitalize_fst
+              (Util.transl conf "estimated average percentage of shared DNA"))
+           colon
+           (Util.string_of_decimal_num conf (round_2_dec pct_dna)));
       print_propose_upto conf base p1 p2 rl);
   Hutil.trailer conf
 
