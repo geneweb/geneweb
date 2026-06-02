@@ -1,16 +1,3 @@
-ifneq ($(MAKECMDGOALS),ci)
-Makefile.config: configure.ml
-	@if [ -e "$@" ]; then \
-	  echo "configure file has changed. Please rerun ocaml ./configure.ml"; exit 1; \
-	else \
-	  echo "Please run ocaml ./configure.ml first"; exit 1; \
-	fi
-include Makefile.config
-
-endif
-
--include Makefile.local
-
 .PHONY: info refresh-version fmt build build-geneweb build-geneweb-rpc gwd \
         install uninstall distrib distrib-rpc doc opendoc test bench \
         bench-marshal bench-tabulate clean ci ocp-indent help bundle \

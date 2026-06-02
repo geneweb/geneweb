@@ -2,9 +2,6 @@
 
 distribution
 
-Makefile.config
-Makefile.local
-
 test-gw-vars.txt
 test/ref
 
