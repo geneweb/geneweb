@@ -35,7 +35,7 @@ fmt build build-geneweb gwd distrib install uninstall: info
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
-	dune build @fmt --auto-promote
+	dune fmt
 
 build:
 	dune build
@@ -54,14 +54,6 @@ gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
 	dune build bin/gwd bin/gwc
 	@printf "Done."
-
-install: ## Install geneweb using dune
-	dune build @install
-	dune install
-
-uninstall: ## Uninstall geneweb using dune
-	dune build @install
-	dune uninstall
 
 distrib: ## Build the project and copy what is necessary for distribution
 	dune build --release @bin/all @lib/all
@@ -182,6 +174,10 @@ test: ## Run tests
 test:
 	@dune build @runtest
 
+ci: ## Run tests, skip known failures
+ci:
+	@GENEWEB_CI=on dune build @runtest
+
 bench: ## Run benchmarks
 bench:
 	dune build @runbench
@@ -206,17 +202,6 @@ clean:
 	@rm -rf $(DISTRIB_DIR)
 	@rm -rf _build
 	@echo " Done."
-
-ci: ## Run tests, skip known failures
-ci:
-	@GENEWEB_CI=on dune build @runtest
-
-ocp-indent: ## Run ocp-indent (inplace edition)
-ocp-indent:
-	for f in `find lib bin -type f -regex .*[.]ml[i]?` ; do \
-		echo $$f ; \
-		ocp-indent -i $$f ; \
-	done
 
 .DEFAULT_GOAL := help
 help:
