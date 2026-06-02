@@ -1,6 +1,7 @@
 {
   lib,
   buildDunePackage,
+  alcotest,
   ancient,
   brotli,
   pcre2,
@@ -20,6 +21,8 @@
   ppx_blob,
   ppx_deriving,
   ppx_import,
+  qcheck,
+  qcheck-alcotest,
   stdlib-shims,
   unidecode,
   uutf,
@@ -41,12 +44,19 @@ buildDunePackage {
   pname = "geneweb";
   version = "dev";
   src = lib.cleanSource ../.;
+  doCheck = true;
 
   nativeBuildInputs = [
     brotli
     not-ocamlfind
     cppo
     camlp5
+  ];
+
+  buildInputs = [
+    alcotest
+    qcheck
+    qcheck-alcotest
   ];
 
   propagatedBuildInputs = [

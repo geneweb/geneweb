@@ -22,6 +22,7 @@
 buildDunePackage {
   pname = "geneweb-rpc";
   inherit (geneweb) version src;
+  doCheck = true;
 
   buildInputs = [
     geneweb-compat
