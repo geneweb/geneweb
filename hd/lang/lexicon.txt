@@ -967,101 +967,101 @@ sl: <em>številka"Sosa"</em>, v odnosu z %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
 tr: <em>Sosa sayısı</em> %t'e göre
 
-    a %s cousin
-af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
-bg: %sи братовчед/%sа братовчедка
-br: ur c'henderv a live an %s derez/ur geniterv a live an %s derez/ ur c'h(g)enderv(ez) a live an %s derez
-ca: un cosí de %s grau/una cosina de %s grau/un(a) cosí(na) de %s grau
-co: un cuginu à u %s gradu/una cugina à u %s gradu/un(a) cuginu(a) à u %s gradu
-cs: bratranec z %s kolena/sestřenice z %s kolena
-da: en fætter af %s grad/en kusine af %s grad
+    a %s%s cousin
+af: 'n %s%s neef/'n %s%s niggie
+bg: %s%sи братовчед/%s%sа братовчедка
+br: ur %s%s c'henderv/ur %s%s geniterv/ur %s%s c'henderv(ez)
+ca: un %s%s cosí/una %s%s cosina/un(a) %s%s cosí(na)
+co: un %s%s cuginu/una %s%s cugina/un(a) %s%s cuginu(a)
+cs: %s%s bratranec/%s%s sestřenice
+da: en %s%s fætter/en %s%s kusine
 de: ein:d:+em Cousin %s Grades/eine:d:+r Cousine %s Grades
-en: a %s cousin
-eo: %s grada kuzo/%s grada kuzino/%s grada kuz(in)o
-es: un primo en %s grado/una prima en %s grado/un(a) primo(a) en %s grado
-et: %s astme nõbu:g:--o
-fi: %s serkku:g:--un
-fr: un cousin au %s degré/une cousine au %s degré/un(e) cousin(e) au %s degré
-he: בן-דוד לדרגה  %s/ בת-דוד לדרגה  %s
-is: systkynabarn %s
-it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
-lt: %s-os eilės pusbrolis/pusseserė
-lv: %s brālēns/māsīca
-nl: een neef in de %s generatie/een nicht in de %s generatie
-no: %smenning
-oc: un cosin del %s gra/una cosina del %s gra/un(a) cosi(na) del %s gra
-pl: kuzyn %s-tego stopnia/kuzynka %s-tego stopnia
-pt: um primo em %s grau/uma prima em %s grau/um(a) primo(a) em %s grau
-ro: un var de gradul %s
-ru: %s-ий кузен/%s-я кузина
-sk: bratranec/sesternica z %s kolena
-sl: bratranec v %s kolenu/sestrična v %s kolenu
-sv: %smänning
-tr: bir %s kuzeni
+en: a %s%s cousin
+eo: %s%s kuzo/%s%s kuzino/%s%s kuzin(o)
+es: un %s%s primo/una %s%s prima/un(a) %s%s primo(a)
+et: %s%s astme nõbu:g:--o
+fi: %s%s serkku:g:--un
+fr: un %s%s cousin/une %s%s cousine/un(e) %s%s cousin(e)
+he: בן-דוד %s%s/בת-דוד %s%s
+is: %s%s systkynabarn
+it: un %s%s cugino/una %s%s cugina/un(a) %s%s cugino(a)
+lt: %s%s pusbrolis/pusseserė
+lv: %s%s brālēns/māsīca
+nl: een %s%s neef/een %s%s nicht
+no: %s%smenning
+oc: un %s%s cosin/una %s%s cosina/un(a) %s%s cosin(a)
+pl: %s%s kuzyn/%s%s kuzynka
+pt: um %s%s primo/uma %s%s prima/um(a) %s%s primo(a)
+ro: un %s%s văr
+ru: %s%s кузен/%s%s кузина
+sk: %s%s bratranec/%s%s sesternica
+sl: %s%s bratranec/%s%s sestrična
+sv: %s%s kusin
+tr: %s%s kuzen
 
     a 2nd cousin
-af: 'n kleinneef/'n kleinniggie
-bg: втори братовчед/втора братовчедка
-br: ur c'hevenderv/ur gevendervez/ur c'h(g)evenderv(ez)
-ca: un cosí segon/una cosina segona/un(a) cosí(na) segon(a)
-co: un cuginu à u %s gradu/una cugina à u %s gradu/un(a) cuginu(a) à u %s gradu
-cs: bratranec z druhého kolena/sestřenice z druhého kolena
-da: en fætter af 2. grad/en kusine af 2. grad
+af: 'n %skleinneef/'n %skleinniggie
+bg: %sвтори братовчед/%sвтора братовчедка
+br: ur %sc'hevenderv/ur %sgevendervez/ur %sc'hevnderv(ez)
+ca: un %scosí segon/una %scosina segona/un(a) %scosí(na) segon(a)
+co: un %scuginu à u 2 gradu/una %scugina à u 2 gradu/un(a) %scuginu(a) à u 2 gradu
+cs: %sbratranec z druhého kolena/%ssestřenice z druhého kolena
+da: en %sfætter af 2. grad/en %skusine af 2. grad
 de: ein:d:+em %sCousin 2. Grades/eine:d:+r %sCousine 2. Grades
 en: a %s2nd cousin
-eo: rekta prakuzo/rekta prakuzino/rekta kuz(in)o
-es: un primo nacido de primos hermanos/una prima nacida de primos hermanos/un(a) primo(a) nacido(a) de primos hermanos
-et: teise astme nõbu:g:--o
-fi: pikkuserkku:g:--un
+eo: %srekta prakuzo/%srekta prakuzino/%srekta kuz(in)o
+es: un %sprimo nacido de primos hermanos/una %sprima nacida de primos hermanos
+et: %steise astme nõbu:g:--o
+fi: %spikkuserkku:g:--un
 fr: un %scousin issu de germains/une %scousine issue de germains
-he: בן-דוד שני/ בת-דוד שניה
-is: tremenningur
-it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino(a) di 2o grado
-lt: antros eilės pusbrolis/pusseserė
-lv: otrais brālēns/māsīca
-nl: een neef in de tweede generatie/een nicht in de tweede generatie
-no: en tremenning
-oc: un cosin eissit de germans/una cosina eissida de germans/un(a) cosin(a) eissit(da) de germans
-pl: kuzyn/kuzynka drugiego stopnia
-pt: um primo em 2º grau/uma prima em 2º grau/um(a) primo(a) em 2º grau
-ro: un var de gradul doi
-ru: троюродный брат/троюродная сестра
-sk: bratranec/sesternica z druhého kolena
-sl: bratranec iz drugega kolena/sestrična iz drugega kolena
-sv: en syssling
-tr: bir 2. kuzen
+he: %sבן-דוד שני/%sבת-דוד שנייה
+is: %stremenningur
+it: un %scugino di 2o grado/una %scugina di 2o grado
+lt: %santros eilės pusbrolis/%spusseserė
+lv: %sotrais brālēns/%smāsīca
+nl: een %sneef in de tweede generatie/een %snicht in de tweede generatie
+no: en %stremenning
+oc: un %scosin eissit de germans/una %scosina eissida de germans
+pl: %skuzyn drugiego stopnia/%skuzynka drugiego stopnia
+pt: um %sprimo em 2º grau/uma %sprima em 2º grau
+ro: un %svar de gradul doi
+ru: %sтроюродный брат/%sтроюродная сестра
+sk: %sbratranec z druhého kolena/%ssesternica z druhého kolena
+sl: %sbratranec iz drugega kolena/%ssestrična iz drugega kolena
+sv: en %ssyssling
+tr: bir %s2. kuzen
 
     a 3rd cousin
-af: 'n agterkleinneef/'n agterkleinniggie
-bg: трети братовчед/трета братовчедка
-br: ur c'hevniant/ur gevniantez/ur c'h(g)evniant(ez)
-ca: un cosí 3er/una cosina 3a/un(a) cosí(na) 3er(a)
-co: un %scuginu à u terzu gradu/una %scugina à u terzu gradu/un(a) %scuginu(a) à u terzu gradu
-cs: bratranec z třetího kolena/sestřenice z třetího kolena
-da: en fætter af 3. grad/en kusine af 3. grad
+af: 'n %sagterkleinneef/'n %sagterkleinniggie
+bg: %sтрети братовчед/%sтрета братовчедка
+br: ur %sc'hevniant/ur %sgevniantez/ur %sc'hevniant(ez)
+ca: un %scosí 3er/una %scosina 3a/un(a) %scosí(na) 3er(a)
+co: un %scuginu à u 3 gradu/una %scugina à u 3 gradu/un(a) %scuginu(a) à u 3 gradu
+cs: %sbratranec z třetího kolena/%ssestřenice z třetího kolena
+da: en %sfætter af 3. grad/en %skusine af 3. grad
 de: ein:d:+em %sCousin 3. Grades/eine:d:+r %sCousine 3. Grades
 en: a %s3rd cousin
-eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
-es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
-et: kolmanda astme nõbu:g:--o
-fi: kolmas serkku:g:nnen serkun
-fr: un %scousin issu d’issus de germains/une %scousine issue d’issus de germains/un(e) %scousin(e) issu(e) d’issus de germains
-he: בן-דוד שלישי/ בת-דוד שלישית
-is: fjórmenningur
-it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino(a) di 3o grado
-lt: trečios eilės pusbrolis/pusseserė
-lv: trešais brālēns/māsīca
-nl: een neef in de derde generatie/een nicht in de derde generatie
-no: en firmenning
-oc: un cosin eissit d'eissits de germans/una cosina eissida d'eissits de germans/un(a) cosin(a) eissit(da) d'eissits de germans
-pl: kuzyn/kuzynka trzeciego stopnia
-pt: um primo em 3º grau/uma prima em 3º grau/um(a) primo(a) em 3º grau
-ro: un var de gradul trei
-ru: троюродный кузен/троюродная кузина
-sk: bratranec/sesternica z tretieho kolena
-sl: bratranec v tretjem kolenu/sestrična v tretjem kolenu
-sv: en brylling
-tr: bir 3. kuzen
+eo: %s3a grada kuzo/%s3a grada kuzino/%s3a grada kuz(in)o
+es: un %sprimo 3ro/una %sprima 3ro/un(a) %sprimo(a) 3ro
+et: %skolmanda astme nõbu:g:--o
+fi: %skolmas serkku:g:nnen serkun
+fr: un %scousin issu d’issus de germains/une %scousine issue d’issus de germains
+he: %sבן-דוד שלישי/%sבת-דוד שלישית
+is: %sfjórmenningur
+it: un %scugino di 3o grado/una %scugina di 3o grado
+lt: %strečios eilės pusbrolis/%spusseserė
+lv: %strešais brālēns/%smāsīca
+nl: een %sneef in de derde generatie/een %snicht in de derde generatie
+no: en %sfirmenning
+oc: un %scosin eissit d'eissits de germans/una %scosina eissida d'eissits de germans
+pl: %skuzyn trzeciego stopnia/%skuzynka trzeciego stopnia
+pt: um %sprimo em 3º grau/uma %sprima em 3º grau
+ro: un %svar de gradul trei
+ru: %sтроюродный кузен/%sтроюродная кузина
+sk: %sbratranec z tretieho kolena/%ssesternica z tretieho kolena
+sl: %sbratranec v tretjem kolenu/%ssestrična v tretjem kolenu
+sv: en %sbrylling
+tr: bir %s3. kuzen
 
     a brother-in-law/a sister-in-law
 af: 'n swaer/'n skoonsuster
@@ -1105,36 +1105,36 @@ sv: en svåger/svågrar/en svägerska/svägerskor
 tr: bir kayınbiraderi/kayınbiraderleri/bir kayınbiraderi/kayınbiraderleri
 
     a brother/a sister/a sibling
-af: 'n broer/'n sister/'n sibbe
-bg: брат/сестра/брат или сестра
-br: ur breur/ur c'hoar/ur breur pe ur c'hoar
-ca: un germà/una germana/un(a) germà(na)
-co: un %sfratellu/una %surella/un %sfratellu o una surella
-cs: bratr/sestra/sourozenec
-da: en broder/en søster/en broder eller en søster
+af: 'n %sbroer/'n %ssuster/'n %ssibbe
+bg: %sбрат/%sсестра/%sбрат или %sсестра
+br: ur %sbreur/ur %sc'hoar/ur %sbreur pe ur %sc'hoar
+ca: un %sgermà/una %sgermana/un(a) %sgermà(na)
+co: un %sfratellu/una %ssurella/un %sfratellu o una %ssurella
+cs: %sbratr/%ssestra/%ssourozenec
+da: en %sbroder/en %ssøster/en %sbroder eller en %ssøster
 de: ein %sBruder/eine %sSchwester/ein %sBruder oder eine %sSchwester
 en: a %sbrother/a %ssister/a %ssibling
-eo: frato/fratino/frat(in)o
-es: un hermano/una hermana/un(a) hermano(a)
-et: vend:g:-na/õde:g:--e/õde:g:--e või vend:g:-na
-fi: veli:g:-jen/sisar:g:+en/sisarus:g:-ksen
-fr: un %sfrère/une %ssœur/un %sfrère ou sœur
-he: אח/ אחות/ אח(ות)
-is: bróðir/systir/systkyn
-it: un fratello/una sorella/un fratello o una sorella
-lt: brolis/sesuo/brolis arba sesuo
-lv: brālis/māsa/a sibling
-nl: een broer/een zuster/een broer of een zuster
-no: bror/søster/søsken
-oc: un fraire/una sòrre/un fraire o una sòrre
-pl: brat/siostra/brat lub siostra
-pt: um irmão/uma irmã/um(a) irmão(ã)
-ro: frate/sora/un frate sau o sora
-ru: брат/сестра/брат или сестра
-sk: brat/sestra/súrodenec
-sl: brat/sestra/brat ali sestra
-sv: en bror/en syster/ett syskon
-tr: bir erkek kardeş/bir kız kardeş/bir kardeş
+eo: %sfrato/%sfratino/%sfrat(in)o
+es: un %shermano/una %shermana/un(a) %shermano(a)
+et: %svend:g:-na/%sõde:g:--e/%sõde:g:--e või vend:g:-na
+fi: %sveli:g:-jen/%ssisar:g:+en/%ssisarus:g:-ksen
+fr: un %sfrère/une %ssœur/un %sfrère ou une %ssœur
+he: %sאח/%sאחות/%sאח(ות)
+is: %sbróðir/%ssystir/%ssystkyn
+it: un %sfratello/una %ssorella/un %sfratello o una %ssorella
+lt: %sbrolis/%ssesuo/%sbrolis arba %ssesuo
+lv: %sbrālis/%smāsa/%sbrālis vai %smāsa
+nl: een %sbroer/een %szuster/een %sbroer of een %szuster
+no: %sbror/%ssøster/%ssøsken
+oc: un %sfraire/una %ssòrre/un %sfraire o una %ssòrre
+pl: %sbrat/%ssiostra/%sbrat lub %ssiostra
+pt: um %sirmão/uma %sirmã/um(a) %sirmão(ã)
+ro: %sfrate/%ssora/%sfrate sau %ssora
+ru: %sбрат/%sсестра/%sбрат или %sсестра
+sk: %sbrat/%ssestra/%ssúrodenec
+sl: %sbrat/%ssestra/%sbrat ali %ssestra
+sv: en %sbror/en %ssyster/ett %ssyskon
+tr: bir %serkek kardeş/bir %skız kardeş/bir %skardeş
 
     a child-in-law/children-in-law
 co: un ghjeneru o una nora/ghjeneri o nore
@@ -1146,36 +1146,36 @@ sv: ett syskonbarn/syskonbarn
 tr: bir kayınvalidesi/kayınvalideleri
 
     a cousin
-af: 'n neef/'n niggie
-bg: първи братовчед/първа братовчедка
-br: ur c'henderv/ur geniterv
-ca: un cosí/una cosina
+af: 'n %sneef/'n %sniggie
+bg: %sпърви братовчед/%sпърва братовчедка
+br: ur %sc'henderv/ur %sgeniterv
+ca: un %scosí/una %scosina
 co: un %scuginu/una %scugina/un %scuginu o una %scugina
-cs: bratranec/sestřenice
-da: en fætter/en kusine
-de: ein:d:+em %sCousin/eine:d:+r %sCousine
+cs: %sbratranec/%ssestřenice
+da: en %sfætter/en %skusine
+de: ein %sCousin/eine %sCousine
 en: a %scousin
-eo: kuzo/kuzino
-es: un primo/una prima
-et: nõbu:g:--o
-fi: serkku:g:--un
+eo: %skuzo/%skuzino
+es: un %sprimo/una %sprima
+et: %snõbu:g:--o
+fi: %sserkku:g:--un
 fr: un %scousin/une %scousine/un·e·%scousin·e
-he: בן-דוד/ בת-דוד
-is: systkynabarn
-it: un cugino/una cugina
-lt: pusbrolis/pusseserė
-lv: brālēns/māsīca
-nl: een neef/een nicht
-no: et søskenbarn
-oc: un cosin/una cosina
-pl: kuzyn/kuzynka
-pt: um primo/uma prima
-ro: un var
-ru: кузен/кузина
-sk: bratranec/sesternica
-sl: bratranec/sestrična
-sv: en kusin
-tr: bir kuzeni
+he: %sבן-דוד/%sבת-דוד
+is: %ssystkynabarn
+it: un %scugino/una %scugina
+lt: %spusbrolis/%spusseserė
+lv: %sbrālēns/%smāsīca
+nl: een %sneef/een %snicht
+no: et %ssøskenbarn
+oc: un %scosin/una %scosina
+pl: %skuzyn/%skuzynka
+pt: um %sprimo/uma %sprima
+ro: un %svar
+ru: %sкузен/%sкузина
+sk: %sbratranec/%ssesternica
+sl: %sbratranec/%ssestrična
+sv: en %skusin
+tr: bir %skuzen
 
     a descendant
 af: 'n afstammeling
@@ -1338,68 +1338,68 @@ sv: ett barnbarns barn/ett barnbarns barn/ett barnbarns barn
 tr: bir büyük torun/bir büyük torun/bir büyük torun
 
     a great-nephew/a great-niece
-af: 'n agterneef/'n agterniggie
-bg: внук на брат или сестра/внучка на брат или сестра
-br: un niz bihan/ur verc'h vihan
-ca: un besnebot/una besneboda
-co: un %sniputinu/una %sniputina/niputini/niputine/niputini è niputine
-cs: prasynovec/praneteř
-da: en grandnevø/en grandniece
+af: 'n %sagterneef/'n %sagterniggie
+bg: %sвнук на брат или сестра/%sвнучка на брат или сестра
+br: un %sniz bihan/ur %sverc'h vihan
+ca: un %sbesnebot/una %sbesneboda
+co: un %sniputinu/una %sniputina/%sniputini/%sniputine/%sniputini è %sniputine
+cs: %sprasynovec/%spraneteř
+da: en %sgrandnevø/en %sgrandniece
 de: ein:d:+em %sGroßneffe:d:+n/eine:d:+r %sGroßnichte/Großneffen/Großnichten/Großneffen und Großnichten
-en: a %sgreat-nephew/a %sgreat-niece/great-nephew/great-niece/great-nephews and great-nieces
-eo: pranevo/pranevino
-es: un sobrino nieto/una sobrina nieta
-et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
-fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:---tären
-fr: un %spetit-neveu/une %spetite-nièce/petits-neveux/petites-nièces/petits-neveux et petites-nièces
-he: בן האחיין/ בת האחיין
-is: frændi/frænka
-it: un pronipote/una pronipote
-lt: brolio ar sesers anūkas/brolio ar sesers anūkė
-lv: brāļa/māsas mazdēls/mazmeita
-nl: een achterneef/een achternicht
-no: en grandnevø/en grandniese
-oc: un rèirenebot/una rèireneboda
-pl: wnuk brata lub siostry/wnuczka brata lub siostry
-pt: um sobrinho-neto/uma sobrinha-neta
-ro: stranepot/stranepoata/stranepoti
-ru: внучатый племянник/внучатая племянница
-sk: prasynovec/praneter
-sl: pranečak/pranečakinja
-sv: en gammel-nevö/en gammel-niece
-tr: bir büyük yeğen/bir büyük yeğen/büyük yeğen/büyük yeğen/büyük yeğenler ve büyük yeğenler
+en: a %sgreat-nephew/a %sgreat-niece/%sgreat-nephews/%sgreat-nieces/%sgreat-nephews and %sgreat-nieces
+eo: %spranevo/%spranevino
+es: un %ssobrino nieto/una %ssobrina nieta
+et: %svenna- või õelapse poeg:g:--ja/%svenna- või õelapse tütar:g:--re
+fi: %sveljen- tai sisarenlapsen poika:g:---jan/%sveljen- tai sisarenlapsen tytär:g:---tären
+fr: un %spetit-neveu/une %spetite-nièce/%spetits-neveux/%spetites-nièces/%spetits-neveux et %spetites-nièces
+he: %sבן האחיין/%sבת האחיין
+is: %sfrændi/%sfrænka
+it: un %spronipote/una %spronipote
+lt: %sbrolio ar %sasesers anūkas/%sbrolio ar %sasesers anūkė
+lv: %sbrāļa/ %smāsas mazdēls/%smazmeita
+nl: een %sachterneef/een %sachternicht
+no: en %sgrandnevø/en %sgrandniese
+oc: un %srèirenebot/una %srèireneboda
+pl: %swnuk brata lub %ssiostry/%swnuczka brata lub %ssiostry
+pt: um %ssobrinho-neto/uma %ssobrinha-neta
+ro: %sstranepot/%sstranepoată/%sstranepoti
+ru: %sвнучатый племянник/%sвнучатая племянница
+sk: %sprasynovec/%spraneter
+sl: %spranečak/%spranečakinja
+sv: en %sgammel-nevö/en %sgammel-niece
+tr: bir %sbüyük yeğen/bir %sbüyük yeğen/%sbüyük yeğen/%sbüyük yeğen/%sbüyük yeğenler ve %sbüyük yeğenler
 
     a great-uncle/a great-aunt
-af: 'n grootoom/'n groottante
-bg: чичо на родител/леля на родител/вуйчо на родител/леля на родител
-br: un eontr-kuñv /ur voereb guñv
-ca: un oncle avi/una tia àvia
+af: 'n %sgrootoom/'n %sgroottante
+bg: %sчичо на родител/%sлеля на родител/%sвуйчо на родител/%sлеля на родител
+br: un %seontr-kuñv/ur %svoereb guñv
+ca: un %soncle avi/una %stia àvia
 co: un %sarciziu/una %sarcizia
-cs: prastrýc/prateta
-da: en grandonkel/en grandtante
+cs: %sprastrýc/%sprateta
+da: en %sgrandonkel/en %sgrandtante
 de: ein:d:+em %sGroßonkel/eine:d:+r %sGroßtante
 en: a %sgreat-uncle/a %sgreat-aunt
-eo: praonklo/praonklino
-es: un tio abuelo/una tia abuela
-et: vanaonu/vanatädi
-fi: isosetä:g:---dän/isotäti:g:--din
+eo: %spraonklo/%spraonklino
+es: un %stío abuelo/una %stía abuela
+et: %svanaonu/%svanatädi
+fi: %sisosetä:g:---dän/%sisotäti:g:--din
 fr: un %sgrand-oncle/une %sgrande-tante
-he: דוד-סב/ דודה-סבה
-is: afa(ömmu)bróðir/afa(ömmu)systir
-it: un prozio/una prozia
-lt: antros eilės dėdė/ antros eilės teta
-lv: vectēva/vecmamas brālis/māsa
-nl: een oudoom/een oudtante
-no: en grandonkel/en grandtante
-oc: un rèironcle/una rèiretanta
-pl: brat dziadka lub babki/siostra dziadka lub babki
-pt: um tio-avô/uma tia-avó
-ro: frate de bunici/sara de bunici
-ru: дядя родителя/тетя родителя
-sk: prastrýko/prateta
-sl: prastric/prateta
-sv: en gammel-farbror/en gammel-moster
-tr: bir büyük amca/bir büyük teyze
+he: %sדוד-סב/%sדודה-סבה
+is: %safa(ömmu)bróðir/%safa(ömmu)systir
+it: un %sprozio/una %sprozia
+lt: %santros eilės dėdė/%santros eilės teta
+lv: %svectēva brālis/%svecmamas brālis/%smāsa
+nl: een %soudoom/een %soudtante
+no: en %sgrandonkel/en %sgrandtante
+oc: un %srèironcle/una %srèiretanta
+pl: %sbrat dziadka lub %sbabki/%ssiostra dziadka lub %sbabki
+pt: um %stio-avô/uma %stia-avó
+ro: %sfrate de bunici/%ssora de bunici
+ru: %sдядя родителя/%sтетя родителя
+sk: %sprastrýko/%sprateta
+sl: %sprastric/%sprateta
+sv: en %sgammel-farbror/en %sgammel-moster
+tr: bir %sbüyük amca/bir %sbüyük teyze
 
     a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
 co: un mezu cugnatu/mezu cugnati/una meza cugnata/meza cugnate
@@ -1452,36 +1452,36 @@ sv: en halvbror/en halvsyster/ett halvsyskon
 tr: bir üvey erkek kardeş/bir üvey kız kardeş/bir üvey kardeş
 
     a nephew/a niece
-af: 'n broerskind/'n susterskind///broers- en susterskinders
-bg: племенник/племенница/племенници/племеннички/племенници и племеннички
-br: un niz/un nizez/nized/nizezed/nized ha nizezed
-ca: un nebot/una neboda/nebots/nebodes/nebots i nebodes
-co: un %snipote/una %snipote/nipoti/nipote/nipoti è nipote
-cs: synovec/neteř/synovci/neteře/synovci a neteře
-da: en nevø/en niece/nevøer/niecer/nevøer og niecer
+af: 'n %sbroerskind/'n %ssusterskind/%sbroers- en %ssusterskinders
+bg: %sплеменник/%sплеменница/%sплеменници/%sплеменнички/%sплеменници и %sплеменнички
+br: un %sniz/un %snizez/%snized/%snizezed/%snized ha %snizezed
+ca: un %snebot/una %sneboda/%snebots/%snebodes/%snebots i %snebodes
+co: un %snipote/una %snipote/%snipoti/%snipote/%snipoti è %snipote
+cs: %ssynovec/%sneteř/%ssynovci/%sneteře/%ssynovci a %sneteře
+da: en %snevø/en %sniece/%snevøer/%sniecer/%snevøer og %sniecer
 de: ein:d:+em %sNeffe:d:+n/eine:d:+r %sNichte/Neffen/Nichten/Neffen und Nichten
-en: a %snephew/a %sniece/nephews/nieces/nephews and nieces
-eo: nevo/nevino/nevoj/nevinoj/nevoj kaj nevinoj
-es: un sobrino/a sobrina/sobrinos/sobrinas/sobrinos y sobrinas
-et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re///venna- ja õelapsed
-fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:---tären///sisarusten lapset
-fr: un %sneveu/une %snièce/neveux/nièces/neveux et nièces
-he: אחיין/ אחיינית///אחיינים
-is: bróður(systur)sonur/bróður(systur)dóttir///bræðra og systrabörn
-it: un nipote/una nipote/nipoti/nipoti/nipoti
-lt: ////sūnėnai ir dukterėčios
-lv: brāļa/māsas dēls/meita
-nl: een neef/een nicht (oom- of tantezegger)///neven en nichten (oom-, tantezegger)
-no: nevø/niese/nevøer/nieser/nevøer og nieser
-oc: un nebot/una neboda/nebots/nebodas/nebots e nebodas
-pl: bratanek lub siostrzeniec/bratanica lub siostrzenica/bratankowie lub siostrzeńcy/bratanice lub siostrzenice/
-pt: um sobrinho/uma sobrinha/sobrinhos/sobrinhas/sobrinhos e sobrinhas
-ro: nepot/nepoata/nepoti/nepoate/nepoti si nepoate
-ru: племянник/племянница/племянники/племянницы/племянники и племянницы
-sk: synovec/neter/synovci/netere/synovci a netere
-sl: nečak/nečakinja/nečaki/nečakinje/nečak in nečakinja
-sv: en nevö/en niece/nevöer/niecer/nevöer och niecer
-tr: bir yeğen/bir yeğen/yeğenler/yeğenler/yeğenler ve yeğenler
+en: a %snephew/a %sniece/%snephews/%snieces/%snephews and %snieces
+eo: %snevo/%snevino/%snevoj/%snevinoj/%snevoj kaj %snevinoj
+es: un %ssobrino/una %ssobrina/%ssobrinos/%ssobrinas/%ssobrinos y %ssobrinas
+et: %svenna- või õepoeg:g:--ja/%svenna- või õetütar:g:--re///%svenna- ja õelapsed
+fi: %sveljen- tai sisarenpoika:g:---jan/%sveljen- tai sisarentytär:g:---tären///%ssisarusten lapset
+fr: un %sneveu/une %snièce/%sneveux/%snièces/%sneveux et %snièces
+he: %sאחיין/%sאחיינית///%sאחיינים
+is: %sfrændi/%sfrænka///%sbræðra og %ssystrabörn
+it: un %snipote/una %snipote/%snipoti/%snipoti/%snipoti
+lt: %ssūnėnas/%sdukterėčia///%ssūnėnai ir %sdukterėčios
+lv: %sbrāļa dēls/%smāsas dēls/%smazdēls/%smazmeita///%sbrāļu un %smāsu bērni
+nl: een %sneef/een %snicht///%sneven en %snichten
+no: en %snevø/en %sniese/%snevøer/%snieser/%snevøer og %snieser
+oc: un %snebot/una %sneboda/%snebots/%snebodas/%snebots e %snebodas
+pl: %sbratanek/%ssiostrzeniec/%sbratanice ou %ssiostrzeńcy/%sbratanice/%sbratankowie i %ssiostrzeńcy/%sbratanice i %ssiostrzenice
+pt: um %ssobrinho/uma %ssobrinha/%ssobrinhos/%ssobrinhas/%ssobrinhos e %ssobrinhas
+ro: %snepot/%snepoată/%snepoti/%snepoate/%snepoti și %snepoate
+ru: %sплемянник/%sплемянница/%sплемянники/%sплемянницы/%sплемянники и %sплемянницы
+sk: %ssynovec/%sneteř/%ssynovci/%sneteře/%ssynovci a %sneteře
+sl: %snečak/%snečakinja/%snečaki/%snečakinje/%snečak in %snečakinja
+sv: en %snevö/en %sniece/%snevöer/%sniecer/%snevöer och %sniecer
+tr: bir %syeğen/bir %syeğen/%syeğenler/%syeğenler/%syeğenler ve %syeğenler
 
     a sibling-in-law/siblings-in-law
 co: un cugnatu o una cugnata/cugnati è cugnate
@@ -2566,36 +2566,36 @@ sv: en ana
 tr: bir ata
 
     an uncle/an aunt
-af: 'n oom/'n tante
-bg: чичо/леля/вуйчо/леля
-br: un eontr/ur voereb
-ca: un oncle/una tia
-co: un %sziu/una %szia/zii/zie/zii è zie
-cs: strýc/teta
-da: en onkel/en tante
+af: 'n %soom/'n %stante
+bg: %sчичо/%sлеля/%sвуйчо/%sлеля
+br: un %seontr/ur %svoereb
+ca: un %soncle/una %stia
+co: un %sziu/una %szia/%szii/%szie/%szii è %szie
+cs: %sstrýc/%steta
+da: en %sonkel/en %stante
 de: ein:d:+em Onkel/eine:d:+r Tante
-en: an %suncle/an %saunt/uncles/aunts/uncles and aunts
-eo: onklo/onklino
-es: un tío/una tía
-et: onu/tädi
-fi: setä:g:---dän/täti:g:--din/eno:g:+n/täti:g:--din
-fr: un %soncle/une %stante
-he: דוד/ דודה
-is: föður(móður)bróðir/föður(móður)systir
-it: uno zio/una zia
-lt: dėdė/teta
-lv: onkulis/tante
-nl: een oom/een tante
-no: onkel/tante
-oc: un oncle/una tanta
-pl: stryj lub wuj/ciotka
-pt: um tio/uma tia
-ro: un unchi/o matusa
-ru: дядя/тетя
-sk: strýc/teta
-sl: stric/teta
-sv: en farbror/en faster/en morbror/en moster
-tr: bir amca/bir teyze/amcalar/teyzeler/amcalar ve teyzeler
+en: an %suncle/an %saunt/%suncles/%saunts/%suncles and %saunts
+eo: %sonklo/%sonklino
+es: un %stío/una %stía
+et: %sonu/%städi
+fi: %ssetä:g:---dän/%stäti:g:--din/%seno:g:+n/%stäti:g:--din
+fr: un %soncle/une %stante/%soncles/%stantes%soncles et tantes
+he: %sדוד/%sדודה
+is: %sföðurbróðir/%sföðursystir/%smóðurbróðir/%smóðurssystir
+it: un %szio/una %szia
+lt: %sdėdė/%steta
+lv: %sonkulis/%stante
+nl: een %soom/een %stante
+no: en %sonkel/en %stante
+oc: un %soncle/una %stanta
+pl: %sstryj lub %swuj/%sciotka
+pt: um %stio/uma %stia
+ro: un %sunchi/%smătușă
+ru: %sдядя/%sтетя
+sk: %sstrýc/%steta
+sl: %sstric/%steta
+sv: en %sfarbror/en %sfaster/en %smorbror/en %smoster
+tr: bir %samca/bir %steyze/%samcalar/%steyzeler/%samcalar ve %steyzeler
 
     ancestor/ancestors
 af: /voorouers
@@ -5595,12 +5595,6 @@ fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept
     cousin.1.1
 ->: a brother/a sister/a sibling
 
-    cousin.1.10
-co: un %ssette volte arciniputinu/una %ssette volte arciniputina/un %ssette volte arciniputinu
-de: ein %sUr<sup>(x7)</sup>-Großneffe/eine %sUr<sup>(x7)</sup>-Großnichte/ein %sUr<sup>(x7)</sup>-Großneffe
-en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
-fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
-
     cousin.1.2
 ->: a nephew/a niece
 
@@ -5642,6 +5636,12 @@ co: un %ssei volte arciniputinu/una %ssei volte arciniputina/un %ssei volte arci
 de: ein %sUr<sup>(×6)</sup>-Großneffe/eine %sUr<sup>(×6)</sup>-Großnichte/ein %sUr<sup>(×6)</sup>-Großneffe
 en: a %ssix-times-great-grandnephew/a %ssix-times-great-grandniece/a %ssix-times-great-grandnephew
 fr: un %ssix-fois-arrière-petit-neveu/une %ssix-fois-arrière-petite-nièce/un %ssix-fois-arrière-petit-neveu
+
+    cousin.1.10
+co: un %ssette volte arciniputinu/una %ssette volte arciniputina/un %ssette volte arciniputinu
+de: ein %sUr<sup>(x7)</sup>-Großneffe/eine %sUr<sup>(x7)</sup>-Großnichte/ein %sUr<sup>(x7)</sup>-Großneffe
+en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
+fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
 
     cousin.10.0
 co: un 8<sup>u</sup> volte arcicaccaru/una 8<sup>u</sup> volte arcicaccara
@@ -9979,10 +9979,36 @@ sv: halvbröder/halvsystrar/halvsyskon
 tr: üvey erkek kardeşler/üvey kız kardeşler/üvey kardeşler
 
     half-relationship
-co: mezu/meza/mezi
+af: half-/half-/half-
+bg: полу-/полу-/полу-
+br: hanter-/hanter-/hanter-
+ca: mig-/mig-/mig-
+co: mezu-/meza-/mezi
+cs: poloviční-/poloviční-/poloviční-
+da: halv-/halv-/halv-
 de: halb-/halb-/halb-
 en: half-/half-/half-
+eo: duon-/duon-/duon-
+es: medio-/media-/medio-
+et: pool-/pool-/pool-
+fi: puoli-/puoli-/puoli-
 fr: demi-/demi-/demi-
+he: חצי-/חצי-/חצי-
+is: hálf-/hálf-/hálf-
+it: mezzo-/mezza-/mezzo-
+lt: pus-/pus-/pus-
+lv: pus-/pus-/pus-
+nl: half-/half-/half-
+no: halv-/halv-/halv-
+oc: meitat-/meitat-/meitat-
+pl: pół-/pół-/pół-
+pt: meio-/meia-/meio-
+ro: semi-/semis-/semi-
+ru: полу-/полу-/полу-
+sk: polovičný-/polovičná-/polovičné-
+sl: pol-/pol-/pol-
+sv: halv-/halv-/halv-
+tr: yarım-/yarım-/yarım-
 
     half-siblings
 co: fratellastri è surellastre
@@ -10983,37 +11009,37 @@ sl: napačna zahteva
 sv: fel förfrågan
 tr: yanlış istek
 
-    indeed,
-af: inderdaad,
+    indeed
+af: inderdaad
 bg: фактически
-br: ez wir,
+br: ez wir
 ca: en efecte
-co: difatti,
+co: difatti
 cs: ve skutečnosti
-da: faktisk,
+da: faktisk
 de: weil
-en: indeed,
-eo: ja,
-es: en efecto,
-et: muidugi,
-fi: aivan,
-fr: en effet,
+en: indeed
+eo: ja
+es: en efecto
+et: muidugi
+fi: aivan
+fr: en effet
 he: לכן
-is: jú,
-it: infatti,
+is: jú
+it: infatti
 lt: iš tikrųjų
-lv: patiešām,
-nl: immers:
+lv: patiešām
+nl: immers
 no: faktisk
 oc: en efièch
-pl: ściślej biorąc,
-pt: com efeito,
+pl: ściślej biorąc
+pt: com efeito
 ro: pentru
-ru: на самом деле,
+ru: на самом деле
 sk: v skutočnosti
 sl: torej
-sv: faktiskt,
-tr: aslında,
+sv: faktiskt
+tr: aslında
 
     index of the descendants
 af: nasaatindeks

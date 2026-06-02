@@ -2,7 +2,7 @@
 %( Boutons de configurations et d'options pour les calculs de relations %)
 %let;e_sp;%if;(e.sp!="")0%else;1%end;%in;
 %let;e_im;%if;(e.im!="")0%else;1%end;%in;
-<div class="btn-toolbar my-2 ms-5" role="toolbar"
+<div class="btn-toolbar my-3 ms-5" role="toolbar"
   aria-label="config buttons toolbar">
   <div class="d-flex gap-2">
   %( ATTENTION p=fn et n=sn avec le nom du conjoint ne fonctionne pas %)
