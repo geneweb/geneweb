@@ -981,7 +981,7 @@ eo: %s%s kuzo/%s%s kuzino/%s%s kuzin(o)
 es: un %s%s primo/una %s%s prima/un(a) %s%s primo(a)
 et: %s%s astme nõbu:g:--o
 fi: %s%s serkku:g:--un
-fr: un %s%s cousin/une %s%s cousine/un(e) %s%s cousin(e)
+fr: un %s cousin au %s degré/une %s cousine au %s degré/un(e) %s cousin(e) au %s degré
 he: בן-דוד %s%s/בת-דוד %s%s
 is: %s%s systkynabarn
 it: un %s%s cugino/una %s%s cugina/un(a) %s%s cugino(a)
@@ -5704,11 +5704,11 @@ fr: un %ssix-fois-arrière-petit-cousin/une %ssix-fois-arrière-petite-cousine
 
     cousin.3.10
 de: ein %sUr<sup>(×5)</sup>-Großneffe 3. Grades/eine %sUr<sup>(×5)</sup>-Großnichte 3. Grades
-fr: un %s6×arrière-petit-cousin au 2<sup>e</sup> degré/une %s6×arrière-petite-cousine au 2<sup>e</sup> degré
+fr: un %s6×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s6×-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.3.2
 de: ein %sOnkel 2. Grades/eine %sTante 2. Grades
-fr: un %soncle à la mode de Bretagne/une %stante à la mode de Bretagne
+fr: un %sgrand-cousin/une %sgrande-cousine
 
     cousin.3.3
 ->: a 2nd cousin
@@ -5727,15 +5727,15 @@ fr: un %sarrière-arrière-petit-cousin au 2<sup>e</sup> degré/une %sarrière-
 
     cousin.3.7
 de: ein %sUr-Urgroßneffe 3. Grades/eine %sUr-Urgroßnichte 3. Grades
-fr: un %s3×arrière-petit-cousin au 2<sup>e</sup> degré/une %s3×arrière-petite-cousine au 2<sup>e</sup> degré
+fr: un %s3×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s3×-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.3.8
 de: ein %sUr-Ur-Urgroßneffe 3. Grades/eine %sUr-Ur-Urgroßnichte 3. Grades
-fr: un %s4×arrière-petit-cousin au 2<sup>e</sup> degré/une %s4×arrière-petite-cousine au 2<sup>e</sup> degré
+fr: un %s4×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s4×-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.3.9
 de: ein %sUr<sup>(×4)</sup>-Großneffe 3. Grades/eine %sUr<sup>(×4)</sup>-Großnichte 3. Grades
-fr: un %s5×arrière-petit-cousin au 2<sup>e</sup> degré/une %s5×arrière-petit-cousine au 2<sup>e</sup> degré
+fr: un %s5×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s5×-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.4.0
 co: un arcicaccarone/una arcicaccarona/un arcicaccarone
@@ -5751,7 +5751,7 @@ fr: un %sarrière-grand-oncle/une %sarrière-grande-tante
 
     cousin.4.10
 de: ein %sUr<sup>(×4)</sup>-Großneffe 4. Grades/eine %sUr<sup>(×4)</sup>-Großnichte 4. Grades
-fr: un %s5×arrière-petit-cousin au 3<sup>e</sup> degré/une %s5×arrière-petite-cousine au 3<sup>e</sup> degré
+fr: un %s5×-arrière-petit-cousin au 3<sup>e</sup> degré/une %s5×-arrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.4.2
 de: ein %sGroßonkel 2. Grades/eine %sGroßtante 2. Grades
@@ -5778,11 +5778,11 @@ fr: un %sarrière-arrière-petit-cousin au 3<sup>e</sup> degré/une %sarrière-
 
     cousin.4.8
 de: ein %sUr-Urgroßneffe 4. Grades/eine %sUr-Urgroßnichte 4. Grades
-fr: un %s3×arrière-petit-cousin au 3<sup>e</sup> degré/une %s3×arrière-petite-cousine au 3<sup>e</sup> degré
+fr: un %s3×-arrière-petit-cousin au 3<sup>e</sup> degré/une %s3×-arrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.4.9
 de: ein %sUr-Ur-Urgroßneffe 4. Grades/eine %sUr-Ur-Urgroßnichte 4. Grades
-fr: un %s4×arrière-petit-cousin au 3<sup>e</sup> degré/une %s4×arrière-petite-cousine au 3<sup>e</sup> degré
+fr: un %s4×-arrière-petit-cousin au 3<sup>e</sup> degré/une %s4×-arrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.5.0
 co: un arciarcicaccarone/una arciarcicaccarona
@@ -5801,7 +5801,7 @@ fr: un %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
 
     cousin.5.3
 de: ein %sGroßonkel 3. Grades/eine %sGroßtante 3. Grades
-fr: un %sarrière-grand-cousin 2<sup>e</sup>/une %sarrière-grande-cousine 2<sup>e</sup>
+fr: un %sarrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-grande-cousine au 2<sup>e</sup> degré
 
     cousin.5.4
 de: ein %sOnkel 4. Grades/eine %sTante 4. Grades
@@ -5811,7 +5811,7 @@ fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</s
 co: un cuginu à u 4<sup>u</sup> gradu/una cugina à u 4<sup>u</sup> gradu
 de: ein %sCousin 4. Grades/eine %sCousine 4. Grades
 en: a %s4th cousin
-fr: un %scousin au 4e degré/une %scousine au 4e degré
+fr: un %scousin au 4<sup>e</sup> degré/une %scousine au 4<sup>e</sup> degré
 
     cousin.6.0
 co: un 4<sup>u</sup> volte arcicaccaru/una 4<sup>u</sup> volte arcicaccara
