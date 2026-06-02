@@ -12,6 +12,7 @@
    (run ./templ_test.exe %{template}))))
 
 (rule
+ (package geneweb)
  (alias runtest)
  (action
   (diff template.expected template.out)))
