@@ -83,15 +83,14 @@ jobs:
           find /usr -name "libgmp.dll.a" -exec mv {} {}.hidden \; 2>/dev/null || true
           OPAM_PREFIX=$(opam var prefix | tr '\\' '/')
           find "$OPAM_PREFIX" -name "libgmp-10.dll" -exec mv {} {}.hidden \; 2>/dev/null || true
-          
+
           # Reinstall zarith WITHOUT depext (won't reinstall system packages)
           echo "Reinstalling zarith with static GMP…"
           OPAMASSUMEDEPEXTS=true opam reinstall zarith --yes
           echo "Static GMP linking configured"
 
-      - name: Configure and build Geneweb
-        run: |
-          opam exec -- ocaml ./configure.ml --sosa-zarith ${{ matrix.is-unix && '--gwd-caching' || '' }}
+      - name: Build Geneweb
+        run:
           opam exec -- make distrib distrib-rpc
 
       - name: Bundle PCRE2 runtime DLL (Windows)
@@ -101,7 +100,7 @@ jobs:
           echo "=== Bundling PCRE2 DLL for Windows ==="
           OPAM_PATH=$(cygpath "$OPAMROOT")
           PCRE2_DLL=$(find "$OPAM_PATH" /usr/x86_64-w64-mingw32 /usr/bin -name "libpcre2-8-0.dll" 2>/dev/null | head -1)
-          
+
           if [ -n "$PCRE2_DLL" ]; then
             echo "Found: $PCRE2_DLL"
             cp "$PCRE2_DLL" distribution/gw/
@@ -119,7 +118,7 @@ jobs:
           echo "=== Checking executable dependencies ==="
           cd distribution/gw
           ldd gwd.exe
-          
+
           NON_WINDOWS=$(ldd gwd.exe | grep -v -F /cygdrive/c/Windows/ || true)
           if [ -n "$NON_WINDOWS" ]; then
             echo "❌ ERROR: Non-Windows dependencies found:"
@@ -156,18 +155,18 @@ jobs:
         shell: bash
         run: |
           echo "🍎 Creating macOS bundle and DMG..."
-          
+
           chmod +x create_bundle.sh create_dmg.sh
-          
+
           ./create_bundle.sh
           ./create_dmg.sh
-          
+
           VERSION="${{ steps.version.outputs.version }}"
           ARCH_SUFFIX="${{ matrix.platform == 'macos-arm64' && 'arm64' || 'intel' }}"
-          
+
           # Find and rename the DMG to match tag version (for consistency with ZIP archives)
           CREATED_DMG=$(ls geneweb-*.dmg 2>/dev/null | head -1)
-          
+
           if [ -n "$CREATED_DMG" ]; then
             DMG_NAME="geneweb-${VERSION}-macos-${ARCH_SUFFIX}.dmg"
             mv "$CREATED_DMG" "${DMG_NAME}"
@@ -184,11 +183,11 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           VERSIONED_ARCHIVE="geneweb-${VERSION}-${{ matrix.platform }}.zip"
-          
+
           cd distribution
           7z a -tzip -mx=9 -mfb=258 -mpass=15 "../${VERSIONED_ARCHIVE}" *
           cd ..
-          
+
           echo "VERSIONED_ARCHIVE=${VERSIONED_ARCHIVE}" >> $GITHUB_ENV
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
@@ -197,19 +196,19 @@ jobs:
         shell: pwsh
         run: |
           $VERSION = "${{ steps.version.outputs.version }}"
-          
+
           # Download InnoSetup
           Write-Host "📥 Downloading InnoSetup..."
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile "innosetup-installer.exe"
-          
+
           # Install InnoSetup silently
           Write-Host "📦 Installing InnoSetup..."
           Start-Process -FilePath "innosetup-installer.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/DIR=.\innosetup" -Wait
-          
+
           # Compile installer
           Write-Host "🔨 Building installer..."
           & ".\innosetup\ISCC.exe" "geneweb.iss" "/DMyVersion=$VERSION"
-          
+
           $INSTALLER_NAME = "geneweb-${VERSION}-windows-setup.exe"
           if (Test-Path $INSTALLER_NAME) {
             Write-Host "✅ Installer created: $INSTALLER_NAME"
@@ -235,19 +234,19 @@ jobs:
             ${{ contains(env.VERSION, 'alpha') && '⚠️ **Alpha release** - Not for production use' || '' }}
             ${{ contains(env.VERSION, 'beta') && '⚠️ **Beta release** - Testing recommended' || '' }}
             ${{ contains(env.VERSION, 'rc') && '✅ **Release candidate** - Production ready pending final validation' || '' }}
-            
+
             ### Download
-            
+
             | Platform | ZIP Archive | Installer |
             |----------|-------------|-----------|
             | 🐧 Linux | [geneweb-${{ env.VERSION }}-linux.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) | - |
             | 🍎 macOS (Apple Silicon) | [geneweb-${{ env.VERSION }}-macos-arm64.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) | [geneweb-${{ env.VERSION }}-macos-arm64.dmg](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.dmg) |
             | 🍎 macOS (Intel) | [geneweb-${{ env.VERSION }}-macos-intel.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) | [geneweb-${{ env.VERSION }}-macos-intel.dmg](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.dmg) |
             | 🪟 Windows | [geneweb-${{ env.VERSION }}-windows.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) | [geneweb-${{ env.VERSION }}-windows-setup.exe](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows-setup.exe) |
-            
+
             ### Prerequisites (Unix ZIP archives only)
-            
+
             **Linux:** `sudo apt-get install libgmp10 libpcre2-dev`
             **macOS**, use [Homebrew](https://brew.sh/): `brew install gmp pcre2`
-            
+
             For more information, see the [documentation](https://geneweb.tuxfamily.org/wiki/GeneWeb).

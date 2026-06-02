@@ -132,9 +132,6 @@ jobs:
         if: env.USE_NNP == 'true'
         run: opam install ancient
 
-      - name: Configure
-        run: opam exec -- ocaml ./configure.ml
-
       - name: Build Geneweb
         id: build
         shell: bash
