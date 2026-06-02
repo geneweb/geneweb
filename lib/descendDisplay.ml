@@ -20,8 +20,8 @@
      filled, used to pack cells left to right;
    - [tdal] is the list of rows being built. [p_pos]/[f_pos] place persons and
      spouses by a pre-order walk (one logical column per node, shifted right on
-     collision); [complete_rows]/[strip_lastx]/[expand_cell]/[correct_spouses]/
-     [manage_vbars] then normalise the matrix before conversion to [hts]. *)
+     collision); [complete_rows]/[strip_lastx]//[correct_spouses]/
+     [drop_empty_rows] then normalise the matrix before conversion to [hts]. *)
 
 open Config
 open Def
@@ -1394,8 +1394,8 @@ let print_tree conf base v p =
      positioning error.
    - Emission. Vaucher prints two passes per level directly; here
      nodes are placed into a sparse matrix [tdal] ([init_tdal]) and
-     normalised ([complete_rows], [clean_rows], [expand_cell] twice,
-     [correct_spouses], [drop_empty_rows]) before conversion to [hts].
+     normalised ([complete_rows], [clean_rows], [correct_spouses], 
+     [drop_empty_rows]) before conversion to [hts].
 
    [last_x.(row)] is the rightmost filled column of each row, held in
    the per-call array threaded through [p_pos]/[f_pos], not a module
@@ -1515,7 +1515,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   in
   let txt = get_text conf base p img cgl in
   let only =
-    if cgl then "|"
+    if cgl then "│"
     else
       Printf.sprintf "<a href=\"%sm=D&t=TV%s%s%s%s%s%s\" %s title=\"%s\">│</a>"
         (Util.commd conf :> string)
@@ -1582,7 +1582,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let fam = Driver.foi base ifam in
   let marr_d =
     if marr && auth then DateDisplay.short_family_dates_text conf base true fam
-    else Adef.safe ""
+    else Adef.safe " "
   in
   let m_txt =
     (* families are scanned in reverse order *)
@@ -1600,8 +1600,8 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     if sps then
       let txt = if kids <> [] then txt ^^^ Adef.safe br_sp else txt in
       let txt = m_txt ^^^ txt in
-      if v > 0 && kids <> [] then txt ^^^ Adef.safe "<br>|" else txt
-    else if v > 0 && kids <> [] then Adef.safe "|"
+      if v > 0 && kids <> [] then txt ^^^ Adef.safe "│" else txt
+    else if v > 0 && kids <> [] then Adef.safe "│"
     else Adef.safe ""
   in
   let flag =
@@ -1705,38 +1705,6 @@ let correct_spouses tdal =
   in
   List.rev tdal
 
-(* Widen a centred item into the padding on either side so it reads as
-   centred over its subtree; run twice for symmetric growth. *)
-let expand_cell tdal =
-  let rec expand row new_row =
-    match row with
-    | (nc1, a1, t1) :: (nc2, a2, t2) :: (nc3, a3, t3) :: row -> (
-        match (t1, t2, t3) with
-        | Dag2html.TDnothing, Dag2html.TDitem _, Dag2html.TDnothing ->
-            if nc1 > 2 && nc3 > 2 then
-              expand
-                ((nc2 + 2, a2, t2) :: (nc3 - 1, a3, t3) :: row)
-                ((nc1 - 1, a1, t1) :: new_row)
-            else
-              expand
-                ((nc2, a2, t2) :: (nc3, a3, t3) :: row)
-                ((nc1, a1, t1) :: new_row)
-        | _ ->
-            expand
-              ((nc2, a2, t2) :: (nc3, a3, t3) :: row)
-              ((nc1, a1, t1) :: new_row))
-    | _ -> List.rev (List.rev_append row new_row)
-  in
-  let tdal =
-    let rec loop tdal new_tdal =
-      match tdal with
-      | [] -> new_tdal
-      | row :: tdal -> loop tdal (expand row [] :: new_tdal)
-    in
-    loop tdal []
-  in
-  List.rev tdal
-
 let strip_lastx tdal = List.map snd tdal
 
 let drop_empty_rows tdal =
@@ -1786,8 +1754,6 @@ let make_vaucher_tree_hts conf base gv p =
   let tdal = Array.to_list tdal in
   let tdal = complete_rows tdal in
   let tdal = strip_lastx tdal in
-  let tdal = expand_cell tdal in
-  let tdal = expand_cell tdal in
   let tdal = correct_spouses tdal in
   let tdal = drop_empty_rows tdal in
   let hts0 = List.fold_left (fun acc row -> Array.of_list row :: acc) [] tdal in
