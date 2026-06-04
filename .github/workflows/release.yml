@@ -17,7 +17,6 @@ on:
         type: string
 
 env:
-  DUNE_PROFILE: "release"
   OPAMYES: true
 
 jobs:
@@ -127,16 +126,6 @@ jobs:
           else
             echo "✅ SUCCESS: All dependencies are statically linked or from Windows"
           fi
-
-      - name: Minify RPC client with terser
-        shell: bash
-        working-directory: distribution/gw/etc/js
-        run: |
-          npm install -g terser
-          chmod +w rpc_client.min.js
-          terser rpc_client.min.js -o rpc_client.min.js --compress --mangle
-          gzip -9 -k -f rpc_client.min.js
-          brotli -f -q 11 rpc_client.min.js
 
       - name: Determine version
         id: version

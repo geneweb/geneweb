@@ -162,12 +162,14 @@ endif
 	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
 	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n\n"
 
-distrib-rpc: build-geneweb-rpc
+distrib-rpc: distrib
+	dune build --release @rpc/all
 	@printf "\n\n\033[1;1m└ Copy RPC server executable and js client to distribution\033[0m\n"
 	mkdir -p $(DISTRIB_DIR)/gw/etc/js
 	cp $(BUILD_DIR)/rpc/server/server.exe $(DISTRIB_DIR)/gw/rpc_server$(EXT)
-	cp $(BUILD_DIR)/rpc/test/client.bc.js $(DISTRIB_DIR)/gw/etc/js/rpc_client.min.js
-	gzip -9 -k -f $(DISTRIB_DIR)/gw/etc/js/rpc_client.min.js
+	cp $(BUILD_DIR)/rpc/test/rpc_client.bc.js $(DISTRIB_DIR)/gw/etc/js/rpc_client.js
+	cp $(BUILD_DIR)/rpc/test/rpc_client.bc.js.gz $(DISTRIB_DIR)/gw/etc/js/rpc_client.js.gz
+	cp $(BUILD_DIR)/rpc/test/rpc_client.bc.js.br $(DISTRIB_DIR)/gw/etc/js/rpc_client.js.br
 	@echo "Done."
 
 # [END] Installation / Distribution section
