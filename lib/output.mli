@@ -37,3 +37,5 @@ val link_header :
   Config.Trimmed.t ->
   Canonical_url.t ->
   unit
+
+val robots_tag_header : ?index:bool -> ?follow:bool -> Config.Trimmed.t -> unit

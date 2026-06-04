@@ -36,3 +36,15 @@ let link_header ?(alternate_urls = []) conf canonical_url =
     "Link: %s"
     (String.concat ", "
        (List.map format_link (canonical_url :: alternate_urls)))
+
+let robots_tag_header ?(index = false) ?(follow = false) conf =
+  let indexing_rules =
+    [
+      (if index then "index" else "noindex");
+      (if follow then "follow" else "nofollow");
+    ]
+  in
+  header
+    (Config.Trimmed.to_config conf)
+    "X-Robots-Tag: %s"
+    (String.concat ", " indexing_rules)
