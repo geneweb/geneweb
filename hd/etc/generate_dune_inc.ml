@@ -14,7 +14,7 @@ let pp_rule path =
   (target %s)
   (deps (:input %s))
   (action
-    (run brotli -f -q 11 %%{input})))@?|}
+    (run brotli -q 11 %%{input})))@?|}
     target_gzip path target_brotli path
 
 let () =

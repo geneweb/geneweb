@@ -7,7 +7,7 @@
  (action
   (with-stdout-to
    %{target}
-   (bash "bash %{script} %{input}"))))
+   (bash "./%{script} %{input}"))))
 
 (library
  (name geneweb)

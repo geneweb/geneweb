@@ -4,9 +4,31 @@
  (libraries fmt yojson geneweb_rpc httpun httpun-lwt-unix httpun-ws))
 
 (executable
- (name client)
+ (name rpc_client)
  (modes js)
- (modules client)
+ (modules rpc_client)
  (libraries geneweb_rpc js_of_ocaml promise_jsoo ojs yojson)
  (preprocess
   (pps js_of_ocaml-ppx)))
+
+(rule
+ (target rpc_client.bc.js.gz)
+ (deps
+  (:input ./rpc_client.bc.js))
+ (action
+  (run gzip -9 -k -f %{input})))
+
+(rule
+ (target rpc_client.bc.js.br)
+ (deps
+  (:input ./rpc_client.bc.js))
+ (action
+  (run brotli -q 11 %{input})))
+
+(install
+ (package geneweb-rpc)
+ (section share)
+ (files
+  (rpc_client.bc.js as rpc_client.js)
+  (rpc_client.bc.js.gz as rpc_client.js.gz)
+  (rpc_client.bc.js.br as rpc_client.js.br)))
