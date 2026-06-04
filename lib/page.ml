@@ -1,3 +1,22 @@
+module Make_url (Query_params : sig
+  type t
+
+  val canonicalize : t -> (string * string) list
+end) : sig
+  val canonical_url : conf:Config.Trimmed.t -> Query_params.t -> Canonical_url.t
+
+  val alternate_urls :
+    conf:Config.Trimmed.t -> Query_params.t -> Localized_url.t list
+end = struct
+  let canonical_url ~conf query_params =
+    let query = Query_params.canonicalize query_params in
+    Canonical_url.make ~conf ~query
+
+  let alternate_urls ~conf query_params =
+    let query = Query_params.canonicalize query_params in
+    List.map (fun lang -> Localized_url.make ~conf ~lang ~query) Lang.all
+end
+
 module Last_name_search = struct
   module Query_params = struct
     type t = {
@@ -15,30 +34,26 @@ module Last_name_search = struct
           let exact = Util.p_getenv env "t" = Some "A" in
           { last_name; display_mode; exact })
         (Util.p_getenv env "v")
+
+    let canonicalize query_params =
+      let last_name =
+        ( "v",
+          (if query_params.exact then Fun.id else Name.lower)
+            query_params.last_name )
+      in
+      let display_mode =
+        match query_params.display_mode with
+        | `Branch -> None
+        | `List -> Some ("o", "i")
+      in
+      let exact =
+        Ext_option.return_if query_params.exact (fun () -> ("t", "A"))
+      in
+      let open Ext_list.Infix in
+      ("m", "N") @:: display_mode @?: last_name @:: exact @?: []
   end
 
-  let url_query (query_params : Query_params.t) =
-    let last_name =
-      ( "v",
-        (if query_params.exact then Fun.id else Name.lower)
-          query_params.last_name )
-    in
-    let display_mode, exact =
-      match query_params.display_mode with
-      | `Branch ->
-          (None, Ext_option.return_if query_params.exact (fun () -> ("t", "A")))
-      | `List -> (Some ("o", "i"), None)
-    in
-    let open Ext_list.Infix in
-    ("m", "N") @:: last_name @:: exact @?: display_mode @?: []
-
-  let canonical_url ~conf query_params =
-    let query = url_query query_params in
-    Canonical_url.make ~conf ~query
-
-  let alternate_url ~conf ~lang query_params =
-    let query = url_query query_params in
-    Localized_url.make ~conf ~lang ~query
+  include Make_url (Query_params)
 end
 
 module First_name_search = struct
@@ -282,4 +297,42 @@ module Advanced_search = struct
         (not @@ are_empty query_params)
         (fun () -> query_params)
   end
+end
+
+module Family_book = struct
+  module Query_params = struct
+    type t = {
+      only_references : bool;
+      page : string option;
+      section : int option;
+    }
+
+    let from_env env =
+      let only_references = Util.p_getenv env "ref" = Some "on" in
+      let page =
+        Option.bind (Util.p_getenv env "f") (fun f ->
+            Ext_option.return_if
+              (NotesLinks.check_file_name f <> None)
+              (fun () -> f)
+            (* Usefulness? *))
+      in
+      let section = Util.p_getint env "v" in
+      { only_references; page; section }
+
+    let canonicalize query_params =
+      let page = Option.map (fun page -> ("f", page)) query_params.page in
+      let section =
+        Option.map
+          (fun section -> ("v", Int.to_string section))
+          query_params.section
+      in
+      let only_references =
+        Ext_option.return_if query_params.only_references (fun () ->
+            ("ref", "on"))
+      in
+      let open Ext_list.Infix in
+      ("m", "NOTES") @:: page @?: section @?: only_references @?: []
+  end
+
+  include Make_url (Query_params)
 end

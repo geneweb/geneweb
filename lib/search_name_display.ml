@@ -861,33 +861,31 @@ type surname_search_result = {
 
 let surname_print ~(query_params : Page.Last_name_search.Query_params.t) conf
     base not_found_fun { iperl; list; bhl } =
+  let print_canonical ?status () =
+    let canonical_url =
+      Page.Last_name_search.canonical_url
+        ~conf:(Config.Trimmed.from_config conf)
+        query_params
+    in
+    let alternate_urls =
+      Page.Last_name_search.alternate_urls
+        ~conf:(Config.Trimmed.from_config conf)
+        query_params
+    in
+    Option.iter (Output.status conf) status;
+    Output.link_header
+      (Config.Trimmed.from_config conf)
+      canonical_url ~alternate_urls
+  in
   match query_params.display_mode with
   | `List ->
       let pl =
         List.fold_right (fun ip ipl -> Util.pget conf base ip :: ipl) iperl []
       in
       let pl = List.filter (fun p -> Person.has_visible_name conf base p) pl in
+      print_canonical ();
       print_family_alphabetic query_params.last_name conf base pl
   | `Branch -> (
-      let print_canonical ?status () =
-        let canonical_url =
-          Page.Last_name_search.canonical_url
-            ~conf:(Config.Trimmed.from_config conf)
-            query_params
-        in
-        let alternate_urls =
-          List.map
-            (fun lang ->
-              Page.Last_name_search.alternate_url
-                ~conf:(Config.Trimmed.from_config conf)
-                ~lang query_params)
-            Lang.all
-        in
-        Option.iter (Output.status conf) status;
-        Output.link_header
-          (Config.Trimmed.from_config conf)
-          canonical_url ~alternate_urls
-      in
       match (bhl, list) with
       | [], _ ->
           print_canonical ~status:Def.Not_Found ();

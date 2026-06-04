@@ -19,3 +19,8 @@ val print_misc_notes : Config.config -> Gwdb.base -> unit
 
 val print_misc_notes_search : Config.config -> Gwdb.base -> unit
 (** Same as `print_misc_notes`, with a default search *)
+
+val canonical_urls :
+  conf:Config.Trimmed.t ->
+  Page.Family_book.Query_params.t ->
+  Canonical_url.t * Localized_url.t list
