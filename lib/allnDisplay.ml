@@ -274,21 +274,22 @@ let print_alphabetic ~prefix ~all ~at_least ~fast ~index conf base is_surnames =
       List.sort Utf8.alphabetic_order (List.map Utf8.uchar_to_string index)
     in
     print_alphabetic_big conf base is_surnames ini list 1 true)
-  else if String.length ini < 2 then Gwdb.load_strings_array base;
-  let list, len =
-    Alln.select_names ~at_least conf base is_surnames ini
-      (if all then max_int else 50)
-  in
-  match list with
-  | Alln.Specify keys ->
-      let keys = List.sort Utf8.alphabetic_order keys in
-      let too_big = (not all) && List.length keys > Alln.default_max_cnt in
-      print_alphabetic_big conf base is_surnames ini keys len too_big
-  | Alln.Result list ->
-      if len >= 50 || ini = "" then
-        let list = Alln.groupby_ini (Utf8.length ini + 1) list in
-        print_alphabetic_all conf base is_surnames ini list len
-      else print_alphabetic_small conf base is_surnames ini list len
+  else
+    let () = if String.length ini < 2 then Gwdb.load_strings_array base in
+    let list, len =
+      Alln.select_names ~at_least conf base is_surnames ini
+        (if all then max_int else 50)
+    in
+    match list with
+    | Alln.Specify keys ->
+        let keys = List.sort Utf8.alphabetic_order keys in
+        let too_big = (not all) && List.length keys > Alln.default_max_cnt in
+        print_alphabetic_big conf base is_surnames ini keys len too_big
+    | Alln.Result list ->
+        if len >= 50 || ini = "" then
+          let list = Alln.groupby_ini (Utf8.length ini + 1) list in
+          print_alphabetic_all conf base is_surnames ini list len
+        else print_alphabetic_small conf base is_surnames ini list len
 
 (* short print *)
 
