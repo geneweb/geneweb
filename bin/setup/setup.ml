@@ -1554,9 +1554,9 @@ let setup_comm_ok conf = function
       | _ -> gwfixbase "gwfix_ok.htm" conf)
   | x ->
       if
-        Ext_string.start_with "doc/" 0 x
-        || Ext_string.start_with "images/" 0 x
-        || Ext_string.start_with "css/" 0 x
+        String.starts_with ~prefix:"doc/" x
+        || String.starts_with ~prefix:"images/" x
+        || String.starts_with ~prefix:"css/" x
       then raw_file conf x
       else error conf ("bad command: \"" ^ x ^ "\"")
 

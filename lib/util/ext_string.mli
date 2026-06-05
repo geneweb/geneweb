@@ -34,13 +34,6 @@ val unsafe_tr : char -> char -> string -> string
     Update [str] in place. Replace all occurences of [c1] by [c2].
  *)
 
-val start_with : string -> int -> string -> bool
-(** [start_with prefix off str]
-    Test if [str] starts with [prefix] (at offset [off]).
-
-    Raise [Invalid_argument] if [off] is not a valid index in [str].
-*)
-
 val contains : string -> string -> bool
 (** [contains str sub] Test [sub] is contained in [str].
 *)

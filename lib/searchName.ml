@@ -31,7 +31,7 @@ let strip_particle base s =
 
 let start_with base pfx s =
   let s = Name.lower (strip_particle base s) in
-  Ext_string.start_with pfx 0 s
+  String.starts_with ~prefix:pfx s
 
 let is_matched_by_actual_surname match_name base p =
   match Authorized.Person.get_surname p with
@@ -145,7 +145,7 @@ let sort_by_len l =
 
 let is_subset_pfx s1 s2 =
   List.for_all
-    (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
+    (fun e -> List.exists (fun s -> String.starts_with ~prefix:e s) s2)
     s1
 
 let filter_marital_names ?(remove_marital_names_match_only = false) match_name
