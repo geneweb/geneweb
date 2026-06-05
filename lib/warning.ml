@@ -262,13 +262,13 @@ let compare_normalized_base_warning (w1 : base_warning) (w2 : base_warning) :
   | ( ChangedOrderOfFamilyEvents (ifam, fevents, fevents2),
       ChangedOrderOfFamilyEvents (ifam', fevents', fevents2') ) ->
       Gwdb.compare_ifam ifam ifam' >>= fun () ->
-      Ext_list.compare compare_gen_fam_event fevents fevents' >>= fun () ->
-      Ext_list.compare compare_gen_fam_event fevents2 fevents2'
+      List.compare compare_gen_fam_event fevents fevents' >>= fun () ->
+      List.compare compare_gen_fam_event fevents2 fevents2'
   | ( ChangedOrderOfPersonEvents (p, pevents, pevents2),
       ChangedOrderOfPersonEvents (p', pevents', pevents2') ) ->
       compare_person p p' >>= fun () ->
-      Ext_list.compare compare_gen_pers_event pevents pevents' >>= fun () ->
-      Ext_list.compare compare_gen_pers_event pevents2 pevents2'
+      List.compare compare_gen_pers_event pevents pevents' >>= fun () ->
+      List.compare compare_gen_pers_event pevents2 pevents2'
   | ( ChildrenNotInOrder (ifam, fam, p1, p2),
       ChildrenNotInOrder (ifam', fam', p1', p2') ) ->
       Gwdb.compare_ifam ifam ifam' >>= fun () ->

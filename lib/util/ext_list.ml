@@ -35,14 +35,6 @@ let iter_first f = function
       f true hd;
       List.iter (f false) tl
 
-let rec compare cmp l1 l2 =
-  match (l1, l2) with
-  | x1 :: l1, x2 :: l2 -> (
-      match cmp x1 x2 with 0 -> compare cmp l1 l2 | x -> x)
-  | [], [] -> 0
-  | [], _ -> -1
-  | _, [] -> 1
-
 let rec last = function
   | [] -> raise (Failure "last")
   | [ x ] -> x

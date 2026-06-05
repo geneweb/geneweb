@@ -19,11 +19,6 @@ val elements_cmp : 'a list -> 'a list -> bool
 val iter_first : (bool -> 'a -> unit) -> 'a list -> unit
 (** [iter_first f l] iter over first element with [f true] and over others with [f false]. *)
 
-val compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
-(** [compare cmp l1 l2]
-    Comparison function for lists, using [cmp] to compare each elements
-*)
-
 val last : 'a list -> 'a
 (** [last list]
     Return the last element of the list.
