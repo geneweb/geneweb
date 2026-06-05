@@ -43,7 +43,7 @@ let sub ?pad str start len =
 
 (**/**)
 
-(* cmap_utf_8 code code comes from
+(* cmap_utf_8 code comes from
    http://erratique.ch/software/uucp/doc/Uucp.Case.html *)
 let cmap_utf_8 cmap s =
   let b = Buffer.create (String.length s * 2) in
