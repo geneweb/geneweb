@@ -12,7 +12,6 @@ val sublist : 'a list -> int -> int -> 'a list
 (** [sublist l pos len] returns the sublist of [l] of length [len]
     starting at the position [pos].  *)
 
-val cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
 val is_subset : 'a list -> 'a list -> bool
 val elements_cmp : 'a list -> 'a list -> bool
 
