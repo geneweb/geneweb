@@ -1499,10 +1499,10 @@ let raw_file conf s =
     List.fold_left Filename.concat !setup_dir (separate_slashed_filename s)
   in
   let typ =
-    if Ext_string.end_with s ".png" then "image/png"
-    else if Ext_string.end_with s ".jpg" then "image/jpeg"
-    else if Ext_string.end_with s ".gif" then "image/gif"
-    else if Ext_string.end_with s ".css" then "text/css"
+    if String.ends_with s ~suffix:".png" then "image/png"
+    else if String.ends_with s ~suffix:".jpg" then "image/jpeg"
+    else if String.ends_with s ~suffix:".gif" then "image/gif"
+    else if String.ends_with s ~suffix:".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
