@@ -34,13 +34,13 @@ let compatible_divorces d1 d2 = d1 = d2
 let compatible_relation_kinds rk1 rk2 = rk1 = rk2
 
 let compatible_titles t1 t2 =
-  Ext_list.cmp (Futil.eq_titles Gwdb.eq_istr) t1 t2 || t2 = []
+  List.equal (Futil.eq_titles Gwdb.eq_istr) t1 t2 || t2 = []
 
 let compatible_pevents pevt1 pevt2 = pevt1 = [] && pevt2 = []
 let compatible_fevents fevt1 fevt2 = fevt1 = [] && fevt2 = []
 
 let compatible_strings_lists sl1 sl2 =
-  sl2 = [] || Ext_list.cmp Gwdb.eq_istr sl1 sl2
+  sl2 = [] || List.equal Gwdb.eq_istr sl1 sl2
 
 let compatible_notes base s1 s2 =
   compatible_strings s1 s2 || Gwdb.sou base s1 = Gwdb.sou base s2

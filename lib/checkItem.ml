@@ -884,7 +884,7 @@ let changed_pevents_order warning p =
       (fun evt -> Gwdb.get_pevent_date evt)
       a
   in
-  let same = Ext_list.cmp Gwdb.eq_pevent a b in
+  let same = List.equal Gwdb.eq_pevent a b in
   if not same then
     let a = List.map Gwdb.gen_pevent_of_pers_event a in
     let b = List.map Gwdb.gen_pevent_of_pers_event b in
@@ -898,7 +898,7 @@ let changed_fevents_order warning (ifam, fam) =
       (Gwdb.get_fevents fam)
   in
   let b = Gwdb.get_fevents fam in
-  let same = Ext_list.cmp Gwdb.eq_fevent a b in
+  let same = List.equal Gwdb.eq_fevent a b in
   if not same then
     let a = List.map Gwdb.gen_fevent_of_fam_event a in
     let b = List.map Gwdb.gen_fevent_of_fam_event b in
