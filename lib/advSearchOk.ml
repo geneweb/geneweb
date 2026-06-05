@@ -39,7 +39,7 @@ let abbrev_lower x = Name.abbrev (Name.lower x)
 
 let is_subset_pfx s1 s2 =
   List.for_all
-    (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
+    (fun e -> List.exists (fun s -> String.starts_with ~prefix:e s) s2)
     s1
 
 module AdvancedSearchMatch : sig

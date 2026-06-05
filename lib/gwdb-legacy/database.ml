@@ -896,7 +896,7 @@ let spi_stream_of_spi spi = { spi; st = `First }
 let rec iper_of_prefix base_data spi prefix =
   let next_person_id istr =
     let s = base_data.Dbdisk.strings.get istr in
-    if Ext_string.start_with prefix 0 s then
+    if String.starts_with ~prefix s then
       iper_of_prefix base_data
         { spi with st = `Current (istr, spi.spi.find istr) }
         prefix
@@ -923,7 +923,7 @@ let prefix_exists base_data spi prefix =
   try
     let istr = spi.spi.cursor prefix in
     let s = base_data.Dbdisk.strings.get istr in
-    Ext_string.start_with prefix 0 s
+    String.starts_with ~prefix s
   with Not_found -> false
 
 let iper_stream_of_prefix base_data spi prefix =

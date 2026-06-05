@@ -31,7 +31,7 @@ let strip_particle base s =
 
 let start_with base pfx s =
   let s = Name.lower (strip_particle base s) in
-  Ext_string.start_with pfx 0 s
+  String.starts_with ~prefix:pfx s
 
 type prefix = { kind : [ `First_name | `Surname ]; value : string }
 
