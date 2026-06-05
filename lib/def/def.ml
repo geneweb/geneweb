@@ -16,11 +16,6 @@ type httpStatus =
 
 exception HttpExn of httpStatus * string
 
-(* TODO OCaml 4.12 : use Either *)
-
-(** Type that represents 2 possible choices *)
-type ('a, 'b) choice = Left of 'a | Right of 'b
-
 type cdate = Adef.cdate
 (** Alias to [Adef.cdate] *)
 

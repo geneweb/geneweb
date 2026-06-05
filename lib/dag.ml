@@ -78,7 +78,7 @@ let make_dag conf base set =
             [] (Gwdb.get_family u)
         in
         let chil = List.rev chil in
-        { Dag2html.pare; valu = Def.Left ip; chil })
+        { Dag2html.pare; valu = Either.Left ip; chil })
       nodes
   in
   let nodes =
@@ -86,7 +86,7 @@ let make_dag conf base set =
       if i = Array.length nodes then nodes
       else
         match nodes.(i) with
-        | { Dag2html.valu = Def.Left ip; chil } ->
+        | { Dag2html.valu = Either.Left ip; chil } ->
             let ifaml =
               Array.to_list (Gwdb.get_family (Util.pget conf base ip))
             in
@@ -102,7 +102,7 @@ let make_dag conf base set =
                         if chil = [] && nodes.(j).Dag2html.chil = [] then (
                           let pare = [ Dag2html.idag_of_int i; jd ] in
                           let d =
-                            { Dag2html.pare; valu = Def.Right n; chil = [] }
+                            { Dag2html.pare; valu = Either.Right n; chil = [] }
                           in
                           let nodes = Array.append nodes [| d |] in
                           let nd = Dag2html.idag_of_int n in

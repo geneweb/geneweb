@@ -14,8 +14,8 @@ let dag_of_ind_dag_list indl =
           List.map idag_of_di_ind ind.Relation.di_famc.Relation.df_pare;
         valu =
           (match ind.Relation.di_val with
-          | Some ic -> Def.Left ic
-          | None -> Def.Right cnt);
+          | Some ic -> Either.Left ic
+          | None -> Either.Right cnt);
         chil = List.map idag_of_di_ind ind.Relation.di_fams.Relation.df_chil;
       })
     indl
@@ -31,8 +31,8 @@ let dag_of_relation_path conf base path =
     List.fold_left
       (fun set n ->
         match n.Dag2html.valu with
-        | Def.Left ip -> Dag.Pset.add ip set
-        | Def.Right _ -> set)
+        | Either.Left ip -> Dag.Pset.add ip set
+        | Either.Right _ -> set)
       Dag.Pset.empty nl
   in
   (set, d)
@@ -1077,7 +1077,8 @@ let print conf base p = function
             | _ -> false
           in
           match
-            try Def.Left (Relation.compute_relationship conf base by_marr p1 p)
+            try
+              Either.Left (Relation.compute_relationship conf base by_marr p1 p)
             with Consang.TopologicalSortError p -> Right p
           with
           | Left rel -> print_main_relationship conf base long p1 p rel
