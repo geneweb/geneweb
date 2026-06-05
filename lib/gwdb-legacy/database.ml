@@ -166,17 +166,7 @@ let old_persons_of_first_name_or_surname base_data params =
       | None ->
           let fname_inx = Filename.concat bname names_inx in
           let ic_inx = Secure.open_in_bin fname_inx in
-          (*
-          let ab1 = Gc.allocated_bytes () in
-          *)
           let bt : int IstrTree.t = input_value ic_inx in
-          (*
-          let ab2 = Gc.allocated_bytes () in
-          Printf.eprintf "*** new database created by version >= 4.10\n";
-          Printf.eprintf "*** using index '%s' allocating here only %.0f bytes\n"
-            names_inx (ab2 -. ab1);
-          flush stderr;
-          *)
           close_in ic_inx;
           btr := Some bt;
           bt
