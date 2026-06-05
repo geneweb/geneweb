@@ -242,10 +242,7 @@ end = struct
         List.exists (Uchar.equal c) (List.map Uchar.of_char delimiters)
       in
       Utf8.filter_map
-        (function
-          | `Malformed _ -> None
-          | `Uchar c ->
-              Ext_option.return_if (not @@ is_delimiter c) (fun () -> c))
+        (fun c -> Ext_option.return_if (not @@ is_delimiter c) (fun () -> c))
         (Utf8.unaccent @@ Utf8.lowercase s)
     in
     Option.fold occupation ~none:true ~some:(fun occupation ->

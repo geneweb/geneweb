@@ -33,7 +33,6 @@ depends: [
   "uri"
   "uucp"
   "uunf"
-  "uutf"
   "zarith"
 ]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
