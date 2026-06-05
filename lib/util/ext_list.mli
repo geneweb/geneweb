@@ -24,12 +24,6 @@ val compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
     Comparison function for lists, using [cmp] to compare each elements
 *)
 
-val find_map : ('a -> 'b option) -> 'a list -> 'b option
-(** [find_map fn list]
-    OCaml Stdlib's [List.find_map] (introduced in 4.10.0)
-    backported into GeneWeb
-  *)
-
 val last : 'a list -> 'a
 (** [last list]
     Return the last element of the list.

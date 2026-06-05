@@ -43,11 +43,6 @@ let rec compare cmp l1 l2 =
   | [], _ -> -1
   | _, [] -> 1
 
-let rec find_map f = function
-  | [] -> None
-  | x :: l -> (
-      match f x with Some _ as result -> result | None -> find_map f l)
-
 let rec last = function
   | [] -> raise (Failure "last")
   | [ x ] -> x
