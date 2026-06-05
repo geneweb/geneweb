@@ -715,7 +715,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   in
   let indi_txt n =
     match n.Dag2html.valu with
-    | Def.Left ip ->
+    | Either.Left ip ->
         let p = Util.pget conf base ip in
         let txt =
           let open Def in
@@ -731,7 +731,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                 match
                   d.Dag2html.dag.(Dag2html.int_of_idag id).Dag2html.valu
                 with
-                | Def.Left cip -> (
+                | Either.Left cip -> (
                     match Gwdb.get_parents (Util.pget conf base cip) with
                     | Some ifam ->
                         let cpl = Gwdb.foi base ifam in
@@ -769,7 +769,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | Right _ -> Adef.safe "&nbsp;"
   in
   let indi_txt n : Adef.safe_string =
-    let bd = match n.Dag2html.valu with Def.Left _ -> bd | Right _ -> 0 in
+    let bd = match n.Dag2html.valu with Either.Left _ -> bd | Right _ -> 0 in
     if bd > 0 then
       let open Def in
       {|<table border="|} ^<^ string_of_int bd
@@ -779,11 +779,11 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   in
   let vbar_txt n =
     match n.Dag2html.valu with
-    | Def.Left ip -> vbar_txt ip
+    | Either.Left ip -> vbar_txt ip
     | Right _ -> Adef.escaped ""
   in
   let phony n =
-    match n.Dag2html.valu with Def.Left _ -> false | Right _ -> true
+    match n.Dag2html.valu with Either.Left _ -> false | Right _ -> true
   in
   let t = Dag2html.table_of_dag phony false invert no_group d in
   if Array.length t.Dag2html.table = 0 then [||]

@@ -14,4 +14,4 @@ val make_dag :
   Config.config ->
   Gwdb.base ->
   Gwdb.iper list ->
-  (Gwdb.iper, int) Def.choice Dag2html.dag
+  (Gwdb.iper, int) Either.t Dag2html.dag
