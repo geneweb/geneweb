@@ -49,13 +49,13 @@ let iter f s = Uutf.String.fold_utf_8 (fun () i c -> f i c) () s
    http://erratique.ch/software/uucp/doc/Uucp.Case.html *)
 let cmap_utf_8 cmap s =
   let b = Buffer.create (String.length s * 2) in
-  let add_map _ _ u =
+  let add_map _ u =
     let u = match u with `Malformed _ -> Uutf.u_rep | `Uchar u -> u in
     match cmap u with
     | `Self -> Uutf.Buffer.add_utf_8 b u
     | `Uchars us -> List.iter (Uutf.Buffer.add_utf_8 b) us
   in
-  Uutf.String.fold_utf_8 add_map () s;
+  iter add_map s;
   Buffer.contents b
 
 (**/**)
@@ -85,7 +85,7 @@ let capitalize s =
 
 let initial n =
   let exception Found of int in
-  let find_uppercase () position character =
+  let find_uppercase position character =
     let is_uppercase =
       match character with
       | `Uchar c -> Uucp.Case.is_upper c
@@ -93,7 +93,7 @@ let initial n =
     in
     if is_uppercase then raise (Found position)
   in
-  match Uutf.String.fold_utf_8 find_uppercase () n with
+  match iter find_uppercase n with
   | exception Found position -> Some position
   | () -> None
 
