@@ -2,7 +2,7 @@
 
 let persons_of_stream conf base filter iperset stream max =
   let rec aux n iperset ipers =
-    match Ext_seq.next ipers with
+    match Seq.uncons ipers with
     | Some (_iper, _) when n <= 0 -> iperset
     | Some (iper, ipers) ->
         let p = Gwdb.poi base iper in
@@ -62,7 +62,7 @@ let persons_of_prefixes_stream max conf base filter other_pfxs main_pfx =
         value
   in
   let rec consume n results main_stream =
-    match Ext_seq.next main_stream with
+    match Seq.uncons main_stream with
     | Some (iper, main_stream) ->
         if n = 0 then results
         else
