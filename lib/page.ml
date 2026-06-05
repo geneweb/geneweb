@@ -126,7 +126,7 @@ module Advanced_search = struct
     }
 
     let get_event_info ~event_kind ~get_info query_params =
-      Ext_list.find_map
+      List.find_map
         (fun (event_kind', event) ->
           Ext_option.return_if (event_kind' = event_kind) (fun () ->
               get_info event))
