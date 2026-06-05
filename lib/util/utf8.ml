@@ -43,7 +43,7 @@ let sub ?pad str start len =
 
 (**/**)
 
-let iter f s = Uutf.String.fold_utf_8 (fun () _ c -> f c) () s
+let iter f s = Uutf.String.fold_utf_8 (fun () i c -> f i c) () s
 
 (* cmap_utf_8 code comes from
    http://erratique.ch/software/uucp/doc/Uucp.Case.html *)
@@ -309,7 +309,7 @@ let alphabetic_order n1 n2 = alphabetic_utf_8 n1 n2
 let filter_map f s =
   let buffer = Buffer.create @@ String.length s in
   let () =
-    iter (fun c -> Option.iter (Buffer.add_utf_8_uchar buffer) (f c)) s
+    iter (fun _ c -> Option.iter (Buffer.add_utf_8_uchar buffer) (f c)) s
   in
   Buffer.contents buffer
 
