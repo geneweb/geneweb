@@ -1119,9 +1119,23 @@ let person_lines ?(pre = Adef.safe "") ~link conf base p auth =
 let make_tree_hts conf base gv p =
   let sps = Util.get_opt conf "sp" true in
   let img = Util.get_opt conf "im" true in
+  let all_children p =
+    Array.concat
+      (List.map
+         (fun ifam -> Driver.get_children (Driver.foi base ifam))
+         (Array.to_list (Driver.get_family p)))
+  in
   let rec nb_column n v u =
-    if v = 0 then n + max 1 (Array.length (Driver.get_family u))
+    if v = 0 then
+      n + if sps then max 1 (Array.length (Driver.get_family u)) else 1
     else if Array.length (Driver.get_family u) = 0 then n + 1
+    else if not sps then
+      let ch = all_children u in
+      if Array.length ch = 0 then n + 1
+      else
+        Array.fold_left
+          (fun n ip -> nb_column n (v - 1) (Util.pget conf base ip))
+          n ch
     else
       Array.fold_left
         (fun n ifam -> fam_nb_column n v (Driver.foi base ifam))
@@ -1132,6 +1146,33 @@ let make_tree_hts conf base gv p =
       Array.fold_left
         (fun n iper -> nb_column n (v - 1) (Util.pget conf base iper))
         n (Driver.get_children des)
+  in
+  let bracket_over v children tdl =
+    let len = Array.length children in
+    if len = 0 then (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+    else if len = 1 then
+      let u = Util.pget conf base children.(0) in
+      let ncol = nb_column 0 (v - 1) u in
+      ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDnothing) :: tdl
+    else
+      let rec loop tdl i =
+        if i = len then tdl
+        else
+          let u = Util.pget conf base children.(i) in
+          let tdl =
+            if i > 0 then
+              (1, Dag2html.CenterA, Dag2html.TDhr Dag2html.CenterA) :: tdl
+            else tdl
+          in
+          let ncol = nb_column 0 (v - 1) u in
+          let align =
+            if i = 0 then Dag2html.RightA
+            else if i = len - 1 then Dag2html.LeftA
+            else Dag2html.CenterA
+          in
+          loop (((2 * ncol) - 1, align, Dag2html.TDhr align) :: tdl) (i + 1)
+      in
+      loop tdl 0
   in
   let vertical_bar_txt v tdl po =
     let tdl =
@@ -1162,23 +1203,30 @@ let make_tree_hts conf base gv p =
     in
     match po with
     | Some (p, _) when Array.length (Driver.get_family p) > 0 ->
-        fst
-        @@ Array.fold_left
-             (fun (tdl, first) ifam ->
-               let tdl =
-                 if first then tdl
-                 else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
-               in
-               let des = Driver.foi base ifam in
-               let td =
-                 if Array.length (Driver.get_children des) = 0 then
-                   (1, Dag2html.LeftA, Dag2html.TDnothing)
-                 else
-                   let ncol = fam_nb_column 0 (v - 1) des in
-                   ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar None)
-               in
-               (td :: tdl, false))
-             (tdl, true) (Driver.get_family p)
+        if not sps then
+          if Array.length (all_children p) = 0 then
+            (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+          else
+            let ncol = nb_column 0 (v - 1) p in
+            ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar None) :: tdl
+        else
+          fst
+          @@ Array.fold_left
+               (fun (tdl, first) ifam ->
+                 let tdl =
+                   if first then tdl
+                   else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+                 in
+                 let des = Driver.foi base ifam in
+                 let td =
+                   if Array.length (Driver.get_children des) = 0 then
+                     (1, Dag2html.LeftA, Dag2html.TDnothing)
+                   else
+                     let ncol = fam_nb_column 0 (v - 1) des in
+                     ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar None)
+                 in
+                 (td :: tdl, false))
+               (tdl, true) (Driver.get_family p)
     | _ -> (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
   in
   let spouses_vertical_bar v gen =
@@ -1191,47 +1239,20 @@ let make_tree_hts conf base gv p =
     in
     match po with
     | Some (p, _) when Array.length (Driver.get_family p) > 0 ->
-        fst
-        @@ Array.fold_left
-             (fun (tdl, first) ifam ->
-               let tdl =
-                 if first then tdl
-                 else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
-               in
-               let des = Driver.foi base ifam in
-               let tdl =
-                 if Array.length (Driver.get_children des) = 0 then
-                   (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
-                 else if Array.length (Driver.get_children des) = 1 then
-                   let u = Util.pget conf base (Driver.get_children des).(0) in
-                   let ncol = nb_column 0 (v - 1) u in
-                   ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDnothing) :: tdl
-                 else
-                   let rec loop tdl i =
-                     if i = Array.length (Driver.get_children des) then tdl
-                     else
-                       let iper = (Driver.get_children des).(i) in
-                       let u = Util.pget conf base iper in
-                       let tdl =
-                         if i > 0 then
-                           let align = Dag2html.CenterA in
-                           (1, align, Dag2html.TDhr align) :: tdl
-                         else tdl
-                       in
-                       let ncol = nb_column 0 (v - 1) u in
-                       let align =
-                         if i = 0 then Dag2html.RightA
-                         else if i = Array.length (Driver.get_children des) - 1
-                         then Dag2html.LeftA
-                         else Dag2html.CenterA
-                       in
-                       let td = ((2 * ncol) - 1, align, Dag2html.TDhr align) in
-                       loop (td :: tdl) (i + 1)
-                   in
-                   loop tdl 0
-               in
-               (tdl, false))
-             (tdl, true) (Driver.get_family p)
+        if not sps then bracket_over v (all_children p) tdl
+        else
+          fst
+          @@ Array.fold_left
+               (fun (tdl, first) ifam ->
+                 let tdl =
+                   if first then tdl
+                   else (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
+                 in
+                 ( bracket_over v
+                     (Driver.get_children (Driver.foi base ifam))
+                     tdl,
+                   false ))
+               (tdl, true) (Driver.get_family p)
     | _ -> (1, Dag2html.LeftA, Dag2html.TDnothing) :: tdl
   in
   let horizontal_bars v gen =
@@ -1294,7 +1315,7 @@ let make_tree_hts conf base gv p =
                     DateDisplay.short_marriage_date_text conf base fam p sp
                   else Adef.safe ""
                 in
-                let pre = ({|<i>|}  ^<^ "&amp;" ^<^ md ^>^ "</i>") in
+                let pre = {|<i>|} ^<^ "&amp;" ^<^ md ^>^ "</i>" in
                 person_lines ~pre
                   ~link:(Util.reference conf base sp)
                   conf base sp auth
@@ -1314,7 +1335,21 @@ let make_tree_hts conf base gv p =
       (fun po gen ->
         match po with
         | Some (p, _) ->
-            if Array.length (Driver.get_family p) = 0 then None :: gen
+            if not sps then
+              let ch = all_children p in
+              if Array.length ch = 0 then None :: gen
+              else
+                let age_auth =
+                  Array.for_all
+                    (fun ip ->
+                      Util.authorized_age conf base (Util.pget conf base ip))
+                    ch
+                in
+                Array.fold_right
+                  (fun iper gen ->
+                    Some (Util.pget conf base iper, age_auth) :: gen)
+                  ch gen
+            else if Array.length (Driver.get_family p) = 0 then None :: gen
             else
               Array.fold_right
                 (fun ifam gen ->
@@ -1329,8 +1364,7 @@ let make_tree_hts conf base gv p =
                     in
                     Array.fold_right
                       (fun iper gen ->
-                        let g = (Util.pget conf base iper, age_auth) in
-                        Some g :: gen)
+                        Some (Util.pget conf base iper, age_auth) :: gen)
                       (Driver.get_children des) gen)
                 (Driver.get_family p) gen
         | None -> None :: gen)
