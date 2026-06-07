@@ -101,11 +101,11 @@ let move_file_to_save dir file =
         if Sys.file_exists orig_ext then rn orig_ext saved_ext)
       extensions;
     1
-  with
-  | Sys_error e ->
-      Log.err (fun k -> k "Error moving file to saved: %s" e);
-      0
-  | _ -> 0
+  with exn ->
+    let bt = Printexc.get_backtrace () in
+    Log.err (fun k ->
+        k "Error moving file to saved: %s\n%s" (Printexc.to_string exn) bt);
+    0
 
 let create_blason_stop conf base p =
   let blason_dir = !GWPARAM.portraits_d conf.bname in
@@ -608,8 +608,8 @@ let effective_delete_ok conf base p =
   let fname = Image.default_image_filename "portraits" base p in
   let ext = get_extension conf fname mode false fname in
   let dir = !GWPARAM.portraits_d conf.bname in
-  if move_file_to_save (fname ^ ext) dir = 0 then
-    incorrect conf "effective delete (ok)";
+  if move_file_to_save dir (fname ^ ext) = 0 then
+    incorrect conf ("effective delete ok (" ^ (fname ^ ext) ^ ")");
   let changed =
     U_Delete_image (Util.string_gen_person base (Driver.gen_person_of_person p))
   in
@@ -675,7 +675,7 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
     (* if delete is on, we are talking about saved files *)
   else if delete then Mutil.rm orig_file (* is it needed ?, move should do it *)
   else if move_file_to_save dir file = 0 then
-    incorrect conf "effective delete (c_ok)";
+    incorrect conf ("effective delete c_ok (" ^ file ^ ")");
   let changed =
     U_Delete_image (Util.string_gen_person base (Driver.gen_person_of_person p))
   in
