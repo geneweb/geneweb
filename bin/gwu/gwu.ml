@@ -2,11 +2,14 @@ open GwuLib
 module Driver = Geneweb_db.Driver
 
 let isolated = ref false
+let bases_dir = ref "."
 
 let speclist opts =
   ( "-odir",
     Arg.String (fun s -> GwuLib.out_dir := s),
     "<dir> create files from original name in directory (else on -o file)" )
+  (* FIXME -bd is a noop for the time being. gwu assumes cd bases_dir prior to execution  *)
+  :: ("-bd", Arg.String (fun s -> bases_dir := s), " defines bases folder")
   :: ( "-isolated",
        Arg.Set isolated,
        " export isolated persons (work only if export all database)." )
