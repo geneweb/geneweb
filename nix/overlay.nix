@@ -13,6 +13,7 @@ self: super: {
       unidecode = final.callPackage ./unidecode.nix { };
       ocamlformat-lib = final.callPackage ./ocamlformat/ocamlformat-lib.nix { };
       ocamlformat = final.callPackage ./ocamlformat/ocamlformat.nix { };
+      dead_code_analyzer = final.callPackage ./dead_code_analyzer.nix { };
       oui = prev.oui.overrideAttrs {
         version = "dev";
         src = super.fetchFromGitHub {
