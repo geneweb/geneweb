@@ -5,6 +5,12 @@
 2: centered
 3: two columns
 %)
+%define;updfield(xx,yy)
+  %if;(wizard or "place" in "xx")<span data-updfield="xx"
+    %if;("place" in "xx")%if;(xx_raw!=xx) data-updraw="%xx_raw;"%end;%end;
+    %if;("xx"="occu") data-updraw="%occupation_raw;"%end;>%end;yy
+    %if;(wizard or "place" in "xx")</span>%end;
+%end;
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 %define;cousin(l1,l2,dd,cc)
   %if;([cousin.l1.l2]!="[cousin.l1.l2]")
@@ -35,23 +41,28 @@
   %if;(has_qualifiers or has_aliases or has_nobility_titles or
        has_public_name or has_surnames_aliases or has_first_names_aliases or
        has_linked_page.HEAD or computable_death_age or computable_age)
+    %reset_count;
     %foreach;qualifier;
       %if;not is_first;
-        %if;has_public_name;%public_name; %qualifier;
-        %else;%first_name; %qualifier;%end;
+        %if;has_public_name;%public_name;%else;%first_name;%end;
+        %sp;%apply;updfield%with;qualifier%count;%and;%qualifier;%end;
       %end;
+      %incr_count;
     %end;
     %if;has_public_name;
-      <span class="d-block fw-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</span>
+      <span class="d-block fw-bold">%apply;updfield%with;first_name%and;%apply;link(first_name,"P")%end; %apply;link(surname,"N")</span>
     %end;
     %if;has_aliases;
+      <div>%reset_count;
       alias%sp;
-      %apply;lazy_print("")
-      %foreach;alias;
-        %if;(lazy_printed)/%end;
-        %lazy_force;
-        <b>%alias;</b>%nn;
-      %end;<br>
+        %apply;lazy_print("")
+        %foreach;alias;
+          %if;(lazy_printed)/%end;
+          %lazy_force;
+          <b>%apply;updfield%with;alias%count;%and;%alias;%end;</b>%nn;
+          %incr_count;
+        %end;
+      </div>
     %end;
     %( Nobility title format:
          “13ᵉ prince de Monaco (Rainier III, 9 mai 1949–6 avril 2005)” %)
@@ -82,23 +93,28 @@
     %end;
     %if;(has_linked_page.HEAD and linked_page.HEAD!="")%linked_page.HEAD;%end;
     %if;has_first_names_aliases;
-      <span class="d-block">%apply;lazy_print("")
+      <div>%reset_count;
         %apply;link(first_name,"P")/%sq;
+        %apply;lazy_print("")
         %foreach;first_name_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;link(first_name_alias,"P")
+          %apply;updfield%with;first_name_alias%count;%and;%apply;link(first_name_alias,"P")%end;
+          %incr_count;
         %end;
-      </span>
-    %end;%sp;
+      </div>
+    %end;
     %if;has_surnames_aliases;
-      %apply;lazy_print("")
-      %apply;link(surname,"N")/%sq;
-      %foreach;surname_alias;
-        %if;(lazy_printed)/%end;
-        %lazy_force;
-        %apply;link(surname_alias,"N")
-      %end;
+      <div>%reset_count;
+        %apply;link(surname,"N")/%sq;
+        %apply;lazy_print("")
+        %foreach;surname_alias;
+          %if;(lazy_printed)/%end;
+          %lazy_force;
+          %apply;updfield%with;surname_alias%count;%and;%apply;link(surname_alias,"N")%end;
+          %incr_count;
+        %end;
+      </div>
     %end;
   %end;
 %end;
@@ -208,10 +224,9 @@
       <li %apply;getvar%with;ns[birth]%end;>
         %if;(not roglo)<span class="fa-li"><i class="fas fa-baby"></i></span>%end;
         %if;has_birth_date;[*born]s %on_birth_date;
-          %if;has_birth_place; %in_place; %birth_place;%end;
+          %if;has_birth_place; %in_place; %apply;updfield%with;birth_place%and;%birth_place;%end;%end;
         %else;
-          %if;has_birth_place;[*born]s %in_place; %birth_place;
-          %end;
+          %if;has_birth_place;[*born]s %in_place;%apply;updfield%with;birth_place%and;%birth_place;%end;%end;
         %end;
       </li>
       %if;birthday;
@@ -225,10 +240,9 @@
       <li %apply;getvar%with;ns[baptism]%end;>
         %if;(not roglo)<span class="fa-li"><i class="fas fa-dove"></i></span>%end;
         %if;has_baptism_date;[*baptized]s %on_baptism_date;
-            %if;has_baptism_place; %in_place; %baptism_place;%end;
+          %if;has_baptism_place; %in_place; %apply;updfield%with;baptism_place%and;%baptism_place;%end;%end;
         %else;
-          %if;has_baptism_place;[*baptized]s %in_place; %baptism_place;
-          %end;
+          %if;has_baptism_place;[*baptized]s %in_place; %apply;updfield%with;baptism_place%and;%baptism_place;%end;%end;
         %end;
         %foreach;event;
           %if;(event.name=[baptism] and event.age!="") [aged] %event.age;%end;
@@ -240,7 +254,7 @@
         %if;(not roglo)<span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>%end;
         %apply;capitalize(died)
         %if;has_death_date; %on_death_date;%end;
-        %if;has_death_place; %in_place; %death_place;%end;
+        %if;has_death_place; %in_place; %apply;updfield%with;death_place%and;%death_place;%end;%end;
         %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
     %end;
     %if;(is_buried or is_cremated)
@@ -248,11 +262,11 @@
         %if;(not roglo)<span class="fa-li"><i class="fas fa-cross"></i></span>%end;
         %if;is_buried;[*buried]s
           %if;has_burial_date; %on_burial_date;%end;
-          %if;has_burial_place; %in_place; %burial_place;%end;
+          %if;has_burial_place; %in_place; %apply;updfield%with;burial_place%and;%burial_place;%end;%end;
         %end;
         %if;is_cremated;[*cremated]s
           %if;has_cremation_date; %on_cremation_date;%end;
-          %if;has_cremation_place; %in_place; %cremation_place;%end;
+          %if;has_cremation_place; %in_place; %apply;updfield%with;burial_place%and;%cremation_place;%end;%end;
         %end;
       </li>%nl;
     %end;
@@ -280,9 +294,9 @@
       </li>
     %end;
     %if;has_occupation;
-      <li class="mt-1" title="[*occupation/occupations]0" >
+      <li class="mt-1" title="[*occupation/occupations]0">
         %if;not roglo;<span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
-         <span data-updatefield="occu">%apply;capitalize(occupation)</span></li>%nl;
+        %apply;updfield%with;occu%and;%apply;capitalize(occupation)%end;</li>%nl;
     %end;
     %if;(has_linked_page.OCCU and linked_page.OCCU!="")
       <li>%if;not roglo;<span class="fa-li"><i class="far fa-file-lines"></i></span>%end;

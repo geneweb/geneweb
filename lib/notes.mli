@@ -91,6 +91,17 @@ val source_note_with_env :
 (** [source_note_with_env conf base env str] Interprets wiki syntax in a
     "source" context with a predefined env. *)
 
+val wiki_of_source :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  always_show_link:bool ->
+  Geneweb_db.Driver.person ->
+  string ->
+  string
+(** [wiki_of_source conf base ~always_show_link p s] renders source string [s]
+    to HTML in the "NOTES" wiki context, marking links to non-public persons;
+    [p] provides the [%i]/[%k] macro env and the person-existence check. *)
+
 type mode = Delete | Rename | Merge
 
 val links_to_ind :

@@ -722,6 +722,26 @@ let source_note conf base p str =
 let source_note_with_env conf base env str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
 
+let wiki_of_source conf base ~always_show_link p s =
+  let wi =
+    {
+      Wiki.wi_mode = "NOTES";
+      Wiki.wi_file_path = file_path conf base;
+      Wiki.wi_person_exists = Util.person_exists conf base;
+      Wiki.wi_mark_if_not_public = Util.mark_if_not_public conf base;
+      Wiki.wi_always_show_link = always_show_link;
+    }
+  in
+  let env =
+    [
+      ( 'i',
+        fun () ->
+          Geneweb_db.Driver.Iper.to_string (Geneweb_db.Driver.get_iper p) );
+      ('k', fun () -> Image.default_image_filename "portraits" base p);
+    ]
+  in
+  Util.string_with_macros conf env (Wiki.syntax_links conf wi s)
+
 let fold_linked_pages conf base db key type_filter transform =
   List.fold_left
     (fun acc (pg, (_, il)) ->

@@ -2240,7 +2240,7 @@ co: à l’età di
 cs: věk v době úmrtí
 da: alder ved død
 de: Alter
-en: age at death
+en: aged
 eo: mortaĝo
 es: a la edad de
 et: vanus surres
@@ -8286,6 +8286,14 @@ de: die Familie bearbeiten durch Klick auf das Hochzeitsdatum einer der beiden P
 en: edit the families by clicking on the date of marriage of the row of one spouses
 fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
 
+    edit mode
+en: edit mode (modify underlined data in-place, enter to validate)
+fr: mode édition (modifier les données soulignées sur place, entrée pour valider)
+
+    edit this field
+en: edit this data in-place
+fr: éditer cette donnée sur place
+
     education
 co: educazione
 de: Ausbildung
@@ -13170,7 +13178,6 @@ ru: прочие сведения
 sv: övriga fält
 tr: diğer alan
 
-
     miscellaneous notes
 bg: разни бележки
 ca: miscel·lània
@@ -13281,6 +13288,10 @@ no: bilde mangler
 pt: imagem em falta
 sv: bild saknas
 tr: eksik görüntü
+
+    missing family event
+en: missing family event
+fr: événement familial manquant
 
     missing parents
 co: genitori assente

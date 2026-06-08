@@ -2056,23 +2056,15 @@ and eval_simple_str_var conf base env (p, p_auth) = function
               else null_val
           | _ -> raise Not_found))
   | "marriage_place_raw" -> (
+      let aux fam =
+        Driver.sou base (Driver.get_marriage_place fam) |> str_val
+      in
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env ->
-          if m_auth then
-            Driver.get_marriage_place fam
-            |> Driver.sou base
-            |> Util.raw_string_of_place conf
-            |> str_val
-          else null_val
+          if m_auth then aux fam else null_val
       | _ -> (
           match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) ->
-              if m_auth then
-                Driver.get_marriage_place fam
-                |> Driver.sou base
-                |> Util.raw_string_of_place conf
-                |> str_val
-              else null_val
+          | Vfam (_, fam, _, m_auth) -> if m_auth then aux fam else null_val
           | _ -> raise Not_found))
   | "marriage_note" -> (
       match get_env "fam" env with
@@ -2085,6 +2077,15 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) ->
           Driver.get_marriage_src fam
           |> get_note_or_source conf base m_auth false
+      | _ -> raise Not_found)
+  | "marriage_source_raw" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) ->
+          if m_auth then
+            safe_val
+              (Util.escape_html (Driver.sou base (Driver.get_marriage_src fam))
+                :> Adef.safe_string)
+          else null_val
       | _ -> raise Not_found)
   | "max_anc_level" -> (
       match get_env "max_anc_level" env with
@@ -2223,6 +2224,14 @@ and eval_simple_str_var conf base env (p, p_auth) = function
               Collection.Marker.set flevt i (Collection.Marker.get flevt_save i))
             (Geneweb_db.Driver.ifams base);
           null_val
+      | _ -> raise Not_found)
+  | "source_field" -> (
+      match get_env "src_field" env with
+      | Vstring s -> VVstring s
+      | _ -> raise Not_found)
+  | "source_ifam" -> (
+      match get_env "src_ifam" env with
+      | Vstring s -> VVstring s
       | _ -> raise Not_found)
   | "source_type" -> (
       match get_env "src_typ" env with
@@ -4042,8 +4051,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "birth_place_raw" ->
       if p_auth then
-        Driver.sou base (Driver.get_birth_place p)
-        |> undo_parentheses |> str_val
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_birth_place p))
+            :> Adef.safe_string)
       else null_val
   | "birth_note" ->
       Driver.get_birth_note p
@@ -4057,8 +4067,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "baptism_place_raw" ->
       if p_auth then
-        Driver.sou base (Driver.get_baptism_place p)
-        |> undo_parentheses |> str_val
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_baptism_place p))
+            :> Adef.safe_string)
       else null_val
   | "baptism_note" ->
       Driver.get_baptism_note p
@@ -4072,8 +4083,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "burial_place_raw" ->
       if p_auth then
-        Driver.sou base (Driver.get_burial_place p)
-        |> undo_parentheses |> str_val
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_burial_place p))
+            :> Adef.safe_string)
       else null_val
   | "burial_note" ->
       Driver.get_burial_note p
@@ -4105,7 +4117,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         |> Util.string_of_place conf |> safe_val
       else null_val
   | "cremation_place_raw" ->
-      if p_auth then Driver.sou base (Driver.get_burial_place p) |> str_val
+      if p_auth then
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_burial_place p))
+            :> Adef.safe_string)
       else null_val
   | "dates" ->
       if p_auth then DateDisplay.short_dates_text conf base p |> safe_val
@@ -4137,8 +4152,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "death_place_raw" ->
       if p_auth then
-        Driver.sou base (Driver.get_death_place p)
-        |> undo_parentheses |> str_val
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_death_place p))
+            :> Adef.safe_string)
       else null_val
   | "death_note" ->
       Driver.get_death_note p
@@ -4367,6 +4383,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "occupation" ->
       Driver.get_occupation p |> get_note_or_source conf base ~p p_auth false
+  | "occupation_raw" ->
+      if p_auth then
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_occupation p))
+            :> Adef.safe_string)
+      else null_val
   | "on_baptism_date" -> date_aux conf p_auth (Driver.get_baptism p)
   | "slash_baptism_date" ->
       if p_auth then
@@ -4482,28 +4504,15 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "source" -> (
       match get_env "src" env with
       | Vstring s ->
-          let env =
-            [
-              ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
-              ('k', fun () -> Image.default_image_filename "portraits" base p);
-            ]
+          let always_show_link =
+            conf.wizard || (conf.friend && Driver.get_access p = SemiPublic)
           in
-          let s =
-            let wi =
-              {
-                Wiki.wi_mode = "NOTES";
-                Wiki.wi_file_path = Notes.file_path conf base;
-                Wiki.wi_person_exists = person_exists conf base;
-                Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
-                Wiki.wi_always_show_link =
-                  conf.wizard
-                  || (conf.friend && Driver.get_access p = SemiPublic);
-              }
-            in
-            Wiki.syntax_links conf wi s
-          in
-          string_with_macros conf env s |> str_val
+          Notes.wiki_of_source conf base ~always_show_link p s |> str_val
       | _ -> null_val)
+  | "source_raw" -> (
+      match get_env "src" env with
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
+      | _ -> raise Not_found)
   | "surname" ->
       if GWPARAM.p_auth_sp conf base p then
         Driver.p_surname base p |> Util.escape_html |> safe_val
@@ -5550,14 +5559,15 @@ let print_foreach conf base print_ast eval_expr =
   in
 
   let print_foreach_source env al ((p, p_auth) as ep) =
-    let rec insert_loop typ src = function
-      | (typ1, src1) :: srcl ->
-          if src = src1 then (typ1 ^ ", " ^ typ, src1) :: srcl
-          else (typ1, src1) :: insert_loop typ src srcl
-      | [] -> [ (typ, src) ]
+    let rec insert_loop typ fld ifo src = function
+      | (typ1, _, _, src1) :: srcl when src = src1 ->
+          (typ1 ^ ", " ^ typ, "", "", src1) :: srcl
+      | e :: srcl -> e :: insert_loop typ fld ifo src srcl
+      | [] -> [ (typ, fld, ifo, src) ]
     in
-    let insert typ src srcl =
-      if src = "" then srcl else insert_loop (Util.translate_eval typ) src srcl
+    let insert typ fld ifo src srcl =
+      if src = "" then srcl
+      else insert_loop (Util.translate_eval typ) fld ifo src srcl
     in
     let srcl =
       if p_auth then
@@ -5565,18 +5575,21 @@ let print_foreach conf base print_ast eval_expr =
         let srcl =
           insert
             (transl_nth conf "person/persons" 0)
+            "psources" ""
             (Driver.sou base (Driver.get_psources p))
             srcl
         in
         let srcl =
           insert
             (transl_nth conf "birth" 0)
+            "birth_src" ""
             (Driver.sou base (Driver.get_birth_src p))
             srcl
         in
         let srcl =
           insert
             (transl_nth conf "baptism" 0)
+            "baptism_src" ""
             (Driver.sou base (Driver.get_baptism_src p))
             srcl
         in
@@ -5586,21 +5599,21 @@ let print_foreach conf base print_ast eval_expr =
               let fam = Driver.foi base ifam in
               let isp = Gutil.spouse (Driver.get_iper p) fam in
               let sp = Driver.poi base isp in
-              (* On sait que p_auth vaut vrai. *)
               let m_auth = authorized_age conf base sp in
               if m_auth then
                 let lab =
                   if Array.length (Driver.get_family p) = 1 then ""
                   else " " ^ string_of_int i
                 in
+                let ifs = Driver.Ifam.to_string ifam in
                 let srcl =
                   let src_typ = transl_nth conf "marriage/marriages" 0 in
-                  insert (src_typ ^ lab)
+                  insert (src_typ ^ lab) "marriage_src" ifs
                     (Driver.sou base (Driver.get_marriage_src fam))
                     srcl
                 in
                 let src_typ = transl_nth conf "family/families" 0 in
-                ( insert (src_typ ^ lab)
+                ( insert (src_typ ^ lab) "fsources" ifs
                     (Driver.sou base (Driver.get_fsources fam))
                     srcl,
                   i + 1 )
@@ -5610,29 +5623,31 @@ let print_foreach conf base print_ast eval_expr =
         let srcl =
           insert
             (transl_nth conf "death" 0)
+            "death_src" ""
             (Driver.sou base (Driver.get_death_src p))
             srcl
         in
         let buri_crem_lex =
           match Driver.get_burial p with
-          | Cremated _cdate -> "cremation"
-          | Buried _cdate -> "burial"
-          | UnknownBurial -> "burial" (* TODOWHY what should we print here *)
+          | Cremated _ -> "cremation"
+          | Buried _ | UnknownBurial -> "burial"
         in
         insert
           (transl_nth conf buri_crem_lex 0)
+          "burial_src" ""
           (Driver.sou base (Driver.get_burial_src p))
           srcl
       else []
     in
-    (* Affiche les sources et met à jour les variables "first" et "last". *)
     let rec loop first = function
-      | (src_typ, src) :: srcl ->
+      | (src_typ, fld, ifs, src) :: srcl ->
           let env =
             Templ.Env.(
               env |> add "first" (Vbool first)
               |> add "last" (Vbool (srcl = []))
               |> add "src_typ" (Vstring src_typ)
+              |> add "src_field" (Vstring fld)
+              |> add "src_ifam" (Vstring ifs)
               |> add "src" (Vstring src))
           in
           List.iter (print_ast env ep) al;

@@ -794,6 +794,7 @@ let treat_request =
              | "TT" -> w_base @@ TitleDisplay.print
              | "U" ->
                  w_wizard @@ w_base @@ w_person @@ Perso.interp_templ "updmenu"
+             | "UPD" -> w_wizard @@ w_lock @@ w_base @@ UpdateField.print
              | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
                  w_wizard @@ w_base @@ WiznotesDisplay.print_view
              | "WIZNOTES" when conf.authorized_wizards_notes ->
