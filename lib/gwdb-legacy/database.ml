@@ -166,17 +166,7 @@ let old_persons_of_first_name_or_surname base_data params =
       | None ->
           let fname_inx = Filename.concat bname names_inx in
           let ic_inx = Secure.open_in_bin fname_inx in
-          (*
-          let ab1 = Gc.allocated_bytes () in
-          *)
           let bt : int IstrTree.t = input_value ic_inx in
-          (*
-          let ab2 = Gc.allocated_bytes () in
-          Printf.eprintf "*** new database created by version >= 4.10\n";
-          Printf.eprintf "*** using index '%s' allocating here only %.0f bytes\n"
-            names_inx (ab2 -. ab1);
-          flush stderr;
-          *)
           close_in ic_inx;
           btr := Some bt;
           bt
@@ -906,7 +896,7 @@ let spi_stream_of_spi spi = { spi; st = `First }
 let rec iper_of_prefix base_data spi prefix =
   let next_person_id istr =
     let s = base_data.Dbdisk.strings.get istr in
-    if Ext_string.start_with prefix 0 s then
+    if String.starts_with ~prefix s then
       iper_of_prefix base_data
         { spi with st = `Current (istr, spi.spi.find istr) }
         prefix
@@ -933,7 +923,7 @@ let prefix_exists base_data spi prefix =
   try
     let istr = spi.spi.cursor prefix in
     let s = base_data.Dbdisk.strings.get istr in
-    Ext_string.start_with prefix 0 s
+    String.starts_with ~prefix s
   with Not_found -> false
 
 let iper_stream_of_prefix base_data spi prefix =

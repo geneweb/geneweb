@@ -1499,10 +1499,10 @@ let raw_file conf s =
     List.fold_left Filename.concat !setup_dir (separate_slashed_filename s)
   in
   let typ =
-    if Ext_string.end_with s ".png" then "image/png"
-    else if Ext_string.end_with s ".jpg" then "image/jpeg"
-    else if Ext_string.end_with s ".gif" then "image/gif"
-    else if Ext_string.end_with s ".css" then "text/css"
+    if String.ends_with s ~suffix:".png" then "image/png"
+    else if String.ends_with s ~suffix:".jpg" then "image/jpeg"
+    else if String.ends_with s ~suffix:".gif" then "image/gif"
+    else if String.ends_with s ~suffix:".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
@@ -1554,9 +1554,9 @@ let setup_comm_ok conf = function
       | _ -> gwfixbase "gwfix_ok.htm" conf)
   | x ->
       if
-        Ext_string.start_with "doc/" 0 x
-        || Ext_string.start_with "images/" 0 x
-        || Ext_string.start_with "css/" 0 x
+        String.starts_with ~prefix:"doc/" x
+        || String.starts_with ~prefix:"images/" x
+        || String.starts_with ~prefix:"css/" x
       then raw_file conf x
       else error conf ("bad command: \"" ^ x ^ "\"")
 

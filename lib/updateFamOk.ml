@@ -1039,11 +1039,11 @@ let need_check_noloop (scpl, sdes, onfs) =
     match onfs with
     | Some ((opar, ochil), (npar, nchil)) ->
         (not
-           (Ext_array.forall2
+           (Array.for_all2
               (is_created_or_already_there opar)
               npar (Adef.parent_array scpl)))
         || not
-             (Ext_array.forall2
+             (Array.for_all2
                 (is_created_or_already_there ochil)
                 nchil sdes.children)
     | None -> true

@@ -11,7 +11,7 @@ val make_tree_hts :
   bool ->
   Gwdb.iper list ->
   (Gwdb.iper * (Gwdb.iper * Gwdb.ifam option)) list ->
-  (Gwdb.iper, 'a) Def.choice Dag2html.dag ->
+  (Gwdb.iper, 'a) Either.t Dag2html.dag ->
   (int * Dag2html.align * Adef.safe_string Dag2html.table_data) array array
 (** [make_tree_hts conf base elem_txt vbar_txt invert set spl d]  *)
 

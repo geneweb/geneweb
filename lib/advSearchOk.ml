@@ -39,7 +39,7 @@ let abbrev_lower x = Name.abbrev (Name.lower x)
 
 let is_subset_pfx s1 s2 =
   List.for_all
-    (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
+    (fun e -> List.exists (fun s -> String.starts_with ~prefix:e s) s2)
     s1
 
 module AdvancedSearchMatch : sig
@@ -242,10 +242,7 @@ end = struct
         List.exists (Uchar.equal c) (List.map Uchar.of_char delimiters)
       in
       Utf8.filter_map
-        (function
-          | `Malformed _ -> None
-          | `Uchar c ->
-              Ext_option.return_if (not @@ is_delimiter c) (fun () -> c))
+        (fun c -> Ext_option.return_if (not @@ is_delimiter c) (fun () -> c))
         (Utf8.unaccent @@ Utf8.lowercase s)
     in
     Option.fold occupation ~none:true ~some:(fun occupation ->

@@ -105,10 +105,6 @@ val unaccent_next : bool -> string -> int -> string * int
 val alphabetic_order : string -> string -> int
 (** Compare two UTF-8 encoded strings by alphabetic order *)
 
-val filter_map :
-  ([ `Uchar of Uchar.t | `Malformed of string ] -> Uchar.t option) ->
-  string ->
-  string
-
+val filter_map : (Uchar.t -> Uchar.t option) -> string -> string
 val unaccent : string -> string
 val uchar_to_string : Uchar.t -> string

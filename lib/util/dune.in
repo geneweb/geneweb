@@ -12,7 +12,6 @@
    unix
    uucp
    uunf.string
-   uutf
    zarith
    %%%SYSLOG_PKG%%%
    markup

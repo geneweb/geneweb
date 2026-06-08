@@ -39,6 +39,5 @@
     uri
     uucp
     uunf
-    uutf
     zarith
   ))

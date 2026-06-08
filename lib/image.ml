@@ -191,12 +191,10 @@ let get_portrait_path conf base p =
 let urlorpath_of_string conf s =
   let http = "http://" in
   let https = "https://" in
-  (* TODO OCaml 4.13: use String.starts_with *)
   if
-    String.length s > String.length http
-    && String.sub s 0 (String.length http) = http
+    (String.length s > String.length http && String.starts_with s ~prefix:http)
     || String.length s > String.length https
-       && String.sub s 0 (String.length https) = https
+       && String.starts_with s ~prefix:https
   then `Url s
   else if Filename.is_implicit s then
     match List.assoc_opt "images_path" conf.Config.base_env with

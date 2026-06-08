@@ -43,17 +43,29 @@ let sub ?pad str start len =
 
 (**/**)
 
-(* cmap_utf_8 code code comes from
-   http://erratique.ch/software/uucp/doc/Uucp.Case.html *)
+let fold f acc s =
+  let rec aux acc i =
+    if i >= String.length s then acc
+    else
+      let decoder = String.get_utf_8_uchar s i in
+      aux
+        (f acc i (Uchar.utf_decode_uchar decoder))
+        (i + Uchar.utf_decode_length decoder)
+  in
+  aux acc 0
+
+let iter f s = fold (fun () i c -> f i c) () s
+
+(* cmap_utf_8 code is inspired by
+   https://erratique.ch/software/uucp/doc/Uucp/Case/index.html *)
 let cmap_utf_8 cmap s =
   let b = Buffer.create (String.length s * 2) in
-  let add_map _ _ u =
-    let u = match u with `Malformed _ -> Uutf.u_rep | `Uchar u -> u in
+  let add_map _ u =
     match cmap u with
-    | `Self -> Uutf.Buffer.add_utf_8 b u
-    | `Uchars us -> List.iter (Uutf.Buffer.add_utf_8 b) us
+    | `Self -> Buffer.add_utf_8_uchar b u
+    | `Uchars us -> List.iter (Buffer.add_utf_8_uchar b) us
   in
-  Uutf.String.fold_utf_8 add_map () s;
+  iter add_map s;
   Buffer.contents b
 
 (**/**)
@@ -84,14 +96,9 @@ let capitalize s =
 let initial n =
   let exception Found of int in
   let find_uppercase () position character =
-    let is_uppercase =
-      match character with
-      | `Uchar c -> Uucp.Case.is_upper c
-      | `Malformed _ -> false
-    in
-    if is_uppercase then raise (Found position)
+    if Uucp.Case.is_upper character then raise (Found position)
   in
-  match Uutf.String.fold_utf_8 find_uppercase () n with
+  match fold find_uppercase () n with
   | exception Found position -> Some position
   | () -> None
 
@@ -303,12 +310,11 @@ let alphabetic_utf_8 n1 n2 =
   if n1 = n2 then 0 else loop 0 0
 
 let alphabetic_order n1 n2 = alphabetic_utf_8 n1 n2
-let iter f s = Uutf.String.fold_utf_8 (fun () _ c -> f c) () s
 
 let filter_map f s =
   let buffer = Buffer.create @@ String.length s in
   let () =
-    iter (fun c -> Option.iter (Buffer.add_utf_8_uchar buffer) (f c)) s
+    iter (fun _ c -> Option.iter (Buffer.add_utf_8_uchar buffer) (f c)) s
   in
   Buffer.contents buffer
 

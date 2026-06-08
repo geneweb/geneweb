@@ -733,7 +733,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
     | None -> ""
     | Some auth ->
         let s = "Basic " in
-        if Ext_string.start_with s 0 auth then
+        if String.starts_with ~prefix:s auth then
           let i = String.length s in
           Geneweb.Base64.decode (String.sub auth i (String.length auth - i))
         else ""
@@ -931,7 +931,7 @@ let digest_authorization request base_env passwd utm base_file command =
       Option.value ~default:""
         (Mutil.extract_param "authorization: " '\r' request)
     in
-    if Ext_string.start_with "Digest " 0 auth then
+    if String.starts_with ~prefix:"Digest " auth then
       let meth =
         match Mutil.extract_param "GET " ' ' request with
         | None -> "POST"
@@ -1524,7 +1524,7 @@ let image_request conf script_name env =
       true
   | _ ->
       let s = script_name in
-      if Ext_string.start_with "images/" 0 s then
+      if String.starts_with ~prefix:"images/" s then
         let i = String.length "images/" in
         let fname = String.sub s i (String.length s - i) in
         let (`Path fname) = Geneweb.Image.path_of_filename fname in
@@ -1575,7 +1575,7 @@ let find_misc_file name =
   if
     Sys.file_exists name
     && List.exists
-         (fun p -> Ext_string.start_with (Filename.concat p "assets") 0 name)
+         (fun p -> String.starts_with ~prefix:(Filename.concat p "assets") name)
          !plugins
   then name
   else
