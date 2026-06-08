@@ -88,6 +88,7 @@
                 memtrace
                 ocamlformat
                 oui
+                dead_code_analyzer
               ]);
 
               inputsFrom = [
