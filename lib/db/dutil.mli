@@ -52,15 +52,6 @@ val dsk_person_misc_names :
 val poi : dsk_base -> int -> dsk_person
 (** [poi base i] returns person's entry with index [i] from [base]. *)
 
-val sou : dsk_base -> int -> string
-(** [poi base i] returns string with index [i] from [base]. *)
-
-val p_first_name : dsk_base -> dsk_person -> string
-(** Returns person's first name from the given person's entry. *)
-
-val p_surname : dsk_base -> dsk_person -> string
-(** Returns person's surname from the given person's entry. *)
-
 val output_value_no_sharing : out_channel -> _ -> unit
 (** Output given value to the channel. Uses [Marshall.to_channel] with
     [No_sharing] flag. *)

@@ -1,6 +1,3 @@
-val src : Logs.src
-(** Source of debugging logs of this module. *)
-
 type t
 (** Type of a worker pool for workers. *)
 

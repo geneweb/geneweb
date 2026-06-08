@@ -58,20 +58,9 @@ let only_suburb =
 let without_suburb =
   suburb_aux (fun s len _i j -> String.sub s j (len - j)) (fun s -> s)
 
-let has_suburb s = String.unsafe_get s 0 = '['
+type 'a env = Vother of 'a
 
-type 'a env =
-  | Vlist_data of (string * (string * int) list) list
-  | Vlist_ini of string list
-  | Vlist_value of (string * (string * int) list) list
-  | Venv_keys of (string * int) list
-  | Vint of int
-  | Vstring of string
-  | Vbool of bool
-  | Vother of 'a
-  | Vnone
-
-let get_vother = function Vother x -> Some x | _ -> None
+let get_vother = function Vother x -> Some x
 let set_vother x = Vother x
 
 let normalize =
@@ -321,10 +310,6 @@ let rec sort_place_utf8 k1 k2 =
         sort_place_utf8 (pl1, sub1) (pl2, sub2)
       else Gutil.alphabetic_order p1 p2
 
-let clean_ps ps =
-  let len = String.length ps in
-  if ps.[0] = '(' && ps.[len - 1] = ')' then String.sub ps 1 (len - 2) else ps
-
 let find_in conf x ini =
   (* look at possibility to have ini=aaa, bbb or aaa (bbb) *)
   let word = p_getenv conf.env "word" = Some "on" in
@@ -405,22 +390,6 @@ let pps_call conf opt long keep k places =
     (if long then "long" else "short")
     (string_of_int keep) k
     (String.concat ", " places)
-
-(* build ip list for all entries having same first element in places *)
-let get_new_l l =
-  let new_l =
-    let rec loop prev ipl acc l =
-      match l with
-      | [] -> acc
-      | ((pl :: _pll, _), snl) :: l when pl = prev ->
-          loop prev (get_ip_list snl :: ipl) acc l
-      | ((pl :: _pll, _), _snl) :: l ->
-          loop pl [] ((prev, List.flatten ipl) :: acc) l
-      | ((_, _), _snl) :: l -> loop "" [] ((prev, List.flatten ipl) :: acc) l
-    in
-    loop "" [] [] l
-  in
-  new_l
 
 (* conserve only keep elements of pll *)
 let strip_pl keep pll =
@@ -769,17 +738,3 @@ let print_all_places_surnames conf base =
     in
     print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
       ~add_death ~add_burial ~add_marriage lim true filter
-
-let print_list conf _base =
-  let ifun =
-    Templ.
-      {
-        eval_var = (fun _ -> raise Not_found);
-        eval_transl = (fun _ -> Templ.eval_transl conf);
-        eval_predefined_apply = (fun _ -> raise Not_found);
-        get_vother;
-        set_vother;
-        print_foreach = (fun _ -> raise Not_found);
-      }
-  in
-  Templ.output conf ifun Templ.Env.empty () "list"

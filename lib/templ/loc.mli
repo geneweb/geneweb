@@ -7,10 +7,6 @@ type source = [ `File of string | `Raw of string ]
 val equal_source : source -> source -> bool
 (** [equal_source s1 s2] checks if the sources [s1] and [s2] are equal. *)
 
-val pp_source : source Fmt.t
-(** [pp_source ppf s] prints a string representation of the source on the
-    formatter [ppf]. *)
-
 val dummy : t
 (** Dummy location. *)
 

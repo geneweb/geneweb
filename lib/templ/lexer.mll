@@ -461,17 +461,6 @@ and variable_ident = parse
       []
     }
 
-and transl_index = parse
-  | num as n {
-      n
-    }
-  | ['a'-'z'] as c {
-      String.make 1 c
-    }
-  | "" {
-      ""
-    }
-
 and lexicon_word_text b n = parse
   | '[' {
       let () = Buffer.add_char b '[' in

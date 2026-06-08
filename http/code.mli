@@ -5,8 +5,6 @@ type status =
   | Unauthorized (* 401 *)
   | Forbidden (* 403 *)
   | Not_Found (* 404 *)
-  | Conflict (* 409 *)
-  | Internal_Server_Error (* 500 *)
   | Service_Unavailable (* 503 *)
 
 val status_code : status -> int

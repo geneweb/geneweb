@@ -125,7 +125,6 @@ module Out_channel = struct
   let with_open_gen flags perm s f =
     with_open (Stdlib.open_out_gen flags perm) s f
 
-  let flush = Stdlib.flush
   let output = Stdlib.output
 
   external isatty : t -> bool = "caml_sys_isatty"

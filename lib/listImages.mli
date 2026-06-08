@@ -37,14 +37,6 @@ val print : Config.config -> Geneweb_db.Driver.base -> unit
 
     Requires {!Config.config.wizard} access. *)
 
-val list_images : string -> string list
-(** Internal helper exposed for testing. Returns image filenames in [dir],
-    filtered by {!Image.ext_list_1} (case-insensitive), sorted. *)
-
-val list_subdirs : string -> string list
-(** Internal helper exposed for testing. Returns subdirectory names in [dir],
-    excluding hidden entries, sorted. *)
-
 val image_extension : string -> bool
 (** Internal helper exposed for testing. Case-insensitive match against
     {!Image.ext_list_1}. *)

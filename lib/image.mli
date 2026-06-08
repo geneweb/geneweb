@@ -17,11 +17,6 @@ val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
     proportionally scaled [(w, h)] rectangle so it can fit in a [(max_w, max_h)]
     rectangle *)
 
-val parse_src_with_size_info :
-  config ->
-  [< `Src_with_size_info of string ] ->
-  ([> `Path of string | `Url of string ] * (int * int), string) result
-
 val key_dir_basename : string -> string -> int -> string
 (** [key_dir_basename fn sn oc] returns the canonical basename used for per-key
     file storage (portraits, image directories, blasons): lower- cased, with

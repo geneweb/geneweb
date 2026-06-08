@@ -1,41 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(** Person lookup for legacy free-form search routes (m=R, m=NG).
-
-    The [m=R] (relation calculator with input mode) and [m=NG] (legacy name
-    search) routes share a common pattern: take a free-form string typed by the
-    user, try to resolve it to one or more persons, then either redirect
-    directly to a unique result or render the "please specify" disambiguation
-    page. This module factors that pattern. *)
-
-val person_matches_input :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  string ->
-  bool
-(** [person_matches_input conf base p input] tests whether [input] is a
-    recognized identifier for [p] — either ["firstname surname"] (modulo
-    {!Name.strip_lower}) or one of the person's misc names (titles, public
-    names, qualifiers, aliases). *)
-
-val lookup_person_by_input :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  string ->
-  Geneweb_db.Driver.person list * bool
-(** [lookup_person_by_input conf base input] resolves [input] through three
-    strategies in order:
-    - as a Sosa number against the base's sosa-reference (returns a
-      single-element list with [sosa_acc=true] on hit);
-    - as an exact unique key via {!SearchName.search_by_key};
-    - as an approximate name match via {!SearchName.search_key_aux}, preferring
-      strict matches but falling back to {!SearchName.search_by_name} when
-      neither strict nor partial matches are found.
-
-    Returns [(persons, sosa_acc)]. The boolean is [true] only when the result
-    came from the Sosa path. *)
-
 val redirect_or_specify :
   Config.config ->
   Geneweb_db.Driver.base ->

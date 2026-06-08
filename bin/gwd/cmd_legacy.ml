@@ -22,7 +22,6 @@ let deprecated_warning_no_fork () =
         "The `-no-fork` option is deprecated and may be removed in a future \
          release.@ To achieve the same behavior, use `-n_workers 0` instead.")
 
-let ( // ) = Filename.concat
 let gw_prefix : string option ref = ref None
 let set_gw_prefix s = gw_prefix := Some s
 let images_prefix : string option ref = ref None

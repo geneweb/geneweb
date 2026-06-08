@@ -11,9 +11,6 @@ val incr_welcome_counter : config -> (int * int * string) option
 val incr_request_counter : config -> (int * int * string) option
 val source_file_name : config -> string -> string
 
-val copy_from_stream :
-  config -> Geneweb_db.Driver.base -> char Stream.t -> src_mode -> unit
-
 val propose_base : Config.config -> unit
 (** [propose_base conf] renders a fallback page presenting an input form to let
     the user select a base by name. Used when no base name was provided in the

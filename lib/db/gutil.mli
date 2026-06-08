@@ -50,14 +50,6 @@ val alphabetic : string -> string -> int
 val alphabetic_order : string -> string -> int
 (** Same as [alphabetic_utf_8] *)
 
-val sort_person_list : Driver.base -> Driver.person list -> Driver.person list
-(** Sort list of persons by comparison with following order:
-    - Compare by birth and death date
-    - Compare by surname
-    - Compare by first name
-    - Compare by occurence number
-    - Compare by id *)
-
 val sort_uniq_person_list :
   Driver.base -> Driver.person list -> Driver.person list
 (** Same as [sort_person_list] but also remove duplicates *)

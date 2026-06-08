@@ -5,8 +5,6 @@ type status =
   | Unauthorized
   | Forbidden
   | Not_Found
-  | Conflict
-  | Internal_Server_Error
   | Service_Unavailable
 
 let status_code s =
@@ -17,8 +15,6 @@ let status_code s =
   | Unauthorized -> 401
   | Forbidden -> 403
   | Not_Found -> 404
-  | Conflict -> 409
-  | Internal_Server_Error -> 500
   | Service_Unavailable -> 503
 
 let pp ppf s =
@@ -29,8 +25,6 @@ let pp ppf s =
   | Unauthorized -> Fmt.pf ppf "401 Unauthorized"
   | Forbidden -> Fmt.pf ppf "403 Forbidden"
   | Not_Found -> Fmt.pf ppf "404 Not Found"
-  | Conflict -> Fmt.pf ppf "409 Conflict"
-  | Internal_Server_Error -> Fmt.pf ppf "500 Internal Server Error"
   | Service_Unavailable -> Fmt.pf ppf "503 Service Unavailable"
 
 let to_string = Fmt.to_to_string pp

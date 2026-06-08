@@ -7,13 +7,6 @@ val effective_del_no_commit :
   unit
 (** Removes a person from the base *)
 
-val effective_del_commit :
-  config ->
-  Geneweb_db.Driver.base ->
-  (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) gen_person ->
-  unit
-(** Adds to the diff the deletion of a person *)
-
 val effective_del :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
 (** [effective_del] applies [effective_del_no_commit] and [effective_del_commit]
@@ -64,17 +57,6 @@ val print_change_event_order : config -> Geneweb_db.Driver.base -> unit
 (** Tries to change the order of events for a person and displays a success HTML
     page if successful *)
 
-(* Ajout pour l'API *)
-val effective_add :
-  config ->
-  Geneweb_db.Driver.base ->
-  (Geneweb_db.Driver.iper, Update.key, string) Def.gen_person ->
-  ( Geneweb_db.Driver.iper,
-    Geneweb_db.Driver.iper,
-    Geneweb_db.Driver.istr )
-  Def.gen_person
-  * Geneweb_db.Driver.ifam Def.gen_ascend
-
 val strip_person :
   (Geneweb_db.Driver.iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person ->
   (Geneweb_db.Driver.iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
@@ -87,20 +69,3 @@ val check_person :
     string )
   Def.gen_person ->
   Update.update_error option
-
-val error_person : config -> Update.update_error -> unit
-
-val update_relations_of_related :
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.iper ->
-  Geneweb_db.Driver.iper list ->
-  unit
-
-val reconstitute_death :
-  config ->
-  Adef.date option ->
-  Adef.date option ->
-  string ->
-  Def.burial ->
-  string ->
-  Def.death

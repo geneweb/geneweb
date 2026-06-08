@@ -1105,21 +1105,3 @@ let eq_warning base w1 w2 =
   | OldForMarriage (p, d, ifam), OldForMarriage (p', d', ifam') ->
       eq_person p p' && d = d' && Driver.Ifam.equal ifam ifam'
   | _ -> false
-
-let person_warnings conf base p =
-  let w = ref [] in
-  let filter x =
-    if
-      (not (List.exists (eq_warning base x) !w))
-      && Util.auth_warning conf base x
-    then w := x :: !w
-  in
-  ignore @@ person base filter p;
-  on_person_update base filter p;
-  Array.iter
-    (fun ifam ->
-      check_siblings ~onchange:false base filter
-        (ifam, Driver.foi base ifam)
-        ignore)
-    (Driver.get_family p);
-  !w

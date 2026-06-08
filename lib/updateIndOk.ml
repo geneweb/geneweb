@@ -879,29 +879,6 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   Update.update_related_pointers base pi ol nl;
   np
 
-let effective_add conf base sp =
-  (match
-     Geneweb_db.Driver.person_of_key base sp.first_name sp.surname sp.occ
-   with
-  | Some p' -> Update.print_create_conflict conf base (Driver.poi base p') ""
-  | None -> ());
-  let created_p = ref [] in
-  let pi =
-    Driver.insert_person_with_union_and_ascendants base
-      (Driver.no_person Driver.Iper.dummy)
-      Driver.no_ascend Driver.no_union
-  in
-  let np =
-    Futil.map_person_ps
-      (Update.insert_person conf base "" created_p)
-      (Driver.insert_string base)
-      { sp with key_index = pi }
-  in
-  Driver.patch_person base pi np;
-  Driver.patch_ascend base pi Driver.no_ascend;
-  Driver.patch_union base pi Driver.no_union;
-  (np, Driver.no_ascend)
-
 let update_relations_of_related base ip old_related =
   List.iter
     (fun ip1 ->

@@ -10,10 +10,6 @@ val code_dmy : config -> Adef.dmy -> string
     language. Uses different encodings depending on day's, month's and year's
     accessibility. Doesn't consider precision. *)
 
-val code_hebrew_date : config -> int -> int -> int -> string
-(** Returns textual representation of a day / month / year in the hebrew
-    calendar translated to the current language. *)
-
 val string_of_dmy : Config.config -> Adef.dmy -> Adef.safe_string
 (** Converts and translate date to the textual representation for the giving
     language. Considers precision. *)
@@ -29,14 +25,6 @@ val string_of_ondate : ?link:bool -> config -> Adef.date -> Adef.safe_string
     verbose then with [string_of_date]. Decline phrase if needed. If [link] is
     true then encapsulates result in HTML link to the page calendar's date
     converter. *)
-
-val string_of_on_french_dmy : config -> Adef.dmy -> Adef.safe_string
-(** Translate a date in the french calendar with prefix "on" before dates
-    (changes for other languages). *)
-
-val string_of_on_hebrew_dmy : config -> Adef.dmy -> Adef.safe_string
-(** Translate a date in the hebrew calendar with prefix "on" before dates
-    (changes for other languages). *)
 
 val string_slash_of_date : config -> Adef.date -> Adef.safe_string
 (** Returns date in format dd/mm/yyyy. Format could be different for other
@@ -110,17 +98,3 @@ val string_of_date_aux :
     - Doesn't consider phrase declination as [string_of_ondate] does. *)
 
 (**/**)
-
-val hebrew_month : config -> int -> string
-(** Returns the translation of the month of French calendar First month is [0]
-*)
-
-val french_month : config -> int -> string
-(** Returns the translation of the month of Hebrew calendar First month is [0]
-*)
-
-val string_of_prec_dmy :
-  config -> Adef.safe_string -> Adef.safe_string -> Adef.dmy -> Adef.safe_string
-(** [string_of_prec_dmy conf s s2 d] Takes two date representations (as strings)
-    [s] and [s2] and returns translated phrase according to prec of [d]. [d] is
-    only used to determine the precision *)

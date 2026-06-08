@@ -17,8 +17,6 @@ let aoi base i = base.data.ascends.get i
 let uoi base i = base.data.unions.get i
 let coi base i = base.data.couples.get i
 let sou base i = base.data.strings.get i
-let p_first_name base p = Mutil.nominative (sou base p.first_name)
-let p_surname base p = Mutil.nominative (sou base p.surname)
 
 let husbands base p =
   Array.map

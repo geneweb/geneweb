@@ -320,17 +320,7 @@ let output_error =
     (match content with
     | Some content -> Output.print_string conf content
     | None -> (
-        let code =
-          match code with
-          | Code.Bad_Request -> "400"
-          | Unauthorized -> "401"
-          | Forbidden -> "403"
-          | Not_Found -> "404"
-          | Conflict -> "409"
-          | Internal_Server_Error -> "500"
-          | Service_Unavailable -> "503"
-          | OK | Moved_Temporarily -> assert false
-        in
+        let code = Code.to_string code in
         let fname lang =
           code ^ "-" ^ lang ^ ".html"
           |> Filename.concat "etc" |> Mutil.search_asset_opt

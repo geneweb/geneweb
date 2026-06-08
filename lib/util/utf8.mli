@@ -23,10 +23,6 @@ val cmap_utf_8 :
     the character map [cmap] to every character of the UTF-8 encoded string [s].
 *)
 
-val lowercase : string -> string
-(** Returns UTF-8 encoded string with all uppercase letters translated to
-    lowercase *)
-
 val uppercase : string -> string
 (** Returns UTF-8 encoded string with all lowercase letters translated to
     uppercase *)
@@ -41,17 +37,6 @@ val capitalize : string -> string
 module C : sig
   (** Utf8 char type. *)
   type t = Str of string | Chr of char | Empty
-
-  val unaccent : bool -> string -> int -> int -> t * int * int
-  (** [unaccent trimmed s i0 len] Returns [(t, start, next)]: next UTF-8
-      character in string [s] starting at position [i0]. The diacritic marks are
-      removed, character is also case lowered, and any character returning
-      [Empty] (unsupported or reported as empty) is ignored: the next character
-      in [s] will be picked except if you reach [len]. In that case, [Empty] is
-      returned.
-
-      [start] is the byte offset in [s] where the resulting character [t]
-      starts. [next] is the offset of the byte after [t]. *)
 
   val cp : string -> int -> Uchar.t
   (** [cp s i] returns the Unicode code point of the character starting at

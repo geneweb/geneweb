@@ -755,9 +755,3 @@ let short_family_dates_text conf base marr_sep fam =
       | None, _ -> ""
     else Option.value ~default:"" sep_dates_aux
   else ""
-
-(* For public interfce, force [string_of_prec_dmy] args to be safe strings *)
-let string_of_prec_dmy conf s s2 d =
-  let s = (s : Adef.safe_string :> string) in
-  let s2 = (s2 : Adef.safe_string :> string) in
-  string_of_prec_dmy conf s s2 d

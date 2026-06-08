@@ -95,11 +95,6 @@ module Out_channel : sig
 
       @since 4.14 *)
 
-  val flush : t -> unit
-  (** Flush the buffer associated with the given output channel, performing all
-      pending writes on that channel. Interactive programs must be careful about
-      flushing standard output and standard error at the right time. *)
-
   val output : t -> bytes -> int -> int -> unit
   (** [output oc buf pos len] writes [len] characters from byte sequence [buf],
       starting at offset [pos], to the given output channel [oc].

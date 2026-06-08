@@ -10,7 +10,6 @@ type update_error =
   | UERR of Adef.safe_string
   | UERR_sex_married of Driver.person
   | UERR_sex_incoherent of Driver.base * Driver.person
-  | UERR_sex_undefined of string * string * int
   | UERR_unknow_person of string * string * int
   | UERR_already_defined of Driver.base * Driver.person * string
   | UERR_own_ancestor of Driver.base * Driver.person
@@ -426,11 +425,6 @@ let string_of_error conf =
       ^
       if Driver.get_sex p = Female then transl conf "should be male"
       else transl conf "should be female")
-      |> Adef.safe
-  | UERR_sex_undefined (f, s, o) ->
-      Printf.sprintf
-        (fcapitale (ftransl conf "undefined sex for %t"))
-        (fun _ -> (fso f s o :> string))
       |> Adef.safe
   | UERR_unknow_person (f, s, o) ->
       Utf8.capitalize_fst (transl conf "unknown person")
@@ -915,23 +909,6 @@ let print_misc conf _base = function
       Output.printf conf "%s\n"
         (Utf8.capitalize_fst (transl conf "missing sources"));
       Output.print_sstring conf "</em>"
-
-(* ************************************************************************* *)
-(*  [Fonc] print_miscs : config -> base -> Def.misc list -> unit             *)
-
-(* ************************************************************************* *)
-
-(** [Description] : Affiche la liste des 'informations diverses'. [Args] :
-    - conf : configuration
-    - base : base
-    - ml : Def.misc list (miscellaneous) [Retour] :
-    - unit [Rem] : Exporté en clair hors de ce module. *)
-let print_miscs conf base ml =
-  print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
-  List.iter (fun m ->
-      Output.print_sstring conf "<li>";
-      print_misc conf base m;
-      Output.print_sstring conf "</li>")
 
 (* ************************************************************************* *)
 (* [Fonc] print_miscs :

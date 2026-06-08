@@ -7,11 +7,8 @@ module IperSet = Set.Make (Driver.Iper)
 type cell_data = { paths : Relation.path_f list; total : Sosa.t; coeff : float }
 
 (* Type variant pour les différents modes de liens R et RL *)
-type relationship_link_mode =
-  | MatrixLink of Driver.person * Driver.person
-  (* Pour la matrice : deux pers. i1/i2 *)
-  | AncestorLink of Driver.person * Driver.person * Driver.person * int * int
-(* Pour la popup : ancêtre i + 2 pers. i1/i2 + degrés l1/l2 *)
+type relationship_link_mode = MatrixLink of Driver.person * Driver.person
+(* Pour la matrice : deux pers. i1/i2 *)
 
 (* Type pour la matrice triangulaire *)
 type 'a triangular_matrix = 'a option array
@@ -75,25 +72,13 @@ let encoded_key name = (Mutil.encode (Name.lower name) :> string)
 let make_relationship_link conf base mode =
   let params = ref [] in
   let person_list, mode_str, extra_params =
-    match mode with
-    | MatrixLink (p1, p2) -> ([ p1; p2 ], "R", [])
-    | AncestorLink (ancestor, p1, p2, l1, l2) ->
-        ( [ ancestor; p1; p2 ],
-          "RL",
-          [ ("l1", string_of_int l1); ("l2", string_of_int l2) ] )
+    match mode with MatrixLink (p1, p2) -> ([ p1; p2 ], "R", [])
   in
   params := [ ("m", mode_str) ];
   List.iteri
     (fun idx person ->
       let i_param =
-        match mode with
-        | MatrixLink _ -> "i" ^ string_of_int (idx + 1)
-        | AncestorLink _ -> (
-            match idx with
-            | 0 -> "i"
-            | 1 -> "i1"
-            | 2 -> "i2"
-            | _ -> "i" ^ string_of_int idx (* au cas où *))
+        match mode with MatrixLink _ -> "i" ^ string_of_int (idx + 1)
       in
       let accessible =
         Util.accessible_by_key conf base person
@@ -104,16 +89,7 @@ let make_relationship_link conf base mode =
         let p = Driver.p_first_name base person in
         let n = Driver.p_surname base person in
         let oc = Driver.get_occ person in
-        let num =
-          match mode with
-          | MatrixLink _ -> string_of_int (idx + 1)
-          | AncestorLink _ -> (
-              match idx with
-              | 0 -> ""
-              | 1 -> "1"
-              | 2 -> "2"
-              | _ -> string_of_int idx)
-        in
+        let num = match mode with MatrixLink _ -> string_of_int (idx + 1) in
         params :=
           !params
           (* Ajouter à la fin pour garder l'ordre *)
@@ -157,50 +133,6 @@ let create_inverted_cell_data cell =
           cell.paths
       in
       Some { cell with paths = inverted_paths }
-
-(* Grouper les ancêtres par couples en utilisant les ifams *)
-let group_ancestors_by_couples (anc_list : Relation.anc_f list) =
-  (* Créer une table des familles pour identifier les couples *)
-  let fam_groups = Hashtbl.create 17 in
-  List.iter
-    (fun anc ->
-      List.iter
-        (fun ifam ->
-          let members =
-            try Hashtbl.find fam_groups ifam with Not_found -> []
-          in
-          if not (List.mem anc.Relation.p members) then
-            Hashtbl.replace fam_groups ifam (anc.Relation.p :: members))
-        anc.Relation.f)
-    anc_list;
-  (* Créer une table des compteurs *)
-  let count_map = Hashtbl.create 17 in
-  List.iter
-    (fun anc -> Hashtbl.add count_map anc.Relation.p anc.Relation.c)
-    anc_list;
-  (* Construire la liste des items (couples ou individus seuls) *)
-  let used = Hashtbl.create 17 in
-  let items = ref [] in
-  Hashtbl.iter
-    (fun ifam members ->
-      match members with
-      | [ a; b ]
-        when a <> b && (not (Hashtbl.mem used a)) && not (Hashtbl.mem used b) ->
-          let ca = try Hashtbl.find count_map a with Not_found -> 1 in
-          let cb = try Hashtbl.find count_map b with Not_found -> 1 in
-          items := `Couple (a, ca, b, cb, ifam) :: !items;
-          Hashtbl.add used a ();
-          Hashtbl.add used b ()
-      | _ -> ())
-    fam_groups;
-  (* Ajouter les individus non utilisés *)
-  List.iter
-    (fun anc ->
-      if not (Hashtbl.mem used anc.Relation.p) then (
-        items := `Unique (anc.Relation.p, anc.Relation.c) :: !items;
-        Hashtbl.add used anc.Relation.p ()))
-    anc_list;
-  List.rev !items
 
 type ancestor_item =
   [ `Couple of Driver.iper * int * Driver.iper * int * Driver.ifam
