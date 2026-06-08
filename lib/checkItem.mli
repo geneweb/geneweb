@@ -94,12 +94,3 @@ val check_other_fields :
 
 val eq_warning : Geneweb_db.Driver.base -> base_warning -> base_warning -> bool
 (** equality between base_warnings *)
-
-val person_warnings :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  base_warning list
-(** [person_warnings conf base p] Shorthand for [CheckItem.person] and
-    [CheckItem.on_person_update] on [p] and [CheckItem.check_siblings] on they
-    children using [auth_warning] for filtering. *)

@@ -2,27 +2,6 @@
 open Config
 open Def
 
-val make_link :
-  ?title:string ->
-  ?css_class:string ->
-  ?tabindex:int option ->
-  ?aria_label:string ->
-  ?disabled:bool ->
-  ?target:string option ->
-  ?data_attrs:(string * string) list ->
-  href:string ->
-  content:string ->
-  unit ->
-  Adef.safe_string
-(** [make_link conf ~href ~content ()] creates an accessible HTML link with
-    proper aria-label, title, and other accessibility attributes. Handles
-    disabled state appropriately. The data_attrs parameter allows custom data-*
-    attributes for JavaScript interaction. *)
-
-val hash_file : string -> string option
-(** [hash_file path] Compute the MD5 hash of the file at [path]. Returns
-    [Some hex] on success or [None] if the file couldn’t be read. *)
-
 val hash_file_cached : string -> string option
 (** [hash_file_cached path] Like [hash_file], but memoizes by file modification
     time to avoid recomputing the hash on repeated calls. *)
@@ -87,8 +66,6 @@ val html : ?content_type:string -> config -> unit
 val unauthorized : config -> string -> unit
 (** Prints HTTP response with code 401 (Unauthorized) and error page with giving
     message *)
-
-val string_of_ctime : config -> string
 
 val commd :
   ?excl:string list ->
@@ -161,14 +138,6 @@ val age_days :
     month > 0, the dmy has been normalized to Gregorian and we pass
     [~from:Adef.Dgregorian]; for partial dmy, the original calendar tag is used.
 *)
-
-val is_old_person :
-  config ->
-  ( Geneweb_db.Driver.iper,
-    Geneweb_db.Driver.iper,
-    Geneweb_db.Driver.istr )
-  gen_person ->
-  bool
 
 val start_with : string -> int -> string -> bool
 (** [start_with s i p] check substring p within string s starting at i. performs
@@ -304,13 +273,6 @@ val gen_person_title_text :
     of person that describes person's first name surname and main title.
     [reference] is used to either encapsulate structure in the link (or other
     type of maniplations). *)
-
-val person_text_without_title :
-  config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  Adef.safe_string
-(** Makes call to [gen_person_text_without_title] with [std_access] *)
 
 val main_title :
   config ->
@@ -449,7 +411,6 @@ val message_to_wizard : config -> unit
     wizards) and in {i <basename>/etc/mess_wizzard_<user>.txt} (messages
     destinated to considered wizard). *)
 
-val of_course_died : config -> Geneweb_db.Driver.person -> bool
 val hexa_string : string -> string
 
 val surname_particle : Geneweb_db.Driver.base -> string -> string
@@ -478,7 +439,6 @@ val get_approx_death_date_place :
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
 val check_format : ('a, 'b) format2 -> string -> ('a, 'b) format2 option
-val valid_format : ('a, 'b) format2 -> string -> ('a, 'b) format2
 
 val transl : config -> string -> string
 (** Find translation of given keyword in [conf.lexicon]. Keywords used to be its
@@ -492,7 +452,6 @@ val simple_decline : config -> string -> string
 val transl_decline : config -> string -> string -> string
 val ftransl : config -> ('a, 'b) format2 -> ('a, 'b) format2
 val ftransl_nth : config -> ('a, 'b) format2 -> int -> ('a, 'b) format2
-val fdecline : ('a, 'b) format2 -> string -> ('a, 'b) format2
 val fcapitale : ('a, 'b) format2 -> ('a, 'b) format2
 
 val nth_field : string -> int -> string
@@ -628,11 +587,6 @@ val branch_of_sosa :
 (** [branch_of_sosa conf base sosa p0] Get all the lineage to go from [p0]'s
     ancestor with sosa number [sosa] to [p0] *)
 
-val sosa_of_branch : Geneweb_db.Driver.person list -> Geneweb_sosa.t
-(** [sosa_of_branch branch] Given a path of person to follow [branch], return
-    the sosa number of the last person of this list. No check is done to ensure
-    that given persons are actually parents. *)
-
 val old_branch_of_sosa :
   config ->
   Geneweb_db.Driver.base ->
@@ -666,9 +620,6 @@ type clean_options = {
   keep_tabs : bool;
 }
 
-val default_clean_options : clean_options
-(** Default options for clean_string: removes all problematic chars. *)
-
 val clean_string : ?options:clean_options -> string -> string
 (** Generic string cleaning with configurable options. *)
 
@@ -688,14 +639,6 @@ val has_nephews_or_nieces :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 
 val doctype : Adef.safe_string
-
-val begin_centered : config -> unit
-(** Prints on the socket beginning of the <table> tag untill first opened <td>
-    where the text is centred *)
-
-val end_centered : config -> unit
-(** Prints on the socket end of the column and table opened by [begin_centered]
-*)
 
 val print_alphab_list :
   config -> ?prefix:string -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
@@ -751,8 +694,6 @@ val display_options : config -> Adef.escaped_string
 type cache_visited_t =
   (string, (Geneweb_db.Driver.iper * string) list) Hashtbl.t
 
-val cache_visited : config -> string
-val read_visited : config -> cache_visited_t
 val record_visited : config -> Geneweb_db.Driver.iper -> unit
 
 val array_mem_witn :
@@ -777,9 +718,6 @@ val name_key : Geneweb_db.Driver.base -> string -> string
 (** [name_key base name] is [name], with particles put at the end of the string
     instead of the beginning. *)
 
-val nb_char_occ : char -> string -> int
-(** [nb_char_occ c s] return the number of times [c] appears in [s]. *)
-
 val escape_html : string -> Adef.escaped_string
 (** [escape_html str] replaces '&', '"', '\'', '<' and '>' with their
     corresponding character entities (using entity number) *)
@@ -801,21 +739,6 @@ val string_with_macros :
 val is_empty_name : Geneweb_db.Driver.person -> bool
 (** [is_empty_name p] [false] if we knwon the first name or the last name of
     [p]. *)
-
-val select_masc :
-  config ->
-  Geneweb_db.Driver.base ->
-  (Geneweb_db.Driver.iper * int) list ->
-  (Geneweb_db.Driver.iper, int * Geneweb_db.Driver.person) Hashtbl.t
-(** [select_masc conf base ips] From [ips], a list matching ipers to a number of
-    maximum generations, get maximum ascendants of ipers up to these
-    corresponding generations.
-
-    A person is maximum ascendant if their generation matches the maximum, or if
-    they do not have ancestors.
-
-    The result is a Hashtbl matching an iper to the corresponding person and
-    their generation. *)
 
 val select_desc :
   config ->
@@ -839,14 +762,6 @@ val select_mascdesc :
 val sprintf_today : Config.config -> Adef.safe_string
 (** [sprintf_today confo] Uses {!val:Mutil.sprintf_date} in order to print
     datetime defined in [conf]. *)
-
-val auth_warning :
-  config ->
-  Geneweb_db.Driver.base ->
-  ('a, Geneweb_db.Driver.person, Geneweb_db.Driver.ifam, 'b, 'c, 'd, 'e) warning ->
-  bool
-(** [auth_warning conf base w] Check if current user has enough right in order
-    to see [w] *)
 
 val name_with_roman_number : string -> string option
 (** Convert arabic numerals to roman numerals. [Some result] is returned if
@@ -911,20 +826,6 @@ val print_loading_overlay :
     overlay with a spinner and message. Uses the translation key
     [waiting overlay] by default, or the provided custom translation key. The
     overlay is initially hidden and can controlled via JavaScript functions. *)
-
-val loading_overlay_js_content : string
-(** [loading_overlay_js_content] contains the JavaScript code for loading
-    overlay functionality as a string constant. This allows modules to compose
-    this JavaScript with their own code rather than printing it directly.
-
-    Contains showOverlay(), hideOverlay() functions and automatic DOM ready
-    initialization. Can be concatenated with other JavaScript before output. *)
-
-val print_loading_overlay_js : Config.config -> unit
-(** [print_loading_overlay_js conf] generates JavaScript functions to control
-    the loading overlay: showOverlay() to display it, hideOverlay() to hide it,
-    and automatic hiding when the page finishes loading. Works with any overlay
-    that has the "loading-overlay" CSS class. *)
 
 type evar_button = { evar : string; text : string }
 

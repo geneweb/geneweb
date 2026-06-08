@@ -7,7 +7,6 @@ type update_error =
   | UERR of Adef.safe_string
   | UERR_sex_married of Geneweb_db.Driver.person
   | UERR_sex_incoherent of Geneweb_db.Driver.base * Geneweb_db.Driver.person
-  | UERR_sex_undefined of string * string * int
   | UERR_unknow_person of string * string * int
   | UERR_already_defined of
       Geneweb_db.Driver.base * Geneweb_db.Driver.person * string
@@ -106,9 +105,6 @@ val print_error : config -> update_error -> unit
 
 val print_warnings :
   config -> Geneweb_db.Driver.base -> CheckItem.base_warning list -> unit
-
-val print_miscs :
-  config -> Geneweb_db.Driver.base -> CheckItem.base_misc list -> unit
 
 val print_warnings_and_miscs :
   config ->

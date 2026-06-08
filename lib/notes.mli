@@ -1,5 +1,3 @@
-val path_of_fnotes : string -> string
-
 val commit_notes :
   Config.config -> Geneweb_db.Driver.base -> string -> string -> unit
 
@@ -71,17 +69,6 @@ val person_note :
     - env is available during [str] interpretation with [i] variable bound to
       person image *)
 
-val source_note :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  string ->
-  Adef.safe_string
-(** [source_note conf base person str] Interprets wiki syntax in a "source"
-    context:
-    - env is available during [str] interpretation with [i] variable bound to
-      person image *)
-
 val source_note_with_env :
   Config.config ->
   Geneweb_db.Driver.base ->
@@ -122,9 +109,6 @@ val links_to_cache_entries :
   list ->
   Def.NLDB.key ->
   (Def.NLDB.key * Def.NLDB.ind) list
-
-val has_linked_pages :
-  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> bool
 
 val linked_pages_nbr :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> int

@@ -354,9 +354,6 @@ let base_wiznotes_read base fwnotes =
 
 let base_notes_read base fnotes = base_notes_read_aux base fnotes Def.RnAll
 
-let base_notes_read_first_line base fnotes =
-  base_notes_read_aux base fnotes Def.Rn1Ln
-
 let base_notes_are_empty base fnotes =
   base_notes_read_aux base fnotes Def.RnDeg = ""
 

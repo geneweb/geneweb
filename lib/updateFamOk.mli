@@ -93,49 +93,12 @@ val print_change_order_ok : Config.config -> Geneweb_db.Driver.base -> unit
 val print_change_event_order : Config.config -> Geneweb_db.Driver.base -> unit
 (** Changes the evenements order for a family *)
 
-val check_family :
-  Config.config ->
-  (string * string * _ * _ * _, _, _) Def.gen_family ->
-  (string * string * _ * _ * _) Adef.gen_couple ->
-  Update.update_error option * Update.update_error option
-(** [check_family conf fam cpl] Checks that no name is missing. *)
-
-val strip_family :
-  (string * 'a * 'b * 'c * 'd, 'e, string) Def.gen_family ->
-  (string * 'f * 'g * 'h * 'i) Def.gen_descend ->
-  (string * 'a * 'b * 'c * 'd, 'e, string) Def.gen_family
-  * (string * 'f * 'g * 'h * 'i) Def.gen_descend
-(** [strip_family fam des] Removes empty person from witness list and empty
-    events from event list. *)
-
-val effective_add :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  bool ->
-  (Update.key, 'a, string) Def.gen_family ->
-  Update.key Adef.gen_couple ->
-  Update.key Def.gen_descend ->
-  Geneweb_db.Driver.ifam
-  * ( Geneweb_db.Driver.iper,
-      Geneweb_db.Driver.ifam,
-      Geneweb_db.Driver.istr )
-    Def.gen_family
-  * Geneweb_db.Driver.iper Adef.gen_couple
-  * Geneweb_db.Driver.iper Def.gen_descend
-(** [effective_add conf base nsck sfam scpl sdes] Patch base without commiting
-    changes. *)
-
-val patch_person_with_pevents :
-  Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> unit
-(** [patch_parent_with_pevents base cpl] If parents have information about birth
-    or death but no pevent, add a pevent with these info *)
+val patch_children_with_pevents :
+  Geneweb_db.Driver.base -> Geneweb_db.Driver.iper Def.gen_descend -> unit
+(** See patch_person_with_pevents *)
 
 val patch_parent_with_pevents :
   Geneweb_db.Driver.base -> Geneweb_db.Driver.iper Adef.gen_couple -> unit
-(** See patch_person_with_pevents *)
-
-val patch_children_with_pevents :
-  Geneweb_db.Driver.base -> Geneweb_db.Driver.iper Def.gen_descend -> unit
 (** See patch_person_with_pevents *)
 
 val family_structure :

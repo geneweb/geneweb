@@ -24,9 +24,6 @@ let extension_of_type = function
   | GIF -> ".gif"
   | PNG -> ".png"
 
-let image_types = [ JPEG; GIF; PNG ]
-let raise_modErr s = raise @@ Update.ModErr (Update.UERR s)
-
 (* Raised after a complete HTTP response has been sent, to cleanly unwind the
    call stack without triggering the server's generic exception handler (which
    would produce a blank "no content sent" page). *)
@@ -232,10 +229,6 @@ let swap_files file old_file =
   let src_file = Filename.remove_extension file ^ ".src" in
   let old_file = Filename.remove_extension old_file ^ ".src" in
   swap_files_aux dir src_file old_file
-
-let clean_saved_portrait file =
-  let file = Filename.remove_extension file in
-  Array.iter (fun ext -> Mutil.rm (file ^ ext)) Image.ext_list_1
 
 (* TODO merge with Image.file_without_extension *)
 let get_extension conf keydir mode saved fname =
@@ -985,15 +978,6 @@ let print conf base =
       let sn = Driver.p_surname base p in
       if fn = "?" || sn = "?" then Hutil.incorrect_request conf
       else print_send_image conf base "portraits" p
-
-let print_family conf base =
-  match p_getenv conf.env "i" with
-  | None -> Hutil.incorrect_request conf
-  | Some ip ->
-      let p = Driver.poi base (Driver.Iper.of_string ip) in
-      let sn = Driver.p_surname base p in
-      if sn = "?" then Hutil.incorrect_request conf
-      else print_send_image conf base "blasons" p
 
 (* carrousel *)
 let print_c ?(saved = false) ?(portrait = true) conf base =

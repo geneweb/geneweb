@@ -23,9 +23,6 @@ val select_names :
     existing names). Otherwise, return the list of values [Result] with all
     first names and number of persons that have giving name. *)
 
-val ini : int -> string -> string
-(** Returns prefix of length [len] of UTF8 encoded name *)
-
 val groupby_ini :
   int -> (string * 'a * 'b) list -> (string * ('a * 'b) list) list
 (** [groupby_ini len results] returns alphabeticaly ordered list of grouped by

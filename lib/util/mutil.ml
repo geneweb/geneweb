@@ -1,9 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-let rec list_limit n l =
-  if n <= 0 then []
-  else match l with [] -> [] | x :: xs -> x :: list_limit (n - 1) xs
-
 let bench name fn =
   let pprint_gc gc =
     let open Gc in
@@ -84,9 +80,6 @@ let bench name fn =
   Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1);
   pprint_gc (diff gc1 gc2);
   res
-
-let print_callstack ?(max = 5) () =
-  Printexc.(print_raw_backtrace stderr @@ get_callstack max)
 
 let verbose = ref true
 let particles_file = ref ""
@@ -584,19 +577,6 @@ let input_lexicon lang ht open_fname =
       | None -> ())
     tmp
 
-let array_to_list_map fn a = Array.fold_right (fun x acc -> fn x :: acc) a []
-let array_to_list_rev_map fn a = Array.fold_left (fun acc x -> fn x :: acc) [] a
-
-let array_assoc k a =
-  let len = Array.length a in
-  let rec loop i =
-    if i = len then raise Not_found
-    else
-      let k', v = Array.unsafe_get a i in
-      if k' = k then v else loop (i + 1)
-  in
-  loop 0
-
 let string_of_int_sep sep x =
   let neg = x < 0 in
   let x = abs x in
@@ -639,11 +619,6 @@ let rec list_compare cmp l1 l2 =
   | [], _ -> -1
   | _, [] -> 1
 
-let rec list_find_map f = function
-  | [] -> None
-  | x :: l -> (
-      match f x with Some _ as result -> result | None -> list_find_map f l)
-
 let array_find_map f a =
   let n = Array.length a in
   let rec loop i =
@@ -654,11 +629,6 @@ let array_find_map f a =
       | Some _ as r -> r
   in
   loop 0
-
-let rec list_last = function
-  | [] -> raise (Failure "list_last")
-  | [ x ] -> x
-  | _ :: tl -> list_last tl
 
 let list_ref_append tl hd = tl := hd :: !tl
 
@@ -704,30 +674,6 @@ let rec list_replace old_v new_v = function
   | [] -> []
   | hd :: tl ->
       if hd = old_v then new_v :: tl else hd :: list_replace old_v new_v tl
-
-let list_except x =
-  let rec loop acc = function
-    | [] -> []
-    | hd :: tl -> if hd = x then List.rev_append acc tl else loop (hd :: acc) tl
-  in
-  loop []
-
-let list_index x list =
-  let rec loop i = function
-    | [] -> raise Not_found
-    | hd :: tl -> if hd = x then i else loop (succ i) tl
-  in
-  loop 0 list
-
-let list_slice a b list =
-  let rec list_slice a b = function
-    | [] -> []
-    | hd :: tl ->
-        if a <> 0 then list_slice (pred a) b tl
-        else if b <> 0 then hd :: list_slice 0 (pred b) tl
-        else []
-  in
-  list_slice a (b - a) list
 
 let input_file_ic ic =
   let len = in_channel_length ic in
@@ -893,12 +839,6 @@ let list_map_sort_uniq (fn : 'a -> 'b) l =
 let list_rev_map_append f l1 l2 =
   let rec aux acc = function [] -> acc | hd :: tl -> aux (f hd :: acc) tl in
   aux l2 l1
-
-let rec list_rev_iter f = function
-  | [] -> ()
-  | hd :: tl ->
-      list_rev_iter f tl;
-      f hd
 
 (* POSIX lockf(3), and fcntl(2), releases its locks when the process
    that holds the locks closes ANY file descriptor that was open on that file.
@@ -1155,10 +1095,6 @@ let search_file_opt directories fname =
 
 let search_asset_opt fname = search_file_opt (Secure.assets ()) fname
 
-let eq_key (fn1, sn1, oc1) (fn2, sn2, oc2) =
-  let s x = x |> nominative |> Name.lower in
-  s fn1 = s fn2 && s sn1 = s sn2 && oc1 = oc2
-
 let ls_r dirs =
   let rec loop acc = function
     | [] -> List.rev acc
@@ -1222,12 +1158,6 @@ let rec filter_map fn = function
       match fn hd with
       | Some x -> x :: filter_map fn tl
       | None -> filter_map fn tl)
-
-let rec rev_iter fn = function
-  | [] -> ()
-  | hd :: tl ->
-      let () = rev_iter fn tl in
-      fn hd
 
 let groupby ~key ~value list =
   let h = Hashtbl.create (List.length list) in

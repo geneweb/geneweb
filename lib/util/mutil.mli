@@ -1,6 +1,4 @@
 (* Copyright (c) 2006-2007 INRIA *)
-val list_limit : int -> 'a list -> 'a list
-
 val particles_file : string ref
 (** File containing particles definitions. Default is etc/particles.txt
     priorities: 1/ particles.txt if exists in bname.gwb 2/ value of -particles
@@ -99,23 +97,6 @@ val unsafe_tr : char -> char -> string -> string
 (** [unsafe_tr c1 c2 str] Update [str] in place. Replace all occurences of [c1]
     by [c2]. *)
 
-val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
-(** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn] but
-    is more efficient.
-
-    The list is constructed backward, so if [fn] have side effects it may not
-    behave as excepted. *)
-
-val array_to_list_rev_map : ('a -> 'b) -> 'a array -> 'b list
-(** [array_to_list_revmap fn a] is almost like
-    [Array.to_list a |> List.rev_map fn] but is more efficient. *)
-
-val array_assoc : 'k -> ('k * 'v) array -> 'v
-(** [array_assoc k arr] returns the value associated with key [k] in the array
-    of pairs [arr]. That is, [array_assoc k [| ... ; (k,v) ; ... |] = v] if
-    [(k,v)] is the leftmost binding of a in array [arr]. Raise [Not_found] if
-    there is no value associated with [k] in [arr]. *)
-
 val start_with : string -> int -> string -> bool
 (** [start_with prefix off str] Test if [str] starts with [prefix] (at offset
     [off]).
@@ -159,27 +140,10 @@ val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
 (** [list_compare cmp l1 l2] Comparison function for lists, using [cmp] to
     compare each elements *)
 
-val list_find_map : ('a -> 'b option) -> 'a list -> 'b option
-(** [list_find_map fn list] OCaml Stdlib's [List.find_map] (introduced in
-    4.10.0) backported into GeneWeb *)
-
 val array_find_map : ('a -> 'b option) -> 'a array -> 'b option
 (** [array_find_map f a] applies [f] to the elements of [a] in order, and
     returns the first result of the form [Some v], or [None] if none exist. TODO
     OCaml 4.13; use Stdlib *)
-
-val list_rev_iter : ('a -> unit) -> 'a list -> unit
-(** [list_rev_iter f l] gives the same result as [List.rev l |> List.iter fn],
-    but without creating intermediate list (not tail-recursive). *)
-
-val list_last : 'a list -> 'a
-(** [list_last list] Return the last element of the list. Raises [Failure] if
-    the list is empty. *)
-
-val list_slice : int -> int -> 'a list -> 'a list
-(** [list_slice from_ to_ list] Extracts elements from [a]-nth (starts with
-    zero, inclusive) to [b]-nth (exclusive). If [list] is not long enough,
-    result will be shorter than requested, but the function will not fail. *)
 
 val check_magic : string -> in_channel -> bool
 (** [check_magic magic ic] Read (and consume) the [magic] string at the
@@ -215,14 +179,6 @@ val list_replace : 'a -> 'a -> 'a list -> 'a list
     first occurence of [old_v] has been replaced by [new_v]. If [old_v] is
     unbound, the list is returned unchanged. *)
 
-val list_except : 'a -> 'a list -> 'a list
-(** [list_except x list] Return a list containing all the elements from [list]
-    except the first occurence of [x]. *)
-
-val list_index : 'a -> 'a list -> int
-(** [list_index element list] Finds the index of [element] in list. Raises
-    [Not_found] if it does not exists. *)
-
 val list_ref_append : 'a list ref -> 'a -> unit
 (** [list_ref_append tl hd] Add [hd] at the beginning of [tl] ref. *)
 
@@ -250,26 +206,6 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 (** [list_rev_map_append f l1 l2] apply [f] to every element in [l1], reverse it
     and concat with [l2]. *)
 
-val read_or_create_channel :
-  ?magic:string ->
-  ?wait:bool ->
-  string ->
-  (in_channel -> 'a) ->
-  (out_channel -> 'a) ->
-  'a
-(** [read_or_create_channel ?magic fname read write]
-
-    If [fname] exists (and starts with [magic] if this one is provided), [read]
-    function is used on the file. If it does not, or does not start with
-    [magic], or if [read] raise an exception, [write] function is used on the
-    file.
-
-    This function takes care of locking and closing files so you must not take
-    care of that in [read]/[write]. It also takes care of writing [magic] at the
-    beginning of the file before calling [write]
-
-    On Windows, file is not locked. *)
-
 val read_or_create_value :
   ?magic:string -> ?wait:bool -> string -> (unit -> 'a) -> 'a
 (** [read_or_create_value ?magic fname create]
@@ -284,9 +220,6 @@ val read_or_create_value :
 val bench : string -> (unit -> 'a) -> 'a
 (** [bench name fn] Execute [fn], print stats about time and memory allocation,
     return [fn] result. *)
-
-val print_callstack : ?max:int -> unit -> unit
-(** Prints call stack on stderr with at most [max] entries. *)
 
 val encode : string -> Adef.encoded_string
 (** [encode s] Encodes the string [s] in another string where spaces and special
@@ -329,21 +262,9 @@ val rev_input_line : in_channel -> int -> bytes ref * int ref -> string * int
     Raises [End_of_file] if the beginning of the file is reached at the
     beginning of line. *)
 
-val search_file_opt : string list -> string -> string option
-(** [search_file directories file] Search for a [file] in different
-    [directories] and return then first result or [None] if not found *)
-
 val search_asset_opt : string -> string option
 (** [search_asset fname] Searches for a file in assets directories. i.e.
     directories previously registered with [Secure.add_assets] *)
-
-val eq_key : string * string * int -> string * string * int -> bool
-(** [eq_key (fn1, sn1, oc1) (fn2, sn2, oc2)] Tests if two persons would have the
-    same key *)
-
-val ls_r : string list -> string list
-(** [ls_r dirs] List directories (and subdirectories) contents of [dirs],
-    including [dirs] themselves. *)
 
 val rm_rf : string -> unit
 (** [rm_rf dir] Remove directory [dir] and everything inside [dir]. *)
@@ -351,10 +272,6 @@ val rm_rf : string -> unit
 val filter_map : ('a -> 'b option) -> 'a list -> 'b list
 (** [filter_map fn list] is a combination of map and filter. Not tail-recursive.
 *)
-
-val rev_iter : ('a -> unit) -> 'a list -> unit
-(** [rev_iter fn list] is like [List.iter fn (List.rev list)]. Not
-    tail-recursive. *)
 
 val groupby :
   key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list

@@ -710,15 +710,6 @@ let person_note conf base p str =
   in
   note conf base env str
 
-let source_note conf base p str =
-  let env =
-    [
-      ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
-      ('k', fun () -> Image.default_image_filename "portraits" base p);
-    ]
-  in
-  wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
-
 let source_note_with_env conf base env str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
 
@@ -834,8 +825,6 @@ let linked_pages_nbr conf base ip =
   let ht = read_cache_linked_pages conf in
   let entry = try Some (Hashtbl.find ht key) with Not_found -> None in
   match entry with Some nbr -> nbr | None -> 0
-
-let has_linked_pages conf base ip = linked_pages_nbr conf base ip <> 0
 
 let linked_page_text_family conf base ifam s (str : Adef.safe_string)
     (pg, (_, il)) : Adef.safe_string =

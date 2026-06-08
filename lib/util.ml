@@ -11,41 +11,6 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Code = Geneweb_http.Code
 
-let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
-    ?(aria_label = "") ?(disabled = false) ?(target = None) ?(data_attrs = [])
-    ~href ~content () =
-  let href_attr = Printf.sprintf " href=\"%s\"" href in
-  let clean_title = String.map (function '"' -> '\'' | c -> c) title in
-  let title_attr =
-    if title = "" then "" else Printf.sprintf " title=\"%s\"" clean_title
-  in
-  let class_attr =
-    if css_class = "" then "" else Printf.sprintf " class=\"%s\"" css_class
-  in
-  let tabindex_attr =
-    match tabindex with
-    | Some i -> Printf.sprintf " tabindex=\"%d\"" i
-    | None -> ""
-  in
-  let aria_label_attr =
-    if aria_label = "" then ""
-    else Printf.sprintf " aria-label=\"%s\"" aria_label
-  in
-  let target_attr =
-    match target with Some t -> Printf.sprintf " target=\"%s\"" t | None -> ""
-  in
-  let disabled_attr = if disabled then " aria-disabled=\"true\"" else "" in
-  let data_attrs_str =
-    List.fold_left
-      (fun acc (k, v) -> acc ^ Printf.sprintf " data-%s=\"%s\"" k v)
-      "" data_attrs
-  in
-  let full_attrs =
-    href_attr ^ title_attr ^ class_attr ^ tabindex_attr ^ aria_label_attr
-    ^ target_attr ^ disabled_attr ^ data_attrs_str
-  in
-  Printf.sprintf "<a%s>%s</a>" full_attrs content |> Adef.safe
-
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
@@ -508,7 +473,6 @@ let ftransl conf s = valid_format s (transl conf (string_of_format s))
 let ftransl_nth conf s p =
   valid_format s (transl_nth conf (string_of_format s) p)
 
-let fdecline w s = valid_format w (gen_decline_basic (string_of_format w) s)
 let translate_eval s = Translate.eval (Mutil.nominative s)
 
 (* *)
@@ -516,11 +480,6 @@ let translate_eval s = Translate.eval (Mutil.nominative s)
 let get_referer conf =
   let referer = Mutil.extract_param "referer: " '\n' conf.request in
   escape_html referer
-
-let begin_centered conf =
-  Output.printf conf
-    "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
-    conf.border
 
 let end_centered conf = Output.print_sstring conf "</td></tr></table>\n"
 
@@ -1205,22 +1164,6 @@ let referenced_person_text conf base p =
 
 let referenced_person_text_without_surname conf base p =
   reference conf base p (gen_person_text ~sn:false conf base p)
-
-let person_text_without_title conf base p =
-  match main_title conf base p with
-  | Some t -> (
-      if Driver.Istr.equal t.t_place (Driver.get_surname p) then
-        gen_person_text ~sn:false conf base p
-      else
-        match (t.t_name, Driver.get_qualifiers p) with
-        | Tname s, nn :: _ ->
-            esc (Driver.sou base s)
-            ^^^ " <em>"
-            ^<^ esc (Driver.sou base nn)
-            ^>^ "</em>"
-        | Tname s, _ -> esc (Driver.sou base s)
-        | _ -> gen_person_text conf base p)
-  | None -> gen_person_text conf base p
 
 let person_title conf base p =
   if authorized_age conf base p then
@@ -2707,13 +2650,6 @@ let is_that_user_and_password auth_scheme user passwd =
         in
         that_response_would_be = ds.ds_response
 
-let of_course_died conf p =
-  match Date.cdate_to_dmy_opt (Driver.get_birth p) with
-  | Some d ->
-      (* TODO this value should be defined elsewhere *)
-      conf.today.year - d.year > conf.private_years + 20
-  | None -> false
-
 let escache_value base =
   let t = Driver.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in
@@ -3227,11 +3163,6 @@ let array_mem_witn conf base x a =
   in
   loop 0
 
-let nb_char_occ c s =
-  let cnt = ref 0 in
-  String.iter (fun x -> if x = c then incr cnt) s;
-  !cnt
-
 let select_masc conf base ips =
   let poi = if conf.wizard || conf.friend then Driver.poi else pget conf in
   let fam = Hashtbl.create 1024 in
@@ -3310,47 +3241,6 @@ let select_mascdesc conf base ips gen_desc =
   let ips = Hashtbl.fold (fun ip (gen, _) acc -> (ip, gen) :: acc) asc [] in
   let r = select_desc conf base gen_desc ips in
   r
-
-let auth_warning conf base w =
-  let pauth p = authorized_age conf base p in
-  let fauth ifam =
-    let fam = Driver.foi base ifam in
-    pauth (Driver.get_father fam |> Driver.poi base)
-    && pauth (Driver.get_mother fam |> Driver.poi base)
-  in
-  match w with
-  | BigAgeBetweenSpouses (p1, p2, _) -> pauth p1 && pauth p2
-  | BirthAfterDeath p -> pauth p
-  | ChildrenNotInOrder (ifam, _, elder, x) ->
-      pauth elder && pauth x && fauth ifam
-  | CloseChildren (ifam, c1, c2) -> pauth c1 && pauth c2 && fauth ifam
-  | DeadOld (p, _) -> pauth p
-  | DeadTooEarlyToBeFather (father, child) -> pauth father && pauth child
-  | DistantChildren (ifam, p1, p2) -> pauth p1 && pauth p2 && fauth ifam
-  | FEventOrder (p, _, _) -> pauth p
-  | FWitnessEventAfterDeath (p, _, fam) -> pauth p && fauth fam
-  | FWitnessEventBeforeBirth (p, _, fam) -> pauth p && fauth fam
-  | IncoherentSex (p, _, _) -> pauth p
-  | IncoherentAncestorDate (anc, p) -> pauth anc && pauth p
-  | MarriageDateAfterDeath p -> pauth p
-  | MarriageDateBeforeBirth p -> pauth p
-  | MotherDeadBeforeChildBirth (mother, child) -> pauth mother && pauth child
-  | ParentBornAfterChild (parent, child) -> pauth parent && pauth child
-  | ParentTooOld (p, _, c) -> pauth p && pauth c
-  | ParentTooYoung (p, _, c) -> pauth p && pauth c
-  | PossibleDuplicateFam (f1, f2) -> fauth f1 && fauth f2
-  | PossibleDuplicateFamHomonymous (f1, f2, p) ->
-      fauth f1 && fauth f2 && pauth p
-  | PEventOrder (p, _, _) -> pauth p
-  | PWitnessEventAfterDeath (p, _, origin) -> pauth p && pauth origin
-  | PWitnessEventBeforeBirth (p, _, origin) -> pauth p && pauth origin
-  | TitleDatesError (p, _) -> pauth p
-  | UndefinedSex p -> pauth p
-  | YoungForMarriage (_, _, fam) -> fauth fam
-  | OldForMarriage (_, _, fam) -> fauth fam
-  | ChangedOrderOfChildren _ | ChangedOrderOfMarriages _
-  | ChangedOrderOfFamilyEvents _ | ChangedOrderOfPersonEvents _ ->
-      false
 
 let name_with_roman_number str =
   let rec loop found len i =
@@ -3530,22 +3420,6 @@ let print_loading_overlay conf ?custom_translation_key () =
 </div>
 |}
     title subtitle
-
-let loading_overlay_js_content =
-  {|<script>
-function showOverlay() {
-  const overlay = document.querySelector('.loading-overlay');
-  if (overlay) overlay.classList.remove('hidden');
-}
-function hideOverlay() {
-  const overlay = document.querySelector('.loading-overlay');
-  if (overlay) overlay.classList.add('hidden');
-}
-document.addEventListener('DOMContentLoaded', hideOverlay);
-</script>|}
-
-let print_loading_overlay_js conf =
-  Output.print_sstring conf loading_overlay_js_content
 
 type evar_button = { evar : string; text : string }
 

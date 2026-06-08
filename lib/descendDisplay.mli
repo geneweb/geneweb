@@ -1,36 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(** Descendant rendering for the [m=D] request.
-
-    Entry points consumed by gwd (request dispatch) and by the [v7_descend]
-    plugin. {!print} is the dispatcher; the other values render one specific [t]
-    mode and are exported because the plugin calls them directly. *)
-
-val display_descendant_index :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  Geneweb_db.Driver.person ->
-  unit
-(** Displays the index of descendants. *)
-
-val display_spouse_index :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  Geneweb_db.Driver.person ->
-  unit
-(** Displays the index of the descendants' spouses (themselves not descendants).
-*)
-
-val print_tree :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  Geneweb_db.Driver.person ->
-  unit
-(** Displays a centred tree of descendants. *)
-
 val print :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
 (** Displays the descendants of the person selected through [conf.env]. The

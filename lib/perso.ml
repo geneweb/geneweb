@@ -203,21 +203,6 @@ let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 let hide_person conf base p =
   (not (Util.authorized_age conf base p)) || Util.is_hide_names conf p
 
-let string_of_marriage_text conf base fam =
-  let marriage = Date.od_of_cdate (Driver.get_marriage fam) in
-  let marriage_place = Driver.sou base (Driver.get_marriage_place fam) in
-  let s =
-    match marriage with
-    | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d
-    | None -> Adef.safe ""
-  in
-  match marriage_place with
-  | "" -> s
-  | _ ->
-      s ^^^ ", "
-      ^<^ Util.safe_html (string_with_macros conf [] marriage_place)
-      ^>^ ","
-
 let string_of_title ?(safe = false) ?(link = true) conf base
     (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
   let safe_html = if not safe then Util.safe_html else Adef.safe in
@@ -363,137 +348,6 @@ let has_history conf base p p_auth =
   let occ = Driver.get_occ p in
   let person_file = HistoryDiff.history_file fn sn occ in
   p_auth && Sys.file_exists (HistoryDiff.history_path conf person_file)
-
-(* ************************************************************************ *)
-(*  [Fonc] get_death_text : config -> person -> bool -> string      *)
-
-(* ************************************************************************ *)
-
-(** [Description] : Retourne une description de la mort de la personne [Args] :
-    - conf : configuration de la base
-    - p : la personne que l'on veut afficher
-    - p_auth : authentifié ou non [Retour] :
-    - string [Rem] : Exporté en clair hors de ce module. *)
-let get_death_text conf p p_auth =
-  let died =
-    if p_auth then
-      let is = index_of_sex (Driver.get_sex p) in
-      match Driver.get_death p with
-      | Death (dr, _) -> (
-          match dr with
-          | Unspecified -> transl_nth conf "died" is |> Adef.safe
-          | Murdered -> transl_nth conf "murdered" is |> Adef.safe
-          | Killed -> transl_nth conf "killed (in action)" is |> Adef.safe
-          | Executed ->
-              transl_nth conf "executed (legally killed)" is |> Adef.safe
-          | Disappeared -> transl_nth conf "disappeared" is |> Adef.safe)
-      | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
-      | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
-      | NotDead | DontKnowIfDead | OfCourseDead -> "" |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_death_date =
-    match (p_auth, Driver.get_death p) with
-    | true, Death (_, d) -> (
-        let d = Date.date_of_cdate d in
-        match List.assoc_opt "long_date" conf.base_env with
-        | Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-    | _ -> "" |> Adef.safe
-  in
-  died ^^^ " " ^<^ on_death_date
-
-let get_baptism_text conf p p_auth =
-  let baptized =
-    if p_auth then
-      Driver.get_sex p |> index_of_sex |> transl_nth conf "baptized"
-      |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_baptism_date =
-    match (p_auth, Date.od_of_cdate (Driver.get_baptism p)) with
-    | true, Some d -> (
-        match List.assoc_opt "long_date" conf.base_env with
-        | Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-    | _ -> "" |> Adef.safe
-  in
-  baptized ^^^ " " ^<^ on_baptism_date
-
-let get_birth_text conf p p_auth =
-  let born =
-    if p_auth then
-      Driver.get_sex p |> index_of_sex |> transl_nth conf "born" |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_birth_date =
-    match (p_auth, Date.od_of_cdate (Driver.get_birth p)) with
-    | true, Some d -> (
-        match List.assoc_opt "long_date" conf.base_env with
-        | Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-    | _ -> "" |> Adef.safe
-  in
-  born ^^^ " " ^<^ on_birth_date
-
-let get_marriage_date_text conf fam p_auth =
-  match (p_auth, Date.od_of_cdate (Driver.get_marriage fam)) with
-  | true, Some d -> (
-      match List.assoc_opt "long_date" conf.base_env with
-      | Some "yes" ->
-          DateDisplay.string_of_ondate ~link:false conf d
-          ^>^ DateDisplay.get_wday conf d
-      | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-  | _ -> "" |> Adef.safe
-
-let get_burial_text conf p p_auth =
-  let buried =
-    if p_auth then
-      Driver.get_sex p |> index_of_sex |> transl_nth conf "buried" |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_burial_date =
-    match Driver.get_burial p with
-    | Buried cod -> (
-        match (p_auth, Date.od_of_cdate cod) with
-        | true, Some d -> (
-            match List.assoc_opt "long_date" conf.base_env with
-            | Some "yes" ->
-                DateDisplay.string_of_ondate ~link:false conf d
-                ^>^ DateDisplay.get_wday conf d
-            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-        | _ -> "" |> Adef.safe)
-    | UnknownBurial | Cremated _ -> "" |> Adef.safe
-  in
-  buried ^^^ " " ^<^ on_burial_date
-
-let get_cremation_text conf p p_auth =
-  let cremated =
-    if p_auth then
-      Driver.get_sex p |> index_of_sex |> transl_nth conf "cremated"
-      |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_cremation_date =
-    match Driver.get_burial p with
-    | Cremated cod -> (
-        match (p_auth, Date.od_of_cdate cod) with
-        | true, Some d -> (
-            match List.assoc_opt "long_date" conf.base_env with
-            | Some "yes" ->
-                DateDisplay.string_of_ondate ~link:false conf d
-                ^>^ DateDisplay.get_wday conf d
-            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-        | _ -> "" |> Adef.safe)
-    | UnknownBurial | Buried _ -> "" |> Adef.safe
-  in
-  cremated ^^^ " " ^<^ on_cremation_date
 
 let limit_desc conf =
   match List.assoc_opt "max_desc_level" conf.base_env with
@@ -1531,29 +1385,6 @@ let get_sosa conf base env r p =
     in
     r := (Driver.get_iper p, s) :: !r;
     s
-
-(* ************************************************************************** *)
-(*  [Fonc] get_linked_page : config -> base -> person -> string -> string     *)
-
-(* ************************************************************************** *)
-
-(** [Description] : Permet de récupérer un lien de la chronique familiale.
-    [Args] :
-    - conf : configuration
-    - base : base de donnée
-    - p : person
-    - s : nom du lien (eg. "HEAD", "OCCU", "BIBLIO", "BNOTE", "DEATH") [Retour]
-      : string : "<a href="xxx">description du lien</a>" [Rem] : Exporté en
-      clair hors de ce module. *)
-let get_linked_page conf base p s =
-  let db = Driver.read_nldb base in
-  let db = Notes.merge_possible_aliases conf db in
-  let key =
-    let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-    let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
-    (fn, sn, Driver.get_occ p)
-  in
-  List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
 
 let make_ep conf base ip =
   let p = pget conf base ip in
@@ -6041,11 +5872,6 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
 
 let interp_templ ?no_headers = gen_interp_templ ?no_headers false (fun _ -> ())
 let interp_templ_with_menu = gen_interp_templ true
-
-let interp_notempl_with_menu title templ_fname conf base p =
-  (* On envoie le header car on n'est pas dans un template (exple: merge). *)
-  Hutil.header_with_title conf title;
-  gen_interp_templ true title templ_fname conf base p
 
 let print_isolated conf base =
   Driver.load_ascends_array base;

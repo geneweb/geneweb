@@ -12,41 +12,6 @@ type fam =
 
 type rel = Driver.relation * Driver.person option
 
-type env = {
-  all_gp : Perso.generation_person list option;
-  baseprefix : string option;
-  desc_level_table : (int array * int array) Lazy.t option;
-  desc_mark : bool array ref option;
-  fam : fam option;
-  fam_link : fam option;
-  prev_fam : fam option;
-  sosa : (Driver.iper * (Sosa.t * Driver.person) option) list ref option;
-  sosa_ref : Driver.person option Lazy.t option;
-  src : string option;
-}
-
-let conf_w_baseprefix conf env =
-  match env.baseprefix with
-  | Some baseprefix -> { conf with command = baseprefix }
-  | None -> conf
-
-let empty =
-  {
-    all_gp = None;
-    baseprefix = None;
-    desc_level_table = None;
-    desc_mark = None;
-    fam = None;
-    fam_link = None;
-    prev_fam = None;
-    sosa = None;
-    sosa_ref = None;
-    src = None;
-  }
-
-let env = empty
-let get_env x = match x with Some x -> x | None -> raise Not_found
-
 let sex_of_index = function
   | 0 -> Male
   | 1 -> Female
@@ -62,59 +27,14 @@ module Person = struct
       Adef.float_of_fix c
     else 0.
 
-  let dates conf base p = DateDisplay.short_dates_text conf base p
   let death p = Driver.get_death p
 
   (* TODOWHY: should it be Event.sorted_events or can it be just Event.events? *)
   let events = Event.sorted_events
   let first_name base p = Driver.p_first_name base p
 
-  let history_file base p =
-    let fn = Driver.sou base (Driver.get_first_name p) in
-    let sn = Driver.sou base (Driver.get_surname p) in
-    let occ = Driver.get_occ p in
-    HistoryDiff.history_file fn sn occ
-
-  let is_accessible_by_key conf base p =
-    Util.accessible_by_key conf base p
-      (Driver.p_first_name base p)
-      (Driver.p_surname base p)
-
-  let linked_page conf base p s =
-    let db = Driver.read_nldb base in
-    let db = Notes.merge_possible_aliases conf db in
-    let key =
-      let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
-      let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
-      (fn, sn, Driver.get_occ p)
-    in
-    List.fold_left (Perso.linked_page_text conf base p s key) (Adef.safe "") db
-
   let note conf base p =
     if not conf.no_note then Driver.sou base (Driver.get_notes p) else ""
-
-  let related conf base p =
-    List.sort (fun (c1, _) (c2, _) ->
-        let mk_date c =
-          match Date.od_of_cdate (Driver.get_baptism c) with
-          | None -> Date.od_of_cdate (Driver.get_birth c)
-          | x -> x
-        in
-        match (mk_date c1, mk_date c2) with
-        | Some d1, Some d2 -> Date.compare_date d1 d2
-        | _ -> -1)
-    @@ List.fold_left
-         (fun list ic ->
-           let c = pget conf base ic in
-           List.fold_left
-             (fun acc r ->
-               match (r.r_fath, r.r_moth) with
-               | Some ip, _ when ip = Driver.get_iper p -> (c, r) :: acc
-               | _, Some ip when ip = Driver.get_iper p -> (c, r) :: acc
-               | _ -> acc)
-             list (Driver.get_rparents c))
-         []
-         (List.sort_uniq compare (Driver.get_related p))
 
   (* Why isnt this already unique? *)
   let relations p = List.sort_uniq compare (Driver.get_related p)
@@ -162,11 +82,6 @@ end
 module Family = struct
   let children (_, fam, _, _) = Driver.get_children fam
 
-  let divorce_date (_, fam, _, auth) =
-    match Driver.get_divorce fam with
-    | Divorced d when auth -> Date.od_of_cdate d
-    | _ -> None
-
   let events (_, fam, (_, _, isp), auth) =
     if auth then
       List.fold_right
@@ -184,18 +99,6 @@ module Family = struct
 
   let father (_, _, (ifath, _, _), _) = ifath
   let ifam (ifam, _, _, _) = Driver.Ifam.to_string ifam
-
-  let marriage_date (_, fam, (_, _, _), auth) =
-    if auth then Date.od_of_cdate (Driver.get_marriage fam) else None
-
-  let marriage_place (_, fam, _, _) = Driver.get_marriage_place fam
-
-  let marriage_note (_, fam, _, auth) =
-    if auth then Driver.get_marriage_note fam else Driver.Istr.empty
-
-  let marriage_source (_, fam, _, auth) =
-    if auth then Driver.get_marriage_src fam else Driver.Istr.empty
-
   let mother (_, _, (_, imoth, _), _) = imoth
 
   let note conf base (_, fam, _, auth) =
@@ -204,11 +107,6 @@ module Family = struct
 
   let origin_file conf base (_, fam, _, _) =
     if conf.wizard then Driver.sou base (Driver.get_origin_file fam) else ""
-
-  let spouse_iper (_, _, (_, _, ip), _) = ip
-
-  let witnesses (_, fam, _, auth) =
-    if auth then Driver.get_witnesses fam else [||]
 
   let sources base (_, fam, _, auth) =
     if auth then Driver.sou base (Driver.get_fsources fam) else ""
