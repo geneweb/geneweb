@@ -1477,7 +1477,7 @@ let log conf from gauth request script_name contents =
   else
     Log.info (fun k ->
         k ~tags:timestamp "(%d) %s?%s\n%s%s%s%s%s" (Unix.getpid ()) script_name
-          (if String.length contents > 200 then
+          (if (not conf.debug) && String.length contents > 200 then
              Printf.sprintf "%s..." (String.sub contents 0 200)
            else contents)
           (Printf.sprintf "  From: %s" from)
