@@ -169,6 +169,12 @@
 # families not connected to the rest on the database).
 #propose_add_family=no
 
+# Reduce place on person pages: collapse repeated comma-separated places
+# ("Town, County, State, Country"). The first occurrence is shown in full;
+# later identical places are reduced to their first comma-segment,
+# wrapped in <abbr title="full place"> for print.
+#reduce_place=yes
+
 # Hide “Places/surname” button on welcome page.
 # By default button is accessible.
 #propose_place_surnames=no

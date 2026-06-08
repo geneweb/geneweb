@@ -126,7 +126,7 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
     %end;
   %end;
 %end;
-%if;("CHK_DATA" in e.m or "MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
+%if;((wizard and e.m="" and not is_welcome) or "CHK_DATA" in e.m or "MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
     or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
     or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")
@@ -884,6 +884,35 @@ function populateDatalists() {
   menu.appendChild(frag);
 })();
 %end;
+%( updateField const + lazy-loading %)
+%if;(wizard and not is_welcome and e.m="")
+const UPD = {
+  prefix: "%prefix;",
+  iper: "%index;",
+  error: "[*error]",
+  editField: "[*edit this field]"
+};
+(function () {
+  const slot = document.getElementById('upd-wand-sources');
+  const wand = document.querySelector('.upd-wand');
+  if (slot && wand && !slot.querySelector('.upd-wand')) {
+    slot.appendChild(wand.cloneNode(true));
+  }
+})();
+(function () {
+  let loaded = false;
+  document.addEventListener('click', ev => {
+    if (!ev.target.closest('.upd-wand')) return;
+    ev.preventDefault();
+    if (loaded) { if (window.InplaceEdit) InplaceEdit.toggle(); return; }
+    loaded = true;
+    const s = document.createElement('script');
+    s.src = "%etc_prefix;js/updateField.min.js?hash=%apply;hash%with;%etc_prefix;js/updateField.min.js%end;";
+    s.onload = () => { InplaceEdit.init(); InplaceEdit.toggle(); };
+    document.head.appendChild(s);
+  });
+})();
+%end;
 const initTooltips = () => {
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
     if (!bootstrap.Tooltip.getInstance(el)) {
@@ -994,3 +1023,30 @@ initTooltips();
 </script>
 %end;
 %end;%( closing initial “not cancel_links”, not indented for convenience %)
+%( b.reduce_place=yes %)
+%if;(e.m="" and not is_welcome and b.reduce_place="yes")
+<script>
+function reducePlaces() {
+  const seen = [];
+  document.querySelectorAll('[data-updfield$="_place"]').forEach(el => {
+    const a = el.querySelector('abbr');
+    const full = (a ? a.title : el.textContent).trim();
+    const raw = (el.dataset.updraw || '').trim();
+    const sub = raw.startsWith('%[') && /\%]\s(?:–|—|-)\s/.test(raw);
+    const sep = sub ? full.search(/\s(?:–|—|-)\s/) : -1;
+    const i = full.indexOf(',', sep < 0 ? 0 : sep);
+    if (i > 0 &&
+        seen.some(s => full.endsWith(s) && full.length - s.length <= i)) {
+      const abbr = document.createElement('abbr');
+      abbr.title = full;
+      abbr.textContent = full.slice(0, i);
+      el.replaceChildren(abbr);
+    } else if (a) {
+      el.textContent = full;
+    }
+    seen.push(full);
+  });
+}
+reducePlaces();
+</script>
+%end;

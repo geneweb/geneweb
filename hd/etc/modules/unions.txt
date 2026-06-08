@@ -327,9 +327,17 @@
                   <div class="ms-2 align-self-center">
                     %if;(count2=0)<ul>%apply;li_SDC("child")%end;%nn;
                       %apply;short_display_person_noname("child")<br>
-                      %if;(child.public_name!="" and child.public_name!=child.first_name)%child.first_name;<br>%end;
+                      %if;(child.public_name!="" and child.public_name!=child.first_name)
+                        %if;wizard;<span data-index="%child.index;" data-updfield="first_name">%end;%child.first_name;%nn;
+                        %if;wizard;</span>%end;<br>
+                      %end;
                       %if;(child.birth_date!="")%if;(child.sex=0) [*born]0%else;[*born]1%end; %child.on_birth_date;%end;
-                      %if;(child.birth_place!="") %in_place; %child.birth_place;%end;
+                      %if;(child.birth_place!="") %in_place;%sp;
+                        <span data-updfield="birth_place"
+                          %if;wizard; data-index="%child.index;"
+                            %if;(child.birth_place_raw!=child.birth_place) data-updraw="%child.birth_place_raw;"%end;
+                          %end;>%child.birth_place;</span>
+                      %end;
                     %if;(count2=0)</li></ul>%end;
                   </div>
                 </div>

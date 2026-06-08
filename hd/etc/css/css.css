@@ -2532,3 +2532,40 @@ input.row-valid-flash {
 a.disabled {
     pointer-events: none;
 }
+
+/* updateField */
+body.upd-edit [data-updfield] {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+body.upd-edit [data-updfield] a {
+  text-decoration: none;
+}
+.upd-occ {
+  display: inline-block;
+  width: 5rem;
+  vertical-align: middle;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.upd-occ::-webkit-inner-spin-button,
+.upd-occ::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+.ajax-notification {
+  font-size: 0.9em;
+  font-weight: 500;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  min-width: 300px;
+  max-width: min(40rem, calc(100vw - 40px));
+  overflow-wrap: anywhere;
+  animation: slideInRight 0.3s ease-out;
+}

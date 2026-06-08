@@ -9,20 +9,27 @@
     <li>%apply;capitalize(linked_page.BIBLIO)</li>
   </ul>
 %end;
+%define;updsource()
+  %if;(wizard and source_field!="")%nn;
+    <span data-updfield="%source_field;" data-updraw="%source_raw;"
+      %if;(source_ifam!="") data-ifam="%source_ifam;"%end;>%source;</span>%nn;
+  %else;%source;%end;
+%end;
 %reset_count;
 %if;has_sources;%incr_count;%end;
 %foreach;event;
   %if;event.has_src;%incr_count;%end;
 %end;
+%let;marr;[marriage/marriages]0%in;
 %if;(count>0)
-  <h2 class="h3 mt-2">%if;(count=1)[*source/sources]0%else;[*source/sources]1%end;</h2>
+  <h2 class="h3 mt-2">%if;(count=1)[*source/sources]0%else;[*source/sources]1%end;
+    %if;wizard;<span id="upd-wand-sources" class="ms-2"></span>%end;</h2>
   <ul class="ps-4 py-0">
-  %let;marr;[marriage/marriages]0%in;
   %foreach;source;
     <li>%apply;capitalize(source_type)[:]
       %if;(marr in source_type and has_linked_page_family.MARIAGE)
-        %linked_page_family.MARIAGE; ;%sp;
-      %end;%source;.
+        %linked_page_family.MARIAGE; ;%sp;
+      %end;%apply;updsource().
     </li>
   %end;
   %if;(has_linked_page_family.MARIAGE)

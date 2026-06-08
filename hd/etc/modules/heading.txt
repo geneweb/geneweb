@@ -5,16 +5,22 @@
        <img src="%blason_url;"%blason_small_size; class="mx-%if;("i3" in p_mod)1%else;2%end;" alt="[blason/blasons]0">%nn;
       %if;not cancel_links;</a>%end;
     %end;
-    %let;qualifier_;%if;has_qualifiers;<em>%qualifier;</em>%end;%in;
+    %let;qualifier_;%if;has_qualifiers;<em>%if;wizard;<span data-updfield="qualifier0">%end;%qualifier;%if;wizard;</span>%end;</em>%end;%in;
     %let;public_or_first_name;
-      %if;has_public_name;%public_name;
+      %if;has_public_name;%if;wizard;<span data-updfield="public_name">%end;%public_name;%if;wizard;</span>%end;
       %else;
-        %if;not cancel_links;<a href="%prefix;m=P&v=%first_name_key;#i%index;">%end;%first_name;%nn;
+        %if;not cancel_links;<a href="%prefix;m=P&v=%first_name_key;#i%index;"%if;wizard; data-updfield="first_name"%end;>%end;%first_name;%nn;
         %if;not cancel_links;</a>%end;
       %end;
     %in;
     %public_or_first_name; %qualifier_;%sp;
-    %if;not cancel_links;<a href="%prefix;m=N&v=%surname_key;#i%index;">%end;%surname;%nn;
+    %if;not cancel_links;<a href="%prefix;m=N&v=%surname_key;#i%index;"%if;wizard; data-updfield="surname"%end;>%end;%surname;%nn;
     %if;not cancel_links;</a>%end;
+    %if;wizard;<input type="number" value="%occ;"
+      class="form-control upd-occ d-none ms-3" min="0" max="99999" step="1"
+      title="[*occ]0" aria-label="[*occ]0">%end;
     <span class="fw-light small">%dates;</span>
+    %if;wizard;<button type="button" class="btn p-0 ms-0 text-muted upd-wand"%nn;
+      title="[*edit mode]" aria-label="[*edit mode]"><i class="fa fa-wand-magic-sparkles fa-sm"></i>%nn;
+      </button>%end;
   </h1>
