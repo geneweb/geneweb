@@ -280,9 +280,9 @@
       </li>
     %end;
     %if;has_occupation;
-      <li class="mt-1" title="[*occupation/occupations]0">
+      <li class="mt-1" title="[*occupation/occupations]0" >
         %if;not roglo;<span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
-        %apply;capitalize(occupation)</li>%nl;
+         <span data-updatefield="occu">%apply;capitalize(occupation)</span></li>%nl;
     %end;
     %if;(has_linked_page.OCCU and linked_page.OCCU!="")
       <li>%if;not roglo;<span class="fa-li"><i class="far fa-file-lines"></i></span>%end;
