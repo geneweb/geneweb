@@ -518,6 +518,7 @@ function setupModalAutofocus() {
 %end;
 %if;(e.m!="MOD_DATA")
 // Floating placeholders for all textual inputs
+// Floating placeholders for all textual inputs
 function setupFloatingPlaceholders() {
   const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
 
@@ -525,12 +526,19 @@ function setupFloatingPlaceholders() {
     // Ignore placeholders that are only non-breaking spaces
     if (input.placeholder.trim() === '') return;
 
-    const hadFocus = document.activeElement === input;
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'input-wrapper';
-    input.parentNode.insertBefore(wrapper, input);
-    wrapper.appendChild(input);
+    let wrapper = input.parentNode;
+    if (wrapper.classList.contains('clear-button-wrapper')) {
+      // Reuse the positioned wrapper added by clearinput; keep the
+      // .input-wrapper CSS hooks so layout rules still match.
+      wrapper.classList.add('input-wrapper');
+    } else if (!wrapper.classList.contains('input-wrapper')) {
+      const hadFocus = document.activeElement === input;
+      wrapper = document.createElement('div');
+      wrapper.className = 'input-wrapper';
+      input.parentNode.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+      if (hadFocus) requestAnimationFrame(() => input.focus());
+    }
 
     const placeholder = document.createElement('span');
     placeholder.className = 'floating-placeholder';
@@ -540,11 +548,8 @@ function setupFloatingPlaceholders() {
     input.addEventListener('focus', () => placeholder.classList.add('active'));
     input.addEventListener('blur', () => placeholder.classList.remove('active'));
 
-    if (hadFocus || input.hasAttribute('autofocus')) {
-      requestAnimationFrame(() => {
-        input.focus();
-        placeholder.classList.add('active');
-      });
+    if (input === document.activeElement || input.hasAttribute('autofocus')) {
+      placeholder.classList.add('active');
     }
   });
 }
