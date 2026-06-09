@@ -422,7 +422,7 @@ let has_pevent_in_env conf tag =
   in
   loop 1
 
-let reconstitute_from_pevents pevents ext bi bp de bu =
+let reconstitute_from_pevents conf pevents ext bi bp de bu =
   (* On tri les évènements pour être sûr. *)
   let pevents = sort_pevents pevents in
   let found_birth = ref false in
@@ -430,11 +430,13 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
   let found_death = ref false in
   let found_burial = ref false in
   let death_reason_std_fields =
-    let death_std_fields, _, _, _ = de in
-    match death_std_fields with
-    | Death (dr, _) -> dr
-    | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
-        Unspecified
+    match p_getenv conf.env "death_reason" with
+    | Some "Killed" -> Killed
+    | Some "Murdered" -> Murdered
+    | Some "Executed" -> Executed
+    | Some "Disappeared" -> Disappeared
+    | Some "Unspecified" | None -> Unspecified
+    | Some x -> failwith ("bad death reason type " ^ x)
   in
   let rec loop pevents bi bp de bu =
     match pevents with
@@ -674,7 +676,7 @@ let reconstitute_person conf =
   let psources = only_printable (get conf "src") in
   (* Mise à jour des évènements principaux. *)
   let bi, bp, de, bu, pevents =
-    reconstitute_from_pevents pevents ext
+    reconstitute_from_pevents conf pevents ext
       (Date.cdate_of_od birth, birth_place, birth_note, birth_src)
       (Date.cdate_of_od bapt, bapt_place, bapt_note, bapt_src)
       (death, death_place, death_note, death_src)
