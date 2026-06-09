@@ -5,6 +5,8 @@ module Gutil = Geneweb_db.Gutil
 
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 
+let bases_dir = ref "."
+
 type gwexport_opts = {
   asc : int option;
   ascdesc : int option;
@@ -55,6 +57,7 @@ let speclist c =
     ( "-a",
       Arg.Int (fun s -> c := { !c with asc = Some s }),
       "<N> maximum generation of the root's ascendants" );
+    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
     ( "-ad",
       Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
       "<N> maximum generation of the root's ascendants descendants \
