@@ -1,8 +1,8 @@
+<!-- $Id: desmenu.txt v7.1 08/06/2026 03:33:27 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: desmenu.txt v7.1 05/04/2026 14:44:59 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -25,49 +25,6 @@
 %message_to_wizard;
 <div class="container">
 %include;perso_header
-<script>
-function no_options() {
-  document.querySelectorAll(
-    'input[type="checkbox"]:not([name="only"]):not([name="image"]):not([name="cgl"])'
-  ).forEach(function(cb) { cb.checked = false; });
-}
-
-function long_display_options() {
-  const ldAll      = document.querySelectorAll('input[type="checkbox"][id^="ld_"]');
-  const ldUnchecked = document.querySelectorAll('input[type="checkbox"][id^="ld_"]:not(:checked)');
-  if (ldAll.length === ldUnchecked.length) {
-    %if;(b.always_surname="yes")
-    const alwsurn = document.getElementById('ld_alwsurn');
-    if (alwsurn) alwsurn.checked = true;
-    %end;
-    const notes = document.getElementById('ld_notes');
-    const src   = document.getElementById('ld_src');
-    if (notes) notes.checked = true;
-    if (src)   src.checked   = true;
-  }
-}
-
-function table_options() {
-  /* Appelé après no_options() — on coche directement les defaults sans guard. */
-  const tmarr = document.getElementById('t_marr');
-  if (tmarr) { tmarr.disabled = false; tmarr.checked = true; }
-  ['t_num_table','t_birth_date','t_birth_place',
-   't_marr_place','t_marr_date','t_child',
-   't_death_date','t_death_place','t_occu','t_gen'
-  ].forEach(function(id) {
-    const el = document.getElementById(id);
-    if (el) el.checked = true;
-  });
-}
-
-function table_spouse_disabled() {
-  /* Appelé après table_options() pour le mode "tableau avec infos conjoints". */
-  const tmarr  = document.getElementById('t_marr');
-  const tmarr2 = document.getElementById('t_marr2');
-  if (tmarr)  { tmarr.disabled = true;  tmarr.checked = true; }
-  if (tmarr2) { tmarr2.disabled = false; }
-}
-</script>
 <h1 class="text-center my-3">%nn;
   %apply;a_of_b_gr_eq_lev%with;
     [*descendants]%nn;
@@ -78,13 +35,11 @@ function table_spouse_disabled() {
     %if;(alias!="") <em>(%alias;)</em>%end;
   %end;
 </h1>
-
 %define;tothegen(xx)
   [*upto the %s generation:::xx]%nn;
 %end;
-
 <form class="needs-validation" novalidate method="get" action="%action;">
-  <div class="d-flex justify-content-start mx-3">
+  <div class="d-flex justify-content-evenly mx-3">
     %hidden;
     %if;access_by_key;
       <input type="hidden" name="p" value="%first_name_key_val;">
@@ -96,7 +51,7 @@ function table_spouse_disabled() {
       <input type="hidden" name="i" value="%index;">
     %end;
     <input type="hidden" name="m" value="D">
-    <div class="col-auto">
+    <div class="d-flex flex-column order-1">
       <div class="form-check">
         <input type="radio" class="form-check-input" id="tL" name="t" value="L"
           onclick="no_options();long_display_options()" checked>
@@ -162,28 +117,6 @@ function table_spouse_disabled() {
       </div>
       <hr>
       <div class="form-check">
-        <input type="radio" class="form-check-input" id="tT" name="t" value="T"
-          onclick="no_options()">
-        <label class="form-check-label" for="tT">
-          <i class="fa fa-sitemap fa-fw me-1"></i>[*descendants tree] <span class="text-info">✘</span>%sp;
-          <span class="text-body-secondary">
-            %if;(b.max_desc_tree="" and max_desc_level>=4)
-              ([maximum] 4 [generation/generations]1)
-            %elseif;(b.max_desc_tree!="" and max_desc_level>=b.max_desc_tree)
-              ([maximum] %b.max_desc_tree; [generation/generations]1)
-            %end;
-          </span>
-        </label>
-      </div>
-      <hr>
-      <div class="form-check">
-        <input type="radio" class="form-check-input" id="tS" name="t" value="S"
-          onclick="no_options()">
-        <label class="form-check-label" for="tS">
-          <i class="fa fa-list fa-fw me-1"></i>[*list/list (ancestors)]0 [descendants at the generation]
-        </label>
-      </div>
-      <div class="form-check">
         <input type="radio" class="form-check-input" id="tN" name="t" value="N"
           onclick="no_options()">
         <label class="form-check-label" for="tN">
@@ -219,141 +152,144 @@ function table_spouse_disabled() {
         </label>
       </div>
     </div>
-
-    <div class="d-flex flex-column">
+    <div class="d-flex flex-column order-3">
+      <div class="form-check">
+        <input type="radio" class="form-check-input" id="tH" name="t" value="H"
+          onclick="no_options();table_options()">
+        <label class="form-check-label" for="tH">
+          <i class="fa fa-table fa-fw me-1"></i>[*table] <span class="text-primary">✱</span><span class="text-info">✘</span>
+          <span class="text-body-secondary">
+            %if;(b.max_desc_level="" and max_desc_level>12)
+              ([maximum] 12 [generation/generations]1)
+            %elseif;(b.max_desc_level!="" and max_desc_level>b.max_desc_level)
+              ([maximum] %b.max_desc_level; [generation/generations]1)
+            %end;
+          </span>
+        </label>
+      </div>
+      <div class="form-check">
+        <input type="radio" class="form-check-input" id="tI" name="t" value="I"
+          onclick="no_options();table_options();table_spouse_disabled()">
+        <label class="form-check-label" for="tI">
+          <i class="fa fa-table fa-fw me-1"></i>[*table] [with] [spouses info] <span class="text-primary">✱</span><span class="text-info">✘</span>
+        </label>
+      </div>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="t_num_table" name="num">
+          <label class="form-check-label" for="t_num_table">[*display Aboville number]</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="t_nowrap" name="nowrap">
+          <label class="form-check-label" for="t_nowrap">[*no line break in names]</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="t_tt" name="tt" value="1">
+          <label class="form-check-label" for="t_tt">[*visualize/show/hide/summary]1 [title/titles]1</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="t_fn" name="fn" value="1">
+          <label class="form-check-label" for="t_fn">[*visualize/show/hide/summary]1 [first name/first names]1</label>
+        </div>
+        <div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_marr" name="marr">
+            <input name="marr" type="hidden" id="t_marr2" value="on" disabled>
+            <label class="form-check-label" for="t_marr">[*spouse/spouses]1</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_child" name="child">
+            <label class="form-check-label" for="t_child">[*number of children]</label>
+          </div>
+        </div>
+        <div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_birth_date" name="birth">
+            <label class="form-check-label" for="t_birth_date" title="[*date of birth]">[*date/dates]0</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_birth_place" name="birth_place">
+            <label class="form-check-label" for="t_birth_place">[*where born]</label>
+          </div>
+        </div>
+        <div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_baptism_date" name="baptism">
+            <label class="form-check-label" for="t_baptism_date" title="[*date of baptism]">[*date/dates]0</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_baptism_place" name="baptism_place">
+            <label class="form-check-label" for="t_baptism_place">[*baptism place]</label>
+          </div>
+        </div>
+        <div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_marr_date" name="marr_date">
+            <label class="form-check-label" for="t_marr_date" title="[*date of marriage]">[*date/dates]0</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_marr_place" name="marr_place">
+            <label class="form-check-label" for="t_marr_place">[*where married]</label>
+          </div>
+        </div>
+        <div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_death_date" name="death">
+            <label class="form-check-label" for="t_death_date" title="[*date of death]">[*date/dates]0</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_death_place" name="death_place">
+            <label class="form-check-label" for="t_death_place">[*where dead]</label>
+          </div>
+        </div>
+        <div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_burial_date" name="burial">
+            <label class="form-check-label" for="t_burial_date" title="[*date of burial]">[*date/dates]0</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_burial_place" name="burial_place">
+            <label class="form-check-label" for="t_burial_place">[*burial place]</label>
+          </div>
+        </div>
+        <div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_age" name="age">
+            <label class="form-check-label" for="t_age" title="[*age] [or] [age at death]">[*age]</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="t_occu" name="occu">
+            <label class="form-check-label" for="t_occu">[*occupation/occupations]1</label>
+          </div>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="t_ns" name="ns" value="1">
+          <label class="form-check-label" for="t_ns">[*see descendants notes/sources]</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="t_gen" name="gen" value="1">
+          <label class="form-check-label" for="t_gen">[*display generation]</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="t_hl" name="hl" value="1">
+          <label class="form-check-label" for="t_hl">[*highlight gaps/hide highlighting]0</label>
+        </div>
+      </div>
+    <div class="d-flex flex-column order-2">
       <div class="order-2">
         <hr>
-        %(
         <div class="form-check">
-          <input type="radio" class="form-check-input" id="tK" name="t" value="K"
-            onclick="no_options();table_options()">
-          <label class="form-check-label" for="tK">
-            <i class="fa fa-table fa-fw"></i>[*table] <span class="text-primary">✱</span>
-          </label>
-        </div> %)
-        <div class="form-check">
-          <input type="radio" class="form-check-input" id="tH" name="t" value="H"
-            onclick="no_options();table_options()">
-          <label class="form-check-label" for="tH">
-            <i class="fa fa-table fa-fw me-1"></i>[*table] <span class="text-primary">✱</span><span class="text-info">✘</span>
+          <input type="radio" class="form-check-input" id="tT" name="t" value="T"
+            onclick="no_options()">
+          <label class="form-check-label" for="tT">
+            <i class="fa fa-sitemap fa-fw me-1"></i>[*descendants tree] <span class="text-info">✘</span>%sp;
             <span class="text-body-secondary">
-              %if;(b.max_desc_level="" and max_desc_level>12)
-                ([maximum] 12 [generation/generations]1)
-              %elseif;(b.max_desc_level!="" and max_desc_level>b.max_desc_level)
-                ([maximum] %b.max_desc_level; [generation/generations]1)
+              %if;(b.max_desc_tree="" and max_desc_level>=4)
+                ([maximum] 4 [generation/generations]1)
+              %elseif;(b.max_desc_tree!="" and max_desc_level>=b.max_desc_tree)
+                ([maximum] %b.max_desc_tree; [generation/generations]1)
               %end;
             </span>
           </label>
-        </div>
-        <div class="form-check">
-          <input type="radio" class="form-check-input" id="tI" name="t" value="I"
-            onclick="no_options();table_options();table_spouse_disabled()">
-          <label class="form-check-label" for="tI">
-            <i class="fa fa-table fa-fw me-1"></i>[*table] [with] [spouses info] <span class="text-primary">✱</span><span class="text-info">✘</span>
-          </label>
-        </div>
-        <div class="ms-4">
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="t_num_table" name="num">
-            <label class="form-check-label" for="t_num_table">[*display Aboville number]</label>
-          </div>
-          <div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_nowrap" name="nowrap">
-              <label class="form-check-label" for="t_nowrap">[*no line break in names]</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_tt" name="tt" value="1">
-              <label class="form-check-label" for="t_tt">[*title/titles]1</label>
-            </div>
-          </div>
-          <div class="form-check form-check-inline">
-            <input type="checkbox" class="form-check-input" id="t_fn" name="fn" value="1">
-            <label class="form-check-label" for="t_fn">[*visualize/show/hide/summary]1 [first name/first names]1</label>
-          </div>
-          <div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_marr" name="marr">
-              <input name="marr" type="hidden" id="t_marr2" value="on" disabled/>
-              <label class="form-check-label" for="t_marr">[*spouse/spouses]1</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_child" name="child">
-              <label class="form-check-label" for="t_child">[*number of children]</label>
-            </div>
-          </div>
-          <div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_birth_date" name="birth">
-              <label class="form-check-label" for="t_birth_date" title="[*date of birth]">[*date/dates]0</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_birth_place" name="birth_place">
-              <label class="form-check-label" for="t_birth_place">[*where born]</label>
-            </div>
-          </div>
-          <div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_baptism_date" name="baptism">
-              <label class="form-check-label" for="t_baptism_date" title="[*date of baptism]">[*date/dates]0</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_baptism_place" name="baptism_place">
-              <label class="form-check-label" for="t_baptism_place">[*baptism place]</label>
-            </div>
-          </div>
-          <div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_marr_date" name="marr_date">
-              <label class="form-check-label" for="t_marr_date" title="[*date of marriage]">[*date/dates]0</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_marr_place" name="marr_place">
-              <label class="form-check-label" for="t_marr_place">[*where married]</label>
-            </div>
-          </div>
-          <div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_death_date" name="death">
-              <label class="form-check-label" for="t_death_date" title="[*date of death]">[*date/dates]0</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_death_place" name="death_place">
-              <label class="form-check-label" for="t_death_place">[*where dead]</label>
-            </div>
-          </div>
-          <div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_burial_date" name="burial">
-              <label class="form-check-label" for="t_burial_date" title="[*date of burial]">[*date/dates]0</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_burial_place" name="burial_place">
-              <label class="form-check-label" for="t_burial_place">[*burial place]</label>
-            </div>
-          </div>
-          <div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_age" name="age">
-              <label class="form-check-label" for="t_age" title="[*age] [or] [age at death]">[*age]</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="checkbox" class="form-check-input" id="t_occu" name="occu">
-              <label class="form-check-label" for="t_occu">[*occupation/occupations]1</label>
-            </div>
-          </div>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="t_ns" name="ns" value="1">
-            <label class="form-check-label" for="t_ns">[*see descendants notes/sources]</label>
-          </div>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="t_gen" name="gen" value="1">
-            <label class="form-check-label" for="t_gen">[*display generation]</label>
-          </div>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="t_hl" name="hl" value="1">
-            <label class="form-check-label" for="t_hl">[*highlight gaps/hide highlighting]0</label>
-          </div>
         </div>
       </div>
       <div class="d-flex flex-column order-1">
@@ -409,5 +345,48 @@ function table_spouse_disabled() {
 </div>
 %include;js
 %query_time;
+<script>
+function no_options() {
+  document.querySelectorAll(
+    'input[type="checkbox"]:not([name="only"]):not([name="image"]):not([name="cgl"])'
+  ).forEach(function(cb) { cb.checked = false; });
+}
+
+function long_display_options() {
+  const ldAll      = document.querySelectorAll('input[type="checkbox"][id^="ld_"]');
+  const ldUnchecked = document.querySelectorAll('input[type="checkbox"][id^="ld_"]:not(:checked)');
+  if (ldAll.length === ldUnchecked.length) {
+    %if;(b.always_surname="yes")
+    const alwsurn = document.getElementById('ld_alwsurn');
+    if (alwsurn) alwsurn.checked = true;
+    %end;
+    const notes = document.getElementById('ld_notes');
+    const src   = document.getElementById('ld_src');
+    if (notes) notes.checked = true;
+    if (src)   src.checked   = true;
+  }
+}
+
+function table_options() {
+  /* Appelé après no_options() — on coche directement les defaults sans guard. */
+  const tmarr = document.getElementById('t_marr');
+  if (tmarr) { tmarr.disabled = false; tmarr.checked = true; }
+  ['t_num_table','t_birth_date','t_birth_place',
+   't_marr_place','t_marr_date','t_child',
+   't_death_date','t_death_place','t_occu','t_gen'
+  ].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.checked = true;
+  });
+}
+
+function table_spouse_disabled() {
+  /* Appelé après table_options() pour le mode "tableau avec infos conjoints". */
+  const tmarr  = document.getElementById('t_marr');
+  const tmarr2 = document.getElementById('t_marr2');
+  if (tmarr)  { tmarr.disabled = true;  tmarr.checked = true; }
+  if (tmarr2) { tmarr2.disabled = false; }
+}
+</script>
 </body>
 </html>
