@@ -131,6 +131,8 @@ let speclist c =
     ("-v", Arg.Unit (fun () -> c := { !c with verbose = true }), " verbose");
     ("-t", Arg.Unit (fun () -> c := { !c with test = true }), " test mode");
   ]
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 module IPS = Geneweb_db.Driver.Iper.Set
 module IFS = Geneweb_db.Driver.Ifam.Set

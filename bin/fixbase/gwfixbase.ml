@@ -239,7 +239,8 @@ let speclist =
       " rebuild index. It is automatically enabled by any other option." );
     ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let anonfun i = bname := i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"

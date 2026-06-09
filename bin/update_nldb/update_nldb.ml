@@ -19,6 +19,8 @@ let speclist =
         (Dirs.name Secure.default_base_dir) );
     ("-debug", Arg.Set debug, " Debug mode.");
   ]
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let anonfun s =
   if !fname = "" then fname := s

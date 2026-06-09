@@ -305,7 +305,8 @@ let speclist =
       "<file> Write HTML output to file (default: text to stderr)." );
     ("-s", Arg.Set statistics, " Print component size statistics.");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let () =
   Arg.parse speclist (fun s -> bname := s) usage;
