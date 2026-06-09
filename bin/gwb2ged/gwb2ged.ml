@@ -7,7 +7,8 @@ let speclist opts =
   ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder")
   :: ("-indexes", Arg.Set with_indexes, " export indexes in gedcom")
   :: Gwexport.speclist opts
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let bname = ref None
 

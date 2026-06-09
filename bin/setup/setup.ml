@@ -1395,6 +1395,7 @@ let merge_1 conf =
   in
   let bases = selected conf.env in
   Printf.eprintf "merge bases: %s -> %s\n%!" (String.concat ", " bases) out_file;
+  Printf.eprintf "pwd: %s\n" (Sys.getcwd ());
   (* cwd is already base_dir (set at startup) *)
   let rc =
     let rec loop = function
