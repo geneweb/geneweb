@@ -18,7 +18,8 @@ let gwd_port = ref 2317
 let default_lang = ref "en"
 let setup_dir = ref (Filename.dirname Sys.argv.(0))
 let bin_dir = ref ""
-let base_dir = ref (Secure.base_dir ())
+let base_dir = ref "."
+let launch_dir = ref "."
 let lang_param = ref ""
 let bname = ref ""
 let no_o = ref true
@@ -584,7 +585,11 @@ let rec copy_from_stream conf print strm =
                   | None -> ())
               | 'D' -> print (transl conf "!doc")
               (* | 'F' see 'V' *)
-              | 'G' -> print_specific_file_tail conf print "gwsetup.log" strm
+              (* the current directory may have changes with -bd *)
+              | 'G' ->
+                  print_specific_file_tail conf print
+                    (Filename.concat !launch_dir "gwsetup.log")
+                    strm
               | 'H' ->
                   (* print the content of -o filename, prepend bname *)
                   let outfile = strip_spaces (s_getenv conf.env "o") in
@@ -1807,6 +1812,7 @@ let intro () =
   in
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
+  launch_dir := Sys.getcwd ();
   (* Change working directory to base_dir once at startup so all tool
      invocations (gwu, gwc, update_nldb…) find bases by bare name.
      -bd is currently a no-op in gwu, consang, connex, fixbase, gwdiff, gwb2ged
