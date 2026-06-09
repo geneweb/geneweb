@@ -1,4 +1,21 @@
 function addClearButtonToInputs() {
+    const selector =
+        'input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),' +
+        'input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),' +
+        'textarea:not(.no-clear-button):not([readonly]):not([disabled]),' +
+        '.clear-button:not([readonly]):not([disabled])';
+
+    let observer = null;
+    let scheduled = false;
+
+    function skip(element) {
+        return element.type === 'hidden' ||
+            element.style.display === 'none' ||
+            element.classList.contains('no-clear-button') ||
+            element.closest('.ts-wrapper') ||
+            element.tabIndex === -1;
+    }
+
     function createClearButton(element) {
         const clearButton = document.createElement('i');
         clearButton.className = 'fas fa-xmark clear-button-icon';
@@ -20,26 +37,12 @@ function addClearButtonToInputs() {
     }
 
     function initializeInput(element) {
-        if (element.type === 'hidden' || 
-            element.style.display === 'none' ||
-            getComputedStyle(element).display === 'none' ||
-            element.classList.contains('no-clear-button') ||
-            element.closest('.ts-wrapper') ||
-            element.tabIndex === -1) {
-            return;
-        }
-        if (element.dataset.clearInitialized) {
-            const existingButton = element.parentNode.querySelector('.clear-button-icon');
-            if (existingButton) {
-                existingButton.style.opacity = element.value ? '1' : '0';
-            }
-            return;
-        }
-
+        if (element.dataset.clearInitialized || skip(element)) return;
         element.dataset.clearInitialized = 'true';
 
         let wrapper = element.parentNode;
-        if (!wrapper.classList.contains('clear-button-wrapper')) {
+        if (!wrapper.classList.contains('clear-button-wrapper') &&
+            !wrapper.classList.contains('input-wrapper')) {
             const isInline = element.style.width === 'auto' ||
                              element.classList.contains('form-control-inline');
             wrapper = document.createElement('div');
@@ -56,9 +59,7 @@ function addClearButtonToInputs() {
         wrapper.appendChild(clearButton);
 
         const updateVisibility = () => {
-            requestAnimationFrame(() => {
-                clearButton.style.opacity = element.value ? '1' : '0';
-            });
+            clearButton.style.opacity = element.value ? '1' : '0';
         };
 
         element.addEventListener('input', updateVisibility);
@@ -73,54 +74,54 @@ function addClearButtonToInputs() {
             e.stopPropagation();
 
             element.value = '';
-            element.focus();
             updateVisibility();
 
-            const inputEvent = new CustomEvent('clearButton', {
-                bubbles: true,
-                detail: { element }
+            // Detach the datalist while focusing so the X does not open a
+            // (potentially huge) native suggestion popup; rebind it on the
+            // next genuine user interaction.
+            const listId = element.getAttribute('list');
+            if (listId) {
+                element.removeAttribute('list');
+                const rebind = () => element.setAttribute('list', listId);
+                element.addEventListener('pointerdown', rebind, { once: true });
+                element.addEventListener('keydown', rebind, { once: true });
+            }
+            element.focus();
+
+            requestAnimationFrame(() => {
+                element.dispatchEvent(new Event('input', { bubbles: true }));
+                element.dispatchEvent(new Event('change', { bubbles: true }));
             });
-            element.dispatchEvent(inputEvent);
-            element.dispatchEvent(new Event('input', { bubbles: true }));
-            element.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
         updateVisibility();
     }
 
     function processInputs() {
-        const selector = `
-            input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-            input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-            textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-            .clear-button:not([readonly]):not([disabled])
-        `;
+        if (observer) observer.disconnect();
+        document.querySelectorAll(selector).forEach(initializeInput);
+        if (observer) {
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+    }
 
+    function scheduleProcess() {
+        if (scheduled) return;
+        scheduled = true;
         requestAnimationFrame(() => {
-            document.querySelectorAll(selector).forEach(initializeInput);
+            scheduled = false;
+            processInputs();
         });
     }
 
-    processInputs();
-
-    const observer = new MutationObserver((mutations) => {
-        let shouldProcess = false;
-        mutations.forEach(mutation => {
-            if (mutation.addedNodes.length ||
-                mutation.type === 'attributes' &&
-                (mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-                shouldProcess = true;
+    observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.addedNodes.length) {
+                scheduleProcess();
+                break;
             }
-        });
-        if (shouldProcess) {
-            processInputs();
         }
     });
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['type', 'class']
-    });
+    scheduleProcess();
 }
