@@ -104,16 +104,3 @@ val reconstitute_death :
   Def.burial ->
   string ->
   Def.death
-
-val reconstitute_from_pevents :
-  ('a, string) Def.gen_pers_event list ->
-  bool ->
-  Adef.cdate * string * string * string ->
-  Adef.cdate * string * string * string ->
-  Def.death * string * string * string ->
-  Def.burial * string * string * string ->
-  (Adef.cdate * string * string * string)
-  * (Adef.cdate * string * string * string)
-  * (Def.death * string * string * string)
-  * (Def.burial * string * string * string)
-  * ('a, string) Def.gen_pers_event list
