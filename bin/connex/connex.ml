@@ -15,6 +15,7 @@ let cnt_for_delete = ref 0
 let exact = ref false
 let bname = ref ""
 let is_html () = !output <> None
+let bases_dir = ref "."
 
 let format_date () =
   let t = Unix.localtime (Unix.gettimeofday ()) in
@@ -285,6 +286,7 @@ let speclist =
   [
     ("-a", Arg.Set all, " List all connected components.");
     ("-bf", Arg.Clear ignore_files, " Group by origin file.");
+    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
     ( "-cnt",
       Arg.Int (fun i -> cnt_for_delete := i),
       "<int> Delete up to n branches of size <= -del value." );

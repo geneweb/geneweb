@@ -535,9 +535,11 @@ let mem = ref false
 let d_mode = ref false
 let ad_mode = ref false
 let html = ref false
+let bases_dir = ref "."
 
 let speclist =
   [
+    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
     ( "-pnoc_a",
       Arg.String (fun s -> pnoc_a := s),
       "<fn>.<occ> <sn> (mandatory) defines starting person in base1" );
