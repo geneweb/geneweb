@@ -6,23 +6,6 @@
     plugin. {!print} is the dispatcher; the other values render one specific [t]
     mode and are exported because the plugin calls them directly. *)
 
-val display_descendants_level :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  Geneweb_db.Driver.person ->
-  unit
-(** Displays the descendants of a single generation as an unordered list. *)
-
-val display_descendants_with_numbers :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  Geneweb_db.Driver.person ->
-  unit
-(** Displays descendants as a letter-numbered list; the title links to the
-    descendants index. *)
-
 val display_descendant_index :
   Config.config ->
   Geneweb_db.Driver.base ->
@@ -40,15 +23,6 @@ val display_spouse_index :
 (** Displays the index of the descendants' spouses (themselves not descendants).
 *)
 
-val display_descendant_with_table :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  Geneweb_db.Driver.person ->
-  unit
-(** Displays descendants in a table whose rows are ordered by d'Aboville number.
-*)
-
 val print_tree :
   Config.config ->
   Geneweb_db.Driver.base ->
@@ -56,16 +30,6 @@ val print_tree :
   Geneweb_db.Driver.person ->
   unit
 (** Displays a centred tree of descendants. *)
-
-val print_aboville :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  int ->
-  Geneweb_db.Driver.person ->
-  unit
-(** Displays descendants in indented d'Aboville form, e.g.:
-
-    person | desc1 | desc2 | | desc21 | desc3 *)
 
 val print :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
@@ -83,9 +47,6 @@ val print :
     - "V": descendants tree.
 
     Modes rendered by the functions of this module:
-    - "B": {!print_aboville};
-    - "S": {!display_descendants_level};
-    - "K": {!display_descendant_with_table};
     - "N": {!display_descendants_with_numbers};
     - "G": {!display_descendant_index};
     - "C": {!display_spouse_index};
