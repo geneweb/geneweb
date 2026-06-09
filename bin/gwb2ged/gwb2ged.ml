@@ -1,9 +1,11 @@
 module Driver = Geneweb_db.Driver
 
 let with_indexes = ref false
+let bases_dir = ref "."
 
 let speclist opts =
-  ("-indexes", Arg.Set with_indexes, " export indexes in gedcom")
+  ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder")
+  :: ("-indexes", Arg.Set with_indexes, " export indexes in gedcom")
   :: Gwexport.speclist opts
   |> List.sort compare |> Arg.align
 

@@ -8,9 +8,11 @@ let scratch = ref false
 let verbosity = ref 2
 let fast = ref false
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
+let bases_dir = ref "."
 
 let speclist =
   [
+    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
     ("-fast", Arg.Set fast, " faster, but use more memory");

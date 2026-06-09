@@ -214,9 +214,11 @@ let index = ref false
 let dry_run = ref false
 let dump = ref false
 let ofile = ref ""
+let bases_dir = ref "."
 
 let speclist =
   [
+    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
     ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
