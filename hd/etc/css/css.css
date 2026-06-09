@@ -629,7 +629,7 @@ html {
 #updform textarea:placeholder-shown, #updform input:placeholder-shown, #updform select.custom-select {
   background-color: #f2f2f2;
 }
-#updform input:focus, #updform textarea:focus {
+#updform input:not(.form-check-input):focus, #updform textarea:focus {
   background-color: white !important;
 }
 
