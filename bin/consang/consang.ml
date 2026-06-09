@@ -22,7 +22,8 @@ let speclist =
       " Save memory, but slower when rewritting database" );
     ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let anonfun s =
   if !fname = "" then fname := s

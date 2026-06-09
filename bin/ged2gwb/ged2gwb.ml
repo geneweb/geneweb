@@ -3279,7 +3279,9 @@ let speclist =
     , "<FILE> Use the given file as list of particles" )
   ; ( "-nowarn", Arg.Set no_warn, " Do not show warnings during import")
   ; ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
-  ] |> List.sort compare |> Arg.align
+  ]
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let anonfun s =
   if !in_file = "" then in_file := s

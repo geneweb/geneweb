@@ -556,7 +556,8 @@ let speclist =
       "<root> HTML format used for report" );
     ("-mem", Arg.Set mem, " save memory space, but slower");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let anon_args = ref []
 let anon_fun arg = anon_args := arg :: !anon_args

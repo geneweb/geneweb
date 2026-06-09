@@ -40,7 +40,8 @@ let speclist opts =
        ^ string_of_int !GwuLib.sep_limit
        ^ ". The present option changes this limit." )
   :: Gwexport.speclist opts
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let bname = ref None
 
