@@ -52,7 +52,7 @@ module AdvancedSearchMatch : sig
     bool
 
   val match_civil_status :
-    conf:Config.config ->
+    conf:Config.Trimmed.t ->
     base:Gwdb.base ->
     p:Authorized.Person.t ->
     sex:Def.sex ->
@@ -69,7 +69,7 @@ module AdvancedSearchMatch : sig
 
   val match_marriage :
     default:bool ->
-    conf:Config.config ->
+    conf:Config.Trimmed.t ->
     base:Gwdb.base ->
     p:Authorized.Person.t ->
     dates:Date.dmy option * Date.dmy option ->
@@ -110,7 +110,7 @@ module AdvancedSearchMatch : sig
     bool
 
   val match_other_events :
-    conf:Config.config ->
+    conf:Config.Trimmed.t ->
     base:Gwdb.base ->
     p:Authorized.Person.t ->
     dates:Date.dmy option * Date.dmy option ->
@@ -400,8 +400,9 @@ end
    a person from the base to match. (ie. "Pierre-Jean de Bourbon de Vallois" matches
    with "Jean Pierre de Vallois de Bourbon" but not with "Jean de Bourbon")
 *)
-let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
+let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf'
     base =
+  let conf = Config.Trimmed.from_config conf' in
   let max_answers = Option.value ~default:max_int query_params.limit in
   let place_with_istr =
     let memo : (string * (string * Gwdb.istr option)) list ref = ref [] in
@@ -470,13 +471,13 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
       Lazy.force civil_match
       && (query_params.events = [] || check match_ query_params.events)
     in
-    if (not @@ SearchName.search_reject_p conf base unsafe_p) && pmatch () then
+    if (not @@ SearchName.search_reject_p conf' base unsafe_p) && pmatch () then
       (unsafe_p :: list, len + 1)
     else acc
   in
   let list, len =
     if query_params.only_root_ancestors then
-      match Util.find_sosa_ref conf base with
+      match Util.find_sosa_ref conf' base with
       | Some sosa_ref ->
           let rec loop p (set, acc) =
             if not (Gwdb.IperSet.mem (Gwdb.get_iper p) set) then
@@ -486,14 +487,14 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
               | Some ifam ->
                   let fam = Gwdb.foi base ifam in
                   let set, acc =
-                    loop (Util.pget conf base @@ Gwdb.get_mother fam) (set, acc)
+                    loop (Util.pget conf' base @@ Gwdb.get_mother fam) (set, acc)
                   in
-                  loop (Util.pget conf base @@ Gwdb.get_father fam) (set, acc)
+                  loop (Util.pget conf' base @@ Gwdb.get_father fam) (set, acc)
               | None -> (set, acc)
             else (set, acc)
           in
           loop
-            (Util.pget conf base @@ Gwdb.get_iper sosa_ref)
+            (Util.pget conf' base @@ Gwdb.get_iper sosa_ref)
             (Gwdb.IperSet.empty, ([], 0))
           |> snd
       | None -> ([], 0)
@@ -524,7 +525,7 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           r <> ([], 0)
         in
         let list =
-          SearchName.persons_starting_with ~conf ~base ~filter
+          SearchName.persons_starting_with ~conf:conf' ~base ~filter
             ~first_name_prefix:""
             ~surname_prefix:(Option.value ~default:"" query_params.surname)
             ~limit:max_answers
@@ -541,7 +542,7 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           r <> ([], 0)
         in
         let list =
-          SearchName.persons_starting_with ~conf ~base ~filter
+          SearchName.persons_starting_with ~conf:conf' ~base ~filter
             ~first_name_prefix:
               (Option.value ~default:"" query_params.first_name)
             ~surname_prefix:"" ~limit:max_answers
@@ -567,7 +568,7 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
           | ip :: l ->
               loop
                 (match_person ~skip_fname ~skip_sname acc
-                   (Util.pget conf base ip) search_type)
+                   (Util.pget conf' base ip) search_type)
                 l
         in
         loop ([], 0) list
@@ -576,7 +577,7 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
       let result =
         Gwdb.Collection.fold_until
           (fun (_, len) -> len < max_answers)
-          (fun acc i -> match_person acc (Util.pget conf base i) search_type)
+          (fun acc i -> match_person acc (Util.pget conf' base i) search_type)
           ([], 0) (Gwdb.ipers base)
       in
       Gwdb.clear_persons_array base;
