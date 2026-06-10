@@ -3611,27 +3611,38 @@ it: Per sapere quale valore mettere per il vostro computer, osservate le tracce 
 lv: Lai uzzinâtu sava datora adresi, skatiet programmas "gwd" darbîbas pçdas, kas redzamas katru reizi, kad Jûs darbojoties ar savâm datu bâzçm. Ðeit Jums jâieraksta, tas ko Jûs redziet pçc "From:".
 sv: För att veta vilket värde du ska skriva in för din dator, titta på utskriften för kommandot "gwd" vilka visas varje gång du navigerar i din database. Du ska skriva in det som står efter "From:".
 
-    To restore a gw database, apply the creation from a GeneWeb source file.
+    To restore a gw database, apply the creation from a .gw GeneWeb source file.
 aa: save.htm
-co: Per risturà una basa di dati à u furmatu gw, appiecate a creazione à partesi d’un schedariu di fonte %G.
-de: Um eine gw Datenbank zu restaurieren, verwende die Funktion Datenbank aus %G-Quelldatei  erzeugen.
-en: To restore a gw database, apply the creation from a %G source file.
-es: Para restaurar una gw base de datos, aplique Ud. la creación a partir de un fichero fuente %G.
-fr: Pour restaurer une base de donnée au format gw appliquez la création à partir d’un fichier source %G.
-it: Per ripristinare il contenuto di una gw base di dati effettuate una creazione partendo da un file sorgente %G.
-lv: Lai atjaunotu datu bâzi, izmantojiet datu bâzes izveidoðanu no %G datnes.
-sv: För att återskapa en databas, använd importera en %G källfil.
+co: Per risturà una basa di dati à u furmatu gw, appiecate a creazione à partesi d’un schedariu di fonte %G (.gw).
+de: Um eine gw Datenbank zu restaurieren, verwende die Funktion Datenbank aus %G-Quelldatei(.gw) erzeugen.
+en: To restore a gw database, apply the creation from a .gw %G source file.
+es: Para restaurar una gw base de datos, aplique Ud. la creación a partir de un fichero fuente %G (.gw).
+fr: Pour restaurer une base de donnée au format gw appliquez la création à partir d’un fichier source %G (.gw).
+it: Per ripristinare il contenuto di una gw base di dati effettuate una creazione partendo da un file sorgente %G (.gw).
+lv: Lai atjaunotu datu bâzi, izmantojiet datu bâzes izveidoðanu no %G (.gw) datnes.
+sv: För att återskapa en databas, använd importera en %G (.gw) källfil.
 
-    To save your database, apply the extraction of a GeneWeb source file. Then copy the obtained file elsewhere in the disk, or better, on an external support.
+    To save your database, apply the creation of a .gw GeneWeb source file.
 aa: save.htm
-co: Per fà una salvaguardia di a vostra basa di dati, appiecate l’estrazzione d’un schedariu di fonte %G. È dopu, cupiate u schedariu ottinutu altronde nant’à u discu, o ancu megliu, nant’à una memoria esterna.
-de: Um deine Datenbank zu sichern, verwende die Extraktion einer  %G-Quelldatei. Dann kopiere die so erhaltene Datei irgendwo anders auf die Platte, oder, noch besser, auf ein externes Medium.
-en: To save your database, apply the extraction of a %G source file. Then copy the obtained file elsewhere in the disk, or better, on an external support.
-es: Para efectuar una copia de seguridad de su base de datos, aplique Ud. la extracción de un fichero fuente %G. Copie luego el fichero asi obtenido en alguna otra parte del disco duro, o mucho mejor en un soporte externo.
-fr: Pour sauvegarder votre base de données, appliquez l’extraction d’un fichier source %G. Puis copiez le fichier ainsi obtenu autre part sur le disque, ou mieux, sur un support externe.
-it: Per effettuare una copia di sicurezza della vostra base procedete  l'estrazione di un file sorgente %G. Poi copiate il file così ottenuto altrove sul disco, o meglio, su un supporto esterno.
-lv: Lai saglabâtu datu bâzi, izveidojiet %G datni. Tad to iekopçjiet droðâ vietâ.
-sv: För att spara din databas, använd exportera en %G källfil. Kopiera sedan den skapade filen någon annanstans på hårddisken, eller bättre, till en annat media.
+co: Per fà una salvaguardia di a vostra basa di dati, appiecate l’estrazzione d’un schedariu di fonte %G (.gw).
+de: Um deine Datenbank zu sichern, verwende die Extraktion einer %G-Quelldatei (.gw).
+en: To save your database, apply the extraction of a .gw %G source file.
+es: Para efectuar una copia de seguridad de su base de datos, aplique Ud. la extracción de un fichero fuente %G (.gw).
+fr: Pour sauvegarder votre base de données, appliquez l’extraction d’un fichier source %G (.gw).
+it: Per effettuare una copia di sicurezza della vostra base procedete  l'estrazione di un file sorgente %G (.gw).
+lv: Lai saglabâtu datu bâzi, izveidojiet %G (.gw) datni.
+sv: För att spara din databas, använd exportera en %G (.gw) källfil.
+
+    Then copy the obtained file elsewhere in the disk, or better, on an external support.
+aa: save.htm
+co: È dopu, cupiate u schedariu ottinutu altronde nant’à u discu, o ancu megliu, nant’à una memoria esterna.
+de: Dann kopiere die so erhaltene Datei irgendwo anders auf die Platte, oder, noch besser, auf ein externes Medium.
+en: Then copy the obtained file elsewhere in the disk, or better, on an external support.
+es: Copie luego el fichero asi obtenido en alguna otra parte del disco duro, o mucho mejor en un soporte externo.
+fr: Puis copiez le fichier ainsi obtenu autre part sur le disque, ou mieux, sur un support externe.
+it: Poi copiate il file così ottenuto altrove sul disco, o meglio, su un supporto esterno.
+lv: Tad to iekopçjiet droðâ vietâ.
+sv: Kopiera sedan den skapade filen någon annanstans på hårddisken, eller bättre, till en annat media.
 
     To specify a background image for the database "%o", you have to write it:
 aa: backg.htm
