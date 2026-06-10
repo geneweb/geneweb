@@ -1579,10 +1579,10 @@ let print_typed_file conf typ fname =
 
 let raw_file conf fname =
   let typ =
-    if String.ends_with ~suffix:".png" s then "image/png"
-    else if String.ends_with ~suffix:".jpg" s then "image/jpeg"
-    else if String.ends_with ~suffix:".gif" s then "image/gif"
-    else if String.ends_with ~suffix:".css" s then "text/css"
+    if Filename.check_suffix s ".png" then "image/png"
+    else if Filename.check_suffix s ".jpg" then "image/jpeg"
+    else if Filename.check_suffix s ".gif" then "image/gif"
+    else if Filename.check_suffix s ".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
