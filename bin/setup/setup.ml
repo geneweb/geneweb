@@ -1113,6 +1113,7 @@ let has_gwu dir =
         (Sys.readdir dir)
   with _ -> false
 
+(* the recovery process is broken (and not offered on the welcome page) *)
 let recover conf =
   let init_dir =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
@@ -1142,6 +1143,7 @@ let recover conf =
   else if not dir_has_gwu then print_file conf "err_ngw.htm"
   else print_file conf "recover1.htm"
 
+(* old_to_src/src_to_new are gwu/gwc or gwb2ged/ged2gwb *)
 let recover_1 conf =
   let in_file =
     match p_getenv conf.env "i" with Some f -> strip_spaces f | None -> ""
