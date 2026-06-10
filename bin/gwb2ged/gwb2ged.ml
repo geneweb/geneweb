@@ -10,13 +10,15 @@ let speclist opts =
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
 
-let bname = ref None
+let bname = ref ""
 
 let anonfun s =
-  if !bname = None then (
+  if !bname = "" then (
     Secure.set_base_dir (Filename.dirname s);
-    bname := Some s)
+    bname := s)
   else raise (Arg.Bad "Cannot treat several databases")
+
+let usage = "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] base"
 
 let ansel_warning =
   "Warning: ANSEL charset was administratively withdrawn in 2013. UTF-8 is \
@@ -24,12 +26,13 @@ let ansel_warning =
 
 let () =
   let opts = ref Gwexport.default_opts in
-  Arg.parse (speclist opts) anonfun Gwexport.errmsg;
+  Arg.parse (speclist opts) anonfun usage;
   if !opts.Gwexport.charset = Gwexport.Ansel then
     Printf.eprintf "%s\n%!" ansel_warning;
-  match !bname with
-  | None -> raise @@ Arg.Bad "Expect a database"
-  | Some bname ->
-      Driver.with_database bname @@ fun base ->
-      let select = Gwexport.select base !opts [] in
-      Gwb2gedLib.gwb2ged base !with_indexes !opts select
+  if !bname = "" then (
+    Arg.usage (speclist opts) usage;
+    exit 2);
+  let bpath = Filename.concat !bases_dir !bname in
+  Driver.with_database bpath @@ fun base ->
+  let select = Gwexport.select base !opts [] in
+  Gwb2gedLib.gwb2ged base !with_indexes !opts select

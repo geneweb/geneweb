@@ -315,12 +315,14 @@ let () =
       let oc = open_out file in
       Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
   | None -> ());
+  let bpath = Filename.concat !bases_dir !bname in
+
   if !ask_for_delete > 0 then
-    let lock_file = Mutil.lock_file !bname in
+    let lock_file = Mutil.lock_file bpath in
     let on_exn exn bt =
       Format.eprintf "%a@." Lock.pp_exception (exn, bt);
       exit 2
     in
     Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-    Driver.with_database !bname (fun base -> compute_connex base !bname)
-  else Driver.with_database !bname (fun base -> compute_connex base !bname)
+    Driver.with_database !bname (fun base -> compute_connex base bpath)
+  else Driver.with_database !bname (fun base -> compute_connex base bpath)

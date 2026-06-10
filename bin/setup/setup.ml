@@ -294,6 +294,11 @@ let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 let macro conf = function
   | '/' -> if Sys.unix then "/" else "\\"
   | 'a' -> strip_spaces (s_getenv conf.env "anon")
+  | 'A' ->
+      (* see %A below *)
+      let o = strip_spaces (s_getenv conf.env "o") in
+      let a = strip_spaces (s_getenv conf.env "anon") in
+      if o <> "" then o else a
   | 'c' -> stringify !setup_dir
   | 'd' -> conf.comm
   | 'i' -> strip_spaces (s_getenv conf.env "i")
@@ -576,6 +581,11 @@ let rec copy_from_stream conf print strm =
           | 'z' -> print (string_of_int !port)
           | ('A' .. 'Z' | '0' .. '9') as c -> (
               match c with
+              | 'A' ->
+                  (* if %o <> "" then %o else %a *)
+                  let o = strip_spaces (s_getenv conf.env "o") in
+                  let a = strip_spaces (s_getenv conf.env "anon") in
+                  print (if o <> "" then o else a)
               | 'C' | 'E' -> (
                   let k, v = get_binding strm in
                   match p_getenv conf.env k with
@@ -862,7 +872,11 @@ let infer_rc conf rc =
   else rc
 
 let exec_f conf comm =
-  let s = comm ^ " > " ^ "comm.log" in
+  let bd_arg =
+    if !base_dir = "." || !base_dir = "" then ""
+    else " -bd " ^ stringify !base_dir
+  in
+  let s = comm ^ bd_arg ^ " > comm.log" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   Printf.eprintf "$ %s\n" s;
   flush stderr;
@@ -974,7 +988,7 @@ let gwc conf =
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "err_standard.htm"
-  else print_file conf "gwc_ok.htm"
+  else print_file conf "create_ok.htm"
 
 let gwdiff_check conf = print_file conf "confirm.htm"
 
@@ -1229,9 +1243,13 @@ let cleanup_1 conf =
   let in_base_dir = in_base ^ ".gwb" in
   let in_base_dir_path = in_base_path ^ ".gwb" in
   let old_dir = Filename.concat !base_dir "old" in
-  (* cwd is already base_dir (set at startup), so bare names work directly *)
+  (* Use a uniquely-named temp file in the system temp dir — completely
+     independent of base_dir and cwd. Tools get bare base names; exec_f
+     injects -bd so they find the base. *)
+  let tmp_gw = Filename.temp_file "gwsetup_" ".gw" in
   let gwu_comm =
-    Filename.concat !bin_dir "gwu" ^ " " ^ stringify in_base ^ " -o tmp.gw"
+    Filename.concat !bin_dir "gwu"
+    ^ " " ^ stringify in_base ^ " -o " ^ stringify tmp_gw
   in
   let _ = exec_f conf gwu_comm in
   Printf.eprintf "$ mkdir %s\n" old_dir;
@@ -1247,11 +1265,12 @@ let cleanup_1 conf =
   else Printf.eprintf "$ move %s %s\\.\n" in_base_dir_path old_dir;
   flush stderr;
   Sys.rename in_base_dir_path (Filename.concat old_dir in_base_dir);
-  (* gwc reads tmp.gw from cwd, writes in_base.gwb to cwd *)
   let gwc_comm =
-    Filename.concat !bin_dir "gwc" ^ " tmp.gw -nofail -o " ^ stringify in_base
+    Filename.concat !bin_dir "gwc"
+    ^ " " ^ stringify tmp_gw ^ " -nofail -o " ^ stringify in_base
   in
   let rc1 = exec_f conf gwc_comm in
+  (try Sys.remove tmp_gw with Sys_error _ -> ());
   let nldb_comm =
     Filename.concat !bin_dir "update_nldb" ^ " " ^ stringify in_base
   in
@@ -1262,7 +1281,7 @@ let cleanup_1 conf =
   if rc > 1 then
     let conf = { conf with comm = "gwc" } in
     print_file conf "err_standard.htm"
-  else print_file conf "cleanup_ok.htm"
+  else print_file conf "create_ok.htm"
 
 let rec check_new_names conf l1 l2 =
   match (l1, l2) with
@@ -1400,22 +1419,25 @@ let merge_1 conf =
   in
   let bases = selected conf.env in
   Printf.eprintf "merge bases: %s -> %s\n%!" (String.concat ", " bases) out_file;
-  Printf.eprintf "pwd: %s\n" (Sys.getcwd ());
-  (* cwd is already base_dir (set at startup) *)
+  (* Allocate a temp file in /tmp for each base dump. Keyed by base name so
+     gwu and gwc agree on the path. Tools get bare base names; exec_f injects -bd. *)
+  let gw_temps =
+    List.map
+      (fun b -> (b, Filename.temp_file ("gwsetup_" ^ b ^ "_") ".gw"))
+      bases
+  in
   let rc =
     let rec loop = function
       | [] -> 0
-      | b :: bases ->
-          (* gwu reads b.gwb from cwd (= base_dir); writes b.gw to cwd *)
+      | (b, gw_out) :: rest ->
           let c =
             Filename.concat !bin_dir "gwu"
-            ^ " " ^ stringify b ^ " -o "
-            ^ stringify (b ^ ".gw")
+            ^ " " ^ stringify b ^ " -o " ^ stringify gw_out
           in
           let r = exec_f conf c in
-          if r <= 1 then loop bases else r (* rc=1 = warnings, non-fatal *)
+          if r <= 1 then loop rest else r
     in
-    loop bases
+    loop gw_temps
   in
   let rc =
     if rc > 1 then rc
@@ -1423,17 +1445,15 @@ let merge_1 conf =
       let c =
         Filename.concat !bin_dir "gwc"
         ^ List.fold_left
-            (fun s b ->
-              (* b.gw files are in cwd = base_dir *)
-              let gw = stringify (b ^ ".gw") in
+            (fun s (_, gw) ->
+              let gw = stringify gw in
               if s = "" then " " ^ gw else s ^ " -sep " ^ gw)
-            "" bases
-        (* gwc writes out_file.gwb into cwd = base_dir *)
-        ^ " -f -o "
-        ^ stringify out_file
+            "" gw_temps
+        ^ " -f -o " ^ stringify out_file
       in
       exec_f conf c
   in
+  List.iter (fun (_, gw) -> try Sys.remove gw with Sys_error _ -> ()) gw_temps;
   if rc > 1 then print_file conf "err_standard.htm"
   else print_file conf "create_ok.htm"
 
@@ -1813,15 +1833,8 @@ let intro () =
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
   launch_dir := Sys.getcwd ();
-  (* Change working directory to base_dir once at startup so all tool
-     invocations (gwu, gwc, update_nldb…) find bases by bare name.
-     -bd is currently a no-op in gwu, consang, connex, fixbase, gwdiff, gwb2ged
-     -bd is handled by gwc, gwd, update_nldb, cache_files, ged2gwb
-     so cwd is the only reliable mechanism. Reset base_dir to "." afterwards so
-     that base_path and all_db work correctly relative to the new cwd. *)
-  (try Sys.chdir !base_dir
-   with Sys_error msg ->
-     Printf.eprintf "Warning: cannot chdir to base_dir %s: %s\n%!" !base_dir msg);
+  (* All tool invocations inject -bd via exec_f so they find bases in
+     base_dir regardless of cwd. *)
   Secure.set_base_dir !base_dir;
   Printf.eprintf "Start gwsetup\n%!";
   default_lang := default_setup_lang;

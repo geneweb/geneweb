@@ -539,7 +539,7 @@ let bases_dir = ref "."
 
 let speclist =
   [
-    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
+    ("-bd", Arg.String (fun s -> bases_dir := s), " Bases folder");
     ( "-pnoc_a",
       Arg.String (fun s -> pnoc_a := s),
       "<fn>.<occ> <sn> (mandatory) defines starting person in base1" );
@@ -597,6 +597,8 @@ let main () =
 
   let _ = if not !html then cr := "\n" else cr := "<BR>\n" in
   (* [base1] is the reference base and [base2] is the destination base. *)
+  in_file1 := Filename.concat !bases_dir !in_file1;
+  in_file2 := Filename.concat !bases_dir !in_file2;
   load_base !in_file1 @@ fun base1 ->
   load_base !in_file2 @@ fun base2 ->
   (* let iper2 = Driver.person_of_key base2 !p2_fn !p2_sn !p2_occ in *)
