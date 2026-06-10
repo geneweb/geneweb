@@ -8,7 +8,6 @@ let speclist opts =
   ( "-odir",
     Arg.String (fun s -> GwuLib.out_dir := s),
     "<dir> create files from original name in directory (else on -o file)" )
-  (* FIXME -bd is a noop for the time being. gwu assumes cd bases_dir prior to execution  *)
   :: ("-bd", Arg.String (fun s -> bases_dir := s), " defines bases folder")
   :: ( "-isolated",
        Arg.Set isolated,
@@ -47,22 +46,27 @@ let bname = ref None
 
 let anonfun s =
   if !bname = None then (
-    Secure.set_base_dir (Filename.dirname s);
-    bname := Some s)
+    bname := Some (Filename.basename s);
+    if s <> Option.value ~default:"" !bname then
+      raise (Arg.Bad "Provide a simple base name. Use -bd for bases folder"))
   else raise (Arg.Bad "Cannot treat several databases")
 
 let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
   let opts = !opts in
+  Secure.set_base_dir !bases_dir;
   match !bname with
   | None -> raise @@ Arg.Bad "Expect a database"
   | Some bname ->
-      Driver.with_database bname @@ fun base ->
-      let select = Gwexport.select base opts [] in
+      Printf.eprintf "S_dir: %s, B_dir: %s, bname: %s\n" (Secure.base_dir ())
+        !bases_dir bname;
       let in_dir =
-        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+        let full = Filename.concat (Secure.base_dir ()) bname in
+        if Filename.check_suffix full ".gwb" then full else full ^ ".gwb"
       in
+      Driver.with_database in_dir @@ fun base ->
+      let select = Gwexport.select base opts [] in
       let src_oc_ht = Hashtbl.create 1009 in
       Driver.load_ascends_array base;
       Driver.load_strings_array base;

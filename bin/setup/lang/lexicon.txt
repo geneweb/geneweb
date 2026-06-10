@@ -1119,17 +1119,30 @@ de: Fertig. Die operation ist abgeschlossen.
 en: Done. The operation is terminated.
 fr: L’opération est terminée.
 
-    Done. The operation is terminated. Your database named "%o" is created.
-aa: bso_ok.htm
-co: Eccu. L’operazione hè compia. A vostra basa di genealugia « %o » hè stata creata.
-de: Die Operation ist beendet. Deine Datenbank namens "%o" wurde angelegt.
-en: Done. The operation is terminated. Your database named "%o" is created.
-es: Muy bien. La operación a terminado. Su base de datos de nombre "%o" ha sido creada.
-fi: Valmis. Toiminto on lopetettu. Tietokanta nimeltä "%0" on luotu.
-fr: L’opération est terminée : votre généalogie "%o" est créée.
-it: L'operazione è terminata. La vostra base di dati "%o" è stata creata.
-lv: Darîts. Datu bâzes izveidoðana ir pabeigta. Jûsu datu bâze "%o" ir izveidota.
-sv: Operationen är avklarad. Din databas benämnd "%o" är skapad.
+    Done. The operation is terminated. Your database named
+aa: create_ok.htm
+co: Eccu. L’operazione hè compia. A vostra basa di genealugia « 
+de: Die Operation ist beendet. Deine Datenbank namens "
+en: Done. The operation is terminated. Your database named "
+es: Muy bien. La operación a terminado. Su base de datos de nombre "
+fi: Valmis. Toiminto on lopetettu. Tietokanta nimeltä "
+fr: L’opération est terminée : votre généalogie « 
+it: L'operazione è terminata. La vostra base di dati "
+lv: Darîts. Datu bâzes izveidoðana ir pabeigta. Jûsu datu bâze "
+sv: Operationen är avklarad. Din databas benämnd "
+
+    is created
+aa: create_ok.htm
+co:  » hè stata creata.
+de: " wurde angelegt.
+en: " is created.
+es: " ha sido creada.
+fi: " on luotu.
+fr:  » est créée.
+it: " è stata creata.
+lv: " ir izveidota.
+sv: " är skapad.
+
 
     Dont extract individual pictures (portraits).
 aa: gwb2ged.htm
