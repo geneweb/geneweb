@@ -321,7 +321,7 @@
                  %if;(xx.computable_age or xx.computable_death_age)
                    %if;xx.computable_age; (%xx.age;)%elseif;xx.computable_death_age; (%xx.death_age;)%end;
                  %end;">%nn;
-      %if;(xx.dates!="")%xx.dates;%nn;
+      %if;(xx.dates!="")%xx.dates_notag;%nn;
       %elseif;(wizard and not cancel_links)-%nn;
       %elseif;(cancel_links)
       %end;%nn;
