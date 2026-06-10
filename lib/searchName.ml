@@ -62,7 +62,8 @@ let has_visible_marital_name match_name conf base p =
 
 type prefix = { kind : [ `First_name | `Surname ]; value : string }
 
-let persons_of_prefixes_stream max conf base filter other_pfxs main_pfx =
+let persons_of_prefixes_stream max conf' base filter other_pfxs main_pfx =
+  let conf = Config.Trimmed.from_config conf' in
   let main_stream =
     (match main_pfx.kind with
     | `First_name -> Gwdb.persons_stream_of_first_name_prefix
@@ -106,7 +107,7 @@ let persons_of_prefixes_stream max conf base filter other_pfxs main_pfx =
           let p = Gwdb.poi base iper in
           if
             List.for_all (match_other_istr p) other_pfxs
-            && Person.has_visible_name conf base p
+            && Person.has_visible_name conf' base p
             && filter p
           then
             let iperset' = Gwdb.IperSet.add iper results in
@@ -149,6 +150,7 @@ let is_subset_pfx s1 s2 =
 
 let filter_marital_names ?(remove_marital_names_match_only = false) match_name
     conf base p =
+  let conf = Config.Trimmed.from_config conf in
   Gwdb.get_sex p <> Def.Female
   ||
   let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper p) in

@@ -47,7 +47,7 @@ module AdvancedSearchMatch : sig
     bool
 
   val match_civil_status :
-    conf:Config.config ->
+    conf:Config.Trimmed.t ->
     base:Gwdb.base ->
     p:Authorized.Person.t ->
     sex:Def.sex ->
@@ -64,7 +64,7 @@ module AdvancedSearchMatch : sig
 
   val match_marriage :
     default:bool ->
-    conf:Config.config ->
+    conf:Config.Trimmed.t ->
     base:Gwdb.base ->
     p:Authorized.Person.t ->
     dates:Date.dmy option * Date.dmy option ->
@@ -105,7 +105,7 @@ module AdvancedSearchMatch : sig
     bool
 
   val match_other_events :
-    conf:Config.config ->
+    conf:Config.Trimmed.t ->
     base:Gwdb.base ->
     p:Authorized.Person.t ->
     dates:Date.dmy option * Date.dmy option ->
@@ -521,8 +521,9 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
    a person from the base to match. (ie. "Pierre-Jean de Bourbon de Vallois" matches
    with "Jean Pierre de Vallois de Bourbon" but not with "Jean de Bourbon")
 *)
-let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
+let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf'
     base =
+  let conf = Config.Trimmed.from_config conf' in
   let max_answers = Option.value ~default:max_int query_params.limit in
   let place_with_istr =
     let memo : (string * (string * Gwdb.istr option)) list ref = ref [] in
@@ -600,13 +601,13 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
       Lazy.force civil_match
       && (query_params.events = [] || check match_ query_params.events)
     in
-    if (not @@ SearchName.search_reject_p conf base unsafe_p) && pmatch () then
+    if (not @@ SearchName.search_reject_p conf' base unsafe_p) && pmatch () then
       (unsafe_p :: list, len + 1)
     else acc
   in
   let list, len =
     if query_params.only_root_ancestors then
-      advanced_search_sosa ~conf ~base ~match_person
+      advanced_search_sosa ~conf:conf' ~base ~match_person
     else
       match
         ((surname_search_mode, sn_list), (first_name_search_mode, fn_list))
@@ -614,19 +615,21 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf
       | (`Not_Exact_Prefix, _ :: _), _ ->
           let surname_prefix = Option.value ~default:"" query_params.surname in
           let remove_marital_names_match_only = fn_list = [] in
-          advanced_search_surname_prefix ~conf ~base ~match_person ~max_answers
-            ~remove_marital_names_match_only ~surname_prefix
+          advanced_search_surname_prefix ~conf:conf' ~base ~match_person
+            ~max_answers ~remove_marital_names_match_only ~surname_prefix
       | _, (`Not_Exact_Prefix, _ :: _) ->
           let first_name_prefix =
             Option.value ~default:"" query_params.first_name
           in
-          advanced_search_first_name_prefix ~conf ~base ~match_person
+          advanced_search_first_name_prefix ~conf:conf' ~base ~match_person
             ~max_answers ~first_name_prefix
       | (_, []), (_, []) ->
-          advanced_search_without_names ~conf ~base ~match_person ~max_answers
+          advanced_search_without_names ~conf:conf' ~base ~match_person
+            ~max_answers
       | _ ->
-          advanced_search_without_prefix ~conf ~base ~match_person ~max_answers
-            ~surname_search_mode ~sn_list ~first_name_search_mode ~fn_list
+          advanced_search_without_prefix ~conf:conf' ~base ~match_person
+            ~max_answers ~surname_search_mode ~sn_list ~first_name_search_mode
+            ~fn_list
   in
   (List.rev list, len)
 
