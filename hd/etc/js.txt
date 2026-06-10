@@ -41,7 +41,7 @@
     %end;
   %end;
   %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
-    <script src="%etc_prefix;js/rpc_client.min.js?hash=%apply;hash%with;%etc_prefix;js/rpc_client.min.js%end;"></script>
+    <script src="%etc_prefix;js/rpc_client.js?hash=%apply;hash%with;%etc_prefix;js/rpc_client.js%end;"></script>
   %end;
   %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
     <script src="%etc_prefix;js/line.js?hash=%apply;hash%with;%etc_prefix;js/line.js%end;"></script>
@@ -607,7 +607,7 @@ const RpcDatalistManager = {
 
   init: async function() {
     if (typeof Rpc === 'undefined') {
-      console.warn('RpcDatalistManager: rpc_client.min.js non chargé');
+      console.warn('RpcDatalistManager: rpc_client.js not loaded');
       return false;
     }
 
@@ -618,14 +618,14 @@ const RpcDatalistManager = {
         const response = await this.client.call('lookup', jargs);
         return JSON.parse(response);
       };
-      
+
       // Test connexion avec timeout 3 secondes
       const testPromise = this.client.lookup('%base.name;_fnames.cache', '', 1);
-      const timeoutPromise = new Promise((_, reject) => 
+      const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('RPC timeout')), 3000)
       );
       await Promise.race(%[testPromise, timeoutPromise%]);
-      
+
       this.isConnected = true;
       console.log('RpcDatalistManager: Connecté au serveur RPC');
       return true;
@@ -670,7 +670,7 @@ const RpcDatalistManager = {
     const self = this;
     document.querySelectorAll('input[list^="datalist_"]').forEach(input => {
       const datalistId = input.getAttribute('list');
-      
+
       // Recherche sur saisie (avec debounce)
       input.addEventListener('input', function() {
         clearTimeout(self.debounceTimers[datalistId]);
@@ -678,7 +678,7 @@ const RpcDatalistManager = {
           self.populateDatalist(datalistId, this.value);
         }, 100);
       });
-      
+
       // Recherche sur focus si champ déjà rempli
       input.addEventListener('focus', function() {
         if (this.value && this.value.length >= 2) {
