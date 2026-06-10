@@ -70,6 +70,16 @@
   (action
     (run brotli -q 11 %{input})))
 (rule
+  (target dagSvg.js.gz)
+  (deps (:input dagSvg.js))
+  (action
+    (run gzip -9 -k -f %{input})))
+(rule
+  (target dagSvg.js.br)
+  (deps (:input dagSvg.js))
+  (action
+    (run brotli -q 11 %{input})))
+(rule
   (target notes_upd_gallery.min.js.gz)
   (deps (:input notes_upd_gallery.min.js))
   (action
