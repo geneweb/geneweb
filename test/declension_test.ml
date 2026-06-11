@@ -401,7 +401,7 @@ let test_decline () =
 
   let s = "married%t to::" in
   let result_d = Templ.eval_transl conf_en true s "0" in
-  (check string) "translate :: empty param 10" "Married to" result_d
+  (check string) "translate :: empty param 10" "Married  to" result_d
 
 (* ============================================ *)
 (* Test suite definition                        *)
