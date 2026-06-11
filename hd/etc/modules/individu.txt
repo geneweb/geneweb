@@ -41,7 +41,7 @@
         %else;%first_name; %qualifier;%end;
       %end;
     %end;
-    %if;(has_public_name or has_qualifiers)
+    %if;has_public_name;
       <span class="d-block fw-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</span>
     %end;
     %if;has_aliases;
