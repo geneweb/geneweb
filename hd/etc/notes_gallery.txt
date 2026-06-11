@@ -120,13 +120,13 @@ function paintLegend(areaId, color) {
 
 // Unifie l'entrée en highlight (hover area OU hover legend item)
 function enterArea(area) {
-  const color = lockedColors[area.id];
+  const color = lockedColors%[area.id];
   maphilight.set(area, configFor(area, { hover: true, boost: !!color }));
   paintLegend(area.id, color ? '#' + color + 'aa' : '#ffccaa');
 }
 
 function leaveArea(area) {
-  const color = lockedColors[area.id];
+  const color = lockedColors%[area.id];
   maphilight.set(area, configFor(area));
   paintLegend(area.id, color ? '#' + color + '66' : '');
 }
@@ -154,7 +154,7 @@ function displayImage(img) {
 
     let cnt = 1, cnt_rlm = 1;
     const hasGroups = img.groups?.length;
-    const ungrouped = [];
+    const ungrouped = %[];
 
   img.map.forEach(r => {
     const t = get(r.t) || 'p';
@@ -196,7 +196,7 @@ function displayImage(img) {
     if (hasGroups && groupNum) {
       const bucket = img.groups.find(g => g.name == groupNum);
       if (bucket) {
-        (bucket._items ||= []).push(item);
+        (bucket._items ||= %[]).push(item);
       } else {
         ungrouped.push(item);
       }
@@ -276,11 +276,11 @@ document.addEventListener('mouseover', e => {
   const label = e.target.closest('.imap-group-legend');
   if (!label) return;
   const groupClass = 'group' + label.id.replace('g', '');
-  if (groupLocked[groupClass]) return;
+  if (groupLocked%[groupClass]) return;
 
   $$$('.' + groupClass).forEach((area, index) => {
     const color = GROUP_COLORS%[(colorOffset + index) % GROUP_COLORS.length%];
-    lockedColors[area.id] = color;
+    lockedColors%[area.id] = color;
     maphilight.set(area, {
       ...MAPHILIGHT_CONFIG, alwaysOn: true,
       fillColor: color, strokeColor: color, groupBy: false
@@ -293,12 +293,12 @@ document.addEventListener('mouseout', e => {
   const label = e.target.closest('.imap-group-legend');
   if (!label) return;
   const groupClass = 'group' + label.id.replace('g', '');
-  if (groupLocked[groupClass]) return;
+  if (groupLocked%[groupClass]) return;
 
   const areas = $$$('.' + groupClass);
   colorOffset += areas.length;
   areas.forEach(area => {
-    delete lockedColors[area.id];
+    delete lockedColors%[area.id];
     maphilight.set(area, MAPHILIGHT_CONFIG);
     paintLegend(area.id, '');
   });
@@ -312,12 +312,12 @@ document.addEventListener('click', e => {
   const groupClass = 'group' + label.id.replace('g', '');
 
   // Si on lock un nouveau groupe, délocker tous les autres d'abord
-  if (!groupLocked[groupClass]) {
+  if (!groupLocked%[groupClass]) {
     Object.keys(groupLocked).forEach(other => {
       if (groupLocked[other]) {
         groupLocked[other] = false;
         $$$('.imap-group-legend').forEach(el => el.classList.remove('imap-locked'));
-        $$$('area[class^="group"]').forEach(area => {
+        $$$('area%[class^="group"]').forEach(area => {
           delete lockedColors[area.id];
           maphilight.set(area, MAPHILIGHT_CONFIG);
           paintLegend(area.id, '');
@@ -326,21 +326,21 @@ document.addEventListener('click', e => {
     });
   }
 
-  groupLocked[groupClass] = !groupLocked[groupClass];
+  groupLocked%[groupClass] = !groupLocked%[groupClass];
   label.classList.toggle('imap-locked');
 
   const areas = $$$('.' + groupClass);
-  if (groupLocked[groupClass]) {
+  if (groupLocked%[groupClass]) {
     // Assigner les couleurs si pas déjà fait (cas click direct sans hover préalable)
     const firstArea = areas[0];
-    if (firstArea && !lockedColors[firstArea.id]) {
+    if (firstArea && !lockedColors%[firstArea.id]) {
       areas.forEach((area, index) => {
-        lockedColors[area.id] = GROUP_COLORS%[(colorOffset + index) % GROUP_COLORS.length%];
+        lockedColors%[area.id] = GROUP_COLORS%[(colorOffset + index) % GROUP_COLORS.length%];
       });
       colorOffset += areas.length;
     }
     areas.forEach(area => {
-      const color = lockedColors[area.id];
+      const color = lockedColors%[area.id];
       maphilight.set(area, {
         ...MAPHILIGHT_CONFIG, alwaysOn: true,
         fillColor: color, strokeColor: color,
@@ -362,13 +362,13 @@ document.addEventListener('click', e => {
 function updateNavButtons() {
   const atStart = current <= 0;
   const atEnd   = current >= imagesCount - 1;
-  ['#first', '#previous'].forEach(sel => {
+  %['#first', '#previous'].forEach(sel => {
     const el = $$(sel);
     if (!el) return;
     el.classList.toggle('disabled', atStart);
     el.classList.toggle('text-body-secondary', atStart);
   });
-  ['#next', '#last'].forEach(sel => {
+  %['#next', '#last'].forEach(sel => {
     const el = $$(sel);
     if (!el) return;
     el.classList.toggle('disabled', atEnd);
@@ -377,7 +377,7 @@ function updateNavButtons() {
 }
 
 function loadCurrentImage() {
-  displayImage(images_l[current]);
+  displayImage(images_l%[current]);
   $$('#current').textContent = current + 1;
   $$('#imageCount').textContent = imagesCount;
   $$('#index-wall').classList.remove('d-flex');
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
       json = j;
       images_l = j.images?.length
         ? j.images
-        : [{ img: j.img, map: j.map, groups: j.groups }];
+        : %[{ img: j.img, map: j.map, groups: j.groups }];
       imagesCount = images_l.length;
       document.title = json.title;
       const p = new URLSearchParams(window.location.search);
