@@ -350,19 +350,16 @@ let tnf s = "[" ^ s ^ "]"
 let transl conf w = try Hashtbl.find conf.lexicon w with Not_found -> tnf w
 
 let transl_nth conf w n =
-  Printf.eprintf "Util.transl_nth 1: %d, %s\n" n w;
   let len = String.length w in
   let w =
     if len > 3 && w.[len - 1] = ':' && w.[len - 2] = ':' && w.[len - 3] = ':'
     then String.sub w 0 (len - 3)
     else w
   in
-  Printf.eprintf "Util.transl_nth 2: %d, (%s)\n" n w;
   try nth_field (Hashtbl.find conf.lexicon w) n
   with Not_found -> tnf (nth_field w n)
 
 let gen_decline_basic wt s =
-  Printf.eprintf "Util.gen_decline_basic: %s, %s\n" wt s;
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
   (* detect wt = xxxx :x: -> decline s according to x *)
@@ -391,14 +388,11 @@ let gen_decline_basic wt s =
   | None -> start ^ " " ^ Mutil.decline 'n' rest
 
 let transl_decline conf w s =
-  Printf.eprintf "Util.transl decline: %s, %s\n" w s;
   let str = Translate.eval (gen_decline_basic (transl conf w) s) in
-  Printf.eprintf "result: %s\n" str;
   str
 
 (* in string s, handle xxx[aa|bb]Xcc according to X status (vowel) *)
 let simple_decline conf wt =
-  Printf.eprintf "Util.simple_decline: %s\n" wt;
   let len = String.length wt in
   let rec loop i =
     if i >= len then ""
@@ -427,7 +421,6 @@ let simple_decline conf wt =
   loop 0
 
 let gen_decline conf wt s1 s2 s2_raw =
-  Printf.eprintf "Util.gen_decline: %s, %s, %s\n" wt s1 s2;
   let string_of = function '1' -> Some s1 | '2' -> Some s2 | _ -> None in
   let len = String.length wt in
   let rec loop i =
