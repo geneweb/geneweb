@@ -98,6 +98,8 @@ let misc_notes_link s i =
           | Some i when i > 0 && b.[i - 1] = 'w' ->
               ( Some (String.sub b 0 i),
                 String.sub b (i + 1) (String.length b - i - 1) )
+          | Some i when i = 5 && String.sub b 0 5 = "image" ->
+              (Some "image", String.sub b (i + 1) (String.length b - i - 1))
           | _ -> (None, b)
         in
         let b, text =
