@@ -3,6 +3,15 @@
         bench-marshal bench-tabulate clean ci ocp-indent help bundle \
         dmg clean-bundle
 
+# OS / extension detection
+ifeq ($(OS),Windows_NT)
+  OS_TYPE := Win
+  EXT := .exe
+else
+  OS_TYPE := $(shell uname -s)
+  EXT :=
+endif
+
 # Variables for packagers.
 DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
