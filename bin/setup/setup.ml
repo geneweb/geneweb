@@ -528,8 +528,18 @@ let rec copy_from_stream conf print strm =
                 conf.env
           | 'f' ->
               (* see r *)
-              let in_file = get_variable strm in
-              let s = file_contents (slashify_linux_dos in_file) in
+              let in_file = get_variable strm |> slashify_linux_dos in
+              let s =
+                match Statics.read (in_file) with
+                | None -> (
+                    match Secure.open_in in_file with
+                    | exception Sys_error _ ->  Printf.sprintf "File %s absent" in_file
+                    | ic -> 
+                        let n = in_channel_length ic in
+                        let s = really_input_string ic n in
+                        close_in ic; s)
+                | Some content -> content
+              in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
               GWPARAM.test_reorg in_base;
               let benv = loc_read_base_env in_base in
