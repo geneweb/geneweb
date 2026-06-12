@@ -150,11 +150,8 @@ let old_print_statistics conf =
   Output.print_sstring conf "<ul>";
   let aux m label =
     Output.print_sstring conf {|<li><a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf {|m=|};
-    Output.print_sstring conf m;
-    Output.print_sstring conf {|&k=|};
-    Output.print_sstring conf (string_of_int n);
+    Output.print_url conf
+      (Util.commd' conf ~query:[ ("m", m); ("k", string_of_int n) ]);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (Printf.sprintf (Util.ftransl conf label) n);
     Output.print_sstring conf {|</a></li>|}

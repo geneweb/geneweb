@@ -76,8 +76,8 @@ let specify conf base n pl =
             (Geneweb.NameDisplay.referenced_person_title_text conf base p)
       | t :: _ ->
           Geneweb.Output.print_sstring conf {|<a href="|};
-          Geneweb.Output.print_string conf (Geneweb.Util.commd conf);
-          Geneweb.Output.print_string conf (Geneweb.Util.acces conf base p);
+          Geneweb.Output.print_url conf
+            (Geneweb.Util.commd' conf ~query:(Geneweb.Util.acces conf base p));
           Geneweb.Output.print_sstring conf {|"> |};
           Geneweb.Output.print_string conf
             (Geneweb.NameDisplay.title_html_of_person conf base p t);
@@ -144,18 +144,11 @@ let person_selected_with_redirect ~conf ~base ?(parameters = []) ~person () =
   | Some "R" -> relation_print conf base person
   | Some _ -> incorrect_request conf
   | None ->
-      let open Def in
       let url =
-        (Geneweb.Util.commd conf ^^^ Geneweb.Util.acces conf base person
-          :> string)
+        Geneweb.Util.commd' conf
+          ~query:(Geneweb.Util.acces conf base person @ parameters)
       in
-      let url =
-        List.fold_left
-          (fun url (param_name, param_value) ->
-            Printf.sprintf "%s&%s=%s" url param_name param_value)
-          url parameters
-      in
-      Wserver.http_redirect_temporarily url
+      Wserver.http_redirect_temporarily @@ Ext_uri.to_string url
 
 let updmenu_print = Geneweb.Perso.interp_templ "updmenu"
 

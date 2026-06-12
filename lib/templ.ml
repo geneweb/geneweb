@@ -1,4 +1,4 @@
-let commd ?excl ?trim conf = (Util.commd ?excl ?trim conf :> string)
+let commd ?excl ?trim conf = Util.commd_prefix ?excl ?trim conf
 
 exception Exc_located of TemplAst.loc * exn
 exception BadApplyArity
@@ -197,7 +197,9 @@ and eval_simple_variable conf = function
                  (Util.transl_nth conf "wizard/wizards/friend/friends/exterior"
                     1)
                  (if conf.wizard then
-                  Printf.sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>" (commd conf)
+                  Printf.sprintf "<a href=\"%s\">%d</a>"
+                    (Ext_uri.to_string
+                    @@ Util.commd' conf ~query:[ ("m", "CONN_WIZ") ])
                     cw
                  else string_of_int cw)
               else "")
@@ -263,7 +265,6 @@ and eval_simple_variable conf = function
           else c ^ k ^ "=" ^ v ^ "&")
         "" l
   | "url" ->
-      let c :> string = Util.commd conf in
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l :> (string * string) list =
         List.fold_left
@@ -271,7 +272,7 @@ and eval_simple_variable conf = function
           conf.env
           (List.rev_append conf.henv conf.senv)
       in
-      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ "&") c l
+      Ext_uri.to_string @@ Util.commd' conf ~query:l
   | "version" -> Version.txt
   | "/" -> ""
   | _ -> raise Not_found

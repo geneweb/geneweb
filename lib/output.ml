@@ -6,6 +6,7 @@ let print_string conf (s : [< `encoded | `escaped | `safe ] Adef.astring) =
   conf.Config.output_conf.Config.body ((s :> Adef.safe_string) :> string)
 
 let printf conf fmt = Printf.ksprintf conf.Config.output_conf.Config.body fmt
+let print_url conf url = print_sstring conf (Ext_uri.to_string url)
 let flush conf = conf.Config.output_conf.Config.flush ()
 
 let link_header ?(alternate_urls = []) conf canonical_url =
