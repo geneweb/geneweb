@@ -1,3 +1,13 @@
+(rule
+ (target statics.ml)
+ (deps
+  (source_tree statics))
+ (action
+  (setenv
+   SOURCE_DATE_EPOCH
+   0
+   (run %{bin:ocaml-crunch} --mode=plain -o statics.ml statics))))
+
 (executable
  (package geneweb)
  (name setup)
