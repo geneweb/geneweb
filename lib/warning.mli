@@ -18,13 +18,13 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** Person's events order has been modified *)
   | ChildrenNotInOrder of 'family * 'descend * 'person * 'person
       (** Children aren't ordered *)
-  | CloseChildren of 'family * 'person * 'person
+  | CloseChildren of ('family * 'person) * ('family * 'person)
       (** Age difference between two child is less then 7 month (except for twins) *)
   | DeadOld of 'person * Date.dmy
       (** Dead old (at the age older then 109 after 1900 year and older then 100 before) *)
   | DeadTooEarlyToBeFather of 'person * 'person
       (** Children is born in more then 1 year after his father's death *)
-  | DistantChildren of 'family * 'person * 'person
+  | DistantChildren of ('family * 'person) * ('family * 'person)
       (** Age gap between two of siblings greater then 50 years *)
   | FEventOrder of 'person * 'fevent * 'fevent
       (** Familial events haven't been ordered correctly *)

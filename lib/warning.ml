@@ -18,13 +18,13 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** Person's events order has been modified *)
   | ChildrenNotInOrder of 'family * 'descend * 'person * 'person
       (** Children aren't ordered *)
-  | CloseChildren of 'family * 'person * 'person
+  | CloseChildren of ('family * 'person) * ('family * 'person)
       (** Age difference between two child is less then 7 month (except for twins) *)
   | DeadOld of 'person * Date.dmy
       (** Dead old (at the age older then 109 after 1900 year and older then 100 before) *)
   | DeadTooEarlyToBeFather of 'person * 'person
       (** Children is born in more then 1 year after his father's death *)
-  | DistantChildren of 'family * 'person * 'person
+  | DistantChildren of ('family * 'person) * ('family * 'person)
       (** Age gap between two of siblings greater then 50 years *)
   | FEventOrder of 'person * 'fevent * 'fevent
       (** Familial events haven't been ordered correctly *)
@@ -90,10 +90,10 @@ let int_of_warning_tag = function
   | ChangedOrderOfFamilyEvents (_ifam, _fevents, _fevents2) -> 7
   | ChangedOrderOfPersonEvents (_p, _pevents, _pevents2) -> 8
   | ChildrenNotInOrder (_ifam, _fam, _p1, _p2) -> 9
-  | CloseChildren (_ifam, _p1, _p2) -> 10
+  | CloseChildren ((_ifam1, _p1), (_ifam2, _p2)) -> 10
   | DeadOld (_p, _d) -> 11
   | DeadTooEarlyToBeFather (_p1, _p2) -> 12
-  | DistantChildren (_ifam, _p1, _p2) -> 13
+  | DistantChildren ((_ifam1, _p1), (_ifam2, _p2)) -> 13
   | FEventOrder (_p, _fevent, _fevent2) -> 14
   | FWitnessEventAfterDeath (_p, _fevent, _ifam) -> 15
   | FWitnessEventBeforeBirth (_p, _fevent, _ifam) -> 16
@@ -139,14 +139,14 @@ let normalize_warning (warning : base_warning) : base_warning =
   | ChangedOrderOfFamilyEvents (_ifam, _fevents, _fevents2) -> warning
   | ChangedOrderOfPersonEvents (_p, _pevents, _pevents2) -> warning
   | ChildrenNotInOrder (_ifam, _fam, _p1, _p2) -> warning
-  | CloseChildren (ifam, p1, p2) ->
+  | CloseChildren ((ifam1, p1), (ifam2, p2)) ->
       if Gwdb.compare_iper (Gwdb.get_iper p2) (Gwdb.get_iper p1) < 0 then
-        CloseChildren (ifam, p2, p1)
+        CloseChildren ((ifam2, p2), (ifam1, p1))
       else warning
   | DeadOld (_p, _d) -> warning
   | DeadTooEarlyToBeFather (_p1, _p2) -> warning
-  | DistantChildren (ifam, p1, p2) ->
-      if compare_person p2 p1 < 0 then DistantChildren (ifam, p2, p1)
+  | DistantChildren ((ifam1, p1), (ifam2, p2)) ->
+      if compare_person p2 p1 < 0 then DistantChildren ((ifam2, p2), (ifam1, p1))
       else warning
   | FEventOrder (_p, _fevent, _fevent2) -> warning
   | FWitnessEventAfterDeath (_p, _fevent, _ifam) -> warning
@@ -274,16 +274,20 @@ let compare_normalized_base_warning (w1 : base_warning) (w2 : base_warning) :
       Gwdb.compare_ifam ifam ifam' >>= fun () ->
       compare_family fam fam' >>= fun () ->
       compare_person p1 p1' >>= fun () -> compare_person p2 p2'
-  | CloseChildren (ifam, p1, p2), CloseChildren (ifam', p1', p2') ->
-      Gwdb.compare_ifam ifam ifam' >>= fun () ->
-      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | ( CloseChildren ((ifam1, p1), (ifam2, p2)),
+      CloseChildren ((ifam1', p1'), (ifam2', p2')) ) ->
+      Gwdb.compare_ifam ifam1 ifam1' >>= fun () ->
+      compare_person p1 p1' >>= fun () ->
+      Gwdb.compare_ifam ifam2 ifam2' >>= fun () -> compare_person p2 p2'
   | DeadOld (p, d), DeadOld (p', d') ->
       compare_person p p' >>= fun () -> Date.compare_dmy d d'
   | DeadTooEarlyToBeFather (p1, p2), DeadTooEarlyToBeFather (p1', p2') ->
       compare_person p1 p1' >>= fun () -> compare_person p2 p2'
-  | DistantChildren (ifam, p1, p2), DistantChildren (ifam', p1', p2') ->
-      Gwdb.compare_ifam ifam ifam' >>= fun () ->
-      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | ( DistantChildren ((ifam1, p1), (ifam2, p2)),
+      DistantChildren ((ifam1', p1'), (ifam2', p2')) ) ->
+      Gwdb.compare_ifam ifam1 ifam1' >>= fun () ->
+      compare_person p1 p1' >>= fun () ->
+      Gwdb.compare_ifam ifam2 ifam2' >>= fun () -> compare_person p2 p2'
   | FEventOrder (p, fevent, fevent2), FEventOrder (p', fevent', fevent2') ->
       compare_person p p' >>= fun () ->
       compare_gen_fam_event fevent fevent' >>= fun () ->

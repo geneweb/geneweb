@@ -1074,21 +1074,25 @@ and mk_warning conf base =
             unsafe_mk_person conf base elder;
             unsafe_mk_person conf base x;
           ]
-    | CloseChildren (ifam, c1, c2) ->
+    | CloseChildren ((ifam1, c1), (ifam2, c2)) ->
+        let have_same_father = Gwdb.eq_ifam ifam1 ifam2 in
         Jingoo.Jg_types.Tset
           [
             Jingoo.Jg_types.Tsafe "CloseChildren";
-            get_fam ifam;
+            get_fam ifam1;
             unsafe_mk_person conf base c1;
             unsafe_mk_person conf base c2;
+            Jingoo.Jg_types.Tbool have_same_father;
           ]
-    | DistantChildren (ifam, c1, c2) ->
+    | DistantChildren ((ifam1, c1), (ifam2, c2)) ->
+        let have_same_father = Gwdb.eq_ifam ifam1 ifam2 in
         Jingoo.Jg_types.Tset
           [
             Jingoo.Jg_types.Tsafe "DistantChildren";
-            get_fam ifam;
+            get_fam ifam1;
             unsafe_mk_person conf base c1;
             unsafe_mk_person conf base c2;
+            Jingoo.Jg_types.Tbool have_same_father;
           ]
     | DeadOld (p, a) ->
         Jingoo.Jg_types.Tset
