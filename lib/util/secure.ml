@@ -14,7 +14,7 @@ let default_base_dir =
   let t = Dirs.make () in
   Dirs.(data_home t // "geneweb" // "bases")
 
-let bd_r = ref (Dirs.path default_base_dir)
+let bd_r = ref None
 
 (* [decompose: string -> string list] decompose a path into a list of
    directory and a basename. "a/b/c" -> [ "a" ; "b"; "c" ] *)
@@ -40,12 +40,14 @@ let add_assets d =
 (* set base dir to which acces could be allowed *)
 let set_base_dir d =
   let ok = decompose d in
-  bd_r := d;
+  bd_r := Some d;
   ok_r := ok :: (List.filter (( <> ) ok)) !ok_r
+
+let () = set_base_dir @@ Dirs.path default_base_dir
 
 (* get all assets *)
 let assets () = !assets_r
-let base_dir () = !bd_r
+let base_dir () = Option.get !bd_r
 
 (* [list_check_prefix d df] returns either [None] if [d] is not a prefix of
    [df], or [Some suffix], where [df = d @ suffix] *)
