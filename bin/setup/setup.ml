@@ -2,12 +2,22 @@ open Geneweb
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 
+let ( // ) = Filename.concat
+
+let default_bin_dir =
+  match Unix.getenv "INSIDE_DUNE" with
+  | exception Not_found -> Filename.dirname Sys.executable_name
+  | default ->
+      (* As dune uses symbolic links to populate the binary directory in
+         `_build/install` directory, we cannot use `executable_path` here. *)
+      default // Filename.parent_dir_name // "install" // "default" // "bin"
+
 let interface = ref "localhost"
 let port = ref 2316
 let gwd_port = ref 2317
 let default_lang = ref "en"
 let setup_dir = ref "."
-let bin_dir = ref ""
+let bin_dir = ref default_bin_dir
 let base_dir = ref (Secure.base_dir ())
 let lang_param = ref ""
 let bname = ref ""
