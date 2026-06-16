@@ -56,28 +56,30 @@ let iterator_gwo_file file_info input =
    operating system at the end of the current process. *)
 let iterator_gwo_files bar inputs file_info =
   let queue = Queue.of_seq @@ List.to_seq inputs in
-  let curr = ref (iterator_gwo_file file_info @@ Queue.pop queue) in
-  let len = Queue.length queue in
-  let cnt = ref 0 in
-  let rec next () =
-    let ic, it = !curr in
-    match it () with
-    | exception exn ->
-        let bt = Printexc.get_raw_backtrace () in
-        close_in_noerr ic;
-        Printexc.raise_with_backtrace exn bt
-    | Some _ as v -> v
-    | None -> (
-        close_in ic;
-        match Queue.pop queue with
-        | exception Queue.Empty -> None
-        | gwo ->
-            incr cnt;
-            ProgrBar.progress bar !cnt len;
-            curr := iterator_gwo_file file_info gwo;
-            next ())
-  in
-  next
+  if Queue.is_empty queue then fun _ -> None
+  else
+    let curr = ref (iterator_gwo_file file_info @@ Queue.pop queue) in
+    let len = Queue.length queue in
+    let cnt = ref 0 in
+    let rec next () =
+      let ic, it = !curr in
+      match it () with
+      | exception exn ->
+          let bt = Printexc.get_raw_backtrace () in
+          close_in_noerr ic;
+          Printexc.raise_with_backtrace exn bt
+      | Some _ as v -> v
+      | None -> (
+          close_in ic;
+          match Queue.pop queue with
+          | exception Queue.Empty -> None
+          | gwo ->
+              incr cnt;
+              ProgrBar.progress bar !cnt len;
+              curr := iterator_gwo_file file_info gwo;
+              next ())
+    in
+    next
 
 let generate_database ~no_warn ~bdir bar gwo_files =
   let iterator = iterator_gwo_files bar gwo_files in
@@ -247,7 +249,10 @@ let anonfun fname =
 
 let parse_output inputs output =
   match (inputs, output) with
-  | [], _ -> raise_bad "You must specify at least one input file."
+  | [], None ->
+      raise_bad
+        "You must specify at least one input file or a base name for a fresh \
+         database."
   | _ :: _ :: _, None ->
       raise_bad
         "In presence of several input files, we cannot infer the output \

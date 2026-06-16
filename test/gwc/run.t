@@ -39,8 +39,34 @@
   [2]
 
   $ gwc -bd .
-  Fatal error: exception Stdlib.Arg.Bad("You must specify at least one input file.")
+  Fatal error: exception Stdlib.Arg.Bad("You must specify at least one input file or a base name for a fresh database.")
   [2]
+
+  $ gwc -bd . -o bar
+  Compilation: 0 min 0 sec
+  Migration check for bar:
+    Classic .gwf exists: false
+    Reorg .gwf exists: false
+  Creating default configuration: bar.gwf
+  
+  pcnt 0 persons 0
+  fcnt 0 families 0
+  scnt 2 strings 3
+  *** saving persons array
+  *** saving ascends array
+  *** saving unions array
+  *** saving families array
+  *** saving couples array
+  *** saving descends array
+  *** saving strings array
+  *** create name index
+  *** create strings of sname
+  *** create strings of fname
+  *** create string index
+  *** create surname index
+  *** create first name index
+  *** ok
+  Database generation: 0 min 0 sec
 
   $ gwc -gwo -bd . ../galichet.gw
   Compilation: 0 min 0 sec
@@ -178,4 +204,3 @@
   Database generation: 0 min 0 sec
   ../galichet.gwo galichet.gwo differ: char 16, line 1
   [1]
-
