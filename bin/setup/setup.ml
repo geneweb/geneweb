@@ -8,7 +8,7 @@ let gwd_port = ref 2317
 let default_lang = ref "en"
 let setup_dir = ref "."
 let bin_dir = ref ""
-let base_dir = ref (Filename.concat Filename.current_dir_name "bases")
+let base_dir = ref (Secure.base_dir ())
 let lang_param = ref ""
 let bname = ref ""
 let no_o = ref true
@@ -512,7 +512,7 @@ let rec copy_from_stream conf print strm =
                 if c = ')' then () else loop ()
               in
               loop ()
-          | 'b' -> for_all conf print (all_db ".") strm
+          | 'b' -> for_all conf print (all_db !base_dir) strm
           | 'e' ->
               print "lang=";
               print conf.lang;
@@ -1353,7 +1353,7 @@ let rename conf =
       files
   in
   try
-    check_new_names conf rename_list (all_db ".");
+    check_new_names conf rename_list (all_db !base_dir);
     check_rename_conflict conf (snd (List.split rename_list));
     List.iter
       (fun (k, v) ->
@@ -1844,7 +1844,6 @@ let intro () =
         else !default_lang
     else !default_lang
   in
-  Secure.set_base_dir ".";
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
   Printf.eprintf "Start gwsetup\n%!";
