@@ -1,4 +1,4 @@
 #!/bin/sh
 cd `dirname "$0"`
 cd bases
-exec ../gw/gwsetup -gd ../gw "$@"
+exec ../gw/gwsetup -bd ../bases -gd ../gw "$@"
