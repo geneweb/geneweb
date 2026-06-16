@@ -1539,19 +1539,12 @@ let end_with s x =
   slen >= xlen && String.sub s (slen - xlen) xlen = x
 
 let print_typed_file conf typ fname =
-  let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
-  match ic_opt with
-  | Some ic ->
+  match Statics.read fname with
+  | Some content ->
       Output.status printer_conf Code.OK;
       Output.header printer_conf "Content-type: %s" typ;
-      Output.header printer_conf "Content-length: %d" (in_channel_length ic);
-      (try
-         while true do
-           let c = input_char ic in
-           Output.printf printer_conf "%c" c
-         done
-       with End_of_file -> ());
-      close_in ic
+      Output.header printer_conf "Content-length: %d" (String.length content);
+      Output.printf printer_conf "%s" content
   | None ->
       let title _ = Output.print_sstring printer_conf "Error" in
       header conf title;
@@ -1562,15 +1555,12 @@ let print_typed_file conf typ fname =
       trailer conf;
       raise Exit
 
-let raw_file conf s =
-  let fname =
-    List.fold_left Filename.concat !setup_dir (separate_slashed_filename s)
-  in
+let raw_file conf fname =
   let typ =
-    if end_with s ".png" then "image/png"
-    else if end_with s ".jpg" then "image/jpeg"
-    else if end_with s ".gif" then "image/gif"
-    else if end_with s ".css" then "text/css"
+    if end_with fname ".png" then "image/png"
+    else if end_with fname ".jpg" then "image/jpeg"
+    else if end_with fname ".gif" then "image/gif"
+    else if end_with fname ".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
