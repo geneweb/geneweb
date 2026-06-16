@@ -602,9 +602,10 @@ let get_others_related conf base p =
       | _ -> -1)
     l
 
-let get_event_witnessed conf base p =
+let get_event_witnessed conf' base p =
+  let conf = Config.Trimmed.from_config conf' in
   let related = List.sort_uniq Stdlib.compare (Gwdb.get_related p) in
-  let related_parents = get_others_related conf base p in
+  let related_parents = get_others_related conf' base p in
   let events_witnesses =
     let l = ref [] in
     let ignore_fevents =
@@ -615,7 +616,7 @@ let get_event_witnessed conf base p =
       (fun ic ->
         Hashtbl.add ignore_fevents ic ();
         (* TODO should it be pget_opt here? *)
-        let c = Util.pget conf base ic in
+        let c = Util.pget conf' base ic in
         List.iter
           (fun event_item ->
             (* check for duplicate Fevent *)
