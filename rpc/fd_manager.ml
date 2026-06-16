@@ -17,7 +17,7 @@ type t = {
       (* Map of active file descriptors to the last time
          a ping was received on it. *)
   max_connection : int limit;
-  idle_timeout : float limit;
+  timeout : float limit;
 }
 
 let limit_of_option = function Some v -> Limit v | None -> Unlimited
@@ -41,12 +41,12 @@ let close { handles; _ } fd =
   H.remove handles fd;
   safe_close fd
 
-let close_idle ({ handles; idle_timeout; _ } as t) =
+let close_idle ({ handles; timeout; _ } as t) =
   let now = Unix.gettimeofday () in
   let dead =
     H.fold
       (fun fd tm dead ->
-        match (Lwt_unix.state fd, idle_timeout) with
+        match (Lwt_unix.state fd, timeout) with
         | Lwt_unix.(Aborted _ | Closed), _ -> fd :: dead
         | Opened, Limit v when now -. tm > v -> fd :: dead
         | _ -> dead)
@@ -55,27 +55,29 @@ let close_idle ({ handles; idle_timeout; _ } as t) =
   let l = List.map (close t) dead in
   Lwt.join l
 
-let ping { handles; idle_timeout; _ } fd =
-  match idle_timeout with
+let ping { handles; timeout; _ } fd =
+  match timeout with
   | Unlimited -> ()
   | Limit _ ->
       let now = Unix.gettimeofday () in
       H.replace handles fd now
 
-let make ?max_connection ?idle_timeout () =
+let make ?max_connection ?timeout () =
   let max_connection = limit_of_option max_connection in
-  let idle_timeout = limit_of_option idle_timeout in
-  { handles = H.create 17; max_connection; idle_timeout }
+  let timeout = limit_of_option timeout in
+  { handles = H.create 17; max_connection; timeout }
 
 let log_manager_exn exn =
+  let bt = Printexc.get_raw_backtrace () in
   Logs.err (fun k ->
-      k "Uncaught exception in the file descriptor manager:@ %a" Util.pp_exn exn);
+      k "Uncaught exception in the file descriptor manager:@ %a"
+        Util.pp_exception (exn, bt));
   raise exn
 
 open Lwt.Infix
 
 let loop ?(sleep = 5.) t =
-  match t.idle_timeout with
+  match t.timeout with
   | Limit _ ->
       let rec loop_idle () =
         close_idle t >>= fun () -> Lwt_unix.sleep sleep >>= loop_idle
