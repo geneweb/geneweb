@@ -1,4 +1,4 @@
-(* $Id: mergeFamOk.ml,v 5.19 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: mergeFamOk.ml v 7.1 16/06/2026 18:10:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -222,7 +222,8 @@ let print_merge conf base =
       let sfam, sdes = reconstitute conf base ifam1 fam1 fam2 in
       let digest =
         let ini_sfam = UpdateFam.string_family_of base ifam1 in
-        Update.digest_family ini_sfam
+        let salt = Option.get conf.secret_salt in
+        Update.digest_family ~salt ini_sfam
       in
       let scpl =
         Adef.map_couple_p
