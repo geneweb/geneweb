@@ -618,12 +618,6 @@ let update_modification_times ~base ~(kind : [< `First_name | `Surname ])
 module Integrity : sig
   type integrity
 
-  module Code : sig
-    type t = Wellformed | PostMaritalGen
-
-    val current : t
-  end
-
   val check_index_integrity :
     kind:[< `Surname | `First_name ] ->
     base:Dbdisk.dsk_base ->
@@ -634,10 +628,7 @@ module Integrity : sig
     kind:[< `Surname | `First_name | `All ] -> base:Dbdisk.dsk_base -> unit
 
   val read_index_integrity : Dbdisk.dsk_base -> integrity
-
-  val integrity_matches :
-    Code.t -> [< `Surname | `First_name ] -> integrity -> bool
-
+  val integrity_matches : [< `Surname | `First_name ] -> integrity -> bool
   val has_index_integrity_file : Dbdisk.dsk_base -> bool
 end = struct
   let index_integrity_fname = "index_integrity"
@@ -645,7 +636,6 @@ end = struct
   module Code : sig
     type t = Wellformed | PostMaritalGen
 
-    val of_string : string -> t option
     val to_string : t -> string
     val current : t
     val matches : t -> string -> bool
@@ -685,7 +675,7 @@ end = struct
       close_in ic;
       integrity
 
-  let integrity_matches code kind integrity =
+  let integrity_matches kind integrity =
     Option.value ~default:false
       (match kind with
       | `Surname -> Option.map (Code.matches Code.current) integrity.surname
@@ -760,7 +750,7 @@ end = struct
       is_ok
     in
     let index_integrity = read_index_integrity base in
-    integrity_matches Code.current kind index_integrity
+    integrity_matches kind index_integrity
     || (is_integrity_empty kind index_integrity && check ())
 
   let has_index_integrity_file base =
@@ -825,7 +815,7 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
         if
           not
             (Integrity.has_index_integrity_file base
-            && Integrity.integrity_matches Integrity.Code.current kind
+            && Integrity.integrity_matches kind
                  (Integrity.read_index_integrity base))
         then Integrity.write_index_integrity ~kind ~base;
         base))
