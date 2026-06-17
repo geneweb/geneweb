@@ -126,28 +126,26 @@ val error_digest : config -> 'exn
 val error_same_file : config -> 'exn
 
 val digest_person :
-  ?salt:string -> (Geneweb_db.Driver.iper, key, string) gen_person -> string
-(** [digest_person ?salt per] generates a digest of the person [pers]. The
+  salt:string -> (Geneweb_db.Driver.iper, key, string) gen_person -> string
+(** [digest_person ~salt per] generates a digest of the person [per]. The
     function is intended for use in form to help prevent:
     - Concurrent edits of the same person.
-    - Cross-site Request Forgery (CSRF) attacks.
-
-    The optional [salt] parameter should be set to a secret value generated at
-    server startup to strengthen security. *)
+    - Cross-site Request Forgery (CSRF) attacks. [salt] is a secret value
+      generated at server startup; it is mandatory so that the compiler rejects
+      any call site that would omit it. *)
 
 val digest_family :
-  ?salt:string ->
+  salt:string ->
   (key, Geneweb_db.Driver.ifam, string) gen_family
   * key Adef.gen_couple
   * key gen_descend ->
   string
-(** [digest_family ?salt fam] generates a digest of the family [fam]. The
+(** [digest_family ~salt fam] generates a digest of the family [fam]. The
     function is intended for use in form to help prevent:
     - Concurrent edits of the same family.
-    - Cross-site Request Forgery (CSRF) attacks.
-
-    The optional [salt] parameter should be set to a secret value generated at
-    server startup to strengthen security. *)
+    - Cross-site Request Forgery (CSRF) attacks. [salt] is a secret value
+      generated at server startup; it is mandatory so that the compiler rejects
+      any call site that would omit it. *)
 
 val reconstitute_date : config -> string -> Adef.date option
 
