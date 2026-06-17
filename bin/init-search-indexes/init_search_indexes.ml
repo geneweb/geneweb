@@ -2,10 +2,10 @@ let files_exist database_path =
   List.exists
     (fun fname -> Sys.file_exists @@ Filename.concat database_path fname)
     [
-      "snames_marital.dat";
-      "snames_marital.inx";
-      "snames_marital_lower.dat";
-      "snames_marital_lower.inx";
+      (* "snames_marital.dat";
+         "snames_marital.inx";
+         "snames_marital_lower.dat";
+         "snames_marital_lower.inx";*)
       "patches";
     ]
 
