@@ -1062,18 +1062,18 @@ let feed_key (s1, s2, i, c, s3) =
   Hasher.SHA256.(
     string s1 <+> string s2 <+> int i <+> feed_create c <+> string s3)
 
-let digest_person =
+let digest_person ~salt =
   let feeder p = Hasher.SHA256.((gen_person iper feed_key string) p) in
-  Hasher.SHA256.feeder_to_hasher feeder
+  Hasher.SHA256.feeder_to_hasher ~salt feeder
 
-let digest_family =
+let digest_family ~salt =
   let feeder (f, c, d) =
     Hasher.SHA256.(
       (gen_family feed_key ifam string) f
       <+> (gen_couple feed_key) c
       <+> (gen_descend feed_key) d)
   in
-  Hasher.SHA256.feeder_to_hasher feeder
+  Hasher.SHA256.feeder_to_hasher ~salt feeder
 
 let get var key env =
   match p_getenv env (var ^ "_" ^ key) with
