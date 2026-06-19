@@ -704,27 +704,28 @@ let check_pevents base (warning : Warning.base_warning -> unit) p =
 
 let check_siblings ?(onchange = true) base warning ~mother callback =
   let children =
-    if onchange then (
-      let b = Gwdb.children_of_p base mother in
-      List.iter
-        (fun (ifam, b) ->
-          Option.iter
-            (fun ifam ->
-              Option.iter
-                (fun (b, a) ->
-                  let ifam = Gwdb.ifam_of_string ifam in
-                  warning
-                    (Warning.ChangedOrderOfChildren
-                       (ifam, Gwdb.foi base ifam, b, a)))
-                (sort_children base (Array.of_list b)))
-            ifam)
-        (Ext_list.groupby
-           ~key:(fun child_id ->
-             Option.map Gwdb.string_of_ifam
-               (Gwdb.get_parents @@ Gwdb.poi base child_id))
-           ~value:Fun.id b);
-      b)
-    else Gwdb.children_of_p base mother
+    let b = Gwdb.children_of_p base mother in
+    let () =
+      if onchange then
+        List.iter
+          (fun (ifam, b) ->
+            Option.iter
+              (fun ifam ->
+                Option.iter
+                  (fun (b, a) ->
+                    let ifam = Gwdb.ifam_of_string ifam in
+                    warning
+                      (Warning.ChangedOrderOfChildren
+                         (ifam, Gwdb.foi base ifam, b, a)))
+                  (sort_children base (Array.of_list b)))
+              ifam)
+          (Ext_list.groupby
+             ~key:(fun child_id ->
+               Option.map Gwdb.string_of_ifam
+                 (Gwdb.get_parents @@ Gwdb.poi base child_id))
+             ~value:Fun.id b)
+    in
+    b
   in
   let _, gap =
     List.fold_left
