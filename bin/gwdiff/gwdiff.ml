@@ -270,10 +270,7 @@ let compatible_death p1 p2 =
     p1.death = p2.death
     ||
     match (p1.death, p2.death) with
-    | Death (_, cdate1), Death (_, cdate2) ->
-        let date1 = Date.date_of_cdate cdate1 in
-        let date2 = Date.date_of_cdate cdate2 in
-        compatible_dates date1 date2
+    | Death (_, cdate1), Death (_, cdate2) -> compatible_cdates cdate1 cdate2
     | NotDead, _
     | DeadYoung, Death (_, _)
     | DeadDontKnowWhen, (Death (_, _) | DeadYoung | DeadDontKnowWhen)
