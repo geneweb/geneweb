@@ -100,27 +100,27 @@
       %apply;add_in_sorted_list(index)
       %apply;add_in_sorted_listc(index)
       %if;(family_cnt > 1 or cancel_links)
-        %self; %dates;%if;(self.title!=""), %self.title;%end;%nn;
+        %self %dates_notag;%if;(self.title!=""), %self.title;%end;%nn;
       %elseif;(not cancel_links)
         <a href="%prefix;%access;" data-index="%index;">%self;</a>
         %if;wizard;<a href="%prefix;m=MOD_IND&i=%index;"
-        title="[modify::person/persons]0">%dates;</a>%else;%dates;%end;
-        %if;(self.title!=""), %self.title;%end;%nn;
+        title="[modify::person/persons]0">%dates_notag;</a>%else;%dates_notag;%end;
+        %if;(self.title!=""), %self.title;%end;
       %end;%sp;
       %if;(wizard and not cancel_links)
-        <a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">
+        <a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%nn;
       %end;
-        <span class="small text-body-secondary text-nowrap">%nn;
+        <span class="small text-body-secondary text-nowrap fst-italic">%nn;
           %if;(are_engaged or are_married)&%elseif;are_not_married;X%end;
           %if;(on_marriage_date!="")%family.date_s;%end;
-        </span>
+        </span>%nn;
       %if;(wizard and not cancel_links)</a>%end;%sp;
       %if;(not cancel_links)
         <a href="%prefix;%spouse.access;">%spouse;</a>
-        %if;wizard;<a href="%prefix;m=MOD_IND&i=%spouse.index;" title="[modify::person/persons]0">%spouse.dates;</a>%else;%spouse.dates;%end;
+        %if;wizard;<a href="%prefix;m=MOD_IND&i=%spouse.index;" title="[modify::person/persons]0">%spouse.dates_notag;</a>%else;%spouse.dates_notag;%end;
         %if;(spouse.title!=""), %spouse.title;%end;%nn;
       %else;
-       %spouse; %spouse.dates;%if;(spouse.title!=""), %spouse.title;%end;%nn;
+       %spouse; %spouse.dates_notag;%if;(spouse.title!=""), %spouse.title;%end;%nn;
       %end;
       %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)
         %apply;add_in_sorted_list(spouse.index)
@@ -190,9 +190,8 @@
       %apply;add_in_sorted_listc(index)
       %if;(not cancel_links)
         <a href="%prefix;%access;" data-index="%index;">%self;</a>%if;(self.title!=""), %self.title;%end;
-      %else;
-        %self;
-      %end; %dates;%nn;
+      %else;%self;%nn;
+      %end;%dates;%nn;
     </span>
     <br data-surname="_%surname">
   %end;
