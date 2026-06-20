@@ -348,13 +348,51 @@ val person_of_gen_person :
 (** Create [person] from associated values. *)
 
 val poi : base -> iper -> person
-(** Create uninitialised person with giving id *)
+(** Create uninitialised person with giving id. Data is loaded lazily from the
+    base (with patches). *)
 
 val foi : base -> ifam -> family
-(** Create uninitialised family with giving id *)
+(** Create uninitialised family with giving id. Data is loaded lazily from the
+    base (with patches). *)
+
+val poi_nopending : base -> iper -> person
+(** [poi_nopending base iper] returns a person whose data is read directly from
+    the base main arrays, bypassing both pending and committed patches. Used by
+    the PPS cache to retrieve pre-patch field values. *)
+
+val foi_nopending : base -> ifam -> family
+(** [foi_nopending base ifam] returns a family whose data is read directly from
+    the base main arrays, bypassing both pending and committed patches. Used by
+    the PPS cache to retrieve pre-patch field values. *)
 
 val sou : base -> istr -> string
-(** Returns string that has giving id from the base *)
+(** Returns string that has giving id from the base (with patches). *)
+
+val sou_nopending : base -> istr -> string
+(** [sou_nopending base i] returns the string with id [i] read directly from the
+    base main string array, bypassing both pending and committed patches. Used
+    by the PPS cache to retrieve the pre-patch value of a place string. *)
+
+val iter_patched_ipers : base -> (iper -> unit) -> unit
+(** [iter_patched_ipers base f] iterates [f] over every [iper] present in the
+    committed patches hashtable, i.e. persons modified or added since the last
+    [gwc] run. Order is unspecified. *)
+
+val iter_patched_ifams : base -> (ifam -> unit) -> unit
+(** [iter_patched_ifams base f] iterates [f] over every [ifam] present in the
+    committed patches hashtable, i.e. families modified or added since the last
+    [gwc] run. Order is unspecified. *)
+
+type synchro_patch = {
+  mutable synch_list : (string * int list * int list) list;
+}
+(** Timestamped history of base modifications. Each entry
+    [(timestamp, ipers, ifams)] records the integer indices of persons and
+    families modified during one commit. *)
+
+val input_synchro : string -> synchro_patch
+(** [input_synchro bdir] reads the [synchro_patches] file from [bdir]. Returns
+    an empty patch list if the file does not exist. *)
 
 val no_person : iper -> (iper, iper, istr) Def.gen_person
 (** Returns unitialised [gen_person] with giving id *)
@@ -386,6 +424,9 @@ val nb_of_families : base -> int
 
 val bname : base -> string
 (** Returns database name *)
+
+val bdir : base -> string
+(** Returns the directory path where the database files are stored. *)
 
 val patch_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
 (** Modify/add person with the giving id in the base. New names are added to the

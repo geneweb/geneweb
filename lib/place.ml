@@ -60,6 +60,15 @@ let without_suburb =
 
 let has_suburb s = String.unsafe_get s 0 = '['
 
+(** Compiled once at module load. *)
+let re_parens = Str.regexp " ?(\\([^)]*\\))"
+
+(** Normalise parenthesised place components to comma-separated form. "Granville
+    (Manche)" -> "Granville, Manche" Fast path: strings without '(' are returned
+    unchanged with no allocation. *)
+let normalize_place_parens s =
+  if String.contains s '(' then Str.global_replace re_parens ", \\1" s else s
+
 type 'a env =
   | Vlist_data of (string * (string * int) list) list
   | Vlist_ini of string list
@@ -127,7 +136,6 @@ let fold_place_long inverted s =
       let sub = only_suburb s in
       let s = without_suburb s in
       let len = String.length s in
-      (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
       let rec loop iend list i ibeg =
         if i = iend then
           if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
@@ -145,27 +153,11 @@ let fold_place_long inverted s =
           in
           loop iend list (i + 1) ibeg
       in
-      let list =
-        if String.unsafe_get s (len - 1) = ')' then
-          match String.rindex_opt s '(' with
-          | Some i when i < len - 2 ->
-              let j =
-                let rec loop i =
-                  if i >= 0 && String.unsafe_get s i = ' ' then loop (i - 1)
-                  else i + 1
-                in
-                loop (i - 1)
-              in
-              String.sub s (i + 1) (len - i - 2) :: loop j [] 0 0
-          | _ -> loop len [] 0 0
-        else loop len [] 0 0
-      in
-      ((if inverted then List.rev list else list), sub)
+      ((if inverted then List.rev (loop len [] 0 0) else loop len [] 0 0), sub)
 
 (* TODO see how to merge these two fold_place_long *)
 let fold_place_long_v6 inverted s =
   let len = String.length s in
-  (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
   let rec loop iend list i ibeg =
     if i = iend then
       if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
@@ -224,7 +216,6 @@ let fold_place_short inverted s =
     else default ()
 
 let places_to_string inverse pl =
-  (* TODO reverse ??*)
   let pl = if inverse then List.rev pl else pl in
   let rec loop acc first = function
     | p :: l -> loop (p ^ (if first then "" else ", ") ^ acc) false l
@@ -246,6 +237,8 @@ let get_opt conf =
         "de";
         "bu";
         "ma";
+        "pe";
+        "fe";
         "f_sort";
         "up";
         "a_sort";
@@ -256,23 +249,29 @@ let get_opt conf =
   in
   String.concat "" l
 
+(** Heuristic initial hashtable size derived from conf.nb_of_persons. Estimate:
+    1 distinct place per 200 persons, clamped [1024, 2^18]. *)
+let ht_initial_size conf = max 1024 (min (1 lsl 18) (conf.nb_of_persons / 200))
+
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
     (fold_place : string -> 'a) (filter : 'a -> bool)
     (mk_value : 'b option -> Driver.person -> 'b) (fn : 'b -> 'c)
     (max_length : int) : ('a * 'c) array =
-  let ht_size = 2048 in
-  (* FIXME: find the good heuristic *)
-  let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
+  let ht : ('a, 'b) Hashtbl.t = Hashtbl.create (ht_initial_size conf) in
   let long = p_getenv conf.env "display" = Some "long" in
+  let ht_add_key key p =
+    match Hashtbl.find_opt ht key with
+    | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
+    | None ->
+        Hashtbl.add ht key (mk_value None p);
+        if Hashtbl.length ht > max_length && long then raise List_too_long
+  in
   let ht_add istr p =
-    let key : 'a = Driver.sou base istr |> fold_place in
-    if filter key then
-      match Hashtbl.find_opt ht key with
-      | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
-      | None ->
-          Hashtbl.add ht key (mk_value None p);
-          if Hashtbl.length ht > max_length && long then raise List_too_long
+    let key : 'a =
+      Driver.sou base istr |> normalize_place_parens |> fold_place
+    in
+    if filter key then ht_add_key key p
   in
   (if add_birth || add_death || add_baptism || add_burial then
      let aux b fn p =
@@ -295,11 +294,16 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
         let fam = Driver.foi base i in
         let pl_ma = Driver.get_marriage_place fam in
         if not (Driver.Istr.is_empty pl_ma) then
-          let fath = pget conf base (Driver.get_father fam) in
-          let moth = pget conf base (Driver.get_mother fam) in
-          if authorized_age conf base fath && authorized_age conf base moth then (
-            ht_add pl_ma fath;
-            ht_add pl_ma moth))
+          let key =
+            Driver.sou base pl_ma |> normalize_place_parens |> fold_place
+          in
+          if filter key then
+            let fath = pget conf base (Driver.get_father fam) in
+            let moth = pget conf base (Driver.get_mother fam) in
+            if authorized_age conf base fath && authorized_age conf base moth
+            then (
+              ht_add_key key fath;
+              ht_add_key key moth))
       (Geneweb_db.Driver.ifams base);
   let len = Hashtbl.length ht in
   let array = Array.make len (dummy_key, dummy_value) in
@@ -310,6 +314,111 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
       incr i)
     ht;
   array
+
+(** Predicate: should this person event be included given the current flags. *)
+let person_event_selected ~add_birth ~add_baptism ~add_death ~add_burial
+    ~add_pevents (name : Driver.istr Def.gen_pers_event_name) =
+  match name with
+  | Epers_Birth -> add_birth
+  | Epers_Baptism -> add_baptism
+  | Epers_Death -> add_death
+  | Epers_Burial -> add_burial
+  | Epers_Cremation -> add_burial
+  | _ -> add_pevents
+
+(** Predicate: should this family event be included given the current flags. *)
+let family_event_selected ~add_marriage ~add_fevents
+    (name : Driver.istr Def.gen_fam_event_name) =
+  match name with
+  | Efam_Marriage -> add_marriage
+  | Efam_MarriageBann -> add_marriage
+  | Efam_MarriageContract -> add_marriage
+  | Efam_MarriageLicense -> add_marriage
+  | Efam_PACS -> add_marriage
+  | Efam_Residence -> add_marriage
+  | _ -> add_fevents
+
+(** Convert the new flat cache format into the presentation format expected by
+    [print_html_places_surnames_*].
+
+    The cache is unfiltered; filtering by event type, authorised age, and
+    initial-letter [filter] is applied here at query time. *)
+let cache_to_array conf base (cache : Place_cache.t) ~add_birth ~add_baptism
+    ~add_death ~add_burial ~add_marriage ~add_pevents ~add_fevents fold_place
+    filter =
+  let ht : (string list * string, (string * Driver.iper list) list) Hashtbl.t =
+    Hashtbl.create (Hashtbl.length cache.Place_cache.persons)
+  in
+  let add_iper key sn_str iper =
+    if filter key then
+      match Hashtbl.find_opt ht key with
+      | None -> Hashtbl.add ht key [ (sn_str, [ iper ]) ]
+      | Some snl ->
+          let snl' =
+            match List.assoc_opt sn_str snl with
+            | None -> (sn_str, [ iper ]) :: snl
+            | Some ipl ->
+                if List.mem iper ipl then snl
+                else (sn_str, iper :: ipl) :: List.remove_assoc sn_str snl
+          in
+          Hashtbl.replace ht key snl'
+  in
+  Hashtbl.iter
+    (fun place events ->
+      let key = normalize_place_parens place |> fold_place in
+      List.iter
+        (fun (evname, iper) ->
+          if
+            person_event_selected ~add_birth ~add_baptism ~add_death ~add_burial
+              ~add_pevents evname
+          then
+            let p = Driver.poi base iper in
+            if authorized_age conf base p then
+              let sn = Driver.sou base (Driver.get_surname p) in
+              add_iper key sn iper)
+        events)
+    cache.Place_cache.persons;
+  Hashtbl.iter
+    (fun place events ->
+      let key = normalize_place_parens place |> fold_place in
+      List.iter
+        (fun (evname, ifam) ->
+          if family_event_selected ~add_marriage ~add_fevents evname then
+            let fam = Driver.foi base ifam in
+            let fath = Driver.get_father fam in
+            let moth = Driver.get_mother fam in
+            let pf = Driver.poi base fath in
+            let pm = Driver.poi base moth in
+            if authorized_age conf base pf && authorized_age conf base pm then begin
+              let sn_f = Driver.sou base (Driver.get_surname pf) in
+              let sn_m = Driver.sou base (Driver.get_surname pm) in
+              add_iper key sn_f fath;
+              add_iper key sn_m moth
+            end)
+        events)
+    cache.Place_cache.families;
+  let len = Hashtbl.length ht in
+  let dummy : (string list * string) * (string * Driver.iper list) list =
+    (([], ""), [])
+  in
+  let arr = Array.make len dummy in
+  let idx = ref 0 in
+  Hashtbl.iter
+    (fun k v ->
+      Array.unsafe_set arr !idx (k, v);
+      incr idx)
+    ht;
+  arr
+
+(** Main entry point for the PPS index. Loads the cache from disk if valid,
+    rebuilds it otherwise, then converts to the presentation format with event
+    filtering applied. *)
+let get_all_cached conf base ~add_birth ~add_baptism ~add_death ~add_burial
+    ~add_marriage ~add_pevents ~add_fevents fold_place filter =
+  let bdir = Driver.bdir base in
+  let cache = Place_cache.get_or_build bdir conf base in
+  cache_to_array conf base cache ~add_birth ~add_baptism ~add_death ~add_burial
+    ~add_marriage ~add_pevents ~add_fevents fold_place filter
 
 let rec sort_place_utf8 k1 k2 =
   match (k1, k2) with
@@ -326,13 +435,9 @@ let clean_ps ps =
   if ps.[0] = '(' && ps.[len - 1] = ')' then String.sub ps 1 (len - 2) else ps
 
 let find_in conf x ini =
-  (* look at possibility to have ini=aaa, bbb or aaa (bbb) *)
   let word = p_getenv conf.env "word" = Some "on" in
-  (* full words *)
   let case = p_getenv conf.env "case" = Some "on" in
-  (* case sensitive *)
   let any = p_getenv conf.env "any" = Some "on" in
-  (* anywhere in place list *)
   let low s = if not case then Name.lower s else s in
   let inil = String.split_on_char ',' ini in
   let inil =
@@ -436,7 +541,6 @@ let strip_pl keep pll =
 
 let print_html_places_surnames_short conf _base _link_to_ind
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
-  (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let long = p_getenv conf.env "display" = Some "long" in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
@@ -445,8 +549,6 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let opt = get_opt conf in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let l = Array.to_list arry in
-  (* build new list of (places, ipl) *)
-  (* accumulate snl according to keep *)
   let new_l =
     let rec loop prev_pl acc_snl acc_l = function
       | ((pl, _sub), snl) :: l when prev_pl = strip_pl keep pl ->
@@ -465,7 +567,6 @@ let print_html_places_surnames_short conf _base _link_to_ind
     in
     loop [] [] [] l
   in
-  (* sort *)
   let new_l =
     if a_sort then
       List.sort
@@ -485,7 +586,6 @@ let print_html_places_surnames_short conf _base _link_to_ind
         new_l
     else new_l
   in
-  (* accumulate snl entries with same pl value *)
   let new_l =
     let rec loop prev acc_snl acc_l new_l =
       match (new_l, prev) with
@@ -555,7 +655,6 @@ let print_html_places_surnames_short conf _base _link_to_ind
 
 let print_html_places_surnames_long conf base link_to_ind
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
-  (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let k =
     (Mutil.encode (match p_getenv conf.env "k" with Some s -> s | _ -> "")
       :> string)
@@ -567,7 +666,6 @@ let print_html_places_surnames_long conf base link_to_ind
   let opt = get_opt conf in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let l = Array.to_list arry in
-  (* sort global list according to a_sort, f_sort *)
   let l =
     if f_sort then
       List.sort
@@ -580,7 +678,6 @@ let print_html_places_surnames_long conf base link_to_ind
     else l
   in
   let print_sn (sn, ips) (pl, _sub) =
-    (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
     let places = places_to_string true pl in
     if link_to_ind then (
@@ -601,7 +698,6 @@ let print_html_places_surnames_long conf base link_to_ind
   let print_sn_list (pl, sub) (snl : (string * Driver.iper list) list) =
     Output.printf conf "<li>%s\n" (if sub <> "" then sub else "");
     let snl =
-      (* sort surname list according to a_sort, f_sort *)
       if f_sort then
         List.sort
           (fun (_, ipl1) (_, ipl2) ->
@@ -623,7 +719,6 @@ let print_html_places_surnames_long conf base link_to_ind
     Output.printf conf "\n";
     Output.print_sstring conf "</li>\n"
   in
-
   let rec loop prev = function
     | ((pl, sub), snl) :: l ->
         let rec loop1 prev (pl, sub) =
@@ -642,7 +737,6 @@ let print_html_places_surnames_long conf base link_to_ind
                   (x1 :: l1);
                 loop1 [] (x2 :: l2, sub))
           | _ -> Output.print_sstring conf "</ul></li>\n"
-          (* FIXME was assert false!! *)
         in
         loop1 prev (pl, sub);
         print_sn_list (pl, sub) snl;
@@ -654,32 +748,20 @@ let print_html_places_surnames_long conf base link_to_ind
   Output.print_sstring conf "</ul>\n"
 
 let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
-    ~add_death ~add_burial ~add_marriage max_length short filter =
+    ~add_death ~add_burial ~add_marriage ~add_pevents ~add_fevents max_length
+    short filter =
   let inverted =
     try List.assoc "places_inverted" conf.base_env = "yes"
     with Not_found -> false
   in
+  let fold = fold_place_long inverted in
+  (* Always use the cache; demote to short display a posteriori if the
+     result exceeds the threshold. *)
   let arry =
-    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      ~add_marriage ([], "") [] (fold_place_long inverted) filter
-      (fun prev p ->
-        (* add one ip to a list flagged by surname *)
-        let value = (Driver.get_surname p, Driver.get_iper p) in
-        match prev with Some l -> value :: l | None -> [ value ])
-      (fun v ->
-        let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
-        let rec loop acc l =
-          match (l, acc) with
-          | [], _ -> acc
-          | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc
-            when Driver.sou base sn = sn' ->
-              loop ((sn', iper :: iper_list) :: tl_acc) tl_list
-          | (sn, iper) :: tl_list, _ ->
-              loop ((Driver.sou base sn, [ iper ]) :: acc) tl_list
-        in
-        loop [] v)
-      max_length
+    get_all_cached conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      ~add_marriage ~add_pevents ~add_fevents fold filter
   in
+  let short = short || Array.length arry > max_length in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let title _ =
     Output.printf conf "%s / %s"
@@ -743,6 +825,8 @@ let print_all_places_surnames conf base =
   let add_baptism = p_getenv conf.env "ba" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
+  let add_pevents = p_getenv conf.env "pe" = Some "on" in
+  let add_fevents = p_getenv conf.env "fe" = Some "on" in
   let lim =
     try int_of_string @@ List.assoc "short_place_threshold" conf.base_env
     with _ -> 500
@@ -755,20 +839,8 @@ let print_all_places_surnames conf base =
         )
     | None -> ("", fun _ -> true)
   in
-  try
-    print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
-      ~add_death ~add_burial ~add_marriage lim false filter
-  with List_too_long ->
-    let conf =
-      {
-        conf with
-        env =
-          ("display", Adef.encoded "short")
-          :: List.remove_assoc "display" conf.env;
-      }
-    in
-    print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
-      ~add_death ~add_burial ~add_marriage lim true filter
+  print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism ~add_death
+    ~add_burial ~add_marriage ~add_pevents ~add_fevents lim false filter
 
 let print_list conf _base =
   let ifun =
