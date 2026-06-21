@@ -8287,10 +8287,12 @@ en: edit the families by clicking on the date of marriage of the row of one spou
 fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
 
     edit mode
+de: Bearbeitungsmodus (unterstrichene Daten direkt bearbeiten, Eingabetaste zur Bestätigung)
 en: edit mode (modify underlined data in-place, enter to validate)
 fr: mode édition (modifier les données soulignées sur place, entrée pour valider)
 
     edit this field
+de: diese Daten direkt bearbeiten
 en: edit this data in-place
 fr: éditer cette donnée sur place
 
@@ -8945,6 +8947,7 @@ en: recenter tree on
 fr: recentrer l’arbre sur
 
     refresh cache files
+de: zwischengespeicherte Dateien aktualisieren
 en: refresh cached files
 fr: rafraîchir les données en cache
 
@@ -13290,6 +13293,7 @@ sv: bild saknas
 tr: eksik görüntü
 
     missing family event
+de: fehlendes Familienereignis
 en: missing family event
 fr: événement familial manquant
 
@@ -18621,6 +18625,7 @@ sv: söner/döttrar/barn
 tr: oğulları/kızları/çocukları
 
     sorted by
+de: sortiert nach
 en: sorted by
 fr: trié par
 
