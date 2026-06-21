@@ -153,7 +153,7 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   --connection-timeout=3600 \
   --default-lang=en \
   --log='<stderr>' \
-  --plugins=uf:$BIN_DIR/plugins \
+  --load-all-plugins \
   2>> $GWDLOG &
 fi
 set +x
