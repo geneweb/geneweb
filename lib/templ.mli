@@ -38,9 +38,21 @@ type ('a, 'b) interp_fun = {
     unit;
 }
 
-val apply_format : Config.config -> int option -> string -> string -> string
-val eval_transl : Config.config -> bool -> string -> string -> string
-val eval_transl_lexicon : Config.config -> bool -> string -> string -> string
+val apply_format :
+  ?transl:bool ->
+  ?case:int ->
+  Config.config ->
+  int option ->
+  string ->
+  string ->
+  string
+
+val eval_transl :
+  ?transl:bool -> Config.config -> bool -> string -> string -> string
+
+val eval_transl_lexicon :
+  ?transl:bool -> Config.config -> bool -> string -> string -> string
+
 val eval_date_var : Config.config -> int -> string list -> 'a expr_val
 
 val output :

@@ -362,30 +362,34 @@ let transl_nth conf w n =
 let gen_decline_basic wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
-  if len >= 3 && wt.[len - 3] = ':' && wt.[len - 1] = ':' then
-    let start = String.sub wt 0 (len - 3) in
-    start ^ Mutil.decline wt.[len - 2] s
-  else
-    match String.rindex_opt wt '+' with
-    | Some i ->
-        if
-          i > 0
-          && wt.[i - 1] = ' '
-          && String.length wt - i = 7
-          && String.get wt (i + 1) = 'b'
-          && String.get wt (i + 2) = 'e'
-          && String.get wt (i + 3) = 'f'
-          && String.get wt (i + 4) = 'o'
-          && String.get wt (i + 5) = 'r'
-          && String.get wt (i + 6) = 'e'
-        then
-          let start = String.sub wt 0 (i - 1) in
-          if s = "" then start else Mutil.decline 'n' s ^ " " ^ start
-        else wt ^ Mutil.decline 'n' s1
-    | None -> wt ^ Mutil.decline 'n' s1
+  (* detect wt = xxxx :x: -> decline s according to x *)
+  let start, rest =
+    if len >= 3 && wt.[len - 3] = ':' && wt.[len - 1] = ':' then
+      (String.sub wt 0 (len - 4), Mutil.decline wt.[len - 2] s)
+    else (wt, s)
+  in
+  (* detect start = xxxx +before -> invert result *)
+  match String.rindex_opt start '+' with
+  | Some i ->
+      if
+        i > 0
+        && wt.[i - 1] = ' '
+        && String.length wt - i = 7
+        && String.get wt (i + 1) = 'b'
+        && String.get wt (i + 2) = 'e'
+        && String.get wt (i + 3) = 'f'
+        && String.get wt (i + 4) = 'o'
+        && String.get wt (i + 5) = 'r'
+        && String.get wt (i + 6) = 'e'
+      then
+        let start = String.sub wt 0 (i - 1) in
+        if s = "" then start else Mutil.decline 'n' s ^ " " ^ start
+      else wt ^ Mutil.decline 'n' s1
+  | None -> start ^ " " ^ Mutil.decline 'n' rest
 
 let transl_decline conf w s =
-  Translate.eval (gen_decline_basic (transl conf w) s)
+  let str = Translate.eval (gen_decline_basic (transl conf w) s) in
+  str
 
 (* in string s, handle xxx[aa|bb]Xcc according to X status (vowel) *)
 let simple_decline conf wt =
@@ -961,8 +965,8 @@ let access_status p =
     - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
 *)
 let acces_n conf base n x : Adef.escaped_string =
-  let first_name = Driver.p_first_name base x in
-  let surname = Driver.p_surname base x in
+  let first_name = Driver.p_first_name_raw base x in
+  let surname = Driver.p_surname_raw base x in
   if surname = "" then Adef.escaped ""
   else if accessible_by_key conf base x first_name surname then
     "p" ^<^ n ^^^ "="

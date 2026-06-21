@@ -670,6 +670,7 @@ let treat_request =
                          (fun (k, _) -> k <> "m" && k <> "v" && k <> "t")
                          conf.env
                      in
+                     (* Redirection vers m=S pour compatibilité *)
                      let conf =
                        {
                          conf with

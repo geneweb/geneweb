@@ -9,7 +9,8 @@
   wiki_test
   merge_test
   util_test
-  dag2html_test)
+  dag2html_test
+  declension_test)
  (libraries alcotest geneweb fmt))
 
 (test
