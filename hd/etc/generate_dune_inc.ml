@@ -6,7 +6,6 @@ let pp_rule ppf path =
   Format.fprintf ppf
     {|
 (rule
-  (alias install)
   (package geneweb)
   (targets %s %s)
   (deps (:input %s))
