@@ -120,6 +120,16 @@
   (action
     (run brotli -q 11 %{input})))
 (rule
+  (target updateField.min.js.gz)
+  (deps (:input updateField.min.js))
+  (action
+    (run gzip -9 -k -f %{input})))
+(rule
+  (target updateField.min.js.br)
+  (deps (:input updateField.min.js))
+  (action
+    (run brotli -q 11 %{input})))
+(rule
   (target checkdata.js.gz)
   (deps (:input checkdata.js))
   (action
@@ -247,6 +257,16 @@
 (rule
   (target tom-select.complete.min.js.br)
   (deps (:input tom-select.complete.min.js))
+  (action
+    (run brotli -q 11 %{input})))
+(rule
+  (target updateField.js.gz)
+  (deps (:input updateField.js))
+  (action
+    (run gzip -9 -k -f %{input})))
+(rule
+  (target updateField.js.br)
+  (deps (:input updateField.js))
   (action
     (run brotli -q 11 %{input})))
 (rule
