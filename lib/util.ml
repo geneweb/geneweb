@@ -324,7 +324,10 @@ let commd ?(excl = []) ?(trim = true) ?(henv = true) ?(senv = true)
         else Some (k, [ Mutil.decode v ]))
       env
   in
-  Uri.make ~path:conf.Config.command
+  Localized_url.make
+    ~conf:(Config.Trimmed.from_config conf)
+    ~lang:(Option.value ~default:Lang.english (Lang.from_tag conf.lang))
+    ~path:conf.Config.command
     ~query:
       ((if henv then aux conf.Config.henv else [])
       @ (if senv then aux conf.Config.senv else [])
@@ -338,7 +341,8 @@ let commd' ?excl ?trim ?henv ?senv ?query conf =
 
 let commd_prefix ?excl ?trim ?henv ?senv conf =
   let url = commd ?excl ?trim ?henv ?senv conf in
-  Ext_uri.to_string url ^ if Uri.query url = [] then "?" else "&"
+  Localized_url.to_string url
+  ^ if Localized_url.query url = [] then "?" else "&"
 
 let prefix_base conf =
   let cmmd = conf.Config.command in
@@ -653,12 +657,12 @@ let acces_n conf base n x =
   if surname = "" then []
   else if accessible_by_key conf base x first_name surname then
     let open Ext_list.Infix in
-    ("p" ^ n, Name.lower first_name)
-    @:: ("n" ^ n, Name.lower surname)
+    ("n" ^ n, Name.lower surname)
     @:: Ext_option.return_if
           (Gwdb.get_occ x <> 0)
           (fun () -> ("oc" ^ n, string_of_int (Gwdb.get_occ x)))
-    @?: []
+    @?: ("p" ^ n, Name.lower first_name)
+    @:: []
   else [ ("i" ^ n, Gwdb.string_of_iper (Gwdb.get_iper x)) ]
 
 let acces_n' conf base n x =
@@ -819,7 +823,7 @@ let update_family_loop conf base p s =
         let ifam = Gwdb.string_of_ifam (List.hd res) in
         let open Def in
         "<a href=\""
-        ^<^ Ext_uri.to_string
+        ^<^ Localized_url.to_string
               (commd' conf
                  ~query:[ ("m", "MOD_FAM"); ("i", ifam); ("ip", iper) ])
         ^<^ "\">" ^<^ s ^>^ "</a>"
@@ -827,7 +831,8 @@ let update_family_loop conf base p s =
         let iper = Gwdb.string_of_iper iper in
         let open Def in
         "<a href=\""
-        ^<^ Ext_uri.to_string (commd' conf ~query:[ ("m", "U"); ("i", iper) ])
+        ^<^ Localized_url.to_string
+              (commd' conf ~query:[ ("m", "U"); ("i", iper) ])
         ^<^ "\">" ^<^ s ^>^ "</a>"
     else s
 

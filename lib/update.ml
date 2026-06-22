@@ -356,7 +356,7 @@ let string_of_error conf =
          ("\"" ^ (fso_p base p :> string) ^ "\"")
          (fun () ->
            Printf.sprintf "<a href=\"%s\">"
-             (Ext_uri.to_string
+             (Localized_url.to_string
              @@ Util.commd' conf ~query:(Util.acces conf base p)))
          (fun () -> "</a>")
       ^

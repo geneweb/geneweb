@@ -378,7 +378,9 @@ let sign_text conf base sign info b1 b2 c1 c2 =
         @?: include_marr conf base 3 @ include_marr conf base 4)
   in
   let open Def in
-  "<a href=\"" ^<^ Ext_uri.to_string href ^<^ "\">"
+  "<a href=\""
+  ^<^ Localized_url.to_string href
+  ^<^ "\">"
   ^<^ (sign : Adef.safe_string)
   ^>^ "</a>"
 
