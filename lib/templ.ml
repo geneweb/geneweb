@@ -198,7 +198,7 @@ and eval_simple_variable conf = function
                     1)
                  (if conf.wizard then
                   Printf.sprintf "<a href=\"%s\">%d</a>"
-                    (Ext_uri.to_string
+                    (Localized_url.to_string
                     @@ Util.commd' conf ~query:[ ("m", "CONN_WIZ") ])
                     cw
                  else string_of_int cw)
@@ -272,7 +272,7 @@ and eval_simple_variable conf = function
           conf.env
           (List.rev_append conf.henv conf.senv)
       in
-      Ext_uri.to_string @@ Util.commd' conf ~query:l
+      Localized_url.to_string @@ Util.commd' conf ~query:l
   | "version" -> Version.txt
   | "/" -> ""
   | _ -> raise Not_found

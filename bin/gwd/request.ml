@@ -148,7 +148,7 @@ let person_selected_with_redirect ~conf ~base ?(parameters = []) ~person () =
         Geneweb.Util.commd' conf
           ~query:(Geneweb.Util.acces conf base person @ parameters)
       in
-      Wserver.http_redirect_temporarily @@ Ext_uri.to_string url
+      Wserver.http_redirect_temporarily @@ Geneweb.Localized_url.to_string url
 
 let updmenu_print = Geneweb.Perso.interp_templ "updmenu"
 
