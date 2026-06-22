@@ -1,61 +1,54 @@
 
 (rule
-  (target datatables.min.css.gz)
-  (deps (:input datatables.min.css))
-  (action
-    (run gzip -9 -k -f %{input})))
-(rule
-  (target datatables.min.css.br)
-  (deps (:input datatables.min.css))
-  (action
-    (run brotli -f -q 11 %{input})))
-(rule
-  (target bootstrap.min.css.gz)
-  (deps (:input bootstrap.min.css))
-  (action
-    (run gzip -9 -k -f %{input})))
-(rule
-  (target bootstrap.min.css.br)
-  (deps (:input bootstrap.min.css))
-  (action
-    (run brotli -f -q 11 %{input})))
-(rule
-  (target tom-select.bootstrap5.min.css.gz)
-  (deps (:input tom-select.bootstrap5.min.css))
-  (action
-    (run gzip -9 -k -f %{input})))
-(rule
-  (target tom-select.bootstrap5.min.css.br)
-  (deps (:input tom-select.bootstrap5.min.css))
-  (action
-    (run brotli -f -q 11 %{input})))
-(rule
-  (target all.min.css.gz)
+  (package geneweb)
+  (targets all.min.css.gz all.min.css.br)
   (deps (:input all.min.css))
   (action
-    (run gzip -9 -k -f %{input})))
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
 (rule
-  (target all.min.css.br)
-  (deps (:input all.min.css))
+  (package geneweb)
+  (targets bootstrap.min.css.gz bootstrap.min.css.br)
+  (deps (:input bootstrap.min.css))
   (action
-    (run brotli -f -q 11 %{input})))
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
 (rule
-  (target css.css.gz)
+  (package geneweb)
+  (targets css.css.gz css.css.br)
   (deps (:input css.css))
   (action
-    (run gzip -9 -k -f %{input})))
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
 (rule
-  (target css.css.br)
-  (deps (:input css.css))
+  (package geneweb)
+  (targets datatables.min.css.gz datatables.min.css.br)
+  (deps (:input datatables.min.css))
   (action
-    (run brotli -f -q 11 %{input})))
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
 (rule
-  (target fanchart.css.gz)
+  (package geneweb)
+  (targets fanchart.css.gz fanchart.css.br)
   (deps (:input fanchart.css))
   (action
-    (run gzip -9 -k -f %{input})))
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
 (rule
-  (target fanchart.css.br)
-  (deps (:input fanchart.css))
+  (package geneweb)
+  (targets tom-select.bootstrap5.min.css.gz tom-select.bootstrap5.min.css.br)
+  (deps (:input tom-select.bootstrap5.min.css))
   (action
-    (run brotli -f -q 11 %{input})))
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
