@@ -88,6 +88,7 @@
                 memtrace
                 ocamlformat
                 oui
+                ocp-index
               ]);
 
               inputsFrom = [

@@ -5,6 +5,7 @@
   ancient,
   brotli,
   cmdliner,
+  crunch,
   pcre2,
   benchmark,
   calendars,
@@ -49,6 +50,7 @@ buildDunePackage {
     brotli
     not-ocamlfind
     camlp5
+    crunch
   ];
 
   buildInputs = [
