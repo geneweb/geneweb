@@ -1,33 +1,28 @@
 let add_extension path ext = Format.sprintf "%s%s" path ext
 
-let pp_rule path =
+let pp_rule ppf path =
   let target_gzip = add_extension path ".gz" in
   let target_brotli = add_extension path ".br" in
-  Format.printf
+  Format.fprintf ppf
     {|
 (rule
-  (target %s)
+  (alias install)
+  (package geneweb)
+  (targets %s %s)
   (deps (:input %s))
   (action
-    (run gzip -9 -k -f %%{input})))
-(rule
-  (target %s)
-  (deps (:input %s))
-  (action
-    (run brotli -q 11 %%{input})))@?|}
-    target_gzip path target_brotli path
+    (concurrent
+      (run gzip -9 -k -f %%{input})
+      (run brotli -q 11 %%{input}))))@?|}
+    target_gzip target_brotli path
+
+let pp_newline ppf () = Format.fprintf ppf "\n"
 
 let () =
-  let handle = Unix.opendir Sys.argv.(1) in
-  Fun.protect ~finally:(fun () -> Unix.closedir handle) @@ fun () ->
-  let rec loop () =
-    match Unix.readdir handle with
-    | exception End_of_file -> ()
-    | s -> (
-        match Filename.extension s with
-        | ".css" | ".js" ->
-            pp_rule s;
-            loop ()
-        | _ -> loop ())
+  let files =
+    Array.to_list @@ Sys.readdir Sys.argv.(1)
+    |> List.filter (fun f ->
+        match Filename.extension f with ".css" | ".js" -> true | _ -> false)
+    |> List.sort String.compare
   in
-  loop ()
+  Format.printf "%a@." (Format.pp_print_list ~pp_sep:pp_newline pp_rule) files
