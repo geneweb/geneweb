@@ -4,7 +4,9 @@ let make ?path ~conf ~lang ~query () =
   let url =
     Uri.make
       ~path:(Option.value ~default:conf.Config.Trimmed.bname path)
-      ~query:(("lang", [ Lang.tag lang ]) :: query)
+      ~query:
+        (("lang", [ Lang.tag lang ])
+        :: List.filter (fun (key, _) -> not @@ String.equal key "lang") query)
       ()
   in
   { lang; url }
