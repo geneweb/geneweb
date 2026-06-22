@@ -124,13 +124,14 @@ let output_name_index_aux cmp cmp_per get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.Dbdisk.data.persons.len - 1 do
     let p = base.data.persons.get i in
-    let ks = get p in
-    List.iter
-      (fun k ->
-        match Dutil.IntHT.find_opt ht k with
-        | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
-        | None -> Dutil.IntHT.add ht k [ p.key_index ])
-      ks
+    if p.key_index <> -1 then
+      let ks = get p in
+      List.iter
+        (fun k ->
+          match Dutil.IntHT.find_opt ht k with
+          | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
+          | None -> Dutil.IntHT.add ht k [ p.key_index ])
+        ks
   done;
   let a = Array.make (Dutil.IntHT.length ht) (0, []) in
   ignore
