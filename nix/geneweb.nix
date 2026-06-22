@@ -20,7 +20,6 @@
   ounit,
   ppx_blob,
   ppx_deriving,
-  ppx_import,
   qcheck,
   qcheck-alcotest,
   stdlib-shims,
@@ -77,7 +76,6 @@ buildDunePackage {
     ounit
     ppx_blob
     ppx_deriving
-    ppx_import
     stdlib-shims
     unidecode
     uutf

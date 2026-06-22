@@ -1,11 +1,7 @@
 (library
  (public_name geneweb-plugins.fixbase_impl)
  (name fixbase_impl)
- (libraries
-  geneweb.register
-  geneweb.def_show
-  geneweb.gwd_lib
-  geneweb-plugins.sites)
+ (libraries geneweb.register geneweb.gwd_lib geneweb-plugins.sites)
  (preprocess
   (pps ppx_deriving.show)))
 

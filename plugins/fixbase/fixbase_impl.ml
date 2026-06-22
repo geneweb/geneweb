@@ -232,36 +232,36 @@ let fixbase_ok conf base =
         [%show: string list];
       ifneq p1.surnames_aliases p2.surnames_aliases "surnames_aliases"
         [%show: string list];
-      ifneq p1.titles p2.titles "titles" [%show: string Def_show.gen_title list];
+      ifneq p1.titles p2.titles "titles" [%show: string Def.gen_title list];
       ifneq p1.rparents p2.rparents "rparents"
-        [%show: (string, string) Def_show.gen_relation list];
+        [%show: (string, string) Def.gen_relation list];
       ifneq p1.related p2.related "related" [%show: string list];
       ifneq p1.occupation p2.occupation "occupation" (fun s -> s);
-      ifneq p1.sex p2.sex "sex" [%show: Def_show.sex];
-      ifneq p1.access p2.access "access" [%show: Def_show.access];
-      ifneq p1.birth p2.birth "birth" [%show: Def_show.cdate];
+      ifneq p1.sex p2.sex "sex" [%show: Def.sex];
+      ifneq p1.access p2.access "access" [%show: Def.access];
+      ifneq p1.birth p2.birth "birth" [%show: Adef.cdate];
       ifneq p1.birth_place p2.birth_place "birth_place" (fun s -> s);
       ifneq p1.birth_note p2.birth_note "birth_note" (fun s -> s);
       ifneq p1.birth_src p2.birth_src "birth_src" (fun s -> s);
-      ifneq p1.baptism p2.baptism "baptism" [%show: Def_show.cdate];
+      ifneq p1.baptism p2.baptism "baptism" [%show: Adef.cdate];
       ifneq p1.baptism_place p2.baptism_place "baptism_place" (fun s -> s);
       ifneq p1.baptism_note p2.baptism_note "baptism_note" (fun s -> s);
       ifneq p1.baptism_src p2.baptism_src "baptism_src" (fun s -> s);
-      ifneq p1.death p2.death "death" [%show: Def_show.death];
+      ifneq p1.death p2.death "death" [%show: Def.death];
       ifneq p1.death_place p2.death_place "death_place" (fun s -> s);
       ifneq p1.death_note p2.death_note "death_note" (fun s -> s);
       ifneq p1.death_src p2.death_src "death_src" (fun s -> s);
-      ifneq p1.burial p2.burial "burial" [%show: Def_show.burial];
+      ifneq p1.burial p2.burial "burial" [%show: Def.burial];
       ifneq p1.burial_place p2.burial_place "burial_place" (fun s -> s);
       ifneq p1.burial_note p2.burial_note "burial_note" (fun s -> s);
       ifneq p1.burial_src p2.burial_src "burial_src" (fun s -> s);
       ifneq p1.pevents p2.pevents "pevents"
-        [%show: (string, string) Def_show.gen_pers_event list];
+        [%show: (string, string) Def.gen_pers_event list];
       ifneq p1.notes p2.notes "notes" (fun s -> s);
       ifneq p1.psources p2.psources "psources" (fun s -> s);
       ifneq p1.key_index p2.key_index "key_index" (fun s -> s);
       ifneq a1.parents a2.parents "parents" [%show: string option];
-      ifneq a1.consang a2.consang "consang" [%show: Def_show.fix];
+      ifneq a1.consang a2.consang "consang" [%show: Adef.fix];
       ifneq u1.family u2.family "family" [%show: string array]
     in
     let dump_f f f' =
@@ -284,15 +284,15 @@ let fixbase_ok conf base =
       let c2 = mkc f' in
       let d2 = mkd f' in
       let ifneq x1 x2 label s = ifneq x1 x2 (Util.escape_html label) s in
-      ifneq f1.marriage f2.marriage "marriage" [%show: Def_show.cdate];
+      ifneq f1.marriage f2.marriage "marriage" [%show: Adef.cdate];
       ifneq f1.marriage_place f2.marriage_place "marriage_place" (fun s -> s);
       ifneq f1.marriage_note f2.marriage_note "marriage_note" (fun s -> s);
       ifneq f1.marriage_src f2.marriage_src "marriage_src" (fun s -> s);
       ifneq f1.witnesses f2.witnesses "witnesses" [%show: string array];
-      ifneq f1.relation f2.relation "relation" [%show: Def_show.relation_kind];
-      ifneq f1.divorce f2.divorce "divorce" [%show: Def_show.divorce];
+      ifneq f1.relation f2.relation "relation" [%show: Def.relation_kind];
+      ifneq f1.divorce f2.divorce "divorce" [%show: Def.divorce];
       ifneq f1.fevents f2.fevents "fevents"
-        [%show: (string, string) Def_show.gen_fam_event list];
+        [%show: (string, string) Def.gen_fam_event list];
       ifneq f1.comment f2.comment "comment" (fun s -> s);
       ifneq f1.origin_file f2.origin_file "origin_file" (fun s -> s);
       ifneq f1.fsources f2.fsources "fsources" (fun s -> s);

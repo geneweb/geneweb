@@ -91,3 +91,12 @@ val escaped : string -> escaped_string
 val encoded : string -> encoded_string
 val as_string : 'a astring -> string
 val safe_fn : (string -> string) -> 'a astring -> 'a astring
+
+val pp_cdate : Format.formatter -> cdate -> unit
+(** Printer for [cdate] *)
+
+val show_fix : fix -> string
+(** Convert [fix] to string *)
+
+val pp_fix : Format.formatter -> fix -> unit
+(** Printer for [fix] *)
