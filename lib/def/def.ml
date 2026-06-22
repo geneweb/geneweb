@@ -20,6 +20,7 @@ type relation_kind =
   | MarriageLicense
   | Pacs
   | Residence
+[@@deriving show { with_path = false }]
 
 (** Divorce status *)
 type divorce =
@@ -28,9 +29,11 @@ type divorce =
   | Separated_old
   | NotSeparated
   | Separated of Adef.cdate
+[@@deriving show { with_path = false }]
 
 (** Death reason *)
 type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
+[@@deriving show { with_path = false }]
 
 (** Death status *)
 type death =
@@ -40,15 +43,19 @@ type death =
   | DeadDontKnowWhen
   | DontKnowIfDead
   | OfCourseDead
+[@@deriving show { with_path = false }]
 
 (** Burial information *)
 type burial = UnknownBurial | Buried of Adef.cdate | Cremated of Adef.cdate
+[@@deriving show { with_path = false }]
 
 (** Rights for access to the personal data *)
 type access = IfTitles | Public | SemiPublic | Private
+[@@deriving show { with_path = false }]
 
 (** Title name *)
 type 'string gen_title_name = Tmain | Tname of 'string | Tnone
+[@@deriving show { with_path = false }]
 
 type 'string gen_title = {
   t_name : 'string gen_title_name;
@@ -58,6 +65,7 @@ type 'string gen_title = {
   t_date_end : Adef.cdate;
   t_nth : int;
 }
+[@@deriving show { with_path = false }]
 (** Type that represents information about nobility title of a person *)
 
 (** Witness kind for an event *)
@@ -70,6 +78,7 @@ type witness_kind =
   | Witness_Attending
   | Witness_Mentioned
   | Witness_Other
+[@@deriving show { with_path = false }]
 
 (** Personal event name. *)
 type 'string gen_pers_event_name =
@@ -124,6 +133,7 @@ type 'string gen_pers_event_name =
   | Epers_VenteBien
   | Epers_Will
   | Epers_Name of 'string
+[@@deriving show { with_path = false }]
 
 type ('person, 'string) gen_pers_event = {
   epers_name : 'string gen_pers_event_name;
@@ -134,6 +144,7 @@ type ('person, 'string) gen_pers_event = {
   epers_src : 'string;
   epers_witnesses : ('person * witness_kind) array;
 }
+[@@deriving show { with_path = false }]
 (** Personal event information *)
 
 (** Event name pertaining a family. *)
@@ -151,6 +162,7 @@ type 'string gen_fam_event_name =
   | Efam_PACS
   | Efam_Residence
   | Efam_Name of 'string
+[@@deriving show { with_path = false }]
 
 type ('person, 'string) gen_fam_event = {
   efam_name : 'string gen_fam_event_name;
@@ -161,6 +173,7 @@ type ('person, 'string) gen_fam_event = {
   efam_src : 'string;
   efam_witnesses : ('person * witness_kind) array;
 }
+[@@deriving show { with_path = false }]
 (** Event information pertaining a family. *)
 
 (** Relation type with parent (if not native) *)
@@ -170,6 +183,7 @@ type relation_type =
   | CandidateParent
   | GodParent
   | FosterParent
+[@@deriving show { with_path = false }]
 
 type ('person, 'string) gen_relation = {
   r_type : relation_type;
@@ -177,10 +191,11 @@ type ('person, 'string) gen_relation = {
   r_moth : 'person option;
   r_sources : 'string;
 }
+[@@deriving show { with_path = false }]
 (** Relation information with parents (if not native) *)
 
 (** Sex of person *)
-type sex = Male | Female | Neuter
+type sex = Male | Female | Neuter [@@deriving show { with_path = false }]
 
 type place = {
   other : string;
@@ -192,6 +207,7 @@ type place = {
   region : string;
   country : string;
 }
+[@@deriving show { with_path = false }]
 (** Place information *)
 
 type ('iper, 'person, 'string) gen_person = {
@@ -234,16 +250,20 @@ type ('iper, 'person, 'string) gen_person = {
   psources : 'string;
   key_index : 'iper;
 }
+[@@deriving show { with_path = false }]
 (** Polymorphic type describing information about person. *)
 
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
+[@@deriving show { with_path = false }]
 (** Person's ascendants (family where he is a children) with its consangunity
     rate (equal to relationship betwen his parents). *)
 
 (* Person's families to which he belongs as parent (union of families) *)
 type 'family gen_union = { family : 'family array }
+[@@deriving show { with_path = false }]
 
 type 'person gen_descend = { children : 'person array }
+[@@deriving show { with_path = false }]
 (** Children of the family *)
 
 type ('person, 'ifam, 'string) gen_family = {
@@ -260,6 +280,7 @@ type ('person, 'ifam, 'string) gen_family = {
   fsources : 'string;
   fam_index : 'ifam;
 }
+[@@deriving show { with_path = false }]
 (** Polymorphic type describing information about family. *)
 
 (** Database errors describing bad specification of the person *)
