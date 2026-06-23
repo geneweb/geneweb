@@ -42,6 +42,7 @@ depends: [
   "pp_loc"
   "dune-site"
   "conf-brotli"
+  "crunch"
   "utop" {with-dev-setup}
   "ocamlformat" {with-dev-setup & = "0.29.0"}
   "odoc" {with-doc}

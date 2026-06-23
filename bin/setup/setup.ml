@@ -351,11 +351,12 @@ let get_binding strm =
   in
   loop 0
 
+let ( // ) = Filename.concat
+
 let variables bname =
-  let dir = Filename.concat !setup_dir "setup" in
-  let fname = Filename.concat (Filename.concat dir "lang") bname in
-  let ic = open_in fname in
-  let strm = Stream.of_channel ic in
+  let fname = "lang" // bname in
+  let content = Option.get @@ Statics.read fname in
+  let strm = Stream.of_string content in
   let vlist, flist =
     let rec loop (vlist, flist) =
       match Stream.peek strm with
@@ -389,7 +390,6 @@ let variables bname =
     in
     loop ([], [])
   in
-  close_in ic;
   (List.rev vlist, flist)
 
 let nth_field s n =
@@ -402,18 +402,7 @@ let nth_field s n =
   loop 0 0
 
 let file_contents fname =
-  try
-    let ic = open_in fname in
-    let rec loop len =
-      match try Some (input_char ic) with End_of_file -> None with
-      | Some '\r' -> loop len
-      | Some c -> loop (Buff.store len c)
-      | None ->
-          close_in ic;
-          Buff.get len
-    in
-    loop 0
-  with Sys_error _ -> ""
+  match Statics.read fname with None -> "" | Some c -> c
 
 let cut_at_equal s =
   match String.index_opt s '=' with
@@ -529,10 +518,7 @@ let rec copy_from_stream conf print strm =
           | 'f' ->
               (* see r *)
               let in_file = get_variable strm in
-              let s =
-                file_contents
-                  (slashify_linux_dos (!bin_dir ^ "/setup/" ^ in_file))
-              in
+              let s = file_contents (slashify_linux_dos in_file) in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
               GWPARAM.test_reorg in_base;
               let benv = loc_read_base_env in_base in
@@ -833,27 +819,15 @@ and for_all conf print list strm =
   | _ -> ()
 
 let print_file conf bname =
-  let dir = Filename.concat !setup_dir "setup" in
-  let fname = Filename.concat (Filename.concat dir "lang") bname in
-  let ic_opt = try Some (open_in fname) with Sys_error _ -> None in
-  match ic_opt with
-  | Some ic ->
-      Output.status printer_conf Code.OK;
-      Output.header printer_conf "Content-type: text/html; charset=%s"
-        (charset conf);
-      copy_from_stream conf
-        (Output.print_sstring printer_conf)
-        (Stream.of_channel ic);
-      close_in ic;
-      trailer conf
-  | None ->
-      let title _ = Output.print_sstring printer_conf "Error" in
-      header conf title;
-      Output.print_sstring printer_conf "<ul><li>\n";
-      Output.printf printer_conf "Cannot access file \"%s\".\n" fname;
-      Output.print_sstring printer_conf "</ul>\n";
-      trailer conf;
-      raise Exit
+  let fname = "lang" // bname in
+  let content = Option.get @@ Statics.read fname in
+  Output.status printer_conf Code.OK;
+  Output.header printer_conf "Content-type: text/html; charset=%s"
+    (charset conf);
+  copy_from_stream conf
+    (Output.print_sstring printer_conf)
+    (Stream.of_string content);
+  trailer conf
 
 let error conf str =
   header conf (fun _ -> Output.print_sstring printer_conf "Incorrect request");
@@ -1548,36 +1522,18 @@ let update_nldb conf ok_file =
   in
   if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
 
-let separate_slashed_filename s =
-  let rec loop i =
-    match try Some (String.index_from s i '/') with Not_found -> None with
-    | Some j ->
-        if j > i then String.sub s i (j - i) :: loop (j + 1) else loop (j + 1)
-    | None ->
-        if i >= String.length s then []
-        else [ String.sub s i (String.length s - i) ]
-  in
-  loop 0
-
 let end_with s x =
   let slen = String.length s in
   let xlen = String.length x in
   slen >= xlen && String.sub s (slen - xlen) xlen = x
 
 let print_typed_file conf typ fname =
-  let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
-  match ic_opt with
-  | Some ic ->
+  match Statics.read fname with
+  | Some content ->
       Output.status printer_conf Code.OK;
       Output.header printer_conf "Content-type: %s" typ;
-      Output.header printer_conf "Content-length: %d" (in_channel_length ic);
-      (try
-         while true do
-           let c = input_char ic in
-           Output.printf printer_conf "%c" c
-         done
-       with End_of_file -> ());
-      close_in ic
+      Output.header printer_conf "Content-length: %d" (String.length content);
+      Output.printf printer_conf "%s" content
   | None ->
       let title _ = Output.print_sstring printer_conf "Error" in
       header conf title;
@@ -1588,15 +1544,12 @@ let print_typed_file conf typ fname =
       trailer conf;
       raise Exit
 
-let raw_file conf s =
-  let fname =
-    List.fold_left Filename.concat !setup_dir (separate_slashed_filename s)
-  in
+let raw_file conf fname =
   let typ =
-    if end_with s ".png" then "image/png"
-    else if end_with s ".jpg" then "image/jpeg"
-    else if end_with s ".gif" then "image/gif"
-    else if end_with s ".css" then "text/css"
+    if end_with fname ".png" then "image/png"
+    else if end_with fname ".jpg" then "image/jpeg"
+    else if end_with fname ".gif" then "image/gif"
+    else if end_with fname ".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
@@ -1678,56 +1631,76 @@ let lindex s c =
   in
   pos 0
 
+(* FIXME: This module mimics the in_channel behavior for strings to avoid
+   rewriting the input_lexicon parser. We must rewrite it in another PR. *)
+module Fake_in_channel : sig
+  type t
+
+  val in_channel_of_string : string -> t
+  val input_line : t -> string
+  val close_in : t -> unit
+end = struct
+  type t = string Queue.t
+
+  let in_channel_of_string s =
+    let lines = String.split_on_char '\n' s in
+    Queue.of_seq @@ List.to_seq lines
+
+  let input_line q =
+    match Queue.pop q with
+    | exception Queue.Empty -> raise End_of_file
+    | line -> line
+
+  let close_in _q = ()
+end
+
 let input_lexicon lang =
+  let open Fake_in_channel in
   let t = Hashtbl.create 501 in
-  try
-    let ic =
-      List.fold_right Filename.concat
-        [ !setup_dir; "setup"; "lang" ]
-        "lexicon.txt"
-      |> open_in
-    in
-    let derived_lang =
-      match lindex lang '-' with Some i -> String.sub lang 0 i | _ -> ""
-    in
-    try
-      (try
-         while true do
-           let k =
-             let rec find_key line =
-               if String.length line < 4 then find_key (input_line ic)
-               else if String.sub line 0 4 <> "    " then
-                 find_key (input_line ic)
-               else line
+  match Statics.read ("lang" // "lexicon.txt") with
+  | None -> t
+  | Some content -> (
+      let derived_lang =
+        match lindex lang '-' with Some i -> String.sub lang 0 i | _ -> ""
+      in
+      let ic = in_channel_of_string content in
+      try
+        (try
+           while true do
+             let k =
+               let rec find_key line =
+                 if String.length line < 4 then find_key (input_line ic)
+                 else if String.sub line 0 4 <> "    " then
+                   find_key (input_line ic)
+                 else line
+               in
+               find_key (input_line ic)
              in
-             find_key (input_line ic)
-           in
-           let k = String.sub k 4 (String.length k - 4) in
-           let rec loop line =
-             match lindex line ':' with
-             | Some i ->
-                 let line_lang = String.sub line 0 i in
-                 (if
-                    line_lang = lang
-                    || (line_lang = derived_lang && not (Hashtbl.mem t k))
-                  then
-                    let v =
-                      if i + 1 = String.length line then ""
-                      else String.sub line (i + 2) (String.length line - i - 2)
-                    in
-                    Hashtbl.add t k v);
-                 loop (input_line ic)
-             | None -> ()
-           in
-           loop (input_line ic)
-         done
-       with End_of_file -> ());
-      close_in ic;
-      t
-    with e ->
-      close_in ic;
-      raise e
-  with Sys_error _ -> t
+             let k = String.sub k 4 (String.length k - 4) in
+             let rec loop line =
+               match lindex line ':' with
+               | Some i ->
+                   let line_lang = String.sub line 0 i in
+                   (if
+                      line_lang = lang
+                      || (line_lang = derived_lang && not (Hashtbl.mem t k))
+                    then
+                      let v =
+                        if i + 1 = String.length line then ""
+                        else String.sub line (i + 2) (String.length line - i - 2)
+                      in
+                      Hashtbl.add t k v);
+                   loop (input_line ic)
+               | None -> ()
+             in
+             loop (input_line ic)
+           done
+         with End_of_file -> ());
+        close_in ic;
+        t
+      with e ->
+        close_in ic;
+        raise e)
 
 let setup (_addr, req) comm (env_str : Adef.encoded_string) =
   let conf =
@@ -1761,23 +1734,13 @@ let wrap_setup a b (c : Adef.encoded_string) =
     try bin_dir := Sys.getenv "GWGD" with Not_found -> ());
   try setup a b c with Exit -> ()
 
-let copy_text lang fname =
-  let dir = Filename.concat !setup_dir "setup" in
-  let fname = Filename.concat dir fname in
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic ->
-      let lexicon = input_lexicon lang in
-      let conf = { lang; comm = ""; env = []; request = []; lexicon } in
-      copy_from_stream conf print_string (Stream.of_channel ic);
-      flush stdout;
-      close_in ic
-  | _ ->
-      Printf.printf "\nCannot access file \"%s\".\n" fname;
-      Printf.printf "Type \"Enter\" to exit\n? ";
-      flush stdout;
-      let _ = input_line stdin in
-      ();
-      exit 2
+let copy_text lang =
+  let lexicon = input_lexicon lang in
+  let conf = { lang; comm = ""; env = []; request = []; lexicon } in
+  fun fname ->
+    let content = Option.get @@ Statics.read fname in
+    copy_from_stream conf print_string (Stream.of_string content);
+    flush stdout
 
 let daemon = ref false
 
