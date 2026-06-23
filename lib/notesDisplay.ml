@@ -171,12 +171,9 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
       if (title :> string) = "" then
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
-  if cnt0 = 0 && (title :> string) <> "" then (
-    Output.print_sstring conf "<br><br><h1>";
-    Output.print_string conf title;
-    Output.print_sstring conf "</h1>");
   let s = string_with_macros conf [] s in
   let lines = Wiki.extract_sub_part s cnt0 in
+  let has_next = Wiki.extract_sub_part s (cnt0 + 1) <> [] in
   let mode = "NOTES" in
   let wi =
     {
@@ -187,7 +184,7 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in
-  Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
+  Wiki.print_sub_part conf wi ~has_next conf.wizard mode fnotes cnt0 lines;
   Hutil.trailer conf
 
 let fmt_fnote_title conf base fnotes =

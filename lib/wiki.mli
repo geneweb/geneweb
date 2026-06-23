@@ -72,8 +72,18 @@ val split_title_and_text : string -> (string * string) list * string
     Otherwise, the title is the empty string. *)
 
 val print_sub_part :
-  config -> wiki_info -> bool -> string -> string -> int -> string list -> unit
-(** Prints an exctracted sub part *)
+  config ->
+  wiki_info ->
+  has_next:bool ->
+  bool ->
+  string ->
+  string ->
+  int ->
+  string list ->
+  unit
+(** [print_sub_part conf wi ~has_next can_edit edit_mode sub_fname cnt0 lines]
+    prints the extracted section [cnt0]. [has_next] enables the next-section
+    navigation button. *)
 
 val print_mod_view_page :
   config (* conf *) ->
