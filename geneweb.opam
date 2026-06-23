@@ -11,7 +11,7 @@ homepage: "https://geneweb.org"
 doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
-  "dune" {>= "3.11"}
+  "dune" {>= "3.14"}
   "ocaml"
   "geneweb-compat"
   "geneweb-http"
@@ -30,7 +30,6 @@ depends: [
   "ounit"
   "ppx_blob"
   "ppx_deriving"
-  "ppx_import"
   "stdlib-shims"
   "unidecode" {>= "0.5.0"}
   "uri"
@@ -42,7 +41,6 @@ depends: [
   "pp_loc"
   "dune-site"
   "conf-brotli"
-  "utop" {with-dev-setup}
   "ocamlformat" {with-dev-setup & = "0.29.0"}
   "odoc" {with-doc}
 ]
@@ -50,7 +48,6 @@ depopts: [
   "ancient" {>= "0.10.0"}
   "zarith"
 ]
-dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build: [
   ["dune" "subst"] {dev}
   [
@@ -66,9 +63,5 @@ build: [
     "@doc" {with-doc}
   ]
   ["dune" "install" "-p" name "--create-install-files" name]
-  ["cmdliner" "install" "tool-support"
-              "--update-opam-install=%{_:name}%.install"
-              "_build/install/default/bin/gwd" {os-family != "windows"}
-              "_build/install/default/bin/gwd.exe:gwd" {os-family = "windows"}
-              "_build/cmdliner-install"]
 ]
+dev-repo: "git+https://github.com/geneweb/geneweb.git"

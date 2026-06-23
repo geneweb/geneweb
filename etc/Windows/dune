@@ -1,0 +1,6 @@
+(install
+ (package geneweb)
+ (enabled_if
+  (= %{os_type} Win32))
+ (section doc)
+ (files README.txt LISEZMOI.txt))

@@ -1,5 +1,6 @@
-(lang dune 3.11)
+(lang dune 3.14)
 (using dune_site 0.1)
+(using directory-targets 0.1)
 (generate_opam_files true)
 
 (name geneweb)
@@ -36,7 +37,6 @@
     ounit
     ppx_blob
     ppx_deriving
-    ppx_import
     stdlib-shims
     (unidecode (>= "0.5.0"))
     uri
@@ -48,7 +48,6 @@
     pp_loc
     dune-site
     conf-brotli
-    (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.29.0")))
   )
   (depopts

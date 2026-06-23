@@ -76,6 +76,7 @@
             pkgs.mkShell {
               packages = [
                 ocamlWrapped
+                pkgs.makeself
               ]
               ++ (with ocamlPackages; [
                 qcheck

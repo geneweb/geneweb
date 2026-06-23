@@ -97,6 +97,10 @@ let var_script_name =
   let doc = "Internal variable used by the CGI mode." in
   C.Cmd.Env.info ~doc "SCRIPT_NAME"
 
+let var_bases_dir =
+  let doc = "Directory of bases" in
+  C.Cmd.Env.info ~doc "GW_BASES_DIR"
+
 (* Helper functions to reject some options on non-UNIX platforms. *)
 
 let unix_only_opt ~error ~default t =
@@ -138,14 +142,7 @@ let log_conv = C.Arg.Conv.make ~docv:"LOG" ~parser:log_parser ~pp:log_pp ()
 (* Directories commands *)
 let dirs_section = "DIRECTORIES"
 let default_base_dir = Secure.default_base_dir
-
-let default_gw_prefix =
-  match Sites.Sites.hd with
-  | s :: _ -> s
-  | _ ->
-      (* This case occurs if gwd hasn't been installed with dune. *)
-      Filename.current_dir_name // "gw"
-
+let default_gw_prefix = List.hd Sites.Sites.hd
 let default_images_prefix = default_gw_prefix // "images"
 let default_etc_prefix = default_gw_prefix // "etc"
 let default_images_dir = ""
@@ -156,7 +153,8 @@ let base_dir =
   C.Arg.(
     value
     & opt dirpath (Dirs.path default_base_dir)
-    & info [ "bd"; "base-dir" ] ~absent ~docs:dirs_section ~doc)
+    & info [ "bd"; "bases-dir" ] ~absent ~env:var_bases_dir ~docs:dirs_section
+        ~doc)
 
 let socket_dir =
   let doc =
@@ -591,6 +589,7 @@ let t =
   let doc = "Geneweb daemon" in
   let envs =
     [
+      var_bases_dir;
       var_secret_salt;
       var_gwd_slow_query_threshold;
       var_wserver;
