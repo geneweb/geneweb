@@ -18,7 +18,7 @@ let gwd_port = ref 2317
 let default_lang = ref "en"
 let setup_dir = ref (Filename.dirname Sys.argv.(0))
 let bin_dir = ref ""
-let base_dir = ref "."
+let bases_dir = ref "."
 let launch_dir = ref "."
 let lang_param = ref ""
 let bname = ref ""
@@ -77,9 +77,9 @@ let abs_setup_dir () =
     Filename.concat (Sys.getcwd ()) !setup_dir
   else !setup_dir
 
-(** Resolve a base name against [!base_dir]. Absolute paths pass through. *)
+(** Resolve a base name against [!bases_dir]. Absolute paths pass through. *)
 let base_path name =
-  if Filename.is_relative name then Filename.concat !base_dir name else name
+  if Filename.is_relative name then Filename.concat !bases_dir name else name
 
 let trailer _conf =
   Output.print_sstring printer_conf {|<br><div id="footer"><hr><div><em>|};
@@ -314,7 +314,7 @@ let macro conf = function
   | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> stringify !bin_dir
   | 'v' -> strip_spaces (s_getenv conf.env "odir")
-  | 'w' -> slashify !base_dir
+  | 'w' -> slashify !bases_dir
   | 'z' -> string_of_int !port
   | 'D' -> transl conf "!doc"
   | 'G' -> transl conf "!geneweb"
@@ -521,7 +521,7 @@ let rec copy_from_stream conf print strm =
                 if c = ')' then () else loop ()
               in
               loop ()
-          | 'b' -> for_all conf print (all_db !base_dir) strm
+          | 'b' -> for_all conf print (all_db !bases_dir) strm
           | 'e' ->
               print "lang=";
               print conf.lang;
@@ -573,7 +573,7 @@ let rec copy_from_stream conf print strm =
               let out = strip_spaces (s_getenv conf.env "o") in
               let bd =
                 let s = strip_spaces (s_getenv conf.env "bd") in
-                if s = "" then !base_dir else s
+                if s = "" then !bases_dir else s
               in
               let base = Filename.concat bd out in
               print_if conf print (Sys.file_exists (base ^ ".gwb")) strm
@@ -873,8 +873,8 @@ let infer_rc conf rc =
 
 let exec_f conf comm =
   let bd_arg =
-    if !base_dir = "." || !base_dir = "" then ""
-    else " -bd " ^ stringify !base_dir
+    if !bases_dir = "." || !bases_dir = "" then ""
+    else " -bd " ^ stringify !bases_dir
   in
   let s = comm ^ bd_arg ^ " > comm.log" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
@@ -1128,7 +1128,7 @@ let recover conf =
         if has_gwu dir then (dir, true) else (init_dir, false)
   in
   let conf = conf_with_env conf "anon" init_dir in
-  let dest_dir = !base_dir in
+  let dest_dir = !bases_dir in
   if init_dir = "" then print_file conf "err_miss.htm"
   else if init_dir = dest_dir then print_file conf "err_smdr.htm"
   else if not (Sys.file_exists init_dir) then print_file conf "err_ndir.htm"
@@ -1244,9 +1244,9 @@ let cleanup_1 conf =
   let in_base_path = base_path in_base in
   let in_base_dir = in_base ^ ".gwb" in
   let in_base_dir_path = in_base_path ^ ".gwb" in
-  let old_dir = Filename.concat !base_dir "old" in
+  let old_dir = Filename.concat !bases_dir "old" in
   (* Use a uniquely-named temp file in the system temp dir — completely
-     independent of base_dir and cwd. Tools get bare base names; exec_f
+     independent of bases_dir and cwd. Tools get bare base names; exec_f
      injects -bd so they find the base. *)
   let tmp_gw = Filename.temp_file "gwsetup_" ".gw" in
   let gwu_comm =
@@ -1355,7 +1355,7 @@ let rename conf =
       files
   in
   try
-    check_new_names conf rename_list (all_db !base_dir);
+    check_new_names conf rename_list (all_db !bases_dir);
     check_rename_conflict conf (snd (List.split rename_list));
     List.iter
       (fun (k, v) ->
@@ -1756,7 +1756,7 @@ let wrap_setup a b (c : Adef.encoded_string) =
     (try default_lang := Sys.getenv "GWLANG" with Not_found -> ());
     (try setup_dir := Sys.getenv "GWGD" with Not_found -> ());
     (try bin_dir := Sys.getenv "GWGD" with Not_found -> ());
-    try base_dir := Sys.getenv "GWBD" with Not_found -> ());
+    try bases_dir := Sys.getenv "GWBD" with Not_found -> ());
   try setup a b c with Exit -> ()
 
 let copy_text lang =
@@ -1780,7 +1780,7 @@ let deprecated_only () =
 let speclist =
   [
     ( "-bd",
-      Arg.String (fun x -> base_dir := x),
+      Arg.String (fun x -> bases_dir := x),
       "<dir> Directory where the databases are installed (default = current \
        directory)." );
     ( "-gwd_p",
@@ -1836,8 +1836,8 @@ let intro () =
   if !bin_dir = "" then bin_dir := !setup_dir;
   launch_dir := Sys.getcwd ();
   (* All tool invocations inject -bd via exec_f so they find bases in
-     base_dir regardless of cwd. *)
-  Secure.set_base_dir !base_dir;
+     bases_dir regardless of cwd. *)
+  Secure.set_base_dir !bases_dir;
   Printf.eprintf "Start gwsetup\n%!";
   default_lang := default_setup_lang;
 
@@ -1872,7 +1872,7 @@ let intro () =
   if not Sys.unix then (
     Unix.putenv "GWLANG" setup_lang;
     Unix.putenv "GWGD" !setup_dir;
-    Unix.putenv "GWBD" !base_dir);
+    Unix.putenv "GWBD" !bases_dir);
   try
     print_char '\n';
     flush stdout
