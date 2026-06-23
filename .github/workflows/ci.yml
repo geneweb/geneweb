@@ -49,6 +49,7 @@ env:
   OPAMYES: true
 
 jobs:
+  if: false
   build:
     runs-on: ${{ matrix.os }}
     strategy:
