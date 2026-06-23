@@ -13,12 +13,12 @@ let handlers : (string * handler) Queue.t HT.t = HT.create 17
 
 let[@inline] add_handler ~name ~meth ht h =
   let q =
-    match HT.find_opt ht meth with
-    | Some q -> q
-    | None ->
+    match HT.find ht meth with
+    | exception Not_found ->
         let q = Queue.create () in
         HT.add ht meth q;
         q
+    | q -> q
   in
   Queue.add (name, h) q
 
