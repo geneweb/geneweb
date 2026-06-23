@@ -25,3 +25,9 @@
  (package geneweb)
  (name heap_test)
  (libraries qcheck qcheck-alcotest geneweb_search))
+
+(test
+ (package geneweb)
+ (name base64_test)
+ (modules base64_test)
+ (libraries alcotest qcheck qcheck-alcotest gwd_lib))
