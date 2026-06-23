@@ -511,11 +511,7 @@ let plugin_flags =
         ( false,
           "you cannot use both --load-plugins and --load-all-plugins options" )
   | [], true -> `Ok All
-  | l, false ->
-      let acc =
-        List.fold_left (fun acc name -> { name } :: acc) [] (List.concat l)
-      in
-      `Ok (List (List.rev acc))
+  | l, false -> `Ok (List (List.concat_map (List.map (fun name -> { name })) l))
 
 (* Tracing & debugging commands *)
 
