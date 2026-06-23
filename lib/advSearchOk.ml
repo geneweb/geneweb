@@ -447,7 +447,7 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
     ~max_answers ~surname_search_mode ~sn_list ~first_name_search_mode ~fn_list
     =
   let persons_of_name_list strings_of persons_of n_list mode =
-    List.map
+    List.concat_map
       (fun x ->
         let eq = AdvancedSearchMatch.match_name ~search_list:n_list ~mode in
         let istrs = strings_of base x in
@@ -458,9 +458,8 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
             else acc)
           [] istrs)
       n_list
-    |> List.flatten |> List.sort_uniq compare
-    |> List.map (Gwdb.spi_find @@ persons_of base)
-    |> List.flatten
+    |> List.sort_uniq compare
+    |> List.concat_map (Gwdb.spi_find @@ persons_of base)
   in
 
   let skip_fname, skip_sname, list =
