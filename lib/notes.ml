@@ -186,9 +186,7 @@ let insert_brs_in_txt br_met ss =
         :: `End_element :: `Text [ "\n" ] :: insert false xs
     | [] -> []
   in
-  let lines : string list =
-    List.flatten @@ List.map (String.split_on_char '\n') ss
-  in
+  let lines : string list = List.concat_map (String.split_on_char '\n') ss in
   let signals = List.map (fun s -> `Text [ s ]) lines in
   let signals' = if br_met then remove_empty_txt_head signals else signals in
   if List.exists (fun s -> s <> `Text [ "" ]) signals' then

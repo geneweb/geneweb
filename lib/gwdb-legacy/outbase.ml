@@ -222,7 +222,7 @@ let output_name_index_lower_aux strings_store cmp cmp_per get base names_inx
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
     let lowered_string_ids =
-      List.flatten (List.map (fun istr -> get_lowered_string_ids istr) (get p))
+      List.concat_map (fun istr -> get_lowered_string_ids istr) (get p)
     in
     List.iter
       (fun id ->
