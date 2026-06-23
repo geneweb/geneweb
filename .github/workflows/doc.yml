@@ -15,6 +15,7 @@ permissions:
 
 
 jobs:
+  if: false
   build-and-deploy:
     runs-on: ubuntu-latest
     environment:
