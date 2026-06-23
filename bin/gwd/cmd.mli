@@ -52,8 +52,8 @@ type t = {
 }
 
 val parse : unit -> t Cmdliner.Cmd.eval_exit
-(** [parse ()] parses the [argv] and produces a structure of type [t] or an
-    error. *)
+(** [parse ()] parses the [argv] and either produces a structure of type [t] or
+    requests an exit, e.g. on [--help], [--version] or a parsing error. *)
 
 (* These default values and parsers are exposed in order to be used by
    the legacy CLI. *)

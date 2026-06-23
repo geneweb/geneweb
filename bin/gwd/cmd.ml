@@ -339,7 +339,7 @@ let wizard_password =
     & info [ "wizard-password" ] ~docs:security_section ~doc)
 
 let friend_password =
-  let doc = "Set a wizard password." in
+  let doc = "Set a friend password." in
   C.Arg.(
     value
     & opt (some string) None
@@ -347,13 +347,13 @@ let friend_password =
 
 let digest_password =
   let doc =
-    "Enables HTTP digest authentification schema instead of plain \n\
-    \  schema. This feature is not compatible with the CGI mode."
+    "Enables HTTP digest authentication scheme instead of plain \n\
+    \  scheme. This feature is not compatible with the CGI mode."
   in
   C.Arg.(value & flag & info [ "digest-password" ] ~docs:security_section ~doc)
 
 let allowed_tags_file =
-  let doc = "File of allowed HTML tags. One tag par line in the file." in
+  let doc = "File of allowed HTML tags. One tag per line in the file." in
   C.Arg.(
     value
     & opt (some filepath) None
@@ -411,7 +411,7 @@ let redirect_interface =
         ~docs:http_section ~docv:"INTERFACE" ~doc)
 
 let port =
-  let doc = "Set the TCP port listen by the HTTP server to $(docv)." in
+  let doc = "Set the TCP port used by by the HTTP server to $(docv)." in
   C.Arg.(
     value & opt int default_port
     & info [ "p"; "port" ] ~docs:http_section ~docv:"PORT" ~doc)
@@ -485,7 +485,7 @@ let browser_lang =
   let doc =
     "Select the user interface language based on the client configuration."
   in
-  let deprecated = "This option is noop" in
+  let deprecated = "This option is noop." in
   C.Arg.(
     value & flag
     & info [ "browser-lang" ] ~deprecated ~docs:web_interface_section ~doc)
@@ -543,7 +543,7 @@ let default_log = Stderr
 let debug =
   let doc =
     "Enable debug mode. Provides more verbose output and traces. The option \n\
-    \  turns predicatable mode on."
+    \  turns predictable mode on."
   in
   C.Arg.(value & flag & info [ "d"; "debug" ] ~docs:tracing_section ~doc)
 
@@ -563,7 +563,7 @@ let predictable_mode =
   let error = "--predictable-mode is available only on UNIX." in
   C.Arg.(
     unix_only_flag ~error & value & flag
-    & info [ "predictable-mode" ] ~docs:security_section ~doc)
+    & info [ "predictable-mode" ] ~docs:tracing_section ~doc)
 
 let verbosity =
   let doc =
@@ -580,7 +580,7 @@ let log =
     value & opt log_conv default_log & info [ "log" ] ~docs:tracing_section ~doc)
 
 let trace_failed_password =
-  let doc = "Trace failed authentification attempts." in
+  let doc = "Trace failed authentication attempts." in
   C.Arg.(
     value & flag & info [ "trace-failed-password" ] ~docs:tracing_section ~doc)
 
