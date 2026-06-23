@@ -42,6 +42,8 @@ let try_handlers ~meth f =
 
 let all_registered () =
   let t : unit HT.t = HT.create 17 in
-  Queue.iter (fun (name, _) -> HT.add t name ()) hooks;
-  HT.iter (fun _ q -> Queue.iter (fun (name, _) -> HT.add t name ()) q) handlers;
+  Queue.iter (fun (name, _) -> HT.replace t name ()) hooks;
+  HT.iter
+    (fun _ q -> Queue.iter (fun (name, _) -> HT.replace t name ()) q)
+    handlers;
   List.of_seq @@ Seq.map fst @@ HT.to_seq t
