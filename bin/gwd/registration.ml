@@ -1,7 +1,3 @@
-module Config = Geneweb.Config
-module Compat = Geneweb_compat
-module H = Digestif.SHA256
-
 module HT = Hashtbl.Make (struct
   type t = string
 
@@ -20,13 +16,11 @@ let[@inline] add_handler ~name ~meth ht h =
     match HT.find ht meth with
     | exception Not_found ->
         let q = Queue.create () in
-        Queue.add (name, h) q;
+        HT.add ht meth q;
         q
-    | q ->
-        Queue.add (name, h) q;
-        q
+    | q -> q
   in
-  HT.replace ht meth q
+  Queue.add (name, h) q
 
 let register ~name h1 h2 =
   List.iter (fun h -> Queue.add (name, h) hooks) h1;
@@ -48,6 +42,8 @@ let try_handlers ~meth f =
 
 let all_registered () =
   let t : unit HT.t = HT.create 17 in
-  Queue.iter (fun (name, _) -> HT.add t name ()) hooks;
-  HT.iter (fun _ q -> Queue.iter (fun (name, _) -> HT.add t name ()) q) handlers;
+  Queue.iter (fun (name, _) -> HT.replace t name ()) hooks;
+  HT.iter
+    (fun _ q -> Queue.iter (fun (name, _) -> HT.replace t name ()) q)
+    handlers;
   List.of_seq @@ Seq.map fst @@ HT.to_seq t
