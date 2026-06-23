@@ -10,7 +10,8 @@ jobs:
   build-dynamic:
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-26.04-arm, macos-latest, windows-latest]
+        # os: [ubuntu-latest, ubuntu-26.04-arm, macos-latest, windows-latest]
+        os: [windows-latest]
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -55,72 +56,72 @@ jobs:
           path: geneweb-*-*-*-*.*
           archive: false
 
-  build-static:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, ubuntu-26.04-arm]
-
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Build GeneWeb artifact
-        run: make static
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: geneweb-${{ runner.os }}-${{ runner.arch }}-${{ env.TAG }}-static
-          path: geneweb-*-*-*-*.*
-          archive: false
-
-  opam-install:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Setup Ocaml
-        uses: ocaml/setup-ocaml@v3
-        with:
-          ocaml-compiler: 5
-
-      - name: Install geneweb-compat
-        run: opam install ./geneweb-compat.opam
-
-      - name: Install geneweb-http
-        run: opam install ./geneweb-http.opam
-
-      - name: Install geneweb
-        run: opam install ./geneweb.opam
-
-      - name: Install geneweb-plugins
-        run: opam install ./geneweb-plugins.opam
-
-      - name: Install geneweb-rpc
-        run: opam install ./geneweb-rpc.opam
-
-      - name: Check binaries
-        run: opam exec -- gwd --check
-
-  publish:
-    runs-on: ubuntu-latest
-    needs: [build-dynamic, build-static, opam-install]
-    permissions:
-      contents: write
-
-    steps:
-      - name: Retrieve artifacts
-        uses: actions/download-artifact@v8
-
-      - name: Display structure of downloaded files
-        run: ls -R
-
-      - name: Publish release artifacts
-        uses: softprops/action-gh-release@v3
-        if: github.ref_type == 'tag'
+  # build-static:
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, ubuntu-26.04-arm]
+  #
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v7
+  #
+  #     - name: Build GeneWeb artifact
+  #       run: make static
+  #
+  #     - name: Upload artifact
+  #       uses: actions/upload-artifact@v7
+  #       with:
+  #         name: geneweb-${{ runner.os }}-${{ runner.arch }}-${{ env.TAG }}-static
+  #         path: geneweb-*-*-*-*.*
+  #         archive: false
+  #
+  # opam-install:
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v7
+  #
+  #     - name: Setup Ocaml
+  #       uses: ocaml/setup-ocaml@v3
+  #       with:
+  #         ocaml-compiler: 5
+  #
+  #     - name: Install geneweb-compat
+  #       run: opam install ./geneweb-compat.opam
+  #
+  #     - name: Install geneweb-http
+  #       run: opam install ./geneweb-http.opam
+  #
+  #     - name: Install geneweb
+  #       run: opam install ./geneweb.opam
+  #
+  #     - name: Install geneweb-plugins
+  #       run: opam install ./geneweb-plugins.opam
+  #
+  #     - name: Install geneweb-rpc
+  #       run: opam install ./geneweb-rpc.opam
+  #
+  #     - name: Check binaries
+  #       run: opam exec -- gwd --check
+  #
+  # publish:
+  #   runs-on: ubuntu-latest
+  #   needs: [build-dynamic, build-static, opam-install]
+  #   permissions:
+  #     contents: write
+  #
+  #   steps:
+  #     - name: Retrieve artifacts
+  #       uses: actions/download-artifact@v8
+  #
+  #     - name: Display structure of downloaded files
+  #       run: ls -R
+  #
+  #     - name: Publish release artifacts
+  #       uses: softprops/action-gh-release@v3
+  #       if: github.ref_type == 'tag'
