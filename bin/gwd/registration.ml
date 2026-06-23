@@ -1,7 +1,3 @@
-module Config = Geneweb.Config
-module Compat = Geneweb_compat
-module H = Digestif.SHA256
-
 module HT = Hashtbl.Make (struct
   type t = string
 
@@ -17,16 +13,14 @@ let handlers : (string * handler) Queue.t HT.t = HT.create 17
 
 let[@inline] add_handler ~name ~meth ht h =
   let q =
-    match HT.find ht meth with
-    | exception Not_found ->
+    match HT.find_opt ht meth with
+    | Some q -> q
+    | None ->
         let q = Queue.create () in
-        Queue.add (name, h) q;
-        q
-    | q ->
-        Queue.add (name, h) q;
+        HT.add ht meth q;
         q
   in
-  HT.replace ht meth q
+  Queue.add (name, h) q
 
 let register ~name h1 h2 =
   List.iter (fun h -> Queue.add (name, h) hooks) h1;
