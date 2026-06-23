@@ -117,24 +117,7 @@ let unix_only_flag ~error t =
   if t && not Sys.unix then `Error (false, error) else `Ok t
 
 (* Custom parsers *)
-
-let error fmt = Fmt.kstr (fun s -> Error s) fmt
-
-let ban_threshold_parser s =
-  match String.index s ',' with
-  | exception Not_found ->
-      error "Invalid threshold value. %S is not of the form: INT,INT" s
-  | i -> (
-      let f1 = String.sub s 0 i in
-      let f2 = String.sub s (i + 1) (String.length s - i - 1) in
-      match (int_of_string_opt f1, int_of_string_opt f2) with
-      | Some i1, Some i2 -> Ok (i1, i2)
-      | _ -> error "Invalid threshold value. %S is not of the form: INT,INT" s)
-
-let ban_threshold_conv =
-  C.Arg.Conv.make ~docv:"THRESHOLD" ~parser:ban_threshold_parser
-    ~pp:Fmt.(pair int int)
-    ()
+let ban_threshold_conv = C.Arg.(pair ~sep:',' int int)
 
 let log_parser s =
   match s with
