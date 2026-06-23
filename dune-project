@@ -37,7 +37,6 @@
     ounit
     ppx_blob
     ppx_deriving
-    ppx_import
     stdlib-shims
     (unidecode (>= "0.5.0"))
     uri
