@@ -58,9 +58,7 @@ val parse : unit -> t Cmdliner.Cmd.eval_exit
 (* These default values and parsers are exposed in order to be used by
    the legacy CLI. *)
 
-val default_images_prefix : string
 val default_images_dir : string
-val default_etc_prefix : string
 val default_connection_timeout : int
 val default_login_timeout : int
 val default_default_lang : string
@@ -68,4 +66,3 @@ val default_verbosity : int
 val default_max_pending_requests : int
 val default_n_workers : int
 val default_port : int
-val log_parser : string -> (log, string) result
