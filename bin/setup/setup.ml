@@ -536,10 +536,10 @@ let rec copy_from_stream conf print strm =
           | 'f' ->
               (* see r *)
               let in_file = get_variable strm in
-              let s =
-                file_contents
-                  (slashify_linux_dos (!bin_dir ^ "/setup/" ^ in_file))
-              in
+              print (Printf.sprintf "<!-- %%f%s -->" in_file);
+              let fname = !setup_dir // "setup" // in_file in
+              print (Printf.sprintf "<!-- %%f%s (%s)-->" in_file fname);
+              let s = file_contents fname in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
               GWPARAM.test_reorg in_base;
               let benv = loc_read_base_env in_base in
