@@ -421,6 +421,9 @@ let print_part_wiznote conf base wz s cnt0 =
   in
   let file_path = Notes.file_path conf base in
   let can_edit = (conf.wizard && conf.user = wz) || conf.manitou in
+  let has_next =
+    Wiki.extract_sub_part (s : Adef.safe_string :> string) (cnt0 + 1) <> []
+  in
   let wi =
     {
       Wiki.wi_mode = "NOTES";
@@ -430,7 +433,7 @@ let print_part_wiznote conf base wz s cnt0 =
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in
-  Wiki.print_sub_part conf wi can_edit "WIZNOTES" wz cnt0 lines;
+  Wiki.print_sub_part conf wi ~has_next can_edit "WIZNOTES" wz cnt0 lines;
   Hutil.trailer conf
 
 let wizard_auth_file_name conf =
