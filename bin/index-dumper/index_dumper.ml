@@ -53,7 +53,7 @@ let dump_index key database index =
 
 type fnames = { inx : string; dat : string }
 
-let filenames ~path ~(kind : [ `Surname | `Firstname ])
+let filenames ~path ~(kind : [ `Surname | `Firstname | `Surname_marital ])
     ~(index_type : [ `Default | `Lower ]) =
   let path =
     if Filename.check_suffix path ".gwb" then path else path ^ ".gwb"
@@ -62,6 +62,9 @@ let filenames ~path ~(kind : [ `Surname | `Firstname ])
     match (index_type, kind) with
     | `Lower, `Surname -> ("snames_lower.inx", "snames_lower.dat")
     | `Default, `Surname -> ("snames.inx", "snames.dat")
+    | `Lower, `Surname_marital ->
+        ("snames_marital_lower.inx", "snames_marital_lower.dat")
+    | `Default, `Surname_marital -> ("snames_marital.inx", "snames_marital.dat")
     | `Lower, `Firstname -> ("fnames_lower.inx", "fnames_lower.dat")
     | `Default, `Firstname -> ("fnames.inx", "fnames.dat")
   in
@@ -106,6 +109,12 @@ let main () =
               database_path database;
             print_endline "==========FNAMES LOWER==========";
             dump_indexes ~key:!key ~kind:`Firstname ~index_type:`Lower
+              database_path database;
+            print_endline "==========SNAMES MARITAL==========";
+            dump_indexes ~key:!key ~kind:`Surname_marital ~index_type:`Default
+              database_path database;
+            print_endline "==========SNAMES MARITAL LOWER==========";
+            dump_indexes ~key:!key ~kind:`Surname_marital ~index_type:`Lower
               database_path database;
             Gwdb.clear_persons_array database;
             Gwdb.clear_strings_array database))
