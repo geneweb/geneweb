@@ -1,0 +1,158 @@
+<!-- $Id: map.txt 18/02/2026 06:21:05 -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>Navigation générationnelle - Carte Généalogique</title>
+  %if;(bvar.robot_index="yes")<meta name="robots" content="index,follow">%else;<meta name="robots" content="none">%end;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+  <link rel="stylesheet" href="%etc_prefix;css/leaflet.css?version=2.0.0-alpha.1">
+  <link rel="stylesheet" href="%etc_prefix;css/map.css?hash=%apply;hash%with;%etc_prefix;css/map.css%end;">
+</head>
+<body%body_prop;>
+%let;l_v;%if;(e.v!="")%expr(e.v-1)%else;%if;has_parents;1%else;0%end;%end;%in;
+  <div id="loadingPopup" class="loading-popup" style="display: none;">
+    <div class="spinner"></div>
+    <div>Géolocalisation en cours…</div>
+    <div id="loadingProgress" style="margin-top: 10px; font-size: 12px; color: #666;"></div>
+    <div style="margin-top: 8px; font-size: 11px; color: #999;">
+      1 req./sec — API libre
+      <a href="https://nominatim.org/release-docs/latest/api/Overview/" target="_blank" rel="noopener">Nominatim</a>
+      / <a href="https://www.openstreetmap.org/about" target="_blank" rel="noopener">OpenStreetMap</a>
+    </div>
+  </div>
+  <div class="map-container">
+    <div id="map"></div>
+    <div class="generation-controls">
+      <div class="controls-header">
+        <span class="controls-title">Navigation</span>
+        <span class="current-generation">Cujus</span>
+      </div>
+      <div class="generation-slider-container">
+        <div class="slider-label">
+          <span>Cujus</span>
+          <span>%l_v;<sup>e</sup> génération</span>
+        </div>
+        <input type="range" class="generation-slider" id="generationSlider" min="0" max="%l_v;" value="%l_v;">
+      </div>
+      <div class="playback-controls">
+        <button class="play-button" id="playButton">
+          <span class="play-icon mr-1">▶</span>
+          <span class="play-text">Lire</span>
+        </button>
+        <div class="speed-control">
+          <span>Vitesse[:]</span>
+          <input type="range" class="speed-slider" id="speedSlider" min="1" max="5" step="1" value="3">
+          <span id="speedValue">3×</span>
+        </div>
+      </div>
+      <div class="timeline-indicator">
+        <div class="timeline-text" id="timelineText">%self; • Génération actuelle</div>
+      </div>
+      <div class="generation-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="placesCount">-</span>
+          <span class="stat-label">Lieux</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="eventsCount">-</span>
+          <span class="stat-label">Événements</span>
+        </div>
+      </div>
+      <div class="color-legend">
+        <div class="legend-title mb-1">Première apparition[:]</div>
+        <div class="legend-items">
+          <div>
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #1054a3;"></div>
+              <span>Gén. 1-2</span>
+            </span>
+            %if;(e.v>2)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #2171b5;"></div>
+              <span>Gén. 3-4</span>
+            </span>
+            %end;
+            %if;(e.v>4)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #4292c6;"></div>
+              <span>Gén. 5-6</span>
+            </span>
+            %end;
+            %if;(e.v>6)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #6baed6;"></div>
+              <span>Gén. 7-8</span>
+            </span>
+            %end;
+            %if;(e.v>8)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #9ecae1;"></div>
+              <span>Gén. 9-10</span>
+            </span>
+            %end;
+            %if;(e.v>10)
+            <span class="legend-item">
+              <div class="legend-color" style="background-color: #c6dbef;"></div>
+              <span>Gén. 11-12</span>
+            </span>
+            %end;
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.__mapData = {
+%let;zz;%sp;%sp;%in;
+%zz;"meta": {"person":"%self;", "index":"%index", "prefix":"%prefix;", "maxGen":%l_v;},
+%zz;"gen": {
+  %empty_sorted_list;
+  %let;lv;%expr(l_v+1)%in;
+  %for;j;0;lv;
+    %foreach;ancestor_level(j)
+      %if;(level<=j)
+        %foreach;ancestor;
+          %if;(ancestor.same = "")
+            %if;(ancestor.has_birth_place)
+              %apply;add_in_sorted_list(ancestor.birth_place,ancestor.birth_date.year,ancestor.index,ancestor.birth_place.sub,ancestor.birth_place.main)
+            %elseif;(ancestor.has_baptism_place)
+              %apply;add_in_sorted_list(ancestor.baptism_place,ancestor.baptism_date.year,ancestor.index,ancestor.baptism_place.sub,ancestor.baptism_place.main)
+            %end;
+            %if;(ancestor.has_death_place)
+              %apply;add_in_sorted_list(ancestor.death_place,ancestor.death_date.year,ancestor.index,ancestor.death_place.sub,ancestor.death_place.main)
+            %elseif;(ancestor.has_burial_place)
+              %apply;add_in_sorted_list(ancestor.burial_place,ancestor.burial_date.year,ancestor.index,ancestor.burial_place.sub,ancestor.burial_place.main)
+            %end;
+            %foreach;ancestor.family;
+              %if;(ancestor.spouse.index = spouse.index and marriage_place != "")
+                %apply;add_in_sorted_list(marriage_place,marriage_date.year,ancestor.index,marriage_place.sub,marriage_place.main)
+              %end;
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+    %zz;%zz;"%j;": {
+    %foreach;sorted_list_item;
+      %if;(prev_item.1!=item.1)
+        %zz;%zz;%zz;"%item.1;": {"s":%if;(item.2!="")%item.2;%else;""%end;%if;(item.4!=""),"sub":"%item.4;","main":"%item.5;"%end;, "i":%[%item.3;
+      %end;
+      %if;(prev_item.1=item.1)%nn;
+        , %item.3;%end;
+      %if;(next_item.1!=item.1)%nn;
+        %], "e":%if;(item.2!="")%item.2;%else;""%end;}%if;(next_item.1!=""),%end;%nl;
+      %end;
+    %end;
+    %zz;%zz;}%if;(j<e.v),%end;%nl;
+    %empty_sorted_list;
+  %end;
+  %zz;}
+};
+  </script>
+  <script type="module" src="%etc_prefix;js/map.min.js?hash=%apply;hash%with;%etc_prefix;js/map.min.js%end;"></script>
+</body>
+</html>
