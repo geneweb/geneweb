@@ -510,7 +510,7 @@ if test "$GWD2START" && test -z "$cgitest"; then
 
     test -n "$debug" && set -x
     sh -c "cd $BASES_DIR;
-    OCAMLRUNPARAM=b $SUDOPRFX ../gw/gwsetup -gd ../gw -lang en >gwsetup.log 2>&1 &"
+    OCAMLRUNPARAM=b $SUDOPRFX ../gw/gwsetup -bd ./ -gd ../gw -lang en >gwsetup.log 2>&1 &"
     set +x
     check_server_start 'gwsetup'
     grep -E "$FAILING_CONDITIONS" $BASES_DIR/gwsetup.log && \
