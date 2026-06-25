@@ -491,15 +491,17 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
         persons_of_name_list Gwdb.base_strings_of_first_name
           Gwdb.persons_of_first_name fn_list first_name_search_mode )
   in
-  let rec loop ((_, len) as acc) = function
+  let rec loop ((_, len) as acc) iper_set = function
     | [] -> acc
     | _ when len >= max_answers -> acc
-    | ip :: l ->
+    | ip :: l when not (Gwdb.IperSet.mem ip iper_set) ->
         loop
           (match_person ~skip_fname ~skip_sname acc (Util.pget conf base ip))
+          (Gwdb.IperSet.add ip iper_set)
           l
+    | _ :: l -> loop acc iper_set l
   in
-  loop ([], 0) list
+  loop ([], 0) Gwdb.IperSet.empty list
 
 (*
   Search for other persons in the base matching with the provided infos.

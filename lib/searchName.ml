@@ -157,7 +157,7 @@ let filter_marital_names ?(remove_marital_names_match_only = false) match_name
      && has_visible_marital_name match_name conf base p
 
 let match_name_starting_with pfx n =
-  is_subset_pfx [ Name.lower pfx.value ] (Name.split (Name.lower n))
+  is_subset_pfx (Name.split (Name.lower pfx.value)) (Name.split (Name.lower n))
 
 let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
     ~first_name_prefix ~surname_prefix ~limit =
