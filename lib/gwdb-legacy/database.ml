@@ -984,7 +984,7 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
                     Dutil.IntHT.add mem_strings istr lowered_strings_istrs;
                     lowered_strings_istrs
               in
-              let istrs = List.flatten (List.map aux (proj p)) in
+              let istrs = List.concat_map aux (proj p) in
               Dutil.IntHT.add mem_proj iper istrs;
               istrs
         in
