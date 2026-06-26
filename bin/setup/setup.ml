@@ -547,7 +547,7 @@ let rec copy_from_stream conf print strm =
               (* depending on when %f is called, conf may be sketchy *)
               (* conf will know bvars from basename.gwf and evars from url *)
               copy_from_stream conf print (Stream.of_string s)
-          | 'g' -> print_specific_file conf print "comm.log" strm
+          | 'g' -> print_specific_file conf print "/tmp/comm.log" strm
           | 'h' ->
               print "<input type=hidden name=lang value=";
               print conf.lang;
@@ -889,7 +889,7 @@ let exec_f conf comm =
     if !bases_dir = "." || !bases_dir = "" then ""
     else " -bd " ^ stringify !bases_dir
   in
-  let s = comm ^ bd_arg ^ " > comm.log" in
+  let s = comm ^ bd_arg ^ " > /tmp/comm.log" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   Printf.eprintf "$ %s\n" s;
   flush stderr;
@@ -1231,7 +1231,7 @@ let recover_2 conf =
       Sys.chdir dir;
       let comm =
         Filename.concat !bin_dir src_to_new
-        ^ " " ^ tmp ^ " -f -o " ^ out_file ^ " > " ^ "comm.log"
+        ^ " " ^ tmp ^ " -f -o " ^ out_file ^ " > /tmp/comm.log"
       in
       let rc = exec_f conf comm in
       rc)
