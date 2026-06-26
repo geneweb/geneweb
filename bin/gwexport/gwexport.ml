@@ -6,6 +6,7 @@ module Gutil = Geneweb_db.Gutil
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 
 let bases_dir = ref "."
+let out_file = ref ""
 
 type gwexport_opts = {
   asc : int option;
@@ -41,7 +42,7 @@ let default_opts =
     mem = false;
     no_notes = `none;
     no_picture = false;
-    oc = ("", prerr_string, fun () -> close_out stderr);
+    oc = ("", prerr_string, fun () -> flush stderr);
     parentship = false;
     picture_path = false;
     source = None;
@@ -106,11 +107,9 @@ let speclist c =
       Arg.Unit (fun () -> c := { !c with no_picture = true }),
       " don't extract individual picture." );
     ( "-o",
-      Arg.String
-        (fun s ->
-          let oc = open_out s in
-          c := { !c with oc = (s, output_string oc, fun () -> close_out oc) }),
-      "<FILE> output file name (default: stdout)." );
+      Arg.String (fun s -> out_file := s),
+      "<FILE> output file name (-bd value will be prepended)(default: stdout)."
+    );
     ( "-parentship",
       Arg.Unit (fun () -> c := { !c with parentship = true }),
       " select individuals involved in parentship computation between pairs of \

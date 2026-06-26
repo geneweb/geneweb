@@ -834,16 +834,16 @@ it: Consultare
 lv: Darboties ar
 sv: Konsultera
 
-    Content of comm.log
+    Content of /tmp/comm.log
 aa: comm.htm
-co: Cuntenutu di u schedariu comm.log
-de: Inhalt der Datei "comm.log"
-en: Content of comm.log
-es: Contenido del fichero "comm.log"
-fi: Tiedoston "comm.log" sisältö
-fr: Contenu du fichier comm.log
-it: Contenuto del file "comm.log"
-sv: Innehållet i filen "comm.log"
+co: Cuntenutu di u schedariu /tmp/comm.log
+de: Inhalt der Datei "/tmp/comm.log"
+en: Content of /tmp/comm.log
+es: Contenido del fichero "/tmp/comm.log"
+fi: Tiedoston "/tmp/comm.log" sisältö
+fr: Contenu du fichier /tmp/comm.log
+it: Contenuto del file "/tmp/comm.log"
+sv: Innehållet i filen "/tmp/comm.log"
 
     Content of result file
 aa: log.htm
@@ -1388,10 +1388,10 @@ fr: Les fichiers ont été reconstitués dans le dossier désigné (-odir).
 
     Data created without origin file
 aa: gwu_ok.htm
-co: I dati novi senza schedariu d’origine sò stati inversiati versu u schedariu « new_data.gw » o versu comm.log.
-de: Erstellte Daten ohne Originaldatei wurden in die Datei "new_data.gw" oder comm.log umgelenkt.
-en: Data created without origin file has been directed to the file "new_data.gw" or to comm.log.
-fr: Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier "new_data.gw" ou vers comm.log.
+co: I dati novi senza schedariu d’origine sò stati inversiati versu u schedariu « new_data.gw » o versu /tmp/comm.log.
+de: Erstellte Daten ohne Originaldatei wurden in die Datei "new_data.gw" oder /tmp/comm.log umgelenkt.
+en: Data created without origin file has been directed to the file "new_data.gw" or to /tmp/comm.log.
+fr: Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier "new_data.gw" ou vers /tmp/comm.log.
 
     It is up to you to manage
 aa: gwu_ok.htm
@@ -1698,18 +1698,18 @@ it: Ecco il suo contenuto
 lv: Ðeit ir "gwd.arg" saturs
 sv: Här är dess innehåll
 
-    Here is the contents of the file "comm.log"
+    Here is the contents of the file "/tmp/comm.log"
 aa: traces.htm
-co: Eccu u cuntenutu di u schedariu « comm.log »
-de: Hier ist der Inhalt der Datei "comm.log"
-en: Here is the contents of the file "comm.log"
-es: He aquí el contenido del fichero "comm.log"
-fi: Tässä tiedoston "comm.log" sisältö
-fr: Voici le contenu du fichier "comm.log"
-it: Ecco il contenuto del file "comm.log"
-lv: Ðeit ir datnes "comm.log" saturs
-lv: Ðeit ir datnes "comm.log" saturs
-sv: Här är innehållet i filen "comm.log"
+co: Eccu u cuntenutu di u schedariu « /tmp/comm.log »
+de: Hier ist der Inhalt der Datei "/tmp/comm.log"
+en: Here is the contents of the file "/tmp/comm.log"
+es: He aquí el contenido del fichero "/tmp/comm.log"
+fi: Tässä tiedoston "/tmp/comm.log" sisältö
+fr: Voici le contenu du fichier "/tmp/comm.log"
+it: Ecco il contenuto del file "/tmp/comm.log"
+lv: Ðeit ir datnes "/tmp/comm.log" saturs
+lv: Ðeit ir datnes "/tmp/comm.log" saturs
+sv: Här är innehållet i filen "/tmp/comm.log"
 
     Hide advanced request.
 aa: gwf_1.htm
@@ -2658,12 +2658,12 @@ de: stiller Modus.
 en: quiet mode.
 fr: peu de traces.
 
-    Read the alert messages in the file "comm.log"
+    Read the alert messages in the file "/tmp/comm.log"
 aa: bso_ok.htm
-co: Fighjà i messaghji d’alerta in u schedariu « comm.log »
-de: Lesen Sie die Warnmeldung in der Datei "comm.log"
-en: Read the alert messages in the file "comm.log"
-fr: Consulter les messages d’alerte dans le fichier "comm.log"
+co: Fighjà i messaghji d’alerta in u schedariu « /tmp/comm.log »
+de: Lesen Sie die Warnmeldung in der Datei "/tmp/comm.log"
+en: Read the alert messages in the file "/tmp/comm.log"
+fr: Consulter les messages d’alerte dans le fichier "/tmp/comm.log"
 
     Recover
 aa: recover1.htm
@@ -3517,6 +3517,12 @@ it: Verrà creata una directory chiamata "%o.gwb".
 lv: Tâs rezultâtâ tiks izveidots katalogs "%o.gwb".
 sv: Detta skapar en katalog benämnd "%o.gwb".
 
+
+    This has built the file
+aa: bsu_ok.htm
+en: This has built the file
+fr: Ceci a construit le fichier
+
     This can be useful, temporarilly, when you make a cleanup of your database, if it is accessible to Internet, to avoid that "wizards" make changes which would be lost during the operation (remember to suppress this option after cleanup).
 aa: gwf_1.htm
 co: St’ozzione pò esse ghjuvevule, timpurariamente, quandu si face una nettata di a vostra basa di dati, s’ella hè acciduta da Internet, per impedisce chì certi « maghi » faccianu mudificazioni chì serianu perse durante l’operazione (ma arricurdatevi di squassà st’ozzione dopu a nettata).
@@ -3537,20 +3543,6 @@ es: Este fichero se encuentra en la carpeta
 fi: Tämä tiedosto on hakemistossa
 fr: Ce fichier se trouve dans le répertoire
 it: Questo file si trova nella directory
-
-    This file is in the directory "%w".
-aa: gwu_ok.htm
-co: Stu schedariu si trova in u cartulare « %w »
-de: Diese Datei steht im Verzeichnis "%w".
-en: This file is in the directory "%w".
-es: Este fichero se encuentra en la carpeta "%w".
-fr: Ce fichier se trouve dans le répertoire "%w".
-it: Questo file si trova nella directory "%w".
-
-    This file is in the directory
-co: Stu schedariu si trova in u cartulare :
-en: This file is in the directory:
-fr: Ce fichier est dans le dossier :
 
     This has built a file named "%o".
 aa: gw2gd_ok.htm

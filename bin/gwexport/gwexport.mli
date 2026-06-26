@@ -31,6 +31,8 @@ type gwexport_opts = {
 val default_opts : gwexport_opts
 (** Default set of options *)
 
+val out_file : string ref
+
 val speclist : gwexport_opts ref -> (Arg.key * Arg.spec * Arg.doc) list
 (** Given a set of options, returns default command line arguments for selecting
     elements from a base. The output of this function is the first input of
