@@ -271,11 +271,10 @@ let print_sosa ~conf ~base ~person ~link =
             let i1 = Gwdb.string_of_iper (Gwdb.get_iper person) in
             let i2 = Gwdb.string_of_iper (Gwdb.get_iper r) in
             let b2 = Sosa.to_string sosa_num in
-            "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
+            [ ("m", "RL"); ("i1", i1); ("i2", i2); ("b1", "1"); ("b2", b2) ]
           in
           Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_string conf (sosa_link |> Adef.safe);
+          Output.print_url conf (Util.commd' conf ~query:sosa_link);
           Output.print_sstring conf {|"> |});
         let title =
           if Person.is_hide_names conf r && not (Person.is_visible conf base r)

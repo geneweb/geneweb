@@ -225,7 +225,7 @@ let macro conf base = function
       let r = count conf in
       string_of_int_sep_aux conf (r.welcome_cnt + r.request_cnt)
   | 'R' -> Adef.safe conf.Config.right
-  | 's' -> (Util.commd conf :> Adef.safe_string)
+  | 's' -> Adef.safe @@ Util.commd_prefix conf
   | 't' -> Adef.safe conf.Config.bname
   | 'T' -> Util.doctype
   | 'U' ->

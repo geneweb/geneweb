@@ -480,7 +480,9 @@ and eval_string s = function
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env p = function
-  | [ "access" ] -> safe_val (Util.acces conf base p :> Adef.safe_string)
+  | [ "access" ] ->
+      safe_val @@ Adef.safe @@ Ext_uri.encoded_of_query
+      @@ Util.acces' conf base p
   | [ "dates" ] -> safe_val (DateDisplay.short_dates_text conf base p)
   | [ "has_history" ] ->
       let fn = Gwdb.sou base (Gwdb.get_first_name p) in

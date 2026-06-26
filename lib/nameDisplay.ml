@@ -160,8 +160,8 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   else
     let open Def in
     "<a href=\""
-    ^<^ (Util.commd conf ^^^ Util.acces conf base p :> Adef.safe_string)
-    ^^^ (if with_id then "\" id=\"i" else "")
+    ^<^ Ext_uri.to_string (Util.commd' conf ~query:(Util.acces conf base p))
+    ^<^ (if with_id then "\" id=\"i" else "")
     ^<^ (if with_id then Gwdb.string_of_iper iper else "")
     ^<^ "\">" ^<^ s ^>^ "</a>"
 

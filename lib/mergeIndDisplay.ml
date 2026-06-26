@@ -207,15 +207,13 @@ let propose_merge_ind conf base branches p1 p2 =
       (Utf8.capitalize_fst (Util.transl conf "you must first merge"));
     Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf "<ul><li><a href=\"";
-    Output.print_string conf (Util.commd conf);
-    Output.print_string conf (Util.acces conf base p1);
+    Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p1));
     Output.print_sstring conf "\">";
     MergeDisplay.print_someone conf base p1;
     Output.print_sstring conf "</a> ";
     Output.print_sstring conf (Util.transl_nth conf "and" 0);
     Output.print_sstring conf " <a href=\"";
-    Output.print_string conf (Util.commd conf);
-    Output.print_string conf (Util.acces conf base p2);
+    Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p2));
     Output.print_sstring conf "\">";
     MergeDisplay.print_someone conf base p2;
     Output.print_sstring conf "</a></li></ul><p></p>");
@@ -275,15 +273,13 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf "<ul><li><a href=\"";
-  Output.print_string conf (Util.commd conf);
-  Output.print_string conf (Util.acces conf base p1);
+  Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p1));
   Output.print_sstring conf "\">";
   MergeDisplay.print_someone conf base p1;
   Output.print_sstring conf "</a> ";
   Output.print_sstring conf (Util.transl conf "with");
   Output.print_sstring conf " <a href=\"";
-  Output.print_string conf (Util.commd conf);
-  Output.print_string conf (Util.acces conf base p2);
+  Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p2));
   Output.print_sstring conf "\">";
   MergeDisplay.print_someone conf base p2;
   Output.print_sstring conf "</a></li></ul><p>";
@@ -324,13 +320,11 @@ let different_sexes conf base p1 p2 =
     (Utf8.capitalize_fst (Util.transl conf "incompatible sexes"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf {|<ul><li><a href="|};
-  Output.print_string conf (Util.commd conf);
-  Output.print_string conf (Util.acces conf base p1);
+  Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p1));
   Output.print_sstring conf {|">|};
   Output.print_string conf (Util.designation base p1);
   Output.print_sstring conf {|</a></li><li>|};
-  Output.print_string conf (Util.commd conf);
-  Output.print_string conf (Util.acces conf base p2);
+  Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p2));
   Output.print_sstring conf {|">|};
   Output.print_string conf (Util.designation base p2);
   Output.print_sstring conf "</li></ul>";
@@ -353,26 +347,24 @@ let print_merged conf base wl p =
       let ip = Gwdb.iper_of_string ip in
       let s1 =
         match Util.p_getenv conf.Config.env "iexcl" with
-        | Some "" | None -> Adef.encoded ""
-        | Some s ->
-            let open Def in
-            "&iexcl=" ^<^ Mutil.encode s
+        | Some "" | None -> None
+        | Some s -> Some ("iexcl", s)
       in
       let s2 =
         match Util.p_getenv conf.Config.env "fexcl" with
-        | Some "" | None -> Adef.encoded ""
-        | Some s ->
-            let open Def in
-            "&fexcl=" ^<^ Mutil.encode s
+        | Some "" | None -> None
+        | Some s -> Some ("fexcl", s)
       in
+      let open Ext_list.Infix in
       Output.print_sstring conf "<p>";
       Output.print_sstring conf "<a href=";
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf "m=MRG_DUP&ip=";
-      Output.print_string conf (Gwdb.string_of_iper ip |> Mutil.encode);
-      Output.print_string conf s1;
-      Output.print_string conf s2;
-      Output.print_sstring conf ">";
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:
+             (("m", "MRG_DUP")
+             @:: ("ip", Gwdb.string_of_iper ip)
+             @:: s1 @?: s2 @?: []));
+      Output.print_sstring conf "\">";
       Output.print_sstring conf
         (Utf8.capitalize_fst (Util.transl conf "continue merging"));
       Output.print_sstring conf "</a>";

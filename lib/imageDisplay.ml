@@ -147,13 +147,12 @@ let print_html conf =
   Output.print_sstring conf "<head><title>";
   Output.print_sstring conf (Util.transl_nth conf "image/images" 0);
   Output.print_sstring conf "</title></head><body><img src=\"";
-  Output.print_string conf (Util.commd conf);
-  Ext_list.iter_first
-    (fun first (k, v) ->
-      let v = if k = "m" then Adef.encoded "IM" else v in
-      if not first then Output.print_sstring conf "&";
-      Output.print_sstring conf k;
-      Output.print_sstring conf "=";
-      Output.print_string conf v)
-    conf.Config.env;
+  Output.print_url conf
+    (Util.commd' conf
+       ~query:
+         (List.map
+            (fun (k, v) ->
+              let v = if k = "m" then "IM" else Mutil.decode v in
+              (k, v))
+            conf.Config.env));
   Output.print_sstring conf "\"></body></html>"
