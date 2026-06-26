@@ -23,6 +23,7 @@ let launch_dir = ref "."
 let lang_param = ref ""
 let bname = ref ""
 let no_o = ref true
+let command = ref ""
 
 let printer_conf =
   {
@@ -666,6 +667,7 @@ let rec copy_from_stream conf print strm =
                   match p_getenv conf.env k with
                   | Some v -> print v
                   | None -> ())
+              | 'W' -> print !command
               | _ -> (
                   match p_getenv conf.env (String.make 1 c) with
                   | Some v -> (
@@ -884,14 +886,14 @@ let infer_rc conf rc =
       | _ -> 0
   else rc
 
-let exec_f conf comm =
+let exec_f conf comm out_f =
   let bd_arg =
     if !bases_dir = "." || !bases_dir = "" then ""
     else " -bd " ^ stringify !bases_dir
   in
-  let s = comm ^ bd_arg ^ " > /tmp/comm.log" in
-  Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
+  let s = if out_f = "" then (comm ^ bd_arg ^ " > /tmp/comm.log") else (comm ^ out_f )in
   Printf.eprintf "$ %s\n" s;
+  command := !command ^ "\n" ^ s;
   flush stderr;
   let rc = Sys.command s in
   if not Sys.unix then infer_rc conf rc else rc
@@ -994,7 +996,7 @@ let ged2gwb_check conf =
 let gwc conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "gwc") in
-    exec_f conf (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env) ""
   in
   let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
   (try Sys.remove gwo with Sys_error _ -> ());
@@ -1006,10 +1008,12 @@ let gwc conf =
 let gwdiff_check conf = print_file conf "confirm.htm"
 
 let gwdiff ok_file conf =
-  let rc =
-    let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env)
+  let out_file =
+    match p_getenv conf.env "o" with Some f -> ("> "  ^ (strip_spaces f)) | None -> ""
   in
+  let comm = stringify (Filename.concat !bin_dir conf.comm) in
+  let rc = exec_f conf (comm ^ parameters conf.env) out_file in
+  Printf.eprintf "%s\n" comm;
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "err_standard.htm"
@@ -1024,7 +1028,7 @@ let gwfixbase_check conf = print_file conf "confirm.htm"
 let gwfixbase ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env) ""
   in
   Printf.eprintf "\n";
   flush stderr;
@@ -1040,7 +1044,7 @@ let cache_files_check conf =
 let cache_files ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "cache_files") ^ " " in
-    exec_f conf (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env) ""
   in
   flush stderr;
   if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
@@ -1050,7 +1054,7 @@ let connex_check conf = print_file conf "confirm.htm"
 let connex ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "connex") in
-    exec_f conf (comm ^ " " ^ parameters conf.env)
+    exec_f conf (comm ^ " " ^ parameters conf.env) ""
   in
   if rc <> 0 then print_file conf "err_standard.htm"
   else print_file conf ok_file
@@ -1093,7 +1097,7 @@ let gwu_or_gwb2ged_check suffix conf =
 let gwb2ged_or_gwu_1 ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env) ""
   in
   if rc > 1 then print_file conf "err_standard.htm"
   else
@@ -1230,10 +1234,9 @@ let recover_2 conf =
       flush stderr;
       Sys.chdir dir;
       let comm =
-        Filename.concat !bin_dir src_to_new
-        ^ " " ^ tmp ^ " -f -o " ^ out_file ^ " > /tmp/comm.log"
+        (Filename.concat !bin_dir src_to_new) ^ " " ^ tmp ^ " -f "
       in
-      let rc = exec_f conf comm in
+      let rc = exec_f conf comm out_file in
       rc)
     else rc
   in
@@ -1266,7 +1269,7 @@ let cleanup_1 conf =
     Filename.concat !bin_dir "gwu"
     ^ " " ^ stringify in_base ^ " -o " ^ stringify tmp_gw
   in
-  let _ = exec_f conf gwu_comm in
+  let _ = exec_f conf gwu_comm "" in
   Printf.eprintf "$ mkdir %s\n" old_dir;
   (try Unix.mkdir old_dir 0o755 with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
   if Sys.unix then Printf.eprintf "$ rm -rf %s/%s\n" old_dir in_base_dir
@@ -1284,12 +1287,12 @@ let cleanup_1 conf =
     Filename.concat !bin_dir "gwc"
     ^ " " ^ stringify tmp_gw ^ " -nofail -o " ^ stringify in_base
   in
-  let rc1 = exec_f conf gwc_comm in
+  let rc1 = exec_f conf gwc_comm "" in
   (try Sys.remove tmp_gw with Sys_error _ -> ());
   let nldb_comm =
     Filename.concat !bin_dir "update_nldb" ^ " " ^ stringify in_base
   in
-  let rc2 = exec_f conf nldb_comm in
+  let rc2 = exec_f conf nldb_comm "" in
   let rc = rc1 + rc2 in
   Printf.eprintf "\n";
   flush stderr;
@@ -1449,7 +1452,7 @@ let merge_1 conf =
             Filename.concat !bin_dir "gwu"
             ^ " " ^ stringify b ^ " -o " ^ stringify gw_out
           in
-          let r = exec_f conf c in
+          let r = exec_f conf c "" in
           if r <= 1 then loop rest else r
     in
     loop gw_temps
@@ -1466,7 +1469,7 @@ let merge_1 conf =
             "" gw_temps
         ^ " -f -o " ^ stringify out_file
       in
-      exec_f conf c
+      exec_f conf c ""
   in
   List.iter (fun (_, gw) -> try Sys.remove gw with Sys_error _ -> ()) gw_temps;
   if rc > 1 then print_file conf "err_standard.htm"
@@ -1542,7 +1545,7 @@ let gwf_1 conf =
 let ged2gwb conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ " -fne '\"\"'" ^ parameters conf.env)
+    exec_f conf (comm ^ " -fne '\"\"'" ^ parameters conf.env) ""
   in
   if rc > 1 then print_file conf "err_standard.htm"
   else
@@ -1553,14 +1556,14 @@ let ged2gwb conf =
 let consang conf ok_file =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env) ""
   in
   if rc > 1 then print_file conf "err_consang.htm" else print_file conf ok_file
 
 let update_nldb conf ok_file =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env)
+    exec_f conf (comm ^ parameters conf.env) ""
   in
   if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
 
