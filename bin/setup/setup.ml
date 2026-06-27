@@ -878,7 +878,9 @@ let exec_f conf comm out_f =
     if !bases_dir = "." || !bases_dir = "" then ""
     else " -bd " ^ stringify !bases_dir
   in
-  let s = if out_f = "" then (comm ^ bd_arg ^ " > /tmp/comm.log") else (comm ^ out_f )in
+  let s =
+    if out_f = "" then comm ^ bd_arg ^ " > /tmp/comm.log" else comm ^ out_f
+  in
   Printf.eprintf "$ %s\n" s;
   command := !command ^ "\n" ^ s;
   flush stderr;
@@ -996,7 +998,9 @@ let gwdiff_check conf = print_file conf "confirm.htm"
 
 let gwdiff ok_file conf =
   let out_file =
-    match p_getenv conf.env "o" with Some f -> ("> "  ^ (strip_spaces f)) | None -> ""
+    match p_getenv conf.env "o" with
+    | Some f -> "> " ^ strip_spaces f
+    | None -> ""
   in
   let comm = stringify (Filename.concat !bin_dir conf.comm) in
   let rc = exec_f conf (comm ^ parameters conf.env) out_file in
@@ -1220,9 +1224,7 @@ let recover_2 conf =
       Printf.eprintf "$ cd \"%s\"\n" dir;
       flush stderr;
       Sys.chdir dir;
-      let comm =
-        (Filename.concat !bin_dir src_to_new) ^ " " ^ tmp ^ " -f "
-      in
+      let comm = Filename.concat !bin_dir src_to_new ^ " " ^ tmp ^ " -f " in
       let rc = exec_f conf comm out_file in
       rc)
     else rc

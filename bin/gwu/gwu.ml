@@ -8,7 +8,13 @@ let speclist opts =
   ( "-odir",
     Arg.String (fun s -> GwuLib.out_dir := s),
     "<dir> create files from original name in directory (else on -o file)" )
-  :: ("-bd", Arg.String (fun s -> bases_dir := s), " defines bases folder")
+  :: ( "-bd",
+       Arg.String
+         (fun s ->
+           if !bases_dir = "." then bases_dir := s
+           else if !bases_dir <> Filename.dirname s then
+             raise (Arg.Bad "-bd conflicts with base path (1)")),
+       " defines bases folder" )
   :: ( "-isolated",
        Arg.Set isolated,
        " export isolated persons (work only if export all database)." )
@@ -48,7 +54,9 @@ let anonfun s =
   if !bname = None then (
     bname := Some (Filename.basename s);
     if s <> Option.value ~default:"" !bname then
-      raise (Arg.Bad "Provide a simple base name. Use -bd for bases folder"))
+      if !bases_dir = "." then bases_dir := Filename.dirname s
+      else if !bases_dir <> Filename.dirname s then
+        raise (Arg.Bad "-bd conflicts with base path (2)"))
   else raise (Arg.Bad "Cannot treat several databases")
 
 let () =
