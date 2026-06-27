@@ -1183,10 +1183,11 @@ let search_fullname cache conf base variants_fn variants_sn =
         Buffer.contents buf
       in
       let normalize s = Name.lower (norm_apo s) in
-      let fn_lower = normalize fn in
-      (* Use the first element of variants_sn as the canonical surname query.
+      (* Use the first element of variants_fn/sn as the canonical first_name surname query.
          variants_sn is sorted and deduplicated but all variants share the same
-         base string; any of them works for the relevance comparison. *)
+         base string; any of them works for the relevance comparison. 
+         FIXME: Is this true for fn ?? *)
+      let fn_lower = normalize (List.hd variants_fn) in
       let sn_lower = normalize (List.hd variants_sn) in
       (* Combined relevance score: weight fn match (0/2) + sn match (0/1).
          Score 0 = both exact, 1 = fn exact only, 2 = sn exact only,
@@ -1273,7 +1274,7 @@ let search_fullname cache conf base variants_fn variants_sn =
           in
           (* Same phonetic crush fallback as for direct persons: catches
              first-name near-misses like "margerite" vs "Marguerite". *)
-          let fn_crushed = Name.crush_lower fn in
+          let fn_crushed = Name.crush_lower fn_lower in
           let spouse_all =
             if fn_crushed = "" then spouse_substr
             else
