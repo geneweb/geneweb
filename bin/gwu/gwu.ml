@@ -72,11 +72,7 @@ let () =
       let oc = open_out path in
       (oc, bname, fun () -> close_out oc)
     else
-      let path =
-        if Filename.is_relative !Gwexport.out_file then
-          Filename.concat !bases_dir !Gwexport.out_file
-        else !Gwexport.out_file
-      in
+      let path = !Gwexport.out_file in
       let oc = open_out path in
       (oc, !Gwexport.out_file, fun () -> close_out oc)
   in
