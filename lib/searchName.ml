@@ -170,22 +170,6 @@ let search_reject_p conf base p =
 
 let persons_to_ipers = List.map Driver.get_iper
 
-let list_take n l =
-  let rec aux acc n = function
-    | [] -> List.rev acc
-    | _ when n <= 0 -> List.rev acc
-    | x :: xs -> aux (x :: acc) (n - 1) xs
-  in
-  aux [] n l
-
-let list_drop n l =
-  let rec aux n = function
-    | xs when n <= 0 -> xs
-    | [] -> []
-    | _ :: xs -> aux (n - 1) xs
-  in
-  aux n l
-
 (* String cache scoped to a single search request to avoid cross-base
    pollution when gwd serves multiple bases.  The cache is created at the
    top of [search] and threaded explicitly through the call chain; there is
@@ -1362,7 +1346,96 @@ let search_partial_key cache conf base query =
 (* Section 4: Name Parsing and Component Extraction                         *)
 (* ========================================================================= *)
 
-let rec extract_name_components conf base =
+let make_parsed_component ?first_name ?surname ?oc original format =
+  let fn_opt = if first_name = Some "" then None else first_name in
+  let sn_opt = if surname = Some "" then None else surname in
+  {
+    first_name = fn_opt;
+    surname = sn_opt;
+    oc;
+    person_name = None;
+    case =
+      ParsedName { first_name = fn_opt; surname = sn_opt; oc; original; format };
+  }
+
+let parse_slash_separated original_pn pn slash_pos =
+  let fn_part = String.sub pn 0 slash_pos in
+  let sn_part =
+    String.sub pn (slash_pos + 1) (String.length pn - slash_pos - 1)
+    |> String.trim
+  in
+  match (fn_part, sn_part) with
+  | "", sn -> make_parsed_component ~surname:sn original_pn `SlashSurname
+  | fn, "" -> make_parsed_component ~first_name:fn original_pn `SlashFirstName
+  | fn, sn ->
+      make_parsed_component ~first_name:fn ~surname:sn original_pn `Slash
+
+let parse_dot_separated original_pn pn dot_pos =
+  let fn_part = String.sub pn 0 dot_pos in
+  let rest = String.sub pn (dot_pos + 1) (String.length pn - dot_pos - 1) in
+  match String.index_opt rest ' ' with
+  | Some space_pos ->
+      let oc = String.sub rest 0 space_pos in
+      let sn_part =
+        String.sub rest (space_pos + 1) (String.length rest - space_pos - 1)
+        |> String.trim
+      in
+      make_parsed_component ~first_name:fn_part ~surname:sn_part ~oc original_pn
+        `DotOc
+  | None ->
+      make_parsed_component ~first_name:fn_part ~surname:rest original_pn `Dot
+
+let parse_person_name pn =
+  let original_pn = pn in
+  (* kept. a possible .gwf param may select the choice *)
+  let _find_last_char c =
+    try Some (String.rindex pn c) with Not_found -> None
+  in
+  let find_char c = try Some (String.index pn c) with Not_found -> None in
+  let slash_pos = find_char '/' in
+  let dot_pos = find_char '.' in
+  let space_pos = find_char ' ' in
+  match (slash_pos, dot_pos, space_pos) with
+  | None, None, None ->
+      {
+        first_name = None;
+        surname = None;
+        oc = None;
+        person_name = Some pn;
+        case = PersonName pn;
+      }
+  | None, None, Some k ->
+      let fn = String.sub pn 0 k in
+      let sn =
+        String.sub pn (k + 1) (String.length pn - k - 1) |> String.trim
+      in
+      {
+        first_name = Some fn;
+        surname = Some sn;
+        oc = None;
+        person_name = None;
+        case =
+          ParsedName
+            {
+              first_name = Some fn;
+              surname = Some sn;
+              oc = None;
+              original = original_pn;
+              format = `Space;
+            };
+      }
+  | Some i, None, _ -> parse_slash_separated original_pn pn i
+  | None, Some j, _ -> parse_dot_separated original_pn pn j
+  | _ ->
+      {
+        first_name = None;
+        surname = None;
+        oc = None;
+        person_name = Some pn;
+        case = InvalidFormat pn;
+      }
+
+let extract_name_components conf _base =
   let get_param key =
     match p_getenv conf.env key with Some "" | None -> None | Some s -> Some s
   in
@@ -1378,7 +1451,7 @@ let rec extract_name_components conf base =
         person_name = None;
         case = NoInput;
       }
-  | None, None, Some pn -> parse_person_name base pn
+  | None, None, Some pn -> parse_person_name pn
   | None, Some sn, None ->
       {
         first_name = None;
@@ -1427,127 +1500,6 @@ let rec extract_name_components conf base =
         person_name = Some pn;
         case = PersonName pn;
       }
-
-(* Insert a '/' before the first surname particle found in pn, so that
-   "henry de foresta" becomes "henry/de foresta" and the existing slash
-   parser can correctly split fn from sn.  Apostrophe variants of each
-   word-suffix are tried against the compiled particle regexp so that
-   "renaud d'harcourt" is detected as having a particle regardless of
-   the apostrophe encoding used in the input.
-
-   The original suffix string is preserved verbatim after the slash:
-   downstream apostrophe variant generation (generate_apostrophe_variants
-   in search_fullname, search_by_name, etc.) handles the typographic form
-   matching against the stored data, so the input form must not be
-   canonicalised here. *)
-and insert_slash_before_particle base pn =
-  let re = Driver.base_particles base in
-  let words = String.split_on_char ' ' pn in
-  let n = List.length words in
-  if n < 2 then pn
-  else
-    let rec aux i =
-      if i >= n then pn
-      else
-        let suffix = String.concat " " (list_drop i words) in
-        let variants = generate_apostrophe_variants suffix in
-        let has_particle =
-          List.exists (fun v -> Mutil.get_particle re v <> "") variants
-        in
-        if has_particle then
-          let fn_part = String.concat " " (list_take i words) in
-          fn_part ^ "/" ^ suffix
-        else aux (i + 1)
-    in
-    aux 1
-
-and parse_person_name base pn =
-  let original_pn = pn in
-  let find_char c = try Some (String.index pn c) with Not_found -> None in
-  let _find_last_char c =
-    try Some (String.rindex pn c) with Not_found -> None
-  in
-  let slash_pos = find_char '/' in
-  let dot_pos = find_char '.' in
-  let space_pos = find_char ' ' in
-  match (slash_pos, dot_pos, space_pos) with
-  | None, None, None ->
-      {
-        first_name = None;
-        surname = None;
-        oc = None;
-        person_name = Some pn;
-        case = PersonName pn;
-      }
-  | None, None, Some k ->
-      let fn = String.sub pn 0 k in
-      let sn =
-        String.sub pn (k + 1) (String.length pn - k - 1) |> String.trim
-      in
-      {
-        first_name = Some fn;
-        surname = Some sn;
-        oc = None;
-        person_name = None;
-        case =
-          ParsedName
-            {
-              first_name = Some fn;
-              surname = Some sn;
-              oc = None;
-              original = original_pn;
-              format = `Space;
-            };
-      }
-  | Some i, None, _ -> parse_slash_separated original_pn pn i
-  | None, Some j, _ -> parse_dot_separated original_pn pn j
-  | _ ->
-      {
-        first_name = None;
-        surname = None;
-        oc = None;
-        person_name = Some pn;
-        case = InvalidFormat pn;
-      }
-
-and make_parsed_component ?first_name ?surname ?oc original format =
-  let fn_opt = if first_name = Some "" then None else first_name in
-  let sn_opt = if surname = Some "" then None else surname in
-  {
-    first_name = fn_opt;
-    surname = sn_opt;
-    oc;
-    person_name = None;
-    case =
-      ParsedName { first_name = fn_opt; surname = sn_opt; oc; original; format };
-  }
-
-and parse_slash_separated original_pn pn slash_pos =
-  let fn_part = String.sub pn 0 slash_pos in
-  let sn_part =
-    String.sub pn (slash_pos + 1) (String.length pn - slash_pos - 1)
-    |> String.trim
-  in
-  match (fn_part, sn_part) with
-  | "", sn -> make_parsed_component ~surname:sn original_pn `SlashSurname
-  | fn, "" -> make_parsed_component ~first_name:fn original_pn `SlashFirstName
-  | fn, sn ->
-      make_parsed_component ~first_name:fn ~surname:sn original_pn `Slash
-
-and parse_dot_separated original_pn pn dot_pos =
-  let fn_part = String.sub pn 0 dot_pos in
-  let rest = String.sub pn (dot_pos + 1) (String.length pn - dot_pos - 1) in
-  match String.index_opt rest ' ' with
-  | Some space_pos ->
-      let oc = String.sub rest 0 space_pos in
-      let sn_part =
-        String.sub rest (space_pos + 1) (String.length rest - space_pos - 1)
-        |> String.trim
-      in
-      make_parsed_component ~first_name:fn_part ~surname:sn_part ~oc original_pn
-        `DotOc
-  | None ->
-      make_parsed_component ~first_name:fn_part ~surname:rest original_pn `Dot
 
 (* ========================================================================= *)
 (* Section 5: Search Orchestration                                          *)
@@ -1718,21 +1670,19 @@ let rec handle_search_results alias_cache conf base query fn_options components
       (Adef.(Util.commd conf ^^^ Util.acces conf base p) :> string)
   in
   let { exact; partial; spouse } = results in
-  let filter_by_oc_and_auth ipers =
-    let ipers =
-      List.filter
-        (fun ip -> GWPARAM.p_auth conf base (Driver.poi base ip))
-        ipers
-    in
+  (* Pre-compute the oc filter once rather than re-deriving it per list. *)
+  let oc_filter =
     match components.oc with
-    | None | Some "" -> ipers
-    | Some oc -> (
-        match int_of_string_opt oc with
-        | None -> ipers
-        | Some n ->
-            List.filter
-              (fun ip -> Driver.get_occ (Driver.poi base ip) = n)
-              ipers)
+    | None | Some "" -> None
+    | Some oc -> int_of_string_opt oc
+  in
+  let filter_by_oc_and_auth ipers =
+    List.filter
+      (fun ip ->
+        let p = Driver.poi base ip in
+        GWPARAM.p_auth conf base p
+        && match oc_filter with None -> true | Some n -> Driver.get_occ p = n)
+      ipers
   in
   let exact = filter_by_oc_and_auth exact in
   let partial = filter_by_oc_and_auth partial in
@@ -1900,15 +1850,14 @@ and display_surname_results conf base alias_cache _query surname all_persons =
    global mutable state.  All search methods handle apostrophe variants
    internally (search_by_key included); no per-variant iteration is needed
    at this level. *)
-let search conf base query search_order fn_options specify =
+let search conf base components query search_order fn_options specify =
   let cache = StringCache.create () in
   let alias_cache = Some.AliasCache.create () in
-  let components = extract_name_components conf base in
   Log.debug (fun k ->
       let fn = Option.value components.first_name ~default:"" in
       let sn = Option.value components.surname ~default:"" in
       let oc = Option.value components.oc ~default:"" in
-      k " Search ccc query=%s, fn %s, sn=%s, oc=%s" query fn sn oc);
+      k " Search query=%s, fn=%s, sn=%s, oc=%s" query fn sn oc);
   let results =
     dispatch_search_methods cache alias_cache conf base components query
       search_order fn_options
@@ -1951,38 +1900,29 @@ let print conf base specify =
       absolute = p_getenv conf.env "t" = Some "A";
     }
   in
-  let case = components.case in
-  let _log_search query order_name =
-    Log.debug (fun k ->
-        k "Search bbb %S case=%s order=%s" query (Debug.case_str case)
-          order_name)
-  in
-  let _search_with query order =
-    search conf base query order fn_options specify
-  in
-  let full_order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
-  let _name_order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
-  let _surname_order = [ Surname ] in
-  let _firstname_order = [ FirstName ] in
   Log.debug (fun k ->
       let fn = Option.value components.first_name ~default:"" in
       let sn = Option.value components.surname ~default:"" in
       let oc = Option.value components.oc ~default:"" in
-      k " Search aaa fn %s, sn=%s, oc=%s" fn sn oc);
-
+      k " Search case=%s fn=%s, sn=%s, oc=%s"
+        (Debug.case_str components.case)
+        fn sn oc);
+  let full_order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
+  let go query order =
+    search conf base components query order fn_options specify
+  in
   match components.case with
   | FirstNameOnly fn ->
       let alias_cache = Some.AliasCache.create () in
       let results = search_firstname alias_cache conf base fn fn_options in
       display_firstname_results conf base alias_cache fn fn_options results
-  | SurnameOnly sn -> search conf base sn [ Surname ] fn_options specify
+  | SurnameOnly sn -> go sn [ Surname ]
   | ParsedName { first_name = Some fn; surname = None; _ } when fn <> "" ->
-      search conf base fn [ FirstName ] fn_options specify
+      go fn [ FirstName ]
   | ParsedName { first_name = None; surname = Some sn; _ } when sn <> "" ->
-      search conf base sn [ Surname ] fn_options specify
+      go sn [ Surname ]
   | ParsedName { first_name = Some fn; surname = Some sn; _ } ->
-      search conf base (fn ^ " " ^ sn) full_order fn_options specify
-  | FirstNameSurname (fn, sn) ->
-      search conf base (fn ^ " " ^ sn) full_order fn_options specify
-  | PersonName pn -> search conf base pn full_order fn_options specify
+      go (fn ^ " " ^ sn) full_order
+  | FirstNameSurname (fn, sn) -> go (fn ^ " " ^ sn) full_order
+  | PersonName pn -> go pn full_order
   | _ -> SrcfileDisplay.print_welcome conf base
