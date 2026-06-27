@@ -3,14 +3,16 @@
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
-let fname = ref ""
+let bname = ref ""
 let scratch = ref false
 let verbosity = ref 2
 let fast = ref false
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
+let bases_dir = ref "."
 
 let speclist =
   [
+    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
     ("-fast", Arg.Set fast, " faster, but use more memory");
@@ -20,28 +22,31 @@ let speclist =
       " Save memory, but slower when rewritting database" );
     ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let anonfun s =
-  if !fname = "" then fname := s
+  if !bname = "" then bname := s
   else raise (Arg.Bad "Cannot treat several databases")
 
 let () =
   Logs.set_reporter (Logs_fmt.reporter ());
   Arg.parse speclist anonfun errmsg;
-  if !fname = "" then (
+  if !bname = "" then (
     Printf.eprintf "Missing file name\n";
     Printf.eprintf "Use option -help for usage@.";
     exit 2);
   if !verbosity = 0 then Mutil.verbose := false;
-  Secure.set_base_dir (Filename.dirname !fname);
-  let lock_file = Mutil.lock_file !fname in
+  let bpath = Filename.concat !bases_dir !bname in
+
+  Secure.set_base_dir (Filename.dirname bpath);
+  let lock_file = Mutil.lock_file bpath in
   let on_exn exn bt =
     Logs.err (fun k -> k "%a" Lock.pp_exception (exn, bt));
     exit 2
   in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  Driver.with_database !fname (fun base ->
+  Driver.with_database bpath (fun base ->
       if !fast then (
         Driver.load_persons_array base;
         Driver.load_families_array base;
