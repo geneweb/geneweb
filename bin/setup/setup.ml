@@ -1086,9 +1086,14 @@ let gwu_or_gwb2ged_check suffix conf =
   else print_file conf "confirm.htm"
 
 let gwb2ged_or_gwu_1 ok_file conf =
+  let out_file =
+    match p_getenv conf.env "o" with
+    | Some f -> "> " ^ strip_spaces f
+    | None -> ""
+  in
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env) ""
+    exec_f conf (comm ^ parameters conf.env) out_file
   in
   if rc > 1 then print_file conf "err_standard.htm"
   else
