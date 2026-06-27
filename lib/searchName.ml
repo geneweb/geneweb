@@ -1463,14 +1463,13 @@ and insert_slash_before_particle base pn =
 
 and parse_person_name base pn =
   let original_pn = pn in
-  let pn = insert_slash_before_particle base pn in
   let find_char c = try Some (String.index pn c) with Not_found -> None in
-  let find_last_char c =
+  let _find_last_char c =
     try Some (String.rindex pn c) with Not_found -> None
   in
   let slash_pos = find_char '/' in
   let dot_pos = find_char '.' in
-  let space_pos = find_last_char ' ' in
+  let space_pos = find_char ' ' in
   match (slash_pos, dot_pos, space_pos) with
   | None, None, None ->
       {
@@ -1625,16 +1624,12 @@ let execute_search_method cache alias_cache conf base components query method_
   | FullName ->
       let fn = Option.value components.first_name ~default:"" in
       let sn = Option.value components.surname ~default:query in
-      let oc = Option.value components.oc ~default:"" in
       if fn = "" then (
         Log.debug (fun k -> k "  Method FullName: skipped (empty fn)");
         { exact = []; partial = []; spouse = [] })
       else
         let variants_sn = generate_apostrophe_variants sn in
-        let variants_fn =
-          let bv = generate_apostrophe_variants fn in
-          if oc = "" then bv else List.map (fun v -> v ^ "." ^ oc) bv
-        in
+        let variants_fn = generate_apostrophe_variants fn in
         Log.debug (fun k -> k "  Method FullName fn=%S sn=%S" fn sn);
         let results = search_fullname cache conf base variants_fn variants_sn in
         Log.debug (fun k ->
@@ -1723,6 +1718,25 @@ let rec handle_search_results alias_cache conf base query fn_options components
       (Adef.(Util.commd conf ^^^ Util.acces conf base p) :> string)
   in
   let { exact; partial; spouse } = results in
+  let filter_by_oc_and_auth ipers =
+    let ipers =
+      List.filter
+        (fun ip -> GWPARAM.p_auth conf base (Driver.poi base ip))
+        ipers
+    in
+    match components.oc with
+    | None | Some "" -> ipers
+    | Some oc -> (
+        match int_of_string_opt oc with
+        | None -> ipers
+        | Some n ->
+            List.filter
+              (fun ip -> Driver.get_occ (Driver.poi base ip) = n)
+              ipers)
+  in
+  let exact = filter_by_oc_and_auth exact in
+  let partial = filter_by_oc_and_auth partial in
+  let spouse = filter_by_oc_and_auth spouse in
   let all_persons = exact @ partial @ spouse in
   match all_persons with
   | [] -> SrcfileDisplay.print_welcome conf base
@@ -1748,9 +1762,9 @@ let rec handle_search_results alias_cache conf base query fn_options components
                type A — fn and sn both match the query exactly, or
                type B — fn matches and a spouse's sn matches exactly.
              If zero or more than one perfect match exists, fall through to
-             specify so the user can choose. *)
-          (* Normalise apostrophes to plain ' before comparing, so that
-             "d'Oiron" and "dâOiron" (curly apostrophe) both match. *)
+             specify so the user can choose.
+             Normalise apostrophes to plain ' before comparing, so that
+             "d'Oiron" and "d’Oiron" (curly apostrophe) both match. *)
           let norm_apo s =
             let buf = Buffer.create (String.length s) in
             let i = ref 0 in
@@ -1890,6 +1904,11 @@ let search conf base query search_order fn_options specify =
   let cache = StringCache.create () in
   let alias_cache = Some.AliasCache.create () in
   let components = extract_name_components conf base in
+  Log.debug (fun k ->
+      let fn = Option.value components.first_name ~default:"" in
+      let sn = Option.value components.surname ~default:"" in
+      let oc = Option.value components.oc ~default:"" in
+      k " Search ccc query=%s, fn %s, sn=%s, oc=%s" query fn sn oc);
   let results =
     dispatch_search_methods cache alias_cache conf base components query
       search_order fn_options
@@ -1902,7 +1921,7 @@ let search conf base query search_order fn_options specify =
 (* ========================================================================= *)
 
 module Debug = struct
-  let format_str format =
+  let _format_str format =
     match format with
     | `Dot -> "Dot"
     | `DotOc -> "DotOc"
@@ -1933,64 +1952,37 @@ let print conf base specify =
     }
   in
   let case = components.case in
-  let log_search query order_name =
+  let _log_search query order_name =
     Log.debug (fun k ->
-        k "Search %S case=%s order=%s" query (Debug.case_str case) order_name)
+        k "Search bbb %S case=%s order=%s" query (Debug.case_str case)
+          order_name)
   in
-  let search_with query order =
+  let _search_with query order =
     search conf base query order fn_options specify
   in
   let full_order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
-  let name_order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
-  let surname_order = [ Surname ] in
-  let firstname_order = [ FirstName ] in
-  match case with
-  | FirstNameSurname (fn, sn) ->
-      let q = fn ^ " " ^ sn in
-      log_search q "name";
-      search_with q name_order
-  | PersonName pn ->
-      log_search pn "name";
-      search_with pn name_order
+  let _name_order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
+  let _surname_order = [ Surname ] in
+  let _firstname_order = [ FirstName ] in
+  Log.debug (fun k ->
+      let fn = Option.value components.first_name ~default:"" in
+      let sn = Option.value components.surname ~default:"" in
+      let oc = Option.value components.oc ~default:"" in
+      k " Search aaa fn %s, sn=%s, oc=%s" fn sn oc);
+
+  match components.case with
   | FirstNameOnly fn ->
-      Log.debug (fun k -> k "Search %S case=FirstNameOnly order=firstname" fn);
       let alias_cache = Some.AliasCache.create () in
       let results = search_firstname alias_cache conf base fn fn_options in
       display_firstname_results conf base alias_cache fn fn_options results
-  | SurnameOnly sn ->
-      log_search sn "surname";
-      search_with sn surname_order
-  | ParsedName { first_name = fn; surname = sn; oc; format; _ } -> (
-      match (fn, sn) with
-      | Some fn, None when fn <> "" ->
-          Log.debug (fun k ->
-              k "Search %S case=ParsedName(fn) order=firstname" fn);
-          search_with fn firstname_order
-      | None, Some sn when sn <> "" ->
-          Log.debug (fun k ->
-              k "Search %S case=ParsedName(sn) order=surname" sn);
-          search_with sn surname_order
-      | _ ->
-          let fn = Option.value fn ~default:"" in
-          let sn = Option.value sn ~default:"" in
-          let oc = Option.value oc ~default:"" in
-          let query =
-            match format with
-            | `DotOc -> Printf.sprintf "%s.%s %s" fn oc sn
-            | `SlashSurname -> sn
-            | `SlashFirstName -> fn
-            | _ -> Printf.sprintf "%s %s" fn sn
-          in
-          let order, order_name =
-            match format with
-            | `SlashSurname -> ([ Surname; ApproxKey ], "slash-surname")
-            | `SlashFirstName -> (firstname_order, "slash-firstname")
-            | _ -> (full_order, "full")
-          in
-          Log.debug (fun k ->
-              k "Search %S case=ParsedName format=%s order=%s" query
-                (Debug.format_str format) order_name);
-          search_with query order)
-  | _ ->
-      Log.debug (fun k -> k "Search (no input) case=%s" (Debug.case_str case));
-      SrcfileDisplay.print_welcome conf base
+  | SurnameOnly sn -> search conf base sn [ Surname ] fn_options specify
+  | ParsedName { first_name = Some fn; surname = None; _ } when fn <> "" ->
+      search conf base fn [ FirstName ] fn_options specify
+  | ParsedName { first_name = None; surname = Some sn; _ } when sn <> "" ->
+      search conf base sn [ Surname ] fn_options specify
+  | ParsedName { first_name = Some fn; surname = Some sn; _ } ->
+      search conf base (fn ^ " " ^ sn) full_order fn_options specify
+  | FirstNameSurname (fn, sn) ->
+      search conf base (fn ^ " " ^ sn) full_order fn_options specify
+  | PersonName pn -> search conf base pn full_order fn_options specify
+  | _ -> SrcfileDisplay.print_welcome conf base
