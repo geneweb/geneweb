@@ -60,18 +60,27 @@ let anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 
 let () =
-  Printf.eprintf "Start gwu\n";
   flush stderr;
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
-  (if !Gwexport.out_file <> "" then
-     let path = Filename.concat !bases_dir !Gwexport.out_file in
-     let oc = open_out path in
-     opts :=
-       {
-         !opts with
-         oc = (!Gwexport.out_file, output_string oc, fun () -> close_out oc);
-       });
+  Printf.eprintf "Start gwu, out_file: %s, bname: %s\n" !Gwexport.out_file
+    (Option.value ~default:"" !bname);
+  let oc, name, close =
+    if !Gwexport.out_file = "" then
+      let bname = Option.value ~default:"" !bname in
+      let path = Filename.concat !bases_dir (bname ^ ".gw") in
+      let oc = open_out path in
+      (oc, bname, fun () -> close_out oc)
+    else
+      let path =
+        if Filename.is_relative !Gwexport.out_file then
+          Filename.concat !bases_dir !Gwexport.out_file
+        else !Gwexport.out_file
+      in
+      let oc = open_out path in
+      (oc, !Gwexport.out_file, fun () -> close_out oc)
+  in
+  opts := { !opts with oc = (name, output_string oc, close) };
   let opts = !opts in
   Secure.set_base_dir !bases_dir;
   match !bname with

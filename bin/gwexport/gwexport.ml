@@ -108,8 +108,8 @@ let speclist c =
       " don't extract individual picture." );
     ( "-o",
       Arg.String (fun s -> out_file := s),
-      "<FILE> output file name (-bd value will be prepended)(default: stdout)."
-    );
+      "<FILE> output file name ( if relative, -bd value will be \
+       prepended)(default: stdout)." );
     ( "-parentship",
       Arg.Unit (fun () -> c := { !c with parentship = true }),
       " select individuals involved in parentship computation between pairs of \
