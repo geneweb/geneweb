@@ -40,17 +40,18 @@ let printer_conf =
       };
   }
 
-let gwsetup_config = lazy (
-  let path_info =
-    [
-      (Printf.sprintf "gwsetup: %s" (Sys.argv.(0)));
-      (Printf.sprintf "working_dir: %s" (Sys.getcwd ()));
-      (Printf.sprintf "setup_dir: %s" !setup_dir);
-      (Printf.sprintf "bin_dir: %s"!bin_dir);
-      (Printf.sprintf "bases_dir: %s" !bases_dir);
-    ]
-  in
-  String.concat "<br>\n" path_info)
+let gwsetup_config =
+  lazy
+    (let path_info =
+       [
+         Printf.sprintf "gwsetup: %s" Sys.argv.(0);
+         Printf.sprintf "working_dir: %s" (Sys.getcwd ());
+         Printf.sprintf "setup_dir: %s" !setup_dir;
+         Printf.sprintf "bin_dir: %s" !bin_dir;
+         Printf.sprintf "bases_dir: %s" !bases_dir;
+       ]
+     in
+     String.concat "<br>\n" path_info)
 
 let slashify s = String.map (function '\\' -> '/' | c -> c) s
 
