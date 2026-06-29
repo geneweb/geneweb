@@ -137,7 +137,6 @@ endif
 	mkdir $(DISTRIB_DIR)/gw/setup
 	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
 	mkdir $(DISTRIB_DIR)/gw/setup/lang
-	cp bin/setup/setup.gwf $(DISTRIB_DIR)/gw/setup/
 	cp bin/setup/setup.css $(DISTRIB_DIR)/gw/setup/
 	cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
