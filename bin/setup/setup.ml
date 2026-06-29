@@ -604,7 +604,7 @@ let rec copy_from_stream conf print strm =
                   print_specific_file conf print outfile strm
               | 'I' ->
                   (* %Ivar;value;{var = value part|false part} *)
-                  (* var is a evar from url or a bvar from basename.gwf or setup.gwf *)
+                  (* var is a evar from url or a bvar from basename.gwf *)
                   let k1 = get_variable strm in
                   let k2 = get_variable strm in
                   print_if_else conf print (s_getenv conf.env k1 = k2) strm
