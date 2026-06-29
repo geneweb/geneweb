@@ -1068,6 +1068,8 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
           Gwdb.patch_union base (Gwdb.get_iper p) { family = after }
       | ChangedOrderOfFamilyEvents (ifam, _, after) ->
           Gwdb.patch_family base ifam { gen_fam with fevents = after }
+      | ChangedOrderOfChildren (family_id, _, _, sorted_children) ->
+          Gwdb.patch_descend base family_id { children = sorted_children }
       | _ -> ())
     wl;
   (wl, ml)
