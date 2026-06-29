@@ -19,8 +19,7 @@ let gwd_port = ref 2317
 let default_lang = ref "en"
 let setup_dir = ref "."
 let bin_dir = ref default_bin_dir
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
-let launch_dir = ref "."
+let bases_dir = ref (Secure.base_dir ())
 let lang_param = ref ""
 let bname = ref ""
 let no_o = ref true
@@ -40,6 +39,18 @@ let printer_conf =
         flush = Server.wflush;
       };
   }
+
+let gwsetup_config = lazy (
+  let path_info =
+    [
+      (Printf.sprintf "gwsetup: %s" (Sys.argv.(0)));
+      (Printf.sprintf "working_dir: %s" (Sys.getcwd ()));
+      (Printf.sprintf "setup_dir: %s" !setup_dir);
+      (Printf.sprintf "bin_dir: %s"!bin_dir);
+      (Printf.sprintf "bases_dir: %s" !bases_dir);
+    ]
+  in
+  String.concat "<br>\n" path_info)
 
 let slashify s = String.map (function '\\' -> '/' | c -> c) s
 
@@ -709,7 +720,7 @@ let rec copy_from_stream conf print strm =
                   match p_getenv conf.env k with
                   | Some v -> print v
                   | None -> ())
-              | 'W' -> print !command
+              | 'W' -> print (Lazy.force gwsetup_config)
               | _ -> (
                   match p_getenv conf.env (String.make 1 c) with
                   | Some v -> (
