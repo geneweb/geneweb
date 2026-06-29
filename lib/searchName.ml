@@ -1688,8 +1688,8 @@ let rec handle_search_results alias_cache conf base query fn_options components
   let partial = filter_by_oc_and_auth partial in
   let spouse = filter_by_oc_and_auth spouse in
   match (exact, partial, spouse) with
-  | ( [], [], [] ) -> SrcfileDisplay.print_welcome conf base
-  | ( [ single_person ], _, _ ) -> redirect_to_person single_person
+  | [], [], [] -> SrcfileDisplay.print_welcome conf base
+  | [ single_person ], _, _ -> redirect_to_person single_person
   | _multiple_persons -> (
       let exact_persons = List.map (Driver.poi base) exact in
       let partial_persons = List.map (Driver.poi base) partial in
