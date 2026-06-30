@@ -1,4 +1,4 @@
-let commd ?excl ?trim conf = (Util.commd ?excl ?trim conf :> string)
+let commd ?excl ?trim conf = Util.commd_prefix ?excl ?trim conf
 
 exception Exc_located of TemplAst.loc * exn
 exception BadApplyArity
@@ -197,7 +197,9 @@ and eval_simple_variable conf = function
                  (Util.transl_nth conf "wizard/wizards/friend/friends/exterior"
                     1)
                  (if conf.wizard then
-                  Printf.sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>" (commd conf)
+                  Printf.sprintf "<a href=\"%s\">%d</a>"
+                    (Localized_url.to_string
+                    @@ Util.commd' conf ~query:[ ("m", "CONN_WIZ") ])
                     cw
                  else string_of_int cw)
               else "")
@@ -233,13 +235,6 @@ and eval_simple_variable conf = function
   | "prefix" -> commd conf
   | "prefix_base" -> (Util.prefix_base conf :> string)
   | "prefix_base_password" -> (Util.prefix_base_password conf :> string)
-  | "prefix_base_password_2" -> (Util.prefix_base_password_2 conf :> string)
-  | "prefix_no_iz" -> commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf
-  | "prefix_no_templ" -> commd ~excl:[ "templ" ] conf
-  | "prefix_no_pmod" -> commd ~excl:[ "p_mod" ] conf
-  | "prefix_no_wide" -> commd ~excl:[ "wide" ] conf
-  | "prefix_no_lang" -> commd ~excl:[ "lang" ] conf
-  | "prefix_no_all" -> commd ~excl:[ "templ"; "p_mod"; "wide" ] conf
   | "referer" ->
       Option.value ~default:"" (Util.get_referer conf :> string option)
   | "right" -> conf.right
@@ -270,7 +265,6 @@ and eval_simple_variable conf = function
           else c ^ k ^ "=" ^ v ^ "&")
         "" l
   | "url" ->
-      let c :> string = Util.commd conf in
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l :> (string * string) list =
         List.fold_left
@@ -278,7 +272,7 @@ and eval_simple_variable conf = function
           conf.env
           (List.rev_append conf.henv conf.senv)
       in
-      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ "&") c l
+      Localized_url.to_string @@ Util.commd' conf ~query:l
   | "version" -> Version.txt
   | "/" -> ""
   | _ -> raise Not_found

@@ -1146,13 +1146,12 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                   let open Def in
                   (a : Adef.safe_string)
                   ^^^ {|<a href="|}
-                  ^<^ (Util.commd conf ^^^ {|m=NOTES&f=|}
-                       ^<^ (Mutil.encode pg :> Adef.escaped_string)
-                       ^>^ {|#p_|}
-                       ^ string_of_int text.Def.NLDB.lnPos
-                        : Adef.escaped_string
-                        :> Adef.safe_string)
-                  ^^^ {|">|} ^<^ b ^^^ {|</a>|} ^<^ c
+                  ^<^ Localized_url.to_string
+                        (Localized_url.with_fragment
+                           (Util.commd' conf
+                              ~query:[ ("m", "NOTES"); ("f", pg) ])
+                           (Some ("p_" ^ string_of_int text.Def.NLDB.lnPos)))
+                  ^<^ {|">|} ^<^ b ^^^ {|</a>|} ^<^ c
                 in
                 if (str :> string) = "" then str1
                 else
@@ -2309,10 +2308,8 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           let p, _ = ep in
           let open Def in
           safe_val
-            ((Util.acces_n conf base (Adef.escaped "1") p
-               : Adef.escaped_string
-               :> Adef.safe_string)
-            ^^^ (str : Adef.encoded_string :> Adef.safe_string))
+            (Ext_uri.encoded_of_query (Util.acces_n' conf base 1 p)
+            ^<^ (str : Adef.encoded_string :> Adef.safe_string))
       | sl ->
           let ep = make_ep conf base (Gwdb.get_iper p) in
           eval_person_field_var conf base env ep loc sl)
@@ -3048,7 +3045,9 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
-  | "access" -> Util.acces conf base p |> safe_val
+  | "access" ->
+      Ext_uri.encoded_of_query (Util.acces' conf base p)
+      |> Adef.encoded |> safe_val
   | "age" ->
       if p_auth && is_alive ~conf p then
         Option.fold ~none:null_val
@@ -3075,7 +3074,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match Image.get_portrait_path conf base p with
       | Some (`Path s) -> str_val s
       | None -> null_val)
-  | "bname_prefix" -> Util.commd conf |> safe_val
+  | "bname_prefix" -> Util.commd_prefix conf |> Adef.encoded |> safe_val
   | "birth_place" ->
       if p_auth then
         Gwdb.get_birth_place p |> Gwdb.sou base |> Util.trimmed_string_of_place
@@ -3555,13 +3554,17 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
         let s = Unix.stat fname in
         let b = Util.acces conf base p in
         let k = Image.default_portrait_filename base p in
-        Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s"
-          (Util.commd conf :> string)
-          (if html then "H" else "")
-          (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-          (b :> string)
-          k
-        |> Adef.escaped
+        let open Ext_list.Infix in
+        Util.commd' conf
+          ~query:
+            (("m", "IM" ^ if html then "H" else "")
+            @:: ( "d",
+                  Int.to_string
+                  @@ int_of_float
+                       (mod_float s.Unix.st_mtime (float_of_int max_int)) )
+            @:: b
+            @ [ ("k", "/" ^ k) ])
+        |> Localized_url.to_string |> Adef.escaped
     | Some (`Url url) -> Adef.escaped url (* FIXME *)
     | None -> Adef.escaped ""
   else Adef.escaped ""
@@ -4657,9 +4660,13 @@ let print_ancestors_dag conf base v p =
   let options = Util.display_options conf in
   let vbar_txt ip =
     let p = Util.pget conf base ip in
-    let open Def in
-    Util.commd conf ^^^ "m=A&t=T&dag=on&v=" ^<^ string_of_int v ^<^ "&"
-    ^<^ options ^^^ "&" ^<^ Util.acces conf base p
+    let open Ext_list.Infix in
+    Adef.escaped @@ Localized_url.to_string
+    @@ Util.commd' conf
+         ~query:
+           (("m", "A") @:: ("t", "T") @:: ("dag", "on")
+           @:: ("v", string_of_int v)
+           @:: options @ Util.acces conf base p)
   in
   let page_title =
     Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
@@ -4701,8 +4708,7 @@ let print_what_links conf base p =
       if h then Output.print_string conf (simple_person_text conf base p true)
       else (
         Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (Util.commd conf);
-        Output.print_string conf (Util.acces conf base p);
+        Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p));
         Output.print_sstring conf {|">|};
         Output.print_string conf (simple_person_text conf base p true);
         Output.print_sstring conf {|</a>|})

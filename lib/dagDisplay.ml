@@ -4,23 +4,32 @@ let image_normal_txt conf base p fname width height =
   let k = Image.default_portrait_filename base p in
   let r =
     Format.sprintf
-      {|<img src="%sm=IM&d=%s&%s&k=%s"%s%s alt="%s" title="%s"
+      {|<img src="%s"%s%s alt="%s" title="%s"
         style="%s %s">|}
-      (Util.commd conf : Adef.escaped_string :> string)
-      (string_of_int
-      @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-      (Util.acces conf base p : Adef.escaped_string :> string)
-      k
+      (Localized_url.to_string
+      @@ Util.commd' conf
+           ~query:
+             ([
+                ("m", "IM");
+                ( "d",
+                  string_of_int
+                  @@ int_of_float
+                       (mod_float s.Unix.st_mtime (float_of_int max_int)) );
+              ]
+             @ Util.acces conf base p
+             @ [ ("k", k) ]))
       (if width = 0 then "" else " width=" ^ string_of_int width)
       (if height = 0 then "" else " height=" ^ string_of_int height)
       image_txt image_txt
       (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
       (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
   in
-  Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
-    (Util.commd conf : Adef.escaped_string :> string)
-    (Util.acces conf base p : Adef.escaped_string :> string)
-    k r
+  let open Ext_list.Infix in
+  Format.sprintf {|<a href="%s">%s</a>|}
+    (Localized_url.to_string
+    @@ Util.commd' conf
+         ~query:((("m", "IM") @:: Util.acces conf base p) @ [ ("k", k) ]))
+    r
   |> Adef.safe
 
 let image_url_txt conf url_p url height : Adef.safe_string =
@@ -28,7 +37,7 @@ let image_url_txt conf url_p url height : Adef.safe_string =
   Format.sprintf
     {|<a href="%s"><img src="%s" alt="%s" title="%s"
       style="%s"></a>|}
-    (url_p : Adef.escaped_string :> string)
+    (Localized_url.to_string url_p)
     (url : Adef.escaped_string :> string)
     image_txt image_txt
     (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
@@ -39,7 +48,7 @@ let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
   Format.sprintf
     {|<a href="%s"><img src="%s"%s%s alt="%s" title="%s"
       style="%s %s">%s</a>|}
-    (url_p : Adef.escaped_string :> string)
+    (Localized_url.to_string url_p)
     (url : Adef.escaped_string :> string)
     (if width = 0 then "" else " width=" ^ string_of_int width)
     (if height = 0 then "" else " height=" ^ string_of_int height)
@@ -68,19 +77,13 @@ let image_txt conf base p =
           ^ (image_normal_txt conf base p s w h |> Adef.as_string)
           ^ "</td></tr></table></center>"
       | Some (`Url url, Some (wid, hei)) ->
-          let url_p =
-            let open Def in
-            Util.commd conf ^^^ Util.acces conf base p
-          in
+          let url_p = Util.commd' conf ~query:(Util.acces conf base p) in
           {|<br><center><table border="0"><tr align="left"><td>|}
           ^ (image_url_txt_with_size conf url_p (Util.escape_html url) wid hei
             |> Adef.as_string)
           ^ {|</td></tr></table></center>|}
       | Some (`Url url, None) ->
-          let url_p =
-            let open Def in
-            Util.commd conf ^^^ Util.acces conf base p
-          in
+          let url_p = Util.commd' conf ~query:(Util.acces conf base p) in
           let height = 75 in
           (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
           {|<br><center><table border="0" style="height:|}
@@ -512,36 +515,31 @@ let print_next_pos conf pos1 pos2 tcol =
           match k with "pos1" | "pos2" -> env | _ -> (k, v) :: env)
         conf.Config.env []
     in
-    let aux env =
-      List.iter
-        (fun (k, v) ->
-          Output.print_sstring conf k;
-          Output.print_sstring conf "=";
-          Output.print_string conf v;
-          Output.print_sstring conf ";")
-        env
-    in
+    let aux env = List.map (fun (k, v) -> (k, Mutil.decode v)) env in
     Output.print_sstring conf {|<div style="text-align:right">|};
     if pos1 = 0 then Output.print_sstring conf "&nbsp;"
     else (
       Output.print_sstring conf "<a href=\"";
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf "\"";
-      aux env;
-      Output.print_sstring conf "pos1=";
-      Output.print_sstring conf (string_of_int @@ (pos1 + overlap - dpos));
-      Output.print_sstring conf "&pos2=";
-      Output.print_sstring conf (string_of_int @@ (pos1 + overlap));
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:
+             (aux env
+             @ [
+                 ("pos1", string_of_int @@ (pos1 + overlap - dpos));
+                 ("pos2", string_of_int @@ (pos1 + overlap));
+               ]));
       Output.print_sstring conf "\">&lt;&lt;</a>");
     if pos2 >= tcol then Output.print_sstring conf "&nbsp;"
     else (
       Output.print_sstring conf "<a href=\"";
-      Output.print_string conf (Util.commd conf);
-      aux env;
-      Output.print_sstring conf "pos1=";
-      Output.print_sstring conf (string_of_int @@ (pos2 - overlap));
-      Output.print_sstring conf "&pos2=";
-      Output.print_sstring conf (string_of_int @@ (pos2 - overlap + dpos));
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:
+             (aux env
+             @ [
+                 ("pos1", string_of_int @@ (pos2 - overlap));
+                 ("pos2", string_of_int @@ (pos2 - overlap + dpos));
+               ]));
       Output.print_sstring conf "\">&gt;&gt;</a>");
     Output.print_sstring conf "</div>")
 
@@ -692,15 +690,12 @@ let print_html_table conf hts =
     Output.print_sstring conf {|<p><div style="text-align:|};
     Output.print_sstring conf conf.Config.right;
     Output.print_sstring conf {|"><a href="|};
-    Output.print_string conf (Util.commd conf);
-    List.iter
-      (fun (k, v) ->
-        Output.print_sstring conf k;
-        Output.print_sstring conf "=";
-        Output.print_string conf v;
-        Output.print_sstring conf ";")
-      conf.Config.env;
-    Output.print_sstring conf {|notab=on&slices=on"><tt>//</tt></a></div></p>|});
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:
+           (List.map (fun (k, v) -> (k, Mutil.decode v)) conf.Config.env
+           @ [ ("notab", "on"); ("slices", "on") ]));
+    Output.print_sstring conf {|"><tt>//</tt></a></div></p>|});
   if
     Util.p_getenv conf.Config.env "notab" = Some "on"
     || Util.p_getenv conf.Config.env "pos2" <> None
@@ -843,7 +838,7 @@ let print_dag_page conf page_title hts next_txt =
   print_html_table conf hts;
   if (next_txt : Adef.escaped_string :> string) <> "" then (
     Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (Util.commd conf);
+    Output.print_sstring conf (Util.commd_prefix conf);
     Output.print_string conf next_txt;
     Output.print_sstring conf {|">&gt;&gt;</a></p>|});
   Hutil.trailer conf

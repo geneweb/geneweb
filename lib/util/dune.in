@@ -16,5 +16,7 @@
    zarith
    %%%SYSLOG_PKG%%%
    markup
+   str
+   uri
  )
 )

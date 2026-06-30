@@ -23,65 +23,69 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
     if Person.is_empty p then s
     else
       let href =
-        let open Def in
-        Util.commd conf ^^^ "m=RL&"
-        ^<^ Util.acces_n conf base (Adef.escaped "1") p1
-        ^^^ "&b1="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1))
-        ^<^ "&"
-        ^<^ Util.acces_n conf base (Adef.escaped "2") p2
-        ^^^ "&b2="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
-        ^<^ ((if
-              (List.assoc_opt "spouse" conf.Config.env :> string option)
-              = Some "on"
-             then Adef.encoded "&spouse=on"
-             else Adef.encoded "")
-             ^^^ (if
-                  (List.assoc_opt "image" conf.Config.env :> string option)
-                  = Some "off"
-                 then Adef.encoded "&image=off"
-                 else Adef.encoded "")
-             ^^^ "&bd="
-             ^<^ Option.value ~default:(Adef.encoded "0")
-                   (List.assoc_opt "bd" conf.Config.env)
-              :> Adef.escaped_string)
+        let open Ext_list.Infix in
+        Util.commd' conf
+          ~query:
+            ((("m", "RL") @:: Util.acces_n conf base 1 p1)
+            @ ( "b1",
+                Sosa.to_string
+                  (Util.old_sosa_of_branch conf base (ia_asex :: b1)) )
+            @:: Util.acces_n conf base 2 p2
+            @ ( "b2",
+                Sosa.to_string
+                  (Util.old_sosa_of_branch conf base (ia_asex :: b2)) )
+            @:: Ext_option.return_if
+                  ((List.assoc_opt "spouse" conf.Config.env :> string option)
+                  = Some "on")
+                  (fun () -> ("spouse", "on"))
+            @?: Ext_option.return_if
+                  ((List.assoc_opt "image" conf.Config.env :> string option)
+                  = Some "off")
+                  (fun () -> ("image", "off"))
+            @?: [
+                  ( "bd",
+                    Option.value ~default:"0"
+                      (Option.map Mutil.decode
+                         (List.assoc_opt "bd" conf.Config.env)) );
+                ])
       in
       let open Def in
-      "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
+      "<a href=\"" ^<^ Localized_url.to_string href ^<^ "\">" ^<^ s ^>^ "</a>"
   in
   let reference_sp p3 _ _ p s =
     if Person.is_empty p then s
     else
       let href =
-        let open Def in
-        Util.commd conf ^^^ "m=RL&"
-        ^<^ Util.acces_n conf base (Adef.escaped "1") p1
-        ^^^ "&b1="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1))
-        ^<^ "&"
-        ^<^ Util.acces_n conf base (Adef.escaped "2") p2
-        ^^^ "&b2="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
-        ^<^ "&"
-        ^<^ Util.acces_n conf base (Adef.escaped "4") p3
-        ^^^ ((if
-              (List.assoc_opt "spouse" conf.Config.env :> string option)
-              = Some "on"
-             then Adef.encoded "&spouse=on"
-             else Adef.encoded "")
-             ^^^ (if
-                  (List.assoc_opt "image" conf.Config.env :> string option)
-                  = Some "off"
-                 then Adef.encoded "&image=off"
-                 else Adef.encoded "")
-             ^^^ "&bd="
-             ^<^ Option.value ~default:(Adef.encoded "0")
-                   (List.assoc_opt "bd" conf.Config.env)
-              :> Adef.escaped_string)
+        let open Ext_list.Infix in
+        Util.commd' conf
+          ~query:
+            (("m", "RL")
+            @:: Util.acces_n conf base 1 p1
+            @ ( "b1",
+                Sosa.to_string
+                  (Util.old_sosa_of_branch conf base (ia_asex :: b1)) )
+            @:: Util.acces_n conf base 2 p2
+            @ ( "b2",
+                Sosa.to_string
+                  (Util.old_sosa_of_branch conf base (ia_asex :: b2)) )
+            @:: Util.acces_n conf base 4 p3
+            @ Ext_option.return_if
+                ((List.assoc_opt "spouse" conf.Config.env :> string option)
+                = Some "on")
+                (fun () -> ("spouse", "on"))
+            @?: Ext_option.return_if
+                  ((List.assoc_opt "image" conf.Config.env :> string option)
+                  = Some "off")
+                  (fun () -> ("image", "off"))
+            @?: [
+                  ( "bd",
+                    Option.value ~default:"0"
+                      (Option.map Mutil.decode
+                         (List.assoc_opt "bd" conf.Config.env)) );
+                ])
       in
       let open Def in
-      "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
+      "<a href=\"" ^<^ Localized_url.to_string href ^<^ "\">" ^<^ s ^>^ "</a>"
   in
   let print_nospouse _ =
     Sosa_cache.print_sosa ~conf ~base ~person:p2 ~link:true;
@@ -408,24 +412,22 @@ let print_anniv conf base p dead_people level =
       set Gwdb.IperMap.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
-    let href : Adef.escaped_string =
-      let open Def in
-      Util.commd conf ^^^ "m=RL&"
-      ^<^ Util.acces_n conf base (Adef.escaped "1") p
-      ^^^ "&b1=" ^<^ string_of_int up_sosa ^<^ "&"
-      ^<^ Util.acces_n conf base (Adef.escaped "2")
-            (Option.fold ~none:c ~some:(Util.pget conf base) spouse)
-      ^^^ "&b2="
-      ^<^ string_of_int (sosa_of_persons conf base down_br)
-      ^<^ (if spouse = None then
-           "&" ^<^ Util.acces_n conf base (Adef.escaped "4") c
-          else Adef.escaped "")
-      ^>^ "&spouse=on"
+    let href =
+      let open Ext_list.Infix in
+      Util.commd' conf
+        ~query:
+          (("m", "RL") @:: Util.acces_n conf base 1 p
+          @ ("b1", string_of_int up_sosa)
+          @:: Util.acces_n conf base 2
+                (Option.fold ~none:c ~some:(Util.pget conf base) spouse)
+          @ ("b2", string_of_int (sosa_of_persons conf base down_br))
+          @:: (if spouse = None then Util.acces_n conf base 4 c else [])
+          @ [ ("spouse", "on") ])
     in
     let open Def in
     "<a href=\""
-    ^<^ (href :> Adef.safe_string)
-    ^^^ "\">"
+    ^<^ Localized_url.to_string href
+    ^<^ "\">"
     ^<^ NameDisplay.person_title_text conf base c
     ^>^ "</a>"
   in

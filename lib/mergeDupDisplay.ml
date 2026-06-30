@@ -3,8 +3,7 @@
 let print_link ?(with_occurrence_number = true) ?(with_life_dates = true)
     ?(with_main_title = true) conf base p =
   Output.print_sstring conf "<a href=\"";
-  Output.print_string conf (Util.commd conf);
-  Output.print_string conf (Util.acces conf base p);
+  Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p));
   Output.print_sstring conf "\">";
   Output.print_string conf
     (Gwdb.get_first_name p |> Gwdb.sou base |> Util.escape_html);

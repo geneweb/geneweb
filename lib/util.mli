@@ -37,12 +37,30 @@ val commd :
   ?trim:bool ->
   ?henv:bool ->
   ?senv:bool ->
+  ?query:(string * string list) list ->
   Config.config ->
-  Adef.escaped_string
+  Localized_url.t
 (** Returns link to the current command (database name after domain name and port in url) with query string
     that containts bindings from [conf.henv] and [conf.senv]. Doesn't add binding [(k,v)] when:
     - k = "oc" or "ocz" and v = "0"
     - v = "" *)
+
+val commd' :
+  ?excl:string list ->
+  ?trim:bool ->
+  ?henv:bool ->
+  ?senv:bool ->
+  ?query:(string * string) list ->
+  Config.config ->
+  Localized_url.t
+
+val commd_prefix :
+  ?excl:string list ->
+  ?trim:bool ->
+  ?henv:bool ->
+  ?senv:bool ->
+  Config.config ->
+  string
 
 val prefix_base : Config.config -> Adef.escaped_string
 val prefix_base_password : Config.config -> Adef.escaped_string
@@ -78,15 +96,21 @@ val is_old_person :
 val start_with_vowel : string -> bool
 
 val acces_n :
-  Config.config ->
-  Gwdb.base ->
-  Adef.escaped_string ->
-  Gwdb.person ->
-  Adef.escaped_string
+  Config.config -> Gwdb.base -> int -> Gwdb.person -> (string * string) list
 (** Returns URL query string to access nth person
     (e.g. for person 2 in url: p2=foo&n2=bar&oc2=1 *)
 
-val acces : Config.config -> Gwdb.base -> Gwdb.person -> Adef.escaped_string
+val acces_n' :
+  Config.config ->
+  Gwdb.base ->
+  int ->
+  Gwdb.person ->
+  (string * string list) list
+
+val acces : Config.config -> Gwdb.base -> Gwdb.person -> (string * string) list
+
+val acces' :
+  Config.config -> Gwdb.base -> Gwdb.person -> (string * string list) list
 
 val accessible_by_key :
   Config.config -> Gwdb.base -> Gwdb.person -> string -> string -> bool
@@ -379,7 +403,7 @@ val gen_print_tips : Config.config -> Adef.safe_string -> unit
 val print_tips_relationship : Config.config -> unit
 (** Print a tip that tells to {i Click an individual below to calculate the family link.} *)
 
-val display_options : Config.config -> Adef.escaped_string
+val display_options : Config.config -> (string * string) list
 
 type cache_visited_t = (string, (Gwdb.iper * string) list) Hashtbl.t
 

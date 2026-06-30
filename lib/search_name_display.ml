@@ -55,18 +55,16 @@ let print_branch_to_alphabetic ~exact (conf : Config.Trimmed.t) (x : string)
   (* Ne pas oublier l'attribut nofollow pour les robots *)
   if exact then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=N&o=i&t=A&v=";
-    Output.print_string conf (Mutil.encode x);
+    Output.print_url conf
+      (Util.commd' conf ~query:[ ("m", "N"); ("o", "i"); ("t", "A"); ("v", x) ]);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
       (Util.transl_nth conf "display by/branch/alphabetic order" 2);
     Output.print_sstring conf "</a>")
   else (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf {|m=N&o=i&t=N&v=|};
-    Output.print_string conf (Mutil.encode x);
+    Output.print_url conf
+      (Util.commd' conf ~query:[ ("m", "N"); ("o", "i"); ("t", "N"); ("v", x) ]);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
       (Util.transl_nth conf "display by/branch/alphabetic order" 2);
@@ -89,18 +87,15 @@ let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
   Output.print_sstring conf "</td><td>";
   if Util.p_getenv conf.Config.env "t" = Some "A" then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=N&t=A&v=";
-    Output.print_string conf (Mutil.encode x);
+    Output.print_url conf
+      (Util.commd' conf ~query:[ ("m", "N"); ("t", "A"); ("v", x) ]);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
       (Util.transl_nth conf "display by/branch/alphabetic order" 1);
     Output.print_sstring conf "</a>")
   else (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=N&v=";
-    Output.print_string conf (Mutil.encode x);
+    Output.print_url conf (Util.commd' conf ~query:[ ("m", "N"); ("v", x) ]);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
       (Util.transl_nth conf "display by/branch/alphabetic order" 1);
@@ -174,8 +169,7 @@ let print_elem conf base is_surname (p, xl) =
       if not first then Output.print_sstring conf "</li><li> ";
       Sosa_cache.print_sosa ~conf ~base ~person:x ~link:true;
       Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_string conf (Util.acces conf base x);
+      Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base x));
       Output.print_sstring conf {|" id="i|};
       Output.print_sstring conf (Gwdb.string_of_iper iper);
       Output.print_sstring conf {|">|};
@@ -236,9 +230,8 @@ let first_name_print_list ~exact conf base x1 xl liste =
         (fun first x ->
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf {|m=P&t=A&v=|};
-          Output.print_string conf (Mutil.encode x);
+          Output.print_url conf
+            (Util.commd' conf ~query:[ ("m", "P"); ("t", "A"); ("v", x) ]);
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
@@ -283,9 +276,8 @@ let select_first_name conf n list =
   List.iter
     (fun (sstr, (strl, _)) ->
       Output.print_sstring conf {|<li><a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf {|m=P&v=|};
-      Output.print_string conf (Mutil.encode sstr);
+      Output.print_url conf
+        (Util.commd' conf ~query:[ ("m", "P"); ("v", sstr) ]);
       Output.print_sstring conf {|">|};
       Ext_list.iter_first
         (fun first str ->
@@ -520,7 +512,8 @@ let print_one_branch ~exact conf base bh psn =
     Output.print_sstring conf "<li>";
     if Person.is_empty p then Output.print_sstring conf "&lt;&lt;"
     else
-      Util.wprint_geneweb_link conf (Util.acces conf base p)
+      Util.wprint_geneweb_link conf
+        (Adef.escaped @@ Ext_uri.encoded_of_query @@ Util.acces' conf base p)
         (Adef.safe "&lt;&lt;");
     Output.print_sstring conf "<ul>";
     List.iter
@@ -574,11 +567,9 @@ let print_one_surname_by_branch ~exact conf base x (bhl, str) =
     @@ List.fold_left
          (fun n bh ->
            Output.print_sstring conf {|<dt><a href="|};
-           Output.print_string conf (Util.commd conf);
-           Output.print_sstring conf {|m=N&v=|};
-           Output.print_string conf (Mutil.encode str);
-           Output.print_sstring conf {|&br=|};
-           Output.print_sstring conf (string_of_int n);
+           Output.print_url conf
+             (Util.commd' conf
+                ~query:[ ("m", "N"); ("v", str); ("br", string_of_int n) ]);
            Output.print_sstring conf {|" rel="nofollow">|};
            Output.print_sstring conf (string_of_int n);
            Output.print_sstring conf ".</a></dt><dd>";
@@ -626,9 +617,8 @@ let print_one_surname_by_branch ~exact conf base x xl branches =
         (fun first x ->
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf {|m=N&t=A&v=|};
-          Output.print_string conf (Mutil.encode x);
+          Output.print_url conf
+            (Util.commd' conf ~query:[ ("m", "N"); ("t", "A"); ("v", x) ]);
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
@@ -697,10 +687,15 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   Output.print_sstring conf {|<p><em style="font-size:80%">|};
   Output.print_sstring conf {| <a |};
   Output.print_sstring conf {| href="|};
-  Output.print_string conf (Util.commd conf);
-  Output.print_sstring conf {|m=N&o=i&t=N&v=|};
-  Output.print_string conf
-    (if List.length homonymes = 1 then Mutil.encode x else Mutil.encode fx);
+  Output.print_url conf
+    (Util.commd' conf
+       ~query:
+         [
+           ("m", "N");
+           ("o", "i");
+           ("t", "N");
+           ("v", if List.length homonymes = 1 then x else fx);
+         ]);
   Output.print_sstring conf {|">|};
   Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf "click"));
   Output.print_sstring conf " ";

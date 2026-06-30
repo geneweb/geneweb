@@ -66,7 +66,6 @@ type wiki_info = {
 }
 
 let escape (s : string) = (Util.escape_html s : Adef.escaped_string :> string)
-let encode (s : string) = (Mutil.encode s : Adef.encoded_string :> string)
 
 let syntax_links conf base wi s =
   let slen = String.length s in
@@ -150,11 +149,14 @@ let syntax_links conf base wi s =
             let f = wi.wi_file_path (fname_of_path fpath) in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
-          let anchor = if anchor = "" then "" else "#" ^ encode anchor in
+          let anchor = Ext_option.return_if (anchor <> "") (fun () -> anchor) in
           let t =
-            Printf.sprintf {|<a href="%sm=%s&f=%s%s"%s>%s</a>|}
-              (Util.commd conf : Adef.escaped_string :> string)
-              (encode wi.wi_mode) (encode fname) anchor c text
+            Printf.sprintf {|<a href="%s"%s>%s</a>|}
+              (Localized_url.to_string
+              @@ Localized_url.with_fragment
+                   (Util.commd' conf ~query:[ ("m", wi.wi_mode); ("f", fname) ])
+                   anchor)
+              c text
           in
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
@@ -181,7 +183,8 @@ let syntax_links conf base wi s =
                   @@ Util.geneweb_link ?style
                        ~id:(Printf.sprintf "p_%d" pos)
                        conf
-                       (Util.acces conf base person)
+                       (Adef.escaped @@ Ext_uri.encoded_of_query
+                       @@ Util.acces' conf base person)
                        (name |> escape |> Adef.safe)
             in
             if wi.wi_person_exists (fn, sn, oc) then profile_page_link ()
@@ -193,9 +196,10 @@ let syntax_links conf base wi s =
       | NotesLinks.WLwizard (j, wiz, name) ->
           let t =
             let s = if name <> "" then name else wiz in
-            Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s\">%s</a>"
-              (Util.commd conf :> string)
-              (encode wiz) s
+            Printf.sprintf "<a href=\"%s\">%s</a>"
+              (Localized_url.to_string
+              @@ Util.commd' conf ~query:[ ("m", "WIZNOTES"); ("f", wiz) ])
+              s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLnone -> loop quot_lev pos (i + 1) (Buff.store len s.[i])
@@ -341,16 +345,17 @@ let summary_of_tlsw_lines conf short lines =
 
 let string_of_modify_link conf cnt empty = function
   | Some (can_edit, mode, sfn) when conf.Config.wizard ->
+      let open Ext_list.Infix in
       (if empty then "<p>"
       else {|<div style="font-size:80%;float:right;margin-left:3em">|})
       ^ {|(<a href="|}
-      ^ (Util.commd conf :> string)
-      ^ "m="
-      ^ (if can_edit then "MOD" else "VIEW")
-      ^ "_"
-      ^ (Mutil.encode mode :> string)
-      ^ "&v=" ^ string_of_int cnt
-      ^ (if sfn = "" then "" else "&f=" ^ (Mutil.encode sfn :> string))
+      ^ Localized_url.to_string
+          (Util.commd' conf
+             ~query:
+               (("m", (if can_edit then "MOD" else "VIEW") ^ "_" ^ mode)
+               @:: ("v", string_of_int cnt)
+               @:: Ext_option.return_if (sfn <> "") (fun () -> ("f", sfn))
+               @?: []))
       ^ {|">|}
       ^ (if can_edit then Util.transl_decline conf "modify" ""
         else Util.transl conf "view source")
@@ -609,31 +614,26 @@ let rev_extract_sub_part (s : string) (v : int) : string list =
 let extract_sub_part s v = List.rev (rev_extract_sub_part s v)
 
 let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
+  let open Ext_list.Infix in
   Output.print_sstring conf "<p>";
   if cnt0 >= first_cnt then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_sstring conf (Util.commd conf :> string);
-    Output.print_sstring conf {|m=|};
-    Output.print_string conf edit_mode;
-    Output.print_string conf sfn;
-    Output.print_sstring conf {|&v=|};
-    Output.print_sstring conf (string_of_int @@ (cnt0 - 1));
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:
+           (("m", edit_mode) @:: sfn @?: [ ("v", string_of_int @@ (cnt0 - 1)) ]));
     Output.print_sstring conf {|">|};
     Output.print_sstring conf {|&lt;&lt;</a> |});
   Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (Util.commd conf);
-  Output.print_sstring conf {|m=|};
-  Output.print_string conf edit_mode;
-  Output.print_string conf sfn;
+  Output.print_url conf
+    (Util.commd' conf ~query:(("m", edit_mode) @:: sfn @?: []));
   Output.print_sstring conf {|">^^</a>|};
   if not is_empty then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=";
-    Output.print_string conf edit_mode;
-    Output.print_string conf sfn;
-    Output.print_sstring conf "&v=";
-    Output.print_sstring conf (string_of_int @@ (cnt0 + 1));
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:
+           (("m", edit_mode) @:: sfn @?: [ ("v", string_of_int @@ (cnt0 + 1)) ]));
     Output.print_sstring conf {|">&gt;&gt;</a>|});
   Output.print_sstring conf "</p>"
 
@@ -659,17 +659,14 @@ let print_sub_part_text conf base wi edit_opt cnt0 lines =
 let print_sub_part conf base wi can_edit edit_mode sub_fname cnt0 lines =
   let edit_opt = Some (can_edit, edit_mode, sub_fname) in
   let sfn =
-    if sub_fname = "" then Adef.encoded ""
-    else
-      let open Def in
-      "&f=" ^<^ Mutil.encode sub_fname
+    Ext_option.return_if (sub_fname <> "") (fun () -> ("f", sub_fname))
   in
-  print_sub_part_links conf (Mutil.encode edit_mode) sfn cnt0 (lines = []);
+  print_sub_part_links conf edit_mode sfn cnt0 (lines = []);
   print_sub_part_text conf base wi edit_opt cnt0 lines
 
 let print_mod_view_page conf can_edit mode fname title env s =
   let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
-  let mode_pref = Mutil.encode (if can_edit then "MOD_" else "VIEW_") in
+  let mode_pref = if can_edit then "MOD_" else "VIEW_" in
   let has_v, v =
     match Util.p_getint conf.Config.env "v" with
     | Some v -> (true, v)
@@ -679,33 +676,27 @@ let print_mod_view_page conf can_edit mode fname title env s =
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
   let is_empty = sub_part = "" in
-  let sfn =
-    if fname = "" then Adef.encoded ""
-    else
-      let open Def in
-      "&f=" ^<^ Mutil.encode fname
-  in
+  let sfn = Ext_option.return_if (fname <> "") (fun () -> ("f", fname)) in
   Hutil.header conf title;
   if can_edit then (
+    let open Ext_list.Infix in
     Output.print_sstring conf {|<div style="font-size:80%;float:|};
     Output.print_sstring conf conf.Config.right;
     Output.print_sstring conf {|;margin-|};
     Output.print_sstring conf conf.Config.left;
     Output.print_sstring conf {|:3em">(<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf {|m=|};
-    Output.print_string conf mode;
-    if has_v then (
-      Output.print_sstring conf "&v=";
-      Output.print_sstring conf (string_of_int v));
-    Output.print_string conf sfn;
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:
+           (("m", Mutil.decode mode)
+           @:: Ext_option.return_if has_v (fun () -> ("v", string_of_int v))
+           @?: sfn @?: []));
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (message_txt conf 0);
     Output.print_sstring conf "</a>)</div>");
   Hutil.print_link_to_welcome conf true;
-  (if can_edit && has_v then
-   let open Def in
-   print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty);
+  if can_edit && has_v then
+    print_sub_part_links conf (mode_pref ^ Mutil.decode mode) sfn v is_empty;
   Output.print_sstring conf {|<form name="form_notes" method="POST" action="|};
   Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|">|};

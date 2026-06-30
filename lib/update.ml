@@ -217,8 +217,7 @@ let infer_witness_death_from_event ~conf ~base ~date ~existing_witnesses =
     [Rem] : Not visible.                                                      *)
 let print_person_parents_and_spouse conf base p =
   Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (Util.commd conf);
-  Output.print_string conf (Util.acces conf base p);
+  Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p));
   Output.print_sstring conf {|">|};
   Output.print_string conf (Util.escape_html @@ Gwdb.p_first_name base p);
   Output.print_sstring conf ".";
@@ -356,9 +355,9 @@ let string_of_error conf =
             (Util.ftransl conf "name %s already used by %tthis person%t"))
          ("\"" ^ (fso_p base p :> string) ^ "\"")
          (fun () ->
-           Printf.sprintf "<a href=\"%s%s\">"
-             (Util.commd conf : Adef.escaped_string :> string)
-             (Util.acces conf base p : Adef.escaped_string :> string))
+           Printf.sprintf "<a href=\"%s\">"
+             (Localized_url.to_string
+             @@ Util.commd' conf ~query:(Util.acces conf base p)))
          (fun () -> "</a>")
       ^
       if var = "" then "."
@@ -482,8 +481,7 @@ let print_error conf e = Output.print_string conf @@ string_of_error conf e
 
 let print_someone_ref_text conf base p =
   Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (Util.commd conf);
-  Output.print_string conf (Util.acces conf base p);
+  Output.print_url conf (Util.commd' conf ~query:(Util.acces conf base p));
   Output.print_sstring conf {|">|};
   Output.print_string conf (Util.escape_html @@ Gwdb.p_first_name base p);
   if Gwdb.get_occ p <> 0 then (

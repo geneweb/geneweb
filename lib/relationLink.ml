@@ -341,48 +341,46 @@ let rec print_both_branches_pre conf base info sz pl1 pl2 =
     | None -> Output.print_sstring conf "\n");
     print_both_branches_pre conf base info sz pl1 pl2
 
-let include_marr conf base (n : Adef.escaped_string) =
-  match Util.find_person_in_env conf base (n :> string) with
-  | Some p ->
-      let open Def in
-      "&" ^<^ Util.acces_n conf base n p
-  | None -> Adef.escaped ""
+let include_marr conf base n =
+  match Util.find_person_in_env conf base (Int.to_string n) with
+  | Some p -> Util.acces_n conf base n p
+  | None -> []
 
 let sign_text conf base sign info b1 b2 c1 c2 =
   let href =
-    let open Def in
-    Util.commd conf ^^^ "m=RL&"
-    ^<^ Util.acces_n conf base (Adef.escaped "1") (Util.pget conf base info.ip1)
-    ^^^ "&"
-    ^<^ Util.acces_n conf base (Adef.escaped "2") (Util.pget conf base info.ip2)
-    ^^^ "&b1="
-    ^<^ Sosa.to_string
-          (Util.old_sosa_of_branch conf base ((info.ip, info.sp) :: b1))
-    ^<^ "&b2="
-    ^<^ Sosa.to_string
-          (Util.old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
-    ^<^ "&c1=" ^<^ string_of_int c1 ^<^ "&c2=" ^<^ string_of_int c2
-    ^<^ Adef.escaped
-          (if Util.p_getenv conf.Config.env "spouse" = Some "on" then
-           "&spouse=on"
-          else "")
-    ^^^ Adef.escaped
-          (if Util.p_getenv conf.Config.env "image" = Some "off" then
-           "&image=off"
-          else "")
-    ^^^ (match Util.p_getenv conf.Config.env "bd" with
-        | None | Some ("0" | "") -> Adef.escaped ""
-        | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
-    ^^^ (match Util.p_getenv conf.Config.env "color" with
-        | None | Some "" -> Adef.escaped ""
-        | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
-    ^^^ include_marr conf base (Adef.escaped "3")
-    ^^^ include_marr conf base (Adef.escaped "4")
+    let open Ext_list.Infix in
+    Util.commd' conf
+      ~query:
+        (("m", "RL")
+        @:: Util.acces_n conf base 1 (Util.pget conf base info.ip1)
+        @ Util.acces_n conf base 2 (Util.pget conf base info.ip2)
+        @ ( "b1",
+            Sosa.to_string
+              (Util.old_sosa_of_branch conf base ((info.ip, info.sp) :: b1)) )
+        @:: ( "b2",
+              Sosa.to_string
+                (Util.old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
+            )
+        @:: ("c1", string_of_int c1)
+        @:: ("c2", string_of_int c2)
+        @:: Ext_option.return_if
+              (Util.p_getenv conf.Config.env "spouse" = Some "on")
+              (fun () -> ("spouse", "on"))
+        @?: Ext_option.return_if
+              (Util.p_getenv conf.Config.env "image" = Some "off")
+              (fun () -> ("image", "off"))
+        @?: (match Util.p_getenv conf.Config.env "bd" with
+            | None | Some ("0" | "") -> None
+            | Some x -> Some ("bd", x))
+        @?: (match Util.p_getenv conf.Config.env "color" with
+            | None | Some "" -> None
+            | Some x -> Some ("color", x))
+        @?: include_marr conf base 3 @ include_marr conf base 4)
   in
   let open Def in
   "<a href=\""
-  ^<^ (href : Adef.escaped_string :> Adef.safe_string)
-  ^^^ "\">"
+  ^<^ Localized_url.to_string href
+  ^<^ "\">"
   ^<^ (sign : Adef.safe_string)
   ^>^ "</a>"
 

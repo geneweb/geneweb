@@ -679,7 +679,11 @@ and mk_str_lst base istrs =
 
 and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
-  let access_url = escaped (Geneweb.Util.acces conf base p) in
+  let access_url =
+    escaped
+      (Adef.escaped @@ Ext_uri.encoded_of_query
+      @@ Geneweb.Util.acces' conf base p)
+  in
   let access = Jingoo.Jg_types.Tbool (Geneweb.Util.is_public conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
@@ -754,7 +758,11 @@ and find_events conf base x events =
 
 and unsafe_mk_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
-  let access_url = escaped (Geneweb.Util.acces conf base p) in
+  let access_url =
+    escaped
+      (Adef.escaped @@ Ext_uri.encoded_of_query
+      @@ Geneweb.Util.acces' conf base p)
+  in
   let access = Jingoo.Jg_types.Tbool (Geneweb.Util.is_public conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
@@ -1325,7 +1333,7 @@ let mk_conf conf =
     | "wizard" -> wizard
     | _ -> raise Not_found)
 
-let prefix conf = escaped (Geneweb.Util.commd conf)
+let prefix conf = escaped (Adef.escaped @@ Geneweb.Util.commd_prefix conf)
 let prefix_base conf = escaped (Geneweb.Util.prefix_base_password conf)
 let url conf = escaped @@ Geneweb.Util.escape_html conf.Geneweb.Config.command
 

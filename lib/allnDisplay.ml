@@ -80,7 +80,7 @@ let surname_list_meta_description conf base =
 
 let print_alphabetic_big conf base is_surnames ini list len too_big =
   let title = print_title conf base is_surnames ini len in
-  let mode = if is_surnames then Adef.encoded "N" else Adef.encoded "P" in
+  let mode = if is_surnames then "N" else "P" in
   let meta =
     if is_surnames then surname_list_meta_description conf base else []
   in
@@ -91,19 +91,13 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     (fun ini_k ->
       if ini_k = ini then (
         Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (Util.commd conf);
-        Output.print_sstring conf "m=";
-        Output.print_string conf mode;
-        Output.print_sstring conf "&tri=A&v=";
-        Output.print_string conf (Mutil.encode ini_k);
+        Output.print_url conf
+          (Util.commd' conf ~query:[ ("m", mode); ("tri", "A"); ("v", ini_k) ]);
         Output.print_sstring conf {|">|})
       else (
         Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (Util.commd conf);
-        Output.print_sstring conf "m=";
-        Output.print_string conf mode;
-        Output.print_sstring conf "&tri=A&k=";
-        Output.print_string conf (Mutil.encode ini_k);
+        Output.print_url conf
+          (Util.commd' conf ~query:[ ("m", mode); ("tri", "A"); ("k", ini_k) ]);
         Output.print_sstring conf {|">|});
       Output.print_string conf (tr '_' "&nbsp;" ini_k |> Util.escape_html);
       Output.print_sstring conf "</a>\n")
@@ -115,29 +109,24 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf "</p><ul><li>";
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=";
-    Output.print_string conf mode;
-    Output.print_sstring conf "&tri=A&o=A&k=";
-    Output.print_string conf (Mutil.encode ini);
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:[ ("m", mode); ("tri", "A"); ("o", "A"); ("k", ini) ]);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (Util.transl conf "long display");
     Output.print_sstring conf "</a></li><li>";
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=";
-    Output.print_string conf mode;
-    Output.print_sstring conf "&tri=S&o=A&k=";
-    Output.print_string conf (Mutil.encode ini);
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:[ ("m", mode); ("tri", "S"); ("o", "A"); ("k", ini) ]);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (Util.transl conf "short display");
     Output.print_sstring conf "</a></li><li>";
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=";
-    Output.print_string conf mode;
-    Output.print_sstring conf "&tri=S&o=A&cgl=on&k=";
-    Output.print_string conf (Mutil.encode ini);
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:
+           [ ("m", mode); ("tri", "S"); ("o", "A"); ("cgl", "on"); ("k", ini) ]);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (Util.transl conf "short display");
     Output.print_sstring conf " + ";
@@ -195,7 +184,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
 
 let print_alphabetic_small conf base is_surnames ini list len =
   let title = print_title conf base is_surnames ini len in
-  let mode = Adef.encoded (if is_surnames then "N" else "P") in
+  let mode = if is_surnames then "N" else "P" in
   let meta =
     if is_surnames then surname_list_meta_description conf base else []
   in
@@ -207,12 +196,9 @@ let print_alphabetic_small conf base is_surnames ini list len =
       (fun (_, s, cnt) ->
         Output.print_sstring conf "<li>";
         Output.print_sstring conf "<a href=\"";
-        Output.print_string conf (Util.commd conf);
-        Output.print_sstring conf "m=";
-        Output.print_string conf mode;
-        Output.print_sstring conf "&v=";
-        Output.print_string conf (Mutil.encode s);
-        Output.print_sstring conf "&t=A\">";
+        Output.print_url conf
+          (Util.commd' conf ~query:[ ("m", mode); ("v", s); ("t", "A") ]);
+        Output.print_sstring conf "\">";
         Output.print_string conf
           (particle_at_the_end base is_surnames s |> Util.escape_html);
         Output.print_sstring conf "</a> (";
@@ -227,7 +213,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
 
 let print_frequency_any conf base is_surnames list len =
   let title = print_title conf base is_surnames "" len in
-  let mode = Adef.encoded (if is_surnames then "N" else "P") in
+  let mode = if is_surnames then "N" else "P" in
   let n = ref 0 in
   let conf = Config.Trimmed.to_config conf in
   Hutil.header conf title;
@@ -241,11 +227,8 @@ let print_frequency_any conf base is_surnames list len =
         List.iter
           (fun s ->
             Output.print_sstring conf "<li><a href=\"";
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf "m=";
-            Output.print_string conf mode;
-            Output.print_sstring conf "&v=";
-            Output.print_string conf (Mutil.encode (Name.lower s));
+            Output.print_url conf
+              (Util.commd' conf ~query:[ ("m", mode); ("v", Name.lower s) ]);
             Output.print_sstring conf "\">";
             Output.print_string conf
               (particle_at_the_end base is_surnames s |> Util.escape_html);
@@ -295,7 +278,7 @@ let print_alphabetic ~prefix ~all ~at_least ~fast ~index conf base is_surnames =
 
 let print_alphabetic_short conf base is_surnames ini list len =
   let title = print_title conf base is_surnames ini len in
-  let mode = Adef.encoded (if is_surnames then "N" else "P") in
+  let mode = if is_surnames then "N" else "P" in
   let need_ref = len >= 250 in
   let meta =
     if is_surnames then surname_list_meta_description conf base else []
@@ -320,10 +303,10 @@ let print_alphabetic_short conf base is_surnames ini list len =
       Ext_list.iter_first
         (fun first (s, cnt) ->
           let href =
-            let open Def in
-            " href=\"" ^<^ Util.commd conf
-            ^^^ ("m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A\""
-                  :> Adef.escaped_string)
+            " href=\""
+            ^ Localized_url.to_string
+                (Util.commd' conf ~query:[ ("m", mode); ("v", s); ("t", "A") ])
+            ^ "\""
           in
           let name =
             Adef.encoded
@@ -331,7 +314,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
           in
           if not first then Output.print_sstring conf ",";
           Output.print_sstring conf "\n<a";
-          Output.print_string conf href;
+          Output.print_sstring conf href;
           Output.print_string conf name;
           Output.print_sstring conf ">";
           Output.print_string conf

@@ -503,7 +503,9 @@ let print_elem conf base paths precision (n, pll) =
           List.iter
             (fun p ->
               Output.print_sstring conf "<li><strong>";
-              Util.wprint_geneweb_link conf (Util.acces conf base p)
+              Util.wprint_geneweb_link conf
+                (Adef.escaped @@ Ext_uri.encoded_of_query
+               @@ Util.acces' conf base p)
                 (Gwdb.p_first_name base p |> Util.escape_html
                   :> Adef.safe_string);
               Output.print_sstring conf "</strong>";
@@ -1073,11 +1075,17 @@ let make_tree_hts conf base gv p =
           let options = Util.display_options conf in
           let ncol = nb_column 0 (v - 1) p in
           let vbar_txt =
-            let open Def in
-            Util.commd conf ^^^ "m=D&t=T&v=" ^<^ string_of_int gv ^<^ "&"
-            ^<^ options ^^^ "&" ^<^ Util.acces conf base p
+            let open Ext_list.Infix in
+            Util.commd' conf
+              ~query:
+                (("m", "D") @:: ("t", "T")
+                @:: ("v", string_of_int gv)
+                @:: options @ Util.acces conf base p)
           in
-          ((2 * ncol) - 1, Dag2html.CenterA, Dag2html.TDbar (Some vbar_txt))
+          ( (2 * ncol) - 1,
+            Dag2html.CenterA,
+            Dag2html.TDbar
+              (Some (Adef.escaped @@ Localized_url.to_string vbar_txt)) )
       | None -> (1, Dag2html.LeftA, Dag2html.TDnothing)
     in
     td :: tdl

@@ -46,7 +46,8 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let hts =
     DagDisplay.make_tree_hts conf base elem_txt vbar_txt invert set [] d
   in
-  DagDisplay.print_slices_menu_or_dag_page conf page_title hts next_txt
+  DagDisplay.print_slices_menu_or_dag_page conf page_title hts
+    (Adef.escaped @@ Option.fold ~none:"" ~some:Localized_url.to_string next_txt)
 
 let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   if Util.p_getenv conf.Config.env "new" <> Some "on" then
@@ -58,36 +59,36 @@ let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
       Util.transl conf "relationship" |> Utf8.capitalize_fst |> Adef.safe
     in
     DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set []
-      page_title next_txt
+      page_title
+      (Adef.escaped
+      @@ Option.fold ~none:"" ~some:Localized_url.to_string next_txt)
 
-let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
+let next_relation_link_txt conf ip1 ip2 excl_faml =
   let bd =
     match Util.p_getenv conf.Config.env "bd" with
-    | None | Some ("0" | "") -> Adef.escaped ""
-    | Some x ->
-        let open Def in
-        "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string)
+    | None | Some ("0" | "") -> None
+    | Some x -> Some ("bd", x)
   in
   let color =
-    match Util.p_getenv conf.Config.env "color" with
-    | None -> Adef.escaped ""
-    | Some x ->
-        let open Def in
-        "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string)
+    Option.map (fun x -> ("color", x)) (Util.p_getenv conf.Config.env "color")
   in
-  let sl, _ =
-    List.fold_left
-      (fun (sl, i) ifam ->
-        ("&ef" ^ string_of_int i ^ "=" ^ Gwdb.string_of_ifam ifam ^ sl, i - 1))
-      ("", List.length excl_faml - 1)
+  let sl =
+    List.mapi
+      (fun i ifam ->
+        ( "ef" ^ string_of_int (List.length excl_faml - 1 - i),
+          Gwdb.string_of_ifam ifam ))
       excl_faml
   in
-  let open Def in
-  Util.commd conf ^^^ "em=R&ei=" ^<^ Gwdb.string_of_iper ip1 ^<^ "&i="
-  ^<^ Gwdb.string_of_iper ip2
-  ^<^ (if Util.p_getenv conf.Config.env "spouse" = Some "on" then "&spouse=on"
-      else "")
-  ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
+  let open Ext_list.Infix in
+  Util.commd' conf
+    ~query:
+      (("em", "R")
+      @:: ("ei", Gwdb.string_of_iper ip1)
+      @:: ("i", Gwdb.string_of_iper ip2)
+      @:: Ext_option.return_if
+            (Util.p_getenv conf.Config.env "spouse" = Some "on")
+            (fun () -> ("spouse", "on"))
+      @?: bd @?: color @?: ("et", "S") @:: sl)
 
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then (
@@ -103,9 +104,10 @@ let print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let vbar_txt ip =
       let u = Util.pget conf base ip in
       let excl_faml = Array.to_list (Gwdb.get_family u) @ excl_faml in
-      next_relation_link_txt conf ip1 ip2 excl_faml
+      Adef.escaped @@ Localized_url.to_string
+      @@ next_relation_link_txt conf ip1 ip2 excl_faml
     in
-    print_relationship_dag conf base elem_txt vbar_txt path next_txt
+    print_relationship_dag conf base elem_txt vbar_txt path (Some next_txt)
 
 let print_shortest_path conf base p1 p2 =
   let ip1 = Gwdb.get_iper p1 in
@@ -146,9 +148,8 @@ let print_shortest_path conf base p1 p2 =
           |> Util.cftransl conf "no known relationship link between %s and %s"
           |> Utf8.capitalize_fst |> Output.print_sstring conf;
           Output.print_sstring conf ".<br><p><span><a href=\"";
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf "&m=R&";
-          Output.print_string conf (Util.acces conf base p1);
+          Output.print_url conf
+            (Util.commd' conf ~query:(("m", "R") :: Util.acces conf base p1));
           Output.print_sstring conf "\">";
           Util.transl_nth conf "try another/relationship computing" 0
           |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -514,10 +515,9 @@ let string_of_big_int conf i =
 
 let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   let image_opt =
-    Adef.escaped
-    @@
-    if Util.p_getenv conf.Config.env "image" = Some "off" then "&image=off"
-    else ""
+    Ext_option.return_if
+      (Util.p_getenv conf.Config.env "image" = Some "off")
+      (fun () -> ("image", "off"))
   in
   Output.print_sstring conf "<ul>";
   List.iter
@@ -539,21 +539,21 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
         Output.print_string conf (Image.prefix conf);
         Output.print_sstring conf "/picto_rel_small.png\" alt=\"\">";
         let href =
-          let open Def in
-          Util.commd conf ^^^ "m=RL&" ^<^ Util.acces conf base a ^^^ "&l1="
-          ^<^ string_of_int x1 ^<^ "&"
-          ^<^ Util.acces_n conf base (Adef.escaped "1") dp1
-          ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
-          ^<^ Util.acces_n conf base (Adef.escaped "2") dp2
-          ^^^ (if pp1 = None then Adef.escaped ""
-              else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
-          ^^^ (if pp2 = None then Adef.escaped ""
-              else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
-          ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
-          ^^^ image_opt
+          let open Ext_list.Infix in
+          Util.commd' conf
+            ~query:
+              (("m", "RL") @:: Util.acces conf base a
+              @ ("l1", string_of_int x1)
+              @:: Util.acces_n conf base 1 dp1
+              @ ("l2", string_of_int x2)
+              @:: Util.acces_n conf base 2 dp2
+              @ (if pp1 = None then [] else Util.acces_n conf base 3 p1)
+              @ (if pp2 = None then [] else Util.acces_n conf base 4 p2)
+              @ Ext_option.return_if propose_dag (fun () -> ("dag", "on"))
+              @?: image_opt @?: [])
         in
         Output.print_sstring conf {|<a href="|};
-        Output.print_string conf href;
+        Output.print_url conf href;
         Output.print_sstring conf {|">|};
         Util.transl conf "see" |> Utf8.capitalize_fst
         |> Output.print_sstring conf;
@@ -567,10 +567,9 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
 let print_solution_not_ancestor conf base long p1 p2 sol =
   let pp1, pp2, (x1, x2, list), reltab = sol in
   let image_opt =
-    Adef.escaped
-    @@
-    if Util.p_getenv conf.Config.env "image" = Some "off" then "&image=off"
-    else ""
+    Ext_option.return_if
+      (Util.p_getenv conf.Config.env "image" = Some "off")
+      (fun () -> ("image", "off"))
   in
   Output.print_sstring conf {|<ul class="li_relationship"><li>|};
   Util.transl conf "indeed," |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -594,21 +593,21 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
         Output.print_string conf (Image.prefix conf);
         Output.print_sstring conf {|/picto_rel_small.png" alt="">|};
         let href =
-          let open Def in
-          Util.commd conf ^^^ "m=RL&" ^<^ Util.acces conf base a ^^^ "&l1="
-          ^<^ string_of_int x1 ^<^ "&"
-          ^<^ Util.acces_n conf base (Adef.escaped "1") dp1
-          ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
-          ^<^ Util.acces_n conf base (Adef.escaped "2") dp2
-          ^^^ (if pp1 = None then Adef.escaped ""
-              else "&" ^<^ Util.acces_n conf base (Adef.escaped "3") p1)
-          ^^^ (if pp2 = None then Adef.escaped ""
-              else "&" ^<^ Util.acces_n conf base (Adef.escaped "4") p2)
-          ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
-          ^^^ image_opt
+          let open Ext_list.Infix in
+          Util.commd' conf
+            ~query:
+              (("m", "RL") @:: Util.acces conf base a
+              @ ("l1", string_of_int x1)
+              @:: Util.acces_n conf base 1 dp1
+              @ ("l2", string_of_int x2)
+              @:: Util.acces_n conf base 2 dp2
+              @ (if pp1 = None then [] else Util.acces_n conf base 3 p1)
+              @ (if pp2 = None then [] else Util.acces_n conf base 4 p2)
+              @ Ext_option.return_if propose_dag (fun () -> ("dag", "on"))
+              @?: image_opt @?: [])
         in
         Output.print_sstring conf {|<a href="|};
-        Output.print_string conf href;
+        Output.print_url conf href;
         Output.print_sstring conf {|">|};
         Util.transl conf "see" |> Utf8.capitalize_fst
         |> Output.print_sstring conf;
@@ -711,59 +710,50 @@ let print_dag_links conf base p1 p2 rl =
         let dp2 = match pp2 with Some p -> p | _ -> p2 in
         if nt > 1 && nn > 1 && nn < max_br then (
           let a = Util.pget conf base ip in
+          let open Ext_list.Infix in
           if not is_anc then (
             Output.print_sstring conf "<li>";
             Output.print_string conf (NameDisplay.person_title_text conf base a);
             Output.print_sstring conf (Util.transl conf ":");
             Output.print_sstring conf " ");
           Output.print_sstring conf "<a href=\"";
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf "m=RL&";
-          Output.print_string conf (Util.acces conf base a);
-          Output.print_sstring conf "&";
-          Output.print_string conf
-            (Util.acces_n conf base (Adef.escaped "1") dp1);
-          Output.print_sstring conf "&";
-          Output.print_string conf
-            (Util.acces_n conf base (Adef.escaped "2") dp2);
-          if pp1 <> None then (
-            Output.print_sstring conf "&";
-            Output.print_string conf
-              (Util.acces_n conf base (Adef.escaped "3") p1));
-          if pp2 <> None then (
-            Output.print_sstring conf "&";
-            Output.print_string conf
-              (Util.acces_n conf base (Adef.escaped "4") p2));
-          let l1, l2 =
-            List.fold_left
-              (fun (l1, l2) (_, _, (x1, x2, list), _) ->
-                List.fold_left
-                  (fun (l1, l2) (a, _) ->
-                    if Gwdb.get_iper a = ip then
-                      let l1 = if List.mem x1 l1 then l1 else x1 :: l1 in
-                      let l2 = if List.mem x2 l2 then l2 else x2 :: l2 in
-                      (l1, l2)
-                    else (l1, l2))
-                  (l1, l2) list)
-              ([], []) rl
-          in
-          Output.print_sstring conf "&l1=";
-          List.iteri
-            (fun i x ->
-              if i <> 0 then Output.print_sstring conf ",";
-              Output.print_sstring conf (string_of_int x))
-            l1;
-          Output.print_sstring conf "&l2=";
-          List.iteri
-            (fun i x ->
-              if i <> 0 then Output.print_sstring conf ",";
-              Output.print_sstring conf (string_of_int x))
-            l2;
-          if Util.p_getenv conf.Config.env "image" = Some "off" then
-            Output.print_sstring conf "&image=off";
-          if Util.p_getenv conf.Config.env "bd" = Some "on" then
-            Output.print_sstring conf "&bd=on";
-          Output.print_sstring conf {|&dag=on">|};
+          Output.print_url conf
+            (Util.commd conf
+               ~query:
+                 (("m", [ "RL" ]) @:: Util.acces' conf base a
+                 @ Util.acces_n' conf base 1 dp1
+                 @ Util.acces_n' conf base 2 dp2
+                 @ (if pp1 <> None then Util.acces_n' conf base 3 p1 else [])
+                 @ (if pp2 <> None then Util.acces_n' conf base 4 p2 else [])
+                 @ (let l1, l2 =
+                      List.fold_left
+                        (fun (l1, l2) (_, _, (x1, x2, list), _) ->
+                          List.fold_left
+                            (fun (l1, l2) (a, _) ->
+                              if Gwdb.get_iper a = ip then
+                                let l1 =
+                                  if List.mem x1 l1 then l1 else x1 :: l1
+                                in
+                                let l2 =
+                                  if List.mem x2 l2 then l2 else x2 :: l2
+                                in
+                                (l1, l2)
+                              else (l1, l2))
+                            (l1, l2) list)
+                        ([], []) rl
+                    in
+                    [
+                      ("l1", List.map string_of_int l1);
+                      ("l2", List.map string_of_int l2);
+                    ])
+                 @ Ext_option.return_if
+                     (Util.p_getenv conf.Config.env "image" = Some "off")
+                     (fun () -> ("image", [ "off" ]))
+                 @?: Ext_option.return_if
+                       (Util.p_getenv conf.Config.env "bd" = Some "on")
+                       (fun () -> ("bd", [ "on" ]))
+                 @?: [ ("dag", [ "on" ]) ]));
+          Output.print_sstring conf {|">|};
           if is_anc then Output.print_sstring conf (Util.transl conf "tree")
           else (
             Output.print_sstring conf (string_of_int nn);
@@ -793,6 +783,7 @@ let print_propose_upto conf base p1 p2 rl =
       let s =
         (NameDisplay.person_title_text conf base p : Adef.safe_string :> string)
       in
+      let open Ext_list.Infix in
       Util.transl_a_of_b conf (Util.transl conf "ancestors") s s
       |> Util.translate_eval |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf " ";
@@ -802,12 +793,12 @@ let print_propose_upto conf base p1 p2 rl =
       Output.print_sstring conf {|&nbsp;<img src="|};
       Output.print_string conf (Image.prefix conf);
       Output.print_sstring conf {|/picto_rel_asc.png" alt=""> <a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_string conf (Util.acces conf base p);
-      Output.print_sstring conf "&m=A&t=D&";
-      Output.print_string conf (Util.acces_n conf base (Adef.escaped "1") a);
-      Output.print_sstring conf "&l=";
-      Output.print_sstring conf (string_of_int maxlen);
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:
+             (Util.acces conf base p @ ("m", "A") @:: ("t", "D")
+            @:: Util.acces_n conf base 1 a
+             @ [ ("l", string_of_int maxlen) ]));
       Output.print_sstring conf {|">|};
       Util.transl conf "see" |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf "</a></span></p>"
@@ -921,9 +912,8 @@ let print_main_relationship conf base long p1 p2 rel =
         |> Util.cftransl conf "no known relationship link between %s and %s"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf {|.<br><p><span><a href="|};
-        Output.print_string conf (Util.commd conf);
-        Output.print_sstring conf "&m=R&";
-        Output.print_string conf (Util.acces conf base p1);
+        Output.print_url conf
+          (Util.commd' conf ~query:(("m", "R") :: Util.acces conf base p1));
         Output.print_sstring conf {|">|};
         Util.transl_nth conf "try another/relationship computing" 0
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -948,38 +938,26 @@ let print_main_relationship conf base long p1 p2 rel =
 let multi_relation_next_txt conf pl2 lim assoc_txt =
   let assoc_txt : (Gwdb.iper, string) Hashtbl.t = assoc_txt in
   match pl2 with
-  | [] -> Adef.escaped ""
+  | [] -> None
   | _ ->
+      let acc = if lim > 0 then [ ("lim", string_of_int lim) ] else [] in
       let acc =
-        Adef.escaped (if lim > 0 then "&lim=" ^ string_of_int lim else "")
+        let open Ext_list.Infix in
+        List.concat
+          (List.mapi
+             (fun n p ->
+               Option.map
+                 (fun s -> ("t" ^ string_of_int (succ n), s))
+                 (Gwdb.get_iper p |> Hashtbl.find_opt assoc_txt)
+               @?: [
+                     ( "i" ^ string_of_int (succ n),
+                       Gwdb.get_iper p |> Gwdb.string_of_iper );
+                   ])
+             pl2)
+        @ acc
       in
-      let acc =
-        List.fold_left
-          (fun (acc, n) p ->
-            let acc =
-              let open Def in
-              Option.fold
-                (Gwdb.get_iper p |> Hashtbl.find_opt assoc_txt)
-                ~some:(fun s ->
-                  "&t" ^<^ string_of_int n ^<^ "="
-                  ^<^ (Mutil.encode s :> Adef.escaped_string)
-                  ^^^ acc)
-                ~none:acc
-            in
-            let acc =
-              let open Def in
-              "&i" ^<^ string_of_int n ^<^ "="
-              ^<^ (Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode
-                    :> Adef.escaped_string)
-              ^^^ acc
-            in
-            (acc, n - 1))
-          (acc, List.length pl2)
-          (List.rev pl2)
-        |> fst
-      in
-      let open Def in
-      Util.commd conf ^^^ "m=RLM" ^<^ acc
+
+      Some (Util.commd' conf ~query:(("m", "RLM") :: acc))
 
 let print_no_relationship conf base pl =
   let title _ =
