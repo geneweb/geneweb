@@ -78,8 +78,9 @@ let print_mod_ok conf base =
     Output.print_sstring conf " ";
     if List.assoc_opt "history" conf.base_env = Some "yes" then (
       Output.print_sstring conf "<a href=\"";
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf "m=HIST&k=20\">";
+      Output.print_url conf
+        (Util.commd' conf ~query:[ ("m", "HIST"); ("k", "20") ]);
+      Output.print_sstring conf "\">";
       Output.print_sstring conf
         (Util.transl_nth conf "modification/modifications"
            (if nb_pers > 1 then 1 else 0));
@@ -115,12 +116,11 @@ let print_mod_ok conf base =
         (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>");
     Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf {|m=MOD_DATA&data=|};
-    Output.print_string conf (Mutil.encode data);
-    Output.print_sstring conf {|&s=|};
-    Output.print_string conf (Mutil.encode new_ini);
-    Output.print_sstring conf ("#entry_anchor_" ^ new_istr_s);
+    Output.print_url conf
+      (Uri.with_fragment
+         (Util.commd' conf
+            ~query:[ ("m", "MOD_DATA"); ("data", data); ("s", new_ini) ])
+         (Some ("entry_anchor_" ^ new_istr_s)));
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (Util.transl conf "new modification"));
@@ -132,12 +132,11 @@ let print_mod_ok conf base =
         |> Utf8.capitalize_fst |> Output.print_sstring conf);
     Hutil.print_link_to_welcome conf true;
     Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf {|m=MOD_DATA&data=|};
-    Output.print_string conf (Mutil.encode data);
-    Output.print_sstring conf {|&s=|};
-    Output.print_string conf (Mutil.encode ini);
-    Output.print_sstring conf ("#entry_anchor_" ^ new_istr_s);
+    Output.print_url conf
+      (Uri.with_fragment
+         (Util.commd' conf
+            ~query:[ ("m", "MOD_DATA"); ("data", data); ("s", ini) ])
+         (Some ("entry_anchor_" ^ new_istr_s)));
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (Util.transl conf "new modification"));

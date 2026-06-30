@@ -42,10 +42,10 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   let what_links_page () =
     if fnotes <> "" then (
       Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf {|m=NOTES&f=|};
-      Output.print_string conf (Mutil.encode fnotes);
-      Output.print_sstring conf {|&ref=on" class="mx-2">(|};
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:[ ("m", "NOTES"); ("f", fnotes); ("ref", "on") ]);
+      Output.print_sstring conf {|" class="mx-2">(|};
       Output.print_sstring conf (Util.transl conf "linked pages");
       Output.print_sstring conf ")</a>\n")
   in
@@ -127,9 +127,8 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "<tt>";
           if conf.Config.wizard then (
             Output.print_sstring conf {|<a href="|};
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf "&i=";
-            Output.print_string conf (Gwdb.string_of_iper ip |> Mutil.encode);
+            Output.print_url conf
+              (Util.commd' conf ~query:[ ("i", Gwdb.string_of_iper ip) ]);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           let p = Util.pget conf base ip in
@@ -145,12 +144,14 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "<tt>";
           if conf.Config.wizard then (
             Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf "m=MOD_FAM&i=";
-            Output.print_string conf (Gwdb.string_of_ifam ifam |> Mutil.encode);
-            Output.print_sstring conf "&ip=";
-            Output.print_string conf
-              (Gwdb.get_iper fath |> Gwdb.string_of_iper |> Mutil.encode);
+            Output.print_url conf
+              (Util.commd' conf
+                 ~query:
+                   [
+                     ("m", "MOD_FAM");
+                     ("i", Gwdb.string_of_ifam ifam);
+                     ("ip", Gwdb.get_iper fath |> Gwdb.string_of_iper);
+                   ]);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf "<span class=\"mx-2\">";
@@ -167,12 +168,13 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "<tt>";
           if conf.Config.wizard then (
             Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (Util.commd conf);
+            Output.print_url conf
+              (Util.commd' conf ~query:[ ("m", "MOD_NOTES") ]);
             Output.print_sstring conf
-              {|m=MOD_NOTES"><sup><i class="fa fa-cog"></i></sup></a>|});
+              {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf "<a class=\"mx-2\" href=\"";
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf "m=NOTES\">";
+          Output.print_url conf (Util.commd' conf ~query:[ ("m", "NOTES") ]);
+          Output.print_sstring conf "\">";
           Output.print_sstring conf (Util.transl_nth conf "note/notes" 1);
           Output.print_sstring conf "</a></tt>"
       | Def.NLDB.PgMisc fnotes ->
@@ -182,15 +184,13 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "<tt>";
           if conf.Config.wizard then (
             Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf {|m=MOD_NOTES&f=|};
-            Output.print_string conf (Mutil.encode fnotes);
+            Output.print_url conf
+              (Util.commd' conf ~query:[ ("m", "MOD_NOTES"); ("f", fnotes) ]);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf {|<a class="mx-2" href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf {|m=NOTES&f=|};
-          Output.print_string conf (Mutil.encode fnotes);
+          Output.print_url conf
+            (Util.commd' conf ~query:[ ("m", "NOTES"); ("f", fnotes) ]);
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html fnotes);
           Output.print_sstring conf "</a>";
@@ -203,15 +203,14 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "<tt>";
           if conf.Config.wizard then (
             Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf {|m=MOD_WIZNOTES&f=|};
-            Output.print_string conf (Mutil.encode wizname);
+            Output.print_url conf
+              (Util.commd' conf
+                 ~query:[ ("m", "MOD_WIZNOTES"); ("f", wizname) ]);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf {|<a class="mx-2" href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf {|m=WIZNOTES&f=|};
-          Output.print_string conf (Mutil.encode wizname);
+          Output.print_url conf
+            (Util.commd' conf ~query:[ ("m", "WIZNOTES"); ("f", wizname) ]);
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html wizname);
           Output.print_sstring conf "</a><i>(";
@@ -233,9 +232,8 @@ let print_what_links conf base fnotes =
       Output.print_sstring conf "]")
     else (
       Output.print_sstring conf {|<tt>[<a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf "m=NOTES&f=";
-      Output.print_string conf (Mutil.encode fnotes);
+      Output.print_url conf
+        (Util.commd' conf ~query:[ ("m", "NOTES"); ("f", fnotes) ]);
       Output.print_sstring conf {|">|};
       Output.print_string conf (Util.escape_html fnotes);
       Output.print_sstring conf "</a>]</tt>")
@@ -370,16 +368,18 @@ let print_misc_notes conf base =
   if db <> [] then (
     Output.print_sstring conf "<ul>";
     if d <> "" then (
+      let open Ext_list.Infix in
       Output.print_sstring conf {|<li class="parent">|};
       Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf "m=MISC_NOTES";
-      (match String.rindex_opt d NotesLinks.char_dir_sep with
-      | Some i ->
-          let open Def in
-          Output.print_string conf @@ "&d=" ^<^ Mutil.encode (String.sub d 0 i)
-      | None -> ());
-      Output.print_sstring conf "<tt>&lt;--</tt></a></li>");
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:
+             (("m", "MISC_NOTES")
+             @:: Option.map
+                   (fun i -> ("d", String.sub d 0 i))
+                   (String.rindex_opt d NotesLinks.char_dir_sep)
+             @?: []));
+      Output.print_sstring conf "\"<tt>&lt;--</tt></a></li>");
     List.iter
       (function
         | r, Some f ->
@@ -399,9 +399,8 @@ let print_misc_notes conf base =
               if Sys.file_exists f then "" else " style=\"color:red\""
             in
             Output.print_sstring conf {|<li class="file"><tt>[<a href="|};
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf {|m=NOTES&f=|};
-            Output.print_string conf (Mutil.encode f);
+            Output.print_url conf
+              (Util.commd' conf ~query:[ ("m", "NOTES"); ("f", f) ]);
             Output.print_sstring conf {|"|};
             Output.print_sstring conf c;
             Output.print_sstring conf ">";
@@ -414,13 +413,15 @@ let print_misc_notes conf base =
             Output.print_sstring conf "</li>"
         | r, None ->
             Output.print_sstring conf {|<li class="folder"><tt><a href="|};
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf "m=MISC_NOTES&d=";
-            if d = "" then Output.print_string conf (Mutil.encode r)
-            else (
-              Output.print_string conf (Mutil.encode d);
-              Output.print_sstring conf (String.make 1 NotesLinks.char_dir_sep);
-              Output.print_string conf (Mutil.encode r));
+            Output.print_url conf
+              (Util.commd' conf
+                 ~query:
+                   [
+                     ("m", "MISC_NOTES");
+                     ( "d",
+                       if d = "" then r
+                       else d ^ String.make 1 NotesLinks.char_dir_sep ^ r );
+                   ]);
             Output.print_sstring conf {|">|};
             Output.print_string conf (Util.escape_html r);
             Output.printf conf " --&gt;</a></tt></li>")

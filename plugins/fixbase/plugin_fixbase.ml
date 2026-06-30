@@ -37,7 +37,7 @@ module UI = struct
 
   let form conf (m : Adef.encoded_string) (submit : Adef.safe_string) args =
     Geneweb.Output.print_sstring conf {|<form action="|};
-    Geneweb.Output.print_string conf (Geneweb.Util.commd conf);
+    Geneweb.Output.print_url conf (Geneweb.Util.commd conf);
     Geneweb.Output.print_sstring conf {|" method="GET">|};
     Geneweb.Output.print_sstring conf {|<input type="hidden" name="m" value="|};
     Geneweb.Output.print_string conf m;
@@ -342,9 +342,9 @@ let fixbase_ok conf base =
       ifneq d1.children d2.children "children" [%show: string array]
     in
     let string_of_p i =
-      Printf.sprintf {|<a href="%s&i=%s">%s</a>|}
-        (Geneweb.Util.commd conf :> string)
-        (Gwdb.string_of_iper i |> Mutil.encode :> string)
+      Printf.sprintf {|<a href="%s">%s</a>|}
+        (Ext_uri.to_string
+        @@ Geneweb.Util.commd' conf ~query:[ ("i", Gwdb.string_of_iper i) ])
         (Geneweb.Util.designation base (Gwdb.poi base i)
           : Adef.escaped_string
           :> string)
@@ -390,7 +390,7 @@ let fixbase_ok conf base =
       !istrs;
     let repost dry txt =
       Geneweb.Output.print_sstring conf {|<form action="|};
-      Geneweb.Output.print_string conf (Geneweb.Util.commd conf);
+      Geneweb.Output.print_url conf (Geneweb.Util.commd conf);
       Geneweb.Output.print_sstring conf {|" method="GET">|};
       Geneweb.Output.print_sstring conf
         {|<input type="hidden" name="m" value="FIXBASE_OK">|};
@@ -465,9 +465,9 @@ let fixbase_ok conf base =
         (Geneweb.Util.transl conf "plugin_fixbase_ok_nothing");
       Geneweb.Output.print_sstring conf {|</p>|});
     Geneweb.Output.print_sstring conf {|<p><a href="|};
-    Geneweb.Output.print_string conf
-      (Geneweb.Util.commd conf : Adef.escaped_string);
-    Geneweb.Output.print_sstring conf {|&m=FIXBASE">|};
+    Geneweb.Output.print_url conf
+      (Geneweb.Util.commd' conf ~query:[ ("m", "FIXBASE") ]);
+    Geneweb.Output.print_sstring conf {|">|};
     Geneweb.Output.print_sstring conf
       (Geneweb.Util.transl conf "plugin_fixbase_ok_return");
     Geneweb.Output.print_sstring conf {|</a></p>|}

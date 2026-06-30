@@ -98,12 +98,17 @@ let print_wizards_by_alphabetic_order conf list =
     in
     if wlink then (
       Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf "m=WIZNOTES&f=";
-      Output.print_string conf (Mutil.encode wz);
-      Output.printf conf "&d=%d-%02d-%02d,%02d:%02d:%02d"
-        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
-        tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:
+             [
+               ("m", "WIZNOTES");
+               ("f", wz);
+               ( "d",
+                 Printf.sprintf "%d-%02d-%02d,%02d:%02d:%02d"
+                   (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
+                   tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec );
+             ]);
       Output.print_sstring conf {|">|});
     if islash > 0 then (
       let s1 =
@@ -181,13 +186,18 @@ let print_wizards_by_date conf list =
          if not (prev = None || new_item) then Output.print_sstring conf ", ";
          if (conf.Config.wizard && conf.Config.user = wz) || wfile <> "" then (
            Output.print_sstring conf {|<a href="|};
-           Output.print_string conf (Util.commd conf);
-           Output.print_sstring conf {|m=WIZNOTES&f=|};
-           Output.print_string conf (Mutil.encode wz);
-           Output.print_sstring conf
-             (Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
-                (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
-                tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec);
+           Output.print_url conf
+             (Util.commd' conf
+                ~query:
+                  [
+                    ("m", "WIZNOTES");
+                    ("f", wz);
+                    ( "d",
+                      Printf.sprintf "%d-%02d-%02d,%02d:%02d:%02d"
+                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+                        tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+                        tm.Unix.tm_sec );
+                  ]);
            Output.print_sstring conf {|">|};
            Output.print_string conf (Util.escape_html wname);
            Output.print_sstring conf {|</a>|})
@@ -206,9 +216,8 @@ let print_old_wizards conf list =
       (fun first wz ->
         if not first then Output.print_sstring conf ", ";
         Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (Util.commd conf);
-        Output.print_sstring conf {|m=WIZNOTES&f=|};
-        Output.print_string conf (Mutil.encode wz);
+        Output.print_url conf
+          (Util.commd' conf ~query:[ ("m", "WIZNOTES"); ("f", wz) ]);
         Output.print_sstring conf {|">|};
         for i = 0 to String.length wz - 1 do
           if wz.[i] = ' ' then Output.print_sstring conf "&nbsp;"
@@ -305,8 +314,9 @@ let print_main conf base auth_file =
     Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf "click"));
     Output.print_sstring conf " ";
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf {|m=WIZNOTES&o=H">|};
+    Output.print_url conf
+      (Util.commd' conf ~query:[ ("m", "WIZNOTES"); ("o", "H") ]);
+    Output.print_sstring conf {|">|};
     Output.print_sstring conf (Util.transl conf "here");
     Output.print_sstring conf "</a> ";
     Output.print_sstring conf
@@ -542,20 +552,24 @@ let print_connected_wizard conf first wddir wz tm_user =
   let tm = Unix.localtime stm in
   if wfile <> "" then (
     Output.print_sstring conf "<a href=\"";
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=WIZNOTES&f=";
-    Output.print_string conf (Mutil.encode wz);
-    Output.print_sstring conf
-      (Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d" (tm.Unix.tm_year + 1900)
-         (tm.Unix.tm_mon + 1) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-         tm.Unix.tm_sec);
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:
+           [
+             ("m", "WIZNOTES");
+             ("f", wz);
+             ( "d",
+               Printf.sprintf "%d-%02d-%02d,%02d:%02d:%02d"
+                 (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
+                 tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec );
+           ]);
+    Output.print_sstring conf "\">";
     Output.print_string conf (Util.escape_html wz);
     Output.print_sstring conf "</a>")
   else Output.print_string conf (Util.escape_html wz);
   Output.print_sstring conf " <a href=\"";
-  Output.print_string conf (Util.commd conf);
-  Output.print_sstring conf "m=HIST&k=20&wiz=";
-  Output.print_string conf (Mutil.encode wz);
+  Output.print_url conf
+    (Util.commd' conf ~query:[ ("m", "HIST"); ("k", "20"); ("wiz", wz) ]);
   Output.print_sstring conf {|" style="text-decoration:none">(*)</a>|};
   let d = conf.Config.ctime -. tm_user in
   if d <> 0.0 then (
@@ -607,10 +621,13 @@ let do_connected_wizards conf base (_, _, _, wl) =
             Output.print_sstring conf " ; ";
             Output.print_sstring conf (Util.transl conf "click");
             Output.print_sstring conf " <a href=\"";
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf "m=CHANGE_WIZ_VIS&v=";
-            Output.print_sstring conf
-              (string_of_int @@ if is_visible then 0 else 1);
+            Output.print_url conf
+              (Util.commd' conf
+                 ~query:
+                   [
+                     ("m", "CHANGE_WIZ_VIS");
+                     ("v", string_of_int @@ if is_visible then 0 else 1);
+                   ]);
             Output.print_sstring conf "\">";
             Output.print_sstring conf (Util.transl conf "here");
             Output.print_sstring conf "</a> ";

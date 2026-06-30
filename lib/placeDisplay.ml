@@ -8,13 +8,12 @@ let print_html_places_surnames conf base
   let print_sn (sn, ips) =
     let len = List.length ips in
     Output.print_sstring conf "<a href=\"";
-    Output.print_string conf (Util.commd conf);
-    if link_to_ind && len = 1 then
-      Output.print_string conf
-        (Util.acces conf base @@ Util.pget conf base @@ List.hd ips)
-    else (
-      Output.print_sstring conf "m=N&v=";
-      Output.print_string conf (Mutil.encode sn));
+    Output.print_url conf
+      (Util.commd' conf
+         ~query:
+           (if link_to_ind && len = 1 then
+            Util.acces conf base @@ Util.pget conf base @@ List.hd ips
+           else [ ("m", "N"); ("v", sn) ]));
     Output.print_sstring conf "\">";
     Output.print_string conf (Util.escape_html sn);
     Output.print_sstring conf "</a> (";
@@ -59,12 +58,13 @@ let print_html_places_surnames conf base
   Output.print_sstring conf "</ul>\n"
 
 let print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage =
-  Adef.encoded
-  @@ (if add_birth then "&bi=on" else "")
-  ^ (if add_baptism then "&bp=on" else "")
-  ^ (if add_death then "&de=on" else "")
-  ^ (if add_burial then "&bu=on" else "")
-  ^ if add_marriage then "&ma=on" else ""
+  let open Ext_list.Infix in
+  Ext_option.return_if add_birth (fun () -> ("bi", "on"))
+  @?: Ext_option.return_if add_baptism (fun () -> ("bp", "on"))
+  @?: Ext_option.return_if add_death (fun () -> ("de", "on"))
+  @?: Ext_option.return_if add_burial (fun () -> ("bu", "on"))
+  @?: Ext_option.return_if add_marriage (fun () -> ("ma", "on"))
+  @?: []
 
 let print_aux conf title fn =
   Hutil.header conf title;
@@ -94,22 +94,20 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
         print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial
           ~add_marriage
       in
+      let open Ext_list.Infix in
       Output.print_sstring conf "<p><a href=\"";
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf "m=PS";
-      Output.print_string conf opt;
-      Output.print_sstring conf "&display=long\">";
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:(("m", "PS") @:: opt @ [ ("display", "long") ]));
+      Output.print_sstring conf "\">";
       Output.print_sstring conf (Util.transl conf "long display");
       Output.print_sstring conf "</a></p><p>";
       let last = Array.length array - 1 in
       Array.iteri
         (fun i (s, x) ->
           Output.print_sstring conf "<a href=\"";
-          Output.print_string conf (Util.commd conf);
-          Output.print_sstring conf "m=PS";
-          Output.print_string conf opt;
-          Output.print_sstring conf "&k=";
-          Output.print_string conf (Mutil.encode s);
+          Output.print_url conf
+            (Util.commd' conf ~query:[ ("m", "PS"); ("k", s) ]);
           Output.print_sstring conf "\">";
           Output.print_string conf (Util.escape_html s);
           Output.print_sstring conf "</a> (";
@@ -168,13 +166,16 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism
   in
   print_aux conf title (fun () ->
       if ini = "" then (
+        let open Ext_list.Infix in
         Output.print_sstring conf "<p><a href=\"";
-        Output.print_string conf (Util.commd conf);
-        Output.print_sstring conf "m=PS";
-        Output.print_string conf
-          (print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial
-             ~add_marriage);
-        Output.print_sstring conf "&display=short\">";
+        Output.print_url conf
+          (Util.commd' conf
+             ~query:
+               (("m", "PS")
+               @:: print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial
+                     ~add_marriage
+               @ [ ("display", "short") ]));
+        Output.print_sstring conf "\">";
         Output.print_sstring conf (Util.transl conf "short display");
         Output.print_sstring conf "</a></p><p>");
       if array <> [||] then print_html_places_surnames conf base array)

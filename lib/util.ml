@@ -311,23 +311,34 @@ let unauthorized conf auth_type =
   Output.printf conf "<ul><li>%s</ul>\n" auth_type;
   Output.print_sstring conf "</body>\n"
 
-let commd ?(excl = []) ?(trim = true) ?(henv = true) ?(senv = true) conf :
-    Adef.escaped_string =
-  let aux =
-    List.fold_left (fun c (k, (v : Adef.encoded_string)) ->
+let commd ?(excl = []) ?(trim = true) ?(henv = true) ?(senv = true)
+    ?(query = []) conf =
+  let aux env =
+    List.filter_map
+      (fun (k, (v : Adef.encoded_string)) ->
         if
           List.mem k excl
           || (trim && (k = "oc" || k = "ocz") && (v :> string) = "0")
           || (v :> string) = ""
-        then c
-        else
-          let open Def in
-          c ^^^ k ^<^ "=" ^<^ (v :> Adef.escaped_string) ^>^ "&")
+        then None
+        else Some (k, [ Mutil.decode v ]))
+      env
   in
-  let s = Adef.escaped @@ conf.Config.command ^ "?" in
-  let s = if henv then aux s conf.Config.henv else s in
-  let s = if senv then aux s conf.Config.senv else s in
-  s
+  Uri.make ~path:conf.Config.command
+    ~query:
+      ((if henv then aux conf.Config.henv else [])
+      @ (if senv then aux conf.Config.senv else [])
+      @ query)
+    ()
+
+let commd' ?excl ?trim ?henv ?senv ?query conf =
+  commd ?excl ?trim ?henv ?senv
+    ?query:(Option.map (List.map (fun (k, v) -> (k, [ v ]))) query)
+    conf
+
+let commd_prefix ?excl ?trim ?henv ?senv conf =
+  let url = commd ?excl ?trim ?henv ?senv conf in
+  Ext_uri.to_string url ^ if Uri.query url = [] then "?" else "&"
 
 let prefix_base conf =
   let cmmd = conf.Config.command in
@@ -635,23 +646,25 @@ let accessible_by_key conf base p fn sn =
     - p    : person
       [Retour] : string
       [Rem] : Exporté en clair hors de ce module.                           *)
-let acces_n conf base n x : Adef.escaped_string =
+let acces_n conf base n x =
   let first_name = Gwdb.p_first_name base x in
   let surname = Gwdb.p_surname base x in
-  if surname = "" then Adef.escaped ""
+  let n = Option.fold ~none:"" ~some:Int.to_string n in
+  if surname = "" then []
   else if accessible_by_key conf base x first_name surname then
-    let open Def in
-    "p" ^<^ n ^^^ "="
-    ^<^ (Mutil.encode (Name.lower first_name) :> Adef.escaped_string)
-    ^^^ "&n" ^<^ n ^^^ "="
-    ^<^ (Mutil.encode (Name.lower surname) :> Adef.escaped_string)
-    ^^^
-    if Gwdb.get_occ x <> 0 then
-      "&oc" ^<^ n ^>^ "=" ^ string_of_int (Gwdb.get_occ x)
-    else Adef.escaped ""
-  else
-    let open Def in
-    "i" ^<^ n ^>^ "=" ^ Gwdb.string_of_iper (Gwdb.get_iper x)
+    let open Ext_list.Infix in
+    ("p" ^ n, Name.lower first_name)
+    @:: ("n" ^ n, Name.lower surname)
+    @:: Ext_option.return_if
+          (Gwdb.get_occ x <> 0)
+          (fun () -> ("oc" ^ n, string_of_int (Gwdb.get_occ x)))
+    @?: []
+  else [ ("i" ^ n, Gwdb.string_of_iper (Gwdb.get_iper x)) ]
+
+let acces_n' conf base n x =
+  List.map (fun (k, v) -> (k, [ v ])) (acces_n conf base n x)
+
+let acces' conf base x = acces_n' conf base None x
 
 (* ********************************************************************** *)
 (*  [Fonc] acces : config -> base -> person -> string                     *)
@@ -665,7 +678,10 @@ let acces_n conf base n x : Adef.escaped_string =
       - p    : person
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
-let acces conf base x = acces_n conf base (Adef.escaped "") x
+let acces conf base x = acces_n conf base None x
+
+let acces_n conf base n x = acces_n conf base (Some n) x
+let acces_n' conf base n x = acces_n' conf base (Some n) x
 
 (**/**)
 
@@ -756,8 +772,8 @@ let geneweb_link ?id ?style conf (href : Adef.escaped_string)
          [ ("id", id); ("style", style) ])
   in
   let open Def in
-  "<a " ^<^ extra_html_attributes ^<^ " href=\""
-  ^<^ (commd conf ^^^ href :> Adef.safe_string)
+  "<a " ^<^ extra_html_attributes ^<^ " href=\"" ^<^ commd_prefix conf
+  ^<^ (href :> Adef.safe_string)
   ^^^ "\">" ^<^ s ^>^ "</a>"
 
 let wprint_geneweb_link conf href s =
@@ -803,15 +819,16 @@ let update_family_loop conf base p s =
         let ifam = Gwdb.string_of_ifam (List.hd res) in
         let open Def in
         "<a href=\""
-        ^<^ (commd conf :> Adef.safe_string)
-        ^^^ "m=MOD_FAM&i=" ^<^ ifam ^<^ "&ip=" ^<^ iper ^<^ "\">" ^<^ s
-        ^>^ "</a>"
+        ^<^ Ext_uri.to_string
+              (commd' conf
+                 ~query:[ ("m", "MOD_FAM"); ("i", ifam); ("ip", iper) ])
+        ^<^ "\">" ^<^ s ^>^ "</a>"
       else
         let iper = Gwdb.string_of_iper iper in
         let open Def in
         "<a href=\""
-        ^<^ (commd conf :> Adef.safe_string)
-        ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
+        ^<^ Ext_uri.to_string (commd' conf ~query:[ ("m", "U"); ("i", iper) ])
+        ^<^ "\">" ^<^ s ^>^ "</a>"
     else s
 
 let person_title conf base p =
@@ -1252,7 +1269,7 @@ let string_with_macros ?(with_links_target_attribute = true) ~conf ~env str =
           | None -> (
               match str.[i + 1] with
               | 's' ->
-                  Buffer.add_string buff (commd conf :> string);
+                  Buffer.add_string buff (commd_prefix conf);
                   i + 2
               | 'v' ->
                   let k, vl, j = get_variable str (i + 2) in
@@ -2076,29 +2093,16 @@ let print_tips_relationship conf =
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
 let display_options conf =
-  let s =
-    Adef.escaped
-    @@
-    if p_getenv conf.Config.env "image" = Some "off" then "&image=off" else ""
-  in
-  let s =
-    if p_getenv conf.Config.env "marriage" = Some "on" then
-      let open Def in
-      s ^>^ "&marriage=on"
-    else s
-  in
-  let s =
-    match p_getenv conf.Config.env "bd" with
-    | Some i ->
-        let open Def in
-        s ^^^ "&bd=" ^<^ (Mutil.encode i :> Adef.escaped_string)
-    | None -> s
-  in
-  match p_getenv conf.Config.env "color" with
-  | Some c ->
-      let open Def in
-      s ^^^ "&color=" ^<^ (Mutil.encode c :> Adef.escaped_string)
-  | None -> s
+  let open Ext_list.Infix in
+  Ext_option.return_if
+    (p_getenv conf.Config.env "image" = Some "off")
+    (fun () -> ("image", "off"))
+  @?: Ext_option.return_if
+        (p_getenv conf.Config.env "marriage" = Some "on")
+        (fun () -> ("marriage", "on"))
+  @?: Option.map (fun i -> ("bd", i)) (p_getenv conf.Config.env "bd")
+  @?: Option.map (fun c -> ("color", c)) (p_getenv conf.Config.env "color")
+  @?: []
 
 (* Hashtbl qui associe un user à la liste des dernières personnes visitées. *)
 (* On en profite aussi pour stocker la date de la dernière visite.          *)
