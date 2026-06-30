@@ -50,9 +50,14 @@ let key_env conf base =
     | kv :: l when drop kv -> loop l
     | ("i", v) :: l -> new_env "i" v (fun x -> x) l
     | ("ei", v) :: l -> new_env "ei" v (fun x -> "e" ^ x) l
-    | (k, v) :: l when String.length k = 2 && k.[0] = 'i' ->
-        let c = String.make 1 k.[1] in
-        new_env k v (fun x -> x ^ c) l
+    | (k, v) :: l
+      when String.length k > 1
+           && k.[0] = 'i'
+           && String.for_all
+                (fun c -> c >= '0' && c <= '9')
+                (String.sub k 1 (String.length k - 1)) ->
+        let suffix = String.sub k 1 (String.length k - 1) in
+        new_env k v (fun x -> x ^ suffix) l
     | (k, (v : Adef.encoded_string)) :: l
       when String.length k > 2 && k.[0] = 'e' && k.[1] = 'f' ->
         new_fam_env k v (fun x -> x ^ k) l

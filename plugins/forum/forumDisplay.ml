@@ -69,6 +69,9 @@ let rec eval_var conf base env _xx _loc = function
   | [ "is_moderated_forum" ] -> VVbool (moderators conf <> [])
   | [ "is_moderator" ] -> VVbool (is_moderator conf)
   | "message" :: sl -> eval_message_var conf base env sl
+  | [ "permalink" ] ->
+      Templ.VVstring
+        (Permalink.script conf (Permalink.query conf base) :> string)
   | [ "pos" ] -> (
       match get_env "pos" env with
       | Vpos r -> safe_val (MF.string_of_pos !r)

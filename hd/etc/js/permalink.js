@@ -19,9 +19,7 @@
     rawBase = segs.length ? segs[0] : "";
     prefix = origin;
   }
-  var bare = rawBase;
-  if (role === 2 && /_w$/.test(bare)) bare = bare.slice(0, -2);
-  else if (role === 1 && /_f$/.test(bare)) bare = bare.slice(0, -2);
+  var bare = rawBase.replace(/_.*$/, "");
   function build(s) {
     var b = bare + s;
     return cgi ? prefix + "?b=" + b + "&" + G.q

@@ -504,6 +504,8 @@ let eval_var conf base env () _loc = function
           r.welcome_cnt
       in
       VVstring s
+  | [ "permalink" ] ->
+      VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | [ "sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> (
