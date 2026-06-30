@@ -1,4 +1,4 @@
-<!-- $Id: welcome.txt v7.1 03/04/2026 $ -->
+<!-- $Id: welcome.txt v7.1 29/06/2026 $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
@@ -395,8 +395,8 @@ fr: Autour de l'arbre
     %end;
     <a role="button" class="btn btn-outline-primary" href="%prefix;m=CAL">%nn;
       <i class="far fa-calendar-days fa-fw me-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
-    %if;((roglo and (user.ident in b.superwizard or (b.superwizard="all" and wizard)))
-      or ((not roglo) and wizard))
+    %if;((roglo and user.indent!="" and (user.ident in b.superwizard or (b.superwizard="all" and wizard)))
+      or (not roglo and wizard))
       <a role="button" class="btn btn-outline-success" href="%prefix;m=H&v=conf">%nn;
         <i class="fas fa-gear fa-fw me-1" aria-hidden="true"></i>[*configuration]1</a>
     %end;
@@ -417,7 +417,7 @@ fr: Autour de l'arbre
       Association Roglo
     </div>
     <div class="d-flex flex-wrap justify-content-md-center">
-      %if;(b.alt_serv_base!="" and not cgi)
+      %if;(false and b.alt_serv_base!="" and not cgi) %(tomporarily suppressed %)
         <a role="button" class="btn btn-outline-primary"%sp;
           href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
             %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"%sp;
@@ -425,7 +425,7 @@ fr: Autour de l'arbre
           %if;(b.alt_serv_title!="")%b.alt_serv_title;%else;[*other base]%end;
         </a>
       %end;
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=NOTES&f=0_Sommaire_des_notes_diverses">Encyclopædia Roglo</a>
+      <a role="button" class="btn btn-outline-primary" href="%prefix;m=NOTES&f=0_Sommaire_des_notes_diverses">Encyclopédie Roglo</a>
       <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/page/350795-l-association">Site de l'association</a>
       <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/page/358570-donnees-personnelles">Politique de confidentialité</a>
       <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/page/350796-decouvrir">Fonctionnement et usage</a>
@@ -435,7 +435,7 @@ fr: Autour de l'arbre
 en: Obtain a <code class="mb-1">Friend</code> access
 fr: Obtenir un accès <code class="mb-1">Ami</code>
 ]</a>
-      <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/collect/description/383016-j-campagne-de-dons-2024-cb-uniquement">%nn;
+      <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/collect/description/383016-campagne-de-dons-cb-uniquement">%nn;
 [
 en: Contribute/join
 fr: Cotiser/adhérer
@@ -448,6 +448,7 @@ fr: Mon compte associatif
       <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/page/418348-faq">Questions fréquentes</a>
       <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/page/365469-charte-des-amis">Charte des amis</a>
       %if;(roglo and wizard)
+        <br>
         <a role="button" class="btn btn-outline-success" href="https://asso.roglo.eu/page/358694-charte-des-magiciens">Chartes des Magiciens</a>
         <a role="button" class="btn btn-outline-success" href="https://asso.roglo.eu/page/358695-charte-des-lieux">Chartes des lieux</a>
         <a role="button" class="btn btn-outline-success" href="https://asso.roglo.eu/page/1409612-charte-des-sources">Chartes des sources</a>
@@ -457,8 +458,9 @@ fr: Mon compte associatif
     </div>
   </div>
 %end;
-%if;(((not roglo and wizard) or (roglo and user.ident!=""
-    and (user.ident in b.superwizard or (b.superwizard="all" and wizard)))) and nb_persons.v!=0)
+
+%if;(nb_persons.v!=0 and (((not roglo) and wizard) or (roglo and (not friend) and user.ident!=""
+    and (user.ident in b.superwizard or b.superwizard="all"))))
   <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-9 mx-auto">
     <div class="h4 text-md-center">
       <i class="fas fa-book fa-sm fa-fw text-success me-1"></i>[*book/books]1%nn;
