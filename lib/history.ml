@@ -411,6 +411,8 @@ let rec eval_var conf base env _ _ = function
       | Vinfo (_, _, _, HI_ind p, _) ->
           VVstring (string_of_int (Driver.get_occ p))
       | _ -> VVstring "")
+  | [ "permalink" ] ->
+      VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | "person" :: sl -> (
       match get_env "info" env with
       | Vinfo (_, _, _, HI_ind p, _) -> eval_person_field_var conf base env p sl

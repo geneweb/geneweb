@@ -490,6 +490,9 @@ let rec eval_var conf base env (bef, aft, p_auth) _loc sl =
 
 and eval_simple_var conf base env (bef, aft, p_auth) :
     string list -> 'a Templ.expr_val = function
+  | [ "permalink" ] ->
+      Templ.VVstring
+        (Permalink.script conf (Permalink.query conf base) :> string)
   | [ s ] -> eval_simple_str_var conf base env (bef, aft, p_auth) s
   | _ -> raise Not_found
 

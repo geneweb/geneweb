@@ -245,6 +245,8 @@ and eval_simple_var conf base env p = function
   | [ "of_course_dead" ] -> bool_val (p.death = OfCourseDead)
   | [ "public_name" ] ->
       safe_val (Util.escape_html p.public_name :> Adef.safe_string)
+  | [ "permalink" ] ->
+      VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | [ "qualifier" ] -> eval_string_env "qualifier" env
   | "relation" :: sl ->
       let r =

@@ -219,6 +219,9 @@ let rec eval_var conf base env xx _loc sl =
   with Not_found -> eval_compound_var conf base env xx sl
 
 and eval_simple_var conf base env xx = function
+  | [ "permalink" ] ->
+      Templ.VVstring
+        (Permalink.script conf (Permalink.query conf base) :> string)
   | [ "p_list" ] ->
       let data =
         match p_getenv conf.env "data" with Some data -> data | _ -> ""
