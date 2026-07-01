@@ -1,15 +1,15 @@
 (cram
- (package geneweb)
- (applies_to help log)
- (deps %{bin:gwd}))
-
-(cram
  (package geneweb-plugins)
  (applies_to plugins)
  (deps
   (package geneweb-plugins)
   %{bin:gwd}
   (glob_files_rec ../../plugins/**)))
+
+(cram
+ (package geneweb)
+ (applies_to help log ancient)
+ (deps %{bin:gwd}))
 
 (cram
  (package geneweb)
