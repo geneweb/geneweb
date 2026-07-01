@@ -4,7 +4,7 @@
 
 (rule
  (deps
-  (:template ./template.html)
+  (:template template.html)
   (glob_files ./*.html))
  (action
   (with-stdout-to
