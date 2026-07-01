@@ -12,6 +12,7 @@
   (pps js_of_ocaml-ppx)))
 
 (rule
+ (package geneweb-rpc)
  (target rpc_client.bc.js.gz)
  (deps
   (:input ./rpc_client.bc.js))
@@ -19,6 +20,7 @@
   (run gzip -9 -k -f %{input})))
 
 (rule
+ (package geneweb-rpc)
  (target rpc_client.bc.js.br)
  (deps
   (:input ./rpc_client.bc.js))
