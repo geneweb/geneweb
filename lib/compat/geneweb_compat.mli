@@ -156,3 +156,11 @@ module Seq : sig
 
       @since 4.14 *)
 end
+
+module String : sig
+  val starts_with : prefix:string -> string -> bool
+  (** [starts_with ][~prefix s] is [true] if and only if [s] starts with
+      [prefix].
+
+      @since 4.13 *)
+end
