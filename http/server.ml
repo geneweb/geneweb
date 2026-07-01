@@ -367,7 +367,7 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
           | Some (addr, socket) ->
               Unix.listen socket max_pending_requests;
               Log.info (fun k ->
-                  k ~tags:timestamp "Ready on %a." pp_sockaddr addr);
+                  k ~tags:timestamp "Ready on http://%a." pp_sockaddr addr);
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
               accept_connections ~timeout ~n_workers callback socket))
