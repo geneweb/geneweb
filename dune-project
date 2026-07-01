@@ -48,6 +48,7 @@
     pp_loc
     dune-site
     conf-brotli
+    crunch
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.29.0")))
   )
