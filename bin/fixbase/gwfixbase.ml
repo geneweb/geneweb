@@ -214,9 +214,11 @@ let index = ref false
 let dry_run = ref false
 let dump = ref false
 let ofile = ref ""
+let bases_dir = ref "."
 
 let speclist =
   [
+    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
     ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
@@ -237,28 +239,30 @@ let speclist =
       " rebuild index. It is automatically enabled by any other option." );
     ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let anonfun i = bname := i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
-  Secure.set_base_dir (Filename.dirname !bname);
+  let bpath = Filename.concat !bases_dir !bname in
+  Secure.set_base_dir (Filename.dirname bpath);
   if !bname = "" then (
     Arg.usage speclist usage;
     exit 2);
-  let lock_file = Mutil.lock_file !bname in
+  let lock_file = Mutil.lock_file bpath in
   let on_exn exn bt =
     Format.eprintf "%a@." Lock.pp_exception (exn, bt);
     exit 2
   in
-  Driver.with_database !bname @@ fun base ->
+  Driver.with_database bpath @@ fun base ->
   let nb_fam = Driver.nb_of_families base in
   let nb_ind = Driver.nb_of_persons base in
   let nb_real_ind = Driver.nb_of_real_persons base in
   nb_ind_init := nb_ind;
-  Printf.eprintf "GwFixbase for base %s\n" !bname;
+  Printf.eprintf "GwFixbase for base %s\n" bpath;
   Printf.eprintf "Initial state: %d persons, %d real persons, %d families\n"
     nb_ind nb_real_ind nb_fam;
 
@@ -282,6 +286,6 @@ let main () =
   check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
     ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
     ~invalid_utf8 ~key;
-  if !dump then dump_persons !bname !ofile
+  if !dump then dump_persons bpath !ofile
 
 let _ = main ()

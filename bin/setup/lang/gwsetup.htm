@@ -1,29 +1,36 @@
 <!DOCTYPE html>
+<html lang="%l">
 <head>
-  <!-- Copyright (c) 1998-2023- GeneWeb -->
-  <!-- $Id: cache_files_ok.htm,v 7.10 2023.11.15 hg Exp $ -->
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwsetup.htm,v 7.00 2018-04-10 05:35:06 hg Exp $ -->
   <meta charset="utf-8">
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[cache files computed]
+  <title>[Content of gwsetup.log]
 </title>
 %fsetup.css;
 </head>
 
-<body %Vbody_prop;">
+<body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
-[cache files computed]
+[Content of gwsetup.log]
 </h1>
 </div>
 
-/tmp/comm.log:<br>
+<p />
+
+<dl><dt><dd>
 <pre>
-%g{- [empty file]
+%G{- [empty file]
 -}
 </pre>
-<p>
-[return]
+</dl>
 
+%( %Io;;{|contenu du fichier -o (%o) :} %)
+
+%H
+
+done

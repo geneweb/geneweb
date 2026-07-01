@@ -31,8 +31,7 @@
 <p>
 [For information, this operation corresponds to the following commands][:]
 <pre>
-     $ cd "%w"
-     $ %x%/gwu %a -o tmp.gw
+     $ %x%/gwu -bd %w %a -o tmp.gw
      $ mkdir old
      [Under Unix][:]
         $ rm -rf old/%a.gwb
@@ -41,6 +40,6 @@
         $ del old\%a.gwb\*.*
         $ rmdir old\%a.gwb
         $ move %a.gwb old\.
-     $ %x%/gwc tmp.gw -nofail -o %a > comm.log 2&>1
+     $ %x%/gwc -bd %w tmp.gw -nofail -o %a > /tmp/comm.log 2&>1
 </pre>
 
