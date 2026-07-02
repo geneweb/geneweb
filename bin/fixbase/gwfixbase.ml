@@ -251,43 +251,45 @@ let main () =
   Secure.set_base_dir !bases_dir;
   let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
   match !bname with
-  | None -> Arg.usage speclist usage;
-    exit 2
-  | _ -> ();
-  let lock_file = Mutil.lock_file bpath in
-  let on_exn exn bt =
-    Format.eprintf "%a@." Lock.pp_exception (exn, bt);
-    exit 2
-  in
-  Driver.with_database bpath @@ fun base ->
-  let nb_fam = Driver.nb_of_families base in
-  let nb_ind = Driver.nb_of_persons base in
-  let nb_real_ind = Driver.nb_of_real_persons base in
-  nb_ind_init := nb_ind;
-  Printf.eprintf "GwFixbase for base %s\n" bpath;
-  Printf.eprintf "Initial state: %d persons, %d real persons, %d families\n"
-    nb_ind nb_real_ind nb_fam;
+  | None ->
+      Arg.usage speclist usage;
+      exit 2
+  | _ ->
+      ();
+      let lock_file = Mutil.lock_file bpath in
+      let on_exn exn bt =
+        Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+        exit 2
+      in
+      Driver.with_database bpath @@ fun base ->
+      let nb_fam = Driver.nb_of_families base in
+      let nb_ind = Driver.nb_of_persons base in
+      let nb_real_ind = Driver.nb_of_real_persons base in
+      nb_ind_init := nb_ind;
+      Printf.eprintf "GwFixbase for base %s\n" bpath;
+      Printf.eprintf "Initial state: %d persons, %d real persons, %d families\n"
+        nb_ind nb_real_ind nb_fam;
 
-  Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
-  if
-    !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
-    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_utf8
-    || !key || !index
-  then ()
-  else (
-    f_parents := true;
-    f_children := true;
-    p_parents := true;
-    p_families := true;
-    pevents_witnesses := true;
-    fevents_witnesses := true;
-    marriage_divorce := true;
-    p_NBDS := true;
-    invalid_utf8 := true;
-    key := true);
-  check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
-    ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key;
-  if !dump then dump_persons bpath !ofile
+      Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
+      if
+        !f_parents || !f_children || !p_parents || !p_families
+        || !pevents_witnesses || !fevents_witnesses || !marriage_divorce
+        || !p_NBDS || !invalid_utf8 || !key || !index
+      then ()
+      else (
+        f_parents := true;
+        f_children := true;
+        p_parents := true;
+        p_families := true;
+        pevents_witnesses := true;
+        fevents_witnesses := true;
+        marriage_divorce := true;
+        p_NBDS := true;
+        invalid_utf8 := true;
+        key := true);
+      check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS
+        ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
+        ~marriage_divorce ~invalid_utf8 ~key;
+      if !dump then dump_persons bpath !ofile
 
 let _ = main ()

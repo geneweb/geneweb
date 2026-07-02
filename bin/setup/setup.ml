@@ -243,16 +243,17 @@ let rec list_replace k v = function
 let conf_with_env conf k v = { conf with env = list_replace k v conf.env }
 
 let all_db dir =
-  match (Sys.readdir dir) with
-  | exception Unix.Unix_error _ -> (
+  match Sys.readdir dir with
+  | exception Unix.Unix_error _ ->
       Printf.eprintf "all_db: cannot open directory %S\n%!" dir;
-      [])
+      []
   | files ->
-      Array.fold_left (fun acc f ->
-        if Filename.check_suffix f ".gwb" then
-          (Filename.chop_suffix f ".gwb") :: acc
-        else acc)
-      [] files
+      Array.fold_left
+        (fun acc f ->
+          if Filename.check_suffix f ".gwb" then
+            Filename.chop_suffix f ".gwb" :: acc
+          else acc)
+        [] files
       |> List.sort compare
 
 let selected env =
@@ -421,14 +422,14 @@ let cut_at_equal s =
 
 let loc_read_base_env bname =
   let fname = !GWPARAM.config bname in
-  match (open_in fname) with
+  match open_in fname with
   | exception Sys_error _ -> []
   | ic ->
       Fun.protect
         ~finally:(fun () -> close_in ic)
         (fun () ->
           let rec loop env =
-            match (input_line ic) with
+            match input_line ic with
             | exception End_of_file -> env
             | s ->
                 let s =

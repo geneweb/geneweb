@@ -15,8 +15,9 @@ let bname = ref None
 
 let anonfun s =
   match !bname with
-  | None -> Secure.set_base_dir (Filename.dirname s);
-    bname := Some s
+  | None ->
+      Secure.set_base_dir (Filename.dirname s);
+      bname := Some s
   | _ -> raise (Arg.Bad "Cannot treat several databases")
 
 let usage = "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] base"
@@ -40,10 +41,14 @@ let () =
   if !opts.Gwexport.charset = Gwexport.Ansel then
     Printf.eprintf "%s\n%!" ansel_warning;
   match !bname with
-    | None -> Arg.usage (speclist opts) usage;
-        exit 2
-    | _ -> ();
-  let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
-  Driver.with_database bpath @@ fun base ->
-  let select = Gwexport.select base !opts [] in
-  Gwb2gedLib.gwb2ged base !with_indexes !opts select
+  | None ->
+      Arg.usage (speclist opts) usage;
+      exit 2
+  | _ ->
+      ();
+      let bpath =
+        Filename.concat !bases_dir (Option.value ~default:"" !bname)
+      in
+      Driver.with_database bpath @@ fun base ->
+      let select = Gwexport.select base !opts [] in
+      Gwb2gedLib.gwb2ged base !with_indexes !opts select
