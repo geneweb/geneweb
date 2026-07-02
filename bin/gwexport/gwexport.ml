@@ -1,11 +1,12 @@
 open Geneweb
 module Collection = Geneweb_db.Collection
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 module Gutil = Geneweb_db.Gutil
 
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 
-let bases_dir = ref "."
+let bases_dir = ref (Dirs.path Secure.default_base_dir )
 let out_file = ref ""
 
 type gwexport_opts = {

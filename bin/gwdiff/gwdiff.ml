@@ -2,6 +2,7 @@
 
 open Def
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 module Collection = Geneweb_db.Collection
 
 (*= TODO =====================================================================
@@ -535,7 +536,7 @@ let mem = ref false
 let d_mode = ref false
 let ad_mode = ref false
 let html = ref false
-let bases_dir = ref "."
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
 
 let speclist =
   [

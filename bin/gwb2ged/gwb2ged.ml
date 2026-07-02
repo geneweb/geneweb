@@ -1,7 +1,8 @@
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 
 let with_indexes = ref false
-let bases_dir = ref "."
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
 
 let speclist opts =
   ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder")
@@ -10,13 +11,13 @@ let speclist opts =
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
 
-let bname = ref ""
+let bname = ref None
 
 let anonfun s =
-  if !bname = "" then (
-    Secure.set_base_dir (Filename.dirname s);
-    bname := s)
-  else raise (Arg.Bad "Cannot treat several databases")
+  match !bname with
+  | None -> Secure.set_base_dir (Filename.dirname s);
+    bname := Some s
+  | _ -> raise (Arg.Bad "Cannot treat several databases")
 
 let usage = "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] base"
 
@@ -38,10 +39,11 @@ let () =
   opts := { !opts with Gwexport.oc = (name, output_string oc, close) };
   if !opts.Gwexport.charset = Gwexport.Ansel then
     Printf.eprintf "%s\n%!" ansel_warning;
-  if !bname = "" then (
-    Arg.usage (speclist opts) usage;
-    exit 2);
-  let bpath = Filename.concat !bases_dir !bname in
+  match !bname with
+    | None -> Arg.usage (speclist opts) usage;
+        exit 2
+    | _ -> ();
+  let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
   Driver.with_database bpath @@ fun base ->
   let select = Gwexport.select base !opts [] in
   Gwb2gedLib.gwb2ged base !with_indexes !opts select

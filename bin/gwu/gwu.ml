@@ -1,8 +1,9 @@
 open GwuLib
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 
 let isolated = ref false
-let bases_dir = ref "."
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
 
 let speclist opts =
   ( "-odir",
@@ -10,11 +11,7 @@ let speclist opts =
     "<dir> create files from original name in directory (else on -o file)" )
   :: ( "-bd",
        Arg.String
-         (fun s ->
-           if !bases_dir = "." then bases_dir := s
-           else if !bases_dir <> Filename.dirname s then
-             raise (Arg.Bad "-bd conflicts with base path (1)")),
-       " defines bases folder" )
+         (fun s -> bases_dir := s), " defines bases folder" )
   :: ( "-isolated",
        Arg.Set isolated,
        " export isolated persons (work only if export all database)." )
@@ -51,12 +48,7 @@ let speclist opts =
 let bname = ref None
 
 let anonfun s =
-  if !bname = None then (
-    bname := Some (Filename.basename s);
-    if s <> Option.value ~default:"" !bname then
-      if !bases_dir = "." then bases_dir := Filename.dirname s
-      else if !bases_dir <> Filename.dirname s then
-        raise (Arg.Bad "-bd conflicts with base path (2)"))
+  if !bname = None then bname := Some (Filename.basename s)
   else raise (Arg.Bad "Cannot treat several databases")
 
 let () =
@@ -84,11 +76,7 @@ let () =
   | Some bname ->
       Printf.eprintf "S_dir: %s, B_dir: %s, bname: %s\n" (Secure.base_dir ())
         !bases_dir bname;
-      let in_dir =
-        let full = Filename.concat (Secure.base_dir ()) bname in
-        if Filename.check_suffix full ".gwb" then full else full ^ ".gwb"
-      in
-      Driver.with_database in_dir @@ fun base ->
+      Driver.with_database bname @@ fun base ->
       let select = Gwexport.select base opts [] in
       let src_oc_ht = Hashtbl.create 1009 in
       Driver.load_ascends_array base;
@@ -128,6 +116,10 @@ let () =
       let _ofile, oc, close = opts.Gwexport.oc in
       if not !GwuLib.raw_output then oc "encoding: utf-8\n";
       if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
+      let in_dir =
+        let full = Filename.concat (Secure.base_dir ()) bname in
+        if Filename.check_suffix full ".gwb" then full else full ^ ".gwb"
+      in
       GwuLib.prepare_free_occ base;
       GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select;
       Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;
