@@ -9,9 +9,7 @@ let speclist opts =
   ( "-odir",
     Arg.String (fun s -> GwuLib.out_dir := s),
     "<dir> create files from original name in directory (else on -o file)" )
-  :: ( "-bd",
-       Arg.String
-         (fun s -> bases_dir := s), " defines bases folder" )
+  :: ("-bd", Arg.String (fun s -> bases_dir := s), " defines bases folder")
   :: ( "-isolated",
        Arg.Set isolated,
        " export isolated persons (work only if export all database)." )

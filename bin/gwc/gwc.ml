@@ -242,6 +242,9 @@ let anonfun fname =
       Fmt.epr "%s" (Arg.usage_string speclist errmsg);
       exit 2)
   in
+  (* If -bd was not provided, derive it from the directory of the first
+     input file given with an absolute path. *)
+  if !base_dir = None then set_base_dir (Filename.dirname fname);
   separate := default_separate;
   bnotes := default_bnotes;
   add_input { fname; kind; separate = sep; bnotes = bn; shift = !shift }

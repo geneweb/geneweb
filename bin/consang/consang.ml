@@ -39,32 +39,35 @@ let () =
       Printf.eprintf "Missing file name\n";
       Printf.eprintf "Use option -help for usage@.";
       exit 2
-  | _ -> ();
-  if !verbosity = 0 then Mutil.verbose := false;
-  let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
+  | _ ->
+      ();
+      if !verbosity = 0 then Mutil.verbose := false;
+      let bpath =
+        Filename.concat !bases_dir (Option.value ~default:"" !bname)
+      in
 
-  Secure.set_base_dir (Filename.dirname bpath);
-  let lock_file = Mutil.lock_file bpath in
-  let on_exn exn bt =
-    Logs.err (fun k -> k "%a" Lock.pp_exception (exn, bt));
-    exit 2
-  in
-  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  Driver.with_database bpath (fun base ->
-      if !fast then (
-        Driver.load_persons_array base;
-        Driver.load_families_array base;
-        Driver.load_ascends_array base;
-        Driver.load_unions_array base;
-        Driver.load_couples_array base;
-        Driver.load_descends_array base;
-        Driver.load_strings_array base);
-      try
-        Sys.catch_break true;
-        if ConsangAll.compute ~verbosity:!verbosity base !scratch then
-          Driver.sync base
-      with Consang.TopologicalSortError p ->
-        Logs.err (fun k ->
-            k "Loop in database, %s is his/her own ancestor."
-              (Gutil.designation base p));
-        exit 2)
+      Secure.set_base_dir (Filename.dirname bpath);
+      let lock_file = Mutil.lock_file bpath in
+      let on_exn exn bt =
+        Logs.err (fun k -> k "%a" Lock.pp_exception (exn, bt));
+        exit 2
+      in
+      Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+      Driver.with_database bpath (fun base ->
+          if !fast then (
+            Driver.load_persons_array base;
+            Driver.load_families_array base;
+            Driver.load_ascends_array base;
+            Driver.load_unions_array base;
+            Driver.load_couples_array base;
+            Driver.load_descends_array base;
+            Driver.load_strings_array base);
+          try
+            Sys.catch_break true;
+            if ConsangAll.compute ~verbosity:!verbosity base !scratch then
+              Driver.sync base
+          with Consang.TopologicalSortError p ->
+            Logs.err (fun k ->
+                k "Loop in database, %s is his/her own ancestor."
+                  (Gutil.designation base p));
+            exit 2)

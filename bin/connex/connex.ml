@@ -287,8 +287,7 @@ let speclist =
   [
     ("-a", Arg.Set all, " List all connected components.");
     ("-bf", Arg.Clear ignore_files, " Group by origin file.");
-    ( "-bd",
-      Arg.String (fun s -> bases_dir := s), " Bases folder" );
+    ("-bd", Arg.String (fun s -> bases_dir := s), " Bases folder");
     ( "-cnt",
       Arg.Int (fun i -> cnt_for_delete := i),
       "<int> Delete up to n branches of size <= -del value." );
@@ -314,9 +313,15 @@ let () =
   Arg.parse speclist (fun s -> bname := Some s) usage;
   Secure.set_base_dir !bases_dir;
   (match !output with
-  | Some file when file="<connex>"->
-      let file = String.concat Filename.dir_sep
-        [ !bases_dir; (Option.value ~default:"" !bname) ^ ".gwb"; "notes_d"; "connex.txt"]
+  | Some file when file = "<connex>" ->
+      let file =
+        String.concat Filename.dir_sep
+          [
+            !bases_dir;
+            Option.value ~default:"" !bname ^ ".gwb";
+            "notes_d";
+            "connex.txt";
+          ]
       in
       let oc = open_out file in
       Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
