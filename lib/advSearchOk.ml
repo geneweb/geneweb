@@ -353,7 +353,14 @@ end = struct
        )
     && (skip_sname
        || match_surname ~base ~surname_list ~mode:exact_surname p
-       || match_surname_alias ~base ~surname_list ~mode:exact_surname p)
+       || match_surname_alias ~base ~surname_list ~mode:exact_surname p
+       || first_name_list <> []
+          && Authorized.Person.get_sex p = Some Def.Female
+          && SearchName.has_visible_marital_name
+               (fun s ->
+                 match_name ~search_list:surname_list ~mode:exact_surname
+                   (List.map Name.lower @@ Name.split @@ s))
+               conf base p)
     && match_alias_public_name_qualifiers ~base ~alias_public_name_qualifiers p
     && match_married ~conf ~base ~p ~married
     && match_occupation ~base ~p ~occupation
