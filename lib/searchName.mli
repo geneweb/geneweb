@@ -53,6 +53,13 @@ val persons_starting_with :
 val search_by_sosa_in_env : Config.config -> Gwdb.base -> Gwdb.person option
 val search_reject_p : Config.config -> Gwdb.base -> Gwdb.person -> bool
 
+val has_visible_marital_name :
+  (string -> bool) ->
+  Config.Trimmed.t ->
+  Gwdb.base ->
+  Authorized.Person.t ->
+  bool
+
 val filter_marital_names :
   ?remove_marital_names_match_only:bool ->
   (string -> bool) ->
