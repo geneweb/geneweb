@@ -2,6 +2,7 @@
 
 open Def
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 module Collection = Geneweb_db.Collection
 
 let all = ref false
@@ -13,9 +14,9 @@ let ignore_files = ref true
 let ask_for_delete = ref 0
 let cnt_for_delete = ref 0
 let exact = ref false
-let bname = ref ""
+let bname = ref None
 let is_html () = !output <> None
-let bases_dir = ref (Secure.base_dir ())
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
 
 let format_date () =
   let t = Unix.localtime (Unix.gettimeofday ()) in
@@ -280,18 +281,14 @@ let compute_connex base basename =
 
 let usage =
   "usage: " ^ Sys.argv.(0) ^ " [options] <base>\nexample: " ^ Sys.argv.(0)
-  ^ " -a -s -o ../bases/base.gwb/notes_d/connex.txt base"
+  ^ " -a -s -o [-bd]/base.gwb/notes_d/connex.txt base"
 
 let speclist =
   [
     ("-a", Arg.Set all, " List all connected components.");
     ("-bf", Arg.Clear ignore_files, " Group by origin file.");
     ( "-bd",
-      Arg.String
-        (fun s ->
-          bases_dir := s;
-          Secure.set_base_dir s),
-      "Bases folder" );
+      Arg.String (fun s -> bases_dir := s), " Bases folder" );
     ( "-cnt",
       Arg.Int (fun i -> cnt_for_delete := i),
       "<int> Delete up to n branches of size <= -del value." );
@@ -314,13 +311,20 @@ let speclist =
   |> Arg.align
 
 let () =
-  Arg.parse speclist (fun s -> bname := s) usage;
+  Arg.parse speclist (fun s -> bname := Some s) usage;
+  Secure.set_base_dir !bases_dir;
   (match !output with
+  | Some file when file="<connex>"->
+      let file = String.concat Filename.dir_sep
+        [ !bases_dir; (Option.value ~default:"" !bname) ^ ".gwb"; "notes_d"; "connex.txt"]
+      in
+      let oc = open_out file in
+      Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
   | Some file ->
       let oc = open_out file in
       Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
   | None -> ());
-  let bpath = Filename.concat !bases_dir !bname in
+  let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
 
   if !ask_for_delete > 0 then
     let lock_file = Mutil.lock_file bpath in

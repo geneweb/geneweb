@@ -1,6 +1,7 @@
 open Geneweb
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Dirs = Geneweb_dirs
 
 let ( // ) = Filename.concat
 
@@ -18,7 +19,7 @@ let gwd_port = ref 2317
 let default_lang = ref "en"
 let setup_dir = ref "."
 let bin_dir = ref default_bin_dir
-let bases_dir = ref (Secure.base_dir ())
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
 let launch_dir = ref "."
 let lang_param = ref ""
 let bname = ref ""
@@ -242,23 +243,17 @@ let rec list_replace k v = function
 let conf_with_env conf k v = { conf with env = list_replace k v conf.env }
 
 let all_db dir =
-  match try Some (Unix.opendir dir) with Unix.Unix_error _ -> None with
-  | None ->
+  match (Sys.readdir dir) with
+  | exception Unix.Unix_error _ -> (
       Printf.eprintf "all_db: cannot open directory %S\n%!" dir;
-      []
-  | Some dh ->
-      let list = ref [] in
-      Fun.protect
-        ~finally:(fun () -> Unix.closedir dh)
-        (fun () ->
-          try
-            while true do
-              let e = Unix.readdir dh in
-              if Filename.check_suffix e ".gwb" then
-                list := Filename.chop_suffix e ".gwb" :: !list
-            done
-          with End_of_file -> ());
-      List.sort compare !list
+      [])
+  | files ->
+      Array.fold_left (fun acc f ->
+        if Filename.check_suffix f ".gwb" then
+          (Filename.chop_suffix f ".gwb") :: acc
+        else acc)
+      [] files
+      |> List.sort compare
 
 let selected env =
   List.fold_right (fun (k, v) env -> if v = "on_" then k :: env else env) env []
@@ -359,9 +354,9 @@ let ( // ) = Filename.concat
 let variables bname =
   let dir = Filename.concat !setup_dir "setup" in
   let fname = Filename.concat (Filename.concat dir "lang") bname in
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | None -> ([], [])
-  | Some ic ->
+  match open_in fname with
+  | exception Sys_error _ -> ([], [])
+  | ic ->
       Fun.protect
         ~finally:(fun () -> close_in ic)
         (fun () ->
@@ -409,17 +404,17 @@ let nth_field s n =
   loop 0 0
 
 let file_contents fname =
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | None -> ""
-  | Some ic ->
+  match (open_in fname) with 
+  | exception Sys_error _ -> ""
+  | ic ->
       Fun.protect
         ~finally:(fun () -> close_in ic)
         (fun () ->
           let rec loop len =
-            match try Some (input_char ic) with End_of_file -> None with
-            | Some '\r' -> loop len
-            | Some c -> loop (Buff.store len c)
-            | None -> Buff.get len
+            match (input_char ic) with
+            | '\r' -> loop len
+            | c -> loop (Buff.store len c)
+            | exception End_of_file -> Buff.get len
           in
           loop 0)
 
@@ -431,16 +426,16 @@ let cut_at_equal s =
 
 let loc_read_base_env bname =
   let fname = !GWPARAM.config bname in
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | None -> []
-  | Some ic ->
+  match (open_in fname) with
+  | exception Sys_error _ -> []
+  | ic ->
       Fun.protect
         ~finally:(fun () -> close_in ic)
         (fun () ->
           let rec loop env =
-            match try Some (input_line ic) with End_of_file -> None with
-            | None -> env
-            | Some s ->
+            match (input_line ic) with
+            | exception End_of_file -> env
+            | s ->
                 let s =
                   if
                     String.length s >= 1

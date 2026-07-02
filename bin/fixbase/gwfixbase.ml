@@ -1,5 +1,6 @@
 open Geneweb
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 
@@ -197,7 +198,7 @@ let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
 
 (**/**)
 
-let bname = ref ""
+let bname = ref None
 let verbosity = ref 2
 let fast = ref false
 let f_parents = ref false
@@ -214,11 +215,11 @@ let index = ref false
 let dry_run = ref false
 let dump = ref false
 let ofile = ref ""
-let bases_dir = ref "."
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
 
 let speclist =
   [
-    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
+    ("-bd", Arg.String (fun s -> bases_dir := s), " Bases folder");
     ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
@@ -242,16 +243,17 @@ let speclist =
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
 
-let anonfun i = bname := i
+let anonfun i = bname := Some i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
-  let bpath = Filename.concat !bases_dir !bname in
-  Secure.set_base_dir (Filename.dirname bpath);
-  if !bname = "" then (
-    Arg.usage speclist usage;
-    exit 2);
+  Secure.set_base_dir !bases_dir;
+  let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
+  match !bname with
+  | None -> Arg.usage speclist usage;
+    exit 2
+  | _ -> ();
   let lock_file = Mutil.lock_file bpath in
   let on_exn exn bt =
     Format.eprintf "%a@." Lock.pp_exception (exn, bt);
