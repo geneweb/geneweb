@@ -716,22 +716,24 @@ module Legacy_driver = struct
   module MemoPersonOfKey =
     Memo.Make
       (struct
-        type t = string * string * int
+        type t = base * string * string * int
 
-        let equal (fn, sn, occ) (fn', sn', occ') =
-          String.equal fn fn' && String.equal sn sn' && Int.equal occ occ'
+        let equal (base, fn, sn, occ) (base', fn', sn', occ') =
+          let basename = bname base in
+          let basename' = bname base' in
+          String.equal basename basename'
+          && String.equal fn fn' && String.equal sn sn' && Int.equal occ occ'
 
-        let hash = Hashtbl.hash
+        let hash (base, fn, sn, occ) = Hashtbl.hash (bname base, fn, sn, occ)
       end)
       (struct
         type res = iper option
-        type f = string * string * int -> iper option
+
+        let f (base, fn, sn, occ) = person_of_key base fn sn occ
       end)
 
   let person_of_key base first_name surname occ =
-    MemoPersonOfKey.memoize
-      (fun (fn, sn, occ) -> person_of_key base first_name surname occ)
-      (first_name, surname, occ)
+    MemoPersonOfKey.memoized (base, first_name, surname, occ)
 
   let open_base path =
     MemoPersonOfKey.init ();

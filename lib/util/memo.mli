@@ -2,8 +2,9 @@
 module Make
     (Key : Hashtbl.HashedType) (F : sig
       type res
-      type f = Key.t -> res
+
+      val f : Key.t -> res
     end) : sig
   val init : unit -> unit
-  val memoize : (Key.t -> F.res) -> Key.t -> F.res
+  val memoized : Key.t -> F.res
 end
