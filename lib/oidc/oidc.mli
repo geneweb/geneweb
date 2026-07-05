@@ -49,10 +49,12 @@ val authorization_url :
   redirect_uri:string ->
   state:string ->
   nonce:string ->
+  code_challenge:string ->
   string
-(** [authorization_url provider ~client_id ~redirect_uri ~state ~nonce] builds
-    the authorization endpoint URL with required OIDC parameters:
-    response_type=code, scope=openid email profile. *)
+(** [authorization_url provider ~client_id ~redirect_uri ~state ~nonce
+     ~code_challenge] builds the authorization endpoint URL with the required
+    OIDC parameters (response_type=code, scope=openid email profile) and the
+    PKCE parameters (code_challenge, code_challenge_method=S256). *)
 
 (** {1 Token Exchange} *)
 
@@ -62,11 +64,13 @@ val exchange_code :
   client_secret:string ->
   redirect_uri:string ->
   code:string ->
+  code_verifier:string ->
   (token_response, error) result
-(** [exchange_code provider ~client_id ~client_secret ~redirect_uri ~code]
-    exchanges an authorization code for tokens via HTTP POST to the token
-    endpoint. Uses client_secret_post authentication method. Returns the token
-    response containing the id_token. *)
+(** [exchange_code provider ~client_id ~client_secret ~redirect_uri ~code
+     ~code_verifier] exchanges an authorization code for tokens via HTTP POST to
+    the token endpoint, sending the PKCE [code_verifier]. Uses
+    client_secret_post authentication method. Returns the token response
+    containing the id_token. *)
 
 (** {1 JWT Verification} *)
 
@@ -143,3 +147,11 @@ val generate_nonce : unit -> string
 val generate_token : unit -> string
 (** [generate_token ()] returns a cryptographically random 256-bit token,
     hex-encoded. Suitable for use as an opaque session identifier. *)
+
+val generate_code_verifier : unit -> string
+(** [generate_code_verifier ()] returns a fresh PKCE code verifier (RFC 7636): a
+    256-bit CSPRNG value, base64url-encoded without padding. *)
+
+val code_challenge : string -> string
+(** [code_challenge verifier] is the S256 PKCE challenge for [verifier], i.e.
+    the base64url-encoded (no padding) SHA-256 of [verifier]. *)
