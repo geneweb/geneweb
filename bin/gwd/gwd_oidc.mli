@@ -1,5 +1,3 @@
-(* Copyright (c) 1998-2007 INRIA *)
-
 open Geneweb
 
 val cookie_access : string list -> string -> (char * string * string) option
