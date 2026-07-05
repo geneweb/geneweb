@@ -4,6 +4,10 @@ module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 open Cmd_legacy
 
+let src = Logs.Src.create ~doc:"OIDC" "OIDC"
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
 let oidc_states_file () = !GWPARAM.adm_file "oidc_states"
 let oidc_sessions_file () = !GWPARAM.adm_file "oidc_sessions"
 
@@ -18,11 +22,11 @@ let read_oidc_states () =
         match input_line ic with
         | line -> (
             match String.split_on_char ' ' line with
-            | [ state; nonce; base_name; ts_str ] ->
-                let ts = float_of_string ts_str in
-                if now -. ts < 300.0 then
-                  loop ((state, (nonce, base_name, ts)) :: acc)
-                else loop acc
+            | [ state; nonce; base_name; ts_str ] -> (
+                match float_of_string_opt ts_str with
+                | Some ts when now -. ts < 300.0 ->
+                    loop ((state, (nonce, base_name, ts)) :: acc)
+                | _ -> loop acc)
             | _ -> loop acc)
         | exception End_of_file ->
             close_in ic;
@@ -76,21 +80,21 @@ let read_oidc_sessions () =
             match String.split_on_char ' ' line with
             | cookie :: ts_str :: from :: base :: acc_str :: id_tok :: user
               :: rest
-              when String.length acc_str = 1 ->
-                let ts = float_of_string ts_str in
-                let username = String.concat " " rest in
-                if now -. ts < tmout then
-                  loop
-                    (( cookie,
-                       ts,
-                       from,
-                       base,
-                       acc_str.[0],
-                       id_tok,
-                       user,
-                       username )
-                    :: acc)
-                else loop acc
+              when String.length acc_str = 1 -> (
+                match float_of_string_opt ts_str with
+                | Some ts when now -. ts < tmout ->
+                    let username = String.concat " " rest in
+                    loop
+                      (( cookie,
+                         ts,
+                         from,
+                         base,
+                         acc_str.[0],
+                         id_tok,
+                         user,
+                         username )
+                      :: acc)
+                | _ -> loop acc)
             | _ -> loop acc)
         | exception End_of_file ->
             close_in ic;
@@ -138,19 +142,24 @@ let lookup_oidc_session cookie_token base_name =
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   let entries = read_oidc_sessions () in
   let found = ref None in
+  let touched = ref false in
   let now = Unix.time () in
   let entries =
     List.map
-      (fun ((cookie, _ts, from, base, acc, id_tok, user, username) as entry) ->
+      (fun ((cookie, ts, from, base, acc, id_tok, user, username) as entry) ->
         if cookie = cookie_token && base = base_name then begin
           found := Some (acc, user, username);
-
-          (cookie, now, from, base, acc, id_tok, user, username)
+          (* slide the expiry at most once a minute to avoid a rewrite per request *)
+          if now -. ts > 60. then begin
+            touched := true;
+            (cookie, now, from, base, acc, id_tok, user, username)
+          end
+          else entry
         end
         else entry)
       entries
   in
-  if !found <> None then write_oidc_sessions entries;
+  if !touched then write_oidc_sessions entries;
   !found
 
 let remove_oidc_session cookie_token base_name =
@@ -252,11 +261,13 @@ let oidc_redirect conf url =
   Output.flush conf
 
 let oidc_error_page conf msg =
+  Log.warn (fun k -> k "authentication failed: %s" msg);
   Output.status conf Code.Bad_Request;
   Output.header conf "Content-type: text/html; charset=utf-8";
   Output.print_sstring conf "<html><head><title>OIDC Error</title></head><body>";
   Output.print_sstring conf "<h1>Authentication Error</h1><p>";
-  Output.print_sstring conf (Util.escape_html msg :> string);
+  Output.print_sstring conf
+    "Authentication failed. Please try again, or contact the administrator.";
   Output.print_sstring conf "</p><p><a href=\"";
   Output.print_sstring conf conf.command;
   Output.print_sstring conf "\">Back</a></p></body></html>";
@@ -374,8 +385,15 @@ let handle_oidc_callback conf base_env from_addr base_file _utm =
   in
   match result with
   | Error msg -> oidc_error_page conf msg
-  | Ok ('v', _, _, _) -> oidc_redirect conf base_url
+  | Ok ('v', user, _, _) ->
+      Log.info (fun k ->
+          k "login as visitor (no role): base=%s user=%s from=%s" base_file user
+            from_addr);
+      oidc_redirect conf base_url
   | Ok (acc, claim_value, username, id_token) ->
+      Log.info (fun k ->
+          k "login: base=%s user=%s access=%c from=%s" base_file claim_value acc
+            from_addr);
       let cookie_token = Geneweb_oidc.Oidc.generate_token () in
       add_oidc_session cookie_token from_addr base_file acc id_token claim_value
         username;
@@ -388,8 +406,8 @@ let handle_oidc_callback conf base_env from_addr base_file _utm =
       Output.flush conf
 
 let handle_oidc_logout conf base_env _from_addr base_file =
+  Log.info (fun k -> k "logout: base=%s" base_file);
   let cookie_name = "gw_oidc_" ^ base_file in
-
   let id_token_opt =
     match extract_oidc_cookie conf.request cookie_name with
     | Some cookie_token -> remove_oidc_session cookie_token base_file
@@ -442,7 +460,8 @@ let handle_mode conf base_env from_addr base_file utm mode =
   | Some "OIDC_LOGOUT" ->
       handle_oidc_logout conf base_env from_addr base_file;
       true
-  | _ ->
+  | None ->
+      (* auto-detect a callback only when no explicit mode is set *)
       let has_code = Util.p_getenv conf.env "code" <> None in
       let has_state = Util.p_getenv conf.env "state" <> None in
       let has_error = Util.p_getenv conf.env "error" <> None in
@@ -454,3 +473,4 @@ let handle_mode conf base_env from_addr base_file utm mode =
         true
       end
       else false
+  | Some _ -> false
