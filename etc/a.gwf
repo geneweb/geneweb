@@ -746,21 +746,21 @@
 # out with "m=OIDC_LOGOUT". On success a session cookie (gw_oidc_<base>) grants
 # wizard or friend access, mapped from a claim in the id_token (see below).
 #
-# OIDC requires HTTPS: the session cookie is issued with the "Secure" flag, so
-# gwd must be served over TLS (directly or behind a TLS-terminating proxy),
-# otherwise the browser will not return the cookie and login silently fails.
+# HTTPS is mandatory: gwd must be served over TLS (the session cookie is
+# "Secure"), and "oidc_provider_url" MUST be https, since the id_token is trusted
+# via TLS to the provider rather than by checking its signature.
 #
 # The login flow is CSRF-protected: the "state", "nonce" and PKCE code verifier
 # are bound to the initiating browser through a signed, short-lived cookie, and
 # the authorization code is exchanged using PKCE (S256). Note that m=OIDC_LOGOUT
 # is a GET, so a third party could trigger a logout (a nuisance, not a breach).
 #
-# Runtime requirement: gwd shells out to the "curl" binary for the discovery,
-# token and JWKS HTTP calls, so curl must be installed and on gwd's PATH.
+# Runtime requirement: gwd shells out to the "curl" binary for the discovery and
+# token HTTP calls, so curl must be installed and on gwd's PATH.
 
-# Provider issuer URL. Its discovery document is fetched from
-# "<oidc_provider_url>/.well-known/openid-configuration". Leaving this empty
-# disables OIDC for the base.
+# Provider issuer URL. Must be https (see above). Its discovery document is
+# fetched from "<oidc_provider_url>/.well-known/openid-configuration". Leaving
+# this empty disables OIDC for the base.
 #oidc_provider_url=https://idp.example.org/realms/main
 
 # OAuth2 client credentials registered with the provider for this base.

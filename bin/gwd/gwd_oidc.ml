@@ -337,8 +337,7 @@ let handle_oidc_callback conf base_env from_addr base_file =
     in
     let* claims =
       Result.map_error err_str
-        (Geneweb_oidc.Oidc.verify_and_decode_id_token
-           ~jwks_uri:provider.jwks_uri ~client_id:cfg.client_id
+        (Geneweb_oidc.Oidc.decode_and_validate_id_token ~client_id:cfg.client_id
            ~issuer:provider.issuer ~nonce token_resp.id_token)
     in
     let claim_string path = Geneweb_oidc.Oidc.claim_string claims path in
