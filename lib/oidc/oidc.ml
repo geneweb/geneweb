@@ -2,12 +2,10 @@ type provider_config = {
   issuer : string;
   authorization_endpoint : string;
   token_endpoint : string;
-  jwks_uri : string;
   end_session_endpoint : string option;
 }
 
 type claims = Yojson.Safe.t
-type jwk = { kid : string; n : string; e : string }
 type token_response = { id_token : string; access_token : string option }
 type error = Http_error of string | Json_error of string | Jwt_error of string
 
@@ -115,19 +113,16 @@ let discover issuer_url =
               (fun authorization_endpoint ->
                 Result.bind (json_string_field "token_endpoint" json)
                   (fun token_endpoint ->
-                    Result.bind (json_string_field "jwks_uri" json)
-                      (fun jwks_uri ->
-                        let end_session_endpoint =
-                          json_string_field_opt "end_session_endpoint" json
-                        in
-                        Ok
-                          {
-                            issuer;
-                            authorization_endpoint;
-                            token_endpoint;
-                            jwks_uri;
-                            end_session_endpoint;
-                          }))))
+                    let end_session_endpoint =
+                      json_string_field_opt "end_session_endpoint" json
+                    in
+                    Ok
+                      {
+                        issuer;
+                        authorization_endpoint;
+                        token_endpoint;
+                        end_session_endpoint;
+                      })))
       with Yojson.Json_error msg -> Error (Json_error msg))
 
 let authorization_url provider ~client_id ~redirect_uri ~state ~nonce
@@ -177,57 +172,10 @@ let exchange_code provider ~client_id ~client_secret ~redirect_uri ~code
                 Ok { id_token; access_token })
       with Yojson.Json_error msg -> Error (Json_error msg))
 
-let parse_jwks_json body =
-  try
-    let json = Yojson.Safe.from_string body in
-    match json with
-    | `Assoc fields -> (
-        match List.assoc_opt "keys" fields with
-        | Some (`List keys) ->
-            let parse_key json =
-              match
-                ( json_string_field_opt "kty" json,
-                  json_string_field_opt "kid" json,
-                  json_string_field_opt "n" json,
-                  json_string_field_opt "e" json )
-              with
-              | Some "RSA", Some kid, Some n, Some e -> Some { kid; n; e }
-              | _ -> None
-            in
-            Ok (List.filter_map parse_key keys)
-        | _ -> Error (Json_error "JWKS missing 'keys' array"))
-    | _ -> Error (Json_error "JWKS expected JSON object")
-  with Yojson.Json_error msg -> Error (Json_error msg)
-
-let fetch_jwks jwks_uri =
-  Result.bind (curl_get jwks_uri) (fun body -> parse_jwks_json body)
-
-let decode_bigint_b64url s =
-  Result.bind (base64url_decode s) (fun bytes ->
-      Ok (Mirage_crypto_pk.Z_extra.of_octets_be bytes))
-
-let rsa_pub_of_jwk jwk =
-  Result.bind (decode_bigint_b64url jwk.e) (fun e ->
-      Result.bind (decode_bigint_b64url jwk.n) (fun n ->
-          match Mirage_crypto_pk.Rsa.pub ~e ~n with
-          | Ok pub -> Ok pub
-          | Error (`Msg msg) ->
-              Error (Jwt_error (Printf.sprintf "RSA key error: %s" msg))))
-
 let split_jwt token =
   match String.split_on_char '.' token with
   | [ header; payload; signature ] -> Ok (header, payload, signature)
   | _ -> Error (Jwt_error "JWT must have exactly 3 parts")
-
-let verify_rs256 ~pub_key ~header_b64 ~payload_b64 ~signature_b64 =
-  Result.bind (base64url_decode signature_b64) (fun signature ->
-      let message = header_b64 ^ "." ^ payload_b64 in
-      if
-        Mirage_crypto_pk.Rsa.PKCS1.verify
-          ~hashp:(fun h -> h = `SHA256)
-          ~key:pub_key ~signature (`Message message)
-      then Ok ()
-      else Error (Jwt_error "RS256 signature verification failed"))
 
 let decode_payload payload_b64 =
   Result.bind (base64url_decode payload_b64) (fun payload_json ->
@@ -327,47 +275,16 @@ let validate_claims ~client_id ~issuer ~nonce claims =
            (Printf.sprintf "nonce mismatch: expected %s, got %s" nonce n))
   | None -> Error (Jwt_error "missing nonce claim")
 
-let verify_and_decode_id_token ~jwks_uri ~client_id ~issuer ~nonce token =
+let decode_and_validate_id_token ~client_id ~issuer ~nonce token =
   let ( let* ) = Result.bind in
-  let* header_b64, payload_b64, signature_b64 = split_jwt token in
-  let* header_json = base64url_decode header_b64 in
-  let header =
-    try Ok (Yojson.Safe.from_string header_json)
-    with Yojson.Json_error msg ->
-      Error (Jwt_error (Printf.sprintf "JWT header JSON error: %s" msg))
-  in
-  let* header = header in
-  let alg = json_string_field_opt "alg" header in
-  let kid = json_string_field_opt "kid" header in
-  let* () =
-    match alg with
-    | Some "RS256" -> Ok ()
-    | Some other ->
-        Error
-          (Jwt_error
-             (Printf.sprintf "unsupported JWT alg: %s (only RS256)" other))
-    | None -> Error (Jwt_error "missing alg in JWT header")
-  in
-  let find_key keys =
-    match kid with
-    | Some kid_val -> List.find_opt (fun k -> k.kid = kid_val) keys
-    | None -> ( match keys with k :: _ -> Some k | [] -> None)
-  in
-  let verify_with_key key =
-    let* pub_key = rsa_pub_of_jwk key in
-    let* () = verify_rs256 ~pub_key ~header_b64 ~payload_b64 ~signature_b64 in
-    let* claims = decode_payload payload_b64 in
-    let* () = validate_claims ~client_id ~issuer ~nonce claims in
-    Ok claims
-  in
-  let* keys = fetch_jwks jwks_uri in
-  match find_key keys with
-  | Some key -> verify_with_key key
-  | None ->
-      Error
-        (Jwt_error
-           (Printf.sprintf "no matching JWK found for kid=%s"
-              (Option.value ~default:"(none)" kid)))
+  (* No local signature check: per OIDC Core 3.1.3.7, in the Authorization Code
+     flow the id_token is obtained directly from the token endpoint over TLS, so
+     TLS server validation stands in for JWS signature validation. We only
+     decode the payload and validate the standard claims. *)
+  let* _header, payload_b64, _signature = split_jwt token in
+  let* claims = decode_payload payload_b64 in
+  let* () = validate_claims ~client_id ~issuer ~nonce claims in
+  Ok claims
 
 let logout_url provider ~id_token_hint ~post_logout_redirect_uri =
   match provider.end_session_endpoint with
