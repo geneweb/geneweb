@@ -16,18 +16,25 @@ let pp_error fmt = function
   | Json_error s -> Format.fprintf fmt "JSON error: %s" s
   | Jwt_error s -> Format.fprintf fmt "JWT error: %s" s
 
+let read_all ic =
+  let bufsz = 65536 in
+  let buf = Buffer.create bufsz in
+  let chunk = Bytes.create bufsz in
+  let rec loop () =
+    let n = input ic chunk 0 bufsz in
+    if n > 0 then (
+      Buffer.add_subbytes buf chunk 0 n;
+      loop ())
+  in
+  loop ();
+  Buffer.contents buf
+
 let curl_get url =
   let cmd = Printf.sprintf "curl -sfS --max-time 10 %s" (Filename.quote url) in
   let ic = Unix.open_process_in cmd in
-  let buf = Buffer.create 4096 in
-  (try
-     while true do
-       Buffer.add_char buf (input_char ic)
-     done
-   with End_of_file -> ());
-  let status = Unix.close_process_in ic in
-  match status with
-  | Unix.WEXITED 0 -> Ok (Buffer.contents buf)
+  let body = read_all ic in
+  match Unix.close_process_in ic with
+  | Unix.WEXITED 0 -> Ok body
   | Unix.WEXITED code ->
       Error
         (Http_error (Printf.sprintf "curl GET %s failed (exit %d)" url code))
@@ -43,22 +50,18 @@ let curl_post url form_data =
       form_data
     |> String.concat "&"
   in
+  (* No -f here: on an OAuth error the token endpoint replies 4xx with a JSON
+     error body we want to read and surface. *)
   let cmd =
-    Printf.sprintf "curl -sfS --max-time 10 -X POST --data-binary @- %s"
+    Printf.sprintf "curl -sS --max-time 10 -X POST --data-binary @- %s"
       (Filename.quote url)
   in
   let ic, oc = Unix.open_process cmd in
   output_string oc body;
   close_out oc;
-  let buf = Buffer.create 4096 in
-  (try
-     while true do
-       Buffer.add_char buf (input_char ic)
-     done
-   with End_of_file -> ());
-  let status = Unix.close_process (ic, oc) in
-  match status with
-  | Unix.WEXITED 0 -> Ok (Buffer.contents buf)
+  let resp = read_all ic in
+  match Unix.close_process (ic, oc) with
+  | Unix.WEXITED 0 -> Ok resp
   | Unix.WEXITED code ->
       Error
         (Http_error (Printf.sprintf "curl POST %s failed (exit %d)" url code))
@@ -95,45 +98,37 @@ let base64url_decode s =
 let base64url_encode s =
   Base64.encode_string ~pad:false ~alphabet:Base64.uri_safe_alphabet s
 
-let discovery_cache : (string, provider_config) Hashtbl.t = Hashtbl.create 4
-
 let discover issuer_url =
-  match Hashtbl.find_opt discovery_cache issuer_url with
-  | Some config -> Ok config
-  | None ->
-      let base =
-        if
-          String.length issuer_url > 0
-          && issuer_url.[String.length issuer_url - 1] = '/'
-        then String.sub issuer_url 0 (String.length issuer_url - 1)
-        else issuer_url
-      in
-      let url = base ^ "/.well-known/openid-configuration" in
-      Result.bind (curl_get url) (fun body ->
-          try
-            let json = Yojson.Safe.from_string body in
-            Result.bind (json_string_field "issuer" json) (fun issuer ->
-                Result.bind (json_string_field "authorization_endpoint" json)
-                  (fun authorization_endpoint ->
-                    Result.bind (json_string_field "token_endpoint" json)
-                      (fun token_endpoint ->
-                        Result.bind (json_string_field "jwks_uri" json)
-                          (fun jwks_uri ->
-                            let end_session_endpoint =
-                              json_string_field_opt "end_session_endpoint" json
-                            in
-                            let config =
-                              {
-                                issuer;
-                                authorization_endpoint;
-                                token_endpoint;
-                                jwks_uri;
-                                end_session_endpoint;
-                              }
-                            in
-                            Hashtbl.replace discovery_cache issuer_url config;
-                            Ok config))))
-          with Yojson.Json_error msg -> Error (Json_error msg))
+  let base =
+    if
+      String.length issuer_url > 0
+      && issuer_url.[String.length issuer_url - 1] = '/'
+    then String.sub issuer_url 0 (String.length issuer_url - 1)
+    else issuer_url
+  in
+  let url = base ^ "/.well-known/openid-configuration" in
+  Result.bind (curl_get url) (fun body ->
+      try
+        let json = Yojson.Safe.from_string body in
+        Result.bind (json_string_field "issuer" json) (fun issuer ->
+            Result.bind (json_string_field "authorization_endpoint" json)
+              (fun authorization_endpoint ->
+                Result.bind (json_string_field "token_endpoint" json)
+                  (fun token_endpoint ->
+                    Result.bind (json_string_field "jwks_uri" json)
+                      (fun jwks_uri ->
+                        let end_session_endpoint =
+                          json_string_field_opt "end_session_endpoint" json
+                        in
+                        Ok
+                          {
+                            issuer;
+                            authorization_endpoint;
+                            token_endpoint;
+                            jwks_uri;
+                            end_session_endpoint;
+                          }))))
+      with Yojson.Json_error msg -> Error (Json_error msg))
 
 let authorization_url provider ~client_id ~redirect_uri ~state ~nonce
     ~code_challenge =
@@ -160,7 +155,6 @@ let exchange_code provider ~client_id ~client_secret ~redirect_uri ~code
       ("grant_type", "authorization_code");
       ("code", code);
       ("redirect_uri", redirect_uri);
-      (* client_secret_post: client credentials in POST body *)
       ("client_id", client_id);
       ("client_secret", client_secret);
       ("code_verifier", code_verifier);
@@ -169,12 +163,19 @@ let exchange_code provider ~client_id ~client_secret ~redirect_uri ~code
   Result.bind (curl_post provider.token_endpoint form_data) (fun body ->
       try
         let json = Yojson.Safe.from_string body in
-        Result.bind (json_string_field "id_token" json) (fun id_token ->
-            let access_token = json_string_field_opt "access_token" json in
-            Ok { id_token; access_token })
+        match json_string_field_opt "error" json with
+        | Some err ->
+            let desc =
+              match json_string_field_opt "error_description" json with
+              | Some d -> ": " ^ d
+              | None -> ""
+            in
+            Error (Http_error ("token endpoint returned " ^ err ^ desc))
+        | None ->
+            Result.bind (json_string_field "id_token" json) (fun id_token ->
+                let access_token = json_string_field_opt "access_token" json in
+                Ok { id_token; access_token })
       with Yojson.Json_error msg -> Error (Json_error msg))
-
-let jwks_cache : (string, jwk list) Hashtbl.t = Hashtbl.create 4
 
 let parse_jwks_json body =
   try
@@ -198,18 +199,8 @@ let parse_jwks_json body =
     | _ -> Error (Json_error "JWKS expected JSON object")
   with Yojson.Json_error msg -> Error (Json_error msg)
 
-let fetch_jwks_internal ~force_refresh jwks_uri =
-  match
-    if force_refresh then None else Hashtbl.find_opt jwks_cache jwks_uri
-  with
-  | Some keys -> Ok keys
-  | None ->
-      Result.bind (curl_get jwks_uri) (fun body ->
-          Result.bind (parse_jwks_json body) (fun keys ->
-              Hashtbl.replace jwks_cache jwks_uri keys;
-              Ok keys))
-
-let fetch_jwks jwks_uri = fetch_jwks_internal ~force_refresh:false jwks_uri
+let fetch_jwks jwks_uri =
+  Result.bind (curl_get jwks_uri) (fun body -> parse_jwks_json body)
 
 let decode_bigint_b64url s =
   Result.bind (base64url_decode s) (fun bytes ->
@@ -369,18 +360,14 @@ let verify_and_decode_id_token ~jwks_uri ~client_id ~issuer ~nonce token =
     let* () = validate_claims ~client_id ~issuer ~nonce claims in
     Ok claims
   in
-  let* keys = fetch_jwks_internal ~force_refresh:false jwks_uri in
+  let* keys = fetch_jwks jwks_uri in
   match find_key keys with
   | Some key -> verify_with_key key
-  | None -> (
-      let* keys = fetch_jwks_internal ~force_refresh:true jwks_uri in
-      match find_key keys with
-      | Some key -> verify_with_key key
-      | None ->
-          Error
-            (Jwt_error
-               (Printf.sprintf "no matching JWK found for kid=%s"
-                  (Option.value ~default:"(none)" kid))))
+  | None ->
+      Error
+        (Jwt_error
+           (Printf.sprintf "no matching JWK found for kid=%s"
+              (Option.value ~default:"(none)" kid)))
 
 let logout_url provider ~id_token_hint ~post_logout_redirect_uri =
   match provider.end_session_endpoint with

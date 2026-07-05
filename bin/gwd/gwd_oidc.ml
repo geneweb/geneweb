@@ -2,13 +2,13 @@ open Geneweb
 open Config
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
-open Cmd_legacy
 
 let src = Logs.Src.create ~doc:"OIDC" "OIDC"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
 let oidc_sessions_file () = !GWPARAM.adm_file "oidc_sessions"
+let oidc_lock_file () = !GWPARAM.adm_file "oidc.lck"
 
 (* The login flow (state, nonce, PKCE verifier) is bound to the initiating
    browser through a signed cookie instead of a shared server-side store. *)
@@ -38,33 +38,33 @@ let parse_login_cookie secret ~base_file value =
       | _ -> None)
   | _ -> None
 
+(* Fields that may contain spaces (from, user, username) are percent-encoded so
+   the space-separated line format stays unambiguous whatever the claim value. *)
 let read_oidc_sessions () =
   let fname = oidc_sessions_file () in
   if not (Sys.file_exists fname) then []
   else
     try
       let ic = Secure.open_in fname in
-      let tmout = float_of_int !login_timeout in
+      let tmout = float_of_int !Cmd_legacy.login_timeout in
       let now = Unix.time () in
       let rec loop acc =
         match input_line ic with
         | line -> (
             match String.split_on_char ' ' line with
-            | cookie :: ts_str :: from :: base :: acc_str :: id_tok :: user
-              :: rest
+            | [ cookie; ts_str; from; base; acc_str; id_tok; user; username ]
               when String.length acc_str = 1 -> (
                 match float_of_string_opt ts_str with
                 | Some ts when now -. ts < tmout ->
-                    let username = String.concat " " rest in
                     loop
                       (( cookie,
                          ts,
-                         from,
+                         Uri.pct_decode from,
                          base,
                          acc_str.[0],
                          id_tok,
-                         user,
-                         username )
+                         Uri.pct_decode user,
+                         Uri.pct_decode username )
                       :: acc)
                 | _ -> loop acc)
             | _ -> loop acc)
@@ -78,19 +78,22 @@ let read_oidc_sessions () =
 let write_oidc_sessions entries =
   let fname = oidc_sessions_file () in
   try
-    let oc = Secure.open_out fname in
+    (* The store holds bearer id_tokens; keep it owner-only (0600). *)
+    let oc =
+      Secure.open_out_gen [ Open_wronly; Open_creat; Open_trunc ] 0o600 fname
+    in
     List.iter
       (fun (cookie, ts, from, base, acc, id_tok, user, username) ->
-        Printf.fprintf oc "%s %.0f %s %s %c %s %s%s\n" cookie ts from base acc
-          id_tok user
-          (if username = "" then "" else " " ^ username))
+        Printf.fprintf oc "%s %.0f %s %s %c %s %s %s\n" cookie ts
+          (Uri.pct_encode from) base acc id_tok (Uri.pct_encode user)
+          (Uri.pct_encode username))
       entries;
     close_out oc
   with Sys_error _ -> ()
 
 let add_oidc_session cookie_token from_addr base_name access_char id_token user
     username =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let lock_file = oidc_lock_file () in
   let on_exn _exn _bt = () in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   let entries = read_oidc_sessions () in
@@ -109,7 +112,7 @@ let add_oidc_session cookie_token from_addr base_name access_char id_token user
   write_oidc_sessions entries
 
 let lookup_oidc_session cookie_token base_name =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let lock_file = oidc_lock_file () in
   let on_exn _exn _bt = None in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   let entries = read_oidc_sessions () in
@@ -135,7 +138,7 @@ let lookup_oidc_session cookie_token base_name =
   !found
 
 let remove_oidc_session cookie_token base_name =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let lock_file = oidc_lock_file () in
   let on_exn _exn _bt = None in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   let entries = read_oidc_sessions () in
@@ -236,7 +239,7 @@ let oidc_error_page conf msg =
   Output.print_sstring conf
     "Authentication failed. Please try again, or contact the administrator.";
   Output.print_sstring conf "</p><p><a href=\"";
-  Output.print_sstring conf conf.command;
+  Output.print_sstring conf (Util.escape_html conf.command :> string);
   Output.print_sstring conf "\">Back</a></p></body></html>";
   Output.flush conf
 
@@ -282,7 +285,7 @@ let handle_oidc_login conf base_env base_file =
           Output.header conf "Location: %s" url;
           Output.flush conf)
 
-let handle_oidc_callback conf base_env from_addr base_file _utm =
+let handle_oidc_callback conf base_env from_addr base_file =
   let ( let* ) = Result.bind in
   let err_str e = Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e in
   let result =
@@ -447,27 +450,30 @@ let handle_oidc_logout conf base_env _from_addr base_file =
       Output.header conf "Location: %s" logout_target;
       Output.flush conf
 
-let handle_mode conf base_env from_addr base_file utm mode =
+let handle_mode conf mode =
+  let base_env = conf.base_env
+  and from_addr = conf.from
+  and base_file = conf.bname in
   match mode with
   | Some "OIDC_LOGIN" ->
       handle_oidc_login conf base_env base_file;
       true
   | Some "OIDC_CALLBACK" ->
-      handle_oidc_callback conf base_env from_addr base_file utm;
+      handle_oidc_callback conf base_env from_addr base_file;
       true
   | Some "OIDC_LOGOUT" ->
       handle_oidc_logout conf base_env from_addr base_file;
       true
   | None ->
-      (* auto-detect a callback only when no explicit mode is set *)
+      (* auto-detect an IdP callback (code+state) when no explicit mode is set *)
       let has_code = Util.p_getenv conf.env "code" <> None in
       let has_state = Util.p_getenv conf.env "state" <> None in
       let has_error = Util.p_getenv conf.env "error" <> None in
       if
         ((has_code && has_state) || (has_error && has_state))
-        && read_oidc_config base_env <> None
+        && Option.is_some (read_oidc_config base_env)
       then begin
-        handle_oidc_callback conf base_env from_addr base_file utm;
+        handle_oidc_callback conf base_env from_addr base_file;
         true
       end
       else false
