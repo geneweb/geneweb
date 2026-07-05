@@ -174,20 +174,6 @@ let remove_oidc_session cookie_token base_name =
   write_oidc_sessions entries;
   !id_token_ref
 
-let random_self_init () =
-  let seed = int_of_float (mod_float (Unix.time ()) (float max_int)) in
-  Random.init seed
-
-let mk_oidc_cookie_token () =
-  random_self_init ();
-  let rec loop len =
-    if len = 32 then Buff.get len
-    else
-      let v = Char.code 'a' + Random.int 26 in
-      loop (Buff.store len (Char.chr v))
-  in
-  loop 0
-
 let extract_oidc_cookie request cookie_name =
   let cookie_hdr = Mutil.extract_param "cookie: " '\n' request in
   if cookie_hdr = "" then None
@@ -412,7 +398,7 @@ let handle_oidc_callback conf base_env from_addr base_file _utm =
                                       else display_name
                                     in
                                     let cookie_token =
-                                      mk_oidc_cookie_token ()
+                                      Geneweb_oidc.Oidc.generate_token ()
                                     in
                                     add_oidc_session cookie_token from_addr
                                       base_file acc token_resp.id_token
