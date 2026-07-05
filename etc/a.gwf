@@ -736,3 +736,56 @@
 # or to only one if variable is set
 # if not set, then togle checkbox accessible on individual page.
 #wide=on
+
+# =============================================================================
+# OpenID Connect (SSO) login
+# =============================================================================
+# When "oidc_provider_url" is set, gwd exposes single sign-on through an
+# OpenID Connect provider (Keycloak, Authentik, Google, etc.) using the
+# Authorization Code Flow. Users reach it with "m=OIDC_LOGIN" and are logged
+# out with "m=OIDC_LOGOUT". On success a session cookie (gw_oidc_<base>) grants
+# wizard or friend access, mapped from a claim in the id_token (see below).
+#
+# OIDC requires HTTPS: the session cookie is issued with the "Secure" flag, so
+# gwd must be served over TLS (directly or behind a TLS-terminating proxy),
+# otherwise the browser will not return the cookie and login silently fails.
+#
+# Note: m=OIDC_LOGIN / m=OIDC_LOGOUT are GET requests and the login "state" is
+# not bound to the browser, so a residual login/logout CSRF exists; SameSite=Lax
+# on the cookie mitigates it. Prefer trusted links for these actions.
+
+# Provider issuer URL. Its discovery document is fetched from
+# "<oidc_provider_url>/.well-known/openid-configuration". Leaving this empty
+# disables OIDC for the base.
+#oidc_provider_url=https://idp.example.org/realms/main
+
+# OAuth2 client credentials registered with the provider for this base.
+#oidc_client_id=
+
+# Client secret. Prefer "oidc_client_secret_file" (path to a file whose first
+# line holds the secret) so the secret is not stored in the .gwf itself.
+# If both are set, the file takes precedence.
+#oidc_client_secret=
+#oidc_client_secret_file=
+
+# Redirect URI registered with the provider. It must point back at this base;
+# the provider appends "code" and "state", which gwd auto-detects as the
+# callback (no "m=" needed).
+#oidc_redirect_uri=https://geneweb.example.org/mybase
+
+# Claim used as the user identity. Falls back to "sub" if absent.
+#oidc_user_claim=email
+
+# Claim inspected for role/group membership (scalar or array), e.g.
+# "realm_access.roles" for Keycloak or "groups" for Authentik. Leave empty to
+# grant every authenticated user visitor access only.
+#oidc_role_claim=
+
+# Values within "oidc_role_claim" that grant wizard and friend access. A user
+# with neither role is logged in as a plain visitor.
+#oidc_wizard_role=
+#oidc_friend_role=
+
+# Optional claim carrying the GeneWeb person key ("first_name.occ surname") to
+# associate the logged-in user with a database individual. Leave empty to skip.
+#oidc_person_key_claim=
