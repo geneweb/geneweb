@@ -752,8 +752,8 @@
 #
 # The login flow is CSRF-protected: the "state", "nonce" and PKCE code verifier
 # are bound to the initiating browser through a signed, short-lived cookie, and
-# the authorization code is exchanged using PKCE (S256). Note that m=OIDC_LOGOUT
-# is a GET, so a third party could trigger a logout (a nuisance, not a breach).
+# the authorization code is exchanged using PKCE (S256). Logout (m=OIDC_LOGOUT)
+# is accepted only over POST, so a cross-site request cannot trigger it.
 #
 # Runtime requirement: gwd shells out to the "curl" binary for the discovery and
 # token HTTP calls, so curl must be installed and on gwd's PATH.
