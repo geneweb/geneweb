@@ -84,8 +84,6 @@ let claim_has_value_scalar () =
 
 let is_ok = function Ok () -> true | Error _ -> false
 
-(* A claims object with a valid exp far in the future and the given iss/aud/
-   nonce, so that only the field under test decides the outcome. *)
 let mk_claims ~iss ~aud ~nonce =
   claims_of
     (Printf.sprintf {|{ "iss": %s, "aud": %s, "exp": 9999999999, "nonce": %s }|}
@@ -97,7 +95,6 @@ let validate_claims_ok () =
     (is_ok
        (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
           ~nonce:"n1" c));
-  (* aud may be an array containing the client_id *)
   let c_arr =
     mk_claims ~iss:{|"https://idp"|} ~aud:{|["other", "client1"]|}
       ~nonce:{|"n1"|}
@@ -123,7 +120,6 @@ let validate_claims_rejects () =
     (is_ok
        (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
           ~nonce:"n2" base));
-  (* an expired token is rejected *)
   let expired =
     claims_of
       {|{ "iss": "https://idp", "aud": "client1", "exp": 1000000000, "nonce": "n1" }|}
@@ -132,7 +128,6 @@ let validate_claims_rejects () =
     (is_ok
        (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
           ~nonce:"n1" expired));
-  (* a missing nonce is rejected *)
   let no_nonce =
     claims_of {|{ "iss": "https://idp", "aud": "client1", "exp": 9999999999 }|}
   in
@@ -147,9 +142,7 @@ let base64url_decode_cases () =
     | Ok d -> d
     | Error _ -> failwith "decode"
   in
-  (* unpadded standard alphabet *)
   (check string) "hello" "hello" (dec "aGVsbG8");
-  (* url-safe characters '-' and '_' map to '+' and '/' *)
   (check string) "url-safe bytes" "\250\251" (dec "-vs");
   (check bool) "invalid input errors" true
     (match Oidc.base64url_decode "!!!" with Error _ -> true | Ok _ -> false)
