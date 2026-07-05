@@ -1,9 +1,7 @@
 val cookie_access : string list -> string -> (char * string * string) option
-(** [cookie_access request base_name] returns the access rights (['w'] wizard or
-    ['f'] friend, together with the user and username) granted by a valid OIDC
-    session cookie found in [request] for [base_name], or [None]. *)
+(** Access ([w]/[f], user, username) from a valid OIDC session cookie in
+    [request] for the base, or [None]. *)
 
 val handle_mode : Geneweb.Config.config -> string option -> bool
-(** [handle_mode conf mode] intercepts the OIDC request modes (login, callback,
-    logout) and auto-detects OIDC callbacks. Returns [true] when the request was
-    an OIDC one and has been handled. *)
+(** Handle the OIDC modes (login, callback, logout) and auto-detected callbacks.
+    Returns [true] if the request was OIDC and has been handled. *)

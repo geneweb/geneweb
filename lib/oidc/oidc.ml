@@ -27,7 +27,6 @@ let read_all ic =
   loop ();
   Buffer.contents buf
 
-(* explicit argv, never a shell, so URLs can't be read as shell metacharacters *)
 let curl_get url =
   let argv = [| "curl"; "-sfS"; "--max-time"; "10"; url |] in
   let ic = Unix.open_process_args_in "curl" argv in
@@ -49,8 +48,7 @@ let curl_post url form_data =
       form_data
     |> String.concat "&"
   in
-  (* No -f here: on an OAuth error the token endpoint replies 4xx with a JSON
-     error body we want to read and surface. *)
+  (* no -f: read the token endpoint's JSON error body on 4xx *)
   let argv =
     [|
       "curl";
@@ -287,10 +285,8 @@ let validate_claims ~client_id ~issuer ~nonce claims =
 
 let decode_and_validate_id_token ~client_id ~issuer ~nonce token =
   let ( let* ) = Result.bind in
-  (* No local signature check: per OIDC Core 3.1.3.7, in the Authorization Code
-     flow the id_token is obtained directly from the token endpoint over TLS, so
-     TLS server validation stands in for JWS signature validation. We only
-     decode the payload and validate the standard claims. *)
+  (* No signature check: the id_token arrives over TLS straight from the token
+     endpoint, which OIDC Core 3.1.3.7 accepts in place of JWS verification. *)
   let* _header, payload_b64, _signature = split_jwt token in
   let* claims = decode_payload payload_b64 in
   let* () = validate_claims ~client_id ~issuer ~nonce claims in

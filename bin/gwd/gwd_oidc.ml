@@ -10,8 +10,7 @@ module Log = (val Logs.src_log src : Logs.LOG)
 let oidc_sessions_file () = !GWPARAM.adm_file "oidc_sessions"
 let oidc_lock_file () = !GWPARAM.adm_file "oidc.lck"
 
-(* The login flow (state, nonce, PKCE verifier) is bound to the initiating
-   browser through a signed cookie instead of a shared server-side store. *)
+(* login state is bound to the browser via a signed cookie, not a server store *)
 
 let login_cookie_name base_file = "gw_oidc_login_" ^ base_file
 
@@ -38,8 +37,6 @@ let parse_login_cookie secret ~base_file value =
       | _ -> None)
   | _ -> None
 
-(* Fields that may contain spaces (user, username) are percent-encoded so the
-   space-separated line format stays unambiguous whatever the claim value. *)
 let read_oidc_sessions () =
   let fname = oidc_sessions_file () in
   if not (Sys.file_exists fname) then []
@@ -489,7 +486,6 @@ let handle_mode conf mode =
       handle_oidc_logout conf base_env from_addr base_file;
       true
   | None ->
-      (* auto-detect an IdP callback (code+state) when no explicit mode is set *)
       let has_code = Util.p_getenv conf.env "code" <> None in
       let has_state = Util.p_getenv conf.env "state" <> None in
       let has_error = Util.p_getenv conf.env "error" <> None in
