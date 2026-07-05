@@ -413,7 +413,7 @@ let handle_oidc_callback conf base_env from_addr base_file _utm =
                                     Output.status conf Code.Moved_Temporarily;
                                     Output.header conf
                                       "Set-Cookie: %s=%s; Path=/; HttpOnly; \
-                                       SameSite=Lax"
+                                       Secure; SameSite=Lax"
                                       cookie_name cookie_token;
                                     Output.header conf "Location: %s" url;
                                     Output.flush conf
@@ -433,7 +433,8 @@ let handle_oidc_logout conf base_env _from_addr base_file =
 
   let clear_cookie conf =
     Output.header conf
-      "Set-Cookie: %s=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" cookie_name
+      "Set-Cookie: %s=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
+      cookie_name
   in
   match read_oidc_config base_env with
   | None ->
