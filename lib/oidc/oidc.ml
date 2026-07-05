@@ -395,30 +395,13 @@ let logout_url provider ~id_token_hint ~post_logout_redirect_uri =
       Some (Uri.to_string uri)
 
 let generate_random_hex len =
-  (* Use mirage-crypto-rng for CSPRNG if available, fall back to /dev/urandom *)
-  try
-    let ic = open_in_bin "/dev/urandom" in
-    let bytes = Bytes.create len in
-    really_input ic bytes 0 len;
-    close_in ic;
-    let hex = Buffer.create (len * 2) in
-    Bytes.iter
-      (fun c -> Buffer.add_string hex (Printf.sprintf "%02x" (Char.code c)))
-      bytes;
-    Buffer.contents hex
-  with Sys_error _ ->
-    (* Fallback: use Unix.time + pid as seed -- not ideal but better than nothing *)
-    let seed =
-      int_of_float (Unix.time ())
-      lxor Unix.getpid ()
-      lxor (Unix.getpid () * 65599)
-    in
-    Random.init seed;
-    let hex = Buffer.create (len * 2) in
-    for _ = 1 to len do
-      Buffer.add_string hex (Printf.sprintf "%02x" (Random.int 256))
-    done;
-    Buffer.contents hex
+  let bytes = Mirage_crypto_rng_unix.getrandom len in
+  let hex = Buffer.create (len * 2) in
+  String.iter
+    (fun c -> Buffer.add_string hex (Printf.sprintf "%02x" (Char.code c)))
+    bytes;
+  Buffer.contents hex
 
 let generate_state () = generate_random_hex 16
 let generate_nonce () = generate_random_hex 16
+let generate_token () = generate_random_hex 32
