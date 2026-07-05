@@ -128,3 +128,7 @@ val generate_state : unit -> string
 
 val generate_nonce : unit -> string
 (** [generate_nonce ()] returns a cryptographically random nonce string. *)
+
+val generate_token : unit -> string
+(** [generate_token ()] returns a cryptographically random 256-bit token,
+    hex-encoded. Suitable for use as an opaque session identifier. *)
