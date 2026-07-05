@@ -27,9 +27,10 @@ let read_all ic =
   loop ();
   Buffer.contents buf
 
+(* explicit argv, never a shell, so URLs can't be read as shell metacharacters *)
 let curl_get url =
-  let cmd = Printf.sprintf "curl -sfS --max-time 10 %s" (Filename.quote url) in
-  let ic = Unix.open_process_in cmd in
+  let argv = [| "curl"; "-sfS"; "--max-time"; "10"; url |] in
+  let ic = Unix.open_process_args_in "curl" argv in
   let body = read_all ic in
   match Unix.close_process_in ic with
   | Unix.WEXITED 0 -> Ok body
@@ -50,11 +51,20 @@ let curl_post url form_data =
   in
   (* No -f here: on an OAuth error the token endpoint replies 4xx with a JSON
      error body we want to read and surface. *)
-  let cmd =
-    Printf.sprintf "curl -sS --max-time 10 -X POST --data-binary @- %s"
-      (Filename.quote url)
+  let argv =
+    [|
+      "curl";
+      "-sS";
+      "--max-time";
+      "10";
+      "-X";
+      "POST";
+      "--data-binary";
+      "@-";
+      url;
+    |]
   in
-  let ic, oc = Unix.open_process cmd in
+  let ic, oc = Unix.open_process_args "curl" argv in
   output_string oc body;
   close_out oc;
   let resp = read_all ic in

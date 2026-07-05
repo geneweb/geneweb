@@ -194,6 +194,16 @@ type oidc_config = {
   person_key_claim : string;
 }
 
+let curl_available () =
+  match Sys.getenv_opt "PATH" with
+  | None -> false
+  | Some path ->
+      let sep = if Sys.win32 then ';' else ':' in
+      let exe = if Sys.win32 then "curl.exe" else "curl" in
+      String.split_on_char sep path
+      |> List.exists (fun dir ->
+          dir <> "" && Sys.file_exists (Filename.concat dir exe))
+
 let read_oidc_config base_env =
   match List.assoc_opt "oidc_provider_url" base_env with
   | None | Some "" -> None
@@ -216,7 +226,12 @@ let read_oidc_config base_env =
       in
       let redirect_uri = get "oidc_redirect_uri" "" in
       if client_id = "" || client_secret = "" || redirect_uri = "" then None
-      else
+      else begin
+        if not (curl_available ()) then
+          Log.err (fun k ->
+              k
+                "OIDC is configured for this base but the curl binary was not \
+                 found in PATH");
         Some
           {
             provider_url;
@@ -229,6 +244,7 @@ let read_oidc_config base_env =
             friend_role = get "oidc_friend_role" "";
             person_key_claim = get "oidc_person_key_claim" "";
           }
+      end
 
 let oidc_error_page conf msg =
   Log.warn (fun k -> k "authentication failed: %s" msg);
