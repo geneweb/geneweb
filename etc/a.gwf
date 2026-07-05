@@ -750,11 +750,6 @@
 # "Secure"), and "oidc_provider_url" MUST be https, since the id_token is trusted
 # via TLS to the provider rather than by checking its signature.
 #
-# The login flow is CSRF-protected: the "state", "nonce" and PKCE code verifier
-# are bound to the initiating browser through a signed, short-lived cookie, and
-# the authorization code is exchanged using PKCE (S256). Logout (m=OIDC_LOGOUT)
-# is accepted only over POST, so a cross-site request cannot trigger it.
-#
 # Runtime requirement: gwd shells out to the "curl" binary for the discovery and
 # token HTTP calls, so curl must be installed and on gwd's PATH.
 
