@@ -137,10 +137,20 @@
           href="%prefix;m=S&pn=%apply;url_encode(userk)"%sp;
           %if;(user.key="")title="[*no user key]" data-bs-toggle="tooltip"%end;>%nn;
           %if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %username;</a>
+        %if;(b.oidc_provider_url!="")
+        <form method="post" action="%action;" class="mt-1 w-100">
+          %hidden;
+          <input type="hidden" name="m" value="OIDC_LOGOUT">
+          <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+            <i class="fas fa-right-from-bracket me-1" aria-hidden="true"></i>%nn;
+            [*disconnect]</button>
+        </form>
+        %else;
         <a class="btn btn-sm btn-outline-danger mt-1 w-100" role="button"
-           href="%prefix;%if;(b.oidc_provider_url!="")m=OIDC_LOGOUT%else;w=%end;">
+           href="%prefix;w=">
           <i class="fas fa-right-from-bracket me-1" aria-hidden="true"></i>%nn;
           [*disconnect]</a>
+        %end;
       %end;
     </div>
   </div>
