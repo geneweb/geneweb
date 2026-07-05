@@ -40,25 +40,31 @@ let curl_get url =
   | _ -> Error (Http_error (Printf.sprintf "curl GET %s killed" url))
 
 let curl_post url form_data =
-  let data_args =
+  let body =
     List.map
       (fun (k, v) ->
-        Printf.sprintf "--data-urlencode %s" (Filename.quote (k ^ "=" ^ v)))
+        Uri.pct_encode ~component:`Query_value k
+        ^ "="
+        ^ Uri.pct_encode ~component:`Query_value v)
       form_data
-    |> String.concat " "
+    |> String.concat "&"
   in
+  (* Send the request body on curl's stdin with [--data-binary @-] so that
+     credentials (client_secret) never appear in the process arguments. *)
   let cmd =
-    Printf.sprintf "curl -sfS --max-time 10 -X POST %s %s" data_args
+    Printf.sprintf "curl -sfS --max-time 10 -X POST --data-binary @- %s"
       (Filename.quote url)
   in
-  let ic = Unix.open_process_in cmd in
+  let ic, oc = Unix.open_process cmd in
+  output_string oc body;
+  close_out oc;
   let buf = Buffer.create 4096 in
   (try
      while true do
        Buffer.add_char buf (input_char ic)
      done
    with End_of_file -> ());
-  let status = Unix.close_process_in ic in
+  let status = Unix.close_process (ic, oc) in
   match status with
   | Unix.WEXITED 0 -> Ok (Buffer.contents buf)
   | Unix.WEXITED code ->
