@@ -18,6 +18,7 @@
   geneweb.oidc
   geneweb_http
   geneweb_register
+  digestif
   dune-site
   dune-site.plugins
   cmdliner)

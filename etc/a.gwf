@@ -750,9 +750,10 @@
 # gwd must be served over TLS (directly or behind a TLS-terminating proxy),
 # otherwise the browser will not return the cookie and login silently fails.
 #
-# Note: m=OIDC_LOGIN / m=OIDC_LOGOUT are GET requests and the login "state" is
-# not bound to the browser, so a residual login/logout CSRF exists; SameSite=Lax
-# on the cookie mitigates it. Prefer trusted links for these actions.
+# The login flow is CSRF-protected: the "state", "nonce" and PKCE code verifier
+# are bound to the initiating browser through a signed, short-lived cookie, and
+# the authorization code is exchanged using PKCE (S256). Note that m=OIDC_LOGOUT
+# is a GET, so a third party could trigger a logout (a nuisance, not a breach).
 
 # Provider issuer URL. Its discovery document is fetched from
 # "<oidc_provider_url>/.well-known/openid-configuration". Leaving this empty
