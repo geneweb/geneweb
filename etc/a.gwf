@@ -772,6 +772,10 @@
 # Provider issuer URL. Must be https (see above). Its discovery document is
 # fetched from "<oidc_provider_url>/.well-known/openid-configuration". Leaving
 # this empty disables OIDC for the base.
+
+# Note: m=OIDC_LOGIN / m=OIDC_LOGOUT are GET requests and the login "state" is
+# not bound to the browser, so a residual login/logout CSRF exists; SameSite=Lax
+# on the cookie mitigates it. Prefer trusted links for these actions.
 #oidc_provider_url=https://idp.example.org/realms/main
 
 # OAuth2 client credentials registered with the provider for this base.
