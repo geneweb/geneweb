@@ -1,7 +1,9 @@
 (** OIDC (OpenID Connect) client for GeneWeb.
 
-    Implements the Authorization Code Flow per OpenID Connect Core 1.0. Uses
-    curl for HTTP requests and mirage-crypto-pk for JWT verification. *)
+    Implements the Authorization Code Flow with PKCE per OpenID Connect Core
+    1.0. Uses curl for HTTP requests. The id_token is obtained over the TLS
+    back-channel to the token endpoint, so its JWS signature is not checked
+    locally (OIDC Core 3.1.3.7). *)
 
 (** {1 Types} *)
 
@@ -9,7 +11,6 @@ type provider_config = {
   issuer : string;
   authorization_endpoint : string;
   token_endpoint : string;
-  jwks_uri : string;
   end_session_endpoint : string option;
 }
 (** OIDC provider configuration, obtained via discovery. *)
@@ -17,13 +18,6 @@ type provider_config = {
 type claims
 (** Decoded JWT claims (opaque JSON object). Access values with {!claim_string}
     and {!claim_has_value}, which support dotted paths and array claims. *)
-
-type jwk = {
-  kid : string;
-  n : string;  (** base64url-encoded RSA modulus *)
-  e : string;  (** base64url-encoded RSA exponent *)
-}
-(** An RSA JSON Web Key. *)
 
 type token_response = { id_token : string; access_token : string option }
 (** Token endpoint response. *)
@@ -38,8 +32,7 @@ val pp_error : Format.formatter -> error -> unit
 
 val discover : string -> (provider_config, error) result
 (** [discover issuer_url] fetches the OpenID Connect discovery document from
-    [issuer_url/.well-known/openid-configuration]. Results are cached in-process
-    after the first successful call. *)
+    [issuer_url/.well-known/openid-configuration]. *)
 
 (** {1 Authorization} *)
 
@@ -72,23 +65,19 @@ val exchange_code :
     client_secret_post authentication method. Returns the token response
     containing the id_token. *)
 
-(** {1 JWT Verification} *)
+(** {1 ID Token} *)
 
-val fetch_jwks : string -> (jwk list, error) result
-(** [fetch_jwks jwks_uri] fetches and parses the JWKS from the provider. Results
-    are cached; cache is invalidated when a JWT contains an unknown kid. *)
-
-val verify_and_decode_id_token :
-  jwks_uri:string ->
+val decode_and_validate_id_token :
   client_id:string ->
   issuer:string ->
   nonce:string ->
   string ->
   (claims, error) result
-(** [verify_and_decode_id_token ~jwks_uri ~client_id ~issuer ~nonce token]
-    decodes a JWT id_token, verifies the RS256 signature against the provider's
-    JWKS, and validates the standard claims (iss, aud, exp, nonce). Returns the
-    decoded claims on success. *)
+(** [decode_and_validate_id_token ~client_id ~issuer ~nonce token] decodes a JWT
+    id_token's payload and validates the standard claims (iss, aud, exp, nonce).
+    It does {b not} verify the JWS signature: the token is fetched directly from
+    the token endpoint over TLS, which authenticates the issuer (OIDC Core
+    3.1.3.7). Returns the decoded claims on success. *)
 
 val validate_claims :
   client_id:string ->
@@ -99,7 +88,7 @@ val validate_claims :
 (** [validate_claims ~client_id ~issuer ~nonce claims] checks the standard OIDC
     id_token claims: [iss] equals [issuer], [aud] contains [client_id], [exp] is
     in the future (with 60s leeway), and [nonce] matches. Applied automatically
-    by {!verify_and_decode_id_token}; exposed for testing. *)
+    by {!decode_and_validate_id_token}; exposed for testing. *)
 
 val base64url_decode : string -> (string, error) result
 (** [base64url_decode s] decodes an unpadded base64url string (RFC 7515).
