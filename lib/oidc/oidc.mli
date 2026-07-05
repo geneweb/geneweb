@@ -30,11 +30,7 @@ type token_response = { id_token : string; access_token : string option }
 
 (** {1 Errors} *)
 
-type error =
-  | Http_error of string
-  | Json_error of string
-  | Jwt_error of string
-  | Config_error of string
+type error = Http_error of string | Json_error of string | Jwt_error of string
 
 val pp_error : Format.formatter -> error -> unit
 
