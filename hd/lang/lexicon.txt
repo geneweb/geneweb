@@ -1640,6 +1640,14 @@ sv: ca
 tr: yak.
 zh: ca
 
+    authentication error
+en: authentication error
+fr: erreur d'authentification
+
+    authentication failed, retry or contact administrator
+en: authentication failed, please retry or contact the administrator
+fr: échec de l'authentification, veuillez réessayer ou contacter l'administrateur
+
     access
 af: toegang
 bg: достъп

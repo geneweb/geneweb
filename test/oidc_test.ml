@@ -19,7 +19,7 @@ let sample =
       "realm_access": { "roles": ["geneweb-wizard", "offline_access"] },
       "groups": ["geneweb-friend"],
       "single_role": "geneweb-wizard",
-      "geneweb_person_key": "christian.0+de vulpillieres"
+      "geneweb_person_key": "alice.0+de test"
     }|}
 
 let claim_string_scalar () =
@@ -55,7 +55,7 @@ let claim_string_dotted () =
     "deep missing path" None
     (Oidc.claim_string c "nope.roles");
   (check (option string))
-    "person key scalar" (Some "christian.0+de vulpillieres")
+    "person key scalar" (Some "alice.0+de test")
     (Oidc.claim_string c "geneweb_person_key")
 
 let claim_has_value_array () =
