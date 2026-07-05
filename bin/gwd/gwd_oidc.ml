@@ -38,8 +38,8 @@ let parse_login_cookie secret ~base_file value =
       | _ -> None)
   | _ -> None
 
-(* Fields that may contain spaces (from, user, username) are percent-encoded so
-   the space-separated line format stays unambiguous whatever the claim value. *)
+(* Fields that may contain spaces (user, username) are percent-encoded so the
+   space-separated line format stays unambiguous whatever the claim value. *)
 let read_oidc_sessions () =
   let fname = oidc_sessions_file () in
   if not (Sys.file_exists fname) then []
@@ -52,14 +52,13 @@ let read_oidc_sessions () =
         match input_line ic with
         | line -> (
             match String.split_on_char ' ' line with
-            | [ cookie; ts_str; from; base; acc_str; id_tok; user; username ]
+            | [ cookie; ts_str; base; acc_str; id_tok; user; username ]
               when String.length acc_str = 1 -> (
                 match float_of_string_opt ts_str with
                 | Some ts when now -. ts < tmout ->
                     loop
                       (( cookie,
                          ts,
-                         Uri.pct_decode from,
                          base,
                          acc_str.[0],
                          id_tok,
@@ -83,30 +82,21 @@ let write_oidc_sessions entries =
       Secure.open_out_gen [ Open_wronly; Open_creat; Open_trunc ] 0o600 fname
     in
     List.iter
-      (fun (cookie, ts, from, base, acc, id_tok, user, username) ->
-        Printf.fprintf oc "%s %.0f %s %s %c %s %s %s\n" cookie ts
-          (Uri.pct_encode from) base acc id_tok (Uri.pct_encode user)
-          (Uri.pct_encode username))
+      (fun (cookie, ts, base, acc, id_tok, user, username) ->
+        Printf.fprintf oc "%s %.0f %s %c %s %s %s\n" cookie ts base acc id_tok
+          (Uri.pct_encode user) (Uri.pct_encode username))
       entries;
     close_out oc
   with Sys_error _ -> ()
 
-let add_oidc_session cookie_token from_addr base_name access_char id_token user
-    username =
+let add_oidc_session cookie_token base_name access_char id_token user username =
   let lock_file = oidc_lock_file () in
   let on_exn _exn _bt = () in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   let entries = read_oidc_sessions () in
   let now = Unix.time () in
   let entries =
-    ( cookie_token,
-      now,
-      from_addr,
-      base_name,
-      access_char,
-      id_token,
-      user,
-      username )
+    (cookie_token, now, base_name, access_char, id_token, user, username)
     :: entries
   in
   write_oidc_sessions entries
@@ -121,13 +111,13 @@ let lookup_oidc_session cookie_token base_name =
   let now = Unix.time () in
   let entries =
     List.map
-      (fun ((cookie, ts, from, base, acc, id_tok, user, username) as entry) ->
+      (fun ((cookie, ts, base, acc, id_tok, user, username) as entry) ->
         if cookie = cookie_token && base = base_name then begin
           found := Some (acc, user, username);
           (* slide the expiry at most once a minute to avoid a rewrite per request *)
           if now -. ts > 60. then begin
             touched := true;
-            (cookie, now, from, base, acc, id_tok, user, username)
+            (cookie, now, base, acc, id_tok, user, username)
           end
           else entry
         end
@@ -145,7 +135,7 @@ let remove_oidc_session cookie_token base_name =
   let id_token_ref = ref None in
   let entries =
     List.filter
-      (fun (cookie, _ts, _from, base, _acc, id_tok, _user, _username) ->
+      (fun (cookie, _ts, base, _acc, id_tok, _user, _username) ->
         if cookie = cookie_token && base = base_name then begin
           id_token_ref := Some id_tok;
           false
@@ -248,15 +238,25 @@ let read_oidc_config base_env =
 
 let oidc_error_page conf msg =
   Log.warn (fun k -> k "authentication failed: %s" msg);
+  let title = Util.transl conf "authentication error" |> Utf8.capitalize_fst in
+  let body =
+    Util.transl conf "authentication failed, retry or contact administrator"
+    |> Utf8.capitalize_fst
+  in
+  let back = Util.transl conf "back" |> Utf8.capitalize_fst in
   Output.status conf Code.Bad_Request;
   Output.header conf "Content-type: text/html; charset=utf-8";
-  Output.print_sstring conf "<html><head><title>OIDC Error</title></head><body>";
-  Output.print_sstring conf "<h1>Authentication Error</h1><p>";
-  Output.print_sstring conf
-    "Authentication failed. Please try again, or contact the administrator.";
+  Output.print_sstring conf "<html><head><title>";
+  Output.print_sstring conf title;
+  Output.print_sstring conf "</title></head><body><h1>";
+  Output.print_sstring conf title;
+  Output.print_sstring conf "</h1><p>";
+  Output.print_sstring conf body;
   Output.print_sstring conf "</p><p><a href=\"";
   Output.print_sstring conf (Util.escape_html conf.command :> string);
-  Output.print_sstring conf "\">Back</a></p></body></html>";
+  Output.print_sstring conf "\">";
+  Output.print_sstring conf back;
+  Output.print_sstring conf "</a></p></body></html>";
   Output.flush conf
 
 let conf_secret conf = match conf.secret_salt with Some s -> s | None -> ""
@@ -410,8 +410,7 @@ let handle_oidc_callback conf base_env from_addr base_file =
           k "login: base=%s user=%s access=%c from=%s" base_file claim_value acc
             from_addr);
       let cookie_token = Geneweb_oidc.Oidc.generate_token () in
-      add_oidc_session cookie_token from_addr base_file acc id_token claim_value
-        username;
+      add_oidc_session cookie_token base_file acc id_token claim_value username;
       let cookie_name = "gw_oidc_" ^ base_file in
       Output.status conf Code.Moved_Temporarily;
       clear_login_cookie conf base_file;
