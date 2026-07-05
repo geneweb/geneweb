@@ -1590,52 +1590,48 @@ let conf_and_connection =
         script_name env
     in
     let m = Util.p_getenv env "m" in
-
-    if
-      Gwd_oidc.handle_mode conf conf.base_env conf.from conf.bname
-        (Unix.time ()) m
-    then ()
-    else
-      let is_binary =
-        match m with
-        | Some
-            ( "IM" | "IM_C" | "IM_C_S" | "IMH" | "FIM" | "SRC" | "DOC" | "DOCH"
-            | "IMA" ) ->
-            true
-        | _ -> false
-      in
-      let gzip_level =
-        match List.assoc_opt "gzip_html_compression" conf.base_env with
-        | Some s -> (
-            match int_of_string_opt s with
-            | Some n when n >= 1 && n <= 9 -> n
-            | _ -> 0)
-        | None -> 6
-      in
-      let enable_gzip () =
-        if gzip_level > 0 && not is_binary then
-          match make_gzip_output_conf ~level:gzip_level request with
-          | Some gzip_oc -> conf.output_conf <- gzip_oc
-          | None -> ()
-      in
-      match !redirected_addr with
-      | Some addr ->
-          print_redirected conf from request addr;
-          Output.flush conf
-      | None -> (
-          let auth_err, auth =
-            if conf.auth_file = "" then (false, "")
-            else if !Server.cgi then (true, "")
-            else auth_err request conf.auth_file
-          in
-          let mode = Util.p_getenv conf.env "m" in
-          (if mode <> Some "IM" then
-             let contents =
-               if List.mem_assoc "log_pwd" env then Adef.encoded "..."
-               else contents
-             in
-             log_and_robot_check conf auth from request script_name
-               (contents :> string));
+    let is_binary =
+      match m with
+      | Some
+          ( "IM" | "IM_C" | "IM_C_S" | "IMH" | "FIM" | "SRC" | "DOC" | "DOCH"
+          | "IMA" ) ->
+          true
+      | _ -> false
+    in
+    let gzip_level =
+      match List.assoc_opt "gzip_html_compression" conf.base_env with
+      | Some s -> (
+          match int_of_string_opt s with
+          | Some n when n >= 1 && n <= 9 -> n
+          | _ -> 0)
+      | None -> 6
+    in
+    let enable_gzip () =
+      if gzip_level > 0 && not is_binary then
+        match make_gzip_output_conf ~level:gzip_level request with
+        | Some gzip_oc -> conf.output_conf <- gzip_oc
+        | None -> ()
+    in
+    match !redirected_addr with
+    | Some addr ->
+        print_redirected conf from request addr;
+        Output.flush conf
+    | None -> (
+        let auth_err, auth =
+          if conf.auth_file = "" then (false, "")
+          else if !Server.cgi then (true, "")
+          else auth_err request conf.auth_file
+        in
+        let mode = Util.p_getenv conf.env "m" in
+        (if mode <> Some "IM" then
+           let contents =
+             if List.mem_assoc "log_pwd" env then Adef.encoded "..."
+             else contents
+           in
+           log_and_robot_check conf auth from request script_name
+             (contents :> string));
+        if Gwd_oidc.handle_mode conf mode then ()
+        else
           match (!Server.cgi, auth_err, passwd_err) with
           | true, true, _ ->
               if is_robot from then Robot.robot_error conf 0 0

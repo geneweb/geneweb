@@ -754,6 +754,9 @@
 # are bound to the initiating browser through a signed, short-lived cookie, and
 # the authorization code is exchanged using PKCE (S256). Note that m=OIDC_LOGOUT
 # is a GET, so a third party could trigger a logout (a nuisance, not a breach).
+#
+# Runtime requirement: gwd shells out to the "curl" binary for the discovery,
+# token and JWKS HTTP calls, so curl must be installed and on gwd's PATH.
 
 # Provider issuer URL. Its discovery document is fetched from
 # "<oidc_provider_url>/.well-known/openid-configuration". Leaving this empty
@@ -790,3 +793,7 @@
 # Optional claim carrying the GeneWeb person key ("first_name.occ surname") to
 # associate the logged-in user with a database individual. Leave empty to skip.
 #oidc_person_key_claim=
+
+# Optional label for the SSO login button on the welcome page. Defaults to the
+# translated "SSO login" when empty.
+#oidc_login_label=
