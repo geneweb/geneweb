@@ -6,16 +6,9 @@ type provider_config = {
   end_session_endpoint : string option;
 }
 
-type claims = (string * string) list
+type claims = Yojson.Safe.t
 type jwk = { kid : string; n : string; e : string }
 type token_response = { id_token : string; access_token : string option }
-
-type user_mapping = {
-  claim_value : string;
-  role : [ `Wizard | `Friend ];
-  display_name : string;
-  person_key : string;
-}
 
 type error =
   | Http_error of string
@@ -248,26 +241,60 @@ let decode_payload payload_b64 =
       try
         let json = Yojson.Safe.from_string payload_json in
         match json with
-        | `Assoc fields ->
-            let to_string = function
-              | `String s -> s
-              | `Int i -> string_of_int i
-              | `Float f ->
-                  let i = Int64.of_float f in
-                  Int64.to_string i
-              | `Bool b -> string_of_bool b
-              | other -> Yojson.Safe.to_string other
-            in
-            Ok (List.map (fun (k, v) -> (k, to_string v)) fields)
+        | `Assoc _ -> Ok json
         | _ -> Error (Jwt_error "JWT payload is not a JSON object")
       with Yojson.Json_error msg ->
         Error (Jwt_error (Printf.sprintf "JWT payload JSON error: %s" msg)))
+
+let claims_of_json_string s =
+  try
+    match Yojson.Safe.from_string s with
+    | `Assoc _ as json -> Ok json
+    | _ -> Error (Json_error "claims JSON is not an object")
+  with Yojson.Json_error msg -> Error (Json_error msg)
+
+let scalar_to_string = function
+  | `String s -> Some s
+  | `Int i -> Some (string_of_int i)
+  | `Intlit s -> Some s
+  | `Float f -> Some (Int64.to_string (Int64.of_float f))
+  | `Bool b -> Some (string_of_bool b)
+  | _ -> None
+
+let json_at_path (claims : claims) dotted =
+  let rec navigate json = function
+    | [] -> Some json
+    | key :: rest -> (
+        match json with
+        | `Assoc fields -> (
+            match List.assoc_opt key fields with
+            | Some v -> navigate v rest
+            | None -> None)
+        | _ -> None)
+  in
+  navigate claims (String.split_on_char '.' dotted)
+
+let claim_string (claims : claims) path =
+  match json_at_path claims path with
+  | Some j -> scalar_to_string j
+  | None -> None
+
+let claim_has_value (claims : claims) ~path ~value =
+  match json_at_path claims path with
+  | Some (`List items) ->
+      List.exists
+        (fun it ->
+          match scalar_to_string it with Some s -> s = value | None -> false)
+        items
+  | Some j -> (
+      match scalar_to_string j with Some s -> s = value | None -> false)
+  | None -> false
 
 let validate_claims ~client_id ~issuer ~nonce claims =
   let ( let* ) = Result.bind in
 
   let* () =
-    match List.assoc_opt "iss" claims with
+    match claim_string claims "iss" with
     | Some iss when iss = issuer -> Ok ()
     | Some iss ->
         Error
@@ -277,25 +304,18 @@ let validate_claims ~client_id ~issuer ~nonce claims =
   in
 
   let* () =
-    match List.assoc_opt "aud" claims with
-    | Some aud when aud = client_id -> Ok ()
-    | Some aud ->
-        if String.contains aud ',' then
-          let parts = String.split_on_char ',' aud |> List.map String.trim in
-          if List.mem client_id parts then Ok ()
-          else
-            Error
-              (Jwt_error
-                 (Printf.sprintf "aud does not contain client_id %s" client_id))
+    match json_at_path claims "aud" with
+    | None -> Error (Jwt_error "missing aud claim")
+    | Some _ ->
+        if claim_has_value claims ~path:"aud" ~value:client_id then Ok ()
         else
           Error
             (Jwt_error
-               (Printf.sprintf "aud mismatch: expected %s, got %s" client_id aud))
-    | None -> Error (Jwt_error "missing aud claim")
+               (Printf.sprintf "aud does not contain client_id %s" client_id))
   in
 
   let* () =
-    match List.assoc_opt "exp" claims with
+    match claim_string claims "exp" with
     | Some exp_s -> (
         try
           let exp = Int64.of_string exp_s in
@@ -306,7 +326,7 @@ let validate_claims ~client_id ~issuer ~nonce claims =
     | None -> Error (Jwt_error "missing exp claim")
   in
 
-  match List.assoc_opt "nonce" claims with
+  match claim_string claims "nonce" with
   | Some n when n = nonce -> Ok ()
   | Some n ->
       Error
@@ -359,63 +379,6 @@ let verify_and_decode_id_token ~jwks_uri ~client_id ~issuer ~nonce token =
             (Jwt_error
                (Printf.sprintf "no matching JWK found for kid=%s"
                   (Option.value ~default:"(none)" kid))))
-
-let read_users_file filename =
-  try
-    let ic = open_in filename in
-    let rec loop acc =
-      match input_line ic with
-      | exception End_of_file ->
-          close_in ic;
-          Ok (List.rev acc)
-      | line -> (
-          let line = String.trim line in
-          if String.length line = 0 || line.[0] = '#' then loop acc
-          else
-            let parts = String.split_on_char ':' line in
-            match parts with
-            | claim_value :: role_str :: display_name :: rest -> (
-                let person_key =
-                  match rest with [] -> "" | pk :: _ -> String.trim pk
-                in
-                let role =
-                  match String.lowercase_ascii (String.trim role_str) with
-                  | "wizard" -> Some `Wizard
-                  | "friend" -> Some `Friend
-                  | _ -> None
-                in
-                match role with
-                | Some role ->
-                    loop
-                      ({
-                         claim_value = String.trim claim_value;
-                         role;
-                         display_name = String.trim display_name;
-                         person_key;
-                       }
-                      :: acc)
-                | None ->
-                    close_in ic;
-                    Error
-                      (Config_error
-                         (Printf.sprintf
-                            "invalid role '%s' in %s (expected wizard or \
-                             friend)"
-                            role_str filename)))
-            | _ ->
-                close_in ic;
-                Error
-                  (Config_error
-                     (Printf.sprintf
-                        "invalid line format in %s: expected \
-                         claim_value:role:display_name[:person_key]"
-                        filename)))
-    in
-    loop []
-  with Sys_error msg -> Error (Config_error msg)
-
-let lookup_user mappings claim_value =
-  List.find_opt (fun m -> m.claim_value = claim_value) mappings
 
 let logout_url provider ~id_token_hint ~post_logout_redirect_uri =
   match provider.end_session_endpoint with

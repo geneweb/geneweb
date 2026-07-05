@@ -9,8 +9,9 @@
   wiki_test
   merge_test
   util_test
-  dag2html_test)
- (libraries alcotest geneweb fmt))
+  dag2html_test
+  oidc_test)
+ (libraries alcotest geneweb geneweb_oidc fmt))
 
 (test
  (package geneweb)

@@ -1,10 +1,4 @@
 (library
  (name geneweb_oidc)
  (public_name geneweb.oidc)
- (libraries
-  unix
-  uri
-  yojson
-  digestif
-  mirage-crypto-pk
-  base64))
+ (libraries unix uri yojson digestif mirage-crypto-pk base64))
