@@ -284,140 +284,110 @@ let handle_oidc_login conf base_env base_file =
           oidc_redirect conf url)
 
 let handle_oidc_callback conf base_env from_addr base_file _utm =
-  let code = Util.p_getenv conf.env "code" in
-  let state = Util.p_getenv conf.env "state" in
-  let error = Util.p_getenv conf.env "error" in
-  match error with
-  | Some err ->
-      let desc =
-        match Util.p_getenv conf.env "error_description" with
-        | Some d -> err ^ ": " ^ d
-        | None -> err
-      in
-      oidc_error_page conf ("IdP returned error: " ^ desc)
-  | None -> (
-      match (code, state) with
-      | None, _ -> oidc_error_page conf "Missing 'code' parameter in callback"
-      | _, None -> oidc_error_page conf "Missing 'state' parameter in callback"
-      | Some code, Some state -> (
-          match take_oidc_state state with
-          | None -> oidc_error_page conf "Invalid or expired state parameter"
-          | Some (nonce, expected_base, _ts) -> (
-              if expected_base <> base_file then
-                oidc_error_page conf "State does not match this base"
-              else
-                match read_oidc_config base_env with
-                | None -> oidc_error_page conf "OIDC not configured"
-                | Some cfg -> (
-                    match Geneweb_oidc.Oidc.discover cfg.provider_url with
-                    | Error e ->
-                        oidc_error_page conf
-                          (Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e)
-                    | Ok provider -> (
-                        match
-                          Geneweb_oidc.Oidc.exchange_code provider
-                            ~client_id:cfg.client_id
-                            ~client_secret:cfg.client_secret
-                            ~redirect_uri:cfg.redirect_uri ~code
-                        with
-                        | Error e ->
-                            oidc_error_page conf
-                              (Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e)
-                        | Ok token_resp -> (
-                            match
-                              Geneweb_oidc.Oidc.verify_and_decode_id_token
-                                ~jwks_uri:provider.jwks_uri
-                                ~client_id:cfg.client_id ~issuer:provider.issuer
-                                ~nonce token_resp.id_token
-                            with
-                            | Error e ->
-                                oidc_error_page conf
-                                  (Format.asprintf "%a"
-                                     Geneweb_oidc.Oidc.pp_error e)
-                            | Ok claims ->
-                                let claim_value =
-                                  match
-                                    Geneweb_oidc.Oidc.claim_string claims
-                                      cfg.user_claim
-                                  with
-                                  | Some v -> v
-                                  | None -> (
-                                      match
-                                        Geneweb_oidc.Oidc.claim_string claims
-                                          "sub"
-                                      with
-                                      | Some v -> v
-                                      | None -> "")
-                                in
-                                if claim_value = "" then
-                                  oidc_error_page conf
-                                    ("No '" ^ cfg.user_claim
-                                   ^ "' claim found in id_token")
-                                else
-                                  let has_role role =
-                                    role <> "" && cfg.role_claim <> ""
-                                    && Geneweb_oidc.Oidc.claim_has_value claims
-                                         ~path:cfg.role_claim ~value:role
-                                  in
-                                  let acc =
-                                    if has_role cfg.wizard_role then 'w'
-                                    else if has_role cfg.friend_role then 'f'
-                                    else 'v'
-                                  in
-
-                                  let person_key =
-                                    if cfg.person_key_claim = "" then ""
-                                    else
-                                      match
-                                        Geneweb_oidc.Oidc.claim_string claims
-                                          cfg.person_key_claim
-                                      with
-                                      | Some v -> v
-                                      | None -> ""
-                                  in
-                                  let display_name =
-                                    match
-                                      Geneweb_oidc.Oidc.claim_string claims
-                                        "name"
-                                    with
-                                    | Some v when v <> "" -> v
-                                    | _ -> claim_value
-                                  in
-                                  if acc = 'v' then begin
-                                    let url =
-                                      if !Server.cgi then
-                                        conf.command ^ "?b=" ^ base_file
-                                      else base_file
-                                    in
-                                    oidc_redirect conf url
-                                  end
-                                  else begin
-                                    let username =
-                                      if person_key <> "" then
-                                        display_name ^ "|" ^ person_key
-                                      else display_name
-                                    in
-                                    let cookie_token =
-                                      Geneweb_oidc.Oidc.generate_token ()
-                                    in
-                                    add_oidc_session cookie_token from_addr
-                                      base_file acc token_resp.id_token
-                                      claim_value username;
-
-                                    let cookie_name = "gw_oidc_" ^ base_file in
-                                    let url =
-                                      if !Server.cgi then
-                                        conf.command ^ "?b=" ^ base_file
-                                      else base_file
-                                    in
-                                    Output.status conf Code.Moved_Temporarily;
-                                    Output.header conf
-                                      "Set-Cookie: %s=%s; Path=/; HttpOnly; \
-                                       Secure; SameSite=Lax"
-                                      cookie_name cookie_token;
-                                    Output.header conf "Location: %s" url;
-                                    Output.flush conf
-                                  end))))))
+  let ( let* ) = Result.bind in
+  let err_str e = Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e in
+  let result =
+    let* () =
+      match Util.p_getenv conf.env "error" with
+      | None -> Ok ()
+      | Some err ->
+          let desc =
+            match Util.p_getenv conf.env "error_description" with
+            | Some d -> err ^ ": " ^ d
+            | None -> err
+          in
+          Error ("IdP returned error: " ^ desc)
+    in
+    let* code =
+      match Util.p_getenv conf.env "code" with
+      | Some c -> Ok c
+      | None -> Error "Missing 'code' parameter in callback"
+    in
+    let* state =
+      match Util.p_getenv conf.env "state" with
+      | Some s -> Ok s
+      | None -> Error "Missing 'state' parameter in callback"
+    in
+    let* nonce =
+      match take_oidc_state state with
+      | None -> Error "Invalid or expired state parameter"
+      | Some (nonce, expected_base, _ts) ->
+          if expected_base <> base_file then
+            Error "State does not match this base"
+          else Ok nonce
+    in
+    let* cfg =
+      match read_oidc_config base_env with
+      | Some cfg -> Ok cfg
+      | None -> Error "OIDC not configured"
+    in
+    let* provider =
+      Result.map_error err_str (Geneweb_oidc.Oidc.discover cfg.provider_url)
+    in
+    let* token_resp =
+      Result.map_error err_str
+        (Geneweb_oidc.Oidc.exchange_code provider ~client_id:cfg.client_id
+           ~client_secret:cfg.client_secret ~redirect_uri:cfg.redirect_uri ~code)
+    in
+    let* claims =
+      Result.map_error err_str
+        (Geneweb_oidc.Oidc.verify_and_decode_id_token
+           ~jwks_uri:provider.jwks_uri ~client_id:cfg.client_id
+           ~issuer:provider.issuer ~nonce token_resp.id_token)
+    in
+    let claim_string path = Geneweb_oidc.Oidc.claim_string claims path in
+    let claim_value =
+      match claim_string cfg.user_claim with
+      | Some v -> v
+      | None -> ( match claim_string "sub" with Some v -> v | None -> "")
+    in
+    let* () =
+      if claim_value = "" then
+        Error ("No '" ^ cfg.user_claim ^ "' claim found in id_token")
+      else Ok ()
+    in
+    let has_role role =
+      role <> "" && cfg.role_claim <> ""
+      && Geneweb_oidc.Oidc.claim_has_value claims ~path:cfg.role_claim
+           ~value:role
+    in
+    let acc =
+      if has_role cfg.wizard_role then 'w'
+      else if has_role cfg.friend_role then 'f'
+      else 'v'
+    in
+    let person_key =
+      if cfg.person_key_claim = "" then ""
+      else
+        match claim_string cfg.person_key_claim with Some v -> v | None -> ""
+    in
+    let display_name =
+      match claim_string "name" with
+      | Some v when v <> "" -> v
+      | _ -> claim_value
+    in
+    let username =
+      if person_key <> "" then display_name ^ "|" ^ person_key else display_name
+    in
+    Ok (acc, claim_value, username, token_resp.id_token)
+  in
+  let base_url =
+    if !Server.cgi then conf.command ^ "?b=" ^ base_file else base_file
+  in
+  match result with
+  | Error msg -> oidc_error_page conf msg
+  | Ok ('v', _, _, _) -> oidc_redirect conf base_url
+  | Ok (acc, claim_value, username, id_token) ->
+      let cookie_token = Geneweb_oidc.Oidc.generate_token () in
+      add_oidc_session cookie_token from_addr base_file acc id_token claim_value
+        username;
+      let cookie_name = "gw_oidc_" ^ base_file in
+      Output.status conf Code.Moved_Temporarily;
+      Output.header conf
+        "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax" cookie_name
+        cookie_token;
+      Output.header conf "Location: %s" base_url;
+      Output.flush conf
 
 let handle_oidc_logout conf base_env _from_addr base_file =
   let cookie_name = "gw_oidc_" ^ base_file in
