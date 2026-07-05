@@ -45,6 +45,9 @@
     uutf
     yojson
     digestif
+    base64
+    mirage-crypto-pk
+    mirage-crypto-rng
     pp_loc
     dune-site
     conf-brotli
