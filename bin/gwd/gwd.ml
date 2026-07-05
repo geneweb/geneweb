@@ -1775,13 +1775,26 @@ let get_oidc_cookie_access request base_name =
 
 let () = oidc_cookie_access := get_oidc_cookie_access
 
+type oidc_config = {
+  provider_url : string;
+  client_id : string;
+  client_secret : string;
+  redirect_uri : string;
+  user_claim : string;
+  role_claim : string;
+  wizard_role : string;
+  friend_role : string;
+  person_key_claim : string;
+}
+
 let read_oidc_config base_env =
   match List.assoc_opt "oidc_provider_url" base_env with
   | None | Some "" -> None
   | Some provider_url ->
-      let client_id =
-        try List.assoc "oidc_client_id" base_env with Not_found -> ""
+      let get key default =
+        try List.assoc key base_env with Not_found -> default
       in
+      let client_id = get "oidc_client_id" "" in
       let client_secret =
         try
           let file = List.assoc "oidc_client_secret_file" base_env in
@@ -1791,27 +1804,24 @@ let read_oidc_config base_env =
             close_in ic;
             s)
           else raise Not_found
-        with Not_found | Sys_error _ | End_of_file -> (
-          try List.assoc "oidc_client_secret" base_env with Not_found -> "")
+        with Not_found | Sys_error _ | End_of_file ->
+          get "oidc_client_secret" ""
       in
-      let redirect_uri =
-        try List.assoc "oidc_redirect_uri" base_env with Not_found -> ""
-      in
-      let user_claim =
-        try List.assoc "oidc_user_claim" base_env with Not_found -> "email"
-      in
-      let users_file =
-        try List.assoc "oidc_users_file" base_env with Not_found -> ""
-      in
+      let redirect_uri = get "oidc_redirect_uri" "" in
       if client_id = "" || client_secret = "" || redirect_uri = "" then None
       else
         Some
-          ( provider_url,
-            client_id,
-            client_secret,
-            redirect_uri,
-            user_claim,
-            users_file )
+          {
+            provider_url;
+            client_id;
+            client_secret;
+            redirect_uri;
+            user_claim = get "oidc_user_claim" "email";
+            role_claim = get "oidc_role_claim" "";
+            wizard_role = get "oidc_wizard_role" "";
+            friend_role = get "oidc_friend_role" "";
+            person_key_claim = get "oidc_person_key_claim" "";
+          }
 
 let oidc_redirect conf url =
   Output.status conf Code.Moved_Temporarily;
@@ -1819,7 +1829,7 @@ let oidc_redirect conf url =
   Output.flush conf
 
 let oidc_error_page conf msg =
-  Output.status conf Code.Internal_Server_Error;
+  Output.status conf Code.Bad_Request;
   Output.header conf "Content-type: text/html; charset=utf-8";
   Output.print_sstring conf "<html><head><title>OIDC Error</title></head><body>";
   Output.print_sstring conf "<h1>Authentication Error</h1><p>";
@@ -1832,14 +1842,8 @@ let oidc_error_page conf msg =
 let handle_oidc_login conf base_env base_file =
   match read_oidc_config base_env with
   | None -> oidc_error_page conf "OIDC not configured for this base"
-  | Some
-      ( provider_url,
-        client_id,
-        _client_secret,
-        redirect_uri,
-        _user_claim,
-        _users_file ) -> (
-      match Geneweb_oidc.Oidc.discover provider_url with
+  | Some cfg -> (
+      match Geneweb_oidc.Oidc.discover cfg.provider_url with
       | Error e ->
           oidc_error_page conf
             (Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e)
@@ -1848,12 +1852,13 @@ let handle_oidc_login conf base_env base_file =
           let nonce = Geneweb_oidc.Oidc.generate_nonce () in
           add_oidc_state state nonce base_file (Unix.time ());
           let url =
-            Geneweb_oidc.Oidc.authorization_url provider ~client_id
-              ~redirect_uri ~state ~nonce
+            Geneweb_oidc.Oidc.authorization_url provider
+              ~client_id:cfg.client_id ~redirect_uri:cfg.redirect_uri ~state
+              ~nonce
           in
           oidc_redirect conf url)
 
-let handle_oidc_callback conf base_env from_addr base_file utm =
+let handle_oidc_callback conf base_env from_addr base_file _utm =
   let code = Util.p_getenv conf.env "code" in
   let state = Util.p_getenv conf.env "state" in
   let error = Util.p_getenv conf.env "error" in
@@ -1878,21 +1883,17 @@ let handle_oidc_callback conf base_env from_addr base_file utm =
               else
                 match read_oidc_config base_env with
                 | None -> oidc_error_page conf "OIDC not configured"
-                | Some
-                    ( provider_url,
-                      client_id,
-                      client_secret,
-                      redirect_uri,
-                      user_claim,
-                      users_file ) -> (
-                    match Geneweb_oidc.Oidc.discover provider_url with
+                | Some cfg -> (
+                    match Geneweb_oidc.Oidc.discover cfg.provider_url with
                     | Error e ->
                         oidc_error_page conf
                           (Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e)
                     | Ok provider -> (
                         match
-                          Geneweb_oidc.Oidc.exchange_code provider ~client_id
-                            ~client_secret ~redirect_uri ~code
+                          Geneweb_oidc.Oidc.exchange_code provider
+                            ~client_id:cfg.client_id
+                            ~client_secret:cfg.client_secret
+                            ~redirect_uri:cfg.redirect_uri ~code
                         with
                         | Error e ->
                             oidc_error_page conf
@@ -1900,9 +1901,9 @@ let handle_oidc_callback conf base_env from_addr base_file utm =
                         | Ok token_resp -> (
                             match
                               Geneweb_oidc.Oidc.verify_and_decode_id_token
-                                ~jwks_uri:provider.jwks_uri ~client_id
-                                ~issuer:provider.issuer ~nonce
-                                token_resp.id_token
+                                ~jwks_uri:provider.jwks_uri
+                                ~client_id:cfg.client_id ~issuer:provider.issuer
+                                ~nonce token_resp.id_token
                             with
                             | Error e ->
                                 oidc_error_page conf
@@ -1910,49 +1911,52 @@ let handle_oidc_callback conf base_env from_addr base_file utm =
                                      Geneweb_oidc.Oidc.pp_error e)
                             | Ok claims ->
                                 let claim_value =
-                                  match List.assoc_opt user_claim claims with
+                                  match
+                                    Geneweb_oidc.Oidc.claim_string claims
+                                      cfg.user_claim
+                                  with
                                   | Some v -> v
                                   | None -> (
-                                      match List.assoc_opt "sub" claims with
+                                      match
+                                        Geneweb_oidc.Oidc.claim_string claims
+                                          "sub"
+                                      with
                                       | Some v -> v
                                       | None -> "")
                                 in
                                 if claim_value = "" then
                                   oidc_error_page conf
-                                    ("No '" ^ user_claim
+                                    ("No '" ^ cfg.user_claim
                                    ^ "' claim found in id_token")
                                 else
-                                  let role, display_name, person_key =
-                                    if users_file = "" then
-                                      (None, claim_value, "")
-                                    else
-                                      let users_path =
-                                        if Filename.is_relative users_file then
-                                          Filename.concat (Secure.base_dir ())
-                                            users_file
-                                        else users_file
-                                      in
-                                      match
-                                        Geneweb_oidc.Oidc.read_users_file
-                                          users_path
-                                      with
-                                      | Error _ -> (None, claim_value, "")
-                                      | Ok mappings -> (
-                                          match
-                                            Geneweb_oidc.Oidc.lookup_user
-                                              mappings claim_value
-                                          with
-                                          | Some m ->
-                                              ( Some m.role,
-                                                m.display_name,
-                                                m.person_key )
-                                          | None -> (None, claim_value, ""))
+                                  let has_role role =
+                                    role <> "" && cfg.role_claim <> ""
+                                    && Geneweb_oidc.Oidc.claim_has_value claims
+                                         ~path:cfg.role_claim ~value:role
                                   in
-                                  let acc, _is_wizard =
-                                    match role with
-                                    | Some `Wizard -> ('w', true)
-                                    | Some `Friend -> ('f', false)
-                                    | None -> ('v', false)
+                                  let acc =
+                                    if has_role cfg.wizard_role then 'w'
+                                    else if has_role cfg.friend_role then 'f'
+                                    else 'v'
+                                  in
+
+                                  let person_key =
+                                    if cfg.person_key_claim = "" then ""
+                                    else
+                                      match
+                                        Geneweb_oidc.Oidc.claim_string claims
+                                          cfg.person_key_claim
+                                      with
+                                      | Some v -> v
+                                      | None -> ""
+                                  in
+                                  let display_name =
+                                    match
+                                      Geneweb_oidc.Oidc.claim_string claims
+                                        "name"
+                                    with
+                                    | Some v when v <> "" -> v
+                                    | _ -> claim_value
                                   in
                                   if acc = 'v' then begin
                                     let url =
@@ -2012,16 +2016,10 @@ let handle_oidc_logout conf base_env _from_addr base_file =
       clear_cookie conf;
       Output.header conf "Location: %s" base_url;
       Output.flush conf
-  | Some
-      ( provider_url,
-        _client_id,
-        _client_secret,
-        redirect_uri,
-        _user_claim,
-        _users_file ) ->
-      let post_logout_uri = redirect_uri in
+  | Some cfg ->
+      let post_logout_uri = cfg.redirect_uri in
       let logout_target =
-        match Geneweb_oidc.Oidc.discover provider_url with
+        match Geneweb_oidc.Oidc.discover cfg.provider_url with
         | Error _ -> base_url
         | Ok provider -> (
             match id_token_opt with
