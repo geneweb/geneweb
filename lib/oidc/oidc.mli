@@ -90,6 +90,21 @@ val verify_and_decode_id_token :
     JWKS, and validates the standard claims (iss, aud, exp, nonce). Returns the
     decoded claims on success. *)
 
+val validate_claims :
+  client_id:string ->
+  issuer:string ->
+  nonce:string ->
+  claims ->
+  (unit, error) result
+(** [validate_claims ~client_id ~issuer ~nonce claims] checks the standard OIDC
+    id_token claims: [iss] equals [issuer], [aud] contains [client_id], [exp] is
+    in the future (with 60s leeway), and [nonce] matches. Applied automatically
+    by {!verify_and_decode_id_token}; exposed for testing. *)
+
+val base64url_decode : string -> (string, error) result
+(** [base64url_decode s] decodes an unpadded base64url string (RFC 7515).
+    Exposed for testing. *)
+
 (** {1 Claim Access} *)
 
 val claims_of_json_string : string -> (claims, error) result

@@ -82,6 +82,78 @@ let claim_has_value_scalar () =
   (check bool) "missing path is false" false
     (Oidc.claim_has_value c ~path:"missing.path" ~value:"x")
 
+let is_ok = function Ok () -> true | Error _ -> false
+
+(* A claims object with a valid exp far in the future and the given iss/aud/
+   nonce, so that only the field under test decides the outcome. *)
+let mk_claims ~iss ~aud ~nonce =
+  claims_of
+    (Printf.sprintf {|{ "iss": %s, "aud": %s, "exp": 9999999999, "nonce": %s }|}
+       iss aud nonce)
+
+let validate_claims_ok () =
+  let c = mk_claims ~iss:{|"https://idp"|} ~aud:{|"client1"|} ~nonce:{|"n1"|} in
+  (check bool) "all valid" true
+    (is_ok
+       (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
+          ~nonce:"n1" c));
+  (* aud may be an array containing the client_id *)
+  let c_arr =
+    mk_claims ~iss:{|"https://idp"|} ~aud:{|["other", "client1"]|}
+      ~nonce:{|"n1"|}
+  in
+  (check bool) "aud array contains client_id" true
+    (is_ok
+       (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
+          ~nonce:"n1" c_arr))
+
+let validate_claims_rejects () =
+  let base =
+    mk_claims ~iss:{|"https://idp"|} ~aud:{|"client1"|} ~nonce:{|"n1"|}
+  in
+  (check bool) "iss mismatch" false
+    (is_ok
+       (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://evil"
+          ~nonce:"n1" base));
+  (check bool) "aud mismatch" false
+    (is_ok
+       (Oidc.validate_claims ~client_id:"other" ~issuer:"https://idp"
+          ~nonce:"n1" base));
+  (check bool) "nonce mismatch" false
+    (is_ok
+       (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
+          ~nonce:"n2" base));
+  (* an expired token is rejected *)
+  let expired =
+    claims_of
+      {|{ "iss": "https://idp", "aud": "client1", "exp": 1000000000, "nonce": "n1" }|}
+  in
+  (check bool) "expired exp" false
+    (is_ok
+       (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
+          ~nonce:"n1" expired));
+  (* a missing nonce is rejected *)
+  let no_nonce =
+    claims_of {|{ "iss": "https://idp", "aud": "client1", "exp": 9999999999 }|}
+  in
+  (check bool) "missing nonce" false
+    (is_ok
+       (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
+          ~nonce:"n1" no_nonce))
+
+let base64url_decode_cases () =
+  let dec s =
+    match Oidc.base64url_decode s with
+    | Ok d -> d
+    | Error _ -> failwith "decode"
+  in
+  (* unpadded standard alphabet *)
+  (check string) "hello" "hello" (dec "aGVsbG8");
+  (* url-safe characters '-' and '_' map to '+' and '/' *)
+  (check string) "url-safe bytes" "\250\251" (dec "-vs");
+  (check bool) "invalid input errors" true
+    (match Oidc.base64url_decode "!!!" with Error _ -> true | Ok _ -> false)
+
 let v =
   [
     ( "oidc-claim-string",
@@ -94,4 +166,11 @@ let v =
         test_case "claim_has_value array" `Quick claim_has_value_array;
         test_case "claim_has_value scalar" `Quick claim_has_value_scalar;
       ] );
+    ( "oidc-validate-claims",
+      [
+        test_case "accepts valid claims" `Quick validate_claims_ok;
+        test_case "rejects invalid claims" `Quick validate_claims_rejects;
+      ] );
+    ( "oidc-base64url",
+      [ test_case "base64url_decode" `Quick base64url_decode_cases ] );
   ]
