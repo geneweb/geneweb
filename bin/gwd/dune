@@ -19,6 +19,7 @@
   geneweb_http
   geneweb_register
   digestif
+  uri
   dune-site
   dune-site.plugins
   cmdliner)

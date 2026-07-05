@@ -18763,6 +18763,10 @@ sk: referenciou "Sosa"
 sv: annummer
 tr: aile ağacı kökü
 
+    SSO login
+en: SSO login
+fr: connexion SSO
+
     source/sources
 af: bron/bronne
 bg: източник/източници

@@ -11,7 +11,7 @@
   util_test
   dag2html_test
   oidc_test)
- (libraries alcotest geneweb geneweb_oidc fmt))
+ (libraries alcotest geneweb geneweb.oidc fmt))
 
 (test
  (package geneweb)
