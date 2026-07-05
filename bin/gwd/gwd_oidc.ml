@@ -8,63 +8,35 @@ let src = Logs.Src.create ~doc:"OIDC" "OIDC"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
-let oidc_states_file () = !GWPARAM.adm_file "oidc_states"
 let oidc_sessions_file () = !GWPARAM.adm_file "oidc_sessions"
 
-let read_oidc_states () =
-  let fname = oidc_states_file () in
-  if not (Sys.file_exists fname) then []
-  else
-    try
-      let ic = Secure.open_in fname in
-      let now = Unix.time () in
-      let rec loop acc =
-        match input_line ic with
-        | line -> (
-            match String.split_on_char ' ' line with
-            | [ state; nonce; base_name; ts_str ] -> (
-                match float_of_string_opt ts_str with
-                | Some ts when now -. ts < 300.0 ->
-                    loop ((state, (nonce, base_name, ts)) :: acc)
-                | _ -> loop acc)
-            | _ -> loop acc)
-        | exception End_of_file ->
-            close_in ic;
-            List.rev acc
-      in
-      loop []
-    with Sys_error _ -> []
+(* The login flow (state, nonce, PKCE verifier) is bound to the initiating
+   browser through a signed cookie instead of a shared server-side store. *)
 
-let write_oidc_states entries =
-  let fname = oidc_states_file () in
-  try
-    let oc = Secure.open_out fname in
-    List.iter
-      (fun (state, (nonce, base_name, ts)) ->
-        Printf.fprintf oc "%s %s %s %.0f\n" state nonce base_name ts)
-      entries;
-    close_out oc
-  with Sys_error _ -> ()
+let login_cookie_name base_file = "gw_oidc_login_" ^ base_file
 
-let add_oidc_state state nonce base_name ts =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
-  let on_exn _exn _bt = () in
-  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  let entries = read_oidc_states () in
-  let entries = (state, (nonce, base_name, ts)) :: entries in
-  write_oidc_states entries
+let login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp =
+  let msg =
+    String.concat "\000"
+      [ base_file; state; nonce; verifier; string_of_int exp ]
+  in
+  Digestif.SHA256.(to_hex (hmac_string ~key:secret msg))
 
-let take_oidc_state state =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
-  let on_exn _exn _bt = None in
-  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  let entries = read_oidc_states () in
-  match List.assoc_opt state entries with
-  | None -> None
-  | Some v ->
-      let entries = List.filter (fun (k, _) -> k <> state) entries in
-      write_oidc_states entries;
-      Some v
+let make_login_cookie secret ~base_file ~state ~nonce ~verifier ~exp =
+  let s = login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp in
+  String.concat "." [ state; nonce; verifier; string_of_int exp; s ]
+
+let parse_login_cookie secret ~base_file value =
+  match String.split_on_char '.' value with
+  | [ state; nonce; verifier; exp_s; s ] -> (
+      match int_of_string_opt exp_s with
+      | Some exp
+        when String.equal s
+               (login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp)
+             && float_of_int exp >= Unix.time () ->
+          Some (state, nonce, verifier)
+      | _ -> None)
+  | _ -> None
 
 let read_oidc_sessions () =
   let fname = oidc_sessions_file () in
@@ -255,11 +227,6 @@ let read_oidc_config base_env =
             person_key_claim = get "oidc_person_key_claim" "";
           }
 
-let oidc_redirect conf url =
-  Output.status conf Code.Moved_Temporarily;
-  Output.header conf "Location: %s" url;
-  Output.flush conf
-
 let oidc_error_page conf msg =
   Log.warn (fun k -> k "authentication failed: %s" msg);
   Output.status conf Code.Bad_Request;
@@ -273,6 +240,19 @@ let oidc_error_page conf msg =
   Output.print_sstring conf "\">Back</a></p></body></html>";
   Output.flush conf
 
+let conf_secret conf = match conf.secret_salt with Some s -> s | None -> ""
+
+let set_login_cookie conf base_file value =
+  Output.header conf
+    "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600"
+    (login_cookie_name base_file)
+    value
+
+let clear_login_cookie conf base_file =
+  Output.header conf
+    "Set-Cookie: %s=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
+    (login_cookie_name base_file)
+
 let handle_oidc_login conf base_env base_file =
   match read_oidc_config base_env with
   | None -> oidc_error_page conf "OIDC not configured for this base"
@@ -284,13 +264,23 @@ let handle_oidc_login conf base_env base_file =
       | Ok provider ->
           let state = Geneweb_oidc.Oidc.generate_state () in
           let nonce = Geneweb_oidc.Oidc.generate_nonce () in
-          add_oidc_state state nonce base_file (Unix.time ());
+          let verifier = Geneweb_oidc.Oidc.generate_code_verifier () in
+          let exp = int_of_float (Unix.time ()) + 600 in
+          let cookie =
+            make_login_cookie (conf_secret conf) ~base_file ~state ~nonce
+              ~verifier ~exp
+          in
           let url =
             Geneweb_oidc.Oidc.authorization_url provider
               ~client_id:cfg.client_id ~redirect_uri:cfg.redirect_uri ~state
               ~nonce
+              ~code_challenge:(Geneweb_oidc.Oidc.code_challenge verifier)
           in
-          oidc_redirect conf url)
+          Log.info (fun k -> k "login initiated: base=%s" base_file);
+          Output.status conf Code.Moved_Temporarily;
+          set_login_cookie conf base_file cookie;
+          Output.header conf "Location: %s" url;
+          Output.flush conf)
 
 let handle_oidc_callback conf base_env from_addr base_file _utm =
   let ( let* ) = Result.bind in
@@ -312,18 +302,21 @@ let handle_oidc_callback conf base_env from_addr base_file _utm =
       | Some c -> Ok c
       | None -> Error "Missing 'code' parameter in callback"
     in
-    let* state =
+    let* url_state =
       match Util.p_getenv conf.env "state" with
       | Some s -> Ok s
       | None -> Error "Missing 'state' parameter in callback"
     in
-    let* nonce =
-      match take_oidc_state state with
-      | None -> Error "Invalid or expired state parameter"
-      | Some (nonce, expected_base, _ts) ->
-          if expected_base <> base_file then
-            Error "State does not match this base"
-          else Ok nonce
+    (* matching the URL state against the login cookie is what stops login CSRF *)
+    let* nonce, verifier =
+      match extract_oidc_cookie conf.request (login_cookie_name base_file) with
+      | None -> Error "No login in progress"
+      | Some v -> (
+          match parse_login_cookie (conf_secret conf) ~base_file v with
+          | None -> Error "Invalid or expired login state"
+          | Some (cookie_state, nonce, verifier) ->
+              if String.equal url_state cookie_state then Ok (nonce, verifier)
+              else Error "State does not match")
     in
     let* cfg =
       match read_oidc_config base_env with
@@ -336,7 +329,8 @@ let handle_oidc_callback conf base_env from_addr base_file _utm =
     let* token_resp =
       Result.map_error err_str
         (Geneweb_oidc.Oidc.exchange_code provider ~client_id:cfg.client_id
-           ~client_secret:cfg.client_secret ~redirect_uri:cfg.redirect_uri ~code)
+           ~client_secret:cfg.client_secret ~redirect_uri:cfg.redirect_uri ~code
+           ~code_verifier:verifier)
     in
     let* claims =
       Result.map_error err_str
@@ -389,7 +383,10 @@ let handle_oidc_callback conf base_env from_addr base_file _utm =
       Log.info (fun k ->
           k "login as visitor (no role): base=%s user=%s from=%s" base_file user
             from_addr);
-      oidc_redirect conf base_url
+      Output.status conf Code.Moved_Temporarily;
+      clear_login_cookie conf base_file;
+      Output.header conf "Location: %s" base_url;
+      Output.flush conf
   | Ok (acc, claim_value, username, id_token) ->
       Log.info (fun k ->
           k "login: base=%s user=%s access=%c from=%s" base_file claim_value acc
@@ -399,6 +396,7 @@ let handle_oidc_callback conf base_env from_addr base_file _utm =
         username;
       let cookie_name = "gw_oidc_" ^ base_file in
       Output.status conf Code.Moved_Temporarily;
+      clear_login_cookie conf base_file;
       Output.header conf
         "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax" cookie_name
         cookie_token;

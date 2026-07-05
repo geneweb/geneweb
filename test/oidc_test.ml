@@ -147,6 +147,19 @@ let base64url_decode_cases () =
   (check bool) "invalid input errors" true
     (match Oidc.base64url_decode "!!!" with Error _ -> true | Ok _ -> false)
 
+let pkce_cases () =
+  (* RFC 7636 Appendix B known-answer vector for the S256 method. *)
+  (check string) "S256 challenge" "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
+    (Oidc.code_challenge "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk");
+  let verifier = Oidc.generate_code_verifier () in
+  (check int) "verifier length" 43 (String.length verifier);
+  (check bool) "verifier is url-safe unreserved" true
+    (String.for_all
+       (function
+         | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '-' | '_' | '.' | '~' -> true
+         | _ -> false)
+       verifier)
+
 let v =
   [
     ( "oidc-claim-string",
@@ -166,4 +179,5 @@ let v =
       ] );
     ( "oidc-base64url",
       [ test_case "base64url_decode" `Quick base64url_decode_cases ] );
+    ("oidc-pkce", [ test_case "code_challenge S256" `Quick pkce_cases ]);
   ]

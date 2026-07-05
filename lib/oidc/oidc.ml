@@ -92,6 +92,9 @@ let base64url_decode s =
   | Error (`Msg msg) ->
       Error (Jwt_error (Printf.sprintf "base64url decode: %s" msg))
 
+let base64url_encode s =
+  Base64.encode_string ~pad:false ~alphabet:Base64.uri_safe_alphabet s
+
 let discovery_cache : (string, provider_config) Hashtbl.t = Hashtbl.create 4
 
 let discover issuer_url =
@@ -132,7 +135,8 @@ let discover issuer_url =
                             Ok config))))
           with Yojson.Json_error msg -> Error (Json_error msg))
 
-let authorization_url provider ~client_id ~redirect_uri ~state ~nonce =
+let authorization_url provider ~client_id ~redirect_uri ~state ~nonce
+    ~code_challenge =
   let params =
     [
       ("response_type", "code");
@@ -141,13 +145,16 @@ let authorization_url provider ~client_id ~redirect_uri ~state ~nonce =
       ("redirect_uri", redirect_uri);
       ("state", state);
       ("nonce", nonce);
+      ("code_challenge", code_challenge);
+      ("code_challenge_method", "S256");
     ]
   in
   let base = Uri.of_string provider.authorization_endpoint in
   let uri = Uri.add_query_params' base params in
   Uri.to_string uri
 
-let exchange_code provider ~client_id ~client_secret ~redirect_uri ~code =
+let exchange_code provider ~client_id ~client_secret ~redirect_uri ~code
+    ~code_verifier =
   let form_data =
     [
       ("grant_type", "authorization_code");
@@ -156,6 +163,7 @@ let exchange_code provider ~client_id ~client_secret ~redirect_uri ~code =
       (* client_secret_post: client credentials in POST body *)
       ("client_id", client_id);
       ("client_secret", client_secret);
+      ("code_verifier", code_verifier);
     ]
   in
   Result.bind (curl_post provider.token_endpoint form_data) (fun body ->
@@ -399,3 +407,9 @@ let generate_random_hex len =
 let generate_state () = generate_random_hex 16
 let generate_nonce () = generate_random_hex 16
 let generate_token () = generate_random_hex 32
+
+let generate_code_verifier () =
+  base64url_encode (Mirage_crypto_rng_unix.getrandom 32)
+
+let code_challenge verifier =
+  base64url_encode Digestif.SHA256.(to_raw_string (digest_string verifier))
