@@ -9,18 +9,12 @@ type provider_config = {
 type claims = Yojson.Safe.t
 type jwk = { kid : string; n : string; e : string }
 type token_response = { id_token : string; access_token : string option }
-
-type error =
-  | Http_error of string
-  | Json_error of string
-  | Jwt_error of string
-  | Config_error of string
+type error = Http_error of string | Json_error of string | Jwt_error of string
 
 let pp_error fmt = function
   | Http_error s -> Format.fprintf fmt "HTTP error: %s" s
   | Json_error s -> Format.fprintf fmt "JSON error: %s" s
   | Jwt_error s -> Format.fprintf fmt "JWT error: %s" s
-  | Config_error s -> Format.fprintf fmt "Config error: %s" s
 
 let curl_get url =
   let cmd = Printf.sprintf "curl -sfS --max-time 10 %s" (Filename.quote url) in
@@ -197,19 +191,15 @@ let parse_jwks_json body =
   with Yojson.Json_error msg -> Error (Json_error msg)
 
 let fetch_jwks_internal ~force_refresh jwks_uri =
-  if not force_refresh then
-    match Hashtbl.find_opt jwks_cache jwks_uri with
-    | Some keys -> Ok keys
-    | None ->
-        Result.bind (curl_get jwks_uri) (fun body ->
-            Result.bind (parse_jwks_json body) (fun keys ->
-                Hashtbl.replace jwks_cache jwks_uri keys;
-                Ok keys))
-  else
-    Result.bind (curl_get jwks_uri) (fun body ->
-        Result.bind (parse_jwks_json body) (fun keys ->
-            Hashtbl.replace jwks_cache jwks_uri keys;
-            Ok keys))
+  match
+    if force_refresh then None else Hashtbl.find_opt jwks_cache jwks_uri
+  with
+  | Some keys -> Ok keys
+  | None ->
+      Result.bind (curl_get jwks_uri) (fun body ->
+          Result.bind (parse_jwks_json body) (fun keys ->
+              Hashtbl.replace jwks_cache jwks_uri keys;
+              Ok keys))
 
 let fetch_jwks jwks_uri = fetch_jwks_internal ~force_refresh:false jwks_uri
 
