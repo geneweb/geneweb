@@ -49,8 +49,6 @@ let curl_post url form_data =
       form_data
     |> String.concat "&"
   in
-  (* Send the request body on curl's stdin with [--data-binary @-] so that
-     credentials (client_secret) never appear in the process arguments. *)
   let cmd =
     Printf.sprintf "curl -sfS --max-time 10 -X POST --data-binary @- %s"
       (Filename.quote url)
