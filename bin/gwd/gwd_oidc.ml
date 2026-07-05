@@ -420,49 +420,59 @@ let handle_oidc_callback conf base_env from_addr base_file =
       Output.header conf "Location: %s" base_url;
       Output.flush conf
 
+let request_is_post request = Mutil.extract_param "GET " ' ' request = ""
+
 let handle_oidc_logout conf base_env _from_addr base_file =
-  Log.info (fun k -> k "logout: base=%s" base_file);
-  let cookie_name = "gw_oidc_" ^ base_file in
-  let id_token_opt =
-    match extract_oidc_cookie conf.request cookie_name with
-    | Some cookie_token -> remove_oidc_session cookie_token base_file
-    | None -> None
-  in
   let base_url =
     if !Server.cgi then conf.command ^ "?b=" ^ base_file else base_file
   in
-
-  let clear_cookie conf =
-    Output.header conf
-      "Set-Cookie: %s=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
-      cookie_name
-  in
-  match read_oidc_config base_env with
-  | None ->
-      Output.status conf Code.Moved_Temporarily;
-      clear_cookie conf;
-      Output.header conf "Location: %s" base_url;
-      Output.flush conf
-  | Some cfg ->
-      let post_logout_uri = cfg.redirect_uri in
-      let logout_target =
-        match Geneweb_oidc.Oidc.discover cfg.provider_url with
-        | Error _ -> base_url
-        | Ok provider -> (
-            match id_token_opt with
-            | None -> base_url
-            | Some id_token -> (
-                match
-                  Geneweb_oidc.Oidc.logout_url provider ~id_token_hint:id_token
-                    ~post_logout_redirect_uri:post_logout_uri
-                with
-                | None -> base_url
-                | Some url -> url))
-      in
-      Output.status conf Code.Moved_Temporarily;
-      clear_cookie conf;
-      Output.header conf "Location: %s" logout_target;
-      Output.flush conf
+  (* logout must be POST so a cross-site GET cannot trigger it (CSRF) *)
+  if not (request_is_post conf.request) then begin
+    Output.status conf Code.Moved_Temporarily;
+    Output.header conf "Location: %s" base_url;
+    Output.flush conf
+  end
+  else begin
+    Log.info (fun k -> k "logout: base=%s" base_file);
+    let cookie_name = "gw_oidc_" ^ base_file in
+    let id_token_opt =
+      match extract_oidc_cookie conf.request cookie_name with
+      | Some cookie_token -> remove_oidc_session cookie_token base_file
+      | None -> None
+    in
+    let clear_cookie conf =
+      Output.header conf
+        "Set-Cookie: %s=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
+        cookie_name
+    in
+    match read_oidc_config base_env with
+    | None ->
+        Output.status conf Code.Moved_Temporarily;
+        clear_cookie conf;
+        Output.header conf "Location: %s" base_url;
+        Output.flush conf
+    | Some cfg ->
+        let post_logout_uri = cfg.redirect_uri in
+        let logout_target =
+          match Geneweb_oidc.Oidc.discover cfg.provider_url with
+          | Error _ -> base_url
+          | Ok provider -> (
+              match id_token_opt with
+              | None -> base_url
+              | Some id_token -> (
+                  match
+                    Geneweb_oidc.Oidc.logout_url provider
+                      ~id_token_hint:id_token
+                      ~post_logout_redirect_uri:post_logout_uri
+                  with
+                  | None -> base_url
+                  | Some url -> url))
+        in
+        Output.status conf Code.Moved_Temporarily;
+        clear_cookie conf;
+        Output.header conf "Location: %s" logout_target;
+        Output.flush conf
+  end
 
 let handle_mode conf mode =
   let base_env = conf.base_env
