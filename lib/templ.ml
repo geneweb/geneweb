@@ -730,7 +730,9 @@ let print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
 
 let print_wid_hei conf fname =
   match Image.size_from_path (Image.path_of_filename fname) with
-  | Ok (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
+  | Ok (wid, hei) ->
+      Output.print_sstring conf
+        (Printf.sprintf " width=\"%d\" height=\"%d\"" wid hei)
   | Error () -> ()
 
 let include_hed_trl conf name =
@@ -878,7 +880,8 @@ let rec interp_ast :
     | Aforeach ((loc, s, sl), el, al) -> (
         try print_foreach conf ifun print_ast eval_expr env ep loc s sl el al
         with Not_found ->
-          Output.printf conf " %%foreach;%s?" (String.concat "." (s :: sl)))
+          Output.print_sstring conf
+            (Printf.sprintf " %%foreach;%s?" (String.concat "." (s :: sl))))
     | Adefine (f, xl, al, alk) -> print_define env ep f xl al alk
     | Aapply (loc, f, ell) -> print_apply env ep loc f ell
     | Alet (k, v, al) -> print_let env ep k v al
@@ -970,8 +973,12 @@ and print_var print_ast_list conf ifun env ep loc sl =
                   Util.include_begin conf (Adef.safe fname);
                   print_ast_list env ep astl;
                   Util.include_end conf (Adef.safe fname)
-              | None -> Output.printf conf " %%%s?" (String.concat "." sl))
-          | None -> Output.printf conf " %%%s?" (String.concat "." sl))
+              | None ->
+                  Output.print_sstring conf
+                    (Printf.sprintf " %%%s?" (String.concat "." sl)))
+          | None ->
+              Output.print_sstring conf
+                (Printf.sprintf " %%%s?" (String.concat "." sl)))
       | sl -> print_variable conf sl)
   in
   let eval_var = eval_var conf ifun env ep loc in
@@ -991,7 +998,8 @@ and print_variable conf sl =
       match sl with
       | [ s ] -> print_simple_variable conf s
       | _ -> raise Not_found
-    with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl))
+    with Not_found ->
+      Output.print_sstring conf (Printf.sprintf " %%%s?" (String.concat "." sl)))
 
 let copy_from_templ :
     Config.config -> Adef.encoded_string env -> in_channel -> unit =
