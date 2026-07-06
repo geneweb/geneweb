@@ -352,16 +352,16 @@ let get_binding strm =
 let ( // ) = Filename.concat
 
 let variables bname =
-  let dir = Filename.concat !setup_dir "setup" in
-  let fname = Filename.concat (Filename.concat dir "lang") bname in
-  match open_in fname with
-  | exception Sys_error _ -> ([], [])
-  | ic ->
-      Fun.protect
-        ~finally:(fun () -> close_in ic)
-        (fun () ->
-          let strm = Stream.of_channel ic in
-          let rec loop (vlist, flist) =
+  let fname = "lang" // bname in
+  let content = Option.get @@ Statics.read fname in
+  let strm = Stream.of_string content in
+  let vlist, flist =
+    let rec loop (vlist, flist) =
+      match Stream.peek strm with
+      | Some '%' ->
+          Stream.junk strm;
+          let vlist, flist =
+            let (strm : _ Stream.t) = strm in
             match Stream.peek strm with
             | Some '%' ->
                 Stream.junk strm;
@@ -391,8 +391,15 @@ let variables bname =
                 loop (vlist, flist)
             | _ -> (vlist, flist)
           in
-          let vlist, flist = loop ([], []) in
-          (List.rev vlist, flist))
+          loop (vlist, flist)
+      | Some _ ->
+          Stream.junk strm;
+          loop (vlist, flist)
+      | _ -> (vlist, flist)
+    in
+    loop ([], [])
+  in
+  (List.rev vlist, flist)
 
 let nth_field s n =
   let rec loop nth i =
@@ -404,19 +411,7 @@ let nth_field s n =
   loop 0 0
 
 let file_contents fname =
-  match (open_in fname) with 
-  | exception Sys_error _ -> ""
-  | ic ->
-      Fun.protect
-        ~finally:(fun () -> close_in ic)
-        (fun () ->
-          let rec loop len =
-            match (input_char ic) with
-            | '\r' -> loop len
-            | c -> loop (Buff.store len c)
-            | exception End_of_file -> Buff.get len
-          in
-          loop 0)
+  match Statics.read fname with None -> "" | Some c -> c
 
 let cut_at_equal s =
   match String.index_opt s '=' with
@@ -1556,24 +1551,18 @@ let update_nldb conf ok_file =
   in
   if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
 
-let separate_slashed_filename s =
-  List.filter (fun x -> x <> "") (String.split_on_char '/' s)
+let end_with s x =
+  let slen = String.length s in
+  let xlen = String.length x in
+  slen >= xlen && String.sub s (slen - xlen) xlen = x
 
 let print_typed_file conf typ fname =
-  match try Some (open_in_bin fname) with Sys_error _ -> None with
-  | Some ic ->
-      let len = in_channel_length ic in
+  match Statics.read fname with
+  | Some content ->
       Output.status printer_conf Code.OK;
       Output.header printer_conf "Content-type: %s" typ;
-      Output.header printer_conf "Content-length: %d" len;
-      Fun.protect
-        ~finally:(fun () -> close_in ic)
-        (fun () ->
-          try
-            while true do
-              Output.printf printer_conf "%c" (input_char ic)
-            done
-          with End_of_file -> ())
+      Output.header printer_conf "Content-length: %d" (String.length content);
+      Output.printf printer_conf "%s" content
   | None ->
       let title _ = Output.print_sstring printer_conf "Error" in
       header conf title;
@@ -1586,10 +1575,10 @@ let print_typed_file conf typ fname =
 
 let raw_file conf fname =
   let typ =
-    if Filename.check_suffix s ".png" then "image/png"
-    else if Filename.check_suffix s ".jpg" then "image/jpeg"
-    else if Filename.check_suffix s ".gif" then "image/gif"
-    else if Filename.check_suffix s ".css" then "text/css"
+    if Filename.check_suffix fname ".png" then "image/png"
+    else if Filename.check_suffix fname ".jpg" then "image/jpeg"
+    else if Filename.check_suffix fname ".gif" then "image/gif"
+    else if Filename.check_suffix fname ".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
@@ -1678,61 +1667,52 @@ end = struct
 end
 
 let input_lexicon lang =
-  match Hashtbl.find_opt lexicon_cache lang with
-  | Some t -> t
-  | None ->
-      let t = Hashtbl.create 501 in
-      let fname =
-        List.fold_right Filename.concat
-          [ !setup_dir; "setup"; "lang" ]
-          "lexicon.txt"
+  let open Fake_in_channel in
+  let t = Hashtbl.create 501 in
+  match Statics.read ("lang" // "lexicon.txt") with
+  | None -> t
+  | Some content -> (
+      let derived_lang =
+        match lindex lang '-' with Some i -> String.sub lang 0 i | _ -> ""
       in
-      (match try Some (open_in fname) with Sys_error _ -> None with
-      | None -> ()
-      | Some ic ->
-          Fun.protect
-            ~finally:(fun () -> close_in ic)
-            (fun () ->
-              let derived_lang =
-                match lindex lang '-' with
-                | Some i -> String.sub lang 0 i
-                | _ -> ""
-              in
-              try
-                while true do
-                  let k =
-                    let rec find_key line =
-                      if String.length line < 4 then find_key (input_line ic)
-                      else if String.sub line 0 4 <> "    " then
-                        find_key (input_line ic)
-                      else line
-                    in
-                    find_key (input_line ic)
-                  in
-                  let k = String.sub k 4 (String.length k - 4) in
-                  let rec loop line =
-                    match lindex line ':' with
-                    | Some i ->
-                        let line_lang = String.sub line 0 i in
-                        (if
-                           line_lang = lang
-                           || (line_lang = derived_lang && not (Hashtbl.mem t k))
-                         then
-                           let v =
-                             if i + 1 = String.length line then ""
-                             else
-                               String.sub line (i + 2)
-                                 (String.length line - i - 2)
-                           in
-                           Hashtbl.add t k v);
-                        loop (input_line ic)
-                    | None -> ()
-                  in
-                  loop (input_line ic)
-                done
-              with End_of_file -> ()));
-      Hashtbl.add lexicon_cache lang t;
-      t
+      let ic = in_channel_of_string content in
+      try
+        (try
+           while true do
+             let k =
+               let rec find_key line =
+                 if String.length line < 4 then find_key (input_line ic)
+                 else if String.sub line 0 4 <> "    " then
+                   find_key (input_line ic)
+                 else line
+               in
+               find_key (input_line ic)
+             in
+             let k = String.sub k 4 (String.length k - 4) in
+             let rec loop line =
+               match lindex line ':' with
+               | Some i ->
+                   let line_lang = String.sub line 0 i in
+                   (if
+                      line_lang = lang
+                      || (line_lang = derived_lang && not (Hashtbl.mem t k))
+                    then
+                      let v =
+                        if i + 1 = String.length line then ""
+                        else String.sub line (i + 2) (String.length line - i - 2)
+                      in
+                      Hashtbl.add t k v);
+                   loop (input_line ic)
+               | None -> ()
+             in
+             loop (input_line ic)
+           done
+         with End_of_file -> ());
+        close_in ic;
+        t
+      with e ->
+        close_in ic;
+        raise e)
 
 let setup (_addr, req) comm (env_str : Adef.encoded_string) =
   let conf =
