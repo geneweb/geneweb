@@ -77,7 +77,10 @@ val validate_claims :
     {!decode_and_validate_id_token}; exposed for testing. *)
 
 val base64url_decode : string -> (string, error) result
-(** Decode an unpadded base64url string (RFC 7515). Exposed for testing. *)
+(** Decode an unpadded base64url string (RFC 7515). *)
+
+val base64url_encode : string -> string
+(** Encode to unpadded base64url (RFC 7515). *)
 
 (** {1 Claim Access} *)
 
@@ -96,11 +99,11 @@ val claim_has_value : claims -> path:string -> value:string -> bool
 
 val logout_url :
   provider_config ->
-  id_token_hint:string ->
+  client_id:string ->
   post_logout_redirect_uri:string ->
   string option
-(** RP-initiated logout URL, or [None] if the provider has no
-    end_session_endpoint. *)
+(** RP-initiated logout URL (identifying the client by [client_id]), or [None]
+    if the provider has no end_session_endpoint. *)
 
 (** {1 State Management} *)
 
