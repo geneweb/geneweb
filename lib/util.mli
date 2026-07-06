@@ -7,8 +7,8 @@ val search_in_assets : string -> string
 (** Checks that the file in argument belong to one of the asserts dir
     (defined in the Secure module) *)
 
-val include_begin : Config.config -> string -> unit
-val include_end : Config.config -> string -> unit
+val include_begin : ?output:(string -> unit) -> Config.config -> string -> unit
+val include_end : ?output:(string -> unit) -> Config.config -> string -> unit
 
 val etc_file_name : string -> string
 (** Returns the path to the template file in parameter *)
@@ -465,6 +465,7 @@ val copy_from_templ_ref :
 (**/**)
 
 val include_template :
+  ?output:(string -> unit) ->
   Config.config ->
   (string * Adef.encoded_string) list ->
   string ->
