@@ -96,6 +96,10 @@ docker logs -f CONTAINER
 ```
 where `CONTAINER` is the name of gwd container to watch its logs.
 
+```console
+podman run -p 2317:2317 -v DIR:/bases -d --name geneweb-gwd:latest ARGS
+```
+
 # opam installation
 
 GeneWeb is distributed on opam too. It is a source installation, which means
