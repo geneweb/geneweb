@@ -26,19 +26,19 @@ jobs:
       matrix:
         include:
           - os: macos-latest
-            ocaml-version: 5.4.1
+            ocaml-version: 5
             platform: macos-arm64
             is-unix: true
           - os: macos-15-intel
-            ocaml-version: 5.4.1
+            ocaml-version: 5
             platform: macos-intel
             is-unix: true
           - os: ubuntu-22.04
-            ocaml-version: 5.4.1
+            ocaml-version: 5
             platform: linux
             is-unix: true
           - os: windows-latest
-            ocaml-version: 4.14.3
+            ocaml-version: 4.14.4
             platform: windows
             is-unix: false
 
