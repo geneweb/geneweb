@@ -2391,8 +2391,8 @@ let setup_log ~predictable_mode t =
       Sys.set_signal Sys.sighup (Sys.Signal_handle (fun _ -> refresh o))
   in
   match t with
-  | Cmd.Stdout -> set_reporter @@ oc_to_fmt Compat.Out_channel.stdout
-  | Stderr -> set_reporter @@ oc_to_fmt Compat.Out_channel.stderr
+  | Cmd.Stdout -> set_reporter @@ oc_to_fmt Out_channel.stdout
+  | Stderr -> set_reporter @@ oc_to_fmt Out_channel.stderr
   | File path ->
       let o = { path; oc = None } in
       refresh o;

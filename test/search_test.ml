@@ -1,8 +1,6 @@
 module A = Alcotest
-module Compat = Geneweb_compat
 module Trie = Geneweb_search.Trie.Default
 module Iterator = Geneweb_search.Iterator
-module Seq = Geneweb_compat.Seq
 
 (* Compute the Levenshtein distance of [s1] and [s2]. *)
 (* Unused --
@@ -78,9 +76,9 @@ module Trie_tests = struct
     not @@ Trie.mem a.(i) trie
 
   let create_trie path =
-    Compat.In_channel.with_open_text path @@ fun ic ->
+    In_channel.with_open_text path @@ fun ic ->
     let rec loop t l i =
-      match Compat.In_channel.input_line ic with
+      match In_channel.input_line ic with
       | None -> (t, Array.of_list l)
       | Some line -> loop (Trie.add line i t) (line :: l) (i + 1)
     in

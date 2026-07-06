@@ -24,7 +24,7 @@ let heap_sort_test =
     Q.Test.make ~count:1000 ~name:"random heap sort" (Q.make gen) @@ fun l ->
     let l1 = heap_sort l in
     let l2 = List.sort Int.compare l in
-    Geneweb_compat.List.equal Int.equal l1 l2
+    List.equal Int.equal l1 l2
   in
   QCheck_alcotest.to_alcotest qtst
 

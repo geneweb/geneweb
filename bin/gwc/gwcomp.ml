@@ -2,7 +2,6 @@
 
 open Def
 module Driver = Geneweb_db.Driver
-module Compat = Geneweb_compat
 
 let magic_gwo = "GnWo000o"
 
@@ -1413,7 +1412,7 @@ let detect_encoding ic =
   | _ -> E_iso_8859_1
 
 let compile ~bname oc input =
-  Compat.In_channel.with_open_text input @@ fun ic ->
+  In_channel.with_open_text input @@ fun ic ->
   let initial_encoding = detect_encoding ic in
   output_string oc magic_gwo;
   output_value oc (input : string);
@@ -1435,7 +1434,7 @@ let compile ~bname oc input =
 
 let compile ~bname ~output input =
   line_cnt := 0;
-  Compat.Out_channel.with_open_gen
+  Out_channel.with_open_gen
     [ Open_wronly; Open_creat; Open_trunc; Open_binary ]
     0o644 output
   @@ fun oc ->
