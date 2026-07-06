@@ -588,7 +588,6 @@ let t =
   let doc = "Geneweb daemon" in
   let envs =
     [
-      var_bases_dir;
       var_secret_salt;
       var_gwd_slow_query_threshold;
       var_wserver;
