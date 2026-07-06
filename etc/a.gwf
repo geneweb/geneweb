@@ -789,6 +789,6 @@
 # associate the logged-in user with a database individual. Leave empty to skip.
 #oidc_person_key_claim=
 
-# Optional label for the SSO login button on the welcome page. Defaults to the
-# translated "SSO login" when empty.
-#oidc_login_label=
+# Provider name shown on the welcome-page login button, after the translated
+# "connect with" (e.g. "Google" -> "Connect with Google"). Defaults to "SSO".
+#oidc_provider_name=
