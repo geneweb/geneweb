@@ -255,12 +255,18 @@ let validate_claims ~client_id ~issuer ~nonce claims =
   let* () =
     match json_at_path claims "aud" with
     | None -> Error (Jwt_error "missing aud claim")
-    | Some _ ->
-        if claim_has_value claims ~path:"aud" ~value:client_id then Ok ()
-        else
+    | Some aud ->
+        if not (claim_has_value claims ~path:"aud" ~value:client_id) then
           Error
             (Jwt_error
                (Printf.sprintf "aud does not contain client_id %s" client_id))
+        else if
+          (* with multiple audiences OIDC requires azp = client_id *)
+          (match aud with `List (_ :: _ :: _) -> true | _ -> false)
+          && claim_string claims "azp" <> Some client_id
+        then
+          Error (Jwt_error "azp must equal client_id when aud is multi-valued")
+        else Ok ()
   in
 
   let* () =
