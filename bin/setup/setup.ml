@@ -531,14 +531,21 @@ let rec copy_from_stream conf print strm =
               (* see r *)
               let in_file = get_variable strm |> slashify_linux_dos in
               let s =
-                match Statics.read (in_file) with
+                match Statics.read in_file with
                 | None -> (
-                    match Secure.open_in in_file with
-                    | exception Sys_error _ ->  Printf.sprintf "File %s absent" in_file
-                    | ic -> 
+                    let fname =
+                      if Filename.is_relative in_file then
+                        !setup_dir // "setup" // in_file
+                      else in_file
+                    in
+                    match Secure.open_in fname with
+                    | exception Sys_error _ ->
+                        Printf.sprintf "File %s absent" fname
+                    | ic ->
                         let n = in_channel_length ic in
                         let s = really_input_string ic n in
-                        close_in ic; s)
+                        close_in ic;
+                        s)
                 | Some content -> content
               in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
