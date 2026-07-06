@@ -534,14 +534,14 @@ let eval_string_expr conf (eval_var, eval_apply) e =
     print_error loc exc;
     ""
 
-let print_body_prop conf =
+let print_body_prop ~output conf =
   let s =
     Option.fold
       (Hashtbl.find_opt conf.Config.lexicon "!dir")
       ~some:(fun d -> " dir=\"" ^ d ^ "\"")
       ~none:""
   in
-  Output.print_sstring conf (s ^ Util.body_prop conf)
+  output (s ^ Util.body_prop conf)
 
 type 'a vother =
   | Vdef of (string * TemplAst.ast option) list * TemplAst.ast list
@@ -551,6 +551,7 @@ type 'a vother =
 type 'a env = (string * 'a) list
 
 type ('a, 'b) interp_fun = {
+  output : string -> unit;
   eval_var :
     'a env -> 'b -> TemplAst.loc -> string list -> 'b TemplAst.expr_val;
   eval_transl : 'a env -> bool -> string -> string -> string;
@@ -728,15 +729,14 @@ let print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
   with Not_found ->
     templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl el al
 
-let print_wid_hei conf fname =
+let print_wid_hei ~output fname =
   match Image.size_from_path (Image.path_of_filename fname) with
   | Ok (wid, hei) ->
-      Output.print_sstring conf
-        (Printf.sprintf " width=\"%d\" height=\"%d\"" wid hei)
+      output (Printf.sprintf " width=\"%d\" height=\"%d\"" wid hei)
   | Error () -> ()
 
-let include_hed_trl conf name =
-  Util.include_template conf [] name (fun () -> ())
+let include_hed_trl ?output conf name =
+  Util.include_template ?output conf [] name (fun () -> ())
 
 let rec interp_ast :
     Config.config ->
@@ -875,27 +875,27 @@ let rec interp_ast :
   let rec print_ast env ep = function
     | TemplAst.Avar (loc, s, sl) ->
         print_var print_ast_list conf ifun env ep loc (s :: sl)
-    | Awid_hei s -> print_wid_hei conf s
+    | Awid_hei s -> print_wid_hei ~output:ifun.output s
     | Aif (e, alt, ale) -> print_if env ep e alt ale
     | Aforeach ((loc, s, sl), el, al) -> (
         try print_foreach conf ifun print_ast eval_expr env ep loc s sl el al
         with Not_found ->
-          Output.print_sstring conf
+          ifun.output
             (Printf.sprintf " %%foreach;%s?" (String.concat "." (s :: sl))))
     | Adefine (f, xl, al, alk) -> print_define env ep f xl al alk
     | Aapply (loc, f, ell) -> print_apply env ep loc f ell
     | Alet (k, v, al) -> print_let env ep k v al
     | Afor (i, min, max, al) -> print_for env ep i min max al
-    | x -> Output.print_sstring conf (eval_ast env ep x)
+    | x -> ifun.output (eval_ast env ep x)
   and print_ast_list env ep = function
     | [] -> m_env := env
     | TemplAst.Avar (_, "sq", []) :: Atext (loc, s) :: al ->
         let s = squeeze_spaces s in
         print_ast_list env ep (Atext (loc, s) :: al)
     | Ainclude (fname, astl) :: al ->
-        Util.include_begin conf fname;
+        Util.include_begin ~output:ifun.output conf fname;
         print_ast_list env ep astl;
-        Util.include_end conf fname;
+        Util.include_end ~output:ifun.output conf fname;
         print_ast_list !m_env ep al
     | [ a ] -> print_ast env ep a
     | a :: al ->
@@ -918,7 +918,7 @@ let rec interp_ast :
           in
           templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
         with e -> print_error loc e)
-    | None -> Output.print_sstring conf (eval_apply env ep loc f vl)
+    | None -> ifun.output (eval_apply env ep loc f vl)
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
     let env = set_val ifun.set_vother k v env in
@@ -955,9 +955,9 @@ and print_var print_ast_list conf ifun env ep loc sl =
   let rec print_var1 eval_var sl =
     try
       match eval_var sl with
-      | TemplAst.VVstring s -> Output.print_sstring conf s
-      | VVbool true -> Output.print_sstring conf "1"
-      | VVbool false -> Output.print_sstring conf "0"
+      | TemplAst.VVstring s -> ifun.output s
+      | VVbool true -> ifun.output "1"
+      | VVbool false -> ifun.output "0"
       | VVother f -> print_var1 f []
     with Not_found -> (
       match sl with
@@ -970,36 +970,33 @@ and print_var print_ast_list conf ifun env ep loc sl =
                     Templ_parser.(
                       included_files := (templ, astl) :: !included_files)
                   in
-                  Util.include_begin conf fname;
+                  Util.include_begin ~output:ifun.output conf fname;
                   print_ast_list env ep astl;
-                  Util.include_end conf fname
+                  Util.include_end ~output:ifun.output conf fname
               | None ->
-                  Output.print_sstring conf
-                    (Printf.sprintf " %%%s?" (String.concat "." sl)))
-          | None ->
-              Output.print_sstring conf
-                (Printf.sprintf " %%%s?" (String.concat "." sl)))
-      | sl -> print_variable conf sl)
+                  ifun.output (Printf.sprintf " %%%s?" (String.concat "." sl)))
+          | None -> ifun.output (Printf.sprintf " %%%s?" (String.concat "." sl))
+          )
+      | sl -> print_variable ~output:ifun.output conf sl)
   in
   let eval_var = eval_var conf ifun env ep loc in
   print_var1 eval_var sl
 
-and print_simple_variable conf = function
-  | "base_header" -> include_hed_trl conf "hed"
-  | "body_prop" -> print_body_prop conf
+and print_simple_variable ~output conf = function
+  | "base_header" -> include_hed_trl ~output conf "hed"
+  | "body_prop" -> print_body_prop ~output conf
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found
 
-and print_variable conf sl =
-  try Output.print_sstring conf (eval_variable conf sl)
+and print_variable ~output conf sl =
+  try output (eval_variable conf sl)
   with Not_found -> (
     try
       match sl with
-      | [ s ] -> print_simple_variable conf s
+      | [ s ] -> print_simple_variable ~output conf s
       | _ -> raise Not_found
-    with Not_found ->
-      Output.print_sstring conf (Printf.sprintf " %%%s?" (String.concat "." sl)))
+    with Not_found -> output (Printf.sprintf " %%%s?" (String.concat "." sl)))
 
 let copy_from_templ :
     Config.config -> Adef.encoded_string env -> in_channel -> unit =
@@ -1008,6 +1005,7 @@ let copy_from_templ :
   close_in ic;
   let ifun =
     {
+      output = Output.print_sstring conf;
       eval_var =
         (fun env _ _ -> function
           | [ s ] -> VVstring (List.assoc s env : Adef.encoded_string :> string)

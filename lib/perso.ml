@@ -4482,7 +4482,9 @@ let eval_predefined_apply conf env f vl =
         [ "<br */?>"; "</?p>"; "</?div>"; "</?span>"; "</?pre>" ]
   | _ -> raise Not_found
 
-let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
+let gen_interp_templ ?(no_headers = false) ?output menu title templ_fname conf
+    base p =
+  let output = Option.value ~default:(Output.print_sstring conf) output in
   let ep = (p, Person.is_visible conf base p) in
   (* TODO what is this? what are those "120" *)
   let emal =
@@ -4560,6 +4562,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   if no_headers then
     Hutil.interp_no_header conf templ_fname
       {
+        output;
         Templ.eval_var = eval_var conf base;
         Templ.eval_transl = eval_transl conf base;
         Templ.eval_predefined_apply = eval_predefined_apply conf;
@@ -4582,6 +4585,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     else
       Hutil.interp_no_header conf templ_fname
         {
+          output;
           Templ.eval_var = eval_var conf base;
           Templ.eval_transl = eval_transl conf base;
           Templ.eval_predefined_apply = eval_predefined_apply conf;
@@ -4593,6 +4597,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   else
     Hutil.interp conf templ_fname
       {
+        output;
         Templ.eval_var = eval_var conf base;
         Templ.eval_transl = eval_transl conf base;
         Templ.eval_predefined_apply = eval_predefined_apply conf;
@@ -4602,7 +4607,9 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       }
       env ep
 
-let interp_templ ?no_headers = gen_interp_templ ?no_headers false (fun _ -> ())
+let interp_templ ?no_headers ?output =
+  gen_interp_templ ?no_headers ?output false (fun _ -> ())
+
 let interp_templ_with_menu = gen_interp_templ true
 
 let interp_notempl_with_menu title templ_fname conf base p =
@@ -4612,7 +4619,7 @@ let interp_notempl_with_menu title templ_fname conf base p =
 
 (* Main *)
 
-let print ?no_headers conf base p =
+let print ?no_headers ?output conf base p =
   let passwd =
     if conf.Config.wizard || conf.Config.friend then None
     else
@@ -4630,7 +4637,7 @@ let print ?no_headers conf base p =
     when Util.is_that_user_and_password conf.Config.auth_scheme "" passwd
          = false ->
       Util.unauthorized conf src
-  | Some _ | None -> interp_templ ?no_headers "perso" conf base p
+  | Some _ | None -> interp_templ ?no_headers ?output "perso" conf base p
 
 let limit_by_tree conf =
   Option.fold

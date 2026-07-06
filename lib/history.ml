@@ -619,6 +619,7 @@ let gen_print conf base hoo =
   in
   Hutil.interp conf "updhist"
     {
+      output = Output.print_sstring conf;
       Templ.eval_var = eval_var conf base;
       Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
       Templ.eval_predefined_apply = (fun _ -> raise Not_found);

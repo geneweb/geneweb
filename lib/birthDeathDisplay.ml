@@ -180,6 +180,7 @@ let print_statistics conf =
   else
     Hutil.interp conf "stats"
       {
+        output = Output.print_sstring conf;
         Templ.eval_var = (fun _ -> raise Not_found);
         Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
         Templ.eval_predefined_apply = (fun _ -> raise Not_found);
