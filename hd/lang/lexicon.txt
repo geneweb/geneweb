@@ -5388,6 +5388,10 @@ pt: confirmação LDS
 sv: konfirmation (LDS)
 tr: onay (LDS)
 
+    connect with
+en: connect with
+fr: se connecter avec
+
     connection/connections
 bg: потребителски връзки
 co: cunnessione/cunnessioni
@@ -19359,10 +19363,6 @@ ru: ссылка Sosa
 sk: referenciou "Sosa"
 sv: annummer
 tr: aile ağacı kökü
-
-    SSO login
-en: SSO login
-fr: connexion SSO
 
     source/sources
 af: bron/bronne
