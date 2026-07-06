@@ -32,6 +32,7 @@
  (libraries
   dynlink
   geneweb
+  geneweb.oidc
   geneweb_http
   geneweb_register
   gwd_lib

@@ -86,10 +86,10 @@ let validate_claims_ok () =
        (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
           ~nonce:"n1" c));
   let c_arr =
-    mk_claims ~iss:{|"https://idp"|} ~aud:{|["other", "client1"]|}
-      ~nonce:{|"n1"|}
+    claims_of
+      {|{ "iss": "https://idp", "aud": ["other", "client1"], "azp": "client1", "exp": 9999999999, "nonce": "n1" }|}
   in
-  (check bool) "aud array contains client_id" true
+  (check bool) "multi-aud with matching azp" true
     (is_ok
        (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
           ~nonce:"n1" c_arr))
@@ -124,7 +124,15 @@ let validate_claims_rejects () =
   (check bool) "missing nonce" false
     (is_ok
        (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
-          ~nonce:"n1" no_nonce))
+          ~nonce:"n1" no_nonce));
+  let multi_aud_no_azp =
+    claims_of
+      {|{ "iss": "https://idp", "aud": ["other", "client1"], "exp": 9999999999, "nonce": "n1" }|}
+  in
+  (check bool) "multi-aud without azp" false
+    (is_ok
+       (Oidc.validate_claims ~client_id:"client1" ~issuer:"https://idp"
+          ~nonce:"n1" multi_aud_no_azp))
 
 let base64url_decode_cases () =
   let dec s =
