@@ -298,13 +298,13 @@ let decode_and_validate_id_token ~client_id ~issuer ~nonce token =
   let* () = validate_claims ~client_id ~issuer ~nonce claims in
   Ok claims
 
-let logout_url provider ~id_token_hint ~post_logout_redirect_uri =
+let logout_url provider ~client_id ~post_logout_redirect_uri =
   match provider.end_session_endpoint with
   | None -> None
   | Some endpoint ->
       let params =
         [
-          ("id_token_hint", id_token_hint);
+          ("client_id", client_id);
           ("post_logout_redirect_uri", post_logout_redirect_uri);
         ]
       in

@@ -1267,7 +1267,7 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
   let access_type =
     match access_type with
     | ATnone -> (
-        match Gwd_oidc.cookie_access request base_file with
+        match Gwd_oidc.cookie_access ~secret:secret_salt request base_file with
         | Some (acc, user, username) ->
             if acc = 'w' then ATwizard (user, username)
             else ATfriend (user, username)
