@@ -306,6 +306,7 @@ let print_mod conf base =
       let env = [ ("list", Vlist_data list) ] in
       Hutil.interp conf "upddata"
         {
+          output = Output.print_sstring conf;
           Templ.eval_var = eval_var conf base;
           Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
@@ -317,6 +318,7 @@ let print_mod conf base =
   | _ ->
       Hutil.interp conf "upddatamenu"
         {
+          output = Output.print_sstring conf;
           Templ.eval_var = (fun _ -> raise Not_found);
           Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
