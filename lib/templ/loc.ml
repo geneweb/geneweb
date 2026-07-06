@@ -1,5 +1,3 @@
-module Compat = Geneweb_compat
-
 type source = [ `File of string | `Raw of string ]
 
 let equal_source src1 src2 =
@@ -34,8 +32,7 @@ let with_pp_loc_input src k =
           open them in text mode. On Windows, text mode normalizes line endings
           to the UNIX format. We must use the same mode to print correct line
           and column numbers. *)
-      Compat.In_channel.with_open_text f @@ fun ic ->
-      k (Pp_loc.Input.in_channel ic)
+      In_channel.with_open_text f @@ fun ic -> k (Pp_loc.Input.in_channel ic)
   | `Raw s -> k (Pp_loc.Input.string s)
 
 let pp ppf ({ src; start; stop } as t) =

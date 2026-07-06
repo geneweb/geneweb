@@ -18,17 +18,17 @@
  (deps
   (:dict ./dict.txt))
  (name search_test)
- (libraries
-  fmt
-  qcheck
-  qcheck-alcotest
-  geneweb_util
-  geneweb_compat
-  geneweb_search)
+ (libraries fmt qcheck qcheck-alcotest geneweb_util geneweb_search)
  (action
   (run %{test} %{dict})))
 
 (test
  (package geneweb)
  (name heap_test)
- (libraries qcheck qcheck-alcotest geneweb_compat geneweb_search))
+ (libraries qcheck qcheck-alcotest geneweb_search))
+
+(test
+ (package geneweb)
+ (name base64_test)
+ (modules base64_test)
+ (libraries alcotest qcheck qcheck-alcotest gwd_lib))

@@ -2052,10 +2052,7 @@ let slashify = String.map (fun c -> match c with '\\' -> '/' | _ -> c)
 let pp_item pp ppf (name, v) =
   Fmt.pf ppf "%a: %a@\n" Fmt.(styled (`Fg `Blue) string) name pp v
 
-let display_infos ?interface ~port () =
-  let hostname =
-    match interface with None -> Unix.gethostname () | Some a -> a
-  in
+let display_infos () =
   let git_info =
     [
       ("source", Version.src);
@@ -2081,10 +2078,7 @@ let display_infos ?interface ~port () =
     Fmt.Dump.string ppf s
   in
   Log.app (fun k ->
-      let s =
-        Fmt.str "Geneweb %s\nListen to http://%s:%d/base" Version.ver hostname
-          port
-      in
+      let s = Fmt.str "Geneweb %s" Version.ver in
       k "%a" Fmt.(styled (`Fg `Green) string) s);
   Log.app (fun k -> k "Type CTRL+C to stop the service");
   Log.app (fun k ->
@@ -2105,7 +2099,7 @@ let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
     | _ -> retrieve_secret_salt ()
     | exception Not_found ->
         daemonize ~daemon @@ fun () ->
-        display_infos ?interface ~port ();
+        display_infos ();
         create_cnt_dir ();
         (* A secret salt is added to the environment to ensure that workers
            use the same salt for digests on both Unix and Windows platforms. *)
@@ -2119,7 +2113,7 @@ let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
      `geneweb` and `geneweb-http`. We must remove it after refactoring
      the encoded string subsystem. *)
   let connection x y z = connection x y (Adef.encoded z) in
-  Server.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+  Server.start ?addr:interface ~port ~timeout:!conn_timeout
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
     (connection ~predictable_mode ~loaded_plugins ~secret_salt)
 
@@ -2402,8 +2396,8 @@ let setup_log ~predictable_mode t =
       Sys.set_signal Sys.sighup (Sys.Signal_handle (fun _ -> refresh o))
   in
   match t with
-  | Cmd.Stdout -> set_reporter @@ oc_to_fmt Compat.Out_channel.stdout
-  | Stderr -> set_reporter @@ oc_to_fmt Compat.Out_channel.stderr
+  | Cmd.Stdout -> set_reporter @@ oc_to_fmt Out_channel.stdout
+  | Stderr -> set_reporter @@ oc_to_fmt Out_channel.stderr
   | File path ->
       let o = { path; oc = None } in
       refresh o;

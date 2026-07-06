@@ -1,5 +1,4 @@
 (* Copyright (c) 2006-2007 INRIA *)
-module Compat = Geneweb_compat
 open Dbdisk
 
 let load_ascends_array base = base.data.ascends.load_array ()
@@ -412,7 +411,7 @@ let ( // ) = Filename.concat
 
 let output_notes base dst =
   let content = base.Dbdisk.data.bnotes.nread "" Def.RnAll in
-  Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content)
+  Out_channel.with_open_text dst (fun oc -> output_string oc content)
 
 (* Copy all the notes from "notes_d" of the database [base] into the
    destination directory [dst_dir]. *)
@@ -427,7 +426,7 @@ let output_notes_d base dst_dir =
          a file in memory too. We should use an enum type to distinguish
          these cases in [Def.base_notes]. *)
       let content = base.Dbdisk.data.bnotes.nread f Def.RnAll in
-      Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content))
+      Out_channel.with_open_text dst (fun oc -> output_string oc content))
     l
 
 let safe_rename src dst =

@@ -1,7 +1,6 @@
 module Y = Yojson.Safe
 module U = Yojson.Safe.Util
 module MS = Map.Make (String)
-module Compat = Geneweb_compat
 open Lwt.Infix
 
 type error = [ Encoding.error | `Bad_arity ]
@@ -105,7 +104,7 @@ module Search = struct
               (* TODO: There is no guarantee that bounding the size of forced
                  elements in the sequence will limit the running time. We
                  should find a solution to limit the running time itself. *)
-              List.of_seq @@ Compat.Seq.take size @@ Compat.Seq.concat
+              List.of_seq @@ Seq.take size @@ Seq.concat
               (* BUG: We can introduce duplicate in the output here. *)
               @@ List.to_seq
                    [

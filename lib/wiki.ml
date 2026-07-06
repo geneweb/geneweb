@@ -796,7 +796,7 @@ let rev_extract_sub_part (s : string) (v : int) : string list =
 
 let extract_sub_part s v = List.rev (rev_extract_sub_part s v)
 
-let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
+let print_sub_part_links conf edit_mode sfn cnt0 has_next =
   Output.print_sstring conf "<div class=\"btn-group mb-3\">";
   if cnt0 >= first_cnt then (
     Output.print_sstring conf {|<a href="|};
@@ -834,7 +834,7 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     (transl_nth conf "visualize/show/hide/summary" 1 |> Utf8.capitalize_fst);
   Output.print_sstring conf "</a>";
 
-  if not is_empty then (
+  if has_next then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=";
@@ -867,12 +867,12 @@ let print_sub_part_text conf wi edit_opt cnt0 lines =
   in
   Output.print_string conf (Util.safe_html s)
 
-let print_sub_part conf wi can_edit edit_mode sub_fname cnt0 lines =
+let print_sub_part conf wi ~has_next can_edit edit_mode sub_fname cnt0 lines =
   let edit_opt = Some (can_edit, edit_mode, sub_fname) in
   let sfn =
     if sub_fname = "" then Adef.encoded "" else "&f=" ^<^ Mutil.encode sub_fname
   in
-  print_sub_part_links conf (Mutil.encode edit_mode) sfn cnt0 (lines = []);
+  print_sub_part_links conf (Mutil.encode edit_mode) sfn cnt0 has_next;
   print_sub_part_text conf wi edit_opt cnt0 lines
 
 let print_mod_view_header conf can_edit (mode : Adef.encoded_string)
@@ -969,7 +969,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   let sub_part =
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
-  let is_empty = sub_part = "" in
+  let has_next = has_v && extract_sub_part s (v + 1) <> [] in
   let is_new_note = Util.p_getenv conf.env "new" <> None in
   let sfn =
     if fname = "" then Adef.encoded "" else "&f=" ^<^ Mutil.encode fname
@@ -980,7 +980,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
     (can_edit && not is_new_note)
     mode sfn has_v v title;
   if can_edit && has_v then
-    print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty;
+    print_sub_part_links conf (mode_pref ^^^ mode) sfn v has_next;
   print_mod_view_form_start conf can_edit mode fname has_v v s is_new_note;
   if is_new_note then print_new_note_input conf;
   print_mod_view_editor conf can_edit sub_part is_new_note;
@@ -1079,19 +1079,23 @@ let print_ok conf wi edit_mode fname title_is_1st s =
           (Utf8.capitalize_fst (Util.transl conf "note modified"))
   in
   Hutil.header conf title;
-  let get_v = Util.p_getint conf.env "v" in
-  let v = match get_v with Some v -> v | None -> 0 in
-  let title, s =
-    if v = 0 && title_is_1st then
-      let env, s = split_title_and_text s in
-      ((try List.assoc "TITLE" env with Not_found -> ""), s)
-    else ("", s)
+  let v, lines, has_next =
+    match Util.p_getint conf.env "v" with
+    | Some v -> (v, extract_sub_part s v, extract_sub_part s (v + 1) <> [])
+    | None ->
+        let title, s =
+          if title_is_1st then
+            let env, s = split_title_and_text s in
+            ((try List.assoc "TITLE" env with Not_found -> ""), s)
+          else ("", s)
+        in
+        let lines, _ = lines_list_of_string s in
+        let lines =
+          if title <> "" then ("<h1>" ^ title ^ "</h1>") :: lines else lines
+        in
+        (0, lines, false)
   in
-  let lines, _ = lines_list_of_string s in
-  let lines =
-    if v = 0 && title <> "" then ("<h1>" ^ title ^ "</h1>") :: lines else lines
-  in
-  print_sub_part conf wi conf.wizard edit_mode fname v lines;
+  print_sub_part conf wi ~has_next conf.wizard edit_mode fname v lines;
   Hutil.trailer conf
 
 let do_mod_ok conf edit_mode fname read_string commit =

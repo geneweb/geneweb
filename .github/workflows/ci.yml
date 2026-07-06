@@ -58,12 +58,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, macos-26, windows-2022]
-        ocaml-compiler: [4.14.3, 5.4.1]
-        include:
-          - os: ubuntu-22.04-arm
-            ocaml-compiler: 4.11.2
-          - os: macos-15-intel
-            ocaml-compiler: 4.11.2
+        ocaml-compiler: [4.14.4, 5]
     outputs:
       total_matrix_jobs: ${{ strategy.job-total || 0 }}
       metric: ${{ steps.collect-metrics.outputs.metric }}
@@ -85,7 +80,7 @@ jobs:
 
       - name: Cache Opam dependencies
         id: cache-opam
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ runner.os == 'Windows' && 'C:\\.opam' || '~/.opam' }}
           key: ${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-${{ hashFiles('**/*.opam') }}

@@ -28,17 +28,17 @@ jobs:
 
       - name: Cache OPAM dependencies
         id: cache-opam
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.opam
-          key: ${{ runner.os }}-doc-ocaml-4.14.3-${{ hashFiles('*.opam') }}
+          key: ${{ runner.os }}-doc-${{ hashFiles('*.opam') }}
           restore-keys: |
-            ${{ runner.os }}-doc-ocaml-4.14.3-
+            ${{ runner.os }}-doc
 
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: 4.14.3
+          ocaml-compiler: 5
 
       - name: Install dependencies
         run: opam install . --deps-only --with-doc

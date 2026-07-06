@@ -1,5 +1,3 @@
-module Compat = Geneweb_compat
-
 exception File_error of string
 
 let raise_error ppf = Format.ksprintf (fun s -> raise (File_error s)) ppf
@@ -111,13 +109,13 @@ let copy_file ?(perm = 0o640) ?(overwrite = true) src dst =
     if overwrite then [ Open_wronly; Open_creat; Open_trunc; Open_binary ]
     else [ Open_wronly; Open_creat; Open_excl; Open_binary ]
   in
-  Compat.In_channel.with_open_bin src @@ fun ic ->
-  Compat.Out_channel.with_open_gen flags perm dst @@ fun oc ->
+  In_channel.with_open_bin src @@ fun ic ->
+  Out_channel.with_open_gen flags perm dst @@ fun oc ->
   let rec loop () =
-    match Compat.In_channel.input ic buf 0 sz with
+    match In_channel.input ic buf 0 sz with
     | 0 -> ()
     | r ->
-        Compat.Out_channel.output oc buf 0 r;
+        Out_channel.output oc buf 0 r;
         loop ()
   in
   loop ()
