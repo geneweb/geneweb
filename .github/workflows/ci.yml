@@ -80,7 +80,7 @@ jobs:
 
       - name: Cache Opam dependencies
         id: cache-opam
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ runner.os == 'Windows' && 'C:\\.opam' || '~/.opam' }}
           key: ${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-${{ hashFiles('**/*.opam') }}
