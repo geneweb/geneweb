@@ -1,5 +1,4 @@
 module Config = Geneweb.Config
-module Compat = Geneweb_compat
 module H = Digestif.SHA256
 
 module HT = Hashtbl.Make (struct

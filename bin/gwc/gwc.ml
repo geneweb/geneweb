@@ -1,5 +1,4 @@
 (* Copyright (c) 1998-2007 INRIA *)
-module Compat = Geneweb_compat
 module GWPARAM = Geneweb.GWPARAM
 module Dirs = Geneweb_dirs
 

@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Compat = Geneweb_compat
-
 let src = Logs.Src.create ~doc:"HTTP" "HTTP"
 
 let timestamp_tag : unit Logs.Tag.def =
@@ -223,7 +221,7 @@ let accept_connection_windows socket =
   connection_closed := false;
   wserver_sock := client_socket;
   check_stopping ();
-  Compat.Out_channel.with_open_bin !sock_in (fun oc ->
+  Out_channel.with_open_bin !sock_in (fun oc ->
       try copy_what_necessary client_socket oc with Unix.Unix_error _ -> ());
   let pid =
     let env =
@@ -240,7 +238,7 @@ let accept_connection_windows socket =
     pid
   in
   let _ = Unix.waitpid [] pid in
-  Compat.In_channel.with_open_bin !sock_in close_in;
+  In_channel.with_open_bin !sock_in close_in;
   let shutdown () =
     (try Unix.shutdown client_socket Unix.SHUTDOWN_SEND with _ -> ());
     skip_possible_remaining_chars client_socket;
@@ -248,7 +246,7 @@ let accept_connection_windows socket =
   in
   Fun.protect ~finally:shutdown (fun () ->
       try
-        Compat.In_channel.with_open_bin !sock_out (fun ic ->
+        In_channel.with_open_bin !sock_out (fun ic ->
             try
               let rec loop () =
                 let len = input ic buff 0 (Bytes.length buff) in

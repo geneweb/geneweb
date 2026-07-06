@@ -1,6 +1,5 @@
 module GWPARAM = Geneweb.GWPARAM
 module Version = Geneweb.Version
-module Compat = Geneweb_compat
 module Dirs = Geneweb_dirs
 module C = Cmdliner
 

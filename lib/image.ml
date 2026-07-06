@@ -4,7 +4,6 @@ let src = Logs.Src.create ~doc:"Image" "IMG "
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
-module Compat = Geneweb_compat
 
 let path_str path =
   match path with Some (`Path pa) -> pa | Some (`Url u) -> u | None -> ""
@@ -490,7 +489,7 @@ let get_carrousel_file_content conf base p fname kind old =
     Filename.chop_extension (carrousel_file_path conf base p fname old) ^ kind
   in
   if Sys.file_exists fname then
-    let s = Secure.with_open_in_text fname Compat.In_channel.input_all in
+    let s = Secure.with_open_in_text fname In_channel.input_all in
     if s = "" then None else Some s
   else None
 
