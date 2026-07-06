@@ -12,7 +12,8 @@ let oidc_lock_file () = !GWPARAM.adm_file "oidc.lck"
 
 (* login state is bound to the browser via a signed cookie, not a server store *)
 
-let login_cookie_name base_file = "gw_oidc_login_" ^ base_file
+let session_cookie_name base_file = "__Host-gw_oidc_" ^ base_file
+let login_cookie_name base_file = "__Host-gw_oidc_login_" ^ base_file
 
 let login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp =
   let msg =
@@ -73,17 +74,20 @@ let read_oidc_sessions () =
 
 let write_oidc_sessions entries =
   let fname = oidc_sessions_file () in
+  (* write to a temp file then rename, so lockless readers never see a partial
+     file (0600: the store holds bearer id_tokens) *)
+  let tmp = fname ^ ".tmp" in
   try
-    (* The store holds bearer id_tokens; keep it owner-only (0600). *)
     let oc =
-      Secure.open_out_gen [ Open_wronly; Open_creat; Open_trunc ] 0o600 fname
+      Secure.open_out_gen [ Open_wronly; Open_creat; Open_trunc ] 0o600 tmp
     in
     List.iter
       (fun (cookie, ts, base, acc, id_tok, user, username) ->
         Printf.fprintf oc "%s %.0f %s %c %s %s %s\n" cookie ts base acc id_tok
           (Uri.pct_encode user) (Uri.pct_encode username))
       entries;
-    close_out oc
+    close_out oc;
+    Sys.rename tmp fname
   with Sys_error _ -> ()
 
 let add_oidc_session cookie_token base_name access_char id_token user username =
@@ -99,30 +103,27 @@ let add_oidc_session cookie_token base_name access_char id_token user username =
   write_oidc_sessions entries
 
 let lookup_oidc_session cookie_token base_name =
-  let lock_file = oidc_lock_file () in
-  let on_exn _exn _bt = None in
-  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  let entries = read_oidc_sessions () in
-  let found = ref None in
-  let touched = ref false in
   let now = Unix.time () in
-  let entries =
-    List.map
-      (fun ((cookie, ts, base, acc, id_tok, user, username) as entry) ->
-        if cookie = cookie_token && base = base_name then begin
-          found := Some (acc, user, username);
-          (* slide the expiry at most once a minute to avoid a rewrite per request *)
-          if now -. ts > 60. then begin
-            touched := true;
-            (cookie, now, base, acc, id_tok, user, username)
-          end
-          else entry
-        end
-        else entry)
-      entries
+  let matches (cookie, _, base, _, _, _, _) =
+    cookie = cookie_token && base = base_name
   in
-  if !touched then write_oidc_sessions entries;
-  !found
+  (* read without the lock; writes are atomic so the file is always consistent *)
+  match List.find_opt matches (read_oidc_sessions ()) with
+  | None -> None
+  | Some (_, ts, _, acc, _, user, username) ->
+      (* slide the expiry at most once a minute, under the lock, best effort *)
+      if now -. ts > 60. then begin
+        let lock_file = oidc_lock_file () in
+        Lock.control ~on_exn:(fun _ _ -> ()) ~wait:true ~lock_file @@ fun () ->
+        read_oidc_sessions ()
+        |> List.map
+             (fun ((cookie, _, base, acc, id_tok, user, username) as e) ->
+               if cookie = cookie_token && base = base_name then
+                 (cookie, now, base, acc, id_tok, user, username)
+               else e)
+        |> write_oidc_sessions
+      end;
+      Some (acc, user, username)
 
 let remove_oidc_session cookie_token base_name =
   let lock_file = oidc_lock_file () in
@@ -164,8 +165,7 @@ let extract_oidc_cookie request cookie_name =
     find pairs
 
 let cookie_access request base_name =
-  let cookie_name = "gw_oidc_" ^ base_name in
-  match extract_oidc_cookie request cookie_name with
+  match extract_oidc_cookie request (session_cookie_name base_name) with
   | None -> None
   | Some cookie_token -> lookup_oidc_session cookie_token base_name
 
@@ -200,16 +200,18 @@ let read_oidc_config base_env =
       in
       let client_id = get "oidc_client_id" "" in
       let client_secret =
-        try
-          let file = List.assoc "oidc_client_secret_file" base_env in
-          if file <> "" then (
-            let ic = open_in file in
-            let s = String.trim (input_line ic) in
-            close_in ic;
-            s)
-          else raise Not_found
-        with Not_found | Sys_error _ | End_of_file ->
-          get "oidc_client_secret" ""
+        match List.assoc_opt "oidc_client_secret_file" base_env with
+        | Some file when file <> "" -> (
+            try
+              let ic = open_in file in
+              let s = String.trim (input_line ic) in
+              close_in ic;
+              s
+            with Sys_error _ | End_of_file ->
+              Log.warn (fun k ->
+                  k "OIDC: cannot read oidc_client_secret_file %s" file);
+              get "oidc_client_secret" "")
+        | _ -> get "oidc_client_secret" ""
       in
       let redirect_uri = get "oidc_redirect_uri" "" in
       if client_id = "" || client_secret = "" || redirect_uri = "" then None
@@ -258,21 +260,27 @@ let oidc_error_page conf msg =
 
 let conf_secret conf = match conf.secret_salt with Some s -> s | None -> ""
 
-let set_login_cookie conf base_file value =
+let set_cookie conf ~name ~value ~max_age =
+  let max_age =
+    match max_age with Some n -> Printf.sprintf "; Max-Age=%d" n | None -> ""
+  in
   Output.header conf
-    "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600"
-    (login_cookie_name base_file)
-    value
+    "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax%s" name value
+    max_age
+
+let set_login_cookie conf base_file value =
+  set_cookie conf ~name:(login_cookie_name base_file) ~value ~max_age:(Some 600)
 
 let clear_login_cookie conf base_file =
-  Output.header conf
-    "Set-Cookie: %s=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
-    (login_cookie_name base_file)
+  set_cookie conf
+    ~name:(login_cookie_name base_file)
+    ~value:"" ~max_age:(Some 0)
 
 let handle_oidc_login conf base_env base_file =
-  match read_oidc_config base_env with
-  | None -> oidc_error_page conf "OIDC not configured for this base"
-  | Some cfg -> (
+  match (conf_secret conf, read_oidc_config base_env) with
+  | "", _ -> oidc_error_page conf "OIDC unavailable: no secret salt configured"
+  | _, None -> oidc_error_page conf "OIDC not configured for this base"
+  | _, Some cfg -> (
       match Geneweb_oidc.Oidc.discover cfg.provider_url with
       | Error e ->
           oidc_error_page conf
@@ -302,6 +310,11 @@ let handle_oidc_callback conf base_env from_addr base_file =
   let ( let* ) = Result.bind in
   let err_str e = Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e in
   let result =
+    let* () =
+      if conf_secret conf = "" then
+        Error "OIDC unavailable: no secret salt configured"
+      else Ok ()
+    in
     let* () =
       match Util.p_getenv conf.env "error" with
       | None -> Ok ()
@@ -408,12 +421,11 @@ let handle_oidc_callback conf base_env from_addr base_file =
             from_addr);
       let cookie_token = Geneweb_oidc.Oidc.generate_token () in
       add_oidc_session cookie_token base_file acc id_token claim_value username;
-      let cookie_name = "gw_oidc_" ^ base_file in
       Output.status conf Code.Moved_Temporarily;
       clear_login_cookie conf base_file;
-      Output.header conf
-        "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax" cookie_name
-        cookie_token;
+      set_cookie conf
+        ~name:(session_cookie_name base_file)
+        ~value:cookie_token ~max_age:None;
       Output.header conf "Location: %s" base_url;
       Output.flush conf
 
@@ -431,16 +443,17 @@ let handle_oidc_logout conf base_env _from_addr base_file =
   end
   else begin
     Log.info (fun k -> k "logout: base=%s" base_file);
-    let cookie_name = "gw_oidc_" ^ base_file in
     let id_token_opt =
-      match extract_oidc_cookie conf.request cookie_name with
+      match
+        extract_oidc_cookie conf.request (session_cookie_name base_file)
+      with
       | Some cookie_token -> remove_oidc_session cookie_token base_file
       | None -> None
     in
     let clear_cookie conf =
-      Output.header conf
-        "Set-Cookie: %s=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
-        cookie_name
+      set_cookie conf
+        ~name:(session_cookie_name base_file)
+        ~value:"" ~max_age:(Some 0)
     in
     match read_oidc_config base_env with
     | None ->
@@ -486,11 +499,15 @@ let handle_mode conf mode =
       handle_oidc_logout conf base_env from_addr base_file;
       true
   | None ->
-      let has_code = Util.p_getenv conf.env "code" <> None in
+      (* only treat code+state as a callback for a login this browser started *)
       let has_state = Util.p_getenv conf.env "state" <> None in
+      let has_code = Util.p_getenv conf.env "code" <> None in
       let has_error = Util.p_getenv conf.env "error" <> None in
+      let in_login =
+        extract_oidc_cookie conf.request (login_cookie_name base_file) <> None
+      in
       if
-        ((has_code && has_state) || (has_error && has_state))
+        has_state && (has_code || has_error) && in_login
         && Option.is_some (read_oidc_config base_env)
       then begin
         handle_oidc_callback conf base_env from_addr base_file;
