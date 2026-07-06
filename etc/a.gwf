@@ -750,8 +750,9 @@
 # "Secure"), and "oidc_provider_url" MUST be https, since the id_token is trusted
 # via TLS to the provider rather than by checking its signature.
 #
-# Runtime requirement: gwd shells out to the "curl" binary for the discovery and
-# token HTTP calls, so curl must be installed and on gwd's PATH.
+# Runtime requirements: OIDC is available only on UNIX (it draws its randomness
+# from /dev/urandom), and gwd shells out to the "curl" binary for the discovery
+# and token HTTP calls, so curl must be installed and on gwd's PATH.
 
 # Provider issuer URL. Must be https (see above). Its discovery document is
 # fetched from "<oidc_provider_url>/.well-known/openid-configuration". Leaving

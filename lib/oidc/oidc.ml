@@ -312,20 +312,30 @@ let logout_url provider ~client_id ~post_logout_redirect_uri =
       let uri = Uri.add_query_params' base params in
       Some (Uri.to_string uri)
 
+(* CSPRNG from /dev/urandom; falls back to a weaker PRNG only where it is
+   absent (e.g. Windows), which is not a target OIDC deployment. *)
+let random_bytes len =
+  try
+    let ic = open_in_bin "/dev/urandom" in
+    let b = Bytes.create len in
+    really_input ic b 0 len;
+    close_in ic;
+    Bytes.to_string b
+  with Sys_error _ ->
+    Random.self_init ();
+    String.init len (fun _ -> Char.chr (Random.int 256))
+
 let generate_random_hex len =
-  let bytes = Mirage_crypto_rng_unix.getrandom len in
   let hex = Buffer.create (len * 2) in
   String.iter
     (fun c -> Buffer.add_string hex (Printf.sprintf "%02x" (Char.code c)))
-    bytes;
+    (random_bytes len);
   Buffer.contents hex
 
 let generate_state () = generate_random_hex 16
 let generate_nonce () = generate_random_hex 16
 let generate_token () = generate_random_hex 32
-
-let generate_code_verifier () =
-  base64url_encode (Mirage_crypto_rng_unix.getrandom 32)
+let generate_code_verifier () = base64url_encode (random_bytes 32)
 
 let code_challenge verifier =
   base64url_encode Digestif.SHA256.(to_raw_string (digest_string verifier))

@@ -151,12 +151,13 @@ let pkce_cases () =
     (Oidc.code_challenge "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk");
   let verifier = Oidc.generate_code_verifier () in
   (check int) "verifier length" 43 (String.length verifier);
-  (check bool) "verifier is url-safe unreserved" true
-    (String.for_all
-       (function
-         | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '-' | '_' | '.' | '~' -> true
-         | _ -> false)
-       verifier)
+  let url_safe = function
+    | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '-' | '_' | '.' | '~' -> true
+    | _ -> false
+  in
+  let all_safe = ref true in
+  String.iter (fun c -> if not (url_safe c) then all_safe := false) verifier;
+  (check bool) "verifier is url-safe unreserved" true !all_safe
 
 let v =
   [

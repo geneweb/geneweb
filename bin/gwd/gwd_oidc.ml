@@ -394,6 +394,10 @@ let handle_mode conf mode =
   and from_addr = conf.from
   and base_file = conf.bname in
   match mode with
+  (* OIDC needs a CSPRNG (/dev/urandom); it is available only on UNIX *)
+  | Some ("OIDC_LOGIN" | "OIDC_CALLBACK" | "OIDC_LOGOUT") when not Sys.unix ->
+      oidc_error_page conf "OIDC is available only on UNIX";
+      true
   | Some "OIDC_LOGIN" ->
       handle_oidc_login conf base_env base_file;
       true
