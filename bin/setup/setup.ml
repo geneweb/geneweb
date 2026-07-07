@@ -202,7 +202,7 @@ let parameters env =
             | "o1" when s <> "" -> comm ^ " -o " ^ s
             | "oc_a" -> loop comm env
             | "oc_b" -> loop comm env
-            | "od" when s <> "" -> loop (comm ^ " " ^ s) env
+            | "od" -> loop comm env
             | "opt" when s <> "" -> loop comm env (* ignore *)
             | "sn_a" -> loop comm env
             | "sn_b" -> loop comm env
@@ -607,8 +607,11 @@ let rec copy_from_stream conf print strm =
                   let bname = strip_spaces (s_getenv conf.env "anon") in
                   let outfile =
                     if bname <> "" then
-                      base_path (slashify_linux_dos bname ^ ".gwb" ^ outfile)
+                      slashify_linux_dos bname ^ ".gwb" ^ outfile
                     else outfile
+                  in
+                  let outfile =
+                    if outfile = "" then "" else base_path outfile
                   in
                   print_specific_file conf print outfile strm
               | 'I' ->
