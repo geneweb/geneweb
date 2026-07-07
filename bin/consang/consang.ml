@@ -37,16 +37,12 @@ let () =
   match !bname with
   | None ->
       Printf.eprintf "Missing file name\n";
-      Printf.eprintf "Use option -help for usage@.";
+      Printf.eprintf "Use option -help for usage\n";
       exit 2
-  | _ ->
-      ();
+  | Some bname ->
       if !verbosity = 0 then Mutil.verbose := false;
-      let bpath =
-        Filename.concat !bases_dir (Option.value ~default:"" !bname)
-      in
-
-      Secure.set_base_dir (Filename.dirname bpath);
+      let bpath = Filename.concat !bases_dir bname in
+      Secure.set_base_dir !bases_dir;
       let lock_file = Mutil.lock_file bpath in
       let on_exn exn bt =
         Logs.err (fun k -> k "%a" Lock.pp_exception (exn, bt));
