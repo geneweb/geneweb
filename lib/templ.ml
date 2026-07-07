@@ -893,9 +893,9 @@ let rec interp_ast :
         let s = squeeze_spaces s in
         print_ast_list env ep (Atext (loc, s) :: al)
     | Ainclude (fname, astl) :: al ->
-        Util.include_begin conf (Adef.safe fname);
+        Util.include_begin conf fname;
         print_ast_list env ep astl;
-        Util.include_end conf (Adef.safe fname);
+        Util.include_end conf fname;
         print_ast_list !m_env ep al
     | [ a ] -> print_ast env ep a
     | a :: al ->
@@ -970,9 +970,9 @@ and print_var print_ast_list conf ifun env ep loc sl =
                     Templ_parser.(
                       included_files := (templ, astl) :: !included_files)
                   in
-                  Util.include_begin conf (Adef.safe fname);
+                  Util.include_begin conf fname;
                   print_ast_list env ep astl;
-                  Util.include_end conf (Adef.safe fname)
+                  Util.include_end conf fname
               | None ->
                   Output.print_sstring conf
                     (Printf.sprintf " %%%s?" (String.concat "." sl)))
