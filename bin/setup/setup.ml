@@ -1552,11 +1552,6 @@ let update_nldb conf ok_file =
   in
   if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
 
-let end_with s x =
-  let slen = String.length s in
-  let xlen = String.length x in
-  slen >= xlen && String.sub s (slen - xlen) xlen = x
-
 let print_typed_file conf typ fname =
   match Statics.read fname with
   | Some content ->
