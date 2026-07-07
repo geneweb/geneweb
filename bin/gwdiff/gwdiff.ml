@@ -12,6 +12,7 @@ module Collection = Geneweb_db.Collection
 let in_file1 = ref ""
 let in_file2 = ref ""
 let html = ref false
+let out_file = ref ""
 let root = ref ""
 let cr = ref ""
 
@@ -556,6 +557,9 @@ let speclist =
           root := s),
       "<root> HTML format used for report" );
     ("-mem", Arg.Set mem, " save memory space, but slower");
+    ( "-o",
+      Arg.String (fun s -> out_file := s),
+      "<file> Redirect the report to this file." );
   ]
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
@@ -578,6 +582,7 @@ let load_base f k =
 
 let main () =
   Arg.parse speclist anon_fun usage_msg;
+  Secure.set_base_dir !bases_dir;
   (match List.rev !anon_args with
   | [ ba; bb ] ->
       in_file1 := ba;
@@ -598,8 +603,14 @@ let main () =
 
   let _ = if not !html then cr := "\n" else cr := "<BR>\n" in
   (* [base1] is the reference base and [base2] is the destination base. *)
-  in_file1 := Filename.concat !bases_dir !in_file1;
-  in_file2 := Filename.concat !bases_dir !in_file2;
+  let resolve f =
+    if Filename.is_relative f then Filename.concat !bases_dir f else f
+  in
+  in_file1 := resolve !in_file1;
+  in_file2 := resolve !in_file2;
+  (if !out_file <> "" then
+     let oc = open_out (resolve !out_file) in
+     Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout);
   load_base !in_file1 @@ fun base1 ->
   load_base !in_file2 @@ fun base2 ->
   (* let iper2 = Driver.person_of_key base2 !p2_fn !p2_sn !p2_occ in *)
