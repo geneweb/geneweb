@@ -281,7 +281,7 @@ let compute_connex base basename =
 
 let usage =
   "usage: " ^ Sys.argv.(0) ^ " [options] <base>\nexample: " ^ Sys.argv.(0)
-  ^ " -a -s -o [-bd]/base.gwb/notes_d/connex.txt base"
+  ^ " -a -s -o base.gwb/notes_d/connex.txt -bd <bases_dir> base"
 
 let speclist =
   [
@@ -313,30 +313,23 @@ let () =
   Arg.parse speclist (fun s -> bname := Some s) usage;
   Secure.set_base_dir !bases_dir;
   (match !output with
-  | Some file when file = "<connex>" ->
-      let file =
-        String.concat Filename.dir_sep
-          [
-            !bases_dir;
-            Option.value ~default:"" !bname ^ ".gwb";
-            "notes_d";
-            "connex.txt";
-          ]
-      in
-      let oc = open_out file in
-      Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
   | Some file ->
+      let file =
+        if Filename.is_relative file then Filename.concat !bases_dir file
+        else file
+      in
       let oc = open_out file in
       Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
   | None -> ());
   let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
-
+  let run () =
+    Driver.with_database bpath (fun base -> compute_connex base bpath)
+  in
   if !ask_for_delete > 0 then
     let lock_file = Mutil.lock_file bpath in
     let on_exn exn bt =
       Format.eprintf "%a@." Lock.pp_exception (exn, bt);
       exit 2
     in
-    Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-    Driver.with_database bpath (fun base -> compute_connex base bpath)
-  else Driver.with_database bpath (fun base -> compute_connex base bpath)
+    Lock.control ~on_exn ~wait:true ~lock_file run
+  else run ()
