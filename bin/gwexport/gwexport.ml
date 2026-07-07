@@ -9,6 +9,10 @@ type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 let bases_dir = ref (Dirs.path Secure.default_base_dir)
 let out_file = ref ""
 
+let resolve_out_file () =
+  if Filename.is_relative !out_file then Filename.concat !bases_dir !out_file
+  else !out_file
+
 type gwexport_opts = {
   asc : int option;
   ascdesc : int option;
@@ -59,7 +63,7 @@ let speclist c =
     ( "-a",
       Arg.Int (fun s -> c := { !c with asc = Some s }),
       "<N> maximum generation of the root's ascendants" );
-    ("-bd", Arg.String (fun s -> bases_dir := s), "Bases folder");
+    ("-bd", Arg.String (fun s -> bases_dir := s), "<dir> bases directory.");
     ( "-ad",
       Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
       "<N> maximum generation of the root's ascendants descendants \
