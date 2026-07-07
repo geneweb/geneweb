@@ -999,25 +999,24 @@ let string_of_access conf access =
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
 
-let include_begin_end_aux (k : Adef.safe_string) conf (fname : Adef.safe_string)
-    =
+let include_begin_end_aux k conf fname =
   if conf.Config.debug then
-    match Filename.extension (fname :> string) with
+    match Filename.extension fname with
     | ".css" | ".js" ->
         Output.print_sstring conf "\n/* ";
-        Output.print_string conf k;
+        Output.print_sstring conf k;
         Output.print_sstring conf " ";
-        Output.print_string conf fname;
+        Output.print_sstring conf (Adef.as_string @@ esc fname);
         Output.print_sstring conf " */\n"
     | _ ->
         Output.print_sstring conf "\n<!-- ";
-        Output.print_string conf k;
+        Output.print_sstring conf k;
         Output.print_sstring conf " ";
-        Output.print_string conf fname;
+        Output.print_sstring conf (Adef.as_string @@ esc fname);
         Output.print_sstring conf " -->\n"
 
-let include_begin = include_begin_end_aux (Adef.safe "begin")
-let include_end = include_begin_end_aux (Adef.safe "end")
+let include_begin = include_begin_end_aux "begin"
+let include_end = include_begin_end_aux "end"
 
 let etc_file_name fname =
   search_in_assets (Filename.concat "etc" (fname ^ ".txt"))
@@ -1052,9 +1051,9 @@ let read_assets_version =
 let include_template conf env fname failure =
   match open_etc_file fname with
   | Some (ic, fname) ->
-      include_begin conf (esc fname);
+      include_begin conf fname;
       copy_from_templ conf env ic;
-      include_end conf (esc fname)
+      include_end conf fname
   | None -> failure ()
 
 let body_prop conf =
