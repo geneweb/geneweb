@@ -197,6 +197,11 @@ let clear_login_cookie conf base_file =
     ~name:(login_cookie_name base_file)
     ~value:"" ~max_age:(Some 0)
 
+let send_redirect conf url =
+  Output.header conf "Location: %s" url;
+  Output.print_sstring conf "";
+  Output.flush conf
+
 let handle_oidc_login conf base_env base_file =
   match (conf_secret conf, read_oidc_config base_env) with
   | "", _ -> oidc_error_page conf "OIDC unavailable: no secret salt configured"
@@ -224,8 +229,7 @@ let handle_oidc_login conf base_env base_file =
           Log.info (fun k -> k "login initiated: base=%s" base_file);
           Output.status conf Code.Moved_Temporarily;
           set_login_cookie conf base_file cookie;
-          Output.header conf "Location: %s" url;
-          Output.flush conf)
+          send_redirect conf url)
 
 let handle_oidc_callback conf base_env from_addr base_file =
   let ( let* ) = Result.bind in
@@ -334,8 +338,7 @@ let handle_oidc_callback conf base_env from_addr base_file =
             from_addr);
       Output.status conf Code.Moved_Temporarily;
       clear_login_cookie conf base_file;
-      Output.header conf "Location: %s" base_url;
-      Output.flush conf
+      send_redirect conf base_url
   | Ok (acc, claim_value, username) ->
       Log.info (fun k ->
           k "login: base=%s user=%s access=%c from=%s" base_file claim_value acc
@@ -350,8 +353,7 @@ let handle_oidc_callback conf base_env from_addr base_file =
       set_cookie conf
         ~name:(session_cookie_name base_file)
         ~value:cookie ~max_age:(Some !Cmd_legacy.login_timeout);
-      Output.header conf "Location: %s" base_url;
-      Output.flush conf
+      send_redirect conf base_url
 
 let request_is_post request = Mutil.extract_param "GET " ' ' request = ""
 
@@ -362,8 +364,7 @@ let handle_oidc_logout conf base_env _from_addr base_file =
   (* logout must be POST so a cross-site GET cannot trigger it (CSRF) *)
   if not (request_is_post conf.request) then begin
     Output.status conf Code.Moved_Temporarily;
-    Output.header conf "Location: %s" base_url;
-    Output.flush conf
+    send_redirect conf base_url
   end
   else begin
     Log.info (fun k -> k "logout: base=%s" base_file);
@@ -385,8 +386,7 @@ let handle_oidc_logout conf base_env _from_addr base_file =
     set_cookie conf
       ~name:(session_cookie_name base_file)
       ~value:"" ~max_age:(Some 0);
-    Output.header conf "Location: %s" logout_target;
-    Output.flush conf
+    send_redirect conf logout_target
   end
 
 let handle_mode conf mode =

@@ -848,11 +848,17 @@ let basic_authorization from_addr request base_env passwd access_type utm
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
+  let oidc_configured =
+    match List.assoc_opt "oidc_provider_url" base_env with
+    | Some url -> url <> ""
+    | None -> false
+  in
   let ok, wizard, friend, username =
     if (not !Server.cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
-        if wizard_passwd = "" && wizard_passwd_file = "" then
-          (true, true, friend_passwd = "", "")
+        if
+          (not oidc_configured) && wizard_passwd = "" && wizard_passwd_file = ""
+        then (true, true, friend_passwd = "", "")
         else
           match
             basic_match_auth wizard_passwd wizard_passwd_file uauth base_file
@@ -860,8 +866,9 @@ let basic_authorization from_addr request base_env passwd access_type utm
           | Some username -> (true, true, false, username)
           | None -> (false, false, false, "")
       else if passwd = "f" then
-        if friend_passwd = "" && friend_passwd_file = "" then
-          (true, false, true, "")
+        if
+          (not oidc_configured) && friend_passwd = "" && friend_passwd_file = ""
+        then (true, false, true, "")
         else
           match
             basic_match_auth friend_passwd friend_passwd_file uauth base_file
@@ -869,16 +876,19 @@ let basic_authorization from_addr request base_env passwd access_type utm
           | Some username -> (true, false, true, username)
           | None -> (false, false, false, "")
       else assert false
-    else if wizard_passwd = "" && wizard_passwd_file = "" then
-      (true, true, friend_passwd = "", "")
+    else if
+      (not oidc_configured) && wizard_passwd = "" && wizard_passwd_file = ""
+    then (true, true, friend_passwd = "", "")
     else
       match
         basic_match_auth wizard_passwd wizard_passwd_file uauth base_file
       with
       | Some username -> (true, true, false, username)
       | _ -> (
-          if friend_passwd = "" && friend_passwd_file = "" then
-            (true, false, true, "")
+          if
+            (not oidc_configured) && friend_passwd = ""
+            && friend_passwd_file = ""
+          then (true, false, true, "")
           else
             match
               basic_match_auth friend_passwd friend_passwd_file uauth base_file
@@ -1264,15 +1274,15 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
     (command, bname, passwd, env, access_type)
   in
 
-  let access_type =
+  let oidc_session, access_type =
     match access_type with
     | ATnone -> (
         match Gwd_oidc.cookie_access ~secret:secret_salt request base_file with
         | Some (acc, user, username) ->
-            if acc = 'w' then ATwizard (user, username)
-            else ATfriend (user, username)
-        | None -> ATnone)
-    | _ -> access_type
+            if acc = 'w' then (true, ATwizard (user, username))
+            else (true, ATfriend (user, username))
+        | None -> (false, ATnone))
+    | _ -> (false, access_type)
   in
   let lang, env = extract_assoc "lang" env in
   let lang = if lang = "" then http_preferred_language request else lang in
@@ -1360,6 +1370,7 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
       debug = !debug;
       query_start = Unix.gettimeofday ();
       friend = ar.ar_friend || (wizard_just_friend && ar.ar_wizard);
+      oidc = oidc_session;
       semi_public =
         (try List.assoc "semi_public" base_env = "yes" with Not_found -> false);
       just_friend_wizard = ar.ar_wizard && wizard_just_friend;
