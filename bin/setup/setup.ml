@@ -351,10 +351,8 @@ let get_binding strm =
   in
   loop 0
 
-let ( // ) = Filename.concat
-
 let variables bname =
-  let fname = "lang" // bname in
+  let fname = "lang/" ^ bname in
   let content = Option.get @@ Statics.read fname in
   let strm = Stream.of_string content in
   let vlist, flist =
@@ -522,24 +520,25 @@ let rec copy_from_stream conf print strm =
                 conf.env
           | 'f' ->
               (* see r *)
-              let in_file = get_variable strm |> slashify_linux_dos in
+              let in_file = get_variable strm in
               let s =
                 match Statics.read in_file with
+                | Some content -> content
                 | None -> (
                     let fname =
                       if Filename.is_relative in_file then
                         !setup_dir // "setup" // in_file
                       else in_file
                     in
-                    match Secure.open_in fname with
+                    let fname = slashify_linux_dos fname in
+                    match open_in fname with
                     | exception Sys_error _ ->
                         Printf.sprintf "File %s absent" fname
                     | ic ->
-                        let n = in_channel_length ic in
-                        let s = really_input_string ic n in
-                        close_in ic;
-                        s)
-                | Some content -> content
+                        Fun.protect
+                          ~finally:(fun () -> close_in ic)
+                          (fun () ->
+                            really_input_string ic (in_channel_length ic)))
               in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
               GWPARAM.test_reorg in_base;
@@ -849,15 +848,20 @@ and for_all conf print list strm =
   | _ -> ()
 
 let print_file conf bname =
-  let fname = "lang" // bname in
-  let content = Option.get @@ Statics.read fname in
-  Output.status printer_conf Code.OK;
-  Output.header printer_conf "Content-type: text/html; charset=%s"
-    (charset conf);
-  copy_from_stream conf
-    (Output.print_sstring printer_conf)
-    (Stream.of_string content);
-  trailer conf
+  match Statics.read ("lang/" ^ bname) with
+  | Some content ->
+      Output.status printer_conf Code.OK;
+      Output.header printer_conf "Content-type: text/html; charset=%s"
+        (charset conf);
+      copy_from_stream conf
+        (Output.print_sstring printer_conf)
+        (Stream.of_string content);
+      trailer conf
+  | None ->
+      let title _ = Output.print_sstring printer_conf "Error" in
+      header conf title;
+      Output.printf printer_conf "<ul><li>Unknown page \"%s\".</ul>\n" bname;
+      trailer conf
 
 let error conf str =
   header conf (fun _ -> Output.print_sstring printer_conf "Incorrect request");
@@ -1637,10 +1641,6 @@ let setup_comm conf comm =
 
 let lindex s c = String.index_opt s c
 
-(** Per-process lexicon cache: avoids re-reading the file on every request. *)
-let lexicon_cache : (string, (string, string) Hashtbl.t) Hashtbl.t =
-  Hashtbl.create 8
-
 (* FIXME: This module mimics the in_channel behavior for strings to avoid
    rewriting the input_lexicon parser. We must rewrite it in another PR. *)
 module Fake_in_channel : sig
@@ -1667,7 +1667,7 @@ end
 let input_lexicon lang =
   let open Fake_in_channel in
   let t = Hashtbl.create 501 in
-  match Statics.read ("lang" // "lexicon.txt") with
+  match Statics.read "lang/lexicon.txt" with
   | None -> t
   | Some content -> (
       let derived_lang =
@@ -1846,7 +1846,7 @@ let intro () =
       let lang =
         if String.length x >= 2 then String.sub x 0 2 else default_setup_lang
       in
-      copy_text lang (Filename.concat "lang" "intro.txt");
+      copy_text lang "lang/intro.txt";
       lang
     end
   in
