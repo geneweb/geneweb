@@ -181,6 +181,7 @@ let parameters env =
                 loop (comm ^ " " ^ !bname) env
             | "anon_a" when s <> "" -> loop (comm ^ " " ^ s) env
             | "anon_b" when s <> "" -> loop (comm ^ " " ^ s) env
+            | "bd" -> loop comm env
             | "a" when s <> "" && s <> "on" -> loop (comm ^ " -d " ^ s) env
             | "d" when s <> "" && s <> "on" -> loop (comm ^ " -d " ^ s) env
             | "fn_a" -> loop comm env
