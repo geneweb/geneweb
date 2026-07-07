@@ -92,10 +92,10 @@ let trailer _conf =
     {|<img src="images/logo_bas.png" style="border:0"></a>|};
   Output.print_sstring printer_conf {| Version |};
   Output.print_sstring printer_conf Version.ver;
-  Output.print_sstring printer_conf {|, commit |};
+  Output.print_sstring printer_conf {| commit |};
   Output.print_sstring printer_conf Version.commit_id;
   Output.print_sstring printer_conf
-    "; Copyright &copy; 1998-2025</em></div></div></body></html>"
+    "–  Copyright &copy;INRIA 1998-2006</em></div></div></body></html>"
 
 let header conf title =
   header_no_page_title conf title;
