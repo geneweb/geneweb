@@ -582,11 +582,7 @@ let rec copy_from_stream conf print strm =
           | 'z' -> print (string_of_int !port)
           | ('A' .. 'Z' | '0' .. '9') as c -> (
               match c with
-              | 'A' ->
-                  (* if %o <> "" then %o else %a *)
-                  let o = strip_spaces (s_getenv conf.env "o") in
-                  let a = strip_spaces (s_getenv conf.env "anon") in
-                  print (if o <> "" then o else a)
+              | 'A' -> print (macro conf 'A')
               | 'C' | 'E' -> (
                   let k, v = get_binding strm in
                   match p_getenv conf.env k with
@@ -1642,8 +1638,6 @@ let setup_comm conf comm =
       setup_gen { conf with env = [ ("lang", conf.lang); ("v", "main.htm") ] }
   | None -> setup_comm_ok conf comm
 
-let lindex s c = String.index_opt s c
-
 (* FIXME: This module mimics the in_channel behavior for strings to avoid
    rewriting the input_lexicon parser. We must rewrite it in another PR. *)
 module Fake_in_channel : sig
@@ -1674,7 +1668,9 @@ let input_lexicon lang =
   | None -> t
   | Some content -> (
       let derived_lang =
-        match lindex lang '-' with Some i -> String.sub lang 0 i | _ -> ""
+        match String.index_opt lang '-' with
+        | Some i -> String.sub lang 0 i
+        | _ -> ""
       in
       let ic = in_channel_of_string content in
       try
@@ -1691,7 +1687,7 @@ let input_lexicon lang =
              in
              let k = String.sub k 4 (String.length k - 4) in
              let rec loop line =
-               match lindex line ':' with
+               match String.index_opt line ':' with
                | Some i ->
                    let line_lang = String.sub line 0 i in
                    (if

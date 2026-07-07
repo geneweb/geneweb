@@ -257,13 +257,12 @@ let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 let main () =
   Arg.parse speclist anonfun usage;
   Secure.set_base_dir !bases_dir;
-  let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
   match !bname with
   | None ->
       Arg.usage speclist usage;
       exit 2
-  | _ ->
-      ();
+  | Some bname ->
+      let bpath = Filename.concat !bases_dir bname in
       let lock_file = Mutil.lock_file bpath in
       let on_exn exn bt =
         Format.eprintf "%a@." Lock.pp_exception (exn, bt);
