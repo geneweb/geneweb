@@ -364,33 +364,25 @@ let variables bname =
           let vlist, flist =
             let (strm : _ Stream.t) = strm in
             match Stream.peek strm with
-            | Some '%' ->
+            | Some ('E' | 'C') ->
                 Stream.junk strm;
-                let vlist, flist =
-                  let (strm : _ Stream.t) = strm in
-                  match Stream.peek strm with
-                  | Some ('E' | 'C') ->
-                      Stream.junk strm;
-                      let v, _ = get_binding strm in
-                      if not (List.mem v vlist) then (v :: vlist, flist)
-                      else (vlist, flist)
-                  | Some 'V' ->
-                      Stream.junk strm;
-                      let v = get_variable strm in
-                      if not (List.mem v vlist) then (v :: vlist, flist)
-                      else (vlist, flist)
-                  | Some 'F' ->
-                      Stream.junk strm;
-                      let v = get_variable strm in
-                      if not (List.mem v flist) then (vlist, v :: flist)
-                      else (vlist, flist)
-                  | _ -> (vlist, flist)
-                in
-                loop (vlist, flist)
+                let v, _ = get_binding strm in
+                if not (List.mem v vlist) then (v :: vlist, flist)
+                else (vlist, flist)
+            | Some 'V' ->
+                Stream.junk strm;
+                let v = get_variable strm in
+                if not (List.mem v vlist) then (v :: vlist, flist)
+                else (vlist, flist)
+            | Some 'F' ->
+                Stream.junk strm;
+                let v = get_variable strm in
+                if not (List.mem v flist) then (vlist, v :: flist)
+                else (vlist, flist)
             | Some _ ->
                 Stream.junk strm;
-                loop (vlist, flist)
-            | _ -> (vlist, flist)
+                (vlist, flist)
+            | None -> (vlist, flist)
           in
           loop (vlist, flist)
       | Some _ ->
