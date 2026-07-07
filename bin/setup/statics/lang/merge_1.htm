@@ -58,5 +58,5 @@ of seconds or some minutes, depending on the cases. Be patient.
 <p>
 [For information, this operation corresponds to the following commands][:]
 <pre>
-%s{     $ %x%/gwu -bd %w %a -o %a.gw|}     $ %x%/gwc -bd %w %s{-sep %a.gw |}\-f -o %o
+%s{     $ %x%/gwu %a -o&lt;tmpdir&gt;/gwsetup_%a.gw -bd %w > comm.log 2>&1|}     $ %x%/gwc %s{-sep &lt;tmpdir&gt;/gwsetup_%a.gw |}\-f -o %o -bd %w > comm.log 2>&1
 </pre>

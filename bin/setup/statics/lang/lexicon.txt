@@ -467,12 +467,24 @@ it: Permette di configurare i colori di fondo, o di inserire un motivo e di camb
 lv: Ar ðo Jûs variet mainît fonu, fona krâsu un arî norâþu krâsu. Ðî parametra sintakse atbilst HTML sintaksei pie "&lt;body&gt;" pirms ">". Skatiet HTML dokumentâciju. Piemçram:
 sv: Gör det möjligt att ändra bakgrunds färgen, att sätta in ett bakgrunds mönster eller att ändra färgen för texten eller länkarna. Syntaxen är den samma som HTML accepterar i taggen "&lt;body&gt;" före ">". Se din HTML dokumentation. Exempel:
 
+    Content of gwsetup.log
+aa: gwsetup.htm
+de: Inhalt der Datei gwsetup.log
+en: Content of gwsetup.log
+fr: Contenu du fichier gwsetup.log
+
     And the content of gwsetup.log
 aa: bsi_err.htm
 co: È u cuntenutu di gwsetup.log
 de: Und der Inhalt von gwsetup.log
 en: And the content of gwsetup.log
 fr: Et le contenu de gwsetup.log
+
+    Command was:
+aa: gwdiff_ok.htm
+de: Der Befehl war:
+en: Command was:
+fr: La commande était :
 
     Application of "%d"
 aa: bsc.htm
@@ -3716,14 +3728,14 @@ it: Sotto <b>Linux</b>, se avete installato %G partendo da un pacchetto rpm, il 
 lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
 sv: Under Linux, om du installerade %G som ett rpm paket, har servicen startat automatiskt. Om du har stoppat den och vill återstarta den, logga in som root och skriv
 
-    Under MSdos
+    Under Windows
 aa: cleanup1.htm
-co: Sottu MSdos
-de: Unter MSdos
-en: Under MSdos
-fi: MS-DOS:ssa
-fr: Sous MSdos
-it: Sotto MSdos
+co: Sottu Windows
+de: Unter Windows
+en: Under Windows
+fi: Windows:ssa
+fr: Sous Windows
+it: Sotto Windows
 
     Under Unix
 aa: cleanup1.htm
