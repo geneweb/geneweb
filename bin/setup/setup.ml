@@ -403,7 +403,12 @@ let nth_field s n =
   loop 0 0
 
 let file_contents fname =
-  match Statics.read fname with None -> "" | Some c -> c
+  match open_in fname with
+  | exception Sys_error _ -> ""
+  | ic ->
+      Fun.protect
+        ~finally:(fun () -> close_in ic)
+        (fun () -> really_input_string ic (in_channel_length ic))
 
 let cut_at_equal s =
   match String.index_opt s '=' with
@@ -1471,7 +1476,7 @@ let gwf conf =
       if !GWPARAM.reorg then
         Filename.concat (!GWPARAM.lang_d in_base "") (in_base ^ ".trl")
       else
-        Filename.concat "lang" (in_base ^ ".trl")
+        Filename.concat (Filename.concat !bases_dir "lang") (in_base ^ ".trl")
         |> file_contents |> Util.escape_html
         |> fun s -> (s :> string)
     in
