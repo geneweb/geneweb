@@ -568,10 +568,12 @@ let rec copy_from_stream conf print strm =
                     print "\">\n"))
                 conf.env
           | 'j' -> print_selector conf print
-          | 'k' -> for_all conf print
-              (List.filter_map
-                 (fun (k, _) -> if k = "lang" then None else Some k)
-                 conf.env) strm
+          | 'k' ->
+              for_all conf print
+                (List.filter_map
+                   (fun (k, _) -> if k = "lang" then None else Some k)
+                   conf.env)
+                strm
           | 'l' -> print conf.lang
           | 'r' ->
               print_specific_file conf print
@@ -1411,7 +1413,7 @@ let gwf_1 conf =
 
   let trl_dir = !GWPARAM.etc_d in_base in
   let trl_file = Filename.concat trl_dir "trl.txt" in
-  Printf.eprintf "Trl_dir: %s, trl file: %s\n" trl_dir trl_file; flush stderr;
+  if trl_dir = "" then failwith "trl_dir est vide (etc_d absent ?)";
   (try Unix.mkdir trl_dir 0o755 with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
   (try
      if trl = "" then Sys.remove trl_file
