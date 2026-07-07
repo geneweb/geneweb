@@ -1,15 +1,12 @@
 open GwuLib
 module Driver = Geneweb_db.Driver
-module Dirs = Geneweb_dirs
 
 let isolated = ref false
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
 
 let speclist opts =
   ( "-odir",
     Arg.String (fun s -> GwuLib.out_dir := s),
     "<dir> create files from original name in directory (else on -o file)" )
-  :: ("-bd", Arg.String (fun s -> bases_dir := s), " defines bases folder")
   :: ( "-isolated",
        Arg.Set isolated,
        " export isolated persons (work only if export all database)." )
@@ -50,31 +47,27 @@ let anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 
 let () =
-  flush stderr;
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
-  Printf.eprintf "Start gwu, out_file: %s, bname: %s\n" !Gwexport.out_file
-    (Option.value ~default:"" !bname);
-  let oc, name, close =
-    if !Gwexport.out_file = "" then
-      let bname = Option.value ~default:"" !bname in
-      let path = Filename.concat !bases_dir (bname ^ ".gw") in
-      let oc = open_out path in
-      (oc, bname, fun () -> close_out oc)
-    else
-      let path = !Gwexport.out_file in
-      let oc = open_out path in
-      (oc, !Gwexport.out_file, fun () -> close_out oc)
-  in
-  opts := { !opts with oc = (name, output_string oc, close) };
-  let opts = !opts in
-  Secure.set_base_dir !bases_dir;
+  let bases_dir = !Gwexport.bases_dir in
+  Secure.set_base_dir bases_dir;
   match !bname with
-  | None -> raise @@ Arg.Bad "Expect a database"
+  | None ->
+      Arg.usage (speclist opts) Gwexport.errmsg;
+      exit 2
   | Some bname ->
-      Printf.eprintf "S_dir: %s, B_dir: %s, bname: %s\n" (Secure.base_dir ())
-        !bases_dir bname;
-      Driver.with_database bname @@ fun base ->
+      let name =
+        if !Gwexport.out_file = "" then Filename.concat bases_dir (bname ^ ".gw")
+        else Gwexport.resolve_out_file ()
+      in
+      let oc = open_out name in
+      opts :=
+        {
+          !opts with
+          Gwexport.oc = (name, output_string oc, fun () -> close_out oc);
+        };
+      let opts = !opts in
+      Driver.with_database (Filename.concat bases_dir bname) @@ fun base ->
       let select = Gwexport.select base opts [] in
       let src_oc_ht = Hashtbl.create 1009 in
       Driver.load_ascends_array base;
