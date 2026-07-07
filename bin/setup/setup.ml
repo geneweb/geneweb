@@ -1354,6 +1354,7 @@ let merge_1 conf =
   else print_file conf "create_ok.htm"
 
 let gwf conf =
+  GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
@@ -1372,6 +1373,7 @@ let gwf conf =
     print_file conf "gwf_1.htm"
 
 let gwf_1 conf =
+  GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
@@ -1409,7 +1411,7 @@ let gwf_1 conf =
 
   let trl_dir = !GWPARAM.etc_d in_base in
   let trl_file = Filename.concat trl_dir "trl.txt" in
-  Printf.eprintf "Trl file: %s\n" trl_file; flush stderr;
+  Printf.eprintf "Trl_dir: %s, trl file: %s\n" trl_dir trl_file; flush stderr;
   (try Unix.mkdir trl_dir 0o755 with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
   (try
      if trl = "" then Sys.remove trl_file
