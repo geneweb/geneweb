@@ -27,7 +27,7 @@ init() {
 	if [ ! -f ${GENEWEB_DB_PATH}.gwf ] || [ ! -d ${GENEWEB_DB_PATH}.gwb ]; then
 		gwlaunch_log "Database ${GENEWEB_DB} not found, creating empty database..."
 		cd ${GENEWEB_HOME}/share/data || exit 1
-		${GENEWEB_HOME}/share/dist/gw/gwc -f -o ${GENEWEB_DB} > /tmp/comm.log 2>&1
+		${GENEWEB_HOME}/share/dist/gw/gwc -f -o ${GENEWEB_DB} > comm.log 2>&1
 		cp ${GENEWEB_HOME}/share/dist/gw/a.gwf ${GENEWEB_DB_PATH}.gwf
 		set_db_config "wizard_passwd_file" "wizard_passwd"
 		echo "${GENEWEB_ADMIN}:${GENEWEB_ADMIN_PASS}" >> ${GENEWEB_HOME}/share/data/wizard_passwd
