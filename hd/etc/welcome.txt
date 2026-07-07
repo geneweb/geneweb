@@ -15,6 +15,7 @@
 <div class="container" id="welcome">
 %include;hed
 %define;book_of(xx)[book of %s:::xx]%end;
+%define;connect_with(xx)[*connect with %s:::xx]%end;
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%end;
 %apply;dl("fnames")
 %apply;dl("snames")
@@ -126,8 +127,7 @@
         <a href="%prefix;m=OIDC_LOGIN" role="button"
            class="btn btn-sm btn-outline-info text-nowrap mt-1 w-100">
           <i class="fas fa-right-to-bracket me-2" aria-hidden="true"></i>%nn;
-          [*connect with]%sp;%nn;
-          %if;(b.oidc_provider_name!="")%bvar.oidc_provider_name;%else;SSO%end;</a>
+          %apply;connect_with%with;%if;(b.oidc_provider_name!="")%bvar.oidc_provider_name;%else;SSO%end;%end;</a>
       %end;
       %let;username;%if;(user.name="")%user.ident;%else;%user.name;%end;%in;
       %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!="" or oidc))
