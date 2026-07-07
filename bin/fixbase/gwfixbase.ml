@@ -224,21 +224,29 @@ let speclist =
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
     ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
-    ("-families-parents", Arg.Set f_parents, " missing doc");
-    ("-families-children", Arg.Set f_children, " missing doc");
-    ("-persons-NBDS", Arg.Set p_parents, " missing doc");
-    ("-persons-parents", Arg.Set p_parents, " missing doc");
-    ("-persons-families", Arg.Set p_families, " missing doc");
-    ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc");
-    ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
-    ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
-    ("-person-key", Arg.Set key, " missing doc");
+    ("-families-parents", Arg.Set f_parents, " fix families’ parents links");
+    ("-families-children", Arg.Set f_children, " fix families’ children links");
+    ( "-persons-NBDS",
+      Arg.Set p_NBDS,
+      " fix persons' birth, baptism, death and burial events" );
+    ("-persons-parents", Arg.Set p_parents, " fix persons’ parents links");
+    ("-persons-families", Arg.Set p_families, " fix persons’ families links");
+    ( "-pevents-witnesses",
+      Arg.Set pevents_witnesses,
+      " fix witnesses of personal events" );
+    ( "-fevents-witnesses",
+      Arg.Set fevents_witnesses,
+      " fix witnesses of family events" );
+    ( "-marriage-divorce",
+      Arg.Set marriage_divorce,
+      " fix marriage and divorce events" );
+    ("-person-key", Arg.Set key, " fix duplicate person keys");
     ("-dump", Arg.Set dump, " dump list of persons");
     ("-o", Arg.String (fun x -> ofile := x), " dump list of persons in ofile");
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enabled by any other option." );
-    ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
+    ("-invalid-utf8", Arg.Set invalid_utf8, " fix invalid UTF-8 sequences");
   ]
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
