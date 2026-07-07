@@ -37,7 +37,7 @@ assigns the current IP address to evar.anon and the content of the only.txt file
 <tr><td>  &#37;h </td><td> %h </td><td> print &#60;input type=hidden name=var value=val> for each env variables </td></tr>
 <tr><td>  &#37;i </td><td> %i </td><td> print evar.i </td></tr>
 <tr><td>  &#37;j </td><td> %j </td><td> print file selector </td></tr>
-<tr><td>  &#37;k{&lt;li&gt;%a&lt;/li&gt;|no var} </td><td> %k{<li>%a</li>|no var} </td><td> print env variables (appear as &#37;a) </td></tr>
+<tr><td>  &#37;k{&lt;li&gt;%a&lt;/li&gt;|no var} </td><td> %k{<li>%a</li>|no var} </td><td> print env variables names (appear as &#37;a) </td></tr>
 <tr><td>  &#37;l </td><td> %l </td><td> print evar.lang </td></tr>
 <tr><td>  &#37;m </td><td> %m </td><td> print server name </td></tr>
 <tr><td>  &#37;n </td><td> %n </td><td> print referer url</td></tr>
@@ -45,7 +45,7 @@ assigns the current IP address to evar.anon and the content of the only.txt file
 <tr><td>  &#37;p </td><td> %p </td><td> print url variables as -var value (conf.env) </td></tr>
 <tr><td>  &#37;q </td><td> %q </td><td> print Version.txt </td></tr>
 <tr><td>  &#37;r{..} </td><td> %r{..} </td><td> print gwd.arg or content of {..} if does not exist </td></tr>
-<tr><td>  &#37;s{ &#37;a |} </td><td> %s{ %a |xxx} </td><td> for each env variable (&#37;a) whose value is on_ print the content of {...| </td></tr>
+<tr><td>  &#37;s{ &#37;a |} </td><td> %s{ %a |} </td><td> for each env variable (&#37;a) whose value is on_ print the content of {...| </td></tr>
 <tr><td>  &#37;t{...} </td><td> %t{.exe} </td><td> print content of {} if not Unix (i.e. {.exe})</td></tr>
 <tr><td>  &#37;u </td><td> %u </td><td> print setup dir </td></tr>
 <tr><td>  &#37;v </td><td> %v{Test exists (env.var o)} </td><td> print content of {...} if env.var o (without extension!) points to an existing base (Test) </td></tr>

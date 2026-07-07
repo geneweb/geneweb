@@ -140,11 +140,31 @@ it: I possessori di password "Wizard" possono in più effettuare delle modifiche
 lv: "Burvji" var veikt arî izmaiòas datu bâzç.
 sv: "Wizards" kan göra modifieringar i databasen.
 
+    check this box if creating a config file in reorg mode
+aa: gwf1.htm
+en: Check this box if creating a config file in reorg mode
+fr: Cocher cette case si vous êtes en mode Reorg
+
+    Reorg mode
+aa: gwf1.htm
+en: Reorg mode
+fr: Mode Reorg
+
+    Configure
+aa: welcome.htm
+en: Configure
+fr: Configurer
+
     build cache files
 aa: welcome.htm
-co: Creà i schedarii di cache per u riempimentu autumaticu è checkdata
-en: Build cache files for auto completion and checkdata
-fr: Créer les fichiers de cache pour l’autocomplétion et checkdata
+co: Creà cache per u riempimentu autumaticu/checkdata
+en: Build cache files for auto completion/checkdata
+fr: Créer les caches pour autocomplétion/checkdata
+
+    No redirection (results on terminal only).
+aa: connex.htm
+en: No redirection (results on terminal only).
+fr: Pas de redirection (en mode treminal seulement).
 
     extract isolated persons
 aa: gwu.htm
@@ -365,33 +385,24 @@ lv: :
 nl: :
 sv: :
 
-    <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
-aa: bsi_connex.htm
-co: <span style="color:#FF0000;">AVERTIMENTU</span> : a cumanda -del squasseghja certe famiglie di manera irriversibile. Forse seria una bella idea d’avè un archiviu di salvaguardia.
-de: <span style="color:#FF0000;">ACHTUNG</span>: der -del Befehl unterdrückt unwiderruflich einige Familien. Ein Backup Archiv wird empfohlen.
-en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
-fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d’avoir une archive de sauvegarde.
-
-    <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
+    WARNING: The content of file %o will be overwritten.
 aa: bsi.htm
 co: <span style="color:#FF0000;">AVERTIMENTU</span> : U cuntenutu di u schedariu %o serà rimpiazzatu.
 de: <span style="color:#FF0000;">ACHTUNG</span>: Der Inhalt der Datei %o wird überschrieben.
 en: <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
 fr: <span style="color:#FF0000;">ATTENTION</span> : le contenu du fichier %o sera écrasé.
 
-    <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
+    WARNING: The following three options result in irreversible deletions. Having a backup archive is recommended.
 aa: connex.htm
 co: <span style="color:#FF0000;">AVERTIMENTU</span> : E trè cumande chì seguitanu ponu squassà parechje famiglie di manera irriversibile. Avè un archiviu di salvaguardia hè ricumandatu.
 de: <span style="color:#FF0000;">ACHTUNG</span>: Die folgenden drei Optionen führen zu unwiderruflichen Löschungen. Ein Backup Archiv wird empfohlen.
 en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
 fr: <span style="color:#FF0000;">ATTENTION</span> : les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
 
-    <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
-aa: bsi_fix.htm
-co: <span style="color:#FF0000;">AVERTIMENTU</span> : sta cumanda mudificheghja a basa di manera irriversibile. Forse seria una bella idea d’avè un archiviu di salvaguardia.
-de: <span style="color:#FF0000;">ACHTUNG</span>: dieser Befehl verändert die base unwiderruflich. Ein Backup Archiv wird empfohlen.
-en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
-fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d’avoir une archive de sauvegarde.
+    WARNING: some commands suppresses irreversibly some data. It may be prudent to have a backup archive.
+aa: confirm.htm
+en: <span style="color:#FF0000;">WARNING</span>: some commands suppresses irreversibly some data. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span>: certaines commandes peuvent modifier la base. Disposer d'une archive de sauvegarde est prudent.
 
     a GEDCOM source file
 aa: welcome.htm

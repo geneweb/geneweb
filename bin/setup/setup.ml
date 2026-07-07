@@ -568,7 +568,10 @@ let rec copy_from_stream conf print strm =
                     print "\">\n"))
                 conf.env
           | 'j' -> print_selector conf print
-          | 'k' -> for_all conf print (fst (List.split conf.env)) strm
+          | 'k' -> for_all conf print
+              (List.filter_map
+                 (fun (k, _) -> if k = "lang" then None else Some k)
+                 conf.env) strm
           | 'l' -> print conf.lang
           | 'r' ->
               print_specific_file conf print
@@ -1120,122 +1123,6 @@ let has_gwu dir =
         (Sys.readdir dir)
   with _ -> false
 
-(* the recovery process is broken (and not offered on the welcome page) *)
-let recover conf =
-  let init_dir =
-    match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
-  in
-  let init_dir, dir_has_gwu =
-    if has_gwu init_dir then (init_dir, true)
-    else
-      let dir = Filename.dirname init_dir in
-      if has_gwu dir then (dir, true)
-      else
-        let dir = Filename.concat dir "gw" in
-        if has_gwu dir then (dir, true) else (init_dir, false)
-  in
-  let conf = conf_with_env conf "anon" init_dir in
-  let dest_dir = !bases_dir in
-  if init_dir = "" then print_file conf "err_miss.htm"
-  else if init_dir = dest_dir then print_file conf "err_smdr.htm"
-  else if not (Sys.file_exists init_dir) then print_file conf "err_ndir.htm"
-  else if
-    Sys.unix
-    &&
-      try
-        (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino
-        = (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
-      with Unix.Unix_error (_, _, _) -> false
-  then print_file conf "err_smdr.htm"
-  else if not dir_has_gwu then print_file conf "err_ngw.htm"
-  else print_file conf "recover1.htm"
-
-(* old_to_src/src_to_new are gwu/gwc or gwb2ged/ged2gwb *)
-let recover_1 conf =
-  let in_file =
-    match p_getenv conf.env "i" with Some f -> strip_spaces f | None -> ""
-  in
-  let out_file =
-    match p_getenv conf.env "o" with Some f -> strip_spaces f | None -> ""
-  in
-  let by_gedcom =
-    match p_getenv conf.env "ged" with Some "on" -> true | _ -> false
-  in
-  let out_file = if out_file = "" then in_file else out_file in
-  let conf = conf_with_env conf "o" out_file in
-  if in_file = "" then print_file conf "err_miss.htm"
-  else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
-  else
-    let old_to_src, o_opt, tmp, src_to_new =
-      if not by_gedcom then ("gwu", " > ", "tmp.gw", "gwc")
-      else ("gwb2ged", " -o ", "tmp.ged", "ged2gwb")
-    in
-    let conf =
-      {
-        conf with
-        env =
-          ("U", old_to_src) :: ("O", o_opt) :: ("T", tmp)
-          :: ("src2new", src_to_new) :: conf.env;
-      }
-    in
-    print_file conf "recover2.htm"
-
-let recover_2 conf =
-  let init_dir =
-    match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
-  in
-  let in_file =
-    match p_getenv conf.env "i" with Some f -> strip_spaces f | None -> ""
-  in
-  let out_file =
-    match p_getenv conf.env "o" with Some f -> strip_spaces f | None -> ""
-  in
-  let by_gedcom =
-    match p_getenv conf.env "ged" with Some "on" -> true | _ -> false
-  in
-  let old_to_src, o_opt, tmp, src_to_new =
-    if not by_gedcom then ("gwu", " > ", "tmp.gw", "gwc")
-    else ("gwb2ged", " -o ", "tmp.ged", "ged2gwb")
-  in
-  let out_file = if out_file = "" then in_file else out_file in
-  let conf = conf_with_env conf "o" out_file in
-  let dir = Sys.getcwd () in
-  let rc =
-    try
-      Printf.eprintf "$ cd \"%s\"\n" init_dir;
-      flush stderr;
-      Sys.chdir init_dir;
-      let c =
-        Printf.sprintf "%s %s %s%s"
-          (Filename.concat "." old_to_src)
-          in_file o_opt
-          (stringify (Filename.concat dir tmp))
-      in
-      Printf.eprintf "$ %s\n" c;
-      flush stderr;
-      Sys.command c
-    with e ->
-      Sys.chdir dir;
-      raise e
-  in
-  let rc =
-    if rc = 0 then (
-      Printf.eprintf "$ cd \"%s\"\n" dir;
-      flush stderr;
-      Sys.chdir dir;
-      let comm =
-        Filename.concat !bin_dir src_to_new
-        ^ " " ^ tmp ^ " -f -o " ^ stringify out_file
-      in
-      let rc = exec_f conf comm in
-      rc)
-    else rc
-  in
-  if rc > 1 then (
-    Sys.chdir dir;
-    print_file conf "err_recover.htm")
-  else print_file conf "create_ok.htm"
-
 let cleanup conf =
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
@@ -1522,6 +1409,7 @@ let gwf_1 conf =
 
   let trl_dir = !GWPARAM.etc_d in_base in
   let trl_file = Filename.concat trl_dir "trl.txt" in
+  Printf.eprintf "Trl file: %s\n" trl_file; flush stderr;
   (try Unix.mkdir trl_dir 0o755 with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
   (try
      if trl = "" then Sys.remove trl_file
@@ -1593,9 +1481,6 @@ let with_opt_check check_fn run_fn conf =
 let setup_comm_ok conf = function
   | "gwsetup" -> setup_gen conf
   | "simple" -> simple conf
-  | "recover" -> recover conf
-  | "recover_1" -> recover_1 conf
-  | "recover_2" -> recover_2 conf
   | "cleanup" -> cleanup conf
   | "cleanup_1" -> cleanup_1 conf
   | "rename" -> rename conf
