@@ -1142,15 +1142,6 @@ let check_anon_base conf =
 let consang_check = check_anon_base
 let update_nldb_check = check_anon_base
 
-let has_gwu dir =
-  try
-    if Sys.unix then Array.mem "gwu" (Sys.readdir dir)
-    else
-      Array.exists
-        (fun s -> String.lowercase_ascii s = "gwu.exe")
-        (Sys.readdir dir)
-  with _ -> false
-
 let cleanup conf =
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
