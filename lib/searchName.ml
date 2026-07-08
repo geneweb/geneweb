@@ -119,6 +119,31 @@ let find_apostrophe_opt s =
   in
   aux 0
 
+(* norm_apo must be applied BEFORE Name.lower because Name.lower
+   transliterates UTF-8 sequences and may destroy the byte patterns
+   that norm_apo matches (e.g. \xE2\x80\x99 curly apostrophe). *)
+let norm_apo s =
+  let buf = Buffer.create (String.length s) in
+  let i = ref 0 in
+  while !i < String.length s do
+    (match s.[!i] with
+    | '\'' -> Buffer.add_char buf '\''
+    | '\xE2'
+      when !i + 2 < String.length s
+           && s.[!i + 1] = '\x80'
+           && s.[!i + 2] = '\x99' ->
+        Buffer.add_char buf '\'';
+        i := !i + 2
+    | '\xCA'
+      when !i + 1 < String.length s
+           && (s.[!i + 1] = '\xBC' || s.[!i + 1] = '\xBB') ->
+        Buffer.add_char buf '\'';
+        i := !i + 1
+    | c -> Buffer.add_char buf c);
+    i := !i + 1
+  done;
+  Buffer.contents buf
+
 let generate_apostrophe_variants s =
   (* Include a plain space as a variant so that e.g. "o brien" (stored
      without apostrophe) is found when the query is "o'brien", and
@@ -1157,36 +1182,10 @@ let search_fullname cache conf base variants_fn variants_sn =
          phonetic/substring match (score 1).  stable_sort preserves the
          existing order within each tier.  This ensures e.g. "Annie" appears
          before "Anne" when the query is "annie vivier". *)
-      (* norm_apo must be applied BEFORE Name.lower because Name.lower
-         transliterates UTF-8 sequences and may destroy the byte patterns
-         that norm_apo matches (e.g. \xE2\x80\x99 curly apostrophe). *)
-      let norm_apo s =
-        let buf = Buffer.create (String.length s) in
-        let i = ref 0 in
-        while !i < String.length s do
-          (match s.[!i] with
-          | '\'' -> Buffer.add_char buf '\''
-          | '\xE2'
-            when !i + 2 < String.length s
-                 && s.[!i + 1] = '\x80'
-                 && s.[!i + 2] = '\x99' ->
-              Buffer.add_char buf '\'';
-              i := !i + 2
-          | '\xCA'
-            when !i + 1 < String.length s
-                 && (s.[!i + 1] = '\xBC' || s.[!i + 1] = '\xBB') ->
-              Buffer.add_char buf '\'';
-              i := !i + 1
-          | c -> Buffer.add_char buf c);
-          i := !i + 1
-        done;
-        Buffer.contents buf
-      in
       let normalize s = Name.lower (norm_apo s) in
       (* Use the first element of variants_fn/sn as the canonical first_name surname query.
          variants_sn is sorted and deduplicated but all variants share the same
-         base string; any of them works for the relevance comparison. 
-         FIXME: Is this true for fn ?? *)
+         base string; any of them works for the relevance comparison. *)
       let fn_lower = normalize (List.hd variants_fn) in
       let sn_lower = normalize (List.hd variants_sn) in
       (* Combined relevance score: weight fn match (0/2) + sn match (0/1).
@@ -1425,10 +1424,6 @@ let parse_dot_separated original_pn pn dot_pos =
 let parse_person_name base pn =
   let pn = insert_slash_before_particle base pn in
   let original_pn = pn in
-  (* find_last_char kept. a possible .gwf param may select the choice *)
-  let _find_last_char c =
-    try Some (String.rindex pn c) with Not_found -> None
-  in
   let find_char c = try Some (String.index pn c) with Not_found -> None in
   let slash_pos = find_char '/' in
   let dot_pos = find_char '.' in
@@ -1753,31 +1748,6 @@ let rec handle_search_results alias_cache conf base query fn_options components
              specify so the user can choose.
              Normalise apostrophes to plain ' before comparing, so that
              "d'Oiron" and "d’Oiron" (curly apostrophe) both match. *)
-          let norm_apo s =
-            let buf = Buffer.create (String.length s) in
-            let i = ref 0 in
-            while !i < String.length s do
-              (match s.[!i] with
-              | '\'' -> Buffer.add_char buf '\''
-              | '\xE2'
-                when !i + 2 < String.length s
-                     && s.[!i + 1] = '\x80'
-                     && s.[!i + 2] = '\x99' ->
-                  Buffer.add_char buf '\'';
-                  i := !i + 2
-              | '\xCA'
-                when !i + 1 < String.length s
-                     && (s.[!i + 1] = '\xBC' || s.[!i + 1] = '\xBB') ->
-                  Buffer.add_char buf '\'';
-                  i := !i + 1
-              | c -> Buffer.add_char buf c);
-              i := !i + 1
-            done;
-            Buffer.contents buf
-          in
-          (* norm_apo must be applied BEFORE Name.lower because Name.lower
-             transliterates UTF-8 sequences and may destroy the byte patterns
-             that norm_apo matches (e.g. \xE2\x80\x99 curly apostrophe). *)
           let normalize s = Name.lower (norm_apo s) in
           let qfn_l = normalize qfn in
           let qsn_l = normalize qsn in
