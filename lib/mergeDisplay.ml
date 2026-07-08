@@ -94,11 +94,14 @@ let print_possible_continue_merging conf base =
       let p1 = Gwdb.poi base ini1 in
       let p2 = Gwdb.poi base ini2 in
       Output.print_sstring conf {|<p><a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf {|m=MRG_IND&i=|};
-      Output.print_string conf (Gwdb.string_of_iper ini1 |> Mutil.encode);
-      Output.print_sstring conf {|&i2=|};
-      Output.print_string conf (Gwdb.string_of_iper ini2 |> Mutil.encode);
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:
+             [
+               ("m", "MRG_IND");
+               ("i", Gwdb.string_of_iper ini1);
+               ("i2", Gwdb.string_of_iper ini2);
+             ]);
       Output.print_sstring conf {|">|};
       Output.print_sstring conf
         (Utf8.capitalize_fst (Util.transl conf "continue merging"));
@@ -127,9 +130,9 @@ let print_possible_continue_merging conf base =
             let p = Gwdb.poi base ip in
             let s = NameDisplay.fullname_html_of_person conf base p in
             Output.print_sstring conf {|<p><a href="|};
-            Output.print_string conf (Util.commd conf);
-            Output.print_sstring conf {|m=MRG_DUP&ip=|};
-            Output.print_string conf (Gwdb.string_of_iper ip |> Mutil.encode);
+            Output.print_url conf
+              (Util.commd' conf
+                 ~query:[ ("m", "MRG_DUP"); ("ip", Gwdb.string_of_iper ip) ]);
             Output.print_string conf s1;
             Output.print_string conf s2;
             Output.print_sstring conf {|">|};

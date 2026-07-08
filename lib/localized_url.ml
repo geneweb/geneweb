@@ -12,4 +12,4 @@ let make ~conf ~lang ~query =
 
 let lang localized_url = localized_url.lang
 let url localized_url = localized_url.url
-let to_string localized_url = localized_url |> url |> Uri.to_string
+let to_string localized_url = localized_url |> url |> Ext_uri.to_string

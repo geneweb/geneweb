@@ -806,7 +806,7 @@ and eval_simple_str_var conf base env (bef, aft, p_auth) :
     string -> 'a TemplAst.expr_val = function
   | "acces" ->
       person_of_gen_p_key base aft.HistoryDiff.gen_p
-      |> Util.acces conf base
+      |> Util.acces' conf base |> Ext_uri.encoded_of_query |> Adef.escaped
       |> (safe_val :> Adef.escaped_string -> 'a TemplAst.expr_val)
   | "date" -> eval_string_env "date" env
   | "history_len" -> eval_int_env "history_len" env

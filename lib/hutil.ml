@@ -22,7 +22,7 @@ let gen_print_link_to_welcome f conf right_aligned =
   let str = link_to_referer conf in
   if (str :> string) <> "" then Output.print_string conf str;
   Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (Util.commd ~senv:false conf);
+  Output.print_url conf (Util.commd ~senv:false conf);
   Output.print_sstring conf {|"><img src="|};
   Output.print_string conf (Image.prefix conf);
   Output.print_sstring conf {|/up.png" alt="^^" title="^^"></a>|};

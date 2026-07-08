@@ -32,15 +32,16 @@ let give_access_someone conf base (x, t) list =
       Output.print_sstring conf "-";
       Output.print_sstring conf (string_of_int d.year));
   if has_dates then Output.print_sstring conf "</em>: ";
-  (if
-   List.exists
-     (fun person -> Gwdb.eq_iper (Gwdb.get_iper person) (Gwdb.get_iper x))
-     list
+  if
+    List.exists
+      (fun person -> Gwdb.eq_iper (Gwdb.get_iper person) (Gwdb.get_iper x))
+      list
   then Output.print_sstring conf "<em>"
   else
-    let open Def in
-    Output.print_string conf
-      ({|<a href="|} ^<^ Util.commd conf ^^^ Util.acces conf base x ^>^ {|">|}));
+    Output.print_sstring conf
+      ({|<a href="|}
+      ^ Ext_uri.to_string (Util.commd' conf ~query:(Util.acces conf base x))
+      ^ {|">|});
   (match (t.t_name, Gwdb.get_public_name x, Gwdb.get_qualifiers x) with
   | Tmain, pn, nn :: _ when Gwdb.sou base pn <> "" ->
       Output.print_string conf (Util.escape_html @@ Gwdb.sou base pn);
@@ -81,30 +82,25 @@ let give_access_someone conf base (x, t) list =
 
 let give_access_title_aux conf xhref content =
   Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (Util.commd conf);
-  Output.print_sstring conf "m=TT&sm=S";
-  Output.print_string conf xhref;
+  Output.print_url conf
+    (Util.commd' conf ~query:(("m", "TT") :: ("sm", "S") :: xhref));
   Output.print_sstring conf {|">|};
   Output.print_string conf content;
   Output.print_sstring conf "</a>"
 
 let give_access_title conf t p =
-  let open Def in
   give_access_title_aux conf
-    ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p)
+    [ ("t", t); ("p", p) ]
     (Util.escape_html @@ Utf8.capitalize_fst t)
 
 let give_access_all_titles conf t absolute =
-  let open Def in
   give_access_title_aux conf
-    ("&t=" ^<^ Mutil.encode t ^>^ if absolute then "&a=A" else "")
+    (("t", t) :: (if absolute then [ ("a", "A") ] else []))
     (Util.escape_html @@ if absolute then t else Utf8.capitalize_fst t)
 
 let give_access_all_places conf t =
   let open Def in
-  give_access_title_aux conf
-    ("&p=" ^<^ Mutil.encode t)
-    ("... " ^<^ Util.escape_html t)
+  give_access_title_aux conf [ ("p", t) ] ("... " ^<^ Util.escape_html t)
 
 let propose_tree_for_list list conf =
   let list, _ =
@@ -116,23 +112,23 @@ let propose_tree_for_list list conf =
   in
   match List.rev list with
   | _ :: _ :: _ as list ->
+      let open Ext_list.Infix in
       Output.print_sstring conf {|<p><a href="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf {|m=RLM|};
-      ignore
-      @@ List.fold_left
-           (fun i (p, n) ->
-             Output.print_sstring conf "&i";
-             Output.print_sstring conf (string_of_int i);
-             Output.print_sstring conf "=";
-             Output.print_sstring conf (Gwdb.string_of_iper @@ Gwdb.get_iper p);
-             Output.print_sstring conf "&t";
-             Output.print_sstring conf (string_of_int i);
-             Output.print_sstring conf "=";
-             Output.print_sstring conf (string_of_int n);
-             i + 1)
-           1 list;
-      Output.print_sstring conf {|&lim=6">|};
+      Output.print_url conf
+        (Util.commd' conf
+           ~query:
+             (("m", "RLM")
+             @:: List.concat
+                   (List.mapi
+                      (fun i (p, n) ->
+                        [
+                          ( "i" ^ string_of_int @@ succ i,
+                            Gwdb.string_of_iper @@ Gwdb.get_iper p );
+                          ("t" ^ string_of_int @@ succ i, string_of_int n);
+                        ])
+                      list)
+             @ [ ("lim", "6") ]));
+      Output.print_sstring conf {|">|};
       Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf "tree"));
       Output.print_sstring conf {|</a></p>|}
   | _ -> ()
@@ -148,15 +144,14 @@ let print_title_place_list conf base t p t_equiv list =
     else
       Ext_list.iter_first
         (fun first t ->
-          let open Def in
           if not first then Output.print_sstring conf ", ";
           give_access_title_aux conf
-            ("&a=A&t=" ^<^ Mutil.encode t)
+            [ ("a", "A"); ("t", t) ]
             (Util.escape_html t);
           if p <> "" then (
             Output.print_sstring conf " ";
             give_access_title_aux conf
-              ("&a=A&p=" ^<^ Mutil.encode p)
+              [ ("a", "A"); ("p", p) ]
               (Util.escape_html p)))
         t_equiv
   in
@@ -230,8 +225,7 @@ let print_places_list conf base t t_equiv list =
   let wprint_elem p =
     let open Def in
     give_access_title_aux conf
-      ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p
-      ^>^ if absolute then "&a=A" else "")
+      (("t", t) :: ("p", p) :: (if absolute then [ ("a", "A") ] else []))
       (if p = "" then Adef.safe "..."
       else
         ((Util.escape_html @@ Util.surname_without_particle base p)
@@ -268,9 +262,8 @@ let print_titles conf base p =
   Output.print_sstring conf "</ul>\n";
   if List.length list > 1 then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf "m=TT&sm=A&p=";
-    Output.print_string conf (Mutil.encode p);
+    Output.print_url conf
+      (Util.commd' conf ~query:[ ("m", "TT"); ("sm", "A"); ("p", p) ]);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (Util.transl conf "the whole list"));
