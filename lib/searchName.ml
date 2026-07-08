@@ -170,6 +170,22 @@ let search_reject_p conf base p =
 
 let persons_to_ipers = List.map Driver.get_iper
 
+let list_take n l =
+  let rec aux acc n = function
+    | [] -> List.rev acc
+    | _ when n <= 0 -> List.rev acc
+    | x :: xs -> aux (x :: acc) (n - 1) xs
+  in
+  aux [] n l
+
+let list_drop n l =
+  let rec aux n = function
+    | xs when n <= 0 -> xs
+    | [] -> []
+    | _ :: xs -> aux (n - 1) xs
+  in
+  aux n l
+
 (* String cache scoped to a single search request to avoid cross-base
    pollution when gwd serves multiple bases.  The cache is created at the
    top of [search] and threaded explicitly through the call chain; there is
@@ -1358,6 +1374,27 @@ let make_parsed_component ?first_name ?surname ?oc original format =
       ParsedName { first_name = fn_opt; surname = sn_opt; oc; original; format };
   }
 
+let insert_slash_before_particle base pn =
+  let re = Driver.base_particles base in
+  let words = String.split_on_char ' ' pn in
+  let n = List.length words in
+  if n < 2 then pn
+  else
+    let rec aux i =
+      if i >= n then pn
+      else
+        let suffix = String.concat " " (list_drop i words) in
+        let variants = generate_apostrophe_variants suffix in
+        let has_particle =
+          List.exists (fun v -> Mutil.get_particle re v <> "") variants
+        in
+        if has_particle then
+          let fn_part = String.concat " " (list_take i words) in
+          fn_part ^ "/" ^ suffix
+        else aux (i + 1)
+    in
+    aux 1
+
 let parse_slash_separated original_pn pn slash_pos =
   let fn_part = String.sub pn 0 slash_pos in
   let sn_part =
@@ -1385,9 +1422,10 @@ let parse_dot_separated original_pn pn dot_pos =
   | None ->
       make_parsed_component ~first_name:fn_part ~surname:rest original_pn `Dot
 
-let parse_person_name pn =
+let parse_person_name base pn =
+  let pn = insert_slash_before_particle base pn in
   let original_pn = pn in
-  (* kept. a possible .gwf param may select the choice *)
+  (* find_last_char kept. a possible .gwf param may select the choice *)
   let _find_last_char c =
     try Some (String.rindex pn c) with Not_found -> None
   in
@@ -1435,7 +1473,7 @@ let parse_person_name pn =
         case = InvalidFormat pn;
       }
 
-let extract_name_components conf _base =
+let extract_name_components conf base =
   let get_param key =
     match p_getenv conf.env key with Some "" | None -> None | Some s -> Some s
   in
@@ -1451,7 +1489,7 @@ let extract_name_components conf _base =
         person_name = None;
         case = NoInput;
       }
-  | None, None, Some pn -> parse_person_name pn
+  | None, None, Some pn -> parse_person_name base pn
   | None, Some sn, None ->
       {
         first_name = None;
