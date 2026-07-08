@@ -483,6 +483,26 @@ let sort_by_first_name base persons_with_titles =
     with_fn
   |> List.map (fun (p, tl, _) -> (p, tl))
 
+(* Sort by first-name exact match first (score 0), then by birth date within
+   each tier.  Used for spouse lists so that e.g. "Annie" appears before "Anne"
+   when the query is "annie vivier", regardless of birth-date ordering. *)
+let sort_by_fn_relevance_then_date base query persons_with_titles =
+  let query_lower = Name.lower query in
+  let fn_score p =
+    let fn = Driver.sou base (Driver.get_first_name p) in
+    if Name.lower fn = query_lower then 0 else 1
+  in
+  let bi p =
+    let b = Driver.get_birth p in
+    let b = if b = Date.cdate_None then Driver.get_baptism p else b in
+    Date.cdate_to_dmy_opt b
+  in
+  List.sort
+    (fun (p1, _) (p2, _) ->
+      let c = compare (fn_score p1) (fn_score p2) in
+      if c <> 0 then c else Option.compare Date.compare_dmy (bi p1) (bi p2))
+    persons_with_titles
+
 (* ========================================================================= *)
 (* Section 5: Result list rendering primitives                               *)
 (* ========================================================================= *)
@@ -857,6 +877,21 @@ let specify conf base alias_cache n pl1 pl2 pl3 =
       (transl conf ":") (transl conf "specify")
   in
   let n = Name.lower n in
+  (* Extract just the first-name part of the query for relevance scoring of
+     pl3.  "annie vivier" -> "annie", so fn_score compares against "annie"
+     not the full query string. *)
+  let query_fn =
+    match p_getenv conf.env "pn" with
+    | Some pn -> (
+        let pn = Name.lower (Mutil.strip_all_trailing_spaces pn) in
+        match String.index_opt pn ' ' with
+        | Some i -> String.sub pn 0 i
+        | None -> pn)
+    | None -> (
+        match String.index_opt n ' ' with
+        | Some i -> String.sub n 0 i
+        | None -> n)
+  in
   let split_pl n pl =
     List.fold_left
       (fun (acc1, acc2) p ->
@@ -896,7 +931,11 @@ let specify conf base alias_cache n pl1 pl2 pl3 =
     let title = transl conf "other possibilities" |> Utf8.capitalize_fst in
     print_person_list conf base alias_cache n (Some title) ptll22
   else ();
-  let ptll3 = process_list pl3 in
+  let ptll3 =
+    pl3
+    |> List.map (fun p -> (p, process_titles conf base n p))
+    |> sort_by_fn_relevance_then_date base query_fn
+  in
   if ptll3 <> [] then
     let title = transl conf "with spouse name" |> Utf8.capitalize_fst in
     print_person_list conf base alias_cache n (Some title) ptll3
