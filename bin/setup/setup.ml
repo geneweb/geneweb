@@ -267,6 +267,25 @@ let parse_upto lim =
     | Some c when c = lim ->
         Stream.junk strm__;
         Buff.get len
+    | Some '\\' -> (
+        Stream.junk strm__;
+        (match Stream.peek strm__ with
+        | Some c -> Printf.eprintf "backslash followed by %C\n%!" c
+        | None -> Printf.eprintf "backslash at eof\n%!");
+        match Stream.peek strm__ with
+        | Some '\r' ->
+            Stream.junk strm__;
+            (match Stream.peek strm__ with
+            | Some '\n' -> Stream.junk strm__
+            | _ -> ());
+            loop len strm__
+        | Some '\n' ->
+            Stream.junk strm__;
+            loop len strm__
+        | Some c ->
+            Stream.junk strm__;
+            loop (Buff.store len c) strm__
+        | None -> raise (Stream.Error "\\ at end of input"))
     | Some c -> (
         Stream.junk strm__;
         try loop (Buff.store len c) strm__
@@ -455,51 +474,52 @@ let rec copy_from_stream conf print strm =
   try
     while true do
       match Stream.next strm with
-      | '[' -> (
-          match Stream.peek strm with
-          | Some '\n' ->
-              let s = parse_upto ']' strm in
-              print
-                "Translations must be on a single line: [string to translate]";
-              print s
-          | _ ->
-              let s =
-                let rec loop len =
-                  match Stream.peek strm with
-                  | Some ']' ->
-                      Stream.junk strm;
-                      Buff.get len
-                  | Some c ->
-                      Stream.junk strm;
-                      loop (Buff.store len c)
-                  | _ -> Buff.get len
-                in
-                loop 0
-              in
-              let n =
-                match Stream.peek strm with
-                | Some ('0' .. '9' as c) ->
-                    Stream.junk strm;
-                    Char.code c - Char.code '0'
-                | _ -> 0
-              in
-              (* translate before macro processing *)
-              let s = nth_field (transl conf s) n in
-              let s =
-                let buf = Buffer.create (String.length s) in
-                let rec loop i =
-                  if i >= String.length s then ()
-                  else if s.[i] = '%' && i + 1 < String.length s then (
-                    Buffer.add_string buf (macro conf s.[i + 1]);
-                    loop (i + 2))
-                  else (
-                    Buffer.add_char buf s.[i];
-                    loop (i + 1))
-                in
-                loop 0;
-                Buffer.contents buf
-              in
-              print (split_string "" s))
+      | '[' ->
+          let s =
+            let rec loop len =
+              match Stream.peek strm with
+              | Some ']' ->
+                  Stream.junk strm;
+                  Buff.get len
+              | Some c ->
+                  Stream.junk strm;
+                  loop (Buff.store len c)
+              | _ -> Buff.get len
+            in
+            loop 0
+          in
+          (* the key may spread over several lines:
+             trim each line and join with single spaces *)
+          let s =
+            String.concat " "
+              (List.filter
+                 (fun l -> l <> "")
+                 (List.map String.trim (String.split_on_char '\n' s)))
+          in
+          let n =
+            match Stream.peek strm with
+            | Some ('0' .. '9' as c) ->
+                Stream.junk strm;
+                Char.code c - Char.code '0'
+            | _ -> 0
+          in
+          (* translate before macro processing *)
+          let s = nth_field (transl conf s) n in
+          let s =
+            let buf = Buffer.create (String.length s) in
+            let rec loop i =
+              if i >= String.length s then ()
+              else if s.[i] = '%' && i + 1 < String.length s then (
+                Buffer.add_string buf (macro conf s.[i + 1]);
+                loop (i + 2))
+              else (
+                Buffer.add_char buf s.[i];
+                loop (i + 1))
+            in
+            loop 0;
+            Buffer.contents buf
+          in
+          print (split_string "" s)
       | '%' -> (
           let c = Stream.next strm in
           match c with
@@ -589,7 +609,6 @@ let rec copy_from_stream conf print strm =
               in
               let base = Filename.concat bd out in
               print_if conf print (Sys.file_exists (base ^ ".gwb")) strm
-          | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int !port)
           | ('A' .. 'Z' | '0' .. '9') as c -> (
               match c with
@@ -623,10 +642,17 @@ let rec copy_from_stream conf print strm =
                   print_specific_file conf print outfile strm
               | 'I' ->
                   (* %Ivar;value;{var = value part|false part} *)
-                  (* var is a evar from url or a bvar from basename.gwf *)
+                  (* var is a evar from url or a bvar from basename.gwf if anon is defined *)
                   let k1 = get_variable strm in
                   let k2 = get_variable strm in
-                  print_if_else conf print (s_getenv conf.env k1 = k2) strm
+                  let in_base = p_getenv conf.env "anon" in
+                  let env =
+                    match in_base with
+                    | Some in_base ->
+                        loc_read_base_env (strip_spaces in_base) @ conf.env
+                    | None -> conf.env
+                  in
+                  print_if_else conf print (s_getenv env k1 = k2) strm
               | 'J' ->
                   (* %Jvar;value;{var = value part|false part} *)
                   (* var and value may contain %m macros *)
@@ -655,7 +681,7 @@ let rec copy_from_stream conf print strm =
                   let outfile =
                     if outfile2 <> "" then outfile2
                     else if bname <> "" then
-                      slashify_linux_dos bname ^ ".gwb" ^ outfile1
+                      Filename.concat (bname ^ ".gwb") outfile1
                     else outfile1
                   in
                   print outfile
