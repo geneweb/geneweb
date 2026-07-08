@@ -1579,6 +1579,32 @@ end
 
 let input_lexicon lang =
   let open Fake_in_channel in
+  let rtrim s =
+    let n = ref (String.length s) in
+    while !n > 0 && (s.[!n - 1] = ' ' || s.[!n - 1] = '\t') do
+      decr n
+    done;
+    String.sub s 0 !n
+  in
+  (* A physical line ending with '\' continues on the next line.
+     Segments are joined with a single space; the continuation line's
+     indentation is discarded. *)
+  let input_logical_line ic =
+    let buf = Buffer.create 80 in
+    let rec loop first =
+      let line = input_line ic in
+      let line = if first then line else String.trim line in
+      let len = String.length line in
+      if len > 0 && line.[len - 1] = '\\' then (
+        Buffer.add_string buf (rtrim (String.sub line 0 (len - 1)));
+        Buffer.add_char buf ' ';
+        loop false)
+      else Buffer.add_string buf line
+    in
+    loop true;
+    Buffer.contents buf
+  in
+
   let t = Hashtbl.create 501 in
   match Statics.read "lang/lexicon.txt" with
   | None -> t
@@ -1594,12 +1620,12 @@ let input_lexicon lang =
            while true do
              let k =
                let rec find_key line =
-                 if String.length line < 4 then find_key (input_line ic)
+                 if String.length line < 4 then find_key (input_logical_line ic)
                  else if String.sub line 0 4 <> "    " then
-                   find_key (input_line ic)
+                   find_key (input_logical_line ic)
                  else line
                in
-               find_key (input_line ic)
+               find_key (input_logical_line ic)
              in
              let k = String.sub k 4 (String.length k - 4) in
              let rec loop line =
@@ -1615,10 +1641,10 @@ let input_lexicon lang =
                         else String.sub line (i + 2) (String.length line - i - 2)
                       in
                       Hashtbl.add t k v);
-                   loop (input_line ic)
+                   loop (input_logical_line ic)
                | None -> ()
              in
-             loop (input_line ic)
+             loop (input_logical_line ic)
            done
          with End_of_file -> ());
         close_in ic;
