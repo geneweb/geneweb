@@ -1578,8 +1578,18 @@ let execute_search_method cache alias_cache conf base components query method_
       Log.debug (fun k -> k "  Method Sosa: %d results" (List.length results));
       { exact = results; partial = []; spouse = [] }
   | Key ->
+      (* Rebuild the full key: person_of_string_key resolves "fn.oc sn"
+         in O(log n); without the oc it would resolve to occ 0 and the
+         result would then be discarded by the downstream oc filter. *)
+      let key_query =
+        match components with
+        | { first_name = Some fn; surname = Some sn; oc = Some oc; _ }
+          when oc <> "" ->
+            fn ^ "." ^ oc ^ " " ^ sn
+        | _ -> query
+      in
       let results =
-        generate_apostrophe_variants query
+        generate_apostrophe_variants key_query
         |> List.concat_map (fun v -> search_key_opt conf base v)
         |> List.sort_uniq compare
       in
