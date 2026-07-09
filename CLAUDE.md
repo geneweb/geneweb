@@ -27,10 +27,48 @@ cd distribution && gw/gwd
 
 ## Architecture
 
+### Library Layout (`lib/`)
+
+| Directory | Library | Role |
+|-----------|---------|------|
+| `def/` | `geneweb_def` | Data type definitions (person, family) |
+| `db/` | `geneweb_db` | Database driver and access layer |
+| `core/` | `geneweb_core` | Core algorithms (consanguinity) |
+| `sosa/` | `geneweb_sosa` | Sosa-Stradonitz numbering |
+| `templ/` | `geneweb_templ` | Template lexer/parser and runtime |
+| `search/` | `geneweb_search` | Search utilities |
+| `util/` | `geneweb_util` | Shared utilities (HTML, escaping) |
+| `compat/` | `geneweb_compat` | OCaml 4.10 backports |
+| `plugin/` | `geneweb_plugin` | Plugin registration framework |
+
+Also: `dirs/` (paths/XDG), `logs/` (logging), `show/` (deriving
+show), `ancient/` (memory-mapped storage).
+
 Avoid bloating catch-all modules. `perso.ml` (~4000 LOC) and
 `util.ml` are already overloaded — prefer creating focused modules.
 `templ.ml` is the template engine runtime; changes there affect every
 page.
+
+### Plugin System
+
+Plugins are native OCaml shared libraries in `plugins/`. Each
+registers handlers via `Plugin.register_se` (side-effect) or
+`Plugin.register` (content). Loaded at runtime by gwd.
+
+Existing plugins: **cgl** (CGI output), **export** (GED/GW export),
+**fixbase** (database repair UI), **forum** (discussions),
+**gwxjg** (XML/JSON output), **jingoo** (Jingoo templates),
+**lib_show** (type display), **no_index** (robots.txt),
+**xhtml** (XHTML output).
+
+### Template Variable Dispatch (`perso.ml`)
+
+Person pages evaluate template variables through a chain of
+`eval_*` functions in `perso.ml`. **Pitfall**: variable names
+defined in `perso.ml` shadow identically-named variables from
+`templ.ml`. Example: `%source;` in `perso.ml` returns the person's
+genealogical source field, hiding `Version.src` which `templ.ml`
+exposes under the same name. Use `%source_repo;` for the repo URL.
 
 ## OCaml Conventions
 
@@ -187,7 +225,9 @@ Engine: `lib/wiki.ml` (rendering), `lib/notesLinks.ml` (parsing).
 Images served via `m=IM&s=filename` (binary). Files in
 `bases/src/{dbname}/images/`. HTML sanitized by `safe_html`
 (`lib/util.ml`) — only whitelisted tags preserved, `on*` attributes
-stripped.
+stripped. The whitelist (~56 tags) covers structural, inline, list,
+table, and media elements but no `<script>`, `<style>`, `<iframe>`,
+or event attributes. Override with `allowed_tags_file`.
 
 ## Database Iteration API
 
