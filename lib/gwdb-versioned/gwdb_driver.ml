@@ -713,31 +713,7 @@ module Legacy_driver = struct
     PatchFam.move_data_file base;
     base
 
-  module MemoPersonOfKey =
-    Memo.Make
-      (struct
-        type t = base * string * string * int
-
-        let equal (base, fn, sn, occ) (base', fn', sn', occ') =
-          let basename = bname base in
-          let basename' = bname base' in
-          String.equal basename basename'
-          && String.equal fn fn' && String.equal sn sn' && Int.equal occ occ'
-
-        let hash (base, fn, sn, occ) = Hashtbl.hash (bname base, fn, sn, occ)
-      end)
-      (struct
-        type res = iper option
-
-        let f (base, fn, sn, occ) = person_of_key base fn sn occ
-      end)
-
-  let person_of_key base first_name surname occ =
-    MemoPersonOfKey.memoized (base, first_name, surname, occ)
-
-  let open_base path =
-    MemoPersonOfKey.init ();
-    open_base path
+  let open_base = open_base
 
   let close_base base =
     close_base base;

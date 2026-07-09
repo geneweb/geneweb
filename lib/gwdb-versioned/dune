@@ -6,7 +6,6 @@
 	geneweb.gwdb-legacy
 	geneweb.def
 	syslog
-	geneweb.util
   )
   (modules
 	gwdb_driver
