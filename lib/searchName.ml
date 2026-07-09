@@ -1796,6 +1796,26 @@ let rec handle_search_results alias_cache conf base query fn_options components
               (fun a b -> compare (Driver.get_iper a) (Driver.get_iper b))
               (perfect_a @ perfect_b)
           in
+          
+          
+          (* Type-C fallback: no A/B perfect match; accept a person whose
+             misc names (aliases, names with titles, ...) contain the query. *)
+          let perfect =
+            match perfect with
+            | [] ->
+                let q_l = normalize query in
+                let nobtit p = Util.nobtit conf base p in
+                List.sort_uniq
+                  (fun a b -> compare (Driver.get_iper a) (Driver.get_iper b))
+                  (List.filter
+                     (fun p ->
+                       List.exists
+                         (fun n -> normalize n = q_l)
+                         (Driver.person_misc_names base p nobtit))
+                     (exact_persons @ partial_persons @ spouse_persons))
+            | l -> l
+          in
+          
           match perfect with
           | [ single ] -> redirect_to_person (Driver.get_iper single)
           | _ ->
