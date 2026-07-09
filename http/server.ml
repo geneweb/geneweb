@@ -325,14 +325,10 @@ let resolve_addr ?addr port =
   | Some a -> Unix.getaddrinfo a port hints
   | None -> Unix.getaddrinfo "" port (Unix.AI_PASSIVE :: hints)
 
-let pp_sockaddr ppf s =
-  match s with
-  | Unix.ADDR_UNIX s -> Fmt.string ppf s
-  | ADDR_INET (a, p) -> Fmt.pf ppf "%s:%d" (Unix.string_of_inet_addr a) p
-
 let try_addresses l =
   let rec loop l =
     match l with
+    | Unix.{ ai_family = Unix.PF_UNIX; _ } :: l -> loop l
     | Unix.{ ai_family; ai_socktype; ai_addr; _ } :: l -> (
         let socket = Unix.socket ai_family ai_socktype 0 in
         Unix.setsockopt socket Unix.SO_REUSEADDR true;
@@ -342,6 +338,16 @@ let try_addresses l =
     | [] -> None
   in
   loop l
+
+let pp_url ppf s =
+  match s with
+  | Unix.ADDR_UNIX _ ->
+      (* Cannot happen as these addresses are discarded in [try_addresses]. *)
+      assert false
+  | ADDR_INET (a, p) ->
+      if Unix.is_inet6_addr a then
+        Fmt.pf ppf "http://[%s]:%d" (Unix.string_of_inet_addr a) p
+      else Fmt.pf ppf "http://%s:%d" (Unix.string_of_inet_addr a) p
 
 let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
@@ -366,8 +372,7 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
               exit 2
           | Some (addr, socket) ->
               Unix.listen socket max_pending_requests;
-              Log.info (fun k ->
-                  k ~tags:timestamp "Ready on http://%a." pp_sockaddr addr);
+              Log.info (fun k -> k ~tags:timestamp "Ready on %a." pp_url addr);
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
               accept_connections ~timeout ~n_workers callback socket))
