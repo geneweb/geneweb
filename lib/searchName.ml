@@ -1422,12 +1422,21 @@ let parse_dot_separated original_pn pn dot_pos =
       make_parsed_component ~first_name:fn_part ~surname:rest original_pn `Dot
 
 let parse_person_name base pn =
-  let pn = insert_slash_before_particle base pn in
+  let is_digit c = c >= '0' && c <= '9' in
   let original_pn = pn in
-  let find_char c = try Some (String.index pn c) with Not_found -> None in
-  let slash_pos = find_char '/' in
-  let dot_pos = find_char '.' in
-  let space_pos = find_char ' ' in
+  let dot_pos =
+    match String.index_opt pn '.' with
+    | Some j when j + 1 < String.length pn && is_digit pn.[j + 1] -> Some j
+    | _ -> None
+  in
+  let slash_pos = String.index_opt pn '/' in
+  let pn =
+    match (dot_pos, slash_pos) with
+    | None, None -> insert_slash_before_particle base pn
+    | _ -> pn
+  in
+  let slash_pos = String.index_opt pn '/' in
+  let space_pos = String.index_opt pn ' ' in
   match (slash_pos, dot_pos, space_pos) with
   | None, None, None ->
       {
@@ -1806,8 +1815,7 @@ let rec handle_search_results alias_cache conf base query fn_options components
               (fun a b -> compare (Driver.get_iper a) (Driver.get_iper b))
               (perfect_a @ perfect_b)
           in
-          
-          
+
           (* Type-C fallback: no A/B perfect match; accept a person whose
              misc names (aliases, names with titles, ...) contain the query. *)
           let perfect =
@@ -1825,7 +1833,7 @@ let rec handle_search_results alias_cache conf base query fn_options components
                      (exact_persons @ partial_persons @ spouse_persons))
             | l -> l
           in
-          
+
           match perfect with
           | [ single ] -> redirect_to_person (Driver.get_iper single)
           | _ ->
