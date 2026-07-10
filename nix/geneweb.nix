@@ -1,10 +1,6 @@
 {
   alcotest,
   ancient,
-  brotli,
-  cmdliner,
-  crunch,
-  pcre2,
   benchmark,
   brotli,
   buildDunePackage,
@@ -12,6 +8,7 @@
   camlp-streams,
   camlp5,
   cmdliner,
+  crunch,
   decompress,
   digestif,
   dune-site,
