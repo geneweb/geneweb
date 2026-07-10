@@ -29,7 +29,7 @@ deps:
 	$(OPAM) pin oui \
 		'https://github.com/Halbaroth/ocaml-universal-installer.git#fix-win-ldd'
 	$(OPAM) pin ancient \
-		'https://github.com/OCamlPro/ocaml-ancient.git#0fbe48c744e5e400565a91367dc7937e151efc8f'
+		'https://github.com/Halbaroth/ocaml-ancient.git#windows-support-2'
 	$(OPAM) install . --deps-only --with-test
 
 docker:
