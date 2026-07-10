@@ -1,7 +1,7 @@
 (executable
  (name generate_cmdliner_rules)
  (modules generate_cmdliner_rules)
- (libraries fmt geneweb_util))
+ (libraries geneweb_util))
 
 (executable
  (name generate_flags)
