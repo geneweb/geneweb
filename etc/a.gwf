@@ -747,8 +747,14 @@
 # wizard or friend access, mapped from a claim in the id_token (see below).
 #
 # HTTPS is mandatory: gwd must be served over TLS (the session cookie is
-# "Secure"), and "oidc_provider_url" MUST be https, since the id_token is trusted
-# via TLS to the provider rather than by checking its signature.
+# "Secure"), and "oidc_provider_url" MUST be https (http is accepted only for
+# loopback hosts, for local testing), since the id_token is trusted via TLS to
+# the provider rather than by checking its signature.
+#
+# Enabling OIDC (setting "oidc_provider_url") disables the legacy "no wizard
+# password configured => every visitor is a wizard" default for this base:
+# access then comes from OIDC, or from an explicitly configured wizard/friend
+# password. Plain visitor access is unchanged.
 #
 # Runtime requirements: OIDC is available only on UNIX (it draws its randomness
 # from /dev/urandom), and gwd shells out to the "curl" binary for the discovery
