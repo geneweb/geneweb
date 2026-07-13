@@ -2031,7 +2031,12 @@ let null_reopen flags fd =
    If the [random] argument is [false], the salt is always the same.
    The default is [true]. *)
 let generate_secret_salt ?(random = true) () =
-  if random then Geneweb_oidc.Oidc.generate_token () else ""
+  if not random then ""
+  else
+    try Geneweb_oidc.Oidc.generate_token ()
+    with Sys_error _ | End_of_file ->
+      Random.self_init ();
+      string_of_int (Random.bits ())
 
 let retrieve_secret_salt () =
   match Unix.getenv "SECRET_SALT" with

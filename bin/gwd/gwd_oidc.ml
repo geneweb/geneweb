@@ -216,25 +216,30 @@ let handle_oidc_login conf base_env base_file =
       | Error e ->
           oidc_error_page conf
             (Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e)
-      | Ok provider ->
-          let state = Geneweb_oidc.Oidc.generate_state () in
-          let nonce = Geneweb_oidc.Oidc.generate_nonce () in
-          let verifier = Geneweb_oidc.Oidc.generate_code_verifier () in
-          let exp = int_of_float (Unix.time ()) + 600 in
-          let cookie =
-            make_login_cookie (conf_secret conf) ~base_file ~state ~nonce
-              ~verifier ~exp
-          in
-          let url =
-            Geneweb_oidc.Oidc.authorization_url provider
-              ~client_id:cfg.client_id ~redirect_uri:cfg.redirect_uri ~state
-              ~nonce
-              ~code_challenge:(Geneweb_oidc.Oidc.code_challenge verifier)
-          in
-          Log.info (fun k -> k "login initiated: base=%s" base_file);
-          Output.status conf Code.Moved_Temporarily;
-          set_login_cookie conf base_file cookie;
-          send_redirect conf url)
+      | Ok provider -> (
+          match
+            ( Geneweb_oidc.Oidc.generate_state (),
+              Geneweb_oidc.Oidc.generate_nonce (),
+              Geneweb_oidc.Oidc.generate_code_verifier () )
+          with
+          | exception (Sys_error _ | End_of_file) ->
+              oidc_error_page conf "OIDC unavailable: no CSPRNG (/dev/urandom)"
+          | state, nonce, verifier ->
+              let exp = int_of_float (Unix.time ()) + 600 in
+              let cookie =
+                make_login_cookie (conf_secret conf) ~base_file ~state ~nonce
+                  ~verifier ~exp
+              in
+              let url =
+                Geneweb_oidc.Oidc.authorization_url provider
+                  ~client_id:cfg.client_id ~redirect_uri:cfg.redirect_uri ~state
+                  ~nonce
+                  ~code_challenge:(Geneweb_oidc.Oidc.code_challenge verifier)
+              in
+              Log.info (fun k -> k "login initiated: base=%s" base_file);
+              Output.status conf Code.Moved_Temporarily;
+              set_login_cookie conf base_file cookie;
+              send_redirect conf url))
 
 let handle_oidc_callback conf base_env from_addr base_file =
   let ( let* ) = Result.bind in
