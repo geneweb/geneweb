@@ -365,14 +365,20 @@ let handle_oidc_callback conf base_env from_addr base_file =
         ~value:cookie ~max_age:(Some !Cmd_legacy.login_timeout);
       send_redirect conf base_url
 
-let request_is_post request = Mutil.extract_param "GET " ' ' request = ""
+let request_is_post request = Mutil.extract_param "POST " ' ' request <> ""
 
 let handle_oidc_logout conf base_env _from_addr base_file =
   let base_url =
     if !Server.cgi then conf.command ^ "?b=" ^ base_file else base_file
   in
-  (* logout must be POST so a cross-site GET cannot trigger it (CSRF) *)
-  if not (request_is_post conf.request) then begin
+  (* Require both POST and a valid session cookie. With SameSite=Lax the
+     session cookie is not sent on a cross-site POST, so a forged logout has
+     no session and becomes a no-op. *)
+  let has_session =
+    Option.is_some
+      (cookie_access ~secret:(conf_secret conf) conf.request base_file)
+  in
+  if not (has_session && request_is_post conf.request) then begin
     Output.status conf Code.Moved_Temporarily;
     send_redirect conf base_url
   end
