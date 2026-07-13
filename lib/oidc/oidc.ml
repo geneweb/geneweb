@@ -312,18 +312,16 @@ let logout_url provider ~client_id ~post_logout_redirect_uri =
       let uri = Uri.add_query_params' base params in
       Some (Uri.to_string uri)
 
-(* CSPRNG from /dev/urandom; falls back to a weaker PRNG only where it is
-   absent (e.g. Windows), which is not a target OIDC deployment. *)
+(* CSPRNG from /dev/urandom. Fails closed (raises Sys_error/End_of_file) rather
+   than silently degrading to a non-cryptographic PRNG; callers must handle it. *)
 let random_bytes len =
-  try
-    let ic = open_in_bin "/dev/urandom" in
-    let b = Bytes.create len in
-    really_input ic b 0 len;
-    close_in ic;
-    Bytes.to_string b
-  with Sys_error _ ->
-    Random.self_init ();
-    String.init len (fun _ -> Char.chr (Random.int 256))
+  let ic = open_in_bin "/dev/urandom" in
+  Fun.protect
+    ~finally:(fun () -> close_in_noerr ic)
+    (fun () ->
+      let b = Bytes.create len in
+      really_input ic b 0 len;
+      Bytes.to_string b)
 
 let generate_random_hex len =
   let hex = Buffer.create (len * 2) in
