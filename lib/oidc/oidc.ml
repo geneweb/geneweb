@@ -28,7 +28,9 @@ let read_all ic =
   Buffer.contents buf
 
 let curl_get url =
-  let argv = [| "curl"; "-sfS"; "--max-time"; "10"; url |] in
+  let argv =
+    [| "curl"; "-sfS"; "--connect-timeout"; "5"; "--max-time"; "10"; url |]
+  in
   let ic = Unix.open_process_args_in "curl" argv in
   let body = read_all ic in
   match Unix.close_process_in ic with
@@ -53,6 +55,8 @@ let curl_post url form_data =
     [|
       "curl";
       "-sS";
+      "--connect-timeout";
+      "5";
       "--max-time";
       "10";
       "-X";
@@ -63,8 +67,7 @@ let curl_post url form_data =
     |]
   in
   let ic, oc = Unix.open_process_args "curl" argv in
-  (* curl may exit before reading stdin (endpoint unreachable), breaking the
-     pipe; ignore the write error and let close_process report the real exit. *)
+  (* curl may close stdin early; let close_process report the real error *)
   (try
      output_string oc body;
      close_out oc
@@ -117,10 +120,7 @@ let is_loopback_host host =
   host = "localhost" || host = "127.0.0.1" || host = "::1" || host = "[::1]"
   || (String.length host >= 4 && String.sub host 0 4 = "127.")
 
-(* A URL is acceptable only over TLS; http is tolerated for loopback hosts so
-   that local dev against an IdP on localhost keeps working. Since the id_token
-   is trusted through the TLS connection to the endpoints (no local JWS check),
-   every non-loopback endpoint must be https. *)
+(* https, or http only for loopback (local dev) *)
 let is_secure_url url =
   let has_prefix p =
     String.length url >= String.length p
@@ -321,16 +321,18 @@ let validate_claims ~client_id ~issuer ~nonce claims =
     match json_at_path claims "aud" with
     | None -> Error (Jwt_error "missing aud claim")
     | Some aud ->
+        let azp = claim_string claims "azp" in
+        let multi_aud =
+          match aud with `List (_ :: _ :: _) -> true | _ -> false
+        in
         if not (claim_has_value claims ~path:"aud" ~value:client_id) then
           Error
             (Jwt_error
                (Printf.sprintf "aud does not contain client_id %s" client_id))
-        else if
-          (* with multiple audiences OIDC requires azp = client_id *)
-          (match aud with `List (_ :: _ :: _) -> true | _ -> false)
-          && claim_string claims "azp" <> Some client_id
-        then
-          Error (Jwt_error "azp must equal client_id when aud is multi-valued")
+        else if match azp with Some a -> a <> client_id | None -> false then
+          Error (Jwt_error "azp does not equal client_id")
+        else if multi_aud && azp = None then
+          Error (Jwt_error "azp required when aud is multi-valued")
         else Ok ()
   in
 
@@ -377,8 +379,7 @@ let logout_url provider ~client_id ~post_logout_redirect_uri =
       let uri = Uri.add_query_params' base params in
       Some (Uri.to_string uri)
 
-(* CSPRNG from /dev/urandom. Fails closed (raises Sys_error/End_of_file) rather
-   than silently degrading to a non-cryptographic PRNG; callers must handle it. *)
+(* CSPRNG from /dev/urandom; fails closed (raises) if unavailable *)
 let random_bytes len =
   let ic = open_in_bin "/dev/urandom" in
   Fun.protect
