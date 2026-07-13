@@ -15,7 +15,9 @@ let login_cookie_name base_file = "__Host-gw_oidc_login_" ^ base_file
 let login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp =
   let msg =
     String.concat "\000"
-      [ base_file; state; nonce; verifier; string_of_int exp ]
+      [
+        "gw-oidc-login-v1"; base_file; state; nonce; verifier; string_of_int exp;
+      ]
   in
   Digestif.SHA256.(to_hex (hmac_string ~key:secret msg))
 
@@ -39,7 +41,8 @@ let parse_login_cookie secret ~base_file value =
    base64url(base|acc|user|username|exp) plus an HMAC keyed by secret_salt. *)
 
 let session_cookie_sig secret payload =
-  Digestif.SHA256.(to_hex (hmac_string ~key:secret payload))
+  Digestif.SHA256.(
+    to_hex (hmac_string ~key:secret ("gw-oidc-sess-v1\000" ^ payload)))
 
 let make_session_cookie secret ~base_file ~acc ~user ~username ~exp =
   let payload =
@@ -86,9 +89,11 @@ let extract_oidc_cookie request cookie_name =
     find pairs
 
 let cookie_access ~secret request base_name =
-  match extract_oidc_cookie request (session_cookie_name base_name) with
-  | None -> None
-  | Some v -> parse_session_cookie secret ~base_file:base_name v
+  if secret = "" then None
+  else
+    match extract_oidc_cookie request (session_cookie_name base_name) with
+    | None -> None
+    | Some v -> parse_session_cookie secret ~base_file:base_name v
 
 type oidc_config = {
   provider_url : string;
