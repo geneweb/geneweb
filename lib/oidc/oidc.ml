@@ -63,8 +63,12 @@ let curl_post url form_data =
     |]
   in
   let ic, oc = Unix.open_process_args "curl" argv in
-  output_string oc body;
-  close_out oc;
+  (* curl may exit before reading stdin (endpoint unreachable), breaking the
+     pipe; ignore the write error and let close_process report the real exit. *)
+  (try
+     output_string oc body;
+     close_out oc
+   with Sys_error _ -> ());
   let resp = read_all ic in
   match Unix.close_process (ic, oc) with
   | Unix.WEXITED 0 -> Ok resp
