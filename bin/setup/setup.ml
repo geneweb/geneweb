@@ -371,9 +371,14 @@ let get_binding strm =
   in
   loop 0
 
+let statics_read fname =
+  match Statics.read fname with
+  | Some content -> content
+  | None -> failwith ("embedded static file not found: " ^ fname)
+
 let variables bname =
   let fname = "lang/" ^ bname in
-  let content = Option.get @@ Statics.read fname in
+  let content = statics_read fname in
   let strm = Stream.of_string content in
   let vlist, flist =
     let rec loop (vlist, flist) =
@@ -1678,7 +1683,7 @@ let copy_text lang =
   let lexicon = input_lexicon lang in
   let conf = { lang; comm = ""; env = []; request = []; lexicon } in
   fun fname ->
-    let content = Option.get @@ Statics.read fname in
+    let content = statics_read fname in
     copy_from_stream conf print_string (Stream.of_string content);
     flush stdout
 
