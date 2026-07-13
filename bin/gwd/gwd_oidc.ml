@@ -21,8 +21,7 @@ let login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp =
   in
   Digestif.SHA256.(to_hex (hmac_string ~key:secret msg))
 
-(* Constant-time comparison of a hex signature against the expected one:
-   digestif's [equal] uses eqaf, avoiding a timing oracle on the HMAC. *)
+(* constant-time HMAC comparison *)
 let sig_ok expected_hex provided_hex =
   match Digestif.SHA256.of_hex_opt provided_hex with
   | None -> false
@@ -234,6 +233,8 @@ let clear_login_cookie conf base_file =
 
 let send_redirect conf url =
   Output.header conf "Location: %s" url;
+  (* empty body terminates the header block (bare headers do not) *)
+  Output.header conf "Content-Length: 0";
   Output.print_sstring conf "";
   Output.flush conf
 
@@ -370,6 +371,11 @@ let handle_oidc_callback conf base_env from_addr base_file =
     let username =
       if person_key <> "" then display_name ^ "|" ^ person_key else display_name
     in
+    let* () =
+      if String.contains claim_value '\000' || String.contains username '\000'
+      then Error "claim value contains a NUL byte"
+      else Ok ()
+    in
     Ok (acc, claim_value, username)
   in
   let base_url =
@@ -406,9 +412,7 @@ let handle_oidc_logout conf base_env _from_addr base_file =
   let base_url =
     if !Server.cgi then conf.command ^ "?b=" ^ base_file else base_file
   in
-  (* Require both POST and a valid session cookie. With SameSite=Lax the
-     session cookie is not sent on a cross-site POST, so a forged logout has
-     no session and becomes a no-op. *)
+  (* SameSite=Lax keeps the session cookie off cross-site POSTs (CSRF) *)
   let has_session =
     Option.is_some
       (cookie_access ~secret:(conf_secret conf) conf.request base_file)
@@ -445,9 +449,9 @@ let handle_mode conf mode =
   and from_addr = conf.from
   and base_file = conf.bname in
   match mode with
-  (* OIDC needs a CSPRNG (/dev/urandom); it is available only on UNIX *)
-  | Some ("OIDC_LOGIN" | "OIDC_CALLBACK" | "OIDC_LOGOUT") when not Sys.unix ->
-      oidc_error_page conf "OIDC is available only on UNIX";
+  (* refused on native Windows; Cygwin has /dev/urandom *)
+  | Some ("OIDC_LOGIN" | "OIDC_CALLBACK" | "OIDC_LOGOUT") when Sys.win32 ->
+      oidc_error_page conf "OIDC is not available on Windows";
       true
   | Some "OIDC_LOGIN" ->
       handle_oidc_login conf base_env base_file;
