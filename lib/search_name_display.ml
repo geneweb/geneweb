@@ -334,7 +334,7 @@ let search_first_name_print
 
       first_name_not_found conf query_params.first_name
   | [ (_, (strl, iperl)) ] ->
-      let iperl = List.sort_uniq compare iperl in
+      let iperl = List.sort_uniq Gwdb.compare_iper iperl in
       let pl = List.map (Util.pget conf base) iperl in
       let pl =
         List.fold_right

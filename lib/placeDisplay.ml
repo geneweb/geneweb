@@ -135,7 +135,7 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism
         let value = (Gwdb.get_surname p, Gwdb.get_iper p) in
         match prev with Some list -> value :: list | None -> [ value ])
       (fun v ->
-        let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
+        let v = List.sort (fun (a, _) (b, _) -> Gwdb.compare_istr a b) v in
         let rec loop acc list =
           match (list, acc) with
           | [], _ -> acc

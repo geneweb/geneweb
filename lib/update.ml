@@ -1472,8 +1472,8 @@ let rec list_except x = function
   | [] -> invalid_arg "list_except"
 
 let update_related_pointers base pi ol nl =
-  let ol = List.sort_uniq compare ol in
-  let nl = List.sort_uniq compare nl in
+  let ol = List.sort_uniq Gwdb.compare_iper ol in
+  let nl = List.sort_uniq Gwdb.compare_iper nl in
   let added_rel, removed_rel =
     let rec loop (added_rel, removed_rel) ol nl =
       match (ol, nl) with
