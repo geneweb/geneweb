@@ -104,34 +104,95 @@ let base64url_decode s =
 let base64url_encode s =
   Base64.encode_string ~pad:false ~alphabet:Base64.uri_safe_alphabet s
 
-let discover issuer_url =
-  let base =
-    if
-      String.length issuer_url > 0
-      && issuer_url.[String.length issuer_url - 1] = '/'
-    then String.sub issuer_url 0 (String.length issuer_url - 1)
-    else issuer_url
+let strip_trailing_slash s =
+  let n = String.length s in
+  if n > 0 && s.[n - 1] = '/' then String.sub s 0 (n - 1) else s
+
+let is_loopback_host host =
+  let host = String.lowercase_ascii host in
+  host = "localhost" || host = "127.0.0.1" || host = "::1" || host = "[::1]"
+  || (String.length host >= 4 && String.sub host 0 4 = "127.")
+
+(* A URL is acceptable only over TLS; http is tolerated for loopback hosts so
+   that local dev against an IdP on localhost keeps working. Since the id_token
+   is trusted through the TLS connection to the endpoints (no local JWS check),
+   every non-loopback endpoint must be https. *)
+let is_secure_url url =
+  let has_prefix p =
+    String.length url >= String.length p
+    && String.sub url 0 (String.length p) = p
   in
-  let url = base ^ "/.well-known/openid-configuration" in
-  Result.bind (curl_get url) (fun body ->
-      try
-        let json = Yojson.Safe.from_string body in
-        Result.bind (json_string_field "issuer" json) (fun issuer ->
-            Result.bind (json_string_field "authorization_endpoint" json)
-              (fun authorization_endpoint ->
-                Result.bind (json_string_field "token_endpoint" json)
-                  (fun token_endpoint ->
-                    let end_session_endpoint =
-                      json_string_field_opt "end_session_endpoint" json
-                    in
-                    Ok
-                      {
-                        issuer;
-                        authorization_endpoint;
-                        token_endpoint;
-                        end_session_endpoint;
-                      })))
-      with Yojson.Json_error msg -> Error (Json_error msg))
+  if has_prefix "https://" then true
+  else if has_prefix "http://" then
+    let rest = String.sub url 7 (String.length url - 7) in
+    let host =
+      match String.index_opt rest '/' with
+      | Some i -> String.sub rest 0 i
+      | None -> rest
+    in
+    let host =
+      if String.length host > 0 && host.[0] = '[' then
+        match String.index_opt host ']' with
+        | Some j -> String.sub host 0 (j + 1)
+        | None -> host
+      else
+        match String.index_opt host ':' with
+        | Some i -> String.sub host 0 i
+        | None -> host
+    in
+    is_loopback_host host
+  else false
+
+let discover issuer_url =
+  let base = strip_trailing_slash issuer_url in
+  if not (is_secure_url base) then
+    Error
+      (Http_error
+         (Printf.sprintf "oidc_provider_url must be https (got %s)" base))
+  else
+    let url = base ^ "/.well-known/openid-configuration" in
+    Result.bind (curl_get url) (fun body ->
+        try
+          let json = Yojson.Safe.from_string body in
+          Result.bind (json_string_field "issuer" json) (fun issuer ->
+              Result.bind (json_string_field "authorization_endpoint" json)
+                (fun authorization_endpoint ->
+                  Result.bind (json_string_field "token_endpoint" json)
+                    (fun token_endpoint ->
+                      if strip_trailing_slash issuer <> base then
+                        Error
+                          (Http_error
+                             (Printf.sprintf
+                                "issuer mismatch: discovery returned %s, \
+                                 expected %s"
+                                issuer base))
+                      else if not (is_secure_url authorization_endpoint) then
+                        Error
+                          (Http_error
+                             (Printf.sprintf
+                                "authorization_endpoint is not https: %s"
+                                authorization_endpoint))
+                      else if not (is_secure_url token_endpoint) then
+                        Error
+                          (Http_error
+                             (Printf.sprintf "token_endpoint is not https: %s"
+                                token_endpoint))
+                      else
+                        let end_session_endpoint =
+                          match
+                            json_string_field_opt "end_session_endpoint" json
+                          with
+                          | Some e when is_secure_url e -> Some e
+                          | _ -> None
+                        in
+                        Ok
+                          {
+                            issuer;
+                            authorization_endpoint;
+                            token_endpoint;
+                            end_session_endpoint;
+                          })))
+        with Yojson.Json_error msg -> Error (Json_error msg))
 
 let authorization_url provider ~client_id ~redirect_uri ~state ~nonce
     ~code_challenge =
