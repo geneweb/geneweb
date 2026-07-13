@@ -26,9 +26,16 @@ val pp_error : Format.formatter -> error -> unit
 
 (** {1 Discovery} *)
 
+val is_secure_url : string -> bool
+(** [is_secure_url url] is [true] for https URLs, and for http URLs whose host
+    is loopback (localhost, 127.0.0.0/8, ::1). Used to require TLS for the
+    provider and its endpoints while still allowing a local dev IdP. *)
+
 val discover : string -> (provider_config, error) result
 (** [discover issuer_url] fetches the OpenID Connect discovery document from
-    [issuer_url/.well-known/openid-configuration]. *)
+    [issuer_url/.well-known/openid-configuration]. Fails if [issuer_url] or the
+    returned authorization/token endpoints are not {!is_secure_url}, or if the
+    document's [issuer] does not match [issuer_url]. *)
 
 (** {1 Authorization} *)
 

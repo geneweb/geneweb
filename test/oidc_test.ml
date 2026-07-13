@@ -159,8 +159,23 @@ let pkce_cases () =
   String.iter (fun c -> if not (url_safe c) then all_safe := false) verifier;
   (check bool) "verifier is url-safe unreserved" true !all_safe
 
+let secure_url_cases () =
+  let yes u = Oidc.is_secure_url u and no u = not (Oidc.is_secure_url u) in
+  (check bool) "https accepted" true (yes "https://idp.example.org/realms/x");
+  (check bool) "http non-loopback rejected" true
+    (no "http://idp.example.org/realms/x");
+  (check bool) "http localhost allowed" true
+    (yes "http://localhost:8080/realms/x");
+  (check bool) "http 127.0.0.1 allowed" true (yes "http://127.0.0.1:8080/x");
+  (check bool) "http ::1 allowed" true (yes "http://[::1]:8080/x");
+  (check bool) "http 127.0.0.0/8 allowed" true (yes "http://127.0.0.53/x");
+  (check bool) "no scheme rejected" true (no "idp.example.org");
+  (check bool) "loopback-lookalike host rejected" true
+    (no "http://localhost.evil.com/x")
+
 let v =
   [
+    ("oidc-secure-url", [ test_case "is_secure_url" `Quick secure_url_cases ]);
     ( "oidc-claim-string",
       [
         test_case "claim_string scalar" `Quick claim_string_scalar;
