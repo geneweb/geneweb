@@ -149,15 +149,18 @@ let pkce_cases () =
   (* RFC 7636 Appendix B known-answer vector for the S256 method. *)
   (check string) "S256 challenge" "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
     (Oidc.code_challenge "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk");
-  let verifier = Oidc.generate_code_verifier () in
-  (check int) "verifier length" 43 (String.length verifier);
-  let url_safe = function
-    | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '-' | '_' | '.' | '~' -> true
-    | _ -> false
-  in
-  let all_safe = ref true in
-  String.iter (fun c -> if not (url_safe c) then all_safe := false) verifier;
-  (check bool) "verifier is url-safe unreserved" true !all_safe
+  (* generate_code_verifier needs /dev/urandom; skip where absent (Windows) *)
+  match Oidc.generate_code_verifier () with
+  | exception Sys_error _ -> ()
+  | verifier ->
+      (check int) "verifier length" 43 (String.length verifier);
+      let url_safe = function
+        | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '-' | '_' | '.' | '~' -> true
+        | _ -> false
+      in
+      let all_safe = ref true in
+      String.iter (fun c -> if not (url_safe c) then all_safe := false) verifier;
+      (check bool) "verifier is url-safe unreserved" true !all_safe
 
 let secure_url_cases () =
   let yes u = Oidc.is_secure_url u and no u = not (Oidc.is_secure_url u) in
