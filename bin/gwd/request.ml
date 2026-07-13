@@ -109,11 +109,18 @@ let make_henv conf base =
   let conf =
     if conf.userkey = "" then conf
     else
-      let fn, oc, sn = GWPARAM.split_key conf.userkey in
-      match
-        Geneweb_db.Driver.person_of_key base fn sn
-          (if oc = "" then 0 else int_of_string oc)
-      with
+      let ip_opt =
+        (* [person_of_string_dot_key] splits on the ".occ" marker, so it also
+           resolves multi-word first names (e.g. "Jean Pierre.0 Galichet");
+           fall back to [split_key] for keys written without an occurrence. *)
+        match Gutil.person_of_string_dot_key base conf.userkey with
+        | Some _ as ip -> ip
+        | None ->
+            let fn, oc, sn = GWPARAM.split_key conf.userkey in
+            Driver.person_of_key base fn sn
+              (if oc = "" then 0 else int_of_string oc)
+      in
+      match ip_opt with
       | Some ip ->
           {
             conf with
