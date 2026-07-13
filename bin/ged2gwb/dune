@@ -2,6 +2,9 @@
  (package geneweb)
  (name ged2gwb)
  (public_name ged2gwb)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (preprocess
   (action
    (run

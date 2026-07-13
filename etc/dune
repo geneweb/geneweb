@@ -1,0 +1,16 @@
+(install
+ (package geneweb)
+ (enabled_if
+  (and
+   (= %{os_type} Unix)
+   (<> %{system} macosx)))
+ (section bin)
+ (files geneweb.sh))
+
+(install
+ (package geneweb)
+ (enabled_if
+  (= %{system} macosx))
+ (section bin)
+ (files
+  (geneweb.sh as geneweb.command)))

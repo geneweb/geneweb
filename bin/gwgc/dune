@@ -2,5 +2,8 @@
  (package geneweb)
  (name gwgc)
  (public_name gwgc)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (modules gwgc)
  (libraries unix str geneweb))

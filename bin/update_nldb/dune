@@ -2,5 +2,8 @@
  (package geneweb)
  (name update_nldb)
  (public_name update_nldb)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (modules update_nldb)
  (libraries unix str geneweb))
