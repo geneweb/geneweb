@@ -848,11 +848,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
-  let oidc_configured =
-    match List.assoc_opt "oidc_provider_url" base_env with
-    | Some url -> url <> ""
-    | None -> false
-  in
+  let oidc_configured = Gwd_oidc.enabled base_env in
   let ok, wizard, friend, username =
     if (not !Server.cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then

@@ -117,6 +117,25 @@ let curl_available () =
       |> List.exists (fun dir ->
           dir <> "" && Sys.file_exists (Filename.concat dir exe))
 
+let enabled base_env =
+  match List.assoc_opt "oidc_provider_url" base_env with
+  | Some url -> url <> ""
+  | None -> false
+
+let missing_required_keys base_env =
+  let present k =
+    match List.assoc_opt k base_env with Some v -> v <> "" | None -> false
+  in
+  let has_secret =
+    present "oidc_client_secret" || present "oidc_client_secret_file"
+  in
+  List.filter
+    (fun k ->
+      match k with
+      | "oidc_client_secret" -> not has_secret
+      | k -> not (present k))
+    [ "oidc_client_id"; "oidc_client_secret"; "oidc_redirect_uri" ]
+
 let read_oidc_config base_env =
   match List.assoc_opt "oidc_provider_url" base_env with
   | None | Some "" -> None
@@ -210,7 +229,12 @@ let send_redirect conf url =
 let handle_oidc_login conf base_env base_file =
   match (conf_secret conf, read_oidc_config base_env) with
   | "", _ -> oidc_error_page conf "OIDC unavailable: no secret salt configured"
-  | _, None -> oidc_error_page conf "OIDC not configured for this base"
+  | _, None ->
+      if enabled base_env then
+        oidc_error_page conf
+          ("OIDC is enabled but incomplete, missing: "
+          ^ String.concat ", " (missing_required_keys base_env))
+      else oidc_error_page conf "OIDC not configured for this base"
   | _, Some cfg -> (
       match Geneweb_oidc.Oidc.discover cfg.provider_url with
       | Error e ->
