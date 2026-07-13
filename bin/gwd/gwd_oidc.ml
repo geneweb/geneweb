@@ -21,6 +21,16 @@ let login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp =
   in
   Digestif.SHA256.(to_hex (hmac_string ~key:secret msg))
 
+(* Constant-time comparison of a hex signature against the expected one:
+   digestif's [equal] uses eqaf, avoiding a timing oracle on the HMAC. *)
+let sig_ok expected_hex provided_hex =
+  match Digestif.SHA256.of_hex_opt provided_hex with
+  | None -> false
+  | Some provided -> (
+      match Digestif.SHA256.of_hex_opt expected_hex with
+      | Some expected -> Digestif.SHA256.equal provided expected
+      | None -> false)
+
 let make_login_cookie secret ~base_file ~state ~nonce ~verifier ~exp =
   let s = login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp in
   String.concat "." [ state; nonce; verifier; string_of_int exp; s ]
@@ -30,8 +40,9 @@ let parse_login_cookie secret ~base_file value =
   | [ state; nonce; verifier; exp_s; s ] -> (
       match int_of_string_opt exp_s with
       | Some exp
-        when String.equal s
+        when sig_ok
                (login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp)
+               s
              && float_of_int exp >= Unix.time () ->
           Some (state, nonce, verifier)
       | _ -> None)
@@ -54,7 +65,7 @@ let make_session_cookie secret ~base_file ~acc ~user ~username ~exp =
 
 let parse_session_cookie secret ~base_file value =
   match String.split_on_char '.' value with
-  | [ payload; s ] when String.equal s (session_cookie_sig secret payload) -> (
+  | [ payload; s ] when sig_ok (session_cookie_sig secret payload) s -> (
       match Geneweb_oidc.Oidc.base64url_decode payload with
       | Ok raw -> (
           match String.split_on_char '\000' raw with
