@@ -1,9 +1,17 @@
 open Geneweb
 module Collection = Geneweb_db.Collection
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 module Gutil = Geneweb_db.Gutil
 
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
+
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
+let out_file = ref ""
+
+let resolve_out_file () =
+  if Filename.is_relative !out_file then Filename.concat !bases_dir !out_file
+  else !out_file
 
 type gwexport_opts = {
   asc : int option;
@@ -39,7 +47,7 @@ let default_opts =
     mem = false;
     no_notes = `none;
     no_picture = false;
-    oc = ("", prerr_string, fun () -> close_out stderr);
+    oc = ("", prerr_string, fun () -> flush stderr);
     parentship = false;
     picture_path = false;
     source = None;
@@ -55,6 +63,7 @@ let speclist c =
     ( "-a",
       Arg.Int (fun s -> c := { !c with asc = Some s }),
       "<N> maximum generation of the root's ascendants" );
+    ("-bd", Arg.String (fun s -> bases_dir := s), "<dir> bases directory.");
     ( "-ad",
       Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
       "<N> maximum generation of the root's ascendants descendants \
@@ -103,11 +112,9 @@ let speclist c =
       Arg.Unit (fun () -> c := { !c with no_picture = true }),
       " don't extract individual picture." );
     ( "-o",
-      Arg.String
-        (fun s ->
-          let oc = open_out s in
-          c := { !c with oc = (s, output_string oc, fun () -> close_out oc) }),
-      "<FILE> output file name (default: stdout)." );
+      Arg.String (fun s -> out_file := s),
+      "<FILE> output file name ( if relative, -bd value will be \
+       prepended)(default: stdout)." );
     ( "-parentship",
       Arg.Unit (fun () -> c := { !c with parentship = true }),
       " select individuals involved in parentship computation between pairs of \
@@ -128,6 +135,8 @@ let speclist c =
     ("-v", Arg.Unit (fun () -> c := { !c with verbose = true }), " verbose");
     ("-t", Arg.Unit (fun () -> c := { !c with test = true }), " test mode");
   ]
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 module IPS = Geneweb_db.Driver.Iper.Set
 module IFS = Geneweb_db.Driver.Ifam.Set

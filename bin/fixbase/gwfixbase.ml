@@ -1,5 +1,6 @@
 open Geneweb
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 
@@ -197,7 +198,7 @@ let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
 
 (**/**)
 
-let bname = ref ""
+let bname = ref None
 let verbosity = ref 2
 let fast = ref false
 let f_parents = ref false
@@ -214,74 +215,88 @@ let index = ref false
 let dry_run = ref false
 let dump = ref false
 let ofile = ref ""
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
 
 let speclist =
   [
+    ("-bd", Arg.String (fun s -> bases_dir := s), " Bases folder");
     ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
     ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
-    ("-families-parents", Arg.Set f_parents, " missing doc");
-    ("-families-children", Arg.Set f_children, " missing doc");
-    ("-persons-NBDS", Arg.Set p_parents, " missing doc");
-    ("-persons-parents", Arg.Set p_parents, " missing doc");
-    ("-persons-families", Arg.Set p_families, " missing doc");
-    ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc");
-    ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
-    ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
-    ("-person-key", Arg.Set key, " missing doc");
+    ("-families-parents", Arg.Set f_parents, " fix families’ parents links");
+    ("-families-children", Arg.Set f_children, " fix families’ children links");
+    ( "-persons-NBDS",
+      Arg.Set p_NBDS,
+      " fix persons' birth, baptism, death and burial events" );
+    ("-persons-parents", Arg.Set p_parents, " fix persons’ parents links");
+    ("-persons-families", Arg.Set p_families, " fix persons’ families links");
+    ( "-pevents-witnesses",
+      Arg.Set pevents_witnesses,
+      " fix witnesses of personal events" );
+    ( "-fevents-witnesses",
+      Arg.Set fevents_witnesses,
+      " fix witnesses of family events" );
+    ( "-marriage-divorce",
+      Arg.Set marriage_divorce,
+      " fix marriage and divorce events" );
+    ("-person-key", Arg.Set key, " fix duplicate person keys");
     ("-dump", Arg.Set dump, " dump list of persons");
     ("-o", Arg.String (fun x -> ofile := x), " dump list of persons in ofile");
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enabled by any other option." );
-    ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
+    ("-invalid-utf8", Arg.Set invalid_utf8, " fix invalid UTF-8 sequences");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
-let anonfun i = bname := i
+let anonfun i = bname := Some i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
-  Secure.set_base_dir (Filename.dirname !bname);
-  if !bname = "" then (
-    Arg.usage speclist usage;
-    exit 2);
-  let lock_file = Mutil.lock_file !bname in
-  let on_exn exn bt =
-    Format.eprintf "%a@." Lock.pp_exception (exn, bt);
-    exit 2
-  in
-  Driver.with_database !bname @@ fun base ->
-  let nb_fam = Driver.nb_of_families base in
-  let nb_ind = Driver.nb_of_persons base in
-  let nb_real_ind = Driver.nb_of_real_persons base in
-  nb_ind_init := nb_ind;
-  Printf.eprintf "GwFixbase for base %s\n" !bname;
-  Printf.eprintf "Initial state: %d persons, %d real persons, %d families\n"
-    nb_ind nb_real_ind nb_fam;
+  Secure.set_base_dir !bases_dir;
+  match !bname with
+  | None ->
+      Arg.usage speclist usage;
+      exit 2
+  | Some bname ->
+      let bpath = Filename.concat !bases_dir bname in
+      let lock_file = Mutil.lock_file bpath in
+      let on_exn exn bt =
+        Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+        exit 2
+      in
+      Driver.with_database bpath @@ fun base ->
+      let nb_fam = Driver.nb_of_families base in
+      let nb_ind = Driver.nb_of_persons base in
+      let nb_real_ind = Driver.nb_of_real_persons base in
+      nb_ind_init := nb_ind;
+      Printf.eprintf "GwFixbase for base %s\n" bpath;
+      Printf.eprintf "Initial state: %d persons, %d real persons, %d families\n"
+        nb_ind nb_real_ind nb_fam;
 
-  Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
-  if
-    !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
-    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_utf8
-    || !key || !index
-  then ()
-  else (
-    f_parents := true;
-    f_children := true;
-    p_parents := true;
-    p_families := true;
-    pevents_witnesses := true;
-    fevents_witnesses := true;
-    marriage_divorce := true;
-    p_NBDS := true;
-    invalid_utf8 := true;
-    key := true);
-  check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
-    ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key;
-  if !dump then dump_persons !bname !ofile
+      Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
+      if
+        !f_parents || !f_children || !p_parents || !p_families
+        || !pevents_witnesses || !fevents_witnesses || !marriage_divorce
+        || !p_NBDS || !invalid_utf8 || !key || !index
+      then ()
+      else (
+        f_parents := true;
+        f_children := true;
+        p_parents := true;
+        p_families := true;
+        pevents_witnesses := true;
+        fevents_witnesses := true;
+        marriage_divorce := true;
+        p_NBDS := true;
+        invalid_utf8 := true;
+        key := true);
+      check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS
+        ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
+        ~marriage_divorce ~invalid_utf8 ~key;
+      if !dump then dump_persons bpath !ofile
 
 let _ = main ()

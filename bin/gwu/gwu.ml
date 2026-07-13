@@ -37,28 +37,38 @@ let speclist opts =
        ^ string_of_int !GwuLib.sep_limit
        ^ ". The present option changes this limit." )
   :: Gwexport.speclist opts
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
 let bname = ref None
 
 let anonfun s =
-  if !bname = None then (
-    Secure.set_base_dir (Filename.dirname s);
-    bname := Some s)
+  if !bname = None then bname := Some (Filename.basename s)
   else raise (Arg.Bad "Cannot treat several databases")
 
 let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
-  let opts = !opts in
+  let bases_dir = !Gwexport.bases_dir in
+  Secure.set_base_dir bases_dir;
   match !bname with
-  | None -> raise @@ Arg.Bad "Expect a database"
+  | None ->
+      Arg.usage (speclist opts) Gwexport.errmsg;
+      exit 2
   | Some bname ->
-      Driver.with_database bname @@ fun base ->
-      let select = Gwexport.select base opts [] in
-      let in_dir =
-        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+      let name =
+        if !Gwexport.out_file = "" then Filename.concat bases_dir (bname ^ ".gw")
+        else Gwexport.resolve_out_file ()
       in
+      let oc = open_out name in
+      opts :=
+        {
+          !opts with
+          Gwexport.oc = (name, output_string oc, fun () -> close_out oc);
+        };
+      let opts = !opts in
+      Driver.with_database (Filename.concat bases_dir bname) @@ fun base ->
+      let select = Gwexport.select base opts [] in
       let src_oc_ht = Hashtbl.create 1009 in
       Driver.load_ascends_array base;
       Driver.load_strings_array base;
@@ -97,6 +107,10 @@ let () =
       let _ofile, oc, close = opts.Gwexport.oc in
       if not !GwuLib.raw_output then oc "encoding: utf-8\n";
       if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
+      let in_dir =
+        let full = Filename.concat (Secure.base_dir ()) bname in
+        if Filename.check_suffix full ".gwb" then full else full ^ ".gwb"
+      in
       GwuLib.prepare_free_occ base;
       GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select;
       Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;

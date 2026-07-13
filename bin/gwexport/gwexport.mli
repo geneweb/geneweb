@@ -31,6 +31,15 @@ type gwexport_opts = {
 val default_opts : gwexport_opts
 (** Default set of options *)
 
+val bases_dir : string ref
+(** Bases directory, set by [-bd] (default: [Secure.default_base_dir]). *)
+
+val out_file : string ref
+(** Output file name, set by [-o] ([""] means tool default). *)
+
+val resolve_out_file : unit -> string
+(** [!out_file], prefixed by [!bases_dir] when relative. *)
+
 val speclist : gwexport_opts ref -> (Arg.key * Arg.spec * Arg.doc) list
 (** Given a set of options, returns default command line arguments for selecting
     elements from a base. The output of this function is the first input of

@@ -1,10 +1,10 @@
 (executable
  (name templ_test)
- (libraries fmt geneweb_templ))
+ (libraries fmt geneweb_templ geneweb_compat))
 
 (rule
  (deps
-  (:template ./template.html)
+  (:template template.html)
   (glob_files ./*.html))
  (action
   (with-stdout-to
