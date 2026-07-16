@@ -95,10 +95,10 @@ let capitalize s =
 
 let initial n =
   let exception Found of int in
-  let find_uppercase () position character =
+  let find_uppercase position character =
     if Uucp.Case.is_upper character then raise (Found position)
   in
-  match fold find_uppercase () n with
+  match iter find_uppercase n with
   | exception Found position -> Some position
   | () -> None
 
