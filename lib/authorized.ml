@@ -27,7 +27,7 @@ module Person' = Person
 module rec Person : sig
   type t
 
-  val make : conf:Config.config -> base:Gwdb.base -> Gwdb.iper -> t
+  val make : conf:Config.Trimmed.t -> base:Gwdb.base -> Gwdb.iper -> t
   val equal : t -> t -> bool
   val get_iper : t -> Gwdb.iper option
   val get_sex : t -> Def.sex option
@@ -49,15 +49,15 @@ module rec Person : sig
   val get_occupation : t -> Gwdb.istr option
 
   val get_family :
-    conf:Config.config -> base:Gwdb.base -> t -> Family.t array option
+    conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Family.t array option
 
   val get_parents :
-    conf:Config.config -> base:Gwdb.base -> t -> Family.t option option
+    conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Family.t option option
 
   val get_pevents : t -> Personal_event.t list option
 
   val has_nephews_or_nieces :
-    conf:Config.config -> base:Gwdb.base -> t -> bool option
+    conf:Config.Trimmed.t -> base:Gwdb.base -> t -> bool option
 end = struct
   type authorization_level =
     | Navigation_without_names
@@ -76,12 +76,13 @@ end = struct
   type t = t' option
 
   let make ~conf ~base person_id =
+    let conf' = Config.Trimmed.to_config conf in
     let person = Gwdb.poi base person_id in
-    if Person'.is_visible conf base person then
+    if Person'.is_visible conf' base person then
       Some { person; authorization_level = Full }
-    else if Person'.has_visible_name conf base person then
+    else if Person'.has_visible_name conf' base person then
       Some { person; authorization_level = Navigation_with_names }
-    else if Person'.is_restricted conf base (Gwdb.get_iper person) then None
+    else if Person'.is_restricted conf' base (Gwdb.get_iper person) then None
     else Some { person; authorization_level = Navigation_without_names }
 
   let get_if_navigation_authorized ~get person =
@@ -202,13 +203,15 @@ end
 and Family : sig
   type t
 
-  val make : conf:Config.config -> base:Gwdb.base -> Gwdb.ifam -> t
+  val make : conf:Config.Trimmed.t -> base:Gwdb.base -> Gwdb.ifam -> t
   val get_marriage : t -> Adef.cdate option
   val get_marriage_place : t -> Gwdb.istr option
-  val get_children : conf:Config.config -> base:Gwdb.base -> t -> Person.t array
+
+  val get_children :
+    conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Person.t array
 
   val get_spouse :
-    conf:Config.config ->
+    conf:Config.Trimmed.t ->
     base:Gwdb.base ->
     person:Person.t ->
     t ->
@@ -223,11 +226,12 @@ end = struct
   type t = { family : Gwdb.family; authorization_level : authorization_level }
 
   let make ~conf ~base family_id =
+    let conf' = Config.Trimmed.to_config conf in
     let family = Gwdb.foi base family_id in
     let is_visible =
       Array.for_all
         (fun person_id ->
-          Person'.is_visible conf base (Gwdb.poi base person_id))
+          Person'.is_visible conf' base (Gwdb.poi base person_id))
         (Gwdb.get_parent_array family)
     in
     { family; authorization_level = (if is_visible then Full else Navigation) }
