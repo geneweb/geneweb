@@ -314,7 +314,7 @@ let sort_person_list_aux sort base =
         with
         | 0 -> (
             match compare (Gwdb.get_occ p1) (Gwdb.get_occ p2) with
-            | 0 -> compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
+            | 0 -> Gwdb.compare_iper (Gwdb.get_iper p1) (Gwdb.get_iper p2)
             | c -> c)
         | c -> c)
     | c -> c

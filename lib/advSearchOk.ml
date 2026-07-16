@@ -458,7 +458,8 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
             else acc)
           [] istrs)
       n_list
-    |> List.flatten |> List.sort_uniq compare
+    |> List.flatten
+    |> List.sort_uniq Gwdb.compare_istr
     |> List.map (Gwdb.spi_find @@ persons_of base)
     |> List.flatten
   in

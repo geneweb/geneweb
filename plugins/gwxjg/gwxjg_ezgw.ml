@@ -112,10 +112,10 @@ module Person = struct
                | _ -> acc)
              list (Gwdb.get_rparents c))
          []
-         (List.sort_uniq compare (Gwdb.get_related p))
+         (List.sort_uniq Gwdb.compare_iper (Gwdb.get_related p))
 
   (* Why isnt this already unique? *)
-  let relations p = List.sort_uniq compare (Gwdb.get_related p)
+  let relations p = List.sort_uniq Gwdb.compare_iper (Gwdb.get_related p)
 
   let siblings base p =
     match Gwdb.get_parents p with

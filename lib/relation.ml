@@ -569,7 +569,7 @@ let compute_relationship conf base by_marr p1 p2 =
 let get_others_related conf base p =
   let l =
     (* persons related to [p] *)
-    let l = List.sort_uniq compare (Gwdb.get_related p) in
+    let l = List.sort_uniq Gwdb.compare_iper (Gwdb.get_related p) in
     (* for each person related to [p] we look for relations they have with [p] *)
     List.fold_left
       (fun acc ic ->
@@ -604,7 +604,7 @@ let get_others_related conf base p =
 
 let get_event_witnessed conf' base p =
   let conf = Config.Trimmed.from_config conf' in
-  let related = List.sort_uniq Stdlib.compare (Gwdb.get_related p) in
+  let related = List.sort_uniq Gwdb.compare_iper (Gwdb.get_related p) in
   let related_parents = get_others_related conf' base p in
   let events_witnesses =
     let l = ref [] in
