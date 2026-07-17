@@ -37,7 +37,7 @@ type t = {
   ban_threshold : (int * int) option;
   min_disp_req : int;
   (* HTTP server *)
-  interface : string option;
+  interface : string;
   redirect_interface : string option;
   port : int;
   connection_timeout : int;
@@ -371,16 +371,20 @@ let min_disp_req =
 (* HTTP server commands *)
 
 let http_section = "HTTP SERVER"
+let default_interface = "::"
 let default_port = 2317
 let default_connection_timeout = 120
 let default_max_pending_requests = 150
 let default_n_workers = 20
 
 let interface =
-  let doc = "Bind the HTTP server to the network interface $(docv)." in
+  let doc =
+    "Bind the HTTP server to the network interface $(docv). Use :: for every \
+     interface (IPv4+IPv6) or 0.0.0.0 for IPv4 only."
+  in
   C.Arg.(
     value
-    & opt (some string) None
+    & opt string default_interface
     & info [ "i"; "interface" ] ~docs:http_section ~docv:"INTERFACE" ~doc)
 
 let redirect_interface =

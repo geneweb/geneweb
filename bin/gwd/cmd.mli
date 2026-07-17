@@ -30,7 +30,7 @@ type t = {
   ban_threshold : (int * int) option;
   min_disp_req : int;
   (* HTTP server *)
-  interface : string option;
+  interface : string;
   redirect_interface : string option;
   port : int;
   connection_timeout : int;
