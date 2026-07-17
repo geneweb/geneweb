@@ -4,6 +4,14 @@ type handler = Unix.sockaddr * string list -> string -> string -> unit
 
 val timestamp_tag : unit Logs.Tag.def
 
+val pp_sockaddr : Format.formatter -> Unix.sockaddr -> unit
+(** Formats an [ADDR_INET] as [ip:port], bracketing the address when it is IPv6.
+    Must not be called with [ADDR_UNIX]. *)
+
+val is_lan_candidate : Unix.sockaddr -> bool
+(** [true] for a non-loopback, non-wildcard IPv4 [ADDR_INET]; [false] for IPv6,
+    [ADDR_UNIX], the loopback, and the wildcard address. *)
+
 val start :
   ?addr:string ->
   port:int ->

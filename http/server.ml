@@ -367,18 +367,21 @@ let try_addresses l =
   in
   loop l
 
+let is_lan_candidate = function
+  | Unix.ADDR_INET (a, _) when not (Unix.is_inet6_addr a) ->
+      a <> Unix.inet_addr_any
+      && not (String.starts_with ~prefix:"127." (Unix.string_of_inet_addr a))
+  | _ -> false
+
 let lan_urls port =
   match resolve_addr ~addr:(Unix.gethostname ()) port with
   | exception Unix.Unix_error (_, _, _) -> []
   | l ->
       List.filter_map
         (fun Unix.{ ai_addr; _ } ->
-          match ai_addr with
-          | Unix.ADDR_INET (a, _) when not (Unix.is_inet6_addr a) ->
-              let addr = Unix.string_of_inet_addr a in
-              if String.starts_with ~prefix:"127." addr then None
-              else Some (Fmt.str "http://%a" pp_sockaddr ai_addr)
-          | _ -> None)
+          if is_lan_candidate ai_addr then
+            Some (Fmt.str "http://%a" pp_sockaddr ai_addr)
+          else None)
         l
       |> List.sort_uniq String.compare
 
