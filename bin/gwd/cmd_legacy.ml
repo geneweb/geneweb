@@ -46,7 +46,6 @@ let no_host_address = ref false
 let only_addresses : string list ref = ref []
 let redirected_addr : string option ref = ref None
 let robot_xcl : (int * int) option ref = ref None
-let selected_addr : string option ref = ref None
 let selected_port = ref Cmd.default_port
 let trace_failed_passwd = ref false
 let debug = ref false

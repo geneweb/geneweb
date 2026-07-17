@@ -31,3 +31,9 @@
  (name base64_test)
  (modules base64_test)
  (libraries alcotest qcheck qcheck-alcotest gwd_lib))
+
+(test
+ (package geneweb)
+ (name url_test)
+ (modules url_test)
+ (libraries alcotest geneweb_http fmt))

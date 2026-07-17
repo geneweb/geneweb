@@ -2,6 +2,15 @@
 
 ## Gwd
 - Use `getaddrinfo` to retrieve addresses from the operating system (#2757)
+- The HTTP server binds `::` (all interfaces, IPv4+IPv6) explicitly by
+  default, restoring the pre-#2757 behavior on every platform. Hosts
+  without IPv6 support must pass `-i 0.0.0.0`.
+- The startup log lists every reachable URL when bound to a wildcard
+  address.
+
+## Gwsetup
+- Bind `127.0.0.1` instead of resolving `localhost`, which selects the
+  IPv6 loopback only on Windows.
 
 ## Breaking changes
 - Deprecate the multi-parents feature (#2726)

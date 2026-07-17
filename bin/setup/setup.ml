@@ -12,7 +12,7 @@ let default_bin_dir =
          `_build/install` directory, we cannot use `executable_path` here. *)
       default // Filename.parent_dir_name // "install" // "default" // "bin"
 
-let interface = ref "localhost"
+let interface = ref "127.0.0.1"
 let port = ref 2316
 let gwd_port = ref 2317
 let default_lang = ref "en"

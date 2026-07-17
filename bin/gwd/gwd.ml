@@ -2262,7 +2262,6 @@ let parse_cmd () =
       arg_file;
   match Cmd.parse () with
   | `Ok o ->
-      selected_addr := o.interface;
       selected_port := o.port;
       Secure.set_base_dir o.base_dir;
       gw_prefix := Some o.gw_prefix;
@@ -2411,7 +2410,7 @@ let () =
   make_socket_dir opts.socket_dir;
   setup_log ~predictable_mode:opts.predictable_mode opts.log;
   try
-    main ~plugins:opts.plugins ?interface:opts.interface ~port:opts.port
+    main ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
       ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ()
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->

@@ -325,29 +325,72 @@ let resolve_addr ?addr port =
   | Some a -> Unix.getaddrinfo a port hints
   | None -> Unix.getaddrinfo "" port (Unix.AI_PASSIVE :: hints)
 
-let try_addresses l =
-  let rec loop l =
-    match l with
-    | Unix.{ ai_family = Unix.PF_UNIX; _ } :: l -> loop l
-    | Unix.{ ai_family; ai_socktype; ai_addr; _ } :: l -> (
-        let socket = Unix.socket ai_family ai_socktype 0 in
-        Unix.setsockopt socket Unix.SO_REUSEADDR true;
-        match Unix.bind socket ai_addr with
-        | exception _ -> loop l
-        | () -> Some (ai_addr, socket))
-    | [] -> None
-  in
-  loop l
-
-let pp_url ppf s =
+let pp_sockaddr ppf s =
   match s with
   | Unix.ADDR_UNIX _ ->
       (* Cannot happen as these addresses are discarded in [try_addresses]. *)
       assert false
   | ADDR_INET (a, p) ->
-      if Unix.is_inet6_addr a then
-        Fmt.pf ppf "http://[%s]:%d" (Unix.string_of_inet_addr a) p
-      else Fmt.pf ppf "http://%s:%d" (Unix.string_of_inet_addr a) p
+      let addr = Unix.string_of_inet_addr a in
+      if Unix.is_inet6_addr a then Fmt.pf ppf "[%s]:%d" addr p
+      else Fmt.pf ppf "%s:%d" addr p
+
+let enable_dual_stack ai_addr socket =
+  match ai_addr with
+  | Unix.ADDR_INET (a, _) when a = Unix.inet6_addr_any ->
+      Unix.setsockopt socket Unix.IPV6_ONLY false
+  | _ -> ()
+
+let try_addresses l =
+  let rec loop l =
+    match l with
+    | Unix.{ ai_family = Unix.PF_UNIX; _ } :: l -> loop l
+    | Unix.{ ai_family; ai_socktype; ai_addr; _ } :: l -> (
+        match Unix.socket ai_family ai_socktype 0 with
+        | exception Unix.Unix_error (e, _, _) ->
+            Log.debug (fun k ->
+                k "failed to create socket for %a: %s" pp_sockaddr ai_addr
+                  (Unix.error_message e));
+            loop l
+        | socket -> (
+            Unix.setsockopt socket Unix.SO_REUSEADDR true;
+            enable_dual_stack ai_addr socket;
+            match Unix.bind socket ai_addr with
+            | exception Unix.Unix_error (e, _, _) ->
+                Log.debug (fun k ->
+                    k "failed to bind socket to %a: %s" pp_sockaddr ai_addr
+                      (Unix.error_message e));
+                Unix.close socket;
+                loop l
+            | () -> Some (ai_addr, socket)))
+    | [] -> None
+  in
+  loop l
+
+let is_lan_candidate = function
+  | Unix.ADDR_INET (a, _) when not (Unix.is_inet6_addr a) ->
+      a <> Unix.inet_addr_any
+      && not (String.starts_with ~prefix:"127." (Unix.string_of_inet_addr a))
+  | _ -> false
+
+let lan_urls port =
+  match resolve_addr ~addr:(Unix.gethostname ()) port with
+  | exception Unix.Unix_error (_, _, _) -> []
+  | l ->
+      List.filter_map
+        (fun Unix.{ ai_addr; _ } ->
+          if is_lan_candidate ai_addr then
+            Some (Fmt.str "http://%a" pp_sockaddr ai_addr)
+          else None)
+        l
+      |> List.sort_uniq String.compare
+
+let pp_urls = Fmt.vbox (Fmt.list ~sep:Fmt.cut Fmt.string)
+
+let pp_url ppf s =
+  match Unix.getnameinfo s [ NI_NAMEREQD ] with
+  | { ni_hostname; _ } -> Fmt.pf ppf "http://%a (%s)" pp_sockaddr s ni_hostname
+  | exception Not_found -> Fmt.pf ppf "http://%a" pp_sockaddr s
 
 let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
@@ -372,7 +415,18 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
               exit 2
           | Some (addr, socket) ->
               Unix.listen socket max_pending_requests;
-              Log.info (fun k -> k ~tags:timestamp "Ready on %a." pp_url addr);
+              (match addr with
+              | Unix.ADDR_INET (a, p)
+                when a = Unix.inet6_addr_any || a = Unix.inet_addr_any ->
+                  Log.info (fun k ->
+                      k ~tags:timestamp
+                        "The server listens on every network interface.");
+                  Log.info (fun k ->
+                      k "Ready on %a" pp_urls
+                        (Printf.sprintf "http://127.0.0.1:%d" p :: lan_urls p))
+              | _ ->
+                  Log.info (fun k ->
+                      k ~tags:timestamp "Ready on %a." pp_url addr));
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
               accept_connections ~timeout ~n_workers callback socket))
