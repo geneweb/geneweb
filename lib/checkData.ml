@@ -169,11 +169,14 @@ let is_roman_numeral s =
 (* Multiple Spaces functions *)
 (* Check if the character following nbsp is part of a roman numeral *)
 let has_roman_after_nbsp s i =
-  if i + 2 >= String.length s then false
+  let w = if s.[i] = '\xC2' then 2 else 3 in
+  if i + w >= String.length s then false
   else
-    let rest = String.sub s (i + 2) (String.length s - (i + 2)) in
+    let rest = String.sub s (i + w) (String.length s - (i + w)) in
     let next_word =
-      try String.sub rest 0 (String.index rest ' ') with Not_found -> rest
+      match String.index_opt rest ' ' with
+      | Some j -> String.sub rest 0 j
+      | None -> rest
     in
     is_roman_numeral next_word
 
@@ -192,19 +195,14 @@ let is_any_space s pos =
 
 let has_multiple_spaces s =
   let len = String.length s in
-  let rec find_spaces byte_pos =
-    if byte_pos >= len then false
-    else if s.[byte_pos] = ' ' then
-      if byte_pos + 1 < len && s.[byte_pos + 1] = ' ' then true
-      else find_spaces (byte_pos + 1)
-    else if Char.code s.[byte_pos] < 0x80 then find_spaces (byte_pos + 1)
-    else if is_any_space s byte_pos then
-      let next_pos = Utf8.next s byte_pos in
-      if next_pos < len && is_any_space s next_pos then true
-      else find_spaces next_pos
-    else find_spaces (Utf8.next s byte_pos)
+  let rec loop i =
+    if i >= len then false
+    else if is_any_space s i then
+      let j = Utf8.next s i in
+      (j < len && is_any_space s j) || loop j
+    else loop (Utf8.next s i)
   in
-  find_spaces 0
+  loop 0
 
 let find_multiple_spaces_positions s =
   let positions = ref [] in
@@ -451,24 +449,19 @@ let invisible_chars_tbl =
 
 let is_invisible_char code = Hashtbl.mem invisible_chars_tbl code
 
+let is_invisible_code code =
+  (code < 0x20 && code <> 0x09 && code <> 0x0A)
+  || code = 0x7F
+  || (code >= 0x80 && code <= 0x9F)
+  || is_invisible_char code
+
 let has_invisible_chars s =
   let len = String.length s in
   let rec aux i =
     if i >= len then false
     else
-      let c = Char.code s.[i] in
-      if c < 0x20 then if c = 0x09 || c = 0x0A then aux (i + 1) else true
-      else if c = 0x7F then true
-      else if c < 0x80 then aux (i + 1)
-      else if c = 0xC2 then
-        if i + 1 < len then
-          let c2 = Char.code s.[i + 1] in
-          if (c2 >= 0x80 && c2 <= 0x9F) || c2 = 0xAD then true else aux (i + 2)
-        else false
-      else if c >= 0xC3 && c < 0xCC then aux (i + 2)
-      else
-        let code, size = Util.get_unicode_point s i in
-        if is_invisible_char code then true else aux (i + size)
+      let code, size = Util.get_unicode_point s i in
+      if is_invisible_code code then true else aux (i + size)
   in
   aux 0
 
@@ -478,7 +471,7 @@ let find_invisible_positions s =
     if i >= len then List.rev acc
     else
       let code, size = Util.get_unicode_point s i in
-      if is_invisible_char code then aux (i :: acc) (i + size)
+      if is_invisible_code code then aux (i :: acc) (i + size)
       else aux acc (i + size)
   in
   aux [] 0
