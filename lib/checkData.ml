@@ -47,17 +47,18 @@ module ErrorSet = Set.Make (struct
   let compare = compare
 end)
 
-let data_to_dict_type data =
-  match data with
+let data_to_dict_type = function
   | "fn" -> Fnames
   | "sn" -> Snames
+  | "fna" -> Fnames_alias
+  | "sna" -> Snames_alias
   | "place" -> Places
-  | "pub_name" -> PubNames
-  | "qualif" -> Qualifiers
+  | "pubn" -> PubNames
+  | "qual" -> Qualifiers
   | "alias" -> Aliases
-  | "occup" -> Occupation
+  | "occu" -> Occupation
   | "title" -> Titles
-  | "estate" -> Estates
+  | "domain" -> Estates
   | "src" -> Sources
   | _ -> Fnames
 
