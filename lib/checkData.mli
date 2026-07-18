@@ -57,7 +57,7 @@ val make_error_html :
 (** Generate HTML markup for displaying an error with highlighting. *)
 
 val collect_all_errors_with_cache :
-  ?max_results:int option ->
+  ?max_results:int ->
   ?sel_err_types:error_type list ->
   Config.config ->
   Geneweb_db.Driver.base ->
