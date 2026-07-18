@@ -115,13 +115,18 @@ let iter_field base p f = function
   | `Estates -> List.iter (fun t -> f t.Def.t_place) (Driver.get_titles p)
   | `Titles -> List.iter (fun t -> f t.Def.t_ident) (Driver.get_titles p)
   | `Sources ->
+      f (Driver.get_birth_src p);
+      f (Driver.get_baptism_src p);
+      f (Driver.get_death_src p);
+      f (Driver.get_burial_src p);
       f (Driver.get_psources p);
       List.iter (fun t -> f t.Def.epers_src) (Driver.get_pevents p);
       Array.iter
         (fun ifam ->
-          List.iter
-            (fun evt -> f evt.Def.efam_src)
-            (Driver.get_fevents (Driver.foi base ifam)))
+          let fam = Driver.foi base ifam in
+          f (Driver.get_marriage_src fam);
+          f (Driver.get_fsources fam);
+          List.iter (fun evt -> f evt.Def.efam_src) (Driver.get_fevents fam))
         (Driver.get_family p)
 
 let field_name = function
