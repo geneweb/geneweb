@@ -894,7 +894,8 @@ let make_highlight_html s highlight_info error_type conf =
         in
         let title_attr =
           match style.make_title ~code:hex ~name ?misc_msg conf with
-          | Some t -> Printf.sprintf " title=\"%s\"" t
+          | Some t ->
+              Printf.sprintf " title=\"%s\"" (Util.escape_html t :> string)
           | None -> ""
         in
         let original = String.sub s i char_size in
