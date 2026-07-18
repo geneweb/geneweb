@@ -222,9 +222,9 @@ let print_redirect_to_list conf base =
         (fun acc (k, v) ->
           if k = "m" then acc
           else
-            let decoded_v = Mutil.decode v in
-            let base_param = acc ^ "&" ^ k ^ "=" ^ decoded_v in
-            if k = "data" && decoded_v = "place" then
+            let v = (v : Adef.encoded_string :> string) in
+            let base_param = acc ^ "&" ^ k ^ "=" ^ v in
+            if k = "data" && v = "place" then
               base_param ^ "&bi=on&ba=on&ma=on&de=on&bu=on"
             else base_param)
         "" conf.env
@@ -249,7 +249,7 @@ let print_redirect_to_list conf base =
         redirect_url ^ String.concat "" person_params
     in
     Server.http_redirect_temporarily final_url
-  with _ ->
+  with Failure _ | Not_found ->
     let error_url = Printf.sprintf "%sm=CHK_DATA" (Util.commd conf :> string) in
     Server.http_redirect_temporarily error_url
 
