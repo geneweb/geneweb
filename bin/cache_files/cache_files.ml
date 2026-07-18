@@ -86,12 +86,16 @@ let iteri_places f base =
       f i (Driver.get_birth_place p);
       f i (Driver.get_baptism_place p);
       f i (Driver.get_death_place p);
-      f i (Driver.get_burial_place p))
+      f i (Driver.get_burial_place p);
+      List.iter (fun e -> f i e.Def.epers_place) (Driver.get_pevents p))
     ipers;
   Collection.iteri
     (fun i ifam ->
       let fam = Driver.foi base ifam in
-      f (n_pers + i) (Driver.get_marriage_place fam))
+      f (n_pers + i) (Driver.get_marriage_place fam);
+      List.iter
+        (fun e -> f (n_pers + i) e.Def.efam_place)
+        (Driver.get_fevents fam))
     ifams
 
 let iteri_pers f base =
