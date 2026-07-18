@@ -23,12 +23,25 @@ type error_type =
 type checkdata_entry = Geneweb_db.Driver.istr * string
 
 val update_cache_entry :
-  Config.config -> dict_type -> Geneweb_db.Driver.istr -> string -> bool
-(** Update a single entry in the cache file for the specified dictionary. *)
+  Config.config ->
+  dict_type ->
+  old_istr:Geneweb_db.Driver.istr ->
+  new_istr:Geneweb_db.Driver.istr ->
+  string ->
+  bool
+(** [update_cache_entry conf dict ~old_istr ~new_istr v] replaces the cache
+    entry keyed by [old_istr] with [(new_istr, v)], atomically (write to a
+    temporary file, then rename). After a modification the persons reference a
+    new istr while the old one keeps its former string, so the entry must be
+    re-keyed to stay valid. Returns [false] if the cache file or the entry is
+    missing, or on write failure. *)
 
 val find_dict_type_for_istr :
   Config.config -> Geneweb_db.Driver.istr -> dict_type option
-(** Find which dictionary type contains the given istr. *)
+(** Find which dictionary cache contains the given istr. Linear scan of all
+    cache files; first match wins even though an istr may belong to several
+    dictionaries. Fallback only: prefer passing the dictionary explicitly via
+    the [d] parameter. *)
 
 val cache_file_exists : Config.config -> dict_type -> bool
 (** Check if a cache file exists for the specified dictionary type. *)
