@@ -984,7 +984,7 @@ let collect_attributes base p
     (Driver.get_family p);
   !attrs
   |> List.filter (fun i -> not (Driver.Istr.is_empty i))
-  |> List.sort_uniq compare
+  |> List.sort_uniq Driver.Istr.compare
 
 let collect_places base p =
   collect_attributes base p
@@ -1018,7 +1018,7 @@ let collect_sources base p =
       let fam = Driver.foi base ifam in
       List.iter (fun x -> sources := x :: !sources) (get_fsources_x fam))
     (Driver.get_family p);
-  List.sort_uniq compare !sources
+  List.sort_uniq Driver.Istr.compare !sources
 
 let collect_dict_strings base = function
   | Fnames -> fun p -> [ Driver.get_first_name p ]
@@ -1083,46 +1083,45 @@ let cache_file_exists conf dict_type =
 
 let read_cache conf dict_type =
   let cache_file = cache_file_path conf dict_type in
-  try
-    let ic = Secure.open_in_bin cache_file in
-    try
-      let data = (Marshal.from_channel ic : checkdata_entry list) in
-      close_in ic;
-      data
-    with e ->
-      close_in ic;
-      raise e
-  with Sys_error _ -> []
+  match Secure.open_in_bin cache_file with
+  | exception Sys_error _ -> []
+  | ic ->
+      Fun.protect
+        ~finally:(fun () -> close_in_noerr ic)
+        (fun () ->
+          try (Marshal.from_channel ic : checkdata_entry list)
+          with End_of_file | Failure _ -> [])
 
-let update_cache_entry conf dict_type istr new_value =
+let update_cache_entry conf dict_type ~old_istr ~new_istr new_value =
   let cache_file = cache_file_path conf dict_type in
-  if Sys.file_exists cache_file then
-    try
-      let entries = read_cache conf dict_type in
-      let updated_entries =
-        List.map
-          (fun (i, s) -> if i = istr then (i, new_value) else (i, s))
+  if not (Sys.file_exists cache_file) then false
+  else
+    let entries = read_cache conf dict_type in
+    if not (List.exists (fun (i, _) -> Driver.Istr.equal i old_istr) entries)
+    then false
+    else
+      let updated =
+        List.filter_map
+          (fun (i, v) ->
+            if Driver.Istr.equal i old_istr then Some (new_istr, new_value)
+            else if Driver.Istr.equal i new_istr then None
+            else Some (i, v))
           entries
       in
-      let oc = Secure.open_out_bin cache_file in
+      let tmp = cache_file ^ ".tmp" in
       try
-        Marshal.to_channel oc updated_entries [ Marshal.No_sharing ];
-        close_out oc;
+        Secure.with_open_out_bin tmp (fun oc ->
+            Marshal.to_channel oc updated [ Marshal.No_sharing ]);
+        (try Sys.remove cache_file with Sys_error _ -> ());
+        Sys.rename tmp cache_file;
         true
-      with e ->
-        close_out oc;
-        raise e
-    with
-    | Sys_error _ -> false
-    | End_of_file -> false
-    | Failure _ -> false
-  else false
+      with Sys_error _ -> false
 
 let find_dict_type_for_istr conf istr =
   let check_in_cache dict_type =
     if cache_file_exists conf dict_type then
       let entries = read_cache conf dict_type in
-      List.exists (fun (i, _) -> i = istr) entries
+      List.exists (fun (i, _) -> Driver.Istr.equal i istr) entries
     else false
   in
   List.find_opt check_in_cache
