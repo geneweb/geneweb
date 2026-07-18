@@ -675,6 +675,7 @@ type chk_result =
   | Error of string
 
 let perform_check_modification conf base =
+  let esc v = (Util.escape_html v :> string) in
   try
     let k =
       Geneweb_db.Driver.Istr.of_string (List.assoc "k" conf.env :> string)
@@ -699,7 +700,7 @@ let perform_check_modification conf base =
       Error
         (Printf.sprintf "%s (%s → %s, %s: %s)"
            (t conf "modification failed")
-           s s2 (t conf "current value") current_val)
+           (esc s) (esc s2) (t conf "current value") (esc current_val))
     else if s = s2 then Error (t conf "no modification")
     else
       let start_time = Unix.gettimeofday () in
@@ -718,7 +719,7 @@ let perform_check_modification conf base =
           let error_msg =
             match dict_param with
             | Some param ->
-                Printf.sprintf "%s: %s" (t conf "incorrect request") param
+                Printf.sprintf "%s: %s" (t conf "incorrect request") (esc param)
             | None -> t conf "cannot determine dictionary type"
           in
           Error error_msg
@@ -770,7 +771,7 @@ let perform_check_modification conf base =
       Error
         (Printf.sprintf "%s: %s"
            (t conf "modification failed")
-           (Printexc.to_string exn))
+           (esc (Printexc.to_string exn)))
 
 let build_success_message conf r =
   match r with
@@ -828,6 +829,10 @@ let print_status_message conf ~success ~content =
   Output.printf conf {|<div class="alert %s">%s</div>|} alert_class content
 
 let send_validation_result_to_opener conf result =
+  let json_for_script j =
+    String.concat "\\u003c"
+      (String.split_on_char '<' (Yojson.Basic.to_string j))
+  in
   let k = (List.assoc "k" conf.env :> string) in
   let s = Option.value ~default:"" (Util.p_getenv conf.env "s") in
   let s2 = Option.value ~default:"" (Util.p_getenv conf.env "s2") in
@@ -860,8 +865,8 @@ let send_validation_result_to_opener conf result =
   }
 })();
 </script>|}
-    (Yojson.Basic.to_string (`String validation_key))
-    (Yojson.Basic.to_string json_data)
+    (json_for_script (`String validation_key))
+    (json_for_script json_data)
 
 let print_result_as_html conf result =
   match result with
