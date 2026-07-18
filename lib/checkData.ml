@@ -1125,7 +1125,7 @@ let collect_all_errors_from_cache conf dict_type base max_results
   in
   List.rev (process_entries entries [] 0)
 
-let collect_all_errors ?(max_results = None) ?(sel_err_types = []) base dict =
+let collect_all_errors ?max_results ?(sel_err_types = []) base dict =
   let istr_errors = Hashtbl.create 1024 in
   let unique_istrs = ref 0 in
   let collect_strings = collect_dict_strings base dict in
@@ -1198,8 +1198,8 @@ let collect_all_errors ?(max_results = None) ?(sel_err_types = []) base dict =
   !result
 
 (* Main function *)
-let collect_all_errors_with_cache ?(max_results = None) ?(sel_err_types = [])
-    conf base dict =
+let collect_all_errors_with_cache ?max_results ?(sel_err_types = []) conf base
+    dict =
   let use_cache =
     match Util.p_getenv conf.env "nocache" with Some "1" -> false | _ -> true
   in
@@ -1212,4 +1212,4 @@ let collect_all_errors_with_cache ?(max_results = None) ?(sel_err_types = [])
       try List.assoc "roglo" conf.base_env = "yes" with Not_found -> false
     in
     if is_roglo then []
-    else collect_all_errors ~max_results ~sel_err_types base dict
+    else collect_all_errors ?max_results ~sel_err_types base dict
