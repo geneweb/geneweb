@@ -542,6 +542,15 @@ let print conf base =
           </div>|}
       (if params.nocache_checked then " checked" else "")
       (tn conf "chk_data use database/cache" 0);
+  let limit_msg =
+    match params.config_max with
+    | Some c ->
+        Utf8.capitalize_fst
+          (Printf.sprintf
+             (Util.ftransl conf "chk_data limited to %d results")
+             c)
+    | None -> ""
+  in
   Output.printf conf
     {|
           <div class="mb-0">
@@ -552,15 +561,12 @@ let print conf base =
     (t conf ":")
     (match params.form_max with Some n -> string_of_int n | None -> "")
     (match params.config_max with
-    | Some n -> Printf.sprintf {| max="%d"|} n
+    | Some n -> Printf.sprintf {| max="%d" data-limit-msg="%s"|} n limit_msg
     | None -> "")
     (match params.config_max with
-    | Some c ->
+    | Some _ ->
         Printf.sprintf {|<small class="ms-1 text-body-secondary">%s</small>|}
-          (Utf8.capitalize_fst
-             (Printf.sprintf
-                (Util.ftransl conf "chk_data limited to %d results")
-                c))
+          limit_msg
     | None -> "");
   Output.printf conf
     {|
@@ -581,10 +587,13 @@ let print conf base =
   <div class="alert alert-info mt-3">
     <i class="fa fa-database me-2"></i>%s
   </div>
-  <div id="cd" data-ok-title="%s">
+  <div id="cd" data-ok-title="%s" data-msg-invalid="%s" data-msg-timeout="%s" data-msg-popup="%s">
 |}
       (tn conf "chk_data use database/cache" cache_index)
-      (tn conf "validate/delete" 0);
+      (tn conf "validate/delete" 0)
+      (t conf "chk_data invalid response")
+      (t conf "chk_data validation timeout")
+      (t conf "chk_data popup blocked");
     display_results conf base params.selected_dicts params.sel_err_types
       params.max_results;
     Output.print_sstring conf {|

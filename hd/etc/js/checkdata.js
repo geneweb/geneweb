@@ -18,6 +18,12 @@ const CheckData = (() => {
     NOTIFY_DURATION: 4000
   };
 
+  const MSG = {
+    invalid: 'Invalid validation response',
+    timeout: 'Validation timeout',
+    popup: 'Validation popup blocked'
+  };
+
   const SELECTORS = {
     err: '.err',
     editContainer: '.edit-container',
@@ -336,7 +342,7 @@ const createContainer = (btn, field) => {
   const handleValidationResult = (result, errEl, s2, orig, val) => {
     if (!result) {
       console.error('Invalid validation result:', result);
-      notify('error', 'Erreur: données de validation invalides');
+      notify('error', MSG.invalid);
       return;
     }
     if (result.success) {
@@ -438,7 +444,7 @@ const createContainer = (btn, field) => {
         } else if (pollCount >= CONFIG.MAX_POLLS) {
           clearInterval(checkInterval);
           localStorage.removeItem(validationKey);
-          notify('error', 'Timeout: validation non reçue');
+          notify('error', MSG.timeout);
         }
       }, CONFIG.POLL_INTERVAL);
     } finally {
@@ -532,6 +538,10 @@ const createContainer = (btn, field) => {
 
       _okTitle = _container.dataset.okTitle || '';
 
+      if (_container.dataset.msgInvalid) MSG.invalid = _container.dataset.msgInvalid;
+      if (_container.dataset.msgTimeout) MSG.timeout = _container.dataset.msgTimeout;
+      if (_container.dataset.msgPopup) MSG.popup = _container.dataset.msgPopup;
+
       initButtons();
 
       _container.addEventListener('click', handleClick, { passive: false });
@@ -568,15 +578,13 @@ const createContainer = (btn, field) => {
       const max = q('input[name="max"]');
       if (!max) return;
 
-      const limit = max.getAttribute('max');
+      const limit = parseInt(max.getAttribute('max'), 10);
       if (!limit) return;
 
-      max.type = 'number';
-      max.min = '1';
       max.addEventListener('input', e => {
-        const v = parseInt(e.target.value);
-        const l = parseInt(limit);
-        e.target.setCustomValidity(v > l ? `Limité à ${l} résultats` : '');
+        const v = parseInt(e.target.value, 10);
+        const msg = e.target.dataset.limitMsg || `Max ${limit}`;
+        e.target.setCustomValidity(v > limit ? msg : '');
         e.target.reportValidity();
       });
     },

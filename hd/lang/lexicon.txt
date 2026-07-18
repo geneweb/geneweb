@@ -4641,6 +4641,11 @@ de: Fehlertypen
 en: error types
 fr: types d’erreur
 
+    chk_data invalid response
+de: Ungültige Validierungsantwort
+en: invalid validation response
+fr: réponse de validation invalide
+
     chk_data keyboard navigation tooltip
 de: verwende die hoch/runter Pfeiltasten um schnell zwischen den Antworten zu navigieren
 en: use up/down arrow keys to quickly navigate between answers
@@ -4680,10 +4685,20 @@ de: fehlendes Leerzeichen vor der Klammer
 en: missing space before parenthesis
 fr: espace manquante avant la parenthèse
 
+    chk_data popup blocked
+de: Validierungs-Popup vom Browser blockiert
+en: validation popup blocked by the browser
+fr: fenêtre de validation bloquée par le navigateur
+
     chk_data use database/cache
 de: Datenbank nutzen/<b>Datenbank</b> nutzen (sehr langsam)/<b>Cache-Daten</b> nutzen (sehr schnell, kann aber Einträge zeigen die korrigiert oder gelöscht wurden)
 en: use database/using <b>database</b> (very slow)/using <b>cached data</b> (very fast but may show entries that have been corrected or deleted)
 fr: utiliser la base de données/utilisation de la <b>base de données</b> (très lent)/utilisation des <b>données en cache</b> (très rapide mais peut afficher des entrées déjà corrigées ou supprimées)
+
+    chk_data validation timeout
+de: Zeitüberschreitung bei der Validierung
+en: validation timeout
+fr: délai de validation dépassé
 
     child/children
 af: kind/kinders
