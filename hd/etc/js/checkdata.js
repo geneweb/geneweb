@@ -3,7 +3,7 @@ const CheckData = (() => {
 
   const CACHE = new WeakMap();
   const VALIDATING = new Set();
-  const RAF = requestAnimationFrame;
+  const RAF = cb => requestAnimationFrame(cb);
 
   let _container = null;
   let _okTitle = '';
@@ -39,12 +39,6 @@ const CheckData = (() => {
 
   const q = (sel, ctx) => (ctx || document).querySelector(sel);
   const qa = (sel, ctx) => Array.from((ctx || document).querySelectorAll(sel));
-
-  const sanitize = str => {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  };
 
   const isVisible = el => {
     if (!el) return false;
@@ -166,15 +160,15 @@ const createContainer = (btn, field) => {
   const handlePersonList = btn => {
     const err = btn.closest(SELECTORS.err);
     const s2Btn = q(SELECTORS.s2, err);
-    const url = new URL(s2Btn.href);
-    const d = url.searchParams.get('d');
-    const s = url.searchParams.get('s');
-    const k = url.searchParams.get('k');
-    const b = url.searchParams.get('b');
-    const baseUrl = `${url.origin}${url.pathname}`;
-    const bParam = b ? `b=${b}&` : '';
-    const newUrl = `${baseUrl}?${bParam}m=CHK_DATA_L&data=${d}&k=${s}&key=${k}`;
-    window.open(newUrl, '_blank');
+    const u = new URL(s2Btn.href);
+    const p = new URLSearchParams();
+    const b = u.searchParams.get('b');
+    if (b) p.set('b', b);
+    p.set('m', 'CHK_DATA_L');
+    p.set('data', u.searchParams.get('d') || '');
+    p.set('k', u.searchParams.get('s') || '');
+    p.set('key', u.searchParams.get('k') || '');
+    window.open(`${u.origin}${u.pathname}?${p}`, '_blank');
   };
 
   const showEditInput = btn => {
@@ -378,30 +372,37 @@ const createContainer = (btn, field) => {
   const validateEntry = async (s2, errEl) => {
     if (!s2 || !errEl) return;
 
-    const { k, s, s2: s2Val } = getUrlParams(s2.href);
-    const key = s2.href;
+    let href = s2.href;
+    let val = null;
+    const c = q(SELECTORS.editContainer, errEl);
+    if (c) {
+      const f = q(SELECTORS.inputField, c);
+      if (f) {
+        val = f.value.trim();
+        if (val) {
+          const base = s2.dataset.origHref || href;
+          href = base.includes('&s2=')
+            ? base.replace(/(&s2=)[^&]*/, `$1${encodeURIComponent(val)}`)
+            : `${base}&s2=${encodeURIComponent(val)}`;
+          s2.href = href;
+        }
+      }
+    }
+    if (!val) {
+      const p = new URLSearchParams(href.split('?')[1]);
+      val = p.get('s2');
+    }
+    const { k, s, s2: s2Val } = getUrlParams(href);
 
-    if (VALIDATING.has(key)) return;
-    VALIDATING.add(key);
+    if (VALIDATING.has(href)) return;
+    VALIDATING.add(href);
 
     const orig = s2.innerHTML;
     s2.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
     s2.className = 's2 btn btn-info';
 
-    let val = null;
-    const c = q(SELECTORS.editContainer, errEl);
-    if (c) {
-      const f = q(SELECTORS.inputField, c);
-      if (f) val = f.value.trim();
-    }
-
-    if (!val) {
-      const p = new URLSearchParams(s2.href.split('?')[1]);
-      val = p.get('s2');
-    }
-
     try {
-      const r = await fetch(`${s2.href}&ajax`, {
+      const r = await fetch(`${href}&ajax`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -413,6 +414,7 @@ const createContainer = (btn, field) => {
 
       const res = await r.json();
       handleValidationResult(res, errEl, s2, orig, val);
+      VALIDATING.delete(href);
 
     } catch (e) {
       console.error('AJAX error:', e);
@@ -422,7 +424,12 @@ const createContainer = (btn, field) => {
       const validationKey = `chk_validation_${k}_${s}_${s2Val}`;
       localStorage.removeItem(validationKey);
 
-      const popup = window.open(s2.href, '_blank');
+      const popup = window.open(href, '_blank');
+      if (!popup) {
+        VALIDATING.delete(href);
+        notify('error', MSG.popup);
+        return;
+      }
 
       let pollCount = 0;
       const checkInterval = setInterval(() => {
@@ -432,6 +439,7 @@ const createContainer = (btn, field) => {
         if (result) {
           clearInterval(checkInterval);
           localStorage.removeItem(validationKey);
+          VALIDATING.delete(href);
 
           try {
             const data = JSON.parse(result);
@@ -444,11 +452,10 @@ const createContainer = (btn, field) => {
         } else if (pollCount >= CONFIG.MAX_POLLS) {
           clearInterval(checkInterval);
           localStorage.removeItem(validationKey);
+          VALIDATING.delete(href);
           notify('error', MSG.timeout);
         }
       }, CONFIG.POLL_INTERVAL);
-    } finally {
-      VALIDATING.delete(key);
     }
   };
 
@@ -508,6 +515,7 @@ const createContainer = (btn, field) => {
     const closeBtn = document.createElement('button');
     closeBtn.type = 'button';
     closeBtn.className = 'btn-close ms-2';
+    closeBtn.setAttribute('aria-label', 'Close');
 
     content.appendChild(msgSpan);
     content.appendChild(closeBtn);
@@ -597,7 +605,7 @@ const createContainer = (btn, field) => {
       const saved = sessionStorage.getItem('checkDataScroll');
       if (saved) {
         RAF(() => {
-          window.scrollTo(0, parseInt(saved));
+          window.scrollTo(0, parseInt(saved, 10));
           sessionStorage.removeItem('checkDataScroll');
         });
       }
