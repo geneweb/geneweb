@@ -505,69 +505,45 @@ let simple_replacements =
     (Re.str "ʻ", "’");
   ]
 
-(* Replacements spécifiques par dictionnaire *)
-let dict_specific_replacements =
-  [
-    (Re.str " -", "-", [ Occupation; Sources ]);
-    (Re.str "- ", "-", [ Occupation; Sources ]);
-  ]
-
 let char_before_parenthesis_pattern =
   Re.seq [ Re.group (Re.set "A-Za-z0-9"); Re.char '(' ]
 
 let breton_trigram_pattern =
   Re.seq [ Re.group (Re.set "cC"); Re.set "’'"; Re.group (Re.set "hH") ]
 
-let compiled_complex =
-  lazy
-    [
-      Re.compile char_before_parenthesis_pattern;
-      Re.compile breton_trigram_pattern;
-    ]
+let dash_replacements = [ (Re.str " -", "-"); (Re.str "- ", "-") ]
 
-let get_applicable_replacements dict_type =
-  let base = simple_replacements in
-  let specific =
-    List.filter_map
-      (fun (pat, repl, excluded) ->
-        if List.mem dict_type excluded then None else Some (pat, repl))
-      dict_specific_replacements
+let compile_replacements l =
+  List.map (fun (pat, repl) -> (Re.compile pat, repl)) l
+
+let replacements_of_dict =
+  let occ_src = lazy (compile_replacements simple_replacements) in
+  let std =
+    lazy
+      (compile_replacements
+         (List.rev_append (List.rev simple_replacements) dash_replacements))
   in
-  base @ specific
+  function Occupation | Sources -> Lazy.force occ_src | _ -> Lazy.force std
 
-let compiled_misc_errors_by_dict =
-  lazy
-    (let build_for_dict dict_type =
-       let replacements = get_applicable_replacements dict_type in
-       let patterns =
-         List.map fst replacements
-         @ [ char_before_parenthesis_pattern; breton_trigram_pattern ]
-       in
-       Re.compile (Re.alt patterns)
-     in
-     [
-       (Fnames, build_for_dict Fnames);
-       (Snames, build_for_dict Snames);
-       (Fnames_alias, build_for_dict Fnames_alias);
-       (Snames_alias, build_for_dict Snames_alias);
-       (Places, build_for_dict Places);
-       (PubNames, build_for_dict PubNames);
-       (Qualifiers, build_for_dict Qualifiers);
-       (Aliases, build_for_dict Aliases);
-       (Occupation, build_for_dict Occupation);
-       (Estates, build_for_dict Estates);
-       (Titles, build_for_dict Titles);
-       (Sources, build_for_dict Sources);
-     ])
+let char_before_paren_re = lazy (Re.compile char_before_parenthesis_pattern)
+let breton_trigram_re = lazy (Re.compile breton_trigram_pattern)
+
+let misc_alt_of_dict =
+  let build extra =
+    Re.compile
+      (Re.alt
+         (List.rev_append
+            (List.rev_map fst simple_replacements)
+            (List.rev_append (List.rev_map fst extra)
+               [ char_before_parenthesis_pattern; breton_trigram_pattern ])))
+  in
+  let std = lazy (build dash_replacements) in
+  let occ_src = lazy (build []) in
+  function Occupation | Sources -> Lazy.force occ_src | _ -> Lazy.force std
 
 let has_misc_typographic_errors dict_type s =
-  let re = List.assoc dict_type (Lazy.force compiled_misc_errors_by_dict) in
-  let check str =
-    try
-      ignore (Re.exec re str);
-      true
-    with Not_found -> false
-  in
+  let re = misc_alt_of_dict dict_type in
+  let check str = Re.execp re str in
   match dict_type with
   | Places -> (
       match place_suburb_sep_range s with
@@ -579,25 +555,35 @@ let has_misc_typographic_errors dict_type s =
   | _ -> check s
 
 let find_misc_typographic_positions dict_type s conf =
-  let replacements = get_applicable_replacements dict_type in
+  let replacements = replacements_of_dict dict_type in
   let errors = ref [] in
   let pos = ref 0 in
   let len = String.length s in
-  let try_pattern pattern message_or_key add_positions found_match =
+  let try_pattern re message_or_key add_positions found_match =
     if !found_match = None then
-      try
-        let result = Re.exec ~pos:!pos pattern s in
-        let start_pos = Re.Group.start result 0 in
-        let end_pos = Re.Group.stop result 0 in
-        if start_pos = !pos then (
-          add_positions start_pos end_pos message_or_key;
-          found_match := Some end_pos)
-      with Not_found -> ()
+      match Re.exec_opt ~pos:!pos re s with
+      | Some result ->
+          let start_pos = Re.Group.start result 0 in
+          let end_pos = Re.Group.stop result 0 in
+          if start_pos = !pos then (
+            add_positions start_pos end_pos message_or_key;
+            found_match := Some end_pos)
+      | None -> ()
+  in
+  let add_single_pos start_pos _end_pos msg_key =
+    let message = Util.transl conf msg_key in
+    errors := { pos = start_pos; message } :: !errors
+  in
+  let add_range_pos start_pos end_pos msg_key =
+    let message = Util.transl conf msg_key in
+    for i = start_pos to end_pos - 1 do
+      errors := { pos = i; message } :: !errors
+    done
   in
   while !pos < len do
     let found_match = ref None in
     List.iter
-      (fun (pat, repl) ->
+      (fun (re, repl) ->
         let add_pos start_pos end_pos _ =
           let matched = String.sub s start_pos (end_pos - start_pos) in
           let msg = Util.transl conf "chk_data ponctuation error" in
@@ -609,24 +595,13 @@ let find_misc_typographic_positions dict_type s conf =
             errors := { pos = i; message } :: !errors
           done
         in
-        try_pattern (Re.compile pat) "" add_pos found_match)
+        try_pattern re "" add_pos found_match)
       replacements;
-    let complex_patterns = Lazy.force compiled_complex in
-    let add_single_pos start_pos _end_pos msg_key =
-      let message = Util.transl conf msg_key in
-      errors := { pos = start_pos; message } :: !errors
-    in
-    let add_range_pos start_pos end_pos msg_key =
-      let message = Util.transl conf msg_key in
-      for i = start_pos to end_pos - 1 do
-        errors := { pos = i; message } :: !errors
-      done
-    in
     try_pattern
-      (List.nth complex_patterns 0)
+      (Lazy.force char_before_paren_re)
       "chk_data ponctuation error missing space" add_single_pos found_match;
     try_pattern
-      (List.nth complex_patterns 1)
+      (Lazy.force breton_trigram_re)
       "chk_data ponctuation error breton trigram help" add_range_pos found_match;
     pos := match !found_match with Some p -> p | None -> !pos + 1
   done;
@@ -640,20 +615,17 @@ let find_misc_typographic_positions dict_type s conf =
   | _ -> errors
 
 let apply_misc_fixes dict_type s =
-  let replacements = get_applicable_replacements dict_type in
   let s =
     List.fold_left
-      (fun acc (pat, repl) -> Re.replace_string (Re.compile pat) ~by:repl acc)
-      s replacements
+      (fun acc (re, repl) -> Re.replace_string re ~by:repl acc)
+      s
+      (replacements_of_dict dict_type)
   in
-  let patterns = Lazy.force compiled_complex in
   s
-  |> Re.replace (List.nth patterns 0) ~f:(fun groups ->
+  |> Re.replace (Lazy.force char_before_paren_re) ~f:(fun groups ->
       Re.Group.get groups 1 ^ " (")
-  |> Re.replace (List.nth patterns 1) ~f:(fun groups ->
-      let c = Re.Group.get groups 1 in
-      let h = Re.Group.get groups 2 in
-      c ^ "ʼ" ^ h)
+  |> Re.replace (Lazy.force breton_trigram_re) ~f:(fun groups ->
+      Re.Group.get groups 1 ^ "ʼ" ^ Re.Group.get groups 2)
 
 let fix_misc_typographic_errors dict_type s =
   match dict_type with
