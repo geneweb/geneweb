@@ -430,8 +430,9 @@ let treat_request =
              | "CHG_FAM_ORD_OK" ->
                  w_wizard @@ w_lock @@ w_base
                  @@ UpdateFamOk.print_change_order_ok
-             | "CHK_DATA" -> w_base @@ CheckDataDisplay.print
-             | "CHK_DATA_L" -> w_base @@ CheckDataDisplay.print_redirect_to_list
+             | "CHK_DATA" -> w_wizard @@ w_base @@ CheckDataDisplay.print
+             | "CHK_DATA_L" ->
+                 w_wizard @@ w_base @@ CheckDataDisplay.print_redirect_to_list
              | "CHK_DATA_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ CheckDataDisplay.print_chk_ok
              | "CONN_WIZ" ->
