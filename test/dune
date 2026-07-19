@@ -10,7 +10,8 @@
   merge_test
   util_test
   dag2html_test
-  oidc_test)
+  oidc_test
+  userkey_test)
  (libraries alcotest geneweb geneweb.oidc fmt))
 
 (test
