@@ -829,6 +829,20 @@ let treat_request =
           | referer when referer <> "" -> "&" ^ referer
           | _ -> ""
         in
+        let oidc_login =
+          if Gwd_oidc.enabled conf.base_env then
+            let provider =
+              match List.assoc_opt "oidc_provider_name" conf.base_env with
+              | Some p when p <> "" -> p
+              | _ -> "SSO"
+            in
+            Printf.sprintf {|<li><a href="%s?%sm=OIDC_LOGIN">%s</a></li>|}
+              (conf.command :> string)
+              base_name
+              (Utf8.capitalize_fst
+                 (Printf.sprintf (Util.ftransl conf "connect with %s") provider))
+          else ""
+        in
         let body =
           if conf.cgi then
             Printf.sprintf
@@ -851,6 +865,7 @@ let treat_request =
               <ul>
               <li>%s%s <a href="%s?%sw=f%s"> %s</a></li>
               <li>%s%s <a href="%s?%sw=w%s"> %s</a></li>
+              %s
               </ul>
             </div> |}
               (transl conf "access" |> Utf8.capitalize_fst)
@@ -863,6 +878,7 @@ let treat_request =
               (conf.command :> string)
               base_name referer
               (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+              oidc_login
         in
         Output.print_sstring conf
           (Printf.sprintf
