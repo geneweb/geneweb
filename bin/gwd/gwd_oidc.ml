@@ -15,11 +15,10 @@ let login_cookie_name base_file = "__Host-gw_oidc_login_" ^ base_file
 let login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp =
   let msg =
     String.concat "\000"
-      [
-        "gw-oidc-login-v1"; base_file; state; nonce; verifier; string_of_int exp;
-      ]
+      [ base_file; state; nonce; verifier; string_of_int exp ]
   in
-  Digestif.SHA256.(to_hex (hmac_string ~key:secret msg))
+  Digestif.SHA256.(
+    to_hex (hmac_string ~key:secret ("gw-oidc-login-v1\000" ^ msg)))
 
 (* constant-time HMAC comparison *)
 let sig_ok expected_hex provided_hex =
@@ -139,12 +138,14 @@ let missing_required_keys base_env =
   let has_secret =
     present "oidc_client_secret" || present "oidc_client_secret_file"
   in
-  List.filter
-    (fun k ->
-      match k with
-      | "oidc_client_secret" -> not has_secret
-      | k -> not (present k))
-    [ "oidc_client_id"; "oidc_client_secret"; "oidc_redirect_uri" ]
+  List.fold_right
+    (fun (ok, label) acc -> if ok then acc else label :: acc)
+    [
+      (present "oidc_client_id", "oidc_client_id");
+      (has_secret, "oidc_client_secret (or oidc_client_secret_file)");
+      (present "oidc_redirect_uri", "oidc_redirect_uri");
+    ]
+    []
 
 let read_oidc_config base_env =
   match List.assoc_opt "oidc_provider_url" base_env with
