@@ -736,3 +736,66 @@
 # or to only one if variable is set
 # if not set, then togle checkbox accessible on individual page.
 #wide=on
+
+# =============================================================================
+# OpenID Connect (SSO) login
+# =============================================================================
+# When "oidc_provider_url" is set, gwd exposes single sign-on through an
+# OpenID Connect provider (Keycloak, Authentik, Google, etc.) using the
+# Authorization Code Flow. Users reach it with "m=OIDC_LOGIN" and are logged
+# out with "m=OIDC_LOGOUT". On success a session cookie (gw_oidc_<base>) grants
+# wizard or friend access, mapped from a claim in the id_token (see below).
+#
+# HTTPS is mandatory: gwd must be served over TLS (the session cookie is
+# "Secure"), and "oidc_provider_url" MUST be https (http is accepted only for
+# loopback hosts, for local testing), since the id_token is trusted via TLS to
+# the provider rather than by checking its signature.
+#
+# Enabling OIDC (setting "oidc_provider_url") disables the legacy "no wizard
+# password configured => every visitor is a wizard" default for this base:
+# access then comes from OIDC, or from an explicitly configured wizard/friend
+# password. Plain visitor access is unchanged.
+#
+# Runtime requirements: OIDC is available only on UNIX (it draws its randomness
+# from /dev/urandom), and gwd shells out to the "curl" binary for the discovery
+# and token HTTP calls, so curl must be installed and on gwd's PATH.
+
+# Provider issuer URL. Must be https (see above). Its discovery document is
+# fetched from "<oidc_provider_url>/.well-known/openid-configuration". Leaving
+# this empty disables OIDC for the base.
+#oidc_provider_url=https://idp.example.org/realms/main
+
+# OAuth2 client credentials registered with the provider for this base.
+#oidc_client_id=
+
+# Client secret. Prefer "oidc_client_secret_file" (path to a file whose first
+# line holds the secret) so the secret is not stored in the .gwf itself.
+# If both are set, the file takes precedence.
+#oidc_client_secret=
+#oidc_client_secret_file=
+
+# Redirect URI registered with the provider. It must point back at this base;
+# the provider appends "code" and "state", which gwd auto-detects as the
+# callback (no "m=" needed).
+#oidc_redirect_uri=https://geneweb.example.org/mybase
+
+# Claim used as the user identity. Falls back to "sub" if absent.
+#oidc_user_claim=email
+
+# Claim inspected for role/group membership (scalar or array), e.g.
+# "realm_access.roles" for Keycloak or "groups" for Authentik. Leave empty to
+# grant every authenticated user visitor access only.
+#oidc_role_claim=
+
+# Values within "oidc_role_claim" that grant wizard and friend access. A user
+# with neither role is logged in as a plain visitor.
+#oidc_wizard_role=
+#oidc_friend_role=
+
+# Optional claim carrying the GeneWeb person key ("first_name.occ surname") to
+# associate the logged-in user with a database individual. Leave empty to skip.
+#oidc_person_key_claim=
+
+# Provider name shown on the welcome-page login button, after the translated
+# "connect with" (e.g. "Google" -> "Connect with Google"). Defaults to "SSO".
+#oidc_provider_name=

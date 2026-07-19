@@ -53,6 +53,7 @@ type config = {
   debug : bool;
   query_start : float;
   friend : bool;
+  oidc : bool;  (** the current session was established through OIDC (SSO) *)
   semi_public : bool;
   just_friend_wizard : bool;
   user : string;

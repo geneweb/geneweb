@@ -15,6 +15,7 @@
 <div class="container" id="welcome">
 %include;hed
 %define;book_of(xx)[book of %s:::xx]%end;
+%define;connect_with(xx)[*connect with %s:::xx]%end;
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%end;
 %apply;dl("fnames")
 %apply;dl("snames")
@@ -122,15 +123,34 @@
         %end;
         </div>
       %end;
+      %if;(b.oidc_provider_url!="" and not wizard and not friend)
+        <a href="%prefix;m=OIDC_LOGIN" role="button"
+           class="btn btn-sm btn-outline-info text-nowrap mt-1 w-100">
+          <i class="fas fa-right-to-bracket me-2" aria-hidden="true"></i>%nn;
+          %apply;connect_with%with;%if;(b.oidc_provider_name!="")%bvar.oidc_provider_name;%else;SSO%end;%end;</a>
+      %end;
       %let;username;%if;(user.name="")%user.ident;%else;%user.name;%end;%in;
-      %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!=""))
-        or (friend and (b.friend_passwd_file!="" or b.friend_passwd!="")))
+      %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!="" or oidc))
+        or (friend and (b.friend_passwd_file!="" or b.friend_passwd!="" or oidc)))
         <a class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom"
           %let;userk;%if;(user.key!="")%user.key;%elseif;(user.name!="")%user.name;%else;%user.ident;%end;%in;
-          href="%prefix;m=S&pn=%apply;url_encode(userk)"%sp;
+          href="%prefix;%if;(user.index!="")i=%user.index;%else;m=S&pn=%apply;url_encode(userk)%end;"%sp;
           %if;(user.key="")title="[*no user key]" data-bs-toggle="tooltip"%end;>%nn;
           %if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %username;</a>
-        <a class="btn btn-sm btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-right-from-bracket mr-1" aria-hidden="true"></i>[*disconnect]</a>
+        %if;oidc;
+        <form method="post" action="%action;" class="mt-1 w-100">
+          %hidden;
+          <input type="hidden" name="m" value="OIDC_LOGOUT">
+          <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+            <i class="fas fa-right-from-bracket me-1" aria-hidden="true"></i>%nn;
+            [*disconnect]</button>
+        </form>
+        %else;
+        <a class="btn btn-sm btn-outline-danger mt-1 w-100" role="button"
+           href="%prefix;w=">
+          <i class="fas fa-right-from-bracket me-1" aria-hidden="true"></i>%nn;
+          [*disconnect]</a>
+        %end;
       %end;
     </div>
   </div>

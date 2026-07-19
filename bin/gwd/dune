@@ -15,12 +15,14 @@
  (name gwd_lib)
  (libraries
   geneweb
+  geneweb.oidc
   geneweb_http
   geneweb_register
+  digestif
   dune-site
   dune-site.plugins
   cmdliner)
- (modules base64 request sites cmd cmd_legacy robot))
+ (modules base64 request sites cmd cmd_legacy robot gwd_oidc))
 
 (executable
  (package geneweb)
@@ -29,6 +31,7 @@
  (libraries
   dynlink
   geneweb
+  geneweb.oidc
   geneweb_http
   geneweb_register
   gwd_lib

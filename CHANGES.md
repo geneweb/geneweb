@@ -1,6 +1,8 @@
 # Unreleased
 
 ## Gwd
+- Add OpenID Connect (SSO) login support, configured per base via the
+  `oidc_*` variables in the `.gwf` file (#2893)
 - Use `getaddrinfo` to retrieve addresses from the operating system (#2757)
 
 ## Breaking changes

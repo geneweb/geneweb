@@ -1640,6 +1640,62 @@ sv: ca
 tr: yak.
 zh: ca
 
+    authentication error
+bg: грешка при удостоверяване
+co: errore d’autenticazione
+cs: chyba ověření
+da: autentificeringsfejl
+de: Authentifizierungsfehler
+en: authentication error
+eo: aŭtentiga eraro
+es: error de autenticación
+et: autentimisviga
+fi: todennusvirhe
+fr: erreur d'authentification
+he: שגיאת אימות
+it: errore di autenticazione
+lt: autentifikavimo klaida
+lv: autentifikācijas kļūda
+nl: authenticatiefout
+no: autentiseringsfeil
+oc: error d’autenticacion
+pl: błąd uwierzytelniania
+pt: erro de autenticação
+ro: eroare de autentificare
+ru: ошибка аутентификации
+sk: chyba overenia
+sl: napaka pri overjanju
+sv: autentiseringsfel
+tr: kimlik doğrulama hatası
+
+    authentication failed, retry or contact administrator
+bg: удостоверяването е неуспешно, опитайте отново или се свържете с администратора
+co: l’autenticazione hè fiasca, pruvate torna o cuntattate l’amministratore
+cs: ověření selhalo, zkuste to znovu nebo kontaktujte správce
+da: godkendelse mislykkedes, prøv igen eller kontakt administratoren
+de: Authentifizierung fehlgeschlagen, bitte erneut versuchen oder den Administrator kontaktieren
+en: authentication failed, please retry or contact the administrator
+eo: aŭtentigo malsukcesis, bonvolu reprovi aŭ kontakti la administranton
+es: error de autenticación, vuelva a intentarlo o póngase en contacto con el administrador
+et: autentimine ebaõnnestus, proovige uuesti või võtke ühendust administraatoriga
+fi: todennus epäonnistui, yritä uudelleen tai ota yhteyttä ylläpitäjään
+fr: échec de l'authentification, veuillez réessayer ou contacter l'administrateur
+he: האימות נכשל, נסו שוב או פנו למנהל המערכת
+it: autenticazione non riuscita, riprova o contatta l’amministratore
+lt: autentifikavimas nepavyko, bandykite dar kartą arba kreipkitės į administratorių
+lv: autentifikācija neizdevās, mēģiniet vēlreiz vai sazinieties ar administratoru
+nl: authenticatie mislukt, probeer het opnieuw of neem contact op met de beheerder
+no: autentisering mislyktes, prøv igjen eller kontakt administratoren
+oc: l’autenticacion a fracassat, tornatz ensajar o contactatz l’administrator
+pl: uwierzytelnianie nie powiodło się, spróbuj ponownie lub skontaktuj się z administratorem
+pt: falha na autenticação, tente novamente ou contacte o administrador
+ro: autentificare eșuată, încercați din nou sau contactați administratorul
+ru: ошибка аутентификации, повторите попытку или обратитесь к администратору
+sk: overenie zlyhalo, skúste to znova alebo kontaktujte správcu
+sl: overjanje ni uspelo, poskusite znova ali se obrnite na skrbnika
+sv: autentiseringen misslyckades, försök igen eller kontakta administratören
+tr: kimlik doğrulama başarısız oldu, lütfen tekrar deneyin veya yöneticiyle iletişime geçin
+
     access
 af: toegang
 bg: достъп
@@ -5287,6 +5343,34 @@ no: konfirmasjon (LDS)
 pt: confirmação LDS
 sv: konfirmation (LDS)
 tr: onay (LDS)
+
+    connect with %s
+bg: вход чрез %s
+co: cunnettesi cù %s
+cs: přihlásit se přes %s
+da: log ind med %s
+de: Anmelden mit %s
+en: connect with %s
+eo: ensaluti per %s
+es: conectarse con %s
+et: logi sisse %s kaudu
+fi: kirjaudu palvelulla %s
+fr: se connecter avec %s
+he: התחבר עם %s
+it: accedi con %s
+lt: prisijungti per %s
+lv: pieslēgties ar %s
+nl: aanmelden met %s
+no: logg inn med %s
+oc: se connectar amb %s
+pl: zaloguj się przez %s
+pt: entrar com %s
+ro: conectare cu %s
+ru: войти через %s
+sk: prihlásiť sa cez %s
+sl: prijava prek %s
+sv: logga in med %s
+tr: %s ile bağlan
 
     connection/connections
 bg: потребителски връзки

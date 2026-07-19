@@ -44,6 +44,7 @@
     uutf
     yojson
     digestif
+    base64
     pp_loc
     dune-site
     conf-brotli
