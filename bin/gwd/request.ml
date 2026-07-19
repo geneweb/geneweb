@@ -109,11 +109,7 @@ let make_henv conf base =
   let conf =
     if conf.userkey = "" then conf
     else
-      let fn, oc, sn = GWPARAM.split_key conf.userkey in
-      match
-        Geneweb_db.Driver.person_of_key base fn sn
-          (if oc = "" then 0 else int_of_string oc)
-      with
+      match GWPARAM.person_of_string_user_key base conf.userkey with
       | Some ip ->
           {
             conf with

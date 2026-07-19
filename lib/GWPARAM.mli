@@ -97,6 +97,13 @@ val split_key : string -> string * string * string
 (** split a key of the form first_name.occ surname into its three components the
     .occ part may be absent. No spaces in first_name and surnames *)
 
+val person_of_string_user_key :
+  Geneweb_db.Driver.base -> string -> Geneweb_db.Driver.iper option
+(** [person_of_string_user_key base key] resolves a user/person key
+    ([first_name.occ surname], '+' allowed for spaces) to an individual. It
+    tries {!split_key} (first-space split) then the occ-aware dot-key parser, so
+    it also resolves multi-word first names. *)
+
 val is_related :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 (** determines if the person is a descendant a sibling or an ancestor of
