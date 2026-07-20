@@ -185,28 +185,26 @@ let get_sel_err_types conf =
 
 let error_type_name conf err_type = t conf (ErrorInfo.get_name err_type)
 
+let get_config_max conf =
+  match List.assoc_opt "chk_data_max_results" conf.base_env with
+  | Some "" -> None
+  | Some s -> (
+      match int_of_string_opt s with
+      | Some n when n > 0 -> Some n
+      | Some _ | None -> Some 150)
+  | None -> Some 150
+
+let get_form_max conf =
+  match Util.p_getenv conf.env "max" with
+  | Some "" -> None
+  | Some s -> (
+      match int_of_string_opt s with
+      | Some n when n > 0 -> Some n
+      | Some _ | None -> None)
+  | None -> None
+
 let get_max_results conf =
-  let config_max =
-    match List.assoc_opt "chk_data_max_results" conf.base_env with
-    | Some "" -> None
-    | Some s -> (
-        try
-          let n = int_of_string s in
-          if n > 0 then Some n else Some 150
-        with _ -> Some 150)
-    | None -> Some 150
-  in
-  let form_max =
-    match Util.p_getenv conf.env "max" with
-    | Some "" -> None
-    | Some s -> (
-        try
-          let n = int_of_string s in
-          if n > 0 then Some n else None
-        with _ -> None)
-    | None -> None
-  in
-  match (config_max, form_max) with
+  match (get_config_max conf, get_form_max conf) with
   | Some c, Some f -> Some (min c f)
   | Some c, None -> Some c
   | None, Some f -> Some f
@@ -460,18 +458,10 @@ let print conf base =
       selected_dicts = get_sel_dicts conf;
       sel_err_types = get_sel_err_types conf;
       max_results = get_max_results conf;
-      form_max =
-        (match Util.p_getenv conf.env "max" with
-        | Some s -> ( try Some (int_of_string s) with _ -> None)
-        | None -> None);
-      config_max =
-        (match List.assoc_opt "chk_data_max_results" conf.base_env with
-        | Some "" -> None
-        | Some s -> ( try Some (int_of_string s) with _ -> Some 150)
-        | None -> Some 150);
+      form_max = get_form_max conf;
+      config_max = get_config_max conf;
       nocache_checked = Util.p_getenv conf.env "nocache" = Some "1";
-      is_roglo =
-        (try List.assoc "roglo" conf.base_env = "yes" with Not_found -> false);
+      is_roglo = List.assoc_opt "roglo" conf.base_env = Some "yes";
     }
   in
   Hutil.header conf title;
@@ -601,15 +591,15 @@ let print conf base =
 |});
   Hutil.trailer conf
 
-type chk_result =
-  | Success of {
-      before : string;
-      after : string;
-      cache_updated : bool;
-      nb_modified : int option;
-      elapsed : float option;
-    }
-  | Error of string
+type chk_success = {
+  before : string;
+  after : string;
+  cache_updated : bool;
+  nb_modified : int option;
+  elapsed : float option;
+}
+
+type chk_result = Success of chk_success | Error of string
 
 let perform_check_modification conf base =
   let esc v = (Util.escape_html v :> string) in
@@ -713,28 +703,25 @@ let perform_check_modification conf base =
            (esc (Printexc.to_string exn)))
 
 let build_success_message conf r =
-  match r with
-  | Success r_data -> (
-      let base_msg = t conf "modification successful" in
-      let cache_msg =
-        if r_data.cache_updated then "✓ " ^ t conf "cache updated" ^ "" else ""
+  let base_msg = t conf "modification successful" in
+  let cache_msg =
+    if r.cache_updated then "✓ " ^ t conf "cache updated" else ""
+  in
+  match (r.nb_modified, r.elapsed) with
+  | Some n, Some time when n > 0 ->
+      let modif_word =
+        Util.transl_nth conf "modification/modifications"
+          (if n = 1 then 0 else 1)
       in
-      match (r_data.nb_modified, r_data.elapsed) with
-      | Some n, Some time when n > 0 ->
-          let modif_word =
-            Util.transl_nth conf "modification/modifications"
-              (if n = 1 then 0 else 1)
-          in
-          Printf.sprintf "%s<br>%s<br><br>%d %s – %.1f s" base_msg cache_msg n
-            modif_word time
-      | _ -> base_msg ^ cache_msg)
-  | Error _ -> t conf "modification failed"
+      Printf.sprintf "%s<br>%s<br><br>%d %s – %.1f s" base_msg cache_msg n
+        modif_word time
+  | _ -> base_msg ^ cache_msg
 
 let print_result_as_json conf result =
   let json =
     match result with
     | Success r ->
-        let msg = build_success_message conf (Success r) in
+        let msg = build_success_message conf r in
         `Assoc
           [
             ("success", `Bool true);
@@ -779,7 +766,7 @@ let send_validation_result_to_opener conf result =
   let json_data =
     match result with
     | Success r ->
-        let msg = build_success_message conf (Success r) in
+        let msg = build_success_message conf r in
         `Assoc
           [
             ("success", `Bool true);
