@@ -921,7 +921,7 @@ and unsafe_mk_person conf' base (p : Gwdb.person) =
         let other_marriage_events ip =
           Array.to_list (Gwdb.get_family (Gwdb.poi base ip))
           |> List.filter (( <> ) ifam)
-          |> List.map (fun ifam ->
+          |> List.concat_map (fun ifam ->
                  let fevents = Gwdb.get_fevents (Gwdb.foi base ifam) in
                  let spouse = get_spouse ifam ip in
                  List.filter
@@ -929,7 +929,6 @@ and unsafe_mk_person conf' base (p : Gwdb.person) =
                    fevents
                  |> List.map
                       (Geneweb.Event.event_item_of_fevent ~sp:(Some spouse)))
-          |> List.concat
         in
 
         ( parent_marriage,
