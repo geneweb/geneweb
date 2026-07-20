@@ -131,7 +131,7 @@ let image_url_from_path conf path =
   else
     let prefix = (Util.commd conf :> string) in
     let album = "albums/" in
-    if Mutil.start_with album 0 path then
+    if String.starts_with ~prefix:album path then
       let n = String.length album in
       prefix ^ "m=IMA&s=" ^ String.sub path n (String.length path - n)
     else prefix ^ "m=DOC&s=" ^ path

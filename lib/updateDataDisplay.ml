@@ -155,7 +155,7 @@ let print_mod_ok conf base =
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "at new location");
       Output.print_sstring conf {|</a>|};
-      if not (Mutil.start_with ini 0 new_ini) then (
+      if not (String.starts_with ~prefix:ini new_ini) then (
         Output.print_sstring conf {| / <a href="|};
         Output.print_string conf (commd conf);
         Output.print_sstring conf {|m=MOD_DATA&data=|};

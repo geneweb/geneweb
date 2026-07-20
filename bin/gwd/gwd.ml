@@ -840,7 +840,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
     if auth = "" then ""
     else
       let s = "Basic " in
-      if Mutil.start_with s 0 auth then
+      if String.starts_with ~prefix:s auth then
         let i = String.length s in
         Base64.decode (String.sub auth i (String.length auth - i))
       else ""
@@ -1049,7 +1049,7 @@ let digest_authorization request base_env passwd utm base_file command =
     }
   else if passwd = "w" || passwd = "f" then
     let auth = Mutil.extract_param "authorization: " '\r' request in
-    if Mutil.start_with "Digest " 0 auth then
+    if String.starts_with ~prefix:"Digest " auth then
       let meth =
         match Mutil.extract_param "GET " ' ' request with
         | "" -> "POST"
@@ -1706,7 +1706,7 @@ let image_request conf script_name env =
       true
   | _ ->
       let s = script_name in
-      if Mutil.start_with "images/" 0 s then
+      if String.starts_with ~prefix:"images/" s then
         let i = String.length "images/" in
         let fname = String.sub s i (String.length s - i) in
         (* Je ne sais pas pourquoi on fait un basename, mais ça empeche *)
@@ -1770,7 +1770,7 @@ let find_misc_file_of_plugins name =
   List.exists
     (fun pname ->
       let assets_dir = assets_of_plugin pname in
-      Mutil.start_with assets_dir 0 name)
+      String.starts_with ~prefix:assets_dir name)
     (Registration.all_registered ())
 
 let find_misc_file conf name =
