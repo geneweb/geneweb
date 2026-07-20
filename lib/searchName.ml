@@ -62,7 +62,8 @@ let has_visible_marital_name match_name conf base p =
 
 type prefix = { kind : [ `First_name | `Surname ]; value : string }
 
-let persons_of_prefixes_stream max conf' base filter other_pfxs main_pfx =
+let persons_of_prefixes_stream max conf' base include_marital_names filter
+    other_pfxs main_pfx =
   let conf = Config.Trimmed.from_config conf' in
   let main_stream =
     (match main_pfx.kind with
@@ -90,14 +91,15 @@ let persons_of_prefixes_stream max conf' base filter other_pfxs main_pfx =
         if Gwdb.get_sex p <> Def.Female then value
         else
           value
-          || has_visible_marital_name
-               (fun s ->
-                 List.exists
-                   (start_with base
-                      (Name.lower (strip_particle base other_pfx.value)))
-                   (Name.split s))
-               conf base
-               (Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
+          || include_marital_names
+             && has_visible_marital_name
+                  (fun s ->
+                    List.exists
+                      (start_with base
+                         (Name.lower (strip_particle base other_pfx.value)))
+                      (Name.split s))
+                  conf base
+                  (Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
   in
   let rec consume n results main_stream =
     match Seq.uncons main_stream with
@@ -118,12 +120,12 @@ let persons_of_prefixes_stream max conf' base filter other_pfxs main_pfx =
   in
   Gwdb.IperSet.elements (consume max Gwdb.IperSet.empty main_stream)
 
-let persons_starting_with ~conf ~base ~filter ~limit ~other_prefixes main_prefix
-    =
+let persons_starting_with ~conf ~base ~include_marital_names ~filter ~limit
+    ~other_prefixes main_prefix =
   match other_prefixes with
   | _ :: _ ->
-      persons_of_prefixes_stream limit conf base filter other_prefixes
-        main_prefix
+      persons_of_prefixes_stream limit conf base include_marital_names filter
+        other_prefixes main_prefix
   | [] ->
       let stream =
         (match main_prefix.kind with
@@ -148,20 +150,19 @@ let is_subset_pfx s1 s2 =
     (fun e -> List.exists (fun s -> String.starts_with ~prefix:e s) s2)
     s1
 
-let filter_marital_names ?(remove_marital_names_match_only = false) match_name
-    conf base p =
+let filter_marital_names ?(include_marital_names = true) match_name conf base p
+    =
   let conf = Config.Trimmed.from_config conf in
   Gwdb.get_sex p <> Def.Female
   ||
   let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper p) in
   is_matched_by_surnames match_name base p
-  || (not remove_marital_names_match_only)
-     && has_visible_marital_name match_name conf base p
+  || (include_marital_names && has_visible_marital_name match_name conf base p)
 
 let match_name_starting_with pfx n =
   is_subset_pfx (Name.split (Name.lower pfx.value)) (Name.split (Name.lower n))
 
-let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
+let persons_starting_with ~include_marital_names ~conf ~base ~filter
     ~first_name_prefix ~surname_prefix ~limit =
   let l =
     let main_prefix, other_prefixes, partial_results, filter =
@@ -173,19 +174,21 @@ let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
       | main_prefix :: other_prefixes, [] ->
           ( Some main_prefix,
             other_prefixes,
-            persons_starting_with ~conf ~base ~filter ~limit ~other_prefixes:[]
+            persons_starting_with ~conf ~base ~include_marital_names ~filter
+              ~limit ~other_prefixes:[]
               { kind = `First_name; value = first_name_prefix },
             filter )
       | [], main_prefix :: other_prefixes ->
           let filter p =
             filter p
-            && filter_marital_names ~remove_marital_names_match_only
+            && filter_marital_names ~include_marital_names
                  (match_name_starting_with main_prefix)
                  conf base p
           in
           ( Some main_prefix,
             other_prefixes,
-            persons_starting_with ~conf ~base ~filter ~limit ~other_prefixes:[]
+            persons_starting_with ~conf ~base ~include_marital_names ~filter
+              ~limit ~other_prefixes:[]
               { kind = `Surname; value = surname_prefix },
             filter )
       | (_ :: _ as first_name_prefixes), main_prefix :: other_prefixes ->
@@ -197,7 +200,8 @@ let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
           in
           ( Some main_prefix,
             first_name_prefixes @ other_prefixes,
-            persons_starting_with ~conf ~base ~filter ~limit
+            persons_starting_with ~conf ~base ~include_marital_names ~filter
+              ~limit
               ~other_prefixes:
                 [ { kind = `First_name; value = first_name_prefix } ]
               { kind = `Surname; value = surname_prefix },
@@ -217,8 +221,8 @@ let persons_starting_with ~remove_marital_names_match_only ~conf ~base ~filter
                 filter person
                 && not (Gwdb.IperSet.mem (Gwdb.get_iper person) partial_results)
             in
-            persons_starting_with ~conf ~base ~filter ~limit ~other_prefixes
-              main_prefix
+            persons_starting_with ~conf ~base ~include_marital_names ~filter
+              ~limit ~other_prefixes main_prefix
         in
         partial_results @ extra_results
   in
