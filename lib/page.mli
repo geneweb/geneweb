@@ -61,6 +61,7 @@ module Advanced_search : sig
       event_search_mode : [ `Or | `And ];
       event_exact_place : bool;
       limit : int option;
+      include_marital_names : bool;
     }
 
     val get_event_place : event_kind:Event.kind -> t -> string option
