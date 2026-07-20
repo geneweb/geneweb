@@ -13,16 +13,6 @@ let take l n =
 
 let rec drop l n = match l with _ :: l when n > 0 -> drop l (n - 1) | _ -> l
 let sublist l pos len = take (drop l pos) len
-
-let cmp cmp l1 l2 =
-  let rec aux l1 l2 =
-    match (l1, l2) with
-    | x :: xs, y :: ys when cmp x y -> aux xs ys
-    | [], [] -> true
-    | _ -> false
-  in
-  aux l1 l2
-
 let is_subset s1 s2 = List.for_all (fun e -> List.mem e s2) s1
 
 let elements_cmp l1 =
@@ -34,19 +24,6 @@ let iter_first f = function
   | hd :: tl ->
       f true hd;
       List.iter (f false) tl
-
-let rec compare cmp l1 l2 =
-  match (l1, l2) with
-  | x1 :: l1, x2 :: l2 -> (
-      match cmp x1 x2 with 0 -> compare cmp l1 l2 | x -> x)
-  | [], [] -> 0
-  | [], _ -> -1
-  | _, [] -> 1
-
-let rec find_map f = function
-  | [] -> None
-  | x :: l -> (
-      match f x with Some _ as result -> result | None -> find_map f l)
 
 let rec last = function
   | [] -> raise (Failure "last")

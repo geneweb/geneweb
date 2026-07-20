@@ -12,23 +12,11 @@ val sublist : 'a list -> int -> int -> 'a list
 (** [sublist l pos len] returns the sublist of [l] of length [len]
     starting at the position [pos].  *)
 
-val cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
 val is_subset : 'a list -> 'a list -> bool
 val elements_cmp : 'a list -> 'a list -> bool
 
 val iter_first : (bool -> 'a -> unit) -> 'a list -> unit
 (** [iter_first f l] iter over first element with [f true] and over others with [f false]. *)
-
-val compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
-(** [compare cmp l1 l2]
-    Comparison function for lists, using [cmp] to compare each elements
-*)
-
-val find_map : ('a -> 'b option) -> 'a list -> 'b option
-(** [find_map fn list]
-    OCaml Stdlib's [List.find_map] (introduced in 4.10.0)
-    backported into GeneWeb
-  *)
 
 val last : 'a list -> 'a
 (** [last list]

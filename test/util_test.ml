@@ -12,22 +12,6 @@ let ext_string_contains () =
   test "r" true;
   test "" true
 
-let ext_string_start_with () =
-  Alcotest.check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Ext_string.start_with "foo" (-1) "foo");
-  Alcotest.check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Ext_string.start_with "foo" 4 "foo");
-  (Alcotest.check Alcotest.bool)
-    "Ext_string.start_with \"foo\" 0 \"foo\"" true
-    (Ext_string.start_with "foo" 0 "foo");
-  (Alcotest.check Alcotest.bool)
-    "not (Ext_string.start_with \"bar\" 0 \"foo\")" true
-    (not @@ Ext_string.start_with "bar" 0 "foo");
-  (Alcotest.check Alcotest.bool)
-    "Ext_string.start_with \"\" 0 \"foo\"" true
-    (Ext_string.start_with "" 0 "foo");
-  ()
-
 let ext_string_split_on_char () =
   let test ~__POS__ ~expected ~separator s =
     Alcotest.check' ~pos:__POS__
@@ -616,7 +600,6 @@ let v =
     ( "ext-string",
       [
         Alcotest.test_case "Ext_string.contains" `Quick ext_string_contains;
-        Alcotest.test_case "Ext_string.start_with" `Quick ext_string_start_with;
         Alcotest.test_case "Ext_string.split_on_char" `Quick
           ext_string_split_on_char;
       ] );

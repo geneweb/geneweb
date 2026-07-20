@@ -283,11 +283,11 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Gwdb.ifam list) =
                       let path =
                         if source then merge_path p2 p1 else merge_path p1 p2
                       in
-                      Def.Left (path, ifam))
+                      Either.Left (path, ifam))
             | [] -> loop1 result vertexlist
           in
           loop2 newvertexlist (neighbours vertex)
-      | [] -> Def.Right newvertexlist
+      | [] -> Either.Right newvertexlist
     in
     loop1 [] queue
   in
@@ -296,13 +296,13 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Gwdb.ifam list) =
     else if visited1 > visited2 then
       let visited2 = visited2 + List.length queue2 in
       match one_step_further false queue2 with
-      | Def.Left (path, ifam) -> Some (path, ifam)
-      | Def.Right queue2 -> width_search queue1 visited1 queue2 visited2
+      | Either.Left (path, ifam) -> Some (path, ifam)
+      | Either.Right queue2 -> width_search queue1 visited1 queue2 visited2
     else
       let visited1 = visited1 + List.length queue1 in
       match one_step_further true queue1 with
-      | Def.Left (path, ifam) -> Some (path, ifam)
-      | Def.Right queue1 -> width_search queue1 visited1 queue2 visited2
+      | Either.Left (path, ifam) -> Some (path, ifam)
+      | Either.Right queue1 -> width_search queue1 visited1 queue2 visited2
   in
   Gwdb.Marker.set mark_per ip1 @@ Visited (true, ip1, Self);
   Gwdb.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
