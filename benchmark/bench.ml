@@ -55,9 +55,6 @@ let bench () =
       bench "Mutil.contains"
         (Mutil.contains "foobarbaz")
         [ "foo"; "bar"; "baz"; "foobarbaz!" ];
-      bench "Mutil.start_with"
-        (Mutil.start_with "foobarbaz" 0)
-        [ "foo"; "bar"; ""; "foobarbaz" ];
       bench "Mutil.start_with_wildcard"
         (Mutil.start_with_wildcard "foobarbaz" 0)
         [ "foo"; "bar"; ""; "foobarbaz" ];

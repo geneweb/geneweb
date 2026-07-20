@@ -226,9 +226,9 @@ let get_portrait_path conf base p =
 
 let is_url str =
   if
-    Mutil.start_with "http" 0 str
-    || Mutil.start_with "https" 0 str
-    || Mutil.start_with "file" 0 str
+    String.starts_with ~prefix:"http" str
+    || String.starts_with ~prefix:"https" str
+    || String.starts_with ~prefix:"file" str
   then true
   else false
 

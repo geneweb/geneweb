@@ -17,19 +17,6 @@ let mutil_contains () =
   test2 "albums/test-images-alb" true;
   test2 "albums/test" true
 
-let mutil_start_with () =
-  check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Mutil.start_with "foo" (-1) "foo");
-  check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Mutil.start_with "foo" 4 "foo");
-  (check bool) "Mutil.start_with \"foo\" 0 \"foo\"" true
-    (Mutil.start_with "foo" 0 "foo");
-  (check bool) "not (Mutil.start_with \"bar\" 0 \"foo\")" true
-    (not @@ Mutil.start_with "bar" 0 "foo");
-  (check bool) "Mutil.start_with \"\" 0 \"foo\"" true
-    (Mutil.start_with "" 0 "foo");
-  ()
-
 let mutil_arabian_romian _ =
   let test a r =
     (check int) "arabian_of_roman" a (Mutil.arabian_of_roman r);
@@ -224,7 +211,6 @@ let v =
     ( "mutil",
       [
         test_case "Mutil.contains" `Quick mutil_contains;
-        test_case "Mutil.start_with" `Quick mutil_start_with;
         test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
         test_case "Mutil particule" `Quick mutil_compare_after_particle;
         test_case "Mutil.string_of_int_sep" `Quick mutil_compare_after_particle;

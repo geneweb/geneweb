@@ -97,12 +97,6 @@ val unsafe_tr : char -> char -> string -> string
 (** [unsafe_tr c1 c2 str] Update [str] in place. Replace all occurences of [c1]
     by [c2]. *)
 
-val start_with : string -> int -> string -> bool
-(** [start_with prefix off str] Test if [str] starts with [prefix] (at offset
-    [off]).
-
-    Raise [Invalid_argument] if [off] is not a valid index in [str]. *)
-
 val start_with_wildcard : string -> int -> string -> bool
 (** [start_with_wildcard prefix off str] Test if [str] starts with [prefix] (at
     offset [off]). Occurences of ['_'] in [prefix] will match both ['_'] and

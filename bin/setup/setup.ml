@@ -1538,9 +1538,9 @@ let setup_comm_ok conf = function
       with_opt_check gwfixbase_check (fun c -> gwfixbase "gwfix_ok.htm" c) conf
   | x ->
       if
-        Mutil.start_with "doc/" 0 x
-        || Mutil.start_with "images/" 0 x
-        || Mutil.start_with "css/" 0 x
+        String.starts_with ~prefix:"doc/" x
+        || String.starts_with ~prefix:"images/" x
+        || String.starts_with ~prefix:"css/" x
       then raw_file conf x
       else error conf ("bad command: \"" ^ x ^ "\"")
 

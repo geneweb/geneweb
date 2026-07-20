@@ -576,7 +576,7 @@ let build_list conf base =
         if is_name_type && str = "?" then None
         else
           let str = if has_particle then move_particle base str else str in
-          if Mutil.start_with ini 0 @@ Place.without_suburb str then
+          if String.starts_with ~prefix:ini @@ Place.without_suburb str then
             Some (istr, str)
           else None)
       list
