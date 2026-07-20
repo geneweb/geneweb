@@ -413,14 +413,14 @@ let advanced_search_sosa ~conf ~base ~match_person =
   | None -> ([], 0)
 
 let advanced_search_surname_prefix ~conf ~base ~(match_person : match_person)
-    ~max_answers ~remove_marital_names_match_only ~surname_prefix =
+    ~max_answers ~include_marital_names ~surname_prefix =
   let filter p =
     let r = match_person ~skip_fname:false ~skip_sname:true ([], 0) p in
     r <> ([], 0)
   in
   let list =
-    SearchName.persons_starting_with ~remove_marital_names_match_only ~conf
-      ~base ~filter ~first_name_prefix:"" ~surname_prefix ~limit:max_answers
+    SearchName.persons_starting_with ~include_marital_names ~conf ~base ~filter
+      ~first_name_prefix:"" ~surname_prefix ~limit:max_answers
   in
   (List.map (Gwdb.poi base) list, List.length list)
 
@@ -431,9 +431,8 @@ let advanced_search_first_name_prefix ~conf ~base ~(match_person : match_person)
     r <> ([], 0)
   in
   let list =
-    SearchName.persons_starting_with ~remove_marital_names_match_only:false
-      ~conf ~base ~filter ~first_name_prefix ~surname_prefix:""
-      ~limit:max_answers
+    SearchName.persons_starting_with ~include_marital_names:true ~conf ~base
+      ~filter ~first_name_prefix ~surname_prefix:"" ~limit:max_answers
   in
   (List.map (Gwdb.poi base) list, List.length list)
 
@@ -483,8 +482,8 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
                 AdvancedSearchMatch.match_name ~search_list:sn_list
                   ~mode:surname_search_mode ns
               in
-              SearchName.filter_marital_names
-                ~remove_marital_names_match_only:true match_name conf base p)
+              SearchName.filter_marital_names ~include_marital_names:false
+                match_name conf base p)
             list
         else list
       in
@@ -619,11 +618,11 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf'
       with
       | (`Not_Exact_Prefix, _ :: _), _ ->
           let surname_prefix = Option.value ~default:"" query_params.surname in
-          let remove_marital_names_match_only =
-            (not query_params.include_marital_names) || fn_list = []
+          let include_marital_names =
+            query_params.include_marital_names && fn_list <> []
           in
           advanced_search_surname_prefix ~conf:conf' ~base ~match_person
-            ~max_answers ~remove_marital_names_match_only ~surname_prefix
+            ~max_answers ~include_marital_names ~surname_prefix
       | _, (`Not_Exact_Prefix, _ :: _) ->
           let first_name_prefix =
             Option.value ~default:"" query_params.first_name
