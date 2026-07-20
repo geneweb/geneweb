@@ -41,7 +41,7 @@ val print :
 val is_subset_pfx : string list -> string list -> bool
 
 val persons_starting_with :
-  remove_marital_names_match_only:bool ->
+  include_marital_names:bool ->
   conf:Config.config ->
   base:Gwdb.base ->
   filter:(Gwdb.person -> bool) ->
@@ -61,7 +61,7 @@ val has_visible_marital_name :
   bool
 
 val filter_marital_names :
-  ?remove_marital_names_match_only:bool ->
+  ?include_marital_names:bool ->
   (string -> bool) ->
   Config.config ->
   Gwdb.base ->
