@@ -103,6 +103,16 @@ let contains str sub =
   in
   loop 0
 
+let contains_word ~word s =
+  let aux () =
+    let word = Str.regexp ("\\b" ^ Str.quote word ^ "\\b") in
+    try
+      ignore (Str.search_forward word s 0);
+      true
+    with Not_found -> false
+  in
+  (not (String.equal (String.trim word) String.empty)) && aux ()
+
 let digest s = Digest.string s |> Digest.to_hex
 
 let trim_trailing_spaces s =
