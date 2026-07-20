@@ -60,6 +60,7 @@ module AdvancedSearchMatch : sig
     skip_sname:bool ->
     exact_first_name:[ `Exact | `Not_Exact | `Not_Exact_Prefix ] ->
     exact_surname:[ `Exact | `Not_Exact | `Not_Exact_Prefix ] ->
+    include_marital_names:bool ->
     bool
 
   val match_marriage :
@@ -345,7 +346,7 @@ end = struct
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~conf ~base ~p ~sex ~married ~occupation
       ~first_name_list ~surname_list ~alias_public_name_qualifiers ~skip_fname
-      ~skip_sname ~exact_first_name ~exact_surname =
+      ~skip_sname ~exact_first_name ~exact_surname ~include_marital_names =
     match_sex ~p ~sex
     && (skip_fname
        || match_first_name ~base ~first_name_list ~mode:exact_first_name p
@@ -354,7 +355,7 @@ end = struct
     && (skip_sname
        || match_surname ~base ~surname_list ~mode:exact_surname p
        || match_surname_alias ~base ~surname_list ~mode:exact_surname p
-       || first_name_list <> []
+       || include_marital_names && first_name_list <> []
           && Authorized.Person.get_sex p = Some Def.Female
           && SearchName.has_visible_marital_name
                (fun s ->
@@ -449,7 +450,7 @@ let advanced_search_without_names ~conf ~base ~match_person ~max_answers =
 
 let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
     ~max_answers ~surname_search_mode ~sn_list ~first_name_search_mode ~fn_list
-    =
+    ~include_marital_names =
   let persons_of_name_list strings_of persons_of n_list mode =
     List.concat_map
       (fun x ->
@@ -473,7 +474,7 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
           Gwdb.persons_of_surname sn_list surname_search_mode
       in
       let list =
-        if fn_list = [] then
+        if (not include_marital_names) || fn_list = [] then
           List.filter
             (fun person_id ->
               let p = Gwdb.poi base person_id in
@@ -579,7 +580,8 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf'
              ~first_name_list:fn_list ~surname_list:sn_list
              ~alias_public_name_qualifiers
              ~exact_first_name:first_name_search_mode
-             ~exact_surname:surname_search_mode)
+             ~exact_surname:surname_search_mode
+             ~include_marital_names:query_params.include_marital_names)
       in
       let check, default =
         match search_type with
@@ -617,7 +619,9 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf'
       with
       | (`Not_Exact_Prefix, _ :: _), _ ->
           let surname_prefix = Option.value ~default:"" query_params.surname in
-          let remove_marital_names_match_only = fn_list = [] in
+          let remove_marital_names_match_only =
+            (not query_params.include_marital_names) || fn_list = []
+          in
           advanced_search_surname_prefix ~conf:conf' ~base ~match_person
             ~max_answers ~remove_marital_names_match_only ~surname_prefix
       | _, (`Not_Exact_Prefix, _ :: _) ->
@@ -632,7 +636,7 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf'
       | _ ->
           advanced_search_without_prefix ~conf:conf' ~base ~match_person
             ~max_answers ~surname_search_mode ~sn_list ~first_name_search_mode
-            ~fn_list
+            ~fn_list ~include_marital_names:query_params.include_marital_names
   in
   (List.rev list, len)
 

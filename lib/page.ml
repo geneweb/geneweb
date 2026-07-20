@@ -123,6 +123,7 @@ module Advanced_search = struct
       event_search_mode : [ `Or | `And ];
       event_exact_place : bool;
       limit : int option;
+      include_marital_names : bool;
     }
 
     let get_event_info ~event_kind ~get_info query_params =
@@ -291,6 +292,7 @@ module Advanced_search = struct
           event_search_mode;
           event_exact_place = "on" = gets "exact_place";
           limit = Util.p_getint env "max";
+          include_marital_names = "false" <> gets "include_marital_names";
         }
       in
       Ext_option.return_if
