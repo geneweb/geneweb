@@ -107,7 +107,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
         (fun i (s, x) ->
           Output.print_sstring conf "<a href=\"";
           Output.print_url conf
-            (Util.commd' conf ~query:[ ("m", "PS"); ("k", s) ]);
+            (Util.commd' conf ~query:(("m", "PS") @:: opt @ [ ("k", s) ]));
           Output.print_sstring conf "\">";
           Output.print_string conf (Util.escape_html s);
           Output.print_sstring conf "</a> (";
