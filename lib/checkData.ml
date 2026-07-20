@@ -143,23 +143,18 @@ let nbsp_re =
           ]))
 
 let has_any_particle base s =
-  let particle = Mutil.get_particle (Driver.base_particles base) s in
-  if particle <> "" then true
-  else
-    let rec check_from pos =
-      if pos >= String.length s then false
+  let rec check_from pos =
+    if pos >= String.length s then false
+    else
+      let remaining = String.sub s pos (String.length s - pos) in
+      if Mutil.get_particle (Driver.base_particles base) remaining <> "" then
+        true
       else
-        let remaining = String.sub s pos (String.length s - pos) in
-        let particle =
-          Mutil.get_particle (Driver.base_particles base) remaining
-        in
-        if particle <> "" then true
-        else
-          match String.index_from_opt s pos ' ' with
-          | None -> false
-          | Some space_pos -> check_from (space_pos + 1)
-    in
-    check_from 0
+        match String.index_from_opt s pos ' ' with
+        | None -> false
+        | Some space_pos -> check_from (space_pos + 1)
+  in
+  check_from 0
 
 let is_roman_numeral s =
   try
@@ -301,7 +296,7 @@ let is_irish_prefix s =
 let is_allowed_word s = is_roman_numeral s || is_irish_prefix s
 
 let lowercase_allowed_words =
-  [ "dit"; "dite"; "ou"; "et"; "genannt"; "gennant"; "vel"; "y"; "e" ]
+  [ "dit"; "dite"; "ou"; "et"; "genannt"; "vel"; "y"; "e" ]
 
 let is_lowercase_allowed word =
   List.mem (String.lowercase_ascii word) lowercase_allowed_words
@@ -434,8 +429,6 @@ let is_zero_width hex =
   | "206E" | "206F" | "FEFF" ->
       true
   | _ -> false
-
-let _hex_to_int hex = int_of_string ("0x" ^ hex)
 
 let invisible_chars_tbl =
   let codes =
@@ -833,19 +826,18 @@ let make_highlight_html s highlight_info error_type conf =
         Some map
     | _ -> None
   in
-  let positions =
-    match highlight_info with
-    | SimplePositions pos_list -> pos_list
-    | WithMessages infos -> List.map (fun info -> info.pos) infos
-  in
-  let rec process_char i in_span =
-    if i >= String.length s then (
-      if in_span then Buffer.add_string buf "</span>";
-      Buffer.contents buf)
-    else
-      let is_highlight = List.mem i positions in
-      if is_highlight then (
-        let char_size = Utf8.nbc s.[i] in
+  let pos_tbl = Hashtbl.create 16 in
+  (match highlight_info with
+  | SimplePositions pos_list ->
+      List.iter (fun p -> Hashtbl.replace pos_tbl p ()) pos_list
+  | WithMessages infos ->
+      List.iter (fun info -> Hashtbl.replace pos_tbl info.pos ()) infos);
+  let rec process_char i =
+    if i >= String.length s then Buffer.contents buf
+    else begin
+      let char_size = Utf8.nbc s.[i] in
+      let escaped = (Util.escape_html (String.sub s i char_size) :> string) in
+      if Hashtbl.mem pos_tbl i then
         let code = Utf8.C.cp s i in
         let hex = Printf.sprintf "%04X" (Uchar.to_int code) in
         let name =
@@ -864,26 +856,16 @@ let make_highlight_html s highlight_info error_type conf =
               Printf.sprintf " title=\"%s\"" (Util.escape_html t :> string)
           | None -> ""
         in
-        let original = String.sub s i char_size in
-        let escaped_original = (Util.escape_html original :> string) in
         Printf.bprintf buf "<span class=\"%s\"%s>%s</span>"
-          (style.make_class hex) title_attr escaped_original;
-        process_char (i + char_size) false)
-      else
-        let char_size = Utf8.nbc s.[i] in
-        let original = String.sub s i char_size in
-        let escaped_char = (Util.escape_html original :> string) in
-        Buffer.add_string buf escaped_char;
-        process_char (i + char_size) false
+          (style.make_class hex) title_attr escaped
+      else Buffer.add_string buf escaped;
+      process_char (i + char_size)
+    end
   in
-  process_char 0 false
+  process_char 0
 
 let first_word s =
-  try
-    let i = String.index s ' ' in
-    if i = String.length s then if i > 8 then String.sub s 0 8 else s
-    else String.sub s 0 i
-  with Not_found -> if String.length s > 8 then String.sub s 0 8 else s
+  match String.index_opt s ' ' with Some i -> String.sub s 0 i | None -> s
 
 let simple_prefix s =
   let len = String.length s in
@@ -1117,11 +1099,8 @@ let collect_all_errors_from_cache conf dict_type base max_results
     | _, Some max when count >= max -> acc
     | (istr, s) :: rest, _ ->
         let errors = analyze_string_errors dict_type base s check_errors_set in
-        let filtered_errors =
-          if ErrorSet.is_empty check_errors_set then errors else errors
-        in
-        if filtered_errors = [] then process_entries rest acc count
-        else process_entries rest ((istr, s, filtered_errors) :: acc) (count + 1)
+        if errors = [] then process_entries rest acc count
+        else process_entries rest ((istr, s, errors) :: acc) (count + 1)
   in
   List.rev (process_entries entries [] 0)
 
@@ -1129,19 +1108,7 @@ let collect_all_errors ?max_results ?(sel_err_types = []) base dict =
   let istr_errors = Hashtbl.create 1024 in
   let unique_istrs = ref 0 in
   let collect_strings = collect_dict_strings base dict in
-  let check_error_types_set =
-    ErrorSet.of_list
-      (if sel_err_types = [] then
-         [
-           InvisibleCharacters;
-           BadCapitalization;
-           MultipleSpaces;
-           NonBreakingSpace;
-           MiscTypographicErrors;
-           MixedScripts;
-         ]
-       else sel_err_types)
-  in
+  let check_error_types_set = make_error_set sel_err_types in
   let add_error istr s err =
     match Hashtbl.find_opt istr_errors istr with
     | Some (stored_s, errs) ->
@@ -1195,7 +1162,7 @@ let collect_all_errors ?max_results ?(sel_err_types = []) base dict =
   Hashtbl.iter
     (fun istr (s, errs) -> result := (istr, s, errs) :: !result)
     istr_errors;
-  !result
+  List.sort (fun (_, s1, _) (_, s2, _) -> String.compare s1 s2) !result
 
 (* Main function *)
 let collect_all_errors_with_cache ?max_results ?(sel_err_types = []) conf base
@@ -1208,8 +1175,6 @@ let collect_all_errors_with_cache ?max_results ?(sel_err_types = []) conf base
       collect_all_errors_from_cache conf dict base max_results ~sel_err_types ()
     else []
   else
-    let is_roglo =
-      try List.assoc "roglo" conf.base_env = "yes" with Not_found -> false
-    in
+    let is_roglo = List.assoc_opt "roglo" conf.base_env = Some "yes" in
     if is_roglo then []
     else collect_all_errors ?max_results ~sel_err_types base dict
