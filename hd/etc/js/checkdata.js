@@ -1,4 +1,4 @@
-const CheckData = (() => {
+(() => {
   'use strict';
 
   const CACHE = new WeakMap();
@@ -24,17 +24,21 @@ const CheckData = (() => {
     popup: 'Validation popup blocked'
   };
 
-  const SELECTORS = {
-    err: '.err',
-    editContainer: '.edit-container',
-    bk: '.bk',
-    pl: ".pl",
-    s2: '.s2',
-    button: 'button:not([data-action])',
-    inputField: 'input, textarea',
+  const CLASSES = {
+    editContainer: 'edit-container',
     disabled: 'disabled',
     validated: 'validated',
     editing: 'editing'
+  };
+
+  const SELECTORS = {
+    err: '.err',
+    editContainer: `.${CLASSES.editContainer}`,
+    bk: '.bk',
+    pl: '.pl',
+    s2: '.s2',
+    button: 'button:not([data-action])',
+    inputField: 'input, textarea'
   };
 
   const q = (sel, ctx) => (ctx || document).querySelector(sel);
@@ -98,9 +102,9 @@ const CheckData = (() => {
     return f;
   };
 
-const createContainer = (btn, field) => {
+  const createContainer = (btn, field) => {
     const c = document.createElement('div');
-    c.className = SELECTORS.editContainer.slice(1);
+    c.className = CLASSES.editContainer;
 
     const orig = document.createElement('div');
     orig.className = 'original-content';
@@ -119,7 +123,7 @@ const createContainer = (btn, field) => {
     const t = e.target;
     const err = t.closest(SELECTORS.err);
 
-    if (err?.classList.contains(SELECTORS.disabled) &&
+    if (err?.classList.contains(CLASSES.disabled) &&
         !t.closest(SELECTORS.s2)) {
       e.preventDefault();
       return;
@@ -173,7 +177,7 @@ const createContainer = (btn, field) => {
 
   const showEditInput = btn => {
     const err = btn.closest(SELECTORS.err);
-    if (err.classList.contains(SELECTORS.editing)) return;
+    if (err.classList.contains(CLASSES.editing)) return;
 
     const val = err.dataset.ori || '';
     const s2 = q(SELECTORS.s2, err);
@@ -183,7 +187,7 @@ const createContainer = (btn, field) => {
       s2.dataset.origHidden = hidden ? '1' : '0';
     }
 
-    err.classList.add(SELECTORS.editing);
+    err.classList.add(CLASSES.editing);
 
     const useTextarea = val.length > CONFIG.TEXTAREA_THRESHOLD ||
                         val.includes('\n');
@@ -273,7 +277,7 @@ const createContainer = (btn, field) => {
     const err = container?.closest(SELECTORS.err);
     if (!err) return;
 
-    err.classList.remove(SELECTORS.editing);
+    err.classList.remove(CLASSES.editing);
 
     const cache = CACHE.get(container);
     if (cache?.btn && container.parentNode) {
@@ -284,6 +288,7 @@ const createContainer = (btn, field) => {
 
     if (s2 && !s2.classList.contains('btn-info')) {
       s2.className = 's2 btn btn-success';
+      s2.style.visibility = wasHidden ? 'hidden' : 'visible';
       if (s2.dataset.origHref) {
         s2.href = s2.dataset.origHref;
         s2.title = s2.dataset.origTitle || '';
@@ -294,7 +299,7 @@ const createContainer = (btn, field) => {
   const navigate = (current, goUp = false) => {
     if (!current) return;
 
-    if (!current.classList.contains(SELECTORS.validated)) {
+    if (!current.classList.contains(CLASSES.validated)) {
       const c = q(SELECTORS.editContainer, current);
       if (c) {
         const s2 = q(SELECTORS.s2, current);
@@ -308,7 +313,7 @@ const createContainer = (btn, field) => {
 
     let next;
     for (let i = idx + step; goUp ? i >= 0 : i < all.length; i += step) {
-      if (!all[i].classList.contains(SELECTORS.disabled)) {
+      if (!all[i].classList.contains(CLASSES.disabled)) {
         next = all[i];
         break;
       }
@@ -343,7 +348,8 @@ const createContainer = (btn, field) => {
       notify('success', `✓ ${result.message}`);
       completeValidation(errEl, s2, result.after || val);
 
-      if (result.nb_modified !== null && result.elapsed_time !== null) {
+      if (Number.isFinite(result.nb_modified) &&
+          Number.isFinite(result.elapsed_time)) {
         const statsDiv = document.createElement('div');
         statsDiv.className = 'small text-center me-2';
         statsDiv.textContent = `+${result.nb_modified}`;
@@ -481,7 +487,7 @@ const createContainer = (btn, field) => {
         if (f && val) f.replaceWith(createValidatedText());
       } else if (btn && val) {
         const newC = document.createElement('div');
-        newC.className = SELECTORS.editContainer.slice(1);
+        newC.className = CLASSES.editContainer;
 
         const orig = document.createElement('div');
         orig.className = 'original-content';
@@ -492,8 +498,8 @@ const createContainer = (btn, field) => {
         btn.replaceWith(newC);
       }
 
-      errEl.classList.add(SELECTORS.disabled, SELECTORS.validated);
-      errEl.classList.remove(SELECTORS.editing);
+      errEl.classList.add(CLASSES.disabled, CLASSES.validated);
+      errEl.classList.remove(CLASSES.editing);
       invalidateCache();
     });
   };
@@ -535,80 +541,87 @@ const createContainer = (btn, field) => {
     document.body.appendChild(n);
   };
 
-  return {
-    init() {
-      this.initToggles();
-      this.initMaxValidation();
-      this.preserveScroll();
+  const initToggles = () => {
+    const setupToggle = (action, prefix) => {
+      const btn = q(`[data-action="${action}"]`);
+      if (!btn || btn.dataset.init) return;
 
-      _container = q('#cd');
-      if (!_container) return;
+      btn.dataset.init = '1';
 
-      _okTitle = _container.dataset.okTitle || '';
+      btn.addEventListener('click', e => {
+        e.preventDefault();
 
-      if (_container.dataset.msgInvalid) MSG.invalid = _container.dataset.msgInvalid;
-      if (_container.dataset.msgTimeout) MSG.timeout = _container.dataset.msgTimeout;
-      if (_container.dataset.msgPopup) MSG.popup = _container.dataset.msgPopup;
+        const boxes = qa(`[name^="${prefix}"]`);
+        const all = boxes.every(b => b.checked);
 
-      initButtons();
-
-      _container.addEventListener('click', handleClick, { passive: false });
-      _container.addEventListener('keydown', handleKeydown, { passive: false });
-    },
-
-    initToggles() {
-      const setupToggle = (action, prefix) => {
-        const btn = q(`[data-action="${action}"]`);
-        if (btn && !btn.dataset.init) {
-          btn.dataset.init = '1';
-          btn.addEventListener('click', e => {
-            e.preventDefault();
-            const boxes = qa(`[name^="${prefix}"]`);
-            const all = boxes.every(b => b.checked);
-            boxes.forEach(b => b.checked = !all);
-          });
-        }
-      };
-
-      setupToggle('toggle-dicts', 'd_');
-      setupToggle('toggle-errors', 'e_');
-
-      const submit = q('[data-action="validate-submit"]');
-      if (submit && !submit.dataset.init) {
-        submit.dataset.init = '1';
-        submit.addEventListener('click', () => {
-          if (typeof showOverlay === 'function') showOverlay();
-        });
-      }
-    },
-
-    initMaxValidation() {
-      const max = q('input[name="max"]');
-      if (!max) return;
-
-      const limit = parseInt(max.getAttribute('max'), 10);
-      if (!limit) return;
-
-      max.addEventListener('input', e => {
-        const v = parseInt(e.target.value, 10);
-        const msg = e.target.dataset.limitMsg || `Max ${limit}`;
-        e.target.setCustomValidity(v > limit ? msg : '');
-        e.target.reportValidity();
+        boxes.forEach(b => (b.checked = !all));
       });
-    },
+    };
 
-    preserveScroll() {
-      window.addEventListener('beforeunload', () => {
-        sessionStorage.setItem('checkDataScroll', window.scrollY);
+    setupToggle('toggle-dicts', 'd_');
+    setupToggle('toggle-errors', 'e_');
+
+    const submit = q('[data-action="validate-submit"]');
+    if (!submit || submit.dataset.init) return;
+
+    submit.dataset.init = '1';
+    submit.addEventListener('click', () => {
+      if (typeof showOverlay === 'function') showOverlay();
+    });
+  };
+
+  const initMaxValidation = () => {
+    const max = q('input[name="max"]');
+    if (!max) return;
+
+    const limit = parseInt(max.getAttribute('max'), 10);
+    if (!limit) return;
+
+    max.addEventListener('input', e => {
+      const v = parseInt(e.target.value, 10);
+      const msg = e.target.dataset.limitMsg || `Max ${limit}`;
+      e.target.setCustomValidity(v > limit ? msg : '');
+      e.target.reportValidity();
+    });
+  };
+
+  const preserveScroll = () => {
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.setItem('checkDataScroll', window.scrollY);
+    });
+
+    const saved = sessionStorage.getItem('checkDataScroll');
+    if (saved) {
+      RAF(() => {
+        window.scrollTo(0, parseInt(saved, 10));
+        sessionStorage.removeItem('checkDataScroll');
       });
-
-      const saved = sessionStorage.getItem('checkDataScroll');
-      if (saved) {
-        RAF(() => {
-          window.scrollTo(0, parseInt(saved, 10));
-          sessionStorage.removeItem('checkDataScroll');
-        });
-      }
     }
   };
+
+  const init = () => {
+    initToggles();
+    initMaxValidation();
+    preserveScroll();
+
+    _container = q('#cd');
+    if (!_container) return;
+
+
+    _okTitle = _container.dataset.okTitle || '';
+    if (_container.dataset.msgInvalid) MSG.invalid = _container.dataset.msgInvalid;
+    if (_container.dataset.msgTimeout) MSG.timeout = _container.dataset.msgTimeout;
+    if (_container.dataset.msgPopup) MSG.popup = _container.dataset.msgPopup;
+
+    initButtons();
+
+    _container.addEventListener('click', handleClick, { passive: false });
+    _container.addEventListener('keydown', handleKeydown, { passive: false });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
 })();

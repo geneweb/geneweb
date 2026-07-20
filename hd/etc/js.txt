@@ -1005,15 +1005,6 @@ initTooltips();
     RelationMatrix.init();
   }
 %end;
-%if;(e.m="CHK_DATA")
-  if (typeof CheckData !== 'undefined' && CheckData.init) {
-    if (document.readyState === 'complete') {
-      CheckData.init();
-    } else {
-      window.addEventListener('load', () => CheckData.init());
-    }
-  }
-%end;
 %if;(e.m="C" and e.t="")
   if (typeof Cousins !== 'undefined' && Cousins.init) {
     Cousins.init();
