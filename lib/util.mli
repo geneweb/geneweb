@@ -39,7 +39,7 @@ val commd :
   ?senv:bool ->
   ?query:(string * string list) list ->
   Config.config ->
-  Uri.t
+  Localized_url.t
 (** Returns link to the current command (database name after domain name and port in url) with query string
     that containts bindings from [conf.henv] and [conf.senv]. Doesn't add binding [(k,v)] when:
     - k = "oc" or "ocz" and v = "0"
@@ -52,7 +52,7 @@ val commd' :
   ?senv:bool ->
   ?query:(string * string) list ->
   Config.config ->
-  Uri.t
+  Localized_url.t
 
 val commd_prefix :
   ?excl:string list ->

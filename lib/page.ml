@@ -14,7 +14,7 @@ end = struct
 
   let alternate_urls ~conf query_params =
     let query = Query_params.canonicalize query_params in
-    List.map (fun lang -> Localized_url.make ~conf ~lang ~query) Lang.all
+    List.map (fun lang -> Localized_url.make' ~conf ~lang ~query ()) Lang.all
 end
 
 module Last_name_search = struct

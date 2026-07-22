@@ -1146,8 +1146,8 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                   let open Def in
                   (a : Adef.safe_string)
                   ^^^ {|<a href="|}
-                  ^<^ Ext_uri.to_string
-                        (Uri.with_fragment
+                  ^<^ Localized_url.to_string
+                        (Localized_url.with_fragment
                            (Util.commd' conf
                               ~query:[ ("m", "NOTES"); ("f", pg) ])
                            (Some ("p_" ^ string_of_int text.Def.NLDB.lnPos)))
@@ -3562,7 +3562,7 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
                        (mod_float s.Unix.st_mtime (float_of_int max_int)) )
             @:: b
             @ [ ("k", "/" ^ k) ])
-        |> Ext_uri.to_string |> Adef.escaped
+        |> Localized_url.to_string |> Adef.escaped
     | Some (`Url url) -> Adef.escaped url (* FIXME *)
     | None -> Adef.escaped ""
   else Adef.escaped ""
@@ -4661,7 +4661,7 @@ let print_ancestors_dag conf base v p =
   let vbar_txt ip =
     let p = Util.pget conf base ip in
     let open Ext_list.Infix in
-    Adef.escaped @@ Ext_uri.to_string
+    Adef.escaped @@ Localized_url.to_string
     @@ Util.commd' conf
          ~query:
            (("m", "A") @:: ("t", "T") @:: ("dag", "on")

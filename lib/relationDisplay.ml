@@ -47,7 +47,7 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
     DagDisplay.make_tree_hts conf base elem_txt vbar_txt invert set [] d
   in
   DagDisplay.print_slices_menu_or_dag_page conf page_title hts
-    (Adef.escaped @@ Option.fold ~none:"" ~some:Ext_uri.to_string next_txt)
+    (Adef.escaped @@ Option.fold ~none:"" ~some:Localized_url.to_string next_txt)
 
 let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   if Util.p_getenv conf.Config.env "new" <> Some "on" then
@@ -60,7 +60,8 @@ let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
     in
     DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set []
       page_title
-      (Adef.escaped @@ Option.fold ~none:"" ~some:Ext_uri.to_string next_txt)
+      (Adef.escaped
+      @@ Option.fold ~none:"" ~some:Localized_url.to_string next_txt)
 
 let next_relation_link_txt conf ip1 ip2 excl_faml =
   let bd =
@@ -103,7 +104,7 @@ let print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let vbar_txt ip =
       let u = Util.pget conf base ip in
       let excl_faml = Array.to_list (Gwdb.get_family u) @ excl_faml in
-      Adef.escaped @@ Ext_uri.to_string
+      Adef.escaped @@ Localized_url.to_string
       @@ next_relation_link_txt conf ip1 ip2 excl_faml
     in
     print_relationship_dag conf base elem_txt vbar_txt path (Some next_txt)

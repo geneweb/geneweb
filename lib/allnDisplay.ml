@@ -304,7 +304,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
         (fun first (s, cnt) ->
           let href =
             " href=\""
-            ^ Ext_uri.to_string
+            ^ Localized_url.to_string
                 (Util.commd' conf ~query:[ ("m", mode); ("v", s); ("t", "A") ])
             ^ "\""
           in

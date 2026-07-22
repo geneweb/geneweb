@@ -40,7 +40,8 @@ let give_access_someone conf base (x, t) list =
   else
     Output.print_sstring conf
       ({|<a href="|}
-      ^ Ext_uri.to_string (Util.commd' conf ~query:(Util.acces conf base x))
+      ^ Localized_url.to_string
+          (Util.commd' conf ~query:(Util.acces conf base x))
       ^ {|">|});
   (match (t.t_name, Gwdb.get_public_name x, Gwdb.get_qualifiers x) with
   | Tmain, pn, nn :: _ when Gwdb.sou base pn <> "" ->

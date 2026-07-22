@@ -152,8 +152,8 @@ let syntax_links conf base wi s =
           let anchor = Ext_option.return_if (anchor <> "") (fun () -> anchor) in
           let t =
             Printf.sprintf {|<a href="%s"%s>%s</a>|}
-              (Ext_uri.to_string
-              @@ Uri.with_fragment
+              (Localized_url.to_string
+              @@ Localized_url.with_fragment
                    (Util.commd' conf ~query:[ ("m", wi.wi_mode); ("f", fname) ])
                    anchor)
               c text
@@ -197,7 +197,7 @@ let syntax_links conf base wi s =
           let t =
             let s = if name <> "" then name else wiz in
             Printf.sprintf "<a href=\"%s\">%s</a>"
-              (Ext_uri.to_string
+              (Localized_url.to_string
               @@ Util.commd' conf ~query:[ ("m", "WIZNOTES"); ("f", wiz) ])
               s
           in
@@ -349,7 +349,7 @@ let string_of_modify_link conf cnt empty = function
       (if empty then "<p>"
       else {|<div style="font-size:80%;float:right;margin-left:3em">|})
       ^ {|(<a href="|}
-      ^ Ext_uri.to_string
+      ^ Localized_url.to_string
           (Util.commd' conf
              ~query:
                (("m", (if can_edit then "MOD" else "VIEW") ^ "_" ^ mode)
