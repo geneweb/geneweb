@@ -9,6 +9,7 @@ type generation_person =
 
 val interp_templ :
   ?no_headers:bool ->
+  ?json_data:string ->
   ?output:(string -> unit) ->
   string ->
   Config.config ->
