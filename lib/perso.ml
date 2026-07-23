@@ -3447,6 +3447,18 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if Person.is_hide_names conf p && not p_auth then null_val
       else Name.strip_c (Gwdb.p_surname base p) '"' |> str_val
   | "title" -> Util.person_title conf base p |> safe_val
+  | "geneweb_data" -> (
+      match get_env "api_data" env with
+      | Vallgp _ | Vanc _ | Vanc_surn _ | Vcell _ | Vcelll _ | Vcnt _
+      | Vdesclevtab _ | Vdmark _ | Vslist _ | Vslistlm _ | Vind _
+      | Vfam (_, _, (_, _, _), _)
+      | Vrel (_, _)
+      | Vbool _ | Vint _ | Vgpl _ | Vnldb _ | Vsosa_ref _
+      | Vtitle (_, (_, _, _, _, _))
+      | Vevent (_, _)
+      | Vlazyp _ | Vlazy _ | Vnone | Vother _ ->
+          null_val
+      | Vstring s -> str_val s)
   | _ -> raise Not_found
 
 and eval_family_field_var conf base env
@@ -4482,8 +4494,8 @@ let eval_predefined_apply conf env f vl =
         [ "<br */?>"; "</?p>"; "</?div>"; "</?span>"; "</?pre>" ]
   | _ -> raise Not_found
 
-let gen_interp_templ ?(no_headers = false) ?output menu title templ_fname conf
-    base p =
+let gen_interp_templ ?(no_headers = false) ?api_data ?output menu title
+    templ_fname conf base p =
   let output = Option.value ~default:(Output.print_sstring conf) output in
   let ep = (p, Person.is_visible conf base p) in
   (* TODO what is this? what are those "120" *)
@@ -4535,29 +4547,31 @@ let gen_interp_templ ?(no_headers = false) ?output menu title templ_fname conf
       Vnldb db
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
-    [
-      ("p", Vind p);
-      ("p_auth", Vbool (Person.is_visible conf base p));
-      ("count", Vcnt (ref 0));
-      ("count1", Vcnt (ref 0));
-      ("count2", Vcnt (ref 0));
-      ("list", Vslist (ref SortedList.empty));
-      ("listb", Vslist (ref SortedList.empty));
-      ("listc", Vslist (ref SortedList.empty));
-      ("desc_mark", Vdmark (ref @@ Gwdb.dummy_marker Gwdb.dummy_iper false));
-      ("lazy_print", Vlazyp (ref None));
-      ("sosa_ref", Vsosa_ref sosa_ref);
-      ("max_anc_level", Vlazy (Lazy.from_fun mal));
-      ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
-      ("sosa_ref_max_anc_level", Vlazy (Lazy.from_fun srmal));
-      ("max_cous_level", Vlazy (Lazy.from_fun mcl));
-      ("max_desc_level", Vlazy (Lazy.from_fun mdl));
-      ("static_max_desc_level", Vlazy (Lazy.from_fun smdl));
-      ("desc_level_table", Vdesclevtab desc_level_table_l);
-      ("desc_level_table_save", Vdesclevtab desc_level_table_l_save);
-      ("nldb", Vlazy (Lazy.from_fun nldb));
-      ("all_gp", Vlazy (Lazy.from_fun all_gp));
-    ]
+    let open Ext_list.Infix in
+    Option.map (fun data -> ("api_data", Vstring data)) api_data
+    @?: [
+          ("p", Vind p);
+          ("p_auth", Vbool (Person.is_visible conf base p));
+          ("count", Vcnt (ref 0));
+          ("count1", Vcnt (ref 0));
+          ("count2", Vcnt (ref 0));
+          ("list", Vslist (ref SortedList.empty));
+          ("listb", Vslist (ref SortedList.empty));
+          ("listc", Vslist (ref SortedList.empty));
+          ("desc_mark", Vdmark (ref @@ Gwdb.dummy_marker Gwdb.dummy_iper false));
+          ("lazy_print", Vlazyp (ref None));
+          ("sosa_ref", Vsosa_ref sosa_ref);
+          ("max_anc_level", Vlazy (Lazy.from_fun mal));
+          ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
+          ("sosa_ref_max_anc_level", Vlazy (Lazy.from_fun srmal));
+          ("max_cous_level", Vlazy (Lazy.from_fun mcl));
+          ("max_desc_level", Vlazy (Lazy.from_fun mdl));
+          ("static_max_desc_level", Vlazy (Lazy.from_fun smdl));
+          ("desc_level_table", Vdesclevtab desc_level_table_l);
+          ("desc_level_table_save", Vdesclevtab desc_level_table_l_save);
+          ("nldb", Vlazy (Lazy.from_fun nldb));
+          ("all_gp", Vlazy (Lazy.from_fun all_gp));
+        ]
   in
   if no_headers then
     Hutil.interp_no_header conf templ_fname
@@ -4607,8 +4621,8 @@ let gen_interp_templ ?(no_headers = false) ?output menu title templ_fname conf
       }
       env ep
 
-let interp_templ ?no_headers ?output =
-  gen_interp_templ ?no_headers ?output false (fun _ -> ())
+let interp_templ ?no_headers ?api_data ?output =
+  gen_interp_templ ?no_headers ?api_data ?output false (fun _ -> ())
 
 let interp_templ_with_menu = gen_interp_templ true
 
