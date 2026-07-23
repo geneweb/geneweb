@@ -639,6 +639,7 @@ let print_one_surname_by_branch ~exact conf base x xl branches =
   Hutil.header_with_meta conf title meta;
   Hutil.interp_no_header conf "list_by_branch"
     {
+      output = Output.print_sstring conf;
       Templ.eval_var =
         (fun _ _ _ -> function
           | [ "content" ] ->

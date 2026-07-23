@@ -9,6 +9,8 @@ type generation_person =
 
 val interp_templ :
   ?no_headers:bool ->
+  ?api_data:string ->
+  ?output:(string -> unit) ->
   string ->
   Config.config ->
   Gwdb.base ->
@@ -22,7 +24,12 @@ val interp_notempl_with_menu :
   (bool -> unit) -> string -> Config.config -> Gwdb.base -> Gwdb.person -> unit
 
 val print :
-  ?no_headers:bool -> Config.config -> Gwdb.base -> Gwdb.person -> unit
+  ?no_headers:bool ->
+  ?output:(string -> unit) ->
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
+  unit
 (** Displays the HTML page of a person *)
 
 val print_ascend : Config.config -> Gwdb.base -> Gwdb.person -> unit
