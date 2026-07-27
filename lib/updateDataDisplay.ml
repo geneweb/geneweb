@@ -117,7 +117,7 @@ let print_mod_ok conf base =
       Output.print_sstring conf "</button></p></form>");
     Output.print_sstring conf {|<p><a href="|};
     Output.print_url conf
-      (Uri.with_fragment
+      (Localized_url.with_fragment
          (Util.commd' conf
             ~query:[ ("m", "MOD_DATA"); ("data", data); ("s", new_ini) ])
          (Some ("entry_anchor_" ^ new_istr_s)));
@@ -133,7 +133,7 @@ let print_mod_ok conf base =
     Hutil.print_link_to_welcome conf true;
     Output.print_sstring conf {|<p><a href="|};
     Output.print_url conf
-      (Uri.with_fragment
+      (Localized_url.with_fragment
          (Util.commd' conf
             ~query:[ ("m", "MOD_DATA"); ("data", data); ("s", ini) ])
          (Some ("entry_anchor_" ^ new_istr_s)));

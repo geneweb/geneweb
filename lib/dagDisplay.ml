@@ -6,7 +6,7 @@ let image_normal_txt conf base p fname width height =
     Format.sprintf
       {|<img src="%s"%s%s alt="%s" title="%s"
         style="%s %s">|}
-      (Ext_uri.to_string
+      (Localized_url.to_string
       @@ Util.commd' conf
            ~query:
              ([
@@ -26,7 +26,7 @@ let image_normal_txt conf base p fname width height =
   in
   let open Ext_list.Infix in
   Format.sprintf {|<a href="%s">%s</a>|}
-    (Ext_uri.to_string
+    (Localized_url.to_string
     @@ Util.commd' conf
          ~query:((("m", "IM") @:: Util.acces conf base p) @ [ ("k", k) ]))
     r
@@ -37,7 +37,7 @@ let image_url_txt conf url_p url height : Adef.safe_string =
   Format.sprintf
     {|<a href="%s"><img src="%s" alt="%s" title="%s"
       style="%s"></a>|}
-    (Ext_uri.to_string url_p)
+    (Localized_url.to_string url_p)
     (url : Adef.escaped_string :> string)
     image_txt image_txt
     (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
@@ -48,7 +48,7 @@ let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
   Format.sprintf
     {|<a href="%s"><img src="%s"%s%s alt="%s" title="%s"
       style="%s %s">%s</a>|}
-    (Ext_uri.to_string url_p)
+    (Localized_url.to_string url_p)
     (url : Adef.escaped_string :> string)
     (if width = 0 then "" else " width=" ^ string_of_int width)
     (if height = 0 then "" else " height=" ^ string_of_int height)

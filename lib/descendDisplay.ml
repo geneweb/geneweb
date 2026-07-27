@@ -1084,8 +1084,8 @@ let make_tree_hts conf base gv p =
           in
           ( (2 * ncol) - 1,
             Dag2html.CenterA,
-            Dag2html.TDbar (Some (Adef.escaped @@ Ext_uri.to_string vbar_txt))
-          )
+            Dag2html.TDbar
+              (Some (Adef.escaped @@ Localized_url.to_string vbar_txt)) )
       | None -> (1, Dag2html.LeftA, Dag2html.TDnothing)
     in
     td :: tdl

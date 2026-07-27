@@ -50,7 +50,7 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
                 ])
       in
       let open Def in
-      "<a href=\"" ^<^ Ext_uri.to_string href ^<^ "\">" ^<^ s ^>^ "</a>"
+      "<a href=\"" ^<^ Localized_url.to_string href ^<^ "\">" ^<^ s ^>^ "</a>"
   in
   let reference_sp p3 _ _ p s =
     if Person.is_empty p then s
@@ -85,7 +85,7 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
                 ])
       in
       let open Def in
-      "<a href=\"" ^<^ Ext_uri.to_string href ^<^ "\">" ^<^ s ^>^ "</a>"
+      "<a href=\"" ^<^ Localized_url.to_string href ^<^ "\">" ^<^ s ^>^ "</a>"
   in
   let print_nospouse _ =
     Sosa_cache.print_sosa ~conf ~base ~person:p2 ~link:true;
@@ -425,7 +425,9 @@ let print_anniv conf base p dead_people level =
           @ [ ("spouse", "on") ])
     in
     let open Def in
-    "<a href=\"" ^<^ Ext_uri.to_string href ^<^ "\">"
+    "<a href=\""
+    ^<^ Localized_url.to_string href
+    ^<^ "\">"
     ^<^ NameDisplay.person_title_text conf base c
     ^>^ "</a>"
   in

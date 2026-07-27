@@ -26,7 +26,7 @@ val print_sstring : Config.config -> string -> unit
 val printf : Config.config -> ('a, unit, string, unit) format4 -> 'a
 (** Formatter printing of the part of HTTP response body on the output channel. *)
 
-val print_url : Config.config -> Uri.t -> unit
+val print_url : Config.config -> Localized_url.t -> unit
 
 val flush : Config.config -> unit
 (** Making sure that previously printed content of the buffer is sent on the output channel.

@@ -343,7 +343,7 @@ let fixbase_ok conf base =
     in
     let string_of_p i =
       Printf.sprintf {|<a href="%s">%s</a>|}
-        (Ext_uri.to_string
+        (Geneweb.Localized_url.to_string
         @@ Geneweb.Util.commd' conf ~query:[ ("i", Gwdb.string_of_iper i) ])
         (Geneweb.Util.designation base (Gwdb.poi base i)
           : Adef.escaped_string

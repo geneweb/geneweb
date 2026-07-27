@@ -578,7 +578,7 @@ let print_start conf base =
     let query = [] in
     ( Canonical_url.make ~conf:trimmed_conf ~query,
       List.map
-        (fun lang -> Localized_url.make ~conf:trimmed_conf ~lang ~query)
+        (fun lang -> Localized_url.make ~conf:trimmed_conf ~lang ~query ())
         Lang.all )
   in
   Output.link_header trimmed_conf ~alternate_urls canonical_url;
