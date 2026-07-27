@@ -12,6 +12,23 @@ let ext_string_contains () =
   test "r" true;
   test "" true
 
+let ext_string_contains_word () =
+  let test ~__POS__ ~expected ~word s =
+    Alcotest.check' ~pos:__POS__ Alcotest.bool ~msg:"" ~expected
+      ~actual:(Ext_string.contains_word ~word s)
+  in
+  test ~__POS__ ~expected:true ~word:"foo" "foo bar";
+  test ~__POS__ ~expected:false ~word:"baz" "foo bar";
+  test ~__POS__ ~expected:false ~word:"foo_b" "foo bar";
+  test ~__POS__ ~expected:false ~word:"foo b" "foo bar";
+  test ~__POS__ ~expected:false ~word:"foo__b" "foo bar";
+  test ~__POS__ ~expected:false ~word:"bar__" "foo bar";
+  test ~__POS__ ~expected:false ~word:"r" "foo bar";
+  test ~__POS__ ~expected:false ~word:"" "foo bar";
+  test ~__POS__ ~expected:true ~word:"bar" "foo bar baz";
+  test ~__POS__ ~expected:true ~word:"baz" "foo bar baz";
+  test ~__POS__ ~expected:false ~word:"foo" "foobar"
+
 let ext_string_split_on_char () =
   let test ~__POS__ ~expected ~separator s =
     Alcotest.check' ~pos:__POS__
@@ -600,6 +617,8 @@ let v =
     ( "ext-string",
       [
         Alcotest.test_case "Ext_string.contains" `Quick ext_string_contains;
+        Alcotest.test_case "Ext_string.contains_word" `Quick
+          ext_string_contains_word;
         Alcotest.test_case "Ext_string.split_on_char" `Quick
           ext_string_split_on_char;
       ] );

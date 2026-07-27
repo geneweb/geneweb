@@ -38,6 +38,8 @@ val contains : string -> string -> bool
 (** [contains str sub] Test [sub] is contained in [str].
 *)
 
+val contains_word : word:string -> string -> bool
+
 val digest : string -> string
 (** [digest s]
     Returns the (128 bits long, using MD5 algorithm) digest of [s].
