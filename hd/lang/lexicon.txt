@@ -7584,6 +7584,7 @@ tr: terhis
 co: arburiscenza discendente
 de: Ansicht Nachfahren-Baum
 en: descendant tree view
+es: árbol compacto de descendientes
 fr: arborescence descendante
 pt: árvore compacta de descendentes
 sv: trädvy med ättlingar
@@ -7642,6 +7643,7 @@ tr: adına göre liste
 co: arburu di discendenza
 de: Nachkommen-Baum
 en: descendants tree
+es: árbol de descendientes
 fr: arbre de descendance
 pt: árvore de descendentes
 sv: träd av ättlingar
@@ -9614,6 +9616,7 @@ tr: tam ağaç
 co: affissera larghezza sana/affissera nant’à duie culonne
 de: Anzeige volle Breite/Anzeige in zwei Spalten
 en: full width display/columns display
+es: mostrar a ancho completo/mostrar en dos columnas
 fr: affichage pleine largeur/affichage sur deux colonnes
 pt: exibir na largura total/exibir em duas colunas
 sv: full bredd/kolumner
@@ -10428,6 +10431,7 @@ tr: güncelleme geçmişi
 co: accolta
 de: Home
 en: home
+es: inicio
 fr: accueil
 pt: início
 sv: hem
@@ -11166,6 +11170,7 @@ sv: informatör/informatör
 co: cronolugia simplice/cronolugia detagliata
 de: einfache Chronologie/detaillierte Chronologie
 en: simple chronology/detailed chronology
+es: cronología simple/cronología detallada
 fr: chronologie simple/chronologie détaillée
 pt: cronologia simples/cronologia detalhada
 sv: förenklad kronologi/detaljerad kronologi
@@ -13567,6 +13572,7 @@ fr: modifier la taille des images à
 co: modulu/moduli
 de: Modul
 en: module/modules
+es: módulo/módulos
 fr: module/modules
 no: modul/moduler
 pt: módulo/módulos
@@ -16731,6 +16737,7 @@ tr: ilişkileri
 co: arburu di e rilazioni
 de: Baum der Beziehungen
 en: tree of relations
+es: árbol de relaciones
 fr: arbre des relations
 pt: árvore de familiares
 sv: relationsträd
@@ -17155,6 +17162,7 @@ fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
 co: caccià l’ultimu modulu aghjuntu
 de: zuletzt hinzugefügtes Modul entfernen
 en: remove the last added module
+es: quitar el último módulo añadido
 fr: retirer le dernier module ajouté
 pt: remover o último módulo adicionado
 sv: tag bort senast tillagda modul
