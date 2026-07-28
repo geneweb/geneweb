@@ -2680,7 +2680,7 @@ da: og
 de: und
 en: and
 eo: kaj
-es: y/e 
+es: y
 et: ja
 fi: ja
 fr: et
@@ -3735,6 +3735,7 @@ fr: lien vers le dictionnaire
 co: dizziunariu/dizziunarii
 de: Wörterbuch/Wörterbücher
 en: dictionary/dictionaries
+es: diccionario/diccionarios
 fr: dictionnaire/dictionnaires
 lt: žodynas/žodynai
 oc: diccionari/diccionaris
@@ -13265,6 +13266,7 @@ tr: bilinmeyen atalar
 co: senza data
 de: fehlendes Datum
 en: no date
+es: sin fecha
 fr: sans date
 lt: be datos
 pt: sem data
@@ -15109,7 +15111,7 @@ da: stilling
 de: Beruf/Berufe
 en: occupation/occupations
 eo: okupado
-es: profesión/profesións
+es: profesión/profesiones
 et: amet
 fi: ammatti/ammatti
 fr: profession/professions
@@ -15134,6 +15136,7 @@ tr: meslek/meslekler
 co: di
 de: von
 en: of
+es: de
 fr: de
 pt: de
 sv: av
@@ -15143,6 +15146,7 @@ tr: /
 co: di
 de: von
 en: of
+es: de
 fr: du
 pt: de
 sv: av
@@ -15222,6 +15226,7 @@ fr: d[e |’]%s
 co: uffiziante/uffiziante/uffizianti
 de: Amtsträger/Amtsträgerin/Amtsträger
 en: officer/officer/officers
+es: oficiante/oficiante/oficiantes
 fr: officiant/officiante/officiants
 pt: oficial/oficial/oficiais
 sv: officer/officer/officerer
@@ -18112,12 +18117,14 @@ tr: içinde görüntüle
 co: Selezziunate ogni modulu via un cliccu nant’à u buttone assuciatu (massimu 15).
 de: Wähle die Module durch Klick auf das zugehörige Feld aus (max. 15).
 en: Select each module by clicking on the corresponding button (max 15).
+es: Seleccione cada módulo pulsando en el botón correspondiente (máx. 15).
 fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
 
     select p_mod
 co: selezziunà i muduli persunalizati
 de: personalisierte Module auswählen
 en: select personalized modules
+es: seleccionar los módulos personalizados
 fr: selectionner les modules personnalisés
 pt: seleccionar os módulos personalizados (por defeito zz)
 sv: välj anpassad modul
@@ -21899,6 +21906,7 @@ tr: tanık/tanık/tanıklar
 co: testimone/testimoni
 de: Zeuge/Zeugen
 en: witness/witnesses
+es: testigo/testigos
 fr: témoin/témoins
 lt: liudytojas/liudytoja/liudytojai/liudytojosės
 pt: testemunha/testemunhas
