@@ -406,43 +406,67 @@ let w_wizard fn conf base =
     (* FIXME: send authentification headers *)
     output_error conf Def.Unauthorized
 
+let to_unsafe_person ~conf ~base person =
+  Geneweb.Util.pget conf base
+    (Option.value ~default:Gwdb.dummy_iper
+       (Geneweb.Authorized.Person.get_iper person))
+
 module NG = struct
   module Util = struct
     let person_is_std_key conf base p k =
       let k = Name.strip_lower k in
       k
-      = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
+      = Name.strip_lower
+          (Option.fold
+             (Geneweb.Authorized.Person.get_first_name p)
+             ~none:"" ~some:(Gwdb.get_name base)
+          ^ " "
+          ^ Option.fold
+              (Geneweb.Authorized.Person.get_surname p)
+              ~none:"" ~some:(Gwdb.get_name base))
       || List.exists
            (fun n -> Name.strip n = k)
-           (Gwdb.person_misc_names base p (Geneweb.Person.nobtit conf base))
+           (Option.value
+              (Geneweb.Authorized.Person.misc_names ~conf ~base p
+                 (Geneweb.Authorized.Person.nobtit ~conf ~base))
+              ~default:[])
 
     let select_std_eq conf base pl k =
       List.filter (fun p -> person_is_std_key conf base p k) pl
 
-    let find_all conf base an =
-      let sosa_ref = Geneweb.Util.find_sosa_ref conf base in
+    let find_all conf' base an =
+      let conf = Geneweb.Config.Trimmed.from_config conf' in
+      let sosa_ref = Geneweb.Util.find_sosa_ref conf' base in
       let sosa_nb = Sosa.of_string an in
       match (sosa_ref, sosa_nb) with
       | Some p, Some n ->
           if n <> Sosa.zero then
-            match Geneweb.Util.p_of_sosa conf base n p with
-            | Some p -> ([ p ], true)
+            match Geneweb.Util.p_of_sosa conf' base n p with
+            | Some p ->
+                let p =
+                  Geneweb.Authorized.Person.make ~conf ~base (Gwdb.get_iper p)
+                in
+                ([ p ], true)
             | _ -> ([], false)
           else ([], false)
       | _ -> (
-          let acc = Geneweb.SearchName.search_by_key conf base an in
+          let acc = Geneweb.SearchName.search_by_key conf' base an in
           match acc with
           | Some acc -> ([ acc ], false)
           | None ->
               ( Geneweb.SearchName.search_key_aux
                   (fun conf base acc an ->
-                    let spl = select_std_eq conf base acc an in
+                    let spl =
+                      select_std_eq
+                        (Geneweb.Config.Trimmed.from_config conf)
+                        base acc an
+                    in
                     if spl = [] then
                       if acc = [] then
                         Geneweb.SearchName.search_by_name conf base an
                       else acc
                     else spl)
-                  conf base an,
+                  conf' base an,
                 false ))
   end
 
@@ -489,7 +513,9 @@ module NG = struct
         if
           sosa_acc
           || Gutil.person_of_string_key base n <> None
-          || Util.person_is_std_key conf base p n
+          || Util.person_is_std_key
+               (Geneweb.Config.Trimmed.from_config conf)
+               base p n
         then person_selected_with_redirect ~conf ~base ~person:p ()
         else specify conf base n pl
     | pl -> specify conf base n pl
@@ -540,7 +566,13 @@ module NG = struct
         let n = real_input conf "v" in
         let fn = real_input conf "fn" in
         let sn = real_input conf "sn" in
-        on_select_input_or_none person_selected_with_redirect specify
+        on_select_input_or_none
+          (fun ~conf ~base ~person ->
+            person_selected_with_redirect ~conf ~base
+              ~person:(to_unsafe_person ~conf ~base person))
+          (fun conf base name persons ->
+            specify conf base name
+              (List.map (to_unsafe_person ~conf ~base) persons))
           incorrect_request conf base (n, fn, sn)
     | Some i ->
         relation_print conf base
@@ -789,7 +821,11 @@ let treat_request =
            | "RLM" -> w_base @@ Geneweb.RelationDisplay.print_multi
            | "S" ->
                w_base @@ fun conf base ->
-               Geneweb.SearchName.print conf base specify unknown
+               Geneweb.SearchName.print conf base
+                 (fun conf base name persons ->
+                   specify conf base name
+                     (List.map (to_unsafe_person ~conf ~base) persons))
+                 unknown
            | "SRC" -> (
                w_base @@ fun conf base ->
                match Geneweb.Util.p_getenv conf.env "v" with

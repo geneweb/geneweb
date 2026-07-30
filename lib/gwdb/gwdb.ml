@@ -247,11 +247,13 @@ let nobtitles base allowed_titles denied_titles p =
               else true)
             list)
 
+let get_name base string_id = Mutil.nominative (sou base string_id)
+
 (** Returns first name of person *)
-let p_first_name base p = Mutil.nominative (sou base (get_first_name p))
+let p_first_name base p = get_name base (get_first_name p)
 
 (** Returns surname of person *)
-let p_surname base p = Mutil.nominative (sou base (get_surname p))
+let p_surname base p = get_name base (get_surname p)
 
 (** Returns array of surnames of person's husbands.
     First element of a couple in the array is husband's surname,
