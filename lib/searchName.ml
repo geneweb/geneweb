@@ -291,12 +291,15 @@ let search_by_sosa ~conf ~base ~sosa =
   if Sosa.eq sosa Sosa.zero then None
   else
     Option.bind (Util.find_sosa_ref conf base) (fun sosa_ref ->
-        Option.map
-          (fun person ->
-            Authorized.Person.make
-              ~conf:(Config.Trimmed.from_config conf)
-              ~base (Gwdb.get_iper person))
-          (Util.p_of_sosa conf base sosa sosa_ref))
+        Option.bind (Util.p_of_sosa conf base sosa sosa_ref) (fun person ->
+            let person =
+              Authorized.Person.make
+                ~conf:(Config.Trimmed.from_config conf)
+                ~base (Gwdb.get_iper person)
+            in
+            Ext_option.return_if
+              (not @@ search_reject_p base person)
+              (fun () -> person)))
 
 let search_by_name conf' base n =
   let conf = Config.Trimmed.from_config conf' in
