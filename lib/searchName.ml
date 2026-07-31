@@ -1850,6 +1850,27 @@ let rec handle_search_results alias_cache conf base query fn_options components
               (perfect_a @ perfect_b)
           in
 
+          (* Boundary-independent key match: the fn/sn split guessed by the
+             parser can land in the wrong place for compound surnames with an
+             internal particle (e.g. "annie crassous de medeuil" is parsed as
+             fn="annie crassous" / sn="de medeuil", but the person is
+             fn="Annie" / sn="Crassous de Médeuil").  When no type-A/B perfect
+             match was found, fall back to comparing the person's own fn+sn
+             (spaces stripped) against the whole query via person_is_approx_key.
+             Unlike the Type-C misc-name test below, this does NOT match on
+             married names, so it distinguishes "Annie Crassous de Médeuil"
+             (born) from "Annie Cleveland" (married into the family). *)
+          let perfect =
+            match perfect with
+            | [] ->
+                List.sort_uniq
+                  (fun a b -> compare (Driver.get_iper a) (Driver.get_iper b))
+                  (List.filter
+                     (fun p -> person_is_approx_key base p query)
+                     (exact_persons @ partial_persons @ spouse_persons))
+            | l -> l
+          in
+
           (* Type-C fallback: no A/B perfect match; accept a person whose
              misc names (aliases, names with titles, ...) match the query.
              Uses person_is_misc_name so the normalisation is shared with
@@ -1998,6 +2019,8 @@ let print conf base specify =
   | FirstNameOnly fn ->
       let alias_cache = Some.AliasCache.create () in
       let results = search_firstname alias_cache conf base fn fn_options in
+      let _ = [ FirstName ] in
+      (* dummy to avoid warning *)
       display_firstname_results conf base alias_cache fn fn_options results
   | SurnameOnly sn -> go sn [ Surname ]
   | ParsedName { first_name = Some fn; surname = None; _ } when fn <> "" ->
