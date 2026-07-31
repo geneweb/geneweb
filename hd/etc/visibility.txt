@@ -18,6 +18,7 @@
 [
 en: You are currently logged-is as
 fr: Vous êtes connecté en mode
+es: Estás conectado en modo
 ] %if;wizard;<span class="text-success">[wizard/wizards/friend/friends/exterior]0</span>%nn;
   %elseif;friend;<span class="text-success">[wizard/wizards/friend/friends/exterior]2</span>%nn;
   %else;<span class="text-success">[wizard/wizards/friend/friends/exterior]4</span>%end;.
@@ -27,21 +28,25 @@ fr: Vous êtes connecté en mode
 [
 en: <span class="text-success">Wizards</span> have full visibility
 fr: Les <span class="text-success">magiciens</span> ont la visibilité de toutes les informations
+es: Los <span class="text-success">magos</span> ven toda la información
 ].<br>
 
 [
 en: For %if;(b.semi_public="yes")<span class="text-success">friends</span> and %end;<span class="text-success">visitors</span>, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter) or if the person has a title and the vriable "public_if_titles" has been activated for the base
 fr: Pour les %if;(b.semi_public="yes")<span class="text-success">amis</span> et %end;<span class="text-success">visiteurs</span>, une personne peut être visible si elle est marquée "Public", si elle est décédée ou suffisamment agée (selon des paramètres de la base) ou si elle porte un titre et la variable "public_if_titles" est activée pour la base
+es: Para los %if;(b.semi_public="yes")<span class="text-success">amigos</span> y %end;<span class="text-success">visitantes</span>, una persona puede ser visible si está marcada como "Público", si falleció o es suficientemente antigua (según parámetros de la base) o si tiene un título y la variable "public_if_titles" está activada en la base
 ].<br>
 %else;
 [
 en: <span class="text-success">Wizards</span> and <span class="text-success">friends</span> have full visibility
 fr: Les <span class="text-success">magiciens</span> et les <span class="text-success">amis</span> ont la visibilité de toutes les informations
+es: Los <span class="text-success">magos</span> y los <span class="text-success">amigos</span> ven toda la información
 ].<br>
 
 [
 en: For <span class="text-success">visitors</span>, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter) or if the person has a title and the vriable "public_if_titles" has been activated for the base
 fr: Pour les <span class="text-success">visiteurs</span>, une personne peut être visible si elle est marquée "Public", si elle est décédée ou suffisamment agée (selon des paramètres de la base) ou si elle porte un titre et la variable "public_if_titles" est activée pour la base
+es: Para los <span class="text-success">visitantes</span>, una persona puede ser visible si está marcada como "Público", si falleció o es suficientemente antigua (según parámetros de la base) o si tiene un título y la variable "public_if_titles" está activada en la base
 ].<br>
 
 %end;
@@ -49,11 +54,13 @@ fr: Pour les <span class="text-success">visiteurs</span>, une personne peut êtr
 [
 en: Anyone cas ask to be tagged as "Private"
 fr: Toute personne peut demander à être marquée "Private" 
+es: Cualquier persona puede pedir ser marcada como "Privado"
 ].<br>
 
 [
 en: When logged-in as <span class="text-success">friend</span>, himself is always visible for himself
 fr: Une personne connectée comme <span class="text-success">ami</span>, voit toujours sa fiche personnelle
+es: Una persona conectada como <span class="text-success">amigo</span> siempre ve su propia ficha
 ].<br>
 
 
@@ -61,21 +68,25 @@ fr: Une personne connectée comme <span class="text-success">ami</span>, voit to
 [
 en: <span class="text-success">Friends</span> who have given their consent see all informations for other consenting <span class="text-success">friends</span>
 fr: Les <span class="text-success">amis</span> qui ont donné leur consentement voient toutes les informations des autres <span class="text-success">amis</span> consentants
+es: Los <span class="text-success">amigos</span> que dieron su consentimiento ven toda la información de los demás <span class="text-success">amigos</span> consentientes
 ].<br>
 
 [
 en: Data for persons who have not (yet) given their consent is limited to first name, surname and marriages for other <span class="text-success">friends</span>
 fr: Pour les personne n'ayant pas (encore) donné leur consentement, seuls les nom, prénom et alliances sont affichés pour les autres <span class="text-success">amis</span>
+es: De las personas que (aún) no dieron su consentimiento, los demás <span class="text-success">amigos</span> solo ven nombre, apellido y matrimonios
 ].<br>
 
 [
 en: If a consenting <span class="text-success">friend</span> activates the "family mode" he will see all data for the members of his family, even if they have not (yet) given their consent
 fr: S'il active le mode "famille", un <span class="text-success">ami</span> ayant donné son consentement verra les données des membres de sa famille, même si ceux-ci n'ont pas (encore) donné leur consentement
+es: Si un <span class="text-success">amigo</span> consentiente activa el "modo familia", verá todos los datos de los miembros de su familia, aunque estos (aún) no hayan dado su consentimiento
 ].<br>
 
 [
 en: this mode is expensive and should be deactivated (second click on the family mode button) for further navigation
 fr: Ce mode, qui est coûteux, doit être désactivé (deuxième click sur le bouton mode famille) pour la poursuite de la navigation
+es: Este modo es costoso y conviene desactivarlo (segundo clic en el botón de modo familia) para seguir navegando
 ].<br>
 
 
@@ -87,6 +98,7 @@ fr: Ce mode, qui est coûteux, doit être désactivé (deuxième click sur le bo
 [
 en: Color code
 fr: Codes couleur
+es: Código de colores
 ][:]
 <div>
   <ul>
@@ -94,23 +106,27 @@ fr: Codes couleur
 [
 en: Public if has titles, if <code>public_if_title=yes</code> (parameter in gwf, default yes), otherwise private
 fr: Publique si titré, si <code>public_if_title=yes</code> (paramètre dans .gwf, défaut yes), sinon privé
+es: Público si tiene títulos, si <code>public_if_title=yes</code> (parámetro del .gwf, por defecto yes); si no, privado
 ];
     <li><i class="fa fa-person fa-fw text-success me-2"></i>[*iftitles/public/semipublic/private]1[:] 
 [
 en: Visible for everyone
 fr: Visible pour tout le monde
+es: Visible para todos
 ];
 %if;(b.semi_public="yes")
     <li><i class="fa fa-person fa-fw text-warning me-2"></i>[*iftitles/public/semipublic/private]2[:]
 [
 en: Visible for <span class="text-success">friends</span> having HalfPublic status (consenting), other <span class="text-success">friends</span> see only firstname and surname
 fr: Visible pour les <span class="text-success">amis</span> consentants (marqués SemiPublic), les autre <span class="text-success">amis</span> ne voient que nom et prénom
+es: Visible para los <span class="text-success">amigos</span> con estado SemiPúblico (consentientes); los demás <span class="text-success">amigos</span> solo ven nombre y apellido
 ];
 %end;
     <li><i class="fa fa-person fa-fw text-danger me-2"></i>[*iftitles/public/semipublic/private]3[:]
 [
 en: Never visible except for himself when logged as <span class="text-success">friend</span>
 fr: Invisible pour tous sauf lui même (si connecté comme <span class="text-success">ami</span>)
+es: Invisible para todos salvo para sí mismo (conectado como <span class="text-success">amigo</span>)
 ];
   </ul>
 </div>
