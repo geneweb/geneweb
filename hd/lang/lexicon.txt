@@ -1099,6 +1099,7 @@ tr: bir kayınbiraderi/kayınbiraderi
 co: un cugnatu/cugnati/una cugnata/cugnate
 de: ein Schwager/Schwäger/eine Schwägerin/Schwägerinnen
 en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
+es: un cuñado/cuñados/una cuñada/cuñadas
 fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
 pt: um cunhado/cunhados/uma cunhada/cunhadas
 sv: en svåger/svågrar/en svägerska/svägerskor
@@ -1140,6 +1141,7 @@ tr: bir %serkek kardeş/bir %skız kardeş/bir %skardeş
 co: un ghjeneru o una nora/ghjeneri o nore
 de: ein Schwiegerkind/Schwiegerkinder
 en: one child-in-law/children-in-law
+es: un hijo político/hijos políticos
 fr: un bel-enfant/beaux-enfants
 pt: enteado/enteados
 sv: ett syskonbarn/syskonbarn
@@ -1405,6 +1407,7 @@ tr: bir %sbüyük amca/bir %sbüyük teyze
 co: un mezu cugnatu/mezu cugnati/una meza cugnata/meza cugnate
 de: ein Halbschwager/Halbschwäger/eine Halbschwägerin/Halbschwägerinnen
 en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
+es: un medio cuñado/medios cuñados/una media cuñada/medias cuñadas
 fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
 pt: um meio cunhado/meios cunhados/uma meia cunhada/meias cunhadas
 sv: en halvsvåger/halvsvågrar/en halvsvägerska/halvsvägerskor
@@ -1414,6 +1417,7 @@ tr: bir üvey kayınbirader/üvey kayınbiraderler/bir üvey baldız/üvey bald�
 co: un mezu cugnatu o una meza cugnata/mezu cugnati è meze cugnate
 de: ein Halbschwager oder eine Halbschwägerin/Halbschwäger oder Halbschwägerinnen
 en: one half sibling-in-law/half siblings-in-law
+es: un medio cuñado o media cuñada/medios cuñados y medias cuñadas
 fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
 pt: um meio cunhado ou cunhada/meios cunhados
 sv: ett halvsyskonbarn/halvsyskonbarn
@@ -1487,6 +1491,7 @@ tr: bir %syeğen/bir %syeğen/%syeğenler/%syeğenler/%syeğenler ve %syeğenler
 co: un cugnatu o una cugnata/cugnati è cugnate
 de: ein Schwager oder eine Schwägerin/Schwäger oder Schwägerinnen
 en: one sibling-in-law/siblings-in-law
+es: un cuñado o cuñada/cuñados y cuñadas
 fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
 pt: um cunhado ou cunhada/cunhados
 sv: en svåger eller svägerska/svågrar och svägerskor
@@ -1560,6 +1565,7 @@ tr: bir oğul/bir kız/bir çocuk
 co: un(a) figliastru(a)/figliastri
 de: ein Stiefkind/Stiefkinder
 en: a stepchild/stepchildren
+es: un hijastro/hijastros
 fr: un bel-enfant/beaux-enfants
 pt: um enteado/enteados
 sv: ett svärbarn/svärbarn
@@ -1569,6 +1575,7 @@ tr: bir üvey çocuk/üvey çocuklar
 co: un figliastru/figliastri/una figliastra/figliastre
 de: ein Stiefsohn/Stiefsöhne/eine Stieftochter/Stieftöchter
 en: one stepson/stepsons/one stepdaughter/stepdaughters
+es: un hijastro/hijastros/una hijastra/hijastras
 fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
 pt: um enteado/enteados/uma enteada/enteadas
 sv: en svärson/svärsöner/svärdotter/svärdöttrar
@@ -1706,6 +1713,7 @@ tr: edinme
 co: attivà/squassà
 de: aktivieren/deaktivieren
 en: activate/suppress
+es: activar/suprimir
 fr: activer/supprimer
 pt: activar/suprimir
 sv: aktivera/undertrycka
@@ -1715,23 +1723,27 @@ tr: etkinleştir/kaldır
 co: squassà stu chjassu
 de: diesen Pfad verbergen
 en: suppress this path
+es: suprimir este camino
 fr: supprimer ce chemin
 
     group/groups
 co: gruppu/gruppi
 de: Gruppe/Gruppen
 en: group/groups
+es: grupo/grupos
 fr: groupe/groupes
 
     group label
 co: nome di u gruppu
 de: Name der Gruppe
 en: group label
+es: nombre del grupo
 fr: nom du groupe
 
     resize fanchart
 de: den Fächerbaum an das Fenster anpassen
 en: resize fanchart to the window
+es: adaptar el árbol en abanico a la ventana
 fr: adapter l’arbre en éventail à la fenêtre
 
     add a group
@@ -1835,24 +1847,28 @@ tr: not ekle
 co: aghjunghje un’armuratura
 de: ein Wappen hinzufügen
 en: add a coat of arms
+es: agregar un blasón
 fr: ajouter un blason
 
     add filter
 co: aghjunghje un filtru
 de: Filter hinzufügen
 en: add a filter
+es: agregar un filtro
 fr: ajouter un filtre
 
     add image
 co: aghjunghje una fiura
 de: Bild hinzufügen
 en: add an image
+es: agregar una imagen
 fr: ajouter une image
 
     add note
 co: aghjunghje una nota
 de: Notiz hinzufügen
 en: add a note
+es: agregar una nota
 fr: ajouter une note
 
     add picture
@@ -1889,24 +1905,28 @@ tr: resim ekle
 co: u ritrattu hè un indirizzu web. Impiegà MOD_IND per mudificallu o squassallu.
 de: Das Bild ist eine URL. Nutze MOD_IND zum korrigieren oder löschen.
 en: portrait is a URL. Use MOD_IND to delete or update.
+es: el retrato es una URL. Usar MOD_IND para corregirlo o eliminarlo.
 fr: le portrait est une URL. Utiliser MOD_IND pour le corriger ou le supprimer.
 
     add portrait
 co: aghjunghje un ritrattu
 de: Porträt hinzufügen
 en: add a portrait
+es: agregar un retrato
 fr: ajouter un portrait
 
     add source
 co: aghjunghje una fonte
 de: Quelle hinzufügen
 en: add a source
+es: agregar una fuente
 fr: ajouter une source
 
     add the previous name as a first name alias
 co: aghjunghje u nome precedente cum’è cugnome di nome
 de: den vorherigen Namen als Vornamen-Alias hinzufügen
 en: add the previous name as a first name alias
+es: agregar el nombre anterior como alias de nombre
 fr: ajouter le nom précédent comme un alias de prénom
 pt: adicionar o nome anterior como primeiro nome alternativo
 sv: lägg till det förra namnet som förnamnsalias
@@ -1916,6 +1936,7 @@ tr: önceki adı, ilk takma adı olarak ekleyin
 co: aghjunghje u nome precedente cum’è cugnome di casata
 de: den vorherigen Namen als Nachnamen-Alias hinzufügen
 en: add the previous name as a surname alias
+es: agregar el nombre anterior como alias de apellido
 fr: ajouter le nom précédent comme un alias de nom
 pt: adicionar o nome anterior como apelido alternativo
 sv: lägg till det förra namnet som efternamnsalias
@@ -2273,12 +2294,14 @@ fr: âges des conjoints
 co: Modulu inaccettevule <strong id="alert-module-2"></strong>. Ci vole à stampittà un’iniziale du modulu accettevule.
 de: Modul ungültig <strong id="alert-module-2"></strong>. Bitte geben Sie einen gültigen Modulanfang an.
 en: Invalid module <strong id="alert-module-2"></strong>. Please enter a valid module initial.
+es: Módulo inválido <strong id="alert-module-2"></strong>. Ingrese una inicial de módulo válida.
 fr: Module invalide <strong id="alert-module-2"></strong>. Veuillez saisir une initiale de module valide.
 
     alert option
 co: Ozzione inaccettevule <strong id="alert-option"></strong> per u modulu <strong id="alert-module"></strong>. Ci vole à stampittà un numeru d’ozzione accettevule.
 de: Ungültige Option <strong id="alert-option"></strong> für Modul <strong id="alert-module"></strong>. Bitte eine gültige Optionsnummer eingeben.
 en: Invalid option <strong id="alert-option"></strong> for module <strong id="alert-module"></strong>. Please enter a valid option number.
+es: Opción inválida <strong id="alert-option"></strong> para el módulo <strong id="alert-module"></strong>. Ingrese un número de opción válido.
 fr: Option invalide <strong id="alert-option"></strong> pour le module <strong id="alert-module"></strong>. Veuillez saisir un numéro d’option valide.
 
     alias
@@ -2318,6 +2341,7 @@ tr: takma ad
 co: tipu di ricerca
 de: Suchmodus
 en: search type
+es: modo de búsqueda
 fr: mode de recherche
 
     maybe alive
@@ -2391,6 +2415,7 @@ tr: canlı
 co: tutti
 de: alle
 en: all
+es: todos
 fr: tous
 
     all the estates
@@ -2429,6 +2454,7 @@ tr: tüm alanlar
 co: tutti i lochi
 de: alle Orte
 en: all the places
+es: todos los lugares
 fr: tous les lieux
 
     all the titles
@@ -2467,6 +2493,7 @@ tr: tüm başlıklar
 co: caratteri permessi
 de: erlaubte Zeichen
 en: allowed characters
+es: caracteres permitidos
 fr: caractères autorisés
 
     alphabetic order
@@ -2666,6 +2693,7 @@ tr: atalar
 co: %s-arburu di l’antenati d[i |’]%s
 de: %s-Baum der Vorfahren von %s
 en: %s-tree of the ancestors of %s
+es: %s-árbol de los antepasados de %s
 fr: %s-arbre des ancêtres d[e |’]%s
 
     and
@@ -2867,18 +2895,21 @@ tr: tabandaki herhangi bir kişi
 co: sottulochi
 de: Teilort
 en: sub-places
+es: sublugares
 fr: sous-lieux
 
     any place title
 co: circà in a lista di i sottulochi
 de: suche in der Liste der Teilorte
 en: search in the list of sub-places
+es: buscar en la lista de sublugares
 fr: rechercher dans la liste des sous-lieux
 
     arbre 8 gen
 co: arburu in H d’8 generazioni
 de: H-Baum 8 Generationen
 en: 8 generations H tree
+es: árbol en H de 8 generaciones
 fr: arbre en H 8 générations
 pt: árvore em H 8 gerações
 sv: 8 generationer H-träd
@@ -2986,12 +3017,14 @@ zh: 上行度/下行度/上行度数/下行度数
 co: à u locu novu
 de: am neuen Ort
 en: at new location
+es: en la nueva ubicación
 fr: au nouvel emplacement
 
     at old location
 co: à u locu anzianu
 de: am alten Ort
 en: at old location
+es: en la ubicación anterior
 fr: à l'ancien emplacement
 
     at the same time
@@ -3030,6 +3063,7 @@ tr: aynı zamanda
 co: lista di e genealugie dispunibule
 de: Liste der verfügbaren Genealogien
 en: list of available genealogies
+es: lista de genealogías disponibles
 fr: listes des généalogies disponibles
 pt: lista das genealogias disponíveis
 sv: lista över tillgängliga släktdatabaser
@@ -3099,6 +3133,7 @@ tr: geri
 co: rivene à l’indice alfabeticu è à a lista di i dizziunarii
 de: zurück zum alphabetischen Index und zur Liste der Wörterbücher
 en: back to alphabetic index and to the list of books
+es: volver al índice alfabético y a la lista de diccionarios
 fr: retourner à l’index alphabétique et à la liste des dictionnaires
 
     baptism
@@ -3264,6 +3299,7 @@ tr: bar mitzvah
 co: basa
 de: Datenbank
 en: base
+es: base
 fr: base
 sv: bas
 tr: taban
@@ -3387,6 +3423,7 @@ tr: bat mitzvah
 co:  nz. à C.
 de:  v. u. Z.
 en:  bce
+es:  a. C.
 fr:  av. J.‑C.
 
     before
@@ -3729,6 +3766,7 @@ tr: soy kitabı
     book link
 de: Link zum Wörterbuch
 en: link to the dictionary
+es: enlace al diccionario
 fr: lien vers le dictionnaire
 
     book/books
@@ -3813,6 +3851,7 @@ zh: 出生
 co: i dui
 de: beide
 en: both
+es: ambos
 fr: les deux
 pt: ambos
 sv: både
@@ -3964,6 +4003,7 @@ tr: satır/çizgiler
 co: fratelli/surelle/fratelli o surelle
 de: Brüder/Schwestern/Geschwister
 en: brothers/sisters/siblings
+es: hermanos/hermanas/hermanos y hermanas
 fr: frères/sœurs/frères et sœurs
 pt: irmãos/irmãs/irmãos e irmãs
 sv: bröder/systrar/syskon
@@ -3973,6 +4013,7 @@ tr: erkek kardeşler/kız kardeşler/kardeşler
 co: navigà
 de: durchsuchen
 en: browse
+es: navegar
 fr: parcourir
 
     build information
@@ -4171,6 +4212,7 @@ zh: 根据
 co: da coppiu/classicu
 de: nach Paar
 en: by couple/classic
+es: por pareja/clásico
 fr: par couple/classique
 pt: por casal
 sv: per par
@@ -4390,6 +4432,7 @@ tr: evli bir kişinin cinsiyetini değiştiremezsin
 co: carusellu
 de: Karussell
 en: carrousel
+es: carrusel
 fr: carrousel
 
     case
@@ -4402,6 +4445,7 @@ fr: majuscules/accents
 co: tene contu di e maiuscule è alette
 de: Beim Titel muss auf Groß- und Kleinschreibung geachtet werden
 en: dont ignore case and accents
+es: tener en cuenta mayúsculas y acentos
 fr: tenir compte des majuscules et accents
 
     celebrities
@@ -4579,110 +4623,131 @@ tr: bireysel etkinliklerin sırasını değiştir
     chk_data %d errors found
 de: %d Fehler gefunden
 en: %d error(s) found
+es: %d error(es) detectado(s)
 fr: %d erreur(s) détectée(s)
 
     chk_data books to check
 de: zu prüfende Wörterbücher
 en: dictionaries to check
+es: diccionarios a verificar
 fr: dictionnaires à vérifier
 
     chk_data cache file not found
 de: Cache-Datei(en) nicht gefunden/zur Erzeugung fehlender Caches, gwsetup verwenden oder ausführen
 en: cache file(s) not found/to generate missing caches, use gwsetup or run
+es: archivo(s) de caché no encontrado(s)/para generar los cachés faltantes, usar gwsetup o ejecutar
 fr: fichier(s) cache absent(s)/pour générer les caches manquants, utiliser gwsetup ou exécutez
 
     chk_data check data
 de: Daten prüfen
 en: check data
+es: verificar los datos
 fr: vérifier les données
 
     chk_data error invisible characters
 co: caratteri invisibile
 de: unsichtbare Zeichen
 en: invisible characters
+es: caracteres invisibles
 fr: caractères invisibles
 
     chk_data error bad capitalization
 co: messa in capitale gattiva
 de: fehlerhafte Großschreibung
 en: bad capitalization
+es: mayúsculas erróneas
 fr: capitalisation erronée
 
     chk_data error misc typographic
 de: fehlerhfte Satzzeichen
 en: bad ponctuation
+es: puntuación errónea
 fr: ponctuation erronée
 
     chk_data error mixed scripts
 de: gemischte Alphabete
 en: mixed alphabets
+es: alfabetos mezclados
 fr: alphabets mélangés
 
     chk_data error multiple spaces
 co: spazii multiplice
 de: mehrere Leerzeichen
 en: multiple spaces
+es: espacios múltiples
 fr: espaces multiples
 
     chk_data error multiple characters
 co: caratteri multiplice
 de: mehrere Zeichen
 en: multiple characters
+es: caracteres múltiples
 fr: caractères multiples
 
     chk_data error non-breaking spaces
 co: spazii nonspezzevule
 de: geschützte Leerzeichen
 en: non-breaking spaces
+es: espacios de no separación
 fr: espaces insécables
 
     chk_data error types
 de: Fehlertypen
 en: error types
+es: tipos de error
 fr: types d’erreur
 
     chk_data keyboard navigation tooltip
 de: verwende die hoch/runter Pfeiltasten um schnell zwischen den Antworten zu navigieren
 en: use up/down arrow keys to quickly navigate between answers
+es: use las flechas arriba/abajo para navegar rápidamente entre los resultados
 fr: utiliser les touches directionnelles haut/bas pour naviguer rapidement entre les réponses
 
     chk_data limit reached
 de: Limit erreicht
 en: limit reached
+es: límite alcanzado
 fr: limite atteinte
 
     chk_data limited to %d results
 de: Limitiert auf <abbr title="gwf variable chk_data_max_results">%d Ergebnisse</abbr>.
 en: limited to <abbr title="gwf variable chk_data_max_results">%d results</abbr>.
+es: limitado a <abbr title="variable gwf chk_data_max_results">%d resultados</abbr>.
 fr: limité à <abbr title="Variable gwf chk_data_max_results">%d résultats</abbr>.
 
     chk_data max results
 de: Maximale Anzahl der Ergebnisse
 en: maximum number of results
+es: número máximo de resultados
 fr: nombre de résultats maximum
 
     chk_data mixed alphabet
 de: griechisches oder kyrillisches Zeichen
 en: greek or cyrillique character
+es: carácter griego o cirílico
 fr: caractère grec ou cyrillique
 
     chk_data ponctuation error
 de: Punktierungsfehler
 en: punctuation error
+es: error de puntuación
 fr: erreur de ponctuation
 
     chk_data ponctuation error breton trigram help
 en: modified letter apostrophe recommended for breton trigram cʼh
+es: se recomienda la letra modificadora apóstrofo para el trigrama bretón cʼh
 fr: lettre modificative apostrophe recommandée pour le trigramme breton cʼh
 
     chk_data ponctuation error missing space
 de: fehlendes Leerzeichen vor der Klammer
 en: missing space before parenthesis
+es: falta un espacio antes del paréntesis
 fr: espace manquante avant la parenthèse
 
     chk_data use database/cache
 de: Datenbank nutzen/<b>Datenbank</b> nutzen (sehr langsam)/<b>Cache-Daten</b> nutzen (sehr schnell, kann aber Einträge zeigen die korrigiert oder gelöscht wurden)
 en: use database/using <b>database</b> (very slow)/using <b>cached data</b> (very fast but may show entries that have been corrected or deleted)
+es: usar la base de datos/usando la <b>base de datos</b> (muy lento)/usando los <b>datos en caché</b> (muy rápido, pero puede mostrar entradas ya corregidas o eliminadas)
 fr: utiliser la base de données/utilisation de la <b>base de données</b> (très lent)/utilisation des <b>données en cache</b> (très rapide mais peut afficher des entrées déjà corrigées ou supprimées)
 
     child/children
@@ -4755,6 +4820,7 @@ tr: çocukların isimleri değişti
 co: sceglie una genealugia
 de: eine Genealogie wählen
 en: choose a genealogy
+es: elegir una genealogía
 fr: choisir une généalogie
 pt: seleccionar uma genealogia
 sv: välj en släktdatabas
@@ -4764,6 +4830,7 @@ tr: bir şecere seçin
 co: sceglie un antenatu
 de: einen Vorfahren auswählen
 en: choose an ancestor
+es: elegir un antepasado
 fr: choisir un ancêtre
 
     choose an image
@@ -4814,6 +4881,7 @@ sv: civila register/civila register
 co: squassà tutti i filtri
 de: alle Filter löschen
 en: clear every filters
+es: borrar todos los filtros
 fr: effacer tous les filtres
 
     clear input
@@ -4918,12 +4986,14 @@ tr: "%s" i tıklayın
 co: per rinuminà tutti i dati uguali&#10;mantene Ctrl è fà un cliccu nant’à un elementu per aprelu in u dizziunariu
 de: zum Umbenennen aller identischen Daten,&#10;halte die Ctrl-Taste und klicke zum Öffnen des Eintrags im Verzeichnis
 en: to rename all the identical data,&#10;hold Ctrl and click to open the entry in the book
+es: para renombrar todos los datos idénticos,&#10;mantenga Ctrl y haga clic para abrir la entrada en el diccionario
 fr: pour renommer toutes les données identiques,&#10;maintenir Ctrl puis cliquer sur une entrée pour l’ouvrir dans le dictionnaire
 
     close
 co: chjode
 de: schließen
 en: close
+es: cerrar
 fr: fermer
 
     close family
@@ -4945,12 +5015,14 @@ tr: bir ebeveyn
 co: armuratura/armurature
 de: Wappen/Wappen
 en: coat of arms/coats of arms
+es: blasón/blasones
 fr: blason/blasons
 
     coefficient of relationship
 co: U <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">cuefficiente di e rilazioni</a> indicheghja u percentuale medianu minimu di geni spartiti trà dui individui.
 de: Der <a href="https://de.wikipedia.org/wiki/Verwandtschaftskoeffizient">Verwandtschaftskoeffizient</a> berechnet den minimalen Prozentsatz der Übereinstimmung der DNA zwischen zwei Personen.
 en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the minimum average percentage of shared DNA between two individuals.
+es: El <a href="https://es.wikipedia.org/wiki/Coeficiente_de_relaci%C3%B3n">coeficiente de parentesco</a> indica el porcentaje medio mínimo de ADN compartido entre dos individuos.
 fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen minimum de gènes partagés entre deux individus.
 
     half-disc/standard/double half-disc
@@ -4962,6 +5034,7 @@ fr: demi-disque/standard/double demi-disque
 co: ripiegà l’implessi
 de: Implex zusammenklappen
 en: collapse implex
+es: reducir los implexos
 fr: réduire les implexes
 pt: reduzir os implexos
 sv: slå ihop implex
@@ -5008,6 +5081,7 @@ tr: renk
 co: un scornu culuritu indicheghja l’esistenza di nota (turchinu), di fonte (giallu) o di i dui (verde) per un evenimentu. Tandu si pò affissà i dati in un finestrinu via un cliccu nant’à u sfondulu di e cellule.
 de: Eine farbige Ecke zeigt das Vorhandensein von Notizen (blau), Quellen (gelb) oder beidem (grün) für ein Ereignis an. Die Daten können dann in einem Popup angezeigt werden, indem man auf den Hintergrund der Zellen klickt.
 en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
+es: una esquina coloreada indica la existencia de notas (azul), fuentes (amarillo) o ambas (verde) para un evento. Los datos pueden verse en una ventana emergente haciendo clic en el fondo de la celda.
 fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
 
     first
@@ -5110,12 +5184,14 @@ tr: yorum
 co: arburu cumpattu di discendenza
 de: kompakter Nachkommenbaum
 en: compact descendants tree
+es: árbol de descendientes compacto
 fr: arbre de descendance compact
 
     compact tree
 co: arburu cumpattu
 de: Kompakter Baum
 en: compact tree
+es: árbol compacto
 fr: arbre compact
 pt: árvore compacta
 sv: kompakt träd
@@ -5385,6 +5461,7 @@ tr: akrabalık katsayısı/akrabalık yüzdesi
 co: cuntinuà
 de: weiter
 en: continue
+es: continuar
 fr: continuer
 
     continue correcting
@@ -5481,12 +5558,14 @@ tr: devam eden
 co: cupiatu/cupiata
 de: kopiert/kopiert
 en: copied/copied
+es: copiado/copiada
 fr: copié/copiée
 
     copy link %s
 co: cupià u liame %s in u preme’papei
 de: kopiere den %s Link in die Zwischenablage
 en: copy the %s link to the clipboard
+es: copiar el enlace %s al portapapeles
 fr: copier le lien %s dans le presse-papier
 pt: copiar o link %s para a área de transferência
 sv: kopiera länken
@@ -5496,6 +5575,7 @@ tr: bağlantıyı panoya kopyala
 co: cupià u permaliame
 de: Permalink kopieren
 en: copy the permalink
+es: copiar el enlace permanente
 fr: copier le permalien
 
     country
@@ -5534,6 +5614,7 @@ tr: i̇lçe
 co: coppii
 de: Paare
 en: couples
+es: parejas
 fr: couples
 pt: casais
 sv: par
@@ -5546,6 +5627,7 @@ tr: çiftler
 co: un ottu volte arcifigliulinu/un’ottu volte arcifigliulina/un ottu volte arcizitellucciu
 de: ein Achtfach-Urenkel/eine Achtfach-Urenkelin/ein Achtfach-Urenkel
 en: a eight-times-great-grandson/a eight-times-great-granddaughter/a eight-times-great-grandchild
+es: un 8×-bisnieto/una 8×-bisnieta/un 8×-bisnieto
 fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit-fois-arrière-petit-enfant
 
     cousin.0.2
@@ -5558,36 +5640,42 @@ fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit
 co: un arciarcifigliulinu/un’arciarcifigliulina/un arciarcizitellucciu
 de: ein Ur-Ur-Enkel/eine Ur-Ur-Enkelin/Ur-Ur-Enkel
 en: a great-great-grandson/a great-great-granddaughter/a great-great-grandchild
+es: un tataranieto/una tataranieta/un tataranieto
 fr: un arrière-arrière-petit-fils/une arrière-arrière-petite-fille/un arrière-arrière-petit-enfant
 
     cousin.0.5
 co: un trè volte arcifigliulinu/un’trè volte arcifigliulina/un trè volte arcizitellucciu
 de: ein Ur-Ur-Ur-Enkel/eine Ur-Ur-Ur-Enkelin/Ur-Ur-Ur-Enkel
 en: a three-times-great-grandson/a three-times-great-granddaughter/a three-times-great-grandchild
+es: un 3×-bisnieto/una 3×-bisnieta/un 3×-bisnieto
 fr: un trois-fois-arrière-petit-fils/une trois-fois-arrière-petite-fille/un trois-fois-arrière-petit-enfant
 
     cousin.0.6
 co: un quattru volte arcifigliulinu/un’quattru volte arcifigliulina/un quattru volte arcizitellucciu
 de: ein vierfacher Ur-Enkel/eine vierfache Ur-Enkelin/vierfacher Ur-Enkel
 en: a four-times-great-grandson/a four-times-great-granddaughter/a four-times-great-grandchild
+es: un 4×-bisnieto/una 4×-bisnieta/un 4×-bisnieto
 fr: un quatre-fois-arrière-petit-fils/une quatre-fois-arrière-petite-fille/un quatre-fois-arrière-petit-enfant
 
     cousin.0.7
 co: un cinque volte arcifigliulinu/un’cinque volte arcifigliulina/un cinque volte arcizitellucciu
 de: ein fünffacher Ur-Enkel/eine fünffache Ur-Enkelin/fünffacher Ur-Enkel
 en: a five-times-great-grandson/a five-times-great-granddaughter/a five-times-great-grandchild
+es: un 5×-bisnieto/una 5×-bisnieta/un 5×-bisnieto
 fr: un cinq-fois-arrière-petit-fils/une cinq-fois-arrière-petite-fille/un cinq-fois-arrière-petit-enfant
 
     cousin.0.8
 co: un sei volte arcifigliulinu/un’sei volte arcifigliulina/un sei volte arcizitellucciu
 de: ein sechsfacher Ur-Enkel/eine sechsfache Ur-Enkelin/sechsfacher Ur-Enkel
 en: a six-times-great-grandson/a six-times-great-granddaughter/a six-times-great-grandchild
+es: un 6×-bisnieto/una 6×-bisnieta/un 6×-bisnieto
 fr: un six-fois-arrière-petit-fils/une six-fois-arrière-petite-fille/un six-fois-arrière-petit-enfant
 
     cousin.0.9
 co: un sette volte arcifigliulinu/un’sette volte arcifigliulina/un sette volte arcizitellucciu
 de: ein siebenfacher Ur-Enkel/eine siebenfache Ur-Enkelin/siebenfacher Ur-Enkel
 en: a seven-times-great-grandson/a seven-times-great-granddaughter/a seven-times-great-grandchild
+es: un 7×-bisnieto/una 7×-bisnieta/un 7×-bisnieto
 fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept-fois-arrière-petit-enfant
 
     cousin.1.0
@@ -5606,54 +5694,63 @@ fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept
 co: un %sarciniputinu/una %sarciniputina/%sarciniputini
 de: ein %sUr-Großneffe/eine %sUr-Großnichte/ein %sUr-Großneffe
 en: a %sgreat-grandnephew/a %sgreat-grandniece/a %sgreat-grandnephew
+es: un %ssobrino bisnieto/una %ssobrina bisnieta/un %ssobrino bisnieto
 fr: un %sarrière-petit-neveu/une %sarrière-petite-nièce/un %sarrière-petit-neveu
 
     cousin.1.5
 co: un %sarciarciniputinu/una %sarciarciniputina/un %sarciarciniputinu
 de: ein %sUr-Ur-Großneffe/eine %sUr-Ur-Großnichte/ein %sUr-Ur-Großneffe
 en: a %sgreat-great-grandnephew/a %sgreat-great-grandniece/a %sgreat-great-grandnephew
+es: un %ssobrino tataranieto/una %ssobrina tataranieta/un %ssobrino tataranieto
 fr: un %sarrière-arrière-petit-neveu/une %sarrière-arrière-petite-nièce/un %sarrière-arrière-petit-neveu
 
     cousin.1.6
 co: un %strè volte arciniputinu/una %strè volte arciniputina/un %strè volte arciniputinu
 de: ein %sUr-Ur-Ur-Großneffe/eine %sUr-Ur-Ur-Großnichte/ein %sUr-Ur-Ur-Großneffe
 en: a %sthree-times-great-grandnephew/a %sthree-times-great-grandniece/a %sthree-times-great-grandnephew
+es: un %ssobrino 3×-bisnieto/una %ssobrina 3×-bisnieta/un %ssobrino 3×-bisnieto
 fr: un %strois-fois-arrière-petit-neveu/une %strois-fois-arrière-petite-nièce/un %strois-fois-arrière-petit-neveu
 
     cousin.1.7
 co: un %squattru volte arciniputinu/una %squattru volte arciniputina/un %squattru volte arciniputinu
 de: ein %sUr<sup>(x4)</sup>-Großneffe/eine %sUr<sup>(x4)</sup>-Großnichte/ein %sUr<sup>(x4)</sup>-Großneffe
 en: a %sfour-times-great-grandnephew/a %sfour-times-great-grandniece/a %sfour-times-great-grandnephew
+es: un %ssobrino 4×-bisnieto/una %ssobrina 4×-bisnieta/un %ssobrino 4×-bisnieto
 fr: un %squatre-fois-arrière-petit-neveu/une %squatre-fois-arrière-petite-nièce/un %squatre-fois-arrière-petit-neveu
 
     cousin.1.8
 co: un %scinque volte arciniputinu/una %scinque volte arciniputina/un %scinque volte arciniputinu
 de: ein %sUr<sup>(x5)</sup>-Großneffe/eine %sUr<sup>(x5)</sup>-Großnichte/ein %sUr<sup>(x5)</sup>-Großneffe
 en: a %sfive-times-great-grandnephew/a %sfive-times-great-grandniece/a %sfive-times-great-grandnephew
+es: un %ssobrino 5×-bisnieto/una %ssobrina 5×-bisnieta/un %ssobrino 5×-bisnieto
 fr: un %scinq-fois-arrière-petit-neveu/une %scinq-fois-arrière-petite-nièce/un %scinq-fois-arrière-petit-neveu
 
     cousin.1.9
 co: un %ssei volte arciniputinu/una %ssei volte arciniputina/un %ssei volte arciniputinu
 de: ein %sUr<sup>(×6)</sup>-Großneffe/eine %sUr<sup>(×6)</sup>-Großnichte/ein %sUr<sup>(×6)</sup>-Großneffe
 en: a %ssix-times-great-grandnephew/a %ssix-times-great-grandniece/a %ssix-times-great-grandnephew
+es: un %ssobrino 6×-bisnieto/una %ssobrina 6×-bisnieta/un %ssobrino 6×-bisnieto
 fr: un %ssix-fois-arrière-petit-neveu/une %ssix-fois-arrière-petite-nièce/un %ssix-fois-arrière-petit-neveu
 
     cousin.1.10
 co: un %ssette volte arciniputinu/una %ssette volte arciniputina/un %ssette volte arciniputinu
 de: ein %sUr<sup>(x7)</sup>-Großneffe/eine %sUr<sup>(x7)</sup>-Großnichte/ein %sUr<sup>(x7)</sup>-Großneffe
 en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
+es: un %ssobrino 7×-bisnieto/una %ssobrina 7×-bisnieta/un %ssobrino 7×-bisnieto
 fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
 
     cousin.10.0
 co: un 8<sup>u</sup> volte arcicaccaru/una 8<sup>u</sup> volte arcicaccara
 de: ein achtfacher Urgroßvater/eine achtfache Urgroßmutter
 en: a 8th-great-grandfather/a 8th-great-grandmother
+es: un 8×-bisabuelo/una 8×-bisabuela
 fr: un 8×-arrière-grand-père/une 8×-arrière-grand-mère
 
     cousin.10.1
 co: un %ssette volte arcizione/una %ssette volte arciziona
 de: ein %sUr<sup>(×7)</sup>-Großonkel/eine %sUr<sup>(×7)</sup>-Großtante
 en: a %sseventh great-granduncle/a %sseventh great-grandaunt
+es: un %stío 7×-bisabuelo/una %stía 7×-bisabuela
 fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grande-tante
 
     cousin.2.0
@@ -5664,6 +5761,7 @@ fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grande-tante
 
     cousin.2.10
 de: ein %sUr<sup>(×6)</sup>-Großneffe 2. Grades/eine %sUr<sup>(×6)</sup>-Großnichte 2. Grades
+es: un %s6×-bisnieto de primo hermano/una %s6×-bisnieta de primo hermano
 fr: un %ssept-fois-arrière-petit-cousin/une %ssept-fois-arrière-petite-cousine
 
     cousin.2.2
@@ -5671,30 +5769,37 @@ fr: un %ssept-fois-arrière-petit-cousin/une %ssept-fois-arrière-petite-cousine
 
     cousin.2.3
 de: ein %sNeffe 2. Grades/eine %sNichte 2. Grades
+es: un %shijo de primo hermano/una %shija de primo hermano
 fr: un %spetit-cousin/une %spetite-cousine
 
     cousin.2.4
 de: ein %sGroßneffe 2. Grades/eine %sGroßnichte 2. Grades
+es: un %snieto de primo hermano/una %snieta de primo hermano
 fr: un %sarrière-petit-cousin/une %sarrière-petite-cousine
 
     cousin.2.5
 de: ein %sUr-Großneffe 2. Grades/eine %sUr-Großnichte 2. Grades
+es: un %sbisnieto de primo hermano/una %sbisnieta de primo hermano
 fr: un %sarrière-arrière-petit-cousin/une %sarrière-arrière-petite-cousine
 
     cousin.2.6
 de: ein %sUr-Ur-Großneffe 2. Grades/eine %sUr-Ur-Großnichte 2. Grades
+es: un %stataranieto de primo hermano/una %stataranieta de primo hermano
 fr: un %strois-fois-arrière-petit-cousin/une %strois-fois-arrière-petite-cousine
 
     cousin.2.7
 de: ein %sUr-Ur-Ur-Großneffe 2. Grades/eine %sUr-Ur-Ur-Großnichte 2. Grades
+es: un %s3×-bisnieto de primo hermano/una %s3×-bisnieta de primo hermano
 fr: un %squatre-fois-arrière-petit-cousin/une %squatre-fois-arrière-petite-cousine
 
     cousin.2.8
 de: ein %sUr<sup>(×4)</sup>-Großneffe 2. Grades/eine %sUr<sup>(×4)</sup>-Großnichte 2. Grades
+es: un %s4×-bisnieto de primo hermano/una %s4×-bisnieta de primo hermano
 fr: un %scinq-fois-arrière-petit-cousin/une %scinq-fois-arrière-petite-cousine
 
     cousin.2.9
 de: ein %sUr<sup>(×5)</sup>-Großneffe 2. Grades/eine %sUr<sup>(×5)</sup>-Großnichte 2. Grades
+es: un %s5×-bisnieto de primo hermano/una %s5×-bisnieta de primo hermano
 fr: un %ssix-fois-arrière-petit-cousin/une %ssix-fois-arrière-petite-cousine
 
     cousin.3.0
@@ -5705,10 +5810,12 @@ fr: un %ssix-fois-arrière-petit-cousin/une %ssix-fois-arrière-petite-cousine
 
     cousin.3.10
 de: ein %sUr<sup>(×5)</sup>-Großneffe 3. Grades/eine %sUr<sup>(×5)</sup>-Großnichte 3. Grades
+es: un %s5×-bisnieto de primo segundo/una %s5×-bisnieta de primo segundo
 fr: un %s6×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s6×-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.3.2
 de: ein %sOnkel 2. Grades/eine %sTante 2. Grades
+es: un %sprimo hermano de los padres/una %sprima hermana de los padres
 fr: un %sgrand-cousin/une %sgrande-cousine
 
     cousin.3.3
@@ -5716,50 +5823,61 @@ fr: un %sgrand-cousin/une %sgrande-cousine
 
     cousin.3.4
 de: ein %sNeffe 3. Grades/eine %sNichte 3. Grades
+es: un %shijo de primo segundo/una %shija de primo segundo
 fr: un %spetit-cousin au 2<sup>e</sup> degré/une %spetite-cousine au 2<sup>e</sup> degré
 
     cousin.3.5
 de: ein %sGroßneffe 3. Grades/eine %sGroßnichte 3. Grades
+es: un %snieto de primo segundo/una %snieta de primo segundo
 fr: un %sarrière-petit-cousin au 2<sup>e</sup> degré/une %sarrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.3.6
 de: ein %sUrgroßneffe 3. Grades/eine %sUrgroßnichte 3. Grades
+es: un %sbisnieto de primo segundo/una %sbisnieta de primo segundo
 fr: un %sarrière-arrière-petit-cousin au 2<sup>e</sup> degré/une %sarrière-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.3.7
 de: ein %sUr-Urgroßneffe 3. Grades/eine %sUr-Urgroßnichte 3. Grades
+es: un %stataranieto de primo segundo/una %stataranieta de primo segundo
 fr: un %s3×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s3×-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.3.8
 de: ein %sUr-Ur-Urgroßneffe 3. Grades/eine %sUr-Ur-Urgroßnichte 3. Grades
+es: un %s3×-bisnieto de primo segundo/una %s3×-bisnieta de primo segundo
 fr: un %s4×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s4×-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.3.9
 de: ein %sUr<sup>(×4)</sup>-Großneffe 3. Grades/eine %sUr<sup>(×4)</sup>-Großnichte 3. Grades
+es: un %s4×-bisnieto de primo segundo/una %s4×-bisnieta de primo segundo
 fr: un %s5×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s5×-arrière-petite-cousine au 2<sup>e</sup> degré
 
     cousin.4.0
 co: un arcicaccarone/una arcicaccarona/un arcicaccarone
 de: ein:d:+em Ur-Urgroßvater/eine:d:+r Ur-Urgroßmutter/ein:d:+em Ur-Urgroßelternteil
 en: a great-great-grandfather/a great-great-grandmother/a great-great-grandparent
+es: un tatarabuelo/una tatarabuela/un tatarabuelo
 fr: un arrière-arrière-grand-père/une arrière-arrière-grand-mère/un arrière-arrière-grand-parent
 
     cousin.4.1
 co: un %sarcizione/una %sarciziona
 de: ein %sUrgroßonkel/eine %sUrgroßtante
 en: a %sgreat-granduncle/a %sgreat-grandaunt
+es: un %stío bisabuelo/una %stía bisabuela
 fr: un %sarrière-grand-oncle/une %sarrière-grande-tante
 
     cousin.4.10
 de: ein %sUr<sup>(×4)</sup>-Großneffe 4. Grades/eine %sUr<sup>(×4)</sup>-Großnichte 4. Grades
+es: un %s4×-bisnieto de primo tercero/una %s4×-bisnieta de primo tercero
 fr: un %s5×-arrière-petit-cousin au 3<sup>e</sup> degré/une %s5×-arrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.4.2
 de: ein %sGroßonkel 2. Grades/eine %sGroßtante 2. Grades
+es: un %sprimo hermano de los abuelos/una %sprima hermana de los abuelos
 fr: un %sarrière-grand-cousin/une %sarrière-grande-cousine
 
     cousin.4.3
 de: ein %sOnkel 3. Grades/eine %sTante 3. Grades
+es: un %sprimo segundo de los padres/una %sprima segunda de los padres
 fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrande-cousine au 2<sup>e</sup> degré
 
     cousin.4.4
@@ -5767,111 +5885,133 @@ fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrande-cousine au 2<sup>e</s
 
     cousin.4.5
 de: ein %sNeffe 4. Grades/eine %sNichte 4. Grades
+es: un %shijo de primo tercero/una %shija de primo tercero
 fr: un %spetit-cousin au 3<sup>e</sup> degré/une %spetite-cousine au 3<sup>e</sup> degré
 
     cousin.4.6
 de: ein %sGroßneffe 4. Grades/eine %sGroßnichte 4. Grades
+es: un %snieto de primo tercero/una %snieta de primo tercero
 fr: un %sarrière-petit-cousin au 3<sup>e</sup> degré/une %sarrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.4.7
 de: ein %sUrgroßneffe 4. Grades/eine %sUrgroßnichte 4. Grades
+es: un %sbisnieto de primo tercero/una %sbisnieta de primo tercero
 fr: un %sarrière-arrière-petit-cousin au 3<sup>e</sup> degré/une %sarrière-arrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.4.8
 de: ein %sUr-Urgroßneffe 4. Grades/eine %sUr-Urgroßnichte 4. Grades
+es: un %stataranieto de primo tercero/una %stataranieta de primo tercero
 fr: un %s3×-arrière-petit-cousin au 3<sup>e</sup> degré/une %s3×-arrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.4.9
 de: ein %sUr-Ur-Urgroßneffe 4. Grades/eine %sUr-Ur-Urgroßnichte 4. Grades
+es: un %s3×-bisnieto de primo tercero/una %s3×-bisnieta de primo tercero
 fr: un %s4×-arrière-petit-cousin au 3<sup>e</sup> degré/une %s4×-arrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.5.0
 co: un arciarcicaccarone/una arciarcicaccarona
 de: ein:d:+em Ur-Ur-Urgroßvater/eine:d:+r Ur-Ur-Urgroßmutter
 en: a great-great-great-grandfather/a great-great-great-grandmother
+es: un 3×-bisabuelo/una 3×-bisabuela
 fr: un 3×-arrière-grand-père/une 3×-arrière-grand-mère
 
     cousin.5.1
 de: ein %sUr-Ur-Großonkel/eine %sUr-Ur-Großtante
 en: a %sgreat-great-granduncle/a %sgreat-great-grandaunt
+es: un %stío tatarabuelo/una %stía tatarabuela
 fr: un %sarrière-arrière-grand-oncle/une %sarrière-arrière-grande-tante
 
     cousin.5.2
 de: ein %sUr-Großonkel 2. Grades/eine %sUr-Großtante 2. Grades
+es: un %sprimo hermano de los bisabuelos/una %sprima hermana de los bisabuelos
 fr: un %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
 
     cousin.5.3
 de: ein %sGroßonkel 3. Grades/eine %sGroßtante 3. Grades
+es: un %sprimo segundo de los abuelos/una %sprima segunda de los abuelos
 fr: un %sarrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-grande-cousine au 2<sup>e</sup> degré
 
     cousin.5.4
 de: ein %sOnkel 4. Grades/eine %sTante 4. Grades
+es: un %sprimo tercero de los padres/una %sprima tercera de los padres
 fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</sup> degré
 
     cousin.5.5
 co: un cuginu à u 4<sup>u</sup> gradu/una cugina à u 4<sup>u</sup> gradu
 de: ein %sCousin 4. Grades/eine %sCousine 4. Grades
 en: a %s4th cousin
+es: un %sprimo cuarto
 fr: un %scousin au 4<sup>e</sup> degré/une %scousine au 4<sup>e</sup> degré
 
     cousin.6.0
 co: un 4<sup>u</sup> volte arcicaccaru/una 4<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×4)</sup>-Großvater/eine Ur<sup>(×4)</sup>-Großmutter
 en: a 4th-great-grandfather/a 4th-great-grandmother
+es: un 4×-bisabuelo/una 4×-bisabuela
 fr: un 4×-arrière-grand-père/une 4×-arrière-grand-mère
 
     cousin.6.1
 co: un %s3<sup>u</sup> volte arcizione/una %s3<sup>u</sup> volte arciziona
 de: ein %sUr-Ur-Urgroßonkel/eine %sUr-Ur-Urgroßtante
 en: a %sthird great-granduncle/a %sthird great-grandaunt
+es: un %stío 3×-bisabuelo/una %stía 3×-bisabuela
 fr: un %strois-fois-arrière-grand-oncle/une %strois-fois-arrière-grande-tante
 
     cousin.6.2
 de: ein %sUr-Ur-Großonkel 2. Grades/eine %sUr-Ur-Großtante 2. Grades
+es: un %sprimo hermano de los tatarabuelos/una %sprima hermana de los tatarabuelos
 fr: un %s3×-arrière-grand-cousin/une %s3×-arrière-grande-cousine
 
     cousin.6.3
 de: ein %sUr-Großonkel 3. Grades/eine %sUr-Großtante 3. Grades
+es: un %sprimo segundo de los bisabuelos/una %sprima segunda de los bisabuelos
 fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière-grande-cousine au 2<sup>e</sup> degré
 
     cousin.6.4
 de: ein %sGroßonkel 4. Grades/eine %sGroßtante 4. Grades
+es: un %sprimo tercero de los abuelos/una %sprima tercera de los abuelos
 fr: un %sarrière-grand-cousin au 3<sup>e</sup> degré/une %sarrière-grande-cousine au 3<sup>e</sup> degré
 
     cousin.7.0
 co: un 5<sup>u</sup> volte arcicaccaru/una 5<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×5)</sup>-Großvater/eine Ur<sup>(×5)</sup>-Großmutter
 en: a 5th-great-grandfather/a 5th-great-grandmother
+es: un 5×-bisabuelo/una 5×-bisabuela
 fr: un 5×-arrière-grand-père/une 5×-arrière-grand-mère
 
     cousin.7.1
 co: un %s4<sup>u</sup> volte arcizione/una %s4<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×4)</sup>-Großonkel/eine %sUr<sup>(×5)</sup>-Großtante
 en: a %sfourth great-granduncle/a %sfourth great-grandaunt
+es: un %stío 4×-bisabuelo/una %stía 4×-bisabuela
 fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grande-tante
 
     cousin.8.0
 co: un 6<sup>u</sup> volte arcicaccaru/una 6<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×6)</sup>-Großvater/eine Ur<sup>(×6)</sup>-Großmutter
 en: a 6th-great-grandfather/a 6th-great-grandmother
+es: un 6×-bisabuelo/una 6×-bisabuela
 fr: un 6×-arrière-grand-père/une 6×-arrière-grand-mère
 
     cousin.8.1
 co: un %s6<sup>u</sup> volte arcizione/una %s6<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×5)</sup>-Großonkel/eine %sUr<sup>(×5)</sup>-Großtante
 en: a %sfifth great-granduncle/a %sfifth great-grandaunt
+es: un %stío 5×-bisabuelo/una %stía 5×-bisabuela
 fr: un %scinq-fois-arrière-grand-oncle/une %scinq-fois-arrière-grande-tante
 
     cousin.9.0
 co: un 7<sup>u</sup> volte arcicaccaru/una 7<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×7)</sup>-Großvater/eine Ur<sup>(×7)</sup>-Großmutter
 en: a 7th-great-grandfather/a 7th-great-grandmother
+es: un 7×-bisabuelo/una 7×-bisabuela
 fr: un 7×-arrière-grand-père/une 7×-arrière-grand-mère
 
     cousin.9.1
 co: un %s6<sup>u</sup> volte arcizione/una %s6<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×6)</sup>-Großonkel/eine %sUr<sup>(×6)</sup>-Großtante
 en: a %ssixth great-granduncle/a %ssixth great-grandaunt
+es: un %stío 6×-bisabuelo/una %stía 6×-bisabuela
 fr: un %ssix-fois-arrière-grand-oncle/une %ssix-fois-arrière-grande-tante
 
     cousins
@@ -5945,78 +6085,91 @@ tr: kuzenler
 co: figlioli è figliole
 de: Söhne und Töchter, Kinder
 en: sons and daughters
+es: hijos e hijas
 fr: fils et filles, enfants
 
     cousins.0.10
 co: 8<sup>u</sup> volte arcizitellucciu/8<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×8)</sup>-Enkel
 en: eight-times-great-grandchild/eight-times-great-grandchildren
+es: 8×-bisnieto/8×-bisnietos
 fr: huit-fois-arrière-petit-enfant/huit-fois-arrière-petits-enfants
 
     cousins.0.2
 co: figliulinu/figliulini
 de: Enkel
 en: grandchild/grandchildren
+es: nieto/nietos
 fr: petit-enfant/petits-enfants
 
     cousins.0.2 tt
 co: zitelli di u so figliolu o di a so figliola
 de: Kinder des Sohnes oder der Tochter
 en: children of one’s son or daughters
+es: hijos de los hijos
 fr: enfants de son fils ou de sa fille
 
     cousins.0.3
 co: arcifigliulinu/arcifigliulini
 de: Urenkel
 en: great-grandchild/great-grandchildren
+es: bisnieto/bisnietos
 fr: arrière-petit-enfant/arrière-petits-enfants
 
     cousins.0.3 tt
 co: zitelli di u so figliulinu o di a so figliulina
 de: Kinder des Enkels oder der Enkelin
 en: children of one’s grandson or granddaughter
+es: hijos de los nietos
 fr: enfants de son petit-fils ou de sa petite-fille
 
     cousins.0.4
 co: arciarcizitellucciu/arciarcizitellucci
 de: Ur-Urenkel
 en: great-great-grandchild/great-great-grandchildren
+es: tataranieto/tataranietos
 fr: arrière-arrière-petit-enfant/arrière-arrière-petits-enfants
 
     cousins.0.4 tt
 co: zitelli d’un arcifigliulinu o d’una arcifigliulina
 de: Kinder des Urenkels oder der Urenkelin
 en: children of one’s great-grandson or great-granddaughter
+es: hijos de los bisnietos
 fr: enfants de son arrière-petit-fils ou de son arrière-petite-fille
 
     cousins.0.5
 co: 3<sup>u</sup> volte arcizitellucciu/3<sup>u</sup> volte arcizitellucci
 de: Ur-Ur-Urenkel
 en: three-times-great-grandchild/three-times-great-grandchildren
+es: 3×-bisnieto/3×-bisnietos
 fr: trois-fois-arrière-petits-enfant/trois-fois-arrière-petits-enfants
 
     cousins.0.6
 co: 4<sup>u</sup> volte arcizitellucciu/4<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×4)</sup>-Enkel
 en: four-times-great-grandchild/four-times-great-grandchildren
+es: 4×-bisnieto/4×-bisnietos
 fr: quatre-fois-arrière-petit-enfant/quatre-fois-arrière-petits-enfants
 
     cousins.0.7
 co: 5<sup>u</sup> volte arcizitellucciu/5<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×5)</sup>-Enkel
 en: five-times-great-grandchild/five-times-great-grandchildren
+es: 5×-bisnieto/5×-bisnietos
 fr: cinq-fois-arrière-petit-enfant/cinq-fois-arrière-petits-enfants
 
     cousins.0.8
 co: 6<sup>u</sup> volte arcizitellucciu/6<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×6)</sup>-Enkel
 en: six-times-great-grandchild/six-times-great-grandchildren
+es: 6×-bisnieto/6×-bisnietos
 fr: six-fois-arrière-petit-enfant/six-fois-arrière-petits-enfants
 
     cousins.0.9
 co: 7<sup>u</sup> volte arcizitellucciu/7<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×7)</sup>-Enkel
 en: seven-times-great-grandchild/seven-times-great-grandchildren
+es: 7×-bisnieto/7×-bisnietos
 fr: sept-fois-arrière-petit-enfant/sept-fois-arrière-petits-enfants
 
     cousins.1.0
@@ -6026,116 +6179,138 @@ fr: sept-fois-arrière-petit-enfant/sept-fois-arrière-petits-enfants
 co: babbu è mamma
 de: Vater und Mutter
 en: father and mother
+es: padre y madre
 fr: père et mère<br>géniteur et génitrice
 
     cousins.1.1
 ->: siblings
 
     cousins.1.1 tt
+es: hermanos y hermanas
 fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
 
     cousins.1.10
 co: 7<sup>u</sup> volte arciniputinu/7<sup>u</sup> volte arciniputini
 de: Ur<sup>(×7)</sup>-Großneffe/Ur<sup>(×7)</sup>-Großneffen
 en: seven-times-great-grandnephew/seven-times-great-grandnephews
+es: sobrino 7×-bisnieto/sobrinos 7×-bisnietos
 fr: sept-fois-arrière-petit-neveu/sept-fois-arrière-petits-neveux
 
     cousins.1.2
 co: nipoti è nipote
 de: Neffen und Nichten
 en: nephew and nieces
+es: sobrinos y sobrinas
 fr: neveux et nièces
 
     cousins.1.2 tt
 de: Kinder der Brüder und Schwestern<br>« Kinder der Cousins »<hr>← Leibliche Cousins der Kinder
+es: hijos de los hermanos y hermanas
 fr: enfants des frères et sœurs<br>« petits-frères et petites-sœurs »<hr>← cousins germains des enfants
 
     cousins.1.3
 co: niputinu/niputini/niputina/niputine
 de: Großneffe/Großneffen/Großnichte/Großnichten
 en: great-nephew/great-nephews/great-niece/great-nieces
+es: sobrino nieto/sobrinos nietos/sobrina nieta/sobrinas nietas
 fr: petit-neveu/petits-neveux/petite-nièce/petites-nièces
 
     cousins.1.3 tt
 co: niputini è niputine
 de: Großneffen und Großnichten
 en: great-nephews and great-nieces
+es: hijos de los sobrinos
 fr: arrière-neveux et arrière-nièces (soutenu)<br>enfant d’un neveu ou d’une nièce
 
     cousins.1.4
 co: arciniputinu/arciniputini
 de: Ur-Großneffe/Ur-Großneffen
 en: great-grandnephew/great-grandnephews
+es: sobrino bisnieto/sobrinos bisnietos
 fr: arrière-petit-neveu/arrière-petits-neveux
 
     cousins.1.4 tt
 de: Kind eines Neffen oder einer Nichte
+es: hijos de los sobrino nietos
 fr: enfant d’un petit-neveu ou d’une petit-nièce
 
     cousins.1.5
 co: arciarciniputinu/arciarciniputini
 de: Ur-Ur-Großneffe/Ur-Ur-Großneffen&#47; -nichten
 en: great-great-grandnephew/great-great-grandnephews
+es: sobrino tataranieto/sobrinos tataranietos
 fr: arrière-arrière-petit-neveu/arrière-arrière-petits-neveux
 
     cousins.1.6
 co: 3<sup>u</sup> volte arciniputinu/3<sup>u</sup> volte arciniputini
 de: Ur-Ur-Ur-Großneffe/Ur-Ur-Ur-Großneffen&#47; -nichten
 en: three-times-great-grandnephew/three-times-great-grandnephews
+es: sobrino 3×-bisnieto/sobrinos 3×-bisnietos
 fr: trois-fois-arrière-petit-neveu/trois-fois-arrière-petits-neveux
 
     cousins.1.7
 co: 4<sup>u</sup> volte arciniputinu/4<sup>u</sup> volte arciniputini
 de: Ur<sup>(×4)</sup>-Großneffe/Ur<sup>(×4)</sup>-Großneffen&#47; -nichten
 en: four-times-great-grandnephew/four-times-great-grandnephews
+es: sobrino 4×-bisnieto/sobrinos 4×-bisnietos
 fr: quatre-fois-arrière-petit-neveu/quatre-fois-arrière-petits-neveux
 
     cousins.1.8
 co: 5<sup>u</sup> volte arciniputinu/5<sup>u</sup> volte arciniputini
 de: Ur<sup>(×5)</sup>-Großneffe/Ur<sup>(×5)</sup>-Großneffen&#47; -nichten
 en: five-times-great-grandnephew/five-times-great-grandnephews
+es: sobrino 5×-bisnieto/sobrinos 5×-bisnietos
 fr: cinq-fois-arrière-petit-neveu/cinq-fois-arrière-petits-neveux
 
     cousins.1.9
 co: 6<sup>u</sup> volte arciniputinu/6<sup>u</sup> volte arciniputini
 de: Ur<sup>(×6)</sup>-Großneffe/Ur<sup>(×6)</sup>-Großneffen&#47; -nichten
 en: six-times-great-grandnephew/six-times-great-grandnephews
+es: sobrino 6×-bisnieto/sobrinos 6×-bisnietos
 fr: six-fois-arrière-petit-neveu/six-fois-arrière-petits-neveux
 
     cousins.10.0
 co: 8<sup>u</sup> arcicaccari
 de: Ur<sup>(×8)</sup>-Großeltern
 en: 8th-great-grandparents
+es: 8×-bisabuelos
 fr: 8×-arrière-grands-parents
 
     cousins.10.0 tt
 de: Stammeltern
+es: 8×-bisabuelos — antepasados de la 10ª generación
 fr: huit-fois-arrière-grands-parents<br>nonaïeuls
 
     cousins.10.1
 co: 7<sup>u</sup> arcizioni
 de: Ur<sup>(×7)</sup>-Großtanten und -onkel
 en: seventh great-granduncles
+es: tíos 7×-bisabuelos
 fr: sept-fois-arrière-grands-oncles
 
     cousins.10.1 tt
 de: Brüder und Schwestern der Ur<sup>(×7)</sup>-Großeltern
+es: hermanos y hermanas de los 7×-bisabuelos
 fr: frères et sœurs des nonaïeuls
 
     cousins.10.10
 de: Cousins 8. Grades
+es: primos novenos
 fr: cousins 9<sup>e</sup>
 
     cousins.10.11
 de: Neffen und Nichten 10. Grades
+es: hijos de primos novenos
 fr: petits-cousins 9<sup>e</sup>
 
     cousins.10.12
 de: Großneffen und -nichten 10. Grades
+es: nietos de primos novenos
 fr: arrière-petits-cousins 9<sup>e</sup>
 
     cousins.10.13
 de: Ur-Großneffen&#47; -nichten 10. Grades
+es: bisnietos de primos novenos
 fr: arrière-arrière-petits-cousins 9<sup>e</sup>
 
     cousins.10.2
@@ -6166,16 +6341,19 @@ de: Tanten und Onkel 9. Grades
 co: 9<sup>u</sup> arcicaccari
 de: Ur<sup>(×9)</sup>-Großeltern
 en: 9th-great-grandparents
+es: 9×-bisabuelos
 fr: 9×-arrière-grands-parents
 
     cousins.11.0 tt
 de: Stammgroßeltern
+es: 9×-bisabuelos — antepasados de la 11ª generación
 fr: neuf-fois-arrière-grands-parents<br>décaïeuls
 
     cousins.12.0
 co: 10<sup>u</sup> arcicaccari
 de: Ur<sup>(×10)</sup>-Großeltern
 en: 10th-great-grandparents
+es: 10×-bisabuelos
 fr: 10×-arrière-grands-parents
 
     cousins.12.0 tt
@@ -6186,6 +6364,7 @@ de: Stammurgroßeltern
 
     cousins.2.0 tt
 de: Eltern der Eltern<br>Großeltern und Großmütter
+es: abuelos — antepasados de la 2ª generación
 fr: aïeul·e·s<br>parents des parents<br>grands-pères et grands-mères
 
     cousins.2.1
@@ -6193,78 +6372,96 @@ fr: aïeul·e·s<br>parents des parents<br>grands-pères et grands-mères
 
     cousins.2.1 tt
 de: Brüder und Schwestern der Eltern
+es: hermanos y hermanas de los padres
 fr: frères et sœurs des parents
 
     cousins.2.10
 de: Ur<sup>(×6)</sup>-Großneffen&#47; -nichten 2. Grades
+es: 6×-bisnieto de primo hermano/6×-bisnietos de primos hermanos
 fr: sept-fois-arrière-petit-cousin/sept-fois-arrière-petits-cousins
 
     cousins.2.2
 co: cugini
 de: Cousins
 en: cousins 1rd
+es: primos hermanos
 fr: cousins
 
     cousins.2.2 tt
 de: Cousins 1. Grades<hr>(Halb- oder Voll)
+es: primos en 1º grado
 fr: cousins au 1<sup>er</sup> degré<hr>(germains ou non)
 
     cousins.2.3
 co: cugini à u 2<sup>u</sup> gradu
 de: Neffe und Nichte 2. Grades/Neffen und Nichten 2. Grades
 en: 1st cousins once removed
+es: hijos de primos hermanos
 fr: petit-cousin/petits-cousins
 
     cousins.2.3 tt
 de: Kinder der Cousins 1. Grades<br>Kinder der Neffen und Nichten<br>Neffen und Nichten der Cousins← Cousins der Cousins der Kinder
+es: primos en 1º grado, 1 generación(es) más abajo
 fr: petits-cousins au 1<sup>er</sup> degré<br>neveux et nièces à la mode de Bourgogne ou Bretagne<br>neveux et nièces issus de germains<hr>← cousins issus de germains des enfants
 
     cousins.2.4
 de: Großneffe 2. Grades/Großneffen&#47; -nichten 2. Grades
+es: nieto de primo hermano/nietos de primos hermanos
 fr: arrière-petit-cousin/arrière-petits-cousins
 
     cousins.2.4 tt
 de: Kinder von Neffen und Nichten 2. Grades
+es: primos en 1º grado, 2 generación(es) más abajo
 fr: arrière-petits-cousins au 1<sup>er</sup> degré<hr>fils d’un petit-cousin ou d’une petite cousine
 
     cousins.2.5
 de: Urgroßneffe&#47; -nichte 2. Grades/Urgroßneffen&#47; -nichten 2. Grades
+es: bisnieto de primo hermano/bisnietos de primos hermanos
 fr: arrière-arrière-petit-cousin/arrière-arrière-petits-cousins
 
     cousins.2.5 tt
 de: Kinder von Großneffen&#47; -nichten 2. Grades
+es: primos en 1º grado, 3 generación(es) más abajo
 fr: deux-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.6
 de: Ur-Urgroßneffe&#47; -nichte 2. Grades/Ur-Urgroßneffen&#47; -nichten 2. Grades
+es: tataranieto de primo hermano/tataranietos de primos hermanos
 fr: trois-fois-arrière-petit-cousin/trois-fois-arrière-petits-cousins
 
     cousins.2.6 tt
 de: Kinder von Urgroßneffen&#47; -nichten 2. Grades
+es: primos en 1º grado, 4 generación(es) más abajo
 fr: trois-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.7
 de: Ur-Ur-Urgroßneffe&#47; -nichte 2. Grades/Ur-Ur-Urgroßneffen&#47; -nichten 2. Grades
+es: 3×-bisnieto de primo hermano/3×-bisnietos de primos hermanos
 fr: quatre-fois-arrière-petit-cousin/quatre-fois-arrière-petits-cousins
 
     cousins.2.7 tt
 de: Kinder von Ur-Urgroßneffe&#47; -nichte 2. Grades
+es: primos en 1º grado, 5 generación(es) más abajo
 fr: sept-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.8
 de: Ur<sup>(×4)</sup>-Großneffe&#47; -nichte 2. Grades/Ur<sup>(×4)</sup>-Großneffen&#47; -nichten 2. Grades
+es: 4×-bisnieto de primo hermano/4×-bisnietos de primos hermanos
 fr: cinq-fois-arrière-petit-cousin/cinq-fois-arrière-petits-cousins
 
     cousins.2.8 tt
 de: Kinder von Ur-Ur-Urgroßneffe&#47; -nichte 2. Grades
+es: primos en 1º grado, 6 generación(es) más abajo
 fr: cinq-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.9
 de: Ur<sup>(×5)</sup>-Großneffe&#47; -nichte 2. Grades/Ur<sup>(×5)</sup>-Großneffen&#47; -nichten 2. Grades
+es: 5×-bisnieto de primo hermano/5×-bisnietos de primos hermanos
 fr: six-fois-arrière-petit-cousin/six-fois-arrière-petits-cousins
 
     cousins.2.9 tt
 de: Kinder von Ur<sup>(×4)</sup>-Großneffen&#47; -nichten 2. Grades
+es: primos en 1º grado, 7 generación(es) más abajo
 fr: six-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.3.0
@@ -6272,68 +6469,85 @@ fr: six-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.3.0 tt
 de: Eltern der Großeltern
+es: bisabuelos — antepasados de la 3ª generación
 fr: bisaïeul·e·s
 
     cousins.3.1
 ->: siblings of the grandparents
 
     cousins.3.1 tt
+es: hermanos y hermanas de los abuelos
 fr: frères et sœurs des grand-parents
 
     cousins.3.10
 de: Ur<sup>(×5)</sup>-Großneffen&#47; -nichten 3. Grades
+es: 5×-bisnietos de primos segundos
 fr: six-fois-arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.2
 de: Tanten+Onkel 2. Grades
+es: primos hermanos de los padres
 fr: grands-cousins
 
     cousins.3.2 tt
+es: primos en 1º grado de los padres
 fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et petites-tantes (désuets)<hr><- cousins germains des parents, oncles et tantes
 
     cousins.3.3
 ->: 2nd cousins
 
     cousins.3.3 tt
+es: primos en 2º grado
 fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)<br>cousins sous germain
 
     cousins.3.4
 de: Neffen und Nichten 3. Grades
+es: hijos de primos segundos
 fr: petits-cousins 2<sup>e</sup>
 
     cousins.3.4 tt
+es: primos en 2º grado, 1 generación(es) más abajo
 fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr><- cousins issus d’issus de germains des enfants
 
     cousins.3.5
 de: Großneffen&#47; -nichten 3. Grades
+es: nietos de primos segundos
 fr: arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.5 tt
+es: primos en 2º grado, 2 generación(es) más abajo
 fr: arrière-petits-cousins au 2<sup>e</sup> degré
 
     cousins.3.6
 de: Urgroßneffen&#47; -nichten 3. Grades
+es: bisnietos de primos segundos
 fr: arrière-arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.6 tt
+es: primos en 2º grado, 3 generación(es) más abajo
 fr: deux-fois-arrière-petits-cousins au deuxième degré
 
     cousins.3.7
 de: Ur-Urgroßneffen&#47; -nichten 3. Grades
+es: tataranietos de primos segundos
 fr: trois-fois-arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.7 tt
+es: primos en 2º grado, 4 generación(es) más abajo
 fr: trois-fois-arrière-petits-cousins au deuxième degré
 
     cousins.3.8
 de: Ur-Ur-Urgroßneffen&#47; -nichten 3. Grades
+es: 3×-bisnietos de primos segundos
 fr: quatre-fois-arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.8 tt
+es: primos en 2º grado, 5 generación(es) más abajo
 fr: quatre-fois-arrière-petits-cousins au deuxième degré
 
     cousins.3.9
 de: Ur<sup>(×4)</sup>-Großneffen&#47; -nichten 3. Grades
+es: 4×-bisnietos de primos segundos
 fr: cinq-fois-arrière-petits-cousins 2<sup>e</sup>
 
     cousins.4.0
@@ -6343,12 +6557,14 @@ fr: cinq-fois-arrière-petits-cousins 2<sup>e</sup>
 co: arciarcicaccari
 de: Alteltern
 en: 2nd-great-grand-parents
+es: tatarabuelos — antepasados de la 4ª generación
 fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
 
     cousins.4.1
 ->: siblings of the great-grandparents
 
     cousins.4.1 tt
+es: hermanos y hermanas de los bisabuelos
 fr: frères et sœurs des arrière-grands-parents
 
     cousins.4.10
@@ -6356,577 +6572,725 @@ de: Ur<sup>(×4)</sup>-Großneffen&#47; -nichten 4. Grades
 
     cousins.4.2
 de: Großtanten und -onkel 2. Grades
+es: primos hermanos de los abuelos
 fr: arrière-grands-cousins
 
     cousins.4.2 tt
+es: primos en 1º grado de los abuelos
 fr: grands-oncles et grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins germains des grands-parents, grands oncles et grandes-tantes
 
     cousins.4.3
 de: Tanten und Onkel 3. Grades
+es: primos segundos de los padres
 fr: grands-cousins 2<sup>e</sup>
 
     cousins.4.3 tt
+es: primos en 2º grado de los padres
 fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des parents et oncles
 
     cousins.4.4
 ->: 3rd cousins
 
     cousins.4.4 tt
+es: primos en 3º grado
 fr: cousins au 3<sup>e</sup> degré<br>cousins arrière-issus-de-germains
 
     cousins.4.5
 de: Neffen und Nichten 4. Grades
+es: hijos de primos terceros
 fr: petits-cousins 3<sup>e</sup>
 
     cousins.4.5 tt
+es: primos en 3º grado, 1 generación(es) más abajo
 fr: petits-cousins au 3<sup>e</sup> degré<br>petits-cousins issus d’issus de germains
 
     cousins.4.6
 de: Großneffen&#47; -nichten 4. Grades
+es: nietos de primos terceros
 fr: arrière-petits-cousins 3<sup>e</sup>
 
     cousins.4.6 tt
+es: primos en 3º grado, 2 generación(es) más abajo
 fr: arrière-petits-cousins au troisième degré
 
     cousins.4.7
 de: Urgroßneffen&#47; -nichten 4. Grades
+es: bisnietos de primos terceros
 fr: arrière-arrière-petits-cousins 3<sup>e</sup>
 
     cousins.4.7 tt
+es: primos en 3º grado, 3 generación(es) más abajo
 fr: deux-fois-arrière-petits-cousins au troisième degré
 
     cousins.4.8
 de: Ur-Urgroßneffen&#47; -nichten 4. Grades
+es: tataranietos de primos terceros
 fr: trois-fois-arrière-petits-cousins 3<sup>e</sup>
 
     cousins.4.8 tt
+es: primos en 3º grado, 4 generación(es) más abajo
 fr: trois-fois-arrière-petits-cousins au troisième degré
 
     cousins.4.9
 de: Ur-Ur-Urgroßneffen&#47; -nichten 4. Grades
+es: 3×-bisnietos de primos terceros
 fr: quatre-fois-arrière-petits-cousins 3<sup>e</sup>
 
     cousins.4.9 tt
+es: primos en 3º grado, 5 generación(es) más abajo
 fr: quatre-fois-arrière-petits-cousins au troisième degré
 
     cousins.5.0
 co: 3<sup>u</sup> arcicaccari
 de: Ur-Ur-Urgroßeltern
 en: great-great-great-grandparents
+es: 3×-bisabuelos
 fr: 3×-arrière-grands-parents
 
     cousins.5.0 tt
 co: 3<sup>u</sup> arcicaccari
 de: Altgroßeltern
 en: 3rd-great-grandparents
+es: 3×-bisabuelos — antepasados de la 5ª generación
 fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
 
     cousins.5.1
 co: arciarcizione
 de: Ur-Urgroßtanten und -onkel
 en: great-great-granduncles
+es: tíos tatarabuelos
 fr: arrière-arrière-grands-oncles
 
     cousins.5.1 tt
 co: fratelli è surelle di l’arciarcicaccari
 en: siblings of the great-great-grandparents
+es: hermanos y hermanas de los tatarabuelos
 fr: frères et sœurs des trisaïeuls
 
     cousins.5.10
 de: Ur-Ur-Ur-Großneffen&#47; -nichten 5. Grades
+es: 3×-bisnietos de primos cuartos
 fr: quatre-fois-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.10 tt
+es: primos en 4º grado, 5 generación(es) más abajo
 fr: quatre-fois-arrière-petits-cousins au quatrième degré
 
     cousins.5.11
 de: Ur<sup>(×4)</sup>-Großneffen&#47; -nichten 5. Grades
+es: 4×-bisnietos de primos cuartos
 fr: cinq-fois-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.12
 de: Ur<sup>(×5)</sup>-Großneffen&#47; -nichten 5. Grades
+es: 5×-bisnietos de primos cuartos
 fr: six-fois-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.13
 de: Ur<sup>(×6)</sup>-Großneffen&#47; -nichten 5. Grades
+es: 6×-bisnietos de primos cuartos
 fr: sept-fois-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.2
 de: Urgroßtanten&#47; -onkel 2. Grades
+es: primos hermanos de los bisabuelos
 fr: arrière-arrière-grands-cousins
 
     cousins.5.2 tt
+es: primos en 1º grado de los bisabuelos
 fr: arrière-grand-oncles et arrière-grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins des arrière-grands-parents et arrière-grands-oncles
 
     cousins.5.3
 de: Großtanten und -onkel 3. Grades
+es: primos segundos de los abuelos
 fr: arrière-grands-cousins 2<sup>e</sup>
 
     cousins.5.3 tt
+es: primos en 2º grado de los abuelos
 fr: arrière-grands-cousins au deuxième degré<hr><- cousins issus de germains des grands-parents et grands-oncles
 
     cousins.5.4
 de: Tanten und Onkel 4. Grades
+es: primos terceros de los padres
 fr: grands-cousins 3<sup>e</sup>
 
     cousins.5.4 tt
+es: primos en 3º grado de los padres
 fr: grands-cousins au troisième degré<hr><- cousins issus d’issus de germains des parents
 
     cousins.5.5
 co: cugini à u 4<sup>u</sup> gradu
 de: Cousins 4. Grades
 en: 4th cousins
+es: primos cuartos
 fr: cousins 4<sup>e</sup>
 
     cousins.5.5 tt
+es: primos en 4º grado
 fr: cousins au quatrième degré<br>cousins issus d’issus d’issus de germains<hr><i>arrière-petits-cousins</i>
 
     cousins.5.6
 de: Neffen und Nichten 5. Grades
+es: hijos de primos cuartos
 fr: petits-cousins 4<sup>e</sup>
 
     cousins.5.6 tt
+es: primos en 4º grado, 1 generación(es) más abajo
 fr: petits-cousins au quatrième degré
 
     cousins.5.7
 de: Großneffen&#47; -nichten 5. Grades
+es: nietos de primos cuartos
 fr: arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.7 tt
+es: primos en 4º grado, 2 generación(es) más abajo
 fr: arrière-petits-cousins au quatrième degré
 
     cousins.5.8
 de: Urgroßneffen&#47; -nichten 5. Grades
+es: bisnietos de primos cuartos
 fr: arrière-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.8 tt
+es: primos en 4º grado, 3 generación(es) más abajo
 fr: deux-fois-arrière-petits-cousins au quatrième degré
 
     cousins.5.9
 de: Ur-Urgroßneffen&#47; -nichten 5. Grades
+es: tataranietos de primos cuartos
 fr: trois-fois-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.9 tt
+es: primos en 4º grado, 4 generación(es) más abajo
 fr: trois-fois-arrière-petits-cousins au quatrième degré
 
     cousins.6.0
 co: 4<sup>u</sup> arcicaccari
 de: Ur<sup>(×4)</sup>-Großeltern
 en: 4th-great-grandparents
+es: 4×-bisabuelos
 fr: 4×-arrière-grands-parents
 
     cousins.6.0 tt
 de: Alturgroßeltern
+es: 4×-bisabuelos — antepasados de la 6ª generación
 fr: quatre-fois-arrière-grands-parents<br>quint(is)aïeuls<br>quinquisaïeuls
 
     cousins.6.1
 co: 3<sup>u</sup> arcizioni
 de: Ur-Ur-Urgroßtanten und -onkel
 en: third great-granduncles
+es: tíos 3×-bisabuelos
 fr: 3×-arrière-grands-oncles
 
     cousins.6.1 tt
+es: hermanos y hermanas de los 3×-bisabuelos
 fr: trois-fois-arrière-grands-oncles<hr>frères et sœurs des quadrisaïeuls
 
     cousins.6.10
 de: Ur-Urgroßneffen&#47; -nichten 6. Grades
+es: tataranietos de primos quintos
 fr: 3×-arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.10 tt
+es: primos en 5º grado, 4 generación(es) más abajo
 fr: trois-fois-arrière-petits-cousins au cinquième degré
 
     cousins.6.11
 de: Ur-Ur-Urgroßneffen&#47; -nichten 6. Grades
+es: 3×-bisnietos de primos quintos
 fr: 4×-arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.11 tt
+es: primos en 5º grado, 5 generación(es) más abajo
 fr: quatre-fois-arrière-petits-cousins au cinquième degré
 
     cousins.6.2
 de: Ur-Urgroßtanten&#47; -onkel 2. Grades
+es: primos hermanos de los tatarabuelos
 fr: 3×-arrière-grands-cousins
 
     cousins.6.2 tt
+es: primos en 1º grado de los tatarabuelos
 fr: arrière-arrière-arrière-grands-cousins au premier degré
 
     cousins.6.3
 de: Urgroßtanten&#47; -onkel 3. Grades
+es: primos segundos de los bisabuelos
 fr: arrière-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.6.3 tt
+es: primos en 2º grado de los bisabuelos
 fr: arrière-arrière-grands-cousins au deuxième degré<br><- cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
 
     cousins.6.4
 de: Großtanten und -onkel 4. Grades
+es: primos terceros de los abuelos
 fr: arrière-grands-cousins 3<sup>e</sup>
 
     cousins.6.4 tt
+es: primos en 3º grado de los abuelos
 fr: arrière-grands-cousins au troisième degré<br><- cousins issus d’issus de germains des grands-parents et grands-oncles
 
     cousins.6.5
 de: Tanten und Onkel 5. Grades
+es: primos cuartos de los padres
 fr: grands-cousins 4<sup>e</sup>
 
     cousins.6.5 tt
+es: primos en 4º grado de los padres
 fr: grands-cousins au quatrième degré
 
     cousins.6.6
 co: cugini à u 5<sup>u</sup> gradu
 de: Cousins 5. Grades
 en: fifth cousins
+es: primos quintos
 fr: cousins 5<sup>e</sup>
 
     cousins.6.6 tt
+es: primos en 5º grado
 fr: cousins au cinquième degré
 
     cousins.6.7
 de: Neffen und Nichten 6. Grades
+es: hijos de primos quintos
 fr: petits-cousins 5<sup>e</sup>
 
     cousins.6.7 tt
+es: primos en 5º grado, 1 generación(es) más abajo
 fr: petits-cousins au cinquième degré
 
     cousins.6.8
 de: Großneffen&#47; -nichten 6. Grades
+es: nietos de primos quintos
 fr: arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.8 tt
+es: primos en 5º grado, 2 generación(es) más abajo
 fr: arrière-petits-cousins au cinquième degré
 
     cousins.6.9
 de: Urgroßneffen&#47; -nichten 6. Grades
+es: bisnietos de primos quintos
 fr: arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.9 tt
+es: primos en 5º grado, 3 generación(es) más abajo
 fr: arrière-arrière-petits-cousins au cinquième degré
 
     cousins.7.0
 co: 5<sup>u</sup> arcicaccari
 de: Ur<sup>(×5)</sup>-Großeltern
 en: 5th-great-grandparents
+es: 5×-bisabuelos
 fr: 5×-arrière-grands-parents
 
     cousins.7.0 tt
 de: Obereltern
+es: 5×-bisabuelos — antepasados de la 7ª generación
 fr: cinq-fois-arrière-grands-parents<br>sext(is)aïeuls
 
     cousins.7.1
 co: 4<sup>u</sup> arcizioni
 de: Ur<sup>(×4)</sup>-Großtanten und -onkel
 en: fourth great-granduncles
+es: tíos 4×-bisabuelos
 fr: 4×-arrière-grands-oncles
 
     cousins.7.1 tt
+es: hermanos y hermanas de los 4×-bisabuelos
 fr: quatre-fois-arrière-grands-oncles<br>frères et sœurs des quinquisaïeuls
 
     cousins.7.10
 de: Urgroßneffen&#47; -nichten 7. Grades
+es: bisnietos de primos sextos
 fr: arrière-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.10 tt
+es: primos en 6º grado, 3 generación(es) más abajo
 fr: arrière-arrière-petits-cousins au sixième degré
 
     cousins.7.11
 de: Ur-Urgroßneffen&#47; -nichten 7. Grades
+es: tataranietos de primos sextos
 fr: 3×-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.11 tt
+es: primos en 6º grado, 4 generación(es) más abajo
 fr: trois-fois-arrière-petits-cousins au sixième degré
 
     cousins.7.12
 de: Ur-Ur-Urgroßneffen&#47; -nichten 7. Grades
+es: 3×-bisnietos de primos sextos
 fr: 4×-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.12 tt
+es: primos en 6º grado, 5 generación(es) más abajo
 fr: quatre-fois-arrière-petits-cousins au sixième degré
 
     cousins.7.2
 de: Ur-Ur-Urgroßtanten&#47; -onkel 2. Grades
+es: primos hermanos de los 3×-bisabuelos
 fr: 4×-arrière-grands-cousins
 
     cousins.7.2 tt
+es: primos en 1º grado de los 3×-bisabuelos
 fr: quatre-fois-arrière-grands-cousins<br>arrrière-arrière-arrière-arrière-grands-cousins au premier degré
 
     cousins.7.3
 de: Ur-Urgroßtanten&#47; -onkel 3. Grades
+es: primos segundos de los tatarabuelos
 fr: 3×-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.7.3 tt
+es: primos en 2º grado de los tatarabuelos
 fr: trois-fois-arrière-grands-cousins au deuxième degré/arrière-arrière-arrière-grands-cousins au deuxième degré
 
     cousins.7.4
 de: Urgroßtanten&#47; -onkel 4. Grades
+es: primos terceros de los bisabuelos
 fr: arrière-arrière-grands-cousins 3<sup>e</sup>
 
     cousins.7.4 tt
+es: primos en 3º grado de los bisabuelos
 fr: arrière-arrière-grands-cousins au troisième degré
 
     cousins.7.5
 de: Großtanten&#47; -onkel 5. Grades
+es: primos cuartos de los abuelos
 fr: arrière-grands-cousins 4<sup>e</sup>
 
     cousins.7.5 tt
+es: primos en 4º grado de los abuelos
 fr: arrière-grands-cousins au quatrième degré
 
     cousins.7.6
 de: Tanten und Onkel 6. Grades
+es: primos quintos de los padres
 fr: grands-cousins 5<sup>e</sup>
 
     cousins.7.6 tt
+es: primos en 5º grado de los padres
 fr: grands-cousins au 5e degré
 
     cousins.7.7
 co: cugini à u 6<sup>u</sup> gradu
 de: Cousins 6. Grades
 en: 6th cousins
+es: primos sextos
 fr: cousins 6<sup>e</sup>
 
     cousins.7.7 tt
+es: primos en 6º grado
 fr: cousins au sixième degré
 
     cousins.7.8
 de: Neffen und Nichten 7. Grades
+es: hijos de primos sextos
 fr: petits-cousins 6<sup>e</sup>
 
     cousins.7.8 tt
+es: primos en 6º grado, 1 generación(es) más abajo
 fr: petits-cousins au sixième degré
 
     cousins.7.9
 de: Großneffen und -nichten 7. Grades
+es: nietos de primos sextos
 fr: arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.9 tt
+es: primos en 6º grado, 2 generación(es) más abajo
 fr: arrière-petits-cousins au sixième degré
 
     cousins.8.0
 co: 6<sup>u</sup> arcicaccari
 de: Ur<sup>(×6)</sup>-Großeltern
 en: 6th-great-grandparents
+es: 6×-bisabuelos
 fr: 6×-arrière-grands-parents
 
     cousins.8.0 tt
 de: Obergroßeltern
+es: 6×-bisabuelos — antepasados de la 8ª generación
 fr: six-fois-arrière-grands-parents<br>sept(is)aïeuls
 
     cousins.8.1
 co: 5<sup>u</sup> arcizioni
 de: Ur<sup>(×5)</sup>-Großtanten und -onkel
 en: fifth great-granduncles
+es: tíos 5×-bisabuelos
 fr: cinq-fois-arrière-grands-oncles
 
     cousins.8.1 tt
+es: hermanos y hermanas de los 5×-bisabuelos
 fr: frères et sœurs des septisaïeuls
 
     cousins.8.10
 de: Großneffen und -nichten 8. Grades
+es: nietos de primos séptimos
 fr: arrière-petits-cousins 7<sup>e</sup>
 
     cousins.8.10 tt
+es: primos en 7º grado, 2 generación(es) más abajo
 fr: arrière-petits-cousins au septième degré
 
     cousins.8.11
 de: Ur-Großneffen&#47; -nichten 8. Grades
+es: bisnietos de primos séptimos
 fr: arrière-arrière-petits-cousins 7<sup>e</sup>
 
     cousins.8.11 tt
+es: primos en 7º grado, 3 generación(es) más abajo
 fr: arrière-arrière-petits-cousins au septième degré
 
     cousins.8.12
 de: Ur-Ur-Großneffen&#47; -nichten 8. Grades
+es: tataranietos de primos séptimos
 fr: trois-fois-arrière-petits-cousins 7<sup>e</sup>
 
     cousins.8.12 tt
+es: primos en 7º grado, 4 generación(es) más abajo
 fr: trois-fois-arrière-petits-cousins au septième degré
 
     cousins.8.13
 de: Ur-Ur-Ur-Großneffen&#47; -nichten 8. Grades
+es: 3×-bisnietos de primos séptimos
 fr: quatre-fois-arrière-petits-cousins 7<sup>e</sup>
 
     cousins.8.13 tt
+es: primos en 7º grado, 5 generación(es) más abajo
 fr: quatre-fois-arrière-petits-cousins au septième degré
 
     cousins.8.2
 de: Ur<sup>(×4)</sup>-Großtanten&#47; -onkel 2. Grades
+es: primos hermanos de los 4×-bisabuelos
 fr: cinq-fois-arrière-grands-cousins
 
     cousins.8.2 tt
+es: primos en 1º grado de los 4×-bisabuelos
 fr: cinq-fois-arrière-grands-cousins au premier degré
 
     cousins.8.3
 de: Ur-Ur-Urgroßtanten&#47; -onkel 3. Grades
+es: primos segundos de los 3×-bisabuelos
 fr: quatre-fois-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.8.3 tt
+es: primos en 2º grado de los 3×-bisabuelos
 fr: quatre-fois-arrière-grands-cousins au deuxième degré
 
     cousins.8.4
 de: Ur-Urgroßtanten&#47; -onkel 4. Grades
+es: primos terceros de los tatarabuelos
 fr: trois-fois-arrière-grands-cousins 3<sup>e</sup>
 
     cousins.8.4 tt
+es: primos en 3º grado de los tatarabuelos
 fr: trois-fois-arrière-grands-cousins au troisième degré
 
     cousins.8.5
 de: Ur-Großtanten&#47; -onkel 5. Grades
+es: primos cuartos de los bisabuelos
 fr: arrière-arrière-grands-cousins 4<sup>e</sup>
 
     cousins.8.5 tt
+es: primos en 4º grado de los bisabuelos
 fr: arrière-arrière-grands-cousins au quatrième degré
 
     cousins.8.6
 de: Großtanten&#47; -onkel 6. Grades
+es: primos quintos de los abuelos
 fr: arrière-grands-cousins 5<sup>e</sup>
 
     cousins.8.6 tt
+es: primos en 5º grado de los abuelos
 fr: arrière-grands-cousins au cinquième degré
 
     cousins.8.7
 de: Tanten und Onkel 7. Grades
+es: primos sextos de los padres
 fr: grands-cousins 6e
 
     cousins.8.7 tt
+es: primos en 6º grado de los padres
 fr: grands-cousins au sixième degré
 
     cousins.8.8
 co: cugini à u 7<sup>u</sup> gradu
 de: Cousins 7. Grades
 en: 7th cousins
+es: primos séptimos
 fr: cousins 7<sup>e</sup>
 
     cousins.8.8 tt
 co: cugini à u 7<sup>u</sup> gradu
 en: seventh cousins
+es: primos en 7º grado
 fr: cousins au septième degré
 
     cousins.8.9
 de: Neffen und Nichten 8. Grades
+es: hijos de primos séptimos
 fr: petits-cousins 7<sup>e</sup>
 
     cousins.8.9 tt
 de: Cousins siebten Grades
+es: primos en 7º grado, 1 generación(es) más abajo
 fr: petits-cousins au septième degré
 
     cousins.9.0
 co: 7<sup>u</sup> arcicaccari
 de: Ur<sup>(×7)</sup>-Großeltern
 en: 7th-great-grandparents
+es: 7×-bisabuelos
 fr: 7×-arrière-grands-parents
 
     cousins.9.0 tt
 de: Oberurgroßeltern
+es: 7×-bisabuelos — antepasados de la 9ª generación
 fr: sept-fois-arrière-grands-parents<br>octaïeuls
 
     cousins.9.1
 co: 6<sup>u</sup> arcizioni
 de: Ur<sup>(×6)</sup>-Großtanten und -onkel
 en: sixth great-granduncles
+es: tíos 6×-bisabuelos
 fr: six-fois-arrière-grands-oncles
 
     cousins.9.1 tt
 de: Brüder und Schwestern der Ur<sup>(×8)</sup>-Großeltern
+es: hermanos y hermanas de los 6×-bisabuelos
 fr: frères et sœurs des octosaïeuls
 
     cousins.9.10
 de: Neffen und Nichten 9. Grades
+es: hijos de primos octavos
 fr: petits-cousins 8<sup>e</sup>
 
     cousins.9.10 tt
 de: Cousins achten Grades
+es: primos en 8º grado, 1 generación(es) más abajo
 fr: petits-cousins au huitième degré
 
     cousins.9.11
 de: Großneffen und -nichten 9. Grades
+es: nietos de primos octavos
 fr: arrière-petits-cousins 8<sup>e</sup>
 
     cousins.9.11 tt
 de: Ur-Cousins achten Grades
+es: primos en 8º grado, 2 generación(es) más abajo
 fr: arrière-petits-cousins au huitième degré
 
     cousins.9.12
 de: Ur-Großneffen&#47; -nichten 9. Grades
+es: bisnietos de primos octavos
 fr: arrière-arrière-petits-cousins 8<sup>e</sup>
 
     cousins.9.12 tt
 de: Ur-Ur-Cousins achten Grades
+es: primos en 8º grado, 3 generación(es) más abajo
 fr: arrière-arrière-petits-cousins au huitième degré
 
     cousins.9.13
 de: Ur-Ur-Großneffen&#47; -nichten 9. Grades
+es: tataranietos de primos octavos
 fr: trois-fois-arrière-petits-cousins 8<sup>e</sup>
 
     cousins.9.13 tt
 de: Ur-Ur-Ur-Cousins achten Grades
+es: primos en 8º grado, 4 generación(es) más abajo
 fr: arrière-arrière-arrière-petits-cousins au huitième degré
 
     cousins.9.14
 de: Ur-Ur-Ur-Großneffen&#47; -nichten 9. Grades
+es: 3×-bisnietos de primos octavos
 fr: quatre-fois-arrière-petits-cousins 8<sup>e</sup>
 
     cousins.9.14 tt
 de: Ur<sup>(×4)</sup>-Cousins achten Grades
+es: primos en 8º grado, 5 generación(es) más abajo
 fr: quatre-fois-arrière-petits-cousins au huitième degré
 
     cousins.9.2
 de: Ur<sup>(×5)</sup>-Großtanten&#47; -onkel 2. Grades
+es: primos hermanos de los 5×-bisabuelos
 fr: 6×-arrière-grands-cousins
 
     cousins.9.2 tt
 de: Ur<sup>(×6)</sup>-Groß-Cousins ersten Grades
+es: primos en 1º grado de los 5×-bisabuelos
 fr: six-foix-arrière-grands-cousins au premier degré
 
     cousins.9.3
 de: Ur<sup>(×4)</sup>-Großtanten&#47; -onkel 3. Grades
+es: primos segundos de los 4×-bisabuelos
 fr: 5×-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.9.3 tt
 de: Ur<sup>(×5)</sup>-Groß-Cousins zweiten Grades
+es: primos en 2º grado de los 4×-bisabuelos
 fr: cinq-fois-arrière-grands-cousins au deuxième degré
 
     cousins.9.4
 de: Ur-Ur-Urgroßtanten&#47; -onkel 4. Grades
+es: primos terceros de los 3×-bisabuelos
 fr: 4×-arrière-grands-cousins 3<sup>e</sup>
 
     cousins.9.4 tt
 de: Ur<sup>(×4)</sup>-Groß-Cousins dritten Grades
+es: primos en 3º grado de los 3×-bisabuelos
 fr: quatre-fois-arrière-grands-cousins au troisième degré
 
     cousins.9.5
 de: Ur-Urgroßtanten&#47; -onkel 5. Grades
+es: primos cuartos de los tatarabuelos
 fr: 3×-arrière-grands-cousins 4<sup>e</sup>
 
     cousins.9.5 tt
 de: Ur-Ur-Ur-Großcousins 4. Grades
+es: primos en 4º grado de los tatarabuelos
 fr: trois-fois-arrière-grands-cousins au quatrième degré
 
     cousins.9.6
 de: Ur-Großtanten&#47; -onkel 6. Grades
+es: primos quintos de los bisabuelos
 fr: arrière-arrière-grands-cousins 5<sup>e</sup>
 
     cousins.9.6 tt
+es: primos en 5º grado de los bisabuelos
 fr: deux-fois-arrière-grands-cousins au cinquième degré
 
     cousins.9.7
 de: Großtanten&#47; -onkel 7. Grades
+es: primos sextos de los abuelos
 fr: arrière-grands-cousins 6<sup>e</sup>
 
     cousins.9.7 tt
 de: Ur-Großcousins sechsten Grades
+es: primos en 6º grado de los abuelos
 fr: arrière-grands-cousins au sixième degré
 
     cousins.9.8
 de: Tanten und Onkel 8. Grades
+es: primos séptimos de los padres
 fr: grands-cousins 7e
 
     cousins.9.8 tt
 de: Groß-Cousins siebten Grades
+es: primos en 7º grado de los padres
 fr: grands-cousins au septième degré
 
     cousins.9.9
 de: Cousins 8. Grades
+es: primos octavos
 fr: cousins 8<sup>e</sup>
 
     cousins.9.9 tt
 de: Cousins achten Grades
+es: primos en 8º grado
 fr: cousins au huitième degré
 
     create
@@ -7049,6 +7413,7 @@ fr: chronique
 co: evenimentu persunalizatu
 de: benutzerdefiniertes Ereignis
 en: custom event
+es: evento personalizado
 fr: événement personnalisé
 pt: evento personalizado
 sv: anpassad händelse
@@ -7073,6 +7438,7 @@ tr: d’Aboville
 co: fusione d’implessi
 de: Implex zusammenfügen
 en: fusion implexes
+es: fusionar los implexos
 fr: fusionner les implexes
 pt: combinar os implexes
 sv: sammanslagning av implex
@@ -7082,6 +7448,7 @@ tr: implexleri birleştirmek
 co: affissà un graficu orientatu aciclicu (dag)/piattà u graficu orientatu aciclicu (dag)
 de: gerichteten azyklischen Graph anzeigen (DAG)/gerichteten azyklischen Graph verbergen (DAG)
 en: show dag/hide dag
+es: mostrar el grafo (dag)/ocultar el grafo (dag)
 fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
 pt: exibir gráfico acíclico orientado (DAG)/ocultar gráfico acíclico orientado (DAG)
 sv: visa implex/dölj implex
@@ -7187,6 +7554,7 @@ tr: için
 co: data di battesimu
 de: Taufdatum
 en: date of baptism
+es: fecha de bautismo
 fr: date du baptême
 sv: dopdag
 tr: vaftiz tarihi
@@ -7211,6 +7579,7 @@ tr: doğum tarihi
 co: data di sepultura
 de: Datum der Bestattung
 en: date of burial
+es: fecha de entierro
 fr: date de la sépulture
 sv: begravningsdatum
 tr: defin tarihi
@@ -7315,6 +7684,7 @@ tr: eski günler
 co: gg/mm/aaaa
 de: TT/MM/JJJJ
 en: dd/mm/yyyy
+es: dd/mm/aaaa
 fr: jj/mm/aaaa
 pt: DD/MM/AAAA
 sv: DD/MM/ÅÅÅÅ
@@ -7456,6 +7826,7 @@ tr: madalya
 co: definisce %s cum’è Sosa 1 per fighjà o riduce l’implessi/rimette u Sosa 1 precedente %s
 de: Definieren Sie %s als Sosa 1, um die Implexe anzuzeigen oder zu reduzieren/vorherige Sosa 1 %s wiederherstellen
 en: define %s as Sosa 1 to see or reduce the implexes/restore previous Sosa 1 %s
+es: definir a %s como Sosa 1 para ver o reducir los implexos/restaurar el Sosa 1 anterior %s
 fr: définir %s comme Sosa 1 pour voir ou réduire les implexes/remettre le précédent Sosa 1 %s
 
     degree of kinship
@@ -7528,42 +7899,49 @@ tr: sil
 co: squassà l’armuratura
 de: lösche das Wappen
 en: delete the coat of arms
+es: eliminar el blasón
 fr: supprimer le blason
 
     delete saved coat of arms
 co: squassà l’armuratura arregistrata
 de: lösche das gespeicherte Wappen
 en: delete the saved coat of arms
+es: eliminar el blasón guardado
 fr: supprimer le blason sauvegardé
 
     delete image
 co: squassà a fiura
 de: Bild löschen
 en: delete image
+es: eliminar la imagen
 fr: supprimer une image
 
     delete saved image
 co: squassà a fiura arregistrata
 de: das gespeicherte Bild löschen
 en: delete saved image
+es: eliminar la imagen guardada
 fr: supprimer une image sauvegardée
 
     delete portrait
 co: squassà u ritrattu
 de: Porträt löschen
 en: delete portrait
+es: eliminar el retrato
 fr: supprimer le portrait
 
     delete saved portrait
 co: squassà u ritrattu arregistratu
 de: das gespeicherte Porträt löschen
 en: delete saved portrait
+es: eliminar el retrato guardado
 fr: supprimer le portrait sauvegardé
 
     deleted
 co: squassatu/squassata
 de: gelöscht
 en: deleted
+es: eliminado/eliminada
 fr: supprimé/supprimée
 
     demobilisationMilitaire
@@ -7956,6 +8334,7 @@ tr: /satır/alfabetik sıraya göre görüntüleme
 co: affissà u carusellu di fiure
 de: Bilderkaroussel anzeigen
 en: display the carrousel of images
+es: mostrar el carrusel de imágenes
 fr: afficher le carrousel d’images
 
     display empty picture
@@ -7994,6 +8373,7 @@ tr: nesilleri göster
 co: affissà l’implessi
 de: Implex anzeigen
 en: display implex
+es: mostrar los implexos
 fr: afficher les implexes
 pt: exibir os implexos
 sv: visa implex
@@ -8186,6 +8566,7 @@ tr: boşanmış
 co: ùn micca
 de: nicht
 en: do not
+es: no
 fr: ne pas
 pt: não
 sv: gör inte
@@ -8287,6 +8668,7 @@ tr: bağış (LDS)
 co: mudificà e famiglie via un cliccu nant’à a data di matrimoniu di a linea d’un cunghjuntu
 de: die Familie bearbeiten durch Klick auf das Hochzeitsdatum einer der beiden Personen
 en: edit the families by clicking on the date of marriage of the row of one spouses
+es: modificar las familias haciendo clic en la fecha de matrimonio en la fila de un cónyuge
 fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
 
     edit mode
@@ -8544,6 +8926,7 @@ fr: événement pour ce lieu/événements pour ce lieu
 co: evenimenti induve %s era testimoniu
 de: Ereignisse, von denen %s Zeuge war
 en: events to which %s was witness
+es: eventos en los que %s fue testigo
 fr: évènements auxquels %s était témoin
 tr: %s'in tanık olduğu etkinlikler
 
@@ -8551,6 +8934,7 @@ tr: %s'in tanık olduğu etkinlikler
 co: arburu di l’evenimenti
 de: Baum der Ereignisse
 en: tree of events
+es: árbol de eventos
 fr: arbre des événements
 pt: árvore de eventos
 sv: träd av händelser
@@ -8640,11 +9024,13 @@ tr: idam
 co: stende à un antenatu vicinu
 de: auf einen nahen Vorfahren erweitern
 en: extend to a near ancestor
+es: extender a un antepasado cercano
 fr: étendre à un ancêtre proche
 
     falsely alive
 de: fälschlicherweise als lebend gemeldet
 en: falsely shown as alive
+es: figura vivo por error
 fr: indiqué vivant par erreur
 
     families with encoding
@@ -8778,12 +9164,14 @@ tr: aile öyküsü
 co: modu di famiglia
 de: Familienmodus
 en: family mode
+es: modo familia
 fr: mode famille
 
     family mode-hlp
 co: stende u statu semipublicu à i membri di a famiglia (vèrde : attivà, rossu : disattivà)
 de: SemiPublic-Status auf Familienmitglieder ausweiten (zweiter Klick deaktiviert)
 en: extend the SemiPublic status to family members (on/off toggle)
+es: extiende el estado semipúblico a los miembros de la familia (un segundo clic lo desactiva)
 fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
 
     family modified
@@ -8838,6 +9226,7 @@ tr: kaynak
 co: cronolugia di a famiglia
 de: Timeline der Familie
 en: time line of the family
+es: cronología de la familia
 fr: chronologie de la famille
 pt: cronologia da família
 tr: ailenin zaman çizelgesi
@@ -8892,6 +9281,7 @@ tr: aile bağlantısı (LDS)
 co: arburu in banderetta
 de: Fächerbaum
 en: fanchart
+es: árbol en abanico
 fr: arbre en éventail
 
     appears/time/times
@@ -9064,12 +9454,14 @@ tr: dosya
 co: filtrà
 de: filtern
 en: filter
+es: filtrar
 fr: filtrer
 
     filter by
 co: filtrà da
 de: filtern durch
 en: filter by
+es: filtrar por
 fr: filtrer par
 
     first free number
@@ -9241,6 +9633,7 @@ zh: 名
     first names exact/included/permuted
 de: identische Vornamen/Vornamen eingeschlossen/Vornamen vertauscht
 en: identical first names/first names included/first names permuted
+es: nombres idénticos/nombres incluidos/nombres permutados
 fr: prénoms identiques/prénoms inclus/prénoms permutés
 
     firstCommunion
@@ -9260,12 +9653,14 @@ tr: ilk komünyon
     fix error automatically
 de: Den Fehler automatisch korrigieren
 en: fix error automatically
+es: corregir el error automáticamente
 fr: fixer automatiquement l’erreur
 
     font size
 co: dimensione di grafia
 de: Schriftgröße
 en: font size
+es: tamaño de letra
 fr: taille de police
 pt: tamanho da fonte
 sv: textstorlek
@@ -9336,12 +9731,14 @@ tr: son değişiklik tarihine göre sıralanmış liste için
 co: per e fiure definite da un indirizzu web
 de: für Bilder, die durch eine URL definiert sind
 en: for URL defined images
+es: para imágenes definidas por URL
 fr: pour les images définies par une URL
 
     for/since
 co: durante/dapoi
 de: während/seit
 en: for/since
+es: durante/desde
 fr: pendant/depuis
 
     forum
@@ -9476,6 +9873,7 @@ zh: 访问次数
 co: da u carusellu
 de: vom Karussell
 en: from carrousel
+es: del carrusel
 fr: du carrousel
 
     from/to (date year)
@@ -9608,6 +10006,7 @@ tr: kardeşler
 co: arburu sanu
 de: Voller Baum
 en: full tree
+es: árbol completo
 fr: arbre complet
 pt: árvore completa
 sv: helt träd
@@ -9709,6 +10108,7 @@ zh: GeneWeb 参数
 co: andà versu a basa di dati/&#10;Fate casu à u numeru d’indice in a richiesta !
 de: gehe zur Datenbank/&#10;Sei vorsichtig mit der Indexnummer in der Anfrage!
 en: go to the database/&#10;Be carefull to the index number in the query!
+es: ir a la base de datos/&#10;¡Atención al número de índice en la consulta!
 fr: aller vers la base de données/&#10;Attention au numéro d’index dans la requête !
 
     go to section %s
@@ -9781,6 +10181,7 @@ tr: vaftiz babası/vaftiz annesi/vaftiz ebeveynleri/vaftiz ebeveyni
 co: cumpare o cummare
 de: Taufzeuge
 en: godparent
+es: padrino o madrina
 fr: parrain ou marraine
 pt: padrinho ou madrinha
 sv: gudförälder
@@ -9902,6 +10303,7 @@ co: arcicaccaroni
 de: Ururgroßeltern
 en: great-great-grandparents
 eo: prapraavo
+es: tatarabuelos
 fr: arrière-arrière-grands-parents
 
     gregorian/julian/french/hebrew
@@ -9971,6 +10373,7 @@ tr: damat/gelin
 co: arburu in H di 7 generazioni
 de: 7-Generationen H-Baum
 en: 7 generation H tree
+es: árbol en H de 7 generaciones
 fr: arbre en H 7 générations
 pt: árvore em H 7 gerações
 sv: 7 generationers H träd
@@ -10165,6 +10568,7 @@ fr: aide et raccourcis
 co: s’è nisuna hè selezziunata, e duie entrate seranu cuncatinate
 de: Bei Nichtauswahl werden die beiden Einträge verkettet
 en: if none is checked, both entries will be concatenated
+es: si no se marca ninguna, ambas entradas se concatenarán
 fr: en cas de non selection, les deux entrées seront concaténées
 
     help modify data
@@ -10234,6 +10638,7 @@ tr: burada
 co: piattà i ritratti
 de: Portraits verbergen
 en: hide portraits
+es: no mostrar los retratos
 fr: ne pas afficher les portraits
 pt: não mostrar os retratos
 sv: dölj personbilder
@@ -10243,18 +10648,21 @@ tr: portreleri gizle
 co: persona piattata
 de: versteckte Person
 en: hidden person
+es: persona oculta
 fr: individu masqué
 
     hiddden first_name
 co: nome piattatu
 de: versteckter Vorname
 en: hidden first name
+es: nombre oculto
 fr: prénom masqué
 
     hiddden surname
 co: casata piattata
 de: versteckter Nachname
 en: hidden surname
+es: apellido oculto
 fr: patronyme masqué
 
     hierarchical navigation
@@ -10295,12 +10703,14 @@ zh: 在层次导航中选择一个条目
 co: e generazioni superiore à 12
 de: der Generationen höher als 12
 en: the generation levels higher then 12
+es: las generaciones superiores a 12
 fr: les générations supérieures à 12
 
     high generation caution
 co: fate casu ! A selezzione d’un numeru maiò di generazioni pò piglià un pezzu per ingenerassi è pò andà fin’à l’interruzzione cù u servitore.
 de: Vorsicht! Bei Auswahl höherer Generationen kann die Erzeugung mehrere Minuten dauern und zu Server-Timeouts führen.
 en: be carefull! Selecting high generation level may take minutes to generate and that can lead to server timeouts.
+es: ¡atención! Seleccionar un número alto de generaciones puede tardar varios minutos en generarse y provocar tiempos de espera agotados en el servidor.
 fr: attention ! Sélectionner un nombre de génération élevé peut prendre plusieurs minutes à générer et entraîner des délais d'attente dépassé du serveur.
 
     highlight gaps/hide highlighting
@@ -10372,6 +10782,7 @@ tr: onu/onu
 co: u so/a so
 de: sein/ihr
 en: his/her
+es: su/su
 fr: son/sa
 no: hans/hennes
 pt: seu/sua
@@ -10442,6 +10853,7 @@ tr: ev
 co: arburiscenza ascendente
 de: horizontaler Baum
 en: horizontal tree
+es: árbol horizontal
 fr: arborescence ascendante
 pt: árvore compacta de ascendentes
 sv: horisontellt träd
@@ -10498,6 +10910,7 @@ tr: hastanede yatış
 co: arburu in H
 de: H-Baum
 en: H-Tree
+es: árbol en H
 fr: arbre en H
 pt: árvore em H
 sv: H-träd
@@ -10507,6 +10920,7 @@ tr: H-Ağacı
 co: arburu cumpattu in H di 7 generazioni cù una marca per l’8<sup>a</sup>
 de: Kompakter H-Baum mit 7 Generationen und Kennzeichnung für die 8
 en: compact H-Tree at 7 generations with marker for the 8th
+es: árbol compacto en H de 7 generaciones con indicador para la 8ª
 fr: arbre compact en H à 7 générations avec indication pour la 8e
 
     husband/wife
@@ -10621,6 +11035,7 @@ tr: başlıklar/herkese Açık/half-public/özel ise
 co: ignurà l’implessi
 de: Implex ignorieren
 en: ignore implex
+es: ignorar los implexos
 fr: ignorer les implexes
 pt: ignorar os implexos
 sv: ignorera implex
@@ -10676,12 +11091,14 @@ tr: resim silindi
 co: aghjunghje una nota per a fiura.
 de: Bildnotiz hinzufügen
 en: add a note for the image.
+es: agregar una nota para la imagen.
 fr: ajouter une note pour l’image.
 
     image map
 co: una fiura reattiva
 de: eine klickbare Grafik
 en: an image map
+es: una imagen interactiva
 fr: une image réactive
 
     image received
@@ -10720,6 +11137,7 @@ tr: resim yüklendi
 co: aghjunghje una fonte per a fiura.
 de: Bildquelle hinzufügen
 en: add a source for the image.
+es: agregar una fuente para la imagen.
 fr: ajouter une source pour l’image.
 
     image/images
@@ -10772,6 +11190,7 @@ tr: göçmenlik
 co: ligà l’implessi
 de: Implex Links
 en: link implexes
+es: enlazar los implexos
 fr: relier les implexes
 pt: ligar os implexes
 sv: implex-länkar
@@ -10781,6 +11200,7 @@ tr: implexlere bağlantı
 co: implessu/implessi
 de: Implex/Ahnenverluste
 en: implex/implexes
+es: implexo/implexos
 fr: implexe/implexes
 pt: implex/implexes
 sv: implex/implexer
@@ -11181,6 +11601,7 @@ tr: basit kronoloji/ayrıntılı kronoloji
 co: Stampittate quì u nome sanu di a basa di dati à impiegà
 de: Bitte den Namen der Datenbank eintragen, die verwendet werden soll
 en: Please, enter the name of the database you want to use
+es: Escriba exactamente el nombre de la genealogía que quiere usar
 fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser
 pt: Introduza o nome da base de dados que quer utilizar
 sv: Skriv namnet på databasen du vill använda
@@ -11238,6 +11659,7 @@ tr: %s için geçmiş bulunamadı
 co: revisioni intermediarie piattate
 de: Zwischenrevisionen versteckt
 en: intermediate revisions not shown
+es: revisiones intermedias ocultas
 fr: révisions intermédiaires masquées
 pt: revisões intermédias ocultas
 sv: mellanrevisioner visas inte
@@ -11247,6 +11669,7 @@ tr: ara revizyonlar gösterilmiyor
 co: intervallu di tempu
 de: Zeitintervall
 en: time interval
+es: intervalo de tiempo
 fr: intervalle de temps
 
     inversion done
@@ -11634,6 +12057,7 @@ tr: aynı kişi!
 co: arburu in I
 de: I-Baum
 en: I-Tree
+es: árbol en I
 fr: arbre en I
 pt: árvore em I
 sv: I-träd
@@ -11675,6 +12099,7 @@ tr: jülyen günü
 co: chjave/chjave d’individuu
 de: Schlüssel
 en: key/individual key
+es: clave/clave de persona
 fr: clé/clé personne
 
     killed (in action)
@@ -11755,6 +12180,7 @@ zh: 最后
 co: ultima revisione
 de: letzte Revision
 en: last revision
+es: última revisión
 fr: dernière révision
 pt: última revisão
 sv: senaste version
@@ -11764,6 +12190,7 @@ tr: son revizyon
 co: l’ultimu livellu di Sosa ùn si pò micca navigà. Impiegate a lista di l’antenati.
 de: letzte Sosa-Ebene nicht navigierbar. Vorfahren-Liste benutzen.
 en: last Sosa level not navigable. Use ancestors list.
+es: el último nivel de Sosa no es navegable. Use la lista de antepasados.
 fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
 pt: o último nível de sosa não é navegável. Utilize a lista de antepassados.
 sv: senaste sosa-nivån kan inte användas. Använd förteckningen över släktingar
@@ -11844,6 +12271,7 @@ fr: espérance de vie
 co: limita
 de: Limit
 en: limit
+es: límite
 fr: limite
 
     link
@@ -11882,6 +12310,7 @@ tr: bağlantı
 co: liame di ritornu versu i genitori
 de: Link zurück zu den Eltern
 en: link back to parents
+es: enlace de regreso a los padres
 fr: lien retour vers les parents
 no: lenke til foreldre
 pt: link de regresso aos pais
@@ -11924,6 +12353,7 @@ tr: arasındaki ilişki
 co: liame ver di i zitelli
 de: Link zu den Kindern
 en: link to children
+es: enlace a los hijos
 fr: lien vers les enfants
 no: lenke til barn
 pt: link para as crianças
@@ -11934,6 +12364,7 @@ tr: çocuklara bağlantı
 co: liame à impiegà
 de: Link zu verwenden
 en: link to use
+es: enlace a usar
 fr: lien à utiliser
 it: link da usare
 oc: ligam d'utilizar
@@ -12052,12 +12483,14 @@ fr: index de la galerie
 co: pagine o note induve a pagina hè referenzata
 de: Seiten oder Notizen, wo die Seite referenziert wird
 en: pages or notes where page is referenced
+es: páginas o notas donde se cita la página
 fr: pages ou notes où la page est citée
 
     linked pages help
 co: note, pagine o gallerie induve a persona hè referenzata
 de: Notizen, Seiten oder Galerien, wo die Person erwähnt wird
 en: notes, pages or galleries where person is referenced
+es: notas, páginas, álbumes o galerías donde se cita a la persona
 fr: notes, pages ou galleries où la personne est citée
 
     linked pages
@@ -12210,6 +12643,7 @@ tr: grafikler ve Listeler
 co: liste di dizziunarii
 de: Liste der Wörterbücher
 en: lists of books
+es: lista de diccionarios
 fr: liste des dictionnaires
 oc: lista dels diccionaris
 pt: lista de dicionários
@@ -12664,6 +13098,7 @@ tr: evlilik notları/evlilik notları
 co: matrimoniu di %t dopu a so morte
 de: Heirat von %t nach seinem/ihrem Tod
 en: marriage of %t after his/her death
+es: casamiento de %t después de su muerte
 fr: mariage de %t après son décès
 lt: santuoka po %t mirties
 
@@ -12671,6 +13106,7 @@ lt: santuoka po %t mirties
 co: matrimoniu di %t nanzu a so nascita
 de: Heirat von %t vor seiner/ihrer Geburt
 en: marriage of %t before his/her birth
+es: casamiento de %t antes de su nacimiento
 fr: mariage de %t avant sa naissance
 lt: %t susituokė prieš gimdamas 
 
@@ -12761,6 +13197,7 @@ tr: evlilik/evlilikler
 co: rilazioni o matrimonii cù
 de: Beziehungen oder Hochzeiten mit
 en: relations or marriages with
+es: relaciones o matrimonios con
 fr: relations ou mariages avec
 
     married
@@ -12864,6 +13301,7 @@ zh: %t配偶是
 co: cuncurdanza
 de: passend
 en: matching
+es: coincidencia
 fr: correspondance
 
     maternal grand-parents
@@ -12886,12 +13324,14 @@ tr: annenin ebeveynleri
 co: num mas rel
 de: max rel Nr.
 en: max rel nbr
+es: nº máx. rel.
 fr: max rel nbr
 
     max nbr title
 co: numeru massimu per e liste di rilazione
 de: maximale Anahl für die der Verwandtschaftslisten
 en: max number for relation list
+es: número máximo para las listas de relaciones
 fr: nombre maximum pour les listes de relations
 
     maximum
@@ -13219,12 +13659,14 @@ tr: çeşitli notlar
     miscellaneous notes help
 co: pagine esterne referenzate in a basa sottu a forma [[[schedariu]]]
 en: external pages referenced in the base as [[[filename]]]
+es: páginas externas referenciadas en la base como [[[archivo]]]
 fr: pages externes réfécencées dans la base sous la forme [[[fichier]]]
 
     missing %s
 co: %s assente
 de: %s fehlt
 en: missing %s
+es: falta %s
 fr: %s manquant
 pt: %s em falta
 sv: %s saknas
@@ -13293,6 +13735,7 @@ tr: eksik etkinlikler
 co: fiura assente
 de: fehlendes Bild
 en: missing image
+es: imagen faltante
 fr: image manquante
 no: bilde mangler
 pt: imagem em falta
@@ -13466,12 +13909,14 @@ tr: güncelleme
 co: mudificà l’armuratura
 de: das Wappen ändern
 en: modify the coat of arms
+es: modificar el blasón
 fr: modifier le blason
 
     modify family %s event order
 co: intervertisce l’evenimenti di a famiglia %s
 de: vertauschen Sie die Ereignisse der Familie %s
 en: permute the events of family %s
+es: permutar los eventos de la familia %s
 fr: permuter les événements de la famille %s
 pt: permutar os eventos da família %s
 sv: ändra ordningen för %s familjehändelser
@@ -13481,30 +13926,35 @@ tr: %s ailesinin etkinliklerini değiştir
 co: mudificà a nota sana/sezzione precedente/sezzione seguente
 de: die ganze Notiz bearbeiten/vorheriger Abschnitt/nächster Abschnitt
 en: modify all the note/previous section/next section
+es: editar toda la nota/sección anterior/sección siguiente
 fr: éditer toute la note/section précédente/section suivante
 
     modify note
 co: mudificà a nota
 de: Notiz bearbeiten
 en: modify the note
+es: modificar la nota
 fr: modifier la note
 
     modify note section %d
 co: mudificà a sezzione %d
 de: den Abschnitt %d bearbeiten
 en: modify the section %d
+es: modificar la sección %d
 fr: modifier la section %d
 
     modify gallery
 co: mudificà a fiura&#047;galleria
 de: das Bild&#047;die Galerie ändern
 en: modify the image&#047;the gallery
+es: modificar la imagen (galería)
 fr: modifier l’image&#047;la gallerie
 
     modify person event order
 co: intervertisce l’evenimenti individuali
 de: Ereignisreihenfolge der Person ändern
 en: permute personnal events
+es: permutar los eventos individuales
 fr: permuter les événéments individuels
 pt: permutar os eventos individuais
 sv: ändra ordningen för personliga händelser
@@ -13544,30 +13994,35 @@ tr: resmi güncelle
 co: mudificà u ritrattu
 de: Porträt ändern
 en: modify the portrait
+es: modificar el retrato
 fr: modifier le portrait
 
     copy portrait to blason
 co: impiegà u ritrattu cum’è armuratura
 de: das Portrait als Wappen verwenden
 en: use portrait as coats of arme
+es: usar el retrato como blasón
 fr: utiliser le portrait comme blason
 
     copy image to blason
 co: impiegà a fiura cum’è armuratura
 de: das Bild als Wappen verwenden
 en: use image as coats of arme
+es: usar la imagen como blasón
 fr: utiliser l'image comme blason
 
     modify source
 co: mudificà a fonte
 de: Quelle ändern
 en: modify the source
+es: modificar la fuente
 fr: modifier la source
 
     modify the size of images to
 co: mudificà a dimensione di e fiure à
 de: Bildgröße ändern auf
 en: modify the size of images to
+es: cambiar el tamaño de las imágenes a
 fr: modifier la taille des images à
 
     module
@@ -13681,11 +14136,13 @@ tr: %d cevaptan daha fazla
 co: dispiazzà l’armuratura versu/cullà l’armuratura à u primu antenatu cunnisciutu chì l’hà purtata
 de: das Wappen verschieben zu/das Wappen zum ersten bekannten Vorfahren zurückführen, der es getragen hat
 en: move the coat of arms to/raise the coat of arms to first known holder who bored it
+es: mover el blasón a/subir el blasón al primer antepasado conocido que lo llevó
 fr: déplacer le blason vers/remonter le blason au premier ancêtre connu l’ayant porté
 
     move union comments to notes
 co: trasferisce u campu storicu « cummenti d’unione » versu quellu cuntiguu di e « note d’unione ».
 en: transfer the historical “comments of union” input to the adjacent “marriage notes” one.
+es: transferir el campo histórico «comentarios de unión» al campo contiguo «notas de matrimonio».
 fr: transférer le champ historique « commentaires d’union » vers celui des « notes de mariage » ci-contre.
 
     move up/down
@@ -13727,6 +14184,7 @@ zh: 向上移动/向下移动/将光标向上移动/将光标向下移动/拖放
 co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnesse à l’altre.<br />Sta ristrizzione hè stata aghjunta da u pruprietariu di a basa di dati.
 de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br /> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
 en: sorry, you can add only families connected to the rest.<br>This restriction has been added by this database owner.
+es: lo sentimos, solo puede agregar familias conectadas con el resto.<br>Esta restricción fue agregada por el dueño de esta base de datos.
 fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br>Cette restriction a été ajoutée par le propriétaire de cette base de données.
 it: spiacenti, puoi aggiungere solo delle famiglie collegate al resto.<br>Questa restrizione è stata aggiunta dal proprietario del data base
 no: beklager, du kan bare legge til familier som er koblet til andre.<br>Denne begrensningen er lagt til av database-eieren.
@@ -13740,6 +14198,7 @@ tr: ne yazık ki, sadece diğerlerine bağlı aileleri ekleyebilirsiniz.<br>Bu k
 co: graficu di rilazioni multiple
 de: Multi-Verwandtschafts-Graph
 en: multi relations graph
+es: grafo de relaciones múltiples
 fr: graphe de relations multiples
 pt: gráfico de relações múltiplas
 sv: graf med flera relationer
@@ -13747,6 +14206,7 @@ tr: çoklu ilişkiler grafiği
 
     multiple relations
 de: Im Falle von Implexen haben einige Individuen mehrere Beziehungen (Pfade) mit dem Stammindividuum. Die Beziehung zwischen zwei Individuen hängt von allen Koeffizienten ihrer Beziehungen (Pfade) ab.
+es: En caso de implexos, algunos individuos tendrán múltiples vínculos de parentesco (caminos) con el individuo raíz. El parentesco entre dos individuos dependerá de todos los coeficientes de sus vínculos de parentesco (caminos).
 fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins).
 
     murdered
@@ -13880,6 +14340,7 @@ tr: %s adı zaten %s tarafından kullanılıyor
 co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. E pagine quaghjò assuciate à l’anziana chjave sò state mudificate.
 de: Vorname, Name oder Vorkommen dieser Person hat sich geändert. Bitte aktualisieren Sie die unten aufgeführten Seiten, die mit dem alten Schlüssel verknüpft sind.
 en: The first name, name or occurrence of this person has changed. The pages linked to the old key listed below have been updated.
+es: El nombre, apellido u ocurrencia de esta persona cambió. Las páginas enlazadas a la clave anterior listadas abajo fueron actualizadas.
 fr: Le prénom, nom ou occurrence de cette personne a changé. Les pages ci-dessous liées à l’ancienne clé ont été mises à jour.
 pt: O primeiro nome, apelido ou ocorrência desta pessoa foi alterada. Por favor actualize as páginas ligadas à chave antiga abaixo.
 sv: Förnamn, efternamn eller förekomst av denna person har ändrats. Uppdatera sidorna som länkar till den gamla nyckeln som visas nedan.
@@ -13903,6 +14364,7 @@ tr: vatandaşlık
 co: navigà nant’à l’arburu
 de: Baum navigieren
 en: navigate on the tree
+es: navegar por el árbol
 fr: naviguer sur l’arbre
 pt: navegar na árvore
 sv: navigering i trädet
@@ -13974,11 +14436,13 @@ tr: Sosa referansı olarak %t kullanarak göz atın
 co: navigà in l’arburu cù st’individuu
 de: im Baum mit dieser Person navigieren
 en: navigation in tree with this individual
+es: navegar por el árbol con este individuo
 fr: naviguer dans l’arbre avec cet individu
 
     navigate with someone
 co: fà un cliccu nant’à %s per cambià l’individuu di a radica
 en: click on %s to change the root individual
+es: haga clic en %s para cambiar el individuo raíz
 fr: cliquer sur %s pour changer l’individu racine
 
     nb branches
@@ -14081,6 +14545,7 @@ tr: düzenlemeye devam et
 co: nome novu
 de: neuer Name
 en: new name
+es: nombre nuevo
 fr: nouveau nom
 no: nytt navn
 pt: nome novo
@@ -14091,18 +14556,21 @@ tr: yeni ad
 co: nome di a nota nova/nota nova
 de: Name der neuen Notiz/neue Notiz
 en: name of the new note/new note
+es: nombre de la nueva nota
 fr: nom de la nouvelle note/nouvelle note
 
     new tree with this individual
 co: arburu novu da st’individuu
 de: Neuer Baum mit dieser Person
 en: new tree with this individual
+es: nuevo árbol a partir de este individuo
 fr: nouvel arbre à partir de cet individu
 
     next
 co: seguente
 de: nächster
 en: next
+es: siguiente
 fr: suivant
 
     next relationship path
@@ -14266,6 +14734,7 @@ tr: %s ve %s arasında bilinen bir ilişki bağlantısı yok
 co: affissà e casate senza saltu di linea
 de: kein Zeilenumbruch in Namen
 en: no line break in names
+es: mostrar los nombres sin salto de línea
 fr: afficher les noms sans saut de ligne
 
     no marriage event
@@ -14368,12 +14837,14 @@ tr: değişiklik yok
 co: micca di più
 de: nicht mehr
 en: no more
+es: no hay más
 fr: pas d’autres
 
     no user key
 co: stu liame pò cundunce à un omonimu o ancu fiascà perchè a chjave di l’utilizatore ùn hè micca definita in u schedariu `.auth`
 de: dieser Link kann zu einem Homonym führen oder sogar fehlschlagen, weil der Nutzerschlüssel nicht in der `.auth` Datei definiert ist
 en: this link may lead to a homonym or even fail because the user key is not defined in the `.auth` file
+es: este enlace puede llevar a un homónimo o incluso fallar porque la clave de usuario no está definida en el archivo `.auth`
 fr: ce lien peut conduire à un homonyme voire échouer car la clé utilisateur n’est pas définie dans le fichier `.auth`
 
     no sexes check
@@ -14617,18 +15088,21 @@ tr: notlar
 co: in sfondulu per affissà e
 de: den Hintergrund zum Anzeigen der
 en: the background to show the
+es: en el fondo para mostrar los
 fr: sur l’arrière-plan pour afficher les
 
     notes sources edit on date
 co: nant’à a data à manca per mudificà st’evenimentu
 de: auf das Datum links zum Ändern dieses Ereignisses
 en: on the date on the left to modify this event
+es: en la fecha a la izquierda para modificar este evento
 fr: sur la date à gauche pour modifier cet événement
 
     note without title
 co: nota senza titulu
 de: Notiz ohne Titel
 en: note without title
+es: nota sin título
 fr: note sans titre
 
     NOTIF error/warning/success/info
@@ -15019,6 +15493,7 @@ tr: yaşayan bireylerin sayısı
 co: numeru di linee
 de: Zeilennummer
 en: number of rows
+es: número de filas
 fr: nombre de lignes
 
     number of unions
@@ -15093,11 +15568,13 @@ tr: Sosa'ya göre
 co: numeru d’occurrenze/occurrenza
 de: Vorkommen-Zahl/Vorkommen
 en: occurence number/occurence
+es: número de ocurrencia/ocurrencia
 fr: numéro d’occurrence/occurence
 
     occurence
 de: Vorkommen/Vorkommen
 en: occurence/occurences
+es: ocurrencia/ocurrencias
 fr: occurrence/occurences
 
     occupation/occupations
@@ -15220,6 +15697,7 @@ tr: %s kuşağının
 co: d[i |’]%s
 de: von %s
 en: of %s
+es: de %s
 fr: d[e |’]%s
 
     officer/officer/officers
@@ -15236,6 +15714,7 @@ tr: memur/memur/memurlar
 co: vechju nome
 de: alter Name
 en: old name
+es: nombre anterior
 fr: ancien nom
 no: gammelt navn
 pt: nome antigo
@@ -15246,6 +15725,7 @@ tr: eski adı
 co: di u latu di i fratelli o surelle di %s
 de: vonseiten der Geschwister von %s
 en: on %s's siblings side
+es: del lado de los hermanos de %s
 fr: du côté des frères et soeurs de %s
 
     on %s's side
@@ -15318,6 +15798,7 @@ br: d'ar
 co: u
 de: am
 en: on
+es: el
 et: :i:
 fi: :e:
 fr: le
@@ -15333,6 +15814,7 @@ tr: -da,-de
 co: una generazione di più
 de: eine weitere Generation
 en: one additional generation
+es: una generación más
 fr: une génération en plus
 pt: uma geração adicional
 sv: en tidigare generation
@@ -15342,6 +15824,7 @@ tr: ek bir kuşak
 co: E relazioni di parentia cunsanguine è uterine per un antenatu cumunu unicu sò incluse ma u so cuefficiente di parentia vale a metà di quellu di a relazione sana equivalente.
 de: Ein gemeinsamer Vorfahre: Blutsverwandte und uterine Halbbeziehungen sind enthalten, aber ihr Elternkoeffizient beträgt die Hälfte der vollständigen äquivalenten Beziehung.
 en: One common ancestor: consanguine and uterine half relationships are included, but their coefficient of parente is half the full equivalent relation.
+es: Un solo ancestro común: se incluyen las medias relaciones consanguíneas y uterinas, pero su coeficiente de parentesco vale la mitad del de la relación completa equivalente.
 fr: Les relations de parenté consanguines et utérines par un seul ancêtre pivot commun sont incluses. Leur coefficient de parenté vaut la moitié de celui de la relation complète équivalente.
 
     one day old
@@ -15444,6 +15927,7 @@ tr: bir yaşında
 co: solu
 de: nur
 en: only
+es: solamente
 fr: uniquement
 no: bare
 pt: só
@@ -15486,18 +15970,21 @@ tr: sadece seçilen nesil
 co: nant’à sta fiura
 de: auf diesem Bild
 en: on this image
+es: sobre esta imagen
 fr: sur cette image
 
     open individual page
 co: apre a pagina individuale
 de: individuelle Seite öffnen
 en: open individual page
+es: abrir la página del individuo
 fr: ouvrir la page individuelle
 
     open this individual page
 co: apre sta pagina individuale
 de: diese individuelle Seite öffnen
 en: open this individual page
+es: abrir la página de este individuo
 fr: ouvrir la page individuelle
 
     optional
@@ -15536,6 +16023,7 @@ tr: isteğe bağlı
 co: ozzioni
 de: Optionen
 en: options
+es: opciones
 fr: options
 pt: opções
 sv: valbart
@@ -15578,12 +16066,14 @@ tr: veya
 co: listessu ordine
 de: Reihenfolge
 en: permutated
+es: permutados
 fr: permutés
 
     order hlp
 co: circà tutte e permutazioni (2 à 4 prenomi)
 de: alle Permutationen suchen (2 bis 4 Vornamen)
 en: search all permutations (2 to 4 first names)
+es: buscar todas las permutaciones (2 a 4 nombres)
 fr: chercher toutes les permutations (2 à 4 prénoms)
 
     ordination
@@ -15646,12 +16136,14 @@ sv: annat/annat/annat
 co: altre pussibilità
 de: andere Möglichkeiten
 en: other possibilities
+es: otras posibilidades
 fr: autres possibilités
 
     ou
 co: o
 de: oder
 en: or
+es: o
 fr: ou
 
     PACS
@@ -15744,12 +16236,14 @@ sv: församlingsregister/församlingsregister
 co: limitatu à l’antenati è i so fratelli è surelle
 de: begrenzt auf Vorfahren und Geschwister
 en: limited to ancestors and siblings
+es: limitado a los ascendientes y sus hermanos
 fr: limité aux ascendants et leurs frères et soeurs
 
     participant/participant
 co: participante/participante
 de: Teilnehmer/Teilnehmerin
 en: participant/participant
+es: participante/participante
 fr: participant/participante
 sv: deltagare/deltagare
 tr: katılımcı/katılımcı
@@ -15758,6 +16252,7 @@ tr: katılımcı/katılımcı
 co: passendu da
 de: im Vorbeigehen
 en: passing by
+es: pasando por
 fr: en passant par
 
     paternal grand-parents
@@ -15780,12 +16275,14 @@ tr: babanın ailesi
 co: chjassu trà
 de: Weg zwischen
 en: path between
+es: camino entre
 fr: chemin entre
 
     path/paths
 co: chjassu/chjassi
 de: Weg/Wege
 en: path/paths
+es: camino/caminos
 fr: chemin/chemins
 
     person added
@@ -15968,6 +16465,7 @@ tr: aynı adı taşıyan kişiler
     phonetic variants
 de: Phonetische Varianten
 en: phonetic variants
+es: variantes fonéticas
 fr: variantes phonétiques
 
     data quality
@@ -16036,6 +16534,7 @@ tr: arşiv ve resimler
 co: numeru d’elementi cunservati in a lista di i lochi
 de: Anzahl der Elemente in der Ortsliste
 en: number of elements kept in places list
+es: número de elementos a conservar en la lista de lugares
 fr: nombre d'éléments à conserver dans la liste des places
 
     places and events
@@ -16079,6 +16578,7 @@ tr: yer/yerler
 co: moduli d’estensione
 de: Plugins
 en: plugins
+es: plugins
 fr: plugins
 
     plus
@@ -16157,6 +16657,7 @@ tr: ölüm yaşı piramidi
 co: ritrattu
 de: Porträt
 en: portrait
+es: retrato
 fr: portrait
 
     possible duplications
@@ -16277,6 +16778,7 @@ sv: närvarande/närvarande/närvarande
 co: prisentazione
 de: Präsentation
 en: presentation
+es: presentación
 fr: présentation
 he: הצגה
 it: presentazione
@@ -16307,6 +16809,7 @@ tr: soy ağacının önizlemesi
 co: precedente
 de: vorher
 en: previous
+es: anterior
 fr: précédent
 
     previous occurrence number
@@ -16317,24 +16820,28 @@ en: previous occurrence number
     previously/subsequently
 de: zuvor/später
 en: previously/subsequently
+es: anteriormente/posteriormente
 fr: auparavant/par la suite
 
     previous coat of arms
 co: una salvaguardia preesistente di l’armuratura serà squassata.
 de: eine mögliche vorherige Version des gespeicherten Wappens wird gelöscht.
 en: a possible previous version of the saved coat of arms will be deleted.
+es: si existe una versión anterior del blasón guardado, se eliminará.
 fr: une sauvegarde pré-existante du blason sera supprimée.
 
     previous image
 co: s’è una fiura cù u listessu nome esiste dighjà in u cartulare di salvaguardia, sta fiura serà squassata.
 de: wenn schon ein gespeichertes Bild mit dem gleichen Namen existiert, wird es gelöscht.
 en: if an image with the same name already exists in the saved, it will be deleted.
+es: si ya existe una imagen guardada con el mismo nombre, se eliminará.
 fr: si une image du même nom existe déjà, elle sera supprimée.
 
     previous portrait
 co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu. Impiegà MOD_IND ùn arregistreghja micca u ritrattu.
 de: wenn schon ein gespeichertes Porträt mit dem gleichen Namen existiert, wird es gelöscht. MOD_IND speichert das Porträt nicht.
 en: a possible previous version of the saved portrait will be deleted. Using MOD_IND does not save the portrait.
+es: si existe una versión anterior del retrato guardado, se eliminará.<br> Usar MOD_IND no guarda el retrato.
 fr: une sauvegarde pré-existante du portrait sera supprimée.<br> Utiliser MOD_IND ne sauvegarde pas le portrait.
 
     previous sibling
@@ -16373,6 +16880,7 @@ tr: önceki kardeş
 co: revisione precedente/revisione seguente
 de: vorheriger Unterschied/nächster Unterschied
 en: previous revision/next revision
+es: revisión anterior/revisión siguiente
 fr: révision précédente/révision suivante
 pt: revisão anterior/revisão seguinte
 sv: föregående version/nästa version
@@ -16460,6 +16968,7 @@ tr: kamu
 co: casata publica/casate publiche
 de: öffentlicher Name/öffentliche Namen
 en: public name/public names
+es: nombre público/nombres públicos
 fr: nom public/noms publics
 
     public name
@@ -16677,6 +17186,7 @@ zh: 在图像上重绘区域
 co: riduce/aumentà
 de: vermindern/erhöhen
 en: reduce/increase
+es: reducir/aumentar
 fr: réduire/augmenter
 pt: reduzir/aumentar
 sv: minska/öka
@@ -16734,6 +17244,7 @@ tr: ilişki/ilişkiler
 co: rilazioni di
 de: Beziehungen von
 en: relations of
+es: relaciones de
 fr: relations de
 sv: relation med
 tr: ilişkileri
@@ -17161,6 +17672,7 @@ tr: ile ilişki%t
 co: fà un cliccu nant’à st’intestatura per caccià sta o ste culonna(e) « %s »
 de: klicke auf diesen Header um die Zeile "%s" zu entfernen
 en: click on this header to remove the column(s) “%s”
+es: haga clic en este encabezado para quitar la(s) columna(s) «%s»
 fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
 
     remove last module
@@ -17182,6 +17694,7 @@ fr: ajouter une génération/retirer une génération
 co: riservatu à l’amichi è à i maghi
 de: reserviert für Freunde und Meister
 en: reserved to friends or wizards
+es: reservado a amigos y magos
 fr: réservée aux amis et magiciens
 sv: reserverat för vänner och administratörer
 tr: arkadaşlar veya sihirbazlar için ayrılmış
@@ -17224,6 +17737,7 @@ zh: 重置所有内容：表单、图像和表格
 co: risturà
 de: zurücksetzen
 en: reset to
+es: restablecer a
 fr: restaurer
 pt: restaurar
 sv: återställ till
@@ -17261,42 +17775,49 @@ tr: ikamet%t ile
 co: risturà
 de: wiederherstellen
 en: restore
+es: restaurar
 fr: restaurer
 
     restore coat of arms saved
 co: risturà l’armuratura
 de: gespeichertes Wappen wiederherstellen
 en: restore coat of arms
+es: restaurar el blasón
 fr: restaurer le blason
 
     restore image saved
 co: risturà una fiura arregistrata
 de: das gespeicherte Bild wiederherstellen
 en: restore saved image
+es: restaurar la imagen guardada
 fr: restaurer une image sauvegardée
 
     restore portrait
 co: risturà u ritrattu
 de: das Porträt wiederherstellen
 en: restore portrait
+es: restaurar el retrato
 fr: restaurer le portrait
 
     restore portrait saved
 co: risturà u ritrattu arregistratu
 de: das gespeicherte Porträt wiederherstellen
 en: restore saved portrait
+es: restaurar el retrato guardado
 fr: restaurer le portrait sauvegardé
 
     restored
 co: risturatu/risturata
 de: wiederhergestellt
 en: restored
+es: restaurado/restaurada
 fr: restauré/restaurée
 
     restricted access
 co: L’accessu hè riservatu à l’amichi è à i maghi di a basa di dati !
 de: Der Zugriff ist auf Freunde und Meister der Datenbank beschränkt!
 en: Access restricted to friends and wizards of the database!
+es: ¡Acceso reservado a los amigos y magos de la base de datos!
 fr: Accès réservé aux amis et magiciens de la base de donnée !
 
     retired
@@ -17503,41 +18024,48 @@ tr: Sosa ile aynı #
 co: arregistrà
 de: speichern
 en: save
+es: guardar
 fr: sauvegarder
 
     save image
 co: una fiura cù un nome simile serà dispiazzata in
 de: wenn ein Bild mit demselben Namen existiert, wird es gespeichert nach
 en: an image with a similar name will moved to
+es: si ya existe una imagen con el mismo nombre, se guardará en
 fr: si une image du même nom existe déjà, elle sera sauvegardée dans
 
     save portrait
 co: u ritrattu esistente serà arregistratu in
 de: das existierende Porträt wird gespeichert nach
 en: the existing portrait will be saved to
+es: el retrato existente se guardará en
 fr: le portrait existant sera sauvegardé dans
 
     saved
 co: arregistratu/arregistrata
 de: gespeichert
 en: saved
+es: guardado/guardada
 fr: sauvegardé/sauvegardée
 
     saved images
 co: fiura arregistrata/fiure arregistrate
 de: gespeichertes Bild/gespeicherte Bilder
 en: saved image/saved images
+es: imagen guardada/imágenes guardadas
 fr: sauvegarde/sauvegardes
 
     save help
 co: schedarii micca referenzati à u furmatu [[[schedariu]]] o referenzati da persone non videvule ; seranu quantunque arregistrati da gwu
 en: files not referenced as [[[filename]]] or referenced by persons not visible; Will nonetheless be saved by gwu
+es: archivos no referenciados como [[[archivo]]] o referenciados por personas no visibles; gwu los guardará de todos modos
 fr: fichiers non référencés au format [[[fichier]]] ou référencés par des personnes non visibles; Seront néanmoins sauvegardés par gwu
 
     files not in db
 co: schedarii micca referenzati
 de: nicht referenzierte Dateien
 en: files not referenced
+es: archivos no referenciados
 fr: fichiers non référencés 
 
     files not in db help
@@ -17549,6 +18077,7 @@ fr: fichiers non référencés dans les notes ou pages (exécuter update_nldb pe
 co: anni à a generazione
 de: Jahre nach Generation
 en: years by generation
+es: años por generación
 fr: années par génération
 pt: anos por geração
 tr: nesile göre yıllar
@@ -17599,53 +18128,62 @@ tr: mühürlü Eş (LDS)
 co: infurmazione legale
 de: rechtlich
 en: legal
+es: aviso legal
 fr: mentions légales
 
     pacs%t to
 de: eingetragener%t Lebenspartner/eingetragene%t Lebenspartnerin
 en: pacs%t with
+es: en unión civil%t con
 fr: pacsé%t avec/pacsée%t avec/pacsés
 
     path to
 co: chjassu versu mè/chjassu versu u Sosa n<sup>u</sup> 1
 de: Weg zu mir/Weg zur Sosa N<sup>o</sup> 1
 en: path to me/path to the Sosa n<sup>o</sup> 1
+es: camino hacia mí/camino hacia el Sosa n<sup>o</sup> 1
 fr: chemin vers moi/chemin vers le Sosa n<sup>o</sup> 1
 
     path to me
 co: chjassu u più cortu trà mè è st’individuu
 de: kürzester Weg zwischen dieser Person und mir
 en: shortest path between this individual and me
+es: camino más corto entre este individuo y yo
 fr: chemin le plus court entre cet individu et moi
 
     path to Sosa 1
 co: chjassu u più cortu trà st’individuu è u Sosa n<sup>u</sup> 1
 de: kürzester Weg zwischen dieser Person und Sosa Nº 1
 en: shortest path between this individual and the Sosa nº 1
+es: camino más corto entre este individuo y el Sosa nº 1
 fr: chemin le plus court entre cet individu et le Sosa nº 1
 
     search format
 co: furmati di ricerca
 de: Suchformat
 en: search formats
+es: formatos de búsqueda
 fr: formats de recherche
 
     search %s on Geneanet
 co: ricercà %s nant’à Geneanet
 de: suche %s auf Geneanet
 en: search %s on Geneanet
+es: buscar %s en Geneanet
 fr: rechercher %s sur Geneanet
 
     search %s on matchID
 co: ricercà %s nant’à matchID
 de: suche %s auf matchID
 en: search %s on matchID
+es: buscar %s en matchID
 fr: recherche %s sur matchID
 
     search Insee
 co: ricerca di currispundenze in i schedarii di i morti di l’Insee
 de: suche Treffer in den Insee Sterbeindex Daten
 en: search matches in the Insee death index files
+es: buscar coincidencias en los archivos de defunciones del Insee
 fr: recherche de correspondances dans les fichiers des décès de l’Insee
 
     search/case sensitive
@@ -17682,47 +18220,55 @@ tr: arama/büyük küçük harfe duyarlı
 co: altra basa
 de: andere Datenbank
 en: other base
+es: otra base
 fr: autre base
 
     hidden first_name
 co: nome piattatu
 de: versteckter Vorname
 en: hidden first name
+es: nombre oculto
 fr: prénom masqué
 
     hidden surname
 co: casata piattata
 de: versteckter Nachname
 en: hidden surname
+es: apellido oculto
 fr: patronyme masqué
 
     hidden person
 co: persona piattata
 de: versteckte Person
 en: hidden person
+es: persona oculta
 fr: personne masquée
 
     not exact
 co: parziali/currispundenze parziali
 de: teilweise/teilweise Übereinstimmungen
 en: partials/partial matches
+es: parciales/coincidencias parciales
 fr: partiels/correspondances partielles
 
     not exact hlp
 co: (caricamentu longu!)
 de: (lädt länger!)
 en: (quite long to load!)
+es: (¡puede tardar bastante en cargar!)
 fr: (chargement potentiellement long !)
 
     note is restricted
 co: l’accessu à sta pagina hè limitatu
 en: access to this page is restricted
+es: el acceso a esta página está restringido
 fr: l'accès à cette page est restreint
 
     optional/mandatory
 co: ozzionale/ubblicatoriu
 de: optional/obligatorisch
 en: optional/mandatory
+es: opcional/obligatorio
 fr: facultatif/obligatoire
 
     search exact
@@ -17897,6 +18443,7 @@ tr: resimleri görüntüle
 co: vede l’armuratura
 de: siehe das Wappen
 en: see the coat of arms
+es: ver el blasón
 fr: voir le blason
 
     see descendants notes/sources
@@ -17983,12 +18530,14 @@ tr: bireysel
 co: vede u ritrattu
 de: siehe Porträt
 en: see portrait
+es: ver el retrato
 fr: voir le portrait
 
     see portrait saved
 co: vede u ritrattu arregistratu
 de: siehe gespeichertes Porträt
 en: see saved portrait
+es: ver el retrato guardado
 fr: voir le portrait sauvegardé
 
     select
@@ -18061,6 +18610,7 @@ tr: tüm yıldönümlerini görmek için bir ay seçin.
 co: selezziunà un evenimentu/squassà l’evenimentu
 de: ein Ereignis auswählen/ein Ereignis löschen
 en: select an event/delete the event
+es: elegir un evento/eliminar el evento
 fr: choisir un événement/supprimer l’événement
 
     select a spouse
@@ -18083,6 +18633,7 @@ tr: eş seçin
 co: sceglie un schedariu
 de: wählen
 en: choose file
+es: elegir archivo
 fr: sélect. fichier
 
     select lang
@@ -18198,6 +18749,7 @@ tr: yükle
 co: mandà a fiura selezziunata cù nota è fonte
 de: sende das gewählte Bild mit Notizen und Quellen
 en: send selected image with note and source
+es: enviar la imagen seleccionada con nota y fuente
 fr: envoyer l’image selectionée avec note et source
 
     separate event
@@ -18356,6 +18908,7 @@ fr: clic : fiche individuelle/clic ▲ : naviguer
 co: accurtatoghji di tastera
 de: Tastaturkürzel
 en: keyboard shortcuts
+es: atajos de teclado
 fr: raccourcis clavier
 pt: atalhos do teclado
 sv: genvägar på tangentbordet
@@ -18466,12 +19019,14 @@ fr: afficher le panneau
 co: affissà tutti i
 de: zeige alle
 en: show all
+es: mostrar todos
 fr: afficher tous les
 
     show implex
 co: identificà l’implessi
 de: Implex anzeigen
 en: show implex
+es: identificar los implexos
 fr: identifier les implexes
 pt: identificar os implexos
 tr: implex göster
@@ -18512,6 +19067,7 @@ tr: kardeşler
 co: arcizii
 de: Großtanten und Großonkel
 en: granduncles
+es: tíos abuelos
 fr: grands-oncles
 it: prozii e prozie
 pt: tios-avôs e tias-avós
@@ -18522,6 +19078,7 @@ tr: büyük amcalar ve büyük teyzeler
 co: fratelli è surelle di l’arcicaccari
 de: Urgroßtanten und Urgroßonkel
 en: great-granduncles
+es: tíos bisabuelos
 fr: arrières-grands-oncles
 pt: tios-bisavôs e tias-bisavós
 sv: syskon till föräldrar tre generationer bakåt
@@ -18559,6 +19116,7 @@ tr: son tıklamadan bu yana
 co: scala
 de: Größe
 en: scale
+es: escala
 fr: échelle
 pt: escala
 sv: skala
@@ -18634,6 +19192,7 @@ tr: oğul/kız/çocuk
 co: figlioli/figliole/zitelli
 de: Söhne/Töchter/Kinder
 en: sons/daughters/children
+es: hijos varones/hijas/hijos
 fr: fils/filles/enfants
 pt: filhos/filhas/filhos
 sv: söner/döttrar/barn
@@ -18864,6 +19423,7 @@ tr: eş/eşler
 co: infurmazione nant’à i cumpagni
 de: Partner-Informationen
 en: spouses informations
+es: información de los cónyuges
 fr: informations conjoints
 pt: informação do cônjuge
 sv: information om partner
@@ -19021,18 +19581,21 @@ zh: 在此工具上停留时
 co: piantà l’adopru di l’armuratura di/st’individuu hà piantatu l’adopru di l’armuratura di u so antenatu
 de: das Wappen dieser Person nicht mehr verwenden/diese Person hat aufgehört, das Wappen ihres Vorfahren zu verwenden
 en: stop using the coat of arms of/this individual stopped using his ancestor coat of arms
+es: dejar de usar el blasón de/este individuo dejó de usar el blasón de su antepasado
 fr: arrêter d’utiliser le blason de/cet individu a arrêté d’utiliser le blason de son ancêtre
 
     store image
 co: a fiura selezziunata serà piazzata in
 de: das ausgewählte Bild wird kopiert nach
 en: the selected image will be copied to
+es: la imagen seleccionada se guardará en
 fr: l’image sélectionnée sera enregistrée dans
 
     subplace help
 co: fate casu, a sintassa di i sottulochi hè « sottulocu – locu » cù una lineetta chì pò esse n (–) o M (—).
 de: Seien Sie vorsichtig, die Syntax von Ortsteilen ist "[Ortsteil] – Ort" mit einem Gedanken- oder Bindestrich.
 en: be carefull, the syntax of subplaces is “[subplace] – place” with a dash that can be emdash or endash.
+es: atención: la sintaxis de los sublugares es «[sublugar] – lugar», con un guion que puede ser largo o medio.
 fr: attention, la syntaxe des sous-lieux est « [sous-lieu] – lieu » avec un tiret qui peut être cadratin ou demi-cadratin.
 
     subdivision
@@ -19103,6 +19666,7 @@ tr: alternatif soyadı
     surname details
 de: Detailansicht/Details anzeigen/zeige die Liste aller Individuen für diese Nachnamen
 en: detailed view/view details/show the liste of all individuals for those surnames
+es: vista detallada/ver detalles/mostrar la lista de todos los individuos con esos apellidos
 fr: vue détaillée/voir détails/afficher la liste de tous les individus pour ces patronymes
 
     surname missing
@@ -19695,6 +20259,7 @@ tr: çocuklar
 co: u nome di a basa di dati « %s » cuntene un caratteru difesu.
 de: der Datenbankname "%s" enthält ein verbotenes Zeichen.
 en: the database name "%s" contains a forbidden character.
+es: el nombre de base "%s" contiene un carácter prohibido.
 fr: le nom de la base "%s" contient un caractère interdit.
 
     the day after tomorrow
@@ -20357,6 +20922,7 @@ tr: zaman çizelgesi
 co: duminiu/duminii
 de: Domäne/Domänen
 en: domain/domains
+es: dominio/dominios
 fr: domaine/domaines
 
     draw selection
@@ -20396,11 +20962,13 @@ zh: 在图像上绘制矩形区域
     alias/aliases
 co: cugnome/cugnomi
 en: alias/aliases
+es: alias/alias
 fr: alias/alias
 
     qualifier/qualifiers
 co: qualificativu/qualificativi
 en: qualifier/qualifiers
+es: calificativo/calificativos
 fr: sobriquet/sobriquets
 
     title/titles
@@ -20438,6 +21006,7 @@ tr: konu başlığı/başlıkları
     to
 de: zu
 en: to
+es: hacia
 fr: vers
 
     to add a child to a family, use "%s"
@@ -20476,6 +21045,7 @@ tr: bir aileye çocuk eklemek için "%s" kullanın
 co: à u carusellu
 de: zum Karussell
 en: to carrousel
+es: al carrusel
 fr: au carrousel
 
     to change
@@ -20876,6 +21446,7 @@ tr: bugün
     toggle all
 de: alle auswählen
 en: toggle all
+es: marcar todo
 fr: tout cocher
 
     tomorrow
@@ -20914,6 +21485,7 @@ tr: yarın
 co: troppu risultati
 de: zu viele Ergebnisse
 en: too much results
+es: demasiados resultados
 fr: trop de résultats
 
     tools
@@ -21017,6 +21589,7 @@ tr: ağaç
 co: arburu di i testimoni
 de: Baum der Zeugen
 en: tree of witnesses
+es: árbol de testigos
 fr: arbre des témoins
 pt: árvore de testemunhas
 sv: vittnesträd
@@ -21079,12 +21652,14 @@ tr: başka bir hesaplama seçeneği deneyin
 co: verificadore tipograficu di i dati
 de: Typografischer Daten-Checker
 en: data typographic checker
+es: verificador tipográfico de los datos
 fr: vérificateur typographique des données
 
     uncheck
 co: diselezziunà
 de: Abwählen
 en: uncheck
+es: desmarcar
 fr: décocher
 pt: desseleccionar
 sv: avmarkera
@@ -21158,24 +21733,28 @@ tr: %t için cinsiyet tanımlanmamış
 co: tutale micca filtratu
 de: Summe ungefiltert
 en: unfiltered total
+es: total sin filtrar
 fr: total non filtré
 
     unknown first_name
 co: nome scunnisciutu
 de: unbekannter Vorname
 en: unknown first name
+es: nombre desconocido
 fr: prénom inconnu
 
     unknown surname
 co: casata scunnisciuta
 de: unbekannter Nachname
 en: unknown surname
+es: apellido desconocido
 fr: patronyme inconnu
 
     unknown index
 co: indice scunnisciutu
 de: unbekannter Index
 en: unknown index
+es: índice desconocido
 fr: index inconnu
 
     unknown person
@@ -21214,6 +21793,7 @@ tr: bilinmeyen kişi
 co: cumpagni scunnisciuti
 de: fehlende(r) Ehegatte(n)
 en: unknown spouses
+es: cónyuges desconocidos
 fr: conjoints manquants
 
     unspecified
@@ -21284,6 +21864,7 @@ tr: kadar
 co: fin’à i
 de: bis zu
 en: up to the
+es: hasta los
 fr: jusqu’aux
 
     update
@@ -21340,18 +21921,21 @@ tr: aileyi Düzenle
 co: mudificà a fiura
 de: Bildnotiz aktualisieren
 en: update image
+es: actualizar la imagen
 fr: mettre à jour l’image
 
     update image source
 co: mudificà a fonte di a fiura
 de: Bildquelle aktualisieren
 en: update image source
+es: actualizar la fuente de la imagen
 fr: mettre à jour la source de l’image
 
     uploaded
 co: incaricatu/incaricata
 de: hochgeladen
 en: uploaded
+es: enviado/enviada
 fr: envoyé/envoyée
 
     URL
@@ -21365,6 +21949,7 @@ fr: URL
 co: risturà Sosa 1 predefinitu
 de: Standard Sosa 1 wiederherstellen
 en: restore default Sosa 1
+es: restaurar el Sosa 1 por defecto
 fr: restorer Sosa 1 par défault
 
     use "link" instead of "create"
@@ -21403,6 +21988,7 @@ tr: "oluştur" yerine "bağlantı" kullanın
 co: impiegà l’armuratura di
 de: verwende das Wappen von
 en: use the coat of arms of
+es: usa el blasón de
 fr: utilise le blason de
 
     user and language variables
@@ -21470,6 +22056,7 @@ tr: kullanıcı/şifre/iptal
 co: lista troppu longa (pruvate d’aumentà u valore di u filtru)
 de: Liste zu lang (versuche einen genaueren Filter)
 en: list too long (try increasing filter value)
+es: lista demasiado larga (pruebe aumentar el valor del filtro)
 fr: liste trop longue (augmentez la valeur du filtre)
 
     validate/delete
@@ -21500,6 +22087,7 @@ tr: gönder/sil
     validate form
 de: die Formularänderungen speichern
 en: save the form changes
+es: guardar los cambios del formulario
 fr: enregistrer les modifications apportées au formulaire
 
     venteBien
@@ -21534,6 +22122,7 @@ tr: sürüm
 co: affissera corta corta
 de: sehr kurze Anzeige
 en: very short display
+es: visualización muy corta
 fr: affichage très court
 
     view source
@@ -21559,12 +22148,14 @@ tr: kaynağı görüntüle
 co: visibilità
 de: Sichtbarkeit
 en: visibility
+es: visibilidad
 fr: visibilité
 
     visibility-hlp
 co: aiutu per a visibilità di l’individui
 de: Hilfe zur Sichtbarkeit von Personen
 en: help for visibility of individuals
+es: ayuda sobre la visibilidad de los individuos
 fr: aide pour la visibilité des individus
 
     visualize/show/hide/summary
@@ -21611,12 +22202,14 @@ tr: bireysel
     waiting overlay
 de: Datenbank wird analysiert/dies kann einen Moment dauern
 en: analyzing the database/this may take a moment
+es: analizando la base de datos/esto puede tardar un momento
 fr: analyse de la base de données/ceci peut prendre quelques instants
 
     warning refresh
 co: attualizà a pagina solu dopu à un cliccu nant’à l’icona principale osinnò si ripiteria u scambiu di e fiure.
 de: Aktualisieren Sie die Seite nicht, ohne vorher auf das Symbol zu klicken, da dies den Bildaustausch wiederholen würde.
 en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
+es: no actualice la página sin antes hacer clic en el ícono principal, ya que repetiría el intercambio de imágenes.
 fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
 
     warnings
@@ -21703,12 +22296,14 @@ tr: nerede evlendi
 co: veduvu/veduva
 de: Witwer/Witwe
 en: widower/widow
+es: viudo/viuda
 fr: veuf/veuve
 
     width
 co: larghezza
 de: Breite
 en: width
+es: ancho
 fr: largeur
 pt: largura
 sv: bredd
@@ -21798,12 +22393,14 @@ tr: ile
 co: cù una nota
 de: mit einer Notiz
 en: with a note
+es: con una nota
 fr: avec une note
 
     with root, spouses and unknowns
 co: cù l’antenatu di a radica, i cumpagni è i scunnisciuti
 de: mit Urahn, Ehegatten und Unbekannten
 en: with root ancestor, spouses and unknowns
+es: con el antepasado raíz, los cónyuges y los desconocidos
 fr: avec l’ancêtre racine, les conjoints et les inconnus
 pt: com o antepassado raiz, cônjuges e desconhecidos 
 sv: med rot, partners och okända
@@ -21813,18 +22410,21 @@ tr: kök atası, eşler ve bilinmeyenler ile
 co: cù u nome di u so cunghjuntu
 de: mit dem Namen des Ehegatten
 en: with spouse's name
+es: con el apellido del cónyuge
 fr: avec le nom de son conjoint
 
     without implex display
 co: senza affissà l’implessi
 de: ohne Implex-Anzeige
 en: without implex display
+es: sin mostrar los implexos
 fr: sans afficher les implexes
 
     witness at %s of
 co: %s à u %s di
 de: %s bei %s von
 en: %s at %s of
+es: %s en el %s de
 fr: %s au %s de
 pt: %s de %s de
 sv: %s vid %s av
@@ -21865,6 +22465,7 @@ tr: %s ve %s evliliğinde tanık
 co: arburu di i testimoni
 de: Baum der Zeugen
 en: tree of witnesses
+es: árbol de testigos
 fr: arbre des témoins
 pt: árvore de testemunhas
 sv: vittnesträd
@@ -21917,6 +22518,7 @@ tr: tanık/tanıklar
 co: testimoni à i so evenimenti
 de: Zeugen zu seinen Ereignissen
 en: witnesses at his events
+es: testigos en sus eventos
 fr: témoins à ses évènements
 sv: vittnen vid hans händelser
 tr: etkinliklerinde tanıklar
@@ -21925,6 +22527,7 @@ tr: etkinliklerinde tanıklar
 co: testimoni à l’evenimenti di
 de: Zeugen zu Ereignissen von
 en: witnesses to events of
+es: testigos en los eventos de
 fr: témoins aux évènements de
 sv: vittnen vid händelser för
 tr: etkinliklerinin tanıkları
@@ -21933,6 +22536,7 @@ tr: etkinliklerinin tanıkları
 co: testimoni à i mo evenimenti è cumpare/cummare
 de: Zeugen zu meinen Ereignissen und Taufzeugen
 en: witnesses to my events and godparents
+es: testigos en mis eventos y padrinos
 fr: témoins à mes évènements et parrains/marraines
 sv: vittnen vid mina händelser och gudföräldrar
 tr: etkinliklerime ve vaftiz babalarıma tanıklar
@@ -21972,29 +22576,34 @@ tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
     wizard note
 de: Meisterseite
 en: wizard note
+es: página de mago
 fr: page magicien
 
     wizard note create
 de: Meisterseite anlegen
 en: create wizard page
+es: crear la página de mago
 fr: créer la page magicien
 
     word/words
 co: solu una parolla/casata sana
 de: nur ein Wort/kompletter Nachname
 en: only one word/full surname
+es: una sola palabra/apellido completo
 fr: un seul mot/patronyme complet
 
     word match
 co: parolla sana
 de: ganzes Wort
 en: word match
+es: palabra completa
 fr: mot complet
 
     word match title
 co: paragunà cù u nome sanu d’un locu
 de: den ganzen Ortsnamen vergleichen
 en: match full location name
+es: comparar con el nombre completo de un lugar
 fr: comparer avec le nom complet d'un lieu
 
     would be his/her own ancestor
@@ -22239,9 +22848,11 @@ tr: mesajınız doğrulama için bekliyor
 co: stu caratteru senza caccia hè statu allargatu per esse videvule
 de: Dieses Zeichen mit der Breite Null wurde vergrößert, damit es sichtbar ist
 en: this zero-width character has been widened to be visible
+es: este carácter de ancho cero fue ensanchado para hacerlo visible
 fr: ce caractère sans chasse a été élargi pour être visible
 
     zoom/unzoom
 de: vergrößern/verkleinern
 en: zoom/unzoom
+es: acercar/alejar
 fr: zoomer/dézoomer
