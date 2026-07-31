@@ -16,7 +16,7 @@
 <h2>[*visibility-hlp]</h2>
 <div class="mb-2">
 [
-en: You are currently logged-is as
+en: You are currently logged-in as
 fr: Vous êtes connecté en mode
 es: Estás conectado en modo
 ] %if;wizard;<span class="text-success">[wizard/wizards/friend/friends/exterior]0</span>%nn;
@@ -32,7 +32,7 @@ es: Los <span class="text-success">magos</span> ven toda la información
 ].<br>
 
 [
-en: For %if;(b.semi_public="yes")<span class="text-success">friends</span> and %end;<span class="text-success">visitors</span>, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter) or if the person has a title and the vriable "public_if_titles" has been activated for the base
+en: For %if;(b.semi_public="yes")<span class="text-success">friends</span> and %end;<span class="text-success">visitors</span>, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter) or if the person has a title and the variable "public_if_titles" has been activated for the base
 fr: Pour les %if;(b.semi_public="yes")<span class="text-success">amis</span> et %end;<span class="text-success">visiteurs</span>, une personne peut être visible si elle est marquée "Public", si elle est décédée ou suffisamment agée (selon des paramètres de la base) ou si elle porte un titre et la variable "public_if_titles" est activée pour la base
 es: Para los %if;(b.semi_public="yes")<span class="text-success">amigos</span> y %end;<span class="text-success">visitantes</span>, una persona puede ser visible si está marcada como "Público", si falleció o es suficientemente antigua (según parámetros de la base) o si tiene un título y la variable "public_if_titles" está activada en la base
 ].<br>
@@ -44,7 +44,7 @@ es: Los <span class="text-success">magos</span> y los <span class="text-success"
 ].<br>
 
 [
-en: For <span class="text-success">visitors</span>, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter) or if the person has a title and the vriable "public_if_titles" has been activated for the base
+en: For <span class="text-success">visitors</span>, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter) or if the person has a title and the variable "public_if_titles" has been activated for the base
 fr: Pour les <span class="text-success">visiteurs</span>, une personne peut être visible si elle est marquée "Public", si elle est décédée ou suffisamment agée (selon des paramètres de la base) ou si elle porte un titre et la variable "public_if_titles" est activée pour la base
 es: Para los <span class="text-success">visitantes</span>, una persona puede ser visible si está marcada como "Público", si falleció o es suficientemente antigua (según parámetros de la base) o si tiene un título y la variable "public_if_titles" está activada en la base
 ].<br>
@@ -52,7 +52,7 @@ es: Para los <span class="text-success">visitantes</span>, una persona puede ser
 %end;
 
 [
-en: Anyone cas ask to be tagged as "Private"
+en: Anyone can ask to be tagged as "Private"
 fr: Toute personne peut demander à être marquée "Private" 
 es: Cualquier persona puede pedir ser marcada como "Privado"
 ].<br>
