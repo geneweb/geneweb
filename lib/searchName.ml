@@ -284,6 +284,9 @@ let select_approx_key conf base pl k =
 
 (* search functions *)
 
+let search_reject_p base p =
+  empty_sn_or_fn base p || not (Authorized.Person.has_visible_name p)
+
 let search_by_sosa ~conf ~base ~sosa =
   if Sosa.eq sosa Sosa.zero then None
   else
@@ -294,9 +297,6 @@ let search_by_sosa ~conf ~base ~sosa =
               ~conf:(Config.Trimmed.from_config conf)
               ~base (Gwdb.get_iper person))
           (Util.p_of_sosa conf base sosa sosa_ref))
-
-let search_reject_p base p =
-  empty_sn_or_fn base p || not (Authorized.Person.has_visible_name p)
 
 let search_by_name conf' base n =
   let conf = Config.Trimmed.from_config conf' in
