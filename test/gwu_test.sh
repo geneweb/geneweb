@@ -141,10 +141,10 @@ if test "$DBNAME" = "$REFDBNAME"; then
     rm -rf $tmpdir
 fi
 
-$SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}.gwu.o.gw 2>$BASES_DIR/$DBNAME.gwu.o.stderr || \
+$SUDOPRFX $BIN_DIR/gwu $DBNAME -bd $BASES_DIR -v -o ${DBNAME}.gwu.o.gw 2>$BASES_DIR/$DBNAME.gwu.o.stderr || \
   { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu.o.stderr"; exit 1; }
 test -n "$debug" && cat $BASES_DIR/$DBNAME.gwu.o.stderr
-$SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}_nouveau.gw -odir $BASES_DIR/outdir.$DBNAME 2>$BASES_DIR/$DBNAME.gwu_stderr || \
+$SUDOPRFX $BIN_DIR/gwu $DBNAME -bd $BASES_DIR -v -o ${DBNAME}_nouveau.gw -odir $BASES_DIR/outdir.$DBNAME 2>$BASES_DIR/$DBNAME.gwu_stderr || \
   { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu_stderr"; exit 1; }
 test -n "$debug" && cat $BASES_DIR/$DBNAME.gwu_stderr
 
@@ -164,8 +164,9 @@ done
 $SUDOPRFX $BIN_DIR/update_nldb -bd $BASES_DIR $DBNAME  >$BASES_DIR/$DBNAME.update_nldb.log 2>&1 || \
   { echo "update_nldb failure, details in $BASES_DIR/$DBNAME.update_nldb.log"; exit 1; }
 
-gwb2gedout="$BASES_DIR/${DBNAME}gwb2ged"
-$SUDOPRFX $BIN_DIR/gwb2ged $BASES_DIR/$DBNAME -v -o $gwb2gedout.ged 2>$gwb2gedout.stderr || \
+gwb2geddbn="${DBNAME}gwb2ged"
+gwb2gedout="$BASES_DIR/$gwb2geddbn"
+$SUDOPRFX $BIN_DIR/gwb2ged $DBNAME -bd $BASES_DIR -v -o $gwb2geddbn.ged 2>$gwb2gedout.stderr || \
   { echo "gwb2ged failure, details in $gwb2gedout.stderr"; exit 1; }
 test -n "$debug" && cat $gwb2gedout.stderr
 
@@ -175,12 +176,13 @@ $SUDOPRFX $BIN_DIR/ged2gwb $gwb2gedout.ged -f -bd $BASES_DIR $optreorg -o $ged2g
   { echo "ged2gwb failure, details in $ged2gwbout.log"; exit 1; }
 test -n "$debug" && cat $ged2gwbout.log
 
-$SUDOPRFX $BIN_DIR/gwu $ged2gwbout -v -o $ged2gwbout.gwu.o.gw 2>$ged2gwbout.gwu.o.stderr || \
+$SUDOPRFX $BIN_DIR/gwu $ged2gwbdbn -bd $BASES_DIR -v -o $ged2gwbdbn.gwu.o.gw 2>$ged2gwbout.gwu.o.stderr || \
   { echo "gwu failure, details in $ged2gwbout.gwu.o.stderr"; exit 1; }
 test -n "$debug" && cat $ged2gwbout.gwu.o.stderr
 
-ged2gedout="$BASES_DIR/${DBNAME}ged2ged"
-$SUDOPRFX $BIN_DIR/gwb2ged $ged2gwbout -v -o $ged2gedout.ged 2>$ged2gedout.stderr || \
+ged2geddbn="${DBNAME}ged2ged"
+ged2gedout="$BASES_DIR/$ged2geddbn"
+$SUDOPRFX $BIN_DIR/gwb2ged $ged2gwbdbn -bd $BASES_DIR -v -o $ged2geddbn.ged 2>$ged2gedout.stderr || \
   { echo "gwb2ged failure, details in $ged2gedout.stderr"; exit 1; }
 test -n "$debug" && cat $ged2gedout.stderr
 
