@@ -285,7 +285,9 @@ let parse_upto lim =
     | Some '\\' -> (
         Stream.junk strm__;
         (match Stream.peek strm__ with
-        | Some c -> Printf.eprintf "backslash followed by %C\n%!" c
+        | Some c ->
+            Printf.eprintf "backslash followed by %C | lim=%C | so far=%S\n%!" c
+              lim (Buff.get len)
         | None -> Printf.eprintf "backslash at eof\n%!");
         match Stream.peek strm__ with
         | Some '\r' ->
@@ -593,7 +595,8 @@ let rec copy_from_stream conf print strm =
               (* depending on when %f is called, conf may be sketchy *)
               (* conf will know bvars from basename.gwf and evars from url *)
               copy_from_stream conf print (Stream.of_string s)
-          | 'g' -> print_specific_file conf print comm_log strm
+          | 'c' -> print (comm_log ^ "\n")
+          | 'g' -> print_specific_file ~wrap:128 conf print comm_log strm
           | 'h' ->
               print "<input type=hidden name=lang value=";
               print conf.lang;
@@ -644,8 +647,13 @@ let rec copy_from_stream conf print strm =
               (* | 'F' see 'V' *)
               (* the current directory may have changes with -bd *)
               | 'G' ->
+                  print
+                    (String.concat Filename.dir_sep
+                       [ !bases_dir; "tmp"; "gwsetup.log" ]
+                    ^ "\n");
                   print_specific_file_tail conf print
-                    (Filename.concat !launch_dir "gwsetup.log")
+                    (String.concat Filename.dir_sep
+                       [ !bases_dir; "tmp"; "gwsetup.log" ])
                     strm
               | 'H' ->
                   (* print the content of -o filename, prepend bname *)
@@ -748,7 +756,22 @@ let rec copy_from_stream conf print strm =
     done
   with Stream.Failure -> ()
 
-and print_specific_file conf print fname strm =
+and wrap_print width print =
+  let col = ref 0 in
+  fun s ->
+    String.iter
+      (fun c ->
+        match c with
+        | '\n' | '\r' -> print "\n"; col := 0
+        | c ->
+            if !col >= width then (print "\n"; col := 0);
+            print (String.make 1 c);
+            incr col)
+      s
+and print_specific_file ?wrap conf print fname strm =
+  let print =
+    match wrap with Some w -> wrap_print w print | None -> print
+  in
   match Stream.next strm with
   | '{' -> (
       let s = parse_upto '}' strm in
@@ -1787,6 +1810,8 @@ let intro () =
   parse_cmd ();
   setup_log ~debug:!debug;
   if !bin_dir = "" then bin_dir := !setup_dir;
+  if not (Sys.file_exists (Filename.concat !bases_dir "tmp")) then
+    Unix.mkdir (Filename.concat !bases_dir "tmp") 0o755;
   launch_dir := Sys.getcwd ();
   (* All tool invocations inject -bd via exec_f so they find bases in
      bases_dir regardless of cwd. *)
