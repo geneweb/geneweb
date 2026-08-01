@@ -826,7 +826,8 @@ let print_sub_part_links conf edit_mode sfn cnt0 has_next =
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (commd conf);
   Output.print_sstring conf {|m=|};
-  Output.print_sstring conf "NOTES";
+  Output.print_sstring conf
+    (if edit_mode = Mutil.encode "MOD_WIZNOTES" then "WIZNOTES" else "NOTES");
   Output.print_string conf sfn;
   Output.print_sstring conf {|" class="btn btn-sm btn-outline-primary">|};
   Output.print_sstring conf {|<i class="fa fa-image fa-fw"></i> |};
