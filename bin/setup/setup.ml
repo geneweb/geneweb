@@ -974,8 +974,7 @@ let simple conf =
     else if out_file = "" then out_name_of_ged ged
     else out_file
   in
-  let env = ("f", "on") :: conf.env in
-  let env = list_replace "anon" ged env in
+  let env = list_replace "anon" ged conf.env in
   let conf =
     {
       comm = (if ged = "" then "gwc" else "ged2gwb");
@@ -1022,9 +1021,7 @@ let gwc_check conf =
   let conf = { conf with env = ("nofail", "on") :: conf.env } in
   gwc_or_ged2gwb out_name_of_gw conf
 
-let ged2gwb_check conf =
-  let conf = { conf with env = ("f", "on") :: conf.env } in
-  gwc_or_ged2gwb out_name_of_ged conf
+let ged2gwb_check conf = gwc_or_ged2gwb out_name_of_ged conf
 
 let gwc conf =
   let rc =
