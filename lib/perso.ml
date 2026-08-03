@@ -2560,6 +2560,7 @@ and eval_date_field_var conf d = function
               TemplAst.VVstring (string_of_int dmy2.year2)
           | _ -> null_val)
       | _ -> null_val)
+  | [ "short" ] -> safe_val @@ DateDisplay.string_slash_of_date conf d
   | [] ->
       DateDisplay.string_of_date_aux conf ~sep:(Adef.safe "<br>") d |> safe_val
   | _ -> raise Not_found
