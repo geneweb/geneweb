@@ -449,6 +449,11 @@ let add_linked_files gen from s some_linked_files =
           Option.fold (String.index_opt b '/') ~some:(String.sub b 0) ~none:b
         in
         let fname =
+          Option.fold
+            (String.index_opt fname '#')
+            ~some:(String.sub fname 0) ~none:fname
+        in
+        let fname =
           Option.value ~default:fname (List.assoc_opt fname gen.notes_alias)
         in
         let new_linked_files =
