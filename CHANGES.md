@@ -33,6 +33,11 @@
   Use `--plugins u:...`, `--plugins f:...`, `--plugins uf:...` for the same
   effect (#2594).
 
+## Build system
+The camlp5 dependency has been removed. The GEDCOM date grammar and the stream
+parsers of `ged2gwb`, its last remaining users, have been rewritten in plain
+OCaml (#2927).
+
 # GeneWeb version 7.1.0~beta2
 After 20 months of development, this release represents a major evolution of
 GeneWeb with over 1000 commits and 300 merged pull requests. The work has been

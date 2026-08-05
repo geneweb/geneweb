@@ -24,7 +24,6 @@
     (alcotest :with-test)
     benchmark
     (calendars (>= "2.0.0"))
-    (camlp5 (>= "8.03.00"))
     camlp-streams
     decompress
     fmt
