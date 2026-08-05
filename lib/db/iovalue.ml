@@ -57,6 +57,7 @@ let rec input_loop ifuns ic =
     let () = assert (Sys.word_size = 64) in
     Obj.magic (input_binary_int64 ifuns ic)
   else if code = code_BLOCK32 then
+    (* WARNING should be masked to 32 bits or aligned with writer/marshall *)
     let header = ifuns.input_binary_int ic in
     Obj.magic (input_block ifuns ic (header land 0xff) (header lsr 10))
   else if code = code_BLOCK64 then

@@ -117,7 +117,7 @@ module Make (W : Word.S) = struct
     let qm, rm = eucl i (1 lsl 20) in
     let qk, rk = eucl rm (1 lsl 10) in
     if qm > 0 then Fmt.pf ppf "%d Mio" qm
-    else if qk > 0 then Fmt.pf ppf "%d Kio" rk
+    else if qk > 0 then Fmt.pf ppf "%d Kio" qk
     else Fmt.pf ppf "%d o" rk
 
   let pp_statistics ppf t =

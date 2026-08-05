@@ -438,6 +438,26 @@ let safe_rename src dst =
     Filesystem.copy_file src dst;
     Mutil.rm src
 
+let test_size bname =
+  (* Final size check for large bases (e.g. Roglo). Positions in the base
+     file are unsigned 32-bit integers (see lib/db/position.mli): writing
+     past 4 GiB raises Position.Overflow and no base is created. Warn at
+     90% of that limit. *)
+  let base_file = Filename.concat bname "base" in
+  let sz = (Unix.LargeFile.stat base_file).Unix.LargeFile.st_size in
+  let limit =
+    0x1_0000_0000L
+    (* 2^32 *)
+  in
+  if Int64.compare sz (Int64.div (Int64.mul limit 9L) 10L) > 0 then
+    Printf.eprintf
+      "Warning: %s is %Ld bytes (%.1f%% of the 4 GiB limit of 32-bit positions \
+       in format GnWb0024).\n\
+       A wider position format will be required soon.\n\
+       %!"
+      base_file sz
+      (100. *. Int64.to_float sz /. Int64.to_float limit)
+
 let output base =
   (* create database directory *)
   let bname = base.data.bdir in
@@ -625,4 +645,6 @@ let output base =
   Mutil.rm (Filename.concat bname "nb_persons");
   (* FIXME: should not be present in this part of the code? *)
   Mutil.rm (Filename.concat bname "tstab");
-  Mutil.rm (Filename.concat bname "tstab_visitor")
+  Mutil.rm (Filename.concat bname "tstab_visitor");
+  (* final test against 4Go size limit *)
+  test_size bname
