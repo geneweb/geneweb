@@ -66,42 +66,43 @@ let in_file = ref ""
 let print_location pos =
   Printf.fprintf !log_oc "File \"%s\", line %d:\n" !in_file pos
 
-let rec skip_eol =
-  parser
-  | [< ''\010' | '\013'; _ = skip_eol >] -> ()
-  | [< >] -> ()
+let rec skip_eol (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+  | Some ('\010' | '\013') -> Stream.junk strm__; skip_eol strm__
+  | _ -> ()
 
-let rec get_to_eoln len =
-  parser
-  | [< ''\010' | '\013'; _ = skip_eol >] -> Buff.get len
-  | [< ''\t'; s >] -> get_to_eoln (Buff.store len ' ') s
-  | [< 'c; s >] -> get_to_eoln (Buff.store len c) s
-  | [< >] -> Buff.get len
+let rec get_to_eoln len (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+  | Some ('\010' | '\013') -> Stream.junk strm__; skip_eol strm__; Buff.get len
+  | Some '\t' -> Stream.junk strm__; get_to_eoln (Buff.store len ' ') strm__
+  | Some c -> Stream.junk strm__; get_to_eoln (Buff.store len c) strm__
+  | None -> Buff.get len
 
-let rec skip_to_eoln =
-  parser
-  | [< ''\010' | '\013'; _ = skip_eol >] -> ()
-  | [< '_; s >] -> skip_to_eoln s
-  | [< >] -> ()
+let rec skip_to_eoln (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+  | Some ('\010' | '\013') -> Stream.junk strm__; skip_eol strm__
+  | Some _ -> Stream.junk strm__; skip_to_eoln strm__
+  | None -> ()
 
 let eol_chars = ['\010'; '\013']
 
-let rec get_ident len =
-  parser
-  | [< '' ' | '\t' >] -> Buff.get len
-  | [< 'c when not (List.mem c eol_chars); s >] ->
-      get_ident (Buff.store len c) s
-  | [< >] -> Buff.get len
+let rec get_ident len (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+  | Some (' ' | '\t') -> Stream.junk strm__; Buff.get len
+  | Some c when not (List.mem c eol_chars) ->
+      Stream.junk strm__; get_ident (Buff.store len c) strm__
+  | _ -> Buff.get len
 
-let skip_space =
-  parser
-  | [< '' ' | '\t' >] -> ()
-  | [< >] -> ()
+let skip_space (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+  | Some (' ' | '\t') -> Stream.junk strm__
+  | _ -> ()
 
-let rec line_start num =
-  parser
-  | [< '' '; s >] -> line_start num s
-  | [< 'x when x = num >] -> ()
+let rec line_start num (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+  | Some ' ' -> Stream.junk strm__; line_start num strm__
+  | Some x when x = num -> Stream.junk strm__
+  | _ -> raise Stream.Failure
 
 let ascii_of_msdos s =
   let conv_char i =
@@ -254,30 +255,42 @@ let utf8_of_string s =
   | MacIntosh -> Mutil.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
   | Utf8 -> s
 
-let rec get_lev n =
-  parser
-    [< _ = line_start n; _ = skip_space; r1 = get_ident 0; strm >] ->
-      let (rlab, rval, rcont, l) =
-        if String.length r1 > 0 && r1.[0] = '@' then parse_address n r1 strm
-        else parse_text n r1 strm
-      in
-      {rlab = rlab; rval = utf8_of_string rval;
-       rcont = utf8_of_string rcont; rsons = List.rev l; rpos = !line_cnt;
-       rused = false}
-and parse_address n r1 =
-  parser
-    [< r2 = get_ident 0; r3 = get_to_eoln 0 (* ? "get to eoln" *);
-       l = get_lev_list [] (Char.chr (Char.code n + 1)) (* ? "get lev list" *) >] ->
-      (r2, r1, r3, l)
-and parse_text n r1 =
-  parser
-    [< r2 = get_to_eoln 0;
-       l = get_lev_list [] (Char.chr (Char.code n + 1)) (* ? "get lev list" *) >] ->
-      (r1, r2, "", l)
-and get_lev_list l n =
-  parser
-  | [< x = get_lev n; s >] -> get_lev_list (x :: l) n s
-  | [< >] -> l
+let rec get_lev n (strm__ : _ Stream.t) =
+  line_start n strm__;
+  let () =
+    try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
+  in
+  let r1 =
+    try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+  in
+  let (rlab, rval, rcont, l) =
+    if String.length r1 > 0 && r1.[0] = '@' then parse_address n r1 strm__
+    else parse_text n r1 strm__
+  in
+  {rlab = rlab; rval = utf8_of_string rval;
+   rcont = utf8_of_string rcont; rsons = List.rev l; rpos = !line_cnt;
+   rused = false}
+and parse_address n r1 (strm__ : _ Stream.t) =
+  let r2 = get_ident 0 strm__ in
+  let r3 =
+    try get_to_eoln 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+  in
+  let l =
+    try get_lev_list [] (Char.chr (Char.code n + 1)) strm__
+    with Stream.Failure -> raise (Stream.Error "")
+  in
+  (r2, r1, r3, l)
+and parse_text n r1 (strm__ : _ Stream.t) =
+  let r2 = get_to_eoln 0 strm__ in
+  let l =
+    try get_lev_list [] (Char.chr (Char.code n + 1)) strm__
+    with Stream.Failure -> raise (Stream.Error "")
+  in
+  (r1, r2, "", l)
+and get_lev_list l n (strm__ : _ Stream.t) =
+  match (try Some (get_lev n strm__) with Stream.Failure -> None) with
+  | Some x -> get_lev_list (x :: l) n strm__
+  | _ -> l
 
 (* Error *)
 
@@ -318,16 +331,16 @@ let warning_month_number_dates () =
   | _ -> ()
 
 (* Decoding fields *)
-let rec skip_spaces =
-  parser
-  | [< '' '; s >] -> skip_spaces s
-  | [< >] -> ()
-let rec ident_slash len =
-  parser
-  | [< ''/' >] -> Buff.get len
-  | [< ''\t'; a = ident_slash (Buff.store len ' ') >] -> a
-  | [< 'c; a = ident_slash (Buff.store len c) >] -> a
-  | [< >] -> Buff.get len
+let rec skip_spaces (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+  | Some ' ' -> Stream.junk strm__; skip_spaces strm__
+  | _ -> ()
+let rec ident_slash len (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+  | Some '/' -> Stream.junk strm__; Buff.get len
+  | Some '\t' -> Stream.junk strm__; ident_slash (Buff.store len ' ') strm__
+  | Some c -> Stream.junk strm__; ident_slash (Buff.store len c) strm__
+  | None -> Buff.get len
 
 let strip c str =
   let start =
@@ -351,14 +364,22 @@ let strip c str =
 let strip_spaces = strip ' '
 let strip_newlines = strip '\n'
 
-let parse_name =
-  parser
-    [< _ = skip_spaces;
-       invert =
-       (parser
-       | [< ''/' >] -> true
-       | [< >] -> false) ;
-       f = ident_slash 0; _ = skip_spaces; s = ident_slash 0 >] ->
+let parse_name (strm__ : _ Stream.t) =
+  skip_spaces strm__;
+  let invert =
+    match Stream.peek strm__ with
+    | Some '/' -> Stream.junk strm__; true
+    | _ -> false
+  in
+  let f =
+    try ident_slash 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+  in
+  let () =
+    try skip_spaces strm__ with Stream.Failure -> raise (Stream.Error "")
+  in
+  let s =
+    try ident_slash 0 strm__ with Stream.Failure -> raise (Stream.Error "")
+  in
   let (f, s) = if invert then (s, f) else (f, s) in
   let f = strip_spaces f in
   let s = strip_spaces s in
@@ -386,67 +407,69 @@ let rec find_field_with_value lab v =
       else find_field_with_value lab v rl
   | [] -> false
 
-let rec lexing_date =
-  parser
-  | [< ''0'..'9' as c; n = number (Buff.store 0 c) >] -> ("INT", n)
-  | [< ''A'..'Z' as c; i = ident (Buff.store 0 c) >] -> ("ID", i)
-  | [< ''('; len = text 0 >] -> ("TEXT", Buff.get len)
-  | [< ''.' >] -> ("", ".")
-  | [< '' ' | '\t' | '\013'; s >] -> lexing_date s
-  | [< _ = Stream.empty >] -> ("EOI", "")
-  | [< 'x >] -> ("", String.make 1 x)
-and number len =
-  parser
-  | [< ''0'..'9' as c; a = number (Buff.store len c) >] -> a
-  | [< >] -> Buff.get len
-and ident len =
-  parser
-  | [< ''A'..'Z' as c; a = ident (Buff.store len c) >] -> a
-  | [< >] -> Buff.get len
-and text len =
-  parser
-  | [< '')' >] -> len
-  | [< ''('; len = text (Buff.store len '('); s >] ->
-      text (Buff.store len ')') s
-  | [< 'c; s >] -> text (Buff.store len c) s
-  | [< >] -> len
 
-let make_date_lexing s = Stream.from (fun _ -> Some (lexing_date s))
+type tok =
+  | INT of string
+  | ID of string
+  | TEXT of string
+  | SYM of char
+  | EOI
 
-let tparse = Token.default_match
+let lex (s : string) : tok list =
+  let n = String.length s in
+  let buf = Buffer.create 16 in
+  let rec skip i =
+    if i < n then (match s.[i] with ' ' | '\t' | '\r' -> skip (i + 1) | _ -> i)
+    else i
+  in
+  let read_text i =
+    Buffer.clear buf;
+    let rec loop i =
+      if i >= n then i
+      else
+        match s.[i] with
+        | ')' -> i + 1
+        | '(' ->
+            Buffer.add_char buf '(';
+            let j = loop (i + 1) in
+            Buffer.add_char buf ')';
+            j
+        | c -> Buffer.add_char buf c; loop (i + 1)
+    in
+    let j = loop i in
+    (Buffer.contents buf, j)
+  in
+  let parse_number s i =
+    let j = ref i in
+    while !j < n && s.[!j] >= '0' && s.[!j] <= '9' do incr j done;
+    !j, INT (String.sub s i (!j - i))
+  in 
+  let parse_id s i =
+    let j = ref i in
+    while !j < n && s.[!j] >= 'A' && s.[!j] <= 'Z' do incr j done;
+    !j, ID (String.sub s i (!j - i))
+  in 
+  let rec search i acc =
+    let i = skip i in
+    if i >= n then List.rev (EOI :: acc)
+    else
+      match s.[i] with
+      | '0' .. '9' -> let j, r = parse_number s i in search j (r :: acc)
+      | 'A' .. 'Z' -> let j, r = parse_id s i in search j (r :: acc)
+      | '(' -> let txt, j = read_text (i + 1) in search j (TEXT txt :: acc)
+      | c -> search (i + 1) (SYM c :: acc)
+  in
+  search 0 []
 
-let using_token (p_con, _) =
-  match p_con with
-    "" | "INT" | "ID" | "TEXT" | "EOI" -> ()
-  | _ ->
-      raise
-        (Token.Error
-           ("the constructor \"" ^ p_con ^
-            "\" is not recognized by the lexer"))
-
-let date_lexer =
-  { Token.tok_func =
-      (fun s -> make_date_lexing s
-              ,  { Plexing.Locations.locations = ref [||]
-                 ; overflow = ref true }
-      )
-  ; Token.tok_using = using_token
-  ; Token.tok_removing = (fun _ -> ())
-  ; Token.tok_match = tparse
-  ; Token.tok_text = (fun _ -> "<tok>")
-  ; Token.tok_comm = None
-  ; Token.kwds = Hashtbl.create 301
-  }
+(* camlp5 stream-parser failure discipline, reproduced by hand:
+   Stream.Failure = backtrack (try next alternative);
+   Stream.Error   = committed failure (aborts the parse). *)
 
 type 'a range =
     Begin of 'a
   | End of 'a
   | BeginEnd of 'a * 'a
 
-let date_g = Grammar.gcreate date_lexer
-let date_value = Grammar.Entry.create date_g "date value"
-let date_interval = Grammar.Entry.create date_g "date interval"
-let date_value_recover = Grammar.Entry.create date_g "date value"
 
 let is_roman_int x =
   try let _ = Mutil.arabian_of_roman x in true with Not_found -> false
@@ -454,12 +477,6 @@ let is_roman_int x =
 let start_with_int x =
   try let s = String.sub x 0 1 in let _ = int_of_string s in true with
     _ -> false
-
-let roman_int =
-  let p =
-    parser [< '("ID", x) when is_roman_int x >] -> Mutil.arabian_of_roman x
-  in
-  Grammar.Entry.of_parser date_g "roman int" p
 
 let date_str = ref ""
 
@@ -505,7 +522,8 @@ let make_date n1 n2 n3 =
       {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | Some y, None, None ->
       {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  | _ -> raise (Stream.Error "bad date")
+  (* WARNING, Stream.error "bad date" would introduces a regression *)
+  | _ -> raise Stream.Failure
 
 let recover_date cal = function
   | Adef.Dgreg (d, Dgregorian) ->
@@ -519,182 +537,220 @@ let recover_date cal = function
     Adef.Dgreg (d, cal)
   | d -> d
 
-[@@@ocaml.warning "-27"]
-EXTEND
-  GLOBAL: date_value date_interval date_value_recover;
-  date_value:
-    [ [ d = date_or_text; EOI -> d ] ]
-  ;
-  date_value_recover:
-    [ [ "@"; "#"; ID "DGREGORIAN"; "@"; d = date_value ->
-          recover_date Dgregorian d
-      | "@"; "#"; ID "DJULIAN"; "@"; d = date_value ->
-          recover_date Djulian d
-      | "@"; "#"; ID "DFRENCH"; ID "R"; "@"; d = date_value ->
-          recover_date Dfrench d
-      | "@"; "#"; ID "DHEBREW"; "@"; d = date_value ->
-          recover_date Dhebrew d ] ]
-  ;
-  date_interval:
-    [ [ ID "BEF"; dt = date_or_text; EOI -> End dt
-      | ID "AFT"; dt = date_or_text; EOI -> Begin dt
-      | ID "BET"; dt = date_or_text; ID "AND"; dt1 = date_or_text; EOI ->
-          BeginEnd (dt, dt1)
-      | ID "TO"; dt = date_or_text; EOI -> End dt
-      | ID "FROM"; dt = date_or_text; EOI -> Begin dt
-      | ID "FROM"; dt = date_or_text; ID "TO"; dt1 = date_or_text; EOI ->
-          BeginEnd (dt, dt1)
-      | dt = date_or_text; EOI -> Begin dt ] ]
-  ;
-  date_or_text:
-    [ [ dr = date_range ->
-          begin match dr with
-          | Begin (d, cal) -> Dgreg ({d with prec = After}, cal)
-          | End (d, cal) -> Dgreg ({d with prec = Before}, cal)
-          | BeginEnd ((d1, cal1), (d2, cal2)) ->
-              let dmy2 =
-                match cal2 with
-                | Dgregorian ->
-                    {Adef.day2 = d2.day; month2 = d2.month;
-                     year2 = d2.year; delta2 = 0}
-                | Djulian ->
-                    let dmy2 = Calendar.julian_of_gregorian d2 in
-                    {day2 = dmy2.day; month2 = dmy2.month;
-                     year2 = dmy2.year; delta2 = 0}
-                | Dfrench ->
-                    let dmy2 = Calendar.french_of_gregorian d2 in
-                    {day2 = dmy2.day; month2 = dmy2.month;
-                     year2 = dmy2.year; delta2 = 0}
-                | Dhebrew ->
-                    let dmy2 = Calendar.hebrew_of_gregorian d2 in
-                    {day2 = dmy2.day; month2 = dmy2.month;
-                     year2 = dmy2.year; delta2 = 0}
-              in
-              Dgreg ({d1 with prec = YearInt dmy2}, cal1) end
-      | (d, cal) = date -> Dgreg (d, cal)
-      | s = TEXT -> Dtext s ] ]
-  ;
-  date_range:
-    [ [ ID "BEF"; dt = date -> End dt
-      | ID "AFT"; dt = date -> Begin dt
-      | ID "BET"; dt = date; ID "AND"; dt1 = date -> BeginEnd (dt, dt1)
-      | ID "TO"; dt = date -> End dt
-      | ID "FROM"; dt = date -> Begin dt
-      | ID "FROM"; dt = date; ID "TO"; dt1 = date -> BeginEnd (dt, dt1) ] ]
-  ;
-  date:
-    [ [ ID "ABT"; (d, cal) = date_calendar -> ({(d) with prec = About}, cal)
-      | ID "ENV"; (d, cal) = date_calendar -> ({(d) with prec = About}, cal)
-      | ID "EST"; (d, cal) = date_calendar -> ({(d) with prec = Maybe}, cal)
-      | ID "AFT"; (d, cal) = date_calendar -> ({(d) with prec = Before}, cal)
-      | ID "BEF"; (d, cal) = date_calendar -> ({(d) with prec = After}, cal)
-      | (d, cal) = date_calendar -> (d, cal) ] ]
-  ;
-  date_calendar:
-    [ [ "@"; "#"; ID "DGREGORIAN"; "@"; d = date_greg -> (d, Dgregorian)
-      | "@"; "#"; ID "DJULIAN"; "@"; d = date_greg ->
-          (Calendar.gregorian_of_julian d, Djulian)
-      | "@"; "#"; ID "DFRENCH"; ID "R"; "@"; d = date_fren ->
-          (Calendar.gregorian_of_french d, Dfrench)
-      | "@"; "#"; ID "DHEBREW"; "@"; d = date_hebr ->
-          (Calendar.gregorian_of_hebrew d, Dhebrew)
-      | d = date_greg -> (d, Dgregorian) ] ]
-  ;
-  date_greg:
-    [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." | "/" ]; n2 = OPT gen_month;
-        LIST0 [ "." | "/" ]; n3 = OPT int; LIST0 "." ->
-          make_date n1 n2 n3 ] ]
-  ;
-  date_fren:
-    [ [ LIST0 "."; n1 = int; (n2, n3) = date_fren_kont ->
-          make_date (Some n1) n2 n3
-      | LIST0 "."; n1 = year_fren -> make_date (Some n1) None None
-      | LIST0 "."; (n2, n3) = date_fren_kont -> make_date None n2 n3 ] ]
-  ;
-  date_fren_kont:
-    [ [ LIST0 [ "." | "/" ]; n2 = OPT gen_french; LIST0 [ "." | "/" ];
-        n3 = OPT year_fren; LIST0 "." ->
-          (n2, n3) ] ]
-  ;
-  date_hebr:
-    [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." | "/" ]; n2 = OPT gen_hebr;
-        LIST0 [ "." | "/" ]; n3 = OPT int; LIST0 "." ->
-          make_date n1 n2 n3 ] ]
-  ;
-  gen_month:
-    [ [ i = int -> Left (abs i)
-      | m = month -> Right m ] ]
-  ;
-  month:
-    [ [ ID "JAN" -> 1
-      | ID "FEB" -> 2
-      | ID "MAR" -> 3
-      | ID "APR" -> 4
-      | ID "MAY" -> 5
-      | ID "JUN" -> 6
-      | ID "JUL" -> 7
-      | ID "AUG" -> 8
-      | ID "SEP" -> 9
-      | ID "OCT" -> 10
-      | ID "NOV" -> 11
-      | ID "DEC" -> 12 ] ]
-  ;
-  gen_french:
-    [ [ m = french -> Right m ] ]
-  ;
-  french:
-    [ [ ID "VEND" -> 1
-      | ID "BRUM" -> 2
-      | ID "FRIM" -> 3
-      | ID "NIVO" -> 4
-      | ID "PLUV" -> 5
-      | ID "VENT" -> 6
-      | ID "GERM" -> 7
-      | ID "FLOR" -> 8
-      | ID "PRAI" -> 9
-      | ID "MESS" -> 10
-      | ID "THER" -> 11
-      | ID "FRUC" -> 12
-      | ID "COMP" -> 13 ] ]
-  ;
-  year_fren:
-    [ [ i = int -> i
-      | ID "AN"; i = roman_int -> i
-      | i = roman_int -> i ] ]
-  ;
-  gen_hebr:
-    [ [ m = hebr -> Right m ] ]
-  ;
-  hebr:
-    [ [ ID "TSH" -> 1
-      | ID "CSH" -> 2
-      | ID "KSL" -> 3
-      | ID "TVT" -> 4
-      | ID "SHV" -> 5
-      | ID "ADR" -> 6
-      | ID "ADS" -> 7
-      | ID "NSN" -> 8
-      | ID "IYR" -> 9
-      | ID "SVN" -> 10
-      | ID "TMZ" -> 11
-      | ID "AAV" -> 12
-      | ID "ELL" -> 13 ] ]
-  ;
-  int:
-    [ [ i = INT ->
-        (try int_of_string i with Failure _ -> raise Stream.Failure)
-      | "-"; i = INT ->
-        (try (- int_of_string i) with  Failure _ -> raise Stream.Failure)
-      | i = INT; ID "BCE" ->
-        (try (- int_of_string i) with  Failure _ -> raise Stream.Failure)
-      | i = INT; ID "B"; "."; ID "C"; "." ->
-        (try (- int_of_string i) with  Failure _ -> raise Stream.Failure)
-      | i = INT; ID "B"; "."; ID "C" ->
-        (try (- int_of_string i) with  Failure _ -> raise Stream.Failure)
-      ] ]
-  ;
-END
-[@@@ocaml.warning "+27"]
+(* --- Recursive-descent date parser (camlp5-free) ------------------------
+   Transcription of the former EXTEND grammar: one function per entry.
+   make_date / recover_date above are reused unchanged. *)
+
+let opt p toks = try let v, r = p toks in (Some v, r) with Stream.Failure -> (None, toks)
+
+let rec list0_syms syms toks =
+  match toks with
+  | SYM c :: r when List.mem c syms -> list0_syms syms r
+  | _ -> toks
+
+let expect_eoi toks =
+  match toks with EOI :: _ | [] -> () | _ -> raise (Stream.Error "expected EOI")
+
+let p_int toks =
+  let toi i = try int_of_string i with Failure _ -> raise Stream.Failure in
+  match toks with
+  | INT i :: ID "BCE" :: r -> (- toi i, r)
+  | INT i :: ID "B" :: SYM '.' :: ID "C" :: SYM '.' :: r -> (- toi i, r)
+  | INT i :: ID "B" :: SYM '.' :: ID "C" :: r -> (- toi i, r)
+  | INT i :: r -> (toi i, r)
+  | SYM '-' :: INT i :: r -> (- toi i, r)
+  | _ -> raise Stream.Failure
+
+let p_month x =
+  match x with
+  | ID "JAN" :: r -> (1, r) | ID "FEB" :: r -> (2, r) | ID "MAR" :: r -> (3, r)
+  | ID "APR" :: r -> (4, r) | ID "MAY" :: r -> (5, r) | ID "JUN" :: r -> (6, r)
+  | ID "JUL" :: r -> (7, r) | ID "AUG" :: r -> (8, r) | ID "SEP" :: r -> (9, r)
+  | ID "OCT" :: r -> (10, r) | ID "NOV" :: r -> (11, r) | ID "DEC" :: r -> (12, r)
+  | _ -> raise Stream.Failure
+
+let p_french x =
+  match x with
+  | ID "VEND" :: r -> (1, r) | ID "BRUM" :: r -> (2, r) | ID "FRIM" :: r -> (3, r)
+  | ID "NIVO" :: r -> (4, r) | ID "PLUV" :: r -> (5, r) | ID "VENT" :: r -> (6, r)
+  | ID "GERM" :: r -> (7, r) | ID "FLOR" :: r -> (8, r) | ID "PRAI" :: r -> (9, r)
+  | ID "MESS" :: r -> (10, r) | ID "THER" :: r -> (11, r) | ID "FRUC" :: r -> (12, r)
+  | ID "COMP" :: r -> (13, r)
+  | _ -> raise Stream.Failure
+
+let p_hebr x=
+  match x with
+  | ID "TSH" :: r -> (1, r) | ID "CSH" :: r -> (2, r) | ID "KSL" :: r -> (3, r)
+  | ID "TVT" :: r -> (4, r) | ID "SHV" :: r -> (5, r) | ID "ADR" :: r -> (6, r)
+  | ID "ADS" :: r -> (7, r) | ID "NSN" :: r -> (8, r) | ID "IYR" :: r -> (9, r)
+  | ID "SVN" :: r -> (10, r) | ID "TMZ" :: r -> (11, r) | ID "AAV" :: r -> (12, r)
+  | ID "ELL" :: r -> (13, r)
+  | _ -> raise Stream.Failure
+
+let p_roman x =
+  match x with
+  | ID x :: r when is_roman_int x -> (Mutil.arabian_of_roman x, r)
+  | _ -> raise Stream.Failure
+
+let p_gen_month toks =
+  match (p_int toks) with
+  | (i, r) -> (Left (abs i), r)
+  | exception Stream.Failure -> let m, r = p_month toks in (Right m, r)
+
+let p_gen_french toks = let m, r = p_french toks in (Right m, r)
+let p_gen_hebr toks = let m, r = p_hebr toks in (Right m, r)
+
+let p_year_fren toks =
+  match (p_int toks) with
+  | (i, r) -> (i, r)
+  | exception Stream.Failure -> (match toks with ID "AN" :: r -> p_roman r | _ -> p_roman toks)
+
+let p_date_greg toks =
+  let toks = list0_syms [ '.' ] toks in
+  let n1, toks = opt p_int toks in
+  let toks = list0_syms [ '.'; '/' ] toks in
+  let n2, toks = opt p_gen_month toks in
+  let toks = list0_syms [ '.'; '/' ] toks in
+  let n3, toks = opt p_int toks in
+  let toks = list0_syms [ '.' ] toks in
+  (make_date n1 n2 n3, toks)
+
+let p_date_hebr toks =
+  let toks = list0_syms [ '.' ] toks in
+  let n1, toks = opt p_int toks in
+  let toks = list0_syms [ '.'; '/' ] toks in
+  let n2, toks = opt p_gen_hebr toks in
+  let toks = list0_syms [ '.'; '/' ] toks in
+  let n3, toks = opt p_int toks in
+  let toks = list0_syms [ '.' ] toks in
+  (make_date n1 n2 n3, toks)
+
+let p_date_fren_kont toks =
+  let toks = list0_syms [ '.'; '/' ] toks in
+  let n2, toks = opt p_gen_french toks in
+  let toks = list0_syms [ '.'; '/' ] toks in
+  let n3, toks = opt p_year_fren toks in
+  let toks = list0_syms [ '.' ] toks in
+  ((n2, n3), toks)
+
+let p_date_fren toks =
+  let toks = list0_syms [ '.' ] toks in
+  match (p_int toks) with
+  | (n1, r) ->
+      let (n2, n3), r = p_date_fren_kont r in
+      (make_date (Some n1) n2 n3, r)
+  | exception Stream.Failure -> (
+      match (p_year_fren toks) with
+      | (n1, r) -> (make_date (Some n1) None None, r)
+      | exception Stream.Failure -> let (n2, n3), r = p_date_fren_kont toks in (make_date None n2 n3, r))
+
+let p_date_calendar toks =
+  match toks with
+  | SYM '@' :: SYM '#' :: ID "DGREGORIAN" :: SYM '@' :: r ->
+      let d, r = p_date_greg r in ((d, Adef.Dgregorian), r)
+  | SYM '@' :: SYM '#' :: ID "DJULIAN" :: SYM '@' :: r ->
+      let d, r = p_date_greg r in ((Calendar.gregorian_of_julian d, Adef.Djulian), r)
+  | SYM '@' :: SYM '#' :: ID "DFRENCH" :: ID "R" :: SYM '@' :: r ->
+      let d, r = p_date_fren r in ((Calendar.gregorian_of_french d, Adef.Dfrench), r)
+  | SYM '@' :: SYM '#' :: ID "DHEBREW" :: SYM '@' :: r ->
+      let d, r = p_date_hebr r in ((Calendar.gregorian_of_hebrew d, Adef.Dhebrew), r)
+  | _ -> let d, r = p_date_greg toks in ((d, Adef.Dgregorian), r)
+
+(* NB: the AFT->Before / BEF->After mapping is reproduced bug-for-bug from the
+   original grammar (ged2gwb date: rule). *)
+let p_date toks =
+  let withp p r =
+    let (d, cal), r = p_date_calendar r in
+    (({ d with prec = p }, cal), r)
+  in
+  match toks with
+  | ID "ABT" :: r -> withp Adef.About r
+  | ID "ENV" :: r -> withp Adef.About r
+  | ID "EST" :: r -> withp Adef.Maybe r
+  | ID "AFT" :: r -> withp Adef.Before r
+  | ID "BEF" :: r -> withp Adef.After r
+  | _ -> p_date_calendar toks
+
+let p_date_range toks =
+  match toks with
+  | ID "BEF" :: r -> let dt, r = p_date r in (End dt, r)
+  | ID "AFT" :: r -> let dt, r = p_date r in (Begin dt, r)
+  | ID "BET" :: r -> (
+      let dt, r = p_date r in
+      match r with
+      | ID "AND" :: r2 -> let dt1, r2 = p_date r2 in (BeginEnd (dt, dt1), r2)
+      | _ -> raise (Stream.Error "BET without AND"))
+  | ID "TO" :: r -> let dt, r = p_date r in (End dt, r)
+  | ID "FROM" :: r -> (
+      let dt, r = p_date r in
+      match r with
+      | ID "TO" :: r2 -> let dt1, r2 = p_date r2 in (BeginEnd (dt, dt1), r2)
+      | _ -> (Begin dt, r))
+  | _ -> raise Stream.Failure
+
+let p_date_or_text toks =
+  match (p_date_range toks) with
+  | (dr, r) ->
+      let d =
+        match dr with
+        | Begin (d, cal) -> Adef.Dgreg ({ d with prec = Adef.After }, cal)
+        | End (d, cal) -> Adef.Dgreg ({ d with prec = Adef.Before }, cal)
+        | BeginEnd ((d1, cal1), (d2, cal2)) ->
+            let dmy2 =
+              match cal2 with
+              | Dgregorian ->
+                  { Adef.day2 = d2.day; month2 = d2.month; year2 = d2.year; delta2 = 0 }
+              | Djulian ->
+                  let d = Calendar.julian_of_gregorian d2 in
+                  { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+              | Dfrench ->
+                  let d = Calendar.french_of_gregorian d2 in
+                  { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+              | Dhebrew ->
+                  let d = Calendar.hebrew_of_gregorian d2 in
+                  { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+            in
+            Adef.Dgreg ({ d1 with prec = Adef.YearInt dmy2 }, cal1)
+      in
+      (d, r)
+  | exception Stream.Failure -> (
+      match (p_date toks) with
+      | ((d, cal), r) -> (Adef.Dgreg (d, cal), r)
+      | exception Stream.Failure -> (match toks with TEXT s :: r -> (Adef.Dtext s, r) | _ -> raise Stream.Failure))
+
+let p_date_value toks = let d, r = p_date_or_text toks in expect_eoi r; d
+
+let p_date_value_recover toks =
+  match toks with
+  | SYM '@' :: SYM '#' :: ID "DGREGORIAN" :: SYM '@' :: r ->
+      recover_date Adef.Dgregorian (p_date_value r)
+  | SYM '@' :: SYM '#' :: ID "DJULIAN" :: SYM '@' :: r ->
+      recover_date Adef.Djulian (p_date_value r)
+  | SYM '@' :: SYM '#' :: ID "DFRENCH" :: ID "R" :: SYM '@' :: r ->
+      recover_date Adef.Dfrench (p_date_value r)
+  | SYM '@' :: SYM '#' :: ID "DHEBREW" :: SYM '@' :: r ->
+      recover_date Adef.Dhebrew (p_date_value r)
+  | _ -> raise Stream.Failure
+
+let p_date_interval toks =
+  let fin dt r = expect_eoi r; dt in
+  match toks with
+  | ID "BEF" :: r -> let dt, r = p_date_or_text r in End (fin dt r)
+  | ID "AFT" :: r -> let dt, r = p_date_or_text r in Begin (fin dt r)
+  | ID "BET" :: r -> (
+      let dt, r = p_date_or_text r in
+      match r with
+      | ID "AND" :: r2 ->
+          let dt1, r2 = p_date_or_text r2 in expect_eoi r2; BeginEnd (dt, dt1)
+      | _ -> raise (Stream.Error "BET without AND"))
+  | ID "TO" :: r -> let dt, r = p_date_or_text r in End (fin dt r)
+  | ID "FROM" :: r -> (
+      let dt, r = p_date_or_text r in
+      match r with
+      | ID "TO" :: r2 ->
+          let dt1, r2 = p_date_or_text r2 in expect_eoi r2; BeginEnd (dt, dt1)
+      | _ -> expect_eoi r; Begin dt)
+  | _ -> let dt, r = p_date_or_text toks in Begin (fin dt r)
 
 (* Perform a regular expression match. *)
 let preg_match pattern subject =
@@ -704,14 +760,17 @@ let preg_match pattern subject =
 let date_of_field d =
   if d = "" then None
   else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Adef.Dtext d)
-  else
-    let s = Stream.of_string (String.uppercase_ascii d) in
+  else begin
     date_str := d;
-    try Some (Grammar.Entry.parse date_value s) with
-      Ploc.Exc (_, Stream.Error _) ->
-        let s = Stream.of_string (String.uppercase_ascii d) in
-        try Some (Grammar.Entry.parse date_value_recover s) with
-          Ploc.Exc (_, Stream.Error _) -> Some (Dtext d)
+    let toks = lex (String.uppercase_ascii d) in
+    match (try Some (p_date_value toks) with Stream.Failure | Stream.Error _ -> None) with
+    | Some v -> Some v
+    | None ->
+        let toks = lex (String.uppercase_ascii d) in
+        (match (try Some (p_date_value_recover toks) with Stream.Failure | Stream.Error _ -> None) with
+         | Some v -> Some v
+         | None -> Some (Dtext d))
+  end
 
 (* Creating base *)
 
@@ -926,8 +985,8 @@ let capitalize_name = aux Name.title
 let uppercase_name = aux Utf8.uppercase
 
 let get_lev0 (strm__ : _ Stream.t) =
-  let _ = line_start '0' strm__ in
-  let _ =
+  line_start '0' strm__;
+  let () =
     try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
   in
   let r1 =
@@ -1139,13 +1198,12 @@ let purge_list list =
     list []
 
 let decode_date_interval pos s =
-  let strm = Stream.of_string s in
-  try
-    match Grammar.Entry.parse date_interval strm with
-      BeginEnd (d1, d2) -> Some d1, Some d2
-    | Begin d -> Some d, None
-    | End d -> None, Some d
-  with Ploc.Exc (_, _) | Not_found -> print_bad_date pos s; None, None
+  let toks = lex s in
+  match (try Some (p_date_interval toks) with Stream.Failure | Stream.Error _ | Not_found -> None) with
+  | Some (BeginEnd (d1, d2)) -> Some d1, Some d2
+  | Some (Begin d) -> Some d, None
+  | Some (End d) -> None, Some d
+  | None -> print_bad_date pos s; None, None
 
 let treat_indi_title gen public_name r =
   let (title, place, nth) = decode_title r.rval in
@@ -1742,18 +1800,18 @@ let add_indi gen r =
   in
   let aliases =
     match find_all_fields "NAME" r.rsons with
-      _ :: l -> List.map (fun r -> r.rval) l
+    | _ :: l -> List.map (fun r -> r.rval) l
     | _ -> []
   in
   let sex =
     match find_field "SEX" r.rsons with
-      Some {rval = "M"; _} -> Male
+    | Some {rval = "M"; _} -> Male
     | Some {rval = "F"; _} -> Female
     | _ -> Neuter
   in
   let image =
     match find_field "OBJE" r.rsons with
-      Some r ->
+    | Some r ->
       begin match find_field "FILE" r.rsons with
           Some r -> if !no_picture then "" else r.rval
         | None -> ""
@@ -1762,7 +1820,7 @@ let add_indi gen r =
   in
   let parents =
     match find_field "FAMC" r.rsons with
-      Some r -> Some (fam_index gen r.rval)
+    | Some r -> Some (fam_index gen r.rval)
     | None -> None
   in
   (* On ne prend que les professions sans info supplémentaires. *)
@@ -1776,7 +1834,7 @@ let add_indi gen r =
   in
   let notes =
     match find_all_fields "NOTE" r.rsons with
-      [] -> ""
+    | [] -> ""
     | rl -> treat_notes gen rl
   in
   let titles =
@@ -1800,7 +1858,7 @@ let add_indi gen r =
       if godparents = [] then
         let ro =
           match find_field "BAPM" r.rsons with
-            None -> find_field "CHR" r.rsons
+          | None -> find_field "CHR" r.rsons
           | x -> x
         in
         if ro <> None then find_all_rela ["godf"; "godm"; "godp"] rasso
@@ -1811,12 +1869,12 @@ let add_indi gen r =
       if rl <> [] then
         let (r_fath, rl) =
           match rl with
-            ("godf", r) :: rl -> Some (forward_godp gen ip r), rl
+          | ("godf", r) :: rl -> Some (forward_godp gen ip r), rl
           | _ -> None, rl
         in
         let (r_moth, rl) =
           match rl with
-            ("godm", r) :: rl -> Some (forward_godp gen ip r), rl
+          | ("godm", r) :: rl -> Some (forward_godp gen ip r), rl
           | _ -> None, rl
         in
         let (r_fath, r_moth, rl) =
@@ -1824,7 +1882,7 @@ let add_indi gen r =
           else
             let (r_fath, rl) =
               match rl with
-                ("godp", r) :: rl -> Some (forward_godp gen ip r), rl
+              | ("godp", r) :: rl -> Some (forward_godp gen ip r), rl
               | _ -> None, rl
             in
             r_fath, None, rl
@@ -1844,20 +1902,20 @@ let add_indi gen r =
   in
   let (birth, birth_place, (birth_note, _), (birth_src, birth_nt)) =
     match find_field "BIRT" r.rsons with
-      Some r ->
+    | Some r ->
       let d =
         match find_field "DATE" r.rsons with
-          Some r -> date_of_field r.rval
+        | Some r -> date_of_field r.rval
         | _ -> None
       in
       let p =
         match find_field "PLAC" r.rsons with
-          Some r -> strip_spaces r.rval
+        | Some r -> strip_spaces r.rval
         | _ -> ""
       in
       let note =
         match find_all_fields "NOTE" r.rsons with
-          [] -> ""
+        | [] -> ""
         | rl -> treat_notes gen rl
       in
       d, p, (note, []), source gen r
@@ -1866,11 +1924,11 @@ let add_indi gen r =
   let (bapt, bapt_place, (bapt_note, _), (bapt_src, bapt_nt)) =
     let ro =
       match find_field "BAPM" r.rsons with
-        None -> find_field "CHR" r.rsons
+      | None -> find_field "CHR" r.rsons
       | x -> x
     in
     match ro with
-      Some r ->
+    | Some r ->
       let d =
         match find_field "DATE" r.rsons with
           Some r -> date_of_field r.rval
@@ -1878,12 +1936,12 @@ let add_indi gen r =
       in
       let p =
         match find_field "PLAC" r.rsons with
-          Some r -> strip_spaces r.rval
+        | Some r -> strip_spaces r.rval
         | _ -> ""
       in
       let note =
         match find_all_fields "NOTE" r.rsons with
-          [] -> ""
+        | [] -> ""
         | rl -> treat_notes gen rl
       in
       d, p, (note, []), source gen r
@@ -1929,17 +1987,17 @@ let add_indi gen r =
         else
           let d =
             match find_field "DATE" r.rsons with
-              Some r -> date_of_field r.rval
+            | Some r -> date_of_field r.rval
             | _ -> None
           in
           let p =
             match find_field "PLAC" r.rsons with
-              Some r -> strip_spaces r.rval
+            | Some r -> strip_spaces r.rval
             | _ -> ""
           in
           let note =
             match find_all_fields "NOTE" r.rsons with
-              [] -> ""
+            | [] -> ""
             | rl -> treat_notes gen rl
           in
           Buried (Date.cdate_of_od d), p, (note, []), source gen r
@@ -3337,11 +3395,6 @@ let main () =
 let _ =
   try main () with
     e ->
-      let e =
-        match e with
-          Ploc.Exc (_, e) -> e
-        | _ -> e
-      in
       Printf.fprintf !log_oc "Uncaught exception: %s\n"
         (Printexc.to_string e);
       if !log_oc != stdout then close_out !log_oc;
