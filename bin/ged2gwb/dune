@@ -2,14 +2,5 @@
  (package geneweb)
  (name ged2gwb)
  (public_name ged2gwb)
- (preprocess
-  (action
-   (run
-    not-ocamlfind
-    preprocess
-    -package
-    camlp5.quotations,camlp5.pr_o
-    -syntax
-    camlp5o
-    %{input-file})))
- (libraries camlp5 unix str geneweb_db geneweb))
+
+ (libraries unix str geneweb_db geneweb))
