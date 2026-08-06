@@ -8,7 +8,7 @@
     not-ocamlfind
     preprocess
     -package
-    camlp5.extend,camlp5.quotations,camlp5.pr_o
+    camlp5.quotations,camlp5.pr_o
     -syntax
     camlp5o
     %{input-file})))
