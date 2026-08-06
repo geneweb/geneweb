@@ -16,7 +16,7 @@
   unix
   str
   stdlib-shims
-  camlp-streams
+  geneweb_compat
   geneweb_core
   geneweb_def
   geneweb_db

@@ -83,3 +83,62 @@ module String = struct
 
   include String
 end
+
+(* Minimal replacement for the [Stream] module formerly provided by
+   [camlp-streams].  Implements only the subset of the API used by GeneWeb:
+   a single-element look-ahead character/'a stream with a consumed counter.
+   [count] returns the number of elements consumed, matching the semantics
+   relied upon by ged2gwb (byte offset used with [seek_in]). *)
+module Stream = struct
+  exception Failure
+  exception Error of string
+
+  type 'a t = {
+    mutable count : int; (* number of elements consumed so far *)
+    mutable peeked : 'a option; (* look-ahead buffer (not yet consumed) *)
+    mutable eos : bool; (* end of source reached *)
+    pull : int -> 'a option; (* produce element at the given index *)
+  }
+
+  let make pull = { count = 0; peeked = None; eos = false; pull }
+
+  let of_string s =
+    make (fun i -> if i < String.length s then Some s.[i] else None)
+
+  let of_channel ic =
+    make (fun _ ->
+        match input_char ic with c -> Some c | exception End_of_file -> None)
+
+  let from f = make f
+
+  let peek t =
+    match t.peeked with
+    | Some _ as o -> o
+    | None -> (
+        if t.eos then None
+        else
+          match t.pull t.count with
+          | Some _ as o ->
+              t.peeked <- o;
+              o
+          | None ->
+              t.eos <- true;
+              None)
+
+  let junk t =
+    match peek t with
+    | Some _ ->
+        t.peeked <- None;
+        t.count <- t.count + 1
+    | None -> ()
+
+  let next t =
+    match peek t with
+    | Some x ->
+        t.peeked <- None;
+        t.count <- t.count + 1;
+        x
+    | None -> raise Failure
+
+  let count t = t.count
+end

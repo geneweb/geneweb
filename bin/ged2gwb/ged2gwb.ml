@@ -5,6 +5,7 @@ open Def
 
 module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
+module Stream = Geneweb_compat.Stream
 
 type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend

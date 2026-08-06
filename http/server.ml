@@ -8,6 +8,7 @@ let timestamp_tag : unit Logs.Tag.def =
 let timestamp = Logs.Tag.(empty |> add timestamp_tag ())
 
 module Log = (val Logs.src_log src : Logs.LOG)
+module Stream = Geneweb_compat.Stream
 
 type handler = Unix.sockaddr * string list -> string -> string -> unit
 

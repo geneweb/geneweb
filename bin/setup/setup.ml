@@ -2,6 +2,7 @@ open Geneweb
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 module Dirs = Geneweb_dirs
+module Stream = Geneweb_compat.Stream
 
 let ( // ) = Filename.concat
 

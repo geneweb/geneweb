@@ -3,6 +3,7 @@
 open Config
 open Util
 module Driver = Geneweb_db.Driver
+module Stream = Geneweb_compat.Stream
 
 type counter = {
   mutable welcome_cnt : int;

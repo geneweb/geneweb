@@ -2,5 +2,4 @@
  (package geneweb)
  (name ged2gwb)
  (public_name ged2gwb)
-
- (libraries unix str geneweb_db geneweb))
+ (libraries unix str geneweb_db geneweb geneweb_compat))

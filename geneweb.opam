@@ -18,7 +18,6 @@ depends: [
   "alcotest" {with-test}
   "benchmark"
   "calendars" {>= "2.0.0"}
-  "camlp-streams"
   "decompress"
   "fmt"
   "logs"

@@ -10,7 +10,6 @@
   benchmark,
   calendars,
   dune-site,
-  camlp-streams,
   decompress,
   fmt,
   logs,
@@ -65,7 +64,6 @@ buildDunePackage {
     benchmark
     calendars
     dune-site
-    camlp-streams
     decompress
     fmt
     logs

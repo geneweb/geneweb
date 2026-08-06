@@ -8,6 +8,7 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Stream = Geneweb_compat.Stream
 
 let cp = Filesystem.copy_file ~perm:0o666
 

@@ -1,5 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+module Stream = Geneweb_compat.Stream
+
 type handler = Unix.sockaddr * string list -> string -> string -> unit
 
 val timestamp_tag : unit Logs.Tag.def

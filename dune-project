@@ -24,7 +24,6 @@
     (alcotest :with-test)
     benchmark
     (calendars (>= "2.0.0"))
-    camlp-streams
     decompress
     fmt
     logs
@@ -67,7 +66,6 @@
   (synopsis "Geneweb library for HTTP support")
   (depends
     ocaml
-    camlp-streams
     geneweb-compat
     logs
     fmt))

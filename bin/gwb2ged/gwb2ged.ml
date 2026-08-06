@@ -1,4 +1,5 @@
 module Driver = Geneweb_db.Driver
+module Stream = Geneweb_compat.Stream
 
 let with_indexes = ref false
 

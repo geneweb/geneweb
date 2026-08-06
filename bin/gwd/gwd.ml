@@ -10,6 +10,7 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Dirs = Geneweb_dirs
 module Registration = Geneweb_register.Registration
+module Stream = Geneweb_compat.Stream
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 module Compat = Geneweb_compat

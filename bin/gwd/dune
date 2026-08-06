@@ -28,6 +28,7 @@
  (public_name gwd)
  (libraries
   dynlink
+  geneweb_compat
   geneweb
   geneweb_http
   geneweb_register
