@@ -10,16 +10,15 @@ let string_of_title ?(safe = false) ?(link = true) conf base
   let acc = safe_html (tit ^ " " ^ est) in
   let href place s =
     if link then
-      let href =
-        let open Def in
-        "m=TT&sm=S&t="
-        ^<^ Mutil.encode (Gwdb.sou base title)
-        ^^^ "&p="
-        ^<^ Mutil.encode (Gwdb.sou base place)
+      let query =
+        [
+          ("m", "TT");
+          ("sm", "S");
+          ("t", Gwdb.sou base title);
+          ("p", Gwdb.sou base place);
+        ]
       in
-      Util.geneweb_link conf
-        (href : Adef.encoded_string :> Adef.escaped_string)
-        s
+      Util.geneweb_link conf ~query s
     else s
   in
   let acc = href (List.hd places) acc in
@@ -3409,11 +3408,15 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some sosa ->
           Option.map
             (fun sosa_ref ->
-              Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
-                (Gwdb.string_of_iper (Gwdb.get_iper p))
-                (Gwdb.string_of_iper (Gwdb.get_iper sosa_ref))
-                (Sosa.to_string sosa)
-              |> str_val)
+              [
+                ("m", "RL");
+                ("i1", Gwdb.string_of_iper (Gwdb.get_iper p));
+                ("i2", Gwdb.string_of_iper (Gwdb.get_iper sosa_ref));
+                ("b1", "1");
+                ("b2", Sosa.to_string sosa);
+              ]
+              |> List.map (fun (k, v) -> (k, [ v ]))
+              |> Ext_uri.encoded_of_query |> str_val)
             (get_sosa_ref env)
           |> Option.value ~default:null_val
       | None -> null_val)

@@ -761,7 +761,7 @@ let one_title_text base t : Adef.safe_string =
   let open Def in
   ", <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
 
-let geneweb_link ?id ?style conf (href : Adef.escaped_string)
+let geneweb_link ?id ?style conf ~(query : (string * string) list)
     (s : Adef.safe_string) =
   let extra_html_attributes =
     let optional_html_attribute ~key ~value =
@@ -776,12 +776,12 @@ let geneweb_link ?id ?style conf (href : Adef.escaped_string)
          [ ("id", id); ("style", style) ])
   in
   let open Def in
-  "<a " ^<^ extra_html_attributes ^<^ " href=\"" ^<^ commd_prefix conf
-  ^<^ (href :> Adef.safe_string)
-  ^^^ "\">" ^<^ s ^>^ "</a>"
+  "<a " ^<^ extra_html_attributes ^<^ " href=\""
+  ^<^ Localized_url.to_string (commd' ~query conf)
+  ^<^ "\">" ^<^ s ^>^ "</a>"
 
-let wprint_geneweb_link conf href s =
-  Output.print_string conf (geneweb_link conf href s)
+let wprint_geneweb_link conf ~query s =
+  Output.print_string conf (geneweb_link conf ~query s)
 
 (* ************************************************************************* *)
 (*  [Fonc] update_family_loop : config -> base -> person -> string -> string *)

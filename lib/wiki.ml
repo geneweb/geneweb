@@ -163,7 +163,7 @@ let syntax_links conf base wi s =
           let t =
             let identity_link () =
               Adef.as_string
-              @@ Util.geneweb_link ~style:"color:red" conf (Adef.escaped "")
+              @@ Util.geneweb_link ~style:"color:red" conf ~query:[]
                    (* TODO how do we know this person is private here?
                       TODO should be is_hidden (?) *)
                    (Adef.safe
@@ -183,8 +183,7 @@ let syntax_links conf base wi s =
                   @@ Util.geneweb_link ?style
                        ~id:(Printf.sprintf "p_%d" pos)
                        conf
-                       (Adef.escaped @@ Ext_uri.encoded_of_query
-                       @@ Util.acces' conf base person)
+                       ~query:(Util.acces conf base person)
                        (name |> escape |> Adef.safe)
             in
             if wi.wi_person_exists (fn, sn, oc) then profile_page_link ()

@@ -512,8 +512,7 @@ let print_one_branch ~exact conf base bh psn =
     Output.print_sstring conf "<li>";
     if Person.is_empty p then Output.print_sstring conf "&lt;&lt;"
     else
-      Util.wprint_geneweb_link conf
-        (Adef.escaped @@ Ext_uri.encoded_of_query @@ Util.acces' conf base p)
+      Util.wprint_geneweb_link conf ~query:(Util.acces conf base p)
         (Adef.safe "&lt;&lt;");
     Output.print_sstring conf "<ul>";
     List.iter
@@ -675,9 +674,8 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   in
   let list = List.sort compare list in
   let access txt sn =
-    let open Def in
     Util.geneweb_link conf
-      ("m=N&v=" ^<^ Mutil.encode sn ^>^ "&t=N" :> Adef.escaped_string)
+      ~query:[ ("m", "N"); ("v", sn); ("t", "N") ]
       (Util.escape_html txt :> Adef.safe_string)
   in
   Util.wprint_in_columns conf
@@ -755,10 +753,8 @@ let print_family_alphabetic x conf base liste =
             if List.length homonymes = 1 then
               (Util.escape_html (Utf8.uppercase x) :> Adef.safe_string)
             else
-              let open Def in
               Util.geneweb_link conf
-                ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
-                  :> Adef.escaped_string)
+                ~query:[ ("m", "N"); ("o", "i"); ("v", x); ("t", "A") ]
                 (Util.escape_html (Utf8.uppercase x) :> Adef.safe_string)
           in
           Ext_list.iter_first
