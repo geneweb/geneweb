@@ -625,17 +625,4 @@ let output base =
   Mutil.rm (Filename.concat bname "nb_persons");
   (* FIXME: should not be present in this part of the code? *)
   Mutil.rm (Filename.concat bname "tstab");
-  Mutil.rm (Filename.concat bname "tstab_visitor");
-  (* final check for large bases (Roglo!) *)
-  let base_file = Filename.concat bname "base" in
-  let sz = (Unix.LargeFile.stat base_file).Unix.LargeFile.st_size in
-  let ceiling = 0x1_0000_0000L in
-  (* 2^32 = 4 294 967 296 *)
-  if Int64.compare sz (Int64.div (Int64.mul ceiling 9L) 10L) > 0 then
-    Printf.eprintf
-      "ATTENTION : %s = %Ld octets (%.1f %% du plafond de 4 Go des positions \
-       32 bits).\n\
-       Prévoir le passage au format GnWb0025 (positions sur 8 octets).\n\
-       %!"
-      base_file sz
-      (100. *. Int64.to_float sz /. Int64.to_float ceiling)
+  Mutil.rm (Filename.concat bname "tstab_visitor")
