@@ -37,7 +37,7 @@ type gw_syntax =
         * string
         * string
         * string
-        * (somebody * sex * witness_kind) list)
+        * (somebody * sex * witness_kind * string) list)
         list
       * ( (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) gen_person,
           Geneweb_db.Driver.ifam,
@@ -72,7 +72,7 @@ type gw_syntax =
         * string
         * string
         * string
-        * (somebody * sex * witness_kind) list)
+        * (somebody * sex * witness_kind * string) list)
         list
       (** Block that defines events of a person. Specific to gwplus format.
           Contains:

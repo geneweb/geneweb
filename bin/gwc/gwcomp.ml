@@ -36,7 +36,7 @@ type gw_syntax =
         * string
         * string
         * string
-        * (somebody * sex * witness_kind) list)
+        * (somebody * sex * witness_kind * string) list)
         list
       * ( (Driver.iper, Driver.iper, string) gen_person,
           Driver.ifam,
@@ -70,7 +70,7 @@ type gw_syntax =
         * string
         * string
         * string
-        * (somebody * sex * witness_kind) list)
+        * (somebody * sex * witness_kind * string) list)
         list
       (** Block that defines events of a person. Specific to gwplus format.
           Contains:
@@ -1106,6 +1106,27 @@ let loop_note line ic =
   in
   loop_note [] line
 
+(** Read succesive witness note lines (starting with "wnote") and concat them.
+*)
+let loop_witness_note line ic =
+  let rec loop acc str =
+    match fields str with
+    | "wnote" :: tl ->
+        let note =
+          if tl = [] then ""
+          else
+            String.sub str
+              (String.length "wnote" + 1)
+              (String.length str - String.length "wnote" - 1)
+        in
+        loop (note :: acc) (input_a_line ic)
+    | _ ->
+        ( Mutil.strip_all_trailing_spaces
+            (String.concat "\n" (List.rev @@ ("" :: acc))),
+          str )
+  in
+  loop [] line
+
 (** Parse witnesses across the lines and returns list of [(wit,wsex,wk)] where
     wit is a witness definition/reference, [wsex] is a sex of witness and [wk]
     is a kind of witness relationship to the family. *)
@@ -1122,7 +1143,9 @@ let loop_witn ~bname line ic =
         let wkind, l = get_event_witness_kind l in
         let wk, _, l = parse_parent ~bname str l in
         if l <> [] then failwith str;
-        loop_witn ((wk, sex, wkind) :: acc) (input_a_line ic)
+        (* read witness note which starts on the following line(s) *)
+        let wnote, str = loop_witness_note (input_a_line ic) ic in
+        loop_witn ((wk, sex, wkind, wnote) :: acc) str
     | _ -> (List.rev acc, str)
   in
   loop_witn [] line
