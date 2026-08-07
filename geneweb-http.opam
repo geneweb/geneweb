@@ -10,7 +10,6 @@ bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "dune" {>= "3.11"}
   "ocaml"
-  "camlp-streams"
   "geneweb-compat"
   "logs"
   "fmt"
