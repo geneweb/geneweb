@@ -700,7 +700,7 @@ val array_mem_witn :
   Config.config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.iper ->
-  (Geneweb_db.Driver.iper * Def.witness_kind) array ->
+  (Geneweb_db.Driver.iper * Def.witness_kind * Geneweb_db.Driver.istr) array ->
   Adef.safe_string option
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array] and returns
     corresponding [string_of_witness_kind] if so. *)

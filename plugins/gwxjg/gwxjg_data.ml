@@ -447,18 +447,20 @@ and mk_event conf base d =
     | [||] -> Tarray [||]
     | w ->
         let lw =
-          lazy (Array.map (fun (i, _) -> get_n_mk_person conf base i) w)
+          lazy (Array.map (fun (i, _, _) -> get_n_mk_person conf base i) w)
         in
         (* We may want to filter on [ip] or [k] before really accessing the person entity *)
         Tarray
           (Array.mapi
-             (fun i (ip, k) ->
+             (fun i (ip, k, wnote) ->
                let kind = mk_witness_kind k in
                let iper = Tstr (Driver.Iper.to_string ip) in
+               let wnote = Tsafe (Driver.sou base wnote) in
                Tpat
                  (function
                  | "kind" -> kind
                  | "iper" -> iper
+                 | "wnote" -> wnote
                  | s -> unbox_pat (Lazy.force lw).(i) @@ s))
              w)
   in

@@ -4,7 +4,7 @@ val reconstitute_from_fevents :
   ('person, 'string) Def.gen_fam_event list ->
   (Def.relation_kind * Adef.cdate * 'string * 'string * 'string)
   * Def.divorce
-  * ('person * Def.witness_kind) array
+  * ('person * Def.witness_kind * 'string) array
 (** [reconstitute_from_fevents nsck empty_string family_events] Iterate over
     family's events and returns a tuple with:
 

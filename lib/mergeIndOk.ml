@@ -355,14 +355,14 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
               let e, mod_pc, p_related, mod_p =
                 let witnesses, mod_p, p_related =
                   List.fold_right
-                    (fun (ip, k) (witnesses, mod_p, p_related) ->
+                    (fun (ip, k, n) (witnesses, mod_p, p_related) ->
                       if ip = ip2 then
                         let p_related, mod_p =
                           if List.mem ipc p_related then (p_related, mod_p)
                           else (ipc :: p_related, true)
                         in
-                        ((p.key_index, k) :: witnesses, mod_p, p_related)
-                      else ((ip, k) :: witnesses, mod_p, p_related))
+                        ((p.key_index, k, n) :: witnesses, mod_p, p_related)
+                      else ((ip, k, n) :: witnesses, mod_p, p_related))
                     (Array.to_list e.epers_witnesses)
                     ([], mod_pc, p_related)
                 in
@@ -415,9 +415,10 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                             (p_related, mod_p)
                           else
                             let p_related, mod_p =
-                              if fst e.efam_witnesses.(j) = ip2 then (
-                                let _, wk = e.efam_witnesses.(j) in
-                                e.efam_witnesses.(j) <- (p.key_index, wk);
+                              let wip, _, _ = e.efam_witnesses.(j) in
+                              if wip = ip2 then (
+                                let _, wk, wn = e.efam_witnesses.(j) in
+                                e.efam_witnesses.(j) <- (p.key_index, wk, wn);
                                 if List.mem ipc p_related then (p_related, mod_p)
                                 else (ipc :: p_related, true))
                               else (p_related, mod_p)
@@ -464,7 +465,7 @@ let redirect_added_families base p ip2 p2_family =
         List.iter
           (fun evt ->
             Array.iter
-              (fun (ip, _) ->
+              (fun (ip, _, _) ->
                 let w = Driver.poi base ip in
                 if not (List.mem p.key_index (Driver.get_related w)) then
                   let w = Driver.gen_person_of_person w in
