@@ -5,6 +5,7 @@ open Def
 
 module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
+
 module Stream = Geneweb_compat.Stream
 
 type person = (int, int, int) Def.gen_person
@@ -264,10 +265,9 @@ let rec get_lev n (strm__ : _ Stream.t) =
   let r1 =
     try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
   in
-  let strm = strm__ in
   let (rlab, rval, rcont, l) =
-    if String.length r1 > 0 && r1.[0] = '@' then parse_address n r1 strm
-    else parse_text n r1 strm
+    if String.length r1 > 0 && r1.[0] = '@' then parse_address n r1 strm__
+    else parse_text n r1 strm__
   in
   {rlab = rlab; rval = utf8_of_string rval;
    rcont = utf8_of_string rcont; rsons = List.rev l; rpos = !line_cnt;
@@ -463,10 +463,8 @@ let lex (s : string) : tok list =
   go 0 []
 
 (* camlp5 stream-parser failure discipline, reproduced by hand:
-   Fail  = Stream.Failure (backtrack, try next alternative);
-   Error = Stream.Error   (committed failure, aborts the parse). *)
-exception Fail
-exception Error of string
+   Stream.Failure = backtrack (try next alternative);
+   Stream.Error   = committed failure (aborts the parse). *)
 
 type 'a range =
     Begin of 'a
@@ -525,7 +523,7 @@ let make_date n1 n2 n3 =
       {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | Some y, None, None ->
       {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  | _ -> raise Fail
+  | _ -> raise Stream.Failure
 
 let recover_date cal = function
   | Adef.Dgreg (d, Dgregorian) ->
@@ -543,7 +541,7 @@ let recover_date cal = function
    Transcription of the former EXTEND grammar: one function per entry.
    make_date / recover_date above are reused unchanged. *)
 
-let opt p toks = try let v, r = p toks in (Some v, r) with Fail -> (None, toks)
+let opt p toks = try let v, r = p toks in (Some v, r) with Stream.Failure -> (None, toks)
 
 let rec list0_syms syms toks =
   match toks with
@@ -551,24 +549,24 @@ let rec list0_syms syms toks =
   | _ -> toks
 
 let expect_eoi toks =
-  match toks with EOI :: _ | [] -> () | _ -> raise (Error "expected EOI")
+  match toks with EOI :: _ | [] -> () | _ -> raise (Stream.Error "expected EOI")
 
 let p_int toks =
-  let toi i = try int_of_string i with Failure _ -> raise Fail in
+  let toi i = try int_of_string i with Failure _ -> raise Stream.Failure in
   match toks with
   | INT i :: ID "BCE" :: r -> (- toi i, r)
   | INT i :: ID "B" :: SYM '.' :: ID "C" :: SYM '.' :: r -> (- toi i, r)
   | INT i :: ID "B" :: SYM '.' :: ID "C" :: r -> (- toi i, r)
   | INT i :: r -> (toi i, r)
   | SYM '-' :: INT i :: r -> (- toi i, r)
-  | _ -> raise Fail
+  | _ -> raise Stream.Failure
 
 let p_month = function
   | ID "JAN" :: r -> (1, r) | ID "FEB" :: r -> (2, r) | ID "MAR" :: r -> (3, r)
   | ID "APR" :: r -> (4, r) | ID "MAY" :: r -> (5, r) | ID "JUN" :: r -> (6, r)
   | ID "JUL" :: r -> (7, r) | ID "AUG" :: r -> (8, r) | ID "SEP" :: r -> (9, r)
   | ID "OCT" :: r -> (10, r) | ID "NOV" :: r -> (11, r) | ID "DEC" :: r -> (12, r)
-  | _ -> raise Fail
+  | _ -> raise Stream.Failure
 
 let p_french = function
   | ID "VEND" :: r -> (1, r) | ID "BRUM" :: r -> (2, r) | ID "FRIM" :: r -> (3, r)
@@ -576,7 +574,7 @@ let p_french = function
   | ID "GERM" :: r -> (7, r) | ID "FLOR" :: r -> (8, r) | ID "PRAI" :: r -> (9, r)
   | ID "MESS" :: r -> (10, r) | ID "THER" :: r -> (11, r) | ID "FRUC" :: r -> (12, r)
   | ID "COMP" :: r -> (13, r)
-  | _ -> raise Fail
+  | _ -> raise Stream.Failure
 
 let p_hebr = function
   | ID "TSH" :: r -> (1, r) | ID "CSH" :: r -> (2, r) | ID "KSL" :: r -> (3, r)
@@ -584,14 +582,14 @@ let p_hebr = function
   | ID "ADS" :: r -> (7, r) | ID "NSN" :: r -> (8, r) | ID "IYR" :: r -> (9, r)
   | ID "SVN" :: r -> (10, r) | ID "TMZ" :: r -> (11, r) | ID "AAV" :: r -> (12, r)
   | ID "ELL" :: r -> (13, r)
-  | _ -> raise Fail
+  | _ -> raise Stream.Failure
 
 let p_roman = function
   | ID x :: r when is_roman_int x -> (Mutil.arabian_of_roman x, r)
-  | _ -> raise Fail
+  | _ -> raise Stream.Failure
 
 let p_gen_month toks =
-  match (try Some (p_int toks) with Fail -> None) with
+  match (try Some (p_int toks) with Stream.Failure -> None) with
   | Some (i, r) -> (Left (abs i), r)
   | None -> let m, r = p_month toks in (Right m, r)
 
@@ -599,7 +597,7 @@ let p_gen_french toks = let m, r = p_french toks in (Right m, r)
 let p_gen_hebr toks = let m, r = p_hebr toks in (Right m, r)
 
 let p_year_fren toks =
-  match (try Some (p_int toks) with Fail -> None) with
+  match (try Some (p_int toks) with Stream.Failure -> None) with
   | Some (i, r) -> (i, r)
   | None -> (match toks with ID "AN" :: r -> p_roman r | _ -> p_roman toks)
 
@@ -633,12 +631,12 @@ let p_date_fren_kont toks =
 
 let p_date_fren toks =
   let toks = list0_syms [ '.' ] toks in
-  match (try Some (p_int toks) with Fail -> None) with
+  match (try Some (p_int toks) with Stream.Failure -> None) with
   | Some (n1, r) ->
       let (n2, n3), r = p_date_fren_kont r in
       (make_date (Some n1) n2 n3, r)
   | None -> (
-      match (try Some (p_year_fren toks) with Fail -> None) with
+      match (try Some (p_year_fren toks) with Stream.Failure -> None) with
       | Some (n1, r) -> (make_date (Some n1) None None, r)
       | None -> let (n2, n3), r = p_date_fren_kont toks in (make_date None n2 n3, r))
 
@@ -677,17 +675,17 @@ let p_date_range toks =
       let dt, r = p_date r in
       match r with
       | ID "AND" :: r2 -> let dt1, r2 = p_date r2 in (BeginEnd (dt, dt1), r2)
-      | _ -> raise (Error "BET without AND"))
+      | _ -> raise (Stream.Error "BET without AND"))
   | ID "TO" :: r -> let dt, r = p_date r in (End dt, r)
   | ID "FROM" :: r -> (
       let dt, r = p_date r in
       match r with
       | ID "TO" :: r2 -> let dt1, r2 = p_date r2 in (BeginEnd (dt, dt1), r2)
       | _ -> (Begin dt, r))
-  | _ -> raise Fail
+  | _ -> raise Stream.Failure
 
 let p_date_or_text toks =
-  match (try `R (p_date_range toks) with Fail -> `N) with
+  match (try `R (p_date_range toks) with Stream.Failure -> `N) with
   | `R (dr, r) ->
       let d =
         match dr with
@@ -712,9 +710,9 @@ let p_date_or_text toks =
       in
       (d, r)
   | `N -> (
-      match (try `D (p_date toks) with Fail -> `N) with
+      match (try `D (p_date toks) with Stream.Failure -> `N) with
       | `D ((d, cal), r) -> (Adef.Dgreg (d, cal), r)
-      | `N -> (match toks with TEXT s :: r -> (Adef.Dtext s, r) | _ -> raise Fail))
+      | `N -> (match toks with TEXT s :: r -> (Adef.Dtext s, r) | _ -> raise Stream.Failure))
 
 let p_date_value toks = let d, r = p_date_or_text toks in expect_eoi r; d
 
@@ -728,7 +726,7 @@ let p_date_value_recover toks =
       recover_date Adef.Dfrench (p_date_value r)
   | SYM '@' :: SYM '#' :: ID "DHEBREW" :: SYM '@' :: r ->
       recover_date Adef.Dhebrew (p_date_value r)
-  | _ -> raise Fail
+  | _ -> raise Stream.Failure
 
 let p_date_interval toks =
   let fin dt r = expect_eoi r; dt in
@@ -740,7 +738,7 @@ let p_date_interval toks =
       match r with
       | ID "AND" :: r2 ->
           let dt1, r2 = p_date_or_text r2 in expect_eoi r2; BeginEnd (dt, dt1)
-      | _ -> raise (Error "BET without AND"))
+      | _ -> raise (Stream.Error "BET without AND"))
   | ID "TO" :: r -> let dt, r = p_date_or_text r in End (fin dt r)
   | ID "FROM" :: r -> (
       let dt, r = p_date_or_text r in
@@ -761,11 +759,11 @@ let date_of_field d =
   else begin
     date_str := d;
     let toks = lex (String.uppercase_ascii d) in
-    match (try Some (p_date_value toks) with Fail | Error _ -> None) with
+    match (try Some (p_date_value toks) with Stream.Failure | Stream.Error _ -> None) with
     | Some v -> Some v
     | None ->
         let toks = lex (String.uppercase_ascii d) in
-        (match (try Some (p_date_value_recover toks) with Fail | Error _ -> None) with
+        (match (try Some (p_date_value_recover toks) with Stream.Failure | Stream.Error _ -> None) with
          | Some v -> Some v
          | None -> Some (Dtext d))
   end
@@ -1197,7 +1195,7 @@ let purge_list list =
 
 let decode_date_interval pos s =
   let toks = lex s in
-  match (try Some (p_date_interval toks) with Fail | Error _ | Not_found -> None) with
+  match (try Some (p_date_interval toks) with Stream.Failure | Stream.Error _ | Not_found -> None) with
   | Some (BeginEnd (d1, d2)) -> Some d1, Some d2
   | Some (Begin d) -> Some d, None
   | Some (End d) -> None, Some d
