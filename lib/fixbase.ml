@@ -270,7 +270,7 @@ let check_pevents_witnesses ?report progress base =
       let ip = Driver.get_iper p in
       List.iter
         (fun evt ->
-          let witn = Array.map fst evt.epers_witnesses in
+          let witn = Array.map (fun (ip, _, _) -> ip) evt.epers_witnesses in
           for j = 0 to Array.length witn - 1 do
             let ip2 = witn.(j) in
             let p2 = Driver.poi base ip2 in
@@ -295,7 +295,7 @@ let check_fevents_witnesses ?report progress base =
       let ifath = Driver.get_father fam in
       List.iter
         (fun evt ->
-          let witn = Array.map fst evt.efam_witnesses in
+          let witn = Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses in
           for j = 0 to Array.length witn - 1 do
             let ip = witn.(j) in
             let p = Driver.poi base ip in
