@@ -10,7 +10,7 @@ type 'a event_item =
   * Geneweb_db.Driver.istr
   * Geneweb_db.Driver.istr
   * Geneweb_db.Driver.istr
-  * (Geneweb_db.Driver.iper * Def.witness_kind) array
+  * (Geneweb_db.Driver.iper * Def.witness_kind * Geneweb_db.Driver.istr) array
   * Geneweb_db.Driver.iper option
 (** a representation of events *)
 

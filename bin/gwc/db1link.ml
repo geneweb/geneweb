@@ -753,7 +753,7 @@ let update_family_with_fevents _gen fam =
         marriage_place;
         marriage_note;
         marriage_src;
-        witnesses = Array.map fst witnesses;
+        witnesses = Array.map (fun (ip, _, _) -> ip) witnesses;
       }
     else fam
   in
@@ -777,7 +777,9 @@ let update_fevents_with_family gen fam =
       | Pacs -> Efam_PACS
       | Residence -> Efam_Residence
     in
-    let witnesses = Array.map (fun ip -> (ip, Witness)) fam.witnesses in
+    let witnesses =
+      Array.map (fun ip -> (ip, Witness, empty_string)) fam.witnesses
+    in
     let evt =
       {
         efam_name = name;
@@ -897,11 +899,11 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
         (* insert all event witnesses *)
         let witnesses =
           List.map
-            (fun (wit, sex, wk) ->
+            (fun (wit, sex, wk, wnote) ->
               let p, ip = insert_somebody gen wit in
               notice_sex gen p sex;
               p.m_related <- ifath :: p.m_related;
-              (ip, wk))
+              (ip, wk, unique_string gen wnote))
             witl
         in
         {
@@ -1040,13 +1042,13 @@ let insert_pevents fname gen sb pevtl =
         (fun (name, date, place, reason, src, notes, witl) ->
           let witnesses =
             List.map
-              (fun (wit, sex, wk) ->
+              (fun (wit, sex, wk, wnote) ->
                 (* insert witnesses *)
                 let wp, wip = insert_somebody gen wit in
                 notice_sex gen wp sex;
                 (* add concerned person as witness' relation *)
                 wp.m_related <- ip :: wp.m_related;
-                (wip, wk))
+                (wip, wk, unique_string gen wnote))
               witl
           in
           {
