@@ -1,4 +1,4 @@
-(lang dune 2.7)
+(lang dune 3.20)
 
 (context default)
 
