@@ -1453,7 +1453,7 @@ let get_marriage_witnesses fam =
 let get_nb_marriage_witnesses_of_kind fam wk =
   let witnesses = get_marriage_witnesses fam in
   Array.fold_left
-    (fun acc (_, w) -> if wk = w then acc + 1 else acc)
+    (fun acc (_, w, _) -> if wk = w then acc + 1 else acc)
     0 witnesses
 
 let number_of_descendants_aux conf base env all_levels sl eval_int =
@@ -4989,7 +4989,7 @@ let print_foreach conf base print_ast eval_expr =
       (fun (name, _, _, _, _, wl, _) ->
         if name = Event.Pevent epers_event then
           Array.iteri
-            (fun i (ip, _) ->
+            (fun i (ip, _, _) ->
               let p = pget conf base ip in
               let env =
                 Templ.Env.(
@@ -5007,7 +5007,7 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "event" env with
       | Vevent (_, (_, _, _, _, _, witnesses, _)) ->
           Array.iteri
-            (fun i (ip, wk) ->
+            (fun i (ip, wk, _wnote) ->
               let p = pget conf base ip in
               let wk_s =
                 Util.string_of_witness_kind conf (Driver.get_sex p) wk
@@ -5073,7 +5073,7 @@ let print_foreach conf base print_ast eval_expr =
     | Vfam (_, fam, _, true) ->
         let _ =
           Array.fold_left
-            (fun (i, first) (ip, wk) ->
+            (fun (i, first) (ip, wk, _wnote) ->
               let p = pget conf base ip in
               (* TODO if witness_kind = Witness, we might want wk = "" *)
               let wk_s =
@@ -5944,7 +5944,7 @@ let print_isolated conf base =
       List.find_map
         (fun evt ->
           Mutil.array_find_map
-            (fun (wip, wk) -> if wip = iper then Some wk else None)
+            (fun (wip, wk, _) -> if wip = iper then Some wk else None)
             evt.Def.epers_witnesses)
         (Driver.get_pevents rp)
     in
@@ -5956,7 +5956,7 @@ let print_isolated conf base =
             List.find_map
               (fun evt ->
                 Mutil.array_find_map
-                  (fun (wip, wk) -> if wip = iper then Some wk else None)
+                  (fun (wip, wk, _) -> if wip = iper then Some wk else None)
                   evt.Def.efam_witnesses)
               (Driver.get_fevents (Driver.foi base ifam)))
           (Driver.get_family rp)
@@ -6037,7 +6037,7 @@ let print_isolated conf base =
         List.filter_map
           (fun (_, _, _, _, _, wl, _) ->
             Mutil.array_find_map
-              (fun (wip, wk) -> if wip = iper then Some wk else None)
+              (fun (wip, wk, _) -> if wip = iper then Some wk else None)
               wl)
           (Event.sorted_events conf base rp))
       (Driver.get_related (Driver.poi base iper))

@@ -525,7 +525,7 @@ let check_witness_pevents base warning origin =
       | None -> ()
       | Some d2 ->
           Array.iter
-            (fun (iw, witness_kind) ->
+            (fun (iw, witness_kind, _wnote) ->
               let p = Driver.poi base iw in
               check_witness_pevents_aux warning origin evt d2
                 (Date.od_of_cdate @@ Driver.get_birth p)
@@ -538,8 +538,10 @@ let check_witness_pevents base warning origin =
     wether it was found associated only with the Mentionned or Other witness
     kind. **)
 let witness_occur :
-    Driver.iper -> (Driver.iper * witness_kind) array -> bool * bool =
-  let f iper (is_witness, only_mentioned_or_other) (i, wk) =
+    Driver.iper ->
+    (Driver.iper * witness_kind * Driver.istr) array ->
+    bool * bool =
+  let f iper (is_witness, only_mentioned_or_other) (i, wk, _wnote) =
     if i = iper then
       ( true,
         only_mentioned_or_other
@@ -747,7 +749,7 @@ let check_witness_fevents base warning fam =
       | None -> ()
       | Some d2 ->
           Array.iter
-            (fun (iw, witness_kind) ->
+            (fun (iw, witness_kind, _wnote) ->
               let p = Driver.poi base iw in
               check_witness_fevents_aux warning fam evt d2
                 (Date.od_of_cdate @@ Driver.get_birth p)
