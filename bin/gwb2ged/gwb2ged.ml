@@ -1,4 +1,5 @@
 module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
 
 let with_indexes = ref false
 
@@ -24,7 +25,7 @@ let ansel_warning =
 let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun usage;
-  let bases_dir = !Gwexport.bases_dir in
+  let bases_dir = Dirs.path Secure.default_base_dir in
   Secure.set_base_dir bases_dir;
   if !opts.Gwexport.charset = Gwexport.Ansel then
     Printf.eprintf "%s\n%!" ansel_warning;
