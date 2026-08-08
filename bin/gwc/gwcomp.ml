@@ -433,8 +433,8 @@ let get_burial l =
 
 (** Parse sex of person *)
 let get_optional_sexe = function
-  | "h" :: l -> (Def.Male, l)
-  | "f" :: l -> (Female, l)
+  | ("h" | "m") :: (_ :: _ as l) -> (Male, l)
+  | "f" :: (_ :: _ as l) -> (Female, l)
   | l -> (Neuter, l)
 
 (** Parses person's first name and occurrence number.
