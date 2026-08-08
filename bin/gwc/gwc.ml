@@ -113,8 +113,8 @@ let compile_gw_files ~bname bar inputs =
       (fname, separate, bnotes, shift, was_gw))
     inputs
 
-let base_dir = ref None
-let set_base_dir s = base_dir := Some s
+let bases_dir = ref None
+let set_base_dir s = bases_dir := Some s
 let just_comp = ref false
 let kill_gwo = ref false
 let no_warn = ref false
@@ -172,10 +172,8 @@ let speclist =
     ( "-bd",
       Arg.String set_base_dir,
       Fmt.str
-        "<DIR> Specify where the “bases” directory with databases is installed \
-         (default if empty is %S)."
-        Dirs.(name Secure.default_base_dir)
-      |> String.split_on_char '\\' |> String.concat "/" );
+        "<DIR> Specify where the 'bases' directory is installed (default %S)"
+        (Dirs.name Secure.default_base_dir) );
     ( "-bnotes",
       Arg.String set_bnotes,
       " [drop|erase|first|merge] Behavior for base notes of the next file. \
@@ -242,9 +240,6 @@ let anonfun fname =
       Fmt.epr "%s" (Arg.usage_string speclist errmsg);
       exit 2)
   in
-  (* If -bd was not provided, derive it from the directory of the first
-     input file given with an absolute path. *)
-  if !base_dir = None then set_base_dir (Filename.dirname fname);
   separate := default_separate;
   bnotes := default_bnotes;
   add_input { fname; kind; separate = sep; bnotes = bn; shift = !shift }
@@ -268,8 +263,16 @@ let parse_cmd () =
   Arg.parse speclist anonfun errmsg;
   let inputs = List.rev !rev_inputs in
   let bname = parse_output inputs !output in
-  let base_dir = Option.value ~default:Filename.current_dir_name !base_dir in
-  (inputs, bname, base_dir)
+  (* derive only now, once all options (incl. -bd) are known *)
+  (if !bases_dir = None then
+     match inputs with
+     | { fname; _ } :: _ when not (Filename.is_relative fname) ->
+         set_base_dir (Filename.dirname fname)
+     | _ -> ());
+  let bases_dir =
+    Option.value ~default:(Dirs.path Secure.default_base_dir) !bases_dir
+  in
+  (inputs, bname, bases_dir)
 
 let with_timer f =
   let start = Unix.gettimeofday () in
@@ -282,8 +285,8 @@ let pp_duration ppf d =
 
 let ( // ) = Filename.concat
 
-let check_database_exists base_dir bname =
-  let path = base_dir // Fmt.str "%s.gwb" bname in
+let check_database_exists bases_dir bname =
+  let path = bases_dir // Fmt.str "%s.gwb" bname in
   Sys.file_exists path
 
 let cleanup gwo_files =
@@ -292,8 +295,8 @@ let cleanup gwo_files =
     gwo_files
 
 let () =
-  let inputs, bname, base_dir = parse_cmd () in
-  Secure.set_base_dir base_dir;
+  let inputs, bname, bases_dir = parse_cmd () in
+  Secure.set_base_dir bases_dir;
   GWPARAM.init ();
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Db1link.particules_file = "" then
@@ -309,7 +312,7 @@ let () =
   in
   Format.eprintf "Compilation: %a@." pp_duration duration;
   if not !just_comp then (
-    if (not !GWPARAM.force) && check_database_exists base_dir bname then (
+    if (not !GWPARAM.force) && check_database_exists bases_dir bname then (
       if !kill_gwo then cleanup gwo_files;
       Fmt.epr "Database %S already exists. Use -f to overwrite.@." bname;
       exit 2);
