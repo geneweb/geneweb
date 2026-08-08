@@ -28,6 +28,7 @@ type patch =
   | Fix_WrongString of
       Gwdb.ifam option * Gwdb.iper option * (Gwdb.istr * Gwdb.istr) option
   | Fix_UpdatedOcc of Gwdb.iper * int * int
+  | Fix_WrongStringFailure of Gwdb.ifam option * Gwdb.iper option * string
 
 val string_of_patch : Gwdb.base -> patch -> string
 
