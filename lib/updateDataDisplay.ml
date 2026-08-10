@@ -223,6 +223,9 @@ and eval_compound_var conf base env xx sl =
         (Util.escape_html (loop sl) :> string) (* FIXME? *)
     | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)
     | "printable" :: sl -> Ext_string.only_printable (loop sl)
+    | "when_short" :: sl ->
+        let s = loop sl in
+        if String.length s < 10_000 then s else ""
     | _ -> raise Not_found
   in
   str_val (loop sl)
