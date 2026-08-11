@@ -25,6 +25,8 @@ let lang_param = ref ""
 let bname = ref ""
 let no_o = ref true
 let command = ref ""
+let debug = ref false
+let daemon = ref false
 let comm_log = Filename.concat (Filename.get_temp_dir_name ()) "comm.log"
 
 let printer_conf =
@@ -1687,46 +1689,66 @@ let copy_text lang =
     copy_from_stream conf print_string (Stream.of_string content);
     flush stdout
 
-let daemon = ref false
-
-let usage =
-  "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
-
 let deprecated_only () =
   Format.eprintf
     "The -only option is deprecated. You must use -i to bind the gwsetup \
      server on a safe interface."
 
-let speclist =
-  [
-    ( "-bd",
-      Arg.String (fun x -> bases_dir := x),
-      "<dir> Directory where the databases are installed (default = current \
-       directory)." );
-    ( "-gwd_p",
-      Arg.Int (fun x -> gwd_port := x),
-      "<number> Specify the port number of gwd (default = "
-      ^ string_of_int !gwd_port ^ "); > 1024 for normal users." );
-    ("-lang", Arg.String (fun x -> lang_param := x), "<string> default lang");
-    ("-daemon", Arg.Set daemon, " Unix daemon mode.");
-    ( "-i",
-      Arg.String (fun s -> interface := s),
-      "Bind gwsetup to this interface." );
-    ( "-p",
-      Arg.Int (fun x -> port := x),
-      "<number> Select a port number (default = " ^ string_of_int !port
-      ^ "); > 1024 for normal users." );
-    ( "-only",
-      Arg.Unit deprecated_only,
-      "<file> File containing the only authorized address" );
-    ("-gd", Arg.String (fun x -> setup_dir := x), "<string> gwsetup directory");
-    ( "-bindir",
-      Arg.String (fun x -> bin_dir := x),
-      "<string> binary directory (default = value of option -gd)" );
-  ]
-  |> List.sort compare |> Arg.align
+let parse_cmd () =
+  let usage =
+    "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
+  in
+  let speclist =
+    [
+      ( "-bd",
+        Arg.String (fun x -> bases_dir := x),
+        "<dir> Directory where the databases are installed (default = current \
+         directory)." );
+      ( "-gwd_p",
+        Arg.Int (fun x -> gwd_port := x),
+        "<number> Specify the port number of gwd (default = "
+        ^ string_of_int !gwd_port ^ "); > 1024 for normal users." );
+      ("-lang", Arg.String (fun x -> lang_param := x), "<string> default lang");
+      ("-daemon", Arg.Set daemon, " Unix daemon mode.");
+      ( "-i",
+        Arg.String (fun s -> interface := s),
+        "Bind gwsetup to this interface." );
+      ( "-p",
+        Arg.Int (fun x -> port := x),
+        "<number> Select a port number (default = " ^ string_of_int !port
+        ^ "); > 1024 for normal users." );
+      ( "-only",
+        Arg.Unit deprecated_only,
+        "<file> File containing the only authorized address" );
+      ("-gd", Arg.String (fun x -> setup_dir := x), "<string> gwsetup directory");
+      ( "-bindir",
+        Arg.String (fun x -> bin_dir := x),
+        "<string> binary directory (default = value of option -gd)" );
+      ("-debug", Arg.Set debug, "Enable debug mode.");
+    ]
+    |> List.sort compare |> Arg.align
+  in
+  let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
+  Arg.parse speclist anonfun usage
 
-let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s))
+let setup_log ~debug =
+  let reporter ppf =
+    let report _src _level ~over k msgf =
+      let k ppf =
+        Format.pp_close_box ppf ();
+        Format.pp_print_newline ppf ();
+        over ();
+        k ()
+      in
+      msgf @@ fun ?header:_ ?tags:_ fmt ->
+      Format.pp_open_box ppf 0;
+      Format.kfprintf k ppf fmt
+    in
+    { Logs.report }
+  in
+  let level = if debug then Logs.Debug else Logs.Info in
+  Logs.set_level ~all:true (Some level);
+  Logs.set_reporter (reporter Format.err_formatter)
 
 let null_reopen flags fd =
   if Sys.unix then (
@@ -1752,7 +1774,8 @@ let intro () =
         else !default_lang
     else !default_lang
   in
-  Arg.parse speclist anonfun usage;
+  parse_cmd ();
+  setup_log ~debug:!debug;
   if !bin_dir = "" then bin_dir := !setup_dir;
   launch_dir := Sys.getcwd ();
   (* All tool invocations inject -bd via exec_f so they find bases in
@@ -1798,23 +1821,7 @@ let intro () =
     flush stdout
   with Sys_error _ -> ()
 
-let reporter ppf =
-  let report _src _level ~over k msgf =
-    let k ppf =
-      Format.pp_close_box ppf ();
-      Format.pp_print_newline ppf ();
-      over ();
-      k ()
-    in
-    msgf @@ fun ?header:_ ?tags:_ fmt ->
-    Format.pp_open_box ppf 0;
-    Format.kfprintf k ppf fmt
-  in
-  { Logs.report }
-
 let () =
-  Logs.set_level ~all:true (Some Logs.Info);
-  Logs.set_reporter (reporter Format.err_formatter);
   if Sys.unix then intro ()
   else if Sys.getenv_opt "WSERVER" = None then intro ();
   (* FIXME: this hack is necessary to avoid a cyclic dependency between
