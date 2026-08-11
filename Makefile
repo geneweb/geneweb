@@ -4,9 +4,6 @@ ODOC_DIR?=_build/default/_doc/_html
 OPAM?=opam
 TAG?=dev
 
-fmt:
-	$(DUNE) fmt
-
 build:
 	$(DUNE) build @install
 
@@ -41,6 +38,9 @@ static:
 		--build-arg TAG="$(TAG)" \
 		-t geneweb-static -f Dockerfile.static . -o .
 
+fmt:
+	$(DUNE) fmt
+
 doc:
 	$(DUNE) build @doc
 
@@ -59,5 +59,5 @@ bench:
 clean:
 	$(DUNE) clean
 
-.PHONY: all fmt build build-geneweb build-geneweb-rpc bundle bundle-static \
-	doc opendoc test ci bench clean
+.PHONY: build build-geneweb build-geneweb-rpc bundle bundle-static \
+	fmt doc opendoc test ci bench clean
