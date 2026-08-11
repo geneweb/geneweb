@@ -18,7 +18,7 @@ RUN apt-get install -yy \
   pkg-config \
   xdot
 
-# Workaround
+# FIXME: Workaround
 RUN mkdir -p /lib64
 
 USER opam
@@ -53,6 +53,7 @@ COPY --from=bundle-builder /lib/*-linux-gnu/libm.so* /lib/
 COPY --from=bundle-builder /lib/*-linux-gnu/libc.so* /lib/
 COPY --from=user-builder --parents /etc/passwd /
 COPY --from=user-builder --parents /etc/group /
+COPY --from=user-builder --parents /tmp /
 
 # ================================================
 # STAGE 3.a: serve gwsetup application

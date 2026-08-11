@@ -24,7 +24,7 @@ bundle-static:
 
 deps:
 	$(OPAM) pin oui \
-		'https://github.com/Halbaroth/ocaml-universal-installer.git#win-ldd-debugger'
+		'https://github.com/Halbaroth/ocaml-universal-installer.git#master'
 	$(OPAM) pin ancient \
 		'https://github.com/Halbaroth/ocaml-ancient.git#windows-support-2'
 	$(OPAM) install . --deps-only --with-test

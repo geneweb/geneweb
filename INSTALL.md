@@ -100,6 +100,13 @@ where `CONTAINER` is the name of gwd container to watch its logs.
 podman run -p 2317:2317 -v DIR:/bases -d --name geneweb-gwd:latest ARGS
 ```
 
+To run `gwsetup`:
+```console
+docker run -p 10.0.0.1:2316:2316 -v DIR:/bases -d -it gwsetup:latest -i 0.0.0.0 ARGS
+```
+By default, `gwsetup` listen to `localhost` for security purpose. To access it
+through a docker container, you must listen to any interface.
+
 # opam installation
 
 GeneWeb is distributed on opam too. It is a source installation, which means
