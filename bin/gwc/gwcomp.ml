@@ -433,7 +433,7 @@ let get_burial l =
 
 (** Parse sex of person *)
 let get_optional_sexe = function
-  | "h" :: l -> (Def.Male, l)
+  | ("h" | "m") :: l -> (Def.Male, l)
   | "f" :: l -> (Female, l)
   | l -> (Neuter, l)
 
@@ -1369,7 +1369,7 @@ let read_family state ic fname =
       parse_parent state str l >>= fun (sb, _, l) ->
       let sex, l =
         match l with
-        | "#h" :: l -> (make_strong_assumption Def.Male, l)
+        | ("#h" | "#m") :: l -> (make_strong_assumption Def.Male, l)
         | "#f" :: l -> (make_strong_assumption Def.Female, l)
         | l -> (make_weak_assumption Def.Neuter, l)
       in
