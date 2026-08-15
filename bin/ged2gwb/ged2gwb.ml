@@ -76,13 +76,13 @@ let rec get_to_eoln len (strm__ : _ Stream.t) =
   | Some ('\010' | '\013') -> Stream.junk strm__; skip_eol strm__; Buff.get len
   | Some '\t' -> Stream.junk strm__; get_to_eoln (Buff.store len ' ') strm__
   | Some c -> Stream.junk strm__; get_to_eoln (Buff.store len c) strm__
-  | None -> Buff.get len
+  | _ -> Buff.get len
 
 let rec skip_to_eoln (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
   | Some ('\010' | '\013') -> Stream.junk strm__; skip_eol strm__
   | Some _ -> Stream.junk strm__; skip_to_eoln strm__
-  | None -> ()
+  | _ -> ()
 
 let eol_chars = ['\010'; '\013']
 
@@ -256,10 +256,10 @@ let utf8_of_string s =
   | Utf8 -> s
 
 let rec get_lev n (strm__ : _ Stream.t) =
-  line_start n strm__;
-  match skip_space strm__ with
-  | exception Stream.Failure -> raise (Stream.Error "")
-  | _ -> ();
+  let _ = line_start n strm__ in
+  let _ =
+    try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
+  in
   let r1 =
     try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
   in
@@ -283,15 +283,14 @@ and parse_address n r1 (strm__ : _ Stream.t) =
 and parse_text n r1 (strm__ : _ Stream.t) =
   let r2 = get_to_eoln 0 strm__ in
   let l =
-    match get_lev_list [] (Char.chr (Char.code n + 1)) strm__ with
-    | exception Stream.Failure -> raise (Stream.Error "")
-    | l -> l
+    try get_lev_list [] (Char.chr (Char.code n + 1)) strm__
+    with Stream.Failure -> raise (Stream.Error "")
   in
   (r1, r2, "", l)
 and get_lev_list l n (strm__ : _ Stream.t) =
-  match get_lev n strm__ with
-  | x -> get_lev_list (x :: l) n strm__
-  | exception Stream.Failure -> l
+  match (try Some (get_lev n strm__) with Stream.Failure -> None) with
+  | Some x -> get_lev_list (x :: l) n strm__
+  | _ -> l
 
 (* Error *)
 
@@ -366,7 +365,7 @@ let strip_spaces = strip ' '
 let strip_newlines = strip '\n'
 
 let parse_name (strm__ : _ Stream.t) =
-  skip_spaces strm__;
+  let _ = skip_spaces strm__ in
   let invert =
     match Stream.peek strm__ with
     | Some '/' -> Stream.junk strm__; true
@@ -408,6 +407,10 @@ let rec find_field_with_value lab v =
       else find_field_with_value lab v rl
   | [] -> false
 
+(* --- GEDCOM date lexer (camlp5-free) ------------------------------------
+   Replaces the former stream lexer lexing_date/number/ident/text and the
+   camlp5 Grammar/Token/Plexing glue (make_date_lexing, date_lexer, date_g,
+   the Grammar.Entry.create entries and the roman_int grammar entry). *)
 type tok =
   | INT of string
   | ID of string
@@ -518,7 +521,8 @@ let make_date n1 n2 n3 =
       {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | Some y, None, None ->
       {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  | _ -> raise (Stream.Error "bad date")
+  (* WARNING, Stream.error "bad date" would introduces a regression *)
+  | _ -> raise Stream.Failure
 
 let recover_date cal = function
   | Adef.Dgreg (d, Dgregorian) ->
@@ -532,10 +536,11 @@ let recover_date cal = function
     Adef.Dgreg (d, cal)
   | d -> d
 
-let opt p toks =
-  match p toks with
-  | (v, r) -> (Some v, r)
-  | exception Stream.Failure -> (None, toks)
+(* --- Recursive-descent date parser (camlp5-free) ------------------------
+   Transcription of the former EXTEND grammar: one function per entry.
+   make_date / recover_date above are reused unchanged. *)
+
+let opt p toks = try let v, r = p toks in (Some v, r) with Stream.Failure -> (None, toks)
 
 let rec list0_syms syms toks =
   match toks with
@@ -555,16 +560,14 @@ let p_int toks =
   | SYM '-' :: INT i :: r -> (- toi i, r)
   | _ -> raise Stream.Failure
 
-let p_month toks =
-  match toks with
+let p_month = function
   | ID "JAN" :: r -> (1, r) | ID "FEB" :: r -> (2, r) | ID "MAR" :: r -> (3, r)
   | ID "APR" :: r -> (4, r) | ID "MAY" :: r -> (5, r) | ID "JUN" :: r -> (6, r)
   | ID "JUL" :: r -> (7, r) | ID "AUG" :: r -> (8, r) | ID "SEP" :: r -> (9, r)
   | ID "OCT" :: r -> (10, r) | ID "NOV" :: r -> (11, r) | ID "DEC" :: r -> (12, r)
   | _ -> raise Stream.Failure
 
-let p_french toks =
-  match toks with
+let p_french = function
   | ID "VEND" :: r -> (1, r) | ID "BRUM" :: r -> (2, r) | ID "FRIM" :: r -> (3, r)
   | ID "NIVO" :: r -> (4, r) | ID "PLUV" :: r -> (5, r) | ID "VENT" :: r -> (6, r)
   | ID "GERM" :: r -> (7, r) | ID "FLOR" :: r -> (8, r) | ID "PRAI" :: r -> (9, r)
@@ -572,8 +575,7 @@ let p_french toks =
   | ID "COMP" :: r -> (13, r)
   | _ -> raise Stream.Failure
 
-let p_hebr toks =
-  match toks with
+let p_hebr = function
   | ID "TSH" :: r -> (1, r) | ID "CSH" :: r -> (2, r) | ID "KSL" :: r -> (3, r)
   | ID "TVT" :: r -> (4, r) | ID "SHV" :: r -> (5, r) | ID "ADR" :: r -> (6, r)
   | ID "ADS" :: r -> (7, r) | ID "NSN" :: r -> (8, r) | ID "IYR" :: r -> (9, r)
@@ -581,24 +583,22 @@ let p_hebr toks =
   | ID "ELL" :: r -> (13, r)
   | _ -> raise Stream.Failure
 
-let p_roman toks =
-  match toks with
+let p_roman = function
   | ID x :: r when is_roman_int x -> (Mutil.arabian_of_roman x, r)
   | _ -> raise Stream.Failure
 
 let p_gen_month toks =
-  match p_int toks with
-  | (i, r) -> (Left (abs i), r)
-  | exception Stream.Failure -> let m, r = p_month toks in (Right m, r)
+  match (try Some (p_int toks) with Stream.Failure -> None) with
+  | Some (i, r) -> (Left (abs i), r)
+  | None -> let m, r = p_month toks in (Right m, r)
 
 let p_gen_french toks = let m, r = p_french toks in (Right m, r)
 let p_gen_hebr toks = let m, r = p_hebr toks in (Right m, r)
 
 let p_year_fren toks =
-  match p_int toks with
-  | (i, r) -> (i, r)
-  | exception Stream.Failure ->
-      (match toks with ID "AN" :: r -> p_roman r | _ -> p_roman toks)
+  match (try Some (p_int toks) with Stream.Failure -> None) with
+  | Some (i, r) -> (i, r)
+  | None -> (match toks with ID "AN" :: r -> p_roman r | _ -> p_roman toks)
 
 let p_date_greg toks =
   let toks = list0_syms [ '.' ] toks in
@@ -630,15 +630,14 @@ let p_date_fren_kont toks =
 
 let p_date_fren toks =
   let toks = list0_syms [ '.' ] toks in
-  match p_int toks with
-  | (n1, r) ->
+  match (try Some (p_int toks) with Stream.Failure -> None) with
+  | Some (n1, r) ->
       let (n2, n3), r = p_date_fren_kont r in
       (make_date (Some n1) n2 n3, r)
-  | exception Stream.Failure -> (
-      match p_year_fren toks with
-      | (n1, r) -> (make_date (Some n1) None None, r)
-      | exception Stream.Failure ->
-          let (n2, n3), r = p_date_fren_kont toks in (make_date None n2 n3, r))
+  | None -> (
+      match (try Some (p_year_fren toks) with Stream.Failure -> None) with
+      | Some (n1, r) -> (make_date (Some n1) None None, r)
+      | None -> let (n2, n3), r = p_date_fren_kont toks in (make_date None n2 n3, r))
 
 let p_date_calendar toks =
   match toks with
@@ -685,8 +684,8 @@ let p_date_range toks =
   | _ -> raise Stream.Failure
 
 let p_date_or_text toks =
-  match p_date_range toks with
-  | (dr, r) ->
+  match (try `R (p_date_range toks) with Stream.Failure -> `N) with
+  | `R (dr, r) ->
       let d =
         match dr with
         | Begin (d, cal) -> Adef.Dgreg ({ d with prec = Adef.After }, cal)
@@ -709,11 +708,10 @@ let p_date_or_text toks =
             Adef.Dgreg ({ d1 with prec = Adef.YearInt dmy2 }, cal1)
       in
       (d, r)
-  | exception Stream.Failure -> (
-      match p_date toks with
-      | ((d, cal), r) -> (Adef.Dgreg (d, cal), r)
-      | exception Stream.Failure ->
-          (match toks with TEXT s :: r -> (Adef.Dtext s, r) | _ -> raise Stream.Failure))
+  | `N -> (
+      match (try `D (p_date toks) with Stream.Failure -> `N) with
+      | `D ((d, cal), r) -> (Adef.Dgreg (d, cal), r)
+      | `N -> (match toks with TEXT s :: r -> (Adef.Dtext s, r) | _ -> raise Stream.Failure))
 
 let p_date_value toks = let d, r = p_date_or_text toks in expect_eoi r; d
 
@@ -730,23 +728,24 @@ let p_date_value_recover toks =
   | _ -> raise Stream.Failure
 
 let p_date_interval toks =
+  let fin dt r = expect_eoi r; dt in
   match toks with
-  | ID "BEF" :: r -> let dt, r = p_date_or_text r in expect_eoi r; End dt
-  | ID "AFT" :: r -> let dt, r = p_date_or_text r in expect_eoi r; Begin dt
+  | ID "BEF" :: r -> let dt, r = p_date_or_text r in End (fin dt r)
+  | ID "AFT" :: r -> let dt, r = p_date_or_text r in Begin (fin dt r)
   | ID "BET" :: r -> (
       let dt, r = p_date_or_text r in
       match r with
       | ID "AND" :: r2 ->
           let dt1, r2 = p_date_or_text r2 in expect_eoi r2; BeginEnd (dt, dt1)
       | _ -> raise (Stream.Error "BET without AND"))
-  | ID "TO" :: r -> let dt, r = p_date_or_text r in expect_eoi r; End dt
+  | ID "TO" :: r -> let dt, r = p_date_or_text r in End (fin dt r)
   | ID "FROM" :: r -> (
       let dt, r = p_date_or_text r in
       match r with
       | ID "TO" :: r2 ->
           let dt1, r2 = p_date_or_text r2 in expect_eoi r2; BeginEnd (dt, dt1)
       | _ -> expect_eoi r; Begin dt)
-  | _ -> let dt, r = p_date_or_text toks in expect_eoi r; Begin dt
+  | _ -> let dt, r = p_date_or_text toks in Begin (fin dt r)
 
 (* Perform a regular expression match. *)
 let preg_match pattern subject =
@@ -759,13 +758,13 @@ let date_of_field d =
   else begin
     date_str := d;
     let toks = lex (String.uppercase_ascii d) in
-    match p_date_value toks with
-    | v -> Some v
-    | exception (Stream.Failure | Stream.Error _) ->
+    match (try Some (p_date_value toks) with Stream.Failure | Stream.Error _ -> None) with
+    | Some v -> Some v
+    | None ->
         let toks = lex (String.uppercase_ascii d) in
-        (match p_date_value_recover toks with
-         | v -> Some v
-         | exception (Stream.Failure | Stream.Error _) -> Some (Dtext d))
+        (match (try Some (p_date_value_recover toks) with Stream.Failure | Stream.Error _ -> None) with
+         | Some v -> Some v
+         | None -> Some (Dtext d))
   end
 
 (* Creating base *)
@@ -1195,12 +1194,11 @@ let purge_list list =
 
 let decode_date_interval pos s =
   let toks = lex s in
-  match p_date_interval toks with
-  | BeginEnd (d1, d2) -> Some d1, Some d2
-  | Begin d -> Some d, None
-  | End d -> None, Some d
-  | exception (Stream.Failure | Stream.Error _ | Not_found) ->
-      print_bad_date pos s; None, None
+  match (try Some (p_date_interval toks) with Stream.Failure | Stream.Error _ | Not_found -> None) with
+  | Some (BeginEnd (d1, d2)) -> Some d1, Some d2
+  | Some (Begin d) -> Some d, None
+  | Some (End d) -> None, Some d
+  | None -> print_bad_date pos s; None, None
 
 let treat_indi_title gen public_name r =
   let (title, place, nth) = decode_title r.rval in
