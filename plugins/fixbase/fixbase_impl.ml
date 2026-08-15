@@ -438,7 +438,7 @@ let ( // ) = Filename.concat
 
 let () =
   Secure.add_assets @@ (List.hd Sites.assets // "fixbase");
-  let aux fn conf base =
+  let aux fn _conn conf base =
     if if opt_manitou then conf.manitou else conf.wizard then (
       fn conf base;
       true)

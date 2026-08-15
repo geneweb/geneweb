@@ -115,7 +115,7 @@ let w_base =
   let none conf = Hutil.incorrect_request conf in
   Gwd_lib.Request.w_base ~none
 
-let no_index conf base =
+let no_index _conn conf base =
   let opt1 = Util.p_getenv conf.env "opt" = Some "no_index" in
   let opt2 = Util.p_getenv conf.env "opt" = Some "no_index_pwd" in
   if opt1 || opt2 then (

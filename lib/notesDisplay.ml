@@ -9,6 +9,8 @@ let src = Logs.Src.create ~doc:"NotesDisplay" "NOTE"
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 
 (* [deprecated] TYPE=album is accepted on read for backward compatibility
    with notes, all new notes always write TYPE=gallery. *)
@@ -770,7 +772,7 @@ let print_gallery conf base =
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
 
-let print_mod_gallery_ok conf base =
+let print_mod_gallery_ok conn conf base =
   let fname = function
     | Some f ->
         let f = Mutil.tr ' ' '_' f in
@@ -786,7 +788,7 @@ let print_mod_gallery_ok conf base =
       (commd conf :> string)
       (Mutil.encode fname_saved :> string)
   in
-  Geneweb_http.Server.http_redirect_temporarily url
+  Connection.http_redirect_temporarily conn url
 
 let print_gallery_json conf base =
   let _, s = read_notes_from_conf conf base in

@@ -7,6 +7,7 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Iper = Driver.Iper
 module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 
 let image_normal_txt conf base p fname width height =
   let image_txt = Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0) in
@@ -778,7 +779,7 @@ let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
   print_dag_page conf base page_title hts next_txt
 
-let print conf base =
+let print conn conf base =
   let has_pnoc_params = Util.url_has_pnoc_params conf.env in
   let has_s1 = Util.p_getenv conf.env "s1" <> None in
   if has_pnoc_params && not has_s1 then (
@@ -833,7 +834,7 @@ let print conf base =
         (Util.prefix_base conf :> string)
         (String.concat "&" (List.rev !converted_params))
     in
-    Server.http_redirect_temporarily clean_url)
+    Connection.http_redirect_temporarily conn clean_url)
   else
     let set = Dag.get_dag_elems conf base in
     let elem_txt p = Item (p, Adef.safe "") in

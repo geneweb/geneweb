@@ -2,6 +2,7 @@ open Geneweb
 open Config
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Connection = Geneweb_http.Connection
 
 let src = Logs.Src.create ~doc:"OIDC" "OIDC"
 
@@ -278,7 +279,7 @@ let handle_oidc_login conf base_env base_file =
               set_login_cookie conf base_file cookie;
               send_redirect conf url))
 
-let handle_oidc_callback conf base_env from_addr base_file =
+let handle_oidc_callback conn conf base_env from_addr base_file =
   let ( let* ) = Result.bind in
   let err_str e = Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e in
   let result =
@@ -380,7 +381,8 @@ let handle_oidc_callback conf base_env from_addr base_file =
     Ok (acc, claim_value, username)
   in
   let base_url =
-    if !Server.cgi then conf.command ^ "?b=" ^ base_file else base_file
+    if Connection.is_cgi conn then conf.command ^ "?b=" ^ base_file
+    else base_file
   in
   match result with
   | Error msg -> oidc_error_page conf msg
@@ -409,9 +411,10 @@ let handle_oidc_callback conf base_env from_addr base_file =
 
 let request_is_post request = Mutil.extract_param "POST " ' ' request <> ""
 
-let handle_oidc_logout conf base_env _from_addr base_file =
+let handle_oidc_logout conn conf base_env _from_addr base_file =
   let base_url =
-    if !Server.cgi then conf.command ^ "?b=" ^ base_file else base_file
+    if Connection.is_cgi conn then conf.command ^ "?b=" ^ base_file
+    else base_file
   in
   (* SameSite=Lax keeps the session cookie off cross-site POSTs (CSRF) *)
   let has_session =
@@ -445,7 +448,7 @@ let handle_oidc_logout conf base_env _from_addr base_file =
     send_redirect conf logout_target
   end
 
-let handle_mode conf mode =
+let handle_mode conn conf mode =
   let base_env = conf.base_env
   and from_addr = conf.from
   and base_file = conf.bname in
@@ -458,10 +461,10 @@ let handle_mode conf mode =
       handle_oidc_login conf base_env base_file;
       true
   | Some "OIDC_CALLBACK" ->
-      handle_oidc_callback conf base_env from_addr base_file;
+      handle_oidc_callback conn conf base_env from_addr base_file;
       true
   | Some "OIDC_LOGOUT" ->
-      handle_oidc_logout conf base_env from_addr base_file;
+      handle_oidc_logout conn conf base_env from_addr base_file;
       true
   | None ->
       (* only treat code+state as a callback for a login this browser started *)
@@ -475,7 +478,7 @@ let handle_mode conf mode =
         has_state && (has_code || has_error) && in_login
         && Option.is_some (read_oidc_config base_env)
       then begin
-        handle_oidc_callback conf base_env from_addr base_file;
+        handle_oidc_callback conn conf base_env from_addr base_file;
         true
       end
       else false
