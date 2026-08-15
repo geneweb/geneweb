@@ -84,7 +84,8 @@ val print_mod_gallery : Config.config -> Driver.base -> unit
     loads the existing note identified by [f]. Refuses access on [RESTRICT]
     mismatch. *)
 
-val print_mod_gallery_ok : Config.config -> Driver.base -> unit
+val print_mod_gallery_ok :
+  Geneweb_http.Connection.t -> Config.config -> Driver.base -> unit
 (** [print_mod_gallery_ok conf base] processes the POST submission of an edited
     or newly-created gallery: validates the digest and commits to disk via
     {!Wiki.do_mod_ok}, then issues an HTTP 302 redirect to

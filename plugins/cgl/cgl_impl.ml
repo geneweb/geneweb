@@ -2,7 +2,7 @@ open Geneweb
 open Config
 module Registration = Geneweb_register.Registration
 
-let hook conf _base =
+let hook _conn conf _base =
   if Util.p_getenv conf.env "cgl" = Some "on" then
     let buffer_status = ref None in
     let buffer_headers = ref [] in
@@ -11,7 +11,7 @@ let hook conf _base =
     let previous_header = conf.output_conf.header in
     let previous_body = conf.output_conf.body in
     let previous_flush = conf.output_conf.flush in
-    let status s = buffer_status := Some s in
+    let status ?cgi:_ s = buffer_status := Some s in
     let header s = buffer_headers := s :: !buffer_headers in
     let body s = Buffer.add_string buffer_body s in
     let flush () =

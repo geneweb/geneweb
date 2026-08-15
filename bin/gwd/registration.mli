@@ -1,5 +1,18 @@
-type hook = Geneweb.Config.config -> string option -> unit
-type handler = Geneweb.Config.config -> string option -> bool
+(* FIXME: this type is an instance of `Request.handler`, that is
+   `(string option, unit) Request.handler.
+
+   We cannot define it as an instance because of a cyclic dependency between
+   this module and `Request`. *)
+type hook =
+  Geneweb_http.Connection.t -> Geneweb.Config.config -> string option -> unit
+
+(* FIXME: this type is an instance of `Request.handler`, that is
+   `(string option, bool) Request.handler.
+
+   We cannot define it as an instance because of a cyclic dependency between
+   this module and `Request`. *)
+type handler =
+  Geneweb_http.Connection.t -> Geneweb.Config.config -> string option -> bool
 
 val register : name:string -> hook list -> (string * handler) list -> unit
 (** [register ~name hooks handlers] registers the plugin [name] with [hooks] and
