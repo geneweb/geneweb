@@ -13,7 +13,8 @@ val print :
     {!Hutil.rheader} when [Consang.TopologicalSortError] is raised during
     computation. *)
 
-val print_multi : config -> Geneweb_db.Driver.base -> unit
+val print_multi :
+  Geneweb_http.Connection.t -> config -> Geneweb_db.Driver.base -> unit
 (** [print_multi conf base] entry point for the [m=RLM] route. Collects persons
     from the [i1], [i2], ... URL parameters and renders the multi-person
     relationship DAG. Performs an HTTP redirect to a canonical URL when

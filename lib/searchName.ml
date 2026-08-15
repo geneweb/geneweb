@@ -6,6 +6,8 @@ module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Iper = Driver.Iper
+module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 
 let src = Logs.Src.create ~doc:"SearchName" "SRCH"
 
@@ -1754,12 +1756,12 @@ let dispatch_search_methods cache alias_cache conf base components query
 (* Section 6: Result Handling and Display                                   *)
 (* ========================================================================= *)
 
-let rec handle_search_results alias_cache conf base query fn_options components
-    specify results =
+let rec handle_search_results alias_cache conn conf base query fn_options
+    components specify results =
   let redirect_to_person ip =
     record_visited conf ip;
     let p = Driver.poi base ip in
-    Geneweb_http.Server.http_redirect_temporarily
+    Connection.http_redirect_temporarily conn
       (Adef.(Util.commd conf ^^^ Util.acces conf base p) :> string)
   in
   let { exact; partial; spouse } = results in
@@ -1970,7 +1972,7 @@ and display_surname_results conf base alias_cache _query surname all_ipers =
    global mutable state.  All search methods handle apostrophe variants
    internally (search_by_key included); no per-variant iteration is needed
    at this level. *)
-let search conf base components query search_order fn_options specify =
+let search conn conf base components query search_order fn_options specify =
   let cache = StringCache.create () in
   let alias_cache = Some.AliasCache.create () in
   Log.debug (fun k ->
@@ -1985,7 +1987,7 @@ let search conf base components query search_order fn_options specify =
     dispatch_search_methods cache alias_cache conf base components query
       search_order fn_options
   in
-  handle_search_results alias_cache conf base query fn_options components
+  handle_search_results alias_cache conn conf base query fn_options components
     specify results
 
 (* ========================================================================= *)
@@ -2004,7 +2006,7 @@ module Debug = struct
     | InvalidFormat _ -> "InvalidFormat"
 end
 
-let print conf base specify =
+let print conn conf base specify =
   let components = extract_name_components conf base in
   let fn_options =
     {
@@ -2025,7 +2027,7 @@ let print conf base specify =
         components.oc);
   let full_order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
   let search query order =
-    search conf base components query order fn_options specify
+    search conn conf base components query order fn_options specify
   in
   match components.case with
   | FirstNameOnly fn ->
