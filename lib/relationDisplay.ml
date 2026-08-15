@@ -6,6 +6,7 @@ module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Iper = Driver.Iper
 module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 
 type 'a dag_ind = {
   di_val : 'a;
@@ -1166,7 +1167,7 @@ let print conf base p p1 =
           | Right p -> print_base_loop conf base p))
   | None -> Perso.interp_templ "relmenu" conf base p
 
-let print_multi conf base =
+let print_multi conn conf base =
   let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t =
     Hashtbl.create 53
   in
@@ -1174,7 +1175,7 @@ let print_multi conf base =
     let clean_url =
       Util.normalize_person_pool_url conf base "RLM" (Some assoc_txt)
     in
-    Server.http_redirect_temporarily clean_url
+    Connection.http_redirect_temporarily conn clean_url
   else
     let pl =
       let rec loop pl i =
