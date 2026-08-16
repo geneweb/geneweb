@@ -762,16 +762,19 @@ and wrap_print width print =
     String.iter
       (fun c ->
         match c with
-        | '\n' | '\r' -> print "\n"; col := 0
+        | '\n' | '\r' ->
+            print "\n";
+            col := 0
         | c ->
-            if !col >= width then (print "\n"; col := 0);
+            if !col >= width then (
+              print "\n";
+              col := 0);
             print (String.make 1 c);
             incr col)
       s
+
 and print_specific_file ?wrap conf print fname strm =
-  let print =
-    match wrap with Some w -> wrap_print w print | None -> print
-  in
+  let print = match wrap with Some w -> wrap_print w print | None -> print in
   match Stream.next strm with
   | '{' -> (
       let s = parse_upto '}' strm in
