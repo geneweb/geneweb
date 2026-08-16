@@ -50,11 +50,6 @@ let parse_cmd () =
   in
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
-<<<<<<< HEAD
-=======
-  let bases_dir = !Gwexport.bases_dir in
-  Secure.set_base_dir bases_dir;
->>>>>>> 810e9e252 (several fixes in gwu and setup)
   match !bname with
   | None ->
       Arg.usage (speclist opts) Gwexport.errmsg;
