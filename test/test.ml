@@ -8,5 +8,5 @@ let () =
     else `Run
   in
   run ~and_exit:false "Geneweb" ~filter
-    (Sosa_test.v @ Place_test.v @ Calendar_test.v @ Wiki_test.v @ Merge_test.v
-   @ Util_test.v @ Dag2html_test.v)
+    (Sosa_test.v @ Place_test.v @ Place_cache_test.v @ Calendar_test.v
+   @ Wiki_test.v @ Merge_test.v @ Util_test.v @ Dag2html_test.v)

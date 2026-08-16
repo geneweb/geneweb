@@ -692,8 +692,7 @@ let treat_request =
              | "POP_PYR" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_population_pyramid
              | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
-             | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
-             | "PPS" -> w_base @@ Place.print_all_places_surnames
+             | "PS" | "PPS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "R" -> (
                  w_base @@ fun conf base ->
                  let r_not_found conf q =

@@ -5,6 +5,7 @@
   test
   sosa_test
   place_test
+  place_cache_test
   calendar_test
   wiki_test
   merge_test

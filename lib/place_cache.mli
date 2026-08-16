@@ -18,8 +18,14 @@ open Geneweb_db.Driver
 type t = {
   persons : (string, (istr gen_pers_event_name * iper) list) Hashtbl.t;
   families : (string, (istr gen_fam_event_name * ifam) list) Hashtbl.t;
+  iper_places : (iper, string list) Hashtbl.t;
+  ifam_places : (ifam, string list) Hashtbl.t;
 }
-(** In-memory cache. *)
+(** In-memory cache. [persons] and [families] are the forward index (place ->
+    ids). [iper_places] and [ifam_places] are a reverse index (id -> the
+    distinct places it contributes to), maintained so that incremental updates
+    can strip a single id without scanning the whole forward index. Both indexes
+    are persisted together and must stay consistent. *)
 
 val magic : string
 (** Magic number embedded at the start of every cache file. Changing this string
@@ -49,4 +55,21 @@ val read : string -> t
 
 val get_or_build : string -> Config.config -> base -> t
 (** [get_or_build bdir conf base] returns the cache, reading it from disk if
-    valid, rebuilding and persisting it otherwise. *)
+    valid, rebuilding and persisting it otherwise. A stale-format ([magic]
+    mismatch) or otherwise unreadable cache file is treated as invalid and
+    triggers a rebuild rather than raising. *)
+
+val update_iper : t -> base -> iper -> unit
+(** [update_iper cache base iper] brings [cache] up to date for a single person:
+    it strips every contribution of [iper] (using the reverse index) and, if
+    [iper] still exists in [base], re-indexes its current event places. Both the
+    forward and reverse indexes are kept consistent. Exposed for the incremental
+    delta path and for testing. *)
+
+val update_ifam : t -> base -> ifam -> unit
+(** [update_ifam cache base ifam] is the family analogue of {!update_iper}. *)
+
+val normalize_place_parens : string -> string
+(** Normalise parenthesised place components to comma-separated form. "Granville
+    (Manche)" -> "Granville, Manche" Fast path: strings without '(' are returned
+    unchanged with no allocation. *)
