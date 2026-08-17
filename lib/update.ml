@@ -192,6 +192,11 @@ let print_person_parents_and_spouses conf base ?(alias = None) ?(snalias = None)
     let first_name = (escape_html (Driver.p_first_name base p) :> string) in
     let surname = (escape_html (Driver.p_surname base p) :> string) in
     let name = if pub_name <> "" then (pub_name :> string) else first_name in
+    let name =
+      match List.assoc_opt "show_occ" conf.base_env with
+      | Some "yes" -> Printf.sprintf "%s.%d" name (Driver.get_occ p)
+      | _ -> name
+    in
     Buffer.add_string buf name;
     Buffer.add_char buf ' ';
     Buffer.add_string buf surname;

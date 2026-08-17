@@ -270,7 +270,7 @@
         %end;
       </li>%nl;
     %end;
-    %if;(computable_death_age or computable_age and not roglo)
+    %if;(computable_death_age or computable_age)
       <li class="mt-1" title="%nn;
         %if;(is_dead and computable_death_age)[*age at death][:]%sp;
         %else;%if;(not is_dead and computable_age)[*age][:]%sp;%end;%end;
