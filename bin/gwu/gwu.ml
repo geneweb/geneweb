@@ -50,7 +50,7 @@ let anonfun s =
 let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
-  let bases_dir = Dirs.path Secure.default_base_dir in
+  let bases_dir = !Gwexport.bases_dir in
   Secure.set_base_dir bases_dir;
   match !bname with
   | None ->
