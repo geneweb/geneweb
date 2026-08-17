@@ -1,4 +1,4 @@
-(lang dune 2.8)
+(lang dune 3.20)
 
 (name geneweb)
 
@@ -24,7 +24,7 @@
     calendars
     (camlp5 (>= "8.03.00"))
     camlp-streams
-    (dune (>= "2.9.0"))
+    dune
     (fmt :with-test)
     jingoo
     markup

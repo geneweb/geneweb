@@ -18,7 +18,7 @@ depends: [
   "calendars"
   "camlp5" {>= "8.03.00"}
   "camlp-streams"
-  "dune" {>= "2.8" & >= "2.9.0"}
+  "dune" {>= "3.20"}
   "fmt" {with-test}
   "jingoo"
   "markup"
@@ -36,6 +36,7 @@ depends: [
   "zarith"
 ]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
+x-maintenance-intent: ["(latest)"]
 build: [
   [ "ocaml" "./configure.ml" "--release" ]
   [ make "build" ]
