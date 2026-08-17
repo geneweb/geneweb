@@ -136,7 +136,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
 
 let print_alphabetic_all conf base is_surnames ini list len =
   let title = print_title conf base is_surnames ini len in
-  let mode = Adef.encoded (if is_surnames then "N" else "P") in
+  let mode = if is_surnames then "N" else "P" in
   let meta =
     if is_surnames then surname_list_meta_description conf base else []
   in
@@ -162,12 +162,8 @@ let print_alphabetic_all conf base is_surnames ini list len =
       List.iter
         (fun (s, cnt) ->
           Output.print_sstring conf "<li>";
-          let href =
-            let open Def in
-            "m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A"
-          in
-          Util.wprint_geneweb_link conf
-            (href :> Adef.escaped_string)
+          let query = [ ("m", mode); ("v", s); ("t", "A") ] in
+          Util.wprint_geneweb_link conf ~query
             (particle_at_the_end base is_surnames s |> Util.escape_html
               :> Adef.safe_string);
           Output.print_sstring conf " (";

@@ -416,10 +416,13 @@ let display_descendants_with_numbers conf base max_level ancestor =
     if h then descendants_title conf base ancestor h
     else
       Util.wprint_geneweb_link conf
-        ("m=D&i="
-         ^ Gwdb.string_of_iper (Gwdb.get_iper ancestor)
-         ^ "&v=" ^ string_of_int max_level ^ "&t=G"
-        |> Adef.escaped)
+        ~query:
+          [
+            ("m", "D");
+            ("i", Gwdb.string_of_iper (Gwdb.get_iper ancestor));
+            ("v", string_of_int max_level);
+            ("t", "G");
+          ]
         (let s = NameDisplay.fullname_html_of_person conf base ancestor in
          Util.transl_a_of_gr_eq_gen_lev conf
            (Util.transl conf "descendants")
@@ -503,9 +506,7 @@ let print_elem conf base paths precision (n, pll) =
           List.iter
             (fun p ->
               Output.print_sstring conf "<li><strong>";
-              Util.wprint_geneweb_link conf
-                (Adef.escaped @@ Ext_uri.encoded_of_query
-               @@ Util.acces' conf base p)
+              Util.wprint_geneweb_link conf ~query:(Util.acces conf base p)
                 (Gwdb.p_first_name base p |> Util.escape_html
                   :> Adef.safe_string);
               Output.print_sstring conf "</strong>";
@@ -575,10 +576,13 @@ let display_descendant_index conf base max_level ancestor =
     in
     if not h then
       Util.wprint_geneweb_link conf
-        ("m=D&i="
-         ^ Gwdb.string_of_iper (Gwdb.get_iper ancestor)
-         ^ "&v=" ^ string_of_int max_level ^ "&t=C"
-        |> Adef.escaped)
+        ~query:
+          [
+            ("m", "D");
+            ("i", Gwdb.string_of_iper (Gwdb.get_iper ancestor));
+            ("v", string_of_int max_level);
+            ("t", "C");
+          ]
         txt
     else Output.print_string conf txt
   in

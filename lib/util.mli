@@ -125,14 +125,14 @@ val geneweb_link :
   ?id:string ->
   ?style:string ->
   Config.config ->
-  Adef.escaped_string ->
+  query:(string * string) list ->
   Adef.safe_string ->
   Adef.safe_string
-(** [geneweb_link conf href s] Returns HTML link to actual geneweb's command (database name) with additional (to those defind by [commd])
-    argument [href] and [s] as textual content of the link. *)
+(** [geneweb_link conf ~query s] Returns HTML link to actual geneweb's command (database name) with additional (to those defind by [commd])
+    argument [query] and [s] as textual content of the link. *)
 
 val wprint_geneweb_link :
-  Config.config -> Adef.escaped_string -> Adef.safe_string -> unit
+  Config.config -> query:(string * string) list -> Adef.safe_string -> unit
 (** Prints on the socket link created by [geneweb_link]. *)
 
 val pget_opt : Config.config -> Gwdb.base -> Gwdb.iper -> Gwdb.person option
