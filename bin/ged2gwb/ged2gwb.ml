@@ -1297,6 +1297,11 @@ let find_event_witness gen tag ip r =
     function
       [] -> []
     | r :: asso_l ->
+        let wnote =
+          match find_all_fields "NOTE" r.rsons with
+          | [] -> string_empty
+          | rl -> add_string gen (treat_notes gen rl)
+        in
         if find_field_with_value "TYPE" tag r.rsons then
           let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
           let witness_kind =
@@ -1304,7 +1309,7 @@ let find_event_witness gen tag ip r =
               Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
-          (witness, witness_kind) :: find_witnesses asso_l
+          (witness, witness_kind, wnote) :: find_witnesses asso_l
         else
           let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
           let witness_kind =
@@ -1312,7 +1317,7 @@ let find_event_witness gen tag ip r =
               Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
-          (witness, witness_kind) :: find_witnesses asso_l
+          (witness, witness_kind, wnote) :: find_witnesses asso_l
   in
   let witnesses =
     match find_all_fields "ASSO" r.rsons with
@@ -1326,6 +1331,11 @@ let find_fevent_witness gen tag ifath r =
     function
       [] -> []
     | r :: asso_l ->
+        let wnote =
+          match find_all_fields "NOTE" r.rsons with
+          | [] -> string_empty
+          | rl -> add_string gen (treat_notes gen rl)
+        in
         if find_field_with_value "TYPE" tag r.rsons then
           let witness = forward_fevent_witn gen ifath (strip_spaces r.rval) in
           let witness_kind =
@@ -1333,7 +1343,7 @@ let find_fevent_witness gen tag ifath r =
               Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
-          (witness, witness_kind) :: find_witnesses asso_l
+          (witness, witness_kind, wnote) :: find_witnesses asso_l
         else
           let witness = forward_fevent_witn gen ifath (strip_spaces r.rval) in
           let witness_kind =
@@ -1341,7 +1351,7 @@ let find_fevent_witness gen tag ifath r =
               Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
-          (witness, witness_kind) :: find_witnesses asso_l
+          (witness, witness_kind, wnote) :: find_witnesses asso_l
   in
   let witnesses =
     match find_all_fields "ASSO" r.rsons with
@@ -2290,14 +2300,14 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
           Efam_Engage ->
             if !found_marriage then loop l marr witn div
             else
-              let witn = Array.map fst evt.efam_witnesses in
+              let witn = Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses in
               let marr =
                 Engaged, evt.efam_date, evt.efam_place, evt.efam_note,
                 evt.efam_src
               in
               let () = found_marriage := true in loop l marr witn div
         | Efam_Marriage ->
-            let witn = Array.map fst evt.efam_witnesses in
+            let witn = Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses in
             let marr =
               Married, evt.efam_date, evt.efam_place, evt.efam_note,
               evt.efam_src
@@ -2306,7 +2316,7 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
         | Efam_MarriageContract ->
             if !found_marriage then loop l marr witn div
             else
-              let witn = Array.map fst evt.efam_witnesses in
+              let witn = Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses in
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on met une précision "vers".      *)
               let date =
@@ -2325,7 +2335,7 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
           Efam_Annulation | Efam_PACS ->
             if !found_marriage then loop l marr witn div
             else
-              let witn = Array.map fst evt.efam_witnesses in
+              let witn = Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses in
               let marr =
                 NoMention, evt.efam_date, evt.efam_place, evt.efam_note,
                 evt.efam_src
@@ -2334,7 +2344,7 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
         | Efam_NoMarriage ->
             if !found_marriage then loop l marr witn div
             else
-              let witn = Array.map fst evt.efam_witnesses in
+              let witn = Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses in
               let marr =
                 NotMarried, evt.efam_date, evt.efam_place, evt.efam_note,
                 evt.efam_src

@@ -3154,12 +3154,12 @@ let record_visited conf ip =
 let array_mem_witn conf base x a =
   let rec loop i =
     if i = Array.length a then None
-    else if x = fst a.(i) then
-      Some
-        (string_of_witness_kind conf
-           (Driver.get_sex @@ Driver.poi base x)
-           (snd a.(i)))
-    else loop (i + 1)
+    else
+      let wip, wk, _ = a.(i) in
+      if x = wip then
+        Some
+          (string_of_witness_kind conf (Driver.get_sex @@ Driver.poi base x) wk)
+      else loop (i + 1)
   in
   loop 0
 
