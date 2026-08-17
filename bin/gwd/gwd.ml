@@ -848,11 +848,13 @@ let basic_authorization from_addr request base_env passwd access_type utm
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
+  let oidc_configured = Gwd_oidc.enabled base_env in
   let ok, wizard, friend, username =
     if (not !Server.cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
-        if wizard_passwd = "" && wizard_passwd_file = "" then
-          (true, true, friend_passwd = "", "")
+        if
+          (not oidc_configured) && wizard_passwd = "" && wizard_passwd_file = ""
+        then (true, true, friend_passwd = "", "")
         else
           match
             basic_match_auth wizard_passwd wizard_passwd_file uauth base_file
@@ -860,8 +862,9 @@ let basic_authorization from_addr request base_env passwd access_type utm
           | Some username -> (true, true, false, username)
           | None -> (false, false, false, "")
       else if passwd = "f" then
-        if friend_passwd = "" && friend_passwd_file = "" then
-          (true, false, true, "")
+        if
+          (not oidc_configured) && friend_passwd = "" && friend_passwd_file = ""
+        then (true, false, true, "")
         else
           match
             basic_match_auth friend_passwd friend_passwd_file uauth base_file
@@ -869,16 +872,19 @@ let basic_authorization from_addr request base_env passwd access_type utm
           | Some username -> (true, false, true, username)
           | None -> (false, false, false, "")
       else assert false
-    else if wizard_passwd = "" && wizard_passwd_file = "" then
-      (true, true, friend_passwd = "", "")
+    else if
+      (not oidc_configured) && wizard_passwd = "" && wizard_passwd_file = ""
+    then (true, true, friend_passwd = "", "")
     else
       match
         basic_match_auth wizard_passwd wizard_passwd_file uauth base_file
       with
       | Some username -> (true, true, false, username)
       | _ -> (
-          if friend_passwd = "" && friend_passwd_file = "" then
-            (true, false, true, "")
+          if
+            (not oidc_configured) && friend_passwd = ""
+            && friend_passwd_file = ""
+          then (true, false, true, "")
           else
             match
               basic_match_auth friend_passwd friend_passwd_file uauth base_file
@@ -1263,6 +1269,17 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
     let command = script_name in
     (command, bname, passwd, env, access_type)
   in
+
+  let oidc_session, access_type =
+    match access_type with
+    | ATnone -> (
+        match Gwd_oidc.cookie_access ~secret:secret_salt request base_file with
+        | Some (acc, user, username) ->
+            if acc = 'w' then (true, ATwizard (user, username))
+            else (true, ATfriend (user, username))
+        | None -> (false, ATnone))
+    | _ -> (false, access_type)
+  in
   let lang, env = extract_assoc "lang" env in
   let lang = if lang = "" then http_preferred_language request else lang in
   let lang = alias_lang lang in
@@ -1349,6 +1366,7 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
       debug = !debug;
       query_start = Unix.gettimeofday ();
       friend = ar.ar_friend || (wizard_just_friend && ar.ar_wizard);
+      oidc = oidc_session;
       semi_public =
         (try List.assoc "semi_public" base_env = "yes" with Not_found -> false);
       just_friend_wizard = ar.ar_wizard && wizard_just_friend;
@@ -1619,49 +1637,52 @@ let conf_and_connection =
            in
            log_and_robot_check conf auth from request script_name
              (contents :> string));
-        match (!Server.cgi, auth_err, passwd_err) with
-        | true, true, _ ->
-            if is_robot from then Robot.robot_error conf 0 0 else no_access conf
-        | _, true, _ ->
-            if is_robot from then Robot.robot_error conf 0 0
-            else
-              let auth_type =
-                let x =
-                  try List.assoc "auth_file" conf.base_env
-                  with Not_found -> ""
+        if Gwd_oidc.handle_mode conf mode then ()
+        else
+          match (!Server.cgi, auth_err, passwd_err) with
+          | true, true, _ ->
+              if is_robot from then Robot.robot_error conf 0 0
+              else no_access conf
+          | _, true, _ ->
+              if is_robot from then Robot.robot_error conf 0 0
+              else
+                let auth_type =
+                  let x =
+                    try List.assoc "auth_file" conf.base_env
+                    with Not_found -> ""
+                  in
+                  if x = "" then "GeneWeb service" else "database " ^ conf.bname
                 in
-                if x = "" then "GeneWeb service" else "database " ^ conf.bname
-              in
-              refuse_auth conf from auth auth_type
-        | _, _, ({ ar_ok = false; _ } as ar) ->
-            if is_robot from then Robot.robot_error conf 0 0
-            else begin
-              let tm = Unix.time () in
-              let lock_file = !GWPARAM.adm_file "gwd.lck" in
-              let on_exn _exn _bt = () in
-              Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
-                  log_passwd_failed ar tm from request conf.bname);
-              unauth_server conf ar
-            end
-        | _ -> (
-            enable_gzip ();
-            try
-              let t1 = Unix.gettimeofday () in
-              Request.treat_request conf;
-              Output.flush conf;
-              let t2 = Unix.gettimeofday () in
-              if t2 -. t1 > slow_query_threshold then
-                Log.warn (fun k ->
-                    k "%s slow query (%.3f)"
-                      (context conf contents : Adef.encoded_string :> string)
-                      (t2 -. t1))
-            with
-            | Exit -> ()
-            | Def.HttpExn (code, _) as exn ->
-                let bt = Printexc.get_raw_backtrace () in
-                GWPARAM.output_error conf code;
-                Log.err (fun k ->
-                    k "%a" (pp_exception ~predictable_mode) (exn, bt))))
+                refuse_auth conf from auth auth_type
+          | _, _, ({ ar_ok = false; _ } as ar) ->
+              if is_robot from then Robot.robot_error conf 0 0
+              else begin
+                let tm = Unix.time () in
+                let lock_file = !GWPARAM.adm_file "gwd.lck" in
+                let on_exn _exn _bt = () in
+                Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
+                    log_passwd_failed ar tm from request conf.bname);
+                unauth_server conf ar
+              end
+          | _ -> (
+              enable_gzip ();
+              try
+                let t1 = Unix.gettimeofday () in
+                Request.treat_request conf;
+                Output.flush conf;
+                let t2 = Unix.gettimeofday () in
+                if t2 -. t1 > slow_query_threshold then
+                  Log.warn (fun k ->
+                      k "%s slow query (%.3f)"
+                        (context conf contents : Adef.encoded_string :> string)
+                        (t2 -. t1))
+              with
+              | Exit -> ()
+              | Def.HttpExn (code, _) as exn ->
+                  let bt = Printexc.get_raw_backtrace () in
+                  GWPARAM.output_error conf code;
+                  Log.err (fun k ->
+                      k "%a" (pp_exception ~predictable_mode) (exn, bt))))
 
 let match_strings regexp s =
   let rec loop i j =
@@ -2006,10 +2027,12 @@ let null_reopen flags fd =
    If the [random] argument is [false], the salt is always the same.
    The default is [true]. *)
 let generate_secret_salt ?(random = true) () =
-  if random then (
-    Random.self_init ();
-    string_of_int @@ Random.bits ())
-  else ""
+  if not random then ""
+  else
+    try Geneweb_oidc.Oidc.generate_token ()
+    with Sys_error _ | End_of_file ->
+      Random.self_init ();
+      string_of_int (Random.bits ())
 
 let retrieve_secret_salt () =
   match Unix.getenv "SECRET_SALT" with
