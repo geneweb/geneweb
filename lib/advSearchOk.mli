@@ -2,7 +2,7 @@ val advanced_search :
   query_params:Page.Advanced_search.Query_params.t ->
   Config.config ->
   Gwdb.base ->
-  Gwdb.person list * int
+  Authorized.Person.t list * int
 (** [advanced_search ~query_params conf base]
     returns at most [query_params.limit] persons from the [base] that match conditions described by those fields. Seond result
     represents real number of matches (if less then [query_params.limit]). *)

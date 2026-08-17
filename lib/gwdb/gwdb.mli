@@ -44,6 +44,7 @@ val insert_family :
   iper Def.gen_descend ->
   ifam
 
+val get_name : base -> istr -> string
 val p_first_name : base -> person -> string
 val p_surname : base -> person -> string
 val person_misc_names : base -> person -> (person -> title list) -> string list

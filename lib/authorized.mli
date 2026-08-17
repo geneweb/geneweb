@@ -24,6 +24,18 @@ module rec Person : sig
   val get_aliases : t -> Gwdb.istr list option
   val get_public_name : t -> Gwdb.istr option
   val get_qualifiers : t -> Gwdb.istr list option
+
+  val misc_names :
+    conf:Config.Trimmed.t ->
+    base:Gwdb.base ->
+    t ->
+    (t -> Gwdb.title list option) ->
+    string list option
+
+  val nobtit :
+    conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Gwdb.title list option
+
+  val get_occ : t -> int option
   val get_baptism : t -> Adef.cdate option
   val get_baptism_place : t -> Gwdb.istr option
   val get_birth : t -> Adef.cdate option
@@ -44,6 +56,9 @@ module rec Person : sig
 
   val has_nephews_or_nieces :
     conf:Config.Trimmed.t -> base:Gwdb.base -> t -> bool option
+
+  val has_visible_name : t -> bool
+  val compare_by_dates : t -> t -> int option
 end
 
 and Family : sig
@@ -54,6 +69,9 @@ and Family : sig
 
   val get_children :
     conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Person.t array
+
+  val get_father : conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Person.t
+  val get_mother : conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Person.t
 
   val get_spouse :
     conf:Config.Trimmed.t ->

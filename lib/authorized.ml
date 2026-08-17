@@ -38,6 +38,18 @@ module rec Person : sig
   val get_aliases : t -> Gwdb.istr list option
   val get_public_name : t -> Gwdb.istr option
   val get_qualifiers : t -> Gwdb.istr list option
+
+  val misc_names :
+    conf:Config.Trimmed.t ->
+    base:Gwdb.base ->
+    t ->
+    (t -> Gwdb.title list option) ->
+    string list option
+
+  val nobtit :
+    conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Gwdb.title list option
+
+  val get_occ : t -> int option
   val get_baptism : t -> Adef.cdate option
   val get_baptism_place : t -> Gwdb.istr option
   val get_birth : t -> Adef.cdate option
@@ -58,6 +70,9 @@ module rec Person : sig
 
   val has_nephews_or_nieces :
     conf:Config.Trimmed.t -> base:Gwdb.base -> t -> bool option
+
+  val has_visible_name : t -> bool
+  val compare_by_dates : t -> t -> int option
 end = struct
   type authorization_level =
     | Navigation_without_names
@@ -133,6 +148,22 @@ end = struct
   let get_qualifiers person =
     get_if_navigation_with_names_authorized ~get:Gwdb.get_qualifiers person
 
+  let misc_names ~conf ~base person nobtit =
+    get_if_navigation_with_names_authorized
+      ~get:(fun person ->
+        Gwdb.person_misc_names base person (fun person ->
+            let person = make ~conf ~base (Gwdb.get_iper person) in
+            Option.value ~default:[] (nobtit person)))
+      person
+
+  let nobtit ~conf ~base person =
+    get_if_navigation_with_names_authorized
+      ~get:(Person'.nobtit (Config.Trimmed.to_config conf) base)
+      person
+
+  let get_occ person =
+    get_if_navigation_with_names_authorized ~get:Gwdb.get_occ person
+
   let get_baptism person = get_if_fully_authorized ~get:Gwdb.get_baptism person
 
   let get_baptism_place person =
@@ -198,6 +229,19 @@ end = struct
               false)
         (Person.get_parents ~conf ~base a)
     with Ok -> Some true
+
+  let has_visible_name person =
+    Option.value ~default:false
+      (get_if_navigation_with_names_authorized ~get:(Fun.const true) person)
+
+  let compare_by_dates person1 person2 =
+    Option.join
+    @@ get_if_fully_authorized
+         ~get:(fun person1 ->
+           get_if_fully_authorized
+             ~get:(fun person2 -> Person'.compare_by_dates person1 person2)
+             person2)
+         person1
 end
 
 and Family : sig
@@ -209,6 +253,9 @@ and Family : sig
 
   val get_children :
     conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Person.t array
+
+  val get_father : conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Person.t
+  val get_mother : conf:Config.Trimmed.t -> base:Gwdb.base -> t -> Person.t
 
   val get_spouse :
     conf:Config.Trimmed.t ->

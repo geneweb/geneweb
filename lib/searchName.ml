@@ -5,8 +5,8 @@ let persons_of_stream conf base filter iperset stream max =
     match Seq.uncons ipers with
     | Some (_iper, _) when n <= 0 -> iperset
     | Some (iper, ipers) ->
-        let p = Gwdb.poi base iper in
-        if Person.has_visible_name conf base p && filter p then
+        let p = Authorized.Person.make ~conf ~base iper in
+        if Authorized.Person.has_visible_name p && filter p then
           let iperset' = Gwdb.IperSet.add iper iperset in
           if iperset' == iperset then aux n iperset ipers
           else aux (n - 1) iperset' ipers
@@ -62,9 +62,8 @@ let has_visible_marital_name match_name conf base p =
 
 type prefix = { kind : [ `First_name | `Surname ]; value : string }
 
-let persons_of_prefixes_stream max conf' base include_marital_names filter
+let persons_of_prefixes_stream max conf base include_marital_names filter
     other_pfxs main_pfx =
-  let conf = Config.Trimmed.from_config conf' in
   let main_stream =
     (match main_pfx.kind with
     | `First_name -> Gwdb.persons_stream_of_first_name_prefix
@@ -75,41 +74,45 @@ let persons_of_prefixes_stream max conf' base include_marital_names filter
   let match_other_istr p other_pfx =
     let istr =
       (match other_pfx.kind with
-      | `First_name -> Gwdb.get_first_name
-      | `Surname -> Gwdb.get_surname)
+      | `First_name -> Authorized.Person.get_first_name
+      | `Surname -> Authorized.Person.get_surname)
         p
     in
-    match Hashtbl.find_opt other_map (istr, other_pfx) with
-    | Some value -> value
-    | None ->
-        let value =
-          List.exists
-            (start_with base (Name.lower (strip_particle base other_pfx.value)))
-            (Name.split @@ Gwdb.sou base istr)
-        in
-        Hashtbl.add other_map (istr, other_pfx) value;
-        if Gwdb.get_sex p <> Def.Female then value
-        else
-          value
-          || include_marital_names
-             && has_visible_marital_name
-                  (fun s ->
-                    List.exists
-                      (start_with base
-                         (Name.lower (strip_particle base other_pfx.value)))
-                      (Name.split s))
-                  conf base
-                  (Authorized.Person.make ~conf ~base (Gwdb.get_iper p))
+    Option.fold istr ~none:false ~some:(fun istr ->
+        match Hashtbl.find_opt other_map (istr, other_pfx) with
+        | Some value -> value
+        | None ->
+            let value =
+              List.exists
+                (start_with base
+                   (Name.lower (strip_particle base other_pfx.value)))
+                (Name.split @@ Gwdb.sou base istr)
+            in
+            Hashtbl.add other_map (istr, other_pfx) value;
+            Option.fold (Authorized.Person.get_sex p) ~none:false
+              ~some:(fun sex ->
+                if sex <> Def.Female then value
+                else
+                  value
+                  || include_marital_names
+                     && has_visible_marital_name
+                          (fun s ->
+                            List.exists
+                              (start_with base
+                                 (Name.lower
+                                    (strip_particle base other_pfx.value)))
+                              (Name.split s))
+                          conf base p))
   in
   let rec consume n results main_stream =
     match Seq.uncons main_stream with
     | Some (iper, main_stream) ->
         if n = 0 then results
         else
-          let p = Gwdb.poi base iper in
+          let p = Authorized.Person.make ~conf ~base iper in
           if
             List.for_all (match_other_istr p) other_pfxs
-            && Person.has_visible_name conf' base p
+            && Authorized.Person.has_visible_name p
             && filter p
           then
             let iperset' = Gwdb.IperSet.add iper results in
@@ -152,11 +155,9 @@ let is_subset_pfx s1 s2 =
 
 let filter_marital_names ?(include_marital_names = true) match_name conf base p
     =
-  let conf = Config.Trimmed.from_config conf in
-  Gwdb.get_sex p <> Def.Female
-  ||
-  let p = Authorized.Person.make ~conf ~base (Gwdb.get_iper p) in
-  is_matched_by_surnames match_name base p
+  Option.fold (Authorized.Person.get_sex p) ~none:false ~some:(fun sex ->
+      sex <> Def.Female)
+  || is_matched_by_surnames match_name base p
   || (include_marital_names && has_visible_marital_name match_name conf base p)
 
 let match_name_starting_with pfx n =
@@ -219,7 +220,9 @@ let persons_starting_with ~include_marital_names ~conf ~base ~filter
               let partial_results = Gwdb.IperSet.of_list partial_results in
               fun person ->
                 filter person
-                && not (Gwdb.IperSet.mem (Gwdb.get_iper person) partial_results)
+                && Option.fold (Authorized.Person.get_iper person) ~none:false
+                     ~some:(fun person_id ->
+                       not (Gwdb.IperSet.mem person_id partial_results))
             in
             persons_starting_with ~conf ~base ~include_marital_names ~filter
               ~limit ~other_prefixes main_prefix
@@ -238,26 +241,40 @@ let persons_starting_with ~include_marital_names ~conf ~base ~filter
     l
 
 let empty_sn_or_fn base p =
-  Gwdb.is_empty_string (Gwdb.get_surname p)
-  || Gwdb.is_quest_string (Gwdb.get_surname p)
-  || Gwdb.is_empty_string (Gwdb.get_first_name p)
-  || Gwdb.is_quest_string (Gwdb.get_first_name p)
-  || Name.lower (Gwdb.sou base (Gwdb.get_surname p)) = ""
-  || Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) = ""
+  match
+    (Authorized.Person.get_surname p, Authorized.Person.get_first_name p)
+  with
+  | None, None | None, Some _ | Some _, None -> true
+  | Some surname, Some first_name ->
+      Gwdb.is_empty_string surname
+      || Gwdb.is_quest_string surname
+      || Gwdb.is_empty_string first_name
+      || Gwdb.is_quest_string first_name
+      || Name.lower (Gwdb.sou base surname) = ""
+      || Name.lower (Gwdb.sou base first_name) = ""
 
 let person_is_misc_name conf base p k =
   let k = Name.strip_lower k in
   List.exists
     (fun n -> Name.strip n = k)
-    (Gwdb.person_misc_names base p (Person.nobtit conf base))
+    (Option.value
+       (Authorized.Person.misc_names ~conf ~base p
+          (Authorized.Person.nobtit ~conf ~base))
+       ~default:[])
 
 let person_is_approx_key base p k =
   let k = Name.strip_lower k in
-  let fn = Name.strip_lower (Gwdb.p_first_name base p) in
-  let sn = Name.strip_lower (Gwdb.p_surname base p) in
-  k = fn ^ sn && fn <> "" && sn <> ""
+  match
+    (Authorized.Person.get_first_name p, Authorized.Person.get_surname p)
+  with
+  | None, None | None, Some _ | Some _, None -> false
+  | Some first_name, Some surname ->
+      let fn = Name.strip_lower (Gwdb.get_name base first_name) in
+      let sn = Name.strip_lower (Gwdb.get_name base surname) in
+      k = fn ^ sn && fn <> "" && sn <> ""
 
 let select_approx_key conf base pl k =
+  let conf = Config.Trimmed.from_config conf in
   List.fold_right
     (fun p pl ->
       if person_is_approx_key base p k then p :: pl
@@ -267,23 +284,32 @@ let select_approx_key conf base pl k =
 
 (* search functions *)
 
+let search_reject_p base p =
+  empty_sn_or_fn base p || not (Authorized.Person.has_visible_name p)
+
 let search_by_sosa ~conf ~base ~sosa =
   if Sosa.eq sosa Sosa.zero then None
   else
     Option.bind (Util.find_sosa_ref conf base) (fun sosa_ref ->
-        Util.p_of_sosa conf base sosa sosa_ref)
+        Option.bind (Util.p_of_sosa conf base sosa sosa_ref) (fun person ->
+            let person =
+              Authorized.Person.make
+                ~conf:(Config.Trimmed.from_config conf)
+                ~base (Gwdb.get_iper person)
+            in
+            Ext_option.return_if
+              (not @@ search_reject_p base person)
+              (fun () -> person)))
 
-let search_reject_p conf base p =
-  empty_sn_or_fn base p || not (Person.has_visible_name conf base p)
-
-let search_by_name conf base n =
+let search_by_name conf' base n =
+  let conf = Config.Trimmed.from_config conf' in
   let n1 = Name.abbrev (Name.lower n) in
   match String.index_opt n1 ' ' with
   | Some i ->
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let list, _ =
-        Search_name_display.persons_of_fsname conf base
+        Search_name_display.persons_of_fsname conf' base
           Gwdb.base_strings_of_surname
           (Gwdb.spi_find (Gwdb.persons_of_surname base))
           Gwdb.get_surname sn
@@ -292,15 +318,20 @@ let search_by_name conf base n =
         (fun pl (_, _, ipl) ->
           List.fold_left
             (fun pl ip ->
-              let p = Util.pget conf base ip in
-              if search_reject_p conf base p then pl
+              let p = Authorized.Person.make ~conf ~base ip in
+              if search_reject_p base p then pl
               else
-                let fn1 =
-                  Name.abbrev
-                    (Name.lower (Gwdb.sou base (Gwdb.get_first_name p)))
-                in
-                if List.mem fn (Ext_string.split_on_char ' ' fn1) then p :: pl
-                else pl)
+                match
+                  Option.map
+                    (fun first_name ->
+                      Name.abbrev (Name.lower (Gwdb.sou base first_name)))
+                    (Authorized.Person.get_first_name p)
+                with
+                | None -> pl
+                | Some fn1 ->
+                    if List.mem fn (Ext_string.split_on_char ' ' fn1) then
+                      p :: pl
+                    else pl)
             pl ipl)
         [] list
   | None -> []
@@ -308,25 +339,51 @@ let search_by_name conf base n =
 let sort_person_list_aux sort base =
   let default p1 p2 =
     match
-      Utf8.alphabetic_order (Gwdb.p_surname base p1) (Gwdb.p_surname base p2)
+      Utf8.alphabetic_order
+        (Option.fold
+           (Authorized.Person.get_surname p1)
+           ~none:"" ~some:(Gwdb.get_name base))
+        (Option.fold
+           (Authorized.Person.get_surname p2)
+           ~none:"" ~some:(Gwdb.get_name base))
     with
     | 0 -> (
         match
           Utf8.alphabetic_order
-            (Gwdb.p_first_name base p1)
-            (Gwdb.p_first_name base p2)
+            (Option.fold
+               (Authorized.Person.get_first_name p1)
+               ~none:"" ~some:(Gwdb.get_name base))
+            (Option.fold
+               (Authorized.Person.get_first_name p2)
+               ~none:"" ~some:(Gwdb.get_name base))
         with
         | 0 -> (
-            match compare (Gwdb.get_occ p1) (Gwdb.get_occ p2) with
-            | 0 -> Gwdb.compare_iper (Gwdb.get_iper p1) (Gwdb.get_iper p2)
+            match
+              compare
+                (Option.value (Authorized.Person.get_occ p1) ~default:0)
+                (Option.value (Authorized.Person.get_occ p2) ~default:0)
+            with
+            | 0 ->
+                Gwdb.compare_iper
+                  (Option.value
+                     (Authorized.Person.get_iper p1)
+                     ~default:Gwdb.dummy_iper)
+                  (Option.value
+                     (Authorized.Person.get_iper p2)
+                     ~default:Gwdb.dummy_iper)
             | c -> c)
         | c -> c)
     | c -> c
   in
   sort (fun p1 p2 ->
-      if Gwdb.get_iper p1 = Gwdb.get_iper p2 then 0
+      if
+        Option.value (Authorized.Person.get_iper p1) ~default:Gwdb.dummy_iper
+        = Option.value (Authorized.Person.get_iper p2) ~default:Gwdb.dummy_iper
+      then 0
       else
-        match Person.compare_by_dates p1 p2 with 0 -> default p1 p2 | c -> c)
+        match Authorized.Person.compare_by_dates p1 p2 with
+        | None | Some 0 -> default p1 p2
+        | Some c -> c)
 
 (* Sort list of persons by comparison with following order:
    - Compare by birth and death date
@@ -335,10 +392,12 @@ let sort_person_list_aux sort base =
    - Compare by occurence number
    - Compare by id
    and also remove duplicates *)
-let sort_uniq_person_list : Gwdb.base -> Gwdb.person list -> Gwdb.person list =
+let sort_uniq_person_list :
+    Gwdb.base -> Authorized.Person.t list -> Authorized.Person.t list =
   sort_person_list_aux List.sort_uniq
 
-let search_key_aux aux conf base an =
+let search_key_aux aux conf' base an =
+  let conf = Config.Trimmed.from_config conf' in
   let acc = Gutil.person_not_a_key_find_all base an in
   let an, acc =
     if acc = [] then
@@ -352,11 +411,11 @@ let search_key_aux aux conf base an =
   let acc =
     List.filter_map
       (fun i ->
-        let p = Util.pget conf base i in
-        if search_reject_p conf base p then None else Some p)
+        let p = Authorized.Person.make ~conf ~base i in
+        if search_reject_p base p then None else Some p)
       acc
   in
-  let acc = aux conf base acc an in
+  let acc = aux conf' base acc an in
   sort_uniq_person_list base acc
 
 let search_partial_key =
@@ -367,13 +426,17 @@ let search_approx_key = search_key_aux select_approx_key
 
 (* recherche par clé, i.e. prenom.occ nom *)
 let search_by_key conf base an =
+  let conf = Config.Trimmed.from_config conf in
   Option.bind (Gutil.person_of_string_key base an) (fun ip ->
-      let p = Util.pget conf base ip in
-      if search_reject_p conf base p then None else Some p)
+      let p = Authorized.Person.make ~conf ~base ip in
+      if search_reject_p base p then None else Some p)
 
 let print_fiche conf base p =
-  Util.record_visited conf (Gwdb.get_iper p);
-  Perso.print conf base p
+  let person_id =
+    Option.value (Authorized.Person.get_iper p) ~default:Gwdb.dummy_iper
+  in
+  Util.record_visited conf person_id;
+  Perso.print conf base (Util.pget conf base person_id)
 
 let search_sosa conf base s =
   match Sosa.of_string s with
