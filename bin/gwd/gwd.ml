@@ -2157,7 +2157,7 @@ let read_input len =
      with End_of_file -> ());
     Buffer.contents buff
 
-let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
+let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2188,13 +2188,13 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
         Log.err (fun k -> k "Cannot load the database %s" dbn);
         exit 2)
     !cache_databases;
-  if Option.is_some !auth_file && !force_cgi then
+  if Option.is_some !auth_file && cgi then
     Log.warn (fun k ->
         k
           "-auth option is not compatible with CGI mode.\n\
           \ Use instead friend_passwd_file= and wizard_passwd_file= in .cgf \
            file");
-  if !digest_password && !force_cgi then
+  if !digest_password && cgi then
     Log.warn (fun k -> k "-digest option is not compatible with CGI mode.");
   (if !images_dir <> "" then
      let abs_dir =
@@ -2211,16 +2211,16 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
     Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
   Server.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
-  let query, cgi =
-    try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
-    with Not_found -> ("" |> Adef.encoded, !force_cgi)
-  in
   Util.is_welcome := false;
   if !check then (
     Log.debug (fun k -> k "End of check mode.");
     exit 0);
   if cgi then (
-    Server.cgi := true;
+    let query =
+      match Sys.getenv "QUERY_STRING" with
+      | exception Not_found -> Adef.encoded ""
+      | s -> Adef.encoded s
+    in
     set_binary_mode_out stdout true;
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
@@ -2293,7 +2293,6 @@ let parse_cmd () =
       wizard_passwd := o.wizard_password;
       log_file := o.log;
       verbosity_level := o.verbosity;
-      force_cgi := o.cgi;
       cgi_secret_salt := o.secret_salt;
       Lock.no_lock_flag := o.no_lock;
       Mutil.particles_file := Option.value ~default:"" o.particles_file;
@@ -2318,6 +2317,19 @@ let switch_debug () =
   set_verbosity_level 7;
   Logs.set_level ~all:true (Some Logs.Debug);
   Sys.enable_runtime_warnings true
+
+let infer_cgi () =
+  match Sys.getenv "QUERY_STRING" with
+  | exception Not_found -> false
+  | _ ->
+      Log.warn (fun k ->
+          k
+            "CGI mode was enabled via QUERY_STRING environment variable. This \
+             implicit behavior is deprecated. Use the `-cgi` CLI option \
+             instead.");
+      true
+
+let switch_cgi_mode () = Server.cgi := true
 
 type opened_file = { path : string; mutable oc : out_channel option }
 
@@ -2409,9 +2421,11 @@ let () =
   if opts.debug then switch_debug ();
   make_socket_dir opts.socket_dir;
   setup_log ~predictable_mode:opts.predictable_mode opts.log;
+  let cgi = opts.cgi || infer_cgi () in
+  if cgi then switch_cgi_mode ();
   try
     main ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
-      ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ()
+      ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ~cgi ()
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Log.err (fun k ->
