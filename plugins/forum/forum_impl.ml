@@ -3,7 +3,7 @@ open Config
 module Registration = Geneweb_register.Registration
 module Sites = Geneweb_plugins_sites.Sites.Sites
 
-let wrapper fn conf base =
+let wrapper fn _conn conf base =
   if List.assoc_opt "disable_forum" conf.base_env <> Some "yes" then
     fn conf base
   else Hutil.incorrect_request conf;

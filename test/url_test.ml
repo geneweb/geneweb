@@ -1,42 +1,43 @@
 open Alcotest
-open Geneweb_http
+module Connection = Geneweb_http.Connection
 
 let inet s p = Unix.ADDR_INET (Unix.inet_addr_of_string s, p)
 
 let pp_sockaddr_ipv4 () =
   (check string) "" "127.0.0.1:2316"
-    (Fmt.str "%a" Server.pp_sockaddr (inet "127.0.0.1" 2316))
+    (Fmt.str "%a" Connection.pp_sockaddr (inet "127.0.0.1" 2316))
 
 let pp_sockaddr_ipv6 () =
   (check string) "" "[::1]:2317"
-    (Fmt.str "%a" Server.pp_sockaddr (inet "::1" 2317))
+    (Fmt.str "%a" Connection.pp_sockaddr (inet "::1" 2317))
 
 let pp_sockaddr_ipv6_wildcard () =
   (check string) "" "[::]:2317"
-    (Fmt.str "%a" Server.pp_sockaddr (inet "::" 2317))
+    (Fmt.str "%a" Connection.pp_sockaddr (inet "::" 2317))
 
 let lan_candidate_rejects_loopback () =
-  (check bool) "" false (Server.is_lan_candidate (inet "127.0.0.1" 0));
-  (check bool) "" false (Server.is_lan_candidate (inet "127.0.1.1" 0))
+  (check bool) "" false (Connection.is_lan_candidate (inet "127.0.0.1" 0));
+  (check bool) "" false (Connection.is_lan_candidate (inet "127.0.1.1" 0))
 
 let lan_candidate_accepts_private_ipv4 () =
-  (check bool) "" true (Server.is_lan_candidate (inet "192.168.2.4" 0))
+  (check bool) "" true (Connection.is_lan_candidate (inet "192.168.2.4" 0))
 
 let lan_candidate_rejects_ipv6 () =
-  (check bool) "" false (Server.is_lan_candidate (inet "::1" 0));
-  (check bool) "" false (Server.is_lan_candidate (inet "fe80::1" 0))
+  (check bool) "" false (Connection.is_lan_candidate (inet "::1" 0));
+  (check bool) "" false (Connection.is_lan_candidate (inet "fe80::1" 0))
 
 let lan_candidate_rejects_unix () =
-  (check bool) "" false (Server.is_lan_candidate (Unix.ADDR_UNIX "/tmp/s"))
+  (check bool) "" false (Connection.is_lan_candidate (Unix.ADDR_UNIX "/tmp/s"))
 
 let lan_candidate_rejects_v4_mapped () =
-  (check bool) "" false (Server.is_lan_candidate (inet "::ffff:192.168.2.4" 0))
+  (check bool) "" false
+    (Connection.is_lan_candidate (inet "::ffff:192.168.2.4" 0))
 
 let lan_candidate_accepts_public_ipv4 () =
-  (check bool) "" true (Server.is_lan_candidate (inet "203.0.113.7" 0))
+  (check bool) "" true (Connection.is_lan_candidate (inet "203.0.113.7" 0))
 
 let lan_candidate_rejects_wildcard () =
-  (check bool) "" false (Server.is_lan_candidate (inet "0.0.0.0" 0))
+  (check bool) "" false (Connection.is_lan_candidate (inet "0.0.0.0" 0))
 
 let v =
   [
@@ -59,4 +60,4 @@ let v =
       ] );
   ]
 
-let () = Alcotest.run ~and_exit:false "Server" v
+let () = Alcotest.run ~and_exit:false "Connection" v

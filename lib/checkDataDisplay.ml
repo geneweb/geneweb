@@ -1,5 +1,6 @@
 open Config
 module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 
 let t conf ?(c = 1) l =
   let s = Util.transl conf l in
@@ -210,7 +211,7 @@ let get_max_results conf =
   | None, Some f -> Some f
   | None, None -> None
 
-let print_redirect_to_list conf base =
+let print_redirect_to_list conn conf base =
   try
     let _, p_list = List.hd (UpdateData.get_person_from_data conf base) in
     let nb = List.length p_list in
@@ -246,10 +247,10 @@ let print_redirect_to_list conf base =
         in
         redirect_url ^ String.concat "" person_params
     in
-    Server.http_redirect_temporarily final_url
+    Connection.http_redirect_temporarily conn final_url
   with Failure _ | Not_found ->
     let error_url = Printf.sprintf "%sm=CHK_DATA" (Util.commd conf :> string) in
-    Server.http_redirect_temporarily error_url
+    Connection.http_redirect_temporarily conn error_url
 
 let render_error_entry_fast conf base dict_param istr s error_type ~book_title
     ~list_title ~fix_title =

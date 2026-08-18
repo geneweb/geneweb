@@ -10,6 +10,9 @@ module Gutil = Geneweb_db.Gutil
 module Registration = Geneweb_register.Registration
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Connection = Geneweb_http.Connection
+
+type ('b, 'a) handler = Geneweb_http.Connection.t -> Config.config -> 'b -> 'a
 
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
@@ -22,7 +25,7 @@ let this_request_updates_database conf =
       true
   | _ -> false
 
-let request_issue ?(level = `Warning) ~key conf base =
+let request_issue ?(level = `Warning) ~key _conn conf base =
   let title = Util.transl conf ("NOTIF_TT " ^ key) in
   let comment = Util.transl conf ("NOTIF " ^ key) in
   (match level with
@@ -32,24 +35,24 @@ let request_issue ?(level = `Warning) ~key conf base =
   let conf = Notif.inject_pending conf in
   SrcfileDisplay.print_welcome conf base
 
-let person_selected conf base p =
+let person_selected conn conf base p =
   match p_getenv conf.senv "em" with
   | Some "R" ->
       let p1 = find_person_in_env_pref conf base "e" in
       RelationDisplay.print conf base p p1
-  | Some _ -> request_issue conf base ~key:"incorrect em value"
+  | Some _ -> request_issue conn conf base ~key:"incorrect em value"
   | None ->
       record_visited conf (Driver.get_iper p);
       Perso.print conf base p
 
-let person_selected_with_redirect conf base p =
+let person_selected_with_redirect conn conf base p =
   match p_getenv conf.senv "em" with
   | Some "R" ->
       let p1 = find_person_in_env_pref conf base "e" in
       RelationDisplay.print conf base p p1
-  | Some _ -> request_issue conf base ~key:"incorrect em value"
+  | Some _ -> request_issue conn conf base ~key:"incorrect em value"
   | None ->
-      Server.http_redirect_temporarily
+      Connection.http_redirect_temporarily conn
         (commd conf ^^^ Util.acces conf base p :> string)
 
 (* Print “Not found” page *)
@@ -65,11 +68,11 @@ let unknown conf n =
   Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
-let redirect_or_specify =
+let redirect_or_specify conn =
   PersonLookup.redirect_or_specify ~not_found:unknown
-    ~redirect_to_person:person_selected_with_redirect
+    ~redirect_to_person:(person_selected_with_redirect conn)
 
-let make_henv conf base =
+let make_henv _conn conf base =
   (* Collect henv extensions in reverse, prepend to conf.henv at the end. *)
   let extras = ref [] in
   let add_extra k v = extras := (k, v) :: !extras in
@@ -161,7 +164,7 @@ let special_vars =
 let only_special_env env =
   List.for_all (fun (x, _) -> List.mem x special_vars) env
 
-let make_senv conf base =
+let make_senv conn conf base =
   let set_senv conf vm vi =
     (* Accumulate senv extensions in reverse, prepend to base senv at the end.
        The base senv starts with [("em", vm); ("ei", vi)] and extras are
@@ -198,24 +201,24 @@ let make_senv conf base =
         match Driver.person_of_key base vp vn voc with
         | Some ip -> ip
         | None ->
-            request_issue conf base ~key:"incorrect person env";
+            request_issue conn conf base ~key:"incorrect person env";
             Driver.Iper.dummy
       in
       let vi = Driver.Iper.to_string ip in
       set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
-let try_plugin conf base_name meth =
+let try_plugin conn conf base_name meth =
   Registration.try_handlers ~meth (fun ~name handler ->
-      List.mem name conf.allowed_plugins && handler conf base_name)
+      List.mem name conf.allowed_plugins && handler conn conf base_name)
 
-let w_lock ~onerror fn conf (base_name : string option) =
+let w_lock ~onerror fn conn conf (base_name : string option) =
   let bfile = !GWPARAM.bpath conf.bname in
   (* FIXME: we lost the backtrace because onerror does not handle it. *)
   Lock.control
-    ~on_exn:(fun _exn _bt -> onerror conf base_name)
+    ~on_exn:(fun _exn _bt -> onerror conn conf base_name)
     ~wait:true ~lock_file:(Mutil.lock_file bfile)
-  @@ fun () -> fn conf base_name
+  @@ fun () -> fn conn conf base_name
 
 (* Module-level ref used as an init-once guard: the nldb format check
    reads the on-disk index header once per gwd process lifetime to
@@ -235,13 +238,13 @@ let check_nldb_format conf base =
           (Util.transl conf "NOTIF incompatible notes_links")
     | `Ok | `NoFile -> ())
 
-let w_base ~none fn conf (bfile : string option) =
+let w_base ~none fn conn conf (bfile : string option) =
   match bfile with
   | None -> none conf
   | Some bfile ->
       Driver.with_database bfile (fun base ->
-          let conf = make_henv conf base in
-          let conf = make_senv conf base in
+          let conf = make_henv conn conf base in
+          let conf = make_senv conn conf base in
           let conf =
             match Util.default_sosa_ref conf base with
             | Some p ->
@@ -260,15 +263,15 @@ let w_base ~none fn conf (bfile : string option) =
           in
           check_nldb_format conf base;
           let conf = Notif.inject_pending conf in
-          fn conf base)
+          fn conn conf base)
 
-let w_person ~none fn conf base =
+let w_person ~none fn conn conf base =
   match find_person_in_env conf base "" with
-  | Some p -> fn conf base p
-  | _ -> none conf base
+  | Some p -> fn conn conf base p
+  | _ -> none conn conf base
 
-let w_wizard fn conf base =
-  if conf.wizard then fn conf base
+let w_wizard fn conn conf base =
+  if conf.wizard then fn conn conf base
   else if conf.just_friend_wizard then GWPARAM.output_error conf Code.Forbidden
   else
     (* FIXME: send authentification headers *)
@@ -280,7 +283,7 @@ let w_wizard fn conf base =
    The actual per-request entry point is the [fun conf -> ...] at the
    end of this binding. *)
 let treat_request =
-  let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
+  let w_lock = w_lock ~onerror:(fun _conn conf _ -> Update.error_locked conf) in
   let w_base =
     let none conf =
       if conf.bname = "" then GWPARAM.output_error conf Code.Bad_Request
@@ -296,25 +299,26 @@ let treat_request =
     in
     w_base ~none
   in
-  let w_person = w_person ~none:SrcfileDisplay.print_welcome in
-  let print_page conf l =
+  let print_welcome _conn = SrcfileDisplay.print_welcome in
+  let w_person = w_person ~none:print_welcome in
+  let print_page conn conf l =
     w_base
-      (if only_special_env conf.env then SrcfileDisplay.print_welcome
+      (if only_special_env conf.env then print_welcome
        else
-         w_person @@ fun conf base p ->
+         w_person @@ fun conn conf base p ->
          match p_getenv conf.env "ptempl" with
          | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
              Perso.interp_templ t conf base p
-         | _ -> person_selected conf base p)
-      conf l
+         | _ -> person_selected conn conf base p)
+      conn conf l
   in
-  let handle_no_bfile conf l =
+  let handle_no_bfile conn conf l =
     if conf.bname = "" then
       try Templ.output_simple conf Templ.Env.empty "index"
       with _ -> SrcfileDisplay.propose_base conf
-    else print_page conf l
+    else print_page conn conf l
   in
-  fun conf ->
+  fun conn conf ->
     let bfile =
       if conf.bname = "" then None
       else
@@ -333,16 +337,17 @@ let treat_request =
           && this_request_updates_database conf
         then
           w_base
-            (fun conf base ->
-              request_issue conf base ~level:`Error ~key:"wizards cant write")
-            conf bfile
+            (fun conn conf base ->
+              request_issue conn conf base ~level:`Error
+                ~key:"wizards cant write")
+            conn conf bfile
         else
           let () =
             Registration.call_hooks (fun ~name hook ->
-                if List.mem name conf.allowed_plugins then hook conf bfile)
+                if List.mem name conf.allowed_plugins then hook conn conf bfile)
           in
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
-          if not @@ try_plugin conf bfile m then
+          if not @@ try_plugin conn conf bfile m then
             ((if
                 List.assoc_opt "counter" conf.base_env <> Some "no"
                 && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
@@ -361,8 +366,12 @@ let treat_request =
                      let f = Filename.chop_suffix f ".txt" in
                      SrcfileDisplay.print_source conf base f
                    else print conf f
-               | _ -> request_issue conf base ~key:"missing doc param"
+               | _ -> request_issue conn conf base ~key:"missing doc param"
              in
+             let w_base hdl = w_base (fun _conn -> hdl) conn in
+             let w_person hdl = w_person (fun _conn -> hdl) conn in
+             let w_lock hdl = w_lock (fun _conn -> hdl) conn in
+             let w_wizard hdl = w_wizard (fun _conn -> hdl) conn in
              match m with
              | "" -> (
                  match bfile with
@@ -370,10 +379,10 @@ let treat_request =
                      (* We attempt to load the database in order to detect issues. *)
                      try
                        Driver.with_database bfile ignore;
-                       print_page
-                     with _ -> handle_no_bfile)
-                 | None -> handle_no_bfile)
-             | "A" -> AscendDisplay.print |> w_person |> w_base
+                       print_page conn
+                     with _ -> handle_no_bfile conn)
+                 | None -> handle_no_bfile conn)
+             | "A" -> w_base @@ w_person @@ AscendDisplay.print
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
              | "ADD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_add
              | "ADD_PAR" -> w_wizard @@ w_base @@ UpdateFam.print_add_parents
@@ -432,13 +441,14 @@ let treat_request =
                  @@ UpdateFamOk.print_change_order_ok
              | "CHK_DATA" -> w_wizard @@ w_base @@ CheckDataDisplay.print
              | "CHK_DATA_L" ->
-                 w_wizard @@ w_base @@ CheckDataDisplay.print_redirect_to_list
+                 w_wizard @@ w_base
+                 @@ CheckDataDisplay.print_redirect_to_list conn
              | "CHK_DATA_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ CheckDataDisplay.print_chk_ok
              | "CONN_WIZ" ->
                  w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
              | "D" -> w_base @@ w_person @@ DescendDisplay.print
-             | "DAG" -> w_base @@ DagDisplay.print
+             | "DAG" -> w_base @@ DagDisplay.print conn
              | "DEL_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_del
              | "DEL_FAM_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
@@ -497,12 +507,12 @@ let treat_request =
                      | _ -> NotesDisplay.print_mod_gallery conf base)
              | "MOD_GALLERY_OK" ->
                  w_wizard @@ w_lock @@ w_base
-                 @@ NotesDisplay.print_mod_gallery_ok
+                 @@ NotesDisplay.print_mod_gallery_ok conn
              | "H" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
                  | Some f -> SrcfileDisplay.print conf base f
-                 | None -> request_issue conf base ~key:"missing v param")
+                 | None -> request_issue conn conf base ~key:"missing v param")
              | "HIST" -> w_base @@ History.print
              | "HIST_CLEAN" ->
                  w_wizard @@ w_base
@@ -606,11 +616,11 @@ let treat_request =
                        | None -> None
                      in
                      match real_input "v" with
-                     | Some n -> redirect_or_specify conf base n
+                     | Some n -> redirect_or_specify conn conf base n
                      | None -> (
                          match (real_input "fn", real_input "sn") with
                          | Some fn, Some sn ->
-                             redirect_or_specify conf base (fn ^ " " ^ sn)
+                             redirect_or_specify conn conf base (fn ^ " " ^ sn)
                          | Some fn, None ->
                              let conf =
                                {
@@ -618,7 +628,7 @@ let treat_request =
                                  env = ("p", Mutil.encode fn) :: conf.env;
                                }
                              in
-                             SearchName.print conf base Some.specify
+                             SearchName.print conn conf base Some.specify
                          | None, Some sn ->
                              let conf =
                                {
@@ -630,7 +640,7 @@ let treat_request =
                              Some.search_surname_print conf base alias_cache
                                unknown sn
                          | None, None ->
-                             request_issue conf base
+                             request_issue conn conf base
                                ~key:"missing fn and sn for search"))
                  | Some i ->
                      RelationDisplay.print conf base
@@ -681,7 +691,7 @@ let treat_request =
                            :: env_clean;
                        }
                      in
-                     SearchName.print conf base Some.specify
+                     SearchName.print conn conf base Some.specify
                  | None ->
                      (* Alphabetic first-name index, sortable by F or A. *)
                      AllnDisplay.print_first_names conf base)
@@ -708,7 +718,7 @@ let treat_request =
                  in
                  let lookup =
                    PersonLookup.redirect_or_specify ~not_found:r_not_found
-                     ~redirect_to_person:person_selected_with_redirect
+                     ~redirect_to_person:(person_selected_with_redirect conn)
                  in
                  match p_getenv conf.env "select" with
                  | Some "input" -> (
@@ -723,7 +733,7 @@ let treat_request =
                          | None, Some sn, _ -> lookup conf base sn
                          | None, None, Some pn -> lookup conf base pn
                          | None, None, None ->
-                             request_issue conf base
+                             request_issue conn conf base
                                ~key:"missing p and n for relation"))
                  | Some i when Option.is_some (int_of_string_opt i) ->
                      RelationDisplay.print conf base
@@ -747,7 +757,7 @@ let treat_request =
                              RelationDisplay.print conf base p1
                                (find_person_in_env_pref conf base "e")
                          | _ ->
-                             request_issue conf base
+                             request_issue conn conf base
                                ~key:"incorrect fallback for relation")))
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
@@ -761,11 +771,11 @@ let treat_request =
                    conf.Config.request
              | "RESET_IMAGE_C_OK" -> w_base @@ ImageCarrousel.print_main_c
              | "RL" -> w_base @@ RelationLink.print
-             | "RM" -> w_base @@ RelationMatrixDisplay.print
-             | "RLM" -> w_base @@ RelationDisplay.print_multi
+             | "RM" -> w_base @@ RelationMatrixDisplay.print conn
+             | "RLM" -> w_base @@ RelationDisplay.print_multi conn
              | "S" | "SN" ->
                  w_base @@ fun conf base ->
-                 SearchName.print conf base Some.specify
+                 SearchName.print conn conf base Some.specify
              | "SND_IMAGE" ->
                  w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print
              | "SND_IMAGE_OK" ->
@@ -778,7 +788,7 @@ let treat_request =
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
                  | Some f -> SrcfileDisplay.print_source conf base f
-                 | _ -> request_issue conf base ~key:"missing v param")
+                 | _ -> request_issue conn conf base ~key:"missing v param")
              | "STAT" ->
                  w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
              | "STATS" -> w_base @@ Statistics.print
@@ -791,7 +801,7 @@ let treat_request =
                      | _ ->
                          Perso.interp_templ ("tp0_" ^ f) conf base
                            (Driver.empty_person base Driver.Iper.dummy))
-                 | None -> request_issue conf base ~key:"missing v param")
+                 | None -> request_issue conn conf base ~key:"missing v param")
              | "TT" -> w_base @@ TitleDisplay.print
              | "U" ->
                  w_wizard @@ w_base @@ w_person @@ Perso.interp_templ "updmenu"
@@ -887,8 +897,8 @@ let treat_request =
       Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
     else process ()
 
-let treat_request conf =
+let treat_request conn conf =
   GWPARAM.nb_errors := 0;
   GWPARAM.errors_undef := [];
   GWPARAM.errors_other := [];
-  try treat_request conf with Update.ModErr _ -> Output.flush conf
+  try treat_request conn conf with Update.ModErr _ -> Output.flush conf

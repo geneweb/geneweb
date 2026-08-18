@@ -135,6 +135,7 @@ val search_by_key :
     @return [Some person] if exactly one person matches, [None] otherwise *)
 
 val print :
+  Geneweb_http.Connection.t ->
   config ->
   Geneweb_db.Driver.base ->
   (config ->

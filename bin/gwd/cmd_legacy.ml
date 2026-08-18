@@ -59,5 +59,4 @@ let wizard_passwd : string option ref = ref None
 let log_file : Cmd.log ref = ref Cmd.Stderr
 let verbosity_level = ref Cmd.default_verbosity
 let set_verbosity_level lvl = verbosity_level := lvl
-let force_cgi = ref false
 let cgi_secret_salt : string option ref = ref None
