@@ -17,10 +17,10 @@ self: super: {
       oui = prev.oui.overrideAttrs {
         version = "dev";
         src = super.fetchFromGitHub {
-          owner = "OCamlPro";
+          owner = "Halbaroth";
           repo = "ocaml-universal-installer";
-          rev = "44e8ec458dcc929300d39ad5b0332f24a8c4546d";
-          hash = "sha256-XLI9n/04InhEmXMMv7at/ScUgDhJ8WWVcEeBJy7j1bE=";
+          rev = "4aec6b40aaf6c45ec82130fc029727c6cb074bd4";
+          hash = "sha256-lr4+R2wOZTltUKceD4CLHhwbz+Mr2fMGwt2wJDPCY8w=";
         };
       };
     }
