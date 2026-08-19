@@ -1060,8 +1060,10 @@ let treat_request =
              conf.bname body);
         Hutil.trailer conf
     in
-    if conf.debug then
-      Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
+    if conf.debug then (
+      let b, r = Mutil.Bench.bench process in
+      Log.debug (fun k -> k "[%s %d] %a" __FILE__ __LINE__ Mutil.Bench.pp b);
+      r)
     else process ()
 
 let treat_request conn conf =
