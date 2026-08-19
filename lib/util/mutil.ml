@@ -1,24 +1,43 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-let bench name fn =
-  let pprint_gc gc =
-    let open Gc in
-    let pint x =
-      let s = string_of_int x in
-      let aux i = String.make 1 @@ String.unsafe_get s i in
-      let rec loop i n acc =
-        if i < 0 then String.concat "" (if x > 0 then "+" :: acc else acc)
-        else
-          let acc =
-            if n > 0 && n mod 3 = 0 && n <> 1 && String.unsafe_get s 0 <> '-'
-            then aux i :: "," :: acc
-            else aux i :: acc
-          in
-          loop (i - 1) (n + 1) acc
-      in
-      loop (String.length s - 1) 0 []
+module Bench = struct
+  type 'a diff = { before : 'a; after : 'a }
+  type t = { gc_stat : Gc.stat diff; timeofday : float diff; time : float diff }
+
+  let wrap w f =
+    let before = w () in
+    let r = f () in
+    let after = w () in
+    ({ before; after }, r)
+
+  let bench f =
+    let gc_stat, (timeofday, (time, r)) =
+      wrap Gc.stat @@ fun () ->
+      wrap Sys.time @@ fun () -> wrap Unix.gettimeofday f
     in
-    Printf.printf
+    let b = { gc_stat; timeofday; time } in
+    (b, r)
+
+  let pint x =
+    let s = string_of_int x in
+    let aux i = String.make 1 @@ String.unsafe_get s i in
+    let rec loop i n acc =
+      if i < 0 then String.concat "" (if x > 0 then "+" :: acc else acc)
+      else
+        let acc =
+          if n > 0 && n mod 3 = 0 && n <> 1 && String.unsafe_get s 0 <> '-' then
+            aux i :: "," :: acc
+          else aux i :: acc
+        in
+        loop (i - 1) (n + 1) acc
+    in
+    loop (String.length s - 1) 0 []
+
+  let pp ppf b =
+    Fmt.pf ppf "%fs (~%fs CPU)\n"
+      (b.time.after -. b.time.before)
+      (b.timeofday.after -. b.timeofday.before);
+    Fmt.pf ppf
       "\tminor_words : %s\n\
        \tpromoted_words : %s\n\
        \tmajor_words : %s\n\
@@ -35,51 +54,28 @@ let bench name fn =
        \tcompactions : %s\n\
        \ttop_heap_words : %s\n\
        \tstack_size : %s\n"
-      (gc.minor_words |> truncate |> pint)
-      (gc.promoted_words |> truncate |> pint)
-      (gc.major_words |> truncate |> pint)
-      (gc.minor_collections |> pint)
-      (gc.major_collections |> pint)
-      (gc.heap_words |> pint) (gc.heap_chunks |> pint) (gc.live_words |> pint)
-      (gc.live_blocks |> pint) (gc.free_words |> pint) (gc.free_blocks |> pint)
-      (gc.largest_free |> pint) (gc.fragments |> pint) (gc.compactions |> pint)
-      (gc.top_heap_words |> pint)
-      (gc.stack_size |> pint)
-  in
-  (* OCaml 4.12 added [forced_major_collections] field. *)
-  (* Using [@warning "-23"] and "gc1 with" as a workaround. *)
-  let[@warning "-23"] diff gc1 gc2 =
-    Gc.
-      {
-        gc1 with
-        minor_words = gc2.minor_words -. gc1.minor_words;
-        promoted_words = gc2.promoted_words -. gc1.promoted_words;
-        major_words = gc2.major_words -. gc1.major_words;
-        minor_collections = gc2.minor_collections - gc1.minor_collections;
-        major_collections = gc2.major_collections - gc1.major_collections;
-        heap_words = gc2.heap_words - gc1.heap_words;
-        heap_chunks = gc2.heap_chunks - gc1.heap_chunks;
-        live_words = gc2.live_words - gc1.live_words;
-        live_blocks = gc2.live_blocks - gc1.live_blocks;
-        free_words = gc2.free_words - gc1.free_words;
-        free_blocks = gc2.free_blocks - gc1.free_blocks;
-        largest_free = gc2.largest_free - gc1.largest_free;
-        fragments = gc2.fragments - gc1.fragments;
-        compactions = gc2.compactions - gc1.compactions;
-        top_heap_words = gc2.top_heap_words - gc1.top_heap_words;
-        stack_size = gc2.stack_size - gc1.stack_size;
-      }
-  in
-  let gc1 = Gc.stat () in
-  let p1 = Sys.time () in
-  let t1 = Unix.gettimeofday () in
-  let res = fn () in
-  let t2 = Unix.gettimeofday () in
-  let p2 = Sys.time () in
-  let gc2 = Gc.stat () in
-  Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1);
-  pprint_gc (diff gc1 gc2);
-  res
+      (b.gc_stat.after.Gc.minor_words -. b.gc_stat.before.minor_words
+      |> truncate |> pint)
+      (b.gc_stat.after.promoted_words -. b.gc_stat.before.promoted_words
+      |> truncate |> pint)
+      (b.gc_stat.after.major_words -. b.gc_stat.before.major_words
+      |> truncate |> pint)
+      (b.gc_stat.after.minor_collections - b.gc_stat.before.minor_collections
+      |> pint)
+      (b.gc_stat.after.major_collections - b.gc_stat.before.major_collections
+      |> pint)
+      (b.gc_stat.after.heap_words - b.gc_stat.before.heap_words |> pint)
+      (b.gc_stat.after.heap_chunks - b.gc_stat.before.heap_chunks |> pint)
+      (b.gc_stat.after.live_words - b.gc_stat.before.live_words |> pint)
+      (b.gc_stat.after.live_blocks - b.gc_stat.before.live_blocks |> pint)
+      (b.gc_stat.after.free_words - b.gc_stat.before.free_words |> pint)
+      (b.gc_stat.after.free_blocks - b.gc_stat.before.free_blocks |> pint)
+      (b.gc_stat.after.largest_free - b.gc_stat.before.largest_free |> pint)
+      (b.gc_stat.after.fragments - b.gc_stat.before.fragments |> pint)
+      (b.gc_stat.after.compactions - b.gc_stat.before.compactions |> pint)
+      (b.gc_stat.after.top_heap_words - b.gc_stat.before.top_heap_words |> pint)
+      (b.gc_stat.after.stack_size - b.gc_stat.before.stack_size |> pint)
+end
 
 let verbose = ref true
 let particles_file = ref ""
