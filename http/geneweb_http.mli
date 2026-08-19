@@ -13,6 +13,7 @@ module Code : sig
   val status_code : status -> int
   val pp : status Fmt.t
   val to_string : status -> string
+  val output : out_channel -> status -> unit
 end
 
 module Header : sig
@@ -28,24 +29,21 @@ end
 module Connection : sig
   type t
 
-  val of_out_channel : cgi:bool -> Out_channel.t -> t
+  val of_channels : cgi:bool -> out_channel -> in_channel -> t
+  val of_socket : Unix.file_descr -> t
 
   val close : t -> unit
   (** Closes the current socket *)
 
+  val close_noerr : t -> unit
+
   val woc : t -> out_channel
   (** Return the out_channel associated to the socket *)
 
+  val wic : t -> in_channel
+
   val wsocket : t -> Unix.file_descr
   (** Returns the last used socket *)
-
-  val pp_sockaddr : Format.formatter -> Unix.sockaddr -> unit
-  (** Formats an [ADDR_INET] as [ip:port], bracketing the address when it is
-      IPv6. Must not be called with [ADDR_UNIX]. *)
-
-  val is_lan_candidate : Unix.sockaddr -> bool
-  (** [true] for a non-loopback, non-wildcard IPv4 [ADDR_INET]; [false] for
-      IPv6, [ADDR_UNIX], the loopback, and the wildcard address. *)
 
   val wflush : t -> unit
   (** Flushes the content of the current socket *)
@@ -144,4 +142,14 @@ module Server : sig
        "machine.domain:2368"   (your machine name)
        "addr:2368"             (your machine internet address)
 *)
+end
+
+module Util : sig
+  val pp_sockaddr : Format.formatter -> Unix.sockaddr -> unit
+  (** Formats an [ADDR_INET] as [ip:port], bracketing the address when it is
+      IPv6. Must not be called with [ADDR_UNIX]. *)
+
+  val is_lan_candidate : Unix.sockaddr -> bool
+  (** [true] for a non-loopback, non-wildcard IPv4 [ADDR_INET]; [false] for
+      IPv6, [ADDR_UNIX], the loopback, and the wildcard address. *)
 end

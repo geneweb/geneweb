@@ -2126,7 +2126,7 @@ let manage_cgi_timeout conn tmout =
     ()
 
 let geneweb_cgi ~loaded_plugins ~secret_salt addr script_name contents =
-  let conn = Connection.of_out_channel ~cgi:true stdout in
+  let conn = Connection.of_channels ~cgi:true stdout stdin in
   if Sys.unix then manage_cgi_timeout conn !conn_timeout;
   (try Unix.mkdir !GWPARAM.cnt_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
