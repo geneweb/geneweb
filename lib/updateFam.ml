@@ -579,6 +579,7 @@ let print_update_fam conf base fcd digest =
       let env = [ ("digest", Vstring digest) ] in
       Hutil.interp conf "updfam"
         {
+          output = Output.print_sstring conf;
           Templ.eval_var = eval_var conf base;
           Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
@@ -879,6 +880,7 @@ let print_change_event_order conf base =
       let sfam = string_family_of base i in
       Hutil.interp conf "updfamevt"
         {
+          output = Output.print_sstring conf;
           Templ.eval_var = eval_var conf base;
           Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
