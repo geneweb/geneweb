@@ -26,7 +26,7 @@ CAMLprim value geneweb_win32_file_descr_of_fd (value v) {
   if (h == INVALID_HANDLE_VALUE)
     caml_invalid_argument ("is not a handle!");
 
-  fd = caml_win32_alloc_socket ((SOCKET) s);
+  fd = caml_win32_alloc_socket ((SOCKET) h);
 #else
   fd = v;
 #endif
