@@ -207,7 +207,7 @@ let accept_connection_windows socket =
     ~finally:(fun () -> close_out_noerr oc)
     (fun () ->
       set_binary_mode_out oc true;
-      Socket.output oc client_socket;
+      output_value oc (Socket.fd_of_file_descr client_socket);
       output_value oc addr);
   close_in stdin;
   ignore (Unix.waitpid [] pid)
@@ -378,7 +378,7 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
               accept_connections ~timeout ~n_workers callback socket))
   | _ ->
       set_binary_mode_in stdin true;
-      let client_socket = Socket.input stdin in
+      let client_socket = Socket.file_descr_of_fd @@ input_value stdin in
       let addr = input_value stdin in
       let oc = Unix.out_channel_of_descr client_socket in
       wserver_oc := oc;
