@@ -96,7 +96,8 @@ val make_and_print_dag :
     - [page_title]: title displayed in the page header
     - [next_txt]: link text for pagination (empty if none) *)
 
-val print : Config.config -> Geneweb_db.Driver.base -> unit
+val print :
+  Geneweb_http.Connection.t -> Config.config -> Geneweb_db.Driver.base -> unit
 (** [print conf base] is the entry point for the [m=DAG] request.
 
     The person set is collected by {!Dag.get_dag_elems} from the indexed URL

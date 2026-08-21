@@ -1,0 +1,7 @@
+(library
+ (package geneweb-win32)
+ (name socket)
+ (libraries unix)
+ (foreign_stubs
+  (language c)
+  (names stubs)))

@@ -3,6 +3,7 @@ open RelationMatrix
 module Driver = Geneweb_db.Driver
 module Sosa = Geneweb_sosa
 module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 
 (* Afficher une cellule de la matrice *)
 let print_matrix_cell conf base tstab persons i j cell_storage n =
@@ -154,10 +155,10 @@ console.log('Matrix data loaded:', Object.keys(window.rmData.cells).length, 'cel
     json_string
 
 (* Point d'entrée principal du module *)
-let print conf base =
+let print conn conf base =
   if Util.url_has_pnoc_params conf.env then
     let clean_url = Util.normalize_person_pool_url conf base "RM" None in
-    Server.http_redirect_temporarily clean_url
+    Connection.http_redirect_temporarily conn clean_url
   else
     let pl =
       let rec loop pl i =
