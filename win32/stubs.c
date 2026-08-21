@@ -2,6 +2,7 @@
 #include <caml/alloc.h>
 #include <caml/memory.h>
 #include <caml/unixsupport.h>
+#include <caml/fail.h>
 
 CAMLprim value geneweb_win32_fd_of_file_descr (value v) {
   CAMLparam1 (v);
@@ -21,8 +22,11 @@ CAMLprim value geneweb_win32_file_descr_of_fd (value v) {
   CAMLlocal1 (fd);
 
 #if defined (_WIN32)
-  SOCKET s = (SOCKET) _get_osfhandle (fd);
-  fd = caml_win32_alloc_socket (s);
+  HANDLE h = (HANDLE) _get_osfhandle (fd);
+  if (h == INVALID_HANDLE_VALUE)
+    caml_invalid_argument ("is not a handle!");
+
+  fd = caml_win32_alloc_socket ((SOCKET) s);
 #else
   fd = v;
 #endif
