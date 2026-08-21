@@ -4,4 +4,4 @@
  (libraries unix)
  (foreign_stubs
   (language c)
-  (names socket_stubs)))
+  (names stubs)))
