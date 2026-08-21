@@ -2273,7 +2273,6 @@ let parse_cmd () =
       images_prefix := Some o.images_prefix;
       images_dir := o.images_dir;
       etc_prefix := Some o.etc_prefix;
-      socket_dir := o.socket_dir;
       auth_file := o.authorization_file;
       cache_langs := o.cache_langs;
       cache_databases := o.cache_databases;
@@ -2304,16 +2303,6 @@ let parse_cmd () =
       Util.allowed_tags_file := Option.value ~default:"" o.allowed_tags_file;
       o
   | `Exit code -> exit code
-
-let make_socket_dir socket_dir =
-  match socket_dir with
-  | Some p ->
-      GWPARAM.sock_dir := p;
-      Filesystem.create_dir ~parent:true p;
-      if Sys.win32 then (
-        Server.sock_in := p // "gwd.sin";
-        Server.sock_out := p // "gwd.sou")
-  | None -> ()
 
 let switch_check () = debug := true
 
@@ -2422,7 +2411,6 @@ let () =
   Secure.add_assets opts.etc_prefix;
   if opts.check then switch_check ();
   if opts.debug then switch_debug ();
-  make_socket_dir opts.socket_dir;
   setup_log ~predictable_mode:opts.predictable_mode opts.log;
   let cgi = opts.cgi || infer_cgi () in
   try

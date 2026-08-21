@@ -12,7 +12,6 @@ type plugins = All | List of plugin list
 type t = {
   (* Directories *)
   base_dir : string;
-  socket_dir : string option;
   gw_prefix : string;
   etc_prefix : string;
   images_prefix : string;
@@ -162,10 +161,11 @@ let socket_dir =
     "$(docv) specifies where socket communication and access count are \n\
     \  stored on Windows."
   in
+  let deprecated = "This option is noop." in
   C.Arg.(
     value
     & opt (some dirpath) None
-    & info [ "wd"; "socket-dir" ] ~docs:dirs_section ~doc)
+    & info [ "wd"; "socket-dir" ] ~docs:dirs_section ~doc ~deprecated)
 
 let gw_prefix =
   let doc =
@@ -605,7 +605,12 @@ let t =
   in
   C.Cmd.make (C.Cmd.info "gwd" ~envs ~version:Version.ver ~doc)
   @@
-  let+ base_dir, socket_dir, gw_prefix, images_prefix, etc_prefix, images_dir =
+  let+ ( base_dir,
+         (_ : string option),
+         gw_prefix,
+         images_prefix,
+         etc_prefix,
+         images_dir ) =
     directories
   and+ cache_databases = cache_databases
   and+ lexicon_files = lexicon_files
@@ -644,7 +649,6 @@ let t =
   and+ _ : bool = noop in
   {
     base_dir;
-    socket_dir;
     gw_prefix;
     images_prefix;
     images_dir;
