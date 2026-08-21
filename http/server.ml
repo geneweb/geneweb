@@ -143,10 +143,6 @@ let get_request_and_content strm =
   in
   (request, content)
 
-let string_of_sockaddr = function
-  | Unix.ADDR_UNIX s -> s
-  | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
-
 let timeout_handler ~timeout _ =
   try
     if !printing_state = Nothing then http Code.OK;
@@ -187,28 +183,6 @@ let treat_connection callback client_addr client_socket =
   in
   callback () (client_addr, request) path query
 
-let buff = Bytes.create 1024
-
-let copy_what_necessary t oc =
-  let strm =
-    let len = ref 0 in
-    let i = ref 0 in
-    Stream.from (fun _ ->
-        if !i >= !len then (
-          len := Unix.read t buff 0 (Bytes.length buff);
-          i := 0;
-          if !len > 0 then output oc buff 0 !len);
-        if !len = 0 then None
-        else (
-          incr i;
-          Some (Bytes.get buff (!i - 1))))
-  in
-  let _ = get_request_and_content strm in
-  ()
-
-let skip_possible_remaining_chars fd =
-  if not !connection_closed then skip_possible_remaining_chars fd
-
 let check_stopping () =
   if Sys.file_exists !stop_server then (
     Log.err (fun k -> k "Server stopped by presence of file %s.\n" !stop_server);
@@ -221,50 +195,22 @@ let accept_connection_windows socket =
   connection_closed := false;
   wserver_sock := client_socket;
   check_stopping ();
-  Out_channel.with_open_bin !sock_in (fun oc ->
-      try copy_what_necessary client_socket oc with Unix.Unix_error _ -> ());
+  let fd_in, fd_out = Unix.pipe ~cloexec:true () in
   let pid =
-    let env =
-      Array.append (Unix.environment ())
-        [| "WSERVER=" ^ string_of_sockaddr addr |]
-    in
-    let args = Sys.argv in
-    let null_in = Unix.openfile "NUL" [ Unix.O_RDONLY ] 0 in
-    let pid =
-      Unix.create_process_env Sys.argv.(0) args env null_in Unix.stdout
-        Unix.stderr
-    in
-    Unix.close null_in;
-    pid
+    let env = Array.append [| "WSERVER=true" |] (Unix.environment ()) in
+    Unix.create_process_env Sys.argv.(0) Sys.argv env fd_in Unix.stdout
+      Unix.stderr
   in
-  let _ = Unix.waitpid [] pid in
-  In_channel.with_open_bin !sock_in close_in;
-  let shutdown () =
-    (try Unix.shutdown client_socket Unix.SHUTDOWN_SEND with _ -> ());
-    skip_possible_remaining_chars client_socket;
-    try Unix.shutdown client_socket Unix.SHUTDOWN_RECEIVE with _ -> ()
-  in
-  Fun.protect ~finally:shutdown (fun () ->
-      try
-        In_channel.with_open_bin !sock_out (fun ic ->
-            try
-              let rec loop () =
-                let len = input ic buff 0 (Bytes.length buff) in
-                if len = 0 then ()
-                else (
-                  (let rec loop_write i =
-                     let olen = Unix.write client_socket buff i (len - i) in
-                     if i + olen < len then loop_write (i + olen)
-                   in
-                   loop_write 0);
-                  loop ())
-              in
-              loop ()
-            with Unix.Unix_error _ -> ())
-      with Unix.Unix_error _ ->
-        (* A Unix exception could be raised by [In_channel.open_bin]
-           inside [In_channel.with_open_bin]. *)
-        ())
+  Unix.close fd_in;
+  let oc = Unix.out_channel_of_descr fd_out in
+  Fun.protect
+    ~finally:(fun () -> close_out_noerr oc)
+    (fun () ->
+      set_binary_mode_out oc true;
+      Socket.output oc client_socket;
+      output_value oc addr);
+  close_in stdin;
+  ignore (Unix.waitpid [] pid)
 
 let accept_connections_windows socket =
   while true do
@@ -430,12 +376,14 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
               accept_connections ~timeout ~n_workers callback socket))
-  | s ->
-      let addr = Unix.ADDR_UNIX s in
-      let client_socket = Unix.openfile !sock_in [ Unix.O_RDONLY ] 0 in
-      let oc = open_out_bin !sock_out in
+  | _ ->
+      set_binary_mode_in stdin true;
+      let client_socket = Socket.input stdin in
+      let addr = input_value stdin in
+      let oc = Unix.out_channel_of_descr client_socket in
       wserver_oc := oc;
       ignore (treat_connection callback addr client_socket);
+      close_connection ();
       exit 0
 
 module Pool = Pool
