@@ -6,14 +6,10 @@ module Gutil = Geneweb_db.Gutil
 
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
 let out_file = ref ""
 
-let resolve_out_file () =
-  if Filename.is_relative !out_file then Filename.concat !bases_dir !out_file
-  else !out_file
-
 type gwexport_opts = {
+  bases_dir : string;
   asc : int option;
   ascdesc : int option;
   censor : int;
@@ -34,8 +30,14 @@ type gwexport_opts = {
   test : bool;
 }
 
+let resolve_out_file opts =
+  if Filename.is_relative !out_file then
+    Filename.concat opts.bases_dir !out_file
+  else !out_file
+
 let default_opts =
   {
+    bases_dir = Dirs.path Secure.default_base_dir;
     asc = None;
     ascdesc = None;
     censor = 0;
@@ -63,7 +65,12 @@ let speclist c =
     ( "-a",
       Arg.Int (fun s -> c := { !c with asc = Some s }),
       "<N> maximum generation of the root's ascendants" );
-    ("-bd", Arg.String (fun s -> bases_dir := s), "<dir> bases directory.");
+    ( "-bd",
+      Arg.String (fun s -> c := { !c with bases_dir = s }),
+      Fmt.str
+        "<DIR> Specify where the bases directory with databases is installed \
+         (default if empty is %S)."
+        (Dirs.name Secure.default_base_dir) );
     ( "-ad",
       Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
       "<N> maximum generation of the root's ascendants descendants \

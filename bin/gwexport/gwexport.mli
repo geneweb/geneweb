@@ -1,6 +1,7 @@
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 
 type gwexport_opts = {
+  bases_dir : string; (* Specify the location of the bases directory. *)
   asc : int option; (* Maximum generation of the root's ascendants *)
   ascdesc : int option;
       (* Maximum generation of the root's ascendants descendants *)
@@ -31,14 +32,11 @@ type gwexport_opts = {
 val default_opts : gwexport_opts
 (** Default set of options *)
 
-val bases_dir : string ref
-(** Bases directory, set by [-bd] (default: [Secure.default_base_dir]). *)
-
 val out_file : string ref
 (** Output file name, set by [-o] ([""] means tool default). *)
 
-val resolve_out_file : unit -> string
-(** [!out_file], prefixed by [!bases_dir] when relative. *)
+val resolve_out_file : gwexport_opts -> string
+(** [!out_file], prefixed by [bases_dir] when relative. *)
 
 val speclist : gwexport_opts ref -> (Arg.key * Arg.spec * Arg.doc) list
 (** Given a set of options, returns default command line arguments for selecting

@@ -22,11 +22,12 @@ let ansel_warning =
   "Warning: ANSEL charset was administratively withdrawn in 2013. UTF-8 is \
    recommended for new GEDCOM files."
 
+let ( // ) = Filename.concat
+
 let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun usage;
-  let bases_dir = Dirs.path Secure.default_base_dir in
-  Secure.set_base_dir bases_dir;
+  Secure.set_base_dir !opts.bases_dir;
   if !opts.Gwexport.charset = Gwexport.Ansel then
     Printf.eprintf "%s\n%!" ansel_warning;
   match !bname with
@@ -37,11 +38,11 @@ let () =
       let oc, name, close =
         if !Gwexport.out_file = "" then (stdout, "", fun () -> flush stdout)
         else
-          let path = Gwexport.resolve_out_file () in
+          let path = Gwexport.resolve_out_file !opts in
           let oc = open_out path in
           (oc, path, fun () -> close_out oc)
       in
       opts := { !opts with Gwexport.oc = (name, output_string oc, close) };
-      Driver.with_database (Filename.concat bases_dir bname) @@ fun base ->
+      Driver.with_database (!opts.bases_dir // bname) @@ fun base ->
       let select = Gwexport.select base !opts [] in
       Gwb2gedLib.gwb2ged base !with_indexes !opts select
