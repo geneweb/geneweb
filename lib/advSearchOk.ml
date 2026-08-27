@@ -487,6 +487,37 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
   in
   loop ([], 0) Gwdb.IperSet.empty list
 
+module Excluded_person_group = struct
+  type t = {
+    reference_id : Gwdb.iper;
+    relation : [ `Self | `Ancestor | `Descendant ];
+  }
+
+  let mem ~base ~excluded_person person =
+    match excluded_person.relation with
+    | `Self ->
+        Option.fold ~none:false
+          ~some:(Gwdb.eq_iper excluded_person.reference_id)
+          (Authorized.Person.get_iper person)
+    | `Ancestor ->
+        Option.fold ~none:false
+          ~some:(fun person_id ->
+            try
+              Person.is_ancestor base (Gwdb.poi base person_id)
+                (Gwdb.poi base excluded_person.reference_id)
+            with Person.Same_person -> false)
+          (Authorized.Person.get_iper person)
+    | `Descendant ->
+        Option.fold ~none:false
+          ~some:(fun person_id ->
+            try
+              Person.is_ancestor base
+                (Gwdb.poi base excluded_person.reference_id)
+                (Gwdb.poi base person_id)
+            with Person.Same_person -> false)
+          (Authorized.Person.get_iper person)
+end
+
 (*
   Search for other persons in the base matching with the provided infos.
 
@@ -505,8 +536,8 @@ let advanced_search_without_prefix ~conf ~base ~(match_person : match_person)
    a person from the base to match. (ie. "Pierre-Jean de Bourbon de Vallois" matches
    with "Jean Pierre de Vallois de Bourbon" but not with "Jean de Bourbon")
 *)
-let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf'
-    base =
+let advanced_search ?(excluded_persons = [])
+    ~(query_params : Page.Advanced_search.Query_params.t) conf' base =
   let conf = Config.Trimmed.from_config conf' in
   let max_answers = Option.value ~default:max_int query_params.limit in
   let place_with_istr =
@@ -582,8 +613,15 @@ let advanced_search ~(query_params : Page.Advanced_search.Query_params.t) conf'
           ~place:(Lazy.force @@ place_searched event_kind)
           ~exact_place:query_params.event_exact_place
       in
+      let is_excluded_person person =
+        List.exists
+          (fun excluded_person ->
+            Excluded_person_group.mem ~base ~excluded_person person)
+          excluded_persons
+      in
       Lazy.force civil_match
       && (query_params.events = [] || check match_ query_params.events)
+      && not (is_excluded_person p)
     in
     if (not @@ SearchName.search_reject_p base p) && pmatch () then
       (p :: list, len + 1)
