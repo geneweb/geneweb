@@ -81,7 +81,7 @@ type config = {
 }
 
 let pp_stringify ppf s =
-  if String.exists (fun c -> c = ' ') s then Format.fprintf ppf "%S" s
+  if String.contains s ' ' then Format.fprintf ppf "\"%s\"" s
   else Format.fprintf ppf "%s" s
 
 let stringify s = Format.asprintf "%a" pp_stringify s
@@ -228,7 +228,7 @@ let parameters env =
                     | _ -> (acc, genv))
                 | [] -> (acc, [])
               in
-              loop2 (s :: "-k" :: comm) env
+              loop2 (s :: ("-" ^ k) :: comm) env
             in
             loop comm env
         | _ -> (
@@ -1480,7 +1480,7 @@ let gwf_1 conf =
 let ged2gwb conf =
   let rc =
     exec_f conf ~path:(!bin_dir // conf.comm)
-      ("-fne" :: "'\"\"'" :: parameters conf.env)
+      ("-fne" :: "\"\"" :: parameters conf.env)
   in
   if rc > 1 then print_file conf "err_standard.htm"
   else
