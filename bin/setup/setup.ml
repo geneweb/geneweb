@@ -91,17 +91,17 @@ module Command : sig
 
   val make : output:string -> path:string -> args:string list -> t
   val pp : Format.formatter -> t -> unit
-  val run : t -> int
+  val run : t -> Unix.process_status
+  val is_failure : Unix.process_status -> bool
 end = struct
   type t = { path : string; args : string list; output : string }
 
   let close_noerr fd = try Unix.close fd with Unix.Unix_error _ -> ()
 
-  let rc_of_status status =
+  let is_failure status =
     match status with
-    | Unix.WEXITED rc -> rc
-    | Unix.WSIGNALED rc -> rc
-    | Unix.WSTOPPED rc -> rc
+    | Unix.WEXITED 0 -> false
+    | Unix.WEXITED _ | Unix.WSIGNALED _ | Unix.WSTOPPED _ -> true
 
   let run { path; args; output } =
     let fd = Unix.openfile output [ O_WRONLY; O_CREAT ] 0o755 in
@@ -109,7 +109,7 @@ end = struct
     let argv = Array.of_list (path :: args) in
     let pid = Unix.create_process path argv Unix.stdin fd fd in
     let (_ : int), status = Unix.waitpid [] pid in
-    rc_of_status status
+    status
 
   let pp ppf { path; args; output } =
     let pp_sep ppf () = Format.fprintf ppf " " in
@@ -971,15 +971,16 @@ let error conf str =
   Output.printf printer_conf "<em>%s</em>\n" (String.capitalize_ascii str);
   trailer conf
 
-let infer_rc conf rc =
-  if not Sys.unix then
-    if rc > 0 then rc
-    else
+let infer_rc conf status =
+  if (not Sys.unix) && (not @@ Command.is_failure status) then
+    let rc =
       match p_getenv conf.env "o" with
       | Some out_file ->
           if Sys.file_exists (base_path out_file ^ ".gwb") then 0 else 2
       | _ -> 0
-  else rc
+    in
+    Unix.WEXITED rc
+  else status
 
 let exec_f conf ~path args =
   let args =
@@ -988,8 +989,7 @@ let exec_f conf ~path args =
   let cmd = Command.make ~output:comm_log ~path ~args in
   Format.eprintf "$ %a@." Command.pp cmd;
   command := Format.asprintf "%a" Command.pp cmd;
-  let rc = Command.run cmd in
-  if not Sys.unix then infer_rc conf rc else rc
+  infer_rc conf @@ Command.run cmd
 
 let out_name_of_ged in_file =
   let f = Filename.basename in_file in
@@ -1089,7 +1089,7 @@ let gwc conf =
   (try Sys.remove gwo with Sys_error _ -> ());
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm"
+  if Command.is_failure rc then print_file conf "err_standard.htm"
   else print_file conf "create_ok.htm"
 
 let gwdiff_check conf = print_file conf "confirm.htm"
@@ -1098,7 +1098,8 @@ let gwdiff ok_file conf =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  if Command.is_failure rc then print_file conf "err_standard.htm"
+  else print_file conf ok_file
 
 let gwfixbase_check conf = print_file conf "confirm.htm"
 
@@ -1106,7 +1107,8 @@ let gwfixbase ok_file conf =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  if Command.is_failure rc then print_file conf "err_standard.htm"
+  else print_file conf ok_file
 
 let cache_files_check conf =
   let in_base =
@@ -1120,13 +1122,14 @@ let cache_files ok_file conf =
     exec_f conf ~path:(!bin_dir // "cache_files") @@ parameters conf.env
   in
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  if Command.is_failure rc then print_file conf "err_standard.htm"
+  else print_file conf ok_file
 
 let connex_check conf = print_file conf "confirm.htm"
 
 let connex ok_file conf =
   let rc = exec_f conf ~path:(!bin_dir // "connex") @@ parameters conf.env in
-  if rc <> 0 then print_file conf "err_standard.htm"
+  if Command.is_failure rc then print_file conf "err_standard.htm"
   else print_file conf ok_file
 
 let gwu_or_gwb2ged_check suffix conf =
@@ -1166,7 +1169,7 @@ let gwu_or_gwb2ged_check suffix conf =
 
 let gwb2ged_or_gwu_1 ok_file conf =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
-  if rc > 1 then print_file conf "err_standard.htm"
+  if Command.is_failure rc then print_file conf "err_standard.htm"
   else
     let conf =
       conf_with_env conf "o" (Filename.basename (s_getenv conf.env "o"))
@@ -1208,7 +1211,7 @@ let cleanup_1 conf =
      independent of bases_dir and cwd. Tools get bare base names; exec_f
      injects -bd so they find the base. *)
   let tmp_gw = Filename.temp_file "gwsetup_" ".gw" in
-  let _ : int =
+  let _ : Unix.process_status =
     exec_f conf ~path:(!bin_dir // "gwu") [ in_base; "-o"; tmp_gw ]
   in
   Printf.eprintf "$ mkdir %s\n" old_dir;
@@ -1229,10 +1232,9 @@ let cleanup_1 conf =
   in
   (try Sys.remove tmp_gw with Sys_error _ -> ());
   let rc2 = exec_f conf ~path:(!bin_dir // "update_nldb") [ in_base ] in
-  let rc = rc1 + rc2 in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then
+  if Command.is_failure rc1 || Command.is_failure rc2 then
     let conf = { conf with comm = "gwc" } in
     print_file conf "err_standard.htm"
   else print_file conf "create_ok.htm"
@@ -1382,15 +1384,16 @@ let merge_1 conf =
   in
   let rc =
     let rec loop = function
-      | [] -> 0
-      | (b, gw_out) :: rest ->
-          let r = exec_f conf ~path:(!bin_dir // "gwu") [ b; "-o"; gw_out ] in
-          if r <= 1 then loop rest else r
+      | [] -> Unix.WEXITED 0
+      | (b, gw_out) :: rest -> (
+          match exec_f conf ~path:(!bin_dir // "gwu") [ b; "-o"; gw_out ] with
+          | Unix.WEXITED rc when rc = 0 || rc = 1 -> loop rest
+          | _ as st -> st)
     in
     loop gw_temps
   in
   let rc =
-    if rc > 1 then rc
+    if Command.is_failure rc then rc
     else
       let args =
         let rec loop l =
@@ -1404,7 +1407,7 @@ let merge_1 conf =
       exec_f conf ~path:(!bin_dir // "gwc") ("-f" :: "-o" :: out_file :: args)
   in
   List.iter (fun (_, gw) -> try Sys.remove gw with Sys_error _ -> ()) gw_temps;
-  if rc > 1 then print_file conf "err_standard.htm"
+  if Command.is_failure rc then print_file conf "err_standard.htm"
   else print_file conf "create_ok.htm"
 
 let gwf conf =
@@ -1482,7 +1485,7 @@ let ged2gwb conf =
     exec_f conf ~path:(!bin_dir // conf.comm)
       ("-fne" :: "\"\"" :: parameters conf.env)
   in
-  if rc > 1 then print_file conf "err_standard.htm"
+  if Command.is_failure rc then print_file conf "err_standard.htm"
   else
     let bname = try List.assoc "o" conf.env with Not_found -> "" in
     Util.print_default_gwf_file bname;
@@ -1490,11 +1493,13 @@ let ged2gwb conf =
 
 let consang conf ok_file =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
-  if rc > 1 then print_file conf "err_consang.htm" else print_file conf ok_file
+  if Command.is_failure rc then print_file conf "err_consang.htm"
+  else print_file conf ok_file
 
 let update_nldb conf ok_file =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  if Command.is_failure rc then print_file conf "err_standard.htm"
+  else print_file conf ok_file
 
 let print_typed_file conf typ fname =
   match Statics.read fname with
