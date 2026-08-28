@@ -5,8 +5,11 @@ module HT = Hashtbl.Make (struct
   let hash = Hashtbl.hash
 end)
 
-type hook = Geneweb.Config.config -> string option -> unit
-type handler = Geneweb.Config.config -> string option -> bool
+type hook =
+  Geneweb_http.Connection.t -> Geneweb.Config.config -> string option -> unit
+
+type handler =
+  Geneweb_http.Connection.t -> Geneweb.Config.config -> string option -> bool
 
 let hooks : (string * hook) Queue.t = Queue.create ()
 let handlers : (string * handler) Queue.t HT.t = HT.create 17

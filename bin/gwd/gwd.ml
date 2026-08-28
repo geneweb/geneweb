@@ -11,6 +11,7 @@ module Gutil = Geneweb_db.Gutil
 module Dirs = Geneweb_dirs
 module Registration = Geneweb_register.Registration
 module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 module Code = Geneweb_http.Code
 module Compat = Geneweb_compat
 open Cmd_legacy
@@ -49,7 +50,7 @@ let client_accepts_encoding request encoding =
     in
     not (List.exists dominated_by_zero (String.split_on_char ',' accept))
 
-let make_gzip_output_conf ~level request =
+let make_gzip_output_conf ~cgi ~level conn request =
   if not (client_accepts_encoding request "gzip") then None
   else
     let body_buf = Buffer.create 65536 in
@@ -92,10 +93,9 @@ let make_gzip_output_conf ~level request =
                   with _ -> (body, false)
                 else (body, false)
               in
-              let oc = Server.woc () in
+              let oc = Connection.woc conn in
               let status_line = Code.to_string !status_ref in
-              if not !Server.cgi then
-                Printf.fprintf oc "HTTP/1.1 %s\r\n" status_line
+              if not cgi then Printf.fprintf oc "HTTP/1.1 %s\r\n" status_line
               else Printf.fprintf oc "Status: %s\r\n" status_line;
               if is_gzipped then begin
                 output_string oc "Content-Encoding: gzip\r\n";
@@ -113,16 +113,16 @@ let make_gzip_output_conf ~level request =
             end);
       }
 
-let output_conf =
+let output_conf conn =
   {
-    status = Server.http;
-    header = Server.header;
-    body = Server.print_string;
-    flush = Server.wflush;
+    status = Connection.http conn;
+    header = Connection.header conn;
+    body = Connection.print_string conn;
+    flush = (fun () -> Connection.wflush conn);
   }
 
 let ( // ) = Filename.concat
-let printer_conf = { Config.empty with output_conf }
+let printer_conf conn = { Config.empty with output_conf = output_conf conn }
 let green_color = "#2f6400"
 
 let is_multipart_form =
@@ -819,7 +819,7 @@ let parse_digest s =
   in
   parse_main (Stream.of_string s)
 
-let basic_authorization from_addr request base_env passwd access_type utm
+let basic_authorization ~cgi from_addr request base_env passwd access_type utm
     base_file command =
   let wizard_passwd =
     try List.assoc "wizard_passwd" base_env
@@ -849,7 +849,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
   let ok, wizard, friend, username =
-    if (not !Server.cgi) && (passwd = "w" || passwd = "f") then
+    if (not cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
         if wizard_passwd = "" && wizard_passwd_file = "" then
           (true, true, friend_passwd = "", "")
@@ -897,13 +897,13 @@ let basic_authorization from_addr request base_env passwd access_type utm
     if access_type = ATset then
       if wizard then
         let pwd_id = set_token utm from_addr base_file 'w' user username in
-        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+        if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
       else if friend then
         let pwd_id = set_token utm from_addr base_file 'f' user username in
-        if !Server.cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
-      else if !Server.cgi then (command, "")
+        if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+      else if cgi then (command, "")
       else (base_file, "")
-    else if !Server.cgi then (command, passwd)
+    else if cgi then (command, passwd)
     else if passwd = "" then
       if auto = "auto" then
         let suffix = if wizard then "_w" else if friend then "_f" else "" in
@@ -1018,7 +1018,7 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz
           ar_can_stale = false;
         }
 
-let digest_authorization request base_env passwd utm base_file command =
+let digest_authorization ~cgi request base_env passwd utm base_file command =
   let wizard_passwd =
     try List.assoc "wizard_passwd" base_env
     with Not_found -> Option.value ~default:"" !wizard_passwd
@@ -1033,7 +1033,7 @@ let digest_authorization request base_env passwd utm base_file command =
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
   in
-  let command = if !Server.cgi then command else base_file in
+  let command = if cgi then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
     {
       ar_ok = true;
@@ -1126,12 +1126,12 @@ let digest_authorization request base_env passwd utm base_file command =
       ar_can_stale = false;
     }
 
-let authorization from_addr request base_env passwd access_type utm base_file
-    command =
+let authorization ~cgi from_addr request base_env passwd access_type utm
+    base_file command =
   match access_type with
   | ATwizard (user, username) ->
       let command, passwd =
-        if !Server.cgi then (command, passwd)
+        if cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1150,7 +1150,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
       }
   | ATfriend (user, username) ->
       let command, passwd =
-        if !Server.cgi then (command, passwd)
+        if cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1168,9 +1168,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
         ar_can_stale = false;
       }
   | ATnormal ->
-      let command, passwd =
-        if !Server.cgi then (command, "") else (base_file, "")
-      in
+      let command, passwd = if cgi then (command, "") else (base_file, "") in
       {
         ar_ok = true;
         ar_command = command;
@@ -1185,10 +1183,10 @@ let authorization from_addr request base_env passwd access_type utm base_file
       }
   | ATnone | ATset ->
       if !digest_password then
-        digest_authorization request base_env passwd utm base_file command
+        digest_authorization ~cgi request base_env passwd utm base_file command
       else
-        basic_authorization from_addr request base_env passwd access_type utm
-          base_file command
+        basic_authorization ~cgi from_addr request base_env passwd access_type
+          utm base_file command
 
 let warning_multi_parents () =
   Log.warn (fun k ->
@@ -1220,8 +1218,8 @@ let allowed_plugins ~loaded_plugins base_env =
   | Allowed s ->
       List.of_seq @@ SS.to_seq @@ SS.filter (fun p -> SS.mem p s) loaded_set
 
-let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
-    script_name env =
+let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
+    request script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
     let str =
       Printf.sprintf "Requested allowed_tags file (%s) absent"
@@ -1231,7 +1229,6 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
     Log.warn (fun k -> k "%s" str));
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
-  let cgi = !Server.cgi in
   let command, base_file, passwd, env, access_type =
     let base_access, env =
       let x, env = extract_assoc "b" env in
@@ -1304,8 +1301,8 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
   (* Il sera mis à jour par effet de bord dans request.ml       *)
   let default_sosa_ref = (Driver.Iper.dummy, None) in
   let ar =
-    authorization from_addr request base_env passwd access_type utm base_file
-      command
+    authorization ~cgi from_addr request base_env passwd access_type utm
+      base_file command
   in
   let wizard_just_friend =
     if !wizard_just_friend then true
@@ -1358,7 +1355,7 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
       user_iper = None;
       auth_scheme = ar.ar_scheme;
       command = ar.ar_command;
-      indep_command = (if !Server.cgi then ar.ar_command else "geneweb") ^ "?";
+      indep_command = (if cgi then ar.ar_command else "geneweb") ^ "?";
       highlight =
         (try List.assoc "highlight_color" base_env
          with Not_found -> green_color);
@@ -1415,7 +1412,7 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
       senv = [];
       cgi_passwd = ar.ar_passwd;
       henv =
-        ((if not !Server.cgi then []
+        ((if not cgi then []
           else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
           else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
         @ (if lang = "" then [] else [ ("lang", Mutil.encode lang) ])
@@ -1452,7 +1449,7 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
       images_prefix = Option.get !images_prefix;
       etc_prefix = Option.get !etc_prefix;
       cgi;
-      output_conf;
+      output_conf = output_conf conn;
       allowed_plugins;
       secret_salt = Some secret_salt;
       predictable_mode;
@@ -1566,6 +1563,7 @@ let conf_and_connection =
     ^<^ contents
   in
   fun ~predictable_mode
+    ~cgi
     ~loaded_plugins
     ~secret_salt
     from
@@ -1573,10 +1571,11 @@ let conf_and_connection =
     script_name
     (contents : Adef.encoded_string)
     env
+    conn
   ->
     let conf, passwd_err =
-      make_conf ~predictable_mode ~loaded_plugins ~secret_salt from request
-        script_name env
+      make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from
+        request script_name env
     in
     let m = Util.p_getenv env "m" in
     let is_binary =
@@ -1597,7 +1596,7 @@ let conf_and_connection =
     in
     let enable_gzip () =
       if gzip_level > 0 && not is_binary then
-        match make_gzip_output_conf ~level:gzip_level request with
+        match make_gzip_output_conf ~cgi ~level:gzip_level conn request with
         | Some gzip_oc -> conf.output_conf <- gzip_oc
         | None -> ()
     in
@@ -1608,7 +1607,7 @@ let conf_and_connection =
     | None -> (
         let auth_err, auth =
           if conf.auth_file = "" then (false, "")
-          else if !Server.cgi then (true, "")
+          else if cgi then (true, "")
           else auth_err request conf.auth_file
         in
         let mode = Util.p_getenv conf.env "m" in
@@ -1619,7 +1618,7 @@ let conf_and_connection =
            in
            log_and_robot_check conf auth from request script_name
              (contents :> string));
-        match (!Server.cgi, auth_err, passwd_err) with
+        match (cgi, auth_err, passwd_err) with
         | true, true, _ ->
             if is_robot from then Robot.robot_error conf 0 0 else no_access conf
         | _, true, _ ->
@@ -1647,7 +1646,7 @@ let conf_and_connection =
             enable_gzip ();
             try
               let t1 = Unix.gettimeofday () in
-              Request.treat_request conf;
+              Request.treat_request conn conf;
               Output.flush conf;
               let t2 = Unix.gettimeofday () in
               if t2 -. t1 > slow_query_threshold then
@@ -1782,7 +1781,7 @@ let find_misc_file conf name =
       let name' = Util.search_in_assets @@ Filename.concat "etc" name in
       if Sys.file_exists name' then name' else ""
 
-let print_misc_file conf misc_fname encoding =
+let print_misc_file conn conf misc_fname encoding =
   match misc_fname with
   | Css fname
   | Js fname
@@ -1802,7 +1801,7 @@ let print_misc_file conf misc_fname encoding =
           else
             let olen = min (Bytes.length buf) len in
             really_input ic buf 0 olen;
-            Server.printf "%s" (Bytes.sub_string buf 0 olen);
+            Connection.printf conn "%s" (Bytes.sub_string buf 0 olen);
             loop (len - olen)
         in
         loop len;
@@ -1825,7 +1824,7 @@ let print_misc_file conf misc_fname encoding =
       loop len;
       true
 
-let misc_request conf request fname =
+let misc_request conn conf request fname =
   let is_compressible =
     Filename.check_suffix fname ".js" || Filename.check_suffix fname ".css"
   in
@@ -1860,7 +1859,7 @@ let misc_request conf request fname =
       else if Filename.check_suffix fname ".cache.gz" then CacheGz actual_fname
       else Other actual_fname
     in
-    print_misc_file conf misc_fname encoding
+    print_misc_file conn conf misc_fname encoding
   else false
 
 let strip_quotes s =
@@ -1966,8 +1965,8 @@ let build_env request (contents : Adef.encoded_string) :
     extract_multipart boundary contents
   else (contents, Util.create_env contents)
 
-let connection ~predictable_mode ~loaded_plugins ~secret_salt (addr, request)
-    script_name contents0 =
+let connection ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn
+    (addr, request) script_name contents0 =
   let from =
     match addr with
     | Unix.ADDR_UNIX x -> x
@@ -1977,6 +1976,7 @@ let connection ~predictable_mode ~loaded_plugins ~secret_salt (addr, request)
           try (Unix.gethostbyaddr iaddr).Unix.h_name
           with _ -> Unix.string_of_inet_addr iaddr)
   in
+  let printer_conf = printer_conf conn in
   if request = [] then ()
   else if script_name = "robots.txt" then robots_txt printer_conf
   else if excluded from then refuse_log printer_conf from
@@ -1990,10 +1990,10 @@ let connection ~predictable_mode ~loaded_plugins ~secret_salt (addr, request)
         let contents, env = build_env request contents0 in
         if
           (not (image_request printer_conf script_name env))
-          && not (misc_request printer_conf request script_name)
+          && not (misc_request conn printer_conf request script_name)
         then
-          conf_and_connection ~predictable_mode ~loaded_plugins ~secret_salt
-            from request script_name contents env
+          conf_and_connection ~predictable_mode ~cgi ~loaded_plugins
+            ~secret_salt from request script_name contents env conn
       with Exit -> ()
 
 let null_reopen flags fd =
@@ -2101,10 +2101,10 @@ let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
   (* FIXME: this hack is necessary to avoid a cyclic dependency between
      `geneweb` and `geneweb-http`. We must remove it after refactoring
      the encoded string subsystem. *)
-  let connection x y z = connection x y (Adef.encoded z) in
+  let connection conn x y z = connection conn x y (Adef.encoded z) in
   Server.start ?addr:interface ~port ~timeout:!conn_timeout
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
-    (connection ~predictable_mode ~loaded_plugins ~secret_salt)
+    (connection ~predictable_mode ~cgi:false ~loaded_plugins ~secret_salt)
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -2116,17 +2116,18 @@ let cgi_timeout conf tmout _ =
   Output.flush conf;
   exit 0
 
-let manage_cgi_timeout tmout =
+let manage_cgi_timeout conn tmout =
   if tmout > 0 then
     let _ =
       Sys.signal Sys.sigalrm
-        (Sys.Signal_handle (cgi_timeout printer_conf tmout))
+        (Sys.Signal_handle (cgi_timeout (printer_conf conn) tmout))
     in
     let _ = Unix.alarm tmout in
     ()
 
 let geneweb_cgi ~loaded_plugins ~secret_salt addr script_name contents =
-  if Sys.unix then manage_cgi_timeout !conn_timeout;
+  let conn = Connection.of_channels ~cgi:true stdout stdin in
+  if Sys.unix then manage_cgi_timeout conn !conn_timeout;
   (try Unix.mkdir !GWPARAM.cnt_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
     try
@@ -2141,7 +2142,8 @@ let geneweb_cgi ~loaded_plugins ~secret_salt addr script_name contents =
   let request = add "accept-encoding" "HTTP_ACCEPT_ENCODING" request in
   let request = add "referer" "HTTP_REFERER" request in
   let request = add "user-agent" "HTTP_USER_AGENT" request in
-  connection ~loaded_plugins ~secret_salt
+  (* FIXME: the CGI handler cannot require a valid HTTP client connection. *)
+  connection ~cgi:true ~loaded_plugins ~secret_salt conn
     (Unix.ADDR_UNIX addr, request)
     script_name contents
 
@@ -2157,7 +2159,7 @@ let read_input len =
      with End_of_file -> ());
     Buffer.contents buff
 
-let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
+let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2188,14 +2190,6 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
         Log.err (fun k -> k "Cannot load the database %s" dbn);
         exit 2)
     !cache_databases;
-  if Option.is_some !auth_file && !force_cgi then
-    Log.warn (fun k ->
-        k
-          "-auth option is not compatible with CGI mode.\n\
-          \ Use instead friend_passwd_file= and wizard_passwd_file= in .cgf \
-           file");
-  if !digest_password && !force_cgi then
-    Log.warn (fun k -> k "-digest option is not compatible with CGI mode.");
   (if !images_dir <> "" then
      let abs_dir =
        let f =
@@ -2211,25 +2205,36 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
     Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
   Server.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
-  let query, cgi =
-    try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
-    with Not_found -> ("" |> Adef.encoded, !force_cgi)
-  in
   Util.is_welcome := false;
   if !check then (
     Log.debug (fun k -> k "End of check mode.");
     exit 0);
   if cgi then (
-    Server.cgi := true;
+    if Option.is_some !auth_file then
+      Log.warn (fun k ->
+          k
+            "-auth option is not compatible with CGI mode.\n\
+            \ Use instead friend_passwd_file= and wizard_passwd_file= in .cgf \
+             file");
+    if !digest_password then
+      Log.warn (fun k -> k "-digest option is not compatible with CGI mode.");
     set_binary_mode_out stdout true;
     let query =
-      if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
-        let len =
-          try int_of_string (Sys.getenv "CONTENT_LENGTH") with Not_found -> -1
-        in
-        set_binary_mode_in stdin true;
-        read_input len |> Adef.encoded)
-      else query
+      match Sys.getenv "REQUEST_METHOD" with
+      | "POST" ->
+          let len =
+            match Sys.getenv "CONTENT_LENGTH" with
+            | exception Not_found -> -1
+            | s ->
+                (* TODO: handle wrong type in the CONTENT_LENGTH variable. *)
+                int_of_string s
+          in
+          set_binary_mode_in stdin true;
+          Adef.encoded @@ read_input len
+      | (exception Not_found) | _ -> (
+          match Sys.getenv "QUERY_STRING" with
+          | exception Not_found -> Adef.encoded ""
+          | s -> Adef.encoded s)
     in
     let addr =
       try Sys.getenv "REMOTE_HOST"
@@ -2268,7 +2273,6 @@ let parse_cmd () =
       images_prefix := Some o.images_prefix;
       images_dir := o.images_dir;
       etc_prefix := Some o.etc_prefix;
-      socket_dir := o.socket_dir;
       auth_file := o.authorization_file;
       cache_langs := o.cache_langs;
       cache_databases := o.cache_databases;
@@ -2293,23 +2297,12 @@ let parse_cmd () =
       wizard_passwd := o.wizard_password;
       log_file := o.log;
       verbosity_level := o.verbosity;
-      force_cgi := o.cgi;
       cgi_secret_salt := o.secret_salt;
       Lock.no_lock_flag := o.no_lock;
       Mutil.particles_file := Option.value ~default:"" o.particles_file;
       Util.allowed_tags_file := Option.value ~default:"" o.allowed_tags_file;
       o
   | `Exit code -> exit code
-
-let make_socket_dir socket_dir =
-  match socket_dir with
-  | Some p ->
-      GWPARAM.sock_dir := p;
-      Filesystem.create_dir ~parent:true p;
-      if Sys.win32 then (
-        Server.sock_in := p // "gwd.sin";
-        Server.sock_out := p // "gwd.sou")
-  | None -> ()
 
 let switch_check () = debug := true
 
@@ -2318,6 +2311,17 @@ let switch_debug () =
   set_verbosity_level 7;
   Logs.set_level ~all:true (Some Logs.Debug);
   Sys.enable_runtime_warnings true
+
+let infer_cgi () =
+  match Sys.getenv "QUERY_STRING" with
+  | exception Not_found -> false
+  | _ ->
+      Log.warn (fun k ->
+          k
+            "CGI mode was enabled via QUERY_STRING environment variable. This \
+             implicit behavior is deprecated. Use the `-cgi` CLI option \
+             instead.");
+      true
 
 type opened_file = { path : string; mutable oc : out_channel option }
 
@@ -2407,11 +2411,11 @@ let () =
   Secure.add_assets opts.etc_prefix;
   if opts.check then switch_check ();
   if opts.debug then switch_debug ();
-  make_socket_dir opts.socket_dir;
   setup_log ~predictable_mode:opts.predictable_mode opts.log;
+  let cgi = opts.cgi || infer_cgi () in
   try
     main ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
-      ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ()
+      ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ~cgi ()
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Log.err (fun k ->
