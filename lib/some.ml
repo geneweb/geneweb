@@ -483,25 +483,29 @@ let sort_by_first_name base persons_with_titles =
     with_fn
   |> List.map (fun (p, tl, _) -> (p, tl))
 
-(* Sort by first-name exact match first (score 0), then by birth date within
+(* Sort by first-name exact match first (score 0), then by birth (or baptism) date within
    each tier.  Used for spouse lists so that e.g. "Annie" appears before "Anne"
    when the query is "annie vivier", regardless of birth-date ordering. *)
 let sort_by_fn_relevance_then_date base query persons_with_titles =
   let query_lower = Name.lower query in
-  let fn_score p =
+  let first_name_matches_query p =
     let fn = Driver.sou base (Driver.get_first_name p) in
-    if Name.lower fn = query_lower then 0 else 1
+    Name.lower fn = query_lower
   in
-  let bi p =
+  let birth_or_baptism_dmy p =
     let b = Driver.get_birth p in
     let b = if b = Date.cdate_None then Driver.get_baptism p else b in
     Date.cdate_to_dmy_opt b
   in
-  List.sort
-    (fun (p1, _) (p2, _) ->
-      let c = compare (fn_score p1) (fn_score p2) in
-      if c <> 0 then c else Option.compare Date.compare_dmy (bi p1) (bi p2))
-    persons_with_titles
+  (* Decorate: compute each sort key once — the accessors are costly. *)
+  persons_with_titles
+  |> List.map (fun ((p, _) as pt) ->
+      (first_name_matches_query p, birth_or_baptism_dmy p, pt))
+  |> List.sort (fun (m1, d1, _) (m2, d2, _) ->
+      let c = Bool.compare m2 m1 in
+      (* note the arguments order *)
+      if c <> 0 then c else Option.compare Date.compare_dmy d1 d2)
+  |> List.map (fun (_, _, pt) -> pt)
 
 (* ========================================================================= *)
 (* Section 5: Result list rendering primitives                               *)
@@ -884,13 +888,13 @@ let specify conf base alias_cache n pl1 pl2 pl3 =
     match p_getenv conf.env "pn" with
     | Some pn -> (
         let pn = Name.lower (Mutil.strip_all_trailing_spaces pn) in
-        match String.index_opt pn ' ' with
-        | Some i -> String.sub pn 0 i
-        | None -> pn)
+        match String.index pn ' ' with
+        | i -> String.sub pn 0 i
+        | exception Not_found -> pn)
     | None -> (
-        match String.index_opt n ' ' with
-        | Some i -> String.sub n 0 i
-        | None -> n)
+        match String.index n ' ' with
+        | i -> String.sub n 0 i
+        | exception Not_found -> n)
   in
   let split_pl n pl =
     List.fold_left
