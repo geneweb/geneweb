@@ -85,6 +85,8 @@ type normalized_string = {
 (* Section 2: Low-level Utilities                                           *)
 (* ========================================================================= *)
 
+let fn_sn fn sn = fn ^ " " ^ sn
+
 let normalize_for_phonetic s =
   let buf = Buffer.create (String.length s) in
   String.iter (function ' ' | '-' -> () | c -> Buffer.add_char buf c) s;
@@ -134,9 +136,10 @@ let norm_apo s =
            && s.[!i + 2] = '\x99' ->
         Buffer.add_char buf '\'';
         i := !i + 2
-    | '\xCA'
-      when !i + 1 < String.length s
-           && (s.[!i + 1] = '\xBC' || s.[!i + 1] = '\xBB') ->
+    | '\xCA' when !i + 1 < String.length s && s.[!i + 1] = '\xBC' ->
+        Buffer.add_char buf '\'';
+        i := !i + 1
+    | '\xCA' when !i + 1 < String.length s && s.[!i + 1] = '\xBB' ->
         Buffer.add_char buf '\'';
         i := !i + 1
     | c -> Buffer.add_char buf c);
@@ -629,18 +632,20 @@ and search_word_in_surname conf base word =
     List.exists (fun tok -> tok = word_lower) (cut_words str_lower)
   in
   let found = ref Iper.Set.empty in
-  (try
-     let list, _name_inj =
-       Some.persons_of_fsname conf base Driver.base_strings_of_surname
-         (Driver.spi_find (Driver.persons_of_surname base))
-         Driver.get_surname word
-     in
-     List.iter
-       (fun (str, _, iperl) ->
-         if is_word_in str then
-           List.iter (fun ip -> found := Iper.Set.add ip !found) iperl)
-       list
-   with Not_found -> ());
+  let () =
+    try
+      let list, _name_inj =
+        Some.persons_of_fsname conf base Driver.base_strings_of_surname
+          (Driver.spi_find (Driver.persons_of_surname base))
+          Driver.get_surname word
+      in
+      List.iter
+        (fun (str, _, iperl) ->
+          if is_word_in str then
+            List.iter (fun ip -> found := Iper.Set.add ip !found) iperl)
+        list
+    with Not_found -> ()
+  in
   Iper.Set.elements !found
 
 and search_phonetic_generic conf base query base_strings spi_find _get_name =
@@ -1453,15 +1458,15 @@ let parse_person_name base pn =
      literal text, so a malformed oc can neither produce a garbage Key query
      nor be silently dropped by the downstream oc filter. *)
   let dot_pos =
-    match String.index_opt pn '.' with
-    | Some j ->
+    match String.index pn '.' with
+    | j ->
         let len = String.length pn in
         let k = ref (j + 1) in
         while !k < len && is_digit pn.[!k] do
           incr k
         done;
         if !k > j + 1 && !k + 1 < len && pn.[!k] = ' ' then Some j else None
-    | None -> None
+    | exception Not_found -> None
   in
   let slash_pos = String.index_opt pn '/' in
   let pn =
@@ -1513,7 +1518,9 @@ let parse_person_name base pn =
 
 let extract_name_components conf base =
   let get_param key =
-    match p_getenv conf.env key with Some "" | None -> None | Some s -> Some s
+    match p_getenv conf.env key with
+    | Some "" | None -> None
+    | Some s -> Some (String.trim s)
   in
   let fn = get_param "p" in
   let sn = get_param "n" in
@@ -1967,10 +1974,13 @@ let search conf base components query search_order fn_options specify =
   let cache = StringCache.create () in
   let alias_cache = Some.AliasCache.create () in
   Log.debug (fun k ->
-      let fn = Option.value components.first_name ~default:"" in
-      let sn = Option.value components.surname ~default:"" in
-      let oc = Option.value components.oc ~default:"" in
-      k " Search query=%s, fn=%s, sn=%s, oc=%s" query fn sn oc);
+      k " Search query=%s,first_name=%a, surname=%a, oc=%a" query
+        Fmt.(option ~none:(any "<none>") string)
+        components.first_name
+        Fmt.(option ~none:(any "<none>") string)
+        components.surname
+        Fmt.(option ~none:(any "<none>") string)
+        components.oc);
   let results =
     dispatch_search_methods cache alias_cache conf base components query
       search_order fn_options
@@ -2005,14 +2015,16 @@ let print conf base specify =
     }
   in
   Log.debug (fun k ->
-      let fn = Option.value components.first_name ~default:"" in
-      let sn = Option.value components.surname ~default:"" in
-      let oc = Option.value components.oc ~default:"" in
-      k " Search case=%s fn=%s, sn=%s, oc=%s"
+      k " Search case=%s,first_name=%a, surname=%a, oc=%a"
         (Debug.case_str components.case)
-        fn sn oc);
+        Fmt.(option ~none:(any "<none>") string)
+        components.first_name
+        Fmt.(option ~none:(any "<none>") string)
+        components.surname
+        Fmt.(option ~none:(any "<none>") string)
+        components.oc);
   let full_order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
-  let go query order =
+  let search query order =
     search conf base components query order fn_options specify
   in
   match components.case with
@@ -2022,7 +2034,7 @@ let print conf base specify =
       let _ = [ FirstName ] in
       (* dummy to avoid warning *)
       display_firstname_results conf base alias_cache fn fn_options results
-  | SurnameOnly sn -> go sn [ Surname ]
+  | SurnameOnly sn -> search sn [ Surname ]
   | ParsedName { first_name = Some fn; surname = None; _ } when fn <> "" ->
       (* Route like FirstNameOnly: going through [search] would run
          search_firstname once in the FirstName method and then a second
@@ -2031,9 +2043,9 @@ let print conf base specify =
       let results = search_firstname alias_cache conf base fn fn_options in
       display_firstname_results conf base alias_cache fn fn_options results
   | ParsedName { first_name = None; surname = Some sn; _ } when sn <> "" ->
-      go sn [ Surname ]
+      search sn [ Surname ]
   | ParsedName { first_name = Some fn; surname = Some sn; _ } ->
-      go (fn ^ " " ^ sn) full_order
-  | FirstNameSurname (fn, sn) -> go (fn ^ " " ^ sn) full_order
-  | PersonName pn -> go pn full_order
+      search (fn_sn fn sn) full_order
+  | FirstNameSurname (fn, sn) -> search (fn_sn fn sn) full_order
+  | PersonName pn -> search pn full_order
   | _ -> SrcfileDisplay.print_welcome conf base

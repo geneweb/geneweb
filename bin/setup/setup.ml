@@ -41,18 +41,18 @@ let printer_conf =
       };
   }
 
-let gwsetup_config =
-  lazy
-    (let path_info =
-       [
-         Printf.sprintf "gwsetup: %s" Sys.argv.(0);
-         Printf.sprintf "working_dir: %s" (Sys.getcwd ());
-         Printf.sprintf "setup_dir: %s" !setup_dir;
-         Printf.sprintf "bin_dir: %s" !bin_dir;
-         Printf.sprintf "bases_dir: %s" !bases_dir;
-       ]
-     in
-     String.concat "<br>\n" path_info)
+let gwsetup_config () =
+  let path_info =
+    [
+      ("gwsetup:", Sys.argv.(0));
+      ("working_dir:", Sys.getcwd ());
+      ("setup_dir:", !setup_dir);
+      ("bin_dir:", !bin_dir);
+      ("bases_dir:", !bases_dir);
+    ]
+  in
+  let pp_br = Fmt.any "<br>" in
+  Fmt.str "%a" Fmt.(list ~sep:pp_br @@ pair string string) path_info
 
 let slashify s = String.map (function '\\' -> '/' | c -> c) s
 
@@ -722,7 +722,7 @@ let rec copy_from_stream conf print strm =
                   match p_getenv conf.env k with
                   | Some v -> print v
                   | None -> ())
-              | 'W' -> print (Lazy.force gwsetup_config)
+              | 'W' -> print (gwsetup_config ())
               | _ -> (
                   match p_getenv conf.env (String.make 1 c) with
                   | Some v -> (
