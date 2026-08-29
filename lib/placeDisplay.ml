@@ -306,8 +306,8 @@ let print_html_places_surnames_long conf base link_to_ind
                   (fun _ -> Output.print_sstring conf "</ul></li>\n")
                   (x1 :: l1);
                 loop1 [] (x2 :: l2, sub))
-          | _ -> Output.print_sstring conf "</ul></li>\n"
-          (* FIXME was assert false!! *)
+          | l1, [] ->
+              List.iter (fun _ -> Output.print_sstring conf "</ul></li>\n") l1
         in
         loop1 prev (pl, sub);
         print_sn_list (pl, sub) snl;
@@ -344,7 +344,6 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
         loop [] v)
       max_length
   in
-  Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let title _ =
     Output.printf conf "%s / %s"
       (Utf8.capitalize (transl_nth conf "place/places" 0))
