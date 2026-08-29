@@ -220,6 +220,7 @@ let rec eval_variable (conf : Config.config) = function
                else "####"))
         "" l
   | [ "gwd"; "arglist" ] -> !GWPARAM.gwd_cmd
+  | [ "evt_symbol"; name ] -> Util.event_symbol conf name
   | [ "bvar"; v ] | [ "b"; v ] -> (
       try List.assoc v conf.base_env with Not_found -> "")
   | [ "connections"; "wizards" ] -> (

@@ -722,6 +722,14 @@ val escape_html : string -> Adef.escaped_string
 (** [escape_html str] replaces '&', '"', '\'', '<' and '>' with their
     corresponding character entities (using entity number) *)
 
+val event_symbol : Config.config -> string -> string
+(** [event_symbol conf name] is the compact event marker for [name] (one of
+    ["birth"], ["baptism"], ["marriage"], ["death"], ["burial"]) used by the m=L
+    "list by place" view. Read from the base [.gwf] key [evt_symbol_<name>],
+    falling back to the built-in defaults [o ~ & + x]. Independent from the
+    date-display keys [birth_symbol]/[death_symbol]. The result is HTML-escaped.
+    Exposed to templates as [%evt_symbol.<name>;]. *)
+
 val safe_html : string -> Adef.safe_string
 (** [safe_html s] sanitizes [s] element in order to fix ill-formed HTML input
     and to prevent XSS injection

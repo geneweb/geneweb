@@ -220,6 +220,23 @@ let escape_attribute =
           Bytes.unsafe_set buf ibuf c;
           loop (istr + 1) (ibuf + 1))
 
+let event_symbol conf name =
+  let default =
+    match name with
+    | "birth" -> "o"
+    | "baptism" -> "~"
+    | "marriage" -> "&"
+    | "death" -> "+"
+    | "burial" -> "x"
+    | _ -> ""
+  in
+  let s =
+    match List.assoc_opt ("evt_symbol_" ^ name) conf.base_env with
+    | Some s when s <> "" -> s
+    | _ -> default
+  in
+  (escape_html s :> string)
+
 let is_hide_names conf p =
   if conf.hide_names && Driver.get_access p = Private then true else false
 

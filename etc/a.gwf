@@ -158,14 +158,18 @@
 # or file://…
 #images_path=
 
-# Event symbols, used in date display (birth_symbol/death_symbol) and as the
-# compact event markers of the m=L “list by place” view. When unset, the
-# markers default to o ~ m + x; the christian date convention uses ° and †.
+# Date-display symbols for births and deaths (e.g. “° 1830”, “† 1912”).
+# The christian convention is ° and †.
 #birth_symbol=°
-#baptism_symbol=~
-#marriage_symbol=m
 #death_symbol=†
-#burial_symbol=x
+
+# Compact event markers for the m=L “list by place” view. Independent from the
+# date symbols above; when unset they default to o ~ & + x.
+#evt_symbol_birth=o
+#evt_symbol_baptism=~
+#evt_symbol_marriage=&
+#evt_symbol_death=+
+#evt_symbol_burial=x
 
 # Hide “search by titles” be on the welcome page.
 #propose_titles=no

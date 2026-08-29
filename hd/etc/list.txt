@@ -83,13 +83,16 @@
   %end;
   %in;
 %let;k;%if;(e.k!="")%e.k;%end;%in;
-%( Event symbols (b. = bvar shortcut), used as the m=L place-event markers.
-   Override per base in the .gwf; defaults o ~ m + x (christian dates use ° †). %)
-%let;birth_symbol;%if;(b.birth_symbol!="")%b.birth_symbol;%else;o%end;%in;
-%let;baptism_symbol;%if;(b.baptism_symbol!="")%b.baptism_symbol;%else;~%end;%in;
-%let;marriage_symbol;%if;(b.marriage_symbol!="")%b.marriage_symbol;%else;m%end;%in;
-%let;death_symbol;%if;(b.death_symbol!="")%b.death_symbol;%else;+%end;%in;
-%let;burial_symbol;%if;(b.burial_symbol!="")%b.burial_symbol;%else;x%end;%in;
+%( Event markers for the m=L place-event view. Single source of truth is
+   Util.event_symbol, exposed as %evt_symbol.<name>; and overridable per base
+   via the evt_symbol_* keys in the .gwf (defaults o ~ & + x). Independent from
+   the date-display symbols birth_symbol/death_symbol (° †); values are
+   HTML-escaped in OCaml. %)
+%let;birth_symbol;%evt_symbol.birth;%in;
+%let;baptism_symbol;%evt_symbol.baptism;%in;
+%let;marriage_symbol;%evt_symbol.marriage;%in;
+%let;death_symbol;%evt_symbol.death;%in;
+%let;burial_symbol;%evt_symbol.burial;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
 %define;evt(vv,tt,ii)
   %if;("vv"!="bi"), %end;%if;(e.vv!="on")<s>%else;<span>%end;tt ii%if;(e.vv!="on")</s>%else;</span>%end;%nn;
