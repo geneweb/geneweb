@@ -79,6 +79,19 @@ Operators in conditions: `=`, `!=`, `<`, `<=`, `>`, `>=`, `and`,
 `or`, `not`, `|` (integer division), `%` (modulo), `in` (substring
 test: `%if;(x in y)` checks if `x` is contained in `y`).
 
+### Macro Parameter Substitution Is Raw Text Replace
+
+`%apply;func(args)` expands a `%define;`d macro by textually replacing
+each parameter *name* with its argument *value*, one parameter at a
+time in declaration order — it is not a scoped binding. A parameter
+name that happens to occur as a substring of an already-substituted
+value is rewritten too: a two-letter name like `tt` gets clobbered
+inside a place value such as "Nottingham". Rule: give any macro
+parameter that carries free text or place data an underscore-prefixed
+name (`p_evt`, `p_sym`, `p_flg`, `p_sel`, `p_lbl`, …) — underscores
+never occur in place strings, so cross-substitution cannot happen.
+(See the `nbmds` / `evt` / `tags` macros in `hd/etc/list.txt`.)
+
 ### Escaping in Inline Script Blocks
 
 The template parser interprets `%` and `[` **everywhere**, including

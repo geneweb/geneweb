@@ -11,7 +11,6 @@
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
   %permalink;
   %include;css
-  <style>.evm{display:inline-block;width:1.2em;text-align:center}</style>
 </head>
 <body%body_prop;>
 %( TODO: SWITCH evar.k to evar.s as in mod_data and chk_data !! %)
@@ -94,8 +93,8 @@
 %let;death_symbol;%evt_symbol.death;%in;
 %let;burial_symbol;%evt_symbol.burial;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
-%define;evt(vv,tt,ii)
-  %if;("vv"!="bi"), %end;%if;(e.vv!="on")<s>%else;<span>%end;tt ii%if;(e.vv!="on")</s>%else;</span>%end;%nn;
+%define;evt(p_key,p_lbl,p_sym)
+  %if;("p_key"!="bi"), %end;%if;(e.p_key!="on")<s>%else;<span>%end;p_lbl p_sym%if;(e.p_key!="on")</s>%else;</span>%end;%nn;
 %end;
 <div class="mt-3">%if;(e.surn!="")[*surname/surnames]0[:] <span class="text-primary">%e.surn;</span>.%end;
   %if;(e.data="place")
@@ -118,30 +117,28 @@
    p_flg="1" => display: symbol p_sym in a fixed-width cell (empty cell on no
    match, to keep the column aligned). Otherwise => compact URL/RLM mode: the
    plain ASCII code p_ltr (URL-safe; a configured symbol may not be).
-   NB: parameter names contain "_" (never present in place data) because macro
-   substitution is a raw substring replace applied one parameter at a time — a
-   plain name like "tt" would otherwise be rewritten inside a place value such
-   as "Nottingham". %)
-%define;nbmds(p_evt,p_sym,p_ltr,p_flg,p_sel)
-  %if;("p_evt"!="" and ", p_sel|" is_substr ", p_evt|")%if;("p_flg"=1)<span class="evm">p_sym</span>%else;p_ltr%end;%else;%if;("p_flg"=1)<span class="evm"></span>%end;%end;%nn;
+   Parameter names are underscore-prefixed for substitution safety — see
+   CLAUDE.md “Macro Parameter Substitution”. %)
+%define;nbmds(p_evt,p_sym,p_ltr,p_flg,p_sel,p_lbl)
+  %if;("p_evt"!="" and ", p_sel|" is_substr ", p_evt|")%if;("p_flg"=1)<span class="evm" title="p_lbl">p_sym</span>%else;p_ltr%end;%else;%if;("p_flg"=1)<span class="evm"></span>%end;%end;%nn;
 %end;
 
-%define;nbmds_m(p_evt,p_sym,p_ltr,p_flg,p_sel)
-  %if;("p_evt"!="" and ("p_sel" is_substr "p_evt" or "p_evt"="p_sel"))%if;("p_flg"=1)<span class="evm">p_sym</span>%else;p_ltr%end;%else;%if;("p_flg"=1)<span class="evm"></span>%end;%end;%nn;
+%define;nbmds_m(p_evt,p_sym,p_ltr,p_flg,p_sel,p_lbl)
+  %if;("p_evt"!="" and ("p_sel" is_substr "p_evt" or "p_evt"="p_sel"))%if;("p_flg"=1)<span class="evm" title="p_lbl">p_sym</span>%else;p_ltr%end;%else;%if;("p_flg"=1)<span class="evm"></span>%end;%end;%nn;
 %end;
 
-%define;tags(xx,tt,ss)
-  %let;myindex;xx%in;
+%define;tags(p_idx,p_flg,p_sel)
+  %let;myindex;p_idx%in;
   %let;birthplace;%apply;get_value(myindex, "birth_place_norm")%in;
   %let;baptismplace;%apply;get_value(myindex, "baptism_place_norm")%in;
   %let;marriageplace;%apply;get_marriage(myindex)%in;
   %let;deathplace;%apply;get_value(myindex, "death_place_norm")%in;
   %let;burialplace;%apply;get_value(myindex, "burial_place_norm")%in;
-  %apply;nbmds(birthplace,birth_symbol,"N","tt","ss")%nn;
-  %apply;nbmds(baptismplace,baptism_symbol,"B","tt","ss")%nn;
-  %apply;nbmds_m(marriageplace,marriage_symbol,"M","tt","ss")%nn;
-  %apply;nbmds(deathplace,death_symbol,"D","tt","ss")%nn;
-  %apply;nbmds(burialplace,burial_symbol,"S","tt","ss")%nn;
+  %apply;nbmds(birthplace,birth_symbol,"N","p_flg","p_sel",[birth])%nn;
+  %apply;nbmds(baptismplace,baptism_symbol,"B","p_flg","p_sel",[baptism])%nn;
+  %apply;nbmds_m(marriageplace,marriage_symbol,"M","p_flg","p_sel",[marriage event])%nn;
+  %apply;nbmds(deathplace,death_symbol,"D","p_flg","p_sel",[death])%nn;
+  %apply;nbmds(burialplace,burial_symbol,"S","p_flg","p_sel",[burial])%nn;
 %end;
 
 %empty_sorted_list

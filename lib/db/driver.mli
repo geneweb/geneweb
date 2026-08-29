@@ -384,6 +384,11 @@ val nb_of_real_persons : base -> int
 val nb_of_families : base -> int
 (** Returns number of families inside the database *)
 
+val nb_of_strings : base -> int
+(** Returns the number of strings (istr) in the database, read from the header.
+    Counts all string kinds (names, places, sources, ...), so it is an upper
+    bound on the number of distinct place strings. *)
+
 val bname : base -> string
 (** Returns database name *)
 
