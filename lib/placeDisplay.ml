@@ -76,9 +76,9 @@ let print_ip_list conf places opt link_to_ind ipl =
     in
     Output.print_sstring conf (head ^ body ^ tail)
 
-(** print a call to m=PPS with a new k value *)
+(** print a call to m=PS with a new k value *)
 let pps_call conf opt long keep k places =
-  Printf.sprintf "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>"
+  Printf.sprintf "<a href=\"%sm=PS%s&display=%s&keep=%s&k=%s\">%s</a>"
     (commd conf :> string)
     opt
     (if long then "long" else "short")
@@ -170,10 +170,10 @@ let print_html_places_surnames_short conf _base _link_to_ind
       match l with
       | [] -> ()
       | (pl, ipl) :: l ->
-          let str = places_to_string true pl in
+          let str = places_to_string false pl in
           let str2 = (Mutil.encode str :> string) in
           Output.printf conf
-            "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>"
+            "<a href=\"%sm=PS%s&display=%s&keep=%s&k=%s\">%s</a>"
             (commd conf :> string)
             opt
             (if long then "long" else "short")
@@ -189,10 +189,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
                   let rec loop2 i = function
                     | [] -> loop1 i l
                     | ip :: ipl ->
-                        Output.printf conf "&i%d=%s%s" i
-                          (Driver.Iper.to_string ip)
-                          (Printf.sprintf "&p%d=%s" i
-                             (places_to_string false pl));
+                        Output.printf conf "&i%d=%s&p%d=%s" i
+                          (Driver.Iper.to_string ip) i
+                          (Mutil.encode (places_to_string false pl) :> string);
                         loop2 (i + 1) ipl
                   in
                   loop2 i ipl
@@ -381,7 +380,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
     else ""
   in
   let href =
-    Printf.sprintf "href=\"%sm=PPS%s&display=%s&keep=%s%s\" title=\"%s\""
+    Printf.sprintf "href=\"%sm=PS%s&display=%s&keep=%s%s\" title=\"%s\""
       (commd conf :> string)
       opt
       (if long then "short" else "long")
