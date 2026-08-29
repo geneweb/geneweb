@@ -57,6 +57,11 @@ val normalize_place : bool -> string -> string
     child-first), so the result is byte-comparable with the key emitted in the
     m=L marker URLs. Example: ["Paris (75)"] -> ["Paris, 75"]. *)
 
+val places_inverted : config -> bool
+(** [places_inverted conf] is [true] when the base records place components
+    parent-first ([places_inverted=yes] in the [.gwf]) — the [inverted] flag
+    threaded through {!fold_place_long} and {!normalize_place}. *)
+
 val max_rlm_nbr : config -> int
 (** Maximum number of persons for which an m=RLM relationship graph is computed.
     Read from the ["max_rlm_nbr"] request parameter, then the base [.gwf], then
