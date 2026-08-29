@@ -2569,3 +2569,6 @@ body.upd-edit [data-updfield] a {
   overflow-wrap: anywhere;
   animation: slideInRight 0.3s ease-out;
 }
+
+/* m=L place-event markers: fixed-width cell so any glyph stays column-aligned */
+.evm { display: inline-block; width: 1.2em; text-align: center; }

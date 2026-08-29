@@ -175,15 +175,17 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     (fold_place : string -> 'a) (filter : 'a -> bool)
     (mk_value : 'b option -> Driver.person -> 'b) (fn : 'b -> 'c)
     (max_length : int) : ('a * 'c) array =
-  let ht_size =
-    (* rough proxy for the number of distinct places, bounded so it stays
-       reasonable on very large bases. FIXME: a real per-base heuristic. *)
-    min 65536 (max 2048 (Driver.nb_of_persons base / 100))
-  in
-  let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
+  (* [fold_cache] is keyed by place [istr]; the total string population is a
+     tight upper bound on the distinct place istrs, so pre-size it there to
+     avoid rehashing during the scan. [ht] holds the (fewer) distinct folded
+     place keys, whose count is unknown up front — start small and let it grow
+     (amortised O(1)). *)
+  let ht : ('a, 'b) Hashtbl.t = Hashtbl.create 2048 in
   (* Many people share the same place [istr]; fold each distinct place string
      once (sou + fold_place) instead of once per person. *)
-  let fold_cache : (Driver.istr, 'a) Hashtbl.t = Hashtbl.create ht_size in
+  let fold_cache : (Driver.istr, 'a) Hashtbl.t =
+    Hashtbl.create (Driver.nb_of_strings base)
+  in
   let key_of istr =
     match Hashtbl.find_opt fold_cache istr with
     | Some key -> key
