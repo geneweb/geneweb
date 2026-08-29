@@ -165,6 +165,9 @@ let places_to_string inverse pl =
 let normalize_place inverted s =
   places_to_string false (fst (fold_place_long inverted s))
 
+let places_inverted conf =
+  List.assoc_opt "places_inverted" conf.base_env = Some "yes"
+
 exception List_too_long
 
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial

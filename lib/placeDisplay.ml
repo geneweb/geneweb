@@ -2,7 +2,6 @@
 
 open Config
 open Util
-open Place
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
@@ -51,7 +50,8 @@ let get_ip_list (snl : (string * Driver.iper list) list) =
 (** print the number of items in ip_list and a call to m=L for them **)
 let print_ip_list conf places opt link_to_ind ipl =
   let len = List.length ipl in
-  if len > max_rlm_nbr conf && link_to_ind then Output.printf conf "(%d)" len
+  if len > Place.max_rlm_nbr conf && link_to_ind then
+    Output.printf conf "(%d)" len
   else
     let places = (Mutil.encode places :> string) in
     let head =
@@ -170,7 +170,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
       match l with
       | [] -> ()
       | (pl, ipl) :: l ->
-          let str = places_to_string false pl in
+          let str = Place.places_to_string false pl in
           let str2 = (Mutil.encode str :> string) in
           Output.printf conf
             "<a href=\"%sm=PS%s&display=%s&keep=%s&k=%s\">%s</a>"
@@ -179,7 +179,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
             (if long then "long" else "short")
             (string_of_int (keep + 1))
             str2 str;
-          if len < max_rlm_nbr conf then (
+          if len < Place.max_rlm_nbr conf then (
             Output.printf conf "&nbsp;(<a href=\"%sm=L&data=place%s&k=%s&nb=%d"
               (commd conf :> string)
               opt str2 len;
@@ -191,7 +191,8 @@ let print_html_places_surnames_short conf _base _link_to_ind
                     | ip :: ipl ->
                         Output.printf conf "&i%d=%s&p%d=%s" i
                           (Driver.Iper.to_string ip) i
-                          (Mutil.encode (places_to_string false pl) :> string);
+                          (Mutil.encode (Place.places_to_string false pl)
+                            :> string);
                         loop2 (i + 1) ipl
                   in
                   loop2 i ipl
@@ -246,7 +247,7 @@ let print_html_places_surnames_long conf base link_to_ind
     let ips = List.sort_uniq compare ips in
     (* child-first order (like short mode), so the place key matches the
        per-person *_place_norm values compared by the m=L list markers *)
-    let places = places_to_string false pl in
+    let places = Place.places_to_string false pl in
     if link_to_ind then (
       match ips with
       | [ ip ] ->
@@ -319,13 +320,12 @@ let print_html_places_surnames_long conf base link_to_ind
 
 let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
     ~add_death ~add_burial ~add_marriage max_length short filter =
-  let inverted =
-    try List.assoc "places_inverted" conf.base_env = "yes"
-    with Not_found -> false
-  in
+  let inverted = Place.places_inverted conf in
   let arry =
-    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      ~add_marriage ([], "") [] (fold_place_long inverted) filter
+    Place.get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      ~add_marriage ([], "") []
+      (Place.fold_place_long inverted)
+      filter
       (fun prev p ->
         (* add one ip to a list flagged by surname *)
         let value = (Driver.get_surname p, Driver.get_iper p) in
@@ -415,14 +415,14 @@ let print_all_places_surnames conf base =
     match p_getenv conf.env "k" with
     | Some ini ->
         ( ini,
-          if ini = "" then fun _ -> true else fun (x, _) -> find_in conf x ini
-        )
+          if ini = "" then fun _ -> true
+          else fun (x, _) -> Place.find_in conf x ini )
     | None -> ("", fun _ -> true)
   in
   try
     print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
       ~add_death ~add_burial ~add_marriage lim false filter
-  with List_too_long ->
+  with Place.List_too_long ->
     let conf =
       {
         conf with
