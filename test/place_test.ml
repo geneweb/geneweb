@@ -56,13 +56,56 @@ let compare_places () =
        "[foo-bar] - baz, boobar, barboo, bam");
   ()
 
+let normalize_place () =
+  (* Canonical leaf-first form; must byte-match m=L p0/p%d and *_place_norm. *)
+  (check string) "berlin false" "Berlin, Allemagne"
+    (Place.normalize_place false "Berlin, Allemagne");
+  (check string) "berlin true" "Allemagne, Berlin"
+    (Place.normalize_place true "Berlin, Allemagne");
+  (check string) "paren false" "Paris, 75"
+    (Place.normalize_place false "Paris (75)");
+  (check string) "paren true" "75, Paris"
+    (Place.normalize_place true "Paris (75)");
+  (check string) "suburb false" "Paris 16e"
+    (Place.normalize_place false "[Hameau Boileau] - Paris 16e");
+  (check string) "suburb true" "Paris 16e"
+    (Place.normalize_place true "[Hameau Boileau] - Paris 16e");
+  (check string) "three false" "Paris, \195\142le-de-France, France"
+    (Place.normalize_place false "Paris, \195\142le-de-France, France");
+  (check string) "three true" "France, \195\142le-de-France, Paris"
+    (Place.normalize_place true "Paris, \195\142le-de-France, France");
+  ()
+
+let fold_place_long () =
+  (check (pair (list string) string))
+    "fold non-inverted"
+    ([ "France"; "Paris" ], "")
+    (Place.fold_place_long false "Paris, France");
+  (check (pair (list string) string))
+    "fold inverted"
+    ([ "Paris"; "France" ], "")
+    (Place.fold_place_long true "Paris, France");
+  (check (pair (list string) string))
+    "fold paren"
+    ([ "75"; "Paris" ], "")
+    (Place.fold_place_long false "Paris (75)");
+  (check (pair (list string) string))
+    "fold suburb"
+    ([ "Paris 16e" ], "Hameau Boileau")
+    (Place.fold_place_long false "[Hameau Boileau] - Paris 16e");
+  ()
+
 let v =
   [
     ("place-normalize", [ test_case "Place normalize" `Quick normalize ]);
+    ( "place-normalize-place",
+      [ test_case "Place normalize_place ordering" `Quick normalize_place ] );
+    ( "place-fold-long",
+      [ test_case "Place fold_place_long ordering" `Quick fold_place_long ] );
     ( "place-split-suburb",
       [ test_case "Place split suburb" `Quick split_suburb ] );
     ("place-only-suburb", [ test_case "Place only suburb" `Quick only_suburb ]);
     ( "place-without-suburb",
-      [ test_case "Place without suburb" `Quick only_suburb ] );
+      [ test_case "Place without suburb" `Quick without_suburb ] );
     ("place-compare", [ test_case "Place compare" `Quick compare_places ]);
   ]
