@@ -1211,7 +1211,7 @@ let check_missing_witnesses_names conf get list =
     let rec loop i =
       if i = len then None
       else
-        let (fn, sn, _, _, _), _ = Array.get witnesses i in
+        let (fn, sn, _, _, _), _, _ = Array.get witnesses i in
         if fn = "" && sn = "" then loop (i + 1)
         else if fn = "" || fn = "?" then
           Some

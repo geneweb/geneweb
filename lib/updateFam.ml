@@ -80,7 +80,9 @@ let family_events_opt env fam =
 let witness_person_of_event_opt env e =
   match get_env "wcnt" env with
   | Vint i when i - 1 >= 0 && i - 1 < Array.length e.efam_witnesses ->
-      Some (fst e.efam_witnesses.(i - 1))
+      Some
+        (let p, _, _ = e.efam_witnesses.(i - 1) in
+         p)
   | Vint i when i - 1 >= 0 && i - 1 < 2 && Array.length e.efam_witnesses < 2 ->
       Some ("", "", 0, Update.Create (Neuter, None), "")
   | _ -> None
@@ -218,7 +220,7 @@ and eval_event_str conf base env fam =
         let src = Util.safe_html (Driver.sou base e.efam_src) in
         let wit =
           Array.fold_right
-            (fun (w, _) accu ->
+            (fun (w, _, _) accu ->
               (transl_nth conf "witness/witnesses" 0
               ^<^ transl conf ":"
               ^<^ Util.gen_person_text conf base (Driver.poi base w))
@@ -256,7 +258,9 @@ and eval_fwitness_kind env fam =
           | Vint i ->
               let i = i - 1 in
               if i >= 0 && i < Array.length e.efam_witnesses then
-                eval_witness_kind (snd e.efam_witnesses.(i))
+                eval_witness_kind
+                  (let _, wk, _ = e.efam_witnesses.(i) in
+                   wk)
               else if i >= 0 && i < 2 && Array.length e.efam_witnesses < 2 then
                 str_val ""
               else raise Not_found

@@ -264,7 +264,7 @@ let string_of_divorce conf divorce =
 
 let string_of_event_witness conf base witnesses =
   Array.fold_right
-    (fun (ip, wk) accu ->
+    (fun (ip, wk, _wnote) accu ->
       let witn = person_of_iper conf base ip in
       let kind =
         Util.string_of_witness_kind conf

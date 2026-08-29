@@ -142,7 +142,7 @@ type ('person, 'string) gen_pers_event = {
   epers_reason : 'string;
   epers_note : 'string;
   epers_src : 'string;
-  epers_witnesses : ('person * witness_kind) array;
+  epers_witnesses : ('person * witness_kind * 'string) array;
 }
 [@@deriving show { with_path = false }]
 (** Personal event information *)
@@ -171,7 +171,7 @@ type ('person, 'string) gen_fam_event = {
   efam_reason : 'string;
   efam_note : 'string;
   efam_src : 'string;
-  efam_witnesses : ('person * witness_kind) array;
+  efam_witnesses : ('person * witness_kind * 'string) array;
 }
 [@@deriving show { with_path = false }]
 (** Event information pertaining a family. *)
