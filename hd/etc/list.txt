@@ -34,7 +34,7 @@
 %end;
 %( %p_of_index.index.marriage_places; renvoie une chaine avec les places de mariage, séparées par des | %)
 %define;get_marriage(myindex)
-  %p_of_index.myindex.marriage_places_raw;
+  %p_of_index.myindex.marriage_places_norm;
 %end;
 %define;get_value(myindex,param)
   %if;("param"="father" or "param"="mother")

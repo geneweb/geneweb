@@ -1480,6 +1480,9 @@ let number_of_descendants_aux conf base env all_levels sl eval_int =
 let places_inverted conf =
   List.assoc_opt "places_inverted" conf.base_env = Some "yes"
 
+let undo_parentheses s =
+  Str.global_replace (Str.regexp " ?(\\([^)]*\\))") ", \\1" s
+
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl
   with Not_found -> eval_compound_var conf base env ep loc sl
@@ -4177,6 +4180,16 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         (Array.to_list (Driver.get_family p))
       |> str_val
   | "marriage_places_raw" ->
+      List.fold_left
+        (fun acc ifam ->
+          acc
+          ^ (if acc = "" then "" else "|")
+          ^ Driver.sou base (Driver.get_marriage_place (Driver.foi base ifam))
+          |> undo_parentheses)
+        ""
+        (Array.to_list (Driver.get_family p))
+      |> str_val
+  | "marriage_places_norm" ->
       List.fold_left
         (fun acc ifam ->
           let pl =
