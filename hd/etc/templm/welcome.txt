@@ -248,7 +248,7 @@ zh: 网络家谱
             <label><input type="checkbox" name="bi" value="on" checked="checked" %l_on1;%/>[birth]</label>
             <label><input type="checkbox" name="ma" value="on" checked="checked" %l_on1;%/>[marriage/marriages]0</label>
             <label><input type="checkbox" name="de" value="on" checked="checked" %l_on1;%/>[death]</label>
-            <label><input type="checkbox" name="bp" value="on" %l_on1;%/>[baptism]</label>
+            <label><input type="checkbox" name="ba" value="on" %l_on1;%/>[baptism]</label>
             <label><input type="checkbox" name="bu" value="on" %l_on1;%/>[burial]</label>
             <input type="submit" value="Ok"%/>
           </form>

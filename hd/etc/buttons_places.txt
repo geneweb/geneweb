@@ -3,7 +3,7 @@
 %( Boutons de configurations et d'options %)
 
 <form class="mx-1" name="evt_url" method="get" action="%action;">
-  <input type="hidden" name="m" value="PPS">
+  <input type="hidden" name="m" value="PS">
   %if;(e.lang!=default_lang)
     <input type="hidden" name="lang" value="%e.lang;">
   %end;

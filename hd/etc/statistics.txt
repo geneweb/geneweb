@@ -166,7 +166,7 @@
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=OA">[*oldest alive]</a>
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LL">[*who lived the longest]</a>
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=POP_PYR">[*population pyramid]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=PPS">[*place/places]1</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=PS">[*place/places]1</a>
     </div>
   </div></div></div>
 </div>
@@ -184,7 +184,7 @@
 var GW = {
   url: "%prefix;m=STATS&json=1",
   sn: "%prefix;m=N&v=",
-  pl: "%prefix;m=PPS&s=",
+  pl: "%prefix;m=PS&s=",
   mo: %["[*(month)]0","[*(month)]1","[*(month)]2","[*(month)]3","[*(month)]4","[*(month)]5","[*(month)]6","[*(month)]7","[*(month)]8","[*(month)]9","[*(month)]10","[*(month)]11",%],
   L: {
     pe:"[*person/persons]1", fa:"[*family/families]1", le:"[*life expectancy]",
