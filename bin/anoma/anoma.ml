@@ -5,6 +5,12 @@
    report with statistics, "extreme" statistics, and per-warning-type sorted
    unique lists of persons/families, each person linking to the base.
 
+   For "possible duplicate families" warnings, which the log identifies only by
+   ifam numbers (reassigned by gwc on every gwu/gwc cycle, hence not durable),
+   the base is opened to resolve each ifam to its couple (father & mother) and
+   the warning is reported by those stable person keys instead. Pass -no-base
+   to skip opening the base (such warnings then keep their ifam numbers).
+
    Build:
      ocamlfind ocamlopt -package str -linkpkg gwwarn.ml -o gwwarn
    or (without ocamlfind):
@@ -14,6 +20,7 @@
    Usage:
      gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored_file>]
             [-out <report.html>] [-url <base_url>] [-w | -nw] [-no-fold]
+            [-no-base]
    Maintenance (no report):
      gwwarn <basename> -bd <bases_dir> [-ok <ignored_file>] -fold-ok
    The ignored file defaults to <bases_dir>/<basename>.ok. A normal run tidies
@@ -22,13 +29,14 @@
 
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
+module Dirs = Geneweb_dirs
 
 (* ------------------------------------------------------------------ *)
 (* Command line                                                        *)
 (* ------------------------------------------------------------------ *)
 
 let base_name = ref ""
-let bases_dir = ref "."
+let bases_dir = ref (Dirs.name Secure.default_base_dir)
 let ignored_file = ref ""
 let log_file = ref ""
 let out_file = ref ""
@@ -36,6 +44,7 @@ let base_url = ref ""
 let wizard = ref true
 let fold_ok = ref false
 let no_fold = ref false
+let no_base = ref false
 
 let usage =
   "usage: gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored>] \
@@ -44,7 +53,9 @@ let usage =
 
 let speclist =
   [
-    ("-bd", Arg.Set_string bases_dir, "<dir>   bases directory (default .)");
+    ( "-bd",
+      Arg.Set_string bases_dir,
+      "<dir>   bases directory (default: GeneWeb base directory)" );
     ( "-ok",
       Arg.Set_string ignored_file,
       "<file>  ignored persons/families (default <basename>.ok in bases dir)" );
@@ -67,6 +78,10 @@ let speclist =
     ( "-no-fold",
       Arg.Set no_fold,
       " do not tidy the ignored file on a normal run (default: tidy on read)" );
+    ( "-no-base",
+      Arg.Set no_base,
+      " do not open the base to resolve duplicate-family ifam numbers to \
+       couples" );
   ]
 
 (* ------------------------------------------------------------------ *)
@@ -458,6 +473,100 @@ let dedup warnings =
     warnings
 
 (* ------------------------------------------------------------------ *)
+(* Resolve unstable ifam-based duplicate-family warnings to couples    *)
+(*                                                                     *)
+(* gwc reassigns ifam numbers on every gwu/gwc cycle, so they are not a *)
+(* durable identifier: an ignored-file entry keyed on ifams is useless  *)
+(* after the next rebuild. When the base is available we replace the    *)
+(* two ifams of a "possible duplicate families" warning by their        *)
+(* couples (father & mother), whose person keys ARE stable, and drop    *)
+(* the ifam numbers entirely — the warning then uses the same WFam      *)
+(* representation as every other family warning (links, sorting, ignore *)
+(* codes, .ok entries).                                                 *)
+(* ------------------------------------------------------------------ *)
+
+let person_of_iper base ip =
+  if Driver.Iper.is_dummy ip then None
+  else
+    try
+      let p = Driver.poi base ip in
+      Some
+        {
+          fn = Driver.sou base (Driver.get_first_name p);
+          occ = Driver.get_occ p;
+          sn = Driver.sou base (Driver.get_surname p);
+        }
+    with _ -> None
+
+let couple_of_ifam base id =
+  match try Some (Driver.Ifam.of_string id) with _ -> None with
+  | None -> None
+  | Some ifam when Driver.Ifam.is_dummy ifam -> None
+  | Some ifam -> (
+      match try Some (Driver.foi base ifam) with _ -> None with
+      | None -> None
+      | Some fam -> (
+          match
+            ( person_of_iper base (Driver.get_father fam),
+              person_of_iper base (Driver.get_mother fam) )
+          with
+          | Some fa, Some mo -> Some (fa, mo)
+          | _ -> None))
+
+let couple_str (fa, mo) =
+  Printf.sprintf "%s & %s" (person_designation fa) (person_designation mo)
+
+(* rebuild one warning: if it is an ifam-based duplicate-family warning that
+   both resolve, replace WFamIds by the couple(s) as WFam and restate the text
+   with names; otherwise leave it unchanged. *)
+let resolve_dup_family base w =
+  match w.items with
+  | [ WFamIds (a, b) ] -> (
+      match (couple_of_ifam base a, couple_of_ifam base b) with
+      | Some c1, Some c2 ->
+          let fa1, mo1 = c1 and fa2, mo2 = c2 in
+          let same =
+            person_key fa1 = person_key fa2 && person_key mo1 = person_key mo2
+          in
+          let items, text =
+            if same then
+              ( [ WFam (fa1, mo1) ],
+                Printf.sprintf
+                  "possible duplicate families: %s (recorded twice)"
+                  (couple_str c1) )
+            else
+              ( [ WFam (fa1, mo1); WFam (fa2, mo2) ],
+                Printf.sprintf "possible duplicate families: %s and %s"
+                  (couple_str c1) (couple_str c2) )
+          in
+          { w with items; text }
+      | _ -> w)
+  | _ -> w
+
+let resolve_dup_families warnings =
+  let has_dupfam =
+    List.exists
+      (fun w -> match w.items with [ WFamIds _ ] -> true | _ -> false)
+      warnings
+  in
+  if !no_base || not has_dupfam then warnings
+  else
+    (* Path passed to with_database is <bases_dir>/<basename> (no ".gwb"), and
+       GeneWeb's Secure sandbox must first be told which directory is the base
+       root, or it raises Sys_error "invalid access" — same setup gwu/gwc do. *)
+    let base_path = Filename.concat !bases_dir !base_name in
+    try
+      Secure.set_base_dir !bases_dir;
+      Driver.with_database base_path (fun base ->
+          List.map (resolve_dup_family base) warnings)
+    with e ->
+      Printf.eprintf
+        "warning: could not open base %s to resolve duplicate-family ids (%s); \
+         those warnings keep their (unstable) ifam numbers\n"
+        base_path (Printexc.to_string e);
+      warnings
+
+(* ------------------------------------------------------------------ *)
 (* Configuration file: <bases_dir>/<basename>.cfg                      *)
 (* ------------------------------------------------------------------ *)
 
@@ -714,7 +823,10 @@ let ignore_entry wtype item =
       | None -> None
       | Some code -> (
           match item with
-          | WFamIds (a, b) -> Some (Printf.sprintf "%s & %s" a b, code)
+          | WFamIds _ ->
+              (* an unresolved ifam pair has no stable key: never write ifam
+                 numbers to the ignored file *)
+              None
           | WFam (fa, mo) ->
               Some
                 ( Printf.sprintf "%s & %s" (person_designation fa)
@@ -1138,7 +1250,8 @@ let () =
          Printf.printf "tidied %s (formatting normalized)\n" !ignored_file
      | _ -> ());
   let lines = Array.of_list (read_lines !log_file) in
-  let warnings = dedup (parse_log lines) in
+  (* resolve ifam-based duplicate-family warnings to stable couples *)
+  let warnings = resolve_dup_families (dedup (parse_log lines)) in
 
   let stats = compute_stats warnings ign in
 
