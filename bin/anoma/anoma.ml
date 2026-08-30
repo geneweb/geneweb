@@ -13,7 +13,7 @@
 
    Usage:
      gwwarn <basename> -bd <bases_dir> -ok <ignored_file> -in <log_file>
-            [-out <report.html>] [-url <base_url>]
+            [-out <report.html>] [-url <base_url>] [-w | -nw]
 *)
 
 open Def
@@ -24,26 +24,36 @@ module Collection = Geneweb_db.Collection
 (* Command line                                                        *)
 (* ------------------------------------------------------------------ *)
 
-
 let base_name = ref ""
 let bases_dir = ref "."
 let ignored_file = ref ""
 let log_file = ref ""
 let out_file = ref ""
 let base_url = ref ""
+let wizard = ref true
 
 let usage =
-  "usage: gwwarn <basename> -bd <bases_dir> -ok <ignored> -in <log_file> \
-   [-out <report.html>] [-url <base_url>]"
+  "usage: gwwarn <basename> -bd <bases_dir> -ok <ignored> -in <log_file> [-out \
+   <report.html>] [-url <base_url>] [-w | -nw]"
 
 let speclist =
-  [ ("-bd", Arg.Set_string bases_dir, "<dir>   bases directory (default .)");
+  [
+    ("-bd", Arg.Set_string bases_dir, "<dir>   bases directory (default .)");
     ("-ok", Arg.Set_string ignored_file, "<file>  ignored persons/families");
     ("-in", Arg.Set_string log_file, "<file>  warning log file");
-    ("-out", Arg.Set_string out_file,
-     "<file>  output HTML (default <basename>_warnings.html)");
-    ("-url", Arg.Set_string base_url,
-     "<url>   base URL (default http://localhost:2317/<basename>)") ]
+    ( "-out",
+      Arg.Set_string out_file,
+      "<file>  output HTML (default <basename>_warnings.html)" );
+    ( "-url",
+      Arg.Set_string base_url,
+      "<url>   base URL (default http://localhost:2317/<basename>)" );
+    ( "-w",
+      Arg.Set wizard,
+      "        correction links use wizard access <basename>_w (default)" );
+    ( "-nw",
+      Arg.Clear wizard,
+      "       correction links use plain access (for shared/public reports)" );
+  ]
 
 (* ------------------------------------------------------------------ *)
 (* Basic helpers                                                       *)
@@ -58,7 +68,9 @@ let read_lines file =
   let rec go acc =
     match input_line ic with
     | line -> go (line :: acc)
-    | exception End_of_file -> close_in ic; List.rev acc
+    | exception End_of_file ->
+        close_in ic;
+        List.rev acc
   in
   go []
 
@@ -133,74 +145,84 @@ let person_designation p =
 
 type witem =
   | WPerson of person
-  | WFam of person * person        (* father, mother *)
-  | WFamIds of string * string     (* possible duplicate families *)
+  | WFam of person * person (* father, mother *)
+  | WFamIds of string * string (* possible duplicate families *)
 
 type warning = {
   wtype : string;
-  items : witem list;  (* first item = main subject *)
+  items : witem list; (* first item = main subject *)
   age : int option;
-  text : string;       (* canonical one-line text, used for dedup + display *)
+  text : string; (* canonical one-line text, used for dedup + display *)
 }
 
 (* --- regexps for every message printed by print_base_warning --------- *)
 
-let re_married =
-  Str.regexp "\\(.*\\) married at age \\([0-9]+\\)"
+let re_married = Str.regexp "\\(.*\\) married at age \\([0-9]+\\)"
 let re_undef_sex = Str.regexp "Undefined sex for \\(.*\\)"
+
 let re_mother_dead =
   Str.regexp "\\(.*\\) is born after the death of his/her mother \\(.*\\)"
+
 let re_father_dead =
   Str.regexp
     "\\(.*\\) is born more than 2 years after the death of his/her father \
      \\(.*\\)"
+
 let re_parent_after_child =
   Str.regexp "\\(.*\\) born after his/her child \\(.*\\)"
+
 let re_birth_after_death = Str.regexp "\\(.*\\) born after his/her death"
-let re_parent_age =
-  Str.regexp "\\(.*\\) was parent at age of \\([0-9]+\\)"
+let re_parent_age = Str.regexp "\\(.*\\) was parent at age of \\([0-9]+\\)"
+
 let re_dup_hom =
   Str.regexp
-    "possible duplicate families: \\([^ ,]+\\) and \\([^ ,]+\\), \\(.*\\) \
-     has unions with several persons named \\(.*\\)"
+    "possible duplicate families: \\([^ ,]+\\) and \\([^ ,]+\\), \\(.*\\) has \
+     unions with several persons named \\(.*\\)"
+
 let re_dup =
   Str.regexp "possible duplicate families: \\([^ ,]+\\) and \\([^ ,]+\\)"
-let re_marr_after_death =
-  Str.regexp "\\(.*\\) marriage after his/her death"
-let re_marr_before_birth =
-  Str.regexp "\\(.*\\) marriage before his/her birth"
+
+let re_marr_after_death = Str.regexp "\\(.*\\) marriage after his/her death"
+let re_marr_before_birth = Str.regexp "\\(.*\\) marriage before his/her birth"
+
 let re_wit_after_death =
   Str.regexp "\\(.*\\) witnessed the \\(.*\\) after his/her death"
+
 let re_wit_before_birth =
   Str.regexp "\\(.*\\) witnessed the \\(.*\\) before his/her birth"
+
 let re_age_diff =
   Str.regexp
-    "The difference of age between \\(.*\\) and \\(.*\\) is quite \
-     important: \\([0-9]+\\)"
+    "The difference of age between \\(.*\\) and \\(.*\\) is quite important: \
+     \\([0-9]+\\)"
+
 let re_dead_old =
   Str.regexp "\\(.*\\) died at the advanced age of \\([0-9]+\\) years old"
+
 let re_younger_ancestor =
   Str.regexp "\\(.*\\) +has a younger ancestor: \\(.*\\)"
-let re_incoherent_sex =
-  Str.regexp "\\(.*\\) sex not coherent with relations.*"
+
+let re_incoherent_sex = Str.regexp "\\(.*\\) sex not coherent with relations.*"
+
 let re_chg_children =
   Str.regexp "Changed order of children of \\(.*\\) and \\(.*\\)"
-let re_chg_marriages =
-  Str.regexp "Changed order of marriages of \\(.*\\)"
+
+let re_chg_marriages = Str.regexp "Changed order of marriages of \\(.*\\)"
+
 let re_chg_fam_events =
   Str.regexp "Changed order of family's events for \\(.*\\)"
+
 let re_chg_pers_events =
   Str.regexp "Changed order of person's events for \\(.*\\)"
-let re_event_order =
-  Str.regexp "\\(.*\\)'s \\(.*\\) before his/her \\(.*\\)"
-let re_title = Str.regexp "\\(.*\\) has incorrect title dates as:"
 
+let re_event_order = Str.regexp "\\(.*\\)'s \\(.*\\) before his/her \\(.*\\)"
+let re_title = Str.regexp "\\(.*\\) has incorrect title dates as:"
 let mk wtype items age text = Some { wtype; items; age; text }
 
 (* Thresholds to disambiguate messages that are printed identically for
    two different warning constructors. *)
-let young_marriage_limit = 50   (* below: YoungForMarriage, else Old *)
-let young_parent_limit = 20     (* below: ParentTooYoung, else TooOld  *)
+let young_marriage_limit = 50 (* below: YoungForMarriage, else Old *)
+let young_parent_limit = 20 (* below: ParentTooYoung, else TooOld  *)
 
 (* Classify a single-line message. IMPORTANT: all Str groups must be
    extracted immediately after a successful match, before calling any
@@ -224,19 +246,22 @@ let classify msg =
     let g1 = Str.matched_group 1 msg in
     let g2 = Str.matched_group 2 msg in
     mk "MotherDeadBeforeChildBirth"
-      [ WPerson (person_of g1); WPerson (person_of g2) ] None msg
+      [ WPerson (person_of g1); WPerson (person_of g2) ]
+      None msg
   end
   else if matches re_father_dead msg then begin
     let g1 = Str.matched_group 1 msg in
     let g2 = Str.matched_group 2 msg in
     mk "DeadTooEarlyToBeFather"
-      [ WPerson (person_of g1); WPerson (person_of g2) ] None msg
+      [ WPerson (person_of g1); WPerson (person_of g2) ]
+      None msg
   end
   else if matches re_parent_after_child msg then begin
     let g1 = Str.matched_group 1 msg in
     let g2 = Str.matched_group 2 msg in
     mk "ParentBornAfterChild"
-      [ WPerson (person_of g1); WPerson (person_of g2) ] None msg
+      [ WPerson (person_of g1); WPerson (person_of g2) ]
+      None msg
   end
   else if matches re_birth_after_death msg then begin
     let g1 = Str.matched_group 1 msg in
@@ -287,7 +312,8 @@ let classify msg =
     let g3 = Str.matched_group 3 msg in
     mk "BigAgeBetweenSpouses"
       [ WPerson (person_of g1); WPerson (person_of g2) ]
-      (Some (int_of_string g3)) msg
+      (Some (int_of_string g3))
+      msg
   end
   else if matches re_dead_old msg then begin
     let g1 = Str.matched_group 1 msg in
@@ -298,13 +324,13 @@ let classify msg =
     let g1 = Str.matched_group 1 msg in
     let g2 = Str.matched_group 2 msg in
     mk "IncoherentAncestorDate"
-      [ WPerson (person_of g1); WPerson (person_of g2) ] None msg
+      [ WPerson (person_of g1); WPerson (person_of g2) ]
+      None msg
   end
   else if matches re_chg_children msg then begin
     let g1 = Str.matched_group 1 msg in
     let g2 = Str.matched_group 2 msg in
-    mk "ChangedOrderOfChildren"
-      [ WFam (person_of g1, person_of g2) ] None msg
+    mk "ChangedOrderOfChildren" [ WFam (person_of g1, person_of g2) ] None msg
   end
   else if matches re_chg_marriages msg then begin
     let g1 = Str.matched_group 1 msg in
@@ -372,10 +398,12 @@ let parse_log lines =
             (String.concat ", " (List.rev !kids))
         in
         res :=
-          { wtype;
+          {
+            wtype;
             items = [ WFam (person_of father, person_of mother) ];
             age = None;
-            text }
+            text;
+          }
           :: !res;
         i := !j
       end
@@ -383,17 +411,17 @@ let parse_log lines =
         let g1 = Str.matched_group 1 msg in
         let title = String.trim lines.(!i + 1) in
         res :=
-          { wtype = "TitleDatesError";
+          {
+            wtype = "TitleDatesError";
             items = [ WPerson (person_of g1) ];
             age = None;
-            text = msg ^ " " ^ title }
+            text = msg ^ " " ^ title;
+          }
           :: !res;
         i := !i + 2
       end
       else begin
-        (match classify msg with
-        | Some w -> res := w :: !res
-        | None -> ());
+        (match classify msg with Some w -> res := w :: !res | None -> ());
         incr i
       end
     end
@@ -447,7 +475,8 @@ let cfg_yes cfg name =
    if either configuration entry says yes *)
 let enabled cfg wtype =
   match wtype with
-  | "CloseChildren" -> cfg_yes cfg "CloseChildren" || cfg_yes cfg "DistantChildren"
+  | "CloseChildren" ->
+      cfg_yes cfg "CloseChildren" || cfg_yes cfg "DistantChildren"
   | "PEventOrder" -> cfg_yes cfg "PEventOrder" || cfg_yes cfg "FEventOrder"
   | "PWitnessEventAfterDeath" ->
       cfg_yes cfg "PWitnessEventAfterDeath"
@@ -466,16 +495,17 @@ let enabled cfg wtype =
 (* ------------------------------------------------------------------ *)
 
 type ignored = {
-  persons : (string, string list) Hashtbl.t;      (* person key -> codes *)
-  fams : (string, string list) Hashtbl.t;         (* "k1|k2" -> codes *)
-  fam_members : (string, string list) Hashtbl.t;  (* member key -> codes *)
+  persons : (string, string list) Hashtbl.t; (* person key -> codes *)
+  fams : (string, string list) Hashtbl.t; (* "k1|k2" -> codes *)
+  fam_members : (string, string list) Hashtbl.t; (* member key -> codes *)
 }
 
 let is_all_digits s =
   s <> ""
-  && (let ok = ref true in
-      String.iter (fun c -> if c < '0' || c > '9' then ok := false) s;
-      !ok)
+  &&
+  let ok = ref true in
+  String.iter (fun c -> if c < '0' || c > '9' then ok := false) s;
+  !ok
 
 let member_key s =
   let s = String.trim s in
@@ -485,9 +515,11 @@ let re_amp = Str.regexp_string " & "
 
 let read_ignored file =
   let ign =
-    { persons = Hashtbl.create 97;
+    {
+      persons = Hashtbl.create 97;
       fams = Hashtbl.create 97;
-      fam_members = Hashtbl.create 97 }
+      fam_members = Hashtbl.create 97;
+    }
   in
   if file <> "" && Sys.file_exists file then
     List.iter
@@ -495,18 +527,19 @@ let read_ignored file =
         let line = String.trim line in
         if line <> "" && line.[0] <> '#' then
           match String.index_opt line ':' with
-          | Some i ->
+          | Some i -> (
               let left = String.trim (String.sub line 0 i) in
               let right =
                 String.sub line (i + 1) (String.length line - i - 1)
               in
               let codes =
-                List.filter (fun s -> s <> "")
+                List.filter
+                  (fun s -> s <> "")
                   (List.map
                      (fun s -> String.uppercase_ascii (String.trim s))
                      (String.split_on_char ',' right))
               in
-              (match Str.bounded_split re_amp left 2 with
+              match Str.bounded_split re_amp left 2 with
               | [ a; b ] ->
                   let ka = member_key a and kb = member_key b in
                   let key = if ka <= kb then ka ^ "|" ^ kb else kb ^ "|" ^ ka in
@@ -559,15 +592,15 @@ let is_ignored ign w =
     | Some code ->
         List.exists
           (function
-            | WFamIds (a, b) ->
+            | WFamIds (a, b) -> (
                 let key = if a <= b then a ^ "|" ^ b else b ^ "|" ^ a in
-                (match Hashtbl.find_opt ign.fams key with
+                match Hashtbl.find_opt ign.fams key with
                 | Some codes -> has_code codes code
                 | None -> false)
-            | WFam (fa, mo) ->
+            | WFam (fa, mo) -> (
                 let ka = person_key fa and kb = person_key mo in
                 let key = if ka <= kb then ka ^ "|" ^ kb else kb ^ "|" ^ ka in
-                (match Hashtbl.find_opt ign.fams key with
+                match Hashtbl.find_opt ign.fams key with
                 | Some codes -> has_code codes code
                 | None -> false)
             | WPerson p -> (
@@ -585,17 +618,39 @@ let is_ignored ign w =
 (* ------------------------------------------------------------------ *)
 
 let all_wtypes =
-  [ "BigAgeBetweenSpouses"; "BirthAfterDeath"; "ChangedOrderOfChildren";
-    "ChildrenNotInOrder"; "ChangedOrderOfMarriages";
-    "ChangedOrderOfFamilyEvents"; "ChangedOrderOfPersonEvents";
-    "CloseChildren"; "DeadOld"; "DeadTooEarlyToBeFather"; "FEventOrder";
-    "FWitnessEventAfterDeath"; "FWitnessEventBeforeBirth"; "IncoherentSex";
-    "IncoherentAncestorDate"; "MarriageDateAfterDeath";
-    "MarriageDateBeforeBirth"; "MotherDeadBeforeChildBirth";
-    "ParentBornAfterChild"; "ParentTooOld"; "ParentTooYoung";
-    "PossibleDuplicateFam"; "PossibleDuplicateFamHomonymous"; "PEventOrder";
-    "PWitnessEventAfterDeath"; "PWitnessEventBeforeBirth"; "TitleDatesError";
-    "UndefinedSex"; "YoungForMarriage"; "OldForMarriage"; "Unrecognized" ]
+  [
+    "BigAgeBetweenSpouses";
+    "BirthAfterDeath";
+    "ChangedOrderOfChildren";
+    "ChildrenNotInOrder";
+    "ChangedOrderOfMarriages";
+    "ChangedOrderOfFamilyEvents";
+    "ChangedOrderOfPersonEvents";
+    "CloseChildren";
+    "DeadOld";
+    "DeadTooEarlyToBeFather";
+    "FEventOrder";
+    "FWitnessEventAfterDeath";
+    "FWitnessEventBeforeBirth";
+    "IncoherentSex";
+    "IncoherentAncestorDate";
+    "MarriageDateAfterDeath";
+    "MarriageDateBeforeBirth";
+    "MotherDeadBeforeChildBirth";
+    "ParentBornAfterChild";
+    "ParentTooOld";
+    "ParentTooYoung";
+    "PossibleDuplicateFam";
+    "PossibleDuplicateFamHomonymous";
+    "PEventOrder";
+    "PWitnessEventAfterDeath";
+    "PWitnessEventBeforeBirth";
+    "TitleDatesError";
+    "UndefinedSex";
+    "YoungForMarriage";
+    "OldForMarriage";
+    "Unrecognized";
+  ]
 
 type stat = { mutable total : int; mutable ignored : int }
 
@@ -618,38 +673,50 @@ let compute_stats warnings ign =
   tbl
 
 (* "extreme" statistics: each bucket collects its persons *)
-type extreme = { label : string; test : warning -> bool; mutable hits : warning list }
+type extreme = {
+  label : string;
+  test : warning -> bool;
+  mutable hits : warning list;
+}
 
 let make_extremes () =
   let wed_le_11 w =
     w.wtype = "YoungForMarriage"
-    && (match w.age with Some a -> a <= 11 | None -> false)
+    && match w.age with Some a -> a <= 11 | None -> false
   in
   let wed_12 w =
     w.wtype = "YoungForMarriage"
-    && (match w.age with Some a -> a = 12 | None -> false)
+    && match w.age with Some a -> a = 12 | None -> false
   in
   let died lo hi w =
     w.wtype = "DeadOld"
-    && (match w.age with Some a -> a >= lo && a < hi | None -> false)
+    && match w.age with Some a -> a >= lo && a < hi | None -> false
   in
-  [ { label = "Married at age &le; 11"; test = wed_le_11; hits = [] };
+  [
+    { label = "Married at age &le; 11"; test = wed_le_11; hits = [] };
     { label = "Married at age 12"; test = wed_12; hits = [] };
     { label = "Died at age 100&ndash;109"; test = died 100 110; hits = [] };
     { label = "Died at age 110&ndash;119"; test = died 110 120; hits = [] };
-    { label = "Died at age &ge; 120"; test = died 120 10000; hits = [] } ]
+    { label = "Died at age &ge; 120"; test = died 120 10000; hits = [] };
+  ]
 
 (* ------------------------------------------------------------------ *)
 (* HTML output                                                         *)
 (* ------------------------------------------------------------------ *)
 
+(* Links point back to the base so a name can be corrected in place. With
+   wizard access on (-w, the default) the "_w" suffix is added to the base
+   name and GeneWeb prompts for the wizard password; with -nw the links are
+   plain, suitable for a report that will be shared or served publicly.
+   [url] is expected to end with the bare basename. *)
 let person_link url p =
   let href =
-    Printf.sprintf "%s?p=%s&n=%s%s" url (url_encode p.fn) (url_encode p.sn)
+    Printf.sprintf "%s%s?p=%s&n=%s%s" url
+      (if !wizard then "_w" else "")
+      (url_encode p.fn) (url_encode p.sn)
       (if p.occ > 0 then Printf.sprintf "&oc=%d" p.occ else "")
   in
-  Printf.sprintf "<a href=\"%s\" target=\"_blank\">%s</a>"
-    (html_escape href)
+  Printf.sprintf "<a href=\"%s\" target=\"_blank\">%s</a>" (html_escape href)
     (html_escape (person_designation p))
 
 let item_html url = function
@@ -697,8 +764,9 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
   pf "td,th{border:1px solid #999;padding:.25em .6em;text-align:left}\n";
   pf "th{background:#eee}\ntd.num{text-align:right}\n";
   pf "details{margin:.5em 0}\n";
-  pf "summary{cursor:pointer;display:inline-block;background:#3563a5;\
-      color:#fff;padding:.35em .9em;border-radius:.35em;user-select:none}\n";
+  pf
+    "summary{cursor:pointer;display:inline-block;background:#3563a5;color:#fff;padding:.35em \
+     .9em;border-radius:.35em;user-select:none}\n";
   pf "summary:hover{background:#274b80}\n";
   pf "ul.plist{columns:3;margin:.5em 0 1em 0}\n";
   pf "ul.plist li{break-inside:avoid}\n";
@@ -708,15 +776,17 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
 
   (* --- statistics ------------------------------------------------- *)
   pf "<h2>Statistics</h2>\n<table>\n";
-  pf "<tr><th>Warning</th><th>Enabled</th><th>Total</th>\
-      <th>Ignored (verified)</th><th>Remaining</th></tr>\n";
+  pf
+    "<tr><th>Warning</th><th>Enabled</th><th>Total</th><th>Ignored \
+     (verified)</th><th>Remaining</th></tr>\n";
   List.iter
     (fun t ->
       match Hashtbl.find_opt stats t with
       | None -> ()
       | Some s ->
-          pf "<tr><td>%s</td><td>%s</td><td class=num>%d</td>\
-              <td class=num>%d</td><td class=num>%d</td></tr>\n"
+          pf
+            "<tr><td>%s</td><td>%s</td><td class=num>%d</td><td \
+             class=num>%d</td><td class=num>%d</td></tr>\n"
             (html_escape t)
             (if enabled cfg t then "yes" else "no")
             s.total s.ignored (s.total - s.ignored))
@@ -741,9 +811,10 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
 
   (* --- per-warning-type lists ------------------------------------- *)
   pf "<h2>Persons / families per warning</h2>\n";
-  pf "<p class=muted>Only warnings enabled (=yes) in %s.cfg and not listed \
-      in the ignored file are shown. Lists are unique and sorted; each name \
-      opens the person in the base.</p>\n"
+  pf
+    "<p class=muted>Only warnings enabled (=yes) in %s.cfg and not listed in \
+     the ignored file are shown. Lists are unique and sorted; each name opens \
+     the person in the base.</p>\n"
     (html_escape basename);
   List.iter
     (fun t ->
@@ -855,13 +926,13 @@ let () =
   in
 
   let oc = open_out !out_file in
-  generate_html ~basename:!base_name ~url:!base_url ~cfg ~stats ~extremes
-    ~kept ~multi oc;
+  generate_html ~basename:!base_name ~url:!base_url ~cfg ~stats ~extremes ~kept
+    ~multi oc;
   close_out oc;
 
   (* console summary *)
-  Printf.printf "gwwarn: %d log lines, %d warnings after deduplication, \
-                 %d ignored\n"
+  Printf.printf
+    "gwwarn: %d log lines, %d warnings after deduplication, %d ignored\n"
     (Array.length lines) (List.length warnings)
     (List.length warnings - List.length kept);
   List.iter
