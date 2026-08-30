@@ -13,11 +13,13 @@
 
    Usage:
      gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored_file>]
-            [-out <report.html>] [-url <base_url>] [-w | -nw]
-   The ignored file defaults to <bases_dir>/<basename>.ok.
+            [-out <report.html>] [-url <base_url>] [-w | -nw] [-no-fold]
+   Maintenance (no report):
+     gwwarn <basename> -bd <bases_dir> [-ok <ignored_file>] -fold-ok
+   The ignored file defaults to <bases_dir>/<basename>.ok. A normal run tidies
+   it in place on read (merging duplicate entries), unless -no-fold is given.
 *)
 
-open Def
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 
@@ -32,10 +34,13 @@ let log_file = ref ""
 let out_file = ref ""
 let base_url = ref ""
 let wizard = ref true
+let fold_ok = ref false
+let no_fold = ref false
 
 let usage =
   "usage: gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored>] \
-   [-out <report.html>] [-url <base_url>] [-w | -nw]"
+   [-out <report.html>] [-url <base_url>] [-w | -nw] [-no-fold]\n\
+  \       gwwarn <basename> -bd <bases_dir> [-ok <ignored>] -fold-ok"
 
 let speclist =
   [
@@ -56,6 +61,12 @@ let speclist =
     ( "-nw",
       Arg.Clear wizard,
       "       correction links use plain access (for shared/public reports)" );
+    ( "-fold-ok",
+      Arg.Set fold_ok,
+      " tidy the ignored file (merge duplicate person/family lines) and exit" );
+    ( "-no-fold",
+      Arg.Set no_fold,
+      " do not tidy the ignored file on a normal run (default: tidy on read)" );
   ]
 
 (* ------------------------------------------------------------------ *)
@@ -567,6 +578,106 @@ let read_ignored file =
       (read_lines file);
   ign
 
+let read_whole_file file =
+  let ic = open_in_bin file in
+  let n = in_channel_length ic in
+  let s = really_input_string ic n in
+  close_in ic;
+  s
+
+(* Rewrite the ignored file so each person/family occupies a single line with
+   its codes merged, in first-occurrence order. Comment lines (#...), blank
+   lines and any unparseable line are kept verbatim and in place; only repeated
+   person/family entries are folded away. Codes on a line are de-duplicated and
+   sorted. The file is left untouched (and no .bak made) when it is already in
+   this canonical form; otherwise the previous file is kept as <file>.bak.
+   Returns None when the file is absent, else Some (entries, merged, rewritten)
+   where [rewritten] is false when nothing had to change. *)
+let fold_ignored file =
+  if not (Sys.file_exists file) then None
+  else begin
+    let lines = read_lines file in
+    (* tokens in original order; entries carry their fold key *)
+    let order = ref [] in
+    let tbl : (string, string * string list ref) Hashtbl.t =
+      Hashtbl.create 4096
+    in
+    let add_uniq cref c =
+      if not (List.mem c !cref) then cref := !cref @ [ c ]
+    in
+    let nkeys = ref 0 and ndup = ref 0 in
+    List.iter
+      (fun raw ->
+        let line = String.trim raw in
+        let colon = if line = "" then None else String.index_opt line ':' in
+        match colon with
+        | Some i when line.[0] <> '#' -> (
+            let left = String.trim (String.sub line 0 i) in
+            let right = String.sub line (i + 1) (String.length line - i - 1) in
+            let codes =
+              List.filter
+                (fun s -> s <> "")
+                (List.map
+                   (fun s -> String.uppercase_ascii (String.trim s))
+                   (String.split_on_char ',' right))
+            in
+            let key =
+              match Str.bounded_split re_amp left 2 with
+              | [ a; b ] ->
+                  let ka = member_key a and kb = member_key b in
+                  if ka <= kb then "f|" ^ ka ^ "|" ^ kb
+                  else "f|" ^ kb ^ "|" ^ ka
+              | _ -> "p|" ^ member_key left
+            in
+            match Hashtbl.find_opt tbl key with
+            | Some (_, cref) ->
+                incr ndup;
+                List.iter (add_uniq cref) codes
+            | None ->
+                incr nkeys;
+                let cref = ref [] in
+                List.iter (add_uniq cref) codes;
+                Hashtbl.add tbl key (left, cref);
+                order := `Entry key :: !order)
+        | _ -> order := `Verbatim raw :: !order)
+      lines;
+    let buf = Buffer.create 65536 in
+    List.iter
+      (function
+        | `Verbatim s ->
+            Buffer.add_string buf s;
+            Buffer.add_char buf '\n'
+        | `Entry key ->
+            let left, cref = Hashtbl.find tbl key in
+            Buffer.add_string buf left;
+            Buffer.add_string buf ": ";
+            Buffer.add_string buf (String.concat ", " (List.sort compare !cref));
+            Buffer.add_char buf '\n')
+      (List.rev !order);
+    let folded = Buffer.contents buf in
+    let original = try read_whole_file file with Sys_error _ -> "" in
+    let rewritten =
+      if folded = original then false
+      else begin
+        (try Sys.remove (file ^ ".bak") with Sys_error _ -> ());
+        (try Sys.rename file (file ^ ".bak")
+         with Sys_error _ ->
+           let oc = open_out (file ^ ".bak") in
+           List.iter
+             (fun l ->
+               output_string oc l;
+               output_char oc '\n')
+             lines;
+           close_out oc);
+        let oc = open_out file in
+        output_string oc folded;
+        close_out oc;
+        true
+      end
+    in
+    Some (!nkeys, !ndup, rewritten)
+  end
+
 (* verification codes: which code covers which warning type *)
 let person_code_for = function
   | "YoungForMarriage" | "OldForMarriage" -> Some "M"
@@ -975,18 +1086,57 @@ let () =
       if !base_name = "" then base_name := s
       else raise (Arg.Bad ("unexpected argument: " ^ s)))
     usage;
-  if !base_name = "" || !log_file = "" then begin
+  if !base_name = "" then begin
+    prerr_endline usage;
+    exit 2
+  end;
+  if !ignored_file = "" then
+    ignored_file := Filename.concat !bases_dir (!base_name ^ ".ok");
+
+  (* -fold-ok is a standalone maintenance action: tidy the ignored file and
+     stop, without needing a log file or producing a report. *)
+  if !fold_ok then begin
+    (match fold_ignored !ignored_file with
+    | None ->
+        Printf.printf "fold: %s does not exist, nothing to do\n" !ignored_file
+    | Some (nk, nd, true) ->
+        Printf.printf
+          "fold: %s -> %d entr%s, %d duplicate line%s merged; previous file \
+           kept as %s.bak\n"
+          !ignored_file nk
+          (if nk = 1 then "y" else "ies")
+          nd
+          (if nd = 1 then "" else "s")
+          !ignored_file
+    | Some (nk, _, false) ->
+        Printf.printf "fold: %s already tidy (%d entr%s), left unchanged\n"
+          !ignored_file nk
+          (if nk = 1 then "y" else "ies"));
+    exit 0
+  end;
+
+  if !log_file = "" then begin
     prerr_endline usage;
     exit 2
   end;
   if !base_url = "" then base_url := "http://localhost:2317/" ^ !base_name;
   if !out_file = "" then out_file := !base_name ^ "_warnings.html";
-  if !ignored_file = "" then
-    ignored_file := Filename.concat !bases_dir (!base_name ^ ".ok");
 
   let cfg_file = Filename.concat !bases_dir (!base_name ^ ".cfg") in
   let cfg = read_config cfg_file in
   let ign = read_ignored !ignored_file in
+  (* Tidy the ignored file in place on every run (unless -no-fold): it stays
+     canonical, so the only loose lines at any time are the corrections
+     appended from the report after this run — which the next run folds in. *)
+  (if not !no_fold then
+     match fold_ignored !ignored_file with
+     | Some (_, nd, true) when nd > 0 ->
+         Printf.printf "tidied %s: %d duplicate line%s merged\n" !ignored_file
+           nd
+           (if nd = 1 then "" else "s")
+     | Some (_, _, true) ->
+         Printf.printf "tidied %s (formatting normalized)\n" !ignored_file
+     | _ -> ());
   let lines = Array.of_list (read_lines !log_file) in
   let warnings = dedup (parse_log lines) in
 
