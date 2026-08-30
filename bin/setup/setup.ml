@@ -741,6 +741,7 @@ and print_specific_file conf print fname strm =
       let s = parse_upto '}' strm in
       match try Some (open_in fname) with Sys_error _ -> None with
       | Some ic ->
+          print (Printf.sprintf "File: %s/%s\n" (Sys.getcwd ()) fname);
           Fun.protect
             ~finally:(fun () -> close_in ic)
             (fun () ->
