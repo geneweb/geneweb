@@ -12,8 +12,9 @@
    or with dune, see the accompanying dune files.
 
    Usage:
-     gwwarn <basename> -bd <bases_dir> -ok <ignored_file> -in <log_file>
+     gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored_file>]
             [-out <report.html>] [-url <base_url>] [-w | -nw]
+   The ignored file defaults to <bases_dir>/<basename>.ok.
 *)
 
 open Def
@@ -33,13 +34,15 @@ let base_url = ref ""
 let wizard = ref true
 
 let usage =
-  "usage: gwwarn <basename> -bd <bases_dir> -ok <ignored> -in <log_file> [-out \
-   <report.html>] [-url <base_url>] [-w | -nw]"
+  "usage: gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored>] \
+   [-out <report.html>] [-url <base_url>] [-w | -nw]"
 
 let speclist =
   [
     ("-bd", Arg.Set_string bases_dir, "<dir>   bases directory (default .)");
-    ("-ok", Arg.Set_string ignored_file, "<file>  ignored persons/families");
+    ( "-ok",
+      Arg.Set_string ignored_file,
+      "<file>  ignored persons/families (default <basename>.ok in bases dir)" );
     ("-in", Arg.Set_string log_file, "<file>  warning log file");
     ( "-out",
       Arg.Set_string out_file,
@@ -513,6 +516,18 @@ let member_key s =
 
 let re_amp = Str.regexp_string " & "
 
+(* merge codes into an existing entry rather than overwriting it, so several
+   lines for the same person/family in the ignored file accumulate their codes
+   (e.g. an "M" line and a later "D" line both take effect). *)
+let add_codes tbl key codes =
+  let prev = match Hashtbl.find_opt tbl key with Some c -> c | None -> [] in
+  let merged =
+    List.fold_left
+      (fun acc c -> if List.mem c acc then acc else acc @ [ c ])
+      prev codes
+  in
+  Hashtbl.replace tbl key merged
+
 let read_ignored file =
   let ign =
     {
@@ -543,11 +558,11 @@ let read_ignored file =
               | [ a; b ] ->
                   let ka = member_key a and kb = member_key b in
                   let key = if ka <= kb then ka ^ "|" ^ kb else kb ^ "|" ^ ka in
-                  Hashtbl.replace ign.fams key codes;
+                  add_codes ign.fams key codes;
                   List.iter
-                    (fun k -> Hashtbl.replace ign.fam_members k codes)
+                    (fun k -> add_codes ign.fam_members k codes)
                     [ ka; kb ]
-              | _ -> Hashtbl.replace ign.persons (member_key left) codes)
+              | _ -> add_codes ign.persons (member_key left) codes)
           | None -> ())
       (read_lines file);
   ign
@@ -571,6 +586,30 @@ let fam_code_for = function
   | _ -> None
 
 let has_code codes c = List.mem c codes
+
+(* The ignored-file entry that would suppress this warning for this item,
+   returned as (left, code) so the stored line reads "left: code". None when
+   the warning type has no verification code, or when an event-order warning
+   (verified per family in the .ok file) is presented as a lone person, from
+   which no family entry can be built. *)
+let ignore_entry wtype item =
+  match person_code_for wtype with
+  | Some code -> (
+      match item with
+      | WPerson p -> Some (person_designation p, code)
+      | _ -> None)
+  | None -> (
+      match fam_code_for wtype with
+      | None -> None
+      | Some code -> (
+          match item with
+          | WFamIds (a, b) -> Some (Printf.sprintf "%s & %s" a b, code)
+          | WFam (fa, mo) ->
+              Some
+                ( Printf.sprintf "%s & %s" (person_designation fa)
+                    (person_designation mo),
+                  code )
+          | WPerson _ -> None))
 
 let is_ignored ign w =
   let person_ok =
@@ -771,6 +810,25 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
   pf "ul.plist{columns:3;margin:.5em 0 1em 0}\n";
   pf "ul.plist li{break-inside:avoid}\n";
   pf ".muted{color:#777}\n";
+  (* ignore buttons + collector tray *)
+  pf
+    "button.ign{font-size:.75em;margin-left:.4em;padding:.02em \
+     .45em;border:1px solid \
+     #3563a5;background:#eaf0fb;color:#274b80;border-radius:.3em;cursor:pointer;vertical-align:baseline}\n";
+  pf "button.ign:hover{background:#dbe6f7}\n";
+  pf "button.ign.on{background:#2e7d32;border-color:#2e7d32;color:#fff}\n";
+  pf
+    "#igntray{display:none;position:fixed;right:1em;bottom:1em;width:26em;max-width:92vw;background:#fff;border:1px \
+     solid #3563a5;border-radius:.5em;box-shadow:0 2px 12px \
+     rgba(0,0,0,.25);padding:.7em .8em;z-index:1000}\n";
+  pf "#igntray .ignhdr{font-weight:bold;margin-bottom:.4em}\n";
+  pf
+    "#igntray \
+     textarea{width:100%%;box-sizing:border-box;font-family:monospace;font-size:.85em}\n";
+  pf "#igntray .ignbtns{margin:.45em 0 .3em 0}\n";
+  pf "#igntray .ignbtns button{margin-right:.4em;cursor:pointer}\n";
+  pf "#igntray .ignhelp{font-size:.8em;color:#555}\n";
+  pf "#igntray code{background:#f2f2f2;padding:0 .3em;border-radius:.2em}\n";
   pf "</style></head><body>\n";
   pf "<h1>GeneWeb warnings — base <i>%s</i></h1>\n" (html_escape basename);
 
@@ -825,7 +883,17 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
           pf "<details><summary>%s (%d)</summary>\n" (html_escape t)
             (List.length items);
           pf "<ul class=plist>\n";
-          List.iter (fun it -> pf "<li>%s</li>\n" (item_html url it)) items;
+          List.iter
+            (fun it ->
+              match ignore_entry t it with
+              | Some (left, code) ->
+                  pf
+                    "<li>%s <button type=button class=ign data-key=\"%s\" \
+                     data-code=\"%s\" \
+                     onclick=\"toggleIgn(this)\">ignore</button></li>\n"
+                    (item_html url it) (html_escape left) (html_escape code)
+              | None -> pf "<li>%s</li>\n" (item_html url it))
+            items;
           pf "</ul>\n";
           (* full warning texts for context *)
           pf "<details><summary>show full messages (%d)</summary><ul>\n"
@@ -849,6 +917,52 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
       multi;
     pf "</table>\n"
   end;
+
+  (* --- ignore-collector tray + script ----------------------------- *)
+  pf "<div id=igntray>\n";
+  pf
+    "<div class=ignhdr>Ignore entries for <i>%s.ok</i> (<span \
+     id=igncount>0</span>)</div>\n"
+    (html_escape basename);
+  pf
+    "<textarea id=ignlist readonly rows=8 placeholder=\"click 'ignore' next to \
+     a name\"></textarea>\n";
+  pf
+    "<div class=ignbtns><button type=button id=igncopy>Copy</button><button \
+     type=button id=igndl data-base=\"%s\">Download</button><button \
+     type=button id=ignclear>Clear</button></div>\n"
+    (html_escape basename);
+  pf
+    "<div class=ignhelp>Append to the ignored file, e.g. <code>cat &gt;&gt; \
+     %s.ok</code> or paste.</div>\n"
+    (html_escape basename);
+  pf "</div>\n";
+  pf
+    "<script>\n\
+     (function(){\n\
+     var picks=new Map();/* key -> Set of codes */\n\
+     var tray=document.getElementById('igntray');\n\
+     var list=document.getElementById('ignlist');\n\
+     var count=document.getElementById('igncount');\n\
+     function lines(){var o=[];picks.forEach(function(c,k){o.push(k+': \
+     '+Array.from(c).sort().join(', '));});o.sort();return o;}\n\
+     function render(){var \
+     l=lines();count.textContent=l.length;list.value=l.join('\\n');tray.style.display=l.length?'block':'none';}\n\
+     window.toggleIgn=function(b){var \
+     k=b.getAttribute('data-key'),d=b.getAttribute('data-code'),c=picks.get(k);\n\
+     if(b.classList.contains('on')){if(c){c.delete(d);if(c.size===0)picks.delete(k);}b.classList.remove('on');b.textContent='ignore';}\n\
+     else{if(!c){c=new \
+     Set();picks.set(k,c);}c.add(d);b.classList.add('on');b.textContent='\\u2713 \
+     ignored';}\n\
+     render();};\n\
+     document.getElementById('igncopy').onclick=function(){var \
+     t=list.value;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).catch(function(){list.select();document.execCommand('copy');});else{list.select();document.execCommand('copy');}};\n\
+     document.getElementById('igndl').onclick=function(){var b=new \
+     Blob([list.value+'\\n'],{type:'text/plain'});var \
+     a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=this.getAttribute('data-base')+'_ignore_additions.ok';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},0);};\n\
+     document.getElementById('ignclear').onclick=function(){picks.clear();document.querySelectorAll('button.ign.on').forEach(function(b){b.classList.remove('on');b.textContent='ignore';});render();};\n\
+     })();\n\
+     </script>\n";
   pf "</body></html>\n"
 
 (* ------------------------------------------------------------------ *)
@@ -867,6 +981,8 @@ let () =
   end;
   if !base_url = "" then base_url := "http://localhost:2317/" ^ !base_name;
   if !out_file = "" then out_file := !base_name ^ "_warnings.html";
+  if !ignored_file = "" then
+    ignored_file := Filename.concat !bases_dir (!base_name ^ ".ok");
 
   let cfg_file = Filename.concat !bases_dir (!base_name ^ ".cfg") in
   let cfg = read_config cfg_file in
