@@ -104,7 +104,7 @@ end = struct
     | Unix.WEXITED _ | Unix.WSIGNALED _ | Unix.WSTOPPED _ -> true
 
   let run { path; args; output } =
-    let fd = Unix.openfile output [ O_WRONLY; O_CREAT ] 0o755 in
+    let fd = Unix.openfile output [ O_WRONLY; O_CREAT; O_TRUNC ] 0o755 in
     Fun.protect ~finally:(fun () -> close_noerr fd) @@ fun () ->
     let argv = Array.of_list (path :: args) in
     let pid = Unix.create_process path argv Unix.stdin fd fd in
