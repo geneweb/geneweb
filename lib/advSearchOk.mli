@@ -1,4 +1,12 @@
+module Excluded_person_group : sig
+  type t = {
+    reference_id : Gwdb.iper;
+    relation : [ `Self | `Ancestor | `Descendant ];
+  }
+end
+
 val advanced_search :
+  ?excluded_persons:Excluded_person_group.t list ->
   query_params:Page.Advanced_search.Query_params.t ->
   Config.config ->
   Gwdb.base ->
