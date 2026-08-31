@@ -503,19 +503,6 @@ let load_all_plugins =
   let doc = "Load all the plugins." in
   C.Arg.(value & flag & info [ "load-all-plugins" ] ~docs:plugin_section ~doc)
 
-let plugin_flags =
-  let open C.Term.Syntax in
-  C.Term.ret
-  @@
-  let+ load_plugins = load_plugins and+ load_all_plugins = load_all_plugins in
-  match (load_plugins, load_all_plugins) with
-  | _ :: _, true ->
-      `Error
-        ( false,
-          "you cannot use both --load-plugins and --load-all-plugins options" )
-  | [], true -> `Ok All
-  | l, false -> `Ok (List (List.concat_map (List.map (fun name -> { name })) l))
-
 (* Tracing & debugging commands *)
 
 let tracing_section = "TRACING & DEBUGGING"
@@ -579,7 +566,22 @@ let noop =
   let doc = "Internal option. DO NOT USE." in
   C.Arg.(value & flag & info [ "noop" ] ~docs:tracing_section ~doc)
 
-let debug_flags =
+(* Parsers of contexts *)
+
+let error fmt = Fmt.kstr (fun s -> `Error (false, s)) fmt
+
+let parse_plugin_flags =
+  let open C.Term.Syntax in
+  C.Term.ret
+  @@
+  let+ load_plugins = load_plugins and+ load_all_plugins = load_all_plugins in
+  match (load_plugins, load_all_plugins) with
+  | _ :: _, true ->
+      error "you cannot use both --load-plugins and --load-all-plugins options"
+  | [], true -> `Ok All
+  | l, false -> `Ok (List (List.concat_map (List.map (fun name -> { name })) l))
+
+let parse_debug_flags =
   let open C.Term.Syntax in
   let+ debug = debug
   and+ check = check
@@ -588,6 +590,18 @@ let debug_flags =
   let debug = if check then true else debug in
   let predictable_mode = if check then true else predictable_mode in
   (debug, check, verbosity, predictable_mode)
+
+let parse_cgi_flags =
+  let open C.Term.Syntax in
+  C.Term.ret
+  @@
+  let+ cgi = cgi and+ log = log in
+  match log with
+  | Stdout when cgi ->
+      error
+        "you cannot redirect the diagnostic output of the server into the \
+         standard output in CGI mode"
+  | _ -> `Ok cgi
 
 let t =
   let open C.Term.Syntax in
@@ -631,13 +645,13 @@ let t =
   and+ max_pending_requests = max_pending_requests
   and+ _ : int = max_clients
   and+ n_workers = n_workers
-  and+ cgi = cgi
+  and+ cgi = parse_cgi_flags
   and+ daemon = daemon
   and+ default_lang = default_lang
   and+ _ : bool = browser_lang
   and+ _ : bool = setup_link
-  and+ plugins = plugin_flags
-  and+ debug, check, verbosity, predictable_mode = debug_flags
+  and+ plugins = parse_plugin_flags
+  and+ debug, check, verbosity, predictable_mode = parse_debug_flags
   and+ log = log
   and+ trace_failed_password = trace_failed_password
   and+ _ : bool = no_fork
