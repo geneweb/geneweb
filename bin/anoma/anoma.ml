@@ -8,23 +8,31 @@
    For "possible duplicate families" warnings, which the log identifies only by
    ifam numbers (reassigned by gwc on every gwu/gwc cycle, hence not durable),
    the base is opened to resolve each ifam to its couple (father & mother) and
-   the warning is reported by those stable person keys instead. Pass -no-base
+   the warning is reported by those stable person keys instead. Pass -ignore_base
    to skip opening the base (such warnings then keep their ifam numbers).
 
-   Build:
-     ocamlfind ocamlopt -package str -linkpkg gwwarn.ml -o gwwarn
+   Multiple wizards contribute to the ignored file at once by each appending to
+   their own fragment <ok-file>.d/<wizard>.ok (typically via a gwd endpoint,
+   authenticated by the wizard session). anoma reads the ignored file together
+   with all fragments, and a fold "commits" the fragments into the ignored file
+   (claiming each atomically so a concurrent append is never lost) and archives
+   the consumed fragments under <ok-file>.d/archive/<timestamp>/.
+
+   Build (needs str and unix):
+     ocamlfind ocamlopt -package str,unix -linkpkg gwwarn.ml -o gwwarn
    or (without ocamlfind):
-     ocamlopt str.cmxa gwwarn.ml -o gwwarn
+     ocamlopt str.cmxa unix.cmxa gwwarn.ml -o gwwarn
    or with dune, see the accompanying dune files.
 
    Usage:
      gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored_file>]
-            [-out <report.html>] [-url <base_url>] [-w | -nw] [-no-fold]
-            [-no-base]
+            [-okd <fragments_dir>] [-out <report.html>] [-url <base_url>]
+            [-w | -nw] [-no-fold] [-ignore_base]
    Maintenance (no report):
-     gwwarn <basename> -bd <bases_dir> [-ok <ignored_file>] -fold-ok
-   The ignored file defaults to <bases_dir>/<basename>.ok. A normal run tidies
-   it in place on read (merging duplicate entries), unless -no-fold is given.
+     gwwarn <basename> -bd <bases_dir> [-ok <ignored_file>] [-okd <dir>] -fold-ok
+   The ignored file defaults to <bases_dir>/<basename>.ok and the fragments
+   directory to <ok-file>.d. A normal run commits fragments and tidies the
+   ignored file in place before reading, unless -no-fold is given.
 *)
 
 module Driver = Geneweb_db.Driver
@@ -38,18 +46,21 @@ module Dirs = Geneweb_dirs
 let base_name = ref ""
 let bases_dir = ref (Dirs.name Secure.default_base_dir)
 let ignored_file = ref ""
+let okd_dir = ref ""
 let log_file = ref ""
 let out_file = ref ""
 let base_url = ref ""
 let wizard = ref true
 let fold_ok = ref false
 let no_fold = ref false
-let no_base = ref false
+let ignore_base = ref false
 
 let usage =
   "usage: gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored>] \
-   [-out <report.html>] [-url <base_url>] [-w | -nw] [-no-fold]\n\
-  \       gwwarn <basename> -bd <bases_dir> [-ok <ignored>] -fold-ok"
+   [-okd <dir>] [-out <report.html>] [-url <base_url>] [-w | -nw] [-no-fold] \
+   [-ignore_base]\n\
+  \       gwwarn <basename> -bd <bases_dir> [-ok <ignored>] [-okd <dir>] \
+   -fold-ok"
 
 let speclist =
   [
@@ -59,10 +70,13 @@ let speclist =
     ( "-ok",
       Arg.Set_string ignored_file,
       "<file>  ignored persons/families (default <basename>.ok in bases dir)" );
+    ( "-okd",
+      Arg.Set_string okd_dir,
+      "<dir>   per-wizard contribution fragments (default <ok-file>.d)" );
     ("-in", Arg.Set_string log_file, "<file>  warning log file");
     ( "-out",
       Arg.Set_string out_file,
-      "<file>  output HTML (default <basename>_warnings.html)" );
+      "<file>  output HTML (default <bases_dir>/<basename>_warnings.html)" );
     ( "-url",
       Arg.Set_string base_url,
       "<url>   base URL (default http://localhost:2317/<basename>)" );
@@ -78,8 +92,8 @@ let speclist =
     ( "-no-fold",
       Arg.Set no_fold,
       " do not tidy the ignored file on a normal run (default: tidy on read)" );
-    ( "-no-base",
-      Arg.Set no_base,
+    ( "-ignore_base",
+      Arg.Set ignore_base,
       " do not open the base to resolve duplicate-family ifam numbers to \
        couples" );
   ]
@@ -549,7 +563,7 @@ let resolve_dup_families warnings =
       (fun w -> match w.items with [ WFamIds _ ] -> true | _ -> false)
       warnings
   in
-  if !no_base || not has_dupfam then warnings
+  if !ignore_base || not has_dupfam then warnings
   else
     (* Path passed to with_database is <bases_dir>/<basename> (no ".gwb"), and
        GeneWeb's Secure sandbox must first be told which directory is the base
@@ -648,7 +662,94 @@ let add_codes tbl key codes =
   in
   Hashtbl.replace tbl key merged
 
-let read_ignored file =
+(* ------------------------------------------------------------------ *)
+(* Per-wizard contribution fragments (<ok-file>.d/<wizard>.ok)         *)
+(*                                                                     *)
+(* Several wizards contribute to base.ok at once by each appending to  *)
+(* their OWN fragment file <ok-file>.d/<wizard>.ok (a gwd endpoint does *)
+(* the append, authenticated by the wizard session). anoma reads       *)
+(* base.ok + all fragments (the code merge makes overlaps harmless),    *)
+(* and a fold "commits" the fragments into base.ok and archives them.   *)
+(* ------------------------------------------------------------------ *)
+
+let ensure_dir d =
+  if not (Sys.file_exists d) then try Sys.mkdir d 0o755 with Sys_error _ -> ()
+
+(* top-level "*.ok" regular files in [dir] (the live fragments), sorted *)
+let fragment_files dir =
+  if Sys.file_exists dir && try Sys.is_directory dir with Sys_error _ -> false
+  then
+    Array.to_list (Sys.readdir dir)
+    |> List.filter (fun n ->
+        n <> ""
+        && n.[0] <> '.'
+        && Filename.check_suffix n ".ok"
+        &&
+        let p = Filename.concat dir n in
+        Sys.file_exists p
+        && not (try Sys.is_directory p with Sys_error _ -> false))
+    |> List.map (fun n -> Filename.concat dir n)
+    |> List.sort compare
+  else []
+
+let stamp () =
+  let t = Unix.localtime (Unix.time ()) in
+  Printf.sprintf "%04d%02d%02d-%02d%02d%02d" (t.Unix.tm_year + 1900)
+    (t.Unix.tm_mon + 1) t.Unix.tm_mday t.Unix.tm_hour t.Unix.tm_min
+    t.Unix.tm_sec
+
+(* human-readable local time for the report header *)
+let fmt_time secs =
+  let t = Unix.localtime secs in
+  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" (t.Unix.tm_year + 1900)
+    (t.Unix.tm_mon + 1) t.Unix.tm_mday t.Unix.tm_hour t.Unix.tm_min
+    t.Unix.tm_sec
+
+let report_time () = fmt_time (Unix.time ())
+
+(* modification time of a file (proxy for the log's creation date), or None *)
+let file_time path =
+  try Some (fmt_time (Unix.stat path).Unix.st_mtime) with _ -> None
+
+(* Atomically claim each fragment by renaming it aside first, so that a wizard
+   appending to <wizard>.ok while we consolidate lands in a fresh file picked up
+   next cycle — never in the batch we are about to archive (no lost updates).
+   Returns (wizard, claimed_path) for each fragment actually claimed. *)
+let claim_fragments dir =
+  let uniq =
+    Printf.sprintf "%d.%.0f" (Unix.getpid ()) (Unix.gettimeofday () *. 1000.)
+  in
+  List.filter_map
+    (fun path ->
+      let claimed = path ^ ".claimed." ^ uniq in
+      try
+        Sys.rename path claimed;
+        Some (Filename.remove_extension (Filename.basename path), claimed)
+      with Sys_error _ -> None)
+    (fragment_files dir)
+
+(* move claimed fragments into <dir>/archive/<timestamp>/<wizard>.ok *)
+let archive_claimed dir claimed =
+  if claimed <> [] then begin
+    let adir = Filename.concat dir "archive" in
+    ensure_dir adir;
+    let sub = Filename.concat adir (stamp ()) in
+    ensure_dir sub;
+    List.iter
+      (fun (wizard, cpath) ->
+        let rec dest n =
+          let cand =
+            if n = 0 then Filename.concat sub (wizard ^ ".ok")
+            else Filename.concat sub (Printf.sprintf "%s.%d.ok" wizard n)
+          in
+          if Sys.file_exists cand then dest (n + 1) else cand
+        in
+        try Sys.rename cpath (dest 0) with Sys_error _ -> ())
+      claimed
+  end
+
+(* read base.ok together with every live fragment in [okd] *)
+let read_ignored file okd =
   let ign =
     {
       persons = Hashtbl.create 97;
@@ -656,35 +757,34 @@ let read_ignored file =
       fam_members = Hashtbl.create 97;
     }
   in
-  if file <> "" && Sys.file_exists file then
-    List.iter
-      (fun line ->
-        let line = String.trim line in
-        if line <> "" && line.[0] <> '#' then
-          match String.index_opt line ':' with
-          | Some i -> (
-              let left = String.trim (String.sub line 0 i) in
-              let right =
-                String.sub line (i + 1) (String.length line - i - 1)
-              in
-              let codes =
-                List.filter
-                  (fun s -> s <> "")
-                  (List.map
-                     (fun s -> String.uppercase_ascii (String.trim s))
-                     (String.split_on_char ',' right))
-              in
-              match Str.bounded_split re_amp left 2 with
-              | [ a; b ] ->
-                  let ka = member_key a and kb = member_key b in
-                  let key = if ka <= kb then ka ^ "|" ^ kb else kb ^ "|" ^ ka in
-                  add_codes ign.fams key codes;
-                  List.iter
-                    (fun k -> add_codes ign.fam_members k codes)
-                    [ ka; kb ]
-              | _ -> add_codes ign.persons (member_key left) codes)
-          | None -> ())
-      (read_lines file);
+  let process_line line =
+    let line = String.trim line in
+    if line <> "" && line.[0] <> '#' then
+      match String.index_opt line ':' with
+      | Some i -> (
+          let left = String.trim (String.sub line 0 i) in
+          let right = String.sub line (i + 1) (String.length line - i - 1) in
+          let codes =
+            List.filter
+              (fun s -> s <> "")
+              (List.map
+                 (fun s -> String.uppercase_ascii (String.trim s))
+                 (String.split_on_char ',' right))
+          in
+          match Str.bounded_split re_amp left 2 with
+          | [ a; b ] ->
+              let ka = member_key a and kb = member_key b in
+              let key = if ka <= kb then ka ^ "|" ^ kb else kb ^ "|" ^ ka in
+              add_codes ign.fams key codes;
+              List.iter (fun k -> add_codes ign.fam_members k codes) [ ka; kb ]
+          | _ -> add_codes ign.persons (member_key left) codes)
+      | None -> ()
+  in
+  let process_file f =
+    if Sys.file_exists f then List.iter process_line (read_lines f)
+  in
+  if file <> "" then process_file file;
+  List.iter process_file (fragment_files okd);
   ign
 
 let read_whole_file file =
@@ -694,19 +794,20 @@ let read_whole_file file =
   close_in ic;
   s
 
-(* Rewrite the ignored file so each person/family occupies a single line with
-   its codes merged, in first-occurrence order. Comment lines (#...), blank
-   lines and any unparseable line are kept verbatim and in place; only repeated
-   person/family entries are folded away. Codes on a line are de-duplicated and
-   sorted. The file is left untouched (and no .bak made) when it is already in
-   this canonical form; otherwise the previous file is kept as <file>.bak.
-   Returns None when the file is absent, else Some (entries, merged, rewritten)
-   where [rewritten] is false when nothing had to change. *)
-let fold_ignored file =
-  if not (Sys.file_exists file) then None
+(* Consolidate base.ok: tidy it so each person/family occupies a single line
+   with codes merged (in first-occurrence order; comment/blank/unparseable lines
+   kept verbatim and in place), AND commit every per-wizard fragment in [okd]
+   into it. Fragments are claimed atomically first (so a concurrent wizard
+   append is never lost), their entries merged in, and the claimed files moved
+   to <okd>/archive/<timestamp>/ as an audit trail. base.ok is left untouched
+   (no .bak) when nothing changed. Returns None when there is nothing at all to
+   do, else Some (entries, merged, rewritten, fragments_committed). *)
+let fold_and_commit file okd =
+  let claimed = claim_fragments okd in
+  let base_exists = Sys.file_exists file in
+  if (not base_exists) && claimed = [] then None
   else begin
-    let lines = read_lines file in
-    (* tokens in original order; entries carry their fold key *)
+    let base_lines = if base_exists then read_lines file else [] in
     let order = ref [] in
     let tbl : (string, string * string list ref) Hashtbl.t =
       Hashtbl.create 4096
@@ -715,41 +816,58 @@ let fold_ignored file =
       if not (List.mem c !cref) then cref := !cref @ [ c ]
     in
     let nkeys = ref 0 and ndup = ref 0 in
+    let key_of left =
+      match Str.bounded_split re_amp left 2 with
+      | [ a; b ] ->
+          let ka = member_key a and kb = member_key b in
+          if ka <= kb then "f|" ^ ka ^ "|" ^ kb else "f|" ^ kb ^ "|" ^ ka
+      | _ -> "p|" ^ member_key left
+    in
+    let add_entry left codes =
+      let key = key_of left in
+      match Hashtbl.find_opt tbl key with
+      | Some (_, cref) ->
+          incr ndup;
+          List.iter (add_uniq cref) codes
+      | None ->
+          incr nkeys;
+          let cref = ref [] in
+          List.iter (add_uniq cref) codes;
+          Hashtbl.add tbl key (left, cref);
+          order := `Entry key :: !order
+    in
+    let parse raw =
+      let line = String.trim raw in
+      let colon = if line = "" then None else String.index_opt line ':' in
+      match colon with
+      | Some i when line.[0] <> '#' ->
+          let left = String.trim (String.sub line 0 i) in
+          let right = String.sub line (i + 1) (String.length line - i - 1) in
+          let codes =
+            List.filter
+              (fun s -> s <> "")
+              (List.map
+                 (fun s -> String.uppercase_ascii (String.trim s))
+                 (String.split_on_char ',' right))
+          in
+          `Line (left, codes)
+      | _ -> `Skip
+    in
+    (* base.ok: keep structure (comments/blank/unparseable verbatim) *)
     List.iter
       (fun raw ->
-        let line = String.trim raw in
-        let colon = if line = "" then None else String.index_opt line ':' in
-        match colon with
-        | Some i when line.[0] <> '#' -> (
-            let left = String.trim (String.sub line 0 i) in
-            let right = String.sub line (i + 1) (String.length line - i - 1) in
-            let codes =
-              List.filter
-                (fun s -> s <> "")
-                (List.map
-                   (fun s -> String.uppercase_ascii (String.trim s))
-                   (String.split_on_char ',' right))
-            in
-            let key =
-              match Str.bounded_split re_amp left 2 with
-              | [ a; b ] ->
-                  let ka = member_key a and kb = member_key b in
-                  if ka <= kb then "f|" ^ ka ^ "|" ^ kb
-                  else "f|" ^ kb ^ "|" ^ ka
-              | _ -> "p|" ^ member_key left
-            in
-            match Hashtbl.find_opt tbl key with
-            | Some (_, cref) ->
-                incr ndup;
-                List.iter (add_uniq cref) codes
-            | None ->
-                incr nkeys;
-                let cref = ref [] in
-                List.iter (add_uniq cref) codes;
-                Hashtbl.add tbl key (left, cref);
-                order := `Entry key :: !order)
-        | _ -> order := `Verbatim raw :: !order)
-      lines;
+        match parse raw with
+        | `Line (left, codes) -> add_entry left codes
+        | `Skip -> order := `Verbatim raw :: !order)
+      base_lines;
+    (* fragments: entry lines only, appended/merged after base content *)
+    List.iter
+      (fun (_wizard, cpath) ->
+        List.iter
+          (fun raw ->
+            match parse raw with `Line (l, c) -> add_entry l c | `Skip -> ())
+          (read_lines cpath))
+      claimed;
     let buf = Buffer.create 65536 in
     List.iter
       (function
@@ -764,27 +882,33 @@ let fold_ignored file =
             Buffer.add_char buf '\n')
       (List.rev !order);
     let folded = Buffer.contents buf in
-    let original = try read_whole_file file with Sys_error _ -> "" in
+    let original =
+      if base_exists then try read_whole_file file with Sys_error _ -> ""
+      else ""
+    in
     let rewritten =
       if folded = original then false
       else begin
-        (try Sys.remove (file ^ ".bak") with Sys_error _ -> ());
-        (try Sys.rename file (file ^ ".bak")
-         with Sys_error _ ->
-           let oc = open_out (file ^ ".bak") in
-           List.iter
-             (fun l ->
-               output_string oc l;
-               output_char oc '\n')
-             lines;
-           close_out oc);
+        if base_exists then begin
+          (try Sys.remove (file ^ ".bak") with Sys_error _ -> ());
+          try Sys.rename file (file ^ ".bak")
+          with Sys_error _ ->
+            let oc = open_out (file ^ ".bak") in
+            List.iter
+              (fun l ->
+                output_string oc l;
+                output_char oc '\n')
+              base_lines;
+            close_out oc
+        end;
         let oc = open_out file in
         output_string oc folded;
         close_out oc;
         true
       end
     in
-    Some (!nkeys, !ndup, rewritten)
+    archive_claimed okd claimed;
+    Some (!nkeys, !ndup, rewritten, List.length claimed)
   end
 
 (* verification codes: which code covers which warning type *)
@@ -1016,7 +1140,8 @@ let sort_uniq_items items =
   in
   List.sort (fun a b -> compare (item_sort_key a) (item_sort_key b)) items
 
-let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
+let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
+    ~input oc =
   let pf fmt = Printf.fprintf oc fmt in
   pf "<!DOCTYPE html>\n<html><head><meta charset=\"utf-8\">\n";
   pf "<title>GeneWeb warnings — %s</title>\n" (html_escape basename);
@@ -1054,6 +1179,18 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
   pf "#igntray code{background:#f2f2f2;padding:0 .3em;border-radius:.2em}\n";
   pf "</style></head><body>\n";
   pf "<h1>GeneWeb warnings — base <i>%s</i></h1>\n" (html_escape basename);
+  pf "<p class=muted>Generated %s%s%s</p>\n" (html_escape generated)
+    (match input with
+    | Some (name, date) ->
+        Printf.sprintf " · from %s dated %s" (html_escape name)
+          (html_escape date)
+    | None -> "")
+    (* link to the read-only ignored-file view (wizard mode only, since m=OK_FILE
+       is wizard-gated); relative to the base url with the _w wizard suffix *)
+    (if !wizard then
+       Printf.sprintf " · <a href=\"%s\">ignored file</a>"
+         (html_escape (url ^ "_w?m=OK_FILE"))
+     else "");
 
   (* --- statistics ------------------------------------------------- *)
   pf "<h2>Statistics</h2>\n<table>\n";
@@ -1150,14 +1287,23 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
   pf
     "<textarea id=ignlist readonly rows=8 placeholder=\"click 'ignore' next to \
      a name\"></textarea>\n";
+  pf "<div class=ignbtns>";
+  if !wizard then
+    pf
+      "<button type=button id=ignsubmit data-submit=\"%s\">Submit to \
+       base</button>"
+      (html_escape (url ^ "_w"));
   pf
-    "<div class=ignbtns><button type=button id=igncopy>Copy</button><button \
-     type=button id=igndl data-base=\"%s\">Download</button><button \
-     type=button id=ignclear>Clear</button></div>\n"
+    "<button type=button id=igncopy>Copy</button><button type=button id=igndl \
+     data-base=\"%s\">Download</button><button type=button \
+     id=ignclear>Clear</button></div>\n"
     (html_escape basename);
   pf
-    "<div class=ignhelp>Append to the ignored file, e.g. <code>cat &gt;&gt; \
-     %s.ok</code> or paste.</div>\n"
+    "<div class=ignhelp>%sCopy/Download appends to <code>%s.ok</code> (or your \
+     wizard fragment).<span id=ignstatus></span></div>\n"
+    (if !wizard then
+       "Submit sends each entry to the base under your wizard login. "
+     else "")
     (html_escape basename);
   pf "</div>\n";
   pf
@@ -1184,6 +1330,18 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi oc =
      Blob([list.value+'\\n'],{type:'text/plain'});var \
      a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=this.getAttribute('data-base')+'_ignore_additions.ok';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},0);};\n\
      document.getElementById('ignclear').onclick=function(){picks.clear();document.querySelectorAll('button.ign.on').forEach(function(b){b.classList.remove('on');b.textContent='ignore';});render();};\n\
+     var sb=document.getElementById('ignsubmit');\n\
+     if(sb)sb.onclick=function(){var \
+     ep=sb.getAttribute('data-submit');if(location.protocol==='http:'||location.protocol==='https:')ep=location.origin+location.pathname;/* \
+     target the gwd that served us */var \
+     st=document.getElementById('ignstatus');var \
+     pairs=[];picks.forEach(function(c,k){c.forEach(function(x){pairs.push([k,x]);});});if(!pairs.length)return;sb.disabled=true;sb.textContent='Submitting\\u2026';st.textContent='';var \
+     ok=0,fail=0,done=0;pairs.forEach(function(p){var \
+     u=ep+(ep.indexOf('?')<0?'?':'&')+'m=OK_ADD&key='+encodeURIComponent(p[0])+'&code='+encodeURIComponent(p[1]);fetch(u,{credentials:'include'}).then(function(r){if(!r.ok)throw \
+     0;return \
+     r.text();}).then(function(){ok++;}).catch(function(){fail++;}).then(function(){done++;if(done===pairs.length){sb.disabled=false;sb.textContent='Submit \
+     to base';st.textContent=' submitted '+ok+(fail?(', '+fail+' \
+     failed'):'');if(!fail){picks.clear();document.querySelectorAll('button.ign.on').forEach(function(b){b.classList.remove('on');b.textContent='ignore';});render();}}});});};\n\
      })();\n\
      </script>\n";
   pf "</body></html>\n"
@@ -1204,26 +1362,28 @@ let () =
   end;
   if !ignored_file = "" then
     ignored_file := Filename.concat !bases_dir (!base_name ^ ".ok");
+  if !okd_dir = "" then okd_dir := !ignored_file ^ ".d";
 
-  (* -fold-ok is a standalone maintenance action: tidy the ignored file and
-     stop, without needing a log file or producing a report. *)
+  (* -fold-ok is a standalone maintenance action: commit per-wizard fragments
+     into the ignored file and tidy it, then stop — no log file or report. *)
   if !fold_ok then begin
-    (match fold_ignored !ignored_file with
+    (match fold_and_commit !ignored_file !okd_dir with
     | None ->
-        Printf.printf "fold: %s does not exist, nothing to do\n" !ignored_file
-    | Some (nk, nd, true) ->
+        Printf.printf "fold: %s absent and no fragments in %s, nothing to do\n"
+          !ignored_file !okd_dir
+    | Some (nk, nd, rew, nc) ->
         Printf.printf
-          "fold: %s -> %d entr%s, %d duplicate line%s merged; previous file \
-           kept as %s.bak\n"
+          "fold: %s -> %d entr%s (%d wizard fragment%s committed, %d duplicate \
+           line%s merged)%s\n"
           !ignored_file nk
           (if nk = 1 then "y" else "ies")
+          nc
+          (if nc = 1 then "" else "s")
           nd
           (if nd = 1 then "" else "s")
-          !ignored_file
-    | Some (nk, _, false) ->
-        Printf.printf "fold: %s already tidy (%d entr%s), left unchanged\n"
-          !ignored_file nk
-          (if nk = 1 then "y" else "ies"));
+          (if rew then
+             Printf.sprintf "; previous file kept as %s.bak" !ignored_file
+           else "; unchanged"));
     exit 0
   end;
 
@@ -1232,23 +1392,33 @@ let () =
     exit 2
   end;
   if !base_url = "" then base_url := "http://localhost:2317/" ^ !base_name;
-  if !out_file = "" then out_file := !base_name ^ "_warnings.html";
+  if !out_file = "" then
+    out_file := Filename.concat !bases_dir (!base_name ^ "_warnings.html");
 
   let cfg_file = Filename.concat !bases_dir (!base_name ^ ".cfg") in
   let cfg = read_config cfg_file in
-  let ign = read_ignored !ignored_file in
-  (* Tidy the ignored file in place on every run (unless -no-fold): it stays
-     canonical, so the only loose lines at any time are the corrections
-     appended from the report after this run — which the next run folds in. *)
+  (* Commit per-wizard fragments into the ignored file and tidy it (unless
+     -no-fold) BEFORE reading, so the report reflects every contribution and
+     the file stays canonical; consumed fragments are archived. *)
   (if not !no_fold then
-     match fold_ignored !ignored_file with
-     | Some (_, nd, true) when nd > 0 ->
-         Printf.printf "tidied %s: %d duplicate line%s merged\n" !ignored_file
-           nd
-           (if nd = 1 then "" else "s")
-     | Some (_, _, true) ->
-         Printf.printf "tidied %s (formatting normalized)\n" !ignored_file
+     match fold_and_commit !ignored_file !okd_dir with
+     | Some (_, nd, rew, nc) when rew || nc > 0 ->
+         let frag =
+           if nc > 0 then
+             Printf.sprintf ", %d wizard fragment%s committed" nc
+               (if nc = 1 then "" else "s")
+           else ""
+         in
+         if rew then
+           Printf.printf "consolidated %s: %d duplicate line%s merged%s\n"
+             !ignored_file nd
+             (if nd = 1 then "" else "s")
+             frag
+         else
+           Printf.printf "consolidated %s%s (base already canonical)\n"
+             !ignored_file frag
      | _ -> ());
+  let ign = read_ignored !ignored_file !okd_dir in
   let lines = Array.of_list (read_lines !log_file) in
   (* resolve ifam-based duplicate-family warnings to stable couples *)
   let warnings = resolve_dup_families (dedup (parse_log lines)) in
@@ -1304,9 +1474,14 @@ let () =
       multi
   in
 
+  let input =
+    match file_time !log_file with
+    | Some d -> Some (Filename.basename !log_file, d)
+    | None -> None
+  in
   let oc = open_out !out_file in
   generate_html ~basename:!base_name ~url:!base_url ~cfg ~stats ~extremes ~kept
-    ~multi oc;
+    ~multi ~generated:(report_time ()) ~input oc;
   close_out oc;
 
   (* console summary *)
