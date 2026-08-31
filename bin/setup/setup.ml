@@ -1211,6 +1211,7 @@ let cleanup_1 conf =
      independent of bases_dir and cwd. Tools get bare base names; exec_f
      injects -bd so they find the base. *)
   let tmp_gw = Filename.temp_file "gwsetup_" ".gw" in
+  (* FIXME: we shouldn't ignore this return code. *)
   let _ : Unix.process_status =
     exec_f conf ~path:(!bin_dir // "gwu") [ in_base; "-o"; tmp_gw ]
   in
