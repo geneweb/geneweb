@@ -468,10 +468,11 @@ fr: Mon compte associatif
         <a class="btn btn-outline-success" href="https://asso.roglo.eu/page/1409612-charte-des-sources">Chartes des sources</a>
         <a class="btn btn-outline-success" href="https://roglo.eu/wizard_w?lang=fr;m=NOTES;f=GeneWeb:Trucs">Trucs et astuces</a>
         <a class="btn btn-outline-success" href="https://roglo.eu/wizard_w?lang=fr;m=NOTES;f=Admin:anoma">Anomalies</a>
+        <a class="btn btn-outline-success" href="%prefix;&m=ANOMA">Anomalies</a>
       %end;
     </div>
   </div>
-%end;
+%end; %(if;roglo %)
 
 %if;(nb_persons.v!=0 and (((not roglo) and wizard) or (roglo and (not friend) and user.ident!=""
     and (user.ident in b.superwizard or b.superwizard="all"))))
