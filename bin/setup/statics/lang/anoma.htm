@@ -16,9 +16,20 @@
 <h1 style="margin:0;">[analyse anomalies]</h1>
 </div>
 <p>
-<ul>
-%b{<li><a href="http://%m:%P/%a_w?m=ANOMA">%a</a>|
-<li>[there is no database at present]
+<form method="GET" action="anoma">
+<input type="hidden" name="bd" value="%w">
+
+
+<table class="setup">
+%b{<tr align=left>
+<td>
+<input type="radio" name="anon" value="%a">   </td>
+<td><a href="http://%m:%z/%a_w?m=ANOMA">%a</a></td>|
+[there is no database at present]
 }
-</ul>
+</table>
+
+[Then push this button][:]
+<input type="submit" value="[Run anomalies analysis]">
+
 </form>

@@ -29,11 +29,13 @@ let debug = ref false
 let daemon = ref false
 let no_anoma = ref false
 
-(* comm.log lives under the bases directory.  Make it a FUNCTION of !bases_dir
-   so it always reflects the -bd value parsed from the command line: a plain
-   `let comm_log = !bases_dir // "comm.log"` would capture the string at
-   module-load time, before Arg.parse sets bases_dir, and never track -bd. *)
-let comm_log () = !bases_dir // "comm.log"
+(* Per-base rebuild log, under <bases_dir>/tmp/.  A FUNCTION of both !bases_dir
+   (so it tracks the -bd parsed from the command line — a plain top-level
+   `let comm_log = ...` would capture the string before Arg.parse runs) and the
+   base name, so different bases don't share one log and anoma can locate
+   "<base>_comm.log" by convention.  Empty base -> plain comm.log. *)
+let comm_log base =
+  !bases_dir // "tmp" // ((if base = "" then "" else base ^ "_") ^ "comm.log")
 
 let printer_conf =
   {
@@ -123,6 +125,14 @@ let strip_spaces = String.trim
 let getenv env label = decode (List.assoc (decode label) env)
 let p_getenv env label = try Some (getenv env label) with Not_found -> None
 let s_getenv env label = try getenv env label with Not_found -> ""
+
+(* Base name for naming the per-base comm.log: the output base "o" when a build
+   sets it (gwc/ged2gwb), else the operated base "anon".  basename-only, so the
+   log file name never contains a path separator. *)
+let log_base conf =
+  let o = strip_spaces (s_getenv conf.env "o") in
+  let b = if o <> "" then o else strip_spaces (s_getenv conf.env "anon") in
+  if b = "" then "" else Filename.basename b
 
 let rec skip_spaces s i =
   if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
@@ -586,7 +596,8 @@ let rec copy_from_stream conf print strm =
               (* depending on when %f is called, conf may be sketchy *)
               (* conf will know bvars from basename.gwf and evars from url *)
               copy_from_stream conf print (Stream.of_string s)
-          | 'g' -> print_specific_file conf print (comm_log ()) strm
+          | 'g' ->
+              print_specific_file conf print (comm_log (log_base conf)) strm
           | 'h' ->
               print "<input type=hidden name=lang value=";
               print conf.lang;
@@ -933,7 +944,11 @@ let exec_f conf comm =
     if !bases_dir = "." || !bases_dir = "" then ""
     else " -bd " ^ stringify !bases_dir
   in
-  let s = comm ^ bd_arg ^ " > " ^ stringify (comm_log ()) ^ " 2>&1" in
+  let clog = comm_log (log_base conf) in
+  (* the per-base log lives under <bases_dir>/tmp; make sure that dir exists *)
+  (try Unix.mkdir (Filename.dirname clog) 0o755
+   with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
+  let s = comm ^ bd_arg ^ " > " ^ stringify clog ^ " 2>&1" in
   Printf.eprintf "$ %s\n" s;
   command := s;
   flush stderr;
@@ -954,9 +969,10 @@ let run_anoma conf =
   if !no_anoma || base = "" then ()
   else
     let anoma = Filename.concat !bin_dir "anoma" in
+    let clog = comm_log base in
     if not (Sys.file_exists anoma) then (
       (* leave a trace on the gwsetup "comm.log" page rather than skip silently *)
-      let oc = open_out_gen [ Open_append; Open_creat ] 0o644 (comm_log ()) in
+      let oc = open_out_gen [ Open_append; Open_creat ] 0o644 clog in
       Printf.fprintf oc "\n--- anoma: not found at %s, skipped ---\n" anoma;
       close_out oc)
     else begin
@@ -966,24 +982,28 @@ let run_anoma conf =
          gwc defaulting to the current dir, but anoma's own default base dir is
          NOT the current dir, so always pass -bd (as "." when unset), letting
          anoma resolve it against the shared cwd.  anoma reads the warnings gwc
-         left in comm_log; its own output is captured to a side file and then
-         appended to comm_log so it shows on the gwsetup comm.log page. *)
+         left in the per-base log (clog).  On success that log is transient — it
+         has been analysed into the report — so remove it; it must not survive
+         to be taken as current on a later run.  On failure keep it and append
+         anoma's output, so the gwsetup comm.log page shows gwc's warnings plus
+         why anoma failed. *)
       let bd = if !bases_dir = "" then "." else !bases_dir in
       let anoma_log =
         Filename.concat (Filename.get_temp_dir_name ()) "anoma.log"
       in
       let s =
-        Printf.sprintf
-          "%s %s -bd %s -in %s > %s 2>&1; { printf '\\n--- anoma \
-           ---\\n';            cat %s; } >> %s"
-          (stringify anoma) (stringify base) (stringify bd)
-          (stringify (comm_log ()))
-          (stringify anoma_log) (stringify anoma_log)
-          (stringify (comm_log ()))
+        Printf.sprintf "%s %s -bd %s -in %s > %s 2>&1" (stringify anoma)
+          (stringify base) (stringify bd) (stringify clog) (stringify anoma_log)
       in
       Printf.eprintf "$ %s\n" s;
       flush stderr;
-      ignore (Sys.command s)
+      if Sys.command s = 0 then try Sys.remove clog with Sys_error _ -> ()
+      else
+        ignore
+          (Sys.command
+             (Printf.sprintf
+                "{ printf '\\n--- anoma (failed) ---\\n'; cat %s; } >> %s"
+                (stringify anoma_log) (stringify clog)))
     end
 
 let out_name_of_ged in_file =
@@ -1520,6 +1540,19 @@ let consang conf ok_file =
   in
   if rc > 1 then print_file conf "err_consang.htm" else print_file conf ok_file
 
+let anoma conf =
+  let rc =
+    let comm = stringify (Filename.concat !bin_dir conf.comm) in
+    let bname =
+      match p_getenv conf.env "anon" with
+      | Some f -> strip_spaces f
+      | None -> ""
+    in
+    exec_f conf (comm ^ parameters conf.env)
+  in
+  if rc > 1 then print_file conf "err_standard.htm"
+  else print_file conf "anoma_ok.htm"
+
 let update_nldb conf ok_file =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
@@ -1560,6 +1593,7 @@ let with_opt_check check_fn run_fn conf =
   | _ -> run_fn conf
 
 let setup_comm_ok conf = function
+  | "anoma" -> anoma conf
   | "gwsetup" -> setup_gen conf
   | "simple" -> simple conf
   | "cleanup" -> cleanup conf

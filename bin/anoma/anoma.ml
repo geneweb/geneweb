@@ -28,11 +28,13 @@
      gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored_file>]
             [-okd <fragments_dir>] [-out <report.html>] [-url <base_url>]
             [-nw] [-no-fold] [-ignore_base] [-hist <days>]
-   Consolidation only (no -in, no report):
+   Consolidation only (no -in and no conventional log, no report):
      gwwarn <basename> -bd <bases_dir> [-ok <ignored_file>] [-okd <dir>]
    Wizard links are the default; -nw makes plain links for a shared report.
    Folding (commit fragments + tidy the ignored file) is on by default; -no-fold
-   turns it off. With no -in, anoma just consolidates and exits. The ignored
+   turns it off. When -in is omitted, anoma falls back to the per-base rebuild
+   log gwsetup writes, <bases_dir>/tmp/<basename>_comm.log, if it exists; if it
+   does not, anoma just consolidates the ignored file and exits. The ignored
    file defaults to <bases_dir>/<basename>.ok and the fragments dir to
    <ok-file>.d.
 *)
@@ -50,6 +52,10 @@ let bases_dir = ref (Dirs.name Secure.default_base_dir)
 let ignored_file = ref ""
 let okd_dir = ref ""
 let log_file = ref ""
+
+(* set when -in was omitted and we fell back to the conventional per-base log;
+   such a derived log is transient and is removed once the report is written *)
+let derived_log = ref false
 let out_file = ref ""
 let base_url = ref ""
 let wizard = ref true
@@ -75,7 +81,10 @@ let speclist =
     ( "-okd",
       Arg.Set_string okd_dir,
       "<dir>   per-wizard contribution fragments (default <ok-file>.d)" );
-    ("-in", Arg.Set_string log_file, "<file>  warning log file");
+    ( "-in",
+      Arg.Set_string log_file,
+      "<file>  warning log file (default <bases_dir>/tmp/<basename>_comm.log \
+       if it exists; otherwise consolidate the ignored file and exit)" );
     ( "-out",
       Arg.Set_string out_file,
       "<file>  output HTML (default <bases_dir>/<basename>_warnings.html)" );
@@ -1608,9 +1617,25 @@ let () =
   if !ignored_file = "" then ignored_file := !bases_dir // (!base_name ^ ".ok");
   if !okd_dir = "" then okd_dir := !ignored_file ^ ".d";
 
-  (* With no log file, this is a standalone consolidation: commit per-wizard
-     fragments into the ignored file and tidy it (unless -no-fold), then stop —
-     no report. (Replaces the former -fold-ok action.) *)
+  (* If no -in log was given, fall back to the conventional per-base rebuild log
+     that gwsetup writes, <bases_dir>/tmp/<basename>_comm.log; use it only if it
+     actually exists, so that with no rebuild log present we still drop into the
+     consolidate-and-exit mode below rather than error on a missing file. *)
+  if !log_file = "" then begin
+    let derived = !bases_dir // "tmp" // (!base_name ^ "_comm.log") in
+    if Sys.file_exists derived then begin
+      log_file := derived;
+      derived_log := true
+    end
+  end;
+
+  (* With no log file (none given, and no conventional one found), this is a
+     standalone consolidation — the m=OK_FOLD path: commit per-wizard fragments
+     into the ignored file and tidy it (unless -no-fold), then stop.  It touches
+     ONLY the ignored file (and its .bak); the existing
+     <basename>_warnings.html report is left exactly as it is, neither deleted
+     nor regenerated — we exit here before out_file is even defaulted or opened
+     below. *)
   if !log_file = "" then begin
     if !fold then
       match fold_and_commit !ignored_file !okd_dir with
@@ -1760,4 +1785,12 @@ let () =
             s.total s.ignored (s.total - s.ignored)
       | _ -> ())
     all_wtypes;
-  Printf.printf "report written to %s\n" !out_file
+  Printf.printf "report written to %s\n" !out_file;
+  (* a derived per-base log is transient: it has been analysed into the report,
+     so remove it. It must not survive to be mistaken for current on a later run
+     (a real -in given on the command line is never touched). *)
+  if !derived_log then
+    try
+      Sys.remove !log_file;
+      Printf.printf "removed transient log %s\n" !log_file
+    with Sys_error _ -> ()
