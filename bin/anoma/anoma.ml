@@ -24,15 +24,17 @@
      ocamlopt str.cmxa unix.cmxa gwwarn.ml -o gwwarn
    or with dune, see the accompanying dune files.
 
-   Usage:
+   Usage (report):
      gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored_file>]
             [-okd <fragments_dir>] [-out <report.html>] [-url <base_url>]
-            [-w | -nw] [-no-fold] [-ignore_base]
-   Maintenance (no report):
-     gwwarn <basename> -bd <bases_dir> [-ok <ignored_file>] [-okd <dir>] -fold-ok
-   The ignored file defaults to <bases_dir>/<basename>.ok and the fragments
-   directory to <ok-file>.d. A normal run commits fragments and tidies the
-   ignored file in place before reading, unless -no-fold is given.
+            [-nw] [-no-fold] [-ignore_base] [-hist <days>]
+   Consolidation only (no -in, no report):
+     gwwarn <basename> -bd <bases_dir> [-ok <ignored_file>] [-okd <dir>]
+   Wizard links are the default; -nw makes plain links for a shared report.
+   Folding (commit fragments + tidy the ignored file) is on by default; -no-fold
+   turns it off. With no -in, anoma just consolidates and exits. The ignored
+   file defaults to <bases_dir>/<basename>.ok and the fragments dir to
+   <ok-file>.d.
 *)
 
 module Driver = Geneweb_db.Driver
@@ -51,16 +53,16 @@ let log_file = ref ""
 let out_file = ref ""
 let base_url = ref ""
 let wizard = ref true
-let fold_ok = ref false
-let no_fold = ref false
+let fold = ref true
 let ignore_base = ref false
+let hist_days = ref 8
 
 let usage =
   "usage: gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored>] \
-   [-okd <dir>] [-out <report.html>] [-url <base_url>] [-w | -nw] [-no-fold] \
-   [-ignore_base]\n\
+   [-okd <dir>] [-out <report.html>] [-url <base_url>] [-nw] [-no-fold] \
+   [-ignore_base] [-hist <days>]\n\
   \       gwwarn <basename> -bd <bases_dir> [-ok <ignored>] [-okd <dir>] \
-   -fold-ok"
+   [-no-fold]   (no -in: consolidate fragments and exit)"
 
 let speclist =
   [
@@ -80,27 +82,28 @@ let speclist =
     ( "-url",
       Arg.Set_string base_url,
       "<url>   base URL (default http://localhost:2317/<basename>)" );
-    ( "-w",
-      Arg.Set wizard,
-      "        correction links use wizard access <basename>_w (default)" );
     ( "-nw",
       Arg.Clear wizard,
-      "       correction links use plain access (for shared/public reports)" );
-    ( "-fold-ok",
-      Arg.Set fold_ok,
-      " tidy the ignored file (merge duplicate person/family lines) and exit" );
+      "       plain (non-wizard) correction links, for shared/public reports \
+       (default: wizard access <basename>_w)" );
     ( "-no-fold",
-      Arg.Set no_fold,
-      " do not tidy the ignored file on a normal run (default: tidy on read)" );
+      Arg.Clear fold,
+      " do not commit fragments / tidy the ignored file (default: fold)" );
     ( "-ignore_base",
       Arg.Set ignore_base,
       " do not open the base to resolve duplicate-family ifam numbers to \
        couples" );
+    ( "-hist",
+      Arg.Set_int hist_days,
+      "<days>  read base history modified within the last <days> days for \
+       last-modifier / per-wizard filter (default 8; 0 disables)" );
   ]
 
 (* ------------------------------------------------------------------ *)
 (* Basic helpers                                                       *)
 (* ------------------------------------------------------------------ *)
+
+let ( // ) = Filename.concat
 
 let starts_with s pre =
   String.length s >= String.length pre
@@ -181,6 +184,74 @@ let person_key p =
 
 let person_designation p =
   if p.sn = "" then p.fn else Printf.sprintf "%s.%d %s" p.fn p.occ p.sn
+
+(* ------------------------------------------------------------------ *)
+(* Base history: <bases_dir>/<basename>.gwb/history                    *)
+(* Each line is "YYYY-MM-DD HH:MM:SS [user] ACTION ITEM"; for a person *)
+(* change ITEM is "(first_name.occ surname)". We map each person key   *)
+(* of interest to its most recent (timestamp, wizard).                 *)
+(* ------------------------------------------------------------------ *)
+
+let history : (string, string * string) Hashtbl.t ref = ref (Hashtbl.create 1)
+let re_hist_person = Str.regexp "(\\(.*\\)\\.\\([0-9]+\\) \\(.*\\))"
+
+(* timestamp of [n] days ago, in the history's "YYYY-MM-DD HH:MM:SS" format;
+   history times sort lexicographically, so a plain string >= comparison keeps
+   only the last [n] days. Local time, to match how gwd writes the history. *)
+let days_ago_stamp n =
+  let t = Unix.localtime (Unix.time () -. (float_of_int n *. 86400.)) in
+  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" (t.Unix.tm_year + 1900)
+    (t.Unix.tm_mon + 1) t.Unix.tm_mday t.Unix.tm_hour t.Unix.tm_min
+    t.Unix.tm_sec
+
+(* [want] is the set of person keys we care about (those in the anomalies);
+   only those are kept, so the map stays small even on a huge history.
+   [cutoff] is a "YYYY-MM-DD HH:MM:SS" lower bound: entries older than it are
+   skipped, so only changes within the requested window are reported. *)
+let read_history bases_dir base_name want cutoff =
+  let tbl : (string, string * string) Hashtbl.t = Hashtbl.create 4096 in
+  let file = bases_dir // (base_name ^ ".gwb") // "history" in
+  if Sys.file_exists file then
+    List.iter
+      (fun line ->
+        try
+          if String.length line > 22 && line.[0] <> '#' && line.[20] = '[' then
+            match String.index_from_opt line 21 ']' with
+            | Some j -> (
+                let time = String.sub line 0 19 in
+                if time < cutoff then ()
+                else
+                  let user = String.sub line 21 (j - 21) in
+                  let rest =
+                    String.trim
+                      (String.sub line (j + 1) (String.length line - j - 1))
+                  in
+                  match String.index_opt rest ' ' with
+                  | Some k ->
+                      let item =
+                        String.trim
+                          (String.sub rest (k + 1) (String.length rest - k - 1))
+                      in
+                      if matches re_hist_person item then begin
+                        let fn = Str.matched_group 1 item in
+                        let occ = Str.matched_group 2 item in
+                        let sn = Str.matched_group 3 item in
+                        let key =
+                          person_key { fn; occ = int_of_string occ; sn }
+                        in
+                        if Hashtbl.mem want key then
+                          match Hashtbl.find_opt tbl key with
+                          | Some (t0, _) when t0 >= time -> ()
+                          | _ -> Hashtbl.replace tbl key (time, user)
+                      end
+                  | None -> ())
+            | None -> ()
+        with _ -> ())
+      (read_lines file);
+  tbl
+
+(* last (timestamp, wizard) that touched this person, from the loaded history *)
+let person_hist p = Hashtbl.find_opt !history (person_key p)
 
 (* ------------------------------------------------------------------ *)
 (* Warnings                                                            *)
@@ -530,6 +601,39 @@ let couple_of_ifam base id =
 let couple_str (fa, mo) =
   Printf.sprintf "%s & %s" (person_designation fa) (person_designation mo)
 
+(* couple -> ifam string, filled by the base pass; used for the family wrench
+   (m=MOD_FAM;i=ifam). Ifams are valid for this report's lifetime (fresh from
+   the base at generation time), which is fine for an edit link even though we
+   never store them in the .ok. *)
+let fam_ifam : (string, string) Hashtbl.t ref = ref (Hashtbl.create 1)
+
+let couple_key fa mo =
+  let a = person_key fa and b = person_key mo in
+  if a <= b then a ^ "|" ^ b else b ^ "|" ^ a
+
+(* [BIND] person_of_key takes (base, first_name, surname, occ); adjust the
+   argument order if your Driver differs. Returns the ifam joining fa and mo. *)
+let ifam_of_couple base fa mo =
+  match Driver.person_of_key base fa.fn fa.sn fa.occ with
+  | None -> None
+  | Some ifa -> (
+      match Driver.person_of_key base mo.fn mo.sn mo.occ with
+      | None -> None
+      | Some imo ->
+          let fams = Driver.get_family (Driver.poi base ifa) in
+          let res = ref None in
+          Array.iter
+            (fun ifam ->
+              if !res = None then begin
+                let fam = Driver.foi base ifam in
+                if
+                  Driver.Iper.equal (Driver.get_mother fam) imo
+                  || Driver.Iper.equal (Driver.get_father fam) imo
+                then res := Some (Driver.Ifam.to_string ifam)
+              end)
+            fams;
+          !res)
+
 (* rebuild one warning: if it is an ifam-based duplicate-family warning that
    both resolve, replace WFamIds by the couple(s) as WFam and restate the text
    with names; otherwise leave it unchanged. *)
@@ -558,25 +662,44 @@ let resolve_dup_family base w =
   | _ -> w
 
 let resolve_dup_families warnings =
-  let has_dupfam =
+  let has_fam =
     List.exists
-      (fun w -> match w.items with [ WFamIds _ ] -> true | _ -> false)
+      (fun w ->
+        List.exists (function WFam _ | WFamIds _ -> true | _ -> false) w.items)
       warnings
   in
-  if !ignore_base || not has_dupfam then warnings
+  if !ignore_base || not has_fam then warnings
   else
     (* Path passed to with_database is <bases_dir>/<basename> (no ".gwb"), and
        GeneWeb's Secure sandbox must first be told which directory is the base
-       root, or it raises Sys_error "invalid access" — same setup gwu/gwc do. *)
-    let base_path = Filename.concat !bases_dir !base_name in
+       root, or it raises Sys_error "invalid access" — same setup gwu/gwc do.
+       In the same base session we (a) resolve duplicate-family ifams to
+       couples and (b) build the couple -> ifam map for the family wrench. *)
+    let base_path = !bases_dir // !base_name in
     try
       Secure.set_base_dir !bases_dir;
       Driver.with_database base_path (fun base ->
-          List.map (resolve_dup_family base) warnings)
+          let warnings = List.map (resolve_dup_family base) warnings in
+          let tbl = Hashtbl.create 4096 in
+          List.iter
+            (fun w ->
+              List.iter
+                (function
+                  | WFam (fa, mo) -> (
+                      let k = couple_key fa mo in
+                      if not (Hashtbl.mem tbl k) then
+                        match ifam_of_couple base fa mo with
+                        | Some ifam -> Hashtbl.replace tbl k ifam
+                        | None -> ())
+                  | _ -> ())
+                w.items)
+            warnings;
+          fam_ifam := tbl;
+          warnings)
     with e ->
       Printf.eprintf
-        "warning: could not open base %s to resolve duplicate-family ids (%s); \
-         those warnings keep their (unstable) ifam numbers\n"
+        "warning: could not open base %s (%s); families get no edit link and \
+         duplicate-family warnings keep their ifam numbers\n"
         base_path (Printexc.to_string e);
       warnings
 
@@ -685,10 +808,10 @@ let fragment_files dir =
         && n.[0] <> '.'
         && Filename.check_suffix n ".ok"
         &&
-        let p = Filename.concat dir n in
+        let p = dir // n in
         Sys.file_exists p
         && not (try Sys.is_directory p with Sys_error _ -> false))
-    |> List.map (fun n -> Filename.concat dir n)
+    |> List.map (fun n -> dir // n)
     |> List.sort compare
   else []
 
@@ -731,16 +854,16 @@ let claim_fragments dir =
 (* move claimed fragments into <dir>/archive/<timestamp>/<wizard>.ok *)
 let archive_claimed dir claimed =
   if claimed <> [] then begin
-    let adir = Filename.concat dir "archive" in
+    let adir = dir // "archive" in
     ensure_dir adir;
-    let sub = Filename.concat adir (stamp ()) in
+    let sub = adir // stamp () in
     ensure_dir sub;
     List.iter
       (fun (wizard, cpath) ->
         let rec dest n =
           let cand =
-            if n = 0 then Filename.concat sub (wizard ^ ".ok")
-            else Filename.concat sub (Printf.sprintf "%s.%d.ok" wizard n)
+            if n = 0 then sub // (wizard ^ ".ok")
+            else sub // Printf.sprintf "%s.%d.ok" wizard n
           in
           if Sys.file_exists cand then dest (n + 1) else cand
         in
@@ -1096,21 +1219,68 @@ let make_extremes () =
    plain, suitable for a report that will be shared or served publicly.
    [url] is expected to end with the bare basename. *)
 let person_link url p =
-  let href =
-    Printf.sprintf "%s%s?p=%s&n=%s%s" url
-      (if !wizard then "_w" else "")
-      (url_encode p.fn) (url_encode p.sn)
+  let q =
+    Printf.sprintf "p=%s&n=%s%s" (url_encode p.fn) (url_encode p.sn)
       (if p.occ > 0 then Printf.sprintf "&oc=%d" p.occ else "")
   in
-  Printf.sprintf "<a href=\"%s\" target=\"_blank\">%s</a>" (html_escape href)
-    (html_escape (person_designation p))
+  let wsuff = if !wizard then "_w" else "" in
+  let view =
+    Printf.sprintf "<a href=\"%s\" target=\"_blank\">%s</a>"
+      (html_escape (Printf.sprintf "%s%s?%s" url wsuff q))
+      (html_escape (person_designation p))
+  in
+  (* wizard-only wrench: edit this person (m=MOD_IND) *)
+  let view =
+    if !wizard then
+      let modind = Printf.sprintf "%s_w?m=MOD_IND&%s" url q in
+      Printf.sprintf
+        "%s <a class=wr href=\"%s\" target=\"_blank\" title=\"edit \
+         person\">\xf0\x9f\x94\xa7</a>"
+        view (html_escape modind)
+    else view
+  in
+  (* last modifier from the history, shown muted *)
+  match person_hist p with
+  | Some (time, wiz) ->
+      Printf.sprintf "%s <span class=hist>· %s %s</span>" view (html_escape wiz)
+        (html_escape
+           (if String.length time >= 10 then String.sub time 0 10 else time))
+  | None -> view
 
 let item_html url = function
   | WPerson p -> person_link url p
   | WFam (fa, mo) ->
-      Printf.sprintf "%s &amp; %s" (person_link url fa) (person_link url mo)
+      let couple =
+        Printf.sprintf "%s &amp; %s" (person_link url fa) (person_link url mo)
+      in
+      (* wizard-only wrench: edit this family (m=MOD_FAM;i=ifam) *)
+      if !wizard then
+        match Hashtbl.find_opt !fam_ifam (couple_key fa mo) with
+        | Some ifam ->
+            Printf.sprintf
+              "%s <a class=wr href=\"%s\" target=\"_blank\" title=\"edit \
+               family\">\xf0\x9f\x94\xa7</a>"
+              couple
+              (html_escape (Printf.sprintf "%s_w?m=MOD_FAM&i=%s" url ifam))
+        | None -> couple
+      else couple
   | WFamIds (a, b) ->
       Printf.sprintf "families %s &amp; %s" (html_escape a) (html_escape b)
+
+(* distinct last-modifier wizards of an item's persons (for the per-wizard
+   filter data attribute); empty when history is unavailable *)
+let item_wizards it =
+  let ps =
+    match it with
+    | WPerson p -> [ p ]
+    | WFam (fa, mo) -> [ fa; mo ]
+    | WFamIds _ -> []
+  in
+  List.sort_uniq compare
+    (List.filter_map
+       (fun p ->
+         match person_hist p with Some (_, w) -> Some w | None -> None)
+       ps)
 
 (* sort key: persons by (surname, first name, occ); families by father *)
 let item_sort_key = function
@@ -1156,8 +1326,22 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
      .9em;border-radius:.35em;user-select:none}\n";
   pf "summary:hover{background:#274b80}\n";
   pf "ul.plist{columns:3;margin:.5em 0 1em 0}\n";
+  pf "ul.plist.wide{columns:1}\n";
+  (* families: one per full-width line *)
   pf "ul.plist li{break-inside:avoid}\n";
   pf ".muted{color:#777}\n";
+  pf
+    "a.wr{text-decoration:none;font-size:.85em;margin-left:.15em;opacity:.55}\n";
+  pf "a.wr:hover{opacity:1}\n";
+  pf ".hist{color:#999;font-size:.82em}\n";
+  pf "#wizbar{margin:.6em 0}\n";
+  pf "li.hidden{display:none}\n";
+  (* "show full messages" is a secondary control: lighter than the warning-kind
+     buttons and indented so it doesn't read as another warning kind *)
+  pf "details.full{margin-left:1.6em}\n";
+  pf
+    "summary.full{background:#e3e7ee;color:#556;font-weight:normal;font-size:.85em}\n";
+  pf "summary.full:hover{background:#d3d9e4}\n";
   (* ignore buttons + collector tray *)
   pf
     "button.ign{font-size:.75em;margin-left:.4em;padding:.02em \
@@ -1234,29 +1418,55 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
      the ignored file are shown. Lists are unique and sorted; each name opens \
      the person in the base.</p>\n"
     (html_escape basename);
+  (* per-wizard filter (populated from the history data on the items) *)
+  if !hist_days > 0 then
+    pf
+      "<div id=wizbar>Last modified by: <select id=wizsel><option \
+       value=\"\">(all)</option></select> <span id=wizcount \
+       class=muted></span> <span class=muted>(history: last %d \
+       day%s)</span></div>\n"
+      !hist_days
+      (if !hist_days = 1 then "" else "s");
   List.iter
     (fun t ->
       if enabled cfg t then begin
         let ws = List.filter (fun w -> w.wtype = t) kept in
         if ws <> [] then begin
           let items = sort_uniq_items (List.concat_map (fun w -> w.items) ws) in
-          pf "<details><summary>%s (%d)</summary>\n" (html_escape t)
+          (* family items are wide (two persons + wrenches + ignore); give
+             them one full-width column instead of the 3-column person layout *)
+          let is_fam =
+            match items with (WFam _ | WFamIds _) :: _ -> true | _ -> false
+          in
+          pf
+            "<details class=wkind data-label=\"%s\" \
+             data-total=\"%d\"><summary>%s (%d)</summary>\n"
+            (html_escape t) (List.length items) (html_escape t)
             (List.length items);
-          pf "<ul class=plist>\n";
+          pf "<ul class=\"plist wfilter%s\">\n" (if is_fam then " wide" else "");
           List.iter
             (fun it ->
+              let wa =
+                match item_wizards it with
+                | [] -> ""
+                | ws ->
+                    Printf.sprintf " data-wiz=\"%s\""
+                      (html_escape (String.concat " " ws))
+              in
               match ignore_entry t it with
               | Some (left, code) ->
                   pf
-                    "<li>%s <button type=button class=ign data-key=\"%s\" \
+                    "<li%s>%s <button type=button class=ign data-key=\"%s\" \
                      data-code=\"%s\" \
                      onclick=\"toggleIgn(this)\">ignore</button></li>\n"
-                    (item_html url it) (html_escape left) (html_escape code)
-              | None -> pf "<li>%s</li>\n" (item_html url it))
+                    wa (item_html url it) (html_escape left) (html_escape code)
+              | None -> pf "<li%s>%s</li>\n" wa (item_html url it))
             items;
           pf "</ul>\n";
           (* full warning texts for context *)
-          pf "<details><summary>show full messages (%d)</summary><ul>\n"
+          pf
+            "<details class=full><summary class=full>show full messages \
+             (%d)</summary><ul>\n"
             (List.length ws);
           List.iter (fun w -> pf "<li>%s</li>\n" (html_escape w.text)) ws;
           pf "</ul></details>\n";
@@ -1264,6 +1474,41 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
         end
       end)
     all_wtypes;
+
+  (* --- per-wizard filter script ----------------------------------- *)
+  (* GWWARN_ME is the viewing wizard: left empty here, replaced by the m=ANOMA
+     plugin with conf.user so the menu can offer "me". Options: (all), me (if
+     known), then the other wizards. *)
+  if !hist_days > 0 then
+    pf
+      "<script>\n\
+       var GWWARN_ME=\"\";\n\
+       (function(){\n\
+       var sel=document.getElementById('wizsel');if(!sel)return;var \
+       cnt=document.getElementById('wizcount');\n\
+       var me=GWWARN_ME||\"\";\n\
+       var \
+       set={};[].forEach.call(document.querySelectorAll('ul.wfilter>li[data-wiz]'),function(li){(li.getAttribute('data-wiz')||'').split(' \
+       ').forEach(function(w){if(w)set[w]=1;});});\n\
+       function opt(v,t){var \
+       o=document.createElement('option');o.value=v;o.textContent=t;sel.appendChild(o);}\n\
+       if(me){opt(me,'me ('+me+')');}\n\
+       Object.keys(set).sort().forEach(function(w){if(w!==me)opt(w,w);});\n\
+       function apply(){var w=sel.value;var shown=0,tot=0;\n\
+       document.querySelectorAll('ul.wfilter>li').forEach(function(li){var \
+       dw=li.getAttribute('data-wiz');tot++;\n\
+       var ok=!w||(dw&&(' '+dw+' ').indexOf(' '+w+' ')>=0);\n\
+       li.classList.toggle('hidden',!ok);if(ok)shown++;});\n\
+       document.querySelectorAll('details.wkind').forEach(function(d){var \
+       ul=d.querySelector('ul.wfilter');if(!ul)return;var \
+       sm=d.querySelector('summary');if(!sm)return;var \
+       label=d.getAttribute('data-label'),total=d.getAttribute('data-total');\n\
+       var n=ul.querySelectorAll('li:not(.hidden)').length;\n\
+       sm.textContent=w?(label+' ('+n+'/'+total+')'):(label+' ('+total+')');});\n\
+       cnt.textContent=w?('showing '+shown+' of '+tot):'';}\n\
+       sel.onchange=apply;apply();\n\
+       })();\n\
+       </script>\n";
 
   (* --- persons with several warnings ------------------------------ *)
   pf "<h2>Persons with several warnings</h2>\n";
@@ -1360,47 +1605,45 @@ let () =
     prerr_endline usage;
     exit 2
   end;
-  if !ignored_file = "" then
-    ignored_file := Filename.concat !bases_dir (!base_name ^ ".ok");
+  if !ignored_file = "" then ignored_file := !bases_dir // (!base_name ^ ".ok");
   if !okd_dir = "" then okd_dir := !ignored_file ^ ".d";
 
-  (* -fold-ok is a standalone maintenance action: commit per-wizard fragments
-     into the ignored file and tidy it, then stop — no log file or report. *)
-  if !fold_ok then begin
-    (match fold_and_commit !ignored_file !okd_dir with
-    | None ->
-        Printf.printf "fold: %s absent and no fragments in %s, nothing to do\n"
-          !ignored_file !okd_dir
-    | Some (nk, nd, rew, nc) ->
-        Printf.printf
-          "fold: %s -> %d entr%s (%d wizard fragment%s committed, %d duplicate \
-           line%s merged)%s\n"
-          !ignored_file nk
-          (if nk = 1 then "y" else "ies")
-          nc
-          (if nc = 1 then "" else "s")
-          nd
-          (if nd = 1 then "" else "s")
-          (if rew then
-             Printf.sprintf "; previous file kept as %s.bak" !ignored_file
-           else "; unchanged"));
-    exit 0
-  end;
-
+  (* With no log file, this is a standalone consolidation: commit per-wizard
+     fragments into the ignored file and tidy it (unless -no-fold), then stop —
+     no report. (Replaces the former -fold-ok action.) *)
   if !log_file = "" then begin
-    prerr_endline usage;
-    exit 2
+    if !fold then
+      match fold_and_commit !ignored_file !okd_dir with
+      | None ->
+          Printf.printf
+            "fold: %s absent and no fragments in %s, nothing to do\n"
+            !ignored_file !okd_dir
+      | Some (nk, nd, rew, nc) ->
+          Printf.printf
+            "fold: %s -> %d entr%s (%d wizard fragment%s committed, %d \
+             duplicate line%s merged)%s\n"
+            !ignored_file nk
+            (if nk = 1 then "y" else "ies")
+            nc
+            (if nc = 1 then "" else "s")
+            nd
+            (if nd = 1 then "" else "s")
+            (if rew then
+               Printf.sprintf "; previous file kept as %s.bak" !ignored_file
+             else "; unchanged")
+    else Printf.printf "nothing to do: no -in <log> given and -no-fold set\n";
+    exit 0
   end;
   if !base_url = "" then base_url := "http://localhost:2317/" ^ !base_name;
   if !out_file = "" then
-    out_file := Filename.concat !bases_dir (!base_name ^ "_warnings.html");
+    out_file := !bases_dir // (!base_name ^ "_warnings.html");
 
-  let cfg_file = Filename.concat !bases_dir (!base_name ^ ".cfg") in
+  let cfg_file = !bases_dir // (!base_name ^ ".cfg") in
   let cfg = read_config cfg_file in
   (* Commit per-wizard fragments into the ignored file and tidy it (unless
      -no-fold) BEFORE reading, so the report reflects every contribution and
      the file stays canonical; consumed fragments are archived. *)
-  (if not !no_fold then
+  (if !fold then
      match fold_and_commit !ignored_file !okd_dir with
      | Some (_, nd, rew, nc) when rew || nc > 0 ->
          let frag =
@@ -1427,6 +1670,26 @@ let () =
 
   (* warnings kept = not ignored *)
   let kept = List.filter (fun w -> not (is_ignored ign w)) warnings in
+
+  (* last modifier per person, from the base history — restricted to the
+     persons actually shown (kept warnings), so it stays cheap on a huge base *)
+  if !hist_days > 0 then begin
+    let want : (string, unit) Hashtbl.t = Hashtbl.create 4096 in
+    List.iter
+      (fun w ->
+        List.iter
+          (fun it ->
+            match it with
+            | WPerson p -> Hashtbl.replace want (person_key p) ()
+            | WFam (fa, mo) ->
+                Hashtbl.replace want (person_key fa) ();
+                Hashtbl.replace want (person_key mo) ()
+            | WFamIds _ -> ())
+          w.items)
+      kept;
+    history :=
+      read_history !bases_dir !base_name want (days_ago_stamp !hist_days)
+  end;
 
   (* extremes on kept warnings *)
   let extremes = make_extremes () in

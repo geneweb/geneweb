@@ -7,9 +7,9 @@
                 read-only. Never editable — hand-editing races with anoma's
                 fold and with the wizard fragments.
 
-     m=OK_FOLD  (wizard) consolidate on demand: run `anoma <base> -bd <bd>
-                -fold-ok`, folding the pending fragments into <base>.ok and
-                archiving them, then show the command output.
+     m=OK_FOLD  (wizard) consolidate on demand: run `anoma <base> -bd <bd>`
+                (no -in => fold only), folding the pending fragments into
+                <base>.ok and archiving them, then show the command output.
 
      m=ANOMA    serve the anomalies report through gwd, so it is same-origin
                 with the base and the wizard session cookie reaches Submit.
@@ -39,7 +39,7 @@ module Registration = Geneweb_register.Registration
 
 (* anoma is installed in the same directory as gwd, so derive its path from the
    running gwd executable — nothing to configure. m=OK_FOLD runs
-   `anoma <base> -bd <base_dir> -fold-ok`. (If your gwd is a symlink resolved
+   `anoma <base> -bd <base_dir>` (no -in => consolidate & exit). (If your gwd is a symlink resolved
    elsewhere, replace this with the absolute path to anoma.) *)
 let anoma_bin = Filename.concat (Filename.dirname Sys.executable_name) "anoma"
 
@@ -114,12 +114,42 @@ let append_fragment ~base_dir ~base ~wizard ~line =
 let report_path conf =
   Filename.concat (Secure.base_dir ()) (conf.bname ^ "_warnings.html")
 
+(* minimal JS-string escaping for a wizard login placed inside "..." *)
+let js_escape s =
+  let b = Buffer.create (String.length s) in
+  String.iter
+    (fun c ->
+      match c with
+      | '\\' -> Buffer.add_string b "\\\\"
+      | '"' -> Buffer.add_string b "\\\""
+      | '\n' | '\r' -> ()
+      | c -> Buffer.add_char b c)
+    s;
+  Buffer.contents b
+
+(* replace the first occurrence of [needle] in [hay] with [rep] *)
+let replace_first hay needle rep =
+  let hl = String.length hay and nl = String.length needle in
+  let rec find i =
+    if i + nl > hl then -1
+    else if String.sub hay i nl = needle then i
+    else find (i + 1)
+  in
+  let i = find 0 in
+  if i < 0 then hay
+  else String.sub hay 0 i ^ rep ^ String.sub hay (i + nl) (hl - i - nl)
+
 let anoma conf _ =
   (if not conf.wizard then Output.print_sstring conf "forbidden: wizard only\n"
    else
      let path = report_path conf in
      match try Some (read_whole_file path) with _ -> None with
      | Some html ->
+         (* tell the report which wizard is viewing, for the "me" filter *)
+         let html =
+           replace_first html "var GWWARN_ME=\"\""
+             (Printf.sprintf "var GWWARN_ME=\"%s\"" (js_escape conf.user))
+         in
          (* [BIND] send as a bare HTML page. If your gwd needs an explicit
             content-type/status, set it here before printing. *)
          Output.print_sstring conf html
@@ -218,7 +248,7 @@ let ok_file conf _ =
 (* ---- m=OK_FOLD : consolidate fragments on demand (wizard) ------------- *)
 
 (* Runs the tested anoma consolidation instead of duplicating it:
-     anoma <base> -bd <base_dir> -fold-ok
+     anoma <base> -bd <base_dir>          (no -in => fold only)
    which folds <base>.ok.d/*.ok into <base>.ok (claiming each atomically) and
    archives them. Command uses only server-side values (base name, base dir),
    never request input, so there is nothing to inject. *)
@@ -226,7 +256,8 @@ let ok_fold conf _ =
   if not conf.wizard then Output.print_sstring conf "forbidden: wizard only\n"
   else begin
     let cmd =
-      Printf.sprintf "%s %s -bd %s -fold-ok 2>&1" (Filename.quote anoma_bin)
+      (* no -in => anoma just consolidates the fragments and exits *)
+      Printf.sprintf "%s %s -bd %s 2>&1" (Filename.quote anoma_bin)
         (Filename.quote conf.bname)
         (Filename.quote (Secure.base_dir ()))
     in
