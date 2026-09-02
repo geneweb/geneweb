@@ -1,5 +1,6 @@
 open Geneweb
 module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 module Code = Geneweb_http.Code
 module Dirs = Geneweb_dirs
 
@@ -29,15 +30,15 @@ let debug = ref false
 let daemon = ref false
 let comm_log = Filename.concat (Filename.get_temp_dir_name ()) "comm.log"
 
-let printer_conf =
+let printer_conf conn =
   {
     Config.empty with
     output_conf =
       {
-        status = Server.http;
-        header = Server.header;
-        body = Server.print_string;
-        flush = Server.wflush;
+        status = Connection.http conn;
+        header = Connection.header conn;
+        body = Connection.print_string conn;
+        flush = (fun () -> Connection.wflush conn);
       };
   }
 
@@ -80,7 +81,8 @@ let transl conf w =
 let charset conf =
   try Hashtbl.find conf.lexicon "!charset" with Not_found -> "utf-8"
 
-let header_no_page_title conf title =
+let header_no_page_title conn conf title =
+  let printer_conf = printer_conf conn in
   Output.status printer_conf Code.OK;
   Output.header printer_conf "Content-type: text/html; charset=%s"
     (charset conf);
@@ -99,7 +101,8 @@ let abs_setup_dir () =
 let base_path name =
   if Filename.is_relative name then Filename.concat !bases_dir name else name
 
-let trailer _conf =
+let trailer conn _conf =
+  let printer_conf = printer_conf conn in
   Output.print_sstring printer_conf {|<br><div id="footer"><hr><div><em>|};
   Output.print_sstring printer_conf
     {|<a href="https://github.com/geneweb/geneweb/">|};
@@ -112,8 +115,9 @@ let trailer _conf =
   Output.print_sstring printer_conf
     "–  Copyright &copy;INRIA 1998-2006</em></div></div></body></html>"
 
-let header conf title =
-  header_no_page_title conf title;
+let header conn conf title =
+  let printer_conf = printer_conf conn in
+  header_no_page_title conn conf title;
   Output.print_sstring printer_conf "<h1>";
   title false;
   Output.print_sstring printer_conf "</h1>"
@@ -903,7 +907,8 @@ and for_all conf print list strm =
         if eol then print "\n")
   | _ -> ()
 
-let print_file conf bname =
+let print_file bname conn conf =
+  let printer_conf = printer_conf conn in
   match Statics.read ("lang/" ^ bname) with
   | Some content ->
       Output.status printer_conf Code.OK;
@@ -912,17 +917,19 @@ let print_file conf bname =
       copy_from_stream conf
         (Output.print_sstring printer_conf)
         (Stream.of_string content);
-      trailer conf
+      trailer conn conf
   | None ->
       let title _ = Output.print_sstring printer_conf "Error" in
-      header conf title;
+      header conn conf title;
       Output.printf printer_conf "<ul><li>Unknown page \"%s\".</ul>\n" bname;
-      trailer conf
+      trailer conn conf
 
-let error conf str =
-  header conf (fun _ -> Output.print_sstring printer_conf "Incorrect request");
+let error str conn conf =
+  let printer_conf = printer_conf conn in
+  header conn conf (fun _ ->
+      Output.print_sstring printer_conf "Incorrect request");
   Output.printf printer_conf "<em>%s</em>\n" (String.capitalize_ascii str);
-  trailer conf
+  trailer conn conf
 
 let infer_rc conf rc =
   if not Sys.unix then
@@ -968,12 +975,12 @@ let basename s =
   in
   loop (String.length s - 1)
 
-let setup_gen conf =
+let setup_gen conn conf =
   match p_getenv conf.env "v" with
-  | Some fname -> print_file conf (basename fname)
-  | _ -> error conf "request needs \"v\" parameter"
+  | Some fname -> print_file (basename fname) conn conf
+  | _ -> error "request needs \"v\" parameter" conn conf
 
-let simple conf =
+let simple conn conf =
   let ged =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
@@ -999,12 +1006,14 @@ let simple conf =
       lexicon = conf.lexicon;
     }
   in
-  if ged <> "" && not (Sys.file_exists ged) then print_file conf "err_unkn.htm"
-  else if out_file = "" then print_file conf "err_miss.htm"
-  else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "create.htm"
+  if ged <> "" && not (Sys.file_exists ged) then
+    print_file "err_unkn.htm" conn conf
+  else if out_file = "" then print_file "err_miss.htm" conn conf
+  else if not (Mutil.good_name out_file) then
+    print_file "err_name.htm" conn conf
+  else print_file "create.htm" conn conf
 
-let gwc_or_ged2gwb out_name_of_in_name conf =
+let gwc_or_ged2gwb out_name_of_in_name conn conf =
   let fname =
     match p_getenv conf.env "fname" with Some f -> strip_spaces f | None -> ""
   in
@@ -1026,19 +1035,20 @@ let gwc_or_ged2gwb out_name_of_in_name conf =
   let conf = conf_with_env conf "body_prop" "" in
   let conf = conf_with_env conf "fname" "" in
   let conf = conf_with_env conf "o" out_file in
-  if in_file = "" || out_file = "" then print_file conf "err_miss.htm"
+  if in_file = "" || out_file = "" then print_file "err_miss.htm" conn conf
   else if (not (Sys.file_exists in_file)) && not (String.contains fname '*')
-  then print_file conf "err_unkn.htm"
-  else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "create.htm"
+  then print_file "err_unkn.htm" conn conf
+  else if not (Mutil.good_name out_file) then
+    print_file "err_name.htm" conn conf
+  else print_file "create.htm" conn conf
 
-let gwc_check conf =
+let gwc_check conn conf =
   let conf = { conf with env = ("nofail", "on") :: conf.env } in
-  gwc_or_ged2gwb out_name_of_gw conf
+  gwc_or_ged2gwb out_name_of_gw conn conf
 
 let ged2gwb_check conf = gwc_or_ged2gwb out_name_of_ged conf
 
-let gwc conf =
+let gwc conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "gwc") in
     exec_f conf (comm ^ parameters conf.env)
@@ -1047,57 +1057,60 @@ let gwc conf =
   (try Sys.remove gwo with Sys_error _ -> ());
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm"
-  else print_file conf "create_ok.htm"
+  if rc > 1 then print_file "err_standard.htm" conn conf
+  else print_file "create_ok.htm" conn conf
 
-let gwdiff_check conf = print_file conf "confirm.htm"
+let gwdiff_check conn conf = print_file "confirm.htm" conn conf
 
-let gwdiff ok_file conf =
+let gwdiff ok_file conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f conf (comm ^ parameters conf.env)
   in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  if rc > 1 then print_file "err_standard.htm" conn conf
+  else print_file ok_file conn conf
 
-let gwfixbase_check conf = print_file conf "confirm.htm"
+let gwfixbase_check conn conf = print_file "confirm.htm" conn conf
 
-let gwfixbase ok_file conf =
+let gwfixbase ok_file conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f conf (comm ^ parameters conf.env)
   in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  if rc > 1 then print_file "err_standard.htm" conn conf
+  else print_file ok_file conn conf
 
-let cache_files_check conf =
+let cache_files_check conn conf =
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
-  if in_base = "" then print_file conf "err_miss.htm"
-  else print_file conf "confirm.htm"
+  if in_base = "" then print_file "err_miss.htm" conn conf
+  else print_file "confirm.htm" conn conf
 
-let cache_files ok_file conf =
+let cache_files ok_file conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "cache_files") ^ " " in
     exec_f conf (comm ^ parameters conf.env)
   in
   flush stderr;
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  if rc > 1 then print_file "err_standard.htm" conn conf
+  else print_file ok_file conn conf
 
-let connex_check conf = print_file conf "confirm.htm"
+let connex_check conn conf = print_file "confirm.htm" conn conf
 
-let connex ok_file conf =
+let connex ok_file conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "connex") in
     exec_f conf (comm ^ " " ^ parameters conf.env)
   in
-  if rc <> 0 then print_file conf "err_standard.htm"
-  else print_file conf ok_file
+  if rc <> 0 then print_file "err_standard.htm" conn conf
+  else print_file ok_file conn conf
 
-let gwu_or_gwb2ged_check suffix conf =
+let gwu_or_gwb2ged_check suffix conn conf =
   let in_file =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
@@ -1129,45 +1142,45 @@ let gwu_or_gwb2ged_check suffix conf =
   let conf = conf_with_env conf "od" "" in
   let conf = conf_with_env conf "odir" odir in
   let conf = conf_with_env conf "o" out_file in
-  if in_file = "" then print_file conf "err_miss.htm"
-  else print_file conf "confirm.htm"
+  if in_file = "" then print_file "err_miss.htm" conn conf
+  else print_file "confirm.htm" conn conf
 
-let gwb2ged_or_gwu_1 ok_file conf =
+let gwb2ged_or_gwu_1 ok_file conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f conf (comm ^ parameters conf.env)
   in
-  if rc > 1 then print_file conf "err_standard.htm"
+  if rc > 1 then print_file "err_standard.htm" conn conf
   else
     let conf =
       conf_with_env conf "o" (Filename.basename (s_getenv conf.env "o"))
     in
-    print_file conf ok_file
+    print_file ok_file conn conf
 
 let gwu_check = gwu_or_gwb2ged_check ".gw"
 let gwu = gwb2ged_or_gwu_1 "gwu_ok.htm"
 let gwb2ged_check = gwu_or_gwb2ged_check ".ged"
 let gwb2ged = gwb2ged_or_gwu_1 "gwb2ged_ok.htm"
 
-let check_anon_base conf =
+let check_anon_base conn conf =
   let in_f =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
-  if in_f = "" then print_file conf "err_miss.htm"
-  else print_file conf "confirm.htm"
+  if in_f = "" then print_file "err_miss.htm" conn conf
+  else print_file "confirm.htm" conn conf
 
 let consang_check = check_anon_base
 let update_nldb_check = check_anon_base
 
-let cleanup conf =
+let cleanup conn conf =
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
   let conf = { conf with comm = "." } in
-  if in_base = "" then print_file conf "err_miss.htm"
-  else print_file conf "cleanup1.htm"
+  if in_base = "" then print_file "err_miss.htm" conn conf
+  else print_file "cleanup1.htm" conn conf
 
-let cleanup_1 conf =
+let cleanup_1 conn conf =
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
@@ -1212,42 +1225,43 @@ let cleanup_1 conf =
   flush stderr;
   if rc > 1 then
     let conf = { conf with comm = "gwc" } in
-    print_file conf "err_standard.htm"
-  else print_file conf "create_ok.htm"
+    print_file "err_standard.htm" conn conf
+  else print_file "create_ok.htm" conn conf
 
-let rec check_new_names conf l1 l2 =
+let rec check_new_names l1 l2 conn conf =
   match (l1, l2) with
   | (k, v) :: l, x :: m ->
       if k <> x then (
         Printf.eprintf "Mismatch: k (%s) <> x (%s)\n" k x;
         flush stderr;
-        print_file conf "err_outd.htm";
+        print_file "err_outd.htm" conn conf;
         raise Exit)
       else if not (Mutil.good_name v) then (
         let conf = { conf with env = ("o", v) :: conf.env } in
         Printf.eprintf "Bad name: (%s)\n" v;
         flush stderr;
-        print_file conf "err_name.htm";
+        print_file "err_name.htm" conn conf;
         raise Exit)
-      else check_new_names conf l m
+      else check_new_names l m conn conf
   | [], [] -> ()
   | _ ->
       Printf.eprintf "Bad exit (l1:%d, l2:%d)\n" (List.length l1)
         (List.length l2);
       flush stderr;
-      print_file conf "err_outd.htm";
+      print_file "err_outd.htm" conn conf;
       raise Exit
 
-let rec check_rename_conflict conf = function
+let rec check_rename_conflict l conn conf =
+  match l with
   | x :: l ->
       if List.mem x l then (
         let conf = { conf with env = ("o", x) :: conf.env } in
-        print_file conf "err_cnfl.htm";
+        print_file "err_cnfl.htm" conn conf;
         raise Exit)
-      else check_rename_conflict conf l
+      else check_rename_conflict l conn conf
   | [] -> ()
 
-let rename conf =
+let rename conn conf =
   GWPARAM.init ();
   flush stderr;
   let rename_list =
@@ -1285,8 +1299,8 @@ let rename conf =
       files
   in
   try
-    check_new_names conf rename_list (all_db !bases_dir);
-    check_rename_conflict conf (snd (List.split rename_list));
+    check_new_names rename_list (all_db !bases_dir) conn conf;
+    check_rename_conflict (snd (List.split rename_list)) conn conf;
     List.iter
       (fun (k, v) ->
         if k <> v then begin
@@ -1314,38 +1328,40 @@ let rename conf =
             raise Exit
         end)
       rename_list;
-    print_file conf "rename_ok.htm"
+    print_file "rename_ok.htm" conn conf
   with
   | Exit ->
       Printf.eprintf "Failed renaming\n";
       flush stderr;
       (*raise Exit  Re-raise to signal failure to caller *)
-      print_file conf "err_standard.htm"
+      print_file "err_standard.htm" conn conf
   | Sys_error msg ->
       Printf.eprintf "System error during renaming: %s\n" msg;
       flush stderr;
       (* raise Exit *)
-      print_file conf "err_standard.htm"
+      print_file "err_standard.htm" conn conf
 
-let delete conf = print_file conf "delete_1.htm"
+let delete conn conf = print_file "delete_1.htm" conn conf
 
-let delete_1 conf =
+let delete_1 conn conf =
   List.iter
     (fun (k, v) -> if v = "del" then Mutil.rm_rf (base_path (k ^ ".gwb")))
     conf.env;
-  print_file conf "delete_ok.htm"
+  print_file "delete_ok.htm" conn conf
 
-let merge conf =
+let merge conn conf =
   let out_file =
     match p_getenv conf.env "o" with Some f -> strip_spaces f | _ -> ""
   in
   let conf = { conf with comm = "merge" } in
   let bases = selected conf.env in
-  if out_file = "" || List.length bases < 2 then print_file conf "err_miss.htm"
-  else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "merge_1.htm"
+  if out_file = "" || List.length bases < 2 then
+    print_file "err_miss.htm" conn conf
+  else if not (Mutil.good_name out_file) then
+    print_file "err_name.htm" conn conf
+  else print_file "merge_1.htm" conn conf
 
-let merge_1 conf =
+let merge_1 conn conf =
   let out_file =
     match p_getenv conf.env "o" with Some f -> strip_spaces f | _ -> ""
   in
@@ -1386,15 +1402,15 @@ let merge_1 conf =
       exec_f conf c
   in
   List.iter (fun (_, gw) -> try Sys.remove gw with Sys_error _ -> ()) gw_temps;
-  if rc > 1 then print_file conf "err_standard.htm"
-  else print_file conf "create_ok.htm"
+  if rc > 1 then print_file "err_standard.htm" conn conf
+  else print_file "create_ok.htm" conn conf
 
-let gwf conf =
+let gwf conn conf =
   GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
-  if in_base = "" then print_file conf "err_miss.htm"
+  if in_base = "" then print_file "err_miss.htm" conn conf
   else
     let benv = loc_read_base_env in_base in
     let trailer =
@@ -1406,9 +1422,9 @@ let gwf conf =
         |> fun s -> (s :> string)
     in
     let conf = { conf with env = benv @ (("trailer", trailer) :: conf.env) } in
-    print_file conf "gwf_1.htm"
+    print_file "gwf_1.htm" conn conf
 
-let gwf_1 conf =
+let gwf_1 conn conf =
   GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
@@ -1457,34 +1473,37 @@ let gwf_1 conf =
        output_string oc "\n";
        close_out oc
    with Sys_error _ -> ());
-  print_file conf "gwf_ok.htm"
+  print_file "gwf_ok.htm" conn conf
 
-let ged2gwb conf =
+let ged2gwb conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f conf (comm ^ " -fne '\"\"'" ^ parameters conf.env)
   in
-  if rc > 1 then print_file conf "err_standard.htm"
+  if rc > 1 then print_file "err_standard.htm" conn conf
   else
     let bname = try List.assoc "o" conf.env with Not_found -> "" in
     Util.print_default_gwf_file bname;
-    print_file conf "create_ok.htm"
+    print_file "create_ok.htm" conn conf
 
-let consang conf ok_file =
+let consang ok_file conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f conf (comm ^ parameters conf.env)
   in
-  if rc > 1 then print_file conf "err_consang.htm" else print_file conf ok_file
+  if rc > 1 then print_file "err_consang.htm" conn conf
+  else print_file ok_file conn conf
 
-let update_nldb conf ok_file =
+let update_nldb ok_file conn conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f conf (comm ^ parameters conf.env)
   in
-  if rc > 1 then print_file conf "err_standard.htm" else print_file conf ok_file
+  if rc > 1 then print_file "err_standard.htm" conn conf
+  else print_file ok_file conn conf
 
-let print_typed_file conf typ fname =
+let print_typed_file conn conf typ fname =
+  let printer_conf = printer_conf conn in
   match Statics.read fname with
   | Some content ->
       Output.status printer_conf Code.OK;
@@ -1493,15 +1512,15 @@ let print_typed_file conf typ fname =
       Output.printf printer_conf "%s" content
   | None ->
       let title _ = Output.print_sstring printer_conf "Error" in
-      header conf title;
+      header conn conf title;
       Output.print_sstring printer_conf "<ul><li>";
       Output.print_sstring printer_conf "Cannot access file \"";
       Output.print_string printer_conf (Util.escape_html fname);
       Output.print_sstring printer_conf "\".</ul>";
-      trailer conf;
+      trailer conn conf;
       raise Exit
 
-let raw_file conf fname =
+let raw_file fname conn conf =
   let typ =
     if Filename.check_suffix fname ".png" then "image/png"
     else if Filename.check_suffix fname ".jpg" then "image/jpeg"
@@ -1509,58 +1528,52 @@ let raw_file conf fname =
     else if Filename.check_suffix fname ".css" then "text/css"
     else "text/html"
   in
-  print_typed_file conf typ fname
+  print_typed_file conn conf typ fname
 
-let with_opt_check check_fn run_fn conf =
+let with_opt_check check_fn run_fn conn conf =
   match p_getenv conf.env "opt" with
-  | Some "check" -> check_fn conf
-  | _ -> run_fn conf
+  | Some "check" -> check_fn conn conf
+  | _ -> run_fn conn conf
 
-let setup_comm_ok conf = function
-  | "gwsetup" -> setup_gen conf
-  | "simple" -> simple conf
-  | "cleanup" -> cleanup conf
-  | "cleanup_1" -> cleanup_1 conf
-  | "rename" -> rename conf
-  | "delete" -> delete conf
-  | "delete_1" -> delete_1 conf
-  | "merge" -> merge conf
-  | "merge_1" -> merge_1 conf
-  | "gwf" -> gwf conf
-  | "gwf_1" -> gwf_1 conf
-  | "gwc" -> with_opt_check gwc_check gwc conf
-  | "gwu" -> with_opt_check gwu_check gwu conf
-  | "ged2gwb" -> with_opt_check ged2gwb_check ged2gwb conf
-  | "gwb2ged" -> with_opt_check gwb2ged_check gwb2ged conf
-  | "consang" ->
-      with_opt_check consang_check (fun c -> consang c "consang_ok.htm") conf
+let setup_comm_ok s =
+  match s with
+  | "gwsetup" -> setup_gen
+  | "simple" -> simple
+  | "cleanup" -> cleanup
+  | "cleanup_1" -> cleanup_1
+  | "rename" -> rename
+  | "delete" -> delete
+  | "delete_1" -> delete_1
+  | "merge" -> merge
+  | "merge_1" -> merge_1
+  | "gwf" -> gwf
+  | "gwf_1" -> gwf_1
+  | "gwc" -> with_opt_check gwc_check gwc
+  | "gwu" -> with_opt_check gwu_check gwu
+  | "ged2gwb" -> with_opt_check ged2gwb_check ged2gwb
+  | "gwb2ged" -> with_opt_check gwb2ged_check gwb2ged
+  | "consang" -> with_opt_check consang_check (consang "consang_ok.htm")
   | "update_nldb" ->
-      with_opt_check update_nldb_check
-        (fun c -> update_nldb c "update_nldb_ok.htm")
-        conf
+      with_opt_check update_nldb_check (update_nldb "update_nldb_ok.htm")
   | "cache_files" ->
-      with_opt_check cache_files_check
-        (fun c -> cache_files "cache_files_ok.htm" c)
-        conf
-  | "connex" ->
-      with_opt_check connex_check (fun c -> connex "connex_ok.htm" c) conf
-  | "gwdiff" ->
-      with_opt_check gwdiff_check (fun c -> gwdiff "gwdiff_ok.htm" c) conf
-  | "gwfixbase" ->
-      with_opt_check gwfixbase_check (fun c -> gwfixbase "gwfix_ok.htm" c) conf
+      with_opt_check cache_files_check (cache_files "cache_files_ok.htm")
+  | "connex" -> with_opt_check connex_check (connex "connex_ok.htm")
+  | "gwdiff" -> with_opt_check gwdiff_check (gwdiff "gwdiff_ok.htm")
+  | "gwfixbase" -> with_opt_check gwfixbase_check (gwfixbase "gwfix_ok.htm")
   | x ->
       if
         String.starts_with ~prefix:"doc/" x
         || String.starts_with ~prefix:"images/" x
         || String.starts_with ~prefix:"css/" x
-      then raw_file conf x
-      else error conf ("bad command: \"" ^ x ^ "\"")
+      then raw_file x
+      else error ("bad command: \"" ^ x ^ "\"")
 
-let setup_comm conf comm =
+let setup_comm comm conn conf =
   match p_getenv conf.env "cancel" with
   | Some _ ->
-      setup_gen { conf with env = [ ("lang", conf.lang); ("v", "main.htm") ] }
-  | None -> setup_comm_ok conf comm
+      setup_gen conn
+        { conf with env = [ ("lang", conf.lang); ("v", "main.htm") ] }
+  | None -> setup_comm_ok comm conn conf
 
 (* FIXME: This module mimics the in_channel behavior for strings to avoid
    rewriting the input_lexicon parser. We must rewrite it in another PR. *)
@@ -1661,7 +1674,7 @@ let input_lexicon lang =
         close_in ic;
         raise e)
 
-let setup (_addr, req) comm (env_str : Adef.encoded_string) =
+let setup conn (_addr, req) comm (env_str : Adef.encoded_string) =
   let conf =
     let env = create_env env_str in
     if env = [] && (comm = "" || String.length comm = 2) then
@@ -1681,15 +1694,16 @@ let setup (_addr, req) comm (env_str : Adef.encoded_string) =
   in
   (* FIXME lang is a conf variable rather that env variable!! *)
   let conf = conf_with_env conf "lang" conf.lang in
-  if conf.comm = "" then print_file conf "welcome.htm" else setup_comm conf comm
+  if conf.comm = "" then print_file "welcome.htm" conn conf
+  else setup_comm comm conn conf
 
-let wrap_setup a b (c : Adef.encoded_string) =
+let wrap_setup conn a b (c : Adef.encoded_string) =
   if not Sys.unix then (
     (try default_lang := Sys.getenv "GWLANG" with Not_found -> ());
     (try setup_dir := Sys.getenv "GWGD" with Not_found -> ());
     (try bin_dir := Sys.getenv "GWGD" with Not_found -> ());
     try bases_dir := Sys.getenv "GWBD" with Not_found -> ());
-  try setup a b c with Exit -> ()
+  try setup conn a b c with Exit -> ()
 
 let copy_text lang =
   let lexicon = input_lexicon lang in
@@ -1837,6 +1851,6 @@ let () =
   (* FIXME: this hack is necessary to avoid a cyclic dependency between
      `geneweb` and `geneweb-http`. We must remove it after refactoring
      the encoded string subsystem. *)
-  let wrap_setup x y z = wrap_setup x y (Adef.encoded z) in
+  let wrap_setup conn x y z = wrap_setup conn x y (Adef.encoded z) in
   Server.start ~addr:!interface ~port:!port ~max_pending_requests:150
     ~n_workers:1 wrap_setup

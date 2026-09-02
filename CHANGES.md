@@ -12,6 +12,10 @@
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
   IPv6 loopback only on Windows.
 
+## Deprecated features
+- The CGI mode inferred by the environment variable `QUERY_STRING` is
+  deprecated.
+
 ## Breaking changes
 - Deprecate the multi-parents feature (#2726)
 - The `gwd.arg` is ignored and a warning is printed if there is such a

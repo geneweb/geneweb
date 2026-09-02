@@ -7,9 +7,10 @@ module Gutil = Geneweb_db.Gutil
 module Registration = Geneweb_register.Registration
 module Code = Geneweb_http.Code
 module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
 
 let w_lock =
-  Gwd_lib.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf)
+  Gwd_lib.Request.w_lock ~onerror:(fun _conn conf _ -> Update.error_locked conf)
 
 let w_base =
   Gwd_lib.Request.w_base ~none:(fun conf ->
@@ -19,7 +20,7 @@ let w_base =
 let getenv var env = List.assoc var env |> Mutil.decode
 let getenv_opt var env = List.assoc_opt var env |> Option.map Mutil.decode
 
-let export conf base =
+let export conn conf base =
   assert conf.wizard;
   match
     match getenv_opt "output" conf.env with
@@ -120,10 +121,11 @@ let export conf base =
       in
       let source = getenv_opt "source" conf.env in
       let isolated = getenv_opt "isolated" conf.env <> Some "off" in
+      let close_connection () = Connection.close conn in
       let opts =
         {
           Gwexport.default_opts with
-          oc = (fname, Output.print_sstring conf, Server.close_connection);
+          oc = (fname, Output.print_sstring conf, close_connection);
           no_notes;
           no_picture = getenv_opt "pictures" conf.env = Some "off";
           source;
@@ -132,9 +134,9 @@ let export conf base =
       let select =
         ((fun i -> Iper.Set.mem i ipers), fun i -> Ifam.Set.mem i ifams)
       in
-      Server.http Code.OK;
-      Server.header "Content-type: text/plain";
-      Server.header
+      Connection.http conn Code.OK;
+      Connection.header conn "Content-type: text/plain";
+      Connection.header conn
         (Printf.sprintf "Content-disposition: attachment; filename=\"%s\"" fname);
       (match output with
       | `ged -> Gwb2gedLib.gwb2ged base false opts select
@@ -143,7 +145,7 @@ let export conf base =
           Output.print_sstring conf "encoding: utf-8\n";
           Output.print_sstring conf "gwplus\n\n";
           GwuLib.gwu opts isolated base "" "" (Hashtbl.create 0) select);
-      Server.wflush ();
+      Connection.wflush conn;
       true
 
 let () =

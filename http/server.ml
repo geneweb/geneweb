@@ -9,14 +9,13 @@ let timestamp = Logs.Tag.(empty |> add timestamp_tag ())
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
-type handler = Unix.sockaddr * string list -> string -> string -> unit
+type handler = unit -> Unix.sockaddr * string list -> string -> string -> unit
 
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
 
 (* global parameters set by command arguments *)
 let stop_server = ref "STOP_SERVER"
-let cgi = ref false
 
 (* state of a connection request *)
 let connection_closed = ref false
@@ -27,6 +26,7 @@ let wserver_oc = ref stdout
 let wsocket () = !wserver_sock
 let woc () = !wserver_oc
 let wflush () = flush !wserver_oc
+let is_cgi = ref false
 
 let skip_possible_remaining_chars fd =
   let b = Bytes.create 3 in
@@ -65,9 +65,9 @@ let printing_state = ref Nothing
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
   printing_state := Status;
-  if status <> Code.OK || not !cgi then (
+  if status <> Code.OK || not !is_cgi then (
     let answer = Code.to_string status in
-    if !cgi then (
+    if !is_cgi then (
       output_string !wserver_oc "Status: ";
       output_string !wserver_oc answer)
     else (
@@ -185,7 +185,7 @@ let treat_connection callback client_addr client_socket =
     in
     (request, path, query)
   in
-  callback (client_addr, request) path query
+  callback () (client_addr, request) path query
 
 let buff = Bytes.create 1024
 

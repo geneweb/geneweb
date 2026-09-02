@@ -4,6 +4,7 @@ open Config
 open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Connection = Geneweb_http.Connection
 
 let wiz_dir conf base =
   Filename.concat (Util.bpath conf.bname) (Driver.base_wiznotes_dir base)
