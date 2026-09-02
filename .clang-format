@@ -1,0 +1,5 @@
+BasedOnStyle: GNU
+AlwaysBreakAfterDefinitionReturnType: All
+BreakBeforeBinaryOperators: None
+SpaceAfterCStyleCast: true
+PointerAlignment: Right

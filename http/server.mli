@@ -76,13 +76,6 @@ val wsocket : unit -> Unix.file_descr
 val woc : unit -> out_channel
 (** Return the out_channel associated to the socket *)
 
-val sock_in : string ref
-(** Names of the files used in windows implementation to communicate http
-    requests and html answers. Default "wserver.sin" and "wserver.sou". Can have
-    relative or absolute paths. *)
-
-val sock_out : string ref
-
 val stop_server : string ref
 (** Name of the file whose presence tells the server to stop (at least one
     request is necessary to unfreeze the server to make it check that this file
