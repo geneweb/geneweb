@@ -1,6 +1,7 @@
 (* anoma.ml — GeneWeb anomalies analyzer.
-   Reads a warning log produced when rebuilding a GeneWeb base, a per-base
-   configuration file <bases_dir>/<basename>.cfg (WarningName=yes/no), and an
+   Reads a warning log produced when rebuilding a GeneWeb base, a curated
+   default enable-set embedded in the binary (config.txt, WarningName=yes/no)
+   overlaid by the per-base <bases_dir>/<basename>.cfg when present, and an
    "ignored" file of already-verified persons/families. Produces an HTML
    report with statistics, "extreme" statistics, and per-warning-type sorted
    unique lists of persons/families, each person linking to the base.
@@ -62,6 +63,8 @@ let wizard = ref true
 let fold = ref true
 let ignore_base = ref false
 let hist_days = ref 8
+let lang = ref "en"
+let lex_file = ref ""
 
 let usage =
   "usage: gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored>] \
@@ -106,6 +109,13 @@ let speclist =
       Arg.Set_int hist_days,
       "<days>  read base history modified within the last <days> days for \
        last-modifier / per-wizard filter (default 8; 0 disables)" );
+    ( "-lang",
+      Arg.Set_string lang,
+      "<lang>  language for the report's headers and buttons (default en)" );
+    ( "-lex",
+      Arg.Set_string lex_file,
+      "<file>  override the built-in lexicon with an external one (GeneWeb \
+       format); default is the copy embedded in the binary" );
   ]
 
 (* ------------------------------------------------------------------ *)
@@ -716,25 +726,33 @@ let resolve_dup_families warnings =
 (* Configuration file: <bases_dir>/<basename>.cfg                      *)
 (* ------------------------------------------------------------------ *)
 
-let read_config file =
+let parse_config_line tbl line =
+  let line = String.trim line in
+  if line <> "" && line.[0] <> '#' then
+    match String.index_opt line '=' with
+    | Some i ->
+        let k = String.trim (String.sub line 0 i) in
+        let v =
+          String.lowercase_ascii
+            (String.trim (String.sub line (i + 1) (String.length line - i - 1)))
+        in
+        Hashtbl.replace tbl k (v = "yes")
+    | None -> ()
+
+let read_config_lines lines =
   let tbl = Hashtbl.create 40 in
-  if Sys.file_exists file then
-    List.iter
-      (fun line ->
-        let line = String.trim line in
-        if line <> "" && line.[0] <> '#' then
-          match String.index_opt line '=' with
-          | Some i ->
-              let k = String.trim (String.sub line 0 i) in
-              let v =
-                String.lowercase_ascii
-                  (String.trim
-                     (String.sub line (i + 1) (String.length line - i - 1)))
-              in
-              Hashtbl.replace tbl k (v = "yes")
-          | None -> ())
-      (read_lines file);
+  List.iter (parse_config_line tbl) lines;
   tbl
+
+let read_config file =
+  if Sys.file_exists file then read_config_lines (read_lines file)
+  else Hashtbl.create 40
+
+(* overlay the entries of a per-base .cfg file onto an existing table, in place;
+   only the keys it lists are changed, so unlisted warnings keep the default *)
+let overlay_config tbl file =
+  if Sys.file_exists file then
+    List.iter (parse_config_line tbl) (read_lines file)
 
 (* a warning type absent from the configuration defaults to yes *)
 let cfg_yes cfg name =
@@ -1319,11 +1337,130 @@ let sort_uniq_items items =
   in
   List.sort (fun a b -> compare (item_sort_key a) (item_sort_key b)) items
 
+(* ------------------------------------------------------------------ *)
+(* Translation (same lexicon.txt format and lang/derived-lang fallback *)
+(* as setup.ml). Only the report's own headers and buttons are         *)
+(* translated — never the warning messages, which come from the log.   *)
+(* ------------------------------------------------------------------ *)
+
+let lexicon : (string, string) Hashtbl.t ref = ref (Hashtbl.create 1)
+
+(* look up a UI phrase; an unknown key shows as "[key]" so gaps are visible *)
+let transl w = try Hashtbl.find !lexicon w with Not_found -> "[" ^ w ^ "]"
+
+(* translated phrase, HTML-escaped for placing in element text *)
+let tr w = html_escape (transl w)
+
+(* translated phrase, escaped for a JS double-quoted string literal *)
+let trj w =
+  let s = transl w in
+  let b = Buffer.create (String.length s + 4) in
+  String.iter
+    (fun c ->
+      match c with
+      | '\\' -> Buffer.add_string b "\\\\"
+      | '"' -> Buffer.add_string b "\\\""
+      | '\n' | '\r' -> ()
+      | c -> Buffer.add_char b c)
+    s;
+  Buffer.contents b
+
+(* Parse a GeneWeb lexicon (given as text) for [lang]. Format: each entry starts
+   with a key line indented by exactly 4 spaces, followed by "lang: translation"
+   lines; entries separated by blank lines. A physical line ending in '\'
+   continues on the next (segments joined by a single space). [lang]'s part
+   before '-' is the derived language, a fallback when the exact lang is absent.
+   Same format and logic as setup.ml's input_lexicon, over a string rather than
+   an in_channel (the text is embedded in the binary — see lexicon_source). *)
+let input_lexicon lang content =
+  let t : (string, string) Hashtbl.t = Hashtbl.create 501 in
+  let derived_lang =
+    match String.index_opt lang '-' with
+    | Some i -> String.sub lang 0 i
+    | None -> ""
+  in
+  let cur = ref (String.split_on_char '\n' content) in
+  let next_line () =
+    match !cur with
+    | [] -> raise End_of_file
+    | l :: tl ->
+        cur := tl;
+        l
+  in
+  let rtrim s =
+    let n = ref (String.length s) in
+    while !n > 0 && (s.[!n - 1] = ' ' || s.[!n - 1] = '\t') do
+      decr n
+    done;
+    String.sub s 0 !n
+  in
+  let input_logical_line () =
+    let buf = Buffer.create 80 in
+    let rec loop first =
+      let line = next_line () in
+      let line = if first then line else String.trim line in
+      let len = String.length line in
+      if len > 0 && line.[len - 1] = '\\' then begin
+        Buffer.add_string buf (rtrim (String.sub line 0 (len - 1)));
+        Buffer.add_char buf ' ';
+        loop false
+      end
+      else Buffer.add_string buf line
+    in
+    loop true;
+    Buffer.contents buf
+  in
+  (try
+     while true do
+       let k =
+         let rec find_key line =
+           if String.length line < 4 || String.sub line 0 4 <> "    " then
+             find_key (input_logical_line ())
+           else line
+         in
+         find_key (input_logical_line ())
+       in
+       let k = String.sub k 4 (String.length k - 4) in
+       let rec loop line =
+         match String.index_opt line ':' with
+         | Some i ->
+             let line_lang = String.sub line 0 i in
+             (if
+                line_lang = lang
+                || (line_lang = derived_lang && not (Hashtbl.mem t k))
+              then
+                let v =
+                  if i + 1 = String.length line then ""
+                  else String.sub line (i + 2) (String.length line - i - 2)
+                in
+                Hashtbl.add t k v);
+             loop (input_logical_line ())
+         | None -> ()
+       in
+       loop (input_logical_line ())
+     done
+   with End_of_file -> ());
+  t
+
+(* The lexicon text: the copy embedded in the binary by ocaml-crunch (exactly
+   like gwsetup's Statics), so there is no runtime file to deploy or locate. A
+   -lex <file> overrides it with an external file, handy for testing a
+   translation without rebuilding. *)
+let lexicon_source () =
+  match !lex_file with
+  | "" -> (
+      match Statics.read "lang/lexicon.txt" with Some s -> s | None -> "")
+  | f ->
+      let ic = open_in_bin f in
+      Fun.protect
+        ~finally:(fun () -> try close_in ic with Sys_error _ -> ())
+        (fun () -> really_input_string ic (in_channel_length ic))
+
 let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
     ~input oc =
   let pf fmt = Printf.fprintf oc fmt in
   pf "<!DOCTYPE html>\n<html><head><meta charset=\"utf-8\">\n";
-  pf "<title>GeneWeb warnings — %s</title>\n" (html_escape basename);
+  pf "<title>%s — %s</title>\n" (tr "GeneWeb warnings") (html_escape basename);
   pf "<style>\n";
   pf "body{font-family:sans-serif;margin:2em;max-width:70em}\n";
   pf "table{border-collapse:collapse}\n";
@@ -1371,25 +1508,27 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
   pf "#igntray .ignhelp{font-size:.8em;color:#555}\n";
   pf "#igntray code{background:#f2f2f2;padding:0 .3em;border-radius:.2em}\n";
   pf "</style></head><body>\n";
-  pf "<h1>GeneWeb warnings — base <i>%s</i></h1>\n" (html_escape basename);
-  pf "<p class=muted>Generated %s%s%s</p>\n" (html_escape generated)
+  pf "<h1>%s — %s <i>%s</i></h1>\n" (tr "GeneWeb warnings") (tr "base")
+    (html_escape basename);
+  pf "<p class=muted>%s %s%s%s</p>\n" (tr "Generated") (html_escape generated)
     (match input with
     | Some (name, date) ->
-        Printf.sprintf " · from %s dated %s" (html_escape name)
-          (html_escape date)
+        Printf.sprintf " · %s %s %s %s" (tr "from") (html_escape name)
+          (tr "dated") (html_escape date)
     | None -> "")
     (* link to the read-only ignored-file view (wizard mode only, since m=OK_FILE
        is wizard-gated); relative to the base url with the _w wizard suffix *)
     (if !wizard then
-       Printf.sprintf " · <a href=\"%s\">ignored file</a>"
+       Printf.sprintf " · <a href=\"%s\">%s</a>"
          (html_escape (url ^ "_w?m=OK_FILE"))
+         (tr "ignored file")
      else "");
 
   (* --- statistics ------------------------------------------------- *)
-  pf "<h2>Statistics</h2>\n<table>\n";
-  pf
-    "<tr><th>Warning</th><th>Enabled</th><th>Total</th><th>Ignored \
-     (verified)</th><th>Remaining</th></tr>\n";
+  pf "<h2>%s</h2>\n<table>\n" (tr "Statistics");
+  pf "<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>\n"
+    (tr "Warning") (tr "Enabled") (tr "Total") (tr "Ignored (verified)")
+    (tr "Remaining");
   List.iter
     (fun t ->
       match Hashtbl.find_opt stats t with
@@ -1405,7 +1544,7 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
   pf "</table>\n";
 
   (* --- extreme statistics ----------------------------------------- *)
-  pf "<h2>Extreme statistics</h2>\n";
+  pf "<h2>%s</h2>\n" (tr "Extreme statistics");
   List.iter
     (fun e ->
       pf "<details><summary>%s (%d)</summary>\n" e.label (List.length e.hits);
@@ -1421,21 +1560,21 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
     extremes;
 
   (* --- per-warning-type lists ------------------------------------- *)
-  pf "<h2>Persons / families per warning</h2>\n";
-  pf
-    "<p class=muted>Only warnings enabled (=yes) in %s.cfg and not listed in \
-     the ignored file are shown. Lists are unique and sorted; each name opens \
-     the person in the base.</p>\n"
-    (html_escape basename);
+  pf "<h2>%s</h2>\n" (tr "Persons / families per warning");
+  (* the note carries one "%s" placeholder for the base name *)
+  pf "<p class=muted>%s</p>\n"
+    (Str.replace_first (Str.regexp_string "%s") (html_escape basename)
+       (transl "per-warning note"));
   (* per-wizard filter (populated from the history data on the items) *)
   if !hist_days > 0 then
     pf
-      "<div id=wizbar>Last modified by: <select id=wizsel><option \
-       value=\"\">(all)</option></select> <span id=wizcount \
-       class=muted></span> <span class=muted>(history: last %d \
-       day%s)</span></div>\n"
-      !hist_days
-      (if !hist_days = 1 then "" else "s");
+      "<div id=wizbar>%s <select id=wizsel><option \
+       value=\"\">%s</option></select> <span id=wizcount class=muted></span> \
+       <span class=muted>(%s)</span></div>\n"
+      (tr "Last modified by:") (tr "(all)")
+      (* the window carries one "%d" placeholder for the number of days *)
+      (Str.replace_first (Str.regexp_string "%d") (string_of_int !hist_days)
+         (transl "history window"));
   List.iter
     (fun t ->
       if enabled cfg t then begin
@@ -1467,22 +1606,29 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
                   pf
                     "<li%s>%s <button type=button class=ign data-key=\"%s\" \
                      data-code=\"%s\" \
-                     onclick=\"toggleIgn(this)\">ignore</button></li>\n"
+                     onclick=\"toggleIgn(this)\">%s</button></li>\n"
                     wa (item_html url it) (html_escape left) (html_escape code)
+                    (tr "ignore")
               | None -> pf "<li%s>%s</li>\n" wa (item_html url it))
             items;
           pf "</ul>\n";
           (* full warning texts for context *)
-          pf
-            "<details class=full><summary class=full>show full messages \
-             (%d)</summary><ul>\n"
-            (List.length ws);
+          pf "<details class=full><summary class=full>%s (%d)</summary><ul>\n"
+            (tr "show full messages") (List.length ws);
           List.iter (fun w -> pf "<li>%s</li>\n" (html_escape w.text)) ws;
           pf "</ul></details>\n";
           pf "</details>\n"
         end
       end)
     all_wtypes;
+
+  (* translated labels for the client-side scripts (dynamic button/status text),
+     so JS-set labels match the translated HTML ones *)
+  pf
+    "<script>var \
+     GWWARN_T={ignore:\"%s\",ignored:\"%s\",submit:\"%s\",submitting:\"%s\",showing:\"%s\",of:\"%s\",me:\"%s\",submitted:\"%s\",failed:\"%s\"};</script>\n"
+    (trj "ignore") (trj "ignored") (trj "Submit to base") (trj "submitting")
+    (trj "showing") (trj "of") (trj "me") (trj "submitted") (trj "failed");
 
   (* --- per-wizard filter script ----------------------------------- *)
   (* GWWARN_ME is the viewing wizard: left empty here, replaced by the m=ANOMA
@@ -1501,7 +1647,7 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
        ').forEach(function(w){if(w)set[w]=1;});});\n\
        function opt(v,t){var \
        o=document.createElement('option');o.value=v;o.textContent=t;sel.appendChild(o);}\n\
-       if(me){opt(me,'me ('+me+')');}\n\
+       if(me){opt(me,GWWARN_T.me+' ('+me+')');}\n\
        Object.keys(set).sort().forEach(function(w){if(w!==me)opt(w,w);});\n\
        function apply(){var w=sel.value;var shown=0,tot=0;\n\
        document.querySelectorAll('ul.wfilter>li').forEach(function(li){var \
@@ -1514,16 +1660,17 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
        label=d.getAttribute('data-label'),total=d.getAttribute('data-total');\n\
        var n=ul.querySelectorAll('li:not(.hidden)').length;\n\
        sm.textContent=w?(label+' ('+n+'/'+total+')'):(label+' ('+total+')');});\n\
-       cnt.textContent=w?('showing '+shown+' of '+tot):'';}\n\
+       cnt.textContent=w?(GWWARN_T.showing+' '+shown+' '+GWWARN_T.of+' \
+       '+tot):'';}\n\
        sel.onchange=apply;apply();\n\
        })();\n\
        </script>\n";
 
   (* --- persons with several warnings ------------------------------ *)
-  pf "<h2>Persons with several warnings</h2>\n";
-  if multi = [] then pf "<p class=muted>none</p>\n"
+  pf "<h2>%s</h2>\n" (tr "Persons with several warnings");
+  if multi = [] then pf "<p class=muted>%s</p>\n" (tr "none")
   else begin
-    pf "<table><tr><th>Person</th><th>Warnings</th></tr>\n";
+    pf "<table><tr><th>%s</th><th>%s</th></tr>\n" (tr "Person") (tr "Warnings");
     List.iter
       (fun (p, texts) ->
         pf "<tr><td>%s</td><td>%s</td></tr>\n" (person_link url p)
@@ -1534,31 +1681,25 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
 
   (* --- ignore-collector tray + script ----------------------------- *)
   pf "<div id=igntray>\n";
-  pf
-    "<div class=ignhdr>Ignore entries for <i>%s.ok</i> (<span \
-     id=igncount>0</span>)</div>\n"
-    (html_escape basename);
-  pf
-    "<textarea id=ignlist readonly rows=8 placeholder=\"click 'ignore' next to \
-     a name\"></textarea>\n";
+  pf "<div class=ignhdr>%s <i>%s.ok</i> (<span id=igncount>0</span>)</div>\n"
+    (tr "Ignore entries for") (html_escape basename);
+  pf "<textarea id=ignlist readonly rows=8 placeholder=\"%s\"></textarea>\n"
+    (tr "click ignore next to a name");
   pf "<div class=ignbtns>";
   if !wizard then
-    pf
-      "<button type=button id=ignsubmit data-submit=\"%s\">Submit to \
-       base</button>"
-      (html_escape (url ^ "_w"));
+    pf "<button type=button id=ignsubmit data-submit=\"%s\">%s</button>"
+      (html_escape (url ^ "_w"))
+      (tr "Submit to base");
   pf
-    "<button type=button id=igncopy>Copy</button><button type=button id=igndl \
-     data-base=\"%s\">Download</button><button type=button \
-     id=ignclear>Clear</button></div>\n"
-    (html_escape basename);
-  pf
-    "<div class=ignhelp>%sCopy/Download appends to <code>%s.ok</code> (or your \
-     wizard fragment).<span id=ignstatus></span></div>\n"
-    (if !wizard then
-       "Submit sends each entry to the base under your wizard login. "
-     else "")
-    (html_escape basename);
+    "<button type=button id=igncopy>%s</button><button type=button id=igndl \
+     data-base=\"%s\">%s</button><button type=button \
+     id=ignclear>%s</button></div>\n"
+    (tr "Copy") (html_escape basename) (tr "Download") (tr "Clear");
+  pf "<div class=ignhelp>%s%s<span id=ignstatus></span></div>\n"
+    (if !wizard then transl "submit note" ^ " " else "")
+    (* the note carries one "%s" placeholder for the base name *)
+    (Str.replace_first (Str.regexp_string "%s") (html_escape basename)
+       (transl "copy/download note"));
   pf "</div>\n";
   pf
     "<script>\n\
@@ -1573,29 +1714,29 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
      l=lines();count.textContent=l.length;list.value=l.join('\\n');tray.style.display=l.length?'block':'none';}\n\
      window.toggleIgn=function(b){var \
      k=b.getAttribute('data-key'),d=b.getAttribute('data-code'),c=picks.get(k);\n\
-     if(b.classList.contains('on')){if(c){c.delete(d);if(c.size===0)picks.delete(k);}b.classList.remove('on');b.textContent='ignore';}\n\
+     if(b.classList.contains('on')){if(c){c.delete(d);if(c.size===0)picks.delete(k);}b.classList.remove('on');b.textContent=GWWARN_T.ignore;}\n\
      else{if(!c){c=new \
      Set();picks.set(k,c);}c.add(d);b.classList.add('on');b.textContent='\\u2713 \
-     ignored';}\n\
+     '+GWWARN_T.ignored;}\n\
      render();};\n\
      document.getElementById('igncopy').onclick=function(){var \
      t=list.value;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).catch(function(){list.select();document.execCommand('copy');});else{list.select();document.execCommand('copy');}};\n\
      document.getElementById('igndl').onclick=function(){var b=new \
      Blob([list.value+'\\n'],{type:'text/plain'});var \
      a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=this.getAttribute('data-base')+'_ignore_additions.ok';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},0);};\n\
-     document.getElementById('ignclear').onclick=function(){picks.clear();document.querySelectorAll('button.ign.on').forEach(function(b){b.classList.remove('on');b.textContent='ignore';});render();};\n\
+     document.getElementById('ignclear').onclick=function(){picks.clear();document.querySelectorAll('button.ign.on').forEach(function(b){b.classList.remove('on');b.textContent=GWWARN_T.ignore;});render();};\n\
      var sb=document.getElementById('ignsubmit');\n\
      if(sb)sb.onclick=function(){var \
      ep=sb.getAttribute('data-submit');if(location.protocol==='http:'||location.protocol==='https:')ep=location.origin+location.pathname;/* \
      target the gwd that served us */var \
      st=document.getElementById('ignstatus');var \
-     pairs=[];picks.forEach(function(c,k){c.forEach(function(x){pairs.push([k,x]);});});if(!pairs.length)return;sb.disabled=true;sb.textContent='Submitting\\u2026';st.textContent='';var \
+     pairs=[];picks.forEach(function(c,k){c.forEach(function(x){pairs.push([k,x]);});});if(!pairs.length)return;sb.disabled=true;sb.textContent=GWWARN_T.submitting+'\\u2026';st.textContent='';var \
      ok=0,fail=0,done=0;pairs.forEach(function(p){var \
      u=ep+(ep.indexOf('?')<0?'?':'&')+'m=OK_ADD&key='+encodeURIComponent(p[0])+'&code='+encodeURIComponent(p[1]);fetch(u,{credentials:'include'}).then(function(r){if(!r.ok)throw \
      0;return \
-     r.text();}).then(function(){ok++;}).catch(function(){fail++;}).then(function(){done++;if(done===pairs.length){sb.disabled=false;sb.textContent='Submit \
-     to base';st.textContent=' submitted '+ok+(fail?(', '+fail+' \
-     failed'):'');if(!fail){picks.clear();document.querySelectorAll('button.ign.on').forEach(function(b){b.classList.remove('on');b.textContent='ignore';});render();}}});});};\n\
+     r.text();}).then(function(){ok++;}).catch(function(){fail++;}).then(function(){done++;if(done===pairs.length){sb.disabled=false;sb.textContent=GWWARN_T.submit;st.textContent=' \
+     '+GWWARN_T.submitted+' '+ok+(fail?(', '+fail+' \
+     '+GWWARN_T.failed):'');if(!fail){picks.clear();document.querySelectorAll('button.ign.on').forEach(function(b){b.classList.remove('on');b.textContent=GWWARN_T.ignore;});render();}}});});};\n\
      })();\n\
      </script>\n";
   pf "</body></html>\n"
@@ -1614,6 +1755,9 @@ let () =
     prerr_endline usage;
     exit 2
   end;
+  (* load the lexicon for the report's headers/buttons from the embedded copy
+     (or a -lex override); a missing key still shows as [key]. *)
+  lexicon := input_lexicon !lang (lexicon_source ());
   if !ignored_file = "" then ignored_file := !bases_dir // (!base_name ^ ".ok");
   if !okd_dir = "" then okd_dir := !ignored_file ^ ".d";
 
@@ -1664,7 +1808,16 @@ let () =
     out_file := !bases_dir // (!base_name ^ "_warnings.html");
 
   let cfg_file = !bases_dir // (!base_name ^ ".cfg") in
-  let cfg = read_config cfg_file in
+  (* Start from the curated default enable-set embedded in the binary
+     (config.txt, via ocaml-crunch), then overlay the per-base <base>.cfg if it
+     exists so it overrides only the warnings it lists. A key present in neither
+     still defaults to yes (cfg_yes). *)
+  let cfg =
+    match Statics.read "config.txt" with
+    | Some s -> read_config_lines (String.split_on_char '\n' s)
+    | None -> Hashtbl.create 40
+  in
+  overlay_config cfg cfg_file;
   (* Commit per-wizard fragments into the ignored file and tidy it (unless
      -no-fold) BEFORE reading, so the report reflects every contribution and
      the file stays canonical; consumed fragments are archived. *)
