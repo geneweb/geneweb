@@ -1,0 +1,8 @@
+(library
+ (package geneweb-win32)
+ (name geneweb_wsa)
+ (modules geneweb_wsa protocol_info)
+ (libraries unix)
+ (foreign_stubs
+  (language c)
+  (names protocol_info)))

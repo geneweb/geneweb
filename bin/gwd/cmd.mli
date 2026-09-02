@@ -5,7 +5,6 @@ type plugins = All | List of plugin list
 type t = {
   (* Directories *)
   base_dir : string;
-  socket_dir : string option;
   gw_prefix : string;
   etc_prefix : string;
   images_prefix : string;

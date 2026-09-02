@@ -43,6 +43,7 @@
             {
               inherit (scope)
                 geneweb-compat
+                geneweb-win32
                 geneweb-http
                 geneweb
                 geneweb-rpc

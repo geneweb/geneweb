@@ -2,6 +2,7 @@
   lib,
   buildDunePackage,
   geneweb-compat,
+  geneweb-win32,
   camlp-streams,
   logs,
   fmt,
@@ -14,6 +15,7 @@ buildDunePackage {
 
   buildInputs = [
     geneweb-compat
+    geneweb-win32
     camlp-streams
     logs
     fmt
