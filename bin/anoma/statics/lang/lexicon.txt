@@ -61,8 +61,8 @@ en: Persons / families per warning
 fr: Personnes / familles par anomalie
 
     per-warning note
-en: Only warnings enabled (=yes) in %s.cfg and not listed in the ignored file are shown. Lists are unique and sorted; each name opens the person in the base.
-fr: Seules les anomalies activées (=yes) dans %s.cfg et absentes du fichier des exceptions sont affichées. Les listes sont uniques et triées ; chaque nom ouvre la personne dans la base.
+en: Only warnings enabled (=yes) in anoma.txt (or the embedded default config) and not listed in the whitelist are shown. Lists are unique and sorted; each name opens the person in the base.
+fr: Seules les anomalies activées (=yes) dans anoma.txt (ou la configuration par défaut embarquée) et absentes de la whitelist sont affichées. Les listes sont uniques et triées ; chaque nom ouvre la personne dans la base.
 
     Last modified by:
 en: Last modified by:
@@ -157,5 +157,5 @@ en: Submit sends each entry to the base under your wizard login.
 fr: « Soumettre » envoie chaque entrée à la base sous votre identifiant magicien.
 
     copy/download note
-en: Copy/Download appends to <code>%s.ok</code> (or your wizard fragment).
-fr: Copier/Télécharger ajoute à <code>%s.ok</code> (ou à votre fragment).
+en: Copy/Download appends to <code>whitelist_warnings.txt</code> (or your wizard fragment).
+fr: Copier/Télécharger ajoute à <code>whitelist_warnings.txt</code> (ou à votre fragment).

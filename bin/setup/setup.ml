@@ -25,6 +25,7 @@ let lang_param = ref ""
 let bname = ref ""
 let no_o = ref true
 let command = ref ""
+let last_comm_log = ref ""
 let debug = ref false
 let daemon = ref false
 let no_anoma = ref false
@@ -34,6 +35,10 @@ let no_anoma = ref false
    `let comm_log = ...` would capture the string before Arg.parse runs) and the
    base name, so different bases don't share one log and anoma can locate
    "<base>_comm.log" by convention.  Empty base -> plain comm.log. *)
+(* Per-base rebuild log, written to <bases_dir>/tmp/ while the command runs
+   (always safe: the base's .gwb may not exist yet during a gwc that creates
+   it). run_anoma later moves it into <base>.gwb/config/comm.log, once gwc has
+   created the base. last_comm_log records the exact path exec_f wrote. *)
 let comm_log base =
   !bases_dir // "tmp" // ((if base = "" then "" else base ^ "_") ^ "comm.log")
 
@@ -945,7 +950,9 @@ let exec_f conf comm =
     else " -bd " ^ stringify !bases_dir
   in
   let clog = comm_log (log_base conf) in
-  (* the per-base log lives under <bases_dir>/tmp; make sure that dir exists *)
+  last_comm_log := clog;
+  (* the log dir (<base>.gwb/config or <bases_dir>/tmp) may be missing; its
+     parent always exists, so a single mkdir suffices *)
   (try Unix.mkdir (Filename.dirname clog) 0o755
    with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
   let s = comm ^ bd_arg ^ " > " ^ stringify clog ^ " 2>&1" in
@@ -969,7 +976,24 @@ let run_anoma conf =
   if !no_anoma || base = "" then ()
   else
     let anoma = Filename.concat !bin_dir "anoma" in
-    let clog = comm_log base in
+    (* exec_f wrote the rebuild log to tmp (the base's .gwb may not have existed
+       during gwc); now that gwc has created the base, move it into the base
+       config dir so anoma — and the comm.log view — find it there. *)
+    let clog =
+      let src = !last_comm_log in
+      let dir = !bases_dir // (base ^ ".gwb") // "config" in
+      let dst = dir // "comm.log" in
+      if src <> "" && src <> dst && Sys.file_exists src then begin
+        (try Unix.mkdir dir 0o755
+         with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
+        try
+          Sys.rename src dst;
+          dst
+        with Sys_error _ -> src
+      end
+      else if Sys.file_exists dst then dst
+      else src
+    in
     if not (Sys.file_exists anoma) then (
       (* leave a trace on the gwsetup "comm.log" page rather than skip silently *)
       let oc = open_out_gen [ Open_append; Open_creat ] 0o644 clog in
@@ -992,7 +1016,7 @@ let run_anoma conf =
         Filename.concat (Filename.get_temp_dir_name ()) "anoma.log"
       in
       let s =
-        Printf.sprintf "%s %s -lang %s -bd %s -in %s > %s 2>&1"
+        Printf.sprintf "%s %s -lang %s -bd %s -keep-logs -in %s > %s 2>&1"
           (stringify anoma) (stringify base) (stringify !lang_param)
           (stringify bd) (stringify clog) (stringify anoma_log)
       in
