@@ -1,0 +1,161 @@
+# anoma / gwwarn report lexicon — GeneWeb lexicon.txt format.
+# Each entry: a key line indented by exactly 4 spaces, then "lang: text" lines.
+# Only the report's own headers and buttons are translated here; the warning
+# messages and warning-type names come from the rebuild log and are never
+# translated. Add languages by adding "xx: ..." lines under each key.
+
+    GeneWeb warnings
+en: GeneWeb warnings
+fr: Anomalies GeneWeb
+
+    base
+en: base
+fr: base
+
+    Generated
+en: Generated
+fr: Généré le
+
+    from
+en: from
+fr: à partir de
+
+    dated
+en: dated
+fr: daté du
+
+    ignored file
+en: ignored file
+fr: fichier des exceptions
+
+    Statistics
+en: Statistics
+fr: Statistiques
+
+    Warning
+en: Warning
+fr: Anomalie
+
+    Enabled
+en: Enabled
+fr: Activée
+
+    Total
+en: Total
+fr: Total
+
+    Ignored (verified)
+en: Ignored (verified)
+fr: Ignorées (vérifiées)
+
+    Remaining
+en: Remaining
+fr: Restantes
+
+    Extreme statistics
+en: Extreme statistics
+fr: Statistiques extrêmes
+
+    Persons / families per warning
+en: Persons / families per warning
+fr: Personnes / familles par anomalie
+
+    per-warning note
+en: Only warnings enabled (=yes) in %s.cfg and not listed in the ignored file are shown. Lists are unique and sorted; each name opens the person in the base.
+fr: Seules les anomalies activées (=yes) dans %s.cfg et absentes du fichier des exceptions sont affichées. Les listes sont uniques et triées ; chaque nom ouvre la personne dans la base.
+
+    Last modified by:
+en: Last modified by:
+fr: Dernière modification par :
+
+    (all)
+en: (all)
+fr: (toutes)
+
+    history window
+en: history: last %d days
+fr: historique : %d derniers jours
+
+    show full messages
+en: show full messages
+fr: afficher les messages complets
+
+    Persons with several warnings
+en: Persons with several warnings
+fr: Personnes avec plusieurs anomalies
+
+    Person
+en: Person
+fr: Personne
+
+    Warnings
+en: Warnings
+fr: Anomalies
+
+    none
+en: none
+fr: aucune
+
+    Ignore entries for
+en: Ignore entries for
+fr: Entrées à ignorer pour
+
+    click ignore next to a name
+en: click 'ignore' next to a name
+fr: cliquez sur « ignorer » à côté d'un nom
+
+    Submit to base
+en: Submit to base
+fr: Soumettre à la base
+
+    Copy
+en: Copy
+fr: Copier
+
+    Download
+en: Download
+fr: Télécharger
+
+    Clear
+en: Clear
+fr: Effacer
+
+    ignore
+en: ignore
+fr: ignorer
+
+    ignored
+en: ignored
+fr: ignorée
+
+    submitting
+en: Submitting
+fr: Envoi
+
+    showing
+en: showing
+fr: affichées
+
+    of
+en: of
+fr: sur
+
+    me
+en: me
+fr: moi
+
+    submitted
+en: submitted
+fr: envoyées
+
+    failed
+en: failed
+fr: échouées
+
+    submit note
+en: Submit sends each entry to the base under your wizard login.
+fr: « Soumettre » envoie chaque entrée à la base sous votre identifiant magicien.
+
+    copy/download note
+en: Copy/Download appends to <code>%s.ok</code> (or your wizard fragment).
+fr: Copier/Télécharger ajoute à <code>%s.ok</code> (ou à votre fragment).
