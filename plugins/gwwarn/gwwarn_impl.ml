@@ -37,6 +37,11 @@ open Geneweb
 open Config
 module Registration = Geneweb_register.Registration
 
+let ( // ) = Filename.concat
+
+(* All per-base files live in <base_dir>/<base>.gwb/config/. *)
+let config_dir conf = Secure.base_dir () // (conf.bname ^ ".gwb") // "config"
+
 (* anoma is installed in the same directory as gwd, so derive its path from the
    running gwd executable — nothing to configure. m=OK_FOLD runs
    `anoma <base> -bd <base_dir>` (no -in => consolidate & exit). (If your gwd is a symlink resolved
@@ -76,9 +81,12 @@ let read_whole_file path =
     ~finally:(fun () -> try close_in ic with Sys_error _ -> ())
     (fun () -> really_input_string ic (in_channel_length ic))
 
-let ensure_dir d =
-  if not (Sys.file_exists d) then
+let rec ensure_dir d =
+  if d <> "" && d <> "." && d <> "/" && not (Sys.file_exists d) then begin
+    let parent = Filename.dirname d in
+    if parent <> d then ensure_dir parent;
     try Unix.mkdir d 0o755 with Unix.Unix_error _ -> ()
+  end
 
 let html_escape s =
   let b = Buffer.create (String.length s) in
@@ -95,7 +103,7 @@ let html_escape s =
 (* atomic single-line append: O_APPEND keeps concurrent line-sized writes from
    interleaving, and each wizard has their own file anyway. *)
 let append_fragment ~base_dir ~base ~wizard ~line =
-  let okd = Filename.concat base_dir (base ^ ".ok.d") in
+  let okd = base_dir // (base ^ ".gwb") // "config" // "whitelist_d" in
   ensure_dir okd;
   let path = Filename.concat okd (wizard ^ ".ok") in
   let fd =
@@ -111,8 +119,7 @@ let append_fragment ~base_dir ~base ~wizard ~line =
 
 (* Location of the report anoma writes; keep in sync with anoma's -out, e.g.
      gwwarn <base> -bd <base_dir> -in <log> -out <base_dir>/<base>_warnings.html *)
-let report_path conf =
-  Filename.concat (Secure.base_dir ()) (conf.bname ^ "_warnings.html")
+let report_path conf = config_dir conf // "anomalies.html"
 
 (* minimal JS-string escaping for a wizard login placed inside "..." *)
 let js_escape s =
@@ -184,7 +191,7 @@ let ok_add conf _ =
    and its fragment directory <base>.ok.d holding not-yet-consolidated
    per-wizard contributions. Displayed as-is; never written — editing by hand
    is unsafe (whole-file races with anoma's fold and with wizard fragments). *)
-let ok_path conf = Filename.concat (Secure.base_dir ()) (conf.bname ^ ".ok")
+let ok_path conf = config_dir conf // "whitelist_warnings.txt"
 
 (* live "*.ok" fragments in [dir] as (wizard, path), sorted *)
 let fragment_files dir =
@@ -212,7 +219,7 @@ let ok_file conf _ =
   if not conf.wizard then Output.print_sstring conf "forbidden: wizard only\n"
   else begin
     let path = ok_path conf in
-    let okd = path ^ ".d" in
+    let okd = config_dir conf // "whitelist_d" in
     Output.print_sstring conf
       "<!DOCTYPE html>\n\
        <meta charset=\"utf-8\">\n\

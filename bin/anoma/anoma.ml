@@ -30,14 +30,16 @@
             [-okd <fragments_dir>] [-out <report.html>] [-url <base_url>]
             [-nw] [-no-fold] [-ignore_base] [-hist <days>]
    Consolidation only (no -in and no conventional log, no report):
-     gwwarn <basename> -bd <bases_dir> [-ok <ignored_file>] [-okd <dir>]
+     gwwarn <basename> -bd <bases_dir> [-ok <whitelist>] [-okd <dir>]
    Wizard links are the default; -nw makes plain links for a shared report.
-   Folding (commit fragments + tidy the ignored file) is on by default; -no-fold
-   turns it off. When -in is omitted, anoma falls back to the per-base rebuild
-   log gwsetup writes, <bases_dir>/tmp/<basename>_comm.log, if it exists; if it
-   does not, anoma just consolidates the ignored file and exits. The ignored
-   file defaults to <bases_dir>/<basename>.ok and the fragments dir to
-   <ok-file>.d.
+   Folding (commit fragments + tidy the whitelist) is on by default; -no-fold
+   turns it off. All per-base files live in <bases_dir>/<basename>.gwb/config/:
+   the per-base warning config anoma.txt (overlaying the embedded config.txt
+   defaults), the whitelist_warnings.txt of verified persons/families, the
+   whitelist_d/ wizard-contribution fragments, the anomalies.html report, and
+   the comm.log rebuild log. When -in is omitted, anoma falls back to that
+   comm.log if it exists; otherwise it just consolidates the whitelist and
+   exits.
 *)
 
 module Driver = Geneweb_db.Driver
@@ -65,13 +67,15 @@ let ignore_base = ref false
 let hist_days = ref 8
 let lang = ref "en"
 let lex_file = ref ""
+let keep_logs = ref false
 
 let usage =
-  "usage: gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <ignored>] \
+  "usage: gwwarn <basename> -bd <bases_dir> -in <log_file> [-ok <whitelist>] \
    [-okd <dir>] [-out <report.html>] [-url <base_url>] [-nw] [-no-fold] \
    [-ignore_base] [-hist <days>]\n\
-  \       gwwarn <basename> -bd <bases_dir> [-ok <ignored>] [-okd <dir>] \
-   [-no-fold]   (no -in: consolidate fragments and exit)"
+  \       gwwarn <basename> -bd <bases_dir> [-ok <whitelist>] [-okd <dir>] \
+   [-no-fold]   (no -in: consolidate fragments and exit)\n\
+  \       per-base files default to <bases_dir>/<basename>.gwb/config/"
 
 let speclist =
   [
@@ -80,17 +84,19 @@ let speclist =
       "<dir>   bases directory (default: GeneWeb base directory)" );
     ( "-ok",
       Arg.Set_string ignored_file,
-      "<file>  ignored persons/families (default <basename>.ok in bases dir)" );
+      "<file>  whitelist of verified persons/families (default \
+       whitelist_warnings.txt in the base config dir)" );
     ( "-okd",
       Arg.Set_string okd_dir,
-      "<dir>   per-wizard contribution fragments (default <ok-file>.d)" );
+      "<dir>   per-wizard contribution fragments (default whitelist_d in the \
+       base config dir)" );
     ( "-in",
       Arg.Set_string log_file,
-      "<file>  warning log file (default <bases_dir>/tmp/<basename>_comm.log \
-       if it exists; otherwise consolidate the ignored file and exit)" );
+      "<file>  warning log file (default <base config dir>/comm.log if it \
+       exists; otherwise consolidate the whitelist and exit)" );
     ( "-out",
       Arg.Set_string out_file,
-      "<file>  output HTML (default <bases_dir>/<basename>_warnings.html)" );
+      "<file>  output HTML (default anomalies.html in the base config dir)" );
     ( "-url",
       Arg.Set_string base_url,
       "<url>   base URL (default http://localhost:2317/<basename>)" );
@@ -116,6 +122,11 @@ let speclist =
       Arg.Set_string lex_file,
       "<file>  override the built-in lexicon with an external one (GeneWeb \
        format); default is the copy embedded in the binary" );
+    ( "-keep-logs",
+      Arg.Set keep_logs,
+      "       archive the warning log as \
+       <config>/logs/<yyyy-mm-dd-HHMMSS>-comm.log (kept even when the working \
+       log is otherwise consumed)" );
   ]
 
 (* ------------------------------------------------------------------ *)
@@ -744,10 +755,6 @@ let read_config_lines lines =
   List.iter (parse_config_line tbl) lines;
   tbl
 
-let read_config file =
-  if Sys.file_exists file then read_config_lines (read_lines file)
-  else Hashtbl.create 40
-
 (* overlay the entries of a per-base .cfg file onto an existing table, in place;
    only the keys it lists are changed, so unlisted warnings keep the default *)
 let overlay_config tbl file =
@@ -824,6 +831,34 @@ let add_codes tbl key codes =
 
 let ensure_dir d =
   if not (Sys.file_exists d) then try Sys.mkdir d 0o755 with Sys_error _ -> ()
+
+(* create [d] and any missing parents (best-effort) *)
+let rec mkdir_p d =
+  if d <> "" && d <> "." && d <> "/" && not (Sys.file_exists d) then begin
+    let parent = Filename.dirname d in
+    if parent <> d then mkdir_p parent;
+    try Sys.mkdir d 0o755 with Sys_error _ -> ()
+  end
+
+(* copy the bytes of [src] to [dst] (best-effort, whole-file) *)
+let copy_file src dst =
+  let ic = open_in_bin src in
+  Fun.protect
+    ~finally:(fun () -> try close_in ic with Sys_error _ -> ())
+    (fun () ->
+      let s = really_input_string ic (in_channel_length ic) in
+      let oc = open_out_bin dst in
+      Fun.protect
+        ~finally:(fun () -> try close_out oc with Sys_error _ -> ())
+        (fun () -> output_string oc s))
+
+(* yyyy-mm-dd-HHMMSS from a file's modification time (local); the rebuild time.
+   Second precision keeps several rebuilds the same day distinct. *)
+let date_stamp path =
+  let tm = Unix.localtime (Unix.stat path).Unix.st_mtime in
+  Printf.sprintf "%04d-%02d-%02d-%02d%02d%02d" (tm.Unix.tm_year + 1900)
+    (tm.Unix.tm_mon + 1) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+    tm.Unix.tm_sec
 
 (* top-level "*.ok" regular files in [dir] (the live fragments), sorted *)
 let fragment_files dir =
@@ -1561,10 +1596,7 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
 
   (* --- per-warning-type lists ------------------------------------- *)
   pf "<h2>%s</h2>\n" (tr "Persons / families per warning");
-  (* the note carries one "%s" placeholder for the base name *)
-  pf "<p class=muted>%s</p>\n"
-    (Str.replace_first (Str.regexp_string "%s") (html_escape basename)
-       (transl "per-warning note"));
+  pf "<p class=muted>%s</p>\n" (transl "per-warning note");
   (* per-wizard filter (populated from the history data on the items) *)
   if !hist_days > 0 then
     pf
@@ -1681,8 +1713,10 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
 
   (* --- ignore-collector tray + script ----------------------------- *)
   pf "<div id=igntray>\n";
-  pf "<div class=ignhdr>%s <i>%s.ok</i> (<span id=igncount>0</span>)</div>\n"
-    (tr "Ignore entries for") (html_escape basename);
+  pf
+    "<div class=ignhdr>%s <i>whitelist_warnings.txt</i> (<span \
+     id=igncount>0</span>)</div>\n"
+    (tr "Ignore entries for");
   pf "<textarea id=ignlist readonly rows=8 placeholder=\"%s\"></textarea>\n"
     (tr "click ignore next to a name");
   pf "<div class=ignbtns>";
@@ -1697,9 +1731,7 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
     (tr "Copy") (html_escape basename) (tr "Download") (tr "Clear");
   pf "<div class=ignhelp>%s%s<span id=ignstatus></span></div>\n"
     (if !wizard then transl "submit note" ^ " " else "")
-    (* the note carries one "%s" placeholder for the base name *)
-    (Str.replace_first (Str.regexp_string "%s") (html_escape basename)
-       (transl "copy/download note"));
+    (transl "copy/download note");
   pf "</div>\n";
   pf
     "<script>\n\
@@ -1723,7 +1755,7 @@ let generate_html ~basename ~url ~cfg ~stats ~extremes ~kept ~multi ~generated
      t=list.value;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).catch(function(){list.select();document.execCommand('copy');});else{list.select();document.execCommand('copy');}};\n\
      document.getElementById('igndl').onclick=function(){var b=new \
      Blob([list.value+'\\n'],{type:'text/plain'});var \
-     a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=this.getAttribute('data-base')+'_ignore_additions.ok';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},0);};\n\
+     a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='whitelist_additions.txt';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},0);};\n\
      document.getElementById('ignclear').onclick=function(){picks.clear();document.querySelectorAll('button.ign.on').forEach(function(b){b.classList.remove('on');b.textContent=GWWARN_T.ignore;});render();};\n\
      var sb=document.getElementById('ignsubmit');\n\
      if(sb)sb.onclick=function(){var \
@@ -1758,15 +1790,20 @@ let () =
   (* load the lexicon for the report's headers/buttons from the embedded copy
      (or a -lex override); a missing key still shows as [key]. *)
   lexicon := input_lexicon !lang (lexicon_source ());
-  if !ignored_file = "" then ignored_file := !bases_dir // (!base_name ^ ".ok");
-  if !okd_dir = "" then okd_dir := !ignored_file ^ ".d";
+  (* All per-base anoma files live together in
+     <bases_dir>/<basename>.gwb/config/ (created if missing). *)
+  let config_dir = !bases_dir // (!base_name ^ ".gwb") // "config" in
+  mkdir_p config_dir;
+  if !ignored_file = "" then
+    ignored_file := config_dir // "whitelist_warnings.txt";
+  if !okd_dir = "" then okd_dir := config_dir // "whitelist_d";
 
   (* If no -in log was given, fall back to the conventional per-base rebuild log
-     that gwsetup writes, <bases_dir>/tmp/<basename>_comm.log; use it only if it
-     actually exists, so that with no rebuild log present we still drop into the
+     gwsetup writes, <config_dir>/comm.log; use it only if it actually exists,
+     so that with no rebuild log present we still drop into the
      consolidate-and-exit mode below rather than error on a missing file. *)
   if !log_file = "" then begin
-    let derived = !bases_dir // "tmp" // (!base_name ^ "_comm.log") in
+    let derived = config_dir // "comm.log" in
     if Sys.file_exists derived then begin
       log_file := derived;
       derived_log := true
@@ -1804,12 +1841,11 @@ let () =
     exit 0
   end;
   if !base_url = "" then base_url := "http://localhost:2317/" ^ !base_name;
-  if !out_file = "" then
-    out_file := !bases_dir // (!base_name ^ "_warnings.html");
+  if !out_file = "" then out_file := config_dir // "anomalies.html";
 
-  let cfg_file = !bases_dir // (!base_name ^ ".cfg") in
+  let cfg_file = config_dir // "anoma.txt" in
   (* Start from the curated default enable-set embedded in the binary
-     (config.txt, via ocaml-crunch), then overlay the per-base <base>.cfg if it
+     (config.txt, via ocaml-crunch), then overlay the per-base anoma.txt if it
      exists so it overrides only the warnings it lists. A key present in neither
      still defaults to yes (cfg_yes). *)
   let cfg =
@@ -1939,6 +1975,17 @@ let () =
       | _ -> ())
     all_wtypes;
   Printf.printf "report written to %s\n" !out_file;
+  (* -keep-logs: before the log is consumed, archive a dated copy under
+     <config_dir>/logs/<yyyy-mm-dd-HHMMSS>-comm.log (stamp = the log's own
+     timestamp, i.e. the rebuild time), so a history of rebuild logs is kept. *)
+  (if !keep_logs && !log_file <> "" && Sys.file_exists !log_file then
+     try
+       let logs_dir = config_dir // "logs" in
+       mkdir_p logs_dir;
+       let dst = logs_dir // (date_stamp !log_file ^ "-comm.log") in
+       copy_file !log_file dst;
+       Printf.printf "log kept as %s\n" dst
+     with Sys_error _ -> ());
   (* a derived per-base log is transient: it has been analysed into the report,
      so remove it. It must not survive to be mistaken for current on a later run
      (a real -in given on the command line is never touched). *)
