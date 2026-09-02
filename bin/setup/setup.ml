@@ -992,8 +992,9 @@ let run_anoma conf =
         Filename.concat (Filename.get_temp_dir_name ()) "anoma.log"
       in
       let s =
-        Printf.sprintf "%s %s -bd %s -in %s > %s 2>&1" (stringify anoma)
-          (stringify base) (stringify bd) (stringify clog) (stringify anoma_log)
+        Printf.sprintf "%s %s -lang %s -bd %s -in %s > %s 2>&1"
+          (stringify anoma) (stringify base) (stringify !lang_param)
+          (stringify bd) (stringify clog) (stringify anoma_log)
       in
       Printf.eprintf "$ %s\n" s;
       flush stderr;
@@ -1543,11 +1544,6 @@ let consang conf ok_file =
 let anoma conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    let bname =
-      match p_getenv conf.env "anon" with
-      | Some f -> strip_spaces f
-      | None -> ""
-    in
     exec_f conf (comm ^ parameters conf.env)
   in
   if rc > 1 then print_file conf "err_standard.htm"

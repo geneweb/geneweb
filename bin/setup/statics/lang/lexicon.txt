@@ -113,13 +113,25 @@ zh: \
 en: or
 fr: ou
 
+    Done
+en: Done
+fr: Effectué
+
     analyse anomalies
 en: analyse anomalies
 fr: analyser les anomalies
 
+    Anomalies analysed
+en: Anomalies analysed
+fr: Anomalies analysées
+
     anomalies
 en: anomalies
 fr: anomalies
+
+    Run anomalies analysis
+en: Run anomalies analysis
+fr: Lancer l'analyse des anomalies
 
     Enter the name of the folder holding databases.
 en: Enter the name of the folder holding databases.
