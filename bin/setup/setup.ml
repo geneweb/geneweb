@@ -25,9 +25,22 @@ let lang_param = ref ""
 let bname = ref ""
 let no_o = ref true
 let command = ref ""
+let last_comm_log = ref ""
 let debug = ref false
 let daemon = ref false
-let comm_log = Filename.concat (Filename.get_temp_dir_name ()) "comm.log"
+let no_anoma = ref false
+
+(* Per-base rebuild log, under <bases_dir>/tmp/.  A FUNCTION of both !bases_dir
+   (so it tracks the -bd parsed from the command line — a plain top-level
+   `let comm_log = ...` would capture the string before Arg.parse runs) and the
+   base name, so different bases don't share one log and anoma can locate
+   "<base>_comm.log" by convention.  Empty base -> plain comm.log. *)
+(* Per-base rebuild log, written to <bases_dir>/tmp/ while the command runs
+   (always safe: the base's .gwb may not exist yet during a gwc that creates
+   it). run_anoma later moves it into <base>.gwb/config/comm.log, once gwc has
+   created the base. last_comm_log records the exact path exec_f wrote. *)
+let comm_log base =
+  !bases_dir // "tmp" // ((if base = "" then "" else base ^ "_") ^ "comm.log")
 
 let printer_conf =
   {
@@ -130,6 +143,14 @@ let strip_spaces = String.trim
 let getenv env label = decode (List.assoc (decode label) env)
 let p_getenv env label = try Some (getenv env label) with Not_found -> None
 let s_getenv env label = try getenv env label with Not_found -> ""
+
+(* Base name for naming the per-base comm.log: the output base "o" when a build
+   sets it (gwc/ged2gwb), else the operated base "anon".  basename-only, so the
+   log file name never contains a path separator. *)
+let log_base conf =
+  let o = strip_spaces (s_getenv conf.env "o") in
+  let b = if o <> "" then o else strip_spaces (s_getenv conf.env "anon") in
+  if b = "" then "" else Filename.basename b
 
 let rec skip_spaces s i =
   if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
@@ -593,7 +614,8 @@ let rec copy_from_stream conf print strm =
               (* depending on when %f is called, conf may be sketchy *)
               (* conf will know bvars from basename.gwf and evars from url *)
               copy_from_stream conf print (Stream.of_string s)
-          | 'g' -> print_specific_file conf print comm_log strm
+          | 'g' ->
+              print_specific_file conf print (comm_log (log_base conf)) strm
           | 'h' ->
               print "<input type=hidden name=lang value=";
               print conf.lang;
@@ -645,7 +667,7 @@ let rec copy_from_stream conf print strm =
               (* the current directory may have changes with -bd *)
               | 'G' ->
                   print_specific_file_tail conf print
-                    (Filename.concat !launch_dir "gwsetup.log")
+                    (!bases_dir // "tmp" // "gwsetup.log")
                     strm
               | 'H' ->
                   (* print the content of -o filename, prepend bname *)
@@ -754,6 +776,7 @@ and print_specific_file conf print fname strm =
       let s = parse_upto '}' strm in
       match try Some (open_in fname) with Sys_error _ -> None with
       | Some ic ->
+          print (Printf.sprintf "File: %s\n" fname);
           Fun.protect
             ~finally:(fun () -> close_in ic)
             (fun () ->
@@ -939,12 +962,87 @@ let exec_f conf comm =
     if !bases_dir = "." || !bases_dir = "" then ""
     else " -bd " ^ stringify !bases_dir
   in
-  let s = comm ^ bd_arg ^ " > " ^ stringify comm_log ^ " 2>&1" in
+  let clog = comm_log (log_base conf) in
+  last_comm_log := clog;
+  (* the log dir (<base>.gwb/config or <bases_dir>/tmp) may be missing; its
+     parent always exists, so a single mkdir suffices *)
+  (try Unix.mkdir (Filename.dirname clog) 0o755
+   with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
+  let s = comm ^ bd_arg ^ " > " ^ stringify clog ^ " 2>&1" in
   Printf.eprintf "$ %s\n" s;
   command := s;
   flush stderr;
   let rc = Sys.command s in
   if not Sys.unix then infer_rc conf rc else rc
+
+(* After a successful gwc/ged2gwb, run the anomalies analyzer (anoma) on the
+   base just built.  gwc/ged2gwb print their "Warning: ..." lines to stdout,
+   which exec_f has just captured into comm_log, so that file is exactly the
+   warning log anoma reads; anoma's own console output is sent to a separate
+   file so it does not overwrite the log while reading it.  anoma writes
+   <bases_dir>/<base>_warnings.html and consolidates <base>.ok.  Best-effort:
+   its exit status is ignored and never changes what the user sees.  Skipped by
+   the -no-anoma command-line option, or when no anoma binary is installed
+   beside the other tools. *)
+let run_anoma conf =
+  let base = s_getenv conf.env "o" in
+  if !no_anoma || base = "" then ()
+  else
+    let anoma = Filename.concat !bin_dir "anoma" in
+    (* exec_f wrote the rebuild log to tmp (the base's .gwb may not have existed
+       during gwc); now that gwc has created the base, move it into the base
+       config dir so anoma — and the comm.log view — find it there. *)
+    let clog =
+      let src = !last_comm_log in
+      let dir = !bases_dir // (base ^ ".gwb") // "config" in
+      let dst = dir // "comm.log" in
+      if src <> "" && src <> dst && Sys.file_exists src then begin
+        (try Unix.mkdir dir 0o755
+         with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
+        try
+          Sys.rename src dst;
+          dst
+        with Sys_error _ -> src
+      end
+      else if Sys.file_exists dst then dst
+      else src
+    in
+    if not (Sys.file_exists anoma) then (
+      (* leave a trace on the gwsetup "comm.log" page rather than skip silently *)
+      let oc = open_out_gen [ Open_append; Open_creat ] 0o644 clog in
+      Printf.fprintf oc "\n--- anoma: not found at %s, skipped ---\n" anoma;
+      close_out oc)
+    else begin
+      (* anoma must use the SAME base directory gwc/ged2gwb used, so its report
+         <bd>/<base>_warnings.html lands beside the base just built and it can
+         reopen that base.  exec_f omits -bd when !bases_dir is ".", relying on
+         gwc defaulting to the current dir, but anoma's own default base dir is
+         NOT the current dir, so always pass -bd (as "." when unset), letting
+         anoma resolve it against the shared cwd.  anoma reads the warnings gwc
+         left in the per-base log (clog).  On success that log is transient — it
+         has been analysed into the report — so remove it; it must not survive
+         to be taken as current on a later run.  On failure keep it and append
+         anoma's output, so the gwsetup comm.log page shows gwc's warnings plus
+         why anoma failed. *)
+      let bd = if !bases_dir = "" then "." else !bases_dir in
+      let anoma_log =
+        Filename.concat (Filename.get_temp_dir_name ()) "anoma.log"
+      in
+      let s =
+        Printf.sprintf "%s %s -lang %s -bd %s -keep-logs -in %s > %s 2>&1"
+          (stringify anoma) (stringify base) (stringify !lang_param)
+          (stringify bd) (stringify clog) (stringify anoma_log)
+      in
+      Printf.eprintf "$ %s\n" s;
+      flush stderr;
+      if Sys.command s = 0 then try Sys.remove clog with Sys_error _ -> ()
+      else
+        ignore
+          (Sys.command
+             (Printf.sprintf
+                "{ printf '\\n--- anoma (failed) ---\\n'; cat %s; } >> %s"
+                (stringify anoma_log) (stringify clog)))
+    end
 
 let out_name_of_ged in_file =
   let f = Filename.basename in_file in
@@ -1048,7 +1146,9 @@ let gwc conf =
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "err_standard.htm"
-  else print_file conf "create_ok.htm"
+  else (
+    run_anoma conf;
+    print_file conf "create_ok.htm")
 
 let gwdiff_check conf = print_file conf "confirm.htm"
 
@@ -1468,6 +1568,7 @@ let ged2gwb conf =
   else
     let bname = try List.assoc "o" conf.env with Not_found -> "" in
     Util.print_default_gwf_file bname;
+    run_anoma conf;
     print_file conf "create_ok.htm"
 
 let consang conf ok_file =
@@ -1476,6 +1577,14 @@ let consang conf ok_file =
     exec_f conf (comm ^ parameters conf.env)
   in
   if rc > 1 then print_file conf "err_consang.htm" else print_file conf ok_file
+
+let anoma conf =
+  let rc =
+    let comm = stringify (Filename.concat !bin_dir conf.comm) in
+    exec_f conf (comm ^ parameters conf.env)
+  in
+  if rc > 1 then print_file conf "err_standard.htm"
+  else print_file conf "anoma_ok.htm"
 
 let update_nldb conf ok_file =
   let rc =
@@ -1517,6 +1626,7 @@ let with_opt_check check_fn run_fn conf =
   | _ -> run_fn conf
 
 let setup_comm_ok conf = function
+  | "anoma" -> anoma conf
   | "gwsetup" -> setup_gen conf
   | "simple" -> simple conf
   | "cleanup" -> cleanup conf
@@ -1734,6 +1844,10 @@ let parse_cmd () =
       ( "-bindir",
         Arg.String (fun x -> bin_dir := x),
         "<string> binary directory (default = value of option -gd)" );
+      ( "-no-anoma",
+        Arg.Set no_anoma,
+        " Do not run the anomalies analyzer (anoma) after a base rebuild \
+         (gwc/ged2gwb)." );
       ("-debug", Arg.Set debug, "Enable debug mode.");
     ]
     |> List.sort compare |> Arg.align
@@ -1786,6 +1900,7 @@ let intro () =
   in
   parse_cmd ();
   setup_log ~debug:!debug;
+
   if !bin_dir = "" then bin_dir := !setup_dir;
   launch_dir := Sys.getcwd ();
   (* All tool invocations inject -bd via exec_f so they find bases in
