@@ -25,15 +25,7 @@ val with_bar :
     To work properly, one should not print anything on [ppf] in [f].
 
     If [ppf] is the standard output or the error output, one should not print
-    anything of both of them.
-
-    [tty] controls the in-place redraws that use carriage returns. It defaults
-    to [Unix.isatty Unix.stdout], matching the usual [Format.std_formatter]
-    destination of the bar; pass it explicitly if [ppf] targets another channel.
-    When [false] (typically because output is redirected to a file such as
-    comm.log), the intermediate redraws are suppressed and only a single
-    completion line is printed, avoiding the huge one-line output that
-    accumulated carriage returns would otherwise produce. *)
+    anything of both of them. *)
 
 (* XXX: The below bar is deprecated and should not be used in new code. *)
 

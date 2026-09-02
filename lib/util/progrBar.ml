@@ -20,8 +20,8 @@ let default_full = '#'
    The two APIs target different channels: [with_bar]/[progress] print to a
    formatter (in practice [Format.std_formatter], i.e. stdout), while the
    deprecated [start]/[run]/[finish] print to stderr. Hence the two checks. *)
-let stdout_is_tty = lazy (Unix.isatty Unix.stdout)
-let stderr_is_tty = lazy (Unix.isatty Unix.stderr)
+let stdout_is_tty = Unix.isatty Unix.stdout
+let stderr_is_tty = Unix.isatty Unix.stderr
 
 type t = {
   ppf : Format.formatter;
@@ -49,15 +49,12 @@ let progress t current total =
       Format.pp_print_flush t.ppf ())
 
 let finish_bar t =
-  (* On a tty, overwrite the in-place bar with the completed one; otherwise
-     print a single clean completion line with no leading carriage return. *)
   if t.tty then
     Format.fprintf t.ppf "\r[%s] 100%%@." (String.make t.width t.full)
   else Format.fprintf t.ppf "[%s] 100%%@." (String.make t.width t.full)
 
 let with_bar ?(width = default_width) ?(empty = default_empty)
-    ?(full = default_full) ?(disabled = false) ?(tty = Lazy.force stdout_is_tty)
-    ppf f =
+    ?(full = default_full) ?(disabled = false) ?(tty = stdout_is_tty) ppf f =
   let t = { ppf; width; empty; full; disabled; tty; last_output = 0. } in
   if not disabled then (
     Format.pp_print_flush t.ppf ();
@@ -65,14 +62,14 @@ let with_bar ?(width = default_width) ?(empty = default_empty)
   else f t
 
 let start () =
-  if Lazy.force stderr_is_tty then (
+  if stderr_is_tty then (
     for _i = 1 to size do
       Printf.eprintf "%c" !empty
     done;
     Printf.eprintf "\013")
 
 let run cnt max_cnt =
-  if Lazy.force stderr_is_tty then (
+  if stderr_is_tty then (
     let pb_cnt = if max_cnt < pb_cnt then size * draw_len else pb_cnt in
     let already_disp = cnt * size / max_cnt in
     let to_disp = (cnt + 1) * size / max_cnt in
@@ -89,7 +86,7 @@ let run cnt max_cnt =
     flush stderr)
 
 let suspend () =
-  if Lazy.force stderr_is_tty then (
+  if stderr_is_tty then (
     Printf.eprintf "%c\n" !full;
     flush stderr)
 
@@ -100,6 +97,6 @@ let restart cnt max_cnt =
   done
 
 let finish () =
-  if Lazy.force stderr_is_tty then (
+  if stderr_is_tty then (
     Printf.eprintf "\n";
     flush stderr)
