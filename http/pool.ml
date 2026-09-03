@@ -31,7 +31,7 @@ end = struct
 
   let watch { pid; fd_in; fd_out } =
     if pid = Unix.getpid () then
-      failwith "watch: cannot watch yourself Narcisse!"
+      failwith "watch: cannot watch yourself Narcissus!"
     else (
       Unix.close fd_out;
       (* Some signals are used by the OCaml runtime and one shouldn't block
