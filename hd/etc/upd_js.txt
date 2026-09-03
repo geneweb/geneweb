@@ -84,12 +84,17 @@ function showEventLabel(type, defaultName, cnt) {
   const input = document.getElementById('e_name' + cnt);
   if (!selector || !wrapper || !input) return;
   const selectedOption = selector.options[selector.selectedIndex];
-  
-  input.value = (selector.value === '') 
-    ? (defaultName && defaultName.charAt(0) !== '#' ? defaultName : '')
-    : selector.value;
-  
   const isCustom = !!selectedOption && selectedOption.id === 'custom' + cnt;
+  const isDelete = !!selectedOption && selectedOption.id === 'delete' + cnt;
+  
+  if (isDelete) {
+    input.value = '';
+  } else if (isCustom) {
+    input.value = (defaultName && defaultName.charAt(0) !== '#') ? defaultName : '';
+  } else {
+    input.value = selector.value;
+  }
+
   wrapper.classList.toggle('d-none', !isCustom);
   if (isCustom && document.activeElement === selector) input.focus();
 }
