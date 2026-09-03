@@ -153,12 +153,12 @@ function initSelectToggle() {
 }
 
 /** Gestion du scroll pour le banner */
-document.addEventListener('scroll', () => {
+function updateBannerState() {
   const banner = document.getElementById('banner');
-  if (banner) {
-    banner.classList.toggle('scrolled', window.scrollY > 35);
-  }
-});
+  if (banner) banner.classList.toggle('scrolled', window.scrollY > 35);
+}
+document.addEventListener('scroll', updateBannerState, { passive: true });
+document.addEventListener('DOMContentLoaded', updateBannerState);
 
 /** Configuration des mois par type de calendrier */
 const CALENDAR_MONTHS = {
