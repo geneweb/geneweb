@@ -35,8 +35,8 @@ module Bench = struct
 
   let pp ppf b =
     Fmt.pf ppf "%fs (~%fs CPU)\n"
-      (b.time.after -. b.time.before)
-      (b.timeofday.after -. b.timeofday.before);
+      (b.timeofday.after -. b.timeofday.before)
+      (b.time.after -. b.time.before);
     Fmt.pf ppf
       "\tminor_words : %s\n\
        \tpromoted_words : %s\n\
