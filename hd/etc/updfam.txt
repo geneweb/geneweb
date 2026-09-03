@@ -476,7 +476,7 @@
       %apply;selector_fevent(xcnt)
     </div>
     <div class="col-sm-7">
-      <label id="fevent_label_selectorxcnt" style="display:none" class="other_evts w-100">
+      <label id="fevent_label_selectorxcnt" class="other_evts w-100 d-none">
         <input type="text" class="form-control fw-bold" name="e_namexcnt" value="%if;(event.e_name="")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0">
       </label>
     </div>
