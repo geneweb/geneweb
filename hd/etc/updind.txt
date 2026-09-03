@@ -268,7 +268,7 @@
   <select class="form-select fw-bold sortable-select" id="pevent_selectxcnt" onchange="show_pevent_label(document.getElementById('e_namexcnt')?.defaultValue || '', 'xcnt')">
     <option value="" id="deletexcnt">[*select/delete an event]1</option>
     <option disabled>──────────────────</option>
-    <option value="">[*custom event]</option>
+    <option value=""%if;(not ("#" in event.e_name) and event.e_name!="") selected%end; id="customxcnt">[*custom event]</option>
     <option disabled>──────────────────</option>
     <option data-insert="1" value=""%if;(event.e_name="") selected%end; disabled> [*select/delete an event]0 </option>
     <option value="#acco" data-sort="1"%if;(event.e_name="#acco") selected%end;>[*accomplishment]</option>
