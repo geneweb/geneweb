@@ -471,14 +471,14 @@
 
 %define;one_fevent(xcnt, has_fevents)
   <div class="row">
-    <h5 class="col-form-label col-sm-2 mb-1 text-uppercase"><label for="e_namexcnt" class="mb-0">[*event/events]0 xcnt</label></h5>
+    <h5 class="col-form-label col-sm-2 mb-1 text-uppercase"><label for="fevent_selectxcnt" class="mb-0">[*event/events]0 xcnt</label></h5>
     <div class="col-sm-3">
       %apply;selector_fevent(xcnt)
     </div>
     <div class="col-sm-7">
-      <label id="fevent_label_selectorxcnt" class="other_evts w-100 d-none">
-        <input type="text" class="form-control fw-bold" name="e_namexcnt" value="%if;(event.e_name="")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0">
-      </label>
+      <div id="fevent_label_selectorxcnt" class="other_evts w-100 d-none">
+        <input type="text" class="form-control fw-bold" name="e_namexcnt" value="%if;(event.e_name="")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0" aria-label="[*custom event]">
+      </div>
     </div>
   </div>
   <div class="row mb-2">
