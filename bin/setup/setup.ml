@@ -54,7 +54,7 @@ let gwsetup_config () =
       ("working_dir:", Sys.getcwd ());
       ("setup_dir:", !setup_dir);
       ("bin_dir:", !bin_dir);
-      ("bases_dir:", !bases_dir);
+      ("bases_dir:", get_bases_dir ());
     ]
   in
   let pp_br = Fmt.any "<br>" in
