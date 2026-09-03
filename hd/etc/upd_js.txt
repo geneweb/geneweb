@@ -80,17 +80,18 @@ function sortSelectOptions() {
 /** Gère l'affichage du champ d'événement personnalisé */
 function showEventLabel(type, defaultName, cnt) {
   const selector = document.getElementById(type + '_select' + cnt);
-  const label = document.getElementById(type + '_label_selector' + cnt);
+  const wrapper = document.getElementById(type + '_label_selector' + cnt);
   const input = document.getElementById('e_name' + cnt);
+  if (!selector || !wrapper || !input) return;
   const selectedOption = selector.options[selector.selectedIndex];
   
   input.value = (selector.value === '') 
     ? (defaultName && defaultName.charAt(0) !== '#' ? defaultName : '')
     : selector.value;
   
-  const isCustom = selectedOption.id === 'custom' + cnt;
-  label.style.display = isCustom ? 'inline' : 'none';
-  input.style.display = isCustom ? 'inline' : 'none';
+  const isCustom = !!selectedOption && selectedOption.id === 'custom' + cnt;
+  wrapper.classList.toggle('d-none', !isCustom);
+  if (isCustom && document.activeElement === selector) input.focus();
 }
 
 function show_pevent_label(xxname, xcnt) {
@@ -105,9 +106,7 @@ function show_fevent_label(xxname, xcnt) {
 function initCustomEvents() {
   document.querySelectorAll('.other_evts').forEach(evt => {
     const input = evt.querySelector('input');
-    if (input?.value && input.value.charAt(0) !== '#') {
-      evt.style.display = '';
-    }
+    evt.classList.toggle('d-none', !(input?.value && input.value.charAt(0) !== '#'));
   });
 }
 
