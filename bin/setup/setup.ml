@@ -1494,7 +1494,7 @@ let ged2gwb conf =
 
 let consang conf ok_file =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
-  if Command.is_failure rc then print_file conf "err_consang.htm"
+  if Command.is_failure rc then print_file conf "err_standard.htm"
   else print_file conf ok_file
 
 let update_nldb conf ok_file =
