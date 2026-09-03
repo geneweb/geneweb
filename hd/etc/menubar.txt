@@ -495,10 +495,7 @@
       </div>
     </div>
   </nav>
-  %( exclusion because AD/MO|D_|PAR/FAM have a menubar if e.ip!="" but the new ADDFAM don’t! %)
-  %if;(not (e.ip!="" and "D_FAM" in e.m or "D_PAR" in e.m))
-    %include;home
-  %end;
+  %include;home
   %if;(evar.m="C" and (e.v1!="" or e.v2!="") and not cancel_links)
     %include;buttons_cousins
   %end;
