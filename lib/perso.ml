@@ -1086,19 +1086,21 @@ let build_list_eclair conf base v p =
   (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
   let rec loop lev p =
     let surn = Driver.get_surname p in
-    if lev > v then
+    if lev >= v then
       (* TODO verify equation and see if hide_person should be used *)
       if is_hide_names conf p && not (authorized_age conf base p) then ()
       else add_person p surn
-    else add_person p surn;
-    match Driver.get_parents p with
-    | None -> ()
-    | Some ifam ->
-        let cpl = Driver.foi base ifam in
-        let fath = pget conf base (Driver.get_father cpl) in
-        let moth = pget conf base (Driver.get_mother cpl) in
-        if not (is_hidden fath) then loop (lev + 1) fath;
-        if not (is_hidden moth) then loop (lev + 1) moth
+    else begin
+      add_person p surn;
+      match Driver.get_parents p with
+      | None -> ()
+      | Some ifam ->
+          let cpl = Driver.foi base ifam in
+          let fath = pget conf base (Driver.get_father cpl) in
+          let moth = pget conf base (Driver.get_mother cpl) in
+          if not (is_hidden fath) then loop (lev + 1) fath;
+          if not (is_hidden moth) then loop (lev + 1) moth
+    end
   in
   (* Construction de la Hashtbl. *)
   loop 1 p;

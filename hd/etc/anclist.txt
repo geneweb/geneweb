@@ -112,7 +112,7 @@
 %define;definecujus(pp,nn)
   %if;(nn=0)[*define Cujus:::pp]0%elseif;(nn=1)[*define Cujus:::pp]1%end;
 %end;
-%if;(e.v="" and e.v=0)
+%if;(e.v="" or e.v=0)
   [*specify::generation/generations]0.
 %else;
   %if;(e.t="L")
@@ -153,7 +153,7 @@
   %elseif;(e.t="E")
     %( list eclair by alphabetic/place/date/ind/event order %)
         %empty_sorted_list;
-    %foreach;ancestor_surname(e.v)
+    %foreach;ancestor_surname(lvl)
       %apply;add_in_sorted_list%with;
         %if;(e.sort="ind")
           -%ancestor.nb_ind;
@@ -182,22 +182,22 @@
           [*sort by/date begin/alphabetic order/nb individuals/nb events]0
           <a role="button" href="%url_set.sort;"
             class="ms-1 btn btn-link%if;(e.sort="") disabled" aria-disabled="true%end;">
-            <i class="fa-solid fa-arrow-down-a-z me-1"></i>
+            <i class="fa-solid fa-arrow-down-a-z me-1"></i>%nn;
             [sort by/date begin/alphabetic order/nb individuals/nb events]2</a>
           <a role="button" href="%url_set.sort.plc;"
             class="btn btn-link%if;(e.sort="plc") disabled" aria-disabled="true%end;">
             <i class="fa-solid fa-arrow-down-a-z me-1"></i>[place/places]1</a>
           <a role="button" href="%url_set.sort.date;"
             class="btn btn-link%if;(e.sort="date") disabled" aria-disabled="true%end;">
-            <i class="fa-regular fa-calendar-days me-1"></i>
+            <i class="fa-regular fa-calendar-days me-1"></i>%nn;
             [sort by/date begin/alphabetic order/nb individuals/nb events]1</a>
           <a role="button" href="%url_set.sort.ind;"
             class="btn btn-link%if;(e.sort="ind") disabled" aria-disabled="true%end;">
-            <i class="fa-solid fa-arrow-down-wide-short me-1"></i>
+            <i class="fa-solid fa-arrow-down-wide-short me-1"></i>%nn;
             [sort by/date begin/alphabetic order/nb individuals/nb events]3</a>
           <a role="button" href="%url_set.sort.evt;"
             class="btn btn-link%if;(e.sort="evt") disabled" aria-disabled="true%end;">
-            <i class="fa-solid fa-arrow-down-wide-short me-1"></i>
+            <i class="fa-solid fa-arrow-down-wide-short me-1"></i>%nn;
             [sort by/date begin/alphabetic order/nb individuals/nb events]4</a>
         </div>
       %end;
@@ -250,7 +250,7 @@
     %( surnames branch sorted by number of branches %)
     %empty_sorted_list;
     %reset_count;
-    %foreach;ancestor_surname(e.v)
+    %foreach;ancestor_surname(lvl)
       %incr_count;
       %let;neg_ancestor_nb_times;%expr(0-ancestor.nb_times)%in;
       %apply;add_in_sorted_list(
@@ -265,7 +265,6 @@
         ancestor.date_end.prec,
         ancestor.date_end.year)
     %end;
-    %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
     %if;(count > 100)
       <span class="ms-3">[*number of branches][:]</span>
       %foreach;sorted_list_item;
@@ -355,7 +354,6 @@
 
   %elseif;(e.t="F")
     %( surnames branch %)
-    %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
     %if;(not cancel_links)
       <div class="ms-3 mb-3">
         [*help surname branch].<br>
@@ -376,7 +374,7 @@
       </tr>
       </thead>
       <tbody>
-      %foreach;ancestor_surname(e.v)
+      %foreach;ancestor_surname(lvl)
         <tr>
           <td>
             %ancestor.surname_end;%ancestor.surname_begin;
