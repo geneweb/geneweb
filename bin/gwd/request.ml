@@ -44,13 +44,10 @@ let person_selected conf base p =
 
 let person_selected_with_redirect conf base p =
   match p_getenv conf.senv "em" with
-  | Some "R" ->
-      let p1 = find_person_in_env_pref conf base "e" in
-      RelationDisplay.print conf base p p1
-  | Some _ -> request_issue conf base ~key:"incorrect em value"
-  | None ->
+  | Some "R" | None ->
       Server.http_redirect_temporarily
         (commd conf ^^^ Util.acces conf base p :> string)
+  | Some _ -> request_issue conf base ~key:"incorrect em value"
 
 (* Print “Not found” page *)
 let unknown conf n =
@@ -633,9 +630,10 @@ let treat_request =
                              request_issue conf base
                                ~key:"missing fn and sn for search"))
                  | Some i ->
-                     RelationDisplay.print conf base
-                       (pget conf base (Driver.Iper.of_string i))
-                       (find_person_in_env_pref conf base "e"))
+                     let p = pget conf base (Driver.Iper.of_string i) in
+                     Server.http_redirect_temporarily
+                       (Adef.(Util.commd conf ^^^ Util.acces conf base p)
+                         :> string))
              | "NOTES" ->
                  w_base (fun conf base ->
                      match p_getenv conf.env "ref" with
