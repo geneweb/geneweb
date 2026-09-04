@@ -274,6 +274,23 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   ^<^ (if sps then "" else "&sp=0")
   ^<^ Adef.escaped ("&et=S" ^ sl)
 
+let print_no_relationship_link conf base p1 p2 =
+  Output.printf conf
+    {|%s.<br><p><span><a href="%sm=R&%s">%s</a> %s.</span></p>|}
+    (([
+        Util.gen_person_title_text Util.reference conf base p1;
+        Util.gen_person_title_text Util.reference conf base p2;
+      ]
+       : Adef.safe_string list
+       :> string list)
+    |> Util.cftransl conf "no known relationship link between %s and %s"
+    |> Utf8.capitalize_fst)
+    (Util.commd ~excl:[ "m"; "em"; "ei"; "et" ] conf :> string)
+    (Util.acces conf base p1 :> string)
+    (Util.transl_nth conf "try another/relationship computing" 0
+    |> Utf8.capitalize_fst)
+    (Util.transl_nth conf "try another/relationship computing" 1)
+
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then (
     let title _ =
@@ -325,17 +342,7 @@ let print_shortest_path conf base p1 p2 =
         | _ ->
             let conf = { conf with is_printed_by_template = false } in
             Templ.output_simple conf Templ.Env.empty "buttons_rel");
-        if excl_faml = [] then
-          Output.printf conf
-            {|%s.<br><p><span><a href="%sm=R&%s">%s</a> %s.</span></p>|}
-            (([ s1; s2 ] : Adef.safe_string list :> string list)
-            |> Util.cftransl conf "no known relationship link between %s and %s"
-            |> Utf8.capitalize_fst)
-            (Util.commd ~excl:[ "m"; "em"; "ei"; "et" ] conf :> string)
-            (Util.acces conf base p1 :> string)
-            (Util.transl_nth conf "try another/relationship computing" 0
-            |> Utf8.capitalize_fst)
-            (Util.transl_nth conf "try another/relationship computing" 1)
+        if excl_faml = [] then print_no_relationship_link conf base p1 p2
         else
           Output.printf conf "<ul><li>%s</li><li>%s</li></ul>"
             (s1 : Adef.safe_string :> string)
@@ -944,22 +951,7 @@ let print_main_relationship conf base long p1 p2 rel =
         Util.transl conf "it is the same person!"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf " ")
-      else
-        Output.printf conf
-          {|%s.<br><p><span><a href="%sm=R&%s">%s</a> %s.</span></p>|}
-          (([
-              Util.gen_person_title_text Util.reference conf base p1;
-              Util.gen_person_title_text Util.reference conf base p2;
-            ]
-             : Adef.safe_string list
-             :> string list)
-          |> Util.cftransl conf "no known relationship link between %s and %s"
-          |> Utf8.capitalize_fst)
-          (Util.commd ~excl:[ "m"; "em"; "ei"; "et" ] conf :> string)
-          (Util.acces conf base p1 :> string)
-          (Util.transl_nth conf "try another/relationship computing" 0
-          |> Utf8.capitalize_fst)
-          (Util.transl_nth conf "try another/relationship computing" 1)
+      else print_no_relationship_link conf base p1 p2
   | Some (rl, _, relationship) ->
       let a1 = p1 in
       let a2 = p2 in
