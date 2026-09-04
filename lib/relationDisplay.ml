@@ -327,11 +327,11 @@ let print_shortest_path conf base p1 p2 =
             Templ.output_simple conf Templ.Env.empty "buttons_rel");
         if excl_faml = [] then
           Output.printf conf
-            {|%s.<br><p><span><a href="%s&m=R&%s">%s</a> %s</span></p>|}
+            {|%s.<br><p><span><a href="%sm=R&%s">%s</a> %s.</span></p>|}
             (([ s1; s2 ] : Adef.safe_string list :> string list)
             |> Util.cftransl conf "no known relationship link between %s and %s"
             |> Utf8.capitalize_fst)
-            (Util.commd ~excl:[ "m" ] conf :> string)
+            (Util.commd ~excl:[ "m"; "em"; "ei"; "et" ] conf :> string)
             (Util.acces conf base p1 :> string)
             (Util.transl_nth conf "try another/relationship computing" 0
             |> Utf8.capitalize_fst)
@@ -946,7 +946,7 @@ let print_main_relationship conf base long p1 p2 rel =
         Output.print_sstring conf " ")
       else
         Output.printf conf
-          {|%s.<br><p><span><a href="%s&m=R&%s">%s</a> %s.</span></p>|}
+          {|%s.<br><p><span><a href="%sm=R&%s">%s</a> %s.</span></p>|}
           (([
               Util.gen_person_title_text Util.reference conf base p1;
               Util.gen_person_title_text Util.reference conf base p2;
@@ -955,7 +955,7 @@ let print_main_relationship conf base long p1 p2 rel =
              :> string list)
           |> Util.cftransl conf "no known relationship link between %s and %s"
           |> Utf8.capitalize_fst)
-          (Util.commd ~excl:[ "m" ] conf :> string)
+          (Util.commd ~excl:[ "m"; "em"; "ei"; "et" ] conf :> string)
           (Util.acces conf base p1 :> string)
           (Util.transl_nth conf "try another/relationship computing" 0
           |> Utf8.capitalize_fst)
