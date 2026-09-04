@@ -1,0 +1,31 @@
+{
+  "name": "geneweb",
+  "fullname": "geneweb",
+  "unique_id": "com.Roglo.Geneweb",
+  "version": "7.0.0.0",
+  "wix_description": "GeneWeb",
+  "wix_manufacturer": "geneweb",
+  "exec_files": [
+    "bin/cache_files",
+    "bin/consang",
+    "bin/connex",
+    "bin/ged2gwb",
+    "bin/gwb2ged",
+    "bin/gwc",
+    "bin/gwd",
+    "bin/gwd-rpc",
+    "bin/gwdiff",
+    "bin/gwfixbase",
+    "bin/gwgc",
+    "bin/gwrobot",
+    "bin/gwsetup",
+    "bin/gwu",
+    "bin/update_nldb"
+  ],
+  "manpages": {
+    "man1": [
+      "share/man/man1/gwd.1",
+      "share/man/man1/gwd-rpc.1"
+    ]
+  }
+}

@@ -2,4 +2,7 @@
  (package geneweb)
  (name gwfixbase)
  (public_name gwfixbase)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (libraries unix str geneweb))
