@@ -58,6 +58,12 @@
 )
 
 (package
+  (name geneweb-win32)
+  (synopsis "Geneweb library for Windows support")
+  (tags (geneweb windows))
+  (depends ocaml))
+
+(package
   (name geneweb-compat)
   (synopsis "Geneweb library for legacy support")
   (tags (geneweb legacy))
@@ -70,6 +76,7 @@
     ocaml
     camlp-streams
     geneweb-compat
+    geneweb-win32
     logs
     fmt))
 

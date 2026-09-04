@@ -1971,11 +1971,16 @@ let connection ~predictable_mode ~loaded_plugins ~secret_salt (addr, request)
   let from =
     match addr with
     | Unix.ADDR_UNIX x -> x
-    | Unix.ADDR_INET (iaddr, _) -> (
+    | Unix.ADDR_INET (iaddr, _) when Sys.unix -> (
         if !no_host_address then Unix.string_of_inet_addr iaddr
         else
           try (Unix.gethostbyaddr iaddr).Unix.h_name
           with _ -> Unix.string_of_inet_addr iaddr)
+    | Unix.ADDR_INET (iaddr, _) ->
+        (* FIXME: The function `Unix.gethostbyaddr` is very slow on Windows.
+   Calling it increases the page load time by a factor of 15 on
+   my computer. *)
+        Unix.string_of_inet_addr iaddr
   in
   if request = [] then ()
   else if script_name = "robots.txt" then robots_txt printer_conf
@@ -2268,7 +2273,6 @@ let parse_cmd () =
       images_prefix := Some o.images_prefix;
       images_dir := o.images_dir;
       etc_prefix := Some o.etc_prefix;
-      socket_dir := o.socket_dir;
       auth_file := o.authorization_file;
       cache_langs := o.cache_langs;
       cache_databases := o.cache_databases;
@@ -2300,16 +2304,6 @@ let parse_cmd () =
       Util.allowed_tags_file := Option.value ~default:"" o.allowed_tags_file;
       o
   | `Exit code -> exit code
-
-let make_socket_dir socket_dir =
-  match socket_dir with
-  | Some p ->
-      GWPARAM.sock_dir := p;
-      Filesystem.create_dir ~parent:true p;
-      if Sys.win32 then (
-        Server.sock_in := p // "gwd.sin";
-        Server.sock_out := p // "gwd.sou")
-  | None -> ()
 
 let switch_check () = debug := true
 
@@ -2407,7 +2401,6 @@ let () =
   Secure.add_assets opts.etc_prefix;
   if opts.check then switch_check ();
   if opts.debug then switch_debug ();
-  make_socket_dir opts.socket_dir;
   setup_log ~predictable_mode:opts.predictable_mode opts.log;
   try
     main ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
