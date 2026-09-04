@@ -42,9 +42,10 @@
               <h2 class="h3 w-100">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h2>
             %end;
               <li class="ms-4">
+                %let;supcnt;<sup><small>%count</small></sup>%in;
                 %if;not cancel_links;
-                  <a href="#wed-callnote-%count;" id="note-wed-%count;" title="[see] [marriage/marriages]0">^</a>%nn;
-                %else;^%end;
+                  <a href="#wed-callnote-%count;" id="note-wed-%count;" title="[see] [marriage/marriages]0">%supcnt;</a>%nn;
+                %else;%supcnt;%end;%sp;
                 %if;(nb_families>1) %apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end;%sp;
                 %spouse.first_name; %spouse.surname;[:] %comment;
               </li>

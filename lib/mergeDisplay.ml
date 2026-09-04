@@ -54,7 +54,7 @@ let print conf base p =
   Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf "\n</h2>\n";
   Output.print_sstring conf
-    (Format.sprintf {|<form method="get" action="%s" class="mx-3 mb-3">|}
+    (Format.sprintf {|<form method="get" action="%s" class="my-3">|}
        (conf.command :> string));
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
@@ -67,7 +67,7 @@ let print conf base p =
       (transl_nth conf "surname/surnames" 0)
   in
   Output.print_sstring conf
-    {|<div class="form-check d-flex align-items-center gap-2 mb-2">|};
+    {|<div class="form-check d-flex align-items-center gap-2 ms-3">|};
   Output.print_sstring conf
     {|<input class="form-check-input" type="radio" name="select" id="input" value="input" checked>|};
   Output.print_sstring conf
@@ -81,7 +81,7 @@ let print conf base p =
   if list <> [] then
     List.iter
       (fun p ->
-        Output.print_sstring conf {|<div class="form-check ms-1">|};
+        Output.print_sstring conf {|<div class="form-check ms-3">|};
         Output.print_sstring conf
           {|<input type="radio" class="form-check-input" name="select" id="|};
         Output.print_string conf
@@ -97,7 +97,7 @@ let print conf base p =
         Output.print_sstring conf {|</label></div>|})
       list;
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary btn-lg mt-2">|};
+    {|<button type="submit" class="btn btn-primary btn-lg mt-3">|};
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></form>\n";
