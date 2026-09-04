@@ -333,7 +333,13 @@ val reference :
   Adef.safe_string
 (** [reference conf base p desc] returns HTML link to the person where [desc] is
     content of the link (generaly his first name and surname description). If
-    person is hidden returns [desc] (do not create link). *)
+    person is hidden returns [desc] (do not create link).
+
+    Relationship-selection parameters ([em], [ei], [et]) are propagated so that
+    listing pages can be used to pick a target, and stripped where the
+    relationship is being displayed and person links must lead to the person
+    page: the [R], [RL] and [RLM] routes, and requests with no [m] at all, which
+    is how [person_selected] reaches the relationship display from [senv]. *)
 
 val reference_noid :
   config ->
@@ -341,7 +347,8 @@ val reference_noid :
   Geneweb_db.Driver.person ->
   Adef.safe_string ->
   Adef.safe_string
-(** Same as [reference] but link doesn't has "id" field *)
+(** Same as {!reference} without the [id] attribute; the same [em], [ei], [et]
+    rule applies. *)
 
 val no_reference :
   config ->

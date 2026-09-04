@@ -1104,9 +1104,13 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   (* let is_hidden = is_empty_string (get_surname p) !! *)
   if (not (GWPARAM.p_auth conf base p)) || cgl then s
   else
+    let excl =
+      match p_getenv conf.env "m" with
+      | None | Some ("" | "R" | "RL" | "RLM") -> [ "em"; "ei"; "et" ]
+      | _ -> []
+    in
     "<a href=\""
-    ^<^ (commd ~excl:[ "em"; "ei"; "et" ] conf ^^^ acces conf base p
-          :> Adef.safe_string)
+    ^<^ (commd ~excl conf ^^^ acces conf base p :> Adef.safe_string)
     ^^^ (if with_id then "\" id=\"i" else "")
     ^<^ (if with_id then Driver.Iper.to_string iper else "")
     ^<^ "\">" ^<^ s ^>^ "</a>"
