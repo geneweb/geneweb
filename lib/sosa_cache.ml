@@ -164,6 +164,7 @@ type t = DynamicCache of DynamicCache.t | StaticCache of StaticCache.t
 let dynamic_cache cache = DynamicCache cache
 let static_cache cache = StaticCache cache
 let sosa_cache : t option ref = ref None
+let reset_cache () = sosa_cache := None
 let sosa_ref : Gwdb.person option option ref = ref None
 
 let find_sosa_ref conf base =
