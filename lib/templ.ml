@@ -1385,6 +1385,7 @@ and print_simple_variable conf = function
       Output.print_sstring conf
         (String.concat ", " (Util.get_bases_list ~format_fun:format_link ()))
   | "hidden" -> Util.hidden_env conf
+  | "hidden_no_senv" -> Util.hidden_env ~senv:false conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | "query_time" ->
       (* FIXME: This variable have been introduced in order to display the

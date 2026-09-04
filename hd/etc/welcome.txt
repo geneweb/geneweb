@@ -194,7 +194,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
   <div id="welcome-search" class="d-flex flex-wrap justify-content-center mt-3 mt-lg-1">
     <div class="col col-md-10 col-xl-9">
       <form id="main-search" class="mt-2 mt-xl-4" method="get" action="%prefix;">
-        %hidden;
+        %hidden_no_senv;
         <input type="hidden" name="m" value="S" class="has_validation">
         <div class="d-flex justify-content-center">
           <div class="d-flex flex-column justify-content-center w-100">
@@ -305,7 +305,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
       <div class="d-flex flex-wrap flex-md-nowrap justify-content-center align-items-md-center mt-1 mt-md-3">
         %if;(b.propose_titles!="no")
           <form id="title-search" class="d-flex flex-column flex-md-row align-items-start align-items-md-center col-12 col-md-9 ms-md-4" method="get" action="%action;">
-            %hidden;
+            %hidden_no_senv;
             <input type="hidden" name="m" value="TT">
             <div class="d-flex align-items-center w-100 mb-2 mb-md-0">
               <a class="me-2" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom"

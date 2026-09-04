@@ -118,7 +118,7 @@
 %end;
 
 <form class="mx-2 mt-3" method="POST" action="%action;">
-  %hidden;
+  %hidden_no_senv;
   <input type="hidden" name="m" value="AS_OK">
   <div class="row">
     <div class="col-6">
