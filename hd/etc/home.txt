@@ -61,7 +61,7 @@
       <div class="modal-content">
         <div class="modal-body" id="ModalSearch">
           <form id="collapse_search" method="get" action="%prefix;">
-            %hidden;
+            %hidden_no_senv;
             <input type="hidden" name="m" value="S">
             <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
               <h3 class="rounded modal-title my-2 ms-3 ms-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h3>

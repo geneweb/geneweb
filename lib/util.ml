@@ -791,9 +791,9 @@ let hidden_input_s conf k v = aux_input_s conf (Adef.encoded "hidden") k v
 let hidden_input conf k v = hidden_input_s conf k (Mutil.decode v)
 let hidden_env_aux conf = List.iter (fun (k, v) -> hidden_input conf k v)
 
-let hidden_env conf =
+let hidden_env ?(senv = true) conf =
   hidden_env_aux conf conf.henv;
-  hidden_env_aux conf conf.senv
+  if senv then hidden_env_aux conf conf.senv
 
 let submit_input conf k v =
   aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
