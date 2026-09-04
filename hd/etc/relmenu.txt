@@ -28,19 +28,7 @@
   %sp;[and]0…%nn;
 </h1>
 <form name="relationship" method="get" action="%action;">
-  %( Propagate henv only, NOT senv — senv contains stale em/ei/et
-     from a previous relationship computation that would conflict
-     with the explicit form inputs below. %)
-  %foreach;env_binding;
-    %if;(env.key="pz" or env.key="nz" or env.key="ocz" or env.key="iz"
-      or env.key="escache" or env.key="alwsurn" or env.key="pure_xhtml"
-      or env.key="size" or env.key="p_mod" or env.key="wide"
-      or env.key="manitou" or env.key="fmode" or env.key="templ"
-      or env.key="dsrc" or env.key="lang")
-      <input type="hidden" name="%env.key;" value="%env.val;">
-    %end;
-  %end;
-  %if;cgi;<input type="hidden" name="b" value="%base.name;">%end;
+  %hidden_no_senv;
   <input type="hidden" name="m" value="NG">
   <div class="row">
     <div id="rel_form_shortcut" class="col-4">

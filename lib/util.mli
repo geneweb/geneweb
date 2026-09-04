@@ -88,10 +88,13 @@ val hidden_env_aux : config -> (string * Adef.encoded_string) list -> unit
 (** [hidden_env_aux env] Creates a hidden HTML input for every key and value in
     [env]. *)
 
-val hidden_env : config -> unit
-(** Creates a hidden HTML input for every key and value in [conf.henv] and
-    [conf.senv]. Used to include immutable environement bindings in the HTML
-    form. *)
+val hidden_env : ?senv:bool -> config -> unit
+(** [hidden_env conf] emits [conf.henv] then [conf.senv] as hidden form inputs.
+    With [~senv:false], only [conf.henv] is emitted: use it on forms that start
+    a new navigation rather than continue the current one. [conf.senv] carries
+    the state of the computation in progress ([em], [ei], [et], [long],
+    [spouse]); a search form that reconducts it resolves its result as a
+    relationship target instead of displaying the person. *)
 
 val hidden_textarea : config -> string -> Adef.encoded_string -> unit
 
