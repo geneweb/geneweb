@@ -42,11 +42,29 @@ page.
    legacy debt — do not add more.
 5. Do not use `List.nth`, `List.concat`, or `@` (quadratic). Use
    `Array` access or accumulator patterns.
-6. When using standard library functions not available in OCaml 4.10,
+6. When using standard library functions not available in OCaml 4.14,
    check `Geneweb_compat` for a backport before reimplementing.
 7. `aux.ml` is a reserved Windows device name — do not use it as a
    filename (breaks CI on Windows/Cygwin).
 8. No commented-out code in committed files.
+9. Avoid `function` as the body of a named function: bind the
+   argument and `match` on it. The arity then shows at the
+   definition, the scrutinee has a name usable in annotations and in
+   error messages, and adding a parameter does not require
+   restructuring. `function` stays fine as an inline lambda, where
+   the type comes from the context:
+   `String.map (function '\\' -> '/' | c -> c) s`.
+10. Ordinary variants by default. Use polymorphic variants
+    (`` `Tag ``) only when a tag set is genuinely shared or extended
+    across several types. A typo in an ordinary constructor is an
+    immediate `Unbound constructor` on the exact line; a typo in a
+    tag silently widens an inferred row type and surfaces later,
+    elsewhere, as a `[< ]` / `[> ]` mismatch. Consuming polymorphic
+    variants from libraries (`Yojson.Safe.t`) is fine — that is
+    their API, not ours.
+11. No `| _ -> ...` over a closed variant type: enumerate the
+    constructors so that adding one raises a warning at every site
+    that must be updated. `_` is fine for `int`, `char`, `string`.
 
 ## Template Engine
 
@@ -114,10 +132,10 @@ For template `templx` on base `mybase`:
 
 ### Frontend Stack
 
-Bootstrap 5.3.8, jQuery, Chart.js 4.5.1 (UMD, not ESM), Font Awesome,
-Leaflet 2.0 alpha. CSS/JS assets in `hd/etc/css/` and `hd/etc/js/`
-use template wrappers (`css.txt`, `js.txt`) for conditional includes.
-Regenerate `.min.js` (Terser) after editing any `.js` file.
+Bootstrap 5.3.8 (no jQuery), Chart.js 4.5.1 (UMD, not ESM), Font Awesome.
+CSS/JS assets in `hd/etc/css/` and `hd/etc/js/` use template wrappers
+(`css.txt`, `js.txt`) for conditional includes. Regenerate `.min.js`
+with Terser after editing any `.js` file.
 
 ### Best Practices
 
