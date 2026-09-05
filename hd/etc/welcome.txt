@@ -345,7 +345,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
 en: Around the tree
 fr: Autour de l'arbre
 ]
-    %else;[*tools]%end;
+    %else;[*tools]%end; <small>(mode %if;reorg;reorg%else;legacy%end;)</small>
   </div>
   <div class="d-flex flex-wrap justify-content-md-center">
     %if;(wizard and not base.has_notes)
