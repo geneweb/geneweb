@@ -117,6 +117,14 @@ fr: Entrez le nom du dossier contenant les bases.
 en: If you write nothing, it will be taken as "."
 fr: Si vous ne mettez rien, la valeur par défaut sera "."
 
+    gwsetup configuration
+en: Environnment
+fr: Environnement
+
+    The parameters are recorded in the text file
+en: The parameters are recorded in the text file
+fr: Les paramètres sont enregistrés dans le fichier texte
+
     public names
 en: Public names
 fr: Noms publics
@@ -2542,32 +2550,24 @@ sv: Om du ändrar namnet på din databas, men databasen har funnits ett bra \
   då att se en sida som hänvisar dem till den nya databasen.
 
     If you gave a text to put in the bottom of the pages, this text is \
-  recorded in the file named "%a.trl" in the subdirectory "lang" of the \
-  directory "%w".
+  recorded in the file
 aa: gwf_ok.htm
 co: S’è vò avete datu un testu à piazzà à u bassu di e pagine, stu \
-  testu serà arregistratu in u schedariu di nome « %a.trl » in u \
-  sottucartulare « lang » di u cartulare « %w ».
+  testu serà arregistratu in u schedariu
 de: Falls du einen Text angegeben hast, der am Fuß der Seiten angezeigt \
-  werden soll, wurde er in der Datei "%a.trl" im Unterverzeichnis "lang" des \
-  Verzeichnisses "%w" gespeichert.
+  werden soll, wurde er in
 en: If you gave a text to put in the bottom of the pages, this text is \
-  recorded in the file named "%a.trl" in the subdirectory "lang" of the \
-  directory "%w".
+  recorded in the file
 es: Si Ud. ha escogido la opción de agregar un texto en la parte inferior de \
-  las páginas, este texto es registrado en el fichero denominado "%a.trl" en \
-  la sub-carpeta "lang" de la carpeta "%w".
+  las páginas, este texto es registrado en el fichero
 fr: Si vous avez donné un texte à mettre au bas des pages, ce texte est \
-  enregistré dans le fichier de nom "%a.trl" dans le sous-répertoire "lang" \
-  du répertoire "%w".
+  enregistré dans le fichier
 it: Se avete scelto l'opzione di aggiungere un testo in piede di pagina, \
-  questo testo è registrato nel file chiamato "%a.trl" nella sub-directory \
-  "lang" della directory "%w".
+  questo testo è registrato nel file
 lv: Ja Jûs norâdîjât arî katras lappuses noslçguma tekstu, tad ðis \
-  teksts ir ierakstîts datnç "%a.trl" kataloga "%w" apakðkatalogâ "lang".
+  teksts ir ierakstîts
 sv: Om du angav en text som ska stå längst ner på sidan, har denna text \
-  sparats i filen benämnd "%a.trl" i underkatalogen "lang" för katalogen \
-  "%w".
+  sparats i filen
 
     If you just made this, it is probably its result, and therefore it is not \
   important. Else, return to the previous page and choose another name for \
@@ -4534,22 +4534,16 @@ sv: Operationen "%d" kommer att appliceras på din databas "%a". Varning: det \
   kan ta några sekunder eller några minuter, beroende på fallet. Ha \
   tålamod.
 
-    The parameters are recorded in the text file "%a.gwf" in the directory \
-  "%w".
+    The parameters are recorded in the text file
 aa: gwf_ok.htm
-co: I parametri sò arregistrati in u schedariu di testu « %a.gwf » in u \
-  cartulare « %w ».
-de: Die Parameter sind in der Textdatei "%a.gwf" im Verzeichnis "%w".
-en: The parameters are recorded in the text file "%a.gwf" in the directory \
-  "%w".
-es: Los parámetros son registrados en el fichero texto "%a.gwf" en la \
-  carpeta "%w".
-fr: Les paramètres sont enregistrés dans le fichier texte "%a.gwf" dans le \
-  répertoire "%w".
-it: I parametri sono stati registrati nel file testo "%a.gwf" nella directory \
-  "%w".
-lv: Ðie parametri ir ierakstîti teksta datnç "%a.gwf" katalogâ "%w".
-sv: Parametrarna har sparats i textfilen "%a.gwf" i katalogen "%w".
+co: I parametri sò arregistrati in u schedariu di testu
+de: Die Parameter sind in der Textdatei
+en: The parameters are recorded in the text file
+es: Los parámetros son registrados en el fichero texto
+fr: Les paramètres sont enregistrés dans le fichier texte
+it: I parametri sono stati registrati nel file testo
+lv: Ðie parametri ir ierakstîti teksta datnç
+sv: Parametrarna har sparats i textfilen
 
     parameters of a database
 aa: welcome.htm
