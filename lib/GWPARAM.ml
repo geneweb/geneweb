@@ -4,6 +4,7 @@
     functions if it does not come with a performance cost. *)
 
 module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 module Code = Geneweb_http.Code
 
 let nb_errors = ref 0
@@ -351,6 +352,14 @@ let split_key key =
               String.sub fn_oc (d + 1) (String.length fn_oc - d - 1) )
       in
       (fn, oc, sn)
+
+let person_of_string_user_key base key =
+  let key = String.map (fun c -> if c = '+' then ' ' else c) key in
+  let fn, oc, sn = split_key key in
+  let occ = Option.value ~default:0 (int_of_string_opt oc) in
+  match Driver.person_of_key base fn sn occ with
+  | Some _ as ip -> ip
+  | None -> Gutil.person_of_string_dot_key base key
 
 (* Determine if person is related to the current user *)
 let ancestors _conf base max_generations family ip =
