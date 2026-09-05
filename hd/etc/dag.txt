@@ -134,7 +134,7 @@
   </tr>
 %end;
 </table>
-%if;(e.m="RL" or e.m="RLM")
+%if;(e.m="R" or e.m="RL" or e.m="RLM")
 %include;copyr
 %end;
 %include;trl
