@@ -691,11 +691,9 @@ let rec copy_from_stream conf print strm =
               (* | 'F' see 'V' *)
               (* the current directory may have changes with -bd *)
               | 'G' ->
-                  print
-                    ("File: " ^ (!bases_dir // "tmp" // "gwsetup.log") ^ "\n");
-                  print_specific_file_tail conf print
-                    (!bases_dir // "tmp" // "gwsetup.log")
-                    strm
+                  let fname = !bases_dir // "tmp" // "gwsetup.log" in
+                  print ("File: " ^ fname ^ "\n");
+                  print_specific_file_tail conf print fname strm
               | 'H' ->
                   (* print the content of -o filename, prepend bname *)
                   let outfile = strip_spaces (s_getenv conf.env "o") in
@@ -722,6 +720,14 @@ let rec copy_from_stream conf print strm =
                     | None -> conf.env
                   in
                   print_if_else conf print (s_getenv env k1 = k2) strm
+              | 'R' -> (
+                  (* %R{reorg part|not reorg part} *)
+                  match p_getenv conf.env "anon" with
+                  | Some in_base ->
+                      print_if_else conf print
+                        (GWPARAM.is_reorg_base in_base)
+                        strm
+                  | None -> print_if_else conf print false strm)
               | 'J' ->
                   (* %Jvar;value;{var = value part|false part} *)
                   (* var and value may contain %m macros *)
@@ -771,6 +777,11 @@ let rec copy_from_stream conf print strm =
                   | Some v -> print v
                   | None -> ())
               | 'W' -> print (gwsetup_config ())
+              | 'Z' -> (
+                  let c = Stream.next strm in
+                  match c with
+                  | 't' -> print "Za test macro"
+                  | _ -> print (Printf.sprintf "BAD Zx macro (%%Z%c)" c))
               | _ -> (
                   match p_getenv conf.env (String.make 1 c) with
                   | Some v -> (
@@ -790,7 +801,7 @@ let rec copy_from_stream conf print strm =
                           print "\"";
                           if v = s then print " checked"
                       | _ -> print (strip_spaces v))
-                  | None -> print ("BAD MACRO 2" ^ String.make 1 c)))
+                  | None -> print (Printf.sprintf "BAD MACRO 2 (%c)" c)))
           | c -> print (macro conf c))
       | c -> print (String.make 1 c)
     done
@@ -1447,11 +1458,8 @@ let gwf conn conf =
   else
     let benv = loc_read_base_env in_base in
     let trailer =
-      if !GWPARAM.reorg then !GWPARAM.lang_d in_base "" // (in_base ^ ".trl")
-      else
-        get_bases_dir () // "lang" // (in_base ^ ".trl")
-        |> file_contents |> Util.escape_html
-        |> fun s -> (s :> string)
+      !GWPARAM.etc_d in_base // "trl.txt" |> file_contents |> Util.escape_html
+      |> fun s -> (s :> string)
     in
     let conf = { conf with env = benv @ (("trailer", trailer) :: conf.env) } in
     print_file "gwf_1.htm" conn conf
@@ -1467,8 +1475,8 @@ let gwf_1 conn conf =
   let vars, _ = variables "gwf_1.htm" in
   let oc =
     open_out
-      (if !GWPARAM.reorg then !GWPARAM.bpath in_base // (in_base ^ ".gwf")
-       else in_base ^ ".gwf")
+      (if !GWPARAM.reorg then GWPARAM.config_reorg in_base
+       else GWPARAM.config_legacy in_base)
   in
   let body_prop =
     match p_getenv conf.env "proposed_body_prop" with
@@ -1491,10 +1499,8 @@ let gwf_1 conn conf =
   close_out oc;
   let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
 
-  let trl_dir = !GWPARAM.etc_d in_base in
-  let trl_file = trl_dir // "trl.txt" in
-  if trl_dir = "" then failwith "trl_dir est vide (etc_d absent ?)";
-  (try Unix.mkdir trl_dir 0o755 with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
+  let trl_file = !GWPARAM.etc_d in_base // "trl.txt" in
+  if !GWPARAM.etc_d in_base = "" then failwith "etc_d absent ?";
   (try
      if trl = "" then Sys.remove trl_file
      else
