@@ -1347,12 +1347,59 @@ let string_of_witness_kind_raw witness_kind =
 
 let bpath bname = !GWPARAM.bpath bname
 
+(* Cache directory listings to avoid one [Sys.file_exists] per (directory,
+   filename) pair. A single page render probes a handful of search
+   directories against dozens of distinct template names ("buttons",
+   "trl", "copyr", "perso", ...); without this cache that is dozens of
+   stat() calls per directory. With the cache, each directory is
+   [Sys.readdir]'d at most once every [dir_listing_cache_ttl] seconds,
+   and every subsequent lookup against it - for any filename - is a
+   plain in-memory Hashtbl lookup. [None] means the directory doesn't
+   exist (or isn't readable). *)
+let dir_listing_cache : (string, float * (string, unit) Hashtbl.t option) Hashtbl.t
+    =
+  Hashtbl.create 16
+
+let dir_listing_cache_ttl = 60.0 (* seconds *)
+
+let dir_listing dir =
+  let now = Unix.time () in
+  match Hashtbl.find_opt dir_listing_cache dir with
+  | Some (checked_at, listing) when now -. checked_at < dir_listing_cache_ttl ->
+      listing
+  | _ ->
+      let listing =
+        match Sys.readdir dir with
+        | entries ->
+            let tbl = Hashtbl.create (Array.length entries) in
+            Array.iter (fun e -> Hashtbl.replace tbl e ()) entries;
+            Some tbl
+        | exception Sys_error _ -> None
+      in
+      Hashtbl.replace dir_listing_cache dir (now, listing);
+      listing
+
+let dir_exists_cached dir = dir_listing dir <> None
+
+(* [filename] may itself contain subdirectory components (e.g.
+   "js/foo.js", "modules/arbre_h6.css"): split it once so that what gets
+   cached is the listing of the directory that actually holds it, not a
+   nonexistent flat lookup key. For the common case of a flat template
+   name, [sub_dir] is ["."] and this collapses to caching [dir] itself. *)
 let find_file_in_directories directories filename =
+  let sub_dir = Filename.dirname filename in
+  let base_name = Filename.basename filename in
   let rec search = function
     | [] -> None
-    | dir :: remaining ->
-        let full_path = Filename.concat dir filename in
-        if Sys.file_exists full_path then Some full_path else search remaining
+    | dir :: remaining -> (
+        let full_dir =
+          if sub_dir = Filename.current_dir_name then dir
+          else Filename.concat dir sub_dir
+        in
+        match dir_listing full_dir with
+        | Some entries when Hashtbl.mem entries base_name ->
+            Some (Filename.concat dir filename)
+        | _ -> search remaining)
   in
   search directories
 
