@@ -1356,8 +1356,8 @@ let bpath bname = !GWPARAM.bpath bname
    and every subsequent lookup against it - for any filename - is a
    plain in-memory Hashtbl lookup. [None] means the directory doesn't
    exist (or isn't readable). *)
-let dir_listing_cache : (string, float * (string, unit) Hashtbl.t option) Hashtbl.t
-    =
+let dir_listing_cache :
+    (string, float * (string, unit) Hashtbl.t option) Hashtbl.t =
   Hashtbl.create 16
 
 let dir_listing_cache_ttl = 60.0 (* seconds *)
@@ -1412,17 +1412,18 @@ let find_file_in_directories directories filename =
     The search is done in this order:
     - bases/etc/mybase/templx/ (template [templx] in mybase)
     - bases/etc/mybase/ (default template in mybase)
-    - bases/etc/templx/ (template [templx] shared across all bases, if it exists)
+    - bases/etc/templx/ (template [templx] shared across all bases, if it
+      exists)
     - bases/etc/ (shared default across all bases, if it exists)
     - gw/etc/templx/ (template [templx] in etc)
     - gw/etc/ (default template in etc)
 
     The [templx] level of both [bases/etc/mybase/] and the two "shared"
-    directories above is only probed if it actually exists (checked via
-    a short-lived cache, see [dir_exists_cached] / [dir_listing]): most
-    installations never create a per-template folder, so this keeps its
-    cost to one cached [Sys.readdir] every [dir_listing_cache_ttl]
-    seconds instead of one stat() per template lookup.
+    directories above is only probed if it actually exists (checked via a
+    short-lived cache, see [dir_exists_cached] / [dir_listing]): most
+    installations never create a per-template folder, so this keeps its cost to
+    one cached [Sys.readdir] every [dir_listing_cache_ttl] seconds instead of
+    one stat() per template lookup.
 
     The template configuration variable can contain:
     - template=templ1,templ2: allows only these templates
