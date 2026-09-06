@@ -246,11 +246,19 @@ let load_lexicon =
   fun lang ->
     let process_lexicon ht fname =
       let fname =
-        let f = Util.search_in_assets fname in
+        (* Search gw/lang/<fname>, then the installation-wide
+           bases/lang/<fname> - deliberately NOT base- or
+           template-specific: unlike templates/CSS/JS, a lexicon
+           override is expected to apply uniformly across every base
+           and template on the installation, and keeping it that way
+           avoids needing a base/template-aware cache key here. *)
+        let f = Util.search_in_assets (Filename.concat "lang" fname) in
         if Sys.file_exists f then f
         else
-          let bf = Filename.concat (Secure.base_dir ()) fname in
-          if Sys.file_exists bf then bf else f
+          let bf =
+            Filename.concat (Secure.base_dir ()) (Filename.concat "lang" fname)
+          in
+          if Sys.file_exists bf then bf else fname
       in
       if Sys.file_exists fname then
         Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
@@ -264,7 +272,7 @@ let load_lexicon =
           Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
             (fun () ->
               let ht = Hashtbl.create 0 in
-              process_lexicon ht ("lang" // "lexicon.txt");
+              process_lexicon ht "lexicon.txt";
               List.iter (process_lexicon ht) !lexicon_list;
               ht)
         in
