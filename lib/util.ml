@@ -1412,8 +1412,16 @@ let find_file_in_directories directories filename =
     The search is done in this order:
     - bases/etc/mybase/templx/ (template [templx] in mybase)
     - bases/etc/mybase/ (default template in mybase)
+    - bases/etc/templx/ (template [templx] shared across all bases, if it exists)
+    - bases/etc/ (shared default across all bases, if it exists)
     - gw/etc/templx/ (template [templx] in etc)
     - gw/etc/ (default template in etc)
+
+    The two "shared" directories above are only probed if they actually
+    exist (checked via a short-lived cache, see [dir_exists_cached] /
+    [dir_listing]): most installations never create them, so this keeps
+    their cost to one cached [Sys.readdir] every [dir_listing_cache_ttl]
+    seconds instead of one stat() per template lookup.
 
     The template configuration variable can contain:
     - template=templ1,templ2: allows only these templates
@@ -1424,6 +1432,7 @@ let find_file_in_directories directories filename =
 
 let generate_search_directories conf =
   let base_etc = !GWPARAM.etc_d conf.bname in
+  let shared_etc = Filename.concat (Secure.base_dir ()) "etc" in
   let asset_dirs = Secure.assets () in
   let configured_templates, allow_all =
     try
@@ -1447,6 +1456,14 @@ let generate_search_directories conf =
     | Some t -> [ Filename.concat base_etc t; base_etc ]
     | None -> [ base_etc ]
   in
+  let shared_dirs =
+    let candidates =
+      match current_template with
+      | Some t -> [ Filename.concat shared_etc t; shared_etc ]
+      | None -> [ shared_etc ]
+    in
+    List.filter dir_exists_cached candidates
+  in
   let asset_template_dirs =
     List.concat
       (List.map
@@ -1457,7 +1474,7 @@ let generate_search_directories conf =
            | None -> [ etc_dir ])
          asset_dirs)
   in
-  template_dirs @ asset_template_dirs
+  template_dirs @ shared_dirs @ asset_template_dirs
 
 (* ************************************************************************ *)
 (*  [Func] find_template_file : config -> string -> bool -> string          *)
