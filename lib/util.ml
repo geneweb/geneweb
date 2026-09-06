@@ -1417,10 +1417,11 @@ let find_file_in_directories directories filename =
     - gw/etc/templx/ (template [templx] in etc)
     - gw/etc/ (default template in etc)
 
-    The two "shared" directories above are only probed if they actually
-    exist (checked via a short-lived cache, see [dir_exists_cached] /
-    [dir_listing]): most installations never create them, so this keeps
-    their cost to one cached [Sys.readdir] every [dir_listing_cache_ttl]
+    The [templx] level of both [bases/etc/mybase/] and the two "shared"
+    directories above is only probed if it actually exists (checked via
+    a short-lived cache, see [dir_exists_cached] / [dir_listing]): most
+    installations never create a per-template folder, so this keeps its
+    cost to one cached [Sys.readdir] every [dir_listing_cache_ttl]
     seconds instead of one stat() per template lookup.
 
     The template configuration variable can contain:
@@ -1453,7 +1454,10 @@ let generate_search_directories conf =
   in
   let template_dirs =
     match current_template with
-    | Some t -> [ Filename.concat base_etc t; base_etc ]
+    | Some t ->
+        let templx_dir = Filename.concat base_etc t in
+        if dir_exists_cached templx_dir then [ templx_dir; base_etc ]
+        else [ base_etc ]
     | None -> [ base_etc ]
   in
   let shared_dirs =
