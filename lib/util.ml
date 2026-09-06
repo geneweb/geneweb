@@ -1496,7 +1496,13 @@ let find_template_file conf fname auto_txt =
     List.fold_left Filename.concat "" (String.split_on_char '/' fname)
   in
   let final_fname =
-    if auto_txt && not (Filename.check_suffix normalized_fname ".txt") then
+    (* Only append ".txt" to a bare name (no extension at all): a name
+       that already carries its own extension (e.g. an "%include"'d
+       "foo.js" or "foo.css") must be looked up as-is. Checking only for
+       an existing ".txt" suffix (as before) let any other extension
+       silently turn into "foo.js.txt", which then could never be found
+       since real assets are never named that way. *)
+    if auto_txt && Filename.extension normalized_fname = "" then
       normalized_fname ^ ".txt"
     else normalized_fname
   in
