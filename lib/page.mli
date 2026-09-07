@@ -70,6 +70,8 @@ module Advanced_search : sig
       event_kind:Event.kind -> t -> Date.dmy option * Date.dmy option
 
     val from_env : Config.env -> t option
+    val set_include_marital_names : bool -> t -> t
+    val set_limit : int option -> t -> t
   end
 end
 
