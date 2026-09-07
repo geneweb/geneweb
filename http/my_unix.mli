@@ -10,3 +10,12 @@ val accept_noeintr :
   ?cloexec:bool -> Unix.file_descr -> Unix.file_descr * Unix.sockaddr
 (** Equivalent to [Unix.accept], but this variant restart upon interruption by
     signals. *)
+
+val select_noeintr :
+  Unix.file_descr list ->
+  Unix.file_descr list ->
+  Unix.file_descr list ->
+  float ->
+  Unix.file_descr list * Unix.file_descr list * Unix.file_descr list
+(** Equivalent to [Unix.select], but this variant restart upon interruption by
+    signals. *)
