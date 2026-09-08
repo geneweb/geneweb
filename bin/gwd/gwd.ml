@@ -1290,7 +1290,8 @@ let make_conf ~predictable_mode ~loaded_plugins ~secret_salt from_addr request
     | "" -> ("", env)
     | _ -> ("", ("opt", Mutil.encode x) :: env)
   in
-  GWPARAM.test_reorg base_file;
+  (* read base environment from the right location *)
+  GWPARAM.set_reorg base_file None;
   let base_env =
     if base_file = "" then []
     else Util.read_base_env base_file (Option.get !gw_prefix) !debug

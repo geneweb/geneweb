@@ -172,10 +172,10 @@ let init () =
     images_d := Legacy.images_d;
     albums_d := Legacy.albums_d)
 
-let test_reorg bname =
-  if !reorg || is_reorg_base bname then (
-    reorg := true;
-    init ())
+let set_reorg bname force =
+  let res = match force with Some b -> b | None -> is_reorg_base bname in
+  reorg := res;
+  init ()
 
 let get_timestamp () =
   let tm = Unix.localtime (Unix.time ()) in

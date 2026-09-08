@@ -37,10 +37,11 @@ val init : unit -> unit
 (** Function called to initialize path functions based on the reorg flag. *)
 
 val is_reorg_base : string -> bool
-(** returns true if mybase.gwb/config/mybase.gwf exists *)
+(** returns true iff mybase.gwb/config/mybase.gwf exists *)
 
-val test_reorg : string -> unit
-(** set reorg to true if !reorg of is_reorg_base; then calls init *)
+val set_reorg : string -> bool option -> unit
+(** if bool option = Some bool -> set reorg to bool if bool option = None -> set
+    reorg according to is_reorg_base; call init *)
 
 val check_base_exists : string -> unit
 (** Check if database exists and exit if so (unless -f flag is set) *)

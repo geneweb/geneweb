@@ -83,12 +83,12 @@ let read_base_env bname gw_prefix debug =
           k "Error %s while loading %s, using empty config" error fname);
       []
   in
-  let fname1 = !GWPARAM.config bname in
-  if Sys.file_exists fname1 then load_file fname1
+  let fname = !GWPARAM.config bname in
+  if Sys.file_exists fname then load_file fname
   else (
     if debug then
       Log.info (fun k ->
-          k "No configuration file %s found,@ see %s for example" fname1
+          k "No configuration file found (%s), see %s for example" fname
             (Filename.concat gw_prefix "a.gwf"));
     [])
 

@@ -235,6 +235,9 @@ let w_base ~none fn conf (bfile : string option) =
   match bfile with
   | None -> none conf
   | Some bfile ->
+      let bname = Filename.basename bfile |> Filename.chop_extension in
+      (* make sure the various folders (portraits, images, ...) are located properly *)
+      GWPARAM.set_reorg bname None;
       Driver.with_database bfile (fun base ->
           let conf = make_henv conf base in
           let conf = make_senv conf base in
