@@ -587,7 +587,7 @@ let rec copy_from_stream conf print strm =
                             really_input_string ic (in_channel_length ic)))
               in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
-              GWPARAM.test_reorg in_base;
+              GWPARAM.set_reorg in_base None;
               let benv = loc_read_base_env in_base in
               let conf = { conf with env = benv @ conf.env } in
               (* depending on when %f is called, conf may be sketchy *)
@@ -1409,13 +1409,11 @@ let gwf conf =
     print_file conf "gwf_1.htm"
 
 let gwf_1 conf =
-  GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
   let reorg = match p_getenv conf.env "reorg" with Some s -> s | _ -> "" in
-  if reorg = "on" then GWPARAM.reorg := true;
-  GWPARAM.test_reorg in_base;
+  GWPARAM.set_reorg in_base (Some (reorg = "on"));
   let benv = loc_read_base_env in_base in
   let vars, _ = variables "gwf_1.htm" in
   let oc =

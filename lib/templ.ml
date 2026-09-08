@@ -683,6 +683,7 @@ let templ_eval_var (conf : Config.config) = function
   | [ "cgi" ] -> VVbool conf.cgi
   | [ "debug" ] -> VVbool conf.debug
   | [ "false" ] -> VVbool false
+  | [ "reorg" ] -> VVbool !GWPARAM.reorg
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
       VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
@@ -1056,7 +1057,6 @@ and eval_integer i = function
 let eval_var conf ifun env ep loc sl =
   try
     match sl with
-    | [ "reorg" ] -> VVbool !GWPARAM.reorg
     | [ "env"; "key" ] -> (
         match ifun.get_vother (Env.find "binding" env) with
         | Some (Vbind (k, _)) -> VVstring k

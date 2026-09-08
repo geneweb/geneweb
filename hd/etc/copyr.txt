@@ -65,6 +65,7 @@
               role="menu" aria-labelledby="dropdownMenu1"></div>
           </div>
         %end;
+        <small class="mb-2 mx-0" title="Mode[:] R=reorg, L=legacy">(%if;reorg;R%else;L%end;)</small>
         <!-- Connections info -->
         %if;(connections.total!="" and b.hide_connections!="yes")
           <div class="d-flex flex-column justify-items-center align-items-center small ms-1 ms-md-3"
