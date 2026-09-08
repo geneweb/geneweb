@@ -51,3 +51,5 @@ val compatible_strings : Gwdb.istr -> Gwdb.istr -> bool
 val compatible_notes : Gwdb.base -> Gwdb.istr -> Gwdb.istr -> bool
 (** [compatible_notes base s1 s2] returns [true] if notes [s1] and [s2]
     contain compatible content. *)
+
+val has_continuation : Config.config -> bool
