@@ -278,11 +278,16 @@ module Advanced_search = struct
               in
               List.filter_map make all_event_kinds
         in
+        let surname_search_mode = get_name_search_mode gets "exact_surname" in
+        let include_marital_names =
+          "false" <> gets "include_marital_names"
+          && surname_search_mode <> `Exact
+        in
         {
           first_name = gets_opt "first_name";
           first_name_search_mode = get_name_search_mode gets "exact_first_name";
           surname = gets_opt "surname";
-          surname_search_mode = get_name_search_mode gets "exact_surname";
+          surname_search_mode;
           alias = gets_opt "alias_pubname_qualifiers";
           sex = gets "sex" |> sex_of_string;
           married;
@@ -292,12 +297,17 @@ module Advanced_search = struct
           event_search_mode;
           event_exact_place = "on" = gets "exact_place";
           limit = Util.p_getint env "max";
-          include_marital_names = "false" <> gets "include_marital_names";
+          include_marital_names;
         }
       in
       Ext_option.return_if
         (not @@ are_empty query_params)
         (fun () -> query_params)
+
+    let set_include_marital_names include_marital_names query_params =
+      { query_params with include_marital_names }
+
+    let set_limit limit query_params = { query_params with limit }
   end
 end
 
