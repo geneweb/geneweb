@@ -148,3 +148,9 @@ let print_possible_continue_merging conf base =
                  (s :> string));
             Output.print_sstring conf {|)</p>|})
       | None -> ())
+
+let page_title ~has_continuation conf =
+  let title_key =
+    if has_continuation then "merge_in_progress" else "merge done"
+  in
+  Utf8.capitalize_fst @@ Util.transl conf title_key
