@@ -15,4 +15,8 @@
  (package geneweb)
  (alias runtest)
  (action
-  (diff template.expected template.out)))
+  (progn
+   (diff template.expected template.out)
+   (run
+    printf
+    "Testing `[1mtempl_test[0m'\n  [32m[OK][0m template parsing matches template.expected\n"))))

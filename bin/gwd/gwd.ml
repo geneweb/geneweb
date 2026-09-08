@@ -1806,15 +1806,7 @@ let find_misc_file_of_plugins name =
 let find_misc_file conf name =
   if Sys.file_exists name && find_misc_file_of_plugins name then name
   else
-    (* [Util.resolve_asset_file] runs the full, template-aware overlay
-       search (base+templ, base, shared+templ, shared, dist+templ, dist -
-       see [Util.generate_search_directories]), backed by the cached
-       directory-listing lookup. This replaces the previous ad hoc
-       2-level search here (base, then dist only), which silently ignored
-       `templ=` for every CSS/JS/font/image file served this way - a
-       `templ`-specific override could never actually be delivered to the
-       browser even though it existed on disk.
-       [resolve_asset_file] always returns *some* path (it falls back to
+    (* [resolve_asset_file] always returns *some* path (it falls back to
        the unresolved name when nothing matches), so existence must still
        be checked here to preserve this function's "" contract. *)
     let path = Util.resolve_asset_file conf name in

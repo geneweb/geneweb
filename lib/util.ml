@@ -1347,15 +1347,7 @@ let string_of_witness_kind_raw witness_kind =
 
 let bpath bname = !GWPARAM.bpath bname
 
-(* Cache directory listings to avoid one [Sys.file_exists] per (directory,
-   filename) pair. A single page render probes a handful of search
-   directories against dozens of distinct template names ("buttons",
-   "trl", "copyr", "perso", ...); without this cache that is dozens of
-   stat() calls per directory. With the cache, each directory is
-   [Sys.readdir]'d at most once every [dir_listing_cache_ttl] seconds,
-   and every subsequent lookup against it - for any filename - is a
-   plain in-memory Hashtbl lookup. [None] means the directory doesn't
-   exist (or isn't readable). *)
+(* Cached [dir_listing_cache_ttl] seconds. [None] = directory absent/unreadable. *)
 let dir_listing_cache :
     (string, float * (string, unit) Hashtbl.t option) Hashtbl.t =
   Hashtbl.create 16
@@ -1364,21 +1356,31 @@ let dir_listing_cache_ttl = 60.0 (* seconds *)
 
 let dir_listing dir =
   let now = Unix.time () in
-  match Hashtbl.find_opt dir_listing_cache dir with
-  | Some (checked_at, listing) when now -. checked_at < dir_listing_cache_ttl ->
+  let recompute () =
+    let listing =
+      try
+        let tbl = Hashtbl.create 16 in
+        Filesystem.walk_folder
+          (fun entry () ->
+            match entry with
+            | Filesystem.File fl | Filesystem.Dir fl ->
+                Hashtbl.replace tbl (Filename.basename fl) ()
+            | Filesystem.Exn { exn; bt; _ } ->
+                Printexc.raise_with_backtrace exn bt)
+          dir ();
+        Some tbl
+      with Unix.Unix_error _ -> None
+    in
+    Hashtbl.replace dir_listing_cache dir (now, listing);
+    listing
+  in
+  match Hashtbl.find dir_listing_cache dir with
+  | checked_at, listing when now -. checked_at < dir_listing_cache_ttl ->
       listing
-  | _ ->
-      let listing =
-        match Sys.readdir dir with
-        | entries ->
-            let tbl = Hashtbl.create (Array.length entries) in
-            Array.iter (fun e -> Hashtbl.replace tbl e ()) entries;
-            Some tbl
-        | exception Sys_error _ -> None
-      in
-      Hashtbl.replace dir_listing_cache dir (now, listing);
-      listing
+  | _ -> recompute ()
+  | exception Not_found -> recompute ()
 
+let parse_file_cached fl = Geneweb_templ.Parser.parse_file ~src:(`File fl) fl
 let dir_exists_cached dir = dir_listing dir <> None
 
 (* [filename] may itself contain subdirectory components (e.g.
