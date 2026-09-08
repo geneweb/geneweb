@@ -331,9 +331,9 @@ let different_sexes conf base p1 p2 =
   Hutil.trailer conf
 
 let print_merged conf base wl p =
+  let has_continuation = MergeInd.has_continuation conf in
   let title _ =
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (Util.transl conf "merge done"))
+    Output.print_sstring conf (MergeDisplay.page_title ~has_continuation conf)
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
