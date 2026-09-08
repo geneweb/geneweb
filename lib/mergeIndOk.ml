@@ -468,8 +468,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let conf = Update.update_conf o_conf in
   let p_family = Gwdb.get_family (Gwdb.poi base sp.Def.key_index) in
   let p2_family = Gwdb.get_family (Gwdb.poi base o_p2.Def.key_index) in
-  let warning _ = () in
-  MergeInd.reparent_ind base warning sp.key_index o_p2.key_index;
+  ignore (MergeInd.reparent_ind base sp.key_index o_p2.key_index);
   let p =
     UpdateIndOk.effective_mod ~skip_conflict:o_p2.key_index conf base sp
   in
