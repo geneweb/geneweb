@@ -4,8 +4,7 @@ module Compat = Geneweb_compat
 
 let parse_file fl =
   let resolve_include _loc s = s in
-  Parser.parse ~cached:false ~on_exn:Printexc.raise_with_backtrace
-    ~resolve_include (`File fl)
+  Parser.parse ~on_exn:Printexc.raise_with_backtrace ~resolve_include (`File fl)
 
 (* HOTFIX: dune 3.24 changed the way it handles path. The latest versions
    introduces systematically a leading dot and the previous version trim it.
