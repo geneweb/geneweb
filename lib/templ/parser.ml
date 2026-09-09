@@ -1,13 +1,3 @@
-let with_cache (type a b) (f : a -> b) : a -> b =
-  let cache : (a, b) Hashtbl.t = Hashtbl.create 17 in
-  fun x ->
-    match Hashtbl.find cache x with
-    | exception Not_found ->
-        let r = f x in
-        Hashtbl.add cache x r;
-        r
-    | r -> r
-
 let parse_ast ~src lexbuf =
   let st = Lexer.State.create ~src lexbuf in
   Lexer.parse_ast (Buffer.create 1024) [] st lexbuf |> fst
@@ -21,10 +11,9 @@ let parse_file ~src fl =
   let lexbuf = Lexing.from_channel ~with_positions:false ic in
   parse_ast ~src lexbuf
 
-let parse_source ~cached src =
+let parse_source src =
   match src with
-  | `File fl ->
-      if cached then with_cache (parse_file ~src) fl else parse_file ~src fl
+  | `File fl -> parse_file ~src fl
   | `Raw s -> parse_ast ~src (Lexing.from_string ~with_positions:false s)
 
 let comment fl =
@@ -35,9 +24,9 @@ let comment fl =
   in
   Ast.mk_text s
 
-let parse ?(cached = true) ~on_exn ~resolve_include src =
+let parse ~on_exn ~resolve_include src =
   let parse_include ~loc src =
-    try Ast.mk_pack ~loc @@ parse_source ~cached src
+    try Ast.mk_pack ~loc @@ parse_source src
     with e ->
       let bt = Printexc.get_raw_backtrace () in
       on_exn e bt;
@@ -61,4 +50,4 @@ let parse ?(cached = true) ~on_exn ~resolve_include src =
             Ast.mk_pack @@ [ comment fl; expand t; comment fl ]
         | `Raw s -> expand @@ parse_include ~loc (`Raw s))
   and expand_list l = List.map expand l in
-  expand_list @@ parse_source ~cached src
+  expand_list @@ parse_source src

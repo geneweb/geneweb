@@ -50,9 +50,7 @@ let resolve_include conf _loc fl =
 
 let parse conf fl =
   let fl = Util.etc_file_name conf fl in
-  let cached = not conf.predictable_mode in
-  Parser.parse ~cached ~on_exn ~resolve_include:(resolve_include conf)
-    (`File fl)
+  Parser.parse ~on_exn ~resolve_include:(resolve_include conf) (`File fl)
 
 let sort_apply_parameters loc f_expr xl vl =
   let named_vl, unnamed_vl =
@@ -1352,9 +1350,8 @@ and print_var print_ast_list conf ifun env ep loc sl =
           try
             let fl = Util.etc_file_name conf templ in
             let astl =
-              let cached = not conf.predictable_mode in
-              Parser.parse ~cached ~on_exn
-                ~resolve_include:(resolve_include conf) (`File fl)
+              Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
+                (`File fl)
             in
             print_ast_list env ep astl
           with _ ->
