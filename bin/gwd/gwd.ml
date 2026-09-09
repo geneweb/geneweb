@@ -2210,9 +2210,10 @@ let main ~plugins ?interface ~port ~predictable_mode ~secret_salt () =
     in
     geneweb_cgi ~predictable_mode ~loaded_plugins ~secret_salt addr
       (Filename.basename script) query)
-  else
+  else (
+    display_infos ();
     geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port
-      ~secret_salt ()
+      ~secret_salt ())
 
 let has_root_privileges () =
   if not Sys.unix then false
@@ -2403,7 +2404,6 @@ let master ~plugins ~interface ~port ~predictable_mode ~force_cgi () =
   (* A secret salt is added to the environment to ensure that workers
      use the same salt for digests on both Unix and Windows platforms. *)
   Unix.putenv "SECRET_SALT" secret_salt;
-  display_infos ();
   main ~plugins ~interface ~port ~predictable_mode ~secret_salt ()
 
 let daemonize ~daemon k =
