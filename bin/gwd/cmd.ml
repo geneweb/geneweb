@@ -589,6 +589,15 @@ let debug_flags =
   let predictable_mode = if check then true else predictable_mode in
   (debug, check, verbosity, predictable_mode)
 
+let parse_cgi_flags =
+  let open C.Term.Syntax in
+  C.Term.ret @@
+  let+ cgi = cgi
+  and+ deamon = daemon
+  in
+  if cgi && deamon then `Error (false, "cannot activate deamon mode in CGI mode")
+  else `Ok cgi
+
 let t =
   let open C.Term.Syntax in
   let doc = "Geneweb daemon" in
@@ -631,7 +640,7 @@ let t =
   and+ max_pending_requests = max_pending_requests
   and+ _ : int = max_clients
   and+ n_workers = n_workers
-  and+ cgi = cgi
+  and+ cgi = parse_cgi_flags
   and+ daemon = daemon
   and+ default_lang = default_lang
   and+ _ : bool = browser_lang
