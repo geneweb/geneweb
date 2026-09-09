@@ -2444,17 +2444,6 @@ let daemonize ~daemon k =
     | _ -> exit 0
   else k ()
 
-let infer_cgi () =
-  match Sys.getenv "QUERY_STRING" with
-  | exception Not_found -> false
-  | _ ->
-      Fmt.epr
-        "CGI mode was enabled via the QUERY_STRING environment variable. This \
-         implicit behavior is deprecated. Use the `--cgi` option.@.";
-      true
-
-let is_cgi ~force_cgi = force_cgi || infer_cgi ()
-
 let () =
   if has_root_privileges () then (
     Format.eprintf
@@ -2471,16 +2460,9 @@ let () =
   setup_log ~port:opts.port ~predictable_mode:opts.predictable_mode opts.log;
   match Unix.getenv "WSERVER" with
   | exception Not_found ->
-      let cgi = is_cgi ~force_cgi:opts.cgi in
-      if cgi && opts.log = Cmd.Stdout then (
-        Fmt.epr
-          "CGI mode cannot use `--log '<stdout>'`: the standard output carries \
-           the response. Redirect the diagnostic output with your shell \
-           instead.@.";
-        exit 2);
       daemonize ~daemon:opts.daemon @@ fun () ->
       master ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
-        ~predictable_mode:opts.predictable_mode ~cgi ()
+        ~predictable_mode:opts.predictable_mode ~cgi:opts.cgi ()
   | _ ->
       windows_worker ~plugins:opts.plugins ~interface:opts.interface
         ~port:opts.port ~predictable_mode:opts.predictable_mode ()
