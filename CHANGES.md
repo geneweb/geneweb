@@ -9,14 +9,19 @@
   without IPv6 support must pass `-i 0.0.0.0`.
 - The startup log lists every reachable URL when bound to a wildcard
   address.
+- `--log '<stdout>'` is now rejected in CGI mode, including when the mode
+  is inferred from `QUERY_STRING` (#2948).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
   IPv6 loopback only on Windows.
 
 ## Deprecated features
-- The CGI mode inferred by the environment variable `QUERY_STRING` is
-  deprecated.
+- Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment
+  variable is deprecated (#2936). Use the `--cgi` option. Note that a CGI
+  binary invoked directly by the web server receives no command line
+  arguments, so `--cgi` requires a wrapper script; this has to be settled
+  before the inference is actually removed.
 
 ## Breaking changes
 - Deprecate the multi-parents feature (#2726)

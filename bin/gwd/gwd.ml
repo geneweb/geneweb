@@ -2253,6 +2253,7 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
     Log.debug (fun k -> k "End of check mode.");
     exit 0);
   if cgi then (
+    Server.cgi := true;
     let query =
       match Sys.getenv "QUERY_STRING" with
       | exception Not_found -> Adef.encoded ""
@@ -2348,14 +2349,10 @@ let infer_cgi () =
   match Sys.getenv "QUERY_STRING" with
   | exception Not_found -> false
   | _ ->
-      Log.warn (fun k ->
-          k
-            "CGI mode was enabled via QUERY_STRING environment variable. This \
-             implicit behavior is deprecated. Use the `--cgi` CLI option \
-             instead.");
+      Fmt.epr
+        "CGI mode was enabled via the QUERY_STRING environment variable. This \
+         implicit behavior is deprecated. Use the `--cgi` option.@.";
       true
-
-let switch_cgi_mode () = Server.cgi := true
 
 type opened_file = { path : string; mutable oc : out_channel option }
 
@@ -2447,7 +2444,11 @@ let () =
   if opts.debug then switch_debug ();
   setup_log ~predictable_mode:opts.predictable_mode opts.log;
   let cgi = opts.cgi || infer_cgi () in
-  if cgi then switch_cgi_mode ();
+  if cgi && opts.log = Cmd.Stdout then (
+    Fmt.epr
+      "CGI mode cannot use `--log '<stdout>'`: the standard output carries the \
+       response. Redirect the diagnostic output with your shell instead.@.";
+    exit 2);
   try
     main ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
       ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ~cgi ()
