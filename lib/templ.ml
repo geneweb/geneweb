@@ -201,7 +201,7 @@ let rec eval_variable (conf : Config.config) = function
         aux 0 assoc_list
       in
       let l =
-        if List.assoc "sort_bvar_entries" conf.base_env = "no" then
+        if List.assoc_opt "sort_bvar_entries" conf.base_env = Some "no" then
           conf.base_env
         else List.sort (fun (k1, _v1) (k2, _v2) -> compare k1 k2) conf.base_env
       in
