@@ -56,14 +56,10 @@ runs:
         end_time=$(date +%s)
         BUILD_TIME=$((end_time - start_time))
 
-        SIZE_BYTES=0
-        if [ -d "distribution" ]; then
-          if [ "$(uname)" = "Darwin" ]; then
-            SIZE_BYTES=$(find distribution -type f -exec stat -f %z {} \; 2>/dev/null | awk "{sum += \$1} END {print sum}" || echo "0")
-          else
-            SIZE_BYTES=$(du -sb distribution 2>/dev/null | cut -f1 || echo "0")
-          fi
-        fi
+        # Executables built by `make build` (dev profile), listed in the job log
+        EXES=$(find _build/default/bin -maxdepth 2 -type f -name '*.exe' -exec wc -c {} + 2>/dev/null || true)
+        echo "$EXES"
+        SIZE_BYTES=$(echo "$EXES" | awk '$2 != "total" {s += $1} END {print s+0}')
 
         # Ensure all test values are numeric and safe
         TESTS_TOTAL=$(echo "${TESTS_TOTAL}" | grep -E '^[0-9]+$' 2>/dev/null || echo "0")
@@ -140,8 +136,8 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "## 📈 Build Results Statistics" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "| OS | OCaml | Status | <abbr title="pass+skip/total">Tests</abbr> | Duration | Size |" >> $GITHUB_STEP_SUMMARY
-        echo "|------------|----------------|:---------:|:---------:|-----------:|---------|" >> $GITHUB_STEP_SUMMARY
+        echo "| OS | OCaml | Status | <abbr title='pass+skip/total'>Tests</abbr> | Duration | <abbr title='bin/*/*.exe, dev profile'>Binaries</abbr> |" >> $GITHUB_STEP_SUMMARY
+        echo "|------------|----------------|:---------:|:---------:|-----------:|---------:|" >> $GITHUB_STEP_SUMMARY
 
         find metrics -name "metric-*.json" -type f | while read -r f; do
           if [ ! -f "$f" ]; then continue; fi
