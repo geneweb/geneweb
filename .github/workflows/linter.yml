@@ -41,7 +41,6 @@ jobs:
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 5
-          dune-cache: true
 
       - name: Install ocamlformat
         run: opam install dune ocamlformat.0.29.0
