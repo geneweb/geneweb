@@ -56,6 +56,10 @@ runs:
         end_time=$(date +%s)
         BUILD_TIME=$((end_time - start_time))
 
+        # Installed compiler version (the matrix may only give a prefix such as "5")
+        OCAML_RESOLVED=$(opam exec -- ocamlc -version 2>/dev/null | tr -d '\r' || true)
+        [ -n "$OCAML_RESOLVED" ] || OCAML_RESOLVED="$OCAML_VERSION"
+
         # Executables built by `make build` (dev profile), listed in the job log
         EXES=$(find _build/default/bin -maxdepth 2 -type f -name '*.exe' -exec wc -c {} + 2>/dev/null || true)
         echo "$EXES"
@@ -71,7 +75,7 @@ runs:
         cat > "metric-$OS_NAME-$OCAML_VERSION.json" << EOF
         {
           "os": "$OS_NAME",
-          "ocaml": "$OCAML_VERSION",
+          "ocaml": "$OCAML_RESOLVED",
           "duration": $BUILD_TIME,
           "status": "$JOB_STATUS",
           "size_bytes": $SIZE_BYTES,
@@ -89,7 +93,7 @@ runs:
         else
           echo "ERROR: Failed to create valid JSON metric" >> $GITHUB_STEP_SUMMARY
           # Create minimal fallback
-          echo 'metric={"os":"'$OS_NAME'","ocaml":"'$OCAML_VERSION'","status":"'$JOB_STATUS'"}' >> $GITHUB_OUTPUT
+          echo 'metric={"os":"'$OS_NAME'","ocaml":"'$OCAML_RESOLVED'","status":"'$JOB_STATUS'"}' >> $GITHUB_OUTPUT
         fi
       env:
         OS_NAME: ${{ inputs.os }}
