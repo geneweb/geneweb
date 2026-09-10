@@ -90,7 +90,6 @@ jobs:
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          dune-cache: true
 
       - name: Install Perl dependencies (Windows)
         if: runner.os == 'Windows'
