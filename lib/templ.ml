@@ -1281,6 +1281,7 @@ let rec eval conf ifun env =
         (* Excluded by [Geneweb_templ.Parser.parse]. *)
         assert false
     | Ast.{ desc = Apack l; _ } :: al ->
+        m_env := env;
         print_ast_list env ep l;
         print_ast_list !m_env ep al
     | [ a ] -> print_ast env ep a
