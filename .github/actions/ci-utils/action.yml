@@ -106,14 +106,14 @@ runs:
 
     # Upload Metrics
     - if: inputs.command == 'collect-metrics'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: metric-${{ inputs.os }}-${{ inputs.ocaml-version }}
         path: metric-${{ inputs.os }}-${{ inputs.ocaml-version }}.json
 
     # Summary Generation
     - if: inputs.command == 'generate-summary'
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         pattern: metric-*
         merge-multiple: true
