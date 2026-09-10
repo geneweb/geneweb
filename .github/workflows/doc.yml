@@ -26,15 +26,6 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Cache OPAM dependencies
-        id: cache-opam
-        uses: actions/cache@v6
-        with:
-          path: ~/.opam
-          key: ${{ runner.os }}-doc-${{ hashFiles('*.opam') }}
-          restore-keys: |
-            ${{ runner.os }}-doc
-
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v3
         with:

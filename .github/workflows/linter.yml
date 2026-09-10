@@ -29,14 +29,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Cache OPAM dependencies
-        uses: actions/cache@v6
-        with:
-          path: ~/.opam
-          key: ${{ runner.os }}-linter-ocaml-${{ hashFiles('*.opam') }}
-          restore-keys: |
-            ${{ runner.os }}-linter-ocaml-
-
       - name: Use OCaml
         uses: ocaml/setup-ocaml@v3
         with:
