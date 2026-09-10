@@ -1,7 +1,13 @@
-<!-- page_test v1 %version 24/12/2023 00:58:22 -->
+<!-- conf.txt, v7.1 11/09/2026 01:38:20 -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
+  <title>[*geneweb parameters]</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
 %include.css
 </head>
 <body>
