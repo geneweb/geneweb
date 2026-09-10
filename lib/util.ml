@@ -3414,7 +3414,7 @@ let normalize_person_pool_url conf base target_module assoc_txt_opt =
       loop (i + 1))
   in
   loop 1;
-  (prefix_base_password conf :> string)
+  (commd conf :> string)
   ^ "m=" ^ target_module ^ "&"
   ^ String.concat "&" (List.rev !converted_params)
 
