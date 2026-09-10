@@ -36,7 +36,7 @@ Protocol_info_val (value v)
   return (WSAPROTOCOL_INFO *) Data_custom_val (v);
 }
 
-void
+static void
 protocol_info_serialize (value v, uintnat *bsize_32, uintnat *bsize_64)
 {
   caml_serialize_block_1 (Protocol_info_val (v), sizeof (WSAPROTOCOL_INFO));
@@ -44,7 +44,7 @@ protocol_info_serialize (value v, uintnat *bsize_32, uintnat *bsize_64)
   *bsize_64 = protocol_info_fixed_length.bsize_64;
 }
 
-uintnat
+static uintnat
 protocol_info_deserialize (void *dst)
 {
 #ifdef ARCH_SIXTYFOUR
@@ -56,7 +56,7 @@ protocol_info_deserialize (void *dst)
 #endif
 }
 
-CAMLexport const struct custom_operations protocol_info_ops = {
+static struct custom_operations protocol_info_ops = {
   "fr.roglo.geneweb.protocol_info", custom_finalize_default,
   custom_compare_default,           custom_hash_default,
   &protocol_info_serialize,         &protocol_info_deserialize,
