@@ -36,17 +36,11 @@ let get_bases_dir () =
   | None -> Dirs.path Secure.default_base_dir
 let no_anoma = ref false
 
-(* Per-base rebuild log, under <bases_dir>/tmp/.  A FUNCTION of both !bases_dir
-   (so it tracks the -bd parsed from the command line — a plain top-level
-   `let comm_log = ...` would capture the string before Arg.parse runs) and the
-   base name, so different bases don't share one log and anoma can locate
-   "<base>_comm.log" by convention.  Empty base -> plain comm.log. *)
 (* Per-base rebuild log, written to <bases_dir>/tmp/ while the command runs
    (always safe: the base's .gwb may not exist yet during a gwc that creates
    it). run_anoma later moves it into <base>.gwb/config/comm.log, once gwc has
    created the base. last_comm_log records the exact path exec_f wrote. *)
-let comm_log base =
-  !bases_dir // "tmp" // ((if base = "" then "" else base ^ "_") ^ "comm.log")
+let comm_log = (get_bases_dir ()) // "tmp" // "comm.log"
 
 let printer_conf =
   {
@@ -662,7 +656,7 @@ let rec copy_from_stream conf print strm =
               (* conf will know bvars from basename.gwf and evars from url *)
               copy_from_stream conf print (Stream.of_string s)
           | 'g' ->
-              print_specific_file conf print (comm_log (log_base conf)) strm
+              print_specific_file conf print comm_log strm
           | 'h' ->
               print "<input type=hidden name=lang value=";
               print conf.lang;
@@ -714,7 +708,7 @@ let rec copy_from_stream conf print strm =
               (* the current directory may have changes with -bd *)
               | 'G' ->
                   print_specific_file_tail conf print
-                    (!bases_dir // "tmp" // "gwsetup.log")
+                    ((get_bases_dir ()) // "tmp" // "gwsetup.log")
                     strm
               | 'H' ->
                   (* print the content of -o filename, prepend bname *)
@@ -1009,6 +1003,8 @@ let exec_f conf ~path args =
   let args =
     match !bases_dir with Some s -> "-bd" :: s :: args | None -> args
   in
+  last_comm_log := comm_log;
+  let bname = s_getenv conf.env "o" |> strip_spaces in 
   let cmd = Command.make ~output:comm_log ~path ~args in
   Format.eprintf "$ %a@." Command.pp cmd;
   command := Format.asprintf "%a" Command.pp cmd;
@@ -1033,7 +1029,7 @@ let run_anoma conf =
        config dir so anoma — and the comm.log view — find it there. *)
     let clog =
       let src = !last_comm_log in
-      let dir = !bases_dir // (base ^ ".gwb") // "config" in
+      let dir = (get_bases_dir ()) // (base ^ ".gwb") // "config" in
       let dst = dir // "comm.log" in
       if src <> "" && src <> dst && Sys.file_exists src then begin
         (try Unix.mkdir dir 0o755
@@ -1063,7 +1059,11 @@ let run_anoma conf =
          to be taken as current on a later run.  On failure keep it and append
          anoma's output, so the gwsetup comm.log page shows gwc's warnings plus
          why anoma failed. *)
-      let bd = if !bases_dir = "" then "." else !bases_dir in
+      let bd = 
+        match !bases_dir with
+        | Some s -> s
+        | None -> get_bases_dir ()
+      in
       let anoma_log =
         Filename.concat (Filename.get_temp_dir_name ()) "anoma.log"
       in
@@ -1589,11 +1589,8 @@ let consang conf ok_file =
   else print_file conf ok_file
 
 let anoma conf =
-  let rc =
-    let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env)
-  in
-  if rc > 1 then print_file conf "err_standard.htm"
+  let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
+  if Command.is_failure rc then print_file conf "err_standard.htm"
   else print_file conf "anoma_ok.htm"
 
 let update_nldb conf ok_file =
