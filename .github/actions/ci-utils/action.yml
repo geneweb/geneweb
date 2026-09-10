@@ -11,10 +11,6 @@ inputs:
   ocaml-version:
     description: 'OCaml version'
     required: false
-  cache-hit:
-    description: 'Cache hit status'
-    required: false
-    default: 'false'
   total-builds:
     description: 'Total number of builds'
     required: true
@@ -75,13 +71,6 @@ runs:
         TESTS_FAILED=$(echo "${TESTS_FAILED}" | grep -E '^[0-9]+$' 2>/dev/null || echo "0")
         TESTS_SKIPPED=$(echo "${TESTS_SKIPPED}" | grep -E '^[0-9]+$' 2>/dev/null || echo "0")
 
-        # Fix cache_hit to be proper boolean
-        if [ "$CACHE_HIT" = "true" ]; then
-          CACHE_HIT_JSON="true"
-        else
-          CACHE_HIT_JSON="false"
-        fi
-
         # Build JSON safely using heredoc
         cat > "metric-$OS_NAME-$OCAML_VERSION.json" << EOF
         {
@@ -89,7 +78,6 @@ runs:
           "ocaml": "$OCAML_VERSION",
           "duration": $BUILD_TIME,
           "status": "$JOB_STATUS",
-          "cache_hit": $CACHE_HIT_JSON,
           "size_bytes": $SIZE_BYTES,
           "tests_total": $TESTS_TOTAL,
           "tests_passed": $TESTS_PASSED,
@@ -111,7 +99,6 @@ runs:
         OS_NAME: ${{ inputs.os }}
         OCAML_VERSION: ${{ inputs.ocaml-version }}
         JOB_STATUS: ${{ job.status }}
-        CACHE_HIT: ${{ inputs.cache-hit }}
         TESTS_TOTAL: ${{ inputs.tests-total }}
         TESTS_PASSED: ${{ inputs.tests-passed }}
         TESTS_FAILED: ${{ inputs.tests-failed }}
@@ -153,8 +140,8 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "## 📈 Build Results Statistics" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "| OS | OCaml | Status | <abbr title="pass+skip/total">Tests</abbr> | Duration | Cache | Size |" >> $GITHUB_STEP_SUMMARY
-        echo "|------------|----------------|:---------:|:---------:|-----------:|:--------:|---------|" >> $GITHUB_STEP_SUMMARY
+        echo "| OS | OCaml | Status | <abbr title="pass+skip/total">Tests</abbr> | Duration | Size |" >> $GITHUB_STEP_SUMMARY
+        echo "|------------|----------------|:---------:|:---------:|-----------:|---------|" >> $GITHUB_STEP_SUMMARY
 
         find metrics -name "metric-*.json" -type f | while read -r f; do
           if [ ! -f "$f" ]; then continue; fi
@@ -169,11 +156,9 @@ runs:
           ocaml=$(jq -r '.ocaml' "$f")
           status=$(jq -r '.status' "$f")
           duration=$(jq -r '.duration' "$f")
-          cache_hit=$(jq -r '.cache_hit' "$f")
           size=$(jq -r '.size_bytes' "$f")
 
           status_icon=$([ "$status" = "success" ] && echo "✅" || echo "❌")
-          cache_icon=$([ "$cache_hit" = "true" ] && echo "✅" || echo "❌")
 
           mins=$((duration / 60))
           secs=$((duration % 60))
@@ -208,8 +193,8 @@ runs:
            fi
          fi
 
-          printf "| %s | %s | %s | %s | %s | %s | %s |\n" \
-            "$os" "$ocaml" "$status_icon" "$test_display" "$duration_str" "$cache_icon" "$size_str"
+          printf "| %s | %s | %s | %s | %s | %s |\n" \
+            "$os" "$ocaml" "$status_icon" "$test_display" "$duration_str" "$size_str"
         done | sort -t'|' -k2,2 -k3,3 >> $GITHUB_STEP_SUMMARY
 
         # Count builds

@@ -78,14 +78,6 @@ jobs:
         with:
           command: start-timer
 
-      - name: Cache Opam dependencies
-        id: cache-opam
-        uses: actions/cache@v6
-        with:
-          path: ${{ runner.os == 'Windows' && 'C:\\.opam' || '~/.opam' }}
-          key: ${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-${{ hashFiles('**/*.opam') }}
-          restore-keys: ${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-
-
       - name: Setup Ocaml with v3
         uses: ocaml/setup-ocaml@v3
         with:
@@ -155,7 +147,6 @@ jobs:
           command: collect-metrics
           os: ${{ matrix.os }}
           ocaml-version: ${{ matrix.ocaml-compiler }}
-          cache-hit: ${{ steps.cache-opam.outputs.cache-hit }}
           tests-total: ${{ steps.tests.outputs.tests_total }}
           tests-passed: ${{ steps.tests.outputs.tests_passed }}
           tests-failed: ${{ steps.tests.outputs.tests_failed }}
