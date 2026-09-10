@@ -2034,27 +2034,8 @@ let generate_secret_salt ?(random = true) () =
       Random.self_init ();
       string_of_int (Random.bits ())
 
-let retrieve_secret_salt () =
-  match Unix.getenv "SECRET_SALT" with
-  | exception Not_found ->
-      Log.err (fun k ->
-          k "Secret salt missing, the worker %d cannot continue its job."
-            (Unix.getpid ()));
-      exit 1
-  | s -> s
-
-let daemonize ~daemon k =
-  if daemon then
-    match Unix.fork () with
-    | 0 ->
-        Unix.close Unix.stdin;
-        null_reopen [ Unix.O_WRONLY ] Unix.stdout;
-        null_reopen [ Unix.O_WRONLY ] Unix.stderr;
-        k ()
-    | _ -> exit 0
-  else k ()
-
 let create_cnt_dir () =
+  GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
   try Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
   with Sys_error e ->
     Log.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
@@ -2103,31 +2084,6 @@ let display_infos () =
         "assets"
         Fmt.(box @@ list ~sep:comma pp_path)
         (Secure.assets ()))
-
-let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
-    =
-  let secret_salt =
-    match Unix.getenv "WSERVER" with
-    | _ -> retrieve_secret_salt ()
-    | exception Not_found ->
-        daemonize ~daemon @@ fun () ->
-        display_infos ();
-        create_cnt_dir ();
-        (* A secret salt is added to the environment to ensure that workers
-           use the same salt for digests on both Unix and Windows platforms. *)
-        let secret_salt =
-          generate_secret_salt ~random:(not predictable_mode) ()
-        in
-        Unix.putenv "SECRET_SALT" secret_salt;
-        secret_salt
-  in
-  (* FIXME: this hack is necessary to avoid a cyclic dependency between
-     `geneweb` and `geneweb-http`. We must remove it after refactoring
-     the encoded string subsystem. *)
-  let connection x y z = connection x y (Adef.encoded z) in
-  Server.start ?addr:interface ~port ~timeout:!conn_timeout
-    ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
-    (connection ~predictable_mode ~loaded_plugins ~secret_salt)
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -2180,7 +2136,20 @@ let read_input len =
      with End_of_file -> ());
     Buffer.contents buff
 
-let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
+let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port
+    ~secret_salt () =
+  (* FIXME: this hack is necessary to avoid a cyclic dependency between
+     `geneweb` and `geneweb-http`. We must remove it after refactoring
+     the encoded string subsystem. *)
+  let connection x y z = connection x y (Adef.encoded z) in
+  Server.start ?addr:interface ~port ~timeout:!conn_timeout
+    ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
+    (connection ~predictable_mode ~loaded_plugins ~secret_salt)
+
+let is_cgi ~force_cgi =
+  force_cgi || (Option.is_some @@ Sys.getenv_opt "QUERY_STRING")
+
+let main ~plugins ?interface ~port ~predictable_mode ~secret_salt () =
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2201,6 +2170,7 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
   (* FIXME: this line MUST be after plugin loading as plugins can modified
      [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
   cache_lexicon ();
+  create_cnt_dir ();
   List.iter
     (fun dbn ->
       Log.info (fun k -> k "Caching database %s in memory… %!" dbn);
@@ -2228,21 +2198,21 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
        if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
      in
      images_prefix := Some ("file://" ^ slashify abs_dir));
-  GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Mutil.particles_file = "" then
     Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
   Server.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
-  let query, cgi =
-    try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
-    with Not_found -> ("" |> Adef.encoded, !force_cgi)
-  in
   Util.is_welcome := false;
   if !check then (
     Log.debug (fun k -> k "End of check mode.");
     exit 0);
-  if cgi then (
+  if is_cgi ~force_cgi:!force_cgi then (
+    let query =
+      match Sys.getenv "QUERY_STRING" with
+      | exception Not_found -> Adef.encoded ""
+      | s -> Adef.encoded s
+    in
     Server.cgi := true;
     set_binary_mode_out stdout true;
     let query =
@@ -2261,11 +2231,12 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode () =
     let script =
       try Sys.getenv "SCRIPT_NAME" with Not_found -> Sys.argv.(0)
     in
-    let secret_salt = match !cgi_secret_salt with None -> "" | Some s -> s in
     geneweb_cgi ~predictable_mode ~loaded_plugins ~secret_salt addr
       (Filename.basename script) query)
-  else
-    geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
+  else (
+    display_infos ();
+    geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port
+      ~secret_salt ())
 
 let has_root_privileges () =
   if not Sys.unix then false
@@ -2387,9 +2358,27 @@ let reporter ~predictable_mode ppf =
   in
   { Logs.report }
 
-let setup_log ~predictable_mode t =
-  Printexc.set_uncaught_exception_handler (fun exn bt ->
-      Log.err (fun k -> k "%a" (pp_exception ~predictable_mode) (exn, bt)));
+let uncaught_exception_handler ~port ~predictable_mode exn bt =
+  match exn with
+  | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
+      Log.err (fun k ->
+          k
+            "Error: the selected port %d is already used by another GeneWeb \
+             daemon or by another program. Solution: kill the other program or \
+             launch GeneWeb with another port."
+            port)
+  | Unix.Unix_error (Unix.EACCES, "bind", _) when Sys.unix ->
+      Log.err (fun k ->
+          k
+            "Error: invalid access to the port %d: users port number less than \
+             1024 are reserved to the system. Please, read the security \
+             section of the documentation."
+            port)
+  | exn -> Log.err (fun k -> k "%a" (pp_exception ~predictable_mode) (exn, bt))
+
+let setup_log ~port ~predictable_mode t =
+  Printexc.set_uncaught_exception_handler
+    (uncaught_exception_handler ~port ~predictable_mode);
   let set_reporter ppf = Logs.set_reporter @@ reporter ~predictable_mode ppf in
   let refresh o =
     Option.iter close_out_noerr o.oc;
@@ -2417,6 +2406,40 @@ let setup_log ~predictable_mode t =
       let addr = Unix.inet_addr_of_string "127.0.0.1" in
       Logs.set_reporter (Logs_syslog_unix.udp_reporter addr ~port:514 ())
 
+let retrieve_secret_salt () =
+  match Unix.getenv "SECRET_SALT" with
+  | exception Not_found ->
+      Log.err (fun k ->
+          k "Secret salt missing, the worker %d cannot continue its job."
+            (Unix.getpid ()));
+      exit 1
+  | s -> s
+
+let windows_worker ~plugins ~interface ~port ~predictable_mode () =
+  let secret_salt = retrieve_secret_salt () in
+  main ~plugins ~interface ~port ~predictable_mode ~secret_salt ()
+
+let master ~plugins ~interface ~port ~predictable_mode ~force_cgi () =
+  let secret_salt =
+    if is_cgi ~force_cgi then Option.value ~default:"" !cgi_secret_salt
+    else generate_secret_salt ~random:(not predictable_mode) ()
+  in
+  (* A secret salt is added to the environment to ensure that workers
+     use the same salt for digests on both Unix and Windows platforms. *)
+  Unix.putenv "SECRET_SALT" secret_salt;
+  main ~plugins ~interface ~port ~predictable_mode ~secret_salt ()
+
+let daemonize ~daemon k =
+  if daemon then
+    match Unix.fork () with
+    | 0 ->
+        Unix.close Unix.stdin;
+        null_reopen [ Unix.O_WRONLY ] Unix.stdout;
+        null_reopen [ Unix.O_WRONLY ] Unix.stderr;
+        k ()
+    | _ -> exit 0
+  else k ()
+
 let () =
   if has_root_privileges () then (
     Format.eprintf
@@ -2431,24 +2454,12 @@ let () =
   if opts.check then switch_check ();
   if opts.debug then switch_debug ();
   make_socket_dir opts.socket_dir;
-  setup_log ~predictable_mode:opts.predictable_mode opts.log;
-  try
-    main ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
-      ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ()
-  with
-  | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
-      Log.err (fun k ->
-          k
-            "Error: the port %d is already used by another GeneWeb daemon or \
-             by another program. Solution: kill the other program or launch \
-             GeneWeb with another port number (option -p)"
-            !selected_port)
-  | Unix.Unix_error (Unix.ENOTCONN, _, _) when Sys.unix ->
-      Log.warn (fun k -> k "Unix.Unix_error(Unix.ENOTCONN, \"shutdown\", \"\")")
-  | Unix.Unix_error (Unix.EACCES, "bind", _) when Sys.unix ->
-      Log.err (fun k ->
-          k
-            "Error: invalid access to the port %d: users port number less than \
-             1024 are reserved to the system. Please, read the security \
-             section of the documentation."
-            !selected_port)
+  setup_log ~port:opts.port ~predictable_mode:opts.predictable_mode opts.log;
+  match Unix.getenv "WSERVER" with
+  | exception Not_found ->
+      daemonize ~daemon:opts.daemon @@ fun () ->
+      master ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
+        ~predictable_mode:opts.predictable_mode ~force_cgi:opts.cgi ()
+  | _ ->
+      windows_worker ~plugins:opts.plugins ~interface:opts.interface
+        ~port:opts.port ~predictable_mode:opts.predictable_mode ()
