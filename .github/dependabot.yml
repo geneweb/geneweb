@@ -5,7 +5,9 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "gitsubmodule"
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/actions/*"
     schedule:
       interval: "daily"
   - package-ecosystem: "github-actions"
