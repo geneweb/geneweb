@@ -25,7 +25,7 @@
          [next relationship path]%end;" accesskey=">">%nn;
         <i class="fas fa-bezier-curve fa-fw"></i>%if;(link_next!="")<i class="fas fa-arrow-right fa-fw"></i>%end;%nn;
       </a>
-      <a%if;(e.et="A") class="border rounded"%end;
+      <a %if;(e.et="A")class="border rounded"%end;
         href="%prefix_clear.m.em.et.i;m=R&em=R&et=A%nn;
           %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
           %elseif;(person_index.1!="" and person_index.2!="")&i=%person_index.1;&ei=%person_index.2;%nn;
@@ -39,7 +39,7 @@
         title="[*relationship link/relationship links]1" accesskey="^">%nn;
         <i class="fa fa-user-group fa-fw"></i>%nn;
       </a>
-      <a%if;(e.et="M") class="border rounded"%end;
+      <a %if;(e.et="M")class="border rounded"%end;
         href="%prefix_clear.m.em.et.i;m=R&em=R&et=M
           %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
           %elseif;(person_index.1!="" and person_index.2!="")&i=%person_index.1;&ei=%person_index.2;%nn;
