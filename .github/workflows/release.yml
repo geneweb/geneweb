@@ -167,17 +167,17 @@ jobs:
         run: |
           $VERSION = "${{ steps.version.outputs.version }}"
 
-          # Download InnoSetup
-          Write-Host "📥 Downloading InnoSetup..."
-          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile "innosetup-installer.exe"
-
-          # Install InnoSetup silently
-          Write-Host "📦 Installing InnoSetup..."
-          Start-Process -FilePath "innosetup-installer.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/DIR=.\innosetup" -Wait
+          # InnoSetup is preinstalled on GitHub-hosted Windows runners
+          $ISCC = (Get-Command ISCC.exe -ErrorAction SilentlyContinue).Source
+          if (-not $ISCC) { $ISCC = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
+          if (-not (Test-Path $ISCC)) {
+            Write-Host "❌ ISCC.exe not found"
+            exit 1
+          }
 
           # Compile installer
           Write-Host "🔨 Building installer..."
-          & ".\innosetup\ISCC.exe" "geneweb.iss" "/DMyVersion=$VERSION"
+          & $ISCC "geneweb.iss" "/DMyVersion=$VERSION"
 
           $INSTALLER_NAME = "geneweb-${VERSION}-windows-setup.exe"
           if (Test-Path $INSTALLER_NAME) {
