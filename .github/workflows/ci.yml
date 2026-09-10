@@ -94,13 +94,6 @@ jobs:
             opam pin add "$pkg" "$d" --yes --no-action
           done
 
-      - name: Remove locked mingw gcc shim if present
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          rm -f _opam/bin/x86_64-w64-mingw32-gcc.exe || true
-          rm -f _opam/bin/i686-w64-mingw32-gcc.exe || true
-
       - name: Update apt cache
         if: runner.os == 'Linux'
         run: sudo apt-get update -qq

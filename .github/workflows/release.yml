@@ -65,8 +65,6 @@ jobs:
             printf 'opam-version: "2.0"\nsynopsis: "Pin bypass"\nmaintainer: "ci"\nbuild: ["true"]\ninstall: ["true"]\n' > "$d/opam"
             opam pin add "$pkg" "$d" --yes --no-action
           done
-          rm -f _opam/bin/x86_64-w64-mingw32-gcc.exe || true
-          rm -f _opam/bin/i686-w64-mingw32-gcc.exe || true
 
       - name: Install dependencies
         run: |
