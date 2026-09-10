@@ -73,59 +73,40 @@ jobs:
           opam install . --deps-only
           ${{ matrix.is-unix && 'opam install ancient' || '' }}
 
-      - name: Force static GMP linking (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          # Zarith is installed with dynamic linking, hide ALL libgmp DLLs
-          find /usr -name "libgmp-10.dll" -exec mv {} {}.hidden \; 2>/dev/null || true
-          find /usr -name "libgmp.dll.a" -exec mv {} {}.hidden \; 2>/dev/null || true
-          OPAM_PREFIX=$(opam var prefix | tr '\\' '/')
-          find "$OPAM_PREFIX" -name "libgmp-10.dll" -exec mv {} {}.hidden \; 2>/dev/null || true
-
-          # Reinstall zarith WITHOUT depext (won't reinstall system packages)
-          echo "Reinstalling zarith with static GMP…"
-          OPAMASSUMEDEPEXTS=true opam reinstall zarith --yes
-          echo "Static GMP linking configured"
-
       - name: Build Geneweb
         run:
           opam exec -- make distrib distrib-rpc
 
-      - name: Bundle PCRE2 runtime DLL (Windows)
+      - name: Bundle runtime DLLs (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          echo "=== Bundling PCRE2 DLL for Windows ==="
-          OPAM_PATH=$(cygpath "$OPAMROOT")
-          PCRE2_DLL=$(find "$OPAM_PATH" /usr/x86_64-w64-mingw32 /usr/bin -name "libpcre2-8-0.dll" 2>/dev/null | head -1)
+          # x86_64 sysroot only: conf-gmp also installs the i686 GMP package
+          MINGW_BIN=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
+          for dll in libgmp-10.dll libpcre2-8-0.dll; do
+            if [ ! -f "$MINGW_BIN/$dll" ]; then
+              echo "::error::$dll not found in $MINGW_BIN"
+              find /usr -name "$dll" 2>/dev/null
+              exit 1
+            fi
+            cp -v "$MINGW_BIN/$dll" distribution/gw/
+          done
 
-          if [ -n "$PCRE2_DLL" ]; then
-            echo "Found: $PCRE2_DLL"
-            cp "$PCRE2_DLL" distribution/gw/
-            ls -lh distribution/gw/libpcre2-8-0.dll
-          else
-            echo "ERROR: PCRE2 DLL not found"
-            find /usr -name "*pcre2*" 2>/dev/null | head -20
-            exit 1
-          fi
-
-      - name: Verify static linking (Windows)
+      - name: Verify bundled DLLs (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          echo "=== Checking executable dependencies ==="
           cd distribution/gw
-          ldd gwd.exe
-
-          NON_WINDOWS=$(ldd gwd.exe | grep -v -F /cygdrive/c/Windows/ || true)
-          if [ -n "$NON_WINDOWS" ]; then
-            echo "❌ ERROR: Non-Windows dependencies found:"
-            echo "$NON_WINDOWS"
+          # Every DLL outside C:\Windows must be resolved from distribution/gw itself
+          BAD=$(for exe in *.exe; do ldd "$exe"; done \
+            | awk -v here="$(pwd)/" '$2 == "=>" && index($3, "/cygdrive/c/Windows/") != 1 && index($3, here) != 1 {print $1 " => " $3}' \
+            | sort -u)
+          if [ -n "$BAD" ]; then
+            echo "::error::DLLs not bundled in distribution/gw:"
+            echo "$BAD"
             exit 1
-          else
-            echo "✅ SUCCESS: All dependencies are statically linked or from Windows"
           fi
+          echo "✅ All non-system DLLs are bundled"
 
       - name: Determine version
         id: version
