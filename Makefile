@@ -65,8 +65,10 @@ gwd: ## Build ondy gwd/gwc executables
 	@printf "Done."
 
 distrib: ## Build the project and copy what is necessary for distribution
-	dune build --release @bin/all @lib/all
-	@printf "Done.\n"
+	dune build --release @install
+	@printf "\n\033[1;1mCreating relocatable install\033[0m\n"
+	rm -rf _build/reloc
+	dune install --relocatable --prefix _build/reloc geneweb geneweb-plugins
 	@rm -rf $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
@@ -91,70 +93,35 @@ else
 	cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.sh
 	cp etc/geneweb.sh $(DISTRIB_DIR)/geneweb.sh
 endif
-	mkdir $(DISTRIB_DIR)/gw
-	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
-	@printf "\n\033[1;1m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
-	cp $(BUILD_DISTRIB_DIR)anoma/anoma.exe $(DISTRIB_DIR)/gw/anoma$(EXT)
-	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT)
-	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT)
-	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT)
-	cp $(BUILD_DISTRIB_DIR)ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT)
-	cp $(BUILD_DISTRIB_DIR)cache_files/cache_files.exe $(DISTRIB_DIR)/gw/cache_files$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT)
-	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT)
-	cp $(BUILD_DISTRIB_DIR)robot/robot.exe $(DISTRIB_DIR)/gw/robot$(EXT)
-	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT)
-	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT)
-	@printf "\n\033[1;1m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
-	cp -R hd/* $(DISTRIB_DIR)/gw/
-	rm $(DISTRIB_DIR)/gw/dune
-	rm $(DISTRIB_DIR)/gw/etc/js/dune
-	rm $(DISTRIB_DIR)/gw/etc/js/dune.inc
-	for f in $(DISTRIB_DIR)/gw/etc/js/*.js ; do \
-	  [ -e "$$f" ] || continue ; \
-	  case "$$f" in *.min.js) continue ;; esac ; \
-	  if [ -f "$${f%.js}.min.js" ]; then rm -f "$$f" ; fi ; \
-	done
+	@printf "\n\033[1;1m└ Copy binaries\033[0m\n"
+	mkdir $(DISTRIB_DIR)/bin
+	cp _build/reloc/bin/* $(DISTRIB_DIR)/bin/
+	cp _build/reloc/etc/a.gwf $(DISTRIB_DIR)/. 2>/dev/null || cp etc/a.gwf $(DISTRIB_DIR)/.
+	@printf "\n\033[1;1m└ Copy plugin libraries (lib/geneweb-plugins, lib/stublibs)\033[0m\n"
+	mkdir -p $(DISTRIB_DIR)/lib
+	cp -R _build/reloc/lib/geneweb-plugins $(DISTRIB_DIR)/lib/
+	cp -R _build/reloc/lib/stublibs $(DISTRIB_DIR)/lib/
+	@printf "\n\033[1;1m└ Copy plugin site metadata (lib/geneweb/plugins)\033[0m\n"
+	mkdir -p $(DISTRIB_DIR)/lib/geneweb
+	cp -R _build/reloc/lib/geneweb/plugins $(DISTRIB_DIR)/lib/geneweb/
+	@printf "\n\033[1;1m└ Copy templates and assets (share/)\033[0m\n"
+	mkdir -p $(DISTRIB_DIR)/share
+	cp -R _build/reloc/share/geneweb $(DISTRIB_DIR)/share/
+	cp -R _build/reloc/share/geneweb-plugins $(DISTRIB_DIR)/share/
 	@printf "\n\033[1;1m└ Compressing large JS/CSS assets\033[0m\n"
-	@for f in $(DISTRIB_DIR)/gw/etc/js/*.min.js; do \
+	@for f in $(DISTRIB_DIR)/share/geneweb/hd/etc/js/*.min.js; do \
 	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 4500 ]; then \
-	    printf "gzip -9 -k %s\n" "$$f"; \
-	    gzip -9 -k -f "$$f"; \
-	    printf "brotli %s\n" "$$f"; \
-	    brotli -f -q 11 "$$f"; \
+	    gzip -9 -k -f "$$f"; brotli -f -q 11 "$$f"; \
 	  fi; \
 	done
-	@for f in $(DISTRIB_DIR)/gw/etc/css/*.css; do \
+	@for f in $(DISTRIB_DIR)/share/geneweb/hd/etc/css/*.css; do \
 	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 10000 ]; then \
-	    printf "gzip -9 -k %s\n" "$$f"; \
-	    gzip -9 -k -f "$$f"; \
-	    printf "brotli %s\n" "$$f"; \
-	    brotli -f -q 11 "$$f"; \
-	  fi; \
-	done
-	mkdir $(DISTRIB_DIR)/gw/setup
-	@printf "\n\033[1;1m└ Copy plugins in $(DISTRIB_DIR)/gw/plugins\033[0m\n"
-	mkdir $(DISTRIB_DIR)/gw/plugins
-	@for P in $(shell ls plugins); do \
-	  if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ] ; then \
-	    mkdir $(DISTRIB_DIR)/gw/plugins/$$P; \
-	    printf "cp %s %s\n" "$(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs" "$(DISTRIB_DIR)/gw/plugins/$$P/"; \
-	    cp $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs $(DISTRIB_DIR)/gw/plugins/$$P/; \
-	    if [ -d plugins/$$P/assets ] ; then \
-	      printf "cp -R %s %s\n" "$(BUILD_DIR)/plugins/$$P/assets" "$(DISTRIB_DIR)/gw/plugins/$$P/"; \
-	      cp -R $(BUILD_DIR)/plugins/$$P/assets $(DISTRIB_DIR)/gw/plugins/$$P/; \
-	    fi; \
-	    if [ -f $(BUILD_DIR)/plugins/$$P/META ] ; then \
-	      printf "cp %s %s\n" "$(BUILD_DIR)/plugins/$$P/META" "$(DISTRIB_DIR)/gw/plugins/$$P/"; \
-	      cp $(BUILD_DIR)/plugins/$$P/META $(DISTRIB_DIR)/gw/plugins/$$P/; \
-	    fi; \
+	    gzip -9 -k -f "$$f"; brotli -f -q 11 "$$f"; \
 	  fi; \
 	done
 	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
-	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n\n"
+	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mbin/gwd$(EXT)\033[0m”.\n\n"
+
 
 distrib-rpc: distrib
 	dune build --release @rpc/all
