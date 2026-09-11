@@ -209,7 +209,12 @@ let speclist =
       Arg.Set_string Db1link.particules_file,
       "<file> Particles file (default = predefined particles)" );
     ("-q", Arg.Clear Gwcomp.verbose, " Quiet");
-    ("-reorg", Arg.Set GWPARAM.reorg, " Mode reorg");
+    ( "-reorg",
+      Arg.Unit
+        (fun () ->
+          GWPARAM.reorg := true;
+          GWPARAM.reorg_forced := true),
+      " Mode reorg" );
     ("-rgpd", Arg.String (fun s -> Gwcomp.rgpd_dir := s), "<dir> Rgpd directory");
     ("-sep", Arg.Set separate, " Separate all persons in next file");
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");
@@ -316,6 +321,7 @@ let () =
       if !kill_gwo then cleanup gwo_files;
       Fmt.epr "Database %S already exists. Use -f to overwrite.@." bname;
       exit 2);
+    if not !GWPARAM.reorg_forced then GWPARAM.set_reorg bname None;
     let bdir = GWPARAM.create_base_and_config bname in
     let lock_file = Mutil.lock_file bdir in
     let on_exn exn bt =

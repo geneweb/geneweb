@@ -109,6 +109,42 @@ zh: \
   巴西葡萄牙语|ro=羅馬尼亞語|ru=俄语|sk=斯洛伐克语|sl=斯洛文尼亚语|sv= \
   瑞典語|tr=土耳其|zh=中文
 
+    or
+en: or
+fr: ou
+
+    Done
+en: Done
+fr: Effectué
+
+    analyse anomalies
+en: analyse anomalies
+fr: analyser les anomalies
+
+    Anomalies analysed
+en: Anomalies analysed
+fr: Anomalies analysées
+
+    anomalies
+en: anomalies
+fr: anomalies
+
+    Run anomalies analysis
+en: Run anomalies analysis
+fr: Lancer l'analyse des anomalies
+
+    Do not run anomalies analysis
+en: Do not run anomalies analysis
+fr: Ne pas exécuter l'analyse des anomalies
+
+    Gwsetup runs automatically anomaly analysis after base creation.
+en: Gwsetup runs automatically anomaly analysis after base creation.
+fr: Gwsetup exécute automatiquement l'analyse des anomalies après création de la base.
+
+    Tell anoma to keep comm.log files after anomalies analysis.
+en: Tell anoma to keep comm.log files after anomalies analysis.
+fr: Transmet à anoma l'ordre de conserver comm.log après analyse des anomalies.
+
     Enter the name of the folder holding databases.
 en: Enter the name of the folder holding databases.
 fr: Entrez le nom du dossier contenant les bases.
@@ -3648,12 +3684,12 @@ de: stiller Modus.
 en: quiet mode.
 fr: peu de traces.
 
-    Read the alert messages in the file comm.log
+    Read the alert messages in the files
 aa: bso_ok.htm
-co: Fighjà i messaghji d’alerta in u schedariu comm.log
-de: Lesen Sie die Warnmeldung in der Datei comm.log
-en: Read the alert messages in the file comm.log
-fr: Consulter les messages d’alerte dans le fichier comm.log
+co: Fighjà i messaghji d’alerta in u schedariu
+de: Lesen Sie die Warnmeldung in der Datei
+en: Read the alert messages in the files
+fr: Consulter les messages d’alerte dans les fichiers
 
     Recover
 aa: recover1.htm

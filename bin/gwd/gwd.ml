@@ -293,8 +293,15 @@ let add_lex_dir dir =
 module MS = Map.Make (String)
 
 let assets_of_plugin name =
-  let path = (List.hd @@ Sites.Sites.plugins) // name in
-  path // "assets"
+  match Sites.Sites.plugins with
+  | dir :: _ -> dir // name // "assets"
+  | [] ->
+      Log.err (fun k ->
+          k
+            "No plugin site directory resolved (Sites.Sites.plugins is empty) \
+             — cannot load assets for plugin %s"
+            name);
+      exit 1
 
 let load_plugin Cmd.{ name } =
   Log.debug (fun k -> k "Loading plugin %s..." name);
@@ -303,8 +310,6 @@ let load_plugin Cmd.{ name } =
   if Sys.file_exists lex_dir then add_lex_dir lex_dir;
   try Sites.Plugins.Plugins.load name
   with _ ->
-    (* FIXME: We cannot print the exception as it contains a user-specific
-       path. *)
     Log.err (fun k -> k "Cannot load the plugin %s" name);
     exit 1
 

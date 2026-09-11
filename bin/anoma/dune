@@ -1,0 +1,19 @@
+(executable
+ (package geneweb)
+ (name anoma)
+ (public_name anoma)
+ (modules anoma statics)
+ (libraries str unix geneweb))
+
+; Embed bin/anoma/statics/** into the binary (like gwsetup); the lexicon is
+; read at runtime via Statics.read "lang/lexicon.txt" — no file to deploy.
+
+(rule
+ (target statics.ml)
+ (deps
+  (source_tree statics))
+ (action
+  (setenv
+   SOURCE_DATE_EPOCH
+   0
+   (run %{bin:ocaml-crunch} --silent --mode=plain -o statics.ml statics))))

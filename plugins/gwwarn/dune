@@ -1,0 +1,20 @@
+; plugins/gwwarn/dune — modeled on plugins/forum/dune.
+; Folder is named "gwwarn" (the plugin name); the impl library and its single
+; source file are "gwwarn_impl" (like forum_impl), so the module's top-level
+; `let () = Registration.register …` runs when the plugin cmxs is loaded.
+;
+; NOTE: gwwarn does NOT use Sites, so it must NOT depend on
+; geneweb-plugins.sites — depending on that sub-library makes the dune-site
+; plugin loader fail at load time ("sub-library sites can't be found ...").
+
+(library
+ (public_name geneweb-plugins.gwwarn_impl)
+ (name gwwarn_impl)
+ (libraries geneweb.register geneweb.gwd_lib unix))
+
+(plugin
+ (package geneweb-plugins)
+ (name gwwarn)
+ (libraries geneweb-plugins.gwwarn_impl)
+ (site
+  (geneweb plugins)))
