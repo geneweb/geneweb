@@ -69,6 +69,9 @@ distrib: ## Build the project and copy what is necessary for distribution
 	@printf "\n\033[1;1mCreating relocatable install\033[0m\n"
 	rm -rf _build/reloc
 	dune install --relocatable --prefix _build/reloc geneweb geneweb-plugins
+	@printf "\n\033[1;1m└ Copy external plugin dependencies (jingoo)\033[0m\n"
+	mkdir -p _build/reloc/lib
+	cp -R "$$(ocamlfind query jingoo)" _build/reloc/lib/jingoo
 	@rm -rf $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
@@ -97,10 +100,9 @@ endif
 	mkdir $(DISTRIB_DIR)/bin
 	cp _build/reloc/bin/* $(DISTRIB_DIR)/bin/
 	cp _build/reloc/etc/a.gwf $(DISTRIB_DIR)/. 2>/dev/null || cp etc/a.gwf $(DISTRIB_DIR)/.
-	@printf "\n\033[1;1m└ Copy plugin libraries (lib/geneweb-plugins, lib/stublibs)\033[0m\n"
+	@printf "\n\033[1;1m└ Copy libraries (lib/) — full copy, plugin dependency graph is not predictable\033[0m\n"
 	mkdir -p $(DISTRIB_DIR)/lib
-	cp -R _build/reloc/lib/geneweb-plugins $(DISTRIB_DIR)/lib/
-	cp -R _build/reloc/lib/stublibs $(DISTRIB_DIR)/lib/
+	cp -R _build/reloc/lib $(DISTRIB_DIR)/
 	@printf "\n\033[1;1m└ Copy plugin site metadata (lib/geneweb/plugins)\033[0m\n"
 	mkdir -p $(DISTRIB_DIR)/lib/geneweb
 	cp -R _build/reloc/lib/geneweb/plugins $(DISTRIB_DIR)/lib/geneweb/
