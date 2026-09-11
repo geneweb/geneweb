@@ -8,8 +8,14 @@
 
 (cram
  (package geneweb)
- (applies_to help log ancient)
+ (applies_to help log ancient windows)
  (deps %{bin:gwd}))
+
+(cram
+ (package geneweb)
+ (applies_to windows)
+ (enabled_if
+  (= %{os_type} Win32)))
 
 (cram
  (package geneweb)
