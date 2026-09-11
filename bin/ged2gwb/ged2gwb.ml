@@ -2655,7 +2655,7 @@ let sort_by_date proj array =
   then
     Array.stable_sort begin fun e1 e2 ->
       match proj e1, proj e2 with
-      | Some d1, Some d2 -> Date.compare_date d1 d2
+      | Some d1, Some d2 -> Date.compare_date_period d1 d2
       | _ -> 1
     end array
 
@@ -3131,7 +3131,10 @@ let negative_dates persons ascends unions families couples =
     let p = persons.(i) in
     match Date.cdate_to_dmy_opt p.birth, Date.dmy_of_death p.death with
     | Some d1, Some d2 ->
-      if d1.year > 0 && d2.year > 0 && Date.compare_dmy d2 d1 < 0
+      if d1.year > 0 && d2.year > 0
+         && (match Date.compare_dmy_strict d2 d1 with
+             | Some c -> c < 0
+             | None -> false)
       then negative_date_ancestors persons ascends unions families couples i
     | _ -> ()
   done
