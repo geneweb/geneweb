@@ -32,6 +32,9 @@ Avoid bloating catch-all modules. `perso.ml` (~4000 LOC) and
 `templ.ml` is the template engine runtime; changes there affect every
 page.
 
+`plugins/` is legacy and is being phased out. Do not add new plugins,
+and do not propose a plugin as the solution to a feature request.
+
 ## OCaml Conventions
 
 1. Never disable compiler warnings.
@@ -71,6 +74,15 @@ page.
 Templates are `.txt` files in `hd/etc/`. The engine is in
 `lib/templ/` (parser/lexer) and `lib/templ.ml` (runtime). Custom
 template engine.
+
+### Variable Resolution on Person Pages
+
+Variables are resolved through the `eval_*` chain of `perso.ml`
+before reaching the generic one in `templ.ml`. A name defined in
+`perso.ml` therefore shadows the generic one silently, with no
+warning: the variable still returns a value, just not the expected
+one. `%source;` on a person page is the person's genealogical source
+field, not `Version.src`.
 
 ### Syntax
 
