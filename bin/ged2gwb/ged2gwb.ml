@@ -522,7 +522,9 @@ let make_date n1 n2 n3 =
       {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | Some y, None, None ->
       {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  (* WARNING, Stream.error "bad date" would introduces a regression *)
+  (* camlp5 raised Stream.Error here. Stream.Failure is used instead so that a
+     failing date_greg backtracks; both are equivalent since p_date_or_text
+     tries TEXT first, as the camlp5 rule tree did. *)
   | _ -> raise Stream.Failure
 
 let recover_date cal = function
@@ -686,7 +688,7 @@ let p_date_range toks =
       match r with
       | ID "TO" :: r2 -> let dt1, r2 = p_date r2 in (BeginEnd (dt, dt1), r2)
       | _ -> (Begin dt, r))
-  | _ -> raise Stream.Failure 
+  | _ -> raise Stream.Failure
 
 let p_date_or_text toks =
   match toks with

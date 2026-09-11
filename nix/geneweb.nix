@@ -10,7 +10,6 @@
   benchmark,
   calendars,
   dune-site,
-  camlp5,
   camlp-streams,
   decompress,
   fmt,
@@ -48,7 +47,6 @@ buildDunePackage {
   nativeBuildInputs = [
     brotli
     not-ocamlfind
-    camlp5
     crunch
   ];
 
@@ -67,7 +65,6 @@ buildDunePackage {
     benchmark
     calendars
     dune-site
-    camlp5
     camlp-streams
     decompress
     fmt
