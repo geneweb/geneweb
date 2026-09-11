@@ -167,18 +167,13 @@ let init () =
     images_d := Legacy.images_d;
     albums_d := Legacy.albums_d)
 
-<<<<<<< HEAD
-let set_reorg bname force =
-  let res = match force with Some b -> b | None -> is_reorg_base bname in
-  reorg := res;
-=======
 let is_reorg_base bname =
   let bname = Filename.remove_extension bname in
   Sys.file_exists (config_reorg bname)
 
-let test_reorg bname =
-  reorg := is_reorg_base bname;
->>>>>>> d47fd89a8 (fix .gwf file handling in gwsetup)
+let set_reorg bname force =
+  let res = match force with Some b -> b | None -> is_reorg_base bname in
+  reorg := res;
   init ()
 
 let get_timestamp () =

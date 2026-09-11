@@ -144,7 +144,7 @@ let abs_setup_dir () =
 
 (** Resolve a base name against [!bases_dir]. Absolute paths pass through. *)
 let base_path name =
-  if Filename.is_relative name then !bases_dir // name else name
+  if Filename.is_relative name then (get_bases_dir ()) // name else name
 
 let trailer conn _conf =
   let printer_conf = printer_conf conn in
@@ -691,7 +691,7 @@ let rec copy_from_stream conf print strm =
               (* | 'F' see 'V' *)
               (* the current directory may have changes with -bd *)
               | 'G' ->
-                  let fname = !bases_dir // "tmp" // "gwsetup.log" in
+                  let fname = (get_bases_dir ()) // "tmp" // "gwsetup.log" in
                   print ("File: " ^ fname ^ "\n");
                   print_specific_file_tail conf print fname strm
               | 'H' ->
