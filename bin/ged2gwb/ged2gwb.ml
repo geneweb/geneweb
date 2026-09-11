@@ -433,7 +433,7 @@ let lex (s : string) : tok list =
             Buffer.add_char buf '(';
             let j = loop (i + 1) in
             Buffer.add_char buf ')';
-            j
+            loop j
         | c -> Buffer.add_char buf c; loop (i + 1)
     in
     let j = loop i in
@@ -686,37 +686,39 @@ let p_date_range toks =
       match r with
       | ID "TO" :: r2 -> let dt1, r2 = p_date r2 in (BeginEnd (dt, dt1), r2)
       | _ -> (Begin dt, r))
-  | _ -> raise Stream.Failure
+  | _ -> raise Stream.Failure 
 
 let p_date_or_text toks =
-  match (p_date_range toks) with
-  | (dr, r) ->
-      let d =
-        match dr with
-        | Begin (d, cal) -> Adef.Dgreg ({ d with prec = Adef.After }, cal)
-        | End (d, cal) -> Adef.Dgreg ({ d with prec = Adef.Before }, cal)
-        | BeginEnd ((d1, cal1), (d2, cal2)) ->
-            let dmy2 =
-              match cal2 with
-              | Dgregorian ->
-                  { Adef.day2 = d2.day; month2 = d2.month; year2 = d2.year; delta2 = 0 }
-              | Djulian ->
-                  let d = Calendar.julian_of_gregorian d2 in
-                  { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
-              | Dfrench ->
-                  let d = Calendar.french_of_gregorian d2 in
-                  { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
-              | Dhebrew ->
-                  let d = Calendar.hebrew_of_gregorian d2 in
-                  { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
-            in
-            Adef.Dgreg ({ d1 with prec = Adef.YearInt dmy2 }, cal1)
-      in
-      (d, r)
-  | exception Stream.Failure -> (
-      match (p_date toks) with
-      | ((d, cal), r) -> (Adef.Dgreg (d, cal), r)
-      | exception Stream.Failure -> (match toks with TEXT s :: r -> (Adef.Dtext s, r) | _ -> raise Stream.Failure))
+  match toks with
+  | TEXT s :: r -> (Adef.Dtext s, r)
+  | _ -> (
+      match p_date_range toks with
+      | dr, r ->
+          let d =
+            match dr with
+            | Begin (d, cal) -> Adef.Dgreg ({ d with prec = Adef.After }, cal)
+            | End (d, cal) -> Adef.Dgreg ({ d with prec = Adef.Before }, cal)
+            | BeginEnd ((d1, cal1), (d2, cal2)) ->
+                let dmy2 =
+                  match cal2 with
+                  | Dgregorian ->
+                      { Adef.day2 = d2.day; month2 = d2.month; year2 = d2.year; delta2 = 0 }
+                  | Djulian ->
+                      let d = Calendar.julian_of_gregorian d2 in
+                      { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+                  | Dfrench ->
+                      let d = Calendar.french_of_gregorian d2 in
+                      { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+                  | Dhebrew ->
+                      let d = Calendar.hebrew_of_gregorian d2 in
+                      { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+                in
+                Adef.Dgreg ({ d1 with prec = Adef.YearInt dmy2 }, cal1)
+          in
+          (d, r)
+      | exception Stream.Failure ->
+          let (d, cal), r = p_date toks in
+          (Adef.Dgreg (d, cal), r))
 
 let p_date_value toks = let d, r = p_date_or_text toks in expect_eoi r; d
 
@@ -763,13 +765,12 @@ let date_of_field d =
   else begin
     date_str := d;
     let toks = lex (String.uppercase_ascii d) in
-    match (try Some (p_date_value toks) with Stream.Failure | Stream.Error _ -> None) with
-    | Some v -> Some v
-    | None ->
-        let toks = lex (String.uppercase_ascii d) in
-        (match (try Some (p_date_value_recover toks) with Stream.Failure | Stream.Error _ -> None) with
-         | Some v -> Some v
-         | None -> Some (Dtext d))
+    match p_date_value toks with
+    | v -> Some v
+    | exception (Stream.Failure | Stream.Error _) -> (
+        match p_date_value_recover toks with
+        | v -> Some v
+        | exception (Stream.Failure | Stream.Error _) -> Some (Dtext d))
   end
 
 (* Creating base *)
@@ -1198,12 +1199,12 @@ let purge_list list =
     list []
 
 let decode_date_interval pos s =
-  let toks = lex s in
-  match (try Some (p_date_interval toks) with Stream.Failure | Stream.Error _ | Not_found -> None) with
-  | Some (BeginEnd (d1, d2)) -> Some d1, Some d2
-  | Some (Begin d) -> Some d, None
-  | Some (End d) -> None, Some d
-  | None -> print_bad_date pos s; None, None
+  match p_date_interval (lex s) with
+  | BeginEnd (d1, d2) -> Some d1, Some d2
+  | Begin d -> Some d, None
+  | End d -> None, Some d
+  | exception (Stream.Failure | Stream.Error _ | Failure _ | Not_found) ->
+      print_bad_date pos s; None, None
 
 let treat_indi_title gen public_name r =
   let (title, place, nth) = decode_title r.rval in
