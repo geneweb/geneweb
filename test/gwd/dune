@@ -8,7 +8,7 @@
 
 (cram
  (package geneweb)
- (applies_to help log ancient)
+ (applies_to help log ancient daemon)
  (deps %{bin:gwd}))
 
 (cram
