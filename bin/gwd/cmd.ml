@@ -450,7 +450,10 @@ let cgi =
 
 let daemon =
   let doc = "Run the process in the background (UNIX only)." in
-  C.Arg.(value & flag & info [ "daemon" ] ~docs:http_section ~doc)
+  let error = "--daemon is available only on UNIX." in
+  C.Arg.(
+    unix_only_flag ~error & value & flag
+    & info [ "daemon" ] ~docs:http_section ~doc)
 
 (* Web interface commands *)
 
