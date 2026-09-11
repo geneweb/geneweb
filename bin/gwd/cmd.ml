@@ -591,16 +591,15 @@ let debug_flags =
 
 let parse_cgi_flags =
   let open C.Term.Syntax in
-  C.Term.ret @@
-  let+ cgi = cgi
-  and+ daemon = daemon
-  in
-  let error = `Error (false, "cannot activate daemon mode in CGI mode") in
-  match Unix.getenv @@ C.Cmd.Env.info_var var_query_string with
-  | exception Not_found ->
-      if cgi && daemon then error
-      else `Ok cgi
-  | _ -> error
+  C.Term.ret
+  @@
+  let+ cgi = cgi and+ daemon = daemon in
+  match
+    (cgi, daemon, Sys.getenv_opt @@ C.Cmd.Env.info_var var_query_string)
+  with
+  | true, true, _ | _, true, Some _ ->
+      `Error (false, "cannot activate daemon mode in CGI mode")
+  | _ -> `Ok cgi
 
 let t =
   let open C.Term.Syntax in
