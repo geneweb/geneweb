@@ -13,6 +13,7 @@ let errors_other = ref []
 let set_vars = ref []
 let gwd_cmd = ref ""
 let reorg = ref false
+let reorg_forced = ref false
 let force = ref false
 let cnt_dir = ref ""
 let sock_dir = ref ""

@@ -3278,7 +3278,7 @@ let speclist =
     , Arg.String (fun s -> particles := Mutil.input_particles s)
     , "<FILE> Use the given file as list of particles" )
   ; ( "-nowarn", Arg.Set no_warn, " Do not show warnings during import")
-  ; ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
+  ; ("-reorg", Arg.Unit (fun () -> GWPARAM.reorg := true; GWPARAM.reorg_forced := true), " Mode reorg")
   ]
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
@@ -3311,6 +3311,7 @@ let main () =
     exit 2);
   let bname = !out_file in
   Geneweb.GWPARAM.check_base_exists bname;
+  if not !GWPARAM.reorg_forced then GWPARAM.set_reorg bname None;
   let _bdir = Geneweb.GWPARAM.create_base_and_config bname in
   out_file := Filename.concat (Secure.base_dir ()) (bname ^ ".gwb");
   Geneweb.GWPARAM.init ();

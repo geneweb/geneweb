@@ -292,14 +292,6 @@ let add_lex_dir dir =
 
 module MS = Map.Make (String)
 
-let fallback_plugins_dir () =
-  Filename.dirname (Unix.realpath Sys.executable_name) // "plugins"
-
-let plugin_site_dir () =
-  match Sites.Sites.plugins with
-  | dir :: _ -> dir
-  | [] -> fallback_plugins_dir ()
-
 let assets_of_plugin name =
   match Sites.Sites.plugins with
   | dir :: _ -> dir // name // "assets"

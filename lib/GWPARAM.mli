@@ -10,6 +10,9 @@ val bases : string ref
 val reorg : bool ref
 (** set to true when base is in reorg format *)
 
+val reorg_forced : bool ref
+(** set to true when base is requested to be in reorg format *)
+
 val force : bool ref
 (** force creation of database if already existing *)
 
