@@ -573,6 +573,23 @@ let print_witness opts base gen p =
     | _ -> gen.notes_pl_p <- p :: gen.notes_pl_p);
     if Driver.get_pevents p <> [] then gen.pevents_pl_p <- p :: gen.pevents_pl_p)
 
+let print_witness_note opts base wnote =
+  if opts.no_notes <> `nnn then
+    match Driver.sou base wnote with
+    | "" -> ()
+    | wnote ->
+        if !old_gw then
+          (* Ancien format : pas de mot-clé `wnote` (illisible par un ancien
+             binaire). On reporte la note du témoin en texte libre, dans un
+             paragraphe séparé. *)
+          List.iter
+            (fun line -> Printf.ksprintf (oc opts) "%s\n" line)
+            ("" :: String.split_on_char '\n' wnote)
+        else
+          List.iter
+            (fun line -> Printf.ksprintf (oc opts) "wnote %s\n" line)
+            (String.split_on_char '\n' wnote)
+
 let print_pevent opts base gen e =
   (match e.epers_name with
   | Epers_Birth -> Printf.ksprintf (oc opts) "#birt"
@@ -638,7 +655,7 @@ let print_pevent opts base gen e =
   if opts.source = None then print_if_no_empty opts base "#s" e.epers_src;
   Printf.ksprintf (oc opts) "\n";
   Array.iter
-    (fun (ip, wk) ->
+    (fun (ip, wk, wnote) ->
       if gen.per_sel ip then (
         let p = Driver.poi base ip in
         Printf.ksprintf (oc opts) "wit";
@@ -652,7 +669,8 @@ let print_pevent opts base gen e =
         | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
         | None -> ());
         print_witness opts base gen p;
-        Printf.ksprintf (oc opts) "\n"))
+        Printf.ksprintf (oc opts) "\n";
+        print_witness_note opts base wnote))
     e.epers_witnesses;
   let note =
     if opts.no_notes <> `nnn then Driver.sou base e.epers_note else ""
@@ -741,7 +759,7 @@ let print_fevent opts base gen in_comment e =
   if opts.source = None then print_if_no_empty opts base "#s" e.efam_src;
   print_sep ();
   Array.iter
-    (fun (ip, wk) ->
+    (fun (ip, wk, wnote) ->
       if gen.per_sel ip then (
         let p = Driver.poi base ip in
         Printf.ksprintf (oc opts) "wit";
@@ -755,7 +773,14 @@ let print_fevent opts base gen in_comment e =
         | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
         | None -> ());
         print_witness opts base gen p;
-        print_sep ()))
+        print_sep ();
+        if not in_comment then print_witness_note opts base wnote
+        else
+          (* Ancien format, évènement familial sérialisé sur une seule ligne
+             (champ `comm`) : on accole la note du témoin en texte. *)
+          match Driver.sou base wnote with
+          | "" -> ()
+          | wn -> Printf.ksprintf (oc opts) "wit-note: %s " (no_newlines wn)))
     e.efam_witnesses;
   let note =
     if opts.no_notes <> `nnn then Driver.sou base e.efam_note else ""
@@ -994,7 +1019,7 @@ let notes_aliases bdir =
 let print_notes_for_person opts base gen p =
   let print_witness_in_notes witnesses =
     Array.iter
-      (fun (ip, wk) ->
+      (fun (ip, wk, wnote) ->
         let p = Driver.poi base ip in
         Printf.ksprintf (oc opts) "wit";
         (match Driver.get_sex p with
@@ -1007,7 +1032,8 @@ let print_notes_for_person opts base gen p =
         | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
         | None -> ());
         print_witness opts base gen p;
-        Printf.ksprintf (oc opts) "\n")
+        Printf.ksprintf (oc opts) "\n";
+        print_witness_note opts base wnote)
       witnesses
   in
   let epers_name_to_string evt =

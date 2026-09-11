@@ -96,6 +96,7 @@ module Make (H : Digestif.S) = struct
   let list f l ctx = List.fold_left (fun ctx a -> f a ctx) ctx l
   let array f l ctx = Array.fold_left (fun ctx a -> f a ctx) ctx l
   let pair f g (x, y) = f x <+> g y
+  let triple f g h (x, y, z) = f x <+> g y <+> h z
 
   let option f x =
     match x with Some u -> string "Some" <+> f u | None -> string "None"
@@ -292,7 +293,7 @@ module Make (H : Digestif.S) = struct
     <+> feed_string epers_note
     <+> feed_string epers_note
     <+> feed_string epers_src
-    <+> (array @@ pair feed_pers witness_kind) epers_witnesses)
+    <+> (array @@ triple feed_pers witness_kind feed_string) epers_witnesses)
     [@ocamlformat "disable"]
 
   let gen_person feed_iper feed_pers feed_string
@@ -412,7 +413,7 @@ module Make (H : Digestif.S) = struct
     <+> feed_string efam_reason
     <+> feed_string efam_note
     <+> feed_string efam_src
-    <+> (array @@ pair feed_pers witness_kind) efam_witnesses)
+    <+> (array @@ triple feed_pers witness_kind feed_string) efam_witnesses)
     [@ocamlformat "disable"]
 
   let relation_kind (k : Def.relation_kind) =
