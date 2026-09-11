@@ -139,11 +139,6 @@ module Legacy = struct
     Filename.concat (base_dir ()) (bname ^ ".gwb")
 end
 
-(* Check if a base is in reorg format *)
-let is_reorg_base bname =
-  let bname = Filename.remove_extension bname in
-  Sys.file_exists (config_reorg bname)
-
 (* Initialize path functions based on mode *)
 let init () =
   Secure.add_assets Filename.current_dir_name;
@@ -171,6 +166,10 @@ let init () =
     portraits_d := Legacy.portraits_d;
     images_d := Legacy.images_d;
     albums_d := Legacy.albums_d)
+
+let is_reorg_base bname =
+  let bname = Filename.remove_extension bname in
+  Sys.file_exists (config_reorg bname)
 
 let set_reorg bname force =
   let res = match force with Some b -> b | None -> is_reorg_base bname in
