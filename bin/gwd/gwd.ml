@@ -294,13 +294,24 @@ let add_lex_dir dir =
 
 module MS = Map.Make (String)
 
+let fallback_plugins_dir () =
+  Filename.dirname (Unix.realpath Sys.executable_name) // "plugins"
+
+let plugin_site_dir () =
+  match Sites.Sites.plugins with
+  | dir :: _ -> dir
+  | [] -> fallback_plugins_dir ()
+
 let assets_of_plugin name =
   match Sites.Sites.plugins with
-  | [] ->
-      failwith
-        "no plugin site found (DUNE_DIR_LOCATIONS unset or geneweb not \
-         installed)"
   | dir :: _ -> dir // name // "assets"
+  | [] ->
+      Log.err (fun k ->
+          k
+            "No plugin site directory resolved (Sites.Sites.plugins is empty) \
+             — cannot load assets for plugin %s"
+            name);
+      exit 1
 
 let load_plugin Cmd.{ name } =
   Log.debug (fun k -> k "Loading plugin %s..." name);
@@ -308,10 +319,12 @@ let load_plugin Cmd.{ name } =
   let lex_dir = assets_of_plugin name // "lex" in
   if Sys.file_exists lex_dir then add_lex_dir lex_dir;
   try Sites.Plugins.Plugins.load name
-  with _ ->
-    (* FIXME: We cannot print the exception as it contains a user-specific
-       path. *)
-    Log.err (fun k -> k "Cannot load the plugin %s" name);
+  with e ->
+    if !debug then
+      Log.err (fun k ->
+          k "Cannot load the plugin %s: %s\n%s" name (Printexc.to_string e)
+            (Printexc.get_backtrace ()))
+    else Log.err (fun k -> k "Cannot load the plugin %s" name);
     exit 1
 
 let load_all_plugins () =
@@ -2211,6 +2224,8 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
     process "" false (Array.to_list Sys.argv)
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
+  Log.debug (fun k ->
+      k "Sites.Sites.plugins = [%s]" (String.concat "; " Sites.Sites.plugins));
   load_plugins plugins;
   let loaded_plugins = Registration.all_registered () in
   GWPARAM.init ();
