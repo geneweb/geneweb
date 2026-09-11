@@ -2147,7 +2147,6 @@ let main ~plugins ?interface ~port ~predictable_mode ~secret_salt () =
   (* FIXME: this line MUST be after plugin loading as plugins can modified
      [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
   cache_lexicon ();
-  create_cnt_dir ();
   List.iter
     (fun dbn ->
       Log.info (fun k -> k "Caching database %s in memory… %!" dbn);
@@ -2211,6 +2210,7 @@ let main ~plugins ?interface ~port ~predictable_mode ~secret_salt () =
     geneweb_cgi ~predictable_mode ~loaded_plugins ~secret_salt addr
       (Filename.basename script) query)
   else (
+    create_cnt_dir ();
     display_infos ();
     geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port
       ~secret_salt ())
