@@ -61,7 +61,7 @@
   %apply;add_in_sorted_list%with;&i%expr(ccc+1)=%xxx.index;%end;
 %end;
 <h3>%if;(evar.v1=0 and evar.v2=0)%if;(sex=0)[*him/her]0%else;[*him/her]1%end;
-   %else;<h3>%apply;a_of_b%with;%apply;cousin_lex(evar.v1,evar.v2)%and;%self;%end;%end;</h3>
+   %else;%apply;a_of_b%with;%apply;cousin_lex(evar.v1,evar.v2)%and;%self;%end;%end;</h3>
 %( siblings and half-siblings %)
 %if;(evar.v1=1 and evar.v2=1)
   %if;(has_parents)
