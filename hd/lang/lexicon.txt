@@ -12405,16 +12405,16 @@ sl: poveži
 sv: länk
 tr: bağlantı
 
-    link back to parents
+    go back to the parent row
 co: liame di ritornu versu i genitori
-de: Link zurück zu den Eltern
-en: link back to parents
-es: enlace de regreso a los padres
-fr: lien retour vers les parents
+de: zur Zeile des Elternteils zurück
+en: go back to the parent row
+es: volver a la fila del progenito
+fr: remonter à la ligne du parent
 no: lenke til foreldre
-pt: link de regresso aos pais
-sv: länk tillbaka till föräldrarna
-tr: ebeveynlere geri bağlantı
+pt: voltar à linha do progenitor
+sv: gå tillbaka till förälderns ra
+tr: ebeveynin satırına geri dön
 
     link between
 af: mense tussen
