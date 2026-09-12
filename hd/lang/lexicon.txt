@@ -1161,7 +1161,7 @@ eo: %skuzo/%skuzino
 es: un %sprimo/una %sprima
 et: %snõbu:g:--o
 fi: %sserkku:g:--un
-fr: un %scousin/une %scousine/un·e·%scousin·e
+fr: un %scousin/une %scousine/un(e) %scousin(e)
 he: %sבן-דוד/%sבת-דוד
 is: %ssystkynabarn
 it: un %scugino/una %scugina
@@ -2444,12 +2444,12 @@ co: vivu/viva/vivu(a)/vivi
 cs: žijící
 da: levende
 de: nicht verstorben
-en: alive/alive/alive/living·s
+en: alive/alive/alive/living(s)
 eo: vivanta
 es: no fallecido/no fallecida/no fallecido(a)
 et: elus
 fi: elossa
-fr: vivant/vivante/vivant(e)/vivant·s
+fr: vivant/vivante/vivant(e)/vivant(s)
 he: בחיים
 is: ekki látin(n)
 it: non deceduto/non deceduta/non deceduto(a)
@@ -6286,7 +6286,7 @@ fr: père et mère<br>géniteur et génitrice
 
     cousins.1.1 tt
 es: hermanos y hermanas
-fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
+fr: adelphe(s)<br>sibling(s)<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
 
     cousins.1.10
 co: 7<sup>u</sup> volte arciniputinu/7<sup>u</sup> volte arciniputini
@@ -6464,7 +6464,7 @@ de: Stammurgroßeltern
     cousins.2.0 tt
 de: Eltern der Eltern<br>Großeltern und Großmütter
 es: abuelos — antepasados de la 2ª generación
-fr: aïeul·e·s<br>parents des parents<br>grands-pères et grands-mères
+fr: aïeul(s)<br>parents des parents<br>grands-pères et grands-mères
 
     cousins.2.1
 ->: uncles and aunts
@@ -6569,7 +6569,7 @@ fr: six-fois-arrière-petits-cousins au 1<sup>er</sup> degré
     cousins.3.0 tt
 de: Eltern der Großeltern
 es: bisabuelos — antepasados de la 3ª generación
-fr: bisaïeul·e·s
+fr: bisaïeul(s)
 
     cousins.3.1
 ->: siblings of the grandparents
@@ -6657,7 +6657,7 @@ co: arciarcicaccari
 de: Alteltern
 en: 2nd-great-grand-parents
 es: tatarabuelos — antepasados de la 4ª generación
-fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
+fr: tri(s)aïeul(s)<br>aïeul(s) des aïeuls
 
     cousins.4.1
 ->: siblings of the great-grandparents
@@ -6751,7 +6751,7 @@ co: 3<sup>u</sup> arcicaccari
 de: Altgroßeltern
 en: 3rd-great-grandparents
 es: 3×-bisabuelos — antepasados de la 5ª generación
-fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
+fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeuls<br>quartaïeuls
 
     cousins.5.1
 co: arciarcizione
@@ -8170,12 +8170,12 @@ co: mortu/morta/mortu(a)/morti
 cs: zemřel/zemřela/zemřeli
 da: død
 de: verstorben
-en: died/died/died/dead·s
+en: died/died/died/dead(s)
 eo: mortinta
 es: fallecido/fallecida/fallecido(a)
 et: surnud
 fi: kuollut
-fr: mort/morte/mort(e)/mort·s
+fr: mort/morte/mort(e)/mort(s)
 he: נפטר/ נפטרה
 is: dó
 it: deceduto/deceduta/deceduto(a)
@@ -9699,14 +9699,14 @@ af: voornaam/voorname
 ar: الإسم
 bg: собствено име/собствени имена
 br: raganv/raganvioù
-ca: nom/noms/nom·s
+ca: nom/noms/nom(s)
 co: nome/nomi/nome(i)
 cs: křestní jméno/křestní jména
 da: fornavn/fornavne
 de: Vorname/Vornamen/Vorname(n)
-en: first name/first names/first name·s
+en: first name/first names/first name(s)
 eo: propra nomo/propraj nomoj
-es: nombre/nombres/nombre·s
+es: nombre/nombres/nombre(s)
 et: eesnimi/eesnimed
 fi: etunimi/etunimet
 fr: prénom/prénoms/prénom(s)
@@ -9717,10 +9717,10 @@ lt: vardas/vardai
 lv: vārds/vārdi
 nl: voornaam/voornamen
 no: fornavn/fornavn
-oc: prenom/prenoms/prenom·s
+oc: prenom/prenoms/prenom(s)
 pl: imię/imiona
 pt: nome/nomes
-pt-br: prenome/prenomes/prenome·s
+pt-br: prenome/prenomes/prenome(s)
 ro: prenume
 ru: имя/имена
 sk: meno/mená
@@ -10300,7 +10300,7 @@ eo: baptofilo/baptofilino/baptofil(in)o
 es: ahijado/ahijada/ahijado(a)
 et: ristipoeg/ristitütar/ristilaps
 fi: kummipoika/kummityttö/kummilapsi
-fr: filleul/filleule/filleul·e
+fr: filleul/filleule/filleul(e)
 he: בן סנדקאות/ בת סנדקאות/ ילד סנדקאות
 is: guðsonur/guðdóttir/guðbarn
 it: figlioccio/figlioccia/figlioccio
