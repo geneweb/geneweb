@@ -6085,6 +6085,9 @@ en: a %sfourth great-granduncle/a %sfourth great-grandaunt
 es: un %stío 4×-bisabuelo/una %stía 4×-bisabuela
 fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grand-tante
 
+   cousin.7.2
+fr: un %s4×-arrière-grand-cousin/une %s4×-arrière-grand-cousine/un(e) %s4×-arrière-grand-cousin(e)
+
     cousin.8.0
 co: un 6<sup>u</sup> volte arcicaccaru/una 6<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×6)</sup>-Großvater/eine Ur<sup>(×6)</sup>-Großmutter
@@ -6390,7 +6393,7 @@ fr: sept-fois-arrière-grands-oncles
     cousins.10.1 tt
 de: Brüder und Schwestern der Ur<sup>(×7)</sup>-Großeltern
 es: hermanos y hermanas de los 7×-bisabuelos
-fr: frères et sœurs des octosaïeuls
+fr: frères et sœurs des oct(os)aïeuls
 
     cousins.10.10
 de: Cousins 8. Grades
@@ -6511,7 +6514,7 @@ fr: arrière-petit-cousin/arrière-petits-cousins
     cousins.2.4 tt
 de: Kinder von Neffen und Nichten 2. Grades
 es: primos en 1º grado, 2 generación(es) más abajo
-fr: arrière-petits-cousins au 1<sup>er</sup> degré<hr>enfant d’un petit-cousin ou d’une petite cousine
+fr: arrière-petits-cousins au 1<sup>er</sup> degré<br>enfant d’un petit-cousin ou d’une petite cousine
 
     cousins.2.5
 de: Urgroßneffe&#47; -nichte 2. Grades/Urgroßneffen&#47; -nichten 2. Grades
@@ -6590,7 +6593,7 @@ fr: grands-cousins
 
     cousins.3.2 tt
 es: primos en 1º grado de los padres
-fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et petites-tantes (désuets)<hr><- cousins germains des parents, oncles et tantes
+fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et petites-tantes (désuets)<hr>← cousins germains des parents, oncles et tantes
 
     cousins.3.3
 ->: 2nd cousins
@@ -6606,7 +6609,7 @@ fr: petits-cousins 2<sup>e</sup>
 
     cousins.3.4 tt
 es: primos en 2º grado, 1 generación(es) más abajo
-fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr><- cousins issus d’issus de germains des enfants
+fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr>← cousins issus d’issus de germains des enfants
 
     cousins.3.5
 de: Großneffen&#47; -nichten 3. Grades
@@ -6676,7 +6679,7 @@ fr: arrière-grands-cousins
 
     cousins.4.2 tt
 es: primos en 1º grado de los abuelos
-fr: grands-oncles et grands-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins germains des grands-parents, grands-oncles et grands-tantes
+fr: grands-oncles et grands-tantes à la mode de Bourgogne ou Bretagne<hr>← cousins germains des grands-parents, grands-oncles et grands-tantes
 
     cousins.4.3
 de: Tanten und Onkel 3. Grades
@@ -6685,7 +6688,7 @@ fr: grands-cousins 2<sup>e</sup>
 
     cousins.4.3 tt
 es: primos en 2º grado de los padres
-fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des parents et oncles
+fr: grands-cousins au 2<sup>e</sup> degré<hr>← cousins issus de germains des parents et oncles
 
     cousins.4.4
 ->: 3rd cousins
@@ -6797,7 +6800,7 @@ fr: arrière-arrière-grands-cousins
 
     cousins.5.2 tt
 es: primos en 1º grado de los bisabuelos
-fr: arrière-grands-oncles et arrière-grands-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins des arrière-grands-parents et arrière-grands-oncles
+fr: arrière-grands-oncles et arrière-grands-tantes à la mode de Bourgogne ou Bretagne<hr>← cousins des arrière-grands-parents et arrière-grands-oncles
 
     cousins.5.3
 de: Großtanten und -onkel 3. Grades
@@ -6806,7 +6809,7 @@ fr: arrière-grands-cousins 2<sup>e</sup>
 
     cousins.5.3 tt
 es: primos en 2º grado de los abuelos
-fr: arrière-grands-cousins au deuxième degré<hr><- cousins issus de germains des grands-parents et grands-oncles
+fr: arrière-grands-cousins au deuxième degré<hr>← cousins issus de germains des grands-parents et grands-oncles
 
     cousins.5.4
 de: Tanten und Onkel 4. Grades
@@ -6815,7 +6818,7 @@ fr: grands-cousins 3<sup>e</sup>
 
     cousins.5.4 tt
 es: primos en 3º grado de los padres
-fr: grands-cousins au troisième degré<hr><- cousins issus d’issus de germains des parents
+fr: grands-cousins au troisième degré<hr>← cousins issus d’issus de germains des parents
 
     cousins.5.5
 co: cugini à u 4<sup>u</sup> gradu
@@ -6921,7 +6924,7 @@ fr: arrière-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.6.3 tt
 es: primos en 2º grado de los bisabuelos
-fr: arrière-arrière-grands-cousins au deuxième degré<br><- cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
+fr: arrière-arrière-grands-cousins au deuxième degré<hr>← cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
 
     cousins.6.4
 de: Großtanten und -onkel 4. Grades
@@ -6930,7 +6933,7 @@ fr: arrière-grands-cousins 3<sup>e</sup>
 
     cousins.6.4 tt
 es: primos en 3º grado de los abuelos
-fr: arrière-grands-cousins au troisième degré<br><- cousins issus d’issus de germains des grands-parents et grands-oncles
+fr: arrière-grands-cousins au troisième degré<hr>← cousins issus d’issus de germains des grands-parents et grands-oncles
 
     cousins.6.5
 de: Tanten und Onkel 5. Grades
@@ -7045,7 +7048,7 @@ fr: 3×-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.7.3 tt
 es: primos en 2º grado de los tatarabuelos
-fr: trois-fois-arrière-grands-cousins au deuxième degré/arrière-arrière-arrière-grands-cousins au deuxième degré
+fr: trois-fois-arrière-grands-cousins au deuxième degré<br>arrière-arrière-arrière-grands-cousins au deuxième degré
 
     cousins.7.4
 de: Urgroßtanten&#47; -onkel 4. Grades
