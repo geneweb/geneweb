@@ -142,6 +142,7 @@ and eval_simple_var conf base env p = function
   | [ "first_name_alias" ] -> eval_string_env "first_name_alias" env
   | [ "has_aliases" ] -> bool_val (p.aliases <> [])
   | [ "has_birth_date" ] -> bool_val (Date.od_of_cdate p.birth <> None)
+  | [ "has_image" ] | [ "has_portrait" ] -> bool_val ((p.image :> string) <> "")
   | [ "has_pevent_birth" ] ->
       let rec loop pevents =
         match pevents with
