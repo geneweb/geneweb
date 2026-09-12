@@ -1161,7 +1161,7 @@ eo: %skuzo/%skuzino
 es: un %sprimo/una %sprima
 et: %snõbu:g:--o
 fi: %sserkku:g:--un
-fr: un %scousin/une %scousine/un·e·%scousin·e
+fr: un %scousin/une %scousine/un(e) %scousin(e)
 he: %sבן-דוד/%sבת-דוד
 is: %ssystkynabarn
 it: un %scugino/una %scugina
@@ -1385,7 +1385,7 @@ eo: %spraonklo/%spraonklino
 es: un %stío abuelo/una %stía abuela
 et: %svanaonu/%svanatädi
 fi: %sisosetä:g:---dän/%sisotäti:g:--din
-fr: un %sgrand-oncle/une %sgrande-tante
+fr: un %sgrand-oncle/une %sgrand-tante
 he: %sדוד-סב/%sדודה-סבה
 is: %safa(ömmu)bróðir/%safa(ömmu)systir
 it: un %sprozio/una %sprozia
@@ -2444,12 +2444,12 @@ co: vivu/viva/vivu(a)/vivi
 cs: žijící
 da: levende
 de: nicht verstorben
-en: alive/alive/alive/living·s
+en: alive/alive/alive/living(s)
 eo: vivanta
 es: no fallecido/no fallecida/no fallecido(a)
 et: elus
 fi: elossa
-fr: vivant/vivante/vivant(e)/vivant·s
+fr: vivant/vivante/vivant(e)/vivant(s)
 he: בחיים
 is: ekki látin(n)
 it: non deceduto/non deceduta/non deceduto(a)
@@ -5720,7 +5720,7 @@ sv: par
 tr: çiftler
 
     cousin.0.1
-->: son/daughter/child
+->: a son/a daughter/a child
 
     cousin.0.10
 co: un ottu volte arcifigliulinu/un’ottu volte arcifigliulina/un ottu volte arcizitellucciu
@@ -5850,7 +5850,7 @@ co: un %ssette volte arcizione/una %ssette volte arciziona
 de: ein %sUr<sup>(×7)</sup>-Großonkel/eine %sUr<sup>(×7)</sup>-Großtante
 en: a %sseventh great-granduncle/a %sseventh great-grandaunt
 es: un %stío 7×-bisabuelo/una %stía 7×-bisabuela
-fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grande-tante
+fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grand-tante
 
     cousin.2.0
 ->: a grandfather/a grandmother/a grandparent
@@ -5915,7 +5915,7 @@ fr: un %s6×-arrière-petit-cousin au 2<sup>e</sup> degré/une %s6×-arrière-pe
     cousin.3.2
 de: ein %sOnkel 2. Grades/eine %sTante 2. Grades
 es: un %sprimo hermano de los padres/una %sprima hermana de los padres
-fr: un %sgrand-cousin/une %sgrande-cousine
+fr: un %sgrand-cousin/une %sgrand-cousine
 
     cousin.3.3
 ->: a 2nd cousin
@@ -5962,7 +5962,7 @@ co: un %sarcizione/una %sarciziona
 de: ein %sUrgroßonkel/eine %sUrgroßtante
 en: a %sgreat-granduncle/a %sgreat-grandaunt
 es: un %stío bisabuelo/una %stía bisabuela
-fr: un %sarrière-grand-oncle/une %sarrière-grande-tante
+fr: un %sarrière-grand-oncle/une %sarrière-grand-tante
 
     cousin.4.10
 de: ein %sUr<sup>(×4)</sup>-Großneffe 4. Grades/eine %sUr<sup>(×4)</sup>-Großnichte 4. Grades
@@ -5972,12 +5972,12 @@ fr: un %s5×-arrière-petit-cousin au 3<sup>e</sup> degré/une %s5×-arrière-pe
     cousin.4.2
 de: ein %sGroßonkel 2. Grades/eine %sGroßtante 2. Grades
 es: un %sprimo hermano de los abuelos/una %sprima hermana de los abuelos
-fr: un %sarrière-grand-cousin/une %sarrière-grande-cousine
+fr: un %sarrière-grand-cousin/une %sarrière-grand-cousine
 
     cousin.4.3
 de: ein %sOnkel 3. Grades/eine %sTante 3. Grades
 es: un %sprimo segundo de los padres/una %sprima segunda de los padres
-fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrande-cousine au 2<sup>e</sup> degré
+fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrand-cousine au 2<sup>e</sup> degré
 
     cousin.4.4
 ->: a 3rd cousin
@@ -6018,22 +6018,22 @@ fr: un 3×-arrière-grand-père/une 3×-arrière-grand-mère
 de: ein %sUr-Ur-Großonkel/eine %sUr-Ur-Großtante
 en: a %sgreat-great-granduncle/a %sgreat-great-grandaunt
 es: un %stío tatarabuelo/una %stía tatarabuela
-fr: un %sarrière-arrière-grand-oncle/une %sarrière-arrière-grande-tante
+fr: un %sarrière-arrière-grand-oncle/une %sarrière-arrière-grand-tante
 
     cousin.5.2
 de: ein %sUr-Großonkel 2. Grades/eine %sUr-Großtante 2. Grades
 es: un %sprimo hermano de los bisabuelos/una %sprima hermana de los bisabuelos
-fr: un %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
+fr: un %sarrière-arrière-grand-cousin/une %sarrière-arrière-grand-cousine
 
     cousin.5.3
 de: ein %sGroßonkel 3. Grades/eine %sGroßtante 3. Grades
 es: un %sprimo segundo de los abuelos/una %sprima segunda de los abuelos
-fr: un %sarrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-grande-cousine au 2<sup>e</sup> degré
+fr: un %sarrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-grand-cousine au 2<sup>e</sup> degré
 
     cousin.5.4
 de: ein %sOnkel 4. Grades/eine %sTante 4. Grades
 es: un %sprimo tercero de los padres/una %sprima tercera de los padres
-fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</sup> degré
+fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrand-cousine au 3<sup>e</sup> degré
 
     cousin.5.5
 co: un cuginu à u 4<sup>u</sup> gradu/una cugina à u 4<sup>u</sup> gradu
@@ -6054,22 +6054,22 @@ co: un %s3<sup>u</sup> volte arcizione/una %s3<sup>u</sup> volte arciziona
 de: ein %sUr-Ur-Urgroßonkel/eine %sUr-Ur-Urgroßtante
 en: a %sthird great-granduncle/a %sthird great-grandaunt
 es: un %stío 3×-bisabuelo/una %stía 3×-bisabuela
-fr: un %strois-fois-arrière-grand-oncle/une %strois-fois-arrière-grande-tante
+fr: un %strois-fois-arrière-grand-oncle/une %strois-fois-arrière-grand-tante
 
     cousin.6.2
 de: ein %sUr-Ur-Großonkel 2. Grades/eine %sUr-Ur-Großtante 2. Grades
 es: un %sprimo hermano de los tatarabuelos/una %sprima hermana de los tatarabuelos
-fr: un %s3×-arrière-grand-cousin/une %s3×-arrière-grande-cousine
+fr: un %s3×-arrière-grand-cousin/une %s3×-arrière-grand-cousine
 
     cousin.6.3
 de: ein %sUr-Großonkel 3. Grades/eine %sUr-Großtante 3. Grades
 es: un %sprimo segundo de los bisabuelos/una %sprima segunda de los bisabuelos
-fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière-grande-cousine au 2<sup>e</sup> degré
+fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière--cousine au 2<sup>e</sup> degré
 
     cousin.6.4
 de: ein %sGroßonkel 4. Grades/eine %sGroßtante 4. Grades
 es: un %sprimo tercero de los abuelos/una %sprima tercera de los abuelos
-fr: un %sarrière-grand-cousin au 3<sup>e</sup> degré/une %sarrière-grande-cousine au 3<sup>e</sup> degré
+fr: un %sarrière-grand-cousin au 3<sup>e</sup> degré/une %sarrière-grand-cousine au 3<sup>e</sup> degré
 
     cousin.7.0
 co: un 5<sup>u</sup> volte arcicaccaru/una 5<sup>u</sup> volte arcicaccara
@@ -6083,7 +6083,10 @@ co: un %s4<sup>u</sup> volte arcizione/una %s4<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×4)</sup>-Großonkel/eine %sUr<sup>(×5)</sup>-Großtante
 en: a %sfourth great-granduncle/a %sfourth great-grandaunt
 es: un %stío 4×-bisabuelo/una %stía 4×-bisabuela
-fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grande-tante
+fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grand-tante
+
+   cousin.7.2
+fr: un %s4×-arrière-grand-cousin/une %s4×-arrière-grand-cousine/un(e) %s4×-arrière-grand-cousin(e)
 
     cousin.8.0
 co: un 6<sup>u</sup> volte arcicaccaru/una 6<sup>u</sup> volte arcicaccara
@@ -6097,7 +6100,7 @@ co: un %s6<sup>u</sup> volte arcizione/una %s6<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×5)</sup>-Großonkel/eine %sUr<sup>(×5)</sup>-Großtante
 en: a %sfifth great-granduncle/a %sfifth great-grandaunt
 es: un %stío 5×-bisabuelo/una %stía 5×-bisabuela
-fr: un %scinq-fois-arrière-grand-oncle/une %scinq-fois-arrière-grande-tante
+fr: un %scinq-fois-arrière-grand-oncle/une %scinq-fois-arrière-grand-tante
 
     cousin.9.0
 co: un 7<sup>u</sup> volte arcicaccaru/una 7<sup>u</sup> volte arcicaccara
@@ -6111,7 +6114,7 @@ co: un %s6<sup>u</sup> volte arcizione/una %s6<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×6)</sup>-Großonkel/eine %sUr<sup>(×6)</sup>-Großtante
 en: a %ssixth great-granduncle/a %ssixth great-grandaunt
 es: un %stío 6×-bisabuelo/una %stía 6×-bisabuela
-fr: un %ssix-fois-arrière-grand-oncle/une %ssix-fois-arrière-grande-tante
+fr: un %ssix-fois-arrière-grand-oncle/une %ssix-fois-arrière-grand-tante
 
     cousins
 af: neefs/niggies
@@ -6241,7 +6244,7 @@ co: 3<sup>u</sup> volte arcizitellucciu/3<sup>u</sup> volte arcizitellucci
 de: Ur-Ur-Urenkel
 en: three-times-great-grandchild/three-times-great-grandchildren
 es: 3×-bisnieto/3×-bisnietos
-fr: trois-fois-arrière-petits-enfant/trois-fois-arrière-petits-enfants
+fr: trois-fois-arrière-petit-enfant/trois-fois-arrière-petits-enfants
 
     cousins.0.6
 co: 4<sup>u</sup> volte arcizitellucciu/4<sup>u</sup> volte arcizitellucci
@@ -6286,7 +6289,7 @@ fr: père et mère<br>géniteur et génitrice
 
     cousins.1.1 tt
 es: hermanos y hermanas
-fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
+fr: adelphe(s)<br>sibling(s)<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
 
     cousins.1.10
 co: 7<sup>u</sup> volte arciniputinu/7<sup>u</sup> volte arciniputini
@@ -6331,7 +6334,7 @@ fr: arrière-petit-neveu/arrière-petits-neveux
     cousins.1.4 tt
 de: Kind eines Neffen oder einer Nichte
 es: hijos de los sobrino nietos
-fr: enfant d’un petit-neveu ou d’une petit-nièce
+fr: enfant d’un petit-neveu ou d’une petite-nièce
 
     cousins.1.5
 co: arciarciniputinu/arciarciniputini
@@ -6390,7 +6393,7 @@ fr: sept-fois-arrière-grands-oncles
     cousins.10.1 tt
 de: Brüder und Schwestern der Ur<sup>(×7)</sup>-Großeltern
 es: hermanos y hermanas de los 7×-bisabuelos
-fr: frères et sœurs des nonaïeuls
+fr: frères et sœurs des oct(os)aïeuls
 
     cousins.10.10
 de: Cousins 8. Grades
@@ -6464,7 +6467,7 @@ de: Stammurgroßeltern
     cousins.2.0 tt
 de: Eltern der Eltern<br>Großeltern und Großmütter
 es: abuelos — antepasados de la 2ª generación
-fr: aïeul·e·s<br>parents des parents<br>grands-pères et grands-mères
+fr: aïeul(s)<br>parents des parents<br>grands-pères et grands-mères
 
     cousins.2.1
 ->: uncles and aunts
@@ -6511,7 +6514,7 @@ fr: arrière-petit-cousin/arrière-petits-cousins
     cousins.2.4 tt
 de: Kinder von Neffen und Nichten 2. Grades
 es: primos en 1º grado, 2 generación(es) más abajo
-fr: arrière-petits-cousins au 1<sup>er</sup> degré<hr>fils d’un petit-cousin ou d’une petite cousine
+fr: arrière-petits-cousins au 1<sup>er</sup> degré<br>enfant d’un petit-cousin ou d’une petite cousine
 
     cousins.2.5
 de: Urgroßneffe&#47; -nichte 2. Grades/Urgroßneffen&#47; -nichten 2. Grades
@@ -6541,7 +6544,7 @@ fr: quatre-fois-arrière-petit-cousin/quatre-fois-arrière-petits-cousins
     cousins.2.7 tt
 de: Kinder von Ur-Urgroßneffe&#47; -nichte 2. Grades
 es: primos en 1º grado, 5 generación(es) más abajo
-fr: sept-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+fr: quatre-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.8
 de: Ur<sup>(×4)</sup>-Großneffe&#47; -nichte 2. Grades/Ur<sup>(×4)</sup>-Großneffen&#47; -nichten 2. Grades
@@ -6569,14 +6572,14 @@ fr: six-fois-arrière-petits-cousins au 1<sup>er</sup> degré
     cousins.3.0 tt
 de: Eltern der Großeltern
 es: bisabuelos — antepasados de la 3ª generación
-fr: bisaïeul·e·s
+fr: bisaïeul(s)
 
     cousins.3.1
 ->: siblings of the grandparents
 
     cousins.3.1 tt
 es: hermanos y hermanas de los abuelos
-fr: frères et sœurs des grand-parents
+fr: frères et sœurs des grands-parents
 
     cousins.3.10
 de: Ur<sup>(×5)</sup>-Großneffen&#47; -nichten 3. Grades
@@ -6590,7 +6593,7 @@ fr: grands-cousins
 
     cousins.3.2 tt
 es: primos en 1º grado de los padres
-fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et petites-tantes (désuets)<hr><- cousins germains des parents, oncles et tantes
+fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et petites-tantes (désuets)<hr>← cousins germains des parents, oncles et tantes
 
     cousins.3.3
 ->: 2nd cousins
@@ -6606,7 +6609,7 @@ fr: petits-cousins 2<sup>e</sup>
 
     cousins.3.4 tt
 es: primos en 2º grado, 1 generación(es) más abajo
-fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr><- cousins issus d’issus de germains des enfants
+fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr>← cousins issus d’issus de germains des enfants
 
     cousins.3.5
 de: Großneffen&#47; -nichten 3. Grades
@@ -6657,7 +6660,7 @@ co: arciarcicaccari
 de: Alteltern
 en: 2nd-great-grand-parents
 es: tatarabuelos — antepasados de la 4ª generación
-fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
+fr: tri(s)aïeul(s)<br>aïeul(s) des aïeuls
 
     cousins.4.1
 ->: siblings of the great-grandparents
@@ -6676,7 +6679,7 @@ fr: arrière-grands-cousins
 
     cousins.4.2 tt
 es: primos en 1º grado de los abuelos
-fr: grands-oncles et grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins germains des grands-parents, grands oncles et grandes-tantes
+fr: grands-oncles et grands-tantes à la mode de Bourgogne ou Bretagne<hr>← cousins germains des grands-parents, grands-oncles et grands-tantes
 
     cousins.4.3
 de: Tanten und Onkel 3. Grades
@@ -6685,7 +6688,7 @@ fr: grands-cousins 2<sup>e</sup>
 
     cousins.4.3 tt
 es: primos en 2º grado de los padres
-fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des parents et oncles
+fr: grands-cousins au 2<sup>e</sup> degré<hr>← cousins issus de germains des parents et oncles
 
     cousins.4.4
 ->: 3rd cousins
@@ -6751,7 +6754,7 @@ co: 3<sup>u</sup> arcicaccari
 de: Altgroßeltern
 en: 3rd-great-grandparents
 es: 3×-bisabuelos — antepasados de la 5ª generación
-fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
+fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeuls<br>quartaïeuls
 
     cousins.5.1
 co: arciarcizione
@@ -6797,7 +6800,7 @@ fr: arrière-arrière-grands-cousins
 
     cousins.5.2 tt
 es: primos en 1º grado de los bisabuelos
-fr: arrière-grand-oncles et arrière-grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins des arrière-grands-parents et arrière-grands-oncles
+fr: arrière-grands-oncles et arrière-grands-tantes à la mode de Bourgogne ou Bretagne<hr>← cousins des arrière-grands-parents et arrière-grands-oncles
 
     cousins.5.3
 de: Großtanten und -onkel 3. Grades
@@ -6806,7 +6809,7 @@ fr: arrière-grands-cousins 2<sup>e</sup>
 
     cousins.5.3 tt
 es: primos en 2º grado de los abuelos
-fr: arrière-grands-cousins au deuxième degré<hr><- cousins issus de germains des grands-parents et grands-oncles
+fr: arrière-grands-cousins au deuxième degré<hr>← cousins issus de germains des grands-parents et grands-oncles
 
     cousins.5.4
 de: Tanten und Onkel 4. Grades
@@ -6815,7 +6818,7 @@ fr: grands-cousins 3<sup>e</sup>
 
     cousins.5.4 tt
 es: primos en 3º grado de los padres
-fr: grands-cousins au troisième degré<hr><- cousins issus d’issus de germains des parents
+fr: grands-cousins au troisième degré<hr>← cousins issus d’issus de germains des parents
 
     cousins.5.5
 co: cugini à u 4<sup>u</sup> gradu
@@ -6921,7 +6924,7 @@ fr: arrière-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.6.3 tt
 es: primos en 2º grado de los bisabuelos
-fr: arrière-arrière-grands-cousins au deuxième degré<br><- cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
+fr: arrière-arrière-grands-cousins au deuxième degré<hr>← cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
 
     cousins.6.4
 de: Großtanten und -onkel 4. Grades
@@ -6930,7 +6933,7 @@ fr: arrière-grands-cousins 3<sup>e</sup>
 
     cousins.6.4 tt
 es: primos en 3º grado de los abuelos
-fr: arrière-grands-cousins au troisième degré<br><- cousins issus d’issus de germains des grands-parents et grands-oncles
+fr: arrière-grands-cousins au troisième degré<hr>← cousins issus d’issus de germains des grands-parents et grands-oncles
 
     cousins.6.5
 de: Tanten und Onkel 5. Grades
@@ -6973,7 +6976,7 @@ fr: arrière-petits-cousins au cinquième degré
     cousins.6.9
 de: Urgroßneffen&#47; -nichten 6. Grades
 es: bisnietos de primos quintos
-fr: arrière-petits-cousins 5<sup>e</sup>
+fr: arrière-arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.9 tt
 es: primos en 5º grado, 3 generación(es) más abajo
@@ -7036,7 +7039,7 @@ fr: 4×-arrière-grands-cousins
 
     cousins.7.2 tt
 es: primos en 1º grado de los 3×-bisabuelos
-fr: quatre-fois-arrière-grands-cousins<br>arrrière-arrière-arrière-arrière-grands-cousins au premier degré
+fr: quatre-fois-arrière-grands-cousins<br>arrière-arrière-arrière-arrière-grands-cousins au premier degré
 
     cousins.7.3
 de: Ur-Urgroßtanten&#47; -onkel 3. Grades
@@ -7045,7 +7048,7 @@ fr: 3×-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.7.3 tt
 es: primos en 2º grado de los tatarabuelos
-fr: trois-fois-arrière-grands-cousins au deuxième degré/arrière-arrière-arrière-grands-cousins au deuxième degré
+fr: trois-fois-arrière-grands-cousins au deuxième degré<br>arrière-arrière-arrière-grands-cousins au deuxième degré
 
     cousins.7.4
 de: Urgroßtanten&#47; -onkel 4. Grades
@@ -7124,7 +7127,7 @@ fr: cinq-fois-arrière-grands-oncles
 
     cousins.8.1 tt
 es: hermanos y hermanas de los 5×-bisabuelos
-fr: frères et sœurs des septisaïeuls
+fr: frères et sœurs des sextisaïeuls
 
     cousins.8.10
 de: Großneffen und -nichten 8. Grades
@@ -7249,7 +7252,7 @@ fr: 7×-arrière-grands-parents
     cousins.9.0 tt
 de: Oberurgroßeltern
 es: 7×-bisabuelos — antepasados de la 9ª generación
-fr: sept-fois-arrière-grands-parents<br>octaïeuls
+fr: sept-fois-arrière-grands-parents<br>oct(os)aïeuls
 
     cousins.9.1
 co: 6<sup>u</sup> arcizioni
@@ -7261,7 +7264,7 @@ fr: six-fois-arrière-grands-oncles
     cousins.9.1 tt
 de: Brüder und Schwestern der Ur<sup>(×8)</sup>-Großeltern
 es: hermanos y hermanas de los 6×-bisabuelos
-fr: frères et sœurs des octosaïeuls
+fr: frères et sœurs des septisaïeuls
 
     cousins.9.10
 de: Neffen und Nichten 9. Grades
@@ -7321,7 +7324,7 @@ fr: 6×-arrière-grands-cousins
     cousins.9.2 tt
 de: Ur<sup>(×6)</sup>-Groß-Cousins ersten Grades
 es: primos en 1º grado de los 5×-bisabuelos
-fr: six-foix-arrière-grands-cousins au premier degré
+fr: six-fois-arrière-grands-cousins au premier degré
 
     cousins.9.3
 de: Ur<sup>(×4)</sup>-Großtanten&#47; -onkel 3. Grades
@@ -8170,12 +8173,12 @@ co: mortu/morta/mortu(a)/morti
 cs: zemřel/zemřela/zemřeli
 da: død
 de: verstorben
-en: died/died/died/dead·s
+en: died/died/died/dead(s)
 eo: mortinta
 es: fallecido/fallecida/fallecido(a)
 et: surnud
 fi: kuollut
-fr: mort/morte/mort(e)/mort·s
+fr: mort/morte/mort(e)/mort(s)
 he: נפטר/ נפטרה
 is: dó
 it: deceduto/deceduta/deceduto(a)
@@ -9699,14 +9702,14 @@ af: voornaam/voorname
 ar: الإسم
 bg: собствено име/собствени имена
 br: raganv/raganvioù
-ca: nom/noms/nom·s
+ca: nom/noms/nom(s)
 co: nome/nomi/nome(i)
 cs: křestní jméno/křestní jména
 da: fornavn/fornavne
 de: Vorname/Vornamen/Vorname(n)
-en: first name/first names/first name·s
+en: first name/first names/first name(s)
 eo: propra nomo/propraj nomoj
-es: nombre/nombres/nombre·s
+es: nombre/nombres/nombre(s)
 et: eesnimi/eesnimed
 fi: etunimi/etunimet
 fr: prénom/prénoms/prénom(s)
@@ -9717,10 +9720,10 @@ lt: vardas/vardai
 lv: vārds/vārdi
 nl: voornaam/voornamen
 no: fornavn/fornavn
-oc: prenom/prenoms/prenom·s
+oc: prenom/prenoms/prenom(s)
 pl: imię/imiona
 pt: nome/nomes
-pt-br: prenome/prenomes/prenome·s
+pt-br: prenome/prenomes/prenome(s)
 ro: prenume
 ru: имя/имена
 sk: meno/mená
@@ -10300,7 +10303,7 @@ eo: baptofilo/baptofilino/baptofil(in)o
 es: ahijado/ahijada/ahijado(a)
 et: ristipoeg/ristitütar/ristilaps
 fi: kummipoika/kummityttö/kummilapsi
-fr: filleul/filleule/filleul·e
+fr: filleul/filleule/filleul(e)
 he: בן סנדקאות/ בת סנדקאות/ ילד סנדקאות
 is: guðsonur/guðdóttir/guðbarn
 it: figlioccio/figlioccia/figlioccio
@@ -12405,16 +12408,16 @@ sl: poveži
 sv: länk
 tr: bağlantı
 
-    link back to parents
+    go back to the parent row
 co: liame di ritornu versu i genitori
-de: Link zurück zu den Eltern
-en: link back to parents
-es: enlace de regreso a los padres
-fr: lien retour vers les parents
+de: zur Zeile des Elternteils zurück
+en: go back to the parent row
+es: volver a la fila del progenito
+fr: remonter à la ligne du parent
 no: lenke til foreldre
-pt: link de regresso aos pais
-sv: länk tillbaka till föräldrarna
-tr: ebeveynlere geri bağlantı
+pt: voltar à linha do progenitor
+sv: gå tillbaka till förälderns ra
+tr: ebeveynin satırına geri dön
 
     link between
 af: mense tussen
@@ -19178,7 +19181,7 @@ co: fratelli è surelle di l’arcicaccari
 de: Urgroßtanten und Urgroßonkel
 en: great-granduncles
 es: tíos bisabuelos
-fr: arrières-grands-oncles
+fr: arrière-grands-oncles
 pt: tios-bisavôs e tias-bisavós
 sv: syskon till föräldrar tre generationer bakåt
 tr: büyük büyük amcalar ve büyük büyük teyzeler

@@ -73,7 +73,7 @@
               %end;">%nn;
           </a>
         %end;
-        %if;not cancel_links;<a class="normal_anchor" href="#prefx" title="[*link back to parents]">%labl;</a>%else;%labl;%end;
+        %if;not cancel_links;<a class="normal_anchor" href="#prefx" title="[*go back to the parent row]">%labl;</a>%else;%labl;%end;
       </td>
     %elseif;(e.t="I")
       <td class="text-center align-middle%if;not cancel_links; table_big_cell%if;(implx!=0) implex%end;%end;">
