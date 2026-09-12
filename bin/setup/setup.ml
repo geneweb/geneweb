@@ -1326,6 +1326,7 @@ let rename conn conf =
     List.iter
       (fun (k, v) ->
         if k <> v then begin
+          GWPARAM.set_reorg k None;
           Printf.eprintf "Start renaming (%s -> %s)\n" k v;
           flush stderr;
           try
