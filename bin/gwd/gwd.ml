@@ -1297,6 +1297,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
   in
   (* read base environment from the right location *)
   GWPARAM.set_reorg base_file None;
+  GWPARAM.cnt_dir := !GWPARAM.cnt_d base_file;
   let base_env =
     if base_file = "" then []
     else Util.read_base_env base_file (Option.get !gw_prefix) !debug
@@ -1482,7 +1483,6 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
       predictable_mode;
     }
   in
-  GWPARAM.cnt_dir := !GWPARAM.cnt_d conf.bname;
   (conf, ar)
 
 (* Filter to avoid logging requests that don't provide useful information *)
