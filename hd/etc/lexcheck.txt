@@ -1,17 +1,84 @@
-%define;cous(xx,yy)
-<span class="text-body-secondary">— [cousins.xx.yy]0</span><br>
-<span class="text-dark">— [cousins.xx.yy]1</span><br>
-<span class="text-primary">— [cousin.xx.yy:::½-]0</span><br>
-<span class="text-danger">— [cousin.xx.yy:::½-]1</span><br>
-<span class="text-warning">— [cousins.xx.yy tt]</span><br>
+%( lexcheck.txt - controle des entrees cousins.v1.v2 / cousin.v1.v2
+   Appel : <base>?m=H&v=lexcheck   (&max=13 pour etendre la matrice)
+   v1 = montee vers l'ancetre commun (colonnes), v2 = descente (lignes).
+   La cle est cousins.v1.v2 : la case ligne 3 / colonne 7 est cousins.7.3
+   Par case : cousins.v1.v2 index 0 puis 1, cousin.v1.v2 index 0/1/2 avec le
+   prefixe demi applique, enfin cousins.v1.v2 tt.
+   Toute chaine entre crochets = entree absente ; le script de fin de fichier
+   la surligne et compte le total.
+%)
+%let;lcmax;%if;(evar.max!="")%evar.max;%else;10%end;%in;
+%let;lcsup;%expr(lcmax+1)%in;
 
+%define;lc_col(kk)
+<th scope="col" class="text-center align-bottom">kk%nn;</th>
+%end;
 
+%define;lc_cell(xx,yy)
+<td class="p-1 align-top%if;(xx=yy) table-active%end;">
+%if;(xx=0 and yy=0)
+<span class="text-body-tertiary">n/a</span>
+%else;
+<div class="text-body-tertiary lh-1 mb-1">xx.yy</div>
+<div><i class="fa-solid fa-user fa-fw text-secondary" title="sg"></i> [cousins.xx.yy]0</div>
+<div><i class="fa-solid fa-users fa-fw text-secondary" title="pl"></i> [cousins.xx.yy]1</div>
+<div class="border-top mt-1 pt-1"><i class="fa-solid fa-mars fa-fw text-primary" title="m"></i> [cousin.xx.yy:::½-]0</div>
+<div><i class="fa-solid fa-venus fa-fw text-danger" title="f"></i> [cousin.xx.yy:::½-]1</div>
+<div><i class="fa-solid fa-genderless fa-fw text-dark" title="n"></i> [cousin.xx.yy:::½-]2</div>
+<div class="border-top mt-1 pt-1"><i class="fa-solid fa-circle-info fa-fw text-warning-emphasis" title="tt"></i> [cousins.xx.yy tt]</div>
 %end;
-<table class="table-bordered" border="1">
-<tr><th></th>%for;k;0;11;<th>%k</th>%end;</tr>
-%for;j;0;11;<tr><td>%j</td>
-  %for;i;0;11;
-    <td>%apply;cous%with;%i%and;%j%end;</td>
-  %end;</tr>
+</td>
 %end;
+
+<div class="table-responsive">
+<table id="lexcheck" class="table table-bordered table-sm align-top small"
+       style="--bs-border-width:2px">
+  <caption class="caption-top">
+    cousins.v1.v2 &mdash; <strong><span id="lexcheck-miss">?</span></strong> entrees absentes &middot;
+    v1 &rarr; colonnes (montee), v2 &darr; lignes (descente), diagonale grisee &middot;
+    <i class="fa-solid fa-user fa-fw text-secondary"></i> index 0
+    <i class="fa-solid fa-users fa-fw text-secondary"></i> index 1
+    <i class="fa-solid fa-mars fa-fw text-primary"></i><i class="fa-solid fa-venus fa-fw text-danger"></i><i class="fa-solid fa-genderless fa-fw text-dark"></i> cousin index 0/1/2
+    <i class="fa-solid fa-circle-info fa-fw text-warning-emphasis"></i> tt
+  </caption>
+  <thead>
+    <tr><th>v2 &darr; / v1 &rarr;</th>%for;k;0;lcsup;%apply;lc_col%with;%k%end;%end;</tr>
+  </thead>
+  <tbody>
+  %for;j;0;lcsup;
+    <tr><th scope="row" class="text-center align-top">%j</th>%nn;
+      %for;i;0;lcsup;%apply;lc_cell%with;%i%and;%j%end;%end;</tr>
+  %end;
+  </tbody>
 </table>
+</div>
+<script>
+(function () {
+  function run() {
+    var OPEN = String.fromCharCode(91), miss = 0;
+    var t = document.getElementById('lexcheck');
+    if (!t) return;
+    var lines = t.querySelectorAll('tbody td div');
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].textContent.indexOf(OPEN) > -1) {
+        lines[i].classList.add('bg-warning-subtle');
+        miss++;
+      }
+    }
+    var c = document.getElementById('lexcheck-miss');
+    if (c) c.textContent = miss;
+    
+    /* epicene retombe sur le masculin */
+    var tds = t.querySelectorAll('tbody td');
+    for (var k = 0; k < tds.length; k++) {
+      var d = tds[k].querySelectorAll('div');
+      if (d.length >= 6 && d[3].textContent.trim() === d[5].textContent.trim())
+        d[5].classList.add('bg-danger-subtle');
+    }
+  }
+  
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', run);
+  else run();
+}());
+</script>
