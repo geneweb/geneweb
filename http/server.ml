@@ -111,42 +111,24 @@ let accept_connections_windows socket =
         Log.info (fun k -> k "%s" (Printexc.to_string e))
   done
 
-module Timeout : sig
-  exception Timeout
-
-  val with_timeout : timeout:int -> (unit -> 'a) -> 'a
-  (* Set a Unix signal with a timeout around the execution of the function [f].
+(* Set a Unix signal with a timeout around the execution of the function [f].
    The signal is properly cleared even if the function [f] raises an exception.
 
    Since a process can have only one active alarm signal at a time, this
    function should be used only once per fork of the web server.
 
-   This function is supported only on Unix.
-
-   @raise Timeout if the time limit is reached.
-   @raise Failure if a timeout is already set up in the current process. *)
-end = struct
-  exception Timeout
-
-  let is_set = ref false
-
-  let with_timeout ~timeout f =
-    if !is_set then failwith "timeout already set"
-    else if timeout <= 0 then f ()
-    else (
-      Sys.set_signal Sys.sigalrm
-        (Sys.Signal_handle (fun (_ : int) -> raise Timeout));
-      let finally () =
-        try
-          ignore (Unix.alarm 0 : int);
-          is_set := false
-        with Timeout -> ()
-      in
-      Fun.protect ~finally @@ fun () ->
-      is_set := true;
+   This function is supported only on Unix. *)
+let with_timeout ~timeout handler f =
+  assert Sys.unix;
+  if timeout > 0 then (
+    Sys.set_signal Sys.sigalrm (Sys.Signal_handle handler);
+    let finally () = ignore (Unix.alarm 0 : int) in
+    let g () =
       ignore (Unix.alarm timeout : int);
-      f ())
-end
+      f ()
+    in
+    Fun.protect ~finally g)
+  else f ()
 
 let output_timeout ~timeout conn =
   Connection.http conn Code.OK;
@@ -173,10 +155,12 @@ let accept_connection_unix ~timeout callback socket pid =
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   let conn = Connection.of_socket client_socket in
   Fun.protect ~finally:(fun () -> Connection.close conn) @@ fun () ->
-  try
-    Timeout.with_timeout ~timeout @@ fun () ->
-    treat_connection callback client_addr conn
-  with Timeout.Timeout -> output_timeout ~timeout conn
+  let timeout_handler (_ : int) =
+    output_timeout ~timeout conn;
+    Connection.close_noerr conn
+  in
+  with_timeout ~timeout timeout_handler @@ fun () ->
+  treat_connection callback client_addr conn
 
 let accept_connections_unix ~timeout ~n_workers callback socket =
   if n_workers > 0 then
