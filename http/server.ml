@@ -157,6 +157,11 @@ let accept_connection_unix ~timeout callback socket pid =
   Fun.protect ~finally:(fun () -> Connection.close conn) @@ fun () ->
   let timeout_handler (_ : int) =
     output_timeout ~timeout conn;
+    (* FIXME: We cannot exit the worker after a timeout and asynchronous
+       exceptions shouldn't be used in OCaml code. The only correct approach
+       is to check if the timeout is reached in several checkpoints.
+       Currently, the approach is to close the connection and an exception is
+       raised in the worker if it attempts to write in the socket. *)
     Connection.close_noerr conn
   in
   with_timeout ~timeout timeout_handler @@ fun () ->
