@@ -117,7 +117,15 @@ let launch_worker socket =
     (fun () ->
       Out_channel.set_binary_mode oc true;
       output_value oc pi);
-  ignore (Unix.waitpid [] pid)
+  pid
+
+let launch_workers ~n_workers socket =
+  let pids = Array.make n_workers 0 in
+  for i = 0 to n_workers - 1 do
+    pids.(i) <- launch_worker socket
+  done;
+  ignore (Geneweb_synchapi.Wait.wait_for_multiple_objects pids false 0);
+  assert false
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
    The signal is properly cleared even if the function [f] raises an exception.
@@ -284,7 +292,7 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
                       k ~tags:timestamp "Ready on %a." pp_url addr));
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
-              if Sys.win32 then launch_worker socket
+              if Sys.win32 then launch_workers ~n_workers socket
               else accept_connections_unix ~timeout ~n_workers callback socket))
   | _ ->
       windows_worker callback;
