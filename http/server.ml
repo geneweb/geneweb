@@ -117,7 +117,8 @@ let launch_worker socket =
     ~finally:(fun () -> close_out_noerr oc)
     (fun () ->
       Out_channel.set_binary_mode oc true;
-      output_value oc pi)
+      output_value oc pi);
+  ignore (Unix.waitpid [] pid)
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
    The signal is properly cleared even if the function [f] raises an exception.
