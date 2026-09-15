@@ -84,7 +84,6 @@ let accept_connection_windows callback socket =
   let client_socket, addr = Unix.accept ~cloexec:true socket in
   check_stopping ();
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
-  let client_socket = Wsa.Protocol_info.to_socket @@ input_value stdin in
   let conn = Connection.of_socket client_socket in
   let finally () = Connection.close conn in
   Fun.protect ~finally (fun () -> ignore (treat_connection callback addr conn))
