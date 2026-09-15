@@ -80,36 +80,44 @@ let check_stopping () =
     Log.err (fun k -> k "Remove that file to allow servers to run again.");
     exit 0)
 
-let accept_connection_windows socket =
+let accept_connection_windows callback socket =
   let client_socket, addr = Unix.accept ~cloexec:true socket in
   check_stopping ();
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
-  let fd_in, fd_out = Unix.pipe ~cloexec:true () in
-  let pid =
-    let env = Array.append (Unix.environment ()) [| "WSERVER=worker" |] in
-    Unix.create_process_env Sys.argv.(0) Sys.argv env fd_in Unix.stdout
-      Unix.stderr
-  in
-  Unix.close fd_in;
-  let pi = Wsa.Protocol_info.duplicate_socket client_socket pid in
-  Unix.close client_socket;
-  let oc = Unix.out_channel_of_descr fd_out in
-  Fun.protect
-    ~finally:(fun () -> close_out_noerr oc)
-    (fun () ->
-      Out_channel.set_binary_mode oc true;
-      output_value oc addr;
-      output_value oc pi);
-  ignore (Unix.waitpid [] pid : int * Unix.process_status)
+  let client_socket = Wsa.Protocol_info.to_socket @@ input_value stdin in
+  let conn = Connection.of_socket client_socket in
+  let finally () = Connection.close conn in
+  Fun.protect ~finally (fun () -> ignore (treat_connection callback addr conn))
 
-let accept_connections_windows socket =
+let accept_connections_windows callback socket =
   while true do
-    try accept_connection_windows socket with
+    try accept_connection_windows callback socket with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
         Log.info (fun k -> k "%s" (Printexc.to_string e))
     | Sys_error msg as e when msg = "Broken pipe" ->
         Log.info (fun k -> k "%s" (Printexc.to_string e))
   done
+
+let windows_worker callback : unit =
+  In_channel.set_binary_mode stdin true;
+  let socket = Wsa.Protocol_info.to_socket @@ input_value stdin in
+  accept_connections_windows callback socket
+
+let launch_worker socket =
+  let fd_in, fd_out = Unix.pipe ~cloexec:true () in
+  let pid =
+    let env = Array.append (Unix.environment ()) [| "WSERVER=worker" |] in
+    Unix.create_process_env Sys.executable_name Sys.argv env fd_in Unix.stdout
+      Unix.stderr
+  in
+  Unix.close fd_in;
+  let pi = Wsa.Protocol_info.duplicate_socket socket pid in
+  let oc = Unix.out_channel_of_descr fd_out in
+  Fun.protect
+    ~finally:(fun () -> close_out_noerr oc)
+    (fun () ->
+      Out_channel.set_binary_mode oc true;
+      output_value oc pi)
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
    The signal is properly cleared even if the function [f] raises an exception.
@@ -176,9 +184,9 @@ let accept_connections_unix ~timeout ~n_workers callback socket =
       accept_connection_unix ~timeout callback socket (Unix.getpid ())
     done
 
-let accept_connections ~timeout ~n_workers callback socket =
-  if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
-  else accept_connections_windows socket
+(* let accept_connections ~timeout ~n_workers callback socket = *)
+(*   if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket *)
+(*   else accept_connections_windows socket *)
 
 let resolve_addr ?addr port =
   let port = string_of_int port in
@@ -239,14 +247,6 @@ let pp_url ppf s =
       Fmt.pf ppf "http://%a (%s)" Util.pp_sockaddr s ni_hostname
   | exception Not_found -> Fmt.pf ppf "http://%a" Util.pp_sockaddr s
 
-let windows_worker callback =
-  In_channel.set_binary_mode stdin true;
-  let addr = input_value stdin in
-  let client_socket = Wsa.Protocol_info.to_socket @@ input_value stdin in
-  let conn = Connection.of_socket client_socket in
-  let finally () = Connection.close conn in
-  Fun.protect ~finally (fun () -> ignore (treat_connection callback addr conn))
-
 let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
   | exception Not_found -> (
@@ -284,7 +284,8 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
                       k ~tags:timestamp "Ready on %a." pp_url addr));
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
-              accept_connections ~timeout ~n_workers callback socket))
+              if Sys.win32 then launch_worker socket
+              else accept_connections_unix ~timeout ~n_workers callback socket))
   | _ ->
       windows_worker callback;
       exit 0
