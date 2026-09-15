@@ -3,15 +3,13 @@
 #include <caml/mlvalues.h>
 
 #if defined(_WIN32)
-#include <windows.h>
-
 #include <caml/alloc.h>
 #include <caml/callback.h>
 #include <caml/custom.h>
 #include <caml/intext.h>
 #include <caml/unixsupport.h>
-
 #include <stdbool.h>
+#include <windows.h>
 
 static value Val_event (DWORD e) {
   CAMLparam0 ();
