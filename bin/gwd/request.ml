@@ -14,6 +14,10 @@ module Connection = Geneweb_http.Connection
 
 type ('b, 'a) handler = Geneweb_http.Connection.t -> Config.config -> 'b -> 'a
 
+let src = Logs.Src.create ~doc:"Request" "REQ "
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
@@ -905,8 +909,10 @@ let treat_request =
              conf.bname body);
         Hutil.trailer conf
     in
-    if conf.debug then
-      Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
+    if conf.debug then (
+      let b, r = Mutil.Bench.bench process in
+      Log.debug (fun k -> k "[%s %d] %a" __FILE__ __LINE__ Mutil.Bench.pp b);
+      r)
     else process ()
 
 let treat_request conn conf =
