@@ -33,7 +33,6 @@
   digestif,
   pp_loc,
   ptime,
-  not-ocamlfind,
   geneweb-compat,
   geneweb-http,
 }:
@@ -46,7 +45,6 @@ buildDunePackage {
 
   nativeBuildInputs = [
     brotli
-    not-ocamlfind
     crunch
   ];
 
