@@ -45,6 +45,7 @@ val all_checks_family :
   Warning.base_warning list * Warning.base_misc list
 
 val print_family :
+  ?references_in_new_tab:bool ->
   Config.config ->
   Gwdb.base ->
   Warning.base_warning list * Warning.base_misc list ->

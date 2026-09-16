@@ -338,7 +338,8 @@ let print_merged conf base wl p =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul><li>";
-  Output.print_string conf (NameDisplay.referenced_person_text conf base p);
+  Output.print_string conf
+    (NameDisplay.referenced_person_text ~new_tab:has_continuation conf base p);
   Output.print_sstring conf "</li></ul>";
   (match
      (Util.p_getenv conf.Config.env "m", Util.p_getenv conf.Config.env "ip")
@@ -374,7 +375,8 @@ let print_merged conf base wl p =
        Output.print_sstring conf
          (Util.transl_a_of_b conf
             (Util.transl conf "possible duplications")
-            (NameDisplay.reference conf base p s :> string)
+            (NameDisplay.reference ~new_tab:has_continuation conf base p s
+              :> string)
             (s :> string));
        Output.print_sstring conf ")\n");
       Output.print_sstring conf "</p>\n"
