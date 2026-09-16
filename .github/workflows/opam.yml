@@ -25,6 +25,9 @@ jobs:
       - name: Install geneweb-compat
         run: opam install ./geneweb-compat.opam
 
+      - name: Install geneweb-win32
+        run: opam install ./geneweb-win32.opam
+
       - name: Install geneweb-http
         run: opam install ./geneweb-http.opam
 
