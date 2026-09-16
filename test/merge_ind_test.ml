@@ -38,7 +38,7 @@ let test_is_ancestor =
   let mother = Gwdb.poi base (iper 2) in
   let test ~__POS__ ~msg exp p1 p2 () =
     Alcotest.check' ~pos:__POS__ Alcotest.bool ~msg ~expected:exp
-      ~actual:(Geneweb.MergeInd.is_ancestor base p1 p2)
+      ~actual:(Geneweb.Person.is_ancestor base p1 p2)
   in
   [
     test ~__POS__ ~msg:"is_ancestor child father" false child father;
@@ -50,7 +50,7 @@ let v =
   [
     ( "merge-individuals",
       [
-        Alcotest.test_case "MergeInd.is_ancestor" `Quick (fun () ->
+        Alcotest.test_case "Person.is_ancestor" `Quick (fun () ->
             List.iter (fun check -> check ()) test_is_ancestor);
       ] );
   ]

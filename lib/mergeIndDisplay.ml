@@ -413,7 +413,7 @@ let print conf base =
       with
       | MergeInd.Error_loop p -> error_loop conf base p
       | MergeInd.Different_sexes (p1, p2) -> different_sexes conf base p1 p2
-      | MergeInd.Same_person -> same_person conf)
+      | Person.Same_person -> same_person conf)
   | _ -> not_found_or_incorrect conf
 
 (* Undocumented feature... Kill someone's ancestors *)

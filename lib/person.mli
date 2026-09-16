@@ -46,3 +46,11 @@ val is_fully_visible_to_visitors :
 val main_title : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title option
 (** Returns main person's title. If person doesn't have it, then returns first title
     from the list. *)
+
+exception Same_person
+
+val is_ancestor : Gwdb.base -> Gwdb.person -> Gwdb.person -> bool
+(** [is_ancestor base p1 p2]
+    Checks if [p1] is an ancestor of [p2].
+    Raises [Same_person] if [p1] and [p2] have the same iper.
+ *)

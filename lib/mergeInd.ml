@@ -193,29 +193,7 @@ let effective_merge_ind conf base (warning : Warning.base_warning -> unit) p1 p2
   Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s
 
 exception Error_loop of Gwdb.person
-exception Same_person
 exception Different_sexes of Gwdb.person * Gwdb.person
-
-let is_ancestor base p1 p2 =
-  let module IperSet = Gwdb.IperSet in
-  let ip1 = Gwdb.get_iper p1 in
-  let ip2 = Gwdb.get_iper p2 in
-  if ip1 = ip2 then raise Same_person
-  else
-    let rec loop set = function
-      | [] -> false
-      | ip :: tl -> (
-          if IperSet.mem ip set then loop set tl
-          else if ip = ip1 then true
-          else
-            let set = IperSet.add ip set in
-            match Gwdb.get_parents (Gwdb.poi base ip) with
-            | Some ifam ->
-                let cpl = Gwdb.foi base ifam in
-                loop set (Gwdb.get_father cpl :: Gwdb.get_mother cpl :: tl)
-            | None -> loop set tl)
-    in
-    loop IperSet.empty [ ip2 ]
 
 let check_ind base p1 p2 =
   if
@@ -223,8 +201,8 @@ let check_ind base p1 p2 =
     && Gwdb.get_sex p1 <> Neuter
     && Gwdb.get_sex p2 <> Neuter
   then raise @@ Different_sexes (p1, p2)
-  else if is_ancestor base p1 p2 then raise (Error_loop p2)
-  else if is_ancestor base p2 p1 then raise (Error_loop p1)
+  else if Person.is_ancestor base p1 p2 then raise (Error_loop p2)
+  else if Person.is_ancestor base p2 p1 then raise (Error_loop p1)
   else compatible_ind base p1 p2
 
 let merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind =
