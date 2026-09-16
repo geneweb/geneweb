@@ -10,98 +10,11 @@ let timestamp = Logs.Tag.(empty |> add timestamp_tag ())
 module Log = (val Logs.src_log src : Logs.LOG)
 module Wsa = Geneweb_wsa
 
-type handler = unit -> Unix.sockaddr * string list -> string -> string -> unit
+type handler =
+  Connection.t -> Unix.sockaddr * string list -> string -> string -> unit
 
 (* global parameters set by command arguments *)
 let stop_server = ref "STOP_SERVER"
-
-(* state of a connection request *)
-let connection_closed = ref false
-let wserver_sock = ref Unix.stdout
-let wserver_oc = ref stdout
-
-(* functions to access the connection state *)
-let wsocket () = !wserver_sock
-let woc () = !wserver_oc
-let wflush () = flush !wserver_oc
-let cgi = ref false
-
-let skip_possible_remaining_chars fd =
-  let b = Bytes.create 3 in
-  try
-    let rec loop () =
-      match Unix.select [ fd ] [] [] 5.0 with
-      | [ _ ], [], [] ->
-          let len = Unix.read fd b 0 (Bytes.length b) in
-          if len = Bytes.length b then loop ()
-      | _ -> ()
-    in
-    loop ()
-    (* Read on https://utcc.utoronto.ca/~cks/space/blog/unix/AcceptErrnoProblem:
-       These days accept() is standardized to return ECONNABORTED instead of
-       ECONNRESET in these circumstances, although this may not be universal.
-    *)
-  with Unix.Unix_error (Unix.(ECONNRESET | ECONNABORTED), _, _) -> ()
-
-let close_connection () =
-  if not !connection_closed then (
-    (try
-       wflush ();
-       Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND;
-       skip_possible_remaining_chars !wserver_sock;
-       close_out !wserver_oc
-     with _ -> ());
-    (* Closing the channel flushes the data and closes the underlying file descriptor *)
-    connection_closed := true)
-
-let printnl () = output_string !wserver_oc "\013\010"
-
-type printing_state = Nothing | Status | Contents
-
-let printing_state = ref Nothing
-
-let http status =
-  if !printing_state <> Nothing then failwith "HTTP Status already sent";
-  printing_state := Status;
-  if status <> Code.OK || not !cgi then (
-    let answer = Code.to_string status in
-    if !cgi then (
-      output_string !wserver_oc "Status: ";
-      output_string !wserver_oc answer)
-    else (
-      output_string !wserver_oc "HTTP/1.0 ";
-      output_string !wserver_oc answer);
-    printnl ())
-
-let header s =
-  if !printing_state <> Status then
-    if !printing_state = Nothing then http Code.OK
-    else failwith "Cannot write HTTP headers: page contents already started";
-  output_string !wserver_oc s;
-  printnl ()
-
-let printf fmt =
-  if !printing_state <> Contents then (
-    if !printing_state = Nothing then http Code.OK;
-    printnl ();
-    printing_state := Contents);
-  Printf.fprintf !wserver_oc fmt
-
-let print_string s =
-  if !printing_state <> Contents then (
-    if !printing_state = Nothing then http Code.OK;
-    printnl ();
-    printing_state := Contents);
-  output_string !wserver_oc s
-
-let http_redirect_temporarily url =
-  http Code.Moved_Temporarily;
-  output_string !wserver_oc "Location: ";
-  output_string !wserver_oc url;
-  printnl ();
-  printnl ();
-  wflush ()
-
 let buff = ref (Bytes.create 80)
 
 let store len x =
@@ -141,30 +54,10 @@ let get_request_and_content strm =
   in
   (request, content)
 
-let timeout_handler ~timeout _ =
-  try
-    if !printing_state = Nothing then http Code.OK;
-    if !printing_state <> Contents then (
-      output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
-      printnl ();
-      printnl ();
-      printf "<head><title>Time out</title></head>\n";
-      printf "<body>");
-    printf "<h1>Time out</h1><p>Computation time > %d second(s)</p></body>"
-      timeout;
-    wflush ();
-    exit 0
-  with Sys_error _ ->
-    (* The client may close the connection before reaching the time limit.
-       In this case, we cannot print the timeout message to the socket but
-       this is not an error and we must exit normally, even in no-fork mode. *)
-    exit 0
-
-let treat_connection callback client_addr client_socket =
-  printing_state := Nothing;
+let treat_connection callback client_addr conn =
   let request, path, query =
     let request, query =
-      let strm = Stream.of_channel (Unix.in_channel_of_descr client_socket) in
+      let strm = Stream.of_channel @@ Connection.wic conn in
       get_request_and_content strm
     in
     let path, query =
@@ -179,7 +72,7 @@ let treat_connection callback client_addr client_socket =
     in
     (request, path, query)
   in
-  callback () (client_addr, request) path query
+  callback conn (client_addr, request) path query
 
 let check_stopping () =
   if Sys.file_exists !stop_server then (
@@ -187,36 +80,52 @@ let check_stopping () =
     Log.err (fun k -> k "Remove that file to allow servers to run again.");
     exit 0)
 
-let accept_connection_windows socket =
+let accept_connection_windows callback socket =
   let client_socket, addr = Unix.accept ~cloexec:true socket in
   check_stopping ();
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
-  let fd_in, fd_out = Unix.pipe ~cloexec:false () in
-  let pid =
-    let env = Array.append (Unix.environment ()) [| "WSERVER=worker" |] in
-    Unix.create_process_env Sys.argv.(0) Sys.argv env fd_in Unix.stdout
-      Unix.stderr
-  in
-  Unix.close fd_in;
-  let pi = Wsa.Protocol_info.duplicate_socket client_socket pid in
-  Unix.close client_socket;
-  let oc = Unix.out_channel_of_descr fd_out in
-  Fun.protect
-    ~finally:(fun () -> close_out_noerr oc)
-    (fun () ->
-      Out_channel.set_binary_mode oc true;
-      output_value oc addr;
-      output_value oc pi);
-  ignore (Unix.waitpid [] pid : int * Unix.process_status)
+  let conn = Connection.of_socket client_socket in
+  let finally () = Connection.close conn in
+  Fun.protect ~finally (fun () -> ignore (treat_connection callback addr conn))
 
-let accept_connections_windows socket =
+let accept_connections_windows callback socket =
   while true do
-    try accept_connection_windows socket with
+    try accept_connection_windows callback socket with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
         Log.info (fun k -> k "%s" (Printexc.to_string e))
     | Sys_error msg as e when msg = "Broken pipe" ->
         Log.info (fun k -> k "%s" (Printexc.to_string e))
   done
+
+let windows_worker callback : unit =
+  In_channel.set_binary_mode stdin true;
+  let socket = Wsa.Protocol_info.to_socket @@ input_value stdin in
+  accept_connections_windows callback socket
+
+let launch_worker socket =
+  let fd_in, fd_out = Unix.pipe ~cloexec:true () in
+  let pid =
+    let env = Array.append (Unix.environment ()) [| "WSERVER=worker" |] in
+    Unix.create_process_env Sys.executable_name Sys.argv env fd_in Unix.stdout
+      Unix.stderr
+  in
+  Unix.close fd_in;
+  let pi = Wsa.Protocol_info.duplicate_socket socket pid in
+  let oc = Unix.out_channel_of_descr fd_out in
+  Fun.protect
+    ~finally:(fun () -> close_out_noerr oc)
+    (fun () ->
+      Out_channel.set_binary_mode oc true;
+      output_value oc pi);
+  pid
+
+let launch_workers ~n_workers socket =
+  let pids = Array.make n_workers 0 in
+  for i = 0 to n_workers - 1 do
+    pids.(i) <- launch_worker socket
+  done;
+  ignore (Geneweb_synchapi.Wait.wait_for_multiple_objects pids false 0);
+  assert false
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
    The signal is properly cleared even if the function [f] raises an exception.
@@ -237,16 +146,42 @@ let with_timeout ~timeout handler f =
     Fun.protect ~finally g)
   else f ()
 
+let output_timeout ~timeout conn =
+  Connection.http conn Code.OK;
+  Connection.header conn "Content-type: text/html; charset=utf-8";
+  Connection.header conn "Connection: close";
+  Connection.printf conn
+    {|
+<html>
+  <head>
+    <title>Time out</title>
+  </head>
+  <body>
+    <h1>Time out</h1>
+    <p>Computation time > %d seconds</p>
+  </body>
+</html>
+|}
+    timeout
+
 let accept_connection_unix ~timeout callback socket pid =
+  check_stopping ();
   let client_socket, client_addr = My_unix.accept_noeintr socket in
   Log.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
-  connection_closed := false;
-  wserver_sock := client_socket;
-  wserver_oc := Unix.out_channel_of_descr client_socket;
-  Fun.protect ~finally:close_connection @@ fun () ->
-  with_timeout ~timeout (timeout_handler ~timeout) @@ fun () ->
-  treat_connection callback client_addr client_socket
+  let conn = Connection.of_socket client_socket in
+  Fun.protect ~finally:(fun () -> Connection.close conn) @@ fun () ->
+  let timeout_handler (_ : int) =
+    output_timeout ~timeout conn;
+    (* FIXME: We cannot exit the worker after a timeout and asynchronous
+       exceptions shouldn't be used in OCaml code. The only correct approach
+       is to check if the timeout is reached in several checkpoints.
+       Currently, the approach is to close the connection and an exception is
+       raised in the worker if it attempts to write in the socket. *)
+    Connection.close_noerr conn
+  in
+  with_timeout ~timeout timeout_handler @@ fun () ->
+  treat_connection callback client_addr conn
 
 let accept_connections_unix ~timeout ~n_workers callback socket =
   if n_workers > 0 then
@@ -257,9 +192,9 @@ let accept_connections_unix ~timeout ~n_workers callback socket =
       accept_connection_unix ~timeout callback socket (Unix.getpid ())
     done
 
-let accept_connections ~timeout ~n_workers callback socket =
-  if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
-  else accept_connections_windows socket
+(* let accept_connections ~timeout ~n_workers callback socket = *)
+(*   if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket *)
+(*   else accept_connections_windows socket *)
 
 let resolve_addr ?addr port =
   let port = string_of_int port in
@@ -267,16 +202,6 @@ let resolve_addr ?addr port =
   match addr with
   | Some a -> Unix.getaddrinfo a port hints
   | None -> Unix.getaddrinfo "" port (Unix.AI_PASSIVE :: hints)
-
-let pp_sockaddr ppf s =
-  match s with
-  | Unix.ADDR_UNIX _ ->
-      (* Cannot happen as these addresses are discarded in [try_addresses]. *)
-      assert false
-  | ADDR_INET (a, p) ->
-      let addr = Unix.string_of_inet_addr a in
-      if Unix.is_inet6_addr a then Fmt.pf ppf "[%s]:%d" addr p
-      else Fmt.pf ppf "%s:%d" addr p
 
 let enable_dual_stack ai_addr socket =
   match ai_addr with
@@ -292,7 +217,7 @@ let try_addresses l =
         match Unix.socket ai_family ai_socktype 0 with
         | exception Unix.Unix_error (e, _, _) ->
             Log.debug (fun k ->
-                k "failed to create socket for %a: %s" pp_sockaddr ai_addr
+                k "failed to create socket for %a: %s" Util.pp_sockaddr ai_addr
                   (Unix.error_message e));
             loop l
         | socket -> (
@@ -301,7 +226,7 @@ let try_addresses l =
             match Unix.bind socket ai_addr with
             | exception Unix.Unix_error (e, _, _) ->
                 Log.debug (fun k ->
-                    k "failed to bind socket to %a: %s" pp_sockaddr ai_addr
+                    k "failed to bind socket to %a: %s" Util.pp_sockaddr ai_addr
                       (Unix.error_message e));
                 Unix.close socket;
                 loop l
@@ -310,20 +235,14 @@ let try_addresses l =
   in
   loop l
 
-let is_lan_candidate = function
-  | Unix.ADDR_INET (a, _) when not (Unix.is_inet6_addr a) ->
-      a <> Unix.inet_addr_any
-      && not (String.starts_with ~prefix:"127." (Unix.string_of_inet_addr a))
-  | _ -> false
-
 let lan_urls port =
   match resolve_addr ~addr:(Unix.gethostname ()) port with
   | exception Unix.Unix_error (_, _, _) -> []
   | l ->
       List.filter_map
         (fun Unix.{ ai_addr; _ } ->
-          if is_lan_candidate ai_addr then
-            Some (Fmt.str "http://%a" pp_sockaddr ai_addr)
+          if Util.is_lan_candidate ai_addr then
+            Some (Fmt.str "http://%a" Util.pp_sockaddr ai_addr)
           else None)
         l
       |> List.sort_uniq String.compare
@@ -332,26 +251,9 @@ let pp_urls = Fmt.vbox (Fmt.list ~sep:Fmt.cut Fmt.string)
 
 let pp_url ppf s =
   match Unix.getnameinfo s [ NI_NAMEREQD ] with
-  | { ni_hostname; _ } -> Fmt.pf ppf "http://%a (%s)" pp_sockaddr s ni_hostname
-  | exception Not_found -> Fmt.pf ppf "http://%a" pp_sockaddr s
-
-let windows_worker callback =
-  In_channel.set_binary_mode stdin true;
-  let addr = input_value stdin in
-  let client_socket = Wsa.Protocol_info.to_socket @@ input_value stdin in
-  let oc = Unix.out_channel_of_descr client_socket in
-  wserver_oc := oc;
-  let shutdown () =
-    try
-      wflush ();
-      Unix.shutdown client_socket Unix.SHUTDOWN_SEND;
-      skip_possible_remaining_chars client_socket;
-      Unix.shutdown client_socket Unix.SHUTDOWN_RECEIVE;
-      close_out oc
-    with _ -> ()
-  in
-  Fun.protect ~finally:shutdown (fun () ->
-      ignore (treat_connection callback addr client_socket))
+  | { ni_hostname; _ } ->
+      Fmt.pf ppf "http://%a (%s)" Util.pp_sockaddr s ni_hostname
+  | exception Not_found -> Fmt.pf ppf "http://%a" Util.pp_sockaddr s
 
 let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
@@ -390,7 +292,8 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
                       k ~tags:timestamp "Ready on %a." pp_url addr));
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
-              accept_connections ~timeout ~n_workers callback socket))
+              if Sys.win32 then launch_workers ~n_workers socket
+              else accept_connections_unix ~timeout ~n_workers callback socket))
   | _ ->
       windows_worker callback;
       exit 0

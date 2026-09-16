@@ -433,15 +433,9 @@ let max_clients =
     & info [ "max-clients" ] ~docs:http_section ~doc ~deprecated)
 
 let n_workers =
-  let doc =
-    "$(docv) is the number of workers available to process \n\
-    \  incoming HTTP requests (UNIX only)."
-  in
-  let error = "--n-workers is available only on UNIX." in
+  let doc = "$(docv) is the number of workers available to process." in
   C.Arg.(
-    unix_only_opt ~error ~default:default_n_workers
-    & value
-    & opt (some int) None
+    value & opt int default_n_workers
     & info [ "n-workers" ] ~docs:http_section ~doc)
 
 let cgi =

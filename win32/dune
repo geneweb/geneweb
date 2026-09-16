@@ -6,3 +6,12 @@
  (foreign_stubs
   (language c)
   (names protocol_info)))
+
+(library
+ (package geneweb-win32)
+ (name geneweb_synchapi)
+ (modules wait)
+ (libraries unix)
+ (foreign_stubs
+  (language c)
+  (names wait)))
