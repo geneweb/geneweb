@@ -9,7 +9,6 @@ self: super: {
           hash = "sha256-iBTGFM1D1S/R68ivWjHZElwhTEmPpgVmDk7Rlf+ENOk=";
         };
       });
-      not-ocamlfind = final.callPackage ./not-ocamlfind.nix { };
       unidecode = final.callPackage ./unidecode.nix { };
       ocamlformat-lib = final.callPackage ./ocamlformat/ocamlformat-lib.nix { };
       ocamlformat = final.callPackage ./ocamlformat/ocamlformat.nix { };
