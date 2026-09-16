@@ -22,7 +22,7 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
   Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf " ";
   Output.print_string conf
-    (NameDisplay.referenced_person_text conf base
+    (NameDisplay.referenced_person_text ~new_tab:has_continuation conf base
        (Gwdb.poi base p.Def.key_index));
   Output.print_sstring conf " ";
   Update.print_warnings conf base wl;

@@ -144,7 +144,7 @@ let print_possible_continue_merging conf base =
             Output.print_sstring conf
               (Util.transl_a_of_b conf
                  (Util.transl conf "possible duplications")
-                 (NameDisplay.reference conf base p s :> string)
+                 (NameDisplay.reference ~new_tab:true conf base p s :> string)
                  (s :> string));
             Output.print_sstring conf {|)</p>|})
       | None -> ())

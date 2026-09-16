@@ -235,7 +235,8 @@ let print_mod_merge_ok conf base wl cpl des =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  UpdateFamOk.print_family conf base wl cpl des;
+  UpdateFamOk.print_family ~references_in_new_tab:has_continuation conf base wl
+    cpl des;
   MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 
