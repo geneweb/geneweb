@@ -238,14 +238,20 @@ let commit conf base o_p ip sp =
   in
   Driver.patch_person base p.key_index p;
   let new_key = Util.make_key base p in
+  (* Must always re-index this person's own note-bearing fields (like
+     update_notes_links_family does unconditionally for families),
+     regardless of whether this person's own key changed - otherwise a
+     [[fn/sn/oc/text]] link just added or edited here is invisible to
+     nldb, and a later rename of its target never reaches this page. *)
+  Notes.update_notes_links_person base p;
   if old_key <> new_key then (
     let pgl =
       let db = Driver.read_nldb base in
       let db = Notes.merge_possible_aliases conf db in
       Notes.links_to_ind conf base db old_key None
     in
-    Notes.update_notes_links_person base p;
-    Notes.update_ind_key conf base pgl old_key new_key;
+    let new_name = (Driver.sou base p.first_name, Driver.sou base p.surname) in
+    Notes.update_ind_key conf base pgl old_key new_key new_name;
     Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0);
   Util.commit_patches conf base;
   let changed = U_Modify_person (o_p, Util.string_gen_person base p) in

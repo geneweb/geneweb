@@ -531,7 +531,15 @@ let update_gallery s oldk newk =
       let updated_json = update_map json oldk newk in
       title_part ^ Yojson.Basic.pretty_to_string updated_json ^ "\n"
 
-let rewrite_key s oldk newk _file =
+(* [oldk]/[newk] are [Def.NLDB.key] triples: they are always lower-cased
+   (see [Util.make_key]), because they double as Hashtbl keys
+   (cache_linked_pages) and are compared against the lower-cased key that
+   [NotesLinks.misc_notes_link] parses out of [[fn/sn/oc/text]] links. They
+   must never be used to build the text written back into the note: doing
+   so is what previously turned the surname (and first name) lowercase
+   after a rename. [new_name] carries the real, case-preserved (first
+   name, surname) of the renamed person, for display purposes only. *)
+let rewrite_key s oldk newk new_name _file =
   let s =
     if Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album" then
       update_gallery s oldk newk
@@ -550,7 +558,8 @@ let rewrite_key s oldk newk _file =
           rebuild (rs ^ ss) j
       | WLperson (j, k, name, text, fam_marker) ->
           if Def.NLDB.equal_key k oldk then
-            let fn, sn, oc = newk in
+            let _, _, oc = newk in
+            let fn, sn = new_name in
             let ofn, osn, _ooc = oldk in
             let name =
               match name with
@@ -578,16 +587,16 @@ let rewrite_key s oldk newk _file =
   in
   rebuild "" 0
 
-let replace_ind_key_in_str base is oldk newk p =
+let replace_ind_key_in_str base is oldk newk new_name p =
   let s = Driver.sou base is in
   let design = Gutil.designation base p in
-  let s' = rewrite_key s oldk newk design in
+  let s' = rewrite_key s oldk newk new_name design in
   Driver.insert_string base s'
 
-let update_ind_key_pgind base p oldk newk =
+let update_ind_key_pgind base p oldk newk new_name =
   let oldp = Driver.gen_person_of_person @@ Driver.poi base p in
   let replace is =
-    replace_ind_key_in_str base is oldk newk (Driver.poi base p)
+    replace_ind_key_in_str base is oldk newk new_name (Driver.poi base p)
   in
   let notes = replace oldp.notes in
   let occupation = replace oldp.occupation in
@@ -630,7 +639,7 @@ let update_ind_key_pgind base p oldk newk =
   Driver.patch_person base p newp;
   update_notes_links_person base newp
 
-let update_ind_key_pgfam base f oldk newk =
+let update_ind_key_pgfam base f oldk newk new_name =
   let oldf = Driver.gen_family_of_family @@ Driver.foi base f in
   let cpl = Driver.foi base f in
   let fath = Driver.poi base (Driver.get_father cpl) in
@@ -638,7 +647,7 @@ let update_ind_key_pgfam base f oldk newk =
   let _family =
     Gutil.designation base fath ^ " x " ^ Gutil.designation base moth
   in
-  let replace is = replace_ind_key_in_str base is oldk newk fath in
+  let replace is = replace_ind_key_in_str base is oldk newk new_name fath in
   let marriage_note = replace oldf.marriage_note in
   let marriage_src = replace oldf.marriage_src in
   let comment = replace oldf.comment in
@@ -659,27 +668,27 @@ let update_ind_key_pgfam base f oldk newk =
   Driver.patch_family base f newf;
   update_notes_links_family base newf
 
-let update_ind_key_pgmisc conf base f oldk newk =
+let update_ind_key_pgmisc conf base f oldk newk new_name =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_notes_read base fname in
-  let newn = rewrite_key oldn oldk newk f in
+  let newn = rewrite_key oldn oldk newk new_name f in
   commit_notes conf base f newn
 
-let update_ind_key_pgwiz conf base f oldk newk =
+let update_ind_key_pgwiz conf base f oldk newk new_name =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_wiznotes_read base fname in
-  let newn = rewrite_key oldn oldk newk f in
+  let newn = rewrite_key oldn oldk newk new_name f in
   commit_wiznotes conf base f newn
 
-let update_ind_key conf base link_pages oldk newk =
+let update_ind_key conf base link_pages oldk newk new_name =
   Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
   List.iter
     (function
-      | Def.NLDB.PgInd p -> update_ind_key_pgind base p oldk newk
-      | PgFam f -> update_ind_key_pgfam base f oldk newk
-      | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
-      | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk
-      | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk)
+      | Def.NLDB.PgInd p -> update_ind_key_pgind base p oldk newk new_name
+      | PgFam f -> update_ind_key_pgfam base f oldk newk new_name
+      | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk new_name
+      | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk new_name
+      | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk new_name)
     link_pages
 
 let wiki_aux pp conf base env str =

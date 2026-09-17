@@ -41,6 +41,7 @@ val update_ind_key :
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
   Def.NLDB.key ->
   string * string * int ->
+  string * string ->
   unit
 
 val source :
