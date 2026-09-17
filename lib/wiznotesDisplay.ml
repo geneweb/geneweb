@@ -113,11 +113,11 @@ let print_wizards_by_alphabetic_order conf list =
         String.sub wname 0 islash
       in
       let s2 = String.sub wname islash (String.length wname - islash) in
-      Output.print_string conf (Util.escape_html s2);
+      Output.print_string conf (Util.safe_html s2);
       Output.print_sstring conf " (";
-      Output.print_string conf (Util.escape_html s1);
+      Output.print_string conf (Util.safe_html s1);
       Output.print_sstring conf ")")
-    else Output.print_string conf (Util.escape_html wname);
+    else Output.print_string conf (Util.safe_html wname);
     if wlink then Output.print_sstring conf "</a>"
   in
   let order (_, (_, (ord, _)), _, _) = ord in
@@ -190,9 +190,9 @@ let print_wizards_by_date conf list =
                 (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
                 tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec);
            Output.print_sstring conf {|">|};
-           Output.print_string conf (Util.escape_html wname);
+           Output.print_string conf (Util.safe_html wname);
            Output.print_sstring conf {|</a>|})
-         else Output.print_string conf (Util.escape_html wname);
+         else Output.print_string conf (Util.safe_html wname);
          (spl, Some tm))
        (sep_period_list, None) list;
   Output.print_sstring conf "</dd></dl>"
@@ -363,7 +363,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     with Not_found -> ("", s)
   in
   let title =
-    if title = "" then wizard_page_title conf @@ Util.escape_html wizname
+    if title = "" then wizard_page_title conf @@ Util.safe_html wizname
     else wizard_page_title conf @@ Util.escape_html title
   in
   Hutil.header_without_home conf title;
