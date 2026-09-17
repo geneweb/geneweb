@@ -3,46 +3,18 @@
 
 open Printf
 
-let magic_robot = "GWRB0008"
+(* This tool used to keep its own, hand-copied definitions of `excl`/`who`
+   and read/write the `cnt/robot` file directly via `Marshal`. That is
+   unsafe by construction: `input_value`/`output_value` do not check that
+   the reading and writing sides agree on the record shape, so a drift
+   between this file and `Gwd_lib.Robot` (which happened at least once
+   already, silently) risks corrupting the file or crashing on read. We
+   now go through `Gwd_lib.Robot` directly, so there is exactly one
+   definition of the on-disk format and the compiler enforces that both
+   tools agree on it. *)
+open Gwd_lib.Robot
 
-let get_robot_file () =
-  String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
-
-module W = Map.Make (struct
-  type t = string
-
-  let compare = compare
-end)
-
-type who = { acc_times : float list; nb_connect : int }
-
-type excl = {
-  mutable excl : (string * int ref) list;
-  mutable who : who W.t;
-  max_conn : int * string;
-}
-
-let output_excl oc xcl =
-  output_string oc magic_robot;
-  output_value oc (xcl : excl)
-
-let read_robot_file fname =
-  try
-    Secure.with_open_in_bin fname @@ fun ic ->
-    let b = really_input_string ic (String.length magic_robot) in
-    if b <> magic_robot then
-      if b = "GWRB0007" then (
-        printf "Error: Old format detected.\n";
-        printf "Please start gwd once to migrate.\n";
-        exit 1)
-      else (
-        printf "Error: Invalid robot file format.\n";
-        exit 1);
-    Some (input_value ic : excl)
-  with _ -> None
-
-let write_robot_file fname xcl =
-  Secure.with_open_out_bin fname @@ fun oc -> output_excl oc xcl
+let get_robot_file () = snd (robot_excl ())
 
 let is_valid_ip ip =
   if String.contains ip '*' then
@@ -70,6 +42,9 @@ let is_valid_ip ip =
           [ a; b; c; d ]
     | _ -> false
 
+(* Only for matching against `xcl.excl` patterns (e.g. "146.174.*"), which
+   is a plain (string * int ref) list unrelated to the on-disk record
+   shape - safe to keep a local copy of this bit of logic. *)
 let ip_matches_pattern ip pattern =
   if String.contains pattern '*' then
     let pattern_parts = String.split_on_char '.' pattern in
@@ -87,80 +62,72 @@ let ip_matches_pattern ip pattern =
   else ip = pattern
 
 let print_status () =
-  let fname = get_robot_file () in
+  let xcl, fname = robot_excl () in
   if not (Sys.file_exists fname) then printf "No robot file found at %s\n" fname
-  else
-    match read_robot_file fname with
-    | None -> printf "Cannot read robot file\n"
-    | Some xcl ->
-        printf "Robot file: %s\n" fname;
-        let individual_ips, patterns =
-          List.partition (fun (ip, _) -> not (String.contains ip '*')) xcl.excl
-        in
-        printf "Blocked individual IPs: %d\n" (List.length individual_ips);
-        printf "Blocked IP patterns: %d\n" (List.length patterns);
-        printf "Monitored IPs: %d\n" (W.cardinal xcl.who);
-        printf "Max connections: %d by %s\n" (fst xcl.max_conn)
-          (snd xcl.max_conn);
-        printf "\nBlocked IPs/Patterns:\n";
-        let total_attempts = ref 0 in
-        List.iter
-          (fun (ip, cnt) ->
-            printf "  %s (%d attempts)\n" ip !cnt;
-            total_attempts := !total_attempts + !cnt)
-          xcl.excl;
-        printf "\nTotal attempts: %d\n" !total_attempts;
-        printf "\nTop monitored IPs:\n";
-        let monitored =
-          W.fold (fun ip who acc -> (ip, who) :: acc) xcl.who []
-        in
-        let sorted =
-          List.sort
-            (fun (_, w1) (_, w2) -> compare w2.nb_connect w1.nb_connect)
-            monitored
-        in
-        let top_10 =
-          let rec take n = function
-            | [] -> []
-            | h :: t -> if n = 0 then [] else h :: take (n - 1) t
-          in
-          take 10 sorted
-        in
-        if top_10 = [] then printf "  (No active monitoring)\n"
-        else
-          List.iter
-            (fun (ip, who) ->
-              if who.acc_times <> [] then
-                printf "  %s: %d req, last: %.0f s ago\n" ip who.nb_connect
-                  (Unix.time () -. List.hd who.acc_times))
-            top_10
+  else (
+    printf "Robot file: %s\n" fname;
+    let individual_ips, patterns =
+      List.partition (fun (ip, _) -> not (String.contains ip '*')) xcl.excl
+    in
+    printf "Blocked individual IPs: %d\n" (List.length individual_ips);
+    printf "Blocked IP patterns: %d\n" (List.length patterns);
+    printf "Monitored (base, IP) pairs: %d\n" (W.cardinal xcl.who);
+    let max_nb, (max_bname, max_ip) = xcl.max_conn in
+    printf "Max connections: %d by %s on %s\n" max_nb max_ip
+      (if max_bname = "" then "(no base)" else max_bname);
+    printf "\nBlocked IPs/Patterns:\n";
+    let total_attempts = ref 0 in
+    List.iter
+      (fun (ip, cnt) ->
+        printf "  %s (%d attempts)\n" ip !cnt;
+        total_attempts := !total_attempts + !cnt)
+      xcl.excl;
+    printf "\nTotal attempts: %d\n" !total_attempts;
+    printf "\nTop monitored (base, IP) pairs:\n";
+    let monitored = W.fold (fun key who acc -> (key, who) :: acc) xcl.who [] in
+    let sorted =
+      List.sort
+        (fun (_, w1) (_, w2) -> compare w2.nb_connect w1.nb_connect)
+        monitored
+    in
+    let top_10 =
+      let rec take n = function
+        | [] -> []
+        | h :: t -> if n = 0 then [] else h :: take (n - 1) t
+      in
+      take 10 sorted
+    in
+    if top_10 = [] then printf "  (No active monitoring)\n"
+    else
+      List.iter
+        (fun ((bname, ip), who) ->
+          if who.acc_times <> [] then
+            printf "  %s on %s: %d req, last: %.0f s ago\n" ip
+              (if bname = "" then "(no base)" else bname)
+              who.nb_connect
+              (Unix.time () -. List.hd who.acc_times))
+        top_10)
 
 let export_blacklist output_file =
-  let fname = get_robot_file () in
-  match read_robot_file fname with
-  | None -> printf "No robot file found\n"
-  | Some xcl ->
-      Secure.with_open_out_text output_file @@ fun oc ->
-      fprintf oc "# Robot blacklist export\n";
-      fprintf oc "# Format: IP<TAB>attempts\n";
-      let tm = Unix.localtime (Unix.time ()) in
-      fprintf oc "# Generated: %04d-%02d-%02d %02d:%02d:%02d\n\n"
-        (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
-        tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
-      List.iter (fun (ip, cnt) -> fprintf oc "%s\t%d\n" ip !cnt) xcl.excl;
-      printf "Exported %d entries to %s\n" (List.length xcl.excl) output_file
+  let xcl, fname = robot_excl () in
+  if not (Sys.file_exists fname) then printf "No robot file found\n"
+  else
+    Secure.with_open_out_text output_file @@ fun oc ->
+    fprintf oc "# Robot blacklist export\n";
+    fprintf oc "# Format: IP<TAB>attempts\n";
+    let tm = Unix.localtime (Unix.time ()) in
+    fprintf oc "# Generated: %04d-%02d-%02d %02d:%02d:%02d\n\n"
+      (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
+      tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
+    List.iter (fun (ip, cnt) -> fprintf oc "%s\t%d\n" ip !cnt) xcl.excl;
+    printf "Exported %d entries to %s\n" (List.length xcl.excl) output_file
 
 let import_blacklist input_file =
   if not (Sys.file_exists input_file) then (
     printf "Error: File %s not found\n" input_file;
     exit 1);
 
-  let fname = get_robot_file () in
-  let xcl =
-    match read_robot_file fname with
-    | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
-  in
+  let xcl, fname = robot_excl () in
 
   let ic = Secure.open_in input_file in
   let imported = ref [] in
@@ -200,7 +167,7 @@ let import_blacklist input_file =
     !imported;
 
   xcl.who <- W.empty;
-  write_robot_file fname xcl;
+  save xcl fname;
   printf "Imported %d unique IPs\n" (List.length !imported)
 
 let add_ip patterns_str =
@@ -219,12 +186,7 @@ let add_ip patterns_str =
         exit 1))
     patterns;
 
-  let fname = get_robot_file () in
-  let xcl =
-    match read_robot_file fname with
-    | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
-  in
+  let xcl, fname = robot_excl () in
 
   List.iter
     (fun pattern ->
@@ -257,116 +219,109 @@ let add_ip patterns_str =
           else printf "Added pattern %s (%d attempts)\n" pattern final_count)
       else if not (List.mem_assoc pattern xcl.excl) then (
         xcl.excl <- (pattern, ref 1) :: xcl.excl;
-        xcl.who <- W.remove pattern xcl.who;
+        xcl.who <- W.filter (fun (_, ip) _ -> ip <> pattern) xcl.who;
         printf "Added %s to blacklist\n" pattern)
       else printf "IP %s already in blacklist\n" pattern)
     patterns;
 
-  write_robot_file fname xcl
+  save xcl fname
 
 let remove_ip ip =
-  let fname = get_robot_file () in
-  let xcl =
-    match read_robot_file fname with
-    | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
-  in
+  let xcl, fname = robot_excl () in
   if List.mem_assoc ip xcl.excl then (
     xcl.excl <- List.remove_assoc ip xcl.excl;
-    write_robot_file fname xcl;
+    save xcl fname;
     printf "Removed %s from blacklist\n" ip)
   else printf "IP %s not found in blacklist\n" ip
 
 let clear_all () =
-  let fname = get_robot_file () in
-  let xcl = { excl = []; who = W.empty; max_conn = (0, "") } in
-  write_robot_file fname xcl;
+  let _, fname = robot_excl () in
+  let xcl =
+    { excl = []; who = W.empty; max_conn = (0, ("", "")); last_summary = 0.0 }
+  in
+  save xcl fname;
   printf "Cleared all robot data\n"
 
 let clear_monitoring () =
-  let fname = get_robot_file () in
-  let xcl =
-    match read_robot_file fname with
-    | Some x -> { x with who = W.empty; max_conn = (0, "") }
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
-  in
-  write_robot_file fname xcl;
+  let xcl, fname = robot_excl () in
+  xcl.who <- W.empty;
+  xcl.max_conn <- (0, ("", ""));
+  save xcl fname;
   printf "Cleared monitoring data (kept blacklist)\n"
 
 let suggest_ranges threshold =
-  let fname = get_robot_file () in
-  match read_robot_file fname with
-  | None -> printf "No robot file found\n"
-  | Some xcl ->
-      let ranges = Hashtbl.create 256 in
-      List.iter
-        (fun (ip, cnt) ->
-          if not (String.contains ip '*') then
-            let parts = String.split_on_char '.' ip in
-            match parts with
-            | [ a; b; c; _ ] ->
-                let range = Printf.sprintf "%s.%s.%s.*" a b c in
-                let current =
-                  try Hashtbl.find ranges range with Not_found -> []
-                in
-                Hashtbl.replace ranges range ((ip, !cnt) :: current)
-            | _ -> ())
-        xcl.excl;
-
-      let suggestions = ref [] in
-      Hashtbl.iter
-        (fun range ips ->
-          let count = List.length ips in
-          if count >= threshold then
-            let total =
-              List.fold_left (fun acc (_, attempts) -> acc + attempts) 0 ips
-            in
-            suggestions := (range, count, total, ips) :: !suggestions)
-        ranges;
-
-      let sorted =
-        List.sort
-          (fun (r1, _, _, _) (r2, _, _, _) -> String.compare r1 r2)
-          !suggestions
-      in
-
-      printf "=== RANGE SUGGESTIONS ===\n";
-      printf "Threshold: %d IPs per /24 range\n\n" threshold;
-
-      if sorted = [] then printf "No ranges found with %d+ IPs\n" threshold
-      else (
-        printf "Suggested ranges to consolidate:\n\n";
-        let all_ranges = ref [] in
-        List.iter
-          (fun (range, count, attempts, ips) ->
-            all_ranges := range :: !all_ranges;
-            printf "%s: %d IPs, %d total attempts\n" range count attempts;
-            let sorted_ips = List.sort (fun (_, a) (_, b) -> compare b a) ips in
-            let samples =
-              let rec take n = function
-                | [] -> []
-                | h :: t -> if n = 0 then [] else h :: take (n - 1) t
+  let xcl, fname = robot_excl () in
+  if not (Sys.file_exists fname) then printf "No robot file found\n"
+  else
+    let ranges = Hashtbl.create 256 in
+    List.iter
+      (fun (ip, cnt) ->
+        if not (String.contains ip '*') then
+          let parts = String.split_on_char '.' ip in
+          match parts with
+          | [ a; b; c; _ ] ->
+              let range = Printf.sprintf "%s.%s.%s.*" a b c in
+              let current =
+                try Hashtbl.find ranges range with Not_found -> []
               in
-              take 5 sorted_ips
+              Hashtbl.replace ranges range ((ip, !cnt) :: current)
+          | _ -> ())
+      xcl.excl;
+
+    let suggestions = ref [] in
+    Hashtbl.iter
+      (fun range ips ->
+        let count = List.length ips in
+        if count >= threshold then
+          let total =
+            List.fold_left (fun acc (_, attempts) -> acc + attempts) 0 ips
+          in
+          suggestions := (range, count, total, ips) :: !suggestions)
+      ranges;
+
+    let sorted =
+      List.sort
+        (fun (r1, _, _, _) (r2, _, _, _) -> String.compare r1 r2)
+        !suggestions
+    in
+
+    printf "=== RANGE SUGGESTIONS ===\n";
+    printf "Threshold: %d IPs per /24 range\n\n" threshold;
+
+    if sorted = [] then printf "No ranges found with %d+ IPs\n" threshold
+    else (
+      printf "Suggested ranges to consolidate:\n\n";
+      let all_ranges = ref [] in
+      List.iter
+        (fun (range, count, attempts, ips) ->
+          all_ranges := range :: !all_ranges;
+          printf "%s: %d IPs, %d total attempts\n" range count attempts;
+          let sorted_ips = List.sort (fun (_, a) (_, b) -> compare b a) ips in
+          let samples =
+            let rec take n = function
+              | [] -> []
+              | h :: t -> if n = 0 then [] else h :: take (n - 1) t
             in
-            printf "  Sample IPs: ";
-            List.iter
-              (fun (ip, attempts) -> printf "%s (%d) " ip attempts)
-              samples;
-            if count > 5 then printf "... and %d more" (count - 5);
-            printf "\n\n")
-          sorted;
+            take 5 sorted_ips
+          in
+          printf "  Sample IPs: ";
+          List.iter
+            (fun (ip, attempts) -> printf "%s (%d) " ip attempts)
+            samples;
+          if count > 5 then printf "... and %d more" (count - 5);
+          printf "\n\n")
+        sorted;
 
-        printf "Summary:\n";
-        printf "  Total suggested ranges: %d\n" (List.length sorted);
-        let total_ips =
-          List.fold_left (fun acc (_, count, _, _) -> acc + count) 0 sorted
-        in
-        printf "  Total IPs that would be consolidated: %d\n\n" total_ips;
+      printf "Summary:\n";
+      printf "  Total suggested ranges: %d\n" (List.length sorted);
+      let total_ips =
+        List.fold_left (fun acc (_, count, _, _) -> acc + count) 0 sorted
+      in
+      printf "  Total IPs that would be consolidated: %d\n\n" total_ips;
 
-        printf "Single command to add all ranges:\n";
-        let ranges_str = String.concat "," (List.rev !all_ranges) in
-        printf "  robot -add \"%s\"\n" ranges_str)
+      printf "Single command to add all ranges:\n";
+      let ranges_str = String.concat "," (List.rev !all_ranges) in
+      printf "  robot -add \"%s\"\n" ranges_str)
 
 let usage () =
   printf "Usage: robot [options] <command> [args]\n";
