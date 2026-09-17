@@ -17,6 +17,17 @@ val dir_sep : string
 val check_file_name : string -> (string list * string) option
 val misc_notes_link : string -> int -> wiki_link
 
+val advances_pos : wiki_link -> bool
+(** Whether a link takes a slot in the [#p_N] anchor numbering shared by
+    [Wiki.syntax_links] and nldb's [lnPos]. *)
+
+val fold_links :
+  (pos:int -> wiki_link -> 'acc -> 'acc) -> 'acc -> string -> 'acc
+(** [fold_links f acc s] folds [f] over the links of [s] in order, with the same
+    escapes as [Wiki.syntax_links] (a percent sign followed by a bracket, a
+    brace or a quote). [pos] is the 1-based ordinal among occurrences counted by
+    [advances_pos], i.e. the [N] of the rendered [#p_N] anchor. *)
+
 val add_in_db :
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.t ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page ->
@@ -27,4 +38,6 @@ val update_db :
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page ->
   string list * (Def.NLDB.key * Def.NLDB.ind) list ->
-  unit
+  (string list * (Def.NLDB.key * Def.NLDB.ind) list) option
+(** [update_db base who list] replaces [who]'s nldb entry with [list] and
+    returns its previous entry, if any. *)
