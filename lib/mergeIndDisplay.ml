@@ -358,7 +358,7 @@ let print_merged conf base wl p =
       in
       let open Ext_list.Infix in
       Output.print_sstring conf "<p>";
-      Output.print_sstring conf "<a href=";
+      Output.print_sstring conf "<a href=\"";
       Output.print_url conf
         (Util.commd' conf
            ~query:
