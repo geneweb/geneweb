@@ -92,7 +92,7 @@ let print_possible_continue_merging conf base =
       let ini2 = Gwdb.iper_of_string ini2 in
       let p1 = Gwdb.poi base ini1 in
       let p2 = Gwdb.poi base ini2 in
-      Output.print_sstring conf {|<p><a href="|};
+      Output.print_sstring conf {|<p><a class="button secondary" href="|};
       Output.print_url conf
         (Util.commd' conf
            ~query:
@@ -129,7 +129,18 @@ let print_possible_continue_merging conf base =
             let p = Gwdb.poi base ip in
             let s = NameDisplay.fullname_html_of_person conf base p in
             let open Ext_list.Infix in
-            Output.print_sstring conf {|<p><a href="|};
+            Output.printf conf "<p>%s%s %s (%s)</p>"
+              (Util.transl conf "merge_todo")
+              (Util.transl conf ":")
+              (Util.transl_a_of_b conf
+                 (Util.transl conf "possible duplications")
+                 (s :> string)
+                 (s :> string))
+              (Adef.as_string
+              @@ NameDisplay.reference ~new_tab:true conf base p
+                   (Adef.safe @@ Util.transl conf "merge_see_profile"));
+            Output.print_sstring conf
+              {|<p><a class = "button secondary" href="|};
             Output.print_url conf
               (Util.commd' conf
                  ~query:
@@ -140,13 +151,7 @@ let print_possible_continue_merging conf base =
             Output.print_sstring conf
               (Utf8.capitalize_fst (Util.transl conf "continue merging"));
             Output.print_sstring conf "</a>";
-            Output.print_sstring conf {| (|};
-            Output.print_sstring conf
-              (Util.transl_a_of_b conf
-                 (Util.transl conf "possible duplications")
-                 (NameDisplay.reference ~new_tab:true conf base p s :> string)
-                 (s :> string));
-            Output.print_sstring conf {|)</p>|})
+            Output.print_sstring conf {|</p>|})
       | None -> ())
 
 let page_title ~has_continuation conf =
