@@ -357,8 +357,20 @@ let print_merged conf base wl p =
         | Some s -> Some ("fexcl", s)
       in
       let open Ext_list.Infix in
+      let p = Gwdb.poi base ip in
+      let s = NameDisplay.fullname_html_of_person conf base p in
+      Output.printf conf "<p>%s%s %s (%s)</p>"
+        (Util.transl conf "merge_todo")
+        (Util.transl conf ":")
+        (Util.transl_a_of_b conf
+           (Util.transl conf "possible duplications")
+           (s :> string)
+           (s :> string))
+        (Adef.as_string
+        @@ NameDisplay.reference ~new_tab:has_continuation conf base p
+             (Adef.safe @@ Util.transl conf "merge_see_profile"));
       Output.print_sstring conf "<p>";
-      Output.print_sstring conf "<a href=\"";
+      Output.print_sstring conf "<a class=\"button secondary\" href=\"";
       Output.print_url conf
         (Util.commd' conf
            ~query:
@@ -369,16 +381,6 @@ let print_merged conf base wl p =
       Output.print_sstring conf
         (Utf8.capitalize_fst (Util.transl conf "continue merging"));
       Output.print_sstring conf "</a>";
-      (let p = Gwdb.poi base ip in
-       let s = NameDisplay.fullname_html_of_person conf base p in
-       Output.print_sstring conf "\n(";
-       Output.print_sstring conf
-         (Util.transl_a_of_b conf
-            (Util.transl conf "possible duplications")
-            (NameDisplay.reference ~new_tab:has_continuation conf base p s
-              :> string)
-            (s :> string));
-       Output.print_sstring conf ")\n");
       Output.print_sstring conf "</p>\n"
   | _ -> ());
   Update.print_warnings conf base wl;
