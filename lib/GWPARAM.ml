@@ -15,7 +15,6 @@ let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
 let cnt_dir = ref ""
-let sock_dir = ref ""
 let bases = ref (Secure.base_dir ())
 
 let config_reorg bname =
@@ -51,12 +50,10 @@ module Default = struct
 
   let cnt_d bname =
     let bname = clean_bname bname in
-    if !sock_dir = "" then
-      cnt_dir :=
-        if bname <> "" then
-          path_concat [ base_dir (); bname ^ ".gwb"; "config"; "cnt" ]
-        else path_concat [ base_dir (); "cnt" ]
-    else cnt_dir := !sock_dir;
+    cnt_dir :=
+      if bname <> "" then
+        path_concat [ base_dir (); bname ^ ".gwb"; "config"; "cnt" ]
+      else path_concat [ base_dir (); "cnt" ];
     !cnt_dir
 
   let adm_file file = Filename.concat !cnt_dir file
@@ -100,8 +97,7 @@ module Legacy = struct
 
   let cnt_d bname =
     let _ = bname in
-    if !sock_dir = "" then cnt_dir := path_concat [ base_dir (); "cnt" ]
-    else cnt_dir := !sock_dir;
+    cnt_dir := path_concat [ base_dir (); "cnt" ];
     !cnt_dir
 
   let adm_file file = Filename.concat !cnt_dir file

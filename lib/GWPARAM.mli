@@ -4,7 +4,6 @@ val errors_other : string list ref
 val set_vars : string list ref
 val gwd_cmd : string ref
 val cnt_dir : string ref
-val sock_dir : string ref
 val bases : string ref
 
 val reorg : bool ref
