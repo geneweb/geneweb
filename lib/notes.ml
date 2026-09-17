@@ -299,81 +299,96 @@ let safe_gallery conf base s =
   Yojson.Basic.to_string json
 
 let update_notes_links_db base fnotes s =
-  let slen = String.length s in
   let list_nt, list_ind =
-    let rec loop list_nt list_ind pos i =
-      if i = slen then (list_nt, list_ind)
-      else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind pos (i + 2)
-      else
-        match NotesLinks.misc_notes_link s i with
-        | NotesLinks.WLpage (j, _, lfname, _, _) ->
+    NotesLinks.fold_links
+      (fun ~pos ~i:_ ~j:_ link (list_nt, list_ind) ->
+        match link with
+        | NotesLinks.WLpage (_, _, lfname, _, _) ->
             let list_nt =
               if List.mem lfname list_nt then list_nt else lfname :: list_nt
             in
-            loop list_nt list_ind pos j
-        | NotesLinks.WLperson (j, key, _, txt, fam_marker) ->
-            let list_ind =
-              let link =
-                {
-                  Def.NLDB.lnTxt = txt;
-                  Def.NLDB.lnPos = pos;
-                  Def.NLDB.lnFamMarker = fam_marker;
-                }
-              in
-              (key, link) :: list_ind
+            (list_nt, list_ind)
+        | NotesLinks.WLperson (_, key, _, txt, fam_marker) ->
+            let link =
+              {
+                Def.NLDB.lnTxt = txt;
+                Def.NLDB.lnPos = pos;
+                Def.NLDB.lnFamMarker = fam_marker;
+              }
             in
-            loop list_nt list_ind (pos + 1) j
-        | NotesLinks.WLwizard (j, _, _) -> loop list_nt list_ind pos j
-        | NotesLinks.WLimage (j, _, _, _) -> loop list_nt list_ind pos j
-        | NotesLinks.WLnone (j, _) -> loop list_nt list_ind pos j
-    in
-    loop [] [] 1 0
+            (list_nt, (key, link) :: list_ind)
+        | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
+            (list_nt, list_ind))
+      ([], []) s 0
   in
   NotesLinks.update_db base fnotes (list_nt, list_ind)
 
-let update_notes_links_person base (p : _ Def.gen_person) =
-  let s =
-    let sl =
-      [
-        p.notes;
-        p.occupation;
-        p.birth_note;
-        p.birth_src;
-        p.baptism_note;
-        p.baptism_src;
-        p.death_note;
-        p.death_src;
-        p.burial_note;
-        p.burial_src;
-        p.psources;
-      ]
-    in
-    let sl =
-      let rec loop l accu =
-        match l with
-        | [] -> accu
-        | evt :: l -> loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
-      in
-      loop p.pevents sl
-    in
-    String.concat " " (List.map (Driver.sou base) sl)
+(* The concatenation of every note-bearing field of a person - the exact
+   text that gets scanned for outgoing [[fn/sn/oc/text]] links. Exposed
+   so callers can compute it BEFORE patching a person (the "old" text)
+   and compare it against the text after patching, to decide whether a
+   full nldb read-modify-write ([update_notes_links_db], and therefore
+   [update_notes_links_person] below) is actually needed - see there. *)
+let notes_bearing_text_of_person base (p : _ Def.gen_person) =
+  let sl =
+    [
+      p.notes;
+      p.occupation;
+      p.birth_note;
+      p.birth_src;
+      p.baptism_note;
+      p.baptism_src;
+      p.death_note;
+      p.death_src;
+      p.burial_note;
+      p.burial_src;
+      p.psources;
+    ]
   in
-  update_notes_links_db base (Def.NLDB.PgInd p.Def.key_index) s
+  let sl =
+    let rec loop l accu =
+      match l with
+      | [] -> accu
+      | evt :: l -> loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
+    in
+    loop p.pevents sl
+  in
+  String.concat " " (List.map (Driver.sou base) sl)
 
-let update_notes_links_family base (f : _ Def.gen_family) =
-  let s =
-    let sl = [ f.marriage_note; f.marriage_src; f.comment; f.fsources ] in
-    let sl =
-      let rec loop l accu =
-        match l with
-        | [] -> accu
-        | evt :: l -> loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
-      in
-      loop f.fevents sl
+(* Likewise for a family's note-bearing fields. *)
+let notes_bearing_text_of_family base (f : _ Def.gen_family) =
+  let sl = [ f.marriage_note; f.marriage_src; f.comment; f.fsources ] in
+  let sl =
+    let rec loop l accu =
+      match l with
+      | [] -> accu
+      | evt :: l -> loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
     in
-    String.concat " " (List.map (Driver.sou base) sl)
+    loop f.fevents sl
   in
-  update_notes_links_db base (Def.NLDB.PgFam f.Def.fam_index) s
+  String.concat " " (List.map (Driver.sou base) sl)
+
+(* [update_notes_links_db] always does a full read + linear scan + full
+   rewrite of the nldb file, however large it is (see [NotesLinks.read]/
+   [write] and [add_in_db]'s [List.remove_assoc]) - there is no partial
+   update. On a very large base, paying this on every single save (as
+   [on_person_saved] now does unconditionally) is a real cost even when
+   the edit had nothing to do with notes at all (a birth date, a
+   source...). [?old_text], when given, is compared against the freshly
+   computed text: if they're equal, nothing note-relevant changed, and
+   the expensive read-modify-write is skipped entirely. Callers that
+   don't have an old snapshot handy (a brand-new person, or a merge
+   where "old" doesn't cleanly apply to the combined result) simply
+   omit it and always reindex, exactly as before this optimization. *)
+let update_notes_links_person ?old_text base (p : _ Def.gen_person) =
+  let s = notes_bearing_text_of_person base p in
+  if old_text <> Some s then
+    update_notes_links_db base (Def.NLDB.PgInd p.Def.key_index) s
+
+let update_notes_links_family ?old_text base (f : _ Def.gen_family) =
+  let s = notes_bearing_text_of_family base f in
+  if old_text <> Some s then
+    update_notes_links_db base (Def.NLDB.PgFam f.Def.fam_index) s
 
 let commit_notes conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
@@ -534,11 +549,14 @@ let update_gallery s oldk newk =
 (* [oldk]/[newk] are [Def.NLDB.key] triples: they are always lower-cased
    (see [Util.make_key]), because they double as Hashtbl keys
    (cache_linked_pages) and are compared against the lower-cased key that
-   [NotesLinks.misc_notes_link] parses out of [[fn/sn/oc/text]] links. They
-   must never be used to build the text written back into the note: doing
-   so is what previously turned the surname (and first name) lowercase
-   after a rename. [new_name] carries the real, case-preserved (first
-   name, surname) of the renamed person, for display purposes only. *)
+   [NotesLinks.misc_notes_link] parses out of [[fn/sn/oc/text]] links.
+   [display_name] is deliberately a different type: the real,
+   case-preserved (first name, surname) of a person, for building the
+   text written back into a note. Never use a [Def.NLDB.key]'s fn/sn for
+   that - doing so is what previously turned the surname (and first
+   name) lowercase after a rename. *)
+type display_name = { df_first_name : string; df_surname : string }
+
 let rewrite_key s oldk newk new_name _file =
   let s =
     if Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album" then
@@ -559,7 +577,7 @@ let rewrite_key s oldk newk new_name _file =
       | WLperson (j, k, name, text, fam_marker) ->
           if Def.NLDB.equal_key k oldk then
             let _, _, oc = newk in
-            let fn, sn = new_name in
+            let { df_first_name = fn; df_surname = sn } = new_name in
             let ofn, osn, _ooc = oldk in
             let name =
               match name with
@@ -807,25 +825,69 @@ let write_cache_linked_pages conf cache_linked_pages =
 
 let update_cache_linked_pages conf mode old_key new_key nbr =
   let ht = read_cache_linked_pages conf in
-  match mode with
+  (match mode with
   | Delete -> Hashtbl.remove ht old_key
-  | Merge -> (
-      let entry = try Some (Hashtbl.find ht old_key) with Not_found -> None in
-      match entry with
-      | Some _ -> Hashtbl.remove ht old_key
-      | None ->
-          ();
-          Hashtbl.add ht new_key nbr)
-  | Rename ->
-      (let entry =
-         try Some (Hashtbl.find ht old_key) with Not_found -> None
-       in
-       match entry with
-       | Some _ ->
-           Hashtbl.remove ht old_key;
-           Hashtbl.add ht new_key nbr
-       | None -> ());
-      write_cache_linked_pages conf ht
+  | Merge ->
+      (* [nbr] here is trusted: every current caller (see mergeInd.ml)
+         computes it fresh from the just-updated nldb before calling
+         this. Drop any stale entry under [old_key] (when it differs
+         from [new_key]) and set the correct, current count. *)
+      if old_key <> new_key then Hashtbl.remove ht old_key;
+      Hashtbl.replace ht new_key nbr
+  | Rename -> (
+      (* The number of pages linking to this person doesn't change on a
+         pure rename - only the key does - so reuse whatever was already
+         cached under [old_key] rather than trusting the caller's [nbr]:
+         every current caller (updateField.ml, updateIndOk.ml) just
+         passes 0 here, not knowing the real count. *)
+      match Hashtbl.find_opt ht old_key with
+      | Some n ->
+          Hashtbl.remove ht old_key;
+          Hashtbl.replace ht new_key n
+      | None -> ()));
+  (* Every mode must persist: a mutation that's only applied to [ht] in
+     memory and never written is silently lost (this used to be true
+     only for [Rename], leaving [Delete] and [Merge] permanently stale
+     until the next full [update_nldb] rebuild). *)
+  write_cache_linked_pages conf ht
+
+(* Call once, right after [Driver.patch_person], for a person that
+   already existed before this operation - an ordinary edit (see
+   updateIndOk.ml, updateField.ml) - NOT for a brand-new person, which
+   has no prior key to fix up elsewhere and should just call
+   [update_notes_links_person] directly. mergeIndOk.ml does NOT go
+   through this either: a merge collapses two old keys into one new
+   one, which doesn't fit this single-[old_key] shape, so it keeps its
+   own (already correct) direct sequence.
+
+   This is the single place that knows the full note-links contract for
+   an ordinary person save, in the correct order - the two call sites
+   above used to each reimplement this by hand, and one of them had
+   forgotten a step:
+   - always re-scan [p]'s own note-bearing fields into nldb, so a
+     [[fn/sn/oc/text]] link just added or edited is tracked (this must
+     happen before the next step, in case of self-reference)
+   - if [p]'s key actually changed relative to [old_key], rewrite every
+     page in [pgl] that referenced [old_key] to the new key/name, and
+     refresh the linked-pages count cache accordingly
+
+   [pgl] (the pages that referenced [old_key]) is taken as a parameter
+   rather than recomputed here because every current caller already
+   computes it via [links_to_ind] for its own "linked pages" display,
+   before this function runs any rewrite. *)
+let on_person_saved conf base ~old_key ?old_text
+    ~(pgl : (Driver.iper, Driver.ifam) Def.NLDB.page list) p =
+  update_notes_links_person ?old_text base p;
+  let new_key = Util.make_key base p in
+  if old_key <> new_key then (
+    let new_name =
+      {
+        df_first_name = Driver.sou base p.first_name;
+        df_surname = Driver.sou base p.surname;
+      }
+    in
+    update_ind_key conf base pgl old_key new_key new_name;
+    update_cache_linked_pages conf Rename old_key new_key 0)
 
 let linked_pages_nbr conf base ip =
   let key =

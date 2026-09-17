@@ -39,30 +39,22 @@ let parse_cmd () =
   (!fname, get_bases_dir ())
 
 let notes_links s =
-  let slen = String.length s in
-  let rec loop list_nt list_ind pos i =
-    if i = slen then (list_nt, list_ind)
-    else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind pos (i + 2)
-    else
-      match NotesLinks.misc_notes_link s i with
-      | NotesLinks.WLpage (j, _, lfname, _, _) ->
+  NotesLinks.fold_links
+    (fun ~pos ~i:_ ~j:_ link (list_nt, list_ind) ->
+      match link with
+      | NotesLinks.WLpage (_, _, lfname, _, _) ->
           let list_nt =
             if List.mem lfname list_nt then list_nt else lfname :: list_nt
           in
-          loop list_nt list_ind pos j
-      | NotesLinks.WLperson (j, key, _name, text, fam_marker) ->
-          let list_ind =
-            let link =
-              { NLDB.lnTxt = text; lnPos = pos; lnFamMarker = fam_marker }
-            in
-            (key, link) :: list_ind
+          (list_nt, list_ind)
+      | NotesLinks.WLperson (_, key, _name, text, fam_marker) ->
+          let link =
+            { NLDB.lnTxt = text; lnPos = pos; lnFamMarker = fam_marker }
           in
-          loop list_nt list_ind (pos + 1) j
-      | NotesLinks.WLwizard (j, _, _) -> loop list_nt list_ind (pos + 1) j
-      | NotesLinks.WLimage (j, _, _, _) -> loop list_nt list_ind pos j
-      | NotesLinks.WLnone (j, _) -> loop list_nt list_ind pos j
-  in
-  loop [] [] 1 0
+          (list_nt, (key, link) :: list_ind)
+      | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
+          (list_nt, list_ind))
+    ([], []) s 0
 
 type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 

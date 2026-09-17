@@ -1138,10 +1138,9 @@ let print_mod ?prerr o_conf base =
   let ofn = o_p.first_name in
   let osn = o_p.surname in
   let oocc = o_p.occ in
-  let old_key =
-    Util.make_key base
-      (Driver.gen_person_of_person (Driver.poi base o_p.key_index))
-  in
+  let old_p = Driver.gen_person_of_person (Driver.poi base o_p.key_index) in
+  let old_key = Util.make_key base old_p in
+  let old_text = Notes.notes_bearing_text_of_person base old_p in
   let conf = Update.update_conf o_conf in
   let pgl =
     let db = Driver.read_nldb base in
@@ -1154,20 +1153,7 @@ let print_mod ?prerr o_conf base =
     let op = Driver.poi base p.key_index in
     let u = { family = Driver.get_family op } in
     Driver.patch_person base p.key_index p;
-    let new_key = Util.make_key base p in
-    (* Must always re-index this person's own note-bearing fields (like
-       update_notes_links_family does unconditionally for families),
-       regardless of whether this person's own key changed - otherwise
-       any [[fn/sn/oc/text]] link just added or edited here is invisible
-       to nldb, and a later rename of its target never reaches this page. *)
-    Notes.update_notes_links_person base p;
-    if old_key <> new_key then (
-      (* Needs the updates in this order in case of self-reference *)
-      let new_name =
-        (Driver.sou base p.first_name, Driver.sou base p.surname)
-      in
-      Notes.update_ind_key conf base pgl old_key new_key new_name;
-      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0);
+    Notes.on_person_saved conf base ~old_key ~old_text ~pgl p;
     let wl =
       let a = Driver.poi base p.key_index in
       let a =
