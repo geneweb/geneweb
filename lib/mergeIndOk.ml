@@ -578,14 +578,21 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   (* p's notes just merged in text from both o_p1 and o_p2 (see
      [reconstitute]'s merge_field for notes/birth_note/etc.), so it may
      now carry [[fn/sn/oc/text]] links that were never scanned under
-     p's own PgInd key - re-index unconditionally, same fix as in
-     updateIndOk.ml/updateField.ml, and before update_ind_key below in
-     case of self-reference. *)
+     p's own PgInd key - re-index unconditionally (same requirement as
+     [Notes.on_person_saved], which updateIndOk.ml/updateField.ml go
+     through - this merge doesn't fit that function's single-old-key
+     shape, so it keeps its own direct call here), and before
+     update_ind_key below in case of self-reference. *)
   Notes.update_notes_links_person base p;
   let new_key =
     (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
   in
-  let new_name = (Driver.sou base p.first_name, Driver.sou base p.surname) in
+  let new_name : Notes.display_name =
+    {
+      df_first_name = Driver.sou base p.first_name;
+      df_surname = Driver.sou base p.surname;
+    }
+  in
   if
     (not (String.equal ofn1 sp.first_name && String.equal osn1 sp.surname))
     || oocc1 <> sp.occ

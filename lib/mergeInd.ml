@@ -180,33 +180,12 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
   Driver.patch_person base p1.key_index p1;
   reparent_ind base warning p1.key_index (Driver.get_iper p2);
   UpdateIndOk.effective_del conf base p2;
-  let s =
-    let sl =
-      [
-        p1.notes;
-        p1.occupation;
-        p1.birth_note;
-        p1.birth_src;
-        p1.baptism_note;
-        p1.baptism_src;
-        p1.death_note;
-        p1.death_src;
-        p1.burial_note;
-        p1.burial_src;
-        p1.psources;
-      ]
-    in
-    let sl =
-      let rec loop l accu =
-        match l with
-        | [] -> accu
-        | evt :: l -> loop l (evt.epers_note :: evt.epers_src :: accu)
-      in
-      loop p1.pevents sl
-    in
-    String.concat " " (List.map (Driver.sou base) sl)
-  in
-  Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s;
+  (* p1 may have just absorbed p2's occupation/notes/sources/etc. (see
+     get_string above), which can carry [[fn/sn/oc/text]] links never
+     scanned under p1's own PgInd key. [Notes.update_notes_links_person]
+     already does exactly the field-concatenation this used to
+     reimplement by hand - use it instead of duplicating it. *)
+  Notes.update_notes_links_person base p1;
   let key = Util.make_key base p1 in
   let pgl =
     let db = Driver.read_nldb base in
@@ -274,7 +253,12 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
     Driver.patch_ascend base ip a
   done;
   Driver.patch_family base ifam1 fam1;
-  Driver.patch_descend base ifam1 des1
+  Driver.patch_descend base ifam1 des1;
+  (* fam1 may have just absorbed fam2's marriage_src/fsources (see
+     get_string above), which can carry [[fn/sn/oc/text]] links never
+     scanned under fam1's own PgFam key - re-index unconditionally,
+     same requirement as updateFamOk.ml's print_add/print_mod. *)
+  Notes.update_notes_links_family base fam1
 
 let merge_fam conf base branches ifam1 ifam2 fam1 fam2 ip1 ip2 changes_done
     propose_merge_fam =

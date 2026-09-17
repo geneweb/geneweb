@@ -35,13 +35,19 @@ val merge_possible_aliases :
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list ->
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list
 
+type display_name = { df_first_name : string; df_surname : string }
+(** The real, case-preserved (first name, surname) of a person, for building the
+    text written back into a note. Deliberately distinct from [Def.NLDB.key],
+    which is always lower-cased (comparison/cache key) and must never be used
+    for that purpose. *)
+
 val update_ind_key :
   Config.config ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
   Def.NLDB.key ->
   string * string * int ->
-  string * string ->
+  display_name ->
   unit
 
 val source :
@@ -118,6 +124,29 @@ val cache_linked_pages_name : string
 
 val update_cache_linked_pages :
   Config.config -> mode -> Def.NLDB.key -> Def.NLDB.key -> int -> unit
+
+val on_person_saved :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  old_key:Def.NLDB.key ->
+  pgl:(Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.istr )
+  Def.gen_person ->
+  unit
+(** [on_person_saved conf base ~old_key ~pgl p], called right after
+    [Driver.patch_person] for a person that already existed before this save -
+    an ordinary edit (updateIndOk.ml, updateField.ml), NOT a brand-new person
+    (call [update_notes_links_person] directly for that) and NOT mergeIndOk.ml's
+    merge (which collapses two old keys into one new one and keeps its own
+    direct sequence for that reason): unconditionally re-indexes [p]'s own
+    note-bearing fields into nldb, then, if [p]'s key differs from [old_key],
+    rewrites every page in [pgl] (the pages that referenced [old_key], as
+    computed by the caller via [links_to_ind] for its own "linked pages"
+    display) to the new key/name and refreshes the linked-pages count cache.
+    This is the single place callers should go through for this sequence instead
+    of reimplementing it by hand. *)
 
 val json_extract_img : Config.config -> string -> string * string
 
