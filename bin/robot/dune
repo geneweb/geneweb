@@ -3,4 +3,4 @@
  (name robot)
  (public_name gwrobot)
  (modules robot)
- (libraries unix geneweb))
+ (libraries unix geneweb gwd_lib))
