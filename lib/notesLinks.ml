@@ -42,7 +42,7 @@ let misc_notes_link s i =
       match s.[j] with
       | '%' -> WLnone (j, cut j)
       | '\'' -> WLnone (j, cut j)
-      | '{' -> WLnone (j, cut j)
+      | '{' | '}' -> WLnone (j, cut j)
       | '[' ->
           if j > i && j + 1 < slen && s.[j + 1] = '[' then WLnone (j, cut j)
           else wlnone (j + 1)
@@ -174,7 +174,7 @@ let misc_notes_link s i =
             let fn = Name.lower fn in
             let sn = Name.lower sn in
             let j, fam_marker =
-              if j < slen && s.[j] = '#' then
+              if j < slen && (s.[j] = '#' || s.[j] = '&') then
                 let rec parse_int acc k =
                   if k < slen && s.[k] >= '0' && s.[k] <= '9' then
                     parse_int
@@ -190,9 +190,42 @@ let misc_notes_link s i =
       else wlnone j
   else wlnone (i + 1)
 
+let end_pos link =
+  match link with
+  | WLpage (j, _, _, _, _)
+  | WLperson (j, _, _, _, _)
+  | WLwizard (j, _, _)
+  | WLimage (j, _, _, _)
+  | WLnone (j, _) ->
+      j
+
+let advances_pos link =
+  match link with
+  | WLperson _ | WLwizard _ -> true
+  | WLpage _ | WLimage _ | WLnone _ -> false
+
+let fold_links f acc s =
+  let slen = String.length s in
+  let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
+  let rec loop acc pos i =
+    if i >= slen then acc
+    else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
+      loop acc pos (i + 2)
+    else if s.[i] = '%' then loop acc pos (i + 1)
+    else
+      let link = misc_notes_link s i in
+      let acc = f ~pos link acc in
+      let pos = if advances_pos link then pos + 1 else pos in
+      loop acc pos (end_pos link)
+  in
+  loop acc 1 0
+
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in
   if list_nt = [] && list_ind = [] then db else (who, (list_nt, list_ind)) :: db
 
 let update_db base who list =
-  Driver.write_nldb base @@ add_in_db (Driver.read_nldb base) who list
+  let db = Driver.read_nldb base in
+  let old_entry = List.assoc_opt who db in
+  Driver.write_nldb base (add_in_db db who list);
+  old_entry
