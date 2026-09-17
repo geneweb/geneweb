@@ -1,5 +1,29 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+type merge_ind_job = { p1 : Gwdb.person; p2 : Gwdb.person }
+type merge_fam_job = { f1 : Gwdb.family; f2 : Gwdb.family }
+type merge_job = IndJob of merge_ind_job | FamJob of merge_fam_job
+type stuck_job = merge_job
+type merge_jobs = merge_job Stack.t
+type remaining_merge_jobs = merge_jobs
+
+type merge_result =
+  | Stuck of stuck_job * remaining_merge_jobs * Warning.base_warning list
+  | Finished of Warning.base_warning list
+
+type job_progression = {
+  stuck_job : merge_job option;
+  jobs : merge_jobs;
+  changes : bool;
+  warnings : Warning.base_warning list;
+}
+
+let empty_job_progression ?(jobs = Stack.create ()) () =
+  { stuck_job = None; changes = false; jobs; warnings = [] }
+
+let add_warning w job_progression =
+  { job_progression with warnings = w :: job_progression.warnings }
+
 let compatible_cdates cd1 cd2 =
   cd1 = cd2 || cd2 = Date.cdate_None || cd1 = Date.cdate_None
 
@@ -84,7 +108,7 @@ let compatible_fam fam1 fam2 =
   && compatible_divorces (Gwdb.get_divorce fam1) (Gwdb.get_divorce fam2)
   && compatible_strings (Gwdb.get_fsources fam1) (Gwdb.get_fsources fam2)
 
-let reparent_ind base (warning : Warning.base_warning -> unit) ip1 ip2 =
+let reparent_ind' base job_progression ip1 ip2 =
   let a1 = Gwdb.poi base ip1 in
   let a2 = Gwdb.poi base ip2 in
   match (Gwdb.get_parents a1, Gwdb.get_parents a2) with
@@ -97,7 +121,8 @@ let reparent_ind base (warning : Warning.base_warning -> unit) ip1 ip2 =
       replace 0;
       let a1 = { Def.parents = Some ifam; consang = Adef.fix (-1) } in
       Gwdb.patch_ascend base ip1 a1;
-      Gwdb.patch_descend base ifam des
+      Gwdb.patch_descend base ifam des;
+      job_progression
   | Some ifam, None -> (
       let fam = Gwdb.foi base ifam in
       let children = Gwdb.get_children fam in
@@ -105,12 +130,15 @@ let reparent_ind base (warning : Warning.base_warning -> unit) ip1 ip2 =
       | Some (b, a) ->
           let des = Gwdb.gen_descend_of_family fam in
           Gwdb.patch_descend base ifam des;
-          warning (ChangedOrderOfChildren (ifam, fam, b, a))
-      | None -> ())
-  | _ -> ()
+          add_warning (ChangedOrderOfChildren (ifam, fam, b, a)) job_progression
+      | None -> job_progression)
+  | _ -> job_progression
 
-let effective_merge_ind conf base (warning : Warning.base_warning -> unit) p1 p2
-    =
+let reparent_ind base ip1 ip2 =
+  let jp = reparent_ind' base (empty_job_progression ()) ip1 ip2 in
+  List.rev jp.warnings
+
+let effective_merge_ind conf base job_progression p1 p2 =
   let u2 = Gwdb.poi base (Gwdb.get_iper p2) in
   if Array.length (Gwdb.get_family u2) <> 0 then (
     for i = 0 to Array.length (Gwdb.get_family u2) - 1 do
@@ -162,7 +190,9 @@ let effective_merge_ind conf base (warning : Warning.base_warning -> unit) p1 p2
     }
   in
   Gwdb.patch_person base p1.key_index p1;
-  reparent_ind base warning p1.key_index (Gwdb.get_iper p2);
+  let job_progression =
+    reparent_ind' base job_progression p1.key_index (Gwdb.get_iper p2)
+  in
   UpdateIndOk.effective_del conf base p2;
   let s =
     let sl =
@@ -190,7 +220,8 @@ let effective_merge_ind conf base (warning : Warning.base_warning -> unit) p1 p2
     in
     String.concat " " (List.map (Gwdb.sou base) sl)
   in
-  Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s
+  Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s;
+  job_progression
 
 exception Error_loop of Gwdb.person
 exception Different_sexes of Gwdb.person * Gwdb.person
@@ -204,14 +235,6 @@ let check_ind base p1 p2 =
   else if Person.is_ancestor base p1 p2 then raise (Error_loop p2)
   else if Person.is_ancestor base p2 p1 then raise (Error_loop p1)
   else compatible_ind base p1 p2
-
-let merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind =
-  if check_ind base p1 p2 then (
-    effective_merge_ind conf base warning p1 p2;
-    (true, true))
-  else (
-    propose_merge_ind conf base branches p1 p2;
-    (false, changes_done))
 
 let effective_merge_fam conf base ifam1 fam1 fam2 =
   let des1 = fam1 in
@@ -252,70 +275,67 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
   Gwdb.patch_family base ifam1 fam1;
   Gwdb.patch_descend base ifam1 des1
 
-let merge_fam conf base branches ifam1 ifam2 fam1 fam2 ip1 ip2 changes_done
-    propose_merge_fam =
-  let p1 = Gwdb.poi base ip1 in
-  let p2 = Gwdb.poi base ip2 in
-  if compatible_fam fam1 fam2 then (
-    effective_merge_fam conf base ifam1 fam1 fam2;
-    (true, true))
-  else (
-    propose_merge_fam conf base branches (ifam1, fam1) (ifam2, fam2) p1 p2;
-    (false, changes_done))
+let push_fam_job base jobs ifam1 ifam2 =
+  let f1 = Gwdb.foi base ifam1 in
+  let f2 = Gwdb.foi base ifam2 in
+  Stack.push (FamJob { f1; f2 }) jobs;
+  let mother1 = Gwdb.poi base @@ Gwdb.get_mother f1 in
+  let mother2 = Gwdb.poi base @@ Gwdb.get_mother f2 in
+  Stack.push (IndJob { p1 = mother1; p2 = mother2 }) jobs;
+  let father1 = Gwdb.poi base @@ Gwdb.get_father f1 in
+  let father2 = Gwdb.poi base @@ Gwdb.get_father f2 in
+  Stack.push (IndJob { p1 = father1; p2 = father2 }) jobs
 
-let rec try_merge conf base warning branches ip1 ip2 changes_done
-    propose_merge_ind propose_merge_fam =
-  let p1 = Gwdb.poi base ip1 in
-  let p2 = Gwdb.poi base ip2 in
-  let ok_so_far = true in
-  let ok_so_far, changes_done =
-    match (Gwdb.get_parents p1, Gwdb.get_parents p2) with
-    | Some ifam1, Some ifam2 when ifam1 <> ifam2 ->
-        let branches = (ip1, ip2) :: branches in
-        let fam1 = Gwdb.foi base ifam1 in
-        let fam2 = Gwdb.foi base ifam2 in
-        let f1 = Gwdb.get_father fam1 in
-        let f2 = Gwdb.get_father fam2 in
-        let m1 = Gwdb.get_mother fam1 in
-        let m2 = Gwdb.get_mother fam2 in
-        let ok_so_far, changes_done =
-          if ok_so_far then
-            if f1 = f2 then (true, changes_done)
-            else
-              try_merge conf base ignore branches f1 f2 changes_done
-                propose_merge_ind propose_merge_fam
-          else (false, changes_done)
-        in
-        let ok_so_far, changes_done =
-          if ok_so_far then
-            if m1 = m2 then (true, changes_done)
-            else
-              try_merge conf base ignore branches m1 m2 changes_done
-                propose_merge_ind propose_merge_fam
-          else (false, changes_done)
-        in
-        let ok_so_far, changes_done =
-          if ok_so_far then
-            merge_fam conf base branches ifam1 ifam2 fam1 fam2 f1 m1
-              changes_done propose_merge_fam
-          else (false, changes_done)
-        in
-        (ok_so_far, changes_done)
-    | _ -> (ok_so_far, changes_done)
-  in
-  if ok_so_far then
-    merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind
-  else (false, changes_done)
+let try_merge_fam conf base job_progression f1 f2 =
+  if compatible_fam f1 f2 then (
+    effective_merge_fam conf base (Gwdb.get_ifam f1) f1 f2;
+    { job_progression with changes = true })
+  else { job_progression with stuck_job = Some (FamJob { f1; f2 }) }
 
-let merge conf base p1 p2 propose_merge_ind propose_merge_fam =
-  let rev_wl = ref [] in
-  let warning w = rev_wl := w :: !rev_wl in
-  let ok, changes_done =
-    try_merge conf base warning [] (Gwdb.get_iper p1) (Gwdb.get_iper p2) false
-      propose_merge_ind propose_merge_fam
-  in
-  if changes_done then Util.commit_patches conf base;
-  (if ok then
+let try_merge conf base job_progression p1 p2 =
+  match (Gwdb.get_parents p1, Gwdb.get_parents p2) with
+  | Some ifam1, Some ifam2 when not (Gwdb.eq_ifam ifam1 ifam2) ->
+      Stack.push (IndJob { p1; p2 }) job_progression.jobs;
+      push_fam_job base job_progression.jobs ifam1 ifam2;
+      job_progression
+  | _ when check_ind base p1 p2 ->
+      let job_progression =
+        effective_merge_ind conf base job_progression p1 p2
+      in
+      { job_progression with changes = true }
+  | _ -> { job_progression with stuck_job = Some (IndJob { p1; p2 }) }
+
+let same_person p1 p2 = Gwdb.eq_iper (Gwdb.get_iper p1) (Gwdb.get_iper p2)
+let same_family f1 f2 = Gwdb.eq_ifam (Gwdb.get_ifam f1) (Gwdb.get_ifam f2)
+
+let rec perform_jobs conf base job_progression =
+  match Stack.pop_opt job_progression.jobs with
+  | Some (IndJob { p1; p2 }) when not (same_person p1 p2) ->
+      let job_progression = try_merge conf base job_progression p1 p2 in
+      if Option.is_some job_progression.stuck_job then job_progression
+      else perform_jobs conf base job_progression
+  | Some (FamJob { f1; f2 }) when not (same_family f1 f2) ->
+      let job_progression = try_merge_fam conf base job_progression f1 f2 in
+      perform_jobs conf base job_progression
+  | Some (FamJob _) | Some (IndJob _) -> perform_jobs conf base job_progression
+  | None -> job_progression
+
+let perform_merge_job conf base p1 p2 =
+  let jobs = Stack.create () in
+  Stack.push (IndJob { p1; p2 }) jobs;
+  let job_progression = empty_job_progression ~jobs () in
+  perform_jobs conf base job_progression
+
+let merge_result_of_job_progression job_progression =
+  match job_progression with
+  | { stuck_job = Some job; jobs; warnings; _ } ->
+      Stuck (job, jobs, List.rev warnings)
+  | { stuck_job = None; warnings; _ } -> Finished (List.rev warnings)
+
+let merge conf base p1 p2 =
+  let job_progression = perform_merge_job conf base p1 p2 in
+  if job_progression.changes then Util.commit_patches conf base;
+  (if Option.is_none job_progression.stuck_job then
    let changed =
      let p1 = Gwdb.gen_person_of_person p1 in
      let p2 = Gwdb.gen_person_of_person p2 in
@@ -323,7 +343,7 @@ let merge conf base p1 p2 propose_merge_ind propose_merge_fam =
    in
    History.record conf base changed "fp");
   Update.delete_topological_sort conf base;
-  (ok, List.rev !rev_wl)
+  merge_result_of_job_progression job_progression
 
 (* Undocumented feature... Kill someone's ancestors *)
 
@@ -343,3 +363,11 @@ let rec kill_ancestors conf base included_self p nb_ind nb_fam =
   if included_self then (
     UpdateIndOk.effective_del conf base p;
     incr nb_ind)
+
+let person_pairs_of_jobs jobs =
+  List.rev
+  @@ Stack.fold
+       (fun acc -> function
+         | IndJob { p1; p2 } -> (Gwdb.get_iper p1, Gwdb.get_iper p2) :: acc
+         | FamJob _ -> acc)
+       [] jobs
