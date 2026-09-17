@@ -28,3 +28,6 @@ val kill_ancestors :
   int ref ->
   int ref ->
   unit
+
+val compatible_strings : Gwdb.istr -> Gwdb.istr -> bool
+val compatible_notes : Gwdb.base -> Gwdb.istr -> Gwdb.istr -> bool
