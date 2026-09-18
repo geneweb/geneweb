@@ -13,19 +13,13 @@
 
 (rule
  (package geneweb-rpc)
- (target rpc_client.bc.js.gz)
+ (targets rpc_client.bc.js.gz rpc_client.bc.js.br)
  (deps
   (:input ./rpc_client.bc.js))
  (action
-  (run gzip -9 -k -f %{input})))
-
-(rule
- (package geneweb-rpc)
- (target rpc_client.bc.js.br)
- (deps
-  (:input ./rpc_client.bc.js))
- (action
-  (run brotli -q 11 %{input})))
+  (concurrent
+   (run gzip -9 -k -f %{input})
+   (run brotli -q 11 %{input}))))
 
 (install
  (package geneweb-rpc)

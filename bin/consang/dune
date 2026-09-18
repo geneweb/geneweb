@@ -2,5 +2,8 @@
  (package geneweb)
  (name consang)
  (public_name consang)
+ (flags
+  (:standard
+   (:include ../flags.dune)))
  (modules consang)
  (libraries unix geneweb logs logs.fmt logs-syslog))

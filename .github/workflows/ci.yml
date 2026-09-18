@@ -1,4 +1,4 @@
-name: Geneweb CI
+name: GeneWeb CI
 on:
   workflow_dispatch:
     inputs:
@@ -25,7 +25,6 @@ on:
       - '.ocamlformat'
       - '.ocamlformat-ignore'
       - 'geneweb.iss'
-      - 'geneweb.opam.template'
   push:
     branches:
       - master
@@ -45,10 +44,8 @@ on:
       - '.ocamlformat'
       - '.ocamlformat-ignore'
       - 'geneweb.iss'
-      - 'geneweb.opam.template'
 
 env:
-  DUNE_PROFILE: "dev"
   OPAMYES: true
 
 jobs:

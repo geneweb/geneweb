@@ -1,209 +1,120 @@
-name: Geneweb Release
-
+name: GeneWeb Releases
 on:
   push:
-    tags:
-      - v*
-  workflow_dispatch:
-    inputs:
-      prerelease:
-        description: 'Pre-release'
-        required: false
-        type: boolean
-        default: true
-      tag_name:
-        description: 'Tag name'
-        required: true
-        type: string
 
 env:
   OPAMYES: true
+  TAG: ${{ github.ref_name }}
 
 jobs:
-  release:
+  build-dynamic:
     strategy:
-      fail-fast: false
       matrix:
-        include:
-          - os: macos-latest
-            ocaml-version: 5
-            platform: macos-arm64
-            is-unix: true
-          - os: macos-15-intel
-            ocaml-version: 5
-            platform: macos-intel
-            is-unix: true
-          - os: ubuntu-22.04
-            ocaml-version: 5
-            platform: linux
-            is-unix: true
-          - os: windows-latest
-            ocaml-version: 4.14.4
-            platform: windows
-            is-unix: false
+        os: [ubuntu-latest, ubuntu-26.04-arm, macos-latest, macos-intel, windows-latest]
 
     runs-on: ${{ matrix.os }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
 
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: ${{ matrix.ocaml-version }}
+          ocaml-compiler: 5
 
-      - name: Install dependencies
-        run: |
-          opam install . --deps-only
-          ${{ matrix.is-unix && 'opam install ancient' || '' }}
-
-      - name: Build Geneweb
-        run:
-          opam exec -- make distrib distrib-rpc
-
-      - name: Bundle runtime DLLs (Windows)
+      - name: Install Microsoft MSBuild
         if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          # x86_64 sysroot only: conf-gmp also installs the i686 GMP package
-          MINGW_BIN=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
-          for dll in libgmp-10.dll libpcre2-8-0.dll; do
-            if [ ! -f "$MINGW_BIN/$dll" ]; then
-              echo "::error::$dll not found in $MINGW_BIN"
-              find /usr -name "$dll" 2>/dev/null
-              exit 1
-            fi
-            cp -v "$MINGW_BIN/$dll" distribution/gw/
-          done
+        uses: microsoft/setup-msbuild@v3
 
-      - name: Verify bundled DLLs (Windows)
+      - name: Install WiX Toolset
         if: runner.os == 'Windows'
-        shell: bash
         run: |
-          cd distribution/gw
-          # Every DLL outside C:\Windows must be resolved from distribution/gw itself
-          BAD=$(for exe in *.exe; do ldd "$exe"; done \
-            | awk -v here="$(pwd)/" '$2 == "=>" && index($3, "/cygdrive/c/Windows/") != 1 && index($3, here) != 1 {print $1 " => " $3}' \
-            | sort -u)
-          if [ -n "$BAD" ]; then
-            echo "::error::DLLs not bundled in distribution/gw:"
-            echo "$BAD"
-            exit 1
-          fi
-          echo "✅ All non-system DLLs are bundled"
+          dotnet tool install --global wix --version 6.0.2
+          wix.exe extension add WixToolset.Util.wixext/6.0.2
+          wix.exe extension add WixToolset.UI.wixext/6.0.2
 
-      - name: Determine version
-        id: version
-        shell: bash
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            VERSION="${{ inputs.tag_name }}"
-          else
-            VERSION="${{ github.ref_name }}"
-          fi
-          VERSION="${VERSION#v}"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+      - name: Install GeneWeb dependencies
+        run: make deps
 
-      - name: Create macOS bundle and DMG
-        if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          echo "🍎 Creating macOS bundle and DMG..."
+      - name: Build GeneWeb bundle
+        run: opam exec -- make bundle
 
-          chmod +x create_bundle.sh create_dmg.sh
-
-          ./create_bundle.sh
-          ./create_dmg.sh
-
-          VERSION="${{ steps.version.outputs.version }}"
-          ARCH_SUFFIX="${{ matrix.platform == 'macos-arm64' && 'arm64' || 'intel' }}"
-
-          # Find and rename the DMG to match tag version (for consistency with ZIP archives)
-          CREATED_DMG=$(ls geneweb-*.dmg 2>/dev/null | head -1)
-
-          if [ -n "$CREATED_DMG" ]; then
-            DMG_NAME="geneweb-${VERSION}-macos-${ARCH_SUFFIX}.dmg"
-            mv "$CREATED_DMG" "${DMG_NAME}"
-            echo "DMG_NAME=${DMG_NAME}" >> $GITHUB_ENV
-            echo "✅ Renamed $CREATED_DMG → ${DMG_NAME}"
-            ls -lh "${DMG_NAME}"
-          else
-            echo "⚠️ No DMG found"
-            ls -la *.dmg 2>/dev/null || echo "No .dmg files in current directory"
-          fi
-
-      - name: Create release archive
-        shell: bash
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          VERSIONED_ARCHIVE="geneweb-${VERSION}-${{ matrix.platform }}.zip"
-
-          cd distribution
-          7z a -tzip -mx=9 -mfb=258 -mpass=15 "../${VERSIONED_ARCHIVE}" *
-          cd ..
-
-          echo "VERSIONED_ARCHIVE=${VERSIONED_ARCHIVE}" >> $GITHUB_ENV
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-
-      - name: Create Windows installer
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $VERSION = "${{ steps.version.outputs.version }}"
-
-          # InnoSetup is preinstalled on GitHub-hosted Windows runners
-          $ISCC = (Get-Command ISCC.exe -ErrorAction SilentlyContinue).Source
-          if (-not $ISCC) { $ISCC = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
-          if (-not (Test-Path $ISCC)) {
-            Write-Host "❌ ISCC.exe not found"
-            exit 1
-          }
-
-          # Compile installer
-          Write-Host "🔨 Building installer..."
-          & $ISCC "geneweb.iss" "/DMyVersion=$VERSION"
-
-          $INSTALLER_NAME = "geneweb-${VERSION}-windows-setup.exe"
-          if (Test-Path $INSTALLER_NAME) {
-            Write-Host "✅ Installer created: $INSTALLER_NAME"
-            echo "INSTALLER_NAME=$INSTALLER_NAME" >> $env:GITHUB_ENV
-          } else {
-            Write-Host "❌ Installer not found!"
-            exit 1
-          }
-
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
         with:
-          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
-          files: |
-            ${{ env.VERSIONED_ARCHIVE }}
-            ${{ env.DMG_NAME }}
-            ${{ env.INSTALLER_NAME }}
-          fail_on_unmatched_files: false
-          prerelease: ${{ (github.event_name == 'workflow_dispatch' && inputs.prerelease) || contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') || contains(github.ref_name, 'dev') }}
-          draft: false
-          name: "GeneWeb ${{ env.VERSION }}"
-          body: |
-            ${{ contains(env.VERSION, 'alpha') && '⚠️ **Alpha release** - Not for production use' || '' }}
-            ${{ contains(env.VERSION, 'beta') && '⚠️ **Beta release** - Testing recommended' || '' }}
-            ${{ contains(env.VERSION, 'rc') && '✅ **Release candidate** - Production ready pending final validation' || '' }}
+          name: geneweb-${{ runner.os }}-${{ runner.arch }}-${{ env.TAG }}-dynamic
+          path: geneweb-*-*-*-*.*
+          archive: false
 
-            ### Download
+  build-static:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-26.04-arm]
 
-            | Platform | ZIP Archive | Installer |
-            |----------|-------------|-----------|
-            | 🐧 Linux | [geneweb-${{ env.VERSION }}-linux.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-linux.zip) | - |
-            | 🍎 macOS (Apple Silicon) | [geneweb-${{ env.VERSION }}-macos-arm64.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.zip) | [geneweb-${{ env.VERSION }}-macos-arm64.dmg](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-arm64.dmg) |
-            | 🍎 macOS (Intel) | [geneweb-${{ env.VERSION }}-macos-intel.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.zip) | [geneweb-${{ env.VERSION }}-macos-intel.dmg](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-macos-intel.dmg) |
-            | 🪟 Windows | [geneweb-${{ env.VERSION }}-windows.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows.zip) | [geneweb-${{ env.VERSION }}-windows-setup.exe](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}/geneweb-${{ env.VERSION }}-windows-setup.exe) |
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-            ### Prerequisites (Unix ZIP archives only)
+      - name: Build GeneWeb artifact
+        run: make static
 
-            **Linux:** `sudo apt-get install libgmp10 libpcre2-dev`
-            **macOS**, use [Homebrew](https://brew.sh/): `brew install gmp pcre2`
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: geneweb-${{ runner.os }}-${{ runner.arch }}-${{ env.TAG }}-static
+          path: geneweb-*-*-*-*.*
+          archive: false
 
-            For more information, see the [documentation](https://geneweb.tuxfamily.org/wiki/GeneWeb).
+  opam-install:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Ocaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5
+
+      - name: Install geneweb-compat
+        run: opam install ./geneweb-compat.opam
+
+      - name: Install geneweb-win32
+        run: opam install ./geneweb-win32.opam
+
+      - name: Install geneweb-http
+        run: opam install ./geneweb-http.opam
+
+      - name: Install geneweb
+        run: opam install ./geneweb.opam
+
+      - name: Install geneweb-plugins
+        run: opam install ./geneweb-plugins.opam
+
+      - name: Install geneweb-rpc
+        run: opam install ./geneweb-rpc.opam
+
+      - name: Check binaries
+        run: opam exec -- gwd --check
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [build-dynamic, build-static, opam-install]
+    permissions:
+      contents: write
+
+    steps:
+      - name: Retrieve artifacts
+        uses: actions/download-artifact@v8
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - name: Publish release artifacts
+        uses: softprops/action-gh-release@v3
+        if: github.ref_type == 'tag'

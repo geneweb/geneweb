@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1
+# ================================================
+# STAGE 1: build static binaries
+# ================================================
+FROM ocaml/opam:alpine-ocaml-5.4 AS builder
+ARG TARGETARCH
+ARG TAG
+USER root
+
+RUN apk add \
+  bash \
+  brotli-dev \
+  build-base \
+  gmp-static \
+  m4 \
+  makeself@testing \
+  patchelf \
+  pcre2-static \
+  perl \
+  zstd-static
+
+USER opam
+WORKDIR /home/opam
+ENV OPAMYES=yes
+
+COPY --chown=opam:opam *.opam Makefile .
+RUN OPAM=opam-2.5 make deps
+
+COPY --chown=opam:opam . .
+ENV RUNNER_OS=linux
+ENV RUNNER_ARCH="$TARGETARCH"
+ENV TAG="$TAG"
+RUN opam-2.5 exec -- make bundle-static
+
+# ================================================
+# STAGE 2: export image
+# ================================================
+FROM scratch AS exporter
+
+COPY --from=builder /home/opam/geneweb-*.run /
