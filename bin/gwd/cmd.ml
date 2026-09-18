@@ -587,20 +587,35 @@ let parse_debug_flags =
   and+ check = check
   and+ verbosity = verbosity
   and+ predictable_mode = predictable_mode in
-  let debug = if check then true else debug in
-  let predictable_mode = if check then true else predictable_mode in
+  let debug = check || debug in
+  let predictable_mode = check || predictable_mode in
   (debug, check, verbosity, predictable_mode)
+
+let infer_cgi =
+  let open C.Term.Syntax in
+  C.Term.ret
+  @@
+  let+ force_cgi = cgi in
+  match Unix.getenv @@ C.Cmd.Env.info_var var_query_string with
+  | exception Not_found -> `Ok force_cgi
+  | _ ->
+      Fmt.epr
+        "gwd: CGI mode was enabled via the QUERY_STRING environment variable.\n\
+         This implicit behavior is deprecated. Use the `--cgi` option.@.";
+      `Ok true
 
 let parse_cgi_flags =
   let open C.Term.Syntax in
   C.Term.ret
   @@
-  let+ cgi = cgi and+ log = log in
-  match log with
-  | Stdout when cgi ->
+  let+ cgi = infer_cgi and+ log = log and+ daemon = daemon in
+  match (cgi, log, daemon) with
+  | true, Stdout, _ ->
       error
         "you cannot redirect the diagnostic output of the server into the \
          standard output in CGI mode"
+  | true, _, true | _, _, true ->
+      error "cannot activate daemon mode in CGI mode"
   | _ -> `Ok cgi
 
 let t =
