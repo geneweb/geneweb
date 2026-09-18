@@ -83,17 +83,6 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - name: Install Perl dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          curl -fsSL https://cpanmin.us | perl - --notest IPC::System::Simple String::ShellQuote
-          for pkg in conf-perl-ipc-system-simple conf-perl-string-shellquote; do
-            d=".pins/$pkg"; mkdir -p "$d"
-            printf 'opam-version: "2.0"\nsynopsis: "Pin bypass"\nmaintainer: "ci"\nbuild: ["true"]\ninstall: ["true"]\n' > "$d/opam"
-            opam pin add "$pkg" "$d" --yes --no-action
-          done
-
       - name: Update apt cache
         if: runner.os == 'Linux'
         run: sudo apt-get update -qq
