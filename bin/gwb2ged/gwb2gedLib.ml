@@ -461,11 +461,14 @@ let ged_pevent opts base per_sel evt =
   let src = Driver.sou base evt.epers_src in
   ged_ev_detail opts 2 typ date place note src;
   Array.iter
-    (fun (ip, wk) ->
+    (fun (ip, wk, wnote) ->
       if per_sel ip then (
         Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
         Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-        oc_witness_kind opts wk))
+        oc_witness_kind opts wk;
+        let wnote = Driver.sou base wnote in
+        if opts.Gwexport.no_notes <> `nnn && wnote <> "" then
+          display_note opts 3 wnote))
     evt.epers_witnesses
 
 let adop_fam_list = ref []
@@ -642,11 +645,14 @@ let ged_fevent opts base per_sel evt =
   let src = Driver.sou base evt.efam_src in
   ged_ev_detail opts 2 typ date place note src;
   Array.iter
-    (fun (ip, wk) ->
+    (fun (ip, wk, wnote) ->
       if per_sel ip then (
         Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
         Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-        oc_witness_kind opts wk))
+        oc_witness_kind opts wk;
+        let wnote = Driver.sou base wnote in
+        if opts.Gwexport.no_notes <> `nnn && wnote <> "" then
+          display_note opts 3 wnote))
     evt.efam_witnesses
 
 let ged_child opts per_sel chil =
