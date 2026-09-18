@@ -154,11 +154,11 @@ let rec compare_dmy_opt ?(strict = false) dmy1 dmy2 =
 
 and compare_month_or_day ~is_day strict dmy1 dmy2 =
   (* compare a known month|day with a unknown one (0) *)
-  let compare_with_unknown_value ~strict ~unknown ~known =
+  let compare_with_unknown_value ~strict ~unknown =
     match unknown.Adef.prec with
     | Adef.After -> Some 1
     | Before -> Some (-1)
-    | _other -> if strict then None else compare_prec false unknown known
+    | _other -> if strict then None else Some (-1)
   in
   (* if we are comparing months the next comparison to do is on days
       else if we are comparing days it is compare_prec *)
@@ -169,11 +169,10 @@ and compare_month_or_day ~is_day strict dmy1 dmy2 =
   (* 0 means month|day is unknow*)
   match (x, y) with
   | 0, 0 -> compare_prec strict dmy1 dmy2
-  | 0, _ -> compare_with_unknown_value ~strict ~unknown:dmy1 ~known:dmy2
+  | 0, _ -> compare_with_unknown_value ~strict ~unknown:dmy1
   | _, 0 ->
       (* swap dmy1 and dmy2 *)
-      Option.map Int.neg
-      @@ compare_with_unknown_value ~strict ~unknown:dmy2 ~known:dmy1
+      Option.map Int.neg @@ compare_with_unknown_value ~strict ~unknown:dmy2
   | m1, m2 -> (
       match Int.compare m1 m2 with
       | 0 -> next_comparison strict dmy1 dmy2
@@ -202,6 +201,15 @@ let compare_dmy dmy1 dmy2 =
   | None -> assert false
   | Some x -> x
 
+let compare_dmy_period d1 d2 =
+  let trunc d =
+    if d1.Adef.month = 0 || d2.Adef.month = 0 then
+      { d with Adef.month = 0; day = 0 }
+    else if d1.day = 0 || d2.day = 0 then { d with Adef.day = 0 }
+    else d
+  in
+  compare_dmy (trunc d1) (trunc d2)
+
 let compare_dmy_strict dmy1 dmy2 = compare_dmy_opt ~strict:true dmy1 dmy2
 
 let compare_date d1 d2 =
@@ -210,6 +218,11 @@ let compare_date d1 d2 =
   | Dgreg (_, _), Dtext _ -> 1
   | Dtext _, Dgreg (_, _) -> -1
   | Dtext _, Dtext _ -> 0
+
+let compare_date_period d1 d2 =
+  match (d1, d2) with
+  | Adef.Dgreg (dmy1, _), Adef.Dgreg (dmy2, _) -> compare_dmy_period dmy1 dmy2
+  | _ -> compare_date d1 d2
 
 let compare_date_strict d1 d2 =
   match (d1, d2) with

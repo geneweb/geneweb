@@ -20,8 +20,8 @@ let select (type a)
   let ref_date =
     match p_getint conf.env "by" with
     | Some by ->
-        let bm = Option.value ~default:(-1) (p_getint conf.env "bm") in
-        let bd = Option.value ~default:(-1) (p_getint conf.env "bd") in
+        let bm = Option.value ~default:0 (p_getint conf.env "bm") in
+        let bd = Option.value ~default:0 (p_getint conf.env "bd") in
         Some { Adef.day = bd; month = bm; year = by; prec = Sure; delta = 0 }
     | None -> None
   in
