@@ -21,7 +21,6 @@ env:
   OPAMYES: true
 
 jobs:
-  if: false
   check_formatting:
     name: Check formatting
     runs-on: ubuntu-latest

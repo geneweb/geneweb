@@ -12,7 +12,6 @@ permissions:
   contents: read
 
 jobs:
-  if: false
   build:
     strategy:
       max-parallel: 1

@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - v**
-
 env:
   OPAMYES: true
 
@@ -13,9 +12,7 @@ permissions:
   pages: write
   id-token: write
 
-
 jobs:
-  if: false
   build-and-deploy:
     runs-on: ubuntu-latest
     environment:
