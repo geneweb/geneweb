@@ -15,15 +15,43 @@ val update_notes_links_db :
   string ->
   unit
 
+val notes_bearing_text_of_person :
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper, _, Geneweb_db.Driver.istr) Def.gen_person ->
+  string
+(** The concatenation of every note-bearing field of a person - the exact text
+    scanned for outgoing [[fn/sn/oc/text]] links. Exposed so callers can capture
+    it before patching a person and pass it as [update_notes_links_person]'s
+    [?old_text] to skip a redundant nldb rewrite when nothing note-relevant
+    changed. *)
+
+val notes_bearing_text_of_family :
+  Geneweb_db.Driver.base ->
+  (_, Geneweb_db.Driver.ifam, Geneweb_db.Driver.istr) Def.gen_family ->
+  string
+(** Likewise for a family's note-bearing fields. *)
+
 val update_notes_links_person :
+  ?old_text:string ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, _, Geneweb_db.Driver.istr) Def.gen_person ->
   unit
+(** Re-scans a person's note-bearing fields into nldb. [update_db]/
+    [update_notes_links_db] always do a full read + linear scan + full rewrite
+    of the nldb file, however large it is - there is no partial update, so this
+    can be a real cost on a very large base if paid on every save regardless of
+    whether the edit touched notes at all. If [?old_text] is given (the person's
+    [notes_bearing_text_of_person] computed before the edit) and equals the
+    current text, the rewrite is skipped entirely. Omit it for a brand-new
+    person, or when there is no meaningful "old" text to compare against (e.g. a
+    merge). *)
 
 val update_notes_links_family :
+  ?old_text:string ->
   Geneweb_db.Driver.base ->
   (_, Geneweb_db.Driver.ifam, Geneweb_db.Driver.istr) Def.gen_family ->
   unit
+(** Likewise for a family - see [update_notes_links_person]. *)
 
 val file_path : Config.config -> Geneweb_db.Driver.base -> string -> string
 
@@ -35,12 +63,19 @@ val merge_possible_aliases :
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list ->
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list
 
+type display_name = { df_first_name : string; df_surname : string }
+(** The real, case-preserved (first name, surname) of a person, for building the
+    text written back into a note. Deliberately distinct from [Def.NLDB.key],
+    which is always lower-cased (comparison/cache key) and must never be used
+    for that purpose. *)
+
 val update_ind_key :
   Config.config ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
   Def.NLDB.key ->
   string * string * int ->
+  display_name ->
   unit
 
 val source :
@@ -117,6 +152,31 @@ val cache_linked_pages_name : string
 
 val update_cache_linked_pages :
   Config.config -> mode -> Def.NLDB.key -> Def.NLDB.key -> int -> unit
+
+val on_person_saved :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  old_key:Def.NLDB.key ->
+  ?old_text:string ->
+  pgl:(Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.istr )
+  Def.gen_person ->
+  unit
+(** [on_person_saved conf base ~old_key ?old_text ~pgl p], called right after
+    [Driver.patch_person] for a person that already existed before this save -
+    an ordinary edit (updateIndOk.ml, updateField.ml), NOT a brand-new person
+    (call [update_notes_links_person] directly for that) and NOT mergeIndOk.ml's
+    merge (which collapses two old keys into one new one and keeps its own
+    direct sequence for that reason): re-indexes [p]'s own note-bearing fields
+    into nldb (skipping that read-modify-write entirely when [?old_text] is
+    given and matches - see [update_notes_links_person]), then, if [p]'s key
+    differs from [old_key], rewrites every page in [pgl] (the pages that
+    referenced [old_key], as computed by the caller via [links_to_ind] for its
+    own "linked pages" display) to the new key/name and refreshes the
+    linked-pages count cache. This is the single place callers should go through
+    for this sequence instead of reimplementing it by hand. *)
 
 val json_extract_img : Config.config -> string -> string * string
 

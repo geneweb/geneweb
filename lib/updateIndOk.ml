@@ -1138,10 +1138,9 @@ let print_mod ?prerr o_conf base =
   let ofn = o_p.first_name in
   let osn = o_p.surname in
   let oocc = o_p.occ in
-  let old_key =
-    Util.make_key base
-      (Driver.gen_person_of_person (Driver.poi base o_p.key_index))
-  in
+  let old_p = Driver.gen_person_of_person (Driver.poi base o_p.key_index) in
+  let old_key = Util.make_key base old_p in
+  let old_text = Notes.notes_bearing_text_of_person base old_p in
   let conf = Update.update_conf o_conf in
   let pgl =
     let db = Driver.read_nldb base in
@@ -1154,12 +1153,7 @@ let print_mod ?prerr o_conf base =
     let op = Driver.poi base p.key_index in
     let u = { family = Driver.get_family op } in
     Driver.patch_person base p.key_index p;
-    let new_key = Util.make_key base p in
-    if old_key <> new_key then (
-      (* Needs the updates in this order in case of self-reference *)
-      Notes.update_notes_links_person base p;
-      Notes.update_ind_key conf base pgl old_key new_key;
-      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0);
+    Notes.on_person_saved conf base ~old_key ~old_text ~pgl p;
     let wl =
       let a = Driver.poi base p.key_index in
       let a =

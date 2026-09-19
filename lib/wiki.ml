@@ -303,7 +303,14 @@ let syntax_links conf wi s =
       Buffer.add_char buff '\'';
       loop quot_lev pos (i + 1))
     else
-      match NotesLinks.misc_notes_link s i with
+      let link = NotesLinks.misc_notes_link s i in
+      (* [pos] numbers WLperson/WLwizard occurrences and must stay in sync
+         with the same counter maintained incrementally in
+         [Notes.update_notes_links_db] and rebuilt in bin/update_nldb (see
+         [NotesLinks.advances_pos] for the shared rule) - #p_%d anchors
+         rendered below must match the lnPos values stored there. *)
+      let next_pos = if NotesLinks.advances_pos link then pos + 1 else pos in
+      match link with
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->
           let text = bold_italic_syntax text in
           let fpath, fname =
@@ -326,7 +333,7 @@ let syntax_links conf wi s =
                 (encode wi.wi_mode) (encode fname) anchor c text
           in
           Buffer.add_string buff t;
-          loop quot_lev pos j
+          loop quot_lev next_pos j
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _, _) ->
           let name =
             if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
@@ -364,7 +371,7 @@ let syntax_links conf wi s =
                 (if conf.hide_names then Util.private_txt conf "" else name)
           in
           Buffer.add_string buff t;
-          loop quot_lev (pos + 1) j
+          loop quot_lev next_pos j
       | NotesLinks.WLwizard (j, wiz, name) ->
           let name = bold_italic_syntax name in
           let t =
@@ -376,7 +383,7 @@ let syntax_links conf wi s =
                 (encode wiz) s
           in
           Buffer.add_string buff t;
-          loop quot_lev (pos + 1) j
+          loop quot_lev next_pos j
       | NotesLinks.WLimage (j, (dirs, file), alt, width_opt) ->
           (* Build the path for the ?s= parameter by joining dirs and file
              with '/' (the ':' directory separator is already split by
@@ -395,10 +402,10 @@ let syntax_links conf wi s =
               (escape alt) style
           in
           Buffer.add_string buff t;
-          loop quot_lev pos j
+          loop quot_lev next_pos j
       | NotesLinks.WLnone (j, none_s) ->
           Buffer.add_string buff none_s;
-          loop quot_lev pos j
+          loop quot_lev next_pos j
   in
   loop Zero 1 0;
   Buffer.contents buff
