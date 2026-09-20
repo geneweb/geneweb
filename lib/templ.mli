@@ -5,6 +5,7 @@ type _ vother
 type 'a env = (string * 'a) list
 
 type ('a, 'b) interp_fun = {
+  output : string -> unit;
   eval_var :
     'a env -> 'b -> TemplAst.loc -> string list -> 'b TemplAst.expr_val;
   eval_transl : 'a env -> bool -> string -> string -> string;
@@ -25,7 +26,8 @@ type ('a, 'b) interp_fun = {
     unit;
 }
 
-val include_hed_trl : Config.config -> string -> unit
+val include_hed_trl :
+  ?output:(string -> unit) -> Config.config -> string -> unit
 
 val interp_ast :
   Config.config ->
