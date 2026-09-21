@@ -216,8 +216,8 @@ let print_base_warning oc base (w : Warning.base_warning) =
       let fath = Gwdb.get_father f in
       let moth = Gwdb.get_mother f in
       let curr, hom =
-        if Gwdb.eq_iper fath (Gwdb.get_iper p) then (moth, fath)
-        else (fath, moth)
+        if Gwdb.eq_iper fath (Gwdb.get_iper p) then (fath, moth)
+        else (moth, fath)
       in
       Printf.fprintf oc
         "possible duplicate families: %s and %s, %s has unions with several \
@@ -225,6 +225,20 @@ let print_base_warning oc base (w : Warning.base_warning) =
         (Gwdb.string_of_ifam f1) (Gwdb.string_of_ifam f2)
         (designation base (Gwdb.poi base curr))
         (designation base (Gwdb.poi base hom))
+  | PossibleDuplicateFamQuestString (f1, f2, p) ->
+      let f = Gwdb.foi base f1 in
+      let fath = Gwdb.get_father f in
+      let moth = Gwdb.get_mother f in
+      let curr, named =
+        if Gwdb.eq_iper fath (Gwdb.get_iper p) then (fath, moth)
+        else (moth, fath)
+      in
+      Printf.fprintf oc
+        "possible duplicate families: %s and %s, %s has a union with a person \
+         named %s and a person named ? ?\n"
+        (Gwdb.string_of_ifam f1) (Gwdb.string_of_ifam f2)
+        (designation base (Gwdb.poi base curr))
+        (designation base (Gwdb.poi base named))
   | PEventOrder (p, e1, e2) ->
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_epers_name base (get_pevent_name e1))
