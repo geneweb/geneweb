@@ -204,7 +204,7 @@ let advances_pos link =
   | WLperson _ | WLwizard _ -> true
   | WLpage _ | WLimage _ | WLnone _ -> false
 
-let fold_links f acc s =
+let fold_links ?(skip_braces = true) f acc s =
   let slen = String.length s in
   let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
   let rec brace_end j =
@@ -218,7 +218,7 @@ let fold_links f acc s =
     else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
       loop acc pos (i + 2)
     else if s.[i] = '%' then loop acc pos (i + 1)
-    else if s.[i] = '{' then
+    else if skip_braces && s.[i] = '{' then
       loop acc pos (Option.value ~default:(i + 1) (brace_end (i + 1)))
     else
       let link = misc_notes_link s i in

@@ -299,8 +299,11 @@ let safe_gallery conf base s =
   Yojson.Basic.to_string json
 
 let update_notes_links_db base fnotes s =
+  let skip_braces =
+    not (Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album")
+  in
   let list_nt, list_ind =
-    NotesLinks.fold_links
+    NotesLinks.fold_links ~skip_braces
       (fun ~pos link (list_nt, list_ind) ->
         match link with
         | NotesLinks.WLpage (_, _, lfname, _, _) ->
