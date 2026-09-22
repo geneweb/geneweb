@@ -40,7 +40,7 @@ let parse_cmd () =
 
 let notes_links s =
   NotesLinks.fold_links
-    (fun ~pos ~i:_ ~j:_ link (list_nt, list_ind) ->
+    (fun ~pos link (list_nt, list_ind) ->
       match link with
       | NotesLinks.WLpage (_, _, lfname, _, _) ->
           let list_nt =
@@ -51,14 +51,10 @@ let notes_links s =
           let link =
             { NLDB.lnTxt = text; lnPos = pos; lnFamMarker = fam_marker }
           in
-          let fn, sn, oc = key in
-          Printf.eprintf
-            "DEBUG update_nldb notes_links: lnPos=%d key=(%s,%s,%d)\n%!" pos fn
-            sn oc;
           (list_nt, (key, link) :: list_ind)
       | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
           (list_nt, list_ind))
-    ([], []) s 0
+    ([], []) s
 
 type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 
@@ -86,10 +82,18 @@ let compute base bdir =
   Printf.eprintf "--- database notes\n";
   flush stderr;
   let list = notes_links (Driver.base_notes_read base "") in
-  (if list = ([], []) then ()
-   else
-     let pg = NLDB.PgNotes in
-     db := NotesLinks.add_in_db !db pg list);
+  (match list with
+  | [], [] -> ()
+  | _list_nt, list_ind ->
+      let pg = NLDB.PgNotes in
+      db := NotesLinks.add_in_db !db pg list;
+      let list_ind =
+        List.fold_left
+          (fun acc (key, l) ->
+            if List.mem_assoc key acc then acc else (key, l) :: acc)
+          [] list_ind
+      in
+      List.iter (fun (key, _) -> update_cache_linked_pages key) list_ind);
 
   Printf.eprintf "--- wizard notes\n";
   flush stderr;

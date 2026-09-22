@@ -228,21 +228,21 @@ let conflicting base ip sp =
   | None -> false
 
 let commit conf base o_p ip sp =
-  let old_key =
-    Util.make_key base (Driver.gen_person_of_person (Driver.poi base ip))
-  in
+  let old_p = Driver.gen_person_of_person (Driver.poi base ip) in
+  let old_key = Util.make_key base old_p in
+  let old_text = Notes.notes_bearing_text_of_person base old_p in
   let p =
     UpdateIndOk.effective_mod ~skip_conflict:ip
       ~prerr:(fun _ _ err -> raise (Update.ModErr err))
       conf base sp
   in
   Driver.patch_person base p.key_index p;
-  let pgl =
+  let pgl () =
     let db = Driver.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     Notes.links_to_ind conf base db old_key None
   in
-  Notes.on_person_saved conf base ~old_key ~pgl p;
+  Notes.on_person_saved conf base ~old_key ~old_text ~pgl p;
   Util.commit_patches conf base;
   let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
   History.record conf base changed "mp";
@@ -409,16 +409,15 @@ let sent_fam_field conf =
 
 let commit_fam conf base ip sfam scpl sdes =
   let ifam = sfam.fam_index in
-  let o_f =
-    Util.string_gen_family base
-      (Driver.gen_family_of_family (Driver.foi base ifam))
-  in
+  let old_fam = Driver.gen_family_of_family (Driver.foi base ifam) in
+  let o_f = Util.string_gen_family base old_fam in
+  let old_text = Notes.notes_bearing_text_of_family base old_fam in
   let _ifam, fam, cpl, des =
     UpdateFamOk.effective_mod conf base false sfam scpl sdes
   in
   UpdateFamOk.patch_parent_with_pevents base cpl;
   UpdateFamOk.patch_children_with_pevents base des;
-  Notes.update_notes_links_family base fam;
+  Notes.update_notes_links_family ~old_text base fam;
   Util.commit_patches conf base;
   let p =
     Util.string_gen_person base

@@ -304,11 +304,6 @@ let syntax_links conf wi s =
       loop quot_lev pos (i + 1))
     else
       let link = NotesLinks.misc_notes_link s i in
-      (* [pos] numbers WLperson/WLwizard occurrences and must stay in sync
-         with the same counter maintained incrementally in
-         [Notes.update_notes_links_db] and rebuilt in bin/update_nldb (see
-         [NotesLinks.advances_pos] for the shared rule) - #p_%d anchors
-         rendered below must match the lnPos values stored there. *)
       let next_pos = if NotesLinks.advances_pos link then pos + 1 else pos in
       match link with
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->

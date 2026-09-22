@@ -174,7 +174,7 @@ let misc_notes_link s i =
             let fn = Name.lower fn in
             let sn = Name.lower sn in
             let j, fam_marker =
-              if j < slen && s.[j] = '#' then
+              if j < slen && (s.[j] = '#' || s.[j] = '&') then
                 let rec parse_int acc k =
                   if k < slen && s.[k] >= '0' && s.[k] <= '9' then
                     parse_int
@@ -190,9 +190,8 @@ let misc_notes_link s i =
       else wlnone j
   else wlnone (i + 1)
 
-(* End position (the [j] every constructor carries) of a [wiki_link], for
-   callers that just want to continue scanning past it. *)
-let end_pos = function
+let end_pos link =
+  match link with
   | WLpage (j, _, _, _, _)
   | WLperson (j, _, _, _, _)
   | WLwizard (j, _, _)
@@ -200,47 +199,34 @@ let end_pos = function
   | WLnone (j, _) ->
       j
 
-(* Whether an occurrence consumes a slot in the shared "pos" counter used
-   both to number the #p_N anchors rendered for person links (see
-   [Wiki.syntax_links]) and to record [Def.NLDB.ind.lnPos] when a note is
-   scanned for its outgoing links (see [Notes.update_notes_links_db] and
-   bin/update_nldb). WLperson and WLwizard both consume a slot - only
-   WLperson's slot is ever rendered as an anchor, but WLwizard must still
-   advance the counter so later WLperson positions stay numbered the same
-   whether the note is scanned incrementally or rebuilt from scratch.
-   This is the ONLY place that should decide this: every caller that
-   numbers occurrences must go through this function (or [fold_links]
-   below) rather than re-deciding it, or the numbering can silently
-   desync between rendering and indexing. *)
-let advances_pos = function
+let advances_pos link =
+  match link with
   | WLperson _ | WLwizard _ -> true
   | WLpage _ | WLimage _ | WLnone _ -> false
 
-(* Walk [s] from [i0], calling [f ~pos ~i ~j link acc] for every
-   occurrence [misc_notes_link] finds (skipping "%%"-escaped positions),
-   maintaining [pos] per [advances_pos]. [f] sees [pos] *before* any
-   increment for the current occurrence, matching what
-   [Wiki.syntax_links] uses for its #p_%d anchors. This is the single
-   scanning loop shared by [Notes.update_notes_links_db] and
-   bin/update_nldb's batch rebuild, so they can no longer drift apart on
-   the numbering rule the way they did before (see [advances_pos]).
-   [Wiki.syntax_links] itself has extra scanning rules (bold/italic
-   markup, '{...}' spans, quotes) that aren't part of link-scanning, so
-   it cannot go through this loop - it instead calls [advances_pos]
-   directly to stay in sync. *)
-let fold_links f acc s i0 =
+let fold_links f acc s =
   let slen = String.length s in
+  let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
+  let rec brace_end j =
+    if j >= slen then None
+    else if j + 1 < slen && s.[j] = '%' then brace_end (j + 2)
+    else if s.[j] = '}' then Some (j + 1)
+    else brace_end (j + 1)
+  in
   let rec loop acc pos i =
     if i >= slen then acc
-    else if i + 1 < slen && s.[i] = '%' then loop acc pos (i + 2)
+    else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
+      loop acc pos (i + 2)
+    else if s.[i] = '%' then loop acc pos (i + 1)
+    else if s.[i] = '{' then
+      loop acc pos (Option.value ~default:(i + 1) (brace_end (i + 1)))
     else
       let link = misc_notes_link s i in
-      let j = end_pos link in
-      let acc = f ~pos ~i ~j link acc in
+      let acc = f ~pos link acc in
       let pos = if advances_pos link then pos + 1 else pos in
-      loop acc pos j
+      loop acc pos (end_pos link)
   in
-  loop acc 1 i0
+  loop acc 1 0
 
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in

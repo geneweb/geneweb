@@ -575,29 +575,15 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   redirect_added_families base p o_p2.key_index p2_family;
   UpdateIndOk.effective_del_no_commit base o_p2;
   Driver.patch_person base p.key_index p;
-  (* p's notes just merged in text from both o_p1 and o_p2 (see
-     [reconstitute]'s merge_field for notes/birth_note/etc.), so it may
-     now carry [[fn/sn/oc/text]] links that were never scanned under
-     p's own PgInd key - re-index unconditionally (same requirement as
-     [Notes.on_person_saved], which updateIndOk.ml/updateField.ml go
-     through - this merge doesn't fit that function's single-old-key
-     shape, so it keeps its own direct call here), and before
-     update_ind_key below in case of self-reference. *)
   Notes.update_notes_links_person base p;
   let new_key =
     (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
   in
-  let new_name : Notes.display_name =
-    {
-      df_first_name = Driver.sou base p.first_name;
-      df_surname = Driver.sou base p.surname;
-    }
-  in
   if
     (not (String.equal ofn1 sp.first_name && String.equal osn1 sp.surname))
     || oocc1 <> sp.occ
-  then Notes.update_ind_key conf base pgl1 key1 new_key new_name;
-  Notes.update_ind_key conf base pgl2 key2 new_key new_name;
+  then Notes.update_ind_key conf base pgl1 key1 new_key;
+  Notes.update_ind_key conf base pgl2 key2 new_key;
   let u = { family = Array.append p_family p2_family } in
   if p2_family <> [||] then Driver.patch_union base p.key_index u;
   Consang.check_noloop_for_person_list base
@@ -615,6 +601,9 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
     (U_Merge_person (o_p1, o_p2, Util.string_gen_person base p))
     "fp";
   Notes.update_notes_links_db base (Def.NLDB.PgInd o_p2.key_index) "";
-  (* TODO update_cache_linked_pages *)
+  let lkey = Util.make_key base p in
+  Notes.update_cache_linked_pages conf Notes.Delete key2 key2 0;
+  Notes.update_cache_linked_pages conf Notes.Merge key1 lkey
+    (Notes.count_linked_pages base lkey);
   Update.delete_topological_sort conf base;
   print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2

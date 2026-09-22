@@ -257,12 +257,6 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
           (scpl, sdes, None)
       in
       Util.commit_patches conf base;
-      (* fam may have just absorbed ifam2's comment/fsources/etc. via the
-         merge form, which can carry [[fn/sn/oc/text]] links never
-         scanned under fam's own PgFam key.
-         [Notes.update_notes_links_family] already does exactly the
-         field-concatenation this used to reimplement by hand - use it
-         instead of duplicating it. *)
       Notes.update_notes_links_family base fam;
       (* TODO update_cache_linked_pages *)
       let changed =

@@ -301,7 +301,7 @@ let safe_gallery conf base s =
 let update_notes_links_db base fnotes s =
   let list_nt, list_ind =
     NotesLinks.fold_links
-      (fun ~pos ~i:_ ~j:_ link (list_nt, list_ind) ->
+      (fun ~pos link (list_nt, list_ind) ->
         match link with
         | NotesLinks.WLpage (_, _, lfname, _, _) ->
             let list_nt =
@@ -316,60 +316,66 @@ let update_notes_links_db base fnotes s =
                 Def.NLDB.lnFamMarker = fam_marker;
               }
             in
-            let fn, sn, oc = key in
-            Printf.eprintf
-              "DEBUG update_notes_links_db: lnPos=%d key=(%s,%s,%d)\n%!" pos fn
-              sn oc;
             (list_nt, (key, link) :: list_ind)
         | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
             (list_nt, list_ind))
-      ([], []) s 0
+      ([], []) s
   in
   NotesLinks.update_db base fnotes (list_nt, list_ind)
 
-let update_notes_links_person base (p : _ Def.gen_person) =
-  let s =
-    let sl =
-      [
-        p.notes;
-        p.occupation;
-        p.birth_note;
-        p.birth_src;
-        p.baptism_note;
-        p.baptism_src;
-        p.death_note;
-        p.death_src;
-        p.burial_note;
-        p.burial_src;
-        p.psources;
-      ]
-    in
-    let sl =
-      let rec loop l accu =
-        match l with
-        | [] -> accu
-        | evt :: l -> loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
-      in
-      loop p.pevents sl
-    in
-    String.concat " " (List.map (Driver.sou base) sl)
+let notes_bearing_text_of_person base (p : _ Def.gen_person) =
+  let sl =
+    [
+      p.notes;
+      p.occupation;
+      p.birth_note;
+      p.birth_src;
+      p.baptism_note;
+      p.baptism_src;
+      p.death_note;
+      p.death_src;
+      p.burial_note;
+      p.burial_src;
+      p.psources;
+    ]
   in
-  update_notes_links_db base (Def.NLDB.PgInd p.Def.key_index) s
+  let sl =
+    let rec loop l accu =
+      match l with
+      | [] -> accu
+      | evt :: l -> loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
+    in
+    loop p.pevents sl
+  in
+  String.concat " " (List.map (Driver.sou base) sl)
 
-let update_notes_links_family base (f : _ Def.gen_family) =
-  let s =
-    let sl = [ f.marriage_note; f.marriage_src; f.comment; f.fsources ] in
-    let sl =
-      let rec loop l accu =
-        match l with
-        | [] -> accu
-        | evt :: l -> loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
-      in
-      loop f.fevents sl
+let notes_bearing_text_of_family base (f : _ Def.gen_family) =
+  let sl = [ f.marriage_note; f.marriage_src; f.comment; f.fsources ] in
+  let sl =
+    let rec loop l accu =
+      match l with
+      | [] -> accu
+      | evt :: l -> loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
     in
-    String.concat " " (List.map (Driver.sou base) sl)
+    loop f.fevents sl
   in
-  update_notes_links_db base (Def.NLDB.PgFam f.Def.fam_index) s
+  String.concat " " (List.map (Driver.sou base) sl)
+
+let has_links s = Mutil.contains s "[["
+
+let update_notes_links_person ?old_text base (p : _ Def.gen_person) =
+  let s = notes_bearing_text_of_person base p in
+  match old_text with
+  | Some t when String.equal t s || not (has_links t || has_links s) -> ()
+  | Some _ | None ->
+      update_notes_links_db base (Def.NLDB.PgInd p.Def.key_index) s
+
+let update_notes_links_family ?old_text base (f : _ Def.gen_family) =
+  let s = notes_bearing_text_of_family base f in
+  match old_text with
+  | Some t when String.equal t s || not (has_links t || has_links s) -> ()
+  | Some _ | None ->
+      update_notes_links_db base (Def.NLDB.PgFam f.Def.fam_index) s
 
 let commit_notes conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
@@ -404,10 +410,10 @@ let replace olds news str =
   let olds_l = Name.lower olds in
   let olds_u1 = Utf8.capitalize_fst olds_l in
   let olds_u2 = Utf8.uppercase olds_l in
-  let regexp =
-    Str.regexp (olds ^ "\\|" ^ olds_l ^ "\\|" ^ olds_u1 ^ "\\|" ^ olds_u2)
-  in
-  Str.global_replace regexp news str
+  (* Names are data: match and substitute them literally. *)
+  let alts = List.map Str.quote [ olds; olds_l; olds_u1; olds_u2 ] in
+  let regexp = Str.regexp (String.concat "\\|" alts) in
+  Str.global_substitute regexp (fun _ -> news) str
 
 (*
 TITLE=Test imap
@@ -465,14 +471,18 @@ let json_gallery_items_for_key conf s key =
       | _ -> process [ `Assoc l ])
   | _ -> []
 
-let replace_person person_json (new_fn, new_sn, new_oc) =
+let replace_person person_json (old_fn, old_sn, _old_oc) (new_fn, new_sn, new_oc)
+    =
+  let old_name = Name.lower (old_fn ^ " " ^ old_sn) in
   `Assoc
     (List.map
        (function
          | "fn", _ -> ("fn", `String new_fn)
          | "sn", _ -> ("sn", `String new_sn)
          | "oc", _ -> ("oc", `String (string_of_int new_oc))
-         | key, value -> (* Preserve any other fields *) (key, value))
+         | "alt", `String s when String.equal (Name.lower s) old_name ->
+             ("alt", `String (new_fn ^ " " ^ new_sn))
+         | key, value -> (key, value))
        (Yojson.Basic.Util.to_assoc person_json))
 
 (* Processes the map to replace target person
@@ -482,7 +492,8 @@ let update_map json oldk newk =
     List.map
       (fun person_json ->
         let current_person = extract_pnoc person_json |> lower_key in
-        if current_person = lower_key oldk then replace_person person_json newk
+        if current_person = lower_key oldk then
+          replace_person person_json oldk newk
         else person_json)
       lmap
   in
@@ -527,18 +538,7 @@ let update_gallery s oldk newk =
       let updated_json = update_map json oldk newk in
       title_part ^ Yojson.Basic.pretty_to_string updated_json ^ "\n"
 
-(* [oldk]/[newk] are [Def.NLDB.key] triples: they are always lower-cased
-   (see [Util.make_key]), because they double as Hashtbl keys
-   (cache_linked_pages) and are compared against the lower-cased key that
-   [NotesLinks.misc_notes_link] parses out of [[fn/sn/oc/text]] links.
-   [display_name] is deliberately a different type: the real,
-   case-preserved (first name, surname) of a person, for building the
-   text written back into a note. Never use a [Def.NLDB.key]'s fn/sn for
-   that - doing so is what previously turned the surname (and first
-   name) lowercase after a rename. *)
-type display_name = { df_first_name : string; df_surname : string }
-
-let rewrite_key s oldk newk new_name _file =
+let rewrite_key s oldk newk _file =
   let s =
     if Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album" then
       update_gallery s oldk newk
@@ -557,8 +557,7 @@ let rewrite_key s oldk newk new_name _file =
           rebuild (rs ^ ss) j
       | WLperson (j, k, name, text, fam_marker) ->
           if Def.NLDB.equal_key k oldk then
-            let _, _, oc = newk in
-            let { df_first_name = fn; df_surname = sn } = new_name in
+            let fn, sn, oc = newk in
             let ofn, osn, _ooc = oldk in
             let name =
               match name with
@@ -567,7 +566,7 @@ let rewrite_key s oldk newk new_name _file =
             in
             let fam_suffix =
               match fam_marker with
-              | Some n -> "&" ^ string_of_int n
+              | Some n -> "#" ^ string_of_int n
               | None -> ""
             in
             let ss =
@@ -586,16 +585,16 @@ let rewrite_key s oldk newk new_name _file =
   in
   rebuild "" 0
 
-let replace_ind_key_in_str base is oldk newk new_name p =
+let replace_ind_key_in_str base is oldk newk p =
   let s = Driver.sou base is in
   let design = Gutil.designation base p in
-  let s' = rewrite_key s oldk newk new_name design in
+  let s' = rewrite_key s oldk newk design in
   Driver.insert_string base s'
 
-let update_ind_key_pgind base p oldk newk new_name =
+let update_ind_key_pgind base p oldk newk =
   let oldp = Driver.gen_person_of_person @@ Driver.poi base p in
   let replace is =
-    replace_ind_key_in_str base is oldk newk new_name (Driver.poi base p)
+    replace_ind_key_in_str base is oldk newk (Driver.poi base p)
   in
   let notes = replace oldp.notes in
   let occupation = replace oldp.occupation in
@@ -638,7 +637,7 @@ let update_ind_key_pgind base p oldk newk new_name =
   Driver.patch_person base p newp;
   update_notes_links_person base newp
 
-let update_ind_key_pgfam base f oldk newk new_name =
+let update_ind_key_pgfam base f oldk newk =
   let oldf = Driver.gen_family_of_family @@ Driver.foi base f in
   let cpl = Driver.foi base f in
   let fath = Driver.poi base (Driver.get_father cpl) in
@@ -646,7 +645,7 @@ let update_ind_key_pgfam base f oldk newk new_name =
   let _family =
     Gutil.designation base fath ^ " x " ^ Gutil.designation base moth
   in
-  let replace is = replace_ind_key_in_str base is oldk newk new_name fath in
+  let replace is = replace_ind_key_in_str base is oldk newk fath in
   let marriage_note = replace oldf.marriage_note in
   let marriage_src = replace oldf.marriage_src in
   let comment = replace oldf.comment in
@@ -667,27 +666,27 @@ let update_ind_key_pgfam base f oldk newk new_name =
   Driver.patch_family base f newf;
   update_notes_links_family base newf
 
-let update_ind_key_pgmisc conf base f oldk newk new_name =
+let update_ind_key_pgmisc conf base f oldk newk =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_notes_read base fname in
-  let newn = rewrite_key oldn oldk newk new_name f in
+  let newn = rewrite_key oldn oldk newk f in
   commit_notes conf base f newn
 
-let update_ind_key_pgwiz conf base f oldk newk new_name =
+let update_ind_key_pgwiz conf base f oldk newk =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_wiznotes_read base fname in
-  let newn = rewrite_key oldn oldk newk new_name f in
+  let newn = rewrite_key oldn oldk newk f in
   commit_wiznotes conf base f newn
 
-let update_ind_key conf base link_pages oldk newk new_name =
+let update_ind_key conf base link_pages oldk newk =
   Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
   List.iter
     (function
-      | Def.NLDB.PgInd p -> update_ind_key_pgind base p oldk newk new_name
-      | PgFam f -> update_ind_key_pgfam base f oldk newk new_name
-      | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk new_name
-      | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk new_name
-      | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk new_name)
+      | Def.NLDB.PgInd p -> update_ind_key_pgind base p oldk newk
+      | PgFam f -> update_ind_key_pgfam base f oldk newk
+      | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
+      | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk
+      | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk)
     link_pages
 
 let wiki_aux pp conf base env str =
@@ -789,13 +788,12 @@ let read_cache_linked_pages conf =
   let fname = get_linked_pages_fname conf in
   match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
   | Some ic ->
-      let ht : cache_linked_pages_t = input_value ic in
-      close_in ic;
-      ht
+      Fun.protect
+        ~finally:(fun () -> close_in ic)
+        (fun () -> Some (input_value ic : cache_linked_pages_t))
   | None ->
       Printf.eprintf "%s not exist. Run update_nldb\n" fname;
-      let ht : cache_linked_pages_t = Hashtbl.create 10 in
-      ht
+      None
 
 (* sync with update_nldb.ml if this changes *)
 let write_cache_linked_pages conf cache_linked_pages =
@@ -805,32 +803,19 @@ let write_cache_linked_pages conf cache_linked_pages =
   close_out oc
 
 let update_cache_linked_pages conf mode old_key new_key nbr =
-  let ht = read_cache_linked_pages conf in
-  (match mode with
-  | Delete -> Hashtbl.remove ht old_key
-  | Merge ->
-      (* [nbr] here is trusted: every current caller (see mergeInd.ml)
-         computes it fresh from the just-updated nldb before calling
-         this. Drop any stale entry under [old_key] (when it differs
-         from [new_key]) and set the correct, current count. *)
-      if old_key <> new_key then Hashtbl.remove ht old_key;
-      Hashtbl.replace ht new_key nbr
-  | Rename -> (
-      (* The number of pages linking to this person doesn't change on a
-         pure rename - only the key does - so reuse whatever was already
-         cached under [old_key] rather than trusting the caller's [nbr]:
-         every current caller (updateField.ml, updateIndOk.ml) just
-         passes 0 here, not knowing the real count. *)
-      match Hashtbl.find_opt ht old_key with
-      | Some n ->
-          Hashtbl.remove ht old_key;
-          Hashtbl.replace ht new_key n
-      | None -> ()));
-  (* Every mode must persist: a mutation that's only applied to [ht] in
-     memory and never written is silently lost (this used to be true
-     only for [Rename], leaving [Delete] and [Merge] permanently stale
-     until the next full [update_nldb] rebuild). *)
-  write_cache_linked_pages conf ht
+  match read_cache_linked_pages conf with
+  | None -> ()
+  | Some ht -> (
+      match mode with
+      | Delete ->
+          if Hashtbl.mem ht old_key then (
+            Hashtbl.remove ht old_key;
+            write_cache_linked_pages conf ht)
+      | Rename | Merge ->
+          if old_key <> new_key || Hashtbl.find_opt ht new_key <> Some nbr then (
+            Hashtbl.remove ht old_key;
+            Hashtbl.replace ht new_key nbr;
+            write_cache_linked_pages conf ht))
 
 (* Call once, right after [Driver.patch_person], for a person that
    already existed before this operation - an ordinary edit (see
@@ -856,27 +841,34 @@ let update_cache_linked_pages conf mode old_key new_key nbr =
    rather than recomputed here because every current caller already
    computes it via [links_to_ind] for its own "linked pages" display,
    before this function runs any rewrite. *)
-let on_person_saved conf base ~old_key
-    ~(pgl : (Driver.iper, Driver.ifam) Def.NLDB.page list) p =
-  update_notes_links_person base p;
+let count_linked_pages base key =
+  List.fold_left
+    (fun n (_, (_, il)) ->
+      if List.exists (fun (k, _) -> Def.NLDB.equal_key k key) il then n + 1
+      else n)
+    0 (Driver.read_nldb base)
+
+let on_person_saved conf base ~old_key ?old_text
+    ~(pgl : unit -> (Driver.iper, Driver.ifam) Def.NLDB.page list) p =
+  (* Must run first: if p links to itself, update_ind_key re-indexes the
+     rewritten notes. *)
+  update_notes_links_person ?old_text base p;
   let new_key = Util.make_key base p in
   if old_key <> new_key then (
-    let new_name =
-      {
-        df_first_name = Driver.sou base p.first_name;
-        df_surname = Driver.sou base p.surname;
-      }
+    let real_key =
+      (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
     in
-    update_ind_key conf base pgl old_key new_key new_name;
-    update_cache_linked_pages conf Rename old_key new_key 0)
+    update_ind_key conf base (pgl ()) old_key real_key;
+    update_cache_linked_pages conf Rename old_key new_key
+      (count_linked_pages base new_key))
 
 let linked_pages_nbr conf base ip =
   let key =
     Util.make_key base (Driver.gen_person_of_person (Driver.poi base ip))
   in
-  let ht = read_cache_linked_pages conf in
-  let entry = try Some (Hashtbl.find ht key) with Not_found -> None in
-  match entry with Some nbr -> nbr | None -> 0
+  match read_cache_linked_pages conf with
+  | None -> 0
+  | Some ht -> ( try Hashtbl.find ht key with Not_found -> 0)
 
 let linked_page_text_family conf base ifam s (str : Adef.safe_string)
     (pg, (_, il)) : Adef.safe_string =

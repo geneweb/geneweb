@@ -820,6 +820,7 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
+  List.iter (Notes.update_notes_links_person ~old_text:"" base) !created_p;
   let nfath_p = Driver.poi base (Adef.father ncpl) in
   let nmoth_p = Driver.poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
@@ -1020,7 +1021,8 @@ let effective_del conf base _ip fam =
   let father = Driver.get_father fam in
   let mother = Driver.get_mother fam in
   let children = Driver.get_children fam in
-  let gen_fam = Util.string_gen_family base (Driver.gen_family_of_family fam) in
+  let istr_fam = Driver.gen_family_of_family fam in
+  let gen_fam = Util.string_gen_family base istr_fam in
   let gen_p_of ip =
     Util.string_gen_person base
       (Driver.gen_person_of_person (Driver.poi base ip))
@@ -1028,19 +1030,10 @@ let effective_del conf base _ip fam =
   let gen_father = gen_p_of father in
   let gen_mother = gen_p_of mother in
   let gen_children = Array.map gen_p_of children in
+  let old_text = Notes.notes_bearing_text_of_family base istr_fam in
   Driver.delete_family_rec base ifam;
-  (* Mirror UpdateIndOk.effective_del_commit's cleanup for persons: a
-     deleted family's own outgoing links (marriage_note, comment,
-     fsources, fevents' notes/sources - anything [[fn/sn/oc/text]] it
-     used to reference) must be cleared from nldb, or a stale [PgFam
-     ifam] entry lingers there forever, pointing at an [ifam] that no
-     longer exists. There is no linked-pages cache entry to clear for a
-     family, unlike for persons: a family is never itself the target of
-     a [[fn/sn/oc/text]] link, only a source. This single fix covers
-     every caller of [effective_del]: the standalone "delete family"
-     feature (print_del) and both merge paths (mergeInd.ml,
-     mergeFamOk.ml). *)
-  Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) "";
+  if Notes.has_links old_text then
+    Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) "";
   History.record conf base (U_Delete_family (gen_father, gen_fam)) "df";
   History.record conf base (U_Delete_family (gen_mother, gen_fam)) "df";
   Array.iter
@@ -1269,12 +1262,7 @@ let print_add o_conf base =
         let ifam, fam, cpl, des = effective_add conf base nsck sfam scpl sdes in
         let () = patch_parent_with_pevents base cpl in
         let () = patch_children_with_pevents base des in
-        (* Same gap as print_mod used to have for persons: a newly
-           created family's own note-bearing fields (comment,
-           marriage_note, fsources, fevents' notes/sources) can already
-           carry [[fn/sn/oc/text]] links at creation time, and must be
-           indexed now, not only on the next edit. *)
-        Notes.update_notes_links_family base fam;
+        Notes.update_notes_links_family ~old_text:"" base fam;
         let wl, ml =
           all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
         in
@@ -1425,14 +1413,15 @@ let print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
-  let o_f =
+  let o_f, old_text =
     let ifam =
       match p_getenv o_conf.env "i" with
       | Some i -> Driver.Ifam.of_string i
       | None -> Driver.Ifam.dummy
     in
-    Util.string_gen_family base
-      (Driver.gen_family_of_family (Driver.foi base ifam))
+    let istr_fam = Driver.gen_family_of_family (Driver.foi base ifam) in
+    ( Util.string_gen_family base istr_fam,
+      Notes.notes_bearing_text_of_family base istr_fam )
   in
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
@@ -1442,7 +1431,7 @@ let print_mod o_conf base =
     let ifam, fam, cpl, des = effective_mod conf base nsck sfam scpl sdes in
     let () = patch_parent_with_pevents base cpl in
     let () = patch_children_with_pevents base des in
-    Notes.update_notes_links_family base fam;
+    Notes.update_notes_links_family ~old_text base fam;
     (* TODO update_cache_linked_pages *)
     let nfs = (Adef.parent_array cpl, des.children) in
     let onfs = Some (ofs, nfs) in

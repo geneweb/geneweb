@@ -180,19 +180,10 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
   Driver.patch_person base p1.key_index p1;
   reparent_ind base warning p1.key_index (Driver.get_iper p2);
   UpdateIndOk.effective_del conf base p2;
-  (* p1 may have just absorbed p2's occupation/notes/sources/etc. (see
-     get_string above), which can carry [[fn/sn/oc/text]] links never
-     scanned under p1's own PgInd key. [Notes.update_notes_links_person]
-     already does exactly the field-concatenation this used to
-     reimplement by hand - use it instead of duplicating it. *)
   Notes.update_notes_links_person base p1;
   let key = Util.make_key base p1 in
-  let pgl =
-    let db = Driver.read_nldb base in
-    let db = Notes.merge_possible_aliases conf db in
-    Notes.links_to_cache_entries conf base db key
-  in
-  Notes.update_cache_linked_pages conf Notes.Merge key key (List.length pgl)
+  Notes.update_cache_linked_pages conf Notes.Merge key key
+    (Notes.count_linked_pages base key)
 
 exception Error_loop of Driver.person
 exception Different_sexes of Driver.person * Driver.person
@@ -218,6 +209,9 @@ let merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind =
 let effective_merge_fam conf base ifam1 fam1 fam2 =
   let des1 = fam1 in
   let des2 = fam2 in
+  let old_text =
+    Notes.notes_bearing_text_of_family base (Driver.gen_family_of_family fam1)
+  in
   let fam1 =
     {
       (Driver.gen_family_of_family fam1) with
@@ -254,11 +248,7 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
   done;
   Driver.patch_family base ifam1 fam1;
   Driver.patch_descend base ifam1 des1;
-  (* fam1 may have just absorbed fam2's marriage_src/fsources (see
-     get_string above), which can carry [[fn/sn/oc/text]] links never
-     scanned under fam1's own PgFam key - re-index unconditionally,
-     same requirement as updateFamOk.ml's print_add/print_mod. *)
-  Notes.update_notes_links_family base fam1
+  Notes.update_notes_links_family ~old_text base fam1
 
 let merge_fam conf base branches ifam1 ifam2 fam1 fam2 ip1 ip2 changes_done
     propose_merge_fam =

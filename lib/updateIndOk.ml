@@ -868,6 +868,7 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
       (Driver.insert_string base)
       sp
   in
+  List.iter (Notes.update_notes_links_person ~old_text:"" base) !created_p;
   let np = { np with related = Driver.get_related op } in
   let ol_rparents = rparents_of (Driver.get_rparents op) in
   let nl_rparents = rparents_of np.rparents in
@@ -963,10 +964,8 @@ let effective_del_no_commit base op =
 
 let effective_del_commit conf base op =
   Notes.update_notes_links_db base (Def.NLDB.PgInd op.key_index) "";
-  let key =
-    Util.make_key base
-      (Driver.gen_person_of_person (Driver.poi base op.key_index))
-  in
+  (* op.key_index is already deleted: build the key from op. *)
+  let key = (Name.lower op.first_name, Name.lower op.surname, op.occ) in
   Notes.update_cache_linked_pages conf Notes.Delete key key 0;
   Util.commit_patches conf base;
   let changed = U_Delete_person op in
@@ -1138,10 +1137,9 @@ let print_mod ?prerr o_conf base =
   let ofn = o_p.first_name in
   let osn = o_p.surname in
   let oocc = o_p.occ in
-  let old_key =
-    Util.make_key base
-      (Driver.gen_person_of_person (Driver.poi base o_p.key_index))
-  in
+  let old_p = Driver.gen_person_of_person (Driver.poi base o_p.key_index) in
+  let old_key = Util.make_key base old_p in
+  let old_text = Notes.notes_bearing_text_of_person base old_p in
   let conf = Update.update_conf o_conf in
   let pgl =
     let db = Driver.read_nldb base in
@@ -1154,7 +1152,7 @@ let print_mod ?prerr o_conf base =
     let op = Driver.poi base p.key_index in
     let u = { family = Driver.get_family op } in
     Driver.patch_person base p.key_index p;
-    Notes.on_person_saved conf base ~old_key ~pgl p;
+    Notes.on_person_saved conf base ~old_key ~old_text ~pgl:(fun () -> pgl) p;
     let wl =
       let a = Driver.poi base p.key_index in
       let a =
