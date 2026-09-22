@@ -817,30 +817,6 @@ let update_cache_linked_pages conf mode old_key new_key nbr =
             Hashtbl.replace ht new_key nbr;
             write_cache_linked_pages conf ht))
 
-(* Call once, right after [Driver.patch_person], for a person that
-   already existed before this operation - an ordinary edit (see
-   updateIndOk.ml, updateField.ml) - NOT for a brand-new person, which
-   has no prior key to fix up elsewhere and should just call
-   [update_notes_links_person] directly. mergeIndOk.ml does NOT go
-   through this either: a merge collapses two old keys into one new
-   one, which doesn't fit this single-[old_key] shape, so it keeps its
-   own (already correct) direct sequence.
-
-   This is the single place that knows the full note-links contract for
-   an ordinary person save, in the correct order - the two call sites
-   above used to each reimplement this by hand, and one of them had
-   forgotten a step:
-   - always re-scan [p]'s own note-bearing fields into nldb, so a
-     [[fn/sn/oc/text]] link just added or edited is tracked (this must
-     happen before the next step, in case of self-reference)
-   - if [p]'s key actually changed relative to [old_key], rewrite every
-     page in [pgl] that referenced [old_key] to the new key/name, and
-     refresh the linked-pages count cache accordingly
-
-   [pgl] (the pages that referenced [old_key]) is taken as a parameter
-   rather than recomputed here because every current caller already
-   computes it via [links_to_ind] for its own "linked pages" display,
-   before this function runs any rewrite. *)
 let count_linked_pages base key =
   List.fold_left
     (fun n (_, (_, il)) ->
