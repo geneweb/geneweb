@@ -296,6 +296,21 @@ let syntax_links conf wi s =
       loop ~stop_at_brace quot_lev pos (i + 1))
     else
       let link = NotesLinks.misc_notes_link s i in
+      let link =
+        (* [misc_notes_link]/[wlnone] never stops a plain-text run at a
+           bare '}' - only at '%'/'\''/'{'/'['. Inside a highlight span,
+           clamp such a run at its first '}' so the outer stop-condition
+           above actually gets to see that character on the next call,
+           instead of it being swallowed into the text. *)
+        if stop_at_brace then
+          match link with
+          | NotesLinks.WLnone (j, none_s) -> (
+              match String.index_opt none_s '}' with
+              | Some k -> NotesLinks.WLnone (i + k, String.sub none_s 0 k)
+              | None -> link)
+          | _ -> link
+        else link
+      in
       let next_pos = if NotesLinks.advances_pos link then pos + 1 else pos in
       match link with
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->

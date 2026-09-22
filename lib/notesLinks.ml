@@ -218,6 +218,21 @@ let fold_links f acc s =
       loop ~stop_at_brace acc pos j
     else
       let link = misc_notes_link s i in
+      let link =
+        (* [misc_notes_link]/[wlnone] never stops a plain-text run at a
+           bare '}' - only at '%'/'\''/'{'/'['. Inside a highlight span,
+           clamp such a run at its first '}' so the outer stop-condition
+           above actually gets to see that character on the next call,
+           instead of it being swallowed into the text. *)
+        if stop_at_brace then
+          match link with
+          | WLnone (j, none_s) -> (
+              match String.index_opt none_s '}' with
+              | Some k -> WLnone (i + k, String.sub none_s 0 k)
+              | None -> link)
+          | _ -> link
+        else link
+      in
       let acc = f ~pos link acc in
       let pos = if advances_pos link then pos + 1 else pos in
       loop ~stop_at_brace acc pos (end_pos link)
