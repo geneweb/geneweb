@@ -204,29 +204,26 @@ let advances_pos link =
   | WLperson _ | WLwizard _ -> true
   | WLpage _ | WLimage _ | WLnone _ -> false
 
-let fold_links ?(skip_braces = true) f acc s =
+let fold_links f acc s =
   let slen = String.length s in
   let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
-  let rec brace_end j =
-    if j >= slen then None
-    else if j + 1 < slen && s.[j] = '%' then brace_end (j + 2)
-    else if s.[j] = '}' then Some (j + 1)
-    else brace_end (j + 1)
-  in
-  let rec loop acc pos i =
-    if i >= slen then acc
+  let rec loop ?(stop_at_brace = false) acc pos i =
+    if stop_at_brace && i < slen && s.[i] = '}' then (acc, pos, i + 1)
+    else if i >= slen then (acc, pos, i)
     else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
-      loop acc pos (i + 2)
-    else if s.[i] = '%' then loop acc pos (i + 1)
-    else if skip_braces && s.[i] = '{' then
-      loop acc pos (Option.value ~default:(i + 1) (brace_end (i + 1)))
+      loop ~stop_at_brace acc pos (i + 2)
+    else if s.[i] = '%' then loop ~stop_at_brace acc pos (i + 1)
+    else if s.[i] = '{' then
+      let acc, pos, j = loop ~stop_at_brace:true acc pos (i + 1) in
+      loop ~stop_at_brace acc pos j
     else
       let link = misc_notes_link s i in
       let acc = f ~pos link acc in
       let pos = if advances_pos link then pos + 1 else pos in
-      loop acc pos (end_pos link)
+      loop ~stop_at_brace acc pos (end_pos link)
   in
-  loop acc 1 0
+  let acc, _, _ = loop acc 1 0 in
+  acc
 
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in

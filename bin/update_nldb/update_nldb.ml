@@ -39,10 +39,7 @@ let parse_cmd () =
   (!fname, get_bases_dir ())
 
 let notes_links s =
-  let skip_braces =
-    not (Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album")
-  in
-  NotesLinks.fold_links ~skip_braces
+  NotesLinks.fold_links
     (fun ~pos link (list_nt, list_ind) ->
       match link with
       | NotesLinks.WLpage (_, _, lfname, _, _) ->

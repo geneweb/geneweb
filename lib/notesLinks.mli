@@ -22,20 +22,13 @@ val advances_pos : wiki_link -> bool
     [Wiki.syntax_links] and nldb's [lnPos]. *)
 
 val fold_links :
-  ?skip_braces:bool ->
-  (pos:int -> wiki_link -> 'acc -> 'acc) ->
-  'acc ->
-  string ->
-  'acc
-(** [fold_links ?skip_braces f acc s] folds [f] over the links of [s] in
-    order. By default ([skip_braces:true]), tokenizes exactly as
-    [Wiki.syntax_links]: a percent sign followed by a bracket, a brace or a
-    quote is an escape, and brace-delimited highlight spans are skipped, so
-    that [pos] (the 1-based ordinal among occurrences counted by
-    [advances_pos], i.e. the [N] of the rendered [#p_N] anchor) matches
-    rendering. Pass [~skip_braces:false] for content where "{"/"}" are not
-    wiki markup at all, e.g. a TYPE=gallery/album note's embedded JSON: there,
-    [[...]] links nested inside a JSON object must still be found. *)
+  (pos:int -> wiki_link -> 'acc -> 'acc) -> 'acc -> string -> 'acc
+(** [fold_links f acc s] folds [f] over the links of [s] in order, tokenizing
+    exactly as [Wiki.syntax_links]: a percent sign followed by a bracket, a
+    brace or a quote is an escape, and the content of a brace-delimited
+    highlight span is folded over too (a link inside one is still found). [pos]
+    is the 1-based ordinal among occurrences counted by [advances_pos], i.e. the
+    [N] of the rendered [#p_N] anchor. *)
 
 val add_in_db :
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.t ->

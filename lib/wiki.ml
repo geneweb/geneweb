@@ -241,14 +241,19 @@ let syntax_links conf wi s =
   let buff = Buffer.create 80 in
   let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
   let slen = String.length s in
-  let rec loop quot_lev pos i =
-    (if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
+  let rec loop ?(stop_at_brace = false) quot_lev pos i =
+    let brace_stop = stop_at_brace && i < slen && s.[i] = '}' in
+    (if
+       i = slen || brace_stop
+       || List.exists (str_start_with s i) [ "</li>"; "</p>" ]
+     then
        match quot_lev with
        | Italic -> Buffer.add_string buff "</i>"
        | Bold -> Buffer.add_string buff "</b>"
        | BoldItalic -> Buffer.add_string buff "</b></i>"
        | Zero -> ());
-    if i = slen then ()
+    if i = slen then (pos, i)
+    else if brace_stop then (pos, i + 1)
     else if
       s.[i] = '%'
       && i < slen - 1
@@ -259,49 +264,36 @@ let syntax_links conf wi s =
          || s.[i + 1] = '\'')
     then (
       Buffer.add_char buff s.[i + 1];
-      loop quot_lev pos (i + 2))
+      loop ~stop_at_brace quot_lev pos (i + 2))
     else if s.[i] = '%' then (
       Buffer.add_char buff '%';
-      loop quot_lev pos (i + 1))
+      loop ~stop_at_brace quot_lev pos (i + 1))
     else if s.[i] = '{' then (
-      let buff2 = Buffer.create 80 in
-      let b, j =
-        let rec loop j =
-          if j = slen then ("", i + 1)
-          else if j < slen - 1 && s.[j] = '%' then (
-            Buffer.add_char buff2 s.[j + 1];
-            loop (j + 2))
-          else if s.[j] = '}' then (Buffer.contents buff2, j + 1)
-          else (
-            Buffer.add_char buff2 s.[j];
-            loop (j + 1))
-        in
-        loop (i + 1)
-      in
-      let t =
-        if String.length b <> 0 then
-          Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
-        else ""
-      in
-      Buffer.add_string buff t;
-      loop quot_lev pos j)
+      let start_len = Buffer.length buff in
+      let pos', j = loop ~stop_at_brace:true Zero pos (i + 1) in
+      let inner = Buffer.sub buff start_len (Buffer.length buff - start_len) in
+      Buffer.truncate buff start_len;
+      if inner <> "" then
+        Buffer.add_string buff
+          (Printf.sprintf "<span class=\"highlight\">%s</span>" inner);
+      loop ~stop_at_brace quot_lev pos' j)
     else if bold_italic_delimiter_at s i quot_lev then (
       let t, ql =
         if quot_lev = Zero then ("<i><b>", BoldItalic) else ("</b></i>", Zero)
       in
       Buffer.add_string buff t;
-      loop ql pos (i + 5))
+      loop ~stop_at_brace ql pos (i + 5))
     else if bold_delimiter_at s i quot_lev then (
       let t, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
       Buffer.add_string buff t;
-      loop ql pos (i + 3))
+      loop ~stop_at_brace ql pos (i + 3))
     else if italic_delimiter_at s i quot_lev then (
       let t, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
       Buffer.add_string buff t;
-      loop ql pos (i + 2))
+      loop ~stop_at_brace ql pos (i + 2))
     else if s.[i] = '\'' then (
       Buffer.add_char buff '\'';
-      loop quot_lev pos (i + 1))
+      loop ~stop_at_brace quot_lev pos (i + 1))
     else
       let link = NotesLinks.misc_notes_link s i in
       let next_pos = if NotesLinks.advances_pos link then pos + 1 else pos in
@@ -328,7 +320,7 @@ let syntax_links conf wi s =
                 (encode wi.wi_mode) (encode fname) anchor c text
           in
           Buffer.add_string buff t;
-          loop quot_lev next_pos j
+          loop ~stop_at_brace quot_lev next_pos j
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _, _) ->
           let name =
             if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
@@ -366,7 +358,7 @@ let syntax_links conf wi s =
                 (if conf.hide_names then Util.private_txt conf "" else name)
           in
           Buffer.add_string buff t;
-          loop quot_lev next_pos j
+          loop ~stop_at_brace quot_lev next_pos j
       | NotesLinks.WLwizard (j, wiz, name) ->
           let name = bold_italic_syntax name in
           let t =
@@ -378,7 +370,7 @@ let syntax_links conf wi s =
                 (encode wiz) s
           in
           Buffer.add_string buff t;
-          loop quot_lev next_pos j
+          loop ~stop_at_brace quot_lev next_pos j
       | NotesLinks.WLimage (j, (dirs, file), alt, width_opt) ->
           (* Build the path for the ?s= parameter by joining dirs and file
              with '/' (the ':' directory separator is already split by
@@ -397,12 +389,12 @@ let syntax_links conf wi s =
               (escape alt) style
           in
           Buffer.add_string buff t;
-          loop quot_lev next_pos j
+          loop ~stop_at_brace quot_lev next_pos j
       | NotesLinks.WLnone (j, none_s) ->
           Buffer.add_string buff none_s;
-          loop quot_lev next_pos j
+          loop ~stop_at_brace quot_lev next_pos j
   in
-  loop Zero 1 0;
+  ignore (loop Zero 1 0);
   Buffer.contents buff
 
 let toc_list = [ "__NOTOC__"; "__TOC__"; "__SHORT_TOC__" ]
