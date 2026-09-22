@@ -226,7 +226,7 @@ let fold_links f acc s =
            instead of it being swallowed into the text. *)
         if stop_at_brace then
           match link with
-          | WLnone (j, none_s) -> (
+          | WLnone (_, none_s) -> (
               match String.index_opt none_s '}' with
               | Some k -> WLnone (i + k, String.sub none_s 0 k)
               | None -> link)
