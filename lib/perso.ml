@@ -824,7 +824,7 @@ let first_possible_duplication base ip (iexcl, fexcl) =
                 if Gwdb.get_iper sp1 = Gwdb.get_iper sp2 then
                   let ifam1 = Array.unsafe_get ifams i in
                   let ifam2 = Array.unsafe_get ifams j in
-                  if not (List.mem (ifam2, ifam2) fexcl) then
+                  if not (List.mem (ifam1, ifam2) fexcl) then
                     DupFam (ifam1, ifam2)
                   else loop' (j + 1)
                 else
