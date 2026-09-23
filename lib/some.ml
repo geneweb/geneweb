@@ -174,6 +174,20 @@ let print_variant_controls conf suggestions =
 })();
 </script>|}
 
+(* Link to the complete list of possible surnames.  SearchName puts
+   "other_names_pn" in the environment when it displays an exact surname
+   (by branch, alphabetically, or as a choice between its spellings) while
+   other possible surnames exist (phonetic variants, compound surnames). *)
+let print_other_names_link conf =
+  match p_getenv conf.env "other_names_pn" with
+  | Some pn when pn <> "" ->
+      Output.printf conf
+        {|<div class="mb-2"><a href="%sm=S&pn=%s&other_names=on" rel="nofollow">%s</a></div>|}
+        (commd conf :> string)
+        (Mutil.encode pn :> string)
+        (Utf8.capitalize_fst (transl conf "other possibilities"))
+  | _ -> ()
+
 let print_nav_variant_bar conf suggestions ~current_mode ~name ?branch_count ()
     =
   let display_by =
@@ -217,7 +231,8 @@ let print_nav_variant_bar conf suggestions ~current_mode ~name ?branch_count ()
         alpha_l);
   Output.print_sstring conf {|</div>|};
   print_variant_controls conf suggestions;
-  Output.print_sstring conf {|</div>|}
+  Output.print_sstring conf {|</div>|};
+  print_other_names_link conf
 
 let print_firstname_variants conf ?(filter = true) variants_set =
   if not (StrSet.is_empty variants_set) then
@@ -1237,6 +1252,7 @@ let print_several_possible_surnames x conf base _alias_cache (_, surname_groups)
   let title = mk_specify_title conf (transl_nth conf "surname/surnames" 0) fx in
   let surname_count = List.length surname_groups in
   Hutil.header_with_title ~fluid:(surname_count > 160) conf title;
+  print_other_names_link conf;
   (* TODO: implement Sosa for surnames | SosaCache.build_sosa_ht conf base; *)
   let search_surname_aliases query =
     let query_lower = Name.lower query in
