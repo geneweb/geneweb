@@ -465,9 +465,15 @@ let print_what_links_p conf base p =
         | Some "gallery" -> ("linked galleries", "linked galleries help")
         | _ -> ("linked pages", "linked pages help")
       in
-      Format.sprintf {|<span title="%s">%s</span>|}
-        (Util.transl conf lnkd_typ_help |> Utf8.capitalize_fst)
-        (Util.transl conf lnkd_typ |> Utf8.capitalize_fst)
+      let lnkd_typ_label = Util.transl conf lnkd_typ |> Utf8.capitalize_fst in
+      (* The page <title> only accepts plain text (see Hutil.header, which
+         calls [title true] there); the tooltip span is only valid in the
+         on-page <h1> (h = false). *)
+      (if h then lnkd_typ_label
+       else
+         Format.sprintf {|<span title="%s">%s</span>|}
+           (Util.transl conf lnkd_typ_help |> Utf8.capitalize_fst)
+           lnkd_typ_label)
       |> Output.print_sstring conf;
       Util.transl conf ":" |> Output.print_sstring conf;
       Output.print_sstring conf " ";
@@ -487,11 +493,17 @@ let print_what_links_p conf base p =
 
 let print_what_links conf base fnotes =
   let title h =
-    Output.print_sstring conf
-      (Format.sprintf {|<span title="%s">%s%s </span>|}
+    let label = Util.transl conf "linked pages" |> Utf8.capitalize_fst in
+    let colon = Util.transl conf ":" in
+    (* The page <title> only accepts plain text (see Hutil.header, which
+       calls [title true] there); the tooltip span is only valid in the
+       on-page <h1> (h = false). *)
+    (if h then Printf.sprintf "%s%s " label colon
+     else
+       Format.sprintf {|<span title="%s">%s%s </span>|}
          (Util.transl conf "linked pages (pages) help" |> Utf8.capitalize_fst)
-         (Util.transl conf "linked pages" |> Utf8.capitalize_fst)
-         (Util.transl conf ":"));
+         label colon)
+    |> Output.print_sstring conf;
     if h then (
       Output.print_sstring conf "[";
       Output.print_string conf (Util.escape_html fnotes);
