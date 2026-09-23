@@ -57,11 +57,19 @@ let print_input_excl conf string_of_i excl excl_name =
   let s = input_excl string_of_i excl in
   if (s :> string) <> "" then Util.hidden_input conf excl_name s
 
-let print_submit conf name value =
-  Output.print_sstring conf {|<input type="submit" name="|};
+let print_submit conf value =
+  let class_, name, label =
+    match value with
+    | `Yes -> ("button secondary", "answer_y", Util.transl conf "merge")
+    | `No ->
+        ( "button bare",
+          "answer_n",
+          Util.transl_nth conf "user/password/cancel" 2 )
+  in
+  Output.printf conf {|<input class="%s" type="submit" name="|} class_;
   Output.print_sstring conf name;
   Output.print_sstring conf {|" value="|};
-  Output.print_sstring conf (Util.transl_nth conf "Y/N" value);
+  Output.print_sstring conf (Utf8.capitalize_fst label);
   Output.print_sstring conf {|" style="margin-right:4px">|}
 
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
@@ -78,8 +86,6 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf "</li><li>";
   print_link conf base (Gwdb.poi base ip2);
   Output.print_sstring conf "</li></ul><p>";
-  Util.transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf " ?\n";
   (* FIXME: trans *)
   Output.print_sstring conf {|<form method="post" action="|};
   Output.print_sstring conf conf.Config.command;
@@ -95,8 +101,8 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
     fexcl "fexcl";
   Util.hidden_input conf "i" (Gwdb.string_of_iper ip1 |> Mutil.encode);
   Util.hidden_input conf "select" (Gwdb.string_of_iper ip2 |> Mutil.encode);
-  print_submit conf "answer_y" 0;
-  print_submit conf "answer_n" 1;
+  print_submit conf `Yes;
+  print_submit conf `No;
   Output.print_sstring conf "</form></p>";
   Hutil.trailer conf
 
@@ -124,8 +130,6 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   Output.print_sstring conf " &amp; ";
   print_link conf base (Gwdb.poi base ip2);
   Output.print_sstring conf "</li></ul><p>";
-  Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf "merge"));
-  Output.print_sstring conf " ? ";
   Output.print_sstring conf {|<form method="post" action="|};
   Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|">|};
@@ -140,8 +144,8 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
     ((ifam1, ifam2) :: fexcl) "fexcl";
   Util.hidden_input conf "i" (Gwdb.string_of_ifam ifam1 |> Mutil.encode);
   Util.hidden_input conf "i2" (Gwdb.string_of_ifam ifam2 |> Mutil.encode);
-  print_submit conf "answer_y" 0;
-  print_submit conf "answer_n" 1;
+  print_submit conf `Yes;
+  print_submit conf `No;
   Output.print_sstring conf "</form></p>";
   Hutil.trailer conf
 
