@@ -109,6 +109,10 @@ zh: \
   巴西葡萄牙语|ro=羅馬尼亞語|ru=俄语|sk=斯洛伐克语|sl=斯洛文尼亚语|sv= \
   瑞典語|tr=土耳其|zh=中文
 
+    decommissioned
+en: Decommissioned (use standard text editor)
+fr: Supprimé (utiliser un éditeur de texte)
+
     Enter the name of the folder holding databases.
 en: Enter the name of the folder holding databases.
 fr: Entrez le nom du dossier contenant les bases.
@@ -117,7 +121,7 @@ fr: Entrez le nom du dossier contenant les bases.
 en: If you write nothing, it will be taken as "."
 fr: Si vous ne mettez rien, la valeur par défaut sera "."
 
-    gwsetup configuration
+    Environnment
 en: Environnment
 fr: Environnement
 
