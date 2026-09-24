@@ -297,6 +297,8 @@ let cleanup gwo_files =
 let () =
   let inputs, bname, bases_dir = parse_cmd () in
   Secure.set_base_dir bases_dir;
+  if not (Sys.file_exists (Filename.concat bases_dir "tmp")) then
+    Unix.mkdir (Filename.concat bases_dir "tmp") 0o755;
   GWPARAM.init ();
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Db1link.particules_file = "" then
