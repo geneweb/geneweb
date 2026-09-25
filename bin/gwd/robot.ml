@@ -8,10 +8,33 @@ let src = Logs.Src.create ~doc:"Robot" "ROB "
 module Log = (val Logs.src_log src : Logs.LOG)
 module Code = Geneweb_http.Code
 
-let magic_robot = "GWRB0008"
+(* Bump: `who`'s key changed from `ip` to `(bname, ip)`, the `nbase`
+   field was dropped from `who` (now redundant with the map key), and
+   `max_conn` changed from `int * string` to `int * (string * string)`.
+   Reading an old "GWRB0008" file with these new types via `input_value`
+   would silently misinterpret bytes rather than raise cleanly, so we
+   bump the magic and let it fall into the "unrecognized format" reset
+   path below instead of attempting a field-by-field migration - this
+   is a transient anti-abuse cache, not data worth the migration risk. *)
+let magic_robot = "GWRB0009"
 
+(* The robot-ban state below is deliberately GLOBAL: an IP must be
+   blocked across every database served by this gwd instance, not just
+   the one it happens to be hitting right now. The lock guarding access
+   to it must therefore also be global, and must NOT go through
+   GWPARAM.adm_file: in "reorg" mode, adm_file resolves to a per-base
+   directory (bname.gwb/config/cnt/...), which would let two workers
+   serving two different bases take two different locks while both
+   read-modify-write this same shared file. *)
+let robot_dir () = String.concat Filename.dir_sep [ Secure.base_dir (); "cnt" ]
+let lock_file () = Filename.concat (robot_dir ()) "gwd_robot.lck"
+
+(* Detection window is scoped per (base, ip): a robot's signature is
+   usually excessive traffic against one specific database, and this
+   avoids false positives from legitimate visitors browsing several
+   bases on the same multi-base site. *)
 module W = Map.Make (struct
-  type t = string
+  type t = string * string (* (bname, ip) *)
 
   let compare = compare
 end)
@@ -22,14 +45,13 @@ type who = {
   acc_times : float list;
   oldest_time : float;
   nb_connect : int;
-  nbase : string;
   utype : norfriwiz;
 }
 
 type excl = {
   mutable excl : (string * int ref) list;
   mutable who : who W.t;
-  mutable max_conn : int * string;
+  mutable max_conn : int * (string * string); (* (count, (bname, ip)) *)
   mutable last_summary : float;
 }
 
@@ -101,10 +123,15 @@ let output_excl oc xcl =
   output_string oc magic_robot;
   output_value oc (xcl : excl)
 
+let save xcl fname =
+  match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
+  | Some oc ->
+      output_excl oc xcl;
+      close_out oc
+  | None -> ()
+
 let robot_excl () =
-  let fname =
-    String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
-  in
+  let fname = Filename.concat (robot_dir ()) "robot" in
   let xcl =
     match try Some (Secure.open_in_bin fname) with _ -> None with
     | Some ic -> (
@@ -114,28 +141,29 @@ let robot_excl () =
             let v = (input_value ic : excl) in
             close_in ic;
             v)
-          else if b = "GWRB0007" then (
-            let old_data =
-              (input_value ic
-                : (string * int ref) list * who W.t * (int * string))
-            in
-            close_in ic;
-            let excl, who, max_conn = old_data in
-            let new_data = { excl; who; max_conn; last_summary = 0.0 } in
-            (try
-               let oc = open_out_bin fname in
-               output_excl oc new_data;
-               close_out oc
-             with _ -> ());
-            new_data)
           else (
             close_in ic;
-            { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 })
+            {
+              excl = [];
+              who = W.empty;
+              max_conn = (0, ("", ""));
+              last_summary = 0.0;
+            })
         with _ ->
           close_in ic;
-          { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 })
+          {
+            excl = [];
+            who = W.empty;
+            max_conn = (0, ("", ""));
+            last_summary = 0.0;
+          })
     | None ->
-        { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 }
+        {
+          excl = [];
+          who = W.empty;
+          max_conn = (0, ("", ""));
+          last_summary = 0.0;
+        }
   in
   (xcl, fname)
 
@@ -147,8 +175,10 @@ let log_summary tm xcl nconn =
       k "%s === ROBOT SUMMARY ===" (Mutil.sprintf_date local_tm :> string));
   Log.info (fun k ->
       k "  Blocked IPs: %d, Monitored: %d" (List.length xcl.excl) nconn);
+  let max_nb, (max_bname, max_ip) = xcl.max_conn in
   Log.info (fun k ->
-      k "  Most active: %d req by %s" (fst xcl.max_conn) (snd xcl.max_conn));
+      k "  Most active: %d req by %s on %s" max_nb max_ip
+        (if max_bname = "" then "(no base)" else max_bname));
   Log.info (fun k -> k "  Blocked robots detail:");
   List.iter
     (fun (ip, att) -> Logs.info (fun k -> k "    %s: %d attempts" ip !att))
@@ -168,6 +198,7 @@ let check tm from max_call sec conf suicide =
     else Normal
   in
   let xcl, fname = robot_excl () in
+  let key = (conf.bname, from) in
   let refused =
     match
       try
@@ -185,7 +216,7 @@ let check tm from max_call sec conf suicide =
         true
     | None ->
         purge_who tm xcl sec;
-        let r = try (W.find from xcl.who).acc_times with Not_found -> [] in
+        let r = try (W.find key xcl.who).acc_times with Not_found -> [] in
         let cnt, tml, tm0 =
           let sec = float sec in
           let rec count cnt tml = function
@@ -201,12 +232,11 @@ let check tm from max_call sec conf suicide =
         in
         let r = List.rev tml in
         xcl.who <-
-          W.add from
+          W.add key
             {
               acc_times = tm :: r;
               oldest_time = tm0;
               nb_connect = cnt;
-              nbase = conf.bname;
               utype = nfw;
             }
             xcl.who;
@@ -221,8 +251,8 @@ let check tm from max_call sec conf suicide =
             else
               Log.info (fun k ->
                   k "ROBOT %s: BLOCKED (covered by existing pattern)\n" from);
-            xcl.who <- W.remove from xcl.who;
-            xcl.max_conn <- (0, "");
+            xcl.who <- W.remove key xcl.who;
+            xcl.max_conn <- (0, ("", ""));
             true)
           else false
         in
@@ -242,15 +272,11 @@ let check tm from max_call sec conf suicide =
           log_summary tm xcl nconn);
         refused
   in
-  (match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
-  | Some oc ->
-      output_excl oc xcl;
-      close_out oc
-  | None -> ());
+  save xcl fname;
   if refused then robot_error conf max_call sec;
   W.fold
-    (fun _ w (c, cw, cf, wl) ->
-      if w.nbase = conf.bname && w.nbase <> "" then
+    (fun (bname, _ip) w (c, cw, cf, wl) ->
+      if bname = conf.bname && bname <> "" then
         match w.utype with
         | Wizard n ->
             let at = List.hd w.acc_times in
