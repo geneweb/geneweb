@@ -84,7 +84,6 @@ let print conf base p =
   Hutil.trailer conf
 
 let print_possible_continue_merging conf base =
-  let open Adef in
   match
     (Util.p_getenv conf.Config.env "ini1", Util.p_getenv conf.Config.env "ini2")
   with
@@ -93,7 +92,7 @@ let print_possible_continue_merging conf base =
       let ini2 = Gwdb.iper_of_string ini2 in
       let p1 = Gwdb.poi base ini1 in
       let p2 = Gwdb.poi base ini2 in
-      Output.print_sstring conf {|<p><a href="|};
+      Output.print_sstring conf {|<p><a class="button secondary" href="|};
       Output.print_url conf
         (Util.commd' conf
            ~query:
@@ -118,32 +117,45 @@ let print_possible_continue_merging conf base =
           let ip = Gwdb.iper_of_string ip in
           let s1 =
             match Util.p_getenv conf.Config.env "iexcl" with
-            | Some "" | None -> Adef.encoded ""
-            | Some s -> "&iexcl=" ^<^ Mutil.encode s
+            | Some "" | None -> None
+            | Some s -> Some ("iexcl", s)
           in
           let s2 =
             match Util.p_getenv conf.Config.env "fexcl" with
-            | Some "" | None -> Adef.encoded ""
-            | Some s -> "&fexcl=" ^<^ Mutil.encode s
+            | Some "" | None -> None
+            | Some s -> Some ("fexcl", s)
           in
-          if s1 <^> Adef.encoded "" || s2 <^> Adef.encoded "" then (
+          if Option.is_some s1 || Option.is_some s2 then (
             let p = Gwdb.poi base ip in
             let s = NameDisplay.fullname_html_of_person conf base p in
-            Output.print_sstring conf {|<p><a href="|};
+            let open Ext_list.Infix in
+            Output.printf conf "<p>%s%s %s (%s)</p>"
+              (Util.transl conf "merge_todo")
+              (Util.transl conf ":")
+              (Util.transl_a_of_b conf
+                 (Util.transl conf "possible duplications")
+                 (s :> string)
+                 (s :> string))
+              (Adef.as_string
+              @@ NameDisplay.reference ~new_tab:true conf base p
+                   (Adef.safe @@ Util.transl conf "merge_see_profile"));
+            Output.print_sstring conf
+              {|<p><a class = "button secondary" href="|};
             Output.print_url conf
               (Util.commd' conf
-                 ~query:[ ("m", "MRG_DUP"); ("ip", Gwdb.string_of_iper ip) ]);
-            Output.print_string conf s1;
-            Output.print_string conf s2;
+                 ~query:
+                   (("m", "MRG_DUP")
+                   @:: ("ip", Gwdb.string_of_iper ip)
+                   @:: s1 @?: s2 @?: []));
             Output.print_sstring conf {|">|};
             Output.print_sstring conf
               (Utf8.capitalize_fst (Util.transl conf "continue merging"));
             Output.print_sstring conf "</a>";
-            Output.print_sstring conf {| (|};
-            Output.print_sstring conf
-              (Util.transl_a_of_b conf
-                 (Util.transl conf "possible duplications")
-                 (NameDisplay.reference conf base p s :> string)
-                 (s :> string));
-            Output.print_sstring conf {|)</p>|})
+            Output.print_sstring conf {|</p>|})
       | None -> ())
+
+let page_title ~has_continuation conf =
+  let title_key =
+    if has_continuation then "merge_in_progress" else "merge done"
+  in
+  Utf8.capitalize_fst @@ Util.transl conf title_key

@@ -1074,7 +1074,7 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
     wl;
   (wl, ml)
 
-let print_family conf base (wl, ml) cpl des =
+let print_family ?(references_in_new_tab = false) conf base (wl, ml) cpl des =
   let rdsrc =
     match Util.p_getenv conf.Config.env "rdsrc" with
     | Some "on" -> Util.p_getenv conf.Config.env "src"
@@ -1089,13 +1089,13 @@ let print_family conf base (wl, ml) cpl des =
   Output.print_sstring conf "<ul>\n";
   Output.print_sstring conf "<li>";
   Output.print_string conf
-    (NameDisplay.referenced_person_text conf base
+    (NameDisplay.referenced_person_text ~new_tab:references_in_new_tab conf base
        (Gwdb.poi base (Adef.father cpl)));
   Output.print_sstring conf "</li>";
   Output.print_sstring conf "\n";
   Output.print_sstring conf "<li>";
   Output.print_string conf
-    (NameDisplay.referenced_person_text conf base
+    (NameDisplay.referenced_person_text ~new_tab:references_in_new_tab conf base
        (Gwdb.poi base (Adef.mother cpl)));
   Output.print_sstring conf "</li>";
   Output.print_sstring conf "</ul>\n";
@@ -1105,7 +1105,8 @@ let print_family conf base (wl, ml) cpl des =
       (fun ip ->
         Output.print_sstring conf "<li>";
         Output.print_string conf
-          (NameDisplay.referenced_person_text conf base (Gwdb.poi base ip));
+          (NameDisplay.referenced_person_text ~new_tab:references_in_new_tab
+             conf base (Gwdb.poi base ip));
         Output.print_sstring conf "</li>")
       des.children;
     Output.print_sstring conf "</ul>\n");
