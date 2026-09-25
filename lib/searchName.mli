@@ -36,11 +36,19 @@ type search_case =
       oc : string option;
       original : string;
       format :
-        [ `Space | `Slash | `Dot | `SlashSurname | `SlashFirstName | `DotOc ];
+        [ `Space
+        | `Slash
+        | `Dot
+        | `SlashSurname
+        | `SlashFirstName
+        | `DotOc
+        | `SurnameGuess ];
     }
       (** [pn] URL parameter parsed by {!parse_person_name}. The [format] field
           records which separator was recognised, driving the subsequent
-          search-method ordering. *)
+          search-method ordering. [`SurnameGuess]: a single word, or a [pn]
+          starting with a particle, searched as a surname first, with a fallback
+          to the full search when no surname matches. *)
   | InvalidFormat of string
       (** [pn] could not be parsed; the offending string is preserved for
           diagnostic display. *)
@@ -67,14 +75,14 @@ val extract_name_components :
     ["henri de foresta"] is recognised as fn = "henri", sn = "de foresta" — see
     {!parse_person_name} for the parsing rules.
 
-    The seven cases:
+    The cases (a parameter that is empty or blank after trimming counts as
+    absent):
     - [p], [n], [pn] all empty → [NoInput]
-    - [pn] alone → parsed by {!parse_person_name}
+    - [pn] present, with or without [p] and/or [n] → parsed by
+      {!parse_person_name}; [p] and [n] are ignored
     - [n] alone → [SurnameOnly]
     - [p] alone → [FirstNameOnly]
     - [p] and [n] → [FirstNameSurname]
-    - [n] and [pn] → [SurnameOnly] (pn ignored, n wins)
-    - [p] and [pn] → [PersonName] (pn merged with p)
 
     @param conf Search request configuration (env, base_env)
     @param base Genealogical database
@@ -157,10 +165,18 @@ val print :
     - [&n=surname]: Surname only search
     - [&p=fn&n=sn]: Combined first name and surname search
     - [&pn=name]: Parsed name with multiple formats:
-    - ["fn sn"]: Space-separated (last space = separator)
+    - ["word"]: a single word is taken as a surname (surname display: branches,
+      or choice between surnames); if no surname matches, it is searched with
+      every method. A number stays a person name (Sosa)
+    - ["de gaulle"]: a pn starting with a particle is taken as a surname, with
+      the same fallback
+    - ["fn sn"]: Space-separated (first space = separator, unless a surname
+      particle occurs from the second word on, in which case the split is made
+      before it: ["jean de la fontaine"] → fn = "jean", sn = "de la fontaine")
     - ["fn/sn"]: Slash-separated
-    - ["fn.sn"]: Dot-separated
-    - ["fn.oc sn"]: Dot-separated with occurrence number
+    - ["fn.oc sn"]: Full key, the dot followed by the digits of the occurrence
+      number and a space (["jean.2 dupont"]). Any other dot (["jean.dupont"],
+      ["pierre.1x dupont"]) is treated as literal text
     - ["/sn"]: Surname only (slash prefix)
     - ["fn/"]: First name only (slash suffix)
 

@@ -29,6 +29,11 @@
 %include;menubar
 <div id="content" tabindex="-1">
 
+%if;(e.other_names="on")
+  <a href="%prefix;m=S&pn=%e.pn;&other_names=on"
+     title="[*other possibilities help]">[*other possibilities]</a>
+%end;
+
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
 %if;(evar.p_mod="zz" or (bvar.p_mod="zz" and evar.p_mod="") or
     (bvar.p_mod="" and evar.p_mod=""))

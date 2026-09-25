@@ -16238,6 +16238,10 @@ en: other possibilities
 es: otras posibilidades
 fr: autres possibilités
 
+    other possibilities help
+en: display other possible results for this name query
+fr: afficher les autres résultats possibles pour la recherche avec ce nom
+
     ou
 co: o
 de: oder
