@@ -59,9 +59,12 @@ let notes_links s =
 type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 
 let save_cache_linked_pages bdir cache_linked_pages =
-  let oc = open_out_bin (Filename.concat bdir Notes.cache_linked_pages_name) in
+  let fname = Filename.concat bdir Notes.cache_linked_pages_name in
+  let fname_tmp = fname ^ ".tmp" in
+  let oc = open_out_bin fname_tmp in
   output_value oc cache_linked_pages;
-  close_out oc
+  close_out oc;
+  Sys.rename fname_tmp fname
 
 let compute base bdir =
   let bdir =
@@ -79,21 +82,17 @@ let compute base bdir =
     Hashtbl.replace cache_linked_pages key (current_count + 1)
   in
 
+  let add_page pg ((_, list_ind) as list) =
+    db := NotesLinks.add_in_db !db pg list;
+    List.iter update_cache_linked_pages
+      (List.sort_uniq compare (List.map fst list_ind))
+  in
+
   Printf.eprintf "--- database notes\n";
   flush stderr;
-  let list = notes_links (Driver.base_notes_read base "") in
-  (match list with
+  (match notes_links (Driver.base_notes_read base "") with
   | [], [] -> ()
-  | _list_nt, list_ind ->
-      let pg = NLDB.PgNotes in
-      db := NotesLinks.add_in_db !db pg list;
-      let list_ind =
-        List.fold_left
-          (fun acc (key, l) ->
-            if List.mem_assoc key acc then acc else (key, l) :: acc)
-          [] list_ind
-      in
-      List.iter (fun (key, _) -> update_cache_linked_pages key) list_ind);
+  | list -> add_page NLDB.PgNotes list);
 
   Printf.eprintf "--- wizard notes\n";
   flush stderr;
@@ -113,20 +112,10 @@ let compute base bdir =
              let wizid = Filename.chop_suffix file ".txt" in
              match notes_links (Driver.base_wiznotes_read base wizid) with
              | [], [] -> ()
-             | (_list_nt, list_ind) as list ->
+             | list ->
                  Printf.eprintf "%s... " wizid;
                  flush stderr;
-                 let pg = NLDB.PgWizard wizid in
-                 db := NotesLinks.add_in_db !db pg list;
-                 let list_ind =
-                   List.fold_left
-                     (fun acc (key, l) ->
-                       if List.mem_assoc key acc then acc else (key, l) :: acc)
-                     [] list_ind
-                 in
-                 List.iter
-                   (fun (key, _) -> update_cache_linked_pages key)
-                   list_ind
+                 add_page (NLDB.PgWizard wizid) list
        with Sys_error _ ->
          Printf.eprintf "Warning: error while reading wizardnotes %s\n"
            files.(i)
@@ -155,7 +144,7 @@ let compute base bdir =
             let file = Filename.concat dir fnotes in
             match notes_links (Driver.base_notes_read base file) with
             | [], [] -> ()
-            | (_list_nt, list_ind) as list ->
+            | list ->
                 let fnotes =
                   if name = "" then fnotes
                   else
@@ -163,17 +152,7 @@ let compute base bdir =
                 in
                 Printf.eprintf "%s...\n" fnotes;
                 flush stderr;
-                let pg = NLDB.PgMisc fnotes in
-                db := NotesLinks.add_in_db !db pg list;
-                let list_ind =
-                  List.fold_left
-                    (fun acc (key, l) ->
-                      if List.mem_assoc key acc then acc else (key, l) :: acc)
-                    [] list_ind
-                in
-                List.iter
-                  (fun (key, _) -> update_cache_linked_pages key)
-                  list_ind)
+                add_page (NLDB.PgMisc fnotes) list)
           else
             loop (Filename.concat dir file)
               (if name = "" then file
@@ -220,15 +199,8 @@ let compute base bdir =
       (* list is: lfname :: list_nt, (key, link) :: list_ind *)
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
-      | (_, list_ind) as list ->
-          (db := NotesLinks.add_in_db !db (NLDB.PgInd (Driver.get_iper p)) list;
-           let list_ind =
-             List.fold_left
-               (fun acc (key, l) ->
-                 if List.mem_assoc key acc then acc else (key, l) :: acc)
-               [] list_ind
-           in
-           List.iter (fun (key, _) -> update_cache_linked_pages key) list_ind);
+      | list ->
+          add_page (NLDB.PgInd (Driver.get_iper p)) list;
           ProgrBar.run i nb_ind)
     (Geneweb_db.Driver.persons base);
   ProgrBar.finish ();
@@ -253,16 +225,8 @@ let compute base bdir =
         (Driver.get_fevents fam);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
-      | (_list_nt, list_ind) as list ->
-          (db :=
-             NotesLinks.add_in_db !db (NLDB.PgFam (Driver.get_ifam fam)) list;
-           let list_ind =
-             List.fold_left
-               (fun acc (key, l) ->
-                 if List.mem_assoc key acc then acc else (key, l) :: acc)
-               [] list_ind
-           in
-           List.iter (fun (key, _) -> update_cache_linked_pages key) list_ind);
+      | list ->
+          add_page (NLDB.PgFam (Driver.get_ifam fam)) list;
           ProgrBar.run i nb_fam)
     (Driver.families base);
   ProgrBar.finish ();

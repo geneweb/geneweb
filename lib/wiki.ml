@@ -241,6 +241,20 @@ let syntax_links conf wi s =
   let buff = Buffer.create 80 in
   let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
   let slen = String.length s in
+  let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
+  let has_closing_brace i0 =
+    let rec look depth i =
+      if i >= slen then false
+      else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
+        look depth (i + 2)
+      else if s.[i] = '%' then look depth (i + 1)
+      else if s.[i] = '{' then look (depth + 1) (i + 1)
+      else if s.[i] = '}' then
+        if depth = 0 then true else look (depth - 1) (i + 1)
+      else look depth (i + 1)
+    in
+    look 0 i0
+  in
   let rec loop ?(stop_at_brace = false) quot_lev pos i =
     let brace_stop = stop_at_brace && i < slen && s.[i] = '}' in
     (if
@@ -268,7 +282,7 @@ let syntax_links conf wi s =
     else if s.[i] = '%' then (
       Buffer.add_char buff '%';
       loop ~stop_at_brace quot_lev pos (i + 1))
-    else if s.[i] = '{' then (
+    else if s.[i] = '{' && has_closing_brace (i + 1) then (
       let start_len = Buffer.length buff in
       let pos', j = loop ~stop_at_brace:true Zero pos (i + 1) in
       let inner = Buffer.sub buff start_len (Buffer.length buff - start_len) in

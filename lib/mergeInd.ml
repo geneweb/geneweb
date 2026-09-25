@@ -180,7 +180,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
   Driver.patch_person base p1.key_index p1;
   reparent_ind base warning p1.key_index (Driver.get_iper p2);
   UpdateIndOk.effective_del conf base p2;
-  Notes.update_notes_links_person base p1;
+  Notes.update_notes_links_person conf base p1;
   let key = Util.make_key base p1 in
   Notes.update_cache_linked_pages conf Notes.Merge key key
     (Notes.count_linked_pages base key)
@@ -248,7 +248,7 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
   done;
   Driver.patch_family base ifam1 fam1;
   Driver.patch_descend base ifam1 des1;
-  Notes.update_notes_links_family ~old_text base fam1
+  Notes.update_notes_links_family conf ~old_text base fam1
 
 let merge_fam conf base branches ifam1 ifam2 fam1 fam2 ip1 ip2 changes_done
     propose_merge_fam =

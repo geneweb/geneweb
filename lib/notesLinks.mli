@@ -40,4 +40,8 @@ val update_db :
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page ->
   string list * (Def.NLDB.key * Def.NLDB.ind) list ->
-  unit
+  (string list * (Def.NLDB.key * Def.NLDB.ind) list) option
+(** [update_db base who list] replaces [who]'s entry with [list] and returns
+    whatever entry [who] had before (if any), so a caller that needs to know
+    what changed (e.g. to adjust a derived count) doesn't have to read nldb a
+    second time to find out. *)

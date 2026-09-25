@@ -820,7 +820,7 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
-  List.iter (Notes.update_notes_links_person ~old_text:"" base) !created_p;
+  List.iter (Notes.update_notes_links_person conf ~old_text:"" base) !created_p;
   let nfath_p = Driver.poi base (Adef.father ncpl) in
   let nmoth_p = Driver.poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
@@ -1033,7 +1033,7 @@ let effective_del conf base _ip fam =
   let old_text = Notes.notes_bearing_text_of_family base istr_fam in
   Driver.delete_family_rec base ifam;
   if Notes.has_links old_text then
-    Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) "";
+    Notes.update_notes_links_db conf base (Def.NLDB.PgFam ifam) "";
   History.record conf base (U_Delete_family (gen_father, gen_fam)) "df";
   History.record conf base (U_Delete_family (gen_mother, gen_fam)) "df";
   Array.iter
@@ -1262,7 +1262,7 @@ let print_add o_conf base =
         let ifam, fam, cpl, des = effective_add conf base nsck sfam scpl sdes in
         let () = patch_parent_with_pevents base cpl in
         let () = patch_children_with_pevents base des in
-        Notes.update_notes_links_family ~old_text:"" base fam;
+        Notes.update_notes_links_family conf ~old_text:"" base fam;
         let wl, ml =
           all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
         in
@@ -1431,8 +1431,7 @@ let print_mod o_conf base =
     let ifam, fam, cpl, des = effective_mod conf base nsck sfam scpl sdes in
     let () = patch_parent_with_pevents base cpl in
     let () = patch_children_with_pevents base des in
-    Notes.update_notes_links_family ~old_text base fam;
-    (* TODO update_cache_linked_pages *)
+    Notes.update_notes_links_family conf ~old_text base fam;
     let nfs = (Adef.parent_array cpl, des.children) in
     let onfs = Some (ofs, nfs) in
     let wl, ml =

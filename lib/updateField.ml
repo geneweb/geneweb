@@ -417,7 +417,7 @@ let commit_fam conf base ip sfam scpl sdes =
   in
   UpdateFamOk.patch_parent_with_pevents base cpl;
   UpdateFamOk.patch_children_with_pevents base des;
-  Notes.update_notes_links_family ~old_text base fam;
+  Notes.update_notes_links_family conf ~old_text base fam;
   Util.commit_patches conf base;
   let p =
     Util.string_gen_person base

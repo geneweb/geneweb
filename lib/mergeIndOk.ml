@@ -575,7 +575,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   redirect_added_families base p o_p2.key_index p2_family;
   UpdateIndOk.effective_del_no_commit base o_p2;
   Driver.patch_person base p.key_index p;
-  Notes.update_notes_links_person base p;
+  Notes.update_notes_links_person conf base p;
   let new_key =
     (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
   in
@@ -600,7 +600,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   History.record conf base
     (U_Merge_person (o_p1, o_p2, Util.string_gen_person base p))
     "fp";
-  Notes.update_notes_links_db base (Def.NLDB.PgInd o_p2.key_index) "";
+  Notes.update_notes_links_db conf base (Def.NLDB.PgInd o_p2.key_index) "";
   let lkey = Util.make_key base p in
   Notes.update_cache_linked_pages conf Notes.Delete key2 key2 0;
   Notes.update_cache_linked_pages conf Notes.Merge key1 lkey

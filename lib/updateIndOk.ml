@@ -868,7 +868,7 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
       (Driver.insert_string base)
       sp
   in
-  List.iter (Notes.update_notes_links_person ~old_text:"" base) !created_p;
+  List.iter (Notes.update_notes_links_person conf ~old_text:"" base) !created_p;
   let np = { np with related = Driver.get_related op } in
   let ol_rparents = rparents_of (Driver.get_rparents op) in
   let nl_rparents = rparents_of np.rparents in
@@ -963,7 +963,7 @@ let effective_del_no_commit base op =
   Driver.delete_person_rec base op.key_index
 
 let effective_del_commit conf base op =
-  Notes.update_notes_links_db base (Def.NLDB.PgInd op.key_index) "";
+  Notes.update_notes_links_db conf base (Def.NLDB.PgInd op.key_index) "";
   (* op.key_index is already deleted: build the key from op. *)
   let key = (Name.lower op.first_name, Name.lower op.surname, op.occ) in
   Notes.update_cache_linked_pages conf Notes.Delete key key 0;

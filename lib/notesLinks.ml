@@ -207,13 +207,26 @@ let advances_pos link =
 let fold_links f acc s =
   let slen = String.length s in
   let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
+  let has_closing_brace i0 =
+    let rec look depth i =
+      if i >= slen then false
+      else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
+        look depth (i + 2)
+      else if s.[i] = '%' then look depth (i + 1)
+      else if s.[i] = '{' then look (depth + 1) (i + 1)
+      else if s.[i] = '}' then
+        if depth = 0 then true else look (depth - 1) (i + 1)
+      else look depth (i + 1)
+    in
+    look 0 i0
+  in
   let rec loop ?(stop_at_brace = false) acc pos i =
     if stop_at_brace && i < slen && s.[i] = '}' then (acc, pos, i + 1)
     else if i >= slen then (acc, pos, i)
     else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
       loop ~stop_at_brace acc pos (i + 2)
     else if s.[i] = '%' then loop ~stop_at_brace acc pos (i + 1)
-    else if s.[i] = '{' then
+    else if s.[i] = '{' && has_closing_brace (i + 1) then
       let acc, pos, j = loop ~stop_at_brace:true acc pos (i + 1) in
       loop ~stop_at_brace acc pos j
     else
@@ -245,4 +258,7 @@ let add_in_db db who (list_nt, list_ind) =
   if list_nt = [] && list_ind = [] then db else (who, (list_nt, list_ind)) :: db
 
 let update_db base who list =
-  Driver.write_nldb base @@ add_in_db (Driver.read_nldb base) who list
+  let db = Driver.read_nldb base in
+  let old_entry = List.assoc_opt who db in
+  Driver.write_nldb base (add_in_db db who list);
+  old_entry

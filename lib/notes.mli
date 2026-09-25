@@ -10,10 +10,15 @@ val notes_links_db :
   list
 
 val update_notes_links_db :
+  Config.config ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page ->
   string ->
   unit
+(** Re-scans [who]'s note-bearing text into nldb and adjusts the linked-pages
+    cache by the resulting difference in referenced keys (added and removed), so
+    the cache stays exact between two runs of update_nldb instead of drifting on
+    every edit. *)
 
 val has_links : string -> bool
 (** Whether a text contains a double opening bracket, i.e. may hold a link
@@ -32,6 +37,7 @@ val notes_bearing_text_of_family :
 (** Concatenation of the family's note-bearing fields, as scanned for links. *)
 
 val update_notes_links_person :
+  Config.config ->
   ?old_text:string ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, _, Geneweb_db.Driver.istr) Def.gen_person ->
@@ -43,6 +49,7 @@ val update_notes_links_person :
     rescan. *)
 
 val update_notes_links_family :
+  Config.config ->
   ?old_text:string ->
   Geneweb_db.Driver.base ->
   (_, Geneweb_db.Driver.ifam, Geneweb_db.Driver.istr) Def.gen_family ->

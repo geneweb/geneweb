@@ -298,7 +298,76 @@ let safe_gallery conf base s =
   in
   Yojson.Basic.to_string json
 
-let update_notes_links_db base fnotes s =
+type mode = Delete | Rename | Merge
+type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
+
+let cache_linked_pages_name = "cache_linked_pages"
+
+let get_linked_pages_fname conf =
+  Filename.concat (!GWPARAM.bpath conf.bname) cache_linked_pages_name
+
+let read_cache_linked_pages conf =
+  let fname = get_linked_pages_fname conf in
+  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
+  | Some ic ->
+      Fun.protect
+        ~finally:(fun () -> close_in ic)
+        (fun () -> Some (input_value ic : cache_linked_pages_t))
+  | None ->
+      Printf.eprintf "%s not exist. Run update_nldb\n" fname;
+      None
+
+(* sync with update_nldb.ml if this changes *)
+let write_cache_linked_pages conf cache_linked_pages =
+  let fname = get_linked_pages_fname conf in
+  let fname_tmp = fname ^ ".tmp" in
+  let oc = open_out_bin fname_tmp in
+  output_value oc cache_linked_pages;
+  close_out oc;
+  Sys.rename fname_tmp fname
+
+let update_cache_linked_pages conf mode old_key new_key nbr =
+  match read_cache_linked_pages conf with
+  | None -> ()
+  | Some ht -> (
+      match mode with
+      | Delete ->
+          if Hashtbl.mem ht old_key then (
+            Hashtbl.remove ht old_key;
+            write_cache_linked_pages conf ht)
+      | Rename | Merge ->
+          if old_key <> new_key || Hashtbl.find_opt ht new_key <> Some nbr then (
+            Hashtbl.remove ht old_key;
+            Hashtbl.replace ht new_key nbr;
+            write_cache_linked_pages conf ht))
+
+let adjust_cache_linked_pages conf ~removed ~added =
+  if removed <> [] || added <> [] then
+    match read_cache_linked_pages conf with
+    | None -> ()
+    | Some ht ->
+        List.iter
+          (fun key ->
+            match Hashtbl.find_opt ht key with
+            | Some 1 -> Hashtbl.remove ht key
+            | Some n -> Hashtbl.replace ht key (n - 1)
+            | None -> ())
+          removed;
+        List.iter
+          (fun key ->
+            let n = try Hashtbl.find ht key with Not_found -> 0 in
+            Hashtbl.replace ht key (n + 1))
+          added;
+        write_cache_linked_pages conf ht
+
+let count_linked_pages base key =
+  List.fold_left
+    (fun n (_, (_, il)) ->
+      if List.exists (fun (k, _) -> Def.NLDB.equal_key k key) il then n + 1
+      else n)
+    0 (Driver.read_nldb base)
+
+let update_notes_links_db conf base fnotes s =
   let list_nt, list_ind =
     NotesLinks.fold_links
       (fun ~pos link (list_nt, list_ind) ->
@@ -321,7 +390,16 @@ let update_notes_links_db base fnotes s =
             (list_nt, list_ind))
       ([], []) s
   in
-  NotesLinks.update_db base fnotes (list_nt, list_ind)
+  let old_entry = NotesLinks.update_db base fnotes (list_nt, list_ind) in
+  let old_keys =
+    match old_entry with
+    | Some (_, old_ind) -> List.map fst old_ind
+    | None -> []
+  in
+  let new_keys = List.map fst list_ind in
+  let removed = List.filter (fun k -> not (List.mem k new_keys)) old_keys in
+  let added = List.filter (fun k -> not (List.mem k old_keys)) new_keys in
+  adjust_cache_linked_pages conf ~removed ~added
 
 let notes_bearing_text_of_person base (p : _ Def.gen_person) =
   let sl =
@@ -363,19 +441,19 @@ let notes_bearing_text_of_family base (f : _ Def.gen_family) =
 
 let has_links s = Mutil.contains s "[["
 
-let update_notes_links_person ?old_text base (p : _ Def.gen_person) =
+let update_notes_links_person conf ?old_text base (p : _ Def.gen_person) =
   let s = notes_bearing_text_of_person base p in
   match old_text with
   | Some t when String.equal t s || not (has_links t || has_links s) -> ()
   | Some _ | None ->
-      update_notes_links_db base (Def.NLDB.PgInd p.Def.key_index) s
+      update_notes_links_db conf base (Def.NLDB.PgInd p.Def.key_index) s
 
-let update_notes_links_family ?old_text base (f : _ Def.gen_family) =
+let update_notes_links_family conf ?old_text base (f : _ Def.gen_family) =
   let s = notes_bearing_text_of_family base f in
   match old_text with
   | Some t when String.equal t s || not (has_links t || has_links s) -> ()
   | Some _ | None ->
-      update_notes_links_db base (Def.NLDB.PgFam f.Def.fam_index) s
+      update_notes_links_db conf base (Def.NLDB.PgFam f.Def.fam_index) s
 
 let commit_notes conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
@@ -389,7 +467,7 @@ let commit_notes conf base fnotes s =
    with Sys_error m ->
      Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
-  update_notes_links_db base pg s
+  update_notes_links_db conf base pg s
 
 let commit_wiznotes conf base fnotes s =
   let pg = Def.NLDB.PgWizard fnotes in
@@ -402,7 +480,7 @@ let commit_wiznotes conf base fnotes s =
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   Driver.commit_wiznotes base fname s;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
-  update_notes_links_db base pg s
+  update_notes_links_db conf base pg s
 
 (* TODO Henri -> Henri-xx -> Henri fails to remove the -xx !! *)
 (* TODO adjust replacement to news capital variants *)
@@ -591,7 +669,7 @@ let replace_ind_key_in_str base is oldk newk p =
   let s' = rewrite_key s oldk newk design in
   Driver.insert_string base s'
 
-let update_ind_key_pgind base p oldk newk =
+let update_ind_key_pgind conf base p oldk newk =
   let oldp = Driver.gen_person_of_person @@ Driver.poi base p in
   let replace is =
     replace_ind_key_in_str base is oldk newk (Driver.poi base p)
@@ -635,9 +713,9 @@ let update_ind_key_pgind base p oldk newk =
     }
   in
   Driver.patch_person base p newp;
-  update_notes_links_person base newp
+  update_notes_links_person conf base newp
 
-let update_ind_key_pgfam base f oldk newk =
+let update_ind_key_pgfam conf base f oldk newk =
   let oldf = Driver.gen_family_of_family @@ Driver.foi base f in
   let cpl = Driver.foi base f in
   let fath = Driver.poi base (Driver.get_father cpl) in
@@ -664,7 +742,7 @@ let update_ind_key_pgfam base f oldk newk =
     { oldf with marriage_note; marriage_src; comment; fsources; fevents }
   in
   Driver.patch_family base f newf;
-  update_notes_links_family base newf
+  update_notes_links_family conf base newf
 
 let update_ind_key_pgmisc conf base f oldk newk =
   let fname = path_of_fnotes f in
@@ -682,8 +760,8 @@ let update_ind_key conf base link_pages oldk newk =
   Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
   List.iter
     (function
-      | Def.NLDB.PgInd p -> update_ind_key_pgind base p oldk newk
-      | PgFam f -> update_ind_key_pgfam base f oldk newk
+      | Def.NLDB.PgInd p -> update_ind_key_pgind conf base p oldk newk
+      | PgFam f -> update_ind_key_pgfam conf base f oldk newk
       | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
       | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk
       | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk)
@@ -776,59 +854,11 @@ let links_to_cache_entries conf base db key =
 let links_to_ind conf base db key typ =
   fold_linked_pages conf base db key typ (fun pg _k _ind acc -> pg :: acc)
 
-type mode = Delete | Rename | Merge
-type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
-
-let cache_linked_pages_name = "cache_linked_pages"
-
-let get_linked_pages_fname conf =
-  Filename.concat (!GWPARAM.bpath conf.bname) cache_linked_pages_name
-
-let read_cache_linked_pages conf =
-  let fname = get_linked_pages_fname conf in
-  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
-  | Some ic ->
-      Fun.protect
-        ~finally:(fun () -> close_in ic)
-        (fun () -> Some (input_value ic : cache_linked_pages_t))
-  | None ->
-      Printf.eprintf "%s not exist. Run update_nldb\n" fname;
-      None
-
-(* sync with update_nldb.ml if this changes *)
-let write_cache_linked_pages conf cache_linked_pages =
-  let fname = get_linked_pages_fname conf in
-  let oc = open_out_bin fname in
-  output_value oc cache_linked_pages;
-  close_out oc
-
-let update_cache_linked_pages conf mode old_key new_key nbr =
-  match read_cache_linked_pages conf with
-  | None -> ()
-  | Some ht -> (
-      match mode with
-      | Delete ->
-          if Hashtbl.mem ht old_key then (
-            Hashtbl.remove ht old_key;
-            write_cache_linked_pages conf ht)
-      | Rename | Merge ->
-          if old_key <> new_key || Hashtbl.find_opt ht new_key <> Some nbr then (
-            Hashtbl.remove ht old_key;
-            Hashtbl.replace ht new_key nbr;
-            write_cache_linked_pages conf ht))
-
-let count_linked_pages base key =
-  List.fold_left
-    (fun n (_, (_, il)) ->
-      if List.exists (fun (k, _) -> Def.NLDB.equal_key k key) il then n + 1
-      else n)
-    0 (Driver.read_nldb base)
-
 let on_person_saved conf base ~old_key ?old_text
     ~(pgl : unit -> (Driver.iper, Driver.ifam) Def.NLDB.page list) p =
   (* Must run first: if p links to itself, update_ind_key re-indexes the
      rewritten notes. *)
-  update_notes_links_person ?old_text base p;
+  update_notes_links_person conf ?old_text base p;
   let new_key = Util.make_key base p in
   if old_key <> new_key then (
     let real_key =

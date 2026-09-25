@@ -257,8 +257,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
           (scpl, sdes, None)
       in
       Util.commit_patches conf base;
-      Notes.update_notes_links_family base fam;
-      (* TODO update_cache_linked_pages *)
+      Notes.update_notes_links_family conf base fam;
       let changed =
         let gen_p =
           let p =
