@@ -54,7 +54,7 @@ type 'a event_item =
   * Driver.istr
   * Driver.istr
   * Driver.istr
-  * (Driver.iper * witness_kind) array
+  * (Driver.iper * witness_kind * Driver.istr) array
   * Driver.iper option
 
 let events conf base p =
