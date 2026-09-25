@@ -405,15 +405,22 @@ let print conf base =
   in
   match (p1, p2) with
   | Some p1, Some p2 -> (
-      try
-        let ok, warnings =
-          MergeInd.merge conf base p1 p2 propose_merge_ind propose_merge_fam
-        in
-        if ok then print_merged conf base warnings p1
-      with
-      | MergeInd.Error_loop p -> error_loop conf base p
-      | MergeInd.Different_sexes (p1, p2) -> different_sexes conf base p1 p2
-      | Person.Same_person -> same_person conf)
+      match MergeInd.merge conf base p1 p2 with
+      | Stuck (IndJob { p1; p2 }, jobs, _warnings) ->
+          let pairs = MergeInd.person_pairs_of_jobs jobs in
+          propose_merge_ind conf base pairs p1 p2
+      | Stuck (FamJob { f1; f2 }, jobs, _warnings) ->
+          let pairs = MergeInd.person_pairs_of_jobs jobs in
+          propose_merge_fam conf base pairs
+            (Gwdb.get_ifam f1, f1)
+            (Gwdb.get_ifam f2, f2)
+            (Gwdb.poi base (Gwdb.get_father f1))
+            (Gwdb.poi base (Gwdb.get_mother f1))
+      | Finished warnings -> print_merged conf base warnings p1
+      | exception MergeInd.Error_loop p -> error_loop conf base p
+      | exception MergeInd.Different_sexes (p1, p2) ->
+          different_sexes conf base p1 p2
+      | exception Person.Same_person -> same_person conf)
   | _ -> not_found_or_incorrect conf
 
 (* Undocumented feature... Kill someone's ancestors *)

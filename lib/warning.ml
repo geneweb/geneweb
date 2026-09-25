@@ -51,6 +51,8 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** There is a possibility that two families are a duplicate of each other *)
   | PossibleDuplicateFamHomonymous of 'family * 'family * 'person
       (** There is a possibility that two families are a duplicate of each other (Homonymous spouse) *)
+  | PossibleDuplicateFamQuestString of 'family * 'family * 'person
+      (** There is a possibility that two families are a duplicate of each other (? ? spouse) *)
   | PWitnessEventAfterDeath of 'person * 'pevent * 'person
       (** Witness is dead before personal event date *)
   | PWitnessEventBeforeBirth of 'person * 'pevent * 'person
@@ -111,6 +113,7 @@ let int_of_warning_tag = function
   | UndefinedSex _p -> 28
   | YoungForMarriage (_p, _d, _ifam) -> 29
   | OldForMarriage (_p, _d, _ifam) -> 30
+  | PossibleDuplicateFamQuestString (_f1, _f2, _p) -> 31
 
 let compare_family f1 f2 =
   Gwdb.compare_ifam (Gwdb.get_ifam f1) (Gwdb.get_ifam f2)
@@ -126,6 +129,10 @@ let normalize_warning (warning : base_warning) : base_warning =
   | PossibleDuplicateFamHomonymous (f1, f2, p) ->
       if Gwdb.compare_ifam f2 f1 < 0 then
         PossibleDuplicateFamHomonymous (f2, f1, p)
+      else warning
+  | PossibleDuplicateFamQuestString (f1, f2, p) ->
+      if Gwdb.compare_ifam f2 f1 < 0 then
+        PossibleDuplicateFamQuestString (f2, f1, p)
       else warning
   | BigAgeBetweenSpouses (p1, p2, d) ->
       if Gwdb.compare_iper (Gwdb.get_iper p2) (Gwdb.get_iper p1) < 0 then
@@ -239,6 +246,10 @@ let compare_normalized_base_warning (w1 : base_warning) (w2 : base_warning) :
       Gwdb.compare_ifam f1 f1' >>= fun () -> Gwdb.compare_ifam f2 f2'
   | ( PossibleDuplicateFamHomonymous (ifam1, ifam2, _),
       PossibleDuplicateFamHomonymous (ifam1', ifam2', _) ) ->
+      Gwdb.compare_ifam ifam1 ifam1' >>= fun () ->
+      Gwdb.compare_ifam ifam2 ifam2'
+  | ( PossibleDuplicateFamQuestString (ifam1, ifam2, _),
+      PossibleDuplicateFamQuestString (ifam1', ifam2', _) ) ->
       Gwdb.compare_ifam ifam1 ifam1' >>= fun () ->
       Gwdb.compare_ifam ifam2 ifam2'
   | BigAgeBetweenSpouses (p1, p2, d), BigAgeBetweenSpouses (p1', p2', d') ->
