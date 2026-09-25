@@ -211,9 +211,17 @@ val read_or_create_value :
 
     On Windows, file is not locked. *)
 
-val bench : string -> (unit -> 'a) -> 'a
-(** [bench name fn] Execute [fn], print stats about time and memory allocation,
-    return [fn] result. *)
+module Bench : sig
+  type t
+  (** Results of a benchmarks. *)
+
+  val pp : t Fmt.t
+  (** [pp ppf t] pretty prints the results on the formatter [ppf]. *)
+
+  val bench : (unit -> 'a) -> t * 'a
+  (** [bench f] executes [f] and returns its result and the benchmark results.
+  *)
+end
 
 val encode : string -> Adef.encoded_string
 (** [encode s] Encodes the string [s] in another string where spaces and special
