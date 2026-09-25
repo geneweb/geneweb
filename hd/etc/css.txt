@@ -43,3 +43,6 @@
 %if;(b.css_prop!="" and b.css_prop!="stylesheet")
   <link rel="stylesheet" href="%etc_prefix;css/%bvar.css_prop;?hash=%apply;hash%with;%etc_prefix;css/%bvar.css_prop;%end;">
 %end;
+%if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
+  <link rel="stylesheet" href="%etc_prefix;css/autocomplete.css?hash=%apply;hash%with;%etc_prefix;css/autocomplete.css%end;">
+%end;

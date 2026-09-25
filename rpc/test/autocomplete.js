@@ -248,6 +248,8 @@
   // ==========================================================
   class AutocompleteWidget {
     constructor(input, rpc, opts) {
+      this.debounceTimer = null;
+      this._selecting = false;      // true while _selectItem dispatches its synthetic events
       this.input = input;
       this.rpc = rpc;
       this.opts = opts;
@@ -415,7 +417,7 @@
       if (this.datalistId) {
         this.input.setAttribute('data-gw-ac-list', this.datalistId);
       }
-      this.input.setAttribute('autocomplete', 'off');
+      this.input.setAttribute('autocomplete', 'gw-ac-' + (this.datalistId || 'field'));
 
       // Badge RPC (optionnel)
       if (this.opts.showRpcBadge) {
@@ -578,6 +580,7 @@
      */
     _bindEvents() {
       this.input.addEventListener('input', () => {
+        if (this._selecting) return;          // event fired by _selectItem: don't search
         const query = this.input.value.trim();
         clearTimeout(this.debounceTimer);
 
@@ -742,8 +745,7 @@
      */
     _onKeyDown(e) {
       if (!this.isOpen) {
-        if ((e.key === 'ArrowDown' || e.key === 'Enter') &&
-            this.input.value.length >= this.opts.minChars) {
+        if (e.key === 'ArrowDown' && this.input.value.length >= this.opts.minChars) {
           e.preventDefault();
           this._doSearch(this.input.value.trim());
         }
@@ -772,15 +774,14 @@
           break;
 
         case 'Enter':
-          e.preventDefault();
           if (this.selectedRow >= 0) {
+            e.preventDefault();
             const item = this._getSelectedItem();
-            if (item) {
-              this._selectItem(item.getAttribute('data-value'));
-            }
+            if (item) this._selectItem(item.getAttribute('data-value'));
+          } else {
+            this.close();          // let the form submit
           }
           break;
-
         case 'Escape':
           e.preventDefault();
           this.close();
@@ -853,16 +854,23 @@
     }
 
     _selectItem(value) {
+      clearTimeout(this.debounceTimer);     // kill a search scheduled by the last keystroke
+      this.debounceTimer = null;
       this.input.value = value;
       this.close();
+      this.results = { col1: [], col2: [], col3: [], col4: [] };  // no reopen on next focus
 
-      this.input.dispatchEvent(new Event('input', { bubbles: true }));
-      this.input.dispatchEvent(new Event('change', { bubbles: true }));
-
+      this._selecting = true;
+      try {
+        this.input.dispatchEvent(new Event('input',  { bubbles: true }));
+        this.input.dispatchEvent(new Event('change', { bubbles: true }));
+      } finally {
+        this._selecting = false;
+      }
+    
       if (typeof this.opts.onSelect === 'function') {
         this.opts.onSelect(value, this.indexName, this.input);
       }
-
       this.log('Sélectionné:', value);
     }
 

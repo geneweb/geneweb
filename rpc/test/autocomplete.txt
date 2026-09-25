@@ -1,0 +1,27 @@
+%( RPC autocomplete — enabled by autocomplete_rpc=... in the .gwf %)
+%if;(b.autocomplete_rpc!="")
+<link rel="stylesheet" href="%etc_prefix;css/autocomplete.css">
+<script src="%etc_prefix;js/autocomplete.js"></script>
+<script>
+(function () {
+  var base = "%base.name;";
+  var rpc  = "%b.autocomplete_rpc;";
+  // Relative path → same host as the page, ws/wss following http/https
+  if (rpc.charAt(0) === '/') {
+    rpc = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + rpc;
+  }
+  var indexMap = {};
+  ['fnames','snames','places','sources','occupations',
+   'qualifiers','titles','estates','aliases','pub_names'].forEach(function (s) {
+    indexMap['datalist_' + s] = base + '_' + s;
+  });
+  GenewebAutocomplete.init({
+    rpcUrl: rpc,
+    indexMap: indexMap,
+    minChars: 2, debounceMs: 250, maxResults: 90,
+    connectTimeout: 1500, maxReconnect: 1,
+    debug: %if;(b.autocomplete_debug="yes")true%else;false%end;
+  });
+})();
+</script>
+%end;
