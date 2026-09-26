@@ -601,9 +601,5 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
     (U_Merge_person (o_p1, o_p2, Util.string_gen_person base p))
     "fp";
   Notes.update_notes_links_db conf base (Def.NLDB.PgInd o_p2.key_index) "";
-  let lkey = Util.make_key base p in
-  Notes.update_cache_linked_pages conf Notes.Delete key2 key2 0;
-  Notes.update_cache_linked_pages conf Notes.Merge key1 lkey
-    (Notes.count_linked_pages base lkey);
   Update.delete_topological_sort conf base;
   print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2

@@ -204,51 +204,43 @@ let advances_pos link =
   | WLperson _ | WLwizard _ -> true
   | WLpage _ | WLimage _ | WLnone _ -> false
 
-let fold_links f acc s =
+let fold_links ?(on_unclosed_brace = fun _ -> ()) f acc s =
   let slen = String.length s in
   let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
-  let has_closing_brace i0 =
-    let rec look depth i =
-      if i >= slen then false
-      else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
-        look depth (i + 2)
-      else if s.[i] = '%' then look depth (i + 1)
-      else if s.[i] = '{' then look (depth + 1) (i + 1)
-      else if s.[i] = '}' then
-        if depth = 0 then true else look (depth - 1) (i + 1)
-      else look depth (i + 1)
-    in
-    look 0 i0
-  in
-  let rec loop ?(stop_at_brace = false) acc pos i =
-    if stop_at_brace && i < slen && s.[i] = '}' then (acc, pos, i + 1)
-    else if i >= slen then (acc, pos, i)
-    else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
-      loop ~stop_at_brace acc pos (i + 2)
-    else if s.[i] = '%' then loop ~stop_at_brace acc pos (i + 1)
-    else if s.[i] = '{' && has_closing_brace (i + 1) then
-      let acc, pos, j = loop ~stop_at_brace:true acc pos (i + 1) in
-      loop ~stop_at_brace acc pos j
-    else
-      let link = misc_notes_link s i in
-      let link =
-        (* [misc_notes_link]/[wlnone] never stops a plain-text run at a
-           bare '}' - only at '%'/'\''/'{'/'['. Inside a highlight span,
-           clamp such a run at its first '}' so the outer stop-condition
-           above actually gets to see that character on the next call,
-           instead of it being swallowed into the text. *)
-        if stop_at_brace then
-          match link with
-          | WLnone (_, none_s) -> (
-              match String.index_opt none_s '}' with
-              | Some k -> WLnone (i + k, String.sub none_s 0 k)
-              | None -> link)
-          | _ -> link
-        else link
-      in
-      let acc = f ~pos link acc in
-      let pos = if advances_pos link then pos + 1 else pos in
-      loop ~stop_at_brace acc pos (end_pos link)
+  let rec loop ?stop_at_brace acc pos i =
+    match stop_at_brace with
+    | Some _ when i < slen && s.[i] = '}' -> (acc, pos, i + 1)
+    | Some brace_pos when i >= slen ->
+        on_unclosed_brace brace_pos;
+        (acc, pos, i)
+    | _ when i >= slen -> (acc, pos, i)
+    | _ ->
+        if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
+          loop ?stop_at_brace acc pos (i + 2)
+        else if s.[i] = '%' then loop ?stop_at_brace acc pos (i + 1)
+        else if s.[i] = '{' then
+          let acc, pos, j = loop ~stop_at_brace:i acc pos (i + 1) in
+          loop ?stop_at_brace acc pos j
+        else
+          let link = misc_notes_link s i in
+          let link =
+            (* [misc_notes_link]/[wlnone] never stops a plain-text run at a
+               bare '}' - only at '%'/'\''/'{'/'['. Inside a highlight span,
+               clamp such a run at its first '}' so the outer stop-condition
+               above actually gets to see that character on the next call,
+               instead of it being swallowed into the text. *)
+            if stop_at_brace <> None then
+              match link with
+              | WLnone (_, none_s) -> (
+                  match String.index_opt none_s '}' with
+                  | Some k -> WLnone (i + k, String.sub none_s 0 k)
+                  | None -> link)
+              | _ -> link
+            else link
+          in
+          let acc = f ~pos link acc in
+          let pos = if advances_pos link then pos + 1 else pos in
+          loop ?stop_at_brace acc pos (end_pos link)
   in
   let acc, _, _ = loop acc 1 0 in
   acc

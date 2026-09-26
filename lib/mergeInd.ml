@@ -180,10 +180,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
   Driver.patch_person base p1.key_index p1;
   reparent_ind base warning p1.key_index (Driver.get_iper p2);
   UpdateIndOk.effective_del conf base p2;
-  Notes.update_notes_links_person conf base p1;
-  let key = Util.make_key base p1 in
-  Notes.update_cache_linked_pages conf Notes.Merge key key
-    (Notes.count_linked_pages base key)
+  Notes.update_notes_links_person conf base p1
 
 exception Error_loop of Driver.person
 exception Different_sexes of Driver.person * Driver.person

@@ -298,7 +298,6 @@ let safe_gallery conf base s =
   in
   Yojson.Basic.to_string json
 
-type mode = Delete | Rename | Merge
 type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 
 let cache_linked_pages_name = "cache_linked_pages"
@@ -326,21 +325,6 @@ let write_cache_linked_pages conf cache_linked_pages =
   close_out oc;
   Sys.rename fname_tmp fname
 
-let update_cache_linked_pages conf mode old_key new_key nbr =
-  match read_cache_linked_pages conf with
-  | None -> ()
-  | Some ht -> (
-      match mode with
-      | Delete ->
-          if Hashtbl.mem ht old_key then (
-            Hashtbl.remove ht old_key;
-            write_cache_linked_pages conf ht)
-      | Rename | Merge ->
-          if old_key <> new_key || Hashtbl.find_opt ht new_key <> Some nbr then (
-            Hashtbl.remove ht old_key;
-            Hashtbl.replace ht new_key nbr;
-            write_cache_linked_pages conf ht))
-
 let adjust_cache_linked_pages conf ~removed ~added =
   if removed <> [] || added <> [] then
     match read_cache_linked_pages conf with
@@ -360,16 +344,21 @@ let adjust_cache_linked_pages conf ~removed ~added =
           added;
         write_cache_linked_pages conf ht
 
-let count_linked_pages base key =
-  List.fold_left
-    (fun n (_, (_, il)) ->
-      if List.exists (fun (k, _) -> Def.NLDB.equal_key k key) il then n + 1
-      else n)
-    0 (Driver.read_nldb base)
-
 let update_notes_links_db conf base fnotes s =
+  let describe_page = function
+    | Def.NLDB.PgInd ip -> Printf.sprintf "PgInd %s" (Driver.Iper.to_string ip)
+    | Def.NLDB.PgFam ifam ->
+        Printf.sprintf "PgFam %s" (Driver.Ifam.to_string ifam)
+    | Def.NLDB.PgNotes -> "PgNotes"
+    | Def.NLDB.PgMisc f -> Printf.sprintf "PgMisc %s" f
+    | Def.NLDB.PgWizard f -> Printf.sprintf "PgWizard %s" f
+  in
+  let on_unclosed_brace brace_pos =
+    Printf.eprintf "Warning: unclosed '{' at position %d in %s\n%!" brace_pos
+      (describe_page fnotes)
+  in
   let list_nt, list_ind =
-    NotesLinks.fold_links
+    NotesLinks.fold_links ~on_unclosed_brace
       (fun ~pos link (list_nt, list_ind) ->
         match link with
         | NotesLinks.WLpage (_, _, lfname, _, _) ->
@@ -390,13 +379,14 @@ let update_notes_links_db conf base fnotes s =
             (list_nt, list_ind))
       ([], []) s
   in
+  let keys l = List.sort_uniq compare (List.map fst l) in
   let old_entry = NotesLinks.update_db base fnotes (list_nt, list_ind) in
   let old_keys =
     match old_entry with
-    | Some (_, old_ind) -> List.map fst old_ind
+    | Some (_, old_ind) -> keys old_ind
     | None -> []
   in
-  let new_keys = List.map fst list_ind in
+  let new_keys = keys list_ind in
   let removed = List.filter (fun k -> not (List.mem k new_keys)) old_keys in
   let added = List.filter (fun k -> not (List.mem k old_keys)) new_keys in
   adjust_cache_linked_pages conf ~removed ~added
@@ -848,9 +838,6 @@ let fold_linked_pages conf base db key type_filter transform =
     [] db
   |> List.sort_uniq compare
 
-let links_to_cache_entries conf base db key =
-  fold_linked_pages conf base db key None (fun _pg k ind acc -> (k, ind) :: acc)
-
 let links_to_ind conf base db key typ =
   fold_linked_pages conf base db key typ (fun pg _k _ind acc -> pg :: acc)
 
@@ -859,14 +846,9 @@ let on_person_saved conf base ~old_key ?old_text
   (* Must run first: if p links to itself, update_ind_key re-indexes the
      rewritten notes. *)
   update_notes_links_person conf ?old_text base p;
-  let new_key = Util.make_key base p in
-  if old_key <> new_key then (
-    let real_key =
+  if old_key <> Util.make_key base p then
+    update_ind_key conf base (pgl ()) old_key
       (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
-    in
-    update_ind_key conf base (pgl ()) old_key real_key;
-    update_cache_linked_pages conf Rename old_key new_key
-      (count_linked_pages base new_key))
 
 let linked_pages_nbr conf base ip =
   let key =

@@ -38,8 +38,11 @@ let parse_cmd () =
   Arg.parse speclist anonfun errmsg;
   (!fname, get_bases_dir ())
 
-let notes_links s =
+let notes_links ~label s =
   NotesLinks.fold_links
+    ~on_unclosed_brace:(fun brace_pos ->
+      Printf.eprintf "Warning: unclosed '{' at position %d in %s\n%!"
+        brace_pos label)
     (fun ~pos link (list_nt, list_ind) ->
       match link with
       | NotesLinks.WLpage (_, _, lfname, _, _) ->
@@ -90,7 +93,7 @@ let compute base bdir =
 
   Printf.eprintf "--- database notes\n";
   flush stderr;
-  (match notes_links (Driver.base_notes_read base "") with
+  (match notes_links ~label:"PgNotes" (Driver.base_notes_read base "") with
   | [], [] -> ()
   | list -> add_page NLDB.PgNotes list);
 
@@ -110,7 +113,11 @@ let compute base bdir =
          then
            if Filename.check_suffix file ".txt" then
              let wizid = Filename.chop_suffix file ".txt" in
-             match notes_links (Driver.base_wiznotes_read base wizid) with
+             match
+               notes_links
+                 ~label:(Printf.sprintf "PgWizard %s" wizid)
+                 (Driver.base_wiznotes_read base wizid)
+             with
              | [], [] -> ()
              | list ->
                  Printf.eprintf "%s... " wizid;
@@ -142,7 +149,10 @@ let compute base bdir =
           if Filename.check_suffix file ".txt" then (
             let fnotes = Filename.chop_suffix file ".txt" in
             let file = Filename.concat dir fnotes in
-            match notes_links (Driver.base_notes_read base file) with
+            match
+              notes_links ~label:(Printf.sprintf "PgMisc %s" file)
+                (Driver.base_notes_read base file)
+            with
             | [], [] -> ()
             | list ->
                 let fnotes =
@@ -197,7 +207,11 @@ let compute base bdir =
           add_string epers_src)
         (Driver.get_pevents p);
       (* list is: lfname :: list_nt, (key, link) :: list_ind *)
-      match notes_links (Buffer.contents buffer) with
+      match
+        notes_links
+          ~label:(Printf.sprintf "PgInd %s" (Gutil.designation base p))
+          (Buffer.contents buffer)
+      with
       | [], [] -> ()
       | list ->
           add_page (NLDB.PgInd (Driver.get_iper p)) list;
@@ -223,7 +237,13 @@ let compute base bdir =
           add_string @@ efam_note;
           add_string @@ efam_src)
         (Driver.get_fevents fam);
-      match notes_links (Buffer.contents buffer) with
+      match
+        notes_links
+          ~label:
+            (Printf.sprintf "PgFam %s"
+               (Driver.Ifam.to_string (Driver.get_ifam fam)))
+          (Buffer.contents buffer)
+      with
       | [], [] -> ()
       | list ->
           add_page (NLDB.PgFam (Driver.get_ifam fam)) list;

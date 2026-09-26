@@ -124,8 +124,6 @@ val wiki_of_source :
     to HTML in the "NOTES" wiki context, marking links to non-public persons;
     [p] provides the [%i]/[%k] macro env and the person-existence check. *)
 
-type mode = Delete | Rename | Merge
-
 val links_to_ind :
   Config.config ->
   Geneweb_db.Driver.base ->
@@ -136,31 +134,10 @@ val links_to_ind :
   string option ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list
 
-val links_to_cache_entries :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  ((Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page
-  * (string list * (Def.NLDB.key * Def.NLDB.ind) list))
-  list ->
-  Def.NLDB.key ->
-  (Def.NLDB.key * Def.NLDB.ind) list
-
 val linked_pages_nbr :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> int
 
-val count_linked_pages : Geneweb_db.Driver.base -> Def.NLDB.key -> int
-(** [count_linked_pages base key] is the number of nldb pages holding at least
-    one link to [key], without alias merging nor access filtering, i.e. the
-    value [update_nldb] stores in the linked-pages cache. *)
-
 val cache_linked_pages_name : string
-
-val update_cache_linked_pages :
-  Config.config -> mode -> Def.NLDB.key -> Def.NLDB.key -> int -> unit
-(** [update_cache_linked_pages conf mode old_key new_key nbr] updates the
-    linked-pages cache if it exists: [Delete] removes [old_key] ([new_key] and
-    [nbr] are ignored); [Rename] and [Merge] remove [old_key] and set [new_key]
-    to [nbr]. The file is rewritten only when an entry changes. *)
 
 val on_person_saved :
   Config.config ->

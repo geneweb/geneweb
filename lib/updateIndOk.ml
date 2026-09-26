@@ -964,9 +964,6 @@ let effective_del_no_commit base op =
 
 let effective_del_commit conf base op =
   Notes.update_notes_links_db conf base (Def.NLDB.PgInd op.key_index) "";
-  (* op.key_index is already deleted: build the key from op. *)
-  let key = (Name.lower op.first_name, Name.lower op.surname, op.occ) in
-  Notes.update_cache_linked_pages conf Notes.Delete key key 0;
   Util.commit_patches conf base;
   let changed = U_Delete_person op in
   History.record conf base changed "dp"
