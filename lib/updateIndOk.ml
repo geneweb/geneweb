@@ -868,7 +868,7 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
       (Driver.insert_string base)
       sp
   in
-  List.iter (Notes.update_notes_links_person conf ~old_text:"" base) !created_p;
+  List.iter (Notes.update_notes_links_person ~old_text:"" conf base) !created_p;
   let np = { np with related = Driver.get_related op } in
   let ol_rparents = rparents_of (Driver.get_rparents op) in
   let nl_rparents = rparents_of np.rparents in

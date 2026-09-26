@@ -6,6 +6,10 @@ module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let src = Logs.Src.create ~doc:"Perso" "PERS"
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
 let file_path conf base fname =
   String.concat Filename.dir_sep
     [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
@@ -317,13 +321,21 @@ let read_cache_linked_pages conf =
       None
 
 (* sync with update_nldb.ml if this changes *)
-let write_cache_linked_pages conf cache_linked_pages =
-  let fname = get_linked_pages_fname conf in
-  let fname_tmp = fname ^ ".tmp" in
-  let oc = open_out_bin fname_tmp in
-  output_value oc cache_linked_pages;
-  close_out oc;
-  Sys.rename fname_tmp fname
+let save_cache_linked_pages bdir (ht : cache_linked_pages_t) =
+  let fname = Filename.concat bdir cache_linked_pages_name in
+  let tmp = fname ^ ".tmp" in
+  let oc = open_out_bin tmp in
+  Fun.protect
+    ~finally:(fun () -> close_out_noerr oc)
+    (fun () ->
+      output_value oc ht;
+      close_out oc);
+  Sys.rename tmp fname
+
+let write_cache_linked_pages conf ht =
+  try save_cache_linked_pages (!GWPARAM.bpath conf.bname) ht
+  with Sys_error e ->
+    Log.warn (fun k -> k "%s not updated: %s" cache_linked_pages_name e)
 
 let adjust_cache_linked_pages conf ~removed ~added =
   if removed <> [] || added <> [] then
@@ -382,9 +394,7 @@ let update_notes_links_db conf base fnotes s =
   let keys l = List.sort_uniq compare (List.map fst l) in
   let old_entry = NotesLinks.update_db base fnotes (list_nt, list_ind) in
   let old_keys =
-    match old_entry with
-    | Some (_, old_ind) -> keys old_ind
-    | None -> []
+    match old_entry with Some (_, old_ind) -> keys old_ind | None -> []
   in
   let new_keys = keys list_ind in
   let removed = List.filter (fun k -> not (List.mem k new_keys)) old_keys in
@@ -431,7 +441,7 @@ let notes_bearing_text_of_family base (f : _ Def.gen_family) =
 
 let has_links s = Mutil.contains s "[["
 
-let update_notes_links_person conf ?old_text base (p : _ Def.gen_person) =
+let update_notes_links_person ?old_text conf base (p : _ Def.gen_person) =
   let s = notes_bearing_text_of_person base p in
   match old_text with
   | Some t when String.equal t s || not (has_links t || has_links s) -> ()
@@ -845,7 +855,7 @@ let on_person_saved conf base ~old_key ?old_text
     ~(pgl : unit -> (Driver.iper, Driver.ifam) Def.NLDB.page list) p =
   (* Must run first: if p links to itself, update_ind_key re-indexes the
      rewritten notes. *)
-  update_notes_links_person conf ?old_text base p;
+  update_notes_links_person ?old_text conf base p;
   if old_key <> Util.make_key base p then
     update_ind_key conf base (pgl ()) old_key
       (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)

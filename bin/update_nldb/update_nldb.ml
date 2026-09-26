@@ -41,8 +41,8 @@ let parse_cmd () =
 let notes_links ~label s =
   NotesLinks.fold_links
     ~on_unclosed_brace:(fun brace_pos ->
-      Printf.eprintf "Warning: unclosed '{' at position %d in %s\n%!"
-        brace_pos label)
+      Printf.eprintf "Warning: unclosed '{' at position %d in %s\n%!" brace_pos
+        label)
     (fun ~pos link (list_nt, list_ind) ->
       match link with
       | NotesLinks.WLpage (_, _, lfname, _, _) ->
@@ -59,16 +59,6 @@ let notes_links ~label s =
           (list_nt, list_ind))
     ([], []) s
 
-type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
-
-let save_cache_linked_pages bdir cache_linked_pages =
-  let fname = Filename.concat bdir Notes.cache_linked_pages_name in
-  let fname_tmp = fname ^ ".tmp" in
-  let oc = open_out_bin fname_tmp in
-  output_value oc cache_linked_pages;
-  close_out oc;
-  Sys.rename fname_tmp fname
-
 let compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
@@ -76,7 +66,7 @@ let compute base bdir =
   let nb_ind = Driver.nb_of_persons base in
   let nb_fam = Driver.nb_of_families base in
   let db = ref [] in
-  let cache_linked_pages : cache_linked_pages_t = Hashtbl.create 1024 in
+  let cache_linked_pages = Hashtbl.create 1024 in
 
   let update_cache_linked_pages key =
     let current_count =
@@ -150,7 +140,8 @@ let compute base bdir =
             let fnotes = Filename.chop_suffix file ".txt" in
             let file = Filename.concat dir fnotes in
             match
-              notes_links ~label:(Printf.sprintf "PgMisc %s" file)
+              notes_links
+                ~label:(Printf.sprintf "PgMisc %s" file)
                 (Driver.base_notes_read base file)
             with
             | [], [] -> ()
@@ -252,8 +243,7 @@ let compute base bdir =
   ProgrBar.finish ();
   Driver.write_nldb base !db;
 
-  (* Save the cache_linked_pages to a file *)
-  save_cache_linked_pages bdir cache_linked_pages
+  Notes.save_cache_linked_pages bdir cache_linked_pages
 
 let ( // ) = Filename.concat
 

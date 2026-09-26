@@ -820,7 +820,7 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
-  List.iter (Notes.update_notes_links_person conf ~old_text:"" base) !created_p;
+  List.iter (Notes.update_notes_links_person ~old_text:"" conf base) !created_p;
   let nfath_p = Driver.poi base (Adef.father ncpl) in
   let nmoth_p = Driver.poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
