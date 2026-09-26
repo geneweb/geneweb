@@ -174,7 +174,7 @@ let misc_notes_link s i =
             let fn = Name.lower fn in
             let sn = Name.lower sn in
             let j, fam_marker =
-              if j < slen && s.[j] = '#' then
+              if j < slen && (s.[j] = '#' || s.[j] = '&') then
                 let rec parse_int acc k =
                   if k < slen && s.[k] >= '0' && s.[k] <= '9' then
                     parse_int
@@ -190,9 +190,67 @@ let misc_notes_link s i =
       else wlnone j
   else wlnone (i + 1)
 
+let end_pos link =
+  match link with
+  | WLpage (j, _, _, _, _)
+  | WLperson (j, _, _, _, _)
+  | WLwizard (j, _, _)
+  | WLimage (j, _, _, _)
+  | WLnone (j, _) ->
+      j
+
+let advances_pos link =
+  match link with
+  | WLperson _ | WLwizard _ -> true
+  | WLpage _ | WLimage _ | WLnone _ -> false
+
+let fold_links ?(on_unclosed_brace = fun _ -> ()) f acc s =
+  let slen = String.length s in
+  let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
+  let rec loop ?stop_at_brace acc pos i =
+    match stop_at_brace with
+    | Some _ when i < slen && s.[i] = '}' -> (acc, pos, i + 1)
+    | Some brace_pos when i >= slen ->
+        on_unclosed_brace brace_pos;
+        (acc, pos, i)
+    | _ when i >= slen -> (acc, pos, i)
+    | _ ->
+        if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
+          loop ?stop_at_brace acc pos (i + 2)
+        else if s.[i] = '%' then loop ?stop_at_brace acc pos (i + 1)
+        else if s.[i] = '{' then
+          let acc, pos, j = loop ~stop_at_brace:i acc pos (i + 1) in
+          loop ?stop_at_brace acc pos j
+        else
+          let link = misc_notes_link s i in
+          let link =
+            (* [misc_notes_link]/[wlnone] never stops a plain-text run at a
+               bare '}' - only at '%'/'\''/'{'/'['. Inside a highlight span,
+               clamp such a run at its first '}' so the outer stop-condition
+               above actually gets to see that character on the next call,
+               instead of it being swallowed into the text. *)
+            if stop_at_brace <> None then
+              match link with
+              | WLnone (_, none_s) -> (
+                  match String.index_opt none_s '}' with
+                  | Some k -> WLnone (i + k, String.sub none_s 0 k)
+                  | None -> link)
+              | _ -> link
+            else link
+          in
+          let acc = f ~pos link acc in
+          let pos = if advances_pos link then pos + 1 else pos in
+          loop ?stop_at_brace acc pos (end_pos link)
+  in
+  let acc, _, _ = loop acc 1 0 in
+  acc
+
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in
   if list_nt = [] && list_ind = [] then db else (who, (list_nt, list_ind)) :: db
 
 let update_db base who list =
-  Driver.write_nldb base @@ add_in_db (Driver.read_nldb base) who list
+  let db = Driver.read_nldb base in
+  let old_entry = List.assoc_opt who db in
+  Driver.write_nldb base (add_in_db db who list);
+  old_entry

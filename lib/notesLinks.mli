@@ -17,6 +17,30 @@ val dir_sep : string
 val check_file_name : string -> (string list * string) option
 val misc_notes_link : string -> int -> wiki_link
 
+val advances_pos : wiki_link -> bool
+(** Whether a link takes a slot in the [#p_N] anchor numbering shared by
+    [Wiki.syntax_links] and nldb's [lnPos]. *)
+
+val fold_links :
+  ?on_unclosed_brace:(int -> unit) ->
+  (pos:int -> wiki_link -> 'acc -> 'acc) ->
+  'acc ->
+  string ->
+  'acc
+(** [fold_links ?on_unclosed_brace f acc s] folds [f] over the links of [s] in
+    order, tokenizing exactly as [Wiki.syntax_links]: a percent sign followed
+    by a bracket, a brace or a quote is an escape, and the content of a
+    brace-delimited highlight span is folded over too (a link inside one is
+    still found). [pos] is the 1-based ordinal among occurrences counted by
+    [advances_pos], i.e. the [N] of the rendered [#p_N] anchor.
+
+    A '{' is assumed to open a span without first checking that it has a
+    matching '}': if [s] ends before one is found, the rest of [s] is folded
+    over as if it were inside the span anyway, and [on_unclosed_brace] (a
+    no-op by default) is called with the position of that '{' - nesting is
+    handled correctly (a properly closed inner span does not make an
+    unclosed outer one look closed). *)
+
 val add_in_db :
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.t ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page ->
@@ -27,4 +51,8 @@ val update_db :
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page ->
   string list * (Def.NLDB.key * Def.NLDB.ind) list ->
-  unit
+  (string list * (Def.NLDB.key * Def.NLDB.ind) list) option
+(** [update_db base who list] replaces [who]'s entry with [list] and returns
+    whatever entry [who] had before (if any), so a caller that needs to know
+    what changed (e.g. to adjust a derived count) doesn't have to read nldb a
+    second time to find out. *)

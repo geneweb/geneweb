@@ -180,40 +180,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
   Driver.patch_person base p1.key_index p1;
   reparent_ind base warning p1.key_index (Driver.get_iper p2);
   UpdateIndOk.effective_del conf base p2;
-  let s =
-    let sl =
-      [
-        p1.notes;
-        p1.occupation;
-        p1.birth_note;
-        p1.birth_src;
-        p1.baptism_note;
-        p1.baptism_src;
-        p1.death_note;
-        p1.death_src;
-        p1.burial_note;
-        p1.burial_src;
-        p1.psources;
-      ]
-    in
-    let sl =
-      let rec loop l accu =
-        match l with
-        | [] -> accu
-        | evt :: l -> loop l (evt.epers_note :: evt.epers_src :: accu)
-      in
-      loop p1.pevents sl
-    in
-    String.concat " " (List.map (Driver.sou base) sl)
-  in
-  Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s;
-  let key = Util.make_key base p1 in
-  let pgl =
-    let db = Driver.read_nldb base in
-    let db = Notes.merge_possible_aliases conf db in
-    Notes.links_to_cache_entries conf base db key
-  in
-  Notes.update_cache_linked_pages conf Notes.Merge key key (List.length pgl)
+  Notes.update_notes_links_person conf base p1
 
 exception Error_loop of Driver.person
 exception Different_sexes of Driver.person * Driver.person
@@ -239,6 +206,9 @@ let merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind =
 let effective_merge_fam conf base ifam1 fam1 fam2 =
   let des1 = fam1 in
   let des2 = fam2 in
+  let old_text =
+    Notes.notes_bearing_text_of_family base (Driver.gen_family_of_family fam1)
+  in
   let fam1 =
     {
       (Driver.gen_family_of_family fam1) with
@@ -274,7 +244,8 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
     Driver.patch_ascend base ip a
   done;
   Driver.patch_family base ifam1 fam1;
-  Driver.patch_descend base ifam1 des1
+  Driver.patch_descend base ifam1 des1;
+  Notes.update_notes_links_family conf ~old_text base fam1
 
 let merge_fam conf base branches ifam1 ifam2 fam1 fam2 ip1 ip2 changes_done
     propose_merge_fam =

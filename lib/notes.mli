@@ -10,20 +10,51 @@ val notes_links_db :
   list
 
 val update_notes_links_db :
+  Config.config ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page ->
   string ->
   unit
+(** Re-scans note-bearing text into nldb and adjusts the linked-pages cache by
+    the resulting difference in referenced keys (added and removed), so the
+    cache stays exact between two runs of update_nldb instead of drifting on
+    every edit. *)
+
+val has_links : string -> bool
+(** Whether a text contains a double opening bracket, i.e. may hold a link
+    indexed in nldb. *)
+
+val notes_bearing_text_of_person :
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper, _, Geneweb_db.Driver.istr) Def.gen_person ->
+  string
+(** Concatenation of the person's note-bearing fields, as scanned for links. *)
+
+val notes_bearing_text_of_family :
+  Geneweb_db.Driver.base ->
+  (_, Geneweb_db.Driver.ifam, Geneweb_db.Driver.istr) Def.gen_family ->
+  string
+(** Concatenation of the family's note-bearing fields, as scanned for links. *)
 
 val update_notes_links_person :
+  ?old_text:string ->
+  Config.config ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, _, Geneweb_db.Driver.istr) Def.gen_person ->
   unit
+(** Re-scans a person's note-bearing fields into nldb. [?old_text] is the text
+    [notes_bearing_text_of_person] returned before the edit ([""] for a person
+    that did not exist); when given, the full nldb rewrite is skipped if the
+    text is unchanged or neither version contains a link. Omit it to force a
+    rescan. *)
 
 val update_notes_links_family :
+  Config.config ->
+  ?old_text:string ->
   Geneweb_db.Driver.base ->
   (_, Geneweb_db.Driver.ifam, Geneweb_db.Driver.istr) Def.gen_family ->
   unit
+(** Same as [update_notes_links_person] for a family. *)
 
 val file_path : Config.config -> Geneweb_db.Driver.base -> string -> string
 
@@ -42,6 +73,10 @@ val update_ind_key :
   Def.NLDB.key ->
   string * string * int ->
   unit
+(** [update_ind_key conf base pgl oldk newk] rewrites the links to [oldk] in
+    every page of [pgl] so they designate [newk]. [oldk] is lower-cased (as
+    built by [Util.make_key]); [newk] carries the case-preserved first name and
+    surname, since it is written back into the notes. *)
 
 val source :
   Config.config -> Geneweb_db.Driver.base -> string -> Adef.safe_string
@@ -89,8 +124,6 @@ val wiki_of_source :
     to HTML in the "NOTES" wiki context, marking links to non-public persons;
     [p] provides the [%i]/[%k] macro env and the person-existence check. *)
 
-type mode = Delete | Rename | Merge
-
 val links_to_ind :
   Config.config ->
   Geneweb_db.Driver.base ->
@@ -101,22 +134,29 @@ val links_to_ind :
   string option ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list
 
-val links_to_cache_entries :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  ((Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page
-  * (string list * (Def.NLDB.key * Def.NLDB.ind) list))
-  list ->
-  Def.NLDB.key ->
-  (Def.NLDB.key * Def.NLDB.ind) list
-
 val linked_pages_nbr :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> int
 
 val cache_linked_pages_name : string
 
-val update_cache_linked_pages :
-  Config.config -> mode -> Def.NLDB.key -> Def.NLDB.key -> int -> unit
+val on_person_saved :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  old_key:Def.NLDB.key ->
+  ?old_text:string ->
+  pgl:
+    (unit ->
+    (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list) ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.istr )
+  Def.gen_person ->
+  unit
+(** [on_person_saved conf base ~old_key ?old_text ~pgl p], called right after
+    [Driver.patch_person] for an existing person, re-indexes [p]'s note-bearing
+    fields (see [update_notes_links_person] for [?old_text]); if [p]'s key
+    differs from [old_key], rewrites the pages returned by [pgl ()] and updates
+    the linked-pages cache. [pgl] is only forced on a rename. *)
 
 val json_extract_img : Config.config -> string -> string * string
 
@@ -150,3 +190,7 @@ val mark_pnocs_validity : Geneweb_db.Driver.base -> string -> string
     unchanged. Used by both the gallery viewer and the gallery editor to seed
     client-side validity state without requiring per-row API round-trips at page
     load. *)
+
+val save_cache_linked_pages : string -> (Def.NLDB.key, int) Hashtbl.t -> unit
+(** [save_cache_linked_pages bdir ht] atomically replaces the linked-pages cache
+    of base directory [bdir] with [ht]. Raises [Sys_error] on failure. *)
