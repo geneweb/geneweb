@@ -40,7 +40,7 @@
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;
-  %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
+  %if;(b.rpc_datalist=1 and (is_welcome or (e.m="MOD_IND" or e.m="ADD_IND" or e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="ADD_PAR")))
     <script src="%etc_prefix;js/autocomplete.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.js%end;"></script>
   %end;
   %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
@@ -590,7 +590,7 @@ function setupAutofocusInput() {
   }
 }
 %end;
-%if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
+%if;(b.rpc_datalist=1 and (is_welcome or (e.m="MOD_IND" or e.m="ADD_IND" or e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="ADD_PAR")))
 // RPC autocomplete (GenewebAutocomplete, autocomplete.js)
 const RpcAutocomplete = {
   init: async function () {
@@ -599,12 +599,22 @@ const RpcAutocomplete = {
       return false;
     }
     const base = '%base.name;';
+    %if;(b.rpc_server_url!="")
+      const rpcCfg = '%b.rpc_server_url;';
+    %else;
+      const rpcCfg = 'ws://127.0.0.1:8080/search';
+    %end;
+    // "/path" → same host as the page (behind the proxy), ws or wss like the page
+    // "ws://…" or "wss://…" → used as is
+    const rpcUrl = (rpcCfg.charAt(0) === '/')
+      ? (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + rpcCfg
+      : rpcCfg;
     const indexMap = {};
     %['fnames', 'snames', 'places', 'sources', 'occupations',
      'qualifiers', 'titles', 'estates', 'aliases', 'pub_names'%]
       .forEach(s => { indexMap%['datalist_' + s%] = base + '_' + s; });
     await GenewebAutocomplete.init({
-      rpcUrl: 'ws://%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;localhost%end;:8080/search',
+      rpcUrl: rpcUrl,
       inputSelector: 'input%[list^="datalist_"%]',
       indexMap: indexMap,
       minChars: 2, debounceMs: 250, maxResults: 90,
@@ -883,7 +893,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCalendarMonthSelects();
 %end;
 %if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_NOTES")
-  %if;(roglo or b.rpc_datalist=1)
+  %if;(b.rpc_datalist=1 and (e.m="MOD_IND" or e.m="ADD_IND" or e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="ADD_PAR"))
       (async () => {
         const rpcOk = (typeof RpcAutocomplete !== 'undefined')
           && await RpcAutocomplete.init();
