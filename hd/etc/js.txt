@@ -599,16 +599,21 @@ const RpcAutocomplete = {
       return false;
     }
     const base = '%base.name;';
+    %if;(b.rpc_port!="")
+      const rpcPort = '%b.rpc_port;';
+    %else;
+      const rpcPort = '8080';
+    %end;
     %if;(b.rpc_server_url!="")
       const rpcCfg = '%b.rpc_server_url;';
     %else;
-      const rpcCfg = 'ws://127.0.0.1:8080/search';
+      const rpcCfg = '127.0.0.1:' + rpcPort + '/search';
     %end;
-    // "/path" → same host as the page (behind the proxy), ws or wss like the page
-    // "ws://…" or "wss://…" → used as is
-    const rpcUrl = (rpcCfg.charAt(0) === '/')
-      ? (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + rpcCfg
-      : rpcCfg;
+    // "/path"      → same host as the page (behind the proxy)
+    // "host/path"  → that host, e.g. "127.0.0.1:port/search"
+    // The scheme follows the page: wss on https, ws on http
+    const rpcUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://')
+      + (rpcCfg.charAt(0) === '/' ? location.host + rpcCfg : rpcCfg);
     const indexMap = {};
     %['fnames', 'snames', 'places', 'sources', 'occupations',
      'qualifiers', 'titles', 'estates', 'aliases', 'pub_names'%]
@@ -618,7 +623,8 @@ const RpcAutocomplete = {
       inputSelector: 'input%[list^="datalist_"%]',
       indexMap: indexMap,
       minChars: 2, debounceMs: 250, maxResults: 90,
-      connectTimeout: 1500, maxReconnect: 1
+      connectTimeout: 1500, maxReconnect: 1,
+      debug: %if;(b.rpc_debug="yes")true%else;false%end;
     });
     return GenewebAutocomplete.isConnected();
   }
@@ -893,7 +899,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCalendarMonthSelects();
 %end;
 %if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_NOTES")
-  %if;(b.rpc_datalist=1 and (e.m="MOD_IND" or e.m="ADD_IND" or e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="ADD_PAR"))
+  %if;(b.rpc_datalist=1 and (is_welcome or (e.m="MOD_IND" or e.m="ADD_IND" or e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="ADD_PAR")))
       (async () => {
         const rpcOk = (typeof RpcAutocomplete !== 'undefined')
           && await RpcAutocomplete.init();
