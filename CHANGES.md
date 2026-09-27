@@ -11,6 +11,13 @@
   address.
 - `--log '<stdout>'` is now rejected in CGI mode, including when the mode
   is inferred from `QUERY_STRING` (#2948).
+- In notes, renaming a person keeps the case of the name in the links
+  pointing to it, and writes the family marker as `#N` (the `&N` written
+  by 7.1-beta2 is still read). A link added or removed in any note is now
+  indexed when saved, not only when the note's owner is renamed. Run
+  `update_nldb` once after upgrading (#2961).
+- Links inside `{...}` highlights are rendered as links; an unclosed `{`
+  is displayed as typed (#2961).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

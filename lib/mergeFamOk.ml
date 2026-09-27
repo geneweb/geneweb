@@ -257,22 +257,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
           (scpl, sdes, None)
       in
       Util.commit_patches conf base;
-      let s =
-        let sl =
-          [ fam.comment; fam.fsources; fam.marriage_note; fam.marriage_src ]
-        in
-        let sl =
-          let rec loop l accu =
-            match l with
-            | [] -> accu
-            | evt :: l -> loop l (evt.efam_note :: evt.efam_src :: accu)
-          in
-          loop fam.fevents sl
-        in
-        String.concat " " (List.map (Driver.sou base) sl)
-      in
-      Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
-      (* TODO update_cache_linked_pages *)
+      Notes.update_notes_links_family conf base fam;
       let changed =
         let gen_p =
           let p =
