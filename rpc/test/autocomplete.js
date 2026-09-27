@@ -875,19 +875,64 @@
     }
 
     open() {
-      this._repositionDropdown();
+      // Show it invisibly first so its real size can be measured
+      this.dropdown.style.visibility = 'hidden';
       this.dropdown.style.display = 'block';
+      this._repositionDropdown();
+      this.dropdown.style.visibility = '';
       this.dropdown.classList.add('gw-ac-visible');
       this.isOpen = true;
     }
 
-    _repositionDropdown() {
-      const rect = this.input.getBoundingClientRect();
-      Object.assign(this.dropdown.style, {
-        top:   (rect.bottom) + 'px',
-        left:  (rect.left)   + 'px',
-        width: Math.max(rect.width, 500) + 'px'
+   _repositionDropdown() {
+      const rect   = this.input.getBoundingClientRect();
+      const vw     = document.documentElement.clientWidth;
+      const vh     = document.documentElement.clientHeight;
+      const margin = 8;     // gap kept from the window edges
+      const maxList = 350;  // preferred list height
+      const minList = 120;  // never smaller than this
+      const s = this.dropdown.style;
+
+      // Input scrolled out of view: close rather than float over the page
+      if (rect.bottom < 0 || rect.top > vh) { this.close(); return; }
+
+      // Horizontal: at least 500px wide, but never wider than the window
+      const width = Math.min(Math.max(rect.width, 500), vw - 2 * margin);
+      const left  = Math.max(margin, Math.min(rect.left, vw - width - margin));
+      s.minWidth = '0';
+      s.width = width + 'px';
+      s.left  = left + 'px';
+
+      // Height taken by everything but the lists (headers, footer, borders)
+      const listNow = Math.max(0, ...this.columns
+        .filter(c => c.items).map(c => c.items.offsetHeight));
+      const chrome = this.dropdown.offsetHeight - listNow;
+
+      const below = vh - rect.bottom - margin;
+      const above = rect.top - margin;
+      const wanted = maxList + chrome;
+      const placeAbove = below < wanted && above > below;
+      const avail = placeAbove ? above : below;
+      const listMax = Math.max(minList, Math.min(maxList, avail - chrome));
+
+      // Cap the lists; each <ul> scrolls internally (overflow-y: auto)
+      this.columns.forEach(c => {
+        if (c.items) c.items.style.maxHeight = listMax + 'px';
+        if (c.el)    c.el.style.maxHeight = 'none';
       });
+      this.grid.style.maxHeight = 'none';
+
+      if (placeAbove) {
+        s.top = 'auto';
+        s.bottom = (vh - rect.top) + 'px';
+        s.borderRadius = '6px 6px 0 0';
+        s.boxShadow = '0 -8px 24px rgba(0,0,0,0.18)';
+      } else {
+        s.bottom = 'auto';
+        s.top = rect.bottom + 'px';
+        s.borderRadius = '0 0 6px 6px';
+        s.boxShadow = '0 8px 24px rgba(0,0,0,0.18)';
+      }
     }
 
     close() {
