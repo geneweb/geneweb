@@ -161,7 +161,6 @@ distrib-rpc: distrib
 	mkdir -p $(DISTRIB_DIR)/gw/etc/js
 	mkdir -p $(DISTRIB_DIR)/gw/etc/css
 	cp $(BUILD_DIR)/rpc/server/server.exe $(DISTRIB_DIR)/gw/rpc_server$(EXT)
-	cp rpc/test/autocomplete.txt $(DISTRIB_DIR)/gw/etc
 	cp rpc/test/autocomplete.js $(DISTRIB_DIR)/gw/etc/js
 	cp rpc/test/autocomplete.css $(DISTRIB_DIR)/gw/etc/css
 	gzip -9 -k -f $(DISTRIB_DIR)/gw/etc/js/autocomplete.js
