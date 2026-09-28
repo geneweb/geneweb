@@ -1,753 +1,661 @@
 /**
- * autocomplete.js (geneweb_autocomplete)
- * =======================================
- * Progressive enhancement pour les templates GeneWeb.
+ * autocomplete.js — GeneWeb RPC autocomplete
+ * ===========================================
+ * Progressive enhancement of GeneWeb's <input list="datalist_xxx"> fields.
+ * When the RPC search server (rpc_server / service.ml) is reachable, each
+ * field gets a three-column dropdown fed over a WebSocket; otherwise the
+ * page is left untouched and the native datalists keep working.
  *
- * Remplace les <datalist> natifs par un widget d'autocomplétion
- * à 3 colonnes alimenté par le serveur RPC via WebSocket.
+ * Server protocol (JSON-RPC 2.0, positional params):
+ *   info   ()                      → [[index_name, count], ...]
+ *   lookup (index, query, size)    → [string, ...]   (flat, may contain duplicates)
+ * Index names are the dictionary file basenames, e.g. "roglo_fnames".
  *
- * Protocole serveur (service.ml) :
- *   - "info"   (arity 0) → list (string * int)
- *              Retourne les paires (nom_index, cardinal) pour tous
- *              les index chargés. Noms = basename sans extension
- *              des fichiers .gz (ex: "HenriT_fnames").
- *   - "lookup" (arity 3) : name:string, query:string, size:int
- *              → list string (résultats plats, ordre priorité :
- *                exact → prefix → fuzzy/Levenshtein)
- *              La déduplication n'est pas garantie côté serveur.
+ * Results are split client-side into three columns:
+ *   prefix   : the entry starts with the query
+ *   internal : the entry contains the query elsewhere
+ *   fuzzy    : everything else (approximate matches)
+ * Matching ignores case and diacritics.
  *
- * Le widget découpe la liste plate en 3 colonnes selon la position
- * du résultat par rapport à la requête :
- *   col1 : résultats commençant par la requête  (prefix exact)
- *   col2 : résultats contenant la requête ailleurs  (exact interne)
- *   col3 : les autres  (fuzzy / Levenshtein)
+ * ---------------------------------------------------------------------------
+ * Usage from a GeneWeb template (self-configuring, no inline JavaScript):
  *
- * Index format côté serveur : <basename>.gz
- * Nom d'index dans les appels RPC : basename sans extension
- * (ex: "HenriT_fnames")
+ *   <script src=".../autocomplete.js"
+ *     data-rpc="/search"            path behind the proxy, host[:port]/path,
+ *                                   or a full ws:// / wss:// URL
+ *     data-base="roglo"             index names become <base>_<type>
+ *     data-debug="1"                optional: console tracing
+ *     data-labels="A|B|C"></script> optional: column titles
  *
- * Ce fichier définit la classe GenewebAutocomplete (exportée globalement).
- * L'initialisation se fait dans js.txt via :
+ * Fallback hook for when the server is unreachable or goes away:
  *
- *   GenewebAutocomplete.init({ rpcUrl: ..., indexMap: { ... } });
+ *   GenewebAutocomplete.onUnavailable(() => populateDatalists());
  *
- * Si le serveur RPC n'est pas disponible, les datalists natifs
- * sont conservés. Aucune dépendance externe (vanilla JS).
+ * Programmatic use (e.g. the standalone demo page):
+ *
+ *   await GenewebAutocomplete.init({ rpcUrl, indexMap: { list_fn: 'HenriT_fnames' } });
+ *
+ * All static styling lives in autocomplete.css.
  */
 ;(function (root) {
   'use strict';
 
-  // ==========================================================
-  // Configuration par défaut
-  // ==========================================================
+  // ==========================================================================
+  // Configuration
+  // ==========================================================================
+
   const DEFAULTS = {
-    rpcUrl: 'ws://localhost:8080/search',
-    // Sélecteur CSS des inputs à enrichir
-    inputSelector: 'input[list]',
-    // Mapping datalist id → nom d'index RPC (basename sans .gz)
-    // Ex: { 'list_fn': 'HenriT_fnames', 'list_sn': 'HenriT_snames', ... }
+    rpcUrl: 'ws://127.0.0.1:8080/search',
+    // Index names are <base>_<suffix>, suffix = datalist id without "datalist_"
+    base: '',
+    // Explicit datalist id → index name; takes precedence over `base`
     indexMap: {},
-    // Nombre min de caractères avant recherche
+    inputSelector: 'input[list]',
     minChars: 2,
-    // Délai de debounce en ms
     debounceMs: 250,
-    // Nombre max de résultats demandés au serveur (liste plate)
     maxResults: 90,
-    // -------------------------------------------------------
-    // Libellés des colonnes — SEUL ENDROIT À MODIFIER
-    // -------------------------------------------------------
-    // Le serveur retourne une liste plate; le widget la découpe en 3 colonnes :
-    //   col1 : résultats dont le début correspond à la requête (préfixe)
-    //   col2 : résultats contenant la requête non en début (exact interne)
-    //   col3 : les autres résultats (fuzzy / Levenshtein)
-    //   col4 : réservé / non utilisé
-    columnLabels: {
-      col1: 'Préfixe exact',
-      col2: 'Préfixe interne',
-      col3: 'Approx.',
-      col4: ''
-    },
-    // Timeout connexion WS en ms
-    connectTimeout: 3000,
-    // Tentatives de reconnexion
-    maxReconnect: 2,
-    // Active le petit badge vert/rouge sur l'input
+    connectTimeout: 1500,
+    requestTimeout: 5000,
+    maxReconnect: 1,
+    // "off" is ignored by browser address autofill; a valid non-address
+    // token keeps the browser's own popup away from the dropdown
+    autocompleteToken: 'one-time-code',
     showRpcBadge: false,
-    // Callback quand un item est sélectionné
+    labels: { prefix: 'Préfixe exact', internal: 'Préfixe interne', fuzzy: 'Approx.' },
+    hints: { navigate: 'naviguer', columns: 'colonnes', select: 'sélectionner', close: 'fermer' },
+    resultLabel: n => n + ' résultat' + (n > 1 ? 's' : ''),
     onSelect: null,
-    // Log debug dans la console
     debug: false
   };
 
-  // ==========================================================
-  // Classe WebSocket RPC (miniature, spécialisée lookup)
-  // ==========================================================
-  class RpcWsClient {
-    constructor(url, opts) {
+  // Column definitions: order matters, the first test that passes wins.
+  // Tests receive folded (lower-case, diacritic-free) strings.
+  const COLUMNS = [
+    { key: 'prefix',   test: (entry, q) => entry.startsWith(q) },
+    { key: 'internal', test: (entry, q) => entry.includes(q) },
+    { key: 'fuzzy',    test: () => true }
+  ];
+
+  const DROPDOWN_ID = 'gw-ac-dropdown';
+  const LIST_MAX = 350;   // preferred list height (px)
+  const LIST_MIN = 120;   // never shrink lists below this
+  const EDGE = 8;         // gap kept from the window edges
+  const MIN_WIDTH = 500;
+
+  // ==========================================================================
+  // Utilities
+  // ==========================================================================
+
+  const COMBINING = /[\u0300-\u036f]/g;
+
+  /** Lower-case and strip diacritics: "Éric" → "eric". */
+  function fold(s) {
+    return s.normalize('NFD').replace(COMBINING, '').toLowerCase();
+  }
+
+  /**
+   * Fold a string and keep, for each code unit of the result, the index of
+   * the original character it came from. Needed because folding can change
+   * the length ("İ" → "i̇", decomposed input, …), so positions found in the
+   * folded string cannot be used directly on the original.
+   */
+  function foldWithMap(text) {
+    let folded = '';
+    const map = [];
+    for (let i = 0; i < text.length; ) {
+      const ch = String.fromCodePoint(text.codePointAt(i));
+      const f = fold(ch);
+      for (let k = 0; k < f.length; k++) map.push(i);
+      folded += f;
+      i += ch.length;
+    }
+    map.push(text.length);
+    return { folded, map };
+  }
+
+  /** Deduplicate a flat result list and split it into COLUMNS. */
+  function classify(values, query) {
+    const q = fold(query);
+    const cols = COLUMNS.map(() => []);
+    const seen = new Set();
+    for (const v of values) {
+      if (typeof v !== 'string' || seen.has(v)) continue;
+      seen.add(v);
+      const f = fold(v);
+      cols[COLUMNS.findIndex(c => c.test(f, q))].push(v);
+    }
+    return cols;
+  }
+
+  /** Text with the matched part wrapped in <span class="gw-ac-match">. */
+  function highlight(text, query) {
+    const frag = document.createDocumentFragment();
+    const q = fold(query);
+    const { folded, map } = foldWithMap(text);
+    const at = q ? folded.indexOf(q) : -1;
+    if (at < 0) {
+      frag.append(text);
+      return frag;
+    }
+    const start = map[at];
+    const end = map[at + q.length];
+    const mark = el('span', 'gw-ac-match', text.slice(start, end));
+    frag.append(text.slice(0, start), mark, text.slice(end));
+    return frag;
+  }
+
+  /**
+   * Build the WebSocket URL from a template setting:
+   *   "ws://…" / "wss://…"  → used as is
+   *   "/search"             → same host as the page (behind a proxy)
+   *   "host:port/search"    → that host
+   * The scheme follows the page: wss on https (required), ws on http.
+   */
+  function buildUrl(cfg) {
+    if (!cfg) return DEFAULTS.rpcUrl;
+    if (/^wss?:\/\//i.test(cfg)) return cfg;
+    const scheme = location.protocol === 'https:' ? 'wss://' : 'ws://';
+    return scheme + (cfg.charAt(0) === '/' ? location.host + cfg : cfg);
+  }
+
+  function el(tag, className, text) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  function makeLog(enabled, tag) {
+    return enabled ? (...args) => console.log(tag, ...args) : () => {};
+  }
+
+  // ==========================================================================
+  // RPC client (JSON-RPC 2.0 over WebSocket)
+  // ==========================================================================
+
+  class RpcClient {
+    constructor(url, opts, log) {
       this.url = url;
       this.opts = opts;
+      this.log = log;
       this.ws = null;
-      this.reqId = 0;
+      this.nextId = 0;
       this.pending = new Map();
-      this._connected = false;
-      this._connecting = false;
+      this.onclose = null;
+      this._connecting = null;
     }
 
-    log(...args) {
-      if (this.opts.debug) console.log('[GW-AC RPC]', ...args);
+    get connected() {
+      return !!this.ws && this.ws.readyState === WebSocket.OPEN;
     }
 
-    isConnected() {
-      return this._connected && this.ws && this.ws.readyState === WebSocket.OPEN;
-    }
-
+    /** Open the connection; concurrent callers share one attempt. */
     connect() {
-      if (this._connected || this._connecting) {
-        return this._connectPromise || Promise.resolve();
-      }
-      this._connecting = true;
-      this._connectPromise = new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          this._connecting = false;
-          reject(new Error('WS connect timeout'));
-        }, this.opts.connectTimeout);
+      if (this.connected) return Promise.resolve();
+      if (this._connecting) return this._connecting;
 
+      this._connecting = new Promise((resolve, reject) => {
+        let ws;
         try {
-          this.ws = new WebSocket(this.url);
+          ws = new WebSocket(this.url);
         } catch (e) {
-          clearTimeout(timer);
-          this._connecting = false;
           reject(e);
           return;
         }
+        const timer = setTimeout(() => {
+          ws.close();
+          reject(new Error('connection timeout'));
+        }, this.opts.connectTimeout);
 
-        this.ws.onopen = () => {
+        ws.onopen = () => {
           clearTimeout(timer);
-          this._connected = true;
-          this._connecting = false;
-          this.log('Connecté à', this.url);
+          this.ws = ws;
+          this.log('connected to', this.url);
           resolve();
         };
-
-        this.ws.onerror = (e) => {
+        ws.onerror = () => {
           clearTimeout(timer);
-          this._connecting = false;
-          this.log('Erreur WS', e);
-          reject(new Error('WS connection error'));
+          reject(new Error('connection error'));
         };
+        ws.onclose = () => {
+          clearTimeout(timer);
+          if (this.ws === ws) this._closed();
+          else reject(new Error('connection closed'));
+        };
+        ws.onmessage = ev => this._receive(ev.data);
+      }).finally(() => { this._connecting = null; });
 
-        this.ws.onclose = () => {
-          this._connected = false;
-          this._connecting = false;
-          // Rejeter toutes les requêtes en attente
-          for (const [id, p] of this.pending) {
-            p.reject(new Error('WS closed'));
-          }
-          this.pending.clear();
-          this.log('Déconnecté');
-        };
-
-        this.ws.onmessage = (event) => {
-          try {
-            const msg = JSON.parse(event.data);
-            if (msg.id != null && this.pending.has(msg.id)) {
-              const p = this.pending.get(msg.id);
-              this.pending.delete(msg.id);
-              if (msg.error) {
-                p.reject(new Error(msg.error.message || 'RPC error'));
-              } else {
-                p.resolve(msg.result);
-              }
-            }
-          } catch (e) {
-            this.log('Parse error', e);
-          }
-        };
-      });
-      return this._connectPromise;
+      return this._connecting;
     }
 
     disconnect() {
-      if (this.ws) {
-        this.ws.close();
-        this.ws = null;
-      }
-      this._connected = false;
+      const ws = this.ws;
+      this.ws = null;
+      this.onclose = null;
+      this._rejectPending('disconnected');
+      if (ws) ws.close();
     }
 
-    /**
-     * Appel RPC générique.
-     * params doit être un Array (params positionnels) car le serveur
-     * OCaml utilise Desc.eval qui consomme une liste JSON ordonnée.
-     */
-    call(method, params) {
-      return new Promise((resolve, reject) => {
-        if (!this.isConnected()) {
-          reject(new Error('Not connected'));
-          return;
-        }
-        const id = ++this.reqId;
-        const msg = JSON.stringify({
-          jsonrpc: '2.0',
-          id,
-          method,
-          params: Array.isArray(params) ? params : []
-        });
-        this.pending.set(id, { resolve, reject });
-        this.ws.send(msg);
+    _closed() {
+      this.ws = null;
+      this._rejectPending('connection closed');
+      this.log('connection closed');
+      if (this.onclose) this.onclose();
+    }
 
-        // Timeout par requête
-        setTimeout(() => {
-          if (this.pending.has(id)) {
-            this.pending.delete(id);
-            reject(new Error('RPC call timeout'));
-          }
-        }, 5000);
+    _rejectPending(reason) {
+      for (const p of this.pending.values()) {
+        clearTimeout(p.timer);
+        p.reject(new Error(reason));
+      }
+      this.pending.clear();
+    }
+
+    _receive(data) {
+      let msg;
+      try {
+        msg = JSON.parse(data);
+      } catch (e) {
+        this.log('invalid JSON from server', e);
+        return;
+      }
+      const p = this.pending.get(msg.id);
+      if (!p) return;
+      this.pending.delete(msg.id);
+      clearTimeout(p.timer);
+      if (msg.error) p.reject(new Error(msg.error.message || 'RPC error'));
+      else p.resolve(msg.result);
+    }
+
+    /** Positional params: the OCaml side consumes an ordered JSON list. */
+    call(method, params) {
+      if (!this.connected) return Promise.reject(new Error('not connected'));
+      const id = ++this.nextId;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          this.pending.delete(id);
+          reject(new Error(method + ': timeout'));
+        }, this.opts.requestTimeout);
+        this.pending.set(id, { resolve, reject, timer });
+        this.ws.send(JSON.stringify({ jsonrpc: '2.0', id, method, params }));
       });
     }
 
-    /**
-     * Recherche : "lookup" (name, query, size) → list string (liste plate).
-     *
-     * Le serveur retourne les résultats dans l'ordre de priorité :
-     *   1. correspondances exactes (commencent par la requête)
-     *   2. correspondances préfixe
-     *   3. correspondances fuzzy (Levenshtein ≤ 1)
-     * La déduplication n'est pas garantie côté serveur.
-     *
-     * Le widget découpe ensuite cette liste plate en colonnes côté JS
-     * (voir _splitResults dans AutocompleteWidget).
-     */
-    async lookup(indexName, query, size) {
-      // Params positionnels : [name, query, size]
-      const result = await this.call('lookup', [indexName, query, size || 90]);
-      // Le serveur renvoie un array plat de strings
-      return Array.isArray(result) ? result : [];
+    async lookup(index, query, size) {
+      const r = await this.call('lookup', [index, query, size]);
+      return Array.isArray(r) ? r : [];
     }
 
-    /**
-     * Info sur les index disponibles.
-     * Méthode "info" (arity 0) → list (string * int)
-     * Retourne des paires [nom_index, cardinal].
-     * Noms = basename du fichier .gz sans extension
-     * (ex: "HenriT_fnames", "HenriT_snames", ...).
-     */
     async info() {
-      const result = await this.call('info', []);
-      // result est une liste de [name, count] (tuple2 sérialisé en array JSON)
-      if (!Array.isArray(result)) return [];
-      return result.map(pair => ({
-        name:  Array.isArray(pair) ? pair[0] : pair.name  || '',
-        count: Array.isArray(pair) ? pair[1] : pair.count || 0
-      }));
+      const r = await this.call('info', []);
+      if (!Array.isArray(r)) return [];
+      return r.map(p => Array.isArray(p)
+        ? { name: p[0], count: p[1] }
+        : { name: p.name || '', count: p.count || 0 });
     }
   }
 
-  // ==========================================================
-  // Classe Widget Autocomplete (une instance par input)
-  // ==========================================================
-  class AutocompleteWidget {
-    constructor(input, rpc, opts) {
-      this.debounceTimer = null;
-      this._selecting = false;      // true while _selectItem dispatches its synthetic events
-      this.input = input;
-      this.rpc = rpc;
-      this.opts = opts;
+  // ==========================================================================
+  // Dropdown — a single instance shared by all fields
+  // ==========================================================================
 
-      // Trouver l'index RPC pour cet input
-      this.datalistId = input.getAttribute('list');
-      this.indexName = this._resolveIndex();
+  class Dropdown {
+    constructor(opts) {
+      this.field = null;
+      this.cols = [];
+      this.sel = { col: 0, row: -1 };
 
-      // État
-      this.isOpen = false;
-      // col4 est vide, on travaille sur 3 colonnes de résultats
-      this.results = { col1: [], col2: [], col3: [], col4: [] };
-      this.selectedCol = 0;
-      this.selectedRow = -1;
-      this.debounceTimer = null;
+      this.el = el('div', 'gw-ac-dropdown');
+      this.el.id = DROPDOWN_ID;
+      this.el.hidden = true;
 
-      // Sauvegarder le datalist original
-      this.originalDatalist = this.datalistId
-        ? document.getElementById(this.datalistId)
-        : null;
+      const grid = el('div', 'gw-ac-grid');
+      COLUMNS.forEach(c => {
+        const label = opts.labels[c.key] || c.key;
+        const col = el('div', 'gw-ac-col gw-ac-col-' + c.key);
+        const header = el('div', 'gw-ac-col-header');
+        const count = el('span', 'gw-ac-count', '0');
+        header.append(el('span', 'gw-ac-col-label', label), count);
+        const list = el('ul', 'gw-ac-items');
+        list.setAttribute('role', 'listbox');
+        list.setAttribute('aria-label', label);
+        col.append(header, list);
+        grid.append(col);
+        this.cols.push({ count, list, values: [] });
+      });
 
-      // Construire le DOM
-      this._buildDOM();
-      this._bindEvents();
+      const hints = el('span', 'gw-ac-hints');
+      [['↑↓', opts.hints.navigate], ['←→', opts.hints.columns],
+       ['Enter', opts.hints.select], ['Esc', opts.hints.close]].forEach(([key, text]) => {
+        const hint = el('span', 'gw-ac-hint');
+        hint.append(el('kbd', null, key), ' ' + text);
+        hints.append(hint);
+      });
+      this.info = el('span', 'gw-ac-info');
+      const footer = el('div', 'gw-ac-footer');
+      footer.append(hints, this.info);
 
-      this.log('Widget créé pour', this.input.name || this.input.id,
-               '→ index:', this.indexName);
-    }
+      this.el.append(grid, footer);
+      document.body.append(this.el);
+      this.resultLabel = opts.resultLabel;
 
-    log(...args) {
-      if (this.opts.debug) console.log('[GW-AC Widget]', ...args);
-    }
-
-    /**
-     * Résout le nom d'index RPC à partir du datalist id.
-     *
-     * Stratégie :
-     * 1. Mapping explicite dans opts.indexMap (valeur = basename sans .gz)
-     * 2. Recherche par pattern dans les index du serveur
-     * 3. Convention GeneWeb (datalist id → suffixe de basename)
-     */
-    _resolveIndex() {
-      // 1. Mapping explicite
-      if (this.datalistId && this.opts.indexMap[this.datalistId]) {
-        const mapped = this.opts.indexMap[this.datalistId];
-        // Vérifier si ce nom existe sur le serveur (correspondance exacte)
-        const serverNames = this.opts._serverIndexNames || [];
-        if (serverNames.indexOf(mapped) !== -1) {
-          return mapped;
-        }
-        // Sinon, recherche floue parmi les index du serveur
-        const found = this._findServerIndex(mapped, serverNames);
-        if (found) return found;
-        // Retourner le mapping tel quel
-        return mapped;
-      }
-
-      // 2. Convention GeneWeb : datalist id → suffixe connu
-      const conventionMap = {
-        'list_fn':     'fnames',
-        'list_sn':     'snames',
-        'list_pl':     'places',
-        'list_src':    'sources',
-        'list_occu':   'occupations',
-        'list_qual':   'qualifiers',
-        'list_titl':   'titles',
-        'list_estate': 'estates',
-        'list_ali':    'aliases',
-        'list_pub':    'pub_names'
+      // Keep focus in the input when the dropdown is clicked, so the
+      // input's blur handler can close the dropdown on any other click.
+      this._onMouseDown = e => e.preventDefault();
+      this._onClick = e => {
+        const item = e.target.closest('.gw-ac-item');
+        if (item && this.field) this.field.select(item.dataset.value);
       };
-
-      const suffix = this.datalistId ? conventionMap[this.datalistId] : null;
-      const serverNames = this.opts._serverIndexNames || [];
-
-      if (suffix) {
-        const found = this._findServerIndex(suffix, serverNames);
-        if (found) return found;
-      }
-
-      // 3. Recherche directe du datalist id dans les noms serveur
-      if (this.datalistId) {
-        const found = this._findServerIndex(this.datalistId, serverNames);
-        if (found) return found;
-      }
-
-      return this.datalistId || 'default';
-    }
-
-    /**
-     * Cherche un index serveur qui correspond à un pattern.
-     * Ex: pattern "fnames" matche "HenriT_fnames"
-     *     pattern "sname"  matche "HenriT_snames"
-     */
-    _findServerIndex(pattern, serverNames) {
-      if (!serverNames || serverNames.length === 0) return null;
-      const lowerPattern = pattern.toLowerCase();
-
-      // Correspondance exacte
-      for (var i = 0; i < serverNames.length; i++) {
-        if (serverNames[i] === pattern) return serverNames[i];
-      }
-
-      // Correspondance partielle : le nom serveur contient le pattern
-      for (var i = 0; i < serverNames.length; i++) {
-        if (serverNames[i].toLowerCase().indexOf(lowerPattern) !== -1)
-          return serverNames[i];
-      }
-
-      // Essai avec pluriel : "fname" → chercher "fnames"
-      const pluralPattern = lowerPattern + 's';
-      for (var i = 0; i < serverNames.length; i++) {
-        if (serverNames[i].toLowerCase().indexOf(pluralPattern) !== -1)
-          return serverNames[i];
-      }
-
-      return null;
-    }
-
-    /**
-     * Découpe la liste plate retournée par "lookup" en 3 colonnes.
-     *
-     * Le serveur retourne : exact → prefix → fuzzy (sans déduplication garantie).
-     * On classe chaque entrée selon sa relation à la requête normalisée :
-     *   col1 : commence par la requête (préfixe)
-     *   col2 : contient la requête ailleurs (exact interne)
-     *   col3 : ne contient pas la requête (fuzzy / Levenshtein)
-     *   col4 : toujours vide
-     *
-     * La déduplication est effectuée ici côté JS.
-     */
-    _splitResults(flatList, query) {
-      const col1 = [], col2 = [], col3 = [];
-      const seen = new Set();
-      const normQ = this._normalize(query);
-
-      for (const entry of flatList) {
-        if (seen.has(entry)) continue;
-        seen.add(entry);
-
-        const normE = this._normalize(entry);
-        if (normE.startsWith(normQ)) {
-          col1.push(entry);
-        } else if (normE.indexOf(normQ) !== -1) {
-          col2.push(entry);
-        } else {
-          col3.push(entry);
-        }
-      }
-
-      return { col1, col2, col3, col4: [] };
-    }
-
-    /**
-     * Construction du DOM du widget
-     */
-    _buildDOM() {
-      // Wrapper autour de l'input
-      this.wrapper = document.createElement('div');
-      this.wrapper.className = 'gw-ac-wrapper';
-      this.input.parentNode.insertBefore(this.wrapper, this.input);
-      this.wrapper.appendChild(this.input);
-
-      // Supprimer l'attribut list pour désactiver le datalist natif
-      this.input.removeAttribute('list');
-      if (this.datalistId) {
-        this.input.setAttribute('data-gw-ac-list', this.datalistId);
-      }
-      this.input.setAttribute('autocomplete', 'gw-ac-' + (this.datalistId || 'field'));
-
-      // Badge RPC (optionnel)
-      if (this.opts.showRpcBadge) {
-        this.badge = document.createElement('span');
-        this.badge.className = 'gw-ac-rpc-badge gw-ac-rpc-ok';
-        this.wrapper.appendChild(this.badge);
-      }
-
-      // Dropdown — attaché au <body> pour échapper aux styles de la page hôte.
-      this.dropdown = document.createElement('div');
-      this.dropdown.className = 'gw-ac-dropdown';
-      this.dropdown.setAttribute('role', 'listbox');
-      Object.assign(this.dropdown.style, {
-        display:       'none',
-        position:      'fixed',
-        zIndex:        '2147483647',
-        background:    '#fff',
-        border:        '1px solid #b0b0b0',
-        borderRadius:  '0 0 6px 6px',
-        boxShadow:     '0 8px 24px rgba(0,0,0,0.18)',
-        minWidth:      '500px',
-        maxWidth:      '900px',
-        overflow:      'hidden',
-        fontFamily:    'inherit',
-        fontSize:      '13px',
-        boxSizing:     'border-box'
-      });
-
-      // Grille — 3 colonnes actives + col4 cachée pour la compatibilité layout
-      this.grid = document.createElement('div');
-      this.grid.className = 'gw-ac-grid';
-      Object.assign(this.grid.style, {
-        display:             'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
-        maxHeight:           '350px',
-        overflow:            'hidden',
-        boxSizing:           'border-box'
-      });
-
-      const labels    = this.opts.columnLabels;
-      const types     = ['col1', 'col2', 'col3'];
-      const colColors = { col1: '#2e7d32', col2: '#1565c0', col3: '#616161' };
-      this.columns = [];
-
-      types.forEach((type, i) => {
-        const col = document.createElement('div');
-        col.className = 'gw-ac-col';
-        Object.assign(col.style, {
-          display:       'flex',
-          flexDirection: 'column',
-          borderRight:   i < 2 ? '1px solid #e0e0e0' : 'none',
-          maxHeight:     '350px',
-          boxSizing:     'border-box',
-          overflow:      'hidden'
-        });
-
-        const header = document.createElement('div');
-        header.className = 'gw-ac-col-header gw-ac-' + type;
-        Object.assign(header.style, {
-          padding:        '6px 10px',
-          fontWeight:     '600',
-          fontSize:       '11px',
-          textTransform:  'uppercase',
-          letterSpacing:  '0.4px',
-          position:       'sticky',
-          top:            '0',
-          zIndex:         '5',
-          display:        'flex',
-          justifyContent: 'space-between',
-          alignItems:     'center',
-          borderBottom:   '2px solid rgba(0,0,0,0.08)',
-          flexShrink:     '0',
-          background:     colColors[type],
-          color:          '#fff',
-          boxSizing:      'border-box'
-        });
-        const labelSpan = document.createElement('span');
-        labelSpan.textContent = labels[type] || type;
-        Object.assign(labelSpan.style, { margin: '0', padding: '0', listStyle: 'none' });
-        const countSpan = document.createElement('span');
-        countSpan.className = 'gw-ac-count';
-        countSpan.textContent = '0';
-        Object.assign(countSpan.style, {
-          background:   'rgba(255,255,255,0.3)',
-          padding:      '1px 6px',
-          borderRadius: '8px',
-          fontSize:     '10px',
-          fontWeight:   'bold',
-          margin:       '0',
-          listStyle:    'none'
-        });
-        header.appendChild(labelSpan);
-        header.appendChild(countSpan);
-
-        const items = document.createElement('ul');
-        items.className = 'gw-ac-items';
-        Object.assign(items.style, {
-          overflowY: 'auto',
-          flex:      '1',
-          margin:    '0',
-          padding:   '0',
-          listStyle: 'none',
-          boxSizing: 'border-box'
-        });
-
-        col.appendChild(header);
-        col.appendChild(items);
-        this.grid.appendChild(col);
-
-        this.columns.push({ el: col, header, items, type });
-      });
-
-      // col4 : colonne fantôme pour conserver la compatibilité éventuelle
-      // (non affichée — gridTemplateColumns est à 3 colonnes)
-      this.columns.push({ el: null, header: null, items: null, type: 'col4' });
-
-      this.dropdown.appendChild(this.grid);
-
-      // Footer
-      this.footer = document.createElement('div');
-      this.footer.className = 'gw-ac-footer';
-      Object.assign(this.footer.style, {
-        padding:         '4px 10px',
-        background:      '#fafafa',
-        borderTop:       '1px solid #e0e0e0',
-        fontSize:        '11px',
-        color:           '#888',
-        display:         'flex',
-        justifyContent:  'space-between',
-        boxSizing:       'border-box',
-        margin:          '0',
-        listStyle:       'none'
-      });
-      const footerLeft = document.createElement('span');
-      footerLeft.style.cssText = 'margin:0;padding:0;list-style:none';
-      ['↑↓ naviguer ', '←→ colonnes ', 'Enter sélectionner ', 'Esc fermer'].forEach((label, idx) => {
-        const keys = ['↑↓', '←→', 'Enter', 'Esc'];
-        const kbd = document.createElement('kbd');
-        kbd.textContent = keys[idx];
-        Object.assign(kbd.style, {
-          display: 'inline-block', padding: '0 4px', background: '#e0e0e0',
-          borderRadius: '3px', fontSize: '10px', fontFamily: 'inherit',
-          margin: '0 2px 0 0', listStyle: 'none'
-        });
-        footerLeft.appendChild(kbd);
-        footerLeft.appendChild(document.createTextNode(' ' + label.trim() + ' '));
-      });
-      const footerInfo = document.createElement('span');
-      footerInfo.className = 'gw-ac-footer-info';
-      footerInfo.style.cssText = 'margin:0;padding:0;list-style:none';
-      this.footer.appendChild(footerLeft);
-      this.footer.appendChild(footerInfo);
-      this.dropdown.appendChild(this.footer);
-
-      document.body.appendChild(this.dropdown);
-    }
-
-    /**
-     * Binding des événements
-     */
-    _bindEvents() {
-      this.input.addEventListener('input', () => {
-        if (this._selecting) return;          // event fired by _selectItem: don't search
-        const query = this.input.value.trim();
-        clearTimeout(this.debounceTimer);
-
-        if (query.length < this.opts.minChars) {
-          this.close();
-          return;
-        }
-
-        this.debounceTimer = setTimeout(() => {
-          this._doSearch(query);
-        }, this.opts.debounceMs);
-      });
-
-      this.input.addEventListener('focus', () => {
-        if (this._hasResults() && this.input.value.length >= this.opts.minChars) {
-          this.open();
-        }
-      });
-
-      this.input.addEventListener('keydown', (e) => this._onKeyDown(e));
-
-      document.addEventListener('click', (e) => {
-        if (!this.wrapper.contains(e.target)) {
-          this.close();
-        }
-      });
-
-      this._scrollHandler = () => { if (this.isOpen) this._repositionDropdown(); };
-      window.addEventListener('scroll', this._scrollHandler, true);
-      window.addEventListener('resize', this._scrollHandler);
-
-      // Clic sur un item (délégation)
-      this.grid.addEventListener('click', (e) => {
+      this._onMouseOver = e => {
         const item = e.target.closest('.gw-ac-item');
-        if (item) {
-          this._selectItem(item.getAttribute('data-value'));
-        }
-      });
+        if (item) this._mark(+item.dataset.col, +item.dataset.row);
+      };
+      this._onViewport = e => {
+        if (e && e.target instanceof Node && this.el.contains(e.target)) return;
+        if (this.isOpen) this.position();
+      };
+      this.el.addEventListener('mousedown', this._onMouseDown);
+      this.el.addEventListener('click', this._onClick);
+      this.el.addEventListener('mouseover', this._onMouseOver);
+      window.addEventListener('scroll', this._onViewport, true);
+      window.addEventListener('resize', this._onViewport);
+    }
 
-      // Hover sur un item
-      this.grid.addEventListener('mouseover', (e) => {
-        const item = e.target.closest('.gw-ac-item');
-        if (item) {
-          this._clearSelection();
-          item.classList.add('gw-ac-selected');
-          this.selectedCol = parseInt(item.getAttribute('data-col'), 10);
-          this.selectedRow = parseInt(item.getAttribute('data-row'), 10);
-        }
-      });
+    get isOpen() {
+      return !this.el.hidden;
+    }
+
+    isFor(field) {
+      return this.isOpen && this.field === field;
+    }
+
+    hasSelection() {
+      return this.sel.row >= 0;
+    }
+
+    selectedValue() {
+      const c = this.cols[this.sel.col];
+      return this.sel.row >= 0 && c ? c.values[this.sel.row] : undefined;
+    }
+
+    show(field, columns, query) {
+      if (this.field && this.field !== field) this._setExpanded(false);
+      this.field = field;
+      this._render(columns, query);
+      this.el.hidden = false;
+      this._setExpanded(true);
+      this.position();
+    }
+
+    hide() {
+      if (this.el.hidden) return;
+      this.el.hidden = true;
+      this._setExpanded(false);
+      this.sel = { col: 0, row: -1 };
+    }
+
+    /** Move the keyboard selection; dx changes column, dy changes row. */
+    move(dx, dy) {
+      const lens = this.cols.map(c => c.values.length);
+      let { col, row } = this.sel;
+      if (row < 0) {
+        if (!lens[col]) col = lens.findIndex(n => n > 0);
+        if (col < 0) return;
+        row = dy < 0 ? lens[col] - 1 : 0;
+      } else if (dx) {
+        let c = col;
+        do { c += dx; } while (c >= 0 && c < lens.length && !lens[c]);
+        if (c < 0 || c >= lens.length) return;
+        col = c;
+        row = Math.min(row, lens[c] - 1);
+      } else {
+        row = Math.max(0, Math.min(lens[col] - 1, row + dy));
+      }
+      this._mark(col, row);
     }
 
     /**
-     * Recherche via RPC
+     * Place the dropdown under the input, or above it when there is more
+     * room there, clamp it horizontally to the window, and cap the list
+     * heights to the available space (lists scroll internally).
      */
-    async _doSearch(query) {
-      if (!this.rpc.isConnected()) {
-        this.log('RPC non connecté, recherche annulée');
+    position() {
+      const input = this.field && this.field.input;
+      if (!input) return;
+      const r = input.getBoundingClientRect();
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
+
+      if (r.bottom < 0 || r.top > vh) {   // input scrolled out of view
+        this.hide();
         return;
       }
 
-      try {
-        // Le serveur retourne une liste plate
-        const flat = await this.rpc.lookup(
-          this.indexName,
-          query,
-          this.opts.maxResults
-        );
-        // Découpe côté JS en 3 colonnes
-        this.results = this._splitResults(flat, query);
-        this._renderResults(query);
-        if (this._hasResults()) {
-          this.open();
-        } else {
-          this.close();
-        }
-      } catch (err) {
-        this.log('Erreur lookup:', err.message);
+      const s = this.el.style;
+      const width = Math.min(Math.max(r.width, MIN_WIDTH), vw - 2 * EDGE);
+      s.width = width + 'px';
+      s.left = Math.max(EDGE, Math.min(r.left, vw - width - EDGE)) + 'px';
+
+      // Measure at the preferred size, then fit to the space available
+      this.cols.forEach(c => { c.list.style.maxHeight = LIST_MAX + 'px'; });
+      const listH = Math.max(...this.cols.map(c => c.list.offsetHeight));
+      const chrome = this.el.offsetHeight - listH;   // headers, footer, borders
+
+      const below = vh - r.bottom - EDGE;
+      const above = r.top - EDGE;
+      const up = below < listH + chrome && above > below;
+      const cap = Math.max(LIST_MIN, Math.min(LIST_MAX, (up ? above : below) - chrome));
+      this.cols.forEach(c => { c.list.style.maxHeight = cap + 'px'; });
+
+      this.el.classList.toggle('gw-ac-above', up);
+      if (up) {
+        s.top = 'auto';
+        s.bottom = (vh - r.top) + 'px';
+      } else {
+        s.bottom = 'auto';
+        s.top = r.bottom + 'px';
       }
     }
 
-    /**
-     * Rendu des résultats dans les 3 colonnes
-     */
-    _renderResults(query) {
-      const activeTypes = ['col1', 'col2', 'col3'];
-      const normQuery = this._normalize(query);
+    destroy() {
+      window.removeEventListener('scroll', this._onViewport, true);
+      window.removeEventListener('resize', this._onViewport);
+      this.el.remove();
+      this.field = null;
+    }
 
-      activeTypes.forEach((type, colIdx) => {
-        const col = this.columns[colIdx];
-        const items = this.results[type] || [];
-        const count = col.header.querySelector('.gw-ac-count');
-        count.textContent = items.length;
-
-        col.items.innerHTML = '';
-
-        if (items.length === 0) {
-          const empty = document.createElement('li');
-          empty.className = 'gw-ac-empty';
-          empty.textContent = '—';
-          col.items.appendChild(empty);
+    _render(columns, query) {
+      let total = 0;
+      columns.forEach((values, ci) => {
+        const c = this.cols[ci];
+        c.values = values;
+        c.count.textContent = values.length;
+        total += values.length;
+        if (!values.length) {
+          c.list.replaceChildren(el('li', 'gw-ac-empty', '—'));
           return;
         }
-
-        items.forEach((value, rowIdx) => {
-          const li = document.createElement('li');
-          li.className = 'gw-ac-item';
-          li.setAttribute('data-value', value);
-          li.setAttribute('data-col', colIdx);
-          li.setAttribute('data-row', rowIdx);
+        const frag = document.createDocumentFragment();
+        values.forEach((v, ri) => {
+          const li = el('li', 'gw-ac-item');
+          li.id = 'gw-ac-opt-' + ci + '-' + ri;
           li.setAttribute('role', 'option');
-
-          li.innerHTML = this._highlight(value, normQuery);
-
-          col.items.appendChild(li);
+          li.dataset.value = v;
+          li.dataset.col = ci;
+          li.dataset.row = ri;
+          li.append(highlight(v, query));
+          frag.append(li);
         });
+        c.list.replaceChildren(frag);
       });
-
-      // Info footer
-      const total = activeTypes.reduce((s, t) => s + (this.results[t] || []).length, 0);
-      const info = this.footer.querySelector('.gw-ac-footer-info');
-      info.textContent = total + ' résultat' + (total > 1 ? 's' : '');
-
-      this.selectedCol = 0;
-      this.selectedRow = -1;
+      this.info.textContent = this.resultLabel(total);
+      this.sel = { col: 0, row: -1 };
     }
 
-    /**
-     * Normalise une chaîne : supprime les accents et met en minuscules.
-     * "Éric" → "eric", "Ångström" → "angstrom"
-     */
-    _normalize(text) {
-      return text
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase();
+    _mark(col, row) {
+      const old = this.el.querySelector('.gw-ac-selected');
+      if (old) old.classList.remove('gw-ac-selected');
+      this.sel = { col, row };
+      const li = this.cols[col] && this.cols[col].list.children[row];
+      if (!li || !li.classList.contains('gw-ac-item')) return;
+      li.classList.add('gw-ac-selected');
+      if (li.scrollIntoView) li.scrollIntoView({ block: 'nearest' });
+      if (this.field) this.field.input.setAttribute('aria-activedescendant', li.id);
     }
 
-    /**
-     * Highlight de la sous-chaîne matchée,
-     * insensible à la casse ET aux accents.
-     */
-    _highlight(text, normQuery) {
-      if (!normQuery) return this._escapeHtml(text);
-      const normText = this._normalize(text);
-      const idx = normText.indexOf(normQuery);
-      if (idx === -1) return this._escapeHtml(text);
+    _setExpanded(open) {
+      if (!this.field) return;
+      const input = this.field.input;
+      input.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!open) input.removeAttribute('aria-activedescendant');
+    }
+  }
 
-      const before = this._escapeHtml(text.substring(0, idx));
-      const match  = this._escapeHtml(text.substring(idx, idx + normQuery.length));
-      const after  = this._escapeHtml(text.substring(idx + normQuery.length));
-      return before + '<span class="gw-ac-match">' + match + '</span>' + after;
+  // ==========================================================================
+  // Field — one per enhanced input
+  // ==========================================================================
+
+  class Field {
+    constructor(input, indexName, mgr) {
+      this.input = input;
+      this.indexName = indexName;
+      this.mgr = mgr;
+      this.datalistId = input.getAttribute('list');
+      this.cols = COLUMNS.map(() => []);
+      this.query = '';
+      this.seq = 0;
+      this.timer = null;
+      this.selecting = false;
+      this.wrapper = null;
+      this._saved = {
+        autocomplete: input.getAttribute('autocomplete'),
+        role: input.getAttribute('role')
+      };
+
+      // Disable the native datalist (restored by destroy)
+      input.removeAttribute('list');
+      if (this.datalistId) input.dataset.gwAcList = this.datalistId;
+      input.setAttribute('autocomplete', mgr.opts.autocompleteToken);
+      input.setAttribute('role', 'combobox');
+      input.setAttribute('aria-autocomplete', 'list');
+      input.setAttribute('aria-expanded', 'false');
+      input.setAttribute('aria-controls', DROPDOWN_ID);
+
+      // The wrapper only exists to position the optional status badge
+      if (mgr.opts.showRpcBadge) {
+        this.wrapper = el('div', 'gw-ac-wrapper');
+        input.parentNode.insertBefore(this.wrapper, input);
+        this.wrapper.append(input, el('span', 'gw-ac-rpc-badge gw-ac-rpc-ok'));
+      }
+
+      this._handlers = {
+        input:   () => this._onInput(),
+        focus:   () => this._onFocus(),
+        blur:    () => { if (mgr.dropdown && mgr.dropdown.isFor(this)) mgr.dropdown.hide(); },
+        keydown: e => this._onKeyDown(e)
+      };
+      for (const [ev, fn] of Object.entries(this._handlers)) input.addEventListener(ev, fn);
     }
 
-    _escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    hasResults() {
+      return this.cols.some(c => c.length > 0);
     }
 
-    /**
-     * Gestion du clavier
-     */
+    async search(query) {
+      const seq = ++this.seq;
+      let values;
+      try {
+        values = await this.mgr.lookup(this.indexName, query);
+      } catch (err) {
+        if (seq === this.seq && this.mgr.state !== 'unavailable') {
+          console.warn('[GW-AC] search failed for', this.indexName, '-', err.message);
+        }
+        return;
+      }
+      // Ignore replies to an older query, or for text that has changed since
+      if (seq !== this.seq || this.input.value.trim() !== query) return;
+
+      this.cols = classify(values, query);
+      this.query = query;
+      const dd = this.mgr.dropdown;
+      if (!dd) return;
+      if (this.hasResults() && document.activeElement === this.input) dd.show(this, this.cols, query);
+      else if (dd.isFor(this)) dd.hide();
+    }
+
+    select(value) {
+      clearTimeout(this.timer);
+      this.seq++;                                   // drop any reply still in flight
+      this.input.value = value;
+      this.cols = COLUMNS.map(() => []);
+      if (this.mgr.dropdown) this.mgr.dropdown.hide();
+
+      // Notify other scripts; our own input handler ignores these events
+      this.selecting = true;
+      try {
+        this.input.dispatchEvent(new Event('input', { bubbles: true }));
+        this.input.dispatchEvent(new Event('change', { bubbles: true }));
+      } finally {
+        this.selecting = false;
+      }
+      const cb = this.mgr.opts.onSelect;
+      if (typeof cb === 'function') cb(value, this.indexName, this.input);
+    }
+
+    destroy() {
+      clearTimeout(this.timer);
+      this.seq++;
+      for (const [ev, fn] of Object.entries(this._handlers)) this.input.removeEventListener(ev, fn);
+      const input = this.input;
+      if (this.datalistId) {
+        input.setAttribute('list', this.datalistId);
+        delete input.dataset.gwAcList;
+      }
+      restoreAttr(input, 'autocomplete', this._saved.autocomplete);
+      restoreAttr(input, 'role', this._saved.role);
+      ['aria-autocomplete', 'aria-expanded', 'aria-controls', 'aria-activedescendant']
+        .forEach(a => input.removeAttribute(a));
+      if (this.wrapper) {
+        this.wrapper.parentNode.insertBefore(input, this.wrapper);
+        this.wrapper.remove();
+      }
+    }
+
+    _onInput() {
+      if (this.selecting) return;
+      const q = this.input.value.trim();
+      clearTimeout(this.timer);
+      if (q.length < this.mgr.opts.minChars) {
+        this.seq++;
+        this.cols = COLUMNS.map(() => []);
+        const dd = this.mgr.dropdown;
+        if (dd && dd.isFor(this)) dd.hide();
+        return;
+      }
+      this.timer = setTimeout(() => this.search(q), this.mgr.opts.debounceMs);
+    }
+
+    _onFocus() {
+      const dd = this.mgr.dropdown;
+      if (dd && this.hasResults() && this.input.value.trim() === this.query) {
+        dd.show(this, this.cols, this.query);
+      }
+    }
+
     _onKeyDown(e) {
-      if (!this.isOpen) {
-        if (e.key === 'ArrowDown' && this.input.value.length >= this.opts.minChars) {
+      const dd = this.mgr.dropdown;
+      if (!dd) return;
+
+      if (!dd.isFor(this)) {
+        const q = this.input.value.trim();
+        if (e.key === 'ArrowDown' && q.length >= this.mgr.opts.minChars) {
           e.preventDefault();
-          this._doSearch(this.input.value.trim());
+          if (this.hasResults() && q === this.query) dd.show(this, this.cols, q);
+          else this.search(q);
         }
         return;
       }
@@ -755,373 +663,252 @@
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          this._moveSelection(0, 1);
+          dd.move(0, 1);
           break;
-
         case 'ArrowUp':
           e.preventDefault();
-          this._moveSelection(0, -1);
+          dd.move(0, -1);
           break;
-
         case 'ArrowRight':
-          e.preventDefault();
-          this._moveSelection(1, 0);
-          break;
-
         case 'ArrowLeft':
-          e.preventDefault();
-          this._moveSelection(-1, 0);
-          break;
-
-        case 'Enter':
-          if (this.selectedRow >= 0) {
+          // Without a selection, arrows keep moving the caret
+          if (dd.hasSelection()) {
             e.preventDefault();
-            const item = this._getSelectedItem();
-            if (item) this._selectItem(item.getAttribute('data-value'));
-          } else {
-            this.close();          // let the form submit
+            dd.move(e.key === 'ArrowRight' ? 1 : -1, 0);
           }
           break;
+        case 'Enter': {
+          const v = dd.selectedValue();
+          if (v !== undefined) {
+            e.preventDefault();          // also suppresses keypress → no submit
+            this.select(v);
+          } else {
+            dd.hide();                   // let the form submit normally
+          }
+          break;
+        }
+        case 'Tab': {
+          const v = dd.selectedValue();
+          if (v !== undefined) this.select(v);   // focus still moves on
+          else dd.hide();
+          break;
+        }
         case 'Escape':
           e.preventDefault();
-          this.close();
+          dd.hide();
           break;
-
-        case 'Tab':
-          if (this.selectedRow >= 0) {
-            const item = this._getSelectedItem();
-            if (item) {
-              this._selectItem(item.getAttribute('data-value'));
-            }
-          }
-          this.close();
-          break;
-      }
-    }
-
-    /**
-     * Déplacement de la sélection clavier (3 colonnes actives)
-     */
-    _moveSelection(dx, dy) {
-      const activeTypes = ['col1', 'col2', 'col3'];
-      const maxCols = activeTypes.length;
-      let newCol = this.selectedCol + dx;
-      if (newCol < 0) newCol = maxCols - 1;
-      if (newCol >= maxCols) newCol = 0;
-
-      // Chercher une colonne non-vide
-      let attempts = 0;
-      while ((this.results[activeTypes[newCol]] || []).length === 0 && attempts < maxCols) {
-        newCol += (dx || 1);
-        if (newCol < 0) newCol = maxCols - 1;
-        if (newCol >= maxCols) newCol = 0;
-        attempts++;
-      }
-
-      const colItems = this.results[activeTypes[newCol]] || [];
-      if (colItems.length === 0) return;
-
-      let newRow = this.selectedRow + dy;
-      if (newRow < 0) newRow = colItems.length - 1;
-      if (newRow >= colItems.length) newRow = 0;
-
-      if (dx !== 0) {
-        newRow = Math.min(this.selectedRow, colItems.length - 1);
-        if (newRow < 0) newRow = 0;
-      }
-
-      this._clearSelection();
-      this.selectedCol = newCol;
-      this.selectedRow = newRow;
-
-      const item = this._getSelectedItem();
-      if (item) {
-        item.classList.add('gw-ac-selected');
-        item.scrollIntoView({ block: 'nearest' });
-      }
-    }
-
-    _getSelectedItem() {
-      return this.grid.querySelector(
-        '.gw-ac-item[data-col="' + this.selectedCol +
-        '"][data-row="' + this.selectedRow + '"]'
-      );
-    }
-
-    _clearSelection() {
-      this.grid.querySelectorAll('.gw-ac-item.gw-ac-selected')
-        .forEach(el => el.classList.remove('gw-ac-selected'));
-    }
-
-    _selectItem(value) {
-      clearTimeout(this.debounceTimer);     // kill a search scheduled by the last keystroke
-      this.debounceTimer = null;
-      this.input.value = value;
-      this.close();
-      this.results = { col1: [], col2: [], col3: [], col4: [] };  // no reopen on next focus
-
-      this._selecting = true;
-      try {
-        this.input.dispatchEvent(new Event('input',  { bubbles: true }));
-        this.input.dispatchEvent(new Event('change', { bubbles: true }));
-      } finally {
-        this._selecting = false;
-      }
-    
-      if (typeof this.opts.onSelect === 'function') {
-        this.opts.onSelect(value, this.indexName, this.input);
-      }
-      this.log('Sélectionné:', value);
-    }
-
-    open() {
-      // Show it invisibly first so its real size can be measured
-      this.dropdown.style.visibility = 'hidden';
-      this.dropdown.style.display = 'block';
-      this._repositionDropdown();
-      this.dropdown.style.visibility = '';
-      this.dropdown.classList.add('gw-ac-visible');
-      this.isOpen = true;
-    }
-
-   _repositionDropdown() {
-      const rect   = this.input.getBoundingClientRect();
-      const vw     = document.documentElement.clientWidth;
-      const vh     = document.documentElement.clientHeight;
-      const margin = 8;     // gap kept from the window edges
-      const maxList = 350;  // preferred list height
-      const minList = 120;  // never smaller than this
-      const s = this.dropdown.style;
-
-      // Input scrolled out of view: close rather than float over the page
-      if (rect.bottom < 0 || rect.top > vh) { this.close(); return; }
-
-      // Horizontal: at least 500px wide, but never wider than the window
-      const width = Math.min(Math.max(rect.width, 500), vw - 2 * margin);
-      const left  = Math.max(margin, Math.min(rect.left, vw - width - margin));
-      s.minWidth = '0';
-      s.width = width + 'px';
-      s.left  = left + 'px';
-
-      // Height taken by everything but the lists (headers, footer, borders)
-      const listNow = Math.max(0, ...this.columns
-        .filter(c => c.items).map(c => c.items.offsetHeight));
-      const chrome = this.dropdown.offsetHeight - listNow;
-
-      const below = vh - rect.bottom - margin;
-      const above = rect.top - margin;
-      const wanted = maxList + chrome;
-      const placeAbove = below < wanted && above > below;
-      const avail = placeAbove ? above : below;
-      const listMax = Math.max(minList, Math.min(maxList, avail - chrome));
-
-      // Cap the lists; each <ul> scrolls internally (overflow-y: auto)
-      this.columns.forEach(c => {
-        if (c.items) c.items.style.maxHeight = listMax + 'px';
-        if (c.el)    c.el.style.maxHeight = 'none';
-      });
-      this.grid.style.maxHeight = 'none';
-
-      if (placeAbove) {
-        s.top = 'auto';
-        s.bottom = (vh - rect.top) + 'px';
-        s.borderRadius = '6px 6px 0 0';
-        s.boxShadow = '0 -8px 24px rgba(0,0,0,0.18)';
-      } else {
-        s.bottom = 'auto';
-        s.top = rect.bottom + 'px';
-        s.borderRadius = '0 0 6px 6px';
-        s.boxShadow = '0 8px 24px rgba(0,0,0,0.18)';
-      }
-    }
-
-    close() {
-      this.dropdown.style.display = 'none';
-      this.dropdown.classList.remove('gw-ac-visible');
-      this.isOpen = false;
-      this._clearSelection();
-      this.selectedRow = -1;
-    }
-
-    _hasResults() {
-      return (this.results.col1.length +
-              this.results.col2.length +
-              this.results.col3.length) > 0;
-    }
-
-    restoreDatalist() {
-      if (this.originalDatalist && this.datalistId) {
-        this.input.setAttribute('list', this.datalistId);
-        this.input.removeAttribute('data-gw-ac-list');
-        this.input.setAttribute('autocomplete', '');
-      }
-      if (this._scrollHandler) {
-        window.removeEventListener('scroll', this._scrollHandler, true);
-        window.removeEventListener('resize', this._scrollHandler);
-      }
-      if (this.dropdown && this.dropdown.parentNode) {
-        this.dropdown.parentNode.removeChild(this.dropdown);
-      }
-      if (this.badge && this.badge.parentNode) {
-        this.badge.parentNode.removeChild(this.badge);
-      }
-      if (this.wrapper && this.wrapper.parentNode) {
-        this.wrapper.parentNode.insertBefore(this.input, this.wrapper);
-        this.wrapper.parentNode.removeChild(this.wrapper);
       }
     }
   }
 
-  // ==========================================================
-  // Classe principale GenewebAutocomplete
-  // ==========================================================
+  function restoreAttr(node, name, value) {
+    if (value == null) node.removeAttribute(name);
+    else node.setAttribute(name, value);
+  }
+
+  // ==========================================================================
+  // Public API
+  // ==========================================================================
+
   class GenewebAutocomplete {
     constructor() {
+      this.opts = Object.assign({}, DEFAULTS);
+      this.state = 'idle';     // idle | connecting | ready | disconnected | unavailable
       this.rpc = null;
+      this.dropdown = null;
       this.widgets = [];
-      this.opts = {};
-      this._initialized = false;
-      // Liste des index disponibles : [{ name, count }]
       this.serverIndexes = [];
+      this.log = () => {};
+      this._initPromise = null;
+      this._unavailableCallbacks = [];
+      this._warned = new Set();
     }
 
     /**
-     * Initialisation principale.
-     * Tente de se connecter au serveur RPC.
-     * Si OK : découvre les index via "info", enrichit les inputs.
-     * Si KO : ne touche à rien, les datalists natifs restent.
+     * Connect, discover the server's indexes and enhance matching inputs.
+     * Resolves to true on success, false if the server is unreachable
+     * (the page is then left untouched). Safe to call more than once.
      */
-    async init(userOpts) {
-      if (this._initialized) {
-        this.log('Déjà initialisé');
-        return;
-      }
-
-      this.opts = Object.assign({}, DEFAULTS, userOpts || {});
-      this.log('Initialisation avec', this.opts);
-
-      this.rpc = new RpcWsClient(this.opts.rpcUrl, this.opts);
-
-      let connected = false;
-      let attempts = 0;
-      while (!connected && attempts < this.opts.maxReconnect) {
-        try {
-          await this.rpc.connect();
-          connected = true;
-        } catch (e) {
-          attempts++;
-          this.log('Connexion échouée (tentative ' + attempts + '):', e.message);
-          if (attempts < this.opts.maxReconnect) {
-            await this._sleep(1000);
-          }
-        }
-      }
-
-      if (!connected) {
-        console.info(
-          '[GeneWeb Autocomplete] Serveur RPC non disponible à ' +
-          this.opts.rpcUrl + '. Les datalists natifs sont conservés.'
-        );
-        return;
-      }
-
-      this.log('Connexion RPC établie');
-
-      // Découvrir les index disponibles via la méthode "info"
-      try {
-        this.serverIndexes = await this.rpc.info();
-        this.log('Index disponibles:', this.serverIndexes);
-      } catch (e) {
-        this.log('Impossible d\'obtenir les infos des index:', e.message);
-        this.serverIndexes = [];
-      }
-
-      // Extraire uniquement les noms pour la résolution d'index
-      const serverIndexNames = this.serverIndexes.map(idx => idx.name);
-
-      const inputs = document.querySelectorAll(this.opts.inputSelector);
-      this.log('Inputs trouvés:', inputs.length);
-
-      inputs.forEach(input => {
-        try {
-          const widgetOpts = Object.assign({}, this.opts, {
-            _serverIndexNames: serverIndexNames
-          });
-          const widget = new AutocompleteWidget(input, this.rpc, widgetOpts);
-          this.widgets.push(widget);
-        } catch (e) {
-          this.log('Erreur création widget pour', input, e);
-        }
-      });
-
-      this._initialized = true;
-      this.log('Initialisation terminée:', this.widgets.length, 'widgets créés');
+    init(userOpts) {
+      if (!this._initPromise) this._initPromise = this._init(userOpts || {});
+      return this._initPromise;
     }
 
-    /**
-     * Enrichir un input spécifique ajouté dynamiquement au DOM.
-     */
+    /** Enhance one input, e.g. added to the page after init. */
     enhance(input, indexName) {
-      if (!this.rpc || !this.rpc.isConnected()) {
-        this.log('RPC non connecté, enhance ignoré');
+      if (this.state !== 'ready' && this.state !== 'disconnected') return null;
+      if (this.widgets.some(w => w.input === input)) return null;
+      const id = input.getAttribute('list');
+      const wanted = indexName || this._indexFor(id);
+      const index = wanted && this._resolveIndex(wanted);
+      if (!index) {
+        this.log('no index for list="' + id + '", field left native');
         return null;
       }
-
-      const opts = Object.assign({}, this.opts, {
-        _serverIndexNames: this.serverIndexes.map(idx => idx.name)
-      });
-      if (indexName) {
-        const datalistId = input.getAttribute('list');
-        if (datalistId) {
-          opts.indexMap[datalistId] = indexName;
-        }
-      }
-
-      const widget = new AutocompleteWidget(input, this.rpc, opts);
-      this.widgets.push(widget);
-      return widget;
+      this._checkIndex(index, id);
+      const field = new Field(input, index, this);
+      this.widgets.push(field);
+      return field;
     }
 
-    /**
-     * Détruire tous les widgets et restaurer les datalists.
-     */
+    /** Run cb if/when autocompletion becomes unavailable (at most once). */
+    onUnavailable(cb) {
+      if (this.state === 'unavailable') cb();
+      else this._unavailableCallbacks.push(cb);
+    }
+
+    /** Remove all widgets, restore the native datalists, disconnect. */
     destroy() {
-      this.widgets.forEach(w => w.restoreDatalist());
+      this._teardown();
+      this.state = 'idle';
+      this.serverIndexes = [];
+      this._initPromise = null;
+      this._warned.clear();
+    }
+
+    isConnected() {
+      return !!(this.rpc && this.rpc.connected);
+    }
+
+    /** Search one index, reconnecting once if the connection was lost. */
+    async lookup(index, query) {
+      if (!this.isConnected()) {
+        if (this.state === 'unavailable' || !this.rpc) throw new Error('unavailable');
+        if (!(await this._connect(1))) {
+          this._fail();
+          throw new Error('unavailable');
+        }
+        this.state = 'ready';
+      }
+      return this.rpc.lookup(index, query, this.opts.maxResults);
+    }
+
+    async _init(userOpts) {
+      const o = this.opts = Object.assign({}, DEFAULTS, userOpts, {
+        labels: Object.assign({}, DEFAULTS.labels, userOpts.labels),
+        hints: Object.assign({}, DEFAULTS.hints, userOpts.hints),
+        indexMap: Object.assign({}, userOpts.indexMap)
+      });
+      this.log = makeLog(o.debug, '[GW-AC]');
+      this.log('init', o);
+
+      this.state = 'connecting';
+      this.rpc = new RpcClient(o.rpcUrl, o, this.log);
+      this.rpc.onclose = () => {
+        if (this.state === 'ready') {
+          this.state = 'disconnected';
+          this.log('connection lost, will reconnect on next search');
+        }
+      };
+
+      if (!(await this._connect(o.maxReconnect))) {
+        this._fail();
+        return false;
+      }
+
+      try {
+        this.serverIndexes = await this.rpc.info();
+      } catch (e) {
+        this.log('info failed:', e.message);
+        this.serverIndexes = [];
+      }
+      this.log('server indexes:', this.serverIndexes);
+
+      this.state = 'ready';
+      this.dropdown = new Dropdown(o);
+      document.querySelectorAll(o.inputSelector).forEach(input => this.enhance(input));
+      this.log(this.widgets.length + ' fields enhanced');
+      return true;
+    }
+
+    async _connect(attempts) {
+      for (let i = 1; i <= attempts; i++) {
+        try {
+          await this.rpc.connect();
+          return true;
+        } catch (e) {
+          this.log('connection attempt ' + i + ' failed:', e.message);
+          if (i < attempts) await sleep(1000);
+        }
+      }
+      return false;
+    }
+
+    /** Map an index name to the server's: exact, or with a file extension
+        ("HenriT_fnames" → "HenriT_fnames.cache"). */
+    _resolveIndex(index) {
+      const names = this.serverIndexes.map(i => i.name);
+      if (!names.length || names.includes(index)) return index;
+      return names.find(n => n.startsWith(index + '.')) || index;
+    }
+
+    _indexFor(datalistId) {
+      if (!datalistId) return null;
+      if (this.opts.indexMap[datalistId]) return this.opts.indexMap[datalistId];
+      if (this.opts.base) return this.opts.base + '_' + datalistId.replace(/^datalist_/, '');
+      return null;
+    }
+
+    /** Warn (once per index) about a configuration mismatch. */
+    _checkIndex(index, datalistId) {
+      if (!this.serverIndexes.length || this._warned.has(index)) return;
+      if (this.serverIndexes.some(i => i.name === index)) return;
+      this._warned.add(index);
+      console.warn('[GW-AC] index "' + index + '" (list="' + datalistId + '") is not loaded on the RPC server; ' +
+                   'server has: ' + this.serverIndexes.map(i => i.name).join(', '));
+    }
+
+    _fail() {
+      if (this.state === 'unavailable') return;
+      console.info('[GeneWeb Autocomplete] RPC server unavailable at ' + this.opts.rpcUrl +
+                   '; native datalists are used.');
+      this._teardown();
+      this.state = 'unavailable';
+      const callbacks = this._unavailableCallbacks;
+      this._unavailableCallbacks = [];
+      callbacks.forEach(cb => {
+        try { cb(); } catch (e) { console.error(e); }
+      });
+      document.dispatchEvent(new CustomEvent('gw-ac:unavailable'));
+    }
+
+    _teardown() {
+      this.widgets.forEach(w => w.destroy());
       this.widgets = [];
+      if (this.dropdown) {
+        this.dropdown.destroy();
+        this.dropdown = null;
+      }
       if (this.rpc) {
         this.rpc.disconnect();
         this.rpc = null;
       }
-      this._initialized = false;
-      this.serverIndexes = [];
-    }
-
-    isConnected() {
-      return this.rpc && this.rpc.isConnected();
-    }
-
-    log(...args) {
-      if (this.opts.debug) console.log('[GW-AC]', ...args);
-    }
-
-    _sleep(ms) {
-      return new Promise(r => setTimeout(r, ms));
     }
   }
 
-  // ==========================================================
-  // Export global
-  // ==========================================================
-  root.GenewebAutocomplete = new GenewebAutocomplete();
+  // ==========================================================================
+  // Export and self-configuration from the <script> tag
+  // ==========================================================================
 
-  // Auto-init si un attribut data est présent sur le body
-  // <body data-gw-ac-rpc="ws://localhost:8080/search">
-  document.addEventListener('DOMContentLoaded', () => {
-    const body = document.body;
-    const autoRpcUrl = body.getAttribute('data-gw-ac-rpc');
-    if (autoRpcUrl) {
-      root.GenewebAutocomplete.init({ rpcUrl: autoRpcUrl });
-    }
-  });
+  const script = document.currentScript;     // only valid during this first run
+  const api = new GenewebAutocomplete();
+  api.util = { fold, classify, buildUrl };   // handy from the console
+  root.GenewebAutocomplete = api;
+
+  if (script && script.dataset.rpc !== undefined) {
+    const d = script.dataset;
+    const labels = d.labels ? d.labels.split('|') : [];
+    const start = () => api.init({
+      rpcUrl: buildUrl(d.rpc),
+      base: d.base || '',
+      inputSelector: d.selector || 'input[list^="datalist_"]',
+      debug: !!d.debug,
+      labels: labels.length === 3
+        ? { prefix: labels[0], internal: labels[1], fuzzy: labels[2] }
+        : undefined
+    });
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
+  }
 
 })(typeof window !== 'undefined' ? window : this);

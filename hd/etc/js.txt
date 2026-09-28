@@ -40,8 +40,13 @@
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;
+  %( RPC autocomplete: self-configuring, see autocomplete.js.
+     rpc_server_url: "/search" (behind a proxy), "host:port/search" or a ws:// URL %)
   %if;(b.rpc_datalist=1 and (is_welcome or (e.m="MOD_IND" or e.m="ADD_IND" or e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="ADD_PAR")))
-    <script src="%etc_prefix;js/autocomplete.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.js%end;"></script>
+    <script src="%etc_prefix;js/autocomplete.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.js%end;"
+      data-rpc="%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;127.0.0.1:%if;(b.rpc_port!="")%b.rpc_port;%else;8080%end;/search%end;"
+      data-base="%base.name;"
+      data-debug="%if;(b.rpc_debug="yes")1%end;"></script>
   %end;
   %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
     <script src="%etc_prefix;js/line.js?hash=%apply;hash%with;%etc_prefix;js/line.js%end;"></script>
@@ -590,46 +595,6 @@ function setupAutofocusInput() {
   }
 }
 %end;
-%if;(b.rpc_datalist=1 and (is_welcome or (e.m="MOD_IND" or e.m="ADD_IND" or e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="ADD_PAR")))
-// RPC autocomplete (GenewebAutocomplete, autocomplete.js)
-const RpcAutocomplete = {
-  init: async function () {
-    if (typeof GenewebAutocomplete === 'undefined') {
-      console.warn('RpcAutocomplete: autocomplete.js not loaded');
-      return false;
-    }
-    const base = '%base.name;';
-    %if;(b.rpc_port!="")
-      const rpcPort = '%b.rpc_port;';
-    %else;
-      const rpcPort = '8080';
-    %end;
-    %if;(b.rpc_server_url!="")
-      const rpcCfg = '%b.rpc_server_url;';
-    %else;
-      const rpcCfg = '127.0.0.1:' + rpcPort + '/search';
-    %end;
-    // "/path"      → same host as the page (behind the proxy)
-    // "host/path"  → that host, e.g. "127.0.0.1:port/search"
-    // The scheme follows the page: wss on https, ws on http
-    const rpcUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://')
-      + (rpcCfg.charAt(0) === '/' ? location.host + rpcCfg : rpcCfg);
-    const indexMap = {};
-    %['fnames', 'snames', 'places', 'sources', 'occupations',
-     'qualifiers', 'titles', 'estates', 'aliases', 'pub_names'%]
-      .forEach(s => { indexMap%['datalist_' + s%] = base + '_' + s; });
-    await GenewebAutocomplete.init({
-      rpcUrl: rpcUrl,
-      inputSelector: 'input%[list^="datalist_"%]',
-      indexMap: indexMap,
-      minChars: 2, debounceMs: 250, maxResults: 90,
-      connectTimeout: 1500, maxReconnect: 1,
-      debug: %if;(b.rpc_debug="yes")true%else;false%end;
-    });
-    return GenewebAutocomplete.isConnected();
-  }
-};
-%end;
 
 %if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
     or b.datalist_titles=1 or b.datalist_estates=1))
@@ -899,21 +864,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initCalendarMonthSelects();
 %end;
 %if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_NOTES")
-  %if;(b.rpc_datalist=1 and (is_welcome or (e.m="MOD_IND" or e.m="ADD_IND" or e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="ADD_PAR")))
-      (async () => {
-        const rpcOk = (typeof RpcAutocomplete !== 'undefined')
-          && await RpcAutocomplete.init();
-        if (!rpcOk) {
-          // Fallback .gz uniquement si serveur RPC indisponible
-          %if;(b.datalist_fnames=1 or b.datalist_snames=1)
-            populateDatalists();
-          %end;
-        }
-      })();
-  %else;
-    %if;(b.datalist_fnames=1 or b.datalist_snames=1)
-      populateDatalists();
-    %end;
+  %if;(b.datalist_fnames=1 or b.datalist_snames=1)
+    // With the RPC widget, load the .gz datalists only if the server is
+    // (or becomes) unavailable; without it, load them right away.
+    if (window.GenewebAutocomplete) GenewebAutocomplete.onUnavailable(populateDatalists);
+    else populateDatalists();
   %end;
 %end;
 initTooltips();

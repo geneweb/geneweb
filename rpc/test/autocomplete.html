@@ -148,9 +148,7 @@
       border: 1px solid #e0e0e0;
       border-radius: 4px;
       font-size: 12px;
-      display: none;
     }
-    .index-info.visible { display: block; }
     .index-info h4 { margin: 0 0 6px; font-size: 13px; color: #333; }
     .index-list {
       display: flex;
@@ -186,7 +184,7 @@
 
 <div class="gw-header">
   <h1>🌳 GeneWeb — Saisie d'un individu (démo)</h1>
-  <span class="status err" id="rpc-status">✗ Erreur : GenewebAutocomplete is not defined</span>
+  <span class="status" id="rpc-status">Non connecté</span>
 </div>
 
 <div class="container">
@@ -195,11 +193,12 @@
     <strong>Démo d'intégration.</strong>
     Cette page simule un formulaire de saisie GeneWeb avec des
     <code>&lt;input list="..."&gt;</code> + <code>&lt;datalist&gt;</code>.
-    Le script <code>geneweb_autocomplete.js</code> les remplace par le widget
-    4 colonnes quand le serveur RPC est disponible.<br>
-    Les index sur le serveur sont des fichiers <code>basename.gz</code>.
-    Le nom utilisé dans les appels RPC est le basename sans extension
-    (ex: <code>HenriT_fnames</code>).
+    Le script <code>autocomplete.js</code> les remplace par le widget
+    3 colonnes quand le serveur RPC est disponible.<br>
+    Les identifiants <code>datalist_xxx</code> sont ceux des templates GeneWeb ;
+    l'index RPC utilisé est <code>&lt;base&gt;_xxx</code>
+    (ex. <code>HenriT_fnames</code>, ou <code>HenriT_fnames.cache</code> si le
+    serveur garde l'extension du fichier).
   </div>
 
   <!-- Panel de configuration -->
@@ -215,7 +214,7 @@
       <label>Nom de base :</label>
       <input type="text" id="base-name" class="base-input" value="HenriT" placeholder="ex: HenriT">
       <span style="font-size:11px; color:#888;">
-        → index RPC : <code><span id="index-preview">HenriT</span>_fnames</code> (fichier <code>.gz</code> sans extension)
+        → index RPC : <code><span id="index-preview">HenriT</span>_fnames</code> 
       </span>
     </div>
 
@@ -223,12 +222,12 @@
       <button id="btn-connect" onclick="doConnect()">Connecter</button>
       <button class="danger" onclick="doDisconnect()">Déconnecter</button>
       <label style="margin-left: 10px;">
-        <input type="checkbox" id="chk-debug" onchange="toggleDebug()"> Debug
+        <input type="checkbox" id="chk-debug"> Debug
       </label>
     </div>
 
     <!-- Info sur les index découverts -->
-    <div class="index-info" id="index-info">
+    <div class="index-info" id="index-info" hidden>
       <h4>Index disponibles sur le serveur :</h4>
       <ul class="index-list" id="index-list"></ul>
     </div>
@@ -237,7 +236,7 @@
   <!-- ============================================================
        Formulaire GeneWeb simulé
        Les inputs ci-dessous sont IDENTIQUES à ce qu'on trouve dans
-       un template GeneWeb standard (upd.txt, perso.txt, etc.)
+       un template GeneWeb standard (welcome.txt, updind.txt, updfam.txt, etc.)
        ============================================================ -->
 
   <div class="gw-form">
@@ -246,8 +245,8 @@
       <tbody><tr>
         <td>Prénom :</td>
         <td>
-          <input type="text" name="first_name" size="23" maxlength="200" list="list_fn" placeholder="Prénom...">
-          <datalist id="list_fn">
+          <input type="text" name="first_name" size="23" maxlength="200" list="datalist_fnames" placeholder="Prénom...">
+          <datalist id="datalist_fnames">
             <option value="Jean">
             </option><option value="Pierre">
             </option><option value="Marie">
@@ -257,8 +256,8 @@
       <tr>
         <td>Nom :</td>
         <td>
-          <input type="text" name="surname" size="23" maxlength="200" list="list_sn" placeholder="Nom de famille...">
-          <datalist id="list_sn">
+          <input type="text" name="surname" size="23" maxlength="200" list="datalist_snames" placeholder="Nom de famille...">
+          <datalist id="datalist_snames">
             <option value="Dupont">
             </option><option value="Martin">
           </option></datalist>
@@ -267,24 +266,24 @@
       <tr>
         <td>Qualificatif :</td>
         <td>
-          <input type="text" name="qualifier" size="23" maxlength="200" list="list_qual" placeholder="Qualificatif...">
-          <datalist id="list_qual">
+          <input type="text" name="qualifier" size="23" maxlength="200" list="datalist_qualifiers" placeholder="Qualificatif...">
+          <datalist id="datalist_qualifiers">
           </datalist>
         </td>
       </tr>
       <tr>
         <td>Alias :</td>
         <td>
-          <input type="text" name="alias" size="23" maxlength="200" list="list_ali" placeholder="Alias...">
-          <datalist id="list_ali">
+          <input type="text" name="alias" size="23" maxlength="200" list="datalist_aliases" placeholder="Alias...">
+          <datalist id="datalist_aliases">
           </datalist>
         </td>
       </tr>
       <tr>
         <td>Nom public :</td>
         <td>
-          <input type="text" name="pub_name" size="23" maxlength="200" list="list_pub" placeholder="Nom public...">
-          <datalist id="list_pub">
+          <input type="text" name="pub_name" size="23" maxlength="200" list="datalist_pub_names" placeholder="Nom public...">
+          <datalist id="datalist_pub_names">
           </datalist>
         </td>
       </tr>
@@ -303,8 +302,8 @@
       <tbody><tr>
         <td>Lieu :</td>
         <td>
-          <input type="text" name="birth_place" size="40" maxlength="200" list="list_pl" placeholder="Lieu de naissance...">
-          <datalist id="list_pl">
+          <input type="text" name="birth_place" size="40" maxlength="200" list="datalist_places" placeholder="Lieu de naissance...">
+          <datalist id="datalist_places">
             <option value="Paris">
             </option><option value="Lyon">
           </option></datalist>
@@ -313,8 +312,8 @@
       <tr>
         <td>Source :</td>
         <td>
-          <input type="text" name="birth_src" size="40" maxlength="200" list="list_src" placeholder="Source...">
-          <datalist id="list_src">
+          <input type="text" name="birth_src" size="40" maxlength="200" list="datalist_sources" placeholder="Source...">
+          <datalist id="datalist_sources">
             <option value="Archives départementales">
           </option></datalist>
         </td>
@@ -328,24 +327,24 @@
       <tbody><tr>
         <td>Occupation :</td>
         <td>
-          <input type="text" name="occupation" size="40" maxlength="200" list="list_occu" placeholder="Profession...">
-          <datalist id="list_occu">
+          <input type="text" name="occupation" size="40" maxlength="200" list="datalist_occupations" placeholder="Profession...">
+          <datalist id="datalist_occupations">
           </datalist>
         </td>
       </tr>
       <tr>
         <td>Titre :</td>
         <td>
-          <input type="text" name="title" size="40" maxlength="200" list="list_titl" placeholder="Titre nobiliaire...">
-          <datalist id="list_titl">
+          <input type="text" name="title" size="40" maxlength="200" list="datalist_titles" placeholder="Titre nobiliaire...">
+          <datalist id="datalist_titles">
           </datalist>
         </td>
       </tr>
       <tr>
         <td>Domaine :</td>
         <td>
-          <input type="text" name="estate" size="40" maxlength="200" list="list_estate" placeholder="Domaine...">
-          <datalist id="list_estate">
+          <input type="text" name="estate" size="40" maxlength="200" list="datalist_estates" placeholder="Domaine...">
+          <datalist id="datalist_estates">
           </datalist>
         </td>
       </tr>
@@ -358,7 +357,7 @@
     </button>
   </div>
 
-  <div class="info-box warn" id="fallback-msg" style="display: block;">
+  <div class="info-box warn" id="fallback-msg" hidden>
     <strong>Mode fallback.</strong>
     Le serveur RPC n'est pas disponible.
     Les datalists natifs du navigateur sont utilisés.
@@ -368,136 +367,63 @@
 
 <script src="./autocomplete.js"></script>
 <script>
-  var statusEl = document.getElementById('rpc-status');
-  var fallbackMsg = document.getElementById('fallback-msg');
+  const $ = id => document.getElementById(id);
 
-  // Mettre à jour l'aperçu du nom d'index quand on tape le basename
-  document.getElementById('base-name').addEventListener('input', function() {
-    document.getElementById('index-preview').textContent = this.value || '???';
+  $('base-name').addEventListener('input', e => {
+    $('index-preview').textContent = e.target.value.trim() || '???';
   });
 
-  /**
-   * Construit le indexMap à partir du basename.
-   * Les noms d'index correspondent aux basenames des fichiers .gz
-   * sans l'extension (ex: "HenriT_fnames" pour "HenriT_fnames.gz").
-   */
-  function buildIndexMap(basename) {
-    var b = basename.trim();
-    return {
-      'list_fn':     b + '_fnames',
-      'list_sn':     b + '_snames',
-      'list_pl':     b + '_places',
-      'list_src':    b + '_sources',
-      'list_occu':   b + '_occupations',
-      'list_qual':   b + '_qualifiers',
-      'list_titl':   b + '_titles',
-      'list_estate': b + '_estates',
-      'list_ali':    b + '_aliases',
-      'list_pub':    b + '_pub_names'
-    };
+  function setStatus(text, cls) {
+    $('rpc-status').textContent = text;
+    $('rpc-status').className = 'status' + (cls ? ' ' + cls : '');
   }
 
-  /**
-   * Affiche les index découverts sur le serveur.
-   * serverIndexes = [{ name: string, count: int }]
-   */
-  function showIndexInfo(serverIndexes, indexMap) {
-    var panel = document.getElementById('index-info');
-    var list = document.getElementById('index-list');
-
-    if (!serverIndexes || serverIndexes.length === 0) {
-      panel.classList.remove('visible');
-      return;
-    }
-
-    // Construire l'ensemble des noms d'index utilisés par notre mapping
-    var usedNames = {};
-    for (var key in indexMap) {
-      usedNames[indexMap[key]] = key;
-    }
-
-    list.innerHTML = '';
-    serverIndexes.forEach(function(idx) {
-      var li = document.createElement('li');
+  /** Server indexes, marked when a form field uses them. */
+  function showIndexInfo() {
+    const used = new Map(GenewebAutocomplete.widgets.map(w => [w.indexName, w.datalistId]));
+    const list = $('index-list');
+    list.replaceChildren(...GenewebAutocomplete.serverIndexes.map(idx => {
+      const li = document.createElement('li');
       li.textContent = idx.name + ' (' + idx.count + ')';
-      if (usedNames[idx.name]) {
-        li.className = 'index-tag matched';
-        li.title = 'Mappé vers ' + usedNames[idx.name];
-      } else {
-        li.className = 'index-tag unmatched';
-        li.title = 'Non utilisé par le formulaire';
-      }
-      list.appendChild(li);
-    });
-
-    panel.classList.add('visible');
+      li.className = 'index-tag ' + (used.has(idx.name) ? 'matched' : 'unmatched');
+      li.title = used.has(idx.name) ? 'Utilisé par ' + used.get(idx.name) : 'Non utilisé par le formulaire';
+      return li;
+    }));
+    $('index-info').hidden = !list.children.length;
   }
 
   async function doConnect() {
-    var url = document.getElementById('rpc-url').value.trim();
-    var basename = document.getElementById('base-name').value.trim();
-    var debug = document.getElementById('chk-debug').checked;
-
-    if (!basename) {
+    const base = $('base-name').value.trim();
+    if (!base) {
       alert('Veuillez renseigner le nom de base (ex: HenriT)');
-      document.getElementById('base-name').focus();
+      $('base-name').focus();
       return;
     }
+    setStatus('⏳ Connexion...');
+    GenewebAutocomplete.destroy();
 
-    statusEl.textContent = '⏳ Connexion...';
-    statusEl.className = 'status';
+    // Same configuration as a GeneWeb page: index = <base>_<type>
+    const ok = await GenewebAutocomplete.init({
+      rpcUrl: GenewebAutocomplete.util.buildUrl($('rpc-url').value.trim()),
+      base,
+      inputSelector: 'input[list^="datalist_"]',
+      debug: $('chk-debug').checked,
+      showRpcBadge: true
+    });
 
-    var indexMap = buildIndexMap(basename);
-
-    try {
-      // Détruire une éventuelle session précédente
-      GenewebAutocomplete.destroy();
-
-      await GenewebAutocomplete.init({
-        rpcUrl: url,
-        debug: debug,
-        indexMap: indexMap,
-        minChars: 2,
-        debounceMs: 250,
-        maxResults: 90,
-        showRpcBadge: true
-      });
-
-      if (GenewebAutocomplete.isConnected()) {
-        statusEl.textContent = '✓ RPC connecté';
-        statusEl.className = 'status ok';
-        fallbackMsg.style.display = 'none';
-
-        // Afficher les index disponibles (serverIndexes = [{name, count}])
-        showIndexInfo(GenewebAutocomplete.serverIndexes, indexMap);
-      } else {
-        statusEl.textContent = '✗ RPC indisponible';
-        statusEl.className = 'status err';
-        fallbackMsg.style.display = 'block';
-        document.getElementById('index-info').classList.remove('visible');
-      }
-    } catch (e) {
-      statusEl.textContent = '✗ Erreur : ' + e.message;
-      statusEl.className = 'status err';
-      fallbackMsg.style.display = 'block';
-      document.getElementById('index-info').classList.remove('visible');
-    }
+    setStatus(ok ? '✓ RPC connecté' : '✗ RPC indisponible', ok ? 'ok' : 'err');
+    $('fallback-msg').hidden = ok;
+    if (ok) showIndexInfo();
+    else $('index-info').hidden = true;
   }
 
   function doDisconnect() {
     GenewebAutocomplete.destroy();
-    statusEl.textContent = '⏳ Non connecté';
-    statusEl.className = 'status';
-    fallbackMsg.style.display = 'block';
-    document.getElementById('index-info').classList.remove('visible');
-  }
-
-  function toggleDebug() {
-    console.log('Debug:', document.getElementById('chk-debug').checked,
-                '(reconnectez pour appliquer)');
+    setStatus('Non connecté');
+    $('fallback-msg').hidden = false;
+    $('index-info').hidden = true;
   }
 </script>
 
-
-
-</body></html>
+</body>
+</html>
