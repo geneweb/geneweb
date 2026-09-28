@@ -1190,8 +1190,12 @@ let print_del conf base =
       print_del_ok conf
   | None -> Hutil.incorrect_request conf
 
-let print_mod_aux ?(check_person_f = check_person) conf base callback =
-  let p, form_is_modified = reconstitute_person ~base conf in
+let print_mod_aux ?(check_person_f = check_person) ?person conf base callback =
+  let p, form_is_modified =
+    match person with
+    | Some person -> (person, false)
+    | None -> reconstitute_person ~base conf
+  in
   let redisp = Option.is_some (Util.p_getenv conf.Config.env "return") in
   let ini_ps = UpdateInd.string_person_of base (Gwdb.poi base p.key_index) in
   let digest = Update.digest_person ini_ps in

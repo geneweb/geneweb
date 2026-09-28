@@ -1344,9 +1344,13 @@ let print_add_parents o_conf base =
     | _ -> print_add o_conf base
   else print_add o_conf base
 
-let print_mod_aux conf base callback =
+let print_mod_aux ?family conf base callback =
   let nsck = Util.p_getenv conf.Config.env "nsck" = Some "on" in
-  let sfam, scpl, sdes, ext = reconstitute_family conf base nsck in
+  let sfam, scpl, sdes, ext =
+    match family with
+    | Some (family, couple, descendants) -> (family, couple, descendants, false)
+    | None -> reconstitute_family conf base nsck
+  in
   let redisp = Option.is_some (Util.p_getenv conf.Config.env "return") in
   let digest =
     let ini_sfam = UpdateFam.string_family_of base sfam.fam_index in
