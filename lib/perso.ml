@@ -793,6 +793,9 @@ let first_possible_duplication base ip (iexcl, fexcl) =
         let child i = Gwdb.poi base @@ Array.unsafe_get children i in
         first_possible_duplication_children iexcl len child eq
   | ifams ->
+      let wildcard_quest_string =
+        not (CheckItem.has_multiple_quest_strings_named_spouses base p ifams)
+      in
       let len = Array.length ifams in
       let fams = Array.make len None in
       let spouses = Array.make len None in
@@ -834,6 +837,9 @@ let first_possible_duplication base ip (iexcl, fexcl) =
                   else if
                     eq (Gwdb.get_first_name sp1) (Gwdb.get_first_name sp2)
                     && eq (Gwdb.get_surname sp1) (Gwdb.get_surname sp2)
+                    || wildcard_quest_string
+                       && (CheckItem.is_quest_string_named sp1
+                          || CheckItem.is_quest_string_named sp2)
                   then DupInd (isp1, isp2)
                   else loop' (j + 1)
             in
