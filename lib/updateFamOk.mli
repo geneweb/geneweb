@@ -64,6 +64,10 @@ val print_add : Config.config -> Gwdb.base -> unit
 val print_add_parents : Config.config -> Gwdb.base -> unit
 
 val print_mod_aux :
+  ?family:
+    (Update.key, Gwdb.ifam, string) Def.gen_family
+    * Update.key Adef.gen_couple
+    * Update.key Def.gen_descend ->
   Config.config ->
   Gwdb.base ->
   (( string * string * int * Update.create * string,
