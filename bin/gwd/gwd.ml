@@ -1519,7 +1519,7 @@ let log conf from gauth request script_name contents =
            else ""))
 
 let is_robot from =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let lock_file = Robot.lock_file () in
   (* FIXME: we silently ignore errors if we cannot lock the database. *)
   let on_exn _exn _bt = false in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
@@ -1564,7 +1564,7 @@ let no_access conf =
   Hutil.trailer conf
 
 let log_and_robot_check conf auth from request script_name contents =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let lock_file = Robot.lock_file () in
   (* FIXME: we silently ignore errors if we cannot lock the database. *)
   let on_exn _exn _bt = () in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
