@@ -18,6 +18,7 @@ let arg_invalid_utf8 = "invalid_utf8"
 let arg_p_key = "p_key"
 let arg_tstab = "tstab"
 let arg_password = "password"
+let ( // ) = Filename.concat
 
 module UI = struct
   let enabled conf s = (List.assoc_opt s conf.env :> string option) = Some "on"
@@ -389,9 +390,9 @@ let fixbase_ok conf base =
     in
     let tstab () =
       if UI.enabled conf "tstab" then (
-        let bname = !GWPARAM.bpath conf.bname in
-        Mutil.rm (Filename.concat bname "tstab_visitor");
-        Mutil.rm (Filename.concat bname "tstab");
+        let bpath = !GWPARAM.bpath conf.bname in
+        Mutil.rm (bpath // "tstab_visitor");
+        Mutil.rm (bpath // "tstab");
         Output.print_sstring conf {|<p>|};
         Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_tstab");
         Output.print_sstring conf {|</p>|})
@@ -433,8 +434,6 @@ let fixbase_ok conf base =
       ~on_exn:(fun _exn _bt ->
         GWPARAM.output_error conf Code.Service_Unavailable)
       ~wait:false ~lock_file process
-
-let ( // ) = Filename.concat
 
 let () =
   Secure.add_assets @@ (List.hd Sites.assets // "fixbase");

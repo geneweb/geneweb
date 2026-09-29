@@ -206,11 +206,11 @@ let try_plugin conn conf base_name meth =
       List.mem name conf.allowed_plugins && handler conn conf base_name)
 
 let w_lock ~onerror fn conn conf (base_name : string option) =
-  let bfile = !GWPARAM.bpath conf.bname in
+  let bpath = !GWPARAM.bpath conf.bname in
   (* FIXME: we lost the backtrace because onerror does not handle it. *)
   Lock.control
     ~on_exn:(fun _exn _bt -> onerror conn conf base_name)
-    ~wait:true ~lock_file:(Mutil.lock_file bfile)
+    ~wait:true ~lock_file:(Mutil.lock_file bpath)
   @@ fun () -> fn conn conf base_name
 
 (* Module-level ref used as an init-once guard: the nldb format check
@@ -231,14 +231,14 @@ let check_nldb_format conf base =
           (Util.transl conf "NOTIF incompatible notes_links")
     | `Ok | `NoFile -> ())
 
-let w_base ~none fn conn conf (bfile : string option) =
-  match bfile with
+let w_base ~none fn conn conf (bpath : string option) =
+  match bpath with
   | None -> none conf
-  | Some bfile ->
-      let bname = Filename.basename bfile |> Filename.chop_extension in
+  | Some bpath ->
+      let bname = Filename.basename bpath |> Filename.chop_extension in
       (* make sure the various folders (portraits, images, ...) are located properly *)
       GWPARAM.set_reorg bname None;
-      Driver.with_database bfile (fun base ->
+      Driver.with_database bpath (fun base ->
           let conf = make_henv conn conf base in
           let conf = make_senv conn conf base in
           let conf =
@@ -273,7 +273,7 @@ let w_wizard fn conn conf base =
     (* FIXME: send authentification headers *)
     GWPARAM.output_error conf Code.Unauthorized
 
-(* The closures w_lock, w_base, w_person, print_page and handle_no_bfile
+(* The closures w_lock, w_base, w_person, print_page and handle_no_bpath
    are constructed once at module load time (treat_request being a value
    binding, not a function definition) and shared across every request.
    The actual per-request entry point is the [fun conf -> ...] at the
@@ -308,20 +308,20 @@ let treat_request =
          | _ -> person_selected conn conf base p)
       conn conf l
   in
-  let handle_no_bfile conn conf l =
+  let handle_no_bpath conn conf l =
     if conf.bname = "" then
       try Templ.output_simple conf Templ.Env.empty "index"
       with _ -> SrcfileDisplay.propose_base conf
     else print_page conn conf l
   in
   fun conn conf ->
-    let bfile =
+    let bpath =
       if conf.bname = "" then None
       else
-        let bfile =
+        let bpath =
           Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb")
         in
-        if Sys.file_exists bfile then Some bfile else None
+        if Sys.file_exists bpath then Some bpath else None
     in
     let process () =
       if
@@ -336,14 +336,14 @@ let treat_request =
             (fun conn conf base ->
               request_issue conn conf base ~level:`Error
                 ~key:"wizards cant write")
-            conn conf bfile
+            conn conf bpath
         else
           let () =
             Registration.call_hooks (fun ~name hook ->
-                if List.mem name conf.allowed_plugins then hook conn conf bfile)
+                if List.mem name conf.allowed_plugins then hook conn conf bpath)
           in
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
-          if not @@ try_plugin conn conf bfile m then
+          if not @@ try_plugin conn conf bpath m then
             ((if
                 List.assoc_opt "counter" conf.base_env <> Some "no"
                 && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
@@ -370,14 +370,14 @@ let treat_request =
              let w_wizard hdl = w_wizard (fun _conn -> hdl) conn in
              match m with
              | "" -> (
-                 match bfile with
-                 | Some bfile -> (
+                 match bpath with
+                 | Some bpath -> (
                      (* We attempt to load the database in order to detect issues. *)
                      try
-                       Driver.with_database bfile ignore;
+                       Driver.with_database bpath ignore;
                        print_page conn
-                     with _ -> handle_no_bfile conn)
-                 | None -> handle_no_bfile conn)
+                     with _ -> handle_no_bpath conn)
+                 | None -> handle_no_bpath conn)
              | "A" -> w_base @@ w_person @@ AscendDisplay.print
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
              | "ADD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_add
@@ -819,7 +819,7 @@ let treat_request =
                       m);
                  let conf = Notif.inject_pending conf in
                  SrcfileDisplay.print_welcome conf base)
-              conf bfile)
+              conf bpath)
       else
         let title _ =
           Printf.sprintf "%s %s %s"

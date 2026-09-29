@@ -175,7 +175,7 @@ let mkdir_p ?(perm = 0o755) d =
   in
   loop d
 
-let lock_file bname = Filename.remove_extension bname ^ ".lck"
+let lock_file bpath = Filename.remove_extension bpath ^ ".lck"
 
 let initial n =
   let rec loop i =

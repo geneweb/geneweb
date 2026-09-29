@@ -276,17 +276,17 @@ let ( // ) = Filename.concat
 let main () =
   let fname, bases_dir = parse_cmd () in
   Secure.set_base_dir bases_dir;
-  let bname = bases_dir // fname in
+  let bpath = bases_dir // fname in
   if fname = "" then (
     Printf.eprintf "Missing database name\n";
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2);
-  Driver.with_database bname @@ fun base ->
+  Driver.with_database bpath @@ fun base ->
   Sys.catch_break true;
   Driver.load_strings_array base;
   Driver.load_unions_array base;
-  try compute base bname
+  try compute base bpath
   with Sys.Break ->
     Printf.eprintf "\n";
     flush stderr

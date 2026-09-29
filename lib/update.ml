@@ -6,6 +6,8 @@ open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let ( // ) = Filename.concat
+
 type update_error =
   | UERR of Adef.safe_string
   | UERR_sex_married of Driver.person
@@ -514,16 +516,16 @@ let print_err_unknown conf (f, s, o) =
   print_return conf
 
 let delete_topological_sort_v conf _base =
-  let bfile = Util.bpath conf.bname in
-  let tstab_file = Filename.concat bfile "tstab_visitor" in
+  let bpath = Util.bpath conf.bname in
+  let tstab_file = bpath // "tstab_visitor" in
   Mutil.rm tstab_file;
-  let tstab_file = Filename.concat bfile "restrict" in
+  let tstab_file = bpath // "restrict" in
   Mutil.rm tstab_file
 
 let delete_topological_sort conf base =
   let _ = delete_topological_sort_v conf base in
-  let bfile = Util.bpath conf.bname in
-  let tstab_file = Filename.concat bfile "tstab" in
+  let bpath = Util.bpath conf.bname in
+  let tstab_file = bpath // "tstab" in
   Mutil.rm tstab_file
 
 let print_someone conf base p =

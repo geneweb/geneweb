@@ -11,6 +11,7 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Code = Geneweb_http.Code
 
+let ( // ) = Filename.concat
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
@@ -2378,11 +2379,11 @@ let create_topological_sort conf base =
       Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Driver.iper_marker (Driver.ipers base) 0
   | _ ->
-      let bfile = bpath (conf.bname ^ ".gwb") in
+      let bpath = bpath (conf.bname ^ ".gwb") in
       let tstab_file =
         if conf.use_restrict && (not conf.wizard) && not conf.friend then
-          Filename.concat bfile "tstab_visitor"
-        else Filename.concat bfile "tstab"
+          bpath // "tstab_visitor"
+        else bpath // "tstab"
       in
       Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
         (fun () ->
@@ -2392,7 +2393,7 @@ let create_topological_sort conf base =
           (* FIXME: we silently ignores error if we cannot lock the database. *)
           let on_exn _exn _bt = () in
           if conf.use_restrict && (not conf.wizard) && not conf.friend then
-            Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bfile)
+            Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bpath)
               (fun () -> Driver.base_visible_write base);
           tstab)
 
