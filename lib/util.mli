@@ -22,9 +22,6 @@ val time_debug :
   config -> float -> int -> string list -> string list -> string list -> unit
 (** prints the query duration and reports it in the "home" section *)
 
-val bpath : string -> string
-(** Alias for !GWPARAM.bpath *)
-
 val search_in_assets : string -> string
 (** Checks that the file in argument belong to one of the asserts dir (defined
     in the Secure module) *)

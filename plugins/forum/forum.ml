@@ -163,8 +163,10 @@ module MF : MF = struct
   let close_in ic = close_in ic.ic_chan
 end
 
+let ( // ) = Filename.concat
+
 let forum_file conf =
-  let fn = Filename.concat (Util.bpath conf.bname) "forum" in
+  let fn = !GWPARAM.bpath conf.bname // "forum" in
   MF.filename_of_string fn
 
 (* Black list *)
@@ -186,7 +188,7 @@ let match_strings regexp s =
 let can_post conf =
   try
     let fname = List.assoc "forum_exclude_file" conf.base_env in
-    let fname = Util.bpath fname in
+    let fname = !GWPARAM.bpath fname in
     let ic = open_in fname in
     let rec loop () =
       match try Some (input_line ic) with End_of_file -> None with
@@ -364,9 +366,10 @@ let moderators conf =
   match List.assoc_opt "moderator_file" conf.base_env with
   | None | Some "" -> []
   | Some fname -> (
-      let fname = Util.bpath fname in
-      match try Some (Secure.open_in fname) with Sys_error _ -> None with
-      | Some ic ->
+      let fname = !GWPARAM.bpath fname in
+      match Secure.open_in fname with
+      | exception Sys_error _ -> []
+      | ic ->
           let list =
             let rec loop list =
               match try Some (input_line ic) with End_of_file -> None with
@@ -376,8 +379,7 @@ let moderators conf =
             loop []
           in
           close_in ic;
-          list
-      | None -> [])
+          list)
 
 let is_moderator conf = conf.wizard && List.mem conf.user (moderators conf)
 

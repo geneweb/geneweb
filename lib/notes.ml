@@ -6,9 +6,10 @@ module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let ( // ) = Filename.concat
+
 let file_path conf base fname =
-  String.concat Filename.dir_sep
-    [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
+  !GWPARAM.bpath conf.bname // Driver.base_notes_dir base // (fname ^ ".txt")
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -379,8 +380,7 @@ let commit_notes conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    String.concat Filename.dir_sep
-      [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ]
+    !GWPARAM.bpath conf.bname // Driver.base_notes_dir base // fname
   in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   (try Driver.commit_notes base fname s
@@ -393,9 +393,7 @@ let commit_wiznotes conf base fnotes s =
   let pg = Def.NLDB.PgWizard fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    List.fold_left Filename.concat
-      (Util.bpath (conf.bname ^ ".gwb"))
-      [ Driver.base_wiznotes_dir base; fname ]
+    !GWPARAM.bpath conf.bname // Driver.base_wiznotes_dir base // fname
   in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   Driver.commit_wiznotes base fname s;

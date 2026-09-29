@@ -7,8 +7,10 @@ open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let ( // ) = Filename.concat
+
 (* S: Fail if conf.bname is undefined? *)
-let file_name conf = Filename.concat (Util.bpath conf.bname) "history"
+let file_name conf = !GWPARAM.bpath conf.bname // "history"
 
 (* Record history when committing updates *)
 

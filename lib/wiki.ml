@@ -37,6 +37,7 @@ open Util
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
+let ( // ) = Filename.concat
 let first_cnt = 1
 let tab lev s = String.make (2 * lev) ' ' ^ s
 
@@ -74,7 +75,7 @@ let notes_aliases conf =
   let fname =
     match List.assoc_opt "notes_alias_file" conf.base_env with
     | Some f -> f
-    | None -> Filename.concat (Util.bpath conf.bname) "notes.alias"
+    | None -> !GWPARAM.bpath conf.bname // "notes.alias"
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic ->
