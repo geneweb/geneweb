@@ -15,7 +15,6 @@ let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
 let cnt_dir = ref ""
-let bases = ref (Secure.bases_dir ())
 
 let config_reorg bname =
   let bname = Filename.remove_extension bname in
