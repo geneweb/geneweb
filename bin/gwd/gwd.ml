@@ -1730,7 +1730,7 @@ let excluded from =
       record.
     - We cannot serve a base image without verifying permissions.
 
-    As a consequence, this function is limited to serve asset imges
+    As a consequence, this function is limited to serve asset images
     only. *)
 let asset_image_request conf fname =
   if String.starts_with ~prefix:"images/" fname then
