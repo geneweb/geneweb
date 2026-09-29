@@ -13,7 +13,7 @@ let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
 let with_lock conf fn =
-  let bpath = !GWPARAM.bpath conf.bname in
+  let bpath = GWPARAM.bpath conf.bname in
   Lock.control
     ~on_exn:(fun _exn _bt -> Update.error_locked conf)
     ~wait:true ~lock_file:(Mutil.lock_file bpath)

@@ -1350,7 +1350,7 @@ let string_of_witness_kind_raw witness_kind =
   in
   Adef.safe s
 
-let bpath bname = !GWPARAM.bpath bname
+let bpath bname = GWPARAM.bpath bname
 
 (* Cached [dir_listing_cache_ttl] seconds. [None] = directory absent/unreadable. *)
 let dir_listing_cache :

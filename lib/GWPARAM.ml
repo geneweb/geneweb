@@ -36,7 +36,6 @@ let src_d = ref (fun _ -> "")
 let etc_d = ref (fun _ -> "")
 let config_d = ref (fun _ -> "")
 let lang_d = ref (fun _ _ -> "")
-let bpath = ref (fun _ -> "")
 let portraits_d = ref (fun _ -> "")
 let images_d = ref (fun _ -> "")
 let albums_d = ref (fun _ -> "")
@@ -44,6 +43,10 @@ let clean_bname bname = Filename.remove_extension bname
 let path_concat parts = String.concat Filename.dir_sep parts
 let bases_dir () = Secure.bases_dir ()
 let is_valid_bname s = not @@ String.ends_with ~suffix:".gwb" s
+
+let bpath bname =
+  if not @@ is_valid_bname bname then invalid_arg "bpath";
+  Filename.concat (bases_dir ()) (bname ^ ".gwb")
 
 (* Module for reorg mode paths *)
 module Default = struct
@@ -86,10 +89,6 @@ module Default = struct
   let albums_d bname =
     if not @@ is_valid_bname bname then invalid_arg "albums_d";
     path_concat [ bases_dir (); bname ^ ".gwb"; "documents"; "albums" ]
-
-  let bpath bname =
-    if not @@ is_valid_bname bname then invalid_arg "bpath";
-    Filename.concat (bases_dir ()) (bname ^ ".gwb")
 end
 
 (* Module for legacy mode paths *)
@@ -130,10 +129,6 @@ module Legacy = struct
   let albums_d bname =
     if not @@ is_valid_bname bname then invalid_arg "albums_d";
     path_concat [ bases_dir (); "src"; bname; "albums" ]
-
-  let bpath bname =
-    if not @@ is_valid_bname bname then invalid_arg "bpath";
-    Filename.concat (bases_dir ()) (bname ^ ".gwb")
 end
 
 (* Check if a base is in reorg format *)
@@ -152,7 +147,6 @@ let init () =
     etc_d := Default.etc_d;
     config_d := Default.config_d;
     lang_d := Default.lang_d;
-    bpath := Default.bpath;
     portraits_d := Default.portraits_d;
     images_d := Default.images_d;
     albums_d := Default.albums_d)
@@ -164,7 +158,6 @@ let init () =
     etc_d := Legacy.etc_d;
     config_d := Legacy.config_d;
     lang_d := Legacy.lang_d;
-    bpath := Legacy.bpath;
     portraits_d := Legacy.portraits_d;
     images_d := Legacy.images_d;
     albums_d := Legacy.albums_d)

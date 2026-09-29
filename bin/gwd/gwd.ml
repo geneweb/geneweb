@@ -1458,7 +1458,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
         (try
            let x = List.assoc "auth_file" base_env in
            if x = "" then Option.value ~default:"" !auth_file
-           else Filename.concat (!GWPARAM.bpath base_file) x
+           else Filename.concat (GWPARAM.bpath base_file) x
          with Not_found -> Option.value ~default:"" !auth_file);
       border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
       n_connect = None;
@@ -2220,7 +2220,7 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
   List.iter
     (fun dbn ->
       Log.info (fun k -> k "Caching database %s in memory… %!" dbn);
-      let bpath = !GWPARAM.bpath dbn in
+      let bpath = GWPARAM.bpath dbn in
       try Driver.load_database bpath
       with Sys_error _ ->
         (* HOTFIX: we cannot print the Sys_error payload in tests. *)

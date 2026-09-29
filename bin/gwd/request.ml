@@ -206,7 +206,7 @@ let try_plugin conn conf base_name meth =
       List.mem name conf.allowed_plugins && handler conn conf base_name)
 
 let w_lock ~onerror fn conn conf (base_name : string option) =
-  let bpath = !GWPARAM.bpath conf.bname in
+  let bpath = GWPARAM.bpath conf.bname in
   (* FIXME: we lost the backtrace because onerror does not handle it. *)
   Lock.control
     ~on_exn:(fun _exn _bt -> onerror conn conf base_name)

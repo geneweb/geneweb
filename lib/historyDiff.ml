@@ -29,7 +29,7 @@ let history_d conf =
     | Some path when path <> "" -> path
     | _ -> "history_d"
   in
-  if Filename.is_relative path then !GWPARAM.bpath conf.bname // path else path
+  if Filename.is_relative path then GWPARAM.bpath conf.bname // path else path
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
 let history_path conf fname =

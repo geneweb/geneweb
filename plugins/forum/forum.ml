@@ -166,7 +166,7 @@ end
 let ( // ) = Filename.concat
 
 let forum_file conf =
-  let fn = !GWPARAM.bpath conf.bname // "forum" in
+  let fn = GWPARAM.bpath conf.bname // "forum" in
   MF.filename_of_string fn
 
 (* Black list *)
@@ -188,7 +188,7 @@ let match_strings regexp s =
 let can_post conf =
   try
     let fname = List.assoc "forum_exclude_file" conf.base_env in
-    let fname = !GWPARAM.bpath fname in
+    let fname = GWPARAM.bpath fname in
     let ic = open_in fname in
     let rec loop () =
       match try Some (input_line ic) with End_of_file -> None with
@@ -366,7 +366,7 @@ let moderators conf =
   match List.assoc_opt "moderator_file" conf.base_env with
   | None | Some "" -> []
   | Some fname -> (
-      let fname = !GWPARAM.bpath fname in
+      let fname = GWPARAM.bpath fname in
       match Secure.open_in fname with
       | exception Sys_error _ -> []
       | ic ->

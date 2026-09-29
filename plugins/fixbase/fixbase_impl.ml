@@ -123,7 +123,7 @@ let fixbase_ok conf base =
   let process () =
     ignore @@ Unix.alarm 0;
     (* cancel timeout *)
-    Driver.with_database (!GWPARAM.bpath conf.bname) @@ fun base' ->
+    Driver.with_database (GWPARAM.bpath conf.bname) @@ fun base' ->
     let ipers = ref [] in
     let ifams = ref [] in
     let istrs = ref [] in
@@ -390,7 +390,7 @@ let fixbase_ok conf base =
     in
     let tstab () =
       if UI.enabled conf "tstab" then (
-        let bpath = !GWPARAM.bpath conf.bname in
+        let bpath = GWPARAM.bpath conf.bname in
         Mutil.rm (bpath // "tstab_visitor");
         Mutil.rm (bpath // "tstab");
         Output.print_sstring conf {|<p>|};
@@ -429,7 +429,7 @@ let fixbase_ok conf base =
   in
   if dry_run then process ()
   else
-    let lock_file = Mutil.lock_file @@ !GWPARAM.bpath conf.bname in
+    let lock_file = Mutil.lock_file @@ GWPARAM.bpath conf.bname in
     Lock.control
       ~on_exn:(fun _exn _bt ->
         GWPARAM.output_error conf Code.Service_Unavailable)

@@ -1456,7 +1456,7 @@ let gwf_1 conn conf =
   let oc =
     open_out
       (if !GWPARAM.reorg then
-         Filename.concat (!GWPARAM.bpath in_base) in_base ^ ".gwf"
+         Filename.concat (GWPARAM.bpath in_base) in_base ^ ".gwf"
        else in_base ^ ".gwf")
   in
   let body_prop =

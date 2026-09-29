@@ -263,7 +263,7 @@ let main () =
   | Some bname ->
       Secure.set_bases_dir !bases_dir;
       GWPARAM.init ();
-      let bpath = !GWPARAM.bpath bname in
+      let bpath = GWPARAM.bpath bname in
       let lock_file = Mutil.lock_file bpath in
       let on_exn exn bt =
         Format.eprintf "%a@." Lock.pp_exception (exn, bt);

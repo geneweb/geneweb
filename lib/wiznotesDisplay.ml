@@ -9,7 +9,7 @@ module Connection = Geneweb_http.Connection
 let ( // ) = Filename.concat
 
 let wiz_dir conf base =
-  !GWPARAM.bpath conf.bname // Driver.base_wiznotes_dir base
+  GWPARAM.bpath conf.bname // Driver.base_wiznotes_dir base
 
 let wzfile wiznotes_dir wiz = Filename.concat wiznotes_dir (wiz ^ ".txt")
 
