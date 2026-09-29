@@ -932,9 +932,6 @@ let try_with_open openfun s f =
 let try_with_open_bin s f = try_with_open Secure.open_in_bin s f
 
 let with_database ?(read_only = false) bpath k =
-  let bpath =
-    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
-  in
   let tm_fname = bpath // "commit_timestamp" in
   let patches = input_patches bpath in
   let pending : patches_ht = empty_patch_ht () in
@@ -1373,12 +1370,9 @@ let record_access_of tab =
   }
 
 let make bpath particles ((persons, families, strings, bnotes) as _arrays) k =
-  let bdir =
-    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
-  in
-  Filesystem.create_dir ~parent:true (bdir // "notes_d");
+  Filesystem.create_dir ~parent:true (bpath // "notes_d");
   (* wiznotes sera créé seulement si nécessaire par db1link.ml *)
-  Filesystem.create_file (bdir // "notes");
+  Filesystem.create_file (bpath // "notes");
   let persons, ascends, unions = persons in
   let families, couples, descends = families in
   let data : Dbdisk.base_data =
@@ -1395,7 +1389,7 @@ let make bpath particles ((persons, families, strings, bnotes) as _arrays) k =
       particles_txt = particles;
       particles = lazy (Mutil.compile_particles particles);
       bnotes;
-      bdir;
+      bdir = bpath;
       perm = RDRW;
     }
   in

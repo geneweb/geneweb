@@ -318,9 +318,7 @@ let treat_request =
     let bpath =
       if conf.bname = "" then None
       else
-        let bpath =
-          Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb")
-        in
+        let bpath = GWPARAM.bpath conf.bname in
         if Sys.file_exists bpath then Some bpath else None
     in
     let process () =

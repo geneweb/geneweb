@@ -112,10 +112,7 @@ let () =
   let _ofile, oc, close = opts.Gwexport.oc in
   if not !GwuLib.raw_output then oc "encoding: utf-8\n";
   if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
-  let in_dir =
-    let full = Filename.concat (Secure.bases_dir ()) bname in
-    if Filename.check_suffix full ".gwb" then full else full ^ ".gwb"
-  in
+  let in_dir = Geneweb.GWPARAM.bpath bname in
   GwuLib.prepare_free_occ base;
   GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select;
   Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;
