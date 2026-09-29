@@ -1733,11 +1733,13 @@ let excluded from =
     As a consequence, this function is limited to serve asset images
     only. *)
 let asset_image_request conf fname =
-  if String.starts_with ~prefix:"images/" fname then
+  if String.starts_with ~prefix:"images/" fname then (
     let path = Util.search_in_assets fname in
     match ImageDisplay.print_image_file conf path with
     | Ok () -> true
-    | Error _ -> false
+    | Error e ->
+        Log.err (fun k -> k "%s" e);
+        false)
   else false
 
 (* Une version un peu à cheval entre avant et maintenant afin de   *)
