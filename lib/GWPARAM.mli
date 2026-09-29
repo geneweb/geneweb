@@ -31,7 +31,7 @@ val albums_d : my_fun_2 ref
 
 (* S: Move it to gwd_lib?  *)
 
-val init : unit -> unit
+val init : string -> unit
 (** Function called to initialize path functions based on the reorg flag. *)
 
 val is_reorg_base : string -> bool
@@ -46,32 +46,6 @@ val check_base_exists : string -> unit
 
 val create_base_and_config : string -> string
 (** Create base directory and configuration. *)
-
-module Default : sig
-  val config : string -> string
-  val cnt_d : string -> string
-  val adm_file : string -> string
-  val portraits_d : string -> string
-  val src_d : string -> string
-  val etc_d : string -> string
-  val config_d : string -> string
-  val lang_d : string -> string -> string
-  val images_d : string -> string
-  val albums_d : string -> string
-end
-
-module Legacy : sig
-  val config : string -> string
-  val cnt_d : string -> string
-  val adm_file : string -> string
-  val portraits_d : string -> string
-  val src_d : string -> string
-  val etc_d : string -> string
-  val config_d : string -> string
-  val lang_d : string -> string -> string
-  val images_d : string -> string
-  val albums_d : string -> string
-end
 
 val output_error :
   ?headers:string list ->

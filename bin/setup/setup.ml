@@ -1284,7 +1284,6 @@ let rec check_rename_conflict l conn conf =
   | [] -> ()
 
 let rename conn conf =
-  GWPARAM.init ();
   flush stderr;
   let rename_list =
     List.fold_left
@@ -1426,12 +1425,12 @@ let merge_1 conn conf =
   else print_file "create_ok.htm" conn conf
 
 let gwf conn conf =
-  GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
   if in_base = "" then print_file "err_miss.htm" conn conf
-  else
+  else (
+    GWPARAM.init in_base;
     let benv = loc_read_base_env in_base in
     let trailer =
       if !GWPARAM.reorg then
@@ -1442,10 +1441,9 @@ let gwf conn conf =
         |> fun s -> (s :> string)
     in
     let conf = { conf with env = benv @ (("trailer", trailer) :: conf.env) } in
-    print_file "gwf_1.htm" conn conf
+    print_file "gwf_1.htm" conn conf)
 
 let gwf_1 conn conf =
-  GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in

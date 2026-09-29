@@ -44,66 +44,57 @@ let bpath bname =
   if not @@ is_valid_bname bname then invalid_arg "bpath";
   Secure.bases_dir () // (bname ^ ".gwb")
 
-(* Module for reorg mode paths *)
-module Default = struct
-  let config bname = config_reorg bname
+type dir = string
+type file = string
 
-  let cnt_d bname =
+type layout = {
+  gwf : file;
+  cnt : dir;
+  adm_file : string -> dir;
+  portraits : dir;
+  src : dir;
+  etc : dir;
+  config : dir;
+  lang : string -> dir;
+  images : dir;
+  albums : dir;
+}
+
+let default bname =
+  let cnt =
     let bname = clean_bname bname in
-    cnt_dir :=
-      if bname <> "" then bpath bname // "config" // "cnt"
-      else Secure.bases_dir () // "cnt";
-    !cnt_dir
+    if bname <> "" then bpath bname // "config" // "cnt"
+    else Secure.bases_dir () // "cnt"
+  in
+  {
+    gwf = config_reorg bname;
+    cnt;
+    adm_file = (fun file -> cnt // file);
+    portraits = bpath bname // "documents" // "portraits";
+    src = bpath bname // "src";
+    etc = bpath bname // "etc";
+    config = bpath bname // "config";
+    lang = (fun file -> bpath bname // "lang" // file);
+    images = bpath bname // "documents" // "images";
+    albums = bpath bname // "documents" // "albums";
+  }
 
-  let adm_file file = !cnt_dir // file
-  let portraits_d bname = bpath bname // "documents" // "portraits"
-  let src_d bname = bpath bname // "src"
-  let etc_d bname = bpath bname // "etc"
-  let config_d bname = bpath bname // "config"
-  let lang_d bname file = bpath bname // "lang" // file
-  let images_d bname = bpath bname // "documents" // "images"
-  let albums_d bname = bpath bname // "documents" // "albums"
-end
-
-(* Module for legacy mode paths *)
-module Legacy = struct
-  let config = config_legacy
-
-  let cnt_d bname =
-    if not @@ is_valid_bname bname then invalid_arg "cnt_d";
-    cnt_dir := Secure.bases_dir () // "cnt";
-    !cnt_dir
-
-  let adm_file file = Filename.concat !cnt_dir file
-
-  let portraits_d bname =
-    if not @@ is_valid_bname bname then invalid_arg "portraits_d";
-    Secure.bases_dir () // "images" // bname
-
-  let src_d bname =
-    if not @@ is_valid_bname bname then invalid_arg "src_d";
-    Secure.bases_dir () // "src" // bname
-
-  let etc_d bname =
-    if not @@ is_valid_bname bname then invalid_arg "etc_d";
-    Secure.bases_dir () // "etc" // bname
-
-  let config_d bname =
-    if not @@ is_valid_bname bname then invalid_arg "config_d";
-    Secure.bases_dir ()
-
-  let lang_d bname file =
-    if not @@ is_valid_bname bname then invalid_arg "lang_d";
-    Secure.bases_dir () // "lang" // bname // file
-
-  let images_d bname =
-    if not @@ is_valid_bname bname then invalid_arg "images_d";
-    Secure.bases_dir () // "src" // bname // "images"
-
-  let albums_d bname =
-    if not @@ is_valid_bname bname then invalid_arg "albums_d";
-    Secure.bases_dir () // "src" // bname // "albums"
-end
+let legacy bname =
+  if not @@ is_valid_bname bname then invalid_arg "legacy";
+  let bases_dir = Secure.bases_dir () in
+  let cnt = bases_dir // "cnt" in
+  {
+    gwf = config_legacy bname;
+    cnt;
+    adm_file = (fun file -> cnt // file);
+    portraits = bases_dir // "images" // bname;
+    src = bases_dir // "src" // bname;
+    etc = bases_dir // "etc" // bname;
+    config = bases_dir;
+    lang = (fun file -> bases_dir // "lang" // bname // file);
+    images = bases_dir // "src" // bname // "images";
+    albums = bases_dir // "src" // bname // "albums";
+  }
 
 (* Check if a base is in reorg format *)
 let is_reorg_base bname =
@@ -111,35 +102,37 @@ let is_reorg_base bname =
   Sys.file_exists (config_reorg bname)
 
 (* Initialize path functions based on mode *)
-let init () =
+let init bname =
   Secure.add_assets Filename.current_dir_name;
   if !reorg then (
-    config := Default.config;
-    cnt_d := Default.cnt_d;
-    adm_file := Default.adm_file;
-    src_d := Default.src_d;
-    etc_d := Default.etc_d;
-    config_d := Default.config_d;
-    lang_d := Default.lang_d;
-    portraits_d := Default.portraits_d;
-    images_d := Default.images_d;
-    albums_d := Default.albums_d)
-  else (
-    config := Legacy.config;
-    cnt_d := Legacy.cnt_d;
-    adm_file := Legacy.adm_file;
-    src_d := Legacy.src_d;
-    etc_d := Legacy.etc_d;
-    config_d := Legacy.config_d;
-    lang_d := Legacy.lang_d;
-    portraits_d := Legacy.portraits_d;
-    images_d := Legacy.images_d;
-    albums_d := Legacy.albums_d)
+    let default = default bname in
+    (config := fun _bname -> default.gwf);
+    (cnt_d := fun _bname -> default.cnt);
+    adm_file := default.adm_file;
+    (src_d := fun _bname -> default.src);
+    (etc_d := fun _bname -> default.etc);
+    (config_d := fun _bname -> default.config);
+    (lang_d := fun _bname -> default.lang);
+    (portraits_d := fun _bname -> default.portraits);
+    (images_d := fun _bname -> default.images);
+    albums_d := fun _bname -> default.albums)
+  else
+    let legacy = legacy bname in
+    (config := fun _bname -> legacy.gwf);
+    (cnt_d := fun _bname -> legacy.cnt);
+    adm_file := legacy.adm_file;
+    (src_d := fun _bname -> legacy.src);
+    (etc_d := fun _bname -> legacy.etc);
+    (config_d := fun _bname -> legacy.config);
+    (lang_d := fun _bname -> legacy.lang);
+    (portraits_d := fun _bname -> legacy.portraits);
+    (images_d := fun _bname -> legacy.images);
+    albums_d := fun _bname -> legacy.albums
 
 let set_reorg bname force =
   let res = match force with Some b -> b | None -> is_reorg_base bname in
   reorg := res;
-  init ()
+  init bname
 
 let get_timestamp () =
   let tm = Unix.localtime (Unix.time ()) in
@@ -193,7 +186,7 @@ let rec create_base_and_config bname =
   then migrate_gwf_bidirectional bname user_wants_reorg;
   Printf.eprintf "\n";
   reorg := user_wants_reorg;
-  init ();
+  init bname;
   bdir
 
 and migrate_gwf_bidirectional bname user_wants_reorg =

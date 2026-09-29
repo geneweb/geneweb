@@ -3710,7 +3710,7 @@ let main () =
   Geneweb.GWPARAM.check_base_exists bname;
   let _bdir = Geneweb.GWPARAM.create_base_and_config bname in
   out_file := Geneweb.GWPARAM.bpath bname;
-  Geneweb.GWPARAM.init ();
+  Geneweb.GWPARAM.init bname;
   let arrays = make_arrays !in_file in
   Gc.compact ();
   let arrays = make_subarrays arrays in

@@ -2213,7 +2213,7 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   load_plugins plugins;
   let loaded_plugins = Registration.all_registered () in
-  GWPARAM.init ();
+  GWPARAM.init "";
   (* FIXME: this line MUST be after plugin loading as plugins can modified
      [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
   cache_lexicon ();
