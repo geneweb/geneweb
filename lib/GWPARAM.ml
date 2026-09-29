@@ -43,6 +43,7 @@ let albums_d = ref (fun _ -> "")
 let clean_bname bname = Filename.remove_extension bname
 let path_concat parts = String.concat Filename.dir_sep parts
 let bases_dir () = Secure.bases_dir ()
+let is_valid_bname s = not @@ String.ends_with ~suffix:".gwb" s
 
 (* Module for reorg mode paths *)
 module Default = struct
@@ -59,35 +60,35 @@ module Default = struct
   let adm_file file = Filename.concat !cnt_dir file
 
   let portraits_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "portraits_d";
     path_concat [ bases_dir (); bname ^ ".gwb"; "documents"; "portraits" ]
 
   let src_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "src_d";
     path_concat [ bases_dir (); bname ^ ".gwb"; "src" ]
 
   let etc_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "etc_d";
     path_concat [ bases_dir (); bname ^ ".gwb"; "etc" ]
 
   let config_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "config_d";
     path_concat [ bases_dir (); bname ^ ".gwb"; "config" ]
 
   let lang_d bname file =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "lang_d";
     Filename.concat (path_concat [ bases_dir (); bname ^ ".gwb"; "lang" ]) file
 
   let images_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "images_d";
     path_concat [ bases_dir (); bname ^ ".gwb"; "documents"; "images" ]
 
   let albums_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "albums_d";
     path_concat [ bases_dir (); bname ^ ".gwb"; "documents"; "albums" ]
 
   let bpath bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "bpath";
     Filename.concat (bases_dir ()) (bname ^ ".gwb")
 end
 
@@ -96,42 +97,42 @@ module Legacy = struct
   let config = config_legacy
 
   let cnt_d bname =
-    let _ = bname in
+    if not @@ is_valid_bname bname then invalid_arg "cnt_d";
     cnt_dir := path_concat [ bases_dir (); "cnt" ];
     !cnt_dir
 
   let adm_file file = Filename.concat !cnt_dir file
 
   let portraits_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "portraits_d";
     path_concat [ bases_dir (); "images"; bname ]
 
   let src_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "src_d";
     path_concat [ bases_dir (); "src"; bname ]
 
   let etc_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "etc_d";
     path_concat [ bases_dir (); "etc"; bname ]
 
   let config_d bname =
-    let _ = bname in
+    if not @@ is_valid_bname bname then invalid_arg "config_d";
     bases_dir ()
 
   let lang_d bname file =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "lang_d";
     Filename.concat (path_concat [ bases_dir (); "lang"; bname ]) file
 
   let images_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "images_d";
     path_concat [ bases_dir (); "src"; bname; "images" ]
 
   let albums_d bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "albums_d";
     path_concat [ bases_dir (); "src"; bname; "albums" ]
 
   let bpath bname =
-    let bname = clean_bname bname in
+    if not @@ is_valid_bname bname then invalid_arg "bpath";
     Filename.concat (bases_dir ()) (bname ^ ".gwb")
 end
 
