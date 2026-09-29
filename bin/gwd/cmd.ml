@@ -11,7 +11,7 @@ type plugins = All | List of plugin list
 
 type t = {
   (* Directories *)
-  base_dir : string;
+  bases_dir : string;
   gw_prefix : string;
   etc_prefix : string;
   images_prefix : string;
@@ -135,7 +135,7 @@ let log_conv = C.Arg.Conv.make ~docv:"LOG" ~parser:log_parser ~pp:log_pp ()
 
 (* Directories commands *)
 let dirs_section = "DIRECTORIES"
-let default_base_dir = Secure.default_base_dir
+let default_bases_dir = Secure.default_bases_dir
 
 let default_gw_prefix =
   match Sites.Sites.hd with
@@ -148,12 +148,12 @@ let default_images_prefix = default_gw_prefix // "images"
 let default_etc_prefix = default_gw_prefix // "etc"
 let default_images_dir = ""
 
-let base_dir =
+let bases_dir =
   let doc = "$(docv) is the directory where GeneWeb databases are stored." in
-  let absent = Dirs.name ~escaped:true default_base_dir in
+  let absent = Dirs.name ~escaped:true default_bases_dir in
   C.Arg.(
     value
-    & opt dirpath (Dirs.path default_base_dir)
+    & opt dirpath (Dirs.path default_bases_dir)
     & info [ "bd"; "base-dir" ] ~absent ~docs:dirs_section ~doc)
 
 let socket_dir =
@@ -222,13 +222,13 @@ let parse_directories bd wd gw_prefix images_prefix etc_prefix images_dir =
 
 let directories =
   let open C.Term.Syntax in
-  let+ base_dir = base_dir
+  let+ bases_dir = bases_dir
   and+ socket_dir = socket_dir
   and+ gw_prefix = gw_prefix
   and+ images_prefix = images_prefix
   and+ etc_prefix = etc_prefix
   and+ images_dir = images_dir in
-  parse_directories base_dir socket_dir gw_prefix images_prefix etc_prefix
+  parse_directories bases_dir socket_dir gw_prefix images_prefix etc_prefix
     images_dir
 
 (* Data management commands *)
@@ -622,7 +622,7 @@ let t =
   in
   C.Cmd.make (C.Cmd.info "gwd" ~envs ~version:Version.ver ~doc)
   @@
-  let+ base_dir, _, gw_prefix, images_prefix, etc_prefix, images_dir =
+  let+ bases_dir, _, gw_prefix, images_prefix, etc_prefix, images_dir =
     directories
   and+ cache_databases = cache_databases
   and+ lexicon_files = lexicon_files
@@ -660,7 +660,7 @@ let t =
   and+ _ : bool = no_fork
   and+ _ : bool = noop in
   {
-    base_dir;
+    bases_dir;
     gw_prefix;
     images_prefix;
     images_dir;

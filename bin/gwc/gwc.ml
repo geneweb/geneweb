@@ -116,7 +116,7 @@ let compile_gw_files ~bname bar inputs =
     inputs
 
 let bases_dir = ref None
-let set_base_dir s = bases_dir := Some s
+let set_bases_dir s = bases_dir := Some s
 let just_comp = ref false
 let kill_gwo = ref false
 let no_warn = ref false
@@ -183,10 +183,10 @@ let set_ngrams_arg s = ngrams_arg := Some (parse_ngrams s)
 let speclist =
   [
     ( "-bd",
-      Arg.String set_base_dir,
+      Arg.String set_bases_dir,
       Fmt.str
         "<DIR> Specify where the 'bases' directory is installed (default %S)"
-        (Dirs.name Secure.default_base_dir) );
+        (Dirs.name Secure.default_bases_dir) );
     ( "-bnotes",
       Arg.String set_bnotes,
       " [drop|erase|first|merge] Behavior for base notes of the next file. \
@@ -284,10 +284,10 @@ let parse_cmd () =
   (if !bases_dir = None then
      match inputs with
      | { fname; _ } :: _ when not (Filename.is_relative fname) ->
-         set_base_dir (Filename.dirname fname)
+         set_bases_dir (Filename.dirname fname)
      | _ -> ());
   let bases_dir =
-    Option.value ~default:(Dirs.path Secure.default_base_dir) !bases_dir
+    Option.value ~default:(Dirs.path Secure.default_bases_dir) !bases_dir
   in
   let gw_prefix = Option.value ~default:default_gw_prefix !gw_prefix in
   (inputs, bname, bases_dir, gw_prefix)
@@ -312,7 +312,7 @@ let cleanup gwo_files =
 
 let () =
   let inputs, bname, bases_dir, gw_prefix = parse_cmd () in
-  Secure.set_base_dir bases_dir;
+  Secure.set_bases_dir bases_dir;
   GWPARAM.init ();
   let dist_etc_d = gw_prefix // "etc" in
   if !Db1link.particules_file = "" then

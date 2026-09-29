@@ -215,7 +215,7 @@ let index = ref false
 let dry_run = ref false
 let dump = ref false
 let ofile = ref ""
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
+let bases_dir = ref (Dirs.path Secure.default_bases_dir)
 
 let speclist =
   [
@@ -261,7 +261,7 @@ let main () =
       Arg.usage speclist usage;
       exit 2
   | Some bname ->
-      Secure.set_base_dir !bases_dir;
+      Secure.set_bases_dir !bases_dir;
       GWPARAM.init ();
       let bpath = !GWPARAM.bpath bname in
       let lock_file = Mutil.lock_file bpath in

@@ -20,7 +20,7 @@ let () =
     | s -> s
   in
   let dry_run = !dry_run in
-  Secure.set_base_dir (Filename.dirname bpath);
+  Secure.set_bases_dir (Filename.dirname bpath);
   let lock_file = Mutil.lock_file bpath in
   let on_exn exn bt =
     Format.eprintf "%a@." Lock.pp_exception (exn, bt);

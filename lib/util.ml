@@ -1441,7 +1441,7 @@ let find_file_in_directories directories filename =
 
 let generate_search_directories conf =
   let base_etc = !GWPARAM.etc_d conf.bname in
-  let shared_etc = Filename.concat (Secure.base_dir ()) "etc" in
+  let shared_etc = Filename.concat (Secure.bases_dir ()) "etc" in
   let asset_dirs = Secure.assets () in
   let configured_templates, allow_all =
     try
@@ -2863,7 +2863,7 @@ let read_gen_auth_file fname base_file =
   let fname =
     if GWPARAM.is_reorg_base base_file then
       Filename.concat (!GWPARAM.config_d base_file) fname
-    else Filename.concat (Secure.base_dir ()) fname
+    else Filename.concat (Secure.bases_dir ()) fname
   in
   try
     let ic = Secure.open_in fname in
@@ -3387,7 +3387,7 @@ let has_children base u =
 
 let get_bases_list ?(format_fun = fun x -> x) () =
   let list = ref [] in
-  let dh = Unix.opendir (Secure.base_dir ()) in
+  let dh = Unix.opendir (Secure.bases_dir ()) in
   (try
      while true do
        let e = Unix.readdir dh in

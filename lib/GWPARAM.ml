@@ -15,15 +15,15 @@ let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
 let cnt_dir = ref ""
-let bases = ref (Secure.base_dir ())
+let bases = ref (Secure.bases_dir ())
 
 let config_reorg bname =
   let bname = Filename.remove_extension bname in
   String.concat Filename.dir_sep
-    [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
+    [ Secure.bases_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
 
 let config_legacy bname =
-  String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwf" ]
+  String.concat Filename.dir_sep [ Secure.bases_dir (); bname ^ ".gwf" ]
 
 type my_fun_2 = string -> string
 type my_fun_3 = string -> string -> string
@@ -42,7 +42,7 @@ let images_d = ref (fun _ -> "")
 let albums_d = ref (fun _ -> "")
 let clean_bname bname = Filename.remove_extension bname
 let path_concat parts = String.concat Filename.dir_sep parts
-let base_dir () = Secure.base_dir ()
+let bases_dir () = Secure.bases_dir ()
 
 (* Module for reorg mode paths *)
 module Default = struct
@@ -52,43 +52,43 @@ module Default = struct
     let bname = clean_bname bname in
     cnt_dir :=
       if bname <> "" then
-        path_concat [ base_dir (); bname ^ ".gwb"; "config"; "cnt" ]
-      else path_concat [ base_dir (); "cnt" ];
+        path_concat [ bases_dir (); bname ^ ".gwb"; "config"; "cnt" ]
+      else path_concat [ bases_dir (); "cnt" ];
     !cnt_dir
 
   let adm_file file = Filename.concat !cnt_dir file
 
   let portraits_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "portraits" ]
+    path_concat [ bases_dir (); bname ^ ".gwb"; "documents"; "portraits" ]
 
   let src_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "src" ]
+    path_concat [ bases_dir (); bname ^ ".gwb"; "src" ]
 
   let etc_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "etc" ]
+    path_concat [ bases_dir (); bname ^ ".gwb"; "etc" ]
 
   let config_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "config" ]
+    path_concat [ bases_dir (); bname ^ ".gwb"; "config" ]
 
   let lang_d bname file =
     let bname = clean_bname bname in
-    Filename.concat (path_concat [ base_dir (); bname ^ ".gwb"; "lang" ]) file
+    Filename.concat (path_concat [ bases_dir (); bname ^ ".gwb"; "lang" ]) file
 
   let images_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "images" ]
+    path_concat [ bases_dir (); bname ^ ".gwb"; "documents"; "images" ]
 
   let albums_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "albums" ]
+    path_concat [ bases_dir (); bname ^ ".gwb"; "documents"; "albums" ]
 
   let bpath bname =
     let bname = clean_bname bname in
-    Filename.concat (base_dir ()) (bname ^ ".gwb")
+    Filename.concat (bases_dir ()) (bname ^ ".gwb")
 end
 
 (* Module for legacy mode paths *)
@@ -97,42 +97,42 @@ module Legacy = struct
 
   let cnt_d bname =
     let _ = bname in
-    cnt_dir := path_concat [ base_dir (); "cnt" ];
+    cnt_dir := path_concat [ bases_dir (); "cnt" ];
     !cnt_dir
 
   let adm_file file = Filename.concat !cnt_dir file
 
   let portraits_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "images"; bname ]
+    path_concat [ bases_dir (); "images"; bname ]
 
   let src_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "src"; bname ]
+    path_concat [ bases_dir (); "src"; bname ]
 
   let etc_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "etc"; bname ]
+    path_concat [ bases_dir (); "etc"; bname ]
 
   let config_d bname =
     let _ = bname in
-    base_dir ()
+    bases_dir ()
 
   let lang_d bname file =
     let bname = clean_bname bname in
-    Filename.concat (path_concat [ base_dir (); "lang"; bname ]) file
+    Filename.concat (path_concat [ bases_dir (); "lang"; bname ]) file
 
   let images_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "src"; bname; "images" ]
+    path_concat [ bases_dir (); "src"; bname; "images" ]
 
   let albums_d bname =
     let bname = clean_bname bname in
-    path_concat [ base_dir (); "src"; bname; "albums" ]
+    path_concat [ bases_dir (); "src"; bname; "albums" ]
 
   let bpath bname =
     let bname = clean_bname bname in
-    Filename.concat (base_dir ()) (bname ^ ".gwb")
+    Filename.concat (bases_dir ()) (bname ^ ".gwb")
 end
 
 (* Check if a base is in reorg format *)
@@ -210,7 +210,7 @@ let create_default_gwf config_path =
 
 let check_base_exists bname =
   let clean_bname = Filename.remove_extension bname in
-  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
+  let bdir = Filename.concat (Secure.bases_dir ()) (clean_bname ^ ".gwb") in
   if (not !force) && Sys.file_exists bdir then (
     Printf.eprintf "Database \"%s\" already exists. Use -f to overwrite.\n"
       bname;
@@ -218,7 +218,7 @@ let check_base_exists bname =
 
 let rec create_base_and_config bname =
   let clean_bname = Filename.remove_extension bname in
-  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
+  let bdir = Filename.concat (Secure.bases_dir ()) (clean_bname ^ ".gwb") in
   let user_wants_reorg = !reorg in
   if Sys.file_exists bdir then
     migrate_gwf_bidirectional clean_bname user_wants_reorg;
@@ -234,10 +234,10 @@ let rec create_base_and_config bname =
 
 and migrate_gwf_bidirectional bname user_wants_reorg =
   let bname = Filename.remove_extension bname in
-  let legacy_path = Filename.concat (Secure.base_dir ()) (bname ^ ".gwf") in
+  let legacy_path = Filename.concat (Secure.bases_dir ()) (bname ^ ".gwf") in
   let reorg_path =
     String.concat Filename.dir_sep
-      [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
+      [ Secure.bases_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
   in
   let legacy_exists = Sys.file_exists legacy_path in
   let reorg_exists = Sys.file_exists reorg_path in
@@ -402,7 +402,7 @@ let is_related conf base p =
     let fname =
       String.concat Filename.dir_sep
         [
-          Secure.base_dir ();
+          Secure.bases_dir ();
           conf.Config.bname ^ ".gwb";
           "caches";
           "family-" ^ conf.Config.userkey;

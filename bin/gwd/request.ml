@@ -319,7 +319,7 @@ let treat_request =
       if conf.bname = "" then None
       else
         let bpath =
-          Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb")
+          Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb")
         in
         if Sys.file_exists bpath then Some bpath else None
     in

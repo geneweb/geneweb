@@ -34,7 +34,7 @@ let set_bases_dir s = bases_dir := Some s
 let get_bases_dir () =
   match !bases_dir with
   | Some s -> s
-  | None -> Dirs.path Secure.default_base_dir
+  | None -> Dirs.path Secure.default_bases_dir
 
 let printer_conf conn =
   {
@@ -1817,7 +1817,7 @@ let intro () =
   launch_dir := Sys.getcwd ();
   (* All tool invocations inject -bd via exec_f so they find bases in
      bases_dir regardless of cwd. *)
-  Secure.set_base_dir @@ get_bases_dir ();
+  Secure.set_bases_dir @@ get_bases_dir ();
   Printf.eprintf "Start gwsetup\n%!";
   default_lang := default_setup_lang;
 

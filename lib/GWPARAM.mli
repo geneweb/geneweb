@@ -61,7 +61,7 @@ module Default : sig
   val albums_d : string -> string
 
   val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ())] *)
+  (** [Filename.concat (Secure.bases_dir ())] *)
 end
 
 module Legacy : sig
@@ -77,7 +77,7 @@ module Legacy : sig
   val albums_d : string -> string
 
   val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ()) (string ^ ".gwb") ] *)
+  (** [Filename.concat (Secure.bases_dir ()) (string ^ ".gwb") ] *)
 end
 
 val output_error :

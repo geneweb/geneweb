@@ -12,7 +12,7 @@ let set_bases_dir s = bases_dir := Some s
 let get_bases_dir () =
   match !bases_dir with
   | Some s -> s
-  | None -> Dirs.path Secure.default_base_dir
+  | None -> Dirs.path Secure.default_bases_dir
 
 let parse_cmd () =
   let fname = ref "" in
@@ -25,7 +25,7 @@ let parse_cmd () =
         Fmt.str
           "<DIR> Specify where the bases directory with databases is installed \
            (default if empty is %S)."
-          (Dirs.name Secure.default_base_dir) );
+          (Dirs.name Secure.default_bases_dir) );
       ("-debug", Arg.Set debug, " Debug mode.");
     ]
     |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
@@ -275,7 +275,7 @@ let ( // ) = Filename.concat
 
 let main () =
   let fname, bases_dir = parse_cmd () in
-  Secure.set_base_dir bases_dir;
+  Secure.set_bases_dir bases_dir;
   let bpath = bases_dir // fname in
   if fname = "" then (
     Printf.eprintf "Missing database name\n";

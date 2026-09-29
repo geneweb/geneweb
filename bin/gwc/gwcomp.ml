@@ -567,7 +567,7 @@ let auth_access ~bname fn sn oc l =
     match auth_file_name with
     | Some file_name -> (
         let friend_passwd_file =
-          Filename.concat (Secure.base_dir ()) file_name
+          Filename.concat (Secure.bases_dir ()) file_name
         in
         try
           Secure.with_open_in_text friend_passwd_file (fun ic ->

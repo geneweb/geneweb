@@ -112,7 +112,7 @@ let bench () =
   | Some bpath when bpath <> "" ->
       let conf = Config.empty in
       let bench_w_base ?t ?(load = []) name fn args =
-        Secure.set_base_dir (Filename.dirname bpath);
+        Secure.set_bases_dir (Filename.dirname bpath);
         Driver.with_database bpath @@ fun base ->
         List.iter (fun load -> load base) load;
         let r = bench ?t name (fn base) args in

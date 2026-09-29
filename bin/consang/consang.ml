@@ -9,7 +9,7 @@ let scratch = ref false
 let verbosity = ref 2
 let fast = ref false
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
+let bases_dir = ref (Dirs.path Secure.default_bases_dir)
 
 let speclist =
   [
@@ -42,7 +42,7 @@ let () =
   | Some bname ->
       if !verbosity = 0 then Mutil.verbose := false;
       let bpath = Filename.concat !bases_dir bname in
-      Secure.set_base_dir !bases_dir;
+      Secure.set_bases_dir !bases_dir;
       let lock_file = Mutil.lock_file bpath in
       let on_exn exn bt =
         Logs.err (fun k -> k "%a" Lock.pp_exception (exn, bt));
