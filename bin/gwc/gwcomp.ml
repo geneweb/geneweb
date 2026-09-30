@@ -541,11 +541,7 @@ let auth_access ~bname fn sn oc l =
   let fns = name_unaccent_lower fn |> Mutil.tr ' ' '_' in
   let sns = name_unaccent_lower sn |> Mutil.tr ' ' '_' in
   let frs = if access = SemiPublic then "SemiPublic" else "Other" in
-  let gwf_file =
-    if Geneweb.GWPARAM.is_reorg_base bname then
-      Geneweb.GWPARAM.config_reorg bname
-    else Geneweb.GWPARAM.config_legacy bname
-  in
+  let gwf_file = Geneweb.GWPARAM.config bname in
   let auth_file_name =
     try
       Secure.with_open_in_text gwf_file (fun ic ->

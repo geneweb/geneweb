@@ -16,12 +16,6 @@ let reorg = ref false
 let force = ref false
 let cnt_dir = ref ""
 let ( // ) = Filename.concat
-
-let config_reorg bname =
-  let bname = Filename.remove_extension bname in
-  Secure.bases_dir () // (bname ^ ".gwb") // "config" // (bname ^ ".gwf")
-
-let config_legacy bname = Secure.bases_dir () // (bname ^ ".gwf")
 let clean_bname bname = Filename.remove_extension bname
 let is_valid_bname s = not @@ String.ends_with ~suffix:".gwb" s
 
@@ -52,7 +46,7 @@ let default bname =
     else Secure.bases_dir () // "cnt"
   in
   {
-    gwf = config_reorg bname;
+    gwf = bpath bname // "config" // (bname ^ ".gwf");
     cnt;
     adm_file = (fun file -> cnt // file);
     portraits = bpath bname // "documents" // "portraits";
@@ -69,7 +63,7 @@ let legacy bname =
   let bases_dir = Secure.bases_dir () in
   let cnt = bases_dir // "cnt" in
   {
-    gwf = config_legacy bname;
+    gwf = bases_dir // (bname ^ ".gwf");
     cnt;
     adm_file = (fun file -> cnt // file);
     portraits = bases_dir // "images" // bname;
@@ -96,7 +90,7 @@ let albums_d _bname = (Option.get !current).albums
 (* Check if a base is in reorg format *)
 let is_reorg_base bname =
   let bname = Filename.remove_extension bname in
-  Sys.file_exists (config_reorg bname)
+  Sys.file_exists (default bname).gwf
 
 (* Initialize path functions based on mode *)
 let init bname =
@@ -163,8 +157,8 @@ let rec create_base_and_config bname =
   if Sys.file_exists bdir then migrate_gwf_bidirectional bname user_wants_reorg;
   Filesystem.create_dir bdir;
   if
-    (not (Sys.file_exists (config_reorg bname)))
-    && not (Sys.file_exists (config_legacy bname))
+    (not @@ Sys.file_exists @@ (default bname).gwf)
+    && (not @@ Sys.file_exists @@ (legacy bname).gwf)
   then migrate_gwf_bidirectional bname user_wants_reorg;
   Printf.eprintf "\n";
   reorg := user_wants_reorg;
@@ -172,9 +166,8 @@ let rec create_base_and_config bname =
   bdir
 
 and migrate_gwf_bidirectional bname user_wants_reorg =
-  let bname = Filename.remove_extension bname in
-  let legacy_path = config_legacy bname in
-  let reorg_path = config_reorg bname in
+  let legacy_path = (legacy bname).gwf in
+  let reorg_path = (default bname).gwf in
   let legacy_exists = Sys.file_exists legacy_path in
   let reorg_exists = Sys.file_exists reorg_path in
   Printf.eprintf "Migration check for %s:\n" bname;

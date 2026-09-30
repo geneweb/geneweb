@@ -313,7 +313,7 @@ let cleanup gwo_files =
 let () =
   let inputs, bname, bases_dir, gw_prefix = parse_cmd () in
   Secure.set_bases_dir bases_dir;
-  GWPARAM.init bname;
+  GWPARAM.set_reorg ~mode:Detect ~bname;
   let dist_etc_d = gw_prefix // "etc" in
   if !Db1link.particules_file = "" then
     Db1link.particules_file := dist_etc_d // "particles.txt";

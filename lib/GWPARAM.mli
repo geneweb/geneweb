@@ -11,9 +11,6 @@ val reorg : bool ref
 val force : bool ref
 (** force creation of database if already existing *)
 
-val config_reorg : string -> string
-val config_legacy : string -> string
-
 type dir = string
 type file = string
 
