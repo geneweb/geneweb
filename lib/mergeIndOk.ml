@@ -6,6 +6,8 @@ open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let ( // ) = Filename.concat
+
 let rec merge_lists l1 = function
   | x2 :: l2 ->
       if List.mem x2 l1 then merge_lists l1 l2 else merge_lists (l1 @ [ x2 ]) l2
@@ -507,7 +509,7 @@ let merge_carrousel conf base o_p1 o_p2 p =
           else ())
       (Sys.readdir dir2)
   in
-  let full_dir file = Filename.concat (!GWPARAM.images_d conf.bname) file in
+  let full_dir file = GWPARAM.images_d conf.bname // file in
   let ofn = p.first_name in
   let osn = p.surname in
   let oocc = p.occ in

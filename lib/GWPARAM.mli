@@ -14,20 +14,33 @@ val force : bool ref
 val config_reorg : string -> string
 val config_legacy : string -> string
 
-type my_fun_2 = string -> string
-type my_fun_3 = string -> string -> string
+type dir = string
+type file = string
 
-val config : my_fun_2 ref
-val cnt_d : my_fun_2 ref
-val adm_file : my_fun_2 ref
-val src_d : my_fun_2 ref
-val etc_d : my_fun_2 ref
-val config_d : my_fun_2 ref
-val lang_d : my_fun_3 ref
+type layout = {
+  gwf : file;
+  cnt : dir;
+  adm_file : string -> dir;
+  portraits : dir;
+  src : dir;
+  etc : dir;
+  config : dir;
+  lang : string -> dir;
+  images : dir;
+  albums : dir;
+}
+
+val config : string -> string
+val cnt_d : string -> string
+val adm_file : string -> string
+val src_d : string -> string
+val etc_d : string -> string
+val config_d : string -> string
+val lang_d : string -> string -> string
 val bpath : string -> string
-val portraits_d : my_fun_2 ref
-val images_d : my_fun_2 ref
-val albums_d : my_fun_2 ref
+val portraits_d : string -> string
+val images_d : string -> string
+val albums_d : string -> string
 
 (* S: Move it to gwd_lib?  *)
 

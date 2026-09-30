@@ -22,21 +22,6 @@ let config_reorg bname =
   Secure.bases_dir () // (bname ^ ".gwb") // "config" // (bname ^ ".gwf")
 
 let config_legacy bname = Secure.bases_dir () // (bname ^ ".gwf")
-
-type my_fun_2 = string -> string
-type my_fun_3 = string -> string -> string
-
-(* Function references that will be set based on mode *)
-let config = ref config_legacy
-let cnt_d = ref (fun _ -> "")
-let adm_file = ref (fun _ -> "")
-let src_d = ref (fun _ -> "")
-let etc_d = ref (fun _ -> "")
-let config_d = ref (fun _ -> "")
-let lang_d = ref (fun _ _ -> "")
-let portraits_d = ref (fun _ -> "")
-let images_d = ref (fun _ -> "")
-let albums_d = ref (fun _ -> "")
 let clean_bname bname = Filename.remove_extension bname
 let is_valid_bname s = not @@ String.ends_with ~suffix:".gwb" s
 
@@ -96,6 +81,18 @@ let legacy bname =
     albums = bases_dir // "src" // bname // "albums";
   }
 
+let current = ref None
+let config _bname = (Option.get !current).gwf
+let cnt_d _bname = (Option.get !current).cnt
+let adm_file file = (Option.get !current).adm_file file
+let src_d _bname = (Option.get !current).src
+let etc_d _bname = (Option.get !current).etc
+let config_d _bname = (Option.get !current).config
+let lang_d _bname = (Option.get !current).lang
+let portraits_d _bname = (Option.get !current).portraits
+let images_d _bname = (Option.get !current).images
+let albums_d _bname = (Option.get !current).albums
+
 (* Check if a base is in reorg format *)
 let is_reorg_base bname =
   let bname = Filename.remove_extension bname in
@@ -104,30 +101,8 @@ let is_reorg_base bname =
 (* Initialize path functions based on mode *)
 let init bname =
   Secure.add_assets Filename.current_dir_name;
-  if !reorg then (
-    let default = default bname in
-    (config := fun _bname -> default.gwf);
-    (cnt_d := fun _bname -> default.cnt);
-    adm_file := default.adm_file;
-    (src_d := fun _bname -> default.src);
-    (etc_d := fun _bname -> default.etc);
-    (config_d := fun _bname -> default.config);
-    (lang_d := fun _bname -> default.lang);
-    (portraits_d := fun _bname -> default.portraits);
-    (images_d := fun _bname -> default.images);
-    albums_d := fun _bname -> default.albums)
-  else
-    let legacy = legacy bname in
-    (config := fun _bname -> legacy.gwf);
-    (cnt_d := fun _bname -> legacy.cnt);
-    adm_file := legacy.adm_file;
-    (src_d := fun _bname -> legacy.src);
-    (etc_d := fun _bname -> legacy.etc);
-    (config_d := fun _bname -> legacy.config);
-    (lang_d := fun _bname -> legacy.lang);
-    (portraits_d := fun _bname -> legacy.portraits);
-    (images_d := fun _bname -> legacy.images);
-    albums_d := fun _bname -> legacy.albums
+  if !reorg then current := Some (default bname)
+  else current := Some (legacy bname)
 
 let set_reorg bname force =
   let res = match force with Some b -> b | None -> is_reorg_base bname in

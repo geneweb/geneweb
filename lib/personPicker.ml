@@ -1,6 +1,8 @@
 open Config
 module Driver = Geneweb_db.Driver
 
+let ( // ) = Filename.concat
+
 let prefix_match prefix s =
   let pl = String.length prefix in
   pl = 0 || (String.length s >= pl && String.sub s 0 pl = prefix)
@@ -58,7 +60,7 @@ let person_to_json conf base p =
   let oc = Driver.get_occ p in
   let key = Image.key_dir_basename fn sn oc in
   let has_keydir =
-    let dir = Filename.concat (!GWPARAM.images_d conf.bname) key in
+    let dir = GWPARAM.images_d conf.bname // key in
     try Sys.is_directory dir with Sys_error _ -> false
   in
   let dates = DateDisplay.short_dates_text_notag conf base p in

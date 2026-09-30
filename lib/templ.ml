@@ -1397,7 +1397,7 @@ and print_simple_variable conf = function
       Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
         !GWPARAM.errors_other !GWPARAM.set_vars
   | "src_albums_list" -> (
-      let dir = !GWPARAM.albums_d conf.bname in
+      let dir = GWPARAM.albums_d conf.bname in
       let has_image path =
         try
           let entries = Sys.readdir path in
@@ -1434,7 +1434,7 @@ and print_simple_variable conf = function
           Log.warn (fun k ->
               k "src_albums_list: %s (%s)" (Unix.error_message err) dir))
   | "src_images_list" -> (
-      let dir = !GWPARAM.images_d conf.bname in
+      let dir = GWPARAM.images_d conf.bname in
       try
         let f_list = Sys.readdir dir |> Array.to_list |> List.sort compare in
         List.iter

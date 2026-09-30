@@ -2,6 +2,8 @@ open Config
 open Util
 module Driver = Geneweb_db.Driver
 
+let ( // ) = Filename.concat
+
 let image_extension f =
   let ext = String.lowercase_ascii (Filename.extension f) in
   Array.exists (fun e -> String.lowercase_ascii e = ext) Image.ext_list_1
@@ -43,7 +45,7 @@ let json_subdir base name =
   `Assoc [ ("name", `String name); ("files", json_strings (list_images sub)) ]
 
 let json_key_full conf key =
-  let base = Filename.concat (!GWPARAM.images_d conf.bname) key in
+  let base = GWPARAM.images_d conf.bname // key in
   `Assoc
     [
       ("src", `String "key");
@@ -53,8 +55,7 @@ let json_key_full conf key =
     ]
 
 let json_key_dir conf key dir =
-  let base = Filename.concat (!GWPARAM.images_d conf.bname) key in
-  let target = Filename.concat base dir in
+  let target = GWPARAM.images_d conf.bname // key // dir in
   `Assoc
     [
       ("src", `String "key");
@@ -64,7 +65,7 @@ let json_key_dir conf key dir =
     ]
 
 let json_albums_root conf =
-  let base = !GWPARAM.albums_d conf.bname in
+  let base = GWPARAM.albums_d conf.bname in
   `Assoc
     [
       ("src", `String "albums");
@@ -77,8 +78,7 @@ let json_albums_root conf =
     ]
 
 let json_albums_dir conf dir =
-  let base = !GWPARAM.albums_d conf.bname in
-  let target = Filename.concat base dir in
+  let target = GWPARAM.albums_d conf.bname // dir in
   `Assoc
     [
       ("src", `String "albums");
