@@ -227,6 +227,17 @@ val pget :
   Geneweb_db.Driver.person
 (** Value of [pget_opt], map None to empty_person *)
 
+val visible_in_search :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+(** Tells if a person read from a name index may appear in search results: first
+    name and surname non-empty and not ["?"], names not hidden (see
+    [is_hide_names]) unless [authorized_age], and not restricted (see
+    [is_restricted]). *)
+
+val visible_in_search_ip :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> bool
+(** [visible_in_search] on [Driver.poi base ip]. *)
+
 val string_gen_person :
   Geneweb_db.Driver.base ->
   ( Geneweb_db.Driver.iper,

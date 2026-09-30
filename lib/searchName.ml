@@ -62,14 +62,7 @@ type name_components = {
   case : search_case;
 }
 
-type search_method =
-  | Sosa
-  | Key
-  | Surname
-  | FirstName
-  | FullName
-  | ApproxKey
-  | PartialKey
+type search_method = Sosa | Key | Surname | FullName | ApproxKey | PartialKey
 
 type firstname_section = {
   persons : Driver.Iper.t list;
@@ -189,22 +182,10 @@ let generate_apostrophe_variants s =
         variants
       |> List.sort_uniq String.compare
 
-let empty_sn_or_fn base p =
-  Driver.Istr.is_empty (Driver.get_surname p)
-  || Driver.Istr.is_quest (Driver.get_surname p)
-  || Driver.Istr.is_empty (Driver.get_first_name p)
-  || Driver.Istr.is_quest (Driver.get_first_name p)
-  || Name.lower (Driver.sou base (Driver.get_surname p)) = ""
-  || Name.lower (Driver.sou base (Driver.get_first_name p)) = ""
-
 let split_normalize case s =
   let s = Name.abbrev s in
   let s = if case then s else Name.lower s in
   cut_words s
-
-let search_reject_p conf base p =
-  empty_sn_or_fn base p
-  || (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
 
 let persons_to_ipers = List.map Driver.get_iper
 
@@ -300,9 +281,10 @@ let person_is_misc_name conf base p k =
     (Driver.person_misc_names base p (nobtit conf base))
 
 let person_is_approx_key base p k =
-  let k = Name.strip_lower k in
-  let fn = Name.strip_lower (Driver.p_first_name base p) in
-  let sn = Name.strip_lower (Driver.p_surname base p) in
+  let norm s = Name.strip_lower (norm_apo s) in
+  let k = norm k in
+  let fn = norm (Driver.p_first_name base p) in
+  let sn = norm (Driver.p_surname base p) in
   k = fn ^ sn && fn <> "" && sn <> ""
 
 let select_approx_key alias_cache conf base pl k =
@@ -313,13 +295,14 @@ let select_approx_key alias_cache conf base pl k =
         Some.AliasCache.add_direct alias_cache iper;
         p :: pl)
       else
-        let k_stripped = Name.strip_lower k in
+        (* Same normalisation as person_is_misc_name: norm_apo first. *)
+        let k_stripped = Name.strip_lower (norm_apo k) in
         let aliases = Driver.get_aliases p in
         let matched_alias =
           List.find_opt
             (fun alias_istr ->
               let alias_str = Driver.sou base alias_istr in
-              Name.strip_lower alias_str = k_stripped)
+              Name.strip_lower (norm_apo alias_str) = k_stripped)
             aliases
         in
         match matched_alias with
@@ -350,7 +333,8 @@ let search_by_sosa conf base an =
 (* Search by partial key: split on first space to get fn and sn, try all
    apostrophe variants of sn. *)
 let search_by_name conf base n =
-  let n1 = Name.abbrev (Name.lower n) in
+  (* norm_apo before Name.lower: see the comment on norm_apo. *)
+  let n1 = Name.abbrev (Name.lower (norm_apo n)) in
   match String.index_opt n1 ' ' with
   | None -> []
   | Some i ->
@@ -501,7 +485,7 @@ let search_for_multiple_fn cache conf base fn pl opts =
   let result =
     List.fold_left
       (fun acc p ->
-        if search_reject_p conf base p then acc
+        if not (Util.visible_in_search conf base p) then acc
         else
           let fn1 =
             StringCache.get_cached cache base (Driver.get_first_name p)
@@ -538,7 +522,7 @@ let partition_for_multiple_fn cache conf base fn pl opts =
   let exact, partial =
     List.fold_left
       (fun (ex, pa) p ->
-        if search_reject_p conf base p then (ex, pa)
+        if not (Util.visible_in_search conf base p) then (ex, pa)
         else
           let fn1 =
             StringCache.get_cached cache base (Driver.get_first_name p)
@@ -672,19 +656,13 @@ let rec search_surname_candidates conf base variants =
         n_persons := !n_persons + List.length iperl;
         List.iter
           (fun ip ->
-            if (is_exact || is_word) && not (Util.is_restricted conf base ip)
-            then (
+            (* One visibility test for the three groups (previously exact
+               and word only checked is_restricted, phonetic only empty and
+               hidden names). *)
+            if Util.visible_in_search_ip conf base ip then (
               if is_exact then exact := Iper.Set.add ip !exact;
-              if is_word then word := Iper.Set.add ip !word);
-            if is_phon then
-              let p = Driver.poi base ip in
-              if
-                not
-                  (Driver.Istr.is_empty (Driver.get_first_name p)
-                  || Driver.Istr.is_empty (Driver.get_surname p)
-                  || Util.is_hide_names conf p
-                     && not (Util.authorized_age conf base p))
-              then phon := Iper.Set.add ip !phon)
+              if is_word then word := Iper.Set.add ip !word;
+              if is_phon then phon := Iper.Set.add ip !phon))
           iperl))
     istrl;
   Log.debug (fun k ->
@@ -708,12 +686,24 @@ let rec search_surname_candidates conf base variants =
    Short crush codes (<=2 chars) require exact equality, to avoid e.g. "Le"
    or "lea" (-> "l") matching every name containing an "l" phoneme; longer
    codes are specific enough for substring containment. *)
-and search_phonetic_generic conf base query base_strings spi_find =
+and search_phonetic_generic ?(by_word = false) conf base query base_strings
+    spi_find =
   let query_crushed = Name.crush_lower query in
-  let sounds_like s =
-    let c = Name.crush_lower s in
+  let test c =
     if String.length query_crushed <= 2 then c = query_crushed
     else Mutil.contains c query_crushed
+  in
+  (* [by_word]: also accept an index string one of whose words sounds like
+     [query].  Needed when [query] is one word of a multi-word query: the
+     index files "Jean-Pierre" under "jean" and "pierre" as well as
+     under the whole name, but the whole-name code "jnpr" never equals
+     the short code "jn", so the string was found and then discarded. *)
+  let sounds_like s =
+    test (Name.crush_lower s)
+    || by_word
+       && List.exists
+            (fun w -> test (Name.crush_lower w))
+            (cut_words (Name.lower s))
   in
   try
     let istrl = base_strings base query in
@@ -721,7 +711,7 @@ and search_phonetic_generic conf base query base_strings spi_find =
       List.filter (fun istr -> sounds_like (Driver.sou base istr)) istrl
     in
     let ddr_iperl = ref Iper.Set.empty in
-    let n_raw = ref 0 and n_empty = ref 0 and n_hidden = ref 0 in
+    let n_raw = ref 0 and n_rejected = ref 0 in
     List.iter
       (fun istr ->
         let iperl = spi_find istr in
@@ -729,33 +719,27 @@ and search_phonetic_generic conf base query base_strings spi_find =
         List.iter
           (fun ip ->
             if not (Iper.Set.mem ip !ddr_iperl) then
-              let p = Driver.poi base ip in
-              if
-                Driver.Istr.is_empty (Driver.get_first_name p)
-                || Driver.Istr.is_empty (Driver.get_surname p)
-              then incr n_empty
-              else if
-                Util.is_hide_names conf p
-                && not (Util.authorized_age conf base p)
-              then incr n_hidden
-              else ddr_iperl := Iper.Set.add ip !ddr_iperl)
+              if Util.visible_in_search_ip conf base ip then
+                ddr_iperl := Iper.Set.add ip !ddr_iperl
+              else incr n_rejected)
           iperl)
       kept_istrl;
     Log.debug (fun k ->
         k
           "      phonetic %S (crush %S): %d index strings, %d sound alike \
-           [%s], %d persons, %d empty names, %d hidden -> %d kept"
+           [%s], %d persons, %d not visible -> %d kept"
           query query_crushed (List.length istrl) (List.length kept_istrl)
           (String.concat "; " (List.map (Driver.sou base) kept_istrl))
-          !n_raw !n_empty !n_hidden
+          !n_raw !n_rejected
           (Iper.Set.cardinal !ddr_iperl));
     Iper.Set.elements !ddr_iperl
   with Not_found ->
     Log.debug (fun k -> k "      phonetic %S: Not_found" query);
     []
 
-and search_firstname_phonetic conf base query =
-  search_phonetic_generic conf base query Driver.base_strings_of_first_name
+and search_firstname_phonetic ?by_word conf base query =
+  search_phonetic_generic ?by_word conf base query
+    Driver.base_strings_of_first_name
     (Driver.spi_find (Driver.persons_of_first_name base))
 
 let deduplicate_collect ipers f =
@@ -802,16 +786,7 @@ let search_firstname_direct conf base query =
         variants
   in
   deduplicate_collect all_ipers (fun ip ->
-      let p = Driver.poi base ip in
-      let fn = Driver.sou base (Driver.get_first_name p) in
-      if
-        fn <> ""
-        && (not (Driver.Istr.is_empty (Driver.get_first_name p)))
-        && (not (Driver.Istr.is_empty (Driver.get_surname p)))
-        && not
-             (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
-      then Some ip
-      else None)
+      if Util.visible_in_search_ip conf base ip then Some ip else None)
 
 (* Search first-name aliases, trying all apostrophe variants of both the
    query and the stored alias strings. *)
@@ -827,10 +802,7 @@ let search_firstname_aliases conf base query =
   List.fold_left
     (fun acc ip ->
       let p = Driver.poi base ip in
-      if
-        empty_sn_or_fn base p
-        || (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
-      then acc
+      if not (Util.visible_in_search conf base p) then acc
       else
         let aliases = Driver.get_first_names_aliases p in
         match
@@ -852,28 +824,36 @@ let search_firstname_phonetic_split alias_cache conf base query =
   let query_words = cut_words query_lower in
   let nb_words = List.length query_words in
   let phonetic_iperl =
-    if nb_words <= 1 then
-      let crushed = Name.crush_lower query_lower in
-      search_firstname_phonetic conf base crushed
+    if nb_words <= 1 then search_firstname_phonetic conf base query_lower
     else
       let word_results =
         List.map
-          (fun w ->
-            let crushed = Name.crush_lower w in
-            (w, search_firstname_phonetic conf base crushed))
+          (fun w -> (w, search_firstname_phonetic ~by_word:true conf base w))
           query_words
       in
       let all_candidates = List.flatten (List.map snd word_results) in
+      (* Every query word must sound like one of the words of the first
+         name (crush equality for codes <= 2 chars, containment otherwise).
+         A literal substring test here would drop exactly the spelling
+         variants the phonetic lookup was meant to find ("jan pier" ->
+         "Jean-Pierre"). *)
+      let word_codes =
+        List.map (fun (w, _) -> Name.crush_lower w) word_results
+        |> List.filter (fun c -> c <> "")
+      in
+      let sounds_like c fc =
+        if String.length c <= 2 then fc = c else Mutil.contains fc c
+      in
       deduplicate_collect all_candidates (fun ip ->
           let p = Driver.poi base ip in
           let fn = Driver.sou base (Driver.get_first_name p) in
-          let fn_norm = normalize_for_phonetic (Name.lower fn) in
+          let fn_codes =
+            List.map Name.crush_lower (cut_words (Name.lower fn))
+          in
           let matches_all_words =
             List.for_all
-              (fun (word, _) ->
-                let word_norm = normalize_for_phonetic word in
-                Mutil.contains fn_norm word_norm)
-              word_results
+              (fun c -> List.exists (sounds_like c) fn_codes)
+              word_codes
           in
           if matches_all_words then Some ip else None)
   in
@@ -897,11 +877,9 @@ let search_with_ngrams_complement conf base _query query_words =
   let nb_words = List.length query_words in
   if nb_words = 0 || nb_words = 1 || nb_words > 4 then []
   else
-    let ngram = String.concat "" query_words in
-    try
-      let crushed = Name.crush ngram in
-      search_firstname_phonetic conf base crushed
-    with Not_found -> []
+    (* search_phonetic_generic crushes the query itself (and catches
+       Not_found): pass the raw n-gram, not a pre-crushed code. *)
+    search_firstname_phonetic conf base (String.concat "" query_words)
 
 (* Phonetic ngrams complement: searches the first-name index using
    crush(concat(query_words)) as a single-token n-gram, then keeps only
@@ -939,7 +917,9 @@ let search_firstname_phonetic_ngrams alias_cache conf base query =
    here, so the old name was misleading. *)
 let search_firstname alias_cache conf base query opts =
   if opts.absolute then
-    let istrl = Driver.base_strings_of_first_name base query in
+    let istrl =
+      try Driver.base_strings_of_first_name base query with Not_found -> []
+    in
     let exact_ips =
       List.fold_left
         (fun acc istr ->
@@ -950,6 +930,7 @@ let search_firstname alias_cache conf base query opts =
               acc
           else acc)
         [] istrl
+      |> List.filter (Util.visible_in_search_ip conf base)
     in
     {
       direct = { persons = exact_ips; variants = Mutil.StrSet.empty };
@@ -968,7 +949,9 @@ let search_firstname alias_cache conf base query opts =
     let query_lower_variants = List.map Name.lower query_variants in
     let istrl =
       List.concat_map
-        (fun variant -> Driver.base_strings_of_first_name base variant)
+        (fun variant ->
+          try Driver.base_strings_of_first_name base variant
+          with Not_found -> [])
         query_variants
       |> List.sort_uniq compare
     in
@@ -979,16 +962,21 @@ let search_firstname alias_cache conf base query opts =
           List.mem str query_lower_variants)
         istrl
     in
+    (* Persons read from the index are filtered here: the first-name
+       display (display_firstname_results) does not go through
+       handle_search_results and its p_auth filter. *)
     let exact_ips =
       List.concat_map
         (fun istr -> Driver.spi_find (Driver.persons_of_first_name base) istr)
         exact_istrl
+      |> List.filter (Util.visible_in_search_ip conf base)
     in
     List.iter (fun ip -> Some.AliasCache.add_direct alias_cache ip) exact_ips;
     let other_ips =
       List.concat_map
         (fun istr -> Driver.spi_find (Driver.persons_of_first_name base) istr)
         other_istrl
+      |> List.filter (Util.visible_in_search_ip conf base)
     in
     List.iter (fun ip -> Some.AliasCache.add_direct alias_cache ip) other_ips;
     let normalize_person ip =
@@ -1282,40 +1270,11 @@ let search_fullname ?(any_order = false) cache conf base variants_fn variants_sn
           in
           (ex, List.rev_append demoted partial)
       in
-      (* Sort by first-name relevance: exact spelling match (score 0) before
-         phonetic/substring match (score 1).  stable_sort preserves the
-         existing order within each tier.  This ensures e.g. "Annie" appears
-         before "Anne" when the query is "annie vivier". *)
-      let normalize s = Name.lower (norm_apo s) in
-      (* Compare against all apostrophe variants: after norm_apo the
-         apostrophe forms collapse to one, but the space variant
-         ("o brien") does not, so membership testing avoids mis-scoring a
-         true exact match when the sorted variant list happens to start
-         with the space form. *)
-      let fn_lowers = List.map normalize variants_fn in
-      let sn_lowers = List.map normalize variants_sn in
-      let fn_lower = normalize (List.hd variants_fn) in
-      (* Combined relevance score: weight fn match (0/2) + sn match (0/1).
-         Score 0 = both exact, 1 = fn exact only, 2 = sn exact only,
-         3 = neither exact.  This pushes e.g. "Sophie d'Oiron" above
-         "Sophie Aron" when the query is "sophiee d'orion". *)
-      let relevance_score p =
-        let fn1 = StringCache.get_cached cache base (Driver.get_first_name p) in
-        let sn1 = Driver.sou base (Driver.get_surname p) in
-        let fn_match = if List.mem (normalize fn1) fn_lowers then 0 else 2 in
-        let sn_match = if List.mem (normalize sn1) sn_lowers then 0 else 1 in
-        fn_match + sn_match
-      in
-      let exact =
-        List.stable_sort
-          (fun a b -> compare (relevance_score a) (relevance_score b))
-          exact
-      in
-      let partial =
-        List.stable_sort
-          (fun a b -> compare (relevance_score a) (relevance_score b))
-          partial
-      in
+      (* No ordering here: dispatch_search_methods sorts every pile by iper
+         (sort_uniq) and Some.specify orders the display (birth date, or
+         first-name relevance for the spouse list).  A relevance sort done
+         at this point was discarded. *)
+      let fn_lower = Name.lower (norm_apo (List.hd variants_fn)) in
       (* Phonetic crush fallback for fn: catches typos / double-letter
          differences like "fereol" vs "Ferreol" where substring matching
          fails but Name.crush_lower matches. Only applied to persons not
@@ -1333,7 +1292,10 @@ let search_fullname ?(any_order = false) cache conf base variants_fn variants_sn
             List.filter
               (fun p ->
                 let ip = Driver.get_iper p in
-                if Iper.Set.mem ip already then false
+                if
+                  Iper.Set.mem ip already
+                  || not (Util.visible_in_search conf base p)
+                then false
                 else
                   let fn1 =
                     StringCache.get_cached cache base (Driver.get_first_name p)
@@ -1350,67 +1312,64 @@ let search_fullname ?(any_order = false) cache conf base variants_fn variants_sn
       in
       (* Reuse all_iper (already gathered above) for the spouse search to
          avoid redundant search_surname calls and duplicate results. *)
+      (* Always run, whatever public_name_as_fn says: that setting is about
+         displaying public names, not about which persons a search finds. *)
       let spouse =
-        if List.assoc_opt "public_name_as_fn" conf.base_env <> Some "no" then
-          let spouses =
-            List.fold_left
-              (fun acc ip ->
-                let p = Driver.poi base ip in
-                Array.fold_left
-                  (fun acc ifam ->
-                    let f = Driver.foi base ifam in
-                    let spouse_ip =
-                      if ip = Driver.get_father f then Driver.get_mother f
-                      else Driver.get_father f
+        let spouses =
+          List.fold_left
+            (fun acc ip ->
+              let p = Driver.poi base ip in
+              Array.fold_left
+                (fun acc ifam ->
+                  let f = Driver.foi base ifam in
+                  let spouse_ip =
+                    if ip = Driver.get_father f then Driver.get_mother f
+                    else Driver.get_father f
+                  in
+                  Driver.poi base spouse_ip :: acc)
+                acc (Driver.get_family p))
+            [] all_iper
+        in
+        let spouse_substr =
+          List.fold_left
+            (fun acc fn_v ->
+              List.rev_append
+                (search_for_multiple_fn cache conf base fn_v spouses
+                   opts_partial)
+                acc)
+            [] variants_fn
+          |> List.sort_uniq (fun a b ->
+              compare (Driver.get_iper a) (Driver.get_iper b))
+        in
+        (* Same phonetic crush fallback as for direct persons: catches
+           first-name near-misses like "margerite" vs "Marguerite". *)
+        let fn_crushed = Name.crush_lower fn_lower in
+        let spouse_all =
+          if fn_crushed = "" then spouse_substr
+          else
+            let already = iper_set_of_lists [ exact; partial; spouse_substr ] in
+            let phonetic_extra =
+              List.filter
+                (fun p ->
+                  let ip = Driver.get_iper p in
+                  if
+                    Iper.Set.mem ip already
+                    || not (Util.visible_in_search conf base p)
+                  then false
+                  else
+                    let fn1 =
+                      StringCache.get_cached cache base
+                        (Driver.get_first_name p)
                     in
-                    Driver.poi base spouse_ip :: acc)
-                  acc (Driver.get_family p))
-              [] all_iper
-          in
-          let spouse_substr =
-            List.fold_left
-              (fun acc fn_v ->
-                List.rev_append
-                  (search_for_multiple_fn cache conf base fn_v spouses
-                     opts_partial)
-                  acc)
-              [] variants_fn
-            |> List.sort_uniq (fun a b ->
-                compare (Driver.get_iper a) (Driver.get_iper b))
-          in
-          (* Same phonetic crush fallback as for direct persons: catches
-             first-name near-misses like "margerite" vs "Marguerite". *)
-          let fn_crushed = Name.crush_lower fn_lower in
-          let spouse_all =
-            if fn_crushed = "" then spouse_substr
-            else
-              let already =
-                iper_set_of_lists [ exact; partial; spouse_substr ]
-              in
-              let phonetic_extra =
-                List.filter
-                  (fun p ->
-                    let ip = Driver.get_iper p in
-                    if Iper.Set.mem ip already || search_reject_p conf base p
-                    then false
-                    else
-                      let fn1 =
-                        StringCache.get_cached cache base
-                          (Driver.get_first_name p)
-                      in
-                      let fn1_crushed = Name.crush_lower fn1 in
-                      if String.length fn_crushed <= 2 then
-                        fn1_crushed = fn_crushed
-                      else Mutil.contains fn1_crushed fn_crushed)
-                  spouses
-              in
-              spouse_substr @ phonetic_extra
-          in
-          (* Sort spouse results by combined fn+sn relevance, same as direct. *)
-          List.stable_sort
-            (fun a b -> compare (relevance_score a) (relevance_score b))
-            spouse_all
-        else []
+                    let fn1_crushed = Name.crush_lower fn1 in
+                    if String.length fn_crushed <= 2 then
+                      fn1_crushed = fn_crushed
+                    else Mutil.contains fn1_crushed fn_crushed)
+                spouses
+            in
+            spouse_substr @ phonetic_extra
+        in
+        spouse_all
       in
       {
         exact = persons_to_ipers exact;
@@ -1423,7 +1382,7 @@ let search_fullname ?(any_order = false) cache conf base variants_fn variants_sn
    the former shortcut branches that returned results without checking fn. *)
 let search_partial_key cache conf base query =
   let pl = search_by_name conf base query in
-  let n1 = Name.abbrev (Name.lower query) in
+  let n1 = Name.abbrev (Name.lower (norm_apo query)) in
   let fn, sn =
     match String.index_opt n1 ' ' with
     | Some i ->
@@ -1442,9 +1401,11 @@ let search_partial_key cache conf base query =
   let persons =
     if pl_filtered <> [] then pl_filtered
     else
-      let conf_sn =
-        { conf with env = ("surname", Adef.encoded sn) :: conf.env }
-      in
+      (* conf.env holds the values URL-encoded: encode [sn] (a raw string
+         marked as encoded was mis-decoded when it contained '+' or '%').
+         Only the surname is passed: the rest of the m=S request (pn, p,
+         n, t, p_exact...) must not be read as advanced-search filters. *)
+      let conf_sn = { conf with env = [ ("surname", Mutil.encode sn) ] } in
       let persons, _ = AdvSearchOk.advanced_search conf_sn base max_int in
       List.filter strict_sn persons
   in
@@ -1505,7 +1466,7 @@ let insert_slash_before_particle base pn =
     aux 1
 
 let parse_slash_separated original_pn pn slash_pos =
-  let fn_part = String.sub pn 0 slash_pos in
+  let fn_part = String.sub pn 0 slash_pos |> String.trim in
   let sn_part =
     String.sub pn (slash_pos + 1) (String.length pn - slash_pos - 1)
     |> String.trim
@@ -1776,24 +1737,6 @@ let execute_search_method cache alias_cache conf base components query method_
           k "  Method Surname: %d exact, %d other possibilities"
             (List.length exact) (List.length partial));
       { exact; partial; spouse = [] }
-  | FirstName ->
-      Log.debug (fun k -> k "  Method FirstName query=%S" query);
-      let fn_results =
-        search_firstname alias_cache conf base query fn_options
-      in
-      let r =
-        {
-          exact =
-            fn_results.direct.persons @ fn_results.aliases.persons
-            @ fn_results.included.persons;
-          partial = fn_results.phonetic.persons @ fn_results.permuted.persons;
-          spouse = [];
-        }
-      in
-      Log.debug (fun k ->
-          k "    -> %d exact, %d partial" (List.length r.exact)
-            (List.length r.partial));
-      r
   | FullName ->
       let fn = Option.value components.first_name ~default:"" in
       let sn = Option.value components.surname ~default:query in
@@ -1855,13 +1798,18 @@ let execute_search_method cache alias_cache conf base components query method_
       let persons =
         search_key_aux (select_approx_key alias_cache) conf base query
       in
+      (* exact: the person's own fn+sn, or one of their aliases, equals the
+         key; partial: matched only through misc names (titles, married
+         names...).  Previously the split relied on the alias cache alone,
+         so an exact own-name match (recorded with add_direct) landed in
+         partial while an alias match landed in exact. *)
+      let q_variants = List.map norm_apo (generate_apostrophe_variants query) in
       let exact_matches, partial_matches =
         List.partition
           (fun p ->
             let iper = Driver.get_iper p in
-            match Some.AliasCache.get_alias alias_cache iper with
-            | Some _ -> true
-            | None -> false)
+            Option.is_some (Some.AliasCache.get_alias alias_cache iper)
+            || List.exists (person_is_approx_key base p) q_variants)
           persons
       in
       let exact_ipers = List.map Driver.get_iper exact_matches in
@@ -1933,11 +1881,20 @@ let persons_known_as conf base query =
       let p = Driver.poi base ip in
       (norm (Driver.get_public_name p) = q
       || List.exists (fun a -> norm a = q) (Driver.get_aliases p))
-      && not (Util.is_hide_names conf p && not (Util.authorized_age conf base p)))
+      && Util.visible_in_search conf base p)
   |> List.sort_uniq compare
 
 let rec handle_search_results alias_cache conn conf base query fn_options
     components specify results =
+  (* Pass the queried first name to [specify] for the spouse ranking.
+     Without it, specify re-parses pn up to the first space, which is
+     wrong for "fn/sn", "fn.oc sn" and multi-word first names. *)
+  let specify conf =
+    match components.first_name with
+    | Some fn when fn <> "" ->
+        specify { conf with env = ("search_fn", Mutil.encode fn) :: conf.env }
+    | _ -> specify conf
+  in
   let redirect_to_person ?(extra = "") ip =
     record_visited conf ip;
     let p = Driver.poi base ip in
@@ -2109,9 +2066,6 @@ let rec handle_search_results alias_cache conn conf base query fn_options
             in
             display_surname_results conf base alias_cache query sn exact
           else display_surname_results conf base alias_cache query sn all_ipers
-      | ParsedName { first_name = Some fn; surname = None; _ } ->
-          display_firstname_results conf base alias_cache fn fn_options
-            (search_firstname alias_cache conf base fn fn_options)
       | ParsedName { first_name = Some qfn; surname = Some qsn; _ }
       | FirstNameSurname (qfn, qsn)
         when not show_all -> (
@@ -2308,8 +2262,7 @@ and display_surname_results conf base alias_cache _query surname all_ipers =
   let surname_groups = group_by_surname base all_ipers in
   match surname_groups with
   | [ (single_surname, _) ] ->
-      Some.search_surname_print conf base alias_cache
-        (fun _conf _x -> ())
+      Some.search_surname_print conf base alias_cache Some.surname_not_found
         single_surname
   | multiple_surnames -> (
       match p_getenv conf.env "m" with
@@ -2394,14 +2347,12 @@ let print conn conf base specify =
   | FirstNameOnly fn ->
       let alias_cache = Some.AliasCache.create () in
       let results = search_firstname alias_cache conf base fn fn_options in
-      let _ = [ FirstName ] in
-      (* dummy to avoid warning *)
       display_firstname_results conf base alias_cache fn fn_options results
   | SurnameOnly sn -> search sn [ Surname ]
   | ParsedName { first_name = Some fn; surname = None; _ } when fn <> "" ->
-      (* Route like FirstNameOnly: going through [search] would run
-         search_firstname once in the FirstName method and then a second
-         time in handle_search_results to rebuild the sectioned display. *)
+      (* Route like FirstNameOnly: first-name queries never go through
+         [search] / handle_search_results, which have no first-name
+         method. *)
       let alias_cache = Some.AliasCache.create () in
       let results = search_firstname alias_cache conf base fn fn_options in
       display_firstname_results conf base alias_cache fn fn_options results
