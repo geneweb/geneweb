@@ -2,6 +2,8 @@
 module GWPARAM = Geneweb.GWPARAM
 module Dirs = Geneweb_dirs
 
+let ( // ) = Filename.concat
+
 type kind = Gw | Gwo
 
 type input = {
@@ -124,6 +126,17 @@ let default_separate = false
 let separate = ref default_separate
 let default_bnotes = Db1link.Merge
 let bnotes = ref default_bnotes
+let gw_prefix = ref None
+let set_gw_prefix s = gw_prefix := Some s
+
+(* FIXME: duplication of the code of bin/gwd/cmd.ml. *)
+let default_gw_prefix =
+  match Sites.Sites.hd with
+  | s :: _ -> s
+  | _ ->
+      (* This case occurs if gwd hasn't been installed with dune. *)
+      Filename.current_dir_name // "gw"
+
 let raise_bad fmt = Format.ksprintf (fun s -> raise (Arg.Bad s)) fmt
 
 let bnotes_to_string b =
@@ -219,6 +232,10 @@ let speclist =
     ( "-roglo_special",
       Arg.Set Gwcomp.roglo_special,
       " Special treatment for Roglo (ignore multiple relations definitions)" );
+    ( "-hd",
+      Arg.String set_gw_prefix,
+      "<DIR> Specify where \"etc\", \"images\" and \"lang\" directories are \
+       installed." );
   ]
   |> List.sort compare |> Arg.align
 
@@ -272,7 +289,8 @@ let parse_cmd () =
   let bases_dir =
     Option.value ~default:(Dirs.path Secure.default_base_dir) !bases_dir
   in
-  (inputs, bname, bases_dir)
+  let gw_prefix = Option.value ~default:default_gw_prefix !gw_prefix in
+  (inputs, bname, bases_dir, gw_prefix)
 
 let with_timer f =
   let start = Unix.gettimeofday () in
@@ -282,8 +300,6 @@ let with_timer f =
 
 let pp_duration ppf d =
   Fmt.pf ppf "%d min %d sec" (int_of_float (d /. 60.0)) (int_of_float d mod 60)
-
-let ( // ) = Filename.concat
 
 let check_database_exists bases_dir bname =
   let path = bases_dir // Fmt.str "%s.gwb" bname in
@@ -295,12 +311,12 @@ let cleanup gwo_files =
     gwo_files
 
 let () =
-  let inputs, bname, bases_dir = parse_cmd () in
+  let inputs, bname, bases_dir, gw_prefix = parse_cmd () in
   Secure.set_base_dir bases_dir;
   GWPARAM.init ();
-  let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
+  let dist_etc_d = gw_prefix // "etc" in
   if !Db1link.particules_file = "" then
-    Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
+    Db1link.particules_file := dist_etc_d // "particles.txt";
   if !Gwcomp.verbose then
     if !Gwcomp.rgpd then
       Format.eprintf "Rgpd status: True, files in: %s@." !Gwcomp.rgpd_dir

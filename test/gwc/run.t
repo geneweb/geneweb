@@ -16,6 +16,7 @@
     -ds <str>                     Set the source field for persons and families without source data
     -f                            Remove database if already existing
     -gwo                          Suppress .gwo files after base creation
+    -hd <DIR>                     Specify where "etc", "images" and "lang" directories are installed.
     -mem                          Save memory, but slower
     -nc                           No consistency check
     -ngrams <bi>[,<tri>[,<quad>]] N-gram indexing thresholds (e.g., '500,20,10' or '500')
