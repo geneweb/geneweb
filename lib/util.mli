@@ -15,7 +15,7 @@ val is_welcome : bool ref
 val print_default_gwf_file : string -> unit
 (** print default config file bname.gwf or bname.gwb/etc/mybase.gwf *)
 
-val read_base_env : string -> string -> bool -> (string * string) list
+val read_base_env : bname:string -> string -> bool -> (string * string) list
 (** read base environment bname.gwf or bname.gwb/etc/bname.gwf *)
 
 val time_debug :

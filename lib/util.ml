@@ -62,7 +62,7 @@ let rec cut_at_equal i s =
     (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
   else cut_at_equal (succ i) s
 
-let read_base_env bname gw_prefix debug =
+let read_base_env ~bname gw_prefix debug =
   let load_file fname =
     try
       let ic = Secure.open_in fname in
@@ -2853,9 +2853,9 @@ let short_f_month m =
 
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
-let read_gen_auth_file fname base_file =
+let read_gen_auth_file fname bname =
   let fname =
-    if GWPARAM.is_reorg_base base_file then GWPARAM.config_d base_file // fname
+    if GWPARAM.is_reorg_base bname then GWPARAM.config_d bname // fname
     else Secure.bases_dir () // fname
   in
   try
