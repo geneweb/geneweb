@@ -175,6 +175,13 @@ let empty =
     dates_format = DMY;
   }
 
+let default_input_mode conf =
+  let default = `Geneanet in
+  conf.base_env
+  |> List.assoc_opt "default_input_mode"
+  |> Option.fold ~none:default ~some:(fun mode ->
+         if mode = "GW" then `Geneweb else default)
+
 (**/**)
 
 module Trimmed = struct
