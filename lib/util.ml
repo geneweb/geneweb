@@ -877,6 +877,23 @@ let pget conf base ip =
   if is_restricted conf base ip then Driver.empty_person base ip
   else Driver.poi base ip
 
+(* Visibility of a person in search results.  Shared by SearchName and
+   Some, which read persons straight from the name indexes (poi, not pget)
+   and used to re-implement the test with small differences. *)
+let visible_in_search conf base p =
+  let empty_or_quest istr =
+    Driver.Istr.is_empty istr || Driver.Istr.is_quest istr
+  in
+  (not (empty_or_quest (Driver.get_surname p)))
+  && (not (empty_or_quest (Driver.get_first_name p)))
+  && Name.lower (Driver.sou base (Driver.get_surname p)) <> ""
+  && Name.lower (Driver.sou base (Driver.get_first_name p)) <> ""
+  && (not (is_hide_names conf p && not (authorized_age conf base p)))
+  && not (is_restricted conf base (Driver.get_iper p))
+
+let visible_in_search_ip conf base ip =
+  visible_in_search conf base (Driver.poi base ip)
+
 let string_gen_person base p =
   Futil.map_person_ps (fun p -> p) (Driver.sou base) p
 
