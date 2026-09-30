@@ -1296,7 +1296,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     | _ -> ("", ("opt", Mutil.encode x) :: env)
   in
   (* read base environment from the right location *)
-  GWPARAM.set_reorg base_file None;
+  GWPARAM.set_reorg ~mode:Detect ~bname:base_file;
   GWPARAM.cnt_dir := GWPARAM.cnt_d base_file;
   let base_env =
     if base_file = "" then []

@@ -104,9 +104,16 @@ let init bname =
   if !reorg then current := Some (default bname)
   else current := Some (legacy bname)
 
-let set_reorg bname force =
-  let res = match force with Some b -> b | None -> is_reorg_base bname in
-  reorg := res;
+type mode = Reorg | Legacy | Detect
+
+let set_reorg ~mode ~bname =
+  let r =
+    match mode with
+    | Reorg -> true
+    | Legacy -> false
+    | Detect -> is_reorg_base bname
+  in
+  reorg := r;
   init bname
 
 let get_timestamp () =
