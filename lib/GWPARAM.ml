@@ -16,11 +16,9 @@ let reorg = ref false
 let force = ref false
 let cnt_dir = ref ""
 let ( // ) = Filename.concat
-let clean_bname bname = Filename.remove_extension bname
-let is_valid_bname s = not @@ String.ends_with ~suffix:".gwb" s
 
 let bpath bname =
-  if not @@ is_valid_bname bname then invalid_arg "bpath";
+  if not @@ Mutil.good_name bname then invalid_arg "bpath";
   Secure.bases_dir () // (bname ^ ".gwb")
 
 type dir = string
@@ -40,8 +38,8 @@ type layout = {
 }
 
 let default bname =
+  if not @@ Mutil.good_name bname then invalid_arg "default";
   let cnt =
-    let bname = clean_bname bname in
     if bname <> "" then bpath bname // "config" // "cnt"
     else Secure.bases_dir () // "cnt"
   in
@@ -59,7 +57,7 @@ let default bname =
   }
 
 let legacy bname =
-  if not @@ is_valid_bname bname then invalid_arg "legacy";
+  if not @@ Mutil.good_name bname then invalid_arg "legacy";
   let bases_dir = Secure.bases_dir () in
   let cnt = bases_dir // "cnt" in
   {
@@ -88,9 +86,7 @@ let images_d _bname = (Option.get !current).images
 let albums_d _bname = (Option.get !current).albums
 
 (* Check if a base is in reorg format *)
-let is_reorg_base bname =
-  let bname = Filename.remove_extension bname in
-  Sys.file_exists (default bname).gwf
+let is_reorg_base bname = Sys.file_exists (default bname).gwf
 
 (* Initialize path functions based on mode *)
 let init bname =

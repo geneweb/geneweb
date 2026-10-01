@@ -280,6 +280,9 @@ let parse_cmd () =
   Arg.parse speclist anonfun errmsg;
   let inputs = List.rev !rev_inputs in
   let bname = parse_output inputs !output in
+  if not @@ Mutil.good_name bname then
+    raise_bad
+      "%s is not a valid database name (allowed: alphanumeric and hyphen)" bname;
   (* derive only now, once all options (incl. -bd) are known *)
   (if !bases_dir = None then
      match inputs with

@@ -4,6 +4,7 @@ module Dirs = Geneweb_dirs
 
 let isolated = ref false
 let bname = ref None
+let raise_bad fmt = Format.kasprintf (fun s -> raise (Arg.Bad s)) fmt
 
 let parse_cmd () =
   let speclist opts =
@@ -45,16 +46,23 @@ let parse_cmd () =
     |> Arg.align
   in
   let anonfun s =
-    if !bname = None then bname := Some (Filename.basename s)
-    else raise (Arg.Bad "Cannot treat several databases")
+    match !bname with
+    | None -> bname := Some s
+    | Some _ -> raise_bad "Cannot treat several databases"
   in
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
-  match !bname with
-  | None ->
-      Arg.usage (speclist opts) Gwexport.errmsg;
-      exit 2
-  | Some bname -> (opts, bname)
+  let bname =
+    match !bname with
+    | None -> raise_bad "a database name is mandatory"
+    | Some s ->
+        if not @@ Mutil.good_name s then
+          raise_bad
+            "%s is not a valid database name (allowed: alphanumeric and hyphen)"
+            s;
+        s
+  in
+  (opts, bname)
 
 let ( // ) = Filename.concat
 

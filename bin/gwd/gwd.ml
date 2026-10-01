@@ -1427,7 +1427,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
          else
            try List.assoc "no_note_for_visitor" base_env = "yes"
            with Not_found -> false);
-      bname = Filename.remove_extension bname;
+      bname;
       nb_of_persons = 0;
       nb_of_families = 0;
       env;

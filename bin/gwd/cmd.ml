@@ -132,6 +132,15 @@ let log_pp ppf l =
   | File s -> Fmt.string ppf s
 
 let log_conv = C.Arg.Conv.make ~docv:"LOG" ~parser:log_parser ~pp:log_pp ()
+let error fmt = Format.kasprintf (fun s -> Error s) fmt
+
+let bname_parser s =
+  if Mutil.good_name s then Ok s
+  else
+    error "%s is not a valid database name (allowed: alphanumeric and hyphen)" s
+
+let bname_conv =
+  C.Arg.Conv.make ~docv:"BNAME" ~parser:bname_parser ~pp:Fmt.string ()
 
 (* Directories commands *)
 let dirs_section = "DIRECTORIES"
@@ -239,7 +248,7 @@ let cache_databases =
   let doc = "Load these databases in memory before starting the server." in
   C.Arg.(
     value
-    & opt_all (list string) []
+    & opt_all (list bname_conv) []
     & info [ "cache-database" ] ~docs:data_section ~doc)
 
 let cache_databases =

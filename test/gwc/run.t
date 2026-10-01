@@ -205,3 +205,11 @@
   Database generation: 0 min 0 sec
   ../galichet.gwo galichet.gwo differ: char 16, line 1
   [1]
+
+  $ gwc -bd . ../galichet.gw -o foo.gwb
+  Fatal error: exception Stdlib.Arg.Bad("foo.gwb is not a valid database name (allowed: alphanumeric and hyphen)")
+  [2]
+
+  $ gwc -bd . ../galichet.gwb.gw
+  Fatal error: exception Stdlib.Arg.Bad("galichet.gwb is not a valid database name (allowed: alphanumeric and hyphen)")
+  [2]
