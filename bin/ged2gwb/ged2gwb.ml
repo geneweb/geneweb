@@ -2,7 +2,6 @@
 
 open Geneweb
 open Def
-
 module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
 
@@ -15,25 +14,24 @@ type descend = int Def.gen_descend
 
 let log_oc = ref stdout
 
-type record =
-  { rlab : string;
-    rval : string;
-    rcont : string;
-    rsons : record list;
-    rpos : int;
-    mutable rused : bool }
+type record = {
+  rlab : string;
+  rval : string;
+  rcont : string;
+  rsons : record list;
+  rpos : int;
+  mutable rused : bool;
+}
 
-type ('a, 'b, 'c, 'd) choice3 =
-    Left3 of 'a
-  | Right3 of 'b * 'c * 'd
+type ('a, 'b, 'c, 'd) choice3 = Left3 of 'a | Right3 of 'b * 'c * 'd
+
 type month_number_dates =
-    MonthDayDates
+  | MonthDayDates
   | DayMonthDates
   | NoMonthNumberDates
   | MonthNumberHappened of string
 
 type charset = Ansel | Ascii | Msdos | MacIntosh | Utf8
-
 type case = NoCase | LowerCase | UpperCase
 
 let lowercase_first_names = ref false
@@ -68,29 +66,45 @@ let print_location pos =
 
 let rec skip_eol (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
-  | Some ('\010' | '\013') -> Stream.junk strm__; skip_eol strm__
+  | Some ('\010' | '\013') ->
+      Stream.junk strm__;
+      skip_eol strm__
   | _ -> ()
 
 let rec get_to_eoln len (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
-  | Some ('\010' | '\013') -> Stream.junk strm__; skip_eol strm__; Buff.get len
-  | Some '\t' -> Stream.junk strm__; get_to_eoln (Buff.store len ' ') strm__
-  | Some c -> Stream.junk strm__; get_to_eoln (Buff.store len c) strm__
+  | Some ('\010' | '\013') ->
+      Stream.junk strm__;
+      skip_eol strm__;
+      Buff.get len
+  | Some '\t' ->
+      Stream.junk strm__;
+      get_to_eoln (Buff.store len ' ') strm__
+  | Some c ->
+      Stream.junk strm__;
+      get_to_eoln (Buff.store len c) strm__
   | None -> Buff.get len
 
 let rec skip_to_eoln (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
-  | Some ('\010' | '\013') -> Stream.junk strm__; skip_eol strm__
-  | Some _ -> Stream.junk strm__; skip_to_eoln strm__
+  | Some ('\010' | '\013') ->
+      Stream.junk strm__;
+      skip_eol strm__
+  | Some _ ->
+      Stream.junk strm__;
+      skip_to_eoln strm__
   | None -> ()
 
-let eol_chars = ['\010'; '\013']
+let eol_chars = [ '\010'; '\013' ]
 
 let rec get_ident len (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
-  | Some (' ' | '\t') -> Stream.junk strm__; Buff.get len
+  | Some (' ' | '\t') ->
+      Stream.junk strm__;
+      Buff.get len
   | Some c when not (List.mem c eol_chars) ->
-      Stream.junk strm__; get_ident (Buff.store len c) strm__
+      Stream.junk strm__;
+      get_ident (Buff.store len c) strm__
   | _ -> Buff.get len
 
 let skip_space (strm__ : _ Stream.t) =
@@ -100,7 +114,9 @@ let skip_space (strm__ : _ Stream.t) =
 
 let rec line_start num (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
-  | Some ' ' -> Stream.junk strm__; line_start num strm__
+  | Some ' ' ->
+      Stream.junk strm__;
+      line_start num strm__
   | Some x when x = num -> Stream.junk strm__
   | _ -> raise Stream.Failure
 
@@ -108,7 +124,7 @@ let ascii_of_msdos s =
   let conv_char i =
     let cc =
       match Char.code s.[i] with
-        0o200 -> 0o307
+      | 0o200 -> 0o307
       | 0o201 -> 0o374
       | 0o202 -> 0o351
       | 0o203 -> 0o342
@@ -169,7 +185,7 @@ let ascii_of_macintosh s =
   let conv_char i =
     let cc =
       match Char.code s.[i] with
-        0o200 -> 0o304
+      | 0o200 -> 0o304
       | 0o201 -> 0o305
       | 0o202 -> 0o307
       | 0o203 -> 0o311
@@ -263,13 +279,19 @@ let rec get_lev n (strm__ : _ Stream.t) =
   let r1 =
     try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
   in
-  let (rlab, rval, rcont, l) =
+  let rlab, rval, rcont, l =
     if String.length r1 > 0 && r1.[0] = '@' then parse_address n r1 strm__
     else parse_text n r1 strm__
   in
-  {rlab = rlab; rval = utf8_of_string rval;
-   rcont = utf8_of_string rcont; rsons = List.rev l; rpos = !line_cnt;
-   rused = false}
+  {
+    rlab;
+    rval = utf8_of_string rval;
+    rcont = utf8_of_string rcont;
+    rsons = List.rev l;
+    rpos = !line_cnt;
+    rused = false;
+  }
+
 and parse_address n r1 (strm__ : _ Stream.t) =
   let r2 = get_ident 0 strm__ in
   let r3 =
@@ -280,6 +302,7 @@ and parse_address n r1 (strm__ : _ Stream.t) =
     with Stream.Failure -> raise (Stream.Error "")
   in
   (r2, r1, r3, l)
+
 and parse_text n r1 (strm__ : _ Stream.t) =
   let r2 = get_to_eoln 0 strm__ in
   let l =
@@ -287,8 +310,9 @@ and parse_text n r1 (strm__ : _ Stream.t) =
     with Stream.Failure -> raise (Stream.Error "")
   in
   (r1, r2, "", l)
+
 and get_lev_list l n (strm__ : _ Stream.t) =
-  match (try Some (get_lev n strm__) with Stream.Failure -> None) with
+  match try Some (get_lev n strm__) with Stream.Failure -> None with
   | Some x -> get_lev_list (x :: l) n strm__
   | _ -> l
 
@@ -298,34 +322,33 @@ let bad_dates_warned = ref false
 
 let print_bad_date pos d =
   if !bad_dates_warned then ()
-  else
-    begin
-      bad_dates_warned := true;
-      print_location pos;
-      Printf.fprintf !log_oc "Can't decode date %s\n" d;
-      flush !log_oc
-    end
+  else begin
+    bad_dates_warned := true;
+    print_location pos;
+    Printf.fprintf !log_oc "Can't decode date %s\n" d;
+    flush !log_oc
+  end
 
 let check_month m =
-  if m < 1 || m > 12 then
-    begin
-      Printf.fprintf !log_oc "Bad (numbered) month in date: %d\n" m;
-      flush !log_oc
-    end
+  if m < 1 || m > 12 then begin
+    Printf.fprintf !log_oc "Bad (numbered) month in date: %d\n" m;
+    flush !log_oc
+  end
 
 let warning_month_number_dates () =
   match !month_number_dates with
-    MonthNumberHappened s ->
+  | MonthNumberHappened s ->
       Printf.fprintf !log_oc
-        "  Warning: the file holds dates with numbered months (like: 12/05/1912).\n  \
- \n  \
-  GEDCOM standard *requires* that months in dates be identifiers. The\n  \
-  correct form for this example would be 12 MAY 1912 or 5 DEC 1912.\n  \
-  \n  \
-  Consider restarting with option \"-dates_dm\" or \"-dates_md\".\n  \
-  Use option -help to see what they do.\n  \
-  \n  \
-  (example found in gedcom: \"%s\")"
+        "  Warning: the file holds dates with numbered months (like: \
+         12/05/1912).\n\
+        \  \n\
+        \  GEDCOM standard *requires* that months in dates be identifiers. The\n\
+        \  correct form for this example would be 12 MAY 1912 or 5 DEC 1912.\n\
+        \  \n\
+        \  Consider restarting with option \"-dates_dm\" or \"-dates_md\".\n\
+        \  Use option -help to see what they do.\n\
+        \  \n\
+        \  (example found in gedcom: \"%s\")"
         s;
       flush !log_oc
   | _ -> ()
@@ -333,13 +356,22 @@ let warning_month_number_dates () =
 (* Decoding fields *)
 let rec skip_spaces (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
-  | Some ' ' -> Stream.junk strm__; skip_spaces strm__
+  | Some ' ' ->
+      Stream.junk strm__;
+      skip_spaces strm__
   | _ -> ()
+
 let rec ident_slash len (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
-  | Some '/' -> Stream.junk strm__; Buff.get len
-  | Some '\t' -> Stream.junk strm__; ident_slash (Buff.store len ' ') strm__
-  | Some c -> Stream.junk strm__; ident_slash (Buff.store len c) strm__
+  | Some '/' ->
+      Stream.junk strm__;
+      Buff.get len
+  | Some '\t' ->
+      Stream.junk strm__;
+      ident_slash (Buff.store len ' ') strm__
+  | Some c ->
+      Stream.junk strm__;
+      ident_slash (Buff.store len c) strm__
   | None -> Buff.get len
 
 let strip c str =
@@ -368,7 +400,9 @@ let parse_name (strm__ : _ Stream.t) =
   skip_spaces strm__;
   let invert =
     match Stream.peek strm__ with
-    | Some '/' -> Stream.junk strm__; true
+    | Some '/' ->
+        Stream.junk strm__;
+        true
     | _ -> false
   in
   let f =
@@ -380,46 +414,45 @@ let parse_name (strm__ : _ Stream.t) =
   let s =
     try ident_slash 0 strm__ with Stream.Failure -> raise (Stream.Error "")
   in
-  let (f, s) = if invert then (s, f) else (f, s) in
+  let f, s = if invert then (s, f) else (f, s) in
   let f = strip_spaces f in
   let s = strip_spaces s in
-  ((if f = "" then "x" else f), (if s = "" then "?" else s))
+  ((if f = "" then "x" else f), if s = "" then "?" else s)
 
-let rec find_field lab =
-  function
-    r :: rl ->
-      if r.rlab = lab then begin r.rused <- true; Some r end
+let rec find_field lab = function
+  | r :: rl ->
+      if r.rlab = lab then begin
+        r.rused <- true;
+        Some r
+      end
       else find_field lab rl
   | [] -> None
 
-let rec find_all_fields lab =
-  function
-    r :: rl ->
-      if r.rlab = lab then
-        begin r.rused <- true; r :: find_all_fields lab rl end
+let rec find_all_fields lab = function
+  | r :: rl ->
+      if r.rlab = lab then begin
+        r.rused <- true;
+        r :: find_all_fields lab rl
+      end
       else find_all_fields lab rl
   | [] -> []
 
-let rec find_field_with_value lab v =
-  function
-    r :: rl ->
-      if r.rlab = lab && r.rval = v then begin r.rused <- true; true end
+let rec find_field_with_value lab v = function
+  | r :: rl ->
+      if r.rlab = lab && r.rval = v then begin
+        r.rused <- true;
+        true
+      end
       else find_field_with_value lab v rl
   | [] -> false
 
-
-type tok =
-  | INT of string
-  | ID of string
-  | TEXT of string
-  | SYM of char
-  | EOI
+type tok = INT of string | ID of string | TEXT of string | SYM of char | EOI
 
 let lex (s : string) : tok list =
   let n = String.length s in
   let buf = Buffer.create 16 in
   let rec skip i =
-    if i < n then (match s.[i] with ' ' | '\t' | '\r' -> skip (i + 1) | _ -> i)
+    if i < n then match s.[i] with ' ' | '\t' | '\r' -> skip (i + 1) | _ -> i
     else i
   in
   let read_text i =
@@ -434,29 +467,41 @@ let lex (s : string) : tok list =
             let j = loop (i + 1) in
             Buffer.add_char buf ')';
             loop j
-        | c -> Buffer.add_char buf c; loop (i + 1)
+        | c ->
+            Buffer.add_char buf c;
+            loop (i + 1)
     in
     let j = loop i in
     (Buffer.contents buf, j)
   in
   let parse_number s i =
     let j = ref i in
-    while !j < n && s.[!j] >= '0' && s.[!j] <= '9' do incr j done;
-    !j, INT (String.sub s i (!j - i))
-  in 
+    while !j < n && s.[!j] >= '0' && s.[!j] <= '9' do
+      incr j
+    done;
+    (!j, INT (String.sub s i (!j - i)))
+  in
   let parse_id s i =
     let j = ref i in
-    while !j < n && s.[!j] >= 'A' && s.[!j] <= 'Z' do incr j done;
-    !j, ID (String.sub s i (!j - i))
-  in 
+    while !j < n && s.[!j] >= 'A' && s.[!j] <= 'Z' do
+      incr j
+    done;
+    (!j, ID (String.sub s i (!j - i)))
+  in
   let rec search i acc =
     let i = skip i in
     if i >= n then List.rev (EOI :: acc)
     else
       match s.[i] with
-      | '0' .. '9' -> let j, r = parse_number s i in search j (r :: acc)
-      | 'A' .. 'Z' -> let j, r = parse_id s i in search j (r :: acc)
-      | '(' -> let txt, j = read_text (i + 1) in search j (TEXT txt :: acc)
+      | '0' .. '9' ->
+          let j, r = parse_number s i in
+          search j (r :: acc)
+      | 'A' .. 'Z' ->
+          let j, r = parse_id s i in
+          search j (r :: acc)
+      | '(' ->
+          let txt, j = read_text (i + 1) in
+          search j (TEXT txt :: acc)
       | c -> search (i + 1) (SYM c :: acc)
   in
   search 0 []
@@ -465,63 +510,62 @@ let lex (s : string) : tok list =
    Stream.Failure = backtrack (try next alternative);
    Stream.Error   = committed failure (aborts the parse). *)
 
-type 'a range =
-    Begin of 'a
-  | End of 'a
-  | BeginEnd of 'a * 'a
-
+type 'a range = Begin of 'a | End of 'a | BeginEnd of 'a * 'a
 
 let is_roman_int x =
-  try let _ = Mutil.arabian_of_roman x in true with Not_found -> false
+  try
+    let _ = Mutil.arabian_of_roman x in
+    true
+  with Not_found -> false
 
 let start_with_int x =
-  try let s = String.sub x 0 1 in let _ = int_of_string s in true with
-    _ -> false
+  try
+    let s = String.sub x 0 1 in
+    let _ = int_of_string s in
+    true
+  with _ -> false
 
 let date_str = ref ""
 
 let make_date n1 n2 n3 =
   let n3 =
     if !no_negative_dates then
-      match n3 with
-        Some n3 -> Some (abs n3)
-      | None -> None
+      match n3 with Some n3 -> Some (abs n3) | None -> None
     else n3
   in
-  match n1, n2, n3 with
-    Some d, Some m, Some y ->
-      let (d, m) =
+  match (n1, n2, n3) with
+  | Some d, Some m, Some y ->
+      let d, m =
         match m with
-          Right m -> d, m
-        | Left m ->
+        | Right m -> (d, m)
+        | Left m -> (
             match !month_number_dates with
-              DayMonthDates -> check_month m; d, m
-            | MonthDayDates -> check_month d; m, d
+            | DayMonthDates ->
+                check_month m;
+                (d, m)
+            | MonthDayDates ->
+                check_month d;
+                (m, d)
             | _ ->
                 if d >= 1 && m >= 1 && d <= 31 && m <= 31 then
-                  if d > 13 && m <= 13 then d, m
-                  else if m > 13 && d <= 13 then m, d
-                  else if d > 13 && m > 13 then 0, 0
-                  else
-                    begin
-                      month_number_dates := MonthNumberHappened !date_str;
-                      0, 0
-                    end
-                else 0, 0
+                  if d > 13 && m <= 13 then (d, m)
+                  else if m > 13 && d <= 13 then (m, d)
+                  else if d > 13 && m > 13 then (0, 0)
+                  else begin
+                    month_number_dates := MonthNumberHappened !date_str;
+                    (0, 0)
+                  end
+                else (0, 0))
       in
-      let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
-      {Adef.day = d; month = m; year = y; prec = Sure; delta = 0}
+      let d, m = if m < 1 || m > 13 then (0, 0) else (d, m) in
+      { Adef.day = d; month = m; year = y; prec = Sure; delta = 0 }
   | None, Some m, Some y ->
-      let m =
-        match m with
-          Right m -> m
-        | Left m -> m
-      in
-      {Adef.day = 0; month = m; year = y; prec = Sure; delta = 0}
+      let m = match m with Right m -> m | Left m -> m in
+      { Adef.day = 0; month = m; year = y; prec = Sure; delta = 0 }
   | None, None, Some y ->
-      {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
+      { Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0 }
   | Some y, None, None ->
-      {Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0}
+      { Adef.day = 0; month = 0; year = y; prec = Sure; delta = 0 }
   (* camlp5 raised Stream.Error here. Stream.Failure is used instead so that a
      failing date_greg backtracks; both are equivalent since p_date_or_text
      tries TEXT first, as the camlp5 rule tree did. *)
@@ -529,21 +573,25 @@ let make_date n1 n2 n3 =
 
 let recover_date cal = function
   | Adef.Dgreg (d, Dgregorian) ->
-    let d =
-      match cal with
-      | Adef.Dgregorian -> d
-      | Djulian -> Calendar.gregorian_of_julian d
-      | Dfrench -> Calendar.gregorian_of_french d
-      | Dhebrew -> Calendar.gregorian_of_hebrew d
-    in
-    Adef.Dgreg (d, cal)
+      let d =
+        match cal with
+        | Adef.Dgregorian -> d
+        | Djulian -> Calendar.gregorian_of_julian d
+        | Dfrench -> Calendar.gregorian_of_french d
+        | Dhebrew -> Calendar.gregorian_of_hebrew d
+      in
+      Adef.Dgreg (d, cal)
   | d -> d
 
 (* --- Recursive-descent date parser (camlp5-free) ------------------------
    Transcription of the former EXTEND grammar: one function per entry.
    make_date / recover_date above are reused unchanged. *)
 
-let opt p toks = try let v, r = p toks in (Some v, r) with Stream.Failure -> (None, toks)
+let opt p toks =
+  try
+    let v, r = p toks in
+    (Some v, r)
+  with Stream.Failure -> (None, toks)
 
 let rec list0_syms syms toks =
   match toks with
@@ -551,41 +599,67 @@ let rec list0_syms syms toks =
   | _ -> toks
 
 let expect_eoi toks =
-  match toks with EOI :: _ | [] -> () | _ -> raise (Stream.Error "expected EOI")
+  match toks with
+  | EOI :: _ | [] -> ()
+  | _ -> raise (Stream.Error "expected EOI")
 
 let p_int toks =
   let toi i = try int_of_string i with Failure _ -> raise Stream.Failure in
   match toks with
-  | INT i :: ID "BCE" :: r -> (- toi i, r)
-  | INT i :: ID "B" :: SYM '.' :: ID "C" :: SYM '.' :: r -> (- toi i, r)
-  | INT i :: ID "B" :: SYM '.' :: ID "C" :: r -> (- toi i, r)
+  | INT i :: ID "BCE" :: r -> (-toi i, r)
+  | INT i :: ID "B" :: SYM '.' :: ID "C" :: SYM '.' :: r -> (-toi i, r)
+  | INT i :: ID "B" :: SYM '.' :: ID "C" :: r -> (-toi i, r)
   | INT i :: r -> (toi i, r)
-  | SYM '-' :: INT i :: r -> (- toi i, r)
+  | SYM '-' :: INT i :: r -> (-toi i, r)
   | _ -> raise Stream.Failure
 
 let p_month x =
   match x with
-  | ID "JAN" :: r -> (1, r) | ID "FEB" :: r -> (2, r) | ID "MAR" :: r -> (3, r)
-  | ID "APR" :: r -> (4, r) | ID "MAY" :: r -> (5, r) | ID "JUN" :: r -> (6, r)
-  | ID "JUL" :: r -> (7, r) | ID "AUG" :: r -> (8, r) | ID "SEP" :: r -> (9, r)
-  | ID "OCT" :: r -> (10, r) | ID "NOV" :: r -> (11, r) | ID "DEC" :: r -> (12, r)
+  | ID "JAN" :: r -> (1, r)
+  | ID "FEB" :: r -> (2, r)
+  | ID "MAR" :: r -> (3, r)
+  | ID "APR" :: r -> (4, r)
+  | ID "MAY" :: r -> (5, r)
+  | ID "JUN" :: r -> (6, r)
+  | ID "JUL" :: r -> (7, r)
+  | ID "AUG" :: r -> (8, r)
+  | ID "SEP" :: r -> (9, r)
+  | ID "OCT" :: r -> (10, r)
+  | ID "NOV" :: r -> (11, r)
+  | ID "DEC" :: r -> (12, r)
   | _ -> raise Stream.Failure
 
 let p_french x =
   match x with
-  | ID "VEND" :: r -> (1, r) | ID "BRUM" :: r -> (2, r) | ID "FRIM" :: r -> (3, r)
-  | ID "NIVO" :: r -> (4, r) | ID "PLUV" :: r -> (5, r) | ID "VENT" :: r -> (6, r)
-  | ID "GERM" :: r -> (7, r) | ID "FLOR" :: r -> (8, r) | ID "PRAI" :: r -> (9, r)
-  | ID "MESS" :: r -> (10, r) | ID "THER" :: r -> (11, r) | ID "FRUC" :: r -> (12, r)
+  | ID "VEND" :: r -> (1, r)
+  | ID "BRUM" :: r -> (2, r)
+  | ID "FRIM" :: r -> (3, r)
+  | ID "NIVO" :: r -> (4, r)
+  | ID "PLUV" :: r -> (5, r)
+  | ID "VENT" :: r -> (6, r)
+  | ID "GERM" :: r -> (7, r)
+  | ID "FLOR" :: r -> (8, r)
+  | ID "PRAI" :: r -> (9, r)
+  | ID "MESS" :: r -> (10, r)
+  | ID "THER" :: r -> (11, r)
+  | ID "FRUC" :: r -> (12, r)
   | ID "COMP" :: r -> (13, r)
   | _ -> raise Stream.Failure
 
-let p_hebr x=
+let p_hebr x =
   match x with
-  | ID "TSH" :: r -> (1, r) | ID "CSH" :: r -> (2, r) | ID "KSL" :: r -> (3, r)
-  | ID "TVT" :: r -> (4, r) | ID "SHV" :: r -> (5, r) | ID "ADR" :: r -> (6, r)
-  | ID "ADS" :: r -> (7, r) | ID "NSN" :: r -> (8, r) | ID "IYR" :: r -> (9, r)
-  | ID "SVN" :: r -> (10, r) | ID "TMZ" :: r -> (11, r) | ID "AAV" :: r -> (12, r)
+  | ID "TSH" :: r -> (1, r)
+  | ID "CSH" :: r -> (2, r)
+  | ID "KSL" :: r -> (3, r)
+  | ID "TVT" :: r -> (4, r)
+  | ID "SHV" :: r -> (5, r)
+  | ID "ADR" :: r -> (6, r)
+  | ID "ADS" :: r -> (7, r)
+  | ID "NSN" :: r -> (8, r)
+  | ID "IYR" :: r -> (9, r)
+  | ID "SVN" :: r -> (10, r)
+  | ID "TMZ" :: r -> (11, r)
+  | ID "AAV" :: r -> (12, r)
   | ID "ELL" :: r -> (13, r)
   | _ -> raise Stream.Failure
 
@@ -595,17 +669,25 @@ let p_roman x =
   | _ -> raise Stream.Failure
 
 let p_gen_month toks =
-  match (p_int toks) with
-  | (i, r) -> (Left (abs i), r)
-  | exception Stream.Failure -> let m, r = p_month toks in (Right m, r)
+  match p_int toks with
+  | i, r -> (Left (abs i), r)
+  | exception Stream.Failure ->
+      let m, r = p_month toks in
+      (Right m, r)
 
-let p_gen_french toks = let m, r = p_french toks in (Right m, r)
-let p_gen_hebr toks = let m, r = p_hebr toks in (Right m, r)
+let p_gen_french toks =
+  let m, r = p_french toks in
+  (Right m, r)
+
+let p_gen_hebr toks =
+  let m, r = p_hebr toks in
+  (Right m, r)
 
 let p_year_fren toks =
-  match (p_int toks) with
-  | (i, r) -> (i, r)
-  | exception Stream.Failure -> (match toks with ID "AN" :: r -> p_roman r | _ -> p_roman toks)
+  match p_int toks with
+  | i, r -> (i, r)
+  | exception Stream.Failure -> (
+      match toks with ID "AN" :: r -> p_roman r | _ -> p_roman toks)
 
 let p_date_greg toks =
   let toks = list0_syms [ '.' ] toks in
@@ -637,26 +719,34 @@ let p_date_fren_kont toks =
 
 let p_date_fren toks =
   let toks = list0_syms [ '.' ] toks in
-  match (p_int toks) with
-  | (n1, r) ->
+  match p_int toks with
+  | n1, r ->
       let (n2, n3), r = p_date_fren_kont r in
       (make_date (Some n1) n2 n3, r)
   | exception Stream.Failure -> (
-      match (p_year_fren toks) with
-      | (n1, r) -> (make_date (Some n1) None None, r)
-      | exception Stream.Failure -> let (n2, n3), r = p_date_fren_kont toks in (make_date None n2 n3, r))
+      match p_year_fren toks with
+      | n1, r -> (make_date (Some n1) None None, r)
+      | exception Stream.Failure ->
+          let (n2, n3), r = p_date_fren_kont toks in
+          (make_date None n2 n3, r))
 
 let p_date_calendar toks =
   match toks with
   | SYM '@' :: SYM '#' :: ID "DGREGORIAN" :: SYM '@' :: r ->
-      let d, r = p_date_greg r in ((d, Adef.Dgregorian), r)
+      let d, r = p_date_greg r in
+      ((d, Adef.Dgregorian), r)
   | SYM '@' :: SYM '#' :: ID "DJULIAN" :: SYM '@' :: r ->
-      let d, r = p_date_greg r in ((Calendar.gregorian_of_julian d, Adef.Djulian), r)
+      let d, r = p_date_greg r in
+      ((Calendar.gregorian_of_julian d, Adef.Djulian), r)
   | SYM '@' :: SYM '#' :: ID "DFRENCH" :: ID "R" :: SYM '@' :: r ->
-      let d, r = p_date_fren r in ((Calendar.gregorian_of_french d, Adef.Dfrench), r)
+      let d, r = p_date_fren r in
+      ((Calendar.gregorian_of_french d, Adef.Dfrench), r)
   | SYM '@' :: SYM '#' :: ID "DHEBREW" :: SYM '@' :: r ->
-      let d, r = p_date_hebr r in ((Calendar.gregorian_of_hebrew d, Adef.Dhebrew), r)
-  | _ -> let d, r = p_date_greg toks in ((d, Adef.Dgregorian), r)
+      let d, r = p_date_hebr r in
+      ((Calendar.gregorian_of_hebrew d, Adef.Dhebrew), r)
+  | _ ->
+      let d, r = p_date_greg toks in
+      ((d, Adef.Dgregorian), r)
 
 (* NB: the AFT->Before / BEF->After mapping is reproduced bug-for-bug from the
    original grammar (ged2gwb date: rule). *)
@@ -675,18 +765,28 @@ let p_date toks =
 
 let p_date_range toks =
   match toks with
-  | ID "BEF" :: r -> let dt, r = p_date r in (End dt, r)
-  | ID "AFT" :: r -> let dt, r = p_date r in (Begin dt, r)
+  | ID "BEF" :: r ->
+      let dt, r = p_date r in
+      (End dt, r)
+  | ID "AFT" :: r ->
+      let dt, r = p_date r in
+      (Begin dt, r)
   | ID "BET" :: r -> (
       let dt, r = p_date r in
       match r with
-      | ID "AND" :: r2 -> let dt1, r2 = p_date r2 in (BeginEnd (dt, dt1), r2)
+      | ID "AND" :: r2 ->
+          let dt1, r2 = p_date r2 in
+          (BeginEnd (dt, dt1), r2)
       | _ -> raise (Stream.Error "BET without AND"))
-  | ID "TO" :: r -> let dt, r = p_date r in (End dt, r)
+  | ID "TO" :: r ->
+      let dt, r = p_date r in
+      (End dt, r)
   | ID "FROM" :: r -> (
       let dt, r = p_date r in
       match r with
-      | ID "TO" :: r2 -> let dt1, r2 = p_date r2 in (BeginEnd (dt, dt1), r2)
+      | ID "TO" :: r2 ->
+          let dt1, r2 = p_date r2 in
+          (BeginEnd (dt, dt1), r2)
       | _ -> (Begin dt, r))
   | _ -> raise Stream.Failure
 
@@ -704,16 +804,36 @@ let p_date_or_text toks =
                 let dmy2 =
                   match cal2 with
                   | Dgregorian ->
-                      { Adef.day2 = d2.day; month2 = d2.month; year2 = d2.year; delta2 = 0 }
+                      {
+                        Adef.day2 = d2.day;
+                        month2 = d2.month;
+                        year2 = d2.year;
+                        delta2 = 0;
+                      }
                   | Djulian ->
                       let d = Calendar.julian_of_gregorian d2 in
-                      { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+                      {
+                        Adef.day2 = d.day;
+                        month2 = d.month;
+                        year2 = d.year;
+                        delta2 = 0;
+                      }
                   | Dfrench ->
                       let d = Calendar.french_of_gregorian d2 in
-                      { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+                      {
+                        Adef.day2 = d.day;
+                        month2 = d.month;
+                        year2 = d.year;
+                        delta2 = 0;
+                      }
                   | Dhebrew ->
                       let d = Calendar.hebrew_of_gregorian d2 in
-                      { Adef.day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0 }
+                      {
+                        Adef.day2 = d.day;
+                        month2 = d.month;
+                        year2 = d.year;
+                        delta2 = 0;
+                      }
                 in
                 Adef.Dgreg ({ d1 with prec = Adef.YearInt dmy2 }, cal1)
           in
@@ -722,7 +842,10 @@ let p_date_or_text toks =
           let (d, cal), r = p_date toks in
           (Adef.Dgreg (d, cal), r))
 
-let p_date_value toks = let d, r = p_date_or_text toks in expect_eoi r; d
+let p_date_value toks =
+  let d, r = p_date_or_text toks in
+  expect_eoi r;
+  d
 
 let p_date_value_recover toks =
   match toks with
@@ -737,33 +860,54 @@ let p_date_value_recover toks =
   | _ -> raise Stream.Failure
 
 let p_date_interval toks =
-  let fin dt r = expect_eoi r; dt in
+  let fin dt r =
+    expect_eoi r;
+    dt
+  in
   match toks with
-  | ID "BEF" :: r -> let dt, r = p_date_or_text r in End (fin dt r)
-  | ID "AFT" :: r -> let dt, r = p_date_or_text r in Begin (fin dt r)
+  | ID "BEF" :: r ->
+      let dt, r = p_date_or_text r in
+      End (fin dt r)
+  | ID "AFT" :: r ->
+      let dt, r = p_date_or_text r in
+      Begin (fin dt r)
   | ID "BET" :: r -> (
       let dt, r = p_date_or_text r in
       match r with
       | ID "AND" :: r2 ->
-          let dt1, r2 = p_date_or_text r2 in expect_eoi r2; BeginEnd (dt, dt1)
+          let dt1, r2 = p_date_or_text r2 in
+          expect_eoi r2;
+          BeginEnd (dt, dt1)
       | _ -> raise (Stream.Error "BET without AND"))
-  | ID "TO" :: r -> let dt, r = p_date_or_text r in End (fin dt r)
+  | ID "TO" :: r ->
+      let dt, r = p_date_or_text r in
+      End (fin dt r)
   | ID "FROM" :: r -> (
       let dt, r = p_date_or_text r in
       match r with
       | ID "TO" :: r2 ->
-          let dt1, r2 = p_date_or_text r2 in expect_eoi r2; BeginEnd (dt, dt1)
-      | _ -> expect_eoi r; Begin dt)
-  | _ -> let dt, r = p_date_or_text toks in Begin (fin dt r)
+          let dt1, r2 = p_date_or_text r2 in
+          expect_eoi r2;
+          BeginEnd (dt, dt1)
+      | _ ->
+          expect_eoi r;
+          Begin dt)
+  | _ ->
+      let dt, r = p_date_or_text toks in
+      Begin (fin dt r)
 
 (* Perform a regular expression match. *)
 let preg_match pattern subject =
   let re = Str.regexp pattern in
-  try ignore (Str.search_forward re subject 0); true with Not_found -> false
+  try
+    ignore (Str.search_forward re subject 0);
+    true
+  with Not_found -> false
 
 let date_of_field d =
   if d = "" then None
-  else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Adef.Dtext d)
+  else if preg_match "^[0-9]+$" d && String.length d > 8 then
+    Some (Adef.Dtext d)
   else begin
     date_str := d;
     let toks = lex (String.uppercase_ascii d) in
@@ -777,33 +921,33 @@ let date_of_field d =
 
 (* Creating base *)
 
-type 'a tab = { mutable arr : 'a array ; mutable tlen : int }
+type 'a tab = { mutable arr : 'a array; mutable tlen : int }
 
-type gen =
-  { g_per : (string, person, ascend, union) choice3 tab
-  ; g_fam : (string, family, couple, descend) choice3 tab
-  ; g_str : string tab
-  ; mutable g_bnot : string
-  ; g_ic : in_channel
-  ; g_not : (string, int) Hashtbl.t
-  ; g_src : (string, int) Hashtbl.t
-  ; g_hper : (string, int) Hashtbl.t
-  ; g_hfam : (string, int) Hashtbl.t
-  ; g_hstr : (string, int) Hashtbl.t
-  ; g_hnam : (string, int ref) Hashtbl.t
-  ; g_adop : (string, int * string) Hashtbl.t
-  ; mutable g_godp : (int * int) list
-  ; mutable g_prelated : (int * int) list
-  ; mutable g_frelated : (int * int) list
-  ; mutable g_witn : (int * int) list
-  }
+type gen = {
+  g_per : (string, person, ascend, union) choice3 tab;
+  g_fam : (string, family, couple, descend) choice3 tab;
+  g_str : string tab;
+  mutable g_bnot : string;
+  g_ic : in_channel;
+  g_not : (string, int) Hashtbl.t;
+  g_src : (string, int) Hashtbl.t;
+  g_hper : (string, int) Hashtbl.t;
+  g_hfam : (string, int) Hashtbl.t;
+  g_hstr : (string, int) Hashtbl.t;
+  g_hnam : (string, int ref) Hashtbl.t;
+  g_adop : (string, int * string) Hashtbl.t;
+  mutable g_godp : (int * int) list;
+  mutable g_prelated : (int * int) list;
+  mutable g_frelated : (int * int) list;
+  mutable g_witn : (int * int) list;
+}
 
 let assume_tab tab none =
-  if tab.tlen = Array.length tab.arr then
-    let new_len = 2 * Array.length tab.arr + 1 in
+  if tab.tlen = Array.length tab.arr then (
+    let new_len = (2 * Array.length tab.arr) + 1 in
     let new_arr = Array.make new_len none in
-    Array.blit tab.arr 0 new_arr 0 (Array.length tab.arr) ;
-    tab.arr <- new_arr
+    Array.blit tab.arr 0 new_arr 0 (Array.length tab.arr);
+    tab.arr <- new_arr)
 
 let add_string gen s =
   try Hashtbl.find gen.g_hstr s
@@ -817,8 +961,10 @@ let add_string gen s =
 
 let extract_addr addr =
   if String.length addr > 0 && addr.[0] = '@' then
-    try let r = String.index_from addr 1 '@' in String.sub addr 0 (r + 1) with
-      Not_found -> addr
+    try
+      let r = String.index_from addr 1 '@' in
+      String.sub addr 0 (r + 1)
+    with Not_found -> addr
   else addr
 
 (* Output Pindex in file *)
@@ -853,14 +999,20 @@ let string_quest = 1
 let string_x = 2
 
 let unknown_per i sex =
-  let p = { (Mutil.empty_person string_empty string_quest) with sex ; occ = i ; key_index = i }
-  and a = {parents = None; consang = Adef.fix (-1)}
-  and u = {family = [| |]} in
-  p, a, u
+  let p =
+    {
+      (Mutil.empty_person string_empty string_quest) with
+      sex;
+      occ = i;
+      key_index = i;
+    }
+  and a = { parents = None; consang = Adef.fix (-1) }
+  and u = { family = [||] } in
+  (p, a, u)
 
 let phony_per gen sex =
   let i = gen.g_per.tlen in
-  let (person, ascend, union) = unknown_per i sex in
+  let person, ascend, union = unknown_per i sex in
   assume_tab gen.g_per (Left3 "");
   gen.g_per.tlen <- gen.g_per.tlen + 1;
   gen.g_per.arr.(i) <- Right3 (person, ascend, union);
@@ -871,32 +1023,33 @@ let unknown_fam gen i =
   let mother = phony_per gen Female in
   let f = { (Mutil.empty_family string_empty) with fam_index = i }
   and c = Adef.couple father mother
-  and d = {children = [| |]} in
-  f, c, d
+  and d = { children = [||] } in
+  (f, c, d)
 
 let phony_fam gen =
   let i = gen.g_fam.tlen in
-  let (fam, cpl, des) = unknown_fam gen i in
+  let fam, cpl, des = unknown_fam gen i in
   assume_tab gen.g_fam (Left3 "");
   gen.g_fam.tlen <- gen.g_fam.tlen + 1;
   gen.g_fam.arr.(i) <- Right3 (fam, cpl, des);
   i
 
 let this_year =
-  let tm = Unix.localtime (Unix.time ()) in tm.Unix.tm_year + 1900
+  let tm = Unix.localtime (Unix.time ()) in
+  tm.Unix.tm_year + 1900
 
 let infer_death birth bapt =
-  match birth, bapt with
+  match (birth, bapt) with
   | Some (Adef.Dgreg (d, _)), _ ->
-    let a = this_year - d.year in
-    if a > !dead_years then DeadDontKnowWhen
-    else if a < !alive_years then NotDead
-    else DontKnowIfDead
+      let a = this_year - d.year in
+      if a > !dead_years then DeadDontKnowWhen
+      else if a < !alive_years then NotDead
+      else DontKnowIfDead
   | _, Some (Adef.Dgreg (d, _)) ->
-    let a = this_year - d.year in
-    if a > !dead_years then DeadDontKnowWhen
-    else if a < !alive_years then NotDead
-    else DontKnowIfDead
+      let a = this_year - d.year in
+      if a > !dead_years then DeadDontKnowWhen
+      else if a < !alive_years then NotDead
+      else DontKnowIfDead
   | _ -> DontKnowIfDead
 
 (* Fonctions utiles pour la mise en forme des noms. *)
@@ -910,23 +1063,18 @@ let string_ini_eq s1 i s2 =
   in
   loop i 0
 
-let particle s i =
-  List.exists (string_ini_eq s i) !particles
+let particle s i = List.exists (string_ini_eq s i) !particles
 
 let look_like_a_number s =
   let rec loop i =
     if i < 0 then assert false
     else if i >= String.length s then true
-    else
-      match s.[i] with
-        '0'..'9' -> loop (i + 1)
-      | _ -> false
+    else match s.[i] with '0' .. '9' -> loop (i + 1) | _ -> false
   in
   loop 0
 
-let is_a_name_char =
-  function
-    'A'..'Z' | 'a'..'z' | '0'..'9' | '-' | '\'' -> true
+let is_a_name_char = function
+  | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '-' | '\'' -> true
   | c -> Char.code c > 127
 
 let rec next_word_pos s i =
@@ -940,20 +1088,22 @@ let rec next_sep_pos s i =
   else i
 
 let public_name_word =
-  ["Ier"; "Ière"; "der"; "den"; "die"; "el"; "le"; "la"; "the"]
+  [ "Ier"; "Ière"; "der"; "den"; "die"; "el"; "le"; "la"; "the" ]
 
 let rec is_a_public_name s i =
   let i = next_word_pos s i in
-  i < String.length s &&
-  (let j = next_sep_pos s i in
-   j > i &&
-   (let w = String.sub s i (j - i) in
-    look_like_a_number w ||
-    is_roman_int w && j < String.length s && s.[j] <> '.' ||
-    List.mem w public_name_word || is_a_public_name s j))
+  i < String.length s
+  &&
+  let j = next_sep_pos s i in
+  j > i
+  &&
+  let w = String.sub s i (j - i) in
+  look_like_a_number w
+  || (is_roman_int w && j < String.length s && s.[j] <> '.')
+  || List.mem w public_name_word
+  || is_a_public_name s j
 
-
-module Buff2 = Buff.Make (struct  end)[@@ocaml.warning "-73"]
+module Buff2 = Buff.Make (struct end) [@@ocaml.warning "-73"]
 
 let aux fn s =
   (* On initialise le buffer à la valeur de s. *)
@@ -966,10 +1116,11 @@ let aux fn s =
       if j > i then
         let w = String.sub s i (j - i) in
         let w =
-          if is_roman_int w || particle s i || List.mem w public_name_word ||
-             start_with_int w
-          then
-            w
+          if
+            is_roman_int w || particle s i
+            || List.mem w public_name_word
+            || start_with_int w
+          then w
           else fn w
         in
         let len =
@@ -984,7 +1135,6 @@ let aux fn s =
   loop 0 0
 
 let capitalize_name = aux Name.title
-
 let uppercase_name = aux Utf8.uppercase
 
 let get_lev0 (strm__ : _ Stream.t) =
@@ -1002,39 +1152,37 @@ let get_lev0 (strm__ : _ Stream.t) =
     try get_to_eoln 0 strm__ with Stream.Failure -> raise (Stream.Error "")
   in
   let l =
-    try get_lev_list [] '1' strm__ with
-      Stream.Failure -> raise (Stream.Error "")
+    try get_lev_list [] '1' strm__
+    with Stream.Failure -> raise (Stream.Error "")
   in
-  let (rlab, rval) = if r2 = "" then r1, "" else r2, r1 in
+  let rlab, rval = if r2 = "" then (r1, "") else (r2, r1) in
   let rval = utf8_of_string rval in
   let rcont = utf8_of_string r3 in
-  {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l;
-   rpos = !line_cnt; rused = false}
+  { rlab; rval; rcont; rsons = List.rev l; rpos = !line_cnt; rused = false }
 
 let find_notes_record gen addr =
   match try Some (Hashtbl.find gen.g_not addr) with Not_found -> None with
-    Some i ->
+  | Some i ->
       seek_in gen.g_ic i;
-      begin try Some (get_lev0 (Stream.of_channel gen.g_ic)) with
-        Stream.Failure | Stream.Error _ -> None
+      begin try Some (get_lev0 (Stream.of_channel gen.g_ic))
+      with Stream.Failure | Stream.Error _ -> None
       end
   | None -> None
 
 let find_sources_record gen addr =
   match try Some (Hashtbl.find gen.g_src addr) with Not_found -> None with
-    Some i ->
+  | Some i ->
       seek_in gen.g_ic i;
-      begin try Some (get_lev '0' (Stream.of_channel gen.g_ic)) with
-        Stream.Failure | Stream.Error _ -> None
+      begin try Some (get_lev '0' (Stream.of_channel gen.g_ic))
+      with Stream.Failure | Stream.Error _ -> None
       end
   | None -> None
 
-let rec flatten_notes =
-  function
-    r :: rl ->
+let rec flatten_notes = function
+  | r :: rl ->
       let n = flatten_notes rl in
       begin match r.rlab with
-        "CONC" | "CONT" | "NOTE" ->
+      | "CONC" | "CONT" | "NOTE" ->
           (r.rlab, r.rval) :: (flatten_notes r.rsons @ n)
       | _ -> n
       end
@@ -1043,52 +1191,53 @@ let rec flatten_notes =
 let extract_notes gen rl =
   List.fold_right
     (fun r lines ->
-       List.fold_right
-         (fun r lines ->
-            r.rused <- true;
-            if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] = '@' then
-              let addr = extract_addr r.rval in
-              match find_notes_record gen addr with
-                Some r ->
-                  let l = flatten_notes r.rsons in
-                  ("NOTE", r.rcont) :: (l @ lines)
-              | None ->
-                  print_location r.rpos;
-                  Printf.fprintf !log_oc "Note %s not found\n" addr;
-                  flush !log_oc;
-                  lines
-            else (r.rlab, r.rval) :: lines)
-         (r :: r.rsons) lines)
+      List.fold_right
+        (fun r lines ->
+          r.rused <- true;
+          if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] = '@' then (
+            let addr = extract_addr r.rval in
+            match find_notes_record gen addr with
+            | Some r ->
+                let l = flatten_notes r.rsons in
+                ("NOTE", r.rcont) :: (l @ lines)
+            | None ->
+                print_location r.rpos;
+                Printf.fprintf !log_oc "Note %s not found\n" addr;
+                flush !log_oc;
+                lines)
+          else (r.rlab, r.rval) :: lines)
+        (r :: r.rsons) lines)
     rl []
 
 let rebuild_text r =
   let s = strip_spaces r.rval in
   List.fold_left
     (fun s e ->
-       let _ = e.rused <- true in
-       let n = e.rval in
-       let end_spc =
-         if String.length n > 1 && n.[String.length n - 1] = ' ' then " "
-         else ""
-       in
-       let n = strip_spaces n in
-       match e.rlab with
-         "CONC" -> s ^ n ^ end_spc
-       | "CONT" -> s ^ "<br>\n" ^ n ^ end_spc
-       | _ -> s)
+      let _ = e.rused <- true in
+      let n = e.rval in
+      let end_spc =
+        if String.length n > 1 && n.[String.length n - 1] = ' ' then " " else ""
+      in
+      let n = strip_spaces n in
+      match e.rlab with
+      | "CONC" -> s ^ n ^ end_spc
+      | "CONT" -> s ^ "<br>\n" ^ n ^ end_spc
+      | _ -> s)
     s r.rsons
 
 let notes_from_source_record rl =
   let title =
     match find_field "TITL" rl with
-      Some l ->
-        let s = rebuild_text l in if s = "" then "" else "<b>" ^ s ^ "</b>"
+    | Some l ->
+        let s = rebuild_text l in
+        if s = "" then "" else "<b>" ^ s ^ "</b>"
     | None -> ""
   in
   let text =
     match find_field "TEXT" rl with
-      Some l ->
-        let s = rebuild_text l in if title = "" then s else "<br>\n" ^ s
+    | Some l ->
+        let s = rebuild_text l in
+        if title = "" then s else "<br>\n" ^ s
     | None -> ""
   in
   title ^ text
@@ -1099,44 +1248,41 @@ let treat_notes gen rl =
   let () =
     List.iter
       (fun (lab, n) ->
-         let spc = String.length n > 0 && n.[0] = ' ' in
-         let end_spc = String.length n > 1 && n.[String.length n - 1] = ' ' in
-         let n = strip_spaces n in
-         if Buffer.length buf = 0 then
-           begin
-             Buffer.add_string buf n;
-             Buffer.add_string buf (if end_spc then " " else "")
-           end
-         else if lab = "CONT" || lab = "NOTE" then
-           begin
-             Buffer.add_string buf "<br>\n";
-             Buffer.add_string buf n;
-             Buffer.add_string buf (if end_spc then " " else "")
-           end
-         else if n = "" then ()
-         else
-           begin
-             Buffer.add_string buf (if spc then "\n" else "");
-             Buffer.add_string buf n;
-             Buffer.add_string buf (if end_spc then " " else "")
-           end)
+        let spc = String.length n > 0 && n.[0] = ' ' in
+        let end_spc = String.length n > 1 && n.[String.length n - 1] = ' ' in
+        let n = strip_spaces n in
+        if Buffer.length buf = 0 then begin
+          Buffer.add_string buf n;
+          Buffer.add_string buf (if end_spc then " " else "")
+        end
+        else if lab = "CONT" || lab = "NOTE" then begin
+          Buffer.add_string buf "<br>\n";
+          Buffer.add_string buf n;
+          Buffer.add_string buf (if end_spc then " " else "")
+        end
+        else if n = "" then ()
+        else begin
+          Buffer.add_string buf (if spc then "\n" else "");
+          Buffer.add_string buf n;
+          Buffer.add_string buf (if end_spc then " " else "")
+        end)
       lines
   in
   strip_newlines (Buffer.contents buf)
 
 let treat_source gen r =
-  if String.length r.rval > 0 && r.rval.[0] = '@' then
+  if String.length r.rval > 0 && r.rval.[0] = '@' then (
     match find_sources_record gen r.rval with
-      Some v ->
+    | Some v ->
         let src =
           let titl =
             match find_field "TITL" v.rsons with
-              Some l -> rebuild_text l
+            | Some l -> rebuild_text l
             | None -> ""
           in
           let text =
             match find_field "TEXT" v.rsons with
-              Some l -> rebuild_text l
+            | Some l -> rebuild_text l
             | None -> ""
           in
           let rcont = strip_spaces v.rcont in
@@ -1146,18 +1292,18 @@ let treat_source gen r =
           else if rcont <> "" then rcont
           else r.rval
         in
-        src, v.rsons
+        (src, v.rsons)
     | None ->
         print_location r.rpos;
         Printf.fprintf !log_oc "Source %s not found\n" r.rval;
         flush !log_oc;
-        "", []
-  else strip_spaces r.rval, r.rsons
+        ("", []))
+  else (strip_spaces r.rval, r.rsons)
 
 let source gen r =
   match find_field "SOUR" r.rsons with
-    Some r -> treat_source gen r
-  | _ -> "", []
+  | Some r -> treat_source gen r
+  | _ -> ("", [])
 
 let p_index_from s i c =
   if i >= String.length s then String.length s
@@ -1169,133 +1315,137 @@ let decode_title s =
   let i1 = p_index_from s 0 ',' in
   let i2 = p_index_from s (i1 + 1) ',' in
   let title = strip_sub s 0 i1 in
-  let (place, nth) =
-    if i1 = String.length s then "", 0
+  let place, nth =
+    if i1 = String.length s then ("", 0)
     else if i2 = String.length s then
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
-      try "", int_of_string s1 with Failure _ -> s1, 0
+      try ("", int_of_string s1) with Failure _ -> (s1, 0)
     else
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
       let s2 = strip_sub s (i2 + 1) (String.length s - i2 - 1) in
-      try s1, int_of_string s2 with
-        Failure _ -> strip_sub s i1 (String.length s - i1), 0
+      try (s1, int_of_string s2)
+      with Failure _ -> (strip_sub s i1 (String.length s - i1), 0)
   in
-  title, place, nth
+  (title, place, nth)
 
 let list_of_string s =
   let rec loop i len list =
     if i = String.length s then List.rev (Buff.get len :: list)
     else
       match s.[i] with
-        ',' -> loop (i + 1) 0 (Buff.get len :: list)
+      | ',' -> loop (i + 1) 0 (Buff.get len :: list)
       | c -> loop (i + 1) (Buff.store len c) list
   in
   loop 0 0 []
 
 let purge_list list =
   List.fold_right
-    (fun s list ->
-       match strip_spaces s with
-         "" -> list
-       | s -> s :: list)
+    (fun s list -> match strip_spaces s with "" -> list | s -> s :: list)
     list []
 
 let decode_date_interval pos s =
   match p_date_interval (lex s) with
-  | BeginEnd (d1, d2) -> Some d1, Some d2
-  | Begin d -> Some d, None
-  | End d -> None, Some d
+  | BeginEnd (d1, d2) -> (Some d1, Some d2)
+  | Begin d -> (Some d, None)
+  | End d -> (None, Some d)
   | exception (Stream.Failure | Stream.Error _ | Failure _ | Not_found) ->
-      print_bad_date pos s; None, None
+      print_bad_date pos s;
+      (None, None)
 
 let treat_indi_title gen public_name r =
-  let (title, place, nth) = decode_title r.rval in
-  let (date_start, date_end) =
+  let title, place, nth = decode_title r.rval in
+  let date_start, date_end =
     match find_field "DATE" r.rsons with
-      Some r -> decode_date_interval r.rpos r.rval
-    | None -> None, None
+    | Some r -> decode_date_interval r.rpos r.rval
+    | None -> (None, None)
   in
-  let (name, title, place) =
+  let name, title, place =
     match find_field "NOTE" r.rsons with
-      Some r ->
-        if title = "" then Tnone, strip_spaces r.rval, ""
-        else if r.rval = public_name then Tmain, title, place
-        else Tname (add_string gen (strip_spaces r.rval)), title, place
-    | None -> Tnone, title, place
+    | Some r ->
+        if title = "" then (Tnone, strip_spaces r.rval, "")
+        else if r.rval = public_name then (Tmain, title, place)
+        else (Tname (add_string gen (strip_spaces r.rval)), title, place)
+    | None -> (Tnone, title, place)
   in
-  {t_name = name; t_ident = add_string gen title;
-   t_place = add_string gen place; t_date_start = Date.cdate_of_od date_start;
-   t_date_end = Date.cdate_of_od date_end; t_nth = nth}
+  {
+    t_name = name;
+    t_ident = add_string gen title;
+    t_place = add_string gen place;
+    t_date_start = Date.cdate_of_od date_start;
+    t_date_end = Date.cdate_of_od date_end;
+    t_nth = nth;
+  }
 
 let forward_adop gen ip lab which_parent =
-  Hashtbl.add
-    gen.g_adop lab
-    (ip, match which_parent with Some r when r.rval <> "" -> r.rval | _ -> "BOTH")
+  Hashtbl.add gen.g_adop lab
+    ( ip,
+      match which_parent with Some r when r.rval <> "" -> r.rval | _ -> "BOTH"
+    )
 
 let adop_parent gen ip r =
   let i = per_index gen r.rval in
   match gen.g_per.arr.(i) with
   | Left3 _ -> None
   | Right3 (p, a, u) ->
-    if List.mem ip p.related then ()
-    else
-      begin let p = { p with related = ip :: p.related } in
+      if List.mem ip p.related then ()
+      else begin
+        let p = { p with related = ip :: p.related } in
         gen.g_per.arr.(i) <- Right3 (p, a, u)
       end;
-    Some p.key_index
+      Some p.key_index
 
 let set_adop_fam gen ip which_parent fath moth =
   match gen.g_per.arr.(ip) with
   | Left3 _ -> ()
   | Right3 (per, asc, uni) ->
       let r_fath =
-        match which_parent, fath with
-          ("HUSB" | "BOTH"), Some r -> adop_parent gen ip r
+        match (which_parent, fath) with
+        | ("HUSB" | "BOTH"), Some r -> adop_parent gen ip r
         | _ -> None
       in
       let r_moth =
-        match which_parent, moth with
-          ("WIFE" | "BOTH"), Some r -> adop_parent gen ip r
+        match (which_parent, moth) with
+        | ("WIFE" | "BOTH"), Some r -> adop_parent gen ip r
         | _ -> None
       in
-      let r =
-        {r_type = Adoption; r_fath = r_fath; r_moth = r_moth;
-         r_sources = string_empty}
-      in
+      let r = { r_type = Adoption; r_fath; r_moth; r_sources = string_empty } in
       let per = { per with rparents = r :: per.rparents } in
       gen.g_per.arr.(ip) <- Right3 (per, asc, uni)
 
 let forward_godp gen ip rval =
-  let ipp = per_index gen rval in gen.g_godp <- (ipp, ip) :: gen.g_godp; ipp
+  let ipp = per_index gen rval in
+  gen.g_godp <- (ipp, ip) :: gen.g_godp;
+  ipp
 
 let forward_witn gen ip rval =
   let ifam = fam_index gen rval in
-  gen.g_witn <- (ifam, ip) :: gen.g_witn; ifam
+  gen.g_witn <- (ifam, ip) :: gen.g_witn;
+  ifam
 
 let forward_pevent_witn gen ip rval =
   let ipp = per_index gen rval in
-  gen.g_prelated <- (ipp, ip) :: gen.g_prelated; ipp
+  gen.g_prelated <- (ipp, ip) :: gen.g_prelated;
+  ipp
 
 let forward_fevent_witn gen ip rval =
   let ipp = per_index gen rval in
-  gen.g_frelated <- (ipp, ip) :: gen.g_frelated; ipp
+  gen.g_frelated <- (ipp, ip) :: gen.g_frelated;
+  ipp
 
 let glop = ref []
 
-let indi_lab =
-  function
-    "ADOP" | "ASSO" | "BAPM" | "BIRT" | "BURI" | "CHR" | "CREM" | "DEAT" |
-    "FAMC" | "FAMS" | "NAME" | "NOTE" | "OBJE" | "OCCU" | "SEX" | "SOUR" |
-    "TITL" ->
+let indi_lab = function
+  | "ADOP" | "ASSO" | "BAPM" | "BIRT" | "BURI" | "CHR" | "CREM" | "DEAT"
+  | "FAMC" | "FAMS" | "NAME" | "NOTE" | "OBJE" | "OCCU" | "SEX" | "SOUR"
+  | "TITL" ->
       true
   | c ->
       if List.mem c !glop then ()
-      else
-        begin
-          glop := c :: !glop;
-          Printf.eprintf "untreated tag %s -> in notes\n" c;
-          flush stderr
-        end;
+      else begin
+        glop := c :: !glop;
+        Printf.eprintf "untreated tag %s -> in notes\n" c;
+        flush stderr
+      end;
       false
 
 let html_text_of_tags text rl =
@@ -1312,57 +1462,57 @@ let html_text_of_tags text rl =
     totl len (lev + 1) r.rsons
   and totl len lev rl =
     List.fold_left
-      (fun len r -> let len = Buff.store len '\n' in tot len lev r) len rl
+      (fun len r ->
+        let len = Buff.store len '\n' in
+        tot len lev r)
+      len rl
   in
   let title =
     if text = "" then "-- GEDCOM --" else "-- GEDCOM (" ^ text ^ ") --"
   in
   let len = 0 in
-  let len = Buff.mstore len title in let len = totl len 1 rl in Buff.get len
+  let len = Buff.mstore len title in
+  let len = totl len 1 rl in
+  Buff.get len
 
-let rec find_all_rela nl =
-  function
-    [] -> []
-  | r :: rl ->
+let rec find_all_rela nl = function
+  | [] -> []
+  | r :: rl -> (
       match find_field "RELA" r.rsons with
-        Some r1 ->
-          let rec loop =
-            function
-              n :: nl1 ->
+      | Some r1 ->
+          let rec loop = function
+            | n :: nl1 ->
                 let len = String.length n in
-                if String.length r1.rval >= len &&
-                   String.lowercase_ascii (String.sub r1.rval 0 len) = n
-                then
-                  (n, r.rval) :: find_all_rela nl rl
+                if
+                  String.length r1.rval >= len
+                  && String.lowercase_ascii (String.sub r1.rval 0 len) = n
+                then (n, r.rval) :: find_all_rela nl rl
                 else loop nl1
             | [] -> find_all_rela nl rl
           in
           loop nl
-      | None -> find_all_rela nl rl
+      | None -> find_all_rela nl rl)
 
-let witness_kind_of_rval rval = match rval with
-  | "GODP"               -> Witness_GodParent
-  | "officer"
-  | "Civil officer"
-  | "Registry officer"   -> Witness_CivilOfficer
-  | "Religious officer"
-  | "Officiating priest" -> Witness_ReligiousOfficer
-  | "Informant"          -> Witness_Informant
-  | "Attending"          -> Witness_Attending
-  | "Mentioned"          -> Witness_Mentioned
-  | "Other"              -> Witness_Other
-  | _                    -> Witness
+let witness_kind_of_rval rval =
+  match rval with
+  | "GODP" -> Witness_GodParent
+  | "officer" | "Civil officer" | "Registry officer" -> Witness_CivilOfficer
+  | "Religious officer" | "Officiating priest" -> Witness_ReligiousOfficer
+  | "Informant" -> Witness_Informant
+  | "Attending" -> Witness_Attending
+  | "Mentioned" -> Witness_Mentioned
+  | "Other" -> Witness_Other
+  | _ -> Witness
 
 let find_event_witness gen tag ip r =
-  let rec find_witnesses =
-    function
-      [] -> []
+  let rec find_witnesses = function
+    | [] -> []
     | r :: asso_l ->
         if find_field_with_value "TYPE" tag r.rsons then
           let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
           let witness_kind =
             match find_field "RELA" r.rsons with
-              Some rr -> witness_kind_of_rval rr.rval
+            | Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
           (witness, witness_kind) :: find_witnesses asso_l
@@ -1370,28 +1520,27 @@ let find_event_witness gen tag ip r =
           let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
           let witness_kind =
             match find_field "RELA" r.rsons with
-              Some rr -> witness_kind_of_rval rr.rval
+            | Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
           (witness, witness_kind) :: find_witnesses asso_l
   in
   let witnesses =
     match find_all_fields "ASSO" r.rsons with
-      [] -> []
+    | [] -> []
     | wl -> find_witnesses wl
   in
   Array.of_list witnesses
 
 let find_fevent_witness gen tag ifath r =
-  let rec find_witnesses =
-    function
-      [] -> []
+  let rec find_witnesses = function
+    | [] -> []
     | r :: asso_l ->
         if find_field_with_value "TYPE" tag r.rsons then
           let witness = forward_fevent_witn gen ifath (strip_spaces r.rval) in
           let witness_kind =
             match find_field "RELA" r.rsons with
-              Some rr -> witness_kind_of_rval rr.rval
+            | Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
           (witness, witness_kind) :: find_witnesses asso_l
@@ -1399,21 +1548,21 @@ let find_fevent_witness gen tag ifath r =
           let witness = forward_fevent_witn gen ifath (strip_spaces r.rval) in
           let witness_kind =
             match find_field "RELA" r.rsons with
-              Some rr -> witness_kind_of_rval rr.rval
+            | Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
           (witness, witness_kind) :: find_witnesses asso_l
   in
   let witnesses =
     match find_all_fields "ASSO" r.rsons with
-      [] -> []
+    | [] -> []
     | wl -> find_witnesses wl
   in
   Array.of_list witnesses
 
 let find_pevent_name_from_tag gen tag tagv =
   match tag with
-    "BIRT" -> Epers_Birth
+  | "BIRT" -> Epers_Birth
   | "BAPM" | "CHR" -> Epers_Baptism
   | "DEAT" -> Epers_Death
   | "BURI" -> Epers_Burial
@@ -1466,32 +1615,137 @@ let find_pevent_name_from_tag gen tag tagv =
   | _ -> Epers_Name (add_string gen (strip_spaces tagv))
 
 let primary_pevents =
-  ["BAPM"; "CHR"; "BAPL"; "BARM"; "BASM"; "BIRT"; "BLES"; "BURI"; "CENS";
-   "CONF"; "CONL"; "CREM"; "DEAT"; "DECO"; "EDUC"; "EMIG"; "ENDL"; "FCOM";
-   "GRAD"; "IMMI"; "NATU"; "OCCU"; "ORDN"; "PROP"; "RETI"; "RESI"; "SLGS";
-   "SLGC"; "WILL"]
+  [
+    "BAPM";
+    "CHR";
+    "BAPL";
+    "BARM";
+    "BASM";
+    "BIRT";
+    "BLES";
+    "BURI";
+    "CENS";
+    "CONF";
+    "CONL";
+    "CREM";
+    "DEAT";
+    "DECO";
+    "EDUC";
+    "EMIG";
+    "ENDL";
+    "FCOM";
+    "GRAD";
+    "IMMI";
+    "NATU";
+    "OCCU";
+    "ORDN";
+    "PROP";
+    "RETI";
+    "RESI";
+    "SLGS";
+    "SLGC";
+    "WILL";
+  ]
 
 let treat_indi_pevent gen ip r =
   let prim_events =
     List.fold_left
       (fun events tag ->
-         List.fold_left
-           (fun events r ->
-              let name = find_pevent_name_from_tag gen tag tag in
+        List.fold_left
+          (fun events r ->
+            let name = find_pevent_name_from_tag gen tag tag in
+            let date =
+              match find_field "DATE" r.rsons with
+              | Some r -> date_of_field r.rval
+              | None -> None
+            in
+            let place =
+              match find_field "PLAC" r.rsons with
+              | Some r -> strip_spaces r.rval
+              | _ -> ""
+            in
+            let reason = "" in
+            let note =
+              match find_all_fields "NOTE" r.rsons with
+              | [] -> ""
+              | rl -> treat_notes gen rl
+            in
+            (* Si le tag 1 XXX a des infos, on les ajoutes. *)
+            let note =
+              let name_info = strip_spaces r.rval in
+              if name_info = "" || r.rval = "Y" then note
+              else name_info ^ "<br>\n" ^ note
+            in
+            let src =
+              match find_all_fields "SOUR" r.rsons with
+              | [] -> ""
+              | rl ->
+                  let rec loop first src rl =
+                    match rl with
+                    | [] -> src
+                    | r :: rl ->
+                        let src_cont, _ = treat_source gen r in
+                        let src =
+                          if first then src ^ src_cont else src ^ " " ^ src_cont
+                        in
+                        loop false src rl
+                  in
+                  loop true "" rl
+            in
+            let witnesses = find_event_witness gen "INDI" ip r in
+            let evt =
+              {
+                epers_name = name;
+                epers_date = Date.cdate_of_od date;
+                epers_place = add_string gen place;
+                epers_reason = add_string gen reason;
+                epers_note = add_string gen note;
+                epers_src = add_string gen src;
+                epers_witnesses = witnesses;
+              }
+            in
+            (* On ajoute que les évènements non vides, sauf *)
+            (* s'il est spécifié qu'il faut l'ajouter.      *)
+            if
+              date <> None || place <> "" || note <> "" || src <> ""
+              || witnesses <> [||] || r.rval = "Y"
+            then
+              if name = Epers_Occupation then
+                if r.rsons <> [] then evt :: events else events
+              else evt :: events
+            else events)
+          events
+          (find_all_fields tag r.rsons))
+      [] primary_pevents
+  in
+  let second_events =
+    List.fold_left
+      (fun events r ->
+        match find_field "TYPE" r.rsons with
+        | Some rr ->
+            if rr.rval <> "" then
+              let name =
+                if List.mem rr.rval primary_pevents then
+                  find_pevent_name_from_tag gen rr.rval rr.rval
+                else
+                  find_pevent_name_from_tag gen
+                    (String.lowercase_ascii rr.rval)
+                    rr.rval
+              in
               let date =
                 match find_field "DATE" r.rsons with
-                  Some r -> date_of_field r.rval
+                | Some r -> date_of_field r.rval
                 | None -> None
               in
               let place =
                 match find_field "PLAC" r.rsons with
-                  Some r -> strip_spaces r.rval
+                | Some r -> strip_spaces r.rval
                 | _ -> ""
               in
               let reason = "" in
               let note =
                 match find_all_fields "NOTE" r.rsons with
-                  [] -> ""
+                | [] -> ""
                 | rl -> treat_notes gen rl
               in
               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
@@ -1502,13 +1756,13 @@ let treat_indi_pevent gen ip r =
               in
               let src =
                 match find_all_fields "SOUR" r.rsons with
-                  [] -> ""
+                | [] -> ""
                 | rl ->
                     let rec loop first src rl =
                       match rl with
-                        [] -> src
+                      | [] -> src
                       | r :: rl ->
-                          let (src_cont, _) = treat_source gen r in
+                          let src_cont, _ = treat_source gen r in
                           let src =
                             if first then src ^ src_cont
                             else src ^ " " ^ src_cont
@@ -1519,117 +1773,53 @@ let treat_indi_pevent gen ip r =
               in
               let witnesses = find_event_witness gen "INDI" ip r in
               let evt =
-                {epers_name = name; epers_date = Date.cdate_of_od date;
-                 epers_place = add_string gen place;
-                 epers_reason = add_string gen reason;
-                 epers_note = add_string gen note;
-                 epers_src = add_string gen src; epers_witnesses = witnesses}
-              in
-              (* On ajoute que les évènements non vides, sauf *)
-              (* s'il est spécifié qu'il faut l'ajouter.      *)
-              if date <> None || place <> "" || note <> "" || src <> "" ||
-                 witnesses <> [| |] || r.rval = "Y"
-              then
-                if name = Epers_Occupation then
-                  if r.rsons <> [] then evt :: events else events
-                else evt :: events
-              else events)
-           events (find_all_fields tag r.rsons))
-      [] primary_pevents
-  in
-  let second_events =
-    List.fold_left
-      (fun events r ->
-         match find_field "TYPE" r.rsons with
-           Some rr ->
-             if rr.rval <> "" then
-               let name =
-                 if List.mem rr.rval primary_pevents then
-                   find_pevent_name_from_tag gen rr.rval rr.rval
-                 else
-                   find_pevent_name_from_tag gen
-                     (String.lowercase_ascii rr.rval) rr.rval
-               in
-               let date =
-                 match find_field "DATE" r.rsons with
-                   Some r -> date_of_field r.rval
-                 | None -> None
-               in
-               let place =
-                 match find_field "PLAC" r.rsons with
-                   Some r -> strip_spaces r.rval
-                 | _ -> ""
-               in
-               let reason = "" in
-               let note =
-                 match find_all_fields "NOTE" r.rsons with
-                   [] -> ""
-                 | rl -> treat_notes gen rl
-               in
-               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
-               let note =
-                 let name_info = strip_spaces r.rval in
-                 if name_info = "" || r.rval = "Y" then note
-                 else name_info ^ "<br>\n" ^ note
-               in
-               let src =
-                 match find_all_fields "SOUR" r.rsons with
-                   [] -> ""
-                 | rl ->
-                     let rec loop first src rl =
-                       match rl with
-                         [] -> src
-                       | r :: rl ->
-                           let (src_cont, _) = treat_source gen r in
-                           let src =
-                             if first then src ^ src_cont
-                             else src ^ " " ^ src_cont
-                           in
-                           loop false src rl
-                     in
-                     loop true "" rl
-               in
-               let witnesses = find_event_witness gen "INDI" ip r in
-               let evt =
-                 {epers_name = name; epers_date = Date.cdate_of_od date;
+                {
+                  epers_name = name;
+                  epers_date = Date.cdate_of_od date;
                   epers_place = add_string gen place;
                   epers_reason = add_string gen reason;
                   epers_note = add_string gen note;
-                  epers_src = add_string gen src; epers_witnesses = witnesses}
-               in
-               (* On ajoute que les évènements non vides, *)
-               (* sauf si évènement personnalisé !        *)
-               let has_epers_name =
-                 match name with
-                   Epers_Name n -> n <> string_empty
-                 | _ -> false
-               in
-               if has_epers_name || date <> None || place <> "" ||
-                  note <> "" || src <> "" || witnesses <> [| |]
-               then
-                 evt :: events
-               else events
-             else events
-         | None -> events)
-      [] (find_all_fields "EVEN" r.rsons)
+                  epers_src = add_string gen src;
+                  epers_witnesses = witnesses;
+                }
+              in
+              (* On ajoute que les évènements non vides, *)
+              (* sauf si évènement personnalisé !        *)
+              let has_epers_name =
+                match name with Epers_Name n -> n <> string_empty | _ -> false
+              in
+              if
+                has_epers_name || date <> None || place <> "" || note <> ""
+                || src <> "" || witnesses <> [||]
+              then evt :: events
+              else events
+            else events
+        | None -> events)
+      []
+      (find_all_fields "EVEN" r.rsons)
   in
   List.rev_append prim_events second_events
 
-let rec build_remain_tags =
-  function
-    [] -> []
+let rec build_remain_tags = function
+  | [] -> []
   | r :: rest ->
       let rsons = if indi_lab r.rlab then [] else build_remain_tags r.rsons in
       let rest = build_remain_tags rest in
       if r.rused = true && rsons = [] then rest
       else
-        {rlab = r.rlab; rval = r.rval; rcont = r.rcont; rsons = rsons;
-         rpos = r.rpos; rused = r.rused} ::
-        rest
+        {
+          rlab = r.rlab;
+          rval = r.rval;
+          rcont = r.rcont;
+          rsons;
+          rpos = r.rpos;
+          rused = r.rused;
+        }
+        :: rest
 
 let applycase_surname s =
   match !case_surnames with
-    NoCase -> s
+  | NoCase -> s
   | LowerCase -> capitalize_name s
   | UpperCase ->
       if !charset = Utf8 then uppercase_name s else String.uppercase_ascii s
@@ -1641,23 +1831,25 @@ let reconstitute_from_pevents pevents bi bp de bu =
   let found_burial = ref false in
   let rec loop pevents bi bp de bu =
     match pevents with
-      [] -> bi, bp, de, bu
-    | evt :: l ->
+    | [] -> (bi, bp, de, bu)
+    | evt :: l -> (
         match evt.epers_name with
-          Epers_Birth ->
+        | Epers_Birth ->
             if !found_birth then loop l bi bp de bu
             else
               let bi =
-                evt.epers_date, evt.epers_place, evt.epers_note, evt.epers_src
+                (evt.epers_date, evt.epers_place, evt.epers_note, evt.epers_src)
               in
-              let () = found_birth := true in loop l bi bp de bu
+              let () = found_birth := true in
+              loop l bi bp de bu
         | Epers_Baptism ->
             if !found_baptism then loop l bi bp de bu
             else
               let bp =
-                evt.epers_date, evt.epers_place, evt.epers_note, evt.epers_src
+                (evt.epers_date, evt.epers_place, evt.epers_note, evt.epers_src)
               in
-              let () = found_baptism := true in loop l bi bp de bu
+              let () = found_baptism := true in
+              loop l bi bp de bu
         | Epers_Death ->
             if !found_death then loop l bi bp de bu
             else
@@ -1667,26 +1859,33 @@ let reconstitute_from_pevents pevents bi bp de bu =
                 | None -> DeadDontKnowWhen
               in
               let de =
-                death, evt.epers_place, evt.epers_note, evt.epers_src
+                (death, evt.epers_place, evt.epers_note, evt.epers_src)
               in
-              let () = found_death := true in loop l bi bp de bu
+              let () = found_death := true in
+              loop l bi bp de bu
         | Epers_Burial ->
             if !found_burial then loop l bi bp de bu
             else
               let bu =
-                Buried evt.epers_date, evt.epers_place, evt.epers_note,
-                evt.epers_src
+                ( Buried evt.epers_date,
+                  evt.epers_place,
+                  evt.epers_note,
+                  evt.epers_src )
               in
-              let () = found_burial := true in loop l bi bp de bu
+              let () = found_burial := true in
+              loop l bi bp de bu
         | Epers_Cremation ->
             if !found_burial then loop l bi bp de bu
             else
               let bu =
-                Cremated evt.epers_date, evt.epers_place, evt.epers_note,
-                evt.epers_src
+                ( Cremated evt.epers_date,
+                  evt.epers_place,
+                  evt.epers_note,
+                  evt.epers_src )
               in
-              let () = found_burial := true in loop l bi bp de bu
-        | _ -> loop l bi bp de bu
+              let () = found_burial := true in
+              loop l bi bp de bu
+        | _ -> loop l bi bp de bu)
   in
   loop pevents bi bp de bu
 
@@ -1695,110 +1894,116 @@ let add_indi gen r =
   let name_sons = find_field "NAME" r.rsons in
   let givn =
     match name_sons with
-      Some n ->
-      begin match find_field "GIVN" n.rsons with
-          Some r -> r.rval
+    | Some n ->
+        begin match find_field "GIVN" n.rsons with
+        | Some r -> r.rval
         | None -> ""
-      end
+        end
     | None -> ""
   in
-  let (first_name, surname, occ, public_name, first_names_aliases) =
+  let first_name, surname, occ, public_name, first_names_aliases =
     match name_sons with
     | Some n ->
-      let (f, s) = parse_name (Stream.of_string n.rval) in
-      let pn = "" in
-      let fal = if givn = f then [] else [givn] in
-      let (f, fal) =
-        match !first_names_brackets with
-          Some (bb, eb) ->
-          let first_enclosed f =
-            let i = String.index f bb in
-            let j =
-              if i + 2 >= String.length f then raise Not_found
-              else String.index_from f (i + 2) eb
-            in
-            let fn = String.sub f (i + 1) (j - i - 1) in
-            let fa =
-              String.sub f 0 i ^ fn ^
-              String.sub f (j + 1) (String.length f - j - 1)
-            in
-            fn, fa
-          in
-          let rec loop first ff accu =
-            try
-              let (fn, fa) = first_enclosed ff in
-              let accu =
-                if first then fn
-                else if fn <> "" then accu ^ " " ^ fn
-                else accu
+        let f, s = parse_name (Stream.of_string n.rval) in
+        let pn = "" in
+        let fal = if givn = f then [] else [ givn ] in
+        let f, fal =
+          match !first_names_brackets with
+          | Some (bb, eb) ->
+              let first_enclosed f =
+                let i = String.index f bb in
+                let j =
+                  if i + 2 >= String.length f then raise Not_found
+                  else String.index_from f (i + 2) eb
+                in
+                let fn = String.sub f (i + 1) (j - i - 1) in
+                let fa =
+                  String.sub f 0 i ^ fn
+                  ^ String.sub f (j + 1) (String.length f - j - 1)
+                in
+                (fn, fa)
               in
-              loop false fa accu
-            with Not_found -> if f = ff then f, fal else accu, ff :: fal
+              let rec loop first ff accu =
+                try
+                  let fn, fa = first_enclosed ff in
+                  let accu =
+                    if first then fn
+                    else if fn <> "" then accu ^ " " ^ fn
+                    else accu
+                  in
+                  loop false fa accu
+                with Not_found ->
+                  if f = ff then (f, fal) else (accu, ff :: fal)
+              in
+              loop true f ""
+          | None -> (f, fal)
+        in
+        let f, pn, fal =
+          if !extract_public_names || !extract_first_names then
+            let i = next_word_pos f 0 in
+            let j = next_sep_pos f i in
+            if j = String.length f then (f, pn, fal)
+            else
+              let fn = String.sub f i (j - i) in
+              if pn = "" && !extract_public_names then
+                if is_a_public_name f j then (fn, f, fal)
+                else if !extract_first_names then (fn, "", f :: fal)
+                else (f, "", fal)
+              else (fn, pn, f :: fal)
+          else (f, pn, fal)
+        in
+        let f = if !lowercase_first_names then capitalize_name f else f in
+        let fal =
+          if !lowercase_first_names then List.map capitalize_name fal else fal
+        in
+        let pn = if capitalize_name pn = f then "" else pn in
+        let pn = if !lowercase_first_names then capitalize_name pn else pn in
+        let fal =
+          List.fold_right
+            (fun fa fal -> if fa = pn then fal else fa :: fal)
+            fal []
+        in
+        let s = applycase_surname s in
+        let r =
+          let key =
+            Name.strip_lower (Mutil.nominative f ^ " " ^ Mutil.nominative s)
           in
-          loop true f ""
-        | None -> f, fal
-      in
-      let (f, pn, fal) =
-        if !extract_public_names || !extract_first_names then
-          let i = next_word_pos f 0 in
-          let j = next_sep_pos f i in
-          if j = String.length f then f, pn, fal
-          else
-            let fn = String.sub f i (j - i) in
-            if pn = "" && !extract_public_names then
-              if is_a_public_name f j then fn, f, fal
-              else if !extract_first_names then fn, "", f :: fal
-              else f, "", fal
-            else fn, pn, f :: fal
-        else f, pn, fal
-      in
-      let f = if !lowercase_first_names then capitalize_name f else f in
-      let fal =
-        if !lowercase_first_names then List.map capitalize_name fal else fal
-      in
-      let pn = if capitalize_name pn = f then "" else pn in
-      let pn = if !lowercase_first_names then capitalize_name pn else pn in
-      let fal =
-        List.fold_right (fun fa fal -> if fa = pn then fal else fa :: fal) fal []
-      in
-      let s = applycase_surname s in
-      let r =
-        let key = Name.strip_lower (Mutil.nominative f ^ " " ^ Mutil.nominative s) in
-        try Hashtbl.find gen.g_hnam key
-        with Not_found ->
-          let r = ref (-1) in
-          Hashtbl.add gen.g_hnam key r ;
-          r
-      in
-      incr r; f, s, !r, pn, fal
-    | None -> "?", "?", ip, givn, []
+          try Hashtbl.find gen.g_hnam key
+          with Not_found ->
+            let r = ref (-1) in
+            Hashtbl.add gen.g_hnam key r;
+            r
+        in
+        incr r;
+        (f, s, !r, pn, fal)
+    | None -> ("?", "?", ip, givn, [])
   in
   (* S'il y a des caractères interdits, on les supprime *)
-  let (first_name, surname) =
-    Name.strip_c first_name ':', Name.strip_c surname ':'
+  let first_name, surname =
+    (Name.strip_c first_name ':', Name.strip_c surname ':')
   in
   let qualifier =
     match name_sons with
-      Some n ->
-      begin match find_field "NICK" n.rsons with
-          Some r -> r.rval
+    | Some n ->
+        begin match find_field "NICK" n.rsons with
+        | Some r -> r.rval
         | None -> ""
-      end
+        end
     | None -> ""
   in
   let surname_aliases =
     match name_sons with
-      Some n ->
-      begin match find_field "SURN" n.rsons with
-          Some r ->
-          let list = purge_list (list_of_string r.rval) in
-          List.fold_right
-            (fun x list ->
-               let x = applycase_surname x in
-               if x <> surname then x :: list else list)
-            list []
+    | Some n ->
+        begin match find_field "SURN" n.rsons with
+        | Some r ->
+            let list = purge_list (list_of_string r.rval) in
+            List.fold_right
+              (fun x list ->
+                let x = applycase_surname x in
+                if x <> surname then x :: list else list)
+              list []
         | _ -> []
-      end
+        end
     | None -> []
   in
   let aliases =
@@ -1808,17 +2013,17 @@ let add_indi gen r =
   in
   let sex =
     match find_field "SEX" r.rsons with
-    | Some {rval = "M"; _} -> Male
-    | Some {rval = "F"; _} -> Female
+    | Some { rval = "M"; _ } -> Male
+    | Some { rval = "F"; _ } -> Female
     | _ -> Neuter
   in
   let image =
     match find_field "OBJE" r.rsons with
     | Some r ->
-      begin match find_field "FILE" r.rsons with
-          Some r -> if !no_picture then "" else r.rval
+        begin match find_field "FILE" r.rsons with
+        | Some r -> if !no_picture then "" else r.rval
         | None -> ""
-      end
+        end
     | None -> ""
   in
   let parents =
@@ -1831,7 +2036,8 @@ let add_indi gen r =
     let l =
       List.fold_right
         (fun r l -> if r.rsons = [] then strip_spaces r.rval :: l else l)
-        (find_all_fields "OCCU" r.rsons) []
+        (find_all_fields "OCCU" r.rsons)
+        []
     in
     String.concat ", " l
   in
@@ -1841,22 +2047,21 @@ let add_indi gen r =
     | rl -> treat_notes gen rl
   in
   let titles =
-    List.map (treat_indi_title gen public_name)
-      (find_all_fields "TITL" r.rsons)
+    List.map (treat_indi_title gen public_name) (find_all_fields "TITL" r.rsons)
   in
   let pevents = treat_indi_pevent gen ip r in
   let family =
     let rl = find_all_fields "FAMS" r.rsons in
     let rvl =
       List.fold_right
-        (fun r rvl -> if List.mem r.rval rvl then rvl else r.rval :: rvl) rl
-        []
+        (fun r rvl -> if List.mem r.rval rvl then rvl else r.rval :: rvl)
+        rl []
     in
     List.map (fun r -> fam_index gen r) rvl
   in
   let rasso = find_all_fields "ASSO" r.rsons in
   let rparents =
-    let godparents = find_all_rela ["godf"; "godm"; "godp"] rasso in
+    let godparents = find_all_rela [ "godf"; "godm"; "godp" ] rasso in
     let godparents =
       if godparents = [] then
         let ro =
@@ -1864,67 +2069,66 @@ let add_indi gen r =
           | None -> find_field "CHR" r.rsons
           | x -> x
         in
-        if ro <> None then find_all_rela ["godf"; "godm"; "godp"] rasso
+        if ro <> None then find_all_rela [ "godf"; "godm"; "godp" ] rasso
         else []
       else godparents
     in
     let rec loop rl =
       if rl <> [] then
-        let (r_fath, rl) =
+        let r_fath, rl =
           match rl with
-          | ("godf", r) :: rl -> Some (forward_godp gen ip r), rl
-          | _ -> None, rl
+          | ("godf", r) :: rl -> (Some (forward_godp gen ip r), rl)
+          | _ -> (None, rl)
         in
-        let (r_moth, rl) =
+        let r_moth, rl =
           match rl with
-          | ("godm", r) :: rl -> Some (forward_godp gen ip r), rl
-          | _ -> None, rl
+          | ("godm", r) :: rl -> (Some (forward_godp gen ip r), rl)
+          | _ -> (None, rl)
         in
-        let (r_fath, r_moth, rl) =
-          if r_fath <> None || r_moth <> None then r_fath, r_moth, rl
+        let r_fath, r_moth, rl =
+          if r_fath <> None || r_moth <> None then (r_fath, r_moth, rl)
           else
-            let (r_fath, rl) =
+            let r_fath, rl =
               match rl with
-              | ("godp", r) :: rl -> Some (forward_godp gen ip r), rl
-              | _ -> None, rl
+              | ("godp", r) :: rl -> (Some (forward_godp gen ip r), rl)
+              | _ -> (None, rl)
             in
-            r_fath, None, rl
+            (r_fath, None, rl)
         in
         let r =
-          {r_type = GodParent; r_fath = r_fath; r_moth = r_moth;
-           r_sources = string_empty}
+          { r_type = GodParent; r_fath; r_moth; r_sources = string_empty }
         in
         r :: loop rl
       else []
     in
     loop godparents
   in
-  let witn = find_all_rela ["witness"] rasso in
+  let witn = find_all_rela [ "witness" ] rasso in
   let () =
-    List.iter (fun (_, rval) -> (@@) ignore (forward_witn gen ip rval)) witn
+    List.iter (fun (_, rval) -> ignore @@ forward_witn gen ip rval) witn
   in
-  let (birth, birth_place, (birth_note, _), (birth_src, birth_nt)) =
+  let birth, birth_place, (birth_note, _), (birth_src, birth_nt) =
     match find_field "BIRT" r.rsons with
     | Some r ->
-      let d =
-        match find_field "DATE" r.rsons with
-        | Some r -> date_of_field r.rval
-        | _ -> None
-      in
-      let p =
-        match find_field "PLAC" r.rsons with
-        | Some r -> strip_spaces r.rval
-        | _ -> ""
-      in
-      let note =
-        match find_all_fields "NOTE" r.rsons with
-        | [] -> ""
-        | rl -> treat_notes gen rl
-      in
-      d, p, (note, []), source gen r
-    | None -> None, "", ("", []), ("", [])
+        let d =
+          match find_field "DATE" r.rsons with
+          | Some r -> date_of_field r.rval
+          | _ -> None
+        in
+        let p =
+          match find_field "PLAC" r.rsons with
+          | Some r -> strip_spaces r.rval
+          | _ -> ""
+        in
+        let note =
+          match find_all_fields "NOTE" r.rsons with
+          | [] -> ""
+          | rl -> treat_notes gen rl
+        in
+        (d, p, (note, []), source gen r)
+    | None -> (None, "", ("", []), ("", []))
   in
-  let (bapt, bapt_place, (bapt_note, _), (bapt_src, bapt_nt)) =
+  let bapt, bapt_place, (bapt_note, _), (bapt_src, bapt_nt) =
     let ro =
       match find_field "BAPM" r.rsons with
       | None -> find_field "CHR" r.rsons
@@ -1932,130 +2136,125 @@ let add_indi gen r =
     in
     match ro with
     | Some r ->
-      let d =
-        match find_field "DATE" r.rsons with
-          Some r -> date_of_field r.rval
-        | _ -> None
-      in
-      let p =
-        match find_field "PLAC" r.rsons with
-        | Some r -> strip_spaces r.rval
-        | _ -> ""
-      in
-      let note =
-        match find_all_fields "NOTE" r.rsons with
-        | [] -> ""
-        | rl -> treat_notes gen rl
-      in
-      d, p, (note, []), source gen r
-    | None -> None, "", ("", []), ("", [])
-  in
-  let (death, death_place, (death_note, _), (death_src, death_nt)) =
-    match find_field "DEAT" r.rsons with
-    | Some r ->
-      if r.rsons = [] then
-        if r.rval = "Y" then DeadDontKnowWhen, "", ("", []), ("", [])
-        else infer_death birth bapt, "", ("", []), ("", [])
-      else
         let d =
           match find_field "DATE" r.rsons with
-            Some r ->
-            begin match date_of_field r.rval with
-              | Some d -> Death (Unspecified, Date.cdate_of_date d)
-              | None -> DeadDontKnowWhen
-            end
-          | _ -> DeadDontKnowWhen
+          | Some r -> date_of_field r.rval
+          | _ -> None
         in
         let p =
           match find_field "PLAC" r.rsons with
           | Some r -> strip_spaces r.rval
-          | None -> ""
+          | _ -> ""
         in
         let note =
           match find_all_fields "NOTE" r.rsons with
           | [] -> ""
           | rl -> treat_notes gen rl
         in
-        d, p, (note, []), source gen r
-    | None -> infer_death birth bapt, "", ("", []), ("", [])
+        (d, p, (note, []), source gen r)
+    | None -> (None, "", ("", []), ("", []))
   in
-  let (burial, burial_place, (burial_note, _), (burial_src, burial_nt)) =
-    let (buri, buri_place, (buri_note, _), (buri_src, buri_nt)) =
-      match find_field "BURI" r.rsons with
-        Some r ->
+  let death, death_place, (death_note, _), (death_src, death_nt) =
+    match find_field "DEAT" r.rsons with
+    | Some r ->
         if r.rsons = [] then
-          if r.rval = "Y" then
-            Buried Date.cdate_None, "", ("", []), ("", [])
-          else UnknownBurial, "", ("", []), ("", [])
+          if r.rval = "Y" then (DeadDontKnowWhen, "", ("", []), ("", []))
+          else (infer_death birth bapt, "", ("", []), ("", []))
         else
           let d =
             match find_field "DATE" r.rsons with
-            | Some r -> date_of_field r.rval
-            | _ -> None
+            | Some r ->
+                begin match date_of_field r.rval with
+                | Some d -> Death (Unspecified, Date.cdate_of_date d)
+                | None -> DeadDontKnowWhen
+                end
+            | _ -> DeadDontKnowWhen
           in
           let p =
             match find_field "PLAC" r.rsons with
             | Some r -> strip_spaces r.rval
-            | _ -> ""
+            | None -> ""
           in
           let note =
             match find_all_fields "NOTE" r.rsons with
             | [] -> ""
             | rl -> treat_notes gen rl
           in
-          Buried (Date.cdate_of_od d), p, (note, []), source gen r
-      | None -> UnknownBurial, "", ("", []), ("", [])
-    in
-    let (crem, crem_place, (crem_note, _), (crem_src, crem_nt)) =
-      match find_field "CREM" r.rsons with
-        Some r ->
-        if r.rsons = [] then
-          if r.rval = "Y" then
-            Cremated Date.cdate_None, "", ("", []), ("", [])
-          else UnknownBurial, "", ("", []), ("", [])
-        else
-          let d =
-            match find_field "DATE" r.rsons with
-              Some r -> date_of_field r.rval
-            | _ -> None
-          in
-          let p =
-            match find_field "PLAC" r.rsons with
-              Some r -> strip_spaces r.rval
-            | _ -> ""
-          in
-          let note =
-            match find_all_fields "NOTE" r.rsons with
-              [] -> ""
-            | rl -> treat_notes gen rl
-          in
-          Cremated (Date.cdate_of_od d), p, (note, []), source gen r
-      | None -> UnknownBurial, "", ("", []), ("", [])
-    in
-    match buri, crem with
-      UnknownBurial, Cremated _ ->
-      crem, crem_place, (crem_note, []), (crem_src, crem_nt)
-    | _ -> buri, buri_place, (buri_note, []), (buri_src, buri_nt)
+          (d, p, (note, []), source gen r)
+    | None -> (infer_death birth bapt, "", ("", []), ("", []))
   in
-  let birth =Date.cdate_of_od birth in
-  let bapt =Date.cdate_of_od bapt in
-  let (psources, psources_nt) =
-    let (s, s_nt) = source gen r in
-    if s = "" then !default_source, s_nt else s, s_nt
+  let burial, burial_place, (burial_note, _), (burial_src, burial_nt) =
+    let buri, buri_place, (buri_note, _), (buri_src, buri_nt) =
+      match find_field "BURI" r.rsons with
+      | Some r ->
+          if r.rsons = [] then
+            if r.rval = "Y" then (Buried Date.cdate_None, "", ("", []), ("", []))
+            else (UnknownBurial, "", ("", []), ("", []))
+          else
+            let d =
+              match find_field "DATE" r.rsons with
+              | Some r -> date_of_field r.rval
+              | _ -> None
+            in
+            let p =
+              match find_field "PLAC" r.rsons with
+              | Some r -> strip_spaces r.rval
+              | _ -> ""
+            in
+            let note =
+              match find_all_fields "NOTE" r.rsons with
+              | [] -> ""
+              | rl -> treat_notes gen rl
+            in
+            (Buried (Date.cdate_of_od d), p, (note, []), source gen r)
+      | None -> (UnknownBurial, "", ("", []), ("", []))
+    in
+    let crem, crem_place, (crem_note, _), (crem_src, crem_nt) =
+      match find_field "CREM" r.rsons with
+      | Some r ->
+          if r.rsons = [] then
+            if r.rval = "Y" then
+              (Cremated Date.cdate_None, "", ("", []), ("", []))
+            else (UnknownBurial, "", ("", []), ("", []))
+          else
+            let d =
+              match find_field "DATE" r.rsons with
+              | Some r -> date_of_field r.rval
+              | _ -> None
+            in
+            let p =
+              match find_field "PLAC" r.rsons with
+              | Some r -> strip_spaces r.rval
+              | _ -> ""
+            in
+            let note =
+              match find_all_fields "NOTE" r.rsons with
+              | [] -> ""
+              | rl -> treat_notes gen rl
+            in
+            (Cremated (Date.cdate_of_od d), p, (note, []), source gen r)
+      | None -> (UnknownBurial, "", ("", []), ("", []))
+    in
+    match (buri, crem) with
+    | UnknownBurial, Cremated _ ->
+        (crem, crem_place, (crem_note, []), (crem_src, crem_nt))
+    | _ -> (buri, buri_place, (buri_note, []), (buri_src, buri_nt))
+  in
+  let birth = Date.cdate_of_od birth in
+  let bapt = Date.cdate_of_od bapt in
+  let psources, psources_nt =
+    let s, s_nt = source gen r in
+    if s = "" then (!default_source, s_nt) else (s, s_nt)
   in
   let ext_notes =
     let concat_text s1 s2 s_sep =
-      let s = if s1 = "" && notes = "" || s2 = "" then "" else s_sep in
+      let s = if (s1 = "" && notes = "") || s2 = "" then "" else s_sep in
       s1 ^ s ^ s2
     in
     let text = concat_text "" (notes_from_source_record birth_nt) "<br>\n" in
     let text = concat_text text (notes_from_source_record bapt_nt) "<br>\n" in
-    let text =
-      concat_text text (notes_from_source_record death_nt) "<br>\n"
-    in
-    let text =
-      concat_text text (notes_from_source_record burial_nt) "<br>\n"
-    in
+    let text = concat_text text (notes_from_source_record death_nt) "<br>\n" in
+    let text = concat_text text (notes_from_source_record burial_nt) "<br>\n" in
     let text =
       concat_text text (notes_from_source_record psources_nt) "<br>\n"
     in
@@ -2075,75 +2274,101 @@ let add_indi gen r =
     else text
   in
   (* Mise à jour des évènements principaux. *)
-  let (birth_place, birth_note, birth_src) =
-    add_string gen birth_place, add_string gen birth_note,
-    add_string gen birth_src
+  let birth_place, birth_note, birth_src =
+    ( add_string gen birth_place,
+      add_string gen birth_note,
+      add_string gen birth_src )
   in
-  let (bapt_place, bapt_note, bapt_src) =
-    add_string gen bapt_place, add_string gen bapt_note,
-    add_string gen bapt_src
+  let bapt_place, bapt_note, bapt_src =
+    ( add_string gen bapt_place,
+      add_string gen bapt_note,
+      add_string gen bapt_src )
   in
-  let (death_place, death_note, death_src) =
-    add_string gen death_place, add_string gen death_note,
-    add_string gen death_src
+  let death_place, death_note, death_src =
+    ( add_string gen death_place,
+      add_string gen death_note,
+      add_string gen death_src )
   in
-  let (burial_place, burial_note, burial_src) =
-    add_string gen burial_place, add_string gen burial_note,
-    add_string gen burial_src
+  let burial_place, burial_note, burial_src =
+    ( add_string gen burial_place,
+      add_string gen burial_note,
+      add_string gen burial_src )
   in
   (* On tri les évènements pour être sûr. *)
   let pevents =
-    Event.sort_events (fun evt -> Event.Pevent evt.epers_name)
-      (fun evt -> evt.epers_date) pevents
+    Event.sort_events
+      (fun evt -> Event.Pevent evt.epers_name)
+      (fun evt -> evt.epers_date)
+      pevents
   in
-  let (bi, bp, de, bu) =
+  let bi, bp, de, bu =
     reconstitute_from_pevents pevents
       (birth, birth_place, birth_note, birth_src)
       (bapt, bapt_place, bapt_note, bapt_src)
       (death, death_place, death_note, death_src)
       (burial, burial_place, burial_note, burial_src)
   in
-  let (birth, birth_place, birth_note, birth_src) = bi in
-  let (bapt, bapt_place, bapt_note, bapt_src) = bp in
-  let (death, death_place, death_note, death_src) = de in
-  let (burial, burial_place, burial_note, burial_src) = bu in
+  let birth, birth_place, birth_note, birth_src = bi in
+  let bapt, bapt_place, bapt_note, bapt_src = bp in
+  let death, death_place, death_note, death_src = de in
+  let burial, burial_place, burial_note, burial_src = bu in
   let person =
-    {first_name = add_string gen first_name;
-     surname = add_string gen surname; occ = occ;
-     public_name = add_string gen public_name; image = add_string gen image;
-     qualifiers =
-       if qualifier <> "" then [add_string gen qualifier] else [];
-     aliases = List.map (add_string gen) aliases;
-     first_names_aliases = List.map (add_string gen) first_names_aliases;
-     surnames_aliases = List.map (add_string gen) surname_aliases;
-     titles = titles; rparents = rparents; related = [];
-     occupation = add_string gen occupation; sex = sex;
-     access = if !no_public_if_titles && titles = [] then Private else IfTitles;
-     birth = birth; birth_place = birth_place; birth_note = birth_note;
-     birth_src = birth_src; baptism = bapt; baptism_place = bapt_place;
-     baptism_note = bapt_note; baptism_src = bapt_src; death = death;
-     death_place = death_place; death_note = death_note;
-     death_src = death_src; burial = burial; burial_place = burial_place;
-     burial_note = burial_note; burial_src = burial_src; pevents = pevents;
-     notes = add_string gen (notes ^ ext_notes);
-     psources = add_string gen psources; key_index = ip}
+    {
+      first_name = add_string gen first_name;
+      surname = add_string gen surname;
+      occ;
+      public_name = add_string gen public_name;
+      image = add_string gen image;
+      qualifiers =
+        (if qualifier <> "" then [ add_string gen qualifier ] else []);
+      aliases = List.map (add_string gen) aliases;
+      first_names_aliases = List.map (add_string gen) first_names_aliases;
+      surnames_aliases = List.map (add_string gen) surname_aliases;
+      titles;
+      rparents;
+      related = [];
+      occupation = add_string gen occupation;
+      sex;
+      access =
+        (if !no_public_if_titles && titles = [] then Private else IfTitles);
+      birth;
+      birth_place;
+      birth_note;
+      birth_src;
+      baptism = bapt;
+      baptism_place = bapt_place;
+      baptism_note = bapt_note;
+      baptism_src = bapt_src;
+      death;
+      death_place;
+      death_note;
+      death_src;
+      burial;
+      burial_place;
+      burial_note;
+      burial_src;
+      pevents;
+      notes = add_string gen (notes ^ ext_notes);
+      psources = add_string gen psources;
+      key_index = ip;
+    }
   in
-  let ascend = {parents = parents; consang = Adef.fix (-1)} in
-  let union = {family = Array.of_list family} in
+  let ascend = { parents; consang = Adef.fix (-1) } in
+  let union = { family = Array.of_list family } in
   gen.g_per.arr.(ip) <- Right3 (person, ascend, union);
   begin match find_field "ADOP" r.rsons with
-    | Some r ->
+  | Some r ->
       begin match find_field "FAMC" r.rsons with
-        | Some r -> forward_adop gen ip r.rval (find_field "ADOP" r.rsons)
-        | _ -> ()
+      | Some r -> forward_adop gen ip r.rval (find_field "ADOP" r.rsons)
+      | _ -> ()
       end
-    | _ -> ()
+  | _ -> ()
   end;
   r.rused <- true
 
 let find_fevent_name_from_tag gen tag tagv =
   match tag with
-    "MARR" -> Efam_Marriage
+  | "MARR" -> Efam_Marriage
   | "unmarried" -> Efam_NoMarriage
   | "nomen" -> Efam_NoMention
   | "ENGA" -> Efam_Engage
@@ -2158,51 +2383,135 @@ let find_fevent_name_from_tag gen tag tagv =
   | _ -> Efam_Name (add_string gen (strip_spaces tagv))
 
 let primary_fevents =
-  ["ANUL"; "DIV"; "ENGA"; "MARR"; "MARB"; "MARC"; "MARL"; "RESI"; "SEP"]
+  [ "ANUL"; "DIV"; "ENGA"; "MARR"; "MARB"; "MARC"; "MARL"; "RESI"; "SEP" ]
 
 (* Types d'évènement présents seulement dans les tags de niveau 2 (2 TYPE). *)
-let secondary_fevent_types =
-  [Efam_NoMarriage; Efam_NoMention; Efam_PACS]
+let secondary_fevent_types = [ Efam_NoMarriage; Efam_NoMention; Efam_PACS ]
 
 let treat_fam_fevent gen ifath r =
   let check_place_unmarried efam_name place r =
     match find_all_fields "PLAC" r.rsons with
-      r :: rl ->
+    | r :: rl ->
         if String.uncapitalize_ascii r.rval = "unmarried" then
-          Efam_NoMarriage, ""
+          (Efam_NoMarriage, "")
         else
           let place = strip_spaces r.rval in
-          let rec loop =
-            function
-              r :: rl ->
+          let rec loop = function
+            | r :: rl ->
                 if String.uncapitalize_ascii r.rval = "unmarried" then
-                  Efam_NoMarriage, place
+                  (Efam_NoMarriage, place)
                 else loop rl
-            | [] -> efam_name, place
+            | [] -> (efam_name, place)
           in
           loop rl
-    | [] -> efam_name, place
+    | [] -> (efam_name, place)
   in
   let prim_events =
     List.fold_left
       (fun events tag ->
-         List.fold_left
-           (fun events r ->
-              let name = find_fevent_name_from_tag gen tag tag in
+        List.fold_left
+          (fun events r ->
+            let name = find_fevent_name_from_tag gen tag tag in
+            let date =
+              match find_field "DATE" r.rsons with
+              | Some r -> date_of_field r.rval
+              | None -> None
+            in
+            let place =
+              match find_field "PLAC" r.rsons with
+              | Some r -> strip_spaces r.rval
+              | _ -> ""
+            in
+            let reason = "" in
+            let note =
+              match find_all_fields "NOTE" r.rsons with
+              | [] -> ""
+              | rl -> treat_notes gen rl
+            in
+            (* Si le tag 1 XXX a des infos, on les ajoutes. *)
+            let note =
+              let name_info = strip_spaces r.rval in
+              if name_info = "" || r.rval = "Y" then note
+              else name_info ^ "<br>\n" ^ note
+            in
+            let src =
+              match find_all_fields "SOUR" r.rsons with
+              | [] -> ""
+              | rl ->
+                  let rec loop first src rl =
+                    match rl with
+                    | [] -> src
+                    | r :: rl ->
+                        let src_cont, _ = treat_source gen r in
+                        let src =
+                          if first then src ^ src_cont else src ^ " " ^ src_cont
+                        in
+                        loop false src rl
+                  in
+                  loop true "" rl
+            in
+            let witnesses = find_fevent_witness gen "INDI" ifath r in
+            (* Vérification du mariage. *)
+            let name, place =
+              match name with
+              | Efam_Marriage ->
+                  begin match find_field "TYPE" r.rsons with
+                  | Some r ->
+                      if String.uncapitalize_ascii r.rval = "unmarried" then
+                        (Efam_NoMarriage, place)
+                      else check_place_unmarried name place r
+                  | None -> check_place_unmarried name place r
+                  end
+              | _ -> (name, place)
+            in
+            let evt =
+              {
+                efam_name = name;
+                efam_date = Date.cdate_of_od date;
+                efam_place = add_string gen place;
+                efam_reason = add_string gen reason;
+                efam_note = add_string gen note;
+                efam_src = add_string gen src;
+                efam_witnesses = witnesses;
+              }
+            in
+            (* On ajoute toujours les évènements principaux liés à la   *)
+            (* famille, sinon, on peut avoir un problème si on supprime *)
+            (* l'évènement, celui ci sera remplacé par la relation par  *)
+            (* défaut.                                                  *)
+            evt :: events)
+          events
+          (find_all_fields tag r.rsons))
+      [] primary_fevents
+  in
+  let second_events =
+    List.fold_left
+      (fun events r ->
+        match find_field "TYPE" r.rsons with
+        | Some rr ->
+            if rr.rval <> "" then
+              let name =
+                if List.mem rr.rval primary_fevents then
+                  find_fevent_name_from_tag gen rr.rval rr.rval
+                else
+                  find_fevent_name_from_tag gen
+                    (String.lowercase_ascii rr.rval)
+                    rr.rval
+              in
               let date =
                 match find_field "DATE" r.rsons with
-                  Some r -> date_of_field r.rval
+                | Some r -> date_of_field r.rval
                 | None -> None
               in
               let place =
                 match find_field "PLAC" r.rsons with
-                  Some r -> strip_spaces r.rval
+                | Some r -> strip_spaces r.rval
                 | _ -> ""
               in
               let reason = "" in
               let note =
                 match find_all_fields "NOTE" r.rsons with
-                  [] -> ""
+                | [] -> ""
                 | rl -> treat_notes gen rl
               in
               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
@@ -2213,13 +2522,13 @@ let treat_fam_fevent gen ifath r =
               in
               let src =
                 match find_all_fields "SOUR" r.rsons with
-                  [] -> ""
+                | [] -> ""
                 | rl ->
                     let rec loop first src rl =
                       match rl with
-                        [] -> src
+                      | [] -> src
                       | r :: rl ->
-                          let (src_cont, _) = treat_source gen r in
+                          let src_cont, _ = treat_source gen r in
                           let src =
                             if first then src ^ src_cont
                             else src ^ " " ^ src_cont
@@ -2229,111 +2538,33 @@ let treat_fam_fevent gen ifath r =
                     loop true "" rl
               in
               let witnesses = find_fevent_witness gen "INDI" ifath r in
-              (* Vérification du mariage. *)
-              let (name, place) =
-                match name with
-                  Efam_Marriage ->
-                    begin match find_field "TYPE" r.rsons with
-                      Some r ->
-                        if String.uncapitalize_ascii r.rval = "unmarried" then
-                          Efam_NoMarriage, place
-                        else check_place_unmarried name place r
-                    | None -> check_place_unmarried name place r
-                    end
-                | _ -> name, place
-              in
               let evt =
-                {efam_name = name; efam_date = Date.cdate_of_od date;
-                 efam_place = add_string gen place;
-                 efam_reason = add_string gen reason;
-                 efam_note = add_string gen note;
-                 efam_src = add_string gen src; efam_witnesses = witnesses}
-              in
-              (* On ajoute toujours les évènements principaux liés à la   *)
-              (* famille, sinon, on peut avoir un problème si on supprime *)
-              (* l'évènement, celui ci sera remplacé par la relation par  *)
-              (* défaut.                                                  *)
-              evt :: events)
-           events (find_all_fields tag r.rsons))
-      [] primary_fevents
-  in
-  let second_events =
-    List.fold_left
-      (fun events r ->
-         match find_field "TYPE" r.rsons with
-           Some rr ->
-             if rr.rval <> "" then
-               let name =
-                 if List.mem rr.rval primary_fevents then
-                   find_fevent_name_from_tag gen rr.rval rr.rval
-                 else
-                   find_fevent_name_from_tag gen
-                     (String.lowercase_ascii rr.rval) rr.rval
-               in
-               let date =
-                 match find_field "DATE" r.rsons with
-                   Some r -> date_of_field r.rval
-                 | None -> None
-               in
-               let place =
-                 match find_field "PLAC" r.rsons with
-                   Some r -> strip_spaces r.rval
-                 | _ -> ""
-               in
-               let reason = "" in
-               let note =
-                 match find_all_fields "NOTE" r.rsons with
-                   [] -> ""
-                 | rl -> treat_notes gen rl
-               in
-               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
-               let note =
-                 let name_info = strip_spaces r.rval in
-                 if name_info = "" || r.rval = "Y" then note
-                 else name_info ^ "<br>\n" ^ note
-               in
-               let src =
-                 match find_all_fields "SOUR" r.rsons with
-                   [] -> ""
-                 | rl ->
-                     let rec loop first src rl =
-                       match rl with
-                         [] -> src
-                       | r :: rl ->
-                           let (src_cont, _) = treat_source gen r in
-                           let src =
-                             if first then src ^ src_cont
-                             else src ^ " " ^ src_cont
-                           in
-                           loop false src rl
-                     in
-                     loop true "" rl
-               in
-               let witnesses = find_fevent_witness gen "INDI" ifath r in
-               let evt =
-                 {efam_name = name; efam_date = Date.cdate_of_od date;
+                {
+                  efam_name = name;
+                  efam_date = Date.cdate_of_od date;
                   efam_place = add_string gen place;
                   efam_reason = add_string gen reason;
                   efam_note = add_string gen note;
-                  efam_src = add_string gen src; efam_witnesses = witnesses}
-               in
-               (* On n'ajoute que les évènements non vides,        *)
-               (* sauf si évènement personnalisé et les évènements *)
-               (* des tags de niveau 2 (qui peuvent être vides).   *)
-               let has_efam_name =
-                 match name with
-                   Efam_Name n -> n <> string_empty
-                 | _ -> false
-               in
-               if has_efam_name || date <> None || place <> "" ||
-                  note <> "" || src <> "" || witnesses <> [| |] ||
-                  List.mem name secondary_fevent_types
-               then
-                 evt :: events
-               else events
-             else events
-         | None -> events)
-      [] (find_all_fields "EVEN" r.rsons)
+                  efam_src = add_string gen src;
+                  efam_witnesses = witnesses;
+                }
+              in
+              (* On n'ajoute que les évènements non vides,        *)
+              (* sauf si évènement personnalisé et les évènements *)
+              (* des tags de niveau 2 (qui peuvent être vides).   *)
+              let has_efam_name =
+                match name with Efam_Name n -> n <> string_empty | _ -> false
+              in
+              if
+                has_efam_name || date <> None || place <> "" || note <> ""
+                || src <> "" || witnesses <> [||]
+                || List.mem name secondary_fevent_types
+              then evt :: events
+              else events
+            else events
+        | None -> events)
+      []
+      (find_all_fields "EVEN" r.rsons)
   in
   List.rev_append prim_events second_events
 
@@ -2345,25 +2576,33 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
   (* qui soit mis dans les évènements principaux.           *)
   let rec loop fevents marr witn div =
     match fevents with
-      [] -> marr, witn, div
-    | evt :: l ->
+    | [] -> (marr, witn, div)
+    | evt :: l -> (
         match evt.efam_name with
-          Efam_Engage ->
+        | Efam_Engage ->
             if !found_marriage then loop l marr witn div
             else
               let witn = Array.map fst evt.efam_witnesses in
               let marr =
-                Engaged, evt.efam_date, evt.efam_place, evt.efam_note,
-                evt.efam_src
+                ( Engaged,
+                  evt.efam_date,
+                  evt.efam_place,
+                  evt.efam_note,
+                  evt.efam_src )
               in
-              let () = found_marriage := true in loop l marr witn div
+              let () = found_marriage := true in
+              loop l marr witn div
         | Efam_Marriage ->
             let witn = Array.map fst evt.efam_witnesses in
             let marr =
-              Married, evt.efam_date, evt.efam_place, evt.efam_note,
-              evt.efam_src
+              ( Married,
+                evt.efam_date,
+                evt.efam_place,
+                evt.efam_note,
+                evt.efam_src )
             in
-            let () = found_marriage := true in marr, witn, div
+            let () = found_marriage := true in
+            (marr, witn, div)
         | Efam_MarriageContract ->
             if !found_marriage then loop l marr witn div
             else
@@ -2373,95 +2612,107 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
               let date =
                 match Date.od_of_cdate evt.efam_date with
                 | Some (Dgreg (dmy, cal)) ->
-                    let dmy = {dmy with prec = About} in
+                    let dmy = { dmy with prec = About } in
                     Date.cdate_of_od (Some (Dgreg (dmy, cal)))
                 | _ -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on ne met pas de lieu.            *)
               let place = add_string gen "" in
-              let marr = Married, date, place, evt.efam_note, evt.efam_src in
-              let () = found_marriage := true in loop l marr witn div
-        | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense |
-          Efam_Annulation | Efam_PACS ->
+              let marr = (Married, date, place, evt.efam_note, evt.efam_src) in
+              let () = found_marriage := true in
+              loop l marr witn div
+        | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense
+        | Efam_Annulation | Efam_PACS ->
             if !found_marriage then loop l marr witn div
             else
               let witn = Array.map fst evt.efam_witnesses in
               let marr =
-                NoMention, evt.efam_date, evt.efam_place, evt.efam_note,
-                evt.efam_src
+                ( NoMention,
+                  evt.efam_date,
+                  evt.efam_place,
+                  evt.efam_note,
+                  evt.efam_src )
               in
-              let () = found_marriage := true in loop l marr witn div
+              let () = found_marriage := true in
+              loop l marr witn div
         | Efam_NoMarriage ->
             if !found_marriage then loop l marr witn div
             else
               let witn = Array.map fst evt.efam_witnesses in
               let marr =
-                NotMarried, evt.efam_date, evt.efam_place, evt.efam_note,
-                evt.efam_src
+                ( NotMarried,
+                  evt.efam_date,
+                  evt.efam_place,
+                  evt.efam_note,
+                  evt.efam_src )
               in
-              let () = found_marriage := true in loop l marr witn div
+              let () = found_marriage := true in
+              loop l marr witn div
         | Efam_Divorce ->
             if !found_divorce then loop l marr witn div
             else
               let div = Divorced evt.efam_date in
-              let () = found_divorce := true in loop l marr witn div
+              let () = found_divorce := true in
+              loop l marr witn div
         | Efam_Separated ->
             if !found_separation then loop l marr witn div
             else
               let div = Separated evt.efam_date in
-              let () = found_separation := true in loop l marr witn div
-        | _ -> loop l marr witn div
+              let () = found_separation := true in
+              loop l marr witn div
+        | _ -> loop l marr witn div)
   in
-  let (marr, witn, div) = loop (List.rev fevents) marr witn div in
+  let marr, witn, div = loop (List.rev fevents) marr witn div in
   (* Parents de même sexe. *)
   if gay then
-    let (relation, date, place, note, src) = marr in
+    let relation, date, place, note, src = marr in
     let relation =
       match relation with
-        Married | NoSexesCheckMarried -> NoSexesCheckMarried
+      | Married | NoSexesCheckMarried -> NoSexesCheckMarried
       | _ -> NoSexesCheckNotMarried
     in
-    let marr = relation, date, place, note, src in marr, witn, div
-  else marr, witn, div
+    let marr = (relation, date, place, note, src) in
+    (marr, witn, div)
+  else (marr, witn, div)
 
 let add_fam_norm gen r adop_list =
   let i = fam_index gen r.rval in
-  let (fath, moth, gay) =
-    match find_all_fields "HUSB" r.rsons, find_all_fields "WIFE" r.rsons with
-    | [f1], [m1] -> per_index gen f1.rval, per_index gen m1.rval, false
-    | [f1; f2], [] -> per_index gen f1.rval, per_index gen f2.rval, true
-    | [], [m1; m2] -> per_index gen m1.rval, per_index gen m2.rval, true
+  let fath, moth, gay =
+    match (find_all_fields "HUSB" r.rsons, find_all_fields "WIFE" r.rsons) with
+    | [ f1 ], [ m1 ] -> (per_index gen f1.rval, per_index gen m1.rval, false)
+    | [ f1; f2 ], [] -> (per_index gen f1.rval, per_index gen f2.rval, true)
+    | [], [ m1; m2 ] -> (per_index gen m1.rval, per_index gen m2.rval, true)
     | _ ->
-      let fath =
-        match find_field "HUSB" r.rsons with
-          Some r -> per_index gen r.rval
-        | None -> phony_per gen Male
-      in
-      let moth =
-        match find_field "WIFE" r.rsons with
-          Some r -> per_index gen r.rval
-        | None -> phony_per gen Female
-      in
-      fath, moth, false
+        let fath =
+          match find_field "HUSB" r.rsons with
+          | Some r -> per_index gen r.rval
+          | None -> phony_per gen Male
+        in
+        let moth =
+          match find_field "WIFE" r.rsons with
+          | Some r -> per_index gen r.rval
+          | None -> phony_per gen Female
+        in
+        (fath, moth, false)
   in
   begin match gen.g_per.arr.(fath) with
-    | Left3 _ -> ()
-    | Right3 (p, a, u) ->
+  | Left3 _ -> ()
+  | Right3 (p, a, u) ->
       let u =
-        if not (Array.mem i u.family)
-        then { family = Array.append u.family [| i |] }
+        if not (Array.mem i u.family) then
+          { family = Array.append u.family [| i |] }
         else u
       in
       let p = if p.sex = Neuter then { p with sex = Male } else p in
       gen.g_per.arr.(fath) <- Right3 (p, a, u)
-  end ;
+  end;
   begin match gen.g_per.arr.(moth) with
-    | Left3 _ -> ()
-    | Right3 (p, a, u) ->
+  | Left3 _ -> ()
+  | Right3 (p, a, u) ->
       let u =
-        if not (Array.mem i u.family)
-        then { family = Array.append u.family [| i |] }
+        if not (Array.mem i u.family) then
+          { family = Array.append u.family [| i |] }
         else u
       in
       let p = if p.sex = Neuter then { p with sex = Female } else p in
@@ -2469,115 +2720,121 @@ let add_fam_norm gen r adop_list =
   end;
   let children =
     let rl = find_all_fields "CHIL" r.rsons in
-    List.fold_right begin fun r ipl ->
-      let ip = per_index gen r.rval in
-      if List.mem_assoc ip adop_list then
-        match gen.g_per.arr.(ip) with
-        | Right3 (p, a, u) ->
-          begin
-            match a.parents with
-            | Some ifam when ifam = i ->
-              let a = { a with parents = None } in
-              gen.g_per.arr.(ip) <- Right3 (p, a, u) ;
-              ipl
-            | _ -> ip :: ipl
-          end
-        | _ -> ip :: ipl
-      else ip :: ipl
-    end rl []
+    List.fold_right
+      begin fun r ipl ->
+        let ip = per_index gen r.rval in
+        if List.mem_assoc ip adop_list then
+          match gen.g_per.arr.(ip) with
+          | Right3 (p, a, u) ->
+              begin match a.parents with
+              | Some ifam when ifam = i ->
+                  let a = { a with parents = None } in
+                  gen.g_per.arr.(ip) <- Right3 (p, a, u);
+                  ipl
+              | _ -> ip :: ipl
+              end
+          | _ -> ip :: ipl
+        else ip :: ipl
+      end
+      rl []
   in
-  let (relation, marr, marr_place, (marr_note, _), (marr_src, marr_nt), witnesses) =
-    let (relation, sons) =
+  let relation, marr, marr_place, (marr_note, _), (marr_src, marr_nt), witnesses
+      =
+    let relation, sons =
       match find_field "MARR" r.rsons with
-      | Some r -> if gay then NoSexesCheckMarried, Some r else Married, Some r
-      | None ->
-        match find_field "ENGA" r.rsons with
-        | Some r -> Engaged, Some r
-        | None -> !relation_status, None
+      | Some r ->
+          if gay then (NoSexesCheckMarried, Some r) else (Married, Some r)
+      | None -> (
+          match find_field "ENGA" r.rsons with
+          | Some r -> (Engaged, Some r)
+          | None -> (!relation_status, None))
     in
     match sons with
-      Some r ->
-      let (u, p) =
-        match find_all_fields "PLAC" r.rsons with
-          r :: rl ->
-          if String.uncapitalize_ascii r.rval = "unmarried" then
-            NotMarried, ""
-          else
-            let p = strip_spaces r.rval in
-            let rec loop =
-              function
-                r :: rl ->
-                if String.uncapitalize_ascii r.rval = "unmarried" then
-                  NotMarried, p
-                else loop rl
-              | [] -> relation, p
-            in
-            loop rl
-        | [] -> relation, ""
-      in
-      let u =
-        match find_field "TYPE" r.rsons with
-          Some r ->
-          if String.uncapitalize_ascii r.rval = "gay" then
-            NoSexesCheckNotMarried
-          else u
-        | None -> u
-      in
-      let d =
-        match find_field "DATE" r.rsons with
-          Some r -> date_of_field r.rval
-        | _ -> None
-      in
-      let rec heredis_witnesses =
-        function
-          [] -> []
-        | r :: asso_l ->
-          if find_field_with_value "RELA" "Witness" r.rsons &&
-             find_field_with_value "TYPE" "INDI" r.rsons
-          then
-            let witness = per_index gen r.rval in
-            witness :: heredis_witnesses asso_l
-          else begin r.rused <- false; heredis_witnesses asso_l end
-      in
-      let witnesses =
-        match find_all_fields "ASSO" r.rsons with
-          [] -> []
-        | wl -> heredis_witnesses wl
-      in
-      let note =
-        match find_all_fields "NOTE" r.rsons with
-          [] -> ""
-        | rl -> treat_notes gen rl
-      in
-      u, d, p, (note, []), source gen r, witnesses
-    | None -> relation, None, "", ("", []), ("", []), []
+    | Some r ->
+        let u, p =
+          match find_all_fields "PLAC" r.rsons with
+          | r :: rl ->
+              if String.uncapitalize_ascii r.rval = "unmarried" then
+                (NotMarried, "")
+              else
+                let p = strip_spaces r.rval in
+                let rec loop = function
+                  | r :: rl ->
+                      if String.uncapitalize_ascii r.rval = "unmarried" then
+                        (NotMarried, p)
+                      else loop rl
+                  | [] -> (relation, p)
+                in
+                loop rl
+          | [] -> (relation, "")
+        in
+        let u =
+          match find_field "TYPE" r.rsons with
+          | Some r ->
+              if String.uncapitalize_ascii r.rval = "gay" then
+                NoSexesCheckNotMarried
+              else u
+          | None -> u
+        in
+        let d =
+          match find_field "DATE" r.rsons with
+          | Some r -> date_of_field r.rval
+          | _ -> None
+        in
+        let rec heredis_witnesses = function
+          | [] -> []
+          | r :: asso_l ->
+              if
+                find_field_with_value "RELA" "Witness" r.rsons
+                && find_field_with_value "TYPE" "INDI" r.rsons
+              then
+                let witness = per_index gen r.rval in
+                witness :: heredis_witnesses asso_l
+              else begin
+                r.rused <- false;
+                heredis_witnesses asso_l
+              end
+        in
+        let witnesses =
+          match find_all_fields "ASSO" r.rsons with
+          | [] -> []
+          | wl -> heredis_witnesses wl
+        in
+        let note =
+          match find_all_fields "NOTE" r.rsons with
+          | [] -> ""
+          | rl -> treat_notes gen rl
+        in
+        (u, d, p, (note, []), source gen r, witnesses)
+    | None -> (relation, None, "", ("", []), ("", []), [])
   in
   let witnesses = Array.of_list witnesses in
   let div =
     match find_field "DIV" r.rsons with
-      Some r ->
-      begin match find_field "DATE" r.rsons with
-          Some d -> Divorced (Date.cdate_of_od (date_of_field d.rval))
-        | _ ->
-          match find_field "PLAC" r.rsons with
-            Some _ -> Divorced Date.cdate_None
-          | _ ->
-            if r.rval = "Y" then Divorced Date.cdate_None else NotDivorced
-      end
+    | Some r ->
+        begin match find_field "DATE" r.rsons with
+        | Some d -> Divorced (Date.cdate_of_od (date_of_field d.rval))
+        | _ -> (
+            match find_field "PLAC" r.rsons with
+            | Some _ -> Divorced Date.cdate_None
+            | _ ->
+                if r.rval = "Y" then Divorced Date.cdate_None else NotDivorced)
+        end
     | None -> NotDivorced
   in
   let fevents = treat_fam_fevent gen fath r in
   let comment =
     match find_all_fields "NOTE" r.rsons with
-      [] -> ""
+    | [] -> ""
     | rl -> treat_notes gen rl
   in
-  let (fsources, fsources_nt) =
-    let (s, s_nt) = source gen r in
-    if s = "" then !default_source, s_nt else s, s_nt
+  let fsources, fsources_nt =
+    let s, s_nt = source gen r in
+    if s = "" then (!default_source, s_nt) else (s, s_nt)
   in
   let concat_text s1 s2 s_sep =
-    let s = if s1 = "" then "" else s_sep in s1 ^ s ^ s2
+    let s = if s1 = "" then "" else s_sep in
+    s1 ^ s ^ s2
   in
   let ext_sources =
     let text = concat_text "" (notes_from_source_record marr_nt) "<br>\n" in
@@ -2600,125 +2857,148 @@ let add_fam_norm gen r adop_list =
     match gen.g_per.arr.(iper) with
     | Left3 _ -> ()
     | Right3 (p, a, u) ->
-      let notes = gen.g_str.arr.(p.notes) in
-      let notes =
-        if notes = "" then ext_sources ^ ext_notes
-        else if ext_sources = "" then notes ^ "\n" ^ ext_notes
-        else notes ^ "<br>\n" ^ ext_sources ^ ext_notes
-      in
-      let new_notes = add_string gen notes in
-      let p = { p with notes = new_notes } in
-      gen.g_per.arr.(iper) <- Right3 (p, a, u)
+        let notes = gen.g_str.arr.(p.notes) in
+        let notes =
+          if notes = "" then ext_sources ^ ext_notes
+          else if ext_sources = "" then notes ^ "\n" ^ ext_notes
+          else notes ^ "<br>\n" ^ ext_sources ^ ext_notes
+        in
+        let new_notes = add_string gen notes in
+        let p = { p with notes = new_notes } in
+        gen.g_per.arr.(iper) <- Right3 (p, a, u)
   in
   let _ =
     if ext_notes = "" then ()
-    else begin add_in_person_notes fath; add_in_person_notes moth end
+    else begin
+      add_in_person_notes fath;
+      add_in_person_notes moth
+    end
   in
   (* Mise à jour des évènements principaux. *)
-  let (marr, marr_place, marr_note, marr_src) =
-    Date.cdate_of_od marr, add_string gen marr_place,
-    add_string gen marr_note, add_string gen marr_src
+  let marr, marr_place, marr_note, marr_src =
+    ( Date.cdate_of_od marr,
+      add_string gen marr_place,
+      add_string gen marr_note,
+      add_string gen marr_src )
   in
   (* On tri les évènements pour être sûr. *)
   let fevents =
-    Event.sort_events (fun evt -> Event.Fevent evt.efam_name)
-      (fun evt -> evt.efam_date) fevents
+    Event.sort_events
+      (fun evt -> Event.Fevent evt.efam_name)
+      (fun evt -> evt.efam_date)
+      fevents
   in
-  let (marr, witn, div) =
+  let marr, witn, div =
     reconstitute_from_fevents gen gay fevents
-      (relation, marr, marr_place, marr_note, marr_src) witnesses div
+      (relation, marr, marr_place, marr_note, marr_src)
+      witnesses div
   in
-  let (relation, marr, marr_place, marr_note, marr_src) = marr in
+  let relation, marr, marr_place, marr_note, marr_src = marr in
   let witnesses = witn in
   let div = div in
   let fam =
-    {marriage = marr; marriage_place = marr_place;
-     marriage_note = marr_note; marriage_src = marr_src;
-     witnesses = witnesses; relation = relation; divorce = div;
-     fevents = fevents; comment = add_string gen comment;
-     origin_file = string_empty; fsources = add_string gen fsources;
-     fam_index = i}
+    {
+      marriage = marr;
+      marriage_place = marr_place;
+      marriage_note = marr_note;
+      marriage_src = marr_src;
+      witnesses;
+      relation;
+      divorce = div;
+      fevents;
+      comment = add_string gen comment;
+      origin_file = string_empty;
+      fsources = add_string gen fsources;
+      fam_index = i;
+    }
   and cpl = Adef.couple fath moth
-  and des = {children = Array.of_list children} in
+  and des = { children = Array.of_list children } in
   gen.g_fam.arr.(i) <- Right3 (fam, cpl, des)
 
 let add_fam gen r =
   let list = Hashtbl.find_all gen.g_adop r.rval in
   match list with
-    [] -> add_fam_norm gen r []
-  | list ->
+  | [] -> add_fam_norm gen r []
+  | list -> (
       let husb = find_field "HUSB" r.rsons in
       let wife = find_field "WIFE" r.rsons in
       List.iter
         (fun (ip, which_parent) -> set_adop_fam gen ip which_parent husb wife)
         list;
       match find_field "CHIL" r.rsons with
-        Some _ -> add_fam_norm gen r list
-      | _ -> ()
+      | Some _ -> add_fam_norm gen r list
+      | _ -> ())
 
 let treat_header2 r =
   begin match !charset_option with
-    Some v -> charset := v
-  | None ->
+  | Some v -> charset := v
+  | None -> (
       match find_field "CHAR" r.rsons with
-        Some r ->
+      | Some r ->
           begin match r.rval with
-            "ANSEL" -> charset := Ansel
+          | "ANSEL" -> charset := Ansel
           | "ASCII" | "IBMPC" -> charset := Ascii
           | "MACINTOSH" -> charset := MacIntosh
           | "UTF-8" -> charset := Utf8
           | _ -> charset := Ascii
           end
-      | None -> ()
+      | None -> ())
   end;
   match find_field "PLAC" r.rsons with
-    Some rr ->
+  | Some rr ->
       begin match find_field "FORM" rr.rsons with
-        Some rrr -> if rrr.rval <> "" then ()
+      | Some rrr -> if rrr.rval <> "" then ()
       | None -> ()
       end
   | None -> ()
 
 let treat_header3 gen r =
   match find_all_fields "NOTE" r.rsons with
-    [] -> ()
+  | [] -> ()
   | rl -> gen.g_bnot <- treat_notes gen rl
 
 let turn_around_genealogos_bug r =
   if String.length r.rlab > 0 && r.rlab.[0] = '@' then
-    {r with rlab = r.rval; rval = r.rlab}
+    { r with rlab = r.rval; rval = r.rlab }
   else r
 
 let make_gen2 gen r =
   let r = turn_around_genealogos_bug r in
   match r.rlab with
-    "HEAD" -> treat_header2 r
+  | "HEAD" -> treat_header2 r
   | "INDI" -> add_indi gen r
   | _ -> ()
 
 let make_gen3 gen r =
   let r = turn_around_genealogos_bug r in
   match r.rlab with
-    "HEAD" -> treat_header3 gen r
+  | "HEAD" -> treat_header3 gen r
   | "SUBM" -> ()
   | "INDI" -> ()
   | "FAM" -> add_fam gen r
   | "NOTE" -> ()
   | "SOUR" -> ()
-  | "TRLR" -> Printf.eprintf "*** Trailer ok\n"; flush stderr
-  | s -> Printf.fprintf !log_oc "Not implemented typ = %s\n" s; flush !log_oc
+  | "TRLR" ->
+      Printf.eprintf "*** Trailer ok\n";
+      flush stderr
+  | s ->
+      Printf.fprintf !log_oc "Not implemented typ = %s\n" s;
+      flush !log_oc
 
 let sortable_by_date proj =
-  Array.for_all begin fun e -> proj e <> None end
+  Array.for_all begin fun e ->
+      proj e <> None
+    end
 
 let sort_by_date proj array =
-  if sortable_by_date proj array
-  then
-    Array.stable_sort begin fun e1 e2 ->
-      match proj e1, proj e2 with
-      | Some d1, Some d2 -> Date.compare_date d1 d2
-      | _ -> 1
-    end array
+  if sortable_by_date proj array then
+    Array.stable_sort
+      begin fun e1 e2 ->
+        match (proj e1, proj e2) with
+        | Some d1, Some d2 -> Date.compare_date d1 d2
+        | _ -> 1
+      end
+      array
 
 let find_lev0 (strm__ : _ Stream.t) =
   let bp = Stream.count strm__ in
@@ -2735,26 +3015,24 @@ let find_lev0 (strm__ : _ Stream.t) =
   let _ =
     try skip_to_eoln strm__ with Stream.Failure -> raise (Stream.Error "")
   in
-  bp, r1, r2
+  (bp, r1, r2)
 
 let open_in_bin_with_bom_check fname =
   let ic = open_in_bin fname in
   (match Bom.check ic with
-   | Bom.Utf8 -> charset_option := Some Utf8
-   | bom when Bom.is_unsupported bom ->
-       close_in ic;
-       let base = Filename.remove_extension fname in
-       let ext = Filename.extension fname in
-       Printf.fprintf !log_oc
-         "Error: %s encoding detected, not supported\n"
-         (Bom.to_string bom);
-       Printf.fprintf !log_oc
-         "Convert to UTF-8 first:\n\
-          iconv -f %s -t UTF-8 %s > %s_UTF8%s\n"
-         (Bom.to_string bom) fname base ext;
-       flush !log_oc;
-       exit 2
-   | _ -> ());
+  | Bom.Utf8 -> charset_option := Some Utf8
+  | bom when Bom.is_unsupported bom ->
+      close_in ic;
+      let base = Filename.remove_extension fname in
+      let ext = Filename.extension fname in
+      Printf.fprintf !log_oc "Error: %s encoding detected, not supported\n"
+        (Bom.to_string bom);
+      Printf.fprintf !log_oc
+        "Convert to UTF-8 first:\niconv -f %s -t UTF-8 %s > %s_UTF8%s\n"
+        (Bom.to_string bom) fname base ext;
+      flush !log_oc;
+      exit 2
+  | _ -> ());
   ic
 
 let pass1 gen fname =
@@ -2762,108 +3040,126 @@ let pass1 gen fname =
   let strm = Stream.of_channel ic in
   let rec loop () =
     match try Some (find_lev0 strm) with Stream.Failure -> None with
-      Some (bp, r1, r2) ->
+    | Some (bp, r1, r2) ->
         begin match r2 with
-          "NOTE" -> Hashtbl.add gen.g_not r1 bp
+        | "NOTE" -> Hashtbl.add gen.g_not r1 bp
         | "SOUR" -> Hashtbl.add gen.g_src r1 bp
         | _ -> ()
         end;
         loop ()
-    | None ->
+    | None -> (
         let (strm__ : _ Stream.t) = strm in
         match Stream.peek strm__ with
-          Some _ -> Stream.junk strm__; skip_to_eoln strm; loop ()
-        | _ -> ()
+        | Some _ ->
+            Stream.junk strm__;
+            skip_to_eoln strm;
+            loop ()
+        | _ -> ())
   in
-  loop (); close_in ic
+  loop ();
+  close_in ic
 
 let fill_g_per gen list =
-  List.iter begin fun (ipp, ip) ->
-    match gen.g_per.arr.(ipp) with
-    | Right3 (p, a, u) when not @@ List.mem ip p.related ->
-      let p = { p with related = ip :: p.related } in
-      gen.g_per.arr.(ipp) <- Right3 (p, a, u)
-    | _ -> ()
-  end list
+  List.iter
+    begin fun (ipp, ip) ->
+      match gen.g_per.arr.(ipp) with
+      | Right3 (p, a, u) when not @@ List.mem ip p.related ->
+          let p = { p with related = ip :: p.related } in
+          gen.g_per.arr.(ipp) <- Right3 (p, a, u)
+      | _ -> ()
+    end
+    list
 
 let pass2 gen fname =
   let ic = open_in_bin_with_bom_check fname in
   line_cnt := 0;
   let strm =
-    Stream.from
-      (fun _ ->
-         try
-           let c = input_char ic in if c = '\n' then incr line_cnt; Some c
-         with End_of_file -> None)
+    Stream.from (fun _ ->
+        try
+          let c = input_char ic in
+          if c = '\n' then incr line_cnt;
+          Some c
+        with End_of_file -> None)
   in
   let rec loop () =
     match try Some (get_lev0 strm) with Stream.Failure -> None with
-      Some r -> make_gen2 gen r; loop ()
-    | None ->
+    | Some r ->
+        make_gen2 gen r;
+        loop ()
+    | None -> (
         let (strm__ : _ Stream.t) = strm in
         match Stream.peek strm__ with
-          Some ('1'..'9') ->
+        | Some '1' .. '9' ->
             Stream.junk strm__;
-            let (_ : string) = get_to_eoln 0 strm in loop ()
+            let (_ : string) = get_to_eoln 0 strm in
+            loop ()
         | Some _ ->
             Stream.junk strm__;
-            let (_ : string) = get_to_eoln 0 strm in loop ()
-        | _ -> ()
+            let (_ : string) = get_to_eoln 0 strm in
+            loop ()
+        | _ -> ())
   in
-  loop () ;
-  fill_g_per gen gen.g_godp ;
-  fill_g_per gen gen.g_prelated ;
+  loop ();
+  fill_g_per gen gen.g_godp;
+  fill_g_per gen gen.g_prelated;
   close_in ic
 
 let pass3 gen fname =
   let ic = open_in_bin_with_bom_check fname in
   line_cnt := 0;
   let strm =
-    Stream.from
-      (fun _ ->
-         try
-           let c = input_char ic in if c = '\n' then incr line_cnt; Some c
-         with End_of_file -> None)
+    Stream.from (fun _ ->
+        try
+          let c = input_char ic in
+          if c = '\n' then incr line_cnt;
+          Some c
+        with End_of_file -> None)
   in
   let rec loop () =
     match try Some (get_lev0 strm) with Stream.Failure -> None with
-      Some r -> make_gen3 gen r; loop ()
-    | None ->
+    | Some r ->
+        make_gen3 gen r;
+        loop ()
+    | None -> (
         let (strm__ : _ Stream.t) = strm in
         match Stream.peek strm__ with
-          Some ('1'..'9') ->
+        | Some '1' .. '9' ->
             Stream.junk strm__;
-            let (_ : string) = get_to_eoln 0 strm in loop ()
+            let (_ : string) = get_to_eoln 0 strm in
+            loop ()
         | Some c ->
             Stream.junk strm__;
             print_location !line_cnt;
             Printf.fprintf !log_oc "Strange input '%c' (%i).\n" c (Char.code c);
             flush !log_oc;
-            let (_ : string) = get_to_eoln 0 strm in loop ()
-        | _ -> ()
+            let (_ : string) = get_to_eoln 0 strm in
+            loop ()
+        | _ -> ())
   in
   loop ();
-  List.iter begin fun (ifam, ip) ->
-    match gen.g_fam.arr.(ifam) with
-    | Right3 (fam, cpl, des) ->
-      begin match gen.g_per.arr.(Adef.father cpl), gen.g_per.arr.(ip) with
-        | Right3 _, Right3 (p, a, u) ->
-          if List.mem (Adef.father cpl) p.related then ()
-          else begin
-            let p = { p with related = Adef.father cpl :: p.related } in
-            gen.g_per.arr.(ip) <- Right3 (p, a, u)
-          end ;
-          if Array.mem ip fam.witnesses then ()
-          else
-            let fam =
-              { fam with witnesses = Array.append fam.witnesses [| ip |] }
-            in
-            gen.g_fam.arr.(ifam) <- Right3 (fam, cpl, des)
-        | _ -> ()
-      end
-    | _ -> ()
-  end gen.g_witn ;
-  fill_g_per gen gen.g_frelated ;
+  List.iter
+    begin fun (ifam, ip) ->
+      match gen.g_fam.arr.(ifam) with
+      | Right3 (fam, cpl, des) ->
+          begin match (gen.g_per.arr.(Adef.father cpl), gen.g_per.arr.(ip)) with
+          | Right3 _, Right3 (p, a, u) ->
+              if List.mem (Adef.father cpl) p.related then ()
+              else begin
+                let p = { p with related = Adef.father cpl :: p.related } in
+                gen.g_per.arr.(ip) <- Right3 (p, a, u)
+              end;
+              if Array.mem ip fam.witnesses then ()
+              else
+                let fam =
+                  { fam with witnesses = Array.append fam.witnesses [| ip |] }
+                in
+                gen.g_fam.arr.(ifam) <- Right3 (fam, cpl, des)
+          | _ -> ()
+          end
+      | _ -> ()
+    end
+    gen.g_witn;
+  fill_g_per gen gen.g_frelated;
   close_in ic
 
 let check_undefined gen =
@@ -2871,17 +3167,17 @@ let check_undefined gen =
     match gen.g_per.arr.(i) with
     | Right3 (_, _, _) -> ()
     | Left3 lab ->
-      let (p, a, u) = unknown_per i Neuter in
-      Printf.fprintf !log_oc "Warning: undefined person %s\n" lab;
-      gen.g_per.arr.(i) <- Right3 (p, a, u)
+        let p, a, u = unknown_per i Neuter in
+        Printf.fprintf !log_oc "Warning: undefined person %s\n" lab;
+        gen.g_per.arr.(i) <- Right3 (p, a, u)
   done;
   for i = 0 to gen.g_fam.tlen - 1 do
     match gen.g_fam.arr.(i) with
     | Right3 (_, _, _) -> ()
     | Left3 lab ->
-      let (f, c, d) = unknown_fam gen i in
-      Printf.fprintf !log_oc "Warning: undefined family %s\n" lab;
-      gen.g_fam.arr.(i) <- Right3 (f, c, d)
+        let f, c, d = unknown_fam gen i in
+        Printf.fprintf !log_oc "Warning: undefined family %s\n" lab;
+        gen.g_fam.arr.(i) <- Right3 (f, c, d)
   done
 
 let add_parents_to_isolated gen =
@@ -2897,7 +3193,9 @@ let add_parents_to_isolated gen =
       else
         match gen.g_fam.arr.(i) with
         | Right3 (_, _, des) ->
-          Array.iter (fun ip -> Hashtbl.add ht_missing_children ip true) des.children ;
+            Array.iter
+              (fun ip -> Hashtbl.add ht_missing_children ip true)
+              des.children;
             loop (i + 1)
         | Left3 _ -> loop (i + 1)
     in
@@ -2906,25 +3204,25 @@ let add_parents_to_isolated gen =
   for i = 0 to gen.g_per.tlen - 1 do
     match gen.g_per.arr.(i) with
     | Right3 (p, a, u) ->
-        if a.parents = None
-        && Array.length u.family = 0
-        && p.rparents = []
-        && p.related = []
-        && not (Hashtbl.mem ht_missing_children p.key_index)
+        if
+          a.parents = None
+          && Array.length u.family = 0
+          && p.rparents = [] && p.related = []
+          && not (Hashtbl.mem ht_missing_children p.key_index)
         then
           let fn = gen.g_str.arr.(p.first_name) in
           let sn = gen.g_str.arr.(p.surname) in
           if fn = "?" && sn = "?" then ()
           else begin
             Printf.fprintf !log_oc
-              "Adding parents to isolated person: %s.%d %s\n" fn p.occ sn ;
+              "Adding parents to isolated person: %s.%d %s\n" fn p.occ sn;
             let ifam = phony_fam gen in
             match gen.g_fam.arr.(ifam) with
             | Right3 (fam, cpl, _) ->
-              let des = { children = [| p.key_index |] } in
-              gen.g_fam.arr.(ifam) <- Right3 (fam, cpl, des);
-              let a = { a with parents = Some ifam } in
-              gen.g_per.arr.(i) <- Right3 (p, a, u)
+                let des = { children = [| p.key_index |] } in
+                gen.g_fam.arr.(ifam) <- Right3 (fam, cpl, des);
+                let a = { a with parents = Some ifam } in
+                gen.g_per.arr.(i) <- Right3 (p, a, u)
             | _ -> ()
           end
     | Left3 _ -> ()
@@ -2932,13 +3230,24 @@ let add_parents_to_isolated gen =
 
 let make_arrays fname =
   let gen =
-    {g_per = {arr = [| |]; tlen = 0}; g_fam = {arr = [| |]; tlen = 0};
-     g_str = {arr = [| |]; tlen = 0}; g_bnot = ""; g_ic = open_in_bin_with_bom_check fname;
-     g_not = Hashtbl.create 3001; g_src = Hashtbl.create 3001;
-     g_hper = Hashtbl.create 3001; g_hfam = Hashtbl.create 3001;
-     g_hstr = Hashtbl.create 3001; g_hnam = Hashtbl.create 3001;
-     g_adop = Hashtbl.create 3001; g_godp = []; g_prelated = [];
-     g_frelated = []; g_witn = []}
+    {
+      g_per = { arr = [||]; tlen = 0 };
+      g_fam = { arr = [||]; tlen = 0 };
+      g_str = { arr = [||]; tlen = 0 };
+      g_bnot = "";
+      g_ic = open_in_bin_with_bom_check fname;
+      g_not = Hashtbl.create 3001;
+      g_src = Hashtbl.create 3001;
+      g_hper = Hashtbl.create 3001;
+      g_hfam = Hashtbl.create 3001;
+      g_hstr = Hashtbl.create 3001;
+      g_hnam = Hashtbl.create 3001;
+      g_adop = Hashtbl.create 3001;
+      g_godp = [];
+      g_prelated = [];
+      g_frelated = [];
+      g_witn = [];
+    }
   in
   assert (add_string gen "" = string_empty);
   assert (add_string gen "?" = string_quest);
@@ -2955,7 +3264,7 @@ let make_arrays fname =
   close_in gen.g_ic;
   check_undefined gen;
   add_parents_to_isolated gen;
-  gen.g_per, gen.g_fam, gen.g_str, gen.g_bnot
+  (gen.g_per, gen.g_fam, gen.g_str, gen.g_bnot)
 
 let make_subarrays (g_per, g_fam, g_str, g_bnot) =
   let persons =
@@ -2964,10 +3273,13 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
     let ua = Array.make g_per.tlen (Obj.magic 0) in
     for i = 0 to g_per.tlen - 1 do
       match g_per.arr.(i) with
-      | Right3 (p, a, u) -> pa.(i) <- p; aa.(i) <- a; ua.(i) <- u
+      | Right3 (p, a, u) ->
+          pa.(i) <- p;
+          aa.(i) <- a;
+          ua.(i) <- u
       | Left3 lab -> failwith ("undefined person " ^ lab)
     done;
-    pa, aa, ua
+    (pa, aa, ua)
   in
   let families =
     let fa = Array.make g_fam.tlen (Obj.magic 0) in
@@ -2975,131 +3287,144 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
     let da = Array.make g_fam.tlen (Obj.magic 0) in
     for i = 0 to g_fam.tlen - 1 do
       match g_fam.arr.(i) with
-        Right3 (f, c, d) -> fa.(i) <- f; ca.(i) <- c; da.(i) <- d
+      | Right3 (f, c, d) ->
+          fa.(i) <- f;
+          ca.(i) <- c;
+          da.(i) <- d
       | Left3 lab -> failwith ("undefined family " ^ lab)
     done;
-    fa, ca, da
+    (fa, ca, da)
   in
   let strings = Array.sub g_str.arr 0 g_str.tlen in
   let bnotes =
-    {nread = (fun s _ -> if s = "" then g_bnot else ""); norigin_file = "";
-     efiles = fun _ -> []}
+    {
+      nread = (fun s _ -> if s = "" then g_bnot else "");
+      norigin_file = "";
+      efiles = (fun _ -> []);
+    }
   in
-  persons, families, strings, bnotes
+  (persons, families, strings, bnotes)
 
 let designation strings p =
   let fn = Mutil.nominative strings.(p.first_name) in
   let sn = Mutil.nominative strings.(p.surname) in
   fn ^ "." ^ string_of_int p.occ ^ " " ^ sn
 
-let check_parents_children persons ascends unions families couples descends strings =
+let check_parents_children persons ascends unions families couples descends
+    strings =
   let prints = Printf.fprintf !log_oc in
   let print = Printf.fprintf !log_oc in
   let designation = designation strings in
   for i = 0 to Array.length ascends - 1 do
     let a = ascends.(i) in
     begin match a.parents with
-      | Some ifam ->
+    | Some ifam ->
         let fam = families.(ifam) in
-        if fam.fam_index = -1
-        then ascends.(i) <- { a with parents = None }
+        if fam.fam_index = -1 then ascends.(i) <- { a with parents = None }
         else
           let cpl = couples.(ifam) in
           let des = descends.(ifam) in
           if Array.memq i des.children then ()
           else
             let p = persons.(i) in
-            prints "%s is not the child of his/her parents\n" (designation p) ;
-            prints "- %s\n" (designation persons.(Adef.father cpl)) ;
-            prints "- %s\n" (designation persons.(Adef.mother cpl)) ;
-            print "=> no more parents for him/her\n" ;
-            print "\n" ;
-            flush !log_oc ;
+            prints "%s is not the child of his/her parents\n" (designation p);
+            prints "- %s\n" (designation persons.(Adef.father cpl));
+            prints "- %s\n" (designation persons.(Adef.mother cpl));
+            print "=> no more parents for him/her\n";
+            print "\n";
+            flush !log_oc;
             ascends.(i) <- { a with parents = None }
-      | None -> ()
+    | None -> ()
     end;
     let u = unions.(i) in
     let fam_to_delete =
-      Array.fold_left begin fun acc ifam ->
-        let cpl = couples.(ifam) in
-        if i <> Adef.father cpl && i <> Adef.mother cpl
-        then begin
-          let acc =
-            prints "%s is spouse in this family but neither husband nor wife:\n"
-              (designation persons.(i)) ;
-            prints "- %s\n" (designation persons.(Adef.father cpl)) ;
-            prints "- %s\n" (designation persons.(Adef.mother cpl)) ;
-            let fath = persons.(Adef.father cpl) in
-            let moth = persons.(Adef.mother cpl) in
-            let ffn = strings.(fath.first_name) in
-            let fsn = strings.(fath.surname) in
-            let mfn = strings.(moth.first_name) in
-            let msn = strings.(moth.surname) in
-            if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then begin
-              print "However, the husband is unknown, I set him as husband\n" ;
-              unions.(Adef.father cpl) <- {family = [| |]};
-              couples.(ifam) <- Adef.couple i (Adef.mother cpl) ;
-              acc
-            end else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then begin
-              print "However, the wife is unknown, I set her as wife\n" ;
-              unions.(Adef.mother cpl) <- {family = [| |]} ;
-              couples.(ifam) <- Adef.couple (Adef.father cpl) i ;
-              acc
-            end else begin
-              print "=> deleted this family for him/her\n" ;
-              ifam :: acc
-            end
-          in
-          print "\n";
-          flush !log_oc ;
-          acc
-        end else acc
-      end [] u.family
+      Array.fold_left
+        begin fun acc ifam ->
+          let cpl = couples.(ifam) in
+          if i <> Adef.father cpl && i <> Adef.mother cpl then begin
+            let acc =
+              prints
+                "%s is spouse in this family but neither husband nor wife:\n"
+                (designation persons.(i));
+              prints "- %s\n" (designation persons.(Adef.father cpl));
+              prints "- %s\n" (designation persons.(Adef.mother cpl));
+              let fath = persons.(Adef.father cpl) in
+              let moth = persons.(Adef.mother cpl) in
+              let ffn = strings.(fath.first_name) in
+              let fsn = strings.(fath.surname) in
+              let mfn = strings.(moth.first_name) in
+              let msn = strings.(moth.surname) in
+              if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then begin
+                print "However, the husband is unknown, I set him as husband\n";
+                unions.(Adef.father cpl) <- { family = [||] };
+                couples.(ifam) <- Adef.couple i (Adef.mother cpl);
+                acc
+              end
+              else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then begin
+                print "However, the wife is unknown, I set her as wife\n";
+                unions.(Adef.mother cpl) <- { family = [||] };
+                couples.(ifam) <- Adef.couple (Adef.father cpl) i;
+                acc
+              end
+              else begin
+                print "=> deleted this family for him/her\n";
+                ifam :: acc
+              end
+            in
+            print "\n";
+            flush !log_oc;
+            acc
+          end
+          else acc
+        end
+        [] u.family
     in
     if fam_to_delete <> [] then
       let list =
-        Array.fold_right begin fun x acc ->
-          if List.mem x fam_to_delete then acc
-          else x :: acc
-        end u.family []
+        Array.fold_right
+          begin fun x acc -> if List.mem x fam_to_delete then acc else x :: acc
+          end
+          u.family []
       in
       unions.(i) <- { family = Array.of_list list }
-  done ;
+  done;
   for i = 0 to Array.length families - 1 do
     let to_delete = ref [] in
     let fam = families.(i) in
     let cpl = couples.(i) in
     let des = descends.(i) in
-    Array.iter begin fun ip ->
-      let a = ascends.(ip) in
-      let p = persons.(ip) in
-      match a.parents with
-      | Some ifam ->
-        if ifam <> i then begin
-            prints "Other parents for %s\n" (designation p);
-            prints "- %s\n" (designation persons.(Adef.father cpl)) ;
-            prints "- %s\n" (designation persons.(Adef.mother cpl)) ;
-            print "=> deleted in this family\n" ;
-            print "\n" ;
-            flush !log_oc ;
-            to_delete := p.key_index :: !to_delete
-          end
-      | None ->
-        prints "%s has no parents but is the child of\n" (designation p) ;
-        prints "- %s\n" (designation persons.(Adef.father cpl)) ;
-        prints "- %s\n" (designation persons.(Adef.mother cpl)) ;
-        print "=> added parents\n" ;
-        print "\n" ;
-        flush !log_oc ;
-        let a = { a with parents = Some fam.fam_index } in
-        ascends.(ip) <- a
-    end des.children ;
-    if !to_delete <> []
-    then
+    Array.iter
+      begin fun ip ->
+        let a = ascends.(ip) in
+        let p = persons.(ip) in
+        match a.parents with
+        | Some ifam ->
+            if ifam <> i then begin
+              prints "Other parents for %s\n" (designation p);
+              prints "- %s\n" (designation persons.(Adef.father cpl));
+              prints "- %s\n" (designation persons.(Adef.mother cpl));
+              print "=> deleted in this family\n";
+              print "\n";
+              flush !log_oc;
+              to_delete := p.key_index :: !to_delete
+            end
+        | None ->
+            prints "%s has no parents but is the child of\n" (designation p);
+            prints "- %s\n" (designation persons.(Adef.father cpl));
+            prints "- %s\n" (designation persons.(Adef.mother cpl));
+            print "=> added parents\n";
+            print "\n";
+            flush !log_oc;
+            let a = { a with parents = Some fam.fam_index } in
+            ascends.(ip) <- a
+      end
+      des.children;
+    if !to_delete <> [] then
       let l =
-        Array.fold_right begin fun ip acc ->
-          if List.mem ip !to_delete then acc else ip :: acc
-        end des.children []
+        Array.fold_right
+          begin fun ip acc -> if List.mem ip !to_delete then acc else ip :: acc
+          end
+          des.children []
       in
       descends.(i) <- { children = Array.of_list l }
   done
@@ -3112,38 +3437,35 @@ let check_parents_sex persons families couples strings =
     let imoth = Adef.mother cpl in
     let fath = persons.(ifath) in
     let moth = persons.(imoth) in
-    if fam.relation = NoSexesCheckNotMarried
-    || fam.relation = NoSexesCheckMarried
+    if
+      fam.relation = NoSexesCheckNotMarried
+      || fam.relation = NoSexesCheckMarried
     then ()
-    else if fath.sex = Female || moth.sex = Male then
-      begin
-        if fath.sex = Female
-        then
-          Printf.fprintf !log_oc "Warning - husband with female sex: %s\n"
-            (designation strings fath) ;
-        if moth.sex = Male
-        then
-          Printf.fprintf !log_oc "Warning - wife with male sex: %s\n"
-            (designation strings moth) ;
-        flush !log_oc ;
-        families.(i) <- { fam with relation = NoSexesCheckNotMarried }
-      end
-    else
-      begin
-        persons.(ifath) <- { fath with sex = Male } ;
-        persons.(imoth) <- { moth with sex = Female }
-      end
+    else if fath.sex = Female || moth.sex = Male then begin
+      if fath.sex = Female then
+        Printf.fprintf !log_oc "Warning - husband with female sex: %s\n"
+          (designation strings fath);
+      if moth.sex = Male then
+        Printf.fprintf !log_oc "Warning - wife with male sex: %s\n"
+          (designation strings moth);
+      flush !log_oc;
+      families.(i) <- { fam with relation = NoSexesCheckNotMarried }
+    end
+    else begin
+      persons.(ifath) <- { fath with sex = Male };
+      persons.(imoth) <- { moth with sex = Female }
+    end
   done
 
 let neg_year_dmy = function
-  | {Adef.day = d; month = m; year = y; prec = OrYear dmy2; _} ->
-    let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
-    {Adef.day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0}
-  | {day = d; month = m; year = y; prec = YearInt dmy2; _} ->
-    let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
-    {day = d; month = m; year = -abs y; prec = YearInt dmy2; delta = 0}
-  | {day = d; month = m; year = y; prec = p; _} ->
-    {day = d; month = m; year = -abs y; prec = p; delta = 0}
+  | { Adef.day = d; month = m; year = y; prec = OrYear dmy2; _ } ->
+      let dmy2 = { dmy2 with year2 = -abs dmy2.year2 } in
+      { Adef.day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0 }
+  | { day = d; month = m; year = y; prec = YearInt dmy2; _ } ->
+      let dmy2 = { dmy2 with year2 = -abs dmy2.year2 } in
+      { day = d; month = m; year = -abs y; prec = YearInt dmy2; delta = 0 }
+  | { day = d; month = m; year = y; prec = p; _ } ->
+      { day = d; month = m; year = -abs y; prec = p; delta = 0 }
 
 let neg_year = function
   | Adef.Dgreg (d, cal) -> Adef.Dgreg (neg_year_dmy d, cal)
@@ -3154,14 +3476,17 @@ let neg_year_cdate cd = Date.cdate_of_date (neg_year (Date.date_of_cdate cd))
 let rec negative_date_ancestors persons ascends unions families couples i =
   let p = persons.(i) in
   let p =
-    { p with
-      birth = begin match Date.od_of_cdate p.birth with
+    {
+      p with
+      birth =
+        begin match Date.od_of_cdate p.birth with
         | Some d1 -> Date.cdate_of_od (Some (neg_year d1))
         | None -> p.birth
-      end ;
-      death = match p.death with
+        end;
+      death =
+        (match p.death with
         | Death (dr, cd2) -> Death (dr, neg_year_cdate cd2)
-        | _ -> p.death
+        | _ -> p.death);
     }
   in
   persons.(i) <- p;
@@ -3172,174 +3497,188 @@ let rec negative_date_ancestors persons ascends unions families couples i =
     match Date.od_of_cdate fam.marriage with
     | None -> ()
     | Some d ->
-      let fam =
-        { fam with marriage = Date.cdate_of_od (Some (neg_year d)) }
-      in
-      families.(j) <- fam
-  done ;
+        let fam =
+          { fam with marriage = Date.cdate_of_od (Some (neg_year d)) }
+        in
+        families.(j) <- fam
+  done;
   let a = ascends.(i) in
   match a.parents with
   | None -> ()
   | Some ifam ->
-    let cpl = couples.(ifam) in
-    negative_date_ancestors
-      persons ascends unions families couples (Adef.father cpl) ;
-    negative_date_ancestors
-      persons ascends unions families couples (Adef.mother cpl)
+      let cpl = couples.(ifam) in
+      negative_date_ancestors persons ascends unions families couples
+        (Adef.father cpl);
+      negative_date_ancestors persons ascends unions families couples
+        (Adef.mother cpl)
 
 let negative_dates persons ascends unions families couples =
   for i = 0 to Array.length persons - 1 do
     let p = persons.(i) in
-    match Date.cdate_to_dmy_opt p.birth, Date.dmy_of_death p.death with
+    match (Date.cdate_to_dmy_opt p.birth, Date.dmy_of_death p.death) with
     | Some d1, Some d2 ->
-      if d1.year > 0 && d2.year > 0 && Date.compare_dmy d2 d1 < 0
-      then negative_date_ancestors persons ascends unions families couples i
+        if d1.year > 0 && d2.year > 0 && Date.compare_dmy d2 d1 < 0 then
+          negative_date_ancestors persons ascends unions families couples i
     | _ -> ()
   done
 
 let finish_base (persons, families, strings, _) =
-  let (persons, ascends, unions) = persons in
-  let (families, couples, descends) = families in
+  let persons, ascends, unions = persons in
+  let families, couples, descends = families in
   for i = 0 to Array.length descends - 1 do
     let des = descends.(i) in
     let children = des.children in
-    sort_by_date (fun i -> Date.od_of_cdate persons.(i).birth) children ;
+    sort_by_date (fun i -> Date.od_of_cdate persons.(i).birth) children;
     descends.(i) <- { children }
-  done ;
+  done;
   for i = 0 to Array.length unions - 1 do
     let u = unions.(i) in
     let family = u.family in
-    sort_by_date (fun i -> Date.od_of_cdate families.(i).marriage) family ;
+    sort_by_date (fun i -> Date.od_of_cdate families.(i).marriage) family;
     unions.(i) <- { family }
-  done ;
+  done;
   for i = 0 to Array.length persons - 1 do
     let p = persons.(i) in
     let a = ascends.(i) in
     let u = unions.(i) in
-    if a.parents <> None
-    && Array.length u.family != 0
- || p.notes <> string_empty
+    if
+      (a.parents <> None && Array.length u.family != 0)
+      || p.notes <> string_empty
     then
-      let (fn, occ) =
-        if strings.(p.first_name) = "?" then string_x, i
-        else p.first_name, p.occ
+      let fn, occ =
+        if strings.(p.first_name) = "?" then (string_x, i)
+        else (p.first_name, p.occ)
       in
-      let (sn, occ) =
-        if strings.(p.surname) = "?" then string_x, i
-        else p.surname, occ
+      let sn, occ =
+        if strings.(p.surname) = "?" then (string_x, i) else (p.surname, occ)
       in
       persons.(i) <- { p with first_name = fn; surname = sn; occ }
   done;
-  check_parents_sex persons families couples strings ;
-  check_parents_children persons ascends unions families couples descends strings ;
-  if !try_negative_dates then negative_dates persons ascends unions families couples
+  check_parents_sex persons families couples strings;
+  check_parents_children persons ascends unions families couples descends
+    strings;
+  if !try_negative_dates then
+    negative_dates persons ascends unions families couples
 
 (* Main *)
 
 let out_file = ref "a"
 
 let speclist =
-  [ ( "-bd",
+  [
+    ( "-bd",
       Arg.String Secure.set_base_dir,
       Fmt.str
-      "<DIR> Specify where the “bases” directory with databases is installed \
-       (default if empty is %S)." (Dirs.name Secure.default_base_dir) )
-  ; ( "-o", Arg.Set_string out_file,
+        "<DIR> Specify where the “bases” directory with databases is installed \
+         (default if empty is %S)."
+        (Dirs.name Secure.default_base_dir) );
+    ( "-o",
+      Arg.Set_string out_file,
       "<file> Output database (default: <input file name>.gwb, a.gwb if not \
-       available). Alphanumerics and -" )
-  ; ( "-f", Arg.Set Geneweb.GWPARAM.force
-    , " Remove database if already existing" )
-  ; ( "-log", Arg.String (fun s -> log_oc := open_out s)
-    , "<file> Redirect log trace to this file." )
-  ; ( "-lf", Arg.Set lowercase_first_names
-    , " Convert first names to lowercase letters, with initials in uppercase." )
-  ; ( "-trackid", Arg.Set track_ged2gw_id,
-      " Print gedcom id to gw id matches." )
-  ; ( "-ls", Arg.Unit (fun () -> case_surnames := LowerCase)
-    , " Convert surnames to lowercase letters, with initials in uppercase. \
-       Try to keep lowercase particles." )
-  ; ( "-us", Arg.Unit (fun () -> case_surnames := UpperCase)
-    , " Convert surnames to uppercase letters." )
-  ; ( "-fne"
-    , Arg.String begin fun s ->
-        if String.length s = 2
-        then first_names_brackets := Some (s.[0], s.[1])
-        else raise (Arg.Bad "-fne option must be followed by a 2 characters string")
-      end
-    , "<be> When creating a person, if the GEDCOM first name part holds \
-       a part between 'b' (any character) and 'e' (any character), it \
-       is considered to be the usual first name: e.g. -fne '\"\"' or \
-       -fne \"()\"." )
-  ; ( "-efn", Arg.Set extract_first_names
-    , " When creating a person, if the GEDCOM first name part holds several \
+       available). Alphanumerics and -" );
+    ("-f", Arg.Set Geneweb.GWPARAM.force, " Remove database if already existing");
+    ( "-log",
+      Arg.String (fun s -> log_oc := open_out s),
+      "<file> Redirect log trace to this file." );
+    ( "-lf",
+      Arg.Set lowercase_first_names,
+      " Convert first names to lowercase letters, with initials in uppercase."
+    );
+    ("-trackid", Arg.Set track_ged2gw_id, " Print gedcom id to gw id matches.");
+    ( "-ls",
+      Arg.Unit (fun () -> case_surnames := LowerCase),
+      " Convert surnames to lowercase letters, with initials in uppercase. Try \
+       to keep lowercase particles." );
+    ( "-us",
+      Arg.Unit (fun () -> case_surnames := UpperCase),
+      " Convert surnames to uppercase letters." );
+    ( "-fne",
+      Arg.String
+        begin fun s ->
+          if String.length s = 2 then first_names_brackets := Some (s.[0], s.[1])
+          else
+            raise
+              (Arg.Bad "-fne option must be followed by a 2 characters string")
+        end,
+      "<be> When creating a person, if the GEDCOM first name part holds a part \
+       between 'b' (any character) and 'e' (any character), it is considered \
+       to be the usual first name: e.g. -fne '\"\"' or -fne \"()\"." );
+    ( "-efn",
+      Arg.Set extract_first_names,
+      " When creating a person, if the GEDCOM first name part holds several \
        names, the first of this names becomes the person \"first name\" and \
-       the complete GEDCOM first name part a \"first name alias\"." )
-  ; ( "-no_efn", Arg.Clear extract_first_names,
-      " Cancels the previous option." )
-  ; ( "-epn", Arg.Set extract_public_names
-    , " When creating a person, if the GEDCOM first name part looks like a \
-       public name, i.e. holds either \
-       a number or a roman number, supposed to be a number of a nobility title, \
-       or one of the words: \
-       \"der\", \"den\", \"die\", \"el\", \"le\", \"la\", \"the\", \
-       supposed to be the beginning of a qualifier, \
-       then the GEDCOM first name part becomes the person \"public name\" \
-       and its first word his \"first name\"." )
-  ; ( "-no_epn", Arg.Clear extract_public_names
-    , " Cancels the previous option." )
-  ; ( "-no_pit", Arg.Set no_public_if_titles
-    , " Do not consider persons having titles as public")
-  ; ( "-tnd", Arg.Set try_negative_dates
-    , " Set negative dates when inconsistency (e.g. birth after death)" )
-  ; ( "-no_nd", Arg.Set no_negative_dates
-    , " Don't interpret a year preceded by a minus sign as a negative year" )
-  ; ( "-nc", Arg.Clear do_check, " No consistency check" )
-  ; ( "-nopicture", Arg.Set no_picture, " Don't extract individual picture." )
-  ; ( "-udi"
-    , Arg.String begin fun s ->
-        match String.index_opt s '-' with
-        | Some i ->
-          let a = String.sub s 0 i in
-          let b = String.sub s (i + 1) (String.length s - i - 1) in
-          let a = if a = "" then !alive_years else int_of_string a in
-          let b = max a (if b = "" then !dead_years else int_of_string b) in
-          alive_years := a ;
-          dead_years := b ;
-        | None -> raise (Arg.Bad "bad parameter for -udi")
-      end
-    , "x-y Set the interval for persons whose death part is undefined: \
-       If before x years, they are considered as alive. \
-       If after y year, they are considered as death. \
-       Between x and y year, they are considered as \"don't know\". \
-       Default x is " ^ string_of_int !alive_years ^ " \
-       Default y is " ^ string_of_int !dead_years)
-  ; ( "-uin", Arg.Set untreated_in_notes
-    , " Put untreated GEDCOM tags in notes" )
-  ; ( "-ds", Arg.Set_string default_source
-    , " Set the source field for persons and families without source data" )
-  ; ( "-dates", Arg.String (fun s ->
+       the complete GEDCOM first name part a \"first name alias\"." );
+    ("-no_efn", Arg.Clear extract_first_names, " Cancels the previous option.");
+    ( "-epn",
+      Arg.Set extract_public_names,
+      " When creating a person, if the GEDCOM first name part looks like a \
+       public name, i.e. holds either a number or a roman number, supposed to \
+       be a number of a nobility title, or one of the words: \"der\", \"den\", \
+       \"die\", \"el\", \"le\", \"la\", \"the\", supposed to be the beginning \
+       of a qualifier, then the GEDCOM first name part becomes the person \
+       \"public name\" and its first word his \"first name\"." );
+    ("-no_epn", Arg.Clear extract_public_names, " Cancels the previous option.");
+    ( "-no_pit",
+      Arg.Set no_public_if_titles,
+      " Do not consider persons having titles as public" );
+    ( "-tnd",
+      Arg.Set try_negative_dates,
+      " Set negative dates when inconsistency (e.g. birth after death)" );
+    ( "-no_nd",
+      Arg.Set no_negative_dates,
+      " Don't interpret a year preceded by a minus sign as a negative year" );
+    ("-nc", Arg.Clear do_check, " No consistency check");
+    ("-nopicture", Arg.Set no_picture, " Don't extract individual picture.");
+    ( "-udi",
+      Arg.String
+        begin fun s ->
+          match String.index_opt s '-' with
+          | Some i ->
+              let a = String.sub s 0 i in
+              let b = String.sub s (i + 1) (String.length s - i - 1) in
+              let a = if a = "" then !alive_years else int_of_string a in
+              let b = max a (if b = "" then !dead_years else int_of_string b) in
+              alive_years := a;
+              dead_years := b
+          | None -> raise (Arg.Bad "bad parameter for -udi")
+        end,
+      "x-y Set the interval for persons whose death part is undefined: If \
+       before x years, they are considered as alive. If after y year, they are \
+       considered as death. Between x and y year, they are considered as \
+       \"don't know\". Default x is " ^ string_of_int !alive_years
+      ^ " Default y is " ^ string_of_int !dead_years );
+    ("-uin", Arg.Set untreated_in_notes, " Put untreated GEDCOM tags in notes");
+    ( "-ds",
+      Arg.Set_string default_source,
+      " Set the source field for persons and families without source data" );
+    ( "-dates",
+      Arg.String
+        (fun s ->
           if s = "dates_md" then month_number_dates := MonthDayDates
-          else if s = "dates_dm" then month_number_dates := DayMonthDates)
-    , " Interpret months-numbered dates as year only (default) or month/day/year or day/month/year" )
-  ; ( "-rs_no_mention", Arg.Unit (fun () -> relation_status := NoMention)
-    , " Force relation status to NoMention (default is Married)" )
-  ; ( "-charset"
-    , Arg.String begin function
-        | "ANSEL" -> charset_option := Some Ansel
-        | "ASCII" -> charset_option := Some Ascii
-        | "MACINTOSH" -> charset_option := Some MacIntosh
-        | "MSDOS" -> charset_option := Some Msdos
-        | "UTF-8" -> charset_option := Some Utf8
-        | "none" -> charset_option := None
-        | _ -> raise (Arg.Bad "bad -charset value")
-      end
-    , " [ANSEL|ANSI|ASCII|MACINTOSH|MSDOS|UTF-8] Force given charset decoding, \
-       overriding the possible setting in GEDCOM" )
-  ; ( "-particles"
-    , Arg.String (fun s -> particles := Mutil.input_particles s)
-    , "<FILE> Use the given file as list of particles" )
-  ; ( "-nowarn", Arg.Set no_warn, " Do not show warnings during import")
-  ; ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
+          else if s = "dates_dm" then month_number_dates := DayMonthDates),
+      " Interpret months-numbered dates as year only (default) or \
+       month/day/year or day/month/year" );
+    ( "-rs_no_mention",
+      Arg.Unit (fun () -> relation_status := NoMention),
+      " Force relation status to NoMention (default is Married)" );
+    ( "-charset",
+      Arg.String
+        begin function
+          | "ANSEL" -> charset_option := Some Ansel
+          | "ASCII" -> charset_option := Some Ascii
+          | "MACINTOSH" -> charset_option := Some MacIntosh
+          | "MSDOS" -> charset_option := Some Msdos
+          | "UTF-8" -> charset_option := Some Utf8
+          | "none" -> charset_option := None
+          | _ -> raise (Arg.Bad "bad -charset value")
+        end,
+      " [ANSEL|ANSI|ASCII|MACINTOSH|MSDOS|UTF-8] Force given charset decoding, \
+       overriding the possible setting in GEDCOM" );
+    ( "-particles",
+      Arg.String (fun s -> particles := Mutil.input_particles s),
+      "<FILE> Use the given file as list of particles" );
+    ("-nowarn", Arg.Set no_warn, " Do not show warnings during import");
+    ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
   ]
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
@@ -3353,15 +3692,12 @@ let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
 let main () =
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
-  if !in_file <> "" then
-    close_in (open_in_bin_with_bom_check !in_file);
+  if !in_file <> "" then close_in (open_in_bin_with_bom_check !in_file);
   let input_file =
-    if !in_file <> "" then
-      Filename.remove_extension !in_file
-    else
-      !in_file
+    if !in_file <> "" then Filename.remove_extension !in_file else !in_file
   in
-  if input_file <> "" && (not (Array.mem "-o" Sys.argv)) then out_file := input_file;
+  if input_file <> "" && not (Array.mem "-o" Sys.argv) then
+    out_file := input_file;
   out_file := Filename.basename !out_file |> Filename.remove_extension;
   if not (Mutil.good_name !out_file) then (
     (* Util.transl conf not available !*)
@@ -3378,27 +3714,29 @@ let main () =
   let arrays = make_arrays !in_file in
   Gc.compact ();
   let arrays = make_subarrays arrays in
-  finish_base arrays ;
+  finish_base arrays;
   Driver.make !out_file !particles arrays @@ fun base ->
   warning_month_number_dates ();
   if !do_check then begin
     let base_error x =
-      Check.print_base_error !log_oc base x; Printf.fprintf !log_oc "\n"
+      Check.print_base_error !log_oc base x;
+      Printf.fprintf !log_oc "\n"
     in
     let base_warning = function
-          | UndefinedSex _ -> ()
-          | _ when !no_warn -> ()
-          | x ->
-            Check.print_base_warning !log_oc base x; Printf.fprintf !log_oc "\n"
+      | UndefinedSex _ -> ()
+      | _ when !no_warn -> ()
+      | x ->
+          Check.print_base_warning !log_oc base x;
+          Printf.fprintf !log_oc "\n"
     in
-    Check.check_base base base_error base_warning ignore; flush !log_oc
-  end ;
+    Check.check_base base base_error base_warning ignore;
+    flush !log_oc
+  end;
   if !log_oc != stdout then close_out !log_oc
 
 let _ =
-  try main () with
-    e ->
-      Printf.fprintf !log_oc "Uncaught exception: %s\n"
-        (Printexc.to_string e);
-      if !log_oc != stdout then close_out !log_oc;
-      exit 2
+  try main ()
+  with e ->
+    Printf.fprintf !log_oc "Uncaught exception: %s\n" (Printexc.to_string e);
+    if !log_oc != stdout then close_out !log_oc;
+    exit 2
