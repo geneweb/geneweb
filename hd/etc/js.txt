@@ -783,13 +783,6 @@ const initTooltips = () => {
     }
   });
 };
-function safeInitialize(fn) {
-  try {
-    fn();
-  } catch (error) {
-    console.error('Initialization error:', error);
-  }
-}
 %if;(e.notif!="")
 %include;js_notif
 %end;
