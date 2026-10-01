@@ -911,15 +911,11 @@ document.addEventListener('DOMContentLoaded', () => {
         RpcDatalistManager.attachAllListeners();
       } else {
         %( .gz fallback when the RPC server is unavailable %)
-        %if;(b.datalist_fnames=1 or b.datalist_snames=1)
-          populateDatalists();
-        %end;
+        if (typeof populateDatalists === 'function') populateDatalists();
       }
     })();
   %else;
-    %if;(b.datalist_fnames=1 or b.datalist_snames=1)
-      populateDatalists();
-    %end;
+    if (typeof populateDatalists === 'function') populateDatalists();
   %end;
 %end;
 initTooltips();
