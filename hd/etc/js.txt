@@ -679,53 +679,12 @@ const RpcDatalistManager = {
 %if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
     or b.datalist_titles=1 or b.datalist_estates=1))
   or (e.m="MOD_GALLERY" and (b.datalist_fnames=1 or b.datalist_snames=1))
-  or ("IND" in e.m or "FAM" in e.m and e.m!="MOD_GALLERY" and (b.datalist_fnames=1
+  or (("IND" in e.m or "FAM" in e.m) and (b.datalist_fnames=1
     or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
     or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
     or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
+%if;(e.m="MOD_GALLERY")
 const DatalistManager = {
-  populateDatalist: function(datalistId, cacheFile) {
-    const dataList = document.getElementById(datalistId);
-    if (!dataList) return;
-
-    fetch(cacheFile)
-      .then(response => {
-        const reader = response.body
-          .pipeThrough(new DecompressionStream('gzip'))
-          .getReader();
-        return new ReadableStream({
-          start(controller) {
-            return pump();
-            function pump() {
-              return reader.read().then(({done, value}) => {
-                if (done) {
-                  controller.close();
-                  return;
-                }
-                controller.enqueue(value);
-                return pump();
-              });
-            }
-          }
-        });
-      })
-      .then(stream => new Response(stream))
-      .then(response => response.text())
-      .then(text => {
-        const fragment = document.createDocumentFragment();
-        text.split("\n")
-            .filter(line => line.trim())
-            .forEach(option => {
-              const opt = document.createElement("option");
-              opt.value = option.trim().replace("<option>", "");
-              fragment.appendChild(opt);
-            });
-        dataList.textContent = '';
-        dataList.appendChild(fragment);
-      })
-      .catch(error => console.error(`Error loading ${cacheFile}:`, error));
-  },
-  %if;(e.m="MOD_GALLERY")
   handleDataTableInput: function(input, listId) {
     const dataList = document.getElementById(listId);
     if (!dataList) return;
@@ -742,46 +701,48 @@ const DatalistManager = {
       el.setSelectionRange(selStart, selEnd);
     });
   }
-  %end;
 };
-
-function constructCachePath() {
-  const baseName = "%base.name;";
-  %if;cgi;
-    const pathname = window.location.pathname;
-    const segments = pathname.split('/');
-    const prefix = segments[1] || '';
-    return `/${prefix}/bases/etc/${baseName}/cache/${baseName}`;
-  %else;
-    return `${baseName}/cache/${baseName}`;
-  %end;
-}
-
+%end;
 function populateDatalists() {
-  const path = constructCachePath();
-  const datalists = %[
-  %if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_GALLERY")
-    %if;(b.datalist_snames=1)  { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
-    %if;(b.datalist_fnames=1)  { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
+  %if;cgi;
+    const path = `/${location.pathname.split('/')%[1%] || ''}/bases/etc/%base.name;/cache/%base.name;_`;
+  %else;
+    const path = '%base.name;/cache/%base.name;_';
+  %end;
+  %[
+    %if;(b.datalist_snames=1)'snames',%end;
+    %if;(b.datalist_fnames=1)'fnames',%end;
     %if;("IND" in e.m or "FAM" in e.m)
-      %if;(b.datalist_places=1)  { id: "datalist_places", file: path + "_places.cache.gz", book: "place" },%end;
-      %if;(b.datalist_occupations=1)  { id: "datalist_occupations", file: path + "_occupations.cache.gz", book: "occu" },%end;
-      %if;(b.datalist_sources=1)  { id: "datalist_sources", file: path + "_sources.cache.gz", book: "src" },%end;
+      %if;(b.datalist_places=1)'places',%end;
+      %if;(b.datalist_occupations=1)'occupations',%end;
+      %if;(b.datalist_sources=1)'sources',%end;
     %end;
-  %end;
-  %if;(is_welcome or "IND" in e.m)
     %if;is_welcome;
-      %if;(b.datalist_titles=1)  { id: "datalist_titles", file: path + "_titles.cache.gz", book: "title" },%end;
-      %if;(b.datalist_estates=1)  { id: "datalist_estates", file: path + "_estates.cache.gz", book: "domain" },%end;
-    %else;
-      %if;(b.datalist_pub_names=1)  { id: "datalist_pub_names", file: path + "_pub_names.cache.gz", book: "pubn" },%end;
-      %if;(b.datalist_qualifiers=1)  { id: "datalist_qualifiers", file: path + "_qualifiers.cache.gz", book: "qual" },%end;
-      %if;(b.datalist_aliases=1)  { id: "datalist_aliases", file: path + "_aliases.cache.gz", book: "alias" },%end;
+      %if;(b.datalist_titles=1)'titles',%end;
+      %if;(b.datalist_estates=1)'estates',%end;
+    %elseif;("IND" in e.m)
+      %if;(b.datalist_pub_names=1)'pub_names',%end;
+      %if;(b.datalist_qualifiers=1)'qualifiers',%end;
+      %if;(b.datalist_aliases=1)'aliases',%end;
     %end;
-  %end;
-  %];
-
-  datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
+  %].forEach(t => {
+    const dl = document.getElementById('datalist_' + t);
+    if (!dl) return;
+    fetch(path + t + '.cache.gz')
+      .then(r => {
+        if (!r.ok) throw new Error(r.status);
+        return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).text();
+      })
+      .then(text => {
+        const frag = document.createDocumentFragment();
+        for (const line of text.split('\n')) {
+          const v = line.trim().replace('<option>', '');
+          if (v) frag.appendChild(new Option('', v));
+        }
+        dl.replaceChildren(frag);
+      })
+      .catch(err => console.error(`datalist_${t}:`, err));
+  });
 }
 %end;
 %if;(e.templ="" and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
