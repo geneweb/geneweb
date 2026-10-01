@@ -69,20 +69,12 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
 %if;(e.m="CHK_DATA")
 <script>
   function showOverlay() {
-    const overlay = document.querySelector('.loading-overlay');
-    if (overlay) {
-      overlay.classList.remove('hidden');
-    }
+    document.querySelector('.loading-overlay')?.classList.remove('hidden');
   }
   function hideOverlay() {
-    const overlay = document.querySelector('.loading-overlay');
-    if (overlay) {
-      overlay.classList.add('hidden');
-    }
+    document.querySelector('.loading-overlay')?.classList.add('hidden');
   }
-  document.addEventListener('DOMContentLoaded', function() {
-    hideOverlay();
-  });
+  document.addEventListener('DOMContentLoaded', hideOverlay);
 </script>
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA")
@@ -92,7 +84,7 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
         var htmlTitle = document.title;
         if (htmlTitle == "[*modification successful]" ||
             htmlTitle == "[*no modification]") {
-          document.getElementById("reference").focus();
+          document.getElementById("reference")?.focus();
         }
       </script>
     %end;
@@ -109,13 +101,13 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
             htmlTitle == "[*image received]"  ||
             htmlTitle == "[*image deleted]"   ||
             htmlTitle == "[*modification successful]") {
-            document.getElementById("i%e.i;").focus();
+            document.getElementById("i%e.i;")?.focus();
         }
         else if (htmlTitle == "[*family modified]" ||
                  htmlTitle == "[*family added]"    ||
                  htmlTitle == "[*family deleted]"  ||
                  htmlTitle == "[*children's names changed]") {
-            document.getElementById("i%e.ip;").focus();
+            document.getElementById("i%e.ip;")?.focus();
         }
       </script>
     %end;
@@ -146,10 +138,8 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
     document.querySelectorAll('.transfer-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const notes = document.getElementById('notes_comments');
-        const marrSrc = document.querySelector('[data-marr]');
-        if (!notes || !marrSrc) return;
-        const target = document.getElementById(marrSrc.id);
-        if (!target) return;
+        const target = document.querySelector('[data-marr]');
+        if (!notes || !target) return;
         target.value = notes.value;
         notes.value = '';
         if (typeof autosize !== 'undefined') autosize.update(target);
@@ -276,74 +266,41 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
     document.querySelectorAll('.ch a').forEach(function (element) {
       element.addEventListener('click', function (event) {
         event.preventDefault();
-        var textarea = document.querySelector('.insert-character-target');
-        insertCharacter(textarea, this.innerText);
+        const textarea = document.querySelector('.insert-character-target');
+        if (textarea) insertCharacter(textarea, this.innerText);
       });
     });
   }
 
   function insertCharacter(t, v) {
-    var startPos = t.selectionStart;
-    var endPos = t.selectionEnd;
-    t.value = t.value.substring(0, startPos) + v + t.value.substring(endPos, t.value.length);
-    t.selectionStart = startPos + v.length;
-    t.selectionEnd = t.selectionStart;
+    t.setRangeText(v, t.selectionStart, t.selectionEnd, 'end');
     t.focus();
   }
 function insertTags(tagOpen, tagClose, sampleText) {
-  const textarea = document.querySelector('textarea#notes_comments');
-  if (!textarea) return false;
-
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const scrollTop = textarea.scrollTop;
-
-  let selectedText = textarea.value.substring(start, end);
-  if (!selectedText) selectedText = sampleText;
-
-  if (selectedText.endsWith(' ')) {
-    selectedText = selectedText.slice(0, -1);
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end);
-    textarea.value = before + tagOpen + selectedText + tagClose + ' ' + after;
-  } else {
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end);
-    textarea.value = before + tagOpen + selectedText + tagClose + after;
-  }
-
-  textarea.scrollTop = scrollTop;
-
+  const ta = document.querySelector('textarea#notes_comments');
+  if (!ta) return false;
+  const { selectionStart: start, selectionEnd: end, scrollTop } = ta;
+  let sel = ta.value.substring(start, end) || sampleText;
+  %( Keep a trailing space of the selection outside the closing tag. %)
+  const trail = sel.endsWith(' ') ? ' ' : '';
+  if (trail) sel = sel.slice(0, -1);
+  ta.setRangeText(tagOpen + sel + tagClose + trail, start, end);
+  ta.scrollTop = scrollTop;
+  const pos = start + tagOpen.length;
   if (start === end) {
-    const cursorPos = start + tagOpen.length;
-    textarea.setSelectionRange(cursorPos, cursorPos + sampleText.length);
+    ta.setSelectionRange(pos, pos + sampleText.length);
   } else {
-    const newCursorPos = start + tagOpen.length + selectedText.length + tagClose.length;
-    textarea.setSelectionRange(newCursorPos, newCursorPos);
+    const after = pos + sel.length + tagClose.length;
+    ta.setSelectionRange(after, after);
   }
-
-  textarea.focus();
+  ta.focus();
   return false;
 }
 function setupToolbarSticky() {
   const toolbar = document.querySelector('.toolbar-wrapper');
   if (!toolbar) return;
-
-  let lastScroll = window.scrollY;
-
-  function handleScroll() {
-    const currentScroll = window.scrollY;
-    if (currentScroll > 0) {
-      toolbar.classList.add('is-sticky');
-    } else {
-      toolbar.classList.remove('is-sticky');
-    }
-    lastScroll = currentScroll;
-  }
-
-  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('scroll', () =>
+    toolbar.classList.toggle('is-sticky', window.scrollY > 0), { passive: true });
 }
 </script>
 %end;
@@ -506,7 +463,8 @@ function setupModalAutofocus() {
   });
 }
 %end;
-%if;(e.m!="MOD_DATA")
+%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D")
+       or (e.m="A" and e.t="H") or "HIST" in e.m))
 %( Floating placeholders for textual inputs. %)
 function setupFloatingPlaceholders() {
   const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
@@ -566,15 +524,10 @@ function setupTocToggle() {
 %( Place the cursor at the end an autofocused input %)
 %if;("MOD" in e.m)
 function setupAutofocusInput() {
-  const focusableElement = document.querySelector('input[autofocus]:not([id="n"]), textarea[autofocus]');
-  if (focusableElement) {
-    focusableElement.focus();
-    if (focusableElement.setSelectionRange) {
-      focusableElement.setSelectionRange(focusableElement.value.length, focusableElement.value.length);
-    } else if (focusableElement.value) {
-      focusableElement.value = focusableElement.value;
-    }
-  }
+  const el = document.querySelector('input[autofocus]:not(#n), textarea[autofocus]');
+  if (!el) return;
+  el.focus();
+  el.setSelectionRange(el.value.length, el.value.length);
 }
 %end;
 %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
@@ -743,7 +696,7 @@ function populateDatalists() {
   });
 }
 %end;
-%if;(e.templ="" and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
+%if;(not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
 %define;language(x)
   %apply;nth%with;
     af/ar/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/%nn;
@@ -879,16 +832,12 @@ document.addEventListener('DOMContentLoaded', () => {
 %end;
 initTooltips();
 %if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
-  if (typeof initializeLazyModules === 'function') {
-    initializeLazyModules();
-  }
+  initializeLazyModules();
 %end;
-%if;(e.templ="" and not is_welcome)
+%if;(not is_welcome)
   setupModalAutofocus();
 %end;
-%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D") or (e.m="A" and e.t="H") or "HIST" in e.m))
-  setupFloatingPlaceholders();
-%end;
+if (typeof setupFloatingPlaceholders === 'function') setupFloatingPlaceholders();
 %if;("ADD" in e.m or "MOD" in e.m)
   setupToolbarSticky();
   setupCharacterInsertion();
