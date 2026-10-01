@@ -51,7 +51,7 @@ es: af=afrikaans/ar=Árabe/bg=búlgaro/br=bretón/ca=catalán/co=corsu/cs=checo/
 et: af=aafrika/ar=araabia/bg=bulgaaria/br=breti/ca=katalaani/co=korsika/cs=tšehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hisp/et=eesti/fi=soome/fr=prantsuse/he=iiri/is=islandi/it=itaalia/lt=leedu/lv=läti/nl=hollandi/no=norra/oc=oksitaani/pl=poola/pt=portugali/pt-br=portugali brasiilia/ro=rumeenia/ru=vene/sk=slovaki/sl=sloveeni/sv=rootsi/tr=türgi/zh=hiina
 fi: af=afrikaans/ar=arabi/bg=bulgaria/br=bretoni/ca=katalonia/co=korsika/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=viro/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lt=liettualainen/lv=latvia/nl=hollanti/no=norja/oc=oksitaani/pl=puola/pt=portugali/pt-br=portugali brasiilia/ro=romania/ru=venäjä/sk=slovakki/sl=sloveeni/sv=ruotsi/tr= turkki/zh=kiina
 fr: af=afrikaans/ar=arabe/bg=bulgare/br=breton/ca=catalan/co=corse/cs=tchèque/da=danois/de=allemand/en=anglais/eo=espéranto/es=espagnol/et=estonien/fi=finnois/fr=français/he=hébreu/is=islandais/it=italien/lt=lituanien/lv=letton/nl=néerlandais/no=norvégien/oc=occitan/pl=polonais/pt=portugais/pt-br=portugais brésilien/ro=roumain/ru=russe/sk=slovaque/sl=slovène/sv=suédois/tr=turc/zh=chinois
-he: af=אפריקאנס/ar=ערבי/bg=בולגרית/br=ברטונית/ca=קטלנית/co=קורסיקנית/cs=צ'כית/da=דנית/de=גרמנית/en=אנגלית/eo=אספרנטו/es=ספרדית/et=אסטונית/fi=פינית/fr=צרפתית/he=עברית/is=איסלנדית/it=איטלקית/lt=ליטאית/lv=לטבית/nl=הולנדית/no=נורווגית/oc=אוקסיטנית/pl=פולנית/pt=פורטוגזית/pt-br=פורטוגזית-ברזילאית/ro=רומנית/ru=רוסית/sk=סלובקית/sl=סלובנית/sv=שוודית/tr=טורקית/zh=סינית
+he: af=אפריקאנס/ar=ערבי/bg=בולגרית/br=ברטונית/ca=קטלנית/co=קורסיקנית/cs=צ׳כית/da=דנית/de=גרמנית/en=אנגלית/eo=אספרנטו/es=ספרדית/et=אסטונית/fi=פינית/fr=צרפתית/he=עברית/is=איסלנדית/it=איטלקית/lt=ליטאית/lv=לטבית/nl=הולנדית/no=נורווגית/oc=אוקסיטנית/pl=פולנית/pt=פורטוגזית/pt-br=פורטוגזית-ברזילאית/ro=רומנית/ru=רוסית/sk=סלובקית/sl=סלובנית/sv=שוודית/tr=טורקית/zh=סינית
 is: af=afrikanska/ar=arabíska/bg=búlgarska/br=bretónska/ca=katalónska/co=korsíska/cs=tékkneska/da=danska/de=þýska/en=enska/eo=esperanto/es=spænska/et=eistneska/fi=finnska/fr=franska/he=hebraska/is=íslenska/it=ítalska/lt=litháíska/lv=lettneska/nl=hollenska/no=norska/oc=oksítanska/pl=Pólska/pt=portúgalska/pt-br=Brasil-portúgalska/ro=rúmenska/ru=rússneska/sk=slóvakíska/sl=slóvenska/sv=sænska/tr=tyrkneska/zh=kínverska
 it: af=afrikaans/ar=arabo/bg=bulgaro/br=bretone/ca=catalano/co=corso/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/et=estone/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lt=lituano/lv=lettone/nl=olandese/no=norvegese/oc=occitano/pl=polacco/pt=portoghese/pt-br=portoghese-brasiliano/ro=romeno/ru=russo/sk=slovacco/sl=sloveno/sv=svedese/tr=turco/zh=cinese
 lt: af=afrikanų/ar=arabų/bg=bulgarų/br=bretonų/ca=katalonų/co=korsikiečių/cs=čekų/da=danų/de=vokiečių/en=anglų/eo=esperanto/es=ispanų/et=estų/fi=suomių/fr=prancūzų/he=hebrajų/is=islandų/it=italų/lt=lietuvių/lv=latvių/nl=olandų/no=norvegų/oc=oksitaniečių/pl=lenkų/pt=portugalų/pt-br=portugalų (Brazilija)/ro=rumunų/ru=rusų/sk=slovakų/sl=slovėnų/sv=švedų/tr=Turkų/zh=kinų
@@ -105,7 +105,7 @@ tr: %1 / %2
     %d years ago
 af: %d jaar gelede
 bg: преди %d години
-br: %d vloaz 'zo
+br: %d vloaz ’zo
 ca: fa %d anys
 co: %d anni fà
 cs: před %d rokem;lety
@@ -382,7 +382,7 @@ tr: %t zaten ebeveynlere sahip
     %t died before his/her birth
 af: %t is dood voor sy/haar geboorte
 bg: %t умира преди раждането си
-br: %t zo marv a-raok e c'h(he g)anedigezh
+br: %t zo marv a-raok e cʼh(he g)anedigezh
 ca: %t va morir abans del seu naixement
 co: %t hè mortu(a) nanzu a so nascita
 cs: %t zemřel před svým narozením/zemřela před svým narozením
@@ -676,7 +676,7 @@ tr: .
 
     (french revolution month)
 bg: вандемиер/брюмер/фример/нивоз/плювиоз/вантоз/жерминал/флореал/прериал/месидор/термидор/фруктидор/добавка
-br: miz ar vañdech (vañdemier)/miz brumer/miz frimer/miz an erc'h (nivoz)/miz ar glav (pluvioz)/miz vañtoz/miz ar sev (jerminal)/miz ar bleuñv (floreal)/miz ar pradeier (prerial)/miz an eost (mesidor)/miz termidor/miz fruktidor/miz komplemanter
+br: miz ar vañdech (vañdemier)/miz brumer/miz frimer/miz an ercʼh (nivoz)/miz ar glav (pluvioz)/miz vañtoz/miz ar sev (jerminal)/miz ar bleuñv (floreal)/miz ar pradeier (prerial)/miz an eost (mesidor)/miz termidor/miz fruktidor/miz komplemanter
 ca: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 co: vindimiaiu/brumaghju/frimaghju/nivosu/piuvosu/ventosu/germinale/flureale/prariale/messidoru/termidoru/fruttidoru/cumplementariu
 cs: Vendémiaire/Brumaire/Frimaire/Nivôse/Pluviôse/Ventôse/Germinal/Floréal/Prairial/Messidor/Thermidor/Fructidor/Complémentaire
@@ -688,7 +688,7 @@ es: vendimiario/brumario/frimario/nevoso/pluvioso/ventoso/germinal/floreal/pradi
 et: vandemjäär/brümäär/frimäär/nivoos/plüvioos/vantoos/žerminaal/floreaal/preriaal/messidoor/termidoor/früktidoor/komplementäär
 fi: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 fr: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
-he: וונדמיאיאר / ברומאיאר / פרימאיאר / ניבוז / פלוביוז / ג'רמינאל / פלוריאל / פראריאל / מסידור / תרמידור / פרוקטידור / נוסף
+he: וונדמיאיאר / ברומאיאר / פרימאיאר / ניבוז / פלוביוז / ג׳רמינאל / פלוריאל / פראריאל / מסידור / תרמידור / פרוקטידור / נוסף
 is: vínyrkjumánuður/þokumánuður/hrímmánuður/snjómánuður/regnmánuður/vindmánuður/frjóangamánuður/blómmánuður/engmánuður/uppskerumánuður/hitamánuður/aldinmánuður/hlaupársdagar
 it: vendemmiaio/brumaio/frimaio/nevoso/piovioso/ventoso/germinale/fiorile/pratile/ messidoro/termidoro/fruttidoro/complementare
 lt: vandenmjeras/briumeras/frimeras/nivozas/pliuvozas/ventozas/žerminalis/fliorealis/prerialis/mesidoras/termidoras/fruktidoras
@@ -720,7 +720,7 @@ es: tishri/marjeshvan o jeshvan/kislev/tevet/shevat/adar /( + adar sheni, adar b
 et: tishrei/chesvan/kislev/tevet/shvat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 fi: Tišrì/Hešván/Kislév/Tevét/Sevat/Adár/Adár II/Nisán/Ijjár/Siván/Tammúz/Ab/Elúl
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
-he: תשרי/ חשון/ כסלו/ טבת/ שבט/ אדר א'/ אדר ב'/ ניסן/ אייר/ סיון/ תמוז/ אב/ אלול
+he: תשרי/ חשון/ כסלו/ טבת/ שבט/ אדר א׳/ אדר ב׳/ ניסן/ אייר/ סיון/ תמוז/ אב/ אלול
 is: tísrí/marhesvan/kíslev/tebet/sebat/adar 1/adar 2/nísan/ijjar/sívan/tammús/ab/elúl
 it: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar 1/Adar 2/Nisan/Iyar/Sivan/Tammuz/Av/Elul
 lt: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyar/sivan/tammuz/av/elul
@@ -741,7 +741,7 @@ tr: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/A
 af: Januarie/Februarie/Maart/April/Mei/Junie/Julie/Augustus/September/Oktober/November/Desember
 ar: جانفي/فيفري/مارس/أفريل/ماي/جوان/جويلية/أوت/سبتمبر/أكتوبر/نوفمبر/ديسمبر
 bg: януари/февруари/март/април/май/юни/юли/август/септември/октомври/ноември/декември
-br: genver/c'hwevrer/meurzh/ebrel/mae/mezheven/gouere/eost/gwengolo/here/du/kerzu
+br: genver/cʼhwevrer/meurzh/ebrel/mae/mezheven/gouere/eost/gwengolo/here/du/kerzu
 ca: gener/febrer/març/abril/maig/juny/juliol/agost/setembre/octubre/novembre/desembre
 co: ghjennaghju/ferraghju/marzu/aprile/maghju/ghjugnu/lugliu/aostu/sittembre/uttobre/nuvembre/dicembre
 cs: ledna/února/března/dubna/května/června/července/srpna/září/října/listopadu/prosince
@@ -809,7 +809,7 @@ zh: .
 af: Sondag/Maandag/Dinsdag/Woensdag/Donderdag/Vrydag/Saterdag
 ar: يوم الإثنين/يوم الثلاثاء/يوم الأربعاء/يوم الخميس/يوم الجمعة/يوم السّبت/يوم ا
 bg: неделя/понеделник/вторник/сряда/четвъртък/петък/събота
-br: sul/lun/meurzh/merc'her/yaou/gwener/sadorn
+br: sul/lun/meurzh/mercʼher/yaou/gwener/sadorn
 ca: diumenge/dilluns/dimarts/dimecres/dijous/divendres/dissabte
 co: dumenica/luni/marti/marcuri/ghjovi/venneri/sabbatu
 cs: neděle/pondělí/úterý/středa/čtvrtek/pátek/sobota
@@ -821,7 +821,7 @@ es: domingo/lunes/martes/miércoles/jueves/viernes/sábado
 et: pühapäev:i:+al/esmaspäev:i:+al/teisipäev:i:+al/kolmapäev:i:+al/neljapäev:i:+al/reede:i:+l/laupäev:i:+al
 fi: sunnuntai:e:+na/maanantai:e:+na/tiistai:e:+na/keskiviikko:e:+na/torstai:e:+na/perjantai:e:+na/lauantai:e:+na
 fr: dimanche/lundi/mardi/mercredi/jeudi/vendredi/samedi
-he: יום א'/ יום ב'/ יום ג'/ יום ד'/ יום ה'/ יום ו'/ שבת
+he: יום א׳/ יום ב׳/ יום ג׳/ יום ד׳/ יום ה׳/ יום ו׳/ שבת
 is: sunnudagur/mánudagur/þriðjudagur/miðvikudagur/fimmtudagur/föstudagur/laugardagur
 it: domenica/lunedì/martedì/mercoledì/giovedì/venerdì/sabato
 lt: sekmadienis/pirmadienis/antradienis/trečiadienis/ketvirtadienis/penktadienis/šeštadienis
@@ -970,7 +970,7 @@ tr: <em>Sosa sayısı</em> %t'e göre
     a %s%s cousin
 af: 'n %s%s neef/'n %s%s niggie
 bg: %s%sи братовчед/%s%sа братовчедка
-br: ur %s%s c'henderv/ur %s%s geniterv/ur %s%s c'henderv(ez)
+br: ur %s%s cʼhenderv/ur %s%s geniterv/ur %s%s cʼhenderv(ez)
 ca: un %s%s cosí/una %s%s cosina/un(a) %s%s cosí(na)
 co: un %s%s cuginu/una %s%s cugina/un(a) %s%s cuginu(a)
 cs: %s%s bratranec/%s%s sestřenice
@@ -1002,7 +1002,7 @@ tr: %s%s kuzen
     a 2nd cousin
 af: 'n %skleinneef/'n %skleinniggie
 bg: %sвтори братовчед/%sвтора братовчедка
-br: ur %sc'hevenderv/ur %sgevendervez/ur %sc'hevnderv(ez)
+br: ur %scʼhevenderv/ur %sgevendervez/ur %scʼhevnderv(ez)
 ca: un %scosí segon/una %scosina segona/un(a) %scosí(na) segon(a)
 co: un %scuginu à u 2 gradu/una %scugina à u 2 gradu/un(a) %scuginu(a) à u 2 gradu
 cs: %sbratranec z druhého kolena/%ssestřenice z druhého kolena
@@ -1034,7 +1034,7 @@ tr: bir %s2. kuzen
     a 3rd cousin
 af: 'n %sagterkleinneef/'n %sagterkleinniggie
 bg: %sтрети братовчед/%sтрета братовчедка
-br: ur %sc'hevniant/ur %sgevniantez/ur %sc'hevniant(ez)
+br: ur %scʼhevniant/ur %sgevniantez/ur %scʼhevniant(ez)
 ca: un %scosí 3er/una %scosina 3a/un(a) %scosí(na) 3er(a)
 co: un %scuginu à u 3 gradu/una %scugina à u 3 gradu/un(a) %scuginu(a) à u 3 gradu
 cs: %sbratranec z třetího kolena/%ssestřenice z třetího kolena
@@ -1066,7 +1066,7 @@ tr: bir %s3. kuzen
     a brother-in-law/a sister-in-law
 af: 'n swaer/'n skoonsuster
 bg: сестрин съпруг, шурей или баджанак/братова съпруга, шуренайка или балдъза/сестрин съпруг, съпруг на зълва или девер/братова съпруга, зълва или етърва
-br: ur breur-kaer/ur c'hoar-gaer
+br: ur breur-kaer/ur cʼhoar-gaer
 ca: un cunyat/una cunyada
 co: un cugnatu/una cugnata
 cs: švagr/švagrová
@@ -1108,7 +1108,7 @@ tr: bir kayınbiraderi/kayınbiraderleri/bir kayınbiraderi/kayınbiraderleri
     a brother/a sister/a sibling
 af: 'n %sbroer/'n %ssuster/'n %ssibbe
 bg: %sбрат/%sсестра/%sбрат или %sсестра
-br: ur %sbreur/ur %sc'hoar/ur %sbreur pe ur %sc'hoar
+br: ur %sbreur/ur %scʼhoar/ur %sbreur pe ur %scʼhoar
 ca: un %sgermà/una %sgermana/un(a) %sgermà(na)
 co: un %sfratellu/una %ssurella/un %sfratellu o una %ssurella
 cs: %sbratr/%ssestra/%ssourozenec
@@ -1150,7 +1150,7 @@ tr: bir kayınvalidesi/kayınvalideleri
     a cousin
 af: 'n %sneef/'n %sniggie
 bg: %sпърви братовчед/%sпърва братовчедка
-br: ur %sc'henderv/ur %sgeniterv
+br: ur %scʼhenderv/ur %sgeniterv
 ca: un %scosí/una %scosina
 co: un %scuginu/una %scugina/un %scuginu o una %scugina
 cs: %sbratranec/%ssestřenice
@@ -1246,7 +1246,7 @@ tr: bir büyükbaba/bir büyükanne/bir büyükbaba veya büyükanne
     a grandson/a granddaughter/a grandchild
 af: 'n kleinseun/'n kleindogter/'n kleinkind
 bg: внук/внучка/внук или внучка
-br: ur mab bihan/ur verc'h vihan/ur bugel bihan
+br: ur mab bihan/ur vercʼh vihan/ur bugel bihan
 ca: un net/una neta/un(a) net(a)
 co: un figliulinu/una figliulina/un(a) figliulinu(a)
 cs: vnuk/vnučka/vnouče
@@ -1310,7 +1310,7 @@ tr: bir büyük büyükbaba/bir büyük büyükanne/bir büyük büyükbaba veya
     a great-grandson/a great-granddaughter/a great-grandchild
 af: 'n agterkleinseun/'n agterkleindogter/'n agterkleinkind
 bg: правнук/правнучка/правнук или правнучка
-br: ur mab-kuñv /ur verc'h guñv/ ur bugel-kuñv
+br: ur mab-kuñv /ur vercʼh guñv/ ur bugel-kuñv
 ca: un besnet/una besneta/un(a) besnet(a)
 co: un arcifigliulinu/un arcifigliulina/un arcifigliulinu(a)
 cs: pravnuk/pravnučka/pravnoučata
@@ -1342,7 +1342,7 @@ tr: bir büyük torun/bir büyük torun/bir büyük torun
     a great-nephew/a great-niece
 af: 'n %sagterneef/'n %sagterniggie
 bg: %sвнук на брат или сестра/%sвнучка на брат или сестра
-br: un %sniz bihan/ur %sverc'h vihan
+br: un %sniz bihan/ur %svercʼh vihan
 ca: un %sbesnebot/una %sbesneboda
 co: un %sniputinu/una %sniputina/%sniputini/%sniputine/%sniputini è %sniputine
 cs: %sprasynovec/%spraneteř
@@ -1426,7 +1426,7 @@ tr: bir üvey kayınbirader/kayınbiraderler
     a half-brother/a half-sister/a half-sibling
 af: 'n stiefbroer/'n stiefsuster/'n stiefbroer of -suster
 bg: полубрат/полусестра/полубрат или полусестра
-br: ul lezvreur/ul lezc'hoar/un hanter-breur pe -c'hoar
+br: ul lezvreur/ul lezcʼhoar/un hanter-breur pe -cʼhoar
 ca: un germanastre/una germanastra/un(a) germanastre(a)
 co: un fratellastru/una surellastra/un mezu-fratellu o surella
 cs: nevlastní bratr/nevlastní sestra/nevlastní sourozenec
@@ -1500,7 +1500,7 @@ tr: bir kayınbiraderi/kayınbiraderleri
     a son-in-law/a daughter-in-law
 af: 'n skoonseun/'n skoondogter
 bg: съпруг на дъщеря/съпруга на син
-br: mabeg/merc'heg
+br: mabeg/mercʼheg
 ca: un gendre/una jove
 co: un ghjeneru/una nora
 cs: zeť/snacha
@@ -1532,7 +1532,7 @@ tr: bir damadı/bir gelini
     a son/a daughter/a child
 af: 'n seun/'n dogter/'n kind
 bg: син/дъщеря/дете
-br: ur mab/ur verc'h/ur bugel
+br: ur mab/ur vercʼh/ur bugel
 ca: un fill/una filla/un(a) fill(a)
 co: un figliolu/una figliola/un(a) zitellu(a)
 cs: syn/dcera/dítě
@@ -2002,7 +2002,7 @@ tr: önceki adı, takma soyadı olarak ekleyin
 af: voeg %tby die data/verwyder die data/wys die grafiek/wysig die data
 ar: أضف %tإلى البيانات/مسح البيانات/عرض الرسم البياني/تعديل البيانات
 bg: добави %tкъм данните/изчисти данните/покажи графиката/редактирай данните
-br: ouzhpennañ %td'ar roadennoù/sileiñ ar roadennoù/diskouez ar grafik/digentañ ar roadennoù
+br: ouzhpennañ %td’ar roadennoù/sileiñ ar roadennoù/diskouez ar grafik/digentañ ar roadennoù
 ca: afegir %ta les dades/esborrar les dades/mostrar el gràfic/editar les dades
 co: aghjunghje %tà i dati/squassà i dati/affissà u graficu/mudificà i dati
 cs: přidat %tdo dat/vymazat data/zobrazit graf/upravit data
@@ -2094,7 +2094,7 @@ tr: evlat edinen baba/evlat edinen anne/evlat edinen ebeveynler
     adoptive son/adoptive daughter/adoptive child
 af: aangenome seun/aangenome dogter/aangenome kind
 bg: осиновен син/осиновена дъщеря/осиновено дете
-br: advab/adverc'h/advugel
+br: advab/advercʼh/advugel
 ca: fill adoptiu/filla adoptiva/fill(a) adoptiu(iva)
 co: figliolu aduttivu/figliola aduttiva/figliolu(a) addutivu(a)
 cs: adoptivní syn/adoptivní dcera/adoptivní dítě
@@ -2274,7 +2274,7 @@ tr: %s doğum yaşı
     age at death
 af: ouderdom by afsterwe
 bg: на възраст
-br: p'edo
+br: p’edo
 ca: a l'edat de
 co: età à u trapassu
 cs: věk v době úmrtí
@@ -2311,7 +2311,7 @@ fr: âge au mariage
     aged
 af: ouderdom by afsterwe
 bg: на възраст
-br: p'edo
+br: p’edo
 ca: a l'edat de
 co: à l’età di
 cs: věk v době úmrtí
@@ -2438,7 +2438,7 @@ zh: 可能活着
     alive
 af: in die lewe
 bg: жив/жива/жив(а)
-br: bev c'hoazh
+br: bev cʼhoazh
 ca: viu/viva/viu(va)
 co: vivu/viva/vivu(a)/vivi
 cs: žijící
@@ -4358,7 +4358,7 @@ tr: GeneWeb bağlantıları olmadan
     candidate father/candidate mother/candidate parents
 af: moontlike vader/moontlike moeder/moontlike ouers
 bg: възможен баща/възможна майка/възможни родители
-br: a c'hell bezañ tad/a c'hell bezañ mamm/a c'hell bezañ tud
+br: a cʼhell bezañ tad/a cʼhell bezañ mamm/a cʼhell bezañ tud
 ca: possible pare/possible mare/possibles pares
 co: babbu pussibule/mamma pussibule/genitori pussibule
 cs: pravděpodobný otec/pravděpodobná matka/pravděpodobní rodiče
@@ -4390,7 +4390,7 @@ tr: baba olabilir/anne olabilir/ebeveyn olabilir
     candidate son/candidate daughter/candidate child
 af: moontlike seun/moontlike dogter/moontlike kind
 bg: възможен син/възможна дъщеря/възможно дете
-br: a c'hell bezañ mab/a c'hell bezañ merc'h/ a c'hell bezañ bugel
+br: a cʼhell bezañ mab/a cʼhell bezañ mercʼh/ a cʼhell bezañ bugel
 ca: possible fill/possible filla/possible fill(a)
 co: figliolu pussibule/figliola pussibule/zitellu(a) pussibule
 cs: pravděpodobný syn/pravděpodobná dcera/pravděpodobné dítě
@@ -4422,7 +4422,7 @@ tr: oğul olabilir/kız olabilir/çocuk olabilir
     cannot access base
 af: databasis ontoeganklik
 bg: няма достъп до базата
-br: n'eus tu ebet da vont e-barzh an bon roadoù
+br: n’eus tu ebet da vont e-barzh an bon roadoù
 ca: impossible accedir a la base
 co: impussibule d’accede à a basa
 cs: databáze je nepřístupná
@@ -4455,7 +4455,7 @@ tr: tabana erişilemiyor
     cannot change sex of a married person
 af: kan die geslag van 'n getroude persoon nie verander nie
 bg: не може да се промени полът на човек в брак
-br: n'heller ket kemm reizh unan euredet
+br: n’heller ket kemm reizh unan euredet
 ca: no es pot canviar el sexe d'una persona casada
 co: ùn si pò micca cambià u sessu d’una persona maritata
 cs: nemohu změnit pohlaví ženatého muže/nemohu změnit pohlaví vdané ženy
@@ -5566,7 +5566,7 @@ fr: continuer
     continue correcting
 af: gaan voort met die samevoeging
 bg: да продължи обединяването
-br: derc'hel da gendeuziñ
+br: dercʼhel da gendeuziñ
 ca: continuar la fusió
 co: cuntinuà a currezzione ?
 cs: pokračovat ve spojování
@@ -5596,7 +5596,7 @@ tr: birleştirmeye devam et
     continue merging
 af: gaan voort met die samevoeging
 bg: да продължи обединяването
-br: derc'hel da gendeuziñ
+br: dercʼhel da gendeuziñ
 ca: continuar la fusió
 co: cuntinuà a fusione
 cs: pokračovat ve spojování
@@ -8396,7 +8396,7 @@ es: mostrar en segmentos/ancho de segmento/superpuesto/ancho total
 et: kuva osadena/osa laius/ülekate/kogulaius
 fi: näytä jaettuna kaistoihin/kaistan leveys/ylitys/koko leveys
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
-he: הצג רצועות  / רוחב רצועות  / חפיפה / ס"ה רוחב
+he: הצג רצועות  / רוחב רצועות  / חפיפה / ס״ה רוחב
 is: sýnt í hlutum/breidd hlutans/skörun hlutanna/öll breiddin
 it: visualizzare per segmenti/larghezza del segmento/sovrapposizione/larghezza totale
 lt: rodyti dalimis/dalies dydis/persidengimas/bendrasdydis
@@ -8674,7 +8674,7 @@ tr: yapmayın
     don't group the common branches together
 af: moet nie takke van ooreenstemende oorsprong saamvoeg nie
 bg: да не се обединяват общите клонове
-br: n'eo ket dav kendastum ar skourroù boutin
+br: n’eo ket dav kendastum ar skourroù boutin
 ca: no reagrupar les branques comunes
 co: ùn adunisce micca e ghjembe cumune
 cs: nespojovat spolecné vetve
@@ -8706,7 +8706,7 @@ tr: ortak dalları bir araya getirmeyin
     don't know
 af: onbekend
 bg: не се знае
-br: n'ouzon
+br: n’ouzon
 ca: no se sap
 co: ùn si sà
 cs: není známo
@@ -9090,7 +9090,7 @@ tr: aforoz
     executed (legally killed)
 af: teregsgestel
 bg: екзекутиран/екзекутирана/екзекутиран(а)
-br: lakaet d'ar marv
+br: lakaet d’ar marv
 ca: executat/executada/executat(ada)
 co: ghjustiziatu/ghjustiziata/ghjustiziatu (a)
 cs: popraven/popravena/popraven(a)
@@ -9664,7 +9664,7 @@ tr: ilk ad eksik
     first name not found
 af: voornaam nie gevind nie
 bg: собственото име не е намерено
-br: n'eo ket bet kavet ar raganv
+br: n’eo ket bet kavet ar raganv
 ca: nom no localitzat
 co: nome micca trovu
 cs: křestní jméno nebylo nalezeno
@@ -9908,7 +9908,7 @@ tr: koruyucu baba/koruyucu anne/koruyucu ebeveynler
     foster son/foster daughter/foster child
 af: pleegseun/pleegdogter/pleegkind
 bg: храненик/храненица/храненик или храненица
-br: mab desavet/merc'h desavet/bugel desavet
+br: mab desavet/mercʼh desavet/bugel desavet
 ca: fill adoptiu/filla adoptiva/fills adoptius
 co: figliolu allevatu/figliola allevata/figliolu(a) allevatu(a)
 cs: schovanec/schovanka/schovanec
@@ -10072,7 +10072,7 @@ tr: %s kuşağına kadar
     full siblings
 af: broers en susters
 bg: братя и сестри
-br: breudeur ha c'hoarezed
+br: breudeur ha cʼhoarezed
 ca: germans i germanes
 co: fratelli è surelle
 cs: sourozenci
@@ -10213,7 +10213,7 @@ fr: aller vers la base de données/&#10;Attention au numéro d’index dans la r
     go to section %s
 af: gaan na die %s seksie
 bg: отиди към раздела %s
-br: mont d'ar rubrik %s
+br: mont d’ar rubrik %s
 ca: anar a la secció %s
 co: andà à a sezzione %s
 cs: jít na sekci %s
@@ -10563,7 +10563,7 @@ tr: onların doğum günü kutlu olsun!
     happy birthday to you!
 af: geluk met jou verjaarsdag!
 bg: честит рожден ден!
-br: kalz a vloavezhioù all deoc'h!
+br: kalz a vloavezhioù all deocʼh!
 ca: per molts anys
 co: felice nataliziu !
 cs: všechno nejlepší k narozeninám!
@@ -10816,7 +10816,7 @@ fr: attention ! Sélectionner un nombre de génération élevé peut prendre pl
 af: beklemtoon leemtes/verwyder beklemtoning
 ar: تسليط الضوء على الثغرات/إخفاء التمييز
 bg: подчертаване на пропуски/скриване на подчертаването
-br: lusk an dalc'hoù/dilemel al lusk
+br: lusk an dalcʼhoù/dilemel al lusk
 ca: ressaltar els buits/amagar el ressaltat
 co: sopralineà e lacune/caccià u sopralineamentu
 cs: zvýraznit mezery/skrýt zvýraznění
@@ -11449,7 +11449,7 @@ tr: eşleri dahil et
     incompatible sexes
 af: botsende geslagte
 bg: несъвместими полове
-br: reizhoù n'hellont ket klotañ
+br: reizhoù n’hellont ket klotañ
 ca: sexes incompatibles
 co: sessi incumpatibili
 cs: nesprávné pohlaví
@@ -11709,7 +11709,7 @@ tr: Lütfen kullanmak istediğiniz veritabanının adını girin
     insert
 af: invoeg
 bg: вмъкване на
-br: ensoc'hañ
+br: ensocʼhañ
 ca: insertar
 co: framette
 cs: vložit
@@ -11808,7 +11808,7 @@ tr: ters çevrilmiş
 af: voeg 'n nuwe persoon en 'n nuwe voorvader aan die einde by/voeg 'n nuwe persoon en 'n nuwe voorvader voor hierdie een in/verwyder hierdie persoon en hul voorvaders uit die tabel/skuif hierdie persoon en hul voorvaders voor die vorige persoon/skuif hierdie persoon en hul voorvaders na die volgende persoon
 ar: إضافة شخص جديد وسلف جديد في النهاية/إدراج شخص جديد وسلف جديد قبل هذا/حذف هذا الشخص وأسلافه من الجدول/نقل هذا الشخص وأسلافه قبل الشخص السابق/نقل هذا الشخص وأسلافه بعد الشخص التالي
 bg: добави нов човек и нов предшественик в края/вмъкни нов човек и нов предшественик преди този/изтрий този човек и неговите предшественици от таблицата/премести този човек и неговите предшественици преди предишния/премести този човек и неговите предшественици след следващия
-br: ouzhpennañ un den nevez hag un hendad nevez er fin/enlakaat un den nevez hag un hendad nevez a-raok an hini-mañ/dilemel an den-mañ hag e hendadoù eus an daolenn/dilec'hiañ an den-mañ hag e hendadoù a-raok ar re kent/dilec'hiañ an den-mañ hag e hendadoù goude ar re war-lerc'h
+br: ouzhpennañ un den nevez hag un hendad nevez er fin/enlakaat un den nevez hag un hendad nevez a-raok an hini-mañ/dilemel an den-mañ hag e hendadoù eus an daolenn/dilecʼhiañ an den-mañ hag e hendadoù a-raok ar re kent/dilecʼhiañ an den-mañ hag e hendadoù goude ar re war-lercʼh
 ca: afegir una nova persona i un nou avantpassat al final/inserir una nova persona i un nou avantpassat abans d'aquest/eliminar aquesta persona i els seus avantpassats de la taula/moure aquesta persona i els seus avantpassats abans de l'anterior/moure aquesta persona i els seus avantpassats després del següent
 co: aghjunghje una nova persona è un novu antenatu à a fine/inserisce una nova persona è un novu antenatu nanzu à questu/squassà sta persona è i so antenati da a tavula/spustà sta persona è i so antenati nanzu à u precedente/spustà sta persona è i so antenati dopu à u seguente
 cs: přidat novou osobu a nového předka na konec/vložit novou osobu a nového předka před tuto/smazat tuto osobu a její předky z tabulky/přesunout tuto osobu a její předky před předchozí/přesunout tuto osobu a její předky za následující
@@ -11876,7 +11876,7 @@ zh: 添加人员/插入人员和祖先/删除人员和祖先/向上移动人员�
 af: voeg 'n nuwe ry aan die einde by/voeg 'n nuwe ry voor hierdie een in/verwyder hierdie ry uit die tabel/skuif hierdie ry een posisie op/skuif hierdie ry een posisie af
 ar: إضافة صف جديد في النهاية/إدراج صف جديد قبل هذا/حذف هذا الصف من الجدول/نقل هذا الصف موضع واحد لأعلى/نقل هذا الصف موضع واحد لأسفل
 bg: добави нов ред в края/вмъкни нов ред преди този/изтрий този ред от таблицата/премести този ред с една позиция нагоре/премести този ред с една позиция надолу
-br: ouzhpennañ ur renk nevez er fin/enlakaat ur renk nevez a-raok an hini-mañ/dilemel ar renk-mañ eus an daolenn/dilec'hiañ ar renk-mañ un taolenn war-zu an nec'h/dilec'hiañ ar renk-mañ un taolenn war-zu an traoñ
+br: ouzhpennañ ur renk nevez er fin/enlakaat ur renk nevez a-raok an hini-mañ/dilemel ar renk-mañ eus an daolenn/dilecʼhiañ ar renk-mañ un taolenn war-zu an necʼh/dilecʼhiañ ar renk-mañ un taolenn war-zu an traoñ
 ca: afegir una nova fila al final/inserir una nova fila abans d'aquesta/eliminar aquesta fila de la taula/moure aquesta fila una posició cap amunt/moure aquesta fila una posició cap avall
 co: aghjunghje una linea nova à a fine/inserisce una linea nova nanzu à questa/squassà sta linea da a tavula/spustà sta linea una pusizione in altu/spustà sta linea una pusizione in bassu
 cs: přidat nový řádek na konec/vložit nový řádek před tento/smazat tento řádek z tabulky/přesunout tento řádek o jednu pozici nahoru/přesunout tento řádek o jednu pozici dolů
@@ -12333,7 +12333,7 @@ zh: Gwd 服务器的启动参数
     less than one month old
 af: minder as 'n maand oud
 bg: на по-малко от месец
-br: n'eo ket koshoc'h eget miz
+br: n’eo ket koshocʼh eget miz
 ca: menys d'un mes
 co: menu d’un mese
 cs: méně než měsíc starý/méně než měsíc stará
@@ -12875,7 +12875,7 @@ tr: kontrol
     loop in database: %s is his/her own ancestor
 af: fout in die databasis: %s sy/haar eie voorvader
 bg: зацикляне в базата от данни
-br: dol er bon roadoù : %s a zo e/he hendad dezhañ/i e/hec'h-unan
+br: dol er bon roadoù : %s a zo e/he hendad dezhañ/i e/hecʼh-unan
 ca: bucle a la base de dades: %s és avantpassat d'ell mateix
 co: referenza circulare in a basa di dati : %s hè u so propiu antenatu
 cs: smyčka v databázi: %s je svůj předek
@@ -13334,7 +13334,7 @@ tr: evli
     married at age %t
 af: getroud op ouderdom %t
 bg: в брак от %t-годишна възраст
-br: euredet d'an oad a %t
+br: euredet d’an oad a %t
 ca: casat a l'edat de %t
 co: maritata(u) à l’età di %t
 cs: oženil se ve věku %t/vdala se ve věku %t
@@ -13436,7 +13436,7 @@ fr: nombre maximum pour les listes de relations
     maximum
 af: maksimum
 bg: най-много
-br: d'ar muiañ
+br: d’ar muiañ
 ca: màxim
 co: massimu
 cs: maximum
@@ -13524,7 +13524,7 @@ tr: birleştirmek
     merge done
 af: saamgevoeg
 bg: обединяването извършено
-br: echu eo ar c'hendeuziñ
+br: echu eo ar cʼhendeuziñ
 ca: fusió acabada
 co: fusione fatta
 cs: spojení dokončeno
@@ -14247,7 +14247,7 @@ fr: transférer le champ historique « commentaires d’union » vers celui des 
     move up/down
 af: skuif op/skuif af/skuif die wyser op/skuif die wyser af/glip-en-los
 bg: преместване нагоре/преместване надолу/преместване на курсора нагоре/преместване на курсора надолу/плъзгане и пускане
-br: pignat/diskenn/pignat ar c'hursor/diskenn ar c'hursor/leuskel-gweredek
+br: pignat/diskenn/pignat ar cʼhursor/diskenn ar cʼhursor/leuskel-gweredek
 ca: moure amunt/moure avall/moure el cursor amunt/moure el cursor avall/arrossegar i deixar anar
 co: cullà/falà/ricullà u cursore/falà u cursore/sguillà è depone
 cs: posunout nahoru/posunout dolů/posunout kurzor nahoru/posunout kurzor dolů/přetáhnout a pustit
@@ -14343,7 +14343,7 @@ tr: öldürülmüş
     n (number)
 af: niemand/een/twee/drie/vier/vyf/ses/sewe/agt/nege/tien/elf/twaalf/dertien/veertien/vyftien/sestien/sewentien/agtien/negentien/twintig/een en twintig/twee en twintig/drie en twintig/vier en twintig/vyf en twintig/ses en twintig/sewe en twintig/agt en twintig/nege en twintig/dertig/een en dertig
 bg: никой/едно/две/три/четири/пет/шест/седем/осем/девет/десет/единадесет/дванадесет/тринадесет/четиринадесет/петнадесет/шестнадесет/седемнадесет/осемнадесет/деветнадесет/двадесет/двадесет и едно/двадесет и две/двадесет и три/двадесет и четири/двадесет и пет/двадесет и шест/двадесет и седем/двадесет и осем/двадесет и девет/тридесет/тридесет и едно
-br: n'eus ket/un/daou/tri/pemp/c'hwec'h/sizh/seizh/eizh/nav/dek/unnek/daouzek/trizek/pevarzek/pemzek/c'hwezek/seitek/triwec'h/naontek/ugent/unan warn ugent/daou warn ugent/tri warn ugent/pevar warn ugent/pemp warn ugent/c'hwec'h warn ugent/seizh warn ugent/eizh warn ugent/nav warn ugent/tregont/unan ha tregont
+br: n’eus ket/un/daou/tri/pemp/cʼhwecʼh/sizh/seizh/eizh/nav/dek/unnek/daouzek/trizek/pevarzek/pemzek/cʼhwezek/seitek/triwecʼh/naontek/ugent/unan warn ugent/daou warn ugent/tri warn ugent/pevar warn ugent/pemp warn ugent/cʼhwecʼh warn ugent/seizh warn ugent/eizh warn ugent/nav warn ugent/tregont/unan ha tregont
 ca: cap/un/dos/tres/quatre/cinc/sis/set/vuit/nou/deu/onze/dotze/tretze/catorze/quinze/setze/disset/divuit/dinou/vint/vint-i-un/vint-i-dos/vint-i-tres/vint-i-quatre/vint-i-cinc/vint-i-sis/vint-i-set/vint-i-vuit/vint-i-nou/trenta/trenta-un
 co: nisunu/unu/dui/trè/quattru/cinque/sei/sette/ottu/nove/dece/ondeci/dodeci/tredeci/quattordeci/quindeci/seideci/dicesette/diciottu/dicennove/vinti/vintunu/vintidui/vintitrè/vintiquattru/vinticinque/vintisei/vintisette/vintottu/vintinove/trenta/trentunu
 cs: žádný/jeden/dva/tři/čtyři/pět/šest/sedm/osm/devět/deset/jedenáct/dvanáct/třináct/čtrnáct/patnáct/šestnáct/sedmnáct/osmnáct/devatenáct/dvacet/dvacet jedna/dvacet dva/dvacet tři/dvacet čtyři/dvacet pět/dvacet šest/dvacet sedm/dvacet osm/dvacet devět/třicet/třicet jedna
@@ -14417,7 +14417,7 @@ es: nombre %s ya utilizado por %s
 et: nimi %s on juba kasutuses %s
 fi: nimi %s on jo käytössä %s
 fr: nom %s déjà utilisé par %s
-he: השם %s בשימוש כבר ע"י %s
+he: השם %s בשימוש כבר ע״י %s
 is: nafnið %s er þegar í notkun af %s
 it: nome %s già utilizzato da %s
 lt: vardas %s jau panaudotas %s
@@ -14502,7 +14502,7 @@ tr: navigasyon
     navigation with %t as Sosa reference
 af: stap met %t as Sosa verwysing
 bg: навигация чрез числа на Соса относно %t
-br: merdeadur gant %t 'vel dave Sosa
+br: merdeadur gant %t ’vel dave Sosa
 ca: navegació amb %t amb referència de "número Sosa"
 co: navigazione cù %t cum’è referenza Sosa
 cs: prohlížení s %t jako "Sosa" referencí
@@ -14688,7 +14688,7 @@ tr: sonraki ilişki yolu
     next sibling
 af: volgende broer/volgende suster/volgende broer of suster
 bg: следващ брат/следваща сестра/следващ брат или следваща сестра
-br: breur da heul/c'hoar da heul/breur pe c'hoar da heul
+br: breur da heul/cʼhoar da heul/breur pe cʼhoar da heul
 ca: germà següent/germana següent/germà(ana) següent
 co: fratellu seguente/surella seguente/fratellu o surella seguente
 cs: následující sourozenec
@@ -14949,7 +14949,7 @@ fr: ce lien peut conduire à un homonyme voire échouer car la clé utilisateur 
     no sexes check
 af: geslag word nie aangedui nie
 bg: без проверка за пол
-br: n'eo ket bet gwiriekaet ar reizh
+br: n’eo ket bet gwiriekaet ar reizh
 ca: no verificar els sexes
 co: unione omosessuale (senza cuntrollu di i sessi)
 cs: bez kontroly pohlaví
@@ -15002,7 +15002,7 @@ sv: inte separerat
     not divorced
 af: nie geskei nie
 bg: неразведени
-br: n'int ket dibriedet
+br: n’int ket dibriedet
 ca: no divorciat
 co: micca divurziati
 cs: nerozvedeni
@@ -15034,7 +15034,7 @@ tr: boşanmamış
     not found
 af: niks gekry nie
 bg: няма резултат от търсенето
-br: n'eo ket bet kavet
+br: n’eo ket bet kavet
 ca: no localitzat
 co: micca trovu
 cs: nenalezeno
@@ -15893,7 +15893,7 @@ tr: -da,-de
 zh: 于
 
     on (weekday day month year)
-br: d'ar
+br: d’ar
 co: u
 de: am
 en: on
@@ -16644,7 +16644,7 @@ fr: lieux & événements
     place/places
 af: plek
 bg: място
-br: lec'h
+br: lecʼh
 ca: lloc
 co: locu/lochi
 cs: místo
@@ -16946,7 +16946,7 @@ fr: une sauvegarde pré-existante du portrait sera supprimée.<br> Utiliser MOD_
     previous sibling
 af: vorige broer/vorige suster/vorige broer of suster
 bg: предхождащ брат/предхождаща сестра/предхождащ брат или предхождаща сестра
-br: breur kent/c'hoar kent/breur pe c'hoar kent
+br: breur kent/cʼhoar kent/breur pe cʼhoar kent
 ca: germà anterior/germana anterior/germà(ana) anterior
 co: fratellu precedente/surella precedente/fratellu o surella precedente
 cs: předchozí sourozenec
@@ -17186,7 +17186,7 @@ tr: nüfus sayımı
     recognized son/recognized daughter/recognized child
 af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
 bg: припознат син/припозната дъщеря/припознато дете
-br: mab anavezet/merc'h anavezet/bugel anavezet
+br: mab anavezet/mercʼh anavezet/bugel anavezet
 ca: fill reconegut/filla reconeguda/fills reconeguts
 co: figliolu ricunisciutu/figliola ricunisciuta/figliolu(a) ricunisciutu(a)
 cs: uznaný syn/uznaná dcera/uznané dítě
@@ -17218,7 +17218,7 @@ tr: tanınan oğul/tanınan kız/tanınan çocuk
     recognizing father/recognizing mother/recognizing parents
 af: erkennende vader/erkennende moeder/erkennende ouders
 bg: припознал баща/припознала майка/припознали родители
-br: an tad en deus e(hec'h) anavezet/ar vamm he deus e(hec'h) anavezet/ar gerent o deus e (hec'h) anavezet
+br: an tad en deus e(hecʼh) anavezet/ar vamm he deus e(hecʼh) anavezet/ar gerent o deus e (hecʼh) anavezet
 ca: pare reconegut/mare reconeguda/pares reconeguts
 co: u babbu l’avendu ricunisciutu(a)/a mamma l’avendu ricunisciutu(a)/i genitori l’avendu ricunisciutu(a)
 cs: uznaný otec/uznaná matka/uznaní rodiče
@@ -17491,7 +17491,7 @@ zh: %s 和 %s 之间的 %d 个 %ss
 af: verwantskapskakel tussen %s en %s deur %s
 ar: رابط قرابة بين %s و %s عبر %s
 bg: връзка на родство между %s и %s чрез %s
-br: liamm c'heneliezh etre %s ha %s dre %s
+br: liamm cʼheneliezh etre %s ha %s dre %s
 ca: enllaç de parentiu entre %s i %s per %s
 co: ligame di parentela trà %s è %s passendu da %s
 cs: příbuzenský vztah mezi %s a %s přes %s
@@ -17654,7 +17654,7 @@ tr: ile aile bağı...
 af: verwantskapskakel/verwantskapskakels
 ar: رابط قرابة/روابط قرابة
 bg: родствена връзка/родствени връзки
-br: liamm c'heneliezh/liammoù c'heneliezh
+br: liamm cʼheneliezh/liammoù cʼheneliezh
 ca: enllaç de parentiu/enllaços de parentiu
 co: liame di parentela/liami di parentela
 cs: příbuzenský vztah/příbuzenské vztahy
@@ -17688,7 +17688,7 @@ zh: 亲属关系/亲属关系
 af: wys verwantskaptabel/wys die tabel van verwantskappe vir al hierdie individue/verwantskaptabel/aantal bekende skakels en kortste stygende&#047;dalende grade
 ar: عرض جدول القرابة/عرض جدول علاقات القرابة لجميع هؤلاء الأفراد/جدول القرابة/عدد الروابط المعروفة والدرجات الصاعدة&#047;النازلة الأقصر
 bg: покажи таблица на родството/покажи таблицата на родствените връзки за всички тези индивиди/таблица на родството/брой известни връзки и най-кратки възходящи&#047;низходящи степени
-br: diskouez taolenn ar c'heneliezh/diskouez taolenn liammoù ar c'heneliezh evit an holl dud-se/taolenn ar c'heneliezh/niver a liammoù anavezet ha dereioù pignat&#047;diskenn berrana
+br: diskouez taolenn ar cʼheneliezh/diskouez taolenn liammoù ar cʼheneliezh evit an holl dud-se/taolenn ar cʼheneliezh/niver a liammoù anavezet ha dereioù pignat&#047;diskenn berrana
 ca: mostrar taula de parentiu/mostrar la taula de relacions de parentiu per a tots aquests individus/taula de parentiu/nombre d'enllaços coneguts i graus ascendent&#047;descendent més curts
 co: affissà tavula di parentela/affissà a tavula di relazioni di parentela per tutti questi individui/tavula di parentela/numeru di ligami cunnisciuti è gradi ascendente&#047;discendente più corti
 cs: zobrazit tabulku příbuzenství/zobrazit tabulku příbuzenských vztahů pro všechny tyto jedince/tabulka příbuzenství/počet známých vazeb a nejkratší vzestupné&#047;sestupné stupně
@@ -17938,7 +17938,7 @@ tr: emeklilik
     return to top
 af: terug na bo
 bg: върни се нагоре
-br: distro da zerc'he
+br: distro da zercʼhe
 ca: torna a dalt
 co: riturnassine insù
 cs: návrat nahoru
@@ -18004,7 +18004,7 @@ tr: revizyon Tarihi
     RLM graph impracticable
 af: RLM-graf onprakties
 bg: RLM график непрактичен
-br: n'eo ket aes grafiñ RLM
+br: n’eo ket aes grafiñ RLM
 ca: el gràfic RLM és impracticable
 co: graficu RLM inaduprevule
 cs: Graf RLM je nepraktický
@@ -18580,7 +18580,7 @@ tr: resimleri görüntüle
     see further
 af: kyk verder
 bg: вж. по-долу
-br: gwelout pelloc'h
+br: gwelout pellocʼh
 ca: veure tot seguit
 co: fighjà dopu
 cs: viz dále
@@ -18739,7 +18739,7 @@ fr: sélect. fichier
 af: taalvoorkeur
 ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية
 bg: можете да изберете друг език за съобщения измежду следните
-br: dibab a c'hellit ur yezh all etre ar re-mañ
+br: dibab a cʼhellit ur yezh all etre ar re-mañ
 ca: podeu seleccionar una altre llengua, hi ha disponibles les següents
 co: selezziunà a lingua
 cs: zvolte jazyk pro prohlížení databáze
@@ -19133,7 +19133,7 @@ tr: implex göster
     siblings
 af: broers en susters
 bg: братя и сестри
-br: breudeur ha c'hoarezed
+br: breudeur ha cʼhoarezed
 ca: germans i germanes
 co: fratelli è surelle
 cs: sourozenci
@@ -19224,7 +19224,7 @@ tr: ölçek
     skip to main content
 af: spring na hoofinhoud
 bg: прескочете към основното съдържание
-br: plij da boud d'an destenn
+br: plij da boud d’an destenn
 ca: salta al contingut principal
 co: andà à u cuntenutu principale
 cs: přeskočit na hlavní obsah
@@ -19258,7 +19258,7 @@ zh: 跳到主要内容
     son/daughter/child
 af: seun/dogter/kind
 bg: син/дъщеря/деца
-br: mab/merc'h/bugel
+br: mab/mercʼh/bugel
 ca: fill/filla/fill(a)
 co: figliolu/figliola/zittellu(a)
 cs: je synem/je dcerou/je dítětem
@@ -19531,7 +19531,7 @@ tr: eşler hakkında bilgi
     spouses not included
 af: eggenote weggelaat
 bg: без да се включват съпрузите/съпругите
-br: ar priedoù n'int ket enklozet
+br: ar priedoù n’int ket enklozet
 ca: cònjuges no inclosos
 co: cumpagni esclusi
 cs: manželé/manželky nejsou zahrnuty
@@ -19804,7 +19804,7 @@ tr: soyadı eksik
     surname not found
 af: van nie gevind nie
 bg: фамилното име не бе намерено
-br: an anv-familh n'eo ket bet kavet
+br: an anv-familh n’eo ket bet kavet
 ca: cognom no localitzat
 co: casata micca trova
 cs: příjmení nenalezeno
@@ -20068,7 +20068,7 @@ tr: %d en yaşlı çift belki hala hayatta ve nişanlı
     the %d oldest perhaps still alive
 af: die %d oudstes wat nog leef
 bg: най-старите %d евентуално още живи лица
-br: ar %d den koshañ bev c'hoazh marteze
+br: ar %d den koshañ bev cʼhoazh marteze
 ca: les %d persones més grans, potser encara vives
 co: i %d i più vechji forse sempre vivi
 cs: %d nejstarších snad ještě žijících osob
@@ -20261,7 +20261,7 @@ tr: evlilik yıldönümü
     the base has changed; do "back", "reload", and refill the form
 af: die databasis het verander; gaan "terug", "herlaai" en vul die vorm weer in
 bg: базата от данни е променена; натиснете "back" и "reload" и попълнете отново формуляра
-br: ar bon roadoù a zo kemmet : distroit d'ar bajenn a-raok, grit "hizivaat ar bajenn", ha grit en-dro ar reolskrid
+br: ar bon roadoù a zo kemmet : distroit d’ar bajenn a-raok, grit "hizivaat ar bajenn", ha grit en-dro ar reolskrid
 ca: la base ha canviat, fer "back", "reload" i completeu novament el formulari
 co: a basa hà cambiatu : rivene à a pagina precedente, attualizà, è riempie torna u furmulariu
 cs: databáze se změnila; vraťte se zpět (back), znovu načtěte stránku (reload) a vyplňte formulář
@@ -20364,7 +20364,7 @@ fr: le nom de la base "%s" contient un caractère interdit.
     the day after tomorrow
 af: oormôre
 bg: вдругиден
-br: an deiz goude warc'hoazh
+br: an deiz goude warcʼhoazh
 ca: demà passat
 co: dopu dumane
 cs: pozítří
@@ -20477,7 +20477,7 @@ zh: 父/母/a parent
     the file is temporarily locked: please try again
 af: die lêer is tydelik gesluit: probeer asseblief later weer
 bg: файлът е временно заключен; опитайте отново. Ако това не помага, изчакайте малко преди да опитате пак
-br: ar fichennaoueg a zo morailhet evit ar poent: klaskit ober ur wech c'hoazh. Ma ne da ket en-dro, gortozit un tamm a-raok adkregiñ ganti
+br: ar fichennaoueg a zo morailhet evit ar poent: klaskit ober ur wech cʼhoazh. Ma ne da ket en-dro, gortozit un tamm a-raok adkregiñ ganti
 ca: la base està temporalment tancada: provar de nou. Si això no funciona, espereu uns moments abans de tornar a provar
 co: u schedariu hè bluccatu : pruvate torna. S’ella ùn funzionneghja micca, aspettate una cria nanzu di pruvà torna.
 cs: soubor je dočasně uzamčen: zkuste to znova. Pokud to stále nefunguje, chvíli počkejte a pak to zkuste znovu.
@@ -20570,7 +20570,7 @@ tr: %t ve %t çocuklarının doğum tarihi birbirine çok uzak
     the following children of %t and %t are not in order
 af: die volgende kinders van %t and %t is nie in die regte volgorde nie
 bg: следните деца на %t и %t не са в хронологичен ред
-br: ar vugale-mañ, re %t ha %t n'int ket en urzh mat
+br: ar vugale-mañ, re %t ha %t n’int ket en urzh mat
 ca: els fills següents de %t i %t no estan en ordre cronològic
 co: quelli zitelli di %t è %t ùn sò micca in l’ordine
 cs: následující děti rodičů %t a %t nejsou v chronologickém pořadí
@@ -21111,7 +21111,7 @@ fr: vers
     to add a child to a family, use "%s"
 af: om 'n kind by te voeg by 'n familie, gebruik "%s"
 bg: за да добавите дете към семейство, използвайте "%s"
-br: evit ouzhpennañ ur bugel d'un tiegezh e ranker implij "%s"
+br: evit ouzhpennañ ur bugel d’un tiegezh e ranker implij "%s"
 ca: per afegir un fill a una família, utilitzeu "%s"
 co: per aghjunghje un(a) zitellu(a) à una famiglia, impiegà « %s »
 cs: pro přidání dítěte do rodiny použij "%s"
@@ -21551,7 +21551,7 @@ fr: tout cocher
     tomorrow
 af: môre
 bg: утре
-br: warc'hoazh
+br: warcʼhoazh
 ca: demà
 co: dumane
 cs: zítra
@@ -21619,7 +21619,7 @@ es: total
 et: kokku
 fi: yhteensä
 fr: total
-he: סה'כ
+he: סה״כ
 is: alls
 it: totale
 lt: iš viso
@@ -21799,7 +21799,7 @@ tr: amcalar ve teyzeler
     undefined sex for %t
 af: geslag onbekend vir %t
 bg: не е определен полът на %t
-br: ar reizh n'eo ket termenet evit %t
+br: ar reizh n’eo ket termenet evit %t
 ca: no s'ha definit el sexe de %t
 co: sessu micca definitu per %t
 cs: neznámé pohlaví pro %t
@@ -21898,7 +21898,7 @@ fr: conjoints manquants
     unspecified
 af: nie gemeld nie
 bg: неуточнено
-br: n'eo ket resisaet
+br: n’eo ket resisaet
 ca: no especificat
 co: micca specificatu
 cs: nespecifikováno
@@ -22054,7 +22054,7 @@ fr: restorer Sosa 1 par défault
     use "link" instead of "create"
 af: gebruik "koppel" eerder as "skep"
 bg: използвайте "да се свърже" вместо "да се създаде"
-br: implijit "liammañ" kentoc'h eget "sevel"
+br: implijit "liammañ" kentocʼh eget "sevel"
 ca: utilitzeu "reunir" en lloc de "crear"
 co: impiegà « unisce » invece di « creà »
 cs: použij "svázat" namísto "vytvořit"
@@ -22740,7 +22740,7 @@ tr: kendi atası olurdu
     Y/N
 af: J/N
 bg: Д/Н
-br: Ya/N'eo ket
+br: Ya/N’eo ket
 ca: S/N
 co: I/N
 cs: A/N
