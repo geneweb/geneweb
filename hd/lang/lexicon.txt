@@ -15636,9 +15636,9 @@ tr: Sosa No.
 af: Sosa nommer relatief tot
 bg: число на Соса относно
 br: niverenn Sosa e keñver
-ca: número "Sosa"relatiu a
+ca: número «Sosa» relatiu a
 co: n<sup>u</sup> Sosa relativu à
-cs: "Sosa" číslo vztažené k
+cs: „Sosa“ číslo vztažené k
 da: Sosa-nummer, refererende til
 de: Ahnenkennziffer relativ zu
 en: Sosa relative to
@@ -15654,12 +15654,12 @@ lv: Sosa pakāpe attiecībā pret
 nl: Sosa nummer ten opzichte van
 no: anenummer i forhold til
 oc: n° de Sosa relatiu a
-pl: numer "Sosa", odnoszący się do:
+pl: numer „Sosa”, odnoszący się do:
 pt: número Sosa em relação a
 ro: numar Sosa in relatie cu
 ru: Sosa номер относительно
-sk: "Sosa" číslo vo vzťahu k
-sl: številka"Sosa", v odnosu z
+sk: „Sosa“ číslo vo vzťahu k
+sl: številka „Sosa“, v odnosu z
 sv: annummer med som proband (Kekules system)
 tr: Sosa'ya göre
 
@@ -17769,7 +17769,7 @@ tr: ile ilişki%t
 
     remove %s column
 co: fà un cliccu nant’à st’intestatura per caccià sta o ste culonna(e) « %s »
-de: klicke auf diesen Header um die Zeile "%s" zu entfernen
+de: klicke auf diesen Header um die Zeile „%s“ zu entfernen
 en: click on this header to remove the column(s) “%s”
 es: haga clic en este encabezado para quitar la(s) columna(s) «%s»
 fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
@@ -18472,7 +18472,7 @@ es: ver más arriba
 et: vaata ülalt
 fi: katso yllä
 fr: voir ci-dessus
-he: הנ"ל
+he: הנ״ל
 is: sjá að ofan
 it: vedi sopra
 lt: žiūrėti anksčiau
@@ -19386,9 +19386,9 @@ tr: Sosa
 af: Sosa 1
 bg: число на Соса 1
 br: Sosa 1
-ca: número "Sosa" 1
+ca: número «Sosa» 1
 co: Sosa 1
-cs: "Sosa" 1
+cs: „Sosa“ 1
 da: Sosa 1
 de: Ahnenkennziffer 1
 en: Sosa 1
@@ -19404,7 +19404,7 @@ lv: Sosa 1
 nl: Sosa 1
 no: Anenummer 1
 oc: numèro de Sosa 1
-pl: "Sosa" 1
+pl: „Sosa” 1
 pt: Sosa 1
 ro: Sosa 1
 ru: Sosa 1
