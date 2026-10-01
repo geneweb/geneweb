@@ -27,7 +27,7 @@
   </div>
   <h1 id="h1" class="ms-3 mb-0">[*loading/error]0</h1>
   <p id="chronicle" class="ms-3 mb-0 text-body-secondary d-none"></p>
-  <div id="index-wall" class="flex-wrap mt-3 ms-3 d-none"></div>
+  <div id="index-wall" class="flex-wrap mt-2 ms-3 gap-2 d-none"></div>
   <div id="album-nav" class="d-none justify-content-center">
     <div class="p-2 bd-highlight"><a id="home" href="#" onclick="loadIndex(); return false;" title="[*gallery index]"><i class="fa-solid fa-house"></i></a></div>
     <div class="p-2 bd-highlight"><a id="first" href="#" title="[*first]" onclick="loadFirstImage(); return false;"><i class="fa-solid fa-backward"></i></a></div>
