@@ -416,7 +416,7 @@ function initializeWelcomeSearchFunctionality() {
   const searchBtn = document.getElementById('global-search');
   if (!searchBtn) return;
 
-  const defaultText = '[*search/case sensitive]0';
+  const defaultText = `[*search/case sensitive]0`;
 
   function hasInput(form) {
     return form && Array.from(form.querySelectorAll('input[type="search"]'))
@@ -438,8 +438,8 @@ function initializeWelcomeSearchFunctionality() {
     const instance = bootstrap.Tooltip.getInstance(searchBtn);
     if (!instance) return;
     let text = defaultText;
-    if (hasInput(mainForm)) text = '[*search/case sensitive]0 [person/persons]0';
-    else if (titleForm && hasInput(titleForm)) text = '[*search/case sensitive]0 [title/titles]0/[estate]0';
+    if (hasInput(mainForm)) text = `[*search/case sensitive]0 [person/persons]0`;
+    else if (titleForm && hasInput(titleForm)) text = `[*search/case sensitive]0 [title/titles]0/[estate]0`;
     instance.setContent({ '.tooltip-inner': text });
     if (text !== defaultText) {
       instance.show();
@@ -550,8 +550,8 @@ function setupTocToggle() {
   if (!tocContent) return;
   function toggleTocText() {
     return tocContent.hidden
-      ? '([visualize/show/hide/summary]1)'
-      : '([visualize/show/hide/summary]2)';
+      ? `([visualize/show/hide/summary]1)`
+      : `([visualize/show/hide/summary]2)`;
   }
   document.querySelectorAll('.toc-toggle').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -758,7 +758,7 @@ function populateDatalists() {
   if (!menu) return;
   const names = {%nn;
     %for;i;0;32;%let;l1;%apply;language(i)%in;%nn;
-      %if;(i>0),%end;'%l1;':'%apply;language_name(l1)'%nn;
+      %if;(i>0),%end;'%l1;':`%apply;language_name(l1)`%nn;
     %end;
   };
   const def = '%b.default_lang;';
