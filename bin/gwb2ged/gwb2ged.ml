@@ -1,5 +1,6 @@
 module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
+module GWPARAM = Geneweb.GWPARAM
 
 let raise_bad fmt = Format.kasprintf (fun s -> raise (Arg.Bad s)) fmt
 
@@ -36,8 +37,6 @@ let parse_cmd () =
   in
   (bname, !opts, !with_indexes)
 
-let ( // ) = Filename.concat
-
 let () =
   let bname, opts, with_indexes = parse_cmd () in
   Secure.set_bases_dir opts.bases_dir;
@@ -49,6 +48,6 @@ let () =
       (oc, path, fun () -> close_out oc)
   in
   let opts = { opts with Gwexport.oc = (name, output_string oc, close) } in
-  Driver.with_database (opts.bases_dir // bname) @@ fun base ->
+  Driver.with_database (GWPARAM.bpath bname) @@ fun base ->
   let select = Gwexport.select base opts [] in
   Gwb2gedLib.gwb2ged base with_indexes opts select

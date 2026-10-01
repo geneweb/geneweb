@@ -4,6 +4,7 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 module Dirs = Geneweb_dirs
+module GWPARAM = Geneweb.GWPARAM
 
 let debug = ref false
 let bases_dir = ref None
@@ -268,13 +269,11 @@ let compute base bpath =
   (* Save the cache_linked_pages to a file *)
   save_cache_linked_pages bpath cache_linked_pages
 
-let ( // ) = Filename.concat
-
 let main () =
-  let fname, bases_dir = parse_cmd () in
+  let bname, bases_dir = parse_cmd () in
   Secure.set_bases_dir bases_dir;
-  let bpath = bases_dir // fname in
-  if fname = "" then (
+  let bpath = GWPARAM.bpath bname in
+  if bname = "" then (
     Printf.eprintf "Missing database name\n";
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;

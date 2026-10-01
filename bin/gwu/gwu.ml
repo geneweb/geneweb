@@ -1,6 +1,7 @@
 open GwuLib
 module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
+module GWPARAM = Geneweb.GWPARAM
 
 let isolated = ref false
 let bname = ref None
@@ -80,7 +81,7 @@ let () =
       Gwexport.oc = (name, output_string oc, fun () -> close_out oc);
     };
   let opts = !opts in
-  Driver.with_database (opts.bases_dir // bname) @@ fun base ->
+  Driver.with_database (GWPARAM.bpath bname) @@ fun base ->
   let select = Gwexport.select base opts [] in
   let src_oc_ht = Hashtbl.create 1009 in
   Driver.load_ascends_array base;
