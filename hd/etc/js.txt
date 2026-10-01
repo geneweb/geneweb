@@ -53,7 +53,7 @@
     <script src="%etc_prefix;js/relationmatrix.min.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.min.js%end;"></script>
   %end;
   %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
-  %if;("IND" in e.m or "FAM" in e.m or "MOD_NOTES" in e.m)
+  %if;("IND" in e.m or "FAM" in e.m or e.m="MOD_GALLERY")
    <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
   %end;
 %end;
@@ -127,7 +127,7 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
   %end;
 %end;
 %if;((wizard and e.m="" and not is_welcome) or "CHK_DATA" in e.m or "MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
+    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES" or e.m="MOD_GALLERY"
     or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/6.0.1/autosize.min.js"
@@ -678,8 +678,8 @@ const RpcDatalistManager = {
 %end;
 %if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
     or b.datalist_titles=1 or b.datalist_estates=1))
-  or (e.m="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1))
-  or ("IND" in e.m or "FAM" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1
+  or (e.m="MOD_GALLERY" and (b.datalist_fnames=1 or b.datalist_snames=1))
+  or ("IND" in e.m or "FAM" in e.m and e.m!="MOD_GALLERY" and (b.datalist_fnames=1
     or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
     or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
     or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
@@ -725,53 +725,24 @@ const DatalistManager = {
       })
       .catch(error => console.error(`Error loading ${cacheFile}:`, error));
   },
-  %if;(e.m="MOD_NOTES")
+  %if;(e.m="MOD_GALLERY")
   handleDataTableInput: function(input, listId) {
-    if (!input || !listId) return;
-
     const dataList = document.getElementById(listId);
     if (!dataList) return;
-
-    const selStart = input.selectionStart;
-    const selEnd = input.selectionEnd;
-    const currentValue = input.value;
-
-    const option = Array.from(dataList.options).find(opt =>
-      opt.value.toLowerCase() === currentValue.toLowerCase()
-    );
-
-    if (option) {
-      const $row = $(input).closest('tr');
-      const $cell = $(input).closest('td');
-      const rowIndex = table.row($row).index();
-      const cellIndex = $cell.index();
-
-      const finalValue = currentValue;
-
-      requestAnimationFrame(() => {
-        const $newRow = $(table.row(rowIndex).node());
-        const $newCell = $newRow.find(`td:eq(${cellIndex})`);
-        const $newInput = $newCell.find('input');
-
-        if ($newInput.length) {
-          if ($newInput.val() !== finalValue) {
-            $newInput.val(finalValue);
-          }
-          $newInput.focus();
-          if (selStart === 0 && selEnd === currentValue.length) {
-            $newInput[0].setSelectionRange(0, finalValue.length);
-          } else {
-            $newInput[0].setSelectionRange(selStart, selEnd);
-          }
-        }
-      });
-    } else {
-      requestAnimationFrame(() => {
-        input.setSelectionRange(selStart, selEnd);
-      });
-    }
+    const { selectionStart: selStart, selectionEnd: selEnd, value } = input;
+    const lc = value.toLowerCase();
+    if (!Array.from(dataList.options).some(o => o.value.toLowerCase() === lc)) return;
+    const rowIndex = table.row(input.closest('tr')).index();
+    const cellIndex = input.closest('td').cellIndex;
+    requestAnimationFrame(() => {
+      const el = table.row(rowIndex).node()?.cells%[cellIndex%]?.querySelector('input');
+      if (!el) return;
+      if (el.value !== value) el.value = value;
+      el.focus();
+      el.setSelectionRange(selStart, selEnd);
+    });
   }
-%end;
+  %end;
 };
 
 function constructCachePath() {
@@ -789,7 +760,7 @@ function constructCachePath() {
 function populateDatalists() {
   const path = constructCachePath();
   const datalists = %[
-  %if;(is_welcome or "IND" in e.m or "FAM" in e.m)
+  %if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_GALLERY")
     %if;(b.datalist_snames=1)  { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
     %if;(b.datalist_fnames=1)  { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
     %if;("IND" in e.m or "FAM" in e.m)
@@ -932,8 +903,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initFormFocus();
   initCalendarMonthSelects();
 %end;
-%if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_NOTES")
-  %if;(roglo or b.rpc_datalist=1)
+%if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_GALLERY")
+  %if;((roglo or b.rpc_datalist=1) and e.m!="MOD_GALLERY")
     (async () => {
       const rpcOk = await RpcDatalistManager.init();
       if (rpcOk) {
