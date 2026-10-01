@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 23/05/2026 05:02:11 $ -->
+<!-- $Id: js.txt v7.1 01/10/2026 17:55:01 $ -->
 %if;not cancel_links;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
@@ -274,7 +274,6 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
 %( Functions for character.txt %)
 %if;("ADD" in e.m or "MOD" in e.m)
 <script>
-  // Attach a click event listener to each anchor element within the character's list container
   function setupCharacterInsertion() {
     document.querySelectorAll('.ch a').forEach(function (element) {
       element.addEventListener('click', function (event) {
@@ -285,7 +284,6 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
     });
   }
 
-  // Function to insert a character at the current cursor position in a textarea
   function insertCharacter(t, v) {
     var startPos = t.selectionStart;
     var endPos = t.selectionEnd;
@@ -305,7 +303,6 @@ function insertTags(tagOpen, tagClose, sampleText) {
   let selectedText = textarea.value.substring(start, end);
   if (!selectedText) selectedText = sampleText;
 
-  // Remove trailing space if exists
   if (selectedText.endsWith(' ')) {
     selectedText = selectedText.slice(0, -1);
     const text = textarea.value;
@@ -319,16 +316,12 @@ function insertTags(tagOpen, tagClose, sampleText) {
     textarea.value = before + tagOpen + selectedText + tagClose + after;
   }
 
-  // Restore scroll position
   textarea.scrollTop = scrollTop;
 
-  // Set selection
   if (start === end) {
-    // No text was selected
     const cursorPos = start + tagOpen.length;
     textarea.setSelectionRange(cursorPos, cursorPos + sampleText.length);
   } else {
-    // Text was selected
     const newCursorPos = start + tagOpen.length + selectedText.length + tagClose.length;
     textarea.setSelectionRange(newCursorPos, newCursorPos);
   }
@@ -336,7 +329,6 @@ function insertTags(tagOpen, tagClose, sampleText) {
   textarea.focus();
   return false;
 }
-// Toolbar sticky behavior
 function setupToolbarSticky() {
   const toolbar = document.querySelector('.toolbar-wrapper');
   if (!toolbar) return;
@@ -373,7 +365,7 @@ document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
     }
   });
 });
-// Restaurer le tooltip natif au survol via title=, que BS5 mange en l'instanciant comme Popover
+%( BS5 moves title= to data-bs-original-title on popovers; restore it as a native hover tooltip. %)
 document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').forEach(el => {
   const helpText = el.getAttribute('data-bs-original-title');
   if (helpText) {
@@ -385,7 +377,7 @@ document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').
 %end;
 <script>
 %if;(wizard and (is_welcome or "ADD_FAM" in e.m or "MOD_" in e.m))
-// Manages enhanced input field behaviors (navigation, interaction)
+%( Ctrl+click on an input with data-book opens its MOD_DATA book. %)
 const inputToBook = {
   addNavigation: function() {
     document.addEventListener('mousedown', function(event) {
@@ -419,8 +411,7 @@ const inputToBook = {
 };
 %end;
 %if;(is_welcome and b.propose_titles!="no")
-// Controls unified search functionality with a shared submit button
-// Handles both main person search and optional title search forms
+%( Shared submit button for the person and title search forms. %)
 function initializeWelcomeSearchFunctionality() {
   const mainForm = document.getElementById('main-search');
   const titleForm = document.getElementById('title-search');
@@ -509,7 +500,7 @@ function moveWelcomeLangSelect() {
 }
 %end;
 %if;(e.templ="" and not is_welcome)
-// Focus on found autofocus input in opening BS modal
+%( Focus the autofocus element of an opening BS modal. %)
 function setupModalAutofocus() {
   document.addEventListener('shown.bs.modal', function(event) {
     const autofocusEl = event.target.querySelector('[autofocus]');
@@ -518,19 +509,18 @@ function setupModalAutofocus() {
 }
 %end;
 %if;(e.m!="MOD_DATA")
-// Floating placeholders for all textual inputs
-// Floating placeholders for all textual inputs
+%( Floating placeholders for textual inputs. %)
 function setupFloatingPlaceholders() {
   const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
 
   inputs.forEach(input => {
-    // Ignore placeholders that are only non-breaking spaces
+    %( Skip placeholders made of non-breaking spaces only. %)
     if (input.placeholder.trim() === '') return;
 
     let wrapper = input.parentNode;
     if (wrapper.classList.contains('clear-button-wrapper')) {
-      // Reuse the positioned wrapper added by clearinput; keep the
-      // .input-wrapper CSS hooks so layout rules still match.
+      %( Reuse the positioned wrapper added by clearinput; keep the
+         .input-wrapper CSS hooks so layout rules still match. %)
       wrapper.classList.add('input-wrapper');
     } else if (!wrapper.classList.contains('input-wrapper')) {
       const hadFocus = document.activeElement === input;
@@ -557,7 +547,6 @@ function setupFloatingPlaceholders() {
 %end;
 %if;(e.templ="")
 %if;(e.m="NOTES" or e.m="WIZNOTES")
-// TOC toggle for NOTES and WIZNOTES
 function setupTocToggle() {
   const tocContent = document.getElementById('toc-content');
   if (!tocContent) return;
@@ -591,7 +580,7 @@ function setupAutofocusInput() {
 }
 %end;
 %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
-// RPC-based datalist manager for Roglo large datasets
+%( RPC-backed datalists for very large bases %)
 const RpcDatalistManager = {
   client: null,
   isConnected: false,
@@ -599,7 +588,7 @@ const RpcDatalistManager = {
 
   RPC_URL: 'ws://%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;localhost%end;:8080/search',
 
-  // Dérive le nom du cache depuis l'ID datalist : datalist_fnames -> base_fnames.cache
+  %( datalist_fnames -> <base>_fnames.cache %)
   getCacheFile: function(datalistId) {
     const type = datalistId.replace('datalist_', '');
     return '%base.name;_' + type + '.cache';
@@ -619,7 +608,7 @@ const RpcDatalistManager = {
         return JSON.parse(response);
       };
 
-      // Test connexion avec timeout 3 secondes
+      %( Probe the server, give up after 3 s. %)
       const testPromise = this.client.lookup('%base.name;_fnames.cache', '', 1);
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('RPC timeout')), 3000)
@@ -665,13 +654,12 @@ const RpcDatalistManager = {
     }
   },
 
-  // Découvre et attache automatiquement tous les inputs avec attribut list="datalist_*"
+  %( Bind every input whose list attribute starts with datalist_. %)
   attachAllListeners: function() {
     const self = this;
     document.querySelectorAll('input[list^="datalist_"]').forEach(input => {
       const datalistId = input.getAttribute('list');
 
-      // Recherche sur saisie (avec debounce)
       input.addEventListener('input', function() {
         clearTimeout(self.debounceTimers[datalistId]);
         self.debounceTimers[datalistId] = setTimeout(() => {
@@ -679,7 +667,6 @@ const RpcDatalistManager = {
         }, 100);
       });
 
-      // Recherche sur focus si champ déjà rempli
       input.addEventListener('focus', function() {
         if (this.value && this.value.length >= 2) {
           self.populateDatalist(datalistId, this.value);
@@ -696,10 +683,7 @@ const RpcDatalistManager = {
     or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
     or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
     or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
-// Manages datalist population and updates
-// Simple datalist manager with special handling for DataTables inputs
 const DatalistManager = {
-  // Main populate function for regular form datalists
   populateDatalist: function(datalistId, cacheFile) {
     const dataList = document.getElementById(datalistId);
     if (!dataList) return;
@@ -742,34 +726,28 @@ const DatalistManager = {
       .catch(error => console.error(`Error loading ${cacheFile}:`, error));
   },
   %if;(e.m="MOD_NOTES")
-  // Special handling for DataTables inputs
   handleDataTableInput: function(input, listId) {
     if (!input || !listId) return;
 
     const dataList = document.getElementById(listId);
     if (!dataList) return;
 
-    // Store current cursor position and selection
     const selStart = input.selectionStart;
     const selEnd = input.selectionEnd;
     const currentValue = input.value;
 
-    // Let browser handle datalist matching
     const option = Array.from(dataList.options).find(opt =>
       opt.value.toLowerCase() === currentValue.toLowerCase()
     );
 
     if (option) {
-      // Get row and cell info before any updates
       const $row = $(input).closest('tr');
       const $cell = $(input).closest('td');
       const rowIndex = table.row($row).index();
       const cellIndex = $cell.index();
 
-      // Preserve case the user typed
       const finalValue = currentValue;
 
-      // Use requestAnimationFrame to handle focus after redraw
       requestAnimationFrame(() => {
         const $newRow = $(table.row(rowIndex).node());
         const $newCell = $newRow.find(`td:eq(${cellIndex})`);
@@ -780,7 +758,6 @@ const DatalistManager = {
             $newInput.val(finalValue);
           }
           $newInput.focus();
-          // Only select if user had selected the whole content
           if (selStart === 0 && selEnd === currentValue.length) {
             $newInput[0].setSelectionRange(0, finalValue.length);
           } else {
@@ -789,7 +766,6 @@ const DatalistManager = {
         }
       });
     } else {
-      // If no match, just maintain cursor position
       requestAnimationFrame(() => {
         input.setSelectionRange(selStart, selEnd);
       });
@@ -963,7 +939,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (rpcOk) {
         RpcDatalistManager.attachAllListeners();
       } else {
-        // Fallback .gz uniquement si serveur RPC indisponible
+        %( .gz fallback when the RPC server is unavailable %)
         %if;(b.datalist_fnames=1 or b.datalist_snames=1)
           populateDatalists();
         %end;
