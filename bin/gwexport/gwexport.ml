@@ -58,8 +58,6 @@ let default_opts =
     test = false;
   }
 
-let errmsg = "Usage: " ^ Sys.argv.(0) ^ " <BASE> [OPT]"
-
 let speclist c =
   [
     ( "-a",

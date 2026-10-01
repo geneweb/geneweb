@@ -8,6 +8,10 @@ let bname = ref None
 let raise_bad fmt = Format.kasprintf (fun s -> raise (Arg.Bad s)) fmt
 
 let parse_cmd () =
+  (* FIXME: this hack ensures that Arg module won't print an os-dependent
+     values in error messages. We can remove this hack after switching to
+     cmdliner in this program. *)
+  Sys.argv.(0) <- "gwu";
   let speclist opts =
     ( "-odir",
       Arg.String (fun s -> GwuLib.out_dir := s),
@@ -52,7 +56,8 @@ let parse_cmd () =
     | Some _ -> raise_bad "Cannot treat several databases"
   in
   let opts = ref Gwexport.default_opts in
-  Arg.parse (speclist opts) anonfun Gwexport.errmsg;
+  let errmsg = "Usage: gwu <BASE> [OPT]" in
+  Arg.parse (speclist opts) anonfun errmsg;
   let bname =
     match !bname with
     | None -> raise_bad "a database name is mandatory"

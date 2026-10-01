@@ -277,6 +277,10 @@ let parse_output inputs output =
   | _, Some bname -> bname
 
 let parse_cmd () =
+  (* FIXME: this hack ensures that Arg module won't print an os-dependent
+     values in error messages. We can remove this hack after switching to
+     cmdliner in this program. *)
+  Sys.argv.(0) <- "gwc";
   Arg.parse speclist anonfun errmsg;
   let inputs = List.rev !rev_inputs in
   let bname = parse_output inputs !output in
