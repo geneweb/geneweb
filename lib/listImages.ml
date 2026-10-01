@@ -45,7 +45,7 @@ let json_subdir base name =
   `Assoc [ ("name", `String name); ("files", json_strings (list_images sub)) ]
 
 let json_key_full conf key =
-  let base = GWPARAM.images_d conf.bname // key in
+  let base = Layout.images conf.layout // key in
   `Assoc
     [
       ("src", `String "key");
@@ -55,7 +55,7 @@ let json_key_full conf key =
     ]
 
 let json_key_dir conf key dir =
-  let target = GWPARAM.images_d conf.bname // key // dir in
+  let target = Layout.images conf.layout // key // dir in
   `Assoc
     [
       ("src", `String "key");
@@ -65,7 +65,7 @@ let json_key_dir conf key dir =
     ]
 
 let json_albums_root conf =
-  let base = GWPARAM.albums_d conf.bname in
+  let base = Layout.albums conf.layout in
   `Assoc
     [
       ("src", `String "albums");
@@ -78,7 +78,7 @@ let json_albums_root conf =
     ]
 
 let json_albums_dir conf dir =
-  let target = GWPARAM.albums_d conf.bname // dir in
+  let target = Layout.albums conf.layout // dir in
   `Assoc
     [
       ("src", `String "albums");

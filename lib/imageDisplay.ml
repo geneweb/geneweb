@@ -100,7 +100,7 @@ let print_folder_images_json conf folder =
   let files =
     match folder with
     | Some f when safe_folder f -> (
-        let dir = GWPARAM.albums_d conf.bname // f in
+        let dir = Layout.albums conf.layout // f in
         let collect entry acc =
           match entry with
           | Filesystem.File path ->
@@ -132,7 +132,7 @@ let print_album_image conf =
       if Mutil.contains fname ".." || String.contains fname '\\' then
         Hutil.incorrect_request conf
       else
-        let fname = GWPARAM.albums_d conf.bname // fname in
+        let fname = Layout.albums conf.layout // fname in
         if conf.wizard || conf.friend || Image.is_not_private_img conf fname
         then
           Result.fold ~ok:ignore
@@ -194,7 +194,7 @@ let print_blason_aux conf base p =
 
 let print_source conf f =
   let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
-  let fname = GWPARAM.images_d conf.bname // fname in
+  let fname = Layout.images conf.layout // fname in
   if (conf.wizard || conf.friend) || Image.is_not_private_img conf fname then
     Result.fold ~ok:ignore
       ~error:(fun _ -> Hutil.incorrect_request conf)

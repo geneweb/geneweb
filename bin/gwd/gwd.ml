@@ -362,7 +362,7 @@ let print_redirected conf from request new_addr =
 
 let nonce_private_key =
   Lazy.from_fun (fun () ->
-      let fname = Filename.concat !GWPARAM.cnt_dir "gwd_private.txt" in
+      let fname = GWPARAM.state_d () // "gwd_private.txt" in
       let k =
         try
           let ic = open_in fname in
@@ -392,7 +392,7 @@ let nonce_private_key =
         string_of_int k)
       else k)
 
-let digest_nonce _ = Lazy.force nonce_private_key
+let digest_nonce () = Lazy.force nonce_private_key
 
 let trace_auth base_env f =
   if List.mem_assoc "trace_auth" base_env then (
@@ -408,8 +408,8 @@ let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
   Output.status conf Code.Unauthorized;
   if !digest_password then
-    let nonce = digest_nonce conf.ctime in
-    let _ =
+    let nonce = digest_nonce () in
+    let () =
       let tm = Unix.localtime (Unix.time ()) in
       trace_auth conf.base_env (fun oc ->
           Printf.fprintf oc
@@ -1082,8 +1082,8 @@ let digest_authorization ~cgi request base_env passwd utm bname command =
           ds_response = get_digenv "response";
         }
       in
-      let nonce = digest_nonce utm in
-      let _ =
+      let nonce = digest_nonce () in
+      let () =
         trace_auth base_env (fun oc ->
             Printf.fprintf oc
               "\n\
@@ -1226,6 +1226,38 @@ let allowed_plugins ~loaded_plugins base_env =
   | Allowed s ->
       List.of_seq @@ SS.to_seq @@ SS.filter (fun p -> SS.mem p s) loaded_set
 
+let rec cut_at_equal i s =
+  if i = String.length s then (s, "")
+  else if s.[i] = '=' then
+    (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
+  else cut_at_equal (succ i) s
+
+let load_file fname =
+  try
+    Secure.with_open_in_text fname @@ fun ic ->
+    let rec loop env =
+      match input_line ic with
+      | exception End_of_file -> List.rev env
+      | s ->
+          let s = Mutil.strip_all_trailing_spaces s in
+          if s = "" || s.[0] = '#' then loop env
+          else loop (cut_at_equal 0 s :: env)
+    in
+    loop []
+  with Sys_error error ->
+    Log.warn (fun k ->
+        k "Error %s while loading %s, using empty config" error fname);
+    []
+
+let read_base_env layout =
+  let fname = Layout.gwf layout in
+  if Sys.file_exists fname then load_file fname
+  else (
+    Log.debug (fun k ->
+        k "No configuration file found (%s), see %s for example" fname
+          (Option.get !gw_prefix // "a.gwf"));
+    [])
+
 let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     request script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
@@ -1268,7 +1300,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     let command = script_name in
     (command, bname, passwd, env, access_type)
   in
-
+  let layout = Layout.of_bname ~mode:Detect bname in
   let oidc_session, access_type =
     match access_type with
     | ATnone -> (
@@ -1290,12 +1322,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     | _ -> ("", ("opt", Mutil.encode x) :: env)
   in
   (* read base environment from the right location *)
-  GWPARAM.set_reorg ~mode:Detect ~bname;
-  GWPARAM.cnt_dir := GWPARAM.cnt_d bname;
-  let base_env =
-    if bname = "" then []
-    else Util.read_base_env ~bname (Option.get !gw_prefix) !debug
-  in
+  let base_env = if bname = "" then [] else read_base_env layout in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
@@ -1475,6 +1502,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
       allowed_plugins;
       secret_salt = Some secret_salt;
       predictable_mode;
+      layout;
     }
   in
   (conf, ar)
@@ -2062,10 +2090,10 @@ let daemonize ~daemon k =
     | _ -> exit 0
   else k ()
 
-let create_cnt_dir () =
-  try Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
-  with Sys_error e ->
-    Log.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
+let create_state_dir () =
+  let dir = GWPARAM.state_d () in
+  try Filesystem.create_dir ~parent:true ~required_perm:0o700 dir
+  with Sys_error e -> Log.err (fun k -> k "failure creating %s:@ %s" dir e)
 
 let slashify = String.map (fun c -> match c with '\\' -> '/' | _ -> c)
 
@@ -2120,7 +2148,7 @@ let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
     | exception Not_found ->
         daemonize ~daemon @@ fun () ->
         display_infos ();
-        create_cnt_dir ();
+        create_state_dir ();
         (* A secret salt is added to the environment to ensure that workers
            use the same salt for digests on both Unix and Windows platforms. *)
         let secret_salt =
@@ -2159,7 +2187,7 @@ let manage_cgi_timeout conn tmout =
 let geneweb_cgi ~loaded_plugins ~secret_salt addr script_name contents =
   let conn = Connection.of_out_channel ~cgi:true stdout in
   if Sys.unix then manage_cgi_timeout conn !conn_timeout;
-  (try Unix.mkdir !GWPARAM.cnt_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
+  create_state_dir ();
   let add k x request =
     try
       let v = Sys.getenv x in
@@ -2230,11 +2258,9 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
        if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
      in
      images_prefix := Some ("file://" ^ slashify abs_dir));
-  GWPARAM.cnt_dir := GWPARAM.cnt_d "";
   if !Mutil.particles_file = "" then
     Mutil.particles_file := Option.get !gw_prefix // "etc" // "particles.txt";
-  Server.stop_server :=
-    List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
+  Server.stop_server := GWPARAM.state_d () // "STOP_SERVER";
   Util.is_welcome := false;
   if !check then (
     Log.debug (fun k -> k "End of check mode.");

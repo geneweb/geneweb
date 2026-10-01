@@ -43,8 +43,9 @@ let print_default_gwf_file bname =
       "p_mod=";
     ]
   in
-  let config_d = GWPARAM.config_d bname in
-  let fname = GWPARAM.config bname in
+  let layout = Layout.of_bname ~mode:Detect bname in
+  let config_d = Layout.config layout in
+  let fname = Layout.gwf layout in
   if not (Sys.file_exists fname) then
     try
       if not (Sys.file_exists config_d) then Unix.mkdir config_d 0o755;
@@ -55,43 +56,6 @@ let print_default_gwf_file bname =
         close_out oc
     with Unix.Unix_error (_, _, _) ->
       Log.warn (fun k -> k "Error while creating %s or %s" config_d fname)
-
-let rec cut_at_equal i s =
-  if i = String.length s then (s, "")
-  else if s.[i] = '=' then
-    (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
-  else cut_at_equal (succ i) s
-
-let read_base_env ~bname gw_prefix debug =
-  let load_file fname =
-    try
-      let ic = Secure.open_in fname in
-      let env =
-        let rec loop env =
-          match input_line ic with
-          | s ->
-              let s = Mutil.strip_all_trailing_spaces s in
-              if s = "" || s.[0] = '#' then loop env
-              else loop (cut_at_equal 0 s :: env)
-          | exception End_of_file -> env
-        in
-        loop []
-      in
-      close_in ic;
-      List.rev env
-    with Sys_error error ->
-      Log.warn (fun k ->
-          k "Error %s while loading %s, using empty config" error fname);
-      []
-  in
-  let fname = GWPARAM.config bname in
-  if Sys.file_exists fname then load_file fname
-  else (
-    if debug then
-      Log.info (fun k ->
-          k "No configuration file found (%s), see %s for example" fname
-            (Filename.concat gw_prefix "a.gwf"));
-    [])
 
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   let disabled =
@@ -1438,7 +1402,7 @@ let find_file_in_directories directories filename =
     @return ordered list of directories to traverse *)
 
 let generate_search_directories conf =
-  let base_etc = GWPARAM.etc_d conf.bname in
+  let base_etc = Layout.etc conf.layout in
   let shared_etc = Filename.concat (Secure.bases_dir ()) "etc" in
   let asset_dirs = Secure.assets () in
   let configured_templates, allow_all =
@@ -1600,7 +1564,7 @@ let get_protocol conf =
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then (
     let print_file fname =
-      let fname = (GWPARAM.etc_d conf.bname // fname) ^ ".txt" in
+      let fname = (Layout.etc conf.layout // fname) ^ ".txt" in
       try
         Secure.with_open_in_text fname @@ fun ic ->
         while true do
@@ -2340,7 +2304,7 @@ let write_default_sosa conf key =
         else (k, v) :: acc)
       [] (List.rev conf.base_env)
   in
-  let fname = GWPARAM.config conf.bname in
+  let fname = Layout.gwf conf.layout in
   let tmp_fname = fname ^ "2" in
   let oc =
     try Stdlib.open_out tmp_fname
@@ -2803,8 +2767,8 @@ let update_wf_trace conf fname =
   write_wf_trace fname (List.sort (fun x y -> compare y x) wt)
 
 let test_cnt_d conf =
-  let config_d = GWPARAM.config_d conf.bname in
-  let cnt_d = GWPARAM.cnt_d conf.bname in
+  let config_d = Layout.config conf.layout in
+  let cnt_d = Layout.cnt conf.layout in
   (if not (Sys.file_exists config_d) then
      try Unix.mkdir config_d 0o755
      with Unix.Unix_error (_, _, _) ->
@@ -2829,7 +2793,7 @@ let commit_patches conf base =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      let fname = GWPARAM.adm_file (conf.bname ^ "_u.txt") in
+      let fname = Layout.cnt conf.layout // (conf.bname ^ "_u.txt") in
       update_wf_trace conf fname
 
 let short_f_month m =
@@ -2855,7 +2819,9 @@ type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
 let read_gen_auth_file fname bname =
   let fname =
-    if GWPARAM.is_reorg_base bname then GWPARAM.config_d bname // fname
+    if GWPARAM.is_reorg_base bname then
+      let layout = Layout.of_bname ~mode:Reorg bname in
+      Layout.config layout // fname
     else Secure.bases_dir () // fname
   in
   try

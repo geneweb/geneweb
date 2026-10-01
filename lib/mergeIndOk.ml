@@ -509,7 +509,7 @@ let merge_carrousel conf base o_p1 o_p2 p =
           else ())
       (Sys.readdir dir2)
   in
-  let full_dir file = GWPARAM.images_d conf.bname // file in
+  let full_dir file = Layout.images conf.layout // file in
   let ofn = p.first_name in
   let osn = p.surname in
   let oocc = p.occ in

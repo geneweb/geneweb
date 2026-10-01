@@ -3,7 +3,6 @@ val errors_undef : string list ref
 val errors_other : string list ref
 val set_vars : string list ref
 val gwd_cmd : string ref
-val cnt_dir : string ref
 
 val reorg : bool ref
 (** set to true when base is in reorg format *)
@@ -11,33 +10,9 @@ val reorg : bool ref
 val force : bool ref
 (** force creation of database if already existing *)
 
-type dir = string
-type file = string
-
-type layout = {
-  gwf : file;
-  cnt : dir;
-  adm_file : string -> dir;
-  portraits : dir;
-  src : dir;
-  etc : dir;
-  config : dir;
-  lang : string -> dir;
-  images : dir;
-  albums : dir;
-}
-
-val config : string -> string
-val cnt_d : string -> string
 val adm_file : string -> string
-val src_d : string -> string
-val etc_d : string -> string
-val config_d : string -> string
-val lang_d : string -> string -> string
 val bpath : string -> string
-val portraits_d : string -> string
-val images_d : string -> string
-val albums_d : string -> string
+val state_d : unit -> string
 
 (* S: Move it to gwd_lib?  *)
 
@@ -47,9 +22,7 @@ val init : string -> unit
 val is_reorg_base : string -> bool
 (** returns true iff mybase.gwb/config/mybase.gwf exists *)
 
-type mode = Reorg | Legacy | Detect
-
-val set_reorg : mode:mode -> bname:string -> unit
+val set_reorg : mode:Layout.mode -> bname:string -> unit
 
 val check_base_exists : string -> unit
 (** Check if database exists and exit if so (unless -f flag is set) *)

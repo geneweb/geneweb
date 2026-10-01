@@ -23,7 +23,7 @@ let input_int ic =
 
 let count conf =
   let _ = Util.test_cnt_d conf in
-  let fname = GWPARAM.adm_file (conf.bname ^ ".txt") in
+  let fname = (Layout.cnt conf.layout // conf.bname) ^ ".txt" in
   try
     Secure.with_open_in_text fname @@ fun ic ->
     let rd =
@@ -89,7 +89,7 @@ let set_wizard_and_friend_traces conf =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      let fname = GWPARAM.adm_file (conf.bname ^ "_w.txt") in
+      let fname = Layout.cnt conf.layout // (conf.bname ^ "_w.txt") in
       update_wf_trace conf fname)
   else if conf.friend && (not conf.just_friend_wizard) && conf.user <> "" then
     let fpf =
@@ -102,7 +102,7 @@ let set_wizard_and_friend_traces conf =
       fpf <> ""
       && is_that_user_and_password conf.auth_scheme conf.user fp = false
     then
-      let fname = GWPARAM.adm_file (conf.bname ^ "_f.txt") in
+      let fname = Layout.cnt conf.layout // (conf.bname ^ "_f.txt") in
       update_wf_trace conf fname
 
 let incr_counter f conf =
@@ -110,7 +110,7 @@ let incr_counter f conf =
   if conf.bname = "" || not (Sys.file_exists bpath) then None
   else (
     ignore (Util.test_cnt_d conf : string);
-    let lock_file = GWPARAM.adm_file (conf.bname ^ ".lck") in
+    let lock_file = GWPARAM.state_d () // (conf.bname ^ ".lck") in
     (* FIXME: we silently ignore errors if we cannot acquire the lock on the
        database. *)
     let on_exn _exn _bt = None in
@@ -132,7 +132,7 @@ let incr_request_counter =
 
 let lang_file_name conf fname =
   let fname1 =
-    GWPARAM.lang_d conf.bname conf.lang // (Filename.basename fname ^ ".txt")
+    Layout.lang conf.layout // conf.lang // (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
@@ -140,17 +140,15 @@ let lang_file_name conf fname =
       (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
 
 let any_lang_file_name conf fname =
-  let fname1 =
-    GWPARAM.lang_d conf.bname "" // (Filename.basename fname ^ ".txt")
-  in
+  let fname1 = Layout.lang conf.layout // (Filename.basename fname ^ ".txt") in
   if Sys.file_exists fname1 then fname1
   else
     search_in_assets (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
 
 let source_file_name conf fname =
-  let fname1 = GWPARAM.src_d conf.bname // conf.lang // (fname ^ ".txt") in
-  if Sys.file_exists fname1 then fname1
-  else Filename.concat (GWPARAM.src_d conf.bname) (fname ^ ".txt")
+  let src = Layout.src conf.layout in
+  let fname1 = src // conf.lang // (fname ^ ".txt") in
+  if Sys.file_exists fname1 then fname1 else Filename.concat src (fname ^ ".txt")
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y)) with _ -> None

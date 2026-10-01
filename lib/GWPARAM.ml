@@ -14,92 +14,26 @@ let set_vars = ref []
 let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
-let cnt_dir = ref ""
 let ( // ) = Filename.concat
 
 let bpath bname =
   if not @@ Mutil.good_name bname then invalid_arg "bpath";
   Secure.bases_dir () // (bname ^ ".gwb")
 
-type dir = string
-type file = string
+let is_reorg_base bname =
+  let layout = Layout.reorg_layout bname in
+  Sys.file_exists @@ Layout.gwf layout
 
-type layout = {
-  gwf : file;
-  cnt : dir;
-  adm_file : string -> dir;
-  portraits : dir;
-  src : dir;
-  etc : dir;
-  config : dir;
-  lang : string -> dir;
-  images : dir;
-  albums : dir;
-}
-
-let default bname =
-  if not @@ Mutil.good_name bname then invalid_arg "default";
-  let cnt =
-    if bname <> "" then bpath bname // "config" // "cnt"
-    else Secure.bases_dir () // "cnt"
-  in
-  {
-    gwf = bpath bname // "config" // (bname ^ ".gwf");
-    cnt;
-    adm_file = (fun file -> cnt // file);
-    portraits = bpath bname // "documents" // "portraits";
-    src = bpath bname // "src";
-    etc = bpath bname // "etc";
-    config = bpath bname // "config";
-    lang = (fun file -> bpath bname // "lang" // file);
-    images = bpath bname // "documents" // "images";
-    albums = bpath bname // "documents" // "albums";
-  }
-
-let legacy bname =
-  if not @@ Mutil.good_name bname then invalid_arg "legacy";
-  let bases_dir = Secure.bases_dir () in
-  let cnt = bases_dir // "cnt" in
-  {
-    gwf = bases_dir // (bname ^ ".gwf");
-    cnt;
-    adm_file = (fun file -> cnt // file);
-    portraits = bases_dir // "images" // bname;
-    src = bases_dir // "src" // bname;
-    etc = bases_dir // "etc" // bname;
-    config = bases_dir;
-    lang = (fun file -> bases_dir // "lang" // bname // file);
-    images = bases_dir // "src" // bname // "images";
-    albums = bases_dir // "src" // bname // "albums";
-  }
-
-let current = ref None
-let config _bname = (Option.get !current).gwf
-let cnt_d _bname = (Option.get !current).cnt
-let adm_file file = (Option.get !current).adm_file file
-let src_d _bname = (Option.get !current).src
-let etc_d _bname = (Option.get !current).etc
-let config_d _bname = (Option.get !current).config
-let lang_d _bname = (Option.get !current).lang
-let portraits_d _bname = (Option.get !current).portraits
-let images_d _bname = (Option.get !current).images
-let albums_d _bname = (Option.get !current).albums
-
-(* Check if a base is in reorg format *)
-let is_reorg_base bname = Sys.file_exists (default bname).gwf
+let state_d () = Secure.bases_dir () // "state.dir"
+let adm_file file = state_d () // file
 
 (* Initialize path functions based on mode *)
-let init bname =
-  Secure.add_assets Filename.current_dir_name;
-  if !reorg then current := Some (default bname)
-  else current := Some (legacy bname)
-
-type mode = Reorg | Legacy | Detect
+let init _bname = Secure.add_assets Filename.current_dir_name
 
 let set_reorg ~mode ~bname =
   let r =
     match mode with
-    | Reorg -> true
+    | Layout.Reorg -> true
     | Legacy -> false
     | Detect -> is_reorg_base bname
   in
@@ -152,9 +86,9 @@ let rec create_base_and_config bname =
   let user_wants_reorg = !reorg in
   if Sys.file_exists bdir then migrate_gwf_bidirectional bname user_wants_reorg;
   Filesystem.create_dir bdir;
-  if
-    (not @@ Sys.file_exists @@ (default bname).gwf)
-    && (not @@ Sys.file_exists @@ (legacy bname).gwf)
+  let legacy_path = Layout.gwf @@ Layout.legacy_layout bname in
+  let reorg_path = Layout.gwf @@ Layout.reorg_layout bname in
+  if (not @@ Sys.file_exists reorg_path) && (not @@ Sys.file_exists legacy_path)
   then migrate_gwf_bidirectional bname user_wants_reorg;
   Printf.eprintf "\n";
   reorg := user_wants_reorg;
@@ -162,8 +96,8 @@ let rec create_base_and_config bname =
   bdir
 
 and migrate_gwf_bidirectional bname user_wants_reorg =
-  let legacy_path = (legacy bname).gwf in
-  let reorg_path = (default bname).gwf in
+  let legacy_path = Layout.gwf @@ Layout.legacy_layout bname in
+  let reorg_path = Layout.gwf @@ Layout.reorg_layout bname in
   let legacy_exists = Sys.file_exists legacy_path in
   let reorg_exists = Sys.file_exists reorg_path in
   Printf.eprintf "Migration check for %s:\n" bname;
