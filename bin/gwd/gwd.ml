@@ -1723,29 +1723,24 @@ let excluded from =
     loop ()
   with Sys_error _ -> false
 
-let image_request conf script_name env =
-  match (Util.p_getenv env "m", Util.p_getenv env "v") with
-  | Some "IM", Some fname ->
-      let fname =
-        if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
-        else fname
-      in
-      let fname = Image.path_of_filename conf fname in
-      let _ = ImageDisplay.print_image_file conf fname in
-      true
-  | _ ->
-      let s = script_name in
-      if String.starts_with ~prefix:"images/" s then
-        let i = String.length "images/" in
-        let fname = String.sub s i (String.length s - i) in
-        (* Je ne sais pas pourquoi on fait un basename, mais ça empeche *)
-        (* empeche d'avoir des images qui se trouvent dans le dossier   *)
-        (* image. Si on ne fait pas de basename, alors ça marche.       *)
-        (* let fname = Filename.basename fname in *)
-        let fname = Image.path_of_filename conf fname in
-        let _ = ImageDisplay.print_image_file conf fname in
-        true
-      else false
+(* FIXME: this function cannot serve images of the base itself for
+   two reasons:
+    - The [conf] argument has an empty `bname` field because
+      `asset_image_request` is called before building the true config
+      record.
+    - We cannot serve a base image without verifying permissions.
+
+    As a consequence, this function is limited to serve asset images
+    only. *)
+let asset_image_request conf fname =
+  if String.starts_with ~prefix:"images/" fname then (
+    let path = Util.search_in_assets fname in
+    match ImageDisplay.print_image_file conf path with
+    | Ok () -> true
+    | Error e ->
+        Log.err (fun k -> k "%s" e);
+        false)
+  else false
 
 (* Une version un peu à cheval entre avant et maintenant afin de   *)
 (* pouvoir inclure une css, un fichier javascript (etc) facilement *)
@@ -2024,7 +2019,7 @@ let connection ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn
       try
         let contents, env = build_env request contents0 in
         if
-          (not (image_request printer_conf script_name env))
+          (not (asset_image_request printer_conf script_name))
           && not (misc_request conn printer_conf request script_name)
         then
           conf_and_connection ~predictable_mode ~cgi ~loaded_plugins

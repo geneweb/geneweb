@@ -42,31 +42,30 @@ let content conf ct len fname =
   Output.header conf "Connection: close";
   Output.flush conf
 
+let allowed_extensions =
+  [
+    (".png", "image/png");
+    (".jpg", "image/jpeg");
+    (".jpeg", "image/jpeg");
+    (".pjpeg", "image/jpeg");
+    (".gif", "image/gif");
+    (".pdf", "application/pdf");
+    (".htm", "text/html");
+    (".html", "text/html");
+  ]
+
+let error fmt = Format.kasprintf (fun s -> Error s) fmt
+
 let print_image_file conf fname =
   let res =
     List.find_opt
       (fun (suff, _ctype) ->
-        if
-          Filename.check_suffix fname suff
-          || Filename.check_suffix fname (String.uppercase_ascii suff)
-        then true
-        else false)
-      [
-        (".png", "image/png");
-        (".jpg", "image/jpeg");
-        (".jpeg", "image/jpeg");
-        (".pjpeg", "image/jpeg");
-        (".gif", "image/gif");
-        (".pdf", "application/pdf");
-        (".htm", "text/html");
-        (".html", "text/html");
-      ]
+        Filename.check_suffix fname suff
+        || Filename.check_suffix fname (String.uppercase_ascii suff))
+      allowed_extensions
   in
   match res with
-  | None ->
-      Error
-        (Format.sprintf "Could not find mime type from extension for file: %s"
-           fname)
+  | None -> error "could not find mime type from extension for file: %s" fname
   | Some (_suff, ctype) -> (
       try
         Secure.with_open_in_bin fname @@ fun ic ->
@@ -84,9 +83,7 @@ let print_image_file conf fname =
         loop len;
         Ok ()
       with Sys_error e ->
-        Log.err (fun k ->
-            k "Error printing image file content for %s : %s" fname e);
-        Error e)
+        error "Error while printing image file content for %s: %s" fname e)
 
 let safe_folder f =
   f <> ""
@@ -152,7 +149,8 @@ let print_portrait conf base p =
   match Image.get_portrait conf base p with
   | Some (`Path path) ->
       Result.fold ~ok:ignore
-        ~error:(fun _ ->
+        ~error:(fun e ->
+          Log.err (fun k -> k "%s" e);
           Hutil.incorrect_request conf
             ~comment:"print_image_file failed (portrait)")
         (print_image_file conf path)
@@ -179,7 +177,9 @@ let print_blason_aux conf base p =
   match Image.get_blason conf base p false with
   | Some (`Path path) ->
       Result.fold ~ok:ignore
-        ~error:(fun _ -> Hutil.incorrect_request conf)
+        ~error:(fun e ->
+          Log.err (fun k -> k "%s" e);
+          Hutil.incorrect_request conf)
         (print_image_file conf path)
   | Some (`Url url) ->
       Util.html conf;
@@ -195,7 +195,9 @@ let print_source conf f =
   let fname = Filename.concat (!GWPARAM.images_d conf.bname) fname in
   if (conf.wizard || conf.friend) || Image.is_not_private_img conf fname then
     Result.fold ~ok:ignore
-      ~error:(fun _ -> Hutil.incorrect_request conf)
+      ~error:(fun e ->
+        Log.err (fun k -> k "%s" e);
+        Hutil.incorrect_request conf)
       (print_image_file conf fname)
   else Hutil.incorrect_request conf
 
