@@ -2237,9 +2237,8 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
      in
      images_prefix := Some ("file://" ^ slashify abs_dir));
   GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
-  let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Mutil.particles_file = "" then
-    Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
+    Mutil.particles_file := Option.get !gw_prefix // "etc" // "particles.txt";
   Server.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
   Util.is_welcome := false;
