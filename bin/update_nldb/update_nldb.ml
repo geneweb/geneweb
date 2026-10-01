@@ -71,10 +71,7 @@ let save_cache_linked_pages bdir cache_linked_pages =
   output_value oc cache_linked_pages;
   close_out oc
 
-let compute base bdir =
-  let bdir =
-    if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
-  in
+let compute base bpath =
   let nb_ind = Driver.nb_of_persons base in
   let nb_fam = Driver.nb_of_families base in
   let db = ref [] in
@@ -99,7 +96,7 @@ let compute base bdir =
   flush stderr;
   (try
      let files =
-       Sys.readdir (Filename.concat bdir (Driver.base_wiznotes_dir base))
+       Sys.readdir (Filename.concat bpath (Driver.base_wiznotes_dir base))
      in
      for i = 0 to Array.length files - 1 do
        try
@@ -138,7 +135,7 @@ let compute base bdir =
 
   Printf.eprintf "--- misc notes\n";
   flush stderr;
-  let ndir = Filename.concat bdir (Driver.base_notes_dir base) in
+  let ndir = Filename.concat bpath (Driver.base_notes_dir base) in
   let rec loop dir name =
     try
       let cdir = Filename.concat ndir dir in
@@ -269,7 +266,7 @@ let compute base bdir =
   Driver.write_nldb base !db;
 
   (* Save the cache_linked_pages to a file *)
-  save_cache_linked_pages bdir cache_linked_pages
+  save_cache_linked_pages bpath cache_linked_pages
 
 let ( // ) = Filename.concat
 
