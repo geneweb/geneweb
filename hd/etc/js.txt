@@ -1011,8 +1011,8 @@ initTooltips();
   }
 %end;
 });
-</script>
 %end;
+</script>
 %end;%( closing initial “not cancel_links”, not indented for convenience %)
 %( b.reduce_place=yes %)
 %if;(e.m="" and not is_welcome and b.reduce_place="yes")
