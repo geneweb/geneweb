@@ -237,18 +237,16 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
       });
     }
 
+    const surnames = document.querySelectorAll('[data-surname]');
     filters.forEach(function(input) {
       input.addEventListener('input', function() {
-        let v1 = document.getElementById('input1').value || '_';
-        const v2 = document.getElementById('input2').value;
-        const v3 = document.getElementById('input3').value;
-        const v4 = document.getElementById('input4').value;
-        const all = document.querySelectorAll('[data-surname]');
-        all.forEach(function(el) { el.classList.add('d-none'); });
-        [v1, v2, v3, v4].forEach(function(v) {
-          if (v === '') return;
-          document.querySelectorAll('[data-surname*="' + v + '"]')
-            .forEach(function(el) { el.classList.remove('d-none'); });
+        const vals = %['input1', 'input2', 'input3', 'input4'%]
+          .map(function(id) { return document.getElementById(id).value; });
+        if (vals%[0%] === '') vals%[0%] = '_';
+        surnames.forEach(function(el) {
+          const sn = el.dataset.surname;
+          el.classList.toggle('d-none',
+            !vals.some(function(v) { return v !== '' && sn.includes(v); }));
         });
       });
     });
