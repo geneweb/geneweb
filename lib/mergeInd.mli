@@ -31,3 +31,4 @@ val kill_ancestors :
 
 val compatible_strings : Gwdb.istr -> Gwdb.istr -> bool
 val compatible_notes : Gwdb.base -> Gwdb.istr -> Gwdb.istr -> bool
+val has_continuation : Config.config -> bool
