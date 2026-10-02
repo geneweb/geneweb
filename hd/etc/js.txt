@@ -370,6 +370,7 @@ const inputToBook = {
     window.open(url, '_blank');
   }
 };
+inputToBook.addNavigation();
 %end;
 %if;(is_welcome and b.propose_titles!="no")
 %( Shared submit button for the person and title search forms. %)
@@ -799,16 +800,12 @@ document.addEventListener('DOMContentLoaded', () => {
   %if;(b.propose_titles!="no")
     initializeWelcomeSearchFunctionality();
   %end;
-  %if;wizard;
-    inputToBook.addNavigation();
-  %end;
   %if;roglo;
     moveWelcomeLangSelect();
   %end;
 %end;
 %if;(upd_form=1)
   addClearButtonToInputs();
-  inputToBook.addNavigation();
   sortSelectOptions();
   initCustomEvents();
   initSelectToggle();
