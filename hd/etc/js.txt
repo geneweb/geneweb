@@ -64,7 +64,7 @@
 %end;
 %if;(e.v="updRLM" or e.m="MRG" or upd_form=1)
 <script>
-const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
+window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
 </script>
 <script src="%etc_prefix;js/person_picker.min.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.min.js%end;"></script>
 %end;
