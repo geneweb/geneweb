@@ -1,13 +1,9 @@
 <!-- $Id: js.txt v7.1 01/10/2026 17:55:01 $ -->
 %if;not cancel_links;
-%( Edit pages, see bin/gwd/request.ml: person and family forms
-   (updind.txt, updfam.txt) and notes editors.
-   TODO: replace with OCaml booleans set where these pages are
-   rendered, as for is_welcome: e.m cannot tell a *_OK form redisplay
-   from a result page. %)
-%let;upd_ind;%if;(e.m="MOD_IND" or e.m="MOD_IND_OK" or e.m="MRG_IND_OK" or e.m="MRG_MOD_IND_OK")1%end;%in;
-%let;upd_form;%if;(upd_ind=1 or e.m="MOD_FAM" or e.m="MOD_FAM_OK" or e.m="ADD_FAM" or e.m="ADD_FAM_OK"
-  or e.m="ADD_PAR" or e.m="ADD_PAR_OK" or e.m="MRG_FAM_OK" or e.m="MRG_MOD_FAM_OK")1%end;%in;
+%( Edit pages: is_upd_ind and is_upd_fam are set by the person and family
+   form printers, so a *_OK result page is not taken for a form; notes
+   editors, see bin/gwd/request.ml. %)
+%let;upd_form;%if;(is_upd_ind or is_upd_fam)1%end;%in;
 %let;upd_notes;%if;(e.m="MOD_NOTES" or e.m="MOD_NOTES_OK" or e.m="MOD_WIZNOTES" or e.m="MOD_WIZNOTES_OK")1%end;%in;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
@@ -138,7 +134,7 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;
-%if;(e.m="MOD_FAM" or e.m="MOD_FAM_OK")
+%if;is_upd_fam;
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.transfer-btn').forEach(function(btn) {
@@ -669,11 +665,11 @@ function populateDatalists() {
       %if;(b.datalist_occupations=1)'occupations',%end;
       %if;(b.datalist_sources=1)'sources',%end;
     %end;
-    %if;(is_welcome or upd_ind=1)
+    %if;(is_welcome or is_upd_ind)
       %if;(b.datalist_titles=1)'titles',%end;
       %if;(b.datalist_estates=1)'estates',%end;
     %end;
-    %if;(upd_ind=1)
+    %if;is_upd_ind;
       %if;(b.datalist_pub_names=1)'pub_names',%end;
       %if;(b.datalist_qualifiers=1)'qualifiers',%end;
       %if;(b.datalist_aliases=1)'aliases',%end;
