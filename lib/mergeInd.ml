@@ -24,6 +24,17 @@ let empty_job_progression ?(jobs = Stack.create ()) () =
 let add_warning w job_progression =
   { job_progression with warnings = w :: job_progression.warnings }
 
+let has_continuation (conf : Config.config) =
+  let is_empty_value key =
+    Option.fold ~none:true
+      ~some:(String.equal String.empty)
+      (Util.p_getenv conf.env key)
+  in
+  Option.is_some (Util.p_getenv conf.env "ini1")
+  && Option.is_some (Util.p_getenv conf.env "ini2")
+  || Option.is_some (Util.p_getenv conf.env "ip")
+     && not (is_empty_value "iexcl" && is_empty_value "fexcl")
+
 let compatible_cdates cd1 cd2 =
   cd1 = cd2 || cd2 = Date.cdate_None || cd1 = Date.cdate_None
 
