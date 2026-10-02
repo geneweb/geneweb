@@ -688,6 +688,7 @@ let templ_eval_var (conf : Config.config) = function
       (* deprecated since version 5.00 *)
       VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
+  | [ "is_upd_ind" ] | [ "is_upd_fam" ] -> VVbool false
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou

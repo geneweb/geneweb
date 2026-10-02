@@ -286,6 +286,10 @@ and eval_simple_var conf base env (fam, cpl, des) = function
       safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | [ "is_first" ] -> eval_is_first env
   | [ "is_last" ] -> eval_is_last env
+  | [ "is_upd_fam" ] -> (
+      match get_env "is_upd_fam" env with
+      | Vbool x -> bool_val x
+      | _ -> raise Not_found)
   | [ "marriage"; s ] -> eval_date_var (Date.od_of_cdate fam.marriage) s
   | [ "marriage_place" ] ->
       safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
@@ -505,7 +509,11 @@ let print_update_fam conf base fcd digest =
       ( "ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "ADD_PAR_OK" | "MOD_FAM"
       | "MOD_FAM_OK" | "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK"
       | "MRG_MOD_FAM_OK" ) ->
-      let env = Templ.Env.empty |> Templ.Env.add "digest" (Vstring digest) in
+      let env =
+        Templ.Env.empty
+        |> Templ.Env.add "digest" (Vstring digest)
+        |> Templ.Env.add "is_upd_fam" (Vbool true)
+      in
       let ifun =
         Templ.
           {
