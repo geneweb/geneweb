@@ -160,10 +160,10 @@ function updateBannerState() {
 document.addEventListener('scroll', updateBannerState, { passive: true });
 document.addEventListener('DOMContentLoaded', updateBannerState);
 
-/** Configuration des mois par type de calendrier */
+%( Month names per calendar select value; any other value, Julian included,
+   uses the Gregorian list, see changeCalendar. %)
 const CALENDAR_MONTHS = {
   'G': %['-', `[(month)]0`, `[(month)]1`, `[(month)]2`, `[(month)]3`, `[(month)]4`, `[(month)]5`, `[(month)]6`, `[(month)]7`, `[(month)]8`, `[(month)]9`, `[(month)]10`, `[(month)]11`],
-  'J': %['-', `[(month)]0`, `[(month)]1`, `[(month)]2`, `[(month)]3`, `[(month)]4`, `[(month)]5`, `[(month)]6`, `[(month)]7`, `[(month)]8`, `[(month)]9`, `[(month)]10`, `[(month)]11`],
   'F': %['-', `[(french revolution month)]0`, `[(french revolution month)]1`, `[(french revolution month)]2`, `[(french revolution month)]3`, `[(french revolution month)]4`, `[(french revolution month)]5`, `[(french revolution month)]6`, `[(french revolution month)]7`, `[(french revolution month)]8`, `[(french revolution month)]9`, `[(french revolution month)]10`, `[(french revolution month)]11`, `[(french revolution month)]12`],
   'H': %['-', `[(hebrew month)]0`, `[(hebrew month)]1`, `[(hebrew month)]2`, `[(hebrew month)]3`, `[(hebrew month)]4`, `[(hebrew month)]5`, `[(hebrew month)]6`, `[(hebrew month)]7`, `[(hebrew month)]8`, `[(hebrew month)]9`, `[(hebrew month)]10`, `[(hebrew month)]11`, `[(hebrew month)]12`]
 };
