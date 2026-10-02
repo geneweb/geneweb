@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 01/10/2026 17:55:01 $ -->
+<!-- $Id: js.txt v7.1 03/10/2026 01:19:36 $ -->
 %if;not cancel_links;
 %( Edit pages: is_upd_ind and is_upd_fam are set by the person and family
    form printers, so a *_OK result page is not taken for a form; notes
@@ -261,23 +261,9 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
   }
 </script>
 %end;
-%( Functions for character.txt %)
+%( Toolbar (toolbar.txt) and special characters (characters.txt) of the editors. %)
 %if;(upd_form=1 or upd_notes=1)
 <script>
-  function setupCharacterInsertion() {
-    document.querySelectorAll('.ch a').forEach(function (element) {
-      element.addEventListener('click', function (event) {
-        event.preventDefault();
-        const textarea = document.querySelector('.insert-character-target');
-        if (textarea) insertCharacter(textarea, this.textContent);
-      });
-    });
-  }
-
-  function insertCharacter(t, v) {
-    t.setRangeText(v, t.selectionStart, t.selectionEnd, 'end');
-    t.focus();
-  }
 function insertTags(tagOpen, tagClose, sampleText) {
   const ta = document.querySelector('textarea#notes_comments');
   if (!ta) return false;
@@ -298,6 +284,17 @@ function insertTags(tagOpen, tagClose, sampleText) {
   ta.focus();
   return false;
 }
+%if;(e.templ="")
+document.addEventListener('click', function(event) {
+  const a = event.target.closest('.ch a');
+  if (!a) return;
+  event.preventDefault();
+  const t = document.querySelector('.insert-character-target');
+  if (!t) return;
+  t.setRangeText(a.textContent, t.selectionStart, t.selectionEnd, 'end');
+  t.focus();
+});
+%end;
 </script>
 %end;
 %( Popover functions for anc/destables %)
@@ -326,9 +323,9 @@ document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').
 });
 </script>
 %end;
-<script>
-%if;(wizard and (is_welcome or upd_form=1 or e.m="MOD_GALLERY"))
 %( Ctrl+click on an input with data-book opens its MOD_DATA book. %)
+%if;(wizard and (is_welcome or upd_form=1 or e.m="MOD_GALLERY"))
+<script>
 const inputToBook = {
   addNavigation: function() {
     document.addEventListener('mousedown', function(event) {
@@ -360,9 +357,16 @@ const inputToBook = {
     window.open(url, '_blank');
   }
 };
+%( notes_upd_gallery.js calls addNavigation() itself. %)
 %if;(e.m!="MOD_GALLERY")inputToBook.addNavigation();%end;
+</script>
 %end;
+%( Each block below runs its setup on DOMContentLoaded; their order is the
+   order of the listeners: clearinput before the floating placeholders,
+   tooltips after the modules that create elements. %)
+%if;(e.templ="")
 %if;(is_welcome and b.propose_titles!="no")
+<script>
 %( Shared submit button for the person and title search forms. %)
 function initializeWelcomeSearchFunctionality() {
   const mainForm = document.getElementById('main-search');
@@ -423,24 +427,11 @@ function initializeWelcomeSearchFunctionality() {
     else if (titleForm && hasInput(titleForm)) titleForm.submit();
   });
 }
-%end;
-%if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
-function initializeLazyModules() {
-  function loadScriptOnce(buttonId, scriptUrl) {
-    const btn = document.getElementById(buttonId);
-    if (!btn) return;
-    btn.addEventListener('click', function handler() {
-      const script = document.createElement('script');
-      script.src = scriptUrl;
-      document.head.appendChild(script);
-      btn.removeEventListener('click', handler);
-    });
-  }
-  loadScriptOnce('load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
-  loadScriptOnce('load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
-}
+document.addEventListener('DOMContentLoaded', initializeWelcomeSearchFunctionality);
+</script>
 %end;
 %if;(roglo and is_welcome)
+<script>
 function moveWelcomeLangSelect() {
   const sel = document.getElementById('dropdownMenu1');
   const group = sel ? sel.closest('.btn-group') : null;
@@ -450,179 +441,21 @@ function moveWelcomeLangSelect() {
   group.classList.add('dropdown');
   loginBox.appendChild(group);
 }
+document.addEventListener('DOMContentLoaded', moveWelcomeLangSelect);
+</script>
 %end;
-%if;(e.templ="" and not is_welcome)
-%( Focus the autofocus element of an opening BS modal. %)
-function setupModalAutofocus() {
-  document.addEventListener('shown.bs.modal', function(event) {
-    const autofocusEl = event.target.querySelector('[autofocus]');
-    if (autofocusEl) autofocusEl.focus();
-  });
-}
-%end;
-%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D")
-       or (e.m="A" and e.t="H") or "HIST" in e.m))
-%( Floating placeholders for textual inputs. %)
-function setupFloatingPlaceholders() {
-  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
-
-  inputs.forEach(input => {
-    %( Skip placeholders made of non-breaking spaces only. %)
-    if (input.placeholder.trim() === '') return;
-
-    let wrapper = input.parentNode;
-    if (wrapper.classList.contains('clear-button-wrapper')) {
-      %( Reuse the positioned wrapper added by clearinput; keep the
-         .input-wrapper CSS hooks so layout rules still match. %)
-      wrapper.classList.add('input-wrapper');
-    } else if (!wrapper.classList.contains('input-wrapper')) {
-      const hadFocus = document.activeElement === input;
-      wrapper = document.createElement('div');
-      wrapper.className = 'input-wrapper';
-      input.parentNode.insertBefore(wrapper, input);
-      wrapper.appendChild(input);
-      if (hadFocus) requestAnimationFrame(() => input.focus());
-    }
-
-    const placeholder = document.createElement('span');
-    placeholder.className = 'floating-placeholder';
-    placeholder.textContent = input.placeholder;
-    wrapper.appendChild(placeholder);
-
-    input.addEventListener('focus', () => placeholder.classList.add('active'));
-    input.addEventListener('blur', () => placeholder.classList.remove('active'));
-
-    if (input === document.activeElement || input.hasAttribute('autofocus')) {
-      placeholder.classList.add('active');
-    }
-  });
-}
-%end;
-%if;(e.templ="")
-%if;(e.m="NOTES" or e.m="WIZNOTES")
-function setupTocToggle() {
-  const tocContent = document.getElementById('toc-content');
-  if (!tocContent) return;
-  function toggleTocText() {
-    return tocContent.hidden
-      ? `([visualize/show/hide/summary]1)`
-      : `([visualize/show/hide/summary]2)`;
-  }
-  document.querySelectorAll('.toc-toggle').forEach(btn => {
-    btn.addEventListener('click', function() {
-      tocContent.hidden = !tocContent.hidden;
-      document.querySelectorAll('.toc-toggle').forEach(b => {
-        b.textContent = toggleTocText();
-      });
-    });
-  });
-}
-%end;
-%( Place the cursor at the end of a prefilled autofocused field in the editors. %)
-%if;(upd_form=1 or upd_notes=1 or e.m="MOD_DATA" or e.m="MOD_DATA_OK")
-function setupAutofocusInput() {
-  const el = document.querySelector('input[autofocus]:not(#n), textarea[autofocus]');
-  if (!el) return;
-  el.focus();
-  el.setSelectionRange(el.value.length, el.value.length);
-}
-%end;
-%if;((roglo or b.rpc_datalist=1) and (is_welcome or upd_form=1))
-%( RPC-backed datalists for very large bases %)
-const RpcDatalistManager = {
-  client: null,
-  isConnected: false,
-  debounceTimers: {},
-
-  RPC_URL: 'ws://%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;localhost%end;:8080/search',
-
-  %( datalist_fnames -> <base>_fnames.cache %)
-  getCacheFile: function(datalistId) {
-    const type = datalistId.replace('datalist_', '');
-    return '%base.name;_' + type + '.cache';
-  },
-
-  init: async function() {
-    if (typeof Rpc === 'undefined') {
-      console.warn('RpcDatalistManager: rpc_client.js not loaded');
-      return false;
-    }
-
-    try {
-      this.client = new Rpc(this.RPC_URL);
-      this.client.lookup = async (...args) => {
-        const jargs = args.map(a => JSON.stringify(a));
-        const response = await this.client.call('lookup', jargs);
-        return JSON.parse(response);
-      };
-
-      %( Probe the server, give up after 3 s. %)
-      const testPromise = this.client.lookup('%base.name;_fnames.cache', '', 1);
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('RPC timeout')), 3000)
-      );
-      await Promise.race(%[testPromise, timeoutPromise%]);
-
-      this.isConnected = true;
-      console.log('RpcDatalistManager: Connecté au serveur RPC');
-      return true;
-    } catch (error) {
-      console.warn('RpcDatalistManager: Serveur RPC indisponible, fallback .gz', error);
-      this.isConnected = false;
-      return false;
-    }
-},
-
-  populateDatalist: async function(datalistId, searchTerm) {
-    if (!this.isConnected || !this.client) return;
-
-    const dataList = document.getElementById(datalistId);
-    if (!dataList) return;
-
-    if (!searchTerm || searchTerm.length < 3) {
-      dataList.innerHTML = '';
-      return;
-    }
-
-    try {
-      const cacheFile = this.getCacheFile(datalistId);
-      const results = await this.client.lookup(cacheFile, searchTerm, 50);
-
-      const fragment = document.createDocumentFragment();
-      results.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item;
-        fragment.appendChild(opt);
-      });
-
-      dataList.innerHTML = '';
-      dataList.appendChild(fragment);
-    } catch (error) {
-      console.error(`RpcDatalistManager: Erreur lookup ${datalistId}`, error);
-    }
-  },
-
-  %( Bind every input whose list attribute starts with datalist_. %)
-  attachAllListeners: function() {
-    const self = this;
-    document.querySelectorAll('input[list^="datalist_"]').forEach(input => {
-      const datalistId = input.getAttribute('list');
-
-      input.addEventListener('input', function() {
-        clearTimeout(self.debounceTimers[datalistId]);
-        self.debounceTimers[datalistId] = setTimeout(() => {
-          self.populateDatalist(datalistId, this.value);
-        }, 100);
-      });
-
-      input.addEventListener('focus', function() {
-        if (this.value && this.value.length >= 2) {
-          self.populateDatalist(datalistId, this.value);
-        }
-      });
-    });
-  }
-};
+%if;(upd_form=1)
+<script>
+%( clearinput.js, then the form setup of upd_js.txt. %)
+document.addEventListener('DOMContentLoaded', () => {
+  addClearButtonToInputs();
+  sortSelectOptions();
+  initCustomEvents();
+  initSelectToggle();
+  initFormFocus();
+  initCalendarMonthSelects();
+});
+</script>
 %end;
 %if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
     or b.datalist_titles=1 or b.datalist_estates=1))
@@ -631,6 +464,7 @@ const RpcDatalistManager = {
     or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
     or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
     or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
+<script>
 %if;(e.m="MOD_GALLERY")
 const DatalistManager = {
   handleDataTableInput: function(input, listId) {
@@ -693,6 +527,118 @@ function populateDatalists() {
       .catch(err => console.error(`datalist_${t}:`, err));
   });
 }
+%( The gallery and the RPC fallback call populateDatalists() themselves. %)
+%if;(e.m!="MOD_GALLERY" and not (roglo or b.rpc_datalist=1))
+document.addEventListener('DOMContentLoaded', populateDatalists);
+%end;
+</script>
+%end;
+%if;((roglo or b.rpc_datalist=1) and (is_welcome or upd_form=1))
+<script>
+%( RPC-backed datalists for very large bases %)
+const RpcDatalistManager = {
+  client: null,
+  isConnected: false,
+  debounceTimers: {},
+
+  RPC_URL: 'ws://%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;localhost%end;:8080/search',
+
+  %( datalist_fnames -> <base>_fnames.cache %)
+  getCacheFile: function(datalistId) {
+    const type = datalistId.replace('datalist_', '');
+    return '%base.name;_' + type + '.cache';
+  },
+
+  init: async function() {
+    if (typeof Rpc === 'undefined') {
+      console.warn('RpcDatalistManager: rpc_client.js not loaded');
+      return false;
+    }
+
+    try {
+      this.client = new Rpc(this.RPC_URL);
+      this.client.lookup = async (...args) => {
+        const jargs = args.map(a => JSON.stringify(a));
+        const response = await this.client.call('lookup', jargs);
+        return JSON.parse(response);
+      };
+
+      %( Probe the server, give up after 3 s. %)
+      const testPromise = this.client.lookup('%base.name;_fnames.cache', '', 1);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('RPC timeout')), 3000)
+      );
+      await Promise.race(%[testPromise, timeoutPromise%]);
+
+      this.isConnected = true;
+      console.log('RpcDatalistManager: Connecté au serveur RPC');
+      return true;
+    } catch (error) {
+      console.warn('RpcDatalistManager: Serveur RPC indisponible, fallback .gz', error);
+      this.isConnected = false;
+      return false;
+    }
+  },
+
+  populateDatalist: async function(datalistId, searchTerm) {
+    if (!this.isConnected || !this.client) return;
+
+    const dataList = document.getElementById(datalistId);
+    if (!dataList) return;
+
+    if (!searchTerm || searchTerm.length < 3) {
+      dataList.innerHTML = '';
+      return;
+    }
+
+    try {
+      const cacheFile = this.getCacheFile(datalistId);
+      const results = await this.client.lookup(cacheFile, searchTerm, 50);
+
+      const fragment = document.createDocumentFragment();
+      results.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        fragment.appendChild(opt);
+      });
+
+      dataList.innerHTML = '';
+      dataList.appendChild(fragment);
+    } catch (error) {
+      console.error(`RpcDatalistManager: Erreur lookup ${datalistId}`, error);
+    }
+  },
+
+  %( Bind every input whose list attribute starts with datalist_. %)
+  attachAllListeners: function() {
+    const self = this;
+    document.querySelectorAll('input[list^="datalist_"]').forEach(input => {
+      const datalistId = input.getAttribute('list');
+
+      input.addEventListener('input', function() {
+        clearTimeout(self.debounceTimers[datalistId]);
+        self.debounceTimers[datalistId] = setTimeout(() => {
+          self.populateDatalist(datalistId, this.value);
+        }, 100);
+      });
+
+      input.addEventListener('focus', function() {
+        if (this.value && this.value.length >= 2) {
+          self.populateDatalist(datalistId, this.value);
+        }
+      });
+    });
+  }
+};
+document.addEventListener('DOMContentLoaded', async () => {
+  if (await RpcDatalistManager.init()) {
+    RpcDatalistManager.attachAllListeners();
+  } else if (typeof populateDatalists === 'function') {
+    %( .gz fallback when the RPC server is unavailable %)
+    populateDatalists();
+  }
+});
+</script>
 %end;
 %if;(not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
 %define;language(x)
@@ -704,6 +650,7 @@ function populateDatalists() {
 %( Hydrate the language selector skeleton emitted by copyr.txt. Names come
    from the !languages lexicon entry, translated server-side for the
    current lang. %)
+<script>
 (() => {
   const menu = document.getElementById('language-menu');
   if (!menu) return;
@@ -740,9 +687,11 @@ function populateDatalists() {
   }
   menu.appendChild(frag);
 })();
+</script>
 %end;
-%( updateField const + lazy-loading %)
 %if;(wizard and not is_welcome and e.m="")
+<script>
+%( updateField const + lazy-loading %)
 const UPD = {
   prefix: "%prefix;",
   iper: "%index;",
@@ -769,8 +718,10 @@ const UPD = {
     document.head.appendChild(s);
   });
 })();
+</script>
 %end;
-const initTooltips = () => {
+<script>
+document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
     if (!bootstrap.Tooltip.getInstance(el)) {
       new bootstrap.Tooltip(el, {
@@ -780,76 +731,133 @@ const initTooltips = () => {
       });
     }
   });
-};
+});
+</script>
 %if;(e.notif!="")
+<script>
 %include;js_notif
+</script>
 %end;
-%( Initialize on DOM Content Loaded %)
-document.addEventListener('DOMContentLoaded', () => {
-%if;is_welcome;
-  %if;(b.propose_titles!="no")
-    initializeWelcomeSearchFunctionality();
-  %end;
-  %if;roglo;
-    moveWelcomeLangSelect();
-  %end;
-%end;
-%if;(upd_form=1)
-  addClearButtonToInputs();
-  sortSelectOptions();
-  initCustomEvents();
-  initSelectToggle();
-  initFormFocus();
-  initCalendarMonthSelects();
-%end;
-%if;(is_welcome or upd_form=1)
-  %if;(roglo or b.rpc_datalist=1)
-    (async () => {
-      const rpcOk = await RpcDatalistManager.init();
-      if (rpcOk) {
-        RpcDatalistManager.attachAllListeners();
-      } else {
-        %( .gz fallback when the RPC server is unavailable %)
-        if (typeof populateDatalists === 'function') populateDatalists();
-      }
-    })();
-  %else;
-    if (typeof populateDatalists === 'function') populateDatalists();
-  %end;
-%end;
-initTooltips();
 %if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
-  initializeLazyModules();
+<script>
+function initializeLazyModules() {
+  function loadScriptOnce(buttonId, scriptUrl) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    btn.addEventListener('click', function handler() {
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      document.head.appendChild(script);
+      btn.removeEventListener('click', handler);
+    });
+  }
+  loadScriptOnce('load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
+  loadScriptOnce('load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
+}
+document.addEventListener('DOMContentLoaded', initializeLazyModules);
+</script>
 %end;
 %if;(not is_welcome)
-  setupModalAutofocus();
+<script>
+%( Focus the autofocus element of an opening BS modal. %)
+document.addEventListener('shown.bs.modal', function(event) {
+  event.target.querySelector('[autofocus]')?.focus();
+});
+</script>
 %end;
-if (typeof setupFloatingPlaceholders === 'function') setupFloatingPlaceholders();
-%if;(upd_form=1 or upd_notes=1)
-  setupCharacterInsertion();
+%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D")
+       or (e.m="A" and e.t="H") or "HIST" in e.m))
+<script>
+%( Floating placeholders for textual inputs. %)
+function setupFloatingPlaceholders() {
+  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
+
+  inputs.forEach(input => {
+    %( Skip placeholders made of non-breaking spaces only. %)
+    if (input.placeholder.trim() === '') return;
+
+    let wrapper = input.parentNode;
+    if (wrapper.classList.contains('clear-button-wrapper')) {
+      %( Reuse the positioned wrapper added by clearinput; keep the
+         .input-wrapper CSS hooks so layout rules still match. %)
+      wrapper.classList.add('input-wrapper');
+    } else if (!wrapper.classList.contains('input-wrapper')) {
+      const hadFocus = document.activeElement === input;
+      wrapper = document.createElement('div');
+      wrapper.className = 'input-wrapper';
+      input.parentNode.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+      if (hadFocus) requestAnimationFrame(() => input.focus());
+    }
+
+    const placeholder = document.createElement('span');
+    placeholder.className = 'floating-placeholder';
+    placeholder.textContent = input.placeholder;
+    wrapper.appendChild(placeholder);
+
+    input.addEventListener('focus', () => placeholder.classList.add('active'));
+    input.addEventListener('blur', () => placeholder.classList.remove('active'));
+
+    if (input === document.activeElement || input.hasAttribute('autofocus')) {
+      placeholder.classList.add('active');
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', setupFloatingPlaceholders);
+</script>
 %end;
 %if;(e.m="NOTES" or e.m="WIZNOTES")
-  setupTocToggle();
+<script>
+function setupTocToggle() {
+  const tocContent = document.getElementById('toc-content');
+  if (!tocContent) return;
+  function toggleTocText() {
+    return tocContent.hidden
+      ? `([visualize/show/hide/summary]1)`
+      : `([visualize/show/hide/summary]2)`;
+  }
+  document.querySelectorAll('.toc-toggle').forEach(btn => {
+    btn.addEventListener('click', function() {
+      tocContent.hidden = !tocContent.hidden;
+      document.querySelectorAll('.toc-toggle').forEach(b => {
+        b.textContent = toggleTocText();
+      });
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', setupTocToggle);
+</script>
 %end;
+%( Place the cursor at the end of a prefilled autofocused field in the editors. %)
 %if;(upd_form=1 or upd_notes=1 or e.m="MOD_DATA" or e.m="MOD_DATA_OK")
-  setupAutofocusInput();
+<script>
+function setupAutofocusInput() {
+  const el = document.querySelector('input[autofocus]:not(#n), textarea[autofocus]');
+  if (!el) return;
+  el.focus();
+  el.setSelectionRange(el.value.length, el.value.length);
+}
+document.addEventListener('DOMContentLoaded', setupAutofocusInput);
+</script>
 %end;
 %if;(e.m="MOD_DATA")
-  updateData.init();
+<script>document.addEventListener('DOMContentLoaded', () => updateData.init());</script>
 %end;
 %if;(e.m="RM")
-  if (typeof RelationMatrix !== 'undefined') {
-    RelationMatrix.init();
-  }
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof RelationMatrix !== 'undefined') RelationMatrix.init();
+});
+</script>
 %end;
 %if;(e.m="C" and e.t="")
-  if (typeof Cousins !== 'undefined' && Cousins.init) {
-    Cousins.init();
-  }
-%end;
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof Cousins !== 'undefined' && Cousins.init) Cousins.init();
 });
-%end;
 </script>
+%end;
+%end;
 %end;%( closing initial “not cancel_links”, not indented for convenience %)
 %( b.reduce_place=yes %)
 %if;(e.m="" and not is_welcome and b.reduce_place="yes")
