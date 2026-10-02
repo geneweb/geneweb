@@ -337,7 +337,7 @@ li.in { background-color: #FFE8CC; }
 %end;
 <script src="%etc_prefix;js/maphilight.min.js?hash=%apply;hash%with;%etc_prefix;js/maphilight.min.js%end;"></script>
 <script>
-const GW = {
+window.GW = {
   prefix: "%prefix;",
   url: "%url;",
   lang: "%lang;",
