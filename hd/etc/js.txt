@@ -1,5 +1,14 @@
 <!-- $Id: js.txt v7.1 01/10/2026 17:55:01 $ -->
 %if;not cancel_links;
+%( Edit pages, see bin/gwd/request.ml: person and family forms
+   (updind.txt, updfam.txt) and notes editors.
+   TODO: replace with OCaml booleans set where these pages are
+   rendered, as for is_welcome: e.m cannot tell a *_OK form redisplay
+   from a result page. %)
+%let;upd_ind;%if;(e.m="MOD_IND" or e.m="MOD_IND_OK" or e.m="MRG_IND_OK" or e.m="MRG_MOD_IND_OK")1%end;%in;
+%let;upd_form;%if;(upd_ind=1 or e.m="MOD_FAM" or e.m="MOD_FAM_OK" or e.m="ADD_FAM" or e.m="ADD_FAM_OK"
+  or e.m="ADD_PAR" or e.m="ADD_PAR_OK" or e.m="MRG_FAM_OK" or e.m="MRG_MOD_FAM_OK")1%end;%in;
+%let;upd_notes;%if;(e.m="MOD_NOTES" or e.m="MOD_NOTES_OK" or e.m="MOD_WIZNOTES" or e.m="MOD_WIZNOTES_OK")1%end;%in;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -40,7 +49,7 @@
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;
-  %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
+  %if;((roglo or b.rpc_datalist=1) and (is_welcome or upd_form=1))
     <script src="%etc_prefix;js/rpc_client.js?hash=%apply;hash%with;%etc_prefix;js/rpc_client.js%end;"></script>
   %end;
   %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
@@ -53,11 +62,11 @@
     <script src="%etc_prefix;js/relationmatrix.min.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.min.js%end;"></script>
   %end;
   %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
-  %if;("IND" in e.m or "FAM" in e.m or e.m="MOD_GALLERY")
+  %if;(upd_form=1 or e.m="MOD_GALLERY")
    <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
   %end;
 %end;
-%if;(e.v="updRLM" or e.m="MRG" or "MOD_IND" in e.m or "MOD_FAM" in e.m or "ADD_FAM" in e.m)
+%if;(e.v="updRLM" or e.m="MRG" or upd_form=1)
 <script>
 const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
 </script>
@@ -111,16 +120,13 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
         }
       </script>
     %end;
-    %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
-    or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK")
+    %if;(upd_form=1)
       <script>new bootstrap.ScrollSpy(document.body, { target: '#banner' })</script>
     %end;
   %end;
 %end;
-%if;((wizard and e.m="" and not is_welcome) or "CHK_DATA" in e.m or "MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES" or e.m="MOD_GALLERY"
-    or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
+%if;((wizard and e.m="" and not is_welcome) or upd_form=1 or "CHK_DATA" in e.m or "SND_IMAGE_C" in e.m
+    or upd_notes=1 or e.m="MOD_GALLERY" or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/6.0.1/autosize.min.js"
             integrity="sha256-VCHx3GCDnd156mCM5EM9bJTj7mhMrrwg2tAab9B1vQs=
@@ -260,7 +266,7 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
 </script>
 %end;
 %( Functions for character.txt %)
-%if;("ADD" in e.m or "MOD" in e.m)
+%if;(upd_form=1 or upd_notes=1)
 <script>
   function setupCharacterInsertion() {
     document.querySelectorAll('.ch a').forEach(function (element) {
@@ -331,7 +337,7 @@ document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').
 </script>
 %end;
 <script>
-%if;(wizard and (is_welcome or "ADD_FAM" in e.m or "MOD_" in e.m))
+%if;(wizard and (is_welcome or upd_form=1 or e.m="MOD_GALLERY"))
 %( Ctrl+click on an input with data-book opens its MOD_DATA book. %)
 const inputToBook = {
   addNavigation: function() {
@@ -521,8 +527,8 @@ function setupTocToggle() {
   });
 }
 %end;
-%( Place the cursor at the end an autofocused input %)
-%if;("MOD" in e.m)
+%( Place the cursor at the end of a prefilled autofocused field in the editors. %)
+%if;(upd_form=1 or upd_notes=1 or e.m="MOD_DATA" or e.m="MOD_DATA_OK")
 function setupAutofocusInput() {
   const el = document.querySelector('input[autofocus]:not(#n), textarea[autofocus]');
   if (!el) return;
@@ -530,7 +536,7 @@ function setupAutofocusInput() {
   el.setSelectionRange(el.value.length, el.value.length);
 }
 %end;
-%if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
+%if;((roglo or b.rpc_datalist=1) and (is_welcome or upd_form=1))
 %( RPC-backed datalists for very large bases %)
 const RpcDatalistManager = {
   client: null,
@@ -630,7 +636,7 @@ const RpcDatalistManager = {
 %if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
     or b.datalist_titles=1 or b.datalist_estates=1))
   or (e.m="MOD_GALLERY" and (b.datalist_fnames=1 or b.datalist_snames=1))
-  or (("IND" in e.m or "FAM" in e.m) and (b.datalist_fnames=1
+  or (upd_form=1 and (b.datalist_fnames=1
     or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
     or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
     or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
@@ -663,15 +669,16 @@ function populateDatalists() {
   %[
     %if;(b.datalist_snames=1)'snames',%end;
     %if;(b.datalist_fnames=1)'fnames',%end;
-    %if;("IND" in e.m or "FAM" in e.m)
+    %if;(upd_form=1)
       %if;(b.datalist_places=1)'places',%end;
       %if;(b.datalist_occupations=1)'occupations',%end;
       %if;(b.datalist_sources=1)'sources',%end;
     %end;
-    %if;is_welcome;
+    %if;(is_welcome or upd_ind=1)
       %if;(b.datalist_titles=1)'titles',%end;
       %if;(b.datalist_estates=1)'estates',%end;
-    %elseif;("IND" in e.m)
+    %end;
+    %if;(upd_ind=1)
       %if;(b.datalist_pub_names=1)'pub_names',%end;
       %if;(b.datalist_qualifiers=1)'qualifiers',%end;
       %if;(b.datalist_aliases=1)'aliases',%end;
@@ -799,7 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
     moveWelcomeLangSelect();
   %end;
 %end;
-%if;("IND" in e.m or "FAM" in e.m)
+%if;(upd_form=1)
   addClearButtonToInputs();
   inputToBook.addNavigation();
   sortSelectOptions();
@@ -808,7 +815,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFormFocus();
   initCalendarMonthSelects();
 %end;
-%if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_GALLERY")
+%if;(is_welcome or upd_form=1 or e.m="MOD_GALLERY")
   %if;((roglo or b.rpc_datalist=1) and e.m!="MOD_GALLERY")
     (async () => {
       const rpcOk = await RpcDatalistManager.init();
@@ -831,14 +838,14 @@ initTooltips();
   setupModalAutofocus();
 %end;
 if (typeof setupFloatingPlaceholders === 'function') setupFloatingPlaceholders();
-%if;("ADD" in e.m or "MOD" in e.m)
+%if;(upd_form=1 or upd_notes=1)
   setupToolbarSticky();
   setupCharacterInsertion();
 %end;
 %if;(e.m="NOTES" or e.m="WIZNOTES")
   setupTocToggle();
 %end;
-%if;("MOD" in e.m)
+%if;(upd_form=1 or upd_notes=1 or e.m="MOD_DATA" or e.m="MOD_DATA_OK")
   setupAutofocusInput();
 %end;
 %if;(e.m="MOD_DATA")
