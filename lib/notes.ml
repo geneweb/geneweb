@@ -6,9 +6,10 @@ module StrSet = Mutil.StrSet
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let ( // ) = Filename.concat
+
 let file_path conf base fname =
-  String.concat Filename.dir_sep
-    [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
+  GWPARAM.bpath conf.bname // Driver.base_notes_dir base // (fname ^ ".txt")
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -378,10 +379,7 @@ let update_notes_links_family base (f : _ Def.gen_family) =
 let commit_notes conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
   let fname = path_of_fnotes fnotes in
-  let fpath =
-    String.concat Filename.dir_sep
-      [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ]
-  in
+  let fpath = GWPARAM.bpath conf.bname // Driver.base_notes_dir base // fname in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   (try Driver.commit_notes base fname s
    with Sys_error m ->
@@ -393,9 +391,7 @@ let commit_wiznotes conf base fnotes s =
   let pg = Def.NLDB.PgWizard fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    List.fold_left Filename.concat
-      (Util.bpath (conf.bname ^ ".gwb"))
-      [ Driver.base_wiznotes_dir base; fname ]
+    GWPARAM.bpath conf.bname // Driver.base_wiznotes_dir base // fname
   in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   Driver.commit_wiznotes base fname s;
@@ -775,7 +771,7 @@ type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 let cache_linked_pages_name = "cache_linked_pages"
 
 let get_linked_pages_fname conf =
-  Filename.concat (!GWPARAM.bpath conf.bname) cache_linked_pages_name
+  Filename.concat (GWPARAM.bpath conf.bname) cache_linked_pages_name
 
 let read_cache_linked_pages conf =
   let fname = get_linked_pages_fname conf in

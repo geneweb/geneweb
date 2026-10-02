@@ -4,6 +4,7 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 module Dirs = Geneweb_dirs
+module GWPARAM = Geneweb.GWPARAM
 
 let debug = ref false
 let bases_dir = ref None
@@ -12,7 +13,7 @@ let set_bases_dir s = bases_dir := Some s
 let get_bases_dir () =
   match !bases_dir with
   | Some s -> s
-  | None -> Dirs.path Secure.default_base_dir
+  | None -> Dirs.path Secure.default_bases_dir
 
 let parse_cmd () =
   let fname = ref "" in
@@ -25,7 +26,7 @@ let parse_cmd () =
         Fmt.str
           "<DIR> Specify where the bases directory with databases is installed \
            (default if empty is %S)."
-          (Dirs.name Secure.default_base_dir) );
+          (Dirs.name Secure.default_bases_dir) );
       ("-debug", Arg.Set debug, " Debug mode.");
     ]
     |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
@@ -71,10 +72,7 @@ let save_cache_linked_pages bdir cache_linked_pages =
   output_value oc cache_linked_pages;
   close_out oc
 
-let compute base bdir =
-  let bdir =
-    if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
-  in
+let compute base bpath =
   let nb_ind = Driver.nb_of_persons base in
   let nb_fam = Driver.nb_of_families base in
   let db = ref [] in
@@ -99,7 +97,7 @@ let compute base bdir =
   flush stderr;
   (try
      let files =
-       Sys.readdir (Filename.concat bdir (Driver.base_wiznotes_dir base))
+       Sys.readdir (Filename.concat bpath (Driver.base_wiznotes_dir base))
      in
      for i = 0 to Array.length files - 1 do
        try
@@ -138,7 +136,7 @@ let compute base bdir =
 
   Printf.eprintf "--- misc notes\n";
   flush stderr;
-  let ndir = Filename.concat bdir (Driver.base_notes_dir base) in
+  let ndir = Filename.concat bpath (Driver.base_notes_dir base) in
   let rec loop dir name =
     try
       let cdir = Filename.concat ndir dir in
@@ -269,24 +267,22 @@ let compute base bdir =
   Driver.write_nldb base !db;
 
   (* Save the cache_linked_pages to a file *)
-  save_cache_linked_pages bdir cache_linked_pages
-
-let ( // ) = Filename.concat
+  save_cache_linked_pages bpath cache_linked_pages
 
 let main () =
-  let fname, bases_dir = parse_cmd () in
-  Secure.set_base_dir bases_dir;
-  let bname = bases_dir // fname in
-  if fname = "" then (
+  let bname, bases_dir = parse_cmd () in
+  Secure.set_bases_dir bases_dir;
+  let bpath = GWPARAM.bpath bname in
+  if bname = "" then (
     Printf.eprintf "Missing database name\n";
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2);
-  Driver.with_database bname @@ fun base ->
+  Driver.with_database bpath @@ fun base ->
   Sys.catch_break true;
   Driver.load_strings_array base;
   Driver.load_unions_array base;
-  try compute base bname
+  try compute base bpath
   with Sys.Break ->
     Printf.eprintf "\n";
     flush stderr

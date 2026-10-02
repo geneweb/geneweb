@@ -211,3 +211,11 @@ Check the support for UTF-16 BE encoding with BOM mark
   Convert to UTF-8 first:
   iconv -f UTF-16BE -t UTF-8 UHLBOMCL.GED > UHLBOMCL_UTF8.GED
   [2]
+
+  $ ged2gwb -bd .
+  Uncaught exception: Stdlib.Arg.Bad("a GEDCOM file is mandatory")
+  [2]
+
+  $ ged2gwb -bd . bar -o foo.gwb
+  Uncaught exception: Stdlib.Arg.Bad("foo.gwb is not a valid database name (allowed: alphanumeric and hyphen)")
+  [2]

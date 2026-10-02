@@ -103,7 +103,7 @@ let output_excl oc xcl =
 
 let robot_excl () =
   let fname =
-    String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
+    String.concat Filename.dir_sep [ Secure.bases_dir (); "cnt"; "robot" ]
   in
   let xcl =
     match try Some (Secure.open_in_bin fname) with _ -> None with

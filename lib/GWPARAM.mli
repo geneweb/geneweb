@@ -3,8 +3,6 @@ val errors_undef : string list ref
 val errors_other : string list ref
 val set_vars : string list ref
 val gwd_cmd : string ref
-val cnt_dir : string ref
-val bases : string ref
 
 val reorg : bool ref
 (** set to true when base is in reorg format *)
@@ -12,73 +10,25 @@ val reorg : bool ref
 val force : bool ref
 (** force creation of database if already existing *)
 
-val config_reorg : string -> string
-val config_legacy : string -> string
-
-type my_fun_2 = string -> string
-type my_fun_3 = string -> string -> string
-
-val config : my_fun_2 ref
-val cnt_d : my_fun_2 ref
-val adm_file : my_fun_2 ref
-val src_d : my_fun_2 ref
-val etc_d : my_fun_2 ref
-val config_d : my_fun_2 ref
-val lang_d : my_fun_3 ref
-val bpath : my_fun_2 ref
-val portraits_d : my_fun_2 ref
-val images_d : my_fun_2 ref
-val albums_d : my_fun_2 ref
+val adm_file : string -> string
+val bpath : string -> string
+val state_d : unit -> string
 
 (* S: Move it to gwd_lib?  *)
 
-val init : unit -> unit
+val init : string -> unit
 (** Function called to initialize path functions based on the reorg flag. *)
 
 val is_reorg_base : string -> bool
 (** returns true iff mybase.gwb/config/mybase.gwf exists *)
 
-val set_reorg : string -> bool option -> unit
-(** if bool option = Some bool -> set reorg to bool if bool option = None -> set
-    reorg according to is_reorg_base; call init *)
+val set_reorg : mode:Layout.mode -> bname:string -> unit
 
 val check_base_exists : string -> unit
 (** Check if database exists and exit if so (unless -f flag is set) *)
 
 val create_base_and_config : string -> string
 (** Create base directory and configuration. *)
-
-module Default : sig
-  val config : string -> string
-  val cnt_d : string -> string
-  val adm_file : string -> string
-  val portraits_d : string -> string
-  val src_d : string -> string
-  val etc_d : string -> string
-  val config_d : string -> string
-  val lang_d : string -> string -> string
-  val images_d : string -> string
-  val albums_d : string -> string
-
-  val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ())] *)
-end
-
-module Legacy : sig
-  val config : string -> string
-  val cnt_d : string -> string
-  val adm_file : string -> string
-  val portraits_d : string -> string
-  val src_d : string -> string
-  val etc_d : string -> string
-  val config_d : string -> string
-  val lang_d : string -> string -> string
-  val images_d : string -> string
-  val albums_d : string -> string
-
-  val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ()) (string ^ ".gwb") ] *)
-end
 
 val output_error :
   ?headers:string list ->

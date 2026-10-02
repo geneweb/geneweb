@@ -3,6 +3,7 @@ module Server = Geneweb_http.Server
 module Connection = Geneweb_http.Connection
 module Code = Geneweb_http.Code
 module Dirs = Geneweb_dirs
+module Layout = Geneweb.Layout
 
 let ( // ) = Filename.concat
 
@@ -34,7 +35,7 @@ let set_bases_dir s = bases_dir := Some s
 let get_bases_dir () =
   match !bases_dir with
   | Some s -> s
-  | None -> Dirs.path Secure.default_base_dir
+  | None -> Dirs.path Secure.default_bases_dir
 
 let printer_conf conn =
   {
@@ -507,13 +508,12 @@ let cut_at_equal s =
       (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
   | None -> (s, "")
 
-let loc_read_base_env bname =
-  let fname = !GWPARAM.config bname in
-  match open_in fname with
+let loc_read_base_env gwf_path =
+  match open_in gwf_path with
   | exception Sys_error _ -> []
   | ic ->
       Fun.protect
-        ~finally:(fun () -> close_in ic)
+        ~finally:(fun () -> close_in_noerr ic)
         (fun () ->
           let rec loop env =
             match input_line ic with
@@ -638,8 +638,8 @@ let rec copy_from_stream conf print strm =
                             really_input_string ic (in_channel_length ic)))
               in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
-              GWPARAM.set_reorg in_base None;
-              let benv = loc_read_base_env in_base in
+              let layout = Layout.of_bname ~mode:Detect in_base in
+              let benv = loc_read_base_env @@ Layout.gwf layout in
               let conf = { conf with env = benv @ conf.env } in
               (* depending on when %f is called, conf may be sketchy *)
               (* conf will know bvars from basename.gwf and evars from url *)
@@ -720,7 +720,8 @@ let rec copy_from_stream conf print strm =
                   let env =
                     match in_base with
                     | Some in_base ->
-                        loc_read_base_env (strip_spaces in_base) @ conf.env
+                        let layout = Layout.of_bname ~mode:Detect in_base in
+                        loc_read_base_env (Layout.gwf layout) @ conf.env
                     | None -> conf.env
                   in
                   print_if_else conf print (s_getenv env k1 = k2) strm
@@ -1284,7 +1285,6 @@ let rec check_rename_conflict l conn conf =
   | [] -> ()
 
 let rename conn conf =
-  GWPARAM.init ();
   flush stderr;
   let rename_list =
     List.fold_left
@@ -1297,7 +1297,8 @@ let rename conn conf =
   flush stderr;
   let rename_cnt_files k v =
     (* we assume that etc/bname/cache has been renamed *)
-    let dir = !GWPARAM.cnt_d k in
+    let layout = Layout.of_bname ~mode:Detect k in
+    let dir = Layout.cnt layout in
     Printf.eprintf "Rename cnt files in %s\n" dir;
     flush stderr;
     let files = Sys.readdir dir in
@@ -1326,7 +1327,9 @@ let rename conn conf =
     List.iter
       (fun (k, v) ->
         if k <> v then begin
-          GWPARAM.set_reorg k None;
+          let mode = if GWPARAM.is_reorg_base k then Layout.Reorg else Legacy in
+          let layout_k = Layout.of_bname ~mode k in
+          let layout_v = Layout.of_bname ~mode v in
           Printf.eprintf "Start renaming (%s -> %s)\n" k v;
           flush stderr;
           try
@@ -1337,12 +1340,14 @@ let rename conn conf =
                 Sys.rename (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"));
               if Sys.file_exists (base_path (k ^ ".gwf")) then
                 Sys.rename (base_path (k ^ ".gwf")) (base_path (v ^ ".gwf"));
-              if Sys.file_exists (!GWPARAM.etc_d k) then
-                Sys.rename (!GWPARAM.etc_d k) (!GWPARAM.etc_d v);
-              if Sys.file_exists (!GWPARAM.src_d k) then
-                Sys.rename (!GWPARAM.src_d k) (!GWPARAM.src_d v);
-              if Sys.file_exists (!GWPARAM.portraits_d k) then
-                Sys.rename (!GWPARAM.portraits_d k) (!GWPARAM.portraits_d v)
+              if Sys.file_exists (Layout.etc layout_k) then
+                Sys.rename (Layout.etc layout_k) (Layout.etc layout_v);
+              if Sys.file_exists (Layout.src layout_k) then
+                Sys.rename (Layout.src layout_k) (Layout.src layout_v);
+              if Sys.file_exists (Layout.portraits layout_k) then
+                Sys.rename
+                  (Layout.portraits layout_k)
+                  (Layout.portraits layout_v)
             end;
             rename_cnt_files k v
           with Sys_error msg ->
@@ -1426,71 +1431,68 @@ let merge_1 conn conf =
   else print_file "create_ok.htm" conn conf
 
 let gwf conn conf =
-  GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
   if in_base = "" then print_file "err_miss.htm" conn conf
-  else
-    let benv = loc_read_base_env in_base in
+  else (
+    GWPARAM.init in_base;
+    let mode = if !GWPARAM.reorg then Layout.Reorg else Detect in
+    let layout = Layout.of_bname ~mode in_base in
+    let benv = loc_read_base_env @@ Layout.gwf layout in
     let trailer =
-      if !GWPARAM.reorg then
-        Filename.concat (!GWPARAM.lang_d in_base "") (in_base ^ ".trl")
+      if !GWPARAM.reorg then Layout.lang layout // (in_base ^ ".trl")
       else
-        get_bases_dir () // "lang" // (in_base ^ ".trl")
+        Layout.lang layout // (in_base ^ ".trl")
         |> file_contents |> Util.escape_html
         |> fun s -> (s :> string)
     in
     let conf = { conf with env = benv @ (("trailer", trailer) :: conf.env) } in
-    print_file "gwf_1.htm" conn conf
+    print_file "gwf_1.htm" conn conf)
 
 let gwf_1 conn conf =
-  GWPARAM.init ();
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
-  let reorg = match p_getenv conf.env "reorg" with Some s -> s | _ -> "" in
-  GWPARAM.set_reorg in_base (Some (reorg = "on"));
-  let benv = loc_read_base_env in_base in
+  let mode =
+    match p_getenv conf.env "reorg" with
+    | Some "on" -> Layout.Reorg
+    | _ -> Legacy
+  in
+  let layout = Layout.of_bname ~mode in_base in
+  let benv = loc_read_base_env @@ Layout.gwf layout in
   let vars, _ = variables "gwf_1.htm" in
-  let oc =
-    open_out
-      (if !GWPARAM.reorg then
-         Filename.concat (!GWPARAM.bpath in_base) in_base ^ ".gwf"
-       else in_base ^ ".gwf")
-  in
-  let body_prop =
-    match p_getenv conf.env "proposed_body_prop" with
-    | Some "" | None -> s_getenv conf.env "body_prop"
-    | Some x -> x
-  in
-  Printf.fprintf oc "# File generated by \"setup\"\n\n";
-  List.iter
-    (fun k ->
-      match k with
-      | "body_prop" ->
-          if body_prop = "" then ()
-          else Printf.fprintf oc "body_prop=%s\n" body_prop
-      | _ -> Printf.fprintf oc "%s=%s\n" k (s_getenv conf.env k))
-    vars;
-  List.iter
-    (fun (k, v) ->
-      if List.mem k vars then () else Printf.fprintf oc "%s=%s\n" k v)
-    benv;
-  close_out oc;
+  Out_channel.with_open_text (Layout.gwf layout) (fun oc ->
+      let body_prop =
+        match p_getenv conf.env "proposed_body_prop" with
+        | Some "" | None -> s_getenv conf.env "body_prop"
+        | Some x -> x
+      in
+      Printf.fprintf oc "# File generated by \"setup\"\n\n";
+      List.iter
+        (fun k ->
+          match k with
+          | "body_prop" ->
+              if body_prop = "" then ()
+              else Printf.fprintf oc "body_prop=%s\n" body_prop
+          | _ -> Printf.fprintf oc "%s=%s\n" k (s_getenv conf.env k))
+        vars;
+      List.iter
+        (fun (k, v) ->
+          if List.mem k vars then () else Printf.fprintf oc "%s=%s\n" k v)
+        benv);
   let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
 
-  let trl_dir = !GWPARAM.etc_d in_base in
-  let trl_file = Filename.concat trl_dir "trl.txt" in
+  let trl_dir = Layout.etc layout in
+  let trl_file = trl_dir // "trl.txt" in
   if trl_dir = "" then failwith "trl_dir est vide (etc_d absent ?)";
   (try Unix.mkdir trl_dir 0o755 with Unix.Unix_error (Unix.EEXIST, _, _) -> ());
   (try
      if trl = "" then Sys.remove trl_file
      else
-       let oc = open_out trl_file in
-       output_string oc trl;
-       output_string oc "\n";
-       close_out oc
+       Out_channel.with_open_text trl_file (fun oc ->
+           output_string oc trl;
+           output_string oc "\n")
    with Sys_error _ -> ());
   print_file "gwf_ok.htm" conn conf
 
@@ -1817,7 +1819,7 @@ let intro () =
   launch_dir := Sys.getcwd ();
   (* All tool invocations inject -bd via exec_f so they find bases in
      bases_dir regardless of cwd. *)
-  Secure.set_base_dir @@ get_bases_dir ();
+  Secure.set_bases_dir @@ get_bases_dir ();
   Printf.eprintf "Start gwsetup\n%!";
   default_lang := default_setup_lang;
 

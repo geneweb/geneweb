@@ -44,9 +44,6 @@ val speclist : gwexport_opts ref -> (Arg.key * Arg.spec * Arg.doc) list
     Arg.parse. *)
 (* Used for gwd2ged and gwu. *)
 
-val errmsg : Arg.usage_msg
-(** Default error message. This is the third argument of Arg.parse. *)
-
 val select :
   Geneweb_db.Driver.base ->
   gwexport_opts ->

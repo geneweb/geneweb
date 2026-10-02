@@ -115,6 +115,7 @@ type config = {
   allowed_plugins : string list;
   secret_salt : string option;
   predictable_mode : bool;
+  layout : Layout.t;
 }
 
 (**/**)
@@ -192,6 +193,7 @@ let empty =
     allowed_plugins = [];
     secret_salt = None;
     predictable_mode = false;
+    layout = Layout.of_bname ~mode:Reorg "dummy";
   }
 
 (**/**)

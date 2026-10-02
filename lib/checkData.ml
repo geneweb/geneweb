@@ -1018,7 +1018,7 @@ let dict_to_cache_name dict_type =
 let cache_file_path conf dict_type =
   let bname = Filename.remove_extension conf.bname in
   let cache_dir =
-    Filename.concat (Secure.base_dir ())
+    Filename.concat (Secure.bases_dir ())
       (Filename.concat "etc" (Filename.concat bname "cache"))
   in
   let fname = dict_to_cache_name dict_type in

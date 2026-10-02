@@ -11,6 +11,7 @@
   address.
 - `--log '<stdout>'` is now rejected in CGI mode, including when the mode
   is inferred from `QUERY_STRING` (#2948).
+- The `cnt` directory now contains only counter information.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
@@ -22,6 +23,10 @@
   binary invoked directly by the web server receives no command line
   arguments, so `--cgi` requires a wrapper script; this has to be settled
   before the inference is actually removed.
+
+## CLI changes
+- Invalid database names are now rejected by gwd, gwc, ged2gwb and gwb2ged.
+  A valid database name contains only alphanumeric and hyphen characters.
 
 ## Breaking changes
 - Deprecate the multi-parents feature (#2726)

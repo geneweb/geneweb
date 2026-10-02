@@ -1,8 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 val with_database : ?read_only:bool -> string -> (Dbdisk.dsk_base -> 'a) -> 'a
-(** [with_database ?read_only dbname k] initializes a [dsk_base] structure from
-    the database located in the specified directory [dbname].
+(** [with_database ?read_only bpath k] initializes a [dsk_base] structure from
+    the database located in the specified directory [bpath].
 
     Both data and functionality part are initialized. The continuation [k] is
     called with the [dsk_base] structure.
@@ -25,7 +25,7 @@ val make :
   * Def.base_notes ->
   (Dbdisk.dsk_base -> 'a) ->
   'a
-(** [make bname particles ((persons, ascendants, unions) (families, couples,
+(** [make bpath particles ((persons, ascendants, unions) (families, couples,
      descendants) strings base_notes) k] initializes a [dsk_base] structure with
     giving data. The continuation [k] is called with the [dsk_base] structure.
 
@@ -43,4 +43,5 @@ type synchro_patch = {
     ids, third - changed/added by considered commit families ids. *)
 
 val input_synchro : string -> synchro_patch
-(** Get [synchro_patch] from the giving database directory. *)
+(** [input_synchro bpath] gets the [synchro_patch] from the database directory
+    [bpath]. *)

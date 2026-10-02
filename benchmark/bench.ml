@@ -109,11 +109,11 @@ let bench () =
     ]
   in
   match Sys.getenv_opt "BENCH_BASE" with
-  | Some bname when bname <> "" ->
+  | Some bpath when bpath <> "" ->
       let conf = Config.empty in
       let bench_w_base ?t ?(load = []) name fn args =
-        Secure.set_base_dir (Filename.dirname bname);
-        Driver.with_database bname @@ fun base ->
+        Secure.set_bases_dir (Filename.dirname bpath);
+        Driver.with_database bpath @@ fun base ->
         List.iter (fun load -> load base) load;
         let r = bench ?t name (fn base) args in
         r

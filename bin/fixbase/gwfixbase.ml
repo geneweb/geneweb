@@ -6,8 +6,8 @@ module Collection = Geneweb_db.Collection
 
 let nb_ind_init = ref 0
 
-let dump_persons bname ofile =
-  Driver.with_database bname @@ fun base ->
+let dump_persons bpath ofile =
+  Driver.with_database bpath @@ fun base ->
   let nb_ind = Driver.nb_of_persons base in
   let nb_fam = Driver.nb_of_families base in
   let undef = ref 0 in
@@ -35,7 +35,7 @@ let dump_persons bname ofile =
     result;
   let real_count = List.length result in
   let check = real_count + !undef in
-  Printf.eprintf "Base %s\n" bname;
+  Printf.eprintf "Base %s\n" bpath;
   Printf.eprintf "Final state: %d persons (initial value %d), %d families\n"
     nb_ind !nb_ind_init nb_fam;
   Printf.eprintf "             %d real persons , %d ?.0 ?, %d+%d=%d (%d)\n"
@@ -215,7 +215,7 @@ let index = ref false
 let dry_run = ref false
 let dump = ref false
 let ofile = ref ""
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
+let bases_dir = ref (Dirs.path Secure.default_bases_dir)
 
 let speclist =
   [
@@ -256,13 +256,14 @@ let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
-  Secure.set_base_dir !bases_dir;
   match !bname with
   | None ->
       Arg.usage speclist usage;
       exit 2
   | Some bname ->
-      let bpath = Filename.concat !bases_dir bname in
+      Secure.set_bases_dir !bases_dir;
+      GWPARAM.init bname;
+      let bpath = GWPARAM.bpath bname in
       let lock_file = Mutil.lock_file bpath in
       let on_exn exn bt =
         Format.eprintf "%a@." Lock.pp_exception (exn, bt);

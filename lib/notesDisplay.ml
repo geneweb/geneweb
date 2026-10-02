@@ -708,7 +708,7 @@ let format_file_entry conf depth d f n_type title view =
   let icon = match n_type with "gallery" -> "image" | _ -> "file-lines" in
   let route = match n_type with "gallery" -> "GALLERY" | _ -> "NOTES" in
   let color, mod_edit =
-    let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
+    let notes_d = Filename.concat (GWPARAM.bpath conf.bname) "notes_d" in
     let f = notes_d ^ Filename.dir_sep ^ d ^ NotesLinks.dir_sep ^ f ^ ".txt" in
     let f = Util.note_link_to_sys f in
     if Sys.file_exists f then ("", "") else (" text-danger", "MOD_")
@@ -822,7 +822,7 @@ let print_misc_notes conf base =
     else List.length (String.split_on_char NotesLinks.char_dir_sep d) + 1
   in
   (* ATTENTION check this if "notes_d" changes (REORG) *)
-  let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
+  let notes_d = Filename.concat (GWPARAM.bpath conf.bname) "notes_d" in
   let path_hierarchy d =
     List.iteri
       (fun i (path_to, dirname) ->

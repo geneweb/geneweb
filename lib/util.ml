@@ -11,6 +11,7 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Code = Geneweb_http.Code
 
+let ( // ) = Filename.concat
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
@@ -42,8 +43,9 @@ let print_default_gwf_file bname =
       "p_mod=";
     ]
   in
-  let config_d = !GWPARAM.config_d bname in
-  let fname = !GWPARAM.config bname in
+  let layout = Layout.of_bname ~mode:Detect bname in
+  let config_d = Layout.config layout in
+  let fname = Layout.gwf layout in
   if not (Sys.file_exists fname) then
     try
       if not (Sys.file_exists config_d) then Unix.mkdir config_d 0o755;
@@ -54,43 +56,6 @@ let print_default_gwf_file bname =
         close_out oc
     with Unix.Unix_error (_, _, _) ->
       Log.warn (fun k -> k "Error while creating %s or %s" config_d fname)
-
-let rec cut_at_equal i s =
-  if i = String.length s then (s, "")
-  else if s.[i] = '=' then
-    (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
-  else cut_at_equal (succ i) s
-
-let read_base_env bname gw_prefix debug =
-  let load_file fname =
-    try
-      let ic = Secure.open_in fname in
-      let env =
-        let rec loop env =
-          match input_line ic with
-          | s ->
-              let s = Mutil.strip_all_trailing_spaces s in
-              if s = "" || s.[0] = '#' then loop env
-              else loop (cut_at_equal 0 s :: env)
-          | exception End_of_file -> env
-        in
-        loop []
-      in
-      close_in ic;
-      List.rev env
-    with Sys_error error ->
-      Log.warn (fun k ->
-          k "Error %s while loading %s, using empty config" error fname);
-      []
-  in
-  let fname = !GWPARAM.config bname in
-  if Sys.file_exists fname then load_file fname
-  else (
-    if debug then
-      Log.info (fun k ->
-          k "No configuration file found (%s), see %s for example" fname
-            (Filename.concat gw_prefix "a.gwf"));
-    [])
 
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   let disabled =
@@ -1349,8 +1314,6 @@ let string_of_witness_kind_raw witness_kind =
   in
   Adef.safe s
 
-let bpath bname = !GWPARAM.bpath bname
-
 (* Cached [dir_listing_cache_ttl] seconds. [None] = directory absent/unreadable. *)
 let dir_listing_cache :
     (string, float * (string, unit) Hashtbl.t option) Hashtbl.t =
@@ -1439,8 +1402,8 @@ let find_file_in_directories directories filename =
     @return ordered list of directories to traverse *)
 
 let generate_search_directories conf =
-  let base_etc = !GWPARAM.etc_d conf.bname in
-  let shared_etc = Filename.concat (Secure.base_dir ()) "etc" in
+  let base_etc = Layout.etc conf.layout in
+  let shared_etc = Filename.concat (Secure.bases_dir ()) "etc" in
   let asset_dirs = Secure.assets () in
   let configured_templates, allow_all =
     try
@@ -1601,16 +1564,12 @@ let get_protocol conf =
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then (
     let print_file fname =
-      let fname =
-        Filename.concat (!GWPARAM.etc_d conf.bname) (fname ^ ".txt")
-      in
+      let fname = (Layout.etc conf.layout // fname) ^ ".txt" in
       try
-        let ic = Secure.open_in fname in
-        try
-          while true do
-            Output.printf conf "%c" (input_char ic)
-          done
-        with End_of_file -> close_in ic
+        Secure.with_open_in_text fname @@ fun ic ->
+        while true do
+          Output.printf conf "%c" (input_char ic)
+        done
       with Sys_error _ -> ()
     in
     print_file "mess_wizard";
@@ -2345,7 +2304,7 @@ let write_default_sosa conf key =
         else (k, v) :: acc)
       [] (List.rev conf.base_env)
   in
-  let fname = !GWPARAM.config conf.bname in
+  let fname = Layout.gwf conf.layout in
   let tmp_fname = fname ^ "2" in
   let oc =
     try Stdlib.open_out tmp_fname
@@ -2378,11 +2337,11 @@ let create_topological_sort conf base =
       Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Driver.iper_marker (Driver.ipers base) 0
   | _ ->
-      let bfile = bpath (conf.bname ^ ".gwb") in
+      let bpath = GWPARAM.bpath conf.bname in
       let tstab_file =
         if conf.use_restrict && (not conf.wizard) && not conf.friend then
-          Filename.concat bfile "tstab_visitor"
-        else Filename.concat bfile "tstab"
+          bpath // "tstab_visitor"
+        else bpath // "tstab"
       in
       Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
         (fun () ->
@@ -2392,7 +2351,7 @@ let create_topological_sort conf base =
           (* FIXME: we silently ignores error if we cannot lock the database. *)
           let on_exn _exn _bt = () in
           if conf.use_restrict && (not conf.wizard) && not conf.friend then
-            Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bfile)
+            Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bpath)
               (fun () -> Driver.base_visible_write base);
           tstab)
 
@@ -2808,8 +2767,8 @@ let update_wf_trace conf fname =
   write_wf_trace fname (List.sort (fun x y -> compare y x) wt)
 
 let test_cnt_d conf =
-  let config_d = !GWPARAM.config_d conf.bname in
-  let cnt_d = !GWPARAM.cnt_d conf.bname in
+  let config_d = Layout.config conf.layout in
+  let cnt_d = Layout.cnt conf.layout in
   (if not (Sys.file_exists config_d) then
      try Unix.mkdir config_d 0o755
      with Unix.Unix_error (_, _, _) ->
@@ -2834,7 +2793,7 @@ let commit_patches conf base =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      let fname = !GWPARAM.adm_file (conf.bname ^ "_u.txt") in
+      let fname = Layout.cnt conf.layout // (conf.bname ^ "_u.txt") in
       update_wf_trace conf fname
 
 let short_f_month m =
@@ -2858,11 +2817,12 @@ let short_f_month m =
 
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
-let read_gen_auth_file fname base_file =
+let read_gen_auth_file fname bname =
   let fname =
-    if GWPARAM.is_reorg_base base_file then
-      Filename.concat (!GWPARAM.config_d base_file) fname
-    else Filename.concat (Secure.base_dir ()) fname
+    if GWPARAM.is_reorg_base bname then
+      let layout = Layout.of_bname ~mode:Reorg bname in
+      Layout.config layout // fname
+    else Secure.bases_dir () // fname
   in
   try
     let ic = Secure.open_in fname in
@@ -3168,12 +3128,7 @@ type cache_visited_t = (string, (Driver.iper * string) list) Hashtbl.t
 (** [Description] : Renvoie le chemin du fichier de cache. [Args] :
     - config : configuration de la base [Retour] : unit [Rem] : Exporté en clair
       hors de ce module. *)
-let cache_visited conf =
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  Filename.concat (bpath bname) "cache_visited"
+let cache_visited conf = GWPARAM.bpath conf.bname // "cache_visited"
 
 (* ************************************************************************ *)
 (*  [Fonc] read_visited : string -> cache_visited_t                         *)
@@ -3386,7 +3341,7 @@ let has_children base u =
 
 let get_bases_list ?(format_fun = fun x -> x) () =
   let list = ref [] in
-  let dh = Unix.opendir (Secure.base_dir ()) in
+  let dh = Unix.opendir (Secure.bases_dir ()) in
   (try
      while true do
        let e = Unix.readdir dh in

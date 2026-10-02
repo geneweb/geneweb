@@ -1,11 +1,17 @@
 open GwuLib
 module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
+module GWPARAM = Geneweb.GWPARAM
 
 let isolated = ref false
 let bname = ref None
+let raise_bad fmt = Format.kasprintf (fun s -> raise (Arg.Bad s)) fmt
 
 let parse_cmd () =
+  (* FIXME: this hack ensures that Arg module won't print an os-dependent
+     values in error messages. We can remove this hack after switching to
+     cmdliner in this program. *)
+  Sys.argv.(0) <- "gwu";
   let speclist opts =
     ( "-odir",
       Arg.String (fun s -> GwuLib.out_dir := s),
@@ -45,22 +51,30 @@ let parse_cmd () =
     |> Arg.align
   in
   let anonfun s =
-    if !bname = None then bname := Some (Filename.basename s)
-    else raise (Arg.Bad "Cannot treat several databases")
+    match !bname with
+    | None -> bname := Some s
+    | Some _ -> raise_bad "Cannot treat several databases"
   in
   let opts = ref Gwexport.default_opts in
-  Arg.parse (speclist opts) anonfun Gwexport.errmsg;
-  match !bname with
-  | None ->
-      Arg.usage (speclist opts) Gwexport.errmsg;
-      exit 2
-  | Some bname -> (opts, bname)
+  let errmsg = "Usage: gwu <BASE> [OPT]" in
+  Arg.parse (speclist opts) anonfun errmsg;
+  let bname =
+    match !bname with
+    | None -> raise_bad "a database name is mandatory"
+    | Some s ->
+        if not @@ Mutil.good_name s then
+          raise_bad
+            "%s is not a valid database name (allowed: alphanumeric and hyphen)"
+            s;
+        s
+  in
+  (opts, bname)
 
 let ( // ) = Filename.concat
 
 let () =
   let opts, bname = parse_cmd () in
-  Secure.set_base_dir !opts.bases_dir;
+  Secure.set_bases_dir !opts.bases_dir;
   let name =
     if !Gwexport.out_file = "" then !opts.bases_dir // (bname ^ ".gw")
     else Gwexport.resolve_out_file !opts
@@ -72,7 +86,7 @@ let () =
       Gwexport.oc = (name, output_string oc, fun () -> close_out oc);
     };
   let opts = !opts in
-  Driver.with_database (opts.bases_dir // bname) @@ fun base ->
+  Driver.with_database (GWPARAM.bpath bname) @@ fun base ->
   let select = Gwexport.select base opts [] in
   let src_oc_ht = Hashtbl.create 1009 in
   Driver.load_ascends_array base;
@@ -112,10 +126,7 @@ let () =
   let _ofile, oc, close = opts.Gwexport.oc in
   if not !GwuLib.raw_output then oc "encoding: utf-8\n";
   if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
-  let in_dir =
-    let full = Filename.concat (Secure.base_dir ()) bname in
-    if Filename.check_suffix full ".gwb" then full else full ^ ".gwb"
-  in
+  let in_dir = Geneweb.GWPARAM.bpath bname in
   GwuLib.prepare_free_occ base;
   GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select;
   Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;

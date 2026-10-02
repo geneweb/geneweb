@@ -5,11 +5,13 @@ let src = Logs.Src.create ~doc:"Image" "IMG "
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 
+let ( // ) = Filename.concat
+
 let path_str path =
   match path with Some (`Path pa) -> pa | Some (`Url u) -> u | None -> ""
 
-let portrait_folder conf = !GWPARAM.portraits_d conf.bname
-let carrousel_folder conf = !GWPARAM.images_d conf.bname
+let portrait_folder conf = Layout.portraits conf.layout
+let carrousel_folder conf = Layout.images conf.layout
 
 let key_dir_basename first_name surname occ =
   let sp2_ = Mutil.tr ' ' '_' in
@@ -81,7 +83,7 @@ let full_image_path mode conf base p saved =
   | None -> None
 
 let path_of_filename conf fname =
-  let fname1 = Filename.concat (!GWPARAM.images_d conf.bname) fname in
+  let fname1 = Layout.images conf.layout // fname in
   if Sys.file_exists fname1 then fname1
   else Util.search_in_assets (Filename.concat "images" fname)
 
@@ -391,10 +393,10 @@ let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
   in
   if old_key = new_key then ()
   else
-    let p_dir = !GWPARAM.portraits_d conf.bname in
-    let i_dir = !GWPARAM.images_d conf.bname in
-    let old_carrousel = Filename.concat i_dir old_key in
-    let new_carrousel = Filename.concat i_dir new_key in
+    let p_dir = Layout.portraits conf.layout in
+    let i_dir = Layout.images conf.layout in
+    let old_carrousel = i_dir // old_key in
+    let new_carrousel = i_dir // new_key in
     (if Sys.file_exists old_carrousel && Sys.is_directory old_carrousel then
        try Sys.rename old_carrousel new_carrousel
        with Sys_error e ->
