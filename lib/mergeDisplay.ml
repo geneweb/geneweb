@@ -129,7 +129,7 @@ let print_possible_continue_merging conf base =
             let p = Gwdb.poi base ip in
             let s = NameDisplay.fullname_html_of_person conf base p in
             let open Ext_list.Infix in
-            Output.printf conf "<p>%s%s %s (%s)</p>"
+            Output.printf conf "<p><b>%s%s</b> %s (%s)</p>"
               (Util.transl conf "merge_todo")
               (Util.transl conf ":")
               (Util.transl_a_of_b conf
