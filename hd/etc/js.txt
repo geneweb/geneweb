@@ -91,8 +91,8 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
     %if;(e.m="MOD_DATA_OK" and e.data!="")
       <script>
         var htmlTitle = document.title;
-        if (htmlTitle == "[*modification successful]" ||
-            htmlTitle == "[*no modification]") {
+        if (htmlTitle == `[*modification successful]` ||
+            htmlTitle == `[*no modification]`) {
           document.getElementById("reference")?.focus();
         }
       </script>
@@ -105,22 +105,22 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
        or (e.m="MOD_DATA_OK" and e.data=""))
       <script>
         var htmlTitle = document.title;
-        if (htmlTitle == "[*person modified]" ||
-            htmlTitle == "[*person added]"    ||
-            htmlTitle == "[*image received]"  ||
-            htmlTitle == "[*image deleted]"   ||
-            htmlTitle == "[*modification successful]") {
+        if (htmlTitle == `[*person modified]` ||
+            htmlTitle == `[*person added]`    ||
+            htmlTitle == `[*image received]`  ||
+            htmlTitle == `[*image deleted]`   ||
+            htmlTitle == `[*modification successful]`) {
             document.getElementById("i%e.i;")?.focus();
         }
-        else if (htmlTitle == "[*family modified]" ||
-                 htmlTitle == "[*family added]"    ||
-                 htmlTitle == "[*family deleted]"  ||
-                 htmlTitle == "[*children's names changed]") {
+        else if (htmlTitle == `[*family modified]` ||
+                 htmlTitle == `[*family added]`    ||
+                 htmlTitle == `[*family deleted]`  ||
+                 htmlTitle == `[*children's names changed]`) {
             document.getElementById("i%e.ip;")?.focus();
         }
       </script>
     %end;
-    %if;(upd_form=1)
+    %if;(upd_form=1 and e.templ="")
       <script>new bootstrap.ScrollSpy(document.body, { target: '#banner' })</script>
     %end;
   %end;
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
       element.addEventListener('click', function (event) {
         event.preventDefault();
         const textarea = document.querySelector('.insert-character-target');
-        if (textarea) insertCharacter(textarea, this.innerText);
+        if (textarea) insertCharacter(textarea, this.textContent);
       });
     });
   }
@@ -301,12 +301,6 @@ function insertTags(tagOpen, tagClose, sampleText) {
   }
   ta.focus();
   return false;
-}
-function setupToolbarSticky() {
-  const toolbar = document.querySelector('.toolbar-wrapper');
-  if (!toolbar) return;
-  window.addEventListener('scroll', () =>
-    toolbar.classList.toggle('is-sticky', window.scrollY > 0), { passive: true });
 }
 </script>
 %end;
@@ -370,7 +364,7 @@ const inputToBook = {
     window.open(url, '_blank');
   }
 };
-inputToBook.addNavigation();
+%if;(e.m!="MOD_GALLERY")inputToBook.addNavigation();%end;
 %end;
 %if;(is_welcome and b.propose_titles!="no")
 %( Shared submit button for the person and title search forms. %)
@@ -756,8 +750,8 @@ function populateDatalists() {
 const UPD = {
   prefix: "%prefix;",
   iper: "%index;",
-  error: "[*error]",
-  editField: "[*edit this field]"
+  error: `[*error]`,
+  editField: `[*edit this field]`
 };
 (function () {
   const slot = document.getElementById('upd-wand-sources');
@@ -812,8 +806,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initFormFocus();
   initCalendarMonthSelects();
 %end;
-%if;(is_welcome or upd_form=1 or e.m="MOD_GALLERY")
-  %if;((roglo or b.rpc_datalist=1) and e.m!="MOD_GALLERY")
+%if;(is_welcome or upd_form=1)
+  %if;(roglo or b.rpc_datalist=1)
     (async () => {
       const rpcOk = await RpcDatalistManager.init();
       if (rpcOk) {
@@ -836,7 +830,6 @@ initTooltips();
 %end;
 if (typeof setupFloatingPlaceholders === 'function') setupFloatingPlaceholders();
 %if;(upd_form=1 or upd_notes=1)
-  setupToolbarSticky();
   setupCharacterInsertion();
 %end;
 %if;(e.m="NOTES" or e.m="WIZNOTES")
