@@ -34,7 +34,7 @@
   %else;
     <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.8">
     <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
-    %if;((e.m="A" and e.t="") or e.m="MOD_NOTES")
+    %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <link rel="stylesheet" href="%etc_prefix;css/tom-select.bootstrap5.min.css?version=2.6.0">
     %end;
   %end;
