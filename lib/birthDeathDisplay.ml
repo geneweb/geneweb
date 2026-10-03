@@ -243,19 +243,16 @@ let print_oldest_alive conf base =
 
 let print_longest_lived conf base =
   let get_longest p =
-    if Util.authorized_age conf base p then
-      match
-        ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
-          Driver.get_death p )
-      with
-      | Some bd, Death (_, cd) -> (
-          match Date.cdate_to_gregorian_dmy_opt cd with
-          | None -> None
-          | Some dd ->
-              let te = Date.time_elapsed bd dd in
-              if te.year >= 0 then Some (Adef.Dgreg (te, Dgregorian)) else None)
-      | _ -> None
-    else None
+    match
+      (Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p), Driver.get_death p)
+    with
+    | Some bd, Death (_, cd) -> (
+        match Date.cdate_to_gregorian_dmy_opt cd with
+        | None -> None
+        | Some dd ->
+            let te = Date.time_elapsed bd dd in
+            if te.year >= 0 then Some (Adef.Dgreg (te, Dgregorian)) else None)
+    | _ -> None
   in
   let list, len = select_person conf base get_longest false in
   let title _ =
@@ -528,8 +525,7 @@ let print_population_pyramid conf base =
       match p_getint conf.env "to" with Some y -> y | None -> from_year
     in
     let men, wom =
-      make_death_pyramid ~nb_intervals ~interval ~limit ~from_year ~to_year conf
-        base
+      make_death_pyramid ~nb_intervals ~interval ~limit ~from_year ~to_year base
     in
     let range =
       if to_year <> from_year then Printf.sprintf "%d-%d" from_year to_year
@@ -574,7 +570,7 @@ let print_population_pyramid conf base =
       | None -> conf.today
     in
     let men, wom =
-      make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base
+      make_population_pyramid ~nb_intervals ~interval ~limit ~at_date base
     in
     let at_year = at_date.year in
     let title _ =
