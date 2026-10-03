@@ -1,13 +1,13 @@
 <!-- $Id: upd_js.txt v7.1 06/01/2026 02:00:03 $ -->
 %( Input datalists and function to populate all datalists %)
-%if;not ("CHG_EVT" in e.m);
+%if;(is_upd_ind or is_upd_fam)
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
 %apply;dl("fnames")
 %apply;dl("snames")
 %apply;dl("places")
 %apply;dl("occupations")
 %apply;dl("sources")
-%if;("IND" in e.m)
+%if;is_upd_ind;
   %apply;dl("pub_names")
   %apply;dl("qualifiers")
   %apply;dl("aliases")
@@ -15,7 +15,7 @@
   %apply;dl("estates")
 %end;
 <script>
-%if;("IND" in e.m)
+%if;is_upd_ind;
 function change_buri(xcnt) {
   const selector = document.getElementById('buri_select' + xcnt);
   const input = document.getElementById('e_name' + xcnt);
@@ -193,6 +193,29 @@ function initCalendarMonthSelects() {
     }
   });
 }
+%( Bootstrap, clearinput.js and autosize are loaded after this file by js.txt. %)
+document.addEventListener('DOMContentLoaded', () => {
+  addClearButtonToInputs();
+  sortSelectOptions();
+  initCustomEvents();
+  initSelectToggle();
+  initFormFocus();
+  initCalendarMonthSelects();
+  new bootstrap.ScrollSpy(document.body, { target: '#banner' });
+%if;is_upd_fam;
+  document.querySelectorAll('.transfer-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const notes = document.getElementById('notes_comments');
+      const target = document.querySelector('[data-marr]');
+      if (!notes || !target) return;
+      target.value = notes.value;
+      notes.value = '';
+      if (typeof autosize !== 'undefined') autosize.update(target);
+      btn.style.display = 'none';
+    });
+  });
+%end;
+});
 </script>
 %else;
 %( m=CHG_EVT %)
