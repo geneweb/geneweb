@@ -79,7 +79,7 @@ window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
   function hideOverlay() {
     document.querySelector('.loading-overlay')?.classList.add('hidden');
   }
-  document.addEventListener('DOMContentLoaded', hideOverlay);
+  window.addEventListener('pageshow', hideOverlay);
 </script>
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA")

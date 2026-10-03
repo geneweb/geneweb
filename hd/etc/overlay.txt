@@ -20,7 +20,5 @@ function hideOverlay() {
     overlay.classList.add('hidden');
   }
 }
-document.addEventListener('DOMContentLoaded', function() {
-  hideOverlay();
-});
+window.addEventListener('pageshow', hideOverlay);
 </script>
