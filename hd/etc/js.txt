@@ -116,9 +116,6 @@ window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
         }
       </script>
     %end;
-    %if;(upd_form=1 and e.templ="")
-      <script>new bootstrap.ScrollSpy(document.body, { target: '#banner' })</script>
-    %end;
   %end;
 %end;
 %if;((wizard and e.m="" and not is_welcome) or upd_form=1 or "CHK_DATA" in e.m or "SND_IMAGE_C" in e.m
@@ -442,19 +439,6 @@ function moveWelcomeLangSelect() {
   loginBox.appendChild(group);
 }
 document.addEventListener('DOMContentLoaded', moveWelcomeLangSelect);
-</script>
-%end;
-%if;(upd_form=1)
-<script>
-%( clearinput.js, then the form setup of upd_js.txt. %)
-document.addEventListener('DOMContentLoaded', () => {
-  addClearButtonToInputs();
-  sortSelectOptions();
-  initCustomEvents();
-  initSelectToggle();
-  initFormFocus();
-  initCalendarMonthSelects();
-});
 </script>
 %end;
 %if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
