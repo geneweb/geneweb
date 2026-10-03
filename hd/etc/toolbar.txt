@@ -1,6 +1,6 @@
 <!-- $Id: toolbar.txt v7.1 04/05/2026 04:40:04 $ -->
 <style>
-%if;(e.m="MOD_NOTES")
+%if;("NOTES" in e.m)
 body {
   /* Add padding to prevent content from hiding under fixed navbar */
   padding-top: 48px;

@@ -28,7 +28,7 @@
 %end;
 %define;addgraph(xxx)[*add/clear/show/edit the graph:::xxx]0%end;
   <nav class="navbar navbar-expand-md pt-0 px-0%sp;
-    %if;("MOD" in e.m or (e.ip!="" and "ADD" in e.m))mt-5%else;mt-1 mt-md-0%end;">
+    %if;("MOD" in e.m or "ADD" in e.m or "MRG" in e.m)mt-5%else;mt-1 mt-md-0%end;">
     <div class="container-fluid justify-content-center px-0">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -290,7 +290,7 @@
                       <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user female"></span></span>%nn;
                       <span class="visually-hidden">[*add::relation/relations]0 ([M/F]1)</span></a>
                 %else;
-                  <a class="nav-link %if;(e.m="ADD_FAM")active%end;" id="add_fam" href="%prefix;m=ADD_FAM&ip=%index;" %laA;>%nn;
+                  <a class="nav-link %if;("ADD_FAM" in e.m)active%end;" id="add_fam" href="%prefix;m=ADD_FAM&ip=%index;" %laA;>%nn;
                     <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user %apply;othersexcolor(sex)"></span></span>%nn;
                     <span class="visually-hidden">[*add::family/families]0 (A)</span></a>
                 %end;
@@ -310,8 +310,9 @@
               %( Family dropdown menu %)
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle text-secondary
-                   %if;(e.m="ADD_FAM" or e.m="CHG_EVT_FAM_ORD" or e.m="DEL_FAM"
-                   or e.m="MRG_FAM" or e.m="INV_FAM" or e.m="CHG_CHN") active%end;"
+                   %if;(e.m="ADD_FAM" or e.m="ADD_FAM_OK" or e.m="CHG_EVT_FAM_ORD" or e.m="DEL_FAM"
+                     or e.m="MRG_FAM" or e.m="MRG_FAM_OK" or e.m="MRG_MOD_FAM_OK" or e.m="MRG_DUP_FAM_Y_N"
+                     or e.m="INV_FAM" or e.m="CHG_CHN") active%end;"
                    data-bs-toggle="dropdown" role="button" href="#" aria-expanded="false"
                    title="[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;">%nn;
                    <span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
