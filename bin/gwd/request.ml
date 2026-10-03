@@ -231,6 +231,29 @@ let check_nldb_format conf base =
           (Util.transl conf "NOTIF incompatible notes_links")
     | `Ok | `NoFile -> ())
 
+let redirect_to_random_person conn conf base =
+  let n = Driver.nb_of_persons base in
+  let rec pick k =
+    let p =
+      Driver.poi base (Driver.Iper.of_string (string_of_int (Random.int n)))
+    in
+    if k = 0 || ((not (Util.is_empty_name p)) && Util.authorized_age conf base p)
+    then p
+    else pick (k - 1)
+  in
+  if n = 0 then SrcfileDisplay.print_welcome conf base
+  else (
+    Random.self_init ();
+    let p = pick 100 in
+    Connection.http_redirect_temporarily conn
+      (match p_getenv conf.env "m" with
+      | None | Some "" -> (commd conf ^^^ Util.acces conf base p :> string)
+      | Some _ ->
+          Util.url_set_aux conf
+            (commd conf :> string)
+            [ "i"; "p"; "n"; "oc"; "file"; "rnd" ]
+            [ Driver.Iper.to_string (Driver.get_iper p) ]))
+
 let w_base ~none fn conn conf (bfile : string option) =
   match bfile with
   | None -> none conf
@@ -337,6 +360,8 @@ let treat_request =
               request_issue conn conf base ~level:`Error
                 ~key:"wizards cant write")
             conn conf bfile
+        else if p_getenv conf.env "rnd" = Some "1" then
+          w_base redirect_to_random_person conn conf bfile
         else
           let () =
             Registration.call_hooks (fun ~name hook ->
