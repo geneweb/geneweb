@@ -537,15 +537,12 @@ let treat_request =
                  w_base @@ fun conf base ->
                  Perso.interp_templ "list" conf base
                    (Driver.empty_person base Driver.Iper.dummy)
-             | "LB" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_birth
-             | "LD" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_death
+             | "LB" -> w_base @@ BirthDeathDisplay.print_birth
+             | "LD" -> w_base @@ BirthDeathDisplay.print_death
              | "LINKED" -> w_base @@ w_person @@ NotesDisplay.print_what_links_p
              | "LIST_IMAGES" -> w_wizard @@ w_base @@ ListImages.print
              | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
-             | "LM" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_marriage
+             | "LM" -> w_base @@ BirthDeathDisplay.print_marriage
              | "MISC_NOTES" -> w_base @@ NotesDisplay.print_misc_notes
              | "MISC_NOTES_SEARCH" ->
                  w_base @@ NotesDisplay.print_misc_notes_search
@@ -656,10 +653,8 @@ let treat_request =
                          in
                          NotesDisplay.print_what_links conf base fnotes
                      | _ -> NotesDisplay.print conf base)
-             | "OA" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_oldest_alive
-             | "OE" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_oldest_engagements
+             | "OA" -> w_base @@ BirthDeathDisplay.print_oldest_alive
+             | "OE" -> w_base @@ BirthDeathDisplay.print_oldest_engagements
              | "P" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
@@ -696,8 +691,7 @@ let treat_request =
                  w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
              | "PNOC_LOOKUP" ->
                  w_base @@ fun conf base -> PersonPicker.lookup_print conf base
-             | "POP_PYR" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_population_pyramid
+             | "POP_PYR" -> w_base @@ BirthDeathDisplay.print_population_pyramid
              | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "R" -> (
