@@ -13,9 +13,12 @@ buildDunePackage {
   src = lib.cleanSource ../.;
   version = "dev";
 
+  propagatedBuildInputs = [
+    geneweb-win32
+  ];
+
   buildInputs = [
     geneweb-compat
-    geneweb-win32
     camlp-streams
     logs
     fmt
