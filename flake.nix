@@ -51,10 +51,18 @@
                 ;
             };
 
-          apps.default = {
-            type = "app";
-            program = "${self.packages.${system}.geneweb}/bin/gwd";
-            meta.description = "Run gwd server.";
+          apps = {
+            default = {
+              type = "app";
+              program = "${self.packages.${system}.geneweb}/bin/gwd";
+              meta.description = "Run gwd server";
+            };
+
+            gwsetup = {
+              type = "app";
+              program = "${self.packages.${system}.geneweb}/bin/gwsetup";
+              meta.description = "Run gwsetup server";
+            };
           };
 
           devShells.default = pkgs.mkShell {
@@ -63,7 +71,7 @@
               qcheck-alcotest
               alcotest
               findlib
-              (odoc.overrideAttrs { doCheck = false; })
+              odoc
               ocaml-lsp
               patdiff
               memtrace
