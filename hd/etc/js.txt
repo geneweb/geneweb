@@ -328,7 +328,7 @@ const inputToBook = {
     document.addEventListener('mousedown', function(event) {
       const input = event.target.closest('input[data-book]');
       if (input && event.ctrlKey && event.button === 0) {
-        event.preventDefault();
+        event.preventDefault();[[Marguerite Marie/RINK]]
         inputToBook.openBook(input.value, input.dataset.book);
       }
     });
