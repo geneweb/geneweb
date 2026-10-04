@@ -6,6 +6,7 @@
   brotli,
   cmdliner,
   crunch,
+  base64,
   pcre2,
   benchmark,
   calendars,
@@ -58,6 +59,7 @@ buildDunePackage {
     geneweb-compat
     geneweb-http
     ancient
+    base64
     cmdliner
     pcre2
     benchmark
