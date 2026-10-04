@@ -605,7 +605,7 @@ let do_connected_wizards conf base (_, _, _, wl) =
           print_connected_wizard conf first wiznotes_dir wz tm_user;
           if wz = conf.user then (
             Output.print_sstring conf (transl conf ":");
-            Output.print_sstring conf " :";
+            Output.print_sstring conf " ";
             Output.print_sstring conf
               (transl_nth conf "you are visible/you are not visible"
                  (if is_visible then 0 else 1));
@@ -642,17 +642,17 @@ let do_change_wizard_visibility conf base x set_vis =
   (if ((not set_vis) && not is_visible) || (set_vis && is_visible) then ()
    else
      let tmp_file = Filename.concat wiznotes_dir "1connected.deny" in
-     Secure.with_open_out_text tmp_file @@ fun oc ->
-     let found =
-       List.fold_left
-         (fun found wz ->
-           if wz = conf.user && set_vis then true
-           else (
-             Printf.fprintf oc "%s\n" wz;
-             found))
-         false denying
-     in
-     if (not found) && not set_vis then Printf.fprintf oc "%s\n" conf.user;
+     ( Secure.with_open_out_text tmp_file @@ fun oc ->
+       let found =
+         List.fold_left
+           (fun found wz ->
+             if wz = conf.user && set_vis then true
+             else (
+               Printf.fprintf oc "%s\n" wz;
+               found))
+           false denying
+       in
+       if (not found) && not set_vis then Printf.fprintf oc "%s\n" conf.user );
      let file = Filename.concat wiznotes_dir "connected.deny" in
      Mutil.rm file;
      Sys.rename tmp_file file);
