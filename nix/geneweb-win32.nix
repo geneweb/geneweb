@@ -1,6 +1,6 @@
 {
   lib,
-  buildDunePackage
+  buildDunePackage,
 }:
 
 buildDunePackage {

@@ -2,13 +2,6 @@ self: super: {
   ocamlPackages = super.ocamlPackages.overrideScope (
     final: prev: {
       calendars = final.callPackage ./calendars.nix { };
-      cmdliner = prev.cmdliner.overrideAttrs (rec {
-        version = "2.1.0";
-        src = super.fetchurl {
-          url = "https://erratique.ch/software/cmdliner/releases/cmdliner-${version}.tbz";
-          hash = "sha256-iBTGFM1D1S/R68ivWjHZElwhTEmPpgVmDk7Rlf+ENOk=";
-        };
-      });
       unidecode = final.callPackage ./unidecode.nix { };
       ocamlformat-lib = final.callPackage ./ocamlformat/ocamlformat-lib.nix { };
       ocamlformat = final.callPackage ./ocamlformat/ocamlformat.nix { };
@@ -22,6 +15,25 @@ self: super: {
           hash = "sha256-XLI9n/04InhEmXMMv7at/ScUgDhJ8WWVcEeBJy7j1bE=";
         };
       };
+      # mirage-crypto < 2.4.0 contains multiple vulnerabilites.
+      mirage-crypto = prev.mirage-crypto.overrideAttrs (
+        finalAttrs: _: {
+          version = "2.4.1";
+
+          src = super.fetchurl {
+            url = "https://github.com/mirage/mirage-crypto/releases/download/v${finalAttrs.version}/mirage-crypto-${finalAttrs.version}.tbz";
+            hash = "sha256-MyiGw2XGA1B3485namPaj3UAwVoWKLPAfhObDlUfH28=";
+          };
+
+          meta.knownVulnerabilities = [ ];
+        }
+      );
+      mirage-crypto-ec = prev.mirage-crypto-ec.overrideAttrs ({
+        meta.knownVulnerabilities = [ ];
+      });
+      mirage-crypto-pk = prev.mirage-crypto-pk.overrideAttrs ({
+        meta.knownVulnerabilities = [ ];
+      });
     }
   );
 }
