@@ -14,6 +14,7 @@
 <body%body_prop;>
 <div id="loading-overlay"></div>
 %include;hed
+<a class="visually-hidden-focusable" href="#main-content">[*skip to main content]</a>
 %include;home
 %define;subsection(x)
   [*go to section %s:::x]%nn;
@@ -53,7 +54,6 @@
   </div>
 %end;
 <div class="container">
-  <a tabindex="4" class="visually-hidden-focusable" href="#main-content">[*skip to main content]</a>
   %let;len_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
   %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
   <nav class="navbar bg-light sticky-top justify-content-start py-1 mt-1 mb-0 px-1 mx-0" aria-labelledby="sub-caracter-selection-heading" id="fixed-nav">
@@ -97,7 +97,7 @@
               </div>
             %end;
           </div>
-          %if;(e.s!="")<a tabindex="5" role="button" class="btn-link border-0 align-self-center mt-1 mb-2 sub-char"
+          %if;(e.s!="")<a class="btn-link border-0 align-self-center mt-1 mb-2 sub-char"
             href="%prefix;m=MOD_DATA&data=%e.data;" title="[*back to index and books]" data-bs-toggle="tooltip" data-placement="bottom">
               <span class="fa-stack mb-1">
                 <i class="fa fa-a fa-stack-2x pe-3"></i>
