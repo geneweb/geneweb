@@ -168,31 +168,6 @@ sv: %s %s som börjar med ”%s”
 tr: %s %s, “%s” ile başlayan
 zh: %s %s 以“%s”开头
 
-    %s access cancelled for that page
-bg: отменен достъп като %s за тази страница
-co: accessu %s abbandunatu per sta pagina
-cs: pristup pro tuto stranku byl zruseny
-de: Zugang für %s wurde gelöscht
-en: %s access cancelled for that page
-eo: %s aliro ne estas ebla por la paĝo
-es: acceso %s anulado para esta página
-et: %s: ligipääs sellele lehele on keelatud
-fi: %s pääsy sivulle peruttu
-fr: accès %s annulé pour cette page
-he: גישה %s בדף זה בוטלה
-it: accesso %s annullato per questa pagina
-lv: %s piekļuve šai lapai ir pārtraukta
-nl: %s toegang gewist voor deze pagina
-no: du har ikke lenger tilgang til denne siden %s
-oc: accès %s anullat per aquela pagina
-pl: dostęp %s anulowany dla tej strony
-pt: acesso %s cancelado para aquela página
-ro: %s acces anulat la această pagină
-ru: доступ %s к этой странице запрещён
-sl: %s nima dostopa do te strani
-sv: du har inte längre åtkomst till denna sida %s
-tr: bu sayfa için %s erişimi iptal edildi
-
     %s and %s have several unions
 bg: %s и %s имат няколко обединения
 co: %s è %s anu parechje unioni
@@ -15261,6 +15236,76 @@ fr: Accès refusé
 de: Schreibaktionen sind für diese Datenbank nicht erlaubt.
 en: Write actions are not allowed on this database.
 fr: Les actions d’écriture ne sont pas autorisées sur cette base.
+
+    NOTIF_TT access refused
+af: Toegang geweier
+ar: تم رفض الوصول
+bg: Достъпът е отказан
+br: Moned nacʼhet
+ca: Accés denegat
+co: Accessu ricusatu
+cs: Přístup odepřen
+da: Adgang nægtet
+de: Zugriff verweigert
+en: Access denied
+eo: Aliro rifuzita
+es: Acceso denegado
+et: Juurdepääs keelatud
+fi: Pääsy estetty
+fr: Accès refusé
+he: הגישה נדחתה
+is: Aðgangi hafnað
+it: Accesso negato
+lt: Prieiga uždrausta
+lv: Piekļuve liegta
+nl: Toegang geweigerd
+no: Tilgang nektet
+oc: Accès refusat
+pl: Odmowa dostępu
+pt: Acesso negado
+pt-br: Acesso negado
+ro: Acces refuzat
+ru: Доступ запрещён
+sk: Prístup zamietnutý
+sl: Dostop zavrnjen
+sv: Åtkomst nekad
+tr: Erişim reddedildi
+zh: 访问被拒绝
+
+    NOTIF access refused
+af: Verkeerde gebruikersnaam of wagwoord, of aanmelding gekanselleer. U kan van hierdie bladsy af weer probeer.
+ar: اسم المستخدم أو كلمة المرور غير صحيحة، أو تم إلغاء تسجيل الدخول. يمكنك المحاولة مرة أخرى من هذه الصفحة.
+bg: Грешно потребителско име или парола, или влизането е отменено. Можете да опитате отново от тази страница.
+br: Anv implijer pe ger-tremen fall, pe kevreadur nullet. Gallout a rit klask en-dro diwar ar bajenn-mañ.
+ca: Nom d’usuari o contrasenya incorrectes, o inici de sessió cancel·lat. Podeu tornar-ho a provar des d’aquesta pàgina.
+co: Nome d’utilizatore o parolla d’ordine sbagliata, o cunnessione abbandunata. Pudete torna à pruvà da sta pagina.
+cs: Nesprávné uživatelské jméno nebo heslo, nebo bylo přihlášení zrušeno. Můžete to zkusit znovu z této stránky.
+da: Forkert brugernavn eller adgangskode, eller login annulleret. Du kan prøve igen fra denne side.
+de: Benutzername oder Passwort falsch, oder Anmeldung abgebrochen. Sie können es auf dieser Seite erneut versuchen.
+en: Wrong user name or password, or login cancelled. You can try again from this page.
+eo: Malĝusta uzantnomo aŭ pasvorto, aŭ ensaluto nuligita. Vi povas reprovi el ĉi tiu paĝo.
+es: Nombre de usuario o contraseña incorrectos, o inicio de sesión cancelado. Puede volver a intentarlo desde esta página.
+et: Vale kasutajanimi või parool või sisselogimine tühistati. Võite sellelt lehelt uuesti proovida.
+fi: Väärä käyttäjätunnus tai salasana, tai kirjautuminen peruttiin. Voit yrittää uudelleen tältä sivulta.
+fr: Identifiant ou mot de passe incorrect, ou connexion annulée. Vous pouvez réessayer depuis cette page.
+he: שם משתמש או סיסמה שגויים, או שההתחברות בוטלה. אפשר לנסות שוב מדף זה.
+is: Rangt notandanafn eða lykilorð, eða hætt var við innskráningu. Þú getur reynt aftur á þessari síðu.
+it: Nome utente o password errati, oppure accesso annullato. Puoi riprovare da questa pagina.
+lt: Neteisingas naudotojo vardas arba slaptažodis, arba prisijungimas atšauktas. Galite bandyti dar kartą iš šio puslapio.
+lv: Nepareizs lietotājvārds vai parole, vai pieteikšanās atcelta. Varat mēģināt vēlreiz no šīs lapas.
+nl: Onjuiste gebruikersnaam of wachtwoord, of aanmelding geannuleerd. U kunt het vanaf deze pagina opnieuw proberen.
+no: Feil brukernavn eller passord, eller innloggingen ble avbrutt. Du kan prøve igjen fra denne siden.
+oc: Nom d’utilizaire o senhal incorrècte, o connexion anullada. Podètz tornar ensajar dempuèi aquesta pagina.
+pl: Nieprawidłowa nazwa użytkownika lub hasło albo logowanie zostało anulowane. Możesz spróbować ponownie na tej stronie.
+pt: Nome de utilizador ou palavra-passe incorretos, ou início de sessão cancelado. Pode tentar novamente a partir desta página.
+pt-br: Nome de usuário ou senha incorretos, ou login cancelado. Você pode tentar novamente a partir desta página.
+ro: Nume de utilizator sau parolă greșită ori autentificare anulată. Puteți încerca din nou de pe această pagină.
+ru: Неверное имя пользователя или пароль, либо вход отменён. Вы можете повторить попытку на этой странице.
+sk: Nesprávne používateľské meno alebo heslo, alebo bolo prihlásenie zrušené. Môžete to skúsiť znova z tejto stránky.
+sl: Napačno uporabniško ime ali geslo ali pa je bila prijava preklicana. Znova lahko poskusite s te strani.
+sv: Fel användarnamn eller lösenord, eller så avbröts inloggningen. Du kan försöka igen från den här sidan.
+tr: Kullanıcı adı veya parola yanlış ya da giriş iptal edildi. Bu sayfadan yeniden deneyebilirsiniz.
+zh: 用户名或密码错误，或登录已取消。您可以在此页面重试。
 
     NOTIF_TT missing doc param
 de: Fehlender Parameter

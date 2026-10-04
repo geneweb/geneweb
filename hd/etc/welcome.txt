@@ -78,11 +78,11 @@
   </div>
   <div class="col-12 col-md-3 order-1 order-md-3 ms-md-2 px-0 mt-xs-2 mt-lg-0 align-self-center">
     <div id="gw-login" class="d-flex flex-column col-md-10 ps-1 pe-0">
-      %if;(cgi and (not wizard or not friend))
+      %if;(not wizard or not friend)
         <form class="d-flex" method="post" action="%action;">
           %hidden;
+          <label for="w" class="visually-hidden">[*user/password/cancel]0:[user/password/cancel]1</label>
           <div class="input-group mt-1">
-            <label for="w" class="visually-hidden">[*user/password/cancel]0:[user/password/cancel]1</label>
             <input type="password" name="w" id="w" class="form-control"
               title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
               placeholder="[user/password/cancel]0:[user/password/cancel]1">
