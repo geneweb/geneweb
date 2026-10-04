@@ -544,12 +544,12 @@ let unauthorized conf auth_type =
   Output.status conf Code.Unauthorized;
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
-  Output.header conf "Content-type: text/html; charset=%s" conf.charset;
-  Output.header conf "Connection: close";
-  Output.print_sstring conf "<head><title>Access failed</title></head>\n";
-  Output.print_sstring conf "<body><h1>Access failed</h1>\n";
-  Output.printf conf "<ul><li>%s</ul>\n" auth_type;
-  Output.print_sstring conf "</body>\n</html>\n"
+  html conf;
+  Output.printf conf
+    {|<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Access failed</title></head>
+<body><h1>Access failed</h1><p>%s</p></body></html>|}
+    (escape_html auth_type :> string)
 
 let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
     ?(senv = true) conf : Adef.escaped_string =

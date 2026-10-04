@@ -51,8 +51,8 @@
                     <div class="d-flex align-items-center flex-grow-1">
                       %apply;input_hidden("e.b","b")
                       %if;(e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
+                      <label for="p_mod" class="visually-hidden">[*select p_mod]</label>
                       <div class="input-group p-mod-group me-2">
-                        <label for="p_mod" class="visually-hidden">[*select p_mod]</label>
                         <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
                           value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
                           placeholder="%if;(e.p_mod="" and b.p_mod!="")%b.p_mod;
