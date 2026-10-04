@@ -15,7 +15,7 @@ self: super: {
           hash = "sha256-XLI9n/04InhEmXMMv7at/ScUgDhJ8WWVcEeBJy7j1bE=";
         };
       };
-      # mirage-crypto < 2.4.0 contains multiple vulnerabilites.
+      # mirage-crypto < 2.4.1 contains multiple vulnerabilites.
       mirage-crypto = prev.mirage-crypto.overrideAttrs (
         finalAttrs: _: {
           version = "2.4.1";
