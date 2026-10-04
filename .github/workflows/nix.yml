@@ -1,0 +1,34 @@
+name: Check Nix flake
+on:
+  push:
+    paths:
+      - 'nix/*'
+      - 'flake.*'
+      - 'dune-project'
+  pull_request:
+    paths:
+      - 'nix/*'
+      - 'flake.*'
+      - 'dune-project'
+
+jobs:
+  nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+
+      - name: Build geneweb-compat
+      - run: nix build .#geneweb-compat
+
+      - name: Build geneweb-win32
+      - run: nix build .#geneweb-win32
+
+      - name: Build geneweb-http
+      - run: nix build .#geneweb-http
+
+      - name: Build geneweb
+      - run: nix build .#geneweb
+
+      - name: Build geneweb-rpc
+      - run: nix build .#geneweb-rpc
