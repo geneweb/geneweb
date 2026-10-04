@@ -1,8 +1,8 @@
+<!-- $Id: perso.txt %version; 04/04/2026 04:04:32 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: perso.txt %version; 04/04/2026 04:04:32 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -21,22 +21,21 @@
   %include;css
 </head>
 <body%body_prop;>
+<a href="#content" class="visually-hidden-focusable ms-4">[*skip to main content]</a>
 %include;hed
 %message_to_wizard;
-<a href="#content" class="visually-hidden visually-hidden-focusable ms-4">[*skip to main content]</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
 %include;perso_utils
 %include;menubar
-<div id="content" tabindex="-1">
-
+<main id="content" tabindex="-1">
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
 %if;(evar.p_mod="zz" or (bvar.p_mod="zz" and evar.p_mod="") or
     (bvar.p_mod="" and evar.p_mod=""))
   %(Statique%)
-  <div class="row col-12">
+  <div class="row">
       %let;op_m;3%in;%include;modules/heading
   </div>
-  <div class="row col-12">
+  <div class="row">
     <div class="col-lg-8">
       %let;op_m;3%in;%include;modules/individu
       %let;op_m;2%in;%include;modules/unions
@@ -51,7 +50,7 @@
     </div>
   </div>
   %if;(b.show_documents="yes")
-    <div class="row col-12">
+    <div class="row">
       %let;op_m;1%in;%include;modules/documents
     </div>
   %end;
@@ -70,14 +69,14 @@
 %end;
 
 %if;(evar.opt="misc")
-  %misc_names;<p>
+  %misc_names;
 %end;
+</main>
 %if;(not cancel_links)
   %include;trl
   %include;copyr
   %query_time;
 %end;
-</div>
 </div>
 %include;js
 </body>
