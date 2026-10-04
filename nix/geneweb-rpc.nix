@@ -1,5 +1,6 @@
 {
   buildDunePackage,
+  brotli,
   lwt,
   lwt_ppx,
   tls-lwt,
@@ -10,6 +11,7 @@
   httpun-ws,
   js_of_ocaml,
   js_of_ocaml-ppx,
+  js_of_ocaml-compiler,
   promise_jsoo,
   benchmark,
   pp_loc,
@@ -23,6 +25,11 @@ buildDunePackage {
   pname = "geneweb-rpc";
   inherit (geneweb) version src;
   doCheck = true;
+
+  nativeBuildInputs = [
+    brotli
+    js_of_ocaml-compiler
+  ];
 
   buildInputs = [
     geneweb-compat
