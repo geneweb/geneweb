@@ -21,7 +21,7 @@
   %include;css
 </head>
 <body%body_prop;>
-<a href="#content" class="visually-hidden-focusable ms-4">[*skip to main content]</a>
+<a href="#content" class="visually-hidden-focusable">[*skip to main content]</a>
 %include;hed
 %message_to_wizard;
 <div class="container%if;(evar.wide="on")-fluid%end;">
