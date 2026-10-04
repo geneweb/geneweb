@@ -356,34 +356,30 @@
 %define;border()
   <div class="w-50 border-end border-dark">&#8203;</div>
 %end;
-%if;(e.m!="MOD_IND")
-  %if;(op_m=1)
+%if;(op_m=1)
+  %apply;portrait()
+  %apply;etat_civil()
+  <div class="mt-2 mb-1 ms-2">
+    %apply;detailed_names()
+  </div>
+%elseif;(op_m=2)
+  <div class="text-center mb-2 mx-2">
     %apply;portrait()
-    %apply;etat_civil()
-    <div class="mt-2 mb-1 ms-2">
-      %apply;detailed_names()
-    </div>
-
-  %elseif;(op_m=2)
-    <div class="text-center mb-2 mx-2">
-      %apply;portrait()
-    </div>
-    <div class="text-center mb-2 mx-2">
-      %apply;detailed_names()
-    </div>
-    %apply;etat_civil()
-  
-  %elseif;(op_m=3)
-    <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start">
-      %apply;portrait()
-      <div class="flex-grow-1">
-        <div class="text-center mb-2 mx-2">
-          %apply;detailed_names()
-        </div>
-        %apply;etat_civil()
+  </div>
+  <div class="text-center mb-2 mx-2">
+    %apply;detailed_names()
+  </div>
+  %apply;etat_civil()
+%elseif;(op_m=3)
+  <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start">
+    %apply;portrait()
+    <div class="flex-grow-1">
+      <div class="text-center mb-2 mx-2">
+        %apply;detailed_names()
       </div>
+      %apply;etat_civil()
     </div>
-  %else;
-  Unavailable option value!
-  %end;
+  </div>
+%else;
+Unavailable option value!
 %end;

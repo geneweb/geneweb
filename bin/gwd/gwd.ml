@@ -1286,6 +1286,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     | _ -> (false, access_type)
   in
   let lang, env = extract_assoc "lang" env in
+  let env = List.filter (fun (k, _) -> k <> "notif") env in
   let lang = if lang = "" then http_preferred_language request else lang in
   let lang = alias_lang lang in
   let from, env =

@@ -2310,6 +2310,14 @@ span.notesourcecolor {
   gap: 0.25rem;
 }
 
+#welcome a:has(> i:only-child) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+}
+
 .imap-gallery {
   width: 250px;
   margin-bottom: 1rem;

@@ -19,15 +19,10 @@
 %end;
 <link rel="preload" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;" as="style" onload="this.onload=null;this.rel='stylesheet'">
 </head>
-%define;get_random(xxx)
-  %random.init;
-  %random.xxx;
-%end;
 %define;dice()
   %random.init;
   %apply;nth%with;one/two/three/four/five/six%and;%random.6;%end;
 %end;
-%let;random_index;%if;(nb_persons.v!=0)%apply;get_random(nb_persons.v)%end;%in;
 %define;event(xx,yy)
   %if;(xx.yy_place!=""),"yy_place":"%xx.yy_place;"%end;
   %if;(xx.yy_place.sub!=""),"yy_sub":"%xx.yy_place.sub;"%nn;
@@ -135,7 +130,7 @@
       <button id="b-help" class="btn-fanchart" title="[*help and shortcuts]">
         <i class="fa fa-info fa-fw"></i>
       </button>
-      <button id="b-rng" class="btn-fanchart" title="[*random individual]" data-url="%apply;url_set%with;i/p/n/oc/file/v%and;%random_index;%end;&v=5">
+      <button id="b-rng" class="btn-fanchart" title="[*random individual]" data-url="%apply;url_set%with;rnd/v%and;1%end;&v=5">
         <i class="fa fa-dice-%apply;dice() fa-fw"></i>
       </button>
     </div>

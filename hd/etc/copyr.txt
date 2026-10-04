@@ -22,7 +22,7 @@
 %if;(not cancel_links)
   <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
     <div class="d-flex flex-wrap justify-content-md-end align-items-center">
-      <!-- legal notices -->
+      %( legal notices %)
       %if;is_printed_by_template;
         %if;(notice1=1)
             %apply;notice("notice1", lang)
@@ -50,25 +50,23 @@
           </div>
         %end;
       %end;
-      <!-- Language selector and connections info -->
-      <div class="d-flex flex-row align-items-lg-end mt-0 ms-3 border-0">
+      %( Language selector and connections info %)
+      <div class="d-flex flex-row align-items-center mt-0 ms-3">
         %if;(e.templ="" and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
           <div class="btn-group dropup" data-bs-toggle="tooltip" data-bs-placement="left"
             title="%apply;language_name(lang) – [*select lang]">
             <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
               data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="visually-hidden">lang</span>
-              <span class="text-uppercase">%lang;</span>
-              <span class="visually-hidden">, [select lang]</span>
+              <span class="text-uppercase" aria-hidden="true">%lang;</span>
+              <span class="visually-hidden">%apply;language_name(lang), [select lang]</span>
             </button>
             <div id="language-menu" class="dropdown-menu scrollable-lang"
-              role="menu" aria-labelledby="dropdownMenu1"></div>
+              aria-labelledby="dropdownMenu1"></div>
           </div>
         %end;
-        <small class="mb-2 mx-0" title="Mode[:] R=reorg, L=legacy">(%if;reorg;R%else;L%end;)</small>
-        <!-- Connections info -->
+        %( Connections info %)
         %if;(connections.total!="" and b.hide_connections!="yes")
-          <div class="d-flex flex-column justify-items-center align-items-center small ms-1 ms-md-3"
+          <div class="d-flex flex-column align-items-center small ms-1 ms-md-3"
             aria-label="[*connection/connections]1" role="status">
             %if;(connections.friends!="" and connections.friends>0)<span>%connections.friends;
               %if;(connections.friends=1) [wizard/wizards/friend/friends/exterior]2
@@ -93,16 +91,15 @@
           </div>
         %end;
       </div>
-      <!-- Footer links and copyright -->
+      %( Footer links and copyright %)
       <div class="d-flex flex-column justify-content-md-end align-self-center ms-1 ms-md-3 ms-lg-4">
         <div class="text-nowrap">
-          <a role="button" class="me-2"
+          <a class="me-2"
               href="%if;(e.templ!="templm")%url_set.templ_file.templm;%end;"
-              aria-label="[*switch template] %if;(e.templ!="templm")templm%else;default%end;"
               data-bs-toggle="tooltip"
               title="%if;(e.templ!="templm")templm%else;default template%end;">%nn;
               <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
-              <span class="visually-hidden">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
+              <span class="visually-hidden">%if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
             </a>%nn;
             %if;predictable_mode;GeneWeb %version_short;
             %else;
