@@ -1,16 +1,19 @@
 {
   fetchFromGitHub,
-  buildDunePackage
+  buildDunePackage,
+  cppo,
 }:
 
-buildDunePackage rec {
+buildDunePackage (finalAttrs: {
   pname = "dead_code_analyzer";
-  version = "1.2.0";
+  version = "1.3.0";
 
   src = fetchFromGitHub {
     owner = "LexiFi";
-    repo = pname;
-    rev = version;
-    sha256 = "sha256-mG4AlZXAY7xWwB5PFF5OPa2GB9bOuuFByuLKkmDASHs=";
+    repo = finalAttrs.pname;
+    rev = finalAttrs.version;
+    sha256 = "sha256-LVZmUzN7p9HvZkWAAluimo46fB0Uj+fzjfHlIoaitJ8=";
   };
-}
+
+  nativeBuildInputs = [ cppo ];
+})
