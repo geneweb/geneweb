@@ -40,37 +40,13 @@ let print_no_candidate conf base p =
   Output.print_sstring conf "</p>";
   Hutil.trailer conf
 
-let input_excl string_of_i excl =
-  List.fold_left
-    (fun (s : Adef.encoded_string) (i1, i2) ->
-      let t =
-        let open Def in
-        string_of_i i1 ^^^ "," ^<^ string_of_i i2
-      in
-      if (s :> string) = "" then t
-      else
-        let open Def in
-        s ^^^ "," ^<^ t)
-    (Adef.encoded "") excl
-
-let print_input_excl conf string_of_i excl excl_name =
-  let s = input_excl string_of_i excl in
-  if (s :> string) <> "" then Util.hidden_input conf excl_name s
-
-let print_submit conf value =
-  let class_, name, label =
-    match value with
-    | `Yes -> ("button secondary", "answer_y", Util.transl conf "merge")
-    | `No ->
-        ( "button bare",
-          "answer_n",
-          Util.transl_nth conf "user/password/cancel" 2 )
-  in
-  Output.printf conf {|<input class="%s" type="submit" name="|} class_;
-  Output.print_sstring conf name;
-  Output.print_sstring conf {|" value="|};
-  Output.print_sstring conf (Utf8.capitalize_fst label);
-  Output.print_sstring conf {|" style="margin-right:4px">|}
+let next_step_buttons ~conf ~cancel_url next_url =
+  Output.printf conf
+    {|<p><a class="button secondary" style="margin-right:4px" href="%s">%s</a><a class="button bare" href="%s">%s</a></p>|}
+    (Localized_url.to_string next_url)
+    (Utf8.capitalize_fst @@ Util.transl conf "merge")
+    (Localized_url.to_string cancel_url)
+    (Utf8.capitalize_fst @@ Util.transl_nth conf "user/password/cancel" 2)
 
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   let title _ =
@@ -85,24 +61,30 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   print_link conf base (Gwdb.poi base ip1);
   Output.print_sstring conf "</li><li>";
   print_link conf base (Gwdb.poi base ip2);
-  Output.print_sstring conf "</li></ul><p>";
-  Output.print_sstring conf {|<form method="post" action="|};
-  Output.print_sstring conf conf.Config.command;
-  Output.print_sstring conf {|">|};
-  Util.hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_IND_Y_N");
-  Util.hidden_input conf "ip" (Gwdb.string_of_iper ip |> Mutil.encode);
-  print_input_excl conf
-    (fun x -> Gwdb.string_of_iper x |> Mutil.encode)
-    ((ip1, ip2) :: iexcl) "iexcl";
-  print_input_excl conf
-    (fun x -> Gwdb.string_of_ifam x |> Mutil.encode)
-    fexcl "fexcl";
-  Util.hidden_input conf "i" (Gwdb.string_of_iper ip1 |> Mutil.encode);
-  Util.hidden_input conf "select" (Gwdb.string_of_iper ip2 |> Mutil.encode);
-  print_submit conf `Yes;
-  print_submit conf `No;
-  Output.print_sstring conf "</form></p>";
+  Output.print_sstring conf "</li></ul>";
+  let make_url mode =
+    let open Ext_list.Infix in
+    Util.commd conf
+      ~query:
+        (("m", [ mode ])
+        @:: ("ip", [ Gwdb.string_of_iper ip ])
+        @:: ( "iexcl",
+              List.concat_map
+                (fun (p1, p2) ->
+                  [ Gwdb.string_of_iper p1; Gwdb.string_of_iper p2 ])
+                ((ip1, ip2) :: iexcl) )
+        @:: Ext_option.return_if (fexcl <> []) (fun () ->
+                ( "fexcl",
+                  List.concat_map
+                    (fun (f1, f2) ->
+                      [ Gwdb.string_of_ifam f1; Gwdb.string_of_ifam f2 ])
+                    fexcl ))
+        @?: ("i", [ Gwdb.string_of_iper ip1 ])
+        @:: [ ("select", [ Gwdb.string_of_iper ip2 ]) ])
+  in
+
+  next_step_buttons ~conf ~cancel_url:(make_url "MRG_DUP")
+    (make_url "MRG_DUP_IND_Y_N");
   Hutil.trailer conf
 
 let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
@@ -128,24 +110,29 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   print_link conf base (Gwdb.poi base ip1);
   Output.print_sstring conf " &amp; ";
   print_link conf base (Gwdb.poi base ip2);
-  Output.print_sstring conf "</li></ul><p>";
-  Output.print_sstring conf {|<form method="post" action="|};
-  Output.print_sstring conf conf.Config.command;
-  Output.print_sstring conf {|">|};
-  Util.hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_FAM_Y_N");
-  Util.hidden_input conf "ip" (Gwdb.string_of_iper ip |> Mutil.encode);
-  print_input_excl conf
-    (fun x -> Gwdb.string_of_iper x |> Mutil.encode)
-    iexcl "iexcl";
-  print_input_excl conf
-    (fun x -> Gwdb.string_of_ifam x |> Mutil.encode)
-    ((ifam1, ifam2) :: fexcl) "fexcl";
-  Util.hidden_input conf "i" (Gwdb.string_of_ifam ifam1 |> Mutil.encode);
-  Util.hidden_input conf "i2" (Gwdb.string_of_ifam ifam2 |> Mutil.encode);
-  print_submit conf `Yes;
-  print_submit conf `No;
-  Output.print_sstring conf "</form></p>";
+  Output.print_sstring conf "</li></ul>";
+  let make_url mode =
+    let open Ext_list.Infix in
+    Util.commd conf
+      ~query:
+        (("m", [ mode ])
+        @:: ("ip", [ Gwdb.string_of_iper ip ])
+        @:: Ext_option.return_if (iexcl <> []) (fun () ->
+                ( "iexcl",
+                  List.concat_map
+                    (fun (p1, p2) ->
+                      [ Gwdb.string_of_iper p1; Gwdb.string_of_iper p2 ])
+                    iexcl ))
+        @?: ( "fexcl",
+              List.concat_map
+                (fun (f1, f2) ->
+                  [ Gwdb.string_of_ifam f1; Gwdb.string_of_ifam f2 ])
+                ((ifam1, ifam2) :: fexcl) )
+        @:: ("i", [ Gwdb.string_of_ifam ifam1 ])
+        @:: [ ("i2", [ Gwdb.string_of_ifam ifam2 ]) ])
+  in
+  next_step_buttons ~conf ~cancel_url:(make_url "MRG_DUP")
+    (make_url "MRG_DUP_FAM_Y_N");
   Hutil.trailer conf
 
 let main_page conf base =
@@ -165,11 +152,3 @@ let main_page conf base =
           print_cand_fam conf base (ip, p) excl ifam1 ifam2
       | Perso.NoDup -> print_no_candidate conf base p)
   | None -> Hutil.incorrect_request conf
-
-let answ_ind_y_n conf base =
-  let yes = Util.p_getenv conf.Config.env "answer_y" <> None in
-  if yes then MergeIndDisplay.print conf base else main_page conf base
-
-let answ_fam_y_n conf base =
-  let yes = Util.p_getenv conf.Config.env "answer_y" <> None in
-  if yes then MergeFamDisplay.print conf base else main_page conf base
