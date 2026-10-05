@@ -24,8 +24,5 @@ val rheader : config -> (bool -> unit) -> unit
 val trailer : config -> unit
 (** Prints trl, copyr, closes container, js, timing, </body>. *)
 
-val link_to_referer : config -> Adef.safe_string
-(** HTML link to previous page (referer). Empty if none. *)
-
 val incorrect_request : ?comment:string -> config -> unit
 (** Sends HTTP 400 Bad Request. *)

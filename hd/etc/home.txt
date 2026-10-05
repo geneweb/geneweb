@@ -13,12 +13,6 @@
       <i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="visually-hidden">[*home]</span>%nn;
     </a>
-    %if;(referer!="")
-      <a class="btn btn-sm btn-link p-0 border-0" href="%referer;" title="[*back]">%nn;
-        <i class="fa fa-arrow-left-long fa-fw fa-xs fa-icon" aria-hidden="true"></i>%nn;
-        <span class="visually-hidden">[*back]</span>%nn;
-      </a>
-    %end;
     <button type="button" class="btn btn-sm btn-link p-0 border-0" data-bs-toggle="modal" data-bs-target="#searchmodal"
       accesskey="S" title="[*search/case sensitive]0">%nn;
       <i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i>%nn;
