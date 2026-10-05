@@ -384,84 +384,91 @@ let descendants _conf base family ip =
     else
       let new_descendants =
         List.fold_left
-          (fun _acc ip ->
+          (fun acc ip ->
             let ifams = Driver.get_family (Driver.poi base ip) in
             Array.fold_left
               (fun acc ifam ->
-                let children = Driver.get_children (Driver.foi base ifam) in
-                Array.to_list children @ acc)
-              [] ifams)
+                Array.to_list (Driver.get_children (Driver.foi base ifam)) @ acc)
+              acc ifams)
           [] ips
       in
       loop (new_descendants @ acc) new_descendants
   in
   loop family [ ip ]
 
-let is_related conf base p =
-  if conf.Config.userkey <> "" then
-    let fname =
-      String.concat Filename.dir_sep
-        [
-          Secure.base_dir ();
-          conf.Config.bname ^ ".gwb";
-          "caches";
-          "family-" ^ conf.Config.userkey;
-        ]
-    in
-    match (List.assoc_opt "fmode" conf.Config.env :> string option) with
-    | Some "on" -> (
-        let family =
-          Mutil.read_or_create_value fname (fun () ->
-              match conf.Config.user_iper with
-              | Some ip ->
-                  let family = [ ip ] in
-                  let max =
-                    try List.assoc "is_semi_public_max" conf.Config.base_env
-                    with Not_found -> "2" |> String.trim
-                  in
-                  let max = if max = "" then 2 else int_of_string max in
-                  let family = ancestors conf base (max + 1) family ip in
-                  (* Add spouses *)
-                  let family =
-                    (let ifams = Driver.get_family (Driver.poi base ip) in
-                     Array.fold_left
-                       (fun acc ifam ->
-                         let sp =
-                           let f = Driver.foi base ifam in
-                           if ip = Driver.get_father f then Driver.get_mother f
-                           else Driver.get_father f
-                         in
-                         if
-                           Driver.sou base
-                             (Driver.get_first_name (Driver.poi base sp))
-                           <> "?"
-                           && Driver.sou base
-                                (Driver.get_surname (Driver.poi base sp))
-                              <> "?"
-                         then sp :: acc
-                         else acc)
-                       [] ifams)
-                    @ family
-                  in
-                  let family = descendants conf base family ip in
-                  List.sort_uniq compare family
-              | _ -> [])
+(* Nombre de générations d'ancêtres ; 2 si absent ou mal renseigné *)
+let semi_public_max conf =
+  match List.assoc_opt "is_semi_public_max" conf.Config.base_env with
+  | Some s -> Option.value ~default:2 (int_of_string_opt (String.trim s))
+  | None -> 2
+
+let compute_family conf base ip =
+  let family = ancestors conf base (semi_public_max conf + 1) [ ip ] ip in
+  let spouses =
+    Array.fold_left
+      (fun acc ifam ->
+        let f = Driver.foi base ifam in
+        let sp =
+          if ip = Driver.get_father f then Driver.get_mother f
+          else Driver.get_father f
         in
-        match conf.Config.user_iper with
-        | Some ip ->
-            Driver.get_access (Driver.poi base ip) = Def.SemiPublic
-            && List.mem (Driver.get_iper p) family
-        | _ -> false)
-    | _ ->
-        if Sys.file_exists fname then (
-          try
-            Sys.remove fname;
-            false
-          with Sys_error _ ->
-            Printf.eprintf "Error when removing %s\n" fname;
-            false)
-        else false
-  else false
+        let psp = Driver.poi base sp in
+        if
+          Driver.sou base (Driver.get_first_name psp) <> "?"
+          && Driver.sou base (Driver.get_surname psp) <> "?"
+        then sp :: acc
+        else acc)
+      []
+      (Driver.get_family (Driver.poi base ip))
+  in
+  descendants conf base (spouses @ family) ip |> List.sort_uniq compare
+
+(* Dernière famille chargée, sous forme d'ensemble, et dernier fichier
+   nettoyé : évite de relire ou de tester le fichier à chaque p_auth *)
+let family_memo : (string * (Driver.iper, unit) Hashtbl.t) option ref = ref None
+let family_cleaned : string option ref = ref None
+
+let family_set conf base fname ip =
+  match !family_memo with
+  | Some (f, set) when f = fname -> set
+  | _ ->
+      let l =
+        Mutil.read_or_create_value fname (fun () -> compute_family conf base ip)
+      in
+      let set = Hashtbl.create (max 16 (List.length l)) in
+      List.iter (fun i -> Hashtbl.replace set i ()) l;
+      family_memo := Some (fname, set);
+      family_cleaned := None;
+      set
+
+let drop_family fname =
+  if !family_cleaned <> Some fname then (
+    (match !family_memo with
+    | Some (f, _) when f = fname -> family_memo := None
+    | _ -> ());
+    (if Sys.file_exists fname then
+       try Sys.remove fname
+       with Sys_error _ -> Printf.eprintf "Error when removing %s\n" fname);
+    family_cleaned := Some fname)
+
+let is_related conf base p =
+  match conf.Config.user_iper with
+  | Some ip when conf.Config.userkey <> "" ->
+      let fname =
+        String.concat Filename.dir_sep
+          [
+            Secure.base_dir ();
+            conf.Config.bname ^ ".gwb";
+            "caches";
+            "family-" ^ conf.Config.userkey;
+          ]
+      in
+      if (List.assoc_opt "fmode" conf.Config.env :> string option) = Some "on"
+      then Hashtbl.mem (family_set conf base fname ip) (Driver.get_iper p)
+      else (
+        drop_family fname;
+        false)
+  | _ -> false
 
 let has_date base p =
   Driver.get_birth p <> Date.cdate_None
@@ -483,18 +490,21 @@ let has_date base p =
 let p_auth conf base p =
   let access = Driver.get_access p in
   let not_private = access <> Def.Private in
-  conf.Config.wizard
-  || ((not conf.Config.semi_public) && conf.Config.friend)
-  || conf.user_iper = Some (Driver.get_iper p)
-  || access = Def.Public
+  conf.Config.wizard (* base does not handle SemiPublic *)
+  || ((not conf.Config.semi_public) && conf.Config.friend) (* myself *)
+  || conf.user_iper = Some (Driver.get_iper p) (* person is Public *)
+  || access = Def.Public (* person is PublicIfTitla *)
   || conf.Config.public_if_titles && access = Def.IfTitles
      && Driver.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-  || conf.Config.friend && conf.Config.semi_public
+     (* User is SemiPublic (consenting) and person is SemiPublic and not Private *)
+  || conf.Config.friend && conf.Config.consent
      && (is_semi_public p || is_related conf base p)
      && not_private
+     (* Public if no date *)
   || (not (has_date base p))
      && conf.Config.public_if_no_date && access <> Def.Private
   ||
+  (* visible if private_years <= -1 *)
   if conf.Config.private_years <= -1 then true
   else
     let check_date d lim none =
@@ -530,9 +540,12 @@ let p_auth conf base p =
     in
     loop 0
 
+(** special p_auth case for fn and sn which are always visible for consenting
+    friends unless private *)
 let p_auth_sp conf base p =
-  p_auth conf base p
-  || (conf.Config.friend && Driver.get_access p <> Def.Private)
+  conf.Config.friend && conf.Config.consent
+  && Driver.get_access p <> Def.Private
+  || p_auth conf base p
 
 (* Wrap content in a basic HTML page *)
 let wrap_output (conf : Config.config) (title : Adef.safe_string)
