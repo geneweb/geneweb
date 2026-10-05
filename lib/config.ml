@@ -101,9 +101,7 @@ type config = {
   ctime : float; (* TODO verify usefulness *)
   mutable output_conf : output_conf;
   (* HTTP printer *)
-  (* prefix for image urls:
-     the value of argument -images_url if specified, otherwise
-     command ^ "?m=IM&v=" in CGI mode
+  (* prefix for image urls: the value of -images_prefix in CGI mode,
      "images" otherwise *)
   gw_prefix : string;
   images_prefix : string;
