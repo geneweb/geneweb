@@ -221,10 +221,7 @@ let macro conf base = function
         Adef.safe (": " ^ conf.user)
       else Adef.safe ""
   | 'v' -> Adef.safe Version.ver
-  | 'w' ->
-      let s = Hutil.link_to_referer conf in
-      if (s :> string) = "" then Adef.safe "&nbsp;" else s
-  | 'W' -> (Util.get_referer conf :> Adef.safe_string)
+  | 'w' | 'W' -> Adef.safe ""
   | '/' -> Adef.safe ""
   | c -> Adef.safe ("%" ^ String.make 1 c)
 

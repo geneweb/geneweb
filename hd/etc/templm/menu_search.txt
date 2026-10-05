@@ -21,9 +21,6 @@
 %end;
 %if;(not cancel_links and e.m != "MOD_DATA_OK" and e.m != "DEL_IND_OK" and e.m != "DEL_FAM_OK" and e.m != "NOTES" and e.m != "MISC_NOTES" and e.templ="templm" and e.m!="RL")
   <div class="menu3" id="menu_search">
-    %if;(referer != "")
-      <span><a href="%referer;" title="[*back]">⇦</a></span>
-    %end;
     %if;(e.n != "" or e.i != "" or e.m !="")
       <span><a href="%prefix;" title="[*home]"> ⇧ </a></span>
     %end;
