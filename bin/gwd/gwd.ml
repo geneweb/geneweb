@@ -827,6 +827,19 @@ let parse_digest s =
   in
   parse_main (Stream.of_string s)
 
+let basic_credentials request =
+  let prefix = "Basic " in
+  match Mutil.extract_param "authorization: " '\r' request with
+  | "" -> Error "(authorization not provided)"
+  | auth when not (String.starts_with ~prefix auth) ->
+      Error "(unsupported authorization scheme)"
+  | auth -> (
+      let i = String.length prefix in
+      match Base64.decode (String.sub auth i (String.length auth - i)) with
+      | Ok "" -> Error "(empty Basic credentials)"
+      | Ok s -> Ok s
+      | Error (`Msg e) -> Error ("(invalid Basic credentials: " ^ e ^ ")"))
+
 let basic_authorization ~cgi from_addr request base_env passwd access_type utm
     base_file command =
   let wizard_passwd =
@@ -844,14 +857,7 @@ let basic_authorization ~cgi from_addr request base_env passwd access_type utm
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
   in
   let passwd1 =
-    let auth = Mutil.extract_param "authorization: " '\r' request in
-    if auth = "" then ""
-    else
-      let s = "Basic " in
-      if String.starts_with ~prefix:s auth then
-        let i = String.length s in
-        Base64.decode (String.sub auth i (String.length auth - i))
-      else ""
+    match basic_credentials request with Ok s -> s | Error _ -> ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
@@ -1529,33 +1535,31 @@ let is_robot from =
 let auth_err request auth_file =
   if auth_file = "" then (false, "")
   else
-    let auth = Mutil.extract_param "authorization: " '\r' request in
-    if auth <> "" then
-      match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
-      | Some ic -> (
-          let auth =
-            let i = String.length "Basic " in
-            Base64.decode (String.sub auth i (String.length auth - i))
-          in
-          try
-            let rec loop () =
-              if auth = input_line ic then (
-                close_in ic;
-                let s =
-                  try
-                    let i = String.rindex auth ':' in
-                    String.sub auth 0 i
-                  with Not_found -> "..."
-                in
-                (false, s))
-              else loop ()
-            in
-            loop ()
-          with End_of_file ->
-            close_in ic;
-            (true, auth))
-      | _ -> (true, "(auth file '" ^ auth_file ^ "' not found)")
-    else (true, "(authorization not provided)")
+    match basic_credentials request with
+    | Error e -> (true, e)
+    | Ok auth -> (
+        match
+          try Some (Secure.open_in auth_file) with Sys_error _ -> None
+        with
+        | Some ic -> (
+            try
+              let rec loop () =
+                if auth = input_line ic then (
+                  close_in ic;
+                  let s =
+                    try
+                      let i = String.rindex auth ':' in
+                      String.sub auth 0 i
+                    with Not_found -> "..."
+                  in
+                  (false, s))
+                else loop ()
+              in
+              loop ()
+            with End_of_file ->
+              close_in ic;
+              (true, auth))
+        | None -> (true, "(auth file '" ^ auth_file ^ "' not found)"))
 
 let no_access conf =
   let title _ = Output.print_sstring conf "Error" in
