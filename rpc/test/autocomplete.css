@@ -1,0 +1,194 @@
+/**
+ * GeneWeb RPC autocomplete (autocomplete.js)
+ *
+ * All static styling of the widget lives here; the script only sets the
+ * dropdown's position and width and the list heights. To restyle for a
+ * base, override the custom properties below in a later stylesheet
+ * (e.g. the base's css_prop file):
+ *
+ *   .gw-ac-dropdown { --gw-ac-prefix: #6a1b9a; }
+ */
+
+.gw-ac-dropdown {
+  --gw-ac-prefix:   #2e7d32;   /* header, entries starting with the query */
+  --gw-ac-internal: #1565c0;   /* header, entries containing the query    */
+  --gw-ac-fuzzy:    #616161;   /* header, approximate matches             */
+  --gw-ac-text:     #333;
+  --gw-ac-muted:    #888;
+  --gw-ac-border:   #b0b0b0;
+  --gw-ac-rule:     #e0e0e0;
+  --gw-ac-hover:    #e3f2fd;
+  --gw-ac-selected: #bbdefb;
+  --gw-ac-match:    #1565c0;
+
+  position: fixed;
+  z-index: 2147483647;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #fff;
+  color: var(--gw-ac-text);
+  border: 1px solid var(--gw-ac-border);
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: left;
+}
+.gw-ac-dropdown[hidden] { display: none; }
+
+/* Opened above the input when there is more room there */
+.gw-ac-dropdown.gw-ac-above {
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.gw-ac-dropdown *,
+.gw-ac-dropdown *::before,
+.gw-ac-dropdown *::after { box-sizing: border-box; }
+
+/* Three equal columns; minmax(0, …) lets long entries ellipsize */
+.gw-ac-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gw-ac-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-right: 1px solid var(--gw-ac-rule);
+}
+.gw-ac-col:last-child { border-right: none; }
+
+.gw-ac-col-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+.gw-ac-col-prefix   .gw-ac-col-header { background: var(--gw-ac-prefix); }
+.gw-ac-col-internal .gw-ac-col-header { background: var(--gw-ac-internal); }
+.gw-ac-col-fuzzy    .gw-ac-col-header { background: var(--gw-ac-fuzzy); }
+
+.gw-ac-col-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.gw-ac-count {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Lists scroll internally; max-height is set by the script */
+.gw-ac-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  max-height: 350px;
+  scrollbar-width: thin;                      /* Firefox */
+  scrollbar-color: #ccc #f5f5f5;
+}
+.gw-ac-items::-webkit-scrollbar       { width: 5px; }
+.gw-ac-items::-webkit-scrollbar-track { background: #f5f5f5; }
+.gw-ac-items::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+.gw-ac-item {
+  display: block;
+  margin: 0;
+  padding: 5px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+.gw-ac-item:last-child { border-bottom: none; }
+.gw-ac-item:hover { background: var(--gw-ac-hover); }
+.gw-ac-item.gw-ac-selected {
+  background: var(--gw-ac-selected);
+  font-weight: 600;
+}
+
+/* Matched part of an entry */
+.gw-ac-match {
+  font-weight: 700;
+  color: var(--gw-ac-match);
+}
+
+/* Placeholder for an empty column */
+.gw-ac-empty {
+  display: block;
+  margin: 0;
+  padding: 12px 10px;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
+}
+
+.gw-ac-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: #fafafa;
+  border-top: 1px solid var(--gw-ac-rule);
+  color: var(--gw-ac-muted);
+  font-size: 11px;
+}
+.gw-ac-hints { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.gw-ac-hint  { margin-right: 10px; }
+.gw-ac-info  { flex-shrink: 0; }
+
+/* Overrides Bootstrap's dark <kbd> */
+.gw-ac-footer kbd {
+  display: inline-block;
+  margin: 0 2px 0 0;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: #e0e0e0;
+  color: var(--gw-ac-text);
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 10px;
+}
+
+/* Optional connection badge (showRpcBadge) */
+.gw-ac-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.gw-ac-rpc-badge {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.gw-ac-rpc-badge.gw-ac-rpc-ok  { background: #4caf50; }
+.gw-ac-rpc-badge.gw-ac-rpc-err { background: #f44336; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-ac-item { transition: none; }
+}
