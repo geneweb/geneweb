@@ -1140,6 +1140,10 @@ input:not(.custom-file-input):focus, select:focus {
   z-index: 1031;
 }
 
+.home-xs > .btn {
+  line-height: 24px;
+}
+
 @media (max-width: 575px) {
   .home-xs.fix_left {
     left:2px;

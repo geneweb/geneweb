@@ -8,7 +8,7 @@
   %apply;nth%with;one/two/three/four/five/six%and;%random.6;%end;
 %end;
 %if;(not cancel_links and e.templ="")
-  <div class="d-flex flex-column fix_top fix_left home-xs">
+  <div class="d-flex flex-column fix_top fix_left home-xs d-print-none">
     <a class="btn btn-sm btn-link p-0 border-0" href="%prefix_no_senv;" title="[*home]">%nn;
       <i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="visually-hidden">[*home]</span>%nn;
