@@ -116,17 +116,6 @@ let header_with_title ?(error = false) ?(fluid = false) conf title =
   title false;
   Output.print_sstring conf "</h1>\n"
 
-let header_without_home conf title =
-  let fluid = is_fluid conf in
-  Util.html conf;
-  header_without_http_nor_home conf title;
-  Output.print_sstring conf
-    (if fluid then "<div class=\"container-fluid mx-3\">\n"
-     else "<div class=\"container\">\n");
-  Output.print_sstring conf "<h1>";
-  title false;
-  Output.print_sstring conf "</h1>\n"
-
 let header ?(error = false) ?(fluid = false) conf title =
   header_with_title ~error ~fluid conf title
 
