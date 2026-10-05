@@ -14,9 +14,6 @@ val header_with_title :
 val header_without_title : config -> unit
 (** Similar to [header] but without any <h1> title element. *)
 
-val header_without_home : config -> (bool -> unit) -> unit
-(** Like [header_with_title] but without home.txt inclusion. *)
-
 val header : ?error:bool -> ?fluid:bool -> config -> (bool -> unit) -> unit
 (** Main header. [title true] prints in <title>, [title false] prints in <h1>.
 *)

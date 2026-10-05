@@ -286,7 +286,7 @@ let print_main conf base auth_file =
     else list
   in
   let wiznotes_dir = wiz_dir conf base in
-  Hutil.header_without_home conf title;
+  Hutil.header conf title;
   (* mouais... *)
   let list =
     List.map
@@ -366,7 +366,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     if title = "" then wizard_page_title conf @@ Util.safe_html wizname
     else wizard_page_title conf @@ Util.escape_html title
   in
-  Hutil.header_without_home conf title;
+  Hutil.header conf title;
   Output.print_sstring conf {|<table border="0" width="100%"><tr><td>|};
   let s = string_with_macros conf [] s in
   let s =
@@ -414,7 +414,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
 
 let print_part_wiznote conf base wz s cnt0 =
   let title = Util.escape_html wz in
-  Hutil.header_without_home conf (fun _ -> Output.print_string conf title);
+  Hutil.header conf (fun _ -> Output.print_string conf title);
   let s = Util.safe_html @@ string_with_macros conf [] s in
   let lines = Wiki.extract_sub_part (s : Adef.safe_string :> string) cnt0 in
   let lines =
@@ -579,7 +579,7 @@ let do_connected_wizards conf base (_, _, _, wl) =
     transl_nth conf "wizard/wizards/friend/friends/exterior" 1
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  Hutil.header_without_home conf title;
+  Hutil.header conf title;
   let wiznotes_dir = wiz_dir conf base in
   let denying = wizard_denying wiznotes_dir in
   let wl =
