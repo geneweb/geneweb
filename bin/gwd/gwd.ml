@@ -1386,6 +1386,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
       user = ar.ar_user;
       username;
       userkey = Name.lower userkey;
+      consent = false;
       user_iper = None;
       auth_scheme = ar.ar_scheme;
       command = ar.ar_command;

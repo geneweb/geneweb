@@ -54,6 +54,7 @@ type config = {
   user : string;
   username : string;
   userkey : string;
+  consent : bool;
   user_iper : Geneweb_db.Driver.iper option;
   auth_scheme : auth_scheme_kind;
   command : string;
@@ -136,6 +137,7 @@ let empty =
     user = "";
     username = "";
     userkey = "";
+    consent = false;
     user_iper = None;
     auth_scheme = NoAuth;
     command = "";
