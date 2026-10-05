@@ -86,7 +86,6 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf "</li><li>";
   print_link conf base (Gwdb.poi base ip2);
   Output.print_sstring conf "</li></ul><p>";
-  (* FIXME: trans *)
   Output.print_sstring conf {|<form method="post" action="|};
   Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|">|};
