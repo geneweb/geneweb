@@ -65,7 +65,7 @@ let print_image_file conf fname =
       allowed_extensions
   in
   match res with
-  | None -> error "could not find mime type from extension for file: %s" fname
+  | None -> error "cannot find MIME type from extension of file %s" fname
   | Some (_suff, ctype) -> (
       try
         Secure.with_open_in_bin fname @@ fun ic ->
@@ -82,8 +82,7 @@ let print_image_file conf fname =
         in
         loop len;
         Ok ()
-      with Sys_error e ->
-        error "Error while printing image file content for %s: %s" fname e)
+      with Sys_error e -> error "cannot print image file %s: %s" fname e)
 
 let safe_folder f =
   f <> ""

@@ -996,7 +996,9 @@ let print_c ?(saved = false) ?(portrait = true) conf base =
       with
       | Some (`Path f) ->
           Result.fold ~ok:ignore
-            ~error:(fun _ -> Hutil.incorrect_request conf)
+            ~error:(fun e ->
+              Log.err (fun k -> k "%s" e);
+              Hutil.incorrect_request conf)
             (ImageDisplay.print_image_file conf f)
       | _ -> Hutil.incorrect_request conf)
   | _, _ -> Hutil.incorrect_request conf

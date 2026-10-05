@@ -1,9 +1,10 @@
 open Config
 
 val print_image_file : config -> string -> (unit, string) result
-(** [print_image_file conf fname] send HTTP respose with content of an image
-    file at the path [fname]. MIME type of an image is deducted from [fname]
-    extension. Returns [false] if image wasn't found or couldn't be send. *)
+(** [print_image_file conf fname] sends an HTTP response with the content of the
+    file at path [fname]. The MIME type is deduced from the [fname] extension.
+    Returns [Error msg] if the extension is not supported or the file cannot be
+    read. *)
 
 val print_source : config -> string -> unit
 (** Display an image of given filename in images folder Filename may contain

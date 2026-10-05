@@ -1723,15 +1723,9 @@ let excluded from =
     loop ()
   with Sys_error _ -> false
 
-(* FIXME: this function cannot serve images of the base itself for
-   two reasons:
-    - The [conf] argument has an empty `bname` field because
-      `asset_image_request` is called before building the true config
-      record.
-    - We cannot serve a base image without verifying permissions.
-
-    As a consequence, this function is limited to serve asset images
-    only. *)
+(* FIXME: base images cannot be served here: [conf.bname] is empty because
+   this function runs before the real config is built, and permissions
+   cannot be checked. Only asset images are served. *)
 let asset_image_request conf fname =
   if String.starts_with ~prefix:"images/" fname then (
     let path = Util.search_in_assets fname in
