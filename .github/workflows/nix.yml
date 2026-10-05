@@ -19,16 +19,16 @@ jobs:
       - uses: cachix/install-nix-action@v31
 
       - name: Build geneweb-compat
-      - run: nix build .#geneweb-compat
+        run: nix build .#geneweb-compat
 
       - name: Build geneweb-win32
-      - run: nix build .#geneweb-win32
+        run: nix build .#geneweb-win32
 
       - name: Build geneweb-http
-      - run: nix build .#geneweb-http
+        run: nix build .#geneweb-http
 
       - name: Build geneweb
-      - run: nix build .#geneweb
+        run: nix build .#geneweb
 
       - name: Build geneweb-rpc
-      - run: nix build .#geneweb-rpc
+        run: nix build .#geneweb-rpc
