@@ -31,5 +31,6 @@ val has_pending : unit -> bool
 (** Check if notifications are pending. *)
 
 val inject_pending : Config.config -> Config.config
-(** Inject pending notifications into conf.env as notif. Merges with any
-    existing notifications. Clears queue. Returns conf unchanged if empty. *)
+(** Inject pending notifications into conf.env as notif (URL-encoded JSON, like
+    any [conf.env] value). Merges with any existing notifications. Clears queue.
+    Returns conf unchanged if empty. *)

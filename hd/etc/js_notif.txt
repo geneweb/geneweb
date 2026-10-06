@@ -12,9 +12,8 @@ var notifIcons={
   info:'fa-circle-info'
 };
 (function(){
-  var txt=document.createElement('textarea'),items=%[%];
-  txt.innerHTML='%e.notif;';
-  try{items=JSON.parse(txt.value)||items;}catch(e){}
+  var items=%[%];
+  try{items=JSON.parse(document.currentScript.dataset.notif)||items;}catch(e){}
   %if;(e.nomod="1")
     items.push({level:'info',title:'[*no modification]',
       message:'[NOTIF no modification]',autohide:true});

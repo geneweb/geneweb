@@ -76,7 +76,7 @@
   </div>
 </div>
 </div>
-%if;(e.notif!="")<script>
+%if;(e.notif!="")<script data-notif="%e.notif;">
 %include;js_notif
 </script>%end;
 </body>
