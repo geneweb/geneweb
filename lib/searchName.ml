@@ -2008,8 +2008,8 @@ let rec handle_search_results alias_cache conn conf base query fn_options
   in
   (* When a redirect to one person leaves other candidates aside, the
      person page is told so: "&other_names=on&pn=<query>" is appended to its
-     URL, so that the template can offer a link repeating the search with
-     other_names=on (m=S&pn=...&other_names=on), which lists everybody.
+     URL, so that the person page notifies a link repeating the search with
+     other_names=on (Some.other_names_notif), which lists everybody.
      [pn] is the original pn, or "fn/sn" for separate p and n fields (the
      slash keeps the same first name / surname split). *)
   let n_candidates =
@@ -2046,24 +2046,16 @@ let rec handle_search_results alias_cache conn conf base query fn_options
       | SurnameOnly sn | ParsedName { first_name = None; surname = Some sn; _ }
         ->
           (* An exact surname exists: display it alone (branches, or choice
-             between its spellings).  If other possible surnames exist, put
-             other_names_pn=<surname> in the environment: the display
-             (Some.print_other_names_link) then offers the link
-             m=S&pn=<surname>&other_names=on, which lists them all.  A
-             surname that pn would not parse as a surname alone keeps a
-             leading "/" (see surname_as_pn). *)
+             between its spellings).  If other possible surnames exist, a
+             notification links to m=S&pn=<surname>&other_names=on, which
+             lists them all (Some.other_names_notif).  A surname that pn
+             would not parse as a surname alone keeps a leading "/" (see
+             surname_as_pn). *)
           let others_hidden =
             (not show_all) && exact <> [] && (partial <> [] || spouse <> [])
           in
           if others_hidden then
-            let conf =
-              {
-                conf with
-                env =
-                  ("other_names_pn", Mutil.encode (surname_as_pn base sn))
-                  :: conf.env;
-              }
-            in
+            let conf = Some.other_names_notif conf (surname_as_pn base sn) in
             display_surname_results conf base alias_cache query sn exact
           else display_surname_results conf base alias_cache query sn all_ipers
       | ParsedName { first_name = Some qfn; surname = Some qsn; _ }

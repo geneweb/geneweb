@@ -70,7 +70,7 @@ a, .pre {
   white-space: unset;
 }
 
-a:has(i), .deslist a, .ind-notes a {
+a:has(i), .deslist a, .ind-notes a, .toast-body a {
   white-space: normal;
 }
 
