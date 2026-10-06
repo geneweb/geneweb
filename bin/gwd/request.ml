@@ -579,6 +579,34 @@ module NG = struct
           (Geneweb.Util.pget conf base (Gwdb.iper_of_string i))
 end
 
+let merge_family_skip_edit_form (conf : Geneweb.Config.config) base
+    ((family, couple, descendants) : _ Def.gen_family * _ * _) digest =
+  let env =
+    let is_same_sex_union =
+      match family.relation with
+      | Married | NotMarried | Engaged | NoMention | MarriageBann
+      | MarriageContract | MarriageLicense | Pacs | Residence ->
+          false
+      | NoSexesCheckNotMarried | NoSexesCheckMarried -> true
+    in
+    ("digest", Mutil.encode digest)
+    :: ("nsck", Mutil.encode @@ if is_same_sex_union then "on" else "off")
+    :: ("i", Mutil.encode @@ Gwdb.string_of_ifam family.fam_index)
+    :: conf.env
+  in
+  Geneweb.MergeFamOk.print_mod_merge
+    ~family:(family, couple, descendants)
+    { conf with env } base
+
+let merge_person_skip_edit_form (conf : Geneweb.Config.config) base
+    (person : _ Def.gen_person) digest =
+  let env =
+    ("digest", Mutil.encode digest)
+    :: ("i", Mutil.encode @@ Gwdb.string_of_iper person.key_index)
+    :: conf.env
+  in
+  Geneweb.MergeIndOkDisplay.print_mod_merge ~person { conf with env } base
+
 let treat_request =
   let w_lock =
     w_lock ~onerror:(fun conf _ -> Geneweb.Update.error_locked conf)
@@ -790,33 +818,7 @@ let treat_request =
                let continue =
                  match Geneweb.Config.default_input_mode conf with
                  | `Geneweb -> None
-                 | `Geneanet ->
-                     Some
-                       (fun (conf : Geneweb.Config.config) base
-                            ((family, couple, descendants) :
-                              _ Def.gen_family * _ * _) digest ->
-                         let env =
-                           let is_same_sex_union =
-                             match family.relation with
-                             | Married | NotMarried | Engaged | NoMention
-                             | MarriageBann | MarriageContract | MarriageLicense
-                             | Pacs | Residence ->
-                                 false
-                             | NoSexesCheckNotMarried | NoSexesCheckMarried ->
-                                 true
-                           in
-                           ("digest", Mutil.encode digest)
-                           :: ( "nsck",
-                                Mutil.encode
-                                @@ if is_same_sex_union then "on" else "off" )
-                           :: ( "i",
-                                Mutil.encode
-                                @@ Gwdb.string_of_ifam family.fam_index )
-                           :: conf.env
-                         in
-                         Geneweb.MergeFamOk.print_mod_merge
-                           ~family:(family, couple, descendants)
-                           { conf with env } base)
+                 | `Geneanet -> Some merge_family_skip_edit_form
                in
                w_wizard @@ w_lock @@ w_base
                @@ Geneweb.MergeFamOk.print_merge ?continue
@@ -829,19 +831,7 @@ let treat_request =
                let continue =
                  match Geneweb.Config.default_input_mode conf with
                  | `Geneweb -> None
-                 | `Geneanet ->
-                     Some
-                       (fun (conf : Geneweb.Config.config) base
-                            (person : _ Def.gen_person) digest ->
-                         let env =
-                           ("digest", Mutil.encode digest)
-                           :: ( "i",
-                                Mutil.encode
-                                @@ Gwdb.string_of_iper person.key_index )
-                           :: conf.env
-                         in
-                         Geneweb.MergeIndOkDisplay.print_mod_merge ~person
-                           { conf with env } base)
+                 | `Geneanet -> Some merge_person_skip_edit_form
                in
                (* despite the _OK suffix, this one does not actually update databse *)
                w_wizard @@ w_base
