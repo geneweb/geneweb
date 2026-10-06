@@ -813,7 +813,12 @@ let treat_request =
            | "MRG_DUP" ->
                w_wizard @@ w_base @@ Geneweb.MergeDupDisplay.main_page
            | "MRG_FAM" | "MRG_DUP_FAM_Y_N" ->
-               w_wizard @@ w_base @@ Geneweb.MergeFamDisplay.print
+               let continue =
+                 match Geneweb.Config.default_input_mode conf with
+                 | `Geneweb -> None
+                 | `Geneanet -> Some merge_family_skip_edit_form
+               in
+               w_wizard @@ w_base @@ Geneweb.MergeFamDisplay.print ?continue
            | "MRG_FAM_OK" ->
                let continue =
                  match Geneweb.Config.default_input_mode conf with
