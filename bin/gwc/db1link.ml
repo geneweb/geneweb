@@ -1571,7 +1571,7 @@ let empty_base : cbase =
   }
 
 (** Extract information from the [gen.g_base] and create database *)
-let make_base bname gen per_index_ic per_ic k =
+let make_base bpath gen per_index_ic per_ic k =
   let _ =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
@@ -1623,7 +1623,7 @@ let make_base bname gen per_index_ic per_ic k =
     gen.g_base.c_strings <- [||];
     a
   in
-  Driver.make bname
+  Driver.make bpath
     (input_particles !particules_file)
     ( (persons, ascends, unions),
       (families, couples, descends),

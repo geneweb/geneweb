@@ -3764,7 +3764,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_wiznotes" ->
       let wfile =
         String.concat Filename.dir_sep
-          [ !GWPARAM.bpath conf.bname; "wiznotes"; conf.user ^ ".txt" ]
+          [ GWPARAM.bpath conf.bname; "wiznotes"; conf.user ^ ".txt" ]
       in
       conf.wizard && Sys.file_exists wfile
   | "has_occupation" ->

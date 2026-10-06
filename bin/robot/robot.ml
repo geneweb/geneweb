@@ -6,7 +6,7 @@ open Printf
 let magic_robot = "GWRB0008"
 
 let get_robot_file () =
-  String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
+  String.concat Filename.dir_sep [ Secure.bases_dir (); "cnt"; "robot" ]
 
 module W = Map.Make (struct
   type t = string
@@ -402,7 +402,7 @@ let usage () =
 
 let rec parse_args = function
   | "-bd" :: basedir :: rest ->
-      Secure.set_base_dir basedir;
+      Secure.set_bases_dir basedir;
       parse_args rest
   | [ "-status" ] -> print_status ()
   | [ "-suggest" ] -> suggest_ranges 10
@@ -418,11 +418,11 @@ let rec parse_args = function
   | _ -> usage ()
 
 let () =
-  let default_base_dir =
+  let default_bases_dir =
     if Sys.file_exists "bases" && Sys.is_directory "bases" then "bases"
     else "../bases"
   in
-  Secure.set_base_dir default_base_dir;
+  Secure.set_bases_dir default_bases_dir;
   match Array.to_list Sys.argv with
   | _ :: args -> parse_args args
   | [] -> usage ()

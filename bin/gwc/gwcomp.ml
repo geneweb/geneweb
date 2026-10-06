@@ -2,6 +2,7 @@
 
 open Def
 module Driver = Geneweb_db.Driver
+module Layout = Geneweb.Layout
 
 let magic_gwo = "GnWo000o"
 
@@ -541,11 +542,8 @@ let auth_access ~bname fn sn oc l =
   let fns = name_unaccent_lower fn |> Mutil.tr ' ' '_' in
   let sns = name_unaccent_lower sn |> Mutil.tr ' ' '_' in
   let frs = if access = SemiPublic then "SemiPublic" else "Other" in
-  let gwf_file =
-    if Geneweb.GWPARAM.is_reorg_base bname then
-      Geneweb.GWPARAM.config_reorg bname
-    else Geneweb.GWPARAM.config_legacy bname
-  in
+  let layout = Layout.of_bname ~mode:Detect bname in
+  let gwf_file = Layout.gwf layout in
   let auth_file_name =
     try
       Secure.with_open_in_text gwf_file (fun ic ->
@@ -567,7 +565,7 @@ let auth_access ~bname fn sn oc l =
     match auth_file_name with
     | Some file_name -> (
         let friend_passwd_file =
-          Filename.concat (Secure.base_dir ()) file_name
+          Filename.concat (Secure.bases_dir ()) file_name
         in
         try
           Secure.with_open_in_text friend_passwd_file (fun ic ->

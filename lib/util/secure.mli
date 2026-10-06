@@ -3,23 +3,23 @@
 val assets : unit -> string list
 (** Returns list of allowed to acces assets *)
 
-val default_base_dir : Geneweb_dirs.one Geneweb_dirs.var
+val default_bases_dir : Geneweb_dirs.one Geneweb_dirs.var
 (** Default value for the base directory. *)
 
-val base_dir : unit -> string
+val bases_dir : unit -> string
 (** Returns directory where databases are installed to which acces is allowed *)
 
 val add_assets : string -> unit
 (** Add new asset to the [assets] list *)
 
-val set_base_dir : string -> unit
+val set_bases_dir : string -> unit
 (** Set base directory *)
 
 val check : string -> bool
 (** Check if a filename is safe to read:
     - it must not contain the '\000' character
     - it must either be relative to the local directory OR included in one of
-      the allowed directories (base_dir or assets)
+      the allowed directories (bases_dir or assets)
     - the relative part does not contain the '..' directory *)
 
 val open_in : string -> in_channel

@@ -129,11 +129,11 @@ let clear_base base =
 (* Map of loaded read-only databases in memory. *)
 let loaded_databases : (string, dsk_base) Hashtbl.t = Hashtbl.create 17
 
-let load_database bname =
-  match Hashtbl.find loaded_databases bname with
+let load_database bpath =
+  match Hashtbl.find loaded_databases bpath with
   | exception Not_found ->
-      Database.with_database ~read_only:true bname (fun base ->
-          Hashtbl.add loaded_databases bname base;
+      Database.with_database ~read_only:true bpath (fun base ->
+          Hashtbl.add loaded_databases bpath base;
           load_persons_array base;
           load_ascends_array base;
           load_unions_array base;
@@ -141,12 +141,12 @@ let load_database bname =
           load_descends_array base;
           load_families_array base;
           load_strings_array base)
-  | _base -> Fmt.failwith "'%s' is already loaded in memory" bname
+  | _base -> Fmt.failwith "'%s' is already loaded in memory" bpath
 
-let with_database bname k =
-  match Hashtbl.find loaded_databases bname with
+let with_database bpath k =
+  match Hashtbl.find loaded_databases bpath with
   | exception Not_found ->
-      Database.with_database ~read_only:false bname (fun base ->
+      Database.with_database ~read_only:false bpath (fun base ->
           Fun.protect ~finally:(fun () -> clear_base base) @@ fun () -> k base)
   | _base ->
       (* FIXME: We cannot reuse [_base] because it contains closures that
@@ -154,7 +154,7 @@ let with_database bname k =
          on disk before each request to process the latest version of the
          base. Otherwise, workers could keep different old versions in
          memory. *)
-      Database.with_database ~read_only:true bname k
+      Database.with_database ~read_only:true bpath k
 
 let date_of_last_change base =
   let s =
@@ -276,9 +276,9 @@ let sync ?(scratch = false) base =
     raise Def.(HttpExn (Forbidden, __LOC__))
   else Outbase.output base
 
-let make bname particles arrays k =
-  Database.make bname particles arrays (sync ~scratch:true);
-  with_database bname k
+let make bpath particles arrays k =
+  Database.make bpath particles arrays (sync ~scratch:true);
+  with_database bpath k
 
 let bfname base fname = Filename.concat base.data.bdir fname
 

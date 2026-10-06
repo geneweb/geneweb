@@ -8,10 +8,10 @@ val w_base :
   none:(Config.config -> 'a) ->
   (Geneweb_db.Driver.base, 'a) handler ->
   (string option, 'a) handler
-(** [w_base ~none callback conf bfile] opens the database at path [bfile] in
+(** [w_base ~none callback conf bpath] opens the database at path [bpath] in
     read-only mode, sets up [conf.henv] / [conf.senv] / [conf.default_sosa_ref]
     via {!make_henv} and {!make_senv}, then calls [callback conf base]. If
-    [bfile] is [None], [none conf] is invoked instead. No locking is performed —
+    [bpath] is [None], [none conf] is invoked instead. No locking is performed —
     see {!w_lock} for write protection. *)
 
 val w_lock :

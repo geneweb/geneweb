@@ -10,7 +10,7 @@ module Dirs = Geneweb_dirs
 let ok_r = ref []
 let assets_r = ref [ "gw" ]
 
-let default_base_dir =
+let default_bases_dir =
   let t = Dirs.make () in
   Dirs.(data_home t // "geneweb" // "bases")
 
@@ -38,16 +38,16 @@ let add_assets d =
     ok_r := decompose d :: !ok_r)
 
 (* set base dir to which acces could be allowed *)
-let set_base_dir d =
+let set_bases_dir d =
   let ok = decompose d in
   bd_r := Some d;
   ok_r := ok :: (List.filter (( <> ) ok)) !ok_r
 
-let () = set_base_dir @@ Dirs.path default_base_dir
+let () = set_bases_dir @@ Dirs.path default_bases_dir
 
 (* get all assets *)
 let assets () = !assets_r
-let base_dir () = Option.get !bd_r
+let bases_dir () = Option.get !bd_r
 
 (* [list_check_prefix d df] returns either [None] if [d] is not a prefix of
    [df], or [Some suffix], where [df = d @ suffix] *)
@@ -61,8 +61,8 @@ let list_check_prefix d df =
 
 (** Check if a filename is safe to read: * it must not contain the '\000'
     character * it must either be relative to the local directory OR included in
-    one of the allowed directories (base_dir or assets) * the relative part does
-    not contain the '..' directory *)
+    one of the allowed directories (bases_dir or assets) * the relative part
+    does not contain the '..' directory *)
 let check fname =
   if String.contains fname '\000' then false
   else

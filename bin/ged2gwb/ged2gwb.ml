@@ -59,10 +59,10 @@ let no_warn = ref false
 (* Reading input *)
 
 let line_cnt = ref 1
-let in_file = ref ""
+let in_file = ref None
 
 let print_location pos =
-  Printf.fprintf !log_oc "File \"%s\", line %d:\n" !in_file pos
+  Printf.fprintf !log_oc "File \"%s\", line %d:\n" (Option.get !in_file) pos
 
 let rec skip_eol (strm__ : _ Stream.t) =
   match Stream.peek strm__ with
@@ -3562,20 +3562,21 @@ let finish_base (persons, families, strings, _) =
 
 (* Main *)
 
-let out_file = ref "a"
+let out_file = ref None
+let set_out_file s = out_file := Some s
 
 let speclist =
   [
     ( "-bd",
-      Arg.String Secure.set_base_dir,
+      Arg.String Secure.set_bases_dir,
       Fmt.str
         "<DIR> Specify where the “bases” directory with databases is installed \
          (default if empty is %S)."
-        (Dirs.name Secure.default_base_dir) );
+        (Dirs.name Secure.default_bases_dir) );
     ( "-o",
-      Arg.Set_string out_file,
-      "<file> Output database (default: <input file name>.gwb, a.gwb if not \
-       available). Alphanumerics and -" );
+      Arg.String set_out_file,
+      "<file> Output database (default: <input file name>.gwb). Alphanumerics \
+       and -" );
     ("-f", Arg.Set Geneweb.GWPARAM.force, " Remove database if already existing");
     ( "-log",
       Arg.String (fun s -> log_oc := open_out s),
@@ -3683,39 +3684,39 @@ let speclist =
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
 
-let anonfun s =
-  if !in_file = "" then in_file := s
-  else raise (Arg.Bad "Cannot treat several GEDCOM files")
+let raise_bad fmt = Format.kasprintf (fun s -> raise (Arg.Bad s)) fmt
 
-let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
+let parse_cmd () =
+  let anonfun s =
+    match !in_file with
+    | None -> in_file := Some s
+    | Some _ -> raise_bad "Cannot treat several GEDCOM files"
+  in
+  let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:" in
+  Arg.parse speclist anonfun errmsg;
+  let in_file =
+    match !in_file with
+    | None -> raise_bad "a GEDCOM file is mandatory"
+    | Some s -> s
+  in
+  let bname = Option.value ~default:in_file !out_file in
+  if not @@ Mutil.good_name bname then
+    raise_bad
+      "%s is not a valid database name (allowed: alphanumeric and hyphen)" bname;
+  (in_file, bname)
 
 let main () =
-  Arg.parse speclist anonfun errmsg;
-  if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
-  if !in_file <> "" then close_in (open_in_bin_with_bom_check !in_file);
-  let input_file =
-    if !in_file <> "" then Filename.remove_extension !in_file else !in_file
-  in
-  if input_file <> "" && not (Array.mem "-o" Sys.argv) then
-    out_file := input_file;
-  out_file := Filename.basename !out_file |> Filename.remove_extension;
-  if not (Mutil.good_name !out_file) then (
-    (* Util.transl conf not available !*)
-    Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
-      !out_file;
-    Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
-    flush stderr;
-    exit 2);
-  let bname = !out_file in
+  let in_file, bname = parse_cmd () in
+  if not (Array.mem "-bd" Sys.argv) then Secure.set_bases_dir ".";
+  close_in (open_in_bin_with_bom_check in_file);
   Geneweb.GWPARAM.check_base_exists bname;
   let _bdir = Geneweb.GWPARAM.create_base_and_config bname in
-  out_file := Filename.concat (Secure.base_dir ()) (bname ^ ".gwb");
-  Geneweb.GWPARAM.init ();
-  let arrays = make_arrays !in_file in
+  Geneweb.GWPARAM.init bname;
+  let arrays = make_arrays in_file in
   Gc.compact ();
   let arrays = make_subarrays arrays in
   finish_base arrays;
-  Driver.make !out_file !particles arrays @@ fun base ->
+  Driver.make (GWPARAM.bpath bname) !particles arrays @@ fun base ->
   warning_month_number_dates ();
   if !do_check then begin
     let base_error x =

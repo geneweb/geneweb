@@ -13,6 +13,8 @@ type gen_record = {
   gen_c : Driver.iper array list;
 }
 
+let ( // ) = Filename.concat
+
 (* Le nom du fichier historique (à partir de la clé personne). *)
 let history_file fn sn occ =
   let space_to_unders = Mutil.tr ' ' '_' in
@@ -27,13 +29,7 @@ let history_d conf =
     | Some path when path <> "" -> path
     | _ -> "history_d"
   in
-  if Filename.is_relative path then
-    let bname =
-      if Filename.check_suffix conf.bname ".gwb" then conf.bname
-      else conf.bname ^ ".gwb"
-    in
-    Filename.concat (Util.bpath bname) path
-  else path
+  if Filename.is_relative path then GWPARAM.bpath conf.bname // path else path
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
 let history_path conf fname =
