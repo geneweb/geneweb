@@ -43,10 +43,9 @@
     Username[:] %user.name;<br>
     Status[:] %if;wizard;Wizard%elseif;friend;Friend%else;Visitor%end;<br>
     Userkey[:] %user.key;<br>
-    Lang: %lang.full; (%lang;)<br>
+    Lang: %apply;language_name(lang) (%lang;)<br>
     Lang fallback: %lang_fallback;<br>
-    Default_lang: %default_lang;<br>
-    Browser_lang: %browser_lang;<br>
+    Lang priority: URL lang (%e.lang;) &gt; browser_lang (%browser_lang;) &gt; base_lang (%base_lang;)<br>
   </div>
 </section>
 

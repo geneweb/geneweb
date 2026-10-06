@@ -51,7 +51,7 @@
                   <div class="d-flex justify-content-between mx-2 mt-2 img-prfx" data-prfx="%images_prefix;modules">
                     <div class="d-flex align-items-center flex-grow-1">
                       %apply;input_hidden("e.b","b")
-                      %if;(e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
+                      %if;(e.lang!="" and e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
                       <label for="p_mod" class="visually-hidden">[*select p_mod]</label>
                       <div class="input-group p-mod-group me-2">
                         <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"

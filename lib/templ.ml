@@ -173,15 +173,6 @@ let substr_start_aux n s =
 
 let rec eval_variable (conf : Config.config) = function
   | [ "base"; "name" ] -> conf.bname
-  | [ "lang"; "full" ] ->
-      let rec func x lst c =
-        match lst with
-        | [] -> "bad language code"
-        | hd :: tl ->
-            if hd = x then Util.transl_nth conf "!languages" c
-            else func x tl (c + 1)
-      in
-      func conf.lang Version.available_languages 0
   | [ "bvar"; "list" ] ->
       let wizard_only =
         [
@@ -402,6 +393,7 @@ and eval_simple_variable conf = function
       match List.assoc_opt conf.lang !Mutil.fallback with
       | Some l -> l
       | None -> "")
+  | "base_lang" -> conf.base_lang
   | "default_lang" -> conf.default_lang
   | "browser_lang" -> conf.browser_lang
   | "left" -> conf.left
