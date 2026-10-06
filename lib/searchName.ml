@@ -1932,7 +1932,7 @@ let rec handle_search_results alias_cache conn conf base query fn_options
        2  first name exact and a spouse's surname exact     (type B)
        1  first name exact, surname only partially matching
           (compound surname, phonetic variant...)
-       0  first name not exact
+       0  neither first name nor public name exact
      A redirect to [target] is refused when another candidate, in any pile,
      has a quality at least equal to [target]'s (and at least 1).
      So "annie vivier" goes to Annie Crassous de Medeuil, wife of Alain
@@ -1974,7 +1974,11 @@ let rec handle_search_results alias_cache conn conf base query fn_options
     | Some (qfn, qsn) ->
         let p = Driver.poi base ip in
         if known_as_query p then 4
-        else if not (same_fn (norm (Driver.get_first_name p)) qfn) then 0
+        else if
+          not
+            (same_fn (norm (Driver.get_first_name p)) qfn
+            || same_fn (norm (Driver.get_public_name p)) qfn)
+        then 0
         else if norm (Driver.get_surname p) = qsn then 3
         else if
           Array.exists
