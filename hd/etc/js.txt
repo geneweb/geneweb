@@ -643,7 +643,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       %if;(i>0),%end;'%l1;':`%apply;language_name(l1)`%nn;
     %end;
   };
-  const def = '%b.default_lang;';
+  const def = '%default_lang;';
+  const base = '%base_lang;';
   %( TODO file= is stripped to flush any image-upload param carried over a
      lang switch; legacy hack inherited from the lang_file pattern in
      copyr.txt, should move to the request handler. %)
@@ -656,11 +657,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   const frag = document.createDocumentFragment();
   for (const l of Object.keys(names)) {
-    if (l === '%lang;') continue;
+    const cur = l === '%lang;';
     const a = document.createElement('a');
-    a.className = 'dropdown-item' + (l === def ? ' bg-warning' : '');
+    a.className = 'dropdown-item' + (l === base ? ' bg-warning' : '')
+      + (cur ? ' disabled' : '');
     a.id = 'lang_' + l;
-    a.href = hrefFor(l);
+    if (cur) a.setAttribute('aria-current', 'true');
+    else a.href = hrefFor(l);
     const code = document.createElement('code');
     code.textContent = (l === 'pt-br' ? l : l + '\u00a0\u00a0\u00a0') + ' ';
     a.appendChild(code);

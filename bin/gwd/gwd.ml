@@ -1263,7 +1263,6 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
   in
   let lang, env = extract_assoc "lang" env in
   let env = List.filter (fun (k, _) -> k <> "notif") env in
-  let lang = if lang = "" then http_preferred_language request else lang in
   let lang = alias_lang lang in
   let from, env =
     let x, env = extract_assoc "opt" env in
@@ -1279,14 +1278,13 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     if base_file = "" then []
     else Util.read_base_env base_file (Option.get !gw_prefix) !debug
   in
-  let default_lang =
-    try
-      let x = List.assoc "default_lang" base_env in
-      if x = "" then !default_lang else x
-    with Not_found -> !default_lang
+  let base_lang =
+    match List.assoc_opt "default_lang" base_env with
+    | Some x when x <> "" -> x
+    | _ -> !default_lang
   in
   let browser_lang = http_preferred_language request in
-  let default_lang = if browser_lang = "" then default_lang else browser_lang in
+  let default_lang = if browser_lang = "" then base_lang else browser_lang in
   let vowels =
     match List.assoc_opt "vowels" base_env with
     | Some l ->
@@ -1366,6 +1364,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
          with Not_found -> green_color);
       lang = (if lang = "" then default_lang else lang);
       vowels;
+      base_lang;
       default_lang;
       browser_lang;
       default_sosa_ref;

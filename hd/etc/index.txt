@@ -16,7 +16,7 @@
 <div class="mt-5">[*input database][:]</div>
 
 <form class="d-flex justify-content-center mt-2" method="get" action="%prefix;">
-  <input type="hidden" name="lang" value="%evar.lang;">
+  %if;(evar.lang!="")<input type="hidden" name="lang" value="%evar.lang;">%end;
   <input name="b" placeholder="%bases_list;" class="form-control col-8">
   <button type="submit" class="btn btn-outline-secondary ms-2" value="">Ok</button>
 </form>

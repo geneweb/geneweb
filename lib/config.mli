@@ -66,6 +66,9 @@ type config = {
   highlight : string;
   lang : string;
   vowels : string list;
+  base_lang : string;
+      (** Base reference language: [default_lang] of the .gwf, else the
+          [--default-lang] server option. Independent of the browser. *)
   default_lang : string;
   browser_lang : string;
   default_sosa_ref : Geneweb_db.Driver.iper * Geneweb_db.Driver.person option;
