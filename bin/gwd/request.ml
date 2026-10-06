@@ -43,6 +43,11 @@ let person_selected conn conf base p =
   | Some _ -> request_issue conn conf base ~key:"incorrect em value"
   | None ->
       record_visited conf (Driver.get_iper p);
+      let conf =
+        match (p_getenv conf.env "other_names", p_getenv conf.env "pn") with
+        | Some "on", Some pn when pn <> "" -> Some.other_names_notif conf pn
+        | _ -> conf
+      in
       Perso.print conf base p
 
 let person_selected_with_redirect conn conf base p =
