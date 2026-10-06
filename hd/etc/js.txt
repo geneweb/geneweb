@@ -721,7 +721,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 %if;(e.notif!="" or e.nomod="1")
-<script>
+<script data-notif="%e.notif;">
 %include;js_notif
 </script>
 %end;
@@ -844,8 +844,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 %end;
-%end;
-%end;%( closing initial “not cancel_links”, not indented for convenience %)
+%end;%( closing “e.templ” of the DOMContentLoaded blocks, not indented for convenience %)
+%end;%( closing initial “not cancel_links”, not indented either %)
 %( b.reduce_place=yes %)
 %if;(e.m="" and not is_welcome and b.reduce_place="yes")
 <script>

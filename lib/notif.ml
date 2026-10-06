@@ -30,7 +30,7 @@ let inject_pending conf =
       match List.assoc_opt "notif" conf.Config.env with
       | Some v -> (
           try
-            match Yojson.Basic.from_string (v :> string) with
+            match Yojson.Basic.from_string (Mutil.decode v) with
             | `List l -> l
             | _ -> []
           with _ -> [])
@@ -52,5 +52,5 @@ let inject_pending conf =
     let json = Yojson.Basic.to_string (`List (existing @ new_items)) in
     {
       conf with
-      env = ("notif", Adef.encoded json) :: List.remove_assoc "notif" conf.env;
+      env = ("notif", Mutil.encode json) :: List.remove_assoc "notif" conf.env;
     }
