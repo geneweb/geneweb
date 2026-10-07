@@ -1140,6 +1140,7 @@ let print_slices_menu_or_dag_page conf page_title hts next_txt =
     in
     Hutil.interp conf "dag"
       {
+        output = Output.print_sstring conf;
         Templ.eval_var = eval_var conf page_title next_txt;
         Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
         Templ.eval_predefined_apply = (fun _ -> raise Not_found);

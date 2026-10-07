@@ -584,6 +584,7 @@ let print_start conf base =
   Output.link_header trimmed_conf ~alternate_urls canonical_url;
   Hutil.interp conf "welcome"
     {
+      output = Output.print_sstring conf;
       Templ.eval_var = eval_var conf base;
       Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
       Templ.eval_predefined_apply = eval_predefined_apply conf;
@@ -598,6 +599,7 @@ let print conf base fname =
   if Sys.file_exists (Util.etc_file_name fname) then
     Hutil.interp conf fname
       {
+        output = Output.print_sstring conf;
         Templ.eval_var = eval_var conf base;
         Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
         Templ.eval_predefined_apply = eval_predefined_apply conf;
