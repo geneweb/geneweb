@@ -53,6 +53,7 @@ val person_title_text :
     and main title. Calls [gen_person_title_text] with [no_reference]. *)
 
 val reference :
+  ?new_tab:bool ->
   Config.config ->
   Gwdb.base ->
   Gwdb.person ->
@@ -64,6 +65,7 @@ val reference :
     create link). *)
 
 val reference_noid :
+  ?new_tab:bool ->
   Config.config ->
   Gwdb.base ->
   Gwdb.person ->
@@ -80,16 +82,16 @@ val no_reference :
 (** [reference conf base p desc] returns [desc] without creating a link *)
 
 val referenced_person_title_text :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
+  ?new_tab:bool -> Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 (** Retruns HTML link to the person that contains its first name, surname and person's
     nobility title. Calls [gen_person_title_text] with [reference]. *)
 
 val referenced_person_text :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
+  ?new_tab:bool -> Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 (** Returns HTML link to the person that contains its first name and surname. *)
 
 val referenced_person_text_without_surname :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
+  ?new_tab:bool -> Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 (** Returns HTML link to the person that contains its first name. *)
 
 val person_text_without_title :

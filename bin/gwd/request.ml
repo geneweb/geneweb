@@ -784,19 +784,14 @@ let treat_request =
                w_wizard @@ w_base @@ w_person @@ Geneweb.MergeDisplay.print
            | "MRG_DUP" ->
                w_wizard @@ w_base @@ Geneweb.MergeDupDisplay.main_page
-           | "MRG_DUP_IND_Y_N" ->
-               w_wizard @@ w_lock @@ w_base
-               @@ Geneweb.MergeDupDisplay.answ_ind_y_n
-           | "MRG_DUP_FAM_Y_N" ->
-               w_wizard @@ w_lock @@ w_base
-               @@ Geneweb.MergeDupDisplay.answ_fam_y_n
-           | "MRG_FAM" -> w_wizard @@ w_base @@ Geneweb.MergeFamDisplay.print
+           | "MRG_FAM" | "MRG_DUP_FAM_Y_N" ->
+               w_wizard @@ w_base @@ Geneweb.MergeFamDisplay.print
            | "MRG_FAM_OK" ->
                w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeFamOk.print_merge
            | "MRG_MOD_FAM_OK" ->
                w_wizard @@ w_lock @@ w_base
                @@ Geneweb.MergeFamOk.print_mod_merge
-           | "MRG_IND" ->
+           | "MRG_IND" | "MRG_DUP_IND_Y_N" ->
                w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeIndDisplay.print
            | "MRG_IND_OK" ->
                (* despite the _OK suffix, this one does not actually update databse *)
