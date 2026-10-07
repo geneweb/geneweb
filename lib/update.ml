@@ -1518,3 +1518,10 @@ let update_related_pointers base pi ol nl =
       in
       Driver.patch_person base ip { p with related })
     removed_rel
+
+let redirect_unchanged conf base p =
+  Output.status conf Geneweb_http.Code.Moved_Temporarily;
+  Output.header conf "Location: %s%s&nomod=1"
+    (commd conf :> string)
+    (acces conf base p :> string);
+  Output.flush conf

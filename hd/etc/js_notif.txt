@@ -12,10 +12,17 @@ var notifIcons={
   info:'fa-circle-info'
 };
 (function(){
-  var txt=document.createElement('textarea');
+  var txt=document.createElement('textarea'),items=%[%];
   txt.innerHTML='%e.notif;';
-  try{var items=JSON.parse(txt.value);}catch(e){return;}
-  if(!items||!items.length)return;
+  try{items=JSON.parse(txt.value)||items;}catch(e){}
+  %if;(e.nomod="1")
+    items.push({level:'info',title:'[*no modification]',
+      message:'[NOTIF no modification]',autohide:true});
+    var u=new URL(location.href);
+    u.searchParams.delete('nomod');
+    history.replaceState(null,'',u);
+  %end;
+  if(!items.length)return;
   var c=document.createElement('div');
   c.className='notif-ctr';
   document.body.appendChild(c);
@@ -29,5 +36,6 @@ var notifIcons={
           '</button></div>'+
           '<div class="toast-body">'+x.message+'</div></div>';
     c.insertAdjacentHTML('beforeend',h);
+    if(x.autohide){var t=c.lastElementChild;setTimeout(function(){t.remove();},6000);}
   });
 })();

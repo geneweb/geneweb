@@ -15367,6 +15367,22 @@ de: Führen Sie das Tool <code><b>update_nldb</b></code> aus<br>oder <b>löschen
 en: Run <code><b>update_nldb</b></code> tool or <b>delete notes_links</b> file.
 fr: Relancez l’outil <code><b>update_nldb</b></code><br> ou <b>supprimez</b> le fichier <b>notes_links</b>.
 
+    NOTIF no modification
+co: Furmulariu validatu senza cambiamentu, nunda ùn hè statu arregistratu.
+de: Formular ohne Änderung bestätigt, nichts wurde gespeichert.
+en: Form submitted without changes, nothing was saved.
+es: Formulario validado sin cambios, no se ha guardado nada.
+fi: Lomake lähetettiin ilman muutoksia, mitään ei tallennettu.
+fr: Formulaire validé sans changement, rien n’a été enregistré.
+it: Modulo convalidato senza modifiche, non è stato salvato nulla.
+nl: Formulier zonder wijzigingen verzonden, er is niets opgeslagen.
+no: Skjemaet ble sendt uten endringer, ingenting ble lagret.
+oc: Formulari validat sens cap de cambiament, res es pas estat enregistrat.
+pt: Formulário validado sem alterações, nada foi guardado.
+ru: Форма отправлена без изменений, ничего не сохранено.
+sv: Formuläret skickades utan ändringar, inget sparades.
+tr: Form değişiklik yapılmadan gönderildi, hiçbir şey kaydedilmedi.
+
     NOTIF_TT bad date
 de: Ungültiges Datum
 en: Invalid date

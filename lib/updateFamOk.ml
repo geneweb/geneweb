@@ -1403,6 +1403,14 @@ let family_structure base ifam =
   let fam = Driver.foi base ifam in
   (Driver.get_parent_array fam, Driver.get_children fam)
 
+let redirect_to_source conf base ifath =
+  let ip =
+    match p_getenv conf.env "ip" with
+    | Some i -> Driver.Iper.of_string i
+    | None -> ifath
+  in
+  Update.redirect_unchanged conf base (Driver.poi base ip)
+
 let print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
@@ -1422,32 +1430,35 @@ let print_mod o_conf base =
     let ofs = family_structure base sfam.fam_index in
     let nsck = p_getenv conf.env "nsck" = Some "on" in
     let ifam, fam, cpl, des = effective_mod conf base nsck sfam scpl sdes in
-    let () = patch_parent_with_pevents base cpl in
-    let () = patch_children_with_pevents base des in
-    Notes.update_notes_links_family base fam;
-    (* TODO update_cache_linked_pages *)
     let nfs = (Adef.parent_array cpl, des.children) in
-    let onfs = Some (ofs, nfs) in
-    let wl, ml =
-      all_checks_family conf base ifam fam cpl des (scpl, sdes, onfs)
-    in
-    Util.commit_patches conf base;
-    let changed =
-      let ip =
-        match p_getenv o_conf.env "ip" with
-        | Some i -> Driver.Iper.of_string i
-        | None -> Driver.Iper.dummy
+    if ofs = nfs && Util.string_gen_family base fam = o_f then
+      redirect_to_source o_conf base (Adef.father cpl)
+    else
+      let () = patch_parent_with_pevents base cpl in
+      let () = patch_children_with_pevents base des in
+      Notes.update_notes_links_family base fam;
+      (* TODO update_cache_linked_pages *)
+      let onfs = Some (ofs, nfs) in
+      let wl, ml =
+        all_checks_family conf base ifam fam cpl des (scpl, sdes, onfs)
       in
-      let p =
-        Util.string_gen_person base
-          (Driver.gen_person_of_person (Driver.poi base ip))
+      Util.commit_patches conf base;
+      let changed =
+        let ip =
+          match p_getenv o_conf.env "ip" with
+          | Some i -> Driver.Iper.of_string i
+          | None -> Driver.Iper.dummy
+        in
+        let p =
+          Util.string_gen_person base
+            (Driver.gen_person_of_person (Driver.poi base ip))
+        in
+        let n_f = Util.string_gen_family base fam in
+        U_Modify_family (p, o_f, n_f)
       in
-      let n_f = Util.string_gen_family base fam in
-      U_Modify_family (p, o_f, n_f)
-    in
-    History.record conf base changed "mf";
-    Update.delete_topological_sort conf base;
-    print_mod_ok conf base (wl, ml) cpl des
+      History.record conf base changed "mf";
+      Update.delete_topological_sort conf base;
+      print_mod_ok conf base (wl, ml) cpl des
   in
   print_mod_aux conf base callback
 
@@ -1518,39 +1529,42 @@ let print_change_event_order conf base =
             with Not_found -> failwith "Sorting event")
           sorted_fevents []
       in
-      let fam = Driver.gen_family_of_family fam in
-      let fam = { fam with fevents } in
-      let fam = update_family_with_fevents conf base fam in
-      Driver.patch_family base fam.fam_index fam;
-      let a = Driver.foi base fam.fam_index in
-      let cpl = Adef.parent (Driver.get_parent_array a) in
-      let des = { children = Driver.get_children a } in
-      let wl =
-        let wl = ref [] in
-        let warning w = wl := w :: !wl in
-        let nfam = Driver.family_of_gen_family base (fam, cpl, des) in
-        CheckItem.family base warning fam.fam_index nfam;
-        List.iter
-          (function
-            | ChangedOrderOfFamilyEvents (ifam, _, after) ->
-                Driver.patch_family base ifam { fam with fevents = after }
-            | _ -> ())
-          !wl;
-        List.rev !wl
-      in
-      Util.commit_patches conf base;
-      let changed =
-        let ip =
-          match p_getenv conf.env "ip" with
-          | Some i -> Driver.Iper.of_string i
-          | None -> Driver.Iper.dummy
+      if fevents = Driver.get_fevents fam then
+        redirect_to_source conf base (Driver.get_father fam)
+      else
+        let fam = Driver.gen_family_of_family fam in
+        let fam = { fam with fevents } in
+        let fam = update_family_with_fevents conf base fam in
+        Driver.patch_family base fam.fam_index fam;
+        let a = Driver.foi base fam.fam_index in
+        let cpl = Adef.parent (Driver.get_parent_array a) in
+        let des = { children = Driver.get_children a } in
+        let wl =
+          let wl = ref [] in
+          let warning w = wl := w :: !wl in
+          let nfam = Driver.family_of_gen_family base (fam, cpl, des) in
+          CheckItem.family base warning fam.fam_index nfam;
+          List.iter
+            (function
+              | ChangedOrderOfFamilyEvents (ifam, _, after) ->
+                  Driver.patch_family base ifam { fam with fevents = after }
+              | _ -> ())
+            !wl;
+          List.rev !wl
         in
-        let p =
-          Util.string_gen_person base
-            (Driver.gen_person_of_person (Driver.poi base ip))
+        Util.commit_patches conf base;
+        let changed =
+          let ip =
+            match p_getenv conf.env "ip" with
+            | Some i -> Driver.Iper.of_string i
+            | None -> Driver.Iper.dummy
+          in
+          let p =
+            Util.string_gen_person base
+              (Driver.gen_person_of_person (Driver.poi base ip))
+          in
+          let n_f = Util.string_gen_family base fam in
+          U_Modify_family (p, o_f, n_f)
         in
-        let n_f = Util.string_gen_family base fam in
-        U_Modify_family (p, o_f, n_f)
-      in
-      History.record conf base changed "mf";
-      print_change_event_order_ok conf base (wl, []) cpl des
+        History.record conf base changed "mf";
+        print_change_event_order_ok conf base (wl, []) cpl des

@@ -720,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-%if;(e.notif!="")
+%if;(e.notif!="" or e.nomod="1")
 <script>
 %include;js_notif
 </script>
