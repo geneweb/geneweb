@@ -140,7 +140,7 @@ let merge_fam1 conf base fam1 fam2 =
   print_differences conf base [] fam1 fam2;
   Hutil.trailer conf
 
-let merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
+let merge_fam ?continue conf base (ifam1, fam1) (ifam2, fam2) =
   let cpl1 = Gwdb.foi base ifam1 in
   let cpl2 = Gwdb.foi base ifam2 in
   (* Vérifie que les deux couples sont identiques. Il est possible dans certains cas (couple de même sexe) que les personnes soient inversées dans l'union. *)
@@ -154,10 +154,10 @@ let merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
       need_differences_selection conf base fam1 fam2
       && compatible_fevents (Gwdb.get_fevents fam1) (Gwdb.get_fevents fam2)
     then merge_fam1 conf base (ifam1, fam1) (ifam2, fam2)
-    else MergeFamOk.print_merge conf base
+    else MergeFamOk.print_merge ?continue conf base
   else Hutil.incorrect_request conf
 
-let print conf base =
+let print ?continue conf base =
   match
     (Util.p_getenv conf.Config.env "i", Util.p_getenv conf.Config.env "i2")
   with
@@ -166,5 +166,5 @@ let print conf base =
       let ifam2 = Gwdb.ifam_of_string f2 in
       let fam1 = Gwdb.foi base ifam1 in
       let fam2 = Gwdb.foi base ifam2 in
-      merge_fam conf base (ifam1, fam1) (ifam2, fam2)
+      merge_fam ?continue conf base (ifam1, fam1) (ifam2, fam2)
   | _ -> Hutil.incorrect_request conf

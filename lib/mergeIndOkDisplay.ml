@@ -1,6 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let print_merge conf base =
+let print_merge ?(continue = UpdateInd.print_update_ind) conf base =
   match
     (Util.p_getenv conf.Config.env "i1", Util.p_getenv conf.Config.env "i2")
   with
@@ -10,20 +10,21 @@ let print_merge conf base =
       let p = MergeIndOk.reconstitute conf base p1 p2 in
       let sp = UpdateInd.string_person_of base p1 in
       let digest = Update.digest_person sp in
-      UpdateInd.print_update_ind conf base p digest
+      continue conf base p digest
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
     =
+  let has_continuation = MergeInd.has_continuation conf in
   Hutil.header conf (fun _ ->
-      Util.transl conf "merge done"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf);
+      MergeDisplay.page_title ~has_continuation conf
+      |> Output.print_sstring conf);
   Hutil.print_link_to_welcome conf true;
-  Output.print_sstring conf " ";
+  Output.print_sstring conf "<p>";
   Output.print_string conf
-    (NameDisplay.referenced_person_text conf base
+    (NameDisplay.referenced_person_text ~new_tab:has_continuation conf base
        (Gwdb.poi base p.Def.key_index));
-  Output.print_sstring conf " ";
+  Output.print_sstring conf "</p>";
   Update.print_warnings conf base wl;
   let pi = p.Def.key_index in
   let np = Gwdb.poi base pi in
@@ -94,7 +95,7 @@ let check_person_before_merge conf base previous_p1 previous_p2 new_p =
     new_p.Def.pevents
   >>= fun () -> check_person_access_before_merge previous_p1 previous_p2 new_p
 
-let print_mod_merge o_conf base =
+let print_mod_merge ?person o_conf base =
   let get_gen_person i =
     match Util.p_getenv o_conf.Config.env i with
     | Some i ->
@@ -107,5 +108,5 @@ let print_mod_merge o_conf base =
   let check_person_f conf base =
     check_person_before_merge conf base o_p1 o_p2
   in
-  UpdateIndOk.print_mod_aux ~check_person_f conf base (fun p ->
+  UpdateIndOk.print_mod_aux ?person ~check_person_f conf base (fun p ->
       MergeIndOk.effective_mod_merge conf base o_p1 o_p2 p print_mod_merge_ok)

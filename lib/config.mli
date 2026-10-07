@@ -117,6 +117,8 @@ val empty : config
 (** A dummy {!type:config} value, with uninitialized fields.
     Used for testing purpose *)
 
+val default_input_mode : config -> [> `Geneweb | `Geneanet ]
+
 module Trimmed : sig
   type t = private {
     from : string;

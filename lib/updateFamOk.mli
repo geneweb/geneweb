@@ -45,6 +45,7 @@ val all_checks_family :
   Warning.base_warning list * Warning.base_misc list
 
 val print_family :
+  ?references_in_new_tab:bool ->
   Config.config ->
   Gwdb.base ->
   Warning.base_warning list * Warning.base_misc list ->
@@ -63,6 +64,10 @@ val print_add : Config.config -> Gwdb.base -> unit
 val print_add_parents : Config.config -> Gwdb.base -> unit
 
 val print_mod_aux :
+  ?family:
+    (Update.key, Gwdb.ifam, string) Def.gen_family
+    * Update.key Adef.gen_couple
+    * Update.key Def.gen_descend ->
   Config.config ->
   Gwdb.base ->
   (( string * string * int * Update.create * string,

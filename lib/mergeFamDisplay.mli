@@ -8,5 +8,16 @@ val print_differences :
 (** Displays differences between couples ; relation kind, marriage, marriage place
     and divorce. *)
 
-val print : Config.config -> Gwdb.base -> unit
+val print :
+  ?continue:
+    (Config.config ->
+    Gwdb.base ->
+    (Update.key, Gwdb.ifam, string) Def.gen_family
+    * Update.key Adef.gen_couple
+    * Update.key Def.gen_descend ->
+    string ->
+    unit) ->
+  Config.config ->
+  Gwdb.base ->
+  unit
 (** Displays a menu for merging families. Couples must be identical (modulo reversion). *)

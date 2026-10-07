@@ -207,7 +207,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
   in
   (fam, des)
 
-let print_merge conf base =
+let print_merge ?(continue = UpdateFam.print_update_fam) conf base =
   match
     (Util.p_getenv conf.Config.env "i", Util.p_getenv conf.Config.env "i2")
   with
@@ -225,17 +225,18 @@ let print_merge conf base =
           (UpdateFam.person_key base)
           (Gwdb.gen_couple_of_family (Gwdb.foi base sfam.fam_index))
       in
-      UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
+      continue conf base (sfam, scpl, sdes) digest
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl cpl des =
+  let has_continuation = MergeInd.has_continuation conf in
   let title _ =
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (Util.transl conf "merge done"))
+    Output.print_sstring conf (MergeDisplay.page_title ~has_continuation conf)
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  UpdateFamOk.print_family conf base wl cpl des;
+  UpdateFamOk.print_family ~references_in_new_tab:has_continuation conf base wl
+    cpl des;
   MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 
@@ -285,7 +286,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
       History.record conf base changed "ff";
       print_mod_merge_ok conf base wl cpl des
 
-let print_mod_merge o_conf base =
+let print_mod_merge ?family o_conf base =
   let get_gen_family i =
     match Util.p_getenv o_conf.Config.env i with
     | Some i ->
@@ -298,4 +299,5 @@ let print_mod_merge o_conf base =
   let o_f1 = get_gen_family "i" in
   let o_f2 = get_gen_family "i2" in
   let conf = Update.update_conf o_conf in
-  UpdateFamOk.print_mod_aux conf base (effective_mod_merge conf base o_f1 o_f2)
+  UpdateFamOk.print_mod_aux ?family conf base
+    (effective_mod_merge conf base o_f1 o_f2)

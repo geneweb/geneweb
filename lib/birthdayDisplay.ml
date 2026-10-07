@@ -162,7 +162,10 @@ let f_scan conf base =
   let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
   fun () ->
     match next () with
-    | Some i -> (Util.pget conf base i, NameDisplay.referenced_person_title_text)
+    | Some i ->
+        ( Util.pget conf base i,
+          fun conf base person ->
+            NameDisplay.referenced_person_title_text conf base person )
     | None -> raise Not_found
 
 let print_birth conf base mois =
@@ -440,7 +443,9 @@ let print_menu_birth conf base =
     fun () ->
       match next () with
       | Some i ->
-          (Util.pget conf base i, NameDisplay.referenced_person_title_text)
+          ( Util.pget conf base i,
+            fun conf base person ->
+              NameDisplay.referenced_person_title_text conf base person )
       | None -> raise Not_found
   in
   let mode () =
@@ -523,7 +528,9 @@ let print_menu_dead conf base =
     fun () ->
       match next () with
       | Some i ->
-          (Util.pget conf base i, NameDisplay.referenced_person_title_text)
+          ( Util.pget conf base i,
+            fun conf base person ->
+              NameDisplay.referenced_person_title_text conf base person )
       | None -> raise Not_found
   in
   gen_print_menu_dead conf base f_scan (fun () ->
