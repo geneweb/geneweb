@@ -76,6 +76,18 @@ let mutil_string_of_int_sep _ =
   test "," "100,000" 100000;
   test "," "1,000,000" 1000000
 
+let mutil_zoneinfo_name _ =
+  let test exp s = (check (option string)) "" exp (Mutil.zoneinfo_name s) in
+  test (Some "Europe/Paris") "Europe/Paris";
+  test (Some "Europe/Paris") ":Europe/Paris";
+  test (Some "Europe/Paris") "/usr/share/zoneinfo/Europe/Paris";
+  test (Some "America/New_York") "../usr/share/zoneinfo/America/New_York";
+  test (Some "Etc/GMT+5") "Etc/GMT+5";
+  test (Some "CET-1CEST,M3.5.0,M10.5.0/3") "CET-1CEST,M3.5.0,M10.5.0/3";
+  test (Some "/etc/localtime") "/etc/localtime";
+  test None "";
+  test None ":"
+
 let name_title _ =
   let test exp = List.iter (fun s -> (check string) "" exp (Name.title s)) in
   test "Jean-Baptiste"
@@ -214,6 +226,7 @@ let v =
         test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
         test_case "Mutil particule" `Quick mutil_compare_after_particle;
         test_case "Mutil.string_of_int_sep" `Quick mutil_compare_after_particle;
+        test_case "Mutil.zoneinfo_name" `Quick mutil_zoneinfo_name;
       ] );
     ("name", [ test_case "Name.title" `Quick name_title ]);
     ( "utf8",

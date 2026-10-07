@@ -754,6 +754,7 @@ and eval_simple_str_var conf base env (bef, aft, p_auth) :
         |> Util.gen_person_text conf base
         |> safe_val
       else eval_string_env "history_file" env
+  | "server_timezone" -> str_val (Mutil.server_timezone ())
   | "wizard" -> eval_string_env "wizard" env
   | _ -> raise Not_found
 
@@ -930,26 +931,6 @@ let print_foreach conf base print_ast _eval_expr =
   in
   print_foreach
 
-let eval_predefined_apply conf _env f vl =
-  let vl =
-    List.map (function Templ.VVstring s -> s | _ -> raise Not_found) vl
-  in
-  match (f, vl) with
-  | "transl_date", [ date_txt ] -> (
-      (* date_tpl = "0000-00-00 00:00:00" *)
-      try
-        let year = int_of_string (String.sub date_txt 0 4) in
-        let month = int_of_string (String.sub date_txt 5 2) in
-        let day = int_of_string (String.sub date_txt 8 2) in
-        let date =
-          Adef.Dgreg
-            ({ Adef.day; month; year; prec = Sure; delta = 0 }, Dgregorian)
-        in
-        let time = String.sub date_txt 11 8 in
-        DateDisplay.string_of_date conf date ^>^ ", " ^ time
-      with Failure _ -> escape_html date_txt)
-  | _ -> raise Not_found
-
 let print conf base =
   match p_getenv conf.env "t" with
   | Some ("SUM" | "DIFF") -> (
@@ -978,15 +959,12 @@ let print conf base =
             |> Templ.Env.add "history_file" (Vstring file)
             |> Templ.Env.add "history_len" (Vint len)
           in
-          let eval_predefined_apply _env f vl =
-            (eval_predefined_apply conf _env f vl :> string)
-          in
           let ifun =
             Templ.
               {
                 eval_var = eval_var conf base;
                 eval_transl = (fun _ -> Templ.eval_transl conf);
-                eval_predefined_apply;
+                eval_predefined_apply = (fun _ -> raise Not_found);
                 get_vother;
                 set_vother;
                 print_foreach = print_foreach conf base;

@@ -1,0 +1,35 @@
+<script>
+// Convert timestamps recorded in the server's timezone to the browser's.
+(function () {
+  var serverTZ = '%server_timezone;';
+  if (!serverTZ) { return; }
+  var fmt;
+  try {
+    fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: serverTZ,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23'
+    });
+  } catch (e) {
+    return;
+  }
+  var offset = function (date) {
+    var m = fmt.format(date).match(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/);
+    if (!m) { return 0; }
+    return Date.UTC(+m[3], +m[1] - 1, +m[2], +m[4], +m[5], +m[6]) - date.getTime();
+  };
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  document.querySelectorAll('.gw-hist-time').forEach(function (el) {
+    var m = el.textContent.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
+    if (!m) { return; }
+    var asUTC = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+    var ts = asUTC - offset(new Date(asUTC));
+    ts = asUTC - offset(new Date(ts));
+    var d = new Date(ts);
+    el.textContent =
+      d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  });
+})();
+</script>

@@ -61,7 +61,7 @@
     </thead>
     %foreach;history_line(kk, e.pos, wiz)
       <tr>
-        <td>%time;</td>
+        <td><span class="gw-hist-time">%time;</span></td>
         <td>
         %if;is_person;
           %if;(person.is_private)
@@ -204,6 +204,7 @@
 %include;trl
 %include;copyr
 </div>
+%include;hist_time
 %include;js
 %query_time;
 </body>

@@ -68,7 +68,7 @@ function updateRadios(changed) {
               <input type="radio" class="form-check-input ms-2" name="new" value="%line;" onclick="updateRadios('new')" %if;(line = 0)checked%elseif;(line = history_len - 1)style="visibility: hidden"%end;%/>
             </div>
           </td>
-          <td %if;(line % 2 != 0) class="odd" %end;>%apply;transl_date%with;%date;%end;</td>
+          <td %if;(line % 2 != 0) class="odd" %end;><span class="gw-hist-time">%date;</span></td>
           <td %if;(line % 2 != 0) class="odd" %end;>%wizard;</td>
         </tr>
       %end;
@@ -306,8 +306,8 @@ function updateRadios(changed) {
     </colgroup>
     <tr>
       <th scope="row" class="table-success text-nowrap">[*revision of]</th>
-      <td><b>%apply;transl_date%with;%before.date;%end;</b></td>
-      <td><b>%apply;transl_date%with;%after.date;%end;</b></td>
+      <td><b><span class="gw-hist-time">%before.date;</span></b></td>
+      <td><b><span class="gw-hist-time">%after.date;</span></b></td>
     </tr>
     <tr>
       <th scope="row" class="table-success text-nowrap"> [*wizard/wizards/friend/friends/exterior]0</th>
@@ -350,6 +350,7 @@ function updateRadios(changed) {
 %include;copyr
 
 </div>
+%include;hist_time
 %include;js
 %query_time;
 </body>
