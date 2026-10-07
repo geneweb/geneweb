@@ -1152,26 +1152,29 @@ let print_mod ?prerr o_conf base =
     with_lock conf @@ fun () ->
     let p = effective_mod ?prerr conf base sp in
     let op = Driver.poi base p.key_index in
-    let u = { family = Driver.get_family op } in
-    Driver.patch_person base p.key_index p;
-    let new_key = Util.make_key base p in
-    if old_key <> new_key then (
-      (* Needs the updates in this order in case of self-reference *)
-      Notes.update_notes_links_person base p;
-      Notes.update_ind_key conf base pgl old_key new_key;
-      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0);
-    let wl =
-      let a = Driver.poi base p.key_index in
-      let a =
-        { parents = Driver.get_parents a; consang = Driver.get_consang a }
+    if p = Driver.gen_person_of_person op then
+      Update.redirect_unchanged conf base op
+    else
+      let u = { family = Driver.get_family op } in
+      Driver.patch_person base p.key_index p;
+      let new_key = Util.make_key base p in
+      if old_key <> new_key then (
+        (* Needs the updates in this order in case of self-reference *)
+        Notes.update_notes_links_person base p;
+        Notes.update_ind_key conf base pgl old_key new_key;
+        Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0);
+      let wl =
+        let a = Driver.poi base p.key_index in
+        let a =
+          { parents = Driver.get_parents a; consang = Driver.get_consang a }
+        in
+        all_checks_person base p a u
       in
-      all_checks_person base p a u
-    in
-    Util.commit_patches conf base;
-    let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
-    History.record conf base changed "mp";
-    Update.delete_topological_sort_v conf base;
-    print_mod_ok conf base wl pgl p ofn osn oocc
+      Util.commit_patches conf base;
+      let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
+      History.record conf base changed "mp";
+      Update.delete_topological_sort_v conf base;
+      print_mod_ok conf base wl pgl p ofn osn oocc
   in
   print_mod_aux conf base callback
 
@@ -1202,19 +1205,22 @@ let print_change_event_order conf base =
             with Not_found -> failwith "Sorting event")
           sorted_pevents []
       in
-      let p = Driver.gen_person_of_person p in
-      let p = { p with pevents } in
-      Driver.patch_person base p.key_index p;
-      let wl =
-        let a = Driver.poi base p.key_index in
-        let a =
-          { parents = Driver.get_parents a; consang = Driver.get_consang a }
+      if pevents = Driver.get_pevents p then
+        Update.redirect_unchanged conf base p
+      else
+        let p = Driver.gen_person_of_person p in
+        let p = { p with pevents } in
+        Driver.patch_person base p.key_index p;
+        let wl =
+          let a = Driver.poi base p.key_index in
+          let a =
+            { parents = Driver.get_parents a; consang = Driver.get_consang a }
+          in
+          let u = Driver.poi base p.key_index in
+          let u = { family = Driver.get_family u } in
+          all_checks_person base p a u
         in
-        let u = Driver.poi base p.key_index in
-        let u = { family = Driver.get_family u } in
-        all_checks_person base p a u
-      in
-      Util.commit_patches conf base;
-      let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
-      History.record conf base changed "mp";
-      print_change_event_order_ok conf base wl p
+        Util.commit_patches conf base;
+        let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
+        History.record conf base changed "mp";
+        print_change_event_order_ok conf base wl p

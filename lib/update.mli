@@ -175,3 +175,10 @@ val print_create_conflict :
 val print_order_changed :
   config -> ('a array -> bool array -> unit) -> 'a array -> 'a array -> unit
 (** [print_order_changed conf print_list before after] *)
+
+val redirect_unchanged :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
+(** [redirect_unchanged conf base p] answers a form submitted without any change
+    with a temporary redirection to the page of [p], addressed by key or by
+    index according to [access_by_key], with [nomod=1] so the page shows a "no
+    modification" notification. *)
