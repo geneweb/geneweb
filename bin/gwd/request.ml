@@ -311,7 +311,7 @@ let treat_request =
           ~title:(Util.transl conf "NOTIF_TT unknown base")
           (Printf.sprintf
              (Util.ftransl conf "NOTIF unknown base %s")
-             conf.bname);
+             (Util.escape_html conf.bname :> string));
         let conf = Notif.inject_pending conf in
         try Templ.output_simple conf Templ.Env.empty "index"
         with _ -> GWPARAM.output_error conf Code.Not_Found)
@@ -835,7 +835,7 @@ let treat_request =
                         (Util.transl conf "NOTIF_TT incorrect request"))
                    (Printf.sprintf
                       (Util.ftransl conf "NOTIF incorrect request %s")
-                      m);
+                      (Util.escape_html m :> string));
                  let conf = Notif.inject_pending conf in
                  SrcfileDisplay.print_welcome conf base)
               conf bfile)
