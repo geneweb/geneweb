@@ -11,6 +11,11 @@
  (libraries geneweb geneweb_compat))
 
 (library
+ (public_name geneweb.robot_state)
+ (name robot_state)
+ (modules robot_state))
+
+(library
  (public_name geneweb.gwd_lib)
  (name gwd_lib)
  (libraries
@@ -18,6 +23,7 @@
   geneweb.oidc
   geneweb_http
   geneweb_register
+  robot_state
   digestif
   dune-site
   dune-site.plugins
