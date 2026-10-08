@@ -725,6 +725,16 @@ document.addEventListener('DOMContentLoaded', () => {
 %include;js_notif
 </script>
 %end;
+%if;(e.m="" and e.other_names="on")
+<script>
+(function(){
+  var u=new URL(location.href);
+  u.searchParams.delete('other_names');
+  u.searchParams.delete('pn');
+  history.replaceState(null,'',u);
+})();
+</script>
+%end;
 %if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
 <script>
 function initializeLazyModules() {
