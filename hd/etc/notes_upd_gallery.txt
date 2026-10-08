@@ -129,7 +129,7 @@ li.in { background-color: #FFE8CC; }
           <label for="fnotes_name" class="col-sm-2 col-form-label">[*name]</label>
           <div class="col-sm-10">
             <input type="text" class="form-control" id="fnotes_name"
-              required pattern="[^/\\?\s]+"
+              required pattern="[^\/\\?\s]+"
               placeholder="ex: famille_dupont_1900">
           </div>
         </div>
