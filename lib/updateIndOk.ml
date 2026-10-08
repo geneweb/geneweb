@@ -847,6 +847,8 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   let ofn = Driver.p_first_name base op in
   let osn = Driver.p_surname base op in
   let oocc = Driver.get_occ op in
+  if (List.assoc_opt "nsck" conf.env :> string option) <> Some "on" then
+    check_sex_married ?prerr conf base sp op;
   (if
      (not (String.equal ofn sp.first_name && String.equal osn sp.surname))
      || oocc <> sp.occ
@@ -859,8 +861,6 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
      | _ ->
          Image.rename_portrait_and_blason conf base op
            (sp.first_name, sp.surname, sp.occ));
-  if (List.assoc_opt "nsck" conf.env :> string option) <> Some "on" then
-    check_sex_married ?prerr conf base sp op;
   let created_p = ref [] in
   let np =
     Futil.map_person_ps
