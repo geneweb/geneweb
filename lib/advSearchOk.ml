@@ -172,15 +172,16 @@ let advanced_search conf base max_answers =
     | Some (Adef.Dgreg (d1, _)), Some (Adef.Dgreg (d2, _)) -> (
         match df () with
         | Some (Adef.Dgreg (d, _)) ->
-            Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
+            Date.compare_dmy_period d d1 >= 0
+            && Date.compare_dmy_period d d2 <= 0
         | _ -> false)
     | Some (Dgreg (d1, _)), _ -> (
         match df () with
-        | Some (Dgreg (d, _)) -> Date.compare_dmy d d1 >= 0
+        | Some (Dgreg (d, _)) -> Date.compare_dmy_period d d1 >= 0
         | _ -> false)
     | _, Some (Dgreg (d2, _)) -> (
         match df () with
-        | Some (Dgreg (d, _)) -> Date.compare_dmy d d2 <= 0
+        | Some (Dgreg (d, _)) -> Date.compare_dmy_period d d2 <= 0
         | _ -> false)
     | _ -> empty_default_value
   in
@@ -340,21 +341,21 @@ let advanced_search conf base max_answers =
         test_date_place (fun fam ->
             match Date.od_of_cdate (Driver.get_marriage fam) with
             | Some (Dgreg (_, _) as d) ->
-                if Date.compare_date d d1 < 0 then false
-                else if Date.compare_date d2 d < 0 then false
+                if Date.compare_date_period d d1 < 0 then false
+                else if Date.compare_date_period d2 d < 0 then false
                 else true
             | _ -> false)
     | Some d1, _ ->
         test_date_place (fun fam ->
             match Date.od_of_cdate (Driver.get_marriage fam) with
             | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-                if Date.compare_date d d1 < 0 then false else true
+                if Date.compare_date_period d d1 < 0 then false else true
             | _ -> false)
     | _, Some d2 ->
         test_date_place (fun fam ->
             match Date.od_of_cdate (Driver.get_marriage fam) with
             | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-                if Date.compare_date d d2 > 0 then false else true
+                if Date.compare_date_period d d2 > 0 then false else true
             | _ -> false)
     | _ ->
         if y = [] then empty_default_value else test_date_place (fun _ -> true)
