@@ -51,6 +51,8 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** There is a possibility that two families are a duplicate of each other *)
   | PossibleDuplicateFamHomonymous of 'family * 'family * 'person
       (** There is a possibility that two families are a duplicate of each other (Homonymous spouse) *)
+  | PossibleDuplicateFamQuestString of 'family * 'family * 'person
+      (** There is a possibility that two families are a duplicate of each other (? ? spouse) *)
   | PWitnessEventAfterDeath of 'person * 'pevent * 'person
       (** Witness is dead before personal event date *)
   | PWitnessEventBeforeBirth of 'person * 'pevent * 'person

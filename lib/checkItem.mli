@@ -62,3 +62,8 @@ val person_warnings :
     and [CheckItem.check_siblings] on they children
     using [auth_warning] for filtering.
 *)
+
+val has_multiple_quest_strings_named_spouses :
+  Gwdb.base -> Gwdb.person -> Gwdb.ifam array -> bool
+
+val is_quest_string_named : Gwdb.person -> bool

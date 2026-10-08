@@ -1256,6 +1256,16 @@ and mk_warning conf base =
             get_fam ifam2;
             unsafe_mk_person conf base p;
           ]
+    | PossibleDuplicateFamQuestString (ifam1, _ifam2, p) ->
+        let named_spouse =
+          Gwdb.poi base @@ Gutil.spouse (Gwdb.get_iper p) (Gwdb.foi base ifam1)
+        in
+        Jingoo.Jg_types.Tset
+          [
+            Jingoo.Jg_types.Tsafe "PossibleDuplicateFamQuestString";
+            unsafe_mk_person conf base p;
+            unsafe_mk_person conf base named_spouse;
+          ]
 
 let module_OPT =
   let map =
