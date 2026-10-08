@@ -19507,6 +19507,30 @@ sk: referenciou „Sosa“
 sv: annummer
 tr: aile ağacı kökü
 
+    remember source
+de: Quelle merken
+en: remember source
+es: recordar la fuente
+fr: mémoriser la source
+it: ricorda la fonte
+nl: bron onthouden
+
+    remember source help
+de: in den nächsten Formularen dieses Browsers erneut vorschlagen
+en: suggest it again in the next forms of this browser
+es: volver a proponerla en los siguientes formularios de este navegador
+fr: la reproposer dans les prochains formulaires de ce navigateur
+it: riproporla nei prossimi moduli di questo browser
+nl: opnieuw voorstellen in de volgende formulieren van deze browser
+
+    sign with
+de: signieren mit
+en: sign with
+es: firmar con
+fr: signer avec
+it: firma con
+nl: ondertekenen met
+
     source/sources
 af: bron/bronne
 bg: източник/източници
