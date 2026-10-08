@@ -987,7 +987,9 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
          (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
          " " Name.forbidden_char);
     Output.print_sstring conf "</h3>\n";
-    List.iter (Output.printf conf "<p>%s</p>") !removed_string);
+    List.iter
+      (fun s -> Output.printf conf "<p>%s</p>" (Util.escape_html s :> string))
+      !removed_string);
   (* Si on a supprimé des relations, on les mentionne *)
   (match !deleted_relation with
   | [] -> ()
@@ -1032,13 +1034,19 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
        <span class=\"float-start ms-1\">%s/%s%s</span>\n\
        <br>"
       (Utf8.capitalize_fst (transl conf "old name"))
-      (transl conf ":") ofn osn soocc;
+      (transl conf ":")
+      (Util.escape_html ofn :> string)
+      (Util.escape_html osn :> string)
+      soocc;
     Output.printf conf
       "<span class=\"unselectable float-start\">%s%s</span>\n\
        <span class=\"float-start ms-1\">%s/%s%s</span>\n\
        <br>"
       (Utf8.capitalize_fst (transl conf "new name"))
-      (transl conf ":") nfn nsn snocc;
+      (transl conf ":")
+      (Util.escape_html nfn :> string)
+      (Util.escape_html nsn :> string)
+      snocc;
     Output.printf conf "<span>%s%s</span>"
       (Utf8.capitalize_fst (transl conf "linked pages"))
       (transl conf ":");

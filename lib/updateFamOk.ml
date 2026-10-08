@@ -1147,7 +1147,9 @@ let print_mod_ok conf base (wl, ml) cpl des =
          (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
          " " Name.forbidden_char);
     Output.print_sstring conf "</h3>\n";
-    List.iter (Output.printf conf "<p>%s</p>") !removed_string);
+    List.iter
+      (fun s -> Output.printf conf "<p>%s</p>" (Util.escape_html s :> string))
+      !removed_string);
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
@@ -1162,7 +1164,9 @@ let print_add_ok conf base (wl, ml) cpl des =
   if List.length !removed_string > 0 then (
     Output.printf conf "<h2 class=\"error\">%s</h2>\n"
       (Utf8.capitalize_fst (transl conf "forbidden char"));
-    List.iter (Output.printf conf "<p>%s</p>") !removed_string);
+    List.iter
+      (fun s -> Output.printf conf "<p>%s</p>" (Util.escape_html s :> string))
+      !removed_string);
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
