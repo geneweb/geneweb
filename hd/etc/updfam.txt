@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;" id="updform">
 <head>
-  <!-- $Id: updfam.txt v7.1 08/10/2026 01:59:36 $ -->
+  <!-- $Id: updfam.txt v7.1 14/10/2026 01:59:36 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -746,12 +746,12 @@
 
   <div class="card">
     %apply;card_header("sources","source/sources")
+    <input type="hidden" name="dsrc" id="dsrc" value="">
     <div class="card-body">
       <div class="row">
         <label for="psrc" class="col-sm-2 col-form-label">[[*person/persons]1]</label>
         <div class="col-sm-10">
-          <textarea class="form-control" rows="1" name="psrc" id="psrc" placeholder="[*source/sources]1 [person/persons]1" %datalist_sources;>%nn;
-            %if;(evar_psrc!="")%evar_psrc;%elseif;(not roglo)%evar_dsrc;%end;%nn;
+          <textarea class="form-control" rows="1" name="psrc" id="psrc" placeholder="[*source/sources]1 [person/persons]1" %datalist_sources;>
           </textarea>
         </div>
       </div>
