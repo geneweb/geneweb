@@ -1916,7 +1916,7 @@ let rec handle_search_results alias_cache conn conf base query fn_options
     List.filter
       (fun ip ->
         let p = Driver.poi base ip in
-        GWPARAM.p_auth conf base p
+        GWPARAM.p_auth_sp conf base p
         && match oc_filter with None -> true | Some n -> Driver.get_occ p = n)
       ipers
   in
