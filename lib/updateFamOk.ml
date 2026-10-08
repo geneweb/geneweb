@@ -1346,10 +1346,11 @@ let print_add_parents o_conf base =
             let ffam = Driver.get_family @@ Driver.poi base fath in
             let mfam = Driver.get_family @@ Driver.poi base moth in
             let rec loop i =
-              if i = -1 then print_add o_conf base
+              if i < 0 then print_add o_conf base
               else
                 let ifam = Array.unsafe_get ffam i in
                 if Array.exists (( = ) ifam) mfam then (
+                  with_lock conf @@ fun () ->
                   let f = Driver.foi base ifam in
                   let sfam = Driver.gen_family_of_family f in
                   let o_f = Util.string_gen_family base sfam in
@@ -1384,7 +1385,7 @@ let print_add_parents o_conf base =
                   print_mod_ok conf base (!wl, []) scpl sdes)
                 else loop (i - 1)
             in
-            loop (Array.length ffam)
+            loop (Array.length ffam - 1)
         | _ -> print_add o_conf base)
     | _ -> print_add o_conf base
   else print_add o_conf base
