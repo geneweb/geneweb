@@ -11,6 +11,8 @@ let pb_cnt = size * draw_rep * draw_len
 let default_width = 60
 let default_empty = '.'
 let default_full = '#'
+let stdout_is_tty = Unix.isatty Unix.stdout
+let stderr_is_tty = Unix.isatty Unix.stderr
 
 type t = {
   ppf : Format.formatter;
@@ -41,6 +43,7 @@ let finish t =
 
 let with_bar ?(width = default_width) ?(empty = default_empty)
     ?(full = default_full) ?(disabled = false) ppf f =
+  let disabled = disabled || not stdout_is_tty in
   let t = { ppf; width; empty; full; disabled; last_output = 0. } in
   if not disabled then (
     Format.pp_print_flush t.ppf ();
@@ -48,30 +51,33 @@ let with_bar ?(width = default_width) ?(empty = default_empty)
   else f t
 
 let start () =
-  for _i = 1 to size do
-    Printf.eprintf "%c" !empty
-  done;
-  Printf.eprintf "\013"
+  if stderr_is_tty then (
+    for _i = 1 to size do
+      Printf.eprintf "%c" !empty
+    done;
+    Printf.eprintf "\013")
 
 let run cnt max_cnt =
-  let pb_cnt = if max_cnt < pb_cnt then size * draw_len else pb_cnt in
-  let already_disp = cnt * size / max_cnt in
-  let to_disp = (cnt + 1) * size / max_cnt in
-  for _i = already_disp + 1 to to_disp do
-    Printf.eprintf "%c" !full
-  done;
-  let already_disp = cnt * pb_cnt / max_cnt in
-  let to_disp = (cnt + 1) * pb_cnt / max_cnt in
-  (if cnt = max_cnt - 1 then Printf.eprintf " \008"
-   else if to_disp > already_disp then
-     let k = to_disp mod draw_len in
-     let k = if k < 0 then draw_len + k else k in
-     Printf.eprintf "%c\008" draw.[k]);
-  flush stderr
+  if stderr_is_tty then (
+    let pb_cnt = if max_cnt < pb_cnt then size * draw_len else pb_cnt in
+    let already_disp = cnt * size / max_cnt in
+    let to_disp = (cnt + 1) * size / max_cnt in
+    for _i = already_disp + 1 to to_disp do
+      Printf.eprintf "%c" !full
+    done;
+    let already_disp = cnt * pb_cnt / max_cnt in
+    let to_disp = (cnt + 1) * pb_cnt / max_cnt in
+    (if cnt = max_cnt - 1 then Printf.eprintf " \008"
+     else if to_disp > already_disp then
+       let k = to_disp mod draw_len in
+       let k = if k < 0 then draw_len + k else k in
+       Printf.eprintf "%c\008" draw.[k]);
+    flush stderr)
 
 let suspend () =
-  Printf.eprintf "%c\n" !full;
-  flush stderr
+  if stderr_is_tty then (
+    Printf.eprintf "%c\n" !full;
+    flush stderr)
 
 let restart cnt max_cnt =
   start ();
@@ -80,5 +86,6 @@ let restart cnt max_cnt =
   done
 
 let finish () =
-  Printf.eprintf "\n";
-  flush stderr
+  if stderr_is_tty then (
+    Printf.eprintf "\n";
+    flush stderr)

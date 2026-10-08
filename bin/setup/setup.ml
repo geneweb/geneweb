@@ -20,7 +20,6 @@ let gwd_port = ref 2317
 let default_lang = ref "en"
 let setup_dir = ref "."
 let bin_dir = ref default_bin_dir
-let launch_dir = ref "."
 let lang_param = ref ""
 let bname = ref ""
 let no_o = ref true
@@ -139,16 +138,12 @@ let header_no_page_title conn conf title =
   Output.print_sstring printer_conf "</title></head><body>"
 
 let abs_setup_dir () =
-  if Filename.is_relative !setup_dir then
-    Filename.concat (Sys.getcwd ()) !setup_dir
+  if Filename.is_relative !setup_dir then Sys.getcwd () // !setup_dir
   else !setup_dir
 
 (** Resolve a base name against [!bases_dir]. Absolute paths pass through. *)
 let base_path name =
-  if Filename.is_relative name then
-    let bases_dir = get_bases_dir () in
-    bases_dir // name
-  else name
+  if Filename.is_relative name then get_bases_dir () // name else name
 
 let trailer conn _conf =
   let printer_conf = printer_conf conn in
@@ -331,9 +326,6 @@ let parse_upto lim =
         Buff.get len
     | Some '\\' -> (
         Stream.junk strm__;
-        (match Stream.peek strm__ with
-        | Some c -> Printf.eprintf "backslash followed by %C\n%!" c
-        | None -> Printf.eprintf "backslash at eof\n%!");
         match Stream.peek strm__ with
         | Some '\r' ->
             Stream.junk strm__;
@@ -644,6 +636,7 @@ let rec copy_from_stream conf print strm =
               (* depending on when %f is called, conf may be sketchy *)
               (* conf will know bvars from basename.gwf and evars from url *)
               copy_from_stream conf print (Stream.of_string s)
+          | 'c' -> print comm_log
           | 'g' -> print_specific_file conf print comm_log strm
           | 'h' ->
               print "<input type=hidden name=lang value=";
@@ -666,10 +659,7 @@ let rec copy_from_stream conf print strm =
                    conf.env)
                 strm
           | 'l' -> print conf.lang
-          | 'r' ->
-              print_specific_file conf print
-                (Filename.concat !setup_dir "gwd.arg")
-                strm
+          | 'r' -> print_specific_file conf print (!setup_dir // "gwd.arg") strm
           | 's' -> for_all conf print (selected conf.env) strm
           | 't' -> print_if conf print (not Sys.unix) strm
           | 'v' ->
@@ -678,7 +668,7 @@ let rec copy_from_stream conf print strm =
                 let s = strip_spaces (s_getenv conf.env "bd") in
                 if s = "" then get_bases_dir () else s
               in
-              let base = Filename.concat bd out in
+              let base = bd // out in
               print_if conf print (Sys.file_exists (base ^ ".gwb")) strm
           | 'z' -> print (string_of_int !port)
           | ('A' .. 'Z' | '0' .. '9') as c -> (
@@ -695,9 +685,9 @@ let rec copy_from_stream conf print strm =
               (* | 'F' see 'V' *)
               (* the current directory may have changes with -bd *)
               | 'G' ->
-                  print_specific_file_tail conf print
-                    (Filename.concat !launch_dir "gwsetup.log")
-                    strm
+                  let fname = GWPARAM.tmp_d () // "gwsetup.log" in
+                  print ("File: " ^ fname ^ "\n");
+                  print_specific_file_tail conf print fname strm
               | 'H' ->
                   (* print the content of -o filename, prepend bname *)
                   let outfile = strip_spaces (s_getenv conf.env "o") in
@@ -751,8 +741,7 @@ let rec copy_from_stream conf print strm =
                   let outfile2 = strip_spaces (s_getenv conf.env "o1") in
                   let outfile =
                     if outfile2 <> "" then outfile2
-                    else if bname <> "" then
-                      Filename.concat (bname ^ ".gwb") outfile1
+                    else if bname <> "" then (bname ^ ".gwb") // outfile1
                     else outfile1
                   in
                   print outfile
@@ -868,9 +857,9 @@ and print_selector conf print =
             else if sel.[String.length sel - 1] <> '\\' then
               Filename.dirname sel ^ "\\"
             else Filename.dirname sel
-          else Filename.concat sel x
+          else sel // x
         in
-        let x = if is_directory d then Filename.concat x "" else x in
+        let x = if is_directory d then x // "" else x in
         (d, x))
       list
   in
@@ -1232,12 +1221,11 @@ let cleanup_1 conn conf =
     Printf.eprintf "$ del %s\\%s\\*.*\n" old_dir in_base_dir;
     Printf.eprintf "$ rmdir %s\\%s\n" old_dir in_base_dir);
   flush stderr;
-  (try Mutil.rm_rf (Filename.concat old_dir in_base_dir)
-   with Sys_error _ -> ());
+  (try Mutil.rm_rf (old_dir // in_base_dir) with Sys_error _ -> ());
   if Sys.unix then Printf.eprintf "$ mv %s %s/.\n" in_base_dir_path old_dir
   else Printf.eprintf "$ move %s %s\\.\n" in_base_dir_path old_dir;
   flush stderr;
-  Sys.rename in_base_dir_path (Filename.concat old_dir in_base_dir);
+  Sys.rename in_base_dir_path (old_dir // in_base_dir);
   let rc1 =
     exec_f conf ~path:(!bin_dir // "gwc") [ tmp_gw; "-nofail"; "-o"; in_base ]
   in
@@ -1310,13 +1298,13 @@ let rename conn conf =
             String.sub filename (String.length k1)
               (String.length filename - String.length k1)
           in
-          let old_path = Filename.concat dir filename in
-          let new_path = Filename.concat dir (v1 ^ suffix) in
+          let old_path = dir // filename in
+          let new_path = dir // (v1 ^ suffix) in
           Unix.rename old_path new_path;
           if Filename.remove_extension filename = k then
             let ext = Filename.extension filename in
-            let old_path = Filename.concat dir filename in
-            let new_path = Filename.concat dir (v ^ ext) in
+            let old_path = dir // filename in
+            let new_path = dir // (v ^ ext) in
             Unix.rename old_path new_path))
       files
   in
@@ -1814,7 +1802,6 @@ let intro () =
   parse_cmd ();
   setup_log ~debug:!debug;
   if !bin_dir = "" then bin_dir := !setup_dir;
-  launch_dir := Sys.getcwd ();
   (* All tool invocations inject -bd via exec_f so they find bases in
      bases_dir regardless of cwd. *)
   Secure.set_base_dir @@ get_bases_dir ();
