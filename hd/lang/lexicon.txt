@@ -9355,6 +9355,34 @@ sl: družina spremenjena
 sv: familj ändrad
 tr: aile değiştirildi
 
+    sign with
+en: sign with
+fr: signer avec
+
+    sign with source help
+en: sign and provide source information (edit by hand the test "Source?" with the actuel source)
+fr: signer en précisant la source (remplacer manuellement le texte "Source?" apr la source concernée)
+
+    sign with source
+en: sign and provide source
+fr: signer en précisant la source
+
+    clear source memory
+en: clear source memory
+fr: supprimer la source mémorisée
+
+    clear source memory help
+en: clear source memory
+fr: supprimer la source mémorisée
+
+    remember source
+en: remember source
+fr: se souvenir de la source
+
+    remember source help
+en: further updates will automatically insert this source
+fr: les mises à jour qui suivent inséreront automatiquement cette source
+
     family source
 co: fonte di famiglia
 de: Quellenangabe-Familie

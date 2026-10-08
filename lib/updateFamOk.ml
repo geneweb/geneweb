@@ -1028,7 +1028,10 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
 let print_family conf base (wl, ml) cpl des =
   let rdsrc =
     match p_getenv conf.env "rdsrc" with
-    | Some "on" -> p_getenv conf.env "src"
+    | Some "on" -> (
+        match p_getenv conf.env "dsrc" with
+        | Some s when s <> "" -> Some s
+        | Some _ | None -> p_getenv conf.env "src")
     | Some _ | None -> p_getenv conf.env "dsrc"
   in
   (match rdsrc with
