@@ -1,0 +1,48 @@
+<!-- $Id: upd_sign.txt v7.1 08/10/2026 $ -->
+%let;sig;%[%[w:%user.ident;%]%]%in;
+%let;sdate;%today.day;/%apply;nth%with;/I/II/III/IV/V/VI/VII/VIII/IX/X/XI/XII%and;%today.month;%end;/%today.year;%in;
+<div class="d-flex align-items-center gap-1 mt-2" id="sign">
+  <button type="button" class="btn btn-sm btn-outline-secondary bg-danger-subtle text-nowrap"
+    data-sig="%sig;" data-date="%sdate;">[*sign with][:]</button>
+  <span class="text-nowrap">%sig; (</span>
+  <input type="text" class="form-control form-control-sm" id="sign_src"
+    aria-label="[*source/sources]0" placeholder="Source?">
+  <span class="text-nowrap">) %sdate;</span>
+  <div class="form-check text-nowrap ms-3" title="[*remember source help]">
+    <input class="form-check-input" type="checkbox" id="sign_keep">
+    <label class="form-check-label" for="sign_keep">[*remember source]</label>
+  </div>
+</div>
+<script>
+(() => {
+  const key = 'gw_sign_src';
+  const btn = document.querySelector('#sign button');
+  const src = document.getElementById('sign_src');
+  const keep = document.getElementById('sign_keep');
+  const save = () => {
+    try {
+      if (keep.checked && src.value.trim()) localStorage.setItem(key, src.value.trim());
+      else localStorage.removeItem(key);
+    } catch (e) {}
+  };
+  try { src.value = localStorage.getItem(key) || ''; } catch (e) {}
+  keep.checked = src.value !== '';
+  src.addEventListener('keydown', e => {
+    if (e.key === 'Enter') e.preventDefault();
+  });
+  btn.addEventListener('click', () => {
+    const txt = src.value.trim();
+    const sig = btn.dataset.sig + ' (' + (txt || 'Source?') + ') ' + btn.dataset.date;
+    'src,psrc'.split(',').forEach(id => {
+      const f = document.getElementById(id);
+      if (!f) return;
+      const cur = f.value.trim();
+      f.value = cur ? cur + ', ' + sig : sig;
+      f.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    save();
+  });
+  keep.addEventListener('change', save);
+  src.addEventListener('input', save);
+})();
+</script>

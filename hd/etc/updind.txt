@@ -971,6 +971,9 @@
           <span class="visually-hidden fw-bold">[*validate/delete]0</span>
         </button>
       </div>
+      %if;roglo;
+        %include;upd_sign
+      %end;
     </div>
   </div>
 
