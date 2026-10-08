@@ -25,6 +25,8 @@ let config_reorg bname =
 let config_legacy bname =
   String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwf" ]
 
+let tmp_d () = Filename.concat (Secure.base_dir ()) "tmp"
+
 type my_fun_2 = string -> string
 type my_fun_3 = string -> string -> string
 

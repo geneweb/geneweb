@@ -15,6 +15,9 @@ val force : bool ref
 val config_reorg : string -> string
 val config_legacy : string -> string
 
+val tmp_d : unit -> string
+(** Shared temporary directory [<bases_dir>/tmp], used for log files. *)
+
 type my_fun_2 = string -> string
 type my_fun_3 = string -> string -> string
 

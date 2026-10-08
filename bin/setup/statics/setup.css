@@ -9,6 +9,8 @@
 
 pre {
   font-family: monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 a.j {

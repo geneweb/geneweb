@@ -92,19 +92,19 @@ main() {
     kill_process '/gwsetup'
     
     # Prepare directories and logs
-    mkdir -p "$BASES_DIR"
+    mkdir -p "$BASES_DIR/tmp"
     cd "$BASES_DIR"
-    rotate_log "gwsetup.log"
-    rotate_log "gwd.log"
+    rotate_log "tmp/gwsetup.log"
+    rotate_log "tmp/gwd.log"
     
     # Start gwsetup
     msg "start_gwsetup"
-    "$SCRIPT_DIR/gw/gwsetup" -gd "$SCRIPT_DIR/gw" -lang "$LANG" > gwsetup.log 2>&1 &
+    "$SCRIPT_DIR/gw/gwsetup" -gd "$SCRIPT_DIR/gw" -lang "$LANG" > tmp/gwsetup.log 2>&1 &
     check_process '/gwsetup' "gwsetup"
     
     # Start gwd
     msg "start_gwd"
-    "$SCRIPT_DIR/gw/gwd" -bd "$BASES_DIR" -hd "$SCRIPT_DIR/gw" > "$SCRIPT_DIR/gw/gwd.log" 2>&1 &
+    "$SCRIPT_DIR/gw/gwd" -bd "$BASES_DIR" -hd "$SCRIPT_DIR/gw" > tmp/gwd.log 2>&1 &
     check_process '/gwd' "gwd"
     
     # Success message
