@@ -64,6 +64,17 @@ gwd: ## Build ondy gwd/gwc executables
 	dune build @bin/gwd/all @bin/gwc/all
 	@printf "Done."
 
+install: ## Install geneweb into the current opam switch (needed for gwtolatex, which depends on the pinned geneweb library)
+	@printf "\n\033[1;1mInstalling geneweb into opam switch\033[0m\n"
+	dune build @install
+	dune install
+	@printf "Done.\n"
+
+uninstall: ## Remove geneweb from the current opam switch
+	@printf "\n\033[1;1mUninstalling geneweb from opam switch\033[0m\n"
+	dune uninstall
+	@printf "Done.\n"
+
 distrib: ## Build the project and copy what is necessary for distribution
 	dune build --release @bin/all @lib/all
 	@printf "Done.\n"
