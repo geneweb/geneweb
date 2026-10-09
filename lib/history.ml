@@ -435,6 +435,12 @@ let rec eval_var conf base env _ _ = function
       match get_env "info" env with
       | Vinfo (s, _, _, _, _) -> VVstring (possibly_highlight env s)
       | _ -> raise Not_found)
+  | [ "time_epoch" ] -> (
+      match get_env "info" env with
+      | Vinfo (s, _, _, _, _) ->
+          VVstring
+            (Option.fold ~none:"" ~some:string_of_int (Mutil.epoch_of_date s))
+      | _ -> VVstring "")
   | "update" :: sl -> (
       match get_env "info" env with
       | Vinfo (_, u, _, _, _) -> eval_string u sl

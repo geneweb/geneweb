@@ -76,6 +76,15 @@ let mutil_string_of_int_sep _ =
   test "," "100,000" 100000;
   test "," "1,000,000" 1000000
 
+let mutil_epoch_of_date _ =
+  let e = 1760000000 in
+  let s = (Mutil.sprintf_date (Unix.localtime (float_of_int e)) :> string) in
+  (check (option int)) "Mutil.epoch_of_date" (Some e) (Mutil.epoch_of_date s);
+  (check (option int))
+    "Mutil.epoch_of_date invalid" None
+    (Mutil.epoch_of_date "1760000000");
+  ()
+
 let name_title _ =
   let test exp = List.iter (fun s -> (check string) "" exp (Name.title s)) in
   test "Jean-Baptiste"
@@ -214,6 +223,7 @@ let v =
         test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
         test_case "Mutil particule" `Quick mutil_compare_after_particle;
         test_case "Mutil.string_of_int_sep" `Quick mutil_compare_after_particle;
+        test_case "Mutil.epoch_of_date" `Quick mutil_epoch_of_date;
       ] );
     ("name", [ test_case "Name.title" `Quick name_title ]);
     ( "utf8",

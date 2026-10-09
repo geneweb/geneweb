@@ -240,6 +240,10 @@ val sprintf_date : Unix.tm -> Adef.safe_string
 (** Print a date using "%04d-%02d-%02d %02d:%02d:%02d" format Example :
     2021-12-13 22:35:08. *)
 
+val epoch_of_date : string -> int option
+(** [epoch_of_date s] is the epoch of [s], a local time printed by
+    {!val:sprintf_date}, or [None] if [s] has another format. *)
+
 val rev_input_line : in_channel -> int -> bytes ref * int ref -> string * int
 (** [rev_input_line ic pos (rbytes, rpos)] Read characters in reverse order from
     the given input channel, until a newline character is encountered. Return

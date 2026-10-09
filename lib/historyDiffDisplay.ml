@@ -9,6 +9,9 @@ module Gutil = Geneweb_db.Gutil
 
 let escape_html s = (Util.escape_html s :> Adef.safe_string)
 
+let date_epoch_str (s : Adef.safe_string) =
+  Option.fold ~none:"" ~some:string_of_int (Mutil.epoch_of_date (s :> string))
+
 let print_clean conf =
   match p_getenv conf.env "f" with
   | Some f when f <> "" ->
@@ -513,6 +516,8 @@ and eval_compound_var conf base env (bef, aft, p_auth) sl : 'b Templ.expr_val =
 and eval_gen_record conf base env (bef, aft, p_auth) :
     string list -> 'a Templ.expr_val * 'b Templ.expr_val = function
   | [ "date" ] -> (safe_val bef.date, safe_val aft.date)
+  | [ "date_epoch" ] ->
+      (str_val (date_epoch_str bef.date), str_val (date_epoch_str aft.date))
   | [ "wizard" ] ->
       (safe_val bef.HistoryDiff.wizard, safe_val aft.HistoryDiff.wizard)
   | [ s ] -> eval_str_gen_record conf base env (bef, aft, p_auth) s
@@ -743,6 +748,7 @@ and eval_simple_str_var conf base env (bef, aft, p_auth) :
       |> acces conf base
       |> (safe_val :> Adef.escaped_string -> 'a Templ.expr_val)
   | "date" -> eval_string_env "date" env
+  | "date_epoch" -> eval_string_env "date_epoch" env
   | "history_len" -> eval_int_env "history_len" env
   | "line" -> eval_int_env "line" env
   | "nb_families" ->
@@ -918,6 +924,7 @@ let print_foreach conf base print_ast _eval_expr =
                 |> Templ.Env.add "line" (Vint i)
                 |> Templ.Env.add "date"
                      (Vstring (gr.date : Adef.safe_string :> string))
+                |> Templ.Env.add "date_epoch" (Vstring (date_epoch_str gr.date))
                 |> Templ.Env.add "wizard"
                      (Vstring
                         (gr.HistoryDiff.wizard : Adef.safe_string :> string))
