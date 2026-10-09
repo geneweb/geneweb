@@ -12,8 +12,10 @@
 - `--log '<stdout>'` is now rejected in CGI mode, including when the mode
   is inferred from `QUERY_STRING` (#2948).
 - The history pages (`m=HIST` and `m=HIST_DIFF`) display update timestamps,
-  recorded in the server's timezone, in the browser's timezone with
-  JavaScript. The history file format is unchanged.
+  recorded in the server's timezone, converted to the browser's timezone and
+  localized in the page language with JavaScript. The history file format is
+  unchanged. The history search query is translated the same way, so that it
+  matches the displayed timestamps.
 - The random person link (`rnd=1`) is resolved server-side, among the
   persons visible to the user, and honors `access_by_key`. On the A, C, D,
   F, LINKED and R tools it keeps the current tool.

@@ -204,7 +204,6 @@
 %include;trl
 %include;copyr
 </div>
-%include;hist_time
 %include;js
 %query_time;
 </body>

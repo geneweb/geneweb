@@ -855,6 +855,91 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 %end;
 %end;%( closing “e.templ” of the DOMContentLoaded blocks, not indented for convenience %)
+%( History pages (m=HIST, m=HIST_SEARCH, m=HIST_DIFF): update times are
+   recorded in the server's timezone; convert them to the browser's timezone
+   and localize them. The history search query is translated the same way,
+   so that it matches the displayed timestamps. %)
+%if;(e.m="HIST" or e.m="HIST_SEARCH" or e.m="HIST_DIFF")
+<script>
+(function () {
+  var serverTZ = '%server_timezone;';
+  if (!serverTZ) { return; }
+  var serverFmt;
+  try {
+    serverFmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: serverTZ,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23'
+    });
+  } catch (e) {
+    return;
+  }
+  var browserFmt = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hourCycle: 'h23'
+  });
+  var dateFmt;
+  try {
+    dateFmt = new Intl.DateTimeFormat(document.documentElement.lang || undefined, {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+  } catch (e) {
+    dateFmt = new Intl.DateTimeFormat(undefined, {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+  }
+  var parts = function (fmt, date) {
+    var m = fmt.format(date).match(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/);
+    return m ? [+m[3], +m[1], +m[2], +m[4], +m[5], +m[6]] : null;
+  };
+  var offset = function (fmt, date) {
+    var p = parts(fmt, date);
+    if (!p) { return 0; }
+    return Date.UTC(p[0], p[1] - 1, p[2], p[3], p[4], p[5]) - date.getTime();
+  };
+  var epochOf = function (fmt, y, mo, d, h, mi, s) {
+    var asUTC = Date.UTC(y, mo - 1, d, h, mi, s);
+    var ts = asUTC - offset(fmt, new Date(asUTC));
+    return asUTC - offset(fmt, new Date(ts));
+  };
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  var browserIso = function (ts) {
+    var d = new Date(ts);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  };
+  var serverIso = function (ts) {
+    var p = parts(serverFmt, new Date(ts));
+    if (!p) { return null; }
+    return p[0] + '-' + pad(p[1]) + '-' + pad(p[2]) + ' ' +
+      pad(p[3]) + ':' + pad(p[4]) + ':' + pad(p[5]);
+  };
+  document.querySelectorAll('.gw-hist-time').forEach(function (el) {
+    var m = el.textContent.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
+    if (!m) { return; }
+    var d = new Date(epochOf(serverFmt, +m[1], +m[2], +m[3], +m[4], +m[5], +m[6]));
+    el.textContent = dateFmt.format(d) + ', ' +
+      pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  });
+  var dtRe = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})(?::(\d{2}))?/g;
+  var translate = function (value, toServer) {
+    return value.replace(dtRe, function (w, y, mo, d, h, mi, s) {
+      var e = epochOf(toServer ? browserFmt : serverFmt, +y, +mo, +d, +h, +mi, s ? +s : 0);
+      var out = toServer ? serverIso(e) : browserIso(e);
+      return s ? out : out.slice(0, 16);
+    });
+  };
+  document.querySelectorAll('input[name="s"]').forEach(function (input) {
+    input.value = translate(input.value, false);
+    input.form.addEventListener('submit', function () {
+      input.value = translate(input.value, true);
+    });
+  });
+})();
+</script>
+%end;
 %end;%( closing initial “not cancel_links”, not indented either %)
 %( b.reduce_place=yes %)
 %if;(e.m="" and not is_welcome and b.reduce_place="yes")
