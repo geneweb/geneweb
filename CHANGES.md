@@ -43,6 +43,8 @@
   are rotated at startup (#3033).
 - `-only <file>` no longer aborts gwsetup at startup; it is deprecated
   and ignored (#3033).
+- `comm.log` is written next to `gwsetup.log` in the launch directory
+  instead of the shared temporary directory (#3033).
 
 ## Templates
 - Accessibility pass on the welcome, home, menubar, copyr and person

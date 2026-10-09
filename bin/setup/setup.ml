@@ -26,7 +26,7 @@ let no_o = ref true
 let command = ref ""
 let debug = ref false
 let daemon = ref false
-let comm_log = Filename.concat (Filename.get_temp_dir_name ()) "comm.log"
+let comm_log = Filename.concat (Sys.getcwd ()) "comm.log"
 let bases_dir = ref None
 let set_bases_dir s = bases_dir := Some s
 
