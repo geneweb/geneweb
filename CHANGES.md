@@ -36,8 +36,8 @@
 - Remove the `.gwf` parameters editor: it only handled the variables of
   its form and blanked the others on "Apply". Edit the `.gwf` file with a
   text editor (#2954, #2958).
-- `geneweb.sh` writes `gwsetup.log` and `gwd.log` to `bases/tmp/`, where
-  the gwsetup log page reads `gwsetup.log` (#2916).
+- `geneweb.sh` writes `gwd.log` next to `gwsetup.log` in `bases/`, so both
+  are rotated at startup (#3033).
 - Command result pages show the path of the log file and wrap long lines.
   Progress bars are no longer written when the output is redirected to a
   file (#2916).
