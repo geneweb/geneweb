@@ -281,6 +281,31 @@ function insertTags(tagOpen, tagClose, sampleText) {
   ta.focus();
   return false;
 }
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('notes-wide');
+  const ta = document.getElementById('notes_comments');
+  if (!btn || !ta) return;
+  const col = ta.parentElement;
+  const side = ta.closest('.row').lastElementChild;
+  const fit = () => {
+    if (btn.getAttribute('aria-pressed') !== 'true') return;
+    const gap = 2 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    ta.style.width = (document.documentElement.clientWidth - 2 * gap) + 'px';
+    ta.style.marginLeft = '0';
+    ta.style.marginLeft = (gap - ta.getBoundingClientRect().left) + 'px';
+  };
+  btn.addEventListener('click', () => {
+    const on = btn.getAttribute('aria-pressed') !== 'true';
+    btn.setAttribute('aria-pressed', on);
+    btn.classList.toggle('text-danger', on);
+    col.classList.toggle('col-9', !on);
+    side.classList.toggle('d-none', on);
+    ta.classList.toggle('ms-2', !on);
+    if (on) fit();
+    else ta.style.width = ta.style.marginLeft = '';
+  });
+  window.addEventListener('resize', fit);
+});
 %if;(e.templ="")
 document.addEventListener('click', function(event) {
   const a = event.target.closest('.ch a');
