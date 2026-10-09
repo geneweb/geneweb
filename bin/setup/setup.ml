@@ -625,9 +625,8 @@ let rec copy_from_stream conf print strm =
                   | None -> ())
               | 'D' -> print (transl conf "!doc")
               (* | 'F' see 'V' *)
-              (* the current directory may have changes with -bd *)
               | 'G' ->
-                  let fname = GWPARAM.tmp_d () // "gwsetup.log" in
+                  let fname = Sys.getcwd () // "gwsetup.log" in
                   print ("File: " ^ fname ^ "\n");
                   print_specific_file_tail conf print fname strm
               | 'H' ->
