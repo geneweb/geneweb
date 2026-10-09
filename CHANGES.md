@@ -33,6 +33,14 @@
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
   IPv6 loopback only on Windows.
+- Remove the `.gwf` parameters editor: it only handled the variables of
+  its form and blanked the others on "Apply". Edit the `.gwf` file with a
+  text editor (#2954, #2958).
+- `geneweb.sh` writes `gwsetup.log` and `gwd.log` to `bases/tmp/`, where
+  the gwsetup log page reads `gwsetup.log` (#2916).
+- Command result pages show the path of the log file and wrap long lines.
+  Progress bars are no longer written when the output is redirected to a
+  file (#2916).
 
 ## Templates
 - Accessibility pass on the welcome, home, menubar, copyr and person
