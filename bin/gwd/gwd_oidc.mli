@@ -3,14 +3,23 @@ val enabled : (string * string) list -> bool
     i.e. OIDC is turned on (even if other required keys are still missing). *)
 
 val cookie_access :
-  secret:string -> string list -> string -> (char * string * string) option
-(** Access ([w]/[f], user, username) from a valid signed OIDC session cookie in
-    [request] for the base, or [None]. [secret] keys the cookie's HMAC. *)
+  secret:string ->
+  string list ->
+  string ->
+  (char * string * string * int) option
+(** Access ([w]/[f], user, username) and absolute session deadline ([0] = no
+    absolute limit) from a valid signed OIDC session cookie in [request] for the
+    base, or [None]. [secret] keys the cookie's HMAC. *)
 
 val session_timeout : (string * string) list -> int
 (** OIDC session lifetime in seconds: [oidc_session_timeout] from the base
     environment when set to a positive integer, otherwise the global
     [login_timeout]. *)
+
+val session_max_age : (string * string) list -> int
+(** Absolute OIDC session lifetime in seconds: [oidc_session_max_age] from the
+    base environment when set to a positive integer, otherwise [0] (no absolute
+    limit). *)
 
 val renew_session :
   Geneweb.Config.config ->
@@ -18,10 +27,11 @@ val renew_session :
   acc:char ->
   user:string ->
   username:string ->
+  deadline:int ->
   unit
-(** Re-issue the OIDC session cookie with a renewed expiry (sliding session), so
-    the timeout applies to inactivity rather than to the time elapsed since
-    login. *)
+(** Re-issue the OIDC session cookie with a renewed expiry (sliding session) and
+    the unchanged absolute [deadline], so the idle timeout applies to inactivity
+    while the absolute lifetime bounds the session. *)
 
 val handle_mode :
   Geneweb_http.Connection.t -> Geneweb.Config.config -> string option -> bool

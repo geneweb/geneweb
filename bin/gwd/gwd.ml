@@ -1255,12 +1255,12 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     match access_type with
     | ATnone -> (
         match Gwd_oidc.cookie_access ~secret:secret_salt request base_file with
-        | Some (acc, user, username) ->
+        | Some (acc, user, username, deadline) ->
             let access_type =
               if acc = 'w' then ATwizard (user, username)
               else ATfriend (user, username)
             in
-            (true, Some (base_file, acc, user, username), access_type)
+            (true, Some (base_file, acc, user, username, deadline), access_type)
         | None -> (false, None, ATnone))
     | _ -> (false, None, access_type)
   in
@@ -1657,8 +1657,9 @@ let conf_and_connection =
           | _ -> (
               enable_gzip ();
               (match oidc_renew with
-              | Some (base_file, acc, user, username) ->
+              | Some (base_file, acc, user, username, deadline) ->
                   Gwd_oidc.renew_session conf ~base_file ~acc ~user ~username
+                    ~deadline
               | None -> ());
               try
                 let t1 = Unix.gettimeofday () in

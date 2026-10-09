@@ -818,3 +818,9 @@
 # this is an inactivity timeout, not a fixed delay since login. Defaults to
 # the global -login-timeout value (1800 seconds).
 #oidc_session_timeout=
+
+# Optional absolute limit in seconds on the OIDC session, counted from login:
+# once reached, the session is refused even if the user is active and they
+# must log in again. The sliding inactivity timeout above still applies before
+# that. Leave empty for no absolute limit.
+#oidc_session_max_age=

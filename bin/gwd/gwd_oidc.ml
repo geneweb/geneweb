@@ -48,17 +48,25 @@ let parse_login_cookie secret ~base_file value =
   | _ -> None
 
 (* The session is a signed, self-contained cookie (no server-side store):
-   base64url(base|acc|user|username|exp) plus an HMAC keyed by secret_salt. *)
+   base64url(base|acc|user|username|exp|deadline) plus an HMAC keyed by
+   secret_salt. [deadline] is the absolute session end (0 = none). *)
 
 let session_cookie_sig secret payload =
   Digestif.SHA256.(
     to_hex (hmac_string ~key:secret ("gw-oidc-sess-v1\000" ^ payload)))
 
-let make_session_cookie secret ~base_file ~acc ~user ~username ~exp =
+let make_session_cookie secret ~base_file ~acc ~user ~username ~exp ~deadline =
   let payload =
     Geneweb_oidc.Oidc.base64url_encode
       (String.concat "\000"
-         [ base_file; String.make 1 acc; user; username; string_of_int exp ])
+         [
+           base_file;
+           String.make 1 acc;
+           user;
+           username;
+           string_of_int exp;
+           string_of_int deadline;
+         ])
   in
   payload ^ "." ^ session_cookie_sig secret payload
 
@@ -68,11 +76,14 @@ let parse_session_cookie secret ~base_file value =
       match Geneweb_oidc.Oidc.base64url_decode payload with
       | Ok raw -> (
           match String.split_on_char '\000' raw with
-          | [ b; acc; user; username; exp_s ]
+          | [ b; acc; user; username; exp_s; deadline_s ]
             when b = base_file && String.length acc = 1 -> (
-              match int_of_string_opt exp_s with
-              | Some exp when float_of_int exp >= Unix.time () ->
-                  Some (acc.[0], user, username)
+              match (int_of_string_opt exp_s, int_of_string_opt deadline_s) with
+              | Some exp, Some deadline
+                when float_of_int exp >= Unix.time ()
+                     && (deadline = 0 || float_of_int deadline >= Unix.time ())
+                ->
+                  Some (acc.[0], user, username, deadline)
               | _ -> None)
           | _ -> None)
       | Error _ -> None)
@@ -241,7 +252,15 @@ let session_timeout base_env =
       | _ -> !Cmd_legacy.login_timeout)
   | None -> !Cmd_legacy.login_timeout
 
-let renew_session conf ~base_file ~acc ~user ~username =
+let session_max_age base_env =
+  match List.assoc_opt "oidc_session_max_age" base_env with
+  | Some v -> (
+      match int_of_string_opt (String.trim v) with
+      | Some n when n > 0 -> n
+      | _ -> 0)
+  | None -> 0
+
+let renew_session conf ~base_file ~acc ~user ~username ~deadline =
   match conf_secret conf with
   | "" -> ()
   | secret ->
@@ -249,6 +268,7 @@ let renew_session conf ~base_file ~acc ~user ~username =
       let exp = int_of_float (Unix.time ()) + timeout in
       let cookie =
         make_session_cookie secret ~base_file ~acc ~user ~username ~exp
+          ~deadline
       in
       set_cookie conf
         ~name:(session_cookie_name base_file)
@@ -418,11 +438,14 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
       Log.info (fun k ->
           k "login: base=%s user=%s access=%c from=%s" base_file claim_value acc
             from_addr);
+      let now = int_of_float (Unix.time ()) in
       let timeout = session_timeout base_env in
-      let exp = int_of_float (Unix.time ()) + timeout in
+      let max_age = session_max_age base_env in
+      let exp = now + timeout in
+      let deadline = if max_age > 0 then now + max_age else 0 in
       let cookie =
         make_session_cookie (conf_secret conf) ~base_file ~acc ~user:claim_value
-          ~username ~exp
+          ~username ~exp ~deadline
       in
       Output.status conf Code.Moved_Temporarily;
       clear_login_cookie conf base_file;
