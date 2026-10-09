@@ -17,6 +17,9 @@ GWD_BIN="$GWD_BIN"
 # This solution is to extensive and should be implemented later.
 GW_PREFIX="../../../../../install/default/share/geneweb/hd"
 
+# HACK: Always use english language for reproductibilty.
+export LANG="en.UTF-8"
+
 QUERY_STRING="${1-}"
 
 echo "=========== QUERY_STRING: $QUERY_STRING ========="
