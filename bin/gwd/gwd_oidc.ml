@@ -233,6 +233,27 @@ let clear_login_cookie conf base_file =
     ~name:(login_cookie_name base_file)
     ~value:"" ~max_age:(Some 0)
 
+let session_timeout base_env =
+  match List.assoc_opt "oidc_session_timeout" base_env with
+  | Some v -> (
+      match int_of_string_opt (String.trim v) with
+      | Some n when n > 0 -> n
+      | _ -> !Cmd_legacy.login_timeout)
+  | None -> !Cmd_legacy.login_timeout
+
+let renew_session conf ~base_file ~acc ~user ~username =
+  match conf_secret conf with
+  | "" -> ()
+  | secret ->
+      let timeout = session_timeout conf.base_env in
+      let exp = int_of_float (Unix.time ()) + timeout in
+      let cookie =
+        make_session_cookie secret ~base_file ~acc ~user ~username ~exp
+      in
+      set_cookie conf
+        ~name:(session_cookie_name base_file)
+        ~value:cookie ~max_age:(Some timeout)
+
 let send_redirect conf url =
   Output.header conf "Location: %s" url;
   (* empty body terminates the header block (bare headers do not) *)
@@ -397,7 +418,8 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
       Log.info (fun k ->
           k "login: base=%s user=%s access=%c from=%s" base_file claim_value acc
             from_addr);
-      let exp = int_of_float (Unix.time ()) + !Cmd_legacy.login_timeout in
+      let timeout = session_timeout base_env in
+      let exp = int_of_float (Unix.time ()) + timeout in
       let cookie =
         make_session_cookie (conf_secret conf) ~base_file ~acc ~user:claim_value
           ~username ~exp
@@ -406,7 +428,7 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
       clear_login_cookie conf base_file;
       set_cookie conf
         ~name:(session_cookie_name base_file)
-        ~value:cookie ~max_age:(Some !Cmd_legacy.login_timeout);
+        ~value:cookie ~max_age:(Some timeout);
       send_redirect conf base_url
 
 let request_is_post request = Mutil.extract_param "POST " ' ' request <> ""
