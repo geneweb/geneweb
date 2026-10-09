@@ -52,10 +52,12 @@ let print_anniversary_day conf base dead_people liste =
 
 let propose_months conf ?max_d mode =
   let is_cousins = p_getenv conf.env "m" = Some "C" in
+  let max_d = Option.value max_d ~default:250 in
   let d_val =
-    match p_getint conf.env "d" with Some d when d >= 0 -> d | _ -> 6
+    match p_getint conf.env "d" with
+    | Some d when d > 0 -> string_of_int d
+    | _ -> ""
   in
-  let max_d = match max_d with Some d -> d | None -> 250 in
   let sel_month =
     match p_getint conf.env "v" with
     | Some v when v >= 1 && v <= 12 -> v
@@ -88,9 +90,9 @@ method="get" action="%s">|}
   <div class="input-group flex-nowrap w-auto">
     <button type="button" class="btn btn-outline-secondary"
       onclick="var i=document.getElementById('d_deg');
-      i.value=Math.max(0,+i.value-1)">&minus;</button>
+      i.value=Math.max(1,+i.value-1)">&minus;</button>
     <input type="number" name="d" id="d_deg" class="form-control text-center"
-      value="%d" min="0" max="%d" style="width:4em">
+      value="%s" min="1" max="%d" placeholder="∞" style="width:4em">
     <button type="button" class="btn btn-outline-secondary"
       onclick="var i=document.getElementById('d_deg');
       i.value=Math.min(%d,+i.value+1)">+</button></div>|}
