@@ -3149,7 +3149,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       | _ -> VVbool false)
   | [ "is_visible" ] -> VVbool p_auth
   | [ "is_public" ] -> VVbool (Driver.get_access p = Public)
-  | [ "is_semi_public" ] -> VVbool (Driver.get_access p = SemiPublic)
+  | [ "is_semi_public" ] -> VVbool (GWPARAM.is_semi_public p)
   | [ "lev_cnt" ] -> (
       match get_env "lev_cnt" env with
       | Vint i -> str_val (string_of_int i)
@@ -4361,7 +4361,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "src" env with
       | Vstring s ->
           let always_show_link =
-            conf.wizard || (conf.friend && Driver.get_access p = SemiPublic)
+            conf.wizard
+            || (conf.friend && conf.consent && GWPARAM.is_semi_public p)
           in
           Notes.wiki_of_source conf base ~always_show_link p s |> str_val
       | _ -> null_val)

@@ -213,8 +213,10 @@ let refuse_log conf from =
 let only_log conf from =
   Log.info (fun k -> k "Connection refused from %s" from);
   http conf Code.OK;
-  Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
-  Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
+  Output.print_sstring conf
+    {|<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Invalid access</title></head>
+<body><h1>Invalid access</h1></body></html>|}
 
 let refuse_auth conf from auth auth_type =
   Log.info (fun k ->
@@ -404,7 +406,7 @@ let trace_auth base_env f =
     f oc;
     close_out oc)
 
-let unauth_server conf ar =
+let unauth_server conn conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
   Output.status conf Code.Unauthorized;
   if !digest_password then
@@ -431,46 +433,14 @@ let unauth_server conf ar =
       (if ar.ar_can_stale then ",stale=true" else "")
   else
     Output.header conf "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
-  let env =
-    List.fold_left
-      (fun l (k, v) ->
-        if k = "" || (k = "oc" && int_of_string (Mutil.decode v) = 0) then l
-        else (k ^ "=" ^ Mutil.decode v) :: l)
-      []
-      (conf.henv @ conf.senv @ conf.env)
-  in
-  let env = String.concat "&" env in
-  let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
-  let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
-  let title h =
-    Output.printf conf
-      (fcapitale (ftransl conf "%s access cancelled for that page"))
-      (if not h then "<em>" ^ typ ^ "</em>" else typ)
-  in
-  Hutil.header_without_http_nor_home conf title;
-  Output.print_sstring conf "<h1>\n";
-  title false;
-  Output.print_sstring conf "</h1>\n";
-  Output.print_sstring conf "<dl>\n";
-  (let alt_bind, alt_access =
-     if ar.ar_passwd = "w" then ("w=f", txt 2) else ("w=w", txt 0)
-   in
-   Output.print_sstring conf "<dd>\n";
-   Output.print_sstring conf "<ul>\n";
-   Output.print_sstring conf "<li>\n";
-   Output.printf conf {|%s : <a href="%s?%s%s%s">%s</a>|} (transl conf "access")
-     conf.bname env
-     (if env = "" then "" else "&")
-     alt_bind alt_access;
-   Output.print_sstring conf "</li>\n";
-   Output.print_sstring conf "<li>\n";
-   Output.printf conf {|%s : <a href="%s?%s">%s</a>|} (transl conf "access")
-     conf.bname env (txt 4);
-   Output.print_sstring conf "</li>\n";
-   Output.print_sstring conf "</ul>\n";
-   Output.print_sstring conf "</dd>\n");
-  Output.print_sstring conf "</dl>\n";
-  Hutil.trailer conf
+  Notif.error
+    ~title:(transl conf "NOTIF_TT access refused")
+    (transl conf "NOTIF access refused");
+  let bfile = Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb") in
+  Request.w_base ~none:ignore
+    (fun _ conf base -> SrcfileDisplay.print_welcome conf base)
+    conn conf
+    (if Sys.file_exists bfile then Some bfile else None)
 
 let gen_match_auth_file test_user_and_password auth_file base_file =
   if auth_file = "" then None
@@ -1292,7 +1262,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     | _ -> (false, access_type)
   in
   let lang, env = extract_assoc "lang" env in
-  let lang = if lang = "" then http_preferred_language request else lang in
+  let env = List.filter (fun (k, _) -> k <> "notif") env in
   let lang = alias_lang lang in
   let from, env =
     let x, env = extract_assoc "opt" env in
@@ -1308,14 +1278,13 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     if base_file = "" then []
     else Util.read_base_env base_file (Option.get !gw_prefix) !debug
   in
-  let default_lang =
-    try
-      let x = List.assoc "default_lang" base_env in
-      if x = "" then !default_lang else x
-    with Not_found -> !default_lang
+  let base_lang =
+    match List.assoc_opt "default_lang" base_env with
+    | Some x when x <> "" -> x
+    | _ -> !default_lang
   in
   let browser_lang = http_preferred_language request in
-  let default_lang = if browser_lang = "" then default_lang else browser_lang in
+  let default_lang = if browser_lang = "" then base_lang else browser_lang in
   let vowels =
     match List.assoc_opt "vowels" base_env with
     | Some l ->
@@ -1386,6 +1355,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
       user = ar.ar_user;
       username;
       userkey = Name.lower userkey;
+      consent = false;
       user_iper = None;
       auth_scheme = ar.ar_scheme;
       command = ar.ar_command;
@@ -1395,6 +1365,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
          with Not_found -> green_color);
       lang = (if lang = "" then default_lang else lang);
       vowels;
+      base_lang;
       default_lang;
       browser_lang;
       default_sosa_ref;
@@ -1489,6 +1460,10 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
       predictable_mode;
     }
   in
+  if access_type = ATset && not (ar.ar_wizard || ar.ar_friend) then
+    Notif.error
+      ~title:(transl conf "NOTIF_TT access refused")
+      (transl conf "NOTIF access refused");
   (conf, ar)
 
 (* Filter to avoid logging requests that don't provide useful information *)
@@ -1674,7 +1649,7 @@ let conf_and_connection =
                 let on_exn _exn _bt = () in
                 Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
                     log_passwd_failed ar tm from request conf.bname);
-                unauth_server conf ar
+                unauth_server conn conf ar
               end
           | _ -> (
               enable_gzip ();

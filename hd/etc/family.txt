@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: family.txt v7.1 30/10/2017 13:28:29 -->
 <title>%nn;
@@ -22,7 +22,7 @@
 <body%body_prop;>
 %include;hed
 %include;perso_utils
-<a href="#content" class="visually-hidden visually-hidden-focusable">Skip navigation menu</a>
+<a href="#content" class="visually-hidden-focusable">[*skip to main content]</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
   %include;menubar
   %message_to_wizard;

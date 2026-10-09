@@ -32,23 +32,6 @@ let include_home_template conf =
   try Templ.output conf ifun Templ.Env.empty () "home"
   with Sys_error _ | Not_found -> error_cannot_access conf "home"
 
-let link_to_referer conf =
-  let referer = Util.get_referer conf in
-  let back = Utf8.capitalize_fst (Util.transl conf "back") in
-  (* Validate the scheme to block javascript: URIs that survive escape_html
-     and could be used as XSS vectors in an href attribute. *)
-  let referer_s = (referer :> string) in
-  let safe_scheme =
-    Util.starts_with referer_s "http://"
-    || Util.starts_with referer_s "https://"
-  in
-  if referer_s <> "" && safe_scheme then
-    ({|<a href="|} ^<^ referer
-     ^>^ {|" class="btn btn-sm btn-link p-0 border-0" title="|} ^ back
-     ^ {|"><i class="fa fa-arrow-left-long fa-fw fa-sm"></i></a>|}
-      :> Adef.safe_string)
-  else Adef.safe ""
-
 let header_without_http_nor_home conf title =
   let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
   (* conf.lang comes from the URL; escape it to prevent attribute injection
@@ -113,17 +96,6 @@ let header_with_title ?(error = false) ?(fluid = false) conf title =
     (if fluid then "<div class=\"container-fluid mx-3\">\n"
      else "<div class=\"container\">\n");
   Output.print_sstring conf (if error then "<h1 class=\"error\">" else "<h1>");
-  title false;
-  Output.print_sstring conf "</h1>\n"
-
-let header_without_home conf title =
-  let fluid = is_fluid conf in
-  Util.html conf;
-  header_without_http_nor_home conf title;
-  Output.print_sstring conf
-    (if fluid then "<div class=\"container-fluid mx-3\">\n"
-     else "<div class=\"container\">\n");
-  Output.print_sstring conf "<h1>";
   title false;
   Output.print_sstring conf "</h1>\n"
 

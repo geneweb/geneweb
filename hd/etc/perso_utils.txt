@@ -139,10 +139,6 @@
   <span class="far fa-circle-dot text-success me-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
 %end;
 
-%define;nav_with_sosa_ref(xxx)
-  [*navigation with %t as Sosa reference:::xxx]
-%end;
-
 %define;witness_relation(xxx, yyy)
   [*witness at marriage of %s and %s:::xxx:yyy]
 %end;
@@ -153,10 +149,6 @@
 
 %define;display_shared_parent(xxx)
   [*on %s's side:::xxx]
-%end;
-
-%define;nav_with_sosa_ref(xxx)
-  [*navigation with %t as Sosa reference:::xxx]%nn;
 %end;
 
 %define;thegen(xx)

@@ -31,6 +31,11 @@ val surname_not_found : Config.config -> string -> unit
 (** [surname_not_found conf x] renders a "surname not found" page for the given
     query [x]. *)
 
+val other_names_notif : Config.config -> string -> Config.config
+(** [other_names_notif conf pn] queues a dismissible info notification linking
+    to [m=S&pn=pn&other_names=on], the search listing every candidate for [pn],
+    and returns [conf] with it injected (see {!Notif.inject_pending}). *)
+
 val persons_of_fsname :
   Config.config ->
   Geneweb_db.Driver.base ->

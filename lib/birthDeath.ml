@@ -20,8 +20,8 @@ let select (type a)
   let ref_date =
     match p_getint conf.env "by" with
     | Some by ->
-        let bm = Option.value ~default:(-1) (p_getint conf.env "bm") in
-        let bd = Option.value ~default:(-1) (p_getint conf.env "bd") in
+        let bm = Option.value ~default:0 (p_getint conf.env "bm") in
+        let bd = Option.value ~default:0 (p_getint conf.env "bd") in
         Some { Adef.day = bd; month = bm; year = by; prec = Sure; delta = 0 }
     | None -> None
   in
@@ -66,6 +66,11 @@ module PQ_oldest = Pqueue.Make (struct
 end)
 
 let select_person conf base get_date find_oldest =
+  let get_date p =
+    match get_date p with
+    | Some _ as d when authorized_age conf base p -> d
+    | _ -> None
+  in
   select
     (if find_oldest then (module PQ_oldest) else (module PQ))
     Driver.nb_of_persons Driver.ipers (pget conf) get_date conf base
@@ -83,19 +88,27 @@ module FQ_oldest = Pqueue.Make (struct
 end)
 
 let select_family conf base get_date find_oldest =
+  let auth ip = authorized_age conf base (Driver.poi base ip) in
+  let get_date fam =
+    match get_date fam with
+    | Some _ as d
+      when auth (Driver.get_father fam) && auth (Driver.get_mother fam) ->
+        d
+    | _ -> None
+  in
   select
     (if find_oldest then (module FQ_oldest) else (module FQ))
     Driver.nb_of_families Driver.ifams Driver.foi get_date conf base
 
 let death_date p = Date.date_of_death (Driver.get_death p)
 
-let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
+let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date base =
   let men = Array.make (nb_intervals + 1) 0 in
   let wom = Array.make (nb_intervals + 1) 0 in
   (* TODO? Load person array *)
   Collection.iter
     (fun i ->
-      let p = pget conf base i in
+      let p = Driver.poi base i in
       let sex = Driver.get_sex p in
       let dea = Driver.get_death p in
       if sex <> Neuter then
@@ -118,13 +131,12 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
     (Driver.ipers base);
   (men, wom)
 
-let make_death_pyramid ~nb_intervals ~interval ~limit ~from_year ~to_year conf
-    base =
+let make_death_pyramid ~nb_intervals ~interval ~limit ~from_year ~to_year base =
   let men = Array.make (nb_intervals + 1) 0 in
   let wom = Array.make (nb_intervals + 1) 0 in
   Collection.iter
     (fun i ->
-      let p = pget conf base i in
+      let p = Driver.poi base i in
       let sex = Driver.get_sex p in
       if sex <> Neuter then
         match Date.dmy_of_death (Driver.get_death p) with

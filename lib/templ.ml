@@ -173,15 +173,6 @@ let substr_start_aux n s =
 
 let rec eval_variable (conf : Config.config) = function
   | [ "base"; "name" ] -> conf.bname
-  | [ "lang"; "full" ] ->
-      let rec func x lst c =
-        match lst with
-        | [] -> "bad language code"
-        | hd :: tl ->
-            if hd = x then Util.transl_nth conf "!languages" c
-            else func x tl (c + 1)
-      in
-      func conf.lang Version.available_languages 0
   | [ "bvar"; "list" ] ->
       let wizard_only =
         [
@@ -402,6 +393,7 @@ and eval_simple_variable conf = function
       match List.assoc_opt conf.lang !Mutil.fallback with
       | Some l -> l
       | None -> "")
+  | "base_lang" -> conf.base_lang
   | "default_lang" -> conf.default_lang
   | "browser_lang" -> conf.browser_lang
   | "left" -> conf.left
@@ -424,7 +416,6 @@ and eval_simple_variable conf = function
   | "prefix_no_all" ->
       (Util.commd ~excl:[ "templ"; "p_mod"; "wide" ] conf :> string)
   | "prefix_no_senv" -> (Util.commd ~senv:false conf :> string)
-  | "referer" -> (Util.get_referer conf :> string)
   | "right" -> conf.right
   | "sosa_ref" -> (
       match find_sosa_ref conf with
@@ -684,10 +675,8 @@ let templ_eval_var (conf : Config.config) = function
   | [ "debug" ] -> VVbool conf.debug
   | [ "false" ] -> VVbool false
   | [ "reorg" ] -> VVbool !GWPARAM.reorg
-  | [ "has_referer" ] ->
-      (* deprecated since version 5.00 *)
-      VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
+  | [ "is_upd_ind" ] | [ "is_upd_fam" ] -> VVbool false
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou

@@ -1,5 +1,34 @@
 (function () {
   "use strict";
+  function writeClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      if (ok) resolve(); else reject();
+    });
+  }
+
+  document.querySelectorAll("[data-wikilink]").forEach(function (b) {
+    b.onclick = function () {
+      writeClipboard(b.dataset.wikilink).then(function () {
+        var i = b.querySelector("i");
+        var cls = i.className;
+        i.className = "fa fa-check fa-fw me-2 text-success";
+        setTimeout(function () { i.className = cls; }, 1400);
+      }, function () {});
+    };
+  });
+
   var G = window.GWPERMA;
   if (!G || !G.q) return;
   if (document.getElementById("gw-perma")) return;
@@ -30,25 +59,6 @@
   if (role >= 2) avail.push({ label: L.w, url: build("_w") });
   var primary = avail[avail.length - 1];
   var others = avail.slice(0, -1);
-
-  function writeClipboard(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText)
-      return navigator.clipboard.writeText(text);
-    return new Promise(function (resolve, reject) {
-      var ta = document.createElement("textarea");
-      ta.value = text;
-      ta.setAttribute("readonly", "");
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      var ok = false;
-      try { ok = document.execCommand("copy"); } catch (e) {}
-      document.body.removeChild(ta);
-      if (ok) resolve(); else reject();
-    });
-  }
-
   var live = document.createElement("span");
   live.className = "visually-hidden";
   live.setAttribute("aria-live", "polite");

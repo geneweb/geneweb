@@ -43,6 +43,11 @@ let person_selected conn conf base p =
   | Some _ -> request_issue conn conf base ~key:"incorrect em value"
   | None ->
       record_visited conf (Driver.get_iper p);
+      let conf =
+        match (p_getenv conf.env "other_names", p_getenv conf.env "pn") with
+        | Some "on", Some pn when pn <> "" -> Some.other_names_notif conf pn
+        | _ -> conf
+      in
       Perso.print conf base p
 
 let person_selected_with_redirect conn conf base p =
@@ -113,10 +118,9 @@ let make_henv _conn conf base =
       | Some ip ->
           {
             conf with
-            semi_public =
-              (if conf.semi_public then
-                 Driver.get_access (Driver.poi base ip) = SemiPublic
-               else true);
+            consent =
+              conf.semi_public
+              && Driver.get_access (Driver.poi base ip) = SemiPublic;
             user_iper = Some ip;
           }
       | None -> conf
@@ -231,6 +235,29 @@ let check_nldb_format conf base =
           (Util.transl conf "NOTIF incompatible notes_links")
     | `Ok | `NoFile -> ())
 
+let redirect_to_random_person conn conf base =
+  let n = Driver.nb_of_persons base in
+  let rec pick k =
+    let p =
+      Driver.poi base (Driver.Iper.of_string (string_of_int (Random.int n)))
+    in
+    if k = 0 || ((not (Util.is_empty_name p)) && Util.authorized_age conf base p)
+    then p
+    else pick (k - 1)
+  in
+  if n = 0 then SrcfileDisplay.print_welcome conf base
+  else (
+    Random.self_init ();
+    let p = pick 100 in
+    Connection.http_redirect_temporarily conn
+      (match p_getenv conf.env "m" with
+      | None | Some "" -> (commd conf ^^^ Util.acces conf base p :> string)
+      | Some _ ->
+          Util.url_set_aux conf
+            (commd conf :> string)
+            [ "i"; "p"; "n"; "oc"; "file"; "rnd" ]
+            [ Driver.Iper.to_string (Driver.get_iper p) ]))
+
 let w_base ~none fn conn conf (bfile : string option) =
   match bfile with
   | None -> none conf
@@ -288,7 +315,7 @@ let treat_request =
           ~title:(Util.transl conf "NOTIF_TT unknown base")
           (Printf.sprintf
              (Util.ftransl conf "NOTIF unknown base %s")
-             conf.bname);
+             (Util.escape_html conf.bname :> string));
         let conf = Notif.inject_pending conf in
         try Templ.output_simple conf Templ.Env.empty "index"
         with _ -> GWPARAM.output_error conf Code.Not_Found)
@@ -337,6 +364,8 @@ let treat_request =
               request_issue conn conf base ~level:`Error
                 ~key:"wizards cant write")
             conn conf bfile
+        else if p_getenv conf.env "rnd" = Some "1" then
+          w_base redirect_to_random_person conn conf bfile
         else
           let () =
             Registration.call_hooks (fun ~name hook ->
@@ -537,15 +566,12 @@ let treat_request =
                  w_base @@ fun conf base ->
                  Perso.interp_templ "list" conf base
                    (Driver.empty_person base Driver.Iper.dummy)
-             | "LB" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_birth
-             | "LD" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_death
+             | "LB" -> w_base @@ BirthDeathDisplay.print_birth
+             | "LD" -> w_base @@ BirthDeathDisplay.print_death
              | "LINKED" -> w_base @@ w_person @@ NotesDisplay.print_what_links_p
              | "LIST_IMAGES" -> w_wizard @@ w_base @@ ListImages.print
              | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
-             | "LM" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_marriage
+             | "LM" -> w_base @@ BirthDeathDisplay.print_marriage
              | "MISC_NOTES" -> w_base @@ NotesDisplay.print_misc_notes
              | "MISC_NOTES_SEARCH" ->
                  w_base @@ NotesDisplay.print_misc_notes_search
@@ -656,10 +682,8 @@ let treat_request =
                          in
                          NotesDisplay.print_what_links conf base fnotes
                      | _ -> NotesDisplay.print conf base)
-             | "OA" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_oldest_alive
-             | "OE" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_oldest_engagements
+             | "OA" -> w_base @@ BirthDeathDisplay.print_oldest_alive
+             | "OE" -> w_base @@ BirthDeathDisplay.print_oldest_engagements
              | "P" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
@@ -696,8 +720,7 @@ let treat_request =
                  w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
              | "PNOC_LOOKUP" ->
                  w_base @@ fun conf base -> PersonPicker.lookup_print conf base
-             | "POP_PYR" when conf.wizard || conf.friend ->
-                 w_base @@ BirthDeathDisplay.print_population_pyramid
+             | "POP_PYR" -> w_base @@ BirthDeathDisplay.print_population_pyramid
              | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "R" -> (
@@ -816,7 +839,7 @@ let treat_request =
                         (Util.transl conf "NOTIF_TT incorrect request"))
                    (Printf.sprintf
                       (Util.ftransl conf "NOTIF incorrect request %s")
-                      m);
+                      (Util.escape_html m :> string));
                  let conf = Notif.inject_pending conf in
                  SrcfileDisplay.print_welcome conf base)
               conf bfile)

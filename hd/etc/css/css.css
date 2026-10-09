@@ -1,3 +1,14 @@
+.visually-hidden-focusable:focus {
+  position: fixed;
+  top: .25rem;
+  left: 2rem;
+  z-index: 1032;
+  padding: .25rem .75rem;
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-primary);
+  border-radius: var(--bs-border-radius);
+}
+
 input[list]:placeholder-shown {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23495057' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -59,7 +70,7 @@ a, .pre {
   white-space: unset;
 }
 
-a:has(i), .deslist a, .ind-notes a {
+a:has(i), .deslist a, .ind-notes a, .toast-body a {
   white-space: normal;
 }
 
@@ -1127,6 +1138,10 @@ input:not(.custom-file-input):focus, select:focus {
 
 .home-xs {
   z-index: 1031;
+}
+
+.home-xs > .btn {
+  line-height: 24px;
 }
 
 @media (max-width: 575px) {
@@ -2308,6 +2323,14 @@ span.notesourcecolor {
 
 #welcome .flex-wrap {
   gap: 0.25rem;
+}
+
+#welcome a:has(> i:only-child) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
 }
 
 .imap-gallery {

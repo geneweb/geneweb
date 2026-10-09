@@ -45,8 +45,17 @@ val compare_dmy : Adef.dmy -> Adef.dmy -> int
     negative integer if [d1] is prior to [d2], [0] if [d1] is equal to [d2], and
     a positive integer if [d2] is prior to [d1]. Date precision is handled
     permissively: dates with uncertain precision ([About], [Maybe]) are
-    comparable with precise dates. This function always returns a result and can
-    be used for sorting. *)
+    comparable with precise dates. An unknown month or day precedes any known
+    value, unless its precision is [After]. This function always returns a
+    result and can be used for sorting. *)
+
+val compare_dmy_period : Adef.dmy -> Adef.dmy -> int
+(** [compare_dmy_period d1 d2] Compare [d1] and [d2] at their common precision:
+    a month or day unknown in either date is ignored in both, so a partial date
+    equals any date of its period ([1900] equals [15/06/1900]). Intended for
+    range filters and for sorts that must keep the stored order when dates are
+    not comparable at full precision. Not transitive: unsuitable for display
+    sorts or priority queues. *)
 
 val compare_dmy_strict : Adef.dmy -> Adef.dmy -> int option
 (** [compare_dmy_strict d1 d2] Compare two dates with strict precision handling.
@@ -61,6 +70,10 @@ val compare_date : Adef.date -> Adef.date -> int
     [Dgreg] dates. [Dtext] dates are always considered prior to any [Dgreg]
     date, and equal to any other [Dtext] date. Always returns a result and can
     be used for sorting. *)
+
+val compare_date_period : Adef.date -> Adef.date -> int
+(** [compare_date_period d1 d2] Same as [compare_date], using
+    [compare_dmy_period] for [Dgreg] dates. *)
 
 val compare_date_strict : Adef.date -> Adef.date -> int option
 (** [compare_date_strict d1 d2] Strict comparison of dates. Return [None] if

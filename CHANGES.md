@@ -14,10 +14,39 @@
 - The history pages (`m=HIST` and `m=HIST_DIFF`) display update timestamps,
   recorded in the server's timezone, in the browser's timezone with
   JavaScript. The history file format is unchanged.
+- The random person link (`rnd=1`) is resolved server-side, among the
+  persons visible to the user, and honors `access_by_key`. On the A, C, D,
+  F, LINKED and R tools it keeps the current tool.
+- The statistics lists (`m=LB`, `LD`, `LM`, `OA`, `OE`) and the age pyramid
+  (`m=POP_PYR`) are open to visitors. The lists only show the persons and
+  families visible to them; the pyramid counts the whole base.
+- A refused or cancelled HTTP authentication and a failed password login
+  return to the welcome page with an error notification, replacing the
+  dedicated "access cancelled" page.
+- A `notif` parameter supplied in the URL is ignored.
+- Fix the wizard visibility toggle (`m=CHANGE_WIZ_VIS`) on Windows.
+- In notes, renaming a person keeps the case of the name in the links
+  pointing to it, and writes the family marker as `#N` (the `&N` written
+  by 7.1-beta2 is still read). A link added or removed in any note is now
+  indexed when saved, not only when the note's owner is renamed. Run
+  `update_nldb` once after upgrading (#2961).
+- Links inside `{...}` highlights are rendered as links; an unclosed `{`
+  is displayed as typed (#2961).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
   IPv6 loopback only on Windows.
+
+## Templates
+- Accessibility pass on the welcome, home, menubar, copyr and person
+  pages: labelled fields, named icon-only controls, no positive tabindex,
+  main landmarks, working skip link.
+- The connected wizards and wizard notes pages include home.txt.
+- Copying the wiki link of a person from the menubar works again,
+  including over plain HTTP.
+- Remove the back links built from the HTTP Referer.
+- New `is_upd_ind` and `is_upd_fam` template variables, true on the
+  person and family update forms.
 
 ## Deprecated features
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment
@@ -35,6 +64,8 @@
 - The `-unsafe` and `-force` options of the plugin subsystem are noop.
   Use `--plugins u:...`, `--plugins f:...`, `--plugins uf:...` for the same
   effect (#2594).
+- The `referer` and `has_referer` template variables are removed. The
+  `%w` and `%W` macros of base source files print nothing.
 
 ## Build system
 The camlp5 dependency has been removed. The GEDCOM date grammar and the stream

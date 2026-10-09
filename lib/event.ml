@@ -41,7 +41,7 @@ let compare get_name get_date e1 e2 =
       match Date.cdate_to_dmy_opt (get_date e2) with
       | None -> compare_event_name (get_name e1) (get_name e2)
       | Some d2 -> (
-          match Date.compare_dmy d1 d2 with
+          match Date.compare_dmy_period d1 d2 with
           | 0 -> compare_event_name (get_name e1) (get_name e2)
           | x -> x))
 

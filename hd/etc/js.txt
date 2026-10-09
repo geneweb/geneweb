@@ -1,5 +1,10 @@
-<!-- $Id: js.txt v7.1 23/05/2026 05:02:11 $ -->
+<!-- $Id: js.txt v7.1 03/10/2026 01:19:36 $ -->
 %if;not cancel_links;
+%( Edit pages: is_upd_ind and is_upd_fam are set by the person and family
+   form printers, so a *_OK result page is not taken for a form; notes
+   editors, see bin/gwd/request.ml. %)
+%let;upd_form;%if;(is_upd_ind or is_upd_fam)1%end;%in;
+%let;upd_notes;%if;(e.m="MOD_NOTES" or e.m="MOD_NOTES_OK" or e.m="MOD_WIZNOTES" or e.m="MOD_WIZNOTES_OK")1%end;%in;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -40,7 +45,7 @@
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;
-  %if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
+  %if;((roglo or b.rpc_datalist=1) and (is_welcome or upd_form=1))
     <script src="%etc_prefix;js/rpc_client.js?hash=%apply;hash%with;%etc_prefix;js/rpc_client.js%end;"></script>
   %end;
   %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
@@ -53,13 +58,13 @@
     <script src="%etc_prefix;js/relationmatrix.min.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.min.js%end;"></script>
   %end;
   %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
-  %if;("IND" in e.m or "FAM" in e.m or "MOD_NOTES" in e.m)
+  %if;(upd_form=1 or e.m="MOD_GALLERY")
    <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
   %end;
 %end;
-%if;(e.v="updRLM" or e.m="MRG" or "MOD_IND" in e.m or "MOD_FAM" in e.m or "ADD_FAM" in e.m)
+%if;(e.v="updRLM" or e.m="MRG" or upd_form=1)
 <script>
-const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
+window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
 </script>
 <script src="%etc_prefix;js/person_picker.min.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.min.js%end;"></script>
 %end;
@@ -69,20 +74,12 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
 %if;(e.m="CHK_DATA")
 <script>
   function showOverlay() {
-    const overlay = document.querySelector('.loading-overlay');
-    if (overlay) {
-      overlay.classList.remove('hidden');
-    }
+    document.querySelector('.loading-overlay')?.classList.remove('hidden');
   }
   function hideOverlay() {
-    const overlay = document.querySelector('.loading-overlay');
-    if (overlay) {
-      overlay.classList.add('hidden');
-    }
+    document.querySelector('.loading-overlay')?.classList.add('hidden');
   }
-  document.addEventListener('DOMContentLoaded', function() {
-    hideOverlay();
-  });
+  window.addEventListener('pageshow', hideOverlay);
 </script>
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA")
@@ -90,45 +87,39 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
     %if;(e.m="MOD_DATA_OK" and e.data!="")
       <script>
         var htmlTitle = document.title;
-        if (htmlTitle == "[*modification successful]" ||
-            htmlTitle == "[*no modification]") {
-          document.getElementById("reference").focus();
+        if (htmlTitle == `[*modification successful]` ||
+            htmlTitle == `[*no modification]`) {
+          document.getElementById("reference")?.focus();
         }
       </script>
     %end;
     %if;(e.m="MOD_IND_OK" or e.m="MOD_FAM_OK"
-       or e.m="ADD_FAM_OK" or e.m="DEL_FAM_OK"
-       or e.m="SND_IMAGE_OK" or e.m="DEL_IMAGE_OK"
+       or e.m="ADD_FAM_OK" or e.m="ADD_PAR_OK"
+       or e.m="DEL_FAM_OK" or e.m="CHG_CHN_OK"
        or e.m="CHG_EVT_IND_ORD_OK" or e.m="CHG_EVT_FAM_ORD_OK"
-       or e.m="CHG_CHN_OK"
+       or e.m="DEL_IMAGE_OK" or e.m="SND_IMAGE_OK"
        or (e.m="MOD_DATA_OK" and e.data=""))
       <script>
         var htmlTitle = document.title;
-        if (htmlTitle == "[*person modified]" ||
-            htmlTitle == "[*person added]"    ||
-            htmlTitle == "[*image received]"  ||
-            htmlTitle == "[*image deleted]"   ||
-            htmlTitle == "[*modification successful]") {
-            document.getElementById("i%e.i;").focus();
+        if (htmlTitle == `[*person modified]` ||
+            htmlTitle == `[*person added]`    ||
+            htmlTitle == `[*image received]`  ||
+            htmlTitle == `[*image deleted]`   ||
+            htmlTitle == `[*modification successful]`) {
+            document.getElementById("i%e.i;")?.focus();
         }
-        else if (htmlTitle == "[*family modified]" ||
-                 htmlTitle == "[*family added]"    ||
-                 htmlTitle == "[*family deleted]"  ||
-                 htmlTitle == "[*children's names changed]") {
-            document.getElementById("i%e.ip;").focus();
+        else if (htmlTitle == `[*family modified]` ||
+                 htmlTitle == `[*family added]`    ||
+                 htmlTitle == `[*family deleted]`  ||
+                 htmlTitle == `[*children's names changed]`) {
+            document.getElementById("i%e.ip;")?.focus();
         }
       </script>
     %end;
-    %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
-    or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK")
-      <script>new bootstrap.ScrollSpy(document.body, { target: '#banner' })</script>
-    %end;
   %end;
 %end;
-%if;((wizard and e.m="" and not is_welcome) or "CHK_DATA" in e.m or "MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
-    or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
+%if;((wizard and e.m="" and not is_welcome) or upd_form=1 or "CHK_DATA" in e.m or "SND_IMAGE_C" in e.m
+    or upd_notes=1 or e.m="MOD_GALLERY" or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/6.0.1/autosize.min.js"
             integrity="sha256-VCHx3GCDnd156mCM5EM9bJTj7mhMrrwg2tAab9B1vQs=
@@ -140,16 +131,14 @@ const GW = Object.assign(window.GW || {}, { prefix: "%prefix;" });
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;
-%if;(e.m="MOD_FAM" or e.m="MOD_FAM_OK")
+%if;is_upd_fam;
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.transfer-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const notes = document.getElementById('notes_comments');
-        const marrSrc = document.querySelector('[data-marr]');
-        if (!notes || !marrSrc) return;
-        const target = document.getElementById(marrSrc.id);
-        if (!target) return;
+        const target = document.querySelector('[data-marr]');
+        if (!notes || !target) return;
         target.value = notes.value;
         notes.value = '';
         if (typeof autosize !== 'undefined') autosize.update(target);
@@ -237,18 +226,16 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
       });
     }
 
+    const surnames = document.querySelectorAll('[data-surname]');
     filters.forEach(function(input) {
       input.addEventListener('input', function() {
-        let v1 = document.getElementById('input1').value || '_';
-        const v2 = document.getElementById('input2').value;
-        const v3 = document.getElementById('input3').value;
-        const v4 = document.getElementById('input4').value;
-        const all = document.querySelectorAll('[data-surname]');
-        all.forEach(function(el) { el.classList.add('d-none'); });
-        [v1, v2, v3, v4].forEach(function(v) {
-          if (v === '') return;
-          document.querySelectorAll('[data-surname*="' + v + '"]')
-            .forEach(function(el) { el.classList.remove('d-none'); });
+        const vals = %['input1', 'input2', 'input3', 'input4'%]
+          .map(function(id) { return document.getElementById(id).value; });
+        if (vals%[0%] === '') vals%[0%] = '_';
+        surnames.forEach(function(el) {
+          const sn = el.dataset.surname;
+          el.classList.toggle('d-none',
+            !vals.some(function(v) { return v !== '' && sn.includes(v); }));
         });
       });
     });
@@ -271,90 +258,40 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
   }
 </script>
 %end;
-%( Functions for character.txt %)
-%if;("ADD" in e.m or "MOD" in e.m)
+%( Toolbar (toolbar.txt) and special characters (characters.txt) of the editors. %)
+%if;(upd_form=1 or upd_notes=1)
 <script>
-  // Attach a click event listener to each anchor element within the character's list container
-  function setupCharacterInsertion() {
-    document.querySelectorAll('.ch a').forEach(function (element) {
-      element.addEventListener('click', function (event) {
-        event.preventDefault();
-        var textarea = document.querySelector('.insert-character-target');
-        insertCharacter(textarea, this.innerText);
-      });
-    });
-  }
-
-  // Function to insert a character at the current cursor position in a textarea
-  function insertCharacter(t, v) {
-    var startPos = t.selectionStart;
-    var endPos = t.selectionEnd;
-    t.value = t.value.substring(0, startPos) + v + t.value.substring(endPos, t.value.length);
-    t.selectionStart = startPos + v.length;
-    t.selectionEnd = t.selectionStart;
-    t.focus();
-  }
 function insertTags(tagOpen, tagClose, sampleText) {
-  const textarea = document.querySelector('textarea#notes_comments');
-  if (!textarea) return false;
-
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const scrollTop = textarea.scrollTop;
-
-  let selectedText = textarea.value.substring(start, end);
-  if (!selectedText) selectedText = sampleText;
-
-  // Remove trailing space if exists
-  if (selectedText.endsWith(' ')) {
-    selectedText = selectedText.slice(0, -1);
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end);
-    textarea.value = before + tagOpen + selectedText + tagClose + ' ' + after;
-  } else {
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end);
-    textarea.value = before + tagOpen + selectedText + tagClose + after;
-  }
-
-  // Restore scroll position
-  textarea.scrollTop = scrollTop;
-
-  // Set selection
+  const ta = document.querySelector('textarea#notes_comments');
+  if (!ta) return false;
+  const { selectionStart: start, selectionEnd: end, scrollTop } = ta;
+  let sel = ta.value.substring(start, end) || sampleText;
+  %( Keep a trailing space of the selection outside the closing tag. %)
+  const trail = sel.endsWith(' ') ? ' ' : '';
+  if (trail) sel = sel.slice(0, -1);
+  ta.setRangeText(tagOpen + sel + tagClose + trail, start, end);
+  ta.scrollTop = scrollTop;
+  const pos = start + tagOpen.length;
   if (start === end) {
-    // No text was selected
-    const cursorPos = start + tagOpen.length;
-    textarea.setSelectionRange(cursorPos, cursorPos + sampleText.length);
+    ta.setSelectionRange(pos, pos + sampleText.length);
   } else {
-    // Text was selected
-    const newCursorPos = start + tagOpen.length + selectedText.length + tagClose.length;
-    textarea.setSelectionRange(newCursorPos, newCursorPos);
+    const after = pos + sel.length + tagClose.length;
+    ta.setSelectionRange(after, after);
   }
-
-  textarea.focus();
+  ta.focus();
   return false;
 }
-// Toolbar sticky behavior
-function setupToolbarSticky() {
-  const toolbar = document.querySelector('.toolbar-wrapper');
-  if (!toolbar) return;
-
-  let lastScroll = window.scrollY;
-
-  function handleScroll() {
-    const currentScroll = window.scrollY;
-    if (currentScroll > 0) {
-      toolbar.classList.add('is-sticky');
-    } else {
-      toolbar.classList.remove('is-sticky');
-    }
-    lastScroll = currentScroll;
-  }
-
-  window.addEventListener('scroll', handleScroll, { passive: true });
-}
+%if;(e.templ="")
+document.addEventListener('click', function(event) {
+  const a = event.target.closest('.ch a');
+  if (!a) return;
+  event.preventDefault();
+  const t = document.querySelector('.insert-character-target');
+  if (!t) return;
+  t.setRangeText(a.textContent, t.selectionStart, t.selectionEnd, 'end');
+  t.focus();
+});
+%end;
 </script>
 %end;
 %( Popover functions for anc/destables %)
@@ -373,7 +310,7 @@ document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
     }
   });
 });
-// Restaurer le tooltip natif au survol via title=, que BS5 mange en l'instanciant comme Popover
+%( BS5 moves title= to data-bs-original-title on popovers; restore it as a native hover tooltip. %)
 document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').forEach(el => {
   const helpText = el.getAttribute('data-bs-original-title');
   if (helpText) {
@@ -383,9 +320,9 @@ document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').
 });
 </script>
 %end;
+%( Ctrl+click on an input with data-book opens its MOD_DATA book. %)
+%if;(wizard and (is_welcome or upd_form=1 or e.m="MOD_GALLERY"))
 <script>
-%if;(wizard and (is_welcome or "ADD_FAM" in e.m or "MOD_" in e.m))
-// Manages enhanced input field behaviors (navigation, interaction)
 const inputToBook = {
   addNavigation: function() {
     document.addEventListener('mousedown', function(event) {
@@ -417,17 +354,24 @@ const inputToBook = {
     window.open(url, '_blank');
   }
 };
+%( notes_upd_gallery.js calls addNavigation() itself. %)
+%if;(e.m!="MOD_GALLERY")inputToBook.addNavigation();%end;
+</script>
 %end;
+%( Each block below runs its setup on DOMContentLoaded; their order is the
+   order of the listeners: clearinput before the floating placeholders,
+   tooltips after the modules that create elements. %)
+%if;(e.templ="")
 %if;(is_welcome and b.propose_titles!="no")
-// Controls unified search functionality with a shared submit button
-// Handles both main person search and optional title search forms
+<script>
+%( Shared submit button for the person and title search forms. %)
 function initializeWelcomeSearchFunctionality() {
   const mainForm = document.getElementById('main-search');
   const titleForm = document.getElementById('title-search');
   const searchBtn = document.getElementById('global-search');
   if (!searchBtn) return;
 
-  const defaultText = '[*search/case sensitive]0';
+  const defaultText = `[*search/case sensitive]0`;
 
   function hasInput(form) {
     return form && Array.from(form.querySelectorAll('input[type="search"]'))
@@ -449,8 +393,8 @@ function initializeWelcomeSearchFunctionality() {
     const instance = bootstrap.Tooltip.getInstance(searchBtn);
     if (!instance) return;
     let text = defaultText;
-    if (hasInput(mainForm)) text = '[*search/case sensitive]0 [person/persons]0';
-    else if (titleForm && hasInput(titleForm)) text = '[*search/case sensitive]0 [title/titles]0/[estate]0';
+    if (hasInput(mainForm)) text = `[*search/case sensitive]0 [person/persons]0`;
+    else if (titleForm && hasInput(titleForm)) text = `[*search/case sensitive]0 [title/titles]0/[estate]0`;
     instance.setContent({ '.tooltip-inner': text });
     if (text !== defaultText) {
       instance.show();
@@ -480,24 +424,11 @@ function initializeWelcomeSearchFunctionality() {
     else if (titleForm && hasInput(titleForm)) titleForm.submit();
   });
 }
-%end;
-%if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
-function initializeLazyModules() {
-  function loadScriptOnce(buttonId, scriptUrl) {
-    const btn = document.getElementById(buttonId);
-    if (!btn) return;
-    btn.addEventListener('click', function handler() {
-      const script = document.createElement('script');
-      script.src = scriptUrl;
-      document.head.appendChild(script);
-      btn.removeEventListener('click', handler);
-    });
-  }
-  loadScriptOnce('load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
-  loadScriptOnce('load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
-}
+document.addEventListener('DOMContentLoaded', initializeWelcomeSearchFunctionality);
+</script>
 %end;
 %if;(roglo and is_welcome)
+<script>
 function moveWelcomeLangSelect() {
   const sel = document.getElementById('dropdownMenu1');
   const group = sel ? sel.closest('.btn-group') : null;
@@ -507,91 +438,88 @@ function moveWelcomeLangSelect() {
   group.classList.add('dropdown');
   loginBox.appendChild(group);
 }
+document.addEventListener('DOMContentLoaded', moveWelcomeLangSelect);
+</script>
 %end;
-%if;(e.templ="" and not is_welcome)
-// Focus on found autofocus input in opening BS modal
-function setupModalAutofocus() {
-  document.addEventListener('shown.bs.modal', function(event) {
-    const autofocusEl = event.target.querySelector('[autofocus]');
-    if (autofocusEl) autofocusEl.focus();
-  });
-}
-%end;
-%if;(e.m!="MOD_DATA")
-// Floating placeholders for all textual inputs
-// Floating placeholders for all textual inputs
-function setupFloatingPlaceholders() {
-  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
-
-  inputs.forEach(input => {
-    // Ignore placeholders that are only non-breaking spaces
-    if (input.placeholder.trim() === '') return;
-
-    let wrapper = input.parentNode;
-    if (wrapper.classList.contains('clear-button-wrapper')) {
-      // Reuse the positioned wrapper added by clearinput; keep the
-      // .input-wrapper CSS hooks so layout rules still match.
-      wrapper.classList.add('input-wrapper');
-    } else if (!wrapper.classList.contains('input-wrapper')) {
-      const hadFocus = document.activeElement === input;
-      wrapper = document.createElement('div');
-      wrapper.className = 'input-wrapper';
-      input.parentNode.insertBefore(wrapper, input);
-      wrapper.appendChild(input);
-      if (hadFocus) requestAnimationFrame(() => input.focus());
-    }
-
-    const placeholder = document.createElement('span');
-    placeholder.className = 'floating-placeholder';
-    placeholder.textContent = input.placeholder;
-    wrapper.appendChild(placeholder);
-
-    input.addEventListener('focus', () => placeholder.classList.add('active'));
-    input.addEventListener('blur', () => placeholder.classList.remove('active'));
-
-    if (input === document.activeElement || input.hasAttribute('autofocus')) {
-      placeholder.classList.add('active');
-    }
-  });
-}
-%end;
-%if;(e.templ="")
-%if;(e.m="NOTES" or e.m="WIZNOTES")
-// TOC toggle for NOTES and WIZNOTES
-function setupTocToggle() {
-  const tocContent = document.getElementById('toc-content');
-  if (!tocContent) return;
-  function toggleTocText() {
-    return tocContent.hidden
-      ? '([visualize/show/hide/summary]1)'
-      : '([visualize/show/hide/summary]2)';
-  }
-  document.querySelectorAll('.toc-toggle').forEach(btn => {
-    btn.addEventListener('click', function() {
-      tocContent.hidden = !tocContent.hidden;
-      document.querySelectorAll('.toc-toggle').forEach(b => {
-        b.textContent = toggleTocText();
-      });
+%if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
+    or b.datalist_titles=1 or b.datalist_estates=1))
+  or (e.m="MOD_GALLERY" and (b.datalist_fnames=1 or b.datalist_snames=1))
+  or (upd_form=1 and (b.datalist_fnames=1
+    or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
+    or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
+    or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
+<script>
+%if;(e.m="MOD_GALLERY")
+const DatalistManager = {
+  handleDataTableInput: function(input, listId) {
+    const dataList = document.getElementById(listId);
+    if (!dataList) return;
+    const { selectionStart: selStart, selectionEnd: selEnd, value } = input;
+    const lc = value.toLowerCase();
+    if (!Array.from(dataList.options).some(o => o.value.toLowerCase() === lc)) return;
+    const rowIndex = table.row(input.closest('tr')).index();
+    const cellIndex = input.closest('td').cellIndex;
+    requestAnimationFrame(() => {
+      const el = table.row(rowIndex).node()?.cells%[cellIndex%]?.querySelector('input');
+      if (!el) return;
+      if (el.value !== value) el.value = value;
+      el.focus();
+      el.setSelectionRange(selStart, selEnd);
     });
+  }
+};
+%end;
+function populateDatalists() {
+  %if;cgi;
+    const path = `/${location.pathname.split('/')%[1%] || ''}/bases/etc/%base.name;/cache/%base.name;_`;
+  %else;
+    const path = '%base.name;/cache/%base.name;_';
+  %end;
+  %[
+    %if;(b.datalist_snames=1)'snames',%end;
+    %if;(b.datalist_fnames=1)'fnames',%end;
+    %if;(upd_form=1)
+      %if;(b.datalist_places=1)'places',%end;
+      %if;(b.datalist_occupations=1)'occupations',%end;
+      %if;(b.datalist_sources=1)'sources',%end;
+    %end;
+    %if;(is_welcome or is_upd_ind)
+      %if;(b.datalist_titles=1)'titles',%end;
+      %if;(b.datalist_estates=1)'estates',%end;
+    %end;
+    %if;is_upd_ind;
+      %if;(b.datalist_pub_names=1)'pub_names',%end;
+      %if;(b.datalist_qualifiers=1)'qualifiers',%end;
+      %if;(b.datalist_aliases=1)'aliases',%end;
+    %end;
+  %].forEach(t => {
+    const dl = document.getElementById('datalist_' + t);
+    if (!dl) return;
+    fetch(path + t + '.cache.gz')
+      .then(r => {
+        if (!r.ok) throw new Error(r.status);
+        return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).text();
+      })
+      .then(text => {
+        const frag = document.createDocumentFragment();
+        for (const line of text.split('\n')) {
+          const v = line.trim().replace('<option>', '');
+          if (v) frag.appendChild(new Option('', v));
+        }
+        dl.replaceChildren(frag);
+      })
+      .catch(err => console.error(`datalist_${t}:`, err));
   });
 }
+%( The gallery and the RPC fallback call populateDatalists() themselves. %)
+%if;(e.m!="MOD_GALLERY" and not (roglo or b.rpc_datalist=1))
+document.addEventListener('DOMContentLoaded', populateDatalists);
 %end;
-%( Place the cursor at the end an autofocused input %)
-%if;("MOD" in e.m)
-function setupAutofocusInput() {
-  const focusableElement = document.querySelector('input[autofocus]:not([id="n"]), textarea[autofocus]');
-  if (focusableElement) {
-    focusableElement.focus();
-    if (focusableElement.setSelectionRange) {
-      focusableElement.setSelectionRange(focusableElement.value.length, focusableElement.value.length);
-    } else if (focusableElement.value) {
-      focusableElement.value = focusableElement.value;
-    }
-  }
-}
+</script>
 %end;
-%if;((roglo or b.rpc_datalist=1) and (is_welcome or "IND" in e.m or "FAM" in e.m))
-// RPC-based datalist manager for Roglo large datasets
+%if;((roglo or b.rpc_datalist=1) and (is_welcome or upd_form=1))
+<script>
+%( RPC-backed datalists for very large bases %)
 const RpcDatalistManager = {
   client: null,
   isConnected: false,
@@ -599,7 +527,7 @@ const RpcDatalistManager = {
 
   RPC_URL: 'ws://%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;localhost%end;:8080/search',
 
-  // Dérive le nom du cache depuis l'ID datalist : datalist_fnames -> base_fnames.cache
+  %( datalist_fnames -> <base>_fnames.cache %)
   getCacheFile: function(datalistId) {
     const type = datalistId.replace('datalist_', '');
     return '%base.name;_' + type + '.cache';
@@ -619,7 +547,7 @@ const RpcDatalistManager = {
         return JSON.parse(response);
       };
 
-      // Test connexion avec timeout 3 secondes
+      %( Probe the server, give up after 3 s. %)
       const testPromise = this.client.lookup('%base.name;_fnames.cache', '', 1);
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('RPC timeout')), 3000)
@@ -634,7 +562,7 @@ const RpcDatalistManager = {
       this.isConnected = false;
       return false;
     }
-},
+  },
 
   populateDatalist: async function(datalistId, searchTerm) {
     if (!this.isConnected || !this.client) return;
@@ -665,13 +593,12 @@ const RpcDatalistManager = {
     }
   },
 
-  // Découvre et attache automatiquement tous les inputs avec attribut list="datalist_*"
+  %( Bind every input whose list attribute starts with datalist_. %)
   attachAllListeners: function() {
     const self = this;
     document.querySelectorAll('input[list^="datalist_"]').forEach(input => {
       const datalistId = input.getAttribute('list');
 
-      // Recherche sur saisie (avec debounce)
       input.addEventListener('input', function() {
         clearTimeout(self.debounceTimers[datalistId]);
         self.debounceTimers[datalistId] = setTimeout(() => {
@@ -679,7 +606,6 @@ const RpcDatalistManager = {
         }, 100);
       });
 
-      // Recherche sur focus si champ déjà rempli
       input.addEventListener('focus', function() {
         if (this.value && this.value.length >= 2) {
           self.populateDatalist(datalistId, this.value);
@@ -688,156 +614,17 @@ const RpcDatalistManager = {
     });
   }
 };
-%end;
-%if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
-    or b.datalist_titles=1 or b.datalist_estates=1))
-  or (e.m="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1))
-  or ("IND" in e.m or "FAM" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1
-    or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
-    or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
-    or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
-// Manages datalist population and updates
-// Simple datalist manager with special handling for DataTables inputs
-const DatalistManager = {
-  // Main populate function for regular form datalists
-  populateDatalist: function(datalistId, cacheFile) {
-    const dataList = document.getElementById(datalistId);
-    if (!dataList) return;
-
-    fetch(cacheFile)
-      .then(response => {
-        const reader = response.body
-          .pipeThrough(new DecompressionStream('gzip'))
-          .getReader();
-        return new ReadableStream({
-          start(controller) {
-            return pump();
-            function pump() {
-              return reader.read().then(({done, value}) => {
-                if (done) {
-                  controller.close();
-                  return;
-                }
-                controller.enqueue(value);
-                return pump();
-              });
-            }
-          }
-        });
-      })
-      .then(stream => new Response(stream))
-      .then(response => response.text())
-      .then(text => {
-        const fragment = document.createDocumentFragment();
-        text.split("\n")
-            .filter(line => line.trim())
-            .forEach(option => {
-              const opt = document.createElement("option");
-              opt.value = option.trim().replace("<option>", "");
-              fragment.appendChild(opt);
-            });
-        dataList.textContent = '';
-        dataList.appendChild(fragment);
-      })
-      .catch(error => console.error(`Error loading ${cacheFile}:`, error));
-  },
-  %if;(e.m="MOD_NOTES")
-  // Special handling for DataTables inputs
-  handleDataTableInput: function(input, listId) {
-    if (!input || !listId) return;
-
-    const dataList = document.getElementById(listId);
-    if (!dataList) return;
-
-    // Store current cursor position and selection
-    const selStart = input.selectionStart;
-    const selEnd = input.selectionEnd;
-    const currentValue = input.value;
-
-    // Let browser handle datalist matching
-    const option = Array.from(dataList.options).find(opt =>
-      opt.value.toLowerCase() === currentValue.toLowerCase()
-    );
-
-    if (option) {
-      // Get row and cell info before any updates
-      const $row = $(input).closest('tr');
-      const $cell = $(input).closest('td');
-      const rowIndex = table.row($row).index();
-      const cellIndex = $cell.index();
-
-      // Preserve case the user typed
-      const finalValue = currentValue;
-
-      // Use requestAnimationFrame to handle focus after redraw
-      requestAnimationFrame(() => {
-        const $newRow = $(table.row(rowIndex).node());
-        const $newCell = $newRow.find(`td:eq(${cellIndex})`);
-        const $newInput = $newCell.find('input');
-
-        if ($newInput.length) {
-          if ($newInput.val() !== finalValue) {
-            $newInput.val(finalValue);
-          }
-          $newInput.focus();
-          // Only select if user had selected the whole content
-          if (selStart === 0 && selEnd === currentValue.length) {
-            $newInput[0].setSelectionRange(0, finalValue.length);
-          } else {
-            $newInput[0].setSelectionRange(selStart, selEnd);
-          }
-        }
-      });
-    } else {
-      // If no match, just maintain cursor position
-      requestAnimationFrame(() => {
-        input.setSelectionRange(selStart, selEnd);
-      });
-    }
+document.addEventListener('DOMContentLoaded', async () => {
+  if (await RpcDatalistManager.init()) {
+    RpcDatalistManager.attachAllListeners();
+  } else if (typeof populateDatalists === 'function') {
+    %( .gz fallback when the RPC server is unavailable %)
+    populateDatalists();
   }
+});
+</script>
 %end;
-};
-
-function constructCachePath() {
-  const baseName = "%base.name;";
-  %if;cgi;
-    const pathname = window.location.pathname;
-    const segments = pathname.split('/');
-    const prefix = segments[1] || '';
-    return `/${prefix}/bases/etc/${baseName}/cache/${baseName}`;
-  %else;
-    return `${baseName}/cache/${baseName}`;
-  %end;
-}
-
-function populateDatalists() {
-  const path = constructCachePath();
-  const datalists = %[
-  %if;(is_welcome or "IND" in e.m or "FAM" in e.m)
-    %if;(b.datalist_snames=1)  { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
-    %if;(b.datalist_fnames=1)  { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
-    %if;("IND" in e.m or "FAM" in e.m)
-      %if;(b.datalist_places=1)  { id: "datalist_places", file: path + "_places.cache.gz", book: "place" },%end;
-      %if;(b.datalist_occupations=1)  { id: "datalist_occupations", file: path + "_occupations.cache.gz", book: "occu" },%end;
-      %if;(b.datalist_sources=1)  { id: "datalist_sources", file: path + "_sources.cache.gz", book: "src" },%end;
-    %end;
-  %end;
-  %if;(is_welcome or "IND" in e.m)
-    %if;is_welcome;
-      %if;(b.datalist_titles=1)  { id: "datalist_titles", file: path + "_titles.cache.gz", book: "title" },%end;
-      %if;(b.datalist_estates=1)  { id: "datalist_estates", file: path + "_estates.cache.gz", book: "domain" },%end;
-    %else;
-      %if;(b.datalist_pub_names=1)  { id: "datalist_pub_names", file: path + "_pub_names.cache.gz", book: "pubn" },%end;
-      %if;(b.datalist_qualifiers=1)  { id: "datalist_qualifiers", file: path + "_qualifiers.cache.gz", book: "qual" },%end;
-      %if;(b.datalist_aliases=1)  { id: "datalist_aliases", file: path + "_aliases.cache.gz", book: "alias" },%end;
-    %end;
-  %end;
-  %];
-
-  datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
-}
-%end;
-%if;(e.templ="" and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
+%if;(not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
 %define;language(x)
   %apply;nth%with;
     af/ar/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/%nn;
@@ -847,15 +634,17 @@ function populateDatalists() {
 %( Hydrate the language selector skeleton emitted by copyr.txt. Names come
    from the !languages lexicon entry, translated server-side for the
    current lang. %)
+<script>
 (() => {
   const menu = document.getElementById('language-menu');
   if (!menu) return;
   const names = {%nn;
     %for;i;0;32;%let;l1;%apply;language(i)%in;%nn;
-      %if;(i>0),%end;'%l1;':'%apply;language_name(l1)'%nn;
+      %if;(i>0),%end;'%l1;':`%apply;language_name(l1)`%nn;
     %end;
   };
-  const def = '%b.default_lang;';
+  const def = '%default_lang;';
+  const base = '%base_lang;';
   %( TODO file= is stripped to flush any image-upload param carried over a
      lang switch; legacy hack inherited from the lang_file pattern in
      copyr.txt, should move to the request handler. %)
@@ -868,11 +657,13 @@ function populateDatalists() {
   };
   const frag = document.createDocumentFragment();
   for (const l of Object.keys(names)) {
-    if (l === '%lang;') continue;
+    const cur = l === '%lang;';
     const a = document.createElement('a');
-    a.className = 'dropdown-item' + (l === def ? ' bg-warning' : '');
+    a.className = 'dropdown-item' + (l === base ? ' bg-warning' : '')
+      + (cur ? ' disabled' : '');
     a.id = 'lang_' + l;
-    a.href = hrefFor(l);
+    if (cur) a.setAttribute('aria-current', 'true');
+    else a.href = hrefFor(l);
     const code = document.createElement('code');
     code.textContent = (l === 'pt-br' ? l : l + '\u00a0\u00a0\u00a0') + ' ';
     a.appendChild(code);
@@ -883,14 +674,16 @@ function populateDatalists() {
   }
   menu.appendChild(frag);
 })();
+</script>
 %end;
-%( updateField const + lazy-loading %)
 %if;(wizard and not is_welcome and e.m="")
+<script>
+%( updateField const + lazy-loading %)
 const UPD = {
   prefix: "%prefix;",
   iper: "%index;",
-  error: "[*error]",
-  editField: "[*edit this field]"
+  error: `[*error]`,
+  editField: `[*edit this field]`
 };
 (function () {
   const slot = document.getElementById('upd-wand-sources');
@@ -912,108 +705,157 @@ const UPD = {
     document.head.appendChild(s);
   });
 })();
+</script>
 %end;
-const initTooltips = () => {
+<script>
+document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
     if (!bootstrap.Tooltip.getInstance(el)) {
       new bootstrap.Tooltip(el, {
-        trigger: 'hover',
+        trigger: el.dataset.bsTrigger || 'hover',
         delay: { show: 200, hide: 50 },
         container: 'body'
       });
     }
   });
-};
-function safeInitialize(fn) {
-  try {
-    fn();
-  } catch (error) {
-    console.error('Initialization error:', error);
-  }
-}
-%if;(e.notif!="")
+});
+</script>
+%if;(e.notif!="" or e.nomod="1")
+<script data-notif="%e.notif;">
 %include;js_notif
+</script>
 %end;
-%( Initialize on DOM Content Loaded %)
-document.addEventListener('DOMContentLoaded', () => {
-%if;is_welcome;
-  %if;(b.propose_titles!="no")
-    initializeWelcomeSearchFunctionality();
-  %end;
-  %if;wizard;
-    inputToBook.addNavigation();
-  %end;
-  %if;roglo;
-    moveWelcomeLangSelect();
-  %end;
+%if;(e.m="" and e.other_names="on")
+<script>
+(function(){
+  var u=new URL(location.href);
+  u.searchParams.delete('other_names');
+  u.searchParams.delete('pn');
+  history.replaceState(null,'',u);
+})();
+</script>
 %end;
-%if;("IND" in e.m or "FAM" in e.m)
-  addClearButtonToInputs();
-  inputToBook.addNavigation();
-  sortSelectOptions();
-  initCustomEvents();
-  initSelectToggle();
-  initFormFocus();
-  initCalendarMonthSelects();
-%end;
-%if;(is_welcome or "IND" in e.m or "FAM" in e.m or e.m="MOD_NOTES")
-  %if;(roglo or b.rpc_datalist=1)
-    (async () => {
-      const rpcOk = await RpcDatalistManager.init();
-      if (rpcOk) {
-        RpcDatalistManager.attachAllListeners();
-      } else {
-        // Fallback .gz uniquement si serveur RPC indisponible
-        %if;(b.datalist_fnames=1 or b.datalist_snames=1)
-          populateDatalists();
-        %end;
-      }
-    })();
-  %else;
-    %if;(b.datalist_fnames=1 or b.datalist_snames=1)
-      populateDatalists();
-    %end;
-  %end;
-%end;
-initTooltips();
 %if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
-  if (typeof initializeLazyModules === 'function') {
-    initializeLazyModules();
+<script>
+function initializeLazyModules() {
+  function loadScriptOnce(buttonId, scriptUrl) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    btn.addEventListener('click', function handler() {
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      document.head.appendChild(script);
+      btn.removeEventListener('click', handler);
+    });
   }
+  loadScriptOnce('load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
+  loadScriptOnce('load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
+}
+document.addEventListener('DOMContentLoaded', initializeLazyModules);
+</script>
 %end;
-%if;(e.templ="" and not is_welcome)
-  setupModalAutofocus();
-%end;
-%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D") or (e.m="A" and e.t="H") or "HIST" in e.m))
-  setupFloatingPlaceholders();
-%end;
-%if;("ADD" in e.m or "MOD" in e.m)
-  setupToolbarSticky();
-  setupCharacterInsertion();
-%end;
-%if;(e.m="NOTES" or e.m="WIZNOTES")
-  setupTocToggle();
-%end;
-%if;("MOD" in e.m)
-  setupAutofocusInput();
-%end;
-%if;(e.m="MOD_DATA")
-  updateData.init();
-%end;
-%if;(e.m="RM")
-  if (typeof RelationMatrix !== 'undefined') {
-    RelationMatrix.init();
-  }
-%end;
-%if;(e.m="C" and e.t="")
-  if (typeof Cousins !== 'undefined' && Cousins.init) {
-    Cousins.init();
-  }
-%end;
+%if;(not is_welcome)
+<script>
+%( Focus the autofocus element of an opening BS modal. %)
+document.addEventListener('shown.bs.modal', function(event) {
+  event.target.querySelector('[autofocus]')?.focus();
 });
 </script>
 %end;
-%end;%( closing initial “not cancel_links”, not indented for convenience %)
+%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D")
+       or (e.m="A" and e.t="H") or "HIST" in e.m))
+<script>
+%( Floating placeholders for textual inputs. %)
+function setupFloatingPlaceholders() {
+  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
+
+  inputs.forEach(input => {
+    %( Skip placeholders made of non-breaking spaces only. %)
+    if (input.placeholder.trim() === '') return;
+
+    let wrapper = input.parentNode;
+    if (wrapper.classList.contains('clear-button-wrapper')) {
+      %( Reuse the positioned wrapper added by clearinput; keep the
+         .input-wrapper CSS hooks so layout rules still match. %)
+      wrapper.classList.add('input-wrapper');
+    } else if (!wrapper.classList.contains('input-wrapper')) {
+      const hadFocus = document.activeElement === input;
+      wrapper = document.createElement('div');
+      wrapper.className = 'input-wrapper';
+      input.parentNode.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+      if (hadFocus) requestAnimationFrame(() => input.focus());
+    }
+
+    const placeholder = document.createElement('span');
+    placeholder.className = 'floating-placeholder';
+    placeholder.textContent = input.placeholder;
+    wrapper.appendChild(placeholder);
+
+    input.addEventListener('focus', () => placeholder.classList.add('active'));
+    input.addEventListener('blur', () => placeholder.classList.remove('active'));
+
+    if (input === document.activeElement || input.hasAttribute('autofocus')) {
+      placeholder.classList.add('active');
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', setupFloatingPlaceholders);
+</script>
+%end;
+%if;(e.m="NOTES" or e.m="WIZNOTES")
+<script>
+function setupTocToggle() {
+  const tocContent = document.getElementById('toc-content');
+  if (!tocContent) return;
+  function toggleTocText() {
+    return tocContent.hidden
+      ? `([visualize/show/hide/summary]1)`
+      : `([visualize/show/hide/summary]2)`;
+  }
+  document.querySelectorAll('.toc-toggle').forEach(btn => {
+    btn.addEventListener('click', function() {
+      tocContent.hidden = !tocContent.hidden;
+      document.querySelectorAll('.toc-toggle').forEach(b => {
+        b.textContent = toggleTocText();
+      });
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', setupTocToggle);
+</script>
+%end;
+%( Place the cursor at the end of a prefilled autofocused field in the editors. %)
+%if;(upd_form=1 or upd_notes=1 or e.m="MOD_DATA" or e.m="MOD_DATA_OK")
+<script>
+function setupAutofocusInput() {
+  const el = document.querySelector('input[autofocus]:not(#n), textarea[autofocus]');
+  if (!el) return;
+  el.focus();
+  el.setSelectionRange(el.value.length, el.value.length);
+}
+document.addEventListener('DOMContentLoaded', setupAutofocusInput);
+</script>
+%end;
+%if;(e.m="MOD_DATA")
+<script>document.addEventListener('DOMContentLoaded', () => updateData.init());</script>
+%end;
+%if;(e.m="RM")
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof RelationMatrix !== 'undefined') RelationMatrix.init();
+});
+</script>
+%end;
+%if;(e.m="C" and e.t="")
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof Cousins !== 'undefined' && Cousins.init) Cousins.init();
+});
+</script>
+%end;
+%end;%( closing “e.templ” of the DOMContentLoaded blocks, not indented for convenience %)
+%end;%( closing initial “not cancel_links”, not indented either %)
 %( b.reduce_place=yes %)
 %if;(e.m="" and not is_welcome and b.reduce_place="yes")
 <script>

@@ -18,7 +18,12 @@ module AliasCache = struct
   type t = (Driver.Iper.t, string option) Hashtbl.t
 
   let create () : t = Hashtbl.create 200
-  let add_direct (cache : t) iper = Hashtbl.replace cache iper None
+
+  (* Never downgrade: a person already recorded with an alias keeps it.
+     Several passes (permutations, phonetic classification) register the
+     same persons again as direct and used to erase the [alias] tag. *)
+  let add_direct (cache : t) iper =
+    if not (Hashtbl.mem cache iper) then Hashtbl.replace cache iper None
 
   let add_alias (cache : t) iper alias_str =
     Hashtbl.replace cache iper (Some alias_str)
@@ -174,6 +179,19 @@ let print_variant_controls conf suggestions =
 })();
 </script>|}
 
+let other_names_notif conf pn =
+  let query = String.map (function '/' -> ' ' | c -> c) pn |> String.trim in
+  Notif.info ~mode:Notif.Dismissible
+    ~title:(Utf8.capitalize_fst (transl conf "NOTIF_TT other possibilities"))
+    (Printf.sprintf
+       {|<a href="%sm=S&pn=%s&other_names=on" rel="nofollow">%s</a>|}
+       (commd conf :> string)
+       (Mutil.encode pn :> string)
+       (Printf.sprintf
+          (ftransl conf "NOTIF all results for %s")
+          (escape_html query :> string)));
+  Notif.inject_pending conf
+
 let print_nav_variant_bar conf suggestions ~current_mode ~name ?branch_count ()
     =
   let display_by =
@@ -221,11 +239,26 @@ let print_nav_variant_bar conf suggestions ~current_mode ~name ?branch_count ()
 
 let print_firstname_variants conf ?(filter = true) variants_set =
   if not (StrSet.is_empty variants_set) then
+    (* The first name queried: p=, or the part before '/' of pn=fn/
+       (the main-box first-name search), or v=. *)
     let query =
+      let pn_fn () =
+        match p_getenv conf.env "pn" with
+        | Some pn -> (
+            match String.index_opt pn '/' with
+            | Some i -> Some (String.trim (String.sub pn 0 i))
+            | None -> None)
+        | None -> None
+      in
       match p_getenv conf.env "p" with
       | Some q -> Name.lower q
       | None -> (
-          match p_getenv conf.env "v" with Some q -> Name.lower q | None -> "")
+          match pn_fn () with
+          | Some q -> Name.lower q
+          | None -> (
+              match p_getenv conf.env "v" with
+              | Some q -> Name.lower q
+              | None -> ""))
     in
     let filtered_variants =
       if filter && query <> "" then
@@ -885,16 +918,22 @@ let specify conf base alias_cache n pl1 pl2 pl3 =
      pl3.  "annie vivier" -> "annie", so fn_score compares against "annie"
      not the full query string. *)
   let query_fn =
-    match p_getenv conf.env "pn" with
-    | Some pn -> (
-        let pn = Name.lower (Mutil.strip_all_trailing_spaces pn) in
-        match String.index pn ' ' with
-        | i -> String.sub pn 0 i
-        | exception Not_found -> pn)
-    | None -> (
-        match String.index n ' ' with
-        | i -> String.sub n 0 i
-        | exception Not_found -> n)
+    (* search_fn is set by SearchName.handle_search_results from the parsed
+       query; the pn re-parsing below is kept for other callers
+       (PersonLookup). *)
+    match p_getenv conf.env "search_fn" with
+    | Some fn when fn <> "" -> Name.lower fn
+    | _ -> (
+        match p_getenv conf.env "pn" with
+        | Some pn -> (
+            let pn = Name.lower (Mutil.strip_all_trailing_spaces pn) in
+            match String.index pn ' ' with
+            | i -> String.sub pn 0 i
+            | exception Not_found -> pn)
+        | None -> (
+            match String.index n ' ' with
+            | i -> String.sub n 0 i
+            | exception Not_found -> n))
   in
   let split_pl n pl =
     List.fold_left
@@ -949,6 +988,18 @@ let specify conf base alias_cache n pl1 pl2 pl3 =
 
 let first_name_print_sections conf base alias_cache listes ~rev =
   let group_persons l =
+    (* The folds below only merge a person into the group at the head of
+       the accumulator, so the input must be sorted by the grouping key:
+       otherwise two Duponts separated by a Martin give two "Dupont"
+       groups.  Stable sort keeps the incoming order within a group. *)
+    let key x =
+      if rev then Driver.p_first_name base x else Driver.p_surname base x
+    in
+    let l =
+      List.map (fun x -> (key x, x)) l
+      |> List.stable_sort (fun (k1, _) (k2, _) -> Gutil.alphabetic k1 k2)
+      |> List.map snd
+    in
     if rev then
       (* Grouper par prénom *)
       List.fold_left
@@ -1244,11 +1295,7 @@ let print_several_possible_surnames x conf base _alias_cache (_, surname_groups)
     List.fold_left
       (fun acc ip ->
         let p = Driver.poi base ip in
-        if
-          Driver.Istr.is_empty (Driver.get_surname p)
-          || Driver.Istr.is_empty (Driver.get_first_name p)
-          || (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
-        then acc
+        if not (Util.visible_in_search conf base p) then acc
         else
           let aliases = Driver.get_surnames_aliases p in
           match
