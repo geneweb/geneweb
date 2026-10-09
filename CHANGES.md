@@ -38,6 +38,8 @@
   text editor (#2954, #2958).
 - `geneweb.sh` writes `gwd.log` next to `gwsetup.log` in `bases/`, so both
   are rotated at startup (#3033).
+- `-only <file>` no longer aborts gwsetup at startup; it is deprecated
+  and ignored (#3033).
 - Command result pages show the path of the log file and wrap long lines.
   Progress bars are no longer written when the output is redirected to a
   file (#2916).
