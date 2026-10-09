@@ -10,6 +10,7 @@ val gen_print :
     Adef.safe_string)) ->
   ?max_d:int ->
   ?mode:(unit -> unit) ->
+  ?root:Geneweb_db.Driver.person ->
   bool ->
   unit
 (** Display anniversaries for a given month, one section per day. [f_scan]
@@ -19,8 +20,10 @@ val gen_print :
     birthdays of living people only. [~max_d] is the maximum total relationship
     degree reachable for the target person (passed to the month/degree form).
     [~mode] emits hidden inputs specific to the calling context; when provided,
-    a month selector (and degree stepper in cousins context) is rendered after
-    the listing. *)
+    a month selector (and degree stepper in cousins context) is rendered above
+    the listing. [~root] is the reference person of a relatives listing; when
+    provided, the title names it and a subtitle shows the month, the degree
+    limit [d] and the listed events (births, or births and deaths). *)
 
 val print_birth : Config.config -> Geneweb_db.Driver.base -> int -> unit
 (** Displays birthdays for alive people for a given month *)
@@ -40,6 +43,7 @@ val gen_print_menu_birth :
     Geneweb_db.Driver.base ->
     Geneweb_db.Driver.person ->
     Adef.safe_string)) ->
+  ?root:Geneweb_db.Driver.person ->
   (unit -> unit) ->
   unit
 (** [gen_print_menu_birth conf base (next,txt_of) mode] displays the main
@@ -50,7 +54,9 @@ val gen_print_menu_birth :
     - Form to select the month of birthdays we want to see. [next] is function
       that returns next person from iterator, [txt_of] text/link that describes
       person's information and [mode] that add some additional hidden inputs in
-      the month form *)
+      the month form. [~root] is the reference person of a relatives listing;
+      when provided, the title names it and a subtitle shows the degree limit
+      [d] and the listed events. The month form is rendered above the lists. *)
 
 val print_menu_birth : Config.config -> Geneweb_db.Driver.base -> unit
 (** Displays the main birthdays menu considering all alive people *)
@@ -64,6 +70,7 @@ val gen_print_menu_dead :
     Geneweb_db.Driver.base ->
     Geneweb_db.Driver.person ->
     Adef.safe_string)) ->
+  ?root:Geneweb_db.Driver.person ->
   (unit -> unit) ->
   unit
 (** [gen_print_menu_dead conf base (next,txt_of) mode] displays the main
@@ -74,7 +81,10 @@ val gen_print_menu_dead :
     - Form to select the month of anniversaries we want to see. [next] is
       function that returns next person from iterator, [txt_of] text/link that
       describes person's information and [mode] that add some additional hidden
-      inputs in the month form *)
+      inputs in the month form. [~root] is the reference person of a relatives
+      listing; when provided, the title names it and a subtitle shows the degree
+      limit [d] and the listed events. The month form is rendered above the
+      lists. *)
 
 val print_menu_dead : Config.config -> Geneweb_db.Driver.base -> unit
 (** Displays the main anniversaries menu considering all dead people *)

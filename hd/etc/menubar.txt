@@ -404,9 +404,12 @@
               <a class="dropdown-item" %nn;
                 href="%prefix;m=F&%access;%if;(e.im=0)&im=0%end;" title="[*family/families]0">
                 <span class="fa fa-users fa-fw me-2" aria-hidden="true"></span>[*family/families]0</a>
-              %if;(died = "" and (wizard or friend))
+              %if;(wizard or friend)
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=C&t=AN&d=6"><span class="fa fa-cake-candles fa-fw me-2" aria-hidden="true"></span>[*family birthday]</a>
+                %if;(died = "")
+                  <a class="dropdown-item" href="%prefix;%access;&m=C&t=AN&d=6"><span class="fa fa-cake-candles fa-fw me-2" aria-hidden="true"></span>[*family birthday]</a>
+                %end;
+                <a class="dropdown-item" href="%prefix;%access;&m=C&t=AD&d=6"><span class="fa fa-calendar-days fa-fw me-2" aria-hidden="true"></span>[*anniversaries of dead relatives]</a>
               %end;
               %( Relationship graph builder %)
               <div class="dropdown-divider"></div>
