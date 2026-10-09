@@ -65,7 +65,17 @@ Atext ("favicon.png\"/>\n<body>\n");
      [{ desc = Aif ({ desc = Avar (c3, []);
                      loc = ./template.html:(60, 11):(60, 13) },
       [], []); loc = ./template.html:(60, 7):(62, 12) }])]);
-     loc = ./template.html:(57, 5):(63, 10) }; Atext ("</body>\n</html>")]);
+     loc = ./template.html:(57, 5):(63, 10) };
+    { desc = Aif (Aop2 (=,
+                  { desc = Avar (lang, []);
+                   loc = ./template.html:(65, 10):(65, 14) }, Atext ("fr")),
+    [Apack ([Atext ("<!-- included.html -->\n");
+             { desc = Apack ([{ desc = Avar (base, [bar]);
+                               loc = included.html:(1, 1):(1, 10) }]);
+              loc = ./template.html:(65, 20):(65, 42) };
+             Atext ("<!-- included.html -->\n")])],
+    []); loc = ./template.html:(65, 5):(65, 47) };
+    Atext ("</body>\n</html>")]);
     loc = ./template.html:(38, 5):(44, 9) }]);
    loc = ./template.html:(11, 5):(15, 10) }]);
   loc = ./template.html:(9, 5):(9, 34) }]);
