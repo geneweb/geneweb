@@ -1584,14 +1584,19 @@ let copy_text lang =
     copy_from_stream conf print_string (Stream.of_string content);
     flush stdout
 
-let deprecated_only () =
+let deprecated_only _ =
   Format.eprintf
     "The -only option is deprecated. You must use -i to bind the gwsetup \
-     server on a safe interface."
+     server on a safe interface.@."
 
 let parse_cmd () =
   let usage =
-    "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
+    "Usage: "
+    ^ Filename.basename Sys.argv.(0)
+    ^ " [options]\n\
+       The traces page shows gwsetup.log from the current directory: redirect \
+       stderr there (gwsetup ... > gwsetup.log 2>&1).\n\
+       Options are:"
   in
   let speclist =
     [
@@ -1607,19 +1612,20 @@ let parse_cmd () =
       ("-daemon", Arg.Set daemon, " Unix daemon mode.");
       ( "-i",
         Arg.String (fun s -> interface := s),
-        "Bind gwsetup to this interface." );
+        "<address> Bind gwsetup to this interface (default = " ^ !interface
+        ^ ")." );
       ( "-p",
         Arg.Int (fun x -> port := x),
         "<number> Select a port number (default = " ^ string_of_int !port
         ^ "); > 1024 for normal users." );
       ( "-only",
-        Arg.Unit deprecated_only,
-        "<file> File containing the only authorized address" );
+        Arg.String deprecated_only,
+        "<file> Deprecated and ignored; use -i." );
       ("-gd", Arg.String (fun x -> setup_dir := x), "<string> gwsetup directory");
       ( "-bindir",
         Arg.String (fun x -> bin_dir := x),
         "<string> binary directory (default = value of option -gd)" );
-      ("-debug", Arg.Set debug, "Enable debug mode.");
+      ("-debug", Arg.Set debug, " Enable debug mode.");
     ]
     |> List.sort compare |> Arg.align
   in
