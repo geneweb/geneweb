@@ -1025,6 +1025,26 @@ let sprintf_date tm =
        (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
        tm.Unix.tm_sec
 
+let epoch_of_date s =
+  try
+    Scanf.sscanf s "%4d-%2d-%2d %2d:%2d:%2d%!" (fun y mo d h mi sec ->
+        let tm =
+          {
+            Unix.tm_year = y - 1900;
+            tm_mon = mo - 1;
+            tm_mday = d;
+            tm_hour = h;
+            tm_min = mi;
+            tm_sec = sec;
+            tm_wday = 0;
+            tm_yday = 0;
+            tm_isdst = false;
+          }
+        in
+        Some (int_of_float (fst (Unix.mktime tm))))
+  with Scanf.Scan_failure _ | Failure _ | End_of_file | Unix.Unix_error _ ->
+    None
+
 let rev_input_line ic pos (rbuff, rpos) =
   let rev = Buffer.create 256 in
   let rev_input_char pos =

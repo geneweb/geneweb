@@ -879,6 +879,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 %end;
+%( History pages (m=HIST, m=HIST_DIFF): update times are recorded in the
+   server's timezone and rendered as Unix epochs in data-epoch attributes;
+   redisplay them in the browser's timezone. %)
+%if;(e.m="HIST" or e.m="HIST_DIFF")
+<script>
+  document.querySelectorAll('.gw-hist-time').forEach((el) => {
+    const epoch = parseInt(el.dataset.epoch, 10);
+    if (isNaN(epoch)) return;
+    const d = new Date(epoch * 1000);
+    const p = (n) => String(n).padStart(2, '0');
+    el.textContent = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} `
+      + `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  });
+</script>
+%end;
 %end;%( closing “e.templ” of the DOMContentLoaded blocks, not indented for convenience %)
 %end;%( closing initial “not cancel_links”, not indented either %)
 %( b.reduce_place=yes %)
