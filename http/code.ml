@@ -28,3 +28,4 @@ let pp ppf s =
   | Service_Unavailable -> Fmt.pf ppf "503 Service Unavailable"
 
 let to_string = Fmt.to_to_string pp
+let output oc s = output_string oc (to_string s)
