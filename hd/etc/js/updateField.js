@@ -123,9 +123,7 @@
         field === 'occu' || field === 'psources' || field === 'fsources'
         || field.endsWith('_src');
       const input = document.createElement(area ? 'textarea' : 'input');
-      input.className = area
-        ? 'form-control upd-input w-100'
-        : 'form-control form-control-inline upd-input';
+      input.className = 'form-control upd-input';
       input.value = original;
       input.style.font = 'inherit';
       if (area) {
@@ -133,10 +131,29 @@
       } else {
         input.type = 'text';
         input.placeholder = original;
-        input.size = original.length + 1;
       }
       el.style.display = 'none';
       el.after(input);
+      input.style.display = 'inline-block';
+      input.style.verticalAlign = area ? 'top' : 'middle';
+      input.style.width = '1px';
+      const box = input.closest('.col, [class*="col-"], .container, .container-fluid')
+        || document.body;
+      const cs = getComputedStyle(box);
+      const r = box.getBoundingClientRect();
+      const right = r.right - parseFloat(cs.paddingRight);
+      const full = Math.floor(right - r.left - parseFloat(cs.paddingLeft)) - 1;
+      const room = Math.floor(right - input.getBoundingClientRect().left) - 1;
+      const min = 15 * parseFloat(getComputedStyle(input).fontSize);
+      const head = input.closest('h1, h2, h3, h4, h5, h6');
+      if (head) {
+        const rg = document.createRange();
+        rg.selectNodeContents(head);
+        const slack = Math.floor(right - rg.getBoundingClientRect().right);
+        input.style.width = Math.max(input.scrollWidth, slack) + 'px';
+      } else {
+        input.style.width = (room >= min ? room : full) + 'px';
+      }
       if (area && typeof autosize === 'function') autosize(input);
       const restore = (text, htmlText) => {
         if (area && typeof autosize === 'function') autosize.destroy(input);
