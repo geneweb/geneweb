@@ -2859,6 +2859,39 @@ sv: årsdagar för avlidna personer
 tr: merhumun yıldönümleri
 zh: 死亡于今日的记录
 
+    anniversaries of dead relatives
+af: herdenkings van oorlede familielede
+bg: годишнини на починали близки
+br: deizioù-ha-bloaz ar gerent varv
+ca: aniversaris dels parents difunts
+co: anniversarii di i parenti defunti
+cs: výročí zemřelých příbuzných
+da: årsdage for afdøde slægtninge
+de: Jahrestage verstorbener Angehöriger
+en: anniversaries of dead relatives
+eo: datrevenoj de mortintaj parencoj
+es: aniversarios de los familiares difuntos
+et: surnud sugulaste mälestuspäevad
+fi: kuolleiden sukulaisten vuosipäivät
+fr: anniversaires des défunts proches
+he: ימי שנה של קרובים שנפטרו
+is: ártíðir látinna ættingja
+it: anniversari dei parenti defunti
+lt: mirusių artimųjų metinės
+lv: mirušo radinieku piemiņas dienas
+nl: verjaardagen van overleden naasten
+no: merkedager for avdøde slektninger
+oc: aniversaris dels parents defunts
+pl: rocznice zmarłych krewnych
+pt: aniversários dos familiares defuntos
+ro: aniversările rudelor decedate
+ru: годовщины умерших родственников
+sk: výročia zosnulých príbuzných
+sl: obletnice umrlih sorodnikov
+sv: årsdagar för avlidna släktingar
+tr: vefat etmiş akrabaların yıldönümleri
+zh: 已故亲属的纪念日
+
     anniversaries of marriage
 af: huweliksherdenkinge
 bg: годишнини от сватба
