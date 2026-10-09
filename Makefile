@@ -47,7 +47,7 @@ fmt: ## Format Ocaml code
 	dune fmt
 
 build:
-	dune build
+	dune build @install
 
 build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
