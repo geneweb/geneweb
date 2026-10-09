@@ -181,17 +181,20 @@ let add_escaped_string buf (s : Adef.escaped_string) =
     - p : person [Retour] : unit [Rem] : Not visible. *)
 let print_person_parents_and_spouses conf base ?(alias = None) ?(snalias = None)
     p =
-  if not (GWPARAM.p_auth conf base p) then ()
+  if not (GWPARAM.p_auth_sp conf base p) then ()
   else
+    let full = GWPARAM.p_auth conf base p in
     let buf = Buffer.create 256 in
     Buffer.add_string buf "<a href=\"";
     add_escaped_string buf (commd conf);
     add_escaped_string buf (acces conf base p);
     Buffer.add_string buf "\">";
-    let pub_name = Driver.sou base (Driver.get_public_name p) in
+    let pub_name =
+      (escape_html (Driver.sou base (Driver.get_public_name p)) :> string)
+    in
     let first_name = (escape_html (Driver.p_first_name base p) :> string) in
     let surname = (escape_html (Driver.p_surname base p) :> string) in
-    let name = if pub_name <> "" then (pub_name :> string) else first_name in
+    let name = if pub_name <> "" then pub_name else first_name in
     let name =
       match List.assoc_opt "show_occ" conf.base_env with
       | Some "yes" -> Printf.sprintf "%s.%d" name (Driver.get_occ p)
@@ -205,7 +208,10 @@ let print_person_parents_and_spouses conf base ?(alias = None) ?(snalias = None)
     | Some sn_a ->
         Buffer.add_string buf (" [" ^ (escape_html sn_a :> string) ^ "]")
     | None -> ());
-    add_safe_string buf (DateDisplay.short_dates_text conf base p);
+    (* Dates : réservées à p_auth.  Le reste (noms des parents et des
+       conjoints) est visible dès p_auth_sp ; chaque nom est filtré
+       individuellement par gen_person_text. *)
+    if full then add_safe_string buf (DateDisplay.short_dates_text conf base p);
     (match alias with
     | Some alias ->
         Printf.bprintf buf " %s %s" (Util.transl conf "alias")
@@ -221,8 +227,7 @@ let print_person_parents_and_spouses conf base ?(alias = None) ?(snalias = None)
       Buffer.add_string buf cop);
     let spouses_buf = Buffer.create 128 in
     ignore (Util.husband_wife ~buf:spouses_buf conf base p true);
-    let spouses_text = Buffer.contents spouses_buf in
-    Buffer.add_string buf spouses_text;
+    Buffer.add_string buf (Buffer.contents spouses_buf);
     Buffer.add_char buf '.';
     Output.print_sstring conf (Buffer.contents buf)
 
