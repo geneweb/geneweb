@@ -812,3 +812,9 @@
 # Provider name shown on the welcome-page login button, after the translated
 # "connect with" (e.g. "Google" -> "Connect with Google"). Defaults to "SSO".
 #oidc_provider_name=
+
+# Lifetime in seconds of the OIDC session cookie. The session is sliding:
+# every authenticated request re-issues the cookie with a renewed expiry, so
+# this is an inactivity timeout, not a fixed delay since login. Defaults to
+# the global -login-timeout value (1800 seconds).
+#oidc_session_timeout=

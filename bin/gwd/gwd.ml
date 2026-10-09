@@ -1251,15 +1251,18 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     (command, bname, passwd, env, access_type)
   in
 
-  let oidc_session, access_type =
+  let oidc_session, oidc_renew, access_type =
     match access_type with
     | ATnone -> (
         match Gwd_oidc.cookie_access ~secret:secret_salt request base_file with
         | Some (acc, user, username) ->
-            if acc = 'w' then (true, ATwizard (user, username))
-            else (true, ATfriend (user, username))
-        | None -> (false, ATnone))
-    | _ -> (false, access_type)
+            let access_type =
+              if acc = 'w' then ATwizard (user, username)
+              else ATfriend (user, username)
+            in
+            (true, Some (base_file, acc, user, username), access_type)
+        | None -> (false, None, ATnone))
+    | _ -> (false, None, access_type)
   in
   let lang, env = extract_assoc "lang" env in
   let env = List.filter (fun (k, _) -> k <> "notif") env in
@@ -1464,7 +1467,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     Notif.error
       ~title:(transl conf "NOTIF_TT access refused")
       (transl conf "NOTIF access refused");
-  (conf, ar)
+  (conf, ar, oidc_renew)
 
 (* Filter to avoid logging requests that don't provide useful information *)
 let should_log_request contents referer user_agent =
@@ -1579,7 +1582,7 @@ let conf_and_connection =
     env
     conn
   ->
-    let conf, passwd_err =
+    let conf, passwd_err, oidc_renew =
       make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from
         request script_name env
     in
@@ -1653,6 +1656,10 @@ let conf_and_connection =
               end
           | _ -> (
               enable_gzip ();
+              (match oidc_renew with
+              | Some (base_file, acc, user, username) ->
+                  Gwd_oidc.renew_session conf ~base_file ~acc ~user ~username
+              | None -> ());
               try
                 let t1 = Unix.gettimeofday () in
                 Request.treat_request conn conf;
