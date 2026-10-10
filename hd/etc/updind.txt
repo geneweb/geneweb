@@ -346,25 +346,14 @@
           %for;i;1;11;<option>%i;</option>%nl;%end;
         </select>
         <label class="btn btn-outline-primary border-start-0">[witness/witness/witnesses]3
-          <input class="ms-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
+          <input class="ms-1" type="checkbox" name="excnt_ins_witnwcnt" value="on"
+            %if;("evt_name" = "#deat")onchange="if (this.checked && !document.getElementById('e_namexcnt').value) set_death_focus(xcnt)"
+            %elseif;("evt_name" = "buri_or_crem")onchange="if (this.checked) set_buri(xcnt)"%end;>
         </label>
         <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0(s)">OK</button>
       </div>
     </div>
   </div>
-%(<table style="border-width:1px">
-    <tr>
-      <td>
-        [*insert]&nbsp;
-        <input type="text" name="excnt_ins_witnwcnt_n" size="1" maxlength="1" value="1" onkeydown= "if(event.keyCode == 13) document.getElementById('excnt_ins_witnwcnt').value = 'on';">
-        </label>[nouveau(x)::witness/witnesses]0 %if;("evt_name" = "#bapt")/ [godfather/godmother/godparents]2%end;
-        <input type="hidden" name="excnt_ins_witnwcnt" id="excnt_ins_witnwcnt" readonly>
-        <input type="submit"
-          onclick="%if;("evt_name" = "buri_or_crem")set_buri(xcnt);%end;
-                   %if;("evt_name" = "#deat")set_insert_death(xcnt);%end; document.forms['form_pers'].action += '#witn';document.getElementById('excnt_ins_witnwcnt').value = 'on'" value="ok" readonly>
-      </td>
-    </tr>
-  </table>%)
 %end;
 
 %define;one_witness(xcnt, wcnt, evt_name)

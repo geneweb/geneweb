@@ -133,6 +133,26 @@ function initFormFocus() {
   }
 }
 
+/** Scrolls back, on a form redisplay, to the first insertion or swap point requested */
+function initInsertScroll(redisplay) {
+  const form = document.getElementById('updfam') || document.forms.upd;
+  if (!form) return;
+  const key = 'upd_insert_point';
+  try {
+    const name = sessionStorage.getItem(key);
+    sessionStorage.removeItem(key);
+    if (redisplay && name) form.elements.namedItem(name)?.scrollIntoView?.({ block: 'center' });
+  } catch (e) {}
+  form.addEventListener('submit', ev => {
+    const el = Array.from(form.elements).find(el => /^(e\d+_)?(ins|inv|add)_/.test(el.name)
+      && (el.checked || el === ev.submitter || (el.tagName === 'SELECT' && +el.value > 1)));
+    try {
+      if (el) sessionStorage.setItem(key, el.name);
+      else sessionStorage.removeItem(key);
+    } catch (e) {}
+  });
+}
+
 /** Toggle visibilité des champs create/link pour témoins/relations */
 function initSelectToggle() {
   document.querySelectorAll('[id$="_selct"]').forEach(select => {
@@ -200,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCustomEvents();
   initSelectToggle();
   initFormFocus();
+  initInsertScroll(%if;("_OK" in evar_m)true%else;false%end;);
   initCalendarMonthSelects();
   new bootstrap.ScrollSpy(document.body, { target: '#banner' });
 %if;is_upd_fam;
