@@ -44,7 +44,6 @@ let n_workers = ref Cmd.default_n_workers
 let max_pending_requests = ref Cmd.default_max_pending_requests
 let no_host_address = ref false
 let only_addresses : string list ref = ref []
-let trusted_proxies : string list ref = ref []
 let redirected_addr : string option ref = ref None
 let robot_xcl : (int * int) option ref = ref None
 let selected_port = ref Cmd.default_port

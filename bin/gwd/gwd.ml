@@ -13,12 +13,15 @@ module Registration = Geneweb_register.Registration
 module Server = Geneweb_http.Server
 module Connection = Geneweb_http.Connection
 module Code = Geneweb_http.Code
+module Header = Geneweb_http.Header
 module Compat = Geneweb_compat
-open Cmd_legacy
 
 let src = Logs.Src.create ~doc:"Gwd" "GWD "
 
 module Log = (val Logs.src_log src : Logs.LOG)
+open Cmd_legacy
+
+let trusted_proxies : string list ref = ref []
 
 let pp_exception ~predictable_mode ppf (exn, bt) =
   let pp_header ppf () =
@@ -36,7 +39,7 @@ let gzip_min_size = 1024
 let client_accepts_encoding request encoding =
   let accept =
     String.lowercase_ascii
-      (Mutil.extract_param "accept-encoding: " '\n' request)
+      (Header.extract_param "accept-encoding: " '\n' request)
   in
   if not (Mutil.contains accept encoding) then false
   else
@@ -162,8 +165,8 @@ let split_username username =
       (username, "")
 
 let log_passwd_failed ar tm from request base_file =
-  let referer = Mutil.extract_param "referer: " '\n' request in
-  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
+  let referer = Header.extract_param "referer: " '\n' request in
+  let user_agent = Header.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
   Log.info (fun k ->
       k "%s (%d) %s_%s => failed (%s)"
@@ -343,7 +346,7 @@ let log_redirect from request req =
     Log.info (fun k -> k "%a\n" Lock.pp_exception (exn, bt))
   in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  let referer = Mutil.extract_param "referer: " '\n' request in
+  let referer = Header.extract_param "referer: " '\n' request in
   Log.info (fun k ->
       k ~tags:timestamp "%s --- From: %s --- Referer: %s" req from referer)
 
@@ -652,7 +655,7 @@ let set_token utm from_addr base_file acc user username =
   x
 
 let http_preferred_language request =
-  let v = Mutil.extract_param "accept-language: " '\n' request in
+  let v = Header.extract_param "accept-language: " '\n' request in
   if v = "" then ""
   else
     let s = String.lowercase_ascii v in
@@ -829,7 +832,7 @@ let parse_digest s =
 
 let basic_credentials request =
   let prefix = "Basic " in
-  match Mutil.extract_param "authorization: " '\r' request with
+  match Header.extract_param "authorization: " '\r' request with
   | "" -> Error "(authorization not provided)"
   | auth when not (String.starts_with ~prefix auth) ->
       Error "(unsupported authorization scheme)"
@@ -860,7 +863,7 @@ let basic_authorization ~cgi from_addr request base_env passwd access_type utm
     match basic_credentials request with Ok s -> s | Error _ -> ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
-  let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
+  let auto = Header.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
   let oidc_configured = Gwd_oidc.enabled base_env in
   let ok, wizard, friend, username =
@@ -1068,10 +1071,10 @@ let digest_authorization ~cgi request base_env passwd utm base_file command =
       ar_can_stale = false;
     }
   else if passwd = "w" || passwd = "f" then
-    let auth = Mutil.extract_param "authorization: " '\r' request in
+    let auth = Header.extract_param "authorization: " '\r' request in
     if String.starts_with ~prefix:"Digest " auth then
       let meth =
-        match Mutil.extract_param "GET " ' ' request with
+        match Header.extract_param "GET " ' ' request with
         | "" -> "POST"
         | _ -> "GET"
       in
@@ -1501,8 +1504,8 @@ let should_log_request contents referer user_agent =
   not (is_browser_probe || is_favicon)
 
 let log conf from gauth request script_name contents =
-  let referer = Mutil.extract_param "referer: " '\n' request in
-  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
+  let referer = Header.extract_param "referer: " '\n' request in
+  let user_agent = Header.extract_param "user-agent: " '\n' request in
   if not (should_log_request contents referer user_agent) then ()
   else
     Log.info (fun k ->
@@ -1978,7 +1981,7 @@ let extract_multipart boundary str =
 
 let build_env request (contents : Adef.encoded_string) :
     Adef.encoded_string * (string * Adef.encoded_string) list =
-  let content_type = Mutil.extract_param "content-type: " '\n' request in
+  let content_type = Header.extract_param "content-type: " '\n' request in
   if is_multipart_form content_type then
     let boundary =
       (extract_boundary (Adef.encoded content_type)
@@ -2004,6 +2007,8 @@ let normalize_addr s =
 let is_trusted_proxy addr =
   !trusted_proxies <> [] && List.mem (normalize_addr addr) !trusted_proxies
 
+type forwarded = Not_forwarded | Client of string | Invalid of string
+
 (* Address of the real client of a request relayed by a trusted proxy.
    X-Forwarded-For is "client, proxy1, proxy2": each proxy appends the address
    it received the request from. The list is walked from the right, skipping
@@ -2017,8 +2022,9 @@ let forwarded_client request =
     | exception Failure _ -> false
   in
   let chain =
-    Mutil.extract_param "x-forwarded-for: " '\r' request
-    |> String.split_on_char ',' |> List.map normalize_addr
+    Header.extract_params "x-forwarded-for:" '\r' request
+    |> List.concat_map (String.split_on_char ',')
+    |> List.map normalize_addr
     |> List.filter (fun s -> s <> "")
   in
   let rec last_untrusted = function
@@ -2026,47 +2032,60 @@ let forwarded_client request =
     | x :: l -> if is_trusted_proxy x then last_untrusted l else Some x
   in
   match last_untrusted (List.rev chain) with
-  | Some s when is_ip s -> Some s
-  | Some _ | None -> None
+  | None -> Not_forwarded
+  | Some s when is_ip s -> Client s
+  | Some s -> Invalid s
 
 let connection ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn
     (addr, request) script_name contents0 =
+  let printer_conf = printer_conf conn in
   let from =
     match addr with
-    | Unix.ADDR_UNIX x -> x
+    | Unix.ADDR_UNIX x -> Ok x
     | Unix.ADDR_INET (iaddr, _) -> (
         let peer = Unix.string_of_inet_addr iaddr in
         match
-          if is_trusted_proxy peer then forwarded_client request else None
+          if is_trusted_proxy peer then forwarded_client request
+          else Not_forwarded
         with
-        | Some client -> client
-        | None ->
+        | Client client -> Ok client
+        | Invalid s -> Error (peer, s)
+        | Not_forwarded ->
             (* FIXME: The function `Unix.gethostbyaddr` is very slow on
                Windows. Calling it increases the page load time by a factor
                of 15 on my computer. *)
             if Sys.unix && not !no_host_address then
-              try (Unix.gethostbyaddr iaddr).Unix.h_name with _ -> peer
-            else peer)
+              try Ok (Unix.gethostbyaddr iaddr).Unix.h_name with _ -> Ok peer
+            else Ok peer)
   in
-  let printer_conf = printer_conf conn in
-  if request = [] then ()
-  else if script_name = "robots.txt" then robots_txt printer_conf
-  else if excluded from then refuse_log printer_conf from
-  else
-    let accept =
-      if !only_addresses = [] then true else List.mem from !only_addresses
-    in
-    if not accept then only_log printer_conf from
-    else
-      try
-        let contents, env = build_env request contents0 in
-        if
-          (not (asset_image_request printer_conf script_name))
-          && not (misc_request conn printer_conf request script_name)
-        then
-          conf_and_connection ~predictable_mode ~cgi ~loaded_plugins
-            ~secret_salt from request script_name contents env conn
-      with Exit -> ()
+  match from with
+  | Error (peer, s) ->
+      if request <> [] then (
+        Log.warn (fun k ->
+            k "Rejected: invalid X-Forwarded-For client %S from proxy %s" s peer);
+        http printer_conf Code.Bad_Request;
+        Output.print_sstring printer_conf
+          "<head><title>Bad request</title></head>\n\
+           <body><h1>Bad request</h1></body>\n")
+  | Ok from -> (
+      if request = [] then ()
+      else if script_name = "robots.txt" then robots_txt printer_conf
+      else if excluded from then refuse_log printer_conf from
+      else
+        let accept =
+          if !only_addresses = [] then true else List.mem from !only_addresses
+        in
+        if not accept then only_log printer_conf from
+        else
+          try
+            let contents, env = build_env request contents0 in
+            if
+              (not (asset_image_request printer_conf script_name))
+              && not (misc_request conn printer_conf request script_name)
+            then
+              conf_and_connection ~predictable_mode ~cgi ~loaded_plugins
+                ~secret_salt from request script_name contents env conn
+          with Exit -> ())
 
 let null_reopen flags fd =
   if Sys.unix then (

@@ -23,6 +23,11 @@ module Header : sig
       ending the request line. For example, the string request has been obtained
       by: [extract_param "GET /" ' ']. Answers the empty string if the parameter
       is not found. *)
+
+  val extract_params : string -> char -> string list -> string list
+  (** Like [extract_param], but returns the values of all the lines starting
+      with [name], in request order. A header field may be repeated; for
+      list-valued fields (X-Forwarded-For...) the occurrences form one list. *)
 end
 
 module Connection : sig

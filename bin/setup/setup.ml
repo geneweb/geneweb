@@ -2,6 +2,7 @@ open Geneweb
 module Server = Geneweb_http.Server
 module Connection = Geneweb_http.Connection
 module Code = Geneweb_http.Code
+module Header = Geneweb_http.Header
 module Dirs = Geneweb_dirs
 
 let ( // ) = Filename.concat
@@ -361,13 +362,13 @@ let is_directory x =
   with Unix.Unix_error (_, _, _) -> false
 
 let server_string conf =
-  let s = Mutil.extract_param "host: " '\r' conf.request in
+  let s = Header.extract_param "host: " '\r' conf.request in
   try
     let i = String.rindex s ':' in
     String.sub s 0 i
   with Not_found -> "127.0.0.1"
 
-let referer conf = Mutil.extract_param "referer: " '\r' conf.request
+let referer conf = Header.extract_param "referer: " '\r' conf.request
 
 (* this set of macros are used within translations, hence the repeat of some *)
 (* like %l, %L, %P, ... and they may be different! %G  *)

@@ -2,6 +2,7 @@ open Geneweb
 open Config
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Header = Geneweb_http.Header
 module Connection = Geneweb_http.Connection
 
 let src = Logs.Src.create ~doc:"OIDC" "OIDC"
@@ -79,7 +80,7 @@ let parse_session_cookie secret ~base_file value =
   | _ -> None
 
 let extract_oidc_cookie request cookie_name =
-  let cookie_hdr = Mutil.extract_param "cookie: " '\n' request in
+  let cookie_hdr = Header.extract_param "cookie: " '\n' request in
   if cookie_hdr = "" then None
   else
     let prefix = cookie_name ^ "=" in
@@ -409,7 +410,7 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
         ~value:cookie ~max_age:(Some !Cmd_legacy.login_timeout);
       send_redirect conf base_url
 
-let request_is_post request = Mutil.extract_param "POST " ' ' request <> ""
+let request_is_post request = Header.extract_param "POST " ' ' request <> ""
 
 let handle_oidc_logout conn conf base_env _from_addr base_file =
   let base_url =

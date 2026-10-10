@@ -10,6 +10,7 @@ module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Code = Geneweb_http.Code
+module Header = Geneweb_http.Header
 
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
@@ -495,7 +496,7 @@ let translate_eval s = Translate.eval (Mutil.nominative s)
 (* *)
 
 let get_referer conf =
-  let referer = Mutil.extract_param "referer: " '\n' conf.request in
+  let referer = Header.extract_param "referer: " '\n' conf.request in
   escape_html referer
 
 let end_centered conf = Output.print_sstring conf "</td></tr></table>\n"
@@ -1570,7 +1571,7 @@ let is_full_html_template conf fname =
       result
 
 let get_server_string conf =
-  if not conf.cgi then Mutil.extract_param "host: " '\r' conf.request
+  if not conf.cgi then Header.extract_param "host: " '\r' conf.request
   else
     let server_name = try Sys.getenv "SERVER_NAME" with Not_found -> "" in
     let server_port =
@@ -1579,7 +1580,7 @@ let get_server_string conf =
     if server_port = "80" then server_name else server_name ^ ":" ^ server_port
 
 let get_request_string conf =
-  if not conf.cgi then Mutil.extract_param "GET " ' ' conf.request
+  if not conf.cgi then Header.extract_param "GET " ' ' conf.request
   else
     let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
@@ -1587,7 +1588,7 @@ let get_request_string conf =
 
 let get_protocol conf =
   let forwarded_proto =
-    Mutil.extract_param "x-forwarded-proto: " '\r' conf.request
+    Header.extract_param "x-forwarded-proto: " '\r' conf.request
   in
   if String.lowercase_ascii forwarded_proto = "https" then "https"
   else
