@@ -500,13 +500,10 @@
         %end;
       </div>
     </div>
-    %if;has_witness;
-      %foreach;witness;
-        %apply;one_witness(xcnt, wcnt, "")
-        %if;is_last;%apply;insert_witness(xcnt, wcnt, "")%end;
-      %end;
-    %else;
-      %apply;insert_witness(xcnt, "0", "")
+    %apply;insert_witness(xcnt, "0", "")
+    %foreach;witness;
+      %apply;one_witness(xcnt, wcnt, "")
+      %apply;insert_witness(xcnt, wcnt, "")
     %end;
     <hr>
   %end;
@@ -596,13 +593,10 @@
         %end;
       </div>
     </div>
-    %if;has_witness;
-      %foreach;witness;
-        %apply;one_witness(xcnt, wcnt, "evt_name")
-        %if;is_last;%apply;insert_witness(xcnt, wcnt, "evt_name")%end;
-      %end;
-    %else;
-      %apply;insert_witness(xcnt, "0", "evt_name")
+    %apply;insert_witness(xcnt, "0", "evt_name")
+    %foreach;witness;
+      %apply;one_witness(xcnt, wcnt, "evt_name")
+      %apply;insert_witness(xcnt, wcnt, "evt_name")
     %end;
   %end;
 %end;
