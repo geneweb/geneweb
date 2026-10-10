@@ -397,6 +397,16 @@
           <option value="othe"%if;(fwitness_kind="othe") selected%end;>[*other/other/other]2</option>
         </select>
       </div>
+      %if;(wcnt!=1)
+        <div class="d-inline-flex align-items-center col-2 ms-auto">
+          <button type="submit" class="btn btn-outline-secondary btn-sm" name="excnt_inv_witnwcnt" value="on"
+            title="[*invert] [witness/witness/witnesses]2 %expr(wcnt-1) [and] wcnt">%nn;
+            <i class="far fa-user"></i> %expr(wcnt-1)%nn;
+            <i class="fa fa-right-left fa-rotate-90 mx-2"></i>%nn;
+            wcnt <i class="far fa-user"></i>%nn;
+          </button>
+        </div>
+      %end;
     </div>
     <div class="row">
       <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
@@ -640,7 +650,7 @@
 %define;invert_children(xcnt)
   <div class="d-inline-flex align-items-center col-2 ms-auto">
     <button type="submit" class="btn btn-outline-secondary btn-sm" name="inv_chxcnt" value="on"
-      title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt">%nn;
+      title="[*invert] [child/children]1 %expr(xcnt-1) [and] xcnt">%nn;
       <i class="far fa-user"></i> %expr(xcnt-1)%nn;
       <i class="fa fa-right-left fa-rotate-90 mx-2"></i>%nn;
        xcnt <i class="far fa-user"></i>%nn;

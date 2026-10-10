@@ -233,6 +233,14 @@ let rec reconstitute_pevents conf ext cnt =
                 | Some "othe" -> (c, Witness_Other)
                 | _ -> (c, Witness)
               in
+              let c, witnesses, ext =
+                let var =
+                  "e" ^ string_of_int cnt ^ "_inv_witn" ^ string_of_int (i + 1)
+                in
+                match (p_getenv conf.env var, witnesses) with
+                | Some "on", c1 :: witnesses -> (c1, c :: witnesses, true)
+                | (Some _ | None), _ -> (c, witnesses, ext)
+              in
               let var_w =
                 "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i
               in

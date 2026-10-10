@@ -390,9 +390,19 @@
           <option value="othe"%if;(witness_kind="othe") selected%end;>[*other/other/other]2</option>
         </select>
       </div>
+      %if;(wcnt!=1)
+        <div class="d-inline-flex align-items-center col-2 ms-auto">
+          <button type="submit" class="btn btn-outline-secondary btn-sm" name="excnt_inv_witnwcnt" value="on"
+            title="[*invert] [witness/witness/witnesses]2 %expr(wcnt-1) [and] wcnt">%nn;
+            <i class="far fa-user"></i> %expr(wcnt-1)%nn;
+            <i class="fa fa-right-left fa-rotate-90 mx-2"></i>%nn;
+            wcnt <i class="far fa-user"></i>%nn;
+          </button>
+        </div>
+      %end;
     </div>
     <div class="row">
-      <label for="excnt_witnwcnt_fn" class="col-2 col-form-label">[*first name/first names]0</label>
+      <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
       <div class="col-6">
         <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn"
           value="%witness.first_name;" placeholder="[*first name/first names]0"%datalist_fnames;>
