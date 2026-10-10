@@ -6,6 +6,7 @@ module Parser = Geneweb_templ.Parser
 module Ast = Geneweb_templ.Ast
 module Loc = Geneweb_templ.Loc
 module Driver = Geneweb_db.Driver
+module Header = Geneweb_http.Header
 
 exception UnboundVar
 exception BadApplyArity
@@ -118,7 +119,7 @@ let not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 
 let setup_link (conf : Config.config) =
-  let s = Mutil.extract_param "host: " '\r' conf.request in
+  let s = Header.extract_param "host: " '\r' conf.request in
   try
     let i = String.rindex s ':' in
     let s = "http://" ^ String.sub s 0 i ^ ":2316/" in

@@ -8,6 +8,7 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
+module Header = Geneweb_http.Header
 
 let cp = Filesystem.copy_file ~perm:0o666
 
@@ -358,7 +359,7 @@ let effective_send_ok conf base p file =
     match image_type content with
     | None ->
         dump_bad_image conf content;
-        Mutil.extract_param "content-type: " '\n' request
+        Header.extract_param "content-type: " '\n' request
         |> incorrect_content_type conf base p
     | Some (typ, content) -> (
         match
@@ -452,7 +453,7 @@ let effective_send_c_ok conf base p file file_name =
     if content <> "" then
       match image_type content with
       | None ->
-          let ct = Mutil.extract_param "Content-Type: " '\n' request in
+          let ct = Header.extract_param "Content-Type: " '\n' request in
           dump_bad_image conf content;
           incorrect_content_type conf base p ct
       | Some (typ, content) -> (
