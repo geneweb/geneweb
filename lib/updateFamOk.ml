@@ -63,73 +63,30 @@ let invert_children conf (c, children, ext) i =
   | _ -> (c, children, ext)
 
 let insert_child conf (children, ext) i =
-  let var = "ins_ch" ^ string_of_int i in
-  match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
-  | _, Some n when n > 1 ->
-      let children =
-        let rec loop children n =
-          if n > 0 then
-            let new_child = ("", "", 0, Update.Create (Neuter, None), "") in
-            loop (new_child :: children) (n - 1)
-          else children
-        in
-        loop children n
-      in
-      (children, true)
-  | Some "on", _ ->
-      let new_child = ("", "", 0, Update.Create (Neuter, None), "") in
-      (new_child :: children, true)
-  | _ -> (children, ext)
+  insert_blanks conf
+    ("ins_ch" ^ string_of_int i)
+    ("", "", 0, Update.Create (Neuter, None), "")
+    (children, ext)
 
 let insert_parent conf (parents, ext) i =
-  let var = "ins_pa" ^ string_of_int i in
-  match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
-  | _, Some n when n > 1 ->
-      let parents =
-        let rec loop parents n =
-          if n > 0 then
-            let new_parent = ("", "", 0, Update.Create (Neuter, None), "") in
-            loop (new_parent :: parents) (n - 1)
-          else parents
-        in
-        loop parents n
-      in
-      (parents, true)
-  | Some "on", _ ->
-      let new_parent = ("", "", 0, Update.Create (Neuter, None), "") in
-      (new_parent :: parents, true)
-  | _ -> (parents, ext)
+  insert_blanks conf
+    ("ins_pa" ^ string_of_int i)
+    ("", "", 0, Update.Create (Neuter, None), "")
+    (parents, ext)
 
 let reconstitute_insert_event conf ext cnt el =
-  let var = "ins_event" ^ string_of_int cnt in
-  let n =
-    match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
-    | _, Some n when n > 1 -> n
-    | Some "on", _ -> 1
-    | _ -> 0
-  in
-  if n > 0 then
-    let el =
-      let rec loop el n =
-        if n > 0 then
-          let e1 =
-            {
-              efam_name = Efam_Name "";
-              efam_date = Date.cdate_None;
-              efam_place = "";
-              efam_reason = "";
-              efam_note = "";
-              efam_src = "";
-              efam_witnesses = [||];
-            }
-          in
-          loop (e1 :: el) (n - 1)
-        else el
-      in
-      loop el n
-    in
-    (el, true)
-  else (el, ext)
+  insert_blanks conf
+    ("ins_event" ^ string_of_int cnt)
+    {
+      efam_name = Efam_Name "";
+      efam_date = Date.cdate_None;
+      efam_place = "";
+      efam_reason = "";
+      efam_note = "";
+      efam_src = "";
+      efam_witnesses = [||];
+    }
+    (el, ext)
 
 let rec reconstitute_events conf ext cnt =
   match get_nth conf "e_name" cnt with
@@ -177,7 +134,7 @@ let rec reconstitute_events conf ext cnt =
             try Some (reconstitute_somebody conf key) with Failure _ -> None
           with
           | None -> ([], ext)
-          | Some (fn, sn, occ, create, var) -> (
+          | Some (fn, sn, occ, create, var) ->
               let witnesses, ext = loop (i + 1) ext in
               let create = update_ci conf create key in
               let c = (fn, sn, occ, create, var) in
@@ -200,60 +157,21 @@ let rec reconstitute_events conf ext cnt =
                 | Some "on", c1 :: witnesses -> (c1, c :: witnesses, true)
                 | (Some _ | None), _ -> (c, witnesses, ext)
               in
-              match
-                p_getenv conf.env
+              let witnesses, ext =
+                insert_blanks conf
                   ("e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i)
-              with
-              | Some "on" -> (
-                  let ins_witn_n =
-                    "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i
-                    ^ "_n"
-                  in
-                  match p_getint conf.env ins_witn_n with
-                  | Some n when n > 1 ->
-                      let rec loop_witn n witnesses =
-                        if n = 0 then (c :: witnesses, true)
-                        else
-                          let new_witn =
-                            ( ("", "", 0, Update.Create (Neuter, None), ""),
-                              Witness )
-                          in
-                          let witnesses = new_witn :: witnesses in
-                          loop_witn (n - 1) witnesses
-                      in
-                      loop_witn n witnesses
-                  | Some _ | None ->
-                      let new_witn =
-                        (("", "", 0, Update.Create (Neuter, None), ""), Witness)
-                      in
-                      (c :: new_witn :: witnesses, true))
-              | Some _ | None -> (c :: witnesses, ext))
+                  (("", "", 0, Update.Create (Neuter, None), ""), Witness)
+                  (witnesses, ext)
+              in
+              (c :: witnesses, ext)
         in
         loop 1 ext
       in
       let witnesses, ext =
-        let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
-        match p_getenv conf.env evt_ins with
-        | Some "on" -> (
-            let ins_witn_n = "e" ^ string_of_int cnt ^ "_ins_witn0_n" in
-            match p_getint conf.env ins_witn_n with
-            | Some n when n > 1 ->
-                let rec loop_witn n witnesses =
-                  if n = 0 then (witnesses, true)
-                  else
-                    let new_witn =
-                      (("", "", 0, Update.Create (Neuter, None), ""), Witness)
-                    in
-                    let witnesses = new_witn :: witnesses in
-                    loop_witn (n - 1) witnesses
-                in
-                loop_witn n witnesses
-            | Some _ | None ->
-                let new_witn =
-                  (("", "", 0, Update.Create (Neuter, None), ""), Witness)
-                in
-                (new_witn :: witnesses, true))
-        | Some _ | None -> (witnesses, ext)
+        insert_blanks conf
+          ("e" ^ string_of_int cnt ^ "_ins_witn0")
+          (("", "", 0, Update.Create (Neuter, None), ""), Witness)
+          (witnesses, ext)
       in
       let e =
         {

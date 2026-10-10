@@ -30,34 +30,17 @@ let rec reconstitute_string_list conf var ext cnt =
       | Some _ | None -> (s :: sl, ext))
 
 let reconstitute_insert_title conf ext cnt tl =
-  let var = "ins_title" ^ string_of_int cnt in
-  let n =
-    match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
-    | _, Some n when n > 1 -> n
-    | Some "on", _ -> 1
-    | _ -> 0
-  in
-  if n > 0 then
-    let tl =
-      let rec loop tl n =
-        if n > 0 then
-          let t1 =
-            {
-              t_name = Tnone;
-              t_ident = "";
-              t_place = "";
-              t_date_start = Date.cdate_None;
-              t_date_end = Date.cdate_None;
-              t_nth = 0;
-            }
-          in
-          loop (t1 :: tl) (n - 1)
-        else tl
-      in
-      loop tl n
-    in
-    (tl, true)
-  else (tl, ext)
+  insert_blanks conf
+    ("ins_title" ^ string_of_int cnt)
+    {
+      t_name = Tnone;
+      t_ident = "";
+      t_place = "";
+      t_date_start = Date.cdate_None;
+      t_date_end = Date.cdate_None;
+      t_nth = 0;
+    }
+    (tl, ext)
 
 let rec reconstitute_titles conf ext cnt =
   match
@@ -217,7 +200,7 @@ let rec reconstitute_pevents conf ext cnt =
           match
             try Some (reconstitute_somebody conf key) with Failure _ -> None
           with
-          | Some (fn, sn, occ, create, var) -> (
+          | Some (fn, sn, occ, create, var) ->
               let witnesses, ext = loop (i + 1) ext in
               let create = update_ci conf create key in
               let c = (fn, sn, occ, create, var) in
@@ -241,60 +224,22 @@ let rec reconstitute_pevents conf ext cnt =
                 | Some "on", c1 :: witnesses -> (c1, c :: witnesses, true)
                 | (Some _ | None), _ -> (c, witnesses, ext)
               in
-              let var_w =
-                "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i
+              let witnesses, ext =
+                insert_blanks conf
+                  ("e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i)
+                  (("", "", 0, Update.Create (Neuter, None), ""), wk)
+                  (witnesses, ext)
               in
-              match p_getenv conf.env var_w with
-              | Some "on" -> (
-                  let ins_witn_n =
-                    "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i
-                    ^ "_n"
-                  in
-                  match p_getint conf.env ins_witn_n with
-                  | Some n when n > 1 ->
-                      let rec loop_witn n witnesses =
-                        if n = 0 then (c :: witnesses, true)
-                        else
-                          let new_witn =
-                            (("", "", 0, Update.Create (Neuter, None), ""), wk)
-                          in
-                          let witnesses = new_witn :: witnesses in
-                          loop_witn (n - 1) witnesses
-                      in
-                      loop_witn n witnesses
-                  | _ ->
-                      let new_witn =
-                        (("", "", 0, Update.Create (Neuter, None), ""), wk)
-                      in
-                      (c :: new_witn :: witnesses, true))
-              | _ -> (c :: witnesses, ext))
+              (c :: witnesses, ext)
           | None -> ([], ext)
         in
         loop 1 ext
       in
       let witnesses, ext =
-        let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
-        match p_getenv conf.env evt_ins with
-        | Some "on" -> (
-            let ins_witn_n = "e" ^ string_of_int cnt ^ "_ins_witn0_n" in
-            match p_getint conf.env ins_witn_n with
-            | Some n when n > 1 ->
-                let rec loop_witn n witnesses =
-                  if n = 0 then (witnesses, true)
-                  else
-                    let new_witn =
-                      (("", "", 0, Update.Create (Neuter, None), ""), wk)
-                    in
-                    let witnesses = new_witn :: witnesses in
-                    loop_witn (n - 1) witnesses
-                in
-                loop_witn n witnesses
-            | Some _ | None ->
-                let new_witn =
-                  (("", "", 0, Update.Create (Neuter, None), ""), wk)
-                in
-                (new_witn :: witnesses, true))
-        | Some _ | None -> (witnesses, ext)
+        insert_blanks conf
+          ("e" ^ string_of_int cnt ^ "_ins_witn0")
+          (("", "", 0, Update.Create (Neuter, None), ""), wk)
+          (witnesses, ext)
       in
       let e =
         {

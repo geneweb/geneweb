@@ -30,6 +30,11 @@ let get conf key =
 
 let get_nth conf key cnt = p_getenv conf.env (key ^ string_of_int cnt)
 
+let insert_blanks conf var blank (l, ext) =
+  match p_getint conf.env (var ^ "_n") with
+  | Some n when n > 0 -> (List.rev_append (List.init n (fun _ -> blank)) l, true)
+  | Some _ | None -> (l, ext)
+
 let getn conf var key =
   match p_getenv conf.env (var ^ "_" ^ key) with
   | Some v -> v
