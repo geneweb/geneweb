@@ -2092,6 +2092,7 @@ let husband_wife ?(buf : Buffer.t option) conf base p all =
     else if idx > 0 then ", "
     else ""
   in
+  let auth_p = authorized_age conf base p in
   let spouses =
     let _, lst =
       Array.to_list families
@@ -2101,10 +2102,15 @@ let husband_wife ?(buf : Buffer.t option) conf base p all =
              let sp = Gutil.spouse (Driver.get_iper p) fam |> pget conf base in
              if is_empty_name sp then (i, acc)
              else
+               let date =
+                 if auth_p && authorized_age conf base sp then
+                   relation_date conf fam
+                 else Adef.safe ""
+               in
                let txt =
                  (translate_eval (sep i)
                   ^<^ gen_person_text conf base sp
-                  ^^^ relation_date conf fam
+                  ^^^ date
                    :> string)
                in
                (i + 1, txt :: acc))
