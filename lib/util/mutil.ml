@@ -1025,6 +1025,50 @@ let sprintf_date tm =
        (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
        tm.Unix.tm_sec
 
+let zoneinfo_name s =
+  let s =
+    if String.length s > 0 && s.[0] = ':' then
+      String.sub s 1 (String.length s - 1)
+    else s
+  in
+  let marker = "zoneinfo/" in
+  let mlen = String.length marker in
+  let rec last_suffix i =
+    match String.index_from_opt s i 'z' with
+    | Some j when j + mlen <= String.length s && String.sub s j mlen = marker ->
+        let next = last_suffix (j + 1) in
+        if next = "" then String.sub s (j + mlen) (String.length s - j - mlen)
+        else next
+    | Some j -> last_suffix (j + 1)
+    | None -> ""
+  in
+  match last_suffix 0 with
+  | "" -> if s = "" then None else Some s
+  | name -> Some name
+
+let server_timezone () =
+  let valid name =
+    name <> "" && Sys.file_exists ("/usr/share/zoneinfo/" ^ name)
+  in
+  let tz_env () = try Sys.getenv "TZ" with Not_found -> "" in
+  let tz_link () = try Unix.readlink "/etc/localtime" with _ -> "" in
+  let tz_file () =
+    try
+      let ic = open_in "/etc/timezone" in
+      let line = input_line ic in
+      close_in ic;
+      line
+    with _ -> ""
+  in
+  let rec aux = function
+    | c :: rest -> (
+        match zoneinfo_name c with
+        | Some name when valid name -> name
+        | _ -> aux rest)
+    | [] -> ""
+  in
+  aux [ tz_env (); tz_link (); tz_file () ]
+
 let rev_input_line ic pos (rbuff, rpos) =
   let rev = Buffer.create 256 in
   let rev_input_char pos =

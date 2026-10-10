@@ -427,6 +427,7 @@ let rec eval_var conf base env _ _ = function
           c := 0;
           VVstring ""
       | _ -> VVstring "")
+  | [ "server_timezone" ] -> VVstring (Mutil.server_timezone ())
   | [ "surname" ] -> (
       match get_env "info" env with
       | Vinfo (_, _, _, HI_ind p, _) -> VVstring (Driver.p_surname base p)
