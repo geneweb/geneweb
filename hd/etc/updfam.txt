@@ -510,16 +510,13 @@
     </div>
   </div>
   <div class="row">
-    %if;(has_fevents and has_fwitness)
-      %foreach;fwitness;
+    <div class="col-12">
+      %apply;insert_witness(xcnt, "0")
+    </div>
+    %foreach;fwitness;
       <div class="col-12">
         %apply;one_witness(xcnt, wcnt)
-        %if;is_last;%apply;insert_witness(xcnt, wcnt)%end;
-      </div>
-      %end;
-    %else;
-      <div class="col-12">
-      %apply;insert_witness(xcnt, "0")
+        %apply;insert_witness(xcnt, wcnt)
       </div>
     %end;
   </div>
