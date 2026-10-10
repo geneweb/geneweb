@@ -52,10 +52,12 @@ let print_anniversary_day conf base dead_people liste =
 
 let propose_months conf ?max_d mode =
   let is_cousins = p_getenv conf.env "m" = Some "C" in
+  let max_d = Option.value max_d ~default:250 in
   let d_val =
-    match p_getint conf.env "d" with Some d when d >= 0 -> d | _ -> 6
+    match p_getint conf.env "d" with
+    | Some d when d > 0 -> string_of_int d
+    | _ -> ""
   in
-  let max_d = match max_d with Some d -> d | None -> 250 in
   let sel_month =
     match p_getint conf.env "v" with
     | Some v when v >= 1 && v <= 12 -> v
@@ -72,36 +74,80 @@ let propose_months conf ?max_d mode =
     Buffer.contents buf
   in
   Output.printf conf
-    {|<form class="d-flex align-items-center justify-content-center gap-3 my-3"
+    {|<form class="d-flex align-items-center gap-3 my-3 d-print-none"
 method="get" action="%s">|}
     conf.command;
   Util.hidden_env conf;
   mode ();
   Output.printf conf
     {|<label for="v_month">%s</label>
-  <select class="form-select form-select-lg w-auto" name="v" id="v_month">%s</select>|}
+  <select class="form-select w-auto" name="v" id="v_month">%s</select>|}
     (Utf8.capitalize_fst (transl_nth conf "year/month/day" 1))
     month_options;
   if is_cousins then
     Output.printf conf
       {|<label for="d_deg">%s</label>
-  <div class="input-group input-group-lg" style="width:auto">
+  <div class="input-group flex-nowrap w-auto">
     <button type="button" class="btn btn-outline-secondary"
       onclick="var i=document.getElementById('d_deg');
-      i.value=Math.max(0,+i.value-1)">&minus;</button>
+      i.value=Math.max(1,+i.value-1)">&minus;</button>
     <input type="number" name="d" id="d_deg" class="form-control text-center"
-      value="%d" min="0" max="%d" style="width:4em">
+      value="%s" min="1" max="%d" placeholder="∞" style="width:4em">
     <button type="button" class="btn btn-outline-secondary"
       onclick="var i=document.getElementById('d_deg');
       i.value=Math.min(%d,+i.value+1)">+</button></div>|}
       (Utf8.capitalize_fst (transl_nth conf "degree of kinship" 0))
       d_val max_d max_d;
   Output.printf conf
-    {|<button type="submit" class="btn btn-primary btn-lg">%s</button>
+    {|<button type="submit" class="btn btn-primary">%s</button>
 </form>|}
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
 
-let gen_print conf base mois f_scan ?max_d ?mode dead_people =
+let relatives_title conf base p dead_people h =
+  let raw = (Util.gen_person_text ~html:false conf base p :> string) in
+  Util.transl_a_of_b conf
+    (transl conf
+       (if dead_people then "anniversaries of dead relatives"
+        else "family birthday"))
+    (if h then raw else (Util.referenced_person_text conf base p :> string))
+    raw
+
+let relatives_subtitle conf mois dead_people =
+  let month =
+    Option.map
+      (fun m -> transl_nth conf "(month)" (m - 1) |> Util.translate_eval)
+      mois
+  in
+  let degree =
+    match p_getint conf.env "d" with
+    | Some d when d > 0 ->
+        Some
+          (Printf.sprintf "%d %s" d
+             (transl_nth conf "degree of kinship" (if d > 1 then 1 else 0)))
+    | _ -> None
+  in
+  let events =
+    let births = transl_nth conf "birth/births" 1 in
+    if dead_people then
+      Printf.sprintf "%s %s %s" births (transl conf "and")
+        (transl_nth conf "death/deaths" 1)
+    else births
+  in
+  String.concat " — " (List.filter_map Fun.id [ month; degree; Some events ])
+  |> Utf8.capitalize_fst
+
+let print_header conf base ?mois ?root dead_people title =
+  match root with
+  | None -> Hutil.header conf title
+  | Some p ->
+      let sub = relatives_subtitle conf mois dead_people in
+      Hutil.header conf (fun h ->
+          relatives_title conf base p dead_people h
+          |> Utf8.capitalize_fst |> Output.print_sstring conf;
+          if h then Output.printf conf " — %s" sub);
+      Output.printf conf {|<p class="lead">%s</p>|} sub
+
+let gen_print conf base mois f_scan ?max_d ?mode ?root dead_people =
   let tab = Array.make 31 [] in
   let title _ =
     let lab =
@@ -161,7 +207,8 @@ let gen_print conf base mois f_scan ?max_d ?mode dead_people =
                            (p, a, DeDeath dr, txt_of) :: tab.(pred j)))
      done
    with Not_found -> ());
-  Hutil.header conf title;
+  print_header conf base ~mois ?root dead_people title;
+  Option.iter (propose_months conf ?max_d) mode;
   if Array.for_all (( = ) []) tab then (
     Output.print_sstring conf "<p>\n";
     Output.printf conf "%s.\n"
@@ -181,7 +228,6 @@ let gen_print conf base mois f_scan ?max_d ?mode dead_people =
       Output.print_sstring conf "</li>\n")
   done;
   Output.print_sstring conf "</ul>\n";
-  (match mode with Some m -> propose_months conf ?max_d m | None -> ());
   Hutil.trailer conf
 
 let print_anniversary_list conf base dead_people dt liste =
@@ -393,7 +439,7 @@ let match_dates conf base p d1 d2 =
   then authorized_age conf base p
   else false
 
-let gen_print_menu_birth conf base f_scan mode =
+let gen_print_menu_birth conf base f_scan ?root mode =
   let title _ =
     transl conf "birthdays" |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
@@ -402,7 +448,8 @@ let gen_print_menu_birth conf base f_scan mode =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  Hutil.header conf title;
+  print_header conf base ?root false title;
+  propose_months conf mode;
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -438,9 +485,6 @@ let gen_print_menu_birth conf base f_scan mode =
     (ftransl conf "%s, it will be %s of")
     ((conf.today_wd + 2) mod 7)
     aft !list_aft;
-  Output.print_sstring conf " ";
-  propose_months conf mode;
-  Output.print_sstring conf " ";
   Hutil.trailer conf
 
 let print_menu_birth conf base =
@@ -457,7 +501,7 @@ let print_menu_birth conf base =
   in
   gen_print_menu_birth conf base f_scan mode
 
-let gen_print_menu_dead conf base f_scan mode =
+let gen_print_menu_dead conf base f_scan ?root mode =
   let title _ =
     transl conf "anniversaries of dead people"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
@@ -467,7 +511,8 @@ let gen_print_menu_dead conf base f_scan mode =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  Hutil.header conf title;
+  print_header conf base ?root true title;
+  propose_months conf mode;
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -519,9 +564,6 @@ let gen_print_menu_dead conf base f_scan mode =
     (ftransl conf "%s, it will be %s of")
     ((conf.today_wd + 2) mod 7)
     aft !list_aft;
-  Output.print_sstring conf "\n";
-  propose_months conf mode;
-  Output.print_sstring conf "\n";
   Hutil.trailer conf
 
 let print_menu_dead conf base =

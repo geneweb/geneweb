@@ -387,11 +387,11 @@ let print_anniv conf base p dead_people level =
   | Some i ->
       BirthdayDisplay.gen_print conf base i f_scan
         ~max_d:((2 * level) + 3)
-        ~mode dead_people
+        ~mode ~root:p dead_people
   | _ ->
       if dead_people then
-        BirthdayDisplay.gen_print_menu_dead conf base f_scan mode
-      else BirthdayDisplay.gen_print_menu_birth conf base f_scan mode
+        BirthdayDisplay.gen_print_menu_dead conf base f_scan ~root:p mode
+      else BirthdayDisplay.gen_print_menu_birth conf base f_scan ~root:p mode
 
 let escape_lt_for_inline_script s =
   let b = Buffer.create (String.length s) in
