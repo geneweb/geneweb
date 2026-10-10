@@ -326,11 +326,9 @@
     <div class="btn-group col-auto border-primary">
       <div class="input-group">
         <select class="form-select bg-light border-primary border-end-0" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
-          %for;i;1;11;<option>%i;</option>%nl;%end;
+          %for;i;0;11;<option>%i;</option>%nl;%end;
         </select>
-        <label class="btn btn-outline-primary border-start-0 mb-0">[event/events]2
-          <input class="ms-1" type="checkbox" name="ins_eventxcnt" value="on">
-        </label>
+        <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[event/events]2</span>
         <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]2">OK</button>
       </div>
     </div>
@@ -342,14 +340,12 @@
     <label for="excnt_ins_witnwcnt_n" class="col-form-label col-2">[*insert]</label>
     <div class="btn-group col-auto border-primary">
       <div class="input-group">
-        <select class="form-select bg-light border-primary border-end-0" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n">
-          %for;i;1;11;<option>%i;</option>%nl;%end;
+        <select class="form-select bg-light border-primary border-end-0" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n"
+          %if;("evt_name" = "#deat")onchange="if (this.value > 0 && !document.getElementById('e_namexcnt').value) set_death_focus(xcnt)"
+          %elseif;("evt_name" = "buri_or_crem")onchange="if (this.value > 0) set_buri(xcnt)"%end;>
+          %for;i;0;11;<option>%i;</option>%nl;%end;
         </select>
-        <label class="btn btn-outline-primary border-start-0">[witness/witness/witnesses]3
-          <input class="ms-1" type="checkbox" name="excnt_ins_witnwcnt" value="on"
-            %if;("evt_name" = "#deat")onchange="if (this.checked && !document.getElementById('e_namexcnt').value) set_death_focus(xcnt)"
-            %elseif;("evt_name" = "buri_or_crem")onchange="if (this.checked) set_buri(xcnt)"%end;>
-        </label>
+        <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[witness/witness/witnesses]3</span>
         <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0(s)">OK</button>
       </div>
     </div>
@@ -1241,11 +1237,9 @@
     <div class="btn-group col-auto">
       <div class="input-group">
         <select class="form-select bg-light border-primary border-end-0" id="ins_titlexcnt_n" name="ins_titlexcnt_n">
-          %for;i;1;11;<option>%i;</option> %end;
+          %for;i;0;11;<option>%i;</option> %end;
         </select>
-        <label class="btn btn-outline-primary border-start-0 mb-0">[title/titles]2
-          <input class="ms-1" type="checkbox" name="ins_titlexcnt" value="on">
-        </label>
+        <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[title/titles]2</span>
         <button type="submit" class="btn btn-outline-primary" title="[*insert::title/titles]2">OK</button>
       </div>
     </div>

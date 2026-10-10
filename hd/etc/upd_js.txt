@@ -145,7 +145,7 @@ function initInsertScroll(redisplay) {
   } catch (e) {}
   form.addEventListener('submit', ev => {
     const el = Array.from(form.elements).find(el => /^(e\d+_)?(ins|inv|add)_/.test(el.name)
-      && (el.checked || el === ev.submitter || (el.tagName === 'SELECT' && +el.value > 1)));
+      && (el.checked || el === ev.submitter || (el.tagName === 'SELECT' && +el.value > 0)));
     try {
       if (el) sessionStorage.setItem(key, el.name);
       else sessionStorage.removeItem(key);

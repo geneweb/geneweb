@@ -307,11 +307,9 @@
     <div class="btn-group col-auto">
       <div class="input-group">
         <select class="form-select bg-light" id="ins_paxcnt_n" name="ins_paxcnt_n">
-          %for;i;1;6;<option>%i;</option> %end;
+          %for;i;0;6;<option>%i;</option> %end;
         </select>
-          <label class="btn btn-outline-primary"> [parents]0
-            <input class="ms-1" type="checkbox" name="ins_paxcnt" value="on">
-          </label>
+          <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[parents]0</span>
           <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]0/[event/events]1">OK</button>
       </div>
     </div>
@@ -347,11 +345,9 @@
     <div class="btn-group col-auto">
       <div class="input-group">
         <select class="form-select bg-light border-primary border-end-0" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
-          %for;i;1;11;<option>%i;</option> %end;
+          %for;i;0;11;<option>%i;</option> %end;
         </select>
-          <label class="btn btn-outline-primary border-start-0"> [event/events]2
-            <input class="ms-1" type="checkbox" name="ins_eventxcnt" value="on">
-          </label>
+          <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[event/events]2</span>
           <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]0/[event/events]1">OK</button>
       </div>
     </div>
@@ -364,11 +360,9 @@
     <div class="btn-group col-auto">
       <div class="input-group">
         <select class="form-select bg-light border-primary border-end-0" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n" >
-          %for;i;1;11;<option>%i;</option> %end;
+          %for;i;0;11;<option>%i;</option> %end;
         </select>
-          <label class="btn btn-outline-primary border-start-0"> [witness/witness/witnesses]3
-            <input class="ms-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
-          </label>
+          <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[witness/witness/witnesses]3</span>
           <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
       </div>
     </div>
@@ -550,15 +544,15 @@
   %end;
 </h1>
 %let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
-%define;ev(vv,xx)%e.ins_vvxx;%end;
+%define;ev(vv,xx)%e.ins_vvxx_n;%end;
 <form method="post" action="%action;" id="updfam"
   data-insert="%for;j;1;100;
                  %let;test_ev;%apply;ev("event",j)%in;
-                 %if;(test_ev="on")%(e_place%)fevent_select%expr(j+1)/%end;
+                 %if;(test_ev!="" and test_ev!="0")%(e_place%)fevent_select%expr(j+1)/%end;
                %end;
                %for;j;1;100;
                  %let;test_ch;%apply;ev("ch",j-1)%in;
-                 %if;(test_ch="on")ch%j;_fn/%end;
+                 %if;(test_ch!="" and test_ch!="0")ch%j;_fn/%end;
                %end;">
   <div class="row">
     %apply;nav()
@@ -637,11 +631,9 @@
   <div class="btn-group col-auto">
     <div class="input-group">
       <select class="form-select bg-light border-primary border-end-0" id="ins_chxcnt_n" name="ins_chxcnt_n">
-        %for;i;1;11;<option>%i;</option>%end;
+        %for;i;0;11;<option>%i;</option>%end;
       </select>
-        <label class="btn btn-outline-primary border-start-0"> [child/children]2
-          <input class="ms-1" type="checkbox" name="ins_chxcnt" value="on">
-        </label>
+        <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[child/children]2</span>
         <button type="submit" class="btn btn-outline-primary" title="[*insert::child/children]2">OK</button>
       </div>
     </div>
