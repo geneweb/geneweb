@@ -220,7 +220,7 @@
                           <input type="hidden" name="s" value="%e.s;">
                           %let;val;%if;(entry_value.original=entry_value)%escape.printable.entry_value;%else;%escape.entry_value.original;%end;%in;
                           <div class="flex-grow-1">
-                            <div class="ps-2 me-2 pe-sm-2 text-body-secondary book-input-text">%nn;
+                            <div class="ps-2 me-2 pe-sm-2 text-body-secondary book-input-text" data-v="%val;">%nn;
                               %if;(e.data="place" and suburb!="")
                                 %escape.entry_value;
                               %else;
