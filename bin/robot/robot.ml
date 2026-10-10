@@ -2,29 +2,10 @@
 (* Usage: robot <command> [options] *)
 
 open Printf
-
-let magic_robot = "GWRB0008"
+open Robot_state
 
 let get_robot_file () =
   String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
-
-module W = Map.Make (struct
-  type t = string
-
-  let compare = compare
-end)
-
-type who = { acc_times : float list; nb_connect : int }
-
-type excl = {
-  mutable excl : (string * int ref) list;
-  mutable who : who W.t;
-  max_conn : int * string;
-}
-
-let output_excl oc xcl =
-  output_string oc magic_robot;
-  output_value oc (xcl : excl)
 
 let read_robot_file fname =
   try
@@ -131,8 +112,14 @@ let print_status () =
           List.iter
             (fun (ip, who) ->
               if who.acc_times <> [] then
-                printf "  %s: %d req, last: %.0f s ago\n" ip who.nb_connect
-                  (Unix.time () -. List.hd who.acc_times))
+                printf "  %s: %d req, last: %.0f s ago, base: %s (%s)\n" ip
+                  who.nb_connect
+                  (Unix.time () -. List.hd who.acc_times)
+                  (if who.nbase = "" then "-" else who.nbase)
+                  (match who.utype with
+                  | Normal -> "visitor"
+                  | Friend _ -> "friend"
+                  | Wizard _ -> "wizard"))
             top_10
 
 let export_blacklist output_file =
@@ -156,11 +143,7 @@ let import_blacklist input_file =
     exit 1);
 
   let fname = get_robot_file () in
-  let xcl =
-    match read_robot_file fname with
-    | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
-  in
+  let xcl = match read_robot_file fname with Some x -> x | None -> empty () in
 
   let ic = Secure.open_in input_file in
   let imported = ref [] in
@@ -220,11 +203,7 @@ let add_ip patterns_str =
     patterns;
 
   let fname = get_robot_file () in
-  let xcl =
-    match read_robot_file fname with
-    | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
-  in
+  let xcl = match read_robot_file fname with Some x -> x | None -> empty () in
 
   List.iter
     (fun pattern ->
@@ -266,11 +245,7 @@ let add_ip patterns_str =
 
 let remove_ip ip =
   let fname = get_robot_file () in
-  let xcl =
-    match read_robot_file fname with
-    | Some x -> x
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
-  in
+  let xcl = match read_robot_file fname with Some x -> x | None -> empty () in
   if List.mem_assoc ip xcl.excl then (
     xcl.excl <- List.remove_assoc ip xcl.excl;
     write_robot_file fname xcl;
@@ -279,7 +254,7 @@ let remove_ip ip =
 
 let clear_all () =
   let fname = get_robot_file () in
-  let xcl = { excl = []; who = W.empty; max_conn = (0, "") } in
+  let xcl = empty () in
   write_robot_file fname xcl;
   printf "Cleared all robot data\n"
 
@@ -288,7 +263,7 @@ let clear_monitoring () =
   let xcl =
     match read_robot_file fname with
     | Some x -> { x with who = W.empty; max_conn = (0, "") }
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
+    | None -> empty ()
   in
   write_robot_file fname xcl;
   printf "Cleared monitoring data (kept blacklist)\n"

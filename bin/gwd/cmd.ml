@@ -32,6 +32,7 @@ type t = {
   digest_password : bool;
   allowed_tags_file : string option;
   allowed_addresses : string list;
+  trusted_proxies : string list;
   no_reverse_host : bool;
   ban_threshold : (int * int) option;
   min_disp_req : int;
@@ -348,6 +349,18 @@ let allowed_addresses =
     & opt (list string) []
     & info [ "allowed-address" ] ~docs:security_section ~doc)
 
+let trusted_proxies =
+  let doc =
+    "Addresses of the reverse proxies placed in front of the server. When a \
+     request comes from one of them, the address of the client is read from \
+     the X-Forwarded-For header instead of the socket. The proxy must set or \
+     append to this header itself, otherwise clients can forge it."
+  in
+  C.Arg.(
+    value
+    & opt (list string) []
+    & info [ "trusted-proxy" ] ~docs:security_section ~docv:"ADDR,..." ~doc)
+
 let no_reverse_host =
   let doc = "Force no reverse host by address." in
   C.Arg.(value & flag & info [ "no-reverse-host" ] ~docs:security_section ~doc)
@@ -639,6 +652,7 @@ let t =
   and+ allowed_tags_file = allowed_tags_file
   and+ no_reverse_host = no_reverse_host
   and+ allowed_addresses = allowed_addresses
+  and+ trusted_proxies = trusted_proxies
   and+ ban_threshold = ban_threshold
   and+ min_disp_req = min_disp_req
   and+ interface = interface
@@ -679,6 +693,7 @@ let t =
     digest_password;
     allowed_tags_file;
     allowed_addresses;
+    trusted_proxies;
     no_reverse_host;
     ban_threshold;
     min_disp_req;

@@ -1971,21 +1971,65 @@ let build_env request (contents : Adef.encoded_string) :
     extract_multipart boundary contents
   else (contents, Util.create_env contents)
 
+(* Strip the IPv4-mapped IPv6 prefix, so that "::ffff:192.168.12.1" and
+   "192.168.12.1" designate the same host. *)
+let normalize_addr s =
+  let s = String.trim s in
+  let prefix = "::ffff:" in
+  let lp = String.length prefix in
+  if
+    String.length s > lp
+    && String.lowercase_ascii (String.sub s 0 lp) = prefix
+    && String.contains s '.'
+  then String.sub s lp (String.length s - lp)
+  else s
+
+let is_trusted_proxy addr =
+  !trusted_proxies <> [] && List.mem (normalize_addr addr) !trusted_proxies
+
+(* Address of the real client of a request relayed by a trusted proxy.
+   X-Forwarded-For is "client, proxy1, proxy2": each proxy appends the address
+   it received the request from. The list is walked from the right, skipping
+   the trusted proxies; the first other address is the last one a trusted
+   proxy vouches for. Anything further left may have been forged by the
+   client. *)
+let forwarded_client request =
+  let is_ip s =
+    match Unix.inet_addr_of_string s with
+    | _ -> true
+    | exception Failure _ -> false
+  in
+  let chain =
+    Mutil.extract_param "x-forwarded-for: " '\r' request
+    |> String.split_on_char ',' |> List.map normalize_addr
+    |> List.filter (fun s -> s <> "")
+  in
+  let rec last_untrusted = function
+    | [] -> None
+    | x :: l -> if is_trusted_proxy x then last_untrusted l else Some x
+  in
+  match last_untrusted (List.rev chain) with
+  | Some s when is_ip s -> Some s
+  | Some _ | None -> None
+
 let connection ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn
     (addr, request) script_name contents0 =
   let from =
     match addr with
     | Unix.ADDR_UNIX x -> x
-    | Unix.ADDR_INET (iaddr, _) when Sys.unix -> (
-        if !no_host_address then Unix.string_of_inet_addr iaddr
-        else
-          try (Unix.gethostbyaddr iaddr).Unix.h_name
-          with _ -> Unix.string_of_inet_addr iaddr)
-    | Unix.ADDR_INET (iaddr, _) ->
-        (* FIXME: The function `Unix.gethostbyaddr` is very slow on Windows.
-   Calling it increases the page load time by a factor of 15 on
-   my computer. *)
-        Unix.string_of_inet_addr iaddr
+    | Unix.ADDR_INET (iaddr, _) -> (
+        let peer = Unix.string_of_inet_addr iaddr in
+        match
+          if is_trusted_proxy peer then forwarded_client request else None
+        with
+        | Some client -> client
+        | None ->
+            (* FIXME: The function `Unix.gethostbyaddr` is very slow on
+               Windows. Calling it increases the page load time by a factor
+               of 15 on my computer. *)
+            if Sys.unix && not !no_host_address then
+              try (Unix.gethostbyaddr iaddr).Unix.h_name with _ -> peer
+            else peer)
   in
   let printer_conf = printer_conf conn in
   if request = [] then ()
@@ -2298,6 +2342,7 @@ let parse_cmd () =
       max_pending_requests := o.max_pending_requests;
       no_host_address := o.no_reverse_host;
       only_addresses := o.allowed_addresses;
+      trusted_proxies := List.map normalize_addr o.trusted_proxies;
       redirected_addr := o.redirect_interface;
       robot_xcl := o.ban_threshold;
       Robot.min_disp_req := o.min_disp_req;
