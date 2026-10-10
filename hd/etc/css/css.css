@@ -766,7 +766,16 @@ a.book-arrow:hover {
   word-break: break-all;
   overflow-wrap: break-word;
 }
-
+#nx_input {
+  resize: both;
+  min-width: 100%;
+}
+.book-input-text[data-v]::after {
+  content: attr(data-v) attr(data-v);
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
 
 /* scrollbar appear as an overlay, thus not affecting the width of the page when appering */
 .book-anchor {
