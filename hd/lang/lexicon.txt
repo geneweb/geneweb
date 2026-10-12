@@ -11131,7 +11131,7 @@ co: s’è tituli/publicu/semi-public/privatu
 de: Adelstitel/öffentlich/halb-öffentlich/privat
 en: if titles/public/half-public/private
 es: si hay títulos/público/half-public/privado
-fr: si titres/public/semi-public/privé
+fr: si titres/publique/semi-publique/privé
 it: se titoli/pubblico/half-public/privato
 oc: si i a de títols/half-public/public/privat
 pt: se títulos/público/half-public/privado
@@ -22384,6 +22384,22 @@ de: Hilfe zur Sichtbarkeit von Personen
 en: help for visibility of individuals
 es: ayuda sobre la visibilidad de los individuos
 fr: aide pour la visibilité des individus
+
+    (p) private, (d) dates
+cs: (p) soukromý, (d) data
+da: (p) privat, (d) datoer
+de: (p) privat, (d) Daten
+en: (p) private, (d) dates
+es: (p) privado, (d) fechas
+fi: (p) yksityinen, (d) päivämäärät
+fr: (p) privé, (d) dates
+it: (p) privato, (d) date
+nl: (p) privé, (d) datums
+no: (p) privat, (d) datoer
+pl: (p) prywatny, (d) daty
+pt: (p) privado, (d) datas
+ru: (p) личное, (d) даты
+sv: (p) privat, (d) datum
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
