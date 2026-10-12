@@ -278,6 +278,17 @@ let print_longest_lived conf base =
   Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
+(* Roglo: the Efam_Engage event records a religious marriage *)
+let engage_is_marriage conf =
+  List.assoc_opt "engage_is_marriage" conf.base_env = Some "yes"
+
+(* date of the first Efam_Engage event, used as a fallback *)
+let engage_date fam =
+  List.find_map
+    (fun e ->
+      if e.efam_name = Efam_Engage then Date.od_of_cdate e.efam_date else None)
+    (Driver.get_fevents fam)
+
 let print_marr_or_eng conf base title list =
   Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
@@ -310,7 +321,10 @@ let print_marr_or_eng conf base title list =
                @@ transl_nth conf "relation/relations" 0
            | Married | NoSexesCheckMarried ->
                Output.print_sstring conf @@ transl conf "married"
-           | Engaged -> Output.print_sstring conf @@ transl conf "engaged"
+           | Engaged ->
+               Output.print_sstring conf
+               @@ transl conf
+                    (if engage_is_marriage conf then "married" else "engaged")
            | MarriageBann | MarriageContract | MarriageLicense | Pacs
            | Residence | NoMention ->
                ());
@@ -326,13 +340,18 @@ let print_marr_or_eng conf base title list =
   Hutil.trailer conf
 
 let print_marriage conf base =
+  let eng = engage_is_marriage conf in
   let list, len =
     select_family conf base
       (fun fam ->
-        let rel = Driver.get_relation fam in
-        if rel = Married || rel = NoSexesCheckMarried then
-          Date.od_of_cdate (Driver.get_marriage fam)
-        else None)
+        match Driver.get_relation fam with
+        | Married | NoSexesCheckMarried -> (
+            match Date.od_of_cdate (Driver.get_marriage fam) with
+            | Some _ as d -> d
+            | None when eng -> engage_date fam
+            | None -> None)
+        | Engaged when eng -> Date.od_of_cdate (Driver.get_marriage fam)
+        | _ -> None)
       false
   in
   let title _ =
