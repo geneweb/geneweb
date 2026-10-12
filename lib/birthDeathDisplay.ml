@@ -376,7 +376,7 @@ let print_marriage conf base =
 
 let print_oldest_engagements conf base =
   let eng = engage_is_marriage conf in
-  let lim = Option.value ~default:100 (p_getint conf.env "lim") in
+  let lim = Option.value ~default:105 (p_getint conf.env "lim") in
   let list, len =
     select_family conf base
       (fun fam ->
@@ -390,24 +390,26 @@ let print_oldest_engagements conf base =
           | _ -> None
         in
         match date with
-        | Some (Dgreg (d, cal)) ->
-            (* with engage_is_marriage, ignore marriages older than [lim]
-               years (default 100) unless both spouses are NotDead *)
-            let recent =
-              (not eng)
-              || (Date.approx_gregorian ~from:cal d).year
-                 >= conf.today.year - lim
-            in
-            let alive p =
-              match Driver.get_death (pget conf base p) with
+        | None -> None
+        | Some _ ->
+            (* with engage_is_marriage, a DontKnowIfDead spouse is perhaps
+               alive only if born less than [lim] years ago (as in m=OA) *)
+            let alive ip =
+              let p = pget conf base ip in
+              match Driver.get_death p with
               | NotDead -> true
-              | DontKnowIfDead -> recent
+              | DontKnowIfDead when eng -> (
+                  match
+                    Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p)
+                  with
+                  | Some b -> conf.today.year - b.year <= lim
+                  | None -> false)
+              | DontKnowIfDead -> true
               | _ -> false
             in
             if alive (Driver.get_father fam) && alive (Driver.get_mother fam)
             then date
-            else None
-        | _ -> None)
+            else None)
       true
   in
   let title _ =
