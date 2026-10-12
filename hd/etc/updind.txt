@@ -1,4 +1,4 @@
-<!-- $Id: updind.txt v7.1 04/04/2026 10:29:21 $ -->
+<!-- $Id: updind.txt v7.1 12/10/2026 10:29:21 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;" id="updform">
@@ -265,6 +265,43 @@
 %end;
 
 %define;selector_pevent(xcnt)
+  %if;roglo;
+  <select class="form-select fw-bold sortable-select" id="pevent_selectxcnt" onchange="show_pevent_label(document.getElementById('e_namexcnt')?.defaultValue || '', 'xcnt')">
+    <option value="" id="deletexcnt">[*select/delete an event]1</option>
+    <option disabled>──────────────────</option>
+    <option data-insert="1" value=""%if;(event.e_name="") selected%end; disabled> [*select/delete an event]0 </option>
+    <option value="#acqu" data-sort="1"%if;(event.e_name="#acqu") selected%end;>[*acquisition]</option>
+    <option value="#adhe" data-sort="1"%if;(event.e_name="#adhe") selected%end;>[*adhesion]</option>
+    <option value="#chgn" data-sort="1"%if;(event.e_name="#chgn") selected%end;>[*change name]</option>
+    <option value="#awar" data-sort="1"%if;(event.e_name="#awar") selected%end;>[*decoration]</option>
+    <option value="#demm" data-sort="1"%if;(event.e_name="#demm") selected%end;>[*demobilisationMilitaire]</option>
+    <option value="#degr" data-sort="1"%if;(event.e_name="#degr") selected%end;>[*diploma]</option>
+    <option value="#dist" data-sort="1"%if;(event.e_name="#dist") selected%end;>[*distinction]</option>
+    <option value="#educ" data-sort="1"%if;(event.e_name="#educ") selected%end;>[*education]</option>
+    <option value="#elec" data-sort="1"%if;(event.e_name="#elec") selected%end;>[*election]</option>
+    <option value="#emig" data-sort="1"%if;(event.e_name="#emig") selected%end;>[*emigration]</option>
+    <option value="#exco" data-sort="1"%if;(event.e_name="#exco") selected%end;>[*excommunication]</option>
+    <option value="#fune" data-sort="1"%if;(event.e_name="#fune") selected%end;>[*funeral]</option>
+    <option value="#grad" data-sort="1"%if;(event.e_name="#grad") selected%end;>[*graduate]</option>
+    <option value="#hosp" data-sort="1"%if;(event.e_name="#hosp") selected%end;>[*hospitalisation]</option>
+    <option value="#illn" data-sort="1"%if;(event.e_name="#illn") selected%end;>[*illness]</option>
+    <option value="#immi" data-sort="1"%if;(event.e_name="#immi") selected%end;>[*immigration]</option>
+    <option value="#lpas" data-sort="1"%if;(event.e_name="#lpas") selected%end;>[*listePassenger]</option>
+    <option value="#mdis" data-sort="1"%if;(event.e_name="#mdis") selected%end;>[*militaryDistinction]</option>
+    <option value="#mpro" data-sort="1"%if;(event.e_name="#mpro") selected%end;>[*militaryPromotion]</option>
+    <option value="#mser" data-sort="1"%if;(event.e_name="#mser") selected%end;>[*militaryService]</option>
+    <option value="#mobm" data-sort="1"%if;(event.e_name="#mobm") selected%end;>[*mobilisationMilitaire]</option>
+    <option value="#natu" data-sort="1"%if;(event.e_name="#natu") selected%end;>[*naturalisation]</option>
+    <option value="#ordn" data-sort="1"%if;(event.e_name="#ordn") selected%end;>[*ordination]</option>
+    <option value="#prop" data-sort="1"%if;(event.e_name="#prop") selected%end;>[*property]</option>
+    <option value="#cens" data-sort="1"%if;(event.e_name="#cens") selected%end;>[*recensement]</option>
+    <option value="#resi" data-sort="1"%if;(event.e_name="#resi") selected%end;>[*residence]</option>
+    <option value="#reti" data-sort="1"%if;(event.e_name="#reti") selected%end;>[*retired]</option>
+    <option value="#vteb" data-sort="1"%if;(event.e_name="#vteb") selected%end;>[*venteBien]</option>
+    <option value="#will" data-sort="1"%if;(event.e_name="#will") selected%end;>[*will]</option>
+    <option data-insert="2" disabled> </option>
+  </select>
+  %else;
   <select class="form-select fw-bold sortable-select" id="pevent_selectxcnt" onchange="show_pevent_label(document.getElementById('e_namexcnt')?.defaultValue || '', 'xcnt')">
     <option value="" id="deletexcnt">[*select/delete an event]1</option>
     <option disabled>──────────────────</option>
@@ -318,6 +355,7 @@
     <option value="#slgp" data-sort="2"%if;(event.e_name="#slgp") selected%end;>[*scellentParentLDS]</option>
     <option value="#slgs" data-sort="2"%if;(event.e_name="#slgs") selected%end;>[*scellentSpouseLDS]</option>
   </select>
+  %end;
 %end;
 
 %define;insert_pevent(xcnt)

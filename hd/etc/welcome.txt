@@ -1,4 +1,4 @@
-<!-- $Id: welcome.txt v7.1 04/10/2026 00:26:24 $ -->
+<!-- $Id: welcome.txt v7.1 12/10/2026 00:26:24 $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
@@ -78,7 +78,7 @@
   </div>
   <div class="col-12 col-md-3 order-1 order-md-3 ms-md-2 px-0 mt-xs-2 mt-lg-0 align-self-center">
     <div id="gw-login" class="d-flex flex-column col-md-10 ps-1 pe-0">
-      %if;(not wizard or not friend)
+      %if;((not wizard or not friend) and not roglo)
         <form class="d-flex" method="post" action="%action;">
           %hidden;
           <label for="w" class="visually-hidden">[*user/password/cancel]0:[user/password/cancel]1</label>

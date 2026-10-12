@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;" id="updform">
 <head>
-  <!-- $Id: updfam.txt v7.1 08/10/2026 01:59:36 $ -->
+  <!-- $Id: updfam.txt v7.1 12/10/2026 01:59:36 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -319,6 +319,25 @@
 %end;
 
 %define;selector_fevent(xcnt)
+  %if;roglo;
+  <select class="form-select fw-bold sortable-select" id="fevent_selectxcnt"
+    onchange="show_fevent_label(document.getElementById('e_namexcnt')?.defaultValue || '', 'xcnt')">
+    <option value="" id="deletexcnt">[*select/delete an event]1</option>
+    <option disabled>───────────────</option>
+    <option data-insert="1" value=""%if;(event.e_name="") selected%end; disabled><i>[*select/delete an event]0</i></option>
+    <option value="#marr" data-sort="1" %if;(event.e_name="#marr") selected%end;>[*marriage event]</option>
+    <option value="#nmar" data-sort="1" %if;(event.e_name="#nmar") selected%end;>[*no marriage event]</option>
+    <option value="#enga" data-sort="1" %if;(event.e_name="#enga") selected%end;>[*engage event]</option>
+    <option value="#marb" data-sort="1" %if;(event.e_name="#marb") selected%end;>[*marriage bann]</option>
+    <option value="#marc" data-sort="1" %if;(event.e_name="#marc") selected%end;>[*marriage contract]</option>
+    <option value="#marl" data-sort="1" %if;(event.e_name="#marl") selected%end;>[*marriage licence]</option>
+    <option value="#pacs" data-sort="1" %if;(event.e_name="#pacs") selected%end;>[*PACS]</option>
+    <option value="#div" data-sort="1" %if;(event.e_name="#div") selected%end;>[*divorce event]</option>
+    <option value="#sep" data-sort="1" %if;(event.e_name="#sep") selected%end;>[*separate event]</option>
+    <option value="#anul" data-sort="1" %if;(event.e_name="#anul") selected%end;>[*annulation]</option>
+    <option value="#resi" data-sort="1" %if;(event.e_name="#resi") selected%end;>[*residence]</option>
+  </select>
+  %else;
   <select class="form-select fw-bold sortable-select" id="fevent_selectxcnt"
     onchange="show_fevent_label(document.getElementById('e_namexcnt')?.defaultValue || '', 'xcnt')">
     <option value="" id="deletexcnt">[*select/delete an event]1</option>
@@ -339,6 +358,7 @@
     <option value="#anul" data-sort="1" %if;(event.e_name="#anul") selected%end;>[*annulation]</option>
     <option value="#resi" data-sort="1" %if;(event.e_name="#resi") selected%end;>[*residence]</option>
   </select>
+  %end;
 %end;
 
 %define;insert_fevent(xcnt)

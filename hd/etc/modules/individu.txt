@@ -1,4 +1,4 @@
-<!-- $Id: modules/individu.txt v7.1 04/03/2026 02:42:09 $ -->
+<!-- $Id: modules/individu.txt v7.1 12/10/2026 02:42:09 $ -->
 %( options
 0: skip
 1: standard
@@ -219,7 +219,7 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="%if;not roglo;fa-ul%end;%if;(not (has_image or b.default_image="yes")) ps-0%end; mb-0">
+  <ul class="%if;not roglo;fa-ul%end;%if;(not ((has_image and image_url!="") or b.default_image="yes")) ps-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
       <li %apply;getvar%with;ns[birth]%end;>
         %if;(not roglo)<span class="fa-li"><i class="fas fa-baby"></i></span>%end;
@@ -337,9 +337,9 @@
   </ul>
 %end;
 %define;portrait()
-  %if;(has_image or has_blason or b.default_image="yes")
+  %if;((has_image and image_url!="") or has_blason or b.default_image="yes")
     <div class="d-flex align-items-center align-self-stretch">
-      %if;has_image;
+      %if;(has_image and image_url!="")
         %if;not cancel_links;<a href="%image_url;" target="_blank">%end;
           <img src="%image_url;"%image_size; class="%if;(op_m=3) mx-1%end; rounded" alt="[image/images]0" title="[him/her]s">%nn;
         %if;not cancel_links;</a>%end;

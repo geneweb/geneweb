@@ -3735,8 +3735,11 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       else Driver.get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
   (* Beware: lots of confusion between image and portrait *)
-  | "has_image" | "has_portrait" ->
-      Image.get_portrait conf base p |> Option.is_some
+  | "has_image" | "has_portrait" -> (
+      match Image.get_portrait conf base p with
+      | Some (`Url url) when url <> "" -> true
+      | Some (`Path path) when path <> "" -> true
+      | _ -> false)
   | "has_blason" -> Image.has_blason conf base p false
   | "has_blason_self" -> Image.has_blason conf base p true
   | "has_blason_stop" -> Image.has_blason_stop conf base p

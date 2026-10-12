@@ -1,4 +1,4 @@
-<!-- $Id: modules/unions.txt v7.1 17/11/2023 10:30:00 $ -->
+<!-- $Id: modules/unions.txt v7.1 12/10/2026 10:30:00 $ -->
 %( op_m=1 simple: name %)
 %( op_m=2 photos: simple with photo %)
 %( op_m=3 evolved: spouse parents and children's spouse %)
@@ -214,9 +214,9 @@
   %reset_count;%reset_count2;
   %foreach;family;
     %incr_count;
-    %if;(spouse.has_image)%incr_count2;%end;
+    %if;(spouse.has_image and spouse.image_url!="")%incr_count2;%end;
     %foreach;child;
-      %if;(child.has_image)%incr_count2;%end;
+      %if;(child.has_image and child.image_url!="")%incr_count2;%end;
     %end;
     <ul class="ps-4 py-0%if;(wizard and not cancel_links) fa-ul ms-0%end; mb-0">
     %if;not (wizard and not cancel_links)%apply;li_SD("spouse")
@@ -271,7 +271,7 @@
           <div class="d-flex flex-column mt-1">
               <div class="d-inline-flex">
                 <div class="align-self-center">
-                  %if;spouse.has_image;
+                  %if;(spouse.has_image and spouse.image_url!="")
                     %apply;picture("spouse","image")
                   %elseif;spouse.has_blason;
                     %apply;picture("spouse","blason")
@@ -316,7 +316,7 @@
               %foreach;child;
                 %incr_count1;
                 <div class="d-flex flex-row mt-1">%count1;.
-                  %if;child.has_image;
+                  %if;(child.has_image and child.image_url!="")
                     %apply;picture("child","image")
                   %elseif;child.has_blason_self;
                     %apply;picture("child","blason")
@@ -541,7 +541,7 @@
     %foreach;family;
       %incr_count;
       %apply;li_SD("spouse")
-        %if;spouse.has_image;
+        %if;(spouse.has_image and not spouse.is_private and not spouse.is_restricted)
           <table style="border-width:%border;">
             <tr>
               <td style="vertical-align: middle">
@@ -582,7 +582,7 @@
         %end;
         %if;are_separated;, [separated]0 %on_separation_date;%end;
         %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
-        %if;spouse.has_image;
+        %if;(spouse.has_image and not spouse.is_private and not spouse.is_restricted)
               </td>
             </tr>
           </table>
@@ -591,7 +591,7 @@
           <ul>
             %foreach;child;
               %apply;li_SDC("child")
-                %if;child.has_image;
+                %if;(child.has_image and not child.is_private and not child.is_restricted)
                   <table style="border-width:%border;">
                     <tr>
                       <td style="vertical-align: middle">
@@ -621,7 +621,7 @@
                     %if;are_separated; [separated]0 %on_separation_date;%end;%nn;
                     %if;are_divorced; [divorced]0 %on_divorce_date;%end;%nn;
                     %if;has_children; %apply;havingchildren(nb_children)
-                      %if;(child.has_image and family_cnt=1)</td></tr></table>%end;%nl;
+                      %if;((child.has_image and not child.is_private and not child.is_restricted) and family_cnt=1)</td></tr></table>%end;%nl;
                       <div style="font-size: 90%%">
                         <ul>
                           %foreach;child;
@@ -657,13 +657,13 @@
                         </ul>
                       </div>
                     %else;
-                      %if;(child.has_image and family_cnt=1)
+                      %if;((child.has_image and not child.is_private and not child.is_restricted) and family_cnt=1)
                         </td></tr></table>
                       %else;<br>%nl;%end;
                     %end;
                   %end;
                 %else;
-                  %if;child.has_image;</td></tr></table>%nl;%end;
+                  %if;(child.has_image and not child.is_private and not child.is_restricted)</td></tr></table>%nl;%end;
                 %end;
               </li>
             %end;

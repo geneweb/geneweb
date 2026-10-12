@@ -1,4 +1,4 @@
-<!-- $Id: perso_utils v7.1 04/04/2026 04:04:19 $ -->
+<!-- $Id: perso_utils v7.1 12/10/2026 04:04:19 $ -->
 %let;birth_symbol;%if;(b.birth_symbol!="")%b.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(b.death_symbol!="")%b.death_symbol;%else;&dagger;%end;%in;
 
@@ -295,10 +295,11 @@
 %end;
 
 %define;short_display_person_tree(xx)
+  %let;frst_name;<span>%if;roglo;%xx.first_name;%else;%xx.public_name;%end;</span>%in;
   <div>
     %if;(xx.has_sosa and e.m!="")%apply;display_sosa("xx")%end;
-    %if;(cancel_links or xx.is_restricted or is_self)<span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span>
-    %else;<a href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span></a>%nn;
+    %if;(cancel_links or xx.is_restricted or is_self)%frst_name;<br><span>%xx.surname;</span>
+    %else;<a href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;">%frst_name;<br><span>%xx.surname;</span></a>%nn;
     %end;
     %if;(wizard and not cancel_links)
       <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
@@ -649,7 +650,7 @@
 %define;display_sibling()
   %apply;li_SDC("child")
     %(%if;(child.has_image and child.index!=central_index%)
-    %if;(child.has_image)
+    %if;(child.has_image and not child.is_restricted and not child.is_private)
       <table>
         <tr>
           <td style="vertical-align: middle">
@@ -677,7 +678,7 @@
       %end;
     %end;
     %(%if;(child.has_image and child.index!=central_index%)
-    %if;(child.has_image)
+    %if;(child.has_image and not child.is_restricted and not child.is_private)
           </td>
         </tr>
       </table>
@@ -688,7 +689,7 @@
 %define;list_half_siblings()
   <ul>
     %apply;li_SD("spouse")
-      %if;spouse.has_image;
+      %if;(spouse.has_image and not spouse.is_restricted and not spouse.is_private)
         <table border="%border;">
           <tr>
             <td style="vertical-align: middle">
