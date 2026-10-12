@@ -4399,6 +4399,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "title" -> if p_auth then person_title conf base p |> safe_val else null_val
   | "p_auth" -> GWPARAM.p_auth conf base p |> bool_val
+  | "test_p_auth" ->
+      Printf.eprintf "Test_p_auth\n";
+      GWPARAM.p_auth ~view:GWPARAM.As_friend conf base p |> bool_val
   | "p_auth_sp" -> GWPARAM.p_auth_sp conf base p |> bool_val
   | _ -> raise Not_found
 

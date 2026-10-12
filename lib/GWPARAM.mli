@@ -110,8 +110,14 @@ val is_related :
     conf.userkey. conf.userkey is the person visiting the base the search for
     ancestors is limited to 3 generations *)
 
+type view = As_is | As_friend | As_visitor
+
 val p_auth :
-  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+  ?view:view ->
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  bool
 (** Calculate the access rights to the person's information in according to his
     age. Returns (in the order of the tests) :
     - `true` if requester is wizard or friend or person is public
