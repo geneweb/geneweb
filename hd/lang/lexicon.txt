@@ -20160,6 +20160,14 @@ sl: %d najstarejših morda še živih in zaročenih parov
 sv: de %d äldsta nu levande paren som kanske fortfarande är förlovade
 tr: %d en yaşlı çift belki hala hayatta ve nişanlı
 
+    the %d oldest couples perhaps still alive and married
+en: the %d oldest couples perhaps still alive and married
+fr: les %d couples mariés les plus anciens peut-être encore vivants
+
+    %d years of marriage
+en: %d years of marriage
+fr: %d ans de mariage
+
     the %d oldest perhaps still alive
 af: die %d oudstes wat nog leef
 bg: най-старите %d евентуално още живи лица

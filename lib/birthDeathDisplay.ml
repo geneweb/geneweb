@@ -10,8 +10,10 @@ let month_txt conf d cal =
   let d = DateDisplay.string_of_date conf (Dgreg ({ d with day = 0 }, cal)) in
   (d : Adef.safe_string :> string) |> Utf8.capitalize_fst |> Adef.safe
 
-let list_aux_1 conf d cal last_month_txt was_future =
-  let month_txt = month_txt conf d cal in
+let list_aux_1 ?heading conf d cal last_month_txt was_future =
+  let month_txt =
+    match heading with Some f -> f d | None -> month_txt conf d cal
+  in
   let future = Date.compare_dmy d conf.today = 1 in
   if (not future) && was_future then (
     Output.print_sstring conf "</li></ul></li></ul><p><ul><li>";
@@ -289,14 +291,26 @@ let engage_date fam =
       if e.efam_name = Efam_Engage then Date.od_of_cdate e.efam_date else None)
     (Driver.get_fevents fam)
 
-let print_marr_or_eng conf base title list =
+(* full years elapsed since [d] (Gregorian), used to group OE by duration *)
+let duration_txt conf d =
+  let y =
+    match Date.time_elapsed_opt d conf.today with
+    | Some a -> a.year
+    | None -> conf.today.year - d.Adef.year
+  in
+  Printf.sprintf (fcapitale (ftransl conf "%d years of marriage")) y
+  |> Adef.safe
+
+let print_marr_or_eng ?(by_duration = false) conf base title list =
   Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
   ignore
   @@ List.fold_left
        (fun (last_month_txt, was_future) (fam, d, cal) ->
          let month_txt, future =
-           list_aux_1 conf d cal last_month_txt was_future
+           list_aux_1
+             ?heading:(if by_duration then Some (duration_txt conf) else None)
+             conf d cal last_month_txt was_future
          in
          Output.print_sstring conf "<li><b>";
          Output.print_string conf
@@ -361,27 +375,51 @@ let print_marriage conf base =
   print_marr_or_eng conf base title list
 
 let print_oldest_engagements conf base =
+  let eng = engage_is_marriage conf in
+  let lim = Option.value ~default:100 (p_getint conf.env "lim") in
   let list, len =
     select_family conf base
       (fun fam ->
-        if Driver.get_relation fam = Engaged then
-          let husb = pget conf base (Driver.get_father fam) in
-          let wife = pget conf base (Driver.get_mother fam) in
-          match (Driver.get_death husb, Driver.get_death wife) with
-          | (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-              Date.od_of_cdate (Driver.get_marriage fam)
+        let date =
+          match Driver.get_relation fam with
+          | Engaged -> Date.od_of_cdate (Driver.get_marriage fam)
+          | (Married | NoSexesCheckMarried) when eng -> (
+              match Date.od_of_cdate (Driver.get_marriage fam) with
+              | Some _ as d -> d
+              | None -> engage_date fam)
           | _ -> None
-        else None)
+        in
+        match date with
+        | Some (Dgreg (d, cal)) ->
+            (* with engage_is_marriage, ignore marriages older than [lim]
+               years (default 100) unless both spouses are NotDead *)
+            let recent =
+              (not eng)
+              || (Date.approx_gregorian ~from:cal d).year
+                 >= conf.today.year - lim
+            in
+            let alive p =
+              match Driver.get_death (pget conf base p) with
+              | NotDead -> true
+              | DontKnowIfDead -> recent
+              | _ -> false
+            in
+            if alive (Driver.get_father fam) && alive (Driver.get_mother fam)
+            then date
+            else None
+        | _ -> None)
       true
   in
   let title _ =
     Printf.sprintf
       (fcapitale
-         (ftransl conf "the %d oldest couples perhaps still alive and engaged"))
+         (ftransl conf
+            (if eng then "the %d oldest couples perhaps still alive and married"
+             else "the %d oldest couples perhaps still alive and engaged")))
       len
     |> Output.print_sstring conf
   in
-  print_marr_or_eng conf base title list
+  print_marr_or_eng ~by_duration:true conf base title list
 
 let old_print_statistics conf =
   let title _ =

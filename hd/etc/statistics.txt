@@ -162,7 +162,7 @@
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LB">[*latest births]</a>
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LD">[*latest deaths]</a>
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LM">[*latest marriages]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=OE">[*oldest engagements]</a>
+      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=OE">%if;(bvar.engage_is_marriage = "yes")[*oldest couples alive]%else;[*oldest engagements]%end;</a>
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=OA">[*oldest alive]</a>
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LL">[*who lived the longest]</a>
       <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=POP_PYR">[*population pyramid]</a>
