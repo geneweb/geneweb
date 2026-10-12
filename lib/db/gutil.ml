@@ -267,26 +267,20 @@ let find_free_occ base f s =
   let ipl = Driver.persons_of_name base (f ^ " " ^ s) in
   let first_name = Name.lower f in
   let surname = Name.lower s in
-  let list_occ =
-    let rec loop list = function
-      | ip :: ipl ->
-          let p = Driver.poi base ip in
-          if
-            (not (List.mem (Driver.get_occ p) list))
-            && first_name = Name.lower (Driver.p_first_name base p)
-            && surname = Name.lower (Driver.p_surname base p)
-          then loop (Driver.get_occ p :: list) ipl
-          else loop list ipl
-      | [] -> list
-    in
-    loop [] ipl
-  in
-  let list_occ = List.sort compare list_occ in
-  let rec loop cnt1 = function
-    | cnt2 :: list -> if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
-    | [] -> cnt1
-  in
-  loop 0 list_occ
+  (* [persons_of_name] returns the whole crushed-name bucket, which for very
+     short names (e.g. "N N") can hold tens of thousands of persons; a set of
+     taken occurrence numbers keeps this linear (it used to be quadratic). *)
+  let taken = Hashtbl.create 64 in
+  List.iter
+    (fun ip ->
+      let p = Driver.poi base ip in
+      if
+        first_name = Name.lower (Driver.p_first_name base p)
+        && surname = Name.lower (Driver.p_surname base p)
+      then Hashtbl.replace taken (Driver.get_occ p) ())
+    ipl;
+  let rec loop n = if Hashtbl.mem taken n then loop (n + 1) else n in
+  loop 0
 
 let get_birth_death_date p =
   let birth_date, approx =
