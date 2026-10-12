@@ -532,9 +532,8 @@ let predictable_mode =
      predictable, which is helpful for debugging or testing (UNIX only). This\n\
     \     option MUST not be used in production."
   in
-  let error = "--predictable-mode is available only on UNIX." in
   C.Arg.(
-    unix_only_flag ~error & value & flag
+    value & flag
     & info [ "predictable-mode" ] ~docs:tracing_section ~doc)
 
 let verbosity =

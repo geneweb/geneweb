@@ -13,6 +13,11 @@
 
 (cram
  (package geneweb)
+ (applies_to cgi)
+ (deps %{bin:gwc} %{bin:gwd} ./gwd-cgi.sh ../galichet.gw))
+
+(cram
+ (package geneweb)
  (applies_to windows)
  (enabled_if
   (= %{os_type} Win32)))
