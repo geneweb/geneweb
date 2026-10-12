@@ -27,11 +27,11 @@
 <div class="container">
 %( do not use %include;menubar %)
 %include_menubar;
-%let;datalist_fnames; list="datalist_fnames" data-book="fn"%in;
-%let;datalist_snames; list="datalist_snames" data-book="sn"%in;
-%let;datalist_places; list="datalist_places" data-book="place"%in;
-%let;datalist_occupations; list="datalist_occupations" data-book="occu"%in;
-%let;datalist_sources; list="datalist_sources" data-book="src"%in;
+%let;datalist_fnames;%if;(b.datalist_fnames=1) list="datalist_fnames"%end; data-book="fn"%in;
+%let;datalist_snames;%if;(b.datalist_snames=1) list="datalist_snames"%end; data-book="sn"%in;
+%let;datalist_places;%if;(b.datalist_places=1) list="datalist_places"%end; data-book="place"%in;
+%let;datalist_occupations;%if;(b.datalist_occupations=1) list="datalist_occupations"%end; data-book="occu"%in;
+%let;datalist_sources;%if;(b.datalist_sources=1) list="datalist_sources"%end; data-book="src"%in;
 %define;nav()
   <div class="container fixed-top">
     <nav class="navbar navbar-light justify-content-center mx-2" id="banner">
