@@ -11098,7 +11098,7 @@ co: s’è tituli/publicu/semi-public/privatu
 de: Adelstitel/öffentlich/halb-öffentlich/privat
 en: if titles/public/half-public/private
 es: si hay títulos/público/half-public/privado
-fr: si titres/public/semi-public/privé
+fr: si titres/publique/semi-publique/privé
 it: se titoli/pubblico/half-public/privato
 oc: si i a de títols/half-public/public/privat
 pt: se títulos/público/half-public/privado

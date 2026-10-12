@@ -295,8 +295,12 @@ let add_lex_dir dir =
 module MS = Map.Make (String)
 
 let assets_of_plugin name =
-  let path = (List.hd @@ Sites.Sites.plugins) // name in
-  path // "assets"
+  match Sites.Sites.plugins with
+  | [] ->
+      failwith
+        "no plugin site found (DUNE_DIR_LOCATIONS unset or geneweb not \
+         installed)"
+  | dir :: _ -> dir // name // "assets"
 
 let load_plugin Cmd.{ name } =
   Log.debug (fun k -> k "Loading plugin %s..." name);

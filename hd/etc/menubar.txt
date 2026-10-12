@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt v7.1 02/05/2024 19:03:42 $ -->
+<!-- $Id: menubar.txt v7.1 12/10/2026 9:05:42 $ -->
 %if;not cancel_links;
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
@@ -11,8 +11,9 @@
 %let;sexcolor;%if;is_male;male%elseif;is_female;female%else;neuter%end;%in;
 %let;iswiz;%if;(b.wizard_just_friend!="yes" and wizard)1%end;%in;
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
-%let;visib;%if;is_private;3%elseif;(b.semi_public="yes" and is_semi_public)2%elseif;(is_public or (b.public_if_titles="yes" and has_titles))1%else;0%end;%in;
+%let;visib;%if;(not test_p_auth)3%elseif;(b.semi_public="yes" and is_semi_public)2%elseif;(is_public or (b.public_if_titles="yes" and has_titles))1%else;0%end;%in;
 %let;visib_color;%apply;nth%with;text-body-secondary/text-success/text-warning/text-danger%and;%visib;%end;%in;
+
 %define;othersexcolor(sex)
   %if;(sex=1)male%elseif;(sex=0)female%else;neuter%end;
 %end;
@@ -172,8 +173,7 @@
               %end;
               %( Visibility button %)
               <a class="dropdown-item" href="%prefix;m=H&v=visibility" title="[*visibility-hlp]" target="_blank">
-                <i class="fa fa-person fa-fw %visib_color; me-2" aria-hidden="true"></i>[*visibility] (%apply;nth%with;[iftitles/public/semipublic/private]%and;%visib;%end;)%nn;
-              </a>
+                <i class="fa fa-person fa-fw %visib_color; me-2" aria-hidden="true"></i>[*visibility]</a>%nn;
               %if;is_semi_public;
               <a class="dropdown-item %if;(e.fmode="on")text-danger%else;text-success%end;"
                 title="[*family mode-hlp]"

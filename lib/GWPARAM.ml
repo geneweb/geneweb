@@ -488,25 +488,30 @@ let has_date base p =
     (fun ifam -> Driver.foi base ifam |> Driver.get_marriage <> Date.cdate_None)
     families
 
+type view = As_is | As_friend | As_visitor
+
 (* Authorization checks for person access *)
-let p_auth conf base p =
+
+let p_auth ?(view = As_is) conf base p =
   let access = Driver.get_access p in
   let not_private = access <> Def.Private in
-  conf.Config.wizard (* base does not handle SemiPublic *)
-  || ((not conf.Config.semi_public) && conf.Config.friend) (* myself *)
-  || conf.user_iper = Some (Driver.get_iper p) (* person is Public *)
-  || access = Def.Public (* person is PublicIfTitla *)
+  let wizard, friend, myself =
+    let me = conf.Config.user_iper = Some (Driver.get_iper p) in
+    match view with
+    | As_is -> (conf.Config.wizard, conf.Config.friend, me)
+    | As_friend -> (false, conf.Config.friend || conf.Config.wizard, me)
+    | As_visitor -> (false, false, false)
+  in
+  wizard
+  || ((not conf.Config.semi_public) && friend)
+  || myself || access = Def.Public
   || conf.Config.public_if_titles && access = Def.IfTitles
      && Driver.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-     (* User is SemiPublic (consenting) and person is SemiPublic and not Private *)
-  || conf.Config.friend && conf.Config.consent
+  || friend && conf.Config.consent
      && (is_semi_public p || is_related conf base p)
      && not_private
-     (* Public if no date *)
-  || (not (has_date base p))
-     && conf.Config.public_if_no_date && access <> Def.Private
+  || ((not (has_date base p)) && conf.Config.public_if_no_date && not_private)
   ||
-  (* visible if private_years <= -1 *)
   if conf.Config.private_years <= -1 then true
   else
     let check_date d lim none =
