@@ -21,8 +21,6 @@ let src = Logs.Src.create ~doc:"Gwd" "GWD "
 module Log = (val Logs.src_log src : Logs.LOG)
 open Cmd_legacy
 
-let trusted_proxies : string list ref = ref []
-
 let pp_exception ~predictable_mode ppf (exn, bt) =
   let pp_header ppf () =
     if predictable_mode then Fmt.pf ppf "Uncaught exception: "
@@ -1978,23 +1976,17 @@ let build_env request (contents : Adef.encoded_string) :
     extract_multipart boundary contents
   else (contents, Util.create_env contents)
 
-(* Strip the IPv4-mapped IPv6 prefix, so that "::ffff:192.168.12.1" and
-   "192.168.12.1" designate the same host. *)
-let normalize_addr s =
-  let s = String.trim s in
-  let prefix = "::ffff:" in
-  let lp = String.length prefix in
-  if
-    String.length s > lp
-    && String.lowercase_ascii (String.sub s 0 lp) = prefix
-    && String.contains s '.'
-  then String.sub s lp (String.length s - lp)
-  else s
+(* Map IPv4-mapped IPv6 addresses (::ffff:a.b.c.d) to plain IPv4, so that
+   both forms designate the same host. *)
+let normalize_addr a =
+  match Ipaddr.to_v4 a with Some v4 -> Ipaddr.V4 v4 | None -> a
 
-let is_trusted_proxy addr =
-  !trusted_proxies <> [] && List.mem (normalize_addr addr) !trusted_proxies
+let parse_addr s = Ipaddr.of_string (String.trim s) |> Result.map normalize_addr
 
 type forwarded = Not_forwarded | Client of string | Invalid of string
+
+let is_trusted_proxy ~trusted_proxies a =
+  List.exists (fun p -> Ipaddr.compare p a = 0) trusted_proxies
 
 (* Address of the real client of a request relayed by a trusted proxy.
    X-Forwarded-For is "client, proxy1, proxy2": each proxy appends the address
@@ -2002,37 +1994,36 @@ type forwarded = Not_forwarded | Client of string | Invalid of string
    the trusted proxies; the first other address is the last one a trusted
    proxy vouches for. Anything further left may have been forged by the
    client. *)
-let forwarded_client request =
-  let is_ip s =
-    match Unix.inet_addr_of_string s with
-    | _ -> true
-    | exception Failure _ -> false
-  in
-  let chain =
-    Header.extract_params "x-forwarded-for:" '\r' request
-    |> List.concat_map (String.split_on_char ',')
-    |> List.map normalize_addr
-    |> List.filter (fun s -> s <> "")
-  in
-  let rec last_untrusted = function
-    | [] -> None
-    | x :: l -> if is_trusted_proxy x then last_untrusted l else Some x
-  in
-  match last_untrusted (List.rev chain) with
-  | None -> Not_forwarded
-  | Some s when is_ip s -> Client s
-  | Some s -> Invalid s
+let forwarded_client ~trusted_proxies request =
+  Header.extract_params "x-forwarded-for:" '\r' request
+  |> List.concat_map (String.split_on_char ',')
+  |> List.map String.trim
+  |> List.filter (fun s -> s <> "")
+  |> List.rev
+  |> List.find_map (fun s ->
+      match parse_addr s with
+      | Ok a when is_trusted_proxy ~trusted_proxies a -> None
+      | Ok a -> Some (Client (Ipaddr.to_string a))
+      | Error _ -> Some (Invalid s))
+  |> Option.value ~default:Not_forwarded
 
-let connection ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn
-    (addr, request) script_name contents0 =
+let connection ~predictable_mode ~cgi ~loaded_plugins ~secret_salt
+    ~trusted_proxies conn (addr, request) script_name contents0 =
   let printer_conf = printer_conf conn in
   let from =
     match addr with
     | Unix.ADDR_UNIX x -> Ok x
     | Unix.ADDR_INET (iaddr, _) -> (
         let peer = Unix.string_of_inet_addr iaddr in
+        let from_trusted_proxy =
+          trusted_proxies <> []
+          &&
+          match parse_addr peer with
+          | Ok a -> is_trusted_proxy ~trusted_proxies a
+          | Error _ -> false
+        in
         match
-          if is_trusted_proxy peer then forwarded_client request
+          if from_trusted_proxy then forwarded_client ~trusted_proxies request
           else Not_forwarded
         with
         | Client client -> Ok client
@@ -2161,8 +2152,8 @@ let display_infos () =
         Fmt.(box @@ list ~sep:comma pp_path)
         (Secure.assets ()))
 
-let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
-    =
+let geneweb_server ~predictable_mode ~loaded_plugins ~trusted_proxies ?interface
+    ~port ~daemon () =
   let secret_salt =
     match Unix.getenv "WSERVER" with
     | _ -> retrieve_secret_salt ()
@@ -2184,7 +2175,8 @@ let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
   let connection conn x y z = connection conn x y (Adef.encoded z) in
   Server.start ?addr:interface ~port ~timeout:!conn_timeout
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
-    (connection ~predictable_mode ~cgi:false ~loaded_plugins ~secret_salt)
+    (connection ~predictable_mode ~cgi:false ~loaded_plugins ~secret_salt
+       ~trusted_proxies)
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -2205,7 +2197,8 @@ let manage_cgi_timeout conn tmout =
     let _ = Unix.alarm tmout in
     ()
 
-let geneweb_cgi ~loaded_plugins ~secret_salt addr script_name contents =
+let geneweb_cgi ~loaded_plugins ~secret_salt ~trusted_proxies addr script_name
+    contents =
   let conn = Connection.of_out_channel ~cgi:true stdout in
   if Sys.unix then manage_cgi_timeout conn !conn_timeout;
   (try Unix.mkdir !GWPARAM.cnt_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
@@ -2223,7 +2216,7 @@ let geneweb_cgi ~loaded_plugins ~secret_salt addr script_name contents =
   let request = add "referer" "HTTP_REFERER" request in
   let request = add "user-agent" "HTTP_USER_AGENT" request in
   (* FIXME: the CGI handler cannot require a valid HTTP client connection. *)
-  connection ~cgi:true ~loaded_plugins ~secret_salt conn
+  connection ~cgi:true ~loaded_plugins ~secret_salt ~trusted_proxies conn
     (Unix.ADDR_UNIX addr, request)
     script_name contents
 
@@ -2239,7 +2232,8 @@ let read_input len =
      with End_of_file -> ());
     Buffer.contents buff
 
-let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
+let main ~plugins ~trusted_proxies ?interface ~port ~daemon ~predictable_mode
+    ~cgi () =
   let gwd_cmd =
     let rec process acc skip_next = function
       | [] -> acc
@@ -2323,10 +2317,11 @@ let main ~plugins ?interface ~port ~daemon ~predictable_mode ~cgi () =
       try Sys.getenv "SCRIPT_NAME" with Not_found -> Sys.argv.(0)
     in
     let secret_salt = match !cgi_secret_salt with None -> "" | Some s -> s in
-    geneweb_cgi ~predictable_mode ~loaded_plugins ~secret_salt addr
-      (Filename.basename script) query)
+    geneweb_cgi ~predictable_mode ~loaded_plugins ~secret_salt ~trusted_proxies
+      addr (Filename.basename script) query)
   else
-    geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
+    geneweb_server ~predictable_mode ~loaded_plugins ~trusted_proxies ?interface
+      ~port ~daemon ()
 
 let has_root_privileges () =
   if not Sys.unix then false
@@ -2365,7 +2360,6 @@ let parse_cmd () =
       max_pending_requests := o.max_pending_requests;
       no_host_address := o.no_reverse_host;
       only_addresses := o.allowed_addresses;
-      trusted_proxies := List.map normalize_addr o.trusted_proxies;
       redirected_addr := o.redirect_interface;
       robot_xcl := o.ban_threshold;
       Robot.min_disp_req := o.min_disp_req;
@@ -2497,8 +2491,10 @@ let () =
        response. Redirect the diagnostic output with your shell instead.@.";
     exit 2);
   try
-    main ~plugins:opts.plugins ~interface:opts.interface ~port:opts.port
-      ~daemon:opts.daemon ~predictable_mode:opts.predictable_mode ~cgi ()
+    main ~plugins:opts.plugins
+      ~trusted_proxies:(List.map normalize_addr opts.trusted_proxies)
+      ~interface:opts.interface ~port:opts.port ~daemon:opts.daemon
+      ~predictable_mode:opts.predictable_mode ~cgi ()
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Log.err (fun k ->

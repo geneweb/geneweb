@@ -32,7 +32,7 @@ type t = {
   digest_password : bool;
   allowed_tags_file : string option;
   allowed_addresses : string list;
-  trusted_proxies : string list;
+  trusted_proxies : Ipaddr.t list;
   no_reverse_host : bool;
   ban_threshold : (int * int) option;
   min_disp_req : int;
@@ -133,6 +133,12 @@ let log_pp ppf l =
   | File s -> Fmt.string ppf s
 
 let log_conv = C.Arg.Conv.make ~docv:"LOG" ~parser:log_parser ~pp:log_pp ()
+
+let ipaddr_parser s =
+  Ipaddr.of_string (String.trim s) |> Result.map_error (fun (`Msg m) -> m)
+
+let ipaddr_conv =
+  C.Arg.Conv.make ~docv:"ADDR" ~parser:ipaddr_parser ~pp:Ipaddr.pp ()
 
 (* Directories commands *)
 let dirs_section = "DIRECTORIES"
@@ -351,14 +357,14 @@ let allowed_addresses =
 
 let trusted_proxies =
   let doc =
-    "Addresses of the reverse proxies placed in front of the server. When a \
-     request comes from one of them, the address of the client is read from \
-     the X-Forwarded-For header instead of the socket. The proxy must set or \
-     append to this header itself, otherwise clients can forge it."
+    "IPv4 or IPv6 addresses of the reverse proxies placed in front of the \
+     server. Requests relayed by these proxies are attributed to the real \
+     client rather than to the proxy, so that access logs, address \
+     restrictions and robot detection apply to the actual visitor."
   in
   C.Arg.(
     value
-    & opt (list string) []
+    & opt (list ipaddr_conv) []
     & info [ "trusted-proxy" ] ~docs:security_section ~docv:"ADDR,..." ~doc)
 
 let no_reverse_host =

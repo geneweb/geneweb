@@ -25,7 +25,7 @@ type t = {
   digest_password : bool;
   allowed_tags_file : string option;
   allowed_addresses : string list;
-  trusted_proxies : string list;
+  trusted_proxies : Ipaddr.t list;
   no_reverse_host : bool;
   ban_threshold : (int * int) option;
   min_disp_req : int;
