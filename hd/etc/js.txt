@@ -82,6 +82,17 @@ window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
   window.addEventListener('pageshow', hideOverlay);
 </script>
 %end;
+%if;(e.m="CHG_CHN")
+<script>
+{
+  const all = document.getElementById('chn_all');
+  all?.form.addEventListener('submit', () => {
+    const v = all.value.trim();
+    if (v) all.form.querySelectorAll('input[name$=_surname]').forEach(i => { i.value = v; });
+  });
+}
+</script>
+%end;
 %if;(not is_welcome and e.m!="MOD_DATA")
   %if;wizard;
     %if;(e.m="MOD_DATA_OK" and e.data!="")
