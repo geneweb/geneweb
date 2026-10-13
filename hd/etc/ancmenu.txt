@@ -213,10 +213,6 @@ function missing_events_options() {
               <label class="form-check-label" for="ld_rel">[*relation/relations]1</label>
             </div>
             <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="ld_notes" name="notes">
-              <label class="form-check-label" for="ld_notes">[*individual notes]</label>
-            </div>
-            <div class="form-check">
               <input type="checkbox" class="form-check-input" id="ld_src" name="src">
               <label class="form-check-label" for="ld_src">[*source/sources]1</label>
             </div>
@@ -225,8 +221,12 @@ function missing_events_options() {
               <label class="form-check-label" for="ld_witn">[*witness/witnesses]1<span class="text-body-secondary"> ([marriage/marriages]1)</span></label>
             </div>
             <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="ld_notes" name="notes">
+              <label class="form-check-label" for="ld_notes">[*individual notes]</label>
+            </div>
+            <div class="form-check">
               <input type="checkbox" class="form-check-input" id="ld_comm" name="comm">
-              <label class="form-check-label" for="ld_comm">[*comment]<span class="text-body-secondary"> ([marriage/marriages]1)</span></label>
+              <label class="form-check-label" for="ld_comm">[*notes on the marriage/notes on the marriages]1<br>[*notes on the family/notes on the families]1</label>
             </div>
             <div class="form-check">
               <input type="checkbox" class="form-check-input" id="ld_inline" name="inline">
@@ -271,7 +271,7 @@ function missing_events_options() {
             </div>
             <div class="form-check">
               <input type="checkbox" class="form-check-input" id="boa_comm" name="comm">
-              <label class="form-check-label" for="boa_comm">[*marriage notes/marriages notes]0</label>
+              <label class="form-check-label" for="boa_comm">[*notes on the marriage/notes on the marriages]1<br>[*notes on the family/notes on the families]1</label>
             </div>
             <div class="form-check">
               <input type="checkbox" class="form-check-input" id="boa_src" name="src">

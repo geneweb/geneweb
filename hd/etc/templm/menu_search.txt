@@ -43,7 +43,7 @@
           Alt+%lfc2k; [add::child/children]0<br>
           Alt+%lfc3k; [date of marriage]/[relation/relations]0<br>
           Alt+%lfc4k; [add::event/events]0<br>
-          Alt+%lfc5k; [marriage notes]<br>
+          Alt+%lfc5k; [notes on the marriage/notes on the marriages]0<br>
           Alt+%lfc6k; [source/sources]1<br>
           Alt+%lpcOk; [invert::event/events]1 [family/families]0<br><br>
           %else;

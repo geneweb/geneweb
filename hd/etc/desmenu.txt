@@ -91,10 +91,6 @@
           <label class="form-check-label" for="ld_rel">[*relation/relations]1</label>
         </div>
         <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="ld_notes" name="notes" checked>
-          <label class="form-check-label" for="ld_notes">[*individual notes]</label>
-        </div>
-        <div class="form-check">
           <input type="checkbox" class="form-check-input" id="ld_src" name="src" checked>
           <label class="form-check-label" for="ld_src">[*source/sources]1</label>
         </div>
@@ -105,9 +101,13 @@
           </label>
         </div>
         <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="ld_notes" name="notes" checked>
+          <label class="form-check-label" for="ld_notes">[*individual notes]</label>
+        </div>
+        <div class="form-check">
           <input type="checkbox" class="form-check-input" id="ld_comm" name="comm">
           <label class="form-check-label" for="ld_comm">
-            [*comment] <span class="text-body-secondary">([marriage/marriages]1)</span>
+            [*notes on the marriage/notes on the marriages]1<br>[*notes on the family/notes on the families]1
           </label>
         </div>
         <div class="form-check">

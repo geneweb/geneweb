@@ -178,7 +178,7 @@
 
 %define;long_display_notes()
   <h3 id="ns">
-    %if;(e.notes="on")[*note/notes]1%else;[*source/sources]1%end;
+    %if;(e.notes="on" or e.comm="on")[*note/notes]1%else;[*source/sources]1%end;
   </h3>
   <dl>
   %foreach;ancestor_level;
@@ -236,6 +236,18 @@
               %end;
             </dd>
           </div>
+        %end;
+        %if;(e.comm="on" and ancestor.same="" and (ancestor.anc_sosa.v=1 or ancestor.is_male))
+          %foreach;ancestor.family;
+            %if;(family.index=ancestor.family.index and (has_marriage_note or has_comment))
+              <div class="shadow p-3">
+                <dt id="fnotes-%ancestor.anc_sosa.v;"><b><a href="#%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
+                  <span class="small text-body-secondary">([marriage/marriages]0 %ancestor; [and] %spouse;)</span>
+                </dt>
+                <dd>%apply;family_notes()</dd>
+              </div>
+            %end;
+          %end;
         %end;
         %if;(e.siblings="on" and
        ancestor.is_female and ancestor.same="")
@@ -348,7 +360,13 @@
           %if;(not is_first),%sp;%end;
           %apply;link2(witness.var, witness.index)
         %end;)
+      %end;
+      %if;(e.comm="on" and e.inline!="on" and (has_marriage_note or has_comment))
+        %sp;<sup><small>(<a href="#fnotes-%ancestor.anc_sosa.v;">[see] [marriage/marriages]0 %ancestor.anc_sosa;</a>)</small></sup>%nn;
       %end;</div>
+      %if;(e.comm="on" and e.inline="on" and (has_marriage_note or has_comment))
+        <div class="my-1 mx-3 p-3 shadow">%apply;family_notes()</div>
+      %end;
     %end;
   %end;
 %end;
@@ -498,10 +516,10 @@
 %end;
 
 %if;(e.only="on")
-  %if;((e.notes="on" or e.src="on") and e.inline!="on")
+  %if;((e.notes="on" or e.src="on" or e.comm="on") and e.inline!="on")
     <div>
       [*see][:] <a href="#asc">[*ancestor/ancestors]1</a>%sp;%nn;
-      %if;((e.notes="on" or e.src="on") and e.inline!="on")
+      %if;((e.notes="on" or e.src="on" or e.comm="on") and e.inline!="on")
         | <a href="#ns">[*note/notes]1</a>
       %end;
     </div>
@@ -525,7 +543,7 @@
       %end;
     %end;
   %end;
-  %if;((e.notes="on" or e.src="on") and e.inline!="on")
+  %if;((e.notes="on" or e.src="on" or e.comm="on") and e.inline!="on")
     %apply;long_display_notes()
   %end;
 %else;
@@ -544,7 +562,7 @@
         %end;
       %end;
     %end;
-    %if;((e.notes="on" or e.src="on") and e.inline!="on")
+    %if;((e.notes="on" or e.src="on" or e.comm="on") and e.inline!="on")
       %apply;long_display_notes()
     %end;
   </div>

@@ -13196,21 +13196,6 @@ pt: licença de casamento
 sv: äktenskapslicens
 tr: evlilik Cüzdanı
 
-    marriage notes/marriages notes
-co: note apprupositu di l’unione/note apprupositu di l’unioni
-de: Notizen zu den Ehen
-en: marriage notes/marriages notes
-es: notas de matrionios
-fi: lisämerkintöjä vihkimisestä
-fr: notes concernant l’union/notes concernant les unions
-it: note di matrimoni
-nl: aantekeningen
-no: notater om ekteskapet
-oc: nòtas sul maridatge
-pt: notas de casamento
-sv: anteckningar om vigseln
-tr: evlilik notları/evlilik notları
-
     marriage of %t after his/her death
 co: matrimoniu di %t dopu a so morte
 de: Heirat von %t nach seinem/ihrem Tod
@@ -15183,6 +15168,40 @@ sk: poznámka zmenená
 sl: zaznamek spremenjen
 sv: notering modifierad
 tr: not değiştirildi
+
+    notes on the family/notes on the families
+ca: notes sobre la família/notes sobre les famílies
+co: note apprupositu di a famiglia/note apprupositu di e famiglie
+da: noter om familien/noter om familierne
+de: Notizen zur Familie/Notizen zu den Familien
+en: notes on the family/notes on the families
+es: notas sobre la familia/notas sobre las familias
+fi: lisämerkintöjä perheestä/lisämerkintöjä perheistä
+fr: notes sur la famille/notes sur les familles
+it: note sulla famiglia/note sulle famiglie
+nl: aantekeningen over het gezin/aantekeningen over de gezinnen
+no: notater om familien/notater om familiene
+oc: nòtas sus la familha/nòtas sus las familhas
+pt: notas sobre a família/notas sobre as famílias
+sv: anteckningar om familjen/anteckningar om familjerna
+tr: aile notları/aile notları
+
+    notes on the marriage/notes on the marriages
+ca: notes sobre el casament/notes sobre els casaments
+co: note apprupositu di u matrimoniu/note apprupositu di i matrimonii
+da: noter om vielsen/noter om vielserne
+de: Notizen zur Heirat/Notizen zu den Heiraten
+en: notes on the marriage/notes on the marriages
+es: notas sobre el matrimonio/notas sobre los matrimonios
+fi: merkintöjä vihkimisestä/merkintöjä vihkimisistä
+fr: notes sur le mariage/notes sur les mariages
+it: note sul matrimonio/note sui matrimoni
+nl: aantekeningen over het huwelijk/aantekeningen over de huwelijken
+no: notater om vielsen/notater om vielsene
+oc: nòtas sul maridatge/nòtas suls maridatges
+pt: notas sobre o casamento/notas sobre os casamentos
+sv: anteckningar om vigseln/anteckningar om vigslarna
+tr: evlilik notları/evlilik notları
 
     notes summary
 bg: резюме на бележките
