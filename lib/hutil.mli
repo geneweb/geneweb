@@ -5,16 +5,28 @@ open Config
 val header_without_http_nor_home : config -> (bool -> unit) -> unit
 
 val header_with_title :
-  ?error:bool -> ?fluid:bool -> config -> (bool -> unit) -> unit
+  ?error:bool ->
+  ?fluid:bool ->
+  ?h1_class:string ->
+  config ->
+  (bool -> unit) ->
+  unit
 (** Prints HTTP header, HTML page header with <!DOCTYPE>, <head>, <body>, home
     template, container <div>, and <h1> title.
     @param error red title if [true]
-    @param fluid container-fluid if [true] *)
+    @param fluid container-fluid if [true]
+    @param h1_class extra classes on the <h1> (e.g. ["h2"] for long titles) *)
 
 val header_without_title : config -> unit
 (** Similar to [header] but without any <h1> title element. *)
 
-val header : ?error:bool -> ?fluid:bool -> config -> (bool -> unit) -> unit
+val header :
+  ?error:bool ->
+  ?fluid:bool ->
+  ?h1_class:string ->
+  config ->
+  (bool -> unit) ->
+  unit
 (** Main header. [title true] prints in <title>, [title false] prints in <h1>.
 *)
 
