@@ -554,18 +554,14 @@ let print_first_name_strong conf base p =
 
 let print_error conf e = Output.print_string conf @@ string_of_error conf e
 
-let print_someone_ref_text conf base p =
-  Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (commd conf);
-  Output.print_string conf (acces conf base p);
-  Output.print_sstring conf {|">|};
-  Output.print_string conf (escape_html @@ Driver.p_first_name base p);
-  if Driver.get_occ p <> 0 then (
-    Output.print_sstring conf ".";
-    Output.print_sstring conf (string_of_int (Driver.get_occ p)));
-  Output.print_sstring conf " ";
-  Output.print_string conf (escape_html @@ Driver.p_surname base p);
-  Output.print_sstring conf "</a>"
+let someone_ref_text conf base p =
+  let occ = Driver.get_occ p in
+  Printf.sprintf {|<a href="%s%s">%s%s %s</a>|}
+    (commd conf :> string)
+    (acces conf base p :> string)
+    (escape_html (Driver.p_first_name base p) :> string)
+    (if occ = 0 then "" else "." ^ string_of_int occ)
+    (escape_html (Driver.p_surname base p) :> string)
 
 let print_list_aux conf base title list printer =
   if list <> [] then (
@@ -623,14 +619,11 @@ let print_warning conf base = function
             Output.print_sstring conf "</li>\n")
           arr
       in
+      let arg p = (someone_ref_text conf base p, Driver.p_first_name base p) in
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "changed order of children"));
-      Output.print_sstring conf "\n";
-      print_someone_ref_text conf base fath;
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (transl_nth conf "and" 0);
-      Output.print_sstring conf " ";
-      print_someone_ref_text conf base moth;
+        (Utf8.capitalize_fst
+           (transl_args conf "changed order of children of %1 and %2"
+              [ arg fath; arg moth ]));
       print_order_changed conf print_list before after
   | ChildrenNotInOrder (ifam, _, elder, x) ->
       let cpl = Driver.foi base ifam in

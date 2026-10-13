@@ -496,6 +496,12 @@ val transl_a_of_b : config -> string -> string -> string -> string
     declension. i.e. if [b] is wrapped in html, [b_raw] should be that texte
     with no html, and [b_raw] should be [b] otherwise. *)
 
+val transl_args : config -> string -> (string * string) list -> string
+(** [transl_args conf key args] translates [key] and replaces each [%N] with the
+    displayed text of the N-th [(text, raw)] argument. [[x|y]%N] picks [y] when
+    [raw] starts with one of the base vowels, [x] otherwise, and [:c:%N] applies
+    declension [c]. [raw] is [text] without its HTML. *)
+
 val transl_a_of_gr_eq_gen_lev : config -> string -> string -> string -> string
 
 val std_color : config -> Adef.safe_string -> Adef.safe_string
