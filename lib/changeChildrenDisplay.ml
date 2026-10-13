@@ -89,28 +89,35 @@ let print_children conf base ipl =
   Output.print_sstring conf "</ul>"
 
 let print_change conf base p =
-  let title _ =
-    transl conf "change children's names"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+  let title h =
+    let t = Utf8.capitalize_fst (transl conf "change children's names") in
+    if h then Output.print_sstring conf t
+    else
+      let s = gen_person_text conf base p in
+      let r = reference conf base p s in
+      Output.print_sstring conf
+        (Util.transl_a_of_b conf t (r :> string) (s :> string));
+      Output.print_string conf (DateDisplay.short_dates_text conf base p)
   in
   let children = Driver.children_of_p base p in
   let digest = digest_children base children in
-  Hutil.header conf title;
-  Output.print_sstring conf
-    (Format.sprintf {|<h2>%s %s</h2>
-<form method="post" action="%s">|}
-       (let s : Adef.safe_string = gen_person_text conf base p in
-        let r : Adef.safe_string = reference conf base p s in
-        Util.transl_a_of_b conf "" (r :> string) (s :> string))
-       (DateDisplay.short_dates_text conf base p :> string)
-       (conf.command :> string));
+  Hutil.header ~h1_class:"h2" conf title;
+  Output.printf conf {|<form method="post" action="%s">|}
+    (conf.command :> string);
   Util.hidden_env conf;
   Util.hidden_input_s conf "ip" (Driver.Iper.to_string (Driver.get_iper p));
   Util.hidden_input_s conf "digest" digest;
   Util.hidden_input_s conf "m" "CHG_CHN_OK";
+  Output.printf conf
+    {|<div class="d-flex flex-wrap align-items-center gap-2 my-3">
+  <label for="chn_all">%s</label>
+  <input class="form-control w-auto" id="chn_all" size="30" maxlength="200">
+  <button type="submit" class="btn btn-primary">OK</button>
+</div>|}
+    (Utf8.capitalize_fst (transl conf "change all children's surnames to"));
   print_children conf base children;
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary btn-lg ml-5 mb-2">|};
+    {|<button type="submit" class="btn btn-primary btn-lg ms-5 mb-2">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></form>";
@@ -124,10 +131,10 @@ let print conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
-  Output.print_sstring conf "<h4>";
+  Output.print_sstring conf "\n<h2 class=\"h4\">";
   transl_nth conf "child/children" 1
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</h4><p><ul>";
+  Output.print_sstring conf "</h2>\n<ul>";
   Array.iter
     (fun ifam ->
       let des = Driver.foi base ifam in

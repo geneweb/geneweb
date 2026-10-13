@@ -4532,35 +4532,45 @@ tr: ünlü insanlar
 
     change children's names
 af: verander kinders se name
-bg: да се промени име на дете
+bg: промяна на имената на децата
 br: kemm anvioù ar vugale
 ca: canviar els noms dels fills
-co: mudificà a casata di i zitelli
+co: mudificà i nomi di i zitelli
 cs: změnit jména dětí
 da: ændre børns navne
 de: Namen der Kinder ändern
-en: update surname of children
+en: change children's names
 eo: ŝanĝi nomojn de la idoj
 es: cambiar los nombres de los hijos
 et: muuda laste nimed
 fi: muuta lasten nimiä
-fr: modifier le patronyme des enfants
+fr: modifier le nom des enfants
 he: עדכן שמות הילדים
-is: breyta nafni barna
+is: breyta nöfnum barna
 it: cambiare i nomi dei figli
-lt: pakeisti vaiko vardą
+lt: pakeisti vaikų vardus
 lv: mainīt bērnu vārdus
 nl: namen van kinderen wijzigen
 no: endre barnas navn
 oc: cambiar los noms dels enfants
-pl: zmień imiona dzieci
+pl: zmień imiona i nazwiska dzieci
 pt: alterar os nomes dos filhos
-ro: schimba numele copiilor
-ru: изменение имени ребенка
+ro: schimbă numele copiilor
+ru: изменить имена детей
 sk: zmeniť mená detí
 sl: spremeni imena otrok
 sv: ändra barnens namn
-tr: çocuklaın adını güncelle
+tr: çocukların adlarını güncelle
+
+    change all children's surnames to
+ca: canviar el cognom de tots els fills a
+de: Nachname aller Kinder ändern in
+en: change all children's surnames to
+es: cambiar el apellido de todos los hijos a
+fr: changer le patronyme de tous les enfants en
+it: cambiare il cognome di tutti i figli in
+nl: achternaam van alle kinderen wijzigen in
+pt: mudar o apelido de todos os filhos para
 
     change it (the number) yourself
 af: verander dit self
