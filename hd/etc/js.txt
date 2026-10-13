@@ -131,23 +131,6 @@ window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;
-%if;is_upd_fam;
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.transfer-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        const notes = document.getElementById('notes_comments');
-        const target = document.querySelector('[data-marr]');
-        if (!notes || !target) return;
-        target.value = notes.value;
-        notes.value = '';
-        if (typeof autosize !== 'undefined') autosize.update(target);
-        btn.style.display = 'none';
-      });
-    });
-  });
-</script>
-%end;
 %if;((e.m="A" or e.m="D") and e.t="")
 <script>
 function initBsValidation() {
