@@ -277,19 +277,9 @@
         %if;(age_days!="")%apply;1000sep(age_days) [days old]%end;
         %if;(lang="en") old%end;">
         %if;not roglo;<span class="fa-li"><i class="far fa-id-card"></i></span>%end;
-        %if;(is_dead and computable_death_age)
-          %if;(death_date.month!="" and death_date.day!=""
-           and birth_date.month!="" and birth_date.day!="")
-            %if;(death_date.sdn > birth_date.sdn)%death_age;
-            %end;
-          %else;~ %death_age;%end;
-        %end;
+        %if;(is_dead and computable_death_age)%death_age;%end;
         %if;(not is_dead and computable_age)
-          %if;(birth_date.month!="" and birth_date.day!="")
-            %if;(today.julian_day > birth_date.sdn)
-              %age;
-            %end;
-          %else;~ %age;%end;
+          %if;(birth_date.day="" or today.julian_day > birth_date.sdn)%age;%end;
         %end;
       </li>
     %end;

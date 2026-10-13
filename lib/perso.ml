@@ -14,13 +14,19 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Iper = Driver.Iper
 
+let elapsed_age d1 d2 =
+  let a = Date.time_elapsed d1 d2 in
+  if a.Adef.prec = Sure && (d1.Adef.day = 0 || d2.Adef.day = 0) then
+    { a with prec = About }
+  else a
+
 let person_living_age conf p p_auth =
   match
     ( p_auth,
       Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
       Driver.get_death p )
   with
-  | true, Some d, NotDead -> Some (Date.time_elapsed d conf.today)
+  | true, Some d, NotDead -> Some (elapsed_age d conf.today)
   | _ -> None
 
 let format_age conf age =
@@ -141,7 +147,7 @@ let eval_death_age conf p p_auth sl =
       when d1 <> d2 -> (
         let d1 = Date.approx_gregorian ~from:c1 d1 in
         let d2 = Date.approx_gregorian ~from:c2 d2 in
-        let age = Date.time_elapsed d1 d2 in
+        let age = elapsed_age d1 d2 in
         match sl with
         | [] -> Templ.VVstring (format_age conf age :> string)
         | _ -> eval_age_field_var conf age sl)
