@@ -414,26 +414,28 @@
           </a>
         %end;
       </div>
-      <div id="excnt_witnwcnt_p_selct_sex" class="col-auto col-form-label">
-        <div class="d-inline-flex align-items-center">
-          <span class="me-2">[*sex]</span>
-          <div class="form-check form-check-inline ms-auto">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-              value="M"%if;(witness.create.sex="male") checked%end;>[M/F]0%nn;
-          </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-                value="N"%if;(witness.create.sex="neuter") checked%end;>?%nn;
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-                value="F"%if;(witness.create.sex="female") checked%end;>[M/F]1%nn;
-            </label>
+      <div id="excnt_witnwcnt_p_selct_sex" class="col-4">
+        <div class="row">
+          <span class="col-6 col-form-label">[*sex]</span>
+          <div class="col-6 mt-2">
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                  value="M"%if;(witness.create.sex="male") checked%end;>[M/F]0%nn;
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                  value="N"%if;(witness.create.sex="neuter") checked%end;>?%nn;
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                  value="F"%if;(witness.create.sex="female") checked%end;>[M/F]1%nn;
+              </label>
+            </div>
           </div>
         </div>
       </div>

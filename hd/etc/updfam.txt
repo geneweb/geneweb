@@ -408,7 +408,7 @@
         <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn"
           value="%fwitness.first_name;" placeholder="[*first name/first names]0"%datalist_fnames;>
       </div>
-      <label for="excnt_witnwcnt_occ" class="col-sm-auto col-form-label">[*number]0</label>
+      <label for="excnt_witnwcnt_occ" class="col-sm-2 col-form-label">[*number]0</label>
       <div class="col-sm-2">
         <input type="number" class="form-control" name="excnt_witnwcnt_occ" id="excnt_witnwcnt_occ"
           min="0" value="%fwitness.occ;" placeholder="#">
@@ -429,26 +429,28 @@
             [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0</a>
         %end;
       </div>
-      <div id="excnt_witnwcnt_p_selct_sex" class="col-auto col-form-label">
-        <div class="d-inline-flex align-items-center">
-          <span class="me-2">[*sex]</span>
-          <div class="form-check form-check-inline ms-auto">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-              value="M"%if;(fwitness.create.sex="male") checked%end;>[M/F]0
-          </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-                value="N"%if;(fwitness.create.sex="neuter") checked%end;>?
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-                value="F"%if;(fwitness.create.sex="female") checked%end;>[M/F]1
-            </label>
+      <div id="excnt_witnwcnt_p_selct_sex" class="col-sm-4">
+        <div class="row">
+          <span class="col-6 col-form-label">[*sex]</span>
+          <div class="col-6 mt-2">
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                  value="M"%if;(fwitness.create.sex="male") checked%end;>[M/F]0
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                  value="N"%if;(fwitness.create.sex="neuter") checked%end;>?
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                  value="F"%if;(fwitness.create.sex="female") checked%end;>[M/F]1
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -666,7 +668,7 @@
     <div class="col-sm-6">
         <input class="form-control" type="text" name="chxcnt_fn" value="%child.first_name;" id="chxcnt_fn" placeholder="[*first name/first names]0"%datalist_fnames;>
     </div>
-    <label for="chxcnt_occ" class="col-sm-auto col-form-label">[*number]</label>
+    <label for="chxcnt_occ" class="col-sm-2 col-form-label">[*number]</label>
     <div class="col-sm-2">
       <input class="form-control" type="number" name="chxcnt_occ" min="0" value="%if;(child.occ="")0%else;%child.occ;%end;" id="chxcnt_occ">
     </div>
@@ -685,10 +687,10 @@
           [*modify] %apply;nth%with;[nth]%and;%cnt;%end; [child/children]0</a>
       %end;
     </div>
-    <div id="chxcnt_p_selct_sex" class="col-auto col-form-label">
-      <div class="d-inline-flex">
-        <span class="col-sm-auto col-form-label">[*sex]</span>
-        <div class="col-sm-auto mt-2">
+    <div id="chxcnt_p_selct_sex" class="col-sm-4">
+      <div class="row">
+        <span class="col-6 col-form-label">[*sex]</span>
+        <div class="col-6 mt-2">
           <div class="form-check form-check-inline">
             <label class="form-check-label">
               <input class="form-check-input" type="radio" name="chxcnt_sex"
