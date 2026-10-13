@@ -321,7 +321,7 @@
     onchange="show_fevent_label(document.getElementById('e_namexcnt')?.defaultValue || '', 'xcnt')">
     <option value="" id="deletexcnt">[*select/delete an event]1</option>
     <option disabled>───────────────</option>
-    <option value=""%if;(event.e_name!="" and (not ("#" in event.e_name) or "&#" in event.e_name)) selected%end; id="customxcnt">[*custom event]</option>
+    <option value=""%if;(event.e_name!="" and (not ("#" in event.e_name) or "&#" in event.e_name)) selected%end;%if;roglo; disabled%end; id="customxcnt">[*custom event]</option>
     <option disabled>───────────────</option>
     <option data-insert="1" value=""%if;(event.e_name="") selected%end; disabled><i>[*select/delete an event]0</i></option>
     <option value="#marr" data-sort="1" %if;(event.e_name="#marr") selected%end;>[*marriage event]</option>
