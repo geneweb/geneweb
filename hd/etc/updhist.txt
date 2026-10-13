@@ -50,6 +50,9 @@
     <thead class="table-light">
       <tr>
         <th>[*date/dates]0</th>
+        <th class="text-center">
+          <i class="fa fa-person fa-fw text-dark" title="[*access]0" aria-hidden="true"></i>
+          <span class="visually-hidden">[access]0</span></th>
         <th>[*person/persons]0</th>
         <th>[*wizard/wizards/friend/friends/exterior]0</th>
         <th>[*update]</th>
@@ -62,20 +65,20 @@
     %foreach;history_line(kk, e.pos, wiz)
       <tr>
         <td><span class="gw-hist-time" data-epoch="%time_epoch;">%time;</span></td>
-        <td>
+        <td class="text-center">
         %if;is_person;
           %if;(person.is_private)
-            <i class="fa fa-person text-danger me-1"> </i>%nn;
+            <i class="fa fa-person fa-fw text-danger"></i>%nn;
           %elseif;(person.is_semi_public)
-            <i class="fa fa-person text-warning me-1"> </i>%nn;
+            <i class="fa fa-person fa-fw text-warning"></i>%nn;
           %elseif;(person.is_public or b.public_if_titles="yes" and person.has_titles)
-            <i class="fa fa-person text-success me-1"> </i>%nn;
+            <i class="fa fa-person fa-fw text-success"></i>%nn;
           %else;
-            <i class="fa fa-person text-body-secondary me-1"> </i>%nn;
+            <i class="fa fa-person fa-fw text-body-secondary"></i>%nn;
           %end;
-        %else;
-          &nbsp;&nbsp;
         %end;
+        </td>
+        <td>
         %if;(first_name!="")
           <a href="%prefix;%person.access;">%person;</a>%nn;
           <a href="%prefix;m=MOD_IND&i=%person.index;">%person.dates;</a> %person.title;
