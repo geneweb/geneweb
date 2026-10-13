@@ -39,6 +39,12 @@ type key = string * string * int * create * string
 val infer_death :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> death
 
+val infer_death_from_cdate : config -> ?max_age:int -> Adef.cdate -> death
+(** [infer_death_from_cdate conf cdate] returns [OfCourseDead] when [cdate]
+    (usually a birth date) is more than [max_age] years ago (default: the
+    maximum lifespan, 125 years), and [DontKnowIfDead] otherwise or when the
+    date is unknown. *)
+
 val infer_death_bb : config -> Adef.date option -> Adef.date option -> death
 
 val infer_death_from_parents :

@@ -21,10 +21,8 @@
 
 %define;births(nnn)[the latest %d births:::nnn]%end;
 %define;deaths(nnn)[the latest %t deaths:::nnn]%end;
-%define;marriages(nnn)[the latest %d marriages:::nnn]%end;
-%define;engaged(nnn)
-  [the %d oldest couples perhaps still alive and engaged:::nnn]%nn;
-%end;
+%define;marriages(nnn)[the latest %d marriages and engagements:::nnn]%end;
+%define;couples(nnn)[the %d oldest couples perhaps still alive:::nnn]%end;
 %define;alive(nnn)[the %d oldest perhaps still alive:::nnn]%end;
 %define;lived(nnn)[the %d who lived the longest:::nnn]%end;
 
@@ -35,7 +33,7 @@
   <li><a href="%prefix;m=LB&k=%n;">%apply;births(n)</a></li>
   <li><a href="%prefix;m=LD&k=%n;">%apply;deaths(n)</a></li>
   <li><a href="%prefix;m=LM&k=%n;">%apply;marriages(n)</a></li>
-  <li><a href="%prefix;m=OE&k=%n;">%apply;engaged(n)</a></li>
+  <li><a href="%prefix;m=OE&k=%n;">%apply;couples(n)</a></li>
   <li><a href="%prefix;m=OA&k=%n;&lim=0">%apply;alive(n)</a></li>
   <li><a href="%prefix;m=LL&k=%n;">%apply;lived(n)</a></li>
 </ul>

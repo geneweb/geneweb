@@ -14,9 +14,9 @@ let get_k conf =
       with Not_found | Failure _ -> 20)
 
 let select (type a)
-    (module Q : Pqueue.S with type elt = a * Adef.dmy * Adef.calendar) nb_of
-    iterator get get_date conf base =
-  let n = min (max 0 (get_k conf)) (nb_of base) in
+    (module Q : Pqueue.S with type elt = a * Adef.dmy * Adef.calendar) limits
+    nb_of iterator get get_date conf base =
+  let limits = Array.map (fun k -> min (max 0 k) (nb_of base)) limits in
   let ref_date =
     match p_getint conf.env "by" with
     | Some by ->
@@ -25,33 +25,34 @@ let select (type a)
         Some { Adef.day = bd; month = bm; year = by; prec = Sure; delta = 0 }
     | None -> None
   in
-  let q, len =
-    Collection.fold
-      (fun (q, len) i ->
-        let x = get base i in
-        match get_date x with
-        | Some (Adef.Dgreg (d, cal)) ->
-            let d_greg = Date.approx_gregorian ~from:cal d in
-            let aft =
-              match ref_date with
-              | Some ref_date -> Date.compare_dmy ref_date d_greg <= 0
-              | None -> false
-            in
-            if aft then (q, len)
-            else
-              let e = (x, d_greg, cal) in
-              if len < n then (Q.add e q, len + 1)
-              else (snd (Q.take (Q.add e q)), len)
-        | _ -> (q, len))
-      (Q.empty, 0) (iterator base)
-  in
-  let rec loop list q =
-    if Q.is_empty q then (list, len)
+  let queues = Array.make (Array.length limits) Q.empty in
+  let lens = Array.make (Array.length limits) 0 in
+  Collection.iter
+    (fun i ->
+      let x = get base i in
+      match get_date x with
+      | Some (b, Adef.Dgreg (d, cal)) ->
+          let d_greg = Date.approx_gregorian ~from:cal d in
+          let aft =
+            match ref_date with
+            | Some ref_date -> Date.compare_dmy ref_date d_greg <= 0
+            | None -> false
+          in
+          if not aft then
+            let q = Q.add (x, d_greg, cal) queues.(b) in
+            if lens.(b) < limits.(b) then (
+              queues.(b) <- q;
+              lens.(b) <- lens.(b) + 1)
+            else queues.(b) <- snd (Q.take q)
+      | Some (_, Adef.Dtext _) | None -> ())
+    (iterator base);
+  let rec to_list list q =
+    if Q.is_empty q then list
     else
       let e, q = Q.take q in
-      loop (e :: list) q
+      to_list (e :: list) q
   in
-  loop [] q
+  Array.mapi (fun b q -> (to_list [] q, lens.(b))) queues
 
 module PQ = Pqueue.Make (struct
   type t = Geneweb_db.Driver.person * Adef.dmy * Adef.calendar
@@ -68,12 +69,13 @@ end)
 let select_person conf base get_date find_oldest =
   let get_date p =
     match get_date p with
-    | Some _ as d when authorized_age conf base p -> d
-    | _ -> None
+    | Some d when authorized_age conf base p -> Some (0, d)
+    | Some _ | None -> None
   in
-  select
-    (if find_oldest then (module PQ_oldest) else (module PQ))
-    Driver.nb_of_persons Driver.ipers (pget conf) get_date conf base
+  (select
+     (if find_oldest then (module PQ_oldest) else (module PQ))
+     [| get_k conf |]
+     Driver.nb_of_persons Driver.ipers (pget conf) get_date conf base).(0)
 
 module FQ = Pqueue.Make (struct
   type t = Geneweb_db.Driver.family * Adef.dmy * Adef.calendar
@@ -87,18 +89,24 @@ module FQ_oldest = Pqueue.Make (struct
   let leq (_, x, _) (_, y, _) = Date.compare_dmy y x <= 0
 end)
 
-let select_family conf base get_date find_oldest =
+let select_families conf base limits get_date find_oldest =
   let auth ip = authorized_age conf base (Driver.poi base ip) in
   let get_date fam =
     match get_date fam with
     | Some _ as d
       when auth (Driver.get_father fam) && auth (Driver.get_mother fam) ->
         d
-    | _ -> None
+    | Some _ | None -> None
   in
   select
     (if find_oldest then (module FQ_oldest) else (module FQ))
-    Driver.nb_of_families Driver.ifams Driver.foi get_date conf base
+    limits Driver.nb_of_families Driver.ifams Driver.foi get_date conf base
+
+let select_family conf base get_date find_oldest =
+  (select_families conf base
+     [| get_k conf |]
+     (fun fam -> Option.map (fun d -> (0, d)) (get_date fam))
+     find_oldest).(0)
 
 let death_date p = Date.date_of_death (Driver.get_death p)
 
