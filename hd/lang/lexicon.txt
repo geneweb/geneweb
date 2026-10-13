@@ -5737,6 +5737,38 @@ pt: casais
 sv: par
 tr: çiftler
 
+    couples united more than %d years ago, with no recorded death
+af: pare wat meer as %d jaar gelede verenig is, sonder aangetekende dood
+bg: двойки, съединени преди повече от %d години, без записана смърт
+ca: parelles unides fa més de %d anys, sense defunció registrada
+co: coppie unite da più di %d anni, senza morte arregistrata
+cs: páry spojené před více než %d lety bez zaznamenaného úmrtí
+da: par forenet for mere end %d år siden uden registreret død
+de: vor mehr als %d Jahren verbundene Paare ohne eingetragenen Tod
+en: couples united more than %d years ago, with no recorded death
+eo: paroj kunigitaj antaŭ pli ol %d jaroj, sen registrita morto
+es: parejas unidas hace más de %d años, sin defunción registrada
+et: üle %d aasta tagasi ühendatud paarid, ilma registreeritud surmata
+fi: yli %d vuotta sitten yhdistyneet parit ilman kirjattua kuolemaa
+fr: couples unis il y a plus de %d ans, sans décès enregistré
+he: זוגות שהתקשרו לפני יותר מ-%d שנים, ללא פטירה רשומה
+is: pör sem gengu saman fyrir meira en %d árum, án skráðs andláts
+it: coppie unite da più di %d anni, senza decesso registrato
+lt: poros, sujungtos daugiau nei prieš %d metų, be užregistruotos mirties
+lv: pāri, kas savienoti pirms vairāk nekā %d gadiem, bez reģistrētas nāves
+nl: paren verbonden meer dan %d jaar geleden, zonder geregistreerd overlijden
+no: par forent for mer enn %d år siden uten registrert død
+oc: parelhs units fa mai de %d ans, sens decès enregistrat
+pl: pary połączone ponad %d lat temu, bez odnotowanej śmierci
+pt: casais unidos há mais de %d anos, sem óbito registado
+pt-br: casais unidos há mais de %d anos, sem óbito registrado
+ro: cupluri unite acum mai bine de %d ani, fără deces înregistrat
+ru: пары, соединённые более %d лет назад, без записи о смерти
+sk: páry spojené pred viac ako %d rokmi bez zaznamenaného úmrtia
+sl: pari, povezani pred več kot %d leti, brez zabeležene smrti
+sv: par förenade för mer än %d år sedan utan registrerad död
+tr: %d yıldan uzun süre önce birleşmiş, ölümü kaydedilmemiş çiftler
+
     cousin.0.1
 ->: a son/a daughter/a child
 
@@ -20190,37 +20222,101 @@ sl: %s lastnih imen
 sv: de %s förnamnen
 tr: %s ilk ad
 
+    the %d oldest couples perhaps still alive
+af: die %d oudste pare moontlik nog in lewe
+bg: най-старите %d двойки, евентуално още живи
+ca: les %d parelles més antigues potser encara vives
+co: e %d coppie più vechje forse sempre vive
+cs: %d nejstarších párů pravděpodobně ještě žijících
+da: de %d ældste par muligvis stadig i live
+de: die %d ältesten möglicherweise noch lebenden Paare
+en: the %d oldest couples perhaps still alive
+eo: la %d plej malnovaj paroj eble ankoraŭ vivantaj
+es: las %d parejas más antiguas quizás todavía vivas
+et: %d vanimat paari, kes võib-olla on veel elus
+fi: %d vanhinta mahdollisesti elossa olevaa paria
+fr: les %d couples les plus anciens peut-être encore vivants
+he: %d הזוגות הוותיקים ביותר שאולי עודם בחיים
+is: %d elstu pörin sem eru hugsanlega enn á lífi
+it: le %d coppie più anziane forse ancora viventi
+lt: %d seniausių porų, galbūt dar gyvų
+lv: %d vecākie pāri, iespējams, vēl dzīvi
+nl: de %d oudste, mogelijk nog in leven zijnde, paren
+no: de %d eldste parene som kanskje fremdeles er i live
+oc: los %d parelhs mai vièlhs benlèu encara vius
+pl: %d najstarszych par prawdopodobnie jeszcze żyjących
+pt: os %d casais mais antigos talvez ainda vivos
+pt-br: os %d casais mais antigos talvez ainda vivos
+ro: cele mai vechi %d cupluri, probabil încă în viață
+ru: %d старейших пар, возможно ещё живых
+sk: %d najstarších párov pravdepodobne ešte žijúcich
+sl: %d najstarejših parov, morda še živih
+sv: de %d äldsta paren som kanske fortfarande lever
+tr: belki hâlâ hayatta olan en eski %d çift
+
     the %d oldest couples perhaps still alive and engaged
-af: die %d oudste pare moontlik nog in lewe en verloof
-bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
-ca: les parelles més grans potser encara vives i juntes
-co: i %d coppii i più vechji forse sempre vivi è fidanzati
-cs: %d nejstarších párů pravděpodobně žijících a zadaných
-da: og de %d ældste par muligvis stadig i live og forlovede
+af: die %d oudste verloofde pare wat moontlik nog leef
+bg: най-старите %d сгодени двойки, евентуално още живи
+ca: les %d parelles promeses més antigues potser encara vives
+co: e %d coppie fidanzate più vechje forse sempre vive
+cs: %d nejstarších snoubeneckých párů pravděpodobně ještě žijících
+da: de %d ældste forlovede par muligvis stadig i live
 de: die %d ältesten verlobten und möglicherweise noch lebenden Paare
 en: the %d oldest couples perhaps still alive and engaged
-eo: versajne la %d plej altaj paroj ankorau vivas kaj estas fiancigitaj
-es: los novios más viejos y quizás todavía vivos
-et: %d vanimat kihlatud ja võib-olla veel elus olevat paari
+eo: la %d plej malnovaj fianĉaj paroj eble ankoraŭ vivantaj
+es: las %d parejas prometidas más antiguas quizás todavía vivas
+et: %d vanimat kihlatud paari, kes võib-olla on veel elus
 fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
-fr: les %d couples les plus anciens peut-être encore vivants et fiancés
-he: יתכן ש-%d הזוגות המבוגרים ביותר עודם בחיים ועודם מאורסים
-is: %d elstu pörin eru hugsanlega enn saman og á lífi
-it: le %d coppie più anziane forse ancora viventi e fidanzate
-lt: %d greičiaisiai vyriausi gyvy sutuoktiniai arba sužadėtiniai
-lv: %d iespējams vēl dzīvu un saderīnātu vecāko pāru
+fr: les %d couples fiancés les plus anciens peut-être encore vivants
+he: %d הזוגות המאורסים הוותיקים ביותר שאולי עודם בחיים
+is: %d elstu trúlofuðu pörin sem eru hugsanlega enn á lífi
+it: le %d coppie fidanzate più anziane forse ancora viventi
+lt: %d seniausių sužadėtinių porų, galbūt dar gyvų
+lv: %d vecākie saderinātie pāri, iespējams, vēl dzīvi
 nl: de %d oudste, mogelijk nog in leven zijnde, verloofde paren
-no: det %d eldste par som kanskje fremdeles er i live og forlovet
-oc: los %d parelhs mai vièlhs benlèu encara vius e promés
-pl: %d najstarszych par prawdopodobnie jeszcze zyjących i pozostających zaręczeni
-pt: o %d mais velho casal talvez ainda vivo e noivado
-pt-br: os %d mais velhos casais talvez ainda vivos
-ro: cei %d mai virstnici perechi logoditi probabil inca in viata
-ru: старейшие %d возможно живых супругов или помолвленных
-sk: %d najstarších párov pravdepodobne žijúcich a zadaných
-sl: %d najstarejših morda še živih in zaročenih parov
-sv: de %d äldsta nu levande paren som kanske fortfarande är förlovade
-tr: %d en yaşlı çift belki hala hayatta ve nişanlı
+no: de %d eldste forlovede parene som kanskje fremdeles er i live
+oc: los %d parelhs promeses mai vièlhs benlèu encara vius
+pl: %d najstarszych par narzeczeńskich prawdopodobnie jeszcze żyjących
+pt: os %d casais noivos mais antigos talvez ainda vivos
+pt-br: os %d casais noivos mais antigos talvez ainda vivos
+ro: cele mai vechi %d cupluri logodite, probabil încă în viață
+ru: %d старейших помолвленных пар, возможно ещё живых
+sk: %d najstarších snúbeneckých párov pravdepodobne ešte žijúcich
+sl: %d najstarejših zaročenih parov, morda še živih
+sv: de %d äldsta förlovade paren som kanske fortfarande lever
+tr: belki hâlâ hayatta olan en eski %d nişanlı çift
+
+    the %d oldest couples perhaps still alive and married
+af: die %d oudste getroude pare wat moontlik nog leef
+bg: най-старите %d семейни двойки, евентуално още живи
+ca: les %d parelles casades més antigues potser encara vives
+co: e %d coppie maritate più vechje forse sempre vive
+cs: %d nejstarších manželských párů pravděpodobně ještě žijících
+da: de %d ældste gifte par muligvis stadig i live
+de: die %d ältesten verheirateten und möglicherweise noch lebenden Paare
+en: the %d oldest couples perhaps still alive and married
+eo: la %d plej malnovaj geedzaj paroj eble ankoraŭ vivantaj
+es: las %d parejas casadas más antiguas quizás todavía vivas
+et: %d vanimat abielus paari, kes võib-olla on veel elus
+fi: %d vanhinta mahdollisesti elossa olevaa avioparia
+fr: les %d couples mariés les plus anciens peut-être encore vivants
+he: %d הזוגות הנשואים הוותיקים ביותר שאולי עודם בחיים
+is: %d elstu giftu pörin sem eru hugsanlega enn á lífi
+it: le %d coppie sposate più anziane forse ancora viventi
+lt: %d seniausių sutuoktinių porų, galbūt dar gyvų
+lv: %d vecākie laulātie pāri, iespējams, vēl dzīvi
+nl: de %d oudste, mogelijk nog in leven zijnde, getrouwde paren
+no: de %d eldste gifte parene som kanskje fremdeles er i live
+oc: los %d parelhs maridats mai vièlhs benlèu encara vius
+pl: %d najstarszych par małżeńskich prawdopodobnie jeszcze żyjących
+pt: os %d casais casados mais antigos talvez ainda vivos
+pt-br: os %d casais casados mais antigos talvez ainda vivos
+ro: cele mai vechi %d cupluri căsătorite, probabil încă în viață
+ru: %d старейших супружеских пар, возможно ещё живых
+sk: %d najstarších manželských párov pravdepodobne ešte žijúcich
+sl: %d najstarejših zakonskih parov, morda še živih
+sv: de %d äldsta gifta paren som kanske fortfarande lever
+tr: belki hâlâ hayatta olan en eski %d evli çift
 
     the %d oldest perhaps still alive
 af: die %d oudstes wat nog leef
@@ -20933,37 +21029,37 @@ ru: последние %d свадеб
 sv: det senaste %d firade bröllopet
 tr: son %d evlilik (Evlilik tarihi)
 
-    the latest %d marriages
-af: die laaste %d huwelike
-bg: последните %d брака
-br: ar %d euredoù diwezhañ
-ca: els %d matrimonis més recents
-co: i %d ultimi matrimonii
-cs: posledních %d svateb
-da: de seneste %d bryllupper
-de: die letzten %d Heiraten
-en: latest %d marriages
-eo: la lastaj %d edziĝoj
-es: los %d últimos casamientos
-et: viimased %d pulma
-fi: viimeiset %d avioliittoa
-fr: les %d derniers mariages
-he: %d הנישואים האחרונים
-is: síðast giftist %d
-it: gli ultimi %d matrimoni
-lt: naujausios santuokos - %d
-lv: pēdējās %d laulības
-nl: de %d jongste huwelijken
-no: de %d sist gifte
-oc: las %d darrièras unions
-pl: %d ostatnich ślubów
-pt: os %d casamentos mais recentes
-ro: ultimi %d insurati
-ru: последние %d браков
-sk: posledných %d sobášov
-sl: zadnjih %d porok
-sv: de senaste %d äktenskapen
-tr: son %d evlilik
+    the latest %d marriages and engagements
+af: die laaste %d huwelike en verlowings
+bg: последните %d брака и годежа
+ca: els %d matrimonis i compromisos més recents
+co: i %d ultimi matrimonii è fidanzamenti
+cs: posledních %d svateb a zasnoubení
+da: de seneste %d bryllupper og forlovelser
+de: die letzten %d Heiraten und Verlobungen
+en: latest %d marriages and engagements
+eo: la lastaj %d edziĝoj kaj fianĉiĝoj
+es: los %d últimos casamientos y compromisos
+et: viimased %d pulma ja kihlust
+fi: viimeiset %d avioliittoa ja kihlausta
+fr: les %d derniers mariages et fiançailles
+he: %d הנישואים והאירוסים האחרונים
+is: síðustu %d hjónabönd og trúlofanir
+it: gli ultimi %d matrimoni e fidanzamenti
+lt: naujausios santuokos ir sužadėtuvės - %d
+lv: pēdējās %d laulības un saderināšanās
+nl: de %d jongste huwelijken en verlovingen
+no: de %d siste ekteskap og forlovelser
+oc: las %d darrièras unions e promessas
+pl: %d ostatnich ślubów i zaręczyn
+pt: os %d casamentos e noivados mais recentes
+pt-br: os %d casamentos e noivados mais recentes
+ro: ultimele %d căsătorii și logodne
+ru: последние %d браков и помолвок
+sk: posledných %d sobášov a zásnub
+sl: zadnjih %d porok in zarok
+sv: de senaste %d äktenskapen och förlovningarna
+tr: son %d evlilik ve nişan
 
     the latest %d registered marriages
 bg: последните %d регистрирани сватби

@@ -1,3 +1,7 @@
+val get_k : Config.config -> int
+(** [get_k conf] returns the number of items to select: the [k] parameter, else
+    the [latest_event] base parameter, else 20. *)
+
 val select_person :
   Config.config ->
   Geneweb_db.Driver.base ->
@@ -14,6 +18,18 @@ val select_person :
     date (all dates after the reference one aren't selected) Returns also the
     number of selected persons. Persons not allowed by [Util.authorized_age] are
     skipped. *)
+
+val select_families :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  int array ->
+  (Geneweb_db.Driver.family -> (int * Adef.date) option) ->
+  bool ->
+  ((Geneweb_db.Driver.family * Adef.dmy * Adef.calendar) list * int) array
+(** [select_families conf base limits get_date find_oldest] fills several lists
+    of families in a single pass over the base. [get_date fam] returns the index
+    of the list for [fam] and its date; list [i] keeps at most [limits.(i)]
+    families. Each list is selected and sorted as by {!select_family}. *)
 
 val select_family :
   Config.config ->

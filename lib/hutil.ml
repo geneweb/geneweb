@@ -78,10 +78,10 @@ let is_fluid conf =
   (try List.assoc "wide" conf.env = Adef.encoded "on" with Not_found -> false)
   || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
 
-let header_without_title conf =
+let header_without_title ?(title = fun _ -> ()) conf =
   let fluid = is_fluid conf in
   Util.html conf;
-  header_without_http_nor_home conf (fun _ -> ());
+  header_without_http_nor_home conf title;
   include_home_template conf;
   Output.print_sstring conf
     (if fluid then "<div class=\"container-fluid mx-3\">\n"

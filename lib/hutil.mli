@@ -17,8 +17,9 @@ val header_with_title :
     @param fluid container-fluid if [true]
     @param h1_class extra classes on the <h1> (e.g. ["h2"] for long titles) *)
 
-val header_without_title : config -> unit
-(** Similar to [header] but without any <h1> title element. *)
+val header_without_title : ?title:(bool -> unit) -> config -> unit
+(** Similar to [header] but without any <h1> title element. [title true] prints
+    the content of the <title> element, empty by default. *)
 
 val header :
   ?error:bool ->

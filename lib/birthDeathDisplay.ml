@@ -278,91 +278,160 @@ let print_longest_lived conf base =
   Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
+let print_union_list ?(mt = false) conf base list =
+  Output.print_sstring conf (if mt then {|<ul class="mt-3">|} else "<ul>");
+  let last_month_txt, _ =
+    List.fold_left
+      (fun (last_month_txt, was_future) (fam, d, cal) ->
+        let month_txt, future =
+          list_aux_1 conf d cal last_month_txt was_future
+        in
+        Output.print_sstring conf "<li><b>";
+        Output.print_string conf
+          (referenced_person_text conf base
+             (pget conf base (Driver.get_father fam)));
+        Output.print_sstring conf "</b> ";
+        Output.print_sstring conf (transl_nth conf "and" 0);
+        Output.print_sstring conf " <b>";
+        Output.print_string conf
+          (referenced_person_text conf base
+             (pget conf base (Driver.get_mother fam)));
+        Output.print_sstring conf "</b>, ";
+        if future then (
+          Output.print_sstring conf "<em>";
+          Output.print_string conf
+            (DateDisplay.string_of_date conf (Dgreg (d, cal)));
+          Output.print_sstring conf "</em>")
+        else (
+          (match Driver.get_relation fam with
+          | NotMarried | NoSexesCheckNotMarried ->
+              Output.print_sstring conf
+              @@ transl_nth conf "relation/relations" 0
+          | Married | NoSexesCheckMarried ->
+              Output.print_sstring conf @@ transl conf "married"
+          | Engaged -> Output.print_sstring conf @@ transl conf "engaged"
+          | MarriageBann | MarriageContract | MarriageLicense | Pacs | Residence
+          | NoMention ->
+              ());
+          Output.print_sstring conf " <em>";
+          Output.print_string conf
+            (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
+          Output.print_sstring conf "</em>.");
+        Output.print_sstring conf "</li>";
+        (month_txt, future))
+      (Adef.safe "", false)
+      list
+  in
+  if (last_month_txt :> string) <> "" then
+    Output.print_sstring conf "</ul></li>";
+  Output.print_sstring conf "</ul>"
+
 let print_marr_or_eng conf base title list =
   Hutil.header conf title;
-  Output.print_sstring conf "<ul>\n";
-  ignore
-  @@ List.fold_left
-       (fun (last_month_txt, was_future) (fam, d, cal) ->
-         let month_txt, future =
-           list_aux_1 conf d cal last_month_txt was_future
-         in
-         Output.print_sstring conf "<li><b>";
-         Output.print_string conf
-           (referenced_person_text conf base
-              (pget conf base (Driver.get_father fam)));
-         Output.print_sstring conf "</b> ";
-         Output.print_sstring conf (transl_nth conf "and" 0);
-         Output.print_sstring conf " <b>";
-         Output.print_string conf
-           (referenced_person_text conf base
-              (pget conf base (Driver.get_mother fam)));
-         Output.print_sstring conf "</b>, ";
-         if future then (
-           Output.print_sstring conf "<em>";
-           Output.print_string conf
-             (DateDisplay.string_of_date conf (Dgreg (d, cal)));
-           Output.print_sstring conf "</em>")
-         else (
-           (match Driver.get_relation fam with
-           | NotMarried | NoSexesCheckNotMarried ->
-               Output.print_sstring conf
-               @@ transl_nth conf "relation/relations" 0
-           | Married | NoSexesCheckMarried ->
-               Output.print_sstring conf @@ transl conf "married"
-           | Engaged -> Output.print_sstring conf @@ transl conf "engaged"
-           | MarriageBann | MarriageContract | MarriageLicense | Pacs
-           | Residence | NoMention ->
-               ());
-           Output.print_sstring conf " <em>";
-           Output.print_string conf
-             (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
-           Output.print_sstring conf "</em>.");
-         Output.print_sstring conf "</li>";
-         (month_txt, future))
-       (Adef.safe "", false)
-       list;
-  Output.print_sstring conf "</ul></li>";
+  print_union_list conf base list;
   Hutil.trailer conf
 
 let print_marriage conf base =
   let list, len =
     select_family conf base
       (fun fam ->
-        let rel = Driver.get_relation fam in
-        if rel = Married || rel = NoSexesCheckMarried then
-          Date.od_of_cdate (Driver.get_marriage fam)
-        else None)
+        match Driver.get_relation fam with
+        | Married | NoSexesCheckMarried | Engaged ->
+            Date.od_of_cdate (Driver.get_marriage fam)
+        | NotMarried | NoSexesCheckNotMarried | NoMention | MarriageBann
+        | MarriageContract | MarriageLicense | Pacs | Residence ->
+            None)
       false
   in
   let title _ =
-    Printf.sprintf (fcapitale (ftransl conf "the latest %d marriages")) len
+    Printf.sprintf
+      (fcapitale (ftransl conf "the latest %d marriages and engagements"))
+      len
     |> Output.print_sstring conf
   in
   print_marr_or_eng conf base title list
 
 let print_oldest_engagements conf base =
-  let list, len =
-    select_family conf base
+  let max_union_age = 90 in
+  let max_suspects = 1000 in
+  let k = get_k conf in
+  let perhaps_alive p =
+    match Driver.get_death p with
+    | NotDead -> true
+    | DontKnowIfDead ->
+        Update.infer_death_from_cdate conf (Driver.get_birth p) = DontKnowIfDead
+    | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> false
+  in
+  let still_together fam =
+    let ifam = Driver.get_ifam fam in
+    let current ip =
+      let p = pget conf base ip in
+      let fams = Driver.get_family p in
+      let n = Array.length fams in
+      n > 0 && Driver.Ifam.equal fams.(n - 1) ifam && perhaps_alive p
+    in
+    (match Driver.get_divorce fam with
+      | NotDivorced | NotSeparated -> true
+      | Divorced _ | Separated_old | Separated _ -> false)
+    && current (Driver.get_father fam)
+    && current (Driver.get_mother fam)
+  in
+  let lists =
+    select_families conf base
+      [| max_suspects + 1; k; max_suspects + 1; k |]
       (fun fam ->
-        if Driver.get_relation fam = Engaged then
-          let husb = pget conf base (Driver.get_father fam) in
-          let wife = pget conf base (Driver.get_mother fam) in
-          match (Driver.get_death husb, Driver.get_death wife) with
-          | (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-              Date.od_of_cdate (Driver.get_marriage fam)
-          | _ -> None
-        else None)
+        let bucket =
+          match Driver.get_relation fam with
+          | Engaged -> Some 0
+          | Married | NoSexesCheckMarried -> Some 2
+          | NotMarried | NoSexesCheckNotMarried | NoMention | MarriageBann
+          | MarriageContract | MarriageLicense | Pacs | Residence ->
+              None
+        in
+        let marr = Driver.get_marriage fam in
+        match (bucket, Date.od_of_cdate marr) with
+        | Some b, Some d when still_together fam ->
+            if
+              Update.infer_death_from_cdate conf ~max_age:max_union_age marr
+              = OfCourseDead
+            then Some (b, d)
+            else Some (b + 1, d)
+        | (Some _ | None), _ -> None)
       true
   in
-  let title _ =
-    Printf.sprintf
-      (fcapitale
-         (ftransl conf "the %d oldest couples perhaps still alive and engaged"))
-      len
+  let title fmt len _ =
+    Printf.sprintf (fcapitale (ftransl conf fmt)) len
     |> Output.print_sstring conf
   in
-  print_marr_or_eng conf base title list
+  let print_section fmt (suspects, n_suspects) (list, n) =
+    Output.print_sstring conf {|<h1 class="h2 mt-3">|};
+    title fmt n false;
+    Output.print_sstring conf "</h1>";
+    if n_suspects > 0 then (
+      Output.printf conf
+        {|<details class="ms-3 my-3 p-2 border"><summary class="text-body-secondary">%s <span class="badge text-bg-secondary">%s</span></summary>|}
+        (Printf.sprintf
+           (fcapitale
+              (ftransl conf
+                 "couples united more than %d years ago, with no recorded death"))
+           max_union_age)
+        (if n_suspects > max_suspects then string_of_int max_suspects ^ "+"
+         else string_of_int n_suspects);
+      print_union_list ~mt:true conf base
+        (List.filteri (fun i _ -> i < max_suspects) suspects);
+      Output.print_sstring conf "</details>");
+    print_union_list conf base list
+  in
+  Hutil.header_without_title conf
+    ~title:
+      (title "the %d oldest couples perhaps still alive"
+         (snd lists.(1) + snd lists.(3)));
+  if snd lists.(0) > 0 || snd lists.(1) > 0 then
+    print_section "the %d oldest couples perhaps still alive and engaged"
+      lists.(0) lists.(1);
+  print_section "the %d oldest couples perhaps still alive and married"
+    lists.(2) lists.(3);
+  Hutil.trailer conf
 
 let old_print_statistics conf =
   let title _ =
@@ -389,8 +458,8 @@ let old_print_statistics conf =
     aux "LB" "the latest %d births";
     aux "LD" "the latest %d deaths";
     (* FIXME *)
-    aux "LM" "the latest %d marriages";
-    aux "OE" "the %d oldest couples perhaps still alive and engaged";
+    aux "LM" "the latest %d marriages and engagements";
+    aux "OE" "the %d oldest couples perhaps still alive";
     aux "OA" "the %d oldest perhaps still alive");
   aux "LL" "the %d who lived the longest";
   Output.print_sstring conf "</ul>\n";
