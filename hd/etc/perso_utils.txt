@@ -295,10 +295,11 @@
 %end;
 
 %define;short_display_person_tree(xx)
+  %let;frst_name;<span>%if;(xx.public_name!="" and not roglo)%xx.public_name;%else;%xx.first_name;%end;</span>%in;
   <div>
     %if;(xx.has_sosa and e.m!="")%apply;display_sosa("xx")%end;
-    %if;(cancel_links or xx.is_restricted or is_self)<span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span>
-    %else;<a href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span></a>%nn;
+    %if;(cancel_links or xx.is_restricted or is_self)%frst_name;<br><span>%xx.surname;</span>
+    %else;<a href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;">%frst_name;<br><span>%xx.surname;</span></a>%nn;
     %end;
     %if;(wizard and not cancel_links)
       <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
