@@ -214,6 +214,7 @@
   %reset_count;%reset_count2;
   %foreach;family;
     %incr_count;
+    %let;marr_note;%if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_marriage_note)<div class="border-start border-3 ps-2 mt-3 mb-2">[*notes on the marriage/notes on the marriages]0[:] %marriage_note;</div>%end;%in;
     %if;(spouse.has_image)%incr_count2;%end;
     %foreach;child;
       %if;(child.has_image)%incr_count2;%end;
@@ -227,9 +228,6 @@
     %end;
     <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
     %apply;short_display_person("spouse")
-    %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_marriage_note)
-      %sp;(%marriage_note;)%nn;
-    %end;
     %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
       %if;(not cancel_links)
          <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[see] [note/notes]0 %count">%nn;
@@ -250,8 +248,9 @@
             %if;not is_first;, %end;%apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
           %end;</span>)%nn;
       %end;
+      %if;(marr_note!="").%marr_note;%end;
       %if;(has_children)%nn;
-        , %apply;havingchildren(nb_children)[:]
+        %if;(marr_note=""), %apply;havingchildren(nb_children)%else;%apply;capitalize%with;%apply;havingchildren(nb_children)%end;%end;[:]
         %foreach;child;
           <ul>
             %apply;li_SDC("child")%nn;
@@ -308,10 +307,11 @@
               </div>
             </div>
           </div>
-          %if;has_children;
+        %marr_note;
+        %if;has_children;
           %let;prev_count;%count;%in;%( on garde la précédente valeur de count %)
             <div class="d-flex flex-column align-content-start ms-2 mt-1">
-              <div class="w-100">%apply;havingchildren(nb_children)[:]</div>
+              <div class="w-100">%if;(marr_note="")%apply;havingchildren(nb_children)%else;%apply;capitalize%with;%apply;havingchildren(nb_children)%end;%end;[:]</div>
               %reset_count1;
               %foreach;child;
                 %incr_count1;

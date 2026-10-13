@@ -239,13 +239,13 @@
     </b>%nn;
     %apply;somebody_long_info("spouse")
     %apply;render_notes_sources_inline%with;spouse%and;ctr%end;
-    %if;(e.comm="on" and (has_comment or has_marriage_note))
-      <span class="text-body-secondary small"> (%comment;
-        %if;has_marriage_note;%apply;clean_html_tags(marriage_note)%end;)
-      </span>
-    %end;
     %if;are_divorced;, <em>[divorced]</em>%end;
     %if;are_separated;, <em>[separated]</em>%end;
+    %if;(e.comm="on" and (has_comment or has_marriage_note))
+      %let;fid;%ctr;%apply;letter(family_cnt)%in;
+      %if;(e.inline="on")<div class="my-1 mx-3 p-3 shadow">%apply;family_notes()</div>
+      %else;%sp;<sup><a href="#fnote-%fid;">(<small>[marriage/marriages]0 %fid;</small>)</a></sup>%end;
+    %end;
     %if;(curlev<maxlev)
       %if;(curlev=0 or e.t="M" and xx.is_male or e.t="F" and xx.is_female or e.t="L")
         %if;(family.desc_level < famlev)
@@ -280,6 +280,13 @@
   %apply;render_notes_reference%with;xx%and;ctr%end;
   %foreach;xx.family;
     %apply;render_notes_reference%with;spouse%and;ctr%apply;letter(family_cnt)%end;
+    %if;(e.comm="on" and (has_comment or has_marriage_note))
+      %let;fid;%ctr;%apply;letter(family_cnt)%in;
+      <div class="p-3 shadow">
+        <dt><a id="fnote-%fid;" href="#person-%ctr;">%fid;</a> <span class="small text-body-secondary">([marriage/marriages]0 [with] %spouse;)</span></dt>
+        <dd>%apply;family_notes()</dd>
+      </div>
+    %end;
     %if;(curlev<maxlev)
       %if;((curlev=0) or (e.t="M" and xx.is_male) or (e.t="F" and xx.is_female) or (e.t="L"))
         %if;(family.desc_level<famlev)%nn;
@@ -300,9 +307,9 @@
   %apply;descendants_by_list("self", "self", 0, xx, 0, 1)%nl;
   [*total][:] %expr(count-1) [person/persons]n%sp;
   ([spouses not included]).
-  %if;((e.notes="on" or e.src="on") and e.inline!="on")
+  %if;((e.notes="on" or e.src="on" or e.comm="on") and e.inline!="on")
     <h3 class="mt-2">
-      %if;(e.notes="on")[*note/notes]1%else;[*source/sources]1%end;
+      %if;(e.notes="on" or e.comm="on")[*note/notes]1%else;[*source/sources]1%end;
     </h3>
     <dl class="ms-0">
       %reset_count;%reset_desc_level;

@@ -831,6 +831,11 @@
   %end;
 %end;
 
+%define;family_notes()
+  %if;has_marriage_note;<div>[*notes on the marriage/notes on the marriages]0[:] %marriage_note;</div>%end;
+  %if;has_comment;<div%if;has_marriage_note; class="mt-2"%end;>[*notes on the family/notes on the families]0[:] %comment;</div>%end;
+%end;
+
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
 
 %define;mm(i)%mi;%end;

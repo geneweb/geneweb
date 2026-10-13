@@ -1,6 +1,6 @@
-<!-- $Id: modules/notes.txt v7.1 04/03/2026 02:42:31 $ -->
-%( op_m=1 Notes and marriage comments %)
-%( op_m=2 Notes and event notes (+comments for marriages) %)
+<!-- $Id: modules/notes.txt v7.1 14/10/2026 23:24:34 $ -->
+%( op_m=1 Individual and family notes %)
+%( op_m=2 Individual, event and family notes %)
 %let;op_m;%if;(op_m!="")%op_m;%else;%if;(has_families)1%end;%else;2%end;%in;
 <div id="mod_notes">
 %reset_count;
@@ -17,7 +17,6 @@
 %reset_count2;
 %foreach;family;
   %if;has_comment;%incr_count2;%end;
-  %if;has_marriage_note;%incr_count2;%end;
 %end;
 %if;(op_m=1 and (wizard or friend or bvar.no_note_for_visitor!="yes") and
       (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE or count2>0))
@@ -33,26 +32,29 @@
   %if;(count2>0 and has_families)
     %( On remet les compteurs à zéro, on démarre à 1 - synchro avec unions.txt %)
     %reset_count;
-    <div class="fam-notes">
-      <ul class="ps-0">
-        %foreach;family;
-          %incr_count;
-          %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
-            %if;(count=1 or count2=1 and (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
-              <h2 class="h3 w-100">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h2>
+    <h2 class="h3 mt-2">%if;(count2>1)[*notes on the family/notes on the families]1%else;[*notes on the family/notes on the families]0%end;</h2>
+    %if;(nb_families=1)
+      %foreach;family;
+        <div class="ms-4 fam-notes" id="note-wed-1">%comment;</div>
+      %end;
+    %else;
+      <div class="fam-notes">
+        <ul class="ps-0">
+          %foreach;family;
+            %incr_count;
+            %if;has_comment;
+                <li class="ms-4">
+                  %let;supcnt;<sup><small>%count</small></sup>%in;
+                  %if;not cancel_links;
+                    <a href="#wed-callnote-%count;" id="note-wed-%count;" title="[see] [marriage/marriages]0">%supcnt;</a>%nn;
+                  %else;%supcnt;%end;%sp;%apply;nth([nth (generation)], count) [marriage with]%sp;
+                  %spouse.first_name; %spouse.surname;[:] %comment;
+                </li>
             %end;
-              <li class="ms-4">
-                %let;supcnt;<sup><small>%count</small></sup>%in;
-                %if;not cancel_links;
-                  <a href="#wed-callnote-%count;" id="note-wed-%count;" title="[see] [marriage/marriages]0">%supcnt;</a>%nn;
-                %else;%supcnt;%end;%sp;
-                %if;(nb_families>1) %apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end;%sp;
-                %spouse.first_name; %spouse.surname;[:] %comment;
-              </li>
           %end;
-        %end;
-      </ul>
-    </div>
+        </ul>
+      </div>
+    %end;
   %end;
   %if;(has_linked_page.NOTE and linked_page.NOTE!="")
     <div class="ms-3">%apply;capitalize(linked_page.NOTE)</div>
@@ -75,15 +77,10 @@
       <blockquote>%baptism_note;</blockquote>
     %end;
     %foreach;family;
-      %if;(has_comment or has_marriage_note)
-        <h3>[*marriage notes/marriages notes]1%sp;
-        [with] %spouse.first_name; %spouse.surname;</h3>
+      %if;has_comment;
+        <h3>[*notes on the family/notes on the families]0 [with] %spouse.first_name; %spouse.surname;</h3>
+        <blockquote>%comment;</blockquote>
       %end;
-      <blockquote>%nn;
-        %if;has_comment;%comment;%end;
-        %if;(has_comment and has_marriage_note)%nl;%end;
-        %if;has_marriage_note;%marriage_note;%end;
-      </blockquote>
     %end;
     %if;has_death_note;
       <h3>[*death]</h3>

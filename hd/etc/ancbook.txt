@@ -169,8 +169,9 @@
     <table class="fp_marriage_notes">
       <tr>
         <td>
-          <span class="textcolor">[*marriage notes/marriages notes]0[:]</span> %comment;
-          %if;has_marriage_note;%marriage_note;%end;
+          %if;has_marriage_note;<span class="textcolor">[*notes on the marriage/notes on the marriages]0[:]</span> %marriage_note;%end;
+          %if;(has_comment and has_marriage_note)<br>%end;
+          %if;has_comment;<span class="textcolor">[*notes on the family/notes on the families]0[:]</span> %comment;%end;
         </td>
       </tr>
     </table><br>
