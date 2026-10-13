@@ -32,7 +32,7 @@ let print_child_person conf base p =
   transl_nth conf "first name/first names" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td colspan="3">|};
-  Output.print_sstring conf {|<input name=\"|};
+  Output.print_sstring conf {|<input name="|};
   Output.print_string conf var;
   Output.print_sstring conf
     {|_first_name" class="form-control" size="23" maxlength="200" id="|};
@@ -51,10 +51,10 @@ let print_child_person conf base p =
   Output.print_string conf var;
   Output.print_sstring conf {|_occ" name="|};
   Output.print_string conf var;
-  Output.print_sstring conf {|occ" size="5" maxlength="8"|};
+  Output.print_sstring conf {|_occ" size="5" maxlength="8"|};
   Output.print_sstring conf
     (if occ = 0 then "" else {| value="|} ^ string_of_int occ ^ {|"|});
-  Output.print_sstring conf {|</td></tr><tr align="|};
+  Output.print_sstring conf {|></td></tr><tr align="|};
   Output.print_sstring conf conf.left;
   Output.print_sstring conf {|"><td>|};
   Output.print_sstring conf {|<label for="|};
