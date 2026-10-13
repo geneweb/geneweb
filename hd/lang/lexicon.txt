@@ -4610,37 +4610,37 @@ ru: смена имени или фамилии
 sv: namnbyte
 tr: ad değişikliği
 
-    changed order of children
-af: verander die volgorde van kinders
-bg: промяна в последователността на децата
-br: kemm urzh ar vugale
-ca: canvi de l’ordre dels fills
-co: cambiu di l’ordine di i zitelli
-cs: změnit pořadí dětí
-da: ændret rækkefølge for børn
-de: Reihenfolge der Kinder gewechselt
-en: changed order of children
-eo: ŝanĝo de la ordo de la idoj
-es: cambio del orden de los hijos
-et: laste järjekord muudetud
-fi: lasten järjestystä on muutettu
-fr: changement de l’ordre des enfants
-he: סדר הילדים השתנה
-is: breytti röð barna
-it: ordine dei figli cambiato
-lt: pakeisti vaikų eiliškumą
-lv: mainīt bērnu secību
-nl: volgorde van de kinderen veranderd
-no: rekkefølgen er endret for barna til
-oc: cambiament de l’òrdre dels enfants
-pl: kolejność dzieci została zmieniona
-pt: mudar a ordem dos filhos
-ro: sa schimbat ordinea copiilor
-ru: изменяющий порядок детей
-sk: zmeniť poradie detí
-sl: zamenjan vrstni red otrok
-sv: ändrade ordningen för barnen
-tr: çocukların sırasını değiştirme
+    changed order of children of %1 and %2
+af: verander die volgorde van die kinders van %1 en %2
+bg: промяна в последователността на децата на %1 и %2
+br: kemm urzh bugale %1 ha %2
+ca: canvi de l’ordre dels fills de %1 i %2
+co: cambiu di l’ordine di i zitelli di %1 è %2
+cs: změna pořadí dětí rodičů %1 a %2
+da: ændret rækkefølge for børn af %1 og %2
+de: Reihenfolge der Kinder von %1 und %2 geändert
+en: changed order of children of %1 and %2
+eo: ŝanĝo de la ordo de la idoj de %1 kaj %2
+es: cambio del orden de los hijos de %1 y %2
+et: %1 ja %2 laste järjekord muudetud
+fi: %1 ja %2 lasten järjestystä on muutettu
+fr: changement de l’ordre des enfants d[e |’]%1 et d[e |’]%2
+he: סדר הילדים של %1 ו-%2 השתנה
+is: breytti röð barna %1 og %2
+it: ordine dei figli di %1 e %2 cambiato
+lt: pakeistas %1 ir %2 vaikų eiliškumas
+lv: mainīta %1 un %2 bērnu secība
+nl: volgorde van de kinderen van %1 en %2 veranderd
+no: rekkefølgen er endret for barna til %1 og %2
+oc: cambiament de l’òrdre dels enfants d[e |’]%1 e d[e |’]%2
+pl: kolejność dzieci (rodzice: %1 i %2) została zmieniona
+pt: mudança da ordem dos filhos de %1 e %2
+ro: s-a schimbat ordinea copiilor lui %1 și %2
+ru: изменён порядок детей %1 и %2
+sk: zmenené poradie detí rodičov %1 a %2
+sl: zamenjan vrstni red otrok od %1 in %2
+sv: ändrade ordningen för barnen till %1 och %2
+tr: %1 ve %2 çocuklarının sırası değiştirildi
 
     changed order of family's events
 co: cambiu di l’ordine di l’evenimenti famigliale

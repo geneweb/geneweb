@@ -398,8 +398,11 @@ let simple_decline conf wt =
   in
   loop 0
 
-let gen_decline conf wt s1 s2 s2_raw =
-  let string_of = function '1' -> Some s1 | '2' -> Some s2 | _ -> None in
+let gen_decline_args conf wt args =
+  let arg c =
+    let n = Char.code c - Char.code '1' in
+    if n >= 0 && n < Array.length args then Some args.(n) else None
+  in
   let len = String.length wt in
   let rec loop i =
     if i = len then ""
@@ -407,25 +410,25 @@ let gen_decline conf wt s1 s2 s2_raw =
       let s, i =
         match wt.[i] with
         | '%' when i + 1 < len -> (
-            match string_of wt.[i + 1] with
-            | Some s -> (s, i + 1)
+            match arg wt.[i + 1] with
+            | Some (s, _) -> (s, i + 1)
             | None -> ("%", i))
         | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' -> (
             let c = wt.[i + 1] in
-            match string_of wt.[i + 4] with
-            | Some s -> (Mutil.decline c s, i + 4)
+            match arg wt.[i + 4] with
+            | Some (s, _) -> (Mutil.decline c s, i + 4)
             | None -> (":", i))
         | '[' -> (
             try
               let j = String.index_from wt i ']' in
               let k = String.index_from wt i '|' in
               if k < j && j + 2 < len && wt.[j + 1] = '%' then
-                match string_of wt.[j + 2] with
-                | Some s ->
+                match arg wt.[j + 2] with
+                | Some (s, raw) ->
                     let s =
-                      if start_with_vowel conf s2_raw then
-                        String.sub wt (k + 1) (j - k - 1) ^ s (*    [aa|bb]  *)
-                      else String.sub wt (i + 1) (k - i - 1) ^ s (* i  k  j  *)
+                      if start_with_vowel conf raw then
+                        String.sub wt (k + 1) (j - k - 1) ^ s
+                      else String.sub wt (i + 1) (k - i - 1) ^ s
                     in
                     (s, j + 2)
                 | None -> raise Not_found
@@ -436,6 +439,12 @@ let gen_decline conf wt s1 s2 s2_raw =
       s ^ loop (i + 1)
   in
   loop 0
+
+let gen_decline conf wt s1 s2 s2_raw =
+  gen_decline_args conf wt [| (s1, s2_raw); (s2, s2_raw) |]
+
+let transl_args conf key args =
+  gen_decline_args conf (transl conf key) (Array.of_list args)
 
 let transl_a_of_b conf x y1 y2 =
   gen_decline conf (transl_nth conf "%1 of %2" 0) x y1 y2
