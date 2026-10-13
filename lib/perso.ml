@@ -4550,10 +4550,8 @@ and string_of_image_url conf base (p, p_auth) html saved : Adef.escaped_string =
       if saved then Image.get_old_portrait conf base p
       else Image.get_portrait conf base p
     with
-    | Some (`Path fname) when Filename.extension fname = ".url" -> (
-        match Some (Secure.open_in fname) with
-        | Some ic -> Adef.escaped (input_line ic)
-        | None -> Adef.escaped "")
+    | Some (`Path fname) when Filename.extension fname = ".url" ->
+        Adef.escaped (Image.read_url_file fname)
     | Some (`Path fname) ->
         let s = Unix.stat fname in
         let b = acces conf base p in
