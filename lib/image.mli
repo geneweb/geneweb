@@ -7,6 +7,10 @@ val ext_list_2 : string array
 val find_file_without_ext : string -> string
 val is_url : string -> bool
 
+val read_url_file : string -> string
+(** [read_url_file f] returns the trimmed first line of the .url file [f], or
+    [""] if the file is empty or cannot be read. *)
+
 val src_of_string :
   config ->
   string ->

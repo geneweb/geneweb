@@ -39,18 +39,20 @@ let default_image_filename mode base p =
 let ext_list_1 = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
 let ext_list_2 = [| ".jpg"; ".jpeg"; ".png"; ".gif"; ".url"; ".stop" |]
 
+let read_url_file f =
+  try
+    Secure.with_open_in_text f (fun ic ->
+        Option.fold ~none:"" ~some:String.trim (In_channel.input_line ic))
+  with Sys_error _ -> ""
+
 let find_img_opt f =
   let exists ext =
     let fname = f ^ ext in
     if Sys.file_exists fname then Some fname else None
   in
-  match exists ".url" with
-  | Some f ->
-      let ic = open_in f in
-      let url = input_line ic in
-      close_in ic;
-      Some (`Url url)
-  | None -> (
+  match Option.map read_url_file (exists ".url") with
+  | Some url when url <> "" -> Some (`Url url)
+  | _ -> (
       match exists ".stop" with
       | Some f -> Some (`Path f)
       | None -> (
