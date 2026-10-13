@@ -36,7 +36,7 @@ info:
 	@printf 'Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n'
 	@printf '  \033[1;1m%s\033[0m\n' '$(subst ','\'',$(COMMIT_TITLE))'
 ifneq ($(COMMIT_COMMENT),)
-	@printf '\n$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
+	@printf '\n%s' '$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
 endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
 
