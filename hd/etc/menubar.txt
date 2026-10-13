@@ -207,7 +207,9 @@
               %( WIZARD | CHG_EVT / SND_IMAGE / MRG / DEL_IND / MRG_DUP / HIST_DIFF buttons %)
               %if;(iswiz=1)
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]"><span class="fa fa-sort fa-fw me-2" aria-hidden="true"></span>[*invert::event/events]1</a>
+                %if;(has_secondary_pevents and nb_pevents>1)
+                  <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]"><span class="fa fa-sort fa-fw me-2" aria-hidden="true"></span>[*invert::event/events]1</a>
+                %end;
                 %if;(first_name!="?" and surname!="?")
                   <a class="dropdown-item" href="%prefix;m=SND_IMAGE&i=%index;">
                     <i class="far fa-file-image fa-fw me-2" aria-hidden="true"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
@@ -316,7 +318,9 @@
                       <div class="dropdown-divider"></div>
                     %end;
                     <span class="dropdown-header">[*marriage with] %spouse;</span>
-                    <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD&i=%family.index;&ip=%index;" title="[*changed order of family's events]"><span class="fa fa-sort fa-fw me-2" aria-hidden="true"></span>[*invert::event/events]1</a>
+                    %if;(family.nb_fevents>1)
+                      <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD&i=%family.index;&ip=%index;" title="[*changed order of family's events]"><span class="fa fa-sort fa-fw me-2" aria-hidden="true"></span>[*invert::event/events]1</a>
+                    %end;
                     <a class="dropdown-item" href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index"><span class="fa fa-trash fa-fw text-danger me-2" aria-hidden="true"></span>[*delete::family/families]0</a>
                     %if;(family_cnt != 1)
                       %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)

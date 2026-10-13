@@ -3790,6 +3790,15 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         in
         Driver.get_rparents p <> [] || related <> []
       else p_auth && (Driver.get_rparents p <> [] || Driver.get_related p <> [])
+  | "has_secondary_pevents" ->
+      List.exists
+        (fun e ->
+          match e.epers_name with
+          | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+          | Epers_Cremation ->
+              false
+          | _ -> true)
+        (Driver.get_pevents p)
   | "has_siblings" -> (
       match Driver.get_parents p with
       | Some ifam ->
@@ -4231,6 +4240,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           |> string_of_int |> str_val)
   | "nb_families" ->
       Driver.get_family p |> Array.length |> string_of_int |> str_val
+  | "nb_pevents" ->
+      Driver.get_pevents p |> List.length |> string_of_int |> str_val
   | "notes" | "pnotes" ->
       Driver.get_notes p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "occ" ->
@@ -4442,6 +4453,8 @@ and eval_family_field_var conf base env
       let ep = make_ep conf base imoth in
       eval_person_field_var conf base env ep loc sl
   | "marriage" :: sl -> eval_family_marriage_field_var fam sl
+  | [ "nb_fevents" ] ->
+      VVstring (string_of_int (List.length (Driver.get_fevents fam)))
   | [ "sep_date_s" ] | [ "sep_dates" ] ->
       VVstring
         (DateDisplay.short_family_dates_text conf base false fam :> string)
