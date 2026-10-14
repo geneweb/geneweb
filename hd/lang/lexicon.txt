@@ -13500,6 +13500,27 @@ sl: največ
 sv: maximalt
 tr: maksimum
 
+    median
+ca: mediana
+cs: medián
+da: median
+de: Median
+en: median
+eo: mediano
+es: mediana
+fi: mediaani
+fr: médiane
+it: mediana
+nl: mediaan
+no: median
+pl: mediana
+pt: mediana
+ro: mediană
+ru: медиана
+sk: medián
+sv: median
+tr: medyan
+
     mentioned/mentioned
 de: zitierte/zitierten
 en: cited/cited

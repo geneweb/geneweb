@@ -23,9 +23,9 @@
 
 <div id="stats-loading" class="text-center py-5">
   <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">[*loading…]</span>
+    <span class="visually-hidden">[*loading/error]0</span>
   </div>
-  <p class="mt-2 text-body-secondary">[*loading…]</p>
+  <p class="mt-2 text-body-secondary">[*loading/error]0</p>
 </div>
 
 <div id="stats-content" class="d-none">
@@ -154,30 +154,12 @@
   </div></div></div>
 </div>
 
-<!-- Quick links -->
-<div class="row mb-4">
-  <div class="col-12"><div class="card"><div class="card-body">
-    <h2 class="h6 card-title text-body-secondary">[*other statistics]</h2>
-    <div class="d-flex flex-wrap">
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LB">[*latest births]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LD">[*latest deaths]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LM">[*latest marriages]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=OE">[*oldest engagements]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=OA">[*oldest alive]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=LL">[*who lived the longest]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=POP_PYR">[*population pyramid]</a>
-      <a class="btn btn-outline-secondary btn-sm m-1" href="%prefix;m=PS">[*place/places]1</a>
-    </div>
-  </div></div></div>
-</div>
-
 </div><!-- stats-content -->
-</div><!-- container-fluid -->
 
 %include;trl
 %include;copyr
 %query_time;
-</div>
+</div><!-- container-fluid -->
 %include;js
 
 <script>
