@@ -145,6 +145,56 @@ let death_dmy_greg p =
   | _ -> None
 
 let yi y = y - year_min
+let is_set s = not (Driver.Istr.is_empty s)
+
+let person_sourced p =
+  is_set (Driver.get_psources p)
+  || is_set (Driver.get_birth_src p)
+  || is_set (Driver.get_baptism_src p)
+  || is_set (Driver.get_death_src p)
+  || is_set (Driver.get_burial_src p)
+  || List.exists (fun e -> is_set e.epers_src) (Driver.get_pevents p)
+
+let family_sourced fam =
+  is_set (Driver.get_fsources fam)
+  || is_set (Driver.get_marriage_src fam)
+  || List.exists (fun e -> is_set e.efam_src) (Driver.get_fevents fam)
+
+let key_of_portrait f =
+  let len = String.length f in
+  let rec digits j =
+    if j < len && f.[j] >= '0' && f.[j] <= '9' then digits (j + 1) else j
+  in
+  let rec find i =
+    match String.index_from_opt f i '.' with
+    | None -> None
+    | Some i ->
+        let j = digits (i + 1) in
+        if j > i + 1 && j < len && f.[j] = '.' then
+          match int_of_string_opt (String.sub f (i + 1) (j - i - 1)) with
+          | Some occ ->
+              Some (String.sub f 0 i, occ, String.sub f (j + 1) (len - j - 1))
+          | None -> None
+        else find (i + 1)
+  in
+  find 0
+
+let portrait_pass conf a =
+  let n =
+    try
+      Array.fold_left
+        (fun n f ->
+          let ext = Filename.extension f in
+          if
+            (ext = ".url" || Array.mem ext Image.ext_list_1)
+            && Option.is_some (key_of_portrait (Filename.remove_extension f))
+          then n + 1
+          else n)
+        0
+        (Sys.readdir (Image.portrait_folder conf))
+    with Sys_error _ -> 0
+  in
+  a.has_image <- a.has_image + n
 
 let person_pass conf base a by_cache auth_cache =
   Collection.iter
@@ -188,10 +238,8 @@ let person_pass conf base a by_cache auth_cache =
           a.has_birth_place <- a.has_birth_place + 1;
         if not (Driver.Istr.is_empty dp || Driver.Istr.is_quest dp) then
           a.has_death_place <- a.has_death_place + 1;
-        if not (Driver.Istr.is_empty (Driver.get_psources p)) then
-          a.has_sources <- a.has_sources + 1;
-        if not (Driver.Istr.is_empty (Driver.get_image p)) then
-          a.has_image <- a.has_image + 1;
+        if person_sourced p then a.has_sources <- a.has_sources + 1;
+        if is_set (Driver.get_image p) then a.has_image <- a.has_image + 1;
         let nf = Array.length (Driver.get_family p) in
         let ri = min nf remarriage_max in
         a.remarriage.(ri) <- a.remarriage.(ri) + 1;
@@ -294,8 +342,7 @@ let family_pass _conf a by_cache auth_cache base =
       (match Driver.get_separation fam with
       | Separated _ | Separated_old -> a.n_separations <- a.n_separations + 1
       | _ -> ());
-      if not (Driver.Istr.is_empty (Driver.get_fsources fam)) then
-        a.has_fsources <- a.has_fsources + 1;
+      if family_sourced fam then a.has_fsources <- a.has_fsources + 1;
       let mp = Driver.get_marriage_place fam in
       incr_istr_tbl a.marriage_places mp;
       let children = Driver.get_children fam in
@@ -715,6 +762,7 @@ let print_json conf base =
   let by_cache = Array.make np 0 in
   let auth_cache = Bytes.make np '\000' in
   person_pass conf base a by_cache auth_cache;
+  portrait_pass conf a;
   family_pass conf a by_cache auth_cache base;
   let buf = Buffer.create 16384 in
   emit_json buf base a;
