@@ -1128,12 +1128,15 @@
 
 %define;insert_relation(xx)
   <div class="row">
-    <span class="col-form-label col-2">[*insert]</span>
-    <div class="btn-group col-auto border-primary">
-      <label class="btn btn-outline-primary  mb-0">1 [relation/relations]0
-        <input class="ms-1" type="checkbox" name="add_relationxx" value="on">
-      </label>
-      <button type="submit" class="btn btn-outline-primary" title="[*insert::relation/relations]0">OK</button>
+    <label for="add_relationxx_n" class="col-form-label col-2">[*insert]</label>
+    <div class="btn-group col-auto">
+      <div class="input-group">
+        <select class="form-select bg-light border-primary border-end-0" id="add_relationxx_n" name="add_relationxx_n">
+          %for;i;0;11;<option>%i;</option> %end;
+        </select>
+        <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[relation/relations]1</span>
+        <button type="submit" class="btn btn-outline-primary" title="[*insert::relation/relations]1">OK</button>
+      </div>
     </div>
   </div>
 %end;

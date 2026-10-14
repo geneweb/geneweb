@@ -240,13 +240,10 @@ let rec reconstitute_pevents conf ext cnt =
       (e :: el, ext)
 
 let reconstitute_add_relation conf ext cnt rl =
-  match get_nth conf "add_relation" cnt with
-  | Some "on" ->
-      let r =
-        { r_type = GodParent; r_fath = None; r_moth = None; r_sources = "" }
-      in
-      (r :: rl, true)
-  | Some _ | None -> (rl, ext)
+  insert_blanks conf
+    ("add_relation" ^ string_of_int cnt)
+    { r_type = GodParent; r_fath = None; r_moth = None; r_sources = "" }
+    (rl, ext)
 
 let deleted_relation = ref []
 
