@@ -657,6 +657,7 @@ let print_update_ind conf base p digest =
       in
       Hutil.interp conf "updind"
         {
+          output = Output.print_sstring conf;
           Templ.eval_var = eval_var conf base;
           Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
@@ -759,6 +760,7 @@ let print_change_event_order conf base =
       let p = string_person_of base (Gwdb.poi base (Gwdb.iper_of_string i)) in
       Hutil.interp conf "updindevt"
         {
+          output = Output.print_sstring conf;
           Templ.eval_var = eval_var conf base;
           Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
