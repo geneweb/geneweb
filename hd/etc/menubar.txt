@@ -167,11 +167,10 @@
               %if;(wizard and b.wizard_passwd_file!="")
                 <a class="dropdown-item %if;(not has_wiznotes)text-danger%end;"
                   href="%prefix;m=%if;(not has_wiznotes)MOD_%end;WIZNOTES&f=%apply;url_encode%with;%user.ident;%end;">%nn;
-                    <i class="fa fa-hat-wizard fa-fw me-2" aria-hidden="true"></i>
+                    <i class="fa fa-hat-wizard fa-fw me-2" aria-hidden="true"></i>%nn;
                     %if;(has_wiznotes)[*wizard note]%else;[*wizard note create]%end;
                     %sp;%apply;a_of_b%with;%and;%if;(user.name!="")%user.name;%else;%user.ident;%end;%end;</a>
               %end;
-              %( Visibility button %)
               <a class="dropdown-item" href="%prefix;m=H&v=visibility" title="[*visibility-hlp]" target="_blank">
                 <i class="fa fa-person fa-fw %visib_color; me-2" aria-hidden="true"></i>[*visibility]%sp;%nn;
                 <span class="me-2" title="[(p) private, (a) age]">%if;(visib=3)%if;is_private;(p)%else;(a)%end;%end;</span></a>%nn;
@@ -179,7 +178,7 @@
               <a class="dropdown-item %if;(e.fmode="on")text-danger%else;text-success%end;"
                 title="[*family mode-hlp]"
                 href="%if;(e.fmode="on")%url_set.fmode;%else;%url;&fmode=on%end;">
-                <span class="fa fa-people-group me-1" aria-hidden="true"></span>
+                <span class="fa fa-people-group fa-fw me-2" aria-hidden="true"></span>%nn;
                 [*family mode]
               </a>
               %end;
@@ -190,19 +189,19 @@
                     href="%if;(b.access_by_key="yes")%apply;url_set%with;pz/nz/ocz%and;%first_name_key;/%surname_key;/%if;(occ!=0)%occ;%end;%end;
                           %else;%apply;url_set("iz",index)%end;"
                     title="%apply;nav_with_sosa_ref(self)" %laS;>%nn;
-                    <i class="far fa-circle-dot fa-fw %sexcolor; me-1" aria-hidden="true"></i> [*modify::Sosa 1][:] %self;</a>
+                    <i class="far fa-circle-dot fa-fw %sexcolor; me-2" aria-hidden="true"></i>[*modify::Sosa 1][:] %self;</a>
               %end;
               %if;(b.default_sosa_ref!=sosa_ref.key)
                 <a class="dropdown-item" href="%url_set.iz_pz_nz_ocz;"
                   title="%if;(b.default_sosa_ref!="")%apply;nav_with_sosa_ref(b.default_sosa_ref)%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
-                  <i class="far fa-circle-stop fa-fw %if;(browsing_with_sosa_ref and b.default_sosa_ref!="")%sexcolor;%else;text-danger%end; me-1"></i>%sp;
+                  <i class="far fa-circle-stop fa-fw %if;(browsing_with_sosa_ref and b.default_sosa_ref!="")%sexcolor;%else;text-danger%end; me-2" aria-hidden="true"></i>%nn;
                   %if;(b.default_sosa_ref!="")%nl;[*restore default_sosa_ref][:] %b.default_sosa_ref;%nn;
                   %else;[*user/password/cancel]2 [navigation] [Sosa]%nn;%end;
                 </a>
               %end;
               %if;not ("MOD" in e.m or "ADD" in e.m or "MRG" in e.m or e.m="R" or e.m="U")
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw me-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
+                <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw me-2" aria-hidden="true"></i>[*cancel GeneWeb links]</a>%nn;
               %end;
               %( WIZARD | CHG_EVT / SND_IMAGE / MRG / DEL_IND / MRG_DUP / HIST_DIFF buttons %)
               %if;(iswiz=1)
@@ -303,8 +302,8 @@
                 <div class="dropdown-menu dropdown-menu-transl">
                   %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
                   %elseif;(not is_male and not is_female)
-                    <a class="dropdown-item" href="%prefix;m=ADD_FAM&ip=%index;&sex=M"><span class="fa fa-plus" aria-hidden="true"></span> [*add::relation/relations]0 ([M/F]0)</a>
-                    <a class="dropdown-item" href="%prefix;m=ADD_FAM&ip=%index;&sex=F"><span class="fa fa-plus" aria-hidden="true"></span> [*add::relation/relations]0 ([M/F]1)</a>
+                    <a class="dropdown-item" href="%prefix;m=ADD_FAM&ip=%index;&sex=M"><span class="fa fa-plus fa-fw me-2" aria-hidden="true"></span>[*add::relation/relations]0 ([M/F]0)</a>
+                    <a class="dropdown-item" href="%prefix;m=ADD_FAM&ip=%index;&sex=F"><span class="fa fa-plus fa-fw me-2" aria-hidden="true"></span>[*add::relation/relations]0 ([M/F]1)</a>
                   %else;
                     <a class="dropdown-item" id="add_fam" href="%prefix;m=ADD_FAM&ip=%index;" %laA;><span class="fa fa-plus fa-fw me-2" aria-hidden="true"></span>[*add::family/families]0</a>
                   %end;
@@ -313,7 +312,7 @@
                     %if;(family_cnt != 1)
                       <a class="dropdown-item" href="%prefix;m=INV_FAM&i=%index;&f=%family.index;"
                         title="[*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;">%nn;
-                        <span class="fa fa-right-left fa-rotate-90 fa-fw me-1" aria-hidden="true"></span> [*invert::family/families]1%nn;
+                        <span class="fa fa-right-left fa-rotate-90 fa-fw me-2" aria-hidden="true"></span>[*invert::family/families]1%nn;
                         <span class="visually-hidden"> %expr(family_cnt-1) [and] %family_cnt;</span></a>
                       <div class="dropdown-divider"></div>
                     %end;
@@ -326,13 +325,13 @@
                     <a class="dropdown-item" href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index"><span class="fa fa-trash fa-fw text-danger me-2" aria-hidden="true"></span>[*delete::family/families]0</a>
                     %if;(family_cnt != 1)
                       %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
-                        <a class="dropdown-item" href="%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;"><span class="fa fa-user-xmark fa-fw me-1" aria-hidden="true"></span>[*merge::family/families]1</a>
+                        <a class="dropdown-item" href="%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;"><span class="fa fa-user-xmark fa-fw me-2" aria-hidden="true"></span>[*merge::family/families]1</a>
                       %end;
                     %end;
                   %end;
                   %if;(nb_children != 0)
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="%prefix;m=CHG_CHN&ip=%index;"><span class="fa fa-child fa-fw me-1" aria-hidden="true"></span> [*change children's names]</a>
+                    <a class="dropdown-item" href="%prefix;m=CHG_CHN&ip=%index;"><span class="fa fa-child fa-fw me-2" aria-hidden="true"></span>[*change children's names]</a>
                   %end;
                 </div>
               </li>
