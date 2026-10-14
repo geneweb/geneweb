@@ -9,6 +9,9 @@ let year_min = 500
 let year_max = 2100
 let year_span = year_max - year_min + 1
 let age_max = 150
+let period_span = 50
+let period_count = ((year_max - year_min) / period_span) + 1
+let period_min_count = 30
 let marriage_age_min = 10
 let marriage_age_max = 80
 let marriage_age_span = marriage_age_max - marriage_age_min + 1
@@ -102,10 +105,10 @@ let make_acc () =
     age_marriage_women = Array.make marriage_age_span 0;
     children_count = Array.make (children_max + 1) 0;
     remarriage = Array.make (remarriage_max + 1) 0;
-    life_cent_sum_men = Array.make 17 0;
-    life_cent_cnt_men = Array.make 17 0;
-    life_cent_sum_women = Array.make 17 0;
-    life_cent_cnt_women = Array.make 17 0;
+    life_cent_sum_men = Array.make period_count 0;
+    life_cent_cnt_men = Array.make period_count 0;
+    life_cent_sum_women = Array.make period_count 0;
+    life_cent_cnt_women = Array.make period_count 0;
     sum_gap_father = 0;
     cnt_gap_father = 0;
     sum_gap_mother = 0;
@@ -289,8 +292,8 @@ let person_pass conf base a by_cache auth_cache =
                     a.age_death_men.(age) <- a.age_death_men.(age) + 1;
                     a.sum_life_men <- a.sum_life_men + age;
                     a.cnt_life_men <- a.cnt_life_men + 1;
-                    let ci = (bd.year - year_min) / 100 in
-                    if ci >= 0 && ci < 17 then begin
+                    let ci = (dd.year - year_min) / period_span in
+                    if ci >= 0 && ci < period_count then begin
                       a.life_cent_sum_men.(ci) <- a.life_cent_sum_men.(ci) + age;
                       a.life_cent_cnt_men.(ci) <- a.life_cent_cnt_men.(ci) + 1
                     end
@@ -298,8 +301,8 @@ let person_pass conf base a by_cache auth_cache =
                     a.age_death_women.(age) <- a.age_death_women.(age) + 1;
                     a.sum_life_women <- a.sum_life_women + age;
                     a.cnt_life_women <- a.cnt_life_women + 1;
-                    let ci = (bd.year - year_min) / 100 in
-                    if ci >= 0 && ci < 17 then begin
+                    let ci = (dd.year - year_min) / period_span in
+                    if ci >= 0 && ci < period_count then begin
                       a.life_cent_sum_women.(ci) <-
                         a.life_cent_sum_women.(ci) + age;
                       a.life_cent_cnt_women.(ci) <-
@@ -647,17 +650,20 @@ let emit_json buf base a =
   Buffer.add_string buf {|,"women":|};
   add_int_array buf ad_women;
   Buffer.add_char buf '}';
-  Buffer.add_string buf {|,"life_exp_by_century":{"labels":|};
+  Buffer.add_string buf {|,"age_at_death_by_period":{"labels":|};
   let lec_labels = ref [] in
   let lec_men = ref [] in
   let lec_women = ref [] in
-  for i = 0 to 16 do
-    if a.life_cent_cnt_men.(i) > 0 || a.life_cent_cnt_women.(i) > 0 then begin
-      let century = year_min + (i * 100) in
-      lec_labels := string_of_int century :: !lec_labels;
-      lec_men := avg a.life_cent_cnt_men.(i) a.life_cent_sum_men.(i) :: !lec_men;
-      lec_women :=
-        avg a.life_cent_cnt_women.(i) a.life_cent_sum_women.(i) :: !lec_women
+  let period_avg cnt sum =
+    if cnt < period_min_count then Float.nan else avg cnt sum
+  in
+  for i = 0 to period_count - 1 do
+    let cm = a.life_cent_cnt_men.(i) in
+    let cw = a.life_cent_cnt_women.(i) in
+    if cm >= period_min_count || cw >= period_min_count then begin
+      lec_labels := string_of_int (year_min + (i * period_span)) :: !lec_labels;
+      lec_men := period_avg cm a.life_cent_sum_men.(i) :: !lec_men;
+      lec_women := period_avg cw a.life_cent_sum_women.(i) :: !lec_women
     end
   done;
   let lec_labels = Array.of_list (List.rev !lec_labels) in
