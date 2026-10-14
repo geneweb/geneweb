@@ -12412,10 +12412,6 @@ sl: star manj kot en mesec/stara manj kot en mesec
 sv: mindre än en månad
 tr: bir aydan kısa bir süre eski
 
-    life expectancy
-en: life expectancy
-fr: espérance de vie
-
     limit
 co: limita
 de: Limit
