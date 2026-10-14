@@ -44,6 +44,7 @@ type search_case =
       format :
         [ `Space
         | `Slash
+        | `SlashOc
         | `Dot
         | `SlashSurname
         | `SlashFirstName
@@ -1507,20 +1508,42 @@ let insert_slash_before_particle base pn =
     in
     aux 1
 
+(* "fn/sn", "/sn", "fn/", and "fn/sn/oc": a second slash introduces the
+   occurrence number, like the dot of the key form "fn.oc sn".  The part
+   after it must be digits (or empty, "fn/sn/" = "fn/sn"); otherwise the
+   second slash is left in the surname, as before.  The occurrence is only
+   meaningful with both a first name and a surname (key search and oc
+   filter); with "/sn/oc" or "fn//oc" it is dropped. *)
 let parse_slash_separated original_pn pn slash_pos =
   let fn_part = String.sub pn 0 slash_pos |> String.trim in
-  let sn_part =
-    String.sub pn (slash_pos + 1) (String.length pn - slash_pos - 1)
-    |> String.trim
+  let rest = String.sub pn (slash_pos + 1) (String.length pn - slash_pos - 1) in
+  let is_digits s =
+    s <> "" && String.for_all (fun c -> c >= '0' && c <= '9') s
   in
-  match (fn_part, sn_part) with
-  | "", sn -> make_parsed_component ~surname:sn original_pn `SlashSurname
-  | fn, "" -> make_parsed_component ~first_name:fn original_pn `SlashFirstName
-  | fn, sn ->
+  let sn_part, oc =
+    match String.rindex_opt rest '/' with
+    | Some j ->
+        let sn = String.sub rest 0 j |> String.trim in
+        let oc =
+          String.sub rest (j + 1) (String.length rest - j - 1) |> String.trim
+        in
+        if oc = "" then (sn, None)
+        else if is_digits oc then (sn, Some oc)
+        else (String.trim rest, None)
+    | None -> (String.trim rest, None)
+  in
+  match (fn_part, sn_part, oc) with
+  | "", sn, _ -> make_parsed_component ~surname:sn original_pn `SlashSurname
+  | fn, "", _ ->
+      make_parsed_component ~first_name:fn original_pn `SlashFirstName
+  | fn, sn, Some oc ->
+      make_parsed_component ~first_name:fn ~surname:sn ~oc original_pn `SlashOc
+  | fn, sn, None ->
       make_parsed_component ~first_name:fn ~surname:sn original_pn `Slash
 
 let parse_dot_separated original_pn pn dot_pos =
-  let fn_part = String.sub pn 0 dot_pos in
+  (* Trimmed like the parts of the slash form: "jean .2 dupont". *)
+  let fn_part = String.sub pn 0 dot_pos |> String.trim in
   let rest = String.sub pn (dot_pos + 1) (String.length pn - dot_pos - 1) in
   match String.index_opt rest ' ' with
   | Some space_pos ->
