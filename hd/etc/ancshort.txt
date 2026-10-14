@@ -5,22 +5,21 @@
     %if;(e_v>=0 and level=e_v)
       <ul class="mb-2">%nl;
         %foreach;ancestor;
-          %if;(ancestor.first_name!="?" and ancestor.surname!="?")
+          %if;(ancestor.interval!="")
+            <li>%ancestor.interval;</li>%nl;
+          %elseif;(ancestor.first_name!="?" and ancestor.surname!="?")
             <li>%sp;
-              %if;(ancestor.interval!="")%ancestor.interval;
+              %if;(ancestor.same="")%incr_count;%end;
+              %ancestor.anc_sosa;%sp;
+              %if;(ancestor.same!="")=&gt;%else;-%end;%sp;
+              %apply;link%with;%ancestor.access;%and;
+                %if;(ancestor.same!="")%ancestor.same;
+                %else;%ancestor;%end;
+                %and;%ancestor.index;
+              %end;
+              %if;(ancestor.same="")%ancestor.title;%ancestor.dates;
               %else;
-                %if;(ancestor.same="")%incr_count;%end;
-                %ancestor.anc_sosa;%sp;
-                %if;(ancestor.same!="")=&gt;%else;-%end;%sp;
-                %apply;link%with;%ancestor.access;%and;
-                  %if;(ancestor.same!="")%ancestor.same;
-                  %else;%ancestor;%end;
-                  %and;%ancestor.index;
-                %end;
-                %if;(ancestor.same="")%ancestor.title;%ancestor.dates;
-                %else;
-                  %sp;(<a href="#i%ancestor.index;" title="[implex/implexes]0, [see above]">↑</a>)
-                %end;
+                %sp;(<a href="#i%ancestor.index;" title="[implex/implexes]0, [see above]">↑</a>)
               %end;
             </li>%nl;
           %end;
