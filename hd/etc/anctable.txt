@@ -117,11 +117,11 @@
               title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
               [*update::family/families]0%end;&#010;
               %ancestor; [and] %spouse;&#010;%apply;relation_separation_tooltip()">%nn;
-              %if;(slash_marriage_date!="")%slash_marriage_date;%else;<span class="fa fa-%nn;
+              %if;(slash_marriage_date!="")%slash_marriage_date;%else;<i class="fa fa-%nn;
                 %if;(ancestor.sex!=spouse.sex)venus-mars%elseif;
                   (ancestor.is_male and ancestor.sex=spouse.sex)mars-double text-secondary%else;
                   venus-double text-danger
-                %end;"></span>
+                %end;"></i>
               %end;
             </a>%nn;
           %else;
@@ -235,11 +235,11 @@
                   title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
                   [*update::family/families]0%end;&#010;
                   %ancestor; [and] %spouse;&#010;%apply;relation_separation_tooltip()">
-                  %if;(slash_marriage_date!="")%slash_marriage_date;%else;<span class="fa fa-%nn;
+                  %if;(slash_marriage_date!="")%slash_marriage_date;%else;<i class="fa fa-%nn;
                     %if;(ancestor.sex!=spouse.sex)venus-mars%elseif;
                       (ancestor.is_male and ancestor.sex=spouse.sex)mars-double text-secondary%else;
                       venus-double text-danger
-                    %end;"></span>
+                    %end;"></i>
                   %end;
                 </a>%nn;
               %else;

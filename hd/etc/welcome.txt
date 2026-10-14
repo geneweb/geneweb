@@ -205,7 +205,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
   <div class="text-lg-center alert alert-danger fw-bold" role="alert">
     <i class="fa fa-triangle-exclamation fa-fw me-2" aria-hidden="true"></i>
     <span>%apply;get_visitor_access_msg(lg)</span>
-    <span class="fa fa-triangle-exclamation fa-fw" aria-hidden="true"></span>
+    <i class="fa fa-triangle-exclamation fa-fw" aria-hidden="true"></i>
   </div>
 %elseif;(nb_persons.v!=0)
   <div id="welcome-search" class="d-flex flex-wrap justify-content-center mt-3 mt-lg-1">

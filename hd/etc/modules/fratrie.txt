@@ -70,7 +70,7 @@
             </a>
           %end;
         %end;
-        %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
+        %if;(count=0)<i class="fa fa-caret-left invisible"></i>%end;
         %foreach;father.child;
           %if;is_sibling_after;
             <a%if;not is_sibling_after; class="invisible"%end; href="%prefix;%child.access;"

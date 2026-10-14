@@ -136,7 +136,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <span class="far fa-circle-dot text-success me-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
+  <i class="far fa-circle-dot text-success me-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></i>%nn;
 %end;
 
 %define;witness_relation(xxx, yyy)
