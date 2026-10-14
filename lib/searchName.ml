@@ -197,6 +197,18 @@ let list_take n l =
   in
   aux [] n l
 
+(* [sub] is a prefix of [l] (word lists). *)
+let rec list_is_prefix sub l =
+  match (sub, l) with
+  | [], _ -> true
+  | _, [] -> false
+  | x :: sub', y :: l' -> x = y && list_is_prefix sub' l'
+
+(* [sub] occurs as a contiguous sequence in [l]. *)
+let rec list_occurs sub l =
+  list_is_prefix sub l
+  || match l with [] -> false | _ :: l' -> list_occurs sub l'
+
 let list_drop n l =
   let rec aux n = function
     | xs when n <= 0 -> xs
@@ -591,8 +603,9 @@ let partition_for_multiple_fn_variants cache conf base variants_fn pl opts =
 
    Classification of an index string (same tests as before):
    - exact: Name.lower of its nominative form equals that of a variant;
-   - word: one of its words equals a variant (compound surnames: "vivier"
-     -> "de Lagoutte du Vivier");
+   - word: the variant occurs as a contiguous sequence of its words
+     (compound surnames: "vivier" -> "de Lagoutte du Vivier",
+     "de belloy" -> "de Belloy de Saint-Lienard");
    - phonetic: its crush code matches the query's (equality for codes of
      <= 2 chars, containment otherwise), as in search_phonetic_generic.
    Visibility filters are unchanged: exact and word candidates exclude
@@ -615,6 +628,16 @@ let rec search_surname_candidates conf base variants =
     else Mutil.contains c q_crushed
   in
   (* One representative variant per distinct crush code, i.e. per bucket. *)
+  (* Word lists of the variants, for the whole-word test: the variant must
+     occur as a contiguous word sequence ([list_occurs]).  A one-word
+     variant reduces to plain membership.  Previously each word of the
+     index string was compared with the whole variant, so a multi-word
+     variant ("de belloy") never matched a longer compound surname. *)
+  let variant_words =
+    List.filter_map
+      (fun v -> match cut_words v with [] -> None | ws -> Some ws)
+      variant_lowers
+  in
   let reps =
     List.fold_left
       (fun acc v ->
@@ -645,9 +668,8 @@ let rec search_surname_candidates conf base variants =
       let nom_lower = Name.lower (Mutil.nominative str) in
       let is_exact = List.mem nom_lower variant_lowers in
       let is_word =
-        List.exists
-          (fun tok -> List.mem tok variant_lowers)
-          (cut_words nom_lower)
+        let toks = cut_words nom_lower in
+        List.exists (fun vw -> list_occurs vw toks) variant_words
       in
       let is_phon = sounds_like str in
       if is_exact || is_word || is_phon then (
@@ -1314,22 +1336,27 @@ let search_fullname ?(any_order = false) cache conf base variants_fn variants_sn
          avoid redundant search_surname calls and duplicate results. *)
       (* Always run, whatever public_name_as_fn says: that setting is about
          displaying public names, not about which persons a search finds. *)
+      (* Spouses, with the set of those reached through an exact-surname
+         candidate (exact or word group, see search_surname_candidates)
+         rather than only through a phonetic one. *)
+      let spouses, spouse_of_exact =
+        List.fold_left
+          (fun (acc, ex) ip ->
+            let p = Driver.poi base ip in
+            let via_exact = Iper.Set.mem ip sn_exact_set in
+            Array.fold_left
+              (fun (acc, ex) ifam ->
+                let f = Driver.foi base ifam in
+                let spouse_ip =
+                  if ip = Driver.get_father f then Driver.get_mother f
+                  else Driver.get_father f
+                in
+                ( Driver.poi base spouse_ip :: acc,
+                  if via_exact then Iper.Set.add spouse_ip ex else ex ))
+              (acc, ex) (Driver.get_family p))
+          ([], Iper.Set.empty) all_iper
+      in
       let spouse =
-        let spouses =
-          List.fold_left
-            (fun acc ip ->
-              let p = Driver.poi base ip in
-              Array.fold_left
-                (fun acc ifam ->
-                  let f = Driver.foi base ifam in
-                  let spouse_ip =
-                    if ip = Driver.get_father f then Driver.get_mother f
-                    else Driver.get_father f
-                  in
-                  Driver.poi base spouse_ip :: acc)
-                acc (Driver.get_family p))
-            [] all_iper
-        in
         let spouse_substr =
           List.fold_left
             (fun acc fn_v ->
@@ -1370,6 +1397,21 @@ let search_fullname ?(any_order = false) cache conf base variants_fn variants_sn
             spouse_substr @ phonetic_extra
         in
         spouse_all
+      in
+      (* Same rule as for direct candidates: when some candidates carry the
+         exact surname, a person reached only as the spouse of a
+         phonetic-only candidate must not compete with the spouses of
+         exact-surname candidates: move them to the partial pile.  A person
+         married to both kinds stays in the spouse pile. *)
+      let spouse, partial =
+        if Iper.Set.is_empty sn_exact_set then (spouse, partial)
+        else
+          let keep, demoted =
+            List.partition
+              (fun p -> Iper.Set.mem (Driver.get_iper p) spouse_of_exact)
+              spouse
+          in
+          (keep, List.rev_append demoted partial)
       in
       {
         exact = persons_to_ipers exact;
@@ -1925,20 +1967,31 @@ let rec handle_search_results alias_cache conn conf base query fn_options
   let spouse = filter_by_oc_and_auth spouse in
   (* Match quality of a candidate against a first name + surname query,
      used to decide whether a direct redirect may hide other candidates:
-       4  public name or an alias equal to the whole query  (type P):
+       6  public name or an alias equal to the whole query  (type P):
           the king Philippe, public name "Philippe le Bel", is a better
           match for "philippe le bel" than a Philippe Le Bel
-       3  first name exact and own surname exact            (type A)
-       2  first name exact and a spouse's surname exact     (type B)
+       5  first name exact and own surname exact            (type A)
+       4  first name exact and a spouse's surname exact     (type B)
+       3  first name exact and own surname beginning with the queried
+          surname, as whole words, possibly after a particle (type E):
+          "franck de belloy" -> Franck de Belloy de Saint-Lienard,
+          "franck belloy" -> the same
+       2  first name exact and a spouse's surname beginning with the
+          queried surname, as for type E (type F): "yolande de belloy"
+          -> Yolande Halliez, wife of Franck de Belloy de Saint-Lienard
        1  first name exact, surname only partially matching
-          (compound surname, phonetic variant...)
+          (word inside a compound surname, phonetic variant...)
        0  neither first name nor public name exact
      A redirect to [target] is refused when another candidate, in any pile,
      has a quality at least equal to [target]'s (and at least 1).
      So "annie vivier" goes to Annie Crassous de Medeuil, wife of Alain
-     Vivier (2), even though Annie de Lagoutte du Vivier (1, compound
-     surname) is in the exact pile; with two candidates of quality 2 the
-     list is shown.  Only applies when the query has a first name and a
+     Vivier (4), even though Annie de Lagoutte du Vivier (1, compound
+     surname, "vivier" not at its beginning) is in the exact pile; with
+     two candidates of quality 4 the list is shown.  "franck de belloy"
+     goes to Franck de Belloy de Saint-Lienard (3) when no Franck de
+     Belloy (5) exists, while a Franck Debelloy (1, phonetic) does not
+     block the redirect; "yolande de belloy" goes to his wife Yolande
+     Halliez (2) in the same way.  Only applies when the query has a first name and a
      surname. *)
   (* First-name equality for the redirect decisions below.  With
      p_order=on the words may come in any order, as in the search itself:
@@ -1968,18 +2021,57 @@ let rec handle_search_results alias_cache conn conf base query fn_options
         norm (Driver.get_public_name p) = whole_query
         || List.exists (fun a -> norm a = whole_query) (Driver.get_aliases p)
   in
+  (* Type E: the person's own surname begins with the queried surname, as
+     whole words, either as stored or after its leading particle, and is
+     longer than it (equality is type A).  [norm_apo] and [Name.lower] on
+     both sides, so "Saint-Lienard" and "saint lienard" tokenise alike;
+     the particle is detected on the stored spelling, before lowering. *)
+  let particles = Driver.base_particles base in
+  let sn_starts_with_query p =
+    match query_names with
+    | None -> false
+    | Some (_, qsn) -> (
+        match cut_words qsn with
+        | [] -> false
+        | q ->
+            let raw = norm_apo (Driver.sou base (Driver.get_surname p)) in
+            let words = cut_words (Name.lower raw) in
+            (List.length words > List.length q && list_is_prefix q words)
+            ||
+            let part = Mutil.get_particle particles raw in
+            let lp = String.length part in
+            lp > 0
+            && lp < String.length raw
+            && list_is_prefix q
+                 (cut_words
+                    (Name.lower (String.sub raw lp (String.length raw - lp)))))
+  in
+  (* The spouses of [p], one per family. *)
+  let spouses_of p =
+    let ip = Driver.get_iper p in
+    Array.to_list (Driver.get_family p)
+    |> List.map (fun ifam ->
+        let f = Driver.foi base ifam in
+        Driver.poi base
+          (if ip = Driver.get_father f then Driver.get_mother f
+           else Driver.get_father f))
+  in
+  (* Type F: one of [p]'s spouses has a surname of type E. *)
+  let spouse_sn_starts_with_query p =
+    List.exists sn_starts_with_query (spouses_of p)
+  in
   let quality ip =
     match query_names with
     | None -> 0
     | Some (qfn, qsn) ->
         let p = Driver.poi base ip in
-        if known_as_query p then 4
+        if known_as_query p then 6
         else if
           not
             (same_fn (norm (Driver.get_first_name p)) qfn
             || same_fn (norm (Driver.get_public_name p)) qfn)
         then 0
-        else if norm (Driver.get_surname p) = qsn then 3
+        else if norm (Driver.get_surname p) = qsn then 5
         else if
           Array.exists
             (fun ifam ->
@@ -1990,7 +2082,9 @@ let rec handle_search_results alias_cache conn conf base query fn_options
               in
               norm (Driver.get_surname (Driver.poi base sp)) = qsn)
             (Driver.get_family p)
-        then 2
+        then 4
+        else if sn_starts_with_query p then 3
+        else if spouse_sn_starts_with_query p then 2
         else 1
   in
   let redirect_ok target =
@@ -2210,6 +2304,37 @@ let rec handle_search_results alias_cache conn conf base query fn_options
                               (Driver.sou base (Driver.get_surname p))
                             = qsn_c)
                        (exact_persons @ partial_persons))
+            | l -> l
+          in
+
+          (* Type-E fallback: first name exact and own surname beginning
+             with the queried surname (see [sn_starts_with_query]):
+             "franck de belloy" opens Franck de Belloy de Saint-Lienard
+             when he is the only such candidate.  The redirect carries
+             other_names=on, so the person page links to the full list. *)
+          let perfect =
+            match perfect with
+            | [] ->
+                List.sort_uniq
+                  (fun a b -> compare (Driver.get_iper a) (Driver.get_iper b))
+                  (List.filter
+                     (fun p -> fn_exact p && sn_starts_with_query p)
+                     (exact_persons @ partial_persons))
+            | l -> l
+          in
+
+          (* Type-F fallback: the same for a spouse's surname, as type B
+             is to type A: "yolande de belloy" opens Yolande Halliez, wife
+             of Franck de Belloy de Saint-Lienard, when she is the only
+             such candidate. *)
+          let perfect =
+            match perfect with
+            | [] ->
+                List.sort_uniq
+                  (fun a b -> compare (Driver.get_iper a) (Driver.get_iper b))
+                  (List.filter
+                     (fun p -> fn_exact p && spouse_sn_starts_with_query p)
+                     (spouse_persons @ exact_persons @ partial_persons))
             | l -> l
           in
 
