@@ -245,7 +245,12 @@ function mfBar(id, d) {
 
 fetch(GW.url).then(function(r) {
   if (!r.ok) throw new Error("HTTP " + r.status);
-  return r.json();
+  return r.text().then(function(t) {
+    try { return JSON.parse(t); }
+    catch (e) {
+      throw new Error(new DOMParser().parseFromString(t, "text/html").body.textContent.trim() || e.message);
+    }
+  });
 }).then(function(D) {
   var c = D.counts, a = D.averages, q = D.completeness, L = GW.L;
   var row = document.getElementById("kpi-row");
@@ -360,7 +365,9 @@ fetch(GW.url).then(function(r) {
   document.getElementById('stats-content').classList.remove('d-none');
   document.getElementById('stats-loading').classList.add('d-none');
 }).catch(function(err) {
-  document.getElementById("stats-loading").innerHTML = '<div class="alert alert-danger">'+err.message+'</div>';
+  var el = document.getElementById("stats-loading");
+  el.innerHTML = '<div class="alert alert-danger"></div>';
+  el.firstChild.textContent = err.message;
 });
 })();
 </script>
