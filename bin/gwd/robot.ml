@@ -10,8 +10,26 @@ module Code = Geneweb_http.Code
 
 let magic_robot = "GWRB0008"
 
+(* The robot-ban state below is deliberately GLOBAL: an IP must be
+   blocked across every database served by this gwd instance, not just
+   the one it happens to be hitting right now. The lock guarding access
+   to it must therefore also be global, and must NOT go through
+   GWPARAM.adm_file: in "reorg" mode, adm_file resolves to a per-base
+   directory (bname.gwb/config/cnt/...), which would let two workers
+   serving two different bases take two different locks while both
+   read-modify-write this same shared file. *)
+let robot_dir () = String.concat Filename.dir_sep [ Secure.base_dir (); "cnt" ]
+let lock_file () = Filename.concat (robot_dir ()) "gwd_robot.lck"
+
+(* The detection window and the ban decision are intentionally SITE-WIDE (keyed
+   by IP alone): a robot spreading its load across several bases on the same
+   multi-base site must still be caught and blocked everywhere, not just on
+   whichever base happened to see enough of its traffic. Each `who` entry still
+   records the base (`nbase`) it was last seen on, purely for reporting (see
+   the per-base tally at the end of `check`); it plays no role in the threshold
+   or ban decision. *)
 module W = Map.Make (struct
-  type t = string
+  type t = string (* ip *)
 
   let compare = compare
 end)
@@ -22,14 +40,14 @@ type who = {
   acc_times : float list;
   oldest_time : float;
   nb_connect : int;
-  nbase : string;
+  nbase : string; (* base last accessed by this IP; reporting only *)
   utype : norfriwiz;
 }
 
 type excl = {
   mutable excl : (string * int ref) list;
   mutable who : who W.t;
-  mutable max_conn : int * string;
+  mutable max_conn : int * string; (* (count, ip) *)
   mutable last_summary : float;
 }
 
@@ -101,10 +119,15 @@ let output_excl oc xcl =
   output_string oc magic_robot;
   output_value oc (xcl : excl)
 
+let save xcl fname =
+  match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
+  | Some oc ->
+      output_excl oc xcl;
+      close_out oc
+  | None -> ()
+
 let robot_excl () =
-  let fname =
-    String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
-  in
+  let fname = Filename.concat (robot_dir ()) "robot" in
   let xcl =
     match try Some (Secure.open_in_bin fname) with _ -> None with
     | Some ic -> (
@@ -114,20 +137,6 @@ let robot_excl () =
             let v = (input_value ic : excl) in
             close_in ic;
             v)
-          else if b = "GWRB0007" then (
-            let old_data =
-              (input_value ic
-                : (string * int ref) list * who W.t * (int * string))
-            in
-            close_in ic;
-            let excl, who, max_conn = old_data in
-            let new_data = { excl; who; max_conn; last_summary = 0.0 } in
-            (try
-               let oc = open_out_bin fname in
-               output_excl oc new_data;
-               close_out oc
-             with _ -> ());
-            new_data)
           else (
             close_in ic;
             { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 })
@@ -242,11 +251,7 @@ let check tm from max_call sec conf suicide =
           log_summary tm xcl nconn);
         refused
   in
-  (match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
-  | Some oc ->
-      output_excl oc xcl;
-      close_out oc
-  | None -> ());
+  save xcl fname;
   if refused then robot_error conf max_call sec;
   W.fold
     (fun _ w (c, cw, cf, wl) ->
