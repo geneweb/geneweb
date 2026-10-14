@@ -48,9 +48,17 @@ let search_prefix conf base ~limit ~fn_prefix ~sn_prefix =
     List.rev acc
 
 let lookup_exact base fn sn oc =
-  match Driver.person_of_key base (Name.lower fn) (Name.lower sn) oc with
-  | Some ip -> [ Driver.poi base ip ]
-  | None -> []
+  if fn = "?" || sn = "?" then
+    if oc < 0 || oc >= Driver.nb_of_persons base then []
+    else
+      let p = Driver.poi base (Driver.Iper.of_string (string_of_int oc)) in
+      if Driver.p_first_name base p = fn && Driver.p_surname base p = sn then
+        [ p ]
+      else []
+  else
+    match Driver.person_of_key base (Name.lower fn) (Name.lower sn) oc with
+    | Some ip -> [ Driver.poi base ip ]
+    | None -> []
 
 let person_to_json conf base p =
   let fn = Driver.p_first_name base p in
