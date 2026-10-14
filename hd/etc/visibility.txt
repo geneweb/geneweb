@@ -73,7 +73,7 @@ es: Para los <span class="text-success">visitantes</span>, una persona puede ser
 
 [
 en: Anyone can ask to be tagged as "Private"
-fr: Toute personne peut demander à être marquée "Private"
+fr: Toute personne peut demander à être marquée "Privée"
 es: Cualquier persona puede pedir ser marcada como "Privado"
 ].<br>
 
@@ -165,9 +165,9 @@ es: Visible para los <span class="text-success">amigos</span> con estado SemiPú
 %end;
     <li><i class="fa fa-person fa-fw text-danger me-2"></i>[*iftitles/public/semipublic/private]3[:]
 [
-en: Never visible except for himself when logged as <span class="text-success">friend</span>
-fr: Invisible pour tous sauf lui même (si connecté comme <span class="text-success">ami</span>)
-es: Invisible para todos salvo para sí mismo (conectado como <span class="text-success">amigo</span>)
+en: Never visible except for himself (when logged as <span class="text-success">friend</span>); (p) ou (a) explains whether Private or age is the reason
+fr: Invisible pour tous sauf lui même (si connecté comme <span class="text-success">ami</span>); (p) ou (a) précise si la raison est Privé ou age
+es: Invisible para todos salvo para sí mismo (conectado como <span class="text-success">amigo</span>); (p) o (a) explica si la razón es Privado o edad
 ];
   </ul>
 </div>

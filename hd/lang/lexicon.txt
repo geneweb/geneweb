@@ -22385,21 +22385,21 @@ en: help for visibility of individuals
 es: ayuda sobre la visibilidad de los individuos
 fr: aide pour la visibilité des individus
 
-    (p) private, (d) dates
-cs: (p) soukromý, (d) data
-da: (p) privat, (d) datoer
-de: (p) privat, (d) Daten
-en: (p) private, (d) dates
-es: (p) privado, (d) fechas
-fi: (p) yksityinen, (d) päivämäärät
-fr: (p) privé, (d) dates
-it: (p) privato, (d) date
-nl: (p) privé, (d) datums
-no: (p) privat, (d) datoer
-pl: (p) prywatny, (d) daty
-pt: (p) privado, (d) datas
-ru: (p) личное, (d) даты
-sv: (p) privat, (d) datum
+    (p) private, (a) age
+cs: (p) soukromý, (a) věk
+da: (p) privat, (a) alder
+de: (p) privat, (a) Alter
+en: (p) private, (a) age
+es: (p) privado, (a) edad
+fi: (p) yksityinen, (a) ikä
+fr: (p) privé, (a) âge
+it: (p) privato, (a) età
+nl: (p) privé, (a) leeftijd
+no: (p) privat, (a) alder
+pl: (p) prywatny, (a) wiek
+pt: (p) privado, (a) idade
+ru: (p) личное, (a) возраст
+sv: (p) privat, (a) ålder
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
