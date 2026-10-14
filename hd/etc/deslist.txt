@@ -180,7 +180,7 @@
        or (e.src="on" and xx.has_sources and e.inline="on"))
     <div class="mt-2 mb-3 ms-4 me-2 p-3 shadow">
       %if;(e.notes="on" and (xx.has_notes or xx.has_event))
-        <div class="h5">[*note/notes]0</div>
+        <div class="h5 small"><b>[*individual notes]</b></div>
       %end;
      %apply;render_notes_content("xx")
     </div>
@@ -243,7 +243,7 @@
     %if;are_separated;, <em>[separated]</em>%end;
     %if;(e.comm="on" and (has_comment or has_marriage_note))
       %let;fid;%ctr;%apply;letter(family_cnt)%in;
-      %if;(e.inline="on")<div class="my-1 mx-3 p-3 shadow">%apply;family_notes()</div>
+      %if;(e.inline="on")<div class="mt-2 mb-3 ms-4 me-2 p-3 shadow">%apply;family_notes()</div>
       %else;%sp;<sup><a href="#fnote-%fid;">(<small>[marriage/marriages]0 %fid;</small>)</a></sup>%end;
     %end;
     %if;(curlev<maxlev)

@@ -241,39 +241,36 @@
           %foreach;ancestor.family;
             %if;(family.index=ancestor.family.index and (has_marriage_note or has_comment))
               <div class="shadow p-3">
-                <dt id="fnotes-%ancestor.anc_sosa.v;"><b><a href="#%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
-                  <span class="small text-body-secondary">([marriage/marriages]0 %ancestor; [and] %spouse;)</span>
+                <dt id="fnotes-%ancestor.anc_sosa.v;"><b><a href="#%ancestor.anc_sosa.v;">m%ancestor.anc_sosa;</a></b>
+                  <span class="small text-body-secondary">(%ancestor;%ancestor.dates; [and] %spouse;%spouse.dates;)</span>
                 </dt>
                 <dd>%apply;family_notes()</dd>
               </div>
             %end;
           %end;
         %end;
-        %if;(e.siblings="on" and
-       ancestor.is_female and ancestor.same="")
-          %( siblings %)
-          %if;(ancestor.index!=self.index)
-            %foreach;ancestor.family;
-              %if;(family.index=ancestor.family.index)
-                %foreach;child;
-                  %apply;child_notes("")
-                %end;
+        %if;((e.siblings="on" and ancestor.is_female or ancestor.anc_sosa.v=1) and ancestor.same="")
+          %( children of the couple, as listed in the text %)
+          %foreach;ancestor.family;
+            %if;(family.index=ancestor.family.index)
+              %foreach;child;
+                %apply;child_notes("")
               %end;
             %end;
-            %( father's other families %)
-            %foreach;ancestor.spouse.family;
-              %if;(spouse.index!=ancestor.index)
-                %foreach;child;
-                  %apply;child_notes(family_cnt)
-                %end;
+          %end;
+          %( father's other families %)
+          %foreach;ancestor.spouse.family;
+            %if;(spouse.index!=ancestor.index)
+              %foreach;child;
+                %apply;child_notes(family_cnt)
               %end;
             %end;
-            %( mother's other families %)
-            %foreach;ancestor.family;
-              %if;(spouse.index!=ancestor.spouse.index)
-                %foreach;child;
-                  %apply;child_notes(family_cnt)
-                %end;
+          %end;
+          %( mother's other families %)
+          %foreach;ancestor.family;
+            %if;(spouse.index!=ancestor.spouse.index)
+              %foreach;child;
+                %apply;child_notes(family_cnt)
               %end;
             %end;
           %end;
@@ -286,27 +283,24 @@
 
 %define;personal_notes()
   %if;((e.notes="on" and (ancestor.has_notes or ancestor.has_event) or e.src="on" and ancestor.has_sources) and e.inline!="on")
-   %sp;<sup><small>(<a href="#notes-%ancestor.anc_sosa.v;">%if;(e.notes="on")[see] [note/notes]0%else;[source/sources]1%end; %ancestor.anc_sosa;</a>)</small></sup>.
+   %sp;<sup><small>(<a href="#notes-%ancestor.anc_sosa.v;">%if;(e.notes="on")[note/notes]0%else;[source/sources]1%end; %ancestor.anc_sosa;</a>)</small></sup>.
   %end;
 %end;
 
 %define;parents_links()
   %if;(e.only!="on" and ancestor.father_sosa!="" and not cancel_links)
-    [*parents][:]
-    <b><a href="#%ancestor.father_sosa;">%ancestor.father_sosa;</a></b>%sp;
-    [and]%sp;
-    <b><a href="#%ancestor.mother_sosa;">%ancestor.mother_sosa;</a></b>.
+    <span class="text-nowrap">&rArr; [*parents][:] <b><a href="#%ancestor.father_sosa;">%ancestor.father_sosa;</a></b> [and] <b><a href="#%ancestor.mother_sosa;">%ancestor.mother_sosa;.</a></b></span>
   %end;
 %end;
 
 %define;long_display_ancestor_personal()
   %apply;somebody("ancestor")
   %if;(ancestor.index=self.index)%apply;personal_notes() %apply;parents_links()%end;
-  %if;(ancestor.index!=index and e.inline="on"). %apply;parents_links()%end;
+  %if;(ancestor.index!=index and e.inline="on") %apply;parents_links()%end;
   %if;((e.notes="on" and (ancestor.has_notes or ancestor.has_event) and e.inline="on") or (e.src="on" and ancestor.has_sources and e.inline="on"))%nn;
-    <div class="mt-2 mb-3 ms-4 me-2 p-3 shadow">
+    <div class="mt-2 mb-3 ms-4 me-2 p-3 pb-1 shadow">
       %if;(e.notes="on" and (ancestor.has_notes or ancestor.has_event))
-        <div class="h5">[*note/notes]0</div>
+        <div class="h5 small"><b>[*individual notes]</b></div>
         %apply;clean_comment_tags(ancestor.notes)
         %if;ancestor.has_event;
           <table>
@@ -362,10 +356,10 @@
         %end;)
       %end;
       %if;(e.comm="on" and e.inline!="on" and (has_marriage_note or has_comment))
-        %sp;<sup><small>(<a href="#fnotes-%ancestor.anc_sosa.v;">[see] [marriage/marriages]0 %ancestor.anc_sosa;</a>)</small></sup>%nn;
+        %sp;<sup><small>(<a href="#fnotes-%ancestor.anc_sosa.v;">[note/notes]0 m%ancestor.anc_sosa;</a>)</small></sup>%nn;
       %end;</div>
       %if;(e.comm="on" and e.inline="on" and (has_marriage_note or has_comment))
-        <div class="my-1 mx-3 p-3 shadow">%apply;family_notes()</div>
+        <div class="mt-2 mb-3 ms-4 me-2 p-3 pb-1 shadow">%apply;family_notes()</div>
       %end;
     %end;
   %end;
@@ -379,9 +373,9 @@
     %apply;somebody_long_info("child")
     %apply;somebody_extra_info("child")
     %if;((e.notes="on" and (child.has_notes or child.has_event) and e.inline="on") or (e.src="on" and child.has_sources and e.inline="on"))
-      .<div class="my-2 ms-4 me-2 p-3 shadow">
+      .<div class="my-2 ms-4 me-2 p-3 pb-1 shadow">
         %if;(e.notes="on" and (child.has_notes or child.has_event))
-          <div class="h5">[*note/notes]1</div> %apply;clean_comment_tags(child.notes)
+          <div class="h5 small"><b>[*individual notes]</b></div>%apply;clean_comment_tags(child.notes)
           %if;child.has_event;
             <table>
               %foreach;child.event;
@@ -425,7 +419,7 @@
       </div>
     %elseif;((e.notes="on" and (child.has_notes or child.has_event) or e.src="on" and child.has_sources) and e.inline!="on")%sp;
       <sup><small>(<a href="#notes-%ancestor.anc_sosa.v;%if;("spec"!="")-spec%end;%apply;letter(child_cnt)">%nn;
-        %if;(e.notes="on")[*note/notes]0%else;[source/sources]1%end;
+        %if;(e.notes="on")[note/notes]0%else;[source/sources]1%end;
          %ancestor.anc_sosa;%if;("spec"!="")-spec%end;%apply;letter(child_cnt)
       </a>)</small></sup>%nn;
     %end;
