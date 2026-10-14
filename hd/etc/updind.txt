@@ -721,7 +721,8 @@
 %end;
 
 %let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
-<form name="upd" method="post" action="%action;">
+<form name="upd" method="post" action="%action;" id="updind"
+  data-insert="%foreach;pevent;%if;(event.e_name="")pevent_select%cnt;/%end;%end;">
   <div class="row">
     %apply;nav()
   </div>
