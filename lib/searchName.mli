@@ -38,6 +38,7 @@ type search_case =
       format :
         [ `Space
         | `Slash
+        | `SlashOc
         | `Dot
         | `SlashSurname
         | `SlashFirstName
