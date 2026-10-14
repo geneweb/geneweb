@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt v7.1 12/10/2026 9:05:42 $ -->
+<!-- $Id: menubar.txt v7.1 14/10/2026 9:05:42 $ -->
 %if;not cancel_links;
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
@@ -173,8 +173,8 @@
               %end;
               %( Visibility button %)
               <a class="dropdown-item" href="%prefix;m=H&v=visibility" title="[*visibility-hlp]" target="_blank">
-                <i class="fa fa-person fa-fw %visib_color; me-2" aria-hidden="true"></i>[*visibility]%nn;
-                %if;(visib=3)<span class="ms-1" title="[*(p) private, (d) dates]">%if;is_private;(p)%else;(d)%end;</span>%end;</a>%nn;
+                <i class="fa fa-person fa-fw %visib_color; me-2" aria-hidden="true"></i>[*visibility]%sp;%nn;
+                <span class="me-2" title="[(p) private, (a) age]">%if;(visib=3)%if;is_private;(p)%else;(a)%end;%end;</span></a>%nn;
               %if;is_semi_public;
               <a class="dropdown-item %if;(e.fmode="on")text-danger%else;text-success%end;"
                 title="[*family mode-hlp]"
