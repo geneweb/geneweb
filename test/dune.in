@@ -21,6 +21,7 @@
   (modules
     test
     check
+    mock_db
     date_test
     place_test
     sosa_test
