@@ -9848,6 +9848,17 @@ sl: za lastna imena po abecednem redu
 sv: för förnamnen i bokstavsordning
 tr: sonuçlar listesini adların alfabetik sırasına göre görüntülemek için
 
+    for the list in alphabetical order
+ca: per a la llista per ordre alfabètic
+de: für die Liste in alphabetischer Reihenfolge
+en: for the list in alphabetical order
+es: para la lista por orden alfabético
+fr: pour la liste par ordre alphabétique
+it: per l’elenco in ordine alfabetico
+nl: voor de lijst in alfabetische volgorde
+pt: para a lista por ordem alfabética
+sv: för listan i bokstavsordning
+
     for the list ordered by the date of the last modification
 bg: за списъка по дати на последно изменение
 co: per a lista classificata da data d’ultima mudificazione

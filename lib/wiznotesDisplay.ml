@@ -286,8 +286,7 @@ let print_main conf base auth_file =
     else list
   in
   let wiznotes_dir = wiz_dir conf base in
-  Hutil.header conf title;
-  (* mouais... *)
+  Hutil.header ~fluid:true conf title;
   let list =
     List.map
       (fun (wz, wname) ->
@@ -311,35 +310,30 @@ let print_main conf base auth_file =
     |> List.sort (fun (_, sn1) (_, sn2) -> String.compare sn2 sn1)
     |> List.rev_map fst
   in
-
+  Output.print_sstring conf "<p>";
+  Output.print_sstring conf (string_of_int @@ List.length wizdata);
+  Output.print_sstring conf " ";
+  Output.print_string conf (Util.safe_html wiztxt);
+  Output.print_sstring conf {|<br><em style="font-size:80%">|};
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "click"));
+  Output.print_sstring conf {| <a href="|};
+  Output.print_string conf (commd conf);
+  Output.print_sstring conf
+    (if by_alphab_order then "m=WIZNOTES&o=H" else "m=WIZNOTES&o=A");
+  Output.print_sstring conf {|">|};
+  Output.print_sstring conf (transl conf "here");
+  Output.print_sstring conf "</a> ";
+  Output.print_sstring conf
+    (transl conf
+       (if by_alphab_order then
+          "for the list ordered by the date of the last modification"
+        else "for the list in alphabetical order"));
+  Output.print_sstring conf ".</em></p>";
   if by_alphab_order then (
-    Output.print_sstring conf "<p>";
-    Output.print_sstring conf (string_of_int @@ List.length wizdata);
-    Output.print_sstring conf " ";
-    Output.print_string conf (Util.safe_html wiztxt);
-    Output.print_sstring conf "<br>";
-    Output.print_sstring conf {|<em style="font-size:80%">|};
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "click"));
-    Output.print_sstring conf " ";
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf {|m=WIZNOTES&o=H">|};
-    Output.print_sstring conf (transl conf "here");
-    Output.print_sstring conf "</a> ";
-    Output.print_sstring conf
-      (transl conf "for the list ordered by the date of the last modification");
-    Output.print_sstring conf ".</em></p>";
-    print_wizards_by_alphabetic_order conf list)
-  else (
-    Output.print_sstring conf "<p>";
-    Output.print_sstring conf (string_of_int @@ List.length wizdata);
-    Output.print_sstring conf " ";
-    Output.print_string conf (Util.safe_html wiztxt);
-    Output.print_sstring conf "</p>";
-    print_wizards_by_date conf list);
-  if by_alphab_order then (
+    print_wizards_by_alphabetic_order conf list;
     print_old_wizards conf old_list;
-    print_search_form conf "");
+    print_search_form conf "")
+  else print_wizards_by_date conf list;
   Hutil.trailer conf
 
 let wizard_page_title conf wizname _ = Output.print_string conf wizname
