@@ -11,7 +11,8 @@
   util_test
   dag2html_test
   oidc_test
-  userkey_test)
+  userkey_test
+  notes_search_test)
  (libraries alcotest geneweb geneweb.oidc fmt))
 
 (test

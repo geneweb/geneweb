@@ -78,7 +78,7 @@ let rec is_restricted conf base anc_l =
   | anc :: l ->
       if is_ancestor conf base anc then false else is_restricted conf base l
 
-let print_search_form conf from_note =
+let print_search_form conf =
   Output.printf conf
     {|<div class="mt-3">
 <form class="d-flex align-items-center gap-2" method="get" action="%s">|}
@@ -86,12 +86,6 @@ let print_search_form conf from_note =
   hidden_env conf;
   Output.print_sstring conf
     {|<input type="hidden" name="m" value="MISC_NOTES_SEARCH">|};
-  (match from_note with
-  | Some n ->
-      Output.print_sstring conf {|<input type="hidden" name="z" value="|};
-      Output.print_string conf (Util.escape_html n);
-      Output.print_sstring conf {|">|}
-  | None -> ());
   Output.print_sstring conf
     {|<input type="text" name="s" size="40" class="form-control w-auto" value="|};
   (match p_getenv conf.env "s" with
@@ -165,7 +159,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   in
   let s = Util.safe_html s in
   Output.print_string conf s;
-  if ho <> None then print_search_form conf (Some fnotes);
+  if ho <> None then print_search_form conf;
   Hutil.trailer conf
 
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
@@ -955,42 +949,112 @@ let print_misc_notes conf base =
       (fun f -> one_file (Filename.basename (Util.note_link_to_sys f)) false)
       files;
     Output.print_sstring conf {|</div>|});
-  if d = "" then print_search_form conf None;
+  if d = "" then print_search_form conf;
   Hutil.trailer conf
 
 (* searching *)
+type search_hit = {
+  sh_fnotes : string;
+  sh_title : string;  (** plain text *)
+  sh_in_title : bool;
+  sh_count : int;  (** occurrences in the body *)
+  sh_snippet : string;  (** HTML, already escaped and highlighted *)
+}
+
+let collect_search_hits conf base case_sens s =
+  let pages = "" :: List.map fst (notes_links_db conf base true) in
+  List.fold_left
+    (fun acc fnotes ->
+      let nenv, nt = read_notes base fnotes in
+      let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
+      let in_title = in_text case_sens s tit in
+      let plain = NotesSearch.plain_text nt in
+      let count = NotesSearch.count_occurrences case_sens s plain in
+      (* [in_text] works on the source, [count] on the decoded text
+         (entities, '' and = markup): a match in either is a hit *)
+      if in_title || count > 0 || in_text case_sens s nt then
+        {
+          sh_fnotes = fnotes;
+          sh_title = NotesSearch.plain_text tit;
+          sh_in_title = in_title;
+          sh_count = count;
+          sh_snippet = NotesSearch.snippet case_sens s plain;
+        }
+        :: acc
+      else acc)
+    [] pages
+  |> List.rev
+  |> List.stable_sort (fun h1 h2 ->
+      match Bool.compare h2.sh_in_title h1.sh_in_title with
+      | 0 -> Int.compare h2.sh_count h1.sh_count
+      | c -> c)
+
+let print_search_hit conf case_sens s hit =
+  let href =
+    if hit.sh_fnotes = "" then (commd conf :> string) ^ "m=NOTES"
+    else
+      (commd conf :> string)
+      ^ "m=NOTES&f="
+      ^ (Mutil.encode hit.sh_fnotes :> string)
+  in
+  let label =
+    if hit.sh_title <> "" then NotesSearch.highlight case_sens s hit.sh_title
+    else if hit.sh_fnotes = "" then
+      (Util.escape_html (Utf8.capitalize_fst (transl conf "base notes"))
+        :> string)
+    else (Util.escape_html hit.sh_fnotes :> string)
+  in
+  let page_name =
+    if hit.sh_fnotes = "" || hit.sh_title = "" then ""
+    else
+      Format.sprintf {|<span class="text-muted small ms-2">[%s]</span>|}
+        (Util.escape_html hit.sh_fnotes :> string)
+  in
+  let count =
+    if hit.sh_count = 0 then ""
+    else
+      Format.sprintf {|<span class="badge text-bg-secondary ms-2">%d</span>|}
+        hit.sh_count
+  in
+  Output.printf conf
+    {|<li class="list-group-item">
+<div><a href="%s">%s</a>%s%s</div>
+<div class="small text-muted">%s</div>
+</li>
+|}
+    href label page_name count hit.sh_snippet
+
+let print_search_hits conf case_sens s hits =
+  let title _ =
+    Printf.sprintf
+      (ftransl conf "NOTIF all results for %s")
+      (Util.escape_html s :> string)
+    |> Output.print_sstring conf
+  in
+  Hutil.header conf title;
+  (match hits with
+  | [] ->
+      Output.printf conf "<p>%s</p>\n"
+        (Utf8.capitalize_fst (transl conf "no match"))
+  | _ :: _ ->
+      Output.print_sstring conf {|<ul class="list-group mb-3">|};
+      List.iter (print_search_hit conf case_sens s) hits;
+      Output.print_sstring conf "</ul>\n");
+  print_search_form conf;
+  Hutil.trailer conf
+
 let search_text conf base s =
-  let s = if s = "" then " " else s in
-  let case_sens = p_getenv conf.env "c" = Some "on" in
-  let db =
-    let db = notes_links_db conf base true in
-    let db = "" :: List.map fst db in
-    match p_getenv conf.env "z" with
-    | None -> db
-    | Some f ->
-        let rec loop = function
-          | fnotes :: list -> if f = fnotes then list else loop list
-          | [] -> []
-        in
-        loop db
-  in
-  let noteo =
-    let rec loop = function
-      | fnotes :: list ->
-          let nenv, nt = read_notes base fnotes in
-          let tit = try List.assoc "TITLE" nenv with Not_found -> "" in
-          if in_text case_sens s tit || in_text case_sens s nt then
-            Some (fnotes, tit, nt)
-          else loop list
-      | [] -> None
-    in
-    loop db
-  in
-  match noteo with
-  | Some (fnotes, tit, nt) ->
-      print_whole_notes conf base fnotes (Util.safe_html tit) nt
-        (Some (case_sens, s))
-  | None -> print_misc_notes conf base
+  let s = String.trim s in
+  if s = "" then print_misc_notes conf base
+  else
+    let case_sens = p_getenv conf.env "c" = Some "on" in
+    match collect_search_hits conf base case_sens s with
+    | [ hit ] ->
+        let nenv, nt = read_notes base hit.sh_fnotes in
+        let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
+        print_whole_notes conf base hit.sh_fnotes (Util.safe_html tit) nt
+          (Some (case_sens, s))
+    | hits -> print_search_hits conf case_sens s hits
 
 let print_misc_notes_search conf base =
   match try Some (List.assoc "s" conf.env) with Not_found -> None with

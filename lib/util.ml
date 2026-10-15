@@ -2954,6 +2954,19 @@ let rec in_text case_sens s m =
   in
   loop false 0
 
+let find_in_text case_sens s m i =
+  if s = "" then None
+  else
+    let len = String.length m in
+    let rec loop i =
+      if i >= len then None
+      else
+        match start_equiv_with case_sens s m i with
+        | Some j -> Some (i, j)
+        | None -> loop (Utf8.next m i)
+    in
+    loop i
+
 let html_highlight case_sens h s =
   let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
   let rec loop in_tag i len =
