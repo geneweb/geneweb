@@ -59,6 +59,10 @@
     };
   };
 
+  const withS2 = (href, v) => href.includes('&s2=')
+    ? href.replace(/(&s2=)[^&]*/, `$1${encodeURIComponent(v)}`)
+    : `${href}&s2=${encodeURIComponent(v)}`;
+
   const invalidateCache = () => { _cacheInvalid = true; };
 
   const getAllErrors = () => {
@@ -86,7 +90,7 @@
         if (btn.dataset.init) return;
         btn.className = cfg.sel.slice(1) + ' ' + cfg.cls;
         if (!btn.innerHTML.includes('<i')) {
-          btn.innerHTML = `<i class="fa ${cfg.icon}"></i>`;
+          btn.innerHTML = `<i class="fa ${cfg.icon}" aria-hidden="true"></i>`;
         }
         if (cfg.target) btn.target = '_blank';
         btn.dataset.init = '1';
@@ -223,10 +227,7 @@
 
       RAF(() => {
         if (changed) {
-          const h = s2.dataset.origHref || attrs.href;
-          s2.href = h.includes('&s2=')
-            ? h.replace(/(&s2=)[^&]*/, `$1${encodeURIComponent(newVal)}`)
-            : `${h}&s2=${encodeURIComponent(newVal)}`;
+          s2.href = withS2(s2.dataset.origHref || attrs.href, newVal);
           s2.className = 's2 btn btn-warning';
           s2.style.visibility = 'visible';
           s2.title = _okTitle;
@@ -364,7 +365,7 @@
       setTimeout(() => navigate(errEl), CONFIG.NAV_DELAY);
     } else {
       notify('error', `✗ ${result.message}`);
-      s2.innerHTML = '<i class="fa fa-exclamation-triangle"></i>';
+      s2.innerHTML = '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>';
       s2.className = 's2 btn btn-danger';
       s2.title = result.message;
 
@@ -386,25 +387,19 @@
       if (f) {
         val = f.value.trim();
         if (val) {
-          const base = s2.dataset.origHref || href;
-          href = base.includes('&s2=')
-            ? base.replace(/(&s2=)[^&]*/, `$1${encodeURIComponent(val)}`)
-            : `${base}&s2=${encodeURIComponent(val)}`;
+          href = withS2(s2.dataset.origHref || href, val);
           s2.href = href;
         }
       }
     }
-    if (!val) {
-      const p = new URLSearchParams(href.split('?')[1]);
-      val = p.get('s2');
-    }
     const { k, s, s2: s2Val } = getUrlParams(href);
+    if (!val) val = s2Val;
 
     if (VALIDATING.has(href)) return;
     VALIDATING.add(href);
 
     const orig = s2.innerHTML;
-    s2.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+    s2.innerHTML = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';
     s2.className = 's2 btn btn-info';
 
     try {
@@ -419,13 +414,19 @@
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
 
       const res = await r.json();
-      handleValidationResult(res, errEl, s2, orig, val);
       VALIDATING.delete(href);
+      handleValidationResult(res, errEl, s2, orig, val);
 
     } catch (e) {
       console.error('AJAX error:', e);
       s2.innerHTML = orig;
       s2.className = 's2 btn btn-warning';
+
+      if (e instanceof SyntaxError) {
+        VALIDATING.delete(href);
+        notify('error', MSG.invalid);
+        return;
+      }
 
       const validationKey = `chk_validation_${k}_${s}_${s2Val}`;
       localStorage.removeItem(validationKey);
@@ -467,7 +468,7 @@
 
   const completeValidation = (errEl, s2, val) => {
     RAF(() => {
-      s2.innerHTML = '<i class="fa fa-spell-check"></i>';
+      s2.innerHTML = '<i class="fa fa-spell-check" aria-hidden="true"></i>';
       s2.className = 's2 btn btn-success';
       s2.style.pointerEvents = 'none';
       s2.style.visibility = 'visible';
@@ -477,7 +478,7 @@
 
       const createValidatedText = () => {
         const txt = document.createElement('div');
-        txt.className = 'text-muted';
+        txt.className = 'text-body-secondary';
         txt.textContent = val;
         return txt;
       };
@@ -565,7 +566,7 @@
     if (!submit || submit.dataset.init) return;
 
     submit.dataset.init = '1';
-    submit.addEventListener('click', () => {
+    submit.form?.addEventListener('submit', () => {
       if (typeof showOverlay === 'function') showOverlay();
     });
   };
@@ -585,25 +586,9 @@
     });
   };
 
-  const preserveScroll = () => {
-    window.addEventListener('beforeunload', () => {
-      sessionStorage.setItem('checkDataScroll', window.scrollY);
-    });
-
-    const saved = sessionStorage.getItem('checkDataScroll');
-    if (saved) {
-      RAF(() => {
-        window.scrollTo(0, parseInt(saved, 10));
-        sessionStorage.removeItem('checkDataScroll');
-      });
-    }
-  };
-
   const init = () => {
     initToggles();
     initMaxValidation();
-    preserveScroll();
-
     _container = q('#cd');
     if (!_container) return;
 

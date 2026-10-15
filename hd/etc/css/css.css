@@ -477,10 +477,9 @@ td .rm-cell {
   min-height: 2.5rem;
 }
 
-#cd .edit-container .text-muted {
+#cd .edit-container .text-body-secondary {
   width: 100%;
   padding: 0.375rem 0.75rem;
-  color: #6c757d;
 }
 
 #cd button {
@@ -545,6 +544,8 @@ td .rm-cell {
   right: 20px;
   z-index: 9999;
   min-width: 300px;
+  max-width: min(40rem, calc(100vw - 40px));
+  overflow-wrap: anywhere;
   animation: slideInRight 0.3s ease-out;
 }
 
@@ -2586,20 +2587,6 @@ body.upd-edit [data-updfield] a {
   -webkit-appearance: none;
   appearance: none;
   margin: 0;
-}
-.ajax-notification {
-  font-size: 0.9em;
-  font-weight: 500;
-  border: none !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
-  min-width: 300px;
-  max-width: min(40rem, calc(100vw - 40px));
-  overflow-wrap: anywhere;
-  animation: slideInRight 0.3s ease-out;
 }
 
 /* m=L place-event markers: fixed-width cell so any glyph stays column-aligned */

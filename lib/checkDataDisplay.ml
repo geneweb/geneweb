@@ -552,7 +552,11 @@ let print conf base =
     (t conf ":")
     (match params.form_max with Some n -> string_of_int n | None -> "")
     (match params.config_max with
-    | Some n -> Printf.sprintf {| max="%d" data-limit-msg="%s"|} n limit_msg
+    | Some n ->
+        Printf.sprintf {| max="%d" data-limit-msg="%s"|} n
+          (Util.escape_html
+             (Str.global_replace (Str.regexp "<[^>]*>") "" limit_msg)
+            :> string)
     | None -> "")
     (match params.config_max with
     | Some _ ->
