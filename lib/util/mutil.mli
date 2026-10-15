@@ -247,9 +247,9 @@ val epoch_of_date : string -> int option
 val rev_input_line : in_channel -> int -> bytes ref * int ref -> string * int
 (** [rev_input_line ic pos (rbytes, rpos)] Read characters in reverse order from
     the given input channel, until a newline character is encountered. Return
-    the string of all characters read, without the newline character at the end,
-    and the position of the first character of the returned line (to be used
-    with next [rev_input_line] call).
+    the string of all characters read, without the newline character (nor the
+    carriage return of a CRLF ending) at the end, and the position of the first
+    character of the returned line (to be used with next [rev_input_line] call).
 
     [rpos] and [rbytes] are intermediate between [ic] and reading functions. At
     the beginig when [!rpos = 0] and [rbytes] is empty, initialise buffer with
