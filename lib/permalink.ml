@@ -1,8 +1,11 @@
 open Config
 module Driver = Geneweb_db.Driver
 
-let drop (k, _) =
-  match k with "dsrc" | "escache" | "templ" -> true | _ -> false
+let drop conf (k, _) =
+  match k with
+  | "dsrc" | "escache" | "templ" | "notif" | "nomod" -> true
+  | "pn" | "other_names" -> List.mem_assoc "notif" conf.env
+  | _ -> false
 
 let key_env conf base =
   let scratch s = Mutil.encode (Name.lower (Driver.sou base s)) in
@@ -47,7 +50,7 @@ let key_env conf base =
       (string * Adef.encoded_string) list -> (string * Adef.encoded_string) list
       = function
     | [] -> []
-    | kv :: l when drop kv -> loop l
+    | kv :: l when drop conf kv -> loop l
     | ("i", v) :: l -> new_env "i" v (fun x -> x) l
     | ("ei", v) :: l -> new_env "ei" v (fun x -> "e" ^ x) l
     | (k, v) :: l
@@ -95,7 +98,7 @@ let query_of_env conf env : Adef.encoded_string =
 let query conf base = query_of_env conf (key_env conf base)
 
 let query_aux conf =
-  query_of_env conf (List.filter (fun kv -> not (drop kv)) conf.env)
+  query_of_env conf (List.filter (fun kv -> not (drop conf kv)) conf.env)
 
 let script conf (q : Adef.encoded_string) : Adef.safe_string =
   let disabled =
