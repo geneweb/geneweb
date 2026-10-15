@@ -688,6 +688,14 @@ val is_that_user_and_password : auth_scheme_kind -> string -> string -> bool
 (* Searching *)
 
 val in_text : bool -> string -> string -> bool
+
+val find_in_text : bool -> string -> string -> int -> (int * int) option
+(** [find_in_text case_sens s m i] is the first occurrence of [s] in the plain
+    text [m] starting at or after byte [i], as [Some (start, stop)] byte
+    offsets ([stop] excluded). Comparison follows [in_text]: exact when
+    [case_sens], otherwise case- and accent-insensitive. [None] if [s] is empty
+    or not found. *)
+
 val html_highlight : bool -> string -> string -> string
 
 (* Print list in columns with Gutil.alphabetic order *)
