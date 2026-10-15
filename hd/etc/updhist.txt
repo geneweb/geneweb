@@ -1,8 +1,8 @@
+<!-- $Id: updhist.txt v7.1 15/10/2026 06:15:29 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist.txt v7.1 11/04/2026 03:47:37 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -16,7 +16,7 @@
 %message_to_wizard;
 <div class="container">
 %include;home
-<h1>[*history of updates]</h1>
+<h1>[*history of updates]%if;(e.wiz!="") — [wizard/wizards/friend/friends/exterior]0 %e.wiz;%end;</h1>
 %define;search_form()
   %if;(wizard or friend)
     <form class="d-flex align-items-center gap-3 mb-2" method="get" action="%action;">
@@ -43,7 +43,6 @@
 %end;
 
 %let;kk;%if;(e.k="")3%else;%e.k%end;%in;
-%let;wiz;%if;(e.wiz!="" and e.n="")%e.wiz;%end;%in;
 %define;table()
   <table class="table table-sm table-hover px-1">
     <caption class="visually-hidden">[*history of updates]</caption>
@@ -62,7 +61,7 @@
             <span class="visually-hidden">[history]</span></th>%end;
       </tr>
     </thead>
-    %foreach;history_line(kk, e.pos, wiz)
+    %foreach;history_line(kk, e.pos, e.wiz)
       <tr>
         <td><span class="gw-hist-time" data-epoch="%time_epoch;">%time;</span></td>
         <td class="text-center">
@@ -81,7 +80,8 @@
         <td>
         %if;(first_name!="")
           <a href="%prefix;%person.access;">%person;</a>%nn;
-          <a href="%prefix;m=MOD_IND&i=%person.index;">%person.dates;</a> %person.title;
+          %if;wizard;<a href="%prefix;m=MOD_IND&i=%person.index;">%end;%person.dates;%nn;
+          %if;wizard;</a>%end; %person.title;
         %elseif;is_note;
           - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
           %if;(note.part!="");v=%note.part;%end;">
@@ -97,7 +97,7 @@
         <td>
           %if;(user!="")
             <i>
-              %if;(wiz="")
+              %if;(e.wiz="")
                 <a href="%prefix;m=HIST&k=%kk;&wiz=%user.v;">%user;</a>%nn;
               %else;
                 %user;
@@ -132,7 +132,7 @@
   %elseif;(uu = "cb")[copy portrait to blason]0%nn;
   %elseif;(uu = "cd")[copy image to blason]0%nn;
   %elseif;(uu = "cn")[change children's names]%nn;
-  %elseif;(uu = "db")[delete::coat of arms]0%nn;
+  %elseif;(uu = "db")[delete::blason/blasons]0%nn;
   %elseif;(uu = "dc")[delete::image/images]0 [from carrousel]%nn;
   %elseif;(uu = "df")[delete::family/families]0%nn;
   %elseif;(uu = "dp")[delete::person/persons]0%nn;
@@ -154,18 +154,17 @@
   %elseif;(uu = "mt")[modify::title/titles]0%nn;
   %elseif;(uu = "mu")[modify::public name]0%nn;
   %elseif;(uu = "mx")[modify::qualifier/qualifiers]0%nn;
-  %elseif;(uu = "rb")[restore::coat of arms]0%nn;
+  %elseif;(uu = "rb")[restore::blason/blasons]0%nn;
   %elseif;(uu = "rc")[restore::carrousel image]%nn;
   %elseif;(uu = "rp")[restore::portrait]%nn;
   %elseif;(uu = "sp")[send::portrait]%nn;
-  %elseif;(uu = "sb")[send::coat of arms]%nn;
+  %elseif;(uu = "sb")[send::blason/blasons]0%nn;
   %elseif;(uu = "s3")[send::image/images]0 [note/notes]0 [and] [source/sources]0 [to carrousel]%nn;
-  %elseif;(uu = "sf")[send::image/images]0 [to carrousel]%nn;
+  %elseif;(uu = "sf" or uu = "sx")[send::image/images]0 [to carrousel]%nn;
   %elseif;(uu = "sn")[modify::surname/surnames]0%nn;
   %elseif;(uu = "sa")[modify::surname alias]0%nn;
   %elseif;(uu = "so")[send::note/notes]0 [to carrousel]%nn;
   %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
-  %elseif;(uu = "sx")[send::unknown]0%nn;
   %elseif;(uu = "s?")[send::unknown]0%nn;
   %else;%apply;interp(uu) %nn;
   %end;
@@ -178,12 +177,8 @@
      <input type="hidden" name="m" value="HIST">
      <input type="hidden" name="k" value="%e.k;">
      <input type="hidden" name="pos" value="%pos;">
-     <div class="input-group">
-       <button type="submit" class="btn btn-outline-primary ms-4" title="[*next]"><i class="fa fa-forward fa-fw"></i></button>
-       %if;(wiz!="")
-         <input type="hidden" name="wiz" value="%wiz;">([wizard/wizards/friend/friends/exterior]0[:] %wiz;)
-       %end;
-     </div>
+     %if;(e.wiz!="")<input type="hidden" name="wiz" value="%e.wiz;">%end;
+     <button type="submit" class="btn btn-outline-primary ms-4" title="[*next]"><i class="fa fa-forward fa-fw"></i></button>
    </form>
   %end;
 %end;

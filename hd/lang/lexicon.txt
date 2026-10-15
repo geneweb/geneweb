@@ -22116,6 +22116,17 @@ en: unfiltered total
 es: total sin filtrar
 fr: total non filtré
 
+    unknown
+ca: desconegut
+de: unbekannt
+en: unknown
+es: desconocido
+fr: inconnu
+it: sconosciuto
+nl: onbekend
+pt: desconhecido
+sv: okänd
+
     unknown first_name
 co: nome scunnisciutu
 de: unbekannter Vorname
