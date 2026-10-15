@@ -156,7 +156,11 @@ module Person = struct
     if is_dummy person then no_union else base.unions.(p.Def.key_index)
 
   let person_of_gen_person base (p, _a, _u) = (base, p)
-  let poi base iper = (base, base.persons.(iper))
+
+  let poi base iper =
+    if iper = dummy_iper then empty_person base iper
+    else (base, base.persons.(iper))
+
   let no_person ip = create_empty_person empty_string empty_string ip
 end
 
@@ -478,8 +482,8 @@ let base_notes_origin_file _base = "origin_file" (* TODO FIX *)
 let base_notes_are_empty _base _fname = true (* TODO FIX *)
 let base_notes_read_first_line _ = assert false
 let base_notes_read _base _fname = ""
-let read_nldb _ = assert false
-let write_nldb _ = assert false
+let read_nldb _ = []
+let write_nldb _ _ = ()
 let base_store = Hashtbl.create 1
 
 (* Should not be necessary but some of the code requires to write
