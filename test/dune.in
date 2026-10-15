@@ -20,6 +20,7 @@
     )
   (modules
     test
+    check
     date_test
     place_test
     sosa_test
