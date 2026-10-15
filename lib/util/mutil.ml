@@ -1082,7 +1082,7 @@ let rev_input_line ic pos (rbuff, rpos) =
         else
           match rev_input_char pos with
           | '\n' -> (get_n_reset (), pos)
-          | '\r' -> (get_n_reset (), pos - 1)
+          | '\r' when Buffer.length rev = 0 -> loop (pos - 1)
           | c ->
               Buffer.add_char rev c;
               loop (pos - 1)
