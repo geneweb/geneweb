@@ -1,4 +1,4 @@
-(* $Id: history.ml,v 5.14 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: history.ml v7.1 15/10/2026 23:13:10 $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -7,7 +7,6 @@ open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
-(* S: Fail if conf.bname is undefined? *)
 let file_name conf = Filename.concat (Util.bpath conf.bname) "history"
 
 (* Record history when committing updates *)
@@ -340,10 +339,9 @@ type hist_item =
   | HI_none
 
 type 'a env =
-  | Vcnt of int ref
   | Vinfo of string * string * string * hist_item * string
   | Vpos of int ref
-  | Vsearch of (bool * string * int) option
+  | Vsearch of bool * string
   | Vother of 'a
   | Vnone
 
@@ -353,30 +351,17 @@ let set_vother x = Vother x
 
 let possibly_highlight env s =
   match get_env "search" env with
-  | Vsearch (Some (case_sens, h, _)) ->
-      if in_text case_sens h s then html_highlight case_sens h s else s
+  | Vsearch (case_sens, h) when in_text case_sens h s ->
+      html_highlight case_sens h s
   | _ -> s
 
 let safe_val (s : Adef.safe_string) = Templ.VVstring (s :> string)
 
 let rec eval_var conf base env _ _ = function
-  | [ "count" ] -> (
-      match get_env "count" env with
-      | Vcnt c -> Templ.VVstring (string_of_int !c)
-      | _ -> VVstring "")
   | [ "first_name" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (Driver.p_first_name base p)
-      | _ -> VVstring "")
-  | [ "found" ] -> (
-      match get_env "search" env with
-      | Vsearch (Some _) -> VVbool true
-      | _ -> VVbool false)
-  | [ "incr_count" ] -> (
-      match get_env "count" env with
-      | Vcnt c ->
-          incr c;
-          VVstring ""
+      | Vinfo (_, _, _, HI_ind p, _) ->
+          Templ.VVstring (Driver.p_first_name base p)
       | _ -> VVstring "")
   | [ "is_note" ] -> (
       match get_env "info" env with
@@ -406,11 +391,6 @@ let rec eval_var conf base env _ _ = function
       | Vinfo (_, _, _, HI_notes (_, Some x), _) -> VVstring (string_of_int x)
       | Vinfo (_, _, _, HI_notes (_, None), _) -> VVstring ""
       | _ -> raise Not_found)
-  | [ "occ" ] -> (
-      match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) ->
-          VVstring (string_of_int (Driver.get_occ p))
-      | _ -> VVstring "")
   | [ "permalink" ] ->
       VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | "person" :: sl -> (
@@ -421,16 +401,6 @@ let rec eval_var conf base env _ _ = function
       match get_env "pos" env with
       | Vpos r -> VVstring (string_of_int !r)
       | _ -> raise Not_found)
-  | [ "reset_count" ] -> (
-      match get_env "count" env with
-      | Vcnt c ->
-          c := 0;
-          VVstring ""
-      | _ -> VVstring "")
-  | [ "surname" ] -> (
-      match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (Driver.p_surname base p)
-      | _ -> VVstring "")
   | [ "time" ] -> (
       match get_env "info" env with
       | Vinfo (s, _, _, _, _) -> VVstring (possibly_highlight env s)
@@ -464,7 +434,6 @@ and eval_string s = function
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env p = function
-  | [ "access" ] -> safe_val (Util.acces conf base p :> Adef.safe_string)
   | [ "dates" ] -> safe_val (DateDisplay.short_dates_text conf base p)
   | [ "has_history" ] ->
       let fn = Driver.sou base (Driver.get_first_name p) in
@@ -478,9 +447,6 @@ and eval_person_field_var conf base env p = function
       let occ = Driver.get_occ p in
       VVstring (HistoryDiff.history_file fn sn occ)
   | [ "index" ] -> Templ.VVstring (Driver.Iper.to_string (Driver.get_iper p))
-  | [ "is_invisible" ] ->
-      let conf = { conf with wizard = false; friend = false } in
-      VVbool (not (Util.authorized_age conf base p))
   | [ "is_public" ] -> VVbool (Driver.get_access p = Public)
   | [ "is_semi_public" ] -> VVbool (Driver.get_access p = SemiPublic)
   | [ "is_private" ] -> VVbool (Driver.get_access p = Private)
@@ -518,12 +484,8 @@ let print_foreach conf base print_ast eval_expr =
             | [ [ e1 ]; [ e2 ]; [ e3 ] ] ->
                 let k = eval_int_expr env xx e1 in
                 let pos =
-                  match get_env "search" env with
-                  | Vsearch (Some (_, _, pos)) -> pos
-                  | Vsearch None -> in_channel_length ic
-                  | _ -> (
-                      try eval_int_expr env xx e2
-                      with Not_found -> in_channel_length ic)
+                  try eval_int_expr env xx e2
+                  with Not_found -> in_channel_length ic
                 in
                 let wiz = eval_expr env xx e3 in
                 (k, pos, wiz)
@@ -555,7 +517,14 @@ let print_foreach conf base print_ast eval_expr =
   and print_history_line2 env xx line wiz i al =
     match line_fields line with
     | Some (time, user, action, keyo) ->
-        if wiz = "" || user = wiz then (
+        let key = Option.value ~default:"" keyo in
+        let found =
+          match get_env "search" env with
+          | Vsearch (case_sens, s) ->
+              List.exists (in_text case_sens s) [ time; user; key ]
+          | _ -> true
+        in
+        if (wiz = "" || user = wiz) && found then (
           let hist_item =
             match keyo with
             | Some key -> (
@@ -586,7 +555,6 @@ let print_foreach conf base print_ast eval_expr =
           in
           if not_displayed then i
           else
-            let key = match keyo with Some s -> s | None -> "" in
             let env =
               Templ.Env.add "info"
                 (Vinfo (time, action, user, hist_item, key))
@@ -599,16 +567,14 @@ let print_foreach conf base print_ast eval_expr =
   in
   print_foreach
 
-let gen_print conf base hoo =
+let print conf base =
+  let env = Templ.Env.add "pos" (Vpos (ref 0)) Templ.Env.empty in
   let env =
-    Templ.Env.empty
-    |> Templ.Env.add "pos" (Vpos (ref 0))
-    |> Templ.Env.add "count" (Vcnt (ref 0))
-  in
-  let env =
-    match hoo with
-    | Some ho -> Templ.Env.add "search" (Vsearch ho) env
-    | None -> env
+    match p_getenv_notrim conf.env "s" with
+    | Some s when s <> "" ->
+        let case_sens = p_getenv conf.env "c" = Some "on" in
+        Templ.Env.add "search" (Vsearch (case_sens, s)) env
+    | _ -> env
   in
   let ifun =
     Templ.
@@ -622,52 +588,3 @@ let gen_print conf base hoo =
       }
   in
   Templ.output conf ifun env () "updhist"
-
-let print conf base = gen_print conf base None
-
-(* searching *)
-
-let search_text conf base s =
-  let s = if s = "" then " " else s in
-  let case_sens = p_getenv conf.env "c" = Some "on" in
-  let found =
-    match
-      try Some (Secure.open_in_bin (file_name conf)) with Sys_error _ -> None
-    with
-    | Some ic ->
-        let pos =
-          match p_getint conf.env "pos" with
-          | Some pos -> pos
-          | None -> in_channel_length ic
-        in
-        let vv = (ref (Bytes.create 0), ref 0) in
-        let rec loop pos =
-          match
-            try Some (Mutil.rev_input_line ic pos vv) with End_of_file -> None
-          with
-          | Some (line, pos2) -> (
-              match line_fields line with
-              | Some (time, user, _, keyo) ->
-                  let key = match keyo with Some key -> key | None -> "" in
-                  if
-                    in_text case_sens s time || in_text case_sens s user
-                    || in_text case_sens s key
-                  then Some pos
-                  else loop pos2
-              | None -> None)
-          | None -> None
-        in
-        loop pos
-    | None -> None
-  in
-  let h =
-    match found with Some pos -> Some (case_sens, s, pos) | None -> None
-  in
-  gen_print conf base (Some h)
-
-let print_search conf base =
-  if conf.wizard || conf.friend then
-    match try Some (List.assoc "s" conf.env) with Not_found -> None with
-    | Some s -> search_text conf base (Mutil.gen_decode false s)
-    | None -> print conf base
-  else print conf base

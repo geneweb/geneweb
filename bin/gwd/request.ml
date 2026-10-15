@@ -546,7 +546,6 @@ let treat_request =
                  w_wizard @@ w_base
                  @@ fun conf _ -> HistoryDiffDisplay.print_clean_ok conf
              | "HIST_DIFF" -> w_base @@ HistoryDiffDisplay.print
-             | "HIST_SEARCH" -> w_base @@ History.print_search
              | "IMA" ->
                  w_base @@ fun conf _base -> ImageDisplay.print_album_image conf
              | "IM_C" -> w_base @@ ImageCarrousel.print_c ~saved:false

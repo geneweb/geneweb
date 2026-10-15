@@ -18,28 +18,27 @@
 %include;home
 <h1>[*history of updates]%if;(e.wiz!="") — [wizard/wizards/friend/friends/exterior]0 %e.wiz;%end;</h1>
 %define;search_form()
-  %if;(wizard or friend)
-    <form class="d-flex align-items-center gap-3 mb-2" method="get" action="%action;">
-      %hidden;
-      <input type="hidden" name="m" value="HIST_SEARCH">
-      %if;(e.m="HIST_SEARCH" and found)
-        <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
-      %end;
-      <div class="input-group w-auto">
-        <input type="text" class="form-control" placeholder="[*search/case sensitive]0"
-          name="s" maxlength="40" value="%e.s.ns;" aria-label="[*search/case sensitive]0">
-        <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
-      </div>
-      <label for="rows" class="col-form-label text-nowrap mb-0">[*number of rows]</label>
-      <input type="number" class="form-control w-auto" id="rows" title="[*number of rows]"
-         name="k" value="%kk;" min="0" max="150" step="10">
-      <div class="form-check text-nowrap">
-        <input type="checkbox" class="form-check-input" name="c" value="on" id="case"
-          %if;("main"!="true" and e.c="on") checked%end;>
-        <label class="form-check-label" for="case">[*search/case sensitive]1</label>
-      </div>
-    </form>
-  %end;
+  <form class="d-flex flex-wrap align-items-center gap-3 mb-2" method="get" action="%action;">
+    %hidden;
+    <input type="hidden" name="m" value="HIST">
+    %if;(e.wiz!="")<input type="hidden" name="wiz" value="%e.wiz;">%end;
+    <div class="input-group w-auto">
+      <input type="text" class="form-control" placeholder="[*search/case sensitive]0"
+        name="s" maxlength="40" value="%e.s.ns;" aria-label="[*search/case sensitive]0">
+      <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
+    </div>
+    <label for="rows" class="col-form-label text-nowrap mb-0">[*number of rows]</label>
+    <input type="number" class="form-control w-auto" id="rows" title="[*number of rows]"
+      name="k" value="%kk;" min="0" max="150" step="10">
+    <div class="form-check text-nowrap">
+      <input type="checkbox" class="form-check-input" name="c" value="on" id="case"%if;(e.c="on") checked%end;>
+      <label class="form-check-label" for="case">[*search/case sensitive]1</label>
+    </div>
+    %if;(e.s!="" or e.wiz!="")
+      <a class="btn btn-outline-secondary" href="%prefix;m=HIST&k=%kk;">%nn;
+        <i class="fa fa-xmark text-danger me-2" aria-hidden="true"></i>[*clear filters]</a>
+    %end;
+  </form>
 %end;
 
 %let;kk;%if;(e.k="")3%else;%e.k%end;%in;
@@ -171,33 +170,23 @@
 %end;
 
 %define;nav()
-  %if;(pos!="")
-   <form method="get" action="%action;">
-     %hidden;
-     <input type="hidden" name="m" value="HIST">
-     <input type="hidden" name="k" value="%e.k;">
-     <input type="hidden" name="pos" value="%pos;">
-     %if;(e.wiz!="")<input type="hidden" name="wiz" value="%e.wiz;">%end;
-     <button type="submit" class="btn btn-outline-primary ms-4" title="[*next]"><i class="fa fa-forward fa-fw"></i></button>
-   </form>
+  %if;(pos>0)
+    <form method="get" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="HIST">
+      <input type="hidden" name="k" value="%kk;">
+      <input type="hidden" name="pos" value="%pos;">
+      %if;(e.s!="")<input type="hidden" name="s" value="%e.s.ns;">%end;
+      %if;(e.c="on")<input type="hidden" name="c" value="on">%end;
+      %if;(e.wiz!="")<input type="hidden" name="wiz" value="%e.wiz;">%end;
+      <button type="submit" class="btn btn-outline-primary" title="[*next]"><i class="fa fa-forward fa-fw" aria-hidden="true"></i></button>
+    </form>
   %end;
 %end;
 
-%if;(not cancel_links and (e.m!="HIST_SEARCH" or not found))
-  <div class="d-flex justify-content-between mt-2 px-1">
-    <div class="order-1">%apply;search_form()</div>
-    <div class="d-none order-3">%apply;table()</div>
-    <div class="order-2">%apply;nav()</div>
-  </div>
-%end;
+%if;not cancel_links;%apply;search_form()%end;
 %apply;table()
-
-%if;(e.m="HIST_SEARCH" and found)
-  <div class="d-flex justify-content-between px-1">
-    %apply;search_form()
-    %apply;nav()
-  </div>
-%end;
+%if;not cancel_links;%apply;nav()%end;
 
 %include;trl
 %include;copyr
