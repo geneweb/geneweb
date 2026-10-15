@@ -51,6 +51,8 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** There is a possibility that two families are a duplicate of each other *)
   | PossibleDuplicateFamHomonymous of 'family * 'family * 'person
       (** There is a possibility that two families are a duplicate of each other (Homonymous spouse) *)
+  | PossibleDuplicateFamQuestString of 'family * 'family * 'person
+      (** There is a possibility that two families are a duplicate of each other (? ? spouse) *)
   | PWitnessEventAfterDeath of 'person * 'pevent * 'person
       (** Witness is dead before personal event date *)
   | PWitnessEventBeforeBirth of 'person * 'pevent * 'person
@@ -111,6 +113,7 @@ let int_of_warning_tag = function
   | UndefinedSex _p -> 28
   | YoungForMarriage (_p, _d, _ifam) -> 29
   | OldForMarriage (_p, _d, _ifam) -> 30
+  | PossibleDuplicateFamQuestString (_f1, _f2, _p) -> 31
 
 let compare_family f1 f2 =
   Gwdb.compare_ifam (Gwdb.get_ifam f1) (Gwdb.get_ifam f2)
@@ -126,6 +129,10 @@ let normalize_warning (warning : base_warning) : base_warning =
   | PossibleDuplicateFamHomonymous (f1, f2, p) ->
       if Gwdb.compare_ifam f2 f1 < 0 then
         PossibleDuplicateFamHomonymous (f2, f1, p)
+      else warning
+  | PossibleDuplicateFamQuestString (f1, f2, p) ->
+      if Gwdb.compare_ifam f2 f1 < 0 then
+        PossibleDuplicateFamQuestString (f2, f1, p)
       else warning
   | BigAgeBetweenSpouses (p1, p2, d) ->
       if Gwdb.compare_iper (Gwdb.get_iper p2) (Gwdb.get_iper p1) < 0 then
@@ -205,22 +212,52 @@ module CoupleSet = Set.Make (struct
   let compare = compare
 end)
 
-let rec handle_homonymous base cpl_set result ws =
+let named_spouse_of_quest_string_warning base p ifam1 ifam2 =
+  let sp1 =
+    Gwdb.poi base @@ Gutil.spouse (Gwdb.get_iper p) (Gwdb.foi base ifam1)
+  in
+  let sp2 =
+    Gwdb.poi base @@ Gutil.spouse (Gwdb.get_iper p) (Gwdb.foi base ifam2)
+  in
+  if Person.is_empty_name sp1 then sp2 else sp1
+
+let is_quest_string_homonymous base = function
+  | PossibleDuplicateFamHomonymous (ifam1, _, p) ->
+      let sp_iper = Gutil.spouse (Gwdb.get_iper p) (Gwdb.foi base ifam1) in
+      Person.is_empty_name (Gwdb.poi base sp_iper)
+  | _ -> false
+
+let parents_with_named_homonymous base warnings =
+  List.fold_left
+    (fun acc -> function
+      | PossibleDuplicateFamHomonymous (_, _, p) as w
+        when not (is_quest_string_homonymous base w) ->
+          Gwdb.IperSet.add (Gwdb.get_iper p) acc
+      | _ -> acc)
+    Gwdb.IperSet.empty warnings
+
+let rec handle_homonymous base named_hom_parents cpl_set result ws =
   match ws with
-  | (PossibleDuplicateFamHomonymous (ifam1, ifam2, _) as w) :: ws ->
-      let fam1 = Gwdb.foi base ifam1 in
-      let couple_name_info1 = couple_name_info_of_family base fam1 in
-      let cpl_set' = CoupleSet.add couple_name_info1 cpl_set in
-      let fam2 = Gwdb.foi base ifam2 in
-      let couple_name_info2 = couple_name_info_of_family base fam2 in
-      let cpl_set' = CoupleSet.add couple_name_info2 cpl_set' in
-      let result = if cpl_set' == cpl_set then result else w :: result in
-      handle_homonymous base cpl_set' result ws
-  | w :: ws -> handle_homonymous base cpl_set (w :: result) ws
+  | (PossibleDuplicateFamHomonymous (ifam1, ifam2, p) as w) :: ws ->
+      if
+        is_quest_string_homonymous base w
+        && Gwdb.IperSet.mem (Gwdb.get_iper p) named_hom_parents
+      then handle_homonymous base named_hom_parents cpl_set result ws
+      else
+        let fam1 = Gwdb.foi base ifam1 in
+        let couple_name_info1 = couple_name_info_of_family base fam1 in
+        let cpl_set' = CoupleSet.add couple_name_info1 cpl_set in
+        let fam2 = Gwdb.foi base ifam2 in
+        let couple_name_info2 = couple_name_info_of_family base fam2 in
+        let cpl_set' = CoupleSet.add couple_name_info2 cpl_set' in
+        let result = if cpl_set' == cpl_set then result else w :: result in
+        handle_homonymous base named_hom_parents cpl_set' result ws
+  | w :: ws -> handle_homonymous base named_hom_parents cpl_set (w :: result) ws
   | [] -> result
 
 let handle_homonymous base warnings =
-  handle_homonymous base CoupleSet.empty [] warnings
+  let named_hom_parents = parents_with_named_homonymous base warnings in
+  handle_homonymous base named_hom_parents CoupleSet.empty [] warnings
 
 let ( >>= ) i f = if i = 0 then f () else i
 
@@ -239,6 +276,10 @@ let compare_normalized_base_warning (w1 : base_warning) (w2 : base_warning) :
       Gwdb.compare_ifam f1 f1' >>= fun () -> Gwdb.compare_ifam f2 f2'
   | ( PossibleDuplicateFamHomonymous (ifam1, ifam2, _),
       PossibleDuplicateFamHomonymous (ifam1', ifam2', _) ) ->
+      Gwdb.compare_ifam ifam1 ifam1' >>= fun () ->
+      Gwdb.compare_ifam ifam2 ifam2'
+  | ( PossibleDuplicateFamQuestString (ifam1, ifam2, _),
+      PossibleDuplicateFamQuestString (ifam1', ifam2', _) ) ->
       Gwdb.compare_ifam ifam1 ifam1' >>= fun () ->
       Gwdb.compare_ifam ifam2 ifam2'
   | BigAgeBetweenSpouses (p1, p2, d), BigAgeBetweenSpouses (p1', p2', d') ->

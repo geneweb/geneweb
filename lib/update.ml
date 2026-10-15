@@ -786,14 +786,22 @@ let print_warning conf base (w : Warning.base_warning) =
       let fath = Gwdb.get_father f in
       let moth = Gwdb.get_mother f in
       let curr, hom =
-        if Gwdb.eq_iper fath (Gwdb.get_iper p) then (moth, fath)
-        else (fath, moth)
+        if Gwdb.eq_iper fath (Gwdb.get_iper p) then (fath, moth)
+        else (moth, fath)
       in
       Output.printf conf
         (Util.fcapitale
            (Util.ftransl conf "%s has unions with several persons named %s"))
         (someone_strong base @@ Gwdb.poi base @@ curr :> string)
         (someone_strong base @@ Gwdb.poi base @@ hom :> string)
+  | PossibleDuplicateFamQuestString (f1, f2, p) ->
+      let named = Warning.named_spouse_of_quest_string_warning base p f1 f2 in
+      Output.printf conf
+        (Util.fcapitale
+           (Util.ftransl conf
+              "%s has a union with a person named %s and a person named ? ?"))
+        (someone_strong base p :> string)
+        (someone_strong base named :> string)
   | PEventOrder (p, e1, e2) ->
       Output.printf conf
         (Util.fcapitale (Util.ftransl conf "%t's %s before his/her %s"))
