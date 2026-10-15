@@ -11,7 +11,9 @@ val query : config -> Geneweb_db.Driver.base -> Adef.encoded_string
     - [ei] -> [ep] & [en] [& eoc]
     - [i?] (2 chars) -> [p?] & [n?] [& oc?] (e.g. i1, i2)
     - [ef?] -> father's key of the family [& f?] Dropped parameters: [dsrc],
-      [escache], [templ]. *)
+      [escache], [templ], the one-shot notification parameters [notif] and
+      [nomod], and [pn] and [other_names] when a notification is shown, as they
+      then only feed it. *)
 
 val query_aux : config -> Adef.encoded_string
 (** Like {!query} but without database access: index parameters are kept
