@@ -541,9 +541,9 @@ let effective_send_c_ok conf base p file file_name =
     | "portraits" -> "sp"
     | "blasons" -> "sb"
     | "carrousel" ->
-        if file_name <> "" && note <> Adef.safe "" && source <> Adef.safe ""
-        then "s3"
-        else if file_name <> "" then "sf"
+        let image = file_name <> "" || image_url <> "" in
+        if image && note <> Adef.safe "" && source <> Adef.safe "" then "s3"
+        else if image then "sf"
         else if note <> Adef.safe "" then "so"
         else if source <> Adef.safe "" then "ss"
         else "sx"
