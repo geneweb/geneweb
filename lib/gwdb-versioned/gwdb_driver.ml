@@ -219,6 +219,28 @@ end
 module Legacy_driver = struct
   include Gwdb_legacy.Gwdb_driver
 
+  module MemoPersonOfKey =
+    Memo.Make
+      (struct
+        type t = base * string * string * int
+
+        let equal (base, fn, sn, occ) (base', fn', sn', occ') =
+          let basename = bname base in
+          let basename' = bname base' in
+          String.equal basename basename'
+          && String.equal fn fn' && String.equal sn sn' && Int.equal occ occ'
+
+        let hash (base, fn, sn, occ) = Hashtbl.hash (bname base, fn, sn, occ)
+      end)
+      (struct
+        type res = iper option
+
+        let f (base, fn, sn, occ) = person_of_key base fn sn occ
+      end)
+
+  let person_of_key base first_name surname occ =
+    MemoPersonOfKey.memoized (base, first_name, surname, occ)
+
   let compatibility_directory = "gnwb25-2"
   let compatibility_file = "witness_notes"
   let fcompatibility_file = "fwitness_notes"
@@ -509,6 +531,7 @@ module Legacy_driver = struct
   let commit_patches base =
     PatchPer.write base;
     PatchFam.write base;
+    MemoPersonOfKey.clear ();
     commit_patches base;
     PatchPer.move_patch_file base;
     PatchFam.move_patch_file base
@@ -713,7 +736,9 @@ module Legacy_driver = struct
     PatchFam.move_data_file base;
     base
 
-  let open_base = open_base
+  let open_base path =
+    MemoPersonOfKey.clear ();
+    open_base path
 
   let close_base base =
     close_base base;

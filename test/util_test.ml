@@ -612,6 +612,36 @@ let html_text_content () =
     (fun (__POS__, expected, s) -> Expected.test ~__POS__ ~expected s)
     test_cases
 
+let test_memo () =
+  let counter = ref 0 in
+  let module M =
+    Memo.Make
+      (struct
+        type t = string
+
+        let equal = String.equal
+        let hash = Hashtbl.hash
+      end)
+      (struct
+        type res = int
+
+        let f s =
+          incr counter;
+          String.length s
+      end)
+  in
+  Alcotest.(check int) "initial counter is 0" 0 !counter;
+  Alcotest.(check int) "result for 'hello'" 5 (M.memoized "hello");
+  Alcotest.(check int) "counter incremented to 1" 1 !counter;
+  Alcotest.(check int) "cached result for 'hello'" 5 (M.memoized "hello");
+  Alcotest.(check int) "counter remains 1" 1 !counter;
+  Alcotest.(check int) "result for 'world!'" 6 (M.memoized "world!");
+  Alcotest.(check int) "counter incremented to 2" 2 !counter;
+  M.clear ();
+  Alcotest.(check int)
+    "recomputed result for 'hello' after clear" 5 (M.memoized "hello");
+  Alcotest.(check int) "counter incremented to 3 after clear" 3 !counter
+
 let v =
   [
     ( "ext-string",
@@ -647,6 +677,7 @@ let v =
           util_name_with_roman_number;
         Alcotest.test_case "privacy-of-dummy-person" `Quick
           privacy_of_dummy_person;
+        Alcotest.test_case "Memo.memoized and Memo.clear" `Quick test_memo;
       ] );
     ( "date-display",
       [
