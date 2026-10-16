@@ -434,6 +434,7 @@ and eval_string s = function
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env p = function
+  | [ "access" ] -> safe_val (Util.acces conf base p :> Adef.safe_string)
   | [ "dates" ] -> safe_val (DateDisplay.short_dates_text conf base p)
   | [ "has_history" ] ->
       let fn = Driver.sou base (Driver.get_first_name p) in
@@ -451,7 +452,6 @@ and eval_person_field_var conf base env p = function
   | [ "is_semi_public" ] -> VVbool (Driver.get_access p = SemiPublic)
   | [ "is_private" ] -> VVbool (Driver.get_access p = Private)
   | [ "has_titles" ] -> VVbool (Driver.get_titles p <> [])
-  | [ "access_status" ] -> VVstring (Util.access_status p)
   | [ "title" ] -> safe_val (person_title conf base p)
   | [] ->
       VVstring
@@ -495,16 +495,20 @@ let print_foreach conf base print_ast eval_expr =
           let pos =
             let vv = (ref (Bytes.create 0), ref 0) in
             let rec loop pos i =
-              if i >= k then pos
-              else
-                match
-                  try Some (Mutil.rev_input_line ic pos vv)
-                  with End_of_file -> None
-                with
-                | Some (line, pos) ->
-                    let i = print_history_line2 env xx line wiz i al in
-                    loop pos i
-                | None -> pos
+              match
+                try Some (Mutil.rev_input_line ic pos vv)
+                with End_of_file -> None
+              with
+              | None -> 0
+              | Some (line, pos') -> (
+                  match history_info env line wiz with
+                  | None -> loop pos' i
+                  | Some _ when i >= k -> pos
+                  | Some info ->
+                      List.iter
+                        (print_ast (Templ.Env.add "info" info env) xx)
+                        al;
+                      loop pos' (i + 1))
             in
             loop pos 0
           in
@@ -514,7 +518,7 @@ let print_foreach conf base print_ast eval_expr =
           close_in ic;
           raise e)
     | None -> ()
-  and print_history_line2 env xx line wiz i al =
+  and history_info env line wiz =
     match line_fields line with
     | Some (time, user, action, keyo) ->
         let key = Option.value ~default:"" keyo in
@@ -524,7 +528,7 @@ let print_foreach conf base print_ast eval_expr =
               List.exists (in_text case_sens s) [ time; user; key ]
           | _ -> true
         in
-        if (wiz = "" || user = wiz) && found then (
+        if (wiz = "" || user = wiz) && found then
           let hist_item =
             match keyo with
             | Some key -> (
@@ -553,17 +557,10 @@ let print_foreach conf base print_ast eval_expr =
                 || (is_hide_names conf p && not (authorized_age conf base p))
             | _ -> false
           in
-          if not_displayed then i
-          else
-            let env =
-              Templ.Env.add "info"
-                (Vinfo (time, action, user, hist_item, key))
-                env
-            in
-            List.iter (print_ast env xx) al;
-            i + 1)
-        else i
-    | None -> i
+          if not_displayed then None
+          else Some (Vinfo (time, action, user, hist_item, key))
+        else None
+    | None -> None
   in
   print_foreach
 
