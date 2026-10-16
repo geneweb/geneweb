@@ -102,7 +102,10 @@ val print_misc_notes : Config.config -> Driver.base -> unit
 
 val print_misc_notes_search : Config.config -> Driver.base -> unit
 (** [print_misc_notes_search conf base] dispatches a text search request: reads
-    [s] (the search string) from the URL and [c=on] for case sensitivity, walks
-    the notes database, and renders the first matching note (via
-    {!print_whole_notes} with search highlighting) or falls back to
-    {!print_misc_notes} if no match is found. *)
+    [s] (the search string) from the URL and [c=on] for case sensitivity. With
+    [f] (a note name, [f=] for the base notes), that note is rendered with the
+    occurrences highlighted. Otherwise every linked note is searched, notes
+    restricted by [RESTRICT] being skipped: a single hit is rendered directly,
+    several hits give a results page (title, occurrence count, highlighted
+    snippet, linking back here with [f]), and no hit gives a "no match"
+    message. An empty [s] renders {!print_misc_notes}. *)

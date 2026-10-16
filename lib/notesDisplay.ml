@@ -158,6 +158,12 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     Wiki.html_with_summary_of_tlsw conf wi edit_opt s
   in
   let s = Util.safe_html s in
+  let s =
+    match ho with
+    | Some (case_sens, h) ->
+        NotesSearch.highlight_html case_sens h (s :> string) |> Adef.safe
+    | None -> s
+  in
   Output.print_string conf s;
   if ho <> None then print_search_form conf;
   Hutil.trailer conf
@@ -961,27 +967,36 @@ type search_hit = {
   sh_snippet : string;  (** HTML, already escaped and highlighted *)
 }
 
+(* same rule as [print]: a note with a RESTRICT list is only visible to the
+   descendants it names *)
+let note_is_restricted conf base nenv =
+  match List.assoc_opt "RESTRICT" nenv with
+  | None | Some "" -> false
+  | Some l -> is_restricted conf base (String.split_on_char ',' l)
+
 let collect_search_hits conf base case_sens s =
   let pages = "" :: List.map fst (notes_links_db conf base true) in
   List.fold_left
     (fun acc fnotes ->
       let nenv, nt = read_notes base fnotes in
-      let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
-      let in_title = in_text case_sens s tit in
-      let plain = NotesSearch.plain_text nt in
-      let count = NotesSearch.count_occurrences case_sens s plain in
-      (* [in_text] works on the source, [count] on the decoded text
-         (entities, '' and = markup): a match in either is a hit *)
-      if in_title || count > 0 || in_text case_sens s nt then
-        {
-          sh_fnotes = fnotes;
-          sh_title = NotesSearch.plain_text tit;
-          sh_in_title = in_title;
-          sh_count = count;
-          sh_snippet = NotesSearch.snippet case_sens s plain;
-        }
-        :: acc
-      else acc)
+      if note_is_restricted conf base nenv then acc
+      else
+        let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
+        let in_title = in_text case_sens s tit in
+        let plain = NotesSearch.plain_text nt in
+        let count = NotesSearch.count_occurrences case_sens s plain in
+        (* [in_text] works on the source, [count] on the decoded text
+           (entities, '' and = markup): a match in either is a hit *)
+        if in_title || count > 0 || in_text case_sens s nt then
+          {
+            sh_fnotes = fnotes;
+            sh_title = NotesSearch.plain_text tit;
+            sh_in_title = in_title;
+            sh_count = count;
+            sh_snippet = NotesSearch.snippet case_sens s plain;
+          }
+          :: acc
+        else acc)
     [] pages
   |> List.rev
   |> List.stable_sort (fun h1 h2 ->
@@ -991,11 +1006,11 @@ let collect_search_hits conf base case_sens s =
 
 let print_search_hit conf case_sens s hit =
   let href =
-    if hit.sh_fnotes = "" then (commd conf :> string) ^ "m=NOTES"
-    else
+    Printf.sprintf "%sm=MISC_NOTES_SEARCH&s=%s%s&f=%s#first-found"
       (commd conf :> string)
-      ^ "m=NOTES&f="
-      ^ (Mutil.encode hit.sh_fnotes :> string)
+      (Mutil.encode s :> string)
+      (if case_sens then "&c=on" else "")
+      (Mutil.encode hit.sh_fnotes :> string)
   in
   let label =
     if hit.sh_title <> "" then NotesSearch.highlight case_sens s hit.sh_title
@@ -1043,18 +1058,32 @@ let print_search_hits conf case_sens s hits =
   print_search_form conf;
   Hutil.trailer conf
 
+let print_found_note conf base case_sens s fnotes =
+  let nenv, nt = read_notes base fnotes in
+  let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
+  print_whole_notes conf base fnotes (Util.safe_html tit) nt
+    (Some (case_sens, s))
+
+(* [f] (as set by the links of the results page) names the note to show;
+   [f=] is the base notes. Without [f], all notes are searched. *)
 let search_text conf base s =
   let s = String.trim s in
   if s = "" then print_misc_notes conf base
   else
     let case_sens = p_getenv conf.env "c" = Some "on" in
-    match collect_search_hits conf base case_sens s with
-    | [ hit ] ->
-        let nenv, nt = read_notes base hit.sh_fnotes in
-        let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
-        print_whole_notes conf base hit.sh_fnotes (Util.safe_html tit) nt
-          (Some (case_sens, s))
-    | hits -> print_search_hits conf case_sens s hits
+    let requested =
+      match p_getenv conf.env "f" with
+      | Some f when f = "" || NotesLinks.check_file_name f <> None ->
+          let nenv, _ = read_notes base f in
+          if note_is_restricted conf base nenv then None else Some f
+      | Some _ | None -> None
+    in
+    match requested with
+    | Some fnotes -> print_found_note conf base case_sens s fnotes
+    | None -> (
+        match collect_search_hits conf base case_sens s with
+        | [ hit ] -> print_found_note conf base case_sens s hit.sh_fnotes
+        | hits -> print_search_hits conf case_sens s hits)
 
 let print_misc_notes_search conf base =
   match try Some (List.assoc "s" conf.env) with Not_found -> None with

@@ -54,6 +54,40 @@ let test_snippet () =
     (NotesSearch.highlight true "b" "a <b>");
   Alcotest.(check string) "empty text" "" (NotesSearch.snippet false "x" "")
 
+let test_highlight_html () =
+  let hl = NotesSearch.highlight_html false in
+  Alcotest.(check string)
+    "first occurrence gets the anchor"
+    {|<p><span class="found" id="first-found">Moulin</span> et <b><span class="found">moulin</span></b></p>|}
+    (hl "moulin" "<p>Moulin et <b>moulin</b></p>");
+  Alcotest.(check string)
+    "tags and attributes untouched"
+    {|<a href="moulin.html" title="moulin">le <span class="found" id="first-found">moulin</span></a>|}
+    (hl "moulin" {|<a href="moulin.html" title="moulin">le moulin</a>|});
+  Alcotest.(check string)
+    "script and style untouched"
+    {|<script>var moulin = "<b>moulin</b>";</script><style>.moulin{}</style>x|}
+    (hl "moulin"
+       {|<script>var moulin = "<b>moulin</b>";</script><style>.moulin{}</style>x|});
+  Alcotest.(check string)
+    "comments untouched" "<!-- moulin -->"
+    (hl "moulin" "<!-- moulin -->");
+  Alcotest.(check string)
+    "entity matched as its character, wrapped whole"
+    {|cadastre <span class="found" id="first-found">&#38; les</span>|}
+    (hl "& les" "cadastre &#38; les");
+  Alcotest.(check string)
+    "entity name not matched" "&amp;"
+    (hl "amp" "&amp;");
+  Alcotest.(check string)
+    "white space run matches one space"
+    "<span class=\"found\" id=\"first-found\">Jean\n  Dupont</span>"
+    (hl "jean dupont" "Jean\n  Dupont");
+  Alcotest.(check string)
+    "accent-insensitive" {|<span class="found" id="first-found">Château</span>|}
+    (hl "chateau" "Château");
+  Alcotest.(check string) "no match" "<p>rien</p>" (hl "moulin" "<p>rien</p>")
+
 let v =
   [
     ( "notes-search",
@@ -62,5 +96,6 @@ let v =
         Alcotest.test_case "count_occurrences" `Quick test_count;
         Alcotest.test_case "find_in_text" `Quick test_find_in_text;
         Alcotest.test_case "snippet" `Quick test_snippet;
+        Alcotest.test_case "highlight_html" `Quick test_highlight_html;
       ] );
   ]
