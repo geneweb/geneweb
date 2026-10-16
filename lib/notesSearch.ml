@@ -145,6 +145,19 @@ let plain_text m =
   loop false 0;
   String.trim (Buffer.contents b)
 
+(* Leading and trailing '*' of a term: wildcards for "full word" mode. *)
+let wildcards t =
+  let len = String.length t in
+  let rec first i = if i < len && t.[i] = '*' then first (i + 1) else i in
+  let rec last j = if j > 0 && t.[j - 1] = '*' then last (j - 1) else j in
+  let i = first 0 in
+  let j = max i (last len) in
+  (i > 0, String.sub t i (j - i), j < len)
+
+let core t =
+  let _, c, _ = wildcards t in
+  c
+
 (* Split a query into terms: words separated by white space, or phrases
    between double quotes ("Saint Pair"). A term starting with '-' (-word,
    -"some phrase") is excluded; a '-' inside a word (Saint-Pair) is not
@@ -188,7 +201,7 @@ let query case_sens q =
   in
   let add l t =
     let t = String.trim t in
-    if t = "" || List.exists (same t) l then l else t :: l
+    if core t = "" || List.exists (same t) l then l else t :: l
   in
   let req, excl =
     List.fold_left
@@ -218,13 +231,29 @@ let prev_char_start p i =
 let word_before p i = i > 0 && is_word_char (uchar_at p (prev_char_start p i))
 let word_after p i = i < String.length p && is_word_char (uchar_at p i)
 
-(* Occurrence of [t] in [p] at or after [i]; with [full_word], only one with
-   no letter or digit right before or right after it. *)
+(* Occurrence of [t] in [p] at or after [i]. With [full_word], only one with
+   no letter or digit right before it (unless [t] starts with '*') nor right
+   after it (unless [t] ends with '*'; on such a side the match extends to
+   the word boundary). Without [full_word], a match can be
+   anywhere and the '*' are ignored. A '*' inside [t] is a plain character. *)
 let find_term ~full_word case_sens t p i =
+  let any_before, t, any_after = wildcards t in
+  let bad x y =
+    full_word
+    && (((not any_before) && word_before p x)
+       || ((not any_after) && word_after p y))
+  in
+  (* on a '*' side, the match extends to the end of the word, so that the
+     whole word is highlighted *)
+  let rec back x = if word_before p x then back (prev_char_start p x) else x in
+  let rec forward y = if word_after p y then forward (Utf8.next p y) else y in
   let rec loop i =
     match Util.find_in_text case_sens t p i with
-    | Some (x, y) when full_word && (word_before p x || word_after p y) ->
-        loop (Utf8.next p x)
+    | Some (x, y) when bad x y -> loop (Utf8.next p x)
+    | Some (x, y) when full_word ->
+        Some
+          ( (if any_before then back x else x),
+            if any_after then forward y else y )
     | (Some _ | None) as r -> r
   in
   loop i

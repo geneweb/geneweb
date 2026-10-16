@@ -5,15 +5,23 @@
     count and highlight occurrences of any of them. With [~full_word:true],
     an occurrence counts only if it has no letter, digit or combining mark
     right before or right after it: [l'a] does not match in [l'aube], but
-    [aube] does. *)
+    [aube] does. In that mode a leading or trailing ['*'] lifts the check on
+    that side: [henri*] matches [Henriette], [*ette] matches [Juliette], and
+    the whole word is highlighted.
+    Without it the ['*'] are ignored, as any match already counts. A ['*']
+    inside a term is a plain character. *)
+
+val core : string -> string
+(** [core t] is the term [t] without its leading and trailing ['*']. *)
 
 val query : bool -> string -> string list * string list
 (** [query case_sens q] splits the query [q] into terms: words separated by
     white space, or phrases between double quotes (["Saint Pair"]), and
     returns [(required, excluded)]. A term written with a leading ['-']
     ([-word], [-"some phrase"]) is excluded; a ['-'] inside a word
-    ([Saint-Pair]) is not special and a lone ['-'] is ignored. Empty terms and
-    duplicates (equal as compared by [Util.in_text]) are dropped. *)
+    ([Saint-Pair]) is not special and a lone ['-'] is ignored. Empty terms
+    (or made only of ['*']) and duplicates (equal as compared by
+    [Util.in_text]) are dropped. *)
 
 val terms : bool -> string -> string list
 (** [terms case_sens q] is the list of required terms of [query case_sens q],

@@ -1042,12 +1042,12 @@ let collect_search_hits conf base ~full_word case_sens (terms, excluded) =
            only the decoded text gives. *)
         let in_tit t =
           if full_word then NotesSearch.mem_all ~full_word case_sens [ t ] plain_tit
-          else in_text case_sens t tit
+          else in_text case_sens (NotesSearch.core t) tit
         in
         let in_title = List.length (List.filter in_tit terms) in
         let present t =
           in_tit t
-          || ((not full_word) && in_text case_sens t nt)
+          || ((not full_word) && in_text case_sens (NotesSearch.core t) nt)
           || NotesSearch.mem_all ~full_word case_sens [ t ] plain
         in
         if
