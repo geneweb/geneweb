@@ -15279,9 +15279,9 @@ en: notes containing all these words, in any order
 fr: notes contenant tous ces mots, dans n’importe quel ordre
 
     notes search help case
-de: Groß-/Kleinschreibung und Akzente werden ignoriert (eglise findet Église), außer wenn „Groß- & Kleinschreibung beachten“ angekreuzt ist; ’ und ' sind dann gleichwertig
-en: case and accents are ignored (eglise finds Église) unless “case sensitive” is ticked; ’ and ' are then the same
-fr: majuscules et accents sont ignorés (eglise trouve Église), sauf si « sensible à la casse » est coché ; ’ et ' sont alors équivalents
+de: ohne „Groß- & Kleinschreibung beachten“ werden Groß-/Kleinschreibung, Akzente und die Form des Apostrophs (’ oder ') ignoriert: eglise findet Église, l'a findet l’a; angekreuzt ist der Vergleich exakt
+en: without “case sensitive”, case, accents and the kind of apostrophe (’ or ') are ignored: eglise finds Église, l'a finds l’a; when ticked, the comparison is exact
+fr: sans « sensible à la casse », majuscules, accents et forme de l’apostrophe (’ ou ') sont ignorés : eglise trouve Église, l'a trouve l’a ; case cochée, la comparaison est exacte
 
     notes search help exclude
 de: ein vorangestelltes - schließt die Notizen mit diesem Wort (oder dieser „Phrase“) aus
