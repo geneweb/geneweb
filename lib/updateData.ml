@@ -522,31 +522,28 @@ let update_person_list conf base new_input list nb_pers max_updates =
       (* Mise à jour de toutes les personnes concernées. *)
       List.iter
         (fun p ->
-          if
-            Driver.sou base (Driver.get_first_name p) <> "?"
-            || Driver.sou base (Driver.get_surname p) <> "?"
-          then (
-            incr cnt;
-            let o_p =
-              Util.string_gen_person base (Driver.gen_person_of_person p)
-            in
-            let np = update_person conf base old new_input p in
-            Driver.patch_person base np.key_index np;
-            if test_family then
-              Array.iter
-                (fun ifam ->
-                  let fam = Driver.foi base ifam in
-                  let nfam = update_family conf base old new_input fam in
-                  Driver.patch_family base nfam.fam_index nfam)
-                (Driver.get_family p);
-            (* On met aussi à jour l'historique. *)
+          incr cnt;
+          let o_p =
+            Util.string_gen_person base (Driver.gen_person_of_person p)
+          in
+          let np = update_person conf base old new_input p in
+          Driver.patch_person base np.key_index np;
+          if test_family then
+            Array.iter
+              (fun ifam ->
+                let fam = Driver.foi base ifam in
+                let nfam = update_family conf base old new_input fam in
+                Driver.patch_family base nfam.fam_index nfam)
+              (Driver.get_family p);
+          (* On met aussi à jour l'historique. *)
+          if not (Util.is_empty_name p) then
             let changed =
               U_Multi
                 ( o_p,
                   Util.string_gen_person base np,
                   if action = "fn" || action = "sn" then true else false )
             in
-            History.record conf base changed action))
+            History.record conf base changed action)
         perl)
     list;
   Util.commit_patches conf base;
