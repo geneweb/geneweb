@@ -22241,6 +22241,114 @@ sl: neznana oseba
 sv: okänd person
 tr: bilinmeyen kişi
 
+    unknown odd names
+de: weitere Vornamen und Familiennamen ohne alphanumerisches Zeichen/die Suche findet die Personen, die sie tragen, doch diese Namen sind zu prüfen: Vermutlich dienen sie einem anderen Zweck als dem eines Vor- oder Familiennamens. Benennen Sie sie gegebenenfalls im Wörterbuch um; stehen sie für eine unbekannte Person, fügen Sie sie dem Feld oben hinzu.
+en: other first names and surnames without alphanumeric characters/search finds the persons who bear them, but these names should be checked: they are probably used for something other than a first name or a surname. If so, rename them in the dictionary; if they stand for an unknown person, add them to the field above.
+es: otros nombres y apellidos sin caracteres alfanuméricos/la búsqueda encuentra a las personas que los llevan, pero estos nombres deben revisarse: probablemente tienen otro uso que el de un nombre o un apellido. Si es así, cámbielos en el diccionario; si designan a una persona desconocida, añádalos al campo de arriba.
+fr: autres prénoms et patronymes sans caractère alphanumérique/la recherche trouve les personnes qui les portent, mais ces noms sont à vérifier : ils relèvent sans doute d’un autre usage qu’un prénom ou un patronyme. Le cas échéant, renommez-les dans le dictionnaire ; s’ils désignent une personne inconnue, ajoutez-les au champ ci-dessus.
+it: altri nomi e cognomi senza caratteri alfanumerici/la ricerca trova le persone che li portano, ma questi nomi vanno verificati: probabilmente hanno un uso diverso da quello di un nome o di un cognome. Se è così, rinominateli nel dizionario; se indicano una persona sconosciuta, aggiungeteli al campo sopra.
+nl: andere voornamen en achternamen zonder alfanumerieke tekens/zoeken vindt de personen die ze dragen, maar deze namen moeten worden nagekeken: waarschijnlijk dienen ze voor iets anders dan een voornaam of achternaam. Hernoem ze zo nodig in het woordenboek; staan ze voor een onbekende persoon, voeg ze dan toe aan het veld hierboven.
+pt: outros nomes próprios e apelidos sem caracteres alfanuméricos/a pesquisa encontra as pessoas que os usam, mas estes nomes devem ser verificados: provavelmente têm outro uso que não o de um nome próprio ou de um apelido. Se for o caso, renomeie-os no dicionário; se designarem uma pessoa desconhecida, acrescente-os ao campo acima.
+
+    unknown blank names
+de: von der Suche übergangene Vornamen und Familiennamen/sie enthalten kein alphanumerisches Zeichen: Die Suche findet die Personen nicht, die sie tragen, und deren Historie wie Porträt können mit denen anderer Personen verwechselt werden. Hier gelten sie immer als Namen unbekannter Personen. Benennen Sie sie im Wörterbuch um, zum Beispiel in Nn.
+en: first names and surnames ignored by search/they contain no alphanumeric character: search does not find the persons who bear them, and their history and portrait may get mixed up with those of other persons. They are always treated here as names of unknown persons. Rename them in the dictionary, for example to Nn.
+es: nombres y apellidos ignorados por la búsqueda/no contienen ningún carácter alfanumérico: la búsqueda no encuentra a las personas que los llevan, y su historial y su retrato pueden confundirse con los de otras personas. Aquí siempre se tratan como nombres de personas desconocidas. Cámbielos en el diccionario, por ejemplo por Nn.
+fr: prénoms et patronymes ignorés par la recherche/ils ne comportent aucun caractère alphanumérique : la recherche ne trouve pas les personnes qui les portent, et leur historique comme leur portrait risquent de se confondre avec ceux d’autres personnes. Ils sont toujours traités ici comme des noms de personnes inconnues. Renommez-les dans le dictionnaire, par exemple en Nn.
+it: nomi e cognomi ignorati dalla ricerca/non contengono alcun carattere alfanumerico: la ricerca non trova le persone che li portano, e la loro cronologia e il loro ritratto rischiano di confondersi con quelli di altre persone. Qui sono sempre trattati come nomi di persone sconosciute. Rinominateli nel dizionario, per esempio in Nn.
+nl: voornamen en achternamen die zoeken overslaat/ze bevatten geen enkel alfanumeriek teken: zoeken vindt de personen die ze dragen niet, en hun geschiedenis en portret kunnen verward raken met die van andere personen. Hier gelden ze altijd als namen van onbekende personen. Hernoem ze in het woordenboek, bijvoorbeeld naar Nn.
+pt: nomes próprios e apelidos ignorados pela pesquisa/não contêm nenhum carácter alfanumérico: a pesquisa não encontra as pessoas que os usam, e o seu histórico e o seu retrato podem confundir-se com os de outras pessoas. Aqui são sempre tratados como nomes de pessoas desconhecidas. Renomeie-os no dicionário, por exemplo para Nn.
+
+    unknown couples with data
+de: Paare unbekannter Personen mit Daten/oder mit mehreren Kindern, Eltern oder einer anderen Familie, von Hand zu bearbeiten
+en: couples of unknown persons with data/or with several children, parents or another family, to process by hand
+es: parejas de personas desconocidas con datos/o con varios hijos, padres u otra familia, a tratar a mano
+fr: couples d’inconnus avec des données/ou avec plusieurs enfants, des parents ou une autre famille, à traiter à la main
+it: coppie di persone sconosciute con dati/o con più figli, genitori o un’altra famiglia, da trattare a mano
+nl: paren van onbekende personen met gegevens/of met meerdere kinderen, ouders of een ander gezin, handmatig te verwerken
+pt: casais de pessoas desconhecidas com dados/ou com vários filhos, pais ou outra família, a tratar manualmente
+sv: par av okända personer med uppgifter/eller med flera barn, föräldrar eller en annan familj, att behandla för hand
+
+    unknown couples without data
+de: Paare unbekannter Personen ohne Daten/das Löschen entfernt beide Ehepartner und ihre Familie
+en: couples of unknown persons without data/deleting them removes both spouses and their family
+es: parejas de personas desconocidas sin datos/borrarlas elimina a ambos cónyuges y su familia
+fr: couples d’inconnus sans données/la suppression efface les deux conjoints et leur famille
+it: coppie di persone sconosciute senza dati/la cancellazione elimina entrambi i coniugi e la loro famiglia
+nl: paren van onbekende personen zonder gegevens/bij verwijdering verdwijnen beide echtgenoten en hun gezin
+pt: casais de pessoas desconhecidas sem dados/a supressão elimina ambos os cônjuges e a sua família
+sv: par av okända personer utan uppgifter/borttagningen tar bort båda makarna och deras familj
+
+    unknown persons
+de: unbekannte Personen
+en: unknown persons
+es: personas desconocidas
+fr: personnes inconnues
+it: persone sconosciute
+nl: onbekende personen
+pt: pessoas desconhecidas
+sv: okända personer
+
+    unknown persons deleted
+de: gelöschte unbekannte Personen
+en: deleted unknown persons
+es: personas desconocidas borradas
+fr: personnes inconnues supprimées
+it: persone sconosciute cancellate
+nl: verwijderde onbekende personen
+pt: pessoas desconhecidas suprimidas
+sv: borttagna okända personer
+
+    unknown persons initials
+de: Initialen (N, X) und Abkürzungen (N., X.) können für einen echten Vor- oder Familiennamen stehen. Vorsichtshalber stehen sie nicht in der Standardliste, da zwei der Listen ein stapelweises Löschen erlauben. Fügen Sie sie hinzu, wenn Ihre Datenbank sie für unbekannte Personen verwendet.
+en: initials (N, X) and abbreviations (N., X.) may stand for a real first name or surname. As a precaution, they are not in the default list, since two of the lists allow batch deletion. Add them if your base uses them for unknown persons.
+es: las iniciales (N, X) y las abreviaturas (N., X.) pueden representar un nombre o apellido real. Por precaución, no figuran en la lista predeterminada, ya que dos de las listas permiten una eliminación por lotes. Añádalas si su base las usa para designar a personas desconocidas.
+fr: les initiales (N, X) et les abréviations (N., X.) peuvent représenter un véritable prénom ou patronyme. Par précaution, elles ne figurent pas dans la liste par défaut, puisque deux des listes permettent une suppression par lot. Ajoutez-les si votre base les emploie pour désigner des personnes inconnues.
+it: le iniziali (N, X) e le abbreviazioni (N., X.) possono rappresentare un vero nome o cognome. Per precauzione, non figurano nell’elenco predefinito, poiché due degli elenchi consentono un’eliminazione per lotti. Aggiungetele se la vostra base le usa per indicare persone sconosciute.
+nl: initialen (N, X) en afkortingen (N., X.) kunnen voor een echte voor- of achternaam staan. Uit voorzorg staan ze niet in de standaardlijst, omdat twee van de lijsten batchgewijs verwijderen toestaan. Voeg ze toe als uw database ze voor onbekende personen gebruikt.
+pt: as iniciais (N, X) e as abreviaturas (N., X.) podem representar um nome próprio ou apelido verdadeiro. Por precaução, não constam da lista predefinida, já que duas das listas permitem uma eliminação em lote. Acrescente-as se a sua base as usar para designar pessoas desconhecidas.
+sv: initialer (N, X) och förkortningar (N., X.) kan stå för ett verkligt för- eller efternamn. Av försiktighet finns de inte i standardlistan, eftersom två av listorna tillåter satsvis radering. Lägg till dem om din databas använder dem för okända personer.
+
+    unknown persons max shown
+de: angezeigte Einträge pro Liste
+en: entries shown per list
+es: entradas mostradas por lista
+fr: entrées affichées par liste
+it: voci mostrate per elenco
+nl: getoonde items per lijst
+pt: entradas mostradas por lista
+sv: visade poster per lista
+
+    unknown persons names
+de: Platzhalternamen für eine unbekannte Person, durch Kommas getrennt; von der Suche übergangene Namen wie ? oder ?? werden immer berücksichtigt
+en: placeholder names standing for an unknown person, separated by commas; names ignored by search, such as ? or ??, are always taken into account
+es: nombres de sustitución que designan a una persona desconocida, separados por comas; los nombres ignorados por la búsqueda, como ? o ??, siempre se tienen en cuenta
+fr: noms de substitution désignant une personne inconnue, séparés par des virgules ; les noms ignorés par la recherche, tels ? ou ??, sont toujours pris en compte
+it: nomi segnaposto che indicano una persona sconosciuta, separati da virgole; i nomi ignorati dalla ricerca, come ? o ??, sono sempre considerati
+nl: plaatsvervangende namen voor een onbekende persoon, gescheiden door komma’s; namen die zoeken overslaat, zoals ? of ??, tellen altijd mee
+pt: nomes substitutos que designam uma pessoa desconhecida, separados por vírgulas; os nomes ignorados pela pesquisa, como ? ou ??, são sempre tidos em conta
+sv: platshållarnamn för en okänd person, åtskilda med kommatecken; namn som sökningen hoppar över, som ? eller ??, räknas alltid med
+
+    unknown persons with data
+de: unbekannte Personen mit Daten/oder mit Eltern, ohne ? ? zu heißen, von Hand zu bearbeiten
+en: unknown persons with data/or with parents without being named ? ?, to process by hand
+es: personas desconocidas con datos/o con padres sin llamarse ? ?, a tratar a mano
+fr: personnes inconnues avec des données/ou ayant des parents sans être nommées ? ?, à traiter à la main
+it: persone sconosciute con dati/o con genitori senza chiamarsi ? ?, da trattare a mano
+nl: onbekende personen met gegevens/of met ouders zonder ? ? te heten, handmatig te verwerken
+pt: pessoas desconhecidas com dados/ou com pais sem se chamarem ? ?, a tratar manualmente
+sv: okända personer med uppgifter/eller med föräldrar utan att heta ? ?, att behandla för hand
+
+    unknown persons without data
+de: unbekannte Personen ohne Daten/das Löschen ersetzt sie in ihren Familien durch ? ? oder entfernt sie, wenn sie isoliert sind
+en: unknown persons without data/deleting them replaces them with ? ? in their families, or removes them when isolated
+es: personas desconocidas sin datos/borrarlas las reemplaza por ? ? en sus familias, o las elimina si están aisladas
+fr: personnes inconnues sans données/la suppression les remplace par ? ? dans leurs familles, ou les efface si elles sont isolées
+it: persone sconosciute senza dati/la cancellazione le sostituisce con ? ? nelle loro famiglie, o le elimina se isolate
+nl: onbekende personen zonder gegevens/verwijderen vervangt ze door ? ? in hun gezinnen, of wist ze als ze geïsoleerd zijn
+pt: pessoas desconhecidas sem dados/a supressão substitui-as por ? ? nas suas famílias, ou elimina-as se estiverem isoladas
+sv: okända personer utan uppgifter/borttagningen ersätter dem med ? ? i deras familjer, eller tar bort dem om de är isolerade
+
     unknown spouse
 co: cumpagni scunnisciuti
 de: fehlende(r) Ehegatte(n)
