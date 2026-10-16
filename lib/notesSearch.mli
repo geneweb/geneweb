@@ -1,24 +1,43 @@
 (** Text search helpers for misc notes. Matching follows [Util.in_text]: exact
-    when [case_sens] is [true], otherwise case- and accent-insensitive. *)
+    when [case_sens] is [true], otherwise case- and accent-insensitive.
+
+    A query is a list of [terms] (see {!terms}); the functions below find,
+    count and highlight occurrences of any of them. *)
+
+val query : bool -> string -> string list * string list
+(** [query case_sens q] splits the query [q] into terms: words separated by
+    white space, or phrases between double quotes (["Saint Pair"]), and
+    returns [(required, excluded)]. A term written with a leading ['-']
+    ([-word], [-"some phrase"]) is excluded; a ['-'] inside a word
+    ([Saint-Pair]) is not special and a lone ['-'] is ignored. Empty terms and
+    duplicates (equal as compared by [Util.in_text]) are dropped. *)
+
+val terms : bool -> string -> string list
+(** [terms case_sens q] is the list of required terms of [query case_sens q],
+    the ones to highlight. *)
+
+val mem_all : bool -> string list -> string -> bool
+(** [mem_all case_sens terms p] is [true] if every term occurs in [p]. *)
 
 val plain_text : string -> string
 (** [plain_text m] is the readable text of the note source [m]: HTML tags
     dropped, wiki links replaced by their displayed text, [''] and [=] markup
     removed, common HTML entities decoded and white space collapsed. *)
 
-val count_occurrences : bool -> string -> string -> int
-(** [count_occurrences case_sens s p] counts non-overlapping occurrences of [s]
-    in the plain text [p]. *)
+val count_occurrences : bool -> string list -> string -> int
+(** [count_occurrences case_sens terms p] counts non-overlapping occurrences
+    of any of [terms] in the plain text [p]. *)
 
-val snippet : ?context:int -> bool -> string -> string -> string
-(** [snippet ?context case_sens s p] is an HTML-escaped excerpt of the plain
-    text [p] around the first occurrence of [s] (about [context] bytes on each
+val snippet : ?context:int -> bool -> string list -> string -> string
+(** [snippet ?context case_sens terms p] is an HTML-escaped excerpt of the
+    plain text [p] around the first occurrence of any of [terms] (about [context] bytes on each
     side, default 80), with occurrences wrapped in [<span class="found">] and an
     ellipsis on truncated sides. Without an occurrence, the beginning of [p] is
     returned. *)
 
-val highlight_html : bool -> string -> string -> string
-(** [highlight_html case_sens s html] wraps every occurrence of [s] in the text
+val highlight_html : bool -> string list -> string -> string
+(** [highlight_html case_sens terms html] wraps every occurrence of any of
+    [terms] in the text
     of the rendered HTML [html] in [<span class="found">], the first one with
     [id="first-found"] so that a [#first-found] URL fragment scrolls to it.
     Tags, attribute values, comments and the contents of [script], [style],
@@ -27,6 +46,6 @@ val highlight_html : bool -> string -> string -> string
     run as one space. Occurrences that span a tag ([mou<i>lin</i>]) are not
     highlighted. *)
 
-val highlight : bool -> string -> string -> string
-(** [highlight case_sens s p] is the whole plain text [p], HTML-escaped, with
-    occurrences of [s] wrapped in [<span class="found">]. *)
+val highlight : bool -> string list -> string -> string
+(** [highlight case_sens terms p] is the whole plain text [p], HTML-escaped,
+    with occurrences of [terms] wrapped in [<span class="found">]. *)
