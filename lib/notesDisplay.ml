@@ -961,6 +961,7 @@ let print_misc_notes conf base =
 (* searching *)
 type search_hit = {
   sh_fnotes : string;
+  sh_file : string;  (** file read, relative to the base directory *)
   sh_title : string;  (** plain text *)
   sh_in_title : bool;
   sh_count : int;  (** occurrences in the body *)
@@ -974,8 +975,35 @@ let note_is_restricted conf base nenv =
   | None | Some "" -> false
   | Some l -> is_restricted conf base (String.split_on_char ',' l)
 
+(* File holding the note [fnotes], relative to the base directory, as read by
+   [Driver.base_notes_read]: [notes] for the base notes. [None] for a name
+   that [read_notes] cannot map to a file (it would read the base notes). *)
+let note_file base fnotes =
+  if fnotes = "" then Some "notes"
+  else
+    match NotesLinks.check_file_name fnotes with
+    | Some (dl, f) ->
+        Some
+          (String.concat "/"
+             (Driver.base_notes_dir base
+             :: List.fold_right (fun d acc -> d :: acc) dl [ f ^ ".txt" ]))
+    | None -> None
+
 let collect_search_hits conf base case_sens s =
-  let pages = "" :: List.map fst (notes_links_db conf base true) in
+  let pages =
+    ""
+    :: List.filter_map
+         (fun (fnotes, _) ->
+           if fnotes = "" then None
+           else
+             match note_file base fnotes with
+             | Some _ -> Some fnotes
+             | None ->
+                 Log.warn (fun k ->
+                     k "notes search: skipping invalid page name %S" fnotes);
+                 None)
+         (notes_links_db conf base true)
+  in
   List.fold_left
     (fun acc fnotes ->
       let nenv, nt = read_notes base fnotes in
@@ -990,6 +1018,7 @@ let collect_search_hits conf base case_sens s =
         if in_title || count > 0 || in_text case_sens s nt then
           {
             sh_fnotes = fnotes;
+            sh_file = Option.value ~default:"" (note_file base fnotes);
             sh_title = NotesSearch.plain_text tit;
             sh_in_title = in_title;
             sh_count = count;
@@ -1020,10 +1049,8 @@ let print_search_hit conf case_sens s hit =
     else (Util.escape_html hit.sh_fnotes :> string)
   in
   let page_name =
-    if hit.sh_fnotes = "" || hit.sh_title = "" then ""
-    else
-      Format.sprintf {|<span class="text-muted small ms-2">[%s]</span>|}
-        (Util.escape_html hit.sh_fnotes :> string)
+    Format.sprintf {|<code class="small ms-2">%s</code>|}
+      (Util.escape_html hit.sh_file :> string)
   in
   let count =
     if hit.sh_count = 0 then ""

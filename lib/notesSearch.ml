@@ -10,6 +10,17 @@ let named_entities =
     ("quot", "\"");
     ("apos", "'");
     ("nbsp", " ");
+    ("hellip", "…");
+    ("mdash", "—");
+    ("ndash", "–");
+    ("laquo", "«");
+    ("raquo", "»");
+    ("lsquo", "‘");
+    ("rsquo", "’");
+    ("ldquo", "“");
+    ("rdquo", "”");
+    ("euro", "€");
+    ("copy", "©");
   ]
 
 (* [decode_entity m i] decodes the character reference starting with '&' at

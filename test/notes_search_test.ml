@@ -22,7 +22,10 @@ let test_count () =
   Alcotest.(check int) "link text" 1 (count false "famille");
   Alcotest.(check int) "accent-insensitive" 1 (count false "chateau");
   Alcotest.(check int) "markup not matched" 0 (count false "href");
-  Alcotest.(check int) "decoded entity" 1 (count false "& les")
+  Alcotest.(check int) "decoded entity" 1 (count false "& les");
+  Alcotest.(check string)
+    "named and numeric entities" "… — «x» &"
+    (NotesSearch.plain_text "&hellip; &mdash; &laquo;x&raquo; &#x26;")
 
 let test_find_in_text () =
   Alcotest.(check (option (pair int int)))
