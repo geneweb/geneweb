@@ -975,13 +975,7 @@ let acces_n conf base n x : Adef.escaped_string =
     if Driver.get_occ x <> 0 then
       "&oc" ^<^ n ^>^ "=" ^ string_of_int (Driver.get_occ x)
     else Adef.escaped ""
-  else
-    "i" ^<^ n ^^^ "="
-    ^<^ Driver.Iper.to_string (Driver.get_iper x)
-    ^<^
-    if conf.wizard && Driver.get_occ x <> 0 then
-      "&oc" ^<^ n ^>^ "=" ^ string_of_int (Driver.get_occ x)
-    else Adef.escaped ""
+  else "i" ^<^ n ^>^ "=" ^ Driver.Iper.to_string (Driver.get_iper x)
 
 (* ********************************************************************** *)
 (*  [Fonc] acces : config -> base -> person -> string                     *)

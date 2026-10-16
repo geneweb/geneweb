@@ -280,7 +280,7 @@
         <i class="fa fa-code-fork ms-2"></i>
         [sort by/branch/alphabetic order]1
         <i class="fa-solid fa-arrow-down-a-z ms-2"></i>
-        <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;">%nn;
+        <a href="%prefix;%access;&m=A&t=%e.t;&sosab=%e.sosab;&v=%e.v;">%nn;
           [sort by/branch/alphabetic order]2</a>
       </div>
     %end;
@@ -359,7 +359,7 @@
         [*help surname branch].<br>
         <b>[*sort by/branch/alphabetic order]0</b>
         <i class="fa fa-code-fork ms-2"></i>
-        <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;&sort=on">%nn;
+        <a href="%prefix;%access;&m=A&t=%e.t;&sosab=%e.sosab;&v=%e.v;&sort=on">%nn;
           [sort by/branch/alphabetic order]1</a>%nn;
         <i class="fa-solid fa-arrow-down-a-z ms-2"></i> [sort by/branch/alphabetic order]2
       </div>
