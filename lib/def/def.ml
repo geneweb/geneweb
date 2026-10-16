@@ -388,6 +388,8 @@ type ('iper, 'person, 'family, 'string) base_changed =
       ('iper, 'person, 'string) gen_person
       * ('iper, 'person, 'string) gen_person
       * ('iper, 'person, 'string) gen_person
+      (** Kept person before the merge, deleted person, kept person after the
+          merge. *)
   | U_Send_image of ('iper, 'person, 'string) gen_person
   | U_Delete_image of ('iper, 'person, 'string) gen_person
   | U_Add_family of

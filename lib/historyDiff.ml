@@ -186,20 +186,7 @@ let record_diff conf base changed =
       | U_Add_person p -> print_ind_add p
       | U_Modify_person (o, p) -> print_ind_mod o p
       | U_Delete_person _ -> ()
-      | U_Merge_person (_, o, p) ->
-          let o_person_file = history_file o.first_name o.surname o.occ in
-          let person_file = history_file p.first_name p.surname p.occ in
-          let fname = history_path conf person_file in
-          let gr = make_gen_record conf base false p in
-          (* La clé a changé avec la fusion, on reprend l'ancien historique. *)
-          if o_person_file <> person_file then (
-            let ofname = history_path conf o_person_file in
-            (try
-               let () = create_history_dirs conf person_file in
-               Sys.rename ofname fname
-             with Sys_error _ -> ());
-            write_history_file conf person_file fname gr)
-          else write_history_file conf person_file fname gr
+      | U_Merge_person (o, _, p) -> print_ind_mod o p
       | U_Delete_family (_p, _f) -> ()
       | U_Add_family (p, f)
       | U_Modify_family (p, _, f)
