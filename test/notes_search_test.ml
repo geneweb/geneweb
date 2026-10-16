@@ -173,6 +173,28 @@ let test_full_word () =
     "mem_all" false
     (NotesSearch.mem_all ~full_word:true false [ "l'a" ] "l'aube")
 
+let test_wildcards () =
+  let count fw t p = NotesSearch.count_occurrences ~full_word:fw false [ t ] p in
+  let text = "Henri, Henriette, Juliette et Jean-Henri" in
+  Alcotest.(check int) "henri word only" 2 (count true "henri" text);
+  Alcotest.(check int) "henri* prefix" 3 (count true "henri*" text);
+  Alcotest.(check int) "*ette suffix" 2 (count true "*ette" text);
+  Alcotest.(check int) "ette needs both sides" 0 (count true "ette" text);
+  Alcotest.(check int) "*enri* anywhere" 3 (count true "*enri*" text);
+  Alcotest.(check int) "prefix still bounded before" 0
+    (count true "enri*" text);
+  Alcotest.(check int) "star ignored when not full word" 3
+    (count false "henri*" text);
+  Alcotest.(check int) "inner star is literal" 0 (count true "hen*ette" text);
+  Alcotest.(check string)
+    "highlight without the star"
+    {|<span class="found" id="first-found">Henriette</span>|}
+    (NotesSearch.highlight_html ~full_word:true false [ "*ette" ] "Henriette");
+  Alcotest.(check (list string))
+    "star-only terms dropped" [ "a" ]
+    (NotesSearch.terms false "* a **");
+  Alcotest.(check string) "core" "henri" (NotesSearch.core "**henri*")
+
 let test_and () =
   Alcotest.(check bool)
     "all present" true
@@ -206,5 +228,6 @@ let v =
         Alcotest.test_case "exclusion" `Quick test_exclusion;
         Alcotest.test_case "apostrophes" `Quick test_apostrophes;
         Alcotest.test_case "full word" `Quick test_full_word;
+        Alcotest.test_case "wildcards" `Quick test_wildcards;
       ] );
   ]
