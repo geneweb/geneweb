@@ -54,14 +54,21 @@ let test_round_trip () =
   let read =
     NotesCorpus.fold_entries "fake"
       (fun kind id text acc ->
-        (NotesCorpus.(match kind with
-          | Person -> "p" | Family -> "f" | Person_event -> "pe" | Family_event -> "fe")
-        ^ id ^ ":" ^ text) :: acc)
+        (NotesCorpus.(
+           match kind with
+           | Person -> "p"
+           | Family -> "f"
+           | Person_event -> "pe"
+           | Family_event -> "fe")
+        ^ id ^ ":" ^ text)
+        :: acc)
       []
     |> List.rev
   in
   Alcotest.(check (list string))
-    "entries, folded" [ "p3:le moulin de l'eglise"; "f0:x" ] read;
+    "entries, folded"
+    [ "p3:le moulin de l'eglise"; "f0:x" ]
+    read;
   (* a rebuilt base (other "base" file) makes the corpus outdated *)
   write_file (file "base") "version 2";
   Alcotest.(check string)
@@ -106,20 +113,24 @@ let test_changes () =
 
 let test_candidate () =
   let cand q = NotesSearch.candidate (NotesSearch.query false q) in
-  let f = NotesSearch.fold "Jean-Pierre Dupond, baptisé à l’Église de Saint‑Pair" in
+  let f =
+    NotesSearch.fold "Jean-Pierre Dupond, baptisé à l’Église de Saint‑Pair"
+  in
   Alcotest.(check bool) "folded word" true (cand "eglise" f);
   Alcotest.(check bool) "accented query" true (cand "Église baptisé" f);
   Alcotest.(check bool) "apostrophe" true (cand "l'eglise" f);
   Alcotest.(check bool) "joker pieces" true (cand "jean?pierre dupon?" f);
   Alcotest.(check bool) "stars dropped" true (cand "*pierre*" f);
   Alcotest.(check bool) "missing word" false (cand "moulin" f);
-  Alcotest.(check bool) "exclusions left to the exact match" true
-    (cand "dupond -eglise" f);
+  Alcotest.(check bool)
+    "exclusions left to the exact match" true (cand "dupond -eglise" f);
   (* never rejects what matches accepts, whatever the mode *)
   let texts =
     [ "Église Saint-Pierre"; "l’aube"; "Jean Pierre"; "HENRIETTE"; "Dupont" ]
   in
-  let queries = [ "eglise"; "l'a"; "jean?pierre"; "henri*"; "*ette"; "dupon?" ] in
+  let queries =
+    [ "eglise"; "l'a"; "jean?pierre"; "henri*"; "*ette"; "dupon?" ]
+  in
   List.iter
     (fun cs ->
       List.iter

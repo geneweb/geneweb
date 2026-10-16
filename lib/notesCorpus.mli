@@ -61,21 +61,20 @@ val file : string -> string
 val write : string -> entry list -> unit
 (** [write bname entries] writes the corpus file of [bname] with [entries],
     their text being stored {!NotesSearch.fold}ed. The file is written to a
-    temporary name and renamed when complete, so that a running gwd never
-    reads a partial file. *)
+    temporary name and renamed when complete, so that a running gwd never reads
+    a partial file. *)
 
 type status =
   | Missing  (** no corpus file, or unreadable *)
   | Outdated
-      (** built for another version of the base (new gwc run), or in an
-          older file format *)
+      (** built for another version of the base (new gwc run), or in an older
+          file format *)
   | Available of t
 
 val read : string -> status
 (** [read bname] reads and checks the corpus of the base [bname]. *)
 
-val fold_entries :
-  string -> (kind -> string -> string -> 'a -> 'a) -> 'a -> 'a
+val fold_entries : string -> (kind -> string -> string -> 'a -> 'a) -> 'a -> 'a
 (** [fold_entries bname f acc] reads the corpus file of [bname] line by line,
     calling [f kind id folded_text] on each entry. *)
 

@@ -104,5 +104,5 @@ val print_misc_notes_search : Config.config -> Driver.base -> unit
 (** [print_misc_notes_search conf base] serves [m=MISC_NOTES_SEARCH]. With [f]
     (a misc note, [f=] for the base notes, as set by the links of the notes
     search results) and [s], that note is rendered with the terms of [s]
-    highlighted (a gallery note as by [m=GALLERY]). Otherwise the search is
-    the merged {!NotesSearchDisplay.print}. Without [s], the misc notes list. *)
+    highlighted (a gallery note as by [m=GALLERY]). Otherwise the search is the
+    merged {!NotesSearchDisplay.print}. Without [s], the misc notes list. *)

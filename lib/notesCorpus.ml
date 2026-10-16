@@ -4,7 +4,6 @@ module Database = Geneweb_db.Database
 
 type kind = Person | Family | Person_event | Family_event
 type entry = { kind : kind; id : string; evt : int; text : string }
-
 type t = { fingerprint : string; built : float; synchro_len : int }
 
 (* File format: a text header, then one line per note:
@@ -84,8 +83,8 @@ let kind_of_code c =
   | _ -> None
 
 let output_header oc h =
-  Printf.fprintf oc "%s %d\n%s\n%.0f\n%d\n" magic current_version
-    h.fingerprint h.built h.synchro_len
+  Printf.fprintf oc "%s %d\n%s\n%.0f\n%d\n" magic current_version h.fingerprint
+    h.built h.synchro_len
 
 let output_entry oc e =
   Printf.fprintf oc "%s %s %d\t%s\n" (kind_code e.kind) e.id e.evt

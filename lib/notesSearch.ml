@@ -571,7 +571,7 @@ let fold s =
   let len = String.length s in
   let b = Buffer.create len in
   let rec loop i =
-    if i < len then
+    if i < len then (
       if
         i + 2 < len
         && s.[i] = '\xE2'
@@ -583,7 +583,7 @@ let fold s =
       else
         let t, j = Name.unaccent_utf_8 true s i in
         Buffer.add_string b t;
-        loop (if j > i then j else i + 1)
+        loop (if j > i then j else i + 1))
   in
   loop 0;
   Buffer.contents b

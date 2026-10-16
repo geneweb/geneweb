@@ -107,8 +107,8 @@ let matches q text =
   NotesSearch.matches ~full_word:q.full_word q.case_sens q.terms text
 
 let count q text =
-  NotesSearch.count_occurrences ~full_word:q.full_word q.case_sens
-    (fst q.terms) text
+  NotesSearch.count_occurrences ~full_word:q.full_word q.case_sens (fst q.terms)
+    text
 
 let snippet q text =
   NotesSearch.snippet ~full_word:q.full_word q.case_sens (fst q.terms) text
@@ -217,11 +217,11 @@ let wiz_hits conf base q =
                       (query_params q)
                       (Mutil.encode wz :> string);
                   label =
-                    (Util.escape_html (WiznotesDisplay.wizard_display_name conf wz)
+                    (Util.escape_html
+                       (WiznotesDisplay.wizard_display_name conf wz)
                       :> string);
                   icon = "file-lines";
-                  file =
-                    Driver.base_wiznotes_dir base ^ "/" ^ wz ^ ".txt";
+                  file = Driver.base_wiznotes_dir base ^ "/" ^ wz ^ ".txt";
                 };
             event = Adef.safe "";
             rank = 0;
@@ -305,8 +305,8 @@ let corpus_hits conf base q bname (ch_p, ch_f) max =
       match kind with
       | NotesCorpus.Person | NotesCorpus.Person_event ->
           let ip = Driver.Iper.of_string id in
-          if Driver.Iper.Set.mem ip ch_p || Driver.Iper.Table.mem seen_p ip
-          then acc
+          if Driver.Iper.Set.mem ip ch_p || Driver.Iper.Table.mem seen_p ip then
+            acc
           else (
             Driver.Iper.Table.add seen_p ip ();
             check acc (person_hits conf base q ip))
@@ -506,7 +506,8 @@ let subject_html conf base hl subject =
       person_link conf base hl fath
       ^ " "
       ^ edit_dates conf
-          (Printf.sprintf "m=MOD_FAM&i=%s&ip=%s" (Driver.Ifam.to_string ifam)
+          (Printf.sprintf "m=MOD_FAM&i=%s&ip=%s"
+             (Driver.Ifam.to_string ifam)
              (Driver.Iper.to_string (Driver.get_iper fath)))
           (Printf.sprintf "%s %s %s %s"
              (Utf8.capitalize_fst
@@ -569,7 +570,9 @@ let print_message conf msg =
 
 (* hits of the corpus groups in scope, after the corpus status *)
 let search_corpus conf base q =
-  if not (List.exists (function Corpus _ -> true | Misc | Wiz -> false) q.scope)
+  if
+    not
+      (List.exists (function Corpus _ -> true | Misc | Wiz -> false) q.scope)
   then []
   else
     let bname = Filename.remove_extension conf.bname in
