@@ -688,13 +688,18 @@ val is_that_user_and_password : auth_scheme_kind -> string -> string -> bool
 (* Searching *)
 
 val in_text : bool -> string -> string -> bool
+(** [in_text case_sens s m] is [true] if [s] occurs in the text of [m] (outside
+    HTML tags, wiki links compared on their displayed text). When [case_sens]
+    is [false], the comparison ignores case and accents, and the typographic
+    apostrophes ‘ and ’ are equal to ['] (this also applies to
+    {!find_in_text} and {!html_highlight}). *)
 
 val find_in_text : bool -> string -> string -> int -> (int * int) option
 (** [find_in_text case_sens s m i] is the first occurrence of [s] in the plain
     text [m] starting at or after byte [i], as [Some (start, stop)] byte
     offsets ([stop] excluded). Comparison follows [in_text]: exact when
-    [case_sens], otherwise case- and accent-insensitive. [None] if [s] is empty
-    or not found. *)
+    [case_sens], otherwise insensitive to case, accents and apostrophe
+    style. [None] if [s] is empty or not found. *)
 
 val html_highlight : bool -> string -> string -> string
 

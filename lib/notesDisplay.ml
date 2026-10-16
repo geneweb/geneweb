@@ -78,6 +78,9 @@ let rec is_restricted conf base anc_l =
   | anc :: l ->
       if is_ancestor conf base anc then false else is_restricted conf base l
 
+(* "full word" box of the notes search form: [word=on] *)
+let full_word_search conf = p_getenv conf.env "word" = Some "on"
+
 let print_search_form conf =
   Output.printf conf
     {|<div class="mt-3">
@@ -101,6 +104,13 @@ let print_search_form conf =
   Output.printf conf {|<label class="form-check-label" for="case">%s</label>|}
     (transl_nth conf "search/case sensitive" 1);
   Output.print_sstring conf "</div>";
+  Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
+  Output.printf conf
+    {|<input type="checkbox" name="word" value="on" class="form-check-input" id="word"%s>|}
+    (if full_word_search conf then " checked" else "");
+  Output.printf conf {|<label class="form-check-label" for="word">%s</label>|}
+    (transl conf "word match");
+  Output.print_sstring conf "</div>";
   Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
   transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -113,7 +123,8 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
       let title_text =
         match ho with
         | Some (case_sens, h) ->
-            NotesSearch.highlight_html case_sens
+            NotesSearch.highlight_html ~full_word:(full_word_search conf)
+              case_sens
               (NotesSearch.terms case_sens h)
               (title : Adef.safe_string :> string)
             |> Adef.safe
@@ -163,7 +174,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   let s =
     match ho with
     | Some (case_sens, h) ->
-        NotesSearch.highlight_html case_sens
+        NotesSearch.highlight_html ~full_word:(full_word_search conf) case_sens
           (NotesSearch.terms case_sens h)
           (s :> string)
         |> Adef.safe
@@ -1002,7 +1013,7 @@ let is_gallery nenv =
 
 (* A note is a hit when every required term occurs in its title or its text
    and no excluded term does. *)
-let collect_search_hits conf base case_sens (terms, excluded) =
+let collect_search_hits conf base ~full_word case_sens (terms, excluded) =
   let pages =
     ""
     :: List.filter_map
@@ -1024,14 +1035,20 @@ let collect_search_hits conf base case_sens (terms, excluded) =
       else
         let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
         let plain = NotesSearch.plain_text nt in
-        let in_title =
-          List.length (List.filter (fun t -> in_text case_sens t tit) terms)
+        let plain_tit = NotesSearch.plain_text tit in
+        (* Without [full_word], [in_text] on the source is also tried
+           besides the decoded text ([plain]: entities, '' and = markup).
+           [full_word] needs to see the neighbouring characters, which
+           only the decoded text gives. *)
+        let in_tit t =
+          if full_word then NotesSearch.mem_all ~full_word case_sens [ t ] plain_tit
+          else in_text case_sens t tit
         in
-        (* [in_text] works on the source, [plain] is the decoded text
-           (entities, '' and = markup): a match in either counts *)
+        let in_title = List.length (List.filter in_tit terms) in
         let present t =
-          in_text case_sens t tit || in_text case_sens t nt
-          || NotesSearch.mem_all case_sens [ t ] plain
+          in_tit t
+          || ((not full_word) && in_text case_sens t nt)
+          || NotesSearch.mem_all ~full_word case_sens [ t ] plain
         in
         if
           List.for_all present terms
@@ -1041,10 +1058,11 @@ let collect_search_hits conf base case_sens (terms, excluded) =
             sh_fnotes = fnotes;
             sh_file = Option.value ~default:"" (note_file base fnotes);
             sh_gallery = is_gallery nenv;
-            sh_title = NotesSearch.plain_text tit;
+            sh_title = plain_tit;
             sh_in_title = in_title;
-            sh_count = NotesSearch.count_occurrences case_sens terms plain;
-            sh_snippet = NotesSearch.snippet case_sens terms plain;
+            sh_count =
+              NotesSearch.count_occurrences ~full_word case_sens terms plain;
+            sh_snippet = NotesSearch.snippet ~full_word case_sens terms plain;
           }
           :: acc
         else acc)
@@ -1055,23 +1073,24 @@ let collect_search_hits conf base case_sens (terms, excluded) =
       | 0 -> Int.compare h2.sh_count h1.sh_count
       | c -> c)
 
-let print_search_hit conf case_sens s terms hit =
+let print_search_hit conf ~full_word case_sens s terms hit =
   let href =
     if hit.sh_gallery then
       Printf.sprintf "%sm=GALLERY&f=%s"
         (commd conf :> string)
         (Mutil.encode hit.sh_fnotes :> string)
     else
-      Printf.sprintf "%sm=MISC_NOTES_SEARCH&s=%s%s&f=%s#first-found"
+      Printf.sprintf "%sm=MISC_NOTES_SEARCH&s=%s%s%s&f=%s#first-found"
         (commd conf :> string)
         (Mutil.encode s :> string)
         (if case_sens then "&c=on" else "")
+        (if full_word then "&word=on" else "")
         (Mutil.encode hit.sh_fnotes :> string)
   in
   let icon = if hit.sh_gallery then "image" else "file-lines" in
   let label =
     if hit.sh_title <> "" then
-      NotesSearch.highlight case_sens terms hit.sh_title
+      NotesSearch.highlight ~full_word case_sens terms hit.sh_title
     else if hit.sh_fnotes = "" then
       (Util.escape_html (Utf8.capitalize_fst (transl conf "base notes"))
         :> string)
@@ -1095,7 +1114,7 @@ let print_search_hit conf case_sens s terms hit =
 |}
     icon href label page_name count hit.sh_snippet
 
-let print_search_hits conf case_sens s terms hits =
+let print_search_hits conf ~full_word case_sens s terms hits =
   let title _ =
     Printf.sprintf
       (ftransl conf "NOTIF all results for %s")
@@ -1109,7 +1128,7 @@ let print_search_hits conf case_sens s terms hits =
         (Utf8.capitalize_fst (transl conf "no match"))
   | _ :: _ ->
       Output.print_sstring conf {|<ul class="list-group mb-3">|};
-      List.iter (print_search_hit conf case_sens s terms) hits;
+      List.iter (print_search_hit conf ~full_word case_sens s terms) hits;
       Output.print_sstring conf "</ul>\n");
   print_search_form conf;
   Hutil.trailer conf
@@ -1146,9 +1165,12 @@ let search_text conf base s =
     match requested with
     | Some fnotes -> print_found_note conf base case_sens s fnotes
     | None -> (
-        match collect_search_hits conf base case_sens (terms, excluded) with
+        let full_word = full_word_search conf in
+        match
+          collect_search_hits conf base ~full_word case_sens (terms, excluded)
+        with
         | [ hit ] -> print_found_note conf base case_sens s hit.sh_fnotes
-        | hits -> print_search_hits conf case_sens s terms hits)
+        | hits -> print_search_hits conf ~full_word case_sens s terms hits)
 
 let print_misc_notes_search conf base =
   match try Some (List.assoc "s" conf.env) with Not_found -> None with
