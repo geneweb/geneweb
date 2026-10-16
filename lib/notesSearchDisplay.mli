@@ -1,7 +1,7 @@
 val print : Config.config -> Geneweb_db.Driver.base -> unit
 (** [print conf base] renders [m=NOTES_SEARCH]: a search in the person, family
-    and event notes of the base, for friends and wizards only (the route is
-    guarded in gwd's request dispatcher, and [print] refuses other users too).
+    and event notes of the base, for friends and wizards only: other users get a
+    "notes search reserved to friends or wizards" page (HTTP 401).
 
     The query [s] follows the misc notes search ({!NotesSearch.query}: AND-ed
     words, ["phrases"], [-excluded], [*] and [?]), with [c=on] (case sensitive)

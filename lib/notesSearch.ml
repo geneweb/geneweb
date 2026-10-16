@@ -345,8 +345,7 @@ let mem_all ?(full_word = false) case_sens terms p =
 
 let matches ?(full_word = false) case_sens (terms, excluded) p =
   mem_all ~full_word case_sens terms p
-  && not
-       (List.exists (fun t -> mem_all ~full_word case_sens [ t ] p) excluded)
+  && not (List.exists (fun t -> mem_all ~full_word case_sens [ t ] p) excluded)
 
 let count_occurrences ?(full_word = false) case_sens terms p =
   let rec loop n i =

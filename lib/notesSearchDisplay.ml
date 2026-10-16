@@ -9,7 +9,12 @@ type scope = { sc_p : bool; sc_f : bool; sc_pe : bool; sc_fe : bool }
 let scope_of_env conf =
   let on k = p_getenv conf.env k = Some "on" in
   let sc =
-    { sc_p = on "sc_p"; sc_f = on "sc_f"; sc_pe = on "sc_pe"; sc_fe = on "sc_fe" }
+    {
+      sc_p = on "sc_p";
+      sc_f = on "sc_f";
+      sc_pe = on "sc_pe";
+      sc_fe = on "sc_fe";
+    }
   in
   if sc.sc_p || sc.sc_f || sc.sc_pe || sc.sc_fe then sc
   else { sc_p = true; sc_f = true; sc_pe = true; sc_fe = true }
@@ -21,8 +26,7 @@ let in_scope sc kind =
   | NotesCorpus.Person_event -> sc.sc_pe
   | NotesCorpus.Family_event -> sc.sc_fe
 
-let kinds =
-  NotesCorpus.[ Person; Family; Person_event; Family_event ]
+let kinds = NotesCorpus.[ Person; Family; Person_event; Family_event ]
 
 let scope_index kind =
   match kind with
@@ -70,7 +74,9 @@ type query = {
 }
 
 let hit_of_entry q subject event (e : NotesCorpus.entry) =
-  if in_scope q.scope e.kind && NotesSearch.matches ~full_word:q.full_word q.case_sens q.terms e.text
+  if
+    in_scope q.scope e.kind
+    && NotesSearch.matches ~full_word:q.full_word q.case_sens q.terms e.text
   then
     let required = fst q.terms in
     Some
@@ -82,8 +88,7 @@ let hit_of_entry q subject event (e : NotesCorpus.entry) =
           NotesSearch.count_occurrences ~full_word:q.full_word q.case_sens
             required e.text;
         snippet =
-          NotesSearch.snippet ~full_word:q.full_word q.case_sens required
-            e.text;
+          NotesSearch.snippet ~full_word:q.full_word q.case_sens required e.text;
       }
   else None
 
@@ -153,7 +158,9 @@ let candidates q (corpus : NotesCorpus.t) (ch_p, ch_f) =
                 Cand_person ip :: acc)
           | NotesCorpus.Family | NotesCorpus.Family_event ->
               let ifam = Driver.Ifam.of_string e.id in
-              if Driver.Ifam.Set.mem ifam ch_f || Driver.Ifam.Table.mem seen_f ifam
+              if
+                Driver.Ifam.Set.mem ifam ch_f
+                || Driver.Ifam.Table.mem seen_f ifam
               then acc
               else (
                 Driver.Ifam.Table.add seen_f ifam ();
@@ -186,8 +193,8 @@ let collect conf base q cands max =
   loop 0 [] cands
 
 let print_form conf s q =
-  Output.printf conf
-    {|<form class="mb-3" method="get" action="%s">|} conf.command;
+  Output.printf conf {|<form class="mb-3" method="get" action="%s">|}
+    conf.command;
   hidden_env conf;
   Output.print_sstring conf
     {|<input type="hidden" name="m" value="NOTES_SEARCH">|};
@@ -234,7 +241,8 @@ let print_hits conf base hits =
       let l = List.filter (fun h -> h.kind = kind) hits in
       let l = List.stable_sort (fun h1 h2 -> Int.compare h2.count h1.count) l in
       if l <> [] then (
-        Output.printf conf {|<h2 class="h4 mt-4">%s <span class="badge text-bg-secondary">%d</span></h2>|}
+        Output.printf conf
+          {|<h2 class="h4 mt-4">%s <span class="badge text-bg-secondary">%d</span></h2>|}
           (scope_label conf kind) (List.length l);
         Output.print_sstring conf {|<ul class="list-group mb-3">|};
         List.iter
@@ -255,7 +263,8 @@ let print_hits conf base hits =
             Output.printf conf
               {|<li class="list-group-item"><div>%s%s%s</div><div class="small text-muted">%s</div></li>
 |}
-              (subject_html conf base h.subject) event count h.snippet)
+              (subject_html conf base h.subject)
+              event count h.snippet)
           l;
         Output.print_sstring conf "</ul>\n"))
     kinds
@@ -289,7 +298,9 @@ let search conf base q s =
            (date_text corpus.built)
            (Driver.Iper.Set.cardinal ch_p + Driver.Ifam.Set.cardinal ch_f));
       let max = max_results conf in
-      let hits, truncated = collect conf base q (candidates q corpus changes) max in
+      let hits, truncated =
+        collect conf base q (candidates q corpus changes) max
+      in
       if hits = [] then
         Output.printf conf "<p>%s</p>\n"
           (Utf8.capitalize_fst (transl conf "no match"))
@@ -306,9 +317,19 @@ let search conf base q s =
         (if q.full_word then "&word=on" else "")
         (transl conf "miscellaneous notes" |> Utf8.capitalize_fst)
 
+(* Not GWPARAM.output_error: it shows a bare "Incorrect request" whatever
+   the status, which does not tell a visitor that logging in is needed. *)
+let print_reserved conf =
+  Output.status conf Code.Unauthorized;
+  let title _ =
+    transl conf "notes search reserved to friends or wizards"
+    |> Utf8.capitalize_fst |> Output.print_sstring conf
+  in
+  Hutil.rheader conf title;
+  Hutil.trailer conf
+
 let print conf base =
-  if not (conf.wizard || conf.friend) then
-    GWPARAM.output_error conf Code.Unauthorized
+  if not (conf.wizard || conf.friend) then print_reserved conf
   else
     let s =
       match p_getenv conf.env "s" with Some s -> String.trim s | None -> ""

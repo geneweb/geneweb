@@ -17,7 +17,8 @@ let with_fake_base f =
     ~finally:(fun () -> Secure.set_base_dir old)
     (fun () -> f (Filename.concat gwb))
 
-let write_file path s = Out_channel.with_open_bin path (fun oc -> output_string oc s)
+let write_file path s =
+  Out_channel.with_open_bin path (fun oc -> output_string oc s)
 
 let write_synchro path l =
   Out_channel.with_open_bin path (fun oc ->
@@ -69,7 +70,8 @@ let test_changes () =
   write_synchro (file "synchro_patches")
     [ ("300", [ 7 ], [ 2 ]); ("200", [ 5; 7 ], []); ("100", [ 1 ], [ 0 ]) ];
   Alcotest.(check (pair (list string) (list string)))
-    "later commits" ([ "5"; "7" ], [ "2" ])
+    "later commits"
+    ([ "5"; "7" ], [ "2" ])
     (names (NotesCorpus.changes "fake" corpus));
   Alcotest.(check string)
     "still available" "available"
@@ -82,7 +84,9 @@ let test_changes () =
 
 let test_matches () =
   let q = NotesSearch.query false "moulin -dupont" in
-  Alcotest.(check bool) "required" true (NotesSearch.matches false q "le moulin");
+  Alcotest.(check bool)
+    "required" true
+    (NotesSearch.matches false q "le moulin");
   Alcotest.(check bool)
     "excluded" false
     (NotesSearch.matches false q "le moulin de Dupont");

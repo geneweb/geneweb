@@ -46,7 +46,9 @@ let person_entries base p =
 
 let family_entries base ifam fam =
   let id = Driver.Ifam.to_string ifam in
-  let acc = entry Family id (-1) (Driver.sou base (Driver.get_comment fam)) [] in
+  let acc =
+    entry Family id (-1) (Driver.sou base (Driver.get_comment fam)) []
+  in
   let _, acc =
     List.fold_left
       (fun (k, acc) e ->
@@ -129,12 +131,14 @@ let changes bname corpus =
         let ps, fs = acc in
         let ps =
           List.fold_left
-            (fun s i -> Driver.Iper.Set.add (Driver.Iper.of_string (string_of_int i)) s)
+            (fun s i ->
+              Driver.Iper.Set.add (Driver.Iper.of_string (string_of_int i)) s)
             ps ipl
         in
         let fs =
           List.fold_left
-            (fun s i -> Driver.Ifam.Set.add (Driver.Ifam.of_string (string_of_int i)) s)
+            (fun s i ->
+              Driver.Ifam.Set.add (Driver.Ifam.of_string (string_of_int i)) s)
             fs ifl
         in
         take (n - 1) rest (ps, fs)

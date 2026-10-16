@@ -15268,6 +15268,11 @@ de: Suche in Personen- und Familiennotizen
 en: search in individual and family notes
 fr: recherche dans les notes d’individus et de familles
 
+    notes search button
+de: Personen- und Familiennotizen
+en: individual and family notes
+fr: notes d’individus et de familles
+
     notes search first results %d
 de: nur die ersten %d Ergebnisse werden angezeigt
 en: only the first %d results are shown
@@ -15287,6 +15292,11 @@ fr: L’index des notes n’a pas encore été construit : lancer « cache_files
 de: Der Notizenindex stammt von einer älteren Version der Datenbank: „cache_files -notes %s“ erneut ausführen.
 en: The notes index was built for an earlier version of the base: run “cache_files -notes %s” again.
 fr: L’index des notes date d’une version antérieure de la base : relancer « cache_files -notes %s ».
+
+    notes search reserved to friends or wizards
+de: Die Suche in den Notizen ist Freunden und Meistern vorbehalten
+en: the notes search is reserved to friends or wizards
+fr: la recherche dans les notes est réservée aux amis et magiciens
 
     notes search scopes
 de: Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen

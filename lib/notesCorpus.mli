@@ -10,8 +10,8 @@
 
     Changes made after the build are followed through the base's
     [synchro_patches]: the persons and families modified since then are read
-    live instead of from the corpus (see {!changes}). A rebuilt base (new
-    [gwc] run) makes the corpus [Outdated]. *)
+    live instead of from the corpus (see {!changes}). A rebuilt base (new [gwc]
+    run) makes the corpus [Outdated]. *)
 
 type kind =
   | Person  (** person notes *)
@@ -23,8 +23,8 @@ type entry = {
   kind : kind;
   id : string;  (** [Iper.to_string] or [Ifam.to_string], following [kind] *)
   evt : int;
-      (** index of the event in [get_pevents] / [get_fevents]; [-1] for
-          [Person] and [Family] *)
+      (** index of the event in [get_pevents] / [get_fevents]; [-1] for [Person]
+          and [Family] *)
   text : string;  (** {!NotesSearch.plain_text} of the note *)
 }
 
@@ -55,8 +55,8 @@ val create : string -> entry list -> t
 
 val build : ?progress:(int -> int -> unit) -> Geneweb_db.Driver.base -> t
 (** [build base] reads every person and family of [base]. [progress i n] is
-    called as the work advances, [n] being the number of persons plus
-    families. *)
+    called as the work advances, [n] being the number of persons plus families.
+*)
 
 val file : string -> string
 (** [file bname] is the corpus file of the base [bname] (without [.gwb]). *)
@@ -74,6 +74,7 @@ type status =
 val read : string -> status
 (** [read bname] reads and checks the corpus of the base [bname]. *)
 
-val changes : string -> t -> Geneweb_db.Driver.Iper.Set.t * Geneweb_db.Driver.Ifam.Set.t
+val changes :
+  string -> t -> Geneweb_db.Driver.Iper.Set.t * Geneweb_db.Driver.Ifam.Set.t
 (** [changes bname corpus] is the set of persons and of families modified since
     [corpus] was built, from the base's [synchro_patches]. *)

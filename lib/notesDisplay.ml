@@ -87,8 +87,8 @@ let print_search_form conf =
 <form class="d-flex align-items-center gap-2" method="get" action="%s">|}
     conf.command;
   hidden_env conf;
-  Output.print_sstring conf
-    {|<input type="hidden" name="m" value="MISC_NOTES_SEARCH">|};
+  (* no hidden m: each submit button sends its own, the first one being the
+     default (Enter in the text box) *)
   Output.print_sstring conf
     {|<input type="text" name="s" size="40" class="form-control w-auto" value="|};
   (match p_getenv conf.env "s" with
@@ -111,22 +111,19 @@ let print_search_form conf =
   Output.printf conf {|<label class="form-check-label" for="word">%s</label>|}
     (transl conf "word match");
   Output.print_sstring conf "</div>";
-  Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
+  Output.print_sstring conf
+    {|<button type="submit" name="m" value="MISC_NOTES_SEARCH" class="btn btn-primary">|};
   transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button>\n</form>\n";
-  (* friends and wizards can also search person, family and event notes *)
+  Output.print_sstring conf "</button>";
+  (* friends and wizards can also search person, family and event notes,
+     with the same text and options *)
   if conf.wizard || conf.friend then
     Output.printf conf
-      {|<div class="mt-1"><a href="%sm=NOTES_SEARCH%s%s%s">%s</a></div>|}
-      (commd conf :> string)
-      (match p_getenv conf.env "s" with
-      | Some s -> "&s=" ^ (Mutil.encode s :> string)
-      | None -> "")
-      (if p_getenv conf.env "c" = Some "on" then "&c=on" else "")
-      (if full_word_search conf then "&word=on" else "")
-      (transl conf "notes search" |> Utf8.capitalize_fst);
-  Output.print_sstring conf "</div>"
+      {|<button type="submit" name="m" value="NOTES_SEARCH" class="btn btn-outline-primary" title="%s">%s</button>|}
+      (transl conf "notes search" |> Utf8.capitalize_fst)
+      (transl conf "notes search button" |> Utf8.capitalize_fst);
+  Output.print_sstring conf "\n</form>\n</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   Hutil.header_without_title conf;

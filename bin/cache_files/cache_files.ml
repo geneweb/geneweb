@@ -251,8 +251,8 @@ let gen_cache bname fname collect_fn =
 let gen_notes_corpus bname base =
   let corpus, duration =
     with_timer (fun () ->
-        ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter
-          (fun bar -> Geneweb.NotesCorpus.build ~progress:(ProgrBar.progress bar) base))
+        ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter (fun bar ->
+            Geneweb.NotesCorpus.build ~progress:(ProgrBar.progress bar) base))
   in
   Geneweb.NotesCorpus.write bname corpus;
   Format.printf "%-*s %d notes, %.2f s@." !width
@@ -295,8 +295,7 @@ let speclist =
     ("-so", Arg.Set sources, " sources");
     ( "-notes",
       Arg.Set notes,
-      " person, family and event notes, for m=NOTES_SEARCH (rebuild nightly)"
-    );
+      " person, family and event notes, for m=NOTES_SEARCH (rebuild nightly)" );
     ("", Arg.Unit (fun () -> ()), "");
     ("-all", Arg.Set all, " build all type of cache files");
     ("", Arg.Unit (fun () -> ()), "");
@@ -332,16 +331,16 @@ let () =
   let only_notes =
     !notes
     && not
-         (!all || !fnames || !snames || !aliases || !pub_names
-        || !fname_aliases || !sname_aliases || !places || !estates || !titles
-        || !occupations || !qualifiers || !sources)
+         (!all || !fnames || !snames || !aliases || !pub_names || !fname_aliases
+        || !sname_aliases || !places || !estates || !titles || !occupations
+        || !qualifiers || !sources)
   in
-  if not only_notes then (
-    match (gen_dl, gen_cd) with
-    | true, true -> Printf.printf "Generating datalist and checkdata caches\n"
-    | false, true -> Printf.printf "Generating CheckData binary caches\n"
-    | true, false -> Printf.printf "Generating datalist compressed caches\n"
-    | false, false -> assert false);
+  (if not only_notes then
+     match (gen_dl, gen_cd) with
+     | true, true -> Printf.printf "Generating datalist and checkdata caches\n"
+     | false, true -> Printf.printf "Generating CheckData binary caches\n"
+     | true, false -> Printf.printf "Generating datalist compressed caches\n"
+     | false, false -> assert false);
 
   let total = ref 0. in
 
@@ -448,8 +447,7 @@ let () =
         !total +. gen_cache bname fname (collect_checkdata_names base field))
     fields;
 
-  if !all || !notes then
-    total := !total +. gen_notes_corpus bname base;
+  if !all || !notes then total := !total +. gen_notes_corpus bname base;
 
   let min, sec = (Float.to_int !total / 60, mod_float !total 60.) in
   Format.printf "Total duration: %d min %6.2f s@." min sec
