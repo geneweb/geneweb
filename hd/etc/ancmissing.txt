@@ -107,7 +107,7 @@
         <td><b>[*sort by/generation/alphabetic order]0</b></td>
         <td><i class="fa fa-sort-numeric-down fa-fw"></i></td>
         <td>
-          <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;%nn;
+          <a href="%prefix;%access;&m=A%nn;
             &t=%e.t;&v=%e_v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al="
           >[sort by/generation/alphabetic order]1
           </a>
@@ -250,7 +250,7 @@
       <td>[sort by/generation/alphabetic order]1</td>
       <td><i class="fa fa-arrow-down-a-z fa-fw"></i></td>
       <td>
-        <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&t=%e.t;&v=%e_v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al=on"
+        <a href="%prefix;%access;&m=A&t=%e.t;&v=%e_v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al=on"
         >[sort by/generation/alphabetic order]2
         </a>
       </td>
