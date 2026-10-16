@@ -132,65 +132,90 @@ let family_hits conf base q ifam =
           hit_of_entry q (Of_family (fath, moth)) event e)
         (NotesCorpus.family_entries base ifam fam)
 
-type candidate = Cand_person of Driver.iper | Cand_family of Driver.ifam
-
-(* Persons and families to check: those with a matching corpus entry, in
-   corpus order, then all those changed since the corpus was built (their
-   corpus entries are stale and skipped). *)
-let candidates q (corpus : NotesCorpus.t) (ch_p, ch_f) =
+(* Hits, at most [max], and [true] if the search stopped there. The corpus
+   is streamed: an entry whose folded text may match is a candidate, checked
+   at once on the live base (access, exact match); persons and families
+   changed since the build are skipped there and checked afterwards, as
+   their corpus text is stale. Stopping at [max] hits bounds the work for
+   common words. *)
+let collect conf base q bname (ch_p, ch_f) max =
   let seen_p = Driver.Iper.Table.create 256 in
   let seen_f = Driver.Ifam.Table.create 256 in
-  let acc =
-    Array.fold_left
-      (fun acc (e : NotesCorpus.entry) ->
-        if
-          in_scope q.scope e.kind
-          && NotesSearch.matches ~full_word:q.full_word q.case_sens q.terms
-               e.text
-        then
-          match e.kind with
-          | NotesCorpus.Person | NotesCorpus.Person_event ->
-              let ip = Driver.Iper.of_string e.id in
-              if Driver.Iper.Set.mem ip ch_p || Driver.Iper.Table.mem seen_p ip
-              then acc
-              else (
-                Driver.Iper.Table.add seen_p ip ();
-                Cand_person ip :: acc)
-          | NotesCorpus.Family | NotesCorpus.Family_event ->
-              let ifam = Driver.Ifam.of_string e.id in
-              if
-                Driver.Ifam.Set.mem ifam ch_f
-                || Driver.Ifam.Table.mem seen_f ifam
-              then acc
-              else (
-                Driver.Ifam.Table.add seen_f ifam ();
-                Cand_family ifam :: acc)
-        else acc)
-      [] corpus.entries
+  let may_match = NotesSearch.candidate q.terms in
+  let exception Enough of hit list in
+  let check (n, acc) hits =
+    let n = n + List.length hits in
+    let acc = List.rev_append hits acc in
+    if n >= max then raise (Enough acc) else (n, acc)
   in
-  let acc =
-    Driver.Iper.Set.fold (fun ip acc -> Cand_person ip :: acc) ch_p acc
+  let from_corpus kind id folded acc =
+    if in_scope q.scope kind && may_match folded then
+      match kind with
+      | NotesCorpus.Person | NotesCorpus.Person_event ->
+          let ip = Driver.Iper.of_string id in
+          if Driver.Iper.Set.mem ip ch_p || Driver.Iper.Table.mem seen_p ip
+          then acc
+          else (
+            Driver.Iper.Table.add seen_p ip ();
+            check acc (person_hits conf base q ip))
+      | NotesCorpus.Family | NotesCorpus.Family_event ->
+          let ifam = Driver.Ifam.of_string id in
+          if Driver.Ifam.Set.mem ifam ch_f || Driver.Ifam.Table.mem seen_f ifam
+          then acc
+          else (
+            Driver.Ifam.Table.add seen_f ifam ();
+            check acc (family_hits conf base q ifam))
+    else acc
   in
-  let acc =
-    Driver.Ifam.Set.fold (fun ifam acc -> Cand_family ifam :: acc) ch_f acc
-  in
-  List.rev acc
+  match
+    let acc = NotesCorpus.fold_entries bname from_corpus (0, []) in
+    let acc =
+      Driver.Iper.Set.fold
+        (fun ip acc -> check acc (person_hits conf base q ip))
+        ch_p acc
+    in
+    Driver.Ifam.Set.fold
+      (fun ifam acc -> check acc (family_hits conf base q ifam))
+      ch_f acc
+  with
+  | _, acc -> (List.rev acc, false)
+  | exception Enough acc -> (List.rev acc, true)
 
-(* hits of the candidates, at most [max]; [true] if some were left out *)
-let collect conf base q cands max =
-  let rec loop n acc cands =
-    match cands with
-    | [] -> (List.rev acc, false)
-    | _ :: _ when n >= max -> (List.rev acc, true)
-    | c :: rest ->
-        let hits =
-          match c with
-          | Cand_person ip -> person_hits conf base q ip
-          | Cand_family ifam -> family_hits conf base q ifam
-        in
-        loop (n + List.length hits) (List.rev_append hits acc) rest
+(* "?" button and the panel it opens (Bootstrap collapse, no script),
+   shared with the misc notes search form. The examples are the same in
+   every language; their explanations come from the lexicon. *)
+let help_id = "notes-search-help"
+
+let print_help_button conf =
+  Output.printf conf
+    {|<button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#%s" aria-expanded="false" aria-controls="%s" title="%s"><i class="far fa-circle-question"></i></button>|}
+    help_id help_id
+    (transl conf "notes search help" |> Utf8.capitalize_fst)
+
+let print_help_panel conf =
+  let rows =
+    [
+      ("moulin dupont", "notes search help and");
+      ({|"saint pair"|}, "notes search help phrase");
+      ("moulin -dupont", "notes search help exclude");
+      ("dupon?", "notes search help joker");
+      ("henri* *ette", "notes search help star");
+      ("l'a", "notes search help word");
+      ("Église", "notes search help case");
+    ]
   in
-  loop 0 [] cands
+  Output.printf conf
+    {|<div class="collapse mt-2" id="%s"><div class="card card-body small"><div class="fw-semibold mb-1">%s</div><dl class="row mb-0">|}
+    help_id
+    (transl conf "notes search help" |> Utf8.capitalize_fst);
+  List.iter
+    (fun (example, key) ->
+      Output.printf conf
+        {|<dt class="col-sm-3"><code>%s</code></dt><dd class="col-sm-9">%s</dd>|}
+        (Util.escape_html example :> string)
+        (transl conf key |> Utf8.capitalize_fst))
+    rows;
+  Output.print_sstring conf "</dl></div></div>\n"
 
 let print_form conf s q =
   Output.printf conf {|<form class="mb-3" method="get" action="%s">|}
@@ -205,23 +230,27 @@ let print_form conf s q =
     (Util.escape_html s :> string);
   let check name id label on =
     Output.printf conf
-      {|<div class="form-check form-check-inline mb-0"><input type="checkbox" name="%s" value="on" class="form-check-input" id="%s"%s><label class="form-check-label" for="%s">%s</label></div>|}
+      {|<div class="form-check form-check-inline mb-0"><input type="checkbox" name="%s" value="on" class="form-check-input" id="%s"%s><label class="form-check-label text-nowrap" for="%s">%s</label></div>|}
       name id
       (if on then " checked" else "")
       id label
   in
   check "c" "case" (transl_nth conf "search/case sensitive" 1) q.case_sens;
   check "word" "word" (transl conf "word match") q.full_word;
+  (* the buttons stay together when the row wraps *)
   Output.printf conf
-    {|<button type="submit" class="btn btn-primary">%s</button></div>|}
+    {|<div class="d-flex gap-2"><button type="submit" class="btn btn-primary text-nowrap">%s</button>|}
     (transl_nth conf "search/case sensitive" 0 |> Utf8.capitalize_fst);
+  print_help_button conf;
+  Output.print_sstring conf "</div></div>";
   Output.print_sstring conf {|<div class="d-flex flex-wrap gap-2">|};
   List.iter
     (fun kind ->
       let p = scope_param kind in
       check p p (scope_label conf kind) (in_scope q.scope kind))
     kinds;
-  Output.print_sstring conf "</div></form>\n"
+  Output.print_sstring conf "</div></form>\n";
+  print_help_panel conf
 
 (* links without id: a person can appear in several hits *)
 let person_link conf base p =
@@ -299,7 +328,7 @@ let search conf base q s =
            (Driver.Iper.Set.cardinal ch_p + Driver.Ifam.Set.cardinal ch_f));
       let max = max_results conf in
       let hits, truncated =
-        collect conf base q (candidates q corpus changes) max
+        collect conf base q bname changes max
       in
       if hits = [] then
         Output.printf conf "<p>%s</p>\n"

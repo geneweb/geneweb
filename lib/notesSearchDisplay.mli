@@ -14,3 +14,11 @@ val print : Config.config -> Geneweb_db.Driver.base -> unit
     from the base, checked for access ([authorized_age] of the person, or of
     both spouses), and matched on its current text. At most
     [notes_search_max_results] hits (base parameter, default 500) are shown. *)
+
+val print_help_button : Config.config -> unit
+(** [print_help_button conf] prints the "?" button of a notes search form; it
+    opens the panel printed by {!print_help_panel}. *)
+
+val print_help_panel : Config.config -> unit
+(** [print_help_panel conf] prints the (collapsed) query syntax help, to be
+    placed after the form holding {!print_help_button}. *)

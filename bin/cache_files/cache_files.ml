@@ -249,16 +249,14 @@ let gen_cache bname fname collect_fn =
    Meant to be rebuilt nightly, e.g. from cron:
      cache_files -bd /path/to/bases -notes mybase *)
 let gen_notes_corpus bname base =
-  let corpus, duration =
+  let n, duration =
     with_timer (fun () ->
         ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter (fun bar ->
             Geneweb.NotesCorpus.build ~progress:(ProgrBar.progress bar) base))
   in
-  Geneweb.NotesCorpus.write bname corpus;
   Format.printf "%-*s %d notes, %.2f s@." !width
     (Geneweb.NotesCorpus.file bname)
-    (Array.length corpus.Geneweb.NotesCorpus.entries)
-    duration;
+    n duration;
   duration
 
 let validate_options () =

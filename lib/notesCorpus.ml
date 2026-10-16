@@ -5,17 +5,21 @@ module Database = Geneweb_db.Database
 type kind = Person | Family | Person_event | Family_event
 type entry = { kind : kind; id : string; evt : int; text : string }
 
-type t = {
-  version : int;
-  fingerprint : string;
-  built : float;
-  synchro_len : int;
-  entries : entry array;
-}
+type t = { fingerprint : string; built : float; synchro_len : int }
 
-(* bumped whenever [t] or [entry] change, so that an old file is rebuilt
-   rather than misread *)
-let current_version = 1
+(* File format: a text header, then one line per note:
+     GWNOTES <version>
+     <fingerprint>
+     <build time>
+     <synchro_len>
+     <kind> <id> <evt>\t<folded text>
+   The text is [NotesSearch.fold] of the plain text: one line, as plain_text
+   turns new lines and tabs into spaces. It is read line by line, so that a
+   search needs neither the whole file in memory nor a deserialisation.
+   [current_version] is bumped when the format changes; an older file is then
+   [Outdated]. *)
+let magic = "GWNOTES"
+let current_version = 2
 let ( // ) = Filename.concat
 let gwb_dir bname = Secure.base_dir () // (bname ^ ".gwb")
 
@@ -57,14 +61,55 @@ let family_entries base ifam fam =
   in
   List.rev acc
 
-let create bname entries =
+let header bname =
   {
-    version = current_version;
     fingerprint = fingerprint bname;
     built = Unix.time ();
     synchro_len = List.length (synchro bname);
-    entries = Array.of_list entries;
   }
+
+let kind_code kind =
+  match kind with
+  | Person -> "p"
+  | Family -> "f"
+  | Person_event -> "pe"
+  | Family_event -> "fe"
+
+let kind_of_code c =
+  match c with
+  | "p" -> Some Person
+  | "f" -> Some Family
+  | "pe" -> Some Person_event
+  | "fe" -> Some Family_event
+  | _ -> None
+
+let output_header oc h =
+  Printf.fprintf oc "%s %d\n%s\n%.0f\n%d\n" magic current_version
+    h.fingerprint h.built h.synchro_len
+
+let output_entry oc e =
+  Printf.fprintf oc "%s %s %d\t%s\n" (kind_code e.kind) e.id e.evt
+    (NotesSearch.fold e.text)
+
+let file bname =
+  Secure.base_dir () // "etc" // bname // "cache"
+  // (bname ^ "_notes_search.cache")
+
+(* write to a temporary file, renamed when complete *)
+let with_output bname f =
+  let file = file bname in
+  Filesystem.create_dir ~parent:true (Filename.dirname file);
+  let tmp = file ^ ".tmp" in
+  let r =
+    Secure.with_open_out_bin tmp (fun oc ->
+        output_header oc (header bname);
+        f oc)
+  in
+  Sys.rename tmp file;
+  r
+
+let write bname entries =
+  with_output bname (fun oc -> List.iter (output_entry oc) entries)
 
 let build ?(progress = fun _ _ -> ()) base =
   let bname = Driver.bname base in
@@ -72,54 +117,75 @@ let build ?(progress = fun _ _ -> ()) base =
   let ifams = Driver.ifams base in
   let n_pers = Collection.length ipers in
   let total = n_pers + Collection.length ifams in
-  (* entries are collected in reverse, then reversed once *)
-  let acc =
-    Collection.fold
-      (fun (i, acc) iper ->
-        progress i total;
-        let es = person_entries base (Driver.poi base iper) in
-        (i + 1, List.rev_append es acc))
-      (0, []) ipers
-    |> snd
-  in
-  let acc =
-    Collection.fold
-      (fun (i, acc) ifam ->
-        progress i total;
-        let es = family_entries base ifam (Driver.foi base ifam) in
-        (i + 1, List.rev_append es acc))
-      (n_pers, acc) ifams
-    |> snd
-  in
-  create bname (List.rev acc)
-
-let file bname =
-  Secure.base_dir () // "etc" // bname // "cache"
-  // (bname ^ "_notes_search.cache")
-
-let write bname corpus =
-  let f = file bname in
-  Filesystem.create_dir ~parent:true (Filename.dirname f);
-  let tmp = f ^ ".tmp" in
-  Secure.with_open_out_bin tmp (fun oc ->
-      Marshal.to_channel oc (corpus : t) [ Marshal.No_sharing ]);
-  Sys.rename tmp f
+  with_output bname (fun oc ->
+      let n =
+        Collection.fold
+          (fun (i, n) iper ->
+            progress i total;
+            let es = person_entries base (Driver.poi base iper) in
+            List.iter (output_entry oc) es;
+            (i + 1, n + List.length es))
+          (0, 0) ipers
+        |> snd
+      in
+      Collection.fold
+        (fun (i, n) ifam ->
+          progress i total;
+          let es = family_entries base ifam (Driver.foi base ifam) in
+          List.iter (output_entry oc) es;
+          (i + 1, n + List.length es))
+        (n_pers, n) ifams
+      |> snd)
 
 type status = Missing | Outdated | Available of t
 
+(* [None] for a file of another format or version *)
+let input_header ic =
+  let ( let* ) = Option.bind in
+  let line () = In_channel.input_line ic in
+  let* m = line () in
+  let* fingerprint = line () in
+  let* built = Option.bind (line ()) float_of_string_opt in
+  let* synchro_len = Option.bind (line ()) int_of_string_opt in
+  if m = Printf.sprintf "%s %d" magic current_version then
+    Some { fingerprint; built; synchro_len }
+  else None
+
 let read bname =
-  match
-    Secure.with_open_in_bin (file bname) (fun ic ->
-        (Marshal.from_channel ic : t))
-  with
-  | exception (Sys_error _ | End_of_file | Failure _) -> Missing
-  | corpus ->
+  match Secure.with_open_in_bin (file bname) input_header with
+  | exception Sys_error _ -> Missing
+  | None -> Outdated
+  | Some h ->
       if
-        corpus.version <> current_version
-        || corpus.fingerprint <> fingerprint bname
-        || corpus.synchro_len > List.length (synchro bname)
+        h.fingerprint <> fingerprint bname
+        || h.synchro_len > List.length (synchro bname)
       then Outdated
-      else Available corpus
+      else Available h
+
+let fold_entries bname f acc =
+  Secure.with_open_in_bin (file bname) @@ fun ic ->
+  match input_header ic with
+  | None -> acc
+  | Some _ ->
+      let rec loop acc =
+        match In_channel.input_line ic with
+        | None -> acc
+        | Some l -> (
+            match String.index_opt l '\t' with
+            | None -> loop acc
+            | Some tab -> (
+                match String.split_on_char ' ' (String.sub l 0 tab) with
+                | [ k; id; _evt ] -> (
+                    match kind_of_code k with
+                    | Some kind ->
+                        let text =
+                          String.sub l (tab + 1) (String.length l - tab - 1)
+                        in
+                        loop (f kind id text acc)
+                    | None -> loop acc)
+                | [] | _ :: _ -> loop acc))
+      in
+      loop acc
 
 let changes bname corpus =
   let l = synchro bname in

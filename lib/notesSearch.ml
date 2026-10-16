@@ -559,3 +559,59 @@ let highlight_html ?(full_word = false) case_sens terms html =
     in
     loop 0;
     Buffer.contents buf
+
+(* Folding for the notes corpus (m=NOTES_SEARCH). Each character is
+   replaced by its lowercase unaccented form, as compared by the
+   case-insensitive matcher (Name.unaccent_utf_8), and the typographic
+   apostrophes by '. Two texts equal for that matcher fold to equal strings,
+   so a plain substring search on folded texts finds every candidate the
+   matcher would accept (and possibly a few more, verified afterwards). *)
+let fold s =
+  let len = String.length s in
+  let b = Buffer.create len in
+  let rec loop i =
+    if i < len then
+      if
+        i + 2 < len
+        && s.[i] = '\xE2'
+        && s.[i + 1] = '\x80'
+        && (s.[i + 2] = '\x98' || s.[i + 2] = '\x99')
+      then (
+        Buffer.add_char b '\'';
+        loop (i + 3))
+      else
+        let t, j = Name.unaccent_utf_8 true s i in
+        Buffer.add_string b t;
+        loop (if j > i then j else i + 1)
+  in
+  loop 0;
+  Buffer.contents b
+
+(* [contains h n]: [n] occurs in [h], without allocation *)
+let contains h n =
+  let lh = String.length h and ln = String.length n in
+  if ln = 0 then true
+  else
+    let c = n.[0] in
+    let rec at i k = k = ln || (h.[i + k] = n.[k] && at i (k + 1)) in
+    let rec from i =
+      if i + ln > lh then false
+      else
+        match String.index_from_opt h i c with
+        | None -> false
+        | Some i -> (i + ln <= lh && at i 1) || from (i + 1)
+    in
+    from 0
+
+let candidate (terms, _excluded) =
+  (* for each required term, its folded pieces between '?' (outer '*'
+     dropped); all of them must occur. Exclusions and word boundaries are
+     left to the exact match on the live text. *)
+  let pieces =
+    List.map
+      (fun t ->
+        String.split_on_char '?' (fold (core t))
+        |> List.filter (fun p -> p <> ""))
+      terms
+  in
+  fun folded -> List.for_all (List.for_all (contains folded)) pieces

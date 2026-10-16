@@ -15268,6 +15268,46 @@ de: Suche in Personen- und Familiennotizen
 en: search in individual and family notes
 fr: recherche dans les notes d’individus et de familles
 
+    notes search help
+de: Suchsyntax
+en: query syntax
+fr: syntaxe de la recherche
+
+    notes search help and
+de: Notizen, die alle diese Wörter enthalten, in beliebiger Reihenfolge
+en: notes containing all these words, in any order
+fr: notes contenant tous ces mots, dans n’importe quel ordre
+
+    notes search help case
+de: Groß-/Kleinschreibung und Akzente werden ignoriert (eglise findet Église), außer wenn „Groß- & Kleinschreibung beachten“ angekreuzt ist; ’ und ' sind dann gleichwertig
+en: case and accents are ignored (eglise finds Église) unless “case sensitive” is ticked; ’ and ' are then the same
+fr: majuscules et accents sont ignorés (eglise trouve Église), sauf si « sensible à la casse » est coché ; ’ et ' sont alors équivalents
+
+    notes search help exclude
+de: ein vorangestelltes - schließt die Notizen mit diesem Wort (oder dieser „Phrase“) aus
+en: a leading - excludes the notes containing this word (or this “phrase”)
+fr: un - en tête exclut les notes contenant ce mot (ou cette « phrase »)
+
+    notes search help joker
+de: ? steht für genau ein beliebiges Zeichen, auch ein Leerzeichen: Dupont, Dupond
+en: ? stands for exactly one character, a space included: Dupont, Dupond
+fr: ? remplace exactement un caractère, espace compris : Dupont, Dupond
+
+    notes search help phrase
+de: genau diese Wortfolge
+en: this exact sequence of words
+fr: cette suite de mots exacte
+
+    notes search help star
+de: mit „ganzes Wort“: ein * am Anfang oder Ende steht für den Rest des Wortes (Henriette, Juliette); ohne passt jedes Wort schon überall
+en: with “word match”: a * at the start or end stands for the rest of the word (Henriette, Juliette); without it, a word already matches anywhere
+fr: avec « mot complet » : un * au début ou à la fin remplace le reste du mot (Henriette, Juliette) ; sans, un mot est déjà trouvé partout
+
+    notes search help word
+de: mit „ganzes Wort“ darf das Wort nicht Teil eines längeren Wortes sein: l'a findet nicht l'aube
+en: with “word match”, the word must not be part of a longer word: l'a does not find l'aube
+fr: avec « mot complet », le mot ne doit pas faire partie d’un mot plus long : l'a ne trouve pas l'aube
+
     notes search button
 de: Personen- und Familiennotizen
 en: individual and family notes

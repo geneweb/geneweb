@@ -84,7 +84,7 @@ let full_word_search conf = p_getenv conf.env "word" = Some "on"
 let print_search_form conf =
   Output.printf conf
     {|<div class="mt-3">
-<form class="d-flex align-items-center gap-2" method="get" action="%s">|}
+<form class="d-flex flex-wrap align-items-center gap-2" method="get" action="%s">|}
     conf.command;
   hidden_env conf;
   (* no hidden m: each submit button sends its own, the first one being the
@@ -101,18 +101,22 @@ let print_search_form conf =
     (match p_getenv conf.env "c" with
     | Some "on" -> " checked"
     | Some _ | None -> "");
-  Output.printf conf {|<label class="form-check-label" for="case">%s</label>|}
+  Output.printf conf
+    {|<label class="form-check-label text-nowrap" for="case">%s</label>|}
     (transl_nth conf "search/case sensitive" 1);
   Output.print_sstring conf "</div>";
   Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
   Output.printf conf
     {|<input type="checkbox" name="word" value="on" class="form-check-input" id="word"%s>|}
     (if full_word_search conf then " checked" else "");
-  Output.printf conf {|<label class="form-check-label" for="word">%s</label>|}
+  Output.printf conf
+    {|<label class="form-check-label text-nowrap" for="word">%s</label>|}
     (transl conf "word match");
   Output.print_sstring conf "</div>";
+  (* the buttons stay together when the row wraps *)
+  Output.print_sstring conf {|<div class="d-flex gap-2">|};
   Output.print_sstring conf
-    {|<button type="submit" name="m" value="MISC_NOTES_SEARCH" class="btn btn-primary">|};
+    {|<button type="submit" name="m" value="MISC_NOTES_SEARCH" class="btn btn-primary text-nowrap">|};
   transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button>";
@@ -120,10 +124,13 @@ let print_search_form conf =
      with the same text and options *)
   if conf.wizard || conf.friend then
     Output.printf conf
-      {|<button type="submit" name="m" value="NOTES_SEARCH" class="btn btn-outline-primary" title="%s">%s</button>|}
+      {|<button type="submit" name="m" value="NOTES_SEARCH" class="btn btn-outline-primary text-nowrap" title="%s">%s</button>|}
       (transl conf "notes search" |> Utf8.capitalize_fst)
       (transl conf "notes search button" |> Utf8.capitalize_fst);
-  Output.print_sstring conf "\n</form>\n</div>"
+  NotesSearchDisplay.print_help_button conf;
+  Output.print_sstring conf "</div>\n</form>\n";
+  NotesSearchDisplay.print_help_panel conf;
+  Output.print_sstring conf "</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   Hutil.header_without_title conf;

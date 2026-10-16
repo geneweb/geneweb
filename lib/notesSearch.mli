@@ -67,3 +67,14 @@ val highlight_html : ?full_word:bool -> bool -> string list -> string -> string
 val highlight : ?full_word:bool -> bool -> string list -> string -> string
 (** [highlight case_sens terms p] is the whole plain text [p], HTML-escaped,
     with occurrences of [terms] wrapped in [<span class="found">]. *)
+
+val fold : string -> string
+(** [fold s] is [s] with each character replaced by its lowercase unaccented
+    form (as compared by the case-insensitive matcher) and the typographic
+    apostrophes by ['], for the notes corpus of [m=NOTES_SEARCH]. *)
+
+val candidate : string list * string list -> string -> bool
+(** [candidate query] is a fast test on {!fold}ed texts: [candidate query f] is
+    [true] for every [f] whose original text could {!matches} [query], in any
+    mode (case sensitive or not, word match or not), and possibly for a few
+    more. Its result must be confirmed with {!matches} on the original text. *)
