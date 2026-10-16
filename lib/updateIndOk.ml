@@ -898,6 +898,7 @@ let effective_del_no_commit base op =
 let effective_del_commit conf base op =
   Notes.update_notes_links_db conf base (Def.NLDB.PgInd op.key_index) "";
   Util.commit_patches conf base;
+  HistoryDiff.archive_deleted conf op;
   let changed = U_Delete_person op in
   History.record conf base changed "dp"
 

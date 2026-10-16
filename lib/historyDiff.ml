@@ -20,6 +20,8 @@ let history_file fn sn occ =
   let s = space_to_unders (Name.lower sn) in
   f ^ "." ^ string_of_int occ ^ "." ^ s
 
+let unique_key fn sn = Name.lower fn <> "" && Name.lower sn <> ""
+
 (* history directory path *)
 let history_d conf =
   let path =
@@ -35,14 +37,15 @@ let history_d conf =
     Filename.concat (Util.bpath bname) path
   else path
 
-(* Le chemin du fichier historique dans le dossier history_d. *)
-let history_path conf fname =
+let path_in dir fname =
   if String.length fname >= 6 then
-    let dirs =
-      [ history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1] ]
-    in
-    List.fold_right Filename.concat dirs fname
-  else Filename.concat (history_d conf) fname
+    List.fold_right Filename.concat
+      [ dir; String.make 1 fname.[0]; String.make 1 fname.[1] ]
+      fname
+  else Filename.concat dir fname
+
+(* Le chemin du fichier historique dans le dossier history_d. *)
+let history_path conf fname = path_in (history_d conf) fname
 
 (* Créé tous les dossiers intermédiaires. *)
 let create_history_dirs conf fname =
@@ -51,6 +54,24 @@ let create_history_dirs conf fname =
       [ history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1] ]
     in
     Filesystem.create_dir ~parent:true (List.fold_left Filename.concat "" dirs)
+
+let archive_deleted conf (p : (_, _, string) gen_person) =
+  if unique_key p.first_name p.surname then
+    let person_file = history_file p.first_name p.surname p.occ in
+    let src = history_path conf person_file in
+    if Sys.file_exists src then
+      let dst =
+        path_in (Filename.concat (history_d conf) "_deleted") person_file
+      in
+      try
+        Filesystem.create_dir ~parent:true (Filename.dirname dst);
+        if Sys.file_exists dst then (
+          let s = Secure.with_open_in_bin src In_channel.input_all in
+          Secure.with_open_out_gen [ Open_wronly; Open_append; Open_binary ]
+            0o644 dst (fun oc -> output_string oc s);
+          Sys.remove src)
+        else Sys.rename src dst
+      with Sys_error _ | Unix.Unix_error _ | Filesystem.File_error _ -> ()
 
 (* ************************************************************************ *)
 (*  [Fonc] write_history_file : config -> string -> gen_record -> unit      *)
