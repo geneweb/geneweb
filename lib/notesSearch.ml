@@ -71,9 +71,33 @@ let is_block_tag m i =
   let name = String.lowercase_ascii (String.sub m i (name_end i - i)) in
   List.mem name
     [
-      "br"; "p"; "div"; "li"; "ul"; "ol"; "dl"; "dt"; "dd"; "tr"; "td"; "th";
-      "table"; "h1"; "h2"; "h3"; "h4"; "h5"; "h6"; "hr"; "blockquote"; "pre";
-      "section"; "article"; "figure"; "figcaption"; "img";
+      "br";
+      "p";
+      "div";
+      "li";
+      "ul";
+      "ol";
+      "dl";
+      "dt";
+      "dd";
+      "tr";
+      "td";
+      "th";
+      "table";
+      "h1";
+      "h2";
+      "h3";
+      "h4";
+      "h5";
+      "h6";
+      "hr";
+      "blockquote";
+      "pre";
+      "section";
+      "article";
+      "figure";
+      "figcaption";
+      "img";
     ]
 
 (* The text a reader sees in a note, close enough for searching and
@@ -124,7 +148,9 @@ let plain_text m =
           (* guard against a parser that would not advance *)
           loop false (if j > i then j else i + 2)
       | '\'' when i + 1 < len && m.[i + 1] = '\'' ->
-          let rec skip j = if j < len && m.[j] = '\'' then skip (j + 1) else j in
+          let rec skip j =
+            if j < len && m.[j] = '\'' then skip (j + 1) else j
+          in
           loop false (skip i)
       | '=' -> loop false (i + 1)
       | ' ' | '\n' | '\r' | '\t' ->
@@ -178,8 +204,7 @@ let query case_sens q =
       | None -> (word neg (i + 1) len acc, len)
     else
       let rec stop j =
-        if j < len && not (is_sep q.[j] || q.[j] = '"') then stop (j + 1)
-        else j
+        if j < len && not (is_sep q.[j] || q.[j] = '"') then stop (j + 1) else j
       in
       let j = stop i in
       (word neg i j acc, j)
@@ -235,7 +260,51 @@ let word_after p i = i < String.length p && is_word_char (uchar_at p i)
    no letter or digit right before it (unless [t] starts with '*') nor right
    after it (unless [t] ends with '*'; on such a side the match extends to
    the word boundary). Without [full_word], a match can be
-   anywhere and the '*' are ignored. A '*' inside [t] is a plain character. *)
+   anywhere and the '*' are ignored. A '*' inside [t] is a plain character;
+   a '?' anywhere in [t] matches any one character. *)
+(* First occurrence of [t] in [p] at or after [i], where each '?' of [t]
+   matches any one character (white space included). *)
+let find_with_jokers case_sens t p i =
+  match String.split_on_char '?' t with
+  | [ _ ] -> Util.find_in_text case_sens t p i
+  | [] -> None
+  | first :: _ as segs ->
+      let len = String.length p in
+      (* end of [segs] matched from [pos], a '?' between consecutive ones *)
+      let rec match_at pos segs =
+        match segs with
+        | [] -> Some pos
+        | s :: rest -> (
+            (* [start_equiv_with] reads [p.[pos]]: stay in bounds *)
+            let q =
+              if s = "" then Some pos
+              else if pos >= len then None
+              else Util.start_equiv_with case_sens s p pos
+            in
+            match q with
+            | None -> None
+            | Some q -> (
+                match rest with
+                | [] -> Some q
+                | _ :: _ ->
+                    if q < len then match_at (Utf8.next p q) rest else None))
+      in
+      let rec loop i =
+        if i >= len then None
+        else
+          let x =
+            if first = "" then Some i
+            else Option.map fst (Util.find_in_text case_sens first p i)
+          in
+          match x with
+          | None -> None
+          | Some x -> (
+              match match_at x segs with
+              | Some y -> Some (x, y)
+              | None -> if x < len then loop (Utf8.next p x) else None)
+      in
+      loop i
+
 let find_term ~full_word case_sens t p i =
   let any_before, t, any_after = wildcards t in
   let bad x y =
@@ -248,7 +317,7 @@ let find_term ~full_word case_sens t p i =
   let rec back x = if word_before p x then back (prev_char_start p x) else x in
   let rec forward y = if word_after p y then forward (Utf8.next p y) else y in
   let rec loop i =
-    match Util.find_in_text case_sens t p i with
+    match find_with_jokers case_sens t p i with
     | Some (x, y) when bad x y -> loop (Utf8.next p x)
     | Some (x, y) when full_word ->
         Some
@@ -315,7 +384,8 @@ let highlighted_range ~full_word case_sens terms p a b =
   let buf = Buffer.create (b - a + 64) in
   let add_escaped i j =
     if j > i then
-      Buffer.add_string buf (Util.escape_html (String.sub p i (j - i)) :> string)
+      Buffer.add_string buf
+        (Util.escape_html (String.sub p i (j - i)) :> string)
   in
   if a > 0 then Buffer.add_string buf "… ";
   let rec loop i =
@@ -347,8 +417,7 @@ let snippet ?(context = 80) ?(full_word = false) case_sens terms p =
 let highlight ?(full_word = false) case_sens terms p =
   highlighted_range ~full_word case_sens terms p 0 (String.length p)
 
-let is_space c =
-  match c with ' ' | '\n' | '\r' | '\t' -> true | _ -> false
+let is_space c = match c with ' ' | '\n' | '\r' | '\t' -> true | _ -> false
 
 (* Highlight occurrences in one HTML text run (no tag inside). Matching is
    done on the decoded text, where an entity is one character and a white
@@ -361,7 +430,9 @@ let highlight_text_run ~full_word case_sens terms first buf run =
     let rec loop acc i =
       if i >= len then List.rev acc
       else if is_space run.[i] then
-        let rec skip j = if j < len && is_space run.[j] then skip (j + 1) else j in
+        let rec skip j =
+          if j < len && is_space run.[j] then skip (j + 1) else j
+        in
         let j = skip i in
         loop ((i, j, " ") :: acc) j
       else if run.[i] = '&' then
@@ -374,7 +445,9 @@ let highlight_text_run ~full_word case_sens terms first buf run =
     in
     Array.of_list (loop [] 0)
   in
-  let d = String.concat "" (Array.to_list (Array.map (fun (_, _, d) -> d) units)) in
+  let d =
+    String.concat "" (Array.to_list (Array.map (fun (_, _, d) -> d) units))
+  in
   (* unit index of each decoded byte *)
   let owners = Array.make (String.length d) 0 in
   ignore
@@ -440,7 +513,9 @@ let find_from m i sub =
 (* position of the "</name" closing the raw text element, case-insensitive *)
 let find_closing m i name =
   let lm = String.lowercase_ascii m in
-  match find_from lm i ("</" ^ name) with Some j -> j | None -> String.length m
+  match find_from lm i ("</" ^ name) with
+  | Some j -> j
+  | None -> String.length m
 
 let highlight_html ?(full_word = false) case_sens terms html =
   if terms = [] then html
@@ -450,7 +525,7 @@ let highlight_html ?(full_word = false) case_sens terms html =
     let first = ref true in
     let rec loop i =
       if i >= len then ()
-      else if html.[i] = '<' then
+      else if html.[i] = '<' then (
         if i + 3 < len && String.sub html i 4 = "<!--" then (
           let j =
             match find_from html (i + 4) "-->" with
@@ -467,10 +542,12 @@ let highlight_html ?(full_word = false) case_sens terms html =
             let k = find_closing html j name in
             Buffer.add_string buf (String.sub html j (k - j));
             loop k)
-          else loop j
+          else loop j)
       else
         let j =
-          match String.index_from_opt html i '<' with Some j -> j | None -> len
+          match String.index_from_opt html i '<' with
+          | Some j -> j
+          | None -> len
         in
         highlight_text_run ~full_word case_sens terms first buf
           (String.sub html i (j - i));

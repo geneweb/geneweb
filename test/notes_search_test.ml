@@ -32,7 +32,8 @@ let test_find_in_text () =
     "empty pattern" None
     (Util.find_in_text false "" "abc" 0);
   Alcotest.(check (option (pair int int)))
-    "from offset" (Some (4, 7))
+    "from offset"
+    (Some (4, 7))
     (Util.find_in_text false "abc" "abc abc" 1)
 
 let test_snippet () =
@@ -79,9 +80,7 @@ let test_highlight_html () =
     "entity matched as its character, wrapped whole"
     {|cadastre <span class="found" id="first-found">&#38; les</span>|}
     (hl "& les" "cadastre &#38; les");
-  Alcotest.(check string)
-    "entity name not matched" "&amp;"
-    (hl "amp" "&amp;");
+  Alcotest.(check string) "entity name not matched" "&amp;" (hl "amp" "&amp;");
   Alcotest.(check string)
     "white space run matches one space"
     "<span class=\"found\" id=\"first-found\">Jean\n  Dupont</span>"
@@ -93,7 +92,8 @@ let test_highlight_html () =
 
 let test_terms () =
   Alcotest.(check (list string))
-    "words and quoted phrase" [ "Annie"; "de Villoutreys"; "album" ]
+    "words and quoted phrase"
+    [ "Annie"; "de Villoutreys"; "album" ]
     (NotesSearch.terms false {|  Annie "de Villoutreys" album |});
   Alcotest.(check (list string))
     "duplicates dropped" [ "henri"; "moulin" ]
@@ -101,7 +101,9 @@ let test_terms () =
   Alcotest.(check (list string))
     "case-sensitive keeps both" [ "henri"; "Henri" ]
     (NotesSearch.terms true "henri Henri");
-  Alcotest.(check (list string)) "only quotes" [] (NotesSearch.terms false {|""|});
+  Alcotest.(check (list string))
+    "only quotes" []
+    (NotesSearch.terms false {|""|});
   Alcotest.(check (list string))
     "unclosed quote" [ "a"; "b c" ]
     (NotesSearch.terms false {|a "b c|})
@@ -109,20 +111,19 @@ let test_terms () =
 let test_exclusion () =
   let q = NotesSearch.query false in
   Alcotest.(check (pair (list string) (list string)))
-    "word excluded" ([ "aaa" ], [ "bbb" ])
-    (q "aaa -bbb");
+    "word excluded" ([ "aaa" ], [ "bbb" ]) (q "aaa -bbb");
   Alcotest.(check (pair (list string) (list string)))
-    "phrase excluded" ([ "Annie" ], [ "de Villoutreys" ])
+    "phrase excluded"
+    ([ "Annie" ], [ "de Villoutreys" ])
     (q {|Annie -"de Villoutreys"|});
   Alcotest.(check (pair (list string) (list string)))
-    "hyphen inside a word" ([ "Saint-Pair" ], [])
-    (q "Saint-Pair");
+    "hyphen inside a word" ([ "Saint-Pair" ], []) (q "Saint-Pair");
   Alcotest.(check (pair (list string) (list string)))
-    "lone hyphen ignored" ([ "a"; "b" ], [])
+    "lone hyphen ignored"
+    ([ "a"; "b" ], [])
     (q "a - b");
   Alcotest.(check (pair (list string) (list string)))
-    "only exclusions" ([], [ "x" ])
-    (q "-x");
+    "only exclusions" ([], [ "x" ]) (q "-x");
   Alcotest.(check (list string))
     "excluded terms not highlighted" [ "aaa" ]
     (NotesSearch.terms false "aaa -bbb")
@@ -132,7 +133,8 @@ let test_apostrophes () =
   let count cs t = NotesSearch.count_occurrences cs [ t ] text in
   Alcotest.(check int) "’ matches '" 1 (count false "l'eglise");
   Alcotest.(check int) "‘ matches '" 1 (count false "saint'pair");
-  Alcotest.(check int) "' in text matches ’" 1
+  Alcotest.(check int)
+    "' in text matches ’" 1
     (NotesSearch.count_occurrences false [ "l’a" ] "jusqu'à l'aube");
   Alcotest.(check int) "case sensitive: exact" 0 (count true "l'Église");
   Alcotest.(check int) "case sensitive: same char" 1 (count true "l’Église");
@@ -153,8 +155,7 @@ let test_full_word () =
   Alcotest.(check int) "l'a as a word" 1 (count "l'a" "il l'a vu");
   Alcotest.(check int) "aube after an apostrophe" 1 (count "aube" "l'aube");
   Alcotest.(check int) "henri not in henriette" 0 (count "henri" "Henriette");
-  Alcotest.(check int) "accented neighbour is a letter" 0
-    (count "rene" "Renée");
+  Alcotest.(check int) "accented neighbour is a letter" 0 (count "rene" "Renée");
   Alcotest.(check int) "hyphen is a boundary" 1 (count "pair" "Saint-Pair");
   Alcotest.(check int) "digits are word characters" 0 (count "18" "1832");
   Alcotest.(check int) "at text ends" 2 (count "henri" "Henri et henri");
@@ -174,16 +175,18 @@ let test_full_word () =
     (NotesSearch.mem_all ~full_word:true false [ "l'a" ] "l'aube")
 
 let test_wildcards () =
-  let count fw t p = NotesSearch.count_occurrences ~full_word:fw false [ t ] p in
+  let count fw t p =
+    NotesSearch.count_occurrences ~full_word:fw false [ t ] p
+  in
   let text = "Henri, Henriette, Juliette et Jean-Henri" in
   Alcotest.(check int) "henri word only" 2 (count true "henri" text);
   Alcotest.(check int) "henri* prefix" 3 (count true "henri*" text);
   Alcotest.(check int) "*ette suffix" 2 (count true "*ette" text);
   Alcotest.(check int) "ette needs both sides" 0 (count true "ette" text);
   Alcotest.(check int) "*enri* anywhere" 3 (count true "*enri*" text);
-  Alcotest.(check int) "prefix still bounded before" 0
-    (count true "enri*" text);
-  Alcotest.(check int) "star ignored when not full word" 3
+  Alcotest.(check int) "prefix still bounded before" 0 (count true "enri*" text);
+  Alcotest.(check int)
+    "star ignored when not full word" 3
     (count false "henri*" text);
   Alcotest.(check int) "inner star is literal" 0 (count true "hen*ette" text);
   Alcotest.(check string)
@@ -194,6 +197,36 @@ let test_wildcards () =
     "star-only terms dropped" [ "a" ]
     (NotesSearch.terms false "* a **");
   Alcotest.(check string) "core" "henri" (NotesSearch.core "**henri*")
+
+let test_jokers () =
+  let count ?(fw = false) ?(cs = false) t p =
+    NotesSearch.count_occurrences ~full_word:fw cs [ t ] p
+  in
+  Alcotest.(check int)
+    "Dupon? matches t and d" 2
+    (count "dupon?" "Dupont et Dupond");
+  Alcotest.(check int)
+    "? matches a hyphen and a space" 2
+    (count "jean?pierre" "Jean-Pierre, Jean Pierre");
+  Alcotest.(check int) "? matches an accented letter" 1 (count "ren?e" "Renée");
+  Alcotest.(check int) "? needs a character" 0 (count "dupon?" "Dupon");
+  Alcotest.(check int)
+    "? at the end, case sensitive" 0
+    (count ~cs:true "Dupon?" "Dupon");
+  Alcotest.(check int) "leading ?" 1 (count "?upont" "Dupont");
+  Alcotest.(check int) "two ?" 1 (count "d??ont" "Dupont");
+  Alcotest.(check int)
+    "full word: whole word only" 1
+    (count ~fw:true "dupon?" "Dupont Duponteau");
+  Alcotest.(check int)
+    "full word with *" 2
+    (count ~fw:true "dupon?*" "Dupont Duponteau");
+  Alcotest.(check string)
+    "highlight" {|<span class="found" id="first-found">Jean-Pierre</span>|}
+    (NotesSearch.highlight_html false [ "jean?pierre" ] "Jean-Pierre");
+  Alcotest.(check bool)
+    "AND with ?" true
+    (NotesSearch.mem_all false [ "dupon?"; "ren?e" ] "Renée Dupond")
 
 let test_and () =
   Alcotest.(check bool)
@@ -229,5 +262,6 @@ let v =
         Alcotest.test_case "apostrophes" `Quick test_apostrophes;
         Alcotest.test_case "full word" `Quick test_full_word;
         Alcotest.test_case "wildcards" `Quick test_wildcards;
+        Alcotest.test_case "jokers" `Quick test_jokers;
       ] );
   ]
