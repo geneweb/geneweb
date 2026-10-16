@@ -962,6 +962,7 @@ let print_misc_notes conf base =
 type search_hit = {
   sh_fnotes : string;
   sh_file : string;  (** file read, relative to the base directory *)
+  sh_gallery : bool;  (** TYPE=gallery (or legacy album): open with m=GALLERY *)
   sh_title : string;  (** plain text *)
   sh_in_title : bool;
   sh_count : int;  (** occurrences in the body *)
@@ -988,6 +989,11 @@ let note_file base fnotes =
              (Driver.base_notes_dir base
              :: List.fold_right (fun d acc -> d :: acc) dl [ f ^ ".txt" ]))
     | None -> None
+
+let is_gallery nenv =
+  match List.assoc_opt "TYPE" nenv with
+  | Some t -> norm_type t = "gallery"
+  | None -> false
 
 let collect_search_hits conf base case_sens s =
   let pages =
@@ -1019,6 +1025,7 @@ let collect_search_hits conf base case_sens s =
           {
             sh_fnotes = fnotes;
             sh_file = Option.value ~default:"" (note_file base fnotes);
+            sh_gallery = is_gallery nenv;
             sh_title = NotesSearch.plain_text tit;
             sh_in_title = in_title;
             sh_count = count;
@@ -1035,12 +1042,18 @@ let collect_search_hits conf base case_sens s =
 
 let print_search_hit conf case_sens s hit =
   let href =
-    Printf.sprintf "%sm=MISC_NOTES_SEARCH&s=%s%s&f=%s#first-found"
-      (commd conf :> string)
-      (Mutil.encode s :> string)
-      (if case_sens then "&c=on" else "")
-      (Mutil.encode hit.sh_fnotes :> string)
+    if hit.sh_gallery then
+      Printf.sprintf "%sm=GALLERY&f=%s"
+        (commd conf :> string)
+        (Mutil.encode hit.sh_fnotes :> string)
+    else
+      Printf.sprintf "%sm=MISC_NOTES_SEARCH&s=%s%s&f=%s#first-found"
+        (commd conf :> string)
+        (Mutil.encode s :> string)
+        (if case_sens then "&c=on" else "")
+        (Mutil.encode hit.sh_fnotes :> string)
   in
+  let icon = if hit.sh_gallery then "image" else "file-lines" in
   let label =
     if hit.sh_title <> "" then NotesSearch.highlight case_sens s hit.sh_title
     else if hit.sh_fnotes = "" then
@@ -1060,11 +1073,11 @@ let print_search_hit conf case_sens s hit =
   in
   Output.printf conf
     {|<li class="list-group-item">
-<div><a href="%s">%s</a>%s%s</div>
+<div><i class="far fa-%s fa-fw me-2"></i><a href="%s">%s</a>%s%s</div>
 <div class="small text-muted">%s</div>
 </li>
 |}
-    href label page_name count hit.sh_snippet
+    icon href label page_name count hit.sh_snippet
 
 let print_search_hits conf case_sens s hits =
   let title _ =
@@ -1085,11 +1098,17 @@ let print_search_hits conf case_sens s hits =
   print_search_form conf;
   Hutil.trailer conf
 
+(* A gallery is a JSON document rendered by the notes_gallery template: show
+   it as m=GALLERY&f=fnotes would, without highlighting. *)
 let print_found_note conf base case_sens s fnotes =
   let nenv, nt = read_notes base fnotes in
-  let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
-  print_whole_notes conf base fnotes (Util.safe_html tit) nt
-    (Some (case_sens, s))
+  if is_gallery nenv then
+    let env = ("f", Mutil.encode fnotes) :: List.remove_assoc "f" conf.env in
+    print_gallery { conf with env } base
+  else
+    let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
+    print_whole_notes conf base fnotes (Util.safe_html tit) nt
+      (Some (case_sens, s))
 
 (* [f] (as set by the links of the results page) names the note to show;
    [f=] is the base notes. Without [f], all notes are searched. *)
