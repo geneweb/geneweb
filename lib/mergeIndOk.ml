@@ -597,6 +597,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
     UpdateIndOk.all_checks_person base p a u
   in
   Util.commit_patches conf base;
+  HistoryDiff.archive_deleted conf o_p2;
   History.record conf base
     (U_Merge_person (o_p1, o_p2, Util.string_gen_person base p))
     "fp";

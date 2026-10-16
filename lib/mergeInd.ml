@@ -311,10 +311,10 @@ let merge conf base p1 p2 propose_merge_ind propose_merge_fam =
   in
   if changes_done then Util.commit_patches conf base;
   (if ok then
+     let gen p = Util.string_gen_person base (Driver.gen_person_of_person p) in
      let changed =
-       let p1 = Util.string_gen_person base (Driver.gen_person_of_person p1) in
-       let p2 = Util.string_gen_person base (Driver.gen_person_of_person p2) in
-       U_Merge_person (p2, p1, p1)
+       U_Merge_person
+         (gen p1, gen p2, gen (Driver.poi base (Driver.get_iper p1)))
      in
      History.record conf base changed "fp");
   Update.delete_topological_sort conf base;
