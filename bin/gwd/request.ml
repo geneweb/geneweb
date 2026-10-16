@@ -293,6 +293,11 @@ let w_person ~none fn conn conf base =
   | Some p -> fn conn conf base p
   | _ -> none conn conf base
 
+(* friends and wizards only; a visitor is asked to log in *)
+let w_friend fn conn conf base =
+  if conf.wizard || conf.friend then fn conn conf base
+  else GWPARAM.output_error conf Code.Unauthorized
+
 let w_wizard fn conn conf base =
   if conf.wizard then fn conn conf base
   else if conf.just_friend_wizard then GWPARAM.output_error conf Code.Forbidden
@@ -397,6 +402,7 @@ let treat_request =
              let w_person hdl = w_person (fun _conn -> hdl) conn in
              let w_lock hdl = w_lock (fun _conn -> hdl) conn in
              let w_wizard hdl = w_wizard (fun _conn -> hdl) conn in
+             let w_friend hdl = w_friend (fun _conn -> hdl) conn in
              match m with
              | "" -> (
                  match bfile with
@@ -681,6 +687,7 @@ let treat_request =
                          in
                          NotesDisplay.print_what_links conf base fnotes
                      | _ -> NotesDisplay.print conf base)
+             | "NOTES_SEARCH" -> w_friend @@ w_base @@ NotesSearchDisplay.print
              | "OA" -> w_base @@ BirthDeathDisplay.print_oldest_alive
              | "OE" -> w_base @@ BirthDeathDisplay.print_oldest_engagements
              | "P" -> (

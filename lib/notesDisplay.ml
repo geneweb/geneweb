@@ -114,7 +114,19 @@ let print_search_form conf =
   Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
   transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button>\n</form>\n</div>"
+  Output.print_sstring conf "</button>\n</form>\n";
+  (* friends and wizards can also search person, family and event notes *)
+  if conf.wizard || conf.friend then
+    Output.printf conf
+      {|<div class="mt-1"><a href="%sm=NOTES_SEARCH%s%s%s">%s</a></div>|}
+      (commd conf :> string)
+      (match p_getenv conf.env "s" with
+      | Some s -> "&s=" ^ (Mutil.encode s :> string)
+      | None -> "")
+      (if p_getenv conf.env "c" = Some "on" then "&c=on" else "")
+      (if full_word_search conf then "&word=on" else "")
+      (transl conf "notes search" |> Utf8.capitalize_fst);
+  Output.print_sstring conf "</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   Hutil.header_without_title conf;

@@ -15263,6 +15263,36 @@ pt: notas sobre o casamento/notas sobre os casamentos
 sv: anteckningar om vigseln/anteckningar om vigslarna
 tr: evlilik notları/evlilik notları
 
+    notes search
+de: Suche in Personen- und Familiennotizen
+en: search in individual and family notes
+fr: recherche dans les notes d’individus et de familles
+
+    notes search first results %d
+de: nur die ersten %d Ergebnisse werden angezeigt
+en: only the first %d results are shown
+fr: seuls les %d premiers résultats sont affichés
+
+    notes search index date %s %d
+de: Notizenindex vom %s, %d spätere Änderung(en) berücksichtigt
+en: notes index of %s, %d later change(s) included
+fr: index des notes du %s, %d modification(s) ultérieure(s) incluse(s)
+
+    notes search index missing %s
+de: Der Notizenindex wurde noch nicht erstellt: „cache_files -notes %s“ auf dem Server ausführen.
+en: The notes index has not been built yet: run “cache_files -notes %s” on the server.
+fr: L’index des notes n’a pas encore été construit : lancer « cache_files -notes %s » sur le serveur.
+
+    notes search index outdated %s
+de: Der Notizenindex stammt von einer älteren Version der Datenbank: „cache_files -notes %s“ erneut ausführen.
+en: The notes index was built for an earlier version of the base: run “cache_files -notes %s” again.
+fr: L’index des notes date d’une version antérieure de la base : relancer « cache_files -notes %s ».
+
+    notes search scopes
+de: Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen
+en: individual notes/family notes/individual event notes/family event notes
+fr: notes d’individus/notes de familles/notes d’événements individuels/notes d’événements familiaux
+
     notes summary
 bg: резюме на бележките
 co: riassuntu di e note diverse
