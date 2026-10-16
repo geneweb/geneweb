@@ -1,4 +1,5 @@
 function addClearButtonToInputs() {
+    const title = document.querySelector('script[data-clear-title]')?.dataset.clearTitle || '';
     const selector =
         'input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),' +
         'input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),' +
@@ -19,7 +20,7 @@ function addClearButtonToInputs() {
     function createClearButton(element) {
         const clearButton = document.createElement('i');
         clearButton.className = 'fas fa-xmark clear-button-icon';
-        clearButton.title = '[*clear input]';
+        clearButton.title = title;
 
         clearButton.style.cssText = `
             position: absolute;
