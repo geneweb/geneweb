@@ -343,6 +343,11 @@ let find_any ~full_word case_sens terms p i =
 let mem_all ?(full_word = false) case_sens terms p =
   List.for_all (fun t -> find_term ~full_word case_sens t p 0 <> None) terms
 
+let matches ?(full_word = false) case_sens (terms, excluded) p =
+  mem_all ~full_word case_sens terms p
+  && not
+       (List.exists (fun t -> mem_all ~full_word case_sens [ t ] p) excluded)
+
 let count_occurrences ?(full_word = false) case_sens terms p =
   let rec loop n i =
     match find_any ~full_word case_sens terms p i with

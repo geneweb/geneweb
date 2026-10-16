@@ -32,6 +32,11 @@ val terms : bool -> string -> string list
 val mem_all : ?full_word:bool -> bool -> string list -> string -> bool
 (** [mem_all case_sens terms p] is [true] if every term occurs in [p]. *)
 
+val matches :
+  ?full_word:bool -> bool -> string list * string list -> string -> bool
+(** [matches case_sens (terms, excluded) p] is [true] if every term of [terms]
+    and none of [excluded] occurs in [p], as returned by {!query}. *)
+
 val plain_text : string -> string
 (** [plain_text m] is the readable text of the note source [m]: HTML tags
     dropped, wiki links replaced by their displayed text, [''] and [=] markup
