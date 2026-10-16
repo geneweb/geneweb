@@ -93,6 +93,11 @@ window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
 }
 </script>
 %end;
+%if;(e.m="HIST" and e.pos!="")
+<script>
+document.getElementById('hist-back')?.addEventListener('click', () => history.back());
+</script>
+%end;
 %if;(not is_welcome and e.m!="MOD_DATA")
   %if;wizard;
     %if;(e.m="MOD_DATA_OK" and e.data!="")
