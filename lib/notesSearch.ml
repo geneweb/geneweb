@@ -181,9 +181,10 @@ let query case_sens q =
       let acc, j = term false acc i in
       loop acc j
   in
+  (* equal as compared by [Util.in_text]: each matches the other whole *)
   let same t1 t2 =
-    String.length t1 = String.length t2
-    && Util.find_in_text case_sens t1 t2 0 = Some (0, String.length t2)
+    Util.find_in_text case_sens t1 t2 0 = Some (0, String.length t2)
+    && Util.find_in_text case_sens t2 t1 0 = Some (0, String.length t1)
   in
   let add l t =
     let t = String.trim t in
@@ -199,25 +200,54 @@ let query case_sens q =
 
 let terms case_sens q = fst (query case_sens q)
 
+(* A letter, a digit or a combining mark: what a "full word" match must not
+   touch on either side. *)
+let is_word_char u =
+  let gc = Uucp.Gc.general_category u in
+  gc = `Nd || gc = `Mn || gc = `Mc || Uucp.Alpha.is_alphabetic u
+
+let uchar_at p i = Uchar.utf_decode_uchar (String.get_utf_8_uchar p i)
+
+(* start of the UTF-8 character ending just before byte [i] *)
+let prev_char_start p i =
+  let rec loop k =
+    if k > 0 && Char.code p.[k] land 0xC0 = 0x80 then loop (k - 1) else k
+  in
+  loop (i - 1)
+
+let word_before p i = i > 0 && is_word_char (uchar_at p (prev_char_start p i))
+let word_after p i = i < String.length p && is_word_char (uchar_at p i)
+
+(* Occurrence of [t] in [p] at or after [i]; with [full_word], only one with
+   no letter or digit right before or right after it. *)
+let find_term ~full_word case_sens t p i =
+  let rec loop i =
+    match Util.find_in_text case_sens t p i with
+    | Some (x, y) when full_word && (word_before p x || word_after p y) ->
+        loop (Utf8.next p x)
+    | (Some _ | None) as r -> r
+  in
+  loop i
+
 (* Earliest occurrence of any of [terms] in [p] at or after [i]; at equal
    start, the longest one, so that overlapping terms (henri, henriette)
    highlight the larger span. *)
-let find_any case_sens terms p i =
+let find_any ~full_word case_sens terms p i =
   List.fold_left
     (fun best t ->
-      match (Util.find_in_text case_sens t p i, best) with
+      match (find_term ~full_word case_sens t p i, best) with
       | None, _ -> best
       | Some m, None -> Some m
       | Some (x, y), Some (bx, by) ->
           if x < bx || (x = bx && y > by) then Some (x, y) else best)
     None terms
 
-let mem_all case_sens terms p =
-  List.for_all (fun t -> Util.find_in_text case_sens t p 0 <> None) terms
+let mem_all ?(full_word = false) case_sens terms p =
+  List.for_all (fun t -> find_term ~full_word case_sens t p 0 <> None) terms
 
-let count_occurrences case_sens terms p =
+let count_occurrences ?(full_word = false) case_sens terms p =
   let rec loop n i =
-    match find_any case_sens terms p i with
+    match find_any ~full_word case_sens terms p i with
     | Some (_, j) -> loop (n + 1) j
     | None -> n
   in
@@ -252,7 +282,7 @@ let snippet_stop p j n =
 (* [p] restricted to [a, b) as HTML: escaped, every occurrence of [terms]
    wrapped in <span class="found">, with an ellipsis on each truncated
    side. *)
-let highlighted_range case_sens terms p a b =
+let highlighted_range ~full_word case_sens terms p a b =
   let buf = Buffer.create (b - a + 64) in
   let add_escaped i j =
     if j > i then
@@ -260,7 +290,7 @@ let highlighted_range case_sens terms p a b =
   in
   if a > 0 then Buffer.add_string buf "… ";
   let rec loop i =
-    match find_any case_sens terms p i with
+    match find_any ~full_word case_sens terms p i with
     | Some (x, y) when y <= b ->
         add_escaped i x;
         Buffer.add_string buf {|<span class="found">|};
@@ -273,20 +303,20 @@ let highlighted_range case_sens terms p a b =
   if b < String.length p then Buffer.add_string buf " …";
   Buffer.contents buf
 
-let snippet ?(context = 80) case_sens terms p =
+let snippet ?(context = 80) ?(full_word = false) case_sens terms p =
   if p = "" then ""
   else
-    match find_any case_sens terms p 0 with
+    match find_any ~full_word case_sens terms p 0 with
     | Some (i, j) ->
         let a = snippet_start p i context in
         let b = snippet_stop p j context in
-        highlighted_range case_sens terms p a b
+        highlighted_range ~full_word case_sens terms p a b
     | None ->
         let b = snippet_stop p 0 (2 * context) in
-        highlighted_range case_sens terms p 0 b
+        highlighted_range ~full_word case_sens terms p 0 b
 
-let highlight case_sens terms p =
-  highlighted_range case_sens terms p 0 (String.length p)
+let highlight ?(full_word = false) case_sens terms p =
+  highlighted_range ~full_word case_sens terms p 0 (String.length p)
 
 let is_space c =
   match c with ' ' | '\n' | '\r' | '\t' -> true | _ -> false
@@ -295,7 +325,7 @@ let is_space c =
    done on the decoded text, where an entity is one character and a white
    space run is one space; each occurrence is wrapped around the original
    bytes it comes from, so the output stays valid, already escaped HTML. *)
-let highlight_text_run case_sens terms first buf run =
+let highlight_text_run ~full_word case_sens terms first buf run =
   let len = String.length run in
   (* units: original [start, stop) and decoded text *)
   let units =
@@ -325,7 +355,7 @@ let highlight_text_run case_sens terms first buf run =
          (k + 1, pos + String.length u))
        (0, 0) units);
   let rec loop pos i =
-    match find_any case_sens terms d i with
+    match find_any ~full_word case_sens terms d i with
     | Some (x, y) when y > x ->
         let a, _, _ = units.(owners.(x)) in
         let _, b, _ = units.(owners.(y - 1)) in
@@ -383,7 +413,7 @@ let find_closing m i name =
   let lm = String.lowercase_ascii m in
   match find_from lm i ("</" ^ name) with Some j -> j | None -> String.length m
 
-let highlight_html case_sens terms html =
+let highlight_html ?(full_word = false) case_sens terms html =
   if terms = [] then html
   else
     let len = String.length html in
@@ -413,7 +443,8 @@ let highlight_html case_sens terms html =
         let j =
           match String.index_from_opt html i '<' with Some j -> j | None -> len
         in
-        highlight_text_run case_sens terms first buf (String.sub html i (j - i));
+        highlight_text_run ~full_word case_sens terms first buf
+          (String.sub html i (j - i));
         loop j
     in
     loop 0;

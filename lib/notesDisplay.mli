@@ -105,7 +105,9 @@ val print_misc_notes_search : Config.config -> Driver.base -> unit
     [s] (the search string) from the URL and [c=on] for case sensitivity. [s]
     is split into terms (words, or phrases between double quotes) which must
     all occur in a note, in its title or its text; all are highlighted. Terms
-    written with a leading ['-'] ([-word], [-"phrase"]) must not occur.
+    written with a leading ['-'] ([-word], [-"phrase"]) must not occur. With
+    [word=on] ("word match" box), a term only matches as a full word: no
+    letter or digit right before or after it.
 
     With [f] (a note name, [f=] for the base notes), that note is rendered with
     the occurrences highlighted; a gallery note ([TYPE=gallery]) is rendered as

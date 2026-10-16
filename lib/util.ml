@@ -2912,6 +2912,26 @@ let read_gen_auth_file fname base_file =
     loop []
   with Sys_error _ -> []
 
+(* Byte length of the apostrophe at [i] in [s]: 1 for ', 3 for the
+   typographic ‘ (U+2018) and ’ (U+2019), 0 if there is none. *)
+let apostrophe_length s i =
+  let len = String.length s in
+  if i < len && s.[i] = '\'' then 1
+  else if
+    i + 2 < len
+    && s.[i] = '\xE2'
+    && s.[i + 1] = '\x80'
+    && (s.[i + 2] = '\x98' || s.[i + 2] = '\x99')
+  then 3
+  else 0
+
+(* [Name.next_chars_if_equiv], where any two apostrophes are also equal. *)
+let next_chars_if_equiv_text m i s j =
+  let a = apostrophe_length m i in
+  let b = if a > 0 then apostrophe_length s j else 0 in
+  if a > 0 && b > 0 then Some (i + a, j + b)
+  else Name.next_chars_if_equiv m i s j
+
 let start_equiv_with case_sens s m i =
   if String.length s = 0 then Some i
   else
@@ -2921,13 +2941,13 @@ let start_equiv_with case_sens s m i =
       else if case_sens then
         if m.[i] = s.[j] then test (i + 1) (j + 1) else None
       else
-        match Name.next_chars_if_equiv m i s j with
+        match next_chars_if_equiv_text m i s j with
         | Some (i, j) -> test i j
         | None -> None
     in
     if case_sens then if m.[i] = s.[0] then test (i + 1) 1 else None
     else
-      match Name.next_chars_if_equiv m i s 0 with
+      match next_chars_if_equiv_text m i s 0 with
       | Some (i, j) -> test i j
       | None -> None
 

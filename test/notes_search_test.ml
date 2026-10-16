@@ -127,6 +127,52 @@ let test_exclusion () =
     "excluded terms not highlighted" [ "aaa" ]
     (NotesSearch.terms false "aaa -bbb")
 
+let test_apostrophes () =
+  let text = "Baptême à l’Église de Saint‘Pair" in
+  let count cs t = NotesSearch.count_occurrences cs [ t ] text in
+  Alcotest.(check int) "’ matches '" 1 (count false "l'eglise");
+  Alcotest.(check int) "‘ matches '" 1 (count false "saint'pair");
+  Alcotest.(check int) "' in text matches ’" 1
+    (NotesSearch.count_occurrences false [ "l’a" ] "jusqu'à l'aube");
+  Alcotest.(check int) "case sensitive: exact" 0 (count true "l'Église");
+  Alcotest.(check int) "case sensitive: same char" 1 (count true "l’Église");
+  Alcotest.(check string)
+    "highlight covers the whole ’"
+    {|à <span class="found" id="first-found">l’Église</span>|}
+    (NotesSearch.highlight_html false [ "l'eglise" ] "à l’Église");
+  Alcotest.(check (list string))
+    "l' and l’ are one term" [ "l'a" ]
+    (NotesSearch.terms false "l'a l’a");
+  Alcotest.(check (list string))
+    "but two when case sensitive" [ "l'a"; "l’a" ]
+    (NotesSearch.terms true "l'a l’a")
+
+let test_full_word () =
+  let count t p = NotesSearch.count_occurrences ~full_word:true false [ t ] p in
+  Alcotest.(check int) "l'a not in l'aube" 0 (count "l'a" "jusqu'à l'aube");
+  Alcotest.(check int) "l'a as a word" 1 (count "l'a" "il l'a vu");
+  Alcotest.(check int) "aube after an apostrophe" 1 (count "aube" "l'aube");
+  Alcotest.(check int) "henri not in henriette" 0 (count "henri" "Henriette");
+  Alcotest.(check int) "accented neighbour is a letter" 0
+    (count "rene" "Renée");
+  Alcotest.(check int) "hyphen is a boundary" 1 (count "pair" "Saint-Pair");
+  Alcotest.(check int) "digits are word characters" 0 (count "18" "1832");
+  Alcotest.(check int) "at text ends" 2 (count "henri" "Henri et henri");
+  Alcotest.(check int)
+    "later whole occurrence found" 1
+    (count "henri" "Henriette et Henri");
+  Alcotest.(check int)
+    "without full_word" 2
+    (NotesSearch.count_occurrences false [ "henri" ] "Henriette et Henri");
+  Alcotest.(check string)
+    "highlight only the word"
+    {|Henriette et <span class="found" id="first-found">Henri</span>|}
+    (NotesSearch.highlight_html ~full_word:true false [ "henri" ]
+       "Henriette et Henri");
+  Alcotest.(check bool)
+    "mem_all" false
+    (NotesSearch.mem_all ~full_word:true false [ "l'a" ] "l'aube")
+
 let test_and () =
   Alcotest.(check bool)
     "all present" true
@@ -158,5 +204,7 @@ let v =
         Alcotest.test_case "terms" `Quick test_terms;
         Alcotest.test_case "and" `Quick test_and;
         Alcotest.test_case "exclusion" `Quick test_exclusion;
+        Alcotest.test_case "apostrophes" `Quick test_apostrophes;
+        Alcotest.test_case "full word" `Quick test_full_word;
       ] );
   ]
