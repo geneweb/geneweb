@@ -17,6 +17,16 @@ val snippet : ?context:int -> bool -> string -> string -> string
     ellipsis on truncated sides. Without an occurrence, the beginning of [p] is
     returned. *)
 
+val highlight_html : bool -> string -> string -> string
+(** [highlight_html case_sens s html] wraps every occurrence of [s] in the text
+    of the rendered HTML [html] in [<span class="found">], the first one with
+    [id="first-found"] so that a [#first-found] URL fragment scrolls to it.
+    Tags, attribute values, comments and the contents of [script], [style],
+    [textarea] and [title] are left untouched. Matching is done on the decoded
+    text: an entity counts as the character it stands for and a white space
+    run as one space. Occurrences that span a tag ([mou<i>lin</i>]) are not
+    highlighted. *)
+
 val highlight : bool -> string -> string -> string
 (** [highlight case_sens s p] is the whole plain text [p], HTML-escaped, with
     occurrences of [s] wrapped in [<span class="found">]. *)
