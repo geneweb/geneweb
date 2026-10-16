@@ -59,7 +59,7 @@
   %end;
   %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
   %if;(upd_form=1 or e.m="MOD_GALLERY" or e.m="UNKNOWN")
-   <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
+   <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;" data-clear-title="[*clear input]"></script>
   %end;
   %if;(e.m="UNKNOWN")
    <script>document.addEventListener('DOMContentLoaded', addClearButtonToInputs);</script>
