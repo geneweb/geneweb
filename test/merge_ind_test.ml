@@ -1,44 +1,15 @@
-let empty_string = 0
-let quest_string = 1
-let ascend parents = { Gwdb.no_ascend with Def.parents }
-let descend children = { Def.children }
-let union family = { Def.family }
-let couple a b = Adef.couple a b
-
-let person i =
-  { (Mutil.empty_person empty_string quest_string) with occ = i; key_index = i }
-
-let family i = { (Mutil.empty_family empty_string) with fam_index = i }
-let iper (i : int) : Gwdb.iper = i |> Int.to_string |> Gwdb.iper_of_string
-
 let test_is_ancestor =
-  let child = person 0 in
-  let father = person 1 in
-  let mother = person 2 in
-  let persons = [| child; father; mother |] in
-  let ascends = [| ascend (Some 0); ascend None; ascend None |] in
-  let unions = [| union [||]; union [| 0 |]; union [| 0 |] |] in
-  let families = [| family 0 |] in
-  let couples = [| couple 1 2 |] in
-  let descends = [| descend [| 0 |] |] in
-  let strings = [| ""; "?" |] in
-  let base_notes =
-    { Def.nread = (fun _ _ -> ""); norigin_file = ""; efiles = (fun () -> []) }
-  in
-  let data =
-    ( (persons, ascends, unions),
-      (families, couples, descends),
-      strings,
-      base_notes )
-  in
-  let base = Gwdb.make "" [] data in
-  let () = Gwdb.load_ascends_array base in
-  let child = Gwdb.poi base (iper 0) in
-  let father = Gwdb.poi base (iper 1) in
-  let mother = Gwdb.poi base (iper 2) in
+  let db = Mock_db.create () in
+  let child = Mock_db.add_person db ~occ:0 () in
+  let father = Mock_db.add_person db ~occ:1 () in
+  let mother = Mock_db.add_person db ~occ:2 () in
+  let _fam = Mock_db.add_family db ~father ~mother ~children:[ child ] () in
+  let base = Mock_db.build db in
+  let child = Mock_db.poi base child in
+  let father = Mock_db.poi base father in
+  let mother = Mock_db.poi base mother in
   let test ~__POS__ ~msg exp p1 p2 () =
-    Alcotest.check' ~pos:__POS__ Alcotest.bool ~msg ~expected:exp
-      ~actual:(Geneweb.Person.is_ancestor base p1 p2)
+    Check.bool ~pos:__POS__ ~msg exp (Geneweb.Person.is_ancestor base p1 p2)
   in
   [
     test ~__POS__ ~msg:"is_ancestor child father" false child father;
@@ -47,10 +18,8 @@ let test_is_ancestor =
   ]
 
 let v =
+  let run_all tests () = List.iter (fun check -> check ()) tests in
   [
-    ( "merge-individuals",
-      [
-        Alcotest.test_case "Person.is_ancestor" `Quick (fun () ->
-            List.iter (fun check -> check ()) test_is_ancestor);
-      ] );
+    Check.suite "merge-individuals"
+      [ Check.case "Person.is_ancestor" (run_all test_is_ancestor) ];
   ]
