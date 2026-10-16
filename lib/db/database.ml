@@ -300,12 +300,13 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
         ipera
       with Not_found -> []
     in
-    let patched = Hashtbl.fold (fun i _ acc -> i :: acc) person_patches [] in
-    let ipera = List.filter (fun i -> not @@ List.mem i patched) ipera in
+    let ipera =
+      List.filter (fun i -> not (Hashtbl.mem person_patches i)) ipera
+    in
     Hashtbl.fold
       (fun i p acc ->
-        let istr1 = proj p in
-        if istr1 = istr then if List.mem i acc then acc else i :: acc else acc)
+        if proj p = istr && Hashtbl.find person_patches i == p then i :: acc
+        else acc)
       person_patches ipera
   in
   let cursor str =
