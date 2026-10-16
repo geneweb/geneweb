@@ -102,12 +102,13 @@ val print_misc_notes : Config.config -> Driver.base -> unit
 
 val print_misc_notes_search : Config.config -> Driver.base -> unit
 (** [print_misc_notes_search conf base] dispatches a text search request: reads
-    [s] (the search string) from the URL and [c=on] for case sensitivity. [s]
-    is split into terms (words, or phrases between double quotes) which must
-    all occur in a note, in its title or its text; all are highlighted. Terms
+    [s] (the search string) from the URL and [c=on] for case sensitivity. [s] is
+    split into terms (words, or phrases between double quotes) which must all
+    occur in a note, in its title or its text; all are highlighted. Terms
     written with a leading ['-'] ([-word], [-"phrase"]) must not occur. With
-    [word=on] ("word match" box), a term only matches as a full word: no
-    letter or digit right before or after it.
+    [word=on] ("word match" box), a term only matches as a full word: no letter
+    or digit right before or after it; [aaa*] and [*aaa] then lift the check on
+    the starred side. A ['?'] matches any one character.
 
     With [f] (a note name, [f=] for the base notes), that note is rendered with
     the occurrences highlighted; a gallery note ([TYPE=gallery]) is rendered as

@@ -1036,13 +1036,12 @@ let collect_search_hits conf base ~full_word case_sens (terms, excluded) =
         let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
         let plain = NotesSearch.plain_text nt in
         let plain_tit = NotesSearch.plain_text tit in
-        (* Without [full_word], [in_text] on the source is also tried
-           besides the decoded text ([plain]: entities, '' and = markup).
-           [full_word] needs to see the neighbouring characters, which
-           only the decoded text gives. *)
+        (* Terms are matched on the decoded text ([plain]: entities, '' and
+           = markup; wildcards). Without [full_word], [in_text] on the source
+           is also tried; [full_word] needs to see the neighbouring
+           characters, which only the decoded text gives. *)
         let in_tit t =
-          if full_word then NotesSearch.mem_all ~full_word case_sens [ t ] plain_tit
-          else in_text case_sens (NotesSearch.core t) tit
+          NotesSearch.mem_all ~full_word case_sens [ t ] plain_tit
         in
         let in_title = List.length (List.filter in_tit terms) in
         let present t =
@@ -1050,10 +1049,7 @@ let collect_search_hits conf base ~full_word case_sens (terms, excluded) =
           || ((not full_word) && in_text case_sens (NotesSearch.core t) nt)
           || NotesSearch.mem_all ~full_word case_sens [ t ] plain
         in
-        if
-          List.for_all present terms
-          && not (List.exists present excluded)
-        then
+        if List.for_all present terms && not (List.exists present excluded) then
           {
             sh_fnotes = fnotes;
             sh_file = Option.value ~default:"" (note_file base fnotes);
