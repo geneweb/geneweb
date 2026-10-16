@@ -521,12 +521,13 @@ let find_closing m i name =
   | Some j -> j
   | None -> String.length m
 
-let highlight_html ?(full_word = false) case_sens terms html =
+let highlight_html ?(full_word = false) ?(anchor = true) case_sens terms html =
   if terms = [] then html
   else
     let len = String.length html in
     let buf = Buffer.create (len + 256) in
-    let first = ref true in
+    (* [false] once the anchor is placed, or if none is wanted *)
+    let first = ref anchor in
     let rec loop i =
       if i >= len then ()
       else if html.[i] = '<' then (

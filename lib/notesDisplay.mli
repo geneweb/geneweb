@@ -101,21 +101,8 @@ val print_misc_notes : Config.config -> Driver.base -> unit
     database, under a "files not in db" heading. *)
 
 val print_misc_notes_search : Config.config -> Driver.base -> unit
-(** [print_misc_notes_search conf base] dispatches a text search request: reads
-    [s] (the search string) from the URL and [c=on] for case sensitivity. [s] is
-    split into terms (words, or phrases between double quotes) which must all
-    occur in a note, in its title or its text; all are highlighted. Terms
-    written with a leading ['-'] ([-word], [-"phrase"]) must not occur. With
-    [word=on] ("word match" box), a term only matches as a full word: no letter
-    or digit right before or after it; [aaa*] and [*aaa] then lift the check on
-    the starred side. A ['?'] matches any one character.
-
-    With [f] (a note name, [f=] for the base notes), that note is rendered with
-    the occurrences highlighted; a gallery note ([TYPE=gallery]) is rendered as
-    by [m=GALLERY], without highlighting.
-
-    Otherwise every linked note is searched, notes restricted by [RESTRICT]
-    being skipped: a single hit is rendered as above; several hits give a
-    results page (title, file, occurrence count, highlighted snippet), whose
-    links come back here with [f], or go to [m=GALLERY] for a gallery; no hit
-    gives a "no match" message. An empty [s] renders {!print_misc_notes}. *)
+(** [print_misc_notes_search conf base] serves [m=MISC_NOTES_SEARCH]. With [f]
+    (a misc note, [f=] for the base notes, as set by the links of the notes
+    search results) and [s], that note is rendered with the terms of [s]
+    highlighted (a gallery note as by [m=GALLERY]). Otherwise the search is
+    the merged {!NotesSearchDisplay.print}. Without [s], the misc notes list. *)

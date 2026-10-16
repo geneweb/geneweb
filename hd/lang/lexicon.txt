@@ -15264,9 +15264,9 @@ sv: anteckningar om vigseln/anteckningar om vigslarna
 tr: evlilik notları/evlilik notları
 
     notes search
-de: Suche in Personen- und Familiennotizen
-en: search in individual and family notes
-fr: recherche dans les notes d’individus et de familles
+de: In den Notizen suchen
+en: search in notes
+fr: rechercher dans les notes
 
     notes search help
 de: Suchsyntax
@@ -15308,10 +15308,6 @@ de: mit „ganzes Wort“ darf das Wort nicht Teil eines längeren Wortes sein: 
 en: with “word match”, the word must not be part of a longer word: l'a does not find l'aube
 fr: avec « mot complet », le mot ne doit pas faire partie d’un mot plus long : l'a ne trouve pas l'aube
 
-    notes search button
-de: Personen- und Familiennotizen
-en: individual and family notes
-fr: notes d’individus et de familles
 
     notes search first results %d
 de: nur die ersten %d Ergebnisse werden angezeigt
@@ -15333,15 +15329,11 @@ de: Der Notizenindex stammt von einer älteren Version der Datenbank: „cache_f
 en: The notes index was built for an earlier version of the base: run “cache_files -notes %s” again.
 fr: L’index des notes date d’une version antérieure de la base : relancer « cache_files -notes %s ».
 
-    notes search reserved to friends or wizards
-de: Die Suche in den Notizen ist Freunden und Meistern vorbehalten
-en: the notes search is reserved to friends or wizards
-fr: la recherche dans les notes est réservée aux amis et magiciens
 
     notes search scopes
-de: Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen
-en: individual notes/family notes/individual event notes/family event notes
-fr: notes d’individus/notes de familles/notes d’événements individuels/notes d’événements familiaux
+de: Diverse Notizen/Notizen der Meister/Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen
+en: miscellaneous notes/wizard notes/individual notes/family notes/individual event notes/family event notes
+fr: notes diverses/notes des magiciens/notes d’individus/notes de familles/notes d’événements individuels/notes d’événements familiaux
 
     notes summary
 bg: резюме на бележките

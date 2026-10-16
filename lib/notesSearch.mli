@@ -54,11 +54,12 @@ val snippet :
     [<span class="found">] and an ellipsis on truncated sides. Without an
     occurrence, the beginning of [p] is returned. *)
 
-val highlight_html : ?full_word:bool -> bool -> string list -> string -> string
+val highlight_html :
+  ?full_word:bool -> ?anchor:bool -> bool -> string list -> string -> string
 (** [highlight_html case_sens terms html] wraps every occurrence of any of
     [terms] in the text of the rendered HTML [html] in [<span class="found">],
-    the first one with [id="first-found"] so that a [#first-found] URL fragment
-    scrolls to it. Tags, attribute values, comments and the contents of
+    the first one with [id="first-found"] (unless [~anchor:false]) so that a
+    [#first-found] URL fragment scrolls to it. Tags, attribute values, comments and the contents of
     [script], [style], [textarea] and [title] are left untouched. Matching is
     done on the decoded text: an entity counts as the character it stands for
     and a white space run as one space. Occurrences that span a tag

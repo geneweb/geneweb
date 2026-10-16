@@ -12,124 +12,14 @@ module Gutil = Geneweb_db.Gutil
 module Server = Geneweb_http.Server
 module Connection = Geneweb_http.Connection
 
-(* [deprecated] TYPE=album is accepted on read for backward compatibility
-   with notes, all new notes always write TYPE=gallery. *)
-let norm_type = function "album" -> "gallery" | t -> t
-
-let is_ancestor conf base anc =
-  let restrict_for_spouses =
-    try List.assoc "restrict_for_spouses" conf.base_env = "yes"
-    with Not_found -> false
-  in
-  let max =
-    match List.assoc_opt "restrict_note_max" conf.base_env with
-    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
-    | None -> 32
-  in
-  let test_ancestor p1 p2 =
-    let ip1 = Driver.get_iper p1 in
-    let ip2 = Driver.get_iper p2 in
-    ip1 = ip2
-    || try Gutil.is_ancestor ~max base p1 p2 with Gutil.Same_person -> true
-  in
-  let bad_format n =
-    Log.warn (fun k -> k "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
-  in
-  if String.length anc <= 4 then (
-    bad_format 1;
-    false)
-  else
-    let anc = String.sub anc 2 (String.length anc - 4) in
-    let parts = String.split_on_char '/' anc in
-    if List.length parts <> 3 then (
-      bad_format 2;
-      false)
-    else
-      let fn = List.nth parts 0 |> Name.lower in
-      let sn = List.nth parts 1 |> Name.lower in
-      let oc =
-        try int_of_string (List.nth parts 2)
-        with Failure _ ->
-          bad_format 3;
-          0
-      in
-      match (Driver.person_of_key base fn sn oc, conf.user_iper) with
-      | Some anc_ip, Some user_ip ->
-          test_ancestor (Driver.poi base anc_ip) (Driver.poi base user_ip)
-          || restrict_for_spouses
-             &&
-             let families = Driver.get_family (Driver.poi base user_ip) in
-             Array.exists
-               (fun fam ->
-                 let fam = Driver.foi base fam in
-                 let fath_ip = Driver.get_father fam in
-                 let moth_ip = Driver.get_mother fam in
-                 let spouse_ip =
-                   if user_ip = fath_ip then moth_ip else fath_ip
-                 in
-                 test_ancestor (Driver.poi base anc_ip)
-                   (Driver.poi base spouse_ip))
-               families
-      | _ -> false
-
-let rec is_restricted conf base anc_l =
-  match anc_l with
-  | [] -> true
-  | anc :: l ->
-      if is_ancestor conf base anc then false else is_restricted conf base l
-
 (* "full word" box of the notes search form: [word=on] *)
 let full_word_search conf = p_getenv conf.env "word" = Some "on"
 
+(* search box at the bottom of the misc notes pages: the merged
+   m=NOTES_SEARCH, with the same text and options *)
 let print_search_form conf =
-  Output.printf conf
-    {|<div class="mt-3">
-<form class="d-flex flex-wrap align-items-center gap-2" method="get" action="%s">|}
-    conf.command;
-  hidden_env conf;
-  (* no hidden m: each submit button sends its own, the first one being the
-     default (Enter in the text box) *)
-  Output.print_sstring conf
-    {|<input type="text" name="s" size="40" class="form-control w-auto" value="|};
-  (match p_getenv conf.env "s" with
-  | Some s -> Output.print_string conf (Util.escape_html s)
-  | None -> ());
-  Output.print_sstring conf "\">";
-  Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
-  Output.printf conf
-    {|<input type="checkbox" name="c" value="on" class="form-check-input" id="case"%s>|}
-    (match p_getenv conf.env "c" with
-    | Some "on" -> " checked"
-    | Some _ | None -> "");
-  Output.printf conf
-    {|<label class="form-check-label text-nowrap" for="case">%s</label>|}
-    (transl_nth conf "search/case sensitive" 1);
-  Output.print_sstring conf "</div>";
-  Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
-  Output.printf conf
-    {|<input type="checkbox" name="word" value="on" class="form-check-input" id="word"%s>|}
-    (if full_word_search conf then " checked" else "");
-  Output.printf conf
-    {|<label class="form-check-label text-nowrap" for="word">%s</label>|}
-    (transl conf "word match");
-  Output.print_sstring conf "</div>";
-  (* the buttons stay together when the row wraps *)
-  Output.print_sstring conf {|<div class="d-flex gap-2">|};
-  Output.print_sstring conf
-    {|<button type="submit" name="m" value="MISC_NOTES_SEARCH" class="btn btn-primary text-nowrap">|};
-  transl_nth conf "search/case sensitive" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button>";
-  (* friends and wizards can also search person, family and event notes,
-     with the same text and options *)
-  if conf.wizard || conf.friend then
-    Output.printf conf
-      {|<button type="submit" name="m" value="NOTES_SEARCH" class="btn btn-outline-primary text-nowrap" title="%s">%s</button>|}
-      (transl conf "notes search" |> Utf8.capitalize_fst)
-      (transl conf "notes search button" |> Utf8.capitalize_fst);
-  NotesSearchDisplay.print_help_button conf;
-  Output.print_sstring conf "</div>\n</form>\n";
-  NotesSearchDisplay.print_help_panel conf;
+  Output.print_sstring conf {|<div class="mt-3">|};
+  NotesSearchDisplay.print_form conf (NotesSearchDisplay.query_of_env conf);
   Output.print_sstring conf "</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
@@ -991,160 +881,6 @@ let print_misc_notes conf base =
   Hutil.trailer conf
 
 (* searching *)
-type search_hit = {
-  sh_fnotes : string;
-  sh_file : string;  (** file read, relative to the base directory *)
-  sh_gallery : bool;  (** TYPE=gallery (or legacy album): open with m=GALLERY *)
-  sh_title : string;  (** plain text *)
-  sh_in_title : int;  (** number of terms found in the title *)
-  sh_count : int;  (** occurrences in the body *)
-  sh_snippet : string;  (** HTML, already escaped and highlighted *)
-}
-
-(* same rule as [print]: a note with a RESTRICT list is only visible to the
-   descendants it names *)
-let note_is_restricted conf base nenv =
-  match List.assoc_opt "RESTRICT" nenv with
-  | None | Some "" -> false
-  | Some l -> is_restricted conf base (String.split_on_char ',' l)
-
-(* File holding the note [fnotes], relative to the base directory, as read by
-   [Driver.base_notes_read]: [notes] for the base notes. [None] for a name
-   that [read_notes] cannot map to a file (it would read the base notes). *)
-let note_file base fnotes =
-  if fnotes = "" then Some "notes"
-  else
-    match NotesLinks.check_file_name fnotes with
-    | Some (dl, f) ->
-        Some
-          (String.concat "/"
-             (Driver.base_notes_dir base
-             :: List.fold_right (fun d acc -> d :: acc) dl [ f ^ ".txt" ]))
-    | None -> None
-
-let is_gallery nenv =
-  match List.assoc_opt "TYPE" nenv with
-  | Some t -> norm_type t = "gallery"
-  | None -> false
-
-(* A note is a hit when every required term occurs in its title or its text
-   and no excluded term does. *)
-let collect_search_hits conf base ~full_word case_sens (terms, excluded) =
-  let pages =
-    ""
-    :: List.filter_map
-         (fun (fnotes, _) ->
-           if fnotes = "" then None
-           else
-             match note_file base fnotes with
-             | Some _ -> Some fnotes
-             | None ->
-                 Log.warn (fun k ->
-                     k "notes search: skipping invalid page name %S" fnotes);
-                 None)
-         (notes_links_db conf base true)
-  in
-  List.fold_left
-    (fun acc fnotes ->
-      let nenv, nt = read_notes base fnotes in
-      if note_is_restricted conf base nenv then acc
-      else
-        let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
-        let plain = NotesSearch.plain_text nt in
-        let plain_tit = NotesSearch.plain_text tit in
-        (* Terms are matched on the decoded text ([plain]: entities, '' and
-           = markup; wildcards). Without [full_word], [in_text] on the source
-           is also tried; [full_word] needs to see the neighbouring
-           characters, which only the decoded text gives. *)
-        let in_tit t =
-          NotesSearch.mem_all ~full_word case_sens [ t ] plain_tit
-        in
-        let in_title = List.length (List.filter in_tit terms) in
-        let present t =
-          in_tit t
-          || ((not full_word) && in_text case_sens (NotesSearch.core t) nt)
-          || NotesSearch.mem_all ~full_word case_sens [ t ] plain
-        in
-        if List.for_all present terms && not (List.exists present excluded) then
-          {
-            sh_fnotes = fnotes;
-            sh_file = Option.value ~default:"" (note_file base fnotes);
-            sh_gallery = is_gallery nenv;
-            sh_title = plain_tit;
-            sh_in_title = in_title;
-            sh_count =
-              NotesSearch.count_occurrences ~full_word case_sens terms plain;
-            sh_snippet = NotesSearch.snippet ~full_word case_sens terms plain;
-          }
-          :: acc
-        else acc)
-    [] pages
-  |> List.rev
-  |> List.stable_sort (fun h1 h2 ->
-      match Int.compare h2.sh_in_title h1.sh_in_title with
-      | 0 -> Int.compare h2.sh_count h1.sh_count
-      | c -> c)
-
-let print_search_hit conf ~full_word case_sens s terms hit =
-  let href =
-    if hit.sh_gallery then
-      Printf.sprintf "%sm=GALLERY&f=%s"
-        (commd conf :> string)
-        (Mutil.encode hit.sh_fnotes :> string)
-    else
-      Printf.sprintf "%sm=MISC_NOTES_SEARCH&s=%s%s%s&f=%s#first-found"
-        (commd conf :> string)
-        (Mutil.encode s :> string)
-        (if case_sens then "&c=on" else "")
-        (if full_word then "&word=on" else "")
-        (Mutil.encode hit.sh_fnotes :> string)
-  in
-  let icon = if hit.sh_gallery then "image" else "file-lines" in
-  let label =
-    if hit.sh_title <> "" then
-      NotesSearch.highlight ~full_word case_sens terms hit.sh_title
-    else if hit.sh_fnotes = "" then
-      (Util.escape_html (Utf8.capitalize_fst (transl conf "base notes"))
-        :> string)
-    else (Util.escape_html hit.sh_fnotes :> string)
-  in
-  let page_name =
-    Format.sprintf {|<code class="small ms-2">%s</code>|}
-      (Util.escape_html hit.sh_file :> string)
-  in
-  let count =
-    if hit.sh_count = 0 then ""
-    else
-      Format.sprintf {|<span class="badge text-bg-secondary ms-2">%d</span>|}
-        hit.sh_count
-  in
-  Output.printf conf
-    {|<li class="list-group-item">
-<div><i class="far fa-%s fa-fw me-2"></i><a href="%s">%s</a>%s%s</div>
-<div class="small text-muted">%s</div>
-</li>
-|}
-    icon href label page_name count hit.sh_snippet
-
-let print_search_hits conf ~full_word case_sens s terms hits =
-  let title _ =
-    Printf.sprintf
-      (ftransl conf "NOTIF all results for %s")
-      (Util.escape_html s :> string)
-    |> Output.print_sstring conf
-  in
-  Hutil.header conf title;
-  (match hits with
-  | [] ->
-      Output.printf conf "<p>%s</p>\n"
-        (Utf8.capitalize_fst (transl conf "no match"))
-  | _ :: _ ->
-      Output.print_sstring conf {|<ul class="list-group mb-3">|};
-      List.iter (print_search_hit conf ~full_word case_sens s terms) hits;
-      Output.print_sstring conf "</ul>\n");
-  print_search_form conf;
-  Hutil.trailer conf
-
 (* A gallery is a JSON document rendered by the notes_gallery template: show
    it as m=GALLERY&f=fnotes would, without highlighting. *)
 let print_found_note conf base case_sens s fnotes =
@@ -1157,32 +893,22 @@ let print_found_note conf base case_sens s fnotes =
     print_whole_notes conf base fnotes (Util.safe_html tit) nt
       (Some (case_sens, s))
 
-(* [s] is split into terms (words, or "quoted phrases"), all required, except
-   those written -word or -"phrase", which must not occur.
-   [f] (as set by the links of the results page) names the note to show;
-   [f=] is the base notes. Without [f], all notes are searched. *)
+(* m=MISC_NOTES_SEARCH: with [f] (set by the links of the notes search
+   results, [f=] being the base notes), that note is shown with the terms of
+   [s] highlighted; otherwise the search is the merged m=NOTES_SEARCH. *)
 let search_text conf base s =
   let s = String.trim s in
   let case_sens = p_getenv conf.env "c" = Some "on" in
-  let terms, excluded = NotesSearch.query case_sens s in
-  if terms = [] && excluded = [] then print_misc_notes conf base
-  else
-    let requested =
-      match p_getenv conf.env "f" with
-      | Some f when f = "" || NotesLinks.check_file_name f <> None ->
-          let nenv, _ = read_notes base f in
-          if note_is_restricted conf base nenv then None else Some f
-      | Some _ | None -> None
-    in
-    match requested with
-    | Some fnotes -> print_found_note conf base case_sens s fnotes
-    | None -> (
-        let full_word = full_word_search conf in
-        match
-          collect_search_hits conf base ~full_word case_sens (terms, excluded)
-        with
-        | [ hit ] -> print_found_note conf base case_sens s hit.sh_fnotes
-        | hits -> print_search_hits conf ~full_word case_sens s terms hits)
+  let requested =
+    match p_getenv conf.env "f" with
+    | Some f when f = "" || NotesLinks.check_file_name f <> None ->
+        let nenv, _ = read_notes base f in
+        if note_is_restricted conf base nenv then None else Some f
+    | Some _ | None -> None
+  in
+  match requested with
+  | Some fnotes when s <> "" -> print_found_note conf base case_sens s fnotes
+  | Some _ | None -> NotesSearchDisplay.print conf base
 
 let print_misc_notes_search conf base =
   match try Some (List.assoc "s" conf.env) with Not_found -> None with
