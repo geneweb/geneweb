@@ -20,8 +20,8 @@ let this_request_updates_database conf =
       ( "ADD_FAM" | "CHANGE_WIZ_VIS" | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM"
       | "DEL_IMAGE" | "DEL_IND" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
       | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
-      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "SND_IMAGE" )
-    ->
+      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "SND_IMAGE"
+      | "UNKNOWN_OK" ) ->
       true
   | _ -> false
 
@@ -823,6 +823,9 @@ let treat_request =
              | "TT" -> w_base @@ TitleDisplay.print
              | "U" ->
                  w_wizard @@ w_base @@ w_person @@ Perso.interp_templ "updmenu"
+             | "UNKNOWN" -> w_wizard @@ w_base @@ UnknownPersons.print
+             | "UNKNOWN_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UnknownPersons.print_ok
              | "UPD" -> w_wizard @@ w_lock @@ w_base @@ UpdateField.print
              | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
                  w_wizard @@ w_base @@ WiznotesDisplay.print_view
