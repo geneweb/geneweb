@@ -51,6 +51,8 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** There is a possibility that two families are a duplicate of each other *)
   | PossibleDuplicateFamHomonymous of 'family * 'family * 'person
       (** There is a possibility that two families are a duplicate of each other (Homonymous spouse) *)
+  | PossibleDuplicateFamQuestString of 'family * 'family * 'person
+      (** There is a possibility that two families are a duplicate of each other (? ? spouse) *)
   | PWitnessEventAfterDeath of 'person * 'pevent * 'person
       (** Witness is dead before personal event date *)
   | PWitnessEventBeforeBirth of 'person * 'pevent * 'person
@@ -84,3 +86,8 @@ val compare_base_warning : base_warning -> base_warning -> int
 module BaseWarningSet : Set.S with type elt = base_warning
 
 val handle_homonymous : Gwdb.base -> base_warning list -> base_warning list
+
+val named_spouse_of_quest_string_warning :
+  Gwdb.base -> Gwdb.person -> Gwdb.ifam -> Gwdb.ifam -> Gwdb.person
+(** [named_spouse_of_quest_string_warning base p ifam1 ifam2] retrieves the named
+    spouse of [p] between families [ifam1] and [ifam2] regardless of normalization order. *)
