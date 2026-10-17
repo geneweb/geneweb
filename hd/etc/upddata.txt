@@ -179,6 +179,9 @@
           <ul class="list-group src-list-bg my-1">
             %foreach;value;
               <li class="list-unstyled ms-sm-1 ps-0" id="k%entry_key;">
+                %if;(is_modified and entry_blank and (e.data="fn" or e.data="sn"))
+                  <div class="alert alert-warning mx-2 mt-2">[*book blank name]</div>
+                %end;
                 <div class="d-flex%if;(is_modified) my-2 my-sm-0 ps-0%end; %if;(e.data!="src")mx-2%else;me-2%end;">
                   %if;(e.data!="src")
                     <div class="d-flex flex-column justify-content-center">

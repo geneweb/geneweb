@@ -3795,6 +3795,16 @@ sv: födelsedagar
 tr: doğum günleri
 zh: 出生于今日的记录
 
+    book blank name
+de: dieser Vor- oder Familienname enthält kein alphanumerisches Zeichen: Die Suche findet die Personen nicht, die ihn tragen, und ihre Historie wie ihr Porträt können mit denen anderer Personen verwechselt werden. Benennen Sie ihn in einen Platzhalternamen um, zum Beispiel Nn.
+en: this first name or surname contains no alphanumeric character: search does not find the persons who bear it, and their history and portrait may get mixed up with those of other persons. Rename it to a placeholder name, for example Nn.
+es: este nombre o apellido no contiene ningún carácter alfanumérico: la búsqueda no encuentra a las personas que lo llevan, y su historial y su retrato pueden confundirse con los de otras personas. Cámbielo por un nombre de sustitución, por ejemplo Nn.
+fr: ce prénom ou patronyme ne comporte aucun caractère alphanumérique : la recherche ne trouve pas les personnes qui le portent, et leur historique comme leur portrait risquent de se confondre avec ceux d’autres personnes. Renommez-le en un nom de substitution, par exemple Nn.
+it: questo nome o cognome non contiene alcun carattere alfanumerico: la ricerca non trova le persone che lo portano, e la loro cronologia e il loro ritratto rischiano di confondersi con quelli di altre persone. Rinominatelo con un nome segnaposto, per esempio Nn.
+nl: deze voor- of achternaam bevat geen enkel alfanumeriek teken: zoeken vindt de personen die hem dragen niet, en hun geschiedenis en portret kunnen verward raken met die van andere personen. Hernoem hem naar een plaatsvervangende naam, bijvoorbeeld Nn.
+pt: este nome próprio ou apelido não contém nenhum carácter alfanumérico: a pesquisa não encontra as pessoas que o usam, e o seu histórico e o seu retrato podem confundir-se com os de outras pessoas. Renomeie-o para um nome substituto, por exemplo Nn.
+sv: detta för- eller efternamn innehåller inget alfanumeriskt tecken: sökningen hittar inte personerna som bär det, och deras historik och porträtt kan förväxlas med andras. Byt till ett platshållarnamn, till exempel Nn.
+
     book of %s
 co: libru di i %s
 de: %s-Lexikon
