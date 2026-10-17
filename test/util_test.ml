@@ -222,7 +222,7 @@ let v =
         test_case "Mutil.contains" `Quick mutil_contains;
         test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
         test_case "Mutil particule" `Quick mutil_compare_after_particle;
-        test_case "Mutil.string_of_int_sep" `Quick mutil_compare_after_particle;
+        test_case "Mutil.string_of_int_sep" `Quick mutil_string_of_int_sep;
         test_case "Mutil.epoch_of_date" `Quick mutil_epoch_of_date;
       ] );
     ("name", [ test_case "Name.title" `Quick name_title ]);
