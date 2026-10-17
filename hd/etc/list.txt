@@ -150,7 +150,7 @@
     %let;occ;%apply;get_value(myindex, "occ")%in;
     %(TODO: would we want to sort by event dates? it was "dates_sort" before %)
     %let;dates;%apply;get_value(myindex, "dates")%in;
-    %let;s;%apply;get_var("p",i)%in;
+    %let;s;%if;(e.p0!="")%apply;get_var("p",i)%end;%in;
     %let;so;%if;(s="" and k!="")%k;%else;%s;%end;%in;
     %apply;add_in_sorted_list%with;
       %so;%and;
