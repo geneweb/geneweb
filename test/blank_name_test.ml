@@ -125,6 +125,25 @@ let test_blank_names () =
     [ "?"; "??"; "-"; "? ?"; "(?)" ];
   (check string) "placeholder" "n.n." (Name.lower "N.N.")
 
+let test_lower_blank_chars () =
+  let blank c =
+    (c < 0x80
+    &&
+    match Char.chr c with
+    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '.' -> false
+    | _ -> true)
+    || (c >= 0x300 && c <= 0x36F)
+  in
+  let mismatches = ref [] in
+  for c = 0x10FFFF downto 0 do
+    if c < 0xD800 || c > 0xDFFF then (
+      let b = Buffer.create 4 in
+      Buffer.add_utf_8_uchar b (Uchar.of_int c);
+      if Name.lower (Buffer.contents b) = "" <> blank c then
+        mismatches := Printf.sprintf "U+%04X" c :: !mismatches)
+  done;
+  (check (list string)) "characters lowered to nothing" [] !mismatches
+
 let test_keys () =
   let key fn sn occ =
     let k = HistoryDiff.history_file fn sn occ in
@@ -138,13 +157,13 @@ let test_keys () =
 
 let test_blank_list () =
   with_base "blank_list_test" @@ fun base ->
-  (check (list (triple string string int)))
+  (check (list (pair string string)))
     "names without letters or digits"
-    [ ("sn", "??", 1); ("sn", "…", 1) ]
+    [ ("sn", "??"); ("sn", "…") ]
     (List.sort compare
        (List.map
-          (fun (data, istr, n) -> (data, Driver.sou base istr, n))
-          (UnknownPersons.blank_names base)))
+          (fun (data, _, s) -> (data, s))
+          (UnknownPersons.blank_names wizard base)))
 
 let test_index_patches () =
   with_base "index_patches_test" @@ fun base ->
@@ -280,6 +299,7 @@ let v =
         test_case "Name.lower and name_index" `Quick test_blank_names;
         test_case "history and image keys" `Quick test_keys;
         test_case "first list" `Quick test_blank_list;
+        test_case "Name.lower over Unicode" `Quick test_lower_blank_chars;
       ] );
     ( "unknown-persons",
       [
