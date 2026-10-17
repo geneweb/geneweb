@@ -4248,8 +4248,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       Driver.get_family p |> Array.length |> string_of_int |> str_val
   | "nb_pevents" ->
       Driver.get_pevents p |> List.length |> string_of_int |> str_val
-  | "notes" | "pnotes" ->
-      Driver.get_notes p |> get_note conf base ~p p_auth
+  | "notes" | "pnotes" -> Driver.get_notes p |> get_note conf base ~p p_auth
   | "occ" ->
       if GWPARAM.p_auth_sp conf base p then
         Driver.get_occ p |> string_of_int |> str_val
