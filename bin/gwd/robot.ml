@@ -8,17 +8,18 @@ let src = Logs.Src.create ~doc:"Robot" "ROB "
 module Log = (val Logs.src_log src : Logs.LOG)
 module Code = Geneweb_http.Code
 
-let magic_robot = "GWRB0008"
+(* The types are defined in [Robot_state], shared with gwrobot. They are
+   re-exported here: the compiler rejects any divergence. *)
+let magic_robot = Robot_state.magic_robot
 
-module W = Map.Make (struct
-  type t = string
+module W = Robot_state.W
 
-  let compare = compare
-end)
+type norfriwiz = Robot_state.norfriwiz =
+  | Normal
+  | Friend of string
+  | Wizard of string
 
-type norfriwiz = Normal | Friend of string | Wizard of string
-
-type who = {
+type who = Robot_state.who = {
   acc_times : float list;
   oldest_time : float;
   nb_connect : int;
@@ -26,7 +27,7 @@ type who = {
   utype : norfriwiz;
 }
 
-type excl = {
+type excl = Robot_state.excl = {
   mutable excl : (string * int ref) list;
   mutable who : who W.t;
   mutable max_conn : int * string;
@@ -97,9 +98,7 @@ let purge_who tm xcl sec =
   in
   List.iter (fun k -> xcl.who <- W.remove k xcl.who) to_remove
 
-let output_excl oc xcl =
-  output_string oc magic_robot;
-  output_value oc (xcl : excl)
+let output_excl = Robot_state.output_excl
 
 let robot_excl () =
   let fname =
