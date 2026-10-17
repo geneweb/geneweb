@@ -12,7 +12,8 @@
   dag2html_test
   oidc_test
   userkey_test
-  cache_test)
+  cache_test
+  blank_name_test)
  (libraries alcotest geneweb geneweb.oidc fmt))
 
 (test
