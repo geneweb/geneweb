@@ -70,9 +70,14 @@ let () =
       Logs.app (fun k -> k "Loading dictionaries in %s..." cfg.index_dir);
       let dicts = load_dictionaries cfg.index_dir in
       Logs.app (fun k -> k "Found %d dictionaries" (List.length dicts));
+      let tls, certfile, keyfile =
+        match cfg.tls with
+        | Some (crt, key) -> (true, Some crt, Some key)
+        | None -> (false, None, None)
+      in
       Rpc.start ~interface:cfg.interface ~port:cfg.port
         ?max_connection:cfg.max_connection ?idle_timeout:cfg.idle_timeout
-        ?task_timeout:cfg.task_timeout
+        ?task_timeout:cfg.task_timeout ~tls ?certfile ?keyfile
       @@ Route.route
            [
              Route.path "/pingpong" Service.PingPong.srv;
