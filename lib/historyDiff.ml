@@ -169,7 +169,11 @@ let record_diff conf base changed =
         let ofname = history_path conf o_person_file in
         let fname = history_path conf person_file in
         (* La clé a changé, on reprend l'ancien historique. *)
-        (if o_person_file <> person_file && Sys.file_exists ofname then
+        (if
+           o_person_file <> person_file
+           && unique_key o.first_name o.surname
+           && Sys.file_exists ofname
+         then
            try
              let () = create_history_dirs conf person_file in
              Sys.rename ofname fname
@@ -236,7 +240,8 @@ let record_diff conf base changed =
               if o_person_file <> person_file then (
                 let ofname = history_path conf o_person_file in
                 let fname = history_path conf person_file in
-                (try Sys.rename ofname fname with Sys_error _ -> ());
+                (if unique_key ofn osn then
+                   try Sys.rename ofname fname with Sys_error _ -> ());
                 let p = Driver.poi base ip in
                 let p =
                   Futil.map_person_ps
