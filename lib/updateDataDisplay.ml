@@ -279,6 +279,7 @@ and eval_simple_bool_var _conf _base env _xx = function
       | _ -> false)
   | "first" -> ( match get_env "first" env with Vbool x -> x | _ -> false)
   | "script" -> ( match get_env "script" env with Vbool x -> x | _ -> false)
+  | "entry_blank" -> Name.lower (eval_string_env "entry_value" env) = ""
   | _ -> raise Not_found
 
 and eval_simple_str_var conf _base env _xx = function

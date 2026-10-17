@@ -3795,6 +3795,16 @@ sv: födelsedagar
 tr: doğum günleri
 zh: 出生于今日的记录
 
+    book blank name
+de: dieser Name enthält weder Buchstaben noch Ziffern: Die Suche übergeht die Personen, die ihn tragen, und ihre Historie oder ihr Porträt können sich mit denen anderer Personen vermischen. Benennen Sie ihn in einen Platzhalternamen um, zum Beispiel Nn.
+en: this name contains no letter or digit: search ignores the persons who bear it, and their history or portrait can get mixed with those of other persons. Rename it to a placeholder name, for example Nn.
+es: este nombre no contiene letras ni cifras: la búsqueda ignora a las personas que lo llevan, y su historial o su retrato pueden mezclarse con los de otras personas. Cámbielo por un nombre de sustitución, por ejemplo Nn.
+fr: ce nom ne contient ni lettre ni chiffre : la recherche ignore les personnes qui le portent, et leur historique ou leur portrait peuvent se mêler à ceux d’autres personnes. Renommez-le en un nom de substitution, par exemple Nn.
+it: questo nome non contiene né lettere né cifre: la ricerca ignora le persone che lo portano, e la loro cronologia o il loro ritratto possono confondersi con quelli di altre persone. Rinominatelo con un nome segnaposto, per esempio Nn.
+nl: deze naam bevat geen letters of cijfers: zoeken slaat de personen die hem dragen over, en hun geschiedenis of portret kan vermengd raken met die van andere personen. Hernoem hem naar een plaatsvervangende naam, bijvoorbeeld Nn.
+pt: este nome não contém letras nem algarismos: a pesquisa ignora as pessoas que o usam, e o seu histórico ou retrato podem misturar-se com os de outras pessoas. Renomeie-o para um nome substituto, por exemplo Nn.
+sv: detta namn innehåller varken bokstäver eller siffror: sökningen hoppar över personerna som bär det, och deras historik eller porträtt kan blandas ihop med andras. Byt till ett platshållarnamn, till exempel Nn.
+
     book of %s
 co: libru di i %s
 de: %s-Lexikon
