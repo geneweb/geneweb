@@ -226,7 +226,7 @@
         %if;has_birth_date;[*born]s %on_birth_date;
           %if;has_birth_place; %in_place; %apply;updfield%with;birth_place%and;%birth_place;%end;%end;
         %else;
-          %if;has_birth_place;[*born]s %in_place;%apply;updfield%with;birth_place%and;%birth_place;%end;%end;
+          %if;has_birth_place;[*born]s %in_place; %apply;updfield%with;birth_place%and;%birth_place;%end;%end;
         %end;
       </li>
       %if;birthday;

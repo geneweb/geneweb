@@ -20,6 +20,8 @@ let history_file fn sn occ =
   let s = space_to_unders (Name.lower sn) in
   f ^ "." ^ string_of_int occ ^ "." ^ s
 
+let unique_key fn sn = Name.lower fn <> "" && Name.lower sn <> ""
+
 (* history directory path *)
 let history_d conf =
   let path =
@@ -35,14 +37,15 @@ let history_d conf =
     Filename.concat (Util.bpath bname) path
   else path
 
-(* Le chemin du fichier historique dans le dossier history_d. *)
-let history_path conf fname =
+let path_in dir fname =
   if String.length fname >= 6 then
-    let dirs =
-      [ history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1] ]
-    in
-    List.fold_right Filename.concat dirs fname
-  else Filename.concat (history_d conf) fname
+    List.fold_right Filename.concat
+      [ dir; String.make 1 fname.[0]; String.make 1 fname.[1] ]
+      fname
+  else Filename.concat dir fname
+
+(* Le chemin du fichier historique dans le dossier history_d. *)
+let history_path conf fname = path_in (history_d conf) fname
 
 (* Créé tous les dossiers intermédiaires. *)
 let create_history_dirs conf fname =
@@ -51,6 +54,24 @@ let create_history_dirs conf fname =
       [ history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1] ]
     in
     Filesystem.create_dir ~parent:true (List.fold_left Filename.concat "" dirs)
+
+let archive_deleted conf (p : (_, _, string) gen_person) =
+  if unique_key p.first_name p.surname then
+    let person_file = history_file p.first_name p.surname p.occ in
+    let src = history_path conf person_file in
+    if Sys.file_exists src then
+      let dst =
+        path_in (Filename.concat (history_d conf) "_deleted") person_file
+      in
+      try
+        Filesystem.create_dir ~parent:true (Filename.dirname dst);
+        if Sys.file_exists dst then (
+          let s = Secure.with_open_in_bin src In_channel.input_all in
+          Secure.with_open_out_gen [ Open_wronly; Open_append; Open_binary ]
+            0o644 dst (fun oc -> output_string oc s);
+          Sys.remove src)
+        else Sys.rename src dst
+      with Sys_error _ | Unix.Unix_error _ | Filesystem.File_error _ -> ()
 
 (* ************************************************************************ *)
 (*  [Fonc] write_history_file : config -> string -> gen_record -> unit      *)
@@ -148,7 +169,11 @@ let record_diff conf base changed =
         let ofname = history_path conf o_person_file in
         let fname = history_path conf person_file in
         (* La clé a changé, on reprend l'ancien historique. *)
-        (if o_person_file <> person_file && Sys.file_exists ofname then
+        (if
+           o_person_file <> person_file
+           && unique_key o.first_name o.surname
+           && Sys.file_exists ofname
+         then
            try
              let () = create_history_dirs conf person_file in
              Sys.rename ofname fname
@@ -165,20 +190,7 @@ let record_diff conf base changed =
       | U_Add_person p -> print_ind_add p
       | U_Modify_person (o, p) -> print_ind_mod o p
       | U_Delete_person _ -> ()
-      | U_Merge_person (_, o, p) ->
-          let o_person_file = history_file o.first_name o.surname o.occ in
-          let person_file = history_file p.first_name p.surname p.occ in
-          let fname = history_path conf person_file in
-          let gr = make_gen_record conf base false p in
-          (* La clé a changé avec la fusion, on reprend l'ancien historique. *)
-          if o_person_file <> person_file then (
-            let ofname = history_path conf o_person_file in
-            (try
-               let () = create_history_dirs conf person_file in
-               Sys.rename ofname fname
-             with Sys_error _ -> ());
-            write_history_file conf person_file fname gr)
-          else write_history_file conf person_file fname gr
+      | U_Merge_person (o, _, p) -> print_ind_mod o p
       | U_Delete_family (_p, _f) -> ()
       | U_Add_family (p, f)
       | U_Modify_family (p, _, f)
@@ -228,7 +240,8 @@ let record_diff conf base changed =
               if o_person_file <> person_file then (
                 let ofname = history_path conf o_person_file in
                 let fname = history_path conf person_file in
-                (try Sys.rename ofname fname with Sys_error _ -> ());
+                (if unique_key ofn osn then
+                   try Sys.rename ofname fname with Sys_error _ -> ());
                 let p = Driver.poi base ip in
                 let p =
                   Futil.map_person_ps

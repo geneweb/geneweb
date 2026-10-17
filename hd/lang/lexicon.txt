@@ -3795,6 +3795,16 @@ sv: födelsedagar
 tr: doğum günleri
 zh: 出生于今日的记录
 
+    book blank name
+de: dieser Name enthält weder Buchstaben noch Ziffern: Die Suche übergeht die Personen, die ihn tragen, und ihre Historie oder ihr Porträt können sich mit denen anderer Personen vermischen. Benennen Sie ihn in einen Platzhalternamen um, zum Beispiel Nn.
+en: this name contains no letter or digit: search ignores the persons who bear it, and their history or portrait can get mixed with those of other persons. Rename it to a placeholder name, for example Nn.
+es: este nombre no contiene letras ni cifras: la búsqueda ignora a las personas que lo llevan, y su historial o su retrato pueden mezclarse con los de otras personas. Cámbielo por un nombre de sustitución, por ejemplo Nn.
+fr: ce nom ne contient ni lettre ni chiffre : la recherche ignore les personnes qui le portent, et leur historique ou leur portrait peuvent se mêler à ceux d’autres personnes. Renommez-le en un nom de substitution, par exemple Nn.
+it: questo nome non contiene né lettere né cifre: la ricerca ignora le persone che lo portano, e la loro cronologia o il loro ritratto possono confondersi con quelli di altre persone. Rinominatelo con un nome segnaposto, per esempio Nn.
+nl: deze naam bevat geen letters of cijfers: zoeken slaat de personen die hem dragen over, en hun geschiedenis of portret kan vermengd raken met die van andere personen. Hernoem hem naar een plaatsvervangende naam, bijvoorbeeld Nn.
+pt: este nome não contém letras nem algarismos: a pesquisa ignora as pessoas que o usam, e o seu histórico ou retrato podem misturar-se com os de outras pessoas. Renomeie-o para um nome substituto, por exemplo Nn.
+sv: detta namn innehåller varken bokstäver eller siffror: sökningen hoppar över personerna som bär det, och deras historik eller porträtt kan blandas ihop med andras. Byt till ett platshållarnamn, till exempel Nn.
+
     book of %s
 co: libru di i %s
 de: %s-Lexikon
@@ -22207,6 +22217,106 @@ sk: neznáma osoba
 sl: neznana oseba
 sv: okänd person
 tr: bilinmeyen kişi
+
+    unknown blank names
+de: Namen ohne Buchstaben und Ziffern/die Suche übergeht die Personen, die sie tragen, und ihre Historie oder ihr Porträt können sich mit denen anderer Personen vermischen (im Wörterbuch umzubenennen, zum Beispiel in Nn)
+en: names without letters or digits/search ignores the persons who bear them, and their history or portrait can get mixed with those of other persons (to rename in the dictionary, for example to Nn)
+es: nombres sin letras ni cifras/la búsqueda ignora a las personas que los llevan, y su historial o su retrato pueden mezclarse con los de otras personas (a renombrar en el diccionario, por ejemplo como Nn)
+fr: noms sans lettre ni chiffre/la recherche ignore les personnes qui les portent, et leur historique ou leur portrait peuvent se mêler à ceux d’autres personnes (à renommer dans le dictionnaire, par exemple en Nn)
+it: nomi senza lettere né cifre/la ricerca ignora le persone che li portano, e la loro cronologia o il loro ritratto possono confondersi con quelli di altre persone (da rinominare nel dizionario, per esempio in Nn)
+nl: namen zonder letters of cijfers/zoeken slaat de personen die ze dragen over, en hun geschiedenis of portret kan vermengd raken met die van andere personen (te hernoemen in het woordenboek, bijvoorbeeld naar Nn)
+pt: nomes sem letras nem algarismos/a pesquisa ignora as pessoas que os usam, e o seu histórico ou retrato podem misturar-se com os de outras pessoas (a renomear no dicionário, por exemplo para Nn)
+sv: namn utan bokstäver eller siffror/sökningen hoppar över personerna som bär dem, och deras historik eller porträtt kan blandas ihop med andras (att byta namn på i förteckningen, till exempel till Nn)
+
+    unknown couples with data
+de: Paare unbekannter Personen mit Daten/oder mit mehreren Kindern, Eltern oder einer anderen Familie, von Hand zu bearbeiten
+en: couples of unknown persons with data/or with several children, parents or another family, to process by hand
+es: parejas de personas desconocidas con datos/o con varios hijos, padres u otra familia, a tratar a mano
+fr: couples d’inconnus avec des données/ou avec plusieurs enfants, des parents ou une autre famille, à traiter à la main
+it: coppie di persone sconosciute con dati/o con più figli, genitori o un’altra famiglia, da trattare a mano
+nl: paren van onbekende personen met gegevens/of met meerdere kinderen, ouders of een ander gezin, handmatig te verwerken
+pt: casais de pessoas desconhecidas com dados/ou com vários filhos, pais ou outra família, a tratar manualmente
+sv: par av okända personer med uppgifter/eller med flera barn, föräldrar eller en annan familj, att behandla för hand
+
+    unknown couples without data
+de: Paare unbekannter Personen ohne Daten/das Löschen entfernt beide Ehepartner und ihre Familie
+en: couples of unknown persons without data/deleting them removes both spouses and their family
+es: parejas de personas desconocidas sin datos/borrarlas elimina a ambos cónyuges y su familia
+fr: couples d’inconnus sans données/la suppression efface les deux conjoints et leur famille
+it: coppie di persone sconosciute senza dati/la cancellazione elimina entrambi i coniugi e la loro famiglia
+nl: paren van onbekende personen zonder gegevens/bij verwijdering verdwijnen beide echtgenoten en hun gezin
+pt: casais de pessoas desconhecidas sem dados/a supressão elimina ambos os cônjuges e a sua família
+sv: par av okända personer utan uppgifter/borttagningen tar bort båda makarna och deras familj
+
+    unknown persons
+de: unbekannte Personen
+en: unknown persons
+es: personas desconocidas
+fr: personnes inconnues
+it: persone sconosciute
+nl: onbekende personen
+pt: pessoas desconhecidas
+sv: okända personer
+
+    unknown persons deleted
+de: gelöschte unbekannte Personen
+en: deleted unknown persons
+es: personas desconocidas borradas
+fr: personnes inconnues supprimées
+it: persone sconosciute cancellate
+nl: verwijderde onbekende personen
+pt: pessoas desconhecidas suprimidas
+sv: borttagna okända personer
+
+    unknown persons initials
+de: einzelne Buchstaben (N, X) und Initialen (N., X.) können einen Vornamen abkürzen. Vorsichtshalber stehen sie nicht in der Standardliste, da zwei der Listen gesammelt gelöscht werden. Fügen Sie sie hinzu, wenn Ihre Datenbank sie für unbekannte Personen verwendet.
+en: single letters (N, X) and initials (N., X.) may abbreviate a first name. As a precaution, they are not in the default list, since two of the lists are deleted in bulk. Add them if your base uses them for unknown persons.
+es: las letras sueltas (N, X) y las iniciales (N., X.) pueden abreviar un nombre. Por precaución no figuran en la lista por defecto, ya que dos de las listas se borran en bloque. Añádalas si su base las usa para personas desconocidas.
+fr: les lettres seules (N, X) et les initiales (N., X.) peuvent abréger un prénom. Par précaution, elles ne sont pas dans la liste par défaut, deux des listes se supprimant en bloc. Ajoutez-les si votre base les emploie pour des inconnus.
+it: le lettere isolate (N, X) e le iniziali (N., X.) possono abbreviare un nome. Per precauzione non sono nell’elenco predefinito, poiché due degli elenchi si cancellano in blocco. Aggiungetele se la vostra base le usa per persone sconosciute.
+nl: losse letters (N, X) en initialen (N., X.) kunnen een voornaam afkorten. Voor de zekerheid staan ze niet in de standaardlijst, omdat twee van de lijsten in één keer worden verwijderd. Voeg ze toe als uw stamboom ze voor onbekende personen gebruikt.
+pt: as letras isoladas (N, X) e as iniciais (N., X.) podem abreviar um nome próprio. Por precaução, não estão na lista por defeito, pois duas das listas são suprimidas em lote. Acrescente-as se a sua base as usar para pessoas desconhecidas.
+sv: enskilda bokstäver (N, X) och initialer (N., X.) kan förkorta ett förnamn. För säkerhets skull finns de inte i standardlistan, eftersom två av listorna tas bort på en gång. Lägg till dem om er databas använder dem för okända personer.
+
+    unknown persons max shown
+de: angezeigte Einträge pro Liste
+en: entries shown per list
+es: entradas mostradas por lista
+fr: entrées affichées par liste
+it: voci mostrate per elenco
+nl: getoonde items per lijst
+pt: entradas mostradas por lista
+sv: visade poster per lista
+
+    unknown persons names
+de: Vor- und Nachnamen für eine unbekannte Person, durch Kommas getrennt (Namen ohne Buchstaben und Ziffern wie ? oder ?? immer enthalten)
+en: first names and surnames standing for an unknown person, separated by commas (names without letters or digits, such as ? or ??, always included)
+es: nombres y apellidos que designan a una persona desconocida, separados por comas (nombres sin letras ni cifras, como ? o ??, siempre incluidos)
+fr: prénoms et noms désignant une personne inconnue, séparés par des virgules (noms sans lettre ni chiffre, comme ? ou ??, toujours inclus)
+it: nomi e cognomi che indicano una persona sconosciuta, separati da virgole (nomi senza lettere né cifre, come ? o ??, sempre inclusi)
+nl: voornamen en achternamen voor een onbekende persoon, gescheiden door komma’s (namen zonder letters of cijfers, zoals ? of ??, altijd inbegrepen)
+pt: nomes e apelidos que designam uma pessoa desconhecida, separados por vírgulas (nomes sem letras nem algarismos, como ? ou ??, sempre incluídos)
+sv: förnamn och efternamn för en okänd person, åtskilda med kommatecken (namn utan bokstäver eller siffror, som ? eller ??, alltid med)
+
+    unknown persons with data
+de: unbekannte Personen mit Daten/oder mit Eltern, ohne ? ? zu heißen, von Hand zu bearbeiten
+en: unknown persons with data/or with parents without being named ? ?, to process by hand
+es: personas desconocidas con datos/o con padres sin llamarse ? ?, a tratar a mano
+fr: personnes inconnues avec des données/ou ayant des parents sans être nommées ? ?, à traiter à la main
+it: persone sconosciute con dati/o con genitori senza chiamarsi ? ?, da trattare a mano
+nl: onbekende personen met gegevens/of met ouders zonder ? ? te heten, handmatig te verwerken
+pt: pessoas desconhecidas com dados/ou com pais sem se chamarem ? ?, a tratar manualmente
+sv: okända personer med uppgifter/eller med föräldrar utan att heta ? ?, att behandla för hand
+
+    unknown persons without data
+de: unbekannte Personen ohne Daten/das Löschen ersetzt sie in ihren Familien durch ? ? oder entfernt sie, wenn sie isoliert sind
+en: unknown persons without data/deleting them replaces them with ? ? in their families, or removes them when isolated
+es: personas desconocidas sin datos/borrarlas las reemplaza por ? ? en sus familias, o las elimina si están aisladas
+fr: personnes inconnues sans données/la suppression les remplace par ? ? dans leurs familles, ou les efface si elles sont isolées
+it: persone sconosciute senza dati/la cancellazione le sostituisce con ? ? nelle loro famiglie, o le elimina se isolate
+nl: onbekende personen zonder gegevens/verwijderen vervangt ze door ? ? in hun gezinnen, of wist ze als ze geïsoleerd zijn
+pt: pessoas desconhecidas sem dados/a supressão substitui-as por ? ? nas suas famílias, ou elimina-as se estiverem isoladas
+sv: okända personer utan uppgifter/borttagningen ersätter dem med ? ? i deras familjer, eller tar bort dem om de är isolerade
 
     unknown spouse
 co: cumpagni scunnisciuti

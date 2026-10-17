@@ -17,6 +17,14 @@ val history_file : string -> string -> int -> string
 val history_path : Config.config -> string -> string
 (** Returns path to the history file inside {i history_d} with given filename *)
 
+val archive_deleted : Config.config -> ('a, 'b, string) Def.gen_person -> unit
+(** [archive_deleted conf p] moves the history file of the deleted person [p] to
+    the folder {i _deleted} of {i history_d}, under the same subfolders,
+    appending it to an archived file of the same key if any, so that a person
+    later given that key does not inherit it. Files of persons whose first name
+    or surname has no letter or digit (["?"], ["??"]) are shared by all such
+    persons and stay in place. *)
+
 val record_diff :
   Config.config ->
   Geneweb_db.Driver.base ->
