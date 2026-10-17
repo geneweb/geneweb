@@ -439,6 +439,20 @@ let wizard_auth_file_name conf =
   | (Some "" | None), (Some "" | None) -> ""
   | Some auth_file, _ | _, Some auth_file -> auth_file
 
+(* for the notes search (NotesSearchDisplay) *)
+let wizards conf base = List.sort compare (wizard_list_from_dir conf base)
+
+let wizard_note conf base wz =
+  fst (read_wizard_notes (wzfile (wiz_dir conf base) (Filename.basename wz)))
+
+let wizard_display_name conf wz =
+  match wizard_auth_file_name conf with
+  | "" -> wz
+  | auth_file -> (
+      match List.assoc_opt wz (read_auth_file auth_file conf.bname) with
+      | Some (name, _) -> name
+      | None -> wz)
+
 let print conf base =
   let auth_file = wizard_auth_file_name conf in
   if auth_file = "" then Hutil.incorrect_request conf
@@ -677,6 +691,12 @@ let search_text conf base s =
   let wizo =
     let rec loop = function
       | [] -> None
+      | wz :: _ when Some wz = p_getenv conf.env "f" ->
+          (* f= (from the notes search results): this wizard's note *)
+          let wfile = wzfile (wiz_dir conf base) wz in
+          let nt, dt = read_wizard_notes wfile in
+          Some (wz, wfile, nt, dt)
+      | _ :: list when p_getenv conf.env "f" <> None -> loop list
       | wz :: list ->
           let wz = Filename.basename wz in
           let wfile = wzfile (wiz_dir conf base) wz in

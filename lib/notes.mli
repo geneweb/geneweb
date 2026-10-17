@@ -196,3 +196,31 @@ val mark_pnocs_validity : Geneweb_db.Driver.base -> string -> string
 val save_cache_linked_pages : string -> (Def.NLDB.key, int) Hashtbl.t -> unit
 (** [save_cache_linked_pages bdir ht] atomically replaces the linked-pages cache
     of base directory [bdir] with [ht]. Raises [Sys_error] on failure. *)
+
+val norm_type : string -> string
+(** [norm_type t] is the note TYPE [t], the deprecated [album] being read as
+    [gallery]. *)
+
+val is_ancestor : Config.config -> Geneweb_db.Driver.base -> string -> bool
+(** [is_ancestor conf base anc] is [true] if the person [anc] (a RESTRICT entry,
+    [[[fn/sn/oc]]]) is an ancestor of the logged-in user (or of a spouse, with
+    [restrict_for_spouses=yes]). *)
+
+val is_restricted :
+  Config.config -> Geneweb_db.Driver.base -> string list -> bool
+(** [is_restricted conf base l] is [true] if none of the RESTRICT entries [l] is
+    an ancestor of the user, see {!is_ancestor}. *)
+
+val note_is_restricted :
+  Config.config -> Geneweb_db.Driver.base -> (string * string) list -> bool
+(** [note_is_restricted conf base nenv] is [true] if the note header [nenv] has
+    a RESTRICT list that hides the note from the user. *)
+
+val note_file : Geneweb_db.Driver.base -> string -> string option
+(** [note_file base fnotes] is the file of the misc note [fnotes], relative to
+    the base directory ([notes] for the base notes); [None] for an invalid name.
+*)
+
+val is_gallery : (string * string) list -> bool
+(** [is_gallery nenv] is [true] for a note header with [TYPE=gallery] (or the
+    legacy [album]). *)

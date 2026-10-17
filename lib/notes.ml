@@ -958,3 +958,95 @@ let get_linked_page_family conf base ifam s =
   let db = Driver.read_nldb base in
   let db = merge_possible_aliases conf db in
   List.fold_left (linked_page_text_family conf base ifam s) (Adef.safe "") db
+
+(* [deprecated] TYPE=album is accepted on read for backward compatibility
+   with notes, all new notes always write TYPE=gallery. *)
+let norm_type = function "album" -> "gallery" | t -> t
+
+let is_ancestor conf base anc =
+  let restrict_for_spouses =
+    try List.assoc "restrict_for_spouses" conf.base_env = "yes"
+    with Not_found -> false
+  in
+  let max =
+    match List.assoc_opt "restrict_note_max" conf.base_env with
+    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
+    | None -> 32
+  in
+  let test_ancestor p1 p2 =
+    let ip1 = Driver.get_iper p1 in
+    let ip2 = Driver.get_iper p2 in
+    ip1 = ip2
+    || try Gutil.is_ancestor ~max base p1 p2 with Gutil.Same_person -> true
+  in
+  let bad_format n =
+    Log.warn (fun k -> k "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
+  in
+  if String.length anc <= 4 then (
+    bad_format 1;
+    false)
+  else
+    let anc = String.sub anc 2 (String.length anc - 4) in
+    let parts = String.split_on_char '/' anc in
+    if List.length parts <> 3 then (
+      bad_format 2;
+      false)
+    else
+      let fn = List.nth parts 0 |> Name.lower in
+      let sn = List.nth parts 1 |> Name.lower in
+      let oc =
+        try int_of_string (List.nth parts 2)
+        with Failure _ ->
+          bad_format 3;
+          0
+      in
+      match (Driver.person_of_key base fn sn oc, conf.user_iper) with
+      | Some anc_ip, Some user_ip ->
+          test_ancestor (Driver.poi base anc_ip) (Driver.poi base user_ip)
+          || restrict_for_spouses
+             &&
+             let families = Driver.get_family (Driver.poi base user_ip) in
+             Array.exists
+               (fun fam ->
+                 let fam = Driver.foi base fam in
+                 let fath_ip = Driver.get_father fam in
+                 let moth_ip = Driver.get_mother fam in
+                 let spouse_ip =
+                   if user_ip = fath_ip then moth_ip else fath_ip
+                 in
+                 test_ancestor (Driver.poi base anc_ip)
+                   (Driver.poi base spouse_ip))
+               families
+      | _ -> false
+
+let rec is_restricted conf base anc_l =
+  match anc_l with
+  | [] -> true
+  | anc :: l ->
+      if is_ancestor conf base anc then false else is_restricted conf base l
+
+(* same rule as [print]: a note with a RESTRICT list is only visible to the
+   descendants it names *)
+let note_is_restricted conf base nenv =
+  match List.assoc_opt "RESTRICT" nenv with
+  | None | Some "" -> false
+  | Some l -> is_restricted conf base (String.split_on_char ',' l)
+
+(* File holding the note [fnotes], relative to the base directory, as read by
+   [Driver.base_notes_read]: [notes] for the base notes. [None] for a name
+   that [read_notes] cannot map to a file (it would read the base notes). *)
+let note_file base fnotes =
+  if fnotes = "" then Some "notes"
+  else
+    match NotesLinks.check_file_name fnotes with
+    | Some (dl, f) ->
+        Some
+          (String.concat "/"
+             (Driver.base_notes_dir base
+             :: List.fold_right (fun d acc -> d :: acc) dl [ f ^ ".txt" ]))
+    | None -> None
+
+let is_gallery nenv =
+  match List.assoc_opt "TYPE" nenv with
+  | Some t -> norm_type t = "gallery"
+  | None -> false

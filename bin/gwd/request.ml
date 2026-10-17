@@ -681,6 +681,10 @@ let treat_request =
                          in
                          NotesDisplay.print_what_links conf base fnotes
                      | _ -> NotesDisplay.print conf base)
+             | "NOTES_SEARCH" ->
+                 (* friends and wizards only, checked by the page itself so
+                    that a visitor gets an explanation *)
+                 w_base @@ NotesSearchDisplay.print
              | "OA" -> w_base @@ BirthDeathDisplay.print_oldest_alive
              | "OE" -> w_base @@ BirthDeathDisplay.print_oldest_engagements
              | "P" -> (

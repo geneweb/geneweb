@@ -12,105 +12,15 @@ module Gutil = Geneweb_db.Gutil
 module Server = Geneweb_http.Server
 module Connection = Geneweb_http.Connection
 
-(* [deprecated] TYPE=album is accepted on read for backward compatibility
-   with notes, all new notes always write TYPE=gallery. *)
-let norm_type = function "album" -> "gallery" | t -> t
+(* "full word" box of the notes search form: [word=on] *)
+let full_word_search conf = p_getenv conf.env "word" = Some "on"
 
-let is_ancestor conf base anc =
-  let restrict_for_spouses =
-    try List.assoc "restrict_for_spouses" conf.base_env = "yes"
-    with Not_found -> false
-  in
-  let max =
-    match List.assoc_opt "restrict_note_max" conf.base_env with
-    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
-    | None -> 32
-  in
-  let test_ancestor p1 p2 =
-    let ip1 = Driver.get_iper p1 in
-    let ip2 = Driver.get_iper p2 in
-    ip1 = ip2
-    || try Gutil.is_ancestor ~max base p1 p2 with Gutil.Same_person -> true
-  in
-  let bad_format n =
-    Log.warn (fun k -> k "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
-  in
-  if String.length anc <= 4 then (
-    bad_format 1;
-    false)
-  else
-    let anc = String.sub anc 2 (String.length anc - 4) in
-    let parts = String.split_on_char '/' anc in
-    if List.length parts <> 3 then (
-      bad_format 2;
-      false)
-    else
-      let fn = List.nth parts 0 |> Name.lower in
-      let sn = List.nth parts 1 |> Name.lower in
-      let oc =
-        try int_of_string (List.nth parts 2)
-        with Failure _ ->
-          bad_format 3;
-          0
-      in
-      match (Driver.person_of_key base fn sn oc, conf.user_iper) with
-      | Some anc_ip, Some user_ip ->
-          test_ancestor (Driver.poi base anc_ip) (Driver.poi base user_ip)
-          || restrict_for_spouses
-             &&
-             let families = Driver.get_family (Driver.poi base user_ip) in
-             Array.exists
-               (fun fam ->
-                 let fam = Driver.foi base fam in
-                 let fath_ip = Driver.get_father fam in
-                 let moth_ip = Driver.get_mother fam in
-                 let spouse_ip =
-                   if user_ip = fath_ip then moth_ip else fath_ip
-                 in
-                 test_ancestor (Driver.poi base anc_ip)
-                   (Driver.poi base spouse_ip))
-               families
-      | _ -> false
-
-let rec is_restricted conf base anc_l =
-  match anc_l with
-  | [] -> true
-  | anc :: l ->
-      if is_ancestor conf base anc then false else is_restricted conf base l
-
-let print_search_form conf from_note =
-  Output.printf conf
-    {|<div class="mt-3">
-<form class="d-flex align-items-center gap-2" method="get" action="%s">|}
-    conf.command;
-  hidden_env conf;
-  Output.print_sstring conf
-    {|<input type="hidden" name="m" value="MISC_NOTES_SEARCH">|};
-  (match from_note with
-  | Some n ->
-      Output.print_sstring conf {|<input type="hidden" name="z" value="|};
-      Output.print_string conf (Util.escape_html n);
-      Output.print_sstring conf {|">|}
-  | None -> ());
-  Output.print_sstring conf
-    {|<input type="text" name="s" size="40" class="form-control w-auto" value="|};
-  (match p_getenv conf.env "s" with
-  | Some s -> Output.print_string conf (Util.escape_html s)
-  | None -> ());
-  Output.print_sstring conf "\">";
-  Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
-  Output.printf conf
-    {|<input type="checkbox" name="c" value="on" class="form-check-input" id="case"%s>|}
-    (match p_getenv conf.env "c" with
-    | Some "on" -> " checked"
-    | Some _ | None -> "");
-  Output.printf conf {|<label class="form-check-label" for="case">%s</label>|}
-    (transl_nth conf "search/case sensitive" 1);
-  Output.print_sstring conf "</div>";
-  Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
-  transl_nth conf "search/case sensitive" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button>\n</form>\n</div>"
+(* search box at the bottom of the misc notes pages: the merged
+   m=NOTES_SEARCH, with the same text and options *)
+let print_search_form conf =
+  Output.print_sstring conf {|<div class="mt-3">|};
+  NotesSearchDisplay.print_form conf (NotesSearchDisplay.query_of_env conf);
+  Output.print_sstring conf "</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   Hutil.header_without_title conf;
@@ -119,7 +29,10 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
       let title_text =
         match ho with
         | Some (case_sens, h) ->
-            html_highlight case_sens h (title : Adef.safe_string :> string)
+            NotesSearch.highlight_html ~full_word:(full_word_search conf)
+              case_sens
+              (NotesSearch.terms case_sens h)
+              (title : Adef.safe_string :> string)
             |> Adef.safe
         | None -> title
       in
@@ -164,8 +77,17 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     Wiki.html_with_summary_of_tlsw conf wi edit_opt s
   in
   let s = Util.safe_html s in
+  let s =
+    match ho with
+    | Some (case_sens, h) ->
+        NotesSearch.highlight_html ~full_word:(full_word_search conf) case_sens
+          (NotesSearch.terms case_sens h)
+          (s :> string)
+        |> Adef.safe
+    | None -> s
+  in
   Output.print_string conf s;
-  if ho <> None then print_search_form conf (Some fnotes);
+  if ho <> None then print_search_form conf;
   Hutil.trailer conf
 
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
@@ -955,42 +877,38 @@ let print_misc_notes conf base =
       (fun f -> one_file (Filename.basename (Util.note_link_to_sys f)) false)
       files;
     Output.print_sstring conf {|</div>|});
-  if d = "" then print_search_form conf None;
+  if d = "" then print_search_form conf;
   Hutil.trailer conf
 
 (* searching *)
+(* A gallery is a JSON document rendered by the notes_gallery template: show
+   it as m=GALLERY&f=fnotes would, without highlighting. *)
+let print_found_note conf base case_sens s fnotes =
+  let nenv, nt = read_notes base fnotes in
+  if is_gallery nenv then
+    let env = ("f", Mutil.encode fnotes) :: List.remove_assoc "f" conf.env in
+    print_gallery { conf with env } base
+  else
+    let tit = Option.value ~default:"" (List.assoc_opt "TITLE" nenv) in
+    print_whole_notes conf base fnotes (Util.safe_html tit) nt
+      (Some (case_sens, s))
+
+(* m=MISC_NOTES_SEARCH: with [f] (set by the links of the notes search
+   results, [f=] being the base notes), that note is shown with the terms of
+   [s] highlighted; otherwise the search is the merged m=NOTES_SEARCH. *)
 let search_text conf base s =
-  let s = if s = "" then " " else s in
+  let s = String.trim s in
   let case_sens = p_getenv conf.env "c" = Some "on" in
-  let db =
-    let db = notes_links_db conf base true in
-    let db = "" :: List.map fst db in
-    match p_getenv conf.env "z" with
-    | None -> db
-    | Some f ->
-        let rec loop = function
-          | fnotes :: list -> if f = fnotes then list else loop list
-          | [] -> []
-        in
-        loop db
+  let requested =
+    match p_getenv conf.env "f" with
+    | Some f when f = "" || NotesLinks.check_file_name f <> None ->
+        let nenv, _ = read_notes base f in
+        if note_is_restricted conf base nenv then None else Some f
+    | Some _ | None -> None
   in
-  let noteo =
-    let rec loop = function
-      | fnotes :: list ->
-          let nenv, nt = read_notes base fnotes in
-          let tit = try List.assoc "TITLE" nenv with Not_found -> "" in
-          if in_text case_sens s tit || in_text case_sens s nt then
-            Some (fnotes, tit, nt)
-          else loop list
-      | [] -> None
-    in
-    loop db
-  in
-  match noteo with
-  | Some (fnotes, tit, nt) ->
-      print_whole_notes conf base fnotes (Util.safe_html tit) nt
-        (Some (case_sens, s))
-  | None -> print_misc_notes conf base
+  match requested with
+  | Some fnotes when s <> "" -> print_found_note conf base case_sens s fnotes
+  | Some _ | None -> NotesSearchDisplay.print conf base
 
 let print_misc_notes_search conf base =
   match try Some (List.assoc "s" conf.env) with Not_found -> None with

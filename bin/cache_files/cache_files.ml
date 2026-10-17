@@ -18,6 +18,7 @@ let titles = ref false
 let occupations = ref false
 let qualifiers = ref false
 let sources = ref false
+let notes = ref false
 let all = ref false
 let prog = ref false
 let checkdata = ref false
@@ -243,6 +244,21 @@ let gen_cache bname fname collect_fn =
   | true, false -> gen_datalist_only bname fname collect_fn
   | false, false -> assert false
 
+(* Corpus of person/family/event notes searched by m=NOTES_SEARCH, written
+   atomically so that a running gwd keeps reading the previous one meanwhile.
+   Meant to be rebuilt nightly, e.g. from cron:
+     cache_files -bd /path/to/bases -notes mybase *)
+let gen_notes_corpus bname base =
+  let n, duration =
+    with_timer (fun () ->
+        ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter (fun bar ->
+            Geneweb.NotesCorpus.build ~progress:(ProgrBar.progress bar) base))
+  in
+  Format.printf "%-*s %d notes, %.2f s@." !width
+    (Geneweb.NotesCorpus.file bname)
+    n duration;
+  duration
+
 let validate_options () =
   if !merge_aliases && not !datalist then (
     Printf.eprintf "Error: -merge can only be used with -datalist\n";
@@ -275,6 +291,9 @@ let speclist =
     ("-ti", Arg.Set titles, " titles");
     ("-es", Arg.Set estates, " estates");
     ("-so", Arg.Set sources, " sources");
+    ( "-notes",
+      Arg.Set notes,
+      " person, family and event notes, for m=NOTES_SEARCH (rebuild nightly)" );
     ("", Arg.Unit (fun () -> ()), "");
     ("-all", Arg.Set all, " build all type of cache files");
     ("", Arg.Unit (fun () -> ()), "");
@@ -307,11 +326,19 @@ let () =
 
   width := String.length (!cache_dir // bname) + 30;
 
-  (match (gen_dl, gen_cd) with
-  | true, true -> Printf.printf "Generating datalist and checkdata caches\n"
-  | false, true -> Printf.printf "Generating CheckData binary caches\n"
-  | true, false -> Printf.printf "Generating datalist compressed caches\n"
-  | false, false -> assert false);
+  let only_notes =
+    !notes
+    && not
+         (!all || !fnames || !snames || !aliases || !pub_names || !fname_aliases
+        || !sname_aliases || !places || !estates || !titles || !occupations
+        || !qualifiers || !sources)
+  in
+  (if not only_notes then
+     match (gen_dl, gen_cd) with
+     | true, true -> Printf.printf "Generating datalist and checkdata caches\n"
+     | false, true -> Printf.printf "Generating CheckData binary caches\n"
+     | true, false -> Printf.printf "Generating datalist compressed caches\n"
+     | false, false -> assert false);
 
   let total = ref 0. in
 
@@ -417,6 +444,8 @@ let () =
       total :=
         !total +. gen_cache bname fname (collect_checkdata_names base field))
     fields;
+
+  if !all || !notes then total := !total +. gen_notes_corpus bname base;
 
   let min, sec = (Float.to_int !total / 60, mod_float !total 60.) in
   Format.printf "Total duration: %d min %6.2f s@." min sec

@@ -9,4 +9,5 @@ let () =
   in
   run ~and_exit:false "Geneweb" ~filter
     (Sosa_test.v @ Place_test.v @ Calendar_test.v @ Wiki_test.v @ Merge_test.v
-   @ Util_test.v @ Dag2html_test.v @ Oidc_test.v @ Userkey_test.v)
+   @ Util_test.v @ Dag2html_test.v @ Oidc_test.v @ Userkey_test.v
+   @ Notes_search_test.v @ Notes_corpus_test.v)

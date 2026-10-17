@@ -6,6 +6,20 @@ open Config
 val wiz_dir : config -> Geneweb_db.Driver.base -> string
 (** Returns the path to the wizard notes files associated to the base. *)
 
+val wizard_auth_file_name : config -> string
+(** The wizard description (or password) file of the base, [""] if none: wizard
+    notes are only available with one. *)
+
+val wizards : config -> Geneweb_db.Driver.base -> string list
+(** The wizards having a notes file, sorted. *)
+
+val wizard_note : config -> Geneweb_db.Driver.base -> string -> string
+(** [wizard_note conf base wz] is the text of the notes of wizard [wz]. *)
+
+val wizard_display_name : config -> string -> string
+(** [wizard_display_name conf wz] is the name of wizard [wz] as given in the
+    wizard description file, [wz] if not found. *)
+
 val print : config -> Geneweb_db.Driver.base -> unit
 (** Prints the HTML page displaying the wizard notes. Fails if wizard
     authentification is incorrect *)
@@ -24,8 +38,9 @@ val print_view : config -> Geneweb_db.Driver.base -> unit
 
 val print_search : config -> Geneweb_db.Driver.base -> unit
 (** Same as `print` but highlights HTML with the speficied string searched
-    (environment key of search is `s`). If no search is specified, just prints
-    the wizard notes. *)
+    (environment key of search is `s`). With [f] (a wizard, as set by the notes
+    search results), that wizard's notes are shown. If no search is specified,
+    just prints the wizard notes. *)
 
 val connected_wizards : config -> Geneweb_db.Driver.base -> unit
 (** Displays the connected wizards. *)

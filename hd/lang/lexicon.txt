@@ -15263,6 +15263,78 @@ pt: notas sobre o casamento/notas sobre os casamentos
 sv: anteckningar om vigseln/anteckningar om vigslarna
 tr: evlilik notları/evlilik notları
 
+    notes search
+de: In den Notizen suchen
+en: search in notes
+fr: rechercher dans les notes
+
+    notes search help
+de: Suchsyntax
+en: query syntax
+fr: syntaxe de la recherche
+
+    notes search help and
+de: Notizen, die alle diese Wörter enthalten, in beliebiger Reihenfolge
+en: notes containing all these words, in any order
+fr: notes contenant tous ces mots, dans n’importe quel ordre
+
+    notes search help case
+de: ohne „Groß- & Kleinschreibung beachten“ werden Groß-/Kleinschreibung, Akzente und die Form des Apostrophs (’ oder ') ignoriert: eglise findet Église, l'a findet l’a; angekreuzt ist der Vergleich exakt
+en: without “case sensitive”, case, accents and the kind of apostrophe (’ or ') are ignored: eglise finds Église, l'a finds l’a; when ticked, the comparison is exact
+fr: sans « sensible à la casse », majuscules, accents et forme de l’apostrophe (’ ou ') sont ignorés : eglise trouve Église, l'a trouve l’a ; case cochée, la comparaison est exacte
+
+    notes search help exclude
+de: ein vorangestelltes - schließt die Notizen mit diesem Wort (oder dieser „Phrase“) aus
+en: a leading - excludes the notes containing this word (or this “phrase”)
+fr: un - en tête exclut les notes contenant ce mot (ou cette « phrase »)
+
+    notes search help joker
+de: ? steht für genau ein beliebiges Zeichen, auch ein Leerzeichen: Dupont, Dupond
+en: ? stands for exactly one character, a space included: Dupont, Dupond
+fr: ? remplace exactement un caractère, espace compris : Dupont, Dupond
+
+    notes search help phrase
+de: genau diese Wortfolge
+en: this exact sequence of words
+fr: cette suite de mots exacte
+
+    notes search help star
+de: mit „ganzes Wort“: ein * am Anfang oder Ende steht für den Rest des Wortes (Henriette, Juliette); ohne passt jedes Wort schon überall
+en: with “word match”: a * at the start or end stands for the rest of the word (Henriette, Juliette); without it, a word already matches anywhere
+fr: avec « mot complet » : un * au début ou à la fin remplace le reste du mot (Henriette, Juliette) ; sans, un mot est déjà trouvé partout
+
+    notes search help word
+de: mit „ganzes Wort“ darf das Wort nicht Teil eines längeren Wortes sein: l'a findet nicht l'aube
+en: with “word match”, the word must not be part of a longer word: l'a does not find l'aube
+fr: avec « mot complet », le mot ne doit pas faire partie d’un mot plus long : l'a ne trouve pas l'aube
+
+
+    notes search first results %d
+de: nur die ersten %d Ergebnisse werden angezeigt
+en: only the first %d results are shown
+fr: seuls les %d premiers résultats sont affichés
+
+    notes search index date %s %d
+de: Notizenindex vom %s, %d spätere Änderung(en) berücksichtigt
+en: notes index of %s, %d later change(s) included
+fr: index des notes du %s, %d modification(s) ultérieure(s) incluse(s)
+
+    notes search index missing %s
+de: Der Notizenindex wurde noch nicht erstellt: „cache_files -notes %s“ auf dem Server ausführen.
+en: The notes index has not been built yet: run “cache_files -notes %s” on the server.
+fr: L’index des notes n’a pas encore été construit : lancer « cache_files -notes %s » sur le serveur.
+
+    notes search index outdated %s
+de: Der Notizenindex stammt von einer älteren Version der Datenbank: „cache_files -notes %s“ erneut ausführen.
+en: The notes index was built for an earlier version of the base: run “cache_files -notes %s” again.
+fr: L’index des notes date d’une version antérieure de la base : relancer « cache_files -notes %s ».
+
+
+    notes search scopes
+de: Diverse Notizen/Notizen der Meister/Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen
+en: miscellaneous notes/wizard notes/individual notes/family notes/individual event notes/family event notes
+fr: notes diverses/notes des magiciens/notes d’individus/notes de familles/notes d’événements individuels/notes d’événements familiaux
+
     notes summary
 bg: резюме на бележките
 co: riassuntu di e note diverse
