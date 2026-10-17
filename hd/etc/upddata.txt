@@ -232,14 +232,12 @@
                               %end;
                             </div>
                             <div class="mt-1">
-                              %if;(b.notextarea!="yes" or e.data="src" or e.data="place")
+                              %if;(e.data="src" or e.data="occu" or e.data="place")
                                 <textarea class="form-control ps-2 pe-2" id="nx_input" name="nx_input" rows="1"
-                                         maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                                         placeholder="%val;" autofocus required>%val;</textarea>
+                                  maxlength="1000" placeholder="%val;" autofocus required>%val;</textarea>
                               %else;
                                 <input type="text" class="form-control flex-grow-1 ps-2 pe-1" id="nx_input" name="nx_input"
-                                      maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                                      value="%val;" placeholder="%val;" autofocus aria-label="[*modify]" required>
+                                  maxlength="200" value="%val;" placeholder="%val;" autofocus aria-label="[*modify]" required>
                               %end;
                               %if;(e.data="fn")
                                 <div class="form-check form-check-inline ms-sm-2">
@@ -308,6 +306,7 @@ const updateData = {
       this.autoSelectLink();
       this.updateInputField();
       this.placeCursorAtEnd();
+      this.submitOnEnter();
     } catch (e) {
       console.error('updateData init failed:', e);
     }
@@ -481,6 +480,16 @@ const updateData = {
     input.focus();
     const len = input.value.length;
     try { input.setSelectionRange(len, len); } catch { /* type non-text */ }
+  },
+
+  submitOnEnter() {
+    const area = document.querySelector('textarea#nx_input');
+    area?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        area.form.requestSubmit();
+      }
+    });
   }
 };
 </script>
