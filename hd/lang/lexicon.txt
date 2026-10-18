@@ -1383,7 +1383,7 @@ co: un mezu cugnatu/mezu cugnati/una meza cugnata/meza cugnate
 de: ein Halbschwager/Halbschwäger/eine Halbschwägerin/Halbschwägerinnen
 en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
 es: un medio cuñado/medios cuñados/una media cuñada/medias cuñadas
-fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
+fr: un demi-beau-frère/demi-beaux-frères/une demi-belle-sœur/demi-belles-sœurs
 pt: um meio cunhado/meios cunhados/uma meia cunhada/meias cunhadas
 sv: en halvsvåger/halvsvågrar/en halvsvägerska/halvsvägerskor
 tr: bir üvey kayınbirader/üvey kayınbiraderler/bir üvey baldız/üvey baldızlar
@@ -1393,7 +1393,7 @@ co: un mezu cugnatu o una meza cugnata/mezu cugnati è meze cugnate
 de: ein Halbschwager oder eine Halbschwägerin/Halbschwäger oder Halbschwägerinnen
 en: one half sibling-in-law/half siblings-in-law
 es: un medio cuñado o media cuñada/medios cuñados y medias cuñadas
-fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
+fr: un demi-beau-frère ou demi-belle-sœur/demi-beaux-frères et demi-belles-sœurs
 pt: um meio cunhado ou cunhada/meios cunhados
 sv: ett halvsyskonbarn/halvsyskonbarn
 tr: bir üvey kayınbirader/kayınbiraderler
@@ -2637,7 +2637,7 @@ eo: %sonklo/%sonklino
 es: un %stío/una %stía
 et: %sonu/%städi
 fi: %ssetä:g:---dän/%stäti:g:--din/%seno:g:+n/%stäti:g:--din
-fr: un %soncle/une %stante/%soncles/%stantes%soncles et tantes
+fr: un %soncle/une %stante/%soncles/%stantes/%soncles et %stantes
 he: %sדוד/%sדודה
 is: %sföðurbróðir/%sföðursystir/%smóðurbróðir/%smóðurssystir
 it: un %szio/una %szia
@@ -3128,7 +3128,7 @@ co: lista di e genealugie dispunibule
 de: Liste der verfügbaren Genealogien
 en: list of available genealogies
 es: lista de genealogías disponibles
-fr: listes des généalogies disponibles
+fr: liste des généalogies disponibles
 pt: lista das genealogias disponíveis
 sv: lista över tillgängliga släktdatabaser
 tr: Mevcut şecere listesi
@@ -4696,7 +4696,7 @@ co: cambiu di l’ordine di l’evenimenti di l’individuu
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual events
 es: cambio del orden de los acontecimientos del individuo
-fr: changement de l’ordre des événements individu
+fr: changement de l’ordre des événements individuels
 it: modifica dell’ordine degli eventi individuo
 oc: cambiament de l’òrdre dels eveniments d’un individú
 pt: modificar ordem dos eventos da pessoa
@@ -4720,7 +4720,7 @@ fr: dictionnaires à vérifier
 de: Cache-Datei(en) nicht gefunden/zur Erzeugung fehlender Caches, gwsetup verwenden oder ausführen
 en: cache file(s) not found/to generate missing caches, use gwsetup or run
 es: archivo(s) de caché no encontrado(s)/para generar los cachés faltantes, usar gwsetup o ejecutar
-fr: fichier(s) cache absent(s)/pour générer les caches manquants, utiliser gwsetup ou exécutez
+fr: fichier(s) cache absent(s)/pour générer les caches manquants, utilisez gwsetup ou exécutez
 
     chk_data check data
 de: Daten prüfen
@@ -5693,7 +5693,7 @@ co: cupià u liame %s in u preme’papei
 de: kopiere den %s Link in die Zwischenablage
 en: copy the %s link to the clipboard
 es: copiar el enlace %s al portapapeles
-fr: copier le lien %s dans le presse-papier
+fr: copier le lien %s dans le presse-papiers
 pt: copiar o link %s para a área de transferência
 sv: kopiera länken
 tr: bağlantıyı panoya kopyala
@@ -6124,7 +6124,7 @@ fr: un %s3×-arrière-grand-cousin/une %s3×-arrière-grand-cousine
     cousin.6.3
 de: ein %sUr-Großonkel 3. Grades/eine %sUr-Großtante 3. Grades
 es: un %sprimo segundo de los bisabuelos/una %sprima segunda de los bisabuelos
-fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière--cousine au 2<sup>e</sup> degré
+fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière-grand-cousine au 2<sup>e</sup> degré
 
     cousin.6.4
 de: ein %sGroßonkel 4. Grades/eine %sGroßtante 4. Grades
@@ -9331,7 +9331,7 @@ co: stende u statu semipublicu à i membri di a famiglia (vèrde : attivà, ross
 de: SemiPublic-Status auf Familienmitglieder ausweiten (zweiter Klick deaktiviert)
 en: extend the SemiPublic status to family members (on/off toggle)
 es: extiende el estado semipúblico a los miembros de la familia (un segundo clic lo desactiva)
-fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
+fr: étendre le statut SemiPublic aux membres de la famille (deuxième clic désactive)
 
     family modified
 af: familie verander
@@ -9371,7 +9371,7 @@ fr: signer avec
 
     sign with source help
 en: sign and provide source information (edit by hand the test "Source?" with the actuel source)
-fr: signer en précisant la source (remplacer manuellement le texte "Source?" apr la source concernée)
+fr: signer en précisant la source (remplacer manuellement le texte "Source?" par la source concernée)
 
     sign with source
 en: sign and provide source
@@ -9841,7 +9841,7 @@ tr: ilk komünyon
 de: Den Fehler automatisch korrigieren
 en: fix error automatically
 es: corregir el error automáticamente
-fr: fixer automatiquement l’erreur
+fr: corriger automatiquement l’erreur
 
     font size
 co: dimensione di grafia
@@ -10767,7 +10767,7 @@ co: s’è nisuna hè selezziunata, e duie entrate seranu cuncatinate
 de: Bei Nichtauswahl werden die beiden Einträge verkettet
 en: if none is checked, both entries will be concatenated
 es: si no se marca ninguna, ambas entradas se concatenarán
-fr: en cas de non selection, les deux entrées seront concaténées
+fr: en cas de non-sélection, les deux entrées seront concaténées
 
     help modify data
 co: Fate casu ! E currezzioni fatte in u dizziunariu mudificheghjanu l’inseme di i dati chì currispondenu in a basa.
@@ -10909,7 +10909,7 @@ co: fate casu ! A selezzione d’un numeru maiò di generazioni pò piglià un 
 de: Vorsicht! Bei Auswahl höherer Generationen kann die Erzeugung mehrere Minuten dauern und zu Server-Timeouts führen.
 en: be carefull! Selecting high generation level may take minutes to generate and that can lead to server timeouts.
 es: ¡atención! Seleccionar un número alto de generaciones puede tardar varios minutos en generarse y provocar tiempos de espera agotados en el servidor.
-fr: attention ! Sélectionner un nombre de génération élevé peut prendre plusieurs minutes à générer et entraîner des délais d’attente dépassé du serveur.
+fr: attention ! Sélectionner un nombre de génération élevé peut prendre plusieurs minutes à générer et entraîner des délais d’attente dépassés du serveur.
 
     highlight gaps/hide highlighting
 af: beklemtoon leemtes/verwyder beklemtoning
@@ -12685,7 +12685,7 @@ co: note, pagine o gallerie induve a persona hè referenzata
 de: Notizen, Seiten oder Galerien, wo die Person erwähnt wird
 en: notes, pages or galleries where person is referenced
 es: notas, páginas, álbumes o galerías donde se cita a la persona
-fr: notes, pages ou galleries où la personne est citée
+fr: notes, pages ou galeries où la personne est citée
 
     linked pages
 bg: свързани страници
@@ -13860,7 +13860,7 @@ tr: çeşitli notlar
 co: pagine esterne referenzate in a basa sottu a forma [[[schedariu]]]
 en: external pages referenced in the base as [[[filename]]]
 es: páginas externas referenciadas en la base como [[[archivo]]]
-fr: pages externes réfécencées dans la base sous la forme [[[fichier]]]
+fr: pages externes référencées dans la base sous la forme [[[fichier]]]
 
     missing %s
 co: %s assente
@@ -14148,7 +14148,7 @@ co: mudificà a fiura&#047;galleria
 de: das Bild&#047;die Galerie ändern
 en: modify the image&#047;the gallery
 es: modificar la imagen (galería)
-fr: modifier l’image&#047;la gallerie
+fr: modifier l’image&#047;la galerie
 
     modify person event order
 co: intervertisce l’evenimenti individuali
@@ -14455,7 +14455,7 @@ eo: neniu unu/du/tri/kvar/kvin/ses/sep/ok/naŭ/dek/dek unu/dek du/dek tri/dek kv
 es: ninguno/uno/dos/tres/cuatro/cinco/seis/siete/ocho/nueve/diez/once/doce/trece/catorce/quince/dieciséis/diecisiete/dieciocho/diecinueve/veinte/veintiuno/veintidós/veintitrés/veinticuatro/veinticinco/veintiséis/veintisiete/veintiocho/veintinueve/treinta/treinta y uno
 et: mitte/üks/kaks/kolm/neli/viis/kuus/seitse/kaheksa/üheksa/kümme/üksteist/kaksteist/kolmteist/neliteist/viisteist/kuusteist/seitseteist/kaheksateist/üheksateist/kakskümmend/kakskümmend üks/kakskümmend kolm/kakskümmend neli/kakskümmend viis/kakskümmend kuus/kakskümmend seitse/kakskümmend kaheksa/kakskümmend üheksa/kolmkümmend/kolmkümmend üks
 fi: ei/yksikään/kaksi/kolme/neljä/viisi/kuusi/seitsemän/kahdeksan/yhdeksän/kymmenen/yksitoista/kaksitoista/kolmetoista/neljätoista/viisitoista/kuusitoista/seitsemäntoista/kahdeksantoista/yhdeksäntoista/kaksikymmentä yksi/kaksikymmentä kolme/kaksikymmentä neljä/kaksikymmentä viisi/kaksikymmentä kuusi/kaksikymmentä seitsemän/kaksikymmentä kahdeksan/kaksikymmentä yhdeksän/kolmekymmentä/kolmekymmentä yksi
-fr: aucun/un/deux/trois/quatre/cinq/six/sept/huit/neuf/dix/onze/douze/treize/quartorze/quinze/seize/dix-sept/dix-huit/dix-neuf/vingt/vingt-et-un/vingt-deux/vingt-trois/vingt-quatre/vingt-cinq/vingt-six/vingt-sept/vingt-huit/vingt-neuf/trente/trente-un
+fr: aucun/un/deux/trois/quatre/cinq/six/sept/huit/neuf/dix/onze/douze/treize/quatorze/quinze/seize/dix-sept/dix-huit/dix-neuf/vingt/vingt-et-un/vingt-deux/vingt-trois/vingt-quatre/vingt-cinq/vingt-six/vingt-sept/vingt-huit/vingt-neuf/trente/trente et un
 is: enginn/einn/tveir/þrír/fjórir/fimm/sex/sjö/átta/níu/tíu/ellefu/tólf/þrettán/fjórtán/fimmtán/sextán/sautján/átján/nítján./tuttugu/tuttugu og einn/tuttugu og tveir/tuttugu og þrír/tuttugu og fjórir/tuttugu og fimm/tuttugu og sex/tuttugu sjö/tuttugu og átta/tuttugu og níu/þrjátíu/þrjátíu og einn
 it: nessuno/uno/due/tre/quattro/cinque/sei/sette/otto/nove/dieci/undici/dodici/tredici/quattordici/quindici/sedici/diciassette/diciannove/venti/ventuno/venti due/venti tre/ventiquattro/venticinque/ventisei/ventisette/ventotto/ventinove/trenta/trentuno
 lt: bet koks/vienas/du/trys/keturi/penki/šeši/septyni/aštuoni/devyni/dešimt/vienuolika/dvylika/trylika/kvarcas/penkiolika/šešiolika/septyniolika/aštuoniolika/devyniolika/dvidešimt/dvidešimt vienas/dvidešimt du/dvidešimt trys/dvidešimt keturi/dvidešimt penki/dvidešimt šeši/dvidešimt septyni/dvidešimt aštuoni/dvidešimt devyni/trisdešimt /trisdešimt vienas
@@ -15491,7 +15491,7 @@ fr: Paramètre <b>s=</b> manquant pour m=DOC.
     NOTIF_TT missing p and n for relation
 de: Fehlende Parameter
 en: Missing parameters
-fr: Paramètres manquant
+fr: Paramètres manquants
 
     NOTIF missing p and n for relation
 de: Fehlende Parameter <b>p=</b> und <b>n=</b> für m=R.
@@ -15521,7 +15521,7 @@ fr: Personnes pour le calcul de relation introuvables.
     NOTIF_TT missing fn and sn for search
 de: Fehlende Parameter
 en: Missing parameters
-fr: Paramètres manquant
+fr: Paramètres manquants
 
     NOTIF missing fn and sn for search
 de: Fehlende Parameter <b>fn=</b> und <b>sn=</b> für die Suche.
@@ -15910,13 +15910,13 @@ co: numeru d’occurrenze/occurrenza
 de: Vorkommen-Zahl/Vorkommen
 en: occurence number/occurence
 es: número de ocurrencia/ocurrencia
-fr: numéro d’occurrence/occurence
+fr: numéro d’occurrence/occurrence
 
     occurence
 de: Vorkommen/Vorkommen
 en: occurence/occurences
 es: ocurrencia/ocurrencias
-fr: occurrence/occurences
+fr: occurrence/occurrences
 
     occupation/occupations
 af: beroep
@@ -16067,7 +16067,7 @@ co: di u latu di i fratelli o surelle di %s
 de: vonseiten der Geschwister von %s
 en: on %s’s siblings side
 es: del lado de los hermanos de %s
-fr: du côté des frères et soeurs de %s
+fr: du côté des frères et sœurs de %s
 
     on %s's side
 af: aan die kant van %s
@@ -16578,7 +16578,7 @@ co: limitatu à l’antenati è i so fratelli è surelle
 de: begrenzt auf Vorfahren und Geschwister
 en: limited to ancestors and siblings
 es: limitado a los ascendientes y sus hermanos
-fr: limité aux ascendants et leurs frères et soeurs
+fr: limité aux ascendants et leurs frères et sœurs
 
     participant/participant
 co: participante/participante
@@ -16876,7 +16876,7 @@ co: numeru d’elementi cunservati in a lista di i lochi
 de: Anzahl der Elemente in der Ortsliste
 en: number of elements kept in places list
 es: número de elementos a conservar en la lista de lugares
-fr: nombre d’éléments à conserver dans la liste des places
+fr: nombre d’éléments à conserver dans la liste des lieux
 
     places and events
 de: Orte & Ereignisse
@@ -17941,7 +17941,7 @@ eo: montri tabelon de parenceco/montri la tabelon de parencaj rilatoj por ĉiuj 
 es: mostrar tabla de parentesco/mostrar la tabla de relaciones de parentesco para todos estos individuos/tabla de parentesco/número de enlaces conocidos y grados ascendente&#047;descendente más cortos
 et: näita sugulustabelit/näita kõigi nende isikute sugulussidemete tabelit/sugulustabel/teadaolevate sidemete arv ja lühimad tõusvad&#047;laskuvad astmed
 fi: näytä sukulaisuustaulukko/näytä kaikkien näiden henkilöiden sukulaisuussuhteiden taulukko/sukulaisuustaulukko/tunnettujen linkkien määrä ja lyhimmät nousevat&#047;laskevat asteet
-fr: afficher tableau de parentés/afficher le tableau des relations de parenté pour tous ces individus/tableau de parentés/nombre de liens connus et degrés ascendant&#047;descendant le plus court
+fr: afficher tableau de parentés/afficher le tableau des relations de parenté pour tous ces individus/tableau de parentés/nombre de liens connus et degrés ascendant&#047;descendant les plus courts
 he: הצג טבלת קרבה/הצג את טבלת יחסי הקרבה עבור כל הפרטים הללו/טבלת קרבה/מספר קישורים ידועים ודרגות עולות&#047;יורדות הקצרות ביותר
 is: sýna ættartöflu/sýna töflu ættartengla fyrir alla þessa einstaklinga/ættartafla/fjöldi þekktra tengla og stystu hækkandi&#047;lækkandi stig
 it: mostra tabella di parentela/mostra la tabella delle relazioni di parentela per tutti questi individui/tabella di parentela/numero di legami conosciuti e gradi ascendente&#047;discendente più brevi
@@ -18014,7 +18014,7 @@ co: fà un cliccu nant’à st’intestatura per caccià sta o ste culonna(e) «
 de: klicke auf diesen Header um die Zeile „%s“ zu entfernen
 en: click on this header to remove the column(s) “%s”
 es: haga clic en este encabezado para quitar la(s) columna(s) «%s»
-fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
+fr: cliquer sur cet en-tête pour supprimer la ou les colonne(s) « %s »
 
     remove last module
 co: caccià l’ultimu modulu aghjuntu
@@ -18054,7 +18054,7 @@ eo: reagordi ĉion: formularo, bildo kaj tabeloj
 es: restablecer todo: formulario, imagen y tablas
 et: lähtesta kõik: vorm, pilt ja tabelid
 fi: nollaa kaikki: lomake, kuva ja taulukot
-fr: réinitialiser tout/tout réinitialiser: formulaire, image et tableaux
+fr: réinitialiser tout/tout réinitialiser : formulaire, image et tableaux
 he: אפס הכל: טופס, תמונה וטבלאות
 is: endurstilla allt: eyðublað, mynd og töflur
 it: reimpostare tutto: modulo, immagine e tabelle
@@ -18411,7 +18411,7 @@ fr: sauvegarde/sauvegardes
 co: schedarii micca referenzati à u furmatu [[[schedariu]]] o referenzati da persone non videvule ; seranu quantunque arregistrati da gwu
 en: files not referenced as [[[filename]]] or referenced by persons not visible; Will nonetheless be saved by gwu
 es: archivos no referenciados como [[[archivo]]] o referenciados por personas no visibles; gwu los guardará de todos modos
-fr: fichiers non référencés au format [[[fichier]]] ou référencés par des personnes non visibles; Seront néanmoins sauvegardés par gwu
+fr: fichiers non référencés au format [[[fichier]]] ou référencés par des personnes non visibles ; seront néanmoins sauvegardés par gwu
 
     files not in db
 co: schedarii micca referenzati
@@ -19028,7 +19028,7 @@ co: selezziunà i muduli persunalizati
 de: personalisierte Module auswählen
 en: select personalized modules
 es: seleccionar los módulos personalizados
-fr: selectionner les modules personnalisés
+fr: sélectionner les modules personnalisés
 pt: seleccionar os módulos personalizados (por defeito zz)
 sv: välj anpassad modul
 tr: kişiselleştirilmiş modülleri seçin
@@ -19102,7 +19102,7 @@ co: mandà a fiura selezziunata cù nota è fonte
 de: sende das gewählte Bild mit Notizen und Quellen
 en: send selected image with note and source
 es: enviar la imagen seleccionada con nota y fuente
-fr: envoyer l’image selectionée avec note et source
+fr: envoyer l’image sélectionnée avec note et source
 
     separate event
 co: staccanza
@@ -20624,7 +20624,7 @@ eo: la bazo ŝangis; faru “malantaŭe”, “reŝargi”, kaj replenigu la for
 es: la base ha cambiado: hacer «back», «reload» y completar nuevamente el formulario
 et: andmebaas on mutunud: mine tagasi, värskenda lehekülg ja täida vorm uuesti
 fi: tietokanta on muuttunut; valitse ”takaisin”, ”lataa uudelleen” ja täytä lomake uudelleen
-fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
+fr: la base a changé : revenez à la page précédente, actualisez-la et resaisissez le formulaire
 he: מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 is: gagnagrunnurinn hefur breyst; gerðu „Back“, „Reload“, og settu aftur í formið
 it: la base è cambiata; fate «back», «reload» e rifate la scheda
@@ -22520,7 +22520,7 @@ co: risturà Sosa 1 predefinitu
 de: Standard Sosa 1 wiederherstellen
 en: restore default Sosa 1
 es: restaurar el Sosa 1 por defecto
-fr: restorer Sosa 1 par défault
+fr: restaurer Sosa 1 par défaut
 
     use "link" instead of "create"
 af: gebruik “koppel” eerder as “skep”
@@ -22796,7 +22796,7 @@ co: attualizà a pagina solu dopu à un cliccu nant’à l’icona principale os
 de: Aktualisieren Sie die Seite nicht, ohne vorher auf das Symbol zu klicken, da dies den Bildaustausch wiederholen würde.
 en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
 es: no actualice la página sin antes hacer clic en el ícono principal, ya que repetiría el intercambio de imágenes.
-fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
+fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icône car cela répéterait l’échange des images.
 
     warnings
 af: waarskuwings
