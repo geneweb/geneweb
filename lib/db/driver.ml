@@ -308,6 +308,22 @@ module NLDB = struct
           [])
     | exception Sys_error _ -> []
 
+  (* An empty database is written as the magic followed by the marshalled
+     empty list, so a file of exactly that length holds no link: the test
+     needs a file size, not the [input_value] of the whole file, which is
+     large on a big base and was paid on every welcome page. *)
+  let empty_length =
+    String.length magic + String.length (Marshal.to_string [] [])
+
+  let is_empty base =
+    let fname = bfname base "notes_links" in
+    match open_in_bin fname with
+    | ic ->
+        Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+        (not (Mutil.check_magic magic ic))
+        || in_channel_length ic <= empty_length
+    | exception Sys_error _ -> true
+
   let write base db =
     if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
     else
@@ -325,6 +341,7 @@ end
 
 let check_nldb_format = NLDB.check_format
 let read_nldb = NLDB.read
+let nldb_is_empty = NLDB.is_empty
 let write_nldb = NLDB.write
 let base_notes_origin_file base = base.data.bnotes.Def.norigin_file
 let base_notes_dir _base = "notes_d"
