@@ -583,6 +583,15 @@ let someone_strong_n_short_dates conf base p =
   (someone_strong base p :> Adef.safe_string)
   ^^^ DateDisplay.short_dates_text conf base p
 
+(* A witness warning embeds the event name. When the lexicon has the "at"
+   form of the event ("au baptême", "bei der Taufe"), it goes into the
+   [with_form] sentence; otherwise the bare name goes into the [legacy]
+   one. *)
+let print_witnessed_event conf who name at ~legacy ~with_form =
+  match at with
+  | Some at -> Output.printf conf (fcapitale (ftransl conf with_form)) who at
+  | None -> Output.printf conf (fcapitale (ftransl conf legacy)) who name
+
 let print_warning conf base = function
   | BigAgeBetweenSpouses (p1, p2, a) ->
       Output.printf conf
@@ -762,15 +771,19 @@ let print_warning conf base = function
         (Util.string_of_fevent_name conf base e1.efam_name :> string)
         (Util.string_of_fevent_name conf base e2.efam_name :> string)
   | FWitnessEventAfterDeath (p, e, _) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
+      print_witnessed_event conf
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
         (Util.string_of_fevent_name conf base e.efam_name :> string)
+        (EventForm.fevent conf EventForm.At e.efam_name)
+        ~legacy:"%t witnessed the %s after his/her death"
+        ~with_form:"%t witnessed %s after his/her death"
   | FWitnessEventBeforeBirth (p, e, _) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
+      print_witnessed_event conf
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
         (Util.string_of_fevent_name conf base e.efam_name :> string)
+        (EventForm.fevent conf EventForm.At e.efam_name)
+        ~legacy:"%t witnessed the %s before his/her birth"
+        ~with_form:"%t witnessed %s before his/her birth"
   | IncoherentSex (p, _, _) ->
       Output.printf conf
         (fcapitale
@@ -841,15 +854,19 @@ let print_warning conf base = function
         (Util.string_of_pevent_name conf base e1.epers_name :> string)
         (Util.string_of_pevent_name conf base e2.epers_name :> string)
   | PWitnessEventAfterDeath (p, e, _origin) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
+      print_witnessed_event conf
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
         (Util.string_of_pevent_name conf base e.epers_name :> string)
+        (EventForm.pevent conf EventForm.At e.epers_name)
+        ~legacy:"%t witnessed the %s after his/her death"
+        ~with_form:"%t witnessed %s after his/her death"
   | PWitnessEventBeforeBirth (p, e, _origin) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
+      print_witnessed_event conf
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
         (Util.string_of_pevent_name conf base e.epers_name :> string)
+        (EventForm.pevent conf EventForm.At e.epers_name)
+        ~legacy:"%t witnessed the %s before his/her birth"
+        ~with_form:"%t witnessed %s before his/her birth"
   | TitleDatesError (p, t) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
