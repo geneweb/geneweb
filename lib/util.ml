@@ -452,6 +452,9 @@ let transl_a_of_b conf x y1 y2 =
 let transl_a_of_gr_eq_gen_lev conf x y1 y2 =
   gen_decline conf (transl_nth conf "%1 of %2" 1) x y1 y2
 
+let transl_a_of_event conf x y =
+  gen_decline conf (transl conf "%1 %2 (of event)") x y y
+
 let check_format ini_fmt (r : string) =
   let s = string_of_format ini_fmt in
   let rec loop i j =
@@ -1269,75 +1272,17 @@ let std_color conf (s : Adef.safe_string) =
 let index_of_sex = function Male -> 0 | Female -> 1 | Neuter -> 2
 
 let string_of_pevent_name conf base epers_name =
-  match epers_name with
-  | Epers_Birth -> Adef.safe @@ transl conf "birth"
-  | Epers_Baptism -> Adef.safe @@ transl conf "baptism"
-  | Epers_Death -> Adef.safe @@ transl conf "death"
-  | Epers_Burial -> Adef.safe @@ transl conf "burial"
-  | Epers_Cremation -> Adef.safe @@ transl conf "cremation"
-  | Epers_Accomplishment -> Adef.safe @@ transl conf "accomplishment"
-  | Epers_Acquisition -> Adef.safe @@ transl conf "acquisition"
-  | Epers_Adhesion -> Adef.safe @@ transl conf "adhesion"
-  | Epers_BaptismLDS -> Adef.safe @@ transl conf "baptismLDS"
-  | Epers_BarMitzvah -> Adef.safe @@ transl conf "bar mitzvah"
-  | Epers_BatMitzvah -> Adef.safe @@ transl conf "bat mitzvah"
-  | Epers_Benediction -> Adef.safe @@ transl conf "benediction"
-  | Epers_ChangeName -> Adef.safe @@ transl conf "change name"
-  | Epers_Circumcision -> Adef.safe @@ transl conf "circumcision"
-  | Epers_Confirmation -> Adef.safe @@ transl conf "confirmation"
-  | Epers_ConfirmationLDS -> Adef.safe @@ transl conf "confirmation LDS"
-  | Epers_Decoration -> Adef.safe @@ transl conf "decoration"
-  | Epers_DemobilisationMilitaire ->
-      Adef.safe @@ transl conf "demobilisationMilitaire"
-  | Epers_Diploma -> Adef.safe @@ transl conf "diploma"
-  | Epers_Distinction -> Adef.safe @@ transl conf "distinction"
-  | Epers_Dotation -> Adef.safe @@ transl conf "dotation"
-  | Epers_DotationLDS -> Adef.safe @@ transl conf "dotationLDS"
-  | Epers_Education -> Adef.safe @@ transl conf "education"
-  | Epers_Election -> Adef.safe @@ transl conf "election"
-  | Epers_Emigration -> Adef.safe @@ transl conf "emigration"
-  | Epers_Excommunication -> Adef.safe @@ transl conf "excommunication"
-  | Epers_FamilyLinkLDS -> Adef.safe @@ transl conf "familyLinkLDS"
-  | Epers_FirstCommunion -> Adef.safe @@ transl conf "firstCommunion"
-  | Epers_Funeral -> Adef.safe @@ transl conf "funeral"
-  | Epers_Graduate -> Adef.safe @@ transl conf "graduate"
-  | Epers_Hospitalisation -> Adef.safe @@ transl conf "hospitalisation"
-  | Epers_Illness -> Adef.safe @@ transl conf "illness"
-  | Epers_Immigration -> Adef.safe @@ transl conf "immigration"
-  | Epers_ListePassenger -> Adef.safe @@ transl conf "listePassenger"
-  | Epers_MilitaryDistinction -> Adef.safe @@ transl conf "militaryDistinction"
-  | Epers_MilitaryPromotion -> Adef.safe @@ transl conf "militaryPromotion"
-  | Epers_MilitaryService -> Adef.safe @@ transl conf "militaryService"
-  | Epers_MobilisationMilitaire ->
-      Adef.safe @@ transl conf "mobilisationMilitaire"
-  | Epers_Naturalisation -> Adef.safe @@ transl conf "naturalisation"
-  | Epers_Occupation -> Adef.safe @@ transl_nth conf "occupation/occupations" 0
-  | Epers_Ordination -> Adef.safe @@ transl conf "ordination"
-  | Epers_Property -> Adef.safe @@ transl conf "property"
-  | Epers_Recensement -> Adef.safe @@ transl conf "recensement"
-  | Epers_Residence -> Adef.safe @@ transl conf "residence"
-  | Epers_Retired -> Adef.safe @@ transl conf "retired"
-  | Epers_ScellentChildLDS -> Adef.safe @@ transl conf "scellentChildLDS"
-  | Epers_ScellentParentLDS -> Adef.safe @@ transl conf "scellentParentLDS"
-  | Epers_ScellentSpouseLDS -> Adef.safe @@ transl conf "scellentSpouseLDS"
-  | Epers_VenteBien -> Adef.safe @@ transl conf "venteBien"
-  | Epers_Will -> Adef.safe @@ transl conf "will"
-  | Epers_Name n -> (escape_html (Driver.sou base n) :> Adef.safe_string)
+  match (epers_name, EventForm.pevent_key epers_name) with
+  | Epers_Name n, _ -> (escape_html (Driver.sou base n) :> Adef.safe_string)
+  | Epers_Occupation, Some k -> Adef.safe @@ transl_nth conf k 0
+  | _, Some k -> Adef.safe @@ transl conf k
+  | _, None -> Adef.safe ""
 
-let string_of_fevent_name conf base = function
-  | Efam_Marriage -> Adef.safe @@ transl conf "marriage event"
-  | Efam_NoMarriage -> Adef.safe @@ transl conf "no marriage event"
-  | Efam_NoMention -> Adef.safe @@ transl conf "no mention"
-  | Efam_Engage -> Adef.safe @@ transl conf "engage event"
-  | Efam_Divorce -> Adef.safe @@ transl conf "divorce event"
-  | Efam_Separated -> Adef.safe @@ transl conf "separate event"
-  | Efam_Annulation -> Adef.safe @@ transl conf "annulation"
-  | Efam_MarriageBann -> Adef.safe @@ transl conf "marriage bann"
-  | Efam_MarriageContract -> Adef.safe @@ transl conf "marriage contract"
-  | Efam_MarriageLicense -> Adef.safe @@ transl conf "marriage licence"
-  | Efam_PACS -> Adef.safe @@ transl conf "PACS"
-  | Efam_Residence -> Adef.safe @@ transl conf "residence"
-  | Efam_Name n -> (escape_html (Driver.sou base n) :> Adef.safe_string)
+let string_of_fevent_name conf base efam_name =
+  match (efam_name, EventForm.fevent_key efam_name) with
+  | Efam_Name n, _ -> (escape_html (Driver.sou base n) :> Adef.safe_string)
+  | _, Some k -> Adef.safe @@ transl conf k
+  | _, None -> Adef.safe ""
 
 let string_of_witness_kind conf sex witness_kind =
   let n = if witness_kind = Witness then 0 else index_of_sex sex in

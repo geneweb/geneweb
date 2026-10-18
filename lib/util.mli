@@ -504,6 +504,11 @@ val transl_args : config -> string -> (string * string) list -> string
 
 val transl_a_of_gr_eq_gen_lev : config -> string -> string -> string -> string
 
+val transl_a_of_event : config -> string -> string -> string
+(** [transl_a_of_event conf a b] Translate "a of the event" where [b] is already
+    the "of" form of an event name (see {!EventForm}), e.g. "notes" and "du
+    baptême" give "notes du baptême". *)
+
 val std_color : config -> Adef.safe_string -> Adef.safe_string
 (** Colorise HTML element with [conf.highlight] color (wrap text in <span> with
     inline style). *)

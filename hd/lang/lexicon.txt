@@ -70,6 +70,16 @@ sv: af=afrikaans/ar=arabiska/bg=bulgariska/br=bretonska/ca=katalanska/co=korsika
 tr: af=Afrikaans/ar=Arapça/bg=Bulgarca/br=Bretonca/ca=Katalanca/co=Korsikaca/cs=Çekçe/da=Danca/de=Almanca/en=İngilizce/eo=Esperanto/es=İspanyolca/et=Estonca/fi=Fince/fr=Fransızca/he=İbranice/is=İzlandaca/it=İtalyanca/lt=Litvanca/lv=Letonca/nl=Hollandaca/no=Norveççe/oc=Oksitanca/pl=Lehçe/pt=Portekizce/pt-br=Brezilya Portekizcesi/ro=Romence/ru=Rusça/sk=Slovakça/sl=Slovence/sv=İsveççe/tr=Türkçe/zh=Çince
 zh: af=南非語/ar=阿拉伯语/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lt=立陶宛语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/tr=土耳其/zh=中文
 
+    %1 %2 (of event)
+de: %1 %2
+en: %1 %2
+es: %1 %2
+fr: %1 %2
+it: %1 %2
+no: %1 %2
+pl: %1 %2
+ru: %1 %2
+
     %1 of %2
 af: %1 van %2
 bg: %1 на :a:%2
@@ -167,6 +177,16 @@ sk: pred %d rokmi
 sl: pred %d leti
 sv: %d år sedan
 tr: %d yıl önce
+
+    %s %s of (witness at event)
+de: %s %s von
+en: %s %s of
+es: %s %s de
+fr: %s %s de
+it: %s %s di
+no: %s %s for
+pl: %s %s
+ru: %s %s
 
     %s %s starting with %s
 af: %s %s begin met “%s”
@@ -553,6 +573,26 @@ ru: %t был(а) свидетелем до своего рождения
 sv: %t var vittne innan dennes födsel
 tr: %t, doğumlarından önce bir tanıktı
 
+    %t witnessed %s after his/her death
+de: %t war Zeuge %s nach seinem Tod
+en: %t was a witness %s after their own death
+es: %t ha sido testigo %s después de su muerte
+fr: %t a été témoin %s après sa mort
+it: %t è stato testimone %s dopo la sua morte
+no: %t var vitne %s etter sin egen død
+pl: %t był(a) świadkiem %s po swojej śmierci
+ru: %t был(а) свидетелем %s после своей смерти
+
+    %t witnessed %s before his/her birth
+de: %t war Zeuge %s vor seiner Geburt
+en: %t was a witness %s before their own birth
+es: %t ha sido testigo %s antes de su nacimiento
+fr: %t a été témoin %s avant sa naissance
+it: %t è stato testimone %s prima della sua nascita
+no: %t var vitne %s før sin egen fødsel
+pl: %t był(a) świadkiem %s przed swoimi narodzinami
+ru: %t был(а) свидетелем %s до своего рождения
+
     %t witnessed the %s after his/her death
 co: %t hè statu testimone di %s dopu a so morta
 de: %t war Zeuge bei der %s nach seinem Tod
@@ -583,15 +623,15 @@ tr: %t, kendi %s doğumundan önce tanıktı
 
     %t's %s before his/her %s
 co: %t: %s nanzu a/u so %s
-de: %t: %s vor seiner/ihrer %s
+de: %t: „%s“ vor „%s“
 en: %t: %s before their %s
-es: %t : %s antes de su %s
-fr: %t : %s avant son/sa %s
-it: %t : %s prima della suo/sua %s
-no: %t: %s før sin %s
-pl: %t: %s przed swoim/swoją %s
-pt: %t: %s antes de seu/sua %s
-ru: %t: %s до их %s
+es: %t: «%s» antes de «%s»
+fr: %t : « %s » avant « %s »
+it: %t: «%s» prima di «%s»
+no: %t: «%s» før «%s»
+pl: %t: „%s” przed „%s”
+pt: %t: «%s» antes de «%s»
+ru: %t: «%s» до «%s»
 sv: %t: %s före dennes %s
 tr: %t: %s önce %s
 
@@ -1758,6 +1798,26 @@ ru: достижение
 sv: prestation
 tr: başarı
 
+    accomplishment (at)
+de: bei der Verwirklichung
+en: at the accomplishment
+es: en el cumplimiento
+fr: à l’accomplissement
+it: al compimento
+no: ved utførelsen
+pl: przy osiągnięciu
+ru: при достижении
+
+    accomplishment (of)
+de: der Verwirklichung
+en: of the accomplishment
+es: del cumplimiento
+fr: de l’accomplissement
+it: del compimento
+no: til utførelsen
+pl: osiągnięcia
+ru: достижения
+
     acquisition
 co: acchjappu
 de: Akquisition
@@ -1773,6 +1833,26 @@ pt: aquisição
 ru: приобретение
 sv: förvärvande
 tr: edinme
+
+    acquisition (at)
+de: bei der Akquisition
+en: at the acquisition
+es: en la adquisición
+fr: à l’acquisition
+it: all’acquisizione
+no: ved anskaffelsen
+pl: przy nabyciu
+ru: при приобретении
+
+    acquisition (of)
+de: der Akquisition
+en: of the acquisition
+es: de la adquisición
+fr: de l’acquisition
+it: dell’acquisizione
+no: til anskaffelsen
+pl: nabycia
+ru: приобретения
 
     activate/suppress
 co: attivà/squassà
@@ -2200,9 +2280,29 @@ nl: lidmaatschap
 no: medlemskap
 pl: członkostwo
 pt: adesão
-ru: участие
+ru: вступление
 sv: medlemskap
 tr: üyelik
+
+    adhesion (at)
+de: beim Beitritt
+en: at the membership
+es: en la adhesión
+fr: à l’adhésion
+it: all’adesione
+no: ved medlemskapet
+pl: przy członkostwie
+ru: при вступлении
+
+    adhesion (of)
+de: des Beitritts
+en: of the membership
+es: de la adhesión
+fr: de l’adhésion
+it: dell’adesione
+no: til medlemskapet
+pl: członkostwa
+ru: вступления
 
     adoptive father/adoptive mother/adoptive parents
 af: aangenome vader/angenome moeder/aangenome ouers
@@ -3116,6 +3216,26 @@ ru: аннулирование брака
 sv: upphävande
 tr: i̇ptal
 
+    annulation (at)
+de: bei der Aufhebung
+en: at the annulment
+es: en la anulación
+fr: à l’annulation
+it: all’annullamento
+no: ved annulleringen
+pl: przy unieważnieniu
+ru: при аннулировании брака
+
+    annulation (of)
+de: der Aufhebung
+en: of the annulment
+es: de la anulación
+fr: de l’annulation
+it: dell’annullamento
+no: til annulleringen
+pl: unieważnienia
+ru: аннулирования брака
+
     any individual in the base
 co: una persona di a basa
 de: jede beliebige Person im Stammbaum
@@ -3506,6 +3626,26 @@ sl: krst
 sv: dop
 tr: vaftiz
 
+    baptism (at)
+de: bei der Taufe
+en: at the baptism
+es: en el bautismo
+fr: au baptême
+it: al battesimo
+no: ved dåpen
+pl: przy chrzcie
+ru: при крещении
+
+    baptism (of)
+de: der Taufe
+en: of the baptism
+es: del bautismo
+fr: du baptême
+it: del battesimo
+no: til dåpen
+pl: chrztu
+ru: крещения
+
     baptism place
 co: locu di battesimu
 de: Ort der Taufe
@@ -3577,7 +3717,7 @@ tr: vaftiz/vaftizler
 co: battesimu LDS
 de: Taufe HLT
 en: baptism (LDS)
-es: bausitsmo LDS
+es: bautismo LDS
 fi: kaste (LSD)
 fr: baptême LDS
 it: battesimo LDS (mormonismo)
@@ -3588,6 +3728,26 @@ pt: batismo LDS
 ru: крещение (СПД)
 sv: dop (LDS)
 tr: vaftiz (LDS)
+
+    baptismLDS (at)
+de: bei der Taufe HLT
+en: at the baptism (LDS)
+es: en el bautismo LDS
+fr: au baptême LDS
+it: al battesimo LDS
+no: ved dåpen (LDS)
+pl: przy chrzcie (LDS)
+ru: при крещении (СПД)
+
+    baptismLDS (of)
+de: der Taufe HLT
+en: of the baptism (LDS)
+es: del bautismo LDS
+fr: du baptême LDS
+it: del battesimo LDS
+no: til dåpen (LDS)
+pl: chrztu (LDS)
+ru: крещения (СПД)
 
     baptized
 af: gedoop
@@ -3637,6 +3797,26 @@ pt: bar mitzvah
 ru: бар-мицва
 sv: bar mitzvah
 tr: bar mitzvah
+
+    bar mitzvah (at)
+de: bei der Bar Mizwa
+en: at the bar mitzvah
+es: en el bar mitzvah
+fr: à la bar mitzvah
+it: al bar mitzvah
+no: ved bar mitzvaen
+pl: przy bar micwie
+ru: при бар-мицве
+
+    bar mitzvah (of)
+de: der Bar Mizwa
+en: of the bar mitzvah
+es: del bar mitzvah
+fr: de la bar mitzvah
+it: del bar mitzvah
+no: til bar mitzvaen
+pl: bar micwy
+ru: бар-мицвы
 
     base
 co: basa
@@ -3767,6 +3947,26 @@ ru: бат-мицва
 sv: bat mitzvah
 tr: bat mitzvah
 
+    bat mitzvah (at)
+de: bei der Bat Mizwa
+en: at the bat Mitzvah
+es: en el bat mitzvah
+fr: à la bat mitzvah
+it: al bat mitzvah
+no: ved bat mitzvaen
+pl: przy bat micwie
+ru: при бат-мицве
+
+    bat mitzvah (of)
+de: der Bat Mizwa
+en: of the bat Mitzvah
+es: del bat mitzvah
+fr: de la bat mitzvah
+it: del bat mitzvah
+no: til bat mitzvaen
+pl: bat micwy
+ru: бат-мицвы
+
     bce
 co:  nz. à C.
 de:  v. u. Z.
@@ -3883,12 +4083,32 @@ fi: siunaaminen
 fr: bénédiction
 it: benedizione
 nl: zegening
-no: elsignelse
+no: velsignelse
 pl: błogosławieństwo
 pt: benção
 ru: благословение
 sv: välsignelse
 tr: kutsama
+
+    benediction (at)
+de: bei der Segnung
+en: at the blessing
+es: en la bendición
+fr: à la bénédiction
+it: alla benedizione
+no: ved velsignelsen
+pl: przy błogosławieństwie
+ru: при благословении
+
+    benediction (of)
+de: der Segnung
+en: of the blessing
+es: de la bendición
+fr: de la bénédiction
+it: della benedizione
+no: til velsignelsen
+pl: błogosławieństwa
+ru: благословения
 
     between (date)
 af: tussen
@@ -3971,6 +4191,26 @@ sk: narodenie
 sl: rojstva
 sv: födelse
 tr: doğum
+
+    birth (at)
+de: bei der Geburt
+en: at the birth
+es: en el nacimiento
+fr: à la naissance
+it: alla nascita
+no: ved fødselen
+pl: przy urodzeniu
+ru: при рождении
+
+    birth (of)
+de: der Geburt
+en: of the birth
+es: del nacimiento
+fr: de la naissance
+it: della nascita
+no: til fødselen
+pl: urodzenia
+ru: рождения
 
     birth date and birth place
 co: data è locu di nascita
@@ -4408,6 +4648,26 @@ sk: pohreb
 sl: pogreb
 sv: begravning
 tr: defin
+
+    burial (at)
+de: bei der Beisetzung
+en: at the burial
+es: en el entierro
+fr: à l’inhumation
+it: alla sepoltura
+no: ved begravelsen
+pl: przy pogrzebie
+ru: на похоронах
+
+    burial (of)
+de: der Beisetzung
+en: of the burial
+es: del entierro
+fr: de l’inhumation
+it: della sepoltura
+no: til begravelsen
+pl: pogrzebu
+ru: похорон
 
     burial place
 co: locu di sepultura
@@ -4917,6 +5177,26 @@ ru: смена имени или фамилии
 sv: namnbyte
 tr: ad değişikliği
 
+    change name (at)
+de: beim Namenswechsel
+en: at the change of surname
+es: en el cambio de apellido
+fr: au changement de nom
+it: al cambiamento di cognome
+no: ved navneendringen
+pl: przy zmianie nazwiska
+ru: при смене имени или фамилии
+
+    change name (of)
+de: des Namenswechsels
+en: of the change of surname
+es: del cambio de apellido
+fr: du changement de nom
+it: del cambiamento di cognome
+no: til navneendringen
+pl: zmiany nazwiska
+ru: смены имени или фамилии
+
     changed order of children of %1 and %2
 af: verander die volgorde van die kinders van %1 en %2
 bg: промяна в последователността на децата на %1 и %2
@@ -5387,6 +5667,26 @@ pt: circuncisão
 ru: обрезание
 sv: omskärellse
 tr: sünnet
+
+    circumcision (at)
+de: bei der Beschneidung
+en: at the circumcision
+es: en la circuncisión
+fr: à la circoncision
+it: alla circoncisione
+no: ved omskjæringen
+pl: przy obrzezaniu
+ru: при обрезании
+
+    circumcision (of)
+de: der Beschneidung
+en: of the circumcision
+es: de la circuncisión
+fr: de la circoncision
+it: della circoncisione
+no: til omskjæringen
+pl: obrzezania
+ru: обрезания
 
     civil registrar/civil registrar/civil registrar
 de: Standesbeamter/Standesbeamter/Standesbeamter
@@ -5924,9 +6224,29 @@ nl: belijdenis
 no: konfirmasjon
 pl: bierzmowanie
 pt: confirmação
-ru: подтверждение
+ru: конфирмация
 sv: konfirmation
 tr: onay
+
+    confirmation (at)
+de: bei der Firmung
+en: at the confirmation
+es: en la confirmación
+fr: à la confirmation
+it: alla cresima
+no: ved konfirmasjonen
+pl: przy bierzmowaniu
+ru: при конфирмации
+
+    confirmation (of)
+de: der Firmung
+en: of the confirmation
+es: de la confirmación
+fr: de la confirmation
+it: della cresima
+no: til konfirmasjonen
+pl: bierzmowania
+ru: конфирмации
 
     confirmation LDS
 co: cresima LDS
@@ -5943,6 +6263,26 @@ pt: confirmação LDS
 ru: конфирмация (СПД)
 sv: konfirmation (LDS)
 tr: onay (LDS)
+
+    confirmation LDS (at)
+de: bei der Firmung HLT
+en: at the confirmation (LDS)
+es: en la confirmación LDS
+fr: à la confirmation LDS
+it: alla cresima LDS
+no: ved konfirmasjonen (LDS)
+pl: przy konfirmacji (LDS)
+ru: при конфирмации (СПД)
+
+    confirmation LDS (of)
+de: der Firmung HLT
+en: of the confirmation (LDS)
+es: de la confirmación LDS
+fr: de la confirmation LDS
+it: della cresima LDS
+no: til konfirmasjonen (LDS)
+pl: konfirmacji (LDS)
+ru: конфирмации (СПД)
 
     connect with %s
 bg: вход чрез %s
@@ -9538,6 +9878,26 @@ ru: кремация
 sv: kremering
 tr: ölü yakma
 
+    cremation (at)
+de: bei der Feuerbestattung
+en: at the cremation
+es: en la incineración
+fr: à la crémation
+it: alla cremazione
+no: ved kremasjonen
+pl: przy kremacji
+ru: при кремации
+
+    cremation (of)
+de: der Feuerbestattung
+en: of the cremation
+es: de la incineración
+fr: de la crémation
+it: della cremazione
+no: til kremasjonen
+pl: kremacji
+ru: кремации
+
     current value
 bg: текуща стойност
 br: talvoud red
@@ -9928,6 +10288,26 @@ sl: smrti
 sv: död
 tr: ölüm
 
+    death (at)
+de: beim Tod
+en: at the death
+es: en la muerte
+fr: au décès
+it: alla morte
+no: ved døden
+pl: przy zgonie
+ru: при кончине
+
+    death (of)
+de: des Todes
+en: of the death
+es: de la muerte
+fr: du décès
+it: della morte
+no: til døden
+pl: zgonu
+ru: смерти
+
     death ages and marriage duration
 de: Sterbealter und Ehedauer
 en: death ages and marriage duration
@@ -10064,6 +10444,26 @@ pt: condecoração
 ru: награда
 sv: medaljer
 tr: madalya
+
+    decoration (at)
+de: bei der Dekoration
+en: at the decoration
+es: en la condecoración
+fr: à la décoration
+it: alla decorazione
+no: ved medaljen
+pl: przy odznaczeniu
+ru: при награждении
+
+    decoration (of)
+de: der Dekoration
+en: of the decoration
+es: de la condecoración
+fr: de la décoration
+it: della decorazione
+no: til medaljen
+pl: odznaczenia
+ru: награды
 
     define Cujus
 co: definisce %s cum’è Sosa 1 per fighjà o riduce l’implessi/rimette u Sosa 1 precedente %s
@@ -10226,7 +10626,7 @@ en: demobilization
 es: licencia militar
 fi: demobilisaatio
 fr: démobilisation militaire
-it: smobilitazione Militare
+it: smobilitazione militare
 nl: demobilisatie
 no: demobilisering
 pl: demobilizacja
@@ -10234,6 +10634,26 @@ pt: desmobilização militar
 ru: демобилизация
 sv: demobilisering
 tr: terhis
+
+    demobilisationMilitaire (at)
+de: bei der militärischen Demobilisierung
+en: at the demobilization
+es: en la licencia militar
+fr: à la démobilisation militaire
+it: alla smobilitazione militare
+no: ved demobiliseringen
+pl: przy demobilizacji
+ru: при демобилизации
+
+    demobilisationMilitaire (of)
+de: der militärischen Demobilisierung
+en: of the demobilization
+es: de la licencia militar
+fr: de la démobilisation militaire
+it: della smobilitazione militare
+no: til demobiliseringen
+pl: demobilizacji
+ru: демобилизации
 
     descendant tree view
 co: arburiscenza discendente
@@ -10462,6 +10882,26 @@ pt: diploma
 ru: диплом
 sv: diplom
 tr: diploma
+
+    diploma (at)
+de: beim Diplom
+en: at the diploma
+es: en el diploma
+fr: au certificat
+it: al diploma
+no: ved diplomet
+pl: przy dyplomie
+ru: при получении диплома
+
+    diploma (of)
+de: des Diploms
+en: of the diploma
+es: del diploma
+fr: du certificat
+it: del diploma
+no: til diplomet
+pl: dyplomu
+ru: диплома
 
     direct ancestor of %s
 co: antenatu direttu di %s
@@ -10810,6 +11250,26 @@ ru: звание
 sv: grad
 tr: rütbe
 
+    distinction (at)
+de: bei der Auszeichnung
+en: at the rank
+es: en la distinción
+fr: à la distinction
+it: alla distinzione
+no: ved graden
+pl: przy wyróżnieniu
+ru: при присвоении звания
+
+    distinction (of)
+de: der Auszeichnung
+en: of the rank
+es: de la distinción
+fr: de la distinction
+it: della distinzione
+no: til graden
+pl: wyróżnienia
+ru: звания
+
     divorce
 af: geskei
 bg: развод
@@ -10857,6 +11317,26 @@ pt: divórcio
 ru: развод
 sv: skilsmässa
 tr: boşanma
+
+    divorce event (at)
+de: bei der Scheidung
+en: at the divorce
+es: en el divorcio
+fr: au divorce
+it: al divorzio
+no: ved skilsmissen
+pl: przy rozwodzie
+ru: при разводе
+
+    divorce event (of)
+de: der Scheidung
+en: of the divorce
+es: del divorcio
+fr: du divorce
+it: del divorzio
+no: til skilsmissen
+pl: rozwodu
+ru: развода
 
     divorced
 af: geskei
@@ -11005,6 +11485,26 @@ ru: дарение
 sv: donation
 tr: bağış
 
+    dotation (at)
+de: bei der Spende
+en: at the endowment
+es: en la dotación
+fr: à la dotation
+it: alla dote
+no: ved stiftelsen av legatet
+pl: przy dotacji
+ru: при дарении
+
+    dotation (of)
+de: der Spende
+en: of the endowment
+es: de la dotación
+fr: de la dotation
+it: della dote
+no: til stiftelsen av legatet
+pl: dotacji
+ru: дарения
+
     dotationLDS
 co: dutazione LDS
 de: Dotations HLT
@@ -11020,6 +11520,26 @@ pt: dotação LDS
 ru: облечение (СПД)
 sv: donation (LDS)
 tr: bağış (LDS)
+
+    dotationLDS (at)
+de: bei der Dotation HLT
+en: at the endowment (LDS)
+es: en la dotación LDS
+fr: à la donation LDS
+it: alla dotazione LDS
+no: ved stiftelsen av legatet (LDS)
+pl: przy obdarowaniu (LDS)
+ru: при облечении (СПД)
+
+    dotationLDS (of)
+de: der Dotation HLT
+en: of the endowment (LDS)
+es: de la dotación LDS
+fr: de la donation LDS
+it: della dotazione LDS
+no: til stiftelsen av legatet (LDS)
+pl: obdarowania (LDS)
+ru: облечения (СПД)
 
     drag/wheel/hover/lock/rotate
 de: Ziehen: verschieben/Rad: zoomen/Zeigen: Details/Klick Ort: fixieren/Rechtsklick: drehen (360°)
@@ -11122,11 +11642,31 @@ ru: образование
 sv: utbildning
 tr: eğitim
 
+    education (at)
+de: bei der Ausbildung
+en: at the education
+es: en la educación
+fr: à l’éducation
+it: all’educazione
+no: ved utdannelsen
+pl: przy wykształceniu
+ru: при получении образования
+
+    education (of)
+de: der Ausbildung
+en: of the education
+es: de la educación
+fr: de l’éducation
+it: dell’educazione
+no: til utdannelsen
+pl: wykształcenia
+ru: образования
+
     election
 co: elezzione
 de: Wahl
 en: election
-es: élección
+es: elección
 fi: luottamustoimet
 fr: élection
 it: elezione
@@ -11137,6 +11677,26 @@ pt: eleição
 ru: избрание
 sv: val
 tr: seçim
+
+    election (at)
+de: bei der Wahl
+en: at the election
+es: en la elección
+fr: à l’élection
+it: all’elezione
+no: ved valget
+pl: przy wyborze
+ru: при избрании
+
+    election (of)
+de: der Wahl
+en: of the election
+es: de la elección
+fr: de l’élection
+it: dell’elezione
+no: til valget
+pl: wyboru
+ru: избрания
 
     emigration
 co: emigrazione
@@ -11153,6 +11713,26 @@ pt: emigração
 ru: эмиграция
 sv: utvandring
 tr: göç
+
+    emigration (at)
+de: bei der Emigration
+en: at the emigration
+es: en la emigración
+fr: à l’émigration
+it: all’emigrazione
+no: ved utvandringen
+pl: przy emigracji
+ru: при эмиграции
+
+    emigration (of)
+de: der Emigration
+en: of the emigration
+es: de la emigración
+fr: de l’émigration
+it: dell’emigrazione
+no: til utvandringen
+pl: emigracji
+ru: эмиграции
 
     end
 af: einde
@@ -11190,7 +11770,7 @@ tr: son
 co: spusaticciu
 de: Verlobung
 en: engagement
-es: petición mano
+es: petición de mano
 fi: kihlaus
 fr: fiançailles
 it: fidanzamento
@@ -11201,6 +11781,26 @@ pt: noivado
 ru: помолвка
 sv: förlovning
 tr: nişan
+
+    engage event (at)
+de: bei der Verlobung
+en: at the engagement
+es: en la petición de mano
+fr: aux fiançailles
+it: al fidanzamento
+no: ved forlovelsen
+pl: przy zaręczynach
+ru: на помолвке
+
+    engage event (of)
+de: der Verlobung
+en: of the engagement
+es: de la petición de mano
+fr: des fiançailles
+it: del fidanzamento
+no: til forlovelsen
+pl: zaręczyn
+ru: помолвки
 
     engaged
 af: verloof
@@ -11464,6 +12064,26 @@ pt: excomunhão
 ru: отлучение от церкви
 sv: bannlysning
 tr: aforoz
+
+    excommunication (at)
+de: bei der Exkommunizierung
+en: at the excommunication
+es: en la excomunión
+fr: à l’excommunication
+it: alla scomunica
+no: ved bannlysingen
+pl: przy ekskomunice
+ru: при отлучении от церкви
+
+    excommunication (of)
+de: der Exkommunizierung
+en: of the excommunication
+es: de la excomunión
+fr: de l’excommunication
+it: della scomunica
+no: til bannlysingen
+pl: ekskomuniki
+ru: отлучения от церкви
 
     executed (legally killed)
 af: teregsgestel
@@ -11773,12 +12393,32 @@ fi: perheyhteys (LDS)
 fr: lien parental LDS
 it: legame di parentela LDS (mormonismo)
 nl: familierelatie (LDS)
-no: famile-lenke (LDS)
+no: familielenke (LDS)
 pl: powiązanie rodzinne (LDS)
 pt: ligação familiar LDS
 ru: семейная связь (СПД)
 sv: familjeband (RDS)
 tr: aile bağlantısı (LDS)
+
+    familyLinkLDS (at)
+de: beim Familien-Link HLT
+en: at the family link (LDS)
+es: en el enlace familiar LDS
+fr: au lien parental LDS
+it: al legame di parentela LDS
+no: ved familielenken (LDS)
+pl: przy powiązaniu rodzinnym (LDS)
+ru: при семейной связи (СПД)
+
+    familyLinkLDS (of)
+de: des Familien-Links HLT
+en: of the family link (LDS)
+es: del enlace familiar LDS
+fr: du lien parental LDS
+it: del legame di parentela LDS
+no: til familielenken (LDS)
+pl: powiązania rodzinnego (LDS)
+ru: семейной связи (СПД)
 
     fanchart
 co: arburu in banderetta
@@ -12178,14 +12818,34 @@ en: first communion
 es: primera comunión
 fi: ensimmäinen ehtoollinen
 fr: première communion
-it: funerali
+it: prima comunione
 nl: eerste communie
-no: første forbindelse
+no: første nattverd
 pl: pierwsza komunia
 pt: primeira comunhão
 ru: первое причастие
 sv: första nattvard
 tr: ilk komünyon
+
+    firstCommunion (at)
+de: bei der ersten Kommunion
+en: at the first communion
+es: en la primera comunión
+fr: à la première communion
+it: alla prima comunione
+no: ved den første nattverden
+pl: przy pierwszej komunii
+ru: при первом причастии
+
+    firstCommunion (of)
+de: der ersten Kommunion
+en: of the first communion
+es: de la primera comunión
+fr: de la première communion
+it: della prima comunione
+no: til den første nattverden
+pl: pierwszej komunii
+ru: первого причастия
 
     fix error automatically
 de: Den Fehler automatisch korrigieren
@@ -12630,7 +13290,7 @@ en: funeral
 es: funerales
 fi: hautajaiset
 fr: funérailles
-it: cerimonia di laurea
+it: funerali
 nl: begrafenis
 no: begravelse
 pl: pogrzeb
@@ -12638,6 +13298,26 @@ pt: funeral
 ru: похороны
 sv: begravning
 tr: cenaze
+
+    funeral (at)
+de: bei der Bestattung
+en: at the funeral
+es: en los funerales
+fr: aux funérailles
+it: ai funerali
+no: ved begravelsen
+pl: na pogrzebie
+ru: на похоронах
+
+    funeral (of)
+de: der Bestattung
+en: of the funeral
+es: de los funerales
+fr: des funérailles
+it: dei funerali
+no: til begravelsen
+pl: pogrzebu
+ru: похорон
 
     gallery
 de: Bildergalerie
@@ -12915,14 +13595,34 @@ en: graduation
 es: graduación
 fi: valmistuminen
 fr: diplôme
-it: diploma
+it: cerimonia di laurea
 nl: eindexamen
-no: utdannelse
+no: eksamen
 pl: ukończenie szkoły
 pt: formatura
 ru: выпуск
 sv: examen
 tr: mezuniyet
+
+    graduate (at)
+de: bei der Graduierungsfeier
+en: at the graduation
+es: en la graduación
+fr: au diplôme
+it: alla cerimonia di laurea
+no: ved eksamen
+pl: przy ukończeniu szkoły
+ru: на выпуске
+
+    graduate (of)
+de: der Graduierungsfeier
+en: of the graduation
+es: de la graduación
+fr: du diplôme
+it: della cerimonia di laurea
+no: til eksamen
+pl: ukończenia szkoły
+ru: выпуска
 
     grand-parents
 af: grootouers
@@ -13722,6 +14422,26 @@ ru: госпитализация
 sv: sjukhusvistelse
 tr: hastanede yatış
 
+    hospitalisation (at)
+de: beim Krankenhausaufenthalt
+en: at the hospitalization
+es: en la hospitalización
+fr: à l’hospitalisation
+it: all’ospedalizzazione
+no: ved hospitaliseringen
+pl: przy hospitalizacji
+ru: при госпитализации
+
+    hospitalisation (of)
+de: des Krankenhausaufenthalts
+en: of the hospitalization
+es: de la hospitalización
+fr: de l’hospitalisation
+it: dell’ospedalizzazione
+no: til hospitaliseringen
+pl: hospitalizacji
+ru: госпитализации
+
     htree
 co: arburu in H
 de: H-Baum
@@ -13888,6 +14608,26 @@ ru: болезнь
 sv: sjukdom
 tr: hastalık
 
+    illness (at)
+de: bei der Krankheit
+en: at the disease
+es: en la enfermedad
+fr: à la maladie
+it: alla malattia
+no: ved sykdommen
+pl: przy chorobie
+ru: при болезни
+
+    illness (of)
+de: der Krankheit
+en: of the disease
+es: de la enfermedad
+fr: de la maladie
+it: della malattia
+no: til sykdommen
+pl: choroby
+ru: болезни
+
     image deleted
 af: prent ontbreek
 bg: изображението е премахнато
@@ -14032,6 +14772,26 @@ pt: imigração
 ru: иммиграция
 sv: invandring
 tr: göçmenlik
+
+    immigration (at)
+de: bei der Immigration
+en: at the immigration
+es: en la inmigración
+fr: à l’immigration
+it: all’immigrazione
+no: ved innvandringen
+pl: przy imigracji
+ru: при иммиграции
+
+    immigration (of)
+de: der Immigration
+en: of the immigration
+es: de la inmigración
+fr: de l’immigration
+it: dell’immigrazione
+no: til innvandringen
+pl: imigracji
+ru: иммиграции
 
     implex links
 co: ligà l’implessi
@@ -15357,6 +16117,26 @@ ru: список пассажиров
 sv: passagerarlista
 tr: yolcu Listesi
 
+    listePassenger (at)
+de: bei der Passagierliste
+en: at the passenger list
+es: en la lista de pasajeros
+fr: à la liste des passagers
+it: all’elenco dei passeggeri
+no: på passasjerlisten
+pl: na liście pasażerów
+ru: в списке пассажиров
+
+    listePassenger (of)
+de: der Passagierliste
+en: of the passenger list
+es: de la lista de pasajeros
+fr: de la liste des passagers
+it: dell’elenco dei passeggeri
+no: til passasjerlisten
+pl: listy pasażerów
+ru: списка пассажиров
+
     lists and charts
 co: grafichi è liste
 de: Stammbäume, Listen und Zustände
@@ -15681,12 +16461,32 @@ fi: aviokielto
 fr: bans de mariage
 it: pubblicazioni di matrimonio
 nl: ondertrouw
-no: ta ut lysning
+no: lysning
 pl: zapowiedzi
 pt: proibição de casamento
 ru: оглашение брака
 sv: förbjudet äktenskap
 tr: evlilik yasağı
+
+    marriage bann (at)
+de: beim Aufgebot
+en: at the marriage banns
+es: en las amonestaciones
+fr: aux bans de mariage
+it: alle pubblicazioni di matrimonio
+no: ved lysningen
+pl: przy zapowiedziach
+ru: при оглашении брака
+
+    marriage bann (of)
+de: des Aufgebots
+en: of the marriage banns
+es: de las amonestaciones
+fr: des bans de mariage
+it: delle pubblicazioni di matrimonio
+no: til lysningen
+pl: zapowiedzi
+ru: оглашения брака
 
     marriage banns%t to
 co: ammunimi di matrimoniu%t cù
@@ -15719,6 +16519,26 @@ pt: contrato de casamento
 ru: брачный договор
 sv: äktenskapförord
 tr: evlilik sözleşmesi (nikah)
+
+    marriage contract (at)
+de: beim Ehevertrag
+en: at the marriage contract
+es: en el contrato de matrimonio
+fr: au contrat de mariage
+it: al contratto di matrimonio
+no: ved ektepakten
+pl: przy intercyzie
+ru: при заключении брачного договора
+
+    marriage contract (of)
+de: des Ehevertrags
+en: of the marriage contract
+es: del contrato de matrimonio
+fr: du contrat de mariage
+it: del contratto di matrimonio
+no: til ektepakten
+pl: intercyzy
+ru: брачного договора
 
     marriage contract%t with
 co: cuntrattu di matrimoniu%t cù
@@ -15769,6 +16589,26 @@ pt: casamento
 ru: бракосочетание
 sv: äktenskap
 tr: evlilik
+
+    marriage event (at)
+de: bei der Heirat
+en: at the marriage
+es: en el matrimonio
+fr: au mariage
+it: al matrimonio
+no: ved vielsen
+pl: na ślubie
+ru: на бракосочетании
+
+    marriage event (of)
+de: der Heirat
+en: of the marriage
+es: del matrimonio
+fr: du mariage
+it: del matrimonio
+no: til ekteskapet
+pl: ślubu
+ru: бракосочетания
 
     marriage had occurred after the death of %t
 af: huwelik plaasgevind het nadat %t dood
@@ -15845,6 +16685,26 @@ pt: licença de casamento
 ru: разрешение на брак
 sv: äktenskapslicens
 tr: evlilik Cüzdanı
+
+    marriage licence (at)
+de: bei der Eheerlaubnis
+en: at the marriage license
+es: en la licencia de matrimonio
+fr: à la licence de mariage
+it: alla licenza di matrimonio
+no: ved vielsesattesten
+pl: przy zezwoleniu na ślub
+ru: при выдаче разрешения на брак
+
+    marriage licence (of)
+de: der Eheerlaubnis
+en: of the marriage license
+es: de la licencia de matrimonio
+fr: de la licence de mariage
+it: della licenza di matrimonio
+no: til vielsesattesten
+pl: zezwolenia na ślub
+ru: разрешения на брак
 
     marriage of %t after his/her death
 co: matrimoniu di %t dopu a so morte
@@ -16417,6 +17277,26 @@ ru: боевая награда
 sv: militär utmärkelse
 tr: askeri dekorasyon
 
+    militaryDistinction (at)
+de: bei der militärischen Auszeichnung
+en: at the military decoration
+es: en la distinción militar
+fr: à la distinction militaire
+it: alla decorazione militare
+no: ved den militære utmerkelsen
+pl: przy odznaczeniu wojskowym
+ru: при награждении боевой наградой
+
+    militaryDistinction (of)
+de: der militärischen Auszeichnung
+en: of the military decoration
+es: de la distinción militar
+fr: de la distinction militaire
+it: della decorazione militare
+no: til den militære utmerkelsen
+pl: odznaczenia wojskowego
+ru: боевой награды
+
     militaryPromotion
 co: prumuzione militare
 de: militärische Promotion
@@ -16433,6 +17313,26 @@ ru: продвижение по службе
 sv: militärt avancemang
 tr: askeri tanıtım
 
+    militaryPromotion (at)
+de: bei der militärischen Promotion
+en: at the military promotion
+es: en la promoción militar
+fr: à la promotion militaire
+it: alla promozione militare
+no: ved den militære forfremmelsen
+pl: przy awansie wojskowym
+ru: при продвижении по службе
+
+    militaryPromotion (of)
+de: der militärischen Promotion
+en: of the military promotion
+es: de la promoción militar
+fr: de la promotion militaire
+it: della promozione militare
+no: til den militære forfremmelsen
+pl: awansu wojskowego
+ru: продвижения по службе
+
     militaryService
 co: serviziu militare
 de: Militärdienst
@@ -16448,6 +17348,26 @@ pt: serviço militar
 ru: военная служба
 sv: militärtjänst
 tr: zorunlu askerlik
+
+    militaryService (at)
+de: beim Militärdienst
+en: at the conscription
+es: en el servicio militar
+fr: au service militaire
+it: al servizio militare
+no: ved verneplikten
+pl: przy służbie wojskowej
+ru: на военной службе
+
+    militaryService (of)
+de: des Militärdienstes
+en: of the conscription
+es: del servicio militar
+fr: du service militaire
+it: del servizio militare
+no: til verneplikten
+pl: służby wojskowej
+ru: военной службы
 
     miscellaneous
 co: diversu
@@ -16697,7 +17617,7 @@ tr: eş bilinmiyor
 co: mubilizazione militare
 de: Mobilmachung
 en: mobilization
-es: mobilización militar
+es: movilización militar
 fi: mobilisaatio
 fr: mobilisation militaire
 it: mobilitazione militare
@@ -16708,6 +17628,26 @@ pt: mobilização militar
 ru: мобилизация
 sv: mobilisering
 tr: seferberlik
+
+    mobilisationMilitaire (at)
+de: bei der Mobilmachung
+en: at the mobilization
+es: en la movilización militar
+fr: à la mobilisation militaire
+it: alla mobilitazione militare
+no: ved mobiliseringen
+pl: przy mobilizacji
+ru: при мобилизации
+
+    mobilisationMilitaire (of)
+de: der Mobilmachung
+en: of the mobilization
+es: de la movilización militar
+fr: de la mobilisation militaire
+it: della mobilitazione militare
+no: til mobiliseringen
+pl: mobilizacji
+ru: мобилизации
 
     modification failed
 co: mudificazione fallita
@@ -17310,6 +18250,26 @@ pt: naturalização
 ru: натурализация
 sv: naturalisation
 tr: vatandaşlık
+
+    naturalisation (at)
+de: bei der Einbürgerung
+en: at the naturalization
+es: en la naturalización
+fr: à la naturalisation
+it: alla naturalizzazione
+no: ved statsborgerskapet
+pl: przy naturalizacji
+ru: при натурализации
+
+    naturalisation (of)
+de: der Einbürgerung
+en: of the naturalization
+es: de la naturalización
+fr: de la naturalisation
+it: della naturalizzazione
+no: til statsborgerskapet
+pl: naturalizacji
+ru: натурализации
 
     navigate on tree
 co: navigà nant’à l’arburu
@@ -18635,7 +19595,7 @@ da: nte/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./2
 de: n-ten/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 en: nth/1st/2nd/3rd/4th/5th/6th/7th/8th/9th/10th/11th/12th/13th/14th/15th/16th/17th/18th/19th/20th/21st/22nd/23rd/24th/25th/26th/27th/28th/29th/30th/31st/32nd/33rd/34th/35th/36th/37th/38th/39th/40th/41st/42nd/43rd/44th/45th/46th/47th/48th/49th/50th/51st/52nd/53rd/54th/55th/56th/57th/58th/59th/60th/61st/62nd/63rd/64th/65th/66th/67th/68th/69th/70th/71st/72nd/73rd/74th/75th/76th/77th/78th/79th/80th/81st/82nd/83rd/84th/85th/86th/87th/88th/89th/90th/91st/92nd/93rd/94th/95th/96th/97th/98th/99th
 eo: n-a/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
-es: n-ésima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
+es: n-ésimo/1.º/2.º/3.º/4.º/5.º/6.º/7.º/8.º/9.º/10.º/11.º/12.º/13.º/14.º/15.º/16.º/17.º/18.º/19.º/20.º/21.º/22.º/23.º/24.º/25.º/26.º/27.º/28.º/29.º/30.º/31.º/32.º/33.º/34.º/35.º/36.º/37.º/38.º/39.º/40.º/41.º/42.º/43.º/44.º/45.º/46.º/47.º/48.º/49.º/50.º/51.º/52.º/53.º/54.º/55.º/56.º/57.º/58.º/59.º/60.º/61.º/62.º/63.º/64.º/65.º/66.º/67.º/68.º/69.º/70.º/71.º/72.º/73.º/74.º/75.º/76.º/77.º/78.º/79.º/80.º/81.º/82.º/83.º/84.º/85.º/86.º/87.º/88.º/89.º/90.º/91.º/92.º/93.º/94.º/95.º/96.º/97.º/98.º/99.º
 et: n-s/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 fi: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 fr: nⁱᵉᵐᵉ/1ᵉʳ/2ᵉ/3ᵉ/4ᵉ/5ᵉ/6ᵉ/7ᵉ/8ᵉ/9ᵉ/10ᵉ/11ᵉ/12ᵉ/13ᵉ/14ᵉ/15ᵉ/16ᵉ/17ᵉ/18ᵉ/19ᵉ/20ᵉ/21ᵉ/22ᵉ/23ᵉ/24ᵉ/25ᵉ/26ᵉ/27ᵉ/28ᵉ/29ᵉ/30ᵉ/31ᵉ/32ᵉ/33ᵉ/34ᵉ/35ᵉ/36ᵉ/37ᵉ/38ᵉ/39ᵉ/40ᵉ/41ᵉ/42ᵉ/43ᵉ/44ᵉ/45ᵉ/46ᵉ/47ᵉ/48ᵉ/49ᵉ/50ᵉ/51ᵉ/52ᵉ/53ᵉ/54ᵉ/55ᵉ/56ᵉ/57ᵉ/58ᵉ/59ᵉ/60ᵉ/61ᵉ/62ᵉ/63ᵉ/64ᵉ/65ᵉ/66ᵉ/67ᵉ/68ᵉ/69ᵉ/70ᵉ/71ᵉ/72ᵉ/73ᵉ/74ᵉ/75ᵉ/76ᵉ/77ᵉ/78ᵉ/79ᵉ/80ᵉ/81ᵉ/82ᵉ/83ᵉ/84ᵉ/85ᵉ/86ᵉ/87ᵉ/88ᵉ/89ᵉ/90ᵉ/91ᵉ/92ᵉ/93ᵉ/94ᵉ/95ᵉ/96ᵉ/97ᵉ/98ᵉ/99ᵉ
@@ -18651,7 +19611,7 @@ pl: n-tego/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20
 pt: n-ésimo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11ro/12ndo/13ro/14rto/15to/16to/17mo/18vo/19no/20mo/21ro/22ndo/23ro/24rto/25to/26to/27mo/28vo/29no/30mo/31ro/32ndo/33ro/34rto/35to/36to/37mo/38vo/39no/40mo/41ro/42ndo/43ro/44rto/45to/46to/47mo/48vo/49no/50mo/51ro/52ndo/53ro/54rto/55to/56to/57mo/58vo/59no/60mo/61ro/62ndo/63ro/64rto/65to/66to/67mo/68vo/69no/70mo/71ro/72ndo/73ro/74rto/75to/76to/77mo/78vo/79no/80mo/81ro/82ndo/83ro/84rto/85to/86to/87mo/88vo/89no/90mo/91ro/92ndo/93ro/94rto/95to/96to/97mo/98vo/99no
 pt-br: n-ésimo/1º/2º/3º/4º/5º/6º/7º/8º/9º/10º/11º/12º/13º/14º/15º/16º/17º/18º/19º/20º/21º/22º/23º/24º/25º/26º/27º/28º/29º/30º/31º/32º/33º/34º/35º/36º/37º/38º/39º/40º/41º/42º/43º/44º/45º/46º/47º/48º/49º/50º/51º/52º/53º/54º/55º/56º/57º/58º/59º/60º/61º/62º/63º/64º/65º/66º/67º/68º/69º/70º/71º/72º/73º/74º/75º/76º/77º/78º/79º/80º/81º/82º/83º/84º/85º/86º/87º/88º/89º/90º/91º/92º/93º/94º/95º/96º/97º/98º/99º
 ro: n-elea/primar/de gradul 2/de gradul 3/de gradul 4/de gardul 5/de gradul 6/de gradul 7/de gradul 8/de gradul 9/de gradul 10
-ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12-й/13-й/14-й/15-й/16-й/17-й/18-й/19-й/20-й
+ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/7-й/8-й/9-й/10-й/11-й/12-й/13-й/14-й/15-й/16-й/17-й/18-й/19-й/20-й
 sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n/två/tre/fyra/fem/sex/sju/åtta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99/100/101/102/103/104/105/106/107/108/109/110/111/112/113/114/115/116/117/118/119/120/121/122/123/124/125/126/127/128/129/130
@@ -18950,6 +19910,25 @@ it: numero di occorrenza/occorrenza
 no: forekomstnummer/forekomst
 pl: numer wystąpienia/wystąpienie
 ru: номер вхождения/вхождение
+
+    occupation (at)
+de: beim Beruf
+en: at the occupation
+es: en la profesión
+fr: à la profession
+it: alla professione
+no: ved yrket
+pl: przy zawodzie
+
+    occupation (of)
+de: des Berufs
+en: of the occupation
+es: de la profesión
+fr: de la profession
+it: della professione
+no: til yrket
+pl: zawodu
+ru: занятия
 
     occupation/occupations
 af: beroep
@@ -19540,12 +20519,32 @@ fi: määräys
 fr: ordination
 it: ordinazione
 nl: inwijding
-no: forordning
+no: ordinasjon
 pl: święcenia
 pt: ordenação
 ru: рукоположение
 sv: förordning
 tr: yönetmelik
+
+    ordination (at)
+de: bei der Ordination
+en: at the ordinance
+es: en la ordenación
+fr: à l’ordination
+it: all’ordinazione
+no: ved ordinasjonen
+pl: przy święceniach
+ru: при рукоположении
+
+    ordination (of)
+de: der Ordination
+en: of the ordinance
+es: de la ordenación
+fr: de l’ordination
+it: dell’ordinazione
+no: til ordinasjonen
+pl: święceń
+ru: рукоположения
 
     other action
 af: ander stappe
@@ -19633,12 +20632,32 @@ fi: siviilivihkiminen
 fr: Pacs
 it: patto civile di solidarietà
 nl: burgerlijk huwelijk
-no: borgelig vielse
+no: registrert partnerskap
 pl: związek partnerski
 pt: Pacs
 ru: гражданский союз
 sv: borgerligt äktenskap
 tr: sivil evlilik
+
+    PACS (at)
+de: bei der verfestigten Lebensgemeinschaft
+en: at the civil marriage
+es: en el Pacs
+fr: au Pacs
+it: al patto civile di solidarietà
+no: ved det registrerte partnerskapet
+pl: przy związku partnerskim
+ru: при гражданском союзе
+
+    PACS (of)
+de: der verfestigten Lebensgemeinschaft
+en: of the civil marriage
+es: del Pacs
+fr: du Pacs
+it: del patto civile di solidarietà
+no: til det registrerte partnerskapet
+pl: związku partnerskiego
+ru: гражданского союза
 
     pacs%t to
 de: eingetragener%t Lebenspartner/eingetragene%t Lebenspartnerin
@@ -20478,6 +21497,25 @@ ru: собственность
 sv: egendom
 tr: mülk
 
+    property (at)
+de: beim persönlichen Eigentum
+en: at the property
+es: en la propiedad
+fr: à la propriété
+it: alla proprietà
+no: ved eiendommen
+pl: przy własności
+
+    property (of)
+de: des persönlichen Eigentums
+en: of the property
+es: de la propiedad
+fr: de la propriété
+it: della proprietà
+no: til eiendommen
+pl: własności
+ru: собственности
+
     public
 af: openbare
 bg: общ
@@ -20646,6 +21684,26 @@ pt: recenseamento
 ru: перепись населения
 sv: folkräkning
 tr: nüfus sayımı
+
+    recensement (at)
+de: bei der Volkszählung
+en: at the census
+es: en el censo
+fr: au recensement
+it: al censimento
+no: ved folketellingen
+pl: przy spisie ludności
+ru: при переписи населения
+
+    recensement (of)
+de: der Volkszählung
+en: of the census
+es: del censo
+fr: du recensement
+it: del censimento
+no: til folketellingen
+pl: spisu ludności
+ru: переписи населения
 
     recenter tree on
 de: Baum neu zentrieren auf
@@ -21337,6 +22395,25 @@ ru: место жительства
 sv: bostad
 tr: i̇kamet
 
+    residence (at)
+de: beim Wohnsitz
+en: at the residence
+es: en la residencia
+fr: à la résidence
+it: alla residenza
+no: ved bopelen
+pl: przy miejscu zamieszkania
+
+    residence (of)
+de: des Wohnsitzes
+en: of the residence
+es: de la residencia
+fr: de la résidence
+it: della residenza
+no: til bopelen
+pl: miejsca zamieszkania
+ru: места жительства
+
     residence%t to
 co: residenza%t cù
 de: gemeinsamer Wohnsitz%t mit
@@ -21475,9 +22552,29 @@ no: pensjonering
 oc: retirat
 pl: emerytura
 pt: reforma
-ru: пенсионер
+ru: выход на пенсию
 sv: pensionerad
 tr: emeklilik
+
+    retired (at)
+de: beim Ruhestand
+en: at the retirement
+es: en la jubilación
+fr: à la retraite
+it: alla pensione
+no: ved pensjoneringen
+pl: przy emeryturze
+ru: при выходе на пенсию
+
+    retired (of)
+de: des Ruhestands
+en: of the retirement
+es: de la jubilación
+fr: de la retraite
+it: della pensione
+no: til pensjoneringen
+pl: emerytury
+ru: выхода на пенсию
 
     return to top
 af: terug na bo
@@ -21761,9 +22858,29 @@ ru: запечатывание ребёнка (СПД)
 sv: besegling med barn (LDS)
 tr: mühürlü çocuk (LDS)
 
+    scellentChildLDS (at)
+de: bei der HLT-Kindessiegelung
+en: at the sealing child (LDS)
+es: en el sellamiento de hijo LDS
+fr: au scellage d’enfant LDS
+it: al legame eterno di figli
+no: ved beseglingen med barn (LDS)
+pl: przy pieczętowaniu dziecka (LDS)
+ru: при запечатывании ребёнка (СПД)
+
+    scellentChildLDS (of)
+de: der HLT-Kindessiegelung
+en: of the sealing child (LDS)
+es: del sellamiento de hijo LDS
+fr: du scellage d’enfant LDS
+it: del legame eterno di figli
+no: til beseglingen med barn (LDS)
+pl: pieczętowania dziecka (LDS)
+ru: запечатывания ребёнка (СПД)
+
     scellentParentLDS
 co: liame eternu cù i genitori LDS
-de: HTL Eltern-Versiegelung
+de: HLT-Eltern-Versiegelung
 en: sealing parent (LDS)
 es: sellamiento con padres LDS
 fi: sinetöity vanhempi (LDS)
@@ -21777,9 +22894,29 @@ ru: запечатывание с родителями (СПД)
 sv: besegling med föräldrar (LDS)
 tr: mühürlü ebeveyn (LDS)
 
+    scellentParentLDS (at)
+de: bei der HLT-Eltern-Versiegelung
+en: at the sealing parent (LDS)
+es: en el sellamiento con padres LDS
+fr: au scellement aux parents LDS
+it: al legame eterno con i genitori LDS
+no: ved beseglingen med foreldre (LDS)
+pl: przy pieczętowaniu z rodzicami (LDS)
+ru: при запечатывании с родителями (СПД)
+
+    scellentParentLDS (of)
+de: der HLT-Eltern-Versiegelung
+en: of the sealing parent (LDS)
+es: del sellamiento con padres LDS
+fr: du scellement aux parents LDS
+it: del legame eterno con i genitori LDS
+no: til beseglingen med foreldre (LDS)
+pl: pieczętowania z rodzicami (LDS)
+ru: запечатывания с родителями (СПД)
+
     scellentSpouseLDS
 co: liame eternu cù a sposa LDS
-de: HTL Ehepartner-Versiegelung
+de: HLT-Ehepartner-Versiegelung
 en: sealing spouse (LDS)
 es: sellamiento con cónyuge LDS
 fi: sinetöity puoliso (LDS)
@@ -21792,6 +22929,26 @@ pt: selamento ao cônjuge LDS
 ru: запечатывание с супругом (СПД)
 sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
+
+    scellentSpouseLDS (at)
+de: bei der HLT-Ehepartner-Versiegelung
+en: at the sealing spouse (LDS)
+es: en el sellamiento con cónyuge LDS
+fr: au scellement au conjoint LDS
+it: al legame eterno con il coniuge LDS
+no: ved beseglingen med ektefelle (LDS)
+pl: przy pieczętowaniu z małżonkiem (LDS)
+ru: при запечатывании с супругом (СПД)
+
+    scellentSpouseLDS (of)
+de: der HLT-Ehepartner-Versiegelung
+en: of the sealing spouse (LDS)
+es: del sellamiento con cónyuge LDS
+fr: du scellement au conjoint LDS
+it: del legame eterno con il coniuge LDS
+no: til beseglingen med ektefelle (LDS)
+pl: pieczętowania z małżonkiem (LDS)
+ru: запечатывания с супругом (СПД)
 
     search %s on Geneanet
 co: ricercà %s nant’à Geneanet
@@ -22426,6 +23583,26 @@ pt: separação
 ru: раздельное проживание
 sv: separation
 tr: ayrılık
+
+    separate event (at)
+de: bei der Trennung
+en: at the separation
+es: en la separación
+fr: à la séparation
+it: alla separazione
+no: ved separasjonen
+pl: przy separacji
+ru: при раздельном проживании
+
+    separate event (of)
+de: der Trennung
+en: of the separation
+es: de la separación
+fr: de la séparation
+it: della separazione
+no: til separasjonen
+pl: separacji
+ru: раздельного проживания
 
     separated
 af: separated
@@ -26173,6 +27350,26 @@ ru: продажа имущества
 sv: försäljning av egendom
 tr: mülk satışı
 
+    venteBien (at)
+de: beim Verkauf von Besitztum
+en: at the sale of property
+es: en la venta de un bien
+fr: à la vente d’un bien
+it: alla vendita di un bene
+no: ved salget av eiendom
+pl: przy sprzedaży majątku
+ru: при продаже имущества
+
+    venteBien (of)
+de: des Verkaufs von Besitztum
+en: of the sale of property
+es: de la venta de un bien
+fr: de la vente d’un bien
+it: della vendita di un bene
+no: til salget av eiendom
+pl: sprzedaży majątku
+ru: продажи имущества
+
     version
 co: versione
 de: Version
@@ -26473,6 +27670,26 @@ ru: завещание
 sv: testamente
 tr: vasiyet
 
+    will (at)
+de: beim letzten Willen
+en: at the will
+es: en el testamento
+fr: au testament
+it: al testamento
+no: ved testamentet
+pl: przy testamencie
+ru: при составлении завещания
+
+    will (of)
+de: des letzten Willens
+en: of the will
+es: del testamento
+fr: du testament
+it: del testamento
+no: til testamentet
+pl: testamentu
+ru: завещания
+
     with
 af: met
 bg: с
@@ -26629,7 +27846,7 @@ ca: testimoni/testimoni/testimonis
 co: testimone/testimone/testimoni
 cs: svědek/svědek/svědkové
 da: vidne/vidne/vidner
-de: Trauzeuge/Trauzeuge/Trauzeugen/Trauzeuge(n)
+de: Zeuge/Zeugin/Zeugen/Zeuge(n)
 en: witness/witness/witnesses/witness(es)
 eo: atestanto:a:+n/atestanto:a:+n/atestantoj
 es: testigo/testigo/testigos
@@ -26642,7 +27859,7 @@ it: testimone/testimone/testimoni
 lt: liudytojas/liudytojas/liudininkai
 lv: liecinieks:a:-u/liecinieks:a:-u/liecinieki
 nl: getuige/getuige/getuigen
-no: forlover/forlover/forlovere
+no: vitne/vitne/vitner
 oc: testimòni/testimòni/testimònis
 pl: świadek:a:--ka/świadek:a:--ka/świadkowie
 pt: testemunha/testemunha/testemunhas

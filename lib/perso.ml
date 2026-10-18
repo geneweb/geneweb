@@ -3428,6 +3428,16 @@ and eval_str_event_field conf base (p, p_auth)
             Util.string_of_pevent_name conf base name |> safe_val
         | Event.Fevent name ->
             Util.string_of_fevent_name conf base name |> safe_val)
+  | ("name_at" | "name_of") as field -> (
+      let form = if field = "name_at" then EventForm.At else EventForm.Of in
+      let phrase =
+        if not p_auth then None
+        else
+          match name with
+          | Event.Pevent name -> EventForm.pevent conf form name
+          | Event.Fevent name -> EventForm.fevent conf form name
+      in
+      match phrase with Some s -> safe_val (Adef.safe s) | None -> null_val)
   | "date" -> (
       if not p_auth then null_val
       else
@@ -5726,6 +5736,15 @@ let eval_predefined_apply conf env f vl =
   | "a_of_b", [ s1; s2 ] -> Util.translate_eval (transl_a_of_b conf s1 s2 s2)
   | "a_of_b2", [ s1; s2; s3 ] ->
       Util.translate_eval (transl_a_of_b conf s1 s2 s3)
+  | "a_of_event", [ s1; s2; s3 ] ->
+      Util.translate_eval
+        (if s2 = "" then transl_a_of_b conf s1 s3 s3
+         else Util.transl_a_of_event conf s1 s2)
+  | "witness_at_event", [ kind; evt ] ->
+      Printf.sprintf
+        (Util.ftransl conf "%s %s of (witness at event)")
+        (Util.translate_eval kind) evt
+      |> Utf8.capitalize_fst
   | "a_of_b_gr_eq_lev", [ s1; s2 ] ->
       Util.translate_eval (transl_a_of_gr_eq_gen_lev conf s1 s2 s2)
   | "add_in_sorted_list", sl -> (
