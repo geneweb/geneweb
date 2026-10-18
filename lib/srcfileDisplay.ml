@@ -318,7 +318,7 @@ let rec copy_from_stream conf base strm mode =
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> false
-    | 'm' -> Driver.read_nldb base <> []
+    | 'm' -> not (Driver.nldb_is_empty base)
     | 'n' -> not (Driver.base_notes_are_empty base "")
     | 'o' -> Sys.file_exists (WiznotesDisplay.wiz_dir conf base)
     | 'p' -> (
@@ -483,7 +483,7 @@ let eval_var conf base env () _loc = function
       | Vsosa_ref v -> VVbool (Lazy.force v <> None)
       | _ -> raise Not_found)
   | [ "has_history" ] -> VVbool (Sys.file_exists (History.file_name conf))
-  | [ "has_misc_notes" ] -> VVbool (Driver.read_nldb base <> [])
+  | [ "has_misc_notes" ] -> VVbool (not (Driver.nldb_is_empty base))
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "nb_accesses" ] ->
       let r = count conf in

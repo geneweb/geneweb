@@ -665,6 +665,11 @@ val check_nldb_format : base -> [ `Ok | `BadFormat | `NoFile ]
 val read_nldb : base -> (iper, ifam) Def.NLDB.t
 (** TODOOCP : doc *)
 
+val nldb_is_empty : base -> bool
+(** [nldb_is_empty base] is [read_nldb base = []], without reading the database:
+    true when the file is missing, has an unsupported format, or holds no link.
+*)
+
 val write_nldb : base -> (iper, ifam) Def.NLDB.t -> unit
 
 val person_misc_names : base -> person -> (person -> title list) -> string list
