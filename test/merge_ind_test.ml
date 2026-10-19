@@ -131,6 +131,69 @@ let test_named_spouse_of_quest_string_warning =
       ~msg:"named_spouse with ifam1 ifam0 (quest then named / normalized)" f1 f0;
   ]
 
+let test_first_possible_duplication =
+  let db = Mock_db.create () in
+  let p0 =
+    Mock_db.add_person db ~first_name:"Jean" ~surname:"Dupont" ~occ:0 ()
+  in
+  let sp_u1 = Mock_db.add_person db ~first_name:"?" ~surname:"?" ~occ:1 () in
+  let sp_u2 = Mock_db.add_person db ~first_name:"?" ~surname:"?" ~occ:2 () in
+  let sp_n1 =
+    Mock_db.add_person db ~first_name:"Marie" ~surname:"Martin" ~occ:3 ()
+  in
+  let sp_n2 =
+    Mock_db.add_person db ~first_name:"Marie" ~surname:"Martin" ~occ:4 ()
+  in
+  let _f0 = Mock_db.add_family db ~father:p0 ~mother:sp_u1 () in
+  let _f1 = Mock_db.add_family db ~father:p0 ~mother:sp_u2 () in
+  let _f2 = Mock_db.add_family db ~father:p0 ~mother:sp_n1 () in
+  let _f3 = Mock_db.add_family db ~father:p0 ~mother:sp_n2 () in
+  let base = Mock_db.build db in
+  let test ~__POS__ ~msg expected () =
+    let res =
+      Geneweb.Perso.first_possible_duplication base (Mock_db.iper p0) ([], [])
+    in
+    match (res, expected) with
+    | Geneweb.Perso.DupInd (ip1, ip2), Geneweb.Perso.DupInd (exp1, exp2) ->
+        Check.int ~pos:__POS__ ~msg:(msg ^ " ip1") (Gwdb.int_of_iper exp1)
+          (Gwdb.int_of_iper ip1);
+        Check.int ~pos:__POS__ ~msg:(msg ^ " ip2") (Gwdb.int_of_iper exp2)
+          (Gwdb.int_of_iper ip2)
+    | _ -> Check.fail ~pos:__POS__ (msg ^ ": mismatch in duplication result")
+  in
+  [
+    test ~__POS__
+      ~msg:"prioritize named duplicates over multiple unnamed duplicates"
+      (Geneweb.Perso.DupInd (Mock_db.iper sp_n1, Mock_db.iper sp_n2));
+  ]
+
+let test_first_possible_duplication_only_unnamed =
+  let db = Mock_db.create () in
+  let p0 =
+    Mock_db.add_person db ~first_name:"Jean" ~surname:"Dupont" ~occ:0 ()
+  in
+  let sp_u1 = Mock_db.add_person db ~first_name:"?" ~surname:"?" ~occ:1 () in
+  let sp_u2 = Mock_db.add_person db ~first_name:"?" ~surname:"?" ~occ:2 () in
+  let _f0 = Mock_db.add_family db ~father:p0 ~mother:sp_u1 () in
+  let _f1 = Mock_db.add_family db ~father:p0 ~mother:sp_u2 () in
+  let base = Mock_db.build db in
+  let test ~__POS__ ~msg expected () =
+    let res =
+      Geneweb.Perso.first_possible_duplication base (Mock_db.iper p0) ([], [])
+    in
+    match (res, expected) with
+    | Geneweb.Perso.DupInd (ip1, ip2), Geneweb.Perso.DupInd (exp1, exp2) ->
+        Check.int ~pos:__POS__ ~msg:(msg ^ " ip1") (Gwdb.int_of_iper exp1)
+          (Gwdb.int_of_iper ip1);
+        Check.int ~pos:__POS__ ~msg:(msg ^ " ip2") (Gwdb.int_of_iper exp2)
+          (Gwdb.int_of_iper ip2)
+    | _ -> Check.fail ~pos:__POS__ (msg ^ ": mismatch in duplication result")
+  in
+  [
+    test ~__POS__ ~msg:"fallback to unnamed duplicates when no named duplicates"
+      (Geneweb.Perso.DupInd (Mock_db.iper sp_u1, Mock_db.iper sp_u2));
+  ]
+
 let test_check_family_unnamed_spouse_duplicate_symmetric =
   let db = Mock_db.create () in
   (* Father with named spouse in f0 and unnamed spouse in f1 *)
@@ -503,6 +566,10 @@ let v =
           (run_all test_warning_handle_homonymous);
         Check.case "Warning.named_spouse_of_quest_string_warning"
           (run_all test_named_spouse_of_quest_string_warning);
+        Check.case "Perso.first_possible_duplication prioritize named"
+          (run_all test_first_possible_duplication);
+        Check.case "Perso.first_possible_duplication fallback unnamed"
+          (run_all test_first_possible_duplication_only_unnamed);
         Check.case "CheckItem.family symmetric unnamed spouse duplicate"
           (run_all test_check_family_unnamed_spouse_duplicate_symmetric);
         Check.case "CheckItem.family unnamed spouse homonymous suppression"
