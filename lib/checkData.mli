@@ -20,8 +20,6 @@ type error_type =
   | MiscTypographicErrors
   | MixedScripts
 
-type checkdata_entry = Geneweb_db.Driver.istr * string
-
 val update_cache_entry :
   Config.config ->
   dict_type ->
