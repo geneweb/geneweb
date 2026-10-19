@@ -517,31 +517,35 @@ const DatalistManager = {
   }
 };
 %end;
-const DATALISTS = %[
-  %if;(b.datalist_snames=1)'snames',%end;
-  %if;(b.datalist_fnames=1)'fnames',%end;
+%( Type → hash of its .gz file, which versions its URL as for the other
+   assets: gwd lets browsers keep these files a year. %)
+%define;gz(xx)%if;(b.datalist_xx=1)xx: '%apply;hash%with;%base.name;/cache/%base.name;_xx.cache.gz%end;',%end;%end;
+const HASHES = {
+  %apply;gz("snames")
+  %apply;gz("fnames")
   %if;(upd_form=1)
-    %if;(b.datalist_places=1)'places',%end;
-    %if;(b.datalist_occupations=1)'occupations',%end;
-    %if;(b.datalist_sources=1)'sources',%end;
+    %apply;gz("places")
+    %apply;gz("occupations")
+    %apply;gz("sources")
   %end;
   %if;(is_welcome or is_upd_ind)
-    %if;(b.datalist_titles=1)'titles',%end;
-    %if;(b.datalist_estates=1)'estates',%end;
+    %apply;gz("titles")
+    %apply;gz("estates")
   %end;
   %if;is_upd_ind;
-    %if;(b.datalist_pub_names=1)'pub_names',%end;
-    %if;(b.datalist_qualifiers=1)'qualifiers',%end;
-    %if;(b.datalist_aliases=1)'aliases',%end;
+    %apply;gz("pub_names")
+    %apply;gz("qualifiers")
+    %apply;gz("aliases")
   %end;
-%];
+};
+const DATALISTS = Object.keys(HASHES);
 %if;cgi;
 const DATALIST_DIR = `/${location.pathname.split('/')%[1%] || ''}/bases/etc/%base.name;/cache/`;
 %else;
 const DATALIST_DIR = '%base.name;/cache/';
 %end;
 function fetchDatalist(index) {
-  return fetch(DATALIST_DIR + index + '.cache.gz')
+  return fetch(DATALIST_DIR + index + '.cache.gz?hash=' + HASHES%[index.replace('%base.name;_', '')%])
     .then(r => {
       if (!r.ok) throw new Error(r.status);
       return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).text();
