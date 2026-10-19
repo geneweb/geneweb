@@ -276,12 +276,19 @@
 # =============================================================================
 # Datalist autocompletion (browser cache files)
 # =============================================================================
-# Enable autocompletion for form inputs using HTML <datalist>.
+# Enable autocompletion for form inputs.
 # Suggestions are loaded from compressed cache files (.gz) generated
 # from your Geneweb database.
 #
 # Cache files are created in: bases/etc/<base>/cache/
 # using the "cache_files" tool (gwsetup or command line).
+#
+# The visitor's browser downloads the files of the options set below:
+# anyone can, whatever the access rights to the base. gwd serves them
+# itself; in CGI mode, the web server must serve them as static files
+# under the first directory of the gwd URL (for /geneweb/gwd:
+# /geneweb/bases/etc/<base>/cache/).
+#
 #
 # IMPORTANT:
 # - Cache files are NOT generated nor updated automatically.
@@ -291,7 +298,7 @@
 # for the corresponding fields.
 #
 # First names and surnames
-# Used in: welcome page, individual and family modification forms
+# Used in: welcome page, individual and family modification forms, gallery
 #datalist_fnames=1
 #datalist_snames=1
 #
@@ -313,20 +320,47 @@
 #datalist_estates=1
 
 # =============================================================================
-# RPC Datalist Server (alternative to static .gz cache files)
+# RPC autocompletion server
 # =============================================================================
-# For large bases, datalist autocompletion can use a WebSocket RPC server
-# instead of loading heavy .gz files in the browser. The server performs
-# lookups on indexed caches, returning only matching results in real-time.
-# Requires the RPC server running with base caches loaded.
+# On large bases, the welcome page and the individual and family forms can
+# query the RPC server (rpc_server, shipped with GeneWeb) while typing,
+# instead of loading whole .gz lists into the page. Every field of these
+# pages that offers autocompletion is then served, whatever the
+# datalist_xxx options above. The gallery keeps using the .gz files.
 #
-# Enable RPC datalists (for non-Roglo bases). Roglo bases use RPC by default.
+# Launch the server on the base's cache directory (every .gz file found
+# there is loaded, one index per field type):
+#   rpc_server --idx bases/etc/<base>/cache
+# Default port 8080; with --crt <file> --key <file> (TLS), 8443.
+#
+# The datalist_xxx options above then only select the .gz files loaded
+# when the server is, or becomes, unreachable. Without any of them, the
+# fields have no suggestions in that case (recommended on very large bases),
+# and only the server reads the .gz files: gwd does not serve them, and in
+# CGI mode the web server need not.
 #rpc_datalist=1
 #
-# RPC server address (without port). Default: localhost
-# The server listens on port 8080 with endpoint /search
-# Examples: localhost, 192.168.1.100, rpc.myserver.org
-#rpc_server_url=localhost
+# Address of the server, as seen by the visitor's BROWSER (it is the
+# browser that connects, not gwd):
+#
+#   host or host:port     ws://host:port/search; port defaults to 8080
+#   /search               same host as the GeneWeb page, through a reverse
+#                         proxy forwarding /search to the server (Apache:
+#                         mod_proxy_wstunnel)
+#   ws://... or wss://... full URL, used as is
+#
+# Except for a full URL, ws:// or wss:// follows the page (http or https).
+# A page served over https may only open wss://, which requires the server
+# to run with a TLS certificate (rpc_server --crt <file> --key <file>,
+# default port 8443) or behind a TLS proxy.
+# Default: 127.0.0.1, the visitor's own computer: only useful to test on
+# the computer running the server.
+#rpc_server_url=192.168.1.10
+#rpc_server_url=/search
+#rpc_server_url=wss://rpc.myserver.org:8443/search
+#
+# Log the autocompletion activity in the browser console.
+#rpc_debug=yes
 
 # Indicate that the present database has been renamed to “newname”.
 #renamed=newname

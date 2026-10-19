@@ -45,13 +45,14 @@
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;
-  %( RPC autocomplete: self-configuring, see autocomplete.js.
-     rpc_server_url: "/search" (behind a proxy), "host:port/search" or a ws:// URL %)
-  %if;(b.rpc_datalist=1 and (is_welcome or upd_form=1))
+  %( autocomplete.js serves the welcome page and form fields: from the RPC
+     server with rpc_datalist=1 (self-configured by the data-* attributes),
+     from the .gz files otherwise (initialised by populateDatalists' block). %)
+  %if;(is_welcome or upd_form=1)
+    %let;rpc_addr;%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;127.0.0.1%end;%in;
     <script src="%etc_prefix;js/autocomplete.min.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.min.js%end;"
-      data-rpc="%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;127.0.0.1:%if;(b.rpc_port!="")%b.rpc_port;%else;8080%end;/search%end;"
-      data-base="%base.name;"
-      data-debug="%if;(b.rpc_debug="yes")1%end;"></script>
+      %if;(b.rpc_datalist=1)data-rpc="%if;("/" in rpc_addr)%rpc_addr;%elseif;(":" in rpc_addr)%rpc_addr;/search%else;%rpc_addr;:8080/search%end;"
+      data-base="%base.name;" data-debug="%if;(b.rpc_debug="yes")1%end;"%end;></script>
   %end;
   %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
     <script src="%etc_prefix;js/line.js?hash=%apply;hash%with;%etc_prefix;js/line.js%end;"></script>
@@ -498,60 +499,71 @@ const DatalistManager = {
   }
 };
 %end;
-function populateDatalists() {
-  %if;cgi;
-    const path = `/${location.pathname.split('/')%[1%] || ''}/bases/etc/%base.name;/cache/%base.name;_`;
-  %else;
-    const path = '%base.name;/cache/%base.name;_';
+const DATALISTS = %[
+  %if;(b.datalist_snames=1)'snames',%end;
+  %if;(b.datalist_fnames=1)'fnames',%end;
+  %if;(upd_form=1)
+    %if;(b.datalist_places=1)'places',%end;
+    %if;(b.datalist_occupations=1)'occupations',%end;
+    %if;(b.datalist_sources=1)'sources',%end;
   %end;
-  %[
-    %if;(b.datalist_snames=1)'snames',%end;
-    %if;(b.datalist_fnames=1)'fnames',%end;
-    %if;(upd_form=1)
-      %if;(b.datalist_places=1)'places',%end;
-      %if;(b.datalist_occupations=1)'occupations',%end;
-      %if;(b.datalist_sources=1)'sources',%end;
-    %end;
-    %if;(is_welcome or is_upd_ind)
-      %if;(b.datalist_titles=1)'titles',%end;
-      %if;(b.datalist_estates=1)'estates',%end;
-    %end;
-    %if;is_upd_ind;
-      %if;(b.datalist_pub_names=1)'pub_names',%end;
-      %if;(b.datalist_qualifiers=1)'qualifiers',%end;
-      %if;(b.datalist_aliases=1)'aliases',%end;
-    %end;
-  %].forEach(t => {
+  %if;(is_welcome or is_upd_ind)
+    %if;(b.datalist_titles=1)'titles',%end;
+    %if;(b.datalist_estates=1)'estates',%end;
+  %end;
+  %if;is_upd_ind;
+    %if;(b.datalist_pub_names=1)'pub_names',%end;
+    %if;(b.datalist_qualifiers=1)'qualifiers',%end;
+    %if;(b.datalist_aliases=1)'aliases',%end;
+  %end;
+%];
+%if;cgi;
+const DATALIST_DIR = `/${location.pathname.split('/')%[1%] || ''}/bases/etc/%base.name;/cache/`;
+%else;
+const DATALIST_DIR = '%base.name;/cache/';
+%end;
+function fetchDatalist(index) {
+  return fetch(DATALIST_DIR + index + '.cache.gz')
+    .then(r => {
+      if (!r.ok) throw new Error(r.status);
+      return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).text();
+    })
+    .then(text => text.split('\n').map(l => l.trim().replace('<option>', '')).filter(Boolean));
+}
+function populateDatalists() {
+  DATALISTS.forEach(t => {
     const dl = document.getElementById('datalist_' + t);
     if (!dl) return;
-    fetch(path + t + '.cache.gz')
-      .then(r => {
-        if (!r.ok) throw new Error(r.status);
-        return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).text();
-      })
-      .then(text => {
+    fetchDatalist('%base.name;_' + t)
+      .then(values => {
         const frag = document.createDocumentFragment();
-        for (const line of text.split('\n')) {
-          const v = line.trim().replace('<option>', '');
-          if (v) frag.appendChild(new Option('', v));
-        }
+        values.forEach(v => frag.appendChild(new Option('', v)));
         dl.replaceChildren(frag);
       })
       .catch(err => console.error(`datalist_${t}:`, err));
   });
 }
-
-%( The gallery calls populateDatalists() itself. With the RPC widget, the
-   .gz datalists are loaded only if the server is (or becomes) unavailable. %)
+%( The gallery calls populateDatalists() itself. Elsewhere autocomplete.js
+   serves the fields from the .gz files of DATALISTS: directly, or once the
+   RPC server is, or becomes, unavailable. %)
 %if;(e.m!="MOD_GALLERY")
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.GenewebAutocomplete) GenewebAutocomplete.onUnavailable(populateDatalists);
-  else populateDatalists();
+  const ac = window.GenewebAutocomplete;
+  if (!ac) return populateDatalists();
+  const local = () => DATALISTS.length && ac.init({
+    base: '%base.name;',
+    inputSelector: DATALISTS.map(t => `input%[list="datalist_${t}"%]`).join(),
+    load: fetchDatalist
+  });
+  %if;(b.rpc_datalist=1)
+    ac.onUnavailable(() => { ac.destroy(); local(); });
+  %else;
+    local();
+  %end;
 });
 %end;
 </script>
 %end;
-
 %if;(not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
 %define;language(x)
   %apply;nth%with;
