@@ -840,6 +840,40 @@ let check_parent_marriage_age warning fam p =
   in
   loop (Gwdb.get_fevents fam)
 
+let can_have_unnamed_spouse_duplicate base p families =
+  if Array.length families <> 2 then false
+  else
+    let iper = Gwdb.get_iper p in
+    let count_unnamed =
+      Array.fold_left
+        (fun count ifam ->
+          let sp = Gwdb.poi base (Gutil.spouse iper (Gwdb.foi base ifam)) in
+          if Person.is_empty_name sp then count + 1 else count)
+        0 families
+    in
+    count_unnamed = 1
+
+let has_named_homonymous_spouses base p families =
+  let iper = Gwdb.get_iper p in
+  let spouse_name ifam =
+    let sp = Gwdb.poi base (Gutil.spouse iper (Gwdb.foi base ifam)) in
+    if Person.is_empty_name sp then None
+    else
+      let fn = Name.strip_lower @@ Gwdb.sou base (Gwdb.get_first_name sp) in
+      let sn = Name.strip_lower @@ Gwdb.sou base (Gwdb.get_surname sp) in
+      Some (Gwdb.get_iper sp, fn, sn)
+  in
+  let spouses = List.filter_map spouse_name (Array.to_list families) in
+  let rec has_dup = function
+    | [] -> false
+    | (sp_iper, fn, sn) :: rest ->
+        let is_homonym (seen_iper, seen_fn, seen_sn) =
+          (not (Gwdb.eq_iper sp_iper seen_iper)) && fn = seen_fn && sn = seen_sn
+        in
+        List.exists is_homonym rest || has_dup rest
+  in
+  has_dup spouses
+
 let check_possible_duplicate_family ?p base warning family father mother =
   let ifath = Gwdb.get_father family in
   let imoth = Gwdb.get_mother family in
@@ -849,47 +883,44 @@ let check_possible_duplicate_family ?p base warning family father mother =
   let first_name = name Gwdb.get_first_name in
   let surname = name Gwdb.get_surname in
 
-  let father_fn, father_sn = (first_name father, surname father) in
-  let mother_fn, mother_sn = (first_name mother, surname mother) in
-  let fath_families = Gwdb.get_family father in
-  let moth_families = Gwdb.get_family mother in
-
-  let f get_parent
-      ( _current_parent,
-        current_parent_iper,
-        current_parent_fn,
-        current_parent_sn ) parent_source ifam' =
-    if Gwdb.eq_ifam ifam ifam' then ()
-    else
-      let fam' = Gwdb.foi base ifam' in
-      let parent' = get_parent fam' in
-      let person = Gwdb.poi base parent' in
-      let fn, sn = (first_name person, surname person) in
-      (* Parent is strictly the same *)
-      if Gwdb.eq_iper parent' current_parent_iper then
-        warning (Warning.PossibleDuplicateFam (ifam, ifam'))
-        (*  Homonymous parents *)
-      else if fn = current_parent_fn && sn = current_parent_sn then
-        warning (PossibleDuplicateFamHomonymous (ifam, ifam', parent_source))
-      else ()
+  let check_parent parent parent_iper spouse spouse_iper =
+    let should_check =
+      match p with
+      | Some p' -> Gwdb.eq_iper (Gwdb.get_iper p') parent_iper
+      | None -> true
+    in
+    if should_check then
+      let spouse_fn, spouse_sn = (first_name spouse, surname spouse) in
+      let families = Gwdb.get_family parent in
+      let wildcard = can_have_unnamed_spouse_duplicate base parent families in
+      let has_named_homon =
+        lazy (has_named_homonymous_spouses base parent families)
+      in
+      Array.iter
+        (fun ifam' ->
+          if not (Gwdb.eq_ifam ifam ifam') then
+            let fam' = Gwdb.foi base ifam' in
+            let sp_iper' = Gutil.spouse parent_iper fam' in
+            if Gwdb.eq_iper sp_iper' spouse_iper then
+              warning (Warning.PossibleDuplicateFam (ifam, ifam'))
+            else if wildcard then
+              warning
+                (Warning.PossibleDuplicateFamQuestString (ifam, ifam', parent))
+            else
+              let sp' = Gwdb.poi base sp_iper' in
+              let fn, sn = (first_name sp', surname sp') in
+              if fn = spouse_fn && sn = spouse_sn then
+                let w =
+                  Warning.PossibleDuplicateFamHomonymous (ifam, ifam', parent)
+                in
+                if
+                  (not (Warning.is_quest_string_homonymous base w))
+                  || not (Lazy.force has_named_homon)
+                then warning w)
+        families
   in
-
-  match p with
-  | Some p when Gwdb.eq_iper (Gwdb.get_iper p) ifath ->
-      Array.iter
-        (f Gwdb.get_mother (mother, imoth, mother_fn, mother_sn) father)
-        fath_families
-  | Some p when Gwdb.eq_iper (Gwdb.get_iper p) imoth ->
-      Array.iter
-        (f Gwdb.get_father (father, ifath, father_fn, father_sn) mother)
-        moth_families
-  | _ ->
-      Array.iter
-        (f Gwdb.get_mother (mother, imoth, mother_fn, mother_sn) father)
-        fath_families;
-      Array.iter
-        (f Gwdb.get_father (father, ifath, father_fn, father_sn) mother)
-        moth_families
+  check_parent father ifath mother imoth;
+  check_parent mother imoth father ifath
 
 let check_parents base warning fam fath moth =
   (* check father's marriage date *)
