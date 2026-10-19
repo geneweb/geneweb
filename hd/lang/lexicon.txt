@@ -14560,6 +14560,17 @@ pt: navegar na árvore
 sv: navigering i trädet
 tr: ağaçta gezin
 
+    navigate/scroll/columns/select/close
+ca: navegar/desplaçar/columnes/seleccionar/tancar
+de: navigieren/blättern/Spalten/auswählen/schließen
+en: navigate/scroll/columns/select/close
+es: navegar/desplazar/columnas/seleccionar/cerrar
+fr: naviguer/défiler/colonnes/sélectionner/fermer
+it: navigare/scorrere/colonne/selezionare/chiudere
+nl: navigeren/bladeren/kolommen/selecteren/sluiten
+pt: navegar/percorrer/colunas/selecionar/fechar
+sv: navigera/bläddra/kolumner/välja/stänga
+
     navigation
 af: stap met
 bg: навигация
@@ -18140,6 +18151,17 @@ en: Access restricted to friends and wizards of the database!
 es: ¡Acceso reservado a los amigos y magos de la base de datos!
 fr: Accès réservé aux amis et magiciens de la base de donnée !
 
+    result/results
+ca: resultat/resultats
+de: Ergebnis/Ergebnisse
+en: result/results
+es: resultado/resultados
+fr: résultat/résultats
+it: risultato/risultati
+nl: resultaat/resultaten
+pt: resultado/resultados
+sv: resultat/resultat
+
     retired
 co: ritirata
 de: Ruhestand
@@ -19804,6 +19826,17 @@ sk: manželia/manželky nie sú zahrnuté
 sl: brez mož/žena
 sv: exklusive makar
 tr: eşler dahil değil
+
+    starts with/contains/approximate
+ca: comença per/conté/aproximat
+de: beginnt mit/enthält/ähnlich
+en: starts with/contains/approximate
+es: empieza por/contiene/aproximado
+fr: commence par/contient/approchant
+it: inizia con/contiene/simile
+nl: begint met/bevat/vergelijkbaar
+pt: começa por/contém/aproximado
+sv: börjar med/innehåller/liknande
 
     starting with
 af: beginnende met

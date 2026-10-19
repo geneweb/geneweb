@@ -50,6 +50,24 @@
      from the .gz files otherwise (initialised by populateDatalists' block). %)
   %if;(is_welcome or upd_form=1)
     %let;rpc_addr;%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;127.0.0.1%end;%in;
+    <script>
+    window.AC_TRANSLATIONS = {
+      labels: {
+        prefix: "[starts with/contains/approximate]0",
+        internal: "[starts with/contains/approximate]1",
+        fuzzy: "[starts with/contains/approximate]2"
+      },
+      hints: {
+        navigate: "[navigate/scroll/columns/select/close]0",
+        page: "[navigate/scroll/columns/select/close]1",
+        columns: "[navigate/scroll/columns/select/close]2",
+        select: "[navigate/scroll/columns/select/close]3",
+        close: "[navigate/scroll/columns/select/close]4"
+      },
+      result: "[result/results]0",
+      results: "[result/results]1"
+    };
+    </script>
     <script src="%etc_prefix;js/autocomplete.min.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.min.js%end;"
       %if;(b.rpc_datalist=1)data-rpc="%if;("/" in rpc_addr)%rpc_addr;%elseif;(":" in rpc_addr)%rpc_addr;/search%else;%rpc_addr;:8080/search%end;"
       data-base="%base.name;" data-debug="%if;(b.rpc_debug="yes")1%end;"%end;></script>
