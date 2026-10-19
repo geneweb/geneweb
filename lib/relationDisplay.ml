@@ -21,7 +21,19 @@ and 'a dag_fam = {
 
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
-let dag_ind_list_of_path path =
+(* [c] is a child of the couple [ip1]/[ip2] in the database. *)
+let is_child_of_couple base ip1 ip2 c =
+  match c.di_val with
+  | None -> false
+  | Some cip -> (
+      match Driver.get_parents (Driver.poi base cip) with
+      | Some ifam ->
+          let cpl = Driver.foi base ifam in
+          let f = Driver.get_father cpl and m = Driver.get_mother cpl in
+          (f = ip1 && m = ip2) || (f = ip2 && m = ip1)
+      | None -> false)
+
+let dag_ind_list_of_path base path =
   let indl, _ =
     let merge l1 l2 =
       if l1 == l2 then l1 else List.rev_append (List.rev l1) l2
@@ -58,9 +70,31 @@ let dag_ind_list_of_path path =
                     df_chil = merge p_ind.di_famc.df_chil ind.di_famc.df_chil;
                   }
               | Relation.Mate ->
+                  (* A dag family already held by one partner belongs to this
+                     couple only if its other parents and its children are
+                     theirs. Otherwise (e.g. Louis XIV, married to both
+                     Maria-Teresa and Françoise d'Aubigné on the path) the
+                     partner starts a fresh family: merging would make all
+                     three spouses co-parents of a single family. *)
+                  let own x =
+                    let fam = x.di_fams in
+                    let of_couple =
+                      match (p_ind.di_val, ind.di_val) with
+                      | Some ip1, Some ip2 ->
+                          List.for_all
+                            (fun y -> y == p_ind || y == ind)
+                            fam.df_pare
+                          && List.for_all
+                               (is_child_of_couple base ip1 ip2)
+                               fam.df_chil
+                      | None, _ | _, None -> true
+                    in
+                    if of_couple then fam else { df_pare = [ x ]; df_chil = [] }
+                  in
+                  let pf = own p_ind and f = own ind in
                   {
-                    df_pare = merge p_ind.di_fams.df_pare ind.di_fams.df_pare;
-                    df_chil = merge p_ind.di_fams.df_chil ind.di_fams.df_chil;
+                    df_pare = merge pf.df_pare f.df_pare;
+                    df_chil = merge pf.df_chil f.df_chil;
                   }
               | Relation.Self -> { df_pare = []; df_chil = [] })
         in
@@ -196,13 +230,28 @@ let excl_faml conf base =
   in
   loop [] 0
 
-let dag_of_ind_dag_list indl =
-  let indl, _ =
+(* A person married several times on the path is a parent of several dag
+   families, but [di_fams] holds only one. Its children are therefore taken
+   from every node naming it as a parent, so [chil] mirrors [pare]. *)
+let children_of indl ind =
+  let primary = ind.di_fams.df_chil in
+  let extra =
     List.fold_right
-      (fun ind (indl, cnt) -> ((ind, cnt) :: indl, cnt + 1))
+      (fun c acc ->
+        if List.memq ind c.di_famc.df_pare && not (List.memq c primary) then
+          c :: acc
+        else acc)
+      indl []
+  in
+  List.rev_append (List.rev primary) extra
+
+let dag_of_ind_dag_list indl =
+  let numbered, _ =
+    List.fold_right
+      (fun ind (numbered, cnt) -> ((ind, cnt) :: numbered, cnt + 1))
       indl ([], 0)
   in
-  let idag_of_di_ind ind = Dag2html.idag_of_int (List.assq ind indl) in
+  let idag_of_di_ind ind = Dag2html.idag_of_int (List.assq ind numbered) in
   List.map
     (fun (ind, cnt) ->
       {
@@ -211,12 +260,12 @@ let dag_of_ind_dag_list indl =
           (match ind.di_val with
           | Some ic -> Def.Left ic
           | None -> Def.Right cnt);
-        chil = List.map idag_of_di_ind ind.di_fams.df_chil;
+        chil = List.map idag_of_di_ind (children_of indl ind);
       })
-    indl
+    numbered
 
 let dag_of_relation_path conf base path =
-  let indl = dag_ind_list_of_path path in
+  let indl = dag_ind_list_of_path base path in
   let indl = add_missing_parents_of_siblings conf base indl in
   let faml = dag_fam_list_of_ind_list indl in
   let indl = add_phony_children indl faml in
