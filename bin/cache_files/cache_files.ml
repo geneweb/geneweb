@@ -2,8 +2,6 @@ module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Dirs = Geneweb_dirs
 
-type checkdata_entry = Driver.istr * string
-
 let bname = ref ""
 let fnames = ref false
 let snames = ref false
@@ -24,10 +22,8 @@ let binary = ref false
 let datalist = ref false
 let width = ref 50
 let text_dir = ref ""
-let bin_dir = ref ""
 let ( // ) = Filename.concat
 let text_file bname fname = !text_dir // (bname ^ "_" ^ fname ^ ".cache.gz")
-let bin_file bname fname = !bin_dir // (bname ^ "_" ^ fname ^ ".bin")
 
 let write_cache_file bname fname data =
   let gz_file = text_file bname fname in
@@ -40,23 +36,9 @@ let write_cache_file bname fname data =
   let compressed = My_gzip.gzip_string ~level:9 (Buffer.contents buf) in
   Secure.with_open_out_bin gz_file (fun oc -> output_string oc compressed)
 
-let write_checkdata_cache bname fname entries =
-  Secure.with_open_out_bin (bin_file bname fname) @@ fun oc ->
-  Marshal.to_channel oc entries []
-
-let read_checkdata_cache bname fname =
-  let file = bin_file bname fname in
-  if Sys.file_exists file then
-    Secure.with_open_in_bin file @@ fun ic ->
-    try
-      let entries = (Marshal.from_channel ic : checkdata_entry list) in
-      Some (List.map snd entries)
-    with _ -> None
-  else None
-
 let entries_strings bname fname collect_fn =
-  match read_checkdata_cache bname fname with
-  | Some data -> data
+  match Geneweb.Cache.read bname fname with
+  | Some entries -> List.map snd entries
   | None ->
       ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter collect_fn
       |> List.map snd
@@ -180,8 +162,8 @@ let gen_checkdata_cache bname fname collect_fn =
     with_timer @@ fun () ->
     ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter collect_fn
   in
-  write_checkdata_cache bname fname entries;
-  let path = bin_file bname fname in
+  Geneweb.Cache.write bname fname entries;
+  let path = Geneweb.Cache.file bname fname in
   Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
     (List.length entries) fname duration;
   (entries, duration)
@@ -302,11 +284,9 @@ let () =
   let gen_dl = should_gen_datalist () in
   let gen_cd = should_gen_checkdata () in
   text_dir := Secure.base_dir () // "etc" // bname // "cache";
-  bin_dir := Geneweb.GWPARAM.cache_d bname;
   if gen_dl then Filesystem.create_dir ~parent:true !text_dir;
-  if gen_cd then Filesystem.create_dir ~parent:true !bin_dir;
 
-  width := String.length (!bin_dir // bname) + 30;
+  width := String.length (Geneweb.GWPARAM.cache_d bname // bname) + 30;
 
   (match (gen_dl, gen_cd) with
   | true, true ->

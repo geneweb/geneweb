@@ -34,7 +34,6 @@ type highlight_style = {
     string option;
 }
 
-type checkdata_entry = Driver.istr * string
 type misc_error_info = { pos : int; message : string }
 
 type highlight_info =
@@ -1015,50 +1014,17 @@ let dict_to_cache_name dict_type =
   | Estates -> "estates"
   | Sources -> "sources"
 
-let cache_file_path conf dict_type =
-  let bname = Filename.remove_extension conf.bname in
-  let fname = dict_to_cache_name dict_type in
-  Filename.concat (GWPARAM.cache_d bname) (bname ^ "_" ^ fname ^ ".bin")
-
 let cache_file_exists conf dict_type =
-  let cache_file = cache_file_path conf dict_type in
-  Sys.file_exists cache_file
+  Cache.exists conf.bname (dict_to_cache_name dict_type)
 
 let read_cache conf dict_type =
-  let cache_file = cache_file_path conf dict_type in
-  match Secure.open_in_bin cache_file with
-  | exception Sys_error _ -> []
-  | ic ->
-      Fun.protect
-        ~finally:(fun () -> close_in_noerr ic)
-        (fun () ->
-          try (Marshal.from_channel ic : checkdata_entry list)
-          with End_of_file | Failure _ -> [])
+  Option.value ~default:[]
+    (Cache.read conf.bname (dict_to_cache_name dict_type))
 
 let update_cache_entry conf dict_type ~old_istr ~new_istr new_value =
-  let cache_file = cache_file_path conf dict_type in
-  if not (Sys.file_exists cache_file) then false
-  else
-    let entries = read_cache conf dict_type in
-    if not (List.exists (fun (i, _) -> Driver.Istr.equal i old_istr) entries)
-    then false
-    else
-      let updated =
-        List.filter_map
-          (fun (i, v) ->
-            if Driver.Istr.equal i old_istr then Some (new_istr, new_value)
-            else if Driver.Istr.equal i new_istr then None
-            else Some (i, v))
-          entries
-      in
-      let tmp = cache_file ^ ".tmp" in
-      try
-        Secure.with_open_out_bin tmp (fun oc ->
-            Marshal.to_channel oc updated [ Marshal.No_sharing ]);
-        (try Sys.remove cache_file with Sys_error _ -> ());
-        Sys.rename tmp cache_file;
-        true
-      with Sys_error _ -> false
+  Cache.update conf.bname
+    (dict_to_cache_name dict_type)
+    ~old_istr ~new_istr new_value
 
 let find_dict_type_for_istr conf istr =
   let check_in_cache dict_type =
