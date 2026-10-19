@@ -64,7 +64,7 @@
     autocompleteToken: 'one-time-code',
     showRpcBadge: false,
     labels: { prefix: 'Préfixe exact', internal: 'Préfixe interne', fuzzy: 'Approx.' },
-    hints: { navigate: 'naviguer', columns: 'colonnes', select: 'sélectionner', close: 'fermer' },
+    hints: { navigate: 'naviguer', page: 'défiler', columns: 'colonnes', select: 'sélectionner', close: 'fermer' },
     resultLabel: n => n + ' résultat' + (n > 1 ? 's' : ''),
     onSelect: null,
     debug: false
@@ -366,7 +366,7 @@
       });
 
       const hints = el('span', 'gw-ac-hints');
-      [['↑↓', opts.hints.navigate], ['←→', opts.hints.columns],
+      [['↑↓', opts.hints.navigate], ['PgUp PgDn', opts.hints.page], ['←→', opts.hints.columns],
        ['Enter', opts.hints.select], ['Esc', opts.hints.close]].forEach(([key, text]) => {
         const hint = el('span', 'gw-ac-hint');
         hint.append(el('kbd', null, key), ' ' + text);
@@ -453,6 +453,14 @@
         row = Math.max(0, Math.min(lens[col] - 1, row + dy));
       }
       this._mark(col, row);
+    }
+
+    /** Rows visible in the tallest list, minus one kept for context. */
+    pageSize() {
+      const item = this.el.querySelector('.gw-ac-item');
+      if (!item) return 1;
+      const h = Math.max(...this.cols.map(c => c.list.clientHeight));
+      return Math.max(1, Math.floor(h / item.offsetHeight) - 1);
     }
 
     /**
@@ -705,6 +713,11 @@
         case 'ArrowUp':
           e.preventDefault();
           dd.move(0, -1);
+          break;
+        case 'PageDown':
+        case 'PageUp':
+          e.preventDefault();
+          dd.move(0, (e.key === 'PageDown' ? 1 : -1) * dd.pageSize());
           break;
         case 'ArrowRight':
         case 'ArrowLeft':
