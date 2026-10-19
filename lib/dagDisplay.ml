@@ -108,7 +108,14 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in
-  let nowrap inner = {|<span class="text-nowrap">|} ^<^ inner ^>^ "</span>" in
+  let nowrap ?sp inner =
+    let attr =
+      match sp with
+      | Some ip -> {| data-sp="|} ^ Driver.Iper.to_string ip ^ {|"|}
+      | None -> ""
+    in
+    {|<span class="text-nowrap"|} ^<^ attr ^<^ ">" ^<^ inner ^>^ "</span>"
+  in
   (* A spouse hook is a Left node with no parents whose children are
      exclusively Right connectors to another Left parent: a spouse the
      DAG builder anchored with no further path in the set. The depth
@@ -400,9 +407,9 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
               (fun (ips, _) -> not (skip via_connector_iperse ips))
               spouses
           in
-          let block ~head ~img_first ~reserve pe =
+          let block ?sp ~head ~img_first ~reserve pe =
             let line =
-              nowrap (head ^^^ string_of_item conf base (elem_txt pe))
+              nowrap ?sp (head ^^^ string_of_item conf base (elem_txt pe))
             in
             let img = image_txt ~reserve conf base pe in
             if img_first then img ^^^ line else line ^^^ img
@@ -420,8 +427,10 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                     (Driver.foi base ifam) p ps
               | _ -> Adef.safe ""
             in
+            (* [data-sp] lets dagSvg.js join the cells showing the same
+               spouse, e.g. the two wives of one man on a relation path. *)
             "<br>"
-            ^<^ block
+            ^<^ block ~sp:ips
                   ~head:(("&amp;" ^<^ md) ^>^ " ")
                   ~img_first:false ~reserve:graph_has_spouse_portrait ps
           in
