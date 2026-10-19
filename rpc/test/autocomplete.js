@@ -771,7 +771,6 @@
       this.log = () => {};
       this._initPromise = null;
       this._unavailableCallbacks = [];
-      this._warned = new Set();
     }
 
     /**
@@ -784,7 +783,8 @@
       return this._initPromise;
     }
 
-    /** Enhance one input, e.g. added to the page after init. */
+    /** Enhance one input, e.g. added to the page after init. An input whose
+        index the server does not load is left native (null). */
     enhance(input, indexName) {
       if (this.state !== 'ready' && this.state !== 'disconnected') return null;
       if (this.widgets.some(w => w.input === input)) return null;
@@ -795,7 +795,6 @@
         this.log('no index for list="' + id + '", field left native');
         return null;
       }
-      this._checkIndex(index, id);
       const field = new Field(input, index, this);
       this.widgets.push(field);
       return field;
@@ -813,7 +812,6 @@
       this.state = 'idle';
       this.serverIndexes = [];
       this._initPromise = null;
-      this._warned.clear();
     }
 
     isConnected() {
@@ -885,11 +883,12 @@
     }
 
     /** Map an index name to the server's: exact, or with a file extension
-        ("HenriT_fnames" → "HenriT_fnames.cache"). */
+        ("HenriT_fnames" → "HenriT_fnames.cache"); null if the server does
+        not load it, kept as is without the server's list (local mode). */
     _resolveIndex(index) {
       const names = this.serverIndexes.map(i => i.name);
       if (!names.length || names.includes(index)) return index;
-      return names.find(n => n.startsWith(index + '.')) || index;
+      return names.find(n => n.startsWith(index + '.')) || null;
     }
 
     _indexFor(datalistId) {
@@ -897,15 +896,6 @@
       if (this.opts.indexMap[datalistId]) return this.opts.indexMap[datalistId];
       if (this.opts.base) return this.opts.base + '_' + datalistId.replace(/^datalist_/, '');
       return null;
-    }
-
-    /** Warn (once per index) about a configuration mismatch. */
-    _checkIndex(index, datalistId) {
-      if (!this.serverIndexes.length || this._warned.has(index)) return;
-      if (this.serverIndexes.some(i => i.name === index)) return;
-      this._warned.add(index);
-      console.warn('[GW-AC] index "' + index + '" (list="' + datalistId + '") is not loaded on the RPC server; ' +
-                   'server has: ' + this.serverIndexes.map(i => i.name).join(', '));
     }
 
     _fail() {
