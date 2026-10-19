@@ -18,14 +18,16 @@
  * Matching ignores case and diacritics.
  *
  * ---------------------------------------------------------------------------
- * Usage from a GeneWeb template (self-configuring, no inline JavaScript):
+ * Usage from a GeneWeb template (self-configuring):
  *
  *   <script src=".../autocomplete.js"
  *     data-rpc="/search"            path behind the proxy, host[:port]/path,
  *                                   or a full ws:// / wss:// URL
  *     data-base="roglo"             index names become <base>_<type>
- *     data-debug="1"                optional: console tracing
- *     data-labels="A|B|C"></script> optional: column titles
+ *     data-debug="1"></script>      optional: console tracing
+ *
+ * The texts are in English; window.AC_TRANSLATIONS (labels, hints,
+ * result, results), set by the page, translates them in every mode.
  *
  * Fallback hook for when the server is unreachable or goes away:
  *
@@ -63,9 +65,10 @@
     // token keeps the browser's own popup away from the dropdown
     autocompleteToken: 'one-time-code',
     showRpcBadge: false,
-    labels: { prefix: 'Préfixe exact', internal: 'Préfixe interne', fuzzy: 'Approx.' },
-    hints: { navigate: 'naviguer', page: 'défiler', columns: 'colonnes', select: 'sélectionner', close: 'fermer' },
-    resultLabel: n => n + ' résultat' + (n > 1 ? 's' : ''),
+    labels: { prefix: 'starts with', internal: 'contains', fuzzy: 'approximate' },
+    hints: { navigate: 'navigate', page: 'scroll', columns: 'columns', select: 'select', close: 'close' },
+    result: 'result',
+    results: 'results',
     onSelect: null,
     debug: false
   };
@@ -378,7 +381,7 @@
 
       this.el.append(grid, footer);
       document.body.append(this.el);
-      this.resultLabel = opts.resultLabel;
+      this.resultLabel = n => n + ' ' + (n > 1 ? opts.results : opts.result);
 
       // Keep focus in the input when the dropdown is clicked, so the
       // input's blur handler can close the dropdown on any other click.
@@ -832,9 +835,10 @@
     }
 
     async _init(userOpts) {
-      const o = this.opts = Object.assign({}, DEFAULTS, userOpts, {
-        labels: Object.assign({}, DEFAULTS.labels, userOpts.labels),
-        hints: Object.assign({}, DEFAULTS.hints, userOpts.hints),
+      const tr = root.AC_TRANSLATIONS || {};
+      const o = this.opts = Object.assign({}, DEFAULTS, tr, userOpts, {
+        labels: Object.assign({}, DEFAULTS.labels, tr.labels, userOpts.labels),
+        hints: Object.assign({}, DEFAULTS.hints, tr.hints, userOpts.hints),
         indexMap: Object.assign({}, userOpts.indexMap)
       });
       this.log = makeLog(o.debug, '[GW-AC]');
@@ -937,15 +941,11 @@
 
   if (script && script.dataset.rpc !== undefined) {
     const d = script.dataset;
-    const labels = d.labels ? d.labels.split('|') : [];
     const start = () => api.init({
       rpcUrl: buildUrl(d.rpc),
       base: d.base || '',
       inputSelector: d.selector || 'input[list^="datalist_"]',
-      debug: !!d.debug,
-      labels: labels.length === 3
-        ? { prefix: labels[0], internal: labels[1], fuzzy: labels[2] }
-        : undefined
+      debug: !!d.debug
     });
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();
