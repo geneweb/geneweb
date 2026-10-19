@@ -64,7 +64,6 @@
     // "off" is ignored by browser address autofill; a valid non-address
     // token keeps the browser's own popup away from the dropdown
     autocompleteToken: 'one-time-code',
-    showRpcBadge: false,
     labels: { prefix: 'starts with', internal: 'contains', fuzzy: 'approximate' },
     hints: { navigate: 'navigate', page: 'scroll', columns: 'columns', select: 'select', close: 'close' },
     result: 'result',
@@ -578,7 +577,6 @@
       this.seq = 0;
       this.timer = null;
       this.selecting = false;
-      this.wrapper = null;
       this._saved = {
         autocomplete: input.getAttribute('autocomplete'),
         role: input.getAttribute('role')
@@ -592,13 +590,6 @@
       input.setAttribute('aria-autocomplete', 'list');
       input.setAttribute('aria-expanded', 'false');
       input.setAttribute('aria-controls', DROPDOWN_ID);
-
-      // The wrapper only exists to position the optional status badge
-      if (mgr.opts.showRpcBadge) {
-        this.wrapper = el('div', 'gw-ac-wrapper');
-        input.parentNode.insertBefore(this.wrapper, input);
-        this.wrapper.append(input, el('span', 'gw-ac-rpc-badge gw-ac-rpc-ok'));
-      }
 
       this._handlers = {
         input:   () => this._onInput(),
@@ -667,10 +658,6 @@
       restoreAttr(input, 'role', this._saved.role);
       ['aria-autocomplete', 'aria-expanded', 'aria-controls', 'aria-activedescendant']
         .forEach(a => input.removeAttribute(a));
-      if (this.wrapper) {
-        this.wrapper.parentNode.insertBefore(input, this.wrapper);
-        this.wrapper.remove();
-      }
     }
 
     _onInput() {
