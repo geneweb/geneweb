@@ -407,8 +407,7 @@
       rpcUrl: GenewebAutocomplete.util.buildUrl($('rpc-url').value.trim()),
       base,
       inputSelector: 'input[list^="datalist_"]',
-      debug: $('chk-debug').checked,
-      showRpcBadge: true
+      debug: $('chk-debug').checked
     });
 
     setStatus(ok ? '✓ RPC connecté' : '✗ RPC indisponible', ok ? 'ok' : 'err');

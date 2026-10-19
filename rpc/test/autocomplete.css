@@ -1,5 +1,5 @@
 /**
- * GeneWeb RPC autocomplete (autocomplete.js)
+ * GeneWeb autocomplete (autocomplete.js)
  *
  * All static styling of the widget lives here; the script only sets the
  * dropdown's position and width and the list heights. To restyle for a
@@ -30,12 +30,10 @@
   border: 1px solid var(--gw-ac-border);
   border-radius: 0 0 6px 6px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  font-family: inherit;
   font-size: 13px;
   line-height: 1.4;
   text-align: left;
 }
-.gw-ac-dropdown[hidden] { display: none; }
 
 /* Opened above the input when there is more room there */
 .gw-ac-dropdown.gw-ac-above {
@@ -43,28 +41,17 @@
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
 }
 
-.gw-ac-dropdown *,
-.gw-ac-dropdown *::before,
-.gw-ac-dropdown *::after { box-sizing: border-box; }
-
-/* Three equal columns; minmax(0, …) lets long entries ellipsize */
+/* One equal column per column shown; minmax(0, …) lets long entries
+   ellipsize. Local mode has no approximate matches: two columns. */
 .gw-ac-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
 }
-
-.gw-ac-col {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  border-right: 1px solid var(--gw-ac-rule);
-}
-.gw-ac-col:last-child { border-right: none; }
-
-/* Local mode (no RPC server): no approximate matches, two columns */
-.gw-ac-local .gw-ac-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.gw-ac-local .gw-ac-col-fuzzy { display: none; }
+.gw-ac-col { border-right: 1px solid var(--gw-ac-rule); }
+.gw-ac-col:last-child,
 .gw-ac-local .gw-ac-col-internal { border-right: none; }
+.gw-ac-local .gw-ac-col-fuzzy { display: none; }
 
 .gw-ac-col-header {
   display: flex;
@@ -104,24 +91,17 @@
   padding: 0;
   list-style: none;
   overflow-y: auto;
-  max-height: 350px;
-  scrollbar-width: thin;                      /* Firefox */
+  scrollbar-width: thin;
   scrollbar-color: #ccc #f5f5f5;
 }
-.gw-ac-items::-webkit-scrollbar       { width: 5px; }
-.gw-ac-items::-webkit-scrollbar-track { background: #f5f5f5; }
-.gw-ac-items::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
 
 .gw-ac-item {
-  display: block;
-  margin: 0;
   padding: 5px 10px;
   border-bottom: 1px solid #f0f0f0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   cursor: pointer;
-  transition: background-color 0.1s;
 }
 .gw-ac-item:last-child { border-bottom: none; }
 .gw-ac-item:hover { background: var(--gw-ac-hover); }
@@ -138,8 +118,6 @@
 
 /* Placeholder for an empty column */
 .gw-ac-empty {
-  display: block;
-  margin: 0;
   padding: 12px 10px;
   text-align: center;
   color: #999;
@@ -169,31 +147,6 @@
   border-radius: 3px;
   background: #e0e0e0;
   color: var(--gw-ac-text);
-  box-shadow: none;
   font-family: inherit;
   font-size: 10px;
-}
-
-/* Optional connection badge (showRpcBadge) */
-.gw-ac-wrapper {
-  position: relative;
-  display: block;
-  width: 100%;
-}
-.gw-ac-rpc-badge {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ccc;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-.gw-ac-rpc-badge.gw-ac-rpc-ok  { background: #4caf50; }
-.gw-ac-rpc-badge.gw-ac-rpc-err { background: #f44336; }
-
-@media (prefers-reduced-motion: reduce) {
-  .gw-ac-item { transition: none; }
 }
