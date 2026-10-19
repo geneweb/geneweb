@@ -48,7 +48,7 @@
   %( RPC autocomplete: self-configuring, see autocomplete.js.
      rpc_server_url: "/search" (behind a proxy), "host:port/search" or a ws:// URL %)
   %if;(b.rpc_datalist=1 and (is_welcome or upd_form=1))
-    <script src="%etc_prefix;js/autocomplete.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.js%end;"
+    <script src="%etc_prefix;js/autocomplete.min.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.min.js%end;"
       data-rpc="%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;127.0.0.1:%if;(b.rpc_port!="")%b.rpc_port;%else;8080%end;/search%end;"
       data-base="%base.name;"
       data-debug="%if;(b.rpc_debug="yes")1%end;"></script>

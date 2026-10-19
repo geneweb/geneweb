@@ -1,6 +1,24 @@
 
 (rule
   (package geneweb)
+  (targets autocomplete.js.gz autocomplete.js.br)
+  (deps (:input autocomplete.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
+  (targets autocomplete.min.js.gz autocomplete.min.js.br)
+  (deps (:input autocomplete.min.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
   (targets autosize.min.js.gz autosize.min.js.br)
   (deps (:input autosize.min.js))
   (action
