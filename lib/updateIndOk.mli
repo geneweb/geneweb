@@ -43,6 +43,7 @@ val print_mod_aux :
     Gwdb.base ->
     (Gwdb.iper, Update.key, string) Def.gen_person ->
     Update.update_error option) ->
+  ?person:(Gwdb.iper, Update.key, string) Def.gen_person ->
   Config.config ->
   Gwdb.base ->
   ((Gwdb.iper, Update.key, string) Def.gen_person -> unit) ->
