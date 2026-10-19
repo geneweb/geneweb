@@ -238,6 +238,9 @@ let gen_cache bname fname collect_fn =
   | false, false -> assert false
 
 let validate_options () =
+  if !bname = "" then (
+    Printf.eprintf "Error: missing database name, see cache_files -help\n";
+    exit 1);
   if !merge_aliases && not !datalist then (
     Printf.eprintf "Error: -merge can only be used with -datalist\n";
     exit 1);
