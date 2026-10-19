@@ -258,6 +258,53 @@ function buildContentIndex(rows, rowType, colStarts, toSVG) {
         });
       });
     });
+
+    drawSpouseLinks(table, svg, toSVG, STROKE);
+  }
+
+  /* One person married to several people of the graph is shown inline
+     beside each partner (e.g. Louis XIV beside Maria-Teresa and beside
+     Françoise d'Aubigné). Join the cells carrying the same spouse,
+     identified by data-sp, with a dashed arc under the spouse lines. */
+  function drawSpouseLinks(table, svg, toSVG, stroke) {
+    const groups = new Map();
+    table.querySelectorAll('span[data-sp]').forEach(function (span) {
+      const td = span.closest('td');
+      const key = span.getAttribute('data-sp');
+      if (!groups.has(key)) groups.set(key, []);
+      const list = groups.get(key);
+      if (list.some(function (e) { return e.td === td; })) return;
+      const anchor = span.querySelector('a') || span;
+      const r = toSVG(anchor.getBoundingClientRect());
+      if (r.w < 1) return;
+      list.push({ td, x: r.cx, y: r.y + r.h + 2 });
+    });
+
+    const tableBottom = toSVG(table.getBoundingClientRect());
+    let lowest = tableBottom.y + tableBottom.h;
+    groups.forEach(function (list) {
+      if (list.length < 2) return;
+      list.sort(function (a, b) { return a.x - b.x; });
+      for (let i = 1; i < list.length; i++) {
+        const a = list[i - 1], b = list[i];
+        const dip = Math.min(40, Math.max(14, Math.abs(b.x - a.x) / 8));
+        const cy = Math.max(a.y, b.y) + dip;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d',
+          'M' + a.x + ',' + a.y +
+          ' C' + a.x + ',' + cy + ' ' + b.x + ',' + cy + ' ' + b.x + ',' + b.y);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', stroke);
+        path.setAttribute('stroke-width', '1');
+        path.setAttribute('stroke-dasharray', '4 3');
+        path.classList.add('dag-spouse-link');
+        svg.appendChild(path);
+        lowest = Math.max(lowest, (a.y + b.y) / 4 + cy * 3 / 4);
+      }
+    });
+    /* An arc under the last row must not run into what follows the table. */
+    const overflow = lowest - (tableBottom.y + tableBottom.h);
+    if (overflow > 0) table.style.marginBottom = Math.ceil(overflow + 4) + 'px';
   }
 
 function makeBar(svg, cx, y1, y2, stroke, href, title) {
