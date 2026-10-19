@@ -50,6 +50,8 @@
     base: '',
     // Explicit datalist id → index name; takes precedence over `base`
     indexMap: {},
+    // Local mode, instead of the RPC server: index name → Promise of string[]
+    load: null,
     inputSelector: 'input[list]',
     minChars: 2,
     debounceMs: 250,
@@ -300,6 +302,39 @@
   }
 
   // ==========================================================================
+  // Local client: the RpcClient interface over lists loaded in the page
+  // ==========================================================================
+
+  class LocalClient {
+    /** load(index) resolves to the entries of that index. */
+    constructor(load) {
+      this.load = load;
+      this.lists = new Map();   // index → Promise of [{ value, folded }]
+      this.onclose = null;
+    }
+
+    get connected() { return true; }
+    connect() { return Promise.resolve(); }
+    disconnect() {}
+    info() { return Promise.resolve([]); }
+
+    /** Entries starting with the query, then entries containing it. */
+    async lookup(index, query, size) {
+      if (!this.lists.has(index)) {
+        this.lists.set(index, Promise.resolve(this.load(index))
+          .then(values => values.map(value => ({ value, folded: fold(value) }))));
+      }
+      const q = fold(query);
+      const prefix = [], internal = [];
+      for (const e of await this.lists.get(index)) {
+        if (e.folded.startsWith(q)) { if (prefix.length < size) prefix.push(e.value); }
+        else if (internal.length < size && e.folded.includes(q)) internal.push(e.value);
+      }
+      return prefix.concat(internal);
+    }
+  }
+
+  // ==========================================================================
   // Dropdown — a single instance shared by all fields
   // ==========================================================================
 
@@ -312,6 +347,8 @@
       this.el = el('div', 'gw-ac-dropdown');
       this.el.id = DROPDOWN_ID;
       this.el.hidden = true;
+      // Local mode has no approximate matches: its column is hidden
+      this.el.classList.toggle('gw-ac-local', !!opts.load);
 
       const grid = el('div', 'gw-ac-grid');
       COLUMNS.forEach(c => {
@@ -793,7 +830,7 @@
       this.log('init', o);
 
       this.state = 'connecting';
-      this.rpc = new RpcClient(o.rpcUrl, o, this.log);
+      this.rpc = o.load ? new LocalClient(o.load) : new RpcClient(o.rpcUrl, o, this.log);
       this.rpc.onclose = () => {
         if (this.state === 'ready') {
           this.state = 'disconnected';

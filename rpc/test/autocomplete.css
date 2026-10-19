@@ -61,6 +61,11 @@
 }
 .gw-ac-col:last-child { border-right: none; }
 
+/* Local mode (no RPC server): no approximate matches, two columns */
+.gw-ac-local .gw-ac-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gw-ac-local .gw-ac-col-fuzzy { display: none; }
+.gw-ac-local .gw-ac-col-internal { border-right: none; }
+
 .gw-ac-col-header {
   display: flex;
   justify-content: space-between;
