@@ -1834,6 +1834,23 @@ let print_misc_file conn conf misc_fname encoding =
       loop len;
       true
 
+let datalist_enabled fname =
+  match String.split_on_char '/' fname with
+  | [ bname; "cache"; file ] -> (
+      let prefix = bname ^ "_" in
+      match Filename.chop_suffix_opt ~suffix:".cache.gz" file with
+      | Some stem when String.starts_with ~prefix stem ->
+          let t =
+            String.sub stem (String.length prefix)
+              (String.length stem - String.length prefix)
+          in
+          GWPARAM.set_reorg bname None;
+          List.assoc_opt ("datalist_" ^ t)
+            (Util.read_base_env bname (Option.get !gw_prefix) !debug)
+          = Some "1"
+      | _ -> false)
+  | _ -> false
+
 let misc_request conn conf request fname =
   let is_compressible =
     Filename.check_suffix fname ".js" || Filename.check_suffix fname ".css"
@@ -1853,6 +1870,9 @@ let misc_request conn conf request fname =
             if path <> "" then (path, enc) else try_candidates rest
       in
       try_candidates candidates
+    else if
+      Filename.check_suffix fname ".cache.gz" && not (datalist_enabled fname)
+    then ("", No_encoding)
     else (find_misc_file conf fname, No_encoding)
   in
   if actual_fname <> "" then
