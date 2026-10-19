@@ -10,6 +10,15 @@
 
 (rule
   (package geneweb)
+  (targets autocomplete.css.gz autocomplete.css.br)
+  (deps (:input autocomplete.css))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
   (targets bootstrap.min.css.gz bootstrap.min.css.br)
   (deps (:input bootstrap.min.css))
   (action
