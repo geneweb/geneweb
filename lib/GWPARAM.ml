@@ -44,6 +44,9 @@ let clean_bname bname = Filename.remove_extension bname
 let path_concat parts = String.concat Filename.dir_sep parts
 let base_dir () = Secure.base_dir ()
 
+let cache_d bname =
+  path_concat [ base_dir (); clean_bname bname ^ ".gwb"; "caches" ]
+
 (* Module for reorg mode paths *)
 module Default = struct
   let config bname = config_reorg bname

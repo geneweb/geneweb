@@ -15,6 +15,13 @@ val force : bool ref
 val config_reorg : string -> string
 val config_legacy : string -> string
 
+val cache_d : string -> string
+(** [cache_d bname] Directory of the binary caches of base [bname], written by
+    cache_files and read by chk_data: bases/bname.gwb/caches, whatever the base
+    format, next to the caches of the cousins tool. Unlike
+    bases/etc/bname/cache, which holds the .gz datalists that browsers download,
+    it is never served. *)
+
 type my_fun_2 = string -> string
 type my_fun_3 = string -> string -> string
 

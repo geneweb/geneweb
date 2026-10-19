@@ -195,9 +195,9 @@ fr: Configurer
 
     build cache files
 aa: welcome.htm
-co: Creà cache per u riempimentu autumaticu/checkdata
-en: Build cache files for auto completion/checkdata
-fr: Créer les caches pour autocomplétion/checkdata
+co: Creà cache per u riempimentu autumaticu
+en: Build cache files for autocompletion and other tools
+fr: Créer les caches pour l’autocomplétion et les autres outils
 
     No redirection (results on terminal only).
 aa: connex.htm
@@ -289,11 +289,11 @@ co: Custruisce tutti i schedarii d’impiatta.
 en: Build all cache files.
 fr: Construire tous les fichiers de cache.
 
-    checkdata
+    binary
 aa: cache_file.htm
-en: Build only cache files with binary format (for typographics verifications)
+en: Build only cache files with binary format (for tools like chk_data)
 fr: Construit uniquement les fichiers cache au format binaire (pour les \
-  vérifications typographiques)
+  autres outils comme chk_data)
 
     datalist
 aa: cache_file.htm

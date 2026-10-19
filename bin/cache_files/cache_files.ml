@@ -20,21 +20,17 @@ let qualifiers = ref false
 let sources = ref false
 let all = ref false
 let prog = ref false
-let checkdata = ref false
+let binary = ref false
 let datalist = ref false
 let width = ref 50
-let cache_dir = ref ""
+let text_dir = ref ""
+let bin_dir = ref ""
 let ( // ) = Filename.concat
-
-let set_cache_dir bname =
-  let dir = Secure.base_dir () // "etc" // bname // "cache" in
-  Filesystem.create_dir ~parent:true dir;
-  dir
+let text_file bname fname = !text_dir // (bname ^ "_" ^ fname ^ ".cache.gz")
+let bin_file bname fname = !bin_dir // (bname ^ "_" ^ fname ^ ".bin")
 
 let write_cache_file bname fname data =
-  let filename = bname ^ "_" ^ fname ^ ".cache" in
-  let file = !cache_dir // filename in
-  let gz_file = file ^ ".gz" in
+  let gz_file = text_file bname fname in
   let buf = Buffer.create 65536 in
   List.iter
     (fun s ->
@@ -45,13 +41,11 @@ let write_cache_file bname fname data =
   Secure.with_open_out_bin gz_file (fun oc -> output_string oc compressed)
 
 let write_checkdata_cache bname fname entries =
-  let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in
-  let file = !cache_dir // filename in
-  Secure.with_open_out_bin file @@ fun oc -> Marshal.to_channel oc entries []
+  Secure.with_open_out_bin (bin_file bname fname) @@ fun oc ->
+  Marshal.to_channel oc entries []
 
 let read_checkdata_cache bname fname =
-  let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in
-  let file = !cache_dir // filename in
+  let file = bin_file bname fname in
   if Sys.file_exists file then
     Secure.with_open_in_bin file @@ fun ic ->
     try
@@ -68,12 +62,12 @@ let entries_strings bname fname collect_fn =
       |> List.map snd
 
 let should_gen_datalist () =
-  match (!checkdata, !datalist) with
+  match (!binary, !datalist) with
   | false, false | false, true | true, true -> true
   | true, false -> false
 
 let should_gen_checkdata () =
-  match (!checkdata, !datalist) with
+  match (!binary, !datalist) with
   | false, false | true, false | true, true -> true
   | false, true -> false
 
@@ -187,7 +181,7 @@ let gen_checkdata_cache bname fname collect_fn =
     ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter collect_fn
   in
   write_checkdata_cache bname fname entries;
-  let path = !cache_dir // (bname ^ "_" ^ fname ^ "_checkdata.cache") in
+  let path = bin_file bname fname in
   Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
     (List.length entries) fname duration;
   (entries, duration)
@@ -197,7 +191,7 @@ let gen_datalist_from_entries bname fname entries =
     with_timer @@ fun () -> List.map snd entries |> List.sort String.compare
   in
   write_cache_file bname fname data;
-  let path = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz") in
+  let path = text_file bname fname in
   Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
     (List.length data) fname duration;
   duration
@@ -209,20 +203,20 @@ let gen_datalist_merged bname fname fetch_main fetch_alias =
       (List.rev_append (fetch_main ()) (fetch_alias ()))
   in
   write_cache_file bname fname data;
-  let path = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz") in
+  let path = text_file bname fname in
   Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
     (List.length data) (fname ^ "+alias") duration;
   duration
 
 let gen_both_caches bname fname collect_fn =
-  if !prog then Format.printf "Generating %s checkdata cache...@." fname;
+  if !prog then Format.printf "Generating %s binary cache...@." fname;
   let entries, dur1 = gen_checkdata_cache bname fname collect_fn in
   if !prog then Format.printf "Extracting %s text cache...@." fname;
   let dur2 = gen_datalist_from_entries bname fname entries in
   dur1 +. dur2
 
 let gen_checkdata_only bname fname collect_fn =
-  if !prog then Format.printf "Generating %s checkdata cache...@." fname;
+  if !prog then Format.printf "Generating %s binary cache...@." fname;
   let _, duration = gen_checkdata_cache bname fname collect_fn in
   duration
 
@@ -248,8 +242,8 @@ let validate_options () =
     Printf.eprintf "Error: -merge can only be used with -datalist\n";
     exit 1);
 
-  if (!fname_aliases || !sname_aliases) && not !checkdata then (
-    Printf.eprintf "Error: -fna and -sna can only be used with -checkdata\n";
+  if (!fname_aliases || !sname_aliases) && not !binary then (
+    Printf.eprintf "Error: -fna and -sna can only be used with -binary\n";
     exit 1)
 
 let speclist =
@@ -261,9 +255,9 @@ let speclist =
         (Dirs.name Secure.default_base_dir) );
     ("", Arg.Unit (fun () -> ()), "");
     ("-fn", Arg.Set fnames, " first names");
-    ("-fna", Arg.Set fname_aliases, " first name aliases (only with -checkdata)");
+    ("-fna", Arg.Set fname_aliases, " first name aliases (only with -binary)");
     ("-sn", Arg.Set snames, " surnames");
-    ("-sna", Arg.Set sname_aliases, " surname aliases (only with -checkdata)");
+    ("-sna", Arg.Set sname_aliases, " surname aliases (only with -binary)");
     ( "-merge",
       Arg.Set merge_aliases,
       " merge fn/sn aliases with fn/sn (only with -datalist)" );
@@ -278,12 +272,14 @@ let speclist =
     ("", Arg.Unit (fun () -> ()), "");
     ("-all", Arg.Set all, " build all type of cache files");
     ("", Arg.Unit (fun () -> ()), "");
-    ( "-checkdata",
-      Arg.Set checkdata,
-      " generate binary caches only (for typographic verification)" );
+    ( "-binary",
+      Arg.Set binary,
+      " generate binary caches only, in <bases>/<base>.gwb/caches (for tools)"
+    );
     ( "-datalist",
       Arg.Set datalist,
-      " generate text caches only (for browser input suggestion)" );
+      " generate text caches only, in <bases>/etc/<base>/cache (for datalists)"
+    );
     ("", Arg.Unit (fun () -> ()), "");
     ("-prog", Arg.Set prog, " show progress bar");
   ]
@@ -300,17 +296,21 @@ let () =
   let bname = Filename.remove_extension (Filename.basename !bname) in
 
   Driver.with_database (Secure.base_dir () // bname) @@ fun base ->
-  cache_dir := set_cache_dir bname;
-
   let gen_dl = should_gen_datalist () in
   let gen_cd = should_gen_checkdata () in
+  text_dir := Secure.base_dir () // "etc" // bname // "cache";
+  bin_dir := Geneweb.GWPARAM.cache_d bname;
+  if gen_dl then Filesystem.create_dir ~parent:true !text_dir;
+  if gen_cd then Filesystem.create_dir ~parent:true !bin_dir;
 
-  width := String.length (!cache_dir // bname) + 30;
+  width := String.length (!bin_dir // bname) + 30;
 
   (match (gen_dl, gen_cd) with
-  | true, true -> Printf.printf "Generating datalist and checkdata caches\n"
-  | false, true -> Printf.printf "Generating CheckData binary caches\n"
-  | true, false -> Printf.printf "Generating datalist compressed caches\n"
+  | true, true ->
+      Printf.printf
+        "Generating binary caches for tools and text caches for datalists\n"
+  | false, true -> Printf.printf "Generating binary caches for tools\n"
+  | true, false -> Printf.printf "Generating text caches for datalists\n"
   | false, false -> assert false);
 
   let total = ref 0. in
