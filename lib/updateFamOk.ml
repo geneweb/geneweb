@@ -959,7 +959,7 @@ let effective_chg_order base ip u ifam n =
   let u = { family = Array.of_list fam } in
   Driver.patch_union base ip u
 
-let effective_del conf base _ip fam =
+let effective_del conf base fam =
   let ifam = Driver.get_ifam fam in
   let father = Driver.get_father fam in
   let mother = Driver.get_mother fam in
@@ -1216,12 +1216,7 @@ let print_del conf base =
         let father = Driver.get_father fam in
         let mother = Driver.get_mother fam in
         let children = Driver.get_children fam in
-        let ip =
-          match p_getenv conf.env "ip" with
-          | Some i when mother = Driver.Iper.of_string i -> mother
-          | Some _ | None -> father
-        in
-        effective_del conf base ip fam;
+        effective_del conf base fam;
         Util.commit_patches conf base;
         print_del_ok conf base [] ~father ~mother ~children
   | None -> Hutil.incorrect_request conf
