@@ -1,4 +1,4 @@
-<!-- $Id: upd_js.txt v7.1 06/01/2026 02:00:03 $ -->
+<!-- $Id: upd_js.txt v7.1 20/10/2026 23:18:54 $ -->
 %( Input datalists and function to populate all datalists %)
 %if;(is_upd_ind or is_upd_fam)
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
@@ -124,7 +124,7 @@ function initFormFocus() {
   
   if (!targetId && form.id === 'updfam') {
     const input = Array.from(form.querySelectorAll('input[type="text"]'))
-      .find(el => (el.id?.startsWith('e_place') || el.id?.endsWith('_fn')) && el.value === '');
+      .find(el => el.offsetParent && (el.id?.startsWith('e_place') || el.id?.endsWith('_fn')) && el.value === '');
     targetId = input?.id;
   }
   
