@@ -247,8 +247,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
   | None -> Hutil.incorrect_request conf
   | Some i2 ->
       let ifam2 = Driver.Ifam.of_string i2 in
-      UpdateFamOk.effective_del conf base Driver.Iper.dummy
-        (Driver.foi base ifam2);
+      UpdateFamOk.effective_del conf base (Driver.foi base ifam2);
       let ifam, fam, cpl, des =
         UpdateFamOk.effective_mod conf base true sfam scpl sdes
       in

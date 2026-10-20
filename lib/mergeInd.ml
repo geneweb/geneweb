@@ -237,7 +237,7 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
     let _ = (CheckItem.sort_children base children : _ option) in
     { children }
   in
-  UpdateFamOk.effective_del conf base Driver.Iper.dummy fam2;
+  UpdateFamOk.effective_del conf base fam2;
   for i = 0 to Array.length (Driver.get_children des2) - 1 do
     let ip = (Driver.get_children des2).(i) in
     let a = { parents = Some ifam1; consang = Adef.fix (-1) } in
@@ -332,7 +332,7 @@ let rec kill_ancestors conf base included_self p nb_ind nb_fam =
       kill_ancestors conf base true
         (Driver.poi base (Driver.get_mother cpl))
         nb_ind nb_fam;
-      UpdateFamOk.effective_del conf base Driver.Iper.dummy cpl;
+      UpdateFamOk.effective_del conf base cpl;
       incr nb_fam
   | None -> ());
   if included_self then (
