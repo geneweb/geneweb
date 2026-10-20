@@ -22,7 +22,7 @@ let print_link ?(with_occurrence_number = true) ?(with_life_dates = true)
         Output.print_string conf (Util.one_title_text base t)
   | None -> ()
 
-let print_no_candidate conf base p =
+let print_no_candidate ~previous_action_was_merge conf base p =
   let title _ =
     Util.transl conf "possible duplications"
     |> Util.transl_decline conf "merge"
@@ -30,7 +30,9 @@ let print_no_candidate conf base p =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Util.transl conf "duplicate_merge_end_explanation"
+  Util.transl conf
+    (if previous_action_was_merge then "duplicate_merge_end_explanation"
+    else "duplicate_merge_end_explanation_no_merge")
   |> Output.printf conf "<p>%s</p>";
   Output.print_sstring conf "<p>";
   Output.print_sstring conf (Util.transl conf "duplicate_merge_end_go_back");
@@ -62,7 +64,12 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf "</li><li>";
   print_link conf base (Gwdb.poi base ip2);
   Output.print_sstring conf "</li></ul>";
-  let make_url mode =
+  let make_url action =
+    let mode, merge =
+      match action with
+      | `Cancel -> ("MRG_DUP", Some false)
+      | `Proceed -> ("MRG_DUP_IND_Y_N", None)
+    in
     let open Ext_list.Infix in
     Util.commd conf
       ~query:
@@ -80,11 +87,11 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
                       [ Gwdb.string_of_ifam f1; Gwdb.string_of_ifam f2 ])
                     fexcl ))
         @?: ("i", [ Gwdb.string_of_iper ip1 ])
-        @:: [ ("select", [ Gwdb.string_of_iper ip2 ]) ])
+        @:: ("select", [ Gwdb.string_of_iper ip2 ])
+        @:: Option.map (fun merge -> ("merge", [ Bool.to_string merge ])) merge
+        @?: [])
   in
-
-  next_step_buttons ~conf ~cancel_url:(make_url "MRG_DUP")
-    (make_url "MRG_DUP_IND_Y_N");
+  next_step_buttons ~conf ~cancel_url:(make_url `Cancel) (make_url `Proceed);
   Hutil.trailer conf
 
 let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
@@ -111,7 +118,12 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   Output.print_sstring conf " &amp; ";
   print_link conf base (Gwdb.poi base ip2);
   Output.print_sstring conf "</li></ul>";
-  let make_url mode =
+  let make_url action =
+    let mode, merge =
+      match action with
+      | `Cancel -> ("MRG_DUP", Some false)
+      | `Proceed -> ("MRG_DUP_FAM_Y_N", None)
+    in
     let open Ext_list.Infix in
     Util.commd conf
       ~query:
@@ -129,10 +141,11 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
                   [ Gwdb.string_of_ifam f1; Gwdb.string_of_ifam f2 ])
                 ((ifam1, ifam2) :: fexcl) )
         @:: ("i", [ Gwdb.string_of_ifam ifam1 ])
-        @:: [ ("i2", [ Gwdb.string_of_ifam ifam2 ]) ])
+        @:: ("i2", [ Gwdb.string_of_ifam ifam2 ])
+        @:: Option.map (fun merge -> ("merge", [ Bool.to_string merge ])) merge
+        @?: [])
   in
-  next_step_buttons ~conf ~cancel_url:(make_url "MRG_DUP")
-    (make_url "MRG_DUP_FAM_Y_N");
+  next_step_buttons ~conf ~cancel_url:(make_url `Cancel) (make_url `Proceed);
   Hutil.trailer conf
 
 let main_page conf base =
@@ -150,5 +163,10 @@ let main_page conf base =
       | Perso.DupInd (ip1, ip2) -> print_cand_ind conf base (ip, p) excl ip1 ip2
       | Perso.DupFam (ifam1, ifam2) ->
           print_cand_fam conf base (ip, p) excl ifam1 ifam2
-      | Perso.NoDup -> print_no_candidate conf base p)
+      | Perso.NoDup ->
+          let previous_action_was_merge =
+            Option.value ~default:true
+              (Option.bind (Util.p_getenv conf.env "merge") bool_of_string_opt)
+          in
+          print_no_candidate ~previous_action_was_merge conf base p)
   | None -> Hutil.incorrect_request conf
