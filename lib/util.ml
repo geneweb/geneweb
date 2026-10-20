@@ -1200,7 +1200,7 @@ let gen_person_title_text reference conf base p =
     match main_title conf base p with
     | Some t ->
         reference conf base p (titled_person_text conf base p t)
-        ^^^ ", " ^<^ one_title_text base t
+        ^^^ "," ^<^ one_title_text base t
     | None -> reference conf base p (gen_person_text conf base p)
   else reference conf base p (gen_person_text conf base p)
 
