@@ -5279,6 +5279,23 @@ sl: komentar
 sv: kommentar
 tr: yorum
 
+    comment on the family of the parents
+af: kommentaar oor die gesin van die ouers
+ca: comentari sobre la família dels pares
+cs: komentář k rodině rodičů
+da: kommentar til forældrenes familie
+de: Kommentar zur Familie der Eltern
+en: comment on the family of the parents
+es: comentario sobre la familia de los padres
+fr: commentaire sur la famille des parents
+it: commento sulla famiglia dei genitori
+nl: commentaar over het gezin van de ouders
+no: kommentar om foreldrenes familie
+pl: uwagi o rodzinie rodziców
+pt: comentário sobre a família dos pais
+ru: комментарий о семье родителей
+sv: kommentar om föräldrarnas familj
+
     compact descendants tree
 co: arburu cumpattu di discendenza
 de: kompakter Nachkommenbaum
@@ -10986,6 +11003,26 @@ no: hans/hennes
 pt: seu/sua
 sv: hans/hennes
 tr: onun/onun
+
+    his parents/her parents/their parents
+af: sy ouers/haar ouers/hul ouers
+bg: неговите родители/нейните родители/родителите
+ca: pares d’ell/pares d’ella/els seus pares
+cs: jeho rodiče/její rodiče/rodiče
+da: hans forældre/hendes forældre/deres forældre
+de: Eltern des Partners/Eltern der Partnerin/Eltern dieser Person
+en: his parents/her parents/their parents
+es: padres de él/padres de ella/sus padres
+fr: parents du conjoint/parents de la conjointe/parents du conjoint ou de la conjointe
+it: genitori di lui/genitori di lei/i suoi genitori
+nl: zijn ouders/haar ouders/hun ouders
+no: hans foreldre/hennes foreldre/deres foreldre
+pl: jego rodzice/jej rodzice/rodzice
+pt: pais dele/pais dela/os seus pais
+ru: его родители/её родители/родители
+sk: jeho rodičia/jej rodičia/rodičia
+sl: njegovi starši/njeni starši/starši
+sv: hans föräldrar/hennes föräldrar/deras föräldrar
 
     history
 co: cronolugia
@@ -19811,21 +19848,36 @@ tr: seç
 zh: 从下列选取
 
     spouse/spouses
+af: lewensmaat/lewensmaats
+ar: زوج/أزواج
+ca: cònjuge/cònjuges
 co: cumpagnu(a)/cumpagni
+cs: partner/partneři
+da: partner/partnere
 de: Ehepartner/Partner
 en: spouse/spouses
+eo: partnero/partneroj
 es: cónyuge/cónyuges
+et: partner/partnerid
 fi: puoliso/puoliso
 fr: conjoint/conjoints
+he: בן זוג/בני זוג
+is: maki/makar
 it: coniuge/coniugi
 lt: bendras/sutuoktiniai
+lv: partneris/partneri
 nl: partner/partners
 no: partner/partners
 oc: conjunt/conjunts
+pl: partner/partnerzy
 pt: cônjuge/cônjuges
+ro: partener/parteneri
 ru: супруг/супруги
+sk: partner/partneri
+sl: partner/partnerji
 sv: partner/partners
 tr: eş/eşler
+zh: 配偶/配偶
 
     spouses info
 co: infurmazione nant’à i cumpagni

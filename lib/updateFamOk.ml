@@ -429,6 +429,23 @@ let reconstitute_family conf base nsck =
   and des = { children = Array.of_list children } in
   (fam, cpl, des, ext)
 
+let reconstitute_grandparents conf =
+  List.filter_map
+    (fun (var, child) ->
+      let default_surname =
+        match (child, p_getenv conf.env (var ^ "_fn")) with
+        | Some child, Some fn when fn <> "" ->
+            Option.value ~default:"" (p_getenv conf.env (child ^ "_sn"))
+        | _ -> ""
+      in
+      match reconstitute_parent_or_child conf var default_surname with
+      | (fn, sn, _, _, _) as k when fn <> "" || sn <> "" -> Some (var, k)
+      | _ -> None
+      | exception Failure _ -> None)
+    [
+      ("pa11", Some "pa1"); ("pa12", None); ("pa21", Some "pa2"); ("pa22", None);
+    ]
+
 let strip_events fevents =
   let strip_array_witness pl =
     Array.of_list
@@ -1025,7 +1042,74 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
     wl;
   (wl, ml)
 
-let print_family conf base (wl, ml) cpl des =
+let effective_add_grandparents conf base grandparents cpl wl =
+  let conf = { conf with env = List.remove_assoc "nsck" conf.env } in
+  let blank = ("", "", 0, Update.Create (Neuter, None), "") in
+  let add ((ipl, hrl, wl) as acc) (var, ip) =
+    match
+      ( List.assoc_opt (var ^ "1") grandparents,
+        List.assoc_opt (var ^ "2") grandparents )
+    with
+    | None, None -> acc
+    | father, mother -> (
+        let scpl =
+          Adef.couple
+            (Option.value father ~default:blank)
+            (Option.value mother ~default:blank)
+        in
+        match check_parents conf scpl with
+        | Some err -> error_family conf err
+        | None ->
+            let sfam =
+              {
+                marriage = Date.cdate_None;
+                marriage_place = "";
+                marriage_note = "";
+                marriage_src = "";
+                witnesses = [||];
+                relation = Married;
+                divorce = NotDivorced;
+                fevents =
+                  [
+                    {
+                      efam_name = Efam_Marriage;
+                      efam_date = Date.cdate_None;
+                      efam_place = "";
+                      efam_reason = "";
+                      efam_note = "";
+                      efam_src = "";
+                      efam_witnesses = [||];
+                    };
+                  ];
+                comment =
+                  only_printable_or_nl
+                    (Mutil.strip_all_trailing_spaces (getn conf var "comment"));
+                origin_file = "";
+                fsources = "";
+                fam_index = Driver.Ifam.dummy;
+              }
+            in
+            let sdes = { children = [| UpdateFam.person_key base ip |] } in
+            let ifam, fam, gcpl, gdes =
+              effective_add conf base false sfam scpl sdes
+            in
+            patch_parent_with_pevents base gcpl;
+            Notes.update_notes_links_family conf ~old_text:"" base fam;
+            let gwl, _ =
+              all_checks_family conf base ifam fam gcpl gdes (scpl, sdes, None)
+            in
+            let p =
+              Util.string_gen_person base
+                (Driver.gen_person_of_person (Driver.poi base ip))
+            in
+            ( ip :: ipl,
+              U_Add_parent (p, Util.string_gen_family base fam) :: hrl,
+              List.rev_append gwl wl ))
+  in
+  List.fold_left add ([], [], wl)
+    [ ("pa1", Adef.father cpl); ("pa2", Adef.mother cpl) ]
+
+let print_family ?(with_parents = []) conf base (wl, ml) cpl des =
   let rdsrc =
     match p_getenv conf.env "rdsrc" with
     | Some "on" -> (
@@ -1039,17 +1123,19 @@ let print_family conf base (wl, ml) cpl des =
       conf.henv <- List.remove_assoc "dsrc" conf.henv;
       if x <> "" then conf.henv <- ("dsrc", Mutil.encode x) :: conf.henv
   | None -> ());
-  Output.print_sstring conf "<ul>\n";
-  Output.print_sstring conf "<li>";
-  Output.print_string conf
-    (referenced_person_text conf base (Driver.poi base (Adef.father cpl)));
-  Output.print_sstring conf "</li>";
-  Output.print_sstring conf "\n";
-  Output.print_sstring conf "<li>";
-  Output.print_string conf
-    (referenced_person_text conf base (Driver.poi base (Adef.mother cpl)));
-  Output.print_sstring conf "</li>";
-  Output.print_sstring conf "</ul>\n";
+  let print_parent ip =
+    let p = Driver.poi base ip in
+    Output.print_sstring conf "<li>";
+    Output.print_string conf (referenced_person_text conf base p);
+    if List.mem ip with_parents then (
+      Output.print_sstring conf ", ";
+      Output.print_string conf (child_of_parent ~link:true conf base p));
+    Output.print_sstring conf "</li>"
+  in
+  Output.print_sstring conf "<ul>";
+  print_parent (Adef.father cpl);
+  print_parent (Adef.mother cpl);
+  Output.print_sstring conf "</ul>";
   if des.children <> [||] then (
     Output.print_sstring conf "<ul>\n";
     Array.iter
@@ -1065,7 +1151,7 @@ let print_family conf base (wl, ml) cpl des =
 let print_title conf fmt _ =
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
 
-let print_mod_ok conf base (wl, ml) cpl des =
+let print_mod_ok ?with_parents conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
@@ -1079,7 +1165,7 @@ let print_mod_ok conf base (wl, ml) cpl des =
     List.iter
       (fun s -> Output.printf conf "<p>%s</p>" (Util.escape_html s :> string))
       !removed_string);
-  print_family conf base (wl, ml) cpl des;
+  print_family ?with_parents conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
 let print_change_event_order_ok conf base (wl, ml) cpl des =
@@ -1087,7 +1173,7 @@ let print_change_event_order_ok conf base (wl, ml) cpl des =
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
-let print_add_ok conf base (wl, ml) cpl des =
+let print_add_ok ?with_parents conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family added";
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
@@ -1096,7 +1182,7 @@ let print_add_ok conf base (wl, ml) cpl des =
     List.iter
       (fun s -> Output.printf conf "<p>%s</p>" (Util.escape_html s :> string))
       !removed_string);
-  print_family conf base (wl, ml) cpl des;
+  print_family ?with_parents conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
 let print_del_ok conf base wl ~father ~mother ~children =
@@ -1182,7 +1268,9 @@ let print_add o_conf base =
   if digest <> "" && sdigest <> "" && digest <> sdigest then
     Update.error_digest conf
   else if ext || redisp then
-    UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
+    UpdateFam.print_update_fam
+      ~grandparents:(reconstitute_grandparents conf)
+      conf base (sfam, scpl, sdes) ""
   else if forbidden_disconnected conf scpl sdes then
     print_error_disconnected conf
   else
@@ -1198,6 +1286,11 @@ let print_add o_conf base =
         Notes.update_notes_links_family conf ~old_text:"" base fam;
         let wl, ml =
           all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
+        in
+        let ipl, hrl, wl =
+          effective_add_grandparents conf base
+            (reconstitute_grandparents conf)
+            cpl wl
         in
         let changed, act =
           let fam = Util.string_gen_family base fam in
@@ -1229,8 +1322,9 @@ let print_add o_conf base =
         in
         Util.commit_patches conf base;
         History.record conf base changed act;
+        List.iter (fun hr -> History.record conf base hr "aa") hrl;
         Update.delete_topological_sort conf base;
-        print_add_ok conf base (wl, ml) cpl des
+        print_add_ok ~with_parents:ipl conf base (wl, ml) cpl des
 
 (* If we only have two linked parents, with one linked child and not other
    informations, and if a union already exists between the parents, edit the
@@ -1293,11 +1387,16 @@ let print_add_parents o_conf base =
                   Driver.patch_descend base ifam sdes;
                   Driver.patch_ascend base child
                     { parents = Some ifam; consang = Adef.fix (-1) };
+                  let ipl, hrl, wl =
+                    effective_add_grandparents conf base
+                      (reconstitute_grandparents conf)
+                      scpl []
+                  in
                   Util.commit_patches conf base;
                   let f' =
                     Driver.family_of_gen_family base (sfam, scpl, sdes)
                   in
-                  let wl = ref [] in
+                  let wl = ref wl in
                   let warning w = wl := w :: !wl in
                   CheckItem.family ~onchange:true base warning ifam f';
                   let n_f = Util.string_gen_family base sfam in
@@ -1309,8 +1408,9 @@ let print_add_parents o_conf base =
                         n_f )
                   in
                   History.record conf base hr "mf";
+                  List.iter (fun hr -> History.record conf base hr "aa") hrl;
                   Update.delete_topological_sort conf base;
-                  print_mod_ok conf base (!wl, []) scpl sdes)
+                  print_mod_ok ~with_parents:ipl conf base (!wl, []) scpl sdes)
                 else loop (i - 1)
             in
             loop (Array.length ffam - 1)
@@ -1329,7 +1429,9 @@ let print_mod_aux conf base callback =
   in
   if digest = get conf "digest" then
     if ext || redisp then
-      UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
+      UpdateFam.print_update_fam
+        ~grandparents:(reconstitute_grandparents conf)
+        conf base (sfam, scpl, sdes) digest
     else
       match check_family conf sfam scpl with
       | Some err, _ | _, Some err -> error_family conf err
@@ -1371,7 +1473,9 @@ let print_mod o_conf base =
     let nsck = p_getenv conf.env "nsck" = Some "on" in
     let ifam, fam, cpl, des = effective_mod conf base nsck sfam scpl sdes in
     let nfs = (Adef.parent_array cpl, des.children) in
-    if ofs = nfs && Util.string_gen_family base fam = o_f then
+    let unchanged = ofs = nfs && Util.string_gen_family base fam = o_f in
+    let grandparents = reconstitute_grandparents conf in
+    if unchanged && grandparents = [] then
       redirect_to_source o_conf base (Adef.father cpl)
     else
       let () = patch_parent_with_pevents base cpl in
@@ -1380,6 +1484,9 @@ let print_mod o_conf base =
       let onfs = Some (ofs, nfs) in
       let wl, ml =
         all_checks_family conf base ifam fam cpl des (scpl, sdes, onfs)
+      in
+      let ipl, hrl, wl =
+        effective_add_grandparents conf base grandparents cpl wl
       in
       Util.commit_patches conf base;
       let changed =
@@ -1395,9 +1502,10 @@ let print_mod o_conf base =
         let n_f = Util.string_gen_family base fam in
         U_Modify_family (p, o_f, n_f)
       in
-      History.record conf base changed "mf";
+      if not unchanged then History.record conf base changed "mf";
+      List.iter (fun hr -> History.record conf base hr "aa") hrl;
       Update.delete_topological_sort conf base;
-      print_mod_ok conf base (wl, ml) cpl des
+      print_mod_ok ~with_parents:ipl conf base (wl, ml) cpl des
   in
   print_mod_aux conf base callback
 

@@ -1,4 +1,4 @@
-(* $Id: updateFam.ml,v 5.24 2008-01-09 03:34:36 ddr Exp $ *)
+(* $Id: updateFam.ml v7.1 20/10/2026 23:25:52 $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -44,6 +44,7 @@ type 'a env =
   | Vint of int
   | Vother of 'a
   | Vbool of bool
+  | Vkey of Update.key
   | Vnone
 
 let bool_val = Update_util.bool_val
@@ -284,6 +285,14 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | "father" :: sl -> eval_key conf base (Adef.father cpl) sl
   | [ "fsources" ] ->
       safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
+  | "grandparent" :: var :: sl ->
+      let k =
+        match get_env var env with
+        | Vkey k -> k
+        | Vstring _ | Vint _ | Vother _ | Vbool _ | Vnone ->
+            ("", "", 0, Update.Create (Neuter, None), "")
+      in
+      eval_key conf base k sl
   | [ "is_first" ] -> eval_is_first env
   | [ "is_last" ] -> eval_is_last env
   | [ "is_upd_fam" ] -> (
@@ -394,6 +403,15 @@ and eval_key conf base (fn, sn, oc, create, _) = function
       match Driver.person_of_key base fn sn oc with
       | Some ip -> str_val (Driver.Iper.to_string ip)
       | _ -> str_val (Driver.Iper.to_string Driver.Iper.dummy))
+  | [ "has_parents" ] -> (
+      match create with
+      | Update.Link -> (
+          match Driver.person_of_key base fn sn oc with
+          | Some ip ->
+              bool_val
+                (Option.is_some (Driver.get_parents (Driver.poi base ip)))
+          | None -> bool_val false)
+      | Update.Create _ -> bool_val false)
   | [ "sexes" ] ->
       (* this is somewhat of a hack to determine same sex situations *)
       (* updateFam.ml does not provide adequate mechanisms to test   *)
@@ -503,7 +521,7 @@ let print_foreach print_ast _eval_expr =
   in
   print_foreach
 
-let print_update_fam conf base fcd digest =
+let print_update_fam ?(grandparents = []) conf base fcd digest =
   match p_getenv conf.env "m" with
   | Some
       ( "ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "ADD_PAR_OK" | "MOD_FAM"
@@ -513,6 +531,11 @@ let print_update_fam conf base fcd digest =
         Templ.Env.empty
         |> Templ.Env.add "digest" (Vstring digest)
         |> Templ.Env.add "is_upd_fam" (Vbool true)
+      in
+      let env =
+        List.fold_left
+          (fun env (var, k) -> Templ.Env.add var (Vkey k) env)
+          env grandparents
       in
       let ifun =
         Templ.

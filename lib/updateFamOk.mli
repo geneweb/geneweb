@@ -54,13 +54,15 @@ val all_checks_family :
   CheckItem.base_warning list * CheckItem.base_misc list
 
 val print_family :
+  ?with_parents:Geneweb_db.Driver.iper list ->
   Config.config ->
   Geneweb_db.Driver.base ->
   CheckItem.base_warning list * CheckItem.base_misc list ->
   Geneweb_db.Driver.iper Adef.gen_couple ->
   Geneweb_db.Driver.iper Def.gen_descend ->
   unit
-(** Displays a family page in HTML after an update. Used by MergeFamOk *)
+(** Displays a family page in HTML after an update, giving the parents of the
+    family parents listed in [with_parents]. Used by MergeFamOk *)
 
 val print_del : Config.config -> Geneweb_db.Driver.base -> unit
 (** Deletes a family and displays a page confirming its deletion *)

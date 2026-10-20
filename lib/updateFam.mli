@@ -1,4 +1,4 @@
-(* $Id: updateFam.mli,v 5.4 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: updateFam.mli v7.1 21/10/2026 00:29:35 $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -8,6 +8,7 @@ val person_key : Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> Update.key
 (** Returns the update key associated to a person *)
 
 val print_update_fam :
+  ?grandparents:(string * Update.key) list ->
   config ->
   Geneweb_db.Driver.base ->
   (Update.key, Geneweb_db.Driver.ifam, string) gen_family
@@ -15,7 +16,9 @@ val print_update_fam :
   * Update.key gen_descend ->
   string ->
   unit
-(** The main page for updating families. *)
+(** The main page for updating families. [grandparents] maps the input prefix
+    ["pa<k><j>"] of parent [j] of the family parent [k] to its key, when the
+    form is redisplayed. *)
 
 val print_add : config -> Geneweb_db.Driver.base -> unit
 (** Displays the form for adding families *)

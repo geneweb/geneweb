@@ -268,10 +268,11 @@
   <div class="row%if;(xcnt>1) mt-3%end;">
    <label for="paxcnt_fn" class="col-sm-2 col-form-label">%nn;
      [*first name/first names]0 <span class="fw-bold text-uppercase">
-     (%if;(xx.first_name!="" or xx.surname!="")%apply;nth_c%with;[M/F]0[M/F]1N%and;psex%end;
-      %else;%if;(xcnt=1)[M/F]0%else;[M/F]1%end;%end;)</span></label>
+     (%if;(xcnt>2)%if;(xcnt%2=1)[father/mother]0%else;[father/mother]1%end;
+      %elseif;(xx.create="link")%apply;nth_c%with;[M/F]0[M/F]1N%and;psex%end;
+      %elseif;(xcnt=1)[M/F]0%else;[M/F]1%end;)</span></label>
     <div class="col-sm-8">
-      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0"%datalist_fnames;%if;(evar.m="ADD_FAM" and xx.first_name="") autofocus%end; >
+      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0"%datalist_fnames;%if;(evar.m="ADD_FAM" and xcnt<3 and xx.first_name="") autofocus%end;>
     </div>
     <label for="paxcnt_occ" class="col-auto col-form-label visually-hidden">[*number]</label>
     <div class="col-sm-2">
@@ -281,7 +282,7 @@
   <div class="row mt-2">
     <label for="paxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
     <div class="col-sm-8">
-      <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0"%datalist_snames;>
+      <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="%if;(xcnt>2 and xcnt%2=1 and parent.surname!="")%parent.surname;%else;[*surname/surnames]0%end;"%datalist_snames;>
     </div>
     <div class="col-sm-2">
       <select class="form-select" id="paxcnt_p_selct" name="paxcnt_p"%if;(xx.index!="-1") data-pnoc-checked="%xx.first_name;|%xx.surname;|%if;(xx.occ!="" and xx.occ!="0")%xx.occ;%else;0%end;"%end;>
@@ -300,6 +301,23 @@
       </div>
     </div>
   </div>
+%end;
+
+%( pa<k><j>: parent j of family parent k; pa<k>_comment: their family comment (UpdateFamOk.reconstitute_grandparents) %)
+%define;grandparents(xcnt)
+  %let;gsex;%if;(parent.create="link")%parent.sex;%else;%expr(xcnt-1)%end;%in;
+  <details class="border rounded bg-body-tertiary mt-2 px-3 py-1"%if;(evar.paxcnt1_fn!="" or evar.paxcnt1_sn!=""
+    or evar.paxcnt2_fn!="" or evar.paxcnt2_sn!="" or evar.paxcnt_comment!="") open%end;>
+    <summary class="col-form-label fw-bold">%apply;capitalize(nth([his parents/her parents/their parents], gsex))</summary>
+    %apply;parent("xcnt1","grandparent.paxcnt1",0)
+    %apply;parent("xcnt2","grandparent.paxcnt2",1)
+    <div class="row my-2">
+      <label for="paxcnt_comment" class="col-sm-2 col-form-label">[*comment]</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" name="paxcnt_comment" id="paxcnt_comment" rows="1" placeholder="[*comment on the family of the parents]">%evar.paxcnt_comment;</textarea>
+      </div>
+    </div>
+  </details>
 %end;
 
 %define;insert_parent(xcnt)
@@ -589,13 +607,16 @@
   </p>
 
   <div class="card">
-    %apply;card_header("parents","parents")
+    %apply;card_header("spouses","spouse/spouses")
     <div class="card-body">
       <div class="row">
           %foreach;parent;
             %let;os;%parent.sexes;%in;
             <div class="col-12">
               %apply;parent(cnt,"parent",parent.sex)
+              %if;(not ("MRG" in evar.m) and not parent.has_parents)
+                %apply;grandparents(cnt)
+              %end;
             </div>
             %if;(cnt=2)
               <div class="form-check mt-3 ms-3">
