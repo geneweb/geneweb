@@ -793,6 +793,9 @@ let first_possible_duplication base ip (iexcl, fexcl) =
         let child i = Gwdb.poi base @@ Array.unsafe_get children i in
         first_possible_duplication_children iexcl len child eq
   | ifams ->
+      let wildcard_quest_string =
+        CheckItem.can_have_unnamed_spouse_duplicate base p ifams
+      in
       let len = Array.length ifams in
       let fams = Array.make len None in
       let spouses = Array.make len None in
@@ -813,12 +816,12 @@ let first_possible_duplication base ip (iexcl, fexcl) =
             sp
       in
       let dup =
-        let rec loop i =
-          if i = len then NoDup
+        let rec loop i deferred_dup =
+          if i = len then deferred_dup
           else
             let sp1 = spouse i in
-            let rec loop' j =
-              if j = len then loop (i + 1)
+            let rec loop' j deferred_dup_inner =
+              if j = len then loop (i + 1) deferred_dup_inner
               else
                 let sp2 = spouse j in
                 if Gwdb.get_iper sp1 = Gwdb.get_iper sp2 then
@@ -826,20 +829,32 @@ let first_possible_duplication base ip (iexcl, fexcl) =
                   let ifam2 = Array.unsafe_get ifams j in
                   if not (List.mem (ifam1, ifam2) fexcl) then
                     DupFam (ifam1, ifam2)
-                  else loop' (j + 1)
+                  else loop' (j + 1) deferred_dup_inner
                 else
                   let isp1 = Gwdb.get_iper sp1 in
                   let isp2 = Gwdb.get_iper sp2 in
-                  if List.mem (isp1, isp2) iexcl then loop' (j + 1)
-                  else if
-                    eq (Gwdb.get_first_name sp1) (Gwdb.get_first_name sp2)
-                    && eq (Gwdb.get_surname sp1) (Gwdb.get_surname sp2)
-                  then DupInd (isp1, isp2)
-                  else loop' (j + 1)
+                  if List.mem (isp1, isp2) iexcl then
+                    loop' (j + 1) deferred_dup_inner
+                  else
+                    let is_homonym =
+                      eq (Gwdb.get_first_name sp1) (Gwdb.get_first_name sp2)
+                      && eq (Gwdb.get_surname sp1) (Gwdb.get_surname sp2)
+                    in
+                    let is_unnamed =
+                      Person.is_empty_name sp1 || Person.is_empty_name sp2
+                    in
+                    if is_homonym && not is_unnamed then DupInd (isp1, isp2)
+                    else if is_homonym || wildcard_quest_string then
+                      let next_deferred =
+                        if deferred_dup_inner = NoDup then DupInd (isp1, isp2)
+                        else deferred_dup_inner
+                      in
+                      loop' (j + 1) next_deferred
+                    else loop' (j + 1) deferred_dup_inner
             in
-            loop' (i + 1)
+            loop' (i + 1) deferred_dup
         in
-        loop 0
+        loop 0 NoDup
       in
       if dup <> NoDup then dup
       else
