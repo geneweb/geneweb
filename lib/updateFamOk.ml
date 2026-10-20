@@ -1232,12 +1232,11 @@ let print_add o_conf base =
         Update.delete_topological_sort conf base;
         print_add_ok conf base (wl, ml) cpl des
 
-(* If we only have two linked parents,
-   with one linked child and not other informations,
-   and if a union already exists between the parents,
-   edit the existing union in order to add a child.
-   Else, create a new union. *)
+(* If we only have two linked parents, with one linked child and not other
+   informations, and if a union already exists between the parents, edit the
+   existing union in order to add a child. Else, create a new union. *)
 let print_add_parents o_conf base =
+  let () = removed_string := [] in
   let conf = Update.update_conf o_conf in
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let sfam, scpl, sdes, _ = reconstitute_family conf base nsck in
