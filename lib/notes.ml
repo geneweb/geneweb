@@ -958,3 +958,77 @@ let get_linked_page_family conf base ifam s =
   let db = Driver.read_nldb base in
   let db = merge_possible_aliases conf db in
   List.fold_left (linked_page_text_family conf base ifam s) (Adef.safe "") db
+
+(* [deprecated] TYPE=album is accepted on read for backward compatibility
+   with notes, all new notes always write TYPE=gallery. *)
+let norm_type = function "album" -> "gallery" | t -> t
+
+let is_ancestor conf base anc =
+  let restrict_for_spouses =
+    try List.assoc "restrict_for_spouses" conf.base_env = "yes"
+    with Not_found -> false
+  in
+  let max =
+    match List.assoc_opt "restrict_note_max" conf.base_env with
+    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
+    | None -> 32
+  in
+  let test_ancestor p1 p2 =
+    let ip1 = Driver.get_iper p1 in
+    let ip2 = Driver.get_iper p2 in
+    ip1 = ip2
+    || try Gutil.is_ancestor ~max base p1 p2 with Gutil.Same_person -> true
+  in
+  let bad_format n =
+    Log.warn (fun k -> k "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
+  in
+  if String.length anc <= 4 then (
+    bad_format 1;
+    false)
+  else
+    match
+      String.split_on_char '/' (String.sub anc 2 (String.length anc - 4))
+    with
+    | [ fn; sn; oc ] -> (
+        let oc =
+          match int_of_string_opt oc with
+          | Some oc -> oc
+          | None ->
+              bad_format 3;
+              0
+        in
+        match
+          ( Driver.person_of_key base (Name.lower fn) (Name.lower sn) oc,
+            conf.user_iper )
+        with
+        | Some anc_ip, Some user_ip ->
+            test_ancestor (Driver.poi base anc_ip) (Driver.poi base user_ip)
+            || restrict_for_spouses
+               &&
+               let families = Driver.get_family (Driver.poi base user_ip) in
+               Array.exists
+                 (fun fam ->
+                   let fam = Driver.foi base fam in
+                   let fath_ip = Driver.get_father fam in
+                   let moth_ip = Driver.get_mother fam in
+                   let spouse_ip =
+                     if user_ip = fath_ip then moth_ip else fath_ip
+                   in
+                   test_ancestor (Driver.poi base anc_ip)
+                     (Driver.poi base spouse_ip))
+                 families
+        | _ -> false)
+    | [] | _ :: _ ->
+        bad_format 2;
+        false
+
+let rec is_restricted conf base anc_l =
+  match anc_l with
+  | [] -> true
+  | anc :: l ->
+      if is_ancestor conf base anc then false else is_restricted conf base l
+
+let note_is_restricted conf base nenv =
+  match List.assoc_opt "RESTRICT" nenv with
+  | None | Some "" -> false
+  | Some l -> is_restricted conf base (String.split_on_char ',' l)

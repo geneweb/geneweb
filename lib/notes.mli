@@ -196,3 +196,12 @@ val mark_pnocs_validity : Geneweb_db.Driver.base -> string -> string
 val save_cache_linked_pages : string -> (Def.NLDB.key, int) Hashtbl.t -> unit
 (** [save_cache_linked_pages bdir ht] atomically replaces the linked-pages cache
     of base directory [bdir] with [ht]. Raises [Sys_error] on failure. *)
+
+val norm_type : string -> string
+(** [norm_type t] is the note TYPE [t], the deprecated [album] being read as
+    [gallery]. *)
+
+val note_is_restricted :
+  Config.config -> Geneweb_db.Driver.base -> (string * string) list -> bool
+(** [note_is_restricted conf base nenv] is [true] if the note header [nenv] has
+    a RESTRICT list that hides the note from the user. *)
