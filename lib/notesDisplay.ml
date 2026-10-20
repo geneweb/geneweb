@@ -12,72 +12,6 @@ module Gutil = Geneweb_db.Gutil
 module Server = Geneweb_http.Server
 module Connection = Geneweb_http.Connection
 
-(* [deprecated] TYPE=album is accepted on read for backward compatibility
-   with notes, all new notes always write TYPE=gallery. *)
-let norm_type = function "album" -> "gallery" | t -> t
-
-let is_ancestor conf base anc =
-  let restrict_for_spouses =
-    try List.assoc "restrict_for_spouses" conf.base_env = "yes"
-    with Not_found -> false
-  in
-  let max =
-    match List.assoc_opt "restrict_note_max" conf.base_env with
-    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
-    | None -> 32
-  in
-  let test_ancestor p1 p2 =
-    let ip1 = Driver.get_iper p1 in
-    let ip2 = Driver.get_iper p2 in
-    ip1 = ip2
-    || try Gutil.is_ancestor ~max base p1 p2 with Gutil.Same_person -> true
-  in
-  let bad_format n =
-    Log.warn (fun k -> k "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
-  in
-  if String.length anc <= 4 then (
-    bad_format 1;
-    false)
-  else
-    let anc = String.sub anc 2 (String.length anc - 4) in
-    let parts = String.split_on_char '/' anc in
-    if List.length parts <> 3 then (
-      bad_format 2;
-      false)
-    else
-      let fn = List.nth parts 0 |> Name.lower in
-      let sn = List.nth parts 1 |> Name.lower in
-      let oc =
-        try int_of_string (List.nth parts 2)
-        with Failure _ ->
-          bad_format 3;
-          0
-      in
-      match (Driver.person_of_key base fn sn oc, conf.user_iper) with
-      | Some anc_ip, Some user_ip ->
-          test_ancestor (Driver.poi base anc_ip) (Driver.poi base user_ip)
-          || restrict_for_spouses
-             &&
-             let families = Driver.get_family (Driver.poi base user_ip) in
-             Array.exists
-               (fun fam ->
-                 let fam = Driver.foi base fam in
-                 let fath_ip = Driver.get_father fam in
-                 let moth_ip = Driver.get_mother fam in
-                 let spouse_ip =
-                   if user_ip = fath_ip then moth_ip else fath_ip
-                 in
-                 test_ancestor (Driver.poi base anc_ip)
-                   (Driver.poi base spouse_ip))
-               families
-      | _ -> false
-
-let rec is_restricted conf base anc_l =
-  match anc_l with
-  | [] -> true
-  | anc :: l ->
-      if is_ancestor conf base anc then false else is_restricted conf base l
-
 let print_search_form conf from_note =
   Output.printf conf
     {|<div class="mt-3">
@@ -376,15 +310,7 @@ let print_linked_list_gallery conf base ?person pgl =
           let typ =
             try norm_type (List.assoc "TYPE" nenv) with Not_found -> ""
           in
-          let restrict_l =
-            try List.assoc "RESTRICT" nenv with Not_found -> ""
-          in
-          let restrict_l =
-            if restrict_l = "" then [] else String.split_on_char ',' restrict_l
-          in
-          if
-            (restrict_l = [] || not (is_restricted conf base restrict_l))
-            && typ = "gallery"
+          if (not (Notes.note_is_restricted conf base nenv)) && typ = "gallery"
           then
             let title = try List.assoc "TITLE" nenv with Not_found -> "" in
             let items =
@@ -417,13 +343,7 @@ let print_linked_list_standard conf base ?person pgl =
       match pg with
       | Def.NLDB.PgMisc fnotes ->
           let nenv, _ = read_notes base fnotes in
-          let restrict_l =
-            try List.assoc "RESTRICT" nenv with Not_found -> ""
-          in
-          let restrict_l =
-            if restrict_l = "" then [] else String.split_on_char ',' restrict_l
-          in
-          if restrict_l = [] || not (is_restricted conf base restrict_l) then (
+          if not (Notes.note_is_restricted conf base nenv) then (
             Output.print_sstring conf "\n<tr>";
             let pgl =
               match List.assoc_opt fnotes db with
@@ -537,11 +457,7 @@ let print conf base =
     | None -> ""
   in
   let nenv, s = read_notes base fnotes in
-  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
-  let restrict_l =
-    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
-  in
-  if restrict_l <> [] && is_restricted conf base restrict_l then
+  if Notes.note_is_restricted conf base nenv then
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
   else
@@ -570,11 +486,7 @@ let print_mod conf base =
       | None -> ""
   in
   let nenv, s = if is_new_note then ([], "") else read_notes base fnotes in
-  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
-  let restrict_l =
-    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
-  in
-  if restrict_l <> [] && is_restricted conf base restrict_l then
+  if Notes.note_is_restricted conf base nenv then
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
   else
@@ -771,11 +683,7 @@ let check_note_access ~is_new conf base =
       | None -> ""
   in
   let nenv, _s = if is_new then ([], "") else read_notes base fnotes in
-  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
-  let restrict_l =
-    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
-  in
-  restrict_l = [] || not (is_restricted conf base restrict_l)
+  not (Notes.note_is_restricted conf base nenv)
 
 let print_gallery conf base =
   if check_note_access ~is_new:false conf base then
