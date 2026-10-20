@@ -91,7 +91,6 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
         @:: Option.map (fun merge -> ("merge", [ Bool.to_string merge ])) merge
         @?: [])
   in
-
   next_step_buttons ~conf ~cancel_url:(make_url `Cancel) (make_url `Proceed);
   Hutil.trailer conf
 
