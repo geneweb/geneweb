@@ -376,6 +376,10 @@ fr: Autour de l’arbre
       <a class="btn btn-outline-primary" href="%prefix;m=MISC_NOTES">%nn;
       <i class="fas fa-align-justify fa-fw me-1" aria-hidden="true"></i>[*base index notes]</a>
     %end;
+    %if;(has_misc_notes or wizard or friend)
+      <a class="btn btn-outline-primary" href="%prefix;m=NOTES_SEARCH">%nn;
+      <i class="fas fa-magnifying-glass fa-fw me-1" aria-hidden="true"></i>[*notes search]</a>
+    %end;
     %if;((wizard or friend) and
         (b.wizard_passwd_file!="" or b.wizard_descr_file!=""))
        <a class="btn btn-outline-primary" href="%prefix;m=WIZNOTES">%nn;

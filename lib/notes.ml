@@ -1032,3 +1032,19 @@ let note_is_restricted conf base nenv =
   match List.assoc_opt "RESTRICT" nenv with
   | None | Some "" -> false
   | Some l -> is_restricted conf base (String.split_on_char ',' l)
+
+let note_file base fnotes =
+  if fnotes = "" then Some "notes"
+  else
+    match NotesLinks.check_file_name fnotes with
+    | Some (dl, f) ->
+        Some
+          (String.concat "/"
+             (Driver.base_notes_dir base
+             :: List.fold_right (fun d acc -> d :: acc) dl [ f ^ ".txt" ]))
+    | None -> None
+
+let is_gallery nenv =
+  match List.assoc_opt "TYPE" nenv with
+  | Some t -> norm_type t = "gallery"
+  | None -> false

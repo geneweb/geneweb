@@ -380,7 +380,8 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     | Some (case_sens, h) -> html_highlight case_sens h s
     | None -> s
   in
-  Output.print_string conf (Util.safe_html s);
+  Output.print_string conf
+    (NotesSearch.highlight_note ~anchor:true conf (Util.safe_html s));
   Output.print_sstring conf "</td></tr></table>";
   if Sys.file_exists wfile then (
     let tm = Unix.localtime date in
@@ -438,6 +439,19 @@ let wizard_auth_file_name conf =
   with
   | (Some "" | None), (Some "" | None) -> ""
   | Some auth_file, _ | _, Some auth_file -> auth_file
+
+let wizards conf base = List.sort compare (wizard_list_from_dir conf base)
+
+let wizard_note conf base wz =
+  fst (read_wizard_notes (wzfile (wiz_dir conf base) (Filename.basename wz)))
+
+let wizard_display_name conf wz =
+  match wizard_auth_file_name conf with
+  | "" -> wz
+  | auth_file -> (
+      match List.assoc_opt wz (read_auth_file auth_file conf.bname) with
+      | Some (name, _) -> name
+      | None -> wz)
 
 let print conf base =
   let auth_file = wizard_auth_file_name conf in

@@ -13,7 +13,9 @@
   oidc_test
   userkey_test
   cache_test
-  blank_name_test)
+  blank_name_test
+  notes_search_test
+  notes_corpus_test)
  (libraries alcotest geneweb geneweb.oidc fmt))
 
 (test

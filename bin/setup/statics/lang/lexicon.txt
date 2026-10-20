@@ -283,6 +283,12 @@ co: Lochi.
 en: Places.
 fr: Lieux.
 
+    notes
+aa: cache_file.htm
+en: Person, family and event notes (for notes search).
+fr: Notes des personnes, familles et événements (pour la recherche dans les \
+  notes).
+
     all
 aa: cache_file.htm
 co: Custruisce tutti i schedarii d’impiatta.
