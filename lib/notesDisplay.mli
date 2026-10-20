@@ -101,8 +101,6 @@ val print_misc_notes : Config.config -> Driver.base -> unit
     database, under a "files not in db" heading. *)
 
 val print_misc_notes_search : Config.config -> Driver.base -> unit
-(** [print_misc_notes_search conf base] dispatches a text search request: reads
-    [s] (the search string) from the URL and [c=on] for case sensitivity, walks
-    the notes database, and renders the first matching note (via
-    {!print_whole_notes} with search highlighting) or falls back to
-    {!print_misc_notes} if no match is found. *)
+(** [print_misc_notes_search conf base] serves [m=MISC_NOTES_SEARCH], kept for
+    old links: with [s], the notes search {!NotesSearchDisplay.print}; otherwise
+    the misc notes list. *)

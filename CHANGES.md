@@ -50,6 +50,16 @@
   `robot` tool takes the same lock when it writes the file.
 - The `robot` tool accepts `-bd <dir>` anywhere on its command line.
 - `robot -status` shows the base each monitored IP was last seen on (#3069).
+- New notes search (`m=NOTES_SEARCH`, also reached by the former
+  `m=MISC_NOTES_SEARCH`): AND-ed words, "phrases", `-` exclusions, `?`
+  and, with word match, `*` jokers. Misc notes are searched for everybody
+  (honouring `RESTRICT`); wizard, person, family and event notes for
+  friends and wizards. The latter need the index built by
+  `cache_files -notes` (also part of `-all`); changes made since are searched
+  directly, so it needs rebuilding only after the base is regenerated (gwc).
+  Base parameter `notes_search_max_results` (default 500).
+- Case-insensitive text searches (notes, history) treat the apostrophes
+  ' and ’ as equal (#3051).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

@@ -185,6 +185,11 @@ zh: 网络家谱
             <a href="%prefix;m=MISC_NOTES">[*base index notes]</a>
           </li>
         %end;
+        %if;(has_misc_notes or wizard or friend)
+          <li>
+            <a href="%prefix;m=NOTES_SEARCH">[*notes search]</a>
+          </li>
+        %end;
         %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
              and (wizard or wiznotes_dir_exists) and
                  bvar.authorized_wizards_notes = "yes")

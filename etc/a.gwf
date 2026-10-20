@@ -84,6 +84,11 @@
 # Notes = individual note or Marriage note.
 #no_note_for_visitor=yes
 
+# Maximum number of person, family and event notes listed by the notes
+# search (m=NOTES_SEARCH), unless the k parameter of the search form says
+# otherwise.
+#notes_search_max_results=500
+
 # There are multiple access control parameters as documented in
 # https://geneweb.tuxfamily.org/wiki/access
 #

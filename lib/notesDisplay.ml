@@ -12,52 +12,15 @@ module Gutil = Geneweb_db.Gutil
 module Server = Geneweb_http.Server
 module Connection = Geneweb_http.Connection
 
-let print_search_form conf from_note =
-  Output.printf conf
-    {|<div class="mt-3">
-<form class="d-flex align-items-center gap-2" method="get" action="%s">|}
-    conf.command;
-  hidden_env conf;
-  Output.print_sstring conf
-    {|<input type="hidden" name="m" value="MISC_NOTES_SEARCH">|};
-  (match from_note with
-  | Some n ->
-      Output.print_sstring conf {|<input type="hidden" name="z" value="|};
-      Output.print_string conf (Util.escape_html n);
-      Output.print_sstring conf {|">|}
-  | None -> ());
-  Output.print_sstring conf
-    {|<input type="text" name="s" size="40" class="form-control w-auto" value="|};
-  (match p_getenv conf.env "s" with
-  | Some s -> Output.print_string conf (Util.escape_html s)
-  | None -> ());
-  Output.print_sstring conf "\">";
-  Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
-  Output.printf conf
-    {|<input type="checkbox" name="c" value="on" class="form-check-input" id="case"%s>|}
-    (match p_getenv conf.env "c" with
-    | Some "on" -> " checked"
-    | Some _ | None -> "");
-  Output.printf conf {|<label class="form-check-label" for="case">%s</label>|}
-    (transl_nth conf "search/case sensitive" 1);
-  Output.print_sstring conf "</div>";
-  Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
-  transl_nth conf "search/case sensitive" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button>\n</form>\n</div>"
+let print_search_form conf =
+  NotesSearchDisplay.print_form conf (NotesSearchDisplay.query_of_env conf)
 
-let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
+let print_whole_notes conf base fnotes (title : Adef.safe_string) s =
   Hutil.header_without_title conf;
   let title_html =
     if (title :> string) <> "" then
-      let title_text =
-        match ho with
-        | Some (case_sens, h) ->
-            html_highlight case_sens h (title : Adef.safe_string :> string)
-            |> Adef.safe
-        | None -> title
-      in
-      Format.sprintf "<h1>%s</h1>" (title_text :> string)
+      Format.sprintf "<h1>%s</h1>"
+        (NotesSearch.highlight_note conf title :> string)
     else ""
   in
   let modbtn =
@@ -97,9 +60,8 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     in
     Wiki.html_with_summary_of_tlsw conf wi edit_opt s
   in
-  let s = Util.safe_html s in
-  Output.print_string conf s;
-  if ho <> None then print_search_form conf (Some fnotes);
+  Output.print_string conf
+    (NotesSearch.highlight_note ~anchor:true conf (Util.safe_html s));
   Hutil.trailer conf
 
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
@@ -465,7 +427,7 @@ let print conf base =
     let title = Util.safe_html title in
     match p_getint conf.env "v" with
     | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-    | None -> print_whole_notes conf base fnotes title s None
+    | None -> print_whole_notes conf base fnotes title s
 
 let print_mod_gallery_json conf base =
   let nenv, s = read_notes_from_conf conf base in
@@ -863,44 +825,9 @@ let print_misc_notes conf base =
       (fun f -> one_file (Filename.basename (Util.note_link_to_sys f)) false)
       files;
     Output.print_sstring conf {|</div>|});
-  if d = "" then print_search_form conf None;
+  if d = "" then print_search_form conf;
   Hutil.trailer conf
 
-(* searching *)
-let search_text conf base s =
-  let s = if s = "" then " " else s in
-  let case_sens = p_getenv conf.env "c" = Some "on" in
-  let db =
-    let db = notes_links_db conf base true in
-    let db = "" :: List.map fst db in
-    match p_getenv conf.env "z" with
-    | None -> db
-    | Some f ->
-        let rec loop = function
-          | fnotes :: list -> if f = fnotes then list else loop list
-          | [] -> []
-        in
-        loop db
-  in
-  let noteo =
-    let rec loop = function
-      | fnotes :: list ->
-          let nenv, nt = read_notes base fnotes in
-          let tit = try List.assoc "TITLE" nenv with Not_found -> "" in
-          if in_text case_sens s tit || in_text case_sens s nt then
-            Some (fnotes, tit, nt)
-          else loop list
-      | [] -> None
-    in
-    loop db
-  in
-  match noteo with
-  | Some (fnotes, tit, nt) ->
-      print_whole_notes conf base fnotes (Util.safe_html tit) nt
-        (Some (case_sens, s))
-  | None -> print_misc_notes conf base
-
 let print_misc_notes_search conf base =
-  match try Some (List.assoc "s" conf.env) with Not_found -> None with
-  | Some s -> search_text conf base (Mutil.gen_decode false s)
-  | None -> print_misc_notes conf base
+  if List.mem_assoc "s" conf.env then NotesSearchDisplay.print conf base
+  else print_misc_notes conf base

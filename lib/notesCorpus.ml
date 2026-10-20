@@ -1,0 +1,225 @@
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
+module Database = Geneweb_db.Database
+
+let src = Logs.Src.create ~doc:"NotesCorpus" "NCORP"
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
+type kind = Person | Family | Person_event | Family_event
+type entry = { kind : kind; id : string; evt : int; text : string }
+type t = { fingerprint : string; built : float; synchro_len : int }
+
+(* File format: a text header, then one line per note:
+     GWNOTES <version>
+     <fingerprint>
+     <build time>
+     <synchro_len>
+     <kind> <id>\t<folded text>
+   The text is [NotesSearch.fold] of the plain text: one line, as plain_text
+   turns new lines and tabs into spaces. It is read line by line, so that a
+   search needs neither the whole file in memory nor a deserialisation.
+   [current_version] is bumped when the format changes; an older file is then
+   [Outdated]. *)
+let magic = "GWNOTES"
+let current_version = 3
+let ( // ) = Filename.concat
+let gwb_dir bname = Secure.base_dir () // (bname ^ ".gwb")
+
+(* The "base" file of a .gwb is only rewritten by a full rebuild (gwc,
+   gwfixbase...), which also renumbers persons and families; commits from
+   gwd go to "patches" and are followed with [changes]. *)
+let fingerprint bname =
+  match Unix.stat (gwb_dir bname // "base") with
+  | st -> Printf.sprintf "%.0f-%d" st.Unix.st_mtime st.Unix.st_size
+  | exception Unix.Unix_error _ -> ""
+
+let synchro bname = (Database.input_synchro (gwb_dir bname)).synch_list
+
+let entry kind id evt note acc =
+  let text = NotesSearch.plain_text note in
+  if text = "" then acc else { kind; id; evt; text } :: acc
+
+let person_entries base p =
+  let id = Driver.Iper.to_string (Driver.get_iper p) in
+  let acc = entry Person id (-1) (Driver.sou base (Driver.get_notes p)) [] in
+  let _, acc =
+    List.fold_left
+      (fun (k, acc) e ->
+        (k + 1, entry Person_event id k (Driver.sou base e.Def.epers_note) acc))
+      (0, acc) (Driver.get_pevents p)
+  in
+  List.rev acc
+
+let family_entries base ifam fam =
+  let id = Driver.Ifam.to_string ifam in
+  let acc =
+    entry Family id (-1) (Driver.sou base (Driver.get_comment fam)) []
+  in
+  let _, acc =
+    List.fold_left
+      (fun (k, acc) e ->
+        (k + 1, entry Family_event id k (Driver.sou base e.Def.efam_note) acc))
+      (0, acc) (Driver.get_fevents fam)
+  in
+  List.rev acc
+
+let header bname =
+  {
+    fingerprint = fingerprint bname;
+    built = Unix.time ();
+    synchro_len = List.length (synchro bname);
+  }
+
+let kind_code kind =
+  match kind with
+  | Person -> "p"
+  | Family -> "f"
+  | Person_event -> "pe"
+  | Family_event -> "fe"
+
+let kind_of_code c =
+  match c with
+  | "p" -> Some Person
+  | "f" -> Some Family
+  | "pe" -> Some Person_event
+  | "fe" -> Some Family_event
+  | _ -> None
+
+let output_header oc h =
+  Printf.fprintf oc "%s %d\n%s\n%.0f\n%d\n" magic current_version h.fingerprint
+    h.built h.synchro_len
+
+let output_entry oc e =
+  Printf.fprintf oc "%s %s\t%s\n" (kind_code e.kind) e.id
+    (NotesSearch.fold e.text)
+
+let file bname = GWPARAM.cache_d bname // (bname ^ "_notes_search.cache")
+
+let with_output bname f =
+  let file = file bname in
+  Filesystem.create_dir ~parent:true (Filename.dirname file);
+  let tmp = file ^ ".tmp" in
+  let r =
+    Secure.with_open_out_bin tmp (fun oc ->
+        output_header oc (header bname);
+        f oc)
+  in
+  Sys.rename tmp file;
+  r
+
+let write bname entries =
+  with_output bname (fun oc -> List.iter (output_entry oc) entries)
+
+let build ?(progress = fun _ _ -> ()) base =
+  let bname = Driver.bname base in
+  let ipers = Driver.ipers base in
+  let ifams = Driver.ifams base in
+  let n_pers = Collection.length ipers in
+  let total = n_pers + Collection.length ifams in
+  with_output bname (fun oc ->
+      let n =
+        Collection.fold
+          (fun (i, n) iper ->
+            progress i total;
+            let es = person_entries base (Driver.poi base iper) in
+            List.iter (output_entry oc) es;
+            (i + 1, n + List.length es))
+          (0, 0) ipers
+        |> snd
+      in
+      Collection.fold
+        (fun (i, n) ifam ->
+          progress i total;
+          let es = family_entries base ifam (Driver.foi base ifam) in
+          List.iter (output_entry oc) es;
+          (i + 1, n + List.length es))
+        (n_pers, n) ifams
+      |> snd)
+
+type status = Missing | Outdated | Available of t
+
+let input_header ic =
+  let ( let* ) = Option.bind in
+  let line () = In_channel.input_line ic in
+  let* m = line () in
+  let* fingerprint = line () in
+  let* built = Option.bind (line ()) float_of_string_opt in
+  let* synchro_len = Option.bind (line ()) int_of_string_opt in
+  if m = Printf.sprintf "%s %d" magic current_version then
+    Some { fingerprint; built; synchro_len }
+  else None
+
+let read bname =
+  let outdated why =
+    Log.warn (fun k ->
+        k "%s: outdated notes index (%s), run: cache_files -notes %s" bname why
+          bname);
+    Outdated
+  in
+  match Secure.with_open_in_bin (file bname) input_header with
+  | exception Sys_error _ ->
+      Log.warn (fun k ->
+          k "%s: no notes index, run: cache_files -notes %s" bname bname);
+      Missing
+  | None -> outdated "other file format"
+  | Some h ->
+      let fp = fingerprint bname in
+      if h.fingerprint <> fp then
+        outdated (Printf.sprintf "base %s, index built for %s" fp h.fingerprint)
+      else if h.synchro_len > List.length (synchro bname) then
+        outdated "synchro_patches reset"
+      else Available h
+
+let fold_entries bname f acc =
+  Secure.with_open_in_bin (file bname) @@ fun ic ->
+  match input_header ic with
+  | None -> acc
+  | Some _ ->
+      let rec loop acc =
+        match In_channel.input_line ic with
+        | None -> acc
+        | Some l -> (
+            match String.index_opt l '\t' with
+            | None -> loop acc
+            | Some tab -> (
+                match String.split_on_char ' ' (String.sub l 0 tab) with
+                | [ k; id ] -> (
+                    match kind_of_code k with
+                    | Some kind ->
+                        let text =
+                          String.sub l (tab + 1) (String.length l - tab - 1)
+                        in
+                        loop (f kind id text acc)
+                    | None -> loop acc)
+                | [] | _ :: _ -> loop acc))
+      in
+      loop acc
+
+let changes bname corpus =
+  let l = synchro bname in
+  (* newest commits first: the ones after the build are the first
+     [length - synchro_len] *)
+  let rec take n l acc =
+    match l with
+    | (_, ipl, ifl) :: rest when n > 0 ->
+        let ps, fs = acc in
+        let ps =
+          List.fold_left
+            (fun s i ->
+              Driver.Iper.Set.add (Driver.Iper.of_string (string_of_int i)) s)
+            ps ipl
+        in
+        let fs =
+          List.fold_left
+            (fun s i ->
+              Driver.Ifam.Set.add (Driver.Ifam.of_string (string_of_int i)) s)
+            fs ifl
+        in
+        take (n - 1) rest (ps, fs)
+    | _ :: _ | [] -> acc
+  in
+  take
+    (List.length l - corpus.synchro_len)
+    l
+    (Driver.Iper.Set.empty, Driver.Ifam.Set.empty)

@@ -15349,6 +15349,86 @@ pt: notas sobre o casamento/notas sobre os casamentos
 sv: anteckningar om vigseln/anteckningar om vigslarna
 tr: evlilik notları/evlilik notları
 
+    notes search
+de: Notizen durchsuchen
+en: search notes
+es: buscar en las notas
+fr: rechercher notes
+it: cerca nelle note
+nl: notities doorzoeken
+pt: pesquisar nas notas
+sv: sök i noteringar
+
+    notes search first results %d
+de: nur die ersten %d Ergebnisse werden angezeigt
+en: only the first %d results are shown
+fr: seuls les %d premiers résultats sont affichés
+
+    notes search help
+de: Suchsyntax
+en: query syntax
+fr: syntaxe de la recherche
+
+    notes search help and
+de: Notizen, die alle diese Wörter enthalten, in beliebiger Reihenfolge
+en: notes containing all these words, in any order
+fr: notes contenant tous ces mots, dans n’importe quel ordre
+
+    notes search help case
+de: mit „Groß- & Kleinschreibung beachten“ ist der Vergleich exakt; ohne werden Groß-/Kleinschreibung und Akzente ignoriert und die Apostrophe ’ und ' gleich behandelt
+en: with “case sensitive”, the comparison is exact; without it, case and accents are ignored and the apostrophes ’ and ' are the same
+fr: avec « sensible à la casse », la comparaison est exacte ; sans, majuscules et accents sont ignorés et les apostrophes ’ et ' confondues
+
+    notes search help exclude
+de: ein Minuszeichen (-) davor schließt die Notizen mit diesem Wort (oder dieser „Phrase“) aus
+en: a leading minus sign (-) excludes the notes containing this word (or this “phrase”)
+fr: un signe moins (-) en tête exclut les notes contenant ce mot (ou cette « phrase »)
+
+    notes search help joker
+de: das Fragezeichen steht für genau ein Zeichen, auch ein Leerzeichen
+en: the question mark stands for exactly one character, a space included
+fr: le point d’interrogation remplace exactement un caractère, espace compris
+
+    notes search help phrase
+de: genau diese Wortfolge
+en: this exact sequence of words
+fr: cette suite de mots exacte
+
+    notes search help star
+de: mit „ganzes Wort“ steht ein Sternchen am Anfang oder Ende für den Rest des Wortes
+en: with “word match”, an asterisk at the start or end stands for the rest of the word
+fr: avec « mot complet », un astérisque au début ou à la fin remplace le reste du mot
+
+    notes search help word
+de: mit „ganzes Wort“ darf das Wort nicht Teil eines längeren Wortes sein
+en: with “word match”, the word must not be part of a longer word
+fr: avec « mot complet », le mot ne doit pas faire partie d’un mot plus long
+
+    notes search index changes %d
+de: seither geänderte Personen oder Familien, direkt aus der Datenbank gelesen: %d
+en: persons or families modified since, read directly from the base: %d
+fr: individus ou familles modifiés depuis, lus directement dans la base : %d
+
+    notes search index date %s
+de: Notizenindex vom %s
+en: notes index of %s
+fr: index des notes du %s
+
+    notes search index missing %s
+de: Der Notizenindex wurde noch nicht erstellt: „cache_files -notes %s“ auf dem Server ausführen.
+en: The notes index has not been built yet: run “cache_files -notes %s” on the server.
+fr: L’index des notes n’a pas encore été construit : lancer « cache_files -notes %s » sur le serveur.
+
+    notes search index outdated %s
+de: Der Notizenindex stammt von einer älteren Version der Datenbank: „cache_files -notes %s“ erneut ausführen.
+en: The notes index was built for an earlier version of the base: run “cache_files -notes %s” again.
+fr: L’index des notes date d’une version antérieure de la base : relancer « cache_files -notes %s ».
+
+    notes search scopes
+de: Diverse Notizen/Notizen der Meister/Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen
+en: miscellaneous notes/wizard notes/individual notes/family notes/individual event notes/family event notes
+fr: notes diverses/notes des magiciens/notes d’individus/notes de familles/notes d’événements individuels/notes d’événements familiaux
+
     notes summary
 bg: резюме на бележките
 co: riassuntu di e note diverse
