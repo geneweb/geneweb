@@ -952,8 +952,8 @@
         %else;
           %if;(event.has_note or event.has_src)data-bs-toggle="tooltip" data-bs-html="true"
             title='<div class="text-wrap text-start">
-              %if;event.has_note;<div><span class="fw-bold">%apply;a_of_b%with;[*note/notes]1%and;%event.name;%end;[:]</span> %event.note;.</div>%end;
-              %if;event.has_src;<div%if;event.has_note; class="mt-2"%end;><span class="fw-bold">%apply;a_of_b%with;[*source/sources]1%and;%event.name;%end;[:]</span> %event.src;.</div>%end;</div>'
+              %if;event.has_note;<div><span class="fw-bold">%apply;a_of_event%with;[*note/notes]1%and;%event.name_of;%and;%event.name;%end;[:]</span> %event.note;.</div>%end;
+              %if;event.has_src;<div%if;event.has_note; class="mt-2"%end;><span class="fw-bold">%apply;a_of_event%with;[*source/sources]1%and;%event.name_of;%and;%event.name;%end;[:]</span> %event.src;.</div>%end;</div>'
           %else;title="%apply;capitalize(event.name)"%nn;
           %end;
         %end;

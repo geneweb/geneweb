@@ -146,6 +146,27 @@ let util_transl_a_of_b _ =
   test "naissance de <b>Jean</b>" ("naissance", "<b>Jean</b>", "Jean");
   test "naissance d'<b>André</b>" ("naissance", "<b>André</b>", "André")
 
+let eventform_lookup _ =
+  let conf = { Config.empty with lexicon = Hashtbl.create 4 } in
+  Hashtbl.add conf.lexicon "funeral (at)" "aux funérailles";
+  Hashtbl.add conf.lexicon "occupation (of)" "de la profession";
+  Hashtbl.add conf.lexicon "%1 %2 (of event)" "%1 %2";
+  let opt = option string in
+  (check string) "form_key" "baptism (at)"
+    (EventForm.form_key EventForm.At "baptism");
+  (check string) "stacked key" "occupation (of)"
+    (EventForm.form_key EventForm.Of "occupation/occupations");
+  (check opt) "at" (Some "aux funérailles")
+    (EventForm.pevent conf EventForm.At Def.Epers_Funeral);
+  (check opt) "missing form" None
+    (EventForm.pevent conf EventForm.Of Def.Epers_Funeral);
+  (check opt) "stacked" (Some "de la profession")
+    (EventForm.pevent conf EventForm.Of Def.Epers_Occupation);
+  (check opt) "custom event" None
+    (EventForm.fevent conf EventForm.At (Def.Efam_Name "x"));
+  (check string) "a of event" "notes de la profession"
+    (Util.transl_a_of_event conf "notes" "de la profession")
+
 let util_string_with_macros _ =
   let conf = Config.empty in
   (check string) ""
@@ -237,6 +258,7 @@ let v =
       [
         test_case "Util.safe_html" `Quick util_safe_html;
         test_case "Util.transl_a_of_b" `Quick util_transl_a_of_b;
+        test_case "EventForm lookup" `Quick eventform_lookup;
         test_case "Util.string_with_macros" `Quick util_string_with_macros;
         test_case "Util.escape_html" `Quick util_escape_html;
         test_case "Util.start_with_vowel" `Quick start_with_vowel;
