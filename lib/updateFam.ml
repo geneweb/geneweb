@@ -525,6 +525,7 @@ let print_update_fam conf base fcd digest =
             print_foreach;
           }
       in
+      sexes := -1;
       Templ.output conf ifun env fcd "updfam"
   | Some _ | None -> Hutil.incorrect_request conf
 
