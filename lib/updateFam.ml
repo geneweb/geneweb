@@ -447,7 +447,9 @@ and eval_special_var conf base = function
           let p = Driver.poi base (Driver.Iper.of_string i) in
           Perso.interp_templ ~no_headers:true "menubar" conf base p;
           VVstring ""
-      | None -> VVstring "")
+      | None ->
+          Hutil.include_home_template conf;
+          VVstring "")
   | _ -> raise Not_found
 
 and eval_int_env var env =

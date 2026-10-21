@@ -4,6 +4,10 @@ open Config
 
 val header_without_http_nor_home : config -> (bool -> unit) -> unit
 
+val include_home_template : config -> unit
+(** [include_home_template conf] prints [home.txt]: the floating home, search
+    and random person buttons. *)
+
 val header_with_title :
   ?error:bool ->
   ?fluid:bool ->
