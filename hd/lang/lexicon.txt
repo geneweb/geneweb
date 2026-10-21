@@ -15482,6 +15482,16 @@ de: Die Datenbank <b>%s</b> existiert nicht.
 en: Database <b>%s</b> does not exist.
 fr: La base de données <b>%s</b> n’existe pas.
 
+    NOTIF_TT incompatible base
+de: Inkompatibles Datenbankformat!
+en: Incompatible database format!
+fr: Format de base incompatible !
+
+    NOTIF incompatible base %s %s %s
+de: Die Datenbank <b>%s</b> hat das Format <b>%s</b>, dieses Programm liest nur %s. Sie wurde vermutlich mit einer anderen GeneWeb-Version erstellt: verwenden Sie gwd aus dieser Version oder kompilieren Sie die Datenbank aus einem .gw-Export neu.
+en: Database <b>%s</b> is in format <b>%s</b>, this executable only reads %s. It was probably built by another GeneWeb version: use the gwd built with it, or recompile the base from a .gw export.
+fr: La base <b>%s</b> est au format <b>%s</b>, cet exécutable ne lit que %s. Elle a sans doute été produite par une autre version de GeneWeb : utilisez le gwd correspondant, ou recompilez la base depuis un export .gw.
+
     NOTIF_TT incorrect request
 ->: incorrect request
 

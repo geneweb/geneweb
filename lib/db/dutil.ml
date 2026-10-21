@@ -11,6 +11,37 @@ let magic_GnWb0021 = "GnWb0021"
 let magic_GnWb0022 = "GnWb0022"
 let magic_GnWb0023 = "GnWb0023"
 let magic_GnWb0024 = "GnWb0024"
+
+let base_magics =
+  [
+    magic_GnWb0024;
+    magic_GnWb0023;
+    magic_GnWb0022;
+    magic_GnWb0021;
+    magic_GnWb0020;
+  ]
+
+exception Incompatible_format of string * string * string list
+
+let printable_magic found =
+  let printable c = c >= ' ' && c <= '~' in
+  if found <> "" && String.for_all printable found then found else "?"
+
+let incompatible_format_message file found expected =
+  Printf.sprintf
+    "%s: unsupported format %S, this executable reads %s. The file was \
+     probably written by another GeneWeb version: use the gwd/gwu/gwc built \
+     with it, or recompile the base from a .gw export made with that version."
+    file (printable_magic found)
+    (String.concat ", " expected)
+
+let () =
+  Printexc.register_printer (fun exn ->
+      match exn with
+      | Incompatible_format (file, found, expected) ->
+          Some (incompatible_format_message file found expected)
+      | _ -> None)
+
 let table_size = 0x3fff
 let poi base i = base.data.persons.get i
 let aoi base i = base.data.ascends.get i
