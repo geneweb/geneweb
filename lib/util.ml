@@ -819,27 +819,6 @@ let strictly_after_private_years a lim =
   else if a.year < lim then false
   else a.month > 0 || a.day > 0
 
-let is_old_person conf p =
-  match
-    ( Date.cdate_to_dmy_opt p.birth,
-      Date.cdate_to_dmy_opt p.baptism,
-      p.death,
-      Date.dmy_of_death p.death )
-  with
-  | _, _, NotDead, _ when conf.private_years > 0 -> false
-  | Some d, _, _, _ ->
-      let a = Date.time_elapsed d conf.today in
-      strictly_after_private_years a conf.private_years
-  | _, Some d, _, _ ->
-      let a = Date.time_elapsed d conf.today in
-      strictly_after_private_years a conf.private_years
-  | _, _, _, Some d ->
-      let a = Date.time_elapsed d conf.today in
-      strictly_after_private_years a conf.private_years_death
-  | None, None, DontKnowIfDead, None ->
-      p.access <> Private && conf.public_if_no_date
-  | _ -> false
-
 let age_days conf _base p =
   match Date.od_of_cdate (Driver.get_birth p) with
   | Some (Dgreg (birth_dmy, cal)) -> (
@@ -915,12 +894,7 @@ let is_empty_name p =
   Driver.Istr.is_quest (Driver.get_surname p)
   && Driver.Istr.is_quest (Driver.get_first_name p)
 
-let is_public conf base p =
-  Driver.get_access p = Public
-  || conf.public_if_titles
-     && Driver.get_access p = IfTitles
-     && nobtit conf base p <> []
-  || is_old_person conf (Driver.gen_person_of_person p)
+let is_public conf base p = GWPARAM.p_auth ~view:GWPARAM.As_visitor conf base p
 
 (* ********************************************************************** *)
 (* [Fonc] accessible_by_key :
