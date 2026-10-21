@@ -266,8 +266,8 @@ let parameters env =
                   in
                   no_o := false;
                   loop (out :: "-o" :: comm) env
-            | "ot" when s <> "" ->loop (s :: "-o" :: comm) env
-            | "o1" when s <> "" ->loop (s :: "-o" :: comm) env
+            | "ot" when s <> "" -> loop (s :: "-o" :: comm) env
+            | "o1" when s <> "" -> loop (s :: "-o" :: comm) env
             | "oc_a" -> loop comm env
             | "oc_b" -> loop comm env
             | "od" -> loop comm env
@@ -1453,11 +1453,11 @@ let ged2gwb conn conf =
       ("-fne" :: "\"\"" :: parameters conf.env)
   in
   if Command.is_failure rc then print_file "err_standard.htm" conn conf
-  else (
+  else
     let bname = try List.assoc "o" conf.env with Not_found -> "" in
     Util.print_default_gwf_file bname;
     run_anoma conf;
-    print_file "create_ok.htm" conn conf)
+    print_file "create_ok.htm" conn conf
 
 let consang ok_file conn conf =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
@@ -1469,7 +1469,7 @@ let anoma conn conf =
   if Command.is_failure rc then print_file "err_standard.htm" conn conf
   else print_file "anoma_ok.htm" conn conf
 
-let update_nldb ok_file conn conf  =
+let update_nldb ok_file conn conf =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
   if Command.is_failure rc then print_file "err_standard.htm" conn conf
   else print_file ok_file conn conf
@@ -1524,14 +1524,21 @@ let setup_comm_ok conn comm conf =
   | "ged2gwb" -> with_opt_check ged2gwb_check ged2gwb conn conf
   | "gwb2ged" -> with_opt_check gwb2ged_check gwb2ged conn conf
   | "consang" ->
-      with_opt_check consang_check (fun c -> consang "consang_ok.htm" c) conn conf
+      with_opt_check consang_check
+        (fun c -> consang "consang_ok.htm" c)
+        conn conf
   | "update_nldb" ->
-      with_opt_check update_nldb_check (update_nldb "update_nldb_ok.htm") conn conf
+      with_opt_check update_nldb_check
+        (update_nldb "update_nldb_ok.htm")
+        conn conf
   | "cache_files" ->
-      with_opt_check cache_files_check (cache_files "cache_files_ok.htm") conn conf
+      with_opt_check cache_files_check
+        (cache_files "cache_files_ok.htm")
+        conn conf
   | "connex" -> with_opt_check connex_check (connex "connex_ok.htm") conn conf
   | "gwdiff" -> with_opt_check gwdiff_check (gwdiff "gwdiff_ok.htm") conn conf
-  | "gwfixbase" -> with_opt_check gwfixbase_check (gwfixbase "gwfix_ok.htm") conn conf
+  | "gwfixbase" ->
+      with_opt_check gwfixbase_check (gwfixbase "gwfix_ok.htm") conn conf
   | x ->
       if
         String.starts_with ~prefix:"doc/" x

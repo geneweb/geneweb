@@ -421,6 +421,9 @@ fr: Autour de l’arbre
       <a class="btn btn-outline-success" href="%prefix;m=ADD_FAM">%nn;
         <i class="fas fa-user-plus fa-fw me-1" aria-hidden="true"></i>[*add::family/families]0</a>
       %end;
+      %if;has_anomalies;
+        <a class="btn btn-outline-success" href="%prefix;&m=ANOMA">[*anomalies]</a>
+      %end;
     %end;
   </div>
 </div>
@@ -467,8 +470,6 @@ fr: Mon compte associatif
         <a class="btn btn-outline-success" href="https://asso.roglo.eu/page/358695-charte-des-lieux">Chartes des lieux</a>
         <a class="btn btn-outline-success" href="https://asso.roglo.eu/page/1409612-charte-des-sources">Chartes des sources</a>
         <a class="btn btn-outline-success" href="https://roglo.eu/wizard_w?lang=fr;m=NOTES;f=GeneWeb:Trucs">Trucs et astuces</a>
-        <a class="btn btn-outline-success" href="https://roglo.eu/wizard_w?lang=fr;m=NOTES;f=Admin:anoma">Anomalies</a>
-        <a class="btn btn-outline-success" href="%prefix;&m=ANOMA">Anomalies</a>
       %end;
     </div>
   </div>

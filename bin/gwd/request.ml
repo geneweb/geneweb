@@ -20,8 +20,8 @@ let this_request_updates_database conf =
       ( "ADD_FAM" | "CHANGE_WIZ_VIS" | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM"
       | "DEL_IMAGE" | "DEL_IND" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
       | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
-      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "SND_IMAGE"
-      | "UNKNOWN_OK" ) ->
+      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "OK_FOLD"
+      | "SND_IMAGE" | "UNKNOWN_OK" ) ->
       true
   | _ -> false
 
@@ -434,6 +434,7 @@ let treat_request =
                  | Some x ->
                      BirthdayDisplay.print_marriage conf base (int_of_string x)
                  | _ -> BirthdayDisplay.print_menu_marriage conf base)
+             | "ANOMA" -> w_wizard @@ w_base @@ AnomaDisplay.print_report
              | "AS" ->
                  w_base @@ fun conf base ->
                  SrcfileDisplay.print conf base "advanced"
@@ -683,6 +684,9 @@ let treat_request =
                      | _ -> NotesDisplay.print conf base)
              | "OA" -> w_base @@ BirthDeathDisplay.print_oldest_alive
              | "OE" -> w_base @@ BirthDeathDisplay.print_oldest_engagements
+             | "OK_ADD" -> w_wizard @@ w_base @@ AnomaDisplay.print_ok_add
+             | "OK_FILE" -> w_wizard @@ w_base @@ AnomaDisplay.print_ok_file
+             | "OK_FOLD" -> w_wizard @@ w_base @@ AnomaDisplay.print_ok_fold
              | "P" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
