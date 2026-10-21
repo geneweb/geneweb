@@ -15487,10 +15487,10 @@ de: Inkompatibles Datenbankformat!
 en: Incompatible database format!
 fr: Format de base incompatible !
 
-    NOTIF incompatible base %s %s %s
-de: Die Datenbank <b>%s</b> hat das Format <b>%s</b>, dieses Programm liest nur %s. Sie wurde vermutlich mit einer anderen GeneWeb-Version erstellt: verwenden Sie gwd aus dieser Version oder kompilieren Sie die Datenbank aus einem .gw-Export neu.
-en: Database <b>%s</b> is in format <b>%s</b>, this executable only reads %s. It was probably built by another GeneWeb version: use the gwd built with it, or recompile the base from a .gw export.
-fr: La base <b>%s</b> est au format <b>%s</b>, cet exécutable ne lit que %s. Elle a sans doute été produite par une autre version de GeneWeb : utilisez le gwd correspondant, ou recompilez la base depuis un export .gw.
+    NOTIF incompatible base %s
+de: Die Datenbank <b>%s</b> ist leer oder wurde mit einer anderen GeneWeb-Version erstellt und kann von dieser nicht geöffnet werden. Exportieren Sie sie mit der bisher verwendeten GeneWeb-Version als .gw-Datei und erstellen Sie sie anschließend mit der vorliegenden Version aus dieser Datei neu.
+en: Database <b>%s</b> is empty or was created by another version of GeneWeb and cannot be opened by this one. Export it as a .gw file with the GeneWeb version you used until now, then recreate it from that file with this version.
+fr: La base <b>%s</b> est vide ou a été créée par une autre version de GeneWeb et ne peut pas être ouverte par celle-ci. Exportez-la au format .gw avec la version de GeneWeb que vous utilisiez jusqu’ici, puis recréez-la à partir de ce fichier avec la présente version.
 
     NOTIF_TT incorrect request
 ->: incorrect request
