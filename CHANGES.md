@@ -32,6 +32,9 @@
   `update_nldb` once after upgrading (#2961).
 - Links inside `{...}` highlights are rendered as links; an unclosed `{`
   is displayed as typed (#2961).
+- The `robot` tool reads and writes the robot file with the same types as
+  gwd: `robot -status` no longer shows wrong request counts, and files it
+  writes are read correctly by gwd.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

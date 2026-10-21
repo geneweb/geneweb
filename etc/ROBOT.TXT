@@ -227,6 +227,6 @@ SECURITY CONSIDERATIONS
   efficient and manageable blacklist.
 
 For technical details, see source code in bin/gwd/robot.ml and 
-bin/robot/robot.ml.
+bin/robot/gwrobot.ml.
 
 ===============================================================================

@@ -16,6 +16,7 @@
  (libraries
   geneweb
   geneweb.oidc
+  geneweb.robot
   geneweb_http
   geneweb_register
   digestif

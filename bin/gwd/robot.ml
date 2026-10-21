@@ -7,31 +7,7 @@ let src = Logs.Src.create ~doc:"Robot" "ROB "
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Code = Geneweb_http.Code
-
-let magic_robot = "GWRB0008"
-
-module W = Map.Make (struct
-  type t = string
-
-  let compare = compare
-end)
-
-type norfriwiz = Normal | Friend of string | Wizard of string
-
-type who = {
-  acc_times : float list;
-  oldest_time : float;
-  nb_connect : int;
-  nbase : string;
-  utype : norfriwiz;
-}
-
-type excl = {
-  mutable excl : (string * int ref) list;
-  mutable who : who W.t;
-  mutable max_conn : int * string;
-  mutable last_summary : float;
-}
+include Geneweb_robot
 
 let is_log_worthy n =
   let rec check_power10 base =
@@ -97,10 +73,6 @@ let purge_who tm xcl sec =
   in
   List.iter (fun k -> xcl.who <- W.remove k xcl.who) to_remove
 
-let output_excl oc xcl =
-  output_string oc magic_robot;
-  output_value oc (xcl : excl)
-
 let robot_excl () =
   let fname =
     String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
@@ -130,12 +102,11 @@ let robot_excl () =
             new_data)
           else (
             close_in ic;
-            { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 })
+            empty ())
         with _ ->
           close_in ic;
-          { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 })
-    | None ->
-        { excl = []; who = W.empty; max_conn = (0, ""); last_summary = 0.0 }
+          empty ())
+    | None -> empty ()
   in
   (xcl, fname)
 
