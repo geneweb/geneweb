@@ -304,5 +304,12 @@
       </div>
     </div>
     %apply;create_data("excnt_witnwcnt","ww")
+    <div class="row mt-1">
+      <label for="excnt_witnwcnt_note" class="col-sm-2 col-form-label">[*note/notes]0</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" name="excnt_witnwcnt_note" id="excnt_witnwcnt_note" rows="1"
+          placeholder="[*note/notes]0 ([witness/witness/witnesses]0)">%ww_note;</textarea>
+      </div>
+    </div>
   </div>
 %end;
