@@ -65,14 +65,14 @@ start() {
 
 	gwlaunch_log "Starting gwd."
 	${GENEWEB_HOME}/share/dist/gw/gwd \
-	--daemon \
-	--plugins --unsafe ${GENEWEB_HOME}/share/dist/gw/plugins \
-	--trace_failed_passwd \
-	--lang fr \
-	--bd ${GENEWEB_BASE_PATH} \
-	--hd ${GENEWEB_HOME}/share/dist/gw \
-	--digest \
-	--log ${GENEWEB_HOME}/log/gwd.log \
+	-daemon \
+	-plugins -unsafe ${GENEWEB_HOME}/share/dist/gw/plugins \
+	-trace_failed_passwd \
+	-lang fr \
+	-bd ${GENEWEB_BASE_PATH} \
+	-hd ${GENEWEB_HOME}/share/dist/gw \
+	-digest \
+	-log ${GENEWEB_HOME}/log/gwd.log \
 	$AUTH_ARG 2>&1
 	#	-cache-in-memory ${GENEWEB_DB} \ # Preload this database in memory
 	gwlaunch_log "-- Started gwd!"
